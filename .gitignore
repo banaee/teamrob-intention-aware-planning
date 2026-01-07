@@ -23,3 +23,10 @@ Thumbs.db
 # Project specific
 *.log
 .pytest_cache/
+
+# Generated file from scripts/domain_assembler.py
+configs/domain.yaml  
+
+# my docs
+docs/my_*
+
