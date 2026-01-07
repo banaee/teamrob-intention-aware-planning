@@ -84,10 +84,10 @@ def convert_gazebo_to_domain(gazebo_json_path=None, output_path='configs/domain.
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     if gazebo_json_path is None:
-        print("⚠️  No Gazebo JSON provided - generating test data")
+        print("No Gazebo JSON provided - generating test data")
         domain = generate_test_domain()
     else:
-        print(f"📄 Parsing Gazebo JSON from {gazebo_json_path}")
+        print(f"Parsing Gazebo JSON from {gazebo_json_path}")
         # TODO: Implement actual Gazebo parsing
         raise NotImplementedError("Gazebo JSON parsing not yet implemented")
     
@@ -95,10 +95,10 @@ def convert_gazebo_to_domain(gazebo_json_path=None, output_path='configs/domain.
     with open(output_path, 'w') as f:
         yaml.dump(domain, f, default_flow_style=False, sort_keys=False)
     
-    print(f"✅ Generated domain config at {output_path}")
+    print(f"Generated domain config at {output_path}")
     
     # Summary
-    print(f"\n📊 Domain Summary:")
+    print(f"\nDomain Summary:")
     print(f"  - Shelves: {len(domain['shelves'])}")
     print(f"  - Items: {len(domain['items'])}")
     print(f"  - Zones: {len(domain['zones'])}")
@@ -116,15 +116,10 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    if args.input:
-        print(f"Using Gazebo JSON input: {args.input}")
-        convert_gazebo_to_domain(
+    convert_gazebo_to_domain(
             gazebo_json_path=args.input,
             output_path=args.output
         )
-    else:
-        print("No Gazebo JSON input provided; using test data.")
-        generate_test_domain()
 
     
     print(f"Domain assembly complete. file {args.output} generated.")    
