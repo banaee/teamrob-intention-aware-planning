@@ -25,7 +25,7 @@ Thumbs.db
 .pytest_cache/
 
 # Generated file from scripts/domain_assembler.py
-configs/domain.yaml  
+# configs/domain.yaml  
 
 # my docs
 docs/my_*
