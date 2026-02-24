@@ -1,0 +1,45 @@
+# configs/actions_library.yaml
+# Action Type Decomposition Library
+# Defines terminal microactions and how each action type decomposes
+#
+# Conventions:
+#   "STEP*"  = dynamic expansion: path planning generates N STEP microactions at runtime
+#   "STAND*" = dynamic expansion: duration generates N STAND microactions at runtime
+#   {param}  = placeholder resolved at runtime from task/domain context
+
+# ---------------------------------------------------------------------------
+# Terminal microactions (atomic, not decomposed further)
+# ---------------------------------------------------------------------------
+microactions:
+  - STEP    # single movement step toward a position
+  - GRASP   # pick up an item
+  - RELEASE # put down an item
+  - STAND   # remain stationary for one timestep
+
+# ---------------------------------------------------------------------------
+# Action decomposition rules
+# ---------------------------------------------------------------------------
+actions:
+
+  GOTO_ZONE:
+    parameters: [zone_id]
+    decomposes_to:
+      - "MOVE_TO({zone_id})"   # delegates to MOVE_TO; zone centroid resolved at runtime
+
+  MOVE_TO:
+    parameters: [target]       # target = entity id or coordinate
+    decomposes_to: "STEP*"     # path planner expands to N STEP microactions at runtime
+
+  PICK_UP:
+    parameters: [item_id]
+    decomposes_to:
+      - "GRASP"                # single microaction
+
+  PLACE:
+    parameters: [item_id, target_holder]
+    decomposes_to:
+      - "RELEASE"              # single microaction
+
+  WAIT_AT:
+    parameters: [entity_id, duration]   # duration in ISO 8601 e.g. PT5M, PT20S
+    decomposes_to: "STAND*"             # duration converted to N STAND steps at runtime

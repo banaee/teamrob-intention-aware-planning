@@ -1,0 +1,47 @@
+# configs/tasks_library.yaml
+# Task Type Library
+# Defines action sequences for assigned and foreseeable task types
+#
+# Conventions:
+#   {param}       = placeholder bound from task parameters at instantiation
+#   {param_zone}  = zone resolved from a domain object at runtime
+#                   e.g. {item_zone} = zone of the item referenced by {item_id}
+#   origin:
+#     assigned    = explicitly assigned as team task
+#     foreseeable = observable human behavior not part of assigned work
+
+# ---------------------------------------------------------------------------
+# Assigned tasks
+# ---------------------------------------------------------------------------
+assigned_tasks:
+
+  - name: DELIVER_ITEM
+    parameters: [item_id]
+    origin: assigned
+    actions:
+      - "GOTO_ZONE({item_zone})"          # {item_zone} resolved from item_id.zone at runtime
+      - "PICK_UP({item_id})"
+      - "MOVE_TO(kitting_table)"
+      - "PLACE({item_id}, kitting_table)"
+
+# ---------------------------------------------------------------------------
+# Foreseeable tasks
+# Human behaviors the robot must recognize but are not team-assigned work
+# ---------------------------------------------------------------------------
+foreseeable_tasks:
+
+  - name: COFFEE_BREAK
+    parameters: []                        # no external params; targets are domain constants
+    origin: foreseeable
+    actions:
+      - "GOTO_ZONE(zone_SW)"
+      - "MOVE_TO(coffee_machine_1)"
+      - "WAIT_AT(coffee_machine_1, PT5M)"
+
+  - name: AC_ACTIVATION
+    parameters: []
+    origin: foreseeable
+    actions:
+      - "GOTO_ZONE(zone_SW)"
+      - "MOVE_TO(ac_switch_1)"
+      - "WAIT_AT(ac_switch_1, PT20S)"
