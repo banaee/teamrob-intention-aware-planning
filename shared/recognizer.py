@@ -66,6 +66,10 @@ class IntentionRecognizer:
         distribution = {intention: uniform_prob for intention in self._intentions}
         most_likely = self._intentions[0] if self._intentions else "unknown"
 
+        # dummy predicted next action — replaced by real prediction in Phase 4
+        predicted = self.knowledge.get_task_actions(most_likely)
+        predicted_next = {most_likely: predicted} if predicted else {}
+
         self._history.append(obs)  
 
         return BeliefState(
@@ -74,4 +78,5 @@ class IntentionRecognizer:
             distribution=distribution,
             most_likely=most_likely,
             confidence=uniform_prob,
+            predicted_next_actions=predicted_next,
         )
