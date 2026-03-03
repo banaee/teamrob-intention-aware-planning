@@ -69,7 +69,11 @@ class BeliefState:
 
 @dataclass
 class AgentState:
-    """Symbolic state of a single agent."""
+    """
+    Symbolic state of a single agent.
+    Built by: SIM_sim/world_state_builder.py while processing simulator state each MESA step or each ROS callback (or when requested by planner).
+    Consumed by: shared/planner.py, shared/replanning.py
+    """
     agent_id: str
     current_zone: str
     holding: Optional[str] = None  # item_id or None
@@ -80,8 +84,11 @@ class AgentState:
 @dataclass
 class WorldState:
     """
-    Symbolic representation of the environment.
-    Built by embodiment layers, consumed by cognitive layer.
+    Symbolic representation (snapshot) of the environment at a given time.
+    Built by embodiment layers, consumed by cognitive layer. 
+    Bulit by SIM_sim/world_state_builder.py in each Mesa step or each ROS callback (or when requested by planner).
+    Consumed by: shared/planner.py, shared/replanning.py
+    Note: not persistent: created fresh each step, passed as argument, discarded.    
     """
     timestamp: float
     agent_states: Dict[str, AgentState]  # {agent_id: AgentState}
