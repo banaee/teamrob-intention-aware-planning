@@ -8,40 +8,40 @@
   {
     "id": "zone_SE",
     "bounds": {
-      "x_min": 800,
-      "x_max": 1600,
-      "y_min": 0,
-      "y_max": 400
+      "x_min": 0,
+      "x_max": 1000,
+      "y_min": -500,
+      "y_max": 0
     },
     "label": "southeast_storage"
   },
   {
     "id": "zone_SW",
     "bounds": { 
-      "x_min": 0,
-      "x_max": 800,
-      "y_min": 0,
-      "y_max": 400
+      "x_min": -1000,
+      "x_max": 0,
+      "y_min": -500,
+      "y_max": 0
     },
     "label": "southwest_storage"
   },
   {
     "id": "zone_NW",
     "bounds": {
-      "x_min": 0,
-      "x_max": 800,
-      "y_min": 400,
-      "y_max": 800
+      "x_min": -1000,
+      "x_max": 0,
+      "y_min": 0,
+      "y_max": 500
     },
     "label": "northwest_work"
   },
   {
     "id": "zone_NE",
     "bounds": {
-      "x_min": 800,
-      "x_max": 1600,
-      "y_min": 400,
-      "y_max": 800
+      "x_min": 0,
+      "x_max": 1000,
+      "y_min": 0,
+      "y_max": 500
     },
     "label": "northeast_work"
   }
@@ -66,7 +66,7 @@
     "position": [-1000, 0],
     "size": [150, 40],
     "slots": 4,
-    "zone": "zone_W"
+    "zone": "zone_SW"
   },
   {
     "id": "shelf_3",
@@ -87,7 +87,7 @@
     "position": [1000, 0],
     "size": [150, 40],
     "slots": 4,
-    "zone": "zone_E"
+    "zone": "zone_SE"
   },
   {
     "id": "shelf_6",
@@ -105,7 +105,7 @@
   }
 ],
 "kitting_table": {
-  "position": [-200, 600],
+  "position": [-200, 400],
   "size": [200, 100],
   "zone": "zone_NW"
 },
@@ -165,7 +165,7 @@
     "id": "coffee_machine_0",
     "position": [-1000, -380],
     "size": [50, 50],
-    "zone": "zone_S"
+    "zone": "zone_SW"
   }
 ],
 "AC_switches": [
@@ -173,14 +173,14 @@
     "id": "AC_switch_0",
     "position": [1000, -420],
     "size": [50, 50],
-    "zone": "zone_S"
+    "zone": "zone_SW"
   }
 ],
 "robots": [
   {
     "id": "robot_0",
     "type": "mobile_manipulator",
-    "initial_location": "zone_NW",
+    "initial_location": "zone_NE",
     "initial_x": 200,
     "initial_y": 200
   }
@@ -189,7 +189,7 @@
   {
     "id": "human_0",
     "type": "worker",
-    "initial_location": "zone_NW",
+    "initial_location": "zone_SW",
     "initial_x": -400,
     "initial_y": -300
   }
