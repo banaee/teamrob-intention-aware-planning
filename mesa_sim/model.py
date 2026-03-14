@@ -38,9 +38,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import mesa
-from mesa.space import ContinuousSpace
-from mesa.time import BaseScheduler
+from mesa_fork.space import ContinuousSpace
+from mesa_fork.time import BaseScheduler
+from mesa_fork import Agent, Model
+from mesa_sim import mesa_fork
+
 
 # Agents imported here — defined in mesa_sim/agents.py
 # from mesa_sim.agents import HumanAgent, RobotAgent  # uncomment when agents.py exists
@@ -77,7 +79,7 @@ class ItemObject:
 # FactoryModel
 # =============================================================================
 
-class FactoryModel(mesa.Model):
+class FactoryModel(mesa_fork.Model):
 
     def __init__(self,
                  scenario_id: str,
@@ -149,7 +151,7 @@ class FactoryModel(mesa.Model):
         # ------------------------------------------------------------------
         # DataCollector (stub)
         # ------------------------------------------------------------------
-        self.datacollector = mesa.DataCollector(
+        self.datacollector = mesa_fork.DataCollector(
             model_reporters={"Step": lambda m: m.schedule.steps},
             agent_reporters={"Position": lambda a: getattr(a, "pos", None)}
         )

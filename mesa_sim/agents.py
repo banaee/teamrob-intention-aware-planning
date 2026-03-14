@@ -36,8 +36,12 @@ STEP ORDER (RobotAgent):
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Dict, Any
 
-import mesa
+from mesa_fork.space import ContinuousSpace
+from mesa_fork.time import BaseScheduler
+from mesa_fork import Agent, Model
 
+
+from mesa_sim import mesa_fork
 from shared.knowledge import KnowledgeBase
 from shared.recognizer import IntentionRecognizer
 from shared.planner import AdaptivePlanner
@@ -58,7 +62,7 @@ if TYPE_CHECKING:
 # Base agent — shared physical attributes
 # =============================================================================
 
-class FactoryAgent(mesa.Agent):
+class FactoryAgent(mesa_fork.Agent):
     """
     Base class for all mobile agents in the factory.
     Holds physical state only — no cognitive logic here.
