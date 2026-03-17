@@ -42,6 +42,7 @@ from mesa_fork import Agent, Model
 
 
 from mesa_sim import mesa_fork
+from mesa_sim.obs_builder import build_observation
 from shared.knowledge import KnowledgeBase
 from shared.recognizer import IntentionRecognizer
 from shared.planner import AdaptivePlanner
@@ -220,11 +221,11 @@ class RobotAgent(FactoryAgent):
         # 2. Build Observation from human's current Mesa state
         # ------------------------------------------------------------------
         # TODO: uncomment when obs_builder.py exists
-        # obs = build_observation(
-        #     human_agent=human,
-        #     model=self.model,
-        #     timestamp=float(self.model.schedule.steps)
-        # )
+        obs = build_observation(
+            human_agent=human,
+            model=self.model,
+            timestamp=float(self.model.schedule.steps)
+        )
 
         # Skeleton stub
         obs = None  # placeholder — obs_builder not yet available
