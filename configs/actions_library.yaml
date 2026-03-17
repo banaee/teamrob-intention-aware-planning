@@ -23,23 +23,28 @@ actions:
 
   GOTO_ZONE:
     parameters: [zone_id]
+    completion_predicate: "at({agent_id}, {zone_id})"
     decomposes_to:
-      - "MOVE_TO({zone_id})"   # delegates to MOVE_TO; zone centroid resolved at runtime
+      - "MOVE_TO({zone_id})"
 
   MOVE_TO:
-    parameters: [target]       # target = entity id or coordinate
-    decomposes_to: "STEP*"     # path planner expands to N STEP microactions at runtime
+    parameters: [target]
+    completion_predicate: "at({agent_id}, {target})"
+    decomposes_to: "STEP*"
 
   PICK_UP:
     parameters: [item_id]
+    completion_predicate: "holding({agent_id}, {item_id})"
     decomposes_to:
-      - "GRASP"                # single microaction
+      - "GRASP"
 
   PLACE:
     parameters: [item_id, target_holder]
+    completion_predicate: "item_at({item_id}, {target_holder})"
     decomposes_to:
-      - "RELEASE"              # single microaction
+      - "RELEASE"
 
   WAIT_AT:
-    parameters: [entity_id, duration]   # duration in ISO 8601 e.g. PT5M, PT20S
-    decomposes_to: "STAND*"             # duration converted to N STAND steps at runtime
+    parameters: [entity_id, duration]
+    completion_predicate: "waited_at({agent_id}, {entity_id})"
+    decomposes_to: "STAND*"
