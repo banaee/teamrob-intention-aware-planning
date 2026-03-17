@@ -89,6 +89,7 @@ class AdaptivePlanner:
             actions.append(
                 AbstractAction(
                     action_type=ActionType.NAVIGATE,  # TODO Phase 4: map action_name to correct ActionType
+                    action_name=action_name,
                     parameters={"raw": action_str, "action_name": action_name},
                 )
             )

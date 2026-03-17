@@ -70,3 +70,10 @@ separately in `mesa_sim/mesa_configs.yaml`.
 **One micro-action per Mesa step**
 Each Mesa step advances exactly one micro-action per agent.
 This enforces the observable micro-action assumption from the paper formalization.
+
+
+**Predicate schema is implicit (to be formalized)**
+WorldState predicates are currently generated ad-hoc in world_state_builder.py.
+completion_predicate templates in actions_library.yaml must manually match.
+Phase 4: define explicit predicate schema in domain1.json (:predicates block)
+and validate both sides against it via KnowledgeBase.

@@ -80,7 +80,18 @@ class AgentState:
     current_task: Optional[str] = None  # task_id or None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
+@dataclass(frozen=True)
+class Predicate:
+    name: str
+    args: tuple  # e.g. ("robot_0", "zone_NW")
 
+    def __str__(self):
+        return f"{self.name}({', '.join(self.args)})"
+    
+    def __repr__(self):
+        return self.__str__()
+    
+    
 @dataclass
 class WorldState:
     """
@@ -93,7 +104,7 @@ class WorldState:
     timestamp: float
     agent_states: Dict[str, AgentState]  # {agent_id: AgentState}
     object_locations: Dict[str, str]  # {object_id: location_id}
-    predicates: Set[str] = field(default_factory=set)  # e.g., "path_clear", "human_at_table"
+    predicates: Set[Predicate] = field(default_factory=set)  # e.g., "path_clear", "human_at_table"
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -117,6 +128,7 @@ class AbstractAction:
     The planner outputs these; embodiment layers interpret them.
     """
     action_type: ActionType
+    action_name: str = ""  # e.g. "GOTO_ZONE", "PICK_UP" — added to AbstractAction for better mapping from raw action strings in KnowledgeBase 
     parameters: Dict[str, Any]  # e.g., {"target": "shelf_3", "item": "item_7"}
     
     # Optional execution hints (Mesa may use directly, ROS may ignore)

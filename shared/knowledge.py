@@ -30,17 +30,39 @@ from typing import Dict, List
 
 class KnowledgeBase:
 
-    def __init__(self, tasks_data: dict, actions_data: dict):
+    def __init__(self, tasks_data: dict, actions_data: dict, costs_data: dict = None):
         self._tasks = tasks_data
         self._actions = actions_data
+        self._costs = costs_data or {}
+
 
     @classmethod
-    def from_yaml(cls, tasks_path: str, actions_path: str) -> "KnowledgeBase":
+    def from_yaml(cls, tasks_path: str, actions_path: str,
+                costs_path: str = None) -> "KnowledgeBase":
         with open(tasks_path, "r") as f:
             tasks_data = yaml.safe_load(f)
         with open(actions_path, "r") as f:
             actions_data = yaml.safe_load(f)
-        return cls(tasks_data, actions_data)
+        costs_data = {}
+        if costs_path:
+            with open(costs_path, "r") as f:
+                costs_data = yaml.safe_load(f)
+        return cls(tasks_data, actions_data, costs_data)
+
+
+    def get_action_completion_predicate(self, action_name: str) -> str:
+        # returns e.g. "at({agent_id}, {zone_id})"
+        actions = self._actions.get("actions", {})
+        action = actions.get(action_name, {})
+        return action.get("completion_predicate", "")
+
+    def get_task_completion_predicate(self, task_name: str) -> str:
+        # returns e.g. "item_at({item_id}, kitting_table)"
+        for section in ["assigned_tasks", "foreseeable_tasks"]:
+            for task in self._tasks.get(section, []):
+                if task["name"] == task_name:
+                    return task.get("completion_predicate", "")
+        return ""
 
     # -------------------------------------------------------------------------
     # Intention set T
