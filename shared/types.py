@@ -128,8 +128,8 @@ class AbstractAction:
     The planner outputs these; embodiment layers interpret them.
     """
     action_type: ActionType
-    action_name: str = ""  # e.g. "GOTO_ZONE", "PICK_UP" — added to AbstractAction for better mapping from raw action strings in KnowledgeBase 
     parameters: Dict[str, Any]  # e.g., {"target": "shelf_3", "item": "item_7"}
+    action_name: str = ""  # e.g. "GOTO_ZONE", "PICK_UP" — added to AbstractAction for better mapping from raw action strings in KnowledgeBase 
     
     # Optional execution hints (Mesa may use directly, ROS may ignore)
     estimated_path: Optional[List[Tuple[float, float]]] = None

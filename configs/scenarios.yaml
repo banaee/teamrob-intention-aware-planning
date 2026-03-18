@@ -15,14 +15,14 @@ scenarios:
       Robot must recognize the deviation and replan accordingly.
 
     # Environment to load (must match configs/domain.yaml)
-    domain: test_kitting_cell
+    domain: domain1  #old name: test_kitting_cell
 
     # Agent definitions
     agents:
 
-      - id: human_1
+      - id: human_0
         type: human
-        start_position: [400, 600]      # zone_NW, near kitting table
+        start_position: [-400, -300]   # zone_SW, center-origin
         assigned_tasks:
           - task: DELIVER_ITEM
             parameters: {item_id: item_1}   # item_1 on shelf_1 (zone_SW)
@@ -33,12 +33,12 @@ scenarios:
           after_task: 0                 # index into assigned_tasks (0 = after item_1)
           task: COFFEE_BREAK
 
-      - id: robot_1
+      - id: robot_0
         type: robot
-        start_position: [1200, 600]     # zone_NE
+        start_position: [200, 200]     # zone_NW, center-origin
         assigned_tasks:
           - task: DELIVER_ITEM
             parameters: {item_id: item_3}   # item_3 on shelf_3 (zone_SE)
           - task: DELIVER_ITEM
             parameters: {item_id: item_2}   # fallback if human skips it
-        observes: [human_1]             # which agents this robot monitors
+        observes: [human_0]             # which agents this robot monitors
