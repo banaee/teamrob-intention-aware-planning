@@ -40,13 +40,9 @@ from typing import Dict, List, Optional, Tuple
 
 from mesa_fork.space import ContinuousSpace
 from mesa_fork.time import BaseScheduler
-from mesa_fork import Agent, Model
 from mesa_sim import mesa_fork
 from shared.knowledge import KnowledgeBase
 from mesa_sim.agents import HumanAgent, RobotAgent
-
-# Agents imported here — defined in mesa_sim/agents.py
-# from mesa_sim.agents import HumanAgent, RobotAgent  # uncomment when agents.py exists
 
 
 # =============================================================================
@@ -283,6 +279,8 @@ class FactoryModel(mesa_fork.Model):
                     unique_id=agent_id,
                     model=self,
                     pos=start_pos,
+                    knowledge=self.knowledge,
+                    assigned_tasks=agent_cfg.get("assigned_tasks", []),
                     observed_agent_id=agent_cfg.get("observes", [None])[0]
                 )
                 self.space.place_agent(agent, start_pos)

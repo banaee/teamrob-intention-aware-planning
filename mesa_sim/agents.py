@@ -48,13 +48,6 @@ from shared.replanning import should_replan
 from shared.types import AbstractPlan, BeliefState
 
 
-
-# Translation layer imports — defined in sibling files
-# Imported here as stubs; will resolve once those files exist
-# from mesa_sim.obs_builder import build_observation
-# from mesa_sim.world_state_builder import build_world_state
-# from mesa_sim.executor import Executor
-
 if TYPE_CHECKING:
     from mesa_sim.model import FactoryModel
 
@@ -71,7 +64,7 @@ class FactoryAgent(mesa_fork.Agent):
 
     def __init__(self, unique_id: str, model: FactoryAgent, pos: tuple):
         super().__init__(unique_id, model)
-        self.pos: tuple = pos               # (x, y) in center-origin coordinates
+        # self.pos: tuple = pos               # (x, y) in center-origin coordinates
         self.carrying: Optional[str] = None # item_id if holding an item, else None
         self.current_task: Optional[str] = None    # task name string
         self.current_action: Optional[str] = None  # action name string
