@@ -36,18 +36,18 @@ STEP ORDER (RobotAgent):
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Dict, Any
 
-from mesa_fork.space import ContinuousSpace
-from mesa_fork.time import BaseScheduler
-from mesa_fork import Agent, Model
-
-
 from mesa_sim import mesa_fork
 from mesa_sim.obs_builder import build_observation
+from mesa_sim.world_state_builder import build_world_state
+from mesa_sim.executor import Executor
+
 from shared.knowledge import KnowledgeBase
 from shared.recognizer import IntentionRecognizer
 from shared.planner import AdaptivePlanner
 from shared.replanning import should_replan
 from shared.types import AbstractPlan, BeliefState
+
+
 
 # Translation layer imports — defined in sibling files
 # Imported here as stubs; will resolve once those files exist
@@ -112,7 +112,7 @@ class HumanAgent(FactoryAgent):
 
         # Executor handles microaction-level execution each step
         # TODO: uncomment when executor.py exists
-        # self.executor = Executor(agent=self)
+        self.executor = Executor(agent=self, knowledge=model.knowledge)
 
     def step(self):
         """
@@ -123,19 +123,27 @@ class HumanAgent(FactoryAgent):
         if self.finished:
             return
 
-        # TODO: replace with executor call when executor.py exists
-        # self.executor.step()
-        # self.current_task = self.executor.current_task
-        # self.current_action = self.executor.current_action
-        # self.current_microaction = self.executor.current_microaction
 
-        # Skeleton stub: just report current script entry
-        if self.script_index < len(self.script):
-            entry = self.script[self.script_index]
-            self.current_task = entry["task"]
-        else:
+        entry = self.get_current_script_entry()
+        if entry is None:
             self.finished = True
             self.current_task = None
+            return
+        
+        plan = self._script_entry_to_plan(entry)
+        world = build_world_state(self.model)
+        self._execute(plan=plan, world=world)
+
+
+
+
+    def _execute(self, plan, world):
+        self.executor.step(plan=plan, world=world)
+        self.current_task = self.executor.current_task
+        self.current_action = self.executor.current_action
+        self.current_microaction = self.executor.current_microaction
+        
+        
 
     def get_current_script_entry(self) -> Optional[Dict[str, Any]]:
         """Return the current task entry from script. Used by obs_builder."""
@@ -199,8 +207,7 @@ class RobotAgent(FactoryAgent):
         self.current_plan: Optional[AbstractPlan] = None
 
         # Executor handles microaction-level execution each step
-        # TODO: uncomment when executor.py exists
-        # self.executor = Executor(agent=self)
+        self.executor = Executor(agent=self, knowledge=knowledge)
 
     def step(self):
         """
@@ -220,15 +227,11 @@ class RobotAgent(FactoryAgent):
         # ------------------------------------------------------------------
         # 2. Build Observation from human's current Mesa state
         # ------------------------------------------------------------------
-        # TODO: uncomment when obs_builder.py exists
         obs = build_observation(
             human_agent=human,
             model=self.model,
             timestamp=float(self.model.schedule.steps)
         )
-
-        # Skeleton stub
-        obs = None  # placeholder — obs_builder not yet available
 
         # ------------------------------------------------------------------
         # 3. Update belief over human intentions
@@ -243,10 +246,7 @@ class RobotAgent(FactoryAgent):
         # ------------------------------------------------------------------
         # 4. Build WorldState snapshot
         # ------------------------------------------------------------------
-        # TODO: uncomment when world_state_builder.py exists
-        # world = build_world_state(model=self.model)
-
-        world = None  # placeholder — world_state_builder not yet available
+        world = build_world_state(model=self.model)
 
         # ------------------------------------------------------------------
         # 5. Check replanning trigger
@@ -275,12 +275,24 @@ class RobotAgent(FactoryAgent):
         # ------------------------------------------------------------------
         # 7. Execute one microaction from current plan
         # ------------------------------------------------------------------
-        self._execute()
+        self._execute(plan=self.current_plan, world=world)
 
     # =========================================================================
     # Internal helpers
     # =========================================================================
 
+    def _execute(self, plan, world):
+        """
+        Execute one microaction from current_plan via executor.
+        Stubbed until executor.py exists.
+        """
+        self.executor.step(plan=plan, world=world)
+        self.current_task = self.executor.current_task
+        self.current_action = self.executor.current_action
+        self.current_microaction = self.executor.current_microaction
+        
+        
+        
     def _get_observed_human(self) -> Optional[HumanAgent]:
         """Return the HumanAgent this robot is observing, or None."""
         if self.observed_agent_id is None:
@@ -293,17 +305,6 @@ class RobotAgent(FactoryAgent):
             return self.assigned_tasks[self.task_index]["task"]
         return None
 
-    def _execute(self):
-        """
-        Execute one microaction from current_plan via executor.
-        Stubbed until executor.py exists.
-        """
-        # TODO: uncomment when executor.py exists
-        # self.executor.step()
-        # self.current_task = self.executor.current_task
-        # self.current_action = self.executor.current_action
-        # self.current_microaction = self.executor.current_microaction
-        pass
 
     def advance_task(self):
         """Called by executor when current assigned task completes."""

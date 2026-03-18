@@ -204,19 +204,19 @@ def SolaraViz(
         # --------------------------------------------------------------
         with solara.Card("Information", margin=1, elevation=2):
             solara.Markdown(md_text=f"Step - {current_step}")
-            solara.Markdown(md_text=f"robot pos - {model.robots['robot_1'].pos}")
-            solara.Markdown(md_text=f"human pos - {model.humans['human_1'].pos}")
+            solara.Markdown(md_text=f"robot pos - {model.robots['robot_0'].pos}")
+            solara.Markdown(md_text=f"human pos - {model.humans['human_0'].pos}")
             # solara.Markdown(md_text=f"kitting table pos - {model.kitting_table.pos}")
             # for sh_id, shelf in model.shelves.items():
             #     solara.Markdown(md_text=f"shelf {sh_id} pos - {shelf.pos}")
             # for i_id, item in model.items.items():
             #     solara.Markdown(md_text=f"item {i_id} pos - {item.pos}")
 
-            # solara.Markdown(md_text=f"robot task actions - {model.robots['robot_1'].task_actions}")
-            # solara.Markdown(md_text=f"human task actions - {model.humans['human_1'].task_actions}")
-            
-            # solara.Markdown(md_text=f"robot task actions - {model.robots['robot_1'].current_action}")
-            # solara.Markdown(md_text=f"human task actions - {model.humans['human_1'].current_action}")                
+            # solara.Markdown(md_text=f"robot task actions - {model.robots['robot_0'].task_actions}")
+            # solara.Markdown(md_text=f"human task actions - {model.humans['human_0'].task_actions}")
+
+            # solara.Markdown(md_text=f"robot task actions - {model.robots['robot_0'].current_action}")
+            # solara.Markdown(md_text=f"human task actions - {model.humans['human_0'].current_action}")                
 
     # main body
     items = [

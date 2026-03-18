@@ -42,7 +42,8 @@ from mesa_fork.space import ContinuousSpace
 from mesa_fork.time import BaseScheduler
 from mesa_fork import Agent, Model
 from mesa_sim import mesa_fork
-
+from shared.knowledge import KnowledgeBase
+from mesa_sim.agents import HumanAgent, RobotAgent
 
 # Agents imported here — defined in mesa_sim/agents.py
 # from mesa_sim.agents import HumanAgent, RobotAgent  # uncomment when agents.py exists
@@ -125,6 +126,14 @@ class FactoryModel(mesa_fork.Model):
             z["id"]: z["bounds"] for z in domain.get("zones", [])
         }
 
+        # ------------------------------------------------------------------
+        # KnowledgeBase — loaded once, shared across agents
+        # ------------------------------------------------------------------
+        self.knowledge = KnowledgeBase.from_yaml(
+            tasks_path="configs/tasks_library.yaml",
+            actions_path="configs/actions_library.yaml"
+        )
+        
         # ------------------------------------------------------------------
         # Environment objects registry
         # {obj_id: EnvObject}  and  {item_id: ItemObject}
@@ -258,31 +267,27 @@ class FactoryModel(mesa_fork.Model):
             start_pos = tuple(agent_cfg["start_position"])
 
             if agent_type == "human":
-                # TODO: uncomment when agents.py exists
-                # script = self._build_human_script(agent_cfg)
-                # agent = HumanAgent(
-                #     unique_id=agent_id,
-                #     model=self,
-                #     script=script,
-                #     pos=start_pos
-                # )
-                # self.space.place_agent(agent, start_pos)
-                # self.schedule.add(agent)
-                # self.humans[agent_id] = agent
-                pass  # placeholder until agents.py exists
+                script = self._build_human_script(agent_cfg)
+                agent = HumanAgent(
+                    unique_id=agent_id,
+                    model=self,
+                    pos=start_pos,
+                    script=script
+                )
+                self.space.place_agent(agent, start_pos)
+                self.schedule.add(agent)
+                self.humans[agent_id] = agent
 
             elif agent_type == "robot":
-                # TODO: uncomment when agents.py exists
-                # agent = RobotAgent(
-                #     unique_id=agent_id,
-                #     model=self,
-                #     pos=start_pos,
-                #     observed_agent_id=agent_cfg.get("observes", [None])[0]
-                # )
-                # self.space.place_agent(agent, start_pos)
-                # self.schedule.add(agent)
-                # self.robots[agent_id] = agent
-                pass  # placeholder until agents.py exists
+                agent = RobotAgent(
+                    unique_id=agent_id,
+                    model=self,
+                    pos=start_pos,
+                    observed_agent_id=agent_cfg.get("observes", [None])[0]
+                )
+                self.space.place_agent(agent, start_pos)
+                self.schedule.add(agent)
+                self.robots[agent_id] = agent
 
     def _build_human_script(self, agent_cfg: dict) -> list:
         """
