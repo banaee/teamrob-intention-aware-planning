@@ -29,7 +29,7 @@ USED BY:
 import solara
 import plotly.graph_objects as go
 
-from mesa_sim.agents import HumanAgent, RobotAgent
+from mesa_sim.sim_agents import HumanAgent, RobotAgent
 
 
 OBJ_COLORS = {

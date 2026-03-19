@@ -43,7 +43,7 @@ from typing import TYPE_CHECKING, Dict, Set
 from shared.types import AgentState, WorldState, Predicate
 
 if TYPE_CHECKING:
-    from mesa_sim.model import FactoryModel
+    from mesa_sim.sim_model import FactoryModel
 
 
 def build_world_state(model: FactoryModel) -> WorldState:

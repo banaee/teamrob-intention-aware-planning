@@ -21,7 +21,7 @@ AGENTS:
 WHAT THIS MODULE DOES NOT DO:
     - No IR logic lives here — that is shared/recognizer.py
     - No planning logic lives here — that is shared/planner.py
-    - No microaction expansion lives here — that is mesa_sim/microactions.py
+    - No microaction expansion lives here — that is mesa_sim/action_decomposer.py
     - No WorldState construction lives here — that is mesa_sim/world_state_builder.py
     - No Observation construction lives here — that is mesa_sim/obs_builder.py
 
@@ -36,33 +36,39 @@ STEP ORDER (RobotAgent):
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Dict, Any
 
-from mesa_sim import mesa_fork
-from mesa_sim.obs_builder import build_observation
-from mesa_sim.world_state_builder import build_world_state
-from mesa_sim.executor import Executor
-
+# imports from shared cognitive layer
 from shared.knowledge import KnowledgeBase
 from shared.recognizer import IntentionRecognizer
 from shared.planner import AdaptivePlanner
 from shared.replanning import should_replan
-from shared.types import AbstractPlan, BeliefState
+from shared.types import AbstractPlan, AbstractAction, ActionType, BeliefState
+
+
+# imports from FORK, Mesa Core module files and functions
+from mesa_sim.mesa_fork import agent
+
+# imports from sibling files 
+from mesa_sim.obs_builder import build_observation
+from mesa_sim.world_state_builder import build_world_state
+from mesa_sim.executor import Executor
+
 
 
 if TYPE_CHECKING:
-    from mesa_sim.model import FactoryModel
+    from mesa_sim.sim_model import FactoryModel
 
 
 # =============================================================================
 # Base agent — shared physical attributes
 # =============================================================================
 
-class FactoryAgent(mesa_fork.Agent):
+class FactoryAgent(agent.Agent):
     """
     Base class for all mobile agents in the factory.
     Holds physical state only — no cognitive logic here.
     """
 
-    def __init__(self, unique_id: str, model: FactoryAgent, pos: tuple):
+    def __init__(self, unique_id: str, model: "FactoryAgent", pos: tuple):
         super().__init__(unique_id, model)
         # self.pos: tuple = pos               # (x, y) in center-origin coordinates
         self.carrying: Optional[str] = None # item_id if holding an item, else None
@@ -104,7 +110,6 @@ class HumanAgent(FactoryAgent):
         self.finished: bool = False
 
         # Executor handles microaction-level execution each step
-        # TODO: uncomment when executor.py exists
         self.executor = Executor(agent=self, knowledge=model.knowledge)
 
     def step(self):
@@ -150,6 +155,33 @@ class HumanAgent(FactoryAgent):
         if self.script_index >= len(self.script):
             self.finished = True
 
+    def _script_entry_to_plan(self, entry: dict) -> AbstractPlan:
+        """
+        Convert a script entry into an AbstractPlan for the executor.
+        Mirrors AdaptivePlanner.plan() but without belief/world adaptation.
+        Task-level parameters (e.g. item_id) are merged into each AbstractAction
+        so the executor can resolve completion predicates correctly.
+        """
+        task_name = entry["task"]
+        task_params = entry.get("parameters", {})
+
+        raw_actions = self.model.knowledge.get_task_actions(task_name)
+
+        actions = []
+        for action_str in raw_actions:
+            action_name = action_str.split("(")[0].strip()
+            actions.append(
+                AbstractAction(
+                    action_type=ActionType.NAVIGATE,
+                    action_name=action_name,
+                    parameters=dict(task_params, raw=action_str, action_name=action_name),
+                )
+            )
+
+        return AbstractPlan(
+            goal_intention=task_name,
+            actions=actions,
+        )
 
 # =============================================================================
 # RobotAgent — cognitive agent, calls shared core each step
@@ -214,7 +246,8 @@ class RobotAgent(FactoryAgent):
         human = self._get_observed_human()
         if human is None:
             # No human to observe — execute current plan if any, then return
-            self._execute()
+            world = build_world_state(model=self.model)
+            self._execute(plan=self.current_plan, world=world)
             return
 
         # ------------------------------------------------------------------

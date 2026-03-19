@@ -38,11 +38,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from mesa_fork.space import ContinuousSpace
-from mesa_fork.time import BaseScheduler
-from mesa_sim import mesa_fork
 from shared.knowledge import KnowledgeBase
-from mesa_sim.agents import HumanAgent, RobotAgent
+
+# imports from FORK, Mesa Core module files and functions
+from mesa_sim.mesa_fork import model, space, time, datacollection
+
+# imports from sibling files 
+from mesa_sim.sim_agents import HumanAgent, RobotAgent
 
 
 # =============================================================================
@@ -76,7 +78,7 @@ class ItemObject:
 # FactoryModel
 # =============================================================================
 
-class FactoryModel(mesa_fork.Model):
+class FactoryModel(model.Model):
 
     def __init__(self,
                  scenario_id: str,
@@ -102,7 +104,7 @@ class FactoryModel(mesa_fork.Model):
         width = room["width"]
         height = room["height"]
 
-        self.space = ContinuousSpace(
+        self.space = space.ContinuousSpace(
             x_min=-width / 2,
             x_max=width / 2,
             y_min=-height / 2,
@@ -113,7 +115,7 @@ class FactoryModel(mesa_fork.Model):
         # ------------------------------------------------------------------
         # Scheduler
         # ------------------------------------------------------------------
-        self.schedule = BaseScheduler(self)
+        self.schedule = time.BaseScheduler(self)
 
         # ------------------------------------------------------------------
         # Zone map  {zone_id: bounds_dict}
@@ -156,7 +158,7 @@ class FactoryModel(mesa_fork.Model):
         # ------------------------------------------------------------------
         # DataCollector (stub)
         # ------------------------------------------------------------------
-        self.datacollector = mesa_fork.DataCollector(
+        self.datacollector = datacollection.DataCollector(
             model_reporters={"Step": lambda m: m.schedule.steps},
             agent_reporters={"Position": lambda a: getattr(a, "pos", None)}
         )
@@ -253,10 +255,6 @@ class FactoryModel(mesa_fork.Model):
         Create HumanAgent and RobotAgent from scenario definition.
         Human receives its full task script. Robot receives nothing cognitive here.
         """
-        # Build quick lookup for domain agent initial positions
-        domain_humans = {h["id"]: h for h in domain.get("humans", [])}
-        domain_robots = {r["id"]: r for r in domain.get("robots", [])}
-
         for agent_cfg in scenario.get("agents", []):
             agent_id = agent_cfg["id"]
             agent_type = agent_cfg["type"]
@@ -289,29 +287,18 @@ class FactoryModel(mesa_fork.Model):
 
     def _build_human_script(self, agent_cfg: dict) -> list:
         """
-        Convert scenario agent config into an ordered task script for HumanAgent.
-        Script is a list of dicts: [{task, parameters}, ...] plus optional deviation.
+        Build ordered task script for HumanAgent from flat tasks list.
+        Each entry: {"task": str, "parameters": dict, "origin": str}
         Robot never sees this.
         """
-        script = []
-        for task_entry in agent_cfg.get("assigned_tasks", []):
-            script.append({
-                "task": task_entry["task"],
-                "parameters": task_entry.get("parameters", {}),
-                "origin": "assigned"
-            })
-
-        deviation = agent_cfg.get("foreseeable_deviation")
-        if deviation:
-            # Insert deviation after the specified task index
-            insert_after = deviation.get("after_task", len(script) - 1)
-            script.insert(insert_after + 1, {
-                "task": deviation["task"],
-                "parameters": deviation.get("parameters", {}),
-                "origin": "foreseeable"
-            })
-
-        return script
+        return [
+            {
+                "task": entry["task"],
+                "parameters": entry.get("parameters", {}),
+                "origin": entry.get("origin", "assigned"),
+            }
+            for entry in agent_cfg.get("tasks", [])
+        ]
 
     # =========================================================================
     # Public query methods

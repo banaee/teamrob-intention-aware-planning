@@ -47,8 +47,8 @@ from typing import TYPE_CHECKING, Optional
 from shared.types import Observation, SpatialContext, ActionContext
 
 if TYPE_CHECKING:
-    from mesa_sim.model import FactoryModel
-    from mesa_sim.agents import HumanAgent
+    from mesa_sim.sim_model import FactoryModel
+    from mesa_sim.sim_agents import HumanAgent
 
 
 def build_observation(

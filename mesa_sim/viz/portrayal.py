@@ -19,7 +19,7 @@ USED BY:
     - mesa_sim/run_mesa.py  → passed to SolaraViz as agent_portrayal
 """
 
-from mesa_sim.agents import HumanAgent, RobotAgent
+from mesa_sim.sim_agents import HumanAgent, RobotAgent
 
 AGENT_DISPLAY_SIZE = 20  # TODO: read from mesa_configs.yaml if needed
 

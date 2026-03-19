@@ -46,7 +46,7 @@ from pathlib import Path
 # Ensure project root is on path when run directly
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from mesa_sim.model import FactoryModel
+from mesa_sim.sim_model import FactoryModel
 
 
 # =============================================================================
@@ -108,19 +108,23 @@ def _make_model():
     )
 
 
-# Solara viz page — instantiated when `solara run mesa_sim/run_mesa.py` is called
-from mesa_sim.viz.space_drawer import space_drawer
-from mesa_sim.viz.portrayal import agent_portrayal
-from mesa_sim.mesa_fork.visualization import SolaraViz
+# Solara viz page — only instantiated when loaded by `solara run`, not by direct python execution
+if __name__ != "__main__":
+    try:
+        from mesa_sim.viz.space_drawer import space_drawer
+        from mesa_sim.viz.portrayal import agent_portrayal
+        from mesa_sim.mesa_fork.visualization import SolaraViz
 
-page = SolaraViz(
-    model_class=FactoryModel,
-    model_params={"scenario_id": DEFAULT_SCENARIO},
-    space_drawer=space_drawer,
-    agent_portrayal=agent_portrayal,
-    name="TeamRob Factory Simulation",
-    play_interval=0.001,
-)
+        page = SolaraViz(
+            model_class=FactoryModel,
+            model_params={"scenario_id": DEFAULT_SCENARIO},
+            space_drawer=space_drawer,
+            agent_portrayal=agent_portrayal,
+            name="TeamRob Factory Simulation",
+            play_interval=0.001,
+        )
+    except ImportError:
+        page = None
 
 
 # =============================================================================
