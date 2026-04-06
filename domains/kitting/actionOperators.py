@@ -1,0 +1,96 @@
+# domains/kitting/actionOperators.py
+"""
+Action operator definitions for the kitting domain.
+These are the HTN primitive actions — directly executable, not decomposed further.
+Microaction expansion (STEP*, GRASP, etc.) is handled by mesa_sim/action_decomposer.py.
+
+PREDICATE NAMING NOTE:
+    Completion predicates here use "at(agent, object)" — object-level proximity.
+    This matches world_state_builder.py which emits Predicate("at", ...) only
+    when agent is within PROXIMITY_THRESHOLD of a named env object or item.
+    Zone-level spatial context uses "in_zone(agent, zone)" — a separate predicate.
+    Do NOT use "at" for zone-level completion — that mismatch was the root cause
+    of the stuck-agent bug where move_to never completed.
+
+"""
+
+from shared.types import Var, Const, ConditionSchema, ActionOperator
+
+_agent  = Var("?agent")
+_item   = Var("?item")
+_target = Var("?target")
+_entity = Var("?entity")
+
+
+# GOTO_ZONE removed entirely:
+# - Not a primitive action (HTN) — it decomposed further
+# - Not an intermediate task — zone is not a meaningful semantic unit
+# - Zone reasoning moved to recognizer context weighting (ωcontext)
+
+# goto_zone = ActionOperator(
+#     name="goto_zone",
+#     parameters=[_zone],
+#     preconditions=[
+#         ConditionSchema("zone_exists", (_zone,)),  
+#     ],
+#     effects=[
+#         ConditionSchema("at", (_agent, _zone)),
+#     ],
+#     completion=ConditionSchema("at", (_agent, _zone)),
+#     microactions="STEP*",
+#     movement_target_key="?zone",
+#     movement_target_type="zone", 
+# )
+
+move_to = ActionOperator(
+    name="move_to",
+    parameters=[_target],
+    preconditions=[],
+    effects=[
+        ConditionSchema("at", (_agent, _target)),
+    ],
+    completion=ConditionSchema("at", (_agent, _target)),
+    microactions="STEP*",
+    movement_target_key="?target",
+    movement_target_type="object",
+)
+
+pick_up = ActionOperator(
+    name="pick_up",
+    parameters=[_item],
+    preconditions=[
+        ConditionSchema("at", (_agent, _item)),
+    ],
+    effects=[
+        ConditionSchema("holding", (_agent, _item)),
+    ],
+    completion=ConditionSchema("holding", (_agent, _item)),
+    microactions=["GRASP"],
+)
+
+place = ActionOperator(
+    name="place",
+    parameters=[_item, _target],
+    preconditions=[
+        ConditionSchema("holding", (_agent, _item)),
+    ],
+    effects=[
+        ConditionSchema("item_at", (_item, _target)),
+        ConditionSchema("not_holding", (_agent, _item)),
+    ],
+    completion=ConditionSchema("item_at", (_item, _target)),
+    microactions=["RELEASE"],
+)
+
+wait_at = ActionOperator(
+    name="wait_at",
+    parameters=[_entity],
+    preconditions=[
+        ConditionSchema("at", (_agent, _entity)),
+    ],
+    effects=[
+        ConditionSchema("waited_at", (_agent, _entity)),
+    ],
+    completion=ConditionSchema("waited_at", (_agent, _entity)),
+    microactions="STAND*",
+)

@@ -1,0 +1,270 @@
+{
+  "room": {
+    "width": 2000,
+    "height": 1000,
+    "units": "cm"
+  },
+"zones": [
+  {
+    "id": "zone_SE",
+    "bounds": {
+      "x_min": 0,
+      "x_max": 1000,
+      "y_min": -500,
+      "y_max": 0
+    },
+    "label": "southeast_storage"
+  },
+  {
+    "id": "zone_SW",
+    "bounds": { 
+      "x_min": -1000,
+      "x_max": 0,
+      "y_min": -500,
+      "y_max": 0
+    },
+    "label": "southwest_storage"
+  },
+  {
+    "id": "zone_NW",
+    "bounds": {
+      "x_min": -1000,
+      "x_max": 0,
+      "y_min": 0,
+      "y_max": 500
+    },
+    "label": "northwest_work"
+  },
+  {
+    "id": "zone_NE",
+    "bounds": {
+      "x_min": 0,
+      "x_max": 1000,
+      "y_min": 0,
+      "y_max": 500
+    },
+    "label": "northeast_work"
+  }
+],
+"shelves": [
+  {
+    "id": "shelf_0",
+    "position": [-1000, 400],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_NW"
+  },
+  {
+    "id": "shelf_1",
+    "position": [-1000, -300],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_SW"
+  },
+  {
+    "id": "shelf_2",
+    "position": [-1000, 0],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_SW"
+  },
+  {
+    "id": "shelf_3",
+    "position": [1000, 400],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_NE"
+  },
+  {
+    "id": "shelf_4",
+    "position": [1000, -300],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_SE"
+  },
+  {
+    "id": "shelf_5",
+    "position": [1000, 0],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_SE"
+  },
+  {
+    "id": "shelf_6",
+    "position": [-700, -500],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_SW"
+  },
+  {
+    "id": "shelf_7",
+    "position": [300, -500],
+    "size": [150, 40],
+    "slots": 4,
+    "zone": "zone_SE"
+  }
+],
+"kitting_table": {
+  "position": [-200, 400],
+  "size": [200, 100],
+  "zone": "zone_NW"
+},
+"doors": [],
+"items": [
+  {
+    "id": "item_0",
+    "type": "part_A",
+    "initial_location": "shelf_0",
+    "size": [25, 25]
+  },
+  {
+    "id": "item_1",
+    "type": "part_A",
+    "initial_location": "shelf_1",
+    "size": [25, 25]
+  },
+  {
+    "id": "item_2",
+    "type": "part_B",
+    "initial_location": "shelf_2",
+    "size": [25, 25]
+  },
+  {
+    "id": "item_3",
+    "type": "part_B",
+    "initial_location": "shelf_3",
+    "size": [25, 25]
+  },
+  {
+    "id": "item_4",
+    "type": "part_C",
+    "initial_location": "shelf_4",
+    "size": [25, 25]
+  },
+  {
+    "id": "item_5",
+    "type": "part_C",
+    "initial_location": "shelf_5",
+    "size": [25, 25]
+  },
+  {
+    "id": "item_6",
+    "type": "part_D",
+    "initial_location": "shelf_6",
+    "size": [25, 25]
+  },
+  {
+    "id": "item_7",
+    "type": "part_D",
+    "initial_location": "shelf_7",
+    "size": [25, 25]
+  }
+],
+"coffee_machine": [
+  {
+    "id": "coffee_machine_0",
+    "position": [-1000, -380],
+    "size": [50, 50],
+    "zone": "zone_SW"
+  }
+],
+"AC_switches": [
+  {
+    "id": "AC_switch_0",
+    "position": [1000, -420],
+    "size": [50, 50],
+    "zone": "zone_SW"
+  }
+],
+"robots": [
+  {
+    "id": "robot_0",
+    "type": "mobile_manipulator",
+    "initial_location": "zone_NE",
+    "initial_x": 200,
+    "initial_y": 200
+  }
+],
+"humans": [
+  {
+    "id": "human_0",
+    "type": "worker",
+    "initial_location": "zone_SW",
+    "initial_x": -400,
+    "initial_y": -300
+  }
+],
+  "obstacles": [
+    {
+      "id": "obstacle_0",
+      "position": [0, 100],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_1",
+      "position": [0, -200],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_2",
+      "position": [400,0],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_3",
+      "position": [-200, 0],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_4",
+      "position": [700,300],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_5",
+      "position": [700, -300],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_6",
+      "position": [-700, 300],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_7",
+      "position": [-700, -100],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_8",
+      "position": [-1000, 200],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_9",
+      "position": [-1000, -200],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_10",
+      "position": [-1000, -450],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_11",
+      "position": [1000, 200],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_12",
+      "position": [1000, -100],
+      "size": [50, 50]
+    },
+    {
+      "id": "obstacle_13",
+      "position": [1000, -380],
+      "size": [50, 50]
+    }
+  ]
+}
+
