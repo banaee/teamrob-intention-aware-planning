@@ -1,15 +1,19 @@
-# scripts/convert_gazebo_to_domain.py
+# scripts/convert_gazebo_to_env_layout.py
 """
-Convert Gazebo world JSON to domain.yaml.
+
+# TODO: this is depricated script, as we are now using now a handcrafted environment layout JSON (not YAML anymore, and it is not called domain anymore)
+
+
+Convert Gazebo world JSON to env_layout.yaml.
 For now, uses hardcoded test data (no Gazebo JSON input yet).
 """
 
 import yaml
 from pathlib import Path
 
-def generate_test_domain():
+def generate_test_environment_layout():
     """
-    Generate test domain config.
+    Generate test environment layout config.
     TODO: Replace with actual Gazebo JSON parsing when available.
     """
     return {
@@ -71,13 +75,13 @@ def generate_test_domain():
         ]
     }
 
-def convert_gazebo_to_domain(gazebo_json_path=None, output_path='configs/domain.yaml'):
+def convert_gazebo_to_env_layout(gazebo_json_path=None, output_path='configs/env_layout.yaml'):
     """
-    Convert Gazebo world JSON to domain.yaml.
+    Convert Gazebo world JSON to env_layout.yaml.
     
     Args:
         gazebo_json_path: Path to Gazebo JSON export (None = use test data)
-        output_path: Where to write domain.yaml
+        output_path: Where to write env_layout.yaml
     """
     
     output_path = Path(output_path)
@@ -85,41 +89,41 @@ def convert_gazebo_to_domain(gazebo_json_path=None, output_path='configs/domain.
     
     if gazebo_json_path is None:
         print("No Gazebo JSON provided - generating test data")
-        domain = generate_test_domain()
+        env_layout = generate_test_environment_layout()
     else:
         print(f"Parsing Gazebo JSON from {gazebo_json_path}")
         # TODO: Implement actual Gazebo parsing
         raise NotImplementedError("Gazebo JSON parsing not yet implemented")
     
-    # Write domain.yaml
+    # Write env_layout.yaml
     with open(output_path, 'w') as f:
-        yaml.dump(domain, f, default_flow_style=False, sort_keys=False)
+        yaml.dump(env_layout, f, default_flow_style=False, sort_keys=False)
     
-    print(f"Generated domain config at {output_path}")
+    print(f"Generated environment layout config at {output_path}")
     
     # Summary
-    print(f"\nDomain Summary:")
-    print(f"  - Shelves: {len(domain['shelves'])}")
-    print(f"  - Items: {len(domain['items'])}")
-    print(f"  - Zones: {len(domain['zones'])}")
-    print(f"  - Grid: {domain['environment']['width']}x{domain['environment']['height']}")
+    print(f"\nEnvironment Layout Summary:")
+    print(f"  - Shelves: {len(env_layout['shelves'])}")
+    print(f"  - Items: {len(env_layout['items'])}")
+    print(f"  - Zones: {len(env_layout['zones'])}")
+    print(f"  - Grid: {env_layout['environment']['width']}x{env_layout['environment']['height']}")
 
 
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='Generate domain.yaml configuration')
+    parser = argparse.ArgumentParser(description='Generate env_layout.yaml configuration')
     parser.add_argument('--input', type=str, default=None,
                        help='Path to Gazebo JSON export (omit for test data)')
-    parser.add_argument('--output', type=str, default='configs/domain.yaml',
-                       help='Output path (default: configs/domain.yaml)')
+    parser.add_argument('--output', type=str, default='configs/env_layout.yaml',
+                       help='Output path (default: configs/env_layout.yaml)')
     
     args = parser.parse_args()
     
-    convert_gazebo_to_domain(
+    convert_gazebo_to_env_layout(
             gazebo_json_path=args.input,
             output_path=args.output
         )
 
     
-    print(f"Domain assembly complete. file {args.output} generated.")    
+    print(f"Environment layout assembly complete. file {args.output} generated.")    

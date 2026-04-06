@@ -23,23 +23,23 @@ source home/python-ens/tr-env/bin/activate
 pip install -r requirements.txt
 ```
 
-### Generate Domain Configuration
+### Generate environment layout Configuration
 
-The simulation requires a domain configuration file that defines the environment layout (shelves, items, zones, etc.).
+The simulation requires a env_layout configuration file that defines the environment layout (shelves, items, zones, etc.).
 
-**If `configs/domain.yaml` does not exist, generate it:**
+**If `configs/env1_layout.yaml` does not exist, generate it:**
 
 ```bash
-# Option 1: Generate test domain (hardcoded test data)
-python3 scripts/domain_assembler.py
+# Option 1: Generate test environment layout (hardcoded test data)
+python3 scripts/env_layout_assembler.py
 
 # Option 2: Parse from Gazebo export (when available)
-python3 scripts/domain_assembler.py --input scripts/gazebo_export.json
+python3 scripts/env_layout_assembler.py --input scripts/gazebo_export.json
 ```
 
-**Output:** `configs/domain.yaml`
+**Output:** `configs/env1_layout.yaml`
 
-**Note:** For initial testing, Option 1 generates a minimal test environment. Once you have a Gazebo world export, use Option 2 to generate the domain from actual simulation data.
+**Note:** For initial testing, Option 1 generates a minimal test environment. Once you have a Gazebo world export, use Option 2 to generate the environment layout from actual simulation data.
 
 ## Running Simulations
 

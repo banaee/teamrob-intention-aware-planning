@@ -24,8 +24,13 @@ Thumbs.db
 *.log
 .pytest_cache/
 
-# Generated file from scripts/domain_assembler.py
-# configs/domain.yaml  # let's keep it in repo 
+# Generated file from scripts/env_layout_assembler.py
+# configs/env1_layout.yaml  # let's keep it in repo 
 
 # anywhere in subdirectories, ignore files starting with "my_"
 **/my_*
+
+# anywhere in subdirectories, ignore files starting with "old_"
+**/old_*
+
+
