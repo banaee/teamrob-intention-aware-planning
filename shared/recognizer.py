@@ -19,7 +19,7 @@ WHAT THIS MODULE DOES NOT DO:
 
 INPUTS:
     - Observation         from mesa_sim/obs_builder.py (or ROS equivalent)
-    - KnowledgeBase       injected once at construction (shared/knowledge.py)
+    - KnowledgeBase       injected once at construction (shared/domain_knowledge.py)
     - prev_belief         its own previous output, passed back by the robot agent
 
 OUTPUTS:
@@ -31,12 +31,12 @@ ALGORITHM (skeleton):
 """
 
 from shared.types import Observation, BeliefState
-from shared.knowledge import KnowledgeBase
+from shared.domain_knowledge import DomainKnowledgeBase 
 
 
 class IntentionRecognizer:
 
-    def __init__(self, knowledge: KnowledgeBase):
+    def __init__(self, knowledge: DomainKnowledgeBase):
         """
         knowledge: provides the intention set T used to initialize distributions.
         """
@@ -67,8 +67,11 @@ class IntentionRecognizer:
         most_likely = self._intentions[0] if self._intentions else "unknown"
 
         # dummy predicted next action — replaced by real prediction in Phase 4
-        predicted = self.knowledge.get_task_actions(most_likely)
-        predicted_next = {most_likely: predicted} if predicted else {}
+        # predicted = self.knowledge.get_task_actions(most_likely)
+        # predicted_next = {most_likely: predicted} if predicted else {}
+
+        # TODO Phase 4: predict next actions from TaskSchema decomposition
+        predicted_next = {}
 
         self._history.append(obs)  
 

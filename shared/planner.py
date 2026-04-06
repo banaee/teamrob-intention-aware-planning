@@ -2,61 +2,55 @@
 shared/planner.py
 
 PURPOSE:
-    The robot's "Adaptive planning" module (see robot agent architecture, HCM paper).
-    Produces a sequence of abstract actions for the robot to execute,
+    The robot's "Adaptive planning" module.
+    Produces a sequence of GroundedActions for the robot to execute,
     adapted to the current belief about what the human intends to do.
-    Answers: "Given what the human is likely doing, what should I do next?"
 
 WHAT THIS MODULE DOES:
-    - Takes the robot's assigned intention (e.g. DELIVER_ITEM)
-    - Looks up the action sequence from KnowledgeBase
-    - Adapts the plan based on the current BeliefState over human intentions
-    - Returns an AbstractPlan (sequence of AbstractActions)
+    - Fetches TaskSchema from DomainKnowledgeBase
+    - Selects applicable method (first method whose guards hold in WorldState)
+    - Grounds each StepCall: resolves Var bindings to Const values
+    - Returns an AbstractPlan with fully grounded GroundedActions
 
 WHAT THIS MODULE DOES NOT DO:
+    - Does NOT parse strings — all structure comes from typed schema objects
+    - Does NOT hardcode variable names — derivations declared in MethodSchema
     - Does NOT decide whether to replan (that is replanning.py)
     - Does NOT execute actions (that is mesa_sim/executor.py)
-    - Does NOT translate to Mesa steps or microactions (that is mesa_sim/microactions.py)
     - Does NOT update beliefs (that is recognizer.py)
-    - Does NOT resolve runtime placeholders like {item_zone} fully yet (Phase 4)
 
-INPUTS:
-    - my_intention    str — robot's currently assigned task name e.g. "DELIVER_ITEM"
-    - belief          BeliefState — current belief over human intentions from recognizer.py
-    - world           WorldState — current symbolic world snapshot from simulator
-    - current_plan    AbstractPlan | None — existing plan (for plan repair, Phase 4)
+GROUNDING:
+    Task parameters arrive as Dict[str, str] e.g. {"?item": "item_3"}.
+    agent_id is passed explicitly as execution context — not a task parameter.
+    The planner resolves each StepCall's bindings:
+        Var("?item")       → looked up in task_params
+        Const("kitting_table") → used as-is
+    All GroundedActions carry a fully instantiated completion_predicate
+    (Predicate with Const args only) — executor checks set membership directly.
 
-OUTPUTS:
-    - AbstractPlan    consumed by mesa_sim/executor.py (via mesa_sim/microactions.py)
-
-ADAPTATION LOGIC (to be implemented):
-    1. Decompose robot's task into candidate action sequence
-    2. Predict human's likely next actions from belief
-    3. Check for spatial-temporal conflicts between robot and human paths
-    4. Select lowest-cost feasible plan (reorder, wait, or reroute if needed)
-    5. Attach execution hints for simulator
-
-ALGORITHM (skeleton):
-    Currently returns a flat AbstractPlan from raw task decomposition.
-    No parameter resolution. No conflict checking. No adaptation.
-    TODO: Implement full cost-based adaptive planning in Phase 4.
+    TODO Phase 4: method guard evaluation, conflict checking, cost-based selection.
 """
 
-from shared.types import AbstractAction, AbstractPlan, ActionType, BeliefState, WorldState, ActionType
-from shared.knowledge import KnowledgeBase
+from typing import Dict, List, Optional
+
+from shared.types import (
+    Var, Const, Predicate, ConditionSchema,
+    GroundedAction, AbstractPlan, BeliefState, WorldState,
+    TaskSchema, MethodSchema, StepCall,
+)
+from shared.domain_knowledge import DomainKnowledgeBase
 
 
 class AdaptivePlanner:
 
-    def __init__(self, knowledge: KnowledgeBase):
-        """
-        knowledge: provides task decompositions and action schemas.
-        """
+    def __init__(self, knowledge: DomainKnowledgeBase):
         self.knowledge = knowledge
 
     def plan(
         self,
         my_intention: str,
+        task_params: Dict[str, str],    # {"?item": "item_3"} — task-level bindings only
+        agent_id: str,                  # executing agent — injected as ?agent, not in task_params
         belief: BeliefState,
         world: WorldState,
         current_plan: AbstractPlan | None = None,
@@ -64,43 +58,169 @@ class AdaptivePlanner:
         """
         Produce an AbstractPlan for the robot to execute.
 
-        INPUT:
-            my_intention  - robot's assigned task name e.g. "DELIVER_ITEM"
-            belief        - current belief over human intentions
-            world         - symbolic world state
-            current_plan  - existing plan if any (for repair, not used yet)
-
-        OUTPUT:
-            AbstractPlan with a sequence of AbstractActions
-
         SKELETON BEHAVIOUR:
-            - Looks up action sequence for my_intention from KnowledgeBase
-            - Wraps each action string in a minimal AbstractAction
-            - No placeholder resolution, no conflict checking, no adaptation
-            TODO: Full implementation in Phase 4.
+            Selects first method unconditionally (guards not evaluated yet).
+            Grounds all StepCalls against task_params, agent_id, and WorldState.
+            No conflict checking, no cost-based selection.
+        TODO Phase 4: guard evaluation, belief-driven adaptation, conflict checking.
         """
+        task_schema = self.knowledge.get_task_schema(my_intention)
+        if task_schema is None:
+            return AbstractPlan(goal_intention=my_intention, actions=[])
 
-        raw_actions = self.knowledge.get_task_actions(my_intention)
+        method = self._select_method(task_schema, world)
+        if method is None:
+            return AbstractPlan(goal_intention=my_intention, actions=[])
 
-        actions = []
-        for action_str in raw_actions:
-            # parse action name from raw string e.g. "GOTO_ZONE({item_zone})" → "GOTO_ZONE"
-            action_name = action_str.split("(")[0].strip()
-            actions.append(
-                AbstractAction(
-                    action_type=ActionType.NAVIGATE,  # TODO Phase 4: map action_name to correct ActionType
-                    action_name=action_name,
-                    parameters={"raw": action_str, "action_name": action_name},
-                )
-            )
+        grounded = self._ground_method(method, task_params, agent_id, world)
 
-        # --- Placeholder: adaptation logic ---
-        # TODO: inspect belief.most_likely and world state
-        # TODO: check for conflicts with predicted human path
-        # TODO: reorder or reroute actions if needed
-        # TODO: attach execution hints (estimated_path, estimated_duration)
+        # TODO Phase 4: inspect belief, check conflicts, reorder/reroute
 
         return AbstractPlan(
             goal_intention=my_intention,
-            actions=actions,
+            actions=grounded,
         )
+
+    # =========================================================================
+    # Method selection
+    # =========================================================================
+
+    def _select_method(
+        self,
+        task_schema: TaskSchema,
+        world: WorldState,
+    ) -> Optional[MethodSchema]:
+        """
+        Select first applicable method.
+        Currently returns the first method unconditionally.
+        TODO Phase 4: evaluate guards against WorldState.predicates.
+        """
+        if task_schema.methods:
+            return task_schema.methods[0]
+        return None
+
+    # =========================================================================
+    # Grounding
+    # =========================================================================
+
+    def _ground_method(
+        self,
+        method: MethodSchema,
+        task_params: Dict[str, str],
+        agent_id: str,
+        world: WorldState,
+    ) -> List[GroundedAction]:
+        """
+        Ground each StepCall in the method into a GroundedAction.
+        Resolves all Vars to Consts using task_params, agent_id, and WorldState.
+        """
+        grounded = []
+        for step in method.steps:
+            operator = self.knowledge.get_action_operator(step.action_name)
+            if operator is None:
+                continue
+            bindings = self._resolve_bindings(step, method, task_params, agent_id, world)
+            completion = self._ground_condition(operator.completion, bindings)
+            grounded.append(GroundedAction(
+                action_name=step.action_name,
+                bindings=bindings,
+                completion_predicate=completion,
+                operator=operator,
+            ))
+        return grounded
+
+    def _resolve_bindings(
+        self,
+        step: StepCall,
+        method: MethodSchema,
+        task_params: Dict[str, str],
+        agent_id: str,
+        world: WorldState,
+    ) -> Dict[str, str]:
+        """
+        Resolve a StepCall's bindings to concrete string values.
+
+        Resolution rules (in order):
+            ?agent                → agent_id (always injected from execution context)
+            Const("x")            → "x" (used as-is)
+            Var("?x") in task_params → task_params["?x"]
+            Var("?x") not in task_params → derived via method.derived_vars registry
+
+        Returns {var_name: concrete_value} e.g. {"?zone": "zone_SE"}.
+        """
+        resolved: Dict[str, str] = {"?agent": agent_id}
+
+        for param_var, binding_term in step.bindings.items():
+            key = param_var.name
+            if isinstance(binding_term, Const):
+                resolved[key] = binding_term.value
+            elif isinstance(binding_term, Var):
+                var_name = binding_term.name
+                if var_name in task_params:
+                    resolved[key] = task_params[var_name]
+                else:
+                    derived = self._resolve_derived(var_name, method, task_params, world)
+                    if derived is not None:
+                        resolved[key] = derived
+                    # else: absent — _ground_condition will raise on use
+        return resolved
+
+    def _resolve_derived(
+        self,
+        var_name: str,
+        method: MethodSchema,
+        task_params: Dict[str, str],
+        world: WorldState,
+    ) -> Optional[str]:
+        """
+        Resolve a derived variable using the method's declared derived_vars.
+        Dispatches through _lookup — no hardcoded variable names here.
+
+        method.derived_vars declares: {var_name: (lookup_fn, source_var)}
+        """
+        if var_name not in method.derived_vars:
+            return None
+        lookup_fn, source_var = method.derived_vars[var_name]
+        source_value = task_params.get(source_var)
+        if source_value is None:
+            return None
+        return self._lookup(lookup_fn, source_value, world)
+
+    def _lookup(self, fn: str, obj_id: str, world: WorldState) -> Optional[str]:
+        """
+        Lookup registry: maps function names to WorldState queries.
+        Currently unused in kitting — zone reasoning moved to recognizer context.
+        Keep registry for future domains that need derived variable resolution.
+        TODO Phase 4: add lookup functions for new domains that need derived variables.
+        Currently unused in kitting — zone reasoning moved to recognizer context.
+        """
+        return None
+
+
+    # =========================================================================
+    # Condition grounding
+    # =========================================================================
+
+    def _ground_condition(
+        self,
+        condition: ConditionSchema,
+        bindings: Dict[str, str],
+    ) -> Predicate:
+        """
+        Ground a ConditionSchema into a fully instantiated Predicate.
+        All Var args substituted from bindings. Const args passed through.
+        Raises ValueError on unresolved variables — fails loudly, not silently.
+        """
+        resolved_args = []
+        for arg in condition.args:
+            if isinstance(arg, Var):
+                value = bindings.get(arg.name)
+                if value is None:
+                    raise ValueError(
+                        f"Unresolved variable '{arg.name}' in condition "
+                        f"'{condition.name}' — check method derived_vars and task_params"
+                    )
+                resolved_args.append(Const(value))
+            else:
+                resolved_args.append(arg)  # already a Const
+        return Predicate(condition.name, tuple(resolved_args))
