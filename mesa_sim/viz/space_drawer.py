@@ -8,18 +8,18 @@ PURPOSE:
 WHAT THIS MODULE DOES:
     - Draws static env objects from model.env_objects (shelves, tables,
       coffee machines, ac switches, obstacles) using positions and sizes
-      from domain1.json
+      from env_layout1.json
     - Draws zone boundaries from model.zone_map
     - Draws dynamic elements: agents (human, robot) and items
     - Draws planned paths if available on agents
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT hardcode any positions, sizes, or colors per object id
-    - Does NOT know about factory vs any other domain — reads from model
+    - Does NOT know about factory vs any other environment layout — reads from model
     - Does NOT define agent appearance — that is portrayal.py
 
 GEOMETRY:
-    All coordinates are center-origin matching domain1.json.
+    All coordinates are center-origin matching env_layout1.json.
     Plotly axes are set to match the model's ContinuousSpace bounds.
 
 USED BY:

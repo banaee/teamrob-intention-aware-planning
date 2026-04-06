@@ -1,62 +1,48 @@
 """
-mesa_sim/model.py
+mesa_sim/sim_model.py
 
 PURPOSE:
     Mesa embodiment of the factory environment.
-    Loads domain1.json and scenarios.yaml, builds the physical space,
-    spawns agents, and drives the simulation step loop.
+    Loads env_layout1.json, receives a ScenarioConfig, builds the physical
+    space, spawns agents, and drives the simulation step loop.
 
 WHAT THIS MODULE DOES:
-    - Reads domain1.json for environment layout (space, zones, shelves,
-      items, tables, coffee machines, AC switches, obstacles)
-    - Reads scenarios.yaml for agent roles, start positions, task scripts
-    - Creates Mesa ContinuousSpace with center-origin (0,0) matching domain1.json
+    - Reads env_layout1.json for environment layout
+    - Receives a ScenarioConfig (Python object) — no YAML scenario parsing
+    - Creates Mesa ContinuousSpace with center-origin (0,0)
     - Instantiates env objects as plain dataclasses (not Mesa agents)
-    - Spawns HumanAgent (scripted) and RobotAgent (cognitive) via agents.py
-    - Runs schedule.step() each tick — no centralized state management
+    - Spawns HumanAgent and RobotAgent via sim_agents.py
+    - Runs schedule.step() each tick
 
 WHAT THIS MODULE DOES NOT DO:
-    - No WorldStateManager — ground truth lives in env_objects, read on
-      demand by mesa_sim/world_state_builder.py
+    - No WorldStateManager — ground truth lives in env_objects
     - No IR, no planning, no task assignment logic
-    - No TaskLibrary — that belongs to shared/knowledge.py
-    - Does not touch tasks_library.yaml or actions_library.yaml
+    - No YAML parsing for scenarios or operator definitions
 
 COORDINATE SYSTEM:
-    Matches domain1.json exactly: origin (0,0) at center of room.
-    ContinuousSpace configured with x_min=-width/2, x_max=width/2,
-    y_min=-height/2, y_max=height/2. No translation needed anywhere.
-
-USED BY:
-    - mesa_sim/run_mesa.py  (entry point)
-    - mesa_sim/world_state_builder.py  (reads env_objects, agent positions)
+    Matches env_layout1.json exactly: origin (0,0) at center of room.
 """
 
 import json
-import yaml
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from shared.knowledge import KnowledgeBase
+from shared.domain_knowledge import DomainKnowledgeBase
+from shared.types import ScenarioConfig
+from domains.kitting.registry import register_kitting_domain
 
-# imports from FORK, Mesa Core module files and functions
 from mesa_sim.mesa_fork import model, space, time, datacollection
-
-# imports from sibling files 
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 
 
 # =============================================================================
 # Environment object dataclasses
-# Ground truth physical state. Mutated by agents during microaction execution.
-# Read by world_state_builder.py to construct WorldState snapshots.
 # =============================================================================
 
 @dataclass
 class EnvObject:
     obj_id: str
-    obj_type: str           # "shelf", "kitting_table", "coffee_machine", "ac_switch", "obstacle"
+    obj_type: str
     position: Tuple[float, float]
     size: Tuple[float, float]
     zone: Optional[str] = None
@@ -65,13 +51,13 @@ class EnvObject:
 @dataclass
 class ItemObject:
     obj_id: str
-    obj_type: str           # always "item"
-    item_type: str          # "part_A", "part_B", etc.
+    obj_type: str
+    item_type: str
     position: Tuple[float, float]
     size: Tuple[float, float]
     zone: Optional[str] = None
-    held_by: Optional[str] = None       # agent_id if being carried, else None
-    at_location: Optional[str] = None   # env obj id (shelf_id or "kitting_table")
+    held_by: Optional[str] = None
+    at_location: Optional[str] = None
 
 
 # =============================================================================
@@ -81,26 +67,20 @@ class ItemObject:
 class FactoryModel(model.Model):
 
     def __init__(self,
-                 scenario_id: str,
-                 domain_path: str = "configs/domain1.json",
-                 scenarios_path: str = "configs/scenarios.yaml"):
+                 scenario: ScenarioConfig,
+                 env_layout_path: str = "domains/kitting/env_layout1.json"):
         super().__init__()
 
         # ------------------------------------------------------------------
-        # Load configs
+        # Load env layout
         # ------------------------------------------------------------------
-        with open(domain_path, "r") as f:
-            domain = json.load(f)
-
-        with open(scenarios_path, "r") as f:
-            scenarios_raw = yaml.safe_load(f)
-
-        scenario = self._find_scenario(scenarios_raw, scenario_id)
+        with open(env_layout_path, "r") as f:
+            env_layout = json.load(f)
 
         # ------------------------------------------------------------------
-        # Space — center-origin, matches domain1.json coordinates directly
+        # Space
         # ------------------------------------------------------------------
-        room = domain["room"]
+        room = env_layout["room"]
         width = room["width"]
         height = room["height"]
 
@@ -118,45 +98,40 @@ class FactoryModel(model.Model):
         self.schedule = time.BaseScheduler(self)
 
         # ------------------------------------------------------------------
-        # Zone map  {zone_id: bounds_dict}
+        # Zone map
         # ------------------------------------------------------------------
         self.zone_map: Dict[str, dict] = {
-            z["id"]: z["bounds"] for z in domain.get("zones", [])
+            z["id"]: z["bounds"] for z in env_layout.get("zones", [])
         }
 
         # ------------------------------------------------------------------
-        # KnowledgeBase — loaded once, shared across agents
+        # DomainKnowledgeBase — loaded once, shared across agents
         # ------------------------------------------------------------------
-        self.knowledge = KnowledgeBase.from_yaml(
-            tasks_path="configs/tasks_library.yaml",
-            actions_path="configs/actions_library.yaml"
-        )
-        
+        self.knowledge = DomainKnowledgeBase.from_domain(register_kitting_domain())
+
         # ------------------------------------------------------------------
         # Environment objects registry
-        # {obj_id: EnvObject}  and  {item_id: ItemObject}
         # ------------------------------------------------------------------
         self.env_objects: Dict[str, EnvObject] = {}
         self.items: Dict[str, ItemObject] = {}
 
-        self._init_shelves(domain.get("shelves", []))
-        self._init_kitting_table(domain.get("kitting_table", {}))
-        self._init_coffee_machines(domain.get("coffee_machine", []))
-        self._init_ac_switches(domain.get("AC_switches", []))
-        self._init_obstacles(domain.get("obstacles", []))
-        self._init_items(domain.get("items", []))
+        self._init_shelves(env_layout.get("shelves", []))
+        self._init_kitting_table(env_layout.get("kitting_table", {}))
+        self._init_coffee_machines(env_layout.get("coffee_machine", []))
+        self._init_ac_switches(env_layout.get("AC_switches", []))
+        self._init_obstacles(env_layout.get("obstacles", []))
+        self._init_items(env_layout.get("items", []))
 
         # ------------------------------------------------------------------
-        # Agents — humans first, then robots (mirrors old repo ordering)
-        # Human script is private: robot has no access to it
+        # Agents
         # ------------------------------------------------------------------
-        self.humans: Dict[str, object] = {}
-        self.robots: Dict[str, object] = {}
+        self.humans: Dict[str, HumanAgent] = {}
+        self.robots: Dict[str, RobotAgent] = {}
 
-        self._spawn_agents(scenario, domain)
+        self._spawn_agents(scenario)
 
         # ------------------------------------------------------------------
-        # DataCollector (stub)
+        # DataCollector
         # ------------------------------------------------------------------
         self.datacollector = datacollection.DataCollector(
             model_reporters={"Step": lambda m: m.schedule.steps},
@@ -168,7 +143,6 @@ class FactoryModel(model.Model):
     # =========================================================================
 
     def step(self):
-        """Advance simulation by one tick. Each agent executes one microaction."""
         self.schedule.step()
         self.datacollector.collect(self)
 
@@ -178,131 +152,95 @@ class FactoryModel(model.Model):
 
     def _init_shelves(self, shelves_data: list):
         for s in shelves_data:
-            obj = EnvObject(
-                obj_id=s["id"],
-                obj_type="shelf",
-                position=tuple(s["position"]),
-                size=tuple(s["size"]),
+            self.env_objects[s["id"]] = EnvObject(
+                obj_id=s["id"], obj_type="shelf",
+                position=tuple(s["position"]), size=tuple(s["size"]),
                 zone=s.get("zone")
             )
-            self.env_objects[s["id"]] = obj
 
     def _init_kitting_table(self, kt_data: dict):
         if not kt_data:
             return
-        obj = EnvObject(
-            obj_id="kitting_table",
-            obj_type="kitting_table",
-            position=tuple(kt_data["position"]),
-            size=tuple(kt_data["size"]),
+        self.env_objects["kitting_table"] = EnvObject(
+            obj_id="kitting_table", obj_type="kitting_table",
+            position=tuple(kt_data["position"]), size=tuple(kt_data["size"]),
             zone=kt_data.get("zone")
         )
-        self.env_objects["kitting_table"] = obj
 
     def _init_coffee_machines(self, cm_data: list):
         for cm in cm_data:
-            obj = EnvObject(
-                obj_id=cm["id"],
-                obj_type="coffee_machine",
-                position=tuple(cm["position"]),
-                size=tuple(cm["size"]),
+            self.env_objects[cm["id"]] = EnvObject(
+                obj_id=cm["id"], obj_type="coffee_machine",
+                position=tuple(cm["position"]), size=tuple(cm["size"]),
                 zone=cm.get("zone")
             )
-            self.env_objects[cm["id"]] = obj
 
     def _init_ac_switches(self, ac_data: list):
         for ac in ac_data:
-            obj = EnvObject(
-                obj_id=ac["id"],
-                obj_type="ac_switch",
-                position=tuple(ac["position"]),
-                size=tuple(ac["size"]),
+            self.env_objects[ac["id"]] = EnvObject(
+                obj_id=ac["id"], obj_type="ac_switch",
+                position=tuple(ac["position"]), size=tuple(ac["size"]),
                 zone=ac.get("zone")
             )
-            self.env_objects[ac["id"]] = obj
 
     def _init_obstacles(self, obs_data: list):
         for ob in obs_data:
-            obj = EnvObject(
-                obj_id=ob["id"],
-                obj_type="obstacle",
-                position=tuple(ob["position"]),
-                size=tuple(ob["size"]),
-                zone=None  # obstacles have no zone in domain1.json
+            self.env_objects[ob["id"]] = EnvObject(
+                obj_id=ob["id"], obj_type="obstacle",
+                position=tuple(ob["position"]), size=tuple(ob["size"]),
+                zone=None
             )
-            self.env_objects[ob["id"]] = obj
 
     def _init_items(self, items_data: list):
         for it in items_data:
             shelf_id = it["initial_location"]
             shelf = self.env_objects.get(shelf_id)
-            initial_pos = shelf.position if shelf else (0.0, 0.0)
-
-            item = ItemObject(
-                obj_id=it["id"],
-                obj_type="item",
+            self.items[it["id"]] = ItemObject(
+                obj_id=it["id"], obj_type="item",
                 item_type=it["type"],
-                position=initial_pos,
+                position=shelf.position if shelf else (0.0, 0.0),
                 size=tuple(it["size"]),
                 zone=shelf.zone if shelf else None,
                 held_by=None,
                 at_location=shelf_id
             )
-            self.items[it["id"]] = item
 
-    def _spawn_agents(self, scenario: dict, domain: dict):
+    def _spawn_agents(self, scenario: ScenarioConfig):
         """
-        Create HumanAgent and RobotAgent from scenario definition.
-        Human receives its full task script. Robot receives nothing cognitive here.
+        Spawn agents from ScenarioConfig.
+        HumanAgent receives its TaskInstance list as script.
+        RobotAgent receives its TaskInstance list as assigned_tasks.
         """
-        for agent_cfg in scenario.get("agents", []):
-            agent_id = agent_cfg["id"]
-            agent_type = agent_cfg["type"]
-            start_pos = tuple(agent_cfg["start_position"])
+        for agent_cfg in scenario.agents:
+            start_pos = agent_cfg.start_position
 
-            if agent_type == "human":
-                script = self._build_human_script(agent_cfg)
+            if agent_cfg.agent_type == "human":
                 agent = HumanAgent(
-                    unique_id=agent_id,
+                    unique_id=agent_cfg.agent_id,
                     model=self,
                     pos=start_pos,
-                    script=script
+                    script=agent_cfg.assigned_tasks,  # List[TaskInstance]
                 )
                 self.space.place_agent(agent, start_pos)
                 self.schedule.add(agent)
-                self.humans[agent_id] = agent
+                self.humans[agent_cfg.agent_id] = agent
 
-            elif agent_type == "robot":
+            elif agent_cfg.agent_type == "robot":
+                observed_id = agent_cfg.observes[0] if agent_cfg.observes else None
                 agent = RobotAgent(
-                    unique_id=agent_id,
+                    unique_id=agent_cfg.agent_id,
                     model=self,
                     pos=start_pos,
                     knowledge=self.knowledge,
-                    assigned_tasks=agent_cfg.get("assigned_tasks", []),
-                    observed_agent_id=agent_cfg.get("observes", [None])[0]
+                    assigned_tasks=agent_cfg.assigned_tasks,  # List[TaskInstance]
+                    observed_agent_id=observed_id,
                 )
                 self.space.place_agent(agent, start_pos)
                 self.schedule.add(agent)
-                self.robots[agent_id] = agent
-
-    def _build_human_script(self, agent_cfg: dict) -> list:
-        """
-        Build ordered task script for HumanAgent from flat tasks list.
-        Each entry: {"task": str, "parameters": dict, "origin": str}
-        Robot never sees this.
-        """
-        return [
-            {
-                "task": entry["task"],
-                "parameters": entry.get("parameters", {}),
-                "origin": entry.get("origin", "assigned"),
-            }
-            for entry in agent_cfg.get("tasks", [])
-        ]
+                self.robots[agent_cfg.agent_id] = agent
 
     # =========================================================================
     # Public query methods
-    # Used by world_state_builder.py and agents
     # =========================================================================
 
     def get_env_object(self, obj_id: str) -> Optional[EnvObject]:
@@ -311,8 +249,11 @@ class FactoryModel(model.Model):
     def get_item(self, item_id: str) -> Optional[ItemObject]:
         return self.items.get(item_id)
 
+    def get_movable_objects(self) -> Dict[str, ItemObject]:
+        """Return all items — used by world_state_builder."""
+        return self.items
+
     def get_zone_of_position(self, x: float, y: float) -> Optional[str]:
-        """Return zone_id for a given (x, y) coordinate, or None if outside all zones."""
         for zone_id, bounds in self.zone_map.items():
             if (bounds["x_min"] <= x <= bounds["x_max"] and
                     bounds["y_min"] <= y <= bounds["y_max"]):
@@ -323,30 +264,13 @@ class FactoryModel(model.Model):
         return [obj for obj in self.env_objects.values() if obj.zone == zone_id]
 
     def get_item_location(self, item_id: str) -> Optional[Tuple[float, float]]:
-        """
-        Return current (x, y) of an item.
-        If held by an agent, returns agent's current position.
-        If at a location, returns that env object's position.
-        """
         item = self.items.get(item_id)
         if item is None:
             return None
         if item.held_by:
-            # Find the carrying agent
-            agent = self.humans.get(item.held_by) or self.robots.get(item.held_by)
-            return getattr(agent, "pos", None)
+            ag = self.humans.get(item.held_by) or self.robots.get(item.held_by)
+            return getattr(ag, "pos", None)
         if item.at_location:
             loc = self.env_objects.get(item.at_location)
             return loc.position if loc else None
         return item.position
-
-    # =========================================================================
-    # Internal helpers
-    # =========================================================================
-
-    @staticmethod
-    def _find_scenario(scenarios_raw: dict, scenario_id: str) -> dict:
-        for s in scenarios_raw.get("scenarios", []):
-            if s["id"] == scenario_id:
-                return s
-        raise ValueError(f"Scenario '{scenario_id}' not found in scenarios.yaml")

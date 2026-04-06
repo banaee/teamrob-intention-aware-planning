@@ -1,267 +1,202 @@
 """
-mesa_sim/agents.py
+mesa_sim/sim_agents.py
 
 PURPOSE:
     Mesa agent implementations for HumanAgent and RobotAgent.
     Bridges the Mesa simulation loop with the shared cognitive layer.
 
 AGENTS:
+    HumanAgent  — scripted agent, executes a fixed TaskInstance sequence.
+                  Provides ground truth for IR evaluation.
+                  Robot has no access to this script.
 
-    HumanAgent  — scripted agent, executes a fixed task sequence loaded from
-                  scenarios.yaml. Provides ground truth for IR evaluation.
-                  The robot has no access to this script.
-
-    RobotAgent  — cognitive agent. Each step it:
-                    1. builds an Observation of the human via obs_builder
+    RobotAgent  — cognitive agent. Each step:
+                    1. builds Observation of human via obs_builder
                     2. updates belief via shared/recognizer.py
                     3. checks replanning trigger via shared/replanning.py
                     4. replans if needed via shared/planner.py
                     5. executes one microaction via executor.py
-
-WHAT THIS MODULE DOES NOT DO:
-    - No IR logic lives here — that is shared/recognizer.py
-    - No planning logic lives here — that is shared/planner.py
-    - No microaction expansion lives here — that is mesa_sim/action_decomposer.py
-    - No WorldState construction lives here — that is mesa_sim/world_state_builder.py
-    - No Observation construction lives here — that is mesa_sim/obs_builder.py
 
 IMPORT BOUNDARY:
     mesa_sim/ may import from shared/. shared/ never imports from mesa_sim/.
 
 STEP ORDER (RobotAgent):
     obs_builder → recognizer → replanning → planner → executor
-    This order is fixed and must not be changed without updating the paper formalization.
+    This order is fixed and must not be changed without updating the paper.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Optional, Dict, Any
+from typing import TYPE_CHECKING, List, Optional, Dict
 
-# imports from shared cognitive layer
-from shared.knowledge import KnowledgeBase
+from shared.domain_knowledge import DomainKnowledgeBase
 from shared.recognizer import IntentionRecognizer
 from shared.planner import AdaptivePlanner
 from shared.replanning import should_replan
-from shared.types import AbstractPlan, AbstractAction, ActionType, BeliefState
+from shared.types import AbstractPlan, BeliefState, TaskInstance
 
-
-# imports from FORK, Mesa Core module files and functions
 from mesa_sim.mesa_fork import agent
-
-# imports from sibling files 
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state
 from mesa_sim.executor import Executor
-
-
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import FactoryModel
 
 
 # =============================================================================
-# Base agent — shared physical attributes
+# Base agent
 # =============================================================================
 
 class FactoryAgent(agent.Agent):
-    """
-    Base class for all mobile agents in the factory.
-    Holds physical state only — no cognitive logic here.
-    """
 
-    def __init__(self, unique_id: str, model: "FactoryAgent", pos: tuple):
+    def __init__(self, unique_id: str, model: "FactoryModel", pos: tuple):
         super().__init__(unique_id, model)
-        # self.pos: tuple = pos               # (x, y) in center-origin coordinates
-        self.carrying: Optional[str] = None # item_id if holding an item, else None
-        self.current_task: Optional[str] = None    # task name string
-        self.current_action: Optional[str] = None  # action name string
-        self.current_microaction: Optional[str] = None  # microaction name string
+        self.carrying: Optional[str] = None
+        self.current_task: Optional[str] = None
+        self.current_action: Optional[str] = None
+        self.current_microaction: Optional[str] = None
 
     def step(self):
-        raise NotImplementedError("Subclasses must implement step()")
+        raise NotImplementedError
 
 
 # =============================================================================
-# HumanAgent — scripted, no cognitive layer
+# HumanAgent
 # =============================================================================
 
 class HumanAgent(FactoryAgent):
     """
-    Scripted human worker. Executes a fixed task sequence from scenarios.yaml.
-
-    The script is a list of dicts built by model._build_human_script():
-        [
-            {"task": "DELIVER_ITEM", "parameters": {"item_id": "item_1"}, "origin": "assigned"},
-            {"task": "COFFEE_BREAK", "parameters": {},                     "origin": "foreseeable"},
-            ...
-        ]
-
-    The robot has no reference to this script — privacy enforced by not
-    exposing it through any model attribute the robot can access.
-
-    Execution is delegated to mesa_sim/executor.py (stubbed until that file exists).
+    Scripted human worker. Executes a fixed List[TaskInstance] sequence.
+    Robot has no reference to this script.
     """
 
-    def __init__(self, unique_id: str, model: FactoryModel,
-                 pos: tuple, script: List[Dict[str, Any]]):
+    def __init__(self, unique_id: str, model: "FactoryModel",
+                 pos: tuple, script: List[TaskInstance]):
         super().__init__(unique_id, model, pos)
 
-        self.script: List[Dict[str, Any]] = script  # private task sequence
-        self.script_index: int = 0                  # current position in script
+        self.script: List[TaskInstance] = script
+        self.script_index: int = 0
         self.finished: bool = False
 
-        # Executor handles microaction-level execution each step
-        self.executor = Executor(agent=self, knowledge=model.knowledge)
+        self.planner = AdaptivePlanner(knowledge=model.knowledge)
+        self.current_plan: Optional[AbstractPlan] = None
+
+        self.executor = Executor(agent=self)
+
 
     def step(self):
-        """
-        Advance human by one microaction.
-        Executor pulls the current task from script and executes one microaction.
-        When a task completes, script_index advances to the next entry.
-        """
         if self.finished:
             return
 
-
-        entry = self.get_current_script_entry()
-        if entry is None:
+        task_instance = self.get_current_task_instance()
+        if task_instance is None:
             self.finished = True
             self.current_task = None
             return
-        
-        plan = self._script_entry_to_plan(entry)
+
         world = build_world_state(self.model)
-        self._execute(plan=plan, world=world)
+        
 
-
-
+        # Build plan once per task — reuse until advance_script() clears it: 
+        # for human agent, the plan is scripted and unaffected by belief updates, so no replanning logic needed.
+        if self.current_plan is None:
+            self.current_plan = self._task_instance_to_plan(task_instance, world)
+        self._execute(plan=self.current_plan, world=world)
+        
 
     def _execute(self, plan, world):
         self.executor.step(plan=plan, world=world)
         self.current_task = self.executor.current_task
         self.current_action = self.executor.current_action
         self.current_microaction = self.executor.current_microaction
-        
-        
 
-    def get_current_script_entry(self) -> Optional[Dict[str, Any]]:
-        """Return the current task entry from script. Used by obs_builder."""
+    def get_current_task_instance(self) -> Optional[TaskInstance]:
+        """Return current TaskInstance. Used by obs_builder."""
         if self.script_index < len(self.script):
             return self.script[self.script_index]
         return None
 
     def advance_script(self):
-        """Called by executor when current task is completed."""
+        """Called by executor when current task completes."""
         self.script_index += 1
+        self.current_plan = None  # Clear plan to trigger new plan generation for next task
         if self.script_index >= len(self.script):
             self.finished = True
 
-    def _script_entry_to_plan(self, entry: dict) -> AbstractPlan:
+    def _task_instance_to_plan(
+        self, task_instance: TaskInstance, world
+    ) -> AbstractPlan:
         """
-        Convert a script entry into an AbstractPlan for the executor.
-        Mirrors AdaptivePlanner.plan() but without belief/world adaptation.
-        Task-level parameters (e.g. item_id) are merged into each AbstractAction
-        so the executor can resolve completion predicates correctly.
+        Convert a TaskInstance into an AbstractPlan via the planner.
+        Bindings are already Dict[Var, Const] — no string manipulation.
+        Uses a dummy belief since human script has no IR.
         """
-        task_name = entry["task"]
-        task_params = entry.get("parameters", {})
+        # Convert Dict[Var, Const] → Dict[str, str] for planner
+        task_params = {k.name: v.value for k, v in task_instance.bindings.items()}
 
-        raw_actions = self.model.knowledge.get_task_actions(task_name)
-
-        actions = []
-        for action_str in raw_actions:
-            action_name = action_str.split("(")[0].strip()
-            actions.append(
-                AbstractAction(
-                    action_type=ActionType.NAVIGATE,
-                    action_name=action_name,
-                    parameters=dict(task_params, raw=action_str, action_name=action_name),
-                )
-            )
-
-        return AbstractPlan(
-            goal_intention=task_name,
-            actions=actions,
+        dummy_belief = BeliefState(
+            timestamp=float(self.model.schedule.steps),
+            agent_id=self.unique_id,
+            distribution={},
+            most_likely="unknown",
+            confidence=0.0,
         )
 
+        return self.planner.plan(
+            my_intention=task_instance.schema.name,
+            task_params=task_params,
+            agent_id=self.unique_id,
+            belief=dummy_belief,
+            world=world,
+        )
+
+
 # =============================================================================
-# RobotAgent — cognitive agent, calls shared core each step
+# RobotAgent
 # =============================================================================
 
 class RobotAgent(FactoryAgent):
     """
     Intention-aware robot agent. Owns the full cognitive loop.
-
-    Each step:
-        1. Build Observation of the human (obs_builder)
-        2. Update belief over human intentions (recognizer)
-        3. Check if replanning is needed (replanning)
-        4. Replan if triggered (planner)
-        5. Execute one microaction (executor)
-
-    Cognitive components (from shared/) are instantiated here and owned
-    by the robot for its lifetime. They are never shared with the model
-    or other agents.
-
-    observed_agent_id: the human agent this robot observes. In the current
-    single-human single-robot setup this is always human_0, but the field
-    is kept explicit to support multi-agent extensions.
     """
 
-    def __init__(self, unique_id: str, model: FactoryModel,
+    def __init__(self, unique_id: str, model: "FactoryModel",
                  pos: tuple,
-                 knowledge: KnowledgeBase,
-                 assigned_tasks: List[Dict[str, Any]],
+                 knowledge: DomainKnowledgeBase,
+                 assigned_tasks: List[TaskInstance],
                  observed_agent_id: Optional[str] = None):
         super().__init__(unique_id, model, pos)
 
-        self.observed_agent_id: Optional[str] = observed_agent_id
-        self.assigned_tasks: List[Dict[str, Any]] = assigned_tasks
+        self.observed_agent_id = observed_agent_id
+        self.assigned_tasks: List[TaskInstance] = assigned_tasks
         self.task_index: int = 0
 
-        # ------------------------------------------------------------------
-        # Cognitive components — all from shared/, no Mesa dependencies
-        # ------------------------------------------------------------------
         self.recognizer = IntentionRecognizer(knowledge=knowledge)
-        self.planner = AdaptivePlanner(knowledge=knowledge)
-
-        # Belief state — updated each step by recognizer
+        
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
 
-        # Current plan — updated when replanning triggers
+        self.planner = AdaptivePlanner(knowledge=knowledge)
         self.current_plan: Optional[AbstractPlan] = None
 
-        # Executor handles microaction-level execution each step
-        self.executor = Executor(agent=self, knowledge=knowledge)
+        self.executor = Executor(agent=self)
 
     def step(self):
         """
         Full cognitive loop: observe → recognize → replan? → plan → execute.
-        Order is fixed per paper formalization.
         """
-
-        # ------------------------------------------------------------------
-        # 1. Get the observed human agent
-        # ------------------------------------------------------------------
         human = self._get_observed_human()
         if human is None:
-            # No human to observe — execute current plan if any, then return
             world = build_world_state(model=self.model)
             self._execute(plan=self.current_plan, world=world)
             return
 
-        # ------------------------------------------------------------------
-        # 2. Build Observation from human's current Mesa state
-        # ------------------------------------------------------------------
         obs = build_observation(
             human_agent=human,
             model=self.model,
             timestamp=float(self.model.schedule.steps)
         )
 
-        # ------------------------------------------------------------------
-        # 3. Update belief over human intentions
-        # ------------------------------------------------------------------
         if obs is not None:
             self.prev_belief = self.belief
             self.belief = self.recognizer.update(
@@ -269,15 +204,9 @@ class RobotAgent(FactoryAgent):
                 prev_belief=self.prev_belief
             )
 
-        # ------------------------------------------------------------------
-        # 4. Build WorldState snapshot
-        # ------------------------------------------------------------------
         world = build_world_state(model=self.model)
 
-        # ------------------------------------------------------------------
-        # 5. Check replanning trigger
-        # ------------------------------------------------------------------
-        if self.belief is not None and world is not None:
+        if self.belief is not None:
             trigger = should_replan(
                 current_plan=self.current_plan,
                 new_belief=self.belief,
@@ -285,22 +214,23 @@ class RobotAgent(FactoryAgent):
                 prev_belief=self.prev_belief
             )
 
-            # ------------------------------------------------------------------
-            # 6. Replan if triggered
-            # ------------------------------------------------------------------
             if trigger["replan"]:
-                my_intention = self._get_current_intention()
-                if my_intention is not None:
+                task_instance = self._get_current_task_instance()
+                if task_instance is not None:
+                    # Convert Dict[Var, Const] → Dict[str, str] for planner
+                    task_params = {
+                        k.name: v.value
+                        for k, v in task_instance.bindings.items()
+                    }
                     self.current_plan = self.planner.plan(
-                        my_intention=my_intention,
+                        my_intention=task_instance.schema.name,
+                        task_params=task_params,
+                        agent_id=self.unique_id,
                         belief=self.belief,
                         world=world,
                         current_plan=self.current_plan
                     )
 
-        # ------------------------------------------------------------------
-        # 7. Execute one microaction from current plan
-        # ------------------------------------------------------------------
         self._execute(plan=self.current_plan, world=world)
 
     # =========================================================================
@@ -308,31 +238,23 @@ class RobotAgent(FactoryAgent):
     # =========================================================================
 
     def _execute(self, plan, world):
-        """
-        Execute one microaction from current_plan via executor.
-        Stubbed until executor.py exists.
-        """
         self.executor.step(plan=plan, world=world)
         self.current_task = self.executor.current_task
         self.current_action = self.executor.current_action
         self.current_microaction = self.executor.current_microaction
-        
-        
-        
+
     def _get_observed_human(self) -> Optional[HumanAgent]:
-        """Return the HumanAgent this robot is observing, or None."""
         if self.observed_agent_id is None:
             return None
         return self.model.humans.get(self.observed_agent_id)
 
-    def _get_current_intention(self) -> Optional[str]:
-        """Return the robot's current assigned task name, or None if done."""
+    def _get_current_task_instance(self) -> Optional[TaskInstance]:
+        """Return current TaskInstance, or None if all tasks done."""
         if self.task_index < len(self.assigned_tasks):
-            return self.assigned_tasks[self.task_index]["task"]
+            return self.assigned_tasks[self.task_index]
         return None
 
-
     def advance_task(self):
-        """Called by executor when current assigned task completes."""
+        """Called by executor when current task completes."""
         self.task_index += 1
-        self.current_plan = None  # force replan on next step
+        self.current_plan = None

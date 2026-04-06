@@ -8,7 +8,7 @@ PURPOSE:
 WHAT THIS MODULE DOES:
     - Returns a portrayal dict for each agent type (HumanAgent, RobotAgent)
     - Uses agent state (carrying, current_task) to adjust appearance
-    - Domain-independent: works for any scenario
+    - Environment-layout-independent: works for any scenario
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT define positions or sizes — those come from agent.pos

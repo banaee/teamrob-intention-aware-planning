@@ -47,16 +47,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mesa_sim.sim_model import FactoryModel
-
+from domains.kitting.scenarios import scenario_01
 
 # =============================================================================
 # Default config
 # =============================================================================
 
-DEFAULT_SCENARIO = "scenario_01"
 DEFAULT_STEPS = 100
-DEFAULT_DOMAIN = "configs/domain1.json"
-DEFAULT_SCENARIOS = "configs/scenarios.yaml"
+DEFAULT_ENV_LAYOUT = "domains/kitting/env_layout1.json"
+
+SCENARIOS = {
+    "scenario_01": scenario_01,
+} 
+DEFAULT_SCENARIO_ID = "scenario_01"
 
 
 # =============================================================================
@@ -70,16 +73,27 @@ def run_headless(scenario_id: str, n_steps: int):
     """
     print(f"[run_mesa] Starting headless run — scenario={scenario_id}, steps={n_steps}")
 
+    scenario  = SCENARIOS.get(scenario_id)
+    if scenario is None:
+        print(f"[run_mesa] ERROR: unknown scenario '{scenario_id}'. "
+              f"Available: {list(SCENARIOS.keys())}")
+        return None
+
     model = FactoryModel(
-        scenario_id=scenario_id,
-        domain_path=DEFAULT_DOMAIN,
-        scenarios_path=DEFAULT_SCENARIOS,
+        scenario=scenario,
+        env_layout_path=DEFAULT_ENV_LAYOUT,
     )
 
     for step in range(n_steps):
         model.step()
         print(f"  step {step + 1}/{n_steps} — schedule steps: {model.schedule.steps}")
-
+        # only for diagnostic purposes — print agent states every 10 steps
+        if step % 10 == 0:
+            for aid, human in model.humans.items():
+                print(f"  [{aid}] task={human.current_task} action={human.current_action} micro={human.current_microaction} pos={human.pos}")
+            for aid, robot in model.robots.items():
+                print(f"  [{aid}] task={robot.current_task} action={robot.current_action} micro={robot.current_microaction} pos={robot.pos}")
+    
     print("[run_mesa] Headless run complete.")
     return model
 
@@ -102,9 +116,8 @@ _space_drawer_stub = None
 def _make_model():
     """Factory function for SolaraViz — creates fresh model instance."""
     return FactoryModel(
-        scenario_id=DEFAULT_SCENARIO,
-        domain_path=DEFAULT_DOMAIN,
-        scenarios_path=DEFAULT_SCENARIOS,
+        scenario=SCENARIOS[DEFAULT_SCENARIO_ID],  # ScenarioConfig object
+        env_layout_path=DEFAULT_ENV_LAYOUT,
     )
 
 
@@ -117,7 +130,7 @@ if __name__ != "__main__":
 
         page = SolaraViz(
             model_class=FactoryModel,
-            model_params={"scenario_id": DEFAULT_SCENARIO},
+            model_params={"scenario": SCENARIOS[DEFAULT_SCENARIO_ID]},  # scenario object, not ID string
             space_drawer=space_drawer,
             agent_portrayal=agent_portrayal,
             name="TeamRob Factory Simulation",
@@ -134,8 +147,8 @@ if __name__ != "__main__":
 def main():
     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
     parser.add_argument(
-        "--scenario", type=str, default=DEFAULT_SCENARIO,
-        help=f"Scenario ID from scenarios.yaml (default: {DEFAULT_SCENARIO})"
+        "--scenario", type=str, default=DEFAULT_SCENARIO_ID,
+        help=f"Scenario ID to run (default: {DEFAULT_SCENARIO_ID}). Available: {list(SCENARIOS.keys())}"
     )
     parser.add_argument(
         "--steps", type=int, default=DEFAULT_STEPS,

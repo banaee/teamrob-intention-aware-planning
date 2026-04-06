@@ -16,17 +16,18 @@ WHAT THIS MODULE DOES:
 
     For HumanAgent:
         - Same structure, but driven by script entries instead of AbstractPlan
-        - Script entry is converted to a minimal plan-like structure internally
+        - Script entry is converted to a minimal GroundedAction plan internally
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT do planning or replanning — that is shared/planner.py
     - Does NOT build WorldState — that is world_state_builder.py
     - Does NOT build Observations — that is obs_builder.py
-    - Does NOT expand AbstractActions — that is action_decomposer.py
+    - Does NOT expand GroundedActions — that is action_decomposer.py
     - Does NOT know about IR or belief states
+    - Does NOT parse strings — completion checking is direct Predicate set membership
 
 I/O:
-    IN:  AbstractPlan          from RobotAgent.current_plan
+    IN:  AbstractPlan          from RobotAgent.current_plan (actions are GroundedActions)
     IN:  WorldState            built fresh each step by world_state_builder
     IN:  model                 for physical world mutation
     OUT: current_task          str — exposed on agent
@@ -35,27 +36,17 @@ I/O:
     OUT: world mutations       agent.pos, item.held_by, item.at_location
 
 COMPLETION CHECKING:
-    Each action has a completion_predicate template in actions_library.yaml
-    e.g. "at({agent_id}, {zone_id})"
-    Executor resolves template with current parameters → Predicate object
-    Checks if that Predicate exists in WorldState.predicates
-    If yes → action complete, advance to next
-
-PHYSICAL EXECUTION (Mesa-specific):
-    STEP    → move agent (and carried item) to target_pos via space.move_agent()
-    GRASP   → update item.held_by, item.at_location, agent.carrying
-    RELEASE → update item.held_by, item.at_location, agent.carrying
-    STAND   → no-op, agent stays in place
+    Each GroundedAction carries a fully instantiated completion_predicate
+    (Predicate with Const args). Executor checks set membership in
+    WorldState.predicates directly — no string parsing, no template resolution.
 """
 
 from __future__ import annotations
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 import math
 
-from shared.types import AbstractPlan, AbstractAction, WorldState
-from shared.types import Predicate
-from shared.knowledge import KnowledgeBase
-from mesa_sim.action_decomposer import Microaction, expand, steps_toward
+from shared.types import AbstractPlan, GroundedAction, WorldState, Predicate
+from mesa_sim.action_decomposer import Microaction, expand
 
 
 class Executor:
@@ -64,14 +55,13 @@ class Executor:
     Instantiated per agent, owned by the agent.
     """
 
-    def __init__(self, agent, knowledge: KnowledgeBase):
+    def __init__(self, agent):
         self.agent = agent
-        self.knowledge = knowledge
 
         # Current tracking state
         self.current_plan: Optional[AbstractPlan] = None
-        self.action_index: int = 0                      # index into plan.actions
-        self.microaction_queue: List[Microaction] = []  # expanded from current action
+        self.action_index: int = 0
+        self.microaction_queue: List[Microaction] = []
 
         # Exposed to agent and obs_builder
         self.current_task: Optional[str] = None
@@ -86,16 +76,12 @@ class Executor:
         """
         Execute one microaction from the current plan.
 
-        INPUT:
-            plan   — current AbstractPlan from robot/human
-            world  — fresh WorldState snapshot from world_state_builder
-
         FLOW:
             1. Load plan if new or changed
-            2. Check if current action is complete → advance if so
-            3. Expand microaction queue if empty
-            4. Execute one microaction
-            5. Update tracking attributes
+            2. Get current action
+            3. Check if current action is complete → advance if so
+            4. Expand microaction queue if empty
+            5. Execute one microaction
         """
 
         # ------------------------------------------------------------------
@@ -112,11 +98,10 @@ class Executor:
         # 2. Get current action
         # ------------------------------------------------------------------
         if self.action_index >= len(self.current_plan.actions):
-            # All actions done — task complete
             self._on_task_complete()
             return
 
-        action = self.current_plan.actions[self.action_index]
+        action: GroundedAction = self.current_plan.actions[self.action_index]
         self.current_task = self.current_plan.goal_intention
         self.current_action = action.action_name
 
@@ -133,7 +118,6 @@ class Executor:
         if not self.microaction_queue:
             self._expand_queue(action)
             if not self.microaction_queue:
-                # Expansion failed — cannot proceed
                 self.current_microaction = None
                 return
 
@@ -148,7 +132,6 @@ class Executor:
         if success:
             self.microaction_queue.pop(0)
         else:
-            # Failed microaction — clear queue, will retry expansion next step
             self.microaction_queue = []
             self.current_microaction = None
 
@@ -156,90 +139,26 @@ class Executor:
     # Action completion checking
     # =========================================================================
 
-    def _is_action_complete(self, action: AbstractAction, world: WorldState) -> bool:
+    def _is_action_complete(self, action: GroundedAction, world: WorldState) -> bool:
         """
         Check if action's completion_predicate is satisfied in WorldState.
-        Resolves parameter placeholders from action.parameters + agent context.
+        Direct set membership — no string parsing, no template resolution.
         """
-        predicate_template = self.knowledge.get_action_completion_predicate(
-            action.action_name
-        )
-        if not predicate_template:
-            return False
-
-        resolved = self._resolve_predicate(predicate_template, action.parameters)
-        if resolved is None:
-            return False
-
-        return resolved in world.predicates
-
-    def _resolve_predicate(
-        self, template: str, params: Dict[str, Any]
-    ) -> Optional[Predicate]:
-        """
-        Resolve a completion_predicate template string into a Predicate object.
-
-        Template format: "at({agent_id}, {zone_id})"
-        Resolution context: action.parameters + agent_id from agent
-
-        Returns None if template cannot be fully resolved.
-
-        TODO Phase 4: handle nested resolution e.g. {item_zone} → zone of item
-        """
-        # Build resolution context
-        context = dict(params)
-        context["agent_id"] = self.agent.unique_id
-
-        # Parse template: "predicate_name(arg1, arg2, ...)"
-        try:
-            name_part, args_part = template.split("(", 1)
-            args_part = args_part.rstrip(")")
-            name = name_part.strip()
-            raw_args = [a.strip() for a in args_part.split(",")]
-
-            resolved_args = []
-            for arg in raw_args:
-                if arg.startswith("{") and arg.endswith("}"):
-                    key = arg[1:-1]
-                    value = context.get(key)
-                    if value is None:
-                        return None  # unresolvable placeholder
-                    resolved_args.append(str(value))
-                else:
-                    resolved_args.append(arg)
-
-            return Predicate(name=name, args=tuple(resolved_args))
-
-        except Exception:
-            return None
+        return action.completion_predicate in world.predicates
 
     # =========================================================================
     # Microaction queue expansion
     # =========================================================================
 
-    def _expand_queue(self, action: AbstractAction):
+    def _expand_queue(self, action: GroundedAction):
         """
-        Expand current action into microaction queue.
-        For STEP-based movement, uses steps_toward() with agent's current pos.
+        Expand current GroundedAction into microaction queue.
+        Fully delegates to action_decomposer.expand() — no domain logic here.
+        Target resolution for movement actions is handled inside expand().
         """
-        action_name = action.action_name.upper() if action.action_name else ""
+        self.microaction_queue = expand(action, self.agent.model, self.agent.pos)
 
-        if action_name in ("GOTO_ZONE", "MOVE_TO"):
-            # Movement: generate STEP sequence from current pos to target
-            from mesa_sim.action_decomposer import _resolve_target_position, _get_step_size
-            target_pos = _resolve_target_position(
-                action_name, action.parameters, self.agent.model
-            )
-            if target_pos:
-                step_size = _get_step_size(self.agent.model)
-                self.microaction_queue = steps_toward(
-                    current_pos=self.agent.pos,
-                    target_pos=target_pos,
-                    step_size=step_size,
-                )
-        else:
-            # Non-movement actions: use standard expand()
-            self.microaction_queue = expand(action, self.agent.model)
+
 
     # =========================================================================
     # Physical microaction execution
@@ -260,7 +179,7 @@ class Executor:
         elif name == "release":
             return self._execute_release(microaction)
         elif name == "stand":
-            return True  # no-op, agent stays in place
+            return True  # no-op
         else:
             return False
 
@@ -270,11 +189,9 @@ class Executor:
         if target_pos is None:
             return False
 
-        # Move agent in Mesa space
         self.agent.model.space.move_agent(self.agent, target_pos)
         self.agent.pos = target_pos
 
-        # If carrying an item, sync item position
         if self.agent.carrying:
             item = self.agent.model.items.get(self.agent.carrying)
             if item:
@@ -292,26 +209,24 @@ class Executor:
         if item is None:
             return False
 
-        # Cannot grasp if already carrying something
         if self.agent.carrying:
             return False
 
-        # Cannot grasp if item already held by someone else
         if item.held_by and item.held_by != self.agent.unique_id:
             return False
 
-        # Update item state
         item.held_by = self.agent.unique_id
-        item.at_location = None  # no longer at a shelf
+        item.at_location = None
         item.position = self.agent.pos
-
-        # Update agent state
         self.agent.carrying = item_id
 
         return True
 
     def _execute_release(self, microaction: Microaction) -> bool:
-        """Place carried item at target location. Updates item state."""
+        """
+        Place carried item at current agent position.
+        Detects target env object by proximity.
+        """
         if not self.agent.carrying:
             return False
 
@@ -320,22 +235,43 @@ class Executor:
         if item is None:
             return False
 
-        target = microaction.params.get("target", "")
-
-        # Verify target env object exists
-        target_obj = self.agent.model.get_env_object(target)
-        if target_obj is None:
+        target_id = self._nearest_env_object()
+        if target_id is None:
             return False
 
-        # Update item state
-        item.held_by = None
-        item.at_location = target
-        item.position = target_obj.position
+        target_obj = self.agent.model.get_env_object(target_id)
+        if target_obj is None:
+            print(f"[executor] WARNING: no env object found near "
+                  f"{self.agent.unique_id} for releasing {item_id}")
+            return False
 
-        # Update agent state
+        print(f"[executor] {self.agent.unique_id} releasing {item_id} "
+              f"at {target_id} ({target_obj.obj_type})")
+
+        item.held_by = None
+        item.at_location = target_id
+        item.position = target_obj.position
+        item.zone = target_obj.zone
         self.agent.carrying = None
 
         return True
+
+    def _nearest_env_object(self) -> Optional[str]:
+        """Find closest non-obstacle env object to agent. Used by release."""
+        agent_x, agent_y = self.agent.pos
+        nearest_id = None
+        nearest_dist = float("inf")
+
+        for obj_id, obj in self.agent.model.env_objects.items():
+            if obj.obj_type == "obstacle":
+                continue
+            ox, oy = obj.position
+            dist = math.sqrt((agent_x - ox) ** 2 + (agent_y - oy) ** 2)
+            if dist < nearest_dist:
+                nearest_dist = dist
+                nearest_id = obj_id
+
+        return nearest_id
 
     # =========================================================================
     # Plan management helpers
@@ -361,7 +297,6 @@ class Executor:
         self.current_microaction = None
         self.microaction_queue = []
 
-        # Signal agent to advance to next task
         if hasattr(self.agent, "advance_task"):
             self.agent.advance_task()
         elif hasattr(self.agent, "advance_script"):
