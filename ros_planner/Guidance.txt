@@ -1,0 +1,27 @@
+
+1: I have assumed 6 different tasks, each including going to object, picking item, going to delivery desk, placing it. Here environment is static, obstacles have been defined as orange circles and human is also assumed to be static. Blue point is the initial point for robot and each red point is like the current goal of the robot for current action. this core is just a proof of concept how my local planner can react in ideal scenarion and under this setting. To run the code after checking planner_node inside lunch file which should be planner_1:
+ 
+	ros2 launch planner planner_visualization.launch.py
+	
+	
+2: I have worked on creating two different environments on gazebo. THey have different sizes and they can be load on ROS2. we can change the name of environment in the launch file. The code to see the .worlds are:
+
+			ros2 launch human_robot my_world.launch.py 
+			
+if it has an error check : 
+	echo 'export GAZEBO_MODEL_PATH=/home/fatemeh/test1/aws-robomaker-small-warehouse-world/models:$GAZEBO_MODEL_PATH' >> ~/.bashrc
+	source ~/.bashrc
+
+			
+3: Next step is to give the created words to Hadi to use them on MESA. Two python codes
+have been written. one of them convert sdf to yaml file and the other one convert .world to both .yaml and .json files. The codes can be run through : (We can choose which .world we aim to and where to save the files inside the python files). So basically, Hadi will have type of objects, their size and also their positions. 
+
+			python3 sdf_to_yaml_json.py 
+			python3 sdf_to_yaml.py 
+
+
+
+4: In this step we add interruption to tasks and run our code again. Interruptions include 4 cases, when going to object -> just cancel the current task, going to targer -> going back to object and place the object back, picking up or placing and item -> contiue the ask and ask human to wait for a couple of seconds. for each task, we have an id, and also we have interruptions while going to object or going to target:
+
+	ros2 launch planner planner_visualization_interrupt.launch.py
+
