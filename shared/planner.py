@@ -34,7 +34,7 @@ GROUNDING:
 from typing import Dict, List, Optional
 
 from shared.types import (
-    Var, Const, Predicate, ConditionSchema,
+    ProcessCompletion, Var, Const, Predicate, ConditionSchema,
     GroundedAction, AbstractPlan, BeliefState, WorldState,
     TaskSchema, MethodSchema, StepCall,
 )
@@ -120,13 +120,24 @@ class AdaptivePlanner:
             if operator is None:
                 continue
             bindings = self._resolve_bindings(step, method, task_params, agent_id, world)
-            completion = self._ground_condition(operator.completion, bindings)
+
+            # Ground the completion predicate, unless it's a ProcessCompletion which is monitored differently by the executor. 
+            if isinstance(operator.completion, ProcessCompletion):
+                completion_predicate = None
+            else:
+                completion_predicate = self._ground_condition(operator.completion, bindings)
+
             grounded.append(GroundedAction(
                 action_name=step.action_name,
                 bindings=bindings,
-                completion_predicate=completion,
+                completion_predicate=completion_predicate,
                 operator=operator,
-            ))
+            ))            
+        
+        
+        
+        
+        
         return grounded
 
     def _resolve_bindings(

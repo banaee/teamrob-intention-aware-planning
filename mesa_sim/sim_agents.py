@@ -180,48 +180,51 @@ class RobotAgent(FactoryAgent):
         self.current_plan: Optional[AbstractPlan] = None
 
         self.executor = Executor(agent=self)
-
     def step(self):
         """
         Full cognitive loop: observe → recognize → replan? → plan → execute.
         """
         human = self._get_observed_human()
-        if human is None:
-            world = build_world_state(model=self.model)
-            self._execute(plan=self.current_plan, world=world)
-            return
 
-        obs = build_observation(
-            human_agent=human,
-            model=self.model,
-            timestamp=float(self.model.schedule.steps)
-        )
-
-        if obs is not None:
-            self.prev_belief = self.belief
-            self.belief = self.recognizer.update(
-                obs=obs,
-                prev_belief=self.prev_belief
+        if human is not None:
+            obs = build_observation(
+                human_agent=human,
+                model=self.model,
+                timestamp=float(self.model.schedule.steps)
             )
+            if obs is not None:
+                self.prev_belief = self.belief
+                self.belief = self.recognizer.update(
+                    obs=obs,
+                    prev_belief=self.prev_belief
+                )
 
         world = build_world_state(model=self.model)
 
-        if self.belief is not None:
+        # Seed initial plan (also triggers after advance_task() clears current_plan)
+        if self.current_plan is None:
+            task_instance = self._get_current_task_instance()
+            if task_instance is not None:
+                task_params = {k.name: v.value for k, v in task_instance.bindings.items()}
+                self.current_plan = self.planner.plan(
+                    my_intention=task_instance.schema.name,
+                    task_params=task_params,
+                    agent_id=self.unique_id,
+                    belief=self.belief or self._make_dummy_belief(),
+                    world=world,
+                )
+
+        if self.belief is not None and human is not None:
             trigger = should_replan(
                 current_plan=self.current_plan,
                 new_belief=self.belief,
                 world=world,
                 prev_belief=self.prev_belief
             )
-
             if trigger["replan"]:
                 task_instance = self._get_current_task_instance()
                 if task_instance is not None:
-                    # Convert Dict[Var, Const] → Dict[str, str] for planner
-                    task_params = {
-                        k.name: v.value
-                        for k, v in task_instance.bindings.items()
-                    }
+                    task_params = {k.name: v.value for k, v in task_instance.bindings.items()}
                     self.current_plan = self.planner.plan(
                         my_intention=task_instance.schema.name,
                         task_params=task_params,
@@ -231,11 +234,22 @@ class RobotAgent(FactoryAgent):
                         current_plan=self.current_plan
                     )
 
-        self._execute(plan=self.current_plan, world=world)
-
+        self._execute(plan=self.current_plan, world=world)    
+        
+    
     # =========================================================================
     # Internal helpers
     # =========================================================================
+
+    def _make_dummy_belief(self) -> BeliefState:
+        return BeliefState(
+            timestamp=float(self.model.schedule.steps),
+            agent_id=self.unique_id,
+            distribution={},
+            most_likely="unknown",
+            confidence=0.0,
+        )
+
 
     def _execute(self, plan, world):
         self.executor.step(plan=plan, world=world)

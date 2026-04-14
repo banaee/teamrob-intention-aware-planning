@@ -14,7 +14,7 @@ PREDICATE NAMING NOTE:
 
 """
 
-from shared.types import Var, Const, ConditionSchema, ActionOperator
+from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionOperator
 
 _agent  = Var("?agent")
 _item   = Var("?item")
@@ -75,10 +75,10 @@ place = ActionOperator(
         ConditionSchema("holding", (_agent, _item)),
     ],
     effects=[
-        ConditionSchema("item_at", (_item, _target)),
+        ConditionSchema("obj_at", (_item, _target)),
         ConditionSchema("not_holding", (_agent, _item)),
     ],
-    completion=ConditionSchema("item_at", (_item, _target)),
+    completion=ConditionSchema("obj_at", (_item, _target)),
     microactions=["RELEASE"],
 )
 
@@ -88,9 +88,7 @@ wait_at = ActionOperator(
     preconditions=[
         ConditionSchema("at", (_agent, _entity)),
     ],
-    effects=[
-        ConditionSchema("waited_at", (_agent, _entity)),
-    ],
-    completion=ConditionSchema("waited_at", (_agent, _entity)),
+    effects=[],
+    completion=ProcessCompletion(),
     microactions="STAND*",
 )

@@ -42,6 +42,7 @@ ROS EQUIVALENT:
 import argparse
 import sys
 from pathlib import Path
+import numpy as np
 
 # Ensure project root is on path when run directly
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -53,7 +54,7 @@ from domains.kitting.scenarios import scenario_01
 # Default config
 # =============================================================================
 
-DEFAULT_STEPS = 100
+DEFAULT_STEPS = 400
 DEFAULT_ENV_LAYOUT = "domains/kitting/env_layout1.json"
 
 SCENARIOS = {
@@ -86,14 +87,14 @@ def run_headless(scenario_id: str, n_steps: int):
 
     for step in range(n_steps):
         model.step()
-        print(f"  step {step + 1}/{n_steps} — schedule steps: {model.schedule.steps}")
+        # print(f"  step {step + 1}/{n_steps} — schedule steps: {model.schedule.steps}")
         # only for diagnostic purposes — print agent states every 10 steps
         if step % 10 == 0:
             for aid, human in model.humans.items():
-                print(f"  [{aid}] task={human.current_task} action={human.current_action} micro={human.current_microaction} pos={human.pos}")
+                print(f"  [{aid}] task={human.current_task} action={human.current_action} micro={human.current_microaction} pos={np.round(human.pos, 2)}")
             for aid, robot in model.robots.items():
-                print(f"  [{aid}] task={robot.current_task} action={robot.current_action} micro={robot.current_microaction} pos={robot.pos}")
-    
+                print(f"  [{aid}] task={robot.current_task} action={robot.current_action} micro={robot.current_microaction} pos={np.round(robot.pos, 2)}")
+
     print("[run_mesa] Headless run complete.")
     return model
 

@@ -203,14 +203,15 @@ def _resolve_movement_target(
         return None
 
 
-
 def _env_object_position(obj_id: str, model) -> Optional[Tuple[float, float]]:
-    """Return the position of a named env object."""
+    """Return the position of a named env object or item."""
     obj = model.get_env_object(obj_id)
-    if obj is None:
-        return None
-    return obj.position
-
+    if obj is not None:
+        return obj.position
+    item = model.get_item(obj_id)
+    if item is not None:
+        return item.position
+    return None
 
 # =============================================================================
 # Step sequence generation

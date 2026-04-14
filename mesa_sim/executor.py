@@ -45,7 +45,7 @@ from __future__ import annotations
 from typing import List, Optional
 import math
 
-from shared.types import AbstractPlan, GroundedAction, WorldState, Predicate
+from shared.types import AbstractPlan, GroundedAction, WorldState, Predicate, ProcessCompletion
 from mesa_sim.action_decomposer import Microaction, expand
 
 
@@ -67,6 +67,7 @@ class Executor:
         self.current_task: Optional[str] = None
         self.current_action: Optional[str] = None
         self.current_microaction: Optional[str] = None
+        self._queue_was_exhausted: bool = False
 
     # =========================================================================
     # Main step — called once per Mesa step by agent.step()
@@ -131,6 +132,8 @@ class Executor:
 
         if success:
             self.microaction_queue.pop(0)
+            if not self.microaction_queue:
+                self._queue_was_exhausted = True
         else:
             self.microaction_queue = []
             self.current_microaction = None
@@ -141,9 +144,14 @@ class Executor:
 
     def _is_action_complete(self, action: GroundedAction, world: WorldState) -> bool:
         """
-        Check if action's completion_predicate is satisfied in WorldState.
-        Direct set membership — no string parsing, no template resolution.
+        Check if action is complete.
+        Branches on completion type declared in the operator schema:
+        - ConditionSchema: checks completion_predicate membership in WorldState.predicates
+        - ProcessCompletion: checks if microaction queue was fully exhausted
+        No string parsing, no template resolution.
         """
+        if isinstance(action.operator.completion, ProcessCompletion):
+            return self._queue_was_exhausted
         return action.completion_predicate in world.predicates
 
     # =========================================================================
@@ -283,12 +291,14 @@ class Executor:
         self.action_index = 0
         self.microaction_queue = []
         self.current_task = plan.goal_intention
+        self._queue_was_exhausted = False
 
     def _advance_action(self):
         """Move to next action in plan."""
         self.action_index += 1
         self.microaction_queue = []
         self.current_microaction = None
+        self._queue_was_exhausted = False
 
     def _on_task_complete(self):
         """Called when all actions in plan are done."""

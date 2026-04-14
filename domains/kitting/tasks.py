@@ -61,7 +61,7 @@ coffee_break = TaskSchema(
                 ),
                 StepCall(
                     action_name="wait_at",
-                    bindings={_entity: Const("coffee_machine_0")},
+                    bindings={_entity: Const("coffee_machine_0"), Var("?duration"): Const("PT60S")},   # using processcompletion 
                 ),
             ],
         )
@@ -85,7 +85,7 @@ ac_activation = TaskSchema(
                 ),
                 StepCall(
                     action_name="wait_at",
-                    bindings={_entity: Const("ac_switch_0")},
+                    bindings={_entity: Const("ac_switch_0"), Var("?duration"): Const("PT2S")},  # using processcompletion
                 ),
             ],
         )

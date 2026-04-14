@@ -178,6 +178,17 @@ class ConditionSchema:
 
 
 @dataclass
+class ProcessCompletion:
+    """
+    Completion determined by process exhaustion, not world state.
+    Executor signals done when microaction queue empties naturally.
+    Planner treats this action as always satisfiable in forward chaining.
+    Used for duration-based actions like wait_at where time is not world state.
+    """
+    pass
+
+
+@dataclass
 class StepCall:
     """
     One step in an HTN method body — a call to an action operator with bindings.
@@ -232,7 +243,7 @@ class ActionOperator:
     parameters: List[Var]
     preconditions: List[ConditionSchema]
     effects: List[ConditionSchema]
-    completion: ConditionSchema         # single predicate — executor monitors this
+    completion: Union[ConditionSchema, ProcessCompletion]    # either conditionSchema or ProcessCompletion
     microactions: Union[str, List[str]] # 'STEP*' / 'STAND*' or ['GRASP'] etc.
     movement_target_key: Optional[str] = None
     # Binding key whose value is the movement target position.
@@ -253,7 +264,7 @@ class GroundedAction:
     """
     action_name: str
     bindings: Dict[str, str]            # {var_name: concrete_value} e.g. {'?zone': 'zone_SE'}
-    completion_predicate: Predicate     # fully grounded, ready for set membership check
+    completion_predicate: Optional[Predicate]     # fully grounded, ready for set membership check (or None if completion is ProcessCompletion)
     operator: ActionOperator            # back-reference for decomposer
 
 
