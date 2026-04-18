@@ -54,7 +54,7 @@ from domains.kitting.scenarios import scenario_01
 # Default config
 # =============================================================================
 
-DEFAULT_STEPS = 400
+DEFAULT_STEPS = 600
 DEFAULT_ENV_LAYOUT = "domains/kitting/env_layout1.json"
 
 SCENARIOS = {
@@ -99,46 +99,24 @@ def run_headless(scenario_id: str, n_steps: int):
     return model
 
 
+
 # =============================================================================
 # Solara visualization entry point
 # =============================================================================
 
-# These will be implemented in mesa_sim/visualization/ when that module exists
-# TODO: implement factory_agent_portrayal
-def _agent_portrayal_stub(agent):
-    return {"color": "blue", "size": 10}
+from mesa_sim.viz.space_drawer import space_drawer
+from mesa_sim.viz.portrayal import agent_portrayal
+from mesa_sim.mesa_fork.visualization import SolaraViz
 
-
-# TODO: implement factory_space_drawer using Plotly
-# mirrors old visualization/factory_space_drawer.py
-_space_drawer_stub = None
-
-
-def _make_model():
-    """Factory function for SolaraViz — creates fresh model instance."""
-    return FactoryModel(
-        scenario=SCENARIOS[DEFAULT_SCENARIO_ID],  # ScenarioConfig object
-        env_layout_path=DEFAULT_ENV_LAYOUT,
-    )
-
-
-# Solara viz page — only instantiated when loaded by `solara run`, not by direct python execution
-if __name__ != "__main__":
-    try:
-        from mesa_sim.viz.space_drawer import space_drawer
-        from mesa_sim.viz.portrayal import agent_portrayal
-        from mesa_sim.mesa_fork.visualization import SolaraViz
-
-        page = SolaraViz(
-            model_class=FactoryModel,
-            model_params={"scenario": SCENARIOS[DEFAULT_SCENARIO_ID]},  # scenario object, not ID string
-            space_drawer=space_drawer,
-            agent_portrayal=agent_portrayal,
-            name="TeamRob Factory Simulation",
-            play_interval=0.001,
-        )
-    except ImportError:
-        page = None
+page = SolaraViz(
+    model_class=FactoryModel,
+    model_params={"scenario": SCENARIOS[DEFAULT_SCENARIO_ID]},
+    space_drawer=space_drawer,
+    agent_portrayal=agent_portrayal,
+    name="TeamRob Factory Simulation",
+    # play_interval=150,  # means about 6 steps per second.
+    play_interval=5,  # means about 6 steps per second.
+)
 
 
 # =============================================================================
@@ -155,19 +133,13 @@ def main():
         "--steps", type=int, default=DEFAULT_STEPS,
         help=f"Number of steps to run in headless mode (default: {DEFAULT_STEPS})"
     )
-    parser.add_argument(
-        "--headless", action="store_true", default=True,
-        help="Run without visualization (default: True)"
-    )
-
     args = parser.parse_args()
-
-    if args.headless:
-        run_headless(scenario_id=args.scenario, n_steps=args.steps)
-    else:
-        print("[run_mesa] Visualization mode not yet implemented — run with solara.")
-        print("  solara run mesa_sim/run_mesa.py")
+    run_headless(scenario_id=args.scenario, n_steps=args.steps)
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if not any("solara" in arg for arg in sys.argv):
+        main()
+        
+        

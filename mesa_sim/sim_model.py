@@ -68,7 +68,8 @@ class FactoryModel(model.Model):
 
     def __init__(self,
                  scenario: ScenarioConfig,
-                 env_layout_path: str = "domains/kitting/env_layout1.json"):
+                 env_layout_path: str = "domains/kitting/env_layout1.json", 
+                 seed=None):
         super().__init__()
 
         # ------------------------------------------------------------------
