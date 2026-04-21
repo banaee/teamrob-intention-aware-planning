@@ -54,6 +54,8 @@ Currently implemented: `domains/kitting/` (industrial kitting scenario)
 
 ## Pre-Requisites
 
+Using Python 3.10+, and vistual environments (in the example below: `venv`) for dependency management.
+
 ```bash
 python3 -m venv ~/python-envs/tr-env
 source ~/python-envs/tr-env/bin/activate
@@ -95,38 +97,37 @@ Todo: instructions for ROS embodiment once implemented.
 ```
 teamrob-intention-aware-planning/
 ├── shared/                      # Cognitive layer — simulator-agnostic
-│   ├── types.py                 # Canonical dataclasses
-│   ├── domain_knowledge.py      # DomainKnowledgeBase interface
-│   ├── recognizer.py            # Intention recognition (Bayesian)
-│   ├── planner.py               # Adaptive planner (HTN grounding)
-│   ├── replanning.py            # Replanning trigger logic
-│   └── io_contracts.md          # Interface specifications
+│   ├── types.py                    # Canonical dataclasses
+│   ├── domain_knowledge.py         # DomainKnowledgeBase interface
+│   ├── recognizer.py               # Intention recognition (Bayesian)
+│   ├── planner.py                  # Adaptive planner (HTN grounding)
+│   ├── replanning.py               # Replanning trigger logic
+│   └── io_contracts.md             # Interface specifications
 │
 ├── domains/                     # Domain-specific knowledge (Python)
 │   └── kitting/
-│       ├── actionOperators.py   # HTN primitive tasks
-│       ├── tasks.py             # HTN non-primitive tasks
-│       ├── registry.py          # DomainModel construction
-│       ├── scenarios.py         # Scenario definitions
-│       └── env1_layout.json     # Environment spatial layout
+│       ├── actionOperators.py      # HTN primitive tasks
+│       ├── tasks.py                # HTN non-primitive tasks
+│       ├── registry.py             # DomainModel construction
+│       ├── scenarios.py            # Scenario definitions
+│       └── env1_layout.json        # Environment spatial layout
 │
 ├── mesa_sim/                    # Mesa embodiment layer
-│   ├── sim_model.py             # FactoryModel (Mesa)
-│   ├── sim_agents.py            # HumanAgent, RobotAgent
-│   ├── world_state_builder.py   # Mesa → WorldState translation
-│   ├── obs_builder.py           # Mesa → Observation translation
-│   ├── action_decomposer.py     # GroundedAction → microaction expansion
-│   ├── executor.py              # Microaction execution engine
-│   ├── run_mesa.py              # Entry point
-│   └── mesa_configs.yaml        # Mesa-specific settings
+│   ├── sim_model.py                # FactoryModel (Mesa)
+│   ├── sim_agents.py               # HumanAgent, RobotAgent
+│   ├── world_state_builder.py      # Mesa → WorldState translation
+│   ├── obs_builder.py              # Mesa → Observation translation
+│   ├── action_decomposer.py        # GroundedAction → microaction expansion
+│   ├── executor.py                 # Microaction execution engine
+│   ├── run_mesa.py                 # Entry point
+│   └── mesa_configs.yaml           # Mesa-specific settings
 │
 ├── ros_sim/                     # ROS embodiment (planned)
+│   ├── ...                         # ...
 ├── configs/                     # Cross-domain config (costs.yaml)
 ├── docs/                        # Design documentation
 └── scripts/                     # Utility scripts
 ```
-
-
 
 ---
 
