@@ -52,6 +52,44 @@ Currently implemented: `domains/kitting/` (industrial kitting scenario)
 
 ---
 
+## Pre-Requisites
+
+```bash
+python3 -m venv ~/python-envs/tr-env
+source ~/python-envs/tr-env/bin/activate
+pip install -r requirements.txt
+```
+
+The Mesa fork is included directly at `mesa_sim/mesa_fork/` — no separate installation needed.
+
+Use any IDE (e.g., [VS Code](https://code.visualstudio.com/)) or editor of your choice to explore the codebase. The cognitive layer is in `shared/`, domain knowledge in `domains/`, and the Mesa embodiment in `mesa_sim/`.
+
+
+---
+
+## Running the MESA Simulation
+
+### Headless (default)
+
+```bash
+python mesa_sim/run_mesa.py
+python mesa_sim/run_mesa.py --scenario scenario_01 --steps 200
+```
+
+### Visualization (Solara)
+
+```bash
+solara run mesa_sim/run_mesa.py
+```
+
+---
+
+## Running the ROS Simulation
+
+Todo: instructions for ROS embodiment once implemented.
+
+---
+
 ## Repository Structure
 
 ```
@@ -88,34 +126,7 @@ teamrob-intention-aware-planning/
 └── scripts/                     # Utility scripts
 ```
 
----
 
-## Pre-Requisites
-
-```bash
-python3 -m venv ~/python-envs/tr-env
-source ~/python-envs/tr-env/bin/activate
-pip install -r requirements.txt
-```
-
-The Mesa fork is included directly at `mesa_sim/mesa_fork/` — no separate installation needed.
-
----
-
-## Running the Simulation
-
-### Headless (default)
-
-```bash
-python mesa_sim/run_mesa.py
-python mesa_sim/run_mesa.py --scenario scenario_01 --steps 200
-```
-
-### Visualization (Solara)
-
-```bash
-solara run mesa_sim/run_mesa.py
-```
 
 ---
 

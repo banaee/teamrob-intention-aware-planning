@@ -49,57 +49,57 @@
 "shelves": [
   {
     "id": "shelf_0",
-    "position": [-1000, 400],
-    "size": [150, 40],
+    "position": [-950, 400],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_NW"
   },
   {
     "id": "shelf_1",
-    "position": [-1000, -300],
-    "size": [150, 40],
+    "position": [-950, -450],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_SW"
   },
   {
     "id": "shelf_2",
-    "position": [-1000, 0],
-    "size": [150, 40],
+    "position": [-950, 0],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_SW"
   },
   {
     "id": "shelf_3",
-    "position": [1000, 400],
-    "size": [150, 40],
+    "position": [950, 400],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_NE"
   },
   {
     "id": "shelf_4",
-    "position": [1000, -300],
-    "size": [150, 40],
+    "position": [950, -300],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_SE"
   },
   {
     "id": "shelf_5",
-    "position": [1000, 0],
-    "size": [150, 40],
+    "position": [950, 0],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_SE"
   },
   {
     "id": "shelf_6",
-    "position": [-700, -500],
-    "size": [150, 40],
+    "position": [-500, -450],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_SW"
   },
   {
     "id": "shelf_7",
-    "position": [300, -500],
-    "size": [150, 40],
+    "position": [300, -450],
+    "size": [100, 100],
     "slots": 4,
     "zone": "zone_SE"
   }
@@ -163,15 +163,15 @@
 "coffee_machine": [
   {
     "id": "coffee_machine_0",
-    "position": [-1000, -380],
-    "size": [50, 50],
+    "position": [-975, -275],
+    "size": [100, 100],
     "zone": "zone_SW"
   }
 ],
 "AC_switches": [
   {
     "id": "AC_switch_0",
-    "position": [1000, -420],
+    "position": [-975, -350],
     "size": [50, 50],
     "zone": "zone_SW"
   }
@@ -247,7 +247,7 @@
     },
     {
       "id": "obstacle_10",
-      "position": [-1000, -450],
+      "position": [-100, -450],
       "size": [50, 50]
     },
     {
