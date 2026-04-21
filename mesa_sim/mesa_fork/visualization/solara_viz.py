@@ -28,6 +28,7 @@ import threading
 import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
+import numpy as np
 
 import mesa_fork.visualization.components.altair as components_altair
 import mesa_fork.visualization.components.matplotlib as components_matplotlib
@@ -204,8 +205,8 @@ def SolaraViz(
         # --------------------------------------------------------------
         with solara.Card("Information", margin=1, elevation=2):
             solara.Markdown(md_text=f"Step - {current_step}")
-            solara.Markdown(md_text=f"robot pos - {model.robots['robot_0'].pos}")
-            solara.Markdown(md_text=f"human pos - {model.humans['human_0'].pos}")
+            solara.Markdown(md_text=f"robot pos - {np.round(model.robots['robot_0'].pos,1)}")
+            solara.Markdown(md_text=f"human pos - {np.round(model.humans['human_0'].pos,1)}")
             # solara.Markdown(md_text=f"kitting table pos - {model.kitting_table.pos}")
             # for sh_id, shelf in model.shelves.items():
             #     solara.Markdown(md_text=f"shelf {sh_id} pos - {shelf.pos}")
