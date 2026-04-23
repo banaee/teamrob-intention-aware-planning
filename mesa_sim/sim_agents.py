@@ -40,7 +40,7 @@ from mesa_sim.world_state_builder import build_world_state
 from mesa_sim.executor import Executor
 
 if TYPE_CHECKING:
-    from mesa_sim.sim_model import FactoryModel
+    from mesa_sim.sim_model import SimModel
 
 
 # =============================================================================
@@ -49,7 +49,7 @@ if TYPE_CHECKING:
 
 class FactoryAgent(agent.Agent):
 
-    def __init__(self, unique_id: str, model: "FactoryModel", pos: tuple):
+    def __init__(self, unique_id: str, model: "SimModel", pos: tuple):
         super().__init__(unique_id, model)
         self.carrying: Optional[str] = None
         self.current_task: Optional[str] = None
@@ -70,7 +70,7 @@ class HumanAgent(FactoryAgent):
     Robot has no reference to this script.
     """
 
-    def __init__(self, unique_id: str, model: "FactoryModel",
+    def __init__(self, unique_id: str, model: "SimModel",
                  pos: tuple, script: List[TaskInstance]):
         super().__init__(unique_id, model, pos)
 
@@ -160,7 +160,7 @@ class RobotAgent(FactoryAgent):
     Intention-aware robot agent. Owns the full cognitive loop.
     """
 
-    def __init__(self, unique_id: str, model: "FactoryModel",
+    def __init__(self, unique_id: str, model: "SimModel",
                  pos: tuple,
                  knowledge: DomainKnowledgeBase,
                  assigned_tasks: List[TaskInstance],

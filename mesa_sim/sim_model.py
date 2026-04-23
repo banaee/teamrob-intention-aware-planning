@@ -67,10 +67,10 @@ class ItemObject:
     is_scanned: bool = False
 
 # =============================================================================
-# FactoryModel
+# SimModel
 # =============================================================================
 
-class FactoryModel(model.Model):
+class SimModel(model.Model):
 
     # TODO: for now it is hardcoded to load the kitting domain — make it flexible to load other domains as well
     def __init__(self,

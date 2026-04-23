@@ -113,7 +113,7 @@ teamrob-intention-aware-planning/
 │       └── env1_layout.json        # Environment spatial layout
 │
 ├── mesa_sim/                    # Mesa embodiment layer
-│   ├── sim_model.py                # FactoryModel (Mesa)
+│   ├── sim_model.py                # SimModel (Mesa)   --- > WorldState translation
 │   ├── sim_agents.py               # HumanAgent, RobotAgent
 │   ├── world_state_builder.py      # Mesa → WorldState translation
 │   ├── obs_builder.py              # Mesa → Observation translation

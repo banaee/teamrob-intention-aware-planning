@@ -55,7 +55,7 @@ import math
 from shared.types import AgentState, WorldState, Predicate, Const
 
 if TYPE_CHECKING:
-    from mesa_sim.sim_model import FactoryModel
+    from mesa_sim.sim_model import SimModel
 
 
 # Distance threshold for object-level "at" predicate
@@ -63,12 +63,12 @@ if TYPE_CHECKING:
 PROXIMITY_THRESHOLD = 30.0  # TODO Phase 4: read from mesa_configs.yaml
 
 
-def build_world_state(model: FactoryModel) -> WorldState:
+def build_world_state(model: SimModel) -> WorldState:
     """
     Build a symbolic WorldState snapshot from current Mesa ground truth.
 
     INPUT:
-        model   — FactoryModel instance (read-only)
+        model   — SimModel instance (read-only)
 
     OUTPUT:
         WorldState with:
@@ -181,7 +181,7 @@ def build_world_state(model: FactoryModel) -> WorldState:
 def _add_proximity_predicates(
     agent_id: str,
     agent_pos: tuple,
-    model: "FactoryModel",
+    model: "SimModel",
     predicates: Set[Predicate],
 ) -> None:
     """

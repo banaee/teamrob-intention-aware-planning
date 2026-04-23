@@ -19,7 +19,7 @@ USAGE:
 
 WHAT THIS MODULE DOES:
     - Parses CLI arguments
-    - Instantiates FactoryModel with chosen scenario
+    - Instantiates SimModel with chosen scenario
     - Either runs headless loop or launches SolaraViz
 
 WHAT THIS MODULE DOES NOT DO:
@@ -47,7 +47,7 @@ import numpy as np
 # Ensure project root is on path when run directly
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from mesa_sim.sim_model import FactoryModel
+from mesa_sim.sim_model import SimModel
 from domains.kitting.scenarios import scenario_01
 
 # =============================================================================
@@ -80,7 +80,7 @@ def run_headless(scenario_id: str, n_steps: int):
               f"Available: {list(SCENARIOS.keys())}")
         return None
 
-    model = FactoryModel(
+    model = SimModel(
         scenario=scenario,
         env_layout_path=DEFAULT_ENV_LAYOUT,
     )
@@ -109,7 +109,7 @@ from mesa_sim.viz.portrayal import agent_portrayal
 from mesa_sim.mesa_fork.visualization import SolaraViz
 
 page = SolaraViz(
-    model_class=FactoryModel,
+    model_class=SimModel,
     model_params={"scenario": SCENARIOS[DEFAULT_SCENARIO_ID]},
     space_drawer=space_drawer,
     agent_portrayal=agent_portrayal,

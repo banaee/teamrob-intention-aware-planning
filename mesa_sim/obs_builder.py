@@ -23,7 +23,7 @@ CALLED BY:
 
 INPUTS:
     - human_agent   HumanAgent — the observed human (read-only)
-    - model         FactoryModel — for zone lookup
+    - model         SimModel — for zone lookup
     - timestamp     float — current simulation step as float
 
 OUTPUTS:
@@ -47,13 +47,13 @@ from typing import TYPE_CHECKING, Optional
 from shared.types import Observation, SpatialContext, ActionContext
 
 if TYPE_CHECKING:
-    from mesa_sim.sim_model import FactoryModel
+    from mesa_sim.sim_model import SimModel
     from mesa_sim.sim_agents import HumanAgent
 
 
 def build_observation(
     human_agent: HumanAgent,
-    model: FactoryModel,
+    model: SimModel,
     timestamp: float,
 ) -> Observation:
     """
@@ -61,7 +61,7 @@ def build_observation(
 
     INPUT:
         human_agent  — the HumanAgent being observed (read-only)
-        model        — FactoryModel for zone lookup (read-only)
+        model        — SimModel for zone lookup (read-only)
         timestamp    — current step as float
 
     OUTPUT:
