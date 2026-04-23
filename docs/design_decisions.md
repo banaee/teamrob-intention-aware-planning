@@ -21,16 +21,16 @@ These two layers communicate only through canonical symbolic types (`Observation
 
 ## The Four Key Decisions
 
-**1. Planner outputs `AbstractPlan` with `List[GroundedAction]`**
-The planner produces fully grounded symbolic actions — all variables resolved to
-concrete values, each carrying a `completion_predicate` for the executor.
-No microactions, no geometry. Mesa and ROS each interpret grounded actions
-through their own embodiment layers (`action_decomposer.py`, `goal_executor_ros.py`).
+**1. Planner outputs AbstractPlan with optional execution hints**
+The planner produces high-level symbolic actions, not microactions.
+Optionally it may attach hints (estimated path, duration, spatial constraints).
+Mesa may follow hints directly. ROS treats them as soft constraints for its own motion stack.
+This keeps planning symbolic while giving simulators flexibility in execution.
 
 **2. WorldState is symbolic**
 Simulators build a canonical symbolic snapshot before calling core.
 Geometry, positions, and sensor data stay inside the simulator.
-The cognitive layer reasons only over predicates (`at`, `in_zone`, `holding`, `obj_at`).
+The cognitive layer reasons only over predicates (zone, holding, task_progress, etc.).
 
 **3. Simulators decide WHEN to call core — core decides WHAT to do**
 Mesa calls the cognitive chain every step.
@@ -52,62 +52,37 @@ Uncertainty is fundamental in human behavior inference, not incidental.
 Evidence must accumulate over time across multiple competing hypotheses.
 Rule-based or classification alternatives were rejected for this reason.
 
-**Domain knowledge is Python, configuration is YAML**
-Task schemas, action operators, and scenarios are defined in Python inside
-`domains/<domain>/` — typed, inspectable, no parsing layer.
-YAML is reserved for true configuration: `costs.yaml`, `mesa_configs.yaml`.
-Reason: the cognitive layer needs the decomposition tree as a queryable data
-structure for both planning (top-down) and intention recognition (bottom-up).
-YAML + string parsing was rejected because it collapsed structure that the
-recognizer needs to traverse.
-
-**HTN-style knowledge representation**
-`TaskSchema` = HTN non-primitive tasks (decompose via methods).
-`ActionSchema` = HTN primitive tasks (executable leaves, not decomposed further).
-Only tasks decompose. Actions are the leaves of the decomposition tree.
-Mesa expands primitive actions into microactions via `action_decomposer.py` —
-this is embodiment-level detail, not part of the HTN structure.
-
-**GOTO_ZONE removed — zone reasoning belongs in IR context**
-`GOTO_ZONE` was removed as an intermediate action because:
-- It was not a meaningful semantic abstraction — just a navigation wrapper
-- Its completion predicate conflated zone arrival with object arrival
-- Zone-level reasoning belongs in the recognizer's context weighting (`ωcontext`),
-  not in the task decomposition tree
-Zone information is still available via `in_zone(agent, zone)` predicates in
-WorldState — used by IR, not by the executor.
-
-**Predicate naming is explicit and distinct**
-Two spatial predicate families with distinct semantics:
-- `in_zone(agent, zone)` — coarse zone-level context, used by IR
-- `at(agent, object)` — fine-grained object proximity, used by executor completion checking
-Conflating these under a single `at` predicate caused a semantic mismatch where
-`move_to` completion was never satisfied. Kept permanently separate.
-
-**Scenarios are Python `ScenarioConfig` objects**
-Scenarios live in `domains/<domain>/scenarios.py` as typed Python objects.
-Task assignments reference `TaskSchema` and `TaskInstance` directly — no string
-parsing, no YAML loading, no `?` prefix conventions at the config level.
-Mesa-specific settings (step count, step size) remain in `mesa_configs.yaml`.
+**Python objects for domain knowledge**
+Task schemas and action operators are defined as typed Python objects (`TaskSchema`,
+`ActionOperator`, `Var`/`Const` terms) in `domains/<domain>/`. YAML was rejected
+for domain knowledge because it required string parsing in the cognitive layer,
+which breaks the no-string-parsing principle. Scenarios and environment layout
+remain in YAML/JSON as configuration (not knowledge).
 
 **Skeleton-first development**
 All modules are built with correct interfaces and dummy logic first.
 This validates the architecture and data flow before investing in algorithms.
-Real algorithms (Bayesian update, cost-based planning, guard evaluation)
-replace dummy logic in Phase 4.
+Real algorithms (Bayesian update, cost-based planning) replace dummy logic later.
+
+**Scenarios are simulator-agnostic**
+`scenarios.yaml` defines agent roles, starting positions, and task assignments
+for both Mesa and ROS. Mesa-specific settings (step count, step size) live
+separately in `mesa_sim/mesa_configs.yaml`.
 
 **One micro-action per Mesa step**
 Each Mesa step advances exactly one micro-action per agent.
 This enforces the observable micro-action assumption from the paper formalization.
 
-**Reactive/contingency behaviors belong in `replanning.py`**
-Unexpected world events (dropped items, human deviations) are handled by the
-replanning trigger — not encoded in task schemas.
-Task schemas describe intended behavior. Contingency response is a runtime concern.
-This boundary is not an HTN limitation — PDDL, HDDL, and all plan-representation
-formalisms share it. Reactive architectures (BDI/PRS) handle it separately.
+**Two distinct predicate families in WorldState**
+`in_zone(agent, zone)` — coarse zone membership, used by the IR recognizer for
+context weighting (ω_context). `at(agent, object)` — proximity-based object
+presence, used by the executor to check action completion. These are separate
+concerns and must not be conflated. `GOTO_ZONE` was removed from the HTN
+decomposition tree entirely; zone-level reasoning lives only in the recognizer.
 
-**Human agent has fixed plan per task — no replanning**
-`HumanAgent` builds a plan once per `TaskInstance` and reuses it until the task
-completes. This is a deliberate modeling assumption: the human is scripted and
-provides ground truth for IR evaluation. Replanning logic exists only on `RobotAgent`.
+**`ProcessCompletion` as the sim-agnostic completion contract**
+The cognitive layer signals action completion by process exhaustion — when the
+microaction queue for a `GroundedAction` is empty, the action is done. Each
+embodiment layer realizes this in its own temporal terms: Mesa uses step counts,
+ROS uses action server feedback. The cognitive layer is ignorant of schedulers,
+wall-clock time, or step size.
