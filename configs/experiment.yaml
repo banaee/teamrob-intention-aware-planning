@@ -1,0 +1,10 @@
+# configs/experiment.yaml
+# Default experiment configuration.
+# CLI args override individual fields: --domain, --layout, --scenario, --steps, --planner, --recognizer
+
+domain: kitting
+layout: 1
+scenario: scenario_01
+steps: 300
+planner: basic
+recognizer: uniform

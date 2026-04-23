@@ -42,7 +42,7 @@ gates, doors — go in the `"env_objects"` list with a `"type"` field. Do not cr
 new top-level sections for new object types.
 Only these top-level keys are valid alongside `"env_objects"`:
 
-- `"room"` — dimensions and units
+- `"space"` — dimensions and units of entire environment space
 - `"zones"` — IR context zones with bounds
 - `"items"` — movable objects with runtime state
 - `"robots"` — robot agent spawn configs

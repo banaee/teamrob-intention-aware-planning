@@ -29,8 +29,8 @@ from typing import Dict, List, Optional, Tuple
 
 from shared.domain_knowledge import DomainKnowledgeBase
 from shared.types import ScenarioConfig
-from domains.kitting.registry import register_kitting_domain
-from domains.dock_loading.registry import register_dock_loading_domain
+# from domains.kitting.registry import register_kitting_domain
+# from domains.dock_loading.registry import register_dock_loading_domain
 
 
 from mesa_sim.mesa_fork import model, space, time, datacollection
@@ -72,13 +72,10 @@ class ItemObject:
 
 class SimModel(model.Model):
 
-    # TODO: for now it is hardcoded to load the kitting domain — make it flexible to load other domains as well
     def __init__(self,
                  scenario: ScenarioConfig,
-                 register_fn=register_kitting_domain,
+                 register_fn,
                  env_layout_path: str = "domains/kitting/env_layout1.json", 
-                #  register_fn=register_dock_loading_domain,
-                    # env_layout_path: str = "domains/dock_loading/env_layout1.json",
                  seed=None):
         super().__init__()
 
@@ -91,15 +88,15 @@ class SimModel(model.Model):
         # ------------------------------------------------------------------
         # Space
         # ------------------------------------------------------------------
-        room = env_layout["room"]
-        width = room["width"]
-        height = room["height"]
+        space_config = env_layout["space"]
+        env_width = space_config["width"]
+        env_height = space_config["height"]
 
         self.space = space.ContinuousSpace(
-            x_min=-width / 2,
-            x_max=width / 2,
-            y_min=-height / 2,
-            y_max=height / 2,
+            x_min=-env_width / 2,
+            x_max=env_width / 2,
+            y_min=-env_height / 2,
+            y_max=env_height / 2,
             torus=False
         )
 
@@ -126,14 +123,22 @@ class SimModel(model.Model):
         self.env_objects: Dict[str, EnvObject] = {}
         self.items: Dict[str, ItemObject] = {}
 
-        self._init_shelves(env_layout.get("shelves", []))
-        self._init_kitting_table(env_layout.get("kitting_table", {}))
-        self._init_coffee_machines(env_layout.get("coffee_machine", []))
-        self._init_ac_switches(env_layout.get("AC_switches", []))
-        self._init_obstacles(env_layout.get("obstacles", []))
+        # ENVIRONEMNT OBJECTS: (static objects in any domain as defined in [domain]/env_layout1.json)
+
+        # before refactor to generic env_objects list in json:
+        # self._init_shelves(env_layout.get("shelves", []))
+        # self._init_kitting_table(env_layout.get("kitting_table", {}))
+        # self._init_coffee_machines(env_layout.get("coffee_machine", []))
+        # self._init_ac_switches(env_layout.get("AC_switches", []))
+        # self._init_obstacles(env_layout.get("obstacles", []))
         # ADD for dock domain
+        # self._init_env_objects(env_layout.get("env_objects", []))
+
+        # after refactor to generic env_objects list in json (for both dock and kitting):
         self._init_env_objects(env_layout.get("env_objects", []))
-        # both domains use it
+
+
+        # both domains use it. TODO: check if it is better to define separate entity of item in various domains, just to reduce the confusion.
         self._init_items(env_layout.get("items", []))
 
 
@@ -207,7 +212,7 @@ class SimModel(model.Model):
             )
 
     def _init_env_objects(self, objects_data: list):
-        """Generic loader for flat env_objects list (dock_loading and future domains)."""
+        """Generic env object loader. Reads type from JSON, works for all domains."""
         for obj in objects_data:
             self.env_objects[obj["id"]] = EnvObject(
                 obj_id=obj["id"],

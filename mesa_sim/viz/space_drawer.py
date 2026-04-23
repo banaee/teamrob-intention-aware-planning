@@ -32,20 +32,51 @@ import plotly.graph_objects as go
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 
 
+# OBJ_COLORS = {
+#     "shelf": ("orange", 0.5),
+#     "kitting_table": ("gray", 0.6),
+#     "coffee_machine": ("saddlebrown", 0.7),
+#     "ac_switch": ("steelblue", 0.7),
+#     "obstacle": ("dimgray", 0.4),
+# }
+
 OBJ_COLORS = {
-    "shelf": ("orange", 0.5),
-    "kitting_table": ("gray", 0.6),
+    # kitting
+    "shelf":          ("orange",      0.5),
+    "kitting_table":  ("gray",        0.6),
     "coffee_machine": ("saddlebrown", 0.7),
-    "ac_switch": ("steelblue", 0.7),
-    "obstacle": ("dimgray", 0.4),
+    "ac_switch":      ("steelblue",   0.7),
+    "obstacle":       ("dimgray",     0.4),
+    # dock_loading
+    "truck":          ("peru",        0.6),
+    "gate":           ("dimgray",     0.5),
+    "delivery_area":  ("lightgreen",  0.4),
+    "empty_bay":      ("lightblue",   0.4),
+    "door":           ("dimgray",     0.3),
 }
 
+# ZONE_COLORS = {
+#     "zone_NW": "rgba(200,230,200,0.15)",
+#     "zone_NE": "rgba(200,200,230,0.15)",
+#     "zone_SW": "rgba(230,220,200,0.15)",
+#     "zone_SE": "rgba(230,200,200,0.15)",
+# }
+
 ZONE_COLORS = {
+    # kitting
     "zone_NW": "rgba(200,230,200,0.15)",
     "zone_NE": "rgba(200,200,230,0.15)",
     "zone_SW": "rgba(230,220,200,0.15)",
     "zone_SE": "rgba(230,200,200,0.15)",
+    # dock_loading
+    "zone_hall_dry":    "rgba(250,220,180,0.15)",
+    "zone_hall_frozen": "rgba(180,220,250,0.15)",
+    "zone_hall_center": "rgba(220,220,220,0.15)",
+    "zone_dock":        "rgba(200,200,180,0.15)",
+    "zone_truck":       "rgba(210,190,170,0.15)",
+    "zone_office":      "rgba(220,230,220,0.15)",
 }
+
 
 
 def space_drawer(model, agent_portrayal):

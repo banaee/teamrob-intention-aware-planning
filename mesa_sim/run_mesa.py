@@ -8,96 +8,191 @@ PURPOSE:
         2. Visualization — Solara + Plotly interactive interface
 
 USAGE:
-    # Headless (default):
+    # Headless (default, uses configs/experiment.yaml):
     python mesa_sim/run_mesa.py
 
-    # Headless with options:
-    python mesa_sim/run_mesa.py --scenario scenario_01 --steps 200 --headless
+    # Headless with domain override:
+    python mesa_sim/run_mesa.py --domain dock_loading
 
-    # Visualization:
+    # Headless with full overrides:
+    python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_01 --steps 400
+
+    # Visualization (uses configs/experiment.yaml):
     solara run mesa_sim/run_mesa.py
 
+    # Visualization with domain override:
+    solara run mesa_sim/run_mesa.py -- --domain dock_loading
+
 WHAT THIS MODULE DOES:
-    - Parses CLI arguments
-    - Instantiates SimModel with chosen scenario
+    - Loads configs/experiment.yaml as default run configuration
+    - Accepts CLI args to override individual fields (domain, scenario, steps, etc.)
+    - Looks up domain registry to resolve string names to Python objects
+    - Instantiates SimModel with chosen domain + scenario
     - Either runs headless loop or launches SolaraViz
 
 WHAT THIS MODULE DOES NOT DO:
-    - No simulation logic here — all in model.py and agents.py
-    - No visualization logic here — that belongs in a future
-      mesa_sim/visualization/ module (space drawer, agent portrayal)
-
-VISUALIZATION (stub):
-    SolaraViz wiring is stubbed — space_drawer and agent_portrayal
-    are placeholders until mesa_sim/visualization/ is built.
-    TODO: implement factory_space_drawer and factory_agent_portrayal
-    mirroring the old factory_space_drawer.py + factory_portrayal.py
+    - No simulation logic — all in sim_model.py and sim_agents.py
+    - No visualization logic — that belongs in mesa_sim/viz/
 
 ROS EQUIVALENT:
-    ros_sim/run_ros.py — launches the ROS node instead of Mesa loop.
-    Both entry points instantiate the same shared cognitive components
-    but drive them through different simulation loops.
+    ros_sim/run_ros.py — same experiment.yaml, different simulator instantiation.
 """
 
 import argparse
 import sys
-from pathlib import Path
+import yaml
 import numpy as np
+from pathlib import Path
 
 # Ensure project root is on path when run directly
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mesa_sim.sim_model import SimModel
-from domains.kitting.scenarios import scenario_01
+from domains.kitting.registry import register_kitting_domain
+from domains.kitting.scenarios import scenario_01 as kitting_scenario_01
+from domains.dock_loading.registry import register_dock_loading_domain
+from domains.dock_loading.scenarios import scenario_01 as dock_scenario_01
+
 
 # =============================================================================
-# Default config
+# Domain registry
+# Maps domain name strings (from experiment.yaml or CLI) to Python objects.
+# Add one entry here when adding a new domain.
 # =============================================================================
 
-DEFAULT_STEPS = 600
-DEFAULT_ENV_LAYOUT = "domains/kitting/env_layout1.json"
+DOMAIN_REGISTRY = {
+    "kitting": {
+        "register_fn":  register_kitting_domain,
+        "layout_path":  "domains/kitting/env_layout1.json",
+        "scenarios":    {"scenario_01": kitting_scenario_01},
+    },
+    "dock_loading": {
+        "register_fn":  register_dock_loading_domain,
+        "layout_path":  "domains/dock_loading/env_layout1.json",
+        "scenarios":    {"scenario_01": dock_scenario_01},
+    },
+}
 
-SCENARIOS = {
-    "scenario_01": scenario_01,
-} 
-DEFAULT_SCENARIO_ID = "scenario_01"
+
+# =============================================================================
+# Experiment config loader
+# =============================================================================
+
+EXPERIMENT_CONFIG_PATH = "configs/experiment.yaml"
+
+
+def load_experiment(experiment_path: str, overrides: dict) -> dict:
+    """
+    Load experiment.yaml and apply CLI overrides.
+    CLI overrides take precedence over file values.
+    """
+    with open(experiment_path, "r") as f:
+        config = yaml.safe_load(f)
+    config.update({k: v for k, v in overrides.items() if v is not None})
+    return config
+
+
+# =============================================================================
+# CLI argument parser
+# =============================================================================
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
+    parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH,
+                        help="Path to experiment YAML config (default: configs/experiment.yaml)")
+    parser.add_argument("--domain",      type=str,  default=None,
+                        help="Domain name override (e.g. kitting, dock_loading)")
+    parser.add_argument("--layout",      type=int,  default=None,
+                        help="Layout number override (default: 1)")
+    parser.add_argument("--scenario",    type=str,  default=None,
+                        help="Scenario ID override (e.g. scenario_01)")
+    parser.add_argument("--steps",       type=int,  default=None,
+                        help="Number of steps override for headless run")
+    parser.add_argument("--planner",     type=str,  default=None,
+                        help="Planner variant override (e.g. basic, intention_aware)")
+    parser.add_argument("--recognizer",  type=str,  default=None,
+                        help="Recognizer variant override (e.g. uniform, bayesian)")
+    return parser.parse_args()
+
+
+# =============================================================================
+# Model factory — shared by headless and Solara
+# =============================================================================
+
+def _make_domain_model() -> SimModel:
+    args = parse_args()
+    config = load_experiment(args.experiment, {
+        "domain":     args.domain,
+        "layout":     args.layout,
+        "scenario":   args.scenario,
+        "steps":      args.steps,
+        "planner":    args.planner,
+        "recognizer": args.recognizer,
+    })
+
+    domain_name = config["domain"]
+    if domain_name not in DOMAIN_REGISTRY:
+        raise ValueError(
+            f"Unknown domain '{domain_name}'. "
+            f"Available: {list(DOMAIN_REGISTRY.keys())}"
+        )
+
+    domain      = DOMAIN_REGISTRY[domain_name]
+    scenario_id = config["scenario"]
+    if scenario_id not in domain["scenarios"]:
+        raise ValueError(
+            f"Unknown scenario '{scenario_id}' for domain '{domain_name}'. "
+            f"Available: {list(domain['scenarios'].keys())}"
+        )
+
+    scenario = domain["scenarios"][scenario_id]
+    # TODO: use config["layout"] number to select layout path when multiple layouts exist
+    layout_path = domain["layout_path"]
+
+    return SimModel(
+        scenario=scenario,
+        register_fn=domain["register_fn"],
+        env_layout_path=layout_path,
+    )
 
 
 # =============================================================================
 # Headless runner
 # =============================================================================
 
-def run_headless(scenario_id: str, n_steps: int):
-    """
-    Run simulation without visualization.
-    Useful for testing, debugging, and batch experiments.
-    """
-    print(f"[run_mesa] Starting headless run — scenario={scenario_id}, steps={n_steps}")
+def run_headless():
+    args = parse_args()
+    config = load_experiment(args.experiment, {
+        "domain":     args.domain,
+        "layout":     args.layout,
+        "scenario":   args.scenario,
+        "steps":      args.steps,
+        "planner":    args.planner,
+        "recognizer": args.recognizer,
+    })
 
-    scenario  = SCENARIOS.get(scenario_id)
-    if scenario is None:
-        print(f"[run_mesa] ERROR: unknown scenario '{scenario_id}'. "
-              f"Available: {list(SCENARIOS.keys())}")
-        return None
+    n_steps = config["steps"]
+    print(f"[run_mesa] Starting headless run — "
+          f"domain={config['domain']} scenario={config['scenario']} steps={n_steps}")
 
-    model = SimModel(
-        scenario=scenario,
-        env_layout_path=DEFAULT_ENV_LAYOUT,
-    )
+    model = _make_domain_model()
 
     for step in range(n_steps):
         model.step()
-        # print(f"  step {step + 1}/{n_steps} — schedule steps: {model.schedule.steps}")
-        # only for diagnostic purposes — print agent states every 10 steps
         if step % 10 == 0:
             for aid, human in model.humans.items():
-                print(f"  [{aid}] task={human.current_task} action={human.current_action} micro={human.current_microaction} pos={np.round(human.pos, 2)}")
+                print(f"  [{aid}] task={human.current_task} "
+                      f"action={human.current_action} "
+                      f"micro={human.current_microaction} "
+                      f"pos={np.round(human.pos, 2)}")
             for aid, robot in model.robots.items():
-                print(f"  [{aid}] task={robot.current_task} action={robot.current_action} micro={robot.current_microaction} pos={np.round(robot.pos, 2)}")
+                print(f"  [{aid}] task={robot.current_task} "
+                      f"action={robot.current_action} "
+                      f"micro={robot.current_microaction} "
+                      f"pos={np.round(robot.pos, 2)}")
 
     print("[run_mesa] Headless run complete.")
     return model
-
 
 
 # =============================================================================
@@ -109,13 +204,12 @@ from mesa_sim.viz.portrayal import agent_portrayal
 from mesa_sim.mesa_fork.visualization import SolaraViz
 
 page = SolaraViz(
-    model_class=SimModel,
-    model_params={"scenario": SCENARIOS[DEFAULT_SCENARIO_ID]},
+    model_class=_make_domain_model,
+    model_params={},
     space_drawer=space_drawer,
     agent_portrayal=agent_portrayal,
-    name="TeamRob Factory Simulation",
-    # play_interval=150,  # means about 6 steps per second.
-    play_interval=5,  # means about 6 steps per second.
+    name="TeamRob Simulation",
+    play_interval=5,
 )
 
 
@@ -123,23 +217,6 @@ page = SolaraViz(
 # CLI entry point
 # =============================================================================
 
-def main():
-    parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
-    parser.add_argument(
-        "--scenario", type=str, default=DEFAULT_SCENARIO_ID,
-        help=f"Scenario ID to run (default: {DEFAULT_SCENARIO_ID}). Available: {list(SCENARIOS.keys())}"
-    )
-    parser.add_argument(
-        "--steps", type=int, default=DEFAULT_STEPS,
-        help=f"Number of steps to run in headless mode (default: {DEFAULT_STEPS})"
-    )
-    args = parser.parse_args()
-    run_headless(scenario_id=args.scenario, n_steps=args.steps)
-
-
 if __name__ == "__main__":
-    import sys
     if not any("solara" in arg for arg in sys.argv):
-        main()
-        
-        
+        run_headless()

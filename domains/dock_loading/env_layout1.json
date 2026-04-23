@@ -1,103 +1,178 @@
 {
-  "room": {
+  "space": {
     "width": 1200,
-    "height": 600,
+    "height": 1200,
     "units": "cm",
-    "note": "origin (0,0) at center of indoor delivery hall. y-up. dock and truck extend below y=-300."
+    "note": "origin (0,0) at center of indoor delivery hall. y-up. Full extent: y from -740 (truck bottom) to +415 (office top). space x: [-600, 600], y: [-600, 600]"
   },
-
   "zones": [
     {
       "id": "zone_hall_dry",
-      "bounds": { "x_min": -600, "x_max": -360, "y_min": -120, "y_max": 300 },
+      "bounds": {
+        "x_min": -600,
+        "x_max": -360,
+        "y_min": -120,
+        "y_max": 300
+      },
       "label": "dry_goods_unload_side"
     },
     {
       "id": "zone_hall_frozen",
-      "bounds": { "x_min": 360, "x_max": 600, "y_min": -120, "y_max": 300 },
+      "bounds": {
+        "x_min": 360,
+        "x_max": 600,
+        "y_min": -120,
+        "y_max": 300
+      },
       "label": "frozen_goods_unload_side"
     },
     {
       "id": "zone_hall_center",
-      "bounds": { "x_min": -360, "x_max": 360, "y_min": -300, "y_max": 300 },
+      "bounds": {
+        "x_min": -360,
+        "x_max": 360,
+        "y_min": -300,
+        "y_max": 300
+      },
       "label": "hall_transit_area"
     },
     {
       "id": "zone_dock",
-      "bounds": { "x_min": -600, "x_max": 600, "y_min": -440, "y_max": -300 },
+      "bounds": {
+        "x_min": -600,
+        "x_max": 600,
+        "y_min": -440,
+        "y_max": -300
+      },
       "label": "dock_platform"
     },
     {
       "id": "zone_truck",
-      "bounds": { "x_min": -125, "x_max": 125, "y_min": -740, "y_max": -440 },
+      "bounds": {
+        "x_min": -125,
+        "x_max": 125,
+        "y_min": -740,
+        "y_max": -440
+      },
       "label": "truck_interior"
     },
     {
       "id": "zone_office",
-      "bounds": { "x_min": -170, "x_max": 170, "y_min": 300, "y_max": 415 },
+      "bounds": {
+        "x_min": -170,
+        "x_max": 170,
+        "y_min": 300,
+        "y_max": 415
+      },
       "label": "office"
     }
   ],
-
   "env_objects": [
     {
       "id": "truck_interior",
       "type": "truck",
-      "position": [0, -590],
-      "size": [250, 300],
+      "position": [
+        0,
+        -590
+      ],
+      "size": [
+        250,
+        300
+      ],
       "zone": "zone_truck"
     },
     {
       "id": "dock_gate",
       "type": "gate",
-      "position": [-2, -300],
-      "size": [300, 10],
+      "position": [
+        -2,
+        -300
+      ],
+      "size": [
+        300,
+        10
+      ],
       "zone": "zone_dock"
     },
     {
       "id": "dry_delivery_area",
       "type": "delivery_area",
-      "position": [-480, 180],
-      "size": [240, 240],
+      "position": [
+        -480,
+        180
+      ],
+      "size": [
+        240,
+        240
+      ],
       "zone": "zone_hall_dry"
     },
     {
       "id": "frozen_delivery_area",
       "type": "delivery_area",
-      "position": [480, 180],
-      "size": [240, 240],
+      "position": [
+        480,
+        180
+      ],
+      "size": [
+        240,
+        240
+      ],
       "zone": "zone_hall_frozen"
     },
     {
       "id": "empty_bay_dry",
       "type": "empty_bay",
-      "position": [-480, -180],
-      "size": [240, 240],
+      "position": [
+        -480,
+        -180
+      ],
+      "size": [
+        240,
+        240
+      ],
       "zone": "zone_hall_dry"
     },
     {
       "id": "empty_bay_frozen",
       "type": "empty_bay",
-      "position": [480, -180],
-      "size": [240, 240],
+      "position": [
+        480,
+        -180
+      ],
+      "size": [
+        240,
+        240
+      ],
       "zone": "zone_hall_frozen"
     },
     {
       "id": "office_door",
       "type": "door",
-      "position": [0, 300],
-      "size": [100, 10],
+      "position": [
+        0,
+        300
+      ],
+      "size": [
+        100,
+        10
+      ],
       "zone": "zone_hall_center"
     },
     {
       "id": "coffee_machine_0",
       "type": "coffee_machine",
-      "position": [-240, 270],
-      "size": [50, 50],
+      "position": [
+        -240,
+        270
+      ],
+      "size": [
+        50,
+        50
+      ],
       "zone": "zone_hall_center"
     }
   ],
-
   "items": [
     {
       "id": "pallet_0",
@@ -105,7 +180,10 @@
       "good_type": "dry",
       "is_empty": false,
       "initial_location": "truck_interior",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_1",
@@ -113,7 +191,10 @@
       "good_type": "dry",
       "is_empty": false,
       "initial_location": "truck_interior",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_2",
@@ -121,7 +202,10 @@
       "good_type": "dry",
       "is_empty": false,
       "initial_location": "truck_interior",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_3",
@@ -129,7 +213,10 @@
       "good_type": "frozen",
       "is_empty": false,
       "initial_location": "truck_interior",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_4",
@@ -137,7 +224,10 @@
       "good_type": "frozen",
       "is_empty": false,
       "initial_location": "truck_interior",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_5",
@@ -145,7 +235,10 @@
       "good_type": "frozen",
       "is_empty": false,
       "initial_location": "truck_interior",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_6",
@@ -153,7 +246,10 @@
       "good_type": null,
       "is_empty": true,
       "initial_location": "empty_bay_dry",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_7",
@@ -161,7 +257,10 @@
       "good_type": null,
       "is_empty": true,
       "initial_location": "empty_bay_dry",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_8",
@@ -169,7 +268,10 @@
       "good_type": null,
       "is_empty": true,
       "initial_location": "empty_bay_frozen",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     },
     {
       "id": "pallet_9",
@@ -177,10 +279,12 @@
       "good_type": null,
       "is_empty": true,
       "initial_location": "empty_bay_frozen",
-      "size": [80, 120]
+      "size": [
+        80,
+        120
+      ]
     }
   ],
-
   "robots": [
     {
       "id": "robot_0",
@@ -190,7 +294,6 @@
       "initial_y": -370
     }
   ],
-
   "humans": [
     {
       "id": "human_0",
