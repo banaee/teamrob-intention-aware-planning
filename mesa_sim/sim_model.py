@@ -30,6 +30,8 @@ from typing import Dict, List, Optional, Tuple
 from shared.domain_knowledge import DomainKnowledgeBase
 from shared.types import ScenarioConfig
 from domains.kitting.registry import register_kitting_domain
+from domains.dock_loading.registry import register_dock_loading_domain
+
 
 from mesa_sim.mesa_fork import model, space, time, datacollection
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
@@ -58,7 +60,11 @@ class ItemObject:
     zone: Optional[str] = None
     held_by: Optional[str] = None
     at_location: Optional[str] = None
-
+    # for pallet loading domain
+    good_type: Optional[str] = None
+    is_empty: bool = False
+    # runtime scan state — set by executor on TOUCH
+    is_scanned: bool = False
 
 # =============================================================================
 # FactoryModel
@@ -66,9 +72,13 @@ class ItemObject:
 
 class FactoryModel(model.Model):
 
+    # TODO: for now it is hardcoded to load the kitting domain — make it flexible to load other domains as well
     def __init__(self,
                  scenario: ScenarioConfig,
+                 register_fn=register_kitting_domain,
                  env_layout_path: str = "domains/kitting/env_layout1.json", 
+                #  register_fn=register_dock_loading_domain,
+                    # env_layout_path: str = "domains/dock_loading/env_layout1.json",
                  seed=None):
         super().__init__()
 
@@ -108,7 +118,7 @@ class FactoryModel(model.Model):
         # ------------------------------------------------------------------
         # DomainKnowledgeBase — loaded once, shared across agents
         # ------------------------------------------------------------------
-        self.knowledge = DomainKnowledgeBase.from_domain(register_kitting_domain())
+        self.knowledge = DomainKnowledgeBase.from_domain(register_fn())
 
         # ------------------------------------------------------------------
         # Environment objects registry
@@ -121,7 +131,11 @@ class FactoryModel(model.Model):
         self._init_coffee_machines(env_layout.get("coffee_machine", []))
         self._init_ac_switches(env_layout.get("AC_switches", []))
         self._init_obstacles(env_layout.get("obstacles", []))
+        # ADD for dock domain
+        self._init_env_objects(env_layout.get("env_objects", []))
+        # both domains use it
         self._init_items(env_layout.get("items", []))
+
 
         # ------------------------------------------------------------------
         # Agents
@@ -192,6 +206,17 @@ class FactoryModel(model.Model):
                 zone=None
             )
 
+    def _init_env_objects(self, objects_data: list):
+        """Generic loader for flat env_objects list (dock_loading and future domains)."""
+        for obj in objects_data:
+            self.env_objects[obj["id"]] = EnvObject(
+                obj_id=obj["id"],
+                obj_type=obj["type"],
+                position=tuple(obj["position"]),
+                size=tuple(obj["size"]),
+                zone=obj.get("zone"),
+            )
+            
     def _init_items(self, items_data: list):
         for it in items_data:
             shelf_id = it["initial_location"]
@@ -203,7 +228,9 @@ class FactoryModel(model.Model):
                 size=tuple(it["size"]),
                 zone=shelf.zone if shelf else None,
                 held_by=None,
-                at_location=shelf_id
+                at_location=shelf_id,
+                good_type=it.get("good_type"),      # for dock domain, e.g. "dry" or "frozen"
+                is_empty=it.get("is_empty", False), # for dock domain, True if it's an empty pallet
             )
 
     def _spawn_agents(self, scenario: ScenarioConfig):

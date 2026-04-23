@@ -150,6 +150,12 @@ def build_world_state(model: FactoryModel) -> WorldState:
         object_locations[obj_id] = location
         object_zones[obj_id] = zone
         predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
+        if obj.is_scanned:
+            predicates.add(Predicate("scanned", (Const(obj_id),)))
+
+    # Phase 2.1: dock gate always open — TODO: derive from gate state
+    predicates.add(Predicate("gate_is_open", (Const("dock_gate"),)))
+
 
     # ------------------------------------------------------------------
     # TODO Phase 4: derive additional predicates
