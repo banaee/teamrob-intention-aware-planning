@@ -36,6 +36,18 @@ This file defines the named locations, zones, and fixed objects in the environme
 
 Every named location or object that appears in `tasks.py` or `actions.py` must have an entry here. Zones use the convention `zone_<descriptor>`. This file contains no logic — only named spatial anchors.
 
+**JSON structure rules:**
+All static physical objects — shelves, tables, machines, obstacles, delivery areas,
+gates, doors — go in the `"env_objects"` list with a `"type"` field. Do not create
+new top-level sections for new object types.
+Only these top-level keys are valid alongside `"env_objects"`:
+
+- `"room"` — dimensions and units
+- `"zones"` — IR context zones with bounds
+- `"items"` — movable objects with runtime state
+- `"robots"` — robot agent spawn configs
+- `"humans"` — human agent spawn configs
+
 ---
 
 ## 3. Concepts: tasks, actions, microactions

@@ -80,6 +80,21 @@ presence, used by the executor to check action completion. These are separate
 concerns and must not be conflated. `GOTO_ZONE` was removed from the HTN
 decomposition tree entirely; zone-level reasoning lives only in the recognizer.
 
+
+**env_layout.json structure: flat `env_objects` for static geometry, separate sections for dynamic entities**
+Static physical objects (shelves, tables, machines, obstacles, delivery areas, gates,
+doors) live in a flat `"env_objects"` list with a `"type"` field per entry.
+`SimModel._init_env_objects()` loads all of them generically — no domain-specific
+loaders needed, no new top-level JSON sections for new object types.
+Items (`"items"`), robots (`"robots"`), and humans (`"humans"`) stay in separate
+top-level sections because they have distinct loading logic: items carry runtime
+state fields (`held_by`, `at_location`, `is_scanned`, etc.), agents are instantiated
+as Mesa objects and registered with the scheduler. Merging them into `"env_objects"`
+would conflate static geometry with dynamic runtime entities.
+Rule: never add a new top-level JSON section for a new object type — add it to
+`"env_objects"` with an appropriate `"type"` value.
+
+
 **`ProcessCompletion` as the sim-agnostic completion contract**
 The cognitive layer signals action completion by process exhaustion — when the
 microaction queue for a `GroundedAction` is empty, the action is done. Each
