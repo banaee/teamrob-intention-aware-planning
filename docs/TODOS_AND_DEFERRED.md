@@ -8,20 +8,15 @@ Items marked **[BLOCKING]** must be resolved before the simulation runs correctl
 
 ## 🐛 Active Bugs
 
-**BUG-01 — `go_to_office` task skipped in dock_loading scenario** [BLOCKING]
-Human agent skips the first task (`go_to_office`) and jumps directly to `scanning_pallet`.
-Likely: task dequeue logic in `sim_agents.py` not initializing the queue correctly,
-or `go_to_office` not registered in `registry.py` intentions set.
-Files: `mesa_sim/sim_agents.py`, `domains/dock_loading/registry.py`
+**BUG-01 — `go_to_office` task skipped in dock_loading scenario** ✅ RESOLVED
+Root cause: `run_mesa.py` `parse_args()` used `parse_args()` instead of `parse_known_args()[0]`,
+causing Solara args to conflict. Also `go_to_office` was missing from `registry.py` intentions set in an earlier version.
+Fixed: `parse_known_args()[0]` in `parse_args()`; `go_to_office` confirmed registered.
 
-**BUG-02 — `scan_pallet` stuck with `micro=None`** [BLOCKING]
-Human reaches delivery area position but `TOUCH` microaction never fires.
-`_execute_touch` in `executor.py` may not be wired to the `"touch"` microaction name,
-or `item.is_scanned` is not being set, so `scanned` predicate is never emitted.
-Files: `mesa_sim/executor.py`, `mesa_sim/world_state_builder.py`
-
-solved: `scan_pallet` method in `tasks.py` was calling `scan_pallet` action operator instead of `scan_it`, which is the one with the correct microaction and effect. Fixed method to call `scan_it`.
-
+**BUG-02 — `scan_it` TOUCH appeared stuck with `micro=None`** ✅ RESOLVED
+Root cause: TOUCH fires and completes within a single Mesa step — invisible in every-10-steps log.
+Also: task was renamed from `scan_pallet` to `confirm_delivered_pallet`, action from `scan_pallet` to `scan_it`.
+Behavior is correct: TOUCH sets `is_scanned=True`, completion check passes, action advances — all in one step.
 
 **BUG-03 — Robot one-step `task=None` gap between tasks**
 After completing one task, robot shows `task=None action=None` for one step before
@@ -179,8 +174,7 @@ Update to `dock_loading`.
 Files: `domains/README.md`
 
 **REFACTOR-04 — `roadmap.md`: update Phase 2.1 and 2.2 status**
-Phase 2.2 (visualization) is complete. Phase 2.1 (dock_loading) is partially complete
-— domain files done, simulation runs but two bugs remain (BUG-01, BUG-02).
+Phase 2.1 simulation runs end-to-end correctly. BUG-01 and BUG-02 resolved.
 Add Phase 2.3 (task eligibility conditions).
 Files: `docs/roadmap.md`
 
@@ -224,7 +218,7 @@ For traceability, the original numbered list from the session:
 | 6 | `sim_model.py` generic loader + parameterized registry | ✅ Done (additive) |
 | 7 | `ItemObject` — `good_type`, `is_empty`, `is_scanned` fields | ✅ Done |
 | 8 | `world_state_builder.py` — `scanned` + `gate_is_open` | ⚠️ Partial (gate_is_open may not be emitting, see BUG-04) |
-| 9 | `executor.py` — `TOUCH` handler | ✅ Done (wired but BUG-02 remains) |
+| 9 | `executor.py` — TOUCH handler | ✅ Done and confirmed working |
 | 10 | `run_mesa.py` — domain selection wiring | ✅ Done |
 | 11 | `space_drawer.py` — dock color entries | ❌ Not done (TODO-11) |
 | 12 | `scan_pallet` precondition guard | ❌ Deferred (DESIGN-01) |
@@ -233,3 +227,4 @@ For traceability, the original numbered list from the session:
 | 15 | Rename `"room"` → `"environment"` in JSON | ❌ Not done (TODO-04) |
 | 16 | `action_decomposer` generic microaction extractor | ❌ Deferred (TODO-01) |
 | 17 | Task eligibility conditions (Phase 2.3) | ❌ Deferred (DESIGN-01) |
+| 18 | `run_mesa.py` — parsing arguments for both Solara and Headless | ✅ Done |
