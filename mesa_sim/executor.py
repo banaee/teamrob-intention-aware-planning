@@ -42,6 +42,7 @@ COMPLETION CHECKING:
 """
 
 from __future__ import annotations
+import logging
 from typing import List, Optional
 import math
 
@@ -249,11 +250,11 @@ class Executor:
 
         target_obj = self.agent.model.get_env_object(target_id)
         if target_obj is None:
-            print(f"[executor] WARNING: no env object found near "
+            logging.warning(f"[executor] WARNING: no env object found near "
                   f"{self.agent.unique_id} for releasing {item_id}")
             return False
 
-        print(f"[executor] {self.agent.unique_id} releasing {item_id} "
+        logging.info(f"[executor] {self.agent.unique_id} releasing {item_id} "
               f"at {target_id} ({target_obj.obj_type})")
 
         item.held_by = None

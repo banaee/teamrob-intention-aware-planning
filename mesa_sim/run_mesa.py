@@ -39,6 +39,7 @@ ROS EQUIVALENT:
 """
 
 import argparse
+import logging
 import sys
 import yaml
 import numpy as np
@@ -52,6 +53,25 @@ from domains.kitting.registry import register_kitting_domain
 from domains.kitting.scenarios import scenario_01 as kitting_scenario_01
 from domains.dock_loading.registry import register_dock_loading_domain
 from domains.dock_loading.scenarios import scenario_01 as dock_scenario_01
+
+
+# ============================================================================
+# Logging setup
+# ============================================================================
+import logging
+from datetime import datetime
+from pathlib import Path
+Path("logs").mkdir(exist_ok=True)
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+log_filename = f"logs/run_{timestamp}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    handlers=[
+        logging.FileHandler(log_filename, mode="w"),
+        logging.StreamHandler(),  # still prints to terminal
+    ]
+)
 
 
 # =============================================================================
@@ -172,7 +192,7 @@ def run_headless():
     })
 
     n_steps = config["steps"]
-    print(f"[run_mesa] Starting headless run — "
+    logging.info(f"[run_mesa] Starting headless run — "
           f"domain={config['domain']} scenario={config['scenario']} steps={n_steps}")
 
     model = _make_domain_model()
@@ -181,17 +201,17 @@ def run_headless():
         model.step()
         if step % 10 == 0:
             for aid, human in model.humans.items():
-                print(f"  [{aid}] task={human.current_task} "
+                logging.info(f"  [{aid}] task={human.current_task} "
                       f"action={human.current_action} "
                       f"micro={human.current_microaction} "
                       f"pos={np.round(human.pos, 2)}")
             for aid, robot in model.robots.items():
-                print(f"  [{aid}] task={robot.current_task} "
+                logging.info(f"  [{aid}] task={robot.current_task} "
                       f"action={robot.current_action} "
                       f"micro={robot.current_microaction} "
                       f"pos={np.round(robot.pos, 2)}")
 
-    print("[run_mesa] Headless run complete.")
+    logging.info("[run_mesa] Headless run complete.")
     return model
 
 

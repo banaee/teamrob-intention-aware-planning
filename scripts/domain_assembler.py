@@ -8,6 +8,8 @@ Convert Gazebo world JSON to env_layout.yaml.
 For now, uses hardcoded test data (no Gazebo JSON input yet).
 """
 
+import logging
+
 import yaml
 from pathlib import Path
 
@@ -88,10 +90,10 @@ def convert_gazebo_to_env_layout(gazebo_json_path=None, output_path='configs/env
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     if gazebo_json_path is None:
-        print("No Gazebo JSON provided - generating test data")
+        logging.info("No Gazebo JSON provided - generating test data")
         env_layout = generate_test_environment_layout()
     else:
-        print(f"Parsing Gazebo JSON from {gazebo_json_path}")
+        logging.info(f"Parsing Gazebo JSON from {gazebo_json_path}")
         # TODO: Implement actual Gazebo parsing
         raise NotImplementedError("Gazebo JSON parsing not yet implemented")
     
@@ -99,14 +101,14 @@ def convert_gazebo_to_env_layout(gazebo_json_path=None, output_path='configs/env
     with open(output_path, 'w') as f:
         yaml.dump(env_layout, f, default_flow_style=False, sort_keys=False)
     
-    print(f"Generated environment layout config at {output_path}")
+    logging.info(f"Generated environment layout config at {output_path}")
     
     # Summary
-    print(f"\nEnvironment Layout Summary:")
-    print(f"  - Shelves: {len(env_layout['shelves'])}")
-    print(f"  - Items: {len(env_layout['items'])}")
-    print(f"  - Zones: {len(env_layout['zones'])}")
-    print(f"  - Grid: {env_layout['environment']['width']}x{env_layout['environment']['height']}")
+    logging.info(f"\nEnvironment Layout Summary:")
+    logging.info(f"  - Shelves: {len(env_layout['shelves'])}")
+    logging.info(f"  - Items: {len(env_layout['items'])}")
+    logging.info(f"  - Zones: {len(env_layout['zones'])}")
+    logging.info(f"  - Grid: {env_layout['environment']['width']}x{env_layout['environment']['height']}")
 
 
 if __name__ == "__main__":

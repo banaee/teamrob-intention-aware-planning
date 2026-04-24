@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 from pathlib import Path
@@ -55,7 +56,7 @@ def startproject(no_input):
 @click.command()
 def version():
     """Show the version of mesa"""
-    print(f"mesa {__version__}")
+    logging.info(f"mesa {__version__}")
 
 
 cli.add_command(runserver)

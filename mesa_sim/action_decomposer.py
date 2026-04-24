@@ -41,6 +41,7 @@ CALLED BY:
 """
 
 from dataclasses import dataclass, field
+import logging
 from typing import List, Dict, Any, Tuple, Optional
 import math
 import yaml
@@ -108,7 +109,7 @@ def expand(
         return _expand_fixed(action, spec)
 
     else:
-        print(f"[action_decomposer] WARNING: unknown microactions spec "
+        logging.warning(f"[action_decomposer] WARNING: unknown microactions spec "
               f"'{spec}' for action '{action.action_name}' — no expansion")
         return []
 
@@ -129,7 +130,7 @@ def _expand_step(
     """
     target_pos = _resolve_movement_target(action, model)
     if target_pos is None:
-        print(f"[action_decomposer] WARNING: could not resolve movement target "
+        logging.warning(f"[action_decomposer] WARNING: could not resolve movement target "
               f"for '{action.action_name}' bindings={action.bindings}")
         return []
 
@@ -168,6 +169,13 @@ def _expand_fixed(
             result.append(Microaction(name="grasp", params={"item_id": item_id}))
         elif mu_lower == "release":
             result.append(Microaction(name="release", params={}))
+        
+        elif mu_lower == "touch":
+            item_id = action.bindings.get("?item", "")
+            result.append(Microaction(name="touch", params={"item_id": item_id}))
+        
+        # Add more fixed microactions here as needed, e.g. based on the domain's microaction vocabulary
+        
         else:
             result.append(Microaction(name=mu_lower, params={}))
     return result
@@ -198,8 +206,8 @@ def _resolve_movement_target(
     if target_type == "object":
         return _env_object_position(target_id, model)
     else:
-        print(f"[action_decomposer] WARNING: movement_target_type not set "
-              f"for '{action.action_name}' — cannot resolve target")
+        logging.warning(f"[action_decomposer] WARNING: movement_target_type not set "
+                        f"for '{action.action_name}' — cannot resolve target")
         return None
 
 

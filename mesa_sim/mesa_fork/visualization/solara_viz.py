@@ -187,7 +187,7 @@ def SolaraViz(
         #         solara.Button("Reset", on_click=lambda: reactive_mytext.set("Hello world"))
         #     solara.Markdown(f"**You entered**: {reactive_mytext}")
         #     model.mytext = reactive_mytext.value
-        #     print("----------------model mytext", model.mytext)
+        #     logging.info("----------------model mytext", model.mytext)
 
 
         # --------------------------------------------------------------
@@ -485,7 +485,7 @@ def make_initial_grid_layout(layout_types):
     Returns:
         list: Initial grid layout configuration
     """
-    # print("----------------layout_types", layout_types)
+    # logging.info("----------------layout_types", layout_types)
     return [
         {
             "i": i,
