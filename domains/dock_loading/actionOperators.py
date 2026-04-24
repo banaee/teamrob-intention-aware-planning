@@ -22,7 +22,7 @@ ACTIONS:
 from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionOperator
 
 _agent  = Var("?agent")
-_pallet = Var("?pallet")
+_item = Var("?item")   # # was _pallet = Var("?pallet"), but now universal (item here means any portable object: TODO: in kitting the instances are also item_i)
 _target = Var("?target")
 _entity = Var("?entity")
 
@@ -42,28 +42,28 @@ move_to = ActionOperator(
 
 pick_up = ActionOperator(
     name="pick_up",
-    parameters=[_pallet],
+    parameters=[_item],
     preconditions=[
-        ConditionSchema("at", (_agent, _pallet)),
+        ConditionSchema("at", (_agent, _item)),
     ],
     effects=[
-        ConditionSchema("holding", (_agent, _pallet)),
+        ConditionSchema("holding", (_agent, _item)),
     ],
-    completion=ConditionSchema("holding", (_agent, _pallet)),
+    completion=ConditionSchema("holding", (_agent, _item)),
     microactions=["GRASP"],
 )
 
 place = ActionOperator(
     name="place",
-    parameters=[_pallet, _target],
+    parameters=[_item, _target],
     preconditions=[
-        ConditionSchema("holding", (_agent, _pallet)),
+        ConditionSchema("holding", (_agent, _item)),
     ],
     effects=[
-        ConditionSchema("obj_at", (_pallet, _target)),
-        ConditionSchema("not_holding", (_agent, _pallet)),
+        ConditionSchema("obj_at", (_item, _target)),
+        ConditionSchema("not_holding", (_agent, _item)),
     ],
-    completion=ConditionSchema("obj_at", (_pallet, _target)),
+    completion=ConditionSchema("obj_at", (_item, _target)),
     microactions=["RELEASE"],
 )
 
@@ -80,13 +80,13 @@ wait_at = ActionOperator(
 
 scan_pallet = ActionOperator(
     name="scan_pallet",
-    parameters=[_pallet],
+    parameters=[_item],
     preconditions=[
-        ConditionSchema("at", (_agent, _pallet)),
+        ConditionSchema("at", (_agent, _item)),
     ],
     effects=[
-        ConditionSchema("scanned", (_pallet,)),
+        ConditionSchema("scanned", (_item,)),
     ],
-    completion=ConditionSchema("scanned", (_pallet,)),
+    completion=ConditionSchema("scanned", (_item,)),
     microactions=["TOUCH"],
 )

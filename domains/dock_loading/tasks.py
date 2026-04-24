@@ -25,7 +25,7 @@ METHODS NOTE:
 from shared.types import Var, Const, ConditionSchema, StepCall, MethodSchema, TaskSchema
 from domains.dock_loading.actionOperators import move_to, pick_up, place, wait_at, scan_pallet
 
-_pallet = Var("?pallet")
+_item = Var("?item")
 _dest   = Var("?dest")
 _target = Var("?target")
 _entity = Var("?entity")
@@ -37,11 +37,11 @@ _entity = Var("?entity")
 
 deliver_pallet = TaskSchema(
     name="deliver_pallet",
-    parameters=[_pallet, _dest],
+    parameters=[_item, _dest],
     methods=[
         MethodSchema(
             name="deliver_pallet_gate_open",
-            parameters=[_pallet, _dest],
+            parameters=[_item, _dest],
             guards=[
                 ConditionSchema("gate_is_open", (Const("dock_gate"),)),
             ],
@@ -52,11 +52,11 @@ deliver_pallet = TaskSchema(
                 ),
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: _pallet},
+                    bindings={_target: _item},
                 ),
                 StepCall(
                     action_name="pick_up",
-                    bindings={_pallet: _pallet},
+                    bindings={_item: _item},
                 ),
                 StepCall(
                     action_name="move_to",
@@ -68,25 +68,25 @@ deliver_pallet = TaskSchema(
                 ),
                 StepCall(
                     action_name="place",
-                    bindings={_pallet: _pallet, _target: _dest},
+                    bindings={_item: _item, _target: _dest},
                 ),
             ],
         ),
         # TODO: implement open_gate ActionOperator, then fill this method
         # MethodSchema(
         #     name="deliver_pallet_gate_closed",
-        #     parameters=[_pallet, _dest],
+        #     parameters=[_item, _dest],
         #     guards=[
         #         ConditionSchema("gate_is_closed", (Const("dock_gate"),)),
         #     ],
         #     steps=[
         #         StepCall("move_to",   {_target: Const("dock_gate")}),
         #         StepCall("open_gate", {_entity: Const("dock_gate")}),
-        #         StepCall("move_to",   {_target: _pallet}),
-        #         StepCall("pick_up",   {_pallet: _pallet}),
+        #         StepCall("move_to",   {_target: _item}),
+        #         StepCall("pick_up",   {_item: _item}),
         #         StepCall("move_to",   {_target: Const("dock_gate")}),
         #         StepCall("move_to",   {_target: _dest}),
-        #         StepCall("place",     {_pallet: _pallet, _target: _dest}),
+        #         StepCall("place",     {_item: _item, _target: _dest}),
         #     ],
         # ),
     ],
@@ -101,22 +101,22 @@ deliver_pallet = TaskSchema(
 
 load_return = TaskSchema(
     name="load_return",
-    parameters=[_pallet],
+    parameters=[_item],
     methods=[
         MethodSchema(
             name="load_return_gate_open",
-            parameters=[_pallet],
+            parameters=[_item],
             guards=[
                 ConditionSchema("gate_is_open", (Const("dock_gate"),)),
             ],
             steps=[
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: _pallet},
+                    bindings={_target: _item},
                 ),
                 StepCall(
                     action_name="pick_up",
-                    bindings={_pallet: _pallet},
+                    bindings={_item: _item},
                 ),
                 StepCall(
                     action_name="move_to",
@@ -128,7 +128,7 @@ load_return = TaskSchema(
                 ),
                 StepCall(
                     action_name="place",
-                    bindings={_pallet: _pallet, _target: Const("truck_interior")},
+                    bindings={_item: _item, _target: Const("truck_interior")},
                 ),
             ],
         ),
@@ -145,20 +145,20 @@ load_return = TaskSchema(
 
 scan_pallet_task = TaskSchema(
     name="scan_pallet",
-    parameters=[_pallet],
+    parameters=[_item],
     methods=[
         MethodSchema(
             name="scan_pallet_default",
-            parameters=[_pallet],
+            parameters=[_item],
             guards=[],
             steps=[
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: _pallet},
+                    bindings={_target: _item},
                 ),
                 StepCall(
                     action_name="scan_pallet",
-                    bindings={_pallet: _pallet},
+                    bindings={_item: _item},
                 ),
             ],
         ),
