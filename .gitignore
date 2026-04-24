@@ -33,4 +33,5 @@ Thumbs.db
 # anywhere in subdirectories, ignore files starting with "old_"
 **/old_*
 
-
+# add logs folder to ignore
+logs/
