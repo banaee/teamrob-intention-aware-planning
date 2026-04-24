@@ -5,6 +5,6 @@
 domain: kitting
 layout: 1
 scenario: scenario_01
-steps: 300
+steps: 500
 planner: basic
 recognizer: uniform
