@@ -7,7 +7,7 @@ is_foreseeable is declared on TaskSchema — not repeated here.
 
 from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig
 from domains.dock_loading.tasks import (
-    deliver_pallet, load_return, scan_pallet_task, coffee_break
+    deliver_pallet, load_return, scan_pallet_task, coffee_break, go_to_office
 )
 
 
@@ -26,15 +26,11 @@ scenario_01 = ScenarioConfig(
             agent_id="human_0",
             agent_type="human",
             start_position=(0, 0),
-            assigned_tasks=[
-                TaskInstance(schema=coffee_break,     bindings={}),
+            scheduled_tasks=[
+                TaskInstance(schema=go_to_office, bindings={}),
                 TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_0")}),
-                TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_1")}),
                 TaskInstance(schema=coffee_break,     bindings={}),
-                TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_2")}),
                 TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_3")}),
-                TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_4")}),
-                TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_5")}),
             ],
             observes=[],
         ),
@@ -42,16 +38,16 @@ scenario_01 = ScenarioConfig(
             agent_id="robot_0",
             agent_type="robot",
             start_position=(0, -370),
-            assigned_tasks=[
+            scheduled_tasks=[
                 # Deliver full pallets: dry to dry_delivery_area
                 TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_0"), Var("?dest"): Const("dry_delivery_area")}),
-                TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_1"), Var("?dest"): Const("dry_delivery_area")}),
+                # TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_1"), Var("?dest"): Const("dry_delivery_area")}),
                 # Deliver full pallets: frozen to frozen_delivery_area
                 TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_3"), Var("?dest"): Const("frozen_delivery_area")}),
-                TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_4"), Var("?dest"): Const("frozen_delivery_area")}),
+                # TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_4"), Var("?dest"): Const("frozen_delivery_area")}),
                 # Load empty pallets back to truck
-                TaskInstance(schema=load_return, bindings={Var("?item"): Const("pallet_6")}),
-                TaskInstance(schema=load_return, bindings={Var("?item"): Const("pallet_8")}),
+                TaskInstance(schema=load_return, bindings={Var("?item"): Const("pallet_6")}), # 6 is innitially empty ib empty_bay_dry
+                TaskInstance(schema=load_return, bindings={Var("?item"): Const("pallet_8")}), # 8 is innitially empty in empty_bay_frozen
             ],
             observes=["human_0"],
         ),

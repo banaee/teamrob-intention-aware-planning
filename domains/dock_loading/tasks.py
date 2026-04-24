@@ -195,3 +195,19 @@ coffee_break = TaskSchema(
     is_assigned=False,
     is_foreseeable=True,
 )
+
+go_to_office = TaskSchema(
+    name="go_to_office",
+    parameters=[],
+    methods=[MethodSchema(
+        name="go_to_office_default",
+        parameters=[],
+        guards=[],
+        steps=[
+            StepCall("move_to", {Var("?target"): Const("office_door")}),
+            StepCall("wait_at", {Var("?entity"): Const("office_door"), Var("?duration"): Const("PT200S")}),
+        ],
+    )],
+    is_assigned=False,
+    is_foreseeable=True,
+)
