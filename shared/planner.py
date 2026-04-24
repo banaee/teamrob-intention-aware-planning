@@ -32,6 +32,7 @@ GROUNDING:
 """
 
 from typing import Dict, List, Optional
+import logging
 
 from shared.types import (
     ProcessCompletion, Var, Const, Predicate, ConditionSchema,
@@ -117,8 +118,11 @@ class AdaptivePlanner:
         grounded = []
         for step in method.steps:
             operator = self.knowledge.get_action_operator(step.action_name)
+            
             if operator is None:
-                continue
+                logging.warning(f"[planner] SKIPPING step '{step.action_name}' — operator not found in domain")
+                continue            
+            
             bindings = self._resolve_bindings(step, method, task_params, agent_id, world)
 
             # Ground the completion predicate, unless it's a ProcessCompletion which is monitored differently by the executor. 

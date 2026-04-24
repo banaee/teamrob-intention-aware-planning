@@ -71,9 +71,9 @@ def generate_test_environment_layout():
         ],
         
         'items': [
-            {'id': 'item_1', 'type': 'part_A', 'initial_location': 'shelf_1', 'size': [25, 25]},
-            {'id': 'item_2', 'type': 'part_A', 'initial_location': 'shelf_2', 'size': [25, 25]},
-            {'id': 'item_3', 'type': 'part_B', 'initial_location': 'shelf_3', 'size': [25, 25]}
+            {'id': 'item_1', 'type': 'part_A', 'initial_container': 'shelf_1', 'size': [25, 25]},
+            {'id': 'item_2', 'type': 'part_A', 'initial_container': 'shelf_2', 'size': [25, 25]},
+            {'id': 'item_3', 'type': 'part_B', 'initial_container': 'shelf_3', 'size': [25, 25]}
         ]
     }
 

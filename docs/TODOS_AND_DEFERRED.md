@@ -9,7 +9,7 @@ Items marked **[BLOCKING]** must be resolved before the simulation runs correctl
 ## 🐛 Active Bugs
 
 **BUG-01 — `go_to_office` task skipped in dock_loading scenario** [BLOCKING]
-Human agent skips the first task (`go_to_office`) and jumps directly to `scan_pallet`.
+Human agent skips the first task (`go_to_office`) and jumps directly to `scanning_pallet`.
 Likely: task dequeue logic in `sim_agents.py` not initializing the queue correctly,
 or `go_to_office` not registered in `registry.py` intentions set.
 Files: `mesa_sim/sim_agents.py`, `domains/dock_loading/registry.py`
@@ -19,6 +19,9 @@ Human reaches delivery area position but `TOUCH` microaction never fires.
 `_execute_touch` in `executor.py` may not be wired to the `"touch"` microaction name,
 or `item.is_scanned` is not being set, so `scanned` predicate is never emitted.
 Files: `mesa_sim/executor.py`, `mesa_sim/world_state_builder.py`
+
+solved: `scan_pallet` method in `tasks.py` was calling `scan_pallet` action operator instead of `scan_it`, which is the one with the correct microaction and effect. Fixed method to call `scan_it`.
+
 
 **BUG-03 — Robot one-step `task=None` gap between tasks**
 After completing one task, robot shows `task=None action=None` for one step before

@@ -152,8 +152,14 @@ class Executor:
         No string parsing, no template resolution.
         """
         if isinstance(action.operator.completion, ProcessCompletion):
-            return self._queue_was_exhausted
-        return action.completion_predicate in world.predicates
+            result = self._queue_was_exhausted
+        else:
+            result = action.completion_predicate in world.predicates
+        
+        # if self.agent.unique_id == "human_0":
+        #     logging.info(f"[executor] is_complete: {action.action_name} → {result} predicate={getattr(action, 'completion_predicate', None)}")
+        
+        return result
 
     # =========================================================================
     # Microaction queue expansion
@@ -189,6 +195,8 @@ class Executor:
             return self._execute_release(microaction)
         elif name == "stand":
             return True  # no-op
+        elif name == "touch":
+            return self._execute_touch(microaction)
         else:
             return False
 
@@ -254,8 +262,6 @@ class Executor:
                   f"{self.agent.unique_id} for releasing {item_id}")
             return False
 
-        logging.info(f"[executor] {self.agent.unique_id} releasing {item_id} "
-              f"at {target_id} ({target_obj.obj_type})")
 
         item.held_by = None
         item.at_location = target_id
@@ -263,6 +269,17 @@ class Executor:
         item.zone = target_obj.zone
         self.agent.carrying = None
 
+        return True
+
+    def _execute_touch(self, microaction: Microaction) -> bool:
+        """Scan an item. Sets item.is_scanned = True."""
+        item_id = microaction.params.get("item_id")
+        if not item_id:
+            return False
+        item = self.agent.model.items.get(item_id)
+        if item is None:
+            return False
+        item.is_scanned = True
         return True
 
     def _nearest_env_object(self) -> Optional[str]:
@@ -300,6 +317,7 @@ class Executor:
         self.microaction_queue = []
         self.current_microaction = None
         self._queue_was_exhausted = False
+        # logging.info(f"[executor] _advance_action: {self.agent.unique_id} {self.action_index} → {self.action_index+1}")
 
     def _on_task_complete(self):
         """Called when all actions in plan are done."""
@@ -307,6 +325,8 @@ class Executor:
         self.current_action = None
         self.current_microaction = None
         self.microaction_queue = []
+        
+        # logging.info(f"[executor] _on_task_complete: {self.agent.unique_id} action_index={self.action_index} plan_len={len(self.current_plan.actions)}")
 
         if hasattr(self.agent, "advance_task"):
             self.agent.advance_task()

@@ -16,7 +16,7 @@ ACTIONS:
     pick_up       — grasp a pallet (agent must be at pallet)
     place         — release a pallet at a target location (agent must be holding it)
     wait_at       — stand at an entity for a process-defined duration
-    scan_pallet   — scan a pallet at close range (agent must be at pallet)
+    scan_it       — do touch screen at close range (agent must be at pallet)
 """
 
 from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionOperator
@@ -67,19 +67,9 @@ place = ActionOperator(
     microactions=["RELEASE"],
 )
 
-wait_at = ActionOperator(
-    name="wait_at",
-    parameters=[_entity],
-    preconditions=[
-        ConditionSchema("at", (_agent, _entity)),
-    ],
-    effects=[],
-    completion=ProcessCompletion(),
-    microactions="STAND*",
-)
 
-scan_pallet = ActionOperator(
-    name="scan_pallet",
+scan_it = ActionOperator(
+    name="scan_it",
     parameters=[_item],
     preconditions=[
         ConditionSchema("at", (_agent, _item)),
@@ -89,4 +79,16 @@ scan_pallet = ActionOperator(
     ],
     completion=ConditionSchema("scanned", (_item,)),
     microactions=["TOUCH"],
+)
+
+
+wait_at = ActionOperator(
+    name="wait_at",
+    parameters=[_entity],
+    preconditions=[
+        ConditionSchema("at", (_agent, _entity)),
+    ],
+    effects=[],
+    completion=ProcessCompletion(),
+    microactions="STAND*",
 )

@@ -51,7 +51,7 @@ class EnvObject:
 
 
 @dataclass
-class ItemObject:
+class PortItemObject:
     obj_id: str
     obj_type: str
     item_type: str
@@ -121,7 +121,7 @@ class SimModel(model.Model):
         # Environment objects registry
         # ------------------------------------------------------------------
         self.env_objects: Dict[str, EnvObject] = {}
-        self.items: Dict[str, ItemObject] = {}
+        self.items: Dict[str, PortItemObject] = {}
 
         # ENVIRONEMNT OBJECTS: (static objects in any domain as defined in [domain]/env_layout1.json)
 
@@ -139,7 +139,7 @@ class SimModel(model.Model):
 
 
         # both domains use it. TODO: check if it is better to define separate entity of item in various domains, just to reduce the confusion.
-        self._init_items(env_layout.get("items", []))
+        self._init_prtable_items(env_layout.get("items", []))
 
 
         # ------------------------------------------------------------------
@@ -222,20 +222,21 @@ class SimModel(model.Model):
                 zone=obj.get("zone"),
             )
             
-    def _init_items(self, items_data: list):
-        for it in items_data:
-            shelf_id = it["initial_location"]
-            shelf = self.env_objects.get(shelf_id)
-            self.items[it["id"]] = ItemObject(
-                obj_id=it["id"], obj_type="item",
-                item_type=it["type"],
-                position=shelf.position if shelf else (0.0, 0.0),
-                size=tuple(it["size"]),
-                zone=shelf.zone if shelf else None,
+    def _init_prtable_items(self, items_data: list):
+        for protable_item in items_data:
+            container_id = protable_item["initial_container"]
+            container_obj = self.env_objects.get(container_id)
+            self.items[protable_item["id"]] = PortItemObject(
+                obj_id=protable_item["id"], obj_type="item",
+                item_type=protable_item["type"],
+                position=container_obj.position if container_obj else (0.0, 0.0),
+                size=tuple(protable_item["size"]),
+                zone=container_obj.zone if container_obj else None,
                 held_by=None,
-                at_location=shelf_id,
-                good_type=it.get("good_type"),      # for dock domain, e.g. "dry" or "frozen"
-                is_empty=it.get("is_empty", False), # for dock domain, True if it's an empty pallet
+                at_location=container_id,
+                good_type=protable_item.get("good_type"),      # for dock domain, e.g. "dry" or "frozen"
+                is_empty=protable_item.get("is_empty", False), # for dock domain, True if it's an empty pallet
+                is_scanned=protable_item.get("is_scanned", False), # for dock domain, whether the item is scanned at the start of the simulation
             )
 
     def _spawn_agents(self, scenario: ScenarioConfig):
@@ -279,10 +280,10 @@ class SimModel(model.Model):
     def get_env_object(self, obj_id: str) -> Optional[EnvObject]:
         return self.env_objects.get(obj_id)
 
-    def get_item(self, item_id: str) -> Optional[ItemObject]:
+    def get_item(self, item_id: str) -> Optional[PortItemObject]:
         return self.items.get(item_id)
 
-    def get_movable_objects(self) -> Dict[str, ItemObject]:
+    def get_movable_objects(self) -> Dict[str, PortItemObject]:
         """Return all items — used by world_state_builder."""
         return self.items
 

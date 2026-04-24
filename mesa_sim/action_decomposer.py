@@ -13,7 +13,7 @@ WHAT THIS MODULE DOES:
       from action.bindings — no action name string matching
     - Expands "STEP*" into a full STEP sequence using steps_toward()
     - Expands "STAND*" into N STAND microactions
-    - Expands fixed lists e.g. ["GRASP"], ["RELEASE"] into single microactions
+    - Expands fixed lists e.g. ["GRASP"], ["RELEASE"], ["TOUCH"] into single microactions
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT execute microactions — that is mesa_sim/executor.py
@@ -60,7 +60,7 @@ class Microaction:
     A single atomic Mesa-executable step.
     Produced by expand(), consumed one per step by executor.py.
     """
-    name: str                              # "step", "grasp", "release", "stand"
+    name: str                              # "step", "grasp", "release", "stand", "touch", etc.
     params: Dict[str, Any] = field(default_factory=dict)
 
     def __str__(self):
@@ -95,6 +95,7 @@ def expand(
         operator.microactions == "STAND*"  → N STAND microactions (duration from bindings)
         operator.microactions == ["GRASP"] → single GRASP with item_id from bindings
         operator.microactions == ["RELEASE"] → single RELEASE
+        operator.microactions == ["TOUCH"] → single TOUCH with item_id from bindings
         unknown                            → empty list with warning
     """
     spec = action.operator.microactions
@@ -157,9 +158,10 @@ def _expand_fixed(
     spec: List[str],
 ) -> List[Microaction]:
     """
-    Expand a fixed microaction list e.g. ["GRASP"] or ["RELEASE"].
+    Expand a fixed microaction list e.g. ["GRASP"] or ["RELEASE"] or ["TOUCH"] into the corresponding microaction(s).
     Reads item_id from bindings for GRASP.
     RELEASE needs no params — executor detects target by proximity.
+    TOUCH ???
     """
     result = []
     for mu in spec:

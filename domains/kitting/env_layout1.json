@@ -51,7 +51,7 @@
     {
       "id": "item_0",
       "type": "part_A",
-      "initial_location": "shelf_0",
+      "initial_container": "shelf_0",
       "size": [
         25,
         25
@@ -60,7 +60,7 @@
     {
       "id": "item_1",
       "type": "part_A",
-      "initial_location": "shelf_1",
+      "initial_container": "shelf_1",
       "size": [
         25,
         25
@@ -69,7 +69,7 @@
     {
       "id": "item_2",
       "type": "part_B",
-      "initial_location": "shelf_2",
+      "initial_container": "shelf_2",
       "size": [
         25,
         25
@@ -78,7 +78,7 @@
     {
       "id": "item_3",
       "type": "part_B",
-      "initial_location": "shelf_3",
+      "initial_container": "shelf_3",
       "size": [
         25,
         25
@@ -87,7 +87,7 @@
     {
       "id": "item_4",
       "type": "part_C",
-      "initial_location": "shelf_4",
+      "initial_container": "shelf_4",
       "size": [
         25,
         25
@@ -96,7 +96,7 @@
     {
       "id": "item_5",
       "type": "part_C",
-      "initial_location": "shelf_5",
+      "initial_container": "shelf_5",
       "size": [
         25,
         25
@@ -105,7 +105,7 @@
     {
       "id": "item_6",
       "type": "part_D",
-      "initial_location": "shelf_6",
+      "initial_container": "shelf_6",
       "size": [
         25,
         25
@@ -114,7 +114,7 @@
     {
       "id": "item_7",
       "type": "part_D",
-      "initial_location": "shelf_7",
+      "initial_container": "shelf_7",
       "size": [
         25,
         25
@@ -125,7 +125,7 @@
     {
       "id": "robot_0",
       "type": "mobile_manipulator",
-      "initial_location": "zone_NE",
+      "initial_container": "zone_NE",
       "initial_x": 200,
       "initial_y": 200
     }
@@ -134,7 +134,7 @@
     {
       "id": "human_0",
       "type": "worker",
-      "initial_location": "zone_SW",
+      "initial_container": "zone_SW",
       "initial_x": -400,
       "initial_y": -300
     }

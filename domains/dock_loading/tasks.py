@@ -9,7 +9,7 @@ TASKS:
         load_return(?pallet)            — pick up empty pallet from bay, load back to truck
 
     Human assigned:
-        scan_pallet(?pallet)            — move to pallet at delivery area and scan it
+        confirm_delivered_pallet(?pallet)            — move to pallet at delivery area and scan it
 
     Human foreseeable:
         coffee_break()                  — move to coffee machine and wait
@@ -23,7 +23,7 @@ METHODS NOTE:
 """
 
 from shared.types import Var, Const, ConditionSchema, StepCall, MethodSchema, TaskSchema
-from domains.dock_loading.actionOperators import move_to, pick_up, place, wait_at, scan_pallet
+from domains.dock_loading.actionOperators import move_to, pick_up, place, wait_at, scan_it
 
 _item = Var("?item")
 _dest   = Var("?dest")
@@ -140,15 +140,15 @@ load_return = TaskSchema(
 
 
 # =============================================================================
-# Human assigned: SCAN_PALLET
+# Human assigned: CONFIRM_DELIVERED_PALLET
 # =============================================================================
 
-scan_pallet_task = TaskSchema(
-    name="scan_pallet",
+confirm_delivered_pallet = TaskSchema(
+    name="confirm_delivered_pallet",
     parameters=[_item],
     methods=[
         MethodSchema(
-            name="scan_pallet_default",
+            name="confirm_delivered_pallet_default",
             parameters=[_item],
             guards=[],
             steps=[
@@ -157,7 +157,7 @@ scan_pallet_task = TaskSchema(
                     bindings={_target: _item},
                 ),
                 StepCall(
-                    action_name="scan_pallet",
+                    action_name="scan_it",
                     bindings={_item: _item},
                 ),
             ],

@@ -179,7 +179,8 @@
       "type": "pallet",
       "good_type": "dry",
       "is_empty": false,
-      "initial_location": "truck_interior",
+      "is_scanned": false,
+      "initial_container": "truck_interior",
       "size": [
         80,
         120
@@ -190,7 +191,8 @@
       "type": "pallet",
       "good_type": "dry",
       "is_empty": false,
-      "initial_location": "truck_interior",
+      "is_scanned": false,
+      "initial_container": "truck_interior",
       "size": [
         80,
         120
@@ -201,7 +203,8 @@
       "type": "pallet",
       "good_type": "dry",
       "is_empty": false,
-      "initial_location": "truck_interior",
+      "is_scanned": false,
+      "initial_container": "truck_interior",
       "size": [
         80,
         120
@@ -212,7 +215,8 @@
       "type": "pallet",
       "good_type": "frozen",
       "is_empty": false,
-      "initial_location": "truck_interior",
+      "is_scanned": false,
+      "initial_container": "truck_interior",
       "size": [
         80,
         120
@@ -223,7 +227,8 @@
       "type": "pallet",
       "good_type": "frozen",
       "is_empty": false,
-      "initial_location": "truck_interior",
+      "is_scanned": false,
+      "initial_container": "truck_interior",
       "size": [
         80,
         120
@@ -234,7 +239,8 @@
       "type": "pallet",
       "good_type": "frozen",
       "is_empty": false,
-      "initial_location": "truck_interior",
+      "is_scanned": false,
+      "initial_container": "truck_interior",
       "size": [
         80,
         120
@@ -245,7 +251,8 @@
       "type": "pallet",
       "good_type": null,
       "is_empty": true,
-      "initial_location": "empty_bay_dry",
+      "is_scanned": true,
+      "initial_container": "empty_bay_dry",
       "size": [
         80,
         120
@@ -256,7 +263,8 @@
       "type": "pallet",
       "good_type": null,
       "is_empty": true,
-      "initial_location": "empty_bay_dry",
+      "is_scanned": true,
+      "initial_container": "empty_bay_dry",
       "size": [
         80,
         120
@@ -267,7 +275,8 @@
       "type": "pallet",
       "good_type": null,
       "is_empty": true,
-      "initial_location": "empty_bay_frozen",
+      "is_scanned": true,
+      "initial_container": "empty_bay_frozen",
       "size": [
         80,
         120
@@ -278,7 +287,8 @@
       "type": "pallet",
       "good_type": null,
       "is_empty": true,
-      "initial_location": "empty_bay_frozen",
+      "is_scanned": true,
+      "initial_container": "empty_bay_frozen",
       "size": [
         80,
         120
@@ -289,7 +299,7 @@
     {
       "id": "robot_0",
       "type": "mobile_manipulator",
-      "initial_location": "zone_dock",
+      "initial_container": "zone_dock",
       "initial_x": 0,
       "initial_y": -370
     }
@@ -298,7 +308,7 @@
     {
       "id": "human_0",
       "type": "scanner",
-      "initial_location": "zone_hall_center",
+      "initial_container": "zone_hall_center",
       "initial_x": 0,
       "initial_y": 0
     }

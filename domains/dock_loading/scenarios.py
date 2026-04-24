@@ -7,7 +7,36 @@ is_foreseeable is declared on TaskSchema — not repeated here.
 
 from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig
 from domains.dock_loading.tasks import (
-    deliver_pallet, load_return, scan_pallet_task, coffee_break, go_to_office
+    deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, go_to_office
+)
+
+
+
+scenario_00 = ScenarioConfig(
+    id="scenario_00",
+    name="minimal_debug",
+    description="Human goes to office. Robot delivers one pallet.",
+    env_layout="env_layout1",
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=[
+                TaskInstance(schema=go_to_office, bindings={}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_0"), Var("?dest"): Const("dry_delivery_area")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
 )
 
 
@@ -28,9 +57,9 @@ scenario_01 = ScenarioConfig(
             start_position=(0, 0),
             scheduled_tasks=[
                 TaskInstance(schema=go_to_office, bindings={}),
-                TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_0")}),
+                TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?item"): Const("pallet_0")}),
                 TaskInstance(schema=coffee_break,     bindings={}),
-                TaskInstance(schema=scan_pallet_task, bindings={Var("?item"): Const("pallet_3")}),
+                TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?item"): Const("pallet_3")}),
             ],
             observes=[],
         ),

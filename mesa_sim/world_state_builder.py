@@ -49,6 +49,7 @@ PROXIMITY_THRESHOLD:
 """
 
 from __future__ import annotations
+import logging
 from typing import TYPE_CHECKING, Dict, Set
 import math
 
@@ -131,7 +132,7 @@ def build_world_state(model: SimModel) -> WorldState:
         _add_proximity_predicates(agent_id, robot.pos, model, predicates)
 
     # ------------------------------------------------------------------
-    # Object locations — items
+    # Object locations — portable items
     # ------------------------------------------------------------------
     for obj_id, obj in model.get_movable_objects().items():
         if obj.held_by:
@@ -147,12 +148,14 @@ def build_world_state(model: SimModel) -> WorldState:
             location = "unknown"
             zone = "unknown"
 
-        object_locations[obj_id] = location
-        object_zones[obj_id] = zone
-        predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
         if obj.is_scanned:
             predicates.add(Predicate("scanned", (Const(obj_id),)))
 
+        # other predicated to be derived from item state can be added here
+        object_locations[obj_id] = location
+        object_zones[obj_id] = zone
+        predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
+        
     # Phase 2.1: dock gate always open — TODO: derive from gate state
     predicates.add(Predicate("gate_is_open", (Const("dock_gate"),)))
 
