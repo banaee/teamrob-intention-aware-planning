@@ -284,14 +284,14 @@ class TaskInstance:
 class AgentConfig:
     """
     Configuration for one agent in a scenario.
-    assigned_tasks is an ordered list — executed sequentially.
+    scheduled_tasks is an ordered list — executed sequentially.
     Foreseeable tasks sit inline in the list at the correct position;
     schema.is_foreseeable identifies them — no special-casing needed.
     """
     agent_id: str
     agent_type: str                      # "human" or "robot"
     start_position: Tuple[float, float]
-    assigned_tasks: List[TaskInstance]
+    scheduled_tasks: List[TaskInstance]
     observes: List[str] = field(default_factory=list)  # agent_ids this agent observes
 
 

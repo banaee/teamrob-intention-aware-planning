@@ -163,12 +163,12 @@ class RobotAgent(FactoryAgent):
     def __init__(self, unique_id: str, model: "SimModel",
                  pos: tuple,
                  knowledge: DomainKnowledgeBase,
-                 assigned_tasks: List[TaskInstance],
+                 scheduled_tasks: List[TaskInstance],
                  observed_agent_id: Optional[str] = None):
         super().__init__(unique_id, model, pos)
 
         self.observed_agent_id = observed_agent_id
-        self.assigned_tasks: List[TaskInstance] = assigned_tasks
+        self.scheduled_tasks: List[TaskInstance] = scheduled_tasks
         self.task_index: int = 0
 
         self.recognizer = IntentionRecognizer(knowledge=knowledge)
@@ -264,8 +264,8 @@ class RobotAgent(FactoryAgent):
 
     def _get_current_task_instance(self) -> Optional[TaskInstance]:
         """Return current TaskInstance, or None if all tasks done."""
-        if self.task_index < len(self.assigned_tasks):
-            return self.assigned_tasks[self.task_index]
+        if self.task_index < len(self.scheduled_tasks):
+            return self.scheduled_tasks[self.task_index]
         return None
 
     def advance_task(self):

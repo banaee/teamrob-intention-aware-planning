@@ -242,7 +242,7 @@ class SimModel(model.Model):
         """
         Spawn agents from ScenarioConfig.
         HumanAgent receives its TaskInstance list as script.
-        RobotAgent receives its TaskInstance list as assigned_tasks.
+        RobotAgent receives its TaskInstance list as scheduled_tasks.
         """
         for agent_cfg in scenario.agents:
             start_pos = agent_cfg.start_position
@@ -252,7 +252,7 @@ class SimModel(model.Model):
                     unique_id=agent_cfg.agent_id,
                     model=self,
                     pos=start_pos,
-                    script=agent_cfg.assigned_tasks,  # List[TaskInstance]
+                    script=agent_cfg.scheduled_tasks,  # List[TaskInstance]
                 )
                 self.space.place_agent(agent, start_pos)
                 self.schedule.add(agent)
@@ -265,7 +265,7 @@ class SimModel(model.Model):
                     model=self,
                     pos=start_pos,
                     knowledge=self.knowledge,
-                    assigned_tasks=agent_cfg.assigned_tasks,  # List[TaskInstance]
+                    scheduled_tasks=agent_cfg.scheduled_tasks,  # List[TaskInstance]
                     observed_agent_id=observed_id,
                 )
                 self.space.place_agent(agent, start_pos)
