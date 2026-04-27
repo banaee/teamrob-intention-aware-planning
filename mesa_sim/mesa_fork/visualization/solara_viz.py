@@ -59,7 +59,7 @@ def Card(
         style_=f"background-color: {color}; width: 100%; height: 100%;"
     ) as main:
         if "Space" in layout_type:
-            rv.CardTitle(children=["Kiting Scenario"])
+            rv.CardTitle(children=[model.env_display_name])
             if space_drawer == "default":
                 # draw with the default implementation
                 components_matplotlib.SpaceMatplotlib(

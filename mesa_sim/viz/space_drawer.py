@@ -185,19 +185,24 @@ def _draw_paths(model, fig):
 
 
 def _update_layout(model, fig):
+    x_range = model.space.x_max - model.space.x_min
+    y_range = model.space.y_max - model.space.y_min
+    aspect = y_range / x_range
+    base_width = 800
     fig.update_layout(
-        width=800, height=500,
+        width=base_width, height=int(base_width * aspect),
         plot_bgcolor="rgba(0,0,0,0)",
         showlegend=False,
         margin=dict(l=20, r=20, t=20, b=20),
     )
     fig.update_xaxes(
         range=[model.space.x_min, model.space.x_max],
-        showline=True, linewidth=2, linecolor="black", mirror=True,
+        showline=True, linewidth=1, linecolor="black", mirror=True,
         showgrid=False, showticklabels=True, title_text="",
     )
     fig.update_yaxes(
         range=[model.space.y_min, model.space.y_max],
-        showline=True, linewidth=2, linecolor="black", mirror=True,
+        showline=True, linewidth=1, linecolor="black", mirror=True,
         showgrid=False, showticklabels=True, title_text="",
+        scaleanchor="x", scaleratio=1,
     )

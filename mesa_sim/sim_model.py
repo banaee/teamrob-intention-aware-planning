@@ -91,14 +91,15 @@ class SimModel(model.Model):
         space_config = env_layout["space"]
         env_width = space_config["width"]
         env_height = space_config["height"]
-
         self.space = space.ContinuousSpace(
             x_min=-env_width / 2,
             x_max=env_width / 2,
             y_min=-env_height / 2,
             y_max=env_height / 2,
-            torus=False
+            torus=False,
         )
+        self.env_display_name = space_config.get("name", "TeamRob Simulation")
+        
 
         # ------------------------------------------------------------------
         # Scheduler

@@ -48,6 +48,9 @@ from pathlib import Path
 # Ensure project root is on path when run directly
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# makes mesa_fork importable directly
+sys.path.insert(0, str(Path(__file__).parent))  
+
 from mesa_sim.sim_model import SimModel
 from domains.kitting.registry import register_kitting_domain
 from domains.kitting.scenarios import scenario_01 as kitting_scenario_01

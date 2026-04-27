@@ -1,7 +1,8 @@
 {
   "space": {
     "width": 1200,
-    "height": 1200,
+    "height": 1400,
+    "name": "Dock Loading Domain Layout 1",
     "units": "cm",
     "note": "origin (0,0) at center of indoor delivery hall. y-up. Full extent: y from -740 (truck bottom) to +415 (office top). space x: [-600, 600], y: [-600, 600]"
   },
