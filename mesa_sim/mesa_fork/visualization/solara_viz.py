@@ -30,8 +30,15 @@ import solara
 from solara.alias import rv
 import numpy as np
 
-import mesa_fork.visualization.components.altair as components_altair
-import mesa_fork.visualization.components.matplotlib as components_matplotlib
+# import mesa_fork.visualization.components.altair as components_altair
+# import mesa_fork.visualization.components.matplotlib as components_matplotlib
+# ============= For getting LOCAL FORK OF MESA ================
+# Relative imports used intentionally — absolute imports (mesa_fork.visualization.components.*)
+# fail on Solara hot reload because the module is re-executed in an isolated namespace
+# where sys.path is not guaranteed. Relative imports are self-contained and reload-safe.
+from .components import altair as components_altair
+from .components import matplotlib as components_matplotlib
+
 from mesa_fork.visualization.UserParam import Slider
 
 
