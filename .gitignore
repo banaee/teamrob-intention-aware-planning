@@ -35,3 +35,6 @@ Thumbs.db
 
 # add logs folder to ignore
 logs/
+
+# ignore all environment stuff .venv
+.venv/
