@@ -1,15 +1,15 @@
 # Core simulation
-numpy==2.0.1
-pandas==2.2.2
-networkx==3.3
-PyYAML==6.0.3
-tqdm==4.66.5
+numpy
+pandas
+networkx
+PyYAML
+tqdm
 
 # Visualization (solara run only)
 solara==1.57.3
 starlette==0.48.0
-plotly==5.23.0
-matplotlib==3.9.0
+plotly
+matplotlib
 
 # NOTE: Mesa is NOT installed via pip.
 # The fork is bundled at mesa_sim/mesa_fork/ and imported directly.
