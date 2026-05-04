@@ -94,6 +94,13 @@ would conflate static geometry with dynamic runtime entities.
 Rule: never add a new top-level JSON section for a new object type — add it to
 `"env_objects"` with an appropriate `"type"` value.
 
+**Three-clock architecture: motion, world state, cognitive**
+Simulators run three decoupled clocks. Motion clock: fastest — Mesa scheduler step,
+ROS PRIEST at 10Hz. World state clock: samples `WorldState` + `Observation` —
+Mesa identical to motion clock, ROS configurable (default ≈ Mesa step rate).
+Cognitive clock: event-driven, not time-based — fires on task completion, belief
+threshold, or observation change. `shared/` operates only at the cognitive clock
+level and is ignorant of motion and world state frequencies.
 
 **`ProcessCompletion` as the sim-agnostic completion contract**
 The cognitive layer signals action completion by process exhaustion — when the
