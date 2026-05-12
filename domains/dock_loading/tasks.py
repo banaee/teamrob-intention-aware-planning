@@ -205,7 +205,7 @@ go_to_office = TaskSchema(
         guards=[],
         steps=[
             StepCall("move_to", {Var("?target"): Const("office_door")}),
-            StepCall("wait_at", {Var("?entity"): Const("office_door"), Var("?duration"): Const("PT200S")}),
+            StepCall("wait_at", {Var("?entity"): Const("office_door"), Var("?duration"): Const("PT80S")}),
         ],
     )],
     is_assigned=False,
