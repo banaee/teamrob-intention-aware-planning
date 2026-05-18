@@ -28,7 +28,7 @@ scenario_00 = ScenarioConfig(
             agent_id="human_0",
             agent_type="human",
             start_position=(-350, 200),
-            assigned_tasks=[
+            scheduled_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2")}),
             ],
@@ -38,7 +38,7 @@ scenario_00 = ScenarioConfig(
             agent_id="robot_0",
             agent_type="robot",
             start_position=(350, 200),
-            assigned_tasks=[
+            scheduled_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7")}),
