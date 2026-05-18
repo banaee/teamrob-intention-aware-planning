@@ -1,6 +1,6 @@
 # TeamRob Framework — TODOs, Bugs, and Deferred Items
 
-Collected from Phase 2.1 (dock_loading domain) and 2.2 (visualization) sessions.
+Collected from Phase 2.1 (dock_loading domain), 2.2 (visualization), and Phase 4 design sessions.
 Each item has a category, priority, and the relevant file(s).
 Items marked **[BLOCKING]** must be resolved before the simulation runs correctly end-to-end.
 
@@ -76,7 +76,7 @@ Reference: TODO #13
 `ActionSchema.effects` are defined but the planner does not use them for forward
 chaining. Required for full HTN planning with precondition checking.
 Files: `shared/planner.py`
-Reference: Phase 4 TODO
+Reference: Phase 4B
 
 **TODO-08 — `dock_gate` open/close: implement `open_gate` ActionSchema**
 `deliver_pallet` and `load_return` have a commented-out `gate_closed` method.
@@ -89,7 +89,7 @@ Reference: TODO in tasks.py comments
 Currently `action_decomposer.steps_toward()` uses straight-line interpolation.
 Agents walk through walls and obstacles. Replace with A* or RRT in Phase 4.
 Files: `mesa_sim/action_decomposer.py`
-Reference: Phase 4 TODO
+Reference: Phase 4D
 
 **TODO-10 — `scan_pallet` precondition: `obj_at(?item, delivery_area)` guard**
 `scan_pallet` should only execute when the pallet has been delivered to the area.
@@ -111,6 +111,21 @@ Files: `mesa_sim/run_mesa.py`, `DOMAIN_REGISTRY`
 **TODO-13 — `logs/` directory: add to `.gitignore`**
 Log files should not be committed to the repo.
 Files: `.gitignore`
+
+**TODO-14 — `AgentConfig.scheduled_tasks` → `assigned_tasks` (unordered set) for robot** [Phase 4 prereq]
+Robot's tasks should be declared as an unordered set in `AgentConfig` and scenario files.
+Initial queue ordering is the meta_planner's responsibility, not the scenario file's.
+Human agent keeps an ordered list (scripted ground truth — ordering is intentional).
+Files: `shared/types.py` (`AgentConfig`), `domains/*/scenarios.py`, `mesa_sim/sim_agents.py`
+Reference: Phase 4 design session
+
+**TODO-15 — Team-level semantic costs: park as future cost function extension**
+Current cost function = Mesa steps (moves, detours, pauses). Team-level costs
+(human waiting time, shared resource conflicts, task dependency violations) are
+intentionally excluded from Phase 4. Add as extension when team efficiency
+metrics are introduced in Phase 5 or later.
+Files: `shared/meta_planner.py` (Phase 4 new)
+Reference: Phase 4 design session
 
 ---
 
@@ -152,6 +167,41 @@ Currently requires manual addition of import + registry entry per domain.
 Consider auto-discovery from `domains/` folder structure in future.
 Files: `mesa_sim/run_mesa.py`
 
+**DESIGN-06 — `ProjectedPlan` type: definition and relation to `AbstractPlan`** [Phase 4 prereq]
+`AbstractPlan` is single-task and executor-facing (existing, keep as-is).
+Phase 4 requires a separate `ProjectedPlan` — multi-task lookahead used only by
+meta_planner for interference detection and cost comparison; never handed to executor.
+Fields needed: `List[(AbstractPlan, estimated_start_step, estimated_duration, spatial_zones)]`.
+"Abstract" in `AbstractPlan` refers to symbolic (vs microaction) level — naming is correct.
+Must be defined in `shared/types.py` before Phase 4 implementation begins.
+Files: `shared/types.py`
+Reference: Phase 4 design session
+
+**DESIGN-07 — Cognitive clock trigger conditions and θ hysteresis policy** [Phase 4 prereq]
+The cognitive clock is event-based. Confirmed triggers:
+- Task completion — queue advances, re-evaluate ordering with latest belief
+- Belief threshold θ crossed (confidence rises above θ for first time, or most_likely switches)
+- Robot commits to task (picks up item) — cancellation cost changes discontinuously here
+
+Open / to settle before Phase 4C implementation:
+- Belief drops below θ again: hold last decision or revert to baseline queue?
+  Single threshold or hysteresis band (enter at θ_high, exit at θ_low)?
+- Human observed completing a task: changes interference picture, likely a trigger
+- Human enters new zone: lightweight spatial pre-trigger before full threshold?
+- Robot reaches path decision point within current action: time-sensitive re-evaluation
+
+`replanning.py` trigger logic to be absorbed into `meta_planner.py`; `replanning.py` retired after migration.
+Files: `shared/meta_planner.py` (Phase 4 new), `shared/replanning.py`
+Reference: Phase 4 design session
+
+**DESIGN-08 — Team-level semantic costs in cost function (parked)**
+Current cost function is purely step-based (Mesa steps / ROS seconds).
+Future extension: incorporate team-level costs — human waiting time, shared resource
+conflicts, task dependency violations. Deferred to post-Phase 4; keep in mind when
+defining cost function interface in meta_planner so extension does not require redesign.
+Files: `shared/meta_planner.py` (Phase 4 new)
+Reference: Phase 4 design session
+
 ---
 
 ## 🧹 Refactoring / Cleanup TODOs
@@ -173,10 +223,8 @@ README still references `dock_delivery_loading` in the folder listing.
 Update to `dock_loading`.
 Files: `domains/README.md`
 
-**REFACTOR-04 — `roadmap.md`: update Phase 2.1 and 2.2 status**
-Phase 2.1 simulation runs end-to-end correctly. BUG-01 and BUG-02 resolved.
-Add Phase 2.3 (task eligibility conditions).
-Files: `docs/roadmap.md`
+**REFACTOR-04 — `roadmap.md`: Phase 2.1 and 2.2 status and Phase 4 expansion** ✅ DONE
+Updated in this session.
 
 ---
 
@@ -184,7 +232,7 @@ Files: `docs/roadmap.md`
 
 **LIMIT-01 — Straight-line agent movement through walls**
 Agents move in straight lines ignoring walls between hall/dock/truck.
-Accepted: same as kitting. Fix deferred to Phase 4 path planning.
+Accepted: same as kitting. Fix deferred to Phase 4 path planning (TODO-09).
 
 **LIMIT-02 — Parallel task independence: human scans before robot delivers**
 Human `scan_pallet` executes without waiting for robot `deliver_pallet` to complete.
@@ -201,6 +249,11 @@ Deferred: individual pallet slot positions within truck area.
 **LIMIT-05 — Empty pallet bays not wired to `LOAD_RETURN` task execution yet**
 `load_return` tasks defined and in scenario but may not complete correctly
 until BUG-01 and BUG-02 are resolved and full scenario runs end-to-end.
+
+**LIMIT-06 — Robot task queue is pre-ordered in scenario file** [Phase 4]
+Robot's `scheduled_tasks` is currently an ordered list in `AgentConfig`.
+Ordering should be the meta_planner's responsibility. Accepted for Phases 1–3;
+fix in Phase 4 via TODO-14.
 
 ---
 

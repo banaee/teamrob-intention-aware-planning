@@ -10,7 +10,7 @@ This is a living reference of *why* things are designed the way they are.
 The robot architecture from the HCM paper maps directly to two layers:
 
 - **Cognitive layer (`shared/`)** — the robot's mind. Simulator-agnostic. Pure Python.
-  Handles intention recognition, adaptive planning, replanning logic, and domain knowledge.
+  Handles intention recognition, adaptive planning, meta-planning, and domain knowledge.
 
 - **Embodiment layer (`mesa_sim/`, `ros_sim/`)** — the robot's body. Simulator-specific.
   Handles sensing, world-state building, observation building, and action execution.
@@ -62,7 +62,8 @@ remain in YAML/JSON as configuration (not knowledge).
 **Skeleton-first development**
 All modules are built with correct interfaces and dummy logic first.
 This validates the architecture and data flow before investing in algorithms.
-Real algorithms (Bayesian update, cost-based planning) replace dummy logic later.
+Real algorithms (Bayesian update, cost-based planning, guard evaluation)
+replace dummy logic in Phase 4.
 
 **Scenarios are simulator-agnostic**
 `scenarios.yaml` defines agent roles, starting positions, and task assignments
@@ -79,7 +80,6 @@ context weighting (ω_context). `at(agent, object)` — proximity-based object
 presence, used by the executor to check action completion. These are separate
 concerns and must not be conflated. `GOTO_ZONE` was removed from the HTN
 decomposition tree entirely; zone-level reasoning lives only in the recognizer.
-
 
 **env_layout.json structure: flat `env_objects` for static geometry, separate sections for dynamic entities**
 Static physical objects (shelves, tables, machines, obstacles, delivery areas, gates,
@@ -108,3 +108,61 @@ microaction queue for a `GroundedAction` is empty, the action is done. Each
 embodiment layer realizes this in its own temporal terms: Mesa uses step counts,
 ROS uses action server feedback. The cognitive layer is ignorant of schedulers,
 wall-clock time, or step size.
+
+---
+
+## Phase 4 Architectural Decisions
+
+**Two planning levels, not one**
+The HCM paper's "adaptive planning" block maps to two distinct modules in implementation:
+- `meta_planner.py` — high-level: task scheduling, candidate ordering generation, cost
+  comparison, reordering/reselection decisions. Owns the task queue.
+- `planner.py` — HTN decomposition: given a single task, recursively decomposes it into
+  a flat `AbstractPlan` of `GroundedAction`s. Called by meta_planner, not by the agent directly.
+`replanning.py` (skeleton) is retired; its trigger logic is absorbed into `meta_planner.py`.
+
+**HTN owns decomposition; meta_planner owns scheduling**
+HTN (`planner.py`) answers: "how do I execute this task?" — recursive decomposition
+until all steps are primitive `ActionSchema` leaves. It does not decide task ordering.
+Meta_planner answers: "which tasks, in what order?" — uses IR predictions and cost
+estimates to evaluate candidate orderings. These are strictly separate responsibilities.
+Introducing a top-level `DELIVER_ALL` HTN task was considered and rejected: it would
+force scheduling logic inside HTN, losing IR visibility and making replanning expensive.
+
+**Robot receives assigned_tasks as an unordered set**
+The robot's tasks are declared as a set in `AgentConfig` — no implicit ordering.
+The meta_planner generates the initial queue Q0 at t=0 using a base-cost heuristic
+(nearest item first, or similar) with a null/uniform belief state.
+This makes the scenario file honest: it declares *what* the robot must do, not *how*
+to sequence it. The human agent retains an ordered list (scripted ground truth).
+
+**AbstractPlan vs ProjectedPlan — two distinct types**
+`AbstractPlan`: single task, executor-facing. Output of `planner.py` (HTN decomposer).
+Contains a flat list of `GroundedAction`s. "Abstract" means symbolic (not microactions).
+`ProjectedPlan`: multi-task lookahead, meta_planner-facing only. Never handed to executor.
+Concatenates AbstractPlans across the full task queue with estimated timing and spatial
+occupancy per action. Used for interference detection and cost comparison.
+Both types are defined in `shared/types.py`.
+
+**Cost function: Mesa steps as the uniform cost unit**
+All robot behaviors carry equal cost per step: moving, detouring, pausing/waiting.
+Total cost of a candidate plan = total Mesa steps to complete all tasks in the horizon.
+This captures team efficiency (faster completion = better) without semantic complexity.
+Cancellation cost of a held-item task includes return-to-shelf steps before reordering.
+Team-level semantic costs (human waiting, shared resource conflicts) are parked as a
+future extension — the cost function interface must be designed to allow this extension
+without requiring meta_planner redesign (see DESIGN-08).
+
+**IR runs from t=0 with uniform prior; meta_planner gates action on confidence θ**
+The recognizer updates belief every cognitive clock tick from the start of simulation.
+It does not wait for "enough" observations. The meta_planner uses a confidence threshold
+θ to gate reordering decisions: below θ, the current queue is maintained; above θ,
+candidate evaluation is triggered. This gives continuous reasoning without premature
+reordering on weak evidence.
+
+**Prediction horizon H bounds the lookahead**
+IR produces a predicted human action sequence with confidence decaying over horizon H.
+Meta_planner reasons only over the overlap between H and the robot's ProjectedPlan.
+Beyond H, prediction uncertainty makes cost estimates unreliable.
+In small scenarios (few tasks), H may span the full queue. In longer shifts, H caps
+the effective lookahead naturally. H is a function of IR confidence, not a fixed value.
