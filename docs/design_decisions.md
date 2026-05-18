@@ -113,8 +113,20 @@ wall-clock time, or step size.
 
 ## Phase 4 Architectural Decisions
 
+**`scheduled_tasks` semantics differ by agent type**
+The field name `scheduled_tasks` is kept on `AgentConfig` for both agent types, but semantics differ:
+
+- **Human**: fixed ordered sequence of `TaskInstance`s (assigned + foreseeable interleaved).
+Order encodes when deviations occur. Never reordered at runtime. Ground truth for IR evaluation.
+- **Robot**: initial ordering produced by meta_planner at t=0 using base-cost heuristic with null belief.
+Treated as a mutable prioritised queue — meta_planner may reorder at any cognitive 
+clock event based on IR output.
+The scenario file's robot `scheduled_tasks` order is therefore only a fallback/hint
+for t=0; it carries no semantic commitment beyond that.
+
 **Two planning levels, not one**
 The HCM paper's "adaptive planning" block maps to two distinct modules in implementation:
+
 - `meta_planner.py` — high-level: task scheduling, candidate ordering generation, cost
   comparison, reordering/reselection decisions. Owns the task queue.
 - `planner.py` — HTN decomposition: given a single task, recursively decomposes it into

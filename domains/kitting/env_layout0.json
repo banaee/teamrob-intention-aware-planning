@@ -1,0 +1,142 @@
+{
+  "space": {
+    "width": 1000,
+    "height": 800,
+    "name": "Kitting Domain Layout 0 — Phase 4 Development",
+    "units": "cm",
+    "notes": "Minimal layout for Phase 4 IR and AP development. Symmetric placement guarantees path crossing near center (Scenario 0.1) and KT convergence conflict (Scenario 0.2). No obstacles, no foreseeable tasks."
+  },
+  "zones": [
+    {
+      "id": "zone_NW",
+      "bounds": { "x_min": -500, "x_max": 0, "y_min": 0, "y_max": 400 },
+      "label": "northwest_work"
+    },
+    {
+      "id": "zone_NE",
+      "bounds": { "x_min": 0, "x_max": 500, "y_min": 0, "y_max": 400 },
+      "label": "northeast_work"
+    },
+    {
+      "id": "zone_SW",
+      "bounds": { "x_min": -500, "x_max": 0, "y_min": -400, "y_max": 0 },
+      "label": "southwest_storage"
+    },
+    {
+      "id": "zone_SE",
+      "bounds": { "x_min": 0, "x_max": 500, "y_min": -400, "y_max": 0 },
+      "label": "southeast_storage"
+    }
+  ],
+  "doors": [],
+  "items": [
+    {
+      "id": "item_3",
+      "type": "part_B",
+      "initial_container": "shelf_3",
+      "size": [25, 25],
+      "notes": "Human first target. Bottom-left. Robot heading to item_4 (bottom-right) crosses human heading here near center."
+    },
+    {
+      "id": "item_4",
+      "type": "part_C",
+      "initial_container": "shelf_4",
+      "size": [25, 25],
+      "notes": "Robot first target. Bottom-right. Symmetric to item_3."
+    },
+    {
+      "id": "item_6",
+      "type": "part_D",
+      "initial_container": "shelf_6",
+      "size": [25, 25],
+      "notes": "Robot second task. Left side."
+    },
+    {
+      "id": "item_7",
+      "type": "part_D",
+      "initial_container": "shelf_7",
+      "size": [25, 25],
+      "notes": "Robot third task. Left side."
+    },
+    {
+      "id": "item_2",
+      "type": "part_B",
+      "initial_container": "shelf_2",
+      "size": [25, 25],
+      "notes": "Human second task. Right side."
+    }
+  ],
+  "robots": [
+    {
+      "id": "robot_0",
+      "type": "mobile_manipulator",
+      "initial_container": "zone_NE",
+      "initial_x": 350,
+      "initial_y": 200
+    }
+  ],
+  "humans": [
+    {
+      "id": "human_0",
+      "type": "worker",
+      "initial_container": "zone_NW",
+      "initial_x": -350,
+      "initial_y": 200
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table",
+      "type": "kitting_table",
+      "position": [0, 350],
+      "size": [200, 100],
+      "zone": "zone_NW",
+      "notes": "Top-center. Both agents converge here after picking — KT conflict zone for Scenario 0.2."
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [-300, -300],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "Human first target. Symmetric to shelf_4 across vertical axis."
+    },
+    {
+      "id": "shelf_4",
+      "type": "shelf",
+      "position": [300, -300],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SE",
+      "notes": "Robot first target. Symmetric to shelf_3."
+    },
+    {
+      "id": "shelf_6",
+      "type": "shelf",
+      "position": [-400, -100],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "Robot second task item."
+    },
+    {
+      "id": "shelf_7",
+      "type": "shelf",
+      "position": [-400, 100],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_NW",
+      "notes": "Robot third task item."
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [400, -100],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SE",
+      "notes": "Human second task item. Symmetric to shelf_6."
+    }
+  ]
+}

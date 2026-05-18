@@ -3,8 +3,8 @@
 # CLI args override individual fields: --domain, --layout, --scenario, --steps, --planner, --recognizer
 
 domain: kitting
-layout: 1
-scenario: scenario_01
-steps: 500
+layout: env_layout1
+scenario: scenario_10
+steps: 30
 planner: basic
-recognizer: uniform
+recognizer: uniform_make_domain_model

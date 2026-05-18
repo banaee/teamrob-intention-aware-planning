@@ -10,15 +10,56 @@ from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig
 from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
 
 
-scenario_01 = ScenarioConfig(
-    id="scenario_01",
+
+# ===============================================================
+# manually defined scenario, for only "env_layout0".
+# ===============================================================
+scenario_00 = ScenarioConfig(
+    id="scenario_00",
+    name="layout0_phase4_collision_baseline",
+    description=(
+        "Minimal Phase 4 development scenario. Robot and human start symmetric, "
+        "paths cross near center during first moveto (case 0.1 collision). "
+        "Both converge on KT after picking (case 0.2 conflict). "
+        "No foreseeable tasks. Human plan is scripted/fixed."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-350, 200),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(350, 200),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+
+# ===============================================================
+# manually defined scenarios, for only "env_layout1".
+# ===============================================================
+scenario_10 = ScenarioConfig(
+    id="scenario_10",
     name="basic_kitting_with_coffee_break",
     description=(
         "Human and robot each deliver items to the kitting table. "
         "Human deviates to a coffee break after completing their first delivery. "
         "Robot must recognize the deviation and replan accordingly."
     ),
-    env_layout="env1_layout",
     agents=[
         AgentConfig(
             agent_id="human_0",

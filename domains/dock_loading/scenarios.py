@@ -11,12 +11,13 @@ from domains.dock_loading.tasks import (
 )
 
 
-
-scenario_00 = ScenarioConfig(
-    id="scenario_00",
+# ===============================================================
+# manually defined scenarios, for only "env_layout1".
+# ===============================================================
+scenario_10 = ScenarioConfig(
+    id="scenario_10",
     name="minimal_debug",
     description="Human goes to office. Robot delivers one pallet.",
-    env_layout="env_layout1",
     agents=[
         AgentConfig(
             agent_id="human_0",
@@ -40,8 +41,11 @@ scenario_00 = ScenarioConfig(
 )
 
 
-scenario_01 = ScenarioConfig(
-    id="scenario_01",
+# ===============================================================
+# manually defined scenarios, for only "env_layout1".
+# ===============================================================
+scenario_11 = ScenarioConfig(
+    id="scenario_11",
     name="basic_dock_loading_with_coffee_break",
     description=(
         "Robot delivers 6 full pallets from truck to hall (3 dry, 3 frozen), "
@@ -49,7 +53,6 @@ scenario_01 = ScenarioConfig(
         "Human scans each delivered pallet. "
         "Human takes a coffee break after the 2nd scan (3rd task slot)."
     ),
-    env_layout="env_layout1",
     agents=[
         AgentConfig(
             agent_id="human_0",

@@ -15,7 +15,7 @@ USAGE:
     python mesa_sim/run_mesa.py --domain dock_loading
 
     # Headless with full overrides:
-    python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_01 --steps 400
+    python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_11 --steps 400
 
     # Visualization (uses configs/experiment.yaml):
     solara run mesa_sim/run_mesa.py
@@ -52,11 +52,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))  
 
 from mesa_sim.sim_model import SimModel
-from domains.kitting.registry import register_kitting_domain
-from domains.kitting.scenarios import scenario_01 as kitting_scenario_01
-from domains.dock_loading.registry import register_dock_loading_domain
-from domains.dock_loading.scenarios import scenario_00 as dock_scenario_00, scenario_01 as dock_scenario_01
+# from domains.kitting.registry import register_kitting_domain
+# from domains.kitting.scenarios import scenario_11 as kitting_scenario_11
+# from domains.dock_loading.registry import register_dock_loading_domain
+# from domains.dock_loading.scenarios import scenario_10 as dock_scenario_10, scenario_11 as dock_scenario_11
 
+from domains.kitting.registry import domain_config as kitting_config
+from domains.dock_loading.registry import domain_config as dock_config
 
 # ============================================================================
 # Logging setup
@@ -83,23 +85,11 @@ logging.basicConfig(
 # Add one entry here when adding a new domain.
 # =============================================================================
 
+
 DOMAIN_REGISTRY = {
-    "kitting": {
-        "register_fn":  register_kitting_domain,
-        "layout_path":  "domains/kitting/env_layout1.json",
-        "scenarios":    {"scenario_01": kitting_scenario_01},
-    },
-    "dock_loading": {
-        "register_fn":  register_dock_loading_domain,
-        "layout_path":  "domains/dock_loading/env_layout1.json",
-        "scenarios":    {
-            "scenario_00": dock_scenario_00,
-            "scenario_01": dock_scenario_01
-            },
-    },
+    "kitting":      kitting_config,
+    "dock_loading": dock_config,
 }
-
-
 
 
 # =============================================================================
@@ -132,7 +122,7 @@ def load_experiment(experiment_path: str, overrides: dict) -> dict:
 #     parser.add_argument("--layout",      type=int,  default=None,
 #                         help="Layout number override (default: 1)")
 #     parser.add_argument("--scenario",    type=str,  default=None,
-#                         help="Scenario ID override (e.g. scenario_01)")
+#                         help="Scenario ID override (e.g. scenario_11)")
 #     parser.add_argument("--steps",       type=int,  default=None,
 #                         help="Number of steps override for headless run")
 #     parser.add_argument("--planner",     type=str,  default=None,
@@ -145,8 +135,8 @@ def parse_user_args():
     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
     parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH)
     parser.add_argument("--domain",      type=str,  default=None, help="Domain name override (e.g. kitting, dock_loading)")
-    parser.add_argument("--layout",      type=int,  default=None, help="Layout number override (default: 1)")
-    parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_01)")
+    parser.add_argument("--layout", type=str, default=None, help="Layout name override (e.g. env_layout1)")
+    parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_11)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
     parser.add_argument("--planner",     type=str,  default=None, help="Planner variant override (e.g. basic, intention_aware)")
     parser.add_argument("--recognizer",  type=str,  default=None, help="Recognizer variant override (e.g. uniform, bayesian)")
@@ -158,8 +148,17 @@ def parse_user_args():
 # =============================================================================
 # Model factory — shared by headless and Solara
 # =============================================================================
-
 def _make_domain_model() -> SimModel:
+    '''
+    Resolves user config to domain, layout, and scenario objects.
+    Then instantiates SimModel with those objects.
+    Steps:
+        1. Parse CLI args and load experiment.yaml config
+        2. Look up domain in DOMAIN_REGISTRY
+        3. Look up layout in domain["layouts"]
+        4. Look up scenario in layout["scenarios"]
+        5. Instantiate SimModel with scenario, domain register_fn, and layout path
+    '''
     user_args = parse_user_args()
     user_config = load_experiment(user_args.experiment, {
         "domain":     user_args.domain,
@@ -170,7 +169,7 @@ def _make_domain_model() -> SimModel:
         "recognizer": user_args.recognizer,
     })
 
-    # --------- domain arguments from config/CLI ---------
+    # --------- domain ---------
     domain_name = user_config["domain"]
     if domain_name not in DOMAIN_REGISTRY:
         raise ValueError(
@@ -178,27 +177,30 @@ def _make_domain_model() -> SimModel:
             f"Available: {list(DOMAIN_REGISTRY.keys())}"
         )
     domain = DOMAIN_REGISTRY[domain_name]
-    
-    # --------- scenario arguments from config/CLI ---------
-    scenario_id = user_config["scenario"]
-    if scenario_id not in domain["scenarios"]:
-        raise ValueError(
-            f"Unknown scenario '{scenario_id}' for domain '{domain_name}'. "
-            f"Available: {list(domain['scenarios'].keys())}"
-        )
-    scenario = domain["scenarios"][scenario_id]
-    
-    # --------- layout arguments from config/CLI ---------
-    # TODO: use config["layout"] number to select layout path when multiple layouts exist
-    layout_path = domain["layout_path"]
 
+    # --------- layout ---------
+    layout_name = user_config["layout"]
+    if layout_name not in domain["layouts"]:
+        raise ValueError(
+            f"Unknown layout '{layout_name}' for domain '{domain_name}'. "
+            f"Available: {list(domain['layouts'].keys())}"
+        )
+    layout = domain["layouts"][layout_name]
+
+    # --------- scenario ---------
+    scenario_id = user_config["scenario"]
+    if scenario_id not in layout["scenarios"]:
+        raise ValueError(
+            f"Unknown scenario '{scenario_id}' for layout '{layout_name}'. "
+            f"Available: {list(layout['scenarios'].keys())}"
+        )
+    scenario = layout["scenarios"][scenario_id]
 
     return SimModel(
         scenario=scenario,
         register_fn=domain["register_fn"],
-        env_layout_path=layout_path,
+        env_layout_path=layout["path"],
     )
-
 
 # =============================================================================
 # Headless runner
@@ -261,11 +263,13 @@ _user_config = load_experiment(_user_args.experiment, {
     "planner":    _user_args.planner,
     "recognizer": _user_args.recognizer,
 })
-_domain_args = DOMAIN_REGISTRY[_user_config["domain"]]
+
+_domain_args = DOMAIN_REGISTRY[_user_config["domain"]]       #todo later: error handling for nonexistent domain
+_layout = _domain_args["layouts"][_user_config["layout"]]    #todo later: error handling for nonexistent layout
 _model_params = {
-    "scenario":        _domain_args["scenarios"][_user_config["scenario"]],
+    "scenario":        _layout["scenarios"][_user_config["scenario"]],
     "register_fn":     _domain_args["register_fn"],
-    "env_layout_path": _domain_args["layout_path"],
+    "env_layout_path": _layout["path"],
 }
 
 # print(f"_model_params: {_model_params}")

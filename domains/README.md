@@ -111,6 +111,13 @@ The registry assembles all tasks and actions into a `DomainModel` and declares t
 
 A `ScenarioConfig` assigns concrete task instances to each agent, with all parameters bound to specific values. Foreseeable tasks sit inline in the human's task list at the position where the deviation is expected. See `domains/kitting/scenarios.py` for the pattern.
 
+### Scenario Naming Convention
+
+Scenario names are prefixed by their layout number so the layout–scenario relationship is visible from the name alone:
+
+- `env_layout0` → `scenario_00`, `scenario_01`, ...
+- `env_layout1` → `scenario_10`, `scenario_11`, ...
+
 ---
 
 ## 8. Checklist before marking a domain ready

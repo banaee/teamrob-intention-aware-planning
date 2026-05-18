@@ -284,14 +284,19 @@ class TaskInstance:
 class AgentConfig:
     """
     Configuration for one agent in a scenario.
-    scheduled_tasks is an ordered list — executed sequentially.
+    scheduled_tasks semantics differ by agent type:
+      - human:  fixed ordered sequence (assigned + foreseeable tasks interleaved).
+                Order encodes when deviations occur. Never reordered at runtime.
+      - robot:  initially ordered by meta_planner at t=0 using base-cost heuristic.
+                Treated as a mutable prioritised set — meta_planner may reorder
+                at any cognitive clock event based on IR output.
     Foreseeable tasks sit inline in the list at the correct position;
     schema.is_foreseeable identifies them — no special-casing needed.
     """
     agent_id: str
     agent_type: str                      # "human" or "robot"
     start_position: Tuple[float, float]
-    scheduled_tasks: List[TaskInstance]
+    scheduled_tasks: List[TaskInstance]  # fixed task sequence for human, flexible mutable task "set" for robot
     observes: List[str] = field(default_factory=list)  # agent_ids this agent observes
 
 
@@ -304,8 +309,8 @@ class ScenarioConfig:
     id: str
     name: str
     description: str
-    env_layout: str                      # e.g. "env1_layout" — filename without extension
     agents: List[AgentConfig]
+    # env_layout: str                      # removed. will be handled in domains/<domain>/registry.py 
     
     
 @dataclass

@@ -81,7 +81,7 @@ Use any IDE (e.g., [VS Code](https://code.visualstudio.com/)) or editor of your 
 
 ```bash
 python mesa_sim/run_mesa.py
-python mesa_sim/run_mesa.py --scenario scenario_01 --steps 200
+python mesa_sim/run_mesa.py --scenario scenario_11 --steps 200
 ```
 
 ### Visualization (Solara)

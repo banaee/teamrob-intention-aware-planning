@@ -103,21 +103,19 @@ Without these, dock env objects render in default gray.
 Files: `mesa_sim/viz/space_drawer.py`
 Reference: TODO #11 (original list)
 
-**TODO-12 — `run_mesa.py`: use `config["layout"]` number for layout path selection**
-Currently layout number from `experiment.yaml` is read but ignored — path is hardcoded
-per domain. Wire layout number to select `env_layout{N}.json` when multiple layouts exist.
-Files: `mesa_sim/run_mesa.py`, `DOMAIN_REGISTRY`
+**TODO-12 — DONE** Layout selection via `experiment.yaml` `layout` field implemented.
+`DOMAIN_REGISTRY` restructured as `domain → layout → scenario` hierarchy in
+`domains/*/registry.py`. `run_mesa.py` resolves layout and scenario by name.
 
 **TODO-13 — `logs/` directory: add to `.gitignore`**
 Log files should not be committed to the repo.
 Files: `.gitignore`
 
-**TODO-14 — `AgentConfig.scheduled_tasks` → `assigned_tasks` (unordered set) for robot** [Phase 4 prereq]
-Robot's tasks should be declared as an unordered set in `AgentConfig` and scenario files.
-Initial queue ordering is the meta_planner's responsibility, not the scenario file's.
-Human agent keeps an ordered list (scripted ground truth — ordering is intentional).
-Files: `shared/types.py` (`AgentConfig`), `domains/*/scenarios.py`, `mesa_sim/sim_agents.py`
-Reference: Phase 4 design session
+**TODO-14 — `AgentConfig.scheduled_tasks` → `assigned_tasks` (unordered set) for robot** ✅ RESOLVED
+`scheduled_tasks` retained as field name on `AgentConfig` for both agent types.
+Semantics split by agent type instead of renaming: human list is fixed/ordered ground truth;
+robot list is a mutable prioritised queue owned by meta_planner at runtime.
+See design_decisions.md Phase 4 section for full specification.
 
 **TODO-15 — Team-level semantic costs: park as future cost function extension**
 Current cost function = Mesa steps (moves, detours, pauses). Team-level costs
