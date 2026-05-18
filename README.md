@@ -13,7 +13,9 @@ Part of the Swedish Knowledge Foundation's **TeamRob Synergy Project**, in colla
 The framework enforces a strict **mind/body separation**:
 
 ### Cognitive Layer (`shared/`)
+
 Simulator-agnostic pure Python. Contains:
+
 - **Intention Recognition** — Bayesian inference over human task hypotheses
 - **Adaptive Planning** — HTN-style grounded action generation
 - **Replanning** — trigger logic for plan revision
@@ -23,7 +25,9 @@ Simulator-agnostic pure Python. Contains:
 The cognitive layer never imports from any simulator.
 
 ### Embodiment Layers
+
 Simulator-specific implementations that translate between physical world and symbolic layer:
+
 - `mesa_sim/` — discrete step-based simulation (Mesa 3.0)
 - `ros_sim/` — real-world deployment (planned)
 
@@ -31,9 +35,11 @@ Each embodiment provides: observation building, world state building, and action
 The cognitive layer is called by the embodiment — it never runs its own loop.
 
 ### Domain Knowledge (`domains/`)
+
 Domain-specific task and action definitions in typed Python — no YAML parsing.
 Each domain defines:
-- **Action operators** — HTN primitive tasks (directly executable)
+
+- **Action schemas** — HTN primitive tasks (directly executable)
 - **Task schemas** — HTN non-primitive tasks (decompose via methods)
 - **Scenarios** — typed agent assignments and task instances
 - **Environment layout** — JSON spatial configuration
@@ -106,7 +112,7 @@ teamrob-intention-aware-planning/
 │
 ├── domains/                     # Domain-specific knowledge (Python)
 │   └── kitting/
-│       ├── actionOperators.py      # HTN primitive tasks
+│       ├── ActionSchemas.py      # HTN primitive tasks
 │       ├── tasks.py                # HTN non-primitive tasks
 │       ├── registry.py             # DomainModel construction
 │       ├── scenarios.py            # Scenario definitions

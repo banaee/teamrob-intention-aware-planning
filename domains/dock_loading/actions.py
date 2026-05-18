@@ -1,6 +1,6 @@
-# domains/dock_loading/actionOperators.py
+# domains/dock_loading/actions.py
 """
-Action operator definitions for the dock_loading domain.
+Action schema definitions for the dock_loading domain.
 These are the HTN primitive actions — directly executable, not decomposed further.
 Microaction expansion (STEP*, GRASP, TOUCH, etc.) is handled by mesa_sim/action_decomposer.py.
 
@@ -19,7 +19,7 @@ ACTIONS:
     scan_it       — do touch screen at close range (agent must be at pallet)
 """
 
-from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionOperator
+from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionSchema
 
 _agent  = Var("?agent")
 _item = Var("?item")   # # was _pallet = Var("?pallet"), but now universal (item here means any portable object: TODO: in kitting the instances are also item_i)
@@ -27,7 +27,7 @@ _target = Var("?target")
 _entity = Var("?entity")
 
 
-move_to = ActionOperator(
+move_to = ActionSchema(
     name="move_to",
     parameters=[_target],
     preconditions=[],
@@ -40,7 +40,7 @@ move_to = ActionOperator(
     movement_target_type="object",
 )
 
-pick_up = ActionOperator(
+pick_up = ActionSchema(
     name="pick_up",
     parameters=[_item],
     preconditions=[
@@ -53,7 +53,7 @@ pick_up = ActionOperator(
     microactions=["GRASP"],
 )
 
-place = ActionOperator(
+place = ActionSchema(
     name="place",
     parameters=[_item, _target],
     preconditions=[
@@ -68,7 +68,7 @@ place = ActionOperator(
 )
 
 
-scan_it = ActionOperator(
+scan_it = ActionSchema(
     name="scan_it",
     parameters=[_item],
     preconditions=[
@@ -82,7 +82,7 @@ scan_it = ActionOperator(
 )
 
 
-wait_at = ActionOperator(
+wait_at = ActionSchema(
     name="wait_at",
     parameters=[_entity],
     preconditions=[

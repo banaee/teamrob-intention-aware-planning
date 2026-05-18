@@ -146,12 +146,12 @@ class Executor:
     def _is_action_complete(self, action: GroundedAction, world: WorldState) -> bool:
         """
         Check if action is complete.
-        Branches on completion type declared in the operator schema:
+        Branches on completion type declared in the action schema:
         - ConditionSchema: checks completion_predicate membership in WorldState.predicates
         - ProcessCompletion: checks if microaction queue was fully exhausted
         No string parsing, no template resolution.
         """
-        if isinstance(action.operator.completion, ProcessCompletion):
+        if isinstance(action.schema.completion, ProcessCompletion):
             result = self._queue_was_exhausted
         else:
             result = action.completion_predicate in world.predicates

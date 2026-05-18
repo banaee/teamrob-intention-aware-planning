@@ -1,6 +1,6 @@
-# domains/kitting/actionOperators.py
+# domains/kitting/actions.py
 """
-Action operator definitions for the kitting domain.
+Action schema definitions for the kitting domain.
 These are the HTN primitive actions — directly executable, not decomposed further.
 Microaction expansion (STEP*, GRASP, etc.) is handled by mesa_sim/action_decomposer.py.
 
@@ -14,7 +14,7 @@ PREDICATE NAMING NOTE:
 
 """
 
-from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionOperator
+from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionSchema
 
 _agent  = Var("?agent")
 _item   = Var("?item")
@@ -27,7 +27,7 @@ _entity = Var("?entity")
 # - Not an intermediate task — zone is not a meaningful semantic unit
 # - Zone reasoning moved to recognizer context weighting (ωcontext)
 
-# goto_zone = ActionOperator(
+# goto_zone = ActionSchema(
 #     name="goto_zone",
 #     parameters=[_zone],
 #     preconditions=[
@@ -42,7 +42,7 @@ _entity = Var("?entity")
 #     movement_target_type="zone", 
 # )
 
-move_to = ActionOperator(
+move_to = ActionSchema(
     name="move_to",
     parameters=[_target],
     preconditions=[],
@@ -55,7 +55,7 @@ move_to = ActionOperator(
     movement_target_type="object",
 )
 
-pick_up = ActionOperator(
+pick_up = ActionSchema(
     name="pick_up",
     parameters=[_item],
     preconditions=[
@@ -68,7 +68,7 @@ pick_up = ActionOperator(
     microactions=["GRASP"],
 )
 
-place = ActionOperator(
+place = ActionSchema(
     name="place",
     parameters=[_item, _target],
     preconditions=[
@@ -82,7 +82,7 @@ place = ActionOperator(
     microactions=["RELEASE"],
 )
 
-wait_at = ActionOperator(
+wait_at = ActionSchema(
     name="wait_at",
     parameters=[_entity],
     preconditions=[

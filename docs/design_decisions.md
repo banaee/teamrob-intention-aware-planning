@@ -53,8 +53,8 @@ Evidence must accumulate over time across multiple competing hypotheses.
 Rule-based or classification alternatives were rejected for this reason.
 
 **Python objects for domain knowledge**
-Task schemas and action operators are defined as typed Python objects (`TaskSchema`,
-`ActionOperator`, `Var`/`Const` terms) in `domains/<domain>/`. YAML was rejected
+Task schemas and action schemas are defined as typed Python objects (`TaskSchema`,
+`ActionSchema`, `Var`/`Const` terms) in `domains/<domain>/`. YAML was rejected
 for domain knowledge because it required string parsing in the cognitive layer,
 which breaks the no-string-parsing principle. Scenarios and environment layout
 remain in YAML/JSON as configuration (not knowledge).

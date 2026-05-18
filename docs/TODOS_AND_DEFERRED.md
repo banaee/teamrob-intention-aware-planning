@@ -35,7 +35,7 @@ Files: `mesa_sim/world_state_builder.py`, `domains/dock_loading/tasks.py`
 
 **TODO-01 — `action_decomposer._expand_fixed`: make fully generic**
 Currently has hardcoded `if/elif` for `GRASP`, `RELEASE`, `TOUCH`.
-Proper fix: `ActionOperator` declares `microaction_param_extractors` dict,
+Proper fix: `ActionSchema` declares `microaction_param_extractors` dict,
 `_expand_fixed` iterates it generically. No domain-specific chains needed.
 Files: `mesa_sim/action_decomposer.py`, `shared/types.py`
 Reference: TODO #16
@@ -73,16 +73,16 @@ Files: `shared/types.py`, `mesa_sim/sim_model.py`, `mesa_sim/world_state_builder
 Reference: TODO #13
 
 **TODO-07 — `effects` field not consumed by live planner**
-`ActionOperator.effects` are defined but the planner does not use them for forward
+`ActionSchema.effects` are defined but the planner does not use them for forward
 chaining. Required for full HTN planning with precondition checking.
 Files: `shared/planner.py`
 Reference: Phase 4 TODO
 
-**TODO-08 — `dock_gate` open/close: implement `open_gate` ActionOperator**
+**TODO-08 — `dock_gate` open/close: implement `open_gate` ActionSchema**
 `deliver_pallet` and `load_return` have a commented-out `gate_closed` method.
-Implement `open_gate` action operator and wire the second method when gate state
+Implement `open_gate` action schemas and wire the second method when gate state
 is modeled dynamically.
-Files: `domains/dock_loading/actionOperators.py`, `domains/dock_loading/tasks.py`
+Files: `domains/dock_loading/ActionSchemas.py`, `domains/dock_loading/tasks.py`
 Reference: TODO in tasks.py comments
 
 **TODO-09 — Path planning: replace straight-line STEP* with obstacle-aware planning**
@@ -192,7 +192,7 @@ Mitigated by `go_to_office` delay in scenario. Proper fix: DESIGN-01.
 
 **LIMIT-03 — Gate always open**
 `gate_is_open(dock_gate)` emitted unconditionally. Gate state not modeled dynamically.
-Fix: TODO-08 (`open_gate` action operator + `gate_closed` method).
+Fix: TODO-08 (`open_gate` action schema + `gate_closed` method).
 
 **LIMIT-04 — All pallets start at same position (truck center)**
 Pallets 0–5 all share `truck_interior` center position. No individual slot positions.
@@ -211,7 +211,7 @@ For traceability, the original numbered list from the session:
 | # | Item | Status |
 |---|------|--------|
 | 1 | `env_layout_dock.json` | ✅ Done (`env_layout1.json`) |
-| 2 | `actionOperators.py` | ✅ Done |
+| 2 | `ActionSchemas.py` | ✅ Done |
 | 3 | `tasks.py` | ✅ Done |
 | 4 | `registry.py` | ✅ Done |
 | 5 | `scenarios.py` | ✅ Done |

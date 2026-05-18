@@ -7,7 +7,7 @@
 - `shared/types.py`: canonical dataclasses (`Observation`, `BeliefState`, `WorldState`, `GroundedAction`, `AbstractPlan`)
 - `shared/io_contracts.md`: interface specification between cognitive and embodiment layers
 - `shared/domain_knowledge.py`: `DomainKnowledgeBase`, `DomainModel` interfaces
-- HTN Python object model: `TaskSchema`, `ActionOperator`, `MethodSchema`, `Var`/`Const` typed terms
+- HTN Python object model: `TaskSchema`, `ActionSchema`, `MethodSchema`, `Var`/`Const` typed terms
 
 ## Phase 2 — Cognitive Layer Skeletons ✅
 - `shared/recognizer.py`: skeleton with uniform prior
@@ -15,7 +15,7 @@
 - `shared/replanning.py`: skeleton with `no_plan` trigger
 
 ## Phase 3 — Kitting Domain + Mesa Simulation ✅
-- `domains/kitting/`: `tasks.py`, `actionOperators.py`, `registry.py`, `scenarios.py`, `env1_layout.json`
+- `domains/kitting/`: `tasks.py`, `ActionSchemas.py`, `registry.py`, `scenarios.py`, `env1_layout.json`
 - `mesa_sim/sim_model.py`, `sim_agents.py`, `world_state_builder.py`, `obs_builder.py`
 - `mesa_sim/action_decomposer.py`, `executor.py`, `run_mesa.py`
 - Headless simulation runs correctly: human and robot agents complete full assigned task sequences

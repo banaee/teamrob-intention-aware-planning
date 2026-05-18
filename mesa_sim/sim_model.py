@@ -17,7 +17,7 @@ WHAT THIS MODULE DOES:
 WHAT THIS MODULE DOES NOT DO:
     - No WorldStateManager — ground truth lives in env_objects
     - No IR, no planning, no task assignment logic
-    - No YAML parsing for scenarios or operator definitions
+    - No YAML parsing for scenarios or action schema definitions
 
 COORDINATE SYSTEM:
     Matches env_layout1.json exactly: origin (0,0) at center of room.

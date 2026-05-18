@@ -191,8 +191,8 @@ class ProcessCompletion:
 @dataclass
 class StepCall:
     """
-    One step in an HTN method body — a call to an action operator with bindings.
-    bindings map the operator's Var parameters to Terms (Vars or Consts).
+    One step in an HTN method body — a call to an action schema with bindings.
+    bindings map the action schema's Var parameters to Terms (Vars or Consts).
     Unresolved Vars are grounded by the planner against WorldState at plan time.
     e.g. StepCall('goto_zone', {Var('?zone'): Var('?item_zone')})
     """
@@ -231,7 +231,7 @@ class TaskSchema:
 
 
 @dataclass
-class ActionOperator:
+class ActionSchema:
     """
     HTN primitive action — directly executable, not decomposed further into subtasks.
     Decomposes to microactions (STEP*, GRASP, etc.) in the embodiment layer.
@@ -265,7 +265,7 @@ class GroundedAction:
     action_name: str
     bindings: Dict[str, str]            # {var_name: concrete_value} e.g. {'?zone': 'zone_SE'}
     completion_predicate: Optional[Predicate]     # fully grounded, ready for set membership check (or None if completion is ProcessCompletion)
-    operator: ActionOperator            # back-reference for decomposer
+    schema: ActionSchema            # back-reference for decomposer
 
 
 @dataclass
@@ -311,12 +311,12 @@ class ScenarioConfig:
 @dataclass
 class DomainModel:
     """
-    The complete HTN planning domain: all task schemas and action operators.
+    The complete HTN planning domain: all task schemas and action schemas.
     Defined once in shared/domain.py, injected into KnowledgeBase at startup.
     Consumed by planner (top-down decomposition) and recognizer (bottom-up inference).
     """
     tasks: Dict[str, TaskSchema]        # {task_name: TaskSchema}
-    actions: Dict[str, ActionOperator]  # {action_name: ActionOperator}
+    actions: Dict[str, ActionSchema]  # {action_name: ActionSchema}
     microactions: List[str]             # terminal symbols e.g. ['STEP', 'GRASP', ...]
     intentions: Set[str]                # set of all intention IDs (task names that can be root tasks). in practice top-lelev HTN tasks.
 
@@ -330,8 +330,8 @@ class DomainModel:
                     break
         return result
 
-    def get_actions_for_microaction(self, mu: str) -> List[ActionOperator]:
-        """Return all action operators that decompose to this microaction."""
+    def get_actions_for_microaction(self, mu: str) -> List[ActionSchema]:
+        """Return all action schemas that decompose to this microaction."""
         result = []
         for op in self.actions.values():
             if isinstance(op.microactions, list) and mu in op.microactions:

@@ -1,7 +1,7 @@
 # domains/dock_loading/tasks.py
 """
 Task schema definitions for the dock_loading domain.
-These are the HTN compound tasks — decomposed into action operator sequences.
+These are the HTN compound tasks — decomposed into action sequences.
 
 TASKS:
     Robot assigned:
@@ -23,7 +23,7 @@ METHODS NOTE:
 """
 
 from shared.types import Var, Const, ConditionSchema, StepCall, MethodSchema, TaskSchema
-from domains.dock_loading.actionOperators import move_to, pick_up, place, wait_at, scan_it
+from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it
 
 _item = Var("?item")
 _dest   = Var("?dest")
@@ -72,7 +72,7 @@ deliver_pallet = TaskSchema(
                 ),
             ],
         ),
-        # TODO: implement open_gate ActionOperator, then fill this method
+        # TODO: implement open_gate ActionSchema, then fill this method
         # MethodSchema(
         #     name="deliver_pallet_gate_closed",
         #     parameters=[_item, _dest],

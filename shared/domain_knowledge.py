@@ -3,7 +3,7 @@ shared/domain_knowledge.py
 
 PURPOSE:
     Central access point for domain knowledge used by the cognitive layer.
-    Receives a DomainModel at construction — no YAML parsing for operators.
+    Receives a DomainModel at construction — no YAML parsing for action schemas.
 
 WHAT THIS MODULE DOES:
     - Accepts a DomainModel (from domains/kitting/registry.py or equivalent)
@@ -12,22 +12,22 @@ WHAT THIS MODULE DOES:
     - Provides reverse-lookup methods for the intention recognizer
 
 WHAT THIS MODULE DOES NOT DO:
-    - Does NOT parse YAML for task or action operator definitions
+    - Does NOT parse YAML for task or action schema definitions
     - Does NOT resolve variable bindings (that is shared/planner.py)
     - Does NOT know about Mesa, ROS, or any simulator
     - Does NOT handle scenarios or agent assignments (that is sim_model.py)
 
 USED BY:
     - shared/recognizer.py   → get_all_intentions(), get_tasks_for_action()
-    - shared/planner.py      → get_task_schema(), get_action_operator()
-    - mesa_sim/executor.py   → get_action_operator()
+    - shared/planner.py      → get_task_schema(), get_action_schema()
+    - mesa_sim/executor.py   → get_action_schema()
     - mesa_sim/sim_agents.py → get_task_schema()
 """
 
 import yaml
 from typing import Dict, List, Optional
 
-from shared.types import DomainModel, TaskSchema, ActionOperator
+from shared.types import DomainModel, TaskSchema, ActionSchema
 
 
 class DomainKnowledgeBase:
@@ -78,8 +78,8 @@ class DomainKnowledgeBase:
     # Action queries
     # =========================================================================
 
-    def get_action_operator(self, action_name: str) -> Optional[ActionOperator]:
-        """Return ActionOperator for an action type, or None if not found."""
+    def get_action_schema(self, action_name: str) -> Optional[ActionSchema]:
+        """Return ActionSchema for an action type, or None if not found."""
         return self._domain.actions.get(action_name)
 
     def get_microactions(self) -> List[str]:
@@ -97,9 +97,9 @@ class DomainKnowledgeBase:
         """
         return self._domain.get_tasks_for_action(action_name)
 
-    def get_actions_for_microaction(self, mu: str) -> List[ActionOperator]:
+    def get_actions_for_microaction(self, mu: str) -> List[ActionSchema]:
         """
-        Return all action operators that decompose to this microaction.
+        Return all action schemas that decompose to this microaction.
         Used by recognizer: observed microaction → candidate actions.
         """
         return self._domain.get_actions_for_microaction(mu)

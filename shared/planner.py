@@ -117,25 +117,25 @@ class AdaptivePlanner:
         """
         grounded = []
         for step in method.steps:
-            operator = self.knowledge.get_action_operator(step.action_name)
+            action_schema = self.knowledge.get_action_schema(step.action_name)
             
-            if operator is None:
-                logging.warning(f"[planner] SKIPPING step '{step.action_name}' — operator not found in domain")
+            if action_schema is None:
+                logging.warning(f"[planner] SKIPPING step '{step.action_name}' — action schema not found in domain")
                 continue            
             
             bindings = self._resolve_bindings(step, method, task_params, agent_id, world)
 
             # Ground the completion predicate, unless it's a ProcessCompletion which is monitored differently by the executor. 
-            if isinstance(operator.completion, ProcessCompletion):
+            if isinstance(action_schema.completion, ProcessCompletion):
                 completion_predicate = None
             else:
-                completion_predicate = self._ground_condition(operator.completion, bindings)
+                completion_predicate = self._ground_condition(action_schema.completion, bindings)
 
             grounded.append(GroundedAction(
                 action_name=step.action_name,
                 bindings=bindings,
                 completion_predicate=completion_predicate,
-                operator=operator,
+                schema=action_schema,
             ))            
         
         

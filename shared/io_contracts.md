@@ -101,7 +101,7 @@ class GroundedAction:
     action_name: str                       # e.g. "move_to", "pick_up"
     bindings: Dict[str, str]               # {var_name: concrete_value}
     completion_predicate: Predicate        # fully instantiated — executor checks this
-    operator: ActionSchema                 # reference to schema for decomposer
+    schema: ActionSchema                 # reference to schema for decomposer
 ```
 
 All variables are fully resolved — no `Var` objects remain in a `GroundedAction`.
@@ -217,14 +217,14 @@ plan(
 DomainKnowledgeBase.from_domain(domain: DomainModel) -> DomainKnowledgeBase
 ```
 
-Domain operators are defined in Python (`domains/<domain>/`), not parsed from YAML.
+Domain action schemas are defined in Python (`domains/<domain>/`), not parsed from YAML.
 
 Provides read-only access to:
 - intention set **T** — via `get_all_intentions()` (filtered by `DomainModel.intentions`)
 - assigned intentions — via `get_assigned_intentions()`
 - foreseeable intentions — via `get_foreseeable_intentions()`
 - task schemas — via `get_task_schema(name)`
-- action operators — via `get_action_operator(name)`
+- action schemas — via `get_action_schema(name)`
 - microaction set **M** — via `get_microactions()`
 - reverse lookups for IR:
   - `get_tasks_for_action(action_name)` → candidate tasks
@@ -241,7 +241,7 @@ Domain knowledge lives outside `shared/` in domain-specific Python packages.
 ```
 domains/kitting/
     tasks.py           # TaskSchema definitions — HTN non-primitive tasks
-    actionOperators.py # ActionSchema definitions — HTN primitive tasks (leaves)
+    ActionSchemas.py # ActionSchema definitions — HTN primitive tasks (leaves)
     registry.py        # builds DomainModel, declares intention set
     scenarios.py       # ScenarioConfig objects — typed Python, no YAML
     env1_layout.json   # environment spatial layout

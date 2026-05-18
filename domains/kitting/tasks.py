@@ -1,11 +1,11 @@
 # domains/kitting/tasks.py
 """
 Task schema definitions for the kitting domain.
-These are the HTN compound tasks — decomposed into action operator sequences.
+These are the HTN compound tasks — decomposed into action schema sequences.
 """
 
 from shared.types import Var, Const, ConditionSchema, StepCall, MethodSchema, TaskSchema
-from domains.kitting.actionOperators import pick_up, move_to, place, wait_at
+from domains.kitting.actions import pick_up, move_to, place, wait_at
 
 _item      = Var("?item")
 _target    = Var("?target")

@@ -8,8 +8,8 @@ PURPOSE:
 
 WHAT THIS MODULE DOES:
     - Takes one GroundedAction at a time
-    - Reads operator.microactions to determine expansion type
-    - Reads operator.movement_target_key to resolve movement targets
+    - Reads schema.microactions to determine expansion type
+    - Reads schema.movement_target_key to resolve movement targets
       from action.bindings — no action name string matching
     - Expands "STEP*" into a full STEP sequence using steps_toward()
     - Expands "STAND*" into N STAND microactions
@@ -20,7 +20,7 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT do path planning — uses straight-line steps for skeleton phase
     - Does NOT know about IR or planning logic
     - Does NOT handle ROS
-    - Does NOT match action names — expansion is driven by operator.microactions
+    - Does NOT match action names — expansion is driven by schema.microactions
 
 ROS EQUIVALENT:
     In ROS, this module has NO direct equivalent because ROS works in reverse:
@@ -79,7 +79,7 @@ def expand(
     """
     Expand one GroundedAction into a list of concrete Microactions.
 
-    Expansion is driven entirely by action.operator.microactions —
+    Expansion is driven entirely by action.schema.microactions —
     no action name string matching anywhere.
 
     INPUT:
@@ -91,14 +91,14 @@ def expand(
         List[Microaction] — ordered sequence to execute, one per Mesa step
 
     EXPANSION RULES:
-        operator.microactions == "STEP*"   → full STEP sequence to movement target
-        operator.microactions == "STAND*"  → N STAND microactions (duration from bindings)
-        operator.microactions == ["GRASP"] → single GRASP with item_id from bindings
-        operator.microactions == ["RELEASE"] → single RELEASE
-        operator.microactions == ["TOUCH"] → single TOUCH with item_id from bindings
+        action.schema.microactions == "STEP*"   → full STEP sequence to movement target
+        action.schema.microactions == "STAND*"  → N STAND microactions (duration from bindings)
+        action.schema.microactions == ["GRASP"] → single GRASP with item_id from bindings
+        action.schema.microactions == ["RELEASE"] → single RELEASE
+        action.schema.microactions == ["TOUCH"] → single TOUCH with item_id from bindings
         unknown                            → empty list with warning
     """
-    spec = action.operator.microactions
+    spec = action.schema.microactions
 
     if spec == "STEP*":
         return _expand_step(action, model, agent_pos)
@@ -126,8 +126,8 @@ def _expand_step(
 ) -> List[Microaction]:
     """
     Expand a STEP* action into a full step sequence.
-    Target is resolved from action.operator.movement_target_key → action.bindings.
-    No action name matching — movement_target_key declared in ActionOperator.
+    Target is resolved from action.schema.movement_target_key → action.bindings.
+    No action name matching — movement_target_key declared in ActionSchema.
     """
     target_pos = _resolve_movement_target(action, model)
     if target_pos is None:
@@ -193,10 +193,10 @@ def _resolve_movement_target(
 ) -> Optional[Tuple[float, float]]:
     """
     Resolve the (x, y) movement target for a STEP* action.
-    Uses action.operator.movement_target_key to find the relevant binding.
+    Uses action.schema.movement_target_key to find the relevant binding.
     No action name string matching.
     """
-    key = action.operator.movement_target_key
+    key = action.schema.movement_target_key
     if key is None:
         return None
 
@@ -204,7 +204,7 @@ def _resolve_movement_target(
     if not target_id:
         return None
 
-    target_type = action.operator.movement_target_type
+    target_type = action.schema.movement_target_type
     if target_type == "object":
         return _env_object_position(target_id, model)
     else:

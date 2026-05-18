@@ -6,7 +6,7 @@ Called once at startup by KnowledgeBase via sim_model.py.
 """
 
 from shared.types import DomainModel
-from domains.kitting.actionOperators import move_to, pick_up, place, wait_at
+from domains.kitting.actions import move_to, pick_up, place, wait_at
 from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
 
 

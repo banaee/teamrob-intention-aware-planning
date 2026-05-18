@@ -22,7 +22,7 @@ Each domain package contains the same five files:
 domains/<your_domain>/
     __init__.py
     tasks.py            # TaskSchema definitions  — HTN compound tasks
-    actions.py          # ActionOperator defs     — HTN primitive actions (leaves)
+    actions.py          # ActionSchema defs     — HTN primitive actions (leaves)
     registry.py         # assembles DomainModel, declares intention set
     scenarios.py        # ScenarioConfig objects  — concrete agent assignments
     env_layout.json     # named locations and zones in the environment
@@ -116,8 +116,8 @@ A `ScenarioConfig` assigns concrete task instances to each agent, with all param
 ## 8. Checklist before marking a domain ready
 
 - [ ] All objects and locations referenced in tasks/actions appear in `env_layout.json`
-- [ ] Every action call in a task method resolves to an `ActionOperator` in `actions.py`
-- [ ] Every action operator used in a task is registered in `registry.py`
+- [ ] Every action call in a task method resolves to an `ActionSchema` in `actions.py`
+- [ ] Every action schema used in a task is registered in `registry.py`
 - [ ] All task schemas appear in `registry.py` `intentions` set
 - [ ] `is_assigned` / `is_foreseeable` flags match domain semantics
 - [ ] `completion` predicate in each action matches what `world_state_builder.py` actually emits
@@ -139,7 +139,7 @@ DELIVER_PALLET → [ACQUIRE_PALLET, move_to(?dest), place]
 
 RETRIEVE_EMPTY_PALLET → [ACQUIRE_PALLET, move_to(?dest), place]
                         |
-                 [move_to, pick_up]     ← same ACQUIRE_PALLET action operator, just different parameter bindings, good for IR reasoning... 
+                 [move_to, pick_up]     ← same ACQUIRE_PALLET action schema, just different parameter bindings, good for IR reasoning... 
 
 ```
 
