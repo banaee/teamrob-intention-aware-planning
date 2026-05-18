@@ -166,3 +166,15 @@ Meta_planner reasons only over the overlap between H and the robot's ProjectedPl
 Beyond H, prediction uncertainty makes cost estimates unreliable.
 In small scenarios (few tasks), H may span the full queue. In longer shifts, H caps
 the effective lookahead naturally. H is a function of IR confidence, not a fixed value.
+
+**Prediction horizon H is derived from IR belief, not a fixed parameter**
+Once IR confidence exceeds θ and most_likely intention is committed, the full HTN
+decomposition of that task is known. The predicted human action sequence — and therefore
+the horizon H — is derived directly from the task schema plus estimated step counts:
+del(item) → moveto(item): i steps, pick(item): j steps, moveto(KT): k steps, place(item): l steps
+Step counts i and k are estimated from layout geometry (distance / step_size).
+Step counts j and l are fixed action costs from the domain schema (e.g. GRASP = 1 step).
+H is therefore belief-coupled (only meaningful above θ) and task-bounded (ends at predicted
+task completion, beyond which uncertainty resumes). Below θ, the distribution spans multiple
+competing hypotheses with conflicting predicted sequences — no reliable horizon exists and
+meta_planner holds the current queue.
