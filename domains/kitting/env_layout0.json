@@ -70,8 +70,8 @@
     {
       "id": "robot_0",
       "type": "mobile_manipulator",
-      "initial_container": "zone_NE",
-      "initial_x": 350,
+      "initial_container": "zone_NW",
+      "initial_x": -350,
       "initial_y": 200
     }
   ],
@@ -79,8 +79,8 @@
     {
       "id": "human_0",
       "type": "worker",
-      "initial_container": "zone_NW",
-      "initial_x": -350,
+      "initial_container": "zone_NE",
+      "initial_x": 350,
       "initial_y": 200
     }
   ],
