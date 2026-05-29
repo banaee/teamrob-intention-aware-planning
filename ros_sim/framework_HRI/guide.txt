@@ -1,0 +1,97 @@
+================================================================================
+FRAMEWORK HRI — QUICK REFERENCE
+================================================================================
+
+RUN
+---
+    source /opt/ros/humble/setup.bash
+    source ~/ros_workspace/install/setup.bash
+    ros2 launch framework_HRI framework_visualization.launch.py
+
+Switch domain in launch file: executable='planner_2' or executable='planner_3'
+Then: colcon build --packages-select framework_HRI && source install/setup.bash
+
+
+PLANNER 2 — kitting domain (ACTIVE — PRIEST running)
+------------------------------------------------------
+Layout: domains/kitting/env_layout1.json
+Shows:  zones (colored floor panels), shelves, item IDs, kitting table,
+        obstacles, robot (moving), human (static), coffee machine,
+        PRIEST trajectory (red line), current goal (red cylinder),
+        task label (current task + current action)
+
+Task source: scenario_10 from domains/kitting/scenarios.py
+             robot_0 assigned: item_5, item_1, item_7
+Task planning: AdaptivePlanner from shared/planner.py
+               produces AbstractPlan (4 actions: move_to → pick_up → move_to → place)
+Execution: ActionExecutor (ContinuousExecutor.py)
+           move_to  → resolves item/shelf position from JSON → sends goal to PRIEST
+           pick_up  → waits pick_delay (2s)
+           place    → waits place_delay (2s)
+           completion checked via WorldState predicates (at, holding, obj_at)
+Motion: PRIESTLocalPlanner — continuous collision-avoiding trajectory
+        obstacles and human position read from layout (static for now)
+        robot state updated by Euler integration each tick (dt=0.1s)
+
+
+PLANNER 3 — dock unloading domain (static visualization only)
+--------------------------------------------------------------
+Layout: domains/docks_unloading/env_layout1.json
+Shows:  zones (6 colored floor panels), truck (semi-transparent grey),
+        dock gate (red bar), pallets (Pallet.dae mesh):
+          yellow=dry goods, blue=frozen goods, grey=empty
+        non-empty pallets have ClutteringA boxes stacked on top
+        robot start, human start, coffee machine
+        pallet labels: item_id only, black text
+        zone labels: small font at northwest corner of each zone
+Status: static visualization — planner and robot motion not yet connected
+
+
+FILES — framework_HRI package
+------------------------------
+planner_2.py          kitting domain node — PRIEST + AdaptivePlanner active
+planner_3.py          dock domain node — static visualization only
+ContinuousExecutor.py bridge between AbstractPlan and PRIEST (domain-agnostic)
+world.py              ContinuousWorld ground truth (not yet connected to planner_2)
+world_state_builder_continuous.py  builds WorldState from world.py (not yet connected)
+
+
+REPO MODULES USED (from PYTHONPATH)
+------------------------------------
+shared/planner.py         AdaptivePlanner — produces AbstractPlan from scenario task
+shared/types.py           BeliefState, WorldState, AbstractPlan, GroundedAction etc.
+domains/kitting/scenarios.py  scenario_10 — robot task assignments
+domains/kitting/registry.py   register_kitting_domain()
+
+
+MESHES
+------
+Source:   ~/ros_workspace/src/planner/meshes/
+Textures: ~/ros_workspace/src/planner/materials/textures/
+If lost after clean rebuild: copy .dae files from folder shared with Hadi then rebuild planner
+Pallet mesh: Pallet.dae (capital P)
+Box mesh:    aws_robomaker_warehouse_ClutteringA_01_visual.dae
+
+
+PYTHONPATH (set in launch file)
+--------------------------------
+/home/fatemeh/Github_human_robot_codes/Github/teamrob-intention-aware-planning
+Set via env= in framework_visualization.launch.py — no .bashrc change needed
+
+
+REBUILD
+-------
+Normal:  colcon build --packages-select framework_HRI && source install/setup.bash
+Planner meshes only: colcon build --packages-select planner && source install/setup.bash
+WARNING: rm -rf build/planner install/planner wipes meshes — copy them back first
+
+
+What should i think for the next part
+----------
+- Connect world.py to planner_2 (replace inline Euler + static snapshot)
+- Connect world_state_builder_continuous.py (replace build_minimal_world_state)
+- Connect shared/recognizer.py for human intention recognition
+- Connect shared/replanning.py for adaptive replanning on intention change
+- Add moving human to planner_2 (world.py human_step already implemented)
+- planner_3: connect PRIEST and ActionExecutor for dock domain
+================================================================================
