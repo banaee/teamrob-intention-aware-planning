@@ -1,0 +1,34 @@
+# costs.yaml
+
+robot:
+  speed_ms: 0.8           # metres/second — tune from your PRIEST config
+  mesa_cell_size_m: 0.01  # env_layout uses cm → 0.01 m per unit
+
+actions:
+  T_pick:          5.0    # seconds —  current pick_delay
+  T_place:         5.0    # seconds —  current place_delay
+  cancel_overhead: 1.0    # seconds — cost of just stopping
+
+###### I think this part can be computed based on offline mapping, or trying trajectories offline based on obstacles in the environment
+priest_correction:
+  default: 1.20
+  zones:
+    zone_NW_to_zone_SW: 1.15
+    zone_NW_to_zone_SE: 1.22
+    zone_NW_to_zone_NE: 1.10
+    zone_SW_to_zone_NW: 1.15
+    zone_SE_to_zone_NW: 1.22
+    zone_NE_to_zone_NW: 1.10
+
+human_correction: 1.10
+
+blocking:
+  continuous_radius_m: 1.0   # from PRIEST a_obs_1 = 1.0
+  mesa_radius_cells:   1
+
+interference:
+  ignore_threshold:          0.10
+  belief_decay_per_second:   0.05
+
+reselect:
+  conflict_threshold: 0.40
