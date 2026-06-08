@@ -10,25 +10,30 @@ WHAT THIS MODULE DOES:
     - Fetches TaskSchema from DomainKnowledgeBase
     - Selects applicable method (first method whose guards hold in WorldState)
     - Grounds each StepCall: resolves Var bindings to Const values
-    - Returns an AbstractPlan with fully grounded GroundedActions
+    - Recursively decomposes StepCalls that name a TaskSchema (not a primitive ActionSchema)
+    - Returns a flat AbstractPlan (single task, executor-facing)
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT parse strings — all structure comes from typed schema objects
     - Does NOT hardcode variable names — derivations declared in MethodSchema
-    - Does NOT decide whether to replan (that is replanning.py)
+    - Does NOT decide whether to replan (that is replanning.py / meta_planner.py)
     - Does NOT execute actions (that is mesa_sim/executor.py)
     - Does NOT update beliefs (that is recognizer.py)
+    - Does NOT schedule across tasks (that is meta_planner.py)
 
 GROUNDING:
     Task parameters arrive as Dict[str, str] e.g. {"?item": "item_3"}.
-    agent_id is passed explicitly as execution context — not a task parameter.
+    agent_id is passed explicitly as execution context — injected as ?agent.
     The planner resolves each StepCall's bindings:
-        Var("?item")       → looked up in task_params
+        Var("?item")           → looked up in task_params / accumulated bindings
         Const("kitting_table") → used as-is
     All GroundedActions carry a fully instantiated completion_predicate
     (Predicate with Const args only) — executor checks set membership directly.
 
-    TODO Phase 4: method guard evaluation, conflict checking, cost-based selection.
+RECURSION:
+    If a StepCall names a TaskSchema (not a primitive ActionSchema), the planner
+    recurses into that sub-task with the current bindings. The result is flattened
+    into the same action list. Output is always a flat AbstractPlan.
 """
 
 from typing import Dict, List, Optional
@@ -37,9 +42,11 @@ import logging
 from shared.types import (
     ProcessCompletion, Var, Const, Predicate, ConditionSchema,
     GroundedAction, AbstractPlan, BeliefState, WorldState,
-    TaskSchema, MethodSchema, StepCall,
+    TaskSchema, ActionSchema, MethodSchema, StepCall,
 )
 from shared.domain_knowledge import DomainKnowledgeBase
+
+logger = logging.getLogger(__name__)
 
 
 class AdaptivePlanner:
@@ -57,185 +64,204 @@ class AdaptivePlanner:
         current_plan: AbstractPlan | None = None,
     ) -> AbstractPlan:
         """
-        Produce an AbstractPlan for the robot to execute.
-
-        SKELETON BEHAVIOUR:
-            Selects first method unconditionally (guards not evaluated yet).
-            Grounds all StepCalls against task_params, agent_id, and WorldState.
-            No conflict checking, no cost-based selection.
-        TODO Phase 4: guard evaluation, belief-driven adaptation, conflict checking.
+        Produce a flat AbstractPlan for a single task.
+        Recursively decomposes sub-tasks until all steps are primitive ActionSchemas.
+        Guard evaluation selects the applicable method per task/sub-task.
         """
-        task_schema = self.knowledge.get_task_schema(my_intention)
-        if task_schema is None:
-            return AbstractPlan(goal_intention=my_intention, actions=[])
+        # Build initial bindings: task params + agent injection
+        bindings: Dict[str, str] = {"?agent": agent_id}
+        bindings.update(task_params)
 
-        method = self._select_method(task_schema, world)
-        if method is None:
-            return AbstractPlan(goal_intention=my_intention, actions=[])
-
-        grounded = self._ground_method(method, task_params, agent_id, world)
-
-        # TODO Phase 4: inspect belief, check conflicts, reorder/reroute
+        actions = self._decompose_task(my_intention, bindings, world)
 
         return AbstractPlan(
             goal_intention=my_intention,
-            actions=grounded,
+            actions=actions,
         )
 
-    # =========================================================================
-    # Method selection
-    # =========================================================================
+    # ------------------------------------------------------------------
+    # Internal decomposition
+    # ------------------------------------------------------------------
+
+    def _decompose_task(
+        self,
+        task_name: str,
+        bindings: Dict[str, str],
+        world: WorldState,
+    ) -> List[GroundedAction]:
+        """
+        Recursively decompose a task into a flat list of GroundedActions.
+        Raises if no applicable method is found.
+        """
+        task_schema = self.knowledge.get_task_schema(task_name)
+        if task_schema is None:
+            raise ValueError(f"AdaptivePlanner: unknown task '{task_name}'")
+
+        method = self._select_method(task_schema, bindings, world)
+
+        # Resolve derived vars declared on this method before processing steps
+        resolved_bindings = self._resolve_derived_vars(method, bindings, world)
+
+        actions: List[GroundedAction] = []
+        for step in method.steps:
+            step_bindings = self._resolve_step_bindings(step, resolved_bindings)
+            step_name = step.action_name
+
+            if self.knowledge.get_task_schema(step_name) is not None:
+                # StepCall names a TaskSchema — recurse
+                sub_actions = self._decompose_task(step_name, step_bindings, world)
+                actions.extend(sub_actions)
+
+            elif self.knowledge.get_action_schema(step_name) is not None:
+                # StepCall names a primitive ActionSchema — ground and append
+                action_schema = self.knowledge.get_action_schema(step_name)
+                grounded = self._ground_action(action_schema, step_bindings)
+                actions.append(grounded)
+
+            else:
+                raise ValueError(
+                    f"AdaptivePlanner: step '{step_name}' in method "
+                    f"'{method.name}' of task '{task_schema.name}' "
+                    f"is neither a known task nor a known action"
+                )
+
+        return actions
 
     def _select_method(
         self,
         task_schema: TaskSchema,
+        bindings: Dict[str, str],
         world: WorldState,
-    ) -> Optional[MethodSchema]:
+    ) -> MethodSchema:
         """
-        Select first applicable method.
-        Currently returns the first method unconditionally.
-        TODO Phase 4: evaluate guards against WorldState.predicates.
+        Return the first method whose guards are all satisfied in world.
+        Empty guard list = unconditional (always passes).
+        Raises ValueError if no method is applicable.
         """
-        if task_schema.methods:
-            return task_schema.methods[0]
-        return None
+        for method in task_schema.methods:
+            if self._guards_satisfied(method, bindings, world):
+                return method
 
-    # =========================================================================
-    # Grounding
-    # =========================================================================
+        raise ValueError(
+            f"AdaptivePlanner: no applicable method for task '{task_schema.name}' "
+            f"in current world state. Bindings: {bindings}"
+        )
 
-    def _ground_method(
+    def _guards_satisfied(
         self,
         method: MethodSchema,
-        task_params: Dict[str, str],
-        agent_id: str,
+        bindings: Dict[str, str],
         world: WorldState,
-    ) -> List[GroundedAction]:
+    ) -> bool:
         """
-        Ground each StepCall in the method into a GroundedAction.
-        Resolves all Vars to Consts using task_params, agent_id, and WorldState.
+        Return True iff all guards hold in world.predicates.
+        Empty guard list → vacuously True.
         """
-        grounded = []
-        for step in method.steps:
-            action_schema = self.knowledge.get_action_schema(step.action_name)
-            
-            if action_schema is None:
-                logging.warning(f"[planner] SKIPPING step '{step.action_name}' — action schema not found in domain")
-                continue            
-            
-            bindings = self._resolve_bindings(step, method, task_params, agent_id, world)
+        for guard in method.guards:
+            grounded = self._ground_predicate(guard, bindings)
+            if grounded not in world.predicates:
+                return False
+        return True
 
-            # Ground the completion predicate, unless it's a ProcessCompletion which is monitored differently by the executor. 
-            if isinstance(action_schema.completion, ProcessCompletion):
-                completion_predicate = None
-            else:
-                completion_predicate = self._ground_condition(action_schema.completion, bindings)
-
-            grounded.append(GroundedAction(
-                action_name=step.action_name,
-                bindings=bindings,
-                completion_predicate=completion_predicate,
-                schema=action_schema,
-            ))            
-        
-        
-        
-        
-        
-        return grounded
-
-    def _resolve_bindings(
+    def _resolve_derived_vars(
         self,
-        step: StepCall,
         method: MethodSchema,
-        task_params: Dict[str, str],
-        agent_id: str,
+        bindings: Dict[str, str],
         world: WorldState,
     ) -> Dict[str, str]:
-        """
-        Resolve a StepCall's bindings to concrete string values.
-
-        Resolution rules (in order):
-            ?agent                → agent_id (always injected from execution context)
-            Const("x")            → "x" (used as-is)
-            Var("?x") in task_params → task_params["?x"]
-            Var("?x") not in task_params → derived via method.derived_vars registry
-
-        Returns {var_name: concrete_value} e.g. {"?zone": "zone_SE"}.
-        """
-        resolved: Dict[str, str] = {"?agent": agent_id}
-
-        for param_var, binding_term in step.bindings.items():
-            key = param_var.name
-            if isinstance(binding_term, Const):
-                resolved[key] = binding_term.value
-            elif isinstance(binding_term, Var):
-                var_name = binding_term.name
-                if var_name in task_params:
-                    resolved[key] = task_params[var_name]
-                else:
-                    derived = self._resolve_derived(var_name, method, task_params, world)
-                    if derived is not None:
-                        resolved[key] = derived
-                    # else: absent — _ground_condition will raise on use
+        resolved = dict(bindings)
+        for var_name, (lookup_fn, source_var) in method.derived_vars.items():
+            source_val = resolved.get(source_var)
+            if source_val is None:
+                raise ValueError(
+                    f"AdaptivePlanner: derived var '{var_name}' depends on "
+                    f"'{source_var}' which is not bound. Method: '{method.name}'"
+                )
+            if lookup_fn == "zone_of":
+                derived_val = world.object_zones.get(source_val)
+            else:
+                raise ValueError(
+                    f"AdaptivePlanner: unknown lookup function '{lookup_fn}' "
+                    f"for derived var '{var_name}'"
+                )
+            if derived_val is None:
+                raise ValueError(
+                    f"AdaptivePlanner: lookup '{lookup_fn}({source_val})' "
+                    f"returned None for derived var '{var_name}'"
+                )
+            resolved[var_name] = derived_val
         return resolved
-
-    def _resolve_derived(
+    
+    def _resolve_step_bindings(
         self,
-        var_name: str,
-        method: MethodSchema,
-        task_params: Dict[str, str],
-        world: WorldState,
-    ) -> Optional[str]:
+        step: StepCall,
+        bindings: Dict[str, str],
+    ) -> Dict[str, str]:
+        # Always carry ?agent forward — it's execution context, not a step parameter
+        step_bindings: Dict[str, str] = {}
+        if "?agent" in bindings:
+            step_bindings["?agent"] = bindings["?agent"]        
+
+        for param_var, term in step.bindings.items():   # param_var is Var, term is Var or Const
+            key = param_var.name                         # e.g. "?item"
+            if isinstance(term, Const):
+                step_bindings[key] = term.value
+            elif isinstance(term, Var):
+                val = bindings.get(term.name)
+                if val is None:
+                    raise ValueError(
+                        f"AdaptivePlanner: unbound variable '{term.name}' "
+                        f"in step '{step.action_name}'"
+                    )
+                step_bindings[key] = val
+            else:
+                raise TypeError(f"AdaptivePlanner: unexpected term type {type(term)}")
+        return step_bindings
+
+
+    def _ground_action(
+        self,
+        schema: ActionSchema,
+        bindings: Dict[str, str],
+    ) -> GroundedAction:
         """
-        Resolve a derived variable using the method's declared derived_vars.
-        Dispatches through _lookup — no hardcoded variable names here.
-
-        method.derived_vars declares: {var_name: (lookup_fn, source_var)}
+        Produce a fully grounded GroundedAction from an ActionSchema and bindings.
+        Resolves completion predicate to Const args only.
         """
-        if var_name not in method.derived_vars:
-            return None
-        lookup_fn, source_var = method.derived_vars[var_name]
-        source_value = task_params.get(source_var)
-        if source_value is None:
-            return None
-        return self._lookup(lookup_fn, source_value, world)
+        completion_predicate = None
 
-    def _lookup(self, fn: str, obj_id: str, world: WorldState) -> Optional[str]:
-        """
-        Lookup registry: maps function names to WorldState queries.
-        Currently unused in kitting — zone reasoning moved to recognizer context.
-        Keep registry for future domains that need derived variable resolution.
-        TODO Phase 4: add lookup functions for new domains that need derived variables.
-        Currently unused in kitting — zone reasoning moved to recognizer context.
-        """
-        return None
+        if isinstance(schema.completion, ConditionSchema):
+            completion_predicate = self._ground_predicate(schema.completion, bindings)
+        # ProcessCompletion: no predicate — executor uses duration/process check
 
+        return GroundedAction(
+            action_name=schema.name,
+            bindings=bindings,
+            completion_predicate=completion_predicate,
+            schema=schema,
+        )
 
-    # =========================================================================
-    # Condition grounding
-    # =========================================================================
-
-    def _ground_condition(
+    def _ground_predicate(
         self,
         condition: ConditionSchema,
         bindings: Dict[str, str],
     ) -> Predicate:
         """
-        Ground a ConditionSchema into a fully instantiated Predicate.
-        All Var args substituted from bindings. Const args passed through.
-        Raises ValueError on unresolved variables — fails loudly, not silently.
+        Ground a ConditionSchema into a Predicate with Const args only.
         """
-        resolved_args = []
-        for arg in condition.args:
-            if isinstance(arg, Var):
-                value = bindings.get(arg.name)
-                if value is None:
+        grounded_args = []
+        for term in condition.args:
+            if isinstance(term, Const):
+                grounded_args.append(term)
+            elif isinstance(term, Var):
+                val = bindings.get(term.name)
+                if val is None:
                     raise ValueError(
-                        f"Unresolved variable '{arg.name}' in condition "
-                        f"'{condition.name}' — check method derived_vars and task_params"
+                        f"AdaptivePlanner: unbound variable '{term.name}' "
+                        f"when grounding predicate '{condition.name}'"
                     )
-                resolved_args.append(Const(value))
+                grounded_args.append(Const(val))
             else:
-                resolved_args.append(arg)  # already a Const
-        return Predicate(condition.name, tuple(resolved_args))
+                raise TypeError(f"AdaptivePlanner: unexpected term type {type(term)}")
+
+        return Predicate(condition.name, tuple(grounded_args))

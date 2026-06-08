@@ -390,5 +390,28 @@ class AbstractPlan:
     contingencies: Dict[str, Any] = field(default_factory=dict)  # Future: alternative plans
     metadata: Dict[str, Any] = field(default_factory=dict)
 
+@dataclass
+class ProjectedPlanEntry:
+    """
+    One task's contribution to a ProjectedPlan.
+    Produced by meta_planner per candidate task in the queue.
+    """
+    abstract_plan: "AbstractPlan"
+    estimated_start_step: int
+    estimated_duration: int         # steps to complete this task
+    spatial_zones: List[str]        # zones occupied during this task (for interference detection)
 
+
+@dataclass
+class ProjectedPlan:
+    """
+    Multi-task lookahead structure for meta_planner reasoning.
+    Never handed to the executor — meta_planner internal only.
+    Spans the full projected task queue with timing and spatial footprint per task.
+    Used for interference detection and cost comparison across candidate orderings.
+    """
+    task_queue: List[str]               # task instance IDs in projected order
+    entries: List[ProjectedPlanEntry]
+    total_estimated_cost: int           # sum of durations + any inter-task gap steps
+    
     
