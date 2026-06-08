@@ -125,6 +125,27 @@ metrics are introduced in Phase 5 or later.
 Files: `shared/meta_planner.py` (Phase 4 new)
 Reference: Phase 4 design session
 
+**TODO-16 — Cost-aware method selection in `_select_method`**
+Currently picks first applicable method (greedy). If multiple methods have
+satisfied guards, the cheaper one may be missed.
+Fix: pass cost estimator from meta_planner into _select_method, score all
+applicable methods, return minimum cost.
+Deferred until meta_planner cost model exists (Phase 4C).
+Files: `shared/planner.py`
+Reference: Phase 4B discussion
+
+**TODO-18 — IR belief inertia at task transition**
+After human completes a task, belief carries over at high confidence for ~4 steps
+before new direction evidence pulls it down (observed: step ~102-106 in scenario_00,
+brief confusion between item_3/item_6/item_2 during del(i3)→del(i2) transition).
+Accepted as option B for Phase 4A — evidence self-corrects within a few steps.
+Phase-aware _get_expected_position mitigates this by keeping direction signal
+correct throughout task lifecycle (shelf phase → KT phase).
+Full fix: reset belief to uniform on cognitive clock task_completion event.
+Deferred to Phase 4C when cognitive clock is implemented.
+Files: shared/recognizer.py, mesa_sim/sim_agents.py
+Reference: Phase 4A validation, scenario_00
+
 ---
 
 ## 🏗️ Design TODOs

@@ -137,11 +137,12 @@ class WorldState:
     """
     timestamp: float
     agent_states: Dict[str, AgentState]  # {agent_id: AgentState}
-    object_locations: Dict[str, str]  # {object_id: location_id}
-    object_zones: Dict[str, str]  # {item_id: zone_id}
+    agent_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {agent_id: (x, y)}
+    object_locations: Dict[str, str] = field(default_factory=dict)  # {item_id: location_id} 
+    object_zones: Dict[str, str] = field(default_factory=dict)  # {item_id: zone_id}
     predicates: Set[Predicate] = field(default_factory=set)  # e.g., "path_clear", "human_at_table"
+    object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — env objects + items, for IR direction reasoning
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 # =============================================================================
 # TASK KNOWLEDGE TYPES (HTN-style, formal term system)
@@ -213,7 +214,7 @@ class MethodSchema:
     name: str
     parameters: List[Var]
     guards: List[ConditionSchema]       # empty = unconditional
-    steps: List[StepCall]               # ordered decomposition
+    step_calls: List[StepCall]               # ordered decomposition
     derived_vars: Dict[str, tuple] = field(default_factory=dict)
     # {var_name: (lookup_fn, source_var_name)} e.g. {"?item_zone": ("zone_of", "?item")}
 
@@ -330,7 +331,7 @@ class DomainModel:
         result = []
         for task in self.tasks.values():
             for method in task.methods:
-                if any(step.action_name == action_name for step in method.steps):
+                if any(step.action_name == action_name for step in method.step_calls):
                     result.append(task)
                     break
         return result

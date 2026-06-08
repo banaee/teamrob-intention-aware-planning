@@ -22,7 +22,7 @@ deliver_item = TaskSchema(
             name="deliver_default",
             parameters=[_item],
             guards=[],
-            steps=[
+            step_calls=[
                 StepCall(
                     action_name="move_to",
                     bindings={_target: _item},  
@@ -54,7 +54,7 @@ coffee_break = TaskSchema(
             name="coffee_break_default",
             parameters=[],
             guards=[],
-            steps=[
+            step_calls=[
                 StepCall(
                     action_name="move_to",
                     bindings={_target: Const("coffee_machine_0")},
@@ -78,7 +78,7 @@ ac_activation = TaskSchema(
             name="ac_activation_default",
             parameters=[],
             guards=[],
-            steps=[
+            step_calls=[
                 StepCall(
                     action_name="move_to",
                     bindings={_target: Const("ac_switch_0")},

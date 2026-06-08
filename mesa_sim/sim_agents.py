@@ -29,8 +29,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, List, Optional, Dict
 
-from shared.domain_knowledge import DomainKnowledgeBase
-from shared.recognizer import IntentionRecognizer
+from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
+from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothesis_space
 from shared.planner import AdaptivePlanner
 from shared.replanning import should_replan
 from shared.types import AbstractPlan, BeliefState, TaskInstance
@@ -163,10 +163,13 @@ class RobotAgent(FactoryAgent):
     Intention-aware robot agent. Owns the full cognitive loop.
     """
 
-    def __init__(self, unique_id: str, model: "SimModel",
+    def __init__(self, 
+                 unique_id: str, 
+                 model: "SimModel",
                  pos: tuple,
                  knowledge: DomainKnowledgeBase,
                  scheduled_tasks: List[TaskInstance],
+                 known_item_ids=List[str],
                  observed_agent_id: Optional[str] = None):
         super().__init__(unique_id, model, pos)
 
@@ -174,7 +177,16 @@ class RobotAgent(FactoryAgent):
         self.scheduled_tasks: List[TaskInstance] = scheduled_tasks
         self.task_index: int = 0
 
-        self.recognizer = IntentionRecognizer(knowledge=knowledge)
+        # Build hypothesis space from observed human's scheduled_tasks
+        hypotheses = build_hypothesis_space(knowledge=knowledge, known_item_ids=known_item_ids)
+
+        context = ContextKnowledge.default()
+
+        self.recognizer = IntentionRecognizer(
+            knowledge=knowledge,
+            hypotheses=hypotheses,
+            context=context
+        )
         
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
@@ -183,11 +195,15 @@ class RobotAgent(FactoryAgent):
         self.current_plan: Optional[AbstractPlan] = None
 
         self.executor = Executor(agent=self)
+    
+    
     def step(self):
         """
         Full cognitive loop: observe → recognize → replan? → plan → execute.
         """
         human = self._get_observed_human()
+
+        world = build_world_state(model=self.model)
 
         if human is not None:
             obs = build_observation(
@@ -199,10 +215,10 @@ class RobotAgent(FactoryAgent):
                 self.prev_belief = self.belief
                 self.belief = self.recognizer.update(
                     obs=obs,
+                    world=world,
                     prev_belief=self.prev_belief
                 )
 
-        world = build_world_state(model=self.model)
 
         # Seed initial plan (also triggers after advance_task() clears current_plan)
         if self.current_plan is None:
@@ -218,6 +234,7 @@ class RobotAgent(FactoryAgent):
                 )
 
         if self.belief is not None and human is not None:
+            logging.info(f"[IR] step={int(obs.timestamp)} most_likely={self.belief.most_likely} confidence={self.belief.confidence:.3f}")
             trigger = should_replan(
                 current_plan=self.current_plan,
                 new_belief=self.belief,

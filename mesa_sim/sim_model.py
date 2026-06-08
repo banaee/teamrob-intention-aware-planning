@@ -268,6 +268,7 @@ class SimModel(model.Model):
                     pos=start_pos,
                     knowledge=self.knowledge,
                     scheduled_tasks=agent_cfg.scheduled_tasks,  # List[TaskInstance]
+                    known_item_ids=list(self.items.keys()),  # all items visible in workspace
                     observed_agent_id=observed_id,
                 )
                 self.space.place_agent(agent, start_pos)

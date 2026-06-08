@@ -103,7 +103,7 @@ class AdaptivePlanner:
         resolved_bindings = self._resolve_derived_vars(method, bindings, world)
 
         actions: List[GroundedAction] = []
-        for step in method.steps:
+        for step in method.step_calls:
             step_bindings = self._resolve_step_bindings(step, resolved_bindings)
             step_name = step.action_name
 

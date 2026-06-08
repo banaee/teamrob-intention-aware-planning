@@ -45,7 +45,7 @@ deliver_pallet = TaskSchema(
             guards=[
                 ConditionSchema("gate_is_open", (Const("dock_gate"),)),
             ],
-            steps=[
+            step_calls=[
                 StepCall(
                     action_name="move_to",
                     bindings={_target: Const("dock_gate")},
@@ -109,7 +109,7 @@ load_return = TaskSchema(
             guards=[
                 ConditionSchema("gate_is_open", (Const("dock_gate"),)),
             ],
-            steps=[
+            step_calls=[
                 StepCall(
                     action_name="move_to",
                     bindings={_target: _item},
@@ -151,7 +151,7 @@ confirm_delivered_pallet = TaskSchema(
             name="confirm_delivered_pallet_default",
             parameters=[_item],
             guards=[],
-            steps=[
+            step_calls=[
                 StepCall(
                     action_name="move_to",
                     bindings={_target: _item},
@@ -180,7 +180,7 @@ coffee_break = TaskSchema(
             name="coffee_break_default",
             parameters=[],
             guards=[],
-            steps=[
+            step_calls=[
                 StepCall(
                     action_name="move_to",
                     bindings={_target: Const("coffee_machine_0")},
@@ -203,7 +203,7 @@ go_to_office = TaskSchema(
         name="go_to_office_default",
         parameters=[],
         guards=[],
-        steps=[
+        step_calls=[
             StepCall("move_to", {Var("?target"): Const("office_door")}),
             StepCall("wait_at", {Var("?entity"): Const("office_door"), Var("?duration"): Const("PT80S")}),
         ],

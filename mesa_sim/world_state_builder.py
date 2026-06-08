@@ -50,7 +50,7 @@ PROXIMITY_THRESHOLD:
 
 from __future__ import annotations
 import logging
-from typing import TYPE_CHECKING, Dict, Set
+from typing import TYPE_CHECKING, Dict, Set, Tuple
 import math
 
 from shared.types import AgentState, WorldState, Predicate, Const
@@ -74,15 +74,19 @@ def build_world_state(model: SimModel) -> WorldState:
     OUTPUT:
         WorldState with:
             - agent_states       for all humans and robots
+            - agent_positions    for all humans and robots, for IR direction-based likelihood
             - object_locations   for all items
             - object_zones       for all items
+            - object_positions   for all env objects and items, for IR direction-based likelihood
             - predicates         derived symbolic facts
     """
 
     timestamp = float(model.schedule.steps)
     agent_states: Dict[str, AgentState] = {}
+    agent_positions: Dict[str, Tuple[float, float]] = {}
     object_locations: Dict[str, str] = {}
     object_zones: Dict[str, str] = {}
+    object_positions: Dict[str, Tuple[float, float]] = {}
     predicates: Set[Predicate] = set()
 
     # ------------------------------------------------------------------
@@ -96,6 +100,9 @@ def build_world_state(model: SimModel) -> WorldState:
             holding=human.carrying,
             current_task=human.current_task,
         )
+
+        # Record agent position 
+        agent_positions[agent_id] = (human.pos[0], human.pos[1])
 
         # Zone-level predicate — for IR context reasoning
         if zone:
@@ -120,6 +127,9 @@ def build_world_state(model: SimModel) -> WorldState:
             current_task=robot.current_task,
         )
 
+        # Record agent position
+        agent_positions[agent_id] = (robot.pos[0], robot.pos[1])
+
         # Zone-level predicate — for IR context reasoning
         if zone:
             predicates.add(Predicate("in_zone", (Const(agent_id), Const(zone))))
@@ -132,9 +142,9 @@ def build_world_state(model: SimModel) -> WorldState:
         _add_proximity_predicates(agent_id, robot.pos, model, predicates)
 
     # ------------------------------------------------------------------
-    # Object locations — portable items
+    # Item Objects (portable items)
     # ------------------------------------------------------------------
-    for obj_id, obj in model.get_movable_objects().items():
+    for item_obj_id, obj in model.get_movable_objects().items():
         if obj.held_by:
             location = obj.held_by
             carrier = model.humans.get(obj.held_by) or model.robots.get(obj.held_by)
@@ -149,17 +159,29 @@ def build_world_state(model: SimModel) -> WorldState:
             zone = "unknown"
 
         if obj.is_scanned:
-            predicates.add(Predicate("scanned", (Const(obj_id),)))
+            predicates.add(Predicate("scanned", (Const(item_obj_id),)))
 
         # other predicated to be derived from item state can be added here
-        object_locations[obj_id] = location
-        object_zones[obj_id] = zone
-        predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
+        object_locations[item_obj_id] = location
+        predicates.add(Predicate("obj_at", (Const(item_obj_id), Const(location))))
+
+        # moveable objects (items) zone and positions
+        object_zones[item_obj_id] = zone
+        object_positions[item_obj_id] = tuple(obj.position)
         
+    # ------------------------------------------------------------------
+    # Environment Object positions — for IR direction-based likelihood, items are already included above
+    # ------------------------------------------------------------------
+    for env_obj_id, obj in model.env_objects.items():
+        object_positions[env_obj_id] = tuple(obj.position)
+        object_zones[env_obj_id] = model.get_zone_of_position(obj.position[0], obj.position[1]) or "unknown"
+
+    # ------------------------------------------------------------------
     # Phase 2.1: dock gate always open — TODO: derive from gate state
+    # ------------------------------------------------------------------
     predicates.add(Predicate("gate_is_open", (Const("dock_gate"),)))
 
-
+        
     # ------------------------------------------------------------------
     # TODO Phase 4: derive additional predicates
     # Examples:
@@ -171,8 +193,10 @@ def build_world_state(model: SimModel) -> WorldState:
     return WorldState(
         timestamp=timestamp,
         agent_states=agent_states,
+        agent_positions=agent_positions,
         object_locations=object_locations,
         object_zones=object_zones,
+        object_positions=object_positions,
         predicates=predicates,
     )
 
