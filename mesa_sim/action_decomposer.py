@@ -299,9 +299,9 @@ def _load_mesa_config(model) -> dict:
 
 def _get_step_size(model) -> float:
     cfg = _load_mesa_config(model)
-    return float(cfg.get("step_size", 20.0))
+    return float(cfg.get("simulation", {}).get("step_size", 20.0))
 
 
 def _get_seconds_per_step(model) -> float:
     cfg = _load_mesa_config(model)
-    return float(cfg.get("seconds_per_step", 1.0))
+    return float(cfg.get("simulation", {}).get("seconds_per_step", 2.0))

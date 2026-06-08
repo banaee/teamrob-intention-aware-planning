@@ -267,6 +267,8 @@ class RobotAgent(FactoryAgent):
 
     def _get_current_task_instance(self) -> Optional[TaskInstance]:
         """Return current TaskInstance, or None if all tasks done."""
+        logging.info(f"[robot] _get_current_task_instance: task_index={self.task_index} len={len(self.scheduled_tasks)}")
+
         if self.task_index < len(self.scheduled_tasks):
             return self.scheduled_tasks[self.task_index]
         return None

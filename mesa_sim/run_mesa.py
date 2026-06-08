@@ -227,14 +227,14 @@ def run_headless():
 
     for step in range(n_steps):
         model.step()
-        if step % 10 == 0:
+        if step % 2 == 0:
             for aid, human in model.humans.items():
-                logging.info(f"  [{aid}] task={human.current_task} "
+                logging.info(f"  step: {step}: [{aid}] task={human.current_task} "
                       f"action={human.current_action} "
                       f"micro={human.current_microaction} "
                       f"pos={np.round(human.pos, 2)}")
             for aid, robot in model.robots.items():
-                logging.info(f"  [{aid}] task={robot.current_task} "
+                logging.info(f"  step: {step}: [{aid}] task={robot.current_task} "
                       f"action={robot.current_action} "
                       f"micro={robot.current_microaction} "
                       f"pos={np.round(robot.pos, 2)}")

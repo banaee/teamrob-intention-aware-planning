@@ -305,6 +305,8 @@ class Executor:
 
     def _load_plan(self, plan: AbstractPlan):
         """Load a new plan, resetting action index and queue."""
+        logging.info(f"[executor] _load_plan: {self.agent.unique_id} goal={plan.goal_intention} actions={len(plan.actions)}")
+        
         self.current_plan = plan
         self.action_index = 0
         self.microaction_queue = []
@@ -326,7 +328,7 @@ class Executor:
         self.current_microaction = None
         self.microaction_queue = []
         
-        # logging.info(f"[executor] _on_task_complete: {self.agent.unique_id} action_index={self.action_index} plan_len={len(self.current_plan.actions)}")
+        logging.info(f"[executor] _on_task_complete: {self.agent.unique_id} action_index={self.action_index} plan_len={len(self.current_plan.actions)}")
 
         if hasattr(self.agent, "advance_task"):
             self.agent.advance_task()
