@@ -25,6 +25,8 @@ if REPO_PATH not in sys.path:
     sys.path.insert(0, REPO_PATH)
 
 from shared.types import Var, Const, BeliefState, WorldState
+from shared.types import AbstractPlan, GroundedAction, WorldState, Predicate, ProcessCompletion
+
 from shared.planner import AdaptivePlanner
 from shared.domain_knowledge import DomainKnowledgeBase
 from domains.kitting.registry import register_kitting_domain
@@ -35,7 +37,7 @@ from domains.kitting.scenarios import scenario_10
 # Constants
 # =============================================================================
 
-LAYOUT_PATH = "/home/fatemeh/Github_human_robot_codes/Github/teamrob-intention-aware-planning/domains/kitting/env_layout1.json"
+LAYOUT_PATH = "/home/fatemeh/Github_human_robot_codes/Github/teamrob-intention-aware-planning/domains/kitting/env_layout0.json"
 CM       = 0.01
 MESH_PKG = "planner"
 DT       = 0.1
