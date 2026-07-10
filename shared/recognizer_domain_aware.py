@@ -73,6 +73,9 @@ LONG_SHIFT_THRESHOLD   = 500    # simulation steps
 # Confidence threshold θ — above this meta_planner may act on belief
 CONFIDENCE_THRESHOLD = 0.75
 
+# Floor applied after normalization to prevent belief collapse to exact zero
+BELIEF_FLOOR = 1e-3
+
 # Unknown hypothesis key
 UNKNOWN = "unknown"
 
@@ -198,6 +201,16 @@ class IntentionRecognizer:
         total = sum(unnorm.values()) or 1.0
         distribution = {k: v / total for k, v in unnorm.items()}
 
+        # Apply floor to prevent belief collapse — zero-probability hypotheses
+        # can never recover through multiplicative update without this.
+        distribution = {k: max(v, BELIEF_FLOOR) for k, v in distribution.items()}
+        floor_total = sum(distribution.values())
+        distribution = {k: v / floor_total for k, v in distribution.items()}
+
+
+
+
+
         most_likely = max(distribution, key=distribution.get)
         confidence = distribution[most_likely]
 
@@ -267,7 +280,7 @@ class IntentionRecognizer:
         if move_norm < 1e-6:
             return NEUTRAL_LIKELIHOOD  # not moving
 
-        expected_pos = self._get_expected_position(hyp, world)
+        expected_pos = self._get_expected_position(hyp, world, obs.agent_id)
         if expected_pos is None:
             return NEUTRAL_LIKELIHOOD
 

@@ -30,7 +30,7 @@ import logging
 from typing import TYPE_CHECKING, List, Optional, Dict
 
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
-from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothesis_space
+from shared.recognizer_domain_aware import IntentionRecognizer, HypothesisKey, build_hypothesis_space
 from shared.planner import AdaptivePlanner
 from shared.replanning import should_replan
 from shared.types import AbstractPlan, BeliefState, TaskInstance
@@ -235,6 +235,18 @@ class RobotAgent(FactoryAgent):
 
         if self.belief is not None and human is not None:
             logging.info(f"[IR] step={int(obs.timestamp)} most_likely={self.belief.most_likely} confidence={self.belief.confidence:.3f}")
+     
+            dist_str = "  ".join(
+            f"{k}={v:.3f}"
+            for k, v in sorted(self.belief.distribution.items(), key=lambda x: -x[1])
+            )
+            logging.info(
+                f"[IR-dist] step={int(obs.timestamp)} "
+                f"most_likely={self.belief.most_likely} "
+                f"confidence={self.belief.confidence:.3f} "
+                f"dist=[{dist_str}]"
+            )
+            
             trigger = should_replan(
                 current_plan=self.current_plan,
                 new_belief=self.belief,

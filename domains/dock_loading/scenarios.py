@@ -33,7 +33,8 @@ scenario_10 = ScenarioConfig(
             agent_type="robot",
             start_position=(0, -370),
             scheduled_tasks=[
-                TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_0"), Var("?dest"): Const("dry_delivery_area")}),
+                TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_3"), Var("?dest"): Const("frozen_delivery_area")}),            
+                # TaskInstance(schema=deliver_pallet, bindings={Var("?item"): Const("pallet_0"), Var("?dest"): Const("dry_delivery_area")}),
             ],
             observes=["human_0"],
         ),

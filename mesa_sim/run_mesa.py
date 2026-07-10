@@ -227,7 +227,11 @@ def run_headless():
 
     for step in range(n_steps):
         model.step()
-        if step % 2 == 0:
+    
+    # -----------------------
+    # logging  
+    # -------------------
+        if step % 1 == 0: # keep logging every 2 steps to avoid log bloat
             for aid, human in model.humans.items():
                 logging.info(f"  step: {step}: [{aid}] task={human.current_task} "
                       f"action={human.current_action} "
@@ -240,6 +244,7 @@ def run_headless():
                       f"pos={np.round(robot.pos, 2)}")
 
     logging.info("[run_mesa] Headless run complete.")
+    
     return model
 
 
