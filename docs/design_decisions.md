@@ -109,6 +109,36 @@ embodiment layer realizes this in its own temporal terms: Mesa uses step counts,
 ROS uses action server feedback. The cognitive layer is ignorant of schedulers,
 wall-clock time, or step size.
 
+**WorldState carries object positions — a scoped exception to symbolic-only reasoning**
+Decision #2 above states geometry stays inside the simulator. In practice,
+WorldState.object_positions / agent_positions / object_zones are populated and
+read by the recognizer. This is a deliberate, scoped exception, not drift:
+move_to-type actions have a genuinely latent parameter (which target the
+trajectory is heading toward) that cannot be resolved from microaction type
+alone — the paper's "deterministic μ→a mapping" holds at the type level
+(a run of STEP microactions is unambiguously a move_to) but not at the
+parameter level (which target). Scoring trajectory-consistency against a
+schema-declared target is legitimate cognitive-layer inference, not a
+simulator leak — it is exactly the Bayesian disambiguation the paper's IR
+formalization exists to do. The exception is scoped narrowly: positions are
+only consumed by direction_consistency_likelihood (shared/likelihood_functions.py)
+and target-resolution helpers (_get_expected_position, _get_target_zone) in
+recognizer.py — never by planner.py or executor.py, which remain fully symbolic.
+
+**IR likelihood dispatch: schema-driven, not microaction-string-driven**
+ActionSchema declares two IR-relevant fields: `completion` (a ConditionSchema
+checked for discrete actions like pick_up/place) and `progress_evaluator`
+(a registered function name for continuous actions like move_to, e.g.
+"directional" for cosine trajectory-consistency). recognizer.py dispatches
+by testing whether the observed microaction is a member of a candidate
+schema's own declared `microactions` vocabulary — never by comparing against
+hardcoded literals like "grasp"/"step". Likelihood math lives in
+shared/likelihood_functions.py as pure functions taking plain positions/
+predicates, with zero knowledge of tasks, items, or simulators. Adding a new
+ongoing-action type (e.g. a future duration-based wait_at evaluator) requires
+writing one function, registering it in PROGRESS_EVALUATORS, and naming it
+in the relevant ActionSchema — zero changes to recognizer orchestration logic.
+
 ---
 
 ## Phase 4 Architectural Decisions

@@ -134,18 +134,53 @@ Deferred until meta_planner cost model exists (Phase 4C).
 Files: `shared/planner.py`
 Reference: Phase 4B discussion
 
-**TODO-18 — IR belief inertia at task transition**
-After human completes a task, belief carries over at high confidence for ~4 steps
-before new direction evidence pulls it down (observed: step ~102-106 in scenario_00,
-brief confusion between item_3/item_6/item_2 during del(i3)→del(i2) transition).
-Accepted as option B for Phase 4A — evidence self-corrects within a few steps.
-Phase-aware _get_expected_position mitigates this by keeping direction signal
-correct throughout task lifecycle (shelf phase → KT phase).
-Full fix: reset belief to uniform on cognitive clock task_completion event.
-Deferred to Phase 4C when cognitive clock is implemented.
-Files: shared/recognizer.py, mesa_sim/sim_agents.py
-Reference: Phase 4A validation, scenario_00
+**TODO-18 — IR belief inertia at task transition** ✅ RESOLVED (partial)
+Root cause identified: belief collapsed to exact 0.000 for suppressed hypotheses
+(floating-point underflow through repeated multiplicative update), making recovery
+after task completion impossible without new evidence overwhelming a zero prior.
+Fix: BELIEF_FLOOR = 1e-3 applied post-normalization in recognizer.update().
+Result (scenario_00, 200 steps): frozen-belief window after task 1 completion
+shrank from 21 steps to 3 (steps 80→83); del(i6) transient wrong-winner at
+transition (previously 3 steps) eliminated entirely; task-2 θ-crossing moved
+from step 111 (required GRASP confirmation) to step 84 (direction evidence
+alone sufficient).
+Remaining gap (deferred, see TODO-20): no explicit reset-to-uniform on task
+completion. The floor makes this non-blocking for Phase 4C but the reset would
+give symmetric convergence rates between first and subsequent tasks.
+Files: shared/recognizer.py, shared/likelihood_functions.py
+Reference: Phase 4A validation, scenario_00, IR debugging session
 
+**TODO-19 — Recognizer hardcoded simulator microaction strings** ✅ RESOLVED
+`_likelihood` branched on literal `"grasp"`/`"step"` string comparisons —
+coupling the cognitive layer to Mesa's specific microaction vocabulary.
+Fix: dispatch now keyed by each hypothesis's ActionSchema fields
+(`microactions` list membership, `progress_evaluator` name) instead of
+hardcoded strings. Likelihood math extracted to new pure module
+shared/likelihood_functions.py (completion_predicate_likelihood,
+direction_consistency_likelihood, PROGRESS_EVALUATORS registry).
+A new domain with a different microaction taxonomy needs zero recognizer
+changes — only correctly populated ActionSchema objects.
+Side effect (intentional, verified non-regressive): "release"/"touch"
+microactions now also receive completion-predicate checks (previously
+always NEUTRAL) — generalized for free, not hand-added.
+Files: shared/types.py (ActionSchema.progress_evaluator field),
+domains/kitting/actions.py, domains/dock_loading/actions.py,
+shared/likelihood_functions.py (new), shared/recognizer.py
+Reference: IR debugging session, behavior-verified against scenario_00
+
+**TODO-20 — Persistent per-hypothesis tree cursor / notify_task_complete**
+Recognizer currently re-derives "which action schema applies" fresh every
+step by scanning the task tree (_get_relevant_action_schemas), rather than
+tracking a persistent cursor per hypothesis. No explicit signal exists for
+"hypothesis h's task just completed → reset its belief contribution."
+BELIEF_FLOOR (TODO-18) makes this non-blocking for Phase 4C, but a full
+fix would: (a) track cursor state per hypothesis across cognitive clock
+ticks, (b) reset belief to uniform on task_completion event, matching the
+paper's Ht bottom-up tree-matching formalization more precisely.
+Deferred to Phase 4C when the cognitive clock and meta_planner exist to
+drive the reset trigger.
+Files: shared/recognizer.py
+Reference: Phase 4A validation, HCM_AAAI26 paper Hypothesis Generation section
 ---
 
 ## 🏗️ Design TODOs
