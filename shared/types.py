@@ -239,6 +239,10 @@ class ActionSchema:
     preconditions: feasibility check at planning time
     effects:       declared world changes (forward reasoning, Phase 4)
     completion:    runtime predicate checked by executor against WorldState
+    progress_evaluator: names a registered IR likelihood function (shared/likelihood_functions.py)
+                   used to score in-progress (not-yet-complete) evidence for this action.
+                   None means this action has no meaningful in-progress signal —
+                   only its completion predicate carries evidence.
     """
     name: str                           # e.g. 'goto_zone'
     parameters: List[Var]
@@ -253,7 +257,13 @@ class ActionSchema:
     movement_target_type: Optional[str] = None
     # "zone" or "object" — tells decomposer how to resolve the movement target.
     # None for non-movement actions.
-
+    progress_evaluator: Optional[str] = None
+    # Name of the IR progress-likelihood function to apply while this action is
+    # ongoing (not yet complete). e.g. "directional" for move_to (cosine-similarity
+    # trajectory consistency). None for pick_up, place, wait_at, scan_it — these
+    # have no graded in-progress signal, only a completion predicate.
+    # Looked up in shared.likelihood_functions.PROGRESS_EVALUATORS by the recognizer.
+    # Recognizer dispatches by this name only — never by microaction string.
 
 @dataclass
 class GroundedAction:

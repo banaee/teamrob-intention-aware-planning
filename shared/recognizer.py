@@ -44,40 +44,42 @@ OUTPUTS:
     - BeliefState: distribution, most_likely, confidence
 """
 
-import math
 from typing import Dict, List, Optional, Tuple
 
 from shared.types import (
     Observation, BeliefState, WorldState, Predicate, Const,
-    TaskSchema, StepCall, Var,
+    TaskSchema, StepCall, Var, ConditionSchema,
 )
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
+from shared import likelihood_functions
+from shared.likelihood_functions import (
+    HIGH_LIKELIHOOD, LOW_LIKELIHOOD, NEUTRAL_LIKELIHOOD,
+)
+
 
 
 # =============================================================================
-# Likelihood constants
+# Recognizer-level constants
+# (HIGH/LOW/NEUTRAL likelihood now live in likelihood_functions.py — single
+#  source of truth, imported above rather than redefined here)
 # =============================================================================
-HIGH_LIKELIHOOD    = 4.0   # strong directional alignment or confirmed grasp
-LOW_LIKELIHOOD     = 0.1   # misaligned direction or wrong item grasped
-NEUTRAL_LIKELIHOOD = 1.0   # uninformative observation
 
 # ω_context boost multipliers
-ZONE_BOOST         = 2.0   # human already in target zone
-TEMPERATURE_BOOST  = 3.0   # high room temp → ac_activation more likely
-FATIGUE_BOOST      = 2.5   # long shift → coffee_break more likely
+ZONE_BOOST         = 2.0
+TEMPERATURE_BOOST  = 3.0
+FATIGUE_BOOST      = 2.5
 
-# Thresholds for context boosts
-HIGH_TEMP_THRESHOLD    = 26.0   # degrees C
-LONG_SHIFT_THRESHOLD   = 500    # simulation steps
+HIGH_TEMP_THRESHOLD    = 26.0
+LONG_SHIFT_THRESHOLD   = 500
 
-# Confidence threshold θ — above this meta_planner may act on belief
 CONFIDENCE_THRESHOLD = 0.75
 
-# Floor applied after normalization to prevent belief collapse to exact zero
+# Floor applied after normalization — prevents belief collapse to exact zero,
+# which otherwise cannot recover through multiplicative Bayesian update.
 BELIEF_FLOOR = 1e-3
 
-# Unknown hypothesis key
 UNKNOWN = "unknown"
+
 
 # =============================================================================
 # HypothesisKey
@@ -201,17 +203,14 @@ class IntentionRecognizer:
         total = sum(unnorm.values()) or 1.0
         distribution = {k: v / total for k, v in unnorm.items()}
 
-        # Apply floor to prevent belief collapse — zero-probability hypotheses
-        # can never recover through multiplicative update without this.
+        # Apply floor — no hypothesis may fall to exact zero, or it can never
+        # recover through multiplicative update (see design_decisions.md).
         distribution = {k: max(v, BELIEF_FLOOR) for k, v in distribution.items()}
         floor_total = sum(distribution.values())
         distribution = {k: v / floor_total for k, v in distribution.items()}
 
-
-
-
-
         most_likely = max(distribution, key=distribution.get)
+        
         confidence = distribution[most_likely]
 
         return BeliefState(
@@ -232,67 +231,145 @@ class IntentionRecognizer:
         world: WorldState,
         hyp: HypothesisKey,
     ) -> float:
-        mu = obs.detected_microaction
+        """
+        Schema-driven dispatch. For each action schema in hyp's task decomposition:
+          - if the schema declares a discrete microaction vocabulary (e.g. ["GRASP"],
+            ["RELEASE"], ["TOUCH"]) and the observed microaction is a member of it
+            → completion-predicate check against WorldState
+          - if the schema is continuous ("STEP*") and declares a progress_evaluator
+            → delegate to the registered evaluator (shared/likelihood_functions.py)
 
-        if mu == "grasp":
-            return self._likelihood_grasp(obs, world, hyp)
-        elif mu == "step":
-            return self._likelihood_step(obs, world, hyp)
-        else:
-            return NEUTRAL_LIKELIHOOD
+        No microaction string literals are compared against hardcoded values here.
+        The only comparison is membership of obs.detected_microaction in each
+        schema's OWN declared microactions list — domain knowledge, not simulator
+        vocabulary. A new domain with a different microaction taxonomy needs zero
+        changes here; it only needs correctly populated ActionSchema objects.
+        """
+        mu = (obs.detected_microaction or "").upper()
 
-    def _likelihood_grasp(
+        for schema in self._get_relevant_action_schemas(hyp):
+            spec = schema.microactions
+
+            # Discrete completion-type action (pick_up, place, scan_it, ...)
+            if isinstance(spec, list) and mu in (m.upper() for m in spec):
+                predicate = self._resolve_completion_predicate(schema, hyp, obs)
+                if predicate is None:
+                    return NEUTRAL_LIKELIHOOD
+                return likelihood_functions.completion_predicate_likelihood(
+                    predicate, world.predicates
+                )
+
+            # Continuous progress-type action (move_to, ...)
+            if spec == "STEP*" and schema.progress_evaluator:
+                return self._progress_likelihood(obs, world, hyp, schema)
+
+        return NEUTRAL_LIKELIHOOD
+
+    def _progress_likelihood(
         self,
         obs: Observation,
         world: WorldState,
         hyp: HypothesisKey,
+        schema,
     ) -> float:
         """
-        Grasp is highly informative: holding τ's target item → HIGH, else → LOW.
-        For tasks with no ?item binding (e.g. coffee_break): uninformative.
-        """
-        item_id = hyp.bindings.get("?item")
-        if item_id is None:
-            return NEUTRAL_LIKELIHOOD
-
-        holding_pred = Predicate("holding", (Const(obs.agent_id), Const(item_id)))
-        return HIGH_LIKELIHOOD if holding_pred in world.predicates else LOW_LIKELIHOOD
-
-    def _likelihood_step(
-        self,
-        obs: Observation,
-        world: WorldState,
-        hyp: HypothesisKey,
-    ) -> float:
-        """
-        Direction-based likelihood.
-        Cosine similarity between movement vector and vector-to-target.
-        Mapped linearly from [-1,1] to [LOW_LIKELIHOOD, HIGH_LIKELIHOOD].
+        Delegate to the progress evaluator named by schema.progress_evaluator.
+        Builds the plain-value inputs (move_vec, current_pos, target_pos) the
+        evaluator needs — no geometry happens here, only assembly of inputs
+        already available from Observation history and _get_expected_position.
         """
         if len(self._history) < 2:
             return NEUTRAL_LIKELIHOOD
 
-        human_pos = obs.spatial_context.position
-        prev_pos = self._history[-2].spatial_context.position
-
-        move_vec = (human_pos[0] - prev_pos[0], human_pos[1] - prev_pos[1])
-        move_norm = math.sqrt(move_vec[0]**2 + move_vec[1]**2)
-        if move_norm < 1e-6:
-            return NEUTRAL_LIKELIHOOD  # not moving
-
-        expected_pos = self._get_expected_position(hyp, world, obs.agent_id)
-        if expected_pos is None:
+        evaluator = likelihood_functions.PROGRESS_EVALUATORS.get(schema.progress_evaluator)
+        if evaluator is None:
             return NEUTRAL_LIKELIHOOD
 
-        to_target = (expected_pos[0] - human_pos[0], expected_pos[1] - human_pos[1])
-        target_norm = math.sqrt(to_target[0]**2 + to_target[1]**2)
-        if target_norm < 1e-6:
-            return HIGH_LIKELIHOOD  # already at target
+        current_pos = obs.spatial_context.position
+        prev_pos = self._history[-2].spatial_context.position
+        move_vec = (current_pos[0] - prev_pos[0], current_pos[1] - prev_pos[1])
 
-        cosine = (move_vec[0]*to_target[0] + move_vec[1]*to_target[1]) / (move_norm * target_norm)
+        target_pos = self._get_expected_position(hyp, world, obs.agent_id)
+        if target_pos is None:
+            return NEUTRAL_LIKELIHOOD
 
-        # Map [-1, 1] → [LOW, HIGH]
-        return LOW_LIKELIHOOD + (cosine + 1.0) / 2.0 * (HIGH_LIKELIHOOD - LOW_LIKELIHOOD)
+        return evaluator(move_vec, current_pos, target_pos)
+
+    def _get_relevant_action_schemas(self, hyp: HypothesisKey) -> List:
+        """
+        Return the (deduplicated) ActionSchema objects for all actions in
+        hyp's task decomposition, in first-appearance order.
+        """
+        task_schema = self.knowledge.get_task_schema(hyp.task_name)
+        if not task_schema or not task_schema.methods:
+            return []
+        seen = set()
+        schemas = []
+        for step in task_schema.methods[0].step_calls:
+            if step.action_name in seen:
+                continue
+            seen.add(step.action_name)
+            schema = self.knowledge.get_action_schema(step.action_name)
+            if schema is not None:
+                schemas.append(schema)
+        return schemas
+
+    def _resolve_completion_predicate(
+        self,
+        schema,
+        hyp: HypothesisKey,
+        obs: Observation,
+    ) -> Optional[Predicate]:
+        """
+        Resolve schema.completion (a ConditionSchema over Vars/Consts) into a
+        fully-grounded Predicate, using hyp's bindings and this action's own
+        step_call bindings. Returns None if schema.completion is a
+        ProcessCompletion (no predicate to check, e.g. wait_at) or if any
+        term can't be resolved.
+        """
+        if not isinstance(schema.completion, ConditionSchema):
+            return None
+
+        task_schema = self.knowledge.get_task_schema(hyp.task_name)
+        values = tuple(
+            self._resolve_term_value(term, hyp, obs, task_schema, schema.name)
+            for term in schema.completion.args
+        )
+        if any(v is None for v in values):
+            return None
+        return Predicate(schema.completion.name, tuple(Const(v) for v in values))
+
+    def _resolve_term_value(
+        self,
+        term,
+        hyp: HypothesisKey,
+        obs: Observation,
+        task_schema: Optional[TaskSchema],
+        action_name: str,
+    ) -> Optional[str]:
+        """
+        Resolve a single Var/Const term to a concrete value string.
+        Same "hasattr(term, 'value')" idiom already used in
+        _get_expected_position / _get_target_zone, kept consistent.
+        """
+        if hasattr(term, "value"):
+            return term.value  # Const — already concrete
+
+        var_name = term.name  # Var
+        if var_name == "?agent":
+            return obs.agent_id
+        if var_name in hyp.bindings:
+            return hyp.bindings[var_name]
+
+        # Fall back: look up this action's own step_call binding for var_name
+        if task_schema and task_schema.methods:
+            for step in task_schema.methods[0].step_calls:
+                if step.action_name == action_name:
+                    for k, v in step.bindings.items():
+                        if getattr(k, "name", None) == var_name and hasattr(v, "value"):
+                            return v.value
+        return None
+
 
     # -------------------------------------------------------------------------
     # Context weight ω_context

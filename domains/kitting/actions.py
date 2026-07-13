@@ -53,6 +53,7 @@ move_to = ActionSchema(
     microactions="STEP*",
     movement_target_key="?target",
     movement_target_type="object",
+    progress_evaluator="directional",   # cosine trajectory-consistency scoring
 )
 
 pick_up = ActionSchema(

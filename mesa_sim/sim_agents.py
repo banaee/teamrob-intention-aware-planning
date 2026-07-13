@@ -30,7 +30,7 @@ import logging
 from typing import TYPE_CHECKING, List, Optional, Dict
 
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
-from shared.recognizer_domain_aware import IntentionRecognizer, HypothesisKey, build_hypothesis_space
+from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothesis_space
 from shared.planner import AdaptivePlanner
 from shared.replanning import should_replan
 from shared.types import AbstractPlan, BeliefState, TaskInstance
