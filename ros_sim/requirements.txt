@@ -1,0 +1,6 @@
+--find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+
+jax==0.4.29
+jaxlib==0.4.29+cuda12.cudnn91
+numpy==2.2.6
+scipy==1.15.2
