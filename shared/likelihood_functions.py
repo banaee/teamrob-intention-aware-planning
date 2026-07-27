@@ -19,7 +19,7 @@ DISPATCH:
 """
 
 import math
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Callable
 
 from shared.types import Predicate
 
@@ -95,7 +95,7 @@ def direction_consistency_likelihood(
 # Registry — dispatch key is ActionSchema.progress_evaluator, never a mu string
 # =============================================================================
 
-PROGRESS_EVALUATORS: Dict[str, callable] = {
+PROGRESS_EVALUATORS: Dict[str, Callable[..., float]] = {
     "directional": direction_consistency_likelihood,
     # Future: "duration": duration_consistency_likelihood,  (for wait_at-style actions)
 }

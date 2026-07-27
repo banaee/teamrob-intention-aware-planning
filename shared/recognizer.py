@@ -274,7 +274,7 @@ class IntentionRecognizer:
                 if predicate is None:
                     return NEUTRAL_LIKELIHOOD
                 return likelihood_functions.completion_predicate_likelihood(
-                    predicate, world.predicates
+                    predicate, frozenset(world.predicates)
                 )
 
             # Continuous progress-type action (move_to, ...)
@@ -355,7 +355,10 @@ class IntentionRecognizer:
         )
         if any(v is None for v in values):
             return None
-        return Predicate(schema.completion.name, tuple(Const(v) for v in values))
+        return Predicate(
+            schema.completion.name, 
+            tuple(Const(v) for v in values if v is not None)
+        )
 
     def _resolve_term_value(
         self,
