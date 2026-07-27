@@ -44,6 +44,7 @@ OUTPUTS:
     - BeliefState: distribution, most_likely, confidence
 """
 
+from importlib.metadata import distribution
 from typing import Dict, List, Optional, Tuple
 
 from shared.types import (
@@ -164,15 +165,21 @@ class IntentionRecognizer:
         hypotheses:  list of (task_name, bindings) pairs for this scenario.
                      Derived from the human agent's scheduled_tasks at
                      construction time in sim_agents.py.
+                     
+        Uniform prior over all hypotheses + unknown.
+        Keyed by repr(hyp) strings — same key space as BeliefState.distribution,
+        so `prior` has one consistent type throughout update(), whether it
+        comes from prev_belief.distribution or this fallback.
         """
         self.knowledge = knowledge
         self.context = context
         self._hypotheses = hypotheses
         self._history: List[Observation] = []
+        self._by_key: Dict[str, HypothesisKey] = {repr(h): h for h in hypotheses}  # this is used to look up HypothesisKey by string repr in update()
 
         # Uniform prior over all hypotheses + unknown
         n = len(hypotheses) + 1
-        self._uniform: Dict = {h: 1.0 / n for h in hypotheses}
+        self._uniform: Dict[str, float] = {repr(h): 1.0 / n for h in hypotheses}
         self._uniform[UNKNOWN] = 1.0 / n
 
     def update(
@@ -186,15 +193,16 @@ class IntentionRecognizer:
         """
         self._history.append(obs)
 
-        prior = prev_belief.distribution if prev_belief is not None else self._uniform
-
+        prior: Dict[str, float] = prev_belief.distribution if prev_belief is not None else self._uniform
+    
         # Compute unnormalized posterior
-        unnorm: Dict = {}
+        unnorm: Dict[str, float] = {}
         for hyp in self._hypotheses:
             key = repr(hyp)
             likelihood = self._likelihood(obs, world, hyp)
             omega = self._context_weight(obs, world, hyp)
-            unnorm[key] = likelihood * omega * prior.get(key, self._uniform.get(hyp, 1.0 / (len(self._hypotheses) + 1)))
+            default = self._uniform.get(key, 1.0 / (len(self._hypotheses) + 1))
+            unnorm[key] = likelihood * omega * prior.get(key, default)
 
         # unknown: neutral likelihood, no context boost
         unnorm[UNKNOWN] = NEUTRAL_LIKELIHOOD * prior.get(UNKNOWN, self._uniform[UNKNOWN])
@@ -209,8 +217,7 @@ class IntentionRecognizer:
         floor_total = sum(distribution.values())
         distribution = {k: v / floor_total for k, v in distribution.items()}
 
-        most_likely = max(distribution, key=distribution.get)
-        
+        most_likely = max(distribution, key=lambda k: distribution[k])
         confidence = distribution[most_likely]
 
         return BeliefState(
@@ -221,6 +228,17 @@ class IntentionRecognizer:
             confidence=confidence,
         )
 
+    def get_hypothesis(self, key: str) -> Optional[HypothesisKey]:
+        """
+        Resolve a distribution/most_likely string key back to its HypothesisKey
+        (task_name + bindings). Used by meta_planner to ground the predicted
+        human task without re-parsing the repr string.
+        meta_planner.py calls recognizer.get_hypothesis(belief.most_likely) when it needs the binding.
+        """
+        return self._by_key.get(key)
+    
+    
+    
     # -------------------------------------------------------------------------
     # Likelihood model
     # -------------------------------------------------------------------------
@@ -351,8 +369,9 @@ class IntentionRecognizer:
         Resolve a single Var/Const term to a concrete value string.
         Same "hasattr(term, 'value')" idiom already used in
         _get_expected_position / _get_target_zone, kept consistent.
+        We changed "hasattr(term, 'value')" to "isinstance(term, Const)" to avoid false positives on Var objects that have a 'value' attribute.
         """
-        if hasattr(term, "value"):
+        if isinstance(term, Const):
             return term.value  # Const — already concrete
 
         var_name = term.name  # Var
@@ -366,7 +385,7 @@ class IntentionRecognizer:
             for step in task_schema.methods[0].step_calls:
                 if step.action_name == action_name:
                     for k, v in step.bindings.items():
-                        if getattr(k, "name", None) == var_name and hasattr(v, "value"):
+                        if getattr(k, "name", None) == var_name and isinstance(v, Const):
                             return v.value
         return None
 
@@ -438,7 +457,7 @@ class IntentionRecognizer:
                     for step in reversed(task_schema.methods[0].step_calls):
                         if step.action_name == "move_to":
                             for param_var, term in step.bindings.items():
-                                if hasattr(term, "value"):
+                                if isinstance(term, Const):
                                     return world.object_positions.get(term.value)
             else:
                 # Phase 1: item not yet held — expected position is item's container (shelf)
@@ -455,7 +474,7 @@ class IntentionRecognizer:
             for step in task_schema.methods[0].step_calls:
                 if step.action_name == "move_to":
                     for param_var, term in step.bindings.items():
-                        if hasattr(term, "value"):
+                        if isinstance(term, Const):
                             return world.object_positions.get(term.value)
         return None
 
@@ -481,7 +500,7 @@ class IntentionRecognizer:
             for step in task_schema.methods[0].step_calls:
                 if step.action_name == "move_to":
                     for param_var, term in step.bindings.items():
-                        if hasattr(term, "value"):
+                        if isinstance(term, Const):
                             return world.object_zones.get(term.value)
         return None
                         
