@@ -229,7 +229,13 @@ class TaskSchema:
     methods: List[MethodSchema]         # one now; multiple for conditional decomposition later
     is_assigned: bool = False
     is_foreseeable: bool = False # TODO: if we need it besides the is_assigned flag in TaskInstance — maybe not.
-
+    parameter_types: Dict[str, str] = field(default_factory=dict)
+    # Maps each enumerable Var name to its object type, e.g.
+    # {"?item": "item", "?destination": "kitting_table"}.
+    # IR's hypothesis space takes the cartesian product over every entry here.
+    # A Var not listed here is not enumerated (fixed at plan time some other way,
+    # or the task has no such parameter). Empty dict = no enumeration (coffee_break
+    # today, one hypothesis total).
 
 @dataclass
 class ActionSchema:

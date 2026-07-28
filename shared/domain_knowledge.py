@@ -80,6 +80,8 @@ class DomainKnowledgeBase:
         """Full TaskSchema objects for all registered intentions."""
         return [self._domain.tasks[name] for name in self._domain.intentions]
 
+    # def get_objects_by_type(self, type: str) -> List[str]:
+    #     return self._objects_by_type.get(type, [])
     # ----------------------------------------------------------------------
     # Action queries
     # ----------------------------------------------------------------------

@@ -45,6 +45,7 @@ OUTPUTS:
 """
 
 from importlib.metadata import distribution
+import itertools
 from typing import Dict, List, Optional, Tuple
 
 from shared.types import (
@@ -112,40 +113,59 @@ class HypothesisKey:
 # ============================================================================
 #  Functions
 # ============================================================================ 
+# def build_hypothesis_space(
+#     knowledge: DomainKnowledgeBase,
+#     known_item_ids: List[str],
+# ) -> List[HypothesisKey]:
+#     """
+#     Build the full hypothesis space for IR.
+#     One HypothesisKey per (intention, parameter_binding) combination.
+
+#     For tasks with ?item parameter: one hypothesis per known item in workspace.
+#     For parameterless tasks (coffee_break, ac_activation): one hypothesis total.
+
+#     Called once at agent construction. Item IDs come from workspace layout —
+#     the robot observes all items exist, but not which are assigned to the human.
+#     """
+#     hypotheses = []
+#     for intention_name in knowledge.get_all_intentions():
+#         task_schema = knowledge.get_task_schema(intention_name)
+#         if task_schema is None:
+#             continue
+#         param_types = task_schema.parameter_types
+#         if not param_types:
+#             hypotheses.append(HypothesisKey(task_name=intention_name, bindings={}))
+#             continue
+#         var_names = list(param_types.keys())
+#         candidate_lists = [knowledge.get_objects_by_type(param_types[v]) for v in var_names]
+#         for combo in itertools.product(*candidate_lists):
+#             hypotheses.append(HypothesisKey(
+#                 task_name=intention_name,
+#                 bindings=dict(zip(var_names, combo)),
+#             ))
+#     return hypotheses
+
 def build_hypothesis_space(
     knowledge: DomainKnowledgeBase,
-    known_item_ids: List[str],
+    known_objects_by_type: Dict[str, List[str]],   # was: known_item_ids: List[str]
 ) -> List[HypothesisKey]:
-    """
-    Build the full hypothesis space for IR.
-    One HypothesisKey per (intention, parameter_binding) combination.
-
-    For tasks with ?item parameter: one hypothesis per known item in workspace.
-    For parameterless tasks (coffee_break, ac_activation): one hypothesis total.
-
-    Called once at agent construction. Item IDs come from workspace layout —
-    the robot observes all items exist, but not which are assigned to the human.
-    """
     hypotheses = []
     for intention_name in knowledge.get_all_intentions():
         task_schema = knowledge.get_task_schema(intention_name)
         if task_schema is None:
             continue
-        has_item_param = any(p.name == "?item" for p in task_schema.parameters)
-        if has_item_param:
-            for item_id in known_item_ids:
-                hypotheses.append(HypothesisKey(
-                    task_name=intention_name,
-                    bindings={"?item": item_id},
-                ))
-        else:
+        param_types = task_schema.parameter_types
+        if not param_types:
+            hypotheses.append(HypothesisKey(task_name=intention_name, bindings={}))
+            continue
+        var_names = list(param_types.keys())
+        candidate_lists = [known_objects_by_type.get(param_types[v], []) for v in var_names]
+        for combo in itertools.product(*candidate_lists):
             hypotheses.append(HypothesisKey(
                 task_name=intention_name,
-                bindings={},
+                bindings=dict(zip(var_names, combo)),
             ))
     return hypotheses
-
-
 
 # =============================================================================
 # IntentionRecognizer
