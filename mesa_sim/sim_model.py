@@ -36,35 +36,35 @@ from shared.types import ScenarioConfig
 from mesa_sim.mesa_fork import model, space, time, datacollection
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 
+import logging 
+logger = logging.getLogger(__name__)
 
 # =============================================================================
-# Environment object dataclasses
+# Environment object dataclass
+# EnvObject and PortItemObject merged into one class called SimObject
+# TODO: move to shared/types.py if ROS later use it
 # =============================================================================
 
 @dataclass
-class EnvObject:
+class SimObject:
     obj_id: str
-    obj_type: str
+    type: str                          # enumeration category — "item", "shelf", "gate", etc.
     position: Tuple[float, float]
     size: Tuple[float, float]
     zone: Optional[str] = None
+    subtype: Optional[str] = None      # domain-specific classification:
+                                        # kitting: "part_A", "part_D", ...
+                                        # dock loading: "frozen", "dry"
 
-
-@dataclass
-class PortItemObject:
-    obj_id: str
-    obj_type: str
-    item_type: str
-    position: Tuple[float, float]
-    size: Tuple[float, float]
-    zone: Optional[str] = None
     held_by: Optional[str] = None
     at_location: Optional[str] = None
-    # for pallet loading domain
-    good_type: Optional[str] = None
-    is_empty: bool = False
-    # runtime scan state — set by executor on TOUCH
+    is_empty: bool = False             # dock loading: pallet empty/full state
     is_scanned: bool = False
+    is_open: Optional[bool] = None     # gates — kept as attribute, not tracked/implemented this phase
+    is_portable: bool = False   # set once at load time — True if loaded via
+                                 # "initial_container" (items/pallets); never
+                                 # mutated afterward. Distinct from at_location/
+                                 # held_by, which change during carrying.
 
 # =============================================================================
 # SimModel
@@ -118,29 +118,14 @@ class SimModel(model.Model):
         # ------------------------------------------------------------------
         self.knowledge = DomainKnowledgeBase.from_domain(register_fn())
 
+
         # ------------------------------------------------------------------
-        # Environment objects registry
+        # Environment objects registry — unified, single dict
         # ------------------------------------------------------------------
-        self.env_objects: Dict[str, EnvObject] = {}
-        self.items: Dict[str, PortItemObject] = {}
+        self.objects: Dict[str, SimObject] = {}
+        self._objects_by_type: Dict[str, List[str]] = {}
 
-        # ENVIRONEMNT OBJECTS: (static objects in any domain as defined in [domain]/env_layout1.json)
-
-        # before refactor to generic env_objects list in json:
-        # self._init_shelves(env_layout.get("shelves", []))
-        # self._init_kitting_table(env_layout.get("kitting_table", {}))
-        # self._init_coffee_machines(env_layout.get("coffee_machine", []))
-        # self._init_ac_switches(env_layout.get("AC_switches", []))
-        # self._init_obstacles(env_layout.get("obstacles", []))
-        # ADD for dock domain
-        # self._init_env_objects(env_layout.get("env_objects", []))
-
-        # after refactor to generic env_objects list in json (for both dock and kitting):
-        self._init_env_objects(env_layout.get("env_objects", []))
-
-
-        # both domains use it. TODO: check if it is better to define separate entity of item in various domains, just to reduce the confusion.
-        self._init_prtable_items(env_layout.get("items", []))
+        self._init_objects(env_layout.get("env_objects", []))
 
 
         # ------------------------------------------------------------------
@@ -171,74 +156,64 @@ class SimModel(model.Model):
     # Initialization helpers
     # =========================================================================
 
-    def _init_shelves(self, shelves_data: list):
-        for s in shelves_data:
-            self.env_objects[s["id"]] = EnvObject(
-                obj_id=s["id"], obj_type="shelf",
-                position=tuple(s["position"]), size=tuple(s["size"]),
-                zone=s.get("zone")
-            )
+    def _init_objects(self, objects_data: list):
+        """
+        Unified loader for all env_objects entries — items and fixed objects alike.
+        Two passes: objects with a direct "position" first (shelves, gates, tables,
+        machines...), then objects with "initial_container" (items, pallets), whose
+        position/zone are derived from their container. Two-pass avoids depending
+        on JSON array order — items may appear before or after their container.
+        """
+        direct = [o for o in objects_data if "initial_container" not in o]
+        contained = [o for o in objects_data if "initial_container" in o]
 
-    def _init_kitting_table(self, kt_data: dict):
-        if not kt_data:
-            return
-        self.env_objects["kitting_table"] = EnvObject(
-            obj_id="kitting_table", obj_type="kitting_table",
-            position=tuple(kt_data["position"]), size=tuple(kt_data["size"]),
-            zone=kt_data.get("zone")
-        )
-
-    def _init_coffee_machines(self, cm_data: list):
-        for cm in cm_data:
-            self.env_objects[cm["id"]] = EnvObject(
-                obj_id=cm["id"], obj_type="coffee_machine",
-                position=tuple(cm["position"]), size=tuple(cm["size"]),
-                zone=cm.get("zone")
-            )
-
-    def _init_ac_switches(self, ac_data: list):
-        for ac in ac_data:
-            self.env_objects[ac["id"]] = EnvObject(
-                obj_id=ac["id"], obj_type="ac_switch",
-                position=tuple(ac["position"]), size=tuple(ac["size"]),
-                zone=ac.get("zone")
-            )
-
-    def _init_obstacles(self, obs_data: list):
-        for ob in obs_data:
-            self.env_objects[ob["id"]] = EnvObject(
-                obj_id=ob["id"], obj_type="obstacle",
-                position=tuple(ob["position"]), size=tuple(ob["size"]),
-                zone=None
-            )
-
-    def _init_env_objects(self, objects_data: list):
-        """Generic env object loader. Reads type from JSON, works for all domains."""
-        for obj in objects_data:
-            self.env_objects[obj["id"]] = EnvObject(
+        for obj in direct:
+            self.objects[obj["id"]] = SimObject(
                 obj_id=obj["id"],
-                obj_type=obj["type"],
+                type=obj["type"],
                 position=tuple(obj["position"]),
                 size=tuple(obj["size"]),
                 zone=obj.get("zone"),
+                subtype=obj.get("subtype"),
+                is_empty=obj.get("is_empty", False),
+                is_scanned=obj.get("is_scanned", False),
+                is_portable=False,  # direct-position objects are not portable
             )
-            
-    def _init_prtable_items(self, items_data: list):
-        for protable_item in items_data:
-            container_id = protable_item["initial_container"]
-            container_obj = self.env_objects.get(container_id)
-            self.items[protable_item["id"]] = PortItemObject(
-                obj_id=protable_item["id"], obj_type="item",
-                item_type=protable_item["type"],
-                position=container_obj.position if container_obj else (0.0, 0.0),
-                size=tuple(protable_item["size"]),
-                zone=container_obj.zone if container_obj else None,
+
+        for obj in contained:
+            container_id = obj["initial_container"]
+            container = self.objects.get(container_id)
+            if container is None:
+                # container itself missing a position (shouldn't happen — direct
+                # pass above should have created it) — fall back, but this is a
+                # layout authoring bug, not expected at runtime.
+                logger.warning(
+                    "Object %s references unknown/unresolved container %s",
+                    obj["id"], container_id,
+                )
+            self.objects[obj["id"]] = SimObject(
+                obj_id=obj["id"],
+                type=obj["type"],
+                position=container.position if container else (0.0, 0.0),
+                size=tuple(obj["size"]),
+                zone=container.zone if container else None,
+                subtype=obj.get("subtype"),
                 held_by=None,
                 at_location=container_id,
-                good_type=protable_item.get("good_type"),      # for dock domain, e.g. "dry" or "frozen"
-                is_empty=protable_item.get("is_empty", False), # for dock domain, True if it's an empty pallet
-                is_scanned=protable_item.get("is_scanned", False), # for dock domain, whether the item is scanned at the start of the simulation
+                is_empty=obj.get("is_empty", False),
+                is_scanned=obj.get("is_scanned", False),
+                is_portable=True,  # items/pallets are portable, even if not currently held
             )
+
+        # Build type → instance-ids registry, feeds IR's hypothesis space
+        for obj_id, obj in self.objects.items():
+            self._objects_by_type.setdefault(obj.type, []).append(obj_id)
+
+
+
+    # =========================================================================
+    # Agent spawning
+    # =========================================================================
 
     def _spawn_agents(self, scenario: ScenarioConfig):
         """
@@ -268,7 +243,7 @@ class SimModel(model.Model):
                     pos=start_pos,
                     knowledge=self.knowledge,
                     scheduled_tasks=agent_cfg.scheduled_tasks,  # List[TaskInstance]
-                    known_item_ids=list(self.items.keys()),  # all items visible in workspace
+                    known_objects_by_type=self._objects_by_type,
                     observed_agent_id=observed_id,
                 )
                 self.space.place_agent(agent, start_pos)
@@ -279,15 +254,15 @@ class SimModel(model.Model):
     # Public query methods
     # =========================================================================
 
-    def get_env_object(self, obj_id: str) -> Optional[EnvObject]:
-        return self.env_objects.get(obj_id)
+    def get_object(self, obj_id: str) -> Optional[SimObject]:
+        return self.objects.get(obj_id)
 
-    def get_item(self, item_id: str) -> Optional[PortItemObject]:
-        return self.items.get(item_id)
+    def get_objects_by_type(self, type: str) -> List[str]:
+        return self._objects_by_type.get(type, [])
 
-    def get_movable_objects(self) -> Dict[str, PortItemObject]:
+    def get_movable_objects(self) -> Dict[str, SimObject]:
         """Return all items — used by world_state_builder."""
-        return self.items
+        return {oid: o for oid, o in self.objects.items() if o.type == "item"}
 
     def get_zone_of_position(self, x: float, y: float) -> Optional[str]:
         for zone_id, bounds in self.zone_map.items():
@@ -296,17 +271,17 @@ class SimModel(model.Model):
                 return zone_id
         return None
 
-    def get_objects_in_zone(self, zone_id: str) -> List[EnvObject]:
-        return [obj for obj in self.env_objects.values() if obj.zone == zone_id]
+    def get_objects_in_zone(self, zone_id: str) -> List[SimObject]:
+        return [obj for obj in self.objects.values() if obj.zone == zone_id]
 
     def get_item_location(self, item_id: str) -> Optional[Tuple[float, float]]:
-        item = self.items.get(item_id)
+        item = self.objects.get(item_id)
         if item is None:
             return None
         if item.held_by:
             ag = self.humans.get(item.held_by) or self.robots.get(item.held_by)
             return getattr(ag, "pos", None)
         if item.at_location:
-            loc = self.env_objects.get(item.at_location)
+            loc = self.objects.get(item.at_location)
             return loc.position if loc else None
         return item.position

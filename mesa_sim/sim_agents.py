@@ -169,7 +169,8 @@ class RobotAgent(FactoryAgent):
                  pos: tuple,
                  knowledge: DomainKnowledgeBase,
                  scheduled_tasks: List[TaskInstance],
-                 known_item_ids=List[str],
+                 # known_item_ids=List[str],
+                 known_objects_by_type: Dict[str, List[str]],
                  observed_agent_id: Optional[str] = None):
         super().__init__(unique_id, model, pos)
 
@@ -178,7 +179,7 @@ class RobotAgent(FactoryAgent):
         self.task_index: int = 0
 
         # Build hypothesis space from observed human's scheduled_tasks
-        hypotheses = build_hypothesis_space(knowledge=knowledge, known_item_ids=known_item_ids)
+        hypotheses = build_hypothesis_space(knowledge=knowledge, known_objects_by_type=known_objects_by_type)
 
         context = ContextKnowledge.default()
 
