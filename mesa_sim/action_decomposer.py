@@ -206,22 +206,17 @@ def _resolve_movement_target(
 
     target_type = action.schema.movement_target_type
     if target_type == "object":
-        return _env_object_position(target_id, model)
+        return _object_position(target_id, model)
     else:
         logging.warning(f"[action_decomposer] WARNING: movement_target_type not set "
                         f"for '{action.action_name}' — cannot resolve target")
         return None
 
 
-def _env_object_position(obj_id: str, model) -> Optional[Tuple[float, float]]:
-    """Return the position of a named env object or item."""
-    obj = model.get_env_object(obj_id)
-    if obj is not None:
-        return obj.position
-    item = model.get_item(obj_id)
-    if item is not None:
-        return item.position
-    return None
+def _object_position(obj_id: str, model) -> Optional[Tuple[float, float]]:
+    """Return the position of a named object (fixed or portable)."""
+    obj = model.get_object(obj_id)
+    return obj.position if obj is not None else None
 
 # =============================================================================
 # Step sequence generation

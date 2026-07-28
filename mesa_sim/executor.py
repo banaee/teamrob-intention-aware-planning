@@ -210,7 +210,7 @@ class Executor:
         self.agent.pos = target_pos
 
         if self.agent.carrying:
-            item = self.agent.model.items.get(self.agent.carrying)
+            item = self.agent.model.objects.get(self.agent.carrying)
             if item:
                 item.position = target_pos
 
@@ -222,7 +222,7 @@ class Executor:
         if not item_id:
             return False
 
-        item = self.agent.model.items.get(item_id)
+        item = self.agent.model.objects.get(item_id)
         if item is None:
             return False
 
@@ -248,7 +248,7 @@ class Executor:
             return False
 
         item_id = self.agent.carrying
-        item = self.agent.model.items.get(item_id)
+        item = self.agent.model.objects.get(item_id)
         if item is None:
             return False
 
@@ -256,7 +256,7 @@ class Executor:
         if target_id is None:
             return False
 
-        target_obj = self.agent.model.get_env_object(target_id)
+        target_obj = self.agent.model.get_object(target_id)
         if target_obj is None:
             logging.warning(f"[executor] WARNING: no env object found near "
                   f"{self.agent.unique_id} for releasing {item_id}")
@@ -276,20 +276,23 @@ class Executor:
         item_id = microaction.params.get("item_id")
         if not item_id:
             return False
-        item = self.agent.model.items.get(item_id)
+        item = self.agent.model.objects.get(item_id)
         if item is None:
             return False
         item.is_scanned = True
         return True
 
     def _nearest_env_object(self) -> Optional[str]:
-        """Find closest non-obstacle env object to agent. Used by release."""
+        """Find closest non-obstacle, non-portable object to agent. Used by release.
+        CHECK LATER: obj.at_location is not None is the same "is this a portable object" signal we used 
+                        in world_state_builder.py — consistent criterion across both files now.
+        """
         agent_x, agent_y = self.agent.pos
         nearest_id = None
         nearest_dist = float("inf")
 
-        for obj_id, obj in self.agent.model.env_objects.items():
-            if obj.obj_type == "obstacle":
+        for obj_id, obj in self.agent.model.objects.items():
+            if obj.type == "obstacle" or obj.is_portable:
                 continue
             ox, oy = obj.position
             dist = math.sqrt((agent_x - ox) ** 2 + (agent_y - oy) ** 2)

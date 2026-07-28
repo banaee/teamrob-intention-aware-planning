@@ -8,7 +8,7 @@ PURPOSE:
 
 WHAT THIS MODULE DOES:
     - Reads agent positions from Mesa space → derives current zones
-    - Reads env_objects and items from model → derives object locations
+    - Reads env_objects () from model → derives object locations
     - Derives symbolic predicates from the above
     - Returns a fresh WorldState each time it is called
 
@@ -142,45 +142,41 @@ def build_world_state(model: SimModel) -> WorldState:
         _add_proximity_predicates(agent_id, robot.pos, model, predicates)
 
     # ------------------------------------------------------------------
-    # Item Objects (portable items)
-    # ------------------------------------------------------------------
-    for item_obj_id, obj in model.get_movable_objects().items():
-        if obj.held_by:
-            location = obj.held_by
-            carrier = model.humans.get(obj.held_by) or model.robots.get(obj.held_by)
-            zone = model.get_zone_of_position(
-                carrier.pos[0], carrier.pos[1]
-            ) if carrier else "unknown"
-        elif obj.at_location:
-            location = obj.at_location
-            zone = model.get_zone_of_position(obj.position[0], obj.position[1])
+    # # Environment Object positions — for IR direction-based likelihood, items are already included above
+    # # one pass over model.objects (before: two loops items and objects)
+    # # ------------------------------------------------------------------
+  
+    for obj_id, obj in model.objects.items():
+        if obj.is_portable:
+            if obj.held_by:
+                location = obj.held_by
+                carrier = model.humans.get(obj.held_by) or model.robots.get(obj.held_by)
+                zone = model.get_zone_of_position(
+                    carrier.pos[0], carrier.pos[1]
+                ) if carrier else "unknown"
+            else:
+                location = obj.at_location
+                zone = model.get_zone_of_position(obj.position[0], obj.position[1])
+
+            if obj.is_scanned:
+                predicates.add(Predicate("scanned", (Const(obj_id),)))
+
+            object_locations[obj_id] = location
+            predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
+            object_zones[obj_id] = zone
+            object_positions[obj_id] = tuple(obj.position)
         else:
-            location = "unknown"
-            zone = "unknown"
-
-        if obj.is_scanned:
-            predicates.add(Predicate("scanned", (Const(item_obj_id),)))
-
-        # other predicated to be derived from item state can be added here
-        object_locations[item_obj_id] = location
-        predicates.add(Predicate("obj_at", (Const(item_obj_id), Const(location))))
-
-        # moveable objects (items) zone and positions
-        object_zones[item_obj_id] = zone
-        object_positions[item_obj_id] = tuple(obj.position)
-        
-    # ------------------------------------------------------------------
-    # Environment Object positions — for IR direction-based likelihood, items are already included above
-    # ------------------------------------------------------------------
-    for env_obj_id, obj in model.env_objects.items():
-        object_positions[env_obj_id] = tuple(obj.position)
-        object_zones[env_obj_id] = model.get_zone_of_position(obj.position[0], obj.position[1]) or "unknown"
+            # Fixed object — direct position/zone, no held_by/at_location semantics.
+            object_positions[obj_id] = tuple(obj.position)
+            object_zones[obj_id] = model.get_zone_of_position(obj.position[0], obj.position[1]) or "unknown"
 
     # ------------------------------------------------------------------
     # Phase 2.1: dock gate always open — TODO: derive from gate state
     # ------------------------------------------------------------------
-    predicates.add(Predicate("gate_is_open", (Const("dock_gate"),)))
-
+    # predicates.add(Predicate("gate_is_open", (Const("dock_gate"),)))
+    for obj_id, obj in model.objects.items():
+            if obj.type == "gate" and obj.is_open is not False:
+                predicates.add(Predicate("gate_is_open", (Const(obj_id),)))
         
     # ------------------------------------------------------------------
     # TODO Phase 4: derive additional predicates
@@ -212,31 +208,25 @@ def _add_proximity_predicates(
     predicates: Set[Predicate],
 ) -> None:
     """
-    Emit at(agent, object) predicates for all env objects and items
-    within PROXIMITY_THRESHOLD of the agent.
-
-    These are consumed by executor._is_action_complete() to check
-    move_to completion: at(agent, target_object) in world.predicates.
-
-    ENV OBJECTS: shelves, kitting_table, coffee_machine, ac_switch
-    ITEMS: only if not currently held (held items travel with agent)
+    Emit at(agent, object) for all objects within PROXIMITY_THRESHOLD.
+    Skips obstacles (not task-relevant targets) and currently-held objects
+    (they travel with the agent, not proximity-checkable at a fixed point).
     """
     ax, ay = agent_pos
 
-    # Check env objects (shelves, kitting_table, coffee_machine, ac_switch, etc.)
-    for obj_id, obj in model.env_objects.items():
-        if obj.obj_type == "obstacle":
+    for obj_id, obj in model.objects.items():
+        if obj.type == "obstacle" or obj.held_by:
             continue
         ox, oy = obj.position
         dist = math.sqrt((ax - ox) ** 2 + (ay - oy) ** 2)
         if dist <= PROXIMITY_THRESHOLD:
             predicates.add(Predicate("at", (Const(agent_id), Const(obj_id))))
-
-    # Check items — only uncarried items have a fixed position
-    for item_id, item in model.items.items():
-        if item.held_by:
-            continue
-        ix, iy = item.position
-        dist = math.sqrt((ax - ix) ** 2 + (ay - iy) ** 2)
-        if dist <= PROXIMITY_THRESHOLD:
-            predicates.add(Predicate("at", (Const(agent_id), Const(item_id))))
+            
+    # TODO: flagged rather than fixed — obj.type == "obstacle". Same shape of hardcoding as "?item" was, technically. 
+    # I'm treating it differently because "obstacle" reads as a physics/rendering category every domain would plausibly share 
+    # (something that blocks movement but is never a task target), not a domain-semantic label like "item"/"pallet." 
+    # But that's a judgment call, not a fact — if you want full rigor, 
+    # this could instead be "skip objects with no plausible task relevance," derived from 
+    # whether any TaskSchema.parameter_types value ever equals this object's type 
+    # (i.e., "is this type ever a valid task target anywhere in the domain"). 
+    # That's a bigger, cross-cutting mechanism though
