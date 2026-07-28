@@ -48,6 +48,19 @@ Only these top-level keys are valid alongside `"env_objects"`:
 - `"robots"` — robot agent spawn configs
 - `"humans"` — human agent spawn configs
 
+**`items` vs `env_objects` — the actual criterion:** not "movable vs static."
+An object goes in `items` if a task schema references it via an unbound `Var`
+that IR must enumerate over multiple candidates (e.g. `deliver_item(?item)` —
+could be any known item, one hypothesis per instance). An object goes in
+`env_objects` if a task schema references it as a fixed `Const` already
+resolved at design time (e.g. `coffee_break`'s target is `Const("coffee_machine_0")`,
+not `Var`) — singular and unambiguous, nothing to enumerate. If a domain ever
+needs multiple instances of something currently modeled as a fixed `Const`
+(e.g. a second coffee machine), it conceptually belongs in `items`, regardless
+of which JSON key it's under. `items` is a generic term for "enumerable
+deliverable/target thing" across domains — not kitting-specific; dock_loading's
+pallets are also `items` under this convention.
+
 ---
 
 ## 3. Concepts: tasks, actions, microactions

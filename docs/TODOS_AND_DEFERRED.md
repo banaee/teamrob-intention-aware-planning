@@ -8,10 +8,10 @@ Items marked **[BLOCKING]** must be resolved before the simulation runs correctl
 
 ## 🐛 Active Bugs
 
-**BUG-01 — `go_to_office` task skipped in dock_loading scenario** ✅ RESOLVED
+**BUG-01 — `office_break` task skipped in dock_loading scenario** ✅ RESOLVED
 Root cause: `run_mesa.py` `parse_args()` used `parse_args()` instead of `parse_known_args()[0]`,
-causing Solara args to conflict. Also `go_to_office` was missing from `registry.py` intentions set in an earlier version.
-Fixed: `parse_known_args()[0]` in `parse_args()`; `go_to_office` confirmed registered.
+causing Solara args to conflict. Also `office_break` was missing from `registry.py` intentions set in an earlier version.
+Fixed: `parse_known_args()[0]` in `parse_args()`; `office_break` confirmed registered.
 
 **BUG-02 — `scan_it` TOUCH appeared stuck with `micro=None`** ✅ RESOLVED
 Root cause: TOUCH fires and completes within a single Mesa step — invisible in every-10-steps log.
@@ -65,7 +65,7 @@ Done in `sim_model.py` but may have residual references in comments or docs.
 Files: all `mesa_sim/` files, `docs/`
 
 **TODO-06 — `ItemObject` / `PalletObject` subclass refactor**
-Currently `good_type`, `is_empty`, `is_scanned` are flat fields on `ItemObject`.
+Currently `subtype`, `is_empty`, `is_scanned` are flat fields on `ItemObject`.
 Proper design: `PalletObject(ItemObject)` subclass with pallet-specific fields,
 `model.pallets` dict separate from `model.items`.
 Requires updating `world_state_builder`, `executor`, `action_decomposer` type references.
@@ -202,7 +202,7 @@ Requires planner extension for existential search over world state.
 Files: `shared/planner.py`
 Reference: discussed in Phase 2.1
 
-**DESIGN-03 — `go_to_office` as foreseeable task: naming and reusability**
+**DESIGN-03 — `office_break` as foreseeable task: naming and reusability**
 Currently defined as a dock_loading-specific foreseeable task. In principle it is
 a generic "agent leaves workspace temporarily" pattern applicable to any domain.
 Consider whether to generalize or keep domain-specific.
@@ -213,7 +213,7 @@ Robot and human run in parallel with no coordination mechanism. Human can attemp
 to scan a pallet before robot has delivered it. Proper fix requires either:
 (a) task eligibility conditions (DESIGN-01), or
 (b) shared world state dependencies between agent task queues.
-Currently mitigated by `go_to_office` delay hack in scenario.
+Currently mitigated by `office_break` delay hack in scenario.
 Reference: TODO #12, DESIGN-01
 
 **DESIGN-05 — `DOMAIN_REGISTRY` in `run_mesa.py`: scaling**
@@ -290,7 +290,7 @@ Accepted: same as kitting. Fix deferred to Phase 4 path planning (TODO-09).
 
 **LIMIT-02 — Parallel task independence: human scans before robot delivers**
 Human `scan_pallet` executes without waiting for robot `deliver_pallet` to complete.
-Mitigated by `go_to_office` delay in scenario. Proper fix: DESIGN-01.
+Mitigated by `office_break` delay in scenario. Proper fix: DESIGN-01.
 
 **LIMIT-03 — Gate always open**
 `gate_is_open(dock_gate)` emitted unconditionally. Gate state not modeled dynamically.
@@ -310,28 +310,50 @@ Ordering should be the meta_planner's responsibility. Accepted for Phases 1–3;
 fix in Phase 4 via TODO-14.
 
 ---
+### NEW TODOs (from Phase 4 design session, July 2026)
 
-## 🗂️ Reference: Original TODO List (from Phase 2.1 session)
+**TODO — move SimObject from mesa_sim/sim_model.py to shared/types.py**
+Currently kept in sim_model.py for expediency during the env_objects/items merge.
+Should eventually live in shared/types.py — it's simulator-agnostic (generic
+spatial object + runtime state), and ROS embodiment will need the same shape.
+Files: mesa_sim/sim_model.py → shared/types.py
 
-For traceability, the original numbered list from the session:
+**TODO — dynamic object registry (future)**
+Object-by-type registry is static-at-construction for now (built once from
+layout JSON). If a scenario ever needs objects to appear/disappear mid-run
+(e.g. robot breakdown, new task becoming available), this requires redesigning
+IntentionRecognizer's belief update — currently assumes fixed hypothesis-space
+size (BELIEF_FLOOR renormalization, uniform prior denominator). Not just a
+registry change — inserting a hypothesis mid-run with no accumulated evidence
+needs its own design (what prior does it get?).
+Files: shared/recognizer.py, object registry (wherever it lands)
 
-| # | Item | Status |
-|---|------|--------|
-| 1 | `env_layout_dock.json` | ✅ Done (`env_layout1.json`) |
-| 2 | `ActionSchemas.py` | ✅ Done |
-| 3 | `tasks.py` | ✅ Done |
-| 4 | `registry.py` | ✅ Done |
-| 5 | `scenarios.py` | ✅ Done |
-| 6 | `sim_model.py` generic loader + parameterized registry | ✅ Done (additive) |
-| 7 | `ItemObject` — `good_type`, `is_empty`, `is_scanned` fields | ✅ Done |
-| 8 | `world_state_builder.py` — `scanned` + `gate_is_open` | ⚠️ Partial (gate_is_open may not be emitting, see BUG-04) |
-| 9 | `executor.py` — TOUCH handler | ✅ Done and confirmed working |
-| 10 | `run_mesa.py` — domain selection wiring | ✅ Done |
-| 11 | `space_drawer.py` — dock color entries | ❌ Not done (TODO-11) |
-| 12 | `scan_pallet` precondition guard | ❌ Deferred (DESIGN-01) |
-| 13 | `ItemObject`/`PalletObject` subclass refactor | ❌ Deferred (TODO-06) |
-| 14 | Rename `FactoryModel` → `SimModel` | ✅ Done |
-| 15 | Rename `"room"` → `"environment"` in JSON | ❌ Not done (TODO-04) |
-| 16 | `action_decomposer` generic microaction extractor | ❌ Deferred (TODO-01) |
-| 17 | Task eligibility conditions (Phase 2.3) | ❌ Deferred (DESIGN-01) |
-| 18 | `run_mesa.py` — parsing arguments for both Solara and Headless | ✅ Done |
+**TODO — TaskSchema.parameter_types declared at task level, not method level**
+Typed-parameter enumeration (?item → "item" type, etc.) declared once per
+TaskSchema. If a task ever needs different methods to target different object
+types (e.g. deliver_pallet's two methods needing different destination types),
+revisit and move parameter_types to MethodSchema instead.
+Files: shared/types.py
+
+**TODO — go_to_office: unresolved design questions (parked)**
+
+1. `parameter_types={"?office_chair": "office_chair"}` doesn't match the
+   office_chair object's actual "type": "chair" in env_layout1.json — one
+   needs to change to match the other before this task can enumerate.
+2. `door_is_open` guard has no fallback method and no confirmed emitter in
+   world_state_builder.py — same unresolved-predicate class as gate_is_open
+   (TODO-02). If never true, go_to_office has zero applicable methods.
+3. Method ends by moving the human to dock_gate rather than returning to a
+   neutral spot — confirm this is deliberate before relying on it.
+Files: domains/dock_loading/tasks.py, mesa_sim/world_state_builder.py
+
+**TODO — "obstacle" type still hardcoded in world_state_builder.py**
+`_add_proximity_predicates()` skips objects where `type == "obstacle"` — same
+class of domain-string hardcoding as the old `"?item"` check, left in as a
+judgment call (treated as a shared physics/rendering category, not a
+domain-semantic label). Not rigorously justified.
+General fix: derive "is this type ever a valid task target" from whether the
+object's `type` appears anywhere in any TaskSchema.parameter_types.values()
+for the active domain, rather than a hardcoded string comparison. Bigger,
+cross-cutting mechanism — needs its own design, not an inline fix.
+Files: mesa_sim/world_state_builder.py (_add_proximity_predicates)

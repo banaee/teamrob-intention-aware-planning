@@ -146,6 +146,24 @@ in the relevant ActionSchema — zero changes to recognizer orchestration logic.
 **`scheduled_tasks` semantics differ by agent type**
 The field name `scheduled_tasks` is kept on `AgentConfig` for both agent types, but semantics differ:
 
+**`?item` as generic cross-domain convention; `TaskSchema.enumerable_param`**
+`?item` is the deliberate, permanent parameter name for "the deliverable thing"
+across all domains — not kitting-specific despite the name. dock_loading's
+deliver_pallet(?item, ?dest) uses it too. items in env layout JSON follows the
+same convention (generic deliverables, not literally kitting parts).
+env_objects holds fixed, singular Consts referenced directly in task schemas
+(coffee_machine_0, kitting_table, dock_gate) — not because they're "static,"
+but because they're hardcoded as Const in methods, with nothing to enumerate.
+If a domain ever needs multiple instances of such an object (e.g. a second
+coffee machine), it moves conceptually into the enumerable category regardless
+of which JSON array it's listed under.
+shared/recognizer.py never hardcodes "?item" as a string comparison — it reads
+TaskSchema.enumerable_param (default "?item", overridable per task, None for
+parameterless tasks like coffee_break). This keeps the convention change-able
+per-task without touching shared/.
+Files: shared/types.py (TaskSchema.enumerable_param), shared/recognizer.py
+Reference: Phase 4C naming discussion.
+
 - **Human**: fixed ordered sequence of `TaskInstance`s (assigned + foreseeable interleaved).
 Order encodes when deviations occur. Never reordered at runtime. Ground truth for IR evaluation.
 - **Robot**: initial ordering produced by meta_planner at t=0 using base-cost heuristic with null belief.
