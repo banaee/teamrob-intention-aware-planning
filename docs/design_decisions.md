@@ -81,18 +81,34 @@ presence, used by the executor to check action completion. These are separate
 concerns and must not be conflated. `GOTO_ZONE` was removed from the HTN
 decomposition tree entirely; zone-level reasoning lives only in the recognizer.
 
-**env_layout.json structure: flat `env_objects` for static geometry, separate sections for dynamic entities**
-Static physical objects (shelves, tables, machines, obstacles, delivery areas, gates,
-doors) live in a flat `"env_objects"` list with a `"type"` field per entry.
-`SimModel._init_env_objects()` loads all of them generically — no domain-specific
-loaders needed, no new top-level JSON sections for new object types.
-Items (`"items"`), robots (`"robots"`), and humans (`"humans"`) stay in separate
-top-level sections because they have distinct loading logic: items carry runtime
-state fields (`held_by`, `at_location`, `is_scanned`, etc.), agents are instantiated
-as Mesa objects and registered with the scheduler. Merging them into `"env_objects"`
-would conflate static geometry with dynamic runtime entities.
-Rule: never add a new top-level JSON section for a new object type — add it to
-`"env_objects"` with an appropriate `"type"` value.
+**env_layout.json: single unified `env_objects` list, `SimObject.is_portable` distinguishes fixed vs. carryable**
+Superseded decision (was: items in a separate top-level `"items"` section from
+static `env_objects`). Items/pallets are now merged into the same flat
+`"env_objects"` list as shelves, tables, gates, etc. — every entry carries a
+`"type"` field (enumeration category, e.g. "item", "shelf", "gate") and an
+optional `"subtype"` (domain-specific classification, e.g. "part_A", "frozen").
+Robots and humans remain in separate top-level sections — they're Mesa agents
+registered with the scheduler, not passive objects, a genuinely different
+loading path.
+`SimModel._init_objects()` loads the unified list in two passes: objects with
+a direct `"position"` first, then objects with `"initial_container"` (items,
+pallets), whose position/zone are derived from their container — two-pass
+avoids depending on JSON array order.
+`SimObject.is_portable: bool` is set once at load time (True only for the
+`initial_container`-loaded branch) and never mutated afterward. This is
+deliberately a separate, stable flag from `held_by`/`at_location`, which
+change during carrying — `at_location` goes `None` while an item is held, so
+using it as the "is this portable" signal caused a real bug: a carried item's
+distance-to-agent is always 0, so it could win as its own release target
+(`_nearest_env_object()` in executor.py). `is_portable` fixes this by staying
+constant regardless of carry state.
+`SimObject` fields kept fully explicit (no metadata dict) per deliberate
+choice — trades some field sprawl across domains (e.g. `good_type`/`is_empty`
+unused by kitting items) for full attribute visibility during development.
+Rule: never add a new top-level JSON section for a new object type — add it
+to `"env_objects"` with an appropriate `"type"` value.
+Files: mesa_sim/sim_model.py, mesa_sim/executor.py, mesa_sim/world_state_builder.py
+Reference: Phase 4C typed-parameter generalization session
 
 **Three-clock architecture: motion, world state, cognitive**
 Simulators run three decoupled clocks. Motion clock: fastest — Mesa scheduler step,
@@ -146,23 +162,38 @@ in the relevant ActionSchema — zero changes to recognizer orchestration logic.
 **`scheduled_tasks` semantics differ by agent type**
 The field name `scheduled_tasks` is kept on `AgentConfig` for both agent types, but semantics differ:
 
-**`?item` as generic cross-domain convention; `TaskSchema.enumerable_param`**
-`?item` is the deliberate, permanent parameter name for "the deliverable thing"
-across all domains — not kitting-specific despite the name. dock_loading's
-deliver_pallet(?item, ?dest) uses it too. items in env layout JSON follows the
-same convention (generic deliverables, not literally kitting parts).
-env_objects holds fixed, singular Consts referenced directly in task schemas
-(coffee_machine_0, kitting_table, dock_gate) — not because they're "static,"
-but because they're hardcoded as Const in methods, with nothing to enumerate.
-If a domain ever needs multiple instances of such an object (e.g. a second
-coffee machine), it moves conceptually into the enumerable category regardless
-of which JSON array it's listed under.
-shared/recognizer.py never hardcodes "?item" as a string comparison — it reads
-TaskSchema.enumerable_param (default "?item", overridable per task, None for
-parameterless tasks like coffee_break). This keeps the convention change-able
-per-task without touching shared/.
-Files: shared/types.py (TaskSchema.enumerable_param), shared/recognizer.py
-Reference: Phase 4C naming discussion.
+**`TaskSchema.parameter_types`: typed, multi-parameter enumeration for IR's hypothesis space**
+Superseded decision (was: single `enumerable_param: Optional[str]`, one
+enumerable parameter per task, defaulting to `"?item"`). Generalized after
+recognizing that a second kitting table or coffee machine would require a
+task to enumerate over *multiple* typed parameters simultaneously (e.g.
+`deliver_item(?item, ?kitting_table)` — cartesian product over items ×
+tables), not just one.
+`TaskSchema.parameter_types: Dict[str, str]` maps each enumerable Var name to
+an object type string (e.g. `{"?item": "item", "?kitting_table":
+"kitting_table"}`). `shared/recognizer.py`'s `build_hypothesis_space()` takes
+the cartesian product of `known_objects_by_type[type]` over every entry —
+degenerates to exactly one combination when every type has a single known
+instance, so single-instance domains behave identically to before.
+`known_objects_by_type: Dict[str, List[str]]` is workspace/layout data, not
+domain knowledge — it's threaded as a parameter into `build_hypothesis_space`
+and `RobotAgent.__init__` (same pattern `known_item_ids` used previously),
+built once in `SimModel._init_objects()` by grouping loaded `SimObject`s by
+`.type`. It deliberately does NOT live on `DomainKnowledgeBase` — that class
+is domain-general and built once per domain regardless of layout; object
+instance counts are per-layout and would break that separation.
+`?item` remains the actual naming convention in use across kitting AND
+dock_loading (not renamed) — but `shared/` no longer hardcodes it as a
+string; it reads whatever `parameter_types` declares per task.
+`coffee_break`/`ac_activation` were converted from `Const`-bound singular
+objects to typed `Var` parameters for consistency with `deliver_item`, even
+though each currently has only one known instance — same rule as `?item`:
+`Const` is fine while an object type is genuinely singular; convert to typed
+`Var` + `parameter_types` once a second instance becomes plausible.
+Files: shared/types.py (TaskSchema.parameter_types), shared/recognizer.py
+(build_hypothesis_space), mesa_sim/sim_model.py (known_objects_by_type
+construction), domains/kitting/tasks.py
+Reference: Phase 4C typed-parameter generalization session
 
 - **Human**: fixed ordered sequence of `TaskInstance`s (assigned + foreseeable interleaved).
 Order encodes when deviations occur. Never reordered at runtime. Ground truth for IR evaluation.

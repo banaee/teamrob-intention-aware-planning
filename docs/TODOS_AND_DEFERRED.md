@@ -29,6 +29,23 @@ goes directly truck → delivery area. Likely: `gate_is_open(dock_gate)` predica
 emitted by `world_state_builder`, so method guard fails and fallback has no gate step.
 Files: `mesa_sim/world_state_builder.py`, `domains/dock_loading/tasks.py`
 
+**BUG-05 — `place` action stalls forever: item released onto itself** ✅ RESOLVED
+Root cause: `executor._nearest_env_object()` used `obj.at_location is not None`
+as the "is this a portable object" filter. `at_location` is transiently `None`
+while an item is being carried (set in `_execute_grasp`), so during
+`_execute_release()`'s call to find a release target, the currently-held item
+itself passed the filter — and since a carried item's position mirrors the
+agent's every step, its distance to the agent is exactly 0, always winning as
+"nearest." Item got released onto itself (`obj_at(item, item)`), never
+matching the real completion predicate (`obj_at(item, kitting_table_0)`).
+`place` action retried forever, task never completed.
+Fix: added stable `SimObject.is_portable` flag, set once at load time, never
+mutated — replaces `at_location is not None` in both
+`executor._nearest_env_object()` and `world_state_builder.py`'s main object
+loop.
+Files: mesa_sim/sim_model.py, mesa_sim/executor.py, mesa_sim/world_state_builder.py
+Reference: scenario_00 debugging session, Phase 4C typed-parameter work
+
 ---
 
 ## 🔧 Technical TODOs
@@ -46,13 +63,12 @@ method guards in `deliver_pallet` and `load_return` evaluate correctly.
 Files: `mesa_sim/world_state_builder.py`
 Reference: TODO #8a
 
-**TODO-03 — `SimModel`: B+C cleanup (rename + generic loader)**
-Currently additive-only for safety. Full cleanup:
-- Remove remaining kitting-specific `_init_*` helpers if any survive
-- Remove hardcoded kitting import from `sim_model.py`
-- Verify `_init_env_objects` handles all object types cleanly
-Files: `mesa_sim/sim_model.py`
-Reference: TODO B+C
+**TODO-03 — `SimModel`: B+C cleanup (rename + generic loader)** ✅ RESOLVED
+Fully superseded by the unified `_init_objects()` loader (Phase 4C typed-
+parameter session) — single generic method for all object types, two-pass
+(direct-position, then container-referenced), no domain-specific `_init_*`
+helpers remain.
+Files: mesa_sim/sim_model.py
 
 **TODO-04 — Rename `"space"` key to `"environment"` in layout JSONs**
 `"space"` (renamed from `"room"`) still implies a single room.
@@ -64,13 +80,14 @@ Reference: TODO #15
 Done in `sim_model.py` but may have residual references in comments or docs.
 Files: all `mesa_sim/` files, `docs/`
 
-**TODO-06 — `ItemObject` / `PalletObject` subclass refactor**
-Currently `subtype`, `is_empty`, `is_scanned` are flat fields on `ItemObject`.
-Proper design: `PalletObject(ItemObject)` subclass with pallet-specific fields,
-`model.pallets` dict separate from `model.items`.
-Requires updating `world_state_builder`, `executor`, `action_decomposer` type references.
-Files: `shared/types.py`, `mesa_sim/sim_model.py`, `mesa_sim/world_state_builder.py`
-Reference: TODO #13
+**TODO-06 — `ItemObject` / `PalletObject` subclass refactor** ✅ SUPERSEDED
+Resolved differently than originally proposed: rather than a `PalletObject`
+subclass, `EnvObject`/`PortItemObject` were merged into one `SimObject` with
+all fields explicit (deliberate choice — full attribute visibility over
+metadata-dict flexibility; accepted field sprawl across domains as the cost).
+`model.items`/`model.env_objects` collapsed into one `model.objects: Dict[str, SimObject]`.
+Files: mesa_sim/sim_model.py
+Reference: Phase 4C typed-parameter generalization session
 
 **TODO-07 — `effects` field not consumed by live planner**
 `ActionSchema.effects` are defined but the planner does not use them for forward
@@ -97,11 +114,9 @@ Requires task eligibility condition evaluation (see DESIGN-01 below).
 Files: `domains/dock_loading/tasks.py`, `shared/` cognitive loop
 Reference: TODO #12
 
-**TODO-11 — `space_drawer.py`: add dock color entries**
-`OBJ_COLORS` and `ZONE_COLORS` missing entries for dock object types.
-Without these, dock env objects render in default gray.
-Files: `mesa_sim/viz/space_drawer.py`
-Reference: TODO #11 (original list)
+**TODO-11 — `space_drawer.py`: add dock color entries** ✅ RESOLVED
+`OBJ_COLORS`/`ZONE_COLORS` both have dock_loading entries (truck, gate,
+delivery_area, empty_bay, door / zone_hall_dry, zone_hall_frozen, etc.).
 
 **TODO-12 — DONE** Layout selection via `experiment.yaml` `layout` field implemented.
 `DOMAIN_REGISTRY` restructured as `domain → layout → scenario` hierarchy in
@@ -260,12 +275,10 @@ Reference: Phase 4 design session
 
 ## 🧹 Refactoring / Cleanup TODOs
 
-**REFACTOR-01 — Normalize kitting `env_layout1.json` to flat `env_objects` format**
-Kitting JSON still uses named sections (`shelves`, `kitting_table`, etc.).
-Normalize to flat `env_objects` list matching dock format.
-Blocked by: need to verify `_init_env_objects` handles all kitting object types.
-Files: `domains/kitting/env_layout1.json`
-Reference: B+C Step 2
+**REFACTOR-01 — Normalize kitting `env_layout1.json` to flat `env_objects` format** ✅ RESOLVED
+Both kitting layouts (`env_layout0.json`, `env_layout1.json`) now use the
+unified `env_objects` list, items merged in with `type`/`subtype` fields.
+Files: domains/kitting/env_layout0.json, domains/kitting/env_layout1.json
 
 **REFACTOR-02 — `parse_args()` called twice in `run_mesa.py`**
 Both `_make_domain_model()` and `run_headless()` call `parse_args()` independently.
@@ -335,14 +348,15 @@ types (e.g. deliver_pallet's two methods needing different destination types),
 revisit and move parameter_types to MethodSchema instead.
 Files: shared/types.py
 
-**TODO — go_to_office: unresolved design questions (parked)**
+**TODO — office_break: unresolved design questions (parked)** [was: go_to_office]
+Task renamed from `go_to_office` to `office_break` (dock_loading).
 
 1. `parameter_types={"?office_chair": "office_chair"}` doesn't match the
    office_chair object's actual "type": "chair" in env_layout1.json — one
    needs to change to match the other before this task can enumerate.
 2. `door_is_open` guard has no fallback method and no confirmed emitter in
    world_state_builder.py — same unresolved-predicate class as gate_is_open
-   (TODO-02). If never true, go_to_office has zero applicable methods.
+   (TODO-02). If never true, office_break has zero applicable methods.
 3. Method ends by moving the human to dock_gate rather than returning to a
    neutral spot — confirm this is deliberate before relying on it.
 Files: domains/dock_loading/tasks.py, mesa_sim/world_state_builder.py
@@ -357,3 +371,16 @@ object's `type` appears anywhere in any TaskSchema.parameter_types.values()
 for the active domain, rather than a hardcoded string comparison. Bigger,
 cross-cutting mechanism — needs its own design, not an inline fix.
 Files: mesa_sim/world_state_builder.py (_add_proximity_predicates)
+
+**TODO — dock_loading typed-parameter integration: not reviewed** [deferred]
+`dock_loading/tasks.py`/`scenarios.py` were manually updated in parallel with
+the kitting typed-parameter work (?pallet/?delivery_bay, office_break rename,
+parameter_types added to deliver_pallet/load_return/coffee_break) but not
+reviewed against the same rigor as kitting. Known issue: `confirm_delivered_pallet`
+TaskSchema is missing `parameter_types` and its `parameters` list (`[_pallet]`
+only) doesn't match `scenarios.py`, which binds both `?pallet` and
+`?delivery_bay` to it — `?delivery_bay` isn't declared on the schema or used
+in its step_calls. Also unconfirmed: whether `registry.py`'s import was
+updated from `go_to_office` to `office_break`.
+Files: domains/dock_loading/tasks.py, domains/dock_loading/scenarios.py, domains/dock_loading/registry.py
+Reference: Phase 4C typed-parameter generalization session

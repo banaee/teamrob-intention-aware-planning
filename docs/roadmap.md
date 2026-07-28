@@ -52,39 +52,57 @@ The robot operates with two planning levels and one recognition module, all in `
 - Cost is measured uniformly in Mesa simulation steps (seconds in ROS): moves, detours, pauses all equal cost units. Team-level semantic costs parked as future extension (see DESIGN-08).
 - Cancellation of a held-item task includes return-to-shelf cost before reordering.
 
-**Phase 4A — IR: Bayesian belief updating**
-- Real likelihood model: P(intention | observations) via Bayesian update
-- Context weighting ω_context: spatial zone, time-of-day, task history
-- Evidence accumulation across steps; prior → posterior as microactions observed
-- IR runs from t=0 with uniform prior; meta_planner gates reordering on confidence threshold θ
-- Output: `BeliefState` with full distribution + `most_likely` + `confidence`
+**Phase 4A — IR: Bayesian belief updating** ✅ COMPLETE, validated against scenario_00
+- Real likelihood model implemented: schema-driven dispatch via
+  `PROGRESS_EVALUATORS` registry (shared/likelihood_functions.py) — no
+  hardcoded microaction strings in recognizer.py
+- `BELIEF_FLOOR = 1e-3` prevents probability collapse at task transitions;
+  frozen-belief window shrank from 21 steps to 3
+- Hypothesis space generalized: `TaskSchema.parameter_types` (multi-parameter,
+  cartesian product) replaces earlier single-parameter design — supports any
+  number of enumerable typed parameters per task, not just `?item`
+- Output: `BeliefState` with full distribution + `most_likely` + `confidence`,
+  verified against scenario_00 (200 steps, no regression)
 
-**Phase 4B — HTN: recursive decomposition in planner.py**
-- Replace flat method grounder with recursive decomposer
-- Guard evaluation: select method whose preconditions hold in `WorldState`
-- Forward chaining over `ActionSchema.effects` for state projection
-- Output: `AbstractPlan` (flat grounded action list, single task)
+**Phase 4B — HTN: recursive decomposition in planner.py** ✅ COMPLETE
+- Recursive decomposer with real guard evaluation, derived variable
+  resolution, `?agent` binding propagation
 
-**Phase 4C — MetaPlanner: scheduling + interference detection + cost comparison**
-- At t=0: generate initial queue Q0 from assigned_tasks set (base cost, no IR)
-- On cognitive clock event: receive BeliefState, ProjectedPlan, WorldState
-- Predict human action sequence over horizon H (from IR most_likely + task decomposition)
-- Align robot's ProjectedPlan against predicted human sequence → detect spatial/temporal interference
-- Enumerate candidate task orderings (current queue + reorderings + cancellation variants)
-- For each candidate: call planner.py (HTN) → projected action sequence → estimate cost
-- Select minimum-cost candidate; update queue and ProjectedPlan if changed
-- Cognitive clock triggers: task completion, belief threshold θ crossed, robot picks up item (cancellation cost changes discontinuously), human observed completing a task
-- Open: hysteresis band for θ (θ_low / θ_high) vs single threshold — see DESIGN-07
+**Phase 4C — MetaPlanner: scheduling + interference detection + cost comparison** 🔲 NOT STARTED
+Design questions resolved (session ending July 2026), implementation not yet begun:
+- Q1: `MetaPlanner` owns the task queue internally (not passed externally)
+- Q2: human task projection uses `recognizer.get_hypothesis()` to resolve
+  `belief.most_likely` back to its `HypothesisKey` (task_name + bindings) —
+  binding inference already solved by the hypothesis-space design, no
+  separate geometric inference step needed
+- Q3: `_estimate_duration` uses a self-contained geometric estimate
+  (`distance / assumed_speed`, constructor param with default) — keeps
+  `shared/` decoupled from simulator step-size config
+- Q4: `replanning.py` held (wired in parallel) until Phase 4C validates
+  end-to-end against scenario_00, then retired in one commit
+- DESIGN-07 resolved: single threshold θ=0.75, no hold-last-decision
+  hysteresis — confidence is gate-only, doesn't feed the cost function
+- Prerequisite typed-parameter/object-model work completed as an unplanned
+  but necessary dependency: `SimObject` unification (`is_portable` flag),
+  `TaskSchema.parameter_types`, `known_objects_by_type` registry — needed
+  once multi-instance object types (kitting_table, coffee_machine) were
+  considered for `?destination`-style task parameters
+- Still to build: `meta_planner.py` itself (`initialize_queue`, `update`,
+  `_project`, `_estimate_duration`, `_detect_interference`, `_cost`), per
+  the interface and flow already designed
 
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
 - No structural change to executor interface; hints richer than current skeleton
 
 ### Prerequisites before implementation
-- DESIGN-06: define `ProjectedPlan` type in `shared/types.py`
-- TODO-14: rename `AgentConfig.scheduled_tasks` → `assigned_tasks` (set) for robot
-- DESIGN-07: settle cognitive clock trigger conditions and θ hysteresis policy
-- New simple kitting layout (Layout 0) and scenario defined for Phase 4 development and testing
+
+- DESIGN-06: define `ProjectedPlan` type in `shared/types.py` ✅ DONE
+- TODO-14: `AgentConfig.scheduled_tasks` semantics split by agent type ✅ DONE
+- DESIGN-07: cognitive clock triggers + θ policy settled ✅ DONE (no hysteresis)
+- New simple kitting layout (Layout 0) and scenario for Phase 4 dev ✅ DONE (env_layout0/scenario_00)
+- Q1–Q4 meta_planner design questions ✅ RESOLVED (see Phase 4C above)
+- Typed-parameter object model (SimObject/is_portable/parameter_types) ✅ DONE, verified against scenario_00
 
 ---
 
