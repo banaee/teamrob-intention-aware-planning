@@ -83,7 +83,7 @@ def space_drawer(model, agent_portrayal):
     fig = go.Figure()
     _draw_zones(model, fig)
     _draw_env_objects(model, fig)
-    _draw_items(model, fig)
+    _draw_delivery_items(model, fig)
     _draw_agents(model, fig)
     _draw_paths(model, fig)
     _update_layout(model, fig)
@@ -112,11 +112,13 @@ def _draw_zones(model, fig):
 
 
 def _draw_env_objects(model, fig):
-    for obj_id, obj in model.env_objects.items():
-        if obj.obj_type == "obstacle":
+    for obj_id, obj in model.objects.items():
+        if obj.is_portable:
+            continue  # portable objects (items/pallets) are drawn separately
+        if obj.type == "obstacle":
             _draw_rect(fig, obj.position, obj.size, "dimgray", 0.4, label=None)
         else:
-            color, opacity = OBJ_COLORS.get(obj.obj_type, ("lightblue", 0.5))
+            color, opacity = OBJ_COLORS.get(obj.type, ("lightblue", 0.5))
             _draw_rect(fig, obj.position, obj.size, color, opacity, label=obj_id)
 
 
@@ -138,8 +140,10 @@ def _draw_rect(fig, position, size, color, opacity, label=None):
         )
 
 
-def _draw_items(model, fig):
-    for item_id, item in model.items.items():
+def _draw_delivery_items(model, fig):
+    for item_id, item in model.objects.items():
+        if not item.is_portable:
+            continue  # non-portable objects are drawn separately
         color = "red" if item.held_by else "black"
         x, y = item.position
         fig.add_shape(
