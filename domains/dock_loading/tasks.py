@@ -25,8 +25,13 @@ METHODS NOTE:
 from shared.types import Var, Const, ConditionSchema, StepCall, MethodSchema, TaskSchema
 from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it
 
-_item = Var("?item")
-_dest   = Var("?dest")
+_pallet = Var("?pallet")
+_delivery_bay = Var("?delivery_bay")
+_empty_pallet_bay = Var("?empty_pallet_bay")
+_coffee_machine = Var("?coffee_machine")
+_office_chair= Var("?office_chair")
+
+# target and entity are used in move_to and wait_at actions, respectively.
 _target = Var("?target")
 _entity = Var("?entity")
 
@@ -37,11 +42,12 @@ _entity = Var("?entity")
 
 deliver_pallet = TaskSchema(
     name="deliver_pallet",
-    parameters=[_item, _dest],
+    parameters=[_pallet, _delivery_bay],
+    parameter_types={"?pallet": "pallet", "?delivery_bay": "delivery_bay"},
     methods=[
         MethodSchema(
             name="deliver_pallet_gate_open",
-            parameters=[_item, _dest],
+            parameters=[_pallet, _delivery_bay],
             guards=[
                 ConditionSchema("gate_is_open", (Const("dock_gate"),)),
             ],
@@ -52,11 +58,11 @@ deliver_pallet = TaskSchema(
                 ),
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: _item},
+                    bindings={_target: _pallet},
                 ),
                 StepCall(
                     action_name="pick_up",
-                    bindings={_item: _item},
+                    bindings={_pallet: _pallet},
                 ),
                 StepCall(
                     action_name="move_to",
@@ -64,29 +70,29 @@ deliver_pallet = TaskSchema(
                 ),
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: _dest},
+                    bindings={_target: _delivery_bay},
                 ),
                 StepCall(
                     action_name="place",
-                    bindings={_item: _item, _target: _dest},
+                    bindings={_pallet: _pallet, _target: _delivery_bay},
                 ),
             ],
         ),
         # TODO: implement open_gate ActionSchema, then fill this method
         # MethodSchema(
         #     name="deliver_pallet_gate_closed",
-        #     parameters=[_item, _dest],
+        #     parameters=[_pallet, _delivery_bay],
         #     guards=[
         #         ConditionSchema("gate_is_closed", (Const("dock_gate"),)),
         #     ],
         #     steps=[
         #         StepCall("move_to",   {_target: Const("dock_gate")}),
         #         StepCall("open_gate", {_entity: Const("dock_gate")}),
-        #         StepCall("move_to",   {_target: _item}),
-        #         StepCall("pick_up",   {_item: _item}),
+        #         StepCall("move_to",   {_target: _pallet}),
+        #         StepCall("pick_up",   {_pallet: _pallet}),
         #         StepCall("move_to",   {_target: Const("dock_gate")}),
-        #         StepCall("move_to",   {_target: _dest}),
-        #         StepCall("place",     {_item: _item, _target: _dest}),
+        #         StepCall("move_to",   {_target: _delivery_bay}),
+        #         StepCall("place",     {_pallet: _pallet, _target: _delivery_bay}),
         #     ],
         # ),
     ],
@@ -101,22 +107,23 @@ deliver_pallet = TaskSchema(
 
 load_return = TaskSchema(
     name="load_return",
-    parameters=[_item],
+    parameters=[_pallet],
+    parameter_types={"?pallet": "pallet"},
     methods=[
         MethodSchema(
             name="load_return_gate_open",
-            parameters=[_item],
+            parameters=[_pallet],
             guards=[
                 ConditionSchema("gate_is_open", (Const("dock_gate"),)),
             ],
             step_calls=[
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: _item},
+                    bindings={_target: _pallet},
                 ),
                 StepCall(
                     action_name="pick_up",
-                    bindings={_item: _item},
+                    bindings={_pallet: _pallet},
                 ),
                 StepCall(
                     action_name="move_to",
@@ -128,7 +135,7 @@ load_return = TaskSchema(
                 ),
                 StepCall(
                     action_name="place",
-                    bindings={_item: _item, _target: Const("truck_interior")},
+                    bindings={_pallet: _pallet, _target: Const("truck_interior")},
                 ),
             ],
         ),
@@ -145,20 +152,20 @@ load_return = TaskSchema(
 
 confirm_delivered_pallet = TaskSchema(
     name="confirm_delivered_pallet",
-    parameters=[_item],
+    parameters=[_pallet],
     methods=[
         MethodSchema(
             name="confirm_delivered_pallet_default",
-            parameters=[_item],
+            parameters=[_pallet],
             guards=[],
             step_calls=[
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: _item},
+                    bindings={_target: _pallet},
                 ),
                 StepCall(
                     action_name="scan_it",
-                    bindings={_item: _item},
+                    bindings={_pallet: _pallet},
                 ),
             ],
         ),
@@ -174,20 +181,21 @@ confirm_delivered_pallet = TaskSchema(
 
 coffee_break = TaskSchema(
     name="coffee_break",
-    parameters=[],
+    parameters=[_coffee_machine],
+    parameter_types={"?coffee_machine": "coffee_machine"},
     methods=[
         MethodSchema(
             name="coffee_break_default",
-            parameters=[],
+            parameters=[_coffee_machine],
             guards=[],
             step_calls=[
                 StepCall(
                     action_name="move_to",
-                    bindings={_target: Const("coffee_machine_0")},
+                    bindings={_target: _coffee_machine},
                 ),
                 StepCall(
                     action_name="wait_at",
-                    bindings={_entity: Const("coffee_machine_0"), Var("?duration"): Const("PT60S")},
+                    bindings={_entity: _coffee_machine, Var("?duration"): Const("PT60S")},
                 ),
             ],
         ),
@@ -196,18 +204,41 @@ coffee_break = TaskSchema(
     is_foreseeable=True,
 )
 
-go_to_office = TaskSchema(
-    name="go_to_office",
-    parameters=[],
-    methods=[MethodSchema(
-        name="go_to_office_default",
-        parameters=[],
-        guards=[],
-        step_calls=[
-            StepCall("move_to", {Var("?target"): Const("office_door")}),
-            StepCall("wait_at", {Var("?entity"): Const("office_door"), Var("?duration"): Const("PT80S")}),
+office_break = TaskSchema(
+    name="office_break",
+    parameters=[_office_chair],
+    parameter_types={"?office_chair": "office_chair"},
+    methods=[
+            MethodSchema(
+                name="office_break_default",
+                parameters=[_office_chair],
+                guards=[
+                    ConditionSchema("door_is_open", (Const("office_door"),))
+                ],
+                step_calls=[
+                    StepCall(
+                        action_name="move_to",
+                        bindings={_target: (Const("office_door"))}
+                    ),
+                    StepCall(
+                        action_name="move_to",
+                        bindings={_target: _office_chair},
+                    ),
+                    StepCall(
+                        action_name="wait_at",
+                        bindings={_entity: _office_chair, Var("?duration"): Const("PT60S")},                  ),
+                    StepCall(
+                        action_name="move_to",
+                        bindings={_target: Const("office_door")},
+                    ),
+                    StepCall(
+                        action_name="move_to",
+                        bindings={_target: Const("dock_gate")}
+                    ),
+                ],
+            ),
+            # TODO: office_door method — same pattern as deliver_pallet
         ],
-    )],
     is_assigned=False,
     is_foreseeable=True,
 )

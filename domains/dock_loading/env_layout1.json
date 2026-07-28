@@ -69,6 +69,126 @@
     }
   ],
   "env_objects": [
+        {
+      "id": "pallet_0",
+      "type": "pallet",
+      "subtype": "dry",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_1",
+      "type": "pallet",
+      "subtype": "dry",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_2",
+      "type": "pallet",
+      "subtype": "dry",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_3",
+      "type": "pallet",
+      "subtype": "frozen",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_4",
+      "type": "pallet",
+      "subtype": "frozen",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_5",
+      "type": "pallet",
+      "subtype": "frozen",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_6",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "dry_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_7",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "dry_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_8",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "frozen_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_9",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "frozen_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
     {
       "id": "truck_interior",
       "type": "truck",
@@ -96,8 +216,8 @@
       "zone": "zone_dock"
     },
     {
-      "id": "dry_delivery_area",
-      "type": "delivery_area",
+      "id": "dry_delivery_bay_0",
+      "type": "delivery_bay",
       "position": [
         -480,
         180
@@ -109,8 +229,8 @@
       "zone": "zone_hall_dry"
     },
     {
-      "id": "frozen_delivery_area",
-      "type": "delivery_area",
+      "id": "frozen_delivery_bay_0",
+      "type": "delivery_bay",
       "position": [
         480,
         180
@@ -122,8 +242,8 @@
       "zone": "zone_hall_frozen"
     },
     {
-      "id": "empty_bay_dry",
-      "type": "empty_bay",
+      "id": "dry_empty_bay_0",
+      "type": "empty_pallet_bay",
       "position": [
         -480,
         -180
@@ -135,8 +255,8 @@
       "zone": "zone_hall_dry"
     },
     {
-      "id": "empty_bay_frozen",
-      "type": "empty_bay",
+      "id": "frozen_empty_bay_0",
+      "type": "empty_pallet_bay",
       "position": [
         480,
         -180
@@ -146,6 +266,19 @@
         240
       ],
       "zone": "zone_hall_frozen"
+    },
+    {
+      "id": "office_chair",
+      "type": "chair",
+      "position": [
+        -240,
+        300
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "zone": "zone_hall_center"
     },
     {
       "id": "office_door",
@@ -172,128 +305,6 @@
         50
       ],
       "zone": "zone_hall_center"
-    }
-  ],
-  "items": [
-    {
-      "id": "pallet_0",
-      "type": "pallet",
-      "good_type": "dry",
-      "is_empty": false,
-      "is_scanned": false,
-      "initial_container": "truck_interior",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_1",
-      "type": "pallet",
-      "good_type": "dry",
-      "is_empty": false,
-      "is_scanned": false,
-      "initial_container": "truck_interior",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_2",
-      "type": "pallet",
-      "good_type": "dry",
-      "is_empty": false,
-      "is_scanned": false,
-      "initial_container": "truck_interior",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_3",
-      "type": "pallet",
-      "good_type": "frozen",
-      "is_empty": false,
-      "is_scanned": false,
-      "initial_container": "truck_interior",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_4",
-      "type": "pallet",
-      "good_type": "frozen",
-      "is_empty": false,
-      "is_scanned": false,
-      "initial_container": "truck_interior",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_5",
-      "type": "pallet",
-      "good_type": "frozen",
-      "is_empty": false,
-      "is_scanned": false,
-      "initial_container": "truck_interior",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_6",
-      "type": "pallet",
-      "good_type": null,
-      "is_empty": true,
-      "is_scanned": true,
-      "initial_container": "empty_bay_dry",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_7",
-      "type": "pallet",
-      "good_type": null,
-      "is_empty": true,
-      "is_scanned": true,
-      "initial_container": "empty_bay_dry",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_8",
-      "type": "pallet",
-      "good_type": null,
-      "is_empty": true,
-      "is_scanned": true,
-      "initial_container": "empty_bay_frozen",
-      "size": [
-        80,
-        120
-      ]
-    },
-    {
-      "id": "pallet_9",
-      "type": "pallet",
-      "good_type": null,
-      "is_empty": true,
-      "is_scanned": true,
-      "initial_container": "empty_bay_frozen",
-      "size": [
-        80,
-        120
-      ]
     }
   ],
   "robots": [

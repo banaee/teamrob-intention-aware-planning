@@ -7,7 +7,7 @@ Called once at startup by DomainKnowledgeBase via sim_model.py.
 
 from shared.types import DomainModel
 from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it
-from domains.dock_loading.tasks import deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, go_to_office
+from domains.dock_loading.tasks import deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break
 from domains.dock_loading.scenarios import scenario_10, scenario_11
 
 def register_dock_loading_domain() -> DomainModel:
@@ -17,7 +17,7 @@ def register_dock_loading_domain() -> DomainModel:
             "load_return":    load_return,
             "confirm_delivered_pallet": confirm_delivered_pallet,
             "coffee_break":   coffee_break,
-            "go_to_office":   go_to_office,
+            "office_break":   office_break,
         },
         actions={
             "move_to":      move_to,
@@ -27,7 +27,7 @@ def register_dock_loading_domain() -> DomainModel:
             "scan_it":      scan_it,
         },
         microactions=["STEP", "GRASP", "RELEASE", "STAND", "TOUCH"],
-        intentions={"deliver_pallet", "load_return", "confirm_delivered_pallet", "coffee_break", "go_to_office"},
+        intentions={"deliver_pallet", "load_return", "confirm_delivered_pallet", "coffee_break", "office_break"},
     )
 
 
