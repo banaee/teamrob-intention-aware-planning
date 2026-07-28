@@ -48,88 +48,6 @@
     }
   ],
   "doors": [],
-  "items": [
-    {
-      "id": "item_0",
-      "type": "part_A",
-      "initial_container": "shelf_0",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": -90
-    },
-    {
-      "id": "item_1",
-      "type": "part_A",
-      "initial_container": "shelf_1",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": -90
-    },
-    {
-      "id": "item_2",
-      "type": "part_B",
-      "initial_container": "shelf_2",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": -90
-    },
-    {
-      "id": "item_3",
-      "type": "part_B",
-      "initial_container": "shelf_3",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": -90 
-    },
-    {
-      "id": "item_4",
-      "type": "part_C",
-      "initial_container": "shelf_4",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": -90
-    },
-    {
-      "id": "item_5",
-      "type": "part_C",
-      "initial_container": "shelf_5",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": -90
-    },
-    {
-      "id": "item_6",
-      "type": "part_D",
-      "initial_container": "shelf_6",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": 0
-    },
-    {
-      "id": "item_7",
-      "type": "part_D",
-      "initial_container": "shelf_7",
-      "size": [
-        25,
-        25
-      ],
-      "orientation_deg": 0
-    }
-  ],
   "robots": [
     {
       "id": "robot_0",
@@ -152,7 +70,7 @@
   ],
   "env_objects": [
     {
-      "id": "kitting_table",
+      "id": "kitting_table_0",
       "type": "kitting_table",
       "position": [
         -200,
@@ -283,6 +201,94 @@
       ],
       "slots": 4,
       "zone": "zone_SE",
+      "orientation_deg": 0
+    },
+        {
+      "id": "item_0",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_1",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_1",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_2",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_3",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90 
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_4",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_5",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_6",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "item_7",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_7",
+      "size": [
+        25,
+        25
+      ],
       "orientation_deg": 0
     },
     {

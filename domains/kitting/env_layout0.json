@@ -2,7 +2,7 @@
   "space": {
     "width": 1000,
     "height": 800,
-    "name": "Kitting Domain Layout 0 — Phase 4 Development",
+    "name": "Kitting Domain Layout 0",
     "units": "cm",
     "notes": "Minimal layout for Phase 4 IR and AP development. Symmetric placement guarantees path crossing near center (Scenario 0.1) and KT convergence conflict (Scenario 0.2). No obstacles, no foreseeable tasks."
   },
@@ -29,43 +29,6 @@
     }
   ],
   "doors": [],
-  "items": [
-    {
-      "id": "item_3",
-      "type": "part_B",
-      "initial_container": "shelf_3",
-      "size": [25, 25],
-      "notes": "Human first target. Bottom-left. Robot heading to item_4 (bottom-right) crosses human heading here near center."
-    },
-    {
-      "id": "item_4",
-      "type": "part_C",
-      "initial_container": "shelf_4",
-      "size": [25, 25],
-      "notes": "Robot first target. Bottom-right. Symmetric to item_3."
-    },
-    {
-      "id": "item_6",
-      "type": "part_D",
-      "initial_container": "shelf_6",
-      "size": [25, 25],
-      "notes": "Robot second task. Left side."
-    },
-    {
-      "id": "item_7",
-      "type": "part_D",
-      "initial_container": "shelf_7",
-      "size": [25, 25],
-      "notes": "Robot third task. Left side."
-    },
-    {
-      "id": "item_2",
-      "type": "part_B",
-      "initial_container": "shelf_2",
-      "size": [25, 25],
-      "notes": "Human second task. Right side."
-    }
-  ],
   "robots": [
     {
       "id": "robot_0",
@@ -86,7 +49,7 @@
   ],
   "env_objects": [
     {
-      "id": "kitting_table",
+      "id": "kitting_table_0",
       "type": "kitting_table",
       "position": [0, 350],
       "size": [200, 100],
@@ -137,6 +100,46 @@
       "slots": 2,
       "zone": "zone_SE",
       "notes": "Human second task item. Symmetric to shelf_6."
+    },
+        {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_3",
+      "size": [25, 25],
+      "notes": "..."
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_4",
+      "size": [25, 25],
+      "notes": "..."
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_6",
+      "size": [25, 25],
+      "notes": "..."
+    },
+    {
+      "id": "item_7",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_7",
+      "size": [25, 25],
+      "notes": "..."
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_2",
+      "size": [25, 25],
+      "notes": "..."
     }
   ]
 }
