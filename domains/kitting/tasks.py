@@ -16,12 +16,85 @@ _ac_switch = Var("?ac_switch")
 _target    = Var("?target")
 _entity    = Var("?entity")
 
+#   
+_other     = Var("?other")   # whatever else the agent may be holding when this task starts
+_agent = Var("?agent")
 
+
+deliver_item_old = TaskSchema(
+    name="deliver_item_old",
+    parameters=[_item, _kitting_table],
+    parameter_types={"?item": "item", "?kitting_table": "kitting_table"},
+    methods=[
+        MethodSchema(
+            name="deliver_simple",
+            parameters=[_item, _kitting_table],
+            guards=[],
+            step_calls=[
+                StepCall(
+                    action_name="move_to",
+                    bindings={_target: _item},  
+                ),
+                StepCall(
+                    action_name="pick_up",
+                    bindings={_item: _item},
+                ),
+                StepCall(
+                    action_name="move_to",
+                    bindings={_target: _kitting_table}
+                ),
+                StepCall(
+                    action_name="place",
+                    bindings={_item: _item, _target: _kitting_table},
+                ),
+            ],
+        )
+    ],
+    is_assigned=True,
+    is_foreseeable=False,
+)
+
+# replaced with:
 deliver_item = TaskSchema(
     name="deliver_item",
     parameters=[_item, _kitting_table],
     parameter_types={"?item": "item", "?kitting_table": "kitting_table"},
     methods=[
+        MethodSchema(
+            name="deliver_with_return",
+            parameters=[_item, _kitting_table],
+            guards=[
+                ConditionSchema("holding", (_agent, _other)),
+                ConditionSchema("not_equal", (_other, _item)),
+            ],
+            derived_vars={"?other_container": ("home_container_of", "?other")},
+            step_calls=[
+                StepCall(
+                    action_name="move_to",
+                    bindings={_target: Var("?other_container")},
+                ),
+                StepCall(
+                    action_name="place",
+                    bindings={_item: _other, _target: Var("?other_container")},
+                ),
+                StepCall(
+                    action_name="move_to",
+                    bindings={_target: _item},
+                ),
+                StepCall(
+                    action_name="pick_up",
+                    bindings={_item: _item},
+                ),
+                StepCall(
+                    action_name="move_to",
+                    bindings={_target: _kitting_table}
+                ),
+                StepCall(
+                    action_name="place",
+                    bindings={_item: _item, _target: _kitting_table},
+                ),
+            ],
+        ),
         MethodSchema(
             name="deliver_default",
             parameters=[_item, _kitting_table],
@@ -44,7 +117,7 @@ deliver_item = TaskSchema(
                     bindings={_item: _item, _target: _kitting_table},
                 ),
             ],
-        )
+        ),
     ],
     is_assigned=True,
     is_foreseeable=False,
