@@ -36,7 +36,7 @@ RECURSION:
     into the same action list. Output is always a flat AbstractPlan.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import logging
 
 from shared.types import (
@@ -97,7 +97,7 @@ class AdaptivePlanner:
         if task_schema is None:
             raise ValueError(f"AdaptivePlanner: unknown task '{task_name}'")
 
-        method = self._select_method(task_schema, bindings, world)
+        method, bindings = self._select_method(task_schema, bindings, world)  # returns method + updated bindings
 
         # Resolve derived vars declared on this method before processing steps
         resolved_bindings = self._resolve_derived_vars(method, bindings, world)
@@ -132,36 +132,97 @@ class AdaptivePlanner:
         task_schema: TaskSchema,
         bindings: Dict[str, str],
         world: WorldState,
-    ) -> MethodSchema:
+        ) -> Tuple[MethodSchema, Dict[str, str]]:
         """
-        Return the first method whose guards are all satisfied in world.
+        Return the first method whose guards are all satisfied in world, along
+        with bindings updated to include any vars discovered by existential
+        guard matching.
         Empty guard list = unconditional (always passes).
         Raises ValueError if no method is applicable.
         """
         for method in task_schema.methods:
-            if self._guards_satisfied(method, bindings, world):
-                return method
+            resolved = self._guards_satisfied(method, bindings, world)
+            if resolved is not None:
+                return method, resolved
 
         raise ValueError(
             f"AdaptivePlanner: no applicable method for task '{task_schema.name}' "
             f"in current world state. Bindings: {bindings}"
         )
-
+    
     def _guards_satisfied(
         self,
         method: MethodSchema,
         bindings: Dict[str, str],
         world: WorldState,
-    ) -> bool:
+    ) -> Optional[Dict[str, str]]:
         """
-        Return True iff all guards hold in world.predicates.
-        Empty guard list → vacuously True.
+        Try to satisfy all guards for this method against world state, in order.
+        Guards may (a) test an already-bound predicate against world.predicates,
+        (b) existentially bind one new Var by searching world.predicates, or
+        (c) invoke a built-in evaluator (currently only 'not_equal') rather than
+        a world.predicates lookup.
+        Returns the bindings dict (original + any newly-discovered vars) if the
+        method is applicable, or None if any guard fails.
+        Empty guard list → vacuously satisfied, original bindings returned unchanged.
         """
+        current = dict(bindings)
+
         for guard in method.guards:
-            grounded = self._ground_predicate(guard, bindings)
-            if grounded not in world.predicates:
-                return False
-        return True
+            if guard.name == "not_equal":
+                left, right = guard.args
+                left_val = current[left.name] if isinstance(left, Var) else left.value
+                right_val = current[right.name] if isinstance(right, Var) else right.value
+                if left_val == right_val:
+                    return None
+                continue
+
+            unbound = [a for a in guard.args if isinstance(a, Var) and a.name not in current]
+
+            if not unbound:
+                # fully bound — test membership, same as before
+                grounded = self._ground_predicate(guard, current)
+                if grounded not in world.predicates:
+                    return None
+                continue
+
+            if len(unbound) > 1:
+                raise ValueError(
+                    f"AdaptivePlanner: guard '{guard.name}' in method '{method.name}' "
+                    f"has more than one unbound variable "
+                    f"({[v.name for v in unbound]}); existential matching supports "
+                    f"binding at most one variable per guard."
+                )
+
+            # Existential match: find predicates with the same name and matching
+            # bound-arg positions; bind the one free position.
+            free_var = unbound[0]
+            free_index = guard.args.index(free_var)
+            matches = []
+            for pred in world.predicates:
+                if pred.name != guard.name or len(pred.args) != len(guard.args):
+                    continue
+                ok = True
+                for i, arg in enumerate(guard.args):
+                    if i == free_index:
+                        continue
+                    bound_val = current[arg.name] if isinstance(arg, Var) else arg.value
+                    if pred.args[i].value != bound_val:
+                        ok = False
+                        break
+                if ok:
+                    matches.append(pred.args[free_index].value)
+
+            if not matches:
+                return None
+
+            # Deterministic tie-break — world.predicates is a Set, so iteration
+            # order isn't a reliable "first match". Not expected to matter today
+            # (e.g. 'carrying' is a scalar field, so 'holding' can't have two
+            # matches for one agent), but sort rather than rely on set order.
+            current[free_var.name] = sorted(matches)[0]
+
+        return current
 
     def _resolve_derived_vars(
         self,
@@ -179,6 +240,8 @@ class AdaptivePlanner:
                 )
             if lookup_fn == "zone_of":
                 derived_val = world.object_zones.get(source_val)
+            elif lookup_fn == "home_container_of":
+                derived_val = world.object_home_container.get(source_val)
             else:
                 raise ValueError(
                     f"AdaptivePlanner: unknown lookup function '{lookup_fn}' "
