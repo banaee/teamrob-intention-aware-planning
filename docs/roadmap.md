@@ -50,7 +50,7 @@ The robot operates with two planning levels and one recognition module, all in `
 - `meta_planner.py` owns task ordering. It calls `planner.py` per candidate ordering to project action sequences, evaluates costs, and selects the best queue. HTN does not schedule — it only decomposes.
 - A new `ProjectedPlan` type (see DESIGN-06) spans the full task queue for lookahead reasoning. It is never handed to the executor — it is the meta_planner's internal reasoning structure.
 - Cost is measured uniformly in Mesa simulation steps (seconds in ROS): moves, detours, pauses all equal cost units. Team-level semantic costs parked as future extension (see DESIGN-08).
-- Cancellation of a held-item task includes return-to-shelf cost before reordering.
+- Cancellation of a held-item task is handled by HTN method selection, not a meta_planner cost term — see design_decisions.md.
 
 **Phase 4A — IR: Bayesian belief updating** ✅ COMPLETE, validated against scenario_00
 - Real likelihood model implemented: schema-driven dispatch via
@@ -82,6 +82,13 @@ Design questions resolved (session ending July 2026), implementation not yet beg
   end-to-end against scenario_00, then retired in one commit
 - DESIGN-07 resolved: single threshold θ=0.75, no hold-last-decision
   hysteresis — confidence is gate-only, doesn't feed the cost function
+- Cancellation resolved: not a meta_planner cost term. `deliver_item` gets a
+  second, guarded HTN method (`deliver_with_return`) selected via existential
+  guard matching in `_guards_satisfied` — `_cost()` needs no `carrying` param
+  and no cancellation branch, it just decomposes each candidate and counts
+  steps. Validated against scenario_00. See design_decisions.md. New open
+  item from this: DESIGN-09 (cheap pre-check before full candidate
+  enumeration — separate from cancellation itself).
 - Prerequisite typed-parameter/object-model work completed as an unplanned
   but necessary dependency: `SimObject` unification (`is_portable` flag),
   `TaskSchema.parameter_types`, `known_objects_by_type` registry — needed
@@ -89,8 +96,9 @@ Design questions resolved (session ending July 2026), implementation not yet beg
   considered for `?destination`-style task parameters
 - Still to build: `meta_planner.py` itself (`initialize_queue`, `update`,
   `_project`, `_estimate_duration`, `_detect_interference`, `_cost`), per
-  the interface and flow already designed
-
+  the interface and flow already designed — `_cost()`'s signature drops
+  `carrying` (no longer needed, per cancellation resolution above)
+  
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
 - No structural change to executor interface; hints richer than current skeleton

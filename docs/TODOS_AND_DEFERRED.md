@@ -196,6 +196,20 @@ Deferred to Phase 4C when the cognitive clock and meta_planner exist to
 drive the reset trigger.
 Files: shared/recognizer.py
 Reference: Phase 4A validation, HCM_AAAI26 paper Hypothesis Generation section
+
+**TODO-21 — Post-completion belief plateau: healthy uncertainty vs. artifact** [needs dedicated IR session]
+Observed in a manual test run (scenario_00, item_6-carrying seed for deliver_with_return
+validation, not an IR-focused test): after human_0 completes its scheduled tasks, belief
+distribution over remaining robot task hypotheses settles at a near-even split (e.g.
+item_3/item_4 ~0.498/0.498) and stays there for the rest of the run. Two explanations
+are equally plausible from this trace alone: (a) genuine perceptual ambiguity — no
+further observations exist to distinguish the hypotheses; (b) an artifact of
+BELIEF_FLOOR + the post-completion frozen-belief window (see TODO-18). This run was not
+designed to evaluate IR dynamics — no conclusion should be drawn either way. Needs a
+dedicated session with a controlled test isolating post-task-completion belief behavior.
+Files: `shared/recognizer.py`
+Reference: cancellation-mechanism validation session, follow-up to TODO-18
+
 ---
 
 ## 🏗️ Design TODOs
@@ -270,6 +284,19 @@ conflicts, task dependency violations. Deferred to post-Phase 4; keep in mind wh
 defining cost function interface in meta_planner so extension does not require redesign.
 Files: `shared/meta_planner.py` (Phase 4 new)
 Reference: Phase 4 design session
+
+
+**DESIGN-09 — Pre-RESELECT cheap filter, separate from candidate cost calc** [Phase 4C, parked]
+Cancellation cost is computed intrinsically by planner.py (guarded HTN method on
+deliver_item — see design_decisions.md), not as a meta_planner cost term. This is
+orthogonal to whether RESELECT should run at all. Open question: should meta_planner
+apply a cheap pre-check (via _detect_interference or immediate evidence) before
+enumerating and decomposing every candidate, vs. always running full enumerate-and-
+minimize? Related to DESIGN-07's θ hysteresis question but distinct: DESIGN-07 gates
+*when* re-evaluation triggers; this gates whether a triggered re-evaluation does full
+candidate enumeration or short-circuits early.
+Files: `shared/meta_planner.py` (Phase 4C, `_detect_interference`)
+Reference: Phase 4C design session, cancellation-mechanism discussion
 
 ---
 

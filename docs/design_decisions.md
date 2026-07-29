@@ -239,10 +239,50 @@ Both types are defined in `shared/types.py`.
 All robot behaviors carry equal cost per step: moving, detouring, pausing/waiting.
 Total cost of a candidate plan = total Mesa steps to complete all tasks in the horizon.
 This captures team efficiency (faster completion = better) without semantic complexity.
-Cancellation cost of a held-item task includes return-to-shelf steps before reordering.
 Team-level semantic costs (human waiting, shared resource conflicts) are parked as a
 future extension — the cost function interface must be designed to allow this extension
 without requiring meta_planner redesign (see DESIGN-08).
+
+**Cancellation is not a meta_planner cost term — it is an HTN method choice**
+Originally specified as a `Ccancel(τcur)` term added explicitly in `_cost()`:
+
+    detect_interference()
+      ↓
+    compute cancellation cost
+      ↓
+    for each candidate:
+        cost(candidate) = execution_cost + cancellation_cost
+
+This made cancellation a meta_planner-level concern, requiring `carrying` state to be
+threaded through `_cost()`/`_project()`, and requiring meta_planner to know *why* a
+candidate costs what it does.
+
+Implemented instead as a second, guarded `MethodSchema` on the task itself
+(`deliver_with_return` in `domains/kitting/tasks.py`, tried before the unconditional
+`deliver_default`), selected via existential guard matching in `_guards_satisfied`
+(`shared/planner.py`):
+
+    detect_interference()
+      ↓
+    if replan:
+        for each candidate:
+            decompose(candidate)   # planner.py picks the applicable method
+              → task's own guarded method decides: continue directly, or return
+                the held item first (holding(?agent, ?other) ∧ ?other != ?item)
+              → resulting plan (4 or 6 steps) determines cost
+
+`meta_planner._cost()` needs no `carrying` parameter and no cancellation branch — it
+simply decomposes each candidate via `planner.py` and counts the resulting actions.
+It does not know, and does not need to know, why one candidate came back longer than
+another. This also collapses the paper's CONTINUATION vs. RESELECT split into the same
+mechanism: if the candidate is the task the held item belongs to, `not_equal` fails,
+the plain method runs, no extra cost; if it's a different task, the guard fires and the
+return steps are already counted in that candidate's own plan length. See DESIGN-09 for
+the separate, still-open question of whether to run this evaluation for every candidate
+on every trigger, or apply a cheap pre-check first.
+Validated (not just designed): `robot.carrying` seeded before a `scenario_00` run
+produced a 6-action `AbstractPlan` (vs. the normal 4) with the correct return-to-shelf-first
+ordering, with no regression to the ordinary path in a separate unmodified run.
 
 **IR runs from t=0 with uniform prior; meta_planner gates action on confidence θ**
 The recognizer updates belief every cognitive clock tick from the start of simulation.
