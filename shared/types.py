@@ -139,8 +139,9 @@ class WorldState:
     agent_states: Dict[str, AgentState]  # {agent_id: AgentState}
     agent_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {agent_id: (x, y)}
     object_locations: Dict[str, str] = field(default_factory=dict)  # {item_id: location_id} 
-    object_zones: Dict[str, str] = field(default_factory=dict)  # {item_id: zone_id}
     predicates: Set[Predicate] = field(default_factory=set)  # e.g., "path_clear", "human_at_table"
+    object_zones: Dict[str, str] = field(default_factory=dict)  # {item_id: zone_id}
+    object_home_container: Dict[str, str] = field(default_factory=dict)  # {item_id: container_id} — static per scenario, set once at load, never updated as item moves (unlike object_locations/object_zones)
     object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — env objects + items, for IR direction reasoning
     metadata: Dict[str, Any] = field(default_factory=dict)
 
