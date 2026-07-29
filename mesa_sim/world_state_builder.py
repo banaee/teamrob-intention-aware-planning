@@ -86,6 +86,7 @@ def build_world_state(model: SimModel) -> WorldState:
     agent_positions: Dict[str, Tuple[float, float]] = {}
     object_locations: Dict[str, str] = {}
     object_zones: Dict[str, str] = {}
+    object_home_container: Dict[str, str] = {}
     object_positions: Dict[str, Tuple[float, float]] = {}
     predicates: Set[Predicate] = set()
 
@@ -164,6 +165,9 @@ def build_world_state(model: SimModel) -> WorldState:
             object_locations[obj_id] = location
             predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
             object_zones[obj_id] = zone
+            object_home_container[obj_id] = obj.home_container   # obj.home_container itself never mutates after load, 
+                                                                 # but the WorldState dict is still refreshed here each call, 
+                                                                 # like object_zones/object_locations above
             object_positions[obj_id] = tuple(obj.position)
         else:
             # Fixed object — direct position/zone, no held_by/at_location semantics.
@@ -192,6 +196,7 @@ def build_world_state(model: SimModel) -> WorldState:
         agent_positions=agent_positions,
         object_locations=object_locations,
         object_zones=object_zones,
+        object_home_container=object_home_container,
         object_positions=object_positions,
         predicates=predicates,
     )

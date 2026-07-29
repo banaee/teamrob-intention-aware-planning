@@ -65,7 +65,11 @@ class SimObject:
                                  # "initial_container" (items/pallets); never
                                  # mutated afterward. Distinct from at_location/
                                  # held_by, which change during carrying.
-
+    home_container: Optional[str] = None  # set once at load time from
+                                 # "initial_container" — the item's origin shelf/bay.
+                                 # None for non-portable objects. Never mutated
+                                 # afterward, unlike at_location/held_by.
+                                 
 # =============================================================================
 # SimModel
 # =============================================================================
@@ -136,6 +140,16 @@ class SimModel(model.Model):
 
         self._spawn_agents(scenario)
 
+
+        # MY_TEST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+        # manually seed robot_0 as already carrying item_6 (its own second      #
+        # assigned task's item) at t=0, to trigger deliver_with_return on the   #
+        # first task (item_4). Temporary hack for testing, not permanent.       #
+        # self.robots["robot_0"].carrying = "item_6"                              #                              
+        # self.objects["item_6"].held_by = "robot_0"                              #
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+
         # ------------------------------------------------------------------
         # DataCollector
         # ------------------------------------------------------------------
@@ -203,7 +217,9 @@ class SimModel(model.Model):
                 is_empty=obj.get("is_empty", False),
                 is_scanned=obj.get("is_scanned", False),
                 is_portable=True,  # items/pallets are portable, even if not currently held
+                home_container=container_id,   # set once at load time, never mutated afterward
             )
+            # print(f"Loaded portable object {obj['id']} with home_container {container_id}")
 
         # Build type → instance-ids registry, feeds IR's hypothesis space
         for obj_id, obj in self.objects.items():
