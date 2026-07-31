@@ -252,6 +252,17 @@ updated from `go_to_office` to `office_break`.
 Files: domains/dock_loading/tasks.py, domains/dock_loading/scenarios.py, domains/dock_loading/registry.py
 Reference: Phase 4C typed-parameter generalization session
 
+**TODO-26 — `HypothesisKey` documented in io_contracts.md §1.8 as a shared/types.py
+dataclass; actually a hand-written class in shared/recognizer.py** (no `@dataclass`
+decorator, manual `__eq__`/`__hash__`/`__repr__`). Doc corrected to reflect actual
+location (see §1.8). Open question for later, not blocking: should it move to
+types.py as a real dataclass for consistency with every other cross-boundary type
+(BeliefState, ProjectedPlan, etc.), or is recognizer-internal placement fine since
+it's only exposed externally via get_hypothesis()? Not needed for meta_planner.py
+work — get_hypothesis()'s return type is unaffected either way.
+Files: shared/recognizer.py, shared/io_contracts.md
+Reference: Phase 4C meta_planner build session, July 2026
+
 ---
 
 ## 🏗️ Design TODOs

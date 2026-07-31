@@ -223,6 +223,11 @@ executor boundary. `ProjectedPlan` never does.
 
 ### 1.8 `HypothesisKey`
 
+**Defined in `shared/recognizer.py`, not `shared/types.py`** — a hand-written class
+(not a `@dataclass`), despite living in this "canonical types" document. Documented
+here because it crosses the recognizer → meta_planner boundary via `get_hypothesis()`.
+See TODO-26 for the open question of whether it should move to `types.py`.
+
 **Used by `IntentionRecognizer`** to represent one point in the hypothesis space — a
 specific (task, parameter-binding) combination the recognizer tracks belief over.
 
@@ -235,6 +240,39 @@ class HypothesisKey:
 
 One `HypothesisKey` exists per combination in the cartesian product of a task's
 `parameter_types` over `known_objects_by_type` — see `build_hypothesis_space()`, §2.1.
+
+---
+
+### 1.9 `ExecutorState`, `TriggerDecision`, `UpdateResult`
+
+**`ExecutorState`** — single immutable per-tick snapshot, built once per cognitive-clock
+event and passed to both `evaluate_triggers()` and `update()` so they never independently
+re-derive robot state and drift apart.
+
+```python
+@dataclass
+class ExecutorState:
+    agent_id: str
+    current_task: Optional[TaskInstance]
+    holding: Optional[str]                 # item_id or None
+```
+
+**`TriggerDecision`** / **`UpdateResult`** — typed returns for `MetaPlanner`'s two public
+methods (§2.2), replacing an earlier dict-shaped draft inherited from `replanning.py`'s
+`should_replan()`. Kept consistent with every other cross-boundary type in this file.
+
+```python
+@dataclass
+class TriggerDecision:
+    replan: bool
+    reason: str
+    score: Optional[float] = None
+
+@dataclass
+class UpdateResult:
+    current_task: TaskInstance
+    queue: List[TaskInstance]
+```
 
 ---
 
@@ -301,17 +339,20 @@ signatures.
 
 #### Constructor
 ```python
-MetaPlanner(knowledge: DomainKnowledgeBase)
+MetaPlanner(knowledge: DomainKnowledgeBase, theta: float = 0.75)
 ```
-Owns the task queue internally (Q1) — not passed in on each call.
+Owns the task queue internally (Q1) — not passed in on each call. `theta` is a cognitive-
+clock policy parameter (DESIGN-07), kept as an explicit constructor default rather than
+read from `costs.yaml` — `costs.yaml` holds domain-specific step costs, a different concern
+from IR confidence-gating.
 
 #### Evaluate Triggers
 ```python
 evaluate_triggers(
     belief: BeliefState,
     world: WorldState,
-    executor_state,                        # type TBD — robot's current execution snapshot
-) -> dict                                  # {"replan": bool, "reason": str, "score": float}
+    executor_state: ExecutorState,
+) -> TriggerDecision
 ```
 Absorbs `replanning.py`'s trigger role (§2.2a). Event-driven only — task completion, belief
 threshold θ crossed (single threshold θ=0.75, no hysteresis), or task commit (holding state
@@ -322,8 +363,8 @@ change). Confidence is a gate here, never a magnitude fed into `_cost()`.
 update(
     belief: BeliefState,
     world: WorldState,
-    executor_state,
-) -> dict                                  # {"current_task": TaskInstance, "queue": List[TaskInstance]}
+    executor_state: ExecutorState,
+) -> UpdateResult
 ```
 `current_task` competes as just another candidate — no special-case WAIT/RESELECT branch;
 continuation vs. reselection falls out of cost comparison across the full candidate set.

@@ -434,5 +434,65 @@ class ProjectedPlan:
     task_queue: List[str]               # task instance IDs in projected order
     entries: List[ProjectedPlanEntry]
     total_estimated_cost: int           # sum of durations + any inter-task gap steps
-    
-    
+
+
+@dataclass
+class ConflictPoint:
+    """
+    A single observed spatial/temporal overlap between the robot's projected
+    trajectory and the human's predicted trajectory.
+    Purely observational — carries no cost/penalty judgment.
+    """
+    step: int
+    zone: str
+
+
+@dataclass
+class InterferenceAssessment:
+    """
+    Output of meta_planner._detect_interference() for one candidate ordering.
+    feasible: hard exclusion — True unless a conflict makes the ordering
+              impossible to execute as projected (e.g. required resource
+              occupied by predicted human position).
+    conflicts: all observed overlap points, feasible or not. _cost() is the
+               sole place that turns these into a numeric penalty — keeps
+               detection (what happened) separate from valuation (how bad
+               is it), per DESIGN-08's requirement that team-level cost
+               extensions not require meta_planner redesign.
+    """
+    feasible: bool
+    conflicts: List[ConflictPoint] = field(default_factory=list)
+
+
+@dataclass
+class ExecutorState:
+    """
+    Single immutable per-tick snapshot passed to both evaluate_triggers() and
+    update() so they never independently re-derive robot state and drift apart.
+    """
+    agent_id: str
+    current_task: Optional["TaskInstance"]
+    holding: Optional[str]   # item_id or None — convenience snapshot for evaluate_triggers()'s
+                              # tick-to-tick task-commit detection; WorldState.predicates carries
+                              # the same fact per-agent but is rebuilt fresh each tick with no
+                              # memory to compare against
+
+
+@dataclass
+class TriggerDecision:
+    """Return type of MetaPlanner.evaluate_triggers()."""
+    replan: bool
+    reason: str
+    score: Optional[float] = None
+
+
+@dataclass
+class UpdateResult:
+    """Return type of MetaPlanner.update().
+    Note: current_task/queue are quoted forward refs ("TaskInstance") since 
+    TaskInstance is defined earlier in the TASK KNOWLEDGE TYPES section, 
+    above PLANNING TYPES — matching the existing pattern already used 
+    for "AbstractPlan" in ProjectedPlanEntry.
+    """
+    current_task: "TaskInstance" 
+    queue: List["TaskInstance"]
