@@ -39,13 +39,15 @@
 The robot operates with two planning levels and one recognition module, all in `shared/`:
 
 **Module structure:**
+
 - `shared/recognizer.py` — Bayesian IR (replaces dummy)
 - `shared/meta_planner.py` — NEW: task scheduling, candidate generation, cost evaluation, reordering decisions
 - `shared/planner.py` — HTN decomposer (called by meta_planner per task; replaces flat method grounder)
 - `shared/replanning.py` — to be absorbed into meta_planner (retire after migration)
 
 **Key design decisions for Phase 4:**
-- Robot receives `assigned_tasks` as an **unordered set**, not a pre-ordered list. Initial queue `Q0` is produced by meta_planner at t=0 using base-cost heuristic (no IR evidence yet).
+
+- Robot's `scheduled_tasks` list order carries no semantic commitment (see design_decisions.md) — it's the same field type/name as the human agent's, just not consumed as a schedule. Initial queue `Q0` is produced by the same update() mechanism used for every later reorder: evaluate_triggers()'s "no current task" condition fires on the first call, no IR confidence required to run it (IR runs from t=0 with a uniform prior regardless). No separate base-cost heuristic.
 - `planner.py` becomes a true recursive HTN decomposer: if a StepCall names a TaskSchema (not a primitive ActionSchema), it recurses. Output remains a flat `AbstractPlan` (single task, executor-facing).
 - `meta_planner.py` owns task ordering. It calls `planner.py` per candidate ordering to project action sequences, evaluates costs, and selects the best queue. HTN does not schedule — it only decomposes.
 - A new `ProjectedPlan` type (see DESIGN-06) spans the full task queue for lookahead reasoning. It is never handed to the executor — it is the meta_planner's internal reasoning structure.
@@ -53,6 +55,7 @@ The robot operates with two planning levels and one recognition module, all in `
 - Cancellation of a held-item task is handled by HTN method selection, not a meta_planner cost term — see design_decisions.md.
 
 **Phase 4A — IR: Bayesian belief updating** ✅ COMPLETE, validated against scenario_00
+
 - Real likelihood model implemented: schema-driven dispatch via
   `PROGRESS_EVALUATORS` registry (shared/likelihood_functions.py) — no
   hardcoded microaction strings in recognizer.py
@@ -65,11 +68,13 @@ The robot operates with two planning levels and one recognition module, all in `
   verified against scenario_00 (200 steps, no regression)
 
 **Phase 4B — HTN: recursive decomposition in planner.py** ✅ COMPLETE
+
 - Recursive decomposer with real guard evaluation, derived variable
   resolution, `?agent` binding propagation
 
 **Phase 4C — MetaPlanner: scheduling + interference detection + cost comparison** 🔲 NOT STARTED
 Design questions resolved (session ending July 2026), implementation not yet begun:
+
 - Q1: `MetaPlanner` owns the task queue internally (not passed externally)
 - Q2: human task projection uses `recognizer.get_hypothesis()` to resolve
   `belief.most_likely` back to its `HypothesisKey` (task_name + bindings) —
@@ -82,7 +87,11 @@ Design questions resolved (session ending July 2026), implementation not yet beg
   end-to-end against scenario_00, then retired in one commit
 - Separate from Q1–Q4 (not itself numbered): current_task competes as just
   another candidate in every `update()` call — no special-case WAIT/RESELECT
-  branch. Continuation vs. reselection falls out of cost comparison across
+  branch.
+- Also separate from Q1–Q4: Q0 (t=0 initial ordering) uses no bespoke heuristic —
+  it's the same update()/evaluate_triggers() mechanism, triggered by "no current
+  task" rather than belief/completion. See design_decisions.md.  
+- Continuation vs. reselection falls out of cost comparison across
   the full candidate set. Previously undocumented despite being decided; now
   written down after cross-checking against an alternative branch-based
   implementation during the Fatemeh code review.

@@ -235,12 +235,21 @@ uniform-candidate design closes off a class of bugs the branch-based version had
 found that this design doesn't already handle.
 Files: shared/meta_planner.py (Phase 4C)
 
-**Robot receives assigned_tasks as an unordered set**
-The robot's tasks are declared as a set in `AgentConfig` — no implicit ordering.
-The meta_planner generates the initial queue Q0 at t=0 using a base-cost heuristic
-(nearest item first, or similar) with a null/uniform belief state.
-This makes the scenario file honest: it declares *what* the robot must do, not *how*
-to sequence it. The human agent retains an ordered list (scripted ground truth).
+**Robot's `scheduled_tasks` order is a scenario-authoring convenience, not a schedule**
+Both agent types use the same `AgentConfig.scheduled_tasks` field — no separate
+unordered-set type, no field split by agent_type. For the robot, list order carries
+no semantic commitment: it's a fallback/hint for how the scenario file reads, never
+consumed as an execution order (see below, "scenario file's robot scheduled_tasks
+order"). Q0 — the real initial ordering — is produced by the identical mechanism
+used for every later reorder: evaluate_triggers()'s "no current task" condition
+fires unconditionally the first time update() is called (the agent has no
+current_task yet), running the normal enumerate → project → detect interference →
+cost pipeline over the full task pool. No separate base-cost heuristic exists —
+an earlier design considered one and it was superseded once current_task-as-
+candidate (below) made a bespoke t=0 heuristic redundant with the mechanism
+already needed for every mid-run reorder. The human agent's list remains genuinely
+ordered (scripted ground truth) — this asymmetry is agent_type-driven, not
+field-driven.
 
 **AbstractPlan vs ProjectedPlan — two distinct types**
 `AbstractPlan`: single task, executor-facing. Output of `planner.py` (HTN decomposer).
