@@ -34,7 +34,10 @@ The cognitive layer reasons only over predicates (zone, holding, task_progress, 
 
 **3. Simulators decide WHEN to call core — core decides WHAT to do**
 Mesa calls the cognitive chain every step.
-ROS calls it periodically or event-driven.
+ROS calls it event-driven, tied to cognitive-layer events (task completion, belief
+threshold, etc.) — never on a fixed timer, and never derived from its own
+motion-clock tick rate (see Three-clock architecture below). A concrete case of
+this anti-pattern was found when reviewing an alternative ROS implementation.
 Core never runs its own loop. It is a stateless service called by the simulator.
 
 **4. ROS must discretize sensor streams into micro-actions before calling IR**
@@ -220,6 +223,18 @@ estimates to evaluate candidate orderings. These are strictly separate responsib
 Introducing a top-level `DELIVER_ALL` HTN task was considered and rejected: it would
 force scheduling logic inside HTN, losing IR visibility and making replanning expensive.
 
+**Current task competes as just another candidate — no special WAIT/RESELECT branch**
+meta_planner's candidate set for every update() call is {current_task} ∪
+remaining_tasks — current_task receives no special-case path distinct from other
+candidates. Continuation vs. reselection falls out of cost comparison across the
+full candidate set, not a separate "should I abandon this?" decision with its own
+branch logic. Cross-checked against an alternative two-branch implementation
+(separate WAIT/RESELECT cost paths) during the Fatemeh code review — the
+uniform-candidate design closes off a class of bugs the branch-based version had
+(an asymmetric cost term only one branch paid, an unused duration field); no gap
+found that this design doesn't already handle.
+Files: shared/meta_planner.py (Phase 4C)
+
 **Robot receives assigned_tasks as an unordered set**
 The robot's tasks are declared as a set in `AgentConfig` — no implicit ordering.
 The meta_planner generates the initial queue Q0 at t=0 using a base-cost heuristic
@@ -290,6 +305,13 @@ It does not wait for "enough" observations. The meta_planner uses a confidence t
 θ to gate reordering decisions: below θ, the current queue is maintained; above θ,
 candidate evaluation is triggered. This gives continuous reasoning without premature
 reordering on weak evidence.
+Confidence functions as a gate only — it determines *whether* candidate evaluation
+runs, never feeds into `_cost()` as a magnitude (e.g. scaling an interference term
+by belief probability). This distinction was implicit rather than stated; made
+explicit after reviewing an alternative implementation that fed decayed belief
+directly into cost as a multiplier. Whether *horizon-projected* confidence (for
+tasks further down a multi-task candidate ordering) should ever feed cost is a
+separate, deliberately open question — see TODOS_AND_DEFERRED.md DESIGN-12.
 
 **Prediction horizon H bounds the lookahead**
 IR produces a predicted human action sequence with confidence decaying over horizon H.

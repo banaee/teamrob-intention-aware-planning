@@ -80,6 +80,12 @@ Design questions resolved (session ending July 2026), implementation not yet beg
   `shared/` decoupled from simulator step-size config
 - Q4: `replanning.py` held (wired in parallel) until Phase 4C validates
   end-to-end against scenario_00, then retired in one commit
+- Separate from Q1–Q4 (not itself numbered): current_task competes as just
+  another candidate in every `update()` call — no special-case WAIT/RESELECT
+  branch. Continuation vs. reselection falls out of cost comparison across
+  the full candidate set. Previously undocumented despite being decided; now
+  written down after cross-checking against an alternative branch-based
+  implementation during the Fatemeh code review.
 - DESIGN-07 resolved: single threshold θ=0.75, no hold-last-decision
   hysteresis — confidence is gate-only, doesn't feed the cost function
 - Cancellation resolved: not a meta_planner cost term. `deliver_item` gets a
@@ -102,6 +108,15 @@ Design questions resolved (session ending July 2026), implementation not yet beg
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
 - No structural change to executor interface; hints richer than current skeleton
+- Now scoped more concretely via DESIGN-13 (see TODOS_AND_DEFERRED.md): a
+  common, non-committed path-realization estimator called from
+  `_estimate_duration`, handling both pause and detour as outcomes of one
+  call driven by a conflict hint from `_detect_interference`. For Mesa, this
+  estimator can also serve as real execution-time realization (replacing
+  straight-line `steps_toward`), collapsing cost-time and execution-time
+  path realization into one function. ROS keeps a two-tier split (this
+  estimator for cost estimation, PRIEST for real execution) — still a
+  dedicated design session away from being built
 
 ### Prerequisites before implementation
 
@@ -127,3 +142,11 @@ Design questions resolved (session ending July 2026), implementation not yet beg
 - Core `shared/` requires no modification for ROS integration
 - Architectural interface already defined in `shared/io_contracts.md`
 - Note: Phase 4 may add fields to `BeliefState` and introduce `ProjectedPlan` — ROS team should not build tightly against current `AbstractPlan` shape
+- Before implementation: cognitive-clock trigger must be event-driven, never
+  a fixed timer or derived from the motion-clock (PRIEST) tick rate; and the
+  RESELECT/WAIT (or equivalent) decision must be made once, in `shared/` —
+  the embodiment layer must only execute the returned decision, never run a
+  parallel heuristic capable of independently producing or short-circuiting
+  it. Both constraints surfaced concretely reviewing an early ROS
+  integration attempt; see TODOS_AND_DEFERRED.md (NOTE on DESIGN-07, and the
+  single-decision-path NOTE) before starting ros_sim/.

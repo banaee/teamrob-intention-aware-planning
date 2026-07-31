@@ -105,6 +105,8 @@ Reference: TODO in tasks.py comments
 **TODO-09 — Path planning: replace straight-line STEP* with obstacle-aware planning**
 Currently `action_decomposer.steps_toward()` uses straight-line interpolation.
 Agents walk through walls and obstacles. Replace with A* or RRT in Phase 4.
+See DESIGN-13 for the broader plan: this becomes Mesa's use of the common
+non-committed path-realization estimator, not a Mesa-only fix.
 Files: `mesa_sim/action_decomposer.py`
 Reference: Phase 4D
 
@@ -210,6 +212,46 @@ dedicated session with a controlled test isolating post-task-completion belief b
 Files: `shared/recognizer.py`
 Reference: cancellation-mechanism validation session, follow-up to TODO-18
 
+**TODO-22 — Move `SimObject` from `mesa_sim/sim_model.py` to `shared/types.py`**
+Currently kept in sim_model.py for expediency during the env_objects/items merge.
+Should eventually live in shared/types.py — it's simulator-agnostic (generic
+spatial object + runtime state), and the ROS embodiment will need the same shape.
+Files: mesa_sim/sim_model.py → shared/types.py
+Reference: Phase 4 design session, July 2026
+
+**TODO-23 — `TaskSchema.parameter_types` declared at task level, not method level**
+Typed-parameter enumeration (?item → "item" type, etc.) declared once per
+TaskSchema. If a task ever needs different methods to target different object
+types (e.g. deliver_pallet's two methods needing different destination types),
+revisit and move parameter_types to MethodSchema instead.
+Files: shared/types.py
+Reference: Phase 4 design session, July 2026
+
+**TODO-24 — `"obstacle"` type still hardcoded in `world_state_builder.py`**
+`_add_proximity_predicates()` skips objects where `type == "obstacle"` — same
+class of domain-string hardcoding as the old `"?item"` check, left in as a
+judgment call (treated as a shared physics/rendering category, not a
+domain-semantic label). Not rigorously justified.
+General fix: derive "is this type ever a valid task target" from whether the
+object's `type` appears anywhere in any TaskSchema.parameter_types.values()
+for the active domain, rather than a hardcoded string comparison. Bigger,
+cross-cutting mechanism — needs its own design, not an inline fix.
+Files: mesa_sim/world_state_builder.py (_add_proximity_predicates)
+Reference: Phase 4 design session, July 2026
+
+**TODO-25 — dock_loading typed-parameter integration: not reviewed** [deferred]
+`dock_loading/tasks.py`/`scenarios.py` were manually updated in parallel with
+the kitting typed-parameter work (?pallet/?delivery_bay, office_break rename,
+parameter_types added to deliver_pallet/load_return/coffee_break) but not
+reviewed against the same rigor as kitting. Known issue: `confirm_delivered_pallet`
+TaskSchema is missing `parameter_types` and its `parameters` list (`[_pallet]`
+only) doesn't match `scenarios.py`, which binds both `?pallet` and
+`?delivery_bay` to it — `?delivery_bay` isn't declared on the schema or used
+in its step_calls. Also unconfirmed: whether `registry.py`'s import was
+updated from `go_to_office` to `office_break`.
+Files: domains/dock_loading/tasks.py, domains/dock_loading/scenarios.py, domains/dock_loading/registry.py
+Reference: Phase 4C typed-parameter generalization session
+
 ---
 
 ## 🏗️ Design TODOs
@@ -277,6 +319,40 @@ Open / to settle before Phase 4C implementation:
 Files: `shared/meta_planner.py` (Phase 4 new), `shared/replanning.py`
 Reference: Phase 4 design session
 
+**NOTE on DESIGN-07 — cognitive clock trigger must be event-driven, not periodic**
+Confirmed requirement for `evaluate_triggers()` and any future `ros_sim/`
+implementation: the cognitive-clock trigger must not run on a fixed timer, and
+specifically must not be derived arithmetically from the motion-clock tick
+rate. A periodic poll is the easy default in ROS (rclpy timers), so this needs
+to be an explicit, stated constraint rather than left implicit — a concrete
+case of exactly this pattern was observed during the Fatemeh code-review
+session.
+Files: shared/meta_planner.py (evaluate_triggers), ros_sim/ (future), ros_sim_guideline.md
+Reference: Fatemeh code review session
+
+**NOTE — single decision path requirement (no parallel shortcut logic in embodiment layer)**
+Design rule for `evaluate_triggers()`/`update()` and any embodiment
+integration: the RESELECT/WAIT (or equivalent) decision must be made once,
+inside `shared/`, and the embodiment layer must only execute the returned
+decision — it must not run its own parallel heuristic capable of
+independently producing or short-circuiting that decision. State this
+explicitly in `ros_sim_guideline.md` before `ros_sim/` integration work
+begins, so a "temporary" fallback path doesn't end up being the only path
+that actually fires.
+Files: shared/meta_planner.py, ros_sim/ (future), ros_sim_guideline.md
+Reference: Fatemeh code review session
+
+**NOTE — current-task-as-candidate design confirmed sufficient** (not Q1 —
+Q1 is queue ownership, see roadmap.md Phase 4C; this is a separate,
+previously unlabeled principle)
+This design (current task competes as just another candidate through the
+same cost pipeline, no special WAIT/RESELECT branch) was cross-checked against
+an alternative two-branch implementation encountered during the Fatemeh code
+review and holds up — no gap found that the uniform-candidate approach doesn't
+already close. No further action; noted for continuity.
+Files: shared/meta_planner.py (Phase 4C)
+Reference: Fatemeh code review session
+
 **DESIGN-08 — Team-level semantic costs in cost function (parked)**
 Current cost function is purely step-based (Mesa steps / ROS seconds).
 Future extension: incorporate team-level costs — human waiting time, shared resource
@@ -284,7 +360,6 @@ conflicts, task dependency violations. Deferred to post-Phase 4; keep in mind wh
 defining cost function interface in meta_planner so extension does not require redesign.
 Files: `shared/meta_planner.py` (Phase 4 new)
 Reference: Phase 4 design session
-
 
 **DESIGN-09 — Pre-RESELECT cheap filter, separate from candidate cost calc** [Phase 4C, parked]
 Cancellation cost is computed intrinsically by planner.py (guarded HTN method on
@@ -297,6 +372,148 @@ minimize? Related to DESIGN-07's θ hysteresis question but distinct: DESIGN-07 
 candidate enumeration or short-circuits early.
 Files: `shared/meta_planner.py` (Phase 4C, `_detect_interference`)
 Reference: Phase 4C design session, cancellation-mechanism discussion
+
+**DESIGN-10 — Interference-detection sampling granularity** [Phase 4C, parked until _detect_interference implementation]
+Two candidate approaches surfaced reviewing an alternative endpoint-only
+implementation: (a) per-GroundedAction-goal points only (cheap, matches a
+coarse endpoint-based pre-filter — see DESIGN-11 — may miss mid-action
+conflicts on long moves), (b) resampled points along each action's projected
+path (catches mid-action conflicts, cost/complexity depends on resampling
+rate). This is distinct from DESIGN-09 (which decides WHEN detection runs) —
+this decides WHAT granularity detection operates at once it runs. Producing
+comparable (time-or-step, position/zone) samples from each backend's
+simulation is a solved, per-embodiment concern (same pattern as
+ProcessCompletion) and not the open part; the open part is which points along
+the sequence shared/ should treat as points of interest. Decide against
+actual ProjectedPlan/AbstractPlan structure once built, not abstractly.
+Files: shared/meta_planner.py (Phase 4C, _detect_interference), shared/types.py (ProjectedPlan)
+Reference: Fatemeh code review session, cost-function comparison
+
+**DESIGN-11 — Endpoint-proximity pre-filter for interference detection (candidate)** [Phase 4C, parked]
+Cheap first-pass option for DESIGN-09's pre-RESELECT filter: check whether a
+candidate's final goal position lands near the human's predicted destination
+(single point-in-radius comparison) before running full step-wise
+_detect_interference() on that candidate. Proposed only as a coarse
+pre-filter, not the detection mechanism itself. Candidates that clear this
+check trivially skip full enumeration; candidates that don't still get the
+real check.
+Files: shared/meta_planner.py (Phase 4C, _detect_interference)
+Reference: Fatemeh code review session, cost-function comparison
+
+**NOTE on DESIGN-09/DESIGN-11 — pre-filter must stay domain-agnostic**
+in_zone-based pre-filtering was considered and rejected: zone granularity is
+too coarse to usefully narrow candidates before full interference detection,
+and building the pre-check around zone/layout specifics would mean
+customizing shared/ logic to how a particular environment is laid out —
+against the mind/body separation principle. Any pre-filter (see DESIGN-11)
+must work from generic position/prediction data only, not domain- or
+layout-aware shortcuts.
+Files: shared/meta_planner.py (Phase 4C)
+Reference: Fatemeh code review session, cost-function comparison
+
+**DESIGN-12 — Horizon-projected confidence as recognizer output, not meta_planner computation** [parked, revisit during IR enhancement]
+Current-moment confidence already flows to planning as-is: BeliefState
+(confidence, most_likely, distribution) is the object MetaPlanner.update()
+receives, and DESIGN-07's θ-gate reads directly from it. Not a gap.
+
+Open, distinct question: multi-task candidate cost evaluation (queue-wide
+lookahead) needs confidence-at-a-future-horizon for tasks further down a
+candidate ordering, where no real observation exists yet — a genuinely
+different need from the live θ-gate, which only ever reads current
+confidence. Surfaced reviewing an alternative implementation that fed a
+decayed probability directly into cost as a magnitude — conflicting with
+DESIGN-07's "confidence is a gate only, never feeds the cost function
+itself," though that resolution was scoped to the live trigger and doesn't
+by itself resolve this case.
+
+Leaning: if built, this belongs as an attribute/output of recognizer.py
+(e.g. an extended get_hypothesis()/projection call returning confidence-at-
+horizon), not as decay math reimplemented inside meta_planner or cost
+functions — belief evolution over an unobserved horizon is a property of
+the belief distribution itself, not a planning computation. Keeps
+meta_planner a pure consumer of whatever recognizer hands it, same pattern
+as ProcessCompletion for embodiment mechanics.
+
+Deliberately left open rather than decided now — revisit when IR is
+enhanced, not before. Do not implement local belief-decay math in
+meta_planner/costs in the meantime.
+Files: shared/recognizer.py, shared/meta_planner.py (Phase 4C)
+Reference: Fatemeh code review session, cost-function comparison
+
+**DESIGN-13 — Common non-committed path-realization estimator ("action-estimator" adaptor)** [Phase 4C, parked — dedicated design session needed]
+Surfaced from the pause/detour cost discussion (DESIGN-10/11 context): a
+common, cheap, non-committed path-planning estimator, used by BOTH backends
+during cost estimation (called from _estimate_duration in meta_planner),
+and additionally by Mesa as its real execution-time path realization
+(replacing the Phase 4 TODO in mesa_sim/action_decomposer.py's
+steps_toward — currently pure straight-line, no obstacle awareness; see
+TODO-09). ROS keeps a two-tier split: this same cheap estimator for cost
+estimation, but real execution still uses PRIEST (GPU CEM optimization) —
+deliberately not unified on the ROS side, since PRIEST is heavy/stateful and
+running it speculatively per candidate is not viable. This means
+estimator-vs-actual divergence is an accepted, known gap on ROS specifically
+(estimate from the common estimator vs. what PRIEST actually produces) — not
+something this design eliminates.
+
+Scope for this estimator, not yet designed — separate dedicated session
+needed to build a skeleton and later the actual algorithm:
+  - Not shared/-resident: needs real geometry (obstacles, walls), so must
+    be implemented once and exposed per-backend through each backend's own
+    adapter (Mesa/ROS), same pattern as layout_adapter — shared/ only ever
+    calls through the adapter interface, never owns the algorithm.
+  - Must handle both pause (temporal wait for a predicted-occupancy
+    conflict to clear) and detour (spatial reroute around a static or
+    moving obstacle) as outcomes of the SAME call — shared/ passes a
+    conflict hint (what/where/when, derived from its own ProjectedPlan /
+    _detect_interference), not a pre-decided pause-or-detour instruction.
+    The estimator decides which resolution (or combination) fits, not
+    shared/.
+  - Return contract (interface, not implementation): should return both
+    (a) a generated feasible trajectory/step-sequence and (b) its
+    estimated cost — not just a cost number. Confirm this exact shape in
+    the dedicated session; noted here so it isn't lost.
+  - Open sub-question, not yet decided: whether the estimator should be
+    parameterized with the same kinematic limits PRIEST respects (v_max,
+    a_max) to narrow the estimate-vs-PRIEST gap on ROS, vs. staying purely
+    geometric (e.g. A*/RRT-lite with no kinematic modeling). Deferred to
+    the dedicated session, not a blocker for scoping the interface now.
+  - Mesa-specific note: for Mesa, since real execution can use this same
+    estimator's output directly, cost-estimation-time and execution-time
+    path realization collapse into one function — no separate "light" vs
+    "real" tier needed on Mesa, unlike ROS. A separate, more optimized
+    Mesa-specific realizer is possible later but not needed now.
+
+Explicitly NOT the place to design the algorithm itself (A*, RRT, or
+otherwise) — this entry captures role/interface/scope only. Algorithm
+design deferred to its own dedicated chat/session.
+Files: shared/meta_planner.py (_estimate_duration), mesa_sim/action_decomposer.py
+(steps_toward), mesa_sim/layout_adapter.py, ros_sim/ (future, PRIEST integration)
+Reference: Fatemeh code review session, pause/detour/path-realization discussion
+
+**DESIGN-14 — Dynamic object registry (future)**
+Object-by-type registry is static-at-construction for now (built once from
+layout JSON). If a scenario ever needs objects to appear/disappear mid-run
+(e.g. robot breakdown, new task becoming available), this requires redesigning
+IntentionRecognizer's belief update — currently assumes fixed hypothesis-space
+size (BELIEF_FLOOR renormalization, uniform prior denominator). Not just a
+registry change — inserting a hypothesis mid-run with no accumulated evidence
+needs its own design (what prior does it get?).
+Files: shared/recognizer.py, object registry (wherever it lands)
+Reference: Phase 4 design session, July 2026
+
+**DESIGN-15 — `office_break`: unresolved design questions (parked)** [was: go_to_office]
+Task renamed from `go_to_office` to `office_break` (dock_loading). Three open
+questions before this task is reliable:
+1. `parameter_types={"?office_chair": "office_chair"}` doesn't match the
+   office_chair object's actual "type": "chair" in env_layout1.json — one
+   needs to change to match the other before this task can enumerate.
+2. `door_is_open` guard has no fallback method and no confirmed emitter in
+   world_state_builder.py — same unresolved-predicate class as gate_is_open
+   (TODO-02). If never true, office_break has zero applicable methods.
+3. Method ends by moving the human to dock_gate rather than returning to a
+   neutral spot — confirm this is deliberate before relying on it.
+Files: domains/dock_loading/tasks.py, mesa_sim/world_state_builder.py
+Reference: Phase 4 design session, July 2026
 
 ---
 
@@ -326,7 +543,7 @@ Updated in this session.
 
 **LIMIT-01 — Straight-line agent movement through walls**
 Agents move in straight lines ignoring walls between hall/dock/truck.
-Accepted: same as kitting. Fix deferred to Phase 4 path planning (TODO-09).
+Accepted: same as kitting. Fix deferred to Phase 4 path planning (TODO-09, DESIGN-13).
 
 **LIMIT-02 — Parallel task independence: human scans before robot delivers**
 Human `scan_pallet` executes without waiting for robot `deliver_pallet` to complete.
@@ -348,66 +565,3 @@ until BUG-01 and BUG-02 are resolved and full scenario runs end-to-end.
 Robot's `scheduled_tasks` is currently an ordered list in `AgentConfig`.
 Ordering should be the meta_planner's responsibility. Accepted for Phases 1–3;
 fix in Phase 4 via TODO-14.
-
----
-### NEW TODOs (from Phase 4 design session, July 2026)
-
-**TODO — move SimObject from mesa_sim/sim_model.py to shared/types.py**
-Currently kept in sim_model.py for expediency during the env_objects/items merge.
-Should eventually live in shared/types.py — it's simulator-agnostic (generic
-spatial object + runtime state), and ROS embodiment will need the same shape.
-Files: mesa_sim/sim_model.py → shared/types.py
-
-**TODO — dynamic object registry (future)**
-Object-by-type registry is static-at-construction for now (built once from
-layout JSON). If a scenario ever needs objects to appear/disappear mid-run
-(e.g. robot breakdown, new task becoming available), this requires redesigning
-IntentionRecognizer's belief update — currently assumes fixed hypothesis-space
-size (BELIEF_FLOOR renormalization, uniform prior denominator). Not just a
-registry change — inserting a hypothesis mid-run with no accumulated evidence
-needs its own design (what prior does it get?).
-Files: shared/recognizer.py, object registry (wherever it lands)
-
-**TODO — TaskSchema.parameter_types declared at task level, not method level**
-Typed-parameter enumeration (?item → "item" type, etc.) declared once per
-TaskSchema. If a task ever needs different methods to target different object
-types (e.g. deliver_pallet's two methods needing different destination types),
-revisit and move parameter_types to MethodSchema instead.
-Files: shared/types.py
-
-**TODO — office_break: unresolved design questions (parked)** [was: go_to_office]
-Task renamed from `go_to_office` to `office_break` (dock_loading).
-
-1. `parameter_types={"?office_chair": "office_chair"}` doesn't match the
-   office_chair object's actual "type": "chair" in env_layout1.json — one
-   needs to change to match the other before this task can enumerate.
-2. `door_is_open` guard has no fallback method and no confirmed emitter in
-   world_state_builder.py — same unresolved-predicate class as gate_is_open
-   (TODO-02). If never true, office_break has zero applicable methods.
-3. Method ends by moving the human to dock_gate rather than returning to a
-   neutral spot — confirm this is deliberate before relying on it.
-Files: domains/dock_loading/tasks.py, mesa_sim/world_state_builder.py
-
-**TODO — "obstacle" type still hardcoded in world_state_builder.py**
-`_add_proximity_predicates()` skips objects where `type == "obstacle"` — same
-class of domain-string hardcoding as the old `"?item"` check, left in as a
-judgment call (treated as a shared physics/rendering category, not a
-domain-semantic label). Not rigorously justified.
-General fix: derive "is this type ever a valid task target" from whether the
-object's `type` appears anywhere in any TaskSchema.parameter_types.values()
-for the active domain, rather than a hardcoded string comparison. Bigger,
-cross-cutting mechanism — needs its own design, not an inline fix.
-Files: mesa_sim/world_state_builder.py (_add_proximity_predicates)
-
-**TODO — dock_loading typed-parameter integration: not reviewed** [deferred]
-`dock_loading/tasks.py`/`scenarios.py` were manually updated in parallel with
-the kitting typed-parameter work (?pallet/?delivery_bay, office_break rename,
-parameter_types added to deliver_pallet/load_return/coffee_break) but not
-reviewed against the same rigor as kitting. Known issue: `confirm_delivered_pallet`
-TaskSchema is missing `parameter_types` and its `parameters` list (`[_pallet]`
-only) doesn't match `scenarios.py`, which binds both `?pallet` and
-`?delivery_bay` to it — `?delivery_bay` isn't declared on the schema or used
-in its step_calls. Also unconfirmed: whether `registry.py`'s import was
-updated from `go_to_office` to `office_break`.
-Files: domains/dock_loading/tasks.py, domains/dock_loading/scenarios.py, domains/dock_loading/registry.py
-Reference: Phase 4C typed-parameter generalization session
