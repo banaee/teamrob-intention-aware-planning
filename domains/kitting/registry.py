@@ -1,4 +1,4 @@
-# domains/kitting/domain.py
+# domains/kitting/registry.py
 """
 Assembles the kitting DomainModel from tasks and actions.
 Entry point: build_kitting_domain()

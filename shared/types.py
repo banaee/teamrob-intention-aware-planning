@@ -60,7 +60,9 @@ class BeliefState:
     distribution: Dict[str, float]  # {intention_id: probability}
     most_likely: str  # intention_id with highest probability
     confidence: float  # overall confidence in belief
-    predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}
+    # predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}  
+                            # OUTDATED: current design uses ProjectedPlan for multi-step prediction; 
+                            # this field is retained for backward compatibility but should not be used in new code.
 
 
 
