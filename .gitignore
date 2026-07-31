@@ -29,6 +29,7 @@ Thumbs.db
 
 # anywhere in subdirectories, ignore files starting with "my_"
 **/my_*
+**/archive_*
 
 # anywhere in subdirectories, ignore files starting with "old_"
 **/old_*
