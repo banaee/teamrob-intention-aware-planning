@@ -61,6 +61,23 @@ deliver_item = TaskSchema(
     parameter_types={"?item": "item", "?kitting_table": "kitting_table"},
     methods=[
         MethodSchema(
+            name="deliver_already_held",
+            parameters=[_item, _kitting_table],
+            guards=[
+                ConditionSchema("holding", (_agent, _item)),
+            ],
+            step_calls=[
+                StepCall(
+                    action_name="move_to",
+                    bindings={_target: _kitting_table}
+                ),
+                StepCall(
+                    action_name="place",
+                    bindings={_item: _item, _target: _kitting_table},
+                ),
+            ],
+        ),
+        MethodSchema(
             name="deliver_with_return",
             parameters=[_item, _kitting_table],
             guards=[
