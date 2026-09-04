@@ -13,15 +13,15 @@ AGENTS:
     RobotAgent  — cognitive agent. Each step:
                     1. builds Observation of human via obs_builder
                     2. updates belief via shared/recognizer.py
-                    3. checks replanning trigger via shared/replanning.py
-                    4. replans if needed via shared/planner.py
+                    3. checks re-evaluation trigger via shared/meta_planner.py
+                    4. selects/replans current task if triggered
                     5. executes one microaction via executor.py
 
 IMPORT BOUNDARY:
     mesa_sim/ may import from shared/. shared/ never imports from mesa_sim/.
 
 STEP ORDER (RobotAgent):
-    obs_builder → recognizer → replanning → planner → executor
+    obs_builder → recognizer → meta_planner → planner → executor
     This order is fixed and must not be changed without updating the paper.
 """
 
@@ -30,10 +30,12 @@ import logging
 from typing import TYPE_CHECKING, List, Optional, Dict
 
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
+from shared.projection import Projector
 from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothesis_space
+
 from shared.planner import AdaptivePlanner
-from shared.replanning import should_replan
-from shared.types import AbstractPlan, BeliefState, TaskInstance
+from shared.meta_planner import MetaPlanner
+from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance
 
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
@@ -174,9 +176,12 @@ class RobotAgent(FactoryAgent):
                  observed_agent_id: Optional[str] = None):
         super().__init__(unique_id, model, pos)
 
+
+        # task_index dropped — current_task_instance replaces it, 
+        # populated from UpdateResult.current_task instead of indexing scheduled_tasks.
+        
         self.observed_agent_id = observed_agent_id
         self.scheduled_tasks: List[TaskInstance] = scheduled_tasks
-        self.task_index: int = 0
 
         # Build hypothesis space from observed human's scheduled_tasks
         hypotheses = build_hypothesis_space(knowledge=knowledge, known_objects_by_type=known_objects_by_type)
@@ -188,7 +193,19 @@ class RobotAgent(FactoryAgent):
             hypotheses=hypotheses,
             context=context
         )
-        
+
+        self.projector = Projector(knowledge=knowledge)
+    
+        self.meta_planner = MetaPlanner(
+            knowledge=knowledge,
+            projector=self.projector,
+            recognizer=self.recognizer,
+            human_agent_id=observed_agent_id,
+        )
+        self.meta_planner.seed_tasks(scheduled_tasks)
+        self.current_task_instance: Optional[TaskInstance] = None
+        self.finished: bool = False
+
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
 
@@ -202,6 +219,8 @@ class RobotAgent(FactoryAgent):
         """
         Full cognitive loop: observe → recognize → replan? → plan → execute.
         """
+        if self.finished:
+            return
         human = self._get_observed_human()
 
         world = build_world_state(model=self.model)
@@ -220,19 +239,25 @@ class RobotAgent(FactoryAgent):
                     prev_belief=self.prev_belief
                 )
 
+        # Note the "seed initial plan" block is gone as a separate step 
+        # — evaluate_triggers()'s no_current_task condition already covers both t=0 and post-advance_task(), 
+        # so the old two-block structure (seed-if-None, then separate should_replan check) collapses 
+        # into one trigger-driven block. 
+        # That's intentional, not an oversight — matches how evaluate_triggers() was designed.
+        
+        executor_state = ExecutorState(
+            agent_id=self.unique_id,
+            current_task=self.current_task_instance,
+            holding=self.carrying,
+        )
+        belief_for_meta_planner = self.belief or self._make_dummy_belief()
 
-        # Seed initial plan (also triggers after advance_task() clears current_plan)
-        if self.current_plan is None:
-            task_instance = self._get_current_task_instance()
-            if task_instance is not None:
-                task_params = {k.name: v.value for k, v in task_instance.bindings.items()}
-                self.current_plan = self.planner.plan(
-                    my_intention=task_instance.schema.name,
-                    task_params=task_params,
-                    agent_id=self.unique_id,
-                    belief=self.belief or self._make_dummy_belief(),
-                    world=world,
-                )
+        trigger = self.meta_planner.evaluate_triggers(
+            belief=belief_for_meta_planner,
+            world=world,
+            executor_state=executor_state,
+        )
+        logging.info(f"[meta-trig] step={int(self.model.schedule.steps)} trigger={trigger.reason}")
 
         if self.belief is not None and human is not None:
             logging.info(f"[IR] step={int(obs.timestamp)} most_likely={self.belief.most_likely} confidence={self.belief.confidence:.3f}")
@@ -247,28 +272,46 @@ class RobotAgent(FactoryAgent):
                 f"confidence={self.belief.confidence:.3f} "
                 f"dist=[{dist_str}]"
             )
-            
-            trigger = should_replan(
-                current_plan=self.current_plan,
-                new_belief=self.belief,
-                world=world,
-                prev_belief=self.prev_belief
-            )
-            if trigger["replan"]:
-                task_instance = self._get_current_task_instance()
-                if task_instance is not None:
-                    task_params = {k.name: v.value for k, v in task_instance.bindings.items()}
-                    self.current_plan = self.planner.plan(
-                        my_intention=task_instance.schema.name,
-                        task_params=task_params,
-                        agent_id=self.unique_id,
-                        belief=self.belief,
-                        world=world,
-                        current_plan=self.current_plan
-                    )
 
-        self._execute(plan=self.current_plan, world=world)    
-        
+        if trigger.fired:
+            human_projection = self.meta_planner.update_human_projection(
+                belief=belief_for_meta_planner,
+                world=world,
+            )
+            result = self.meta_planner.update(
+                belief=belief_for_meta_planner,
+                world=world,
+                executor_state=executor_state,
+                human_projection=human_projection,
+            )
+
+            if result.current_task is None:
+                logging.info(f"[meta] step={int(self.model.schedule.steps)} all tasks complete")
+                self.finished = True
+                self.current_task_instance = None
+                self.current_plan = None
+                self.current_task = None
+                return
+
+            logging.info(
+                f"[meta] step={int(self.model.schedule.steps)} trigger={trigger.reason} "
+                f"winner={result.current_task.schema.name}"
+                f"{ {k.name: v.value for k, v in result.current_task.bindings.items()} } "
+                f"queue={[t.schema.name + str({k.name: v.value for k, v in t.bindings.items()}) for t in result.queue]}"
+            )
+            same_task = result.current_task is self.current_task_instance
+            self.current_task_instance = result.current_task
+            task_params = {k.name: v.value for k, v in self.current_task_instance.bindings.items()}
+            self.current_plan = self.planner.plan(
+                my_intention=self.current_task_instance.schema.name,
+                task_params=task_params,
+                agent_id=self.unique_id,
+                belief=belief_for_meta_planner,
+                world=world,
+                current_plan=self.current_plan if same_task else None,
+            )
+                            
+        self._execute(plan=self.current_plan, world=world)        
     
     # =========================================================================
     # Internal helpers
@@ -295,15 +338,7 @@ class RobotAgent(FactoryAgent):
             return None
         return self.model.humans.get(self.observed_agent_id)
 
-    def _get_current_task_instance(self) -> Optional[TaskInstance]:
-        """Return current TaskInstance, or None if all tasks done."""
-        logging.info(f"[robot] _get_current_task_instance: task_index={self.task_index} len={len(self.scheduled_tasks)}")
-
-        if self.task_index < len(self.scheduled_tasks):
-            return self.scheduled_tasks[self.task_index]
-        return None
-
     def advance_task(self):
         """Called by executor when current task completes."""
-        self.task_index += 1
+        self.current_task_instance = None
         self.current_plan = None

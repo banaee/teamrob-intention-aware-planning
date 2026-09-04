@@ -92,8 +92,22 @@ Reference: Phase 4C typed-parameter generalization session
 **TODO-07 — `effects` field not consumed by live planner**
 `ActionSchema.effects` are defined but the planner does not use them for forward
 chaining. Required for full HTN planning with precondition checking.
-Files: `shared/planner.py`
-Reference: Phase 4B
+UPDATED (Sept 2026): this is now the concrete blocker for DESIGN-16's `full_reorder`
+strategy. Multi-task projection requires propagating a hypothetical WorldState across
+tasks that have not executed — task 2's guards and duration estimate must see the world
+as if task 1 completed. Applying declared effects generically is the correct mechanism,
+but `ConditionSchema` has no retraction/negation semantics: `place`'s effects add
+`not_holding(agent,item)` without removing the stale `holding(agent,item)` from the
+earlier `pick_up`, so a naive union produces contradictory predicates and
+`_guards_satisfied`'s existential matching would still find the stale fact. The existence
+of `not_holding` as its own predicate name (never consumed anywhere) is itself a symptom
+of this gap. Fixing it properly touches the core predicate model in `shared/types.py` and
+deserves its own design session — deliberately NOT solved with a narrow position/holding
+stopgap inside `_project()`, since that would silently fail for any future guard depending
+on a different predicate (dock_loading gate state, `obj_at`, etc.).
+Not blocking: `single_task` projects only from the real live WorldState.
+Files: `shared/planner.py`, `shared/types.py` (ConditionSchema), `shared/meta_planner.py`
+Reference: Phase 4B; Phase 4C meta_planner build session, September 2026
 
 **TODO-08 — `dock_gate` open/close: implement `open_gate` ActionSchema**
 `deliver_pallet` and `load_return` have a commented-out `gate_closed` method.
@@ -131,8 +145,14 @@ Files: `.gitignore`
 **TODO-14 — `AgentConfig.scheduled_tasks` → `assigned_tasks` (unordered set) for robot** ✅ RESOLVED
 `scheduled_tasks` retained as field name on `AgentConfig` for both agent types.
 Semantics split by agent type instead of renaming: human list is fixed/ordered ground truth;
-robot list is a mutable prioritised queue owned by meta_planner at runtime.
+robot list is an unordered task **pool** owned by meta_planner at runtime.
+CORRECTED (Sept 2026): the earlier resolution text described the robot list as a "mutable
+prioritised queue," which no longer holds. Under DESIGN-16's `single_task` strategy,
+meta_planner selects one task per trigger and the remaining pool carries no ordering
+commitment at any point — `MetaPlanner._queue`'s list order is storage order, not priority.
+`seed_tasks()` loads the pool without ordering it; Q0 comes from the first `update()` call.
 See design_decisions.md Phase 4 section for full specification.
+Files: `shared/meta_planner.py`, `shared/types.py` (AgentConfig)
 
 **TODO-15 — Team-level semantic costs: park as future cost function extension**
 Current cost function = Mesa steps (moves, detours, pauses). Team-level costs
@@ -313,7 +333,22 @@ Must be defined in `shared/types.py` before Phase 4 implementation begins.
 Files: `shared/types.py`
 Reference: Phase 4 design session
 
-**DESIGN-07 — Cognitive clock trigger conditions and θ hysteresis policy** [Phase 4 prereq]
+**DESIGN-07 — Cognitive clock trigger conditions and θ hysteresis policy** ✅ RESOLVED (Sept 2026)
+IMPLEMENTED: `evaluate_triggers()` has exactly three conditions — `no_current_task` (covers
+both t=0 and ordinary completion in one condition), `theta_crossed` (a *crossing* event:
+`prev < θ ≤ current`, not a per-tick threshold test, which would refire continuously), and
+`task_committed` (`holding` transitions `None → not-None`). θ=0.75, single threshold, no
+hysteresis; confidence is gate-only and never feeds `_cost()`. `MetaPlanner` owns
+`_prev_belief`/`_prev_executor_state` internally rather than accepting them as parameters.
+See design_decisions.md, "Three cognitive-clock triggers."
+The remaining open sub-questions from the original entry (human-completes-task trigger,
+human-enters-zone pre-trigger, within-action decision points) were NOT implemented and
+remain available as future additions — none is required for Phase 4C. Also unresolved and
+low-stakes: `theta_crossed` wins arbitrarily if it and `task_committed` fire on the same
+tick (only the unused `score` field differs).
+Original entry retained below.
+
+[original entry, Phase 4 prereq]
 The cognitive clock is event-based. Confirmed triggers:
 - Task completion — queue advances, re-evaluate ordering with latest belief
 - Belief threshold θ crossed (confidence rises above θ for first time, or most_likely switches)
@@ -384,7 +419,21 @@ candidate enumeration or short-circuits early.
 Files: `shared/meta_planner.py` (Phase 4C, `_detect_interference`)
 Reference: Phase 4C design session, cancellation-mechanism discussion
 
-**DESIGN-10 — Interference-detection sampling granularity** [Phase 4C, parked until _detect_interference implementation]
+**DESIGN-10 — Interference-detection sampling granularity** ✅ PARTIALLY RESOLVED (Sept 2026)
+RESOLUTION: option (b) — resampled points along each projected trajectory — chosen; option
+(a) endpoint-only rejected as structurally blind to mid-move conflicts. Implemented as
+`discretized_time_sampling()` in `shared/trajectory_algorithms.py`: samples both `Segment`s
+at fixed step intervals across their overlapping time window plus the window's exact end
+point. `interval=1.0` is a placeholder, not calibrated.
+Zone-vs-position is also resolved and NOT as originally framed — see design_decisions.md,
+"Interference is geometric, not zone-based." `ConflictPoint` carries `position`+`distance`,
+never a zone.
+STILL OPEN: (i) whether to implement `closest_point_of_approach()` (documented in
+trajectory_algorithms.py, exact rather than sampled, no interval tradeoff, but has
+near-zero-relative-velocity edge cases); (ii) tuning `interval`; (iii) the volume problem —
+see TODO-27. Original entry retained below for context.
+
+[original entry, Phase 4C, parked until _detect_interference implementation]
 Two candidate approaches surfaced reviewing an alternative endpoint-only
 implementation: (a) per-GroundedAction-goal points only (cheap, matches a
 coarse endpoint-based pre-filter — see DESIGN-11 — may miss mid-action
@@ -422,7 +471,16 @@ layout-aware shortcuts.
 Files: shared/meta_planner.py (Phase 4C)
 Reference: Fatemeh code review session, cost-function comparison
 
-**DESIGN-12 — Horizon-projected confidence as recognizer output, not meta_planner computation** [parked, revisit during IR enhancement]
+**DESIGN-12 — Horizon-projected confidence as recognizer output, not meta_planner computation** [parked — now MOOT under single_task]
+STATUS UPDATE (Sept 2026): this entry exists to serve multi-task candidate cost evaluation
+(confidence-at-a-future-horizon for tasks further down a candidate ordering). DESIGN-16
+adopted single-task selection, under which no task is ever costed before it starts — every
+candidate is projected from the live WorldState with the live belief. The need disappears.
+This entry becomes live again only if `full_reorder` is ever implemented. Not closed, since
+that strategy is retained as a documented alternative; do not implement in the meantime.
+Original entry retained below.
+
+[original entry, parked, revisit during IR enhancement]
 Current-moment confidence already flows to planning as-is: BeliefState
 (confidence, most_likely, distribution) is the object MetaPlanner.update()
 receives, and DESIGN-07's θ-gate reads directly from it. Not a gap.
@@ -525,6 +583,156 @@ questions before this task is reliable:
    neutral spot — confirm this is deliberate before relying on it.
 Files: domains/dock_loading/tasks.py, mesa_sim/world_state_builder.py
 Reference: Phase 4 design session, July 2026
+
+**DESIGN-16 — Single-task RESELECT vs. full queue reordering (strategy flag)** ✅ RESOLVED (Sept 2026)
+RESOLVED in favour of single-task, receding-horizon selection as the implemented default;
+full reordering retained as a documented, switchable alternative. Full rationale in
+design_decisions.md, "Single-task selection (receding horizon), not queue-wide reordering."
+
+Implementation: `MetaPlanner._strategy: Literal["single_task", "full_reorder"]`, constructor
+param, defaults to `"single_task"`. `update()` branches on it; `_project()` raises
+`NotImplementedError` for orderings longer than 1. The seam exists in code, not only in docs,
+so `full_reorder` is a known-cost extension rather than a rewrite.
+
+To implement `full_reorder`, three things are needed: (i) resolve TODO-07's effects/retraction
+semantics for cross-task WorldState propagation, (ii) DESIGN-12's horizon-projected confidence,
+(iii) a scalable ordering search — brute permutation is O(n!) and is the wrong shape for any
+realistic task count. Do not implement piecemeal.
+
+NOTE ON NUMBERING: this decision was referred to as "DESIGN-14" throughout the September 2026
+build session before it was noticed that DESIGN-14/15 were already taken. Any code comment,
+docstring, or chat reference to "DESIGN-14" regarding strategy/reordering means DESIGN-16.
+Files: shared/meta_planner.py, shared/io_contracts.md §2.2
+Reference: Phase 4C meta_planner build session, September 2026
+
+**TODO-27 — `conflicts` list volume: no "worth recording" threshold** [Phase 4C, deferred]
+`_detect_interference()` concatenates every `ConflictPoint` from every time-overlapping
+segment pair with no filtering. Observed in scenario_00: 900–1500 ConflictPoints for a single
+candidate, since `discretized_time_sampling(interval=1.0)` emits one point per step per pair
+over ~1700-step projections. Functionally correct (only the minimum distance is read) but
+memory-wasteful, and makes the objects useless for logging/inspection.
+Deliberately not fixed now: a second "only record below distance X" threshold was considered
+and rejected as premature — the list is bounded and correctness is unaffected. Revisit if
+profiling shows it matters, or when DESIGN-08's soft penalty needs to actually iterate these.
+FFiles: shared/meta_planner.py (_detect_interference), shared/trajectory_algorithms.py, shared/projection.py
+Reference: Phase 4C scenario_00 validation, September 2026
+
+**TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders**
+Both default to `1.0` in `MetaPlanner.__init__` with no calibration against Mesa's actual
+distance/step scale (agent positions span roughly ±400 units; `interval` in
+`discretized_time_sampling` is likewise `1.0`). `min_safe_distance=1.0` proved permissive in
+scenario_00 — nothing was ever excluded, closest observed approach was ~2.9 — so the
+infeasibility branch is effectively untested (see TODO-30). A too-large value would exclude
+every candidate; a too-small one makes interference detection inert.
+Needs a calibration pass against real layout geometry, ideally alongside `default_action_cost`.
+Files: shared/projection.py (init — assumed_speed, default_action_cost), shared/meta_planner.py (init — min_safe_distance)
+Reference: Phase 4C scenario_00 validation, September 2026
+
+**TODO-29 — `deliver_with_return` untested under MetaPlanner**
+The guard was validated pre-MetaPlanner via a manual `robot.carrying` seed in
+`sim_model.__init__`. That seed is now removed, and it would no longer exercise the path
+anyway: a held item that is also one of the robot's own candidate tasks always wins on cost
+(it is cheapest to deliver what you are holding), so `not_equal(?other, ?item)` fails and
+`deliver_already_held` fires instead of `deliver_with_return`.
+Re-testing needs a seed item that is NOT in the robot's candidate pool. Until then,
+`deliver_with_return` is unexercised under the current selection mechanism.
+Files: domains/kitting/tasks.py, mesa_sim/sim_model.py, domains/kitting/scenarios.py
+Reference: Phase 4C scenario_00 validation, September 2026
+
+**TODO-30 — Interference exclusion branch never exercised**
+Across scenario_00 validation runs every candidate returned `feasible=True`; no candidate was
+ever excluded by `_detect_interference()`. The detection machinery runs and produces plausible
+distances, but the branch that actually removes a candidate — and therefore the whole reason
+interference detection exists — is unproven. Also unproven: `update()`'s `RuntimeError` when
+*every* candidate is infeasible.
+Needs a scenario deliberately constructed so the human's predicted trajectory blocks a robot
+candidate (or a calibrated `min_safe_distance`, see TODO-28). This is the main gap before
+Phase 4C can be called validated rather than merely working.
+Files: shared/meta_planner.py (`_detect_interference`, `update`), domains/kitting/scenarios.py
+Reference: Phase 4C scenario_00 validation, September 2026
+
+**TODO-31 — `estimate_duration()` is unused internally**
+`Projector.project()` calls `build_segments()` directly and derives duration from the
+segments it already has, rather than calling `estimate_duration()` (which would trigger a
+second, redundant geometry walk). Nothing currently calls `estimate_duration()`. It was
+retained as a standalone convenience method, with its signature taking `agent_id`/`start_step`
+explicitly instead of re-deriving `agent_id` from `plan.actions[0].bindings`. Likely callers
+are viz or Phase 5 evaluation — either wire it in or delete it.
+Files: shared/projection.py
+Reference: Phase 4C meta_planner build session, September 2026
+
+**TODO-32 — `wait_at` duration ignored in cost estimation**
+`Projector.build_segments()` treats every non-movement action as costing
+`knowledge.get_cost(action_name)` or `default_action_cost`, including `wait_at` — so a
+`PT60S` coffee break and a `PT2S` AC toggle currently cost the same. The real ISO-8601
+`?duration` binding is parsed in `mesa_sim/action_decomposer.py`, which `shared/` cannot
+import. A known simplification, not a considered decision.
+Matters specifically for foreseeable tasks (`coffee_break`, `ac_activation`), whose whole
+point is that the robot should reason about how long the human will be occupied. Likely to
+distort candidate costs once foreseeable-task scenarios are tested.
+Files: shared/projection.py (build_segments), mesa_sim/action_decomposer.py
+Reference: Phase 4C meta_planner build session, September 2026
+
+**TODO-33 — Run loop does not stop when all agents are finished**
+`RobotAgent.finished` was added (mirroring `HumanAgent.finished`) so the terminal state is
+reachable, but nothing outside `sim_agents.py` reads either flag — confirmed by grep. A
+200-step run continues stepping both agents as no-ops long after all tasks complete
+(scenario_00: everything done by step 147).
+Harmless, but wasteful and makes log tails uninformative. Fix belongs in the run loop
+(`run_mesa.py` / `SimModel.step()`), not in the agents.
+Files: mesa_sim/run_mesa.py, mesa_sim/sim_model.py
+Reference: Phase 4C scenario_00 validation, September 2026
+
+**TODO-34 — Pre-existing `obs` fragility in `RobotAgent.step()` logging**
+The IR logging block guards on `self.belief is not None and human is not None`, then reads
+`obs.timestamp`. But `obs` is only bound when *this step's* `build_observation()` returned
+non-None, while `self.belief` persists across steps. If `human is not None` and
+`build_observation()` returns `None` on a step where a belief already exists, `obs` is either
+stale or unbound — `AttributeError`/`UnboundLocalError`.
+Not introduced by the MetaPlanner migration; pre-existing, spotted while editing the
+surrounding block. Not observed firing in scenario_00.
+Files: mesa_sim/sim_agents.py (`RobotAgent.step`)
+Reference: Phase 4C meta_planner build session, September 2026
+
+**TODO-35 — `seed_tasks()` placement: private section but called externally**
+`seed_tasks()` lives under `meta_planner.py`'s "Internal" section but is called by
+`sim_agents.py` at agent construction, making it de facto public. Either move it to the
+public interface section and document it in `io_contracts.md` §2.2, or have the constructor
+take the initial task pool directly. Cosmetic/contract-hygiene only.
+Files: shared/meta_planner.py, shared/io_contracts.md
+Reference: Phase 4C meta_planner build session, September 2026
+
+
+**TODO-36 — `MetaPlanner` block restructuring (B1/B2/B3) not yet implemented**
+`update()` currently runs one flat pipeline: assemble candidates → project each → detect
+interference → filter infeasible → cost → argmin. A block decomposition was designed
+(September 2026) but not built:
+  B1  human projection — DONE, extracted to `Projector.project_human()`, called via
+      `MetaPlanner.update_human_projection()` once per fired trigger
+  B2  plausibility gate on the current task — NOT BUILT. Decides whether to continue the
+      current task or escalate to reorder. Two variants: B2.A (assess current task in
+      isolation; needs a worthiness score that does not exist yet) and B2.B (compare
+      current against other tasks individually — self-calibrating, but redundant with B3.A)
+  B3  reorder — B3.A (single-task argmin, what `update()` does today) or B3.B
+      (permutations, blocked on TODO-07 and the horizon question)
+Also: `no_current_task` bypasses B2 entirely and goes straight to B3 — there is nothing to
+continue. B2 is therefore specifically a *mid-task* commitment mechanism; the robot still
+re-decides freely at every task boundary.
+Both B2 and B3 to be independent flags, all four combinations runnable. B2.B+B3.A is a
+redundancy control, not a policy — it computes the same argmin twice and selects identically
+to B2.A+B3.A, differing only in projection count. Useful in an ablation table, misleading if
+read as a fourth strategy.
+BLOCKER: B2.A needs a scalar worthiness score turning `List[ConflictPoint]` into a number —
+the same missing quantity as DESIGN-08's soft interference penalty. Build once, use for both.
+Candidate formulas: minimum distance across conflicts; count below a radius; proximity
+integrated over time; or estimated added cost from pausing/detouring (DESIGN-13), which would
+make the score comparable to execution cost and remove the need for a separate threshold.
+Also open: whether B2's threshold is distinct from B3's exclusion threshold — they are
+different in kind (graded/effort-based vs. binary/safety-based), not merely in value.
+Naming: `_is_current_task_plausible()` or similar — "feasible" is wrong, since the check is
+about worthiness, not doability.
+Files: shared/meta_planner.py (`update`)
+Reference: Phase 4C block-design session, September 2026
 
 ---
 

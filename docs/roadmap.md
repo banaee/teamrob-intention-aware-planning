@@ -12,7 +12,7 @@
 ## Phase 2 — Cognitive Layer Skeletons ✅
 - `shared/recognizer.py`: skeleton with uniform prior
 - `shared/planner.py`: skeleton — flat method grounder (single-level decomposition, first method unconditionally)
-- `shared/replanning.py`: skeleton with `no_plan` trigger
+- `shared/replanning.py`: skeleton with `no_plan` trigger *(retired Sept 2026 — absorbed into meta_planner.py)*
 
 ## Phase 3 — Kitting Domain + Mesa Simulation ✅
 - `domains/kitting/`: `tasks.py`, `ActionSchemas.py`, `registry.py`, `scenarios.py`, `env1_layout.json`
@@ -32,25 +32,29 @@
 
 ---
 
-## Phase 4 — Full Cognitive Algorithms 🔲
+## Phase 4 — Full Cognitive Algorithms 🔄 (4A ✅, 4B ✅, 4C ✅ single_task path, 4D 🔲)
 
-### Conceptual design settled (not yet implemented)
+### Conceptual design settled; 4A/4B/4C implemented
 
 The robot operates with two planning levels and one recognition module, all in `shared/`:
 
 **Module structure:**
 
 - `shared/recognizer.py` — Bayesian IR (replaces dummy)
-- `shared/meta_planner.py` — NEW: task scheduling, candidate generation, cost evaluation, reordering decisions
-- `shared/planner.py` — HTN decomposer (called by meta_planner per task; replaces flat method grounder)
-- `shared/replanning.py` — to be absorbed into meta_planner (retire after migration)
+- `shared/meta_planner.py` — task scheduling, candidate evaluation, interference detection, cost comparison
+- `shared/projection.py` — NEW: `Projector` — task + world → predicted trajectory; consumed by meta_planner, and by viz/evaluation later
+- `shared/trajectory_algorithms.py` — NEW: pluggable path-realization and interference-detection functions
+- `shared/planner.py` — HTN decomposer (called by meta_planner per candidate; replaces flat method grounder)
+- ~~`shared/replanning.py`~~ — **retired Sept 2026**, deleted; trigger role absorbed into `evaluate_triggers()`
 
 **Key design decisions for Phase 4:**
 
 - Robot's `scheduled_tasks` list order carries no semantic commitment (see design_decisions.md) — it's the same field type/name as the human agent's, just not consumed as a schedule. Initial queue `Q0` is produced by the same update() mechanism used for every later reorder: evaluate_triggers()'s "no current task" condition fires on the first call, no IR confidence required to run it (IR runs from t=0 with a uniform prior regardless). No separate base-cost heuristic.
 - `planner.py` becomes a true recursive HTN decomposer: if a StepCall names a TaskSchema (not a primitive ActionSchema), it recurses. Output remains a flat `AbstractPlan` (single task, executor-facing).
-- `meta_planner.py` owns task ordering. It calls `planner.py` per candidate ordering to project action sequences, evaluates costs, and selects the best queue. HTN does not schedule — it only decomposes.
-- A new `ProjectedPlan` type (see DESIGN-06) spans the full task queue for lookahead reasoning. It is never handed to the executor — it is the meta_planner's internal reasoning structure.
+- `meta_planner.py` owns task selection. It calls `planner.py` per candidate task to project action sequences, evaluates costs, and selects the next task. HTN does not schedule — it only decomposes.
+- Selection is **single-task, receding-horizon** (DESIGN-16): one best next task per trigger, re-decided from fresh WorldState and belief at the next trigger — not a search over orderings of the remaining pool. `full_reorder` is retained as a documented, switchable alternative but is not implemented.
+- `ProjectedPlan` (DESIGN-06) is the meta_planner's internal reasoning structure, never handed to the executor. Under `single_task` it always holds exactly one entry; the multi-entry shape is retained for `full_reorder`.
+- Interference detection is **geometric, not zone-based** — actual Euclidean distance between projected positions over time. `ProjectedPlanEntry` carries `Segment`s; `ConflictPoint` carries `position` + `distance`, no zone.
 - Cost is measured uniformly in Mesa simulation steps (seconds in ROS): moves, detours, pauses all equal cost units. Team-level semantic costs parked as future extension (see DESIGN-08).
 - Cancellation of a held-item task is handled by HTN method selection, not a meta_planner cost term — see design_decisions.md.
 
@@ -72,48 +76,56 @@ The robot operates with two planning levels and one recognition module, all in `
 - Recursive decomposer with real guard evaluation, derived variable
   resolution, `?agent` binding propagation
 
-**Phase 4C — MetaPlanner: scheduling + interference detection + cost comparison** 🔲 NOT STARTED
-Design questions resolved (session ending July 2026), implementation not yet begun:
+**Phase 4C — MetaPlanner: scheduling + interference detection + cost comparison** ✅ COMPLETE (`single_task` path), validated against scenario_00
 
+Built and running end-to-end. All three tasks complete, correct terminal state, zero errors.
+
+*Implemented:*
+- `shared/meta_planner.py` — public: `evaluate_triggers()`, `update_human_projection()`,
+  `update()`; internal: `seed_tasks()`, `_detect_interference()`, `_cost()`
+- `shared/projection.py` — `Projector` extracted from `MetaPlanner`: `project()`
+  (single-task path), `project_human()`, `build_segments()`, `estimate_duration()`.
+  Injected into `MetaPlanner` rather than constructed by it — one instance, held by the
+  agent, shareable with viz/evaluation
+- `shared/trajectory_algorithms.py` — `straight_line_path()`, `stationary_segment()`,
+  `discretized_time_sampling()`; `closest_point_of_approach()` and `obstacle_aware_path()`
+  documented but deliberately unimplemented
+- `shared/types.py` — `Segment`, `ConflictPoint` (retyped, zone-free),
+  `InterferenceAssessment`, `ExecutorState`, `TriggerDecision`, `UpdateResult`,
+  `task_instance_key()`; `ProjectedPlanEntry.spatial_zones` → `segments`
+- `mesa_sim/sim_agents.py` — `RobotAgent` migrated off `replanning.py`; `task_index` and
+  `_get_current_task_instance()` removed; `finished` flag added
+- `domains/kitting/tasks.py` — third `MethodSchema` `deliver_already_held`, required by the
+  re-decompose-from-scratch design (see design_decisions.md)
+- `shared/replanning.py` — deleted
+
+*Design questions resolved (Q1–Q4 from July 2026, plus September 2026 session):*
 - Q1: `MetaPlanner` owns the task queue internally (not passed externally)
-- Q2: human task projection uses `recognizer.get_hypothesis()` to resolve
-  `belief.most_likely` back to its `HypothesisKey` (task_name + bindings) —
-  binding inference already solved by the hypothesis-space design, no
-  separate geometric inference step needed
-- Q3: `_estimate_duration` uses a self-contained geometric estimate
-  (`distance / assumed_speed`, constructor param with default) — keeps
-  `shared/` decoupled from simulator step-size config
-- Q4: `replanning.py` held (wired in parallel) until Phase 4C validates
-  end-to-end against scenario_00, then retired in one commit
-- Separate from Q1–Q4 (not itself numbered): current_task competes as just
-  another candidate in every `update()` call — no special-case WAIT/RESELECT
-  branch.
-- Also separate from Q1–Q4: Q0 (t=0 initial ordering) uses no bespoke heuristic —
-  it's the same update()/evaluate_triggers() mechanism, triggered by "no current
-  task" rather than belief/completion. See design_decisions.md.  
-- Continuation vs. reselection falls out of cost comparison across
-  the full candidate set. Previously undocumented despite being decided; now
-  written down after cross-checking against an alternative branch-based
-  implementation during the Fatemeh code review.
-- DESIGN-07 resolved: single threshold θ=0.75, no hold-last-decision
-  hysteresis — confidence is gate-only, doesn't feed the cost function
-- Cancellation resolved: not a meta_planner cost term. `deliver_item` gets a
-  second, guarded HTN method (`deliver_with_return`) selected via existential
-  guard matching in `_guards_satisfied` — `_cost()` needs no `carrying` param
-  and no cancellation branch, it just decomposes each candidate and counts
-  steps. Validated against scenario_00. See design_decisions.md. New open
-  item from this: DESIGN-09 (cheap pre-check before full candidate
-  enumeration — separate from cancellation itself).
-- Prerequisite typed-parameter/object-model work completed as an unplanned
-  but necessary dependency: `SimObject` unification (`is_portable` flag),
-  `TaskSchema.parameter_types`, `known_objects_by_type` registry — needed
-  once multi-instance object types (kitting_table, coffee_machine) were
-  considered for `?destination`-style task parameters
-- Still to build: `meta_planner.py` itself (`initialize_queue`, `update`,
-  `_project`, `_estimate_duration`, `_detect_interference`, `_cost`), per
-  the interface and flow already designed — `_cost()`'s signature drops
-  `carrying` (no longer needed, per cancellation resolution above)
-  
+- Q2: human task projection uses `recognizer.get_hypothesis()` to resolve `belief.most_likely`
+  back to its `HypothesisKey`; the recognizer is held **by reference** (same live instance the
+  agent owns — `get_hypothesis()` is belief-stateless, so no staleness risk)
+- Q3: `_estimate_duration` uses a self-contained geometric estimate (`distance / assumed_speed`)
+- Q4: `replanning.py` retired in one commit after end-to-end validation ✅ done
+- DESIGN-07 resolved: three triggers (`no_current_task`, `theta_crossed` as a *crossing event*,
+  `task_committed`); θ=0.75, no hysteresis, confidence gate-only
+- DESIGN-16 resolved: single-task receding-horizon selection; strategy flag for `full_reorder`
+- Cancellation resolved (July): guarded HTN method, not a `_cost()` term
+- Queue invariant: `_queue` excludes the executing task; candidates = `[current_task] + queue`
+- Task exhaustion returned as `UpdateResult(current_task=None, queue=[])`, not raised
+- `_cost()` is hard-gate only — `conflicts` computed and carried but not priced (DESIGN-08)
+- Q0 needs no bespoke heuristic — `no_current_task` covers t=0 and completion identically
+
+*Known validation gaps (not blocking, tracked in TODOS_AND_DEFERRED.md):*
+- TODO-30: interference **exclusion** branch never exercised — every candidate was feasible
+  in every run. The detection machinery runs, but its whole purpose is unproven.
+- TODO-29: `deliver_with_return` unexercised under MetaPlanner (a held item that is also a
+  candidate always wins on cost, so `deliver_already_held` fires instead)
+- TODO-28: `min_safe_distance` / `assumed_speed` uncalibrated placeholders
+- TODO-32: `wait_at` duration ignored — matters once foreseeable tasks are tested
+
+*Next for Phase 4C:* stress-testing with scenarios that force actual reselection and
+interference exclusion, and with the human performing foreseeable tasks.
+
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
 - No structural change to executor interface; hints richer than current skeleton
@@ -130,11 +142,12 @@ Design questions resolved (session ending July 2026), implementation not yet beg
 ### Prerequisites before implementation
 
 - DESIGN-06: define `ProjectedPlan` type in `shared/types.py` ✅ DONE
-- TODO-14: `AgentConfig.scheduled_tasks` semantics split by agent type ✅ DONE
-- DESIGN-07: cognitive clock triggers + θ policy settled ✅ DONE (no hysteresis)
+- TODO-14: `AgentConfig.scheduled_tasks` semantics split by agent type ✅ DONE (resolution text corrected Sept 2026 — robot list is an unordered *pool*, not a prioritised queue)
+- DESIGN-07: cognitive clock triggers + θ policy settled ✅ DONE (no hysteresis; three triggers implemented)
 - New simple kitting layout (Layout 0) and scenario for Phase 4 dev ✅ DONE (env_layout0/scenario_00)
 - Q1–Q4 meta_planner design questions ✅ RESOLVED (see Phase 4C above)
 - Typed-parameter object model (SimObject/is_portable/parameter_types) ✅ DONE, verified against scenario_00
+- DESIGN-16: selection strategy (single-task vs. full reorder) ✅ RESOLVED (Sept 2026)
 
 ---
 

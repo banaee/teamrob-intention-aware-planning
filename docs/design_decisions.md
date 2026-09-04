@@ -200,11 +200,12 @@ Reference: Phase 4C typed-parameter generalization session
 
 - **Human**: fixed ordered sequence of `TaskInstance`s (assigned + foreseeable interleaved).
 Order encodes when deviations occur. Never reordered at runtime. Ground truth for IR evaluation.
-- **Robot**: initial ordering produced by meta_planner at t=0 using base-cost heuristic with null belief.
-Treated as a mutable prioritised queue — meta_planner may reorder at any cognitive 
-clock event based on IR output.
-The scenario file's robot `scheduled_tasks` order is therefore only a fallback/hint
-for t=0; it carries no semantic commitment beyond that.
+- **Robot**: an unordered task *pool*, not a schedule. No base-cost heuristic produces an
+initial ordering — Q0 comes from the same `update()` mechanism as every later
+re-evaluation (see "Robot's `scheduled_tasks` order is a scenario-authoring convenience"
+below). Under the `single_task` strategy (DESIGN-16), meta_planner selects one task at
+each cognitive-clock event; the remaining pool carries no ordering commitment at any point.
+The scenario file's robot `scheduled_tasks` order is never consumed as an execution order.
 
 **Two planning levels, not one**
 The HCM paper's "adaptive planning" block maps to two distinct modules in implementation:
@@ -254,9 +255,12 @@ field-driven.
 **AbstractPlan vs ProjectedPlan — two distinct types**
 `AbstractPlan`: single task, executor-facing. Output of `planner.py` (HTN decomposer).
 Contains a flat list of `GroundedAction`s. "Abstract" means symbolic (not microactions).
-`ProjectedPlan`: multi-task lookahead, meta_planner-facing only. Never handed to executor.
-Concatenates AbstractPlans across the full task queue with estimated timing and spatial
-occupancy per action. Used for interference detection and cost comparison.
+`ProjectedPlan`: meta_planner-facing only. Never handed to executor. Wraps an
+`AbstractPlan` with estimated timing and a list of `Segment`s (per-action geometry).
+Used for interference detection and cost comparison.
+Under the implemented `single_task` strategy (DESIGN-16) a `ProjectedPlan` always holds
+exactly one entry. The multi-entry shape is retained for the deferred `full_reorder`
+strategy — `_project()` raises `NotImplementedError` for orderings longer than 1.
 Both types are defined in `shared/types.py`.
 
 **Cost function: Mesa steps as the uniform cost unit**
@@ -340,3 +344,229 @@ H is therefore belief-coupled (only meaningful above θ) and task-bounded (ends 
 task completion, beyond which uncertainty resumes). Below θ, the distribution spans multiple
 competing hypotheses with conflicting predicted sequences — no reliable horizon exists and
 meta_planner holds the current queue.
+
+**Plans are re-decomposed from scratch; the world state is the execution cursor**
+There is no plan cursor, action index, or resumption mechanism. Every cognitive trigger
+re-decomposes the chosen task via `planner.plan()` against the current WorldState, and
+`_project()` does the same for every candidate during cost comparison. Nothing carries
+forward from a partially-executed plan — `plan()` accepts a `current_plan` parameter but
+does not read it.
+
+This was chosen over tracking execution position: no action cursor, no partial-action
+state, and no possibility of the plan's recorded progress diverging from what the world
+actually shows. The world is the record of progress.
+
+The consequence is a requirement on domain authoring: each task's `MethodSchema` set must
+cover every world state the task can legitimately start *or resume* from. Guards encode
+"what remains to be done from here," not merely "how to begin." This is not edge-case
+handling — the trigger design guarantees mid-task re-decomposition (`task_committed` fires
+immediately after every successful `pick_up`), so the partially-executed states are reached
+on every task, every run.
+
+`deliver_item`'s three methods are complete under this rule, ordered most-specific-first
+since `_select_method` returns the first method whose guards pass:
+  1. `deliver_already_held` — guard `holding(?agent, ?item)`; the target is in hand, only
+     `move_to(kitting_table) → place` remains.
+  2. `deliver_with_return` — guard `holding(?agent, ?other)` + `not_equal(?other, ?item)`;
+     an unrelated item is held and must be returned first.
+  3. `deliver_default` — unguarded fallback; nothing held.
+
+Omitting (1) is a selection bug, not only wasted motion: the current task's projected cost
+would include a redundant `move_to` + `pick_up`, inflating it relative to alternatives and
+potentially causing the robot to abandon a task it is halfway through.
+**Single-task selection (receding horizon), not queue-wide reordering** [DESIGN-16]
+meta_planner selects the single best *next* task at each trigger, then re-decides at the
+next trigger from fresh WorldState and belief. It does not search permutations of the
+remaining task pool for a globally optimal ordering.
+
+The two are not equivalent, and this is an accepted trade-off rather than an approximation
+of a settled objective. Full reordering can exploit downstream task interactions (task A is
+cheapest now, but doing B first makes C much cheaper); single-task selection cannot see that
+and will miss such cases. The argument for accepting that loss:
+
+- The whole architecture exists to keep improving information about a human teammate.
+  Optimizing the robot's *entire* future queue against a prediction we know will be better
+  informed at the next trigger inverts that premise. Triggers fire often (task completion,
+  θ-crossing, task-commit), so decisions are re-made from fresh evidence continuously.
+- Prediction horizon H is already belief-bounded and task-bounded (see above). Committing to
+  a multi-task robot schedule optimized against an uncertain horizon has weaker justification
+  than re-deciding within it. A mathematically optimal permutation under an inaccurate
+  forecast is not a better policy.
+- Queue-wide projection created an asymmetry: human prediction bounded by H, robot
+  optimization potentially spanning the entire remaining queue. DESIGN-12 (horizon-projected
+  confidence) exists only to patch that asymmetry, and becomes moot under single-task.
+- Multi-task projection requires propagating a *hypothetical* WorldState across tasks that
+  have not executed (task 2's guards must see the world as if task 1 completed). That needs
+  effects/retraction semantics `ConditionSchema` does not have today (TODO-07) — a change to
+  the core predicate model. Single-task projection always starts from the real, live
+  WorldState, so the question does not arise.
+
+The last point is *supporting evidence, not the justification*. The architecture was chosen
+because the decision semantics favour receding-horizon selection; the fact that it also
+eliminates a large speculative-state machinery problem is a consequence, not the reason.
+
+This is a domain-dependent choice, not a universal one. Domains with strong task-to-task
+coupling — travel/setup costs between tasks, deadlines, dependencies, shared resources,
+batching — would justify deeper lookahead. `full_reorder` is retained as a documented,
+switchable alternative for that case (see below). Note that if it is ever built for a
+larger task set, brute permutation is the wrong shape (O(n!)); it would need bounded-depth
+lookahead, a routing/assignment formulation, or beam search.
+
+Terminology, fixed: **"candidate" means the unit being selected** — whatever the argmin
+ranges over. Under `single_task` that is an individual task; under `full_reorder` it is a
+permuted ordering. This keeps `_cost(candidate)`, "feasible candidates," and "argmin over
+candidates" reading correctly regardless of strategy. (This reverses an earlier rule fixing
+"candidate" to mean an individual task always — that rule made every downstream phrase
+strategy-dependent once orderings entered the picture.) Tasks inside a fixed ordering are
+not candidates: they compete for nothing. What differs between strategies is only how much
+of the queue a given `update()` call rewrites — the head (single_task) or the whole thing
+(full_reorder). "Greedy" is deliberately avoided as a description: it presupposes
+full-sequence optimization is the true objective being approximated, which is exactly what
+is not established here.
+Files: shared/meta_planner.py (`_strategy` flag, `update()`), shared/projection.py (`project()`)
+Reference: Phase 4C meta_planner build session, September 2026
+
+**Interference is geometric, not zone-based**
+Zone co-occupancy was rejected as the proximity criterion for interference detection.
+Zones are arbitrary in size and shape; two agents in one large zone may be far apart, and
+two agents in adjacent zones may be adjacent in space. This extends the existing rejection
+of zone-based *pre-filtering* (NOTE on DESIGN-09/DESIGN-11) to the detection mechanism
+itself, for the same underlying reason.
+
+Interference detection instead computes actual Euclidean distance between the robot's and
+the human's projected positions over time. Since interference is conceptually a
+coarse-grained analogue of collision checking, it uses what collision checking uses.
+`ProjectedPlanEntry.spatial_zones: List[str]` was accordingly removed and replaced by
+`segments: List[Segment]`; `ConflictPoint` lost its `zone: str` field and gained
+`position: Tuple[float, float]` and `distance: float`.
+Files: shared/types.py (Segment, ConflictPoint, ProjectedPlanEntry),
+shared/trajectory_algorithms.py, shared/meta_planner.py (`_detect_interference`)
+Reference: Phase 4C meta_planner build session, September 2026
+
+**Trajectory algorithms are pluggable free functions, not embedded logic**
+`shared/trajectory_algorithms.py` holds pure functions operating on `Segment`/`ConflictPoint`,
+in two families, each a deliberate swap point rather than a fixed implementation:
+
+- *Path realization* — how one action's motion is computed. `straight_line_path()` and
+  `stationary_segment()` are the current defaults, consumed by `_build_segments()`.
+  `obstacle_aware_path()` is a documented, unimplemented placeholder (DESIGN-13 / TODO-09).
+- *Interference detection* — given two `Segment`s, where and how close do they get.
+  `discretized_time_sampling()` is the current default; `closest_point_of_approach()` (CPA)
+  is documented with its analytic approach but not implemented.
+
+`MetaPlanner` holds `interference_algorithm` as a constructor parameter, so swapping
+algorithms — including to approaches from the planning literature not considered here — is a
+one-argument change, never an edit to `_detect_interference()`. Discretized sampling was
+implemented first rather than CPA deliberately: it is verifiable by inspection and exercises
+the pluggable interface, whereas CPA has real edge cases (clamping the analytic minimum to
+the overlap window, near-zero relative velocity) better added behind a proven seam.
+
+The algorithms measure only; they hold no policy. The single policy decision — what distance
+counts as unsafe — lives in `_detect_interference()` as `min_safe_distance`.
+Files: shared/trajectory_algorithms.py, shared/meta_planner.py
+Reference: Phase 4C meta_planner build session, September 2026
+
+**Three cognitive-clock triggers; θ-crossing is an event, not a threshold test**
+`evaluate_triggers()` implements exactly three conditions (resolving DESIGN-07):
+
+- `no_current_task` — `ExecutorState.current_task is None`. Covers both t=0 and ordinary
+  task completion in one condition. There is no separate t=0 path and no separate
+  task-completed check; the embodiment layer clearing `current_task` on completion is what
+  makes these the same event.
+- `theta_crossed` — belief confidence crosses θ from below to at-or-above it. Explicitly a
+  *crossing* (`prev < θ ≤ current`), not `confidence >= θ` evaluated per tick, which would
+  refire continuously for as long as confidence stayed high.
+- `task_committed` — `holding` transitions `None → not-None` (the robot just picked
+  something up).
+
+`MetaPlanner` owns `_prev_belief`/`_prev_executor_state` internally to detect the two
+transition-based triggers, rather than accepting them as parameters as `should_replan()` did.
+Unresolved and low-stakes: if `theta_crossed` and `task_committed` both hold on one tick,
+`theta_crossed` wins arbitrarily. Only the reported `score` differs, and `score` is not
+consumed anywhere yet.
+Files: shared/meta_planner.py (`evaluate_triggers`)
+Reference: Phase 4C meta_planner build session, September 2026
+
+**Queue invariant: the executing task is not in the queue**
+`MetaPlanner._queue` holds only tasks that are *not* currently executing. The in-progress
+task lives solely in `ExecutorState.current_task`, supplied fresh each call by the
+embodiment layer. Candidates are assembled as `[current_task] + queue`.
+
+The alternative — queue always contains every incomplete task including the running one —
+was rejected because it duplicates a fact across two independently-maintained pieces of
+state that must then be kept in agreement, and because `TaskInstance.bindings` is an
+unhashable dict, making identity comparison awkward. One fact, one owner.
+Files: shared/meta_planner.py (`update`), shared/types.py (ExecutorState)
+Reference: Phase 4C meta_planner build session, September 2026
+
+**Task exhaustion is returned, not raised**
+When no candidates remain, `update()` returns `UpdateResult(current_task=None, queue=[])`
+rather than raising. "All tasks complete" is a fact the cognitive layer discovers about its
+own state; signalling it by exception would force the embodiment layer to catch and
+translate it into a decision `shared/` already made. That inverts the mind/body separation,
+where `shared/` decides and simulators execute.
+
+This is consistent with the rest of the interface: `evaluate_triggers()` already returns a
+typed "nothing to do" decision rather than signalling absence otherwise, and
+`ExecutorState.current_task` is already `Optional`.
+
+The remaining `RuntimeError` in `update()` — every candidate excluded as infeasible by
+interference — deliberately stays an exception. That is a genuine anomaly, not a normal end
+state, and keeping the two distinguishable matters: using one mechanism for both would force
+callers to inspect the message string to tell them apart.
+Files: shared/meta_planner.py (`update`), mesa_sim/sim_agents.py (RobotAgent.finished)
+Reference: Phase 4C meta_planner build session, September 2026
+
+**Interference is a hard gate only; conflicts are not yet priced**
+`_detect_interference()` observes (returns all `ConflictPoint`s plus a `feasible` verdict);
+`_cost()` values. This separation is per DESIGN-08 and is already reflected in the types.
+Currently `_cost()` returns execution cost alone: `feasible=False` removes a candidate
+entirely before cost is computed, and a candidate that is feasible-but-close pays no penalty.
+"Near but safe" is therefore not yet penalized — only "unsafe" is excluded.
+
+`assessment.conflicts` is deliberately computed, carried, and left unused by `_cost()`, so
+adding a soft penalty later requires no new computation and no interface change — only a
+formula. That formula is DESIGN-08's open question and is not decided here.
+
+Note also that no separate "trigger a reselect" step exists. An infeasible `current_task` is
+simply excluded like any other candidate, and whatever wins the argmin over survivors becomes
+the new current task — which *looks* like a reselect but is not a distinct decision path.
+This is the current-task-as-candidate principle applied consistently to feasibility.
+Files: shared/meta_planner.py (`_detect_interference`, `_cost`, `update`)
+Reference: Phase 4C meta_planner build session, September 2026
+
+
+**Projection is a service, separate from selection**
+`shared/projection.py` (`Projector`) owns turning a task into a predicted trajectory:
+`project()`, `project_human()`, `build_segments()`, `estimate_duration()`. These were
+originally private methods on `MetaPlanner` (`_project`, `_build_segments`,
+`_estimate_duration`, plus inline human-projection code in `update()`).
+
+Extracted because projection is not selection logic — `MetaPlanner` merely consumes it.
+Three planned consumers want projection without wanting selection: DESIGN-13's
+path-realization estimator (Phase 4D), visualization drawing predicted paths, and Phase 5
+evaluation measuring prediction quality. Under the old structure each would have had to
+reach into `MetaPlanner`'s privates or duplicate the logic.
+
+Layering, one-way:
+
+    trajectory_algorithms.py   pure geometry
+            ↓
+    projection.py              task + world → trajectory
+            ↓
+    meta_planner.py            which trajectory to pick
+
+The `Projector` is **injected**, not constructed by `MetaPlanner` — one instance, held by
+the agent, shareable with viz/evaluation later. `assumed_speed` and `default_action_cost`
+live on `Projector` only; duplicating them on `MetaPlanner` would give two sources of truth
+that could silently disagree.
+
+The human's projection is built once per fired trigger via
+`MetaPlanner.update_human_projection()` (a thin wrapper supplying the recognizer and
+`human_agent_id`) and passed to `update()` as an explicit parameter rather than stored on
+the instance. Passing it makes the ordering requirement a type-level fact instead of a
+runtime convention — `update()` cannot be called without one, so there is no stale-state
+failure mode to guard against. Consistent with how `BeliefState` already flows: computed by
+one call, passed explicitly to the next, never stashed.
+Files: shared/projection.py, shared/meta_planner.py, mesa_sim/sim_agents.py
+Reference: Phase 4C meta_planner build session, September 2026

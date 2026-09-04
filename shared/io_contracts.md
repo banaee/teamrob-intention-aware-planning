@@ -4,11 +4,12 @@ This document defines the **minimal, simulator-agnostic I/O contracts** for the 
 Implementation details (Bayes, HTN search, etc.) are intentionally omitted.
 All simulators (Mesa, ROS) must translate their internal data into these canonical forms.
 
-**Regenerated in full** against current `shared/types.py`, `shared/planner.py`,
-`shared/domain_knowledge.py`, `shared/recognizer.py` — the previous version had drifted
-significantly (missing `meta_planner.py` entirely, wrong `Observation`/`BeliefState` field
-names, stale `IntentionRecognizer` constructor, stale filenames). One item below is flagged
-as an open discrepancy rather than silently resolved — see §1.3.
+**Last aligned September 2026** against `shared/types.py`, `shared/planner.py`,
+`shared/domain_knowledge.py`, `shared/recognizer.py`, `shared/meta_planner.py`, and
+`shared/trajectory_algorithms.py`, following the Phase 4C MetaPlanner build. §2.2 is now
+verified implementation, not proposed design; §2.2a (the retired `replanning.py` trigger)
+has been deleted along with the module. The previously-flagged §1.3 discrepancy
+(`object_positions`/`agent_positions`) is now confirmed resolved.
 
 ---
 
@@ -63,7 +64,7 @@ ROS must **discretize sensor streams** into microaction labels before calling IR
 
 ### 1.2 `BeliefState`
 
-**Produced by IR**, consumed by `meta_planner.py` (proposed) and `replanning.py` (current).
+**Produced by IR**, consumed by `meta_planner.py`.
 
 ```python
 @dataclass
@@ -86,7 +87,7 @@ class BeliefState:
 
 ### 1.3 `WorldState`
 
-**Produced by simulator**, consumed by `planner.py`, `replanning.py`, and `meta_planner.py` (proposed).
+**Produced by simulator**, consumed by `planner.py` and `meta_planner.py`.
 
 ```python
 @dataclass
@@ -112,13 +113,12 @@ class WorldState:
     metadata: Dict[str, Any] = field(default_factory=dict)
 ```
 
-**Status note, not a silent assumption:** `object_positions`/`agent_positions` are included
-here because `design_decisions.md` records them as decided, deliberate design — the same
-treatment given to `meta_planner.py` (§2.2), which is also documented ahead of being built.
-Unlike `meta_planner.py`, there's no clean "NOT STARTED"-style signal for these two fields —
-it's genuinely unclear whether they're implemented and my search just didn't surface them,
-or genuinely not yet added to the dataclass. Confirm directly against `shared/types.py`
-before depending on this in code.
+**Status: RESOLVED (September 2026).** `object_positions`/`agent_positions` were previously
+flagged here as an open discrepancy — documented as decided design, but unconfirmed as
+present in the dataclass. Both are confirmed implemented and live:
+`MetaPlanner._build_segments()` reads `world.agent_positions[agent_id]` and
+`world.object_positions[target_id]` on every projection, and `scenario_00` runs end-to-end
+without error. No longer a discrepancy.
 
 **Scoped exception, per design_decisions.md:** exists specifically for `move_to`'s latent
 target-parameter inference (trajectory-consistency scoring in the recognizer) — the one case
@@ -136,8 +136,10 @@ and target-resolution helpers (`_get_expected_position`, `_get_target_zone`) in
 `in_zone` and `at` are intentionally distinct predicates. Conflating them caused a semantic
 mismatch where `move_to` completion was never satisfied.
 
-**Design rule:** core planners only use symbolic predicates; geometry stays in simulators
-(subject to the §1.3 discrepancy above, which is the one narrow exception if it exists).
+**Design rule:** core planners only use symbolic predicates; geometry stays in simulators —
+subject to the two scoped exceptions above, both now confirmed live: IR's trajectory-
+consistency scoring, and `MetaPlanner`'s duration/interference estimation, which reads
+positions to build `Segment`s (§1.7). `planner.py` and `executor.py` remain fully symbolic.
 
 ---
 
@@ -197,27 +199,37 @@ class TaskInstance:
 
 ### 1.7 `ProjectedPlan` — meta_planner-internal only
 
-**Produced and consumed only by `meta_planner.py`** (proposed, not yet implemented — see
-§2.2). Never handed to the executor. Multi-task lookahead across a candidate ordering, used
-for interference detection and cost comparison.
+**Produced and consumed only by `meta_planner.py`.** Never handed to the executor. Under
+the `single_task` strategy (DESIGN-16, the implemented default) a `ProjectedPlan` always
+holds exactly one entry — the multi-entry shape is retained for the deferred
+`full_reorder` strategy, which is not implemented.
 
 ```python
 @dataclass
+class Segment:
+    start_pos: Tuple[float, float]
+    start_step: float
+    end_pos: Tuple[float, float]
+    end_step: float
+
+@dataclass
 class ProjectedPlanEntry:
     abstract_plan: AbstractPlan
-    estimated_start_step: float
-    estimated_duration: float
-    spatial_zones: List[str]
+    estimated_start_step: int
+    estimated_duration: int
+    segments: List[Segment]
 
 @dataclass
 class ProjectedPlan:
-    task_queue: List[TaskInstance]
+    task_queue: List[str]        # task_instance_key() strings, not TaskInstance objects
     entries: List[ProjectedPlanEntry]
-    total_estimated_cost: float
+    total_estimated_cost: int
 ```
 
-**Invariant:** only `AbstractPlan` (single task) crosses the meta_planner → planner →
-executor boundary. `ProjectedPlan` never does.
+`spatial_zones` was removed — zone membership was rejected as a proximity criterion
+(zones are arbitrary in size; co-location in one zone doesn't imply closeness). Replaced
+by `segments`, which carry actual geometry for distance-based interference detection.
+See `shared/trajectory_algorithms.py`.
 
 ---
 
@@ -270,9 +282,46 @@ class TriggerDecision:
 
 @dataclass
 class UpdateResult:
-    current_task: TaskInstance
+    current_task: Optional[TaskInstance]   # None = all tasks complete (see §2.2, Update)
     queue: List[TaskInstance]
 ```
+
+**`ConflictPoint`** / **`InterferenceAssessment`** — interference-detection output.
+`_detect_interference()` observes; `_cost()` values. The separation is deliberate
+(DESIGN-08): conflicts are computed and carried but not currently priced.
+
+```python
+@dataclass
+class ConflictPoint:
+    step: float                            # may be fractional — continuous sampling
+    position: Tuple[float, float]          # midpoint between the two agents
+    distance: float                        # actual Euclidean separation at this point
+
+@dataclass
+class InterferenceAssessment:
+    feasible: bool                         # False = candidate excluded before costing
+    conflicts: List[ConflictPoint]         # all observed, feasible or not
+```
+
+No `zone` field: zone co-occupancy was rejected as a proximity criterion (zones are
+arbitrary in size, so co-location implies nothing about closeness). See
+design_decisions.md, "Interference is geometric, not zone-based."
+
+---
+
+### 1.10 `task_instance_key()`
+
+**Free function in `shared/types.py`**, not a method. Derives a stable identity string
+for a `TaskInstance` (schema name + sorted bindings), used for `ProjectedPlan.task_queue`.
+`TaskInstance` has no `id` field and its `bindings` dict is unhashable, so it cannot be a
+set member or dict key directly.
+
+```python
+task_instance_key(task: TaskInstance) -> str    # "deliver_item(?item=item_3)"
+```
+
+Two `TaskInstance`s with identical schema+bindings produce the same key by design — that
+is correct, not a collision to guard against. Mirrors `HypothesisKey.__repr__`'s pattern.
 
 ---
 
@@ -310,9 +359,16 @@ task's `TaskSchema.parameter_types`. Degenerates to one hypothesis for parameter
 ```python
 update(
     obs: Observation,
-    prev_belief: BeliefState | None = None
+    world: WorldState,
+    prev_belief: BeliefState | None = None,
 ) -> BeliefState
 ```
+
+**Correction (September 2026):** the previous contract omitted `world: WorldState`. It is a
+required positional parameter — the recognizer needs world predicates and positions for
+likelihood evaluation. Confirmed against `shared/recognizer.py` and the call site in
+`mesa_sim/sim_agents.py`. The recognizer holds no belief internally: `prev_belief` comes in,
+a new `BeliefState` goes out, and the caller owns the state.
 
 Dispatches by schema-declared `microactions` membership and `progress_evaluator` name —
 never by hardcoded microaction strings. See `design_decisions.md`, "IR likelihood dispatch."
@@ -330,21 +386,48 @@ binding resolution.
 
 ---
 
-### 2.2 `MetaPlanner` (`shared/meta_planner.py`) — PROPOSED, not yet implemented
+### 2.2 `MetaPlanner` (`shared/meta_planner.py`) — IMPLEMENTED (`single_task` path)
 
-Per `roadmap.md`, Phase 4C is 🔲 NOT STARTED — this section documents resolved design
-questions (Q1–Q4, DESIGN-07, DESIGN-09, the cancellation resolution), not verified code.
-Confirm against actual `shared/meta_planner.py` once it exists, before relying on exact
-signatures.
+Verified against `shared/meta_planner.py` and validated end-to-end against `scenario_00`
+(September 2026). The `full_reorder` strategy is **not** implemented — `update()` and
+`_project()` both raise `NotImplementedError` for it (DESIGN-16).
+
+Private methods (`_project`, `_build_segments`, `_detect_interference`, `_cost`,
+`_estimate_duration`) are internal to the class and deliberately not part of this contract;
+only the constructor and the two public methods below are cross-boundary surface.
 
 #### Constructor
+
 ```python
-MetaPlanner(knowledge: DomainKnowledgeBase, theta: float = 0.75)
+MetaPlanner(
+    knowledge: DomainKnowledgeBase,
+    recognizer: IntentionRecognizer,
+    theta: float = 0.75,
+    assumed_speed: float = 1.0,
+    default_action_cost: float = 1.0,
+    min_safe_distance: float = 1.0,
+    strategy: Literal["single_task", "full_reorder"] = "single_task",
+    interference_algorithm: Callable = discretized_time_sampling,
+    human_agent_id: Optional[str] = None,
+)
 ```
+
 Owns the task queue internally (Q1) — not passed in on each call. `theta` is a cognitive-
 clock policy parameter (DESIGN-07), kept as an explicit constructor default rather than
 read from `costs.yaml` — `costs.yaml` holds domain-specific step costs, a different concern
 from IR confidence-gating.
+
+`recognizer` is the **same live instance** the owning agent holds, not a second one built
+here — `get_hypothesis()` is a static lookup built once at recognizer construction and is
+stateless with respect to belief, so holding this reference carries no staleness risk. It
+also avoids constructor bloat (`context`, `hypotheses`) and a redundant unused `_history`.
+
+`strategy` and `interference_algorithm` are swap points (DESIGN-16, DESIGN-10).
+`human_agent_id=None` means no human projection is built and every candidate is treated as
+feasible — mirroring `RobotAgent.observed_agent_id`'s existing optionality.
+
+`assumed_speed`, `default_action_cost`, and `min_safe_distance` are **uncalibrated
+placeholders**, not tuned values (TODO-28).
 
 #### Evaluate Triggers
 ```python
@@ -354,9 +437,18 @@ evaluate_triggers(
     executor_state: ExecutorState,
 ) -> TriggerDecision
 ```
-Absorbs `replanning.py`'s trigger role (§2.2a). Event-driven only — task completion, belief
-threshold θ crossed (single threshold θ=0.75, no hysteresis), or task commit (holding state
-change). Confidence is a gate here, never a magnitude fed into `_cost()`.
+Event-driven only. Exactly three conditions (DESIGN-07, resolved):
+
+- `no_current_task` — `executor_state.current_task is None`. Covers **both** t=0 and ordinary
+  task completion in one condition; there is no separate initialization path. This assumes the
+  embodiment layer clears `current_task` when a task's plan finishes.
+- `theta_crossed` — confidence crosses θ from below to at-or-above (`prev < θ ≤ current`).
+  A *crossing event*, not `confidence >= θ` per tick, which would refire continuously.
+- `task_committed` — `executor_state.holding` transitions `None → not-None`.
+
+θ=0.75, single threshold, no hysteresis. Confidence is a gate here, never a magnitude fed
+into `_cost()`. `MetaPlanner` owns `_prev_belief`/`_prev_executor_state` internally — unlike
+the retired `should_replan()`, these are not parameters.
 
 #### Update
 ```python
@@ -371,28 +463,73 @@ continuation vs. reselection falls out of cost comparison across the full candid
 Cancellation cost is not computed here — resolved intrinsically by `planner.py`'s guarded
 method selection on the task itself (`deliver_with_return`, see `design_decisions.md`).
 
+**Queue invariant:** `self._queue` holds only tasks NOT currently executing; the in-progress
+task lives solely in `ExecutorState.current_task`. Candidates = `[current_task] + queue`.
+
+**Strategy (DESIGN-16).** "Candidate" always means an individual task, never an ordering.
+`self._strategy` controls only how much of the queue one `update()` call rewrites:
+
+- `single_task` (default, implemented) — each candidate is projected alone from the live
+  `WorldState`, infeasible ones dropped, argmin becomes the new `current_task`. The rest of
+  the queue carries no ordering commitment; it is re-decided at the next trigger.
+- `full_reorder` (not implemented) — would score permutations of the candidate set and
+  replace the whole queue. Blocked on cross-task `WorldState` propagation (TODO-07).
+
+The human's projection is built once per call via `recognizer.get_hypothesis(belief.most_likely)`
+and reused for every candidate. If `human_agent_id is None`, or the hypothesis cannot be
+resolved, no interference check runs that call and every candidate is treated as feasible.
+
+**Terminal state:** `update()` returns `UpdateResult(current_task=None, queue=[])` when no
+candidates remain — all assigned tasks are complete. Callers check
+`result.current_task is None`. Task exhaustion is never signalled by exception; "all tasks
+done" is a fact `shared/` discovers about its own state, so it is returned through the
+contract rather than raised for the embodiment layer to catch and reinterpret.
+
+`update()` does still raise `RuntimeError` when candidates exist but **every** one is
+excluded as infeasible — a genuine anomaly, deliberately distinguishable from exhaustion.
+
+#### Seed Tasks
+```python
+seed_tasks(tasks: List[TaskInstance]) -> None
+```
+Loads the initial task pool. Does **not** order it — Q0 comes from the first `update()` call,
+fired by `no_current_task`, through the identical pipeline used for every later
+re-evaluation. There is no base-cost heuristic and no special t=0 path. Called once by the
+embodiment layer at agent construction (see TODO-35 on its placement).
+
 ---
 
-### 2.2a Replanning Trigger (`shared/replanning.py`) — current, transitional
+### 2.2b `trajectory_algorithms` (`shared/trajectory_algorithms.py`)
 
+Pure free functions operating on `Segment` / `ConflictPoint` — no classes, no state, no
+simulator imports. Two families, each a deliberate swap point rather than fixed logic.
+`MetaPlanner` selects the interference algorithm via its `interference_algorithm`
+constructor parameter, so replacing one never requires editing `_detect_interference()`.
+
+**Path realization** — how one action's motion is computed:
 ```python
-should_replan(
-    current_plan: AbstractPlan | None,
-    new_belief: BeliefState,
-    world: WorldState,
-    prev_belief: BeliefState | None = None,
-) -> dict   # {"replan": bool, "reason": str, "score": float | None}
+straight_line_path(start_pos, start_step, end_pos, assumed_speed) -> Segment
+stationary_segment(pos, start_step, duration) -> Segment          # non-movement actions
+obstacle_aware_path(...)                                          # NOT IMPLEMENTED
 ```
+`obstacle_aware_path()` is the documented placeholder for DESIGN-13 / TODO-09's
+non-linear, obstacle-aware realization (Phase 4D). Note it may require `Segment` itself to
+grow (e.g. a waypoint list), since a non-linear path is not captured by a start/end pair.
 
-**This is the actually-callable trigger mechanism today.** Held wired in parallel (Q4) until
-`meta_planner.py` validates end-to-end against `scenario_00`, then retired in one commit — at
-that point §2.2a is deleted from this document, not just marked superseded.
+**Interference detection** — given two `Segment`s, where and how close do they get:
+```python
+discretized_time_sampling(segment_a, segment_b, interval=1.0) -> List[ConflictPoint]
+closest_point_of_approach(segment_a, segment_b) -> List[ConflictPoint]   # NOT IMPLEMENTED
+```
+Both are symmetric in their arguments and return an empty list when the segments do not
+overlap in step-time. `discretized_time_sampling()` is the current default;
+`closest_point_of_approach()` (CPA) is documented with its analytic approach but unbuilt —
+exact rather than sampled, no interval tradeoff, but with real edge cases (clamping the
+analytic minimum to the overlap window, near-zero relative velocity).
 
-**Notes**
-- Simulators decide WHEN to call this — Mesa calls every step; ROS ties this to
-  cognitive-layer events, never a fixed timer or the motion-clock tick rate.
-  "Periodically" is not a valid calling pattern on either backend.
-- Core never schedules itself
+These functions **measure only and hold no policy**. The single policy decision — what
+distance counts as unsafe — lives in `MetaPlanner._detect_interference()` as
+`min_safe_distance`.
 
 ---
 
@@ -467,10 +604,13 @@ domains/kitting/
     actions.py          # ActionSchema definitions — HTN primitive tasks (leaves)
     registry.py        # builds DomainModel, declares intention set
     scenarios.py       # ScenarioConfig objects — typed Python, no YAML
-    env1_layout.json   # environment spatial layout
+    env_layout0.json   # environment spatial layout (one file per layout)
+    env_layout1.json
 ```
 
-**Correction from previous version:** the file is `actions.py`, not `ActionSchemas.py`.
+**Corrections from previous versions:** the file is `actions.py`, not `ActionSchemas.py`;
+layout files are `env_layout0.json` / `env_layout1.json`, not `env1_layout.json`. Each
+layout carries its own scenarios, registered in `registry.py`'s `domain_config["layouts"]`.
 
 **HTN alignment:**
 - `TaskSchema` = non-primitive task — decomposes via `MethodSchema`
@@ -486,8 +626,12 @@ domains/kitting/
 - Maintains perfect synchronous ground truth
 - Builds `Observation` each step from human agent state (`detected_microaction` known exactly)
 - Builds `WorldState` each step from Mesa world — emits `in_zone` and `at` predicates
-- Calls cognitive loop each step: `obs_builder → recognizer → meta_planner (absorbs
-  replanning's trigger role via evaluate_triggers(), §2.2) → planner → executor`
+- Calls cognitive loop each step: `obs_builder → recognizer → meta_planner
+  (evaluate_triggers/update, §2.2) → planner → executor`
+- Builds one `ExecutorState` per step and passes the same instance to both
+  `evaluate_triggers()` and `update()` — never re-derives it between the two calls
+- Clears `current_task` on task completion (this is what makes `no_current_task` fire) and
+  sets its own `finished` flag when `update()` returns `current_task=None`
 - Executes `GroundedAction` via `action_decomposer.py` → microaction queue → one microaction per step
 
 ### 4.2 ROS (`ros_sim/`)
@@ -523,5 +667,12 @@ Simulators MUST ensure:
 5. `AbstractPlan.actions` is a non-empty list of fully grounded `GroundedAction` objects
 6. No `Var` objects remain in any `GroundedAction.bindings` or `completion_predicate`
 7. All intention names in `BeliefState.distribution` are registered in `DomainModel.intentions`
+8. `ExecutorState` is built once per cognitive-clock event and passed unchanged to both
+   `evaluate_triggers()` and `update()`
+9. `ExecutorState.current_task` is cleared to `None` when a task's plan completes — omitting
+   this silently disables the `no_current_task` trigger and the robot never advances
+10. A task's `MethodSchema` set covers every world state that task can start *or resume*
+    from — plans are re-decomposed from scratch at every trigger, never resumed from a
+    cursor (see design_decisions.md)
 
 ---

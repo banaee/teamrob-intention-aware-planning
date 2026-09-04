@@ -71,7 +71,7 @@ class AgentState:
     """
     Symbolic state of a single agent.
     Built by: SIM_sim/world_state_builder.py while processing simulator state each MESA step or each ROS callback (or when requested by planner).
-    Consumed by: shared/planner.py, shared/replanning.py
+    Consumed by: shared/planner.py, shared/meta_planner.py
     """
     agent_id: str
     current_zone: str
@@ -134,7 +134,7 @@ class WorldState:
     Symbolic representation (snapshot) of the environment at a given time.
     Built by embodiment layers, consumed by cognitive layer. 
     Bulit by SIM_sim/world_state_builder.py in each Mesa step or each ROS callback (or when requested by planner).
-    Consumed by: shared/planner.py, shared/replanning.py
+    Consumed by: shared/planner.py, shared/meta_planner.py
     Note: not persistent: created fresh each step, passed as argument, discarded.    
     """
     timestamp: float
@@ -300,6 +300,23 @@ class TaskInstance:
     schema: "TaskSchema"
     bindings: Dict[Var, Const]  # {Var("?item"): Const("item_1")}
 
+def task_instance_key(task: TaskInstance) -> str:
+    """
+    Derived identity string for a TaskInstance — schema name + sorted bindings,
+    e.g. "deliver_item(?item=item_3)". Two TaskInstances with identical
+    schema+bindings produce the same key by design (not a bug to guard
+    against — see design_decisions.md). Mirrors HypothesisKey.__repr__ in
+    shared/recognizer.py; introduced here rather than as a stored id field
+    on TaskInstance (would touch every construction site in
+    domains/*/scenarios.py for no benefit).
+    """
+    if not task.bindings:
+        return f"{task.schema.name}()"
+    params = ",".join(
+        f"{var.name}={const.value}"
+        for var, const in sorted(task.bindings.items(), key=lambda kv: kv[0].name)
+    )
+    return f"{task.schema.name}({params})"
 
 @dataclass
 class AgentConfig:
@@ -412,6 +429,30 @@ class AbstractPlan:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
+class Segment:
+    """
+    One action's straight-line motion (or stationary hold) through space and
+    step-time — the unit interference-detection algorithms operate on.
+
+    Straight-line/constant-speed only, matching the same assumption
+    _estimate_duration() already makes (distance / assumed_speed) and Mesa's
+    current steps_toward(). Non-movement actions (grasp, wait, place) are
+    stationary segments — start_pos == end_pos, spanning the action's
+    duration — still valid input to interference algorithms (e.g. a human
+    passing close while the robot is stationary mid-pickup).
+
+    Path-realization beyond straight-line (static-obstacle-aware, non-linear)
+    is DESIGN-13's common path-realization estimator (Phase 4D) — out of
+    scope here by design. Swapping it in later should only require changing
+    how MetaPlanner._build_segments() computes each segment's path, not this
+    shape.
+    """
+    start_pos: Tuple[float, float]
+    start_step: float
+    end_pos: Tuple[float, float]
+    end_step: float
+    
+@dataclass
 class ProjectedPlanEntry:
     """
     One task's contribution to a ProjectedPlan.
@@ -420,9 +461,9 @@ class ProjectedPlanEntry:
     abstract_plan: "AbstractPlan"
     estimated_start_step: int
     estimated_duration: int         # steps to complete this task
-    spatial_zones: List[str]        # zones occupied during this task (for interference detection)
-
-
+    segments: List[Segment]         # per-action straight-line motion/hold, for interference detection
+    
+    
 @dataclass
 class ProjectedPlan:
     """
@@ -435,16 +476,25 @@ class ProjectedPlan:
     entries: List[ProjectedPlanEntry]
     total_estimated_cost: int           # sum of durations + any inter-task gap steps
 
-
 @dataclass
 class ConflictPoint:
     """
     A single observed spatial/temporal overlap between the robot's projected
-    trajectory and the human's predicted trajectory.
-    Purely observational — carries no cost/penalty judgment.
+    trajectory and the human's predicted trajectory. Purely observational —
+    carries no cost/penalty judgment; _detect_interference() thresholds
+    `distance` to decide feasibility, _cost() may use it as a soft-penalty
+    magnitude once DESIGN-08 is revisited (not yet — hard-gate only for now).
+
+    No `zone` field — zone-based proximity was rejected as too coarse and
+    arbitrary a definition of "close" (see design_decisions.md); replaced by
+    actual geometric distance between the two agents' projected positions,
+    produced by whichever interference algorithm is in use (discretized
+    time-sampling by default, CPA as a documented future alternative — see
+    shared/interference_algorithms.py).
     """
-    step: int
-    zone: str
+    step: float
+    position: Tuple[float, float]
+    distance: float
 
 
 @dataclass
@@ -481,7 +531,9 @@ class ExecutorState:
 @dataclass
 class TriggerDecision:
     """Return type of MetaPlanner.evaluate_triggers()."""
-    replan: bool
+    fired: bool          # a cognitive-clock event occurred; what the caller does with
+                         # it is the caller's business (renamed from `replan`, which
+                         # presumed the consequence — inherited from should_replan())
     reason: str
     score: Optional[float] = None
 
