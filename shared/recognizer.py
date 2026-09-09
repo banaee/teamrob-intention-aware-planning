@@ -46,6 +46,7 @@ OUTPUTS:
 
 from importlib.metadata import distribution
 import itertools
+import logging
 from typing import Dict, List, Optional, Tuple
 
 from shared.types import (
@@ -282,7 +283,35 @@ class IntentionRecognizer:
         schema's OWN declared microactions list — domain knowledge, not simulator
         vocabulary. A new domain with a different microaction taxonomy needs zero
         changes here; it only needs correctly populated ActionSchema objects.
+
+        HELD-ITEM CONSTRAINT (see TODO-37): if the observed agent is holding an
+        item, every hypothesis bound to a DIFFERENT item is refuted, not merely
+        less likely — the intention is observed, not inferred. Returning
+        LOW_LIKELIHOOD before any directional evidence is consulted prevents
+        weak cosine-similarity evidence from outvoting a world fact. Without
+        this, a previously-delivered item sitting at the kitting table becomes a
+        geometric decoy for every human carry leg (validated: scenario_00,
+        run_20260904_131808, belief reached 0.995 on an already-completed task).
         """
+
+        held_item = next(
+            (
+                p.args[1].value
+                for p in world.predicates
+                if p.name == "holding"
+                and len(p.args) == 2
+                and p.args[0].value == obs.agent_id
+            ),
+            None,
+        )
+        if held_item is not None:
+            hyp_item = hyp.bindings.get("?item")
+            if hyp_item is not None and hyp_item != held_item:
+                return LOW_LIKELIHOOD
+            
+            
+            
+        
         mu = (obs.detected_microaction or "").upper()
 
         for schema in self._get_relevant_action_schemas(hyp):

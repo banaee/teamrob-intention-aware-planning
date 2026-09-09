@@ -201,6 +201,7 @@ class RobotAgent(FactoryAgent):
             projector=self.projector,
             recognizer=self.recognizer,
             human_agent_id=observed_agent_id,
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         )
         self.meta_planner.seed_tasks(scheduled_tasks)
         self.current_task_instance: Optional[TaskInstance] = None

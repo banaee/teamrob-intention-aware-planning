@@ -43,14 +43,28 @@ WHAT THIS MODULE DOES NOT DO:
       call evaluate_triggers()/update(); this module decides WHAT counts as a trigger
     - Does NOT import from mesa_sim/ or ros_sim/
 
-CANDIDATE SET (settled design, see design_decisions.md):
-    "Candidate" always means an individual task — never an ordering. The
-    candidate set for every update() call is {current_task} ∪ remaining_tasks.
-    current_task competes as just another candidate — no special-case
-    WAIT/RESELECT branch. Continuation vs. reselection falls out of cost
-    comparison, not a separate decision — there is no distinct "go for
-    reselect" step; an infeasible or costlier current_task is simply excluded
-    or outscored like any other candidate would be.
+BLOCK STRUCTURE OF update():
+    0.    task pool = ([current_task] if not None else []) + self._queue.
+          Terminal return if empty.
+    B1.5  current_task is None → nothing to continue; go straight to B3.
+          Not an algorithmic block. Task boundaries always re-decide freely.
+    B2    _is_current_task_plausible() — a MID-TASK commitment gate. Continue
+          the current task, or escalate to B3. Skipped entirely when
+          self._gate_strategy == "none" (the default), in which case update()
+          behaves exactly as it did before the block split.
+    B3    _replan_tasks() — selects the task assignment and commits.
+
+TASK POOL vs. CANDIDATES:
+    The pool assembled in update() is NOT a candidate set. Nothing competes at
+    that level. Candidates come into existence only inside B3, and what they
+    are depends on B3's strategy: an individual task under "single_task", a
+    permuted ordering under "full_reorder". Forming them from the pool is B3's
+    private business.
+
+    Inside B3, current_task is an ordinary candidate and competes on identical
+    terms — no WAIT/RESELECT branch there; continuation vs. reselection falls
+    out of the argmin. The one explicit continuation branch in the design is
+    B2, which decides whether B3 runs at all, not what B3 decides once it does.
 
 STRATEGY (DESIGN-16):
     self._strategy controls how much of the queue a given update() call
@@ -100,6 +114,7 @@ from shared.types import (
     UpdateResult,
     Segment,
     ConflictPoint,
+    task_instance_key,
 )
 
 
@@ -121,6 +136,7 @@ class MetaPlanner:
         theta: float = 0.75,
         min_safe_distance: float = 1.0,
         strategy: Literal["single_task", "full_reorder"] = "single_task",
+        gate_strategy: Literal["none", "b2a", "b2b"] = "none",
         interference_algorithm: Callable[[Segment, Segment], List[ConflictPoint]] = discretized_time_sampling,
         human_agent_id: Optional[str] = None,
     ):
@@ -137,17 +153,20 @@ class MetaPlanner:
                                  list that constructing a second instance would add.
         theta:                   cognitive-clock confidence threshold (DESIGN-07). Gate
                                  only — never fed into _cost() as a magnitude.
-        assumed_speed:           forwarded to Projector — world-units per estimation-unit
-                                 for movement actions. Uncalibrated placeholder (TODO-28).
-        default_action_cost:     forwarded to Projector — fallback duration for
-                                 non-movement actions with no costs.yaml entry. Also a
-                                 placeholder.
         min_safe_distance:       distance threshold below which a ConflictPoint makes a
                                  candidate infeasible (see _detect_interference()).
                                  Placeholder default, same "needs calibration" status as
                                  assumed_speed — not derived from any domain config yet.
-        strategy:                "single_task" (default, implemented) or "full_reorder"
-                                 (not yet functional) — see module docstring, DESIGN-16.
+        strategy:                B3's strategy — "single_task" (default, implemented) or
+                                 "full_reorder" (not yet functional). Selects what a
+                                 candidate is inside _replan_tasks(): an individual task,
+                                 or a permuted ordering. See module docstring, DESIGN-16. DESIGN-16.
+        gate_strategy:           B2, the mid-task plausibility gate. "none" (default)
+                                 skips B2 entirely — update() then behaves exactly as it
+                                 did before the block split. "b2a" (assess current task in
+                                 isolation) and "b2b" (compare current against other tasks
+                                 individually) are not yet implemented. Independent of
+                                 `strategy`; all combinations are intended to be runnable.
         interference_algorithm:  function(Segment, Segment) -> List[ConflictPoint].
                                  Defaults to trajectory_algorithms.discretized_time_sampling.
                                  closest_point_of_approach is a documented, unimplemented
@@ -166,6 +185,7 @@ class MetaPlanner:
         self._theta = theta
         self._min_safe_distance = min_safe_distance
         self._strategy = strategy
+        self._gate_strategy = gate_strategy
         self._interference_algorithm = interference_algorithm
         self._human_agent_id = human_agent_id
         self._queue: List[TaskInstance] = []  # owned internally per Q1; populated by seed_tasks()
@@ -256,8 +276,6 @@ class MetaPlanner:
         )
     
     
-    
-    
     def update(
         self,
         belief: BeliefState,
@@ -266,95 +284,76 @@ class MetaPlanner:
         human_projection: Optional[ProjectedPlan]
     ) -> UpdateResult:
         """
-        Main entry point when evaluate_triggers() fires.
+        Main entry point when evaluate_triggers() fires. Dispatch only — the
+        decision logic lives in the blocks below.
 
-        Queue invariant (settled this session): self._queue holds only tasks
-        NOT currently executing. The in-progress task, if any, lives solely in
-        executor_state.current_task — it is not also a member of self._queue.
-        Candidates = ([executor_state.current_task] if not None else []) +
-        self._queue. On a winner: if it's the same object as current_task,
-        the queue is untouched (continuation); if different, the winner is
-        removed from the candidate list to form the new queue and the
-        abandoned current_task (if any) is implicitly back in the pool via
-        that same list. No special-case branch for either outcome — both fall
-        out of the identical argmin.
+        Queue invariant: self._queue holds only tasks NOT currently executing.
+        The in-progress task, if any, lives solely in
+        executor_state.current_task. The task pool for this call is
+        ([current_task] if not None else []) + self._queue.
 
-        single_task strategy (the only implemented path):
-            1. `human_projection` is supplied by the caller, built once per fired
-               trigger via update_human_projection(). Not rebuilt here, not
-               recomputed per candidate. None means no human observed or the
-               hypothesis was unresolvable — every candidate is then scored
-               without an interference check, not treated as always-conflicting.
-            2. For each candidate: _project([task], ...) alone, then
-               _detect_interference() against the human's projection (if
-               built). Infeasible candidates are dropped before cost is even
-               computed.
-            3. argmin _cost() over the feasible survivors becomes the new
-               current_task; the queue is every other candidate, in whatever
-               order they happened to iterate — order carries no commitment
-               under this strategy, it will be re-decided next trigger.
+        Note the pool is NOT called "candidates". Candidates come into
+        existence only inside B3, and what they are depends on B3's strategy —
+        individual tasks under single_task, permuted orderings under
+        full_reorder. Nothing is competing for anything at this level.
 
-        full_reorder strategy: NOT YET IMPLEMENTED — raises NotImplementedError.
-        _project() itself already refuses orderings longer than 1 (DESIGN-16).
+        BLOCK STRUCTURE:
+            0.    assemble the task pool; terminal return if empty
+            B1.5  no current task → nothing to continue, go straight to B3
+            B2    _is_current_task_plausible() — continue, or escalate to B3
+            B3    _replan_tasks() — select and commit
+
+        `human_projection` is supplied by the caller, built once per fired
+        trigger via update_human_projection(). Not rebuilt here, not recomputed
+        per candidate. None means no human observed or the hypothesis was
+        unresolvable — every candidate is then scored without an interference
+        check, not treated as always-conflicting.
 
         TERMINAL STATE: returns UpdateResult(current_task=None, queue=[]) when
-        no candidates remain (queue empty and nothing executing) — all assigned
-        tasks are complete. This is a normal return, not an exception; callers
-        check `result.current_task is None`. The remaining RuntimeError in this
-        method (every candidate excluded by _detect_interference()) is a genuine
-        anomaly and stays an exception, deliberately distinguishable from this.
+        the pool is empty (queue empty and nothing executing) — all assigned
+        tasks are complete. A normal return, not an exception; callers check
+        `result.current_task is None`.
         """
-        candidates: List[TaskInstance] = list(self._queue)
+        task_pool: List[TaskInstance] = list(self._queue)
         if executor_state.current_task is not None:
-            candidates = [executor_state.current_task] + candidates
+            task_pool = [executor_state.current_task] + task_pool
 
-        if not candidates:
+        if not task_pool:
             # Terminal state, not an error: all assigned tasks are complete.
             # Returned rather than raised so the embodiment layer learns this
             # from the contract instead of catching an exception — see
             # design_decisions.md, mind/body separation.
             return UpdateResult(current_task=None, queue=[])
 
-        if self._strategy == "full_reorder":
-            raise NotImplementedError(
-                "MetaPlanner.update: 'full_reorder' strategy is not yet "
-                "implemented — see design_decisions.md, DESIGN-16. "
-                "_project() raises NotImplementedError for orderings longer "
-                "than 1, which this strategy would require."
-            )
-        if self._strategy != "single_task":
-            raise ValueError(f"MetaPlanner: unknown strategy '{self._strategy}'")
+        # ---- B1.5: no current task, so there is nothing to continue --------
+        # Not an algorithmic block. Task boundaries always re-decide freely;
+        # B2 is specifically a MID-TASK commitment mechanism.
+        if executor_state.current_task is not None:
+            # ---- B2: plausibility gate on the current task ------------------
+            if self._is_current_task_plausible(
+                belief=belief,
+                world=world,
+                executor_state=executor_state,
+                human_projection=human_projection,
+                task_pool=task_pool,
+            ):
+                # Continuation: queue untouched, current task keeps executing.
+                return UpdateResult(
+                    current_task=executor_state.current_task,
+                    queue=list(self._queue),
+                )
 
-
-        scored: List[tuple] = []
-        for task in candidates:
-            projection = self._projector.project([task], world, executor_state.agent_id, belief, start_step=0.0)
-            if human_projection is not None:
-                assessment = self._detect_interference(projection, human_projection)
-            else:
-                assessment = InterferenceAssessment(feasible=True, conflicts=[])
-            
-            logging.info(
-            # f"[meta-cand] {task_instance_key(task)} "
-            f"cost={projection.total_estimated_cost} "
-            f"feasible={assessment.feasible} "
-            f"conflicts={len(assessment.conflicts)} "
-            f"min_dist={min((c.distance for c in assessment.conflicts), default=None)}"
+        # ---- B3: replan the task assignment ---------------------------------
+        return self._replan_tasks(
+            task_pool=task_pool,
+            belief=belief,
+            world=world,
+            executor_state=executor_state,
+            human_projection=human_projection,
         )
-            if assessment.feasible:
-                scored.append((self._cost(projection, assessment), task))
-
-        if not scored:
-            raise RuntimeError(
-                "MetaPlanner.update: no feasible candidate task this trigger "
-                "(every candidate excluded by _detect_interference())."
-            )
-
-        _, winner = min(scored, key=lambda pair: pair[0])
-        new_queue = [t for t in candidates if t is not winner]
-        self._queue = new_queue
-        return UpdateResult(current_task=winner, queue=list(new_queue))
-
+        
+        
+        
     # =========================================================================
     # Internal (not part of io_contracts.md — private to this class)
     # =========================================================================
@@ -375,182 +374,137 @@ class MetaPlanner:
         """
         self._queue = list(tasks)
 
-    def _build_segments(
+
+    # =========================================================================
+    # B2 — plausibility gate on the current task
+    # =========================================================================
+
+    def _is_current_task_plausible(
         self,
-        plan: AbstractPlan,
+        belief: BeliefState,
         world: WorldState,
-        agent_id: str,
-        start_step: float,
-    ) -> List[Segment]:
+        executor_state: ExecutorState,
+        human_projection: Optional[ProjectedPlan],
+        task_pool: List[TaskInstance],
+    ) -> bool:
         """
-        Per-action straight-line motion/hold Segments for `plan`, starting from
-        the agent's live position at `start_step`. Single geometry pass, reused
-        by _project() (attaches segments to ProjectedPlanEntry for interference
-        detection) and available to _estimate_duration() (sums segment spans) —
-        one implementation, not two independent walks.
+        SKELETON — not yet implemented (TODO-36).
 
-        Movement actions (schema.movement_target_key is not None): resolved via
-        trajectory_algorithms.straight_line_path() — the current default path
-        realization (see module docstring, DESIGN-13). Only
-        movement_target_type == "object" is handled — "zone" targets were
-        removed from the live domain (see actions.py); this raises explicitly
-        rather than silently mis-estimating if one reappears.
+        Decides whether the currently-executing task should keep executing, or
+        whether the situation warrants escalating to B3. Called only when
+        executor_state.current_task is not None (see update()'s B1.5).
 
-        Non-movement actions: trajectory_algorithms.stationary_segment(), held
-        for self._knowledge.get_cost(action_name) steps, falling back to
-        self._default_action_cost if costs.yaml has no entry. This includes
-        wait_at — its real ISO-8601 ?duration binding is a
-        mesa_sim/action_decomposer.py concern shared/ has no access to; known
-        simplification (does not distinguish a long wait from a short one),
-        not a considered design decision. Worth revisiting if scenario_00
-        validation shows it producing bad orderings around foreseeable tasks.
+        This is a WORTHINESS check, not a feasibility check. The current task
+        may remain perfectly doable but only via a long pause or detour;
+        "doable" is not the question. Naming reflects that — "feasible" and
+        "should_continue" were both rejected as implying a bare collision test.
+
+        Returns True to continue the current task, False to escalate to B3.
+
+        Strategies (self._gate_strategy):
+            "none" (default) — no gate; always escalate. update() then behaves
+                exactly as it did before the block split.
+            "b2a"  — assess the current task in isolation. Needs a scalar
+                worthiness score derived from the current task's projection
+                against human_projection. NOT IMPLEMENTED.
+            "b2b"  — compare the current task against the other tasks in
+                task_pool individually; continue only if it wins by a clear
+                margin. Redundant with B3 under single_task by construction —
+                a redundancy control for ablation, not a fourth policy.
+                NOT IMPLEMENTED.
+
+        `task_pool` is unused under "b2a" and is present only so the signature
+        does not change when "b2b" is filled in.
         """
-        current_pos = world.agent_positions.get(agent_id)
-        if current_pos is None:
-            raise ValueError(
-                f"MetaPlanner._build_segments: no position for agent "
-                f"'{agent_id}' in world.agent_positions"
+        if self._gate_strategy == "none":
+            return False
+
+        raise NotImplementedError(
+            f"MetaPlanner._is_current_task_plausible: gate_strategy "
+            f"'{self._gate_strategy}' is not yet implemented — see "
+            f"TODOS_AND_DEFERRED.md, TODO-36."
+        )
+
+    # =========================================================================
+    # B3 — task-level replanning
+    # =========================================================================
+
+    def _replan_tasks(
+        self,
+        task_pool: List[TaskInstance],
+        belief: BeliefState,
+        world: WorldState,
+        executor_state: ExecutorState,
+        human_projection: Optional[ProjectedPlan],
+    ) -> UpdateResult:
+        """
+        Selects the task assignment: which task executes now, and what remains
+        queued. "Replan" here is TASK-level — distinct from planner.plan()'s
+        HTN decomposition, which is action-level.
+
+        Forming candidates from task_pool is this block's private business:
+            single_task  — each task in the pool is a candidate; argmin wins.
+            full_reorder — each permutation of the pool is a candidate.
+                           NOT IMPLEMENTED; _project() also refuses orderings
+                           longer than 1 (DESIGN-16).
+
+        single_task detail: each candidate is projected alone from the live
+        WorldState, interference-checked against human_projection if one was
+        built, infeasible candidates dropped before cost is computed. The
+        argmin over survivors becomes current_task; the rest form the queue in
+        whatever order they happened to iterate — order carries no commitment
+        under this strategy, it is re-decided next trigger.
+
+        current_task, if any, is an ordinary member of task_pool and competes
+        on identical terms. Continuation vs. reselection falls out of the
+        argmin; there is no branch for either outcome here. (The one explicit
+        continuation branch in the design lives in update()'s B2, which decides
+        whether this method runs at all — not what it decides once it does.)
+
+        The RuntimeError below (every candidate excluded by
+        _detect_interference()) is a genuine anomaly and stays an exception,
+        deliberately distinguishable from update()'s terminal return.
+        """
+        if self._strategy == "full_reorder":
+            raise NotImplementedError(
+                "MetaPlanner._replan_tasks: 'full_reorder' strategy is not yet "
+                "implemented — see design_decisions.md, DESIGN-16. "
+                "_project() raises NotImplementedError for orderings longer "
+                "than 1, which this strategy would require."
             )
+        if self._strategy != "single_task":
+            raise ValueError(f"MetaPlanner: unknown strategy '{self._strategy}'")
 
-        segments: List[Segment] = []
-        current_step = start_step
-
-        for action in plan.actions:
-            schema = action.schema
-
-            if schema.movement_target_key is not None:
-                if schema.movement_target_type != "object":
-                    raise ValueError(
-                        f"MetaPlanner._build_segments: unsupported "
-                        f"movement_target_type '{schema.movement_target_type}' "
-                        f"for action '{action.action_name}' — only 'object' is "
-                        f"handled (zone targets removed from live domain)"
-                    )
-                target_id = action.bindings.get(schema.movement_target_key)
-                target_pos = world.object_positions.get(target_id)
-                if target_pos is None:
-                    raise ValueError(
-                        f"MetaPlanner._build_segments: no position for target "
-                        f"'{target_id}' in world.object_positions "
-                        f"(action '{action.action_name}')"
-                    )
-                segment = straight_line_path(current_pos, current_step, target_pos, self._assumed_speed)
-                current_pos = target_pos
+        scored: List[tuple] = []
+        for task in task_pool:
+            projection = self._projector.project([task], world, executor_state.agent_id, belief, start_step=0.0)
+            if human_projection is not None:
+                assessment = self._detect_interference(projection, human_projection)
             else:
-                cost = self._knowledge.get_cost(action.action_name)
-                duration = cost if cost is not None else self._default_action_cost
-                segment = stationary_segment(current_pos, current_step, duration)
-
-            segments.append(segment)
+                assessment = InterferenceAssessment(feasible=True, conflicts=[])
 
             logging.info(
-                f"[meta-seg] {agent_id} {action.action_name} "
-                f"{segment.start_pos}@{segment.start_step:.1f} -> "
-                f"{segment.end_pos}@{segment.end_step:.1f}"
+                f"[meta-cand] {task_instance_key(task)} "
+                f"cost={projection.total_estimated_cost} "
+                f"feasible={assessment.feasible} "
+                f"conflicts={len(assessment.conflicts)} "
+                f"min_dist={min((c.distance for c in assessment.conflicts), default=None)}"
             )
-            
-            current_step = segment.end_step
+            if assessment.feasible:
+                scored.append((self._cost(projection, assessment), task))
 
-        return segments
-
-    def _estimate_duration(
-        self,
-        plan: AbstractPlan,
-        world: WorldState,
-        agent_id: str,
-        start_step: float = 0.0,
-    ) -> int:
-        """
-        Total estimated steps to complete `plan` — sum of _build_segments()'s
-        per-action spans. Thin convenience wrapper; _project() does NOT call
-        this, since it needs the segments themselves (for ProjectedPlanEntry)
-        and would otherwise trigger a second, redundant _build_segments() call
-        — it computes duration directly from the segments it already builds.
-        Kept as its own method for any caller that only wants the number.
-
-        Signature changed from the original (plan, world) — agent_id and
-        start_step are now explicit params rather than agent_id being derived
-        from plan.actions[0].bindings.get("?agent"). _project() always has
-        both values on hand already; re-deriving agent_id from bindings was a
-        workaround for not having it, not a considered design choice worth
-        preserving now that every caller can just pass it through. Private
-        method, not part of io_contracts.md, so this is a safe signature change.
-        """
-        segments = self._build_segments(plan, world, agent_id, start_step)
-        if not segments:
-            return 0
-        return int(round(segments[-1].end_step - segments[0].start_step))
-
-    def _project(
-        self,
-        ordering: List[TaskInstance],
-        world: WorldState,
-        agent_id: str,
-        belief: BeliefState,
-        start_step: float,
-    ) -> ProjectedPlan:
-        """
-        Builds a ProjectedPlan for `ordering`.
-
-        len(ordering) == 1 — the only path the "single_task" strategy uses,
-        and the only one implemented:
-            Decomposes the one task via self._planner.plan(), starting from
-            the live WorldState — so a partially-executed current_task is
-            projected from where the agent actually is, not from scratch.
-            No cross-task WorldState chaining involved. `belief` is forwarded
-            to planner.plan() as-is (required, no default on that signature) —
-            _project() always has a real belief available, unlike the human
-            script path in sim_agents.py, which fabricates a dummy one because
-            it has no IR at all.
-
-        len(ordering) > 1 — only reachable under "full_reorder":
-            NOT YET IMPLEMENTED, and deliberately so. For task 2+ in an
-            ordering, the WorldState passed to planner.plan() would need to
-            reflect the world as if every prior task in the ordering already
-            completed — blocked on a WorldState-continuity design question
-            (guard/effects retraction semantics; see design_decisions.md,
-            DESIGN-16). Not solved with a narrow stopgap here, since
-            full_reorder is not the active strategy.
-
-        Also used for the human's predicted single-task "projection" (agent-
-        agnostic, not robot-specific) — wired in from update() via
-        get_hypothesis().
-        """
-        if len(ordering) > 1:
-            raise NotImplementedError(
-                "MetaPlanner._project: multi-task ordering projection requires "
-                "resolving cross-task WorldState continuity — see "
-                "design_decisions.md, DESIGN-16. Not needed while "
-                "self._strategy == 'single_task'."
+        if not scored:
+            raise RuntimeError(
+                "MetaPlanner._replan_tasks: no feasible candidate task this "
+                "trigger (every candidate excluded by _detect_interference())."
             )
 
-        task = ordering[0]
-        task_params = {var.name: const.value for var, const in task.bindings.items()}
-
-        abstract_plan = self._planner.plan(
-            my_intention=task.schema.name,
-            task_params=task_params,
-            agent_id=agent_id,
-            belief=belief,
-            world=world,
-        )
-
-        segments = self._build_segments(abstract_plan, world, agent_id, start_step)
-        duration = int(round(segments[-1].end_step - start_step)) if segments else 0
-
-        entry = ProjectedPlanEntry(
-            abstract_plan=abstract_plan,
-            estimated_start_step=int(start_step),
-            estimated_duration=duration,
-            segments=segments,
-        )
-
-        return ProjectedPlan(
-            task_queue=[task_instance_key(task)],
-            entries=[entry],
-            total_estimated_cost=duration,
-        )
-
+        _, winner = min(scored, key=lambda pair: pair[0])
+        new_queue = [t for t in task_pool if t is not winner]
+        self._queue = new_queue
+        return UpdateResult(current_task=winner, queue=list(new_queue))
+    
+    
     def _detect_interference(
         self,
         robot_projection: ProjectedPlan,
@@ -583,6 +537,7 @@ class MetaPlanner:
                 conflicts.extend(self._interference_algorithm(robot_seg, human_seg))
 
         feasible = not any(cp.distance < self._min_safe_distance for cp in conflicts)
+
         return InterferenceAssessment(feasible=feasible, conflicts=conflicts)
 
     def _cost(
@@ -602,4 +557,5 @@ class MetaPlanner:
         already reflected in projection's step count via planner.py's guarded
         method selection (see design_decisions.md).
         """
+    
         return projection.total_estimated_cost
