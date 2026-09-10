@@ -1,0 +1,5 @@
+# raw per-trigger/per-tick capture (MBs) and instrumented run logs — regenerate with measure.py
+captures.json
+logs_instrumented/
+# per-step d(t) CSVs for the non-required triggers (2.7 MB, regenerable with analyze.py); PNGs are kept
+b_curves/all/*.csv
