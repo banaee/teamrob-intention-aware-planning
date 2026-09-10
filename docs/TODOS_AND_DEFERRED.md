@@ -988,6 +988,32 @@ Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_targ
 `_get_relevant_action_schemas`)
 Reference: leg-level evidence session, September 2026
 
+**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C]
+Plan: run every B2.X × B3.X combination over hundreds of generated simulations (randomised
+layouts, scenarios, parameters) and compare outcomes. Not seed repetition — the sim is
+deterministic under PYTHONHASHSEED=0, so variation must come from generated inputs.
+Prerequisites:
+(a) Programmatic layout/scenario registration — adding a layout today needs three manual
+    edits (layout JSON, `scenarios.py`, `registry.py`).
+(b) Scale-relative calibration — `min_safe_distance` (and any B2 threshold) must be expressed
+    relative to layout scale or agent speed × steps, not as an absolute read off one fixture.
+Also: B2.B+B3.A must select identically to none+B3.A under the same `_cost()` — treat as an
+assertion in the harness; any divergence is a bug. Only projection count may differ.
+Files: domains/kitting/registry.py, domains/kitting/scenarios.py, mesa_sim/run_mesa.py,
+shared/meta_planner.py
+Reference: Phase 4C B2/B3 session, September 2026
+
+**TODO-48 — Hypothesis change above θ fires no trigger**
+`theta_crossed` fires on a confidence crossing (`prev < θ ≤ now`), not on a change of
+`most_likely`. If belief moves from one hypothesis to another while confidence stays ≥ θ
+(e.g. a grasp pins the old top hypothesis and mass jumps to a new one in the same tick),
+no trigger fires, B2 never runs, and the robot keeps the last trigger's projection until its
+next grasp or task boundary. B2 is the mid-task evidence mechanism; this is the correction
+case it cannot see. Candidate fix, undecided: fire on `most_likely` change while ≥ θ.
+First measure whether it occurs in current scenarios.
+Files: shared/meta_planner.py (evaluate_triggers)
+Reference: Phase 4C B2/B3 session, September 2026
+
 ---
 
 ## 🧹 Refactoring / Cleanup TODOs
