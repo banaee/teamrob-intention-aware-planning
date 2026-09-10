@@ -65,8 +65,9 @@ Do not explore the whole tree. Start from the files a task names; widen only wit
    ambiguous, stop and ask.
 5. **Flag, don't fix.** Issues noticed outside the task scope: list them at the end, don't
    change them.
-6. **Git:** work on a feature branch; commit in logical groups with clear messages; never
-   push; never rewrite history.
+6. **Git:** commit directly on main in logical groups with clear messages, only after the
+   task's checks pass. Use a feature branch only when I ask for one. Push only when I
+   explicitly say so in the current conversation. Never rewrite history.
 7. Be concise in reports: what changed, where, verification result.
 
 ## Running
