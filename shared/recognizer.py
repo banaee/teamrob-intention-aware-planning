@@ -27,18 +27,30 @@ ALGORITHM:
         - Uniform at t=0
         - Previous posterior at t>0 (passed in as prev_belief)
 
+    Persistent assignment prior (optional, off by default):
+        When the robot knows which tasks the observed agent is assigned — a work
+        order, not a plan — each hypothesis carries a fixed weight w(τ):
+        ASSIGNED_TASK_PRIOR for an assigned task, 1.0 otherwise (and for
+        'unknown'). The weight is divided out of the incoming belief, the ordinary
+        update above runs on that base belief, and the weight is multiplied back in
+        on output. This keeps the prior persistent without compounding — see the
+        comment in update(). Nothing is filtered out; assigned hypotheses are only
+        boosted. With no assignment known, this whole mechanism is inert and the
+        original code path runs unchanged.
+
     Normalization: posterior sums to 1.0 after each update.
 
 HYPOTHESIS SPACE:
-    One hypothesis per (task_name, param_bindings) pair derived from the
-    human agent's scheduled_tasks at construction time, plus 'unknown'.
+    One hypothesis per (task_name, param_bindings) pair derived from the domain
+    schemas and the objects present in the workspace, plus 'unknown'.
     Hypotheses include both assigned and foreseeable tasks.
 
 INPUTS:
     - Observation:      detected_microaction, spatial_context.position, spatial_context.zone
     - WorldState:       predicates (in_zone, holding), object_locations, object_positions
     - ContextKnowledge: shift_start_step, room_temperature
-    - prev_belief:      previous BeliefState (None → uniform prior)
+    - prev_belief:      previous BeliefState (None → initial prior)
+    - assigned_tasks:   observed agent's work order (None/empty → prior is off)
 
 OUTPUTS:
     - BeliefState: distribution, most_likely, confidence
@@ -52,6 +64,7 @@ from typing import Dict, List, Optional, Tuple
 from shared.types import (
     Observation, BeliefState, WorldState, Predicate, Const,
     TaskSchema, StepCall, Var, ConditionSchema,
+    TaskInstance, task_instance_key,
 )
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
 from shared import likelihood_functions
@@ -71,6 +84,10 @@ from shared.likelihood_functions import (
 ZONE_BOOST         = 2.0
 TEMPERATURE_BOOST  = 3.0
 FATIGUE_BOOST      = 2.5
+
+# Strength of the persistent assignment prior — how much more likely a task the
+# observed agent is known to be assigned is, a priori, than an unassigned one.
+ASSIGNED_TASK_PRIOR = 10.0
 
 HIGH_TEMP_THRESHOLD    = 26.0
 LONG_SHIFT_THRESHOLD   = 500
@@ -168,6 +185,13 @@ def build_hypothesis_space(
             ))
     return hypotheses
 
+def _normalize(weights: Dict[str, float]) -> Dict[str, float]:
+    """Rescale a weight map so it sums to 1.0. Same guard against an all-zero
+    map (`or 1.0`) as the inline normalization in update()."""
+    total = sum(weights.values()) or 1.0
+    return {k: v / total for k, v in weights.items()}
+
+
 # =============================================================================
 # IntentionRecognizer
 # =============================================================================
@@ -179,15 +203,22 @@ class IntentionRecognizer:
         knowledge: DomainKnowledgeBase,
         context: ContextKnowledge,
         hypotheses: List[HypothesisKey],
+        assigned_tasks: Optional[List[TaskInstance]] = None,
     ):
         """
-        knowledge:   HTN domain knowledge
-        context:     background context facts for ω_context weighting
-        hypotheses:  list of (task_name, bindings) pairs for this scenario.
-                     Derived from the human agent's scheduled_tasks at
-                     construction time in sim_agents.py.
-                     
-        Uniform prior over all hypotheses + unknown.
+        knowledge:      HTN domain knowledge
+        context:        background context facts for ω_context weighting
+        hypotheses:     list of (task_name, bindings) pairs for this scenario.
+                        Built from the domain schemas and the workspace objects
+                        at construction time in sim_agents.py.
+        assigned_tasks: the OBSERVED agent's work order — which tasks it was
+                        assigned, not in which order it will do them. None or
+                        empty means the robot has no such knowledge: the
+                        persistent assignment prior is off and update() runs its
+                        original unweighted path.
+
+        _initial_prior is the t=0 prior over all hypotheses + unknown: uniform
+        when the assignment prior is off, the normalized weights when it is on.
         Keyed by repr(hyp) strings — same key space as BeliefState.distribution,
         so `prior` has one consistent type throughout update(), whether it
         comes from prev_belief.distribution or this fallback.
@@ -198,10 +229,43 @@ class IntentionRecognizer:
         self._history: List[Observation] = []
         self._by_key: Dict[str, HypothesisKey] = {repr(h): h for h in hypotheses}  # this is used to look up HypothesisKey by string repr in update()
 
-        # Uniform prior over all hypotheses + unknown
-        n = len(hypotheses) + 1
-        self._uniform: Dict[str, float] = {repr(h): 1.0 / n for h in hypotheses}
-        self._uniform[UNKNOWN] = 1.0 / n
+        self._prior_weights: Optional[Dict[str, float]] = self._build_prior_weights(assigned_tasks)
+
+        if self._prior_weights is None:
+            # Uniform prior over all hypotheses + unknown
+            n = len(hypotheses) + 1
+            self._initial_prior: Dict[str, float] = {repr(h): 1.0 / n for h in hypotheses}
+            self._initial_prior[UNKNOWN] = 1.0 / n
+        else:
+            self._initial_prior = _normalize(self._prior_weights)
+
+    def _build_prior_weights(
+        self,
+        assigned_tasks: Optional[List[TaskInstance]],
+    ) -> Optional[Dict[str, float]]:
+        """
+        Map every hypothesis key (and 'unknown') to its persistent prior weight:
+        ASSIGNED_TASK_PRIOR for a task the observed agent is known to be assigned,
+        1.0 for everything else. Returns None when nothing is known, which switches
+        the mechanism off entirely rather than filling the map with 1.0s — see
+        update() for why that distinction matters.
+
+        Assignment identity crosses the layer boundary as task_instance_key(),
+        which produces the same string as HypothesisKey.__repr__ by design.
+        """
+        if not assigned_tasks:
+            return None
+
+        weights: Dict[str, float] = {repr(h): 1.0 for h in self._hypotheses}
+        weights[UNKNOWN] = 1.0
+        for key in (task_instance_key(t) for t in assigned_tasks):
+            if key in weights:
+                weights[key] = ASSIGNED_TASK_PRIOR
+            else:
+                logging.warning(
+                    "[recognizer] assigned task %s matches no hypothesis — ignored", key
+                )
+        return weights
 
     def update(
         self,
@@ -214,19 +278,30 @@ class IntentionRecognizer:
         """
         self._history.append(obs)
 
-        prior: Dict[str, float] = prev_belief.distribution if prev_belief is not None else self._uniform
-    
+        prior: Dict[str, float] = prev_belief.distribution if prev_belief is not None else self._initial_prior
+
+        # Persistent assignment prior: divide the weights back out, so the Bayesian
+        # update below runs on an unweighted base belief and the weights are
+        # re-applied only on output. Neither simpler option works: a one-time prior
+        # at t=0 is erased by BELIEF_FLOOR within the first task, and folding the
+        # weight into ω_context re-applies it every step, compounding to wⁿ and
+        # making the boost depend on the update rate rather than on the assignment.
+        if self._prior_weights is not None:
+            prior = _normalize({
+                k: v / self._prior_weights.get(k, 1.0) for k, v in prior.items()
+            })
+
         # Compute unnormalized posterior
         unnorm: Dict[str, float] = {}
         for hyp in self._hypotheses:
             key = repr(hyp)
             likelihood = self._likelihood(obs, world, hyp)
             omega = self._context_weight(obs, world, hyp)
-            default = self._uniform.get(key, 1.0 / (len(self._hypotheses) + 1))
+            default = self._initial_prior.get(key, 1.0 / (len(self._hypotheses) + 1))
             unnorm[key] = likelihood * omega * prior.get(key, default)
 
         # unknown: neutral likelihood, no context boost
-        unnorm[UNKNOWN] = NEUTRAL_LIKELIHOOD * prior.get(UNKNOWN, self._uniform[UNKNOWN])
+        unnorm[UNKNOWN] = NEUTRAL_LIKELIHOOD * prior.get(UNKNOWN, self._initial_prior[UNKNOWN])
 
         # Normalize
         total = sum(unnorm.values()) or 1.0
@@ -237,6 +312,15 @@ class IntentionRecognizer:
         distribution = {k: max(v, BELIEF_FLOOR) for k, v in distribution.items()}
         floor_total = sum(distribution.values())
         distribution = {k: v / floor_total for k, v in distribution.items()}
+
+        # Re-apply the assignment weights. The floor above guarantees a non-zero
+        # base belief for every hypothesis, so an unassigned hypothesis can land
+        # below BELIEF_FLOOR in this output distribution — expected, not a bug:
+        # the floor protects recoverability of the base belief, not the output.
+        if self._prior_weights is not None:
+            distribution = _normalize({
+                k: v * self._prior_weights.get(k, 1.0) for k, v in distribution.items()
+            })
 
         most_likely = max(distribution, key=lambda k: distribution[k])
         confidence = distribution[most_likely]
