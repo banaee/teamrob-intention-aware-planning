@@ -216,15 +216,16 @@ human's *plan* — order, timing, deviations. Three decisions make that separati
   (`shared/types.py`), which produces the same string as `repr(HypothesisKey)` by design —
   e.g. `deliver_item(?item=item_3,?kitting_table=kitting_table_0)`. The two are kept in
   lockstep deliberately; io_contracts.md §1.10 and §1.8 are the contract.
-- **D2 — the prior is persistent and non-compounding.** Each hypothesis carries a fixed
-  weight w(τ): `ASSIGNED_TASK_PRIOR` (10.0) if assigned, 1.0 otherwise and for `unknown`.
-  `update()` divides w out of the incoming belief, runs the ordinary Bayesian update and
-  `BELIEF_FLOOR` on that base belief, then multiplies w back in on output. Two simpler
-  designs were rejected: a one-time prior at t=0 is erased by `BELIEF_FLOOR` within the
-  first task, and folding w into ω_context re-applies it every step, compounding to wⁿ and
-  making the boost a function of the update rate rather than of the assignment. A
-  consequence, and not a bug: unassigned hypotheses can appear *below* `BELIEF_FLOOR` in the
-  output distribution — the floor protects recoverability of the base belief, not the output.
+- **D2 — the knowledge is a support restriction, not a prior.** The admissible set is the
+  assigned tasks, plus every foreseeable task, plus `unknown`; inadmissible hypotheses are
+  pinned at `BELIEF_FLOOR` and never accumulate evidence. See "Assigned-task pool is a support
+  restriction, not a prior" below for the decision and the record of the 10× multiplier it
+  replaced. The first build was a persistent, non-compounding weight w(τ) (`ASSIGNED_TASK_PRIOR`
+  = 10.0 if assigned, 1.0 otherwise), divided out of the incoming belief and multiplied back
+  in on output. That shape was chosen over two simpler ones — a one-time prior at t=0 is
+  erased by `BELIEF_FLOOR` within the first task, and folding w into ω_context compounds to
+  wⁿ, making the boost a function of the update rate — and those two rejections still stand.
+  What did not survive is the weight itself; the entry below says why.
 - **D3 — the knowledge lives on the scenario `AgentConfig`.** Human: `assigned_tasks` is the
   assignment (a fact), `scheduled_tasks` is the developer's execution script and drives
   `HumanAgent` only. Robot: `assigned_tasks` is its task pool, seeded into the meta_planner;
@@ -233,17 +234,19 @@ human's *plan* — order, timing, deviations. Three decisions make that separati
   exactly — a foreseeable deviation is never part of a work order. Empty `assigned_tasks`
   skips validation, so un-migrated domains stay loadable.
 
-Nothing is ever filtered out: assigned hypotheses are boosted, never exclusive. The switch is
-global evaluation config (`configs/experiment.yaml: assignment_prior`, default `false`,
-`--assignment_prior true` to override), not a scenario fact — which scenario is being run and
-what the robot is permitted to know are independent axes. With the prior off the recognizer
-runs its original code path unchanged, verified byte-identical on `[meta]`, `meta-cand`,
-`[IR]` and `[IR-dist]` across scenario_00, scenario_10 and scenario_20 (with
+Foreseeable tasks and `unknown` are never restricted away: a deviation is exactly what a
+work order does not list, and must stay recognizable. The switch is global evaluation config
+(`configs/experiment.yaml: assignment_prior`, default `false`, `--assignment_prior true` to
+override; the name predates the restriction — TODO-44), not a scenario fact — which scenario
+is being run and what the robot is permitted to know are independent axes. With the switch
+off the recognizer runs its original code path unchanged, verified byte-identical on
+`[meta]`, `[IR]` and `[IR-dist]` across scenario_00, scenario_10 and scenario_20 (with
 `PYTHONHASHSEED=0`, see TODO-42).
-With the prior on, t=0 `most_likely` is usually an assigned task, so the t=0 human projection
-is usually already correct. Fixtures that rely on a mid-task reveal (scenario_20) must run
-with the prior off. Supports one observed human (`RobotAgent` uses `observes[0]`); multiple
-observed agents would need `assigned_tasks` keyed per agent.
+With the switch on, t=0 belief is uniform over the admissible set, so the human's task is
+resolved within a few observations rather than after a plateau. Fixtures that rely on a
+mid-task reveal (scenario_20) must run with the switch off. Supports one observed human
+(`RobotAgent` uses `observes[0]`); multiple observed agents would need `assigned_tasks` keyed
+per agent.
 Files: shared/types.py (AgentConfig), shared/recognizer.py, mesa_sim/sim_model.py,
 mesa_sim/sim_agents.py, mesa_sim/run_mesa.py, configs/experiment.yaml,
 domains/kitting/scenarios.py
@@ -612,3 +615,71 @@ failure mode to guard against. Consistent with how `BeliefState` already flows: 
 one call, passed explicitly to the next, never stashed.
 Files: shared/projection.py, shared/meta_planner.py, mesa_sim/sim_agents.py
 Reference: Phase 4C meta_planner build session, September 2026
+
+**Assigned-task pool is a support restriction, not a prior**
+What the robot knows when it knows the human's `assigned_tasks` is *"the human's task lies
+in this set"* — a restriction on the support of the belief. The first build encoded it as a
+magnitude: hypotheses in the pool weighed `ASSIGNED_TASK_PRIOR` = 10.0, all others 1.0. A
+soft number standing in for a hard fact, and the number, not the evidence, decided when
+θ was crossed. Measured in scenario_20: evidence alone plateaus near 0.36 for twenty steps
+(0.167 → 0.252 → 0.304 → 0.364 at steps 0/1/2/8, 0.840 only at the human's grasp, step 22);
+with the multiplier, confidence is 0.417 at t=0 and 0.774 at step 2 — over θ on prior mass,
+before the human has done anything distinguishing. No value of θ and no value of the
+constant fixes that: the crossing is a property of the constant.
+
+The restriction removes the blend. The admissible set is the pool, plus every foreseeable
+task (`TaskSchema.is_foreseeable` — schema-derived, so `shared/` names no task), plus
+`unknown`. Admissible hypotheses take the ordinary update, normalized over admissible mass;
+inadmissible ones are pinned at `BELIEF_FLOOR` and never accumulate evidence (skipped in the
+update, restored pinned on output, so the distribution still spans the full space and sums
+to 1.0). No weight, no divide-out/multiply-back: a mask needs no compensation, and with the
+switch off nothing is masked, so the original path runs by construction. Confidence is then
+a function of the admissible set size and of the evidence alone — with three admissible
+hypotheses in scenario_20, t=0 is 0.332 and step 2 is 0.881, on two directional updates.
+
+This is the same principle as the held-item constraint already in `_likelihood()` (TODO-37c):
+a hypothesis the robot *knows* to be wrong is refuted, not down-weighted. It also removes
+the hypotheses that were doing the flattening — in scenario_20 they are the robot's own
+items, whose shelf sits 9–20° off the human's heading. That is general, not fixture-specific:
+a robot's own tasks are systematically wrong hypotheses for its human, and often nearby,
+because both agents work the same shelves. Cost: the log cannot distinguish a pinned
+hypothesis from an admissible one refuted by evidence — both read `BELIEF_FLOOR`.
+
+Foreseeable tasks and `unknown` stay admissible deliberately. `coffee_break` and
+`ac_activation` are not in `assigned_tasks` precisely because they are the deviations the
+robot must be able to recognize; restricting them away would make scenario_10's coffee break
+unrecognizable, and `unknown` is the escape hatch for behaviour outside the model. Verified:
+with the switch on, `coffee_break` accumulates evidence during scenario_10's deviation
+(0.004 → 0.016) while the four out-of-pool items sit pinned. An empty pool (dock_loading,
+TODO-39) admits everything and degrades to the original path, never to an empty set.
+Files: shared/recognizer.py (`_build_admissible_keys`, `_pin_inadmissible`, `update`)
+Reference: evidence-gated projection admission session, September 2026
+
+**θ gates projection admission as well as triggering**
+`MetaPlanner.update_human_projection()` now returns `None` without calling the projector
+when `belief.confidence < θ`. Extends DESIGN-07: θ already decided *whether* candidate
+evaluation runs (`theta_crossed`); it now also decides whether the human's most-likely
+hypothesis is trustworthy enough to project against. Below θ, `most_likely` is a tie-break
+over near-uniform mass — in scenario_20 at t=0 it is item_4, a robot task, chosen by
+insertion order (TODO-42) — and an interference check against it is a check against noise.
+`update()` already handled `human_projection=None` (every candidate feasible, no
+interference check), so the gate needed no downstream change. Admission is a MetaPlanner
+decision; `Projector` stays a pure projection service holding no policy.
+
+The gate is only meaningful because of the restriction above: with the 10× multiplier,
+`belief.confidence` crossed θ on prior mass, so gating on it would have admitted a
+projection built on almost no observation. Once the pool is a restriction,
+`belief.confidence` *is* evidence confidence, and no `BeliefState` field was needed.
+
+θ still never feeds `_cost()`. One θ serves both roles — triggering and admission — until
+evidence separates them; if a run shows the two want different thresholds, that is the
+point to split them, not before. Observed effect with the switch off: `none(below_theta)`
+at t=0 in every scenario, and also at scenario_00's step-7 `task_committed` (0.388) and
+step-95 `no_current_task` (0.642), where the human is between tasks; the t=0 `[meta-cand]`
+lines lose their conflict counts (`conflicts=0 min_dist=None`), winners and costs unchanged.
+Logged once per call as `[meta-proj] confidence=… theta=… projection=built |
+none(below_theta) | none(no_human) | none(unresolved)`; no step or trigger field, since
+step counts are a simulator concept and the trigger belongs to the caller — both are
+recoverable from the `[meta-trig]` line of the same tick.
+Files: shared/meta_planner.py (`update_human_projection`)
+Reference: evidence-gated projection admission session, September 2026

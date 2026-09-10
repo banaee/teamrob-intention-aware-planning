@@ -484,9 +484,11 @@ task lives solely in `ExecutorState.current_task`. Candidates = `[current_task] 
 - `full_reorder` (not implemented) — would score permutations of the candidate set and
   replace the whole queue. Blocked on cross-task `WorldState` propagation (TODO-07).
 
-The human's projection is built once per call via `recognizer.get_hypothesis(belief.most_likely)`
-and reused for every candidate. If `human_agent_id is None`, or the hypothesis cannot be
-resolved, no interference check runs that call and every candidate is treated as feasible.
+The human's projection is built once per fired trigger by `update_human_projection()` (below)
+and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.
+`human_projection=None` means no interference check runs that call and every candidate is
+treated as feasible — `_replan_tasks()` substitutes `InterferenceAssessment(feasible=True,
+conflicts=[])`. It is never treated as always-conflicting.
 
 **Terminal state:** `update()` returns `UpdateResult(current_task=None, queue=[])` when no
 candidates remain — all assigned tasks are complete. Callers check
@@ -496,6 +498,30 @@ contract rather than raised for the embodiment layer to catch and reinterpret.
 
 `update()` does still raise `RuntimeError` when candidates exist but **every** one is
 excluded as infeasible — a genuine anomaly, deliberately distinguishable from exhaustion.
+
+#### Update Human Projection
+```python
+update_human_projection(
+    belief: BeliefState,
+    world: WorldState,
+) -> Optional[ProjectedPlan]
+```
+Called once per fired trigger, between `evaluate_triggers()` and `update()`; the result is
+`update()`'s `human_projection` argument. Projection **admission** is decided here — a
+MetaPlanner policy, not a `Projector` one — then delegated to `Projector.project_human()`.
+
+Returns `None`, checked in this order, when:
+
+- `belief.confidence < theta` — the projector is not called. θ gates admission as it gates
+  triggering (DESIGN-07); it still never feeds `_cost()`.
+- `human_agent_id is None` — no human observed.
+- the hypothesis is unresolvable — `Projector.project_human()` returned `None`
+  (`belief.most_likely` is `unknown`, or its task name is not in the domain).
+
+Emits one `[meta-proj] confidence=<c> theta=<θ> projection=<reason>` line per call, with
+`reason` ∈ `built`, `none(below_theta)`, `none(no_human)`, `none(unresolved)`. No `step` or
+`trigger` field: both belong to the caller and are recoverable from the `[meta-trig]` line of
+the same tick.
 
 #### Seed Tasks
 ```python

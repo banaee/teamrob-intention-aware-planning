@@ -800,6 +800,19 @@ Update (fixture-design session): scenario_20 no longer depends on this — its e
 planned via assignment_prior on plus a confidence-gated human projection (meta_planner,
 pending). Decide TODO-38 on IR-quality grounds only.
 
+Update (evidence-gated projection admission session): first MEASURED instance of
+"confidence ≠ correctness" — previously only a noted risk. scenario_10, assignment_prior on,
+run_20260910_144817, step 80: the human has finished item_2 and is walking to the coffee
+machine; belief goes to `deliver_item(item_6)` at 0.783 (0.991 by step 85), `theta_crossed`
+fires, and `update_human_projection()` admits a projection for a task the human is not
+doing. The projection is well-formed, its hypothesis is admissible (item_6 is in human_0's
+pool), it is above θ — and it is wrong. `coffee_break` peaks at 0.016 during the walk; with
+the switch off the same walk converges on item_0 instead, so this is the direction-only
+shape above, not the restriction. `coffee_break` never becomes `most_likely` in any run,
+including the unmodified prior-off baseline.
+Bears on B2 (TODO-36) rather than on the recognizer: an admitted projection must not be
+treated as ground truth, and B2's design should not assume otherwise.
+
 **TODO-39 — Migrate `domains/dock_loading/scenarios.py` to `assigned_tasks`**
 `AgentConfig.assigned_tasks` was added and all three kitting scenarios migrated; dock_loading
 still declares only `scheduled_tasks` for both agent types. It imports and loads fine — empty
@@ -811,17 +824,18 @@ before running dock_loading again: humans get `assigned_tasks` = their non-fores
 Files: domains/dock_loading/scenarios.py
 Reference: assignment-prior session, September 2026
 
-**TODO-40 — Assignment prior strengthens TODO-37(a)**
-The persistent assignment prior up-weights an assigned hypothesis by 10× for the whole run,
-including after that task is complete. Combined with TODO-37(a) — a delivered item's expected
+**TODO-40 — Assignment prior strengthens TODO-37(a)** ✅ RESOLVED
+The persistent assignment prior up-weighted an assigned hypothesis by 10× for the whole run,
+including after that task was complete. Combined with TODO-37(a) — a delivered item's expected
 position resolves to the delivery target, geometrically identical to every later human carry
-leg — a *delivered assigned* item is now a 10× decoy on every subsequent approach leg, where
-before it was a 1× one. The held-item constraint in `_likelihood()` (the sub-item of TODO-37
-marked FIXED) still refutes it during carry, so the exposure is the approach phase, when
-nothing is held. Not observed to change a decision yet.
-Fix direction not decided; belongs with TODO-37(a) and TODO-20 (reset on task completion).
-Files: shared/recognizer.py (`_get_expected_position`)
-Reference: assignment-prior session, September 2026
+leg — a *delivered assigned* item was a 10× decoy on every subsequent approach leg.
+RESOLVED (Sept 2026): there is no 10× any more — the pool is a support restriction (see
+design_decisions.md, "Assigned-task pool is a support restriction, not a prior"), and every
+admissible hypothesis carries unit weight. A delivered assigned item may still be a decoy,
+at unit weight; that residual is TODO-37(a) itself, unchanged.
+Files: shared/recognizer.py
+Reference: assignment-prior session, September 2026; resolved in the evidence-gated
+projection admission session, September 2026
 
 **TODO-41 — `ros_sim/planner_2.py` reads robot `scheduled_tasks`, now empty**
 `ros_sim/framework_HRI/framework_HRI/planner_2.py:252` builds its task queue from
@@ -869,6 +883,29 @@ every "continue" would stall the robot. Fix direction not decided; candidate: ke
 current plan when `UpdateResult.current_task` is the executing task.
 Files: mesa_sim/sim_agents.py (`RobotAgent.step`), shared/meta_planner.py (`update`)
 Reference: fixture-design session, September 2026
+
+**TODO-44 — `assignment_prior` config key and CLI flag are misnamed**
+`configs/experiment.yaml: assignment_prior` and `--assignment_prior` now switch a support
+*restriction*, not a prior — nothing is weighted (design_decisions.md, "Assigned-task pool is
+a support restriction, not a prior"). The name is a leftover from the first build. Also
+reaches `SimModel.assignment_prior`, `run_mesa.py`'s argument plumbing, and the `[IR-prior]`
+log tag. Flagged only; renaming was explicitly out of scope for the session that made the
+switch a restriction, and touches files outside `shared/`.
+Files: configs/experiment.yaml, mesa_sim/run_mesa.py, mesa_sim/sim_model.py,
+mesa_sim/sim_agents.py
+Reference: evidence-gated projection admission session, September 2026
+
+**TODO-45 — Deferred idea: admit a projection when the admissible non-`unknown` set is a singleton**
+With the restriction on, a human with one remaining assigned task has an admissible set of
+{that task, foreseeable tasks, `unknown`}. The idea: treat "the human has one task, so we
+know what they're doing" as sufficient to admit a projection without waiting for
+`belief.confidence >= theta`. Rejected for now: it would have to ignore the foreseeable tasks
+and `unknown`, i.e. assume the human will not deviate at exactly the moment there is no
+evidence either way — and a foreseeable deviation is the case the robot most needs to catch.
+Revisit once results with the θ gate are in, and only if the wait for θ is shown to cost
+something.
+Files: shared/meta_planner.py (`update_human_projection`)
+Reference: evidence-gated projection admission session, September 2026
 
 ---
 

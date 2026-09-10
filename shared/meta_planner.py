@@ -259,21 +259,50 @@ class MetaPlanner:
         world: WorldState,
     ) -> Optional[ProjectedPlan]:
         """
-        Thin wrapper over Projector.project_human(), supplying the recognizer and
-        human_agent_id this MetaPlanner was constructed with. Call once per fired
-        trigger, between evaluate_triggers() and update(); pass the result to
-        update() as its human_projection argument.
+        Projection admission, then a thin wrapper over Projector.project_human(),
+        supplying the recognizer and human_agent_id this MetaPlanner was
+        constructed with. Call once per fired trigger, between
+        evaluate_triggers() and update(); pass the result to update() as its
+        human_projection argument.
 
-        Returns None if no human is observed or the hypothesis cannot be resolved
-        — update() then treats every candidate as feasible and runs no
+        Admission is a MetaPlanner decision — Projector holds no policy. A
+        projection is admitted only when belief.confidence >= self._theta: below
+        that the most-likely hypothesis is not evidence, and an interference
+        check against it would be a check against noise. theta is a gate here as
+        it is in evaluate_triggers() (DESIGN-07) — never fed into _cost().
+
+        Returns None, in this order, when
+          - belief.confidence is below theta (the projector is not called),
+          - no human is observed,
+          - the hypothesis cannot be resolved (project_human() returned None).
+        update() then treats every candidate as feasible and runs no
         interference check that call.
+
+        Logs one [meta-proj] line per call. No step or trigger field: step
+        counts are a simulator concept, and the TriggerDecision belongs to the
+        caller. Both are recoverable by adjacency — this is called only on a
+        fired trigger, so the [meta-trig] line of the same tick precedes it.
         """
-        return self._projector.project_human(
-            belief=belief,
-            world=world,
-            human_agent_id=self._human_agent_id,
-            recognizer=self._recognizer,
+        if belief.confidence < self._theta:
+            reason = "none(below_theta)"
+            projection = None
+        elif self._human_agent_id is None:
+            reason = "none(no_human)"
+            projection = None
+        else:
+            projection = self._projector.project_human(
+                belief=belief,
+                world=world,
+                human_agent_id=self._human_agent_id,
+                recognizer=self._recognizer,
+            )
+            reason = "built" if projection is not None else "none(unresolved)"
+
+        logging.info(
+            f"[meta-proj] confidence={belief.confidence:.3f} "
+            f"theta={self._theta:.3f} projection={reason}"
         )
+        return projection
     
     
     def update(
@@ -415,6 +444,13 @@ class MetaPlanner:
 
         `task_pool` is unused under "b2a" and is present only so the signature
         does not change when "b2b" is filled in.
+
+        When `human_projection` is None — not admitted by
+        update_human_projection() (below theta, no human, unresolvable) — B2
+        returns True: continue the current task. B2 escalates on evidence
+        AGAINST the current task; no projection means no evidence, and no
+        reason to interrupt committed work. Not yet a branch here, since both
+        real strategies are stubs; to be implemented together with B2 itself.
         """
         if self._gate_strategy == "none":
             return False

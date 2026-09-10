@@ -27,15 +27,17 @@ ALGORITHM:
         - Uniform at t=0
         - Previous posterior at t>0 (passed in as prev_belief)
 
-    Persistent assignment prior (optional, off by default):
+    Admissibility restriction (optional, off by default):
         When the robot knows which tasks the observed agent is assigned — a work
-        order, not a plan — each hypothesis carries a fixed weight w(τ):
-        ASSIGNED_TASK_PRIOR for an assigned task, 1.0 otherwise (and for
-        'unknown'). The weight is divided out of the incoming belief, the ordinary
-        update above runs on that base belief, and the weight is multiplied back in
-        on output. This keeps the prior persistent without compounding — see the
-        comment in update(). Nothing is filtered out; assigned hypotheses are only
-        boosted. With no assignment known, this whole mechanism is inert and the
+        order, not a plan — that knowledge restricts the SUPPORT of the belief;
+        it is not a magnitude. The admissible set is the assigned tasks, plus
+        every foreseeable task (schema.is_foreseeable — a deviation is never part
+        of a work order, and must stay recognizable), plus 'unknown'. Admissible
+        hypotheses take the ordinary update above, normalized over admissible
+        mass only; inadmissible ones are refuted — pinned at BELIEF_FLOOR, never
+        accumulating evidence. No weight, no boost: confidence is then a function
+        of the admissible set size and of the evidence, with no tunable magnitude
+        in it. With no assignment known, this whole mechanism is inert and the
         original code path runs unchanged.
 
     Normalization: posterior sums to 1.0 after each update.
@@ -50,7 +52,7 @@ INPUTS:
     - WorldState:       predicates (in_zone, holding), object_locations, object_positions
     - ContextKnowledge: shift_start_step, room_temperature
     - prev_belief:      previous BeliefState (None → initial prior)
-    - assigned_tasks:   observed agent's work order (None/empty → prior is off)
+    - assigned_tasks:   observed agent's work order (None/empty → restriction is off)
 
 OUTPUTS:
     - BeliefState: distribution, most_likely, confidence
@@ -59,7 +61,7 @@ OUTPUTS:
 from importlib.metadata import distribution
 import itertools
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from shared.types import (
     Observation, BeliefState, WorldState, Predicate, Const,
@@ -84,10 +86,6 @@ from shared.likelihood_functions import (
 ZONE_BOOST         = 2.0
 TEMPERATURE_BOOST  = 3.0
 FATIGUE_BOOST      = 2.5
-
-# Strength of the persistent assignment prior — how much more likely a task the
-# observed agent is known to be assigned is, a priori, than an unassigned one.
-ASSIGNED_TASK_PRIOR = 10.0
 
 HIGH_TEMP_THRESHOLD    = 26.0
 LONG_SHIFT_THRESHOLD   = 500
@@ -185,13 +183,6 @@ def build_hypothesis_space(
             ))
     return hypotheses
 
-def _normalize(weights: Dict[str, float]) -> Dict[str, float]:
-    """Rescale a weight map so it sums to 1.0. Same guard against an all-zero
-    map (`or 1.0`) as the inline normalization in update()."""
-    total = sum(weights.values()) or 1.0
-    return {k: v / total for k, v in weights.items()}
-
-
 # =============================================================================
 # IntentionRecognizer
 # =============================================================================
@@ -214,11 +205,12 @@ class IntentionRecognizer:
         assigned_tasks: the OBSERVED agent's work order — which tasks it was
                         assigned, not in which order it will do them. None or
                         empty means the robot has no such knowledge: the
-                        persistent assignment prior is off and update() runs its
-                        original unweighted path.
+                        admissibility restriction is off and update() runs its
+                        original unrestricted path over every hypothesis.
 
         _initial_prior is the t=0 prior over all hypotheses + unknown: uniform
-        when the assignment prior is off, the normalized weights when it is on.
+        when the restriction is off; uniform over the admissible set, with the
+        inadmissible pinned, when it is on.
         Keyed by repr(hyp) strings — same key space as BeliefState.distribution,
         so `prior` has one consistent type throughout update(), whether it
         comes from prev_belief.distribution or this fallback.
@@ -229,26 +221,38 @@ class IntentionRecognizer:
         self._history: List[Observation] = []
         self._by_key: Dict[str, HypothesisKey] = {repr(h): h for h in hypotheses}  # this is used to look up HypothesisKey by string repr in update()
 
-        self._prior_weights: Optional[Dict[str, float]] = self._build_prior_weights(assigned_tasks)
+        self._admissible: Optional[Set[str]] = self._build_admissible_keys(assigned_tasks)
 
-        if self._prior_weights is None:
+        if self._admissible is None:
             # Uniform prior over all hypotheses + unknown
             n = len(hypotheses) + 1
             self._initial_prior: Dict[str, float] = {repr(h): 1.0 / n for h in hypotheses}
             self._initial_prior[UNKNOWN] = 1.0 / n
         else:
-            self._initial_prior = _normalize(self._prior_weights)
+            # Uniform over the admissible set only, then pinned — the same shape
+            # as every distribution update() produces, so prior and posterior agree.
+            n = len(self._admissible)
+            self._initial_prior = self._pin_inadmissible(
+                {k: 1.0 / n for k in self._admissible}
+            )
 
-    def _build_prior_weights(
+    def _build_admissible_keys(
         self,
         assigned_tasks: Optional[List[TaskInstance]],
-    ) -> Optional[Dict[str, float]]:
+    ) -> Optional[Set[str]]:
         """
-        Map every hypothesis key (and 'unknown') to its persistent prior weight:
-        ASSIGNED_TASK_PRIOR for a task the observed agent is known to be assigned,
-        1.0 for everything else. Returns None when nothing is known, which switches
-        the mechanism off entirely rather than filling the map with 1.0s — see
-        update() for why that distinction matters.
+        The set of hypothesis keys the observed agent's intention may lie in:
+        its assigned tasks, plus every foreseeable task, plus 'unknown'. Returns
+        None when nothing is known, which switches the mechanism off entirely
+        rather than admitting everything explicitly — equivalent in effect, but
+        None keeps update() on its original, unrestricted path.
+
+        Foreseeable tasks and 'unknown' are admissible by construction. A
+        foreseeable task is a deviation, and deviations are exactly what a work
+        order does not list — identified by schema.is_foreseeable, so no task
+        name is named here. 'unknown' is the escape hatch for behaviour outside
+        the model. Restricting either away would make a deviation unrecognizable
+        at the very moment it happens.
 
         Assignment identity crosses the layer boundary as task_instance_key(),
         which produces the same string as HypothesisKey.__repr__ by design.
@@ -256,16 +260,39 @@ class IntentionRecognizer:
         if not assigned_tasks:
             return None
 
-        weights: Dict[str, float] = {repr(h): 1.0 for h in self._hypotheses}
-        weights[UNKNOWN] = 1.0
+        admissible: Set[str] = {UNKNOWN}
+        for hyp in self._hypotheses:
+            schema = self.knowledge.get_task_schema(hyp.task_name)
+            if schema is not None and schema.is_foreseeable:
+                admissible.add(repr(hyp))
+
         for key in (task_instance_key(t) for t in assigned_tasks):
-            if key in weights:
-                weights[key] = ASSIGNED_TASK_PRIOR
+            if key in self._by_key:
+                admissible.add(key)
             else:
                 logging.warning(
                     "[recognizer] assigned task %s matches no hypothesis — ignored", key
                 )
-        return weights
+        return admissible
+
+    def _pin_inadmissible(self, distribution: Dict[str, float]) -> Dict[str, float]:
+        """
+        Pin every inadmissible hypothesis at BELIEF_FLOOR and rescale the
+        admissible mass to fill what is left, so the result spans the full
+        hypothesis space and still sums to 1.0. `distribution` holds admissible
+        keys only, normalized — inadmissible hypotheses never enter the update
+        that produced it.
+
+        Pinned at the floor rather than at zero for the reason the floor exists
+        at all: a hypothesis at exact zero can never recover through
+        multiplicative update. Note the log cannot tell a pinned hypothesis from
+        an admissible one refuted by evidence — both read BELIEF_FLOOR.
+        """
+        inadmissible = [k for k in self._by_key if k not in self._admissible]
+        admissible_mass = 1.0 - len(inadmissible) * BELIEF_FLOOR
+        pinned = {k: v * admissible_mass for k, v in distribution.items()}
+        pinned.update({k: BELIEF_FLOOR for k in inadmissible})
+        return pinned
 
     def update(
         self,
@@ -280,21 +307,17 @@ class IntentionRecognizer:
 
         prior: Dict[str, float] = prev_belief.distribution if prev_belief is not None else self._initial_prior
 
-        # Persistent assignment prior: divide the weights back out, so the Bayesian
-        # update below runs on an unweighted base belief and the weights are
-        # re-applied only on output. Neither simpler option works: a one-time prior
-        # at t=0 is erased by BELIEF_FLOOR within the first task, and folding the
-        # weight into ω_context re-applies it every step, compounding to wⁿ and
-        # making the boost depend on the update rate rather than on the assignment.
-        if self._prior_weights is not None:
-            prior = _normalize({
-                k: v / self._prior_weights.get(k, 1.0) for k, v in prior.items()
-            })
-
-        # Compute unnormalized posterior
+        # Compute unnormalized posterior over the admissible hypotheses. An
+        # inadmissible one is refuted, not down-weighted: skipped here, it
+        # neither accumulates evidence nor takes part in the normalization
+        # below, and is pinned at BELIEF_FLOOR on output. With the restriction
+        # off (_admissible is None) nothing is skipped and the original path
+        # runs unchanged.
         unnorm: Dict[str, float] = {}
         for hyp in self._hypotheses:
             key = repr(hyp)
+            if self._admissible is not None and key not in self._admissible:
+                continue
             likelihood = self._likelihood(obs, world, hyp)
             omega = self._context_weight(obs, world, hyp)
             default = self._initial_prior.get(key, 1.0 / (len(self._hypotheses) + 1))
@@ -313,14 +336,10 @@ class IntentionRecognizer:
         floor_total = sum(distribution.values())
         distribution = {k: v / floor_total for k, v in distribution.items()}
 
-        # Re-apply the assignment weights. The floor above guarantees a non-zero
-        # base belief for every hypothesis, so an unassigned hypothesis can land
-        # below BELIEF_FLOOR in this output distribution — expected, not a bug:
-        # the floor protects recoverability of the base belief, not the output.
-        if self._prior_weights is not None:
-            distribution = _normalize({
-                k: v * self._prior_weights.get(k, 1.0) for k, v in distribution.items()
-            })
+        # Restore the inadmissible hypotheses, pinned, so the distribution spans
+        # the full hypothesis space again and still sums to 1.0.
+        if self._admissible is not None:
+            distribution = self._pin_inadmissible(distribution)
 
         most_likely = max(distribution, key=lambda k: distribution[k])
         confidence = distribution[most_likely]
