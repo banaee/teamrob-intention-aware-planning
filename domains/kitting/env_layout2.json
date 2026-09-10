@@ -1,0 +1,94 @@
+{
+  "space": {
+    "width": 1200,
+    "height": 900,
+    "name": "Kitting Domain Layout 2",
+    "units": "cm",
+    "notes": "Phase 4C B2 validation layout. Unlike layout0's symmetric design (transient centre crossing), this layout is built for SUSTAINED interference on the APPROACH leg: the robot's cheapest task and the human's first task target adjacent shelves reached by time-aligned approaches, so the two agents converge and then run near-parallel into the kitting table. Robot start is deliberately far from all shelves so the theta-crossing has room to land mid-approach, before pick_up, while abandoning the task is still cheap. No obstacles, no foreseeable tasks."
+  },
+  "zones": [
+    { "id": "zone_NW", "bounds": { "x_min": -600, "x_max": 0, "y_min": 0, "y_max": 450 }, "label": "northwest_work" },
+    { "id": "zone_NE", "bounds": { "x_min": 0, "x_max": 600, "y_min": 0, "y_max": 450 }, "label": "northeast_work" },
+    { "id": "zone_SW", "bounds": { "x_min": -600, "x_max": 0, "y_min": -450, "y_max": 0 }, "label": "southwest_storage" },
+    { "id": "zone_SE", "bounds": { "x_min": 0, "x_max": 600, "y_min": -450, "y_max": 0 }, "label": "southeast_storage" }
+  ],
+  "doors": [],
+  "robots": [
+    {
+      "id": "robot_0",
+      "type": "mobile_manipulator",
+      "initial_container": "zone_NW",
+      "initial_x": -500,
+      "initial_y": 300
+    }
+  ],
+  "humans": [
+    {
+      "id": "human_0",
+      "type": "worker",
+      "initial_container": "zone_NE",
+      "initial_x": 200,
+      "initial_y": 50
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table_0",
+      "type": "kitting_table",
+      "position": [0, 400],
+      "size": [200, 100],
+      "zone": "zone_NW",
+      "notes": "Shared delivery sink. Both agents' carry legs terminate here, so distance goes to zero for EVERY task pair — the discriminator between candidates is the approach leg and the early carry, not the minimum distance."
+    },
+    {
+      "id": "shelf_4",
+      "type": "shelf",
+      "position": [-300, -100],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "Robot's CHEAPEST task (approach 447 + carry 583 = 1033), so the greedy t=0 pick lands here by construction. 150 units from shelf_3 — this adjacency is what creates the sustained conflict."
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [-180, -190],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "Human's first target. Human approach is 449 against the robot's 447 — deliberately time-aligned so both agents arrive together rather than sequentially."
+    },
+    {
+      "id": "shelf_6",
+      "type": "shelf",
+      "position": [-500, -250],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "Robot's CLEAN ALTERNATIVE (total 1373). 340 steps dearer than item_4 — a real cost to switching, so B2 faces a genuine trade-off rather than a free escape. Its carry leg stays ~326 from the human's, roughly 2x clearer than item_4's."
+    },
+    {
+      "id": "shelf_7",
+      "type": "shelf",
+      "position": [450, -350],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SE",
+      "notes": "Robot's third task (total 2029). Far enough east that it never competes — present to keep the pool at three, matching scenario_00."
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [400, -100],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SE",
+      "notes": "Human's second target. At -36.9 deg from the human's start it is angularly far from shelf_3/4/6, so it does not muddy the early ambiguity."
+    },
+    { "id": "item_4", "type": "item", "subtype": "part_C", "initial_container": "shelf_4", "size": [25, 25], "notes": "Robot task 1 — the conflicted one." },
+    { "id": "item_3", "type": "item", "subtype": "part_B", "initial_container": "shelf_3", "size": [25, 25], "notes": "Human task 1 — the conflict source." },
+    { "id": "item_6", "type": "item", "subtype": "part_D", "initial_container": "shelf_6", "size": [25, 25], "notes": "Robot task 2 — the clean alternative B2 can escalate to." },
+    { "id": "item_7", "type": "item", "subtype": "part_D", "initial_container": "shelf_7", "size": [25, 25], "notes": "Robot task 3 — never competitive." },
+    { "id": "item_2", "type": "item", "subtype": "part_B", "initial_container": "shelf_2", "size": [25, 25], "notes": "Human task 2." }
+  ]
+}
