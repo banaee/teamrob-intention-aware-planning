@@ -60,14 +60,17 @@ def completion_predicate_likelihood(
 
 def direction_consistency_likelihood(
     move_vec: Tuple[float, float],
-    current_pos: Tuple[float, float],
+    origin: Tuple[float, float],
     target_pos: Tuple[float, float],
 ) -> float:
     """
     Cosine-similarity trajectory-consistency check.
 
     Scores how consistent an observed movement vector is with heading toward
-    target_pos from current_pos. Mapped linearly from cosine similarity
+    target_pos from `origin` — the point the movement began at. The recognizer
+    passes the start of the current movement leg, so move_vec is the leg's
+    chord and the bearing is measured from where the leg started (see
+    recognizer._progress_likelihood). Mapped linearly from cosine similarity
     [-1, 1] to [LOW_LIKELIHOOD, HIGH_LIKELIHOOD].
 
     Registered as "directional" in PROGRESS_EVALUATORS. Applies to any action
@@ -81,7 +84,7 @@ def direction_consistency_likelihood(
     if move_norm < 1e-6:
         return NEUTRAL_LIKELIHOOD  # not moving — no directional evidence
 
-    to_target = (target_pos[0] - current_pos[0], target_pos[1] - current_pos[1])
+    to_target = (target_pos[0] - origin[0], target_pos[1] - origin[1])
     target_norm = math.sqrt(to_target[0] ** 2 + to_target[1] ** 2)
     if target_norm < 1e-6:
         return HIGH_LIKELIHOOD  # already at target

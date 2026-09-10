@@ -111,12 +111,14 @@ scenario_20 = ScenarioConfig(
         "arrival times at the shared kitting table: both carry legs converge there with a small "
         "gap, giving a long near-by overlap (step 22: item_4 min_dist 15.5, under 50 cm for ~166 "
         "projection units). item_6 (cost 1372, min_dist ~185) is a clean alternative. "
-        "Known limits: (1) assignment_prior off — theta crosses only at the human's GRASP (step "
-        "22), after the robot's move_to has completed, not mid-approach; (2) assignment_prior on "
-        "— theta crosses at step 2, but the t=0 human projection is already correct unless the "
-        "meta_planner gates projection on confidence (pending); (3) t=0 most_likely is a "
-        "tie-break on layout item order (TODO-42). No foreseeable tasks. Human plan is "
-        "scripted/fixed."
+        "Measured (leg-level recognizer, PYTHONHASHSEED=0): t=0 confidence is below theta in "
+        "both conditions, so no projection is built at t=0. (1) assignment_prior off — theta "
+        "crosses at the human's GRASP (step 22, 0.797), after the robot's move_to has completed. "
+        "(2) assignment_prior on — theta crosses at step 11 (0.780) when the human enters "
+        "zone_SW and ZONE_BOOST applies to item_3; the robot is roughly half-way to shelf_4 (its "
+        "move_to completes at 21), a projection is built, item_4 min_dist 14.98 vs item_6 292. "
+        "(3) t=0 most_likely is a tie-break on layout item order (TODO-42). No foreseeable "
+        "tasks. Human plan is scripted/fixed."
     ),
     agents=[
         AgentConfig(

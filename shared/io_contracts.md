@@ -411,25 +411,32 @@ Verified against `shared/meta_planner.py` and validated end-to-end against `scen
 (September 2026). The `full_reorder` strategy is **not** implemented — `update()` and
 `_project()` both raise `NotImplementedError` for it (DESIGN-16).
 
-Private methods (`_project`, `_build_segments`, `_detect_interference`, `_cost`,
-`_estimate_duration`) are internal to the class and deliberately not part of this contract;
-only the constructor and the two public methods below are cross-boundary surface.
+Private methods (`_is_current_task_plausible`, `_replan_tasks`, `_detect_interference`,
+`_cost`) are internal to the class and deliberately not part of this contract; only the
+constructor and the public methods below are cross-boundary surface. Projection
+(`project`, `build_segments`, `estimate_duration`) lives on `Projector`
+(`shared/projection.py`), which is injected.
 
 #### Constructor
 
 ```python
 MetaPlanner(
     knowledge: DomainKnowledgeBase,
+    projector: Projector,
     recognizer: IntentionRecognizer,
     theta: float = 0.75,
-    assumed_speed: float = 1.0,
-    default_action_cost: float = 1.0,
     min_safe_distance: float = 1.0,
     strategy: Literal["single_task", "full_reorder"] = "single_task",
-    interference_algorithm: Callable = discretized_time_sampling,
+    gate_strategy: Literal["none", "b2a", "b2b"] = "none",
+    interference_algorithm: Callable[[Segment, Segment], List[ConflictPoint]] = discretized_time_sampling,
     human_agent_id: Optional[str] = None,
 )
 ```
+
+**Correction (September 2026):** `assumed_speed` and `default_action_cost` are `Projector`
+constructor parameters, not `MetaPlanner`'s; `projector` is injected (one instance, held by
+the agent); `gate_strategy` selects B2 — `"none"` (default) skips the gate entirely,
+`"b2a"`/`"b2b"` raise `NotImplementedError` (TODO-36).
 
 Owns the task queue internally (Q1) — not passed in on each call. `theta` is a cognitive-
 clock policy parameter (DESIGN-07), kept as an explicit constructor default rather than
@@ -445,8 +452,8 @@ also avoids constructor bloat (`context`, `hypotheses`) and a redundant unused `
 `human_agent_id=None` means no human projection is built and every candidate is treated as
 feasible — mirroring `RobotAgent.observed_agent_id`'s existing optionality.
 
-`assumed_speed`, `default_action_cost`, and `min_safe_distance` are **uncalibrated
-placeholders**, not tuned values (TODO-28).
+`min_safe_distance` here, and `assumed_speed` / `default_action_cost` on `Projector`, are
+**uncalibrated placeholders**, not tuned values (TODO-28).
 
 #### Evaluate Triggers
 ```python
@@ -475,8 +482,11 @@ update(
     belief: BeliefState,
     world: WorldState,
     executor_state: ExecutorState,
+    human_projection: Optional[ProjectedPlan],
 ) -> UpdateResult
 ```
+`human_projection` is required (no default): the result of `update_human_projection()` for
+this trigger, or `None`.
 `current_task` competes as just another candidate — no special-case WAIT/RESELECT branch;
 continuation vs. reselection falls out of cost comparison across the full candidate set.
 Cancellation cost is not computed here — resolved intrinsically by `planner.py`'s guarded
