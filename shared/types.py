@@ -322,20 +322,72 @@ def task_instance_key(task: TaskInstance) -> str:
 class AgentConfig:
     """
     Configuration for one agent in a scenario.
-    scheduled_tasks semantics differ by agent type:
-      - human:  fixed ordered sequence (assigned + foreseeable tasks interleaved).
-                Order encodes when deviations occur. Never reordered at runtime.
-      - robot:  initially ordered by meta_planner at t=0 using base-cost heuristic.
-                Treated as a mutable prioritised set — meta_planner may reorder
-                at any cognitive clock event based on IR output.
-    Foreseeable tasks sit inline in the list at the correct position;
-    schema.is_foreseeable identifies them — no special-casing needed.
+    Two task fields, with semantics differing by agent type:
+      - human:  assigned_tasks  — the work order the human was given. A fact the
+                                  robot may know: WHICH tasks, never their order.
+                scheduled_tasks — the developer's execution script: fixed ordered
+                                  sequence (assigned + foreseeable interleaved).
+                                  Order encodes when deviations occur. Never
+                                  reordered at runtime. Drives HumanAgent only;
+                                  the robot has no access to it.
+      - robot:  assigned_tasks  — its task pool, seeded into the meta_planner.
+                                  Unordered: the meta_planner produces Q0 and every
+                                  later ordering from IR output.
+                scheduled_tasks — not read for robots.
+    Foreseeable tasks sit inline in scheduled_tasks at the correct position;
+    schema.is_foreseeable identifies them — no special-casing needed. They never
+    appear in assigned_tasks: a deviation is not part of a work order.
     """
     agent_id: str
     agent_type: str                      # "human" or "robot"
     start_position: Tuple[float, float]
-    scheduled_tasks: List[TaskInstance]  # fixed task sequence for human, flexible mutable task "set" for robot
+    scheduled_tasks: List[TaskInstance] = field(default_factory=list)  # human execution script; unread for robot
     observes: List[str] = field(default_factory=list)  # agent_ids this agent observes
+    assigned_tasks: List[TaskInstance] = field(default_factory=list)   # the work order — see docstring
+
+    def __post_init__(self):
+        """
+        Validate assigned_tasks against what this agent declares.
+        Empty assigned_tasks skips validation entirely, so scenarios not yet
+        migrated stay loadable.
+        Identity is the task_instance_key() string throughout: TaskInstance is
+        deliberately unhashable, so duplicate/set checks run on keys, never on
+        instances.
+        """
+        if not self.assigned_tasks:
+            return
+
+        assigned_keys = [task_instance_key(t) for t in self.assigned_tasks]
+        dupes = sorted({k for k in assigned_keys if assigned_keys.count(k) > 1})
+        if dupes:
+            raise ValueError(
+                f"AgentConfig '{self.agent_id}': duplicate assigned_tasks keys: {dupes}"
+            )
+
+        if self.agent_type != "human":
+            return
+
+        scripted_keys = [
+            task_instance_key(t)
+            for t in self.scheduled_tasks
+            if not t.schema.is_foreseeable
+        ]
+        scripted_dupes = sorted({k for k in scripted_keys if scripted_keys.count(k) > 1})
+        if scripted_dupes:
+            raise ValueError(
+                f"AgentConfig '{self.agent_id}': duplicate non-foreseeable "
+                f"scheduled_tasks keys: {scripted_dupes}"
+            )
+
+        missing = sorted(set(scripted_keys) - set(assigned_keys))
+        extra = sorted(set(assigned_keys) - set(scripted_keys))
+        if missing or extra:
+            raise ValueError(
+                f"AgentConfig '{self.agent_id}': assigned_tasks must match the "
+                f"non-foreseeable scheduled_tasks exactly. "
+                f"Scripted but not assigned: {missing}. "
+                f"Assigned but not scripted: {extra}."
+            )
 
 
 @dataclass

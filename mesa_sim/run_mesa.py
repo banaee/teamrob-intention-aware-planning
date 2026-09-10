@@ -131,6 +131,16 @@ def load_experiment(experiment_path: str, overrides: dict) -> dict:
 #                         help="Recognizer variant override (e.g. uniform, bayesian)")
 #     return parser.parse_known_args()[0]
 
+def _bool_arg(value: str) -> bool:
+    """argparse type for the true/false override flags. Needed because bool('false')
+    is True — argparse would otherwise accept any string as True."""
+    if value.lower() in ("true", "1", "yes"):
+        return True
+    if value.lower() in ("false", "0", "no"):
+        return False
+    raise argparse.ArgumentTypeError(f"expected true/false, got '{value}'")
+
+
 def parse_user_args():
     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
     parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH)
@@ -140,6 +150,7 @@ def parse_user_args():
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
     parser.add_argument("--planner",     type=str,  default=None, help="Planner variant override (e.g. basic, intention_aware)")
     parser.add_argument("--recognizer",  type=str,  default=None, help="Recognizer variant override (e.g. uniform, bayesian)")
+    parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
     argv = [a for a in sys.argv[1:] if a != '--']  # strip '--' separator
     return parser.parse_known_args(argv)[0]
 
@@ -167,6 +178,7 @@ def _make_domain_model() -> SimModel:
         "steps":      user_args.steps,
         "planner":    user_args.planner,
         "recognizer": user_args.recognizer,
+        "assignment_prior": user_args.assignment_prior,
     })
 
     # --------- domain ---------
@@ -200,6 +212,7 @@ def _make_domain_model() -> SimModel:
         scenario=scenario,
         register_fn=domain["register_fn"],
         env_layout_path=layout["path"],
+        assignment_prior=bool(user_config.get("assignment_prior", False)),
     )
 
 # =============================================================================
@@ -217,6 +230,7 @@ def run_headless():
         "steps":      user_args.steps,
         "planner":    user_args.planner,
         "recognizer": user_args.recognizer,
+        "assignment_prior": user_args.assignment_prior,
     })
 
     n_steps = user_config["steps"]
@@ -267,6 +281,7 @@ _user_config = load_experiment(_user_args.experiment, {
     "steps":      _user_args.steps,
     "planner":    _user_args.planner,
     "recognizer": _user_args.recognizer,
+    "assignment_prior": _user_args.assignment_prior,
 })
 
 _domain_args = DOMAIN_REGISTRY[_user_config["domain"]]       #todo later: error handling for nonexistent domain
@@ -275,6 +290,7 @@ _model_params = {
     "scenario":        _layout["scenarios"][_user_config["scenario"]],
     "register_fn":     _domain_args["register_fn"],
     "env_layout_path": _layout["path"],
+    "assignment_prior": bool(_user_config.get("assignment_prior", False)),
 }
 
 # print(f"_model_params: {_model_params}")

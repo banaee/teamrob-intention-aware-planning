@@ -8,3 +8,6 @@ scenario: scenario_00
 steps: 50
 planner: basic
 recognizer: uniform_make_domain_model
+
+# Give the robot the observed human's work order as a persistent IR prior (evaluation switch, not a scenario fact)
+assignment_prior: false

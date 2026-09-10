@@ -35,7 +35,7 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothes
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
-from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance
+from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance, task_instance_key
 
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
@@ -170,20 +170,21 @@ class RobotAgent(FactoryAgent):
                  model: "SimModel",
                  pos: tuple,
                  knowledge: DomainKnowledgeBase,
-                 scheduled_tasks: List[TaskInstance],
+                 assigned_tasks: List[TaskInstance],
                  # known_item_ids=List[str],
                  known_objects_by_type: Dict[str, List[str]],
-                 observed_agent_id: Optional[str] = None):
+                 observed_agent_id: Optional[str] = None,
+                 observed_assigned_tasks: Optional[List[TaskInstance]] = None):
         super().__init__(unique_id, model, pos)
 
 
         # task_index dropped — current_task_instance replaces it, 
-        # populated from UpdateResult.current_task instead of indexing scheduled_tasks.
+        # populated from UpdateResult.current_task instead of indexing assigned_tasks.
         
         self.observed_agent_id = observed_agent_id
-        self.scheduled_tasks: List[TaskInstance] = scheduled_tasks
+        self.assigned_tasks: List[TaskInstance] = assigned_tasks
 
-        # Build hypothesis space from observed human's scheduled_tasks
+        # Build hypothesis space from the domain schemas and the workspace objects
         hypotheses = build_hypothesis_space(knowledge=knowledge, known_objects_by_type=known_objects_by_type)
 
         context = ContextKnowledge.default()
@@ -191,7 +192,12 @@ class RobotAgent(FactoryAgent):
         self.recognizer = IntentionRecognizer(
             knowledge=knowledge,
             hypotheses=hypotheses,
-            context=context
+            context=context,
+            assigned_tasks=observed_assigned_tasks,
+        )
+        logging.info(
+            f"[IR-prior] assignment_prior={'on' if observed_assigned_tasks else 'off'} "
+            f"known={[task_instance_key(t) for t in (observed_assigned_tasks or [])]}"
         )
 
         self.projector = Projector(knowledge=knowledge)
@@ -203,7 +209,7 @@ class RobotAgent(FactoryAgent):
             human_agent_id=observed_agent_id,
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         )
-        self.meta_planner.seed_tasks(scheduled_tasks)
+        self.meta_planner.seed_tasks(assigned_tasks)
         self.current_task_instance: Optional[TaskInstance] = None
         self.finished: bool = False
 

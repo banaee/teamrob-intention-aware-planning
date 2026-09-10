@@ -80,8 +80,13 @@ class SimModel(model.Model):
                  scenario: ScenarioConfig,
                  register_fn,
                  env_layout_path: str = "domains/kitting/env_layout1.json", 
-                 seed=None):
+                 seed=None,
+                 assignment_prior: bool = False):
         super().__init__()
+
+        # Evaluation switch: give each robot the observed human's assigned_tasks
+        # as a persistent IR prior. Off = the robot knows no work order.
+        self.assignment_prior = assignment_prior
 
         # ------------------------------------------------------------------
         # Load env layout
@@ -234,9 +239,13 @@ class SimModel(model.Model):
     def _spawn_agents(self, scenario: ScenarioConfig):
         """
         Spawn agents from ScenarioConfig.
-        HumanAgent receives its TaskInstance list as script.
-        RobotAgent receives its TaskInstance list as scheduled_tasks.
+        HumanAgent receives its scheduled_tasks as script — its execution order.
+        RobotAgent receives its assigned_tasks as its task pool, plus (when the
+        assignment_prior switch is on) the observed human's assigned_tasks: the
+        work order, never the script.
         """
+        agent_cfgs = {a.agent_id: a for a in scenario.agents}
+
         for agent_cfg in scenario.agents:
             start_pos = agent_cfg.start_position
 
@@ -253,14 +262,21 @@ class SimModel(model.Model):
 
             elif agent_cfg.agent_type == "robot":
                 observed_id = agent_cfg.observes[0] if agent_cfg.observes else None
+                observed_cfg = agent_cfgs.get(observed_id) if observed_id else None
+                observed_assigned = (
+                    observed_cfg.assigned_tasks
+                    if (self.assignment_prior and observed_cfg is not None)
+                    else None
+                )
                 agent = RobotAgent(
                     unique_id=agent_cfg.agent_id,
                     model=self,
                     pos=start_pos,
                     knowledge=self.knowledge,
-                    scheduled_tasks=agent_cfg.scheduled_tasks,  # List[TaskInstance]
+                    assigned_tasks=agent_cfg.assigned_tasks,  # List[TaskInstance]
                     known_objects_by_type=self._objects_by_type,
                     observed_agent_id=observed_id,
+                    observed_assigned_tasks=observed_assigned,
                 )
                 self.space.place_agent(agent, start_pos)
                 self.schedule.add(agent)
