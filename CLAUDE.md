@@ -48,8 +48,8 @@ Do not explore the whole tree. Start from the files a task names; widen only wit
 - **ROS side is paused.** Do not modify anything under `ros_sim/`.
 - **dock_loading domain is deferred.** Do not modify `domains/dock_loading/` unless the task
   explicitly says so. It must still *import* without error (run_mesa.py imports its registry).
-- **`shared/meta_planner.py` is under active design elsewhere** (B2/B3 blocks). Do not modify
-  it unless the task explicitly says so.
+- **`shared/meta_planner.py`:** B1/B2/B3 blocks are under active design. Change only what the
+  task specifies; do not fill in unspecified block logic.
 - **Docs lag the code.** `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`,
   `io_contracts.md` may be stale. The code is the source of truth. Do not "fix" code to
   match docs. Do not edit docs unless the task says so.
@@ -58,16 +58,18 @@ Do not explore the whole tree. Start from the files a task names; widen only wit
 
 1. **Plan before editing.** For any multi-file task: read the relevant files, then present a
    plan (files, what changes, why) and wait for approval.
-2. **One file at a time.** Show the diff for each file and wait for "ok" before the next.
+2. **Checkpoints, not per-file approval.** Edits may be applied without per-file approval.
+   Stop at the checkpoints the task defines (show `git diff --stat` and a short summary);
+   if a diff would touch a file outside the task's allowlist, stop immediately.
 3. **Surgical changes only.** Match existing style. No unrelated refactors, renames, or
    reformatting. No speculative abstractions or configurability.
 4. **Ask, don't guess.** If the code doesn't match what the task describes, or a decision is
    ambiguous, stop and ask.
 5. **Flag, don't fix.** Issues noticed outside the task scope: list them at the end, don't
    change them.
-6. **Git:** commit directly on main in logical groups with clear messages, only after the
-   task's checks pass. Use a feature branch only when I ask for one. Push only when I
-   explicitly say so in the current conversation. Never rewrite history.
+6. **Git:** commit directly on `main` in logical groups with clear messages, only after the
+   task's checks pass and I approve. Use a feature branch only when I ask for one. Push only
+   when I explicitly say so in the current conversation. Never rewrite history.
 7. Be concise in reports: what changed, where, verification result.
 
 ## Running
@@ -76,6 +78,8 @@ Do not explore the whole tree. Start from the files a task names; widen only wit
 # headless; --domain/--layout/--scenario are all needed for non-default scenarios
 python mesa_sim/run_mesa.py --domain kitting --layout env_layout0 --scenario scenario_00 --steps 200
 python mesa_sim/run_mesa.py --domain kitting --layout env_layout2 --scenario scenario_20 --steps 200
+# optional evaluation switch (default off): robot knows the observed human's assigned-task pool
+python mesa_sim/run_mesa.py --domain kitting --layout env_layout2 --scenario scenario_20 --steps 200 --assignment_prior true
 # visualization
 solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout2 --scenario scenario_20
 ```

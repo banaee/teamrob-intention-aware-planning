@@ -106,18 +106,17 @@ scenario_20 = ScenarioConfig(
     id="scenario_20",
     name="layout2_midapproach_sustained_conflict",
     description=(
-        "Phase 4C B2 validation scenario. Built to make the B2 gate reachable and "
-        "consequential, which scenario_00 cannot do. Three properties are engineered: "
-        "(1) the robot's cheapest task (item_4, cost 1033) targets shelf_4, 150 units "
-        "from the human's first target shelf_3, so the greedy t=0 pick lands on the "
-        "conflicted task by construction; (2) approach legs are time-aligned (robot 447, "
-        "human 449) so both agents arrive together and their carry legs then run "
-        "near-parallel into the shared kitting table, giving SUSTAINED low distance "
-        "rather than a transient crossing; (3) the robot's start is far from every shelf, "
-        "so the theta-crossing can land mid-approach — before pick_up, while nothing is "
-        "held and abandoning the task is still cheap. item_6 (cost 1373) is a genuine "
-        "alternative: 340 steps dearer, but roughly 2x clearer of the human. "
-        "No foreseeable tasks. Human plan is scripted/fixed."
+        "Phase 4C B2/B3 fixture. The robot's cheapest task (item_4, cost 1032) is the conflicted "
+        "one, so the t=0 pick lands on it by construction. The conflict comes from matched "
+        "arrival times at the shared kitting table: both carry legs converge there with a small "
+        "gap, giving a long near-by overlap (step 22: item_4 min_dist 15.5, under 50 cm for ~166 "
+        "projection units). item_6 (cost 1372, min_dist ~185) is a clean alternative. "
+        "Known limits: (1) assignment_prior off — theta crosses only at the human's GRASP (step "
+        "22), after the robot's move_to has completed, not mid-approach; (2) assignment_prior on "
+        "— theta crosses at step 2, but the t=0 human projection is already correct unless the "
+        "meta_planner gates projection on confidence (pending); (3) t=0 most_likely is a "
+        "tie-break on layout item order (TODO-42). No foreseeable tasks. Human plan is "
+        "scripted/fixed."
     ),
     agents=[
         AgentConfig(

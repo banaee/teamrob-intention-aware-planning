@@ -614,7 +614,7 @@ memory-wasteful, and makes the objects useless for logging/inspection.
 Deliberately not fixed now: a second "only record below distance X" threshold was considered
 and rejected as premature — the list is bounded and correctness is unaffected. Revisit if
 profiling shows it matters, or when DESIGN-08's soft penalty needs to actually iterate these.
-FFiles: shared/meta_planner.py (_detect_interference), shared/trajectory_algorithms.py, shared/projection.py
+Files: shared/meta_planner.py (_detect_interference), shared/trajectory_algorithms.py, shared/projection.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
 **TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders**
@@ -627,6 +627,11 @@ every candidate; a too-small one makes interference detection inert.
 Needs a calibration pass against real layout geometry, ideally alongside `default_action_cost`.
 Files: shared/projection.py (init — assumed_speed, default_action_cost), shared/meta_planner.py (init — min_safe_distance)
 Reference: Phase 4C scenario_00 validation, September 2026
+
+Calibration order (fixture-design session): calibrate only after the meta_planner's
+confidence-gated human projection lands. Under today's ungated projection,
+min_safe_distance=50 would exclude scenario_20's item_4 at t=0 against a 0.167 tie-break
+projection (min_dist 20) — an exclusion, but not a legitimate one.
 
 **TODO-29 — `deliver_with_return` untested under MetaPlanner**
 The guard was validated pre-MetaPlanner via a manual `robot.carrying` seed in
@@ -650,6 +655,11 @@ candidate (or a calibrated `min_safe_distance`, see TODO-28). This is the main g
 Phase 4C can be called validated rather than merely working.
 Files: shared/meta_planner.py (`_detect_interference`, `update`), domains/kitting/scenarios.py
 Reference: Phase 4C scenario_00 validation, September 2026
+
+Calibration order (fixture-design session): calibrate only after the meta_planner's
+confidence-gated human projection lands. Under today's ungated projection,
+min_safe_distance=50 would exclude scenario_20's item_4 at t=0 against a 0.167 tie-break
+projection (min_dist 20) — an exclusion, but not a legitimate one.
 
 **TODO-31 — `estimate_duration()` is unused internally**
 `Projector.project()` calls `build_segments()` directly and derives duration from the
@@ -786,6 +796,10 @@ Decide on IR-quality grounds with a controlled IR-only test, not to make a fixtu
 Files: shared/likelihood_functions.py, shared/recognizer.py
 Reference: Phase 4C fixture-design session, September 2026
 
+Update (fixture-design session): scenario_20 no longer depends on this — its early reveal is
+planned via assignment_prior on plus a confidence-gated human projection (meta_planner,
+pending). Decide TODO-38 on IR-quality grounds only.
+
 **TODO-39 — Migrate `domains/dock_loading/scenarios.py` to `assigned_tasks`**
 `AgentConfig.assigned_tasks` was added and all three kitting scenarios migrated; dock_loading
 still declares only `scheduled_tasks` for both agent types. It imports and loads fine — empty
@@ -844,6 +858,18 @@ Files: shared/types.py (`DomainModel.intentions`), shared/domain_knowledge.py
 (`get_all_intentions`), shared/recognizer.py (`build_hypothesis_space`)
 Reference: assignment-prior session, September 2026
 
+**TODO-43 — A no-op `update()` costs the robot one tick**
+When a trigger fires and B3 re-selects the task already executing, `RobotAgent` reloads the
+plan (`[executor] _load_plan`) and the robot loses that tick. scenario_20, assignment_prior
+off: the step-22 `theta_crossed` re-issues item_4 and the robot grasps at step 23; with the
+prior on (no trigger at step 22) it grasps at step 22. Every later event shifts by one step,
+and projection distances shift with it (`task_committed` item_4 min_dist 4.9 vs 24.9 — one
+step of arrival gap). Harmless at today's trigger rate; a real cost once B2 fires often, since
+every "continue" would stall the robot. Fix direction not decided; candidate: keep the
+current plan when `UpdateResult.current_task` is the executing task.
+Files: mesa_sim/sim_agents.py (`RobotAgent.step`), shared/meta_planner.py (`update`)
+Reference: fixture-design session, September 2026
+
 ---
 
 ## 🧹 Refactoring / Cleanup TODOs
@@ -890,7 +916,9 @@ Deferred: individual pallet slot positions within truck area.
 `load_return` tasks defined and in scenario but may not complete correctly
 until BUG-01 and BUG-02 are resolved and full scenario runs end-to-end.
 
-**LIMIT-06 — Robot task queue is pre-ordered in scenario file** [Phase 4]
+**LIMIT-06 — Robot task queue is pre-ordered in scenario file** [Phase 4] ✅ RESOLVED
 Robot's `scheduled_tasks` is currently an ordered list in `AgentConfig`.
 Ordering should be the meta_planner's responsibility. Accepted for Phases 1–3;
 fix in Phase 4 via TODO-14.
+Resolved: the robot's task pool is `AgentConfig.assigned_tasks` (unordered); ordering is the
+meta_planner's (assignment-prior session, September 2026).

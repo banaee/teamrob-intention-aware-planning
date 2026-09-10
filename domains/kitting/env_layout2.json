@@ -4,7 +4,7 @@
     "height": 900,
     "name": "Kitting Domain Layout 2",
     "units": "cm",
-    "notes": "Phase 4C B2 validation layout. Unlike layout0's symmetric design (transient centre crossing), this layout is built for SUSTAINED interference on the APPROACH leg: the robot's cheapest task and the human's first task target adjacent shelves reached by time-aligned approaches, so the two agents converge and then run near-parallel into the kitting table. Robot start is deliberately far from all shelves so the theta-crossing has room to land mid-approach, before pick_up, while abandoning the task is still cheap. No obstacles, no foreseeable tasks."
+    "notes": "Phase 4C B2/B3 fixture layout. Built for sustained interference: the robot's cheapest task (shelf_4) and the human's first task (shelf_3) have near-equal approach + carry totals, so both carry legs converge into the kitting table with a small arrival gap. Measured behaviour and limits: see scenario_20 description. No obstacles, no foreseeable tasks."
   },
   "zones": [
     { "id": "zone_NW", "bounds": { "x_min": -600, "x_max": 0, "y_min": 0, "y_max": 450 }, "label": "northwest_work" },
@@ -38,7 +38,7 @@
       "position": [0, 400],
       "size": [200, 100],
       "zone": "zone_NW",
-      "notes": "Shared delivery sink. Both agents' carry legs terminate here, so distance goes to zero for EVERY task pair — the discriminator between candidates is the approach leg and the early carry, not the minimum distance."
+      "notes": "Shared delivery sink. A candidate whose carry leg reaches the table before the human's projection ends converges here; its min_dist is roughly the projected arrival-time gap (item_4: ~15). Candidates arriving after the human's projection ends show no sink conflict."
     },
     {
       "id": "shelf_4",
@@ -47,7 +47,7 @@
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SW",
-      "notes": "Robot's CHEAPEST task (approach 447 + carry 583 = 1033), so the greedy t=0 pick lands here by construction. 150 units from shelf_3 — this adjacency is what creates the sustained conflict."
+      "notes": "Robot's cheapest task (approach 447 + carry 583 ≈ 1032). Its conflict comes from the matched arrival time at the kitting table, not from the 150-unit adjacency to shelf_3; the adjacency makes item_4 an early IR decoy."
     },
     {
       "id": "shelf_3",
@@ -56,7 +56,7 @@
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SW",
-      "notes": "Human's first target. Human approach is 449 against the robot's 447 — deliberately time-aligned so both agents arrive together rather than sequentially."
+      "notes": "Human's first target. Human approach 449 vs robot 447 — time-aligned. With assignment_prior off, theta crosses at the human's grasp here (step 22)."
     },
     {
       "id": "shelf_6",
@@ -65,7 +65,7 @@
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SW",
-      "notes": "Robot's CLEAN ALTERNATIVE (total 1373). 340 steps dearer than item_4 — a real cost to switching, so B2 faces a genuine trade-off rather than a free escape. Its carry leg stays ~326 from the human's, roughly 2x clearer than item_4's."
+      "notes": "Robot's clean alternative (cost 1372). Seen from the human's path it lies nearly behind shelf_3 (9–20° off heading), so it is the IR decoy that keeps confidence below theta until the grasp (TODO-38)."
     },
     {
       "id": "shelf_7",
