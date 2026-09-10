@@ -207,6 +207,48 @@ below). Under the `single_task` strategy (DESIGN-16), meta_planner selects one t
 each cognitive-clock event; the remaining pool carries no ordering commitment at any point.
 The scenario file's robot `scheduled_tasks` order is never consumed as an execution order.
 
+**Assignment knowledge: `assigned_tasks` is the work order, `scheduled_tasks` is the script**
+The robot may know *which* tasks the observed human was assigned without knowing the
+human's *plan* — order, timing, deviations. Three decisions make that separation concrete:
+
+- **D1 — the unit of knowledge is `TaskInstance`**, not a task name and not a bare item id.
+  Matching an assigned task to an IR hypothesis goes through `task_instance_key()`
+  (`shared/types.py`), which produces the same string as `repr(HypothesisKey)` by design —
+  e.g. `deliver_item(?item=item_3,?kitting_table=kitting_table_0)`. The two are kept in
+  lockstep deliberately; io_contracts.md §1.10 and §1.8 are the contract.
+- **D2 — the prior is persistent and non-compounding.** Each hypothesis carries a fixed
+  weight w(τ): `ASSIGNED_TASK_PRIOR` (10.0) if assigned, 1.0 otherwise and for `unknown`.
+  `update()` divides w out of the incoming belief, runs the ordinary Bayesian update and
+  `BELIEF_FLOOR` on that base belief, then multiplies w back in on output. Two simpler
+  designs were rejected: a one-time prior at t=0 is erased by `BELIEF_FLOOR` within the
+  first task, and folding w into ω_context re-applies it every step, compounding to wⁿ and
+  making the boost a function of the update rate rather than of the assignment. A
+  consequence, and not a bug: unassigned hypotheses can appear *below* `BELIEF_FLOOR` in the
+  output distribution — the floor protects recoverability of the base belief, not the output.
+- **D3 — the knowledge lives on the scenario `AgentConfig`.** Human: `assigned_tasks` is the
+  assignment (a fact), `scheduled_tasks` is the developer's execution script and drives
+  `HumanAgent` only. Robot: `assigned_tasks` is its task pool, seeded into the meta_planner;
+  robot `scheduled_tasks` is no longer read or declared. `AgentConfig.__post_init__`
+  enforces that a human's `assigned_tasks` equal its non-foreseeable `scheduled_tasks`
+  exactly — a foreseeable deviation is never part of a work order. Empty `assigned_tasks`
+  skips validation, so un-migrated domains stay loadable.
+
+Nothing is ever filtered out: assigned hypotheses are boosted, never exclusive. The switch is
+global evaluation config (`configs/experiment.yaml: assignment_prior`, default `false`,
+`--assignment_prior true` to override), not a scenario fact — which scenario is being run and
+what the robot is permitted to know are independent axes. With the prior off the recognizer
+runs its original code path unchanged, verified byte-identical on `[meta]`, `meta-cand`,
+`[IR]` and `[IR-dist]` across scenario_00, scenario_10 and scenario_20 (with
+`PYTHONHASHSEED=0`, see TODO-42).
+With the prior on, t=0 `most_likely` is usually an assigned task, so the t=0 human projection
+is usually already correct. Fixtures that rely on a mid-task reveal (scenario_20) must run
+with the prior off. Supports one observed human (`RobotAgent` uses `observes[0]`); multiple
+observed agents would need `assigned_tasks` keyed per agent.
+Files: shared/types.py (AgentConfig), shared/recognizer.py, mesa_sim/sim_model.py,
+mesa_sim/sim_agents.py, mesa_sim/run_mesa.py, configs/experiment.yaml,
+domains/kitting/scenarios.py
+Reference: assignment-prior session, September 2026
+
 **Two planning levels, not one**
 The HCM paper's "adaptive planning" block maps to two distinct modules in implementation:
 

@@ -334,14 +334,23 @@ is correct, not a collision to guard against. Mirrors `HypothesisKey.__repr__`'s
 ```python
 IntentionRecognizer(
     knowledge: DomainKnowledgeBase,
-    context: ContextKnowledge,             # background facts for ω_context weighting
-    hypotheses: List[HypothesisKey],       # precomputed hypothesis space for this scenario
+    context: ContextKnowledge,                        # background facts for ω_context weighting
+    hypotheses: List[HypothesisKey],                  # precomputed hypothesis space for this scenario
+    assigned_tasks: Optional[List[TaskInstance]] = None,   # OBSERVED agent's work order; None/empty = prior off
 )
 ```
 
-**Correction from previous version:** this is a 3-argument constructor, not
+**Correction from previous version:** this is a 4-argument constructor, not
 `IntentionRecognizer(knowledge)`. `hypotheses` is built once at agent construction time via
-the free function below, derived from the human agent's `scheduled_tasks`.
+the free function below, from the domain schemas and the objects present in the workspace —
+*not* from the human agent's `scheduled_tasks`, which the robot never sees.
+
+`assigned_tasks` carries the observed agent's work order — which tasks it was assigned, never
+in which order it will do them. Identity crosses the boundary as `task_instance_key()` (§1.10),
+which matches `repr(HypothesisKey)` (§1.8); an assigned task matching no hypothesis is logged
+as a warning and ignored. `None` or `[]` switches the persistent assignment prior off entirely
+and `update()` runs its original unweighted path. See `design_decisions.md`, "Assignment
+knowledge: `assigned_tasks` is the work order, `scheduled_tasks` is the script."
 
 ```python
 def build_hypothesis_space(

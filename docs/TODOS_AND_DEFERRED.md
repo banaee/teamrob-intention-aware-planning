@@ -786,6 +786,64 @@ Decide on IR-quality grounds with a controlled IR-only test, not to make a fixtu
 Files: shared/likelihood_functions.py, shared/recognizer.py
 Reference: Phase 4C fixture-design session, September 2026
 
+**TODO-39 — Migrate `domains/dock_loading/scenarios.py` to `assigned_tasks`**
+`AgentConfig.assigned_tasks` was added and all three kitting scenarios migrated; dock_loading
+still declares only `scheduled_tasks` for both agent types. It imports and loads fine — empty
+`assigned_tasks` skips `__post_init__` validation by design — but `SimModel._spawn_agents()`
+already seeds robots from `assigned_tasks`, so a dock_loading robot gets an **empty task pool
+today**: a dock_loading run has an idle robot right now, with no exception raised. Migrate
+before running dock_loading again: humans get `assigned_tasks` = their non-foreseeable
+`scheduled_tasks`; robots get `assigned_tasks=` in place of `scheduled_tasks=`.
+Files: domains/dock_loading/scenarios.py
+Reference: assignment-prior session, September 2026
+
+**TODO-40 — Assignment prior strengthens TODO-37(a)**
+The persistent assignment prior up-weights an assigned hypothesis by 10× for the whole run,
+including after that task is complete. Combined with TODO-37(a) — a delivered item's expected
+position resolves to the delivery target, geometrically identical to every later human carry
+leg — a *delivered assigned* item is now a 10× decoy on every subsequent approach leg, where
+before it was a 1× one. The held-item constraint in `_likelihood()` (the sub-item of TODO-37
+marked FIXED) still refutes it during carry, so the exposure is the approach phase, when
+nothing is held. Not observed to change a decision yet.
+Fix direction not decided; belongs with TODO-37(a) and TODO-20 (reset on task completion).
+Files: shared/recognizer.py (`_get_expected_position`)
+Reference: assignment-prior session, September 2026
+
+**TODO-41 — `ros_sim/planner_2.py` reads robot `scheduled_tasks`, now empty**
+`ros_sim/framework_HRI/framework_HRI/planner_2.py:252` builds its task queue from
+`scenario_10.agents["robot_0"].scheduled_tasks` (kitting). After the `assigned_tasks`
+migration that list is empty, so the ROS planner would silently get **zero tasks** — no
+exception, just an idle robot. ROS is paused, so this was flagged rather than fixed. Change to
+`.assigned_tasks` when ROS resumes; check for other readers at the same time.
+Files: ros_sim/framework_HRI/framework_HRI/planner_2.py
+Reference: assignment-prior session, September 2026
+
+**TODO-42 — `DomainModel.intentions` is a `Set`, so hypothesis order is nondeterministic**
+`DomainModel.intentions: Set[str]` (`shared/types.py`) and `get_all_intentions()` returns
+`list(self._domain.intentions)`. Python randomizes string hashing per process, so that list
+comes out in a different order on every run — five fresh processes gave three different
+orders. `build_hypothesis_space()` iterates it, so `self._hypotheses` order, and therefore
+`BeliefState.distribution`'s insertion order, varies per run. Consequences:
+(a) `[IR-dist]` emits tied entries in a different order run-to-run (`sorted(key=-v)` is
+    stable), so byte-identical log diffing fails spuriously;
+(b) `max(distribution, ...)` breaks exact ties by insertion order, so t=0 `most_likely` — and
+    the human projection the meta_planner builds from it — is nondeterministic when the
+    initial prior is uniform and no evidence has arrived.
+A deterministic order makes tie-breaks reproducible, not meaningful: with a uniform prior, t=0
+`most_likely` is still whichever hypothesis comes first — for single-intention layouts, the
+first item in the layout JSON (e.g. scenario_20's item_4).
+Only visible when a layout's hypothesis space holds more than one intention type: env_layout1
+(scenario_10) does, env_layout0/env_layout2 do not — their coffee_machine/ac_switch types are
+absent, so only `deliver_item` hypotheses exist and there is nothing to reorder. This is
+pre-existing, not introduced by the assignment prior; it was found while regression-diffing
+that change and worked around with `PYTHONHASHSEED=0`.
+Candidate fix: give `get_all_intentions()` a deterministic order (e.g. `sorted()`, or make
+`intentions` an ordered collection). Tie order in logs will change when it lands — re-baseline
+after fixing, do not treat that diff as a behaviour change.
+Files: shared/types.py (`DomainModel.intentions`), shared/domain_knowledge.py
+(`get_all_intentions`), shared/recognizer.py (`build_hypothesis_space`)
+Reference: assignment-prior session, September 2026
+
 ---
 
 ## 🧹 Refactoring / Cleanup TODOs
