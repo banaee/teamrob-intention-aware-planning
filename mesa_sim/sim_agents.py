@@ -196,7 +196,7 @@ class RobotAgent(FactoryAgent):
             assigned_tasks=observed_assigned_tasks,
         )
         logging.info(
-            f"[IR-prior] assignment_prior={'on' if observed_assigned_tasks else 'off'} "
+            f"[IR-prior] switch={'on' if self.model.assignment_prior else 'off'} "
             f"known={[task_instance_key(t) for t in (observed_assigned_tasks or [])]}"
         )
 

@@ -268,6 +268,12 @@ class SimModel(model.Model):
                     if (self.assignment_prior and observed_cfg is not None)
                     else None
                 )
+                if agent_cfg.scheduled_tasks and not agent_cfg.assigned_tasks:
+                    logger.warning(
+                        "Robot %s declares scheduled_tasks but no assigned_tasks — "
+                        "its task pool is empty (robot scheduled_tasks is not read; see TODO-39)",
+                        agent_cfg.agent_id,
+                    )
                 agent = RobotAgent(
                     unique_id=agent_cfg.agent_id,
                     model=self,
