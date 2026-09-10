@@ -376,8 +376,18 @@ update(
 **Correction (September 2026):** the previous contract omitted `world: WorldState`. It is a
 required positional parameter — the recognizer needs world predicates and positions for
 likelihood evaluation. Confirmed against `shared/recognizer.py` and the call site in
-`mesa_sim/sim_agents.py`. The recognizer holds no belief internally: `prev_belief` comes in,
-a new `BeliefState` goes out, and the caller owns the state.
+`mesa_sim/sim_agents.py`.
+
+**Correction (leg session, September 2026):** the recognizer now OWNS its belief. It keeps
+an evidence state (no context weights, no state refutations) and derives each tick's
+`BeliefState` from it; `prev_belief` is accepted for signature compatibility and not
+consulted — its distribution contains output-only factors that must not be fed back.
+Evidence accounting: a discrete observation (microaction in some action schema's declared
+vocabulary) is an event and multiplies onto the evidence state; a moving observation is one
+chord from the start of the current movement leg, replacing that leg's earlier chords; a
+stationary observation closes the leg. Output = evidence × ω_context, with hypotheses
+refuted by the held item and inadmissible hypotheses pinned at `BELIEF_FLOOR`. See
+`design_decisions.md`, "One leg is one observation".
 
 Dispatches by schema-declared `microactions` membership and `progress_evaluator` name —
 never by hardcoded microaction strings. See `design_decisions.md`, "IR likelihood dispatch."

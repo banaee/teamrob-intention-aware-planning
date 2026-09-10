@@ -11,11 +11,43 @@ ALGORITHM:
     Likelihood P(obs_t | τ):
         - microaction is 'grasp': if observed agent is now holding τ's target item → HIGH,
           else → LOW
-        - microaction is 'step': direction-based — cosine similarity between
-          human's movement vector and vector from human toward τ's target object.
-          Mapped to [LOW_LIKELIHOOD, HIGH_LIKELIHOOD].
-        - other microactions (release, stand): uninformative → NEUTRAL
+        - movement (no discrete vocabulary matches): direction-based — cosine
+          similarity between the CHORD from the current leg's start to the
+          agent's position and the vector from that leg start toward τ's target
+          object. Mapped to [LOW_LIKELIHOOD, HIGH_LIKELIHOOD].
+        - other discrete microactions (release, stand): uninformative → NEUTRAL
         - 'unknown' hypothesis: always NEUTRAL (decays via normalization only)
+
+    Evidence accounting — one leg is one observation:
+        The recognizer keeps an EVIDENCE state (no context weights, no state
+        refutations in it) and derives the output belief from it each tick.
+        A discrete observation (its microaction is in some action schema's
+        declared vocabulary: grasp, release, ...) is an EVENT: it multiplies
+        onto the evidence state and closes the current movement leg.
+        A moving observation is scored as one chord from the leg start, on top
+        of the evidence the leg started from, REPLACING the leg's earlier chords
+        rather than multiplying on them. A stationary observation changes
+        nothing and closes the leg: a leg is a maximal run of moving
+        observations. Consecutive steps of a straight walk are the same
+        observation (heading varies ≤0.04° within a leg in the simulator);
+        multiplying n copies of it gave 4ⁿ against 'unknown' and saturated
+        belief in three steps. See design_decisions.md, "One leg is one
+        observation".
+
+    Output belief = evidence × ω_context, with state refutations pinned:
+        ω_context and the held-item refutation below are facts about the current
+        state, not events, so they are applied to the OUTPUT only and never fed
+        back — otherwise every leg boundary would count them twice.
+
+    Held-item refutation (hard):
+        If the observed agent holds item X, every hypothesis bound to a
+        different item is REFUTED — the intention is observed, not inferred —
+        and pinned at BELIEF_FLOOR on output, the same treatment as an
+        inadmissible hypothesis. Hypotheses with no item binding (coffee_break,
+        ac_activation) and 'unknown' are never refuted by a grasp. This used to
+        be a ×0.1 factor per step; under per-step multiplication that was de
+        facto elimination, under one-observation-per-leg it would have been a
+        one-shot nudge, which was never what the constraint claimed.
 
     Context weight ω_context(τ, context, world):
         - ZONE_BOOST if in_zone(human, zone) matches τ's target zone
@@ -61,6 +93,7 @@ OUTPUTS:
 from importlib.metadata import distribution
 import itertools
 import logging
+import math
 from typing import Dict, List, Optional, Set, Tuple
 
 from shared.types import (
@@ -221,6 +254,32 @@ class IntentionRecognizer:
         self._history: List[Observation] = []
         self._by_key: Dict[str, HypothesisKey] = {repr(h): h for h in hypotheses}  # this is used to look up HypothesisKey by string repr in update()
 
+        # Microactions some action in the hypothesis space declares as a discrete
+        # vocabulary (pick_up → ["GRASP"], place → ["RELEASE"], ...). Read from
+        # the schemas, never from simulator string literals — the same membership
+        # test _likelihood() dispatches on, asked once over the whole space. Used
+        # by update() to tell an event from a movement observation.
+        # Every method is consulted, not only methods[0] as _likelihood()'s
+        # dispatch does: deliver_item's first method is the guarded
+        # deliver_already_held (move_to, place), which has no pick_up, so the
+        # grasp vocabulary lives only in the other methods (see TODO-46).
+        self._discrete_microactions: Set[str] = set()
+        for hyp in hypotheses:
+            task_schema = self.knowledge.get_task_schema(hyp.task_name)
+            for method in (task_schema.methods if task_schema else []):
+                for step in method.step_calls:
+                    schema = self.knowledge.get_action_schema(step.action_name)
+                    if schema is not None and isinstance(schema.microactions, list):
+                        self._discrete_microactions.update(m.upper() for m in schema.microactions)
+        # Evidence state — see update(). `_evidence` is the belief with no
+        # context weights or state refutations in it; `_leg_base` is its value
+        # at the start of the current movement leg, and `_leg_start_pos` where
+        # that leg started. Movement observations are scored as ONE chord from
+        # there, replacing the leg's earlier chords, not multiplying.
+        self._evidence: Optional[Dict[str, float]] = None
+        self._leg_base: Optional[Dict[str, float]] = None
+        self._leg_start_pos: Optional[Tuple[float, float]] = None
+
         self._admissible: Optional[Set[str]] = self._build_admissible_keys(assigned_tasks)
 
         if self._admissible is None:
@@ -232,9 +291,17 @@ class IntentionRecognizer:
             # Uniform over the admissible set only, then pinned — the same shape
             # as every distribution update() produces, so prior and posterior agree.
             n = len(self._admissible)
-            self._initial_prior = self._pin_inadmissible(
-                {k: 1.0 / n for k in self._admissible}
+            self._initial_prior = self._pin(
+                {k: 1.0 / n for k in self._admissible},
+                {k for k in self._by_key if k not in self._admissible},
             )
+        # Keys pinned at BELIEF_FLOOR on every output because of the restriction.
+        self._inadmissible: Set[str] = (
+            set() if self._admissible is None
+            else {k for k in self._by_key if k not in self._admissible}
+        )
+        self._evidence = self._initial_prior
+        self._leg_base = self._initial_prior
 
     def _build_admissible_keys(
         self,
@@ -275,24 +342,23 @@ class IntentionRecognizer:
                 )
         return admissible
 
-    def _pin_inadmissible(self, distribution: Dict[str, float]) -> Dict[str, float]:
+    def _pin(self, distribution: Dict[str, float], pinned: Set[str]) -> Dict[str, float]:
         """
-        Pin every inadmissible hypothesis at BELIEF_FLOOR and rescale the
-        admissible mass to fill what is left, so the result spans the full
-        hypothesis space and still sums to 1.0. `distribution` holds admissible
-        keys only, normalized — inadmissible hypotheses never enter the update
-        that produced it.
+        Pin every key in `pinned` at BELIEF_FLOOR and rescale the live mass to
+        fill what is left, so the result spans the full hypothesis space and
+        still sums to 1.0. `distribution` holds the live keys only, normalized.
+        Used for inadmissible hypotheses (restriction) and for hypotheses
+        refuted by the held item (state) alike.
 
         Pinned at the floor rather than at zero for the reason the floor exists
         at all: a hypothesis at exact zero can never recover through
         multiplicative update. Note the log cannot tell a pinned hypothesis from
-        an admissible one refuted by evidence — both read BELIEF_FLOOR.
+        a live one refuted by evidence — both read BELIEF_FLOOR.
         """
-        inadmissible = [k for k in self._by_key if k not in self._admissible]
-        admissible_mass = 1.0 - len(inadmissible) * BELIEF_FLOOR
-        pinned = {k: v * admissible_mass for k, v in distribution.items()}
-        pinned.update({k: BELIEF_FLOOR for k in inadmissible})
-        return pinned
+        live_mass = 1.0 - len(pinned) * BELIEF_FLOOR
+        out = {k: v * live_mass for k, v in distribution.items()}
+        out.update({k: BELIEF_FLOOR for k in pinned})
+        return out
 
     def update(
         self,
@@ -302,45 +368,49 @@ class IntentionRecognizer:
     ) -> BeliefState:
         """
         Bayesian update: P(τ|obs_1..t) ∝ P(obs_t|τ) · ω_context(τ) · P(τ|obs_1..t-1)
+
+        Evidence accounting — three kinds of observation:
+
+          discrete (microaction in some action schema's declared vocabulary —
+              a domain fact, not a string literal): an EVENT. Multiplies onto
+              the evidence state and closes the current movement leg.
+          moving: scored as one chord from the leg start to the current
+              position, on top of the evidence the leg started from —
+              REPLACING the leg's earlier chords, never multiplying on them.
+          stationary (no displacement since the previous observation): nothing
+              new; closes the leg. A leg is a maximal run of moving
+              observations, so a turn without a discrete event still starts a
+              fresh chord from where the agent stopped.
+
+        The evidence state carries neither ω_context nor the held-item
+        refutation — both are facts about the current state and are applied to
+        the output only (see _output()). The recognizer therefore owns its
+        belief; `prev_belief` is accepted for contract compatibility and not
+        consulted (its distribution already contains those output-only
+        factors, so feeding it back would count them twice).
         """
         self._history.append(obs)
+        current_pos = obs.spatial_context.position
+        if self._leg_start_pos is None:
+            self._leg_start_pos = current_pos   # the first observation opens the first leg
 
-        prior: Dict[str, float] = prev_belief.distribution if prev_belief is not None else self._initial_prior
+        mu = (obs.detected_microaction or "").upper()
+        discrete = mu in self._discrete_microactions
+        prev_pos = self._history[-2].spatial_context.position if len(self._history) >= 2 else None
+        moving = (
+            prev_pos is not None
+            and math.hypot(current_pos[0] - prev_pos[0], current_pos[1] - prev_pos[1]) >= 1e-6
+        )
 
-        # Compute unnormalized posterior over the admissible hypotheses. An
-        # inadmissible one is refuted, not down-weighted: skipped here, it
-        # neither accumulates evidence nor takes part in the normalization
-        # below, and is pinned at BELIEF_FLOOR on output. With the restriction
-        # off (_admissible is None) nothing is skipped and the original path
-        # runs unchanged.
-        unnorm: Dict[str, float] = {}
-        for hyp in self._hypotheses:
-            key = repr(hyp)
-            if self._admissible is not None and key not in self._admissible:
-                continue
-            likelihood = self._likelihood(obs, world, hyp)
-            omega = self._context_weight(obs, world, hyp)
-            default = self._initial_prior.get(key, 1.0 / (len(self._hypotheses) + 1))
-            unnorm[key] = likelihood * omega * prior.get(key, default)
+        if discrete:
+            self._evidence = self._finalize(self._weigh(obs, world, self._evidence, prev_pos))
+            self._leg_base, self._leg_start_pos = self._evidence, current_pos
+        elif moving:
+            self._evidence = self._finalize(self._weigh(obs, world, self._leg_base, self._leg_start_pos))
+        else:
+            self._leg_base, self._leg_start_pos = self._evidence, current_pos
 
-        # unknown: neutral likelihood, no context boost
-        unnorm[UNKNOWN] = NEUTRAL_LIKELIHOOD * prior.get(UNKNOWN, self._initial_prior[UNKNOWN])
-
-        # Normalize
-        total = sum(unnorm.values()) or 1.0
-        distribution = {k: v / total for k, v in unnorm.items()}
-
-        # Apply floor — no hypothesis may fall to exact zero, or it can never
-        # recover through multiplicative update (see design_decisions.md).
-        distribution = {k: max(v, BELIEF_FLOOR) for k, v in distribution.items()}
-        floor_total = sum(distribution.values())
-        distribution = {k: v / floor_total for k, v in distribution.items()}
-
-        # Restore the inadmissible hypotheses, pinned, so the distribution spans
-        # the full hypothesis space again and still sums to 1.0.
-        if self._admissible is not None:
-            distribution = self._pin_inadmissible(distribution)
-
+        distribution = self._output(obs, world)
         most_likely = max(distribution, key=lambda k: distribution[k])
         confidence = distribution[most_likely]
 
@@ -351,6 +421,97 @@ class IntentionRecognizer:
             most_likely=most_likely,
             confidence=confidence,
         )
+
+    def _weigh(
+        self,
+        obs: Observation,
+        world: WorldState,
+        prior: Dict[str, float],
+        origin: Optional[Tuple[float, float]],
+    ) -> Dict[str, float]:
+        """
+        Unnormalized evidence posterior: likelihood × prior over the admissible
+        hypotheses plus 'unknown'. An inadmissible hypothesis is refuted, not
+        down-weighted: skipped here, it neither accumulates evidence nor takes
+        part in the normalization, and is pinned at BELIEF_FLOOR on output.
+        With the restriction off (_admissible is None) nothing is skipped.
+        `origin` is where the movement being scored began (see _progress_likelihood).
+        """
+        unnorm: Dict[str, float] = {}
+        for hyp in self._hypotheses:
+            key = repr(hyp)
+            if self._admissible is not None and key not in self._admissible:
+                continue
+            default = self._initial_prior.get(key, 1.0 / (len(self._hypotheses) + 1))
+            unnorm[key] = self._likelihood(obs, world, hyp, origin) * prior.get(key, default)
+        # unknown: neutral likelihood
+        unnorm[UNKNOWN] = NEUTRAL_LIKELIHOOD * prior.get(UNKNOWN, self._initial_prior[UNKNOWN])
+        return unnorm
+
+    def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
+        """
+        The belief reported this tick: evidence × ω_context, with the
+        hypotheses refuted by the held item pinned at BELIEF_FLOOR alongside the
+        inadmissible ones. State factors only — nothing here is fed back.
+        """
+        refuted = self._refuted_by_holding(obs, world)
+        unnorm: Dict[str, float] = {}
+        for key, p in self._evidence.items():
+            if key in self._inadmissible or key in refuted:
+                continue
+            hyp = self._by_key.get(key)
+            omega = self._context_weight(obs, world, hyp) if hyp is not None else 1.0
+            unnorm[key] = p * omega
+        return self._finalize(unnorm, self._inadmissible | refuted)
+
+    def _refuted_by_holding(self, obs: Observation, world: WorldState) -> Set[str]:
+        """
+        HELD-ITEM REFUTATION (see TODO-37): if the observed agent is holding an
+        item, every hypothesis bound to a DIFFERENT item is refuted — the
+        intention is observed, not inferred. Hypotheses with no item binding
+        and 'unknown' are untouched. Returns the refuted keys; _output() pins
+        them. Without this, a previously-delivered item sitting at the kitting
+        table becomes a geometric decoy for every human carry leg (validated:
+        scenario_00, run_20260904_131808, belief reached 0.995 on an
+        already-completed task).
+
+        DESIGN DEBT (TODO-37): reads the literal "?item" from the bindings,
+        matching the precedent in _get_expected_position / _get_target_zone.
+        """
+        held_item = next(
+            (
+                p.args[1].value
+                for p in world.predicates
+                if p.name == "holding"
+                and len(p.args) == 2
+                and p.args[0].value == obs.agent_id
+            ),
+            None,
+        )
+        if held_item is None:
+            return set()
+        return {
+            repr(h) for h in self._hypotheses
+            if h.bindings.get("?item") is not None and h.bindings.get("?item") != held_item
+        }
+
+    def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:
+        """Normalize, floor, and pin an unnormalized posterior over the live
+        keys. `pinned` defaults to the inadmissible set (the evidence state);
+        _output() adds the held-item refutations."""
+        total = sum(unnorm.values()) or 1.0
+        distribution = {k: v / total for k, v in unnorm.items()}
+
+        # Apply floor — no hypothesis may fall to exact zero, or it can never
+        # recover through multiplicative update (see design_decisions.md).
+        distribution = {k: max(v, BELIEF_FLOOR) for k, v in distribution.items()}
+        floor_total = sum(distribution.values())
+        distribution = {k: v / floor_total for k, v in distribution.items()}
+
+        # Restore the pinned hypotheses so the distribution spans the full
+        # hypothesis space again and still sums to 1.0.
+        pinned = self._inadmissible if pinned is None else pinned
+        return self._pin(distribution, pinned) if pinned else distribution
 
     def get_hypothesis(self, key: str) -> Optional[HypothesisKey]:
         """
@@ -372,6 +533,7 @@ class IntentionRecognizer:
         obs: Observation,
         world: WorldState,
         hyp: HypothesisKey,
+        origin: Optional[Tuple[float, float]] = None,
     ) -> float:
         """
         Schema-driven dispatch. For each action schema in hyp's task decomposition:
@@ -387,34 +549,11 @@ class IntentionRecognizer:
         vocabulary. A new domain with a different microaction taxonomy needs zero
         changes here; it only needs correctly populated ActionSchema objects.
 
-        HELD-ITEM CONSTRAINT (see TODO-37): if the observed agent is holding an
-        item, every hypothesis bound to a DIFFERENT item is refuted, not merely
-        less likely — the intention is observed, not inferred. Returning
-        LOW_LIKELIHOOD before any directional evidence is consulted prevents
-        weak cosine-similarity evidence from outvoting a world fact. Without
-        this, a previously-delivered item sitting at the kitting table becomes a
-        geometric decoy for every human carry leg (validated: scenario_00,
-        run_20260904_131808, belief reached 0.995 on an already-completed task).
+        The held-item refutation is NOT applied here any more: it is a state
+        fact, pinned on output by _refuted_by_holding() / _output(). Evidence
+        for a refuted hypothesis still accumulates here so that it is live again,
+        honestly weighted, once the item is released.
         """
-
-        held_item = next(
-            (
-                p.args[1].value
-                for p in world.predicates
-                if p.name == "holding"
-                and len(p.args) == 2
-                and p.args[0].value == obs.agent_id
-            ),
-            None,
-        )
-        if held_item is not None:
-            hyp_item = hyp.bindings.get("?item")
-            if hyp_item is not None and hyp_item != held_item:
-                return LOW_LIKELIHOOD
-            
-            
-            
-        
         mu = (obs.detected_microaction or "").upper()
 
         for schema in self._get_relevant_action_schemas(hyp):
@@ -431,7 +570,7 @@ class IntentionRecognizer:
 
             # Continuous progress-type action (move_to, ...)
             if spec == "STEP*" and schema.progress_evaluator:
-                return self._progress_likelihood(obs, world, hyp, schema)
+                return self._progress_likelihood(obs, world, hyp, schema, origin)
 
         return NEUTRAL_LIKELIHOOD
 
@@ -441,14 +580,24 @@ class IntentionRecognizer:
         world: WorldState,
         hyp: HypothesisKey,
         schema,
+        origin: Optional[Tuple[float, float]],
     ) -> float:
         """
         Delegate to the progress evaluator named by schema.progress_evaluator.
-        Builds the plain-value inputs (move_vec, current_pos, target_pos) the
-        evaluator needs — no geometry happens here, only assembly of inputs
-        already available from Observation history and _get_expected_position.
+        Builds the plain-value inputs (move_vec, origin, target_pos) the evaluator
+        needs — no geometry happens here, only assembly of inputs already
+        available from the leg state and _get_expected_position.
+
+        `origin` is where the movement being scored began: the leg start for a
+        continuous observation (so move_vec is the leg's chord), the previous
+        position for a discrete one (standing still → zero vector → NEUTRAL).
+        The heading is compared against the bearing to the target FROM THE
+        ORIGIN, not from the current position: a τ-walker would have gone
+        straight from where the leg began. Measuring against the current
+        position would let a passed target's swinging bearing re-import, one
+        step at a time, the accumulation this design removes.
         """
-        if len(self._history) < 2:
+        if origin is None:
             return NEUTRAL_LIKELIHOOD
 
         evaluator = likelihood_functions.PROGRESS_EVALUATORS.get(schema.progress_evaluator)
@@ -456,14 +605,13 @@ class IntentionRecognizer:
             return NEUTRAL_LIKELIHOOD
 
         current_pos = obs.spatial_context.position
-        prev_pos = self._history[-2].spatial_context.position
-        move_vec = (current_pos[0] - prev_pos[0], current_pos[1] - prev_pos[1])
+        move_vec = (current_pos[0] - origin[0], current_pos[1] - origin[1])
 
         target_pos = self._get_expected_position(hyp, world, obs.agent_id)
         if target_pos is None:
             return NEUTRAL_LIKELIHOOD
 
-        return evaluator(move_vec, current_pos, target_pos)
+        return evaluator(move_vec, origin, target_pos)
 
     def _get_relevant_action_schemas(self, hyp: HypothesisKey) -> List:
         """

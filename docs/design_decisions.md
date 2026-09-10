@@ -636,6 +636,9 @@ to 1.0). No weight, no divide-out/multiply-back: a mask needs no compensation, a
 switch off nothing is masked, so the original path runs by construction. Confidence is then
 a function of the admissible set size and of the evidence alone — with three admissible
 hypotheses in scenario_20, t=0 is 0.332 and step 2 is 0.881, on two directional updates.
+CORRECTION (leg session, September 2026): the 0.881 was two copies of ONE observation
+multiplied together, not two updates — see "One leg is one observation" below. The honest
+value of that walk is 0.641, and the restriction's t=0 figure (0.332) stands.
 
 This is the same principle as the held-item constraint already in `_likelihood()` (TODO-37c):
 a hypothesis the robot *knows* to be wrong is refuted, not down-weighted. It also removes
@@ -649,8 +652,10 @@ Foreseeable tasks and `unknown` stay admissible deliberately. `coffee_break` and
 `ac_activation` are not in `assigned_tasks` precisely because they are the deviations the
 robot must be able to recognize; restricting them away would make scenario_10's coffee break
 unrecognizable, and `unknown` is the escape hatch for behaviour outside the model. Verified:
-with the switch on, `coffee_break` accumulates evidence during scenario_10's deviation
-(0.004 → 0.016) while the four out-of-pool items sit pinned. An empty pool (dock_loading,
+with the switch on, `coffee_break` stays live during scenario_10's deviation (0.004 → 0.016)
+while the four out-of-pool items sit pinned — CORRECTION (leg session): that movement was
+ω_context and renormalization, not chord evidence; `coffee_break` has never received
+directional evidence at all (TODO-46). Admissibility held; recognition did not. An empty pool (dock_loading,
 TODO-39) admits everything and degrades to the original path, never to an empty set.
 Files: shared/recognizer.py (`_build_admissible_keys`, `_pin_inadmissible`, `update`)
 Reference: evidence-gated projection admission session, September 2026
@@ -683,3 +688,99 @@ step counts are a simulator concept and the trigger belongs to the caller — bo
 recoverable from the `[meta-trig]` line of the same tick.
 Files: shared/meta_planner.py (`update_human_projection`)
 Reference: evidence-gated projection admission session, September 2026
+
+**One leg is one observation — replace, do not multiply**
+Measured in every leg of every run (scenarios 00/10/20, switch off and on,
+PYTHONHASHSEED=0): the human's heading varies by **≤ 0.04°** within a movement leg, so
+consecutive STEP observations are exact duplicates of one another. The recognizer multiplied
+them: the per-step likelihood ratio of the correct hypothesis against `unknown` is 4.00
+(HIGH/NEUTRAL) and against a hypothesis behind the human ~40, so n steps of one straight walk
+gave 4ⁿ and belief saturated at 0.995 within three to six ticks — from one heading. Against
+a collinear decoy the same walk gave 1.03ⁿ, which is why the 20°-off shelf never separated
+(TODO-38). Diagnosis: not a kernel-sharpness problem but an INDEPENDENCE one — the kernel is
+in fact too flat near the peak (a 10° miss costs 0.7 %, 30° costs 6.5 %) and its ratio
+against NEUTRAL is what set the compounding rate.
+
+RETRACTED as artefacts of duplicate counting: the "mid-approach reveals" measured in the
+projection-admission session — scenario_20 switch-on at step 2 (0.881), scenario_00 at step
+3, scenario_10 at step 2 — and the two confident wrong answers on scenario_10's coffee walk
+(0.991 on item_6 switch-on, 0.971 on item_0 switch-off). None of them was evidence.
+
+Decision. The recognizer keeps an EVIDENCE state and derives the output belief from it each
+tick:
+- A discrete observation (microaction in some action schema's declared vocabulary — built
+  from every method of every task in the hypothesis space, not `methods[0]`) is an EVENT:
+  it multiplies onto the evidence state and closes the current movement leg.
+- A moving observation is ONE chord from the leg start to the current position, scored on
+  top of the evidence the leg started from and REPLACING the leg's earlier chords. The chord
+  is compared against the bearing to the target from the leg start — a τ-walker would have
+  gone straight from there. Comparing against the current position was considered and
+  rejected: a passed target's swinging bearing would re-import the accumulation one step at
+  a time.
+- A stationary observation changes nothing and closes the leg. A leg is a maximal run of
+  moving observations, so a turn without a discrete event (the walk from the kitting table
+  to the coffee machine and on to shelf_4 in scenario_10 has none) still starts a fresh
+  chord. Without this rule the chord from the kitting table rotated through the whole
+  coffee walk and drove a false crossing on the delivered item at step 194.
+- ω_context and the held-item refutation are facts about the current STATE, not events.
+  They are applied to the output only and never fed back; folding them into the evidence
+  state counted them twice at every leg boundary (measured: ×2 ×2 at steps 78–79). The
+  recognizer therefore owns its belief; `update()`'s `prev_belief` is accepted for contract
+  compatibility and not consulted.
+- The held-item constraint is a HARD refutation: hypotheses bound to a different item than
+  the one held are pinned at `BELIEF_FLOOR` on output, the same treatment as
+  inadmissibility. It was a ×0.1 factor per step; under per-step multiplication that was de
+  facto elimination, under one-observation-per-leg it would have been a one-shot nudge —
+  a soft multiplier standing in for a hard fact, the same pattern as the 10× prior and the
+  duplicate chord. `unknown` and hypotheses with no item binding are never refuted by a
+  grasp.
+
+Two premises of the analysis that preceded this were wrong and are corrected here:
+(1) "ω_context ≡ 1 in these layouts" — false. Zones are top-level quadrants in all three
+layouts and ZONE_BOOST fires as state (item_2 ×2 at step 4, item_3 ×2 at step 11 in
+scenario_20 switch-on). It was hidden by saturation. (2) "The grasp gives ×40" — false. It
+gives ×10 via the held-item refutation of the OTHER items; the grasped item's own completion
+predicate has never been evaluated (TODO-46). Every "grasp reveal" and "carry reveal" in
+every run to date was held-item refutation of the alternatives.
+
+Grasp confidence is 0.797, not the 0.888 obtained by pinning and renormalizing the step-21
+belief: that arithmetic assumed ω constant across the grasp. It is not — the moment
+`holding` appears, the held item's container is the agent, `_get_target_zone()` finds no
+zone, and item_3's ×2 vanishes (TODO-37(b)); 0.248 : 0.062 = 4 : 1 → 0.80 minus floor mass.
+The obvious fix — resolve a held item's zone from the holder's position — is wrong:
+ZONE_BOOST means "the agent is in the zone of this hypothesis's TARGET", and in phase 2 the
+target is the kitting table, not the item; an agent is always in the zone of what it
+carries, so that fix would hand every carrying hypothesis a permanent free ×2. The correct
+phase-2 branch mirrors `_get_expected_position()`: target zone = the kitting table's zone,
+under which there is still no boost during the carry until the human reaches the table.
+0.797 stands either way.
+
+Crossings after the change (PYTHONHASHSEED=0; runs 20260910_1552xx). `theta_crossed` =
+crossing events; "built" = admitted projections:
+
+| run      | first ≥ θ            | theta_crossed | built projections  | note |
+|----------|----------------------|---------------|--------------------|------|
+| s20 off  | 22 (0.797), grasp    | 22, 89        | 22, 24, 89, 96     | late-reveal condition |
+| s20 on   | **11 (0.780)**       | 11, 82        | 11, 23, 82, 95     | PRE-GRASP: human crosses x=0 into zone_SW at 11 (13.99 → −2.92) and ZONE_BOOST doubles item_3 (0.641 → 0.780); robot at (−393, 85), its move_to to shelf_4 completes at 21 — roughly half the approach; projection built, item_4 min_dist 14.98 at cost 812. This is the fixture condition B2 needs. It is a zone-state reveal on top of one honest chord (0.641), not an accumulation. |
+| s00 off  | 41 (0.797), grasp    | 41, 111       | 41, 63, 111, 131   | |
+| s00 on   | 41 (0.797), grasp    | 41, 81        | 41, 63, 81, 95, 131| leg-2 first chord 0.856 (carry-leg chord had already favoured shelf_2, 49° off, L 3.4) |
+| s10 off  | 257 (0.769), grasp of item_4 | 257   | 257, 262           | grasp of item_2 at 31 gives 0.662: item_2 : coffee : unknown = 4 : 1 : 1 — coffee has no item binding and survives the pin |
+| s10 on   | **107 (0.853) on item_6 — wrong** | 107, 257 | 107, 142, 200, 257, 262 | coffee-leg criterion FAILED, known consequence of TODO-46: `coffee_break` gets no chord evidence, so the walk to the coffee machine is credited to shelf_6 (27° off) and doubled on zone_SW entry |
+
+Every belief change in all six runs is attributable to a leg start, a discrete event, a
+quadrant crossing, or a world change (a robot-carried item's expected position moving with
+the robot — switch-off only, since those hypotheses are inadmissible switch-on). No
+per-step accumulation remains; within-leg values are flat to the third decimal.
+
+KNOWN DEPENDENCY, recorded so it is not mistaken later: with one chord per leg, the kernel
+alone decides whether any mid-approach reveal exists. Under the current linear kernel one
+honest chord carries 0.64 against two alternatives (0.80 against `unknown` alone); a
+normalised von Mises at σ ≤ 30° carries 0.82–0.88 (step-1 crossing in the two-hypothesis
+pools), σ = 45° carries 0.69 (crossing at the grasp). After TODO-38 lands, **σ becomes
+load-bearing for the whole meta-planner**: every downstream B2 result is conditional on it,
+and a B2 finding that moves with σ is a σ artefact, not a robust result. The scenario_20
+switch-on reveal at step 11 above is a zone-state reveal and does not depend on σ; the
+step-2 reveals that would appear under σ ≤ 30° do.
+Files: shared/recognizer.py (`update`, `_weigh`, `_output`, `_refuted_by_holding`,
+`_progress_likelihood`, `_finalize`, `_pin`)
+Reference: leg-level evidence session, September 2026

@@ -641,6 +641,10 @@ unblocked. Findings from scenario_20, 200 steps, PYTHONHASHSEED=0, runs 20260910
   directional updates over three admissible hypotheses), item_4 min_dist 14.98 vs item_6
   321.9, at ~9% of the robot's approach. Switch OFF is the late-reveal condition: first
   admission at step 22, the human's grasp, 100% of the approach spent.
+  CORRECTION (leg session): the step-2 figure was duplicate counting and is retracted. After
+  "One leg is one observation" the switch-ON reveal is at step 11 (0.780, ZONE_BOOST on
+  zone_SW entry over one honest chord of 0.641; robot ~half way to shelf_4; item_4 min_dist
+  14.98 at cost 812) and the switch-OFF reveal stays at the grasp, step 22 (0.797).
 - The t=0 phantom projection is closed in both runs: `none(below_theta)` (0.167 off, 0.332 on).
 - No selection changed in either run. `min_safe_distance=1.0` excludes nothing, `_cost()` is
   execution cost only, so B3 is pure argmin and the cheapest task wins every trigger. item_4
@@ -785,6 +789,14 @@ the human carries item X, `object_locations[X]` is the carrier's agent_id, so
 `object_zones.get("human_0")` returns None (agent id looked up in an object dict — silent
 miss, not an error) and the CORRECT hypothesis loses its ZONE_BOOST exactly when the human
 commits, while the delivered-item decoy gains one. NOT FIXED.
+Measured cost (leg session): grasp confidence is 0.797, not the 0.888 that pinning and
+renormalizing the pre-grasp belief predicts — item_3's ×2 vanishes on the grasp tick. The
+obvious fix, resolving the held item's zone from the holder's position, is WRONG:
+ZONE_BOOST means "the agent is in the zone of this hypothesis's TARGET", and in phase 2 the
+target is the kitting table; an agent is always in the zone of what it carries, so every
+carrying hypothesis would get a permanent free ×2. The correct phase-2 branch mirrors
+`_get_expected_position()`: target zone = the kitting table's zone. Under that fix there is
+still no boost during the carry until the human reaches the table; 0.797 stands.
 
 (c) No hard constraint from `holding`. FIXED — `_likelihood()` now returns LOW_LIKELIHOOD
 for any hypothesis whose `?item` differs from the observed held item, before microaction
@@ -838,6 +850,23 @@ shape above, not the restriction. `coffee_break` never becomes `most_likely` in 
 including the unmodified prior-off baseline.
 Bears on B2 (TODO-36) rather than on the recognizer: an admitted projection must not be
 treated as ground truth, and B2's design should not assume otherwise.
+CORRECTION (leg session): the 0.991 was duplicate counting (design_decisions.md, "One leg is
+one observation") and `coffee_break`'s 0.016 was ω/renormalization — it receives no chord
+evidence at all (TODO-46). After the leg change the same walk still crosses θ on item_6,
+at 0.853 (step 107, switch on): one honest chord 27° off shelf_6 plus ZONE_BOOST. The
+"confidence ≠ correctness" finding stands, on a smaller number.
+
+Update (leg session) — SCOPE FOR THE NEXT TASK: this is the B2 unblocker, not cleanup. With
+one chord per leg, the kernel alone decides whether any mid-approach reveal exists:
+linear (current) → 0.64 on one chord against two alternatives, crossing at the grasp;
+normalised von Mises σ ≤ 30° → 0.82–0.88, crossing at step 1; σ = 45° → 0.69, the grasp.
+After this lands σ is LOAD-BEARING for every downstream B2 result — record any B2 finding
+together with the σ it was obtained under. Includes the NEUTRAL merge: under a kernel
+normalised as a density ratio against uniform, `unknown` = 1 by construction and the
+current inconsistency (linear kernel circle-mean 2.05 vs NEUTRAL = 1.0, which handicaps
+`unknown` 2× against a random heading) disappears without a separate constant. Decide σ
+with a controlled IR-only test, ideally against recorded human walks when ROS resumes; do
+not tune it toward a fixture.
 
 **TODO-39 — Migrate `domains/dock_loading/scenarios.py` to `assigned_tasks`**
 `AgentConfig.assigned_tasks` was added and all three kitting scenarios migrated; dock_loading
@@ -932,6 +961,32 @@ Revisit once results with the θ gate are in, and only if the wait for θ is sho
 something.
 Files: shared/meta_planner.py (`update_human_projection`)
 Reference: evidence-gated projection admission session, September 2026
+
+**TODO-46 — IR has never used completion evidence; only phase-1 shelf approach ever scores**
+One root cause, three symptoms. `_get_expected_position()` returns `None` — hence NEUTRAL —
+whenever the target binding it inspects is a `Var` rather than a `Const`:
+(1) Completion evidence is unreachable. `_likelihood()` returns from the FIRST schema in
+    `methods[0]`'s decomposition; for `deliver_item` that is `deliver_already_held`, whose
+    first step is `move_to` (progress branch), so `pick_up`/`place` completion predicates
+    are never evaluated for any observation.
+(2) Phase-2 carry targets are unresolvable: the last `move_to` binds `?target` to
+    `Var("?kitting_table")`, so the carried item's hypothesis is NEUTRAL for the whole carry.
+(3) Parameterised foreseeable targets are unresolvable: `coffee_break`'s `move_to` binds
+    `?target` to `Var("?coffee_machine")`, so `coffee_break` has never received directional
+    evidence; the walk to the coffee machine is credited to the nearest shelf hypothesis.
+Net: the recognizer's ONLY working evidence path has ever been phase-1 shelf approach for
+`?item` hypotheses, plus held-item refutation of the alternatives. Every "grasp reveal" and
+"carry reveal" in every run to date was the held-item refutation; `unknown` has never been
+refuted by anything but a chord. The failed coffee-leg criterion in the leg session
+(scenario_10 switch on, `theta_crossed` at 107 on item_6 at 0.853) is a known consequence.
+Fix direction: resolve task-level parameter bindings (`hyp.bindings`) when a step_call term
+is a `Var` — the same lookup `_resolve_term_value()` already does for completion predicates
+— and dispatch completion checks over the method whose vocabulary matches, not
+`methods[0]`. A finding about the IR, not a footnote; deferred from the leg session so that
+change stayed one semantic change.
+Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_target_zone`,
+`_get_relevant_action_schemas`)
+Reference: leg-level evidence session, September 2026
 
 ---
 
