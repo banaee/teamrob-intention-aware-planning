@@ -633,6 +633,27 @@ confidence-gated human projection lands. Under today's ungated projection,
 min_safe_distance=50 would exclude scenario_20's item_4 at t=0 against a 0.167 tie-break
 projection (min_dist 20) — an exclusion, but not a legitimate one.
 
+Update (evidence-gated projection admission session): the gate has landed; calibration is
+unblocked. Findings from scenario_20, 200 steps, PYTHONHASHSEED=0, runs 20260910_144814
+(switch off) and 20260910_144816 (switch on):
+- scenario_20 now has two valid fixture conditions. Switch ON is the mid-approach-reveal
+  condition: first admitted projection at step 2 (confidence 0.881, evidence-based — two
+  directional updates over three admissible hypotheses), item_4 min_dist 14.98 vs item_6
+  321.9, at ~9% of the robot's approach. Switch OFF is the late-reveal condition: first
+  admission at step 22, the human's grasp, 100% of the approach spent.
+- The t=0 phantom projection is closed in both runs: `none(below_theta)` (0.167 off, 0.332 on).
+- No selection changed in either run. `min_safe_distance=1.0` excludes nothing, `_cost()` is
+  execution cost only, so B3 is pure argmin and the cheapest task wins every trigger. item_4
+  reaches min_dist 4.90 (switch off, step 24 `task_committed`) on a ±600 layout and is still
+  selected. This is the concrete demonstration that the pipeline cannot express "close is
+  bad" — the gap B2 (TODO-36) and DESIGN-08 exist to fill.
+- Calibration evidence for `min_safe_distance`: across both runs, conflicted values cluster
+  at ~4.9–29 (4.90, 14.98, 15.45, 15.53, 24.90, 29.11) and clear values at ~93–819, with no
+  observation between 30 and 93.
+- Step 59, switch on: item_6 119.5 vs item_7 119.3 — indistinguishable on proximity, separated
+  only by cost (1513 vs 1711). A worthiness score based on distance alone would have nothing
+  to say here.
+
 **TODO-29 — `deliver_with_return` untested under MetaPlanner**
 The guard was validated pre-MetaPlanner via a manual `robot.carrying` seed in
 `sim_model.__init__`. That seed is now removed, and it would no longer exercise the path
@@ -660,6 +681,11 @@ Calibration order (fixture-design session): calibrate only after the meta_planne
 confidence-gated human projection lands. Under today's ungated projection,
 min_safe_distance=50 would exclude scenario_20's item_4 at t=0 against a 0.167 tie-break
 projection (min_dist 20) — an exclusion, but not a legitimate one.
+
+Update (evidence-gated projection admission session): still never exercised. With the gate in
+place, every candidate across scenario_00/10/20 is `feasible=True`, including item_4 at
+min_dist 4.90 in scenario_20 (switch off, step 24). Calibration evidence and the two
+scenario_20 fixture conditions are recorded under TODO-28.
 
 **TODO-31 — `estimate_duration()` is unused internally**
 `Projector.project()` calls `build_segments()` directly and derives duration from the
