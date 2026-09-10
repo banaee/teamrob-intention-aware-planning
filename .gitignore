@@ -39,3 +39,6 @@ logs/
 
 # ignore all environment stuff .venv
 .venv/
+
+# ignore claude-related local settings
+.claude/*
