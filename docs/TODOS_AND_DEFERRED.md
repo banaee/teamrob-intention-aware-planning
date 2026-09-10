@@ -734,6 +734,58 @@ about worthiness, not doability.
 Files: shared/meta_planner.py (`update`)
 Reference: Phase 4C block-design session, September 2026
 
+
+**TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places**
+Found during Phase 4C B2 design (September 2026), scenario_00 run_20260904_131808.
+Three separable defects; only the third is fixed.
+
+(a) After delivery, `world.object_locations[item] = kitting_table_0`, so
+`_get_expected_position()`'s phase-1 branch resolves a delivered item's expected position
+to the delivery target — geometrically identical to every subsequent human carry leg. The
+completed task remains a full-weight attractor for the rest of the run. NOT FIXED.
+
+(b) `_get_target_zone()` has no phase-2 branch, unlike `_get_expected_position()`. While
+the human carries item X, `object_locations[X]` is the carrier's agent_id, so
+`object_zones.get("human_0")` returns None (agent id looked up in an object dict — silent
+miss, not an error) and the CORRECT hypothesis loses its ZONE_BOOST exactly when the human
+commits, while the delivered-item decoy gains one. NOT FIXED.
+
+(c) No hard constraint from `holding`. FIXED — `_likelihood()` now returns LOW_LIKELIHOOD
+for any hypothesis whose `?item` differs from the observed held item, before microaction
+dispatch. (a) and (b) still apply during the approach phase, when nothing is held.
+
+Observed impact before the fix: belief converged to 0.995 on `deliver_item(item_7)` — a
+task the ROBOT had completed 28 steps earlier and never a human task — driving both
+meta-planner decisions at steps 46 and 57 against a fabricated human trajectory,
+including the first-ever candidate exclusion (min_dist=0.309) and the first-ever
+mid-task reselection.
+
+DESIGN DEBT: the fix reads the literal `"?item"` from hypothesis bindings, matching
+existing precedent in `_get_expected_position()` and `_get_target_zone()`. That makes it
+three instances — structural rather than incidental domain leakage into `shared/`. The
+clean form derives the held-item parameter from `TaskSchema.parameter_types` instead.
+Deferred deliberately to unblock Phase 4C meta-planning.
+Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_target_zone`)
+Reference: Phase 4C B2 design session, September 2026
+
+**TODO-38 — IR: direction-only likelihood cannot separate collinear decoys** [OPEN DISCUSSION — not decided]
+Observed: scenario_20 (run_20260910_083630). shelf_6 lies nearly behind the human's target
+shelf_3 (9°→20° off heading over the approach). Likelihood is cosine-only — distance plays no
+role — so item_6/item_3 ratio stays 0.97–0.99 per step; confidence plateaus at 0.516 and θ is
+crossed only by GRASP at step 22. A side decoy (shelf_4, angle opens to 60°) resolves fine.
+
+Question: correct uncertainty or a weakness? Options, none decided:
+(a) Distance term (boost closer targets). Risk: compounds multiplicatively (1.05^20 ≈ 2.65),
+    confidently wrong when the far shelf is the real target; tie-breaker variant needs an ε cutoff.
+(b) Passed-target refutation (distance starts increasing → refute). Real evidence, but only
+    after passing the near target — no help when the human stops there.
+(c) Sharper kernel, e.g. exp(κ·cos). Faster rejection of side decoys; no help for decoys behind.
+(d) Leave as-is; treat collinear ambiguity as a fixture-design constraint.
+
+Decide on IR-quality grounds with a controlled IR-only test, not to make a fixture fire earlier.
+Files: shared/likelihood_functions.py, shared/recognizer.py
+Reference: Phase 4C fixture-design session, September 2026
+
 ---
 
 ## 🧹 Refactoring / Cleanup TODOs
@@ -784,36 +836,3 @@ until BUG-01 and BUG-02 are resolved and full scenario runs end-to-end.
 Robot's `scheduled_tasks` is currently an ordered list in `AgentConfig`.
 Ordering should be the meta_planner's responsibility. Accepted for Phases 1–3;
 fix in Phase 4 via TODO-14.
-
-**TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places**
-Found during Phase 4C B2 design (September 2026), scenario_00 run_20260904_131808.
-Three separable defects; only the third is fixed.
-
-(a) After delivery, `world.object_locations[item] = kitting_table_0`, so
-`_get_expected_position()`'s phase-1 branch resolves a delivered item's expected position
-to the delivery target — geometrically identical to every subsequent human carry leg. The
-completed task remains a full-weight attractor for the rest of the run. NOT FIXED.
-
-(b) `_get_target_zone()` has no phase-2 branch, unlike `_get_expected_position()`. While
-the human carries item X, `object_locations[X]` is the carrier's agent_id, so
-`object_zones.get("human_0")` returns None (agent id looked up in an object dict — silent
-miss, not an error) and the CORRECT hypothesis loses its ZONE_BOOST exactly when the human
-commits, while the delivered-item decoy gains one. NOT FIXED.
-
-(c) No hard constraint from `holding`. FIXED — `_likelihood()` now returns LOW_LIKELIHOOD
-for any hypothesis whose `?item` differs from the observed held item, before microaction
-dispatch. (a) and (b) still apply during the approach phase, when nothing is held.
-
-Observed impact before the fix: belief converged to 0.995 on `deliver_item(item_7)` — a
-task the ROBOT had completed 28 steps earlier and never a human task — driving both
-meta-planner decisions at steps 46 and 57 against a fabricated human trajectory,
-including the first-ever candidate exclusion (min_dist=0.309) and the first-ever
-mid-task reselection.
-
-DESIGN DEBT: the fix reads the literal `"?item"` from hypothesis bindings, matching
-existing precedent in `_get_expected_position()` and `_get_target_zone()`. That makes it
-three instances — structural rather than incidental domain leakage into `shared/`. The
-clean form derives the held-item parameter from `TaskSchema.parameter_types` instead.
-Deferred deliberately to unblock Phase 4C meta-planning.
-Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_target_zone`)
-Reference: Phase 4C B2 design session, September 2026
