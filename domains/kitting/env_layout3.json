@@ -2,9 +2,9 @@
   "space": {
     "width": 1000,
     "height": 800,
-    "name": "Kitting Domain Layout 0",
+    "name": "Kitting Domain Layout 3",
     "units": "cm",
-    "notes": "Minimal layout for Phase 4 IR and AP development. Symmetric placement guarantees path crossing near center (Scenario 0.1) and KT convergence conflict (Scenario 0.2). No obstacles, no foreseeable tasks."
+    "notes": "Crossing fixture (from the edited layout0 geometry, September 2026). Mirror-symmetric about x=0: shelf_3 (-200,-300) for the human and shelf_4 (200,-300) for the robot, so two agents starting at (450,350) and (-450,350) walk mirror-image approaches that cross at the centre line mid-path. Scenario: scenario_30. No obstacles."
   },
   "zones": [
     {
@@ -59,7 +59,7 @@
     {
       "id": "shelf_3",
       "type": "shelf",
-      "position": [-300, -300],
+      "position": [-200, -300],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SW",
@@ -68,7 +68,7 @@
     {
       "id": "shelf_4",
       "type": "shelf",
-      "position": [300, -300],
+      "position": [200, -300],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SE",
@@ -77,16 +77,16 @@
     {
       "id": "shelf_6",
       "type": "shelf",
-      "position": [-400, -100],
+      "position": [400, -100],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "zone": "zone_SE",
       "notes": "Robot second task item."
     },
     {
       "id": "shelf_7",
       "type": "shelf",
-      "position": [-400, 100],
+      "position": [-400, 200],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_NW",
@@ -95,7 +95,7 @@
     {
       "id": "shelf_2",
       "type": "shelf",
-      "position": [400, -100],
+      "position": [400, -300],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SE",
