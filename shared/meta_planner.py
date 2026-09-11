@@ -170,7 +170,13 @@ class MetaPlanner:
                                  individually) are not yet implemented. Independent of
                                  `strategy`; all combinations are intended to be runnable.
         interference_algorithm:  function(Segment, Segment) -> List[ConflictPoint].
-                                 Defaults to trajectory_algorithms.discretized_time_sampling.
+                                 Defaults to trajectory_algorithms.discretized_time_sampling,
+                                 whose spatial resolution (max_spatial_step, world units)
+                                 has no default: the embodiment layer must bind it from its
+                                 own config (functools.partial) and pass the bound callable
+                                 here, as mesa_sim/sim_agents.py does. Left unbound, the
+                                 first interference check raises TypeError — deliberately,
+                                 rather than sampling at an assumed unit scale.
                                  closest_point_of_approach is a documented, unimplemented
                                  drop-in alternative — same signature, swap here when built.
         human_agent_id:          agent_id of the human this robot observes, for building

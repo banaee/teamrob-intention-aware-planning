@@ -663,8 +663,11 @@ steps are execution ticks: `RobotAgent` constructs `Projector(assumed_speed=<Mes
 default_action_cost=1.0)` (mesa_sim/sim_agents.py; step_size read from mesa_configs.yaml), so a
 movement action lasts distance/20 ticks and a stationary action one tick, for robot and human
 projections alike. `shared/` still holds no Mesa constant. Sampling resolution is preserved in
-world units: `discretized_time_sampling(max_spatial_step=1.0)` spaces samples so the faster
-agent moves at most 1 unit between them (speed read off the Segment). `[meta-cand] cost=` now
+world units: `discretized_time_sampling(max_spatial_step=...)` spaces samples so the faster
+agent moves at most that many units between them (speed read off the Segment); the value is
+bound on the body side from `mesa_configs.yaml: simulation.interference_spatial_resolution`
+(1 cm) and has no default in `shared/`, since a world-unit resolution is itself a unit-scale
+assumption. `[meta-cand] cost=` now
 reads in ticks (scenario_20 t=0: 54 / 71 / 103, formerly 1032 / 1372 / 2028). The T1 evidence
 above and in `analysis/t1_conflict_measurement/REPORT.md` is in world units and unchanged.
 Consequence: with placement lasting a real tick, both agents' placement segments sit at the

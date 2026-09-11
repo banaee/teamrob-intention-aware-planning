@@ -38,7 +38,7 @@
       "position": [0, 400],
       "size": [200, 100],
       "zone": "zone_NW",
-      "notes": "Shared delivery sink. A candidate whose carry leg reaches the table before the human's projection ends converges here; its min_dist is roughly the projected arrival-time gap (item_4: ~15). Candidates arriving after the human's projection ends show no sink conflict."
+      "notes": "Shared delivery sink. A candidate whose carry leg reaches the table while the human's projection is still running converges here, and its min_dist is set by the projected arrival-time gap (both placements coincide at this point when the gap is under a tick). Candidates arriving after the human's projection ends show no sink conflict. Current figures: analysis/t1_conflict_measurement/REPORT.md, TODO-28/TODO-30."
     },
     {
       "id": "shelf_4",
@@ -47,7 +47,7 @@
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SW",
-      "notes": "Robot's cheapest task (approach 447 + carry 583 ≈ 1032). Its conflict comes from the matched arrival time at the kitting table, not from the 150-unit adjacency to shelf_3; the adjacency makes item_4 an early IR decoy."
+      "notes": "Robot's cheapest task (approach 447 + carry 583 cm ≈ 54 ticks at 20 cm/tick, incl. pick and place). Its conflict comes from the matched arrival time at the kitting table, not from the 150 cm adjacency to shelf_3; the adjacency makes item_4 an early IR decoy."
     },
     {
       "id": "shelf_3",
@@ -65,7 +65,7 @@
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SW",
-      "notes": "Robot's clean alternative (cost 1372). Seen from the human's path it lies nearly behind shelf_3 (9–20° off heading), so it is the IR decoy that keeps confidence below theta until the grasp (TODO-38)."
+      "notes": "Robot's clean alternative (approach 550 + carry 820 cm ≈ 71 ticks). Seen from the human's path it lies nearly behind shelf_3 (9–20° off heading), so it is the IR decoy that keeps confidence below theta until the grasp (TODO-38)."
     },
     {
       "id": "shelf_7",
@@ -74,7 +74,7 @@
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SE",
-      "notes": "Robot's third task (total 2029). Far enough east that it never competes — present to keep the pool at three, matching scenario_00."
+      "notes": "Robot's third task (approach 1151 + carry 875 cm ≈ 103 ticks). Far enough east that it never competes — present to keep the pool at three, matching scenario_00."
     },
     {
       "id": "shelf_2",

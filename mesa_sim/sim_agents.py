@@ -27,6 +27,7 @@ STEP ORDER (RobotAgent):
 
 from __future__ import annotations
 import logging
+from functools import partial
 from typing import TYPE_CHECKING, List, Optional, Dict
 
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
@@ -35,13 +36,17 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothes
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
+from shared.trajectory_algorithms import discretized_time_sampling
 from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance, task_instance_key
 
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state
 from mesa_sim.executor import Executor
-from mesa_sim.action_decomposer import _get_step_size  # single reader of mesa_configs.yaml
+from mesa_sim.action_decomposer import (  # single reader of mesa_configs.yaml
+    _get_step_size,
+    _get_interference_spatial_resolution,
+)
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
@@ -211,10 +216,17 @@ class RobotAgent(FactoryAgent):
             default_action_cost=1.0,
         )
     
+        # The interference sampler's spatial resolution is a world-unit quantity
+        # (cm here), so it is bound on the body side from mesa_configs.yaml —
+        # shared/ carries no default for it (see discretized_time_sampling).
         self.meta_planner = MetaPlanner(
             knowledge=knowledge,
             projector=self.projector,
             recognizer=self.recognizer,
+            interference_algorithm=partial(
+                discretized_time_sampling,
+                max_spatial_step=_get_interference_spatial_resolution(model),
+            ),
             human_agent_id=observed_agent_id,
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         )

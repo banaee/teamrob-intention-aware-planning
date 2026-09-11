@@ -300,3 +300,21 @@ def _get_step_size(model) -> float:
 def _get_seconds_per_step(model) -> float:
     cfg = _load_mesa_config(model)
     return float(cfg.get("simulation", {}).get("seconds_per_step", 2.0))
+
+
+def _get_interference_spatial_resolution(model) -> float:
+    """
+    World units (cm) the faster agent may move between two interference samples
+    — bound into shared.trajectory_algorithms.discretized_time_sampling by
+    sim_agents.py. No fallback: a resolution in world units is a unit-scale
+    fact about this body, so a missing key is a configuration error, not
+    something to assume.
+    """
+    cfg = _load_mesa_config(model)
+    try:
+        return float(cfg["simulation"]["interference_spatial_resolution"])
+    except KeyError:
+        raise KeyError(
+            "mesa_configs.yaml: simulation.interference_spatial_resolution is "
+            "required (world units between interference samples); no default."
+        ) from None

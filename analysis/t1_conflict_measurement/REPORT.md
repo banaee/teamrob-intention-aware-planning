@@ -1,5 +1,10 @@
 # T1 — Conflict-geometry measurement for MetaPlanner (measurement only)
 
+> **Units note (added after T2, commit `2282c83`):** every cost, step count, T_r/T_h and pause
+> delay δ in this report is in pre-T2 projection units (1 unit = 1 cm of motion, ≈ 20 units per
+> Mesa tick; stationary actions 1 unit). Since T2 the projector runs in execution ticks.
+> Distances (min d, s) are world units (cm) and are unchanged.
+
 Code at HEAD `372d925` (main, clean tree). `shared/` untouched. Six runs, `PYTHONHASHSEED=0`.
 No decision, default, threshold or cost was changed; nothing below proposes one.
 

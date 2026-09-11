@@ -167,7 +167,8 @@ def discretized_time_sampling(
     segment_a: Segment,
     segment_b: Segment,
     interval: float = 1.0,
-    max_spatial_step: float = 1.0,
+    *,
+    max_spatial_step: float,
 ) -> list:
     """
     Default interference algorithm. Samples both segments at fixed step
@@ -179,15 +180,18 @@ def discretized_time_sampling(
     cheaper but can miss a close pass between samples; finer catches more but
     costs more calls. Not tuned — same "placeholder default" status as
     assumed_speed.
-    max_spatial_step: upper bound, in world units, on how far the faster of the
-    two agents moves between consecutive samples. The effective spacing is
-    min(interval, max_spatial_step / max(speed_a, speed_b)), with speed read
-    off each Segment itself (distance / duration). This keeps the sampling
-    resolution a fact about geometry (1 world unit) rather than about the
-    simulator's step size: a projection built at 20 units per tick is sampled
-    20 times per tick, one at 1 unit per tick once per tick, and two
-    stationary segments once per `interval`. shared/ never learns the step
-    size — the Segments carry it.
+    max_spatial_step: REQUIRED, keyword-only. Upper bound, in world units, on
+    how far the faster of the two agents moves between consecutive samples.
+    The effective spacing is min(interval, max_spatial_step / max(speed_a,
+    speed_b)), with speed read off each Segment itself (distance / duration),
+    so a projection built at 20 units per tick is sampled 20 times per tick
+    when max_spatial_step is 1. It has no default on purpose: a value in world
+    units is a unit-scale assumption (1 cm in Mesa, 1 m in ROS would not be
+    the same resolution), and that is a fact about the body. The embodiment
+    layer binds it — e.g. functools.partial(discretized_time_sampling,
+    max_spatial_step=<from its config>) — and passes the bound callable to
+    MetaPlanner as interference_algorithm. Calling this without it raises
+    TypeError rather than sampling at an assumed scale.
 
     Returns List[ConflictPoint], one per sample in the overlap window,
     regardless of how close the sample is — MetaPlanner._detect_interference()

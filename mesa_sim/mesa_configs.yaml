@@ -4,3 +4,4 @@
       max_steps: 2000
       step_size: 20                      # 1 step = 20 centimeters
       seconds_per_step: 2.0
+      interference_spatial_resolution: 1.0   # centimeters between interference samples (max_spatial_step); required, no default
