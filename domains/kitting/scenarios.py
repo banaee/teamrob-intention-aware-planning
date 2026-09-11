@@ -63,15 +63,15 @@ scenario_01 = ScenarioConfig(
         AgentConfig(
             agent_id="human_0",
             agent_type="human",
-            start_position=(350, 200),
+            start_position=(450, 350),
             scheduled_tasks=[
-                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
-                TaskInstance(schema=deliver_item,bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item,bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_0")}),
             ],
             assigned_tasks=[
-                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_0")}),
             ],
             observes=[],
@@ -79,7 +79,7 @@ scenario_01 = ScenarioConfig(
         AgentConfig(
             agent_id="robot_0",
             agent_type="robot",
-            start_position=(-350, 200),
+            start_position=(-450, 350),
             assigned_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),

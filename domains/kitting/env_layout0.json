@@ -59,7 +59,7 @@
     {
       "id": "shelf_3",
       "type": "shelf",
-      "position": [-300, -300],
+      "position": [-200, -300],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SW",
@@ -68,7 +68,7 @@
     {
       "id": "shelf_4",
       "type": "shelf",
-      "position": [300, -300],
+      "position": [200, -300],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SE",
@@ -86,7 +86,7 @@
     {
       "id": "shelf_7",
       "type": "shelf",
-      "position": [-400, 100],
+      "position": [-400, 200],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_NW",
@@ -95,7 +95,7 @@
     {
       "id": "shelf_2",
       "type": "shelf",
-      "position": [400, -100],
+      "position": [400, -300],
       "size": [100, 100],
       "slots": 2,
       "zone": "zone_SE",
