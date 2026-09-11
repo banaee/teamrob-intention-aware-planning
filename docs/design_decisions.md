@@ -755,8 +755,10 @@ phase-2 branch mirrors `_get_expected_position()`: target zone = the kitting tab
 under which there is still no boost during the carry until the human reaches the table.
 0.797 stands either way.
 
-Crossings after the change (PYTHONHASHSEED=0; runs 20260910_1552xx). `theta_crossed` =
-crossing events; "built" = admitted projections:
+Crossings after the change (PYTHONHASHSEED=0; runs 20260910_1552xx — superseded as regression
+baselines by runs 20260911_0826xx after T2 rescaled projection time to execution ticks; the
+`theta_crossed` steps below are unchanged in those runs, the built/selected columns are not —
+see TODO-28 and TODO-30). `theta_crossed` = crossing events; "built" = admitted projections:
 
 | run      | first ≥ θ            | theta_crossed | built projections  | note |
 |----------|----------------------|---------------|--------------------|------|

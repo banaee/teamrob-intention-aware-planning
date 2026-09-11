@@ -41,6 +41,7 @@ from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state
 from mesa_sim.executor import Executor
+from mesa_sim.action_decomposer import _get_step_size  # single reader of mesa_configs.yaml
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
@@ -200,7 +201,15 @@ class RobotAgent(FactoryAgent):
             f"known={[task_instance_key(t) for t in (observed_assigned_tasks or [])]}"
         )
 
-        self.projector = Projector(knowledge=knowledge)
+        # Projection time is execution time: one projection step is one Mesa tick.
+        # The body supplies the motion rate (step_size world units per tick, from
+        # mesa_configs.yaml) and the duration of a stationary action (one tick per
+        # GRASP/RELEASE microaction); shared/ never learns either constant.
+        self.projector = Projector(
+            knowledge=knowledge,
+            assumed_speed=_get_step_size(model),
+            default_action_cost=1.0,
+        )
     
         self.meta_planner = MetaPlanner(
             knowledge=knowledge,

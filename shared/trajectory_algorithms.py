@@ -155,10 +155,19 @@ def obstacle_aware_path(
 # INTERFERENCE DETECTION
 # =============================================================================
 
+def _speed(segment: Segment) -> float:
+    """World units per step along `segment`; 0.0 for a stationary or zero-duration segment."""
+    duration = segment.end_step - segment.start_step
+    if duration <= 0.0:
+        return 0.0
+    return _distance(segment.start_pos, segment.end_pos) / duration
+
+
 def discretized_time_sampling(
     segment_a: Segment,
     segment_b: Segment,
     interval: float = 1.0,
+    max_spatial_step: float = 1.0,
 ) -> list:
     """
     Default interference algorithm. Samples both segments at fixed step
@@ -166,9 +175,19 @@ def discretized_time_sampling(
     geometric distance at each sample. Zero-length overlap (segments don't
     share any step-time) returns an empty list — not a conflict.
 
-    interval: sampling spacing in steps. Coarser than 1.0 is cheaper but can
-    miss a close pass between samples; finer catches more but costs more
-    calls. Not tuned — same "placeholder default" status as assumed_speed.
+    interval: sampling spacing in steps (execution ticks). Coarser than 1.0 is
+    cheaper but can miss a close pass between samples; finer catches more but
+    costs more calls. Not tuned — same "placeholder default" status as
+    assumed_speed.
+    max_spatial_step: upper bound, in world units, on how far the faster of the
+    two agents moves between consecutive samples. The effective spacing is
+    min(interval, max_spatial_step / max(speed_a, speed_b)), with speed read
+    off each Segment itself (distance / duration). This keeps the sampling
+    resolution a fact about geometry (1 world unit) rather than about the
+    simulator's step size: a projection built at 20 units per tick is sampled
+    20 times per tick, one at 1 unit per tick once per tick, and two
+    stationary segments once per `interval`. shared/ never learns the step
+    size — the Segments carry it.
 
     Returns List[ConflictPoint], one per sample in the overlap window,
     regardless of how close the sample is — MetaPlanner._detect_interference()
@@ -181,6 +200,10 @@ def discretized_time_sampling(
     overlap_end = min(segment_a.end_step, segment_b.end_step)
     if overlap_start >= overlap_end:
         return []
+
+    max_speed = max(_speed(segment_a), _speed(segment_b))
+    if max_speed > 0.0:
+        interval = min(interval, max_spatial_step / max_speed)
 
     conflicts = []
     step = overlap_start

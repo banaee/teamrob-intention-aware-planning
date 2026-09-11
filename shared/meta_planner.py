@@ -5,8 +5,8 @@ PURPOSE:
     Owns robot task scheduling: which task to do next, and (under the not-yet-
     implemented "full_reorder" strategy) what order the rest follow. Sits above
     planner.py (decomposes one task) and replaces replanning.py (trigger-only).
-    Called by sim_agents.py; calls planner.py per candidate task to project
-    execution.
+    Called by sim_agents.py; projects each candidate task through the injected
+    Projector (shared/projection.py), which decomposes via planner.py.
 
     See shared/io_contracts.md §2.2 for the authoritative interface contract.
     See design_decisions.md, "Cancellation is not a meta_planner cost term",
@@ -25,7 +25,8 @@ WHAT THIS MODULE DOES:
       implemented) would also decide what order the rest of the queue follows
     - Projects a candidate task — or, under "full_reorder", a candidate
       ordering — and the human's predicted task, for interference checking,
-      using planner.py per candidate. Never decomposes tasks itself.
+      through Projector.project() / project_human(). Never decomposes tasks
+      itself.
     - Detects interference by comparing straight-line Segments (see
       shared/trajectory_algorithms.py) between the robot's projection and the
       human's, via a swappable algorithm — no zone concept involved (see
@@ -76,9 +77,10 @@ STRATEGY (DESIGN-16):
             pool with no ordering commitment.
         "full_reorder" (NOT IMPLEMENTED) — score every permutation of
             candidates; the argmin permutation becomes the entire new queue.
-            _project() raises NotImplementedError for orderings longer than
-            1, pending the WorldState-continuity design that multi-task
-            projection depends on (guard/effects retraction semantics).
+            Projector.project() raises NotImplementedError for orderings
+            longer than 1, pending the WorldState-continuity design that
+            multi-task projection depends on (guard/effects retraction
+            semantics).
     Rationale for defaulting to single_task: the human-prediction horizon H is
     already belief-bounded and uncertain beyond it — committing to a
     multi-task robot schedule optimized against that same uncertain horizon
@@ -334,7 +336,8 @@ class MetaPlanner:
 
         `human_projection` is supplied by the caller, built once per fired
         trigger via update_human_projection(). Not rebuilt here, not recomputed
-        per candidate. None means no human observed or the hypothesis was
+        per candidate. None means the projection was not admitted: belief
+        confidence below theta, no human observed, or the hypothesis was
         unresolvable — every candidate is then scored without an interference
         check, not treated as always-conflicting.
 
@@ -481,8 +484,8 @@ class MetaPlanner:
         Forming candidates from task_pool is this block's private business:
             single_task  — each task in the pool is a candidate; argmin wins.
             full_reorder — each permutation of the pool is a candidate.
-                           NOT IMPLEMENTED; _project() also refuses orderings
-                           longer than 1 (DESIGN-16).
+                           NOT IMPLEMENTED; Projector.project() also refuses
+                           orderings longer than 1 (DESIGN-16).
 
         single_task detail: each candidate is projected alone from the live
         WorldState, interference-checked against human_projection if one was
@@ -505,8 +508,8 @@ class MetaPlanner:
             raise NotImplementedError(
                 "MetaPlanner._replan_tasks: 'full_reorder' strategy is not yet "
                 "implemented — see design_decisions.md, DESIGN-16. "
-                "_project() raises NotImplementedError for orderings longer "
-                "than 1, which this strategy would require."
+                "Projector.project() raises NotImplementedError for orderings "
+                "longer than 1, which this strategy would require."
             )
         if self._strategy != "single_task":
             raise ValueError(f"MetaPlanner: unknown strategy '{self._strategy}'")

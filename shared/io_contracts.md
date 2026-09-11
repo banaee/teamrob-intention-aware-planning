@@ -573,11 +573,14 @@ grow (e.g. a waypoint list), since a non-linear path is not captured by a start/
 
 **Interference detection** — given two `Segment`s, where and how close do they get:
 ```python
-discretized_time_sampling(segment_a, segment_b, interval=1.0) -> List[ConflictPoint]
+discretized_time_sampling(segment_a, segment_b, interval=1.0, max_spatial_step=1.0) -> List[ConflictPoint]
 closest_point_of_approach(segment_a, segment_b) -> List[ConflictPoint]   # NOT IMPLEMENTED
 ```
 Both are symmetric in their arguments and return an empty list when the segments do not
-overlap in step-time. `discretized_time_sampling()` is the current default;
+overlap in step-time. `discretized_time_sampling()` is the current default; its sampling
+spacing is `min(interval, max_spatial_step / max(speed_a, speed_b))` with each Segment's
+speed read off the Segment itself, so resolution is fixed in world units (1.0) whatever the
+embodiment's step size — projection steps are execution ticks (T2, September 2026);
 `closest_point_of_approach()` (CPA) is documented with its analytic approach but unbuilt —
 exact rather than sampled, no interval tradeoff, but with real edge cases (clamping the
 analytic minimum to the overlap window, near-zero relative velocity).

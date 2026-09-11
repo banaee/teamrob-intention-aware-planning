@@ -72,13 +72,17 @@ class Projector:
         """
         knowledge:            HTN domain knowledge, passed through to planner.py calls
                               and used for per-action cost lookup.
-        assumed_speed:        world-units per estimation-unit for movement actions
-                              (distance / assumed_speed). Placeholder default — needs
-                              calibration against the simulator's real step scale
-                              (TODO-28), not a tuned value.
-        default_action_cost:  fallback duration for non-movement actions when
-                              knowledge.get_cost(action_name) has no costs.yaml entry.
-                              Also a placeholder.
+        assumed_speed:        world units the agent moves per execution step, so a
+                              movement action lasts distance / assumed_speed steps.
+                              Supplied by the embodiment layer (Mesa: its step_size,
+                              see mesa_sim/sim_agents.py; ROS would supply its own).
+                              The 1.0 default is a unit-less placeholder, not a value
+                              shared/ knows to be right.
+        default_action_cost:  duration, in execution steps, of a non-movement action
+                              when knowledge.get_cost(action_name) has no costs.yaml
+                              entry. Mesa executes one microaction per tick, so 1.0 is
+                              exact for pick_up/place there; wait_at's real duration is
+                              still not honoured (TODO-32).
         """
         self._knowledge = knowledge
         self._planner = AdaptivePlanner(knowledge=knowledge)

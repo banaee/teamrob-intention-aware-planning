@@ -658,6 +658,24 @@ unblocked. Findings from scenario_20, 200 steps, PYTHONHASHSEED=0, runs 20260910
   only by cost (1513 vs 1711). A worthiness score based on distance alone would have nothing
   to say here.
 
+Update (T2, September 2026) — the `assumed_speed` / time-scale half is RESOLVED. Projection
+steps are execution ticks: `RobotAgent` constructs `Projector(assumed_speed=<Mesa step_size>,
+default_action_cost=1.0)` (mesa_sim/sim_agents.py; step_size read from mesa_configs.yaml), so a
+movement action lasts distance/20 ticks and a stationary action one tick, for robot and human
+projections alike. `shared/` still holds no Mesa constant. Sampling resolution is preserved in
+world units: `discretized_time_sampling(max_spatial_step=1.0)` spaces samples so the faster
+agent moves at most 1 unit between them (speed read off the Segment). `[meta-cand] cost=` now
+reads in ticks (scenario_20 t=0: 54 / 71 / 103, formerly 1032 / 1372 / 2028). The T1 evidence
+above and in `analysis/t1_conflict_measurement/REPORT.md` is in world units and unchanged.
+Consequence: with placement lasting a real tick, both agents' placement segments sit at the
+identical table position in overlapping ticks whenever the arrival gap is under a tick, so
+`min_dist` reaches exactly 0.0 and `min_safe_distance = 1.0` now EXCLUDES those candidates
+(TODO-30 is exercised; scenario_10 step 257 hits the every-candidate-excluded `RuntimeError`).
+`min_safe_distance` itself stays OPEN and was deliberately not touched.
+Post-T2 regression baselines (PYTHONHASHSEED=0): runs 20260911_082601 (s00 off), _082604
+(s00 on), _082606 (s10 off, aborts at step 257), _082609 (s10 on, aborts at 257), _082612
+(s20 off), _082615 (s20 on).
+
 **TODO-29 — `deliver_with_return` untested under MetaPlanner**
 The guard was validated pre-MetaPlanner via a manual `robot.carrying` seed in
 `sim_model.__init__`. That seed is now removed, and it would no longer exercise the path
@@ -690,6 +708,18 @@ Update (evidence-gated projection admission session): still never exercised. Wit
 place, every candidate across scenario_00/10/20 is `feasible=True`, including item_4 at
 min_dist 4.90 in scenario_20 (switch off, step 24). Calibration evidence and the two
 scenario_20 fixture conditions are recorded under TODO-28.
+
+Update (T2, September 2026): NOW EXERCISED, by the time-scale fix rather than by calibration.
+With projection steps = execution ticks, a placement occupies a full tick, and two agents
+projected to place at the same table within a tick of each other stand at the identical
+point: `min_dist = 0.0 < 1.0`. scenario_20 switch on, step 11: item_4 `feasible=False`,
+item_6 selected. scenario_20 switch off, step 24: item_4 excluded, item_6 selected.
+scenario_10 (both switches), step 257: item_5 is the only remaining candidate and is
+excluded → `RuntimeError` (every candidate infeasible), the run aborts. Both branches this
+item asked for are therefore reached; whether the exclusion is *legitimate* (an arrival gap
+under one tick at a 200 × 100 table modelled as a point) is the `min_safe_distance` question
+under TODO-28, still open, and the "what does the robot do when everything is excluded"
+question (no WAIT outcome) is now live rather than hypothetical.
 
 **TODO-31 — `estimate_duration()` is unused internally**
 `Projector.project()` calls `build_segments()` directly and derives duration from the
@@ -997,6 +1027,12 @@ Prerequisites:
     edits (layout JSON, `scenarios.py`, `registry.py`).
 (b) Scale-relative calibration — `min_safe_distance` (and any B2 threshold) must be expressed
     relative to layout scale or agent speed × steps, not as an absolute read off one fixture.
+(c) Fixture gap (T1, `analysis/t1_conflict_measurement/REPORT.md` §(a), §(c)): no current
+    scenario has a correct-hypothesis *crossing* on the robot's current task. The only
+    correct-hypothesis crossings measured are the never-selected item_7 alternatives in
+    scenario_20 (robot approach across the human's carry path); every conflict on a current
+    task is co-directional convergence into the kitting table. B2 continuation will therefore
+    only be exercised on table convergence until a crossing fixture exists.
 Also: B2.B+B3.A must select identically to none+B3.A under the same `_cost()` — treat as an
 assertion in the harness; any divergence is a bug. Only projection count may differ.
 Files: domains/kitting/registry.py, domains/kitting/scenarios.py, mesa_sim/run_mesa.py,
@@ -1011,8 +1047,15 @@ no trigger fires, B2 never runs, and the robot keeps the last trigger's projecti
 next grasp or task boundary. B2 is the mid-task evidence mechanism; this is the correction
 case it cannot see. Candidate fix, undecided: fire on `most_likely` change while ≥ θ.
 First measure whether it occurs in current scenarios.
+
+Measured (T1, `analysis/t1_conflict_measurement/REPORT.md` §θ-flip scan, all six baselines,
+PYTHONHASHSEED=0): it does not occur. 0 of 25 `most_likely` changes happen with confidence
+≥ θ at both the tick and the previous tick — 16 have both sides below θ, 6 are collapses
+from ≥ θ to well below after the human's task completes, 3 coincide with a `theta_crossed`
+trigger on the same tick. DEFERRED ON EVIDENCE: revisit when new scenarios exist
+(TODO-47), not before.
 Files: shared/meta_planner.py (evaluate_triggers)
-Reference: Phase 4C B2/B3 session, September 2026
+Reference: Phase 4C B2/B3 session, September 2026; T1 measurement session, September 2026
 
 ---
 
