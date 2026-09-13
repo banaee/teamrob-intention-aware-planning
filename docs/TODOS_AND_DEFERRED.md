@@ -1341,7 +1341,9 @@ RESOLVED in I4c (`analysis/i4c_episode/REPORT.md`), reading by reading:
 - (c) out (I4); (a) superseded by (b).
 - (e) OPEN: whether `deliver_with_return`'s guard should distinguish a stray item from one the agent is
   assigned to deliver. A domain-model question (`domains/kitting/tasks.py`), independent of the likelihood
-  and of the episode semantics.
+  and of the episode semantics. I5: implicated in the prior-off repeated `theta_crossed` (TODO-68) — the
+  rivals' `place`-back-on-the-shelf phase and the regress that follows are this method's phases, scored as
+  observations the human never made.
 
 **TODO-56 — The completion channel's gate is the old model's, and it is a decision** ✅ RESOLVED (I4b) — the gate stays, with its exclusion stated
 Decided in I4b (`analysis/i4b_boundary/REPORT.md` §6): under the detection model a hit is ×1.0, so the
@@ -1465,7 +1467,38 @@ Not a retune of u. Out of I4c's scope (the likelihood form).
 Files: shared/recognizer.py (`update`: the fold and `unknown`'s factor), shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`)
 Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §5
 
-**TODO-61 — Confirmation is length-blind: a zero-excess stretch scores L = 1 after one step as after 400 cm** [OPEN — deliberately untouched in I4d]
+**TODO-61 — The evidence model is one-sided and observation-counted: (a) confirmation is length-blind, (b) accumulation is observation-count and decomposition sensitive** [OPEN — characterised in I5; a property of the chosen model, not a defect]
+Broadened in I5 from (a) alone. DECISION and why: the two are kept under one item because they have one root
+— costdif1 with a constant `unknown`: a fitting stretch scores L = 1 whatever its length, and every scored
+observation is worth L/u against a constant reference — and because any remedy for one changes the other's
+currency (grading confirmation by the fraction of the direct cost covered changes what a fitting observation
+is worth, which is exactly what (b) counts; charging u per unit of evidence rather than per observation changes
+both at once). The two I4d illustrations involve both at once (below). They are two SHARP statements, lettered,
+each with its own mechanism and candidate remedy, so that either can be closed alone; a single blurred
+"the evidence is weak at confirmation" would lose the decomposition sensitivity, which is the less obvious half.
+(a) CONFIRMATION IS LENGTH-BLIND. dC discriminates by penalising wrong hypotheses, not by rewarding right
+    ones: the correct hypothesis sits at zero excess however far it walks, L(0) = 1 after 15 cm as after
+    300 cm. Evidence is one-sided — strong at refutation, weak at confirmation. Illustration: s40_on 187, one
+    15 cm step toward wander_0 (on the bearing to shelf_6) takes item_6 from 0.333 to 0.485; the 20-tick walk
+    to 0.79 (11 wrong-task ticks, 203–213, the only ones in the matrix), undone by the turn. Candidate remedy,
+    not chosen: a confirmation term graded by covered fraction of C(origin, g) (neither Ramírez–Geffner nor
+    Masters–Sardina has one; segment 3a is the ambiguous case they accept).
+(b) ACCUMULATION IS OBSERVATION-COUNT AND DECOMPOSITION SENSITIVE. Each scored observation contributes its
+    likelihood relative to the constant `unknown`, so a fitting observation is worth 1/u regardless of what it
+    observed: a 300 cm walk straight at the target, a no-graded-signal phase (pick_up, place, wait_at), and a
+    regress-generated zero-excess stretch are each 1/u. A hypothesis's DECOMPOSITION — how many phases its
+    selected method has and where its steps sit — therefore sets how much evidence it can accumulate
+    (`deliver_with_return` has six actions to `deliver_default`'s four). Illustrations: item_6 recognised at
+    274 in s40 despite a 539 cm detour worth ×0.09, because two fitting observations at ×10 each (a
+    stationary pick_up phase, one 15 cm carry step) outweigh it; s20_off's first reveal moving 31 → 20
+    because the arrival's fold (×10) separates item_3 from its two collinear decoys before the grasp; and
+    prior-off the rivals' `deliver_with_return` phases at the grasp (a `place` worth 1/u, then a fresh
+    stretch — (a)) dipping the true task under θ twice (TODO-68). Candidate remedies, not chosen: u per unit
+    of evidence (TODO-59's rejected alternative), or normalising accumulated odds by decomposition length —
+    both change the meaning of `unknown` and would have to be decided with TODO-63.
+Both were visible in I4d's accounting before they were measured; neither is a reason to touch β, u or the
+likelihood form without a decision that names which of (a), (b) it addresses.
+I4d note (as written then):
 I4d note: with `unknown` folded (TODO-60) this property now also shows prior-off at every rival's regress
 after the grasp — a fresh `move_to(shelf)` stretch at L ≈ 1 from its first step lifts the rival and dips the
 true task under θ (s00_off 114, s20_off 25) — and in item_6's recognition at 274 after a 539 cm detour: the
@@ -1482,6 +1515,97 @@ cost covered (Ramírez–Geffner's and Masters–Sardina's models do not; the fi
 the ambiguous case they accept) is a likelihood-form question. Recorded; not a reason to touch β or u.
 Files: shared/likelihood_functions.py (`excess_path_likelihood`)
 Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §4
+
+**TODO-62 — Radius of maximum probability (Masters & Sardina, JAIR 64, 2019): a diagnostic ON the model, not built** [DEFERRED for scope]
+Computes, from geometry alone, the cost-distance at which a goal becomes the most probable — so a reveal
+location can be PREDICTED from the layout and the parameters and then checked against a run, instead of
+being discovered by sweeping. A diagnostic on the evidence model, never called by the recognizer. Considered
+during the I4 design and deliberately not built: scope, not prematurity. Under the current model the
+prediction would need the closed form the I4c region analysis used (uniform base, no fold in the window),
+extended by the fold's 1/u at each phase advance (TODO-61 (b)).
+Trigger to build it: whenever choosing β or u starts to feel like tuning rather than measurement.
+Files: none (analysis-side; would live under analysis/)
+Reference: I4 evidence-model design discussion; I5 hand-back
+
+**TODO-63 — Rationality measure (Masters & Sardina, AAMAS-19): competes with the constant `unknown`, not built** [DEFERRED by decision]
+Estimates the observed agent's degree of suboptimality and lowers the recognizer's own confidence when the
+behaviour fits no hypothesis well. It COMPETES with the constant `unknown` hypothesis for the same job —
+holding the line on behaviour that fits nothing — and running both would make neither evaluable, which is
+why it was not built. Considered during the I4 design.
+Trigger to revisit: if the constant `unknown` is shown unable to hold the line on behaviour that fits
+nothing (a wrong task above θ on a walk that fits no task, sustained). Decide together with TODO-61 (b)'s
+remedies, which also change what `unknown` means.
+Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`), shared/recognizer.py
+Reference: I4 evidence-model design discussion; I5 hand-back
+
+**TODO-64 — θ's reachability under the current model: the ceiling is 1/(1 + uⁿ), and reachability is a function of the live set** [OPEN]
+F1 measured a perfect hypothesis reaching only 0.569 once two foreseeable hypotheses and `unknown` were in
+the space (that figure came from the held-item pin, removed in I3); the 0.797 quoted for months exists only
+in layouts with no foreseeable task. Restated under I4d: a lone fitting task's ceiling is 1/(1 + uⁿ) over
+its n observations — 0.909 on its first stretch, 0.990 after one fold, 0.999 after two — and with rivals
+live at the prior the confidence is 1/(1 + uⁿ + Σ_rivals odds_j). So θ = 0.75 is reachable on the FIRST
+stretch only if the rivals' summed odds fall below 1/3 − u ≈ 0.233 (u = 0.1), and after one fold below
+10 × that. The question now: is θ meant to be reachable on a first stretch (then the live-set size and the
+layout's decoy geometry decide it — s20_off needs the arrival's fold), or only after a verifiable phase
+(then θ is a prefix-length bar, not a fit bar)? Undecided; measure nothing until it is decided together
+with TODO-65.
+Files: shared/recognizer.py (`_output`), shared/meta_planner.py (θ)
+Reference: F1 fixture session; I4b/I4c/I4d reports; I5 hand-back
+
+**TODO-65 — Whether the gate should be a likelihood ratio rather than a normalised posterior** [OPEN since I1]
+Confidence is a normalised posterior over the live set, so θ = 0.75 is a different evidential bar in a
+3-hypothesis run than in an 8-hypothesis one (prior-on vs prior-off: the same coffee walk crosses at 135
+with three live rivals and 143 with seven). The recognizer's evidence state already IS a set of odds against
+`unknown` (I4d's invariant); a gate on odds_k against `unknown`, or on the ratio of the top two, would be
+live-set-invariant. An interface/design question for the meta-planner side (what `confidence` means at the
+gate), not a likelihood question. Decide with TODO-64 and TODO-68.
+Files: shared/recognizer.py (`_output`, `BeliefState.confidence`), shared/meta_planner.py (`evaluate_triggers`)
+Reference: I1 audit; I5 hand-back
+
+**TODO-66 — The context / knowledge-representation pass: `_context_weight` branches on literal task names** [DEFERRED deliberately]
+`_context_weight` still tests `hyp.task_name == "ac_activation"` and `"coffee_break"` and carries its own
+constants (TEMPERATURE_BOOST 3.0, FATIGUE_BOOST 2.5, HIGH_TEMP_THRESHOLD 26.0, LONG_SHIFT_THRESHOLD 500) —
+the one place in shared/ that names a domain task. Applied to the output only, never fed back, so it does
+not touch the evidence state or the accounting. Deferred because fixing it properly reopens the ontology
+and knowledge-representation questions (what a context fact is, which schema field declares a task's
+sensitivity to it, where the constants live — a `ContextSchema`, not a branch). Not a bug in any measured
+condition (no scenario sets the temperature or a long shift).
+Files: shared/recognizer.py (`_context_weight`, the four constants), shared/domain_knowledge.py
+Reference: I1 audit (architecture invariant "no domain-specific strings in shared/"); I5 hand-back
+
+**TODO-67 — s30_off: the meta-planner selects the already-delivered item_2 at 87** [meta-planner side; recorded]
+`[meta] step=87 trigger=theta_crossed winner=deliver_item(item_2)` one tick after the robot's own delivery
+of item_2 (the recognizer's `[IR-complete]` at 86); `no_current_task` re-selects item_4 at 93 (I4c) / the
+same in I4d. Either the robot's task pool drops a completed task a tick late or B3's candidate set does not
+read the world's completion. Meta-planner paused: recorded, not investigated.
+Files: shared/meta_planner.py
+Reference: I4c report ("Flagged, not fixed"); I5 hand-back
+
+**TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question]
+Measured (I4d, confirmed at HEAD in I5): prior-off the true task crosses θ three times per recognition —
+s00_off 109 / 113 / 115, s20_off 20 / 24 / 30 and 87 / 91 / 95. Three things, kept separate:
+(a) RECOGNIZER BELIEF: the trajectory is exactly what the stated model implies (the I4d invariant holds to
+    7e-15 on every one of these ticks). The true task rises above θ at its arrival (the `move_to` fold,
+    ×10); at the grasp each rival's method flips to `deliver_with_return`, whose `place` phase back on the
+    shelf is a no-graded-signal observation worth 1/u (TODO-61 (b)) and lifts the rival, dipping the true
+    task below θ; on departure the rival regresses to a fresh zero-excess stretch at L ≈ 1 (TODO-61 (a))
+    and dips it again; the walk away then refutes the rival. The same bumps existed in I4c below θ; I4d's
+    ceiling made them cross. The recognizer is correctly implementing its model.
+(b) THE EVENT'S SEMANTICS. `io_contracts.md` defines `theta_crossed` as "confidence crosses θ from below to
+    at-or-above (prev < θ ≤ current) — a crossing event, not confidence ≥ θ per tick". It does NOT promise
+    one crossing per task; it promises a crossing whenever the confidence trajectory crosses, which it did.
+    What the meta-planner READS the event as — "a task has just become recognised" — is a stronger claim
+    than the contract makes. If a one-shot semantics is wanted (one event per (task, episode)), that is an
+    INTERFACE decision: a change to the event's definition or to the consumer's handling (a debounce, a
+    per-episode latch, a gate on odds — TODO-65), not to the evidence model. Do not tune the likelihood to
+    make the trajectory cross once.
+(c) THE META-PLANNER'S HANDLING (out of scope): each crossing re-runs B2/B3 (s20_off re-decides at 20, 24,
+    29, 30 and 87–103, moving the robot's item_4 delivery 52 → 60 and item_6's 136 → 144). Decide with
+    TODO-48 (no trigger on a `most_likely` change above θ) and TODO-54 (`theta_crossed` on `unknown` after
+    a pin): all three are the same question — what a trigger is an event OF.
+Prior-on none of this occurs (no live rival flips); one crossing per recognition in every prior-on condition.
+Files: shared/io_contracts.md (`theta_crossed`), shared/meta_planner.py (`evaluate_triggers`)
+Reference: analysis/i4d_fold_unknown/REPORT.md §6(a); analysis/i5_handback/; docs/recognizer_handback.md
 
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β

@@ -1173,3 +1173,29 @@ TODO-61, both open. Also: item_6 is recognised at 274 after its 539 cm detour (�
 fitting observations (×10 each) — point 2 in action.
 Files: shared/recognizer.py (`update`: the fold and the open term); analysis/i4d_fold_unknown/
 Reference: I4d fold-unknown session, September 2026
+
+**I5 — confirmation and hand-back: what the recognizer guarantees, what is a characterised limitation, what travels to the meta-planner work**
+No model change. The final matrix at HEAD (`analysis/i5_handback/`) reproduces I4d's logs byte-for-byte, the
+I4d reversion reproduces I4c's, the invariant holds to 7e-15, and every result carried forward from I4–I4d is
+asserted (`criteria.md`). The hand-back — `docs/recognizer_handback.md` — is the central artifact: the model
+in a paragraph, the four parameters, the GUARANTEE STATEMENT (prior-on and prior-off separately; what is
+conditional on β/u/θ, and what on Mesa's straight lines, PROXIMITY_THRESHOLD = 30 cm and kitting's guards),
+the characterised limitations, the `theta_crossed` interface question, the open items, and the removed
+mechanisms that must not return.
+
+Decisions recorded here: (1) TODO-61 is BROADENED to one item with two lettered, separately closable
+statements — (a) confirmation is length-blind, (b) accumulation is observation-count and decomposition
+sensitive — because they share one root (costdif1 with a constant `unknown`) and any remedy for one changes
+the other's currency; both are PROPERTIES OF THE CHOSEN MODEL, visible in I4d's accounting, not defects
+found in I4d. (2) The prior-off repeated `theta_crossed` is three separate things and stays so: the belief
+trajectory is what the model implies (recognizer correct); the contract defines a crossing event and does
+not promise one per task, so a one-shot semantics would be an interface decision (TODO-68), not an evidence
+question; the meta-planner's handling is handed over with TODO-48/54. (3) Two analytical tools from the I4
+design discussion are filed, not built: the radius of maximum probability (TODO-62, a diagnostic on the
+model) and the rationality measure (TODO-63, which competes with the constant `unknown`). (4) The
+paper-facing divergence is flagged in the hand-back: the HCM paper writes P(task | O) over a sequence of
+ACTIONS; the recognizer observes a microaction and a position, the action is LATENT, and
+P(o | τ) = P(o | a_φ(τ)) is that marginalisation collapsed by the derived phase (the I3 entry above). The
+paper is a position paper, outdated relative to this design, and not a specification.
+Files: docs/recognizer_handback.md, docs/TODOS_AND_DEFERRED.md (TODO-61 to TODO-68), analysis/i5_handback/
+Reference: I5 hand-back session, September 2026
