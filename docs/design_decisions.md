@@ -793,6 +793,18 @@ Files: shared/recognizer.py (`update`, `_weigh`, `_output`, `_refuted_by_holding
 `_progress_likelihood`, `_finalize`, `_pin`)
 Reference: leg-level evidence session, September 2026
 
+SUPERSEDED IN PART BY I3 (below). What stands: the kernel, HIGH/LOW/NEUTRAL, one normalization, the
+retraction of the duplicate-counting reveals, and "replace, do not multiply" for movement. What no
+longer holds: (1) there is no leg. The unit of a movement observation is now one HYPOTHESIS's stretch
+toward one expected action, measured from that hypothesis's own origin, and nothing global closes
+it — not a discrete event, not a stationary tick, not the body's synthetic `stand` (I1 audit 3.13,
+drift 10.12: "a discrete observation … closes the current movement leg" was true of the code path
+and false of its effect; both are gone). A turn without a phase change therefore does NOT start a
+fresh chord any more: the chord is origin → current position and sweeps with the agent. (2) The
+held-item refutation is deleted, not moved. (3) The floor is applied to the OUTPUT only; the evidence
+state is normalized but not floored (it used to be re-floored at every leg base, a once-per-leg
+recovery clamp that was never a stated decision).
+
 **Targets, methods and completions are the planner's — the recognizer resolves nothing itself (I2)**
 Until I2 the recognizer resolved a hypothesis's target with its own copy of the lookup: read
 the literal `"?item"`, take `methods[0]`, take the first `Const` bound to a step named
@@ -872,3 +884,77 @@ shared/target_resolution.py (new), shared/projection.py, domains/kitting/actions
 mesa_sim/executor.py, mesa_sim/action_decomposer.py, mesa_sim/world_state_builder.py,
 mesa_sim/sim_agents.py, mesa_sim/sim_model.py, domains/kitting/env_layout1.json
 Reference: I2 IR foundations session, September 2026; analysis/i2_ir_foundations/REPORT.md
+
+**A task's likelihood is the likelihood of the action it expects now (I3, the phase model)**
+Until I3 the recognizer decided "which action is the human on" with a single `holding` check that
+worked for `deliver_item`'s two stages and generalised to nothing: the first action of the selected
+method answered for every observation, so no completion predicate was ever evaluated (I1: 0 of
+5,579 likelihood calls), every grasp and release handed 1.0 to every hypothesis, and the "grasp
+reveal" in every run was the held-item pin of the alternatives.
+
+Decision. P(o_t | τ) = P(o_t | a_φ(τ)). For every live hypothesis, every tick, the planner selects
+τ's method by guards against the current world for the observed agent (I2), the grounded actions are
+walked from the start, and the EXPECTED action is the first whose completion condition does not
+hold. This is a marginalisation over a latent action that collapses because the phase is derived
+deterministically — not a nested recognizer; there is one normalisation, at the task layer, over
+every hypothesis and `unknown`. Consequences, each chosen deliberately:
+- PHASE IS DERIVED, ORIGIN IS STORED. A hypothesis keeps the action it expected last tick and the
+  agent's position when it began expecting it (its origin). It never stores an index into an
+  action list, because method selection genuinely flips under it (`deliver_item(Y)` becomes
+  `deliver_with_return` while X is carried: index 2 of six actions is not index 2 of two —
+  TODO-51). A change of expected action — an advance, or a regress when `at(agent, X)` flickers off
+  at 30 cm, both derived facts — folds the closing action's final chord into the evidence once and
+  moves the origin to the agent's position. Nothing is shared across hypotheses: no leg, no global
+  base, no leg closed by the body's `stand`.
+- The completion channel is judged on the action the hypothesis expected BEFORE the event. The
+  world after a grasp already satisfies `pick_up`'s completion, so the action derived against it
+  has moved on; the literal order "derive, then check the derived action's completion" can never
+  find a completion that holds. An event multiplies; a chord replaces.
+- The channel is gated by the action's own vocabulary: `GRASP` is judged against `pick_up`'s
+  completion because `pick_up` declares `["GRASP"]`; `move_to` declares `"STEP*"` and is NEUTRAL at
+  a grasp, exactly as before. The ungated reading — every expected action LOW at a discrete tick
+  unless complete — is a new factor (P(event | movement action) was NEUTRAL, never LOW) and was
+  measured, not shipped: it hands `unknown` ×10 against every live task at every grasp and release,
+  so `unknown` sits at 0.96–0.99 after every completion and no second θ crossing occurs in any
+  condition (`analysis/i3_phase_model/summary.md`, variant `ungated`).
+- Likelihoods are memoised per tick by their inputs — (evaluator, origin, target position) for the
+  progress channel, the grounded predicate for the completion channel — so two hypotheses expecting
+  the same thing from the same place receive one value computed once; two items on one shelf are
+  identical by construction (check U1).
+- The evidence state is kept per hypothesis in ONE common scale (`_base`, rescaled by the tick's
+  total so Σ base · chord = 1). Storing each hypothesis's base as its normalised value at its own
+  advance tick, as the per-tick spelling of the algorithm suggests, carries that tick's normaliser
+  into the cross-hypothesis ratios (a rival advancing at a tick where the leader's chord is 4.0 is
+  charged ≈ ×3.6 for nothing); the common scale makes the result exactly the product over the
+  hypothesis's own segments.
+- COMPLETED TASKS leave contention, judged on the TERMINAL action's completion condition directly,
+  whoever did it — `obj_at(item_7, kitting_table_0)` is true because the robot delivered item_7,
+  and that is the signal wanted: the task cannot be done again. Completion latches (the fact may be
+  transient: `waited` is visible for three ticks); the hypothesis is skipped in the update AND
+  pinned at BELIEF_FLOOR on output, for the rest of the run, never removed from the space (the
+  meta-planner resolves its keys). `[IR-complete]` logs each one.
+- REMOVED: the held-item rule (a domain shortcut the phase model subsumes — the rival's expected
+  action is elsewhere and the geometry refutes it, with no `?item`, no carrying-capacity assumption,
+  and in domains with no holding relation) and ZONE_BOOST (fired for the wrong hypothesis in 28 of
+  52 measured episodes, I1 5.4). `holding` is read only as a world fact through a grounded
+  completion condition, never as a phase signal (check U5).
+
+Measured (`analysis/i3_phase_model/REPORT.md`, every difference staged and attributed: S1 ZONE_BOOST
+off, S2 + held-item off, S3 phase model without the pin, S4 = HEAD): completion evidence fires for
+the first time — `holding(human_0, item)` HIGH for the grasped item's hypothesis at every grasp
+(×4; 0.586–0.880 at the grasp tick depending on the live set), nothing at a release because the pin
+preempts the channel; `coffee_break` is pinned at 184 in s40 (the first `waited` tick) and never
+returns (TODO-50 closed); the delivered item is pinned at its release, so s30_on's TODO-48 flip is a
+θ crossing again (98). Two structural findings recorded for the next stages rather than tuned here:
+(1) the rival-targeting effect of `deliver_with_return` (TODO-51) is NOT removed by the phase model —
+while the human carries X, `deliver_item(Y)`'s guard-selected method is `deliver_with_return` and
+its expected action is `place(X, shelf_X)` then `move_to(shelf_X)`, so rivals are refuted ≈ ×0.1 per
+carry and the next task's θ crossing stays at its grasp (s00_on 111, s20_on 89, s30_on 98; the
+variant `ownshelf`, rivals decomposed as if nothing were held, gives 97 / 77 / none); (2) a
+hypothesis whose expected action never completes keeps its t=0 origin, so under the cosine kernel
+its whole history is ONE chord from the start and it is never charged for the detour —
+`ac_activation` is `most_likely` (0.45–0.69) from 184 to 271 in s40 on the chord start → shelf_6.
+I4's excess-path-cost likelihood, which reads the distance walked since the origin, is the term that
+charges it; it must not be patched here with a distance factor.
+Files: shared/recognizer.py; analysis/i3_phase_model/ (check_i3.py, REPORT.md)
+Reference: I3 phase-model session, September 2026

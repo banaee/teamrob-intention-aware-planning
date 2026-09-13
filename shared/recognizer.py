@@ -8,65 +8,56 @@ PURPOSE:
 ALGORITHM:
     P(τ | obs_1..t) ∝ P(obs_t | τ) · ω_context(τ, context, world) · P(τ | obs_1..t-1)
 
-    Likelihood P(obs_t | τ):
-        - discrete microaction (grasp, release): the completion predicate of
-          the matching action, as the planner grounded it, would be checked —
-          but the first action of every method is a movement, whose branch
-          answers first, so in practice a discrete tick is a zero-length chord
-          and every hypothesis gets NEUTRAL (I1 audit 2.2; the per-hypothesis
-          phase of I3 makes the completion branch reachable)
-        - movement (no discrete vocabulary matches): direction-based — cosine
-          similarity between the CHORD from the current leg's start to the
-          agent's position and the vector from that leg start toward τ's target
-          object. Mapped to [LOW_LIKELIHOOD, HIGH_LIKELIHOOD].
-          τ's target is the target of the first movement action of the method
-          the planner selects for τ against the current world — the observed
-          agent's bindings, its guards (what it holds), its derived vars —
-          resolved to a position by shared/target_resolution.py. No method is
-          ever chosen by position in the schema, and no parameter is named
-          here. A hypothesis no method applies to in this world (guards
-          unsatisfiable, a derived var with no value) is scored NEUTRAL, not
-          crashed on; the first such tick per hypothesis is logged.
-        - other discrete microactions (release, stand): uninformative → NEUTRAL
-        - 'unknown' hypothesis: always NEUTRAL (decays via normalization only)
+    P(obs_t | τ) = P(obs_t | a_φ(τ)) — a task's likelihood IS the likelihood of
+    the action it expects now (the phase model, I3). The phase is DERIVED every
+    tick, never stored: the planner selects τ's method by guards against the
+    current world for the observed agent (I2), its actions are walked from the
+    start, and the expected action is the first whose completion condition does
+    not yet hold. A hypothesis remembers which action it expected last tick and
+    where the agent was when it began expecting it (its ORIGIN); it never stores
+    an index into an action list, because method selection genuinely flips
+    under it (deliver_item(Y) becomes deliver_with_return while X is carried).
 
-    Evidence accounting — one leg is one observation:
-        The recognizer keeps an EVIDENCE state (no context weights, no state
-        refutations in it) and derives the output belief from it each tick.
-        A discrete observation (its microaction is in some action schema's
-        declared vocabulary: grasp, release, ...) is an EVENT: it multiplies
-        onto the evidence state and closes the current movement leg.
-        A moving observation is scored as one chord from the leg start, on top
-        of the evidence the leg started from, REPLACING the leg's earlier chords
-        rather than multiplying on them. A stationary observation changes
-        nothing and closes the leg: a leg is a maximal run of moving
-        observations. Consecutive steps of a straight walk are the same
-        observation (heading varies ≤0.04° within a leg in the simulator);
-        multiplying n copies of it gave 4ⁿ against 'unknown' and saturated
-        belief in three steps. See design_decisions.md, "One leg is one
-        observation".
+    Likelihood of the expected action a, all constants unchanged from before:
+        - completion channel: the observed microaction is in a's declared
+          discrete vocabulary (pick_up → GRASP, place → RELEASE, ...) → HIGH if
+          a's grounded completion predicate holds in the world, else LOW. It is
+          judged on the action the hypothesis expected BEFORE the event (the
+          world after a grasp already satisfies pick_up's completion, so the
+          derived action has moved on). An event is a fact at a moment: it
+          MULTIPLIES onto the hypothesis's evidence.
+        - progress channel: a has a progress_evaluator (move_to) → the cosine
+          kernel on the CHORD from the hypothesis's origin to the agent's
+          position, against the bearing from that origin to a's target (the
+          object's current location, shared/target_resolution.py). One stretch
+          of movement toward one target is one observation however many ticks
+          it spans: the chord value REPLACES the previous tick's, it is not
+          multiplied on it. When the expected action changes (phase advance,
+          or regress — derived, so both happen), the closing action's final
+          chord is folded into the evidence once and the origin moves to the
+          agent's position.
+        - neither (a stationary tick, a discrete action observing something
+          outside its vocabulary, an action without target or evaluator, a
+          hypothesis the planner cannot decompose here): NEUTRAL.
+        - 'unknown': always NEUTRAL.
+    Two hypotheses whose expected actions share evaluator, origin and target
+    position receive the same value, computed once per tick.
 
-    Output belief = evidence × ω_context, with state refutations pinned:
-        ω_context and the held-item refutation below are facts about the current
-        state, not events, so they are applied to the OUTPUT only and never fed
-        back — otherwise every leg boundary would count them twice.
+    Completed tasks: judged on the TERMINAL action's completion condition
+    directly (obj_at(item, table), waited(agent, machine)), whatever the phase
+    walk did and whoever did it — the task is done and nobody can do it again.
+    A completed hypothesis is skipped in the update (it accumulates no more
+    evidence) AND pinned at BELIEF_FLOOR on output, for the rest of the run.
 
-    Held-item refutation (hard):
-        If the observed agent holds object X, every hypothesis bound to a
-        different portable object is REFUTED — the intention is observed, not
-        inferred — and pinned at BELIEF_FLOOR on output, the same treatment as
-        an inadmissible hypothesis. Hypotheses bound to no portable object
-        (coffee_break, ac_activation) and 'unknown' are never refuted by a
-        grasp. This used to
-        be a ×0.1 factor per step; under per-step multiplication that was de
-        facto elimination, under one-observation-per-leg it would have been a
-        one-shot nudge, which was never what the constraint claimed.
+    Output belief = evidence × ω_context, with inadmissible and completed
+    hypotheses pinned at BELIEF_FLOOR and the floor applied. ω_context is a fact
+    about the current state, not an event: applied to the output only, never
+    fed back. The distribution is over TASKS; the phase is internal.
 
     Context weight ω_context(τ, context, world):
-        - ZONE_BOOST if in_zone(human, zone) matches τ's target zone
         - TEMPERATURE_BOOST if room_temperature is high and τ is ac_activation
         - FATIGUE_BOOST if shift is long and τ is coffee_break
-        - 1.0 otherwise (no boost)
+        - 1.0 otherwise
 
     Prior:
         - Uniform at t=0
@@ -82,8 +73,7 @@ ALGORITHM:
         mass only; inadmissible ones are refuted — pinned at BELIEF_FLOOR, never
         accumulating evidence. No weight, no boost: confidence is then a function
         of the admissible set size and of the evidence, with no tunable magnitude
-        in it. With no assignment known, this whole mechanism is inert and the
-        original code path runs unchanged.
+        in it. With no assignment known, this whole mechanism is inert.
 
     Normalization: posterior sums to 1.0 after each update.
 
@@ -93,8 +83,9 @@ HYPOTHESIS SPACE:
     Hypotheses include both assigned and foreseeable tasks.
 
 INPUTS:
-    - Observation:      detected_microaction, spatial_context.position, spatial_context.zone
-    - WorldState:       predicates (in_zone, holding), object_locations, object_positions
+    - Observation:      detected_microaction, spatial_context.position
+    - WorldState:       predicates (completion conditions), object_locations,
+                        object_positions, agent_positions (target resolution)
     - ContextKnowledge: shift_start_step, room_temperature
     - prev_belief:      previous BeliefState (None → initial prior)
     - assigned_tasks:   observed agent's work order (None/empty → restriction is off)
@@ -103,10 +94,8 @@ OUTPUTS:
     - BeliefState: distribution, most_likely, confidence
 """
 
-from importlib.metadata import distribution
 import itertools
 import logging
-import math
 from typing import Dict, List, Optional, Set, Tuple
 
 from shared.types import (
@@ -115,7 +104,7 @@ from shared.types import (
 )
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
 from shared.planner import AdaptivePlanner, DecompositionError
-from shared.target_resolution import movement_target_id, movement_target_position
+from shared.target_resolution import movement_target_position
 from shared import likelihood_functions
 from shared.likelihood_functions import (
     HIGH_LIKELIHOOD, LOW_LIKELIHOOD, NEUTRAL_LIKELIHOOD,
@@ -130,7 +119,6 @@ from shared.likelihood_functions import (
 # =============================================================================
 
 # ω_context boost multipliers
-ZONE_BOOST         = 2.0
 TEMPERATURE_BOOST  = 3.0
 FATIGUE_BOOST      = 2.5
 
@@ -281,38 +269,33 @@ class IntentionRecognizer:
         # holds one — decomposition is stateless and world-driven.
         self._planner = AdaptivePlanner(knowledge=knowledge)
         # Per-tick memo of the grounded action list per hypothesis key (None =
-        # not decomposable this tick). Cleared at the top of update(); both the
-        # evidence pass and the output pass of one tick read it.
+        # not decomposable this tick). Cleared at the top of update().
         self._tick_actions: Dict[str, Optional[List[GroundedAction]]] = {}
         # Keys already reported as undecomposable, so the log says it once per
         # episode rather than once per tick.
         self._undecomposable: Set[str] = set()
 
-        # Microactions some action in the hypothesis space declares as a discrete
-        # vocabulary (pick_up → ["GRASP"], place → ["RELEASE"], ...). Read from
-        # the schemas, never from simulator string literals — the same membership
-        # test _likelihood() dispatches on, asked once over the whole space. Used
-        # by update() to tell an event from a movement observation.
-        # Every method is consulted: deliver_item's first method is the guarded
-        # deliver_already_held (move_to, place), which has no pick_up, so the
-        # grasp vocabulary lives only in the other methods. (Per-tick dispatch
-        # in _likelihood() uses the method the planner's guards select.)
-        self._discrete_microactions: Set[str] = set()
-        for hyp in self._hypotheses:
-            task_schema = self.knowledge.get_task_schema(hyp.task_name)
-            for method in (task_schema.methods if task_schema else []):
-                for step in method.step_calls:
-                    schema = self.knowledge.get_action_schema(step.action_name)
-                    if schema is not None and isinstance(schema.microactions, list):
-                        self._discrete_microactions.update(m.upper() for m in schema.microactions)
-        # Evidence state — see update(). `_evidence` is the belief with no
-        # context weights or state refutations in it; `_leg_base` is its value
-        # at the start of the current movement leg, and `_leg_start_pos` where
-        # that leg started. Movement observations are scored as ONE chord from
-        # there, replacing the leg's earlier chords, not multiplying.
-        self._evidence: Optional[Dict[str, float]] = None
-        self._leg_base: Optional[Dict[str, float]] = None
-        self._leg_start_pos: Optional[Tuple[float, float]] = None
+        # Per-hypothesis phase state (see update()). Nothing here is an index
+        # into an action list, and nothing is shared across hypotheses.
+        #   _expected[key]  the GroundedAction the hypothesis expected on the
+        #                   previous tick (None = not decomposable then); a key
+        #                   absent from the dict has not been observed yet
+        #   _origin[key]    the agent's position when that action became the
+        #                   expected one — where its chord is measured from
+        #   _base[key]      the hypothesis's evidence with every closed phase and
+        #                   every event folded in, in one common scale across
+        #                   keys (rescaled each tick so that Σ base·chord = 1);
+        #                   the open phase's chord is recomputed from _origin
+        #                   each tick and multiplied on top, never into it
+        #   _completed      keys whose terminal completion condition has held:
+        #                   skipped and pinned for the rest of the run
+        self._expected: Dict[str, Optional[GroundedAction]] = {}
+        self._origin: Dict[str, Tuple[float, float]] = {}
+        self._base: Dict[str, float] = {}
+        self._completed: Set[str] = set()
+        # Normalized evidence over the live keys + unknown — the belief with no
+        # context weights and no pins in it; _output() derives the report from it.
+        self._evidence: Dict[str, float] = {}
 
         self._admissible: Optional[Set[str]] = self._build_admissible_keys(assigned_tasks)
 
@@ -324,7 +307,7 @@ class IntentionRecognizer:
         else:
             # Uniform over the admissible set only, then pinned — the same shape
             # as every distribution update() produces, so prior and posterior
-            # agree. Built in hypothesis order (then unknown), the order _weigh
+            # agree. Built in hypothesis order (then unknown), the order update()
             # produces, not in the admissible set's iteration order.
             n = len(self._admissible)
             live = {repr(h): 1.0 / n for h in self._hypotheses if repr(h) in self._admissible}
@@ -338,8 +321,8 @@ class IntentionRecognizer:
             set() if self._admissible is None
             else {k for k in self._by_key if k not in self._admissible}
         )
-        self._evidence = self._initial_prior
-        self._leg_base = self._initial_prior
+        self._evidence = {k: v for k, v in self._initial_prior.items() if k not in self._inadmissible}
+        self._base = dict(self._evidence)
 
     def _build_admissible_keys(
         self,
@@ -405,49 +388,78 @@ class IntentionRecognizer:
         prev_belief: Optional[BeliefState] = None,
     ) -> BeliefState:
         """
-        Bayesian update: P(τ|obs_1..t) ∝ P(obs_t|τ) · ω_context(τ) · P(τ|obs_1..t-1)
+        Bayesian update: P(τ|obs_1..t) ∝ P(obs_t|τ) · ω_context(τ) · P(τ|obs_1..t-1),
+        with P(obs_t|τ) the likelihood of the action τ expects now.
 
-        Evidence accounting — three kinds of observation:
+        Per live hypothesis, in this order:
+          1. derive the expected action against the current world (planner's
+             guard-selected method, walked from the start to the first action
+             whose completion condition does not hold);
+          2. if the TERMINAL action's completion holds, the task is complete:
+             retire the hypothesis (skipped here, pinned in _output) for good;
+          3. if the observed microaction is in the vocabulary of the action the
+             hypothesis expected on the previous tick, that action's completion
+             check multiplies onto its evidence (an event);
+          4. if the expected action changed, fold the closing action's final
+             chord into the evidence once and move the origin to the agent's
+             position (a phase advance — or regress; both are derived facts);
+          5. the open action's chord from the origin multiplies on top of the
+             evidence for this tick only (replaced next tick).
+        Then normalize over the live keys + unknown.
 
-          discrete (microaction in some action schema's declared vocabulary —
-              a domain fact, not a string literal): an EVENT. Multiplies onto
-              the evidence state and closes the current movement leg.
-          moving: scored as one chord from the leg start to the current
-              position, on top of the evidence the leg started from —
-              REPLACING the leg's earlier chords, never multiplying on them.
-          stationary (no displacement since the previous observation): nothing
-              new; closes the leg. A leg is a maximal run of moving
-              observations, so a turn without a discrete event still starts a
-              fresh chord from where the agent stopped.
-
-        The evidence state carries neither ω_context nor the held-item
-        refutation — both are facts about the current state and are applied to
-        the output only (see _output()). The recognizer therefore owns its
-        belief; `prev_belief` is accepted for contract compatibility and not
-        consulted (its distribution already contains those output-only
-        factors, so feeding it back would count them twice).
+        ω_context is applied to the output only (see _output()). The recognizer
+        therefore owns its belief; `prev_belief` is accepted for contract
+        compatibility and not consulted (its distribution already contains the
+        output-only factors, so feeding it back would count them twice).
         """
         self._history.append(obs)
         self._tick_actions = {}
-        current_pos = obs.spatial_context.position
-        if self._leg_start_pos is None:
-            self._leg_start_pos = current_pos   # the first observation opens the first leg
-
+        memo: Dict[tuple, float] = {}          # likelihood computations this tick, by inputs
+        pos = obs.spatial_context.position
         mu = (obs.detected_microaction or "").upper()
-        discrete = mu in self._discrete_microactions
-        prev_pos = self._history[-2].spatial_context.position if len(self._history) >= 2 else None
-        moving = (
-            prev_pos is not None
-            and math.hypot(current_pos[0] - prev_pos[0], current_pos[1] - prev_pos[1]) >= 1e-6
-        )
 
-        if discrete:
-            self._evidence = self._finalize(self._weigh(obs, world, self._evidence, prev_pos))
-            self._leg_base, self._leg_start_pos = self._evidence, current_pos
-        elif moving:
-            self._evidence = self._finalize(self._weigh(obs, world, self._leg_base, self._leg_start_pos))
-        else:
-            self._leg_base, self._leg_start_pos = self._evidence, current_pos
+        unnorm: Dict[str, float] = {}
+        for hyp in self._hypotheses:
+            key = repr(hyp)
+            if key in self._inadmissible or key in self._completed:
+                continue
+            actions = self._grounded_actions(hyp, obs.agent_id, world)
+            if actions is not None and self._terminal_complete(actions, world):
+                self._completed.add(key)
+                self._base.pop(key, None)
+                self._expected.pop(key, None)
+                self._origin.pop(key, None)
+                logging.info("[IR-complete] step=%d %s completed: %s holds",
+                             int(obs.timestamp), key, actions[-1].completion_predicate)
+                continue
+            current = self._expected_action(actions, world)
+
+            if key not in self._expected:
+                # First observation of this hypothesis: it enters its current
+                # action here. No chord yet.
+                self._expected[key], self._origin[key] = current, pos
+                unnorm[key] = self._base[key]
+                continue
+
+            previous = self._expected[key]
+            if previous is not None and self._in_vocabulary(previous, mu):
+                self._base[key] *= self._completion_likelihood(previous, world, memo)
+            if not self._same_action(previous, current):
+                self._base[key] *= self._progress_likelihood(previous, self._origin[key], pos, world, memo)
+                self._expected[key], self._origin[key] = current, pos
+                chord = NEUTRAL_LIKELIHOOD
+            else:
+                chord = self._progress_likelihood(current, self._origin[key], pos, world, memo)
+            unnorm[key] = self._base[key] * chord
+        unnorm[UNKNOWN] = self._base[UNKNOWN] * NEUTRAL_LIKELIHOOD
+
+        # One normalization, at the task layer. The bases are rescaled by the
+        # same total so they stay in one scale with each other (ratios are
+        # untouched) and so that evidence == base × open chord exactly.
+        total = sum(unnorm.values()) or 1.0
+        for key in self._base:
+            self._base[key] /= total
+        self._evidence = {k: v / total for k, v in unnorm.items()}
 
         distribution = self._output(obs, world)
         most_likely = max(distribution, key=lambda k: distribution[k])
@@ -461,80 +473,23 @@ class IntentionRecognizer:
             confidence=confidence,
         )
 
-    def _weigh(
-        self,
-        obs: Observation,
-        world: WorldState,
-        prior: Dict[str, float],
-        origin: Optional[Tuple[float, float]],
-    ) -> Dict[str, float]:
-        """
-        Unnormalized evidence posterior: likelihood × prior over the admissible
-        hypotheses plus 'unknown'. An inadmissible hypothesis is refuted, not
-        down-weighted: skipped here, it neither accumulates evidence nor takes
-        part in the normalization, and is pinned at BELIEF_FLOOR on output.
-        With the restriction off (_admissible is None) nothing is skipped.
-        `origin` is where the movement being scored began (see _progress_likelihood).
-        """
-        unnorm: Dict[str, float] = {}
-        for hyp in self._hypotheses:
-            key = repr(hyp)
-            if self._admissible is not None and key not in self._admissible:
-                continue
-            default = self._initial_prior.get(key, 1.0 / (len(self._hypotheses) + 1))
-            unnorm[key] = self._likelihood(obs, world, hyp, origin) * prior.get(key, default)
-        # unknown: neutral likelihood
-        unnorm[UNKNOWN] = NEUTRAL_LIKELIHOOD * prior.get(UNKNOWN, self._initial_prior[UNKNOWN])
-        return unnorm
-
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
         The belief reported this tick: evidence × ω_context, with the
-        hypotheses refuted by the held item pinned at BELIEF_FLOOR alongside the
-        inadmissible ones. State factors only — nothing here is fed back.
+        inadmissible and the completed hypotheses pinned at BELIEF_FLOOR and the
+        floor applied. State factors only — nothing here is fed back.
         """
-        refuted = self._refuted_by_holding(obs, world)
         unnorm: Dict[str, float] = {}
         for key, p in self._evidence.items():
-            if key in self._inadmissible or key in refuted:
-                continue
             hyp = self._by_key.get(key)
             omega = self._context_weight(obs, world, hyp) if hyp is not None else 1.0
             unnorm[key] = p * omega
-        return self._finalize(unnorm, self._inadmissible | refuted)
-
-    def _refuted_by_holding(self, obs: Observation, world: WorldState) -> Set[str]:
-        """
-        HELD-ITEM REFUTATION (see TODO-37): if the observed agent is holding an
-        object, every hypothesis bound to a DIFFERENT portable object is
-        refuted — the intention is observed, not inferred. Hypotheses bound to
-        no portable object and 'unknown' are untouched. Returns the refuted
-        keys; _output() pins them. Without this, a previously-delivered item
-        sitting at the kitting table becomes a geometric decoy for every human
-        carry leg (validated: scenario_00, run_20260904_131808, belief reached
-        0.995 on an already-completed task).
-
-        What the agent holds is read from its AgentState, a typed field, not
-        by scanning predicates for a name. "Portable" is the world's own
-        notion — an object that has a location (WorldState.object_locations
-        is populated for exactly those) — so no parameter name is read: a
-        hypothesis is refuted when any of its bindings names a portable object
-        other than the held one. A rule of the evidence model; scheduled for
-        removal in I3, kept exactly here.
-        """
-        agent_state = world.agent_states.get(obs.agent_id)
-        held = agent_state.holding if agent_state is not None else None
-        if held is None:
-            return set()
-        return {
-            repr(h) for h in self._hypotheses
-            if any(v != held and v in world.object_locations for v in h.bindings.values())
-        }
+        return self._finalize(unnorm, self._inadmissible | self._completed)
 
     def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:
         """Normalize, floor, and pin an unnormalized posterior over the live
-        keys. `pinned` defaults to the inadmissible set (the evidence state);
-        _output() adds the held-item refutations."""
+        keys — the output step. `pinned` defaults to the inadmissible set;
+        _output() adds the completed hypotheses."""
         total = sum(unnorm.values()) or 1.0
         distribution = {k: v / total for k, v in unnorm.items()}
 
@@ -561,111 +516,127 @@ class IntentionRecognizer:
     
     
     # -------------------------------------------------------------------------
-    # Likelihood model
+    # Phase derivation
     # -------------------------------------------------------------------------
 
-    def _likelihood(
-        self,
-        obs: Observation,
+    @staticmethod
+    def _expected_action(
+        actions: Optional[List[GroundedAction]],
         world: WorldState,
-        hyp: HypothesisKey,
-        origin: Optional[Tuple[float, float]] = None,
-    ) -> float:
+    ) -> Optional[GroundedAction]:
         """
-        Schema-driven dispatch over the actions the observed agent would
-        perform under hyp — the planner's decomposition of hyp against the
-        current world (guard-selected method, every binding grounded), in
-        order. For each grounded action:
-          - if its schema declares a discrete microaction vocabulary (e.g.
-            ["GRASP"], ["RELEASE"], ["TOUCH"]) and the observed microaction is
-            a member of it → completion-predicate check against WorldState,
-            using the predicate the planner already grounded
-          - if the schema is continuous ("STEP*") and declares a
-            progress_evaluator → delegate to the registered evaluator
-            (shared/likelihood_functions.py) against that action's target
-        The first action that answers decides (unchanged dispatch order; a
-        per-hypothesis phase is I3's).
-
-        No microaction string literals are compared against hardcoded values here.
-        The only comparison is membership of obs.detected_microaction in each
-        schema's OWN declared microactions list — domain knowledge, not simulator
-        vocabulary. A new domain with a different microaction taxonomy needs zero
-        changes here; it only needs correctly populated ActionSchema objects.
-
-        A hypothesis the planner cannot decompose in this world (no method's
-        guards hold, a derived var has no value) has no actions to dispatch
-        over and is NEUTRAL.
-
-        The held-item refutation is NOT applied here any more: it is a state
-        fact, pinned on output by _refuted_by_holding() / _output(). Evidence
-        for a refuted hypothesis still accumulates here so that it is live again,
-        honestly weighted, once the item is released.
+        The action the observed agent would be on if it held this intention:
+        walk the planner's grounded list from the start and return the first
+        whose completion condition does not hold in the world. Derived from the
+        world every tick, never stored as an index — the method may have been
+        re-selected since the last tick, and the same position in a different
+        method is a different action. None when the hypothesis is not
+        decomposable here or every completion already holds (the caller has
+        then retired it on the terminal condition).
+        An action with no completion predicate (ProcessCompletion) never reads
+        as complete, so a walk stops at it.
         """
-        mu = (obs.detected_microaction or "").upper()
+        for action in actions or []:
+            predicate = action.completion_predicate
+            if predicate is None or predicate not in world.predicates:
+                return action
+        return None
 
-        actions = self._grounded_actions(hyp, obs.agent_id, world)
-        if actions is None:
-            return NEUTRAL_LIKELIHOOD
+    @staticmethod
+    def _terminal_complete(actions: List[GroundedAction], world: WorldState) -> bool:
+        """
+        Whether the task is done: its terminal action's completion condition
+        holds, judged directly and independently of how the phases advanced.
+        Deliberately indifferent to who did it — obj_at(item, table) is true
+        when the robot delivered the item, and that is exactly the signal
+        wanted: the task cannot be done again. A terminal ProcessCompletion
+        (no predicate) can never be observed complete.
+        """
+        predicate = actions[-1].completion_predicate
+        return predicate is not None and predicate in world.predicates
 
-        for action in actions:
-            spec = action.schema.microactions
+    @staticmethod
+    def _same_action(a: Optional[GroundedAction], b: Optional[GroundedAction]) -> bool:
+        """Identity of an expected action: name and grounded bindings — the
+        decision, not its position in whichever method produced it."""
+        if a is None or b is None:
+            return a is b
+        return a.action_name == b.action_name and a.bindings == b.bindings
 
-            # Discrete completion-type action (pick_up, place, scan_it, ...)
-            if isinstance(spec, list) and mu in (m.upper() for m in spec):
-                predicate = action.completion_predicate
-                if predicate is None:   # ProcessCompletion — nothing to observe
-                    return NEUTRAL_LIKELIHOOD
-                return likelihood_functions.completion_predicate_likelihood(
-                    predicate, frozenset(world.predicates)
-                )
+    @staticmethod
+    def _in_vocabulary(action: GroundedAction, mu: str) -> bool:
+        """Whether `mu` is one of the discrete microactions the action's schema
+        declares (pick_up → ["GRASP"], ...). Membership in the schema's own
+        list — domain knowledge, never a literal compared here. A continuous
+        action ("STEP*", "STAND*") declares no such list."""
+        spec = action.schema.microactions
+        return isinstance(spec, list) and mu in (m.upper() for m in spec)
 
-            # Continuous progress-type action (move_to, ...)
-            if spec == "STEP*" and action.schema.progress_evaluator:
-                return self._progress_likelihood(obs, world, action, origin)
+    # -------------------------------------------------------------------------
+    # Likelihood model — one value per distinct set of inputs per tick
+    # -------------------------------------------------------------------------
 
-        return NEUTRAL_LIKELIHOOD
-
-    def _progress_likelihood(
-        self,
-        obs: Observation,
-        world: WorldState,
+    @staticmethod
+    def _completion_likelihood(
         action: GroundedAction,
-        origin: Optional[Tuple[float, float]],
+        world: WorldState,
+        memo: Dict[tuple, float],
     ) -> float:
         """
-        Delegate to the progress evaluator named by action.schema.progress_evaluator.
-        Builds the plain-value inputs (move_vec, origin, target_pos) the evaluator
-        needs — no geometry happens here, only assembly of inputs already
-        available from the leg state and the action's resolved target.
-
-        `origin` is where the movement being scored began: the leg start for a
-        continuous observation (so move_vec is the leg's chord), the previous
-        position for a discrete one (standing still → zero vector → NEUTRAL).
-        The heading is compared against the bearing to the target FROM THE
-        ORIGIN, not from the current position: a τ-walker would have gone
-        straight from where the leg began. Measuring against the current
-        position would let a passed target's swinging bearing re-import, one
-        step at a time, the accumulation this design removes.
-
-        The target is where the action's target object is NOW (a carried one
-        is wherever its holder is) — shared/target_resolution.py, the lookup
-        the projector uses for the same action.
+        Completion channel: the observed microaction is in `action`'s
+        vocabulary, so the question is whether the action's grounded completion
+        predicate (the planner's) now holds — HIGH or LOW. No predicate
+        (ProcessCompletion) → nothing to observe → NEUTRAL. Memoised by the
+        predicate: two hypotheses expecting the same completion share one value.
         """
-        if origin is None:
+        predicate = action.completion_predicate
+        if predicate is None:
             return NEUTRAL_LIKELIHOOD
+        key = ("completion", predicate)
+        if key not in memo:
+            memo[key] = likelihood_functions.completion_predicate_likelihood(
+                predicate, frozenset(world.predicates)
+            )
+        return memo[key]
 
+    @staticmethod
+    def _progress_likelihood(
+        action: Optional[GroundedAction],
+        origin: Tuple[float, float],
+        pos: Tuple[float, float],
+        world: WorldState,
+        memo: Dict[tuple, float],
+    ) -> float:
+        """
+        Progress channel: delegate to the evaluator named by
+        action.schema.progress_evaluator with the chord from `origin` (where
+        the hypothesis entered this action) to `pos`, against the target's
+        current position (shared/target_resolution.py, the lookup the projector
+        uses). The heading is compared with the bearing FROM THE ORIGIN, not
+        from the current position: a τ-walker would have gone straight from
+        where it began; a passed target's swinging bearing must not re-import
+        accumulation one step at a time. A zero chord (the agent has not moved
+        since the origin was set) is NEUTRAL inside the kernel.
+
+        NEUTRAL when there is no action, no evaluator (pick_up, place, wait_at:
+        no graded in-progress signal) or no resolvable target. Memoised by
+        (evaluator, origin, target position): two hypotheses whose expected
+        actions head for the same place from the same origin — two items on one
+        shelf — share one value.
+        """
+        if action is None:
+            return NEUTRAL_LIKELIHOOD
         evaluator = likelihood_functions.PROGRESS_EVALUATORS.get(action.schema.progress_evaluator)
         if evaluator is None:
             return NEUTRAL_LIKELIHOOD
-
-        current_pos = obs.spatial_context.position
-        move_vec = (current_pos[0] - origin[0], current_pos[1] - origin[1])
-
         target_pos = movement_target_position(action, world)
         if target_pos is None:
             return NEUTRAL_LIKELIHOOD
-
-        return evaluator(move_vec, origin, target_pos)
+        key = ("progress", action.schema.progress_evaluator, origin, target_pos)
+        if key not in memo:
+            move_vec = (pos[0] - origin[0], pos[1] - origin[1])
+            memo[key] = evaluator(move_vec, origin, target_pos)
+        return memo[key]
 
     def _grounded_actions(
         self,
@@ -688,7 +659,7 @@ class IntentionRecognizer:
         rather than indistinguishable from one that is merely uninformative.
         Schema errors (unbound variable, unknown lookup) propagate: a domain
         modelling mistake must not look like uncertainty.
-        Memoised per tick: the evidence pass and the output pass read it.
+        Memoised per tick (cleared at the top of update()).
         """
         key = repr(hyp)
         if key in self._tick_actions:
@@ -721,13 +692,6 @@ class IntentionRecognizer:
         """
         weight = 1.0
 
-        # Zone boost — human already in target zone. The observation carries
-        # the agent's zone; the target zone is that of the object the
-        # hypothesis's chord is scored against.
-        target_zone = self._target_zone(hyp, obs.agent_id, world)
-        if target_zone is not None and obs.spatial_context.zone == target_zone:
-            weight *= ZONE_BOOST
-
         # Temperature boost — high temp makes ac_activation more likely
         if hyp.task_name == "ac_activation":
             if (self.context.room_temperature is not None
@@ -741,29 +705,3 @@ class IntentionRecognizer:
                 weight *= FATIGUE_BOOST
 
         return weight
-
-    # -------------------------------------------------------------------------
-    # Target resolution helpers
-    # -------------------------------------------------------------------------
-
-    def _target_zone(
-        self,
-        hyp: HypothesisKey,
-        agent_id: str,
-        world: WorldState,
-    ) -> Optional[str]:
-        """
-        Zone of τ's target object, for ω_context zone boost: the target of the
-        first movement action of the method the planner selects for τ in this
-        world — the same object _progress_likelihood scores the chord against.
-        WorldState.object_zones already places a carried object in its
-        carrier's zone, consistent with target_resolution's position rule.
-        None when τ has no movement action, is not decomposable here, or the
-        object has no zone.
-        """
-        actions = self._grounded_actions(hyp, agent_id, world)
-        for action in actions or []:
-            target_id = movement_target_id(action)
-            if target_id is not None:
-                return world.object_zones.get(target_id)
-        return None

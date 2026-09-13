@@ -1,0 +1,342 @@
+ticks: base 379 new 379  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.304 dist=d(item_3)=0.304 coffee=0.251 d(item_5)=0.125 d(item_6)=0.103 d(item_4)=0.077 unknown=0.076 d(item_7)=0.037 ac=0.027
+t=0 new: most_likely=d(item_3) conf=0.304 dist=d(item_3)=0.304 coffee=0.251 d(item_5)=0.125 d(item_6)=0.103 d(item_4)=0.077 unknown=0.076 d(item_7)=0.037 ac=0.027
+
+== most_likely differences ==
+  t=115 base=d(item_3)(0.979) new=coffee(0.646)  human: deliver_item/place/release
+  t=116 base=d(item_3)(0.979) new=coffee(0.646)  human: deliver_item/place/None
+  t=117 base=d(item_3)(0.979) new=coffee(0.646)  human: None/None/None
+  t=118 base=d(item_3)(0.976) new=coffee(0.551)  human: coffee_break/move_to/step
+  t=119 base=d(item_3)(0.947) new=coffee(0.550)  human: coffee_break/move_to/step
+  t=120 base=d(item_3)(0.945) new=coffee(0.548)  human: coffee_break/move_to/step
+  t=121 base=d(item_3)(0.944) new=coffee(0.544)  human: coffee_break/move_to/step
+  t=122 base=d(item_3)(0.943) new=coffee(0.541)  human: coffee_break/move_to/step
+  t=123 base=d(item_3)(0.942) new=coffee(0.538)  human: coffee_break/move_to/step
+  t=124 base=d(item_3)(0.941) new=coffee(0.534)  human: coffee_break/move_to/step
+  t=125 base=d(item_3)(0.940) new=coffee(0.531)  human: coffee_break/move_to/step
+  t=126 base=d(item_3)(0.940) new=coffee(0.529)  human: coffee_break/move_to/step
+  t=127 base=d(item_3)(0.939) new=coffee(0.526)  human: coffee_break/move_to/step
+  t=128 base=d(item_3)(0.939) new=coffee(0.524)  human: coffee_break/move_to/step
+  t=129 base=d(item_3)(0.938) new=coffee(0.521)  human: coffee_break/move_to/step
+  t=130 base=d(item_3)(0.938) new=coffee(0.519)  human: coffee_break/move_to/step
+  t=131 base=d(item_3)(0.938) new=coffee(0.518)  human: coffee_break/move_to/step
+  t=132 base=d(item_3)(0.937) new=coffee(0.516)  human: coffee_break/move_to/step
+  t=133 base=d(item_3)(0.937) new=coffee(0.514)  human: coffee_break/move_to/step
+  t=134 base=d(item_3)(0.937) new=coffee(0.513)  human: coffee_break/move_to/step
+  t=135 base=d(item_3)(0.937) new=coffee(0.512)  human: coffee_break/move_to/step
+  t=136 base=d(item_3)(0.937) new=coffee(0.511)  human: coffee_break/move_to/step
+  t=137 base=d(item_3)(0.936) new=coffee(0.510)  human: coffee_break/move_to/step
+  t=138 base=d(item_3)(0.936) new=coffee(0.509)  human: coffee_break/move_to/step
+  t=139 base=d(item_3)(0.936) new=coffee(0.508)  human: coffee_break/move_to/step
+  t=140 base=d(item_3)(0.936) new=coffee(0.508)  human: coffee_break/move_to/step
+  t=141 base=d(item_3)(0.936) new=coffee(0.508)  human: coffee_break/move_to/step
+  t=142 base=d(item_3)(0.936) new=coffee(0.508)  human: coffee_break/move_to/step
+  t=143 base=d(item_3)(0.936) new=coffee(0.511)  human: coffee_break/move_to/step
+  t=144 base=d(item_3)(0.936) new=coffee(0.510)  human: coffee_break/move_to/step
+  t=145 base=d(item_3)(0.936) new=coffee(0.518)  human: coffee_break/move_to/step
+  t=146 base=d(item_3)(0.936) new=coffee(0.518)  human: coffee_break/move_to/step
+  t=147 base=d(item_3)(0.936) new=coffee(0.517)  human: coffee_break/move_to/step
+  t=148 base=d(item_3)(0.936) new=coffee(0.516)  human: coffee_break/move_to/step
+  t=149 base=d(item_3)(0.936) new=coffee(0.516)  human: coffee_break/move_to/step
+  t=150 base=d(item_3)(0.936) new=coffee(0.515)  human: coffee_break/move_to/step
+  t=151 base=d(item_3)(0.936) new=coffee(0.515)  human: coffee_break/move_to/step
+  t=152 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/move_to/step
+  t=153 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/move_to/step
+  t=154 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/move_to/None
+  t=155 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=156 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=157 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=158 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=159 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=160 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=161 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=162 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=163 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=164 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=165 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=166 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=167 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=168 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=169 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=170 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=171 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=172 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=173 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=174 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=175 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=176 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=177 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=178 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=179 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=180 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=181 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=182 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=183 base=d(item_3)(0.936) new=coffee(0.514)  human: coffee_break/wait_at/stand
+  t=184 base=d(item_3)(0.936) new=ac(0.451)  human: coffee_break/wait_at/stand
+  t=185 base=d(item_3)(0.936) new=ac(0.451)  human: coffee_break/wait_at/None
+  t=186 base=d(item_3)(0.936) new=ac(0.451)  human: None/None/None
+  t=187 base=d(item_3)(0.939) new=ac(0.456)  human: ac_activation/move_to/step
+  t=188 base=d(item_3)(0.943) new=ac(0.461)  human: ac_activation/move_to/step
+  t=189 base=d(item_3)(0.965) new=ac(0.466)  human: ac_activation/move_to/step
+  t=190 base=d(item_3)(0.967) new=ac(0.471)  human: ac_activation/move_to/step
+  t=191 base=d(item_3)(0.968) new=ac(0.475)  human: ac_activation/move_to/step
+  t=192 base=d(item_3)(0.970) new=ac(0.480)  human: ac_activation/move_to/step
+  t=193 base=d(item_3)(0.971) new=ac(0.485)  human: ac_activation/move_to/step
+  t=194 base=d(item_3)(0.972) new=ac(0.489)  human: ac_activation/move_to/step
+  t=195 base=d(item_3)(0.973) new=ac(0.494)  human: ac_activation/move_to/step
+  t=196 base=d(item_3)(0.974) new=ac(0.498)  human: ac_activation/move_to/step
+  t=197 base=d(item_3)(0.975) new=ac(0.502)  human: ac_activation/move_to/step
+  t=198 base=d(item_3)(0.976) new=ac(0.507)  human: ac_activation/move_to/step
+  t=199 base=d(item_3)(0.977) new=ac(0.511)  human: ac_activation/move_to/step
+  t=200 base=d(item_3)(0.977) new=ac(0.515)  human: ac_activation/move_to/step
+  t=201 base=d(item_3)(0.978) new=ac(0.519)  human: ac_activation/move_to/step
+  t=202 base=d(item_3)(0.978) new=ac(0.522)  human: ac_activation/move_to/step
+  t=203 base=d(item_3)(0.979) new=ac(0.526)  human: ac_activation/move_to/step
+  t=204 base=d(item_3)(0.979) new=ac(0.530)  human: ac_activation/move_to/step
+  t=205 base=d(item_3)(0.980) new=ac(0.533)  human: ac_activation/move_to/step
+  t=206 base=d(item_3)(0.980) new=ac(0.533)  human: ac_activation/move_to/None
+  t=207 base=d(item_3)(0.980) new=ac(0.533)  human: ac_activation/wait_at/stand
+  t=208 base=d(item_3)(0.980) new=ac(0.533)  human: ac_activation/wait_at/None
+  t=209 base=d(item_3)(0.980) new=ac(0.533)  human: None/None/None
+  t=210 base=d(item_3)(0.979) new=ac(0.531)  human: ac_activation/move_to/step
+  t=211 base=d(item_3)(0.978) new=ac(0.530)  human: ac_activation/move_to/step
+  t=212 base=d(item_3)(0.977) new=ac(0.528)  human: ac_activation/move_to/step
+  t=213 base=d(item_3)(0.975) new=ac(0.526)  human: ac_activation/move_to/step
+  t=214 base=d(item_3)(0.974) new=ac(0.525)  human: ac_activation/move_to/step
+  t=215 base=d(item_3)(0.972) new=ac(0.523)  human: ac_activation/move_to/step
+  t=216 base=d(item_3)(0.971) new=ac(0.521)  human: ac_activation/move_to/step
+  t=217 base=d(item_3)(0.969) new=ac(0.520)  human: ac_activation/move_to/step
+  t=218 base=d(item_3)(0.967) new=ac(0.519)  human: ac_activation/move_to/step
+  t=219 base=d(item_3)(0.965) new=ac(0.517)  human: ac_activation/move_to/step
+  t=220 base=d(item_3)(0.962) new=ac(0.516)  human: ac_activation/move_to/step
+  t=221 base=d(item_3)(0.960) new=ac(0.515)  human: ac_activation/move_to/step
+  t=222 base=d(item_3)(0.958) new=ac(0.513)  human: ac_activation/move_to/step
+  t=223 base=d(item_3)(0.956) new=ac(0.512)  human: ac_activation/move_to/step
+  t=224 base=d(item_3)(0.953) new=ac(0.511)  human: ac_activation/move_to/step
+  t=225 base=d(item_3)(0.951) new=ac(0.510)  human: ac_activation/move_to/step
+  t=226 base=d(item_3)(0.949) new=ac(0.509)  human: ac_activation/move_to/step
+  t=227 base=d(item_3)(0.949) new=ac(0.509)  human: ac_activation/move_to/None
+  t=228 base=d(item_3)(0.949) new=ac(0.509)  human: ac_activation/wait_at/stand
+  t=229 base=d(item_3)(0.949) new=ac(0.509)  human: ac_activation/wait_at/None
+  t=230 base=d(item_3)(0.949) new=ac(0.509)  human: None/None/None
+  t=231 base=d(item_3)(0.952) new=ac(0.511)  human: deliver_item/move_to/step
+  t=232 base=d(item_3)(0.955) new=ac(0.514)  human: deliver_item/move_to/step
+  t=233 base=d(item_3)(0.957) new=ac(0.517)  human: deliver_item/move_to/step
+  t=234 base=d(item_3)(0.960) new=ac(0.520)  human: deliver_item/move_to/step
+  t=235 base=d(item_3)(0.962) new=ac(0.522)  human: deliver_item/move_to/step
+  t=236 base=d(item_3)(0.964) new=ac(0.525)  human: deliver_item/move_to/step
+  t=237 base=d(item_3)(0.966) new=ac(0.528)  human: deliver_item/move_to/step
+  t=238 base=d(item_3)(0.968) new=ac(0.531)  human: deliver_item/move_to/step
+  t=239 base=d(item_3)(0.969) new=ac(0.534)  human: deliver_item/move_to/step
+  t=240 base=d(item_3)(0.971) new=ac(0.537)  human: deliver_item/move_to/step
+  t=241 base=d(item_3)(0.972) new=ac(0.541)  human: deliver_item/move_to/step
+  t=242 base=d(item_3)(0.973) new=ac(0.544)  human: deliver_item/move_to/step
+  t=243 base=d(item_3)(0.974) new=ac(0.558)  human: deliver_item/move_to/step
+  t=244 base=d(item_3)(0.975) new=ac(0.561)  human: deliver_item/move_to/step
+  t=245 base=d(item_3)(0.976) new=ac(0.563)  human: deliver_item/move_to/step
+  t=246 base=d(item_3)(0.977) new=ac(0.566)  human: deliver_item/move_to/step
+  t=247 base=d(item_3)(0.978) new=ac(0.568)  human: deliver_item/move_to/step
+  t=248 base=d(item_3)(0.979) new=ac(0.571)  human: deliver_item/move_to/step
+  t=249 base=d(item_3)(0.979) new=ac(0.573)  human: deliver_item/move_to/step
+  t=250 base=d(item_3)(0.980) new=ac(0.576)  human: deliver_item/move_to/step
+  t=251 base=d(item_3)(0.981) new=ac(0.578)  human: deliver_item/move_to/step
+  t=252 base=d(item_3)(0.981) new=ac(0.580)  human: deliver_item/move_to/step
+  t=253 base=d(item_3)(0.982) new=ac(0.583)  human: deliver_item/move_to/step
+  t=254 base=d(item_3)(0.982) new=ac(0.585)  human: deliver_item/move_to/step
+  t=255 base=d(item_3)(0.982) new=ac(0.587)  human: deliver_item/move_to/step
+  t=256 base=d(item_3)(0.983) new=ac(0.589)  human: deliver_item/move_to/step
+  t=257 base=d(item_3)(0.983) new=ac(0.592)  human: deliver_item/move_to/step
+  t=258 base=d(item_3)(0.983) new=ac(0.594)  human: deliver_item/move_to/step
+  t=259 base=d(item_3)(0.984) new=ac(0.596)  human: deliver_item/move_to/step
+  t=260 base=d(item_3)(0.984) new=ac(0.598)  human: deliver_item/move_to/step
+  t=261 base=d(item_3)(0.984) new=ac(0.600)  human: deliver_item/move_to/step
+  t=262 base=d(item_3)(0.985) new=ac(0.601)  human: deliver_item/move_to/step
+  t=263 base=d(item_3)(0.985) new=ac(0.603)  human: deliver_item/move_to/step
+  t=264 base=d(item_3)(0.985) new=ac(0.605)  human: deliver_item/move_to/step
+  t=265 base=d(item_3)(0.985) new=ac(0.607)  human: deliver_item/move_to/step
+  t=266 base=d(item_3)(0.986) new=ac(0.609)  human: deliver_item/move_to/step
+  t=267 base=d(item_3)(0.986) new=ac(0.610)  human: deliver_item/move_to/step
+  t=268 base=d(item_3)(0.986) new=ac(0.612)  human: deliver_item/move_to/step
+  t=269 base=d(item_3)(0.986) new=ac(0.613)  human: deliver_item/move_to/step
+  t=270 base=d(item_3)(0.986) new=ac(0.615)  human: deliver_item/move_to/step
+  t=271 base=d(item_3)(0.986) new=ac(0.615)  human: deliver_item/move_to/None
+  t=272 base=d(item_3)(0.983) new=ac(0.479)  human: deliver_item/pick_up/grasp
+  t=273 base=d(item_3)(0.983) new=ac(0.479)  human: deliver_item/pick_up/None
+  t=274 base=d(item_3)(0.972) new=d(item_6)(0.623)  human: deliver_item/move_to/step
+  t=275 base=d(item_3)(0.972) new=d(item_6)(0.624)  human: deliver_item/move_to/step
+  t=276 base=d(item_3)(0.854) new=d(item_6)(0.650)  human: deliver_item/move_to/step
+  t=277 base=d(item_3)(0.854) new=d(item_6)(0.650)  human: deliver_item/move_to/step
+  t=278 base=d(item_3)(0.855) new=d(item_6)(0.650)  human: deliver_item/move_to/step
+  t=279 base=d(item_3)(0.855) new=d(item_6)(0.650)  human: deliver_item/move_to/step
+  t=280 base=d(item_3)(0.855) new=d(item_6)(0.650)  human: deliver_item/move_to/step
+  t=281 base=d(item_3)(0.855) new=d(item_6)(0.650)  human: deliver_item/move_to/step
+  t=282 base=d(item_3)(0.856) new=d(item_6)(0.650)  human: deliver_item/move_to/step
+  t=283 base=d(item_3)(0.856) new=d(item_6)(0.651)  human: deliver_item/move_to/step
+  t=284 base=d(item_3)(0.856) new=d(item_6)(0.651)  human: deliver_item/move_to/step
+  t=285 base=d(item_3)(0.857) new=d(item_6)(0.651)  human: deliver_item/move_to/step
+  t=286 base=d(item_3)(0.857) new=d(item_6)(0.651)  human: deliver_item/move_to/step
+  t=287 base=d(item_3)(0.857) new=d(item_6)(0.651)  human: deliver_item/move_to/step
+  t=288 base=d(item_3)(0.857) new=d(item_6)(0.651)  human: deliver_item/move_to/step
+  t=289 base=d(item_3)(0.857) new=d(item_6)(0.652)  human: deliver_item/move_to/step
+  t=290 base=d(item_3)(0.857) new=d(item_6)(0.652)  human: deliver_item/move_to/step
+  t=291 base=d(item_3)(0.857) new=d(item_6)(0.652)  human: deliver_item/move_to/step
+  t=292 base=d(item_3)(0.858) new=d(item_6)(0.652)  human: deliver_item/move_to/step
+  t=293 base=d(item_3)(0.858) new=d(item_6)(0.653)  human: deliver_item/move_to/step
+  t=294 base=d(item_3)(0.858) new=d(item_6)(0.653)  human: deliver_item/move_to/step
+  t=295 base=d(item_3)(0.857) new=d(item_6)(0.653)  human: deliver_item/move_to/step
+  t=296 base=d(item_3)(0.857) new=d(item_6)(0.653)  human: deliver_item/move_to/step
+  t=297 base=d(item_3)(0.857) new=d(item_6)(0.654)  human: deliver_item/move_to/step
+  t=298 base=d(item_3)(0.857) new=d(item_6)(0.654)  human: deliver_item/move_to/step
+  t=299 base=d(item_3)(0.857) new=d(item_6)(0.654)  human: deliver_item/move_to/step
+  t=300 base=d(item_3)(0.856) new=d(item_6)(0.655)  human: deliver_item/move_to/step
+  t=301 base=d(item_3)(0.856) new=d(item_6)(0.655)  human: deliver_item/move_to/step
+  t=302 base=d(item_3)(0.855) new=d(item_6)(0.656)  human: deliver_item/move_to/step
+  t=303 base=d(item_3)(0.855) new=d(item_6)(0.656)  human: deliver_item/move_to/step
+  t=304 base=d(item_3)(0.854) new=d(item_6)(0.657)  human: deliver_item/move_to/step
+  t=305 base=d(item_3)(0.853) new=d(item_6)(0.658)  human: deliver_item/move_to/step
+  t=306 base=d(item_3)(0.853) new=d(item_6)(0.658)  human: deliver_item/move_to/step
+  t=307 base=d(item_3)(0.852) new=d(item_6)(0.659)  human: deliver_item/move_to/step
+  t=308 base=d(item_3)(0.851) new=d(item_6)(0.660)  human: deliver_item/move_to/step
+  t=309 base=d(item_3)(0.850) new=d(item_6)(0.661)  human: deliver_item/move_to/step
+  t=310 base=d(item_3)(0.849) new=d(item_6)(0.662)  human: deliver_item/move_to/step
+  t=311 base=d(item_3)(0.848) new=d(item_6)(0.663)  human: deliver_item/move_to/step
+  t=312 base=d(item_3)(0.847) new=d(item_6)(0.664)  human: deliver_item/move_to/step
+  t=313 base=d(item_3)(0.846) new=d(item_6)(0.666)  human: deliver_item/move_to/step
+  t=314 base=d(item_3)(0.845) new=d(item_6)(0.668)  human: deliver_item/move_to/step
+  t=315 base=d(item_3)(0.844) new=d(item_6)(0.670)  human: deliver_item/move_to/step
+  t=316 base=d(item_3)(0.843) new=d(item_6)(0.672)  human: deliver_item/move_to/step
+  t=317 base=d(item_3)(0.842) new=d(item_6)(0.675)  human: deliver_item/move_to/step
+  t=318 base=d(item_3)(0.841) new=d(item_6)(0.679)  human: deliver_item/move_to/step
+  t=319 base=d(item_3)(0.840) new=d(item_6)(0.683)  human: deliver_item/move_to/step
+  t=320 base=d(item_3)(0.839) new=d(item_6)(0.688)  human: deliver_item/move_to/step
+  t=321 base=d(item_3)(0.839) new=d(item_6)(0.695)  human: deliver_item/move_to/step
+  t=322 base=d(item_3)(0.839) new=d(item_6)(0.703)  human: deliver_item/move_to/step
+  t=323 base=d(item_3)(0.839) new=d(item_6)(0.714)  human: deliver_item/move_to/step
+  t=324 base=d(item_3)(0.839) new=d(item_6)(0.728)  human: deliver_item/move_to/step
+  t=325 base=d(item_3)(0.840) new=d(item_6)(0.746)  human: deliver_item/move_to/step
+  t=326 base=d(item_3)(0.841) new=d(item_6)(0.767)  human: deliver_item/move_to/step
+  t=327 base=d(item_3)(0.843) new=d(item_6)(0.792)  human: deliver_item/move_to/step
+  t=328 base=d(item_3)(0.844) new=d(item_6)(0.816)  human: deliver_item/move_to/step
+  t=329 base=d(item_3)(0.845) new=d(item_6)(0.838)  human: deliver_item/move_to/step
+  t=330 base=d(item_3)(0.845) new=d(item_6)(0.838)  human: deliver_item/move_to/None
+  t=331 base=d(item_3)(0.668) new=unknown(0.607)  human: deliver_item/place/release
+  t=332 base=d(item_3)(0.668) new=unknown(0.607)  human: deliver_item/place/None
+  t=333 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=334 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=335 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=336 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=337 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=338 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=339 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=340 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=341 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=342 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=343 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=344 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=345 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=346 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=347 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=348 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=349 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=350 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=351 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=352 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=353 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=354 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=355 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=356 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=357 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=358 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=359 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=360 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=361 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=362 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=363 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=364 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=365 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=366 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=367 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=368 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=369 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=370 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=371 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=372 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=373 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=374 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=375 base=d(item_3)(0.668) new=unknown(0.607)  human: None/None/None
+  t=376 base=d(item_3)(0.668) new=unknown(0.645)  human: None/None/None
+  t=377 base=d(item_3)(0.668) new=unknown(0.645)  human: None/None/None
+  t=378 base=d(item_3)(0.668) new=unknown(0.645)  human: None/None/None
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-114: identical
+  t=115-144 human@start deliver_item/place/release:
+      ac           max Δ=+0.194 at t=144 (0.013 → 0.207)
+      coffee       max Δ=+0.634 at t=115 (0.012 → 0.646)
+      d(item_3)    max Δ=-0.978 at t=115 (0.979 → 0.001)
+      d(item_4)    max Δ=+0.043 at t=118 (0.001 → 0.044)
+      d(item_5)    max Δ=+0.087 at t=118 (0.002 → 0.089)
+      d(item_6)    max Δ=+0.066 at t=118 (0.002 → 0.068)
+      d(item_7)    max Δ=+0.015 at t=118 (0.001 → 0.016)
+      unknown      max Δ=+0.196 at t=115 (0.004 → 0.200)
+  t=145-242 human@start coffee_break/move_to/step:
+      ac           max Δ=+0.535 at t=242 (0.009 → 0.544)
+      coffee       max Δ=+0.486 at t=145 (0.032 → 0.518)
+      d(item_3)    max Δ=-0.979 at t=205 (0.980 → 0.001)
+      d(item_5)    max Δ=+0.141 at t=184 (0.004 → 0.145)
+      d(item_6)    max Δ=+0.108 at t=184 (0.003 → 0.111)
+      d(item_7)    max Δ=+0.028 at t=197 (0.001 → 0.029)
+      unknown      max Δ=+0.256 at t=184 (0.008 → 0.264)
+  t=243-273 human@start deliver_item/move_to/step:
+      ac           max Δ=+0.609 at t=270 (0.006 → 0.615)
+      coffee       max Δ=-0.007 at t=243 (0.008 → 0.001)
+      d(item_3)    max Δ=-0.985 at t=266 (0.986 → 0.001)
+      d(item_5)    max Δ=+0.128 at t=243 (0.002 → 0.130)
+      d(item_6)    max Δ=+0.290 at t=272 (0.004 → 0.294)
+      unknown      max Δ=+0.201 at t=243 (0.003 → 0.204)
+  t=274-275 human@start deliver_item/move_to/step:
+      ac           max Δ=+0.248 at t=274 (0.006 → 0.254)
+      d(item_3)    max Δ=-0.971 at t=274 (0.972 → 0.001)
+      d(item_5)    max Δ=+0.046 at t=274 (0.001 → 0.047)
+      d(item_6)    max Δ=+0.609 at t=275 (0.015 → 0.624)
+      unknown      max Δ=+0.070 at t=274 (0.002 → 0.072)
+  t=276-375 human@start deliver_item/move_to/step:
+      ac           max Δ=+0.325 at t=331 (0.004 → 0.329)
+      coffee       max Δ=-0.047 at t=329 (0.048 → 0.001)
+      d(item_3)    max Δ=-0.857 at t=292 (0.858 → 0.001)
+      d(item_5)    max Δ=+0.059 at t=331 (0.001 → 0.060)
+      d(item_6)    max Δ=+0.750 at t=329 (0.088 → 0.838)
+      unknown      max Δ=+0.599 at t=331 (0.008 → 0.607)
+  t=376-378 human@start None/None/None:
+      ac           max Δ=+0.345 at t=376 (0.004 → 0.349)
+      coffee       max Δ=-0.037 at t=376 (0.038 → 0.001)
+      d(item_3)    max Δ=-0.667 at t=376 (0.668 → 0.001)
+      d(item_6)    max Δ=-0.277 at t=376 (0.278 → 0.001)
+      unknown      max Δ=+0.637 at t=376 (0.008 → 0.645)
+
+== meta lines ==
+  -[meta-proj] confidence=0.936 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=97 feasible=True conflicts=660 min_dist=442.3176636603069
+  -[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=132 feasible=True conflicts=660 min_dist=267.139547746391
+  +[meta-proj] confidence=0.517 theta=0.750 projection=none(below_theta)
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=97 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=132 feasible=True conflicts=0 min_dist=None
+  -[meta-proj] confidence=0.973 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=48 feasible=True conflicts=782 min_dist=153.84529722865588
+  -[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=112 feasible=True conflicts=784 min_dist=874.4697608791839
+  +[meta-proj] confidence=0.494 theta=0.750 projection=none(below_theta)
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=48 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=112 feasible=True conflicts=0 min_dist=None
+  -[meta-proj] confidence=0.976 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=132 feasible=True conflicts=1068 min_dist=159.27216815731495
+  +[meta-proj] confidence=0.563 theta=0.750 projection=none(below_theta)
+  +[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=132 feasible=True conflicts=0 min_dist=None
+  -[meta-proj] confidence=0.848 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=65 feasible=True conflicts=1315 min_dist=130.8330352268954
+  +[meta-proj] confidence=0.663 theta=0.750 projection=none(below_theta)
+  +[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=65 feasible=True conflicts=0 min_dist=None
+  -[meta-proj] confidence=0.668 theta=0.750 projection=none(below_theta)
+  +[meta-proj] confidence=0.767 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_5,?kitting_table=kitting_table_0) cost=50 feasible=True conflicts=109 min_dist=882.2022530315634
+  +[meta] step=326 trigger=theta_crossed winner=deliver_item{'?item': 'item_5', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.645 theta=0.750 projection=none(below_theta)

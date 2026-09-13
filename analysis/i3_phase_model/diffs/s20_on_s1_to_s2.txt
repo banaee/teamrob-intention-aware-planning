@@ -1,0 +1,71 @@
+ticks: base 200 new 200  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.627 dist=d(item_3)=0.627 d(item_2)=0.213 unknown=0.157 d(item_4)=0.001 d(item_6)=0.001 d(item_7)=0.001
+t=0 new: most_likely=d(item_3) conf=0.627 dist=d(item_3)=0.627 d(item_2)=0.213 unknown=0.157 d(item_4)=0.001 d(item_6)=0.001 d(item_7)=0.001
+
+== most_likely differences ==
+  t= 89 base=d(item_2)(0.766) new=d(item_3)(0.772)  human: deliver_item/pick_up/grasp
+  t= 90 base=d(item_2)(0.766) new=d(item_3)(0.772)  human: deliver_item/pick_up/None
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-21: identical
+  t=22-53 human@start deliver_item/pick_up/grasp:
+      d(item_2)    max Δ=+0.212 at t=22 (0.001 → 0.213)
+      d(item_3)    max Δ=-0.170 at t=22 (0.797 → 0.627)
+      unknown      max Δ=-0.042 at t=22 (0.199 → 0.157)
+  t=54-88: identical
+  t=89-121 human@start deliver_item/pick_up/grasp:
+      d(item_2)    max Δ=-0.593 at t=89 (0.766 → 0.173)
+      d(item_3)    max Δ=+0.771 at t=89 (0.001 → 0.772)
+      unknown      max Δ=-0.178 at t=89 (0.230 → 0.052)
+  t=122-199: identical
+
+== meta lines ==
+  -[meta-proj] confidence=0.797 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=33 feasible=True conflicts=621 min_dist=15.454345849279438
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=56 feasible=True conflicts=620 min_dist=185.4311904038384
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=86 feasible=True conflicts=617 min_dist=93.65699756222112
+  -[meta] step=22 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.937 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=29 feasible=False conflicts=579 min_dist=0.0
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=58 feasible=True conflicts=603 min_dist=159.80309323027348
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=88 feasible=True conflicts=601 min_dist=138.66917151633692
+  -[meta] step=24 trigger=task_committed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.937 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=41 feasible=True conflicts=257 min_dist=549.1666169053962
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=45 feasible=True conflicts=260 min_dist=593.3799951685838
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=95 feasible=True conflicts=260 min_dist=593.3799951685838
+  -[meta] step=41 trigger=task_committed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.772 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=59 feasible=True conflicts=606 min_dist=338.8213626145823
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=89 feasible=True conflicts=612 min_dist=53.12431503963493
+  -[meta] step=84 trigger=no_current_task winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.927 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=29 feasible=True conflicts=191 min_dist=375.1975816433437
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=87 feasible=True conflicts=194 min_dist=529.2726335816709
+  -[meta] step=113 trigger=task_committed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.627 theta=0.750 projection=none(below_theta)
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=29 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=58 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=88 feasible=True conflicts=0 min_dist=None
+  +[meta] step=23 trigger=task_committed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.894 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=28 feasible=True conflicts=571 min_dist=5.906133984370862
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=59 feasible=True conflicts=603 min_dist=161.5080403348358
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=88 feasible=True conflicts=601 min_dist=148.18456607132907
+  +[meta] step=24 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.894 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=83 feasible=True conflicts=59 min_dist=15.539791660474151
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=89 feasible=True conflicts=59 min_dist=15.539791660474151
+  +[meta] step=54 trigger=no_current_task winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=89 feasible=True conflicts=74 min_dist=23.46699546445645
+  -[meta] step=144 trigger=no_current_task winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=41 feasible=True conflicts=551 min_dist=260.1971962751593
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=95 feasible=True conflicts=554 min_dist=618.4414713142534
+  +[meta] step=95 trigger=task_committed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=44 feasible=True conflicts=74 min_dist=782.3104057440911
+  -[meta] step=188 trigger=task_committed winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=89 feasible=True conflicts=74 min_dist=29.11691445748935
+  +[meta] step=138 trigger=no_current_task winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.840 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=44 feasible=True conflicts=74 min_dist=781.4923732170156
+  +[meta] step=182 trigger=task_committed winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]

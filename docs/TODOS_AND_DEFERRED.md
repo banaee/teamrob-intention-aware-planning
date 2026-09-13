@@ -216,7 +216,10 @@ step, rather than tracking a persistent cursor per hypothesis. (Until I2 it read
 `methods[0]` and returned from its first schema — no tree was scanned, I1 10.5;
 since I2 it decomposes each hypothesis through the planner's guard-selected
 method every tick and dispatches over the grounded actions in order. Per-tick
-re-selection, no stored phase: the phase is I3's.) No explicit signal exists for
+re-selection, no stored phase: the phase is I3's.) UPDATE (I3): the per-hypothesis cursor
+exists — derived every tick, with the expected action and origin stored
+(design_decisions.md, I3 entry) — and completion is a pin, not a reset-to-uniform.
+(b) remains open as TODO-55. No explicit signal exists for
 "hypothesis h's task just completed → reset its belief contribution."
 BELIEF_FLOOR (TODO-18) makes this non-blocking for Phase 4C, but a full
 fix would: (a) track cursor state per hypothesis across cognitive clock
@@ -824,7 +827,11 @@ Files: shared/meta_planner.py (`update`)
 Reference: Phase 4C block-design session, September 2026
 
 
-**TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places**
+**TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places** ✅ RESOLVED (I3)
+I3: (a) a delivered task is pinned at BELIEF_FLOOR from the tick its terminal completion
+`obj_at(item, table)` holds (`[IR-complete]`), whoever delivered it — the decoy cannot exist.
+(b) is moot: ZONE_BOOST is removed. (c) the held-item rule is removed; the phase model refutes a
+rival through the geometry of its own expected action. History below kept as the record.
 Found during Phase 4C B2 design (September 2026), scenario_00 run_20260904_131808.
 Three separable defects; only the third is fixed.
 UPDATE (I2, September 2026): the `?item` literals are gone — the recognizer names no
@@ -1031,7 +1038,13 @@ something.
 Files: shared/meta_planner.py (`update_human_projection`)
 Reference: evidence-gated projection admission session, September 2026
 
-**TODO-46 — IR has never used completion evidence; only phase-1 shelf approach ever scores** ✅ (2) and (3) RESOLVED in I2; (1) is I3's
+**TODO-46 — IR has never used completion evidence; only phase-1 shelf approach ever scores** ✅ RESOLVED (I2: (2), (3); I3: (1))
+I3: the likelihood is that of the action the hypothesis expects now, so `pick_up`'s completion is
+evaluated at every grasp for the hypothesis that expected it — `holding(human_0, item_X)` HIGH,
+×4, in all eight conditions (`analysis/i3_phase_model/completion_events.csv`). `place` is never
+reached by the channel: the task's terminal completion holds on the same tick and the pin
+preempts it. No completion check ever returned LOW in the sweep (items sit on distinct shelves, so
+no two hypotheses expect a grasp at once; check U4 shows the ×40 discrimination when they do).
 I2: `_get_expected_position()` is gone; the target is the first movement action of the
 planner's guard-selected method, grounded through task and step bindings and resolved by
 `shared/target_resolution.py`. Measured (`analysis/i2_ir_foundations/summary.md`): 0 unresolved
@@ -1099,8 +1112,11 @@ PYTHONHASHSEED=0): it does not occur. UPDATE (I2): it now does — scenario_30, 
 on, step 98: `most_likely` flips from the delivered item_3 (0.782, ≥ θ) to item_7 at its grasp
 (0.876) and no trigger fires; the robot keeps the projection built at step 39 (a task the human
 finished at 73). Cause: the delivered-item lead created by scored carry legs (TODO-37(a),
-I2). Revisit with I3's completion pin — if the delivered task is pinned, the flip is a crossing
-again — before deciding on a `most_likely`-change trigger. 0 of 25 `most_likely` changes happen with confidence
+I2). UPDATE (I3): with the completion pin the delivered item_3 is at BELIEF_FLOOR from 74, and
+item_7's grasp at 98 is a `theta_crossed` again (0.885) — the flip is gone in the sweep. A new
+shape appears instead: `theta_crossed` fires on `unknown` (s20_off step 136, 0.804) when the robot's
+own delivery pins a live hypothesis and `unknown` inherits the mass — the meta-planner then builds a
+projection from `unknown`. Meta-planner is paused; recorded, not handled (TODO-54). 0 of 25 `most_likely` changes happen with confidence
 ≥ θ at both the tick and the previous tick — 16 have both sides below θ, 6 are collapses
 from ≥ θ to well below after the human's task completes, 3 coincide with a `theta_crossed`
 trigger on the same tick. DEFERRED ON EVIDENCE: revisit when new scenarios exist
@@ -1130,7 +1146,14 @@ id the script already used). Proposal, not built (I2 report §6):
 Files: shared/recognizer.py (build_hypothesis_space), mesa_sim/sim_model.py
 Reference: I1 audit 3.8, F1 report §1, I2 IR foundations session
 
-**TODO-50 — A foreseeable task that is never completed becomes a permanent attractor**
+**TODO-50 — A foreseeable task that is never completed becomes a permanent attractor** ✅ RESOLVED (I3)
+I3: `coffee_break` is pinned at BELIEF_FLOOR at step 184 of s40 — the first tick
+`waited(human_0, coffee_machine_0)` holds — and stays pinned (completion latches; the fact itself is
+visible for three ticks only). It is never `most_likely` again; 0.001 at the grasp of item_6 (was
+0.96). No decay, no refutation of foreseeable tasks. What it did NOT give: `coffee_break` ≥ θ during
+the coffee walk (max 0.551 off / 0.645 on; I2's 0.81 at 142 was a ZONE_BOOST event), and `item_6`
+is not `most_likely` at its grasp at 272 (0.29–0.32; `ac_activation` 0.48–0.53, TODO-53) — it is
+from the first carry tick (274). History below.
 Since I2 `coffee_break`'s target resolves, so it collects the coffee walk (correct) — and then
 keeps its lead for the rest of scenario_40: it is never refuted by a grasp (no portable object
 in its bindings), nothing marks it complete, and later legs still hand it moderate chord
@@ -1156,6 +1179,25 @@ them collect L ≈ 0.1 per carry leg under the held-item pin, and return after t
     the evidence model, I3/I4's.
 The evidence that settles it: with I3's completion pin in place, do the next-task reveal
 times (s00_on 81 → 111, s20_on 82 → 89, s30_on 77 → none) return to or improve on baseline?
+MEASURED (I3): they do not, and the phase model does not remove the effect — it reproduces it
+through the walk. While the human holds X, `deliver_item(Y)`'s guard-selected method is
+`deliver_with_return`; the walk finds `move_to(shelf_X)` complete (`at(human, shelf_X)` at the
+grasp), so the expected action is `place(X, shelf_X)` for two ticks and then, once the human is
+30 cm away, `move_to(shelf_X)` from an origin on the table side of the shelf: chord ≈ 180° off,
+L ≈ 0.1 for the carry, folded at the release (`rival_phase.csv`). The delivered item is pinned at
+the release, so the rival no longer fights the 0.8 lead — but it fights `unknown` from a 1 : 3–8
+deficit, and the kernel gives ×4 per leg: next-task crossings at the grasp in every prior-on
+condition (s00_on 111, s20_on 89, s30_on 98; the s30_on one is new — TODO-48's flip became a
+crossing). `unknown` is `most_likely` after every release (0.38–0.71). The task's criterion 2
+("deliver_item(Y) at phase 0 must expect move_to(shelf_Y)") therefore does not hold under the
+design as specified: the expected action is fixed by the domain's methods and guard selection, and
+that is a decision about the DOMAIN (is `deliver_with_return` a human method at all?) or about
+what a single-task hypothesis means while a different task is visibly under way, not about the
+recognizer. Measured what the task's reading would give (variant `ownshelf`, rivals decomposed as
+if nothing were held — analysis only): s00_on 97, s20_on 77, s40 item_6 ≥ θ at its grasp (272) —
+and s30_on loses its crossing (item_7 reaches 0.795 at the RELEASE of item_3, 74, because shelf_7
+is 39° off the carry direction: the collinear decoy, TODO-38). Decision open; both readings on
+record. I4's path-cost kernel changes the magnitude of the carry refutation, not its sign.
 Files: shared/recognizer.py (`_weigh`, `_output`), shared/planner.py (`decompose`)
 Reference: I1 audit §9 (per-tick vs frozen selection); I2 IR foundations session
 
@@ -1166,9 +1208,66 @@ settings run 300 steps to completion — only because the belief at 257 is now `
 at 0.69 (below θ; the AC hypothesis exists since the layout fix, TODO-49) so no crossing fires
 there. The meta-planner condition that raised is untouched. Not a sweep scenario (dropped in I2);
 keep it dropped until the meta-planner is unpaused, and expect the crash to return when the
-belief changes again.
+belief changes again. UPDATE (I3): it did — run for the `waited` check only, s10_off raises at step
+260 (`theta_crossed` on item_4 at its grasp at 257, 0.822; the carry tick 260 triggers the replan
+with every candidate excluded). `waited(human_0, coffee_machine_0)` at 158–160 was attributed
+correctly before the crash.
 Files: shared/meta_planner.py
 Reference: I1 audit O1; I2 IR foundations session
+
+**TODO-53 — A hypothesis whose expected action never completes is judged by one chord from t=0**
+Under the phase model the origin moves only when the expected action changes. A hypothesis whose
+first action is never completed by the observed agent (`ac_activation` in s40; every
+`deliver_item` the human never starts, until a shared completion such as `at(human, shelf_X)` flips
+its method) keeps its t=0 origin for the whole run, and under the cosine kernel — which reads
+direction only — its entire history is ONE chord from the start position to wherever the agent is
+now, replaced each tick. It is never charged for the detour, while hypotheses whose phases flip
+have their chords folded permanently. Measured (s40, both settings): `ac_activation` is
+`most_likely` at 0.45–0.69 from 184 (coffee pinned) to 271, on the chord start → shelf_6 being 39°
+off the switch's bearing (L ≈ 3.5), and item_6 — whose origin was reset to the table at 115 and
+which carries the ×0.1–0.3 carry fold — is 0.09–0.13 until its grasp. Also why `coffee_break` is
+`most_likely` at 0.65–0.69 at 115–117, before the coffee walk begins. Not a kernel to tune here: I4's
+excess-path-cost likelihood reads the path length since the origin and charges exactly this. If
+I4 does not close it, the candidate is an origin reset on the observed agent's task boundary — a
+decision about what one hypothesis's "stretch" is, to be measured on s40 first.
+Files: shared/recognizer.py (`update`: origin handling)
+Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §4
+
+**TODO-54 — `theta_crossed` fires on `unknown` when a pin shrinks the live set**
+s20_off step 136: the robot delivers item_6, the recognizer pins `deliver_item(item_6)`, and
+`unknown` inherits its mass (0.654 → 0.804 ≥ θ) while the human stands idle. `evaluate_triggers`
+fires `theta_crossed`, the meta-planner builds a projection for `unknown` and replans. Belief-side
+this is correct (the human has no task); the trigger should probably not fire on `unknown`, and
+the earlier question (TODO-48) of a `most_likely`-change trigger should be decided together with
+it. Meta-planner paused: recorded only.
+Files: shared/meta_planner.py (evaluate_triggers)
+Reference: I3 phase-model session
+
+**TODO-55 — What a single-task hypothesis means while another task is visibly under way**
+The phase model judges `deliver_item(Y)` under the method the observed agent's world selects —
+`deliver_with_return` while X is carried — so Y is refuted by X's carry (TODO-51, measured) and
+every next-task reveal waits for the grasp. Three readings, none chosen: (a) correct as is —
+the domain says so, and the belief after a release honestly favours `unknown`; (b) the prior over
+the remaining tasks should be reset on the observed agent's task completion (the C5 event now
+exists: `[IR-complete]`), so a finished task's carry does not bury the next one — TODO-18/20's
+"reset-to-uniform", now implementable; (c) `deliver_with_return` is a robot contingency and the
+human's hypotheses should be decomposed against a world without its own `holding` facts — which
+is a domain-specific filter and the variant `ownshelf` shows its cost on s30_on. Evidence that
+settles it: whether I4's path-cost kernel makes the approach after a release decisive before the
+grasp under (a); if not, (b) is the principled option and (c) is not.
+Files: shared/recognizer.py, domains/kitting/tasks.py
+Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §5
+
+**TODO-56 — The completion channel's gate is the old model's, and it is a decision**
+I3 judges an event only against expected actions whose vocabulary declares it (GRASP → `pick_up`),
+leaving movement actions NEUTRAL at a grasp as before. The other reading — every expected action
+LOW at a discrete tick unless its completion holds — is generative-model-correct (a walker does not
+emit GRASP) and was measured (variant `ungated`): `unknown`, which pays nothing, takes ×10 against
+every live task at every grasp and release and ends at 0.96–0.99 after every completion; no second θ
+crossing in any condition. The asymmetry is `unknown`'s flat likelihood, not the gate. If I4 gives
+`unknown` a likelihood of its own, revisit the gate with it.
+Files: shared/recognizer.py (`_in_vocabulary`)
+Reference: I3 phase-model session; analysis/i3_phase_model/summary.md
 
 ---
 

@@ -1,0 +1,242 @@
+ticks: base 200 new 200  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.245 dist=d(item_3)=0.245 d(item_6)=0.244 d(item_4)=0.241 d(item_7)=0.126 d(item_2)=0.083 unknown=0.061
+t=0 new: most_likely=d(item_3) conf=0.245 dist=d(item_3)=0.245 d(item_6)=0.244 d(item_4)=0.241 d(item_7)=0.126 d(item_2)=0.083 unknown=0.061
+
+== most_likely differences ==
+  t=  4 base=d(item_7)(0.209) new=d(item_3)(0.245)  human: deliver_item/move_to/step
+  t=  5 base=d(item_7)(0.209) new=d(item_3)(0.245)  human: deliver_item/move_to/step
+  t=  6 base=d(item_7)(0.209) new=d(item_3)(0.245)  human: deliver_item/move_to/step
+  t=  7 base=d(item_7)(0.209) new=d(item_3)(0.245)  human: deliver_item/move_to/step
+  t=  8 base=d(item_7)(0.209) new=d(item_3)(0.245)  human: deliver_item/move_to/step
+  t=  9 base=d(item_7)(0.209) new=d(item_3)(0.245)  human: deliver_item/move_to/step
+  t= 10 base=d(item_7)(0.209) new=d(item_3)(0.245)  human: deliver_item/move_to/step
+  t= 54 base=d(item_3)(0.801) new=d(item_6)(0.366)  human: deliver_item/place/release
+  t= 55 base=d(item_3)(0.801) new=d(item_6)(0.366)  human: deliver_item/place/None
+  t= 56 base=d(item_3)(0.801) new=d(item_6)(0.366)  human: None/None/None
+  t= 57 base=d(item_3)(0.404) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 58 base=d(item_3)(0.404) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 59 base=d(item_3)(0.404) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 60 base=d(item_3)(0.404) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 61 base=d(item_3)(0.404) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 62 base=d(item_3)(0.404) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 63 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 64 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 65 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 66 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 67 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 68 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 69 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 70 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 71 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 72 base=d(item_3)(0.405) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 73 base=d(item_3)(0.406) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 74 base=d(item_3)(0.406) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 75 base=d(item_3)(0.406) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 76 base=d(item_3)(0.407) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 77 base=d(item_3)(0.408) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 78 base=d(item_3)(0.410) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 79 base=d(item_3)(0.413) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 80 base=d(item_3)(0.431) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 81 base=d(item_3)(0.431) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 82 base=d(item_3)(0.359) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 83 base=d(item_3)(0.359) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 84 base=d(item_3)(0.359) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 85 base=d(item_3)(0.359) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 86 base=d(item_3)(0.359) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 87 base=d(item_3)(0.359) new=d(item_6)(0.364)  human: deliver_item/move_to/step
+  t= 88 base=d(item_3)(0.359) new=d(item_6)(0.364)  human: deliver_item/move_to/None
+  t=122 base=d(item_2)(0.775) new=unknown(0.654)  human: deliver_item/place/release
+  t=123 base=d(item_2)(0.775) new=unknown(0.654)  human: deliver_item/place/None
+  t=124 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=125 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=126 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=127 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=128 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=129 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=130 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=131 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=132 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=133 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=134 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=135 base=d(item_2)(0.775) new=unknown(0.654)  human: None/None/None
+  t=136 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=137 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=138 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=139 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=140 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=141 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=142 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=143 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=144 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=145 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=146 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=147 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=148 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=149 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=150 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=151 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=152 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=153 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=154 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=155 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=156 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=157 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=158 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=159 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=160 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=161 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=162 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=163 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=164 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=165 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=166 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=167 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=168 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=169 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=170 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=171 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=172 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=173 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=174 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=175 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=176 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=177 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=178 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=179 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=180 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=181 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=182 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=183 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=184 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=185 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=186 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=187 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=188 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=189 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=190 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=191 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=192 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=193 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=194 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=195 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=196 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=197 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=198 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+  t=199 base=d(item_2)(0.775) new=unknown(0.804)  human: None/None/None
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-3: identical
+  t=4-24 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=-0.054 at t=4 (0.137 → 0.083)
+      d(item_3)    max Δ=-0.232 at t=22 (0.797 → 0.565)
+      d(item_4)    max Δ=+0.138 at t=22 (0.001 → 0.139)
+      d(item_6)    max Δ=+0.139 at t=22 (0.001 → 0.140)
+      d(item_7)    max Δ=-0.083 at t=4 (0.209 → 0.126)
+      unknown      max Δ=-0.164 at t=22 (0.199 → 0.035)
+  t=25-32 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.005 at t=25 (0.001 → 0.006)
+      d(item_4)    max Δ=+0.016 at t=25 (0.001 → 0.017)
+      d(item_6)    max Δ=+0.016 at t=25 (0.001 → 0.017)
+      d(item_7)    max Δ=+0.008 at t=25 (0.001 → 0.009)
+      unknown      max Δ=-0.044 at t=25 (0.059 → 0.015)
+  t=33-51 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.005 at t=33 (0.001 → 0.006)
+      d(item_3)    max Δ=-0.029 at t=33 (0.966 → 0.937)
+      d(item_4)    max Δ=+0.016 at t=33 (0.001 → 0.017)
+      d(item_6)    max Δ=+0.016 at t=33 (0.001 → 0.017)
+      d(item_7)    max Δ=+0.008 at t=33 (0.001 → 0.009)
+      unknown      max Δ=-0.015 at t=33 (0.030 → 0.015)
+  t=52-53 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.005 at t=52 (0.001 → 0.006)
+      d(item_3)    max Δ=-0.014 at t=52 (0.966 → 0.952)
+      d(item_6)    max Δ=+0.016 at t=52 (0.001 → 0.017)
+      d(item_7)    max Δ=+0.008 at t=52 (0.001 → 0.009)
+      unknown      max Δ=-0.015 at t=52 (0.030 → 0.015)
+  t=54-88 human@start deliver_item/place/release:
+      d(item_2)    max Δ=+0.111 at t=57 (0.091 → 0.202)
+      d(item_3)    max Δ=-0.800 at t=54 (0.801 → 0.001)
+      d(item_4)    max Δ=-0.187 at t=80 (0.188 → 0.001)
+      d(item_6)    max Δ=+0.309 at t=82 (0.055 → 0.364)
+      d(item_7)    max Δ=+0.168 at t=57 (0.137 → 0.305)
+      unknown      max Δ=+0.292 at t=54 (0.025 → 0.317)
+  t=89-121 human@start deliver_item/pick_up/grasp:
+      d(item_2)    max Δ=-0.264 at t=89 (0.766 → 0.502)
+      d(item_6)    max Δ=+0.226 at t=89 (0.001 → 0.227)
+      d(item_7)    max Δ=+0.189 at t=89 (0.001 → 0.190)
+      unknown      max Δ=-0.150 at t=89 (0.230 → 0.080)
+  t=122-199 human@start deliver_item/place/release:
+      d(item_2)    max Δ=-0.774 at t=122 (0.775 → 0.001)
+      d(item_3)    max Δ=-0.086 at t=122 (0.087 → 0.001)
+      d(item_4)    max Δ=-0.037 at t=122 (0.038 → 0.001)
+      d(item_6)    max Δ=+0.174 at t=122 (0.013 → 0.187)
+      d(item_7)    max Δ=+0.163 at t=136 (0.029 → 0.192)
+      unknown      max Δ=+0.746 at t=136 (0.058 → 0.804)
+
+== meta lines ==
+  -[meta-proj] confidence=0.797 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=33 feasible=True conflicts=621 min_dist=15.454345849279438
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=56 feasible=True conflicts=620 min_dist=185.4311904038384
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=86 feasible=True conflicts=617 min_dist=93.65699756222112
+  -[meta] step=22 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.937 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=29 feasible=False conflicts=579 min_dist=0.0
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=58 feasible=True conflicts=603 min_dist=159.80309323027348
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=88 feasible=True conflicts=601 min_dist=138.66917151633692
+  -[meta] step=24 trigger=task_committed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.966 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=41 feasible=True conflicts=257 min_dist=549.1666169053962
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=45 feasible=True conflicts=260 min_dist=593.3799951685838
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=95 feasible=True conflicts=260 min_dist=593.3799951685838
+  -[meta] step=41 trigger=task_committed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.359 theta=0.750 projection=none(below_theta)
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=59 feasible=True conflicts=0 min_dist=None
+  +[meta-proj] confidence=0.565 theta=0.750 projection=none(below_theta)
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=29 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=58 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=88 feasible=True conflicts=0 min_dist=None
+  +[meta] step=23 trigger=task_committed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.839 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=28 feasible=True conflicts=571 min_dist=5.906133984370862
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=59 feasible=True conflicts=603 min_dist=161.5080403348358
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=88 feasible=True conflicts=601 min_dist=148.18456607132907
+  +[meta] step=24 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.366 theta=0.750 projection=none(below_theta)
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=83 feasible=True conflicts=0 min_dist=None
+  -[meta] step=84 trigger=no_current_task winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.766 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=54 feasible=True conflicts=655 min_dist=413.6590307888103
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=87 feasible=True conflicts=652 min_dist=116.8557632049251
+  -[meta] step=89 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.927 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=29 feasible=True conflicts=191 min_dist=375.1975816433437
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=87 feasible=True conflicts=194 min_dist=529.2726335816709
+  -[meta] step=113 trigger=task_committed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.775 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=89 feasible=True conflicts=74 min_dist=23.466995464456417
+  -[meta] step=144 trigger=no_current_task winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]
+  -[meta-proj] confidence=0.775 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=44 feasible=True conflicts=74 min_dist=782.3104057440911
+  -[meta] step=188 trigger=task_committed winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta] step=54 trigger=no_current_task winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.800 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=46 feasible=True conflicts=635 min_dist=262.5907976155474
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=92 feasible=True conflicts=631 min_dist=540.8111723256977
+  +[meta] step=91 trigger=theta_crossed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.941 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=41 feasible=True conflicts=551 min_dist=260.1971962751592
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=95 feasible=True conflicts=554 min_dist=618.4414713142534
+  +[meta] step=95 trigger=task_committed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.804 theta=0.750 projection=none(unresolved)
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=3 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=89 feasible=True conflicts=0 min_dist=None
+  +[meta] step=136 trigger=theta_crossed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.804 theta=0.750 projection=none(unresolved)
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=2 feasible=True conflicts=0 min_dist=None
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=134 feasible=True conflicts=0 min_dist=None
+  +[meta] step=138 trigger=task_committed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.804 theta=0.750 projection=none(unresolved)
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=89 feasible=True conflicts=0 min_dist=None
+  +[meta] step=142 trigger=no_current_task winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.804 theta=0.750 projection=none(unresolved)
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=44 feasible=True conflicts=0 min_dist=None
+  +[meta] step=186 trigger=task_committed winner=deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'} queue=[]

@@ -1,0 +1,49 @@
+ticks: base 379 new 379  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.304 dist=d(item_3)=0.304 coffee=0.251 d(item_5)=0.125 d(item_6)=0.103 d(item_4)=0.077 unknown=0.076 d(item_7)=0.037 ac=0.027
+t=0 new: most_likely=d(item_3) conf=0.304 dist=d(item_3)=0.304 coffee=0.251 d(item_5)=0.125 d(item_6)=0.103 d(item_4)=0.077 unknown=0.076 d(item_7)=0.037 ac=0.027
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-59: identical
+  t=60-61 human@start deliver_item/pick_up/grasp:
+      ac           max Δ=-0.014 at t=60 (0.041 → 0.027)
+      coffee       max Δ=-0.128 at t=60 (0.379 → 0.251)
+      d(item_3)    max Δ=-0.156 at t=60 (0.460 → 0.304)
+      d(item_4)    max Δ=+0.076 at t=60 (0.001 → 0.077)
+      d(item_5)    max Δ=+0.124 at t=60 (0.001 → 0.125)
+      d(item_6)    max Δ=+0.102 at t=60 (0.001 → 0.103)
+      d(item_7)    max Δ=+0.036 at t=60 (0.001 → 0.037)
+      unknown      max Δ=-0.039 at t=60 (0.115 → 0.076)
+  t=62-114 human@start deliver_item/move_to/step:
+      ac           max Δ=-0.001 at t=62 (0.048 → 0.047)
+      coffee       max Δ=-0.004 at t=62 (0.381 → 0.377)
+      d(item_3)    max Δ=-0.005 at t=62 (0.534 → 0.529)
+      d(item_4)    max Δ=+0.002 at t=62 (0.001 → 0.003)
+      d(item_5)    max Δ=+0.004 at t=62 (0.001 → 0.005)
+      d(item_6)    max Δ=+0.003 at t=62 (0.001 → 0.004)
+      d(item_7)    max Δ=+0.001 at t=62 (0.001 → 0.002)
+  t=115-271: identical
+  t=272-273 human@start deliver_item/pick_up/grasp:
+      ac           max Δ=-0.002 at t=272 (0.010 → 0.008)
+      coffee       max Δ=-0.163 at t=272 (0.962 → 0.799)
+      d(item_3)    max Δ=+0.131 at t=272 (0.001 → 0.132)
+      d(item_4)    max Δ=+0.001 at t=272 (0.001 → 0.002)
+      d(item_5)    max Δ=+0.036 at t=272 (0.001 → 0.037)
+      d(item_6)    max Δ=-0.004 at t=272 (0.022 → 0.018)
+      d(item_7)    max Δ=+0.001 at t=272 (0.001 → 0.002)
+      unknown      max Δ=-0.001 at t=272 (0.003 → 0.002)
+  t=274-330 human@start deliver_item/move_to/step:
+      ac           max Δ=-0.001 at t=274 (0.011 → 0.010)
+      coffee       max Δ=-0.058 at t=274 (0.959 → 0.901)
+      d(item_3)    max Δ=+0.048 at t=274 (0.001 → 0.049)
+      d(item_5)    max Δ=+0.013 at t=274 (0.001 → 0.014)
+      d(item_6)    max Δ=-0.002 at t=274 (0.025 → 0.023)
+  t=331-378: identical
+
+== meta lines ==
+  -[meta-proj] confidence=0.534 theta=0.750 projection=none(below_theta)
+  +[meta-proj] confidence=0.529 theta=0.750 projection=none(below_theta)
+  -[meta-proj] confidence=0.959 theta=0.750 projection=built
+  +[meta-proj] confidence=0.901 theta=0.750 projection=built
