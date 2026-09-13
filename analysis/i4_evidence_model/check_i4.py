@@ -116,8 +116,10 @@ def apply_constants(beta, unknown, frac=False):
     LF.PROGRESS_EVALUATORS["excess_path"] = fractional_excess_path_likelihood if frac else LF.excess_path_likelihood
 
 
-def run_condition(name, beta, unknown, frac=False, variant="base", log_dir=None, collect=False):
-    """Returns (trace rows, stats). trace rows: one per tick the IR ran."""
+def run_condition(name, beta, unknown, frac=False, variant="base", log_dir=None, collect=False, setup=None):
+    """Returns (trace rows, stats). trace rows: one per tick the IR ran.
+    `setup(rec, model, human)`: an optional caller-supplied monkeypatch applied after the named variant
+    (check_i4b.py's boundary candidates)."""
     apply_constants(beta, unknown, frac)
     from mesa_sim.sim_model import SimModel
     from domains.kitting.registry import domain_config
@@ -179,6 +181,9 @@ def run_condition(name, beta, unknown, frac=False, variant="base", log_dir=None,
             rec._tick_actions[key] = acts
             return acts
         rec._grounded_actions = grounded
+
+    if setup is not None:
+        setup(rec, model, human)
 
     # --- counters ---
     orig_kernel = LF.PROGRESS_EVALUATORS["excess_path"]

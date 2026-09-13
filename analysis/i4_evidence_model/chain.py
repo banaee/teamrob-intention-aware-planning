@@ -11,6 +11,8 @@ import csv, math, sys
 from pathlib import Path
 HERE = Path(__file__).parent
 tag, hyp, a, b = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+if "--dir" in sys.argv:                       # read another stage's excess.csv / trace.csv (I4b)
+    HERE = Path(sys.argv[sys.argv.index("--dir") + 1]).resolve()
 beta = float(sys.argv[sys.argv.index("--beta") + 1]) if "--beta" in sys.argv else None
 if beta is None:
     sys.path.insert(0, str(HERE.parents[1]))

@@ -1309,7 +1309,29 @@ Remaining candidates: (b), (d), (e). The evidence that separates them: whether t
 after a release should carry the previous task's refutation at all ((b) says no; (d) says only until
 the method re-selects; (e) says the method is wrong). Decide together with TODO-57.
 
-**TODO-56 — The completion channel's gate is the old model's, and it is a decision**
+RE-MEASURED after I4b's boundary (`analysis/i4b_boundary/REPORT.md` §7), still no reading chosen:
+(a) unchanged — never, in all eight (the rival's carry folds are in its base; the boundary keeps them).
+(c) `ownshelf` + boundary is no longer identical to (a): with no method flip there is no fold, the
+rival's approach excess from t = 0 is dropped at the human's release, and next-task reveals appear
+PRE-GRASP prior-on — s00_on 80 (grasp 111), s20_on 56 (89), s30_on 76 (98) — post-grasp prior-off
+(s00_off 116, s20_off 95; s30_off 87 pre-grasp) with wrong crossings on the idle human prior-off
+(TODO-59) and TODO-52's crash (s20_off 142). In s40 it gives the fixture's shape (item_6 0.47 → 0.79
+through 3a, 0.80 → 0.083 through 3b). The boundary made the inequality explicit: whether a rival's
+previous-task charge survives the boundary depends on whether its guard selected `deliver_with_return`
+under the carry — (d)'s point — so (a) as shipped treats hypotheses unequally at the boundary.
+
+**TODO-56 — The completion channel's gate is the old model's, and it is a decision** ✅ RESOLVED (I4b) — the gate stays, with its exclusion stated
+Decided in I4b (`analysis/i4b_boundary/REPORT.md` §6): under the detection model a hit is ×1.0, so the
+ungated channel adds exactly one thing — the permanent ×10⁻³ false-alarm charge on every hypothesis
+whose expected action is elsewhere at a discrete tick (108 of 124 ungated events, all on `move_to`; the
+"rival expecting move_to(shelf_X) at a grasp at shelf_X" case is a hit, ×1.0, no information). That
+charge is generatively right for a FIXED intention and, being an event, cannot be reset by the task
+boundary: with it, coffee_break is 0.001 for ever in s40 (variant `ungated` + boundary). The movement
+channel already carries the same fact in the one form the boundary can reset. Cost of withholding:
+s20_off's reveal at 31 instead of the grasp tick 22 (two decoys beyond the target on the same bearing).
+If a grasp-tick reveal of the CURRENT task is wanted, the mechanism is an event scoped to the current
+task (resettable at the boundary), a change to the event channel's bookkeeping — I5, not a flag.
+Original text:
 I3 judges an event only against expected actions whose vocabulary declares it (GRASP → `pick_up`),
 leaving movement actions NEUTRAL at a grasp as before. The other reading — every expected action
 LOW at a discrete tick unless its completion holds — is generative-model-correct (a walker does not
@@ -1330,7 +1352,18 @@ the gate a grasp is no longer evidence at all (hit rate 1.0 against unjudged riv
 grasp-tick reveal is wanted, the ungated reading is the mechanism, not a constant. Decision open on
 the generative argument (a walker does not emit GRASP); the gate stays until it is taken.
 
-**TODO-57 — What a task boundary is to the recognizer (origin and evidence across the observed agent's completions)** [DESIGN DECISION — the open problem I4 leaves]
+**TODO-57 — What a task boundary is to the recognizer (origin and evidence across the observed agent's completions)** ✅ RESOLVED (I4b) for the origin; the evidence half is TODO-55/59
+Shipped in I4b: a retirement whose hypothesis expected its terminal action on the previous tick (the
+observed agent's own derived phase reached the completing action) moves every live origin to the
+agent's position; bases, folds and events untouched. Fires at 18/18 human task boundaries, at none of
+the robot's completions; coffee_break 0.904 in both prior settings; s00/s20/s30 byte-identical to I4.
+Candidates A'/B/C/D rejected with numbers (`analysis/i4b_boundary/REPORT.md` §2). Open questions (1)
+and (2) below are answered (a retirement the phase state accounts for; origins only). Question (3)
+stands: no boundary sees segment 3's waypoint pauses (1 tick, retire nothing), and a domain whose tasks
+end in a ProcessCompletion has none. What the boundary does NOT fix — a rival's permanent folds from the
+previous task (item_6 stays at the floor; §3 of the report) — is TODO-55's, and what it exposes — a
+lone survivor at 0.909 on zero evidence — is TODO-59.
+Original text:
 The excess-path likelihood is correct within a task and blind to the observed agent finishing one task
 and starting another: a hypothesis the agent has not started keeps its priming-tick origin (coffee in
 s40 enters its own walk 2144 cm in the red), and every phase a rival lost is folded permanently
@@ -1352,6 +1385,21 @@ Constraints inherited from I2–I4: no global leg closed by the body's `stand`, 
 a boundary is an event, and an event is allowed to multiply and to move origins.
 Files: shared/recognizer.py (`update`: retirement branch, `_origin`, `_origin_odo`, `_base`)
 Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.2, §6, §10
+
+**TODO-59 — A zero-length stretch is scored as a perfect fit: a lone surviving hypothesis is at 1/(1+u) before the agent moves**
+L(0) = 1 and `unknown` pays UNKNOWN_LIKELIHOOD = 0.1 on every tick, including a tick on which nothing
+has been walked since the origin. At t = 0 in a one-task space, and after every task boundary (I4b)
+for every surviving stuck hypothesis, the belief is therefore 1/(1+u) = 0.909 for that hypothesis with
+no evidence: s40, `ac_activation` ≥ θ at 185–200 (segment 3a, human standing then walking 55° off the
+switch) and 333–378 (idle after the last delivery), 63 wrong-task ticks, 0 in I4; also the prior-off
+wrong reveals on the robot's undelivered items under `ownshelf`. The boundary exposes it (it
+manufactures zero-length stretches mid-run); the cause is I4's per-tick constant for `unknown`.
+Candidates, all semantic: `unknown`'s likelihood as a function of the evidence on the stretch (u per
+unit walked, so that an unwalked stretch is uninformative for everyone), or re-priming hypotheses with
+no folds from the prior at a boundary (TODO-55 (b), restricted). Not a retune of u (any u < 1/3
+reproduces it). Out of I4b's scope (the likelihood form).
+Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`, `logistic_of_excess`), shared/recognizer.py (`update`)
+Reference: I4b task-boundary session; analysis/i4b_boundary/REPORT.md §5, §8
 
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
