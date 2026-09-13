@@ -1436,7 +1436,20 @@ reproduces it). Out of I4b's scope (the likelihood form).
 Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`, `logistic_of_excess`), shared/recognizer.py (`update`)
 Reference: I4b task-boundary session; analysis/i4b_boundary/REPORT.md §5, §8
 
-**TODO-60 — `unknown`'s u is charged per OPEN observation and never folded: the belief with no observation is the base ratio**
+**TODO-60 — `unknown`'s u is charged per OPEN observation and never folded: the belief with no observation is the base ratio** ✅ RESOLVED (I4d)
+The accounting: for every live hypothesis k and tick t within an episode,
+    E_t(k)/E_t(unknown) = [π(k)/π(unknown)] · Π_{closed stretches s of k} L_k(s)/u · Π_{events} c_k(e) · (v_k(t)/u | 1 if empty).
+`unknown` is the reference; a task's odds against it are the product over the task's own observations of
+L/u, and a fold moves a factor from the open term to the base without changing it. Implemented as: the fold
+multiplies L/u into the base, the open observation multiplies v/u, `unknown` takes no factor. Checked by an
+independent accumulator on every tick of the eight conditions (max |Δ log odds| 7e-15, 5,069 checks). The
+re-triggers are gone (s00_on 0.905 → 0.986 → 0.995 through the grasp; no `theta_crossed` at 113/91/100).
+Accepted with it: the ceiling is 1/(1+uⁿ) over n observations; an extra closed stretch is worth 1/u between
+tasks of equal fit; regresses and no-graded-signal phases fold 1/u. New, reported not fixed: prior-off the
+rivals' `deliver_with_return` phases at the grasp (a `place` worth 1/u, then a fresh stretch — TODO-61)
+dip the true task under θ twice, three crossings per recognition (s00_off 109/113/115, s20_off 20/24/30 and
+87/91/95). `analysis/i4d_fold_unknown/REPORT.md`.
+Original text:
 The hypotheses fold each closed stretch's value into their bases; `unknown`'s constant is applied only to
 the open observation and never folded (I4's design — it is what makes 1/(1+u) a CEILING rather than a
 value that climbs with prefix length). So the base ratio of a task with only perfect folds to `unknown`
@@ -1452,7 +1465,12 @@ Not a retune of u. Out of I4c's scope (the likelihood form).
 Files: shared/recognizer.py (`update`: the fold and `unknown`'s factor), shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`)
 Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §5
 
-**TODO-61 — Confirmation is length-blind: a zero-excess stretch scores L = 1 after one step as after 400 cm**
+**TODO-61 — Confirmation is length-blind: a zero-excess stretch scores L = 1 after one step as after 400 cm** [OPEN — deliberately untouched in I4d]
+I4d note: with `unknown` folded (TODO-60) this property now also shows prior-off at every rival's regress
+after the grasp — a fresh `move_to(shelf)` stretch at L ≈ 1 from its first step lifts the rival and dips the
+true task under θ (s00_off 114, s20_off 25) — and in item_6's recognition at 274 after a 539 cm detour: the
+detour is ×0.09, the first step of the carry ×10. A property of the chosen model, not an implementation
+defect; left as it is by decision.
 The excess-path likelihood charges wasted path and credits nothing for path covered: a hypothesis whose
 target lies on the agent's bearing is at the perfect fit from the first step, however far the target is.
 From the uniform base a boundary leaves, one 15 cm step toward wander_0 (on the bearing to shelf_6) takes

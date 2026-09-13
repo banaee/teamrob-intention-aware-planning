@@ -1120,9 +1120,56 @@ retraction is visible (item_6 0.790 → 0.083); retention across every boundary 
 equal at the boundary tick, with 0 to 3 advances in the ended episode). Two things Decision 4 exposes, for
 I5: (1) `unknown`'s u is charged per OPEN observation and never folded (I4's ceiling design), so the belief
 that carries forward on a tick with no observation is the base ratio — 1:1 against `unknown` for a task
-with only perfect folds — and a lone live hypothesis dips from 0.905 to 0.498 on the grasp tick (TODO-60);
-(2) confirmation is length-blind — L(0) = 1 after one step as after 400 cm — so a 20-tick walk aligned
-with shelf_6 takes item_6 to 0.79 (11 wrong-task ticks, s40_on; TODO-61).
+with only perfect folds — and a lone live hypothesis dips from 0.905 to 0.498 on the grasp tick (TODO-60,
+corrected in I4d — next entry); (2) confirmation is length-blind — L(0) = 1 after one step as after 400 cm — so
+a 20-tick walk aligned with shelf_6 takes item_6 to 0.79 (11 wrong-task ticks, s40_on; TODO-61, open).
 Files: shared/recognizer.py (`update`, `_begin_episode`, `_prior`, `_progress_likelihood`,
 `_task_boundary`); analysis/i4b_boundary/, analysis/i4c_episode/
 Reference: I4b task-boundary session and I4c episode-semantics session, September 2026
+
+**`unknown` folds with the stretch: a hypothesis's evidence is its odds against `unknown` over its own observations (I4d)**
+The defect (TODO-60) was a FALSE EVENT at the IR / meta-planner interface: a task's stretch folded into its
+base as L alone, `unknown`'s u for that same stretch was charged only while the stretch was open, so on the
+fold tick the task's odds against `unknown` fell from 1/u to 1 — a lone live hypothesis dropped from 0.905
+to 0.498 on its own grasp tick, recovered at the first step, and `theta_crossed` fired a second time with
+nothing new observed (s00_on 113, s20_on 91, s30_on 100). Not a retune and not a new evidence source: the
+evidence a stretch provided for "this task rather than unexplained behaviour" was lost in the transition
+from open to folded.
+
+The accounting, stated before the implementation and checked after it. For every live hypothesis k and every
+tick t within an episode:
+
+    E_t(k) / E_t(unknown) = [π(k)/π(unknown)] · Π_{stretches s of k closed by t} L_k(s)/u
+                            · Π_{events e of k} c_k(e) · ( v_k(t)/u if k's open stretch is an observation, else 1 )
+
+`unknown` is the reference hypothesis. Each task's odds against it are the product over that task's OWN
+observations of L/u — closed stretches and events in its base, the open stretch multiplied on top as v/u —
+and a fold moves one factor from the open term to the base without changing it. `unknown`'s base is the
+reference and takes no factor; the empty-stretch rule (TODO-59) is untouched: no observation, nothing on
+either side. Representation: `_base[k]` holds k's closed odds; `_base[unknown]` only rescales. Verified by an
+independent accumulator driven only by the phase state and the likelihood functions: max |Δ log odds|
+7e-15 over 5,069 tick-hypothesis checks in the eight conditions (`analysis/i4d_fold_unknown/invariant.csv`);
+the reversion variant reproduces I4c byte-for-byte in all eight.
+
+What the accounting makes explicit, and is accepted with it: (1) a lone fitting task's ceiling is 1/(1+uⁿ)
+over its n observations — 0.905 on the first stretch, 0.986 after the first fold, 0.995 after the second —
+no longer 1/(1+u); (2) between two tasks of equal fit an extra closed stretch is worth 1/u, so a phase advance
+is evidence and the plan's segmentation of the trajectory matters (prefix accumulation, I4c's stated core
+property, now real against `unknown` and between tasks); (3) a regress folds too, and a phase with no graded
+signal folds its perfect-fit value as 1/u; (4) on a mixed tick the hypothesis whose stretch is empty pays
+nothing while its rivals pay their L/u — I4c's global "u if some hypothesis was scored" was this rule's
+approximation; (5) events and the episode boundary are unchanged.
+
+Measured (`analysis/i4d_fold_unknown/REPORT.md`): the three re-triggers are gone (0.905 → 0.986 through the
+grasp, no `[meta]` line); I4c's results hold — next-task reveals 81/57/77 prior-on and 87 in s30_off, coffee
+135/143, the 63 wrong-task ticks still gone, 3b's retraction 0.790 → 0.083, s30 pre-grasp, TODO-53 closed;
+the working region is unchanged (the closed-form windows contain no fold). Reported, not fixed: prior-off the
+correction lifts the true task above θ at its ARRIVAL (s00_off 109, s20_off 20 and 87 — pre-grasp, where I4c
+had 117/31/96), and the rivals' method flip at the grasp then opens a `place` phase worth 1/u (point 3) and,
+on departure, a fresh zero-excess stretch (TODO-61), so the true task dips under θ twice and `theta_crossed`
+fires three times per recognition (109/113/115, 20/24/30, 87/91/95) — the same interface defect with a
+different producer, the rivals' phase structure under `deliver_with_return`, which belongs to TODO-55 (e) and
+TODO-61, both open. Also: item_6 is recognised at 274 after its 539 cm detour (×0.09) is outweighed by two
+fitting observations (×10 each) — point 2 in action.
+Files: shared/recognizer.py (`update`: the fold and the open term); analysis/i4d_fold_unknown/
+Reference: I4d fold-unknown session, September 2026

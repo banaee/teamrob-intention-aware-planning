@@ -1,0 +1,28 @@
+ticks: base 160 new 160  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.481 dist=d(item_3)=0.481 d(item_7)=0.468 unknown=0.048 d(item_2)=0.001 d(item_4)=0.001 d(item_6)=0.001
+t=0 new: most_likely=d(item_3) conf=0.481 dist=d(item_3)=0.481 d(item_7)=0.468 unknown=0.048 d(item_2)=0.001 d(item_4)=0.001 d(item_6)=0.001
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-36: identical
+  t=37-44 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.093 at t=41 (0.902 → 0.995)
+      d(item_7)    max Δ=-0.004 at t=37 (0.005 → 0.001)
+      unknown      max Δ=-0.089 at t=41 (0.090 → 0.001)
+  t=45-73 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.090 at t=46 (0.905 → 0.995)
+      unknown      max Δ=-0.090 at t=46 (0.091 → 0.001)
+  t=74-95: identical
+  t=96-120 human@start deliver_item/move_to/step:
+      d(item_7)    max Δ=+0.488 at t=98 (0.498 → 0.986)
+      unknown      max Δ=-0.488 at t=98 (0.498 → 0.010)
+  t=121-159: identical
+
+== meta lines ==
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  +[meta-proj] confidence=0.995 theta=0.750 projection=built
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=58 feasible=True conflicts=415 min_dist=428.3125002260533
+  -[meta] step=100 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]

@@ -1,0 +1,61 @@
+ticks: base 173 new 173  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+t=0 new: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-38: identical
+  t=39-53 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.215 at t=43 (0.760 → 0.975)
+      d(item_6)    max Δ=-0.141 at t=39 (0.162 → 0.021)
+      unknown      max Δ=-0.089 at t=52 (0.090 → 0.001)
+  t=54-56 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.090 at t=55 (0.903 → 0.993)
+      unknown      max Δ=-0.089 at t=54 (0.090 → 0.001)
+  t=57-57 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.089 at t=57 (0.905 → 0.994)
+      d(item_6)    max Δ=+0.001 at t=57 (0.001 → 0.002)
+      unknown      max Δ=-0.090 at t=57 (0.091 → 0.001)
+  t=58-77 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.090 at t=58 (0.905 → 0.995)
+      unknown      max Δ=-0.090 at t=58 (0.091 → 0.001)
+  t=78-108: identical
+  t=109-124 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.331 at t=113 (0.616 → 0.947)
+      d(item_4)    max Δ=-0.270 at t=109 (0.319 → 0.049)
+      unknown      max Δ=-0.089 at t=124 (0.090 → 0.001)
+  t=125-125 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.089 at t=125 (0.899 → 0.988)
+      unknown      max Δ=-0.089 at t=125 (0.090 → 0.001)
+  t=126-128 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.089 at t=127 (0.903 → 0.992)
+      d(item_4)    max Δ=+0.001 at t=126 (0.005 → 0.006)
+      unknown      max Δ=-0.089 at t=126 (0.090 → 0.001)
+  t=129-141 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.090 at t=130 (0.905 → 0.995)
+      unknown      max Δ=-0.090 at t=130 (0.091 → 0.001)
+  t=142-172: identical
+
+== meta lines ==
+  -[meta-proj] confidence=0.760 theta=0.750 projection=built
+  +[meta-proj] confidence=0.967 theta=0.750 projection=built
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  +[meta-proj] confidence=0.995 theta=0.750 projection=built
+  -[meta-proj] confidence=0.783 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=51 feasible=True conflicts=512 min_dist=143.33851563969384
+  -[meta] step=117 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=35 feasible=True conflicts=230 min_dist=460.7487794216825
+  +[meta-proj] confidence=0.939 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=59 feasible=True conflicts=666 min_dist=142.27866603761353
+  +[meta] step=109 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.947 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=55 feasible=True conflicts=592 min_dist=143.3385156396938
+  +[meta] step=113 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.754 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=53 feasible=True conflicts=552 min_dist=143.33851563969384
+  +[meta] step=115 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.995 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=35 feasible=True conflicts=230 min_dist=460.7487794216824
