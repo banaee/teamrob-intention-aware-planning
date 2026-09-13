@@ -92,6 +92,10 @@ class DomainKnowledgeBase:
         """Return ActionSchema for an action type, or None if not found."""
         return self._domain.actions.get(action_name)
 
+    def get_all_actions(self) -> List[ActionSchema]:
+        """Every ActionSchema of the domain (schema validation at construction)."""
+        return list(self._domain.actions.values())
+
     def get_microactions(self) -> List[str]:
         """Terminal microactions: ['STEP', 'GRASP', 'RELEASE', 'STAND']."""
         return self._domain.microactions

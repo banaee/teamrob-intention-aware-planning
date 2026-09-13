@@ -58,6 +58,21 @@ ALGORITHM:
     A completed hypothesis is skipped in the update (it accumulates no more
     evidence) AND pinned at BELIEF_FLOOR on output, for the rest of the run.
 
+    Task boundary (I4b): when a completion retires a hypothesis whose expected
+    action on the previous tick WAS its terminal action — the observed agent's
+    own derived phase had reached the completing action — the observed agent
+    has finished a task, and every live hypothesis's origin (position and
+    odometer reading) moves to the agent's current position. The origin is
+    only the reference from which future excess path is measured; the belief
+    is untouched (bases, folds and events stay). The pin and the reset answer
+    different questions and deliberately do not share a criterion: the pin
+    asks whether the task is complete in the world (whoever did it); the reset
+    asks when the observed agent's behavioural reference frame changed, and
+    another agent completing a task is not such a moment. The attribution is
+    the recognizer's own phase state — no authorship in the world state, no
+    microaction vocabulary — and it assumes that an agent whose derived phase
+    reached the terminal action is the one who completed it.
+
     Output belief = evidence × ω_context, with inadmissible and completed
     hypotheses pinned at BELIEF_FLOOR and the floor applied. ω_context is a fact
     about the current state, not an event: applied to the output only, never
@@ -265,6 +280,16 @@ class IntentionRecognizer:
         self.knowledge = knowledge
         self.context = context
         self._path_cost = path_cost or likelihood_functions.straight_line_cost
+        # A schema naming an evaluator the registry does not have is a domain
+        # modelling error, and must not look like uncertainty: without this
+        # check every movement under it would silently score the perfect fit.
+        for schema in knowledge.get_all_actions():
+            name = schema.progress_evaluator
+            if name is not None and name not in likelihood_functions.PROGRESS_EVALUATORS:
+                raise ValueError(
+                    f"action '{schema.name}' names progress_evaluator '{name}', which is not "
+                    f"registered in likelihood_functions.PROGRESS_EVALUATORS "
+                    f"({sorted(likelihood_functions.PROGRESS_EVALUATORS)})")
         # Sorted by key so that every order-dependent step downstream — the
         # insertion order of the evidence and output dicts, hence max()'s
         # tie-break for most_likely and the order of tied entries in the log —
@@ -427,7 +452,10 @@ class IntentionRecognizer:
              or regress; both are derived facts);
           5. the open action's excess-path value from the origin multiplies on
              top of the evidence for this tick only (replaced next tick).
-        Then normalize over the live keys + unknown together.
+        Then normalize over the live keys + unknown together. If a retirement
+        this tick was the observed agent's own (step 2, terminal action
+        expected on the previous tick), every live origin moves to the agent's
+        position for the next tick: the geometry resets, the belief does not.
 
         ω_context is applied to the output only (see _output()). The recognizer
         therefore owns its belief; `prev_belief` is accepted for contract
@@ -449,12 +477,15 @@ class IntentionRecognizer:
         odo = self._odometer[agent]
 
         unnorm: Dict[str, float] = {}
+        boundary = False
         for hyp in self._hypotheses:
             key = repr(hyp)
             if key in self._inadmissible or key in self._completed:
                 continue
             actions = self._grounded_actions(hyp, obs.agent_id, world)
             if actions is not None and self._terminal_complete(actions, world):
+                if self._task_boundary(self._expected.get(key), actions):
+                    boundary = True
                 self._completed.add(key)
                 self._base.pop(key, None)
                 self._expected.pop(key, None)
@@ -495,6 +526,15 @@ class IntentionRecognizer:
         for key in self._base:
             self._base[key] /= total
         self._evidence = {k: v / total for k, v in unnorm.items()}
+
+        if boundary:
+            # The observed agent's task boundary: reset the geometry, keep the
+            # belief. Every live stretch starts here; this tick's values were
+            # the old stretches' closing values, nothing is folded.
+            for key in self._origin:
+                self._origin[key], self._origin_odo[key] = pos, odo
+            logging.info("[IR-boundary] step=%d %s completed a task: origins reset for %d hypotheses",
+                         int(obs.timestamp), agent, len(self._origin))
 
         distribution = self._output(obs, world)
         most_likely = max(distribution, key=lambda k: distribution[k])
@@ -589,6 +629,21 @@ class IntentionRecognizer:
         """
         predicate = actions[-1].completion_predicate
         return predicate is not None and predicate in world.predicates
+
+    @staticmethod
+    def _task_boundary(previous: Optional[GroundedAction], actions: List[GroundedAction]) -> bool:
+        """
+        Whether a retirement is the OBSERVED AGENT's task boundary: the
+        hypothesis expected the terminal action on the previous tick, i.e. the
+        agent's own derived phase had reached the action whose completion now
+        holds. A completion that arrives while the hypothesis still expected an
+        earlier action (another agent delivered the item; the agent was never
+        there) retires the hypothesis (the pin) but is nobody's boundary here.
+        Assumes an agent whose phase reached the terminal action is the one
+        who completed it — the recognizer's own evidence, not authorship in
+        the world state (I1 finding 5: there is none).
+        """
+        return IntentionRecognizer._same_action(previous, actions[-1])
 
     @staticmethod
     def _same_action(a: Optional[GroundedAction], b: Optional[GroundedAction]) -> bool:

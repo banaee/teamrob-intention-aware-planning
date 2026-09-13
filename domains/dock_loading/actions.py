@@ -38,7 +38,7 @@ move_to = ActionSchema(
     microactions="STEP*",
     movement_target_key="?target",
     movement_target_type="object",
-    progress_evaluator="directional",   # cosine trajectory-consistency scoring
+    progress_evaluator="excess_path",   # excess-path (wasted distance) likelihood, I4
 )
 
 pick_up = ActionSchema(
