@@ -44,9 +44,17 @@ ALGORITHM:
         - no graded signal (an action without target or evaluator — pick_up,
           place, wait_at: the agent is within reach of where it happens — or a
           hypothesis the planner cannot decompose here): the perfect-fit value,
-          nothing to charge. A stationary tick changes nothing: the excess is
-          what it was.
-        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD.
+          nothing to charge. A stationary tick mid-stretch changes nothing:
+          the excess is what it was.
+        - an EMPTY stretch — nothing walked since the origin: the tick a
+          hypothesis enters an action, the ticks after an episode boundary
+          before the agent moves, t = 0 — is not an observation. The channel
+          contributes NO FACTOR for it (not 1.0: zero excess is a perfectly
+          efficient walk, and no walk is not that), and the belief carries
+          forward unchanged.
+        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD, per observation.
+          It applies on a tick on which some hypothesis was scored on one, and
+          not at all on a tick with nothing observed (every stretch empty).
     Normalisation is over every hypothesis AND 'unknown' together, never over
     the hypotheses alone. Two hypotheses whose expected actions share
     evaluator, origin, walked distance and target position receive the same
@@ -58,20 +66,32 @@ ALGORITHM:
     A completed hypothesis is skipped in the update (it accumulates no more
     evidence) AND pinned at BELIEF_FLOOR on output, for the rest of the run.
 
-    Task boundary (I4b): when a completion retires a hypothesis whose expected
-    action on the previous tick WAS its terminal action — the observed agent's
-    own derived phase had reached the completing action — the observed agent
-    has finished a task, and every live hypothesis's origin (position and
-    odometer reading) moves to the agent's current position. The origin is
-    only the reference from which future excess path is measured; the belief
-    is untouched (bases, folds and events stay). The pin and the reset answer
-    different questions and deliberately do not share a criterion: the pin
-    asks whether the task is complete in the world (whoever did it); the reset
-    asks when the observed agent's behavioural reference frame changed, and
-    another agent completing a task is not such a moment. The attribution is
-    the recognizer's own phase state — no authorship in the world state, no
-    microaction vocabulary — and it assumes that an agent whose derived phase
-    reached the terminal action is the one who completed it.
+    Episodes (I4b, I4c): the recognizer estimates the intention of the
+    observed agent's CURRENT BEHAVIOURAL EPISODE — deliver_item(item_3) means
+    "this is the task being executed now", not a disposition or a belief
+    about later tasks; there is no representation here in which "the agent
+    seems uninterested in shelf_9" could live. Within a task, a phase advance
+    ends a STRETCH: the closing stretch's value folds into the evidence and is
+    retained, so a task grows more likely as more of its actions verifiably
+    complete (prefix accumulation). A task boundary ends the EPISODE: when a
+    completion retires a hypothesis whose expected action on the previous tick
+    WAS its terminal action — the observed agent's own derived phase had
+    reached the completing action — the observed agent has finished a task,
+    and the belief re-initialises to the prior over the hypotheses still live,
+    uniformly, with no dependence on any hypothesis's fold history; every
+    origin moves to the agent's current position; completed tasks stay
+    pinned. Nothing crosses the boundary, and no persistence layer carries
+    anything across it: cross-episode information is outside the
+    task-hypothesis model by decision, and would need its own representation.
+    The pin and the boundary answer different questions and deliberately do
+    not share a criterion: the pin asks whether the task is complete in the
+    world (whoever did it — the normalisation set shrinks, the belief does
+    not re-initialise); the boundary asks whether the observed agent changed
+    episode, and another agent completing a task is not such a moment. The
+    attribution is the recognizer's own phase state — no authorship in the
+    world state, no microaction vocabulary — and it assumes that an agent
+    whose derived phase reached the terminal action is the one who completed
+    it.
 
     Output belief = evidence × ω_context, with inadmissible and completed
     hypotheses pinned at BELIEF_FLOOR and the floor applied. ω_context is a fact
@@ -84,8 +104,10 @@ ALGORITHM:
         - 1.0 otherwise
 
     Prior:
-        - Uniform at t=0
-        - Previous posterior at t>0 (passed in as prev_belief)
+        - Uniform over the live hypotheses + unknown at t=0 and at every
+          episode boundary (the admissible prior, over the current support)
+        - The recognizer's own evidence state at t>0 (prev_belief is not
+          consulted — see update())
 
     Admissibility restriction (optional, off by default):
         When the robot knows which tasks the observed agent is assigned — a work
@@ -323,10 +345,12 @@ class IntentionRecognizer:
         #   _origin_odo[key] the agent's odometer reading at that moment, so
         #                   that walked = odometer − _origin_odo[key]
         #   _base[key]      the hypothesis's evidence with every closed phase and
-        #                   every event folded in, in one common scale across
-        #                   keys (rescaled each tick so that Σ base·value = 1);
-        #                   the open phase's value is recomputed from _origin
-        #                   each tick and multiplied on top, never into it
+        #                   every event of the CURRENT EPISODE folded in, in one
+        #                   common scale across keys (rescaled each tick so that
+        #                   Σ base·value = 1); the open phase's value is
+        #                   recomputed from _origin each tick and multiplied on
+        #                   top, never into it; re-initialised to the prior at
+        #                   every episode boundary
         #   _completed      keys whose terminal completion condition has held:
         #                   skipped and pinned for the rest of the run
         self._expected: Dict[str, Optional[GroundedAction]] = {}
@@ -347,19 +371,14 @@ class IntentionRecognizer:
 
         if self._admissible is None:
             # Uniform prior over all hypotheses + unknown
-            n = len(self._hypotheses) + 1
-            self._initial_prior: Dict[str, float] = {repr(h): 1.0 / n for h in self._hypotheses}
-            self._initial_prior[UNKNOWN] = 1.0 / n
+            self._initial_prior: Dict[str, float] = self._prior([repr(h) for h in self._hypotheses])
         else:
             # Uniform over the admissible set only, then pinned — the same shape
             # as every distribution update() produces, so prior and posterior
             # agree. Built in hypothesis order (then unknown), the order update()
             # produces, not in the admissible set's iteration order.
-            n = len(self._admissible)
-            live = {repr(h): 1.0 / n for h in self._hypotheses if repr(h) in self._admissible}
-            live[UNKNOWN] = 1.0 / n
             self._initial_prior = self._pin(
-                live,
+                self._prior([repr(h) for h in self._hypotheses if repr(h) in self._admissible]),
                 {k for k in self._by_key if k not in self._admissible},
             )
         # Keys pinned at BELIEF_FLOOR on every output because of the restriction.
@@ -369,6 +388,39 @@ class IntentionRecognizer:
         )
         self._evidence = {k: v for k, v in self._initial_prior.items() if k not in self._inadmissible}
         self._base = dict(self._evidence)
+
+    @staticmethod
+    def _prior(live: List[str]) -> Dict[str, float]:
+        """
+        The prior over the hypotheses in `live` (keys, in hypothesis order)
+        and 'unknown': uniform. The one prior the recognizer has — used at
+        construction over the admissible set and at every episode boundary
+        over the hypotheses still live. Nothing else is stored to re-start
+        from.
+        """
+        n = len(live) + 1
+        out = {k: 1.0 / n for k in live}
+        out[UNKNOWN] = 1.0 / n
+        return out
+
+    def _begin_episode(self, pos: Tuple[float, float], odo: float) -> None:
+        """
+        An episode boundary: the observed agent has completed a task, and the
+        intention the recognizer estimates — the task of the CURRENT
+        behavioural episode — is a new question. The ended episode's evidence
+        (every fold, every event) is discarded uniformly: every live
+        hypothesis's base becomes the prior over the hypotheses still live,
+        whatever its phase history was, and every origin moves to the agent's
+        position. Every stretch is now empty, so the belief IS the prior until
+        the agent moves. Completed hypotheses are not live and stay pinned.
+        Nothing crosses the boundary: a task hypothesis says which task is
+        being executed now, not what the agent is disposed to do next, and
+        there is no representation here for the latter.
+        """
+        self._base = self._prior([k for k in self._base if k != UNKNOWN])
+        self._evidence = dict(self._base)
+        for key in self._origin:
+            self._origin[key], self._origin_odo[key] = pos, odo
 
     def _build_admissible_keys(
         self,
@@ -447,15 +499,21 @@ class IntentionRecognizer:
              hypothesis expected on the previous tick, that action's completion
              check multiplies onto its evidence (an event);
           4. if the expected action changed, fold the closing action's final
-             excess-path value into the evidence once and move the origin
-             (position and odometer reading) to the agent's (a phase advance —
-             or regress; both are derived facts);
+             excess-path value into the evidence once (nothing, if its stretch
+             was empty) and move the origin (position and odometer reading)
+             to the agent's (a phase advance — or regress; both are derived
+             facts);
           5. the open action's excess-path value from the origin multiplies on
-             top of the evidence for this tick only (replaced next tick).
-        Then normalize over the live keys + unknown together. If a retirement
-        this tick was the observed agent's own (step 2, terminal action
-        expected on the previous tick), every live origin moves to the agent's
-        position for the next tick: the geometry resets, the belief does not.
+             top of the evidence for this tick only (replaced next tick) — or
+             no factor at all if the stretch is empty (nothing walked since
+             the origin: not an observation).
+        `unknown` takes its constant if some hypothesis was scored on an
+        observation, nothing otherwise. Then normalize over the live keys +
+        unknown together. If a retirement this tick was the observed agent's
+        own (step 2, terminal action expected on the previous tick), the
+        episode ends: the belief re-initialises to the prior over the live
+        keys + unknown and every origin moves to the agent's position
+        (_begin_episode); this tick reports the re-initialised belief.
 
         ω_context is applied to the output only (see _output()). The recognizer
         therefore owns its belief; `prev_belief` is accepted for contract
@@ -477,6 +535,7 @@ class IntentionRecognizer:
         odo = self._odometer[agent]
 
         unnorm: Dict[str, float] = {}
+        observed = False       # some live hypothesis was scored on an observation this tick
         boundary = False
         for hyp in self._hypotheses:
             key = repr(hyp)
@@ -498,25 +557,40 @@ class IntentionRecognizer:
 
             if key not in self._expected:
                 # First observation of this hypothesis: it enters its current
-                # action here. Nothing walked yet: the perfect-fit value.
+                # action here. Its stretch is empty: no observation, no factor.
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
-                unnorm[key] = self._base[key] * likelihood_functions.PERFECT_FIT_LIKELIHOOD
+                unnorm[key] = self._base[key]
                 continue
 
             previous = self._expected[key]
             if previous is not None and self._in_vocabulary(previous, mu):
                 self._base[key] *= self._completion_likelihood(previous, world, memo)
             if not self._same_action(previous, current):
-                self._base[key] *= self._progress_likelihood(
+                # The closing stretch's final value folds into the evidence
+                # once — nothing folds if the stretch was empty. The new
+                # action's stretch begins here, empty: no factor this tick
+                # unless the action has no graded signal (then, as on every
+                # tick, the perfect-fit value: nothing to charge).
+                closing = self._progress_likelihood(
                     previous, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
+                if closing is not None:
+                    self._base[key] *= closing
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
-                # The new action is entered here: zero excess by construction.
-                value = likelihood_functions.PERFECT_FIT_LIKELIHOOD
+                value = self._progress_likelihood(current, pos, 0.0, pos, world, memo)
             else:
                 value = self._progress_likelihood(
                     current, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
-            unnorm[key] = self._base[key] * value
-        unnorm[UNKNOWN] = self._base[UNKNOWN] * likelihood_functions.UNKNOWN_LIKELIHOOD
+            if value is None:
+                unnorm[key] = self._base[key]
+            else:
+                unnorm[key] = self._base[key] * value
+                observed = True
+        # `unknown` is scored on the same observation as the hypotheses are:
+        # its constant applies when at least one of them was scored this tick,
+        # and not at all on a tick with no observation (every stretch empty).
+        unnorm[UNKNOWN] = self._base[UNKNOWN]
+        if observed:
+            unnorm[UNKNOWN] *= likelihood_functions.UNKNOWN_LIKELIHOOD
 
         # One normalization, at the task layer, over the live keys AND unknown.
         # The bases are rescaled by the same total so they stay in one scale
@@ -528,12 +602,13 @@ class IntentionRecognizer:
         self._evidence = {k: v / total for k, v in unnorm.items()}
 
         if boundary:
-            # The observed agent's task boundary: reset the geometry, keep the
-            # belief. Every live stretch starts here; this tick's values were
-            # the old stretches' closing values, nothing is folded.
-            for key in self._origin:
-                self._origin[key], self._origin_odo[key] = pos, odo
-            logging.info("[IR-boundary] step=%d %s completed a task: origins reset for %d hypotheses",
+            # The observed agent's task boundary ends the behavioural episode:
+            # the next one's inference starts from the prior, here, and this
+            # tick already reports it (the ended episode's closing values are
+            # not a belief the model holds any more).
+            self._begin_episode(pos, odo)
+            logging.info("[IR-boundary] step=%d %s completed a task: belief re-initialised to the "
+                         "prior over %d hypotheses + unknown, origins reset",
                          int(obs.timestamp), agent, len(self._origin))
 
         distribution = self._output(obs, world)
@@ -698,7 +773,7 @@ class IntentionRecognizer:
         pos: Tuple[float, float],
         world: WorldState,
         memo: Dict[tuple, float],
-    ) -> float:
+    ) -> Optional[float]:
         """
         Progress channel: delegate to the evaluator named by
         action.schema.progress_evaluator with the distance `walked` since
@@ -708,6 +783,13 @@ class IntentionRecognizer:
         is measured FROM THE ORIGIN, not tick to tick: a τ-walker would have
         gone straight from where it began, and a passed target must not
         re-import accumulation one step at a time.
+
+        None when the stretch is EMPTY — nothing walked since the origin. An
+        empty stretch is not an observation: it is not a perfectly efficient
+        walk (zero excess), it is no walk, and the channel has nothing to say.
+        The caller applies no factor for it. (Stationarity as evidence AGAINST
+        an action that predicts movement would be a different observation
+        channel; it is not this one.)
 
         The perfect-fit value when there is no action, no evaluator (pick_up,
         place, wait_at: no graded in-progress signal) or no resolvable target.
@@ -724,6 +806,8 @@ class IntentionRecognizer:
         target_pos = movement_target_position(action, world)
         if target_pos is None:
             return likelihood_functions.PERFECT_FIT_LIKELIHOOD
+        if walked <= 0.0:
+            return None
         key = ("progress", action.schema.progress_evaluator, origin, walked, target_pos)
         if key not in memo:
             memo[key] = evaluator(walked, origin, pos, target_pos, self._path_cost)
