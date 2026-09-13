@@ -1,0 +1,30 @@
+ticks: base 169 new 169  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.488 dist=d(item_3)=0.488 d(item_2)=0.461 unknown=0.049 d(item_4)=0.001 d(item_6)=0.001 d(item_7)=0.001
+t=0 new: most_likely=d(item_3) conf=0.488 dist=d(item_3)=0.488 d(item_2)=0.461 unknown=0.049 d(item_4)=0.001 d(item_6)=0.001 d(item_7)=0.001
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-77: identical
+  t=78-80 human@start deliver_item/place/release:
+      d(item_2)    max Δ=+0.407 at t=78 (0.498 → 0.905)
+      unknown      max Δ=-0.407 at t=78 (0.498 → 0.091)
+  t=81-110: identical
+  t=111-112 human@start deliver_item/pick_up/grasp:
+      d(item_2)    max Δ=+0.407 at t=111 (0.498 → 0.905)
+      unknown      max Δ=-0.407 at t=111 (0.498 → 0.091)
+  t=113-168: identical
+
+== meta lines ==
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=12 feasible=True conflicts=243 min_dist=154.79429320225282
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=94 feasible=True conflicts=1229 min_dist=203.16099583581837
+  -[meta] step=81 trigger=theta_crossed winner=deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=73 feasible=True conflicts=947 min_dist=142.27866603761356
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=73 feasible=True conflicts=947 min_dist=142.2786660376136
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=55 feasible=True conflicts=592 min_dist=143.33851563969384
+  -[meta] step=113 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=35 feasible=True conflicts=230 min_dist=460.7487794216825
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=35 feasible=True conflicts=230 min_dist=460.74877942168246

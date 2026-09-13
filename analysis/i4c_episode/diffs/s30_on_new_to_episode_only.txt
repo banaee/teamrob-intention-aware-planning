@@ -1,0 +1,26 @@
+ticks: base 160 new 160  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.481 dist=d(item_3)=0.481 d(item_7)=0.468 unknown=0.048 d(item_2)=0.001 d(item_4)=0.001 d(item_6)=0.001
+t=0 new: most_likely=d(item_3) conf=0.481 dist=d(item_3)=0.481 d(item_7)=0.468 unknown=0.048 d(item_2)=0.001 d(item_4)=0.001 d(item_6)=0.001
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-73: identical
+  t=74-76 human@start deliver_item/place/release:
+      d(item_7)    max Δ=+0.407 at t=74 (0.498 → 0.905)
+      unknown      max Δ=-0.407 at t=74 (0.498 → 0.091)
+  t=77-97: identical
+  t=98-99 human@start deliver_item/pick_up/grasp:
+      d(item_7)    max Δ=+0.407 at t=98 (0.498 → 0.905)
+      unknown      max Δ=-0.407 at t=98 (0.498 → 0.091)
+  t=100-159: identical
+
+== meta lines ==
+  -[meta-cand] deliver_item(?item=item_2,?kitting_table=kitting_table_0) cost=10 feasible=True conflicts=194 min_dist=148.66461418625423
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=77 feasible=True conflicts=875 min_dist=166.0322841814406
+  -[meta] step=77 trigger=theta_crossed winner=deliver_item{'?item': 'item_2', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=58 feasible=True conflicts=415 min_dist=428.3125002260533
+  -[meta] step=100 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]

@@ -1040,61 +1040,89 @@ Files: shared/likelihood_functions.py (rewritten), shared/recognizer.py (`__init
 analysis/i4_evidence_model/ (check_i4.py, REPORT.md, sweeps, chain.py)
 Reference: I4 evidence-model session, September 2026
 
-**The task boundary: reset the geometry, keep the belief — and the pin and the reset are different (I4b)**
+**The recognizer estimates the intention of the current behavioural episode — and an empty stretch is not an observation (I4b, I4c)**
 I4 left one defect: a hypothesis's origin moved only when its expected ACTION changed, never when the
 observed agent finished a TASK, so every task the agent had not started carried the whole previous task
-as wasted path (coffee entered its own walk with 2144 cm of excess). The principle: at a task boundary,
-every live hypothesis's origin (position and odometer reading) moves to the agent's current position;
-the belief — bases, folds, events — is untouched.
+as wasted path (coffee entered its own walk with 2144 cm of excess). I4b's principle for the fix — "reset
+the geometry, keep the belief" — was measured and found wrong, and I4c replaced it. This entry describes
+what the model does now; the I4b principle is not amended here because it is false.
 
-Decision 1 — what a boundary is. Four definitions were ranked from the architecture and measured from
-the existing logs before any code (`analysis/i4b_boundary/candidates.py`): (A) a retirement whose
-hypothesis expected its TERMINAL action on the previous tick; (A') a retirement on a RELEASE; (B) the
+Decision 1 — what a boundary is (I4b, unchanged). Four definitions were ranked from the architecture and
+measured from the existing logs before any code (`analysis/i4b_boundary/candidates.py`): (A) a retirement
+whose hypothesis expected its TERMINAL action on the previous tick; (A') a retirement on a RELEASE; (B) the
 first phase advance after any retirement; (C) a sustained stop of N ticks; (D) any phase advance. A is
 shipped: it is literally the thing meant (the observed agent's own derived phase had reached the
-completing action), it needs nothing the recognizer does not already hold (`_expected` and the
-planner's action list), no constant and no rule, and it fired at 18 of 18 human task boundaries in the
-sweep and at none of the robot's five prior-off completions. Its one assumption is named: authorship
-is inferred from the agent's phase, not read from the world (there is none — I1 finding 5); a domain in
-which another agent can satisfy a terminal condition while the observed agent stands in its terminal
-phase would attribute wrongly. Rejected with numbers: A' assumes tasks end in a discrete microaction
-(kitting's waits do not; misses coffee at 184); B needs an arbitrary "which hypothesis" rule and fires
-mid-approach after the robot's completions (23,621 cm of decoy discrimination dropped); C needs N, and
-stops track boundaries in these data only because a place stop lasts one tick longer than a grasp stop
-(N = 5, a kitting-executor accident; 9,531 cm dropped; the waypoint pauses are invisible to it too);
-D fires 74 times, two ticks before every grasp and release, neutralises every fold by timing and
-collapses the excess to the current leg (132,250 cm dropped, wrong reveals prior-off).
+completing action), it needs nothing the recognizer does not already hold (`_expected` and the planner's
+action list), no constant and no rule, and it fired at 18 of 18 human task boundaries in the sweep and at
+none of the robot's five prior-off completions. Its one assumption is named: authorship is inferred from
+the agent's phase, not read from the world (there is none — I1 finding 5); a domain in which another
+agent can satisfy a terminal condition while the observed agent stands in its terminal phase would
+attribute wrongly. Rejected with numbers: A' assumes tasks end in a discrete microaction (kitting's waits
+do not; misses coffee at 184); B needs an arbitrary "which hypothesis" rule and fires mid-approach after
+the robot's completions (23,621 cm of decoy discrimination dropped); C needs N, and stops track boundaries
+in these data only because a place stop lasts one tick longer than a grasp stop (N = 5, a kitting-executor
+accident; 9,531 cm dropped; the waypoint pauses are invisible to it too); D fires 74 times, two ticks
+before every grasp and release, neutralises every fold by timing and collapses the excess to the current
+leg (132,250 cm dropped, wrong reveals prior-off).
 
-Decision 2 — the pin and the reset do not share a criterion. The terminal pin (I3) fires on the
-world's completion condition whoever satisfied it: `obj_at(item_7, table)` means the task is done and
-nobody can do it again — the right question for pinning. The reset asks a different question: when did
-the OBSERVED AGENT's behavioural reference frame change. The robot finishing a delivery is not such a
-moment (I4's what-if measured the damage: resets mid-walk at 145/243/376 prior-off). The two are the
-same event class and deliberately different tests; the natural instinct to unify them is wrong.
+Decision 2 — what a boundary does: the episode's inference ends (I4c). A task hypothesis —
+`deliver_item(item_3)` — means "this is the task being executed now". It is not a standing disposition,
+a preference or a belief about future tasks, and this architecture has no representation in which "the
+human seems uninterested in shelf_9" could live. Carrying evidence from a completed episode into the next
+one gives the belief a meaning the hypothesis does not have, and trying to make one number carry both
+meanings is what produced I4b's fold asymmetry: a hypothesis that never phase-advanced holds its charge in
+its OPEN stretch, not its base, so I4b's origin move discarded exactly the charge that happened to be open
+and kept exactly the folds that happened to be closed (item_6 kept its segment-1 folds because its method
+flipped under the carry; coffee returned to its prior because its never did — evidence retention depended
+on accidental phase history). Semantics now: WITHIN a task, a phase advance ends a STRETCH, not an
+episode — the completed stretch's evidence folds and is retained, so a task becomes more likely as more of
+its actions verifiably complete (prefix accumulation; a core property, kept). AT a task boundary (the
+observed agent completes a task — Decision 1's criterion), the belief re-initialises to the admissible
+prior over the hypotheses still live, uniformly, for every hypothesis, with no dependence on fold history;
+every origin moves to the agent's current position; completed tasks stay pinned. The re-initialisation
+target is the prior the recognizer already computes at construction, recomputed over the live set (one
+helper, `_prior`); no new state, no new constant. NO PERSISTENCE LAYER: cross-episode information is
+explicitly outside the task-hypothesis model. If it is ever wanted it needs its own representation; it is
+not to be smuggled into task belief. Nobody re-adds it. Consequence recorded: the completion channel's
+events, permanent within an episode, are discarded with the rest of the base at a boundary — the I4b gate
+statement's "unresettable by construction" now reads "within an episode".
 
-Measured (`analysis/i4b_boundary/REPORT.md`): s00, s20 and s30 are byte-identical to I4 (nothing live is
-stuck there); in s40 `coffee_break` crosses θ at 125 and reaches the ceiling 0.904 in both prior
-settings by the intended chain — its excess stays at 0 from the release, `ac_activation`'s grows at
-1.8 cm per cm walked. Two findings recorded rather than absorbed: (1) "their charge is already in the
-belief" is not true of the state for a hypothesis that never advanced — its whole charge is its open
-stretch, and moving the origin DROPS it; that drop is the coffee reveal (folding the open value first,
-the literal "keep the belief", changes nothing anywhere: variant `fold`), and it treats hypotheses
-unequally — a rival whose method flipped keeps its folds and stays at the floor (item_6, segment 3b's
-retraction still invisible), a hypothesis that never advanced returns to its prior (TODO-55 (d)'s
-point; `ownshelf` + boundary treats all alike). (2) A zero-length stretch is scored as a perfect fit
-against `unknown`'s per-tick 0.1, so after a boundary a lone surviving stuck hypothesis is at 1/(1+u)
-= 0.909 before the agent moves: `ac_activation` ≥ θ for 16 ticks after coffee retires and for the
-idle tail after the last delivery (63 wrong-task ticks in s40, 0 in I4). I4's model, exposed by the
-boundary; for I5 (TODO-59).
+Decision 3 — the pin and the boundary do not share a criterion, and the difference is now visible. The
+terminal pin (I3) fires on the world's completion condition whoever satisfied it: `obj_at(item_7, table)`
+means the task is done and nobody can do it again — the right question for pinning. The boundary asks
+whether the OBSERVED AGENT changed episode. A ROBOT completion therefore pins (the normalisation set
+shrinks) but does not re-initialise: with the human idle after its last task, prior-off, the belief steps
+from 1/3 each over {ac, item_5, unknown} to 1/2 each when the robot delivers item_5 (s40_off, tick 376).
+That is correct, it looks odd in a log, and the two are deliberately not unified.
 
-Also decided: the completion-channel gate STAYS, with its exclusion stated (TODO-56 closed): under the
-detection model a hit is ×1.0, so the ungated channel adds exactly the permanent ×10⁻³ false-alarm
-charge on every hypothesis whose expected action is elsewhere at a discrete tick (108 of 124 ungated
-events, all on `move_to`; the "rival at shelf_X at the grasp" case is a hit, ×1.0, zero information).
-That charge is correct for a fixed intention and, being an event, unresettable by the boundary: with
-it, coffee is 0.001 for ever. The movement channel carries the same fact in the one form the boundary
-can reset. A schema naming an unregistered evaluator now raises at recognizer construction (dock_loading
-named the deleted `directional` and would have scored every movement at the perfect fit, silently).
-Files: shared/recognizer.py (`update`, `_task_boundary`, `__init__`), shared/domain_knowledge.py
-(`get_all_actions`), domains/dock_loading/actions.py; analysis/i4b_boundary/
-Reference: I4b task-boundary session, September 2026
+Decision 4 — an empty stretch is not an observation (I4c). dC = 0 used to mean two things: a perfectly
+efficient walk, and no walk at all. A stationary tick after an origin reset produced the second and was
+scored as the first, so a lone surviving hypothesis sat at 1/(1+u) = 0.909 on nothing and `unknown` was
+implicitly penalised for the human standing still (I4b's 63 wrong-task ticks; TODO-59). dC is defined over
+an OBSERVED MOVEMENT STRETCH; an empty stretch (nothing walked since the origin: the tick a hypothesis
+enters an action, the ticks after a boundary before the agent moves, t = 0) contributes NO FACTOR — not
+1.0, not a neutral constant — and `unknown`'s constant, being the likelihood of an observation, applies
+only on a tick on which some hypothesis was scored on one. Rejected: L = 1 for tasks (frames absence as
+perfect fit and penalises `unknown`); L = 1 for all including `unknown` (numerically the same per tick,
+but asserts a likelihood where no observation exists); any neutral constant (no semantic basis). An
+action with no graded signal (pick_up, place, wait_at) keeps I4's perfect-fit value: the agent within
+reach of where the action happens is an observation with nothing to charge. Explicitly deferred and NOT
+part of dC: stationarity as evidence AGAINST hypotheses that predict movement — a different observation
+channel with its own model, recorded (TODO-59), not built.
+
+Measured (`analysis/i4c_episode/REPORT.md`; `neither` — both changes reverted — reproduces I4b
+byte-for-byte in all eight conditions): next-task reveals appear in every scenario (pre-grasp prior-on:
+s00 81, s20 57, s30 77; prior-off 117/96/87), with no wrong crossing; coffee crosses θ at 135 (prior-on)
+and 143 (prior-off), later than I4b's 125 because item_6 (and prior-off the robot's items) now compete
+from the prior instead of from the floor; I4b's 63 wrong-task ticks are gone (the 47 idle-tail ticks by
+Decision 4, the 16 segment-3a ticks by Decision 2, which makes item_6 a live competitor); segment 3b's
+retraction is visible (item_6 0.790 → 0.083); retention across every boundary is uniform (every live base
+equal at the boundary tick, with 0 to 3 advances in the ended episode). Two things Decision 4 exposes, for
+I5: (1) `unknown`'s u is charged per OPEN observation and never folded (I4's ceiling design), so the belief
+that carries forward on a tick with no observation is the base ratio — 1:1 against `unknown` for a task
+with only perfect folds — and a lone live hypothesis dips from 0.905 to 0.498 on the grasp tick (TODO-60);
+(2) confirmation is length-blind — L(0) = 1 after one step as after 400 cm — so a 20-tick walk aligned
+with shelf_6 takes item_6 to 0.79 (11 wrong-task ticks, s40_on; TODO-61).
+Files: shared/recognizer.py (`update`, `_begin_episode`, `_prior`, `_progress_likelihood`,
+`_task_boundary`); analysis/i4b_boundary/, analysis/i4c_episode/
+Reference: I4b task-boundary session and I4c episode-semantics session, September 2026

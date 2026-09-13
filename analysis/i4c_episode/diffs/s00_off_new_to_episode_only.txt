@@ -1,0 +1,29 @@
+ticks: base 173 new 169  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+t=0 new: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-77: identical
+  t=78-80 human@start deliver_item/place/release:
+      d(item_2)    max Δ=+0.073 at t=78 (0.249 → 0.322)
+      d(item_4)    max Δ=+0.073 at t=78 (0.249 → 0.322)
+      d(item_6)    max Δ=+0.073 at t=78 (0.249 → 0.322)
+      unknown      max Δ=-0.217 at t=78 (0.249 → 0.032)
+  t=81-141: identical
+  t=142-165 human@start deliver_item/place/release:
+      d(item_4)    max Δ=+0.407 at t=142 (0.498 → 0.905)
+      unknown      max Δ=-0.407 at t=142 (0.498 → 0.091)
+  t=166-168: identical
+
+== meta lines ==
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=3 feasible=True conflicts=0 min_dist=None
+  -[meta] step=166 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  -[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=2 feasible=True conflicts=0 min_dist=None
+  -[meta] step=168 trigger=task_committed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  -[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  -[meta] step=172 all tasks complete
+  +[meta] step=168 all tasks complete

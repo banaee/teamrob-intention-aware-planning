@@ -1,0 +1,131 @@
+ticks: base 169 new 173  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+t=0 new: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+
+== most_likely differences ==
+  t= 78 base=unknown(0.995) new=d(item_2)(0.249)  human: deliver_item/place/release
+  t= 79 base=unknown(0.995) new=d(item_2)(0.249)  human: deliver_item/place/None
+  t= 80 base=unknown(0.995) new=d(item_2)(0.249)  human: None/None/None
+  t= 81 base=unknown(0.995) new=d(item_2)(0.333)  human: deliver_item/move_to/step
+  t= 82 base=unknown(0.995) new=d(item_2)(0.346)  human: deliver_item/move_to/step
+  t= 83 base=unknown(0.995) new=d(item_2)(0.362)  human: deliver_item/move_to/step
+  t= 84 base=unknown(0.995) new=d(item_2)(0.380)  human: deliver_item/move_to/step
+  t= 85 base=unknown(0.995) new=d(item_2)(0.400)  human: deliver_item/move_to/step
+  t= 86 base=unknown(0.995) new=d(item_2)(0.421)  human: deliver_item/move_to/step
+  t= 87 base=unknown(0.995) new=d(item_2)(0.441)  human: deliver_item/move_to/step
+  t= 88 base=unknown(0.995) new=d(item_2)(0.458)  human: deliver_item/move_to/step
+  t= 89 base=unknown(0.995) new=d(item_2)(0.470)  human: deliver_item/move_to/step
+  t= 90 base=unknown(0.995) new=d(item_2)(0.480)  human: deliver_item/move_to/step
+  t= 91 base=unknown(0.995) new=d(item_2)(0.486)  human: deliver_item/move_to/step
+  t= 92 base=unknown(0.995) new=d(item_2)(0.490)  human: deliver_item/move_to/step
+  t= 93 base=unknown(0.995) new=d(item_2)(0.496)  human: deliver_item/move_to/step
+  t= 94 base=unknown(0.995) new=d(item_2)(0.499)  human: deliver_item/move_to/step
+  t= 95 base=unknown(0.995) new=d(item_2)(0.502)  human: deliver_item/move_to/step
+  t= 96 base=unknown(0.995) new=d(item_2)(0.506)  human: deliver_item/move_to/step
+  t= 97 base=unknown(0.995) new=d(item_2)(0.509)  human: deliver_item/move_to/step
+  t= 98 base=unknown(0.995) new=d(item_2)(0.514)  human: deliver_item/move_to/step
+  t= 99 base=unknown(0.995) new=d(item_2)(0.518)  human: deliver_item/move_to/step
+  t=100 base=unknown(0.995) new=d(item_2)(0.523)  human: deliver_item/move_to/step
+  t=101 base=unknown(0.995) new=d(item_2)(0.529)  human: deliver_item/move_to/step
+  t=102 base=unknown(0.995) new=d(item_2)(0.536)  human: deliver_item/move_to/step
+  t=103 base=unknown(0.995) new=d(item_2)(0.543)  human: deliver_item/move_to/step
+  t=104 base=unknown(0.995) new=d(item_2)(0.552)  human: deliver_item/move_to/step
+  t=105 base=unknown(0.995) new=d(item_2)(0.562)  human: deliver_item/move_to/step
+  t=106 base=unknown(0.995) new=d(item_2)(0.573)  human: deliver_item/move_to/step
+  t=107 base=unknown(0.995) new=d(item_2)(0.585)  human: deliver_item/move_to/step
+  t=108 base=unknown(0.995) new=d(item_2)(0.600)  human: deliver_item/move_to/step
+  t=109 base=unknown(0.995) new=d(item_2)(0.616)  human: deliver_item/move_to/step
+  t=110 base=unknown(0.995) new=d(item_2)(0.616)  human: deliver_item/move_to/None
+  t=111 base=unknown(0.995) new=d(item_2)(0.616)  human: deliver_item/pick_up/grasp
+  t=112 base=unknown(0.995) new=d(item_2)(0.616)  human: deliver_item/pick_up/None
+  t=113 base=unknown(0.995) new=d(item_2)(0.616)  human: deliver_item/move_to/step
+  t=114 base=unknown(0.995) new=d(item_2)(0.658)  human: deliver_item/move_to/step
+  t=115 base=unknown(0.995) new=d(item_2)(0.702)  human: deliver_item/move_to/step
+  t=116 base=unknown(0.995) new=d(item_2)(0.744)  human: deliver_item/move_to/step
+  t=117 base=unknown(0.995) new=d(item_2)(0.783)  human: deliver_item/move_to/step
+  t=118 base=unknown(0.995) new=d(item_2)(0.815)  human: deliver_item/move_to/step
+  t=119 base=unknown(0.995) new=d(item_2)(0.841)  human: deliver_item/move_to/step
+  t=120 base=unknown(0.995) new=d(item_2)(0.860)  human: deliver_item/move_to/step
+  t=121 base=unknown(0.995) new=d(item_2)(0.874)  human: deliver_item/move_to/step
+  t=122 base=unknown(0.995) new=d(item_2)(0.884)  human: deliver_item/move_to/step
+  t=123 base=unknown(0.995) new=d(item_2)(0.891)  human: deliver_item/move_to/step
+  t=124 base=unknown(0.995) new=d(item_2)(0.896)  human: deliver_item/move_to/step
+  t=125 base=unknown(0.995) new=d(item_2)(0.899)  human: deliver_item/move_to/step
+  t=126 base=unknown(0.995) new=d(item_2)(0.902)  human: deliver_item/move_to/step
+  t=127 base=unknown(0.995) new=d(item_2)(0.903)  human: deliver_item/move_to/step
+  t=128 base=unknown(0.995) new=d(item_2)(0.904)  human: deliver_item/move_to/step
+  t=129 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=130 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=131 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=132 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=133 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=134 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=135 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=136 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=137 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=138 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=139 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=140 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/step
+  t=141 base=unknown(0.995) new=d(item_2)(0.905)  human: deliver_item/move_to/None
+  t=142 base=unknown(0.995) new=d(item_4)(0.498)  human: deliver_item/place/release
+  t=143 base=unknown(0.995) new=d(item_4)(0.498)  human: deliver_item/place/None
+  t=144 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=145 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=146 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=147 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=148 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=149 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=150 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=151 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=152 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=153 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=154 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=155 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=156 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=157 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=158 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=159 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=160 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=161 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=162 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=163 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=164 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+  t=165 base=unknown(0.995) new=d(item_4)(0.498)  human: None/None/None
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-77: identical
+  t=78-92 human@start deliver_item/place/release:
+      d(item_2)    max Δ=+0.489 at t=92 (0.001 → 0.490)
+      d(item_4)    max Δ=+0.450 at t=91 (0.001 → 0.451)
+      d(item_6)    max Δ=+0.299 at t=81 (0.001 → 0.300)
+      unknown      max Δ=-0.962 at t=81 (0.995 → 0.033)
+  t=93-129 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.904 at t=129 (0.001 → 0.905)
+      d(item_4)    max Δ=+0.450 at t=93 (0.001 → 0.451)
+      unknown      max Δ=-0.945 at t=93 (0.995 → 0.050)
+  t=130-141 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.904 at t=130 (0.001 → 0.905)
+      unknown      max Δ=-0.904 at t=130 (0.995 → 0.091)
+  t=142-165 human@start deliver_item/place/release:
+      d(item_4)    max Δ=+0.497 at t=142 (0.001 → 0.498)
+      unknown      max Δ=-0.497 at t=142 (0.995 → 0.498)
+  t=166-168: identical
+
+== meta lines ==
+  -[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  +[meta-proj] confidence=0.502 theta=0.750 projection=none(below_theta)
+  -[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=35 feasible=True conflicts=0 min_dist=None
+  +[meta-proj] confidence=0.783 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=51 feasible=True conflicts=512 min_dist=143.33851563969384
+  +[meta] step=117 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.905 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=35 feasible=True conflicts=230 min_dist=460.7487794216825
+  -[meta] step=168 all tasks complete
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=3 feasible=True conflicts=0 min_dist=None
+  +[meta] step=166 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=2 feasible=True conflicts=0 min_dist=None
+  +[meta] step=168 trigger=task_committed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=[]
+  +[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  +[meta] step=172 all tasks complete

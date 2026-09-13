@@ -1251,7 +1251,7 @@ it. Meta-planner paused: recorded only.
 Files: shared/meta_planner.py (evaluate_triggers)
 Reference: I3 phase-model session
 
-**TODO-55 — What a single-task hypothesis means while another task is visibly under way** [DEFERRED by decision — re-measure after I4, not before]
+**TODO-55 — What a single-task hypothesis means while another task is visibly under way** ✅ (b) CLOSED by decision (I4c); (d) reported; (e) OPEN
 The phase model judges `deliver_item(Y)` under the method the observed agent's world selects —
 `deliver_with_return` while X is carried — so Y is refuted by X's carry (TODO-51, measured ≈ ×0.1
 per carry) and every next-task reveal waits for the grasp (s00_on 111, s20_on 89, s30_on 98).
@@ -1320,6 +1320,29 @@ through 3a, 0.80 → 0.083 through 3b). The boundary made the inequality explici
 previous-task charge survives the boundary depends on whether its guard selected `deliver_with_return`
 under the carry — (d)'s point — so (a) as shipped treats hypotheses unequally at the boundary.
 
+RESOLVED in I4c (`analysis/i4c_episode/REPORT.md`), reading by reading:
+- (b) IS the episode semantics: the recognizer estimates the intention of the observed agent's current
+  behavioural episode; at the observed agent's own task boundary the belief re-initialises to the
+  admissible prior over the hypotheses still live, uniformly, and every origin moves. Adopted by decision,
+  not by measurement; the measurement confirms it: next-task reveals in every condition (pre-grasp
+  prior-on s00 81 / s20 57 / s30 77; prior-off 117 / 96 / 87), no wrong crossing, no crash (the crash and
+  the prior-off wrong crossings of the I4 `reset_boundary` what-if were the lone-survivor effect, TODO-59,
+  which I4c's other change removes — variant `episode_only` reproduces them: s20_off item_7 136–141 then
+  the TODO-52 abort at 142; s00_off item_4 142–165; s30_off item_6 161–167; s40_off ac 376–382).
+- (d) rebasing on a method change: within an episode a rival's method still flips under the carry and its
+  fold history differs from a never-advanced hypothesis's (s40 episode 1: item_6 flips at 60, 62 and 115
+  and holds its two folds in its base — 0.0 — while coffee and ac hold 2144 / 2349 cm in their open
+  stretches — base 0.909, value 0.000); the posterior consequence within the episode is nil (all three at
+  the floor at 114) and across the boundary it is nil by construction (all 0.25 at 115). No within-episode
+  flip in the four scenarios is caused by anything but the observed agent's own grasp and release, so in
+  kitting the unevenness never outlives the episode. That is a fact about kitting's guards, not a general
+  argument; the general question — whether evidence accumulated under one method is evidence about another
+  method's plan — stays as stated, dormant, with no case in the current domain.
+- (c) out (I4); (a) superseded by (b).
+- (e) OPEN: whether `deliver_with_return`'s guard should distinguish a stray item from one the agent is
+  assigned to deliver. A domain-model question (`domains/kitting/tasks.py`), independent of the likelihood
+  and of the episode semantics.
+
 **TODO-56 — The completion channel's gate is the old model's, and it is a decision** ✅ RESOLVED (I4b) — the gate stays, with its exclusion stated
 Decided in I4b (`analysis/i4b_boundary/REPORT.md` §6): under the detection model a hit is ×1.0, so the
 ungated channel adds exactly one thing — the permanent ×10⁻³ false-alarm charge on every hypothesis
@@ -1352,7 +1375,7 @@ the gate a grasp is no longer evidence at all (hit rate 1.0 against unjudged riv
 grasp-tick reveal is wanted, the ungated reading is the mechanism, not a constant. Decision open on
 the generative argument (a walker does not emit GRASP); the gate stays until it is taken.
 
-**TODO-57 — What a task boundary is to the recognizer (origin and evidence across the observed agent's completions)** ✅ RESOLVED (I4b) for the origin; the evidence half is TODO-55/59
+**TODO-57 — What a task boundary is to the recognizer (origin and evidence across the observed agent's completions)** ✅ RESOLVED (I4b origin, I4c evidence: the episode re-initialises to the prior — TODO-55 (b))
 Shipped in I4b: a retirement whose hypothesis expected its terminal action on the previous tick (the
 observed agent's own derived phase reached the completing action) moves every live origin to the
 agent's position; bases, folds and events untouched. Fires at 18/18 human task boundaries, at none of
@@ -1386,7 +1409,19 @@ a boundary is an event, and an event is allowed to multiply and to move origins.
 Files: shared/recognizer.py (`update`: retirement branch, `_origin`, `_origin_odo`, `_base`)
 Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.2, §6, §10
 
-**TODO-59 — A zero-length stretch is scored as a perfect fit: a lone surviving hypothesis is at 1/(1+u) before the agent moves**
+**TODO-59 — A zero-length stretch is scored as a perfect fit: a lone surviving hypothesis is at 1/(1+u) before the agent moves** ✅ RESOLVED (I4c)
+An empty stretch — nothing walked since the origin — is not an observation: the movement channel
+contributes no factor for it (not 1.0, not a neutral constant), and `unknown`'s constant applies only on
+a tick on which some hypothesis was scored on an observation. Applies to a stationary tick after any
+origin reset, phase advance or episode boundary, and to t = 0. Measured: the 63 wrong-task ticks are gone
+(the 47 idle-tail ticks by this change alone — variant `episode_only` keeps ac at 0.904 for 331–378 —
+and the 16 segment-3a ticks by the episode re-initialisation, which gives ac a live competitor); the
+prior-off lone-survivor crossings of every reset what-if are gone with them. On a tick with no
+observation the belief is the prior (after a boundary) or the base ratio (after an advance) — see
+TODO-60 for what that exposes. Explicitly deferred, NOT part of dC and not built: stationarity as
+evidence AGAINST hypotheses that predict movement (a human standing still may be informative; that is a
+different observation channel with its own model).
+Original text:
 L(0) = 1 and `unknown` pays UNKNOWN_LIKELIHOOD = 0.1 on every tick, including a tick on which nothing
 has been walked since the origin. At t = 0 in a one-task space, and after every task boundary (I4b)
 for every surviving stuck hypothesis, the belief is therefore 1/(1+u) = 0.909 for that hypothesis with
@@ -1400,6 +1435,35 @@ no folds from the prior at a boundary (TODO-55 (b), restricted). Not a retune of
 reproduces it). Out of I4b's scope (the likelihood form).
 Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`, `logistic_of_excess`), shared/recognizer.py (`update`)
 Reference: I4b task-boundary session; analysis/i4b_boundary/REPORT.md §5, §8
+
+**TODO-60 — `unknown`'s u is charged per OPEN observation and never folded: the belief with no observation is the base ratio**
+The hypotheses fold each closed stretch's value into their bases; `unknown`'s constant is applied only to
+the open observation and never folded (I4's design — it is what makes 1/(1+u) a CEILING rather than a
+value that climbs with prefix length). So the base ratio of a task with only perfect folds to `unknown`
+is 1:1, and on a tick with no observation (I4c: an empty stretch) the reported belief is that ratio, not
+the previous tick's posterior: a lone live hypothesis dips from 0.905 to 0.498 on its grasp tick and the
+one after (s00_on 111–112, s20_on 89–90, s30_on 98–99 — the only live rival being pinned), recovers at the
+first step, and the recovery fires a second `theta_crossed` (s00_on 113, s20_on 91, s30_on 100; the
+meta-planner re-decides, harmlessly here). The spec's "the belief carries forward unchanged" holds for
+the base and not for the posterior, because I4's model gives them different meanings for `unknown`. The
+candidates are the likelihood form's: fold u per closed observation (the ceiling then rises with prefix
+length — a task at its third perfect stretch is at 1/(1+u³)), or keep the ceiling and accept the dip.
+Not a retune of u. Out of I4c's scope (the likelihood form).
+Files: shared/recognizer.py (`update`: the fold and `unknown`'s factor), shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`)
+Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §5
+
+**TODO-61 — Confirmation is length-blind: a zero-excess stretch scores L = 1 after one step as after 400 cm**
+The excess-path likelihood charges wasted path and credits nothing for path covered: a hypothesis whose
+target lies on the agent's bearing is at the perfect fit from the first step, however far the target is.
+From the uniform base a boundary leaves, one 15 cm step toward wander_0 (on the bearing to shelf_6) takes
+item_6 from 0.333 to 0.485 (s40_on, 187), and the 20-tick walk to 0.79 — 11 wrong-task ticks at 203–213,
+the only ones left in the matrix, produced by real evidence (zero excess over ≈ 300 cm walked) and
+undone by the turn (0.790 → 0.083 through 3b). Prior-off the same walk peaks at 0.462: the robot's live
+items dilute it, not the evidence. Whether confirmation should be graded by the fraction of the direct
+cost covered (Ramírez–Geffner's and Masters–Sardina's models do not; the fixture's segment 3a is exactly
+the ambiguous case they accept) is a likelihood-form question. Recorded; not a reason to touch β or u.
+Files: shared/likelihood_functions.py (`excess_path_likelihood`)
+Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §4
 
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
