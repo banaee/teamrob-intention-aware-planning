@@ -18,30 +18,39 @@ ALGORITHM:
     an index into an action list, because method selection genuinely flips
     under it (deliver_item(Y) becomes deliver_with_return while X is carried).
 
-    Likelihood of the expected action a, all constants unchanged from before:
+    Likelihood of the expected action a — the evidence model (I4), every
+    constant of which lives in shared/likelihood_functions.py with its meaning:
         - completion channel: the observed microaction is in a's declared
-          discrete vocabulary (pick_up → GRASP, place → RELEASE, ...) → HIGH if
-          a's grounded completion predicate holds in the world, else LOW. It is
-          judged on the action the hypothesis expected BEFORE the event (the
-          world after a grasp already satisfies pick_up's completion, so the
-          derived action has moved on). An event is a fact at a moment: it
-          MULTIPLIES onto the hypothesis's evidence.
-        - progress channel: a has a progress_evaluator (move_to) → the cosine
-          kernel on the CHORD from the hypothesis's origin to the agent's
-          position, against the bearing from that origin to a's target (the
-          object's current location, shared/target_resolution.py). One stretch
-          of movement toward one target is one observation however many ticks
-          it spans: the chord value REPLACES the previous tick's, it is not
-          multiplied on it. When the expected action changes (phase advance,
-          or regress — derived, so both happen), the closing action's final
-          chord is folded into the evidence once and the origin moves to the
-          agent's position.
-        - neither (a stationary tick, a discrete action observing something
-          outside its vocabulary, an action without target or evaluator, a
-          hypothesis the planner cannot decompose here): NEUTRAL.
-        - 'unknown': always NEUTRAL.
-    Two hypotheses whose expected actions share evaluator, origin and target
-    position receive the same value, computed once per tick.
+          discrete vocabulary (pick_up → GRASP, place → RELEASE, ...) → the
+          detector's hit rate if a's grounded completion predicate holds in
+          the world, its false-alarm rate if not. It is judged on the action
+          the hypothesis expected BEFORE the event (the world after a grasp
+          already satisfies pick_up's completion, so the derived action has
+          moved on). An event is a fact at a moment: it MULTIPLIES onto the
+          hypothesis's evidence.
+        - progress channel: a has a progress_evaluator (move_to) → the
+          excess-path likelihood: the distance the agent has walked since the
+          hypothesis's origin (a per-agent odometer, read at the origin), plus
+          the remaining cost to a's target, minus the direct cost from the
+          origin — the path WASTED under the hypothesis — through a logistic.
+          The target is the object's current location
+          (shared/target_resolution.py). One stretch of movement toward one
+          target is one observation however many ticks it spans: the value is
+          recomputed from the origin and REPLACES the previous tick's, it is
+          not multiplied on it. When the expected action changes (phase
+          advance, or regress — derived, so both happen), the closing action's
+          final value is folded into the evidence once and the origin (position
+          and odometer reading) moves to the agent's.
+        - no graded signal (an action without target or evaluator — pick_up,
+          place, wait_at: the agent is within reach of where it happens — or a
+          hypothesis the planner cannot decompose here): the perfect-fit value,
+          nothing to charge. A stationary tick changes nothing: the excess is
+          what it was.
+        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD.
+    Normalisation is over every hypothesis AND 'unknown' together, never over
+    the hypotheses alone. Two hypotheses whose expected actions share
+    evaluator, origin, walked distance and target position receive the same
+    value, computed once per tick.
 
     Completed tasks: judged on the TERMINAL action's completion condition
     directly (obj_at(item, table), waited(agent, machine)), whatever the phase
@@ -106,16 +115,14 @@ from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
 from shared.planner import AdaptivePlanner, DecompositionError
 from shared.target_resolution import movement_target_position
 from shared import likelihood_functions
-from shared.likelihood_functions import (
-    HIGH_LIKELIHOOD, LOW_LIKELIHOOD, NEUTRAL_LIKELIHOOD,
-)
 
 
 
 # =============================================================================
 # Recognizer-level constants
-# (HIGH/LOW/NEUTRAL likelihood now live in likelihood_functions.py — single
-#  source of truth, imported above rather than redefined here)
+# (the likelihood constants — BETA, UNKNOWN_LIKELIHOOD, the detection rates —
+#  live in likelihood_functions.py, single source of truth, read through the
+#  module at call time rather than redefined here)
 # =============================================================================
 
 # ω_context boost multipliers
@@ -230,6 +237,7 @@ class IntentionRecognizer:
         context: ContextKnowledge,
         hypotheses: List[HypothesisKey],
         assigned_tasks: Optional[List[TaskInstance]] = None,
+        path_cost: Optional[likelihood_functions.PathCost] = None,
     ):
         """
         knowledge:      HTN domain knowledge
@@ -242,6 +250,10 @@ class IntentionRecognizer:
                         empty means the robot has no such knowledge: the
                         admissibility restriction is off and update() runs its
                         original unrestricted path over every hypothesis.
+        path_cost:      C(a, b), the cost of the walk between two positions the
+                        excess-path likelihood is measured against. Straight-line
+                        distance by default (Mesa agents walk through obstacles);
+                        a domain with a better model injects it here.
 
         _initial_prior is the t=0 prior over all hypotheses + unknown: uniform
         when the restriction is off; uniform over the admissible set, with the
@@ -252,6 +264,7 @@ class IntentionRecognizer:
         """
         self.knowledge = knowledge
         self.context = context
+        self._path_cost = path_cost or likelihood_functions.straight_line_cost
         # Sorted by key so that every order-dependent step downstream — the
         # insertion order of the evidence and output dicts, hence max()'s
         # tie-break for most_likely and the order of tied entries in the log —
@@ -281,18 +294,26 @@ class IntentionRecognizer:
         #                   previous tick (None = not decomposable then); a key
         #                   absent from the dict has not been observed yet
         #   _origin[key]    the agent's position when that action became the
-        #                   expected one — where its chord is measured from
+        #                   expected one — where its excess path is measured from
+        #   _origin_odo[key] the agent's odometer reading at that moment, so
+        #                   that walked = odometer − _origin_odo[key]
         #   _base[key]      the hypothesis's evidence with every closed phase and
         #                   every event folded in, in one common scale across
-        #                   keys (rescaled each tick so that Σ base·chord = 1);
-        #                   the open phase's chord is recomputed from _origin
+        #                   keys (rescaled each tick so that Σ base·value = 1);
+        #                   the open phase's value is recomputed from _origin
         #                   each tick and multiplied on top, never into it
         #   _completed      keys whose terminal completion condition has held:
         #                   skipped and pinned for the rest of the run
         self._expected: Dict[str, Optional[GroundedAction]] = {}
         self._origin: Dict[str, Tuple[float, float]] = {}
+        self._origin_odo: Dict[str, float] = {}
         self._base: Dict[str, float] = {}
         self._completed: Set[str] = set()
+        # Per observed agent: total path length walked since its first
+        # observation (the sum of straight-line steps between consecutive
+        # observed positions) and the position that total was last advanced to.
+        self._odometer: Dict[str, float] = {}
+        self._last_pos: Dict[str, Tuple[float, float]] = {}
         # Normalized evidence over the live keys + unknown — the belief with no
         # context weights and no pins in it; _output() derives the report from it.
         self._evidence: Dict[str, float] = {}
@@ -401,11 +422,12 @@ class IntentionRecognizer:
              hypothesis expected on the previous tick, that action's completion
              check multiplies onto its evidence (an event);
           4. if the expected action changed, fold the closing action's final
-             chord into the evidence once and move the origin to the agent's
-             position (a phase advance — or regress; both are derived facts);
-          5. the open action's chord from the origin multiplies on top of the
-             evidence for this tick only (replaced next tick).
-        Then normalize over the live keys + unknown.
+             excess-path value into the evidence once and move the origin
+             (position and odometer reading) to the agent's (a phase advance —
+             or regress; both are derived facts);
+          5. the open action's excess-path value from the origin multiplies on
+             top of the evidence for this tick only (replaced next tick).
+        Then normalize over the live keys + unknown together.
 
         ω_context is applied to the output only (see _output()). The recognizer
         therefore owns its belief; `prev_belief` is accepted for contract
@@ -417,6 +439,14 @@ class IntentionRecognizer:
         memo: Dict[tuple, float] = {}          # likelihood computations this tick, by inputs
         pos = obs.spatial_context.position
         mu = (obs.detected_microaction or "").upper()
+        # Advance the observed agent's odometer by the step just observed.
+        agent = obs.agent_id
+        if agent in self._last_pos:
+            self._odometer[agent] += likelihood_functions.straight_line_cost(self._last_pos[agent], pos)
+        else:
+            self._odometer[agent] = 0.0
+        self._last_pos[agent] = pos
+        odo = self._odometer[agent]
 
         unnorm: Dict[str, float] = {}
         for hyp in self._hypotheses:
@@ -429,6 +459,7 @@ class IntentionRecognizer:
                 self._base.pop(key, None)
                 self._expected.pop(key, None)
                 self._origin.pop(key, None)
+                self._origin_odo.pop(key, None)
                 logging.info("[IR-complete] step=%d %s completed: %s holds",
                              int(obs.timestamp), key, actions[-1].completion_predicate)
                 continue
@@ -436,26 +467,30 @@ class IntentionRecognizer:
 
             if key not in self._expected:
                 # First observation of this hypothesis: it enters its current
-                # action here. No chord yet.
-                self._expected[key], self._origin[key] = current, pos
-                unnorm[key] = self._base[key]
+                # action here. Nothing walked yet: the perfect-fit value.
+                self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
+                unnorm[key] = self._base[key] * likelihood_functions.PERFECT_FIT_LIKELIHOOD
                 continue
 
             previous = self._expected[key]
             if previous is not None and self._in_vocabulary(previous, mu):
                 self._base[key] *= self._completion_likelihood(previous, world, memo)
             if not self._same_action(previous, current):
-                self._base[key] *= self._progress_likelihood(previous, self._origin[key], pos, world, memo)
-                self._expected[key], self._origin[key] = current, pos
-                chord = NEUTRAL_LIKELIHOOD
+                self._base[key] *= self._progress_likelihood(
+                    previous, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
+                self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
+                # The new action is entered here: zero excess by construction.
+                value = likelihood_functions.PERFECT_FIT_LIKELIHOOD
             else:
-                chord = self._progress_likelihood(current, self._origin[key], pos, world, memo)
-            unnorm[key] = self._base[key] * chord
-        unnorm[UNKNOWN] = self._base[UNKNOWN] * NEUTRAL_LIKELIHOOD
+                value = self._progress_likelihood(
+                    current, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
+            unnorm[key] = self._base[key] * value
+        unnorm[UNKNOWN] = self._base[UNKNOWN] * likelihood_functions.UNKNOWN_LIKELIHOOD
 
-        # One normalization, at the task layer. The bases are rescaled by the
-        # same total so they stay in one scale with each other (ratios are
-        # untouched) and so that evidence == base × open chord exactly.
+        # One normalization, at the task layer, over the live keys AND unknown.
+        # The bases are rescaled by the same total so they stay in one scale
+        # with each other (ratios are untouched) and so that
+        # evidence == base × open value exactly.
         total = sum(unnorm.values()) or 1.0
         for key in self._base:
             self._base[key] /= total
@@ -585,13 +620,14 @@ class IntentionRecognizer:
         """
         Completion channel: the observed microaction is in `action`'s
         vocabulary, so the question is whether the action's grounded completion
-        predicate (the planner's) now holds — HIGH or LOW. No predicate
-        (ProcessCompletion) → nothing to observe → NEUTRAL. Memoised by the
-        predicate: two hypotheses expecting the same completion share one value.
+        predicate (the planner's) now holds — the detector's hit rate or its
+        false-alarm rate. No predicate (ProcessCompletion) → nothing to judge →
+        the multiplicative identity. Memoised by the predicate: two hypotheses
+        expecting the same completion share one value.
         """
         predicate = action.completion_predicate
         if predicate is None:
-            return NEUTRAL_LIKELIHOOD
+            return 1.0
         key = ("completion", predicate)
         if key not in memo:
             memo[key] = likelihood_functions.completion_predicate_likelihood(
@@ -599,43 +635,43 @@ class IntentionRecognizer:
             )
         return memo[key]
 
-    @staticmethod
     def _progress_likelihood(
+        self,
         action: Optional[GroundedAction],
         origin: Tuple[float, float],
+        walked: float,
         pos: Tuple[float, float],
         world: WorldState,
         memo: Dict[tuple, float],
     ) -> float:
         """
         Progress channel: delegate to the evaluator named by
-        action.schema.progress_evaluator with the chord from `origin` (where
-        the hypothesis entered this action) to `pos`, against the target's
-        current position (shared/target_resolution.py, the lookup the projector
-        uses). The heading is compared with the bearing FROM THE ORIGIN, not
-        from the current position: a τ-walker would have gone straight from
-        where it began; a passed target's swinging bearing must not re-import
-        accumulation one step at a time. A zero chord (the agent has not moved
-        since the origin was set) is NEUTRAL inside the kernel.
+        action.schema.progress_evaluator with the distance `walked` since
+        `origin` (where the hypothesis entered this action), the agent's
+        position, the target's current position (shared/target_resolution.py,
+        the lookup the projector uses) and the injected path cost. The excess
+        is measured FROM THE ORIGIN, not tick to tick: a τ-walker would have
+        gone straight from where it began, and a passed target must not
+        re-import accumulation one step at a time.
 
-        NEUTRAL when there is no action, no evaluator (pick_up, place, wait_at:
-        no graded in-progress signal) or no resolvable target. Memoised by
-        (evaluator, origin, target position): two hypotheses whose expected
-        actions head for the same place from the same origin — two items on one
-        shelf — share one value.
+        The perfect-fit value when there is no action, no evaluator (pick_up,
+        place, wait_at: no graded in-progress signal) or no resolvable target.
+        Memoised by (evaluator, origin, walked, target position): two
+        hypotheses whose expected actions head for the same place from the
+        same origin at the same odometer reading — two items on one shelf —
+        share one value; two that share a position but not the reading do not.
         """
         if action is None:
-            return NEUTRAL_LIKELIHOOD
+            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
         evaluator = likelihood_functions.PROGRESS_EVALUATORS.get(action.schema.progress_evaluator)
         if evaluator is None:
-            return NEUTRAL_LIKELIHOOD
+            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
         target_pos = movement_target_position(action, world)
         if target_pos is None:
-            return NEUTRAL_LIKELIHOOD
-        key = ("progress", action.schema.progress_evaluator, origin, target_pos)
+            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
+        key = ("progress", action.schema.progress_evaluator, origin, walked, target_pos)
         if key not in memo:
-            move_vec = (pos[0] - origin[0], pos[1] - origin[1])
-            memo[key] = evaluator(move_vec, origin, target_pos)
+            memo[key] = evaluator(walked, origin, pos, target_pos, self._path_cost)
         return memo[key]
 
     def _grounded_actions(
@@ -654,7 +690,7 @@ class IntentionRecognizer:
         None when the planner cannot decompose hyp here (DecompositionError:
         no applicable method, a derived var without a value). That is a fact
         about this hypothesis in this world, not an error in the recognizer,
-        and the hypothesis is scored NEUTRAL; it is logged once per episode so
+        and the hypothesis is scored at the perfect-fit value (nothing to charge); it is logged once per episode so
         that a hypothesis that can never be scored is visible in the log
         rather than indistinguishable from one that is merely uninformative.
         Schema errors (unbound variable, unknown lookup) propagate: a domain
@@ -671,7 +707,7 @@ class IntentionRecognizer:
             actions = None
             if key not in self._undecomposable:
                 self._undecomposable.add(key)
-                logging.warning("[recognizer] %s not decomposable for %s, scored NEUTRAL: %s",
+                logging.warning("[recognizer] %s not decomposable for %s, scored perfect-fit: %s",
                                 key, agent_id, e)
         self._tick_actions[key] = actions
         return actions

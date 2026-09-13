@@ -3,12 +3,80 @@ shared/likelihood_functions.py
 
 PURPOSE:
     Pure, domain-agnostic likelihood functions for Bayesian intention recognition.
-    No knowledge of tasks, items, zones, or simulators — only vector math and
+    No knowledge of tasks, items, zones, or simulators — only distances and
     predicate membership tests over plain symbolic inputs.
 
     recognizer.py resolves WHAT to check (which predicate, which target position,
     which evaluator) from domain knowledge (ActionSchema fields). This module only
     answers HOW LIKELY a given observation is, given already-resolved inputs.
+
+THE EVIDENCE MODEL (I4):
+    Every constant here has a physical meaning; nothing is a tuning knob without
+    one. The recognizer's belief depends on exactly these, plus the world-state
+    builder's proximity threshold (which decides when at(agent, object) holds,
+    hence when phases advance — not a likelihood constant, but load-bearing).
+
+    Movement — the excess-path likelihood (Masters & Sardina's costdif, IJCAI-18,
+    with the logistic of Ramírez & Geffner's RG2). For a hypothesis whose
+    expected action is located at g, measured from the ORIGIN where it began
+    expecting that action:
+        excess = walked + C(pos, g) - C(origin, g)
+        L      = 2 / (1 + exp(BETA * excess))     — the logistic, normalised
+                 so that L = 1 at zero excess (see PERFECT_FIT_LIKELIHOOD)
+    `walked` is the odometer distance since the origin; C is a path cost —
+    straight-line by default (Mesa agents walk through obstacles, so observed
+    paths ARE straight lines), injectable for a domain that has something
+    better. `excess` is the WASTED distance under the hypothesis: how much
+    further the agent has walked than a perfectly efficient walk from the
+    origin to g would have required. Walk straight at g and it stays at 0;
+    walk away and it grows with every step — direction and distance in one
+    quantity. It is recomputed from the origin every tick and REPLACES the
+    previous value: twenty ticks of one walk are one observation, counted once.
+    The `walked` term is kept deliberately (costdif2 drops it, preserving the
+    ranking but not the values — and the meta-planner's θ gate reads values).
+    The logistic is bounded and behaves when excess is negative (a moving
+    target can produce it): (0, 2) after the normalisation, (0, 1] for any
+    excess ≥ 0.
+
+    BETA — detour tolerance, per cm: how much wasted path makes a target
+    implausible. 1/BETA is the excess at which the likelihood has fallen to
+    ≈ 0.27 (from 0.5 at zero excess). Absolute units make it layout-scale
+    dependent (the same defect recorded for min_safe_distance, TODO-28); the
+    fractional form (excess as a fraction of C(origin, g)) was measured against
+    it in the I4 sweep — see analysis/i4_evidence_model/REPORT.md.
+
+    PERFECT_FIT_LIKELIHOOD — the value at zero excess, 1.0: the multiplicative
+    identity, so that a phase with no wasted path folds NOTHING into the
+    evidence when it closes and a phase advance is continuous (with the raw
+    logistic, 0.5 at zero excess, every advance halved the evidence of a
+    hypothesis that had done nothing wrong — measured as a 0.83 → 0.71 drop at
+    the grasp tick of s40's positive control, I4 report §1). Also the value of a
+    tick that offers nothing to charge: the expected action has no location or
+    no graded signal (pick_up, place, wait_at: the agent is within reach of the
+    action's location, or the walk would have regressed to the approach).
+
+    UNKNOWN_LIKELIHOOD — the constant likelihood of every observation under
+    `unknown`. It is the threshold separating "fits badly enough to be called
+    unexplained" from "fits well enough to be a real hypothesis": walk toward
+    something no task targets, every hypothesis's excess grows and its
+    likelihood falls, `unknown`'s does not move, and `unknown` wins. It is also
+    the CEILING on confidence — with one hypothesis fitting perfectly and every
+    rival refuted, the best reachable confidence is 1 / (1 + UNKNOWN_LIKELIHOOD).
+
+    Completion — a detection-reliability model. The observed microaction is in
+    the expected action's vocabulary (GRASP for pick_up), so the question is
+    how much more likely that signal is when the action really completed than
+    when it did not: P(signal | completed) = DETECTION_HIT_RATE,
+    P(signal | not completed) = DETECTION_FALSE_ALARM_RATE. These describe a
+    detector, not a preference. In Mesa the simulator's report IS the ground
+    truth: every completion is reported (hit rate 1.0) and no signal arrives
+    without one — the false-alarm rate is kept at a small non-zero value only
+    so that a refuted hypothesis retains a recoverable base (the same reason
+    BELIEF_FLOOR exists), and its exact value is not load-bearing in any
+    measured condition (no two hypotheses ever expect a grasp at the same tick
+    in the current layouts). A real cell's grasp detector misses and misfires;
+    set these from its measured rates. A completion is an event at a moment: it
+    MULTIPLIES onto the hypothesis's evidence, unlike the movement value.
 
 DISPATCH:
     recognizer.py selects a progress evaluator by NAME (ActionSchema.progress_evaluator),
@@ -19,22 +87,70 @@ DISPATCH:
 """
 
 import math
-from typing import Dict, Optional, Tuple, Callable
+from typing import Callable, Dict, Optional, Tuple
 
 from shared.types import Predicate
 
-
-# =============================================================================
-# Likelihood constants
-# (single source of truth — recognizer.py imports these, does not redefine them)
-# =============================================================================
-HIGH_LIKELIHOOD    = 4.0   # strong directional alignment or confirmed completion
-LOW_LIKELIHOOD     = 0.1   # misaligned direction or completion predicate absent
-NEUTRAL_LIKELIHOOD = 1.0   # uninformative observation
+Position = Tuple[float, float]
+PathCost = Callable[[Position, Position], float]
 
 
 # =============================================================================
-# Completion-predicate likelihood
+# The parameter set (single source of truth — recognizer.py reads these through
+# the module, never redefines them)
+# =============================================================================
+BETA                       = 0.01    # detour tolerance, 1/cm (excess of 100 cm → L ≈ 0.54)
+UNKNOWN_LIKELIHOOD         = 0.1     # constant likelihood under `unknown`; ceiling 1/(1+u)
+DETECTION_HIT_RATE         = 1.0     # P(signal | completed): Mesa reports every completion
+DETECTION_FALSE_ALARM_RATE = 1e-3    # P(signal | not completed): none in Mesa; non-zero for recoverability
+
+
+# =============================================================================
+# Path cost — straight-line default, injectable
+# =============================================================================
+
+def straight_line_cost(a: Position, b: Position) -> float:
+    """Euclidean distance. The default C(a, b): a distance, not a path."""
+    return math.hypot(b[0] - a[0], b[1] - a[1])
+
+
+# =============================================================================
+# Movement — excess-path likelihood
+# =============================================================================
+
+def logistic_of_excess(excess: float, beta: Optional[float] = None) -> float:
+    """2 / (1 + exp(beta · excess)): 1 at zero excess, → 0 as the excess
+    grows, → 2 for a (moving-target) negative excess."""
+    b = BETA if beta is None else beta
+    x = b * excess
+    if x > 700.0:                      # exp overflow guard; the value is 0 to double precision
+        return 0.0
+    return 2.0 / (1.0 + math.exp(x))
+
+
+PERFECT_FIT_LIKELIHOOD = logistic_of_excess(0.0)    # 1.0: nothing to charge
+
+
+def excess_path_likelihood(
+    walked: float,
+    origin: Position,
+    pos: Position,
+    target_pos: Position,
+    cost: PathCost = straight_line_cost,
+) -> float:
+    """
+    Excess-path likelihood of the movement observed since `origin` under an
+    action located at `target_pos`: the agent has walked `walked` (odometer
+    since the origin) and is now at `pos`; a perfectly efficient walk would
+    have cost C(origin, target). Registered as "excess_path"; applies to any
+    action schema with progress_evaluator="excess_path" (currently: move_to).
+    """
+    excess = walked + cost(pos, target_pos) - cost(origin, target_pos)
+    return logistic_of_excess(excess)
+
+
+# =============================================================================
+# Completion — detection reliability
 # =============================================================================
 
 def completion_predicate_likelihood(
@@ -42,56 +158,13 @@ def completion_predicate_likelihood(
     world_predicates: frozenset,
 ) -> float:
     """
-    Generic completion check: does the given (already-resolved) predicate
-    currently hold in the world?
-
-    Used for any action whose ActionSchema.completion is a ConditionSchema
-    (pick_up → holding, place → obj_at, scan_it → scanned, ...). The caller
-    (recognizer) is responsible for resolving the schema's completion
-    ConditionSchema into a concrete Predicate using the hypothesis's bindings —
-    this function only tests set membership.
+    Likelihood of the observed completion signal: the detector's hit rate if
+    the action's (already-resolved) completion predicate holds in the world,
+    its false-alarm rate if it does not. The caller (recognizer) resolves the
+    schema's completion ConditionSchema into a concrete Predicate through the
+    planner — this function only tests set membership.
     """
-    return HIGH_LIKELIHOOD if predicate in world_predicates else LOW_LIKELIHOOD
-
-
-# =============================================================================
-# Directional (movement) progress likelihood
-# =============================================================================
-
-def direction_consistency_likelihood(
-    move_vec: Tuple[float, float],
-    origin: Tuple[float, float],
-    target_pos: Tuple[float, float],
-) -> float:
-    """
-    Cosine-similarity trajectory-consistency check.
-
-    Scores how consistent an observed movement vector is with heading toward
-    target_pos from `origin` — the point the movement began at. The recognizer
-    passes the start of the current movement leg, so move_vec is the leg's
-    chord and the bearing is measured from where the leg started (see
-    recognizer._progress_likelihood). Mapped linearly from cosine similarity
-    [-1, 1] to [LOW_LIKELIHOOD, HIGH_LIKELIHOOD].
-
-    Registered as "directional" in PROGRESS_EVALUATORS. Applies to any action
-    schema with progress_evaluator="directional" (currently: move_to).
-
-    Returns NEUTRAL_LIKELIHOOD if the agent isn't moving (move_vec ~ 0) —
-    no directional evidence available. Returns HIGH_LIKELIHOOD if already
-    at the target (target_vec ~ 0) — trivially consistent.
-    """
-    move_norm = math.sqrt(move_vec[0] ** 2 + move_vec[1] ** 2)
-    if move_norm < 1e-6:
-        return NEUTRAL_LIKELIHOOD  # not moving — no directional evidence
-
-    to_target = (target_pos[0] - origin[0], target_pos[1] - origin[1])
-    target_norm = math.sqrt(to_target[0] ** 2 + to_target[1] ** 2)
-    if target_norm < 1e-6:
-        return HIGH_LIKELIHOOD  # already at target
-
-    cosine = (move_vec[0] * to_target[0] + move_vec[1] * to_target[1]) / (move_norm * target_norm)
-
-    return LOW_LIKELIHOOD + (cosine + 1.0) / 2.0 * (HIGH_LIKELIHOOD - LOW_LIKELIHOOD)
+    return DETECTION_HIT_RATE if predicate in world_predicates else DETECTION_FALSE_ALARM_RATE
 
 
 # =============================================================================
@@ -99,6 +172,6 @@ def direction_consistency_likelihood(
 # =============================================================================
 
 PROGRESS_EVALUATORS: Dict[str, Callable[..., float]] = {
-    "directional": direction_consistency_likelihood,
+    "excess_path": excess_path_likelihood,
     # Future: "duration": duration_consistency_likelihood,  (for wait_at-style actions)
 }
