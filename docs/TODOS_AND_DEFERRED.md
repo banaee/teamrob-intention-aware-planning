@@ -1215,7 +1215,15 @@ correctly before the crash.
 Files: shared/meta_planner.py
 Reference: I1 audit O1; I2 IR foundations session
 
-**TODO-53 — A hypothesis whose expected action never completes is judged by one chord from t=0**
+**TODO-53 — A hypothesis whose expected action never completes is judged by one chord from t=0** ✅ RESOLVED (I4) — and inverted; see TODO-57
+Resolved by the excess-path likelihood: the stuck-origin hypothesis is charged for its whole path
+(`ac_activation` in s40: 2373 cm of excess at 118, 5664 at 331; `most_likely` for 0 ticks of 184–271,
+was 88 at 0.45–0.69; 0.001 at item_6's grasp, was 0.48–0.53). The same mechanism now OVER-charges every
+task the observed agent has not started yet: `coffee_break`'s origin is the priming tick, so it enters
+its own walk with 2144 cm of excess that its efficient walk never reduces. The alternative named
+below — an origin reset on the observed agent's task boundary — was measured as the analysis-only
+variant `reset_origin` (coffee 0.90, θ at 125, both prior settings) and is now TODO-57.
+Original text:
 Under the phase model the origin moves only when the expected action changes. A hypothesis whose
 first action is never completed by the observed agent (`ac_activation` in s40; every
 `deliver_item` the human never starts, until a shared completion such as `at(human, shelf_X)` flips
@@ -1279,6 +1287,28 @@ Files: shared/recognizer.py, shared/planner.py (method on the grounded output, f
 domains/kitting/tasks.py (for (e))
 Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §5, §8
 
+RE-MEASURED after I4 (β = 0.01, u = 0.1; `analysis/i4_evidence_model/REPORT.md` §8), no reading chosen:
+- (a) as is: the rival's charge per task is two permanent folds, the first approach at its final
+  excess and the carry phase's `move_to(shelf_X)` at its final excess — s00_on item_2 ×1.1e-5 then
+  ×≈3e-6, s30_on item_7 ×0.006 then ×≈8e-6, s40 item_6 ×3e-9 then ×1e-9 (was ≈ ×0.1 per carry). Next-task
+  reveals: NEVER, in all eight conditions (I3: at the grasp). `unknown` holds 0.995 from the first
+  release. The approach after a release is not decisive before the grasp — it is not decisive at all —
+  so by the criterion written above (a) does not stand.
+- (c) `ownshelf`: identical to (a) — never, in all eight (s20_off 32 vs 31). The rival's t=0 origin
+  then accumulates the whole first task as one excess (2358 cm at the release for s40's item_6). The
+  carry-method charge (TODO-51) is no longer the binding one; (c) is out.
+- (b) prior reset on the observed agent's task completion, measured as `reset_boundary` (origins and
+  evidence state reset to uniform at every retirement): next-task reveals PRE-GRASP prior-on — s00_on 80
+  (grasp 111), s20_on 56 (89), s30_on 76 (98) — and 117/96/96 prior-off (post-grasp in s00/s20), with
+  three wrong crossings prior-off (s20_off item_7 136, s30_off item_6 156, s40_off ac 376), all on a
+  reset fired by the ROBOT's completion while the human idles, and TODO-52's crash in s20_off at 142.
+  Works when the boundary is the human's; needs a boundary the recognizer can attribute to the
+  observed agent (TODO-57).
+- (d), (e): not measured (changes outside the recognizer).
+Remaining candidates: (b), (d), (e). The evidence that separates them: whether the first approach
+after a release should carry the previous task's refutation at all ((b) says no; (d) says only until
+the method re-selects; (e) says the method is wrong). Decide together with TODO-57.
+
 **TODO-56 — The completion channel's gate is the old model's, and it is a decision**
 I3 judges an event only against expected actions whose vocabulary declares it (GRASP → `pick_up`),
 leaving movement actions NEUTRAL at a grasp as before. The other reading — every expected action
@@ -1289,6 +1319,52 @@ crossing in any condition. The asymmetry is `unknown`'s flat likelihood, not the
 `unknown` a likelihood of its own, revisit the gate with it.
 Files: shared/recognizer.py (`_in_vocabulary`)
 Reference: I3 phase-model session; analysis/i3_phase_model/summary.md
+
+RE-CHECKED under I4's constants (variant `ungated`, `analysis/i4_evidence_model/REPORT.md` §7): the
+`unknown` sweep does not occur — `unknown`'s likelihood is a per-tick constant never multiplied into
+its base, while the false-alarm rate (1e-3) multiplies into the rivals'. Crossings identical to the
+gated code in seven of eight conditions; s20_off's reveal moves from 31 to 22, the grasp tick (the two
+on-path decoys the approach cannot separate are charged at the grasp). The measurement no longer
+rejects the ungated reading; it favours it slightly (one earlier reveal, no cost). Note also that under
+the gate a grasp is no longer evidence at all (hit rate 1.0 against unjudged rivals at 1.0): if a
+grasp-tick reveal is wanted, the ungated reading is the mechanism, not a constant. Decision open on
+the generative argument (a walker does not emit GRASP); the gate stays until it is taken.
+
+**TODO-57 — What a task boundary is to the recognizer (origin and evidence across the observed agent's completions)** [DESIGN DECISION — the open problem I4 leaves]
+The excess-path likelihood is correct within a task and blind to the observed agent finishing one task
+and starting another: a hypothesis the agent has not started keeps its priming-tick origin (coffee in
+s40 enters its own walk 2144 cm in the red), and every phase a rival lost is folded permanently
+(item_6 carries ×3e-9 × 1e-9 into segment 2). Both are right for a fixed intention and wrong for a
+sequence of them; no β, u pair reconciles the first-task and later-task requirements (they are a
+factor ≥ 5 apart in β — `analysis/i4_evidence_model/REPORT.md` §4.2). Two analysis-only what-ifs
+isolate the halves: `reset_origin` (every live origin moves to the agent at a retirement) gives
+`coffee_break` 0.90 in both prior settings by the intended chain and leaves item_6 buried;
+`reset_boundary` (origins + evidence state to uniform) also gives item_6 0.47 → 0.79 while the human
+heads at shelf_6, 0.80 → 0.08 after the turn, 0.82 at its own grasp prior-off, and pre-grasp next-task
+reveals prior-on. Neither is shipped. Open questions: (1) which event is the boundary — a retirement
+fires on the robot's completions too (prior-off: s40 145/243/376, s20 52/136, s30 86/156, s00
+31/93/166) and s40's waypoint stops retire nothing; the recognizer-side signal is a terminal completion
+that held on a tick where the observed agent's own microaction was in the terminal action's
+vocabulary (RELEASE → `place`; `waited(human, ·)` names the agent); (2) reset origins only, or the
+evidence state too (TODO-55 (b)); (3) what happens at an unmodelled boundary (segment 3 → 4: item_6's
+539 cm of segment-3 excess is never reset, so it stays at 0.08 through its own approach prior-on).
+Constraints inherited from I2–I4: no global leg closed by the body's `stand`, no decay, no factor;
+a boundary is an event, and an event is allowed to multiply and to move origins.
+Files: shared/recognizer.py (`update`: retirement branch, `_origin`, `_origin_odo`, `_base`)
+Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.2, §6, §10
+
+**TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
+`BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
+(TODO-28's class of defect). The fractional reading — excess as a fraction of C(origin, target) — was
+measured and rejected: its reference length goes to zero at every origin that sits near its target
+(every `deliver_with_return` carry phase, every regress at the 30 cm proximity threshold), so a 100 cm
+excess there is an infinite detour, and where it produced coffee crossings it did so by coffee having
+the longest direct distance among the stuck-origin hypotheses (s30's first task then reveals after its
+grasp). A scale-invariant form would normalise by a layout-level length (workspace diagonal, mean
+inter-target distance), which `WorldState` does not carry. Also load-bearing and in cm:
+PROXIMITY_THRESHOLD (30) sets the geometric slop β must tolerate (×0.85 at β = 0.01).
+Files: shared/likelihood_functions.py (`BETA`), mesa_sim/world_state_builder.py (`PROXIMITY_THRESHOLD`)
+Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.3
 
 ---
 

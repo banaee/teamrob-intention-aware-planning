@@ -1,0 +1,26 @@
+ticks: base 160 new 160  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.481 dist=d(item_3)=0.481 d(item_7)=0.468 unknown=0.048 d(item_2)=0.001 d(item_4)=0.001 d(item_6)=0.001
+t=0 new: most_likely=d(item_3) conf=0.481 dist=d(item_3)=0.481 d(item_7)=0.468 unknown=0.048 d(item_2)=0.001 d(item_4)=0.001 d(item_6)=0.001
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-41: identical
+  t=42-42 human@start deliver_item/move_to/step:
+      d(item_7)    max Δ=+0.001 at t=42 (0.004 → 0.005)
+  t=43-45 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=-0.002 at t=44 (0.904 → 0.902)
+      d(item_7)    max Δ=+0.002 at t=43 (0.003 → 0.005)
+  t=46-52 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=-0.002 at t=46 (0.905 → 0.903)
+      d(item_7)    max Δ=+0.003 at t=46 (0.001 → 0.004)
+      unknown      max Δ=-0.001 at t=46 (0.091 → 0.090)
+  t=53-54 human@start deliver_item/move_to/step:
+      d(item_7)    max Δ=+0.001 at t=53 (0.001 → 0.002)
+      unknown      max Δ=-0.001 at t=53 (0.091 → 0.090)
+  t=55-159: identical
+
+== meta lines ==
+  -[meta-proj] confidence=0.905 theta=0.750 projection=built
+  +[meta-proj] confidence=0.903 theta=0.750 projection=built

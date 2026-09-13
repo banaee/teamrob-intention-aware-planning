@@ -1,0 +1,34 @@
+ticks: base 169 new 169  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+t=0 new: most_likely=d(item_3) conf=0.200 dist=d(item_3)=0.200 d(item_6)=0.199 d(item_7)=0.197 d(item_4)=0.194 d(item_2)=0.189 unknown=0.020
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-42: identical
+  t=43-43 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.010 at t=43 (0.760 → 0.770)
+      d(item_6)    max Δ=-0.012 at t=43 (0.162 → 0.150)
+      unknown      max Δ=+0.001 at t=43 (0.076 → 0.077)
+  t=44-44 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=-0.003 at t=44 (0.784 → 0.781)
+      d(item_6)    max Δ=+0.004 at t=44 (0.134 → 0.138)
+  t=45-55 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=-0.035 at t=48 (0.866 → 0.831)
+      d(item_6)    max Δ=+0.039 at t=48 (0.044 → 0.083)
+      unknown      max Δ=-0.004 at t=48 (0.087 → 0.083)
+  t=56-56 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=-0.007 at t=56 (0.904 → 0.897)
+      d(item_6)    max Δ=+0.009 at t=56 (0.002 → 0.011)
+  t=57-60 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=-0.006 at t=57 (0.905 → 0.899)
+      d(item_6)    max Δ=+0.007 at t=57 (0.001 → 0.008)
+      unknown      max Δ=-0.001 at t=57 (0.091 → 0.090)
+  t=61-61 human@start deliver_item/move_to/step:
+      d(item_6)    max Δ=+0.001 at t=61 (0.001 → 0.002)
+      unknown      max Δ=-0.001 at t=61 (0.091 → 0.090)
+  t=62-168: identical
+
+== meta lines ==
+  identical

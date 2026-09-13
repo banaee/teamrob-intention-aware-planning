@@ -1,0 +1,69 @@
+ticks: base 200 new 200  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.206 dist=d(item_3)=0.206 d(item_6)=0.206 d(item_4)=0.205 d(item_7)=0.185 d(item_2)=0.178 unknown=0.021
+t=0 new: most_likely=d(item_3) conf=0.205 dist=d(item_3)=0.205 d(item_6)=0.205 d(item_4)=0.205 d(item_7)=0.186 d(item_2)=0.180 unknown=0.019
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-0 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.002 at t=0 (0.178 → 0.180)
+      d(item_3)    max Δ=-0.001 at t=0 (0.206 → 0.205)
+      d(item_6)    max Δ=-0.001 at t=0 (0.206 → 0.205)
+      d(item_7)    max Δ=+0.001 at t=0 (0.185 → 0.186)
+      unknown      max Δ=-0.002 at t=0 (0.021 → 0.019)
+  t=1-40 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.046 at t=8 (0.032 → 0.078)
+      d(item_3)    max Δ=-0.134 at t=31 (0.771 → 0.637)
+      d(item_4)    max Δ=+0.090 at t=31 (0.064 → 0.154)
+      d(item_6)    max Δ=+0.075 at t=32 (0.062 → 0.137)
+      d(item_7)    max Δ=+0.079 at t=12 (0.024 → 0.103)
+      unknown      max Δ=-0.067 at t=38 (0.090 → 0.023)
+  t=41-47 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.048 at t=47 (0.905 → 0.953)
+      d(item_4)    max Δ=+0.030 at t=41 (0.001 → 0.031)
+      d(item_6)    max Δ=+0.029 at t=41 (0.002 → 0.031)
+      d(item_7)    max Δ=+0.004 at t=41 (0.001 → 0.005)
+      unknown      max Δ=-0.067 at t=42 (0.091 → 0.024)
+  t=48-51 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.059 at t=51 (0.905 → 0.964)
+      d(item_4)    max Δ=+0.007 at t=48 (0.001 → 0.008)
+      d(item_6)    max Δ=+0.007 at t=48 (0.001 → 0.008)
+      unknown      max Δ=-0.067 at t=48 (0.091 → 0.024)
+  t=52-53 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.064 at t=52 (0.905 → 0.969)
+      d(item_6)    max Δ=+0.003 at t=52 (0.001 → 0.004)
+      unknown      max Δ=-0.066 at t=52 (0.091 → 0.025)
+  t=54-111 human@start deliver_item/place/release:
+      d(item_2)    max Δ=+0.024 at t=107 (0.001 → 0.025)
+      d(item_6)    max Δ=+0.134 at t=62 (0.001 → 0.135)
+      d(item_7)    max Δ=+0.044 at t=84 (0.001 → 0.045)
+      unknown      max Δ=-0.179 at t=67 (0.995 → 0.816)
+  t=112-114 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.024 at t=112 (0.001 → 0.025)
+      d(item_6)    max Δ=+0.001 at t=112 (0.001 → 0.002)
+      unknown      max Δ=-0.026 at t=112 (0.995 → 0.969)
+  t=115-121 human@start deliver_item/move_to/step:
+      d(item_2)    max Δ=+0.025 at t=116 (0.001 → 0.026)
+      unknown      max Δ=-0.025 at t=115 (0.995 → 0.970)
+  t=122-199: identical
+
+== meta lines ==
+  -[meta-proj] confidence=0.206 theta=0.750 projection=none(below_theta)
+  +[meta-proj] confidence=0.205 theta=0.750 projection=none(below_theta)
+  -[meta-proj] confidence=0.363 theta=0.750 projection=none(below_theta)
+  +[meta-proj] confidence=0.307 theta=0.750 projection=none(below_theta)
+  -[meta-proj] confidence=0.771 theta=0.750 projection=built
+  -[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=21 feasible=True conflicts=431 min_dist=5.906133984370924
+  -[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=65 feasible=True conflicts=453 min_dist=131.1578853283411
+  -[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=95 feasible=True conflicts=460 min_dist=131.1578853283411
+  -[meta] step=31 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  -[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  +[meta-proj] confidence=0.752 theta=0.750 projection=built
+  +[meta-cand] deliver_item(?item=item_4,?kitting_table=kitting_table_0) cost=18 feasible=True conflicts=371 min_dist=5.90613398437092
+  +[meta-cand] deliver_item(?item=item_6,?kitting_table=kitting_table_0) cost=68 feasible=True conflicts=400 min_dist=112.81381165415337
+  +[meta-cand] deliver_item(?item=item_7,?kitting_table=kitting_table_0) cost=98 feasible=True conflicts=400 min_dist=112.81381165415337
+  +[meta] step=34 trigger=theta_crossed winner=deliver_item{'?item': 'item_4', '?kitting_table': 'kitting_table_0'} queue=["deliver_item{'?item': 'item_6', '?kitting_table': 'kitting_table_0'}", "deliver_item{'?item': 'item_7', '?kitting_table': 'kitting_table_0'}"]
+  +[meta-proj] confidence=0.843 theta=0.750 projection=none(unresolved)
+  -[meta-proj] confidence=0.995 theta=0.750 projection=none(unresolved)
+  +[meta-proj] confidence=0.906 theta=0.750 projection=none(unresolved)

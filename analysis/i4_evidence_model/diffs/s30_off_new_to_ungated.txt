@@ -1,0 +1,22 @@
+ticks: base 159 new 159  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.201 dist=d(item_3)=0.201 d(item_4)=0.198 d(item_7)=0.195 d(item_2)=0.194 d(item_6)=0.192 unknown=0.020
+t=0 new: most_likely=d(item_3) conf=0.201 dist=d(item_3)=0.201 d(item_4)=0.198 d(item_7)=0.195 d(item_2)=0.194 d(item_6)=0.192 unknown=0.020
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-38: identical
+  t=39-45 human@start deliver_item/pick_up/grasp:
+      d(item_3)    max Δ=+0.010 at t=39 (0.895 → 0.905)
+      d(item_4)    max Δ=-0.007 at t=39 (0.008 → 0.001)
+      d(item_7)    max Δ=-0.004 at t=39 (0.005 → 0.001)
+      unknown      max Δ=+0.002 at t=39 (0.089 → 0.091)
+  t=46-46 human@start deliver_item/move_to/step:
+      d(item_3)    max Δ=+0.001 at t=46 (0.904 → 0.905)
+      d(item_4)    max Δ=-0.001 at t=46 (0.002 → 0.001)
+      unknown      max Δ=+0.001 at t=46 (0.090 → 0.091)
+  t=47-158: identical
+
+== meta lines ==
+  identical

@@ -1,0 +1,148 @@
+beta,unknown,condition,crossings,n_cross,n_wrong_cross,wrong_theta_ticks,wrong_theta_task_ticks,correct_theta_ticks,max_conf,reveals,unknown_when_idle,coffee_max_seg2,coffee_theta_ticks_seg2,deliver_max_seg2,item6_3a_end,item6_3b_start_end,item6_3b_falls,max_task_seg3,unknown_end_seg3,ac_max_184_271,ac_most_likely_ticks_184_271,at_272
+0.001,0.01,s40_on,,0,0,0,0,0,0.687,d(item_3):never(max 0.69) coffee:never(max 0.66) d(item_6):never(max 0.63),0.357,0.657,0,0.384,0.431,0.431->0.463,False,0.519,0.161,0.519,29,d(item_6) 0.555 (item_6 0.555)
+0.001,0.01,s30_on,74:d(item_7)!,1,1,4,2,81,0.995,"d(item_3):never(max 0.75) d(item_7):76(pre-grasp,grasp 98)",0.995,,,,,,,,,,,
+0.001,0.01,s00_on,59:d(item_3),1,0,4,2,106,0.995,"d(item_3):59(post-grasp,grasp 41) d(item_2):80(pre-grasp,grasp 111)",0.995,,,,,,,,,,,
+0.001,0.02,s40_on,,0,0,0,0,0,0.739,d(item_3):never(max 0.68) coffee:never(max 0.64) d(item_6):never(max 0.51),0.478,0.637,0,0.351,0.391,0.391->0.399,False,0.475,0.278,0.475,29,d(item_6) 0.465 (item_6 0.465)
+0.001,0.02,s30_on,74:d(item_7)!,1,1,4,2,81,0.995,"d(item_3):never(max 0.74) d(item_7):76(pre-grasp,grasp 98)",0.995,,,,,,,,,,,
+0.001,0.02,s00_on,61:d(item_3),1,0,4,2,104,0.995,"d(item_3):61(post-grasp,grasp 41) d(item_2):80(pre-grasp,grasp 111)",0.995,,,,,,,,,,,
+0.001,0.05,s40_on,331:unknown!,1,1,2,0,46,0.873,d(item_3):never(max 0.67) coffee:never(max 0.58) d(item_6):never(max 0.33),0.638,0.584,0,0.28,0.305,0.305->0.281,True,0.379,0.489,0.379,14,unknown 0.544 (item_6 0.312)
+0.001,0.05,s30_on,74:d(item_7)!,1,1,4,2,81,0.995,"d(item_3):never(max 0.73) d(item_7):76(pre-grasp,grasp 98)",0.995,,,,,,,,,,,
+0.001,0.05,s00_on,64:d(item_3),1,0,4,2,101,0.995,"d(item_3):64(post-grasp,grasp 41) d(item_2):80(pre-grasp,grasp 111)",0.995,,,,,,,,,,,
+0.001,0.1,s40_on,331:unknown!,1,1,2,0,46,0.93,d(item_3):never(max 0.65) coffee:never(max 0.51) d(item_6):never(max 0.21),0.749,0.512,0,0.209,0.223,0.223->0.188,True,0.283,0.656,0.283,0,unknown 0.703 (item_6 0.202)
+0.001,0.1,s30_on,74:d(item_7)!,1,1,4,2,81,0.995,"d(item_3):never(max 0.70) d(item_7):76(pre-grasp,grasp 98)",0.995,,,,,,,,,,,
+0.001,0.1,s00_on,71:d(item_3) 142:unknown!,2,1,2,0,32,0.995,"d(item_3):71(post-grasp,grasp 41) d(item_2):never(max 0.66)",0.995,,,,,,,,,,,
+0.001,0.2,s40_on,219:unknown,1,0,103,0,57,0.961,d(item_3):never(max 0.61) coffee:never(max 0.41) d(item_6):never(max 0.12),0.841,0.411,0,0.139,0.145,0.145->0.114,True,0.188,0.791,0.188,0,unknown 0.824 (item_6 0.118)
+0.001,0.2,s30_on,121:unknown!,1,1,2,0,32,0.995,d(item_3):never(max 0.66) d(item_7):never(max 0.61),0.995,,,,,,,,,,,
+0.001,0.2,s00_on,142:unknown!,1,1,2,0,25,0.995,d(item_3):never(max 0.71) d(item_2):never(max 0.49),0.995,,,,,,,,,,,
+0.001,0.35,s40_on,184:unknown!,1,1,105,0,90,0.975,d(item_3):never(max 0.56) coffee:never(max 0.32) d(item_6):never(max 0.07),0.895,0.318,0,0.093,0.095,0.095->0.071,True,0.125,0.867,0.125,0,unknown 0.890 (item_6 0.073)
+0.001,0.35,s30_on,121:unknown!,1,1,2,0,32,0.995,d(item_3):never(max 0.60) d(item_7):never(max 0.48),0.995,,,,,,,,,,,
+0.001,0.35,s00_on,142:unknown!,1,1,2,0,25,0.995,d(item_3):never(max 0.65) d(item_2):never(max 0.36),0.995,,,,,,,,,,,
+0.001,0.5,s40_on,184:unknown!,1,1,105,0,90,0.98,d(item_3):never(max 0.51) coffee:never(max 0.26) d(item_6):never(max 0.05),0.921,0.259,0,0.069,0.071,0.071->0.052,True,0.094,0.902,0.094,0,unknown 0.919 (item_6 0.053)
+0.001,0.5,s30_on,121:unknown!,1,1,2,0,32,0.995,d(item_3):never(max 0.55) d(item_7):never(max 0.39),0.995,,,,,,,,,,,
+0.001,0.5,s00_on,142:unknown!,1,1,2,0,25,0.995,d(item_3):never(max 0.59) d(item_2):never(max 0.28),0.995,,,,,,,,,,,
+0.002,0.01,s40_on,51:d(item_3) 184:unknown!,2,1,105,0,154,0.992,"d(item_3):51(pre-grasp,grasp 60) coffee:never(max 0.68) d(item_6):never(max 0.03)",0.932,0.684,0,0.052,0.055,0.055->0.025,True,0.136,0.945,0.136,0,unknown 0.962 (item_6 0.026)
+0.002,0.01,s30_on,50:d(item_3),1,0,4,2,131,0.995,"d(item_3):50(post-grasp,grasp 39) d(item_7):76(pre-grasp,grasp 98)",0.995,,,,,,,,,,,
+0.002,0.01,s00_on,30:d(item_3) 142:unknown!,2,1,2,0,74,0.995,"d(item_3):30(pre-grasp,grasp 41) d(item_2):never(max 0.68)",0.995,,,,,,,,,,,
+0.002,0.02,s40_on,52:d(item_3) 184:unknown!,2,1,105,0,153,0.993,"d(item_3):52(pre-grasp,grasp 60) coffee:never(max 0.55) d(item_6):never(max 0.01)",0.961,0.546,0,0.029,0.03,0.030->0.013,True,0.075,0.969,0.075,0,unknown 0.978 (item_6 0.013)
+0.002,0.02,s30_on,51:d(item_3),1,0,4,2,132,0.995,"d(item_3):51(post-grasp,grasp 39) d(item_7):76(pre-grasp,grasp 98)",0.995,,,,,,,,,,,
+0.002,0.02,s00_on,30:d(item_3) 142:unknown!,2,1,2,0,74,0.995,"d(item_3):30(pre-grasp,grasp 41) d(item_2):never(max 0.52)",0.995,,,,,,,,,,,
+0.002,0.05,s40_on,54:d(item_3) 184:unknown!,2,1,105,0,151,0.993,"d(item_3):54(pre-grasp,grasp 60) coffee:never(max 0.34) d(item_6):never(max 0.01)",0.98,0.34,0,0.013,0.013,0.013->0.005,True,0.032,0.984,0.032,0,unknown 0.988 (item_6 0.005)
+0.002,0.05,s30_on,53:d(item_3) 121:unknown!,2,1,2,0,89,0.995,"d(item_3):53(post-grasp,grasp 39) d(item_7):never(max 0.59)",0.995,,,,,,,,,,,
+0.002,0.05,s00_on,32:d(item_3) 142:unknown!,2,1,2,0,76,0.995,"d(item_3):32(pre-grasp,grasp 41) d(item_2):never(max 0.30)",0.995,,,,,,,,,,,
+0.002,0.1,s40_on,57:d(item_3) 139:unknown!,2,1,150,0,148,0.993,"d(item_3):57(pre-grasp,grasp 60) coffee:never(max 0.21) d(item_6):never(max 0.00)",0.987,0.209,0,0.009,0.006,0.006->0.003,True,0.016,0.99,0.016,0,unknown 0.991 (item_6 0.003)
+0.002,0.1,s30_on,56:d(item_3) 121:unknown!,2,1,2,0,92,0.995,"d(item_3):56(post-grasp,grasp 39) d(item_7):never(max 0.42)",0.995,,,,,,,,,,,
+0.002,0.1,s00_on,35:d(item_3),1,0,66,0,68,0.995,"d(item_3):35(pre-grasp,grasp 41) d(item_2):never(max 0.18)",0.995,,,,,,,,,,,
+0.002,0.2,s40_on,84:d(item_3),1,0,174,0,121,0.993,"d(item_3):84(post-grasp,grasp 60) coffee:never(max 0.12) d(item_6):never(max 0.00)",0.99,0.118,0,0.005,0.003,0.003->0.001,True,0.008,0.992,0.008,0,unknown 0.993 (item_6 0.001)
+0.002,0.2,s30_on,65:d(item_3) 121:unknown!,2,1,2,0,86,0.995,"d(item_3):65(post-grasp,grasp 39) d(item_7):never(max 0.27)",0.995,,,,,,,,,,,
+0.002,0.2,s00_on,49:d(item_3),1,0,66,0,54,0.995,"d(item_3):49(post-grasp,grasp 41) d(item_2):never(max 0.10)",0.995,,,,,,,,,,,
+0.002,0.35,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.71) coffee:never(max 0.07) d(item_6):never(max 0.00),0.992,0.071,0,0.003,0.002,0.002->0.001,True,0.005,0.993,0.005,0,unknown 0.993 (item_6 0.001)
+0.002,0.35,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.70) d(item_7):never(max 0.17),0.995,,,,,,,,,,,
+0.002,0.35,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.73) d(item_2):never(max 0.06),0.995,,,,,,,,,,,
+0.002,0.5,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.64) coffee:never(max 0.05) d(item_6):never(max 0.00),0.992,0.051,0,0.002,0.001,0.001->0.001,True,0.003,0.993,0.003,0,unknown 0.993 (item_6 0.001)
+0.002,0.5,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.63) d(item_7):never(max 0.13),0.995,,,,,,,,,,,
+0.002,0.5,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.66) d(item_2):never(max 0.04),0.995,,,,,,,,,,,
+0.005,0.01,s40_on,27:d(item_3),1,0,174,0,178,0.993,"d(item_3):27(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.004,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.005,0.01,s30_on,28:d(item_3),1,0,49,0,82,0.995,"d(item_3):28(pre-grasp,grasp 39) d(item_7):never(max 0.04)",0.995,,,,,,,,,,,
+0.005,0.01,s00_on,15:d(item_3),1,0,66,0,88,0.995,"d(item_3):15(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.005,0.02,s40_on,27:d(item_3),1,0,174,0,178,0.993,"d(item_3):27(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.002,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.005,0.02,s30_on,28:d(item_3),1,0,49,0,82,0.995,"d(item_3):28(pre-grasp,grasp 39) d(item_7):never(max 0.02)",0.995,,,,,,,,,,,
+0.005,0.02,s00_on,16:d(item_3),1,0,66,0,87,0.995,"d(item_3):16(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.005,0.05,s40_on,28:d(item_3),1,0,174,0,177,0.993,"d(item_3):28(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.005,0.05,s30_on,29:d(item_3),1,0,49,0,81,0.995,"d(item_3):29(pre-grasp,grasp 39) d(item_7):never(max 0.01)",0.995,,,,,,,,,,,
+0.005,0.05,s00_on,16:d(item_3),1,0,66,0,87,0.995,"d(item_3):16(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.005,0.1,s40_on,30:d(item_3),1,0,174,0,175,0.993,"d(item_3):30(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.005,0.1,s30_on,31:d(item_3),1,0,49,0,79,0.995,"d(item_3):31(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.005,0.1,s00_on,18:d(item_3),1,0,66,0,85,0.995,"d(item_3):18(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.005,0.2,s40_on,35:d(item_3),1,0,174,0,170,0.993,"d(item_3):35(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.005,0.2,s30_on,36:d(item_3),1,0,49,0,75,0.995,"d(item_3):36(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.005,0.2,s00_on,21:d(item_3),1,0,66,0,82,0.995,"d(item_3):21(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.005,0.35,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.74) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.005,0.35,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.74) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.005,0.35,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.74) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.005,0.5,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.66) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.005,0.5,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.66) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.005,0.5,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.66) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.01,0.01,s40_on,16:d(item_3),1,0,174,0,189,0.993,"d(item_3):16(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.01,0.01,s30_on,18:d(item_3),1,0,49,0,93,0.995,"d(item_3):18(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.01,s00_on,9:d(item_3),1,0,66,0,94,0.995,"d(item_3):9(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.02,s40_on,16:d(item_3),1,0,174,0,189,0.993,"d(item_3):16(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.01,0.02,s30_on,19:d(item_3),1,0,49,0,92,0.995,"d(item_3):19(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.02,s00_on,9:d(item_3),1,0,66,0,94,0.995,"d(item_3):9(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.05,s40_on,17:d(item_3),1,0,174,0,188,0.993,"d(item_3):17(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.01,0.05,s30_on,19:d(item_3),1,0,49,0,92,0.995,"d(item_3):19(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.05,s00_on,10:d(item_3),1,0,66,0,93,0.995,"d(item_3):10(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.1,s40_on,19:d(item_3),1,0,174,0,186,0.993,"d(item_3):19(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.01,0.1,s30_on,21:d(item_3),1,0,49,0,90,0.995,"d(item_3):21(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.1,s00_on,11:d(item_3),1,0,66,0,92,0.995,"d(item_3):11(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.2,s40_on,22:d(item_3),1,0,174,0,183,0.993,"d(item_3):22(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.01,0.2,s30_on,24:d(item_3),1,0,49,0,86,0.995,"d(item_3):24(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.2,s00_on,13:d(item_3),1,0,66,0,90,0.995,"d(item_3):13(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.01,0.35,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.74) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.01,0.35,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.74) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.01,0.35,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.74) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.01,0.5,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.66) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,True,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.01,0.5,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.66) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.01,0.5,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.66) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.02,0.01,s40_on,9:d(item_3),1,0,174,0,196,0.993,"d(item_3):9(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.02,0.01,s30_on,11:d(item_3),1,0,49,0,98,0.995,"d(item_3):11(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.01,s00_on,5:d(item_3),1,0,66,0,98,0.995,"d(item_3):5(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.02,s40_on,9:d(item_3),1,0,174,0,196,0.993,"d(item_3):9(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.02,0.02,s30_on,11:d(item_3),1,0,49,0,98,0.995,"d(item_3):11(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.02,s00_on,5:d(item_3),1,0,66,0,98,0.995,"d(item_3):5(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.05,s40_on,10:d(item_3),1,0,174,0,195,0.993,"d(item_3):10(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.02,0.05,s30_on,12:d(item_3),1,0,49,0,97,0.995,"d(item_3):12(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.05,s00_on,6:d(item_3),1,0,66,0,98,0.995,"d(item_3):6(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.1,s40_on,11:d(item_3),1,0,174,0,194,0.993,"d(item_3):11(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.02,0.1,s30_on,13:d(item_3),1,0,49,0,96,0.995,"d(item_3):13(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.1,s00_on,6:d(item_3),1,0,66,0,98,0.995,"d(item_3):6(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.2,s40_on,13:d(item_3),1,0,174,0,192,0.993,"d(item_3):13(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.02,0.2,s30_on,16:d(item_3),1,0,49,0,93,0.995,"d(item_3):16(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.2,s00_on,8:d(item_3),1,0,66,0,95,0.995,"d(item_3):8(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.02,0.35,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.74) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.02,0.35,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.74) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.02,0.35,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.74) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.02,0.5,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.66) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.02,0.5,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.66) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.02,0.5,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.66) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.05,0.01,s40_on,4:d(item_3),1,0,174,0,201,0.993,"d(item_3):4(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.05,0.01,s30_on,5:d(item_3),1,0,49,0,104,0.995,"d(item_3):5(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.01,s00_on,2:d(item_3),1,0,66,0,101,0.995,"d(item_3):2(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.02,s40_on,4:d(item_3),1,0,174,0,201,0.993,"d(item_3):4(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.05,0.02,s30_on,5:d(item_3),1,0,49,0,104,0.995,"d(item_3):5(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.02,s00_on,2:d(item_3),1,0,66,0,101,0.995,"d(item_3):2(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.05,s40_on,4:d(item_3),1,0,174,0,201,0.993,"d(item_3):4(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.05,0.05,s30_on,6:d(item_3),1,0,49,0,103,0.995,"d(item_3):6(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.05,s00_on,2:d(item_3),1,0,66,0,101,0.995,"d(item_3):2(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.1,s40_on,5:d(item_3),1,0,174,0,200,0.993,"d(item_3):5(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.05,0.1,s30_on,6:d(item_3),1,0,49,0,103,0.995,"d(item_3):6(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.1,s00_on,3:d(item_3),1,0,66,0,100,0.995,"d(item_3):3(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.2,s40_on,6:d(item_3),1,0,174,0,199,0.993,"d(item_3):6(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.05,0.2,s30_on,8:d(item_3),1,0,49,0,101,0.995,"d(item_3):8(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.2,s00_on,4:d(item_3),1,0,66,0,99,0.995,"d(item_3):4(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.05,0.35,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.74) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.05,0.35,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.74) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.05,0.35,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.74) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.05,0.5,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.66) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.05,0.5,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.66) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.05,0.5,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.66) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.1,0.01,s40_on,2:d(item_3),1,0,174,0,203,0.993,"d(item_3):2(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.1,0.01,s30_on,2:d(item_3),1,0,49,0,107,0.995,"d(item_3):2(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.01,s00_on,1:d(item_3),1,0,66,0,102,0.995,"d(item_3):1(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.02,s40_on,2:d(item_3),1,0,174,0,203,0.993,"d(item_3):2(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.1,0.02,s30_on,3:d(item_3),1,0,49,0,106,0.995,"d(item_3):3(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.02,s00_on,1:d(item_3),1,0,66,0,102,0.995,"d(item_3):1(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.05,s40_on,2:d(item_3),1,0,174,0,203,0.993,"d(item_3):2(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.1,0.05,s30_on,3:d(item_3),1,0,49,0,106,0.995,"d(item_3):3(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.05,s00_on,1:d(item_3),1,0,66,0,102,0.995,"d(item_3):1(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.1,s40_on,2:d(item_3),1,0,174,0,203,0.993,"d(item_3):2(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.1,0.1,s30_on,3:d(item_3),1,0,49,0,106,0.995,"d(item_3):3(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.1,s00_on,1:d(item_3),1,0,66,0,102,0.995,"d(item_3):1(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.2,s40_on,3:d(item_3),1,0,174,0,202,0.993,"d(item_3):3(pre-grasp,grasp 60) coffee:never(max 0.00) d(item_6):never(max 0.00)",0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.1,0.2,s30_on,4:d(item_3),1,0,49,0,105,0.995,"d(item_3):4(pre-grasp,grasp 39) d(item_7):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.2,s00_on,2:d(item_3),1,0,66,0,101,0.995,"d(item_3):2(pre-grasp,grasp 41) d(item_2):never(max 0.00)",0.995,,,,,,,,,,,
+0.1,0.35,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.74) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.1,0.35,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.74) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.1,0.35,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.74) d(item_2):never(max 0.00),0.995,,,,,,,,,,,
+0.1,0.5,s40_on,115:unknown!,1,1,174,0,90,0.993,d(item_3):never(max 0.66) coffee:never(max 0.00) d(item_6):never(max 0.00),0.993,0.001,0,0.001,0.001,0.001->0.001,False,0.001,0.993,0.001,0,unknown 0.993 (item_6 0.001)
+0.1,0.5,s30_on,74:unknown!,1,1,49,0,36,0.995,d(item_3):never(max 0.66) d(item_7):never(max 0.00),0.995,,,,,,,,,,,
+0.1,0.5,s00_on,78:unknown!,1,1,66,0,25,0.995,d(item_3):never(max 0.66) d(item_2):never(max 0.00),0.995,,,,,,,,,,,

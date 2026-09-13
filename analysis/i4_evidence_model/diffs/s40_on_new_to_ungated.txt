@@ -1,0 +1,12 @@
+ticks: base 379 new 379  eps=0.0005
+t=0 base: most_likely=d(item_3) conf=0.266 dist=d(item_3)=0.266 coffee=0.257 d(item_6)=0.230 ac=0.217 unknown=0.027 d(item_4)=0.001 d(item_5)=0.001 d(item_7)=0.001
+t=0 new: most_likely=d(item_3) conf=0.266 dist=d(item_3)=0.266 coffee=0.257 d(item_6)=0.230 ac=0.217 unknown=0.027 d(item_4)=0.001 d(item_5)=0.001 d(item_7)=0.001
+
+== most_likely differences ==
+  none
+
+== changed-key episodes (|new-base| > eps) ==
+  t=0-378: identical
+
+== meta lines ==
+  identical

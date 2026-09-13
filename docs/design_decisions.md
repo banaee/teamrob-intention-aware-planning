@@ -958,3 +958,84 @@ I4's excess-path-cost likelihood, which reads the distance walked since the orig
 charges it; it must not be patched here with a distance factor.
 Files: shared/recognizer.py; analysis/i3_phase_model/ (check_i3.py, REPORT.md)
 Reference: I3 phase-model session, September 2026
+
+**The evidence model: excess-path likelihood, detection reliability, a stated `unknown` (I4)**
+Until I4 the recognizer's belief rested on four numbers with no stated meaning — the cosine kernel's
+HIGH 4.0 / LOW 0.1, NEUTRAL 1.0 (also `unknown`'s flat value), ZONE_BOOST 2.0 before it — and I1/I3
+traced every asymmetry they exposed to `unknown` paying nothing while wrong hypotheses averaged 2.3–3.1
+against its 1.0. The kernel read direction only, so a hypothesis was never charged for the distance it
+had wasted (TODO-53) and walking 116° away from a shelf was still better evidence for it than for
+`unknown` (F1, segment 3b).
+
+Decision. The structure I3 built (per-hypothesis expected action and origin, fold at a phase advance,
+one normalisation over every hypothesis and `unknown`, the terminal pin) is unchanged; what goes into
+it is replaced by four constants, each with a physical meaning (`shared/likelihood_functions.py`):
+- MOVEMENT is the excess-path likelihood — Masters & Sardina's costdif1 (IJCAI-18) through the
+  logistic of Ramírez & Geffner's RG2. Per hypothesis, from the origin where it began expecting its
+  current action: excess = walked + C(pos, g) − C(origin, g), where `walked` is a per-observed-agent
+  odometer read at the origin and g is the expected action's target; L = 2/(1 + e^{β·excess}). The
+  wasted distance under the hypothesis: 0 for a straight walk at g, growing with every step away —
+  direction and distance in one quantity. The `walked` term is kept (costdif2 drops it, preserving
+  the ranking but not the values the θ gate reads; it is also observation-independent, a continuous
+  ZONE_BOOST — measured as variant `costdif2`: coffee "revealed" at 120 by proximity, `ac_activation`
+  wrongly at 297). C is a distance, not a path: straight-line by default (Mesa agents walk through
+  obstacles), injected through `IntentionRecognizer(path_cost=...)` for a domain with something
+  better; no planner calls, no distance fields. Recomputed from the origin every tick and REPLACING
+  the previous value (twenty ticks of one walk are one observation); a completion is an event and
+  multiplies. Cost per tick: one distance evaluation per (expected action, origin, walked, target).
+- The logistic is NORMALISED to 1 at zero excess (a spec correction, measured): with the raw form
+  (0.5 at zero excess) every phase advance folded 0.5 into a hypothesis that had done nothing wrong
+  and halved it against `unknown`, whose value is never folded — s40's positive control dropped
+  0.83 → 0.71 at its own grasp; s00_off/s20_off never reached θ. The value at zero excess is therefore
+  the multiplicative identity (PERFECT_FIT_LIKELIHOOD = 1.0), also scored by a hypothesis with no
+  graded signal (`pick_up`, `place`, `wait_at`: the agent is within reach of where that action
+  happens, or the walk would have regressed to the approach). There is no NEUTRAL: a stationary tick
+  leaves the excess where it was.
+- `unknown` scores a stated CONSTANT, UNKNOWN_LIKELIHOOD, every tick. Normalisation is over all
+  hypotheses AND `unknown`, never over the hypotheses alone. The constant is the threshold between
+  "fits badly enough to be unexplained" and "a real hypothesis", and the CEILING on confidence:
+  1/(1 + u) with every rival refuted. u ≥ 1/3 makes θ = 0.75 unreachable by construction.
+- COMPLETION is a detection-reliability model: P(signal | completed) = DETECTION_HIT_RATE,
+  P(signal | not) = DETECTION_FALSE_ALARM_RATE. In Mesa the simulator's report IS ground truth, so
+  these are stated (1.0 and 1e-3 — the latter non-zero only so a refuted hypothesis keeps a
+  recoverable base), not tuned; a real cell's detector supplies its measured rates. Consequence under
+  the (unchanged) vocabulary gate: a grasp is no longer evidence — the grasped item is multiplied by
+  1.0 and rivals are not judged — so the approach carries every reveal.
+- β = 0.01 /cm and u = 0.1, from a JOINT sweep (49-cell coarse grid, 25-cell fine grid, prior-on
+  s40/s30/s00; full matrix once at the chosen values): the region where every first task is revealed
+  pre-grasp with no wrong task at θ is β ∈ [0.005, 0.1] × u ∈ [0.01, 0.2], smooth (the reveal tick
+  moves ~1 tick per 0.05 of u, 3–6 ticks per β step, no cliffs); the chosen point is its centre.
+  Meanings: 100 cm of wasted path costs ×0.54, ≈ 294 cm is no better than unexplained, ceiling 0.909.
+  β is in cm, so the tolerance is layout-scale dependent (TODO-28's class); the fractional reading
+  (excess / C(origin, g)) was measured and rejected — its reference length goes to zero at every
+  carry-phase or 30 cm-regress origin, and where it produced coffee crossings (β_f ∈ [0.2, 1], u ≤ 0.1)
+  it did so by coffee having the longest direct distance among the stuck-origin hypotheses, with s30's
+  first task then revealed after its grasp (TODO-58).
+- The fourth load-bearing number is the world-state builder's PROXIMITY_THRESHOLD (30 cm): it decides
+  when `at` holds, hence every phase advance and every origin. Not a likelihood constant, named here
+  because it was previously documented as unrelated.
+
+Measured (`analysis/i4_evidence_model/REPORT.md`; every difference staged S0 → S1 raw logistic → new
+and attributed): the first task of every scenario is revealed mid-approach, before the grasp, in seven
+of eight conditions (s00 39/11, s20 31/6, s30 28/21, s40 19/19 off/on; s20_off's 31 is after its grasp
+at 22 because two decoys lie beyond the target on the same bearing); no wrong task above θ anywhere;
+θ is reachable for a first task even with two foreseeable hypotheses in the space (s40 0.904; F1's
+0.569 came from pinning); TODO-53 closed — `ac_activation` is charged 2373–5664 cm and is `most_likely`
+for 0 ticks of 184–271 (was 88). AND the design as specified recognises no task after the observed
+agent's first one, at any β, u: a hypothesis the agent has not started keeps its priming-tick origin
+(coffee enters its own walk with 2144 cm of excess and its efficient walk adds nothing to it), and
+every closed phase is folded permanently (item_6 carries ×3e-9 × 1e-9 from segment 1). `coffee_break`
+never crosses θ in s40 (max 0.001 at the shipped values; 0.68 anywhere in the sweep, at a point where
+`ac_activation` wins segment 3), the segment-3b retraction is real in the excess (550 → 1088 cm) and
+invisible at the floor, and every next-task reveal is gone (TODO-55). The diagnosis is the phase state
+across a task boundary, not the trajectory evidence, `unknown` or the hypothesis space: the
+analysis-only what-ifs that move every origin to the observed agent's task boundary (TODO-53's named
+alternative) and also reset the prior there (TODO-55 (b)) give coffee 0.90 in both prior settings by
+the intended chain, item_6 rising to 0.79 while the human heads at shelf_6 and retracting to 0.08 after
+the turn, and pre-grasp next-task reveals prior-on (80 / 56 / 76) — with the prior-off caveat that a
+retirement fires on the robot's completions too. Neither is shipped: what a task boundary IS to the
+recognizer is a design decision (TODO-57), deferred with TODO-55.
+Files: shared/likelihood_functions.py (rewritten), shared/recognizer.py (`__init__`, `update`,
+`_progress_likelihood`, `_completion_likelihood`), domains/kitting/actions.py (`move_to.progress_evaluator`);
+analysis/i4_evidence_model/ (check_i4.py, REPORT.md, sweeps, chain.py)
+Reference: I4 evidence-model session, September 2026
