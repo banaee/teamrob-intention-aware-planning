@@ -52,9 +52,19 @@ ALGORITHM:
           contributes NO FACTOR for it (not 1.0: zero excess is a perfectly
           efficient walk, and no walk is not that), and the belief carries
           forward unchanged.
-        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD, per observation.
-          It applies on a tick on which some hypothesis was scored on one, and
-          not at all on a tick with nothing observed (every stretch empty).
+        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD, per observation —
+          the reference every observation is scored against (I4d). A
+          hypothesis's evidence is its ODDS against 'unknown': the product over
+          its own observations of L/u, closed stretches and events in its base,
+          the open stretch multiplied on top as v/u for this tick. A fold moves
+          one factor from the open term to the base and changes nothing;
+          'unknown' itself takes no factor. The invariant, for every live
+          hypothesis k and tick t within an episode:
+              E_t(k)/E_t(unknown) = [π(k)/π(unknown)] · Π_closed L_k(s)/u
+                                    · Π_events c_k(e) · (v_k(t)/u | 1 if empty)
+          So a lone fitting task's ceiling is 1/(1+uⁿ) over its n observations,
+          and between two tasks of equal fit an extra closed stretch is worth
+          1/u: a phase advance is evidence.
     Normalisation is over every hypothesis AND 'unknown' together, never over
     the hypotheses alone. Two hypotheses whose expected actions share
     evaluator, origin, walked distance and target position receive the same
@@ -344,13 +354,14 @@ class IntentionRecognizer:
         #                   expected one — where its excess path is measured from
         #   _origin_odo[key] the agent's odometer reading at that moment, so
         #                   that walked = odometer − _origin_odo[key]
-        #   _base[key]      the hypothesis's evidence with every closed phase and
-        #                   every event of the CURRENT EPISODE folded in, in one
-        #                   common scale across keys (rescaled each tick so that
-        #                   Σ base·value = 1); the open phase's value is
-        #                   recomputed from _origin each tick and multiplied on
-        #                   top, never into it; re-initialised to the prior at
-        #                   every episode boundary
+        #   _base[key]      the hypothesis's closed ODDS against unknown: every
+        #                   closed phase (as L/u) and every event of the CURRENT
+        #                   EPISODE folded in, in one common scale across keys
+        #                   (rescaled each tick so that Σ base·open = 1); the
+        #                   open phase's v/u is recomputed from _origin each tick
+        #                   and multiplied on top, never into it; re-initialised
+        #                   to the prior at every episode boundary.
+        #                   _base[UNKNOWN] is the reference and only rescales.
         #   _completed      keys whose terminal completion condition has held:
         #                   skipped and pinned for the rest of the run
         self._expected: Dict[str, Optional[GroundedAction]] = {}
@@ -499,17 +510,16 @@ class IntentionRecognizer:
              hypothesis expected on the previous tick, that action's completion
              check multiplies onto its evidence (an event);
           4. if the expected action changed, fold the closing action's final
-             excess-path value into the evidence once (nothing, if its stretch
-             was empty) and move the origin (position and odometer reading)
-             to the agent's (a phase advance — or regress; both are derived
-             facts);
-          5. the open action's excess-path value from the origin multiplies on
-             top of the evidence for this tick only (replaced next tick) — or
-             no factor at all if the stretch is empty (nothing walked since
-             the origin: not an observation).
-        `unknown` takes its constant if some hypothesis was scored on an
-        observation, nothing otherwise. Then normalize over the live keys +
-        unknown together. If a retirement this tick was the observed agent's
+             excess-path value, as odds L/u against unknown, into the evidence
+             once (nothing, if its stretch was empty) and move the origin
+             (position and odometer reading) to the agent's (a phase advance —
+             or regress; both are derived facts);
+          5. the open action's excess-path value from the origin, as v/u,
+             multiplies on top of the evidence for this tick only (replaced
+             next tick) — or no factor at all if the stretch is empty (nothing
+             walked since the origin: not an observation).
+        `unknown` is the reference and takes no factor. Then normalize over the
+        live keys + unknown together. If a retirement this tick was the observed agent's
         own (step 2, terminal action expected on the previous tick), the
         episode ends: the belief re-initialises to the prior over the live
         keys + unknown and every origin moves to the agent's position
@@ -535,7 +545,7 @@ class IntentionRecognizer:
         odo = self._odometer[agent]
 
         unnorm: Dict[str, float] = {}
-        observed = False       # some live hypothesis was scored on an observation this tick
+        u = likelihood_functions.UNKNOWN_LIKELIHOOD
         boundary = False
         for hyp in self._hypotheses:
             key = repr(hyp)
@@ -574,23 +584,20 @@ class IntentionRecognizer:
                 closing = self._progress_likelihood(
                     previous, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
                 if closing is not None:
-                    self._base[key] *= closing
+                    # The stretch was one observation: its likelihood under
+                    # the hypothesis AND under `unknown` fold together, as the
+                    # odds L/u the open term already held (I4d).
+                    self._base[key] *= closing / u
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
                 value = self._progress_likelihood(current, pos, 0.0, pos, world, memo)
             else:
                 value = self._progress_likelihood(
                     current, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
-            if value is None:
-                unnorm[key] = self._base[key]
-            else:
-                unnorm[key] = self._base[key] * value
-                observed = True
-        # `unknown` is scored on the same observation as the hypotheses are:
-        # its constant applies when at least one of them was scored this tick,
-        # and not at all on a tick with no observation (every stretch empty).
+            # The open observation, if there is one, as odds against `unknown`.
+            unnorm[key] = self._base[key] if value is None else self._base[key] * value / u
+        # `unknown` is the reference: every observation is scored against it
+        # inside the hypothesis's own odds, so it takes no factor of its own.
         unnorm[UNKNOWN] = self._base[UNKNOWN]
-        if observed:
-            unnorm[UNKNOWN] *= likelihood_functions.UNKNOWN_LIKELIHOOD
 
         # One normalization, at the task layer, over the live keys AND unknown.
         # The bases are rescaled by the same total so they stay in one scale
