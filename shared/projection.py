@@ -52,6 +52,7 @@ from shared.types import (
 from shared.domain_knowledge import DomainKnowledgeBase
 from shared.planner import AdaptivePlanner
 from shared.recognizer import IntentionRecognizer
+from shared.target_resolution import movement_target_id, movement_target_position
 from shared.trajectory_algorithms import straight_line_path, stationary_segment
 
 
@@ -217,8 +218,10 @@ class Projector:
         agent's live position at `start_step`. Single geometry pass, chained
         head-to-tail in both position and step-time.
 
-        Movement actions (schema.movement_target_key is not None): resolved via
-        trajectory_algorithms.straight_line_path() — the current default path
+        Movement actions (schema.movement_target_key is not None): the target
+        position comes from shared/target_resolution.py — the same lookup the
+        recognizer scores chords against — and the path from
+        trajectory_algorithms.straight_line_path(), the current default path
         realization. Only movement_target_type == "object" is handled; "zone"
         targets were removed from the live domain (see domains/kitting/actions.py),
         and this raises explicitly rather than silently mis-estimating if one
@@ -253,13 +256,12 @@ class Projector:
                         f"for action '{action.action_name}' — only 'object' is "
                         f"handled (zone targets removed from live domain)"
                     )
-                target_id = action.bindings.get(schema.movement_target_key)
-                target_pos = world.object_positions.get(target_id)
+                target_pos = movement_target_position(action, world)
                 if target_pos is None:
                     raise ValueError(
                         f"Projector.build_segments: no position for target "
-                        f"'{target_id}' in world.object_positions "
-                        f"(action '{action.action_name}')"
+                        f"'{movement_target_id(action)}' of action "
+                        f"'{action.action_name}'"
                     )
                 segment = straight_line_path(current_pos, current_step, target_pos, self._assumed_speed)
                 current_pos = target_pos

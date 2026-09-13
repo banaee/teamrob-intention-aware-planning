@@ -306,8 +306,8 @@
       "orientation_deg": 0
     },
     {
-      "id": "AC_switch_0",
-      "type": "AC_switch",
+      "id": "ac_switch_0",
+      "type": "ac_switch",
       "position": [
         -975,
         -350

@@ -61,6 +61,7 @@ class FactoryAgent(agent.Agent):
     def __init__(self, unique_id: str, model: "SimModel", pos: tuple):
         super().__init__(unique_id, model)
         self.carrying: Optional[str] = None
+        self.waited_at: Optional[str] = None   # fixed object a completed wait ended at (executor)
         self.current_task: Optional[str] = None
         self.current_action: Optional[str] = None
         self.current_microaction: Optional[str] = None
@@ -341,6 +342,28 @@ class RobotAgent(FactoryAgent):
                             
         self._execute(plan=self.current_plan, world=world)        
     
+    def observe_initial(self):
+        """
+        Hand the recognizer the observed human's position BEFORE the clock
+        starts. Within a tick the human acts before the robot observes it
+        (BaseScheduler, scenario order), so the tick-0 observation already
+        shows the human one step from where it started; without this the
+        recognizer opened its first leg there and the first step was never
+        scored (I1 audit 2.12). The belief this produces is the prior and is
+        not stored — the first reported belief is still tick 0's. Called by
+        SimModel once all agents exist.
+        """
+        human = self._get_observed_human()
+        if human is None:
+            return
+        world = build_world_state(model=self.model)
+        obs = build_observation(
+            human_agent=human,
+            model=self.model,
+            timestamp=float(self.model.schedule.steps),
+        )
+        self.recognizer.update(obs=obs, world=world, prev_belief=None)
+
     # =========================================================================
     # Internal helpers
     # =========================================================================

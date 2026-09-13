@@ -15,6 +15,14 @@ ALGORITHM:
           similarity between the CHORD from the current leg's start to the
           agent's position and the vector from that leg start toward τ's target
           object. Mapped to [LOW_LIKELIHOOD, HIGH_LIKELIHOOD].
+          τ's target is the target of the first movement action of the method
+          the planner selects for τ against the current world — the observed
+          agent's bindings, its guards (what it holds), its derived vars —
+          resolved to a position by shared/target_resolution.py. No method is
+          ever chosen by position in the schema, and no parameter is named
+          here. A hypothesis no method applies to in this world (guards
+          unsatisfiable, a derived var with no value) is scored NEUTRAL, not
+          crashed on; the first such tick per hypothesis is logged.
         - other discrete microactions (release, stand): uninformative → NEUTRAL
         - 'unknown' hypothesis: always NEUTRAL (decays via normalization only)
 
@@ -40,11 +48,12 @@ ALGORITHM:
         back — otherwise every leg boundary would count them twice.
 
     Held-item refutation (hard):
-        If the observed agent holds item X, every hypothesis bound to a
-        different item is REFUTED — the intention is observed, not inferred —
-        and pinned at BELIEF_FLOOR on output, the same treatment as an
-        inadmissible hypothesis. Hypotheses with no item binding (coffee_break,
-        ac_activation) and 'unknown' are never refuted by a grasp. This used to
+        If the observed agent holds object X, every hypothesis bound to a
+        different portable object is REFUTED — the intention is observed, not
+        inferred — and pinned at BELIEF_FLOOR on output, the same treatment as
+        an inadmissible hypothesis. Hypotheses bound to no portable object
+        (coffee_break, ac_activation) and 'unknown' are never refuted by a
+        grasp. This used to
         be a ×0.1 factor per step; under per-step multiplication that was de
         facto elimination, under one-observation-per-leg it would have been a
         one-shot nudge, which was never what the constraint claimed.
@@ -97,11 +106,12 @@ import math
 from typing import Dict, List, Optional, Set, Tuple
 
 from shared.types import (
-    Observation, BeliefState, WorldState, Predicate, Const,
-    TaskSchema, StepCall, Var, ConditionSchema,
+    Observation, BeliefState, WorldState, GroundedAction,
     TaskInstance, task_instance_key,
 )
 from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
+from shared.planner import AdaptivePlanner, DecompositionError
+from shared.target_resolution import movement_target_id, movement_target_position
 from shared import likelihood_functions
 from shared.likelihood_functions import (
     HIGH_LIKELIHOOD, LOW_LIKELIHOOD, NEUTRAL_LIKELIHOOD,
@@ -250,21 +260,41 @@ class IntentionRecognizer:
         """
         self.knowledge = knowledge
         self.context = context
-        self._hypotheses = hypotheses
+        # Sorted by key so that every order-dependent step downstream — the
+        # insertion order of the evidence and output dicts, hence max()'s
+        # tie-break for most_likely and the order of tied entries in the log —
+        # is a function of the hypothesis space alone, not of the order the
+        # caller enumerated it in (which followed DomainModel.intentions, a
+        # set, hence the process's hash seed; TODO-42).
+        self._hypotheses = sorted(hypotheses, key=repr)
         self._history: List[Observation] = []
-        self._by_key: Dict[str, HypothesisKey] = {repr(h): h for h in hypotheses}  # this is used to look up HypothesisKey by string repr in update()
+        self._by_key: Dict[str, HypothesisKey] = {repr(h): h for h in self._hypotheses}  # this is used to look up HypothesisKey by string repr in update()
+
+        # The same method selection the executor's plans come from. A
+        # hypothesis is grounded through it every tick against the live world:
+        # which method its guards admit for the observed agent, and what each
+        # step then targets. Held privately for the same reason the projector
+        # holds one — decomposition is stateless and world-driven.
+        self._planner = AdaptivePlanner(knowledge=knowledge)
+        # Per-tick memo of the grounded action list per hypothesis key (None =
+        # not decomposable this tick). Cleared at the top of update(); both the
+        # evidence pass and the output pass of one tick read it.
+        self._tick_actions: Dict[str, Optional[List[GroundedAction]]] = {}
+        # Keys already reported as undecomposable, so the log says it once per
+        # episode rather than once per tick.
+        self._undecomposable: Set[str] = set()
 
         # Microactions some action in the hypothesis space declares as a discrete
         # vocabulary (pick_up → ["GRASP"], place → ["RELEASE"], ...). Read from
         # the schemas, never from simulator string literals — the same membership
         # test _likelihood() dispatches on, asked once over the whole space. Used
         # by update() to tell an event from a movement observation.
-        # Every method is consulted, not only methods[0] as _likelihood()'s
-        # dispatch does: deliver_item's first method is the guarded
+        # Every method is consulted: deliver_item's first method is the guarded
         # deliver_already_held (move_to, place), which has no pick_up, so the
-        # grasp vocabulary lives only in the other methods (see TODO-46).
+        # grasp vocabulary lives only in the other methods. (Per-tick dispatch
+        # in _likelihood() uses the method the planner's guards select.)
         self._discrete_microactions: Set[str] = set()
-        for hyp in hypotheses:
+        for hyp in self._hypotheses:
             task_schema = self.knowledge.get_task_schema(hyp.task_name)
             for method in (task_schema.methods if task_schema else []):
                 for step in method.step_calls:
@@ -284,15 +314,19 @@ class IntentionRecognizer:
 
         if self._admissible is None:
             # Uniform prior over all hypotheses + unknown
-            n = len(hypotheses) + 1
-            self._initial_prior: Dict[str, float] = {repr(h): 1.0 / n for h in hypotheses}
+            n = len(self._hypotheses) + 1
+            self._initial_prior: Dict[str, float] = {repr(h): 1.0 / n for h in self._hypotheses}
             self._initial_prior[UNKNOWN] = 1.0 / n
         else:
             # Uniform over the admissible set only, then pinned — the same shape
-            # as every distribution update() produces, so prior and posterior agree.
+            # as every distribution update() produces, so prior and posterior
+            # agree. Built in hypothesis order (then unknown), the order _weigh
+            # produces, not in the admissible set's iteration order.
             n = len(self._admissible)
+            live = {repr(h): 1.0 / n for h in self._hypotheses if repr(h) in self._admissible}
+            live[UNKNOWN] = 1.0 / n
             self._initial_prior = self._pin(
-                {k: 1.0 / n for k in self._admissible},
+                live,
                 {k for k in self._by_key if k not in self._admissible},
             )
         # Keys pinned at BELIEF_FLOOR on every output because of the restriction.
@@ -357,7 +391,7 @@ class IntentionRecognizer:
         """
         live_mass = 1.0 - len(pinned) * BELIEF_FLOOR
         out = {k: v * live_mass for k, v in distribution.items()}
-        out.update({k: BELIEF_FLOOR for k in pinned})
+        out.update({k: BELIEF_FLOOR for k in sorted(pinned)})   # sets have no stable order
         return out
 
     def update(
@@ -390,6 +424,7 @@ class IntentionRecognizer:
         factors, so feeding it back would count them twice).
         """
         self._history.append(obs)
+        self._tick_actions = {}
         current_pos = obs.spatial_context.position
         if self._leg_start_pos is None:
             self._leg_start_pos = current_pos   # the first observation opens the first leg
@@ -467,32 +502,29 @@ class IntentionRecognizer:
     def _refuted_by_holding(self, obs: Observation, world: WorldState) -> Set[str]:
         """
         HELD-ITEM REFUTATION (see TODO-37): if the observed agent is holding an
-        item, every hypothesis bound to a DIFFERENT item is refuted — the
-        intention is observed, not inferred. Hypotheses with no item binding
-        and 'unknown' are untouched. Returns the refuted keys; _output() pins
-        them. Without this, a previously-delivered item sitting at the kitting
-        table becomes a geometric decoy for every human carry leg (validated:
-        scenario_00, run_20260904_131808, belief reached 0.995 on an
-        already-completed task).
+        object, every hypothesis bound to a DIFFERENT portable object is
+        refuted — the intention is observed, not inferred. Hypotheses bound to
+        no portable object and 'unknown' are untouched. Returns the refuted
+        keys; _output() pins them. Without this, a previously-delivered item
+        sitting at the kitting table becomes a geometric decoy for every human
+        carry leg (validated: scenario_00, run_20260904_131808, belief reached
+        0.995 on an already-completed task).
 
-        DESIGN DEBT (TODO-37): reads the literal "?item" from the bindings,
-        matching the precedent in _get_expected_position / _get_target_zone.
+        What the agent holds is read from its AgentState, a typed field, not
+        by scanning predicates for a name. "Portable" is the world's own
+        notion — an object that has a location (WorldState.object_locations
+        is populated for exactly those) — so no parameter name is read: a
+        hypothesis is refuted when any of its bindings names a portable object
+        other than the held one. A rule of the evidence model; scheduled for
+        removal in I3, kept exactly here.
         """
-        held_item = next(
-            (
-                p.args[1].value
-                for p in world.predicates
-                if p.name == "holding"
-                and len(p.args) == 2
-                and p.args[0].value == obs.agent_id
-            ),
-            None,
-        )
-        if held_item is None:
+        agent_state = world.agent_states.get(obs.agent_id)
+        held = agent_state.holding if agent_state is not None else None
+        if held is None:
             return set()
         return {
             repr(h) for h in self._hypotheses
-            if h.bindings.get("?item") is not None and h.bindings.get("?item") != held_item
+            if any(v != held and v in world.object_locations for v in h.bindings.values())
         }
 
     def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:
@@ -536,18 +568,29 @@ class IntentionRecognizer:
         origin: Optional[Tuple[float, float]] = None,
     ) -> float:
         """
-        Schema-driven dispatch. For each action schema in hyp's task decomposition:
-          - if the schema declares a discrete microaction vocabulary (e.g. ["GRASP"],
-            ["RELEASE"], ["TOUCH"]) and the observed microaction is a member of it
-            → completion-predicate check against WorldState
-          - if the schema is continuous ("STEP*") and declares a progress_evaluator
-            → delegate to the registered evaluator (shared/likelihood_functions.py)
+        Schema-driven dispatch over the actions the observed agent would
+        perform under hyp — the planner's decomposition of hyp against the
+        current world (guard-selected method, every binding grounded), in
+        order. For each grounded action:
+          - if its schema declares a discrete microaction vocabulary (e.g.
+            ["GRASP"], ["RELEASE"], ["TOUCH"]) and the observed microaction is
+            a member of it → completion-predicate check against WorldState,
+            using the predicate the planner already grounded
+          - if the schema is continuous ("STEP*") and declares a
+            progress_evaluator → delegate to the registered evaluator
+            (shared/likelihood_functions.py) against that action's target
+        The first action that answers decides (unchanged dispatch order; a
+        per-hypothesis phase is I3's).
 
         No microaction string literals are compared against hardcoded values here.
         The only comparison is membership of obs.detected_microaction in each
         schema's OWN declared microactions list — domain knowledge, not simulator
         vocabulary. A new domain with a different microaction taxonomy needs zero
         changes here; it only needs correctly populated ActionSchema objects.
+
+        A hypothesis the planner cannot decompose in this world (no method's
+        guards hold, a derived var has no value) has no actions to dispatch
+        over and is NEUTRAL.
 
         The held-item refutation is NOT applied here any more: it is a state
         fact, pinned on output by _refuted_by_holding() / _output(). Evidence
@@ -556,21 +599,25 @@ class IntentionRecognizer:
         """
         mu = (obs.detected_microaction or "").upper()
 
-        for schema in self._get_relevant_action_schemas(hyp):
-            spec = schema.microactions
+        actions = self._grounded_actions(hyp, obs.agent_id, world)
+        if actions is None:
+            return NEUTRAL_LIKELIHOOD
+
+        for action in actions:
+            spec = action.schema.microactions
 
             # Discrete completion-type action (pick_up, place, scan_it, ...)
             if isinstance(spec, list) and mu in (m.upper() for m in spec):
-                predicate = self._resolve_completion_predicate(schema, hyp, obs)
-                if predicate is None:
+                predicate = action.completion_predicate
+                if predicate is None:   # ProcessCompletion — nothing to observe
                     return NEUTRAL_LIKELIHOOD
                 return likelihood_functions.completion_predicate_likelihood(
                     predicate, frozenset(world.predicates)
                 )
 
             # Continuous progress-type action (move_to, ...)
-            if spec == "STEP*" and schema.progress_evaluator:
-                return self._progress_likelihood(obs, world, hyp, schema, origin)
+            if spec == "STEP*" and action.schema.progress_evaluator:
+                return self._progress_likelihood(obs, world, action, origin)
 
         return NEUTRAL_LIKELIHOOD
 
@@ -578,15 +625,14 @@ class IntentionRecognizer:
         self,
         obs: Observation,
         world: WorldState,
-        hyp: HypothesisKey,
-        schema,
+        action: GroundedAction,
         origin: Optional[Tuple[float, float]],
     ) -> float:
         """
-        Delegate to the progress evaluator named by schema.progress_evaluator.
+        Delegate to the progress evaluator named by action.schema.progress_evaluator.
         Builds the plain-value inputs (move_vec, origin, target_pos) the evaluator
         needs — no geometry happens here, only assembly of inputs already
-        available from the leg state and _get_expected_position.
+        available from the leg state and the action's resolved target.
 
         `origin` is where the movement being scored began: the leg start for a
         continuous observation (so move_vec is the leg's chord), the previous
@@ -596,102 +642,64 @@ class IntentionRecognizer:
         straight from where the leg began. Measuring against the current
         position would let a passed target's swinging bearing re-import, one
         step at a time, the accumulation this design removes.
+
+        The target is where the action's target object is NOW (a carried one
+        is wherever its holder is) — shared/target_resolution.py, the lookup
+        the projector uses for the same action.
         """
         if origin is None:
             return NEUTRAL_LIKELIHOOD
 
-        evaluator = likelihood_functions.PROGRESS_EVALUATORS.get(schema.progress_evaluator)
+        evaluator = likelihood_functions.PROGRESS_EVALUATORS.get(action.schema.progress_evaluator)
         if evaluator is None:
             return NEUTRAL_LIKELIHOOD
 
         current_pos = obs.spatial_context.position
         move_vec = (current_pos[0] - origin[0], current_pos[1] - origin[1])
 
-        target_pos = self._get_expected_position(hyp, world, obs.agent_id)
+        target_pos = movement_target_position(action, world)
         if target_pos is None:
             return NEUTRAL_LIKELIHOOD
 
         return evaluator(move_vec, origin, target_pos)
 
-    def _get_relevant_action_schemas(self, hyp: HypothesisKey) -> List:
-        """
-        Return the (deduplicated) ActionSchema objects for all actions in
-        hyp's task decomposition, in first-appearance order.
-        """
-        task_schema = self.knowledge.get_task_schema(hyp.task_name)
-        if not task_schema or not task_schema.methods:
-            return []
-        seen = set()
-        schemas = []
-        for step in task_schema.methods[0].step_calls:
-            if step.action_name in seen:
-                continue
-            seen.add(step.action_name)
-            schema = self.knowledge.get_action_schema(step.action_name)
-            if schema is not None:
-                schemas.append(schema)
-        return schemas
-
-    def _resolve_completion_predicate(
+    def _grounded_actions(
         self,
-        schema,
         hyp: HypothesisKey,
-        obs: Observation,
-    ) -> Optional[Predicate]:
+        agent_id: str,
+        world: WorldState,
+    ) -> Optional[List[GroundedAction]]:
         """
-        Resolve schema.completion (a ConditionSchema over Vars/Consts) into a
-        fully-grounded Predicate, using hyp's bindings and this action's own
-        step_call bindings. Returns None if schema.completion is a
-        ProcessCompletion (no predicate to check, e.g. wait_at) or if any
-        term can't be resolved.
+        The actions the observed agent would perform under hyp, grounded
+        against the current world by the planner: the method whose guards
+        hold for that agent (what it holds decides between deliver_default,
+        deliver_already_held and deliver_with_return), its derived vars, and
+        every step binding. Re-selected every tick — the world is the cursor.
+
+        None when the planner cannot decompose hyp here (DecompositionError:
+        no applicable method, a derived var without a value). That is a fact
+        about this hypothesis in this world, not an error in the recognizer,
+        and the hypothesis is scored NEUTRAL; it is logged once per episode so
+        that a hypothesis that can never be scored is visible in the log
+        rather than indistinguishable from one that is merely uninformative.
+        Schema errors (unbound variable, unknown lookup) propagate: a domain
+        modelling mistake must not look like uncertainty.
+        Memoised per tick: the evidence pass and the output pass read it.
         """
-        if not isinstance(schema.completion, ConditionSchema):
-            return None
-
-        task_schema = self.knowledge.get_task_schema(hyp.task_name)
-        values = tuple(
-            self._resolve_term_value(term, hyp, obs, task_schema, schema.name)
-            for term in schema.completion.args
-        )
-        if any(v is None for v in values):
-            return None
-        return Predicate(
-            schema.completion.name, 
-            tuple(Const(v) for v in values if v is not None)
-        )
-
-    def _resolve_term_value(
-        self,
-        term,
-        hyp: HypothesisKey,
-        obs: Observation,
-        task_schema: Optional[TaskSchema],
-        action_name: str,
-    ) -> Optional[str]:
-        """
-        Resolve a single Var/Const term to a concrete value string.
-        Same "hasattr(term, 'value')" idiom already used in
-        _get_expected_position / _get_target_zone, kept consistent.
-        We changed "hasattr(term, 'value')" to "isinstance(term, Const)" to avoid false positives on Var objects that have a 'value' attribute.
-        """
-        if isinstance(term, Const):
-            return term.value  # Const — already concrete
-
-        var_name = term.name  # Var
-        if var_name == "?agent":
-            return obs.agent_id
-        if var_name in hyp.bindings:
-            return hyp.bindings[var_name]
-
-        # Fall back: look up this action's own step_call binding for var_name
-        if task_schema and task_schema.methods:
-            for step in task_schema.methods[0].step_calls:
-                if step.action_name == action_name:
-                    for k, v in step.bindings.items():
-                        if getattr(k, "name", None) == var_name and isinstance(v, Const):
-                            return v.value
-        return None
-
+        key = repr(hyp)
+        if key in self._tick_actions:
+            return self._tick_actions[key]
+        try:
+            actions = self._planner.decompose(hyp.task_name, hyp.bindings, agent_id, world)
+            self._undecomposable.discard(key)
+        except DecompositionError as e:
+            actions = None
+            if key not in self._undecomposable:
+                self._undecomposable.add(key)
+                logging.warning("[recognizer] %s not decomposable for %s, scored NEUTRAL: %s",
+                                key, agent_id, e)
+        self._tick_actions[key] = actions
+        return actions
 
     # -------------------------------------------------------------------------
     # Context weight ω_context
@@ -709,12 +717,12 @@ class IntentionRecognizer:
         """
         weight = 1.0
 
-        # Zone boost — human already in target zone
-        target_zone = self._get_target_zone(hyp, world)
-        if target_zone is not None:
-            in_zone_pred = Predicate("in_zone", (Const(obs.agent_id), Const(target_zone)))
-            if in_zone_pred in world.predicates:
-                weight *= ZONE_BOOST
+        # Zone boost — human already in target zone. The observation carries
+        # the agent's zone; the target zone is that of the object the
+        # hypothesis's chord is scored against.
+        target_zone = self._target_zone(hyp, obs.agent_id, world)
+        if target_zone is not None and obs.spatial_context.zone == target_zone:
+            weight *= ZONE_BOOST
 
         # Temperature boost — high temp makes ac_activation more likely
         if hyp.task_name == "ac_activation":
@@ -733,78 +741,25 @@ class IntentionRecognizer:
     # -------------------------------------------------------------------------
     # Target resolution helpers
     # -------------------------------------------------------------------------
-    def _get_expected_position(
+
+    def _target_zone(
         self,
         hyp: HypothesisKey,
-        world: WorldState,
         agent_id: str,
-    ) -> Optional[Tuple[float, float]]:
-        """
-        Return (x, y) of the position the human is expected to be moving toward
-        given hypothesis τ and current world state.
-
-        For deliver_item(?item=X):
-            - Phase 1 (not holding item): expected position is item's container (shelf)
-            - Phase 2 (holding item): expected position is delivery destination
-            (last move_to target in task schema, e.g. kitting_table)
-        For foreseeable tasks with no ?item (coffee_break, ac_activation):
-            inspect first move_to step_call in task schema → position of its target object.
-        """
-        item_id = hyp.bindings.get("?item")
-        if item_id is not None:
-            holding_pred = Predicate("holding", (Const(agent_id), Const(item_id)))
-            if holding_pred in world.predicates:
-                # Phase 2: item is held — expected position is delivery destination
-                task_schema = self.knowledge.get_task_schema(hyp.task_name)
-                if task_schema and task_schema.methods:
-                    for step in reversed(task_schema.methods[0].step_calls):
-                        if step.action_name == "move_to":
-                            for param_var, term in step.bindings.items():
-                                if isinstance(term, Const):
-                                    return world.object_positions.get(term.value)
-            else:
-                # Phase 1: item not yet held — expected position is item's container (shelf)
-                container = world.object_locations.get(item_id)
-                if container:
-                    pos = world.object_positions.get(container)
-                    if pos:
-                        return pos
-                return world.object_positions.get(item_id)
-
-        # No ?item — foreseeable task: use first move_to step_call target
-        task_schema = self.knowledge.get_task_schema(hyp.task_name)
-        if task_schema and task_schema.methods:
-            for step in task_schema.methods[0].step_calls:
-                if step.action_name == "move_to":
-                    for param_var, term in step.bindings.items():
-                        if isinstance(term, Const):
-                            return world.object_positions.get(term.value)
-        return None
-
-
-    def _get_target_zone(
-        self,
-        hyp: HypothesisKey,
         world: WorldState,
     ) -> Optional[str]:
         """
-        Return the zone of τ's target object, for ω_context zone boost.
+        Zone of τ's target object, for ω_context zone boost: the target of the
+        first movement action of the method the planner selects for τ in this
+        world — the same object _progress_likelihood scores the chord against.
+        WorldState.object_zones already places a carried object in its
+        carrier's zone, consistent with target_resolution's position rule.
+        None when τ has no movement action, is not decomposable here, or the
+        object has no zone.
         """
-        item_id = hyp.bindings.get("?item")
-        if item_id is not None:
-            container = world.object_locations.get(item_id)
-            if container:
-                return world.object_zones.get(container)
-            return world.object_zones.get(item_id)
-
-        # Foreseeable task — get zone of first move_to target
-        task_schema = self.knowledge.get_task_schema(hyp.task_name)
-        if task_schema and task_schema.methods:
-            for step in task_schema.methods[0].step_calls:
-                if step.action_name == "move_to":
-                    for param_var, term in step.bindings.items():
-                        if isinstance(term, Const):
-                            return world.object_zones.get(term.value)
+        actions = self._grounded_actions(hyp, agent_id, world)
+        for action in actions or []:
+            target_id = movement_target_id(action)
+            if target_id is not None:
+                return world.object_zones.get(target_id)
         return None
-                        
-        

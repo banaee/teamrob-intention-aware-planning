@@ -144,6 +144,11 @@ class SimModel(model.Model):
         self.robots: Dict[str, RobotAgent] = {}
 
         self._spawn_agents(scenario)
+        # First observation before the clock starts: the human acts before the
+        # robot observes within a tick, so without this the first step is never
+        # scored (see RobotAgent.observe_initial).
+        for robot in self.robots.values():
+            robot.observe_initial()
 
 
         # MY_TEST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#

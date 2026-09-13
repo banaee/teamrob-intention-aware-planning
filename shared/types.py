@@ -188,7 +188,10 @@ class ProcessCompletion:
     Completion determined by process exhaustion, not world state.
     Executor signals done when microaction queue empties naturally.
     Planner treats this action as always satisfiable in forward chaining.
-    Used for duration-based actions like wait_at where time is not world state.
+    Nothing outside the executor can observe such a completion, so a recognizer
+    cannot see the action end. kitting's wait_at no longer uses it: the body
+    emits waited(agent, entity) when its timer runs out (see
+    domains/kitting/actions.py). Still used by dock_loading's wait_at (deferred).
     """
     pass
 

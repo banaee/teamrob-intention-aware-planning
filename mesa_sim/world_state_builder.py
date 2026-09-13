@@ -36,6 +36,13 @@ PREDICATES GENERATED:
         Predicate("holding", (Const(agent_id), Const(item_id)))
         Predicate("obj_at", (Const(item_id), Const(location_id)))
 
+    Process:
+        Predicate("waited", (Const(agent_id), Const(obj_id)))
+        — emitted while agent.waited_at is set: the executor sets it on the last
+          STAND of a wait (nearest fixed object) and clears it on the agent's
+          next step/grasp/release/touch. wait_at's completion condition; the
+          body runs the timer, so the body says when the wait is over.
+
 PREDICATE NAMING RATIONALE:
     "in_zone" and "at" are intentionally distinct:
     - in_zone(agent, zone) — coarse spatial context for IR
@@ -113,6 +120,10 @@ def build_world_state(model: SimModel) -> WorldState:
         if human.carrying:
             predicates.add(Predicate("holding", (Const(agent_id), Const(human.carrying))))
 
+        # Process predicate — a completed wait the agent has not yet moved on from
+        if human.waited_at:
+            predicates.add(Predicate("waited", (Const(agent_id), Const(human.waited_at))))
+
         # Object-level proximity predicates — for executor completion checking
         _add_proximity_predicates(agent_id, human.pos, model, predicates)
 
@@ -138,6 +149,10 @@ def build_world_state(model: SimModel) -> WorldState:
         # Manipulation predicate
         if robot.carrying:
             predicates.add(Predicate("holding", (Const(agent_id), Const(robot.carrying))))
+
+        # Process predicate — a completed wait the agent has not yet moved on from
+        if robot.waited_at:
+            predicates.add(Predicate("waited", (Const(agent_id), Const(robot.waited_at))))
 
         # Object-level proximity predicates — for executor completion checking
         _add_proximity_predicates(agent_id, robot.pos, model, predicates)

@@ -33,7 +33,10 @@ I/O:
     OUT: current_task          str — exposed on agent
     OUT: current_action        str — exposed on agent
     OUT: current_microaction   str — exposed on agent, read by obs_builder
-    OUT: world mutations       agent.pos, item.held_by, item.at_location
+    OUT: world mutations       agent.pos, item.held_by, item.at_location,
+                               agent.waited_at (the fixed object a completed wait
+                               ended at; world_state_builder emits waited(agent, obj)
+                               from it, as holding(agent, item) comes from carrying)
 
 COMPLETION CHECKING:
     Each GroundedAction carries a fully instantiated completion_predicate
@@ -194,7 +197,7 @@ class Executor:
         elif name == "release":
             return self._execute_release(microaction)
         elif name == "stand":
-            return True  # no-op
+            return self._execute_stand(microaction)
         elif name == "touch":
             return self._execute_touch(microaction)
         else:
@@ -208,6 +211,7 @@ class Executor:
 
         self.agent.model.space.move_agent(self.agent, target_pos)
         self.agent.pos = target_pos
+        self.agent.waited_at = None
 
         if self.agent.carrying:
             item = self.agent.model.objects.get(self.agent.carrying)
@@ -236,6 +240,7 @@ class Executor:
         item.at_location = None
         item.position = self.agent.pos
         self.agent.carrying = item_id
+        self.agent.waited_at = None
 
         return True
 
@@ -268,6 +273,7 @@ class Executor:
         item.position = target_obj.position
         item.zone = target_obj.zone
         self.agent.carrying = None
+        self.agent.waited_at = None
 
         return True
 
@@ -280,6 +286,22 @@ class Executor:
         if item is None:
             return False
         item.is_scanned = True
+        self.agent.waited_at = None
+        return True
+
+    def _execute_stand(self, microaction: Microaction) -> bool:
+        """
+        Stand still for one tick. On the last STAND of a wait (remaining == 1,
+        see action_decomposer._expand_stand) the body records where the wait
+        ended — the nearest fixed object, the same proximity rule release uses
+        for its target — so that world_state_builder can emit
+        waited(agent, object). The wait's end is a body fact: the body runs
+        the timer, so the body says when it is over, the way a grasp makes
+        holding true. Cleared by the next step/grasp/release/touch — the fact
+        describes an agent that has finished waiting and not yet moved on.
+        """
+        if microaction.params.get("remaining") == 1:
+            self.agent.waited_at = self._nearest_env_object()
         return True
 
     def _nearest_env_object(self) -> Optional[str]:

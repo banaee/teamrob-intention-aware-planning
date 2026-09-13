@@ -200,6 +200,11 @@ changes — only correctly populated ActionSchema objects.
 Side effect (intentional, verified non-regressive): "release"/"touch"
 microactions now also receive completion-predicate checks (previously
 always NEUTRAL) — generalized for free, not hand-added.
+CORRECTION (I1 audit 10.3, I2): that check has never been reached — the first
+action of every kitting method is `move_to`, whose STEP* branch answers first for
+every observation, so release ticks return 1.0 for every hypothesis. Unchanged by
+I2 (dispatch order is the evidence model's, I3's business); the completion
+predicate is now the planner-grounded one when the check is reached.
 Files: shared/types.py (ActionSchema.progress_evaluator field),
 domains/kitting/actions.py, domains/dock_loading/actions.py,
 shared/likelihood_functions.py (new), shared/recognizer.py
@@ -207,8 +212,11 @@ Reference: IR debugging session, behavior-verified against scenario_00
 
 **TODO-20 — Persistent per-hypothesis tree cursor / notify_task_complete**
 Recognizer currently re-derives "which action schema applies" fresh every
-step by scanning the task tree (_get_relevant_action_schemas), rather than
-tracking a persistent cursor per hypothesis. No explicit signal exists for
+step, rather than tracking a persistent cursor per hypothesis. (Until I2 it read
+`methods[0]` and returned from its first schema — no tree was scanned, I1 10.5;
+since I2 it decomposes each hypothesis through the planner's guard-selected
+method every tick and dispatches over the grounded actions in order. Per-tick
+re-selection, no stored phase: the phase is I3's.) No explicit signal exists for
 "hypothesis h's task just completed → reset its belief contribution."
 BELIEF_FLOOR (TODO-18) makes this non-blocking for Phase 4C, but a full
 fix would: (a) track cursor state per hypothesis across cognitive clock
@@ -269,8 +277,16 @@ only) doesn't match `scenarios.py`, which binds both `?pallet` and
 `?delivery_bay` to it — `?delivery_bay` isn't declared on the schema or used
 in its step_calls. Also unconfirmed: whether `registry.py`'s import was
 updated from `go_to_office` to `office_break`.
-Files: domains/dock_loading/tasks.py, domains/dock_loading/scenarios.py, domains/dock_loading/registry.py
-Reference: Phase 4C typed-parameter generalization session
+Since I2 the recognizer grounds every hypothesis through the planner each tick, so
+`confirm_delivered_pallet`'s empty-bindings hypothesis raises `ValueError: unbound
+variable '?pallet'` on the first tick of any dock_loading run — a modelling error
+surfacing loudly, by design (see design_decisions.md, I2 entry), not a recognizer bug.
+Fix the schema (add `parameter_types`) before running dock_loading. `office_break`'s
+guarded-only method is handled: no applicable method → NEUTRAL, logged once.
+dock_loading's `wait_at` still declares `ProcessCompletion` (kitting's does not since
+I2); migrate it to `waited(?agent, ?entity)` with the rest of TODO-25.
+Files: domains/dock_loading/tasks.py, domains/dock_loading/scenarios.py, domains/dock_loading/registry.py, domains/dock_loading/actions.py
+Reference: Phase 4C typed-parameter generalization session; I2 IR foundations session
 
 **TODO-26 — `HypothesisKey` documented in io_contracts.md §1.8 as a shared/types.py
 dataclass; actually a hand-written class in shared/recognizer.py** (no `@dataclass`
@@ -811,6 +827,16 @@ Reference: Phase 4C block-design session, September 2026
 **TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places**
 Found during Phase 4C B2 design (September 2026), scenario_00 run_20260904_131808.
 Three separable defects; only the third is fixed.
+UPDATE (I2, September 2026): the `?item` literals are gone — the recognizer names no
+parameter; targets come from the planner's grounded actions (design_decisions.md, I2
+entry). (b) is fixed by construction: the target zone is the zone of the chord target, so
+the carried item's hypothesis gets ZONE_BOOST when the human enters the table's zone
+(measured: 20–50 new firings per condition, `analysis/i2_ir_foundations/zone_boost_episodes.csv`).
+(a) is SHARPER, not fixed: the carry chord now scores (it was NEUTRAL, TODO-46), so a
+delivered item leads by ≈ 0.8 : 0.05 after the release instead of ≈ 0.35 : 0.3, and the
+next task's approach is credited to it until the grasp — s00_on's second θ crossing moved
+from step 81 to 111. What removes it is a completion event that pins the delivered task
+(I1 C5), i.e. I3's phase model — not a target-resolution rule.
 
 (a) After delivery, `world.object_locations[item] = kitting_table_0`, so
 `_get_expected_position()`'s phase-1 branch resolves a delivered item's expected position
@@ -934,7 +960,15 @@ exception, just an idle robot. ROS is paused, so this was flagged rather than fi
 Files: ros_sim/framework_HRI/framework_HRI/planner_2.py
 Reference: assignment-prior session, September 2026
 
-**TODO-42 — `DomainModel.intentions` is a `Set`, so hypothesis order is nondeterministic**
+**TODO-42 — `DomainModel.intentions` is a `Set`, so hypothesis order is nondeterministic** ✅ RESOLVED for the recognizer (I2)
+The recognizer sorts its hypothesis list by key at construction, builds the initial prior in
+that order, and emits pinned keys in sorted order, so `most_likely` tie-breaks and `[IR-dist]`
+order are functions of the hypothesis space only. Measured: scenario_40, both prior settings,
+byte-identical on `[meta]`, `[IR]`, `[IR-dist]`, `[meta-cand]` under PYTHONHASHSEED=0, 1 and 2.
+`get_all_intentions()` itself is still unordered (nothing downstream depends on its order now);
+keep PYTHONHASHSEED=0 in the regression recipe until every other consumer is checked.
+Tie-breaks are now alphabetical by key (t=0 prior-off winner in s00 is item_2, was the
+layout's first item) — reproducible, not meaningful, as noted below.
 `DomainModel.intentions: Set[str]` (`shared/types.py`) and `get_all_intentions()` returns
 `list(self._domain.intentions)`. Python randomizes string hashing per process, so that list
 comes out in a different order on every run — five fresh processes gave three different
@@ -995,7 +1029,14 @@ something.
 Files: shared/meta_planner.py (`update_human_projection`)
 Reference: evidence-gated projection admission session, September 2026
 
-**TODO-46 — IR has never used completion evidence; only phase-1 shelf approach ever scores**
+**TODO-46 — IR has never used completion evidence; only phase-1 shelf approach ever scores** ✅ (2) and (3) RESOLVED in I2; (1) is I3's
+I2: `_get_expected_position()` is gone; the target is the first movement action of the
+planner's guard-selected method, grounded through task and step bindings and resolved by
+`shared/target_resolution.py`. Measured (`analysis/i2_ir_foundations/summary.md`): 0 unresolved
+targets in all eight conditions (was 64/261/61/54 per scenario); the carry chord scores
+(0.797 → 0.966 mid-carry in s00/s20/s30); `coffee_break` gets the coffee walk (s40: 0.81, θ at
+142). (1) — completion evidence at GRASP/RELEASE — is still unreachable because `move_to`
+answers first in dispatch order; that is the per-hypothesis phase (I3), not target resolution.
 One root cause, three symptoms. `_get_expected_position()` returns `None` — hence NEUTRAL —
 whenever the target binding it inspects is a `Var` rather than a `Const`:
 (1) Completion evidence is unreachable. `_likelihood()` returns from the FIRST schema in
@@ -1052,13 +1093,80 @@ case it cannot see. Candidate fix, undecided: fire on `most_likely` change while
 First measure whether it occurs in current scenarios.
 
 Measured (T1, `analysis/t1_conflict_measurement/REPORT.md` §θ-flip scan, all six baselines,
-PYTHONHASHSEED=0): it does not occur. 0 of 25 `most_likely` changes happen with confidence
+PYTHONHASHSEED=0): it does not occur. UPDATE (I2): it now does — scenario_30, assignment_prior
+on, step 98: `most_likely` flips from the delivered item_3 (0.782, ≥ θ) to item_7 at its grasp
+(0.876) and no trigger fires; the robot keeps the projection built at step 39 (a task the human
+finished at 73). Cause: the delivered-item lead created by scored carry legs (TODO-37(a),
+I2). Revisit with I3's completion pin — if the delivered task is pinned, the flip is a crossing
+again — before deciding on a `most_likely`-change trigger. 0 of 25 `most_likely` changes happen with confidence
 ≥ θ at both the tick and the previous tick — 16 have both sides below θ, 6 are collapses
 from ≥ θ to well below after the human's task completes, 3 coincide with a `theta_crossed`
 trigger on the same tick. DEFERRED ON EVIDENCE: revisit when new scenarios exist
-(TODO-47), not before.
+(TODO-47), not before — superseded by the I2 measurement above.
 Files: shared/meta_planner.py (evaluate_triggers)
-Reference: Phase 4C B2/B3 session, September 2026; T1 measurement session, September 2026
+Reference: Phase 4C B2/B3 session, September 2026; T1 measurement session, September 2026; I2
+
+**TODO-49 — Type-name mismatch between layout and schema silently empties a task's hypothesis space**
+`build_hypothesis_space()` does `known_objects_by_type.get(type, [])`; a task whose parameter
+type has no object in the layout gets zero hypotheses. Legitimate when the layout genuinely
+lacks the object (s00/s20/s30 have no coffee machine — DESIGN-14), a silent modelling error
+when it is a spelling mismatch: `env_layout1.json` declared `AC_switch` against
+`parameter_types` `ac_switch`, so scenario_10's scripted `ac_activation` was unrecognisable
+for the whole life of the scenario and every audit count said "coffee_break is the only
+foreseeable hypothesis" (fixed in I2: the layout now spells `ac_switch_0` / `ac_switch`, the
+id the script already used). Proposal, not built (I2 report §6):
+(1) `build_hypothesis_space()` logs one `[IR-space]` line per intention with its hypothesis
+    count, so the log states which tasks are recognisable in this layout;
+(2) a scenario's `scheduled_tasks` are validated at spawn: every scripted task's key must be in
+    the hypothesis space, and every bound object id must exist in the layout — an error, not a
+    warning, because the human is about to execute a task the robot cannot recognise, and no
+    fixture can mean that on purpose;
+(3) a parameter type that matches a layout type case-insensitively but not exactly is an
+    error at hypothesis-space construction.
+(1) is a log line; (2) and (3) are the small validation this needs, in `SimModel._spawn_agents`
+/ `build_hypothesis_space`, not a framework.
+Files: shared/recognizer.py (build_hypothesis_space), mesa_sim/sim_model.py
+Reference: I1 audit 3.8, F1 report §1, I2 IR foundations session
+
+**TODO-50 — A foreseeable task that is never completed becomes a permanent attractor**
+Since I2 `coffee_break`'s target resolves, so it collects the coffee walk (correct) — and then
+keeps its lead for the rest of scenario_40: it is never refuted by a grasp (no portable object
+in its bindings), nothing marks it complete, and later legs still hand it moderate chord
+credit (the walk away from the machine is 64° off it, L ≈ 2.9, better than any shelf). Measured
+(`analysis/i2_ir_foundations/f1_traces/`): `most_likely` from step 118 to the end of the run,
+0.96 at the human's grasp of item_6 (272), 0.89–0.90 while the human is idle. This is I1's C5
+(no completion event) in its clearest form and the reason I2 made `wait_at` observable
+(`waited(agent, entity)`, visible at steps 184–186): I3's phase model can complete
+`coffee_break` on it. Do not add a decay or a refutation for foreseeable tasks — the fixture
+shows the missing piece is completion, and its numbers are the reference for I3.
+Files: shared/recognizer.py
+Reference: I2 IR foundations session; analysis/i2_ir_foundations/REPORT.md §4
+
+**TODO-51 — Per-tick method re-selection scores every other delivery against the held item's home shelf**
+While the human carries X, `deliver_item(Y)` for every Y ≠ X selects `deliver_with_return`,
+whose first movement is to X's home container — behind the human on every carry — so all of
+them collect L ≈ 0.1 per carry leg under the held-item pin, and return after the release at
+≈ 0.02–0.14 against the delivered item's 0.8 (I2 report §4). Two readings, both on record:
+(a) correct — the domain says a human who wanted Y while holding X would return X first, and
+    this human did not; the delivered item's lead afterwards is C5, fixed by completion;
+(b) evidence for hypotheses under a hard refutation should not accumulate at all (they are
+    refuted, not scored), in which case the pin should freeze their evidence — a change to
+    the evidence model, I3/I4's.
+The evidence that settles it: with I3's completion pin in place, do the next-task reveal
+times (s00_on 81 → 111, s20_on 82 → 89, s30_on 77 → none) return to or improve on baseline?
+Files: shared/recognizer.py (`_weigh`, `_output`), shared/planner.py (`decompose`)
+Reference: I1 audit §9 (per-tick vs frozen selection); I2 IR foundations session
+
+**TODO-52 — scenario_10's step-257 RuntimeError is latent, not fixed**
+I1's O1 (`MetaPlanner._replan_tasks`: no feasible candidate, `min_dist=0.0`, at the
+`theta_crossed` on the human's grasp of item_4 at 257) no longer fires after I2 — both prior
+settings run 300 steps to completion — only because the belief at 257 is now `ac_activation`
+at 0.69 (below θ; the AC hypothesis exists since the layout fix, TODO-49) so no crossing fires
+there. The meta-planner condition that raised is untouched. Not a sweep scenario (dropped in I2);
+keep it dropped until the meta-planner is unpaused, and expect the crash to return when the
+belief changes again.
+Files: shared/meta_planner.py
+Reference: I1 audit O1; I2 IR foundations session
 
 ---
 

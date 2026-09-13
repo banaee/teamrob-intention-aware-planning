@@ -786,3 +786,83 @@ step-2 reveals that would appear under σ ≤ 30° do.
 Files: shared/recognizer.py (`update`, `_weigh`, `_output`, `_refuted_by_holding`,
 `_progress_likelihood`, `_finalize`, `_pin`)
 Reference: leg-level evidence session, September 2026
+
+**Targets, methods and completions are the planner's — the recognizer resolves nothing itself (I2)**
+Until I2 the recognizer resolved a hypothesis's target with its own copy of the lookup: read
+the literal `"?item"`, take `methods[0]`, take the first `Const` bound to a step named
+`"move_to"`, and read the item's container out of `object_locations`. It worked for kitting's
+current schemas only, and where it did not (a `Var`-bound target: every carry leg, every
+`coffee_break` / `ac_activation` chord) the hypothesis silently scored NEUTRAL — 64/261/61/54
+likelihood calls per scenario in the I1 audit (`analysis/i1_ir_audit/REPORT.md` §3.1). The
+audit found the same lookup, weaker, duplicated three times (§4.1–4.3) and every method chosen
+by position (§9.3–9.5).
+
+Decision. Every tick, for every live hypothesis, the recognizer asks the planner what the
+observed agent would do if it held that intention — `AdaptivePlanner.decompose(task, bindings,
+agent_id, world)`, the same guard-selected method, derived vars and step grounding the executor's
+plans come from — and scores against those GroundedActions:
+- the chord target is the first movement action's target (`ActionSchema.movement_target_key`),
+  resolved to a position by `shared/target_resolution.py`; the projector uses the same function
+  for its segments. There is one answer to "where is the thing this action targets", and it is
+  the object's CURRENT location, a carried object resolving through its holder (its
+  `object_locations` entry is an agent id, i.e. a key of `agent_positions`). The planner's
+  `home_container_of` derived var answers a different question — where an object belongs, a
+  symbolic return destination — and stays a derived var; the two are not merged;
+- completion predicates are the ones the planner already grounded (`GroundedAction.
+  completion_predicate`); `_resolve_term_value` and its `"?agent"` literal are gone;
+- ZONE_BOOST's target zone is the zone of the same object the chord is scored against;
+- the held-item rule reads `AgentState.holding` and refutes a hypothesis that binds a portable
+  object (one that has an `object_locations` entry) other than the held one — no parameter name;
+- the agent's zone comes from the observation it was given (`spatial_context.zone`), not from a
+  rebuilt `in_zone` predicate.
+Method selection is re-evaluated every tick against the live world ("the world is the cursor");
+which action a hypothesis is *on* is not stored — that is I3's per-hypothesis phase.
+A hypothesis the planner cannot decompose in this world (no method's guards hold, a derived var
+without a value — `DecompositionError`, a subclass of `ValueError` raised only for these
+world-dependent cases) is scored NEUTRAL and logged once per episode, so an unscorable
+hypothesis is visible rather than indistinguishable from an uninformative one. An unbound
+variable or unknown lookup is a schema error and still raises: a domain modelling mistake must
+not look like uncertainty (dock_loading's `confirm_delivered_pallet`, TODO-25, now fails
+loudly at the first tick instead of being NEUTRAL forever).
+
+Consequences measured (`analysis/i2_ir_foundations/REPORT.md`; every difference from the I1/F1
+baselines attributed by stage): no target is unresolved in any of the eight conditions; the
+carried item's hypothesis now receives the carry chord (grasp 0.797 → 0.966 mid-carry in
+s00/s20/s30); `coffee_break` receives the coffee walk (s40: 0.02 → 0.81, θ at step 142, the
+F1 segment-2 criterion). Two consequences the phase model (I3) inherits rather than I2 fixes:
+(1) while the human carries X, every other `deliver_item` hypothesis selects
+`deliver_with_return`, whose first step walks back to X's home shelf — the carry is strong
+evidence against all of them, so after the release the delivered item leads by 0.8 : 0.05
+(C5, no completion event) and the next task's approach is credited to it: s00_on's second
+θ crossing moves from step 81 (mid-approach) to 111 (the grasp), s20_on's from 82 to 89,
+s30_on's does not fire at all (the winner flips above θ, TODO-48); (2) a foreseeable task,
+never refuted by a grasp and never completed, becomes a permanent attractor: `coffee_break`
+stays `most_likely` for the rest of s40 (0.96 at the grasp of item_6). Both readings are on
+record in the report; the evidence that settles them is what the completion pin does to
+these numbers in I3.
+
+wait_at. Its completion was a `ProcessCompletion` — executor-internal queue exhaustion that
+nothing outside the executor could observe, so a phase model would stall on it forever
+(`coffee_break` and `ac_activation` both end in it). The body runs the timer, so the body
+says when the wait is over: on the last STAND the executor records the nearest fixed object
+(the proximity rule release already uses) as `agent.waited_at`, `world_state_builder` emits
+`waited(agent, object)` from it, and kitting's `wait_at` declares that predicate as its
+completion — an ordinary ConditionSchema, no special case in `shared/`. The fact persists until
+the agent's next step/grasp/release/touch (measured: visible for three ticks after each wait
+in s40); a second `wait_at` at the same object issued before the agent moves would therefore
+complete at once (no scenario does this — surfaced, not judged; the alternative, clearing on
+action advance, is executor-internal state). dock_loading's `wait_at` keeps
+`ProcessCompletion` (deferred domain; the executor branch stays for it).
+
+Also in I2: the hypothesis list is sorted by key at construction and pinned keys are emitted in
+sorted order, so tie-breaks and log order no longer depend on the process hash seed (measured:
+s40 byte-identical on the four regression greps under PYTHONHASHSEED=0/1/2; TODO-42 for the
+recognizer); the robot observes the human once before the clock starts (`RobotAgent.
+observe_initial`), because the human acts before the robot observes within a tick and the
+first step was never scored (I1 2.12); `env_layout1.json`'s `AC_switch` is spelled
+`ac_switch`, so scenario_10 has an `ac_activation` hypothesis for the first time (9 → 10 keys).
+Files: shared/recognizer.py, shared/planner.py (`decompose`, `DecompositionError`),
+shared/target_resolution.py (new), shared/projection.py, domains/kitting/actions.py (`wait_at`),
+mesa_sim/executor.py, mesa_sim/action_decomposer.py, mesa_sim/world_state_builder.py,
+mesa_sim/sim_agents.py, mesa_sim/sim_model.py, domains/kitting/env_layout1.json
+Reference: I2 IR foundations session, September 2026; analysis/i2_ir_foundations/REPORT.md

@@ -150,7 +150,9 @@ def _expand_stand(
     """
     duration_str = action.bindings.get("?duration", "PT1S")
     n_steps = _parse_duration_to_steps(duration_str, model)
-    return [Microaction(name="stand", params={"remaining": n_steps})] * n_steps
+    # Distinct objects counting down to 1 — the executor recognises the last
+    # STAND of a wait by remaining == 1 (it was one shared dict repeated n times).
+    return [Microaction(name="stand", params={"remaining": n_steps - i}) for i in range(n_steps)]
 
 
 def _expand_fixed(

@@ -8,7 +8,9 @@ PURPOSE:
 
 WHAT THIS MODULE DOES:
     - Fetches TaskSchema from DomainKnowledgeBase
-    - Selects applicable method (first method whose guards hold in WorldState)
+    - Selects applicable method (first method whose guards hold in WorldState);
+      decompose() exposes that selection to the recognizer, which must never
+      pick a method by position
     - Grounds each StepCall: resolves Var bindings to Const values
     - Recursively decomposes StepCalls that name a TaskSchema (not a primitive ActionSchema)
     - Returns a flat AbstractPlan (single task, executor-facing)
@@ -49,6 +51,19 @@ from shared.domain_knowledge import DomainKnowledgeBase
 logger = logging.getLogger(__name__)
 
 
+class DecompositionError(ValueError):
+    """
+    The task cannot be decomposed in THIS world: no method's guards hold, or a
+    derived-var lookup has no value here. A fact about the world, not about the
+    schema — the same task may decompose a tick later. Callers that plan for
+    themselves let it propagate (an unexecutable plan is an error); callers that
+    only ask whether a task is possible for someone else (the recognizer, per
+    hypothesis) catch it and score the hypothesis neutrally. Schema errors —
+    an unknown task or step, an unbound variable, an unknown lookup function —
+    stay plain ValueError: they are modelling mistakes and must surface loudly.
+    """
+
+
 class AdaptivePlanner:
 
     def __init__(self, knowledge: DomainKnowledgeBase):
@@ -68,16 +83,33 @@ class AdaptivePlanner:
         Recursively decomposes sub-tasks until all steps are primitive ActionSchemas.
         Guard evaluation selects the applicable method per task/sub-task.
         """
-        # Build initial bindings: task params + agent injection
-        bindings: Dict[str, str] = {"?agent": agent_id}
-        bindings.update(task_params)
-
-        actions = self._decompose_task(my_intention, bindings, world)
+        actions = self.decompose(my_intention, task_params, agent_id, world)
 
         return AbstractPlan(
             goal_intention=my_intention,
             actions=actions,
         )
+
+    def decompose(
+        self,
+        task_name: str,
+        task_params: Dict[str, str],
+        agent_id: str,
+        world: WorldState,
+    ) -> List[GroundedAction]:
+        """
+        The flat GroundedAction list for one task, grounded for `agent_id`
+        against `world`: guard-selected method, derived vars, every step Var
+        resolved through the task and step bindings. plan() wraps this for the
+        executor; the recognizer calls it directly, once per hypothesis and
+        tick, to learn which actions the observed agent would perform if it
+        held that intention — the same selection, not a parallel one.
+        Raises DecompositionError when no method applies in this world.
+        """
+        # Build initial bindings: task params + agent injection
+        bindings: Dict[str, str] = {"?agent": agent_id}
+        bindings.update(task_params)
+        return self._decompose_task(task_name, bindings, world)
 
     # ------------------------------------------------------------------
     # Internal decomposition
@@ -138,14 +170,14 @@ class AdaptivePlanner:
         with bindings updated to include any vars discovered by existential
         guard matching.
         Empty guard list = unconditional (always passes).
-        Raises ValueError if no method is applicable.
+        Raises DecompositionError if no method is applicable.
         """
         for method in task_schema.methods:
             resolved = self._guards_satisfied(method, bindings, world)
             if resolved is not None:
                 return method, resolved
 
-        raise ValueError(
+        raise DecompositionError(
             f"AdaptivePlanner: no applicable method for task '{task_schema.name}' "
             f"in current world state. Bindings: {bindings}"
         )
@@ -248,7 +280,7 @@ class AdaptivePlanner:
                     f"for derived var '{var_name}'"
                 )
             if derived_val is None:
-                raise ValueError(
+                raise DecompositionError(
                     f"AdaptivePlanner: lookup '{lookup_fn}({source_val})' "
                     f"returned None for derived var '{var_name}'"
                 )

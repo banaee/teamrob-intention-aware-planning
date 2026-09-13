@@ -14,7 +14,7 @@ PREDICATE NAMING NOTE:
 
 """
 
-from shared.types import Var, Const, ConditionSchema, ProcessCompletion, ActionSchema
+from shared.types import Var, Const, ConditionSchema, ActionSchema
 
 _agent  = Var("?agent")
 _item   = Var("?item")
@@ -83,13 +83,21 @@ place = ActionSchema(
     microactions=["RELEASE"],
 )
 
+# wait_at's completion is a world fact the body emits when its timer runs out —
+# waited(agent, entity), the way a grasp yields holding(agent, item). It was a
+# ProcessCompletion (executor-internal queue exhaustion), which nothing outside
+# the executor could observe, so a recognizer tracking the phase of a
+# coffee_break or ac_activation hypothesis would have stalled on it forever.
+# The body determines the entity by proximity, as release does its target.
 wait_at = ActionSchema(
     name="wait_at",
     parameters=[_entity],
     preconditions=[
         ConditionSchema("at", (_agent, _entity)),
     ],
-    effects=[],
-    completion=ProcessCompletion(),
+    effects=[
+        ConditionSchema("waited", (_agent, _entity)),
+    ],
+    completion=ConditionSchema("waited", (_agent, _entity)),
     microactions="STAND*",
 )
