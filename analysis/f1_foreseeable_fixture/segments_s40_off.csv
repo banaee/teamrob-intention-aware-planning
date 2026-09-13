@@ -1,0 +1,20 @@
+condition,segment,human_task,human_action,first_step,last_step,ir_ticks,most_likely_first,conf_first,most_likely_last,conf_last,most_likely_at_max,conf_max,step_of_max,ticks_at_or_above_theta,deliver_item_above_theta,p_coffee_max,p_unknown_min,p_unknown_max,winner_sequence
+s40_off,seg1_deliver_item_3,item_3,move_to,0,59,60,item_4,0.2,item_3,0.52,item_3,0.52,55,0,-,0.1,0.065,0.1,item_4@0 > item_3@1
+s40_off,seg1_deliver_item_3,item_3,pick_up,60,61,2,item_3,0.5691,item_3,0.5691,item_3,0.5691,60,0,-,0.1423,0.1423,0.1423,item_3@60
+s40_off,seg1_deliver_item_3,item_3,move_to,62,114,53,item_3,0.5691,item_3,0.5691,item_3,0.5691,62,0,-,0.1423,0.1423,0.1423,item_3@62
+s40_off,seg1_deliver_item_3,item_3,place,115,116,2,item_3,0.2941,item_3,0.2941,item_3,0.2941,115,0,-,0.0368,0.0368,0.0368,item_3@115
+s40_off,seg2_coffee,coffee_break,-,117,117,1,item_3,0.2941,item_3,0.2941,item_3,0.2941,117,0,-,0.0368,0.0368,0.0368,item_3@117
+s40_off,seg2_coffee,coffee_break,move_to,118,154,37,item_5,0.3188,item_5,0.3871,item_5,0.3871,145,0,-,0.0205,0.0169,0.0205,item_5@118
+s40_off,seg2_coffee,coffee_break,wait_at,155,185,31,item_5,0.3871,item_5,0.3871,item_5,0.3871,155,0,-,0.0205,0.0205,0.0205,item_5@155
+s40_off,seg3a_toward_shelf_6,ac_activation,-,186,186,1,item_5,0.3871,item_5,0.3871,item_5,0.3871,186,0,-,0.0205,0.0205,0.0205,item_5@186
+s40_off,seg3a_toward_shelf_6,ac_activation,move_to,187,206,20,item_5,0.4384,item_5,0.4904,item_5,0.4904,205,0,-,0.0059,0.0033,0.0059,item_5@187
+s40_off,seg3a_toward_shelf_6,ac_activation,wait_at,207,208,2,item_5,0.4904,item_5,0.4904,item_5,0.4904,207,0,-,0.0033,0.0033,0.0033,item_5@207
+s40_off,seg3b_turn_away,ac_activation,-,209,209,1,item_5,0.4904,item_5,0.4904,item_5,0.4904,209,0,-,0.0033,0.0033,0.0033,item_5@209
+s40_off,seg3b_turn_away,ac_activation,move_to,210,227,18,item_5,0.6421,item_5,0.64,item_5,0.6423,212,0,-,0.0021,0.0021,0.0021,item_5@210
+s40_off,seg3b_turn_away,ac_activation,wait_at,228,229,2,item_5,0.64,item_5,0.64,item_5,0.64,228,0,-,0.0021,0.0021,0.0021,item_5@228
+s40_off,seg4_deliver_item_6,item_6,-,230,230,1,item_5,0.64,item_5,0.64,item_5,0.64,230,0,-,0.0021,0.0021,0.0021,item_5@230
+s40_off,seg4_deliver_item_6,item_6,move_to,231,271,41,item_5,0.6438,item_5,0.6442,item_5,0.6442,240,0,-,0.001,0.001,0.001,item_5@231
+s40_off,seg4_deliver_item_6,item_6,pick_up,272,273,2,item_6,0.9863,item_6,0.9863,item_6,0.9863,272,2,item_6,0.0032,0.0032,0.0032,item_6@272
+s40_off,seg4_deliver_item_6,item_6,move_to,274,330,57,item_6,0.9863,item_6,0.9706,item_6,0.9863,274,57,item_6,0.0085,0.0032,0.0085,item_6@274
+s40_off,seg4_deliver_item_6,item_6,place,331,332,2,item_5,0.8257,item_5,0.8257,item_5,0.8257,331,2,item_5,0.001,0.001,0.001,item_5@331
+s40_off,done,-,-,333,378,46,item_5,0.8257,item_5,0.8257,item_5,0.8257,333,46,item_5,0.001,0.001,0.001,item_5@333

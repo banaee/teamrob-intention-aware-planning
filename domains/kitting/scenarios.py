@@ -203,3 +203,60 @@ scenario_30 = ScenarioConfig(
         ),
     ],
 )
+
+# ===============================================================================
+# manually defined scenario, for only "env_layout4".
+# ===============================================================================
+scenario_40 = ScenarioConfig(
+    id="scenario_40",
+    name="layout4_foreseeable_and_unmodelled",
+    description=(
+        "Foreseeable-task fixture (I1 follow-up; baseline for I3/I4). One human run in four "
+        "segments. (1) deliver item_3 from shelf_3 (-950, -50): 1209 cm approach from "
+        "(100, 550), every other target >= 50 deg off the heading - the positive control. "
+        "(2) coffee_break at coffee_machine_0 (-40, -250): scheduled, not assigned; from the "
+        "kitting table the coffee bearing is >= 49.6 deg off every task target. (3) walk to two "
+        "'waypoint' objects no task enumerates: wander_0 (356, -210) lies on the straight line "
+        "from the coffee machine to shelf_6, so the human first heads toward a shelf it will "
+        "deliver from later; wander_1 (230, -550) is >= 64 deg off every target seen from "
+        "wander_0, so the turn is a retraction case. The two walks are scripted as "
+        "ac_activation instances bound to the waypoints (move_to + a one-tick wait_at): the "
+        "schema only supplies the walk; ac_activation's own hypothesis is bound to "
+        "ac_switch_0, which is never visited. (4) deliver item_6 from shelf_6 (950, -150), so "
+        "the assigned pool is exactly the deliveries; shelf_5 (robot, undelivered then) is "
+        "17 deg off this last approach - a prior-off decoy, inadmissible prior-on. Robot: "
+        "item_4, item_7, item_5 from a SW start, ~375 ticks of work so the IR keeps observing "
+        "until the human's script ends (~330 ticks). Run with --steps 400. Measured baselines: "
+        "analysis/f1_foreseeable_fixture/REPORT.md."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(100, 550),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")}),
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("wander_0")}),   # segment 3, leg 1: toward shelf_6
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("wander_1")}),   # segment 3, leg 2: turn away
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-950, -550),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)

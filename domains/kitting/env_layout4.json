@@ -1,0 +1,49 @@
+{
+  "space": {
+    "width": 2000,
+    "height": 1200,
+    "name": "Kitting Domain Layout 4",
+    "units": "cm",
+    "notes": "Foreseeable-task fixture (scenario_40). One human run in four segments: (1) an assigned delivery with a 1209 cm approach (positive control); (2) a walk from the kitting table to the coffee machine, >= 49.6 deg off every task target seen from the table; (3) a walk to two 'waypoint' markers that no task enumerates - wander_0 lies on the straight line from the coffee machine to shelf_6 (the human heads toward a shelf it will use later), wander_1 is >= 50 deg off every target seen from wander_0 (the human turns away); (4) the delivery from shelf_6. The coffee machine sits alone south of the table; every shelf is on the east or west edge. Every target is >= 50 deg off the segment-1 heading. No obstacles. The ac_switch object uses the type string ac_activation's parameter_types asks for ('ac_switch'); env_layout1 spells it 'AC_switch' and gets no hypothesis (I1 follow-up)."
+  },
+  "zones": [
+    {"id": "zone_NW", "bounds": {"x_min": -1000, "x_max": 0,    "y_min": 0,    "y_max": 600}, "label": "northwest_work"},
+    {"id": "zone_NE", "bounds": {"x_min": 0,     "x_max": 1000, "y_min": 0,    "y_max": 600}, "label": "northeast_work"},
+    {"id": "zone_SW", "bounds": {"x_min": -1000, "x_max": 0,    "y_min": -600, "y_max": 0},   "label": "southwest_storage"},
+    {"id": "zone_SE", "bounds": {"x_min": 0,     "x_max": 1000, "y_min": -600, "y_max": 0},   "label": "southeast_storage"}
+  ],
+  "doors": [],
+  "robots": [
+    {"id": "robot_0", "type": "mobile_manipulator", "initial_container": "zone_SW", "initial_x": -950, "initial_y": -550}
+  ],
+  "humans": [
+    {"id": "human_0", "type": "worker", "initial_container": "zone_NE", "initial_x": 100, "initial_y": 550}
+  ],
+  "env_objects": [
+    {"id": "kitting_table_0", "type": "kitting_table", "position": [0, 500], "size": [200, 100], "zone": "zone_NW",
+     "notes": "Shared delivery sink, top centre. Segment 2 starts here."},
+    {"id": "shelf_3", "type": "shelf", "position": [-950, -50], "size": [100, 100], "slots": 2, "zone": "zone_SW",
+     "notes": "Human's first delivery (segment 1). Approach from (100, 550): 1209 cm, bearing -150.3 deg; every other target is >= 50 deg off that heading."},
+    {"id": "shelf_6", "type": "shelf", "position": [950, -150], "size": [100, 100], "slots": 2, "zone": "zone_SE",
+     "notes": "Human's last delivery (segment 4). Segment 3's first waypoint lies on the coffee_machine_0 -> shelf_6 line, 40% of the way."},
+    {"id": "shelf_4", "type": "shelf", "position": [850, 150], "size": [100, 100], "slots": 2, "zone": "zone_SE",
+     "notes": "Robot task 1 (cheapest from its SW start)."},
+    {"id": "shelf_7", "type": "shelf", "position": [950, 450], "size": [100, 100], "slots": 2, "zone": "zone_NE",
+     "notes": "Robot task 2 (cheapest from the table after item_4)."},
+    {"id": "shelf_5", "type": "shelf", "position": [950, -400], "size": [100, 100], "slots": 2, "zone": "zone_SE",
+     "notes": "Robot task 3, the most expensive from the table, so it is done last and keeps the robot busy until ~375 ticks - the IR is only called while the robot has tasks (I1 7.12). Undelivered during the human's segment 4, where it is 17 deg off the heading (prior-off decoy; inadmissible prior-on)."},
+    {"id": "coffee_machine_0", "type": "coffee_machine", "position": [-40, -250], "size": [50, 50], "zone": "zone_SW",
+     "notes": "Segment 2 target. From the kitting table: bearing -93.1 deg, 751 cm; nearest task-target bearing from there is shelf_5 at -43.5 deg (49.6 deg off). x = -40 keeps the walk off the x = 0 zone boundary."},
+    {"id": "ac_switch_0", "type": "ac_switch", "position": [400, 550], "size": [20, 20], "zone": "zone_NE",
+     "notes": "Second foreseeable target; never visited. Type spelled as ac_activation's parameter_types requires."},
+    {"id": "wander_0", "type": "waypoint", "position": [356, -210], "size": [10, 10], "zone": "zone_SE",
+     "notes": "Segment 3, leg 1 end. Exactly on the coffee_machine_0 -> shelf_6 line (t = 0.4): the human heads toward shelf_6 for 398 cm, then turns. No task enumerates type 'waypoint', so no hypothesis targets it."},
+    {"id": "wander_1", "type": "waypoint", "position": [230, -550], "size": [10, 10], "zone": "zone_SE",
+     "notes": "Segment 3, leg 2 end. From wander_0: bearing -110.3 deg, 362 cm; >= 64 deg off every target (shelf_5 92.6, coffee 64.0, shelf_6 116.1, table 133.1)."},
+    {"id": "item_3", "type": "item", "subtype": "part_B", "initial_container": "shelf_3", "size": [25, 25], "notes": "human, segment 1"},
+    {"id": "item_6", "type": "item", "subtype": "part_D", "initial_container": "shelf_6", "size": [25, 25], "notes": "human, segment 4"},
+    {"id": "item_4", "type": "item", "subtype": "part_C", "initial_container": "shelf_4", "size": [25, 25], "notes": "robot"},
+    {"id": "item_7", "type": "item", "subtype": "part_D", "initial_container": "shelf_7", "size": [25, 25], "notes": "robot"},
+    {"id": "item_5", "type": "item", "subtype": "part_C", "initial_container": "shelf_5", "size": [25, 25], "notes": "robot"}
+  ]
+}
