@@ -1243,20 +1243,41 @@ it. Meta-planner paused: recorded only.
 Files: shared/meta_planner.py (evaluate_triggers)
 Reference: I3 phase-model session
 
-**TODO-55 — What a single-task hypothesis means while another task is visibly under way**
+**TODO-55 — What a single-task hypothesis means while another task is visibly under way** [DEFERRED by decision — re-measure after I4, not before]
 The phase model judges `deliver_item(Y)` under the method the observed agent's world selects —
-`deliver_with_return` while X is carried — so Y is refuted by X's carry (TODO-51, measured) and
-every next-task reveal waits for the grasp. Three readings, none chosen: (a) correct as is —
-the domain says so, and the belief after a release honestly favours `unknown`; (b) the prior over
-the remaining tasks should be reset on the observed agent's task completion (the C5 event now
-exists: `[IR-complete]`), so a finished task's carry does not bury the next one — TODO-18/20's
-"reset-to-uniform", now implementable; (c) `deliver_with_return` is a robot contingency and the
-human's hypotheses should be decomposed against a world without its own `holding` facts — which
-is a domain-specific filter and the variant `ownshelf` shows its cost on s30_on. Evidence that
-settles it: whether I4's path-cost kernel makes the approach after a release decisive before the
-grasp under (a); if not, (b) is the principled option and (c) is not.
-Files: shared/recognizer.py, domains/kitting/tasks.py
-Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §5
+`deliver_with_return` while X is carried — so Y is refuted by X's carry (TODO-51, measured ≈ ×0.1
+per carry) and every next-task reveal waits for the grasp (s00_on 111, s20_on 89, s30_on 98).
+DEFERRED, not open for I4 to settle in passing: the severity above is measured against the
+LOW_LIKELIHOOD cliff (0.1 for a chord ≈ 180° off), which I4 replaces with a gradient. Every reading
+below must be re-measured after the I4 sweep before any of them is chosen; the I3 numbers say the
+effect exists, not how large it is under the likelihood that will be in place.
+Five readings, none chosen:
+(a) correct as is — the domain says a human who wanted Y while holding X would return X first, and
+    the belief after a release honestly favours `unknown` (0.38–0.71);
+(b) reset the prior over the remaining tasks on the observed agent's task completion (the C5 event
+    now exists: `[IR-complete]`), so a finished task's carry does not bury the next one —
+    TODO-18/20's "reset-to-uniform", now implementable;
+(c) decompose the human's hypotheses against a world without its own `holding` facts
+    (`deliver_with_return` as a robot contingency) — a domain-specific filter; the analysis-only
+    variant `ownshelf` gives s00_on 97, s20_on 77, s40 item_6 ≥ θ at its grasp, and s30_on loses
+    its crossing to a collinear decoy (item_7 0.795 at the release of item_3);
+(d) rebase a hypothesis's evidence when its selected METHOD changes, not only when its expected
+    action changes: evidence accumulated while Y's predicted plan was "return X first" is evidence
+    about a different predicted plan than "fetch Y", and carrying it across the re-selection
+    conflates the two. The method name is not on `GroundedAction` today (I2 §9(c)): it would have
+    to be added to the planner's output, not inferred from the action count;
+(e) the domain model may be at fault rather than the recognizer: `deliver_with_return` describes
+    someone holding a STRAY item, not someone holding an item they are assigned to deliver. Its
+    guard (`holding(?agent, ?other)` ∧ `not_equal(?other, ?item)`) does not separate those, so the
+    IR is faithfully predicting a bad plan. A domain question (`domains/kitting/tasks.py`),
+    separable from the likelihood, and the one reading under which the recognizer is right and the
+    fixture is wrong.
+Evidence that settles it: the I4 sweep's next-task reveal ticks under (a); if the approach after a
+release is decisive before the grasp there, (a) stands; if not, (b), (d) and (e) are the principled
+candidates and (c) is not.
+Files: shared/recognizer.py, shared/planner.py (method on the grounded output, for (d)),
+domains/kitting/tasks.py (for (e))
+Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §5, §8
 
 **TODO-56 — The completion channel's gate is the old model's, and it is a decision**
 I3 judges an event only against expected actions whose vocabulary declares it (GRASP → `pick_up`),
