@@ -261,3 +261,80 @@ scoring NEUTRAL.
   that were updated).
 - `CLAUDE.md`'s "prefix with PYTHONHASHSEED=0 until TODO-42 is fixed": the recognizer no longer needs
   it (measured on s40 only); other consumers of `get_all_intentions()` order were not checked.
+
+## 9. Hand-off for I3 (what the commit history does not say)
+
+Reproduce any number below with, at `dd680ea` or later:
+
+```
+PYTHONHASHSEED=0 ~/python-envs/teamrob-sp4-env/bin/python mesa_sim/run_mesa.py \
+    --domain kitting --layout env_layout<N> --scenario scenario_<N>0 --steps <300|200|200|400> --assignment_prior <false|true>
+PYTHONHASHSEED=0 ~/python-envs/teamrob-sp4-env/bin/python analysis/i2_ir_foundations/check_i2.py     # summary.md + CSVs
+python3 analysis/i2_ir_foundations/diff_ir.py <before.log> <after.log>                              # per-tick attribution
+```
+Steps per scenario: s00 300, s20 200, s30 200, s40 400. `[IR]`, `[IR-dist]`, `[meta]`, `[meta-cand]`
+are the regression greps; at this commit they are byte-identical across PYTHONHASHSEED 0/1/2/7 on s40.
+
+**(a) The `deliver_with_return` rival-targeting effect.** What it is: while the observed human holds X,
+`AdaptivePlanner.decompose()` selects `deliver_with_return` for every `deliver_item(Y≠X)` hypothesis
+(guards `holding(?agent, ?other)` ∧ `not_equal(?other, ?item)` hold with `?other = X`), whose first
+action is `move_to(?target = home_container_of(X))` — X's shelf, which the human has just left. The
+carry chord toward the table is therefore ≈180° off every rival's target: L ≈ 0.1 per rival per carry
+leg, against 4.0 for `deliver_item(X)`. The rivals are pinned on output during the carry (held-item
+rule), so nothing shows until the release; then they return with that evidence. Counts:
+`method_selection.csv`, `deliver_item:6` = 256/64/244/61/216/54/440/110 hypothesis-ticks per
+condition (off/on for s00, s20, s30, s40).
+
+Release-tick distributions it produced (base → I2; base logs are the I1/F1 baselines at `ff78636`):
+
+| condition | release tick | delivered item | best rival |
+|---|---|---|---|
+| s00_off | 78 | item_3 0.120 → **0.805** | item_7 0.351 → 0.051; item_4 0.356 → 0.138 |
+| s00_on | 81 | item_3 0.118 → **0.804** | item_2 0.856 → 0.154 |
+| s20_off | 54 | item_3 0.222 → **0.801** | item_6 0.277 → 0.061; item_4 0.267 → 0.060 |
+| s30_off | 74 | item_3 0.124 → **0.853** | item_7 (next task) reaches only 0.176 at 93 (was 0.704) |
+
+θ crossings it moved (the human's next assigned task): s00_on 81 → 111 (mid-approach → grasp, 0.856 →
+0.796); s20_on 82 → 89 (0.851 → 0.766); s30_on 77 → none (item_7's grasp at 98 flips the winner
+item_3 0.782 → item_7 0.876 with both sides ≥ θ, so `theta_crossed` never fires: TODO-48's first
+occurrence). What would show it is gone: with a completion pin on the delivered task, the release
+tick should put the delivered item at BELIEF_FLOOR and the next-task crossing at ≤ 81 (s00_on), ≤ 82
+(s20_on) and a crossing on item_7 in s30_on at ≤ 77 — i.e. back to or better than baseline. If the
+crossings return but the rivals still come back near-uniform at the release (all ≈ 0.02–0.14 as now),
+the pin is masking the effect rather than removing it; the direct check is the rivals' evidence at the
+release tick (`_evidence`, not the output) — under reading (b) of TODO-51 (freeze evidence under a
+hard refutation) it would equal their pre-grasp evidence.
+
+**(b) TODO-50, `coffee_break` never releasing (s40).** Trace (`f1_traces/trace_s40_*.csv`, column
+`p_coffee_break`; off / on): 0.550 / 0.550 from step 118 (first coffee-walk chord, L = 4.0 dead on);
+**0.811 / 0.814 at 142** — the θ crossing, which is a ZONE_BOOST event (the delivered item_3 at the
+table in zone_NW loses ×2 when the human leaves the zone), not new chord evidence; flat through the
+wait 155–185; 0.772 / 0.780 at 187 falling to 0.612 / 0.633 by 206 (segment 3a: shelf_6 dead ahead
+scores 4.0, coffee 50°+ off); **0.860 / 0.887 at 210** (segment 3b: coffee 63.9° off → L ≈ 2.9, every
+shelf ≥ 77°) — a second `theta_crossed`; 0.758 / 0.815 through the approach to shelf_6 (231–271,
+coffee 103° off → L ≈ 1.6, but the lead holds); **0.962 at 272**, the grasp of item_6 (the pin removes
+items 3/4/5/7; coffee is not refuted; item_6 is at 0.022); 0.959 → 0.949 through the carry (coffee is
+29° off the carry direction, L ≈ 3.5); 0.892 / 0.903 from 331 to the end. `unknown` ends segment 3 at
+0.0035 / 0.0036. The completion fact I3 can use: `waited(human_0, coffee_machine_0)` is in
+`world.predicates` at steps 184, 185, 186 (`waited_ticks.csv`); `at(human_0, coffee_machine_0)` holds
+from 154. Success criterion for I3 on this fixture: `coffee_break` ≥ θ during 118–186 and at
+BELIEF_FLOOR (or no longer `most_likely`) from 187 on; item_6 `most_likely` by the grasp at 272 (base
+prior-off: 0.986 there), and no `deliver_item` ≥ θ during 187–229.
+
+**(c) TODO-51, last-completed-action versus method re-selection.** Concrete case, s00: the human
+holds item_3 from 41 to 77. On every one of those ticks `deliver_item(item_2)` decomposes to six
+actions [`move_to(shelf_3)`, `place(item_3, shelf_3)`, `move_to(item_2)`, `pick_up(item_2)`,
+`move_to(kitting_table_0)`, `place(item_2, kitting_table_0)`]; at 78 (release) it decomposes to four
+[`move_to(item_2)`, `pick_up(item_2)`, `move_to(kitting_table_0)`, `place(…)`]; `deliver_item(item_3)`
+meanwhile is two actions [`move_to(kitting_table_0)`, `place(…)`]. An index into the list is meaningless
+across a re-selection (index 0 is "return item_3" in one and "fetch item_2" in the other). A stored
+`(action_name, bindings)` — the decision already taken — must be *searched for* in the newly selected
+list each tick, and may be absent (a completed `move_to(item_2)` does not appear in
+`deliver_already_held`), so I3 needs a rule for "last completed action not in the current method":
+the candidates are "restart at index 0 of the new method" and "treat as completed past the end".
+`GroundedAction` has no method name; if I3 needs it, add it to the planner's output rather than
+inferring it from the action count as `check_i2.py` does for analysis.
+
+**(d) Two more numbers I3 will be measured against.** The grasp tick is unchanged by I2 (0.797 in
+s00/s20/s30, 0.549 in s40 where `coffee_break` and `ac_activation` survive the pin); the mid-carry
+0.966 includes the phase-2 ZONE_BOOST ×2 and will drop to ≈ 0.94 when ZONE_BOOST goes.

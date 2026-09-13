@@ -22,7 +22,9 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT handle scenarios or agent assignments (that is sim_model.py)
 
 USED BY:
-    - shared/recognizer.py   → get_all_intentions(), get_tasks_for_action(), ContextKnowledge
+    - shared/recognizer.py   → get_all_intentions(), get_task_schema(), get_action_schema(),
+                               ContextKnowledge (the reverse lookups below are called by nothing
+                               in the repository today — I1 audit 4.8 / 10.11)
     - shared/planner.py      → get_task_schema(), get_action_schema()
     - mesa_sim/executor.py   → get_action_schema()
     - mesa_sim/sim_agents.py → get_task_schema(), ContextKnowledge.default()

@@ -857,9 +857,11 @@ carrying hypothesis would get a permanent free ×2. The correct phase-2 branch m
 `_get_expected_position()`: target zone = the kitting table's zone. Under that fix there is
 still no boost during the carry until the human reaches the table; 0.797 stands.
 
-(c) No hard constraint from `holding`. FIXED — `_likelihood()` now returns LOW_LIKELIHOOD
-for any hypothesis whose `?item` differs from the observed held item, before microaction
-dispatch. (a) and (b) still apply during the approach phase, when nothing is held.
+(c) No hard constraint from `holding`. FIXED — originally as LOW_LIKELIHOOD inside
+`_likelihood()`; since the leg session it is a hard pin on OUTPUT (`_refuted_by_holding` /
+`_output`, design_decisions.md "One leg is one observation"), and since I2 it reads
+`AgentState.holding` and refutes any hypothesis binding a different *portable* object (no
+parameter name). (a) and (b) still apply during the approach phase, when nothing is held.
 
 Observed impact before the fix: belief converged to 0.995 on `deliver_item(item_7)` — a
 task the ROBOT had completed 28 steps earlier and never a human task — driving both

@@ -140,13 +140,19 @@ parameter level (which target). Scoring trajectory-consistency against a
 schema-declared target is legitimate cognitive-layer inference, not a
 simulator leak — it is exactly the Bayesian disambiguation the paper's IR
 formalization exists to do. The exception is scoped narrowly: positions are
-only consumed by direction_consistency_likelihood (shared/likelihood_functions.py)
-and target-resolution helpers (_get_expected_position, _get_target_zone) in
-recognizer.py — never by planner.py or executor.py, which remain fully symbolic.
+consumed by direction_consistency_likelihood (shared/likelihood_functions.py),
+by shared/target_resolution.py (the one lookup from a grounded action to a
+position, since I2), and by its two callers — recognizer.py (chord target, zone)
+and projection.py (segments, and through it meta_planner.py) — never by
+planner.py or executor.py, which remain fully symbolic. (Updated in I2; the
+earlier wording predated the projector, I1 audit 10.8.)
 
 **IR likelihood dispatch: schema-driven, not microaction-string-driven**
 ActionSchema declares two IR-relevant fields: `completion` (a ConditionSchema
-checked for discrete actions like pick_up/place) and `progress_evaluator`
+checked for discrete actions like pick_up/place — declared and dispatched on,
+but never reached in any run to date: the first action of every kitting method
+is `move_to`, whose STEP* branch answers first, I1 audit 2.2; the per-hypothesis
+phase of I3 is what makes it reachable) and `progress_evaluator`
 (a registered function name for continuous actions like move_to, e.g.
 "directional" for cosine trajectory-consistency). recognizer.py dispatches
 by testing whether the observed microaction is a member of a candidate

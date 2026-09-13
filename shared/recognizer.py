@@ -9,8 +9,12 @@ ALGORITHM:
     P(τ | obs_1..t) ∝ P(obs_t | τ) · ω_context(τ, context, world) · P(τ | obs_1..t-1)
 
     Likelihood P(obs_t | τ):
-        - microaction is 'grasp': if observed agent is now holding τ's target item → HIGH,
-          else → LOW
+        - discrete microaction (grasp, release): the completion predicate of
+          the matching action, as the planner grounded it, would be checked —
+          but the first action of every method is a movement, whose branch
+          answers first, so in practice a discrete tick is a zero-length chord
+          and every hypothesis gets NEUTRAL (I1 audit 2.2; the per-hypothesis
+          phase of I3 makes the completion branch reachable)
         - movement (no discrete vocabulary matches): direction-based — cosine
           similarity between the CHORD from the current leg's start to the
           agent's position and the vector from that leg start toward τ's target
