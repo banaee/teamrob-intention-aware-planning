@@ -318,6 +318,189 @@
       ],
       "zone": "zone_SW",
       "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_0",
+      "type": "obstacle",
+      "position": [
+        0,
+        100
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_1",
+      "type": "obstacle",
+      "position": [
+        0,
+        -200
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_2",
+      "type": "obstacle",
+      "position": [
+        400,
+        0
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_3",
+      "type": "obstacle",
+      "position": [
+        -200,
+        0
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_4",
+      "type": "obstacle",
+      "position": [
+        700,
+        300
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+      
+    },
+    {
+      "id": "obstacle_5",
+      "type": "obstacle",
+      "position": [
+        700,
+        -300
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_6",
+      "type": "obstacle",
+      "position": [
+        -700,
+        300
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_7",
+      "type": "obstacle",
+      "position": [
+        -700,
+        -100
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_8",
+      "type": "obstacle",
+      "position": [
+        -1000,
+        200
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_9",
+      "type": "obstacle",
+      "position": [
+        -1000,
+        -200
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_10",
+      "type": "obstacle",
+      "position": [
+        -100,
+        -450
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_11",
+      "type": "obstacle",
+      "position": [
+        1000,
+        200
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_12",
+      "type": "obstacle",
+      "position": [
+        1000,
+        -100
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "obstacle_13",
+      "type": "obstacle",
+      "position": [
+        1000,
+        -380
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "orientation_deg": 0
     }
   ]
 }
