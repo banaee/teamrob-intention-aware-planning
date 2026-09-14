@@ -1,0 +1,15 @@
+== scenario_30_off_injectnone
+  44:move_to/step  45:move_to/step  46:move_to/None  47:pick_up/grasp  48:move_to/step  49:move_to/step  50:move_to/step
+  first grasp tick=47  first release tick=85
+== scenario_30_off_inject46
+  44:move_to/step  45:move_to/step  46:move_to/None  47:pick_up/grasp  48:move_to/step  49:move_to/step  50:move_to/step
+  first grasp tick=47  first release tick=85
+== scenario_30_off_inject47
+  44:move_to/step  45:move_to/step  46:move_to/None  47:pick_up/grasp  48:move_to/step  49:move_to/step  50:move_to/step
+  first grasp tick=47  first release tick=85
+== scenario_30_off_inject84
+  44:move_to/step  45:move_to/step  46:move_to/None  47:pick_up/grasp  48:move_to/step  49:move_to/step  50:move_to/step
+  first grasp tick=47  first release tick=85
+== scenario_30_off_inject85
+  44:move_to/step  45:move_to/step  46:move_to/None  47:pick_up/grasp  48:move_to/step  49:move_to/step  50:move_to/step
+  first grasp tick=47  first release tick=85
