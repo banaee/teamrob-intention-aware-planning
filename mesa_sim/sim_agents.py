@@ -328,7 +328,15 @@ class RobotAgent(FactoryAgent):
                 f"{ {k.name: v.value for k, v in result.current_task.bindings.items()} } "
                 f"queue={[t.schema.name + str({k.name: v.value for k, v in t.bindings.items()}) for t in result.queue]}"
             )
-            same_task = result.current_task is self.current_task_instance
+            # A CONTINUE decision: the winner is the task already executing, by
+            # task identity (task_instance_key), never object identity. The plan
+            # is still re-decomposed from the live world (settled: never resumed),
+            # but the executor adopts it without restarting — a continue costs
+            # nothing (io_contracts.md §1.9, TODO-43).
+            continues = (
+                self.current_task_instance is not None
+                and task_instance_key(result.current_task) == task_instance_key(self.current_task_instance)
+            )
             self.current_task_instance = result.current_task
             task_params = {k.name: v.value for k, v in self.current_task_instance.bindings.items()}
             self.current_plan = self.planner.plan(
@@ -337,8 +345,10 @@ class RobotAgent(FactoryAgent):
                 agent_id=self.unique_id,
                 belief=belief_for_meta_planner,
                 world=world,
-                current_plan=self.current_plan if same_task else None,
+                current_plan=self.current_plan if continues else None,
             )
+            if continues:
+                self.executor.continue_plan(self.current_plan)
                             
         self._execute(plan=self.current_plan, world=world)        
     

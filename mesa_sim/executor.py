@@ -13,6 +13,11 @@ WHAT THIS MODULE DOES:
         - Checks completion_predicate against WorldState after each microaction
         - Advances to next action when current action is complete
         - Signals task completion to agent when all actions done
+        - On a CONTINUE decision (the meta-planner re-selected the task already
+          executing; io_contracts.md §1.9) adopts the fresh decomposition via
+          continue_plan() without restarting: the action in flight keeps its
+          microaction queue, so the tick is spent exactly as if no trigger had
+          fired. A plan handed to step() any other way is loaded from its start.
 
     For HumanAgent:
         - Same structure, but driven by script entries instead of AbstractPlan
@@ -327,6 +332,37 @@ class Executor:
     # =========================================================================
     # Plan management helpers
     # =========================================================================
+
+    def continue_plan(self, plan: AbstractPlan):
+        """
+        Adopt `plan` as the fresh decomposition of the task ALREADY executing
+        (a continue decision, TODO-43): re-decomposition stays, execution
+        progress survives. If the action in flight appears in the new plan,
+        the cursor moves to it and the microaction queue and completion
+        bookkeeping are kept — the tick then proceeds exactly as it would
+        have with no trigger, whether that is a step, the acknowledgement of
+        an action the world already shows complete, or the next grasp. If it
+        does not appear — the world moved and the decomposition genuinely
+        changed, e.g. task_committed after a pick_up selects a method with no
+        pick_up — the plan is loaded from its start as any new plan is; the
+        world remains the cursor. Same-action is dataclass equality on the
+        GroundedAction (name, bindings, completion predicate, schema), never
+        object identity: the planner builds fresh objects every call.
+        """
+        if self.current_plan is None or self.action_index >= len(self.current_plan.actions):
+            self._load_plan(plan)
+            return
+        in_flight = self.current_plan.actions[self.action_index]
+        index = next((i for i, a in enumerate(plan.actions) if a == in_flight), None)
+        if index is None:
+            self._load_plan(plan)
+            return
+        logging.info(f"[executor] continue_plan: {self.agent.unique_id} goal={plan.goal_intention} "
+                     f"actions={len(plan.actions)} action_index {self.action_index}->{index} "
+                     f"queue_len={len(self.microaction_queue)}")
+        self.current_plan = plan
+        self.action_index = index
+        self.current_task = plan.goal_intention
 
     def _load_plan(self, plan: AbstractPlan):
         """Load a new plan, resetting action index and queue."""
