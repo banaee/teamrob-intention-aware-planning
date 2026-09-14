@@ -111,6 +111,30 @@ class AdaptivePlanner:
         bindings.update(task_params)
         return self._decompose_task(task_name, bindings, world)
 
+    def is_complete(
+        self,
+        task_name: str,
+        task_params: Dict[str, str],
+        agent_id: str,
+        world: WorldState,
+    ) -> bool:
+        """
+        Whether the task is already done in `world`: the completion condition
+        of the TERMINAL action of its decomposition for `agent_id` holds. A
+        TaskSchema declares no goal of its own — a task's completion is the
+        completion of the last action of the method its guards select — so
+        the test is derived here from the same decomposition the executor
+        and the recognizer use, never from a predicate name. Indifferent to
+        who did it: obj_at(item, table) holds whoever delivered the item, and
+        that is the fact wanted — the task cannot be done again. A terminal
+        ProcessCompletion (no predicate) never reads as complete. Raises
+        DecompositionError as decompose() does: a task that cannot be
+        decomposed here cannot be planned here either.
+        """
+        actions = self.decompose(task_name, task_params, agent_id, world)
+        predicate = actions[-1].completion_predicate if actions else None
+        return predicate is not None and predicate in world.predicates
+
     # ------------------------------------------------------------------
     # Internal decomposition
     # ------------------------------------------------------------------

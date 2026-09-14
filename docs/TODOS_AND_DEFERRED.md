@@ -1241,15 +1241,32 @@ decision about what one hypothesis's "stretch" is, to be measured on s40 first.
 Files: shared/recognizer.py (`update`: origin handling)
 Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §4
 
-**TODO-54 — `theta_crossed` fires on `unknown` when a pin shrinks the live set**
+**TODO-54 — `theta_crossed` fires on `unknown` when a pin shrinks the live set** — admission side ✅ CLOSED (T8); trigger side OPEN (with TODO-68/48)
 s20_off step 136: the robot delivers item_6, the recognizer pins `deliver_item(item_6)`, and
 `unknown` inherits its mass (0.654 → 0.804 ≥ θ) while the human stands idle. `evaluate_triggers`
 fires `theta_crossed`, the meta-planner builds a projection for `unknown` and replans. Belief-side
 this is correct (the human has no task); the trigger should probably not fire on `unknown`, and
 the earlier question (TODO-48) of a `most_likely`-change trigger should be decided together with
 it. Meta-planner paused: recorded only.
-Files: shared/meta_planner.py (evaluate_triggers)
-Reference: I3 phase-model session
+UPDATE (T8): "builds a projection for `unknown`" was not literally true, then or now: `unknown` is not in
+the recognizer's hypothesis table, so `get_hypothesis("unknown")` returns None and `project_human()`
+returned None — logged as `none(unresolved)`, the reason io_contracts.md reserved for a hypothesis the
+projector cannot ground. What did happen is the pure-cost re-selection on the trigger. The admission was
+therefore right by accident of the resolver, not by decision. Fix: `update_human_projection()` now refuses
+`unknown` itself, before the projector is called, as `none(unknown)` — checked after `below_theta` and
+`no_human`, before the projector; `unknown` is resolved through the recognizer's `UNKNOWN` constant, not a
+literal. `none(unresolved)` again means what it says. No decision changes anywhere in the sweep (only the
+reason string). At HEAD the event no longer occurs at s20_off 136 (the pin is at 144 and the belief stays at
+0.498); `theta_crossed` on `unknown` occurs at s00_off 166 (0.995; coincides with the robot's own last
+delivery — with T7 the pool is empty there and the run ends), s40_off 226 (0.751) and s40_on 223 (0.791).
+At the two s40 crossings the trigger produces a pure-cost re-selection with no interference check — one
+candidate each, item_7, the task already executing, re-confirmed (cost 17 / 20). `unknown ≥ θ` without a
+crossing is also reached on `no_current_task` / `task_committed` at s00_on 168, s20_on 132 / 176, s30_on
+123 / 159, s40 245: every one a pure-cost selection over the remaining pool. Whether the trigger should fire
+on `unknown` at all, and the one-shot question, are the interface question of TODO-68 (with TODO-48) —
+untouched here.
+Files: shared/meta_planner.py (`update_human_projection`; `evaluate_triggers` for the open trigger side)
+Reference: I3 phase-model session; T7/T8 session, September 2026
 
 **TODO-55 — What a single-task hypothesis means while another task is visibly under way** ✅ (b) CLOSED by decision (I4c); (d) reported; (e) OPEN
 The phase model judges `deliver_item(Y)` under the method the observed agent's world selects —
@@ -1573,13 +1590,35 @@ condition (no scenario sets the temperature or a long shift).
 Files: shared/recognizer.py (`_context_weight`, the four constants), shared/domain_knowledge.py
 Reference: I1 audit (architecture invariant "no domain-specific strings in shared/"); I5 hand-back
 
-**TODO-67 — s30_off: the meta-planner selects the already-delivered item_2 at 87** [meta-planner side; recorded]
+**TODO-67 — s30_off: the meta-planner selects the already-delivered item_2 at 87** ✅ FIXED (T7)
 `[meta] step=87 trigger=theta_crossed winner=deliver_item(item_2)` one tick after the robot's own delivery
 of item_2 (the recognizer's `[IR-complete]` at 86); `no_current_task` re-selects item_4 at 93 (I4c) / the
 same in I4d. Either the robot's task pool drops a completed task a tick late or B3's candidate set does not
 read the world's completion. Meta-planner paused: recorded, not investigated.
-Files: shared/meta_planner.py
-Reference: I4c report ("Flagged, not fixed"); I5 hand-back
+UPDATE (T7): both, and the second is the cause. The executor learns of its own task's completion up to two
+ticks after the world does: RELEASE at 85; `obj_at(item_2, kitting_table_0)` is in the WorldState built at
+86; the executor advances past `place` at 86 and calls `_on_task_complete` (→ `advance_task`, current task
+cleared) at 87 — after the meta-planner has run that tick, since the cognitive loop precedes execution
+within a step. In that window `update()` assembled its pool from the robot's bookkeeping alone
+(`[current_task] + queue`) and never consulted the world, so the trigger at 87 offered the finished task as
+a candidate; the planner, decomposing from the live world, turned `deliver_item(item_2)` with the item
+already on the table into a four-action plan of cost 3 (zero-length walk, re-grasp from the table, re-place)
+which beat item_4 at 69. The robot re-grasped its delivered item (`task_committed` at 89 re-selected it
+again, cost 2) and re-placed it; item_4 began at 93. The same shape at s00_off 166 (the robot's last item,
+re-grasped at 168, run end 172 instead of 166). Fix: completion is a WORLD fact, read generically — a new
+`AdaptivePlanner.is_complete(task_name, task_params, agent_id, world)` (the terminal action's completion
+condition of the guard-selected decomposition holds; the recognizer's `_terminal_complete` criterion,
+indifferent to who did it) — and `update()` drops every complete task from the pool on every call, logged as
+`[meta-pool] <task> complete in world: dropped from the pool`. Nothing is recorded: the queue invariant is
+unchanged, B3's queue rewrite persists the drop, and an empty pool after the drop is the terminal return.
+Sweep effect (PYTHONHASHSEED=0, analysis/t7_t8_meta_bugs/summary.md): s30_off — item_4 selected at 87
+(was 93), its `task_committed` at 121 (was 127), delivered at 155 (was 161), run end 157 (was 163); s00_off —
+`all tasks complete` at 166 (was 172). No other condition's decisions move. The recognizer's private
+`_terminal_complete` implements the same test; making it delegate to the planner's method is recognizer-side
+work, not done here.
+Files: shared/meta_planner.py (`update`, `_is_complete`), shared/planner.py (`is_complete`)
+Reference: I4c report ("Flagged, not fixed"); I5 hand-back; T7/T8 session, September 2026; design_decisions.md
+"Task completion is a world fact"
 
 **TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question]
 Measured (I4d, confirmed at HEAD in I5): prior-off the true task crosses θ three times per recognition —

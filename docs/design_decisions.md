@@ -1199,3 +1199,48 @@ P(o | τ) = P(o | a_φ(τ)) is that marginalisation collapsed by the derived pha
 paper is a position paper, outdated relative to this design, and not a specification.
 Files: docs/recognizer_handback.md, docs/TODOS_AND_DEFERRED.md (TODO-61 to TODO-68), analysis/i5_handback/
 Reference: I5 hand-back session, September 2026
+
+**Task completion is a world fact: the pool reads it from the WorldState, not from the executor's bookkeeping (T7)**
+`MetaPlanner.update()` assembled its task pool from the robot's own bookkeeping — `ExecutorState.current_task`
+plus the queue — and nothing in the meta-planner asked the world whether a pooled task was already done.
+That made the executor a second owner of "what remains to do", and it is a lagging one: the embodiment's
+executor learns of its own task's completion up to two ticks after the terminal condition holds (the fact is
+in the WorldState the tick after the RELEASE; the executor advances past the action that tick and clears the
+task the tick after, and the cognitive loop runs before execution within a step). A trigger inside that window
+(s30_off 87, `theta_crossed` one tick after the robot's `[IR-complete]` at 86; s00_off 166) offered the
+finished task as a candidate, and since the planner decomposes from the live world with no notion of a
+satisfied goal, `deliver_item` of an item already on the table projects as a cost-3 re-grasp-and-re-place,
+which wins any argmin. The robot re-did its own delivery (TODO-67).
+
+Decision: a task's completion is a fact about the WORLD — its terminal condition holds, whoever made it hold —
+and the meta-planner reads it from the world on every call, never from who performed it and never from a
+flag it keeps. The generic test lives on the planner, the owner of decomposition, as
+`AdaptivePlanner.is_complete(task_name, task_params, agent_id, world)`: a `TaskSchema` declares no goal of
+its own, so a task's completion is the completion condition of the terminal action of the method its guards
+select — derived from the schema through the same decomposition the executor and the recognizer use, no
+predicate name known anywhere in `shared/`. It is the criterion the recognizer already retires a hypothesis on
+(`_terminal_complete`; that private copy should delegate to the planner's method in a recognizer-side change).
+`update()` drops every complete task at pool assembly (`[meta-pool] … complete in world: dropped from the
+pool`), before B1.5/B2/B3, so a completed current task is neither continued nor a candidate. Nothing is
+duplicated: the queue invariant (`_queue` holds only tasks not executing; the in-progress task lives solely in
+`ExecutorState.current_task`) is untouched, B3's queue rewrite persists the drop, and an empty pool after the
+drop is the existing terminal return — "all assigned tasks are complete" now means exactly that, including
+tasks someone else finished. `no_current_task` still fires from the executor's clearing; the pool no longer
+depends on it for correctness.
+
+Companion (T8): `update_human_projection()` refuses `belief.most_likely == UNKNOWN` as `none(unknown)` before
+calling the projector. Mass on `unknown` above θ is not a recognition (recognizer_handback.md §3.4: something
+outside the hypothesis space, between tasks, or a deviation) and there is no trajectory to project. The
+projector had been returning None for it by accident — `unknown` has no hypothesis entry to resolve — under
+the `none(unresolved)` reason, so admission was correct by the resolver's ignorance rather than by decision;
+`none(unresolved)` again means an unresolvable hypothesis only. The trigger still fires on `unknown`; whether it
+should, and the one-shot semantics, are TODO-68's interface question, deliberately not decided here.
+
+Sweep (PYTHONHASHSEED=0, analysis/t7_t8_meta_bugs/): decisions move only where the re-delivery was — s30_off
+item_4 at 87 instead of 93, run end 157 instead of 163; s00_off run end 166 instead of 172 — and `[IR]` /
+`[IR-dist]` lines are byte-identical up to the tick the robot's earlier delivery changes the world the
+recognizer reads (s30_off 155, the item_4 pin; s00_off's are a prefix, the run simply ends earlier). The
+recognizer is untouched. These runs are the meta-planner-side regression baselines from here on.
+Files: shared/meta_planner.py (`update`, `_is_complete`, `update_human_projection`), shared/planner.py
+(`is_complete`), analysis/t7_t8_meta_bugs/ (compare.py, stages.sh, summary.md)
+Reference: T7/T8 session, September 2026; TODO-67, TODO-54, TODO-68

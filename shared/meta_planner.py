@@ -45,7 +45,9 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT import from mesa_sim/ or ros_sim/
 
 BLOCK STRUCTURE OF update():
-    0.    task pool = ([current_task] if not None else []) + self._queue.
+    0.    task pool = ([current_task] if not None else []) + self._queue,
+          minus every task already complete in the WorldState (its terminal
+          condition holds — whoever did it; see _is_complete()).
           Terminal return if empty.
     B1.5  current_task is None → nothing to continue; go straight to B3.
           Not an algorithmic block. Task boundaries always re-decide freely.
@@ -121,7 +123,8 @@ from shared.types import (
 
 
 from shared.domain_knowledge import DomainKnowledgeBase
-from shared.recognizer import IntentionRecognizer
+from shared.recognizer import IntentionRecognizer, UNKNOWN
+from shared.planner import AdaptivePlanner
 from shared.projection import Projector
 from shared.trajectory_algorithms import discretized_time_sampling
 
@@ -196,6 +199,9 @@ class MetaPlanner:
         self._gate_strategy = gate_strategy
         self._interference_algorithm = interference_algorithm
         self._human_agent_id = human_agent_id
+        # For the pool's completion test only (_is_complete()). Decomposition
+        # for projection stays inside Projector; this never plans.
+        self._planner = AdaptivePlanner(knowledge=knowledge)
         self._queue: List[TaskInstance] = []  # owned internally per Q1; populated by seed_tasks()
         # Tick-to-tick comparison state for evaluate_triggers()'s theta_crossed and
         # task_commit checks. evaluate_triggers() has no prev_belief/prev_executor_state
@@ -282,6 +288,12 @@ class MetaPlanner:
         Returns None, in this order, when
           - belief.confidence is below theta (the projector is not called),
           - no human is observed,
+          - belief.most_likely is the recognizer's `unknown` (the projector is
+            not called): mass on `unknown` above theta is not a recognition —
+            the human is doing something outside the hypothesis space, is
+            between tasks, or is deviating — and there is no trajectory to
+            project. Reachable since the completion pin: a hypothesis retired
+            by the robot's own delivery hands its mass to `unknown` (TODO-54),
           - the hypothesis cannot be resolved (project_human() returned None).
         update() then treats every candidate as feasible and runs no
         interference check that call.
@@ -296,6 +308,9 @@ class MetaPlanner:
             projection = None
         elif self._human_agent_id is None:
             reason = "none(no_human)"
+            projection = None
+        elif belief.most_likely == UNKNOWN:
+            reason = "none(unknown)"
             projection = None
         else:
             projection = self._projector.project_human(
@@ -327,7 +342,12 @@ class MetaPlanner:
         Queue invariant: self._queue holds only tasks NOT currently executing.
         The in-progress task, if any, lives solely in
         executor_state.current_task. The task pool for this call is
-        ([current_task] if not None else []) + self._queue.
+        ([current_task] if not None else []) + self._queue, minus every task
+        already complete in `world` (see _is_complete()). Completion is a
+        WORLD fact and is read from the world on every call, never recorded
+        here: the executor's bookkeeping learns of its own task's completion
+        up to two ticks after the terminal condition holds, and a queued task
+        may be finished by someone else — neither owner is consulted.
 
         Note the pool is NOT called "candidates". Candidates come into
         existence only inside B3, and what they are depends on B3's strategy —
@@ -348,13 +368,22 @@ class MetaPlanner:
         check, not treated as always-conflicting.
 
         TERMINAL STATE: returns UpdateResult(current_task=None, queue=[]) when
-        the pool is empty (queue empty and nothing executing) — all assigned
-        tasks are complete. A normal return, not an exception; callers check
-        `result.current_task is None`.
+        the pool is empty (nothing left to do: queue empty and nothing
+        executing, or everything remaining is already complete in the world)
+        — all assigned tasks are complete. A normal return, not an exception;
+        callers check `result.current_task is None`.
         """
         task_pool: List[TaskInstance] = list(self._queue)
         if executor_state.current_task is not None:
             task_pool = [executor_state.current_task] + task_pool
+
+        remaining: List[TaskInstance] = []
+        for task in task_pool:
+            if self._is_complete(task, world, executor_state.agent_id):
+                logging.info(f"[meta-pool] {task_instance_key(task)} complete in world: dropped from the pool")
+            else:
+                remaining.append(task)
+        task_pool = remaining
 
         if not task_pool:
             # Terminal state, not an error: all assigned tasks are complete.
@@ -411,6 +440,23 @@ class MetaPlanner:
         that placement wasn't part of any session's discussion.
         """
         self._queue = list(tasks)
+
+    def _is_complete(
+        self,
+        task: TaskInstance,
+        world: WorldState,
+        agent_id: str,
+    ) -> bool:
+        """
+        Whether `task` is already done in `world`, by the planner's generic
+        test (AdaptivePlanner.is_complete: the terminal action's completion
+        condition of the task's decomposition for `agent_id` holds). The same
+        criterion the recognizer retires a hypothesis on, and equally
+        indifferent to who did it. Derived from the task's own schema through
+        the decomposition — no predicate name is known here.
+        """
+        task_params = {var.name: const.value for var, const in task.bindings.items()}
+        return self._planner.is_complete(task.schema.name, task_params, agent_id, world)
 
 
     # =========================================================================
