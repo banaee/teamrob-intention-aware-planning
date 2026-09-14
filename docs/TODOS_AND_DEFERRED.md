@@ -1607,6 +1607,23 @@ Prior-on none of this occurs (no live rival flips); one crossing per recognition
 Files: shared/io_contracts.md (`theta_crossed`), shared/meta_planner.py (`evaluate_triggers`)
 Reference: analysis/i4d_fold_unknown/REPORT.md §6(a); analysis/i5_handback/; docs/recognizer_handback.md
 
+**TODO-69 — The unassessed tail biases conflict-aware selection**
+The human projection covers one recognised task. Beyond its end the robot's remaining segments
+are shifted by any computed pause but not assessed, so they read as conflict-free by
+construction. T1 measured a median unchecked share of ~49% per candidate; the bias is
+systematic, since a longer candidate has more of its trajectory beyond the horizon and
+therefore looks cleaner. Accepted deliberately for now (simplest option; decided with Hadi,
+Sept 2026).
+Three readings, none chosen: (1) ignore, as now; (2) compare candidates only over the common
+assessed window; (3) carry the assessed fraction as a confidence on the cost, not a change to
+its magnitude.
+Not to be closed by projecting the human's NEXT task from `scheduled_tasks`: that is the
+script, not something the robot can know. The horizon can only be extended by observation.
+Related: the "what is H" question (H bounds the human's projection, not the robot's ordering).
+Files: shared/meta_planner.py (_detect_interference, _cost), shared/projection.py
+Reference: T1 measurement session; Phase 4C wait-decision session, September 2026
+
+
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
 (TODO-28's class of defect). The fractional reading — excess as a fraction of C(origin, target) — was
