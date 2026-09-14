@@ -414,11 +414,11 @@ table convergence is (T_h − robot arrival) + s / 20 (spot check): s enters as 
 7. **Nothing was found structurally or experimentally deadlocked.** The one structural limit: with the human's projection ending at the table and every candidate ending
    there, "realizable with the human held at its end" is false for all 87 rows at every s, so the
    tail question cannot be separated from the fixture design on this data.
-8. **`shared/meta_planner.py` changed on disk during the session** (`theta` default 0.75 → 0.65,
-   uncommitted, at 17:02, after the captures at 16:49; not made by this task). All runs and all
-   logs here are at the committed default (`[meta-proj] theta=0.750`). The change is not included
-   in this commit. Since `sim_agents.py` does not pass `theta`, the default governs the run; any
-   regeneration with that edit in place will not reproduce these baselines.
+8. **`shared/meta_planner.py` changed on disk during the session** (`theta` default 0.75 → 0.65 at
+   17:02, after the captures at 16:49; reverted at 17:08; not made by this task). All runs and all
+   logs here are at the committed default (`[meta-proj] theta=0.750`); the tree was clean at the
+   commit. Since `sim_agents.py` does not pass `theta`, the default governs the run; a regeneration
+   with such an edit in place will not reproduce these baselines.
 
 # Not measured
 
