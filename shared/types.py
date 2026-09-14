@@ -490,16 +490,19 @@ class Segment:
     step-time — the unit interference-detection algorithms operate on.
 
     Straight-line/constant-speed only, matching the same assumption
-    _estimate_duration() already makes (distance / assumed_speed) and Mesa's
-    current steps_toward(). Non-movement actions (grasp, wait, place) are
-    stationary segments — start_pos == end_pos, spanning the action's
+    Projector.build_segments() already makes (distance / assumed_speed) and
+    Mesa's current steps_toward(). Non-movement actions (grasp, wait, place)
+    are stationary segments — start_pos == end_pos, spanning the action's
     duration — still valid input to interference algorithms (e.g. a human
-    passing close while the robot is stationary mid-pickup).
+    passing close while the robot is stationary mid-pickup). A HOLD placed by
+    realization (Phase 4C wait-decision revision) is a stationary segment of
+    exactly this shape, and is checked like any other: the robot waits where
+    it is.
 
     Path-realization beyond straight-line (static-obstacle-aware, non-linear)
-    is DESIGN-13's common path-realization estimator (Phase 4D) — out of
+    is the detour strategy of realization (DESIGN-13, Phase 4D) — out of
     scope here by design. Swapping it in later should only require changing
-    how MetaPlanner._build_segments() computes each segment's path, not this
+    how Projector.build_segments() computes each segment's path, not this
     shape.
     """
     start_pos: Tuple[float, float]
@@ -516,7 +519,7 @@ class ProjectedPlanEntry:
     abstract_plan: "AbstractPlan"
     estimated_start_step: int
     estimated_duration: int         # steps to complete this task
-    segments: List[Segment]         # per-action straight-line motion/hold, for interference detection
+    segments: List[Segment]         # per-action straight-line motion/hold, for interference detection / realization
     
     
 @dataclass
@@ -539,6 +542,11 @@ class ConflictPoint:
     carries no cost/penalty judgment; _detect_interference() thresholds
     `distance` to decide feasibility, _cost() may use it as a soft-penalty
     magnitude once DESIGN-08 is revisited (not yet — hard-gate only for now).
+    SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026): DESIGN-08 is
+    resolved without a penalty — realization prices a conflict as the
+    duration of the hold that avoids it, and asks for the earliest violation
+    interval per segment rather than a list of samples. This type stays
+    until realization lands.
 
     No `zone` field — zone-based proximity was rejected as too coarse and
     arbitrary a definition of "close" (see design_decisions.md); replaced by
@@ -564,6 +572,12 @@ class InterferenceAssessment:
                detection (what happened) separate from valuation (how bad
                is it), per DESIGN-08's requirement that team-level cost
                extensions not require meta_planner redesign.
+    SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026): to be replaced
+    by a RealizedPlan — placed segments, holds (where, how long), duration =
+    walking + holds, and the share of the trajectory beyond the human's
+    horizon (unassessed, TODO-69). `feasible` then means "a realization
+    exists within the horizon". The detection/valuation split survives inside
+    realization: earliest_violation observes, holding values.
     """
     feasible: bool
     conflicts: List[ConflictPoint] = field(default_factory=list)
@@ -600,6 +614,10 @@ class UpdateResult:
     TaskInstance is defined earlier in the TASK KNOWLEDGE TYPES section, 
     above PLANNING TYPES — matching the existing pattern already used 
     for "AbstractPlan" in ProjectedPlanEntry.
+    PLANNED (wait-decision revision, Sept 2026; io_contracts.md §1.9): will
+    also carry the winner's realized HOLDS (where the robot stands, for how
+    many ticks, before which segment) as an execution hint — the executor
+    may refine a hold, never re-decide or drop it silently (TODO-71).
     """
     current_task: "TaskInstance" 
     queue: List["TaskInstance"]

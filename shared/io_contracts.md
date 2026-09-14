@@ -11,6 +11,13 @@ verified implementation, not proposed design; §2.2a (the retired `replanning.py
 has been deleted along with the module. The previously-flagged §1.3 discrepancy
 (`object_positions`/`agent_positions`) is now confirmed resolved.
 
+**Re-aligned after T7/T8 and the Phase 4C wait-decision revision (September 2026)** for §1.9,
+§2.2 and §2.2b: the task pool's completion drop, the `[meta-proj]` reason set, and the
+realization design — a per-candidate `realize()` whose holds price conflict as duration and
+reach the executor as a hint. Where a paragraph below is marked PLANNED it describes the
+contract realization will add; the code at this alignment still runs the superseded
+`_detect_interference()` / `min_safe_distance` path, byte-identically to the T7/T8 baselines.
+
 ---
 
 ## 0. Notation (matches paper)
@@ -116,9 +123,9 @@ class WorldState:
 **Status: RESOLVED (September 2026).** `object_positions`/`agent_positions` were previously
 flagged here as an open discrepancy — documented as decided design, but unconfirmed as
 present in the dataclass. Both are confirmed implemented and live:
-`MetaPlanner._build_segments()` reads `world.agent_positions[agent_id]` and
-`world.object_positions[target_id]` on every projection, and `scenario_00` runs end-to-end
-without error. No longer a discrepancy.
+`Projector.build_segments()` (formerly `MetaPlanner._build_segments()`) reads
+`world.agent_positions[agent_id]` and `world.object_positions[target_id]` on every projection,
+and `scenario_00` runs end-to-end without error. No longer a discrepancy.
 
 **Scoped exception, per design_decisions.md:** exists specifically for `move_to`'s latent
 target-parameter inference (trajectory-consistency scoring in the recognizer) — the one case
@@ -276,7 +283,8 @@ methods (§2.2), replacing an earlier dict-shaped draft inherited from `replanni
 ```python
 @dataclass
 class TriggerDecision:
-    replan: bool
+    fired: bool                            # a cognitive-clock event occurred (was `replan`,
+                                           # renamed: the consequence is the caller's business)
     reason: str
     score: Optional[float] = None
 
@@ -284,11 +292,38 @@ class TriggerDecision:
 class UpdateResult:
     current_task: Optional[TaskInstance]   # None = all tasks complete (see §2.2, Update)
     queue: List[TaskInstance]
+    # PLANNED (wait-decision revision): the winner's realized holds — see below
 ```
+
+**The hold — PLANNED, not yet in the dataclass** (Phase 4C wait-decision revision, September
+2026; design_decisions.md, "The robot can wait"). `update()` will return, with the winning task,
+the HOLDS its realization placed: for each held segment, where the robot stands and for how
+many ticks, before it starts that segment. Semantics across the boundary:
+
+- It is an execution HINT, in the sense of design_decisions.md's first key decision: a preplan
+  that saves the executor solving avoidance from scratch. The human may deviate within a few
+  ticks, and each embodiment's own collision handling differs, so the executor may REFINE a
+  hold (shorten or extend it as the world shows the way clear or blocked).
+- It is not optional. The decision — which task, and that it waits — is made ONCE, in `shared/`.
+  The embodiment must not decide independently whether to wait, which task to run, or drop the
+  hold silently: the cost the task won on was computed with that hold, and a behaviour that
+  departs from it silently leaves neither the cost nor the behaviour authoritative (the
+  single-decision-path rule, §4.2 and TODOS_AND_DEFERRED.md). Refinement is the whole of the
+  executor's latitude.
+- Mesa executes a hold as STAND microactions before the held segment (TODO-71); ROS treats it
+  as a soft constraint on PRIEST, as it treats every hint.
+- A hold is a POSITION: the robot waits where it is. Waiting elsewhere is a detour, a different
+  realization strategy (Phase 4D).
 
 **`ConflictPoint`** / **`InterferenceAssessment`** — interference-detection output.
 `_detect_interference()` observes; `_cost()` values. The separation is deliberate
 (DESIGN-08): conflicts are computed and carried but not currently priced.
+SUPERSEDED IN DESIGN (wait-decision revision): both types describe the batch profile
+realization replaces. Under realization a conflict is priced by construction — as the duration
+of the hold that avoids it — and the observe / value split survives inside realization
+(`earliest_violation` observes; holding values). The types stay until realization lands; a
+`RealizedPlan` (placed segments, holds, duration = walking + holds, unassessed share beyond
+the human's horizon) replaces `InterferenceAssessment` on the meta-planner side.
 
 ```python
 @dataclass
@@ -411,11 +446,13 @@ Verified against `shared/meta_planner.py` and validated end-to-end against `scen
 (September 2026). The `full_reorder` strategy is **not** implemented — `update()` and
 `_project()` both raise `NotImplementedError` for it (DESIGN-16).
 
-Private methods (`_is_current_task_plausible`, `_replan_tasks`, `_detect_interference`,
-`_cost`) are internal to the class and deliberately not part of this contract; only the
-constructor and the public methods below are cross-boundary surface. Projection
-(`project`, `build_segments`, `estimate_duration`) lives on `Projector`
-(`shared/projection.py`), which is injected.
+Private methods (`_is_current_task_plausible`, `_replan_tasks`, `_is_complete`,
+`_detect_interference`, `_cost`) are internal to the class and deliberately not part of this
+contract; only the constructor and the public methods below are cross-boundary surface.
+Projection (`project`, `build_segments`, `estimate_duration`) lives on `Projector`
+(`shared/projection.py`), which is injected. Realization (`realize()`, PLANNED — the
+wait-decision revision) will live on the projection / trajectory side as well, not on
+`MetaPlanner`, which supplies `min_separation` and consumes the `RealizedPlan`.
 
 #### Constructor
 
@@ -453,7 +490,11 @@ also avoids constructor bloat (`context`, `hypotheses`) and a redundant unused `
 feasible — mirroring `RobotAgent.observed_agent_id`'s existing optionality.
 
 `min_safe_distance` here, and `assumed_speed` / `default_action_cost` on `Projector`, are
-**uncalibrated placeholders**, not tuned values (TODO-28).
+**uncalibrated placeholders**, not tuned values (TODO-28). RESTATED by the wait-decision
+revision: the parameter becomes `min_separation`, the clearance realization must ACHIEVE by
+holding, passed into `realize()` — no longer a threshold below which a candidate is excluded.
+Still the single policy value, still uncalibrated; its value is to be argued relative to scale
+(TODO-28). The constructor keeps the old name until realization lands.
 
 #### Evaluate Triggers
 ```python
@@ -488,15 +529,34 @@ update(
 `human_projection` is required (no default): the result of `update_human_projection()` for
 this trigger, or `None`.
 `current_task` competes as just another candidate — no special-case WAIT/RESELECT branch;
-continuation vs. reselection falls out of cost comparison across the full candidate set.
+continuation vs. reselection falls out of cost comparison across the full candidate set. Under
+the wait-decision revision that remains true with waiting added: a wait is a HOLD inside a
+candidate's realized cost, not a branch.
 Cancellation cost is not computed here — resolved intrinsically by `planner.py`'s guarded
 method selection on the task itself (`deliver_with_return`, see `design_decisions.md`).
+
+**Task pool (T7).** `update()` assembles `([current_task] if not None else []) + queue` and
+drops every task already COMPLETE in `world` — its terminal condition holds, whoever made it
+hold, by `AdaptivePlanner.is_complete()` — before any block runs, logging
+`[meta-pool] <task> complete in world: dropped from the pool`. Completion is a world fact read
+on every call, never a flag kept here; the executor's own bookkeeping lags it by up to two ticks.
 
 **Queue invariant:** `self._queue` holds only tasks NOT currently executing; the in-progress
 task lives solely in `ExecutorState.current_task`. Candidates = `[current_task] + queue`.
 
-**Strategy (DESIGN-16).** "Candidate" always means an individual task, never an ordering.
-`self._strategy` controls only how much of the queue one `update()` call rewrites:
+**Blocks.** 0: pool assembly (above); terminal return if empty. B1.5: no current task → straight
+to B3. B2: `_is_current_task_plausible()`, the mid-task plausibility gate — `gate_strategy`
+`"none"` (default) never continues; `"b2a"` / `"b2b"` raise `NotImplementedError` (TODO-36).
+B3: `_replan_tasks()`, selection. PLANNED (wait-decision revision): both B2 and B3 consume
+realization — B2 realizes the current task alone and judges its hold; B3 realizes every
+candidate and takes the argmin of realized duration (walking + holds). When
+`human_projection` is `None` realization is not called and the cost is the plain projected
+duration, exactly as today.
+
+**Strategy (DESIGN-16).** "Candidate" means the unit the argmin ranges over — an individual
+task under `single_task`, a permuted ordering under `full_reorder` (design_decisions.md,
+DESIGN-16, terminology). `self._strategy` controls only how much of the queue one `update()`
+call rewrites:
 
 - `single_task` (default, implemented) — each candidate is projected alone from the live
   `WorldState`, infeasible ones dropped, argmin becomes the new `current_task`. The rest of
@@ -508,7 +568,9 @@ The human's projection is built once per fired trigger by `update_human_projecti
 and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.
 `human_projection=None` means no interference check runs that call and every candidate is
 treated as feasible — `_replan_tasks()` substitutes `InterferenceAssessment(feasible=True,
-conflicts=[])`. It is never treated as always-conflicting.
+conflicts=[])`. It is never treated as always-conflicting. `None` is a ROUTINE mid-run state,
+not an edge case: the belief re-initialises at every human task boundary (I4c), so most
+`no_current_task` triggers and every trigger between the human's tasks run without a projection.
 
 **Terminal state:** `update()` returns `UpdateResult(current_task=None, queue=[])` when no
 candidates remain — all assigned tasks are complete. Callers check
@@ -518,6 +580,11 @@ contract rather than raised for the embodiment layer to catch and reinterpret.
 
 `update()` does still raise `RuntimeError` when candidates exist but **every** one is
 excluded as infeasible — a genuine anomaly, deliberately distinguishable from exhaustion.
+SUPERSEDED IN DESIGN (wait-decision revision): under realization "every candidate infeasible"
+means no candidate has a start time within the human's horizon that clears `min_separation` —
+a situation, not an anomaly — and the outcome is OPEN with three readings (hold and re-decide;
+least-bad candidate, the executor handling the residue; record as a mis-set parameter or a
+short horizon — TODO-30). The raise stays until realization lands and one is chosen.
 
 #### Update Human Projection
 ```python
@@ -535,13 +602,17 @@ Returns `None`, checked in this order, when:
 - `belief.confidence < theta` — the projector is not called. θ gates admission as it gates
   triggering (DESIGN-07); it still never feeds `_cost()`.
 - `human_agent_id is None` — no human observed.
-- the hypothesis is unresolvable — `Projector.project_human()` returned `None`
-  (`belief.most_likely` is `unknown`, or its task name is not in the domain).
+- `belief.most_likely` is the recognizer's `unknown` (T8) — the projector is not called. Mass
+  on `unknown` above θ is not a recognition and there is no trajectory to project. Reachable
+  since the completion pin: a hypothesis retired by the robot's own delivery hands its mass to
+  `unknown` (TODO-54). The trigger still fires on it (TODO-68).
+- the hypothesis is unresolvable — `Projector.project_human()` returned `None` (its task name
+  is not in the domain).
 
 Emits one `[meta-proj] confidence=<c> theta=<θ> projection=<reason>` line per call, with
-`reason` ∈ `built`, `none(below_theta)`, `none(no_human)`, `none(unresolved)`. No `step` or
-`trigger` field: both belong to the caller and are recoverable from the `[meta-trig]` line of
-the same tick.
+`reason` ∈ `built`, `none(below_theta)`, `none(no_human)`, `none(unknown)`, `none(unresolved)`.
+No `step` or `trigger` field: both belong to the caller and are recoverable from the
+`[meta-trig]` line of the same tick.
 
 #### Seed Tasks
 ```python
@@ -590,9 +661,22 @@ simulation.interference_spatial_resolution`) and passes the bound callable as
 exact rather than sampled, no interval tradeoff, but with real edge cases (clamping the
 analytic minimum to the overlap window, near-zero relative velocity).
 
+PLANNED (wait-decision revision): realization asks this family a different question —
+"earliest violation for this robot segment, placed at this start time, against the human's
+segments, at `min_separation`" — and CPA's closed form is its answer: both segments have
+constant velocity, so squared distance is a quadratic in time; no real root below
+`min_separation²` means no violation, and the roots give the violation interval and hence the
+earliest clear time. No sampling, no resolution parameter, no world-unit constant in
+`shared/`. `discretized_time_sampling()` can serve as a fallback (first sample below the
+threshold) but computes more than a hold needs. Which is built first is an implementation
+choice; the interface is `earliest_violation`. `obstacle_aware_path()` becomes the detour
+strategy of realization (Phase 4D).
+
 These functions **measure only and hold no policy**. The single policy decision — what
 distance counts as unsafe — lives in `MetaPlanner._detect_interference()` as
-`min_safe_distance`.
+`min_safe_distance`. RESTATED (wait-decision revision): the single policy value is
+`min_separation`, the clearance realization must achieve; `MetaPlanner` supplies it and
+realization is GIVEN it, so no policy enters the geometry.
 
 ---
 
@@ -623,6 +707,40 @@ earlier stage than what `plan()` consumes).
 **Status:** guard evaluation, recursive decomposition, derived variable resolution, and
 `?agent` binding propagation are all implemented (Phase 4B, complete). **Still TODO:**
 cost-aware method selection (TODO-16) — deferred until `meta_planner.py`'s cost model exists.
+
+#### Decompose
+```python
+decompose(
+    task_name: str,
+    task_params: Dict[str, str],
+    agent_id: str,
+    world: WorldState,
+) -> List[GroundedAction]
+```
+The bare decomposition `plan()` wraps — the same guard-selected method, derived vars and step
+grounding — without the `AbstractPlan` envelope. Added in I2 for the recognizer, which asks it
+every tick, per hypothesis, what the observed agent would do if it held that intention. Raises
+`DecompositionError` (a `ValueError` subclass) only for world-dependent failures — no method's
+guards hold, a derived var without a value — so callers can treat "unscorable here" apart from
+a schema error, which still raises plainly.
+
+#### Is Complete
+```python
+is_complete(
+    task_name: str,
+    task_params: Dict[str, str],
+    agent_id: str,
+    world: WorldState,
+) -> bool
+```
+The generic completion test (T7). A `TaskSchema` declares no goal of its own, so a task is
+complete when the completion condition of the TERMINAL action of its decomposition for
+`agent_id` holds in `world` — derived through `decompose()`, never from a predicate name.
+Indifferent to who did it: `obj_at(item, table)` holds whoever delivered the item, and that is
+the fact wanted — the task cannot be done again. A terminal `ProcessCompletion` (no predicate)
+never reads as complete. Raises `DecompositionError` as `decompose()` does. Consumers:
+`MetaPlanner.update()`'s pool assembly (§2.2, "Task pool"), and — the same criterion, in a
+private copy that should delegate here — the recognizer's terminal pin (`_terminal_complete`).
 
 ---
 
@@ -696,6 +814,9 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
 - Clears `current_task` on task completion (this is what makes `no_current_task` fire) and
   sets its own `finished` flag when `update()` returns `current_task=None`
 - Executes `GroundedAction` via `action_decomposer.py` → microaction queue → one microaction per step
+- PLANNED (TODO-71): executes the hold `UpdateResult` carries as STAND microactions before the
+  held segment; may refine the hold against what the world shows, never decides independently
+  whether to wait or drops it silently (§1.9, the hold)
 
 ### 4.2 ROS (`ros_sim/`)
 
@@ -737,5 +858,9 @@ Simulators MUST ensure:
 10. A task's `MethodSchema` set covers every world state that task can start *or resume*
     from — plans are re-decomposed from scratch at every trigger, never resumed from a
     cursor (see design_decisions.md)
+11. PLANNED (wait-decision revision): the hold returned by `update()` is executed. The
+    embodiment may refine it; it must not run a parallel heuristic that decides whether to
+    wait or which task to run, and must not drop the hold silently (§1.9, the hold; the
+    single-decision-path NOTE in TODOS_AND_DEFERRED.md)
 
 ---

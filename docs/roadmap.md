@@ -56,9 +56,9 @@ The robot operates with two planning levels and one recognition module, all in `
 - `shared/recognizer.py` — Bayesian IR, rebuilt I1–I5 (see 4C-IR below)
 - `shared/likelihood_functions.py` — the evidence model's functions and its four constants
 - `shared/target_resolution.py` — where a movement action's target is now (I2; shared by recognizer and projector)
-- `shared/meta_planner.py` — task scheduling, candidate evaluation, interference detection, cost comparison
-- `shared/projection.py` — `Projector` — task + world → predicted trajectory; consumed by meta_planner, and by viz/evaluation later
-- `shared/trajectory_algorithms.py` — pluggable path-realization and interference-detection functions
+- `shared/meta_planner.py` — task scheduling, candidate evaluation, cost comparison; supplies `min_separation` to realization and consumes its result (the 4C wait-decision revision moves interference detection out of it)
+- `shared/projection.py` — `Projector` — task + world → predicted trajectory; consumed by meta_planner, and by viz/evaluation later. Realization (`realize()`, hold-only first) belongs on this side, not in `MetaPlanner`
+- `shared/trajectory_algorithms.py` — pluggable path-realization and interference-detection functions; `earliest_violation` (closed form, the role reserved for `closest_point_of_approach()`) to be built here for realization
 - `shared/planner.py` — HTN decomposer, called by meta_planner per candidate AND by the recognizer per hypothesis per tick
 - ~~`shared/replanning.py`~~ — **retired Sept 2026**, deleted; trigger role absorbed into `evaluate_triggers()`
 
@@ -70,7 +70,8 @@ The robot operates with two planning levels and one recognition module, all in `
 - Selection is **single-task, receding-horizon** (DESIGN-16): one best next task per trigger, re-decided from fresh WorldState and belief at the next trigger — not a search over orderings of the remaining pool. `full_reorder` is retained as a documented, switchable alternative but is not implemented.
 - `ProjectedPlan` (DESIGN-06) is the meta_planner's internal reasoning structure, never handed to the executor. Under `single_task` it always holds exactly one entry; the multi-entry shape is retained for `full_reorder`.
 - Interference detection is **geometric, not zone-based** — actual Euclidean distance between projected positions over time. `ProjectedPlanEntry` carries `Segment`s; `ConflictPoint` carries `position` + `distance`, no zone.
-- Cost is measured in execution ticks (T2: projection steps are Mesa ticks; seconds in ROS): moves, detours, pauses all equal cost units. Team-level semantic costs parked as future extension (see DESIGN-08).
+- Cost is measured in execution ticks (T2: projection steps are Mesa ticks; seconds in ROS): moves, detours, pauses all equal cost units. Since the 4C wait-decision revision a candidate's cost is its REALIZED duration — walking plus the holds placed to keep `min_separation` from the human — so a conflict is priced as time by construction (DESIGN-08 resolved). Team-level semantic costs parked as future extension (TODO-15).
+- The robot can WAIT (4C wait-decision revision, Sept 2026): a hold is computed from the human's projection, enters the cost, and reaches the executor as an execution HINT the executor may refine but never re-decide or cancel. Waiting is not a branch — B2 realizes the current task alone and judges its hold; B3 realizes every candidate and takes the argmin. See design_decisions.md, "The robot can wait".
 - Cancellation of a held-item task is handled by HTN method selection, not a meta_planner cost term — see design_decisions.md.
 - The recognizer resolves nothing itself: targets, methods and completions are the planner's (I2). The scenarios are experiments for evaluating the algorithm, never its specification (I-series standing rule).
 
@@ -95,20 +96,22 @@ heading kernel (HIGH 4.0 / LOW 0.1 / NEUTRAL 1.0) that multiplied identical head
 - Recursive decomposer with real guard evaluation, derived variable
   resolution, `?agent` binding propagation
 
-**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built and validated on scenario_00; the recognizer rebuilt and handed back; the meta-planner side resumes on the hand-back)
+**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built and validated on scenario_00; the recognizer rebuilt and handed back; the meta-planner side resumed with T7/T8 and the wait-decision revision — realization designed and recorded, not yet built)
 
 Built and running end-to-end. All three tasks complete, correct terminal state, zero errors.
 
 *Implemented (meta-planner side):*
 - `shared/meta_planner.py` — public: `evaluate_triggers()`, `update_human_projection()`,
-  `update()`; internal: `seed_tasks()`, `_detect_interference()`, `_cost()`
+  `update()`; internal: `seed_tasks()`, `_is_complete()` (T7), `_detect_interference()`, `_cost()`
+  — the last two are superseded in design by realization (below) and stay until it lands
 - `shared/projection.py` — `Projector` extracted from `MetaPlanner`: `project()`
   (single-task path), `project_human()`, `build_segments()`, `estimate_duration()`.
   Injected into `MetaPlanner` rather than constructed by it — one instance, held by the
   agent, shareable with viz/evaluation
 - `shared/trajectory_algorithms.py` — `straight_line_path()`, `stationary_segment()`,
   `discretized_time_sampling()`; `closest_point_of_approach()` and `obstacle_aware_path()`
-  documented but deliberately unimplemented
+  documented but deliberately unimplemented — now with assigned roles: the closed-form
+  `earliest_violation` realization needs, and the detour strategy (4D)
 - `shared/types.py` — `Segment`, `ConflictPoint` (retyped, zone-free),
   `InterferenceAssessment`, `ExecutorState`, `TriggerDecision`, `UpdateResult`,
   `task_instance_key()`; `ProjectedPlanEntry.spatial_zones` → `segments`
@@ -119,8 +122,22 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
 - `shared/replanning.py` — deleted
 - T1 (conflict-geometry measurement, `analysis/t1_conflict_measurement/`) and T2 (projection in execution
   ticks; `min_safe_distance` exclusion now reachable) — measurement and units, no decision changed
-- B1/B2/B3 (evidence-gated human projection, mid-task evidence, candidate selection) under active design;
-  the meta-planner has been PAUSED during 4C-IR and resumes from `docs/recognizer_handback.md`
+- T7/T8 (Sept 2026): completed tasks leave the pool by world fact (`AdaptivePlanner.is_complete`);
+  `unknown` is not admitted as a projection. `analysis/t7_t8_meta_bugs/` holds the meta-planner-side
+  regression baselines from here on
+- WAIT-DECISION REVISION (Sept 2026, documents only): T1 showed the fixtures' interference is a TIMING
+  conflict (both agents reach the table within a tick), so the proportionate response is a short wait,
+  which the robot could not express — its only lever was which task to do. Decided: the robot can wait.
+  A per-candidate `realize()` (projection side; hold-only strategy first) holds each robot segment until
+  `earliest_violation` against the human's projection clears at `min_separation`; the candidate's cost
+  is the realized duration (walking + holds), so conflict is priced by construction; the winner's holds
+  reach the executor as a HINT. Supersedes `_detect_interference()` as a B3 step, DESIGN-08 as posed,
+  `min_safe_distance` as an exclusion threshold (now `min_separation`, the clearance to achieve) and the
+  all-excluded `RuntimeError` (outcome open, TODO-30). B2 and B3 both consume realization: B2 realizes
+  the current task alone and judges its hold δ; B3 realizes every candidate and takes the argmin.
+  Whether B2 survives as a policy block is open (TODO-36). The one parameter before implementation is
+  `min_separation`'s value, relative to scale (TODO-28). Full record: design_decisions.md, "The robot
+  can wait"; new items TODO-70 (per-segment vs whole-trajectory holds), TODO-71 (the hint on the body side)
 
 *Design questions resolved (Q1–Q4 from July 2026, plus September 2026 session):*
 - Q1: `MetaPlanner` owns the task queue internally (not passed externally)
@@ -135,7 +152,8 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
 - Cancellation resolved (July): guarded HTN method, not a `_cost()` term
 - Queue invariant: `_queue` excludes the executing task; candidates = `[current_task] + queue`
 - Task exhaustion returned as `UpdateResult(current_task=None, queue=[])`, not raised
-- `_cost()` is hard-gate only — `conflicts` computed and carried but not priced (DESIGN-08)
+- ~~`_cost()` is hard-gate only — `conflicts` computed and carried but not priced (DESIGN-08)~~ — superseded
+  by the wait-decision revision: `_cost()` becomes the realized duration; DESIGN-08 resolved by construction
 - Q0 needs no bespoke heuristic — `no_current_task` covers t=0 and completion identically
 
 **Phase 4C-IR — the recognizer rebuild, I1–I5 (Sept 2026)** ✅ handed back
@@ -174,15 +192,20 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 
 *Validation gaps under 4C, checked against current state (Sept 2026):*
 - TODO-28: `min_safe_distance` still an uncalibrated placeholder (T1 gives the calibration evidence); the
-  `assumed_speed` / time-scale half was RESOLVED by T2.
+  `assumed_speed` / time-scale half was RESOLVED by T2. Restated by the wait-decision revision as
+  `min_separation`, the clearance realization must achieve; its value must be argued relative to scale
+  and is the one open parameter before realization is built.
 - TODO-29: `deliver_with_return` still unexercised under the MetaPlanner for the ROBOT. It is exercised every
   run by the recognizer for rival hypotheses of the human, and whether its guard is the right prediction there
   is now an open domain question (TODO-55 (e)).
 - TODO-30: the interference exclusion branch is NOW EXERCISED (T2): candidates are excluded at `min_dist = 0`
   (scenario_20 steps 11 / 24) and every-candidate-excluded raises (scenario_10 step 257). Whether those
   exclusions are legitimate is TODO-28's question; what the robot does when everything is excluded is open.
+  Under realization those exclusions become short holds; "infeasible" means no realization within the
+  human's horizon, and the all-unrealizable outcome is open with three readings (TODO-30).
 - TODO-32: `wait_at` duration still ignored in COST estimation (projector side). The recognizer side is done:
-  waits are observable (`waited`) and `coffee_break` is recognised mid-walk in scenario_40.
+  waits are observable (`waited`) and `coffee_break` is recognised mid-walk in scenario_40. Now load-bearing:
+  a human's projected occupation is the hold a robot task pays to pass it.
 
 *Waiting on the meta-planner side (from the hand-back):*
 - `theta_crossed` as an interface event (TODO-68, with TODO-48 and TODO-54): prior-off the true task can
@@ -198,15 +221,18 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
 - No structural change to executor interface; hints richer than current skeleton
-- Now scoped more concretely via DESIGN-13 (see TODOS_AND_DEFERRED.md): a
-  common, non-committed path-realization estimator called from
-  `_estimate_duration`, handling both pause and detour as outcomes of one
-  call driven by a conflict hint from `_detect_interference`. For Mesa, this
-  estimator can also serve as real execution-time realization (replacing
-  straight-line `steps_toward`), collapsing cost-time and execution-time
-  path realization into one function. ROS keeps a two-tier split (this
-  estimator for cost estimation, PRIEST for real execution) — still a
-  dedicated design session away from being built
+- DESIGN-13's realization estimator is PARTLY PULLED FORWARD into 4C by the wait-decision
+  revision: the PAUSE outcome is 4C's `realize()` with the hold-only strategy, `shared/`-resident
+  (a hold needs only the two projections, no obstacle geometry), returning the placed plan and
+  its duration. What remains 4D, as further pluggable strategies of the same function: DETOUR
+  (go around — needs a path planner, `obstacle_aware_path()`'s role, and introduces iteration
+  between trajectory and interference) and the OFF-THE-SHELF PLANNER (PRIEST or equivalent,
+  ROS). For Mesa, a detour-capable realization can also serve as execution-time path
+  realization (replacing straight-line `steps_toward`), collapsing cost-time and execution-time
+  realization into one function. ROS keeps a two-tier split (this estimator for cost
+  estimation, PRIEST for real execution) — still a dedicated design session away from being built
+- The hold hint's consumption on the body side (execute, refine, never re-decide) is TODO-71;
+  Mesa first
 
 ### Prerequisites before implementation
 
@@ -252,6 +278,11 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   it. Both constraints surfaced concretely reviewing an early ROS
   integration attempt; see TODOS_AND_DEFERRED.md (NOTE on DESIGN-07, and the
   single-decision-path NOTE) before starting ros_sim/.
+- The same rule applies to the HOLD the meta-planner will return with its decision (4C
+  wait-decision revision; TODO-71): it is an execution hint — PRIEST may refine a hold as it
+  refines any hint, but must not decide independently whether to wait, which task to run, or
+  drop the hold silently. The cost was computed on that hold; a body that departs from it
+  silently leaves neither the cost nor the behaviour authoritative.
 - The recognizer now depends on the embodiment in four places the ROS team should know before building
   (hand-back §3.3):
   - **Paths are assumed straight.** The excess-path likelihood measures wasted distance against a Euclidean

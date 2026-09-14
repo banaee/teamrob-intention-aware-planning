@@ -285,6 +285,10 @@ branch logic. Cross-checked against an alternative two-branch implementation
 uniform-candidate design closes off a class of bugs the branch-based version had
 (an asymmetric cost term only one branch paid, an unused duration field); no gap
 found that this design doesn't already handle.
+REAFFIRMED (wait-decision revision, September 2026): the robot can now WAIT, and waiting is
+still not a branch. A wait is a HOLD inside a candidate's realized cost, so "continue, paying
+a 2-tick hold" and "switch, paying 19 ticks of walking" are compared by the same argmin. See
+"The robot can wait", below.
 Files: shared/meta_planner.py (Phase 4C)
 
 **Robot's `scheduled_tasks` order is a scenario-authoring convenience, not a schedule**
@@ -321,6 +325,11 @@ This captures team efficiency (faster completion = better) without semantic comp
 Team-level semantic costs (human waiting, shared resource conflicts) are parked as a
 future extension — the cost function interface must be designed to allow this extension
 without requiring meta_planner redesign (see DESIGN-08).
+UPDATE (wait-decision revision, September 2026): the uniform unit stands. A candidate's cost
+is its REALIZED duration — walking plus the holds realization places to keep `min_separation`
+from the human — so a conflict is priced as time by construction, with no conflict weight.
+DESIGN-08 is resolved by that (see "The robot can wait", below); team-level semantic costs
+remain parked as before (TODO-15).
 
 **Cancellation is not a meta_planner cost term — it is an HTN method choice**
 Originally specified as a `Ccancel(τcur)` term added explicitly in `_cost()`:
@@ -490,6 +499,9 @@ coarse-grained analogue of collision checking, it uses what collision checking u
 `ProjectedPlanEntry.spatial_zones: List[str]` was accordingly removed and replaced by
 `segments: List[Segment]`; `ConflictPoint` lost its `zone: str` field and gained
 `position: Tuple[float, float]` and `distance: float`.
+Unchanged by the wait-decision revision (September 2026): realization's `earliest_violation`
+is the same Euclidean test, asked per segment for a given start time instead of in batch over
+two fixed trajectories.
 Files: shared/types.py (Segment, ConflictPoint, ProjectedPlanEntry),
 shared/trajectory_algorithms.py, shared/meta_planner.py (`_detect_interference`)
 Reference: Phase 4C meta_planner build session, September 2026
@@ -514,6 +526,15 @@ the overlap window, near-zero relative velocity) better added behind a proven se
 
 The algorithms measure only; they hold no policy. The single policy decision — what distance
 counts as unsafe — lives in `_detect_interference()` as `min_safe_distance`.
+SUPERSEDED IN PART (wait-decision revision, September 2026). Still true: two pluggable
+families, and the algorithms measure only. What changed: the single policy value is
+`min_separation`, the clearance realization must ACHIEVE, and it is passed INTO the
+realization function rather than applied by `_detect_interference()` as an exclusion
+threshold. The question asked of the interference family changes from "where do these two
+fixed trajectories come close" to "earliest violation for this segment at this start time" —
+the closed-form role `closest_point_of_approach()` was reserved for; `discretized_time_sampling()`
+becomes a fallback that computes more than a hold needs. `obstacle_aware_path()` becomes the
+detour strategy of realization (Phase 4D). See "The robot can wait", below.
 Files: shared/trajectory_algorithms.py, shared/meta_planner.py
 Reference: Phase 4C meta_planner build session, September 2026
 
@@ -565,10 +586,21 @@ The remaining `RuntimeError` in `update()` — every candidate excluded as infea
 interference — deliberately stays an exception. That is a genuine anomaly, not a normal end
 state, and keeping the two distinguishable matters: using one mechanism for both would force
 callers to inspect the message string to tell them apart.
+SUPERSEDED IN PART (wait-decision revision, September 2026): the returned terminal state
+stands. The `RuntimeError` does not: "every candidate excluded" now means "no candidate has a
+realization within the human's horizon", which is a situation, not an anomaly, and its outcome
+is OPEN with three readings (TODO-30; "The robot can wait", below). The raise stays in the code
+only until realization lands.
 Files: shared/meta_planner.py (`update`), mesa_sim/sim_agents.py (RobotAgent.finished)
 Reference: Phase 4C meta_planner build session, September 2026
 
-**Interference is a hard gate only; conflicts are not yet priced**
+**Interference is a hard gate only; conflicts are not yet priced** — SUPERSEDED (wait-decision
+revision, September 2026) by "The robot can wait", below: conflict becomes cost BY CONSTRUCTION
+as the duration of the holds realization places; `_detect_interference()` is replaced by a
+per-candidate `realize()` with detection internal to it; `feasible=False` now means "no
+realization within the horizon"; the observe/value split survives, relocated
+(`earliest_violation` observes, holding values). Original entry retained as history; it still
+describes the code until realization lands.
 `_detect_interference()` observes (returns all `ConflictPoint`s plus a `feasible` verdict);
 `_cost()` values. This separation is per DESIGN-08 and is already reflected in the types.
 Currently `_cost()` returns execution cost alone: `feasible=False` removes a candidate
@@ -598,6 +630,12 @@ Three planned consumers want projection without wanting selection: DESIGN-13's
 path-realization estimator (Phase 4D), visualization drawing predicted paths, and Phase 5
 evaluation measuring prediction quality. Under the old structure each would have had to
 reach into `MetaPlanner`'s privates or duplicate the logic.
+UPDATE (wait-decision revision, September 2026): the first of those consumers is now the
+realization function (`realize()`, hold-only first — DESIGN-13's estimator partly pulled
+forward into 4C), and it belongs on THIS side of the layering, not in `MetaPlanner`, which
+supplies `min_separation` and consumes the result. The three-layer diagram above gains a
+layer between geometry and projection — the four-layer diagram under "The robot can wait",
+below, is the current one.
 
 Layering, one-way:
 
@@ -1244,3 +1282,203 @@ recognizer is untouched. These runs are the meta-planner-side regression baselin
 Files: shared/meta_planner.py (`update`, `_is_complete`, `update_human_projection`), shared/planner.py
 (`is_complete`), analysis/t7_t8_meta_bugs/ (compare.py, stages.sh, summary.md)
 Reference: T7/T8 session, September 2026; TODO-67, TODO-54, TODO-68
+
+**The robot can wait: realization prices a conflict as duration, and B2 and B3 both consume it (Phase 4C wait-decision revision)**
+Phase 4C paused on one question — whether the robot can WAIT for the human — and it is settled here,
+together with the restructuring of `update()` that follows from it. This entry RECORDS the design; the
+realization function itself lands in a later task, after its one open parameter (`min_separation`,
+TODO-28) is decided on re-measured data. Nothing below is implemented at the time of writing except
+the comment-level consequences (see the T7/T8 baselines: byte-identical after this entry).
+
+THE DECISION. T1 (`analysis/t1_conflict_measurement/`) established that the interference in our
+fixtures is a TIMING conflict, not a path conflict: both agents arrive at the shared kitting table
+within a tick of each other. The proportionate response is to wait briefly, not to abandon the task.
+The robot could not wait — its only lever was WHICH task to do, so the only available response to a
+conflict was to switch, the over-reaction — and pricing a conflict the robot would never act on would
+have been a cost fiction. Decided: the robot can wait. A pause is computed from the human's
+projection, it enters the cost, and it reaches the executor as an execution HINT. A hint, not a
+command, because the human may deviate within a few ticks and the executor's own collision handling
+differs per embodiment; the hint is a preplan that saves the executor solving avoidance from scratch.
+The line this must not cross (roadmap Phase 6, the single-decision-path NOTE in TODOS_AND_DEFERRED):
+the decision is made ONCE, in `shared/`. The executor may REFINE a hold. It must not independently
+decide whether to wait, or which task to run, or silently cancel the decision — that would produce
+the cost in one place and the behaviour in another, with neither authoritative. Rejected: "estimate
+the pause now, execute it in 4D" — a cost containing a hold the robot never takes is a fiction, and
+any B2/B3 result measured on it would describe a plan that was not executed.
+
+THE SECOND FINDING: A BATCH INTERFERENCE PROFILE CANNOT PLACE A HOLD. `_detect_interference()`
+answers "over these two FIXED trajectories, where do they come close". It cannot see that holding at
+the first conflict shifts everything after it, so later conflicts may vanish, shrink or worsen; its
+answer is stale the moment a hold is placed. T1 also measured that its aggregates mislead: every
+conflicted `min_dist` was at the LAST step of the shared window (an arrival-time gap, not a closest
+approach), and exposure (steps below s) ranked candidates OPPOSITE to the pause they actually require
+(s20_on step 11, pre-T2 projection units: item_4 close for 188 steps needs δ = 67, item_7 close
+for 36 steps needs δ = 144).
+A gate built on those aggregates would gate on a misleading number.
+
+WHAT REPLACES WHAT.
+- `_detect_interference()` as a public step in B3 (project → detect → drop infeasible → `_cost`):
+  SUPERSEDED by one `realize()` per candidate; interference detection becomes INTERNAL to it.
+- DESIGN-08 (`_detect_interference` observes, `_cost()` the only place a conflict COULD become a
+  number; computed, carried, unused): RESOLVED — conflict becomes cost BY CONSTRUCTION. A conflicted
+  task is dearer because avoiding the human genuinely takes longer. No conflict weight, no term to
+  tune. See "what survives" below.
+- `min_safe_distance` as an exclusion threshold: RESTATED as `min_separation`, the clearance
+  realization must ACHIEVE. Still the single policy decision, still uncalibrated (TODO-28).
+- "infeasible" = a ConflictPoint below the threshold: RESTATED — "infeasible" = NO REALIZATION EXISTS
+  within the human's projected horizon. Rarer, and meaningful.
+- all-candidates-excluded raises `RuntimeError`: SUPERSEDED — the condition changed meaning and the
+  outcome is OPEN (below).
+- interference measured in BATCH over whole trajectories (~900–1500 ConflictPoints, TODO-27):
+  SUPERSEDED by PER SEGMENT, earliest violation given a start time.
+- B2 has no scalar to compute (stub, TODO-36): RESOLVED — realization gives B2 the current task's
+  hold δ. Whether δ ALONE suffices as a plausibility test is open (below).
+UNCHANGED and reaffirmed: DESIGN-16 single-task receding horizon (realization changes what a candidate
+COSTS, not how many are chosen); trajectory algorithms MEASURE ONLY and hold no policy (realization
+asks them a different question; `min_separation` is passed IN); the queue invariant (`_queue` excludes
+the executing task; candidates = `[current_task] + queue`); cancellation is an HTN method choice,
+never a cost term (realization adds HOLDS, never methods); plans are re-decomposed from scratch and
+realization produces no persistent state; interference is geometric, not zone-based; projection is a
+service separate from selection — realization belongs on the projection / trajectory side, NOT in
+`MetaPlanner`, which supplies `min_separation` and consumes the result; task exhaustion is returned,
+not raised.
+
+DESIGN-08 — WHAT IS RESOLVED AND WHAT SURVIVES. DESIGN-08 asked WHERE conflict becomes a number: in
+`_cost()`, or gated in B2. The answer is NEITHER — it becomes a number in realization, as duration.
+The question is settled rather than answered as posed. What survives, recorded so that "DESIGN-08
+closed" is never read as "the split was abandoned": the separation between OBSERVATION and VALUATION
+is intact, relocated. `earliest_violation` OBSERVES (pure geometry, no policy); holding is what turns
+that observation into a number. Realization is GIVEN `min_separation` rather than choosing it, so no
+policy has leaked into the geometry. Also surviving, unchanged: team-level semantic costs (a human's
+time valued differently from the robot's, disruption, fairness) remain PARKED as a future extension
+(TODO-15). Realization prices only the robot's own time.
+
+THE REALIZATION FUNCTION. Lives in the projection / trajectory layer. Its placement, one-way, no
+cycles (supersedes the three-layer diagram under "Projection is a service, separate from
+selection"):
+
+    trajectory_algorithms.py   pure geometry   segments in -> earliest violation / conflicts out
+            |
+    realization (hold-only)    "what would this trajectory actually be, given the human?"
+            |
+    projection.py              Projector       task + world -> predicted trajectory
+            |
+    meta_planner.py            MetaPlanner     which trajectory to pick
+
+`MetaPlanner` never reaches below `projection.py`; realization never reaches above
+`trajectory_algorithms.py` for its geometry and knows nothing of tasks, beliefs or selection.
+Pluggable strategies, mirroring how `trajectory_algorithms.py` is organised:
+- hold-only — TO BE IMPLEMENTED (later task): stand still until the way is clear, then proceed;
+- detour — documented, unimplemented: go around. Needs a path planner and introduces iteration
+  between trajectory and interference (`obstacle_aware_path()`'s role; Phase 4D);
+- off-the-shelf planner (PRIEST or equivalent, ROS) — documented, unimplemented (Phase 4D).
+Interface (design; the exact signature is the implementer's):
+
+    realize(projected_plan, human_projection, min_separation, start_tick)
+        -> RealizedPlan | None        # None: no realization within the horizon
+
+`RealizedPlan` carries: the placed segments; the holds (where, how long); the total duration (walking
++ holds); and the share of the trajectory lying BEYOND the human's horizon and therefore unassessed
+(TODO-69). Algorithm, hold-only:
+
+    t = start_tick
+    total_hold = 0
+    for each robot segment in order:
+        loop:
+            v = earliest_violation(segment placed at t, human_projection, min_separation)
+            if v is None: break
+            if v.clear_time is beyond the human's horizon: break   # no human left
+            total_hold += (v.clear_time - t)
+            t = v.clear_time
+        place segment at t
+        t += segment duration
+    return RealizedPlan(..., duration = walking + total_hold)
+
+Two properties the loop MUST preserve: (1) A HOLD IS A POSITION — while holding, the robot stands
+where it is, so that stationary stretch is checked like any other; T1 found holds that "cleared" only
+because the waiting position was never checked. (2) TERMINATION — each iteration moves `t` strictly
+forward past a violation interval that ends within a finite horizon. Deliberately OUT OF SCOPE: a hold
+placed MID-segment (walk part way, then stop) may be cheaper than holding before starting, but holding
+before starting always converges and is what T1 measured; waiting somewhere other than where you are
+is a DETOUR, i.e. a different strategy.
+
+`earliest_violation`: per robot segment against each time-overlapping human segment. Both have
+constant velocity, so relative motion is linear and squared distance is a quadratic in time — no real
+root below `min_separation²` means no violation; the roots give the violation interval and hence the
+earliest clear time. CLOSED FORM: no sampling, no resolution parameter, and no world-unit constant in
+`shared/` (the class of assumption the T2 follow-up removed). This is what `closest_point_of_approach`
+was reserved for. `discretized_time_sampling` can serve as a fallback (first sample below the
+threshold rather than the minimum over all of them) but computes more than a hold needs. Which is
+implemented first is an implementation choice; the interface is "earliest violation for this segment
+at this start time".
+
+THE ROLE OF REALIZATION IN B2 AND B3 — BOTH CONSUME IT. This changes what each block IS.
+B2 = PLAUSIBILITY. Mid-task, is the current task still worth continuing? A gate: continue, or
+escalate to B3. Reached only by `theta_crossed` and `task_committed` (`no_current_task` bypasses via
+B1.5 — there is nothing to continue). B3 = REORDER / SELECTION. Under `single_task` (the only
+implemented strategy, DESIGN-16) it picks the best NEXT task; the rest of the pool becomes the queue,
+unordered. `full_reorder` stays a documented flag. REALIZATION IS SHARED MACHINERY, NOT OWNED BY
+EITHER BLOCK. Both consume it; they differ in how many tasks they realize and what they do with the
+result: B2 realizes the CURRENT TASK ALONE and judges its hold δ — one candidate's work, far cheaper
+than B3, and the graded worthiness scalar B2 always lacked; B3 realizes EVERY candidate and takes the
+argmin of realized cost — "continue, paying a 2-tick hold" and "switch, paying 19 ticks of walking"
+become directly comparable numbers. CONSEQUENCE: B3's argmin now already accounts for conflict, so
+B2's original rationale — that B3 could not express "close is bad" (TODO-28's scenario_20 finding) —
+is gone. B2's remaining candidate roles are narrower: computation saving, and hysteresis (which
+matters more now that prior-off `theta_crossed` can fire up to three times per recognition, TODO-68).
+Whether B2 survives as a policy block at all is OPEN and belongs to the next decision point (TODO-36).
+`_cost()` becomes the realized duration and stops being a place where a policy could hide. When
+`human_projection is None` — now a ROUTINE mid-run state, because the belief re-initialises at every
+human task boundary (I4c) — realization is not called and cost is the plain projected duration,
+exactly as today.
+
+`update()` after the revision (design shape, not a patch):
+
+    update(belief, world, executor_state, human_projection) -> UpdateResult
+      # Block 0 — pool assembly (unchanged, incl. the T7 completion drop)
+      pool = ([current_task] if not None else []) + _queue
+      drop tasks already complete in the world (planner.is_complete)
+      if pool is empty: return UpdateResult(None, [])
+      # B1.5 — branch, unchanged
+      if current_task is None: goto B3
+      # B2 — plausibility gate
+      #   "none": False always (default)
+      #   "b2a" : realize the CURRENT TASK ALONE; judge its hold δ    [open: TODO-36]
+      #   "b2b" : realize current + each other task; margin           [redundant with B3]
+      #   human_projection is None -> True (continue)
+      if _is_current_task_plausible(...): return UpdateResult(current_task, _queue)
+      # B3 — reorder / selection
+      for task in pool:
+          proj     = projector.project(task, world)
+          realized = realize(proj, human_projection, min_separation, now)
+          if realized is None: continue        # no realization within the horizon
+          cost = realized.duration             # walking + holds, ONE number
+      if no candidate realized: -> the open case below
+      winner = argmin cost
+      _queue = pool - winner
+      return UpdateResult(winner, _queue, hold = winner's realized holds)
+
+ALL CANDIDATES UNREALIZABLE — the condition now means: for every task, no start time within the
+human's horizon clears the separation (e.g. a human standing at the kitting table blocks every
+delivery in the pool). The `RuntimeError` is not the right answer to that. THE OUTCOME IS OPEN — three
+readings, NONE CHOSEN (TODO-30): (1) hold and re-decide: stand still this tick, keep the current task,
+decide again at the next trigger — needs a re-entry rule (what ends the hold) and a guard against
+deadlock if the human is idle and nothing triggers; (2) pick the least-bad candidate and let the
+executor handle the residual conflict — defensible precisely because the hold is a hint; (3) treat it
+as evidence that `min_separation` is set wrong, or that the human's horizon is too short, and record
+rather than act.
+
+OPEN, belonging to the next decision point (recorded, not decided): `min_separation`'s VALUE, argued
+and expressed RELATIVE to scale — agent motion per tick, or layout scale — not as an absolute, so it
+survives randomised layouts (TODO-28, TODO-47 (b)); whether B2 survives as a block, and what δ is
+judged against (TODO-36); per-segment vs whole-trajectory holds — T1 measured a single shift of the
+whole trajectory, the algorithm above holds per segment (TODO-70); the horizon — realization estimates
+only WITHIN the human's projected horizon, and a hold pushes MORE of the trajectory past it (TODO-69);
+what a trigger is an event OF (TODO-68 / 48 / 54), unchanged by this revision. The hold's consumption
+on the body side — Mesa's executor, later PRIEST — is TODO-71.
+Files: docs only at this revision. To be touched when realization lands: shared/projection.py or a
+new realization module (`realize`, `RealizedPlan`), shared/trajectory_algorithms.py
+(`earliest_violation` — the role reserved for `closest_point_of_approach`), shared/meta_planner.py
+(`_replan_tasks`, `_cost`, `_is_current_task_plausible`, `min_separation`), shared/types.py
+(`UpdateResult.hold`), mesa_sim/executor.py (the hint)
+Reference: Phase 4C wait-decision session, September 2026; T1 measurement session

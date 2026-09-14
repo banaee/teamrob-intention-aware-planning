@@ -9,7 +9,12 @@ PURPOSE:
     1. PATH REALIZATION — how a single action's motion is computed.
        Consumed by MetaPlanner._build_segments().
     2. INTERFERENCE DETECTION — given two agents' Segments, where/how close do
-       they get. Consumed by MetaPlanner._detect_interference().
+       they get. Consumed by MetaPlanner._detect_interference() today; under
+       the Phase 4C wait-decision revision (design_decisions.md, "The robot can
+       wait") the consumer becomes realize(), on the projection side, asking a
+       narrower question — the EARLIEST VIOLATION of a given min_separation
+       for one robot segment placed at a given start time — and holding until
+       it clears. min_separation is passed in; nothing here holds policy.
 
     No classes, no state, no imports from mesa_sim/ or ros_sim/ — same
     mind/body constraint as the rest of shared/.
@@ -21,9 +26,12 @@ WHAT'S IMPLEMENTED VS. PLACEHOLDER:
     closest_point_of_approach()— NOT IMPLEMENTED. Documented analytic approach
                                   below; swap-in replacement for
                                   discretized_time_sampling(), same signature.
+                                  Its closed form is what realization's
+                                  earliest_violation needs (see its docstring).
     obstacle_aware_path()      — NOT IMPLEMENTED. DESIGN-13 / TODO-09's future
                                   non-linear path realization; swap-in
-                                  replacement for straight_line_path().
+                                  replacement for straight_line_path(), and the
+                                  DETOUR strategy of realization (Phase 4D).
 
     Both placeholders exist so the swap points are visible in code, not just in
     docs — implement when actually needed, not speculatively now.
@@ -143,6 +151,13 @@ def obstacle_aware_path(
     returns a path that Segment's straight-line start/end can't fully capture,
     so Segment itself may need to grow (e.g. an optional waypoint list) when
     this is actually built — not resolved now, flagging rather than guessing.
+
+    ROLE UNDER REALIZATION (Phase 4C wait-decision revision): the DETOUR
+    strategy — go around the human rather than hold — as opposed to the
+    hold-only strategy 4C builds first. Waiting somewhere other than where
+    you are is a detour too. Needs a path planner and introduces iteration
+    between trajectory and interference (a new path has new violations), which
+    is why it stays Phase 4D with the off-the-shelf planner (PRIEST, ROS).
     """
     raise NotImplementedError(
         "trajectory_algorithms.obstacle_aware_path: not yet built — see "
@@ -197,6 +212,11 @@ def discretized_time_sampling(
     regardless of how close the sample is — MetaPlanner._detect_interference()
     is where a `distance` threshold turns these into a feasible/infeasible
     decision, not here. This function only measures, it doesn't judge.
+
+    Under realization (design, not yet built) this is the FALLBACK for
+    earliest_violation: the first sample below min_separation, not the
+    minimum over all of them. It computes more than a hold needs — the
+    closed form in closest_point_of_approach() is the intended answer.
 
     Symmetric in segment_a/segment_b — order doesn't affect the result.
     """
@@ -260,6 +280,19 @@ def closest_point_of_approach(
     velocity between the two agents makes the quadratic near-degenerate).
     Left unimplemented deliberately: discretized_time_sampling() is the
     working default until this is worth the edge-case care.
+
+    ROLE UNDER REALIZATION (Phase 4C wait-decision revision; design_decisions.md,
+    "The robot can wait"): this is what the closed form was reserved for. The
+    question realization asks is not "the minimum over the window" but the
+    EARLIEST VIOLATION of a given min_separation for one robot segment placed
+    at a given start time, against each time-overlapping human segment. Same
+    quadratic: no real root of d²(t) = min_separation² inside the overlap
+    window means no violation; the roots give the violation interval and
+    hence the earliest clear time, which is where the robot holds until. No
+    sampling, no resolution parameter, no world-unit constant in shared/ —
+    min_separation is passed in. Whether it lands under this name or as an
+    `earliest_violation` beside it is the implementer's; the interface is
+    "earliest violation for this segment at this start time".
     """
     raise NotImplementedError(
         "trajectory_algorithms.closest_point_of_approach: not yet built — "

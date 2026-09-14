@@ -41,7 +41,8 @@ THE EVIDENCE MODEL (I4):
     BETA — detour tolerance, per cm: how much wasted path makes a target
     implausible. 1/BETA is the excess at which the likelihood has fallen to
     ≈ 0.27 (from 0.5 at zero excess). Absolute units make it layout-scale
-    dependent (the same defect recorded for min_safe_distance, TODO-28); the
+    dependent (the same defect recorded for min_separation, formerly
+    min_safe_distance, TODO-28); the
     fractional form (excess as a fraction of C(origin, g)) was measured against
     it in the I4 sweep — see analysis/i4_evidence_model/REPORT.md.
 

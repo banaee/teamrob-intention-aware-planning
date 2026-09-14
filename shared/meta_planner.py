@@ -31,15 +31,24 @@ WHAT THIS MODULE DOES:
       shared/trajectory_algorithms.py) between the robot's projection and the
       human's, via a swappable algorithm — no zone concept involved (see
       design_decisions.md on why zone-based proximity was rejected).
+      SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026; see
+      design_decisions.md, "The robot can wait"): detection moves INSIDE a
+      per-candidate realize() on the projection side, which holds each robot
+      segment until the way is clear at min_separation and returns the
+      realized duration (walking + holds). This module will supply
+      min_separation and consume the result. _detect_interference() and
+      _cost() below still run the superseded path until realization lands.
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT decompose a task into actions (that is planner.py)
     - Does NOT compute cancellation cost as a separate term (resolved intrinsically
       by planner.py's guarded method selection on the task itself)
-    - Does NOT search for alternate paths/detours to avoid a conflict — that is
-      Phase 4D's low-level path-realization estimator (DESIGN-13), driven by a
-      conflict hint from _detect_interference(), not a meta_planner concern.
-      MetaPlanner only ever picks among the discrete candidate tasks it's given.
+    - Does NOT search for alternate paths/detours to avoid a conflict, and does
+      NOT compute holds itself — that is realization (hold-only first, in 4C;
+      detour and an off-the-shelf planner in 4D, DESIGN-13), a service on the
+      projection side. MetaPlanner only ever picks among the discrete candidate
+      tasks it's given, on their realized costs, and passes the winner's holds
+      on as an execution hint.
     - Does NOT know about Mesa steps or ROS callbacks — simulators decide WHEN to
       call evaluate_triggers()/update(); this module decides WHAT counts as a trigger
     - Does NOT import from mesa_sim/ or ros_sim/
@@ -56,6 +65,11 @@ BLOCK STRUCTURE OF update():
           self._gate_strategy == "none" (the default), in which case update()
           behaves exactly as it did before the block split.
     B3    _replan_tasks() — selects the task assignment and commits.
+    Both B2 and B3 will consume realization (design, not yet built): B2
+    realizes the CURRENT task alone and judges its hold; B3 realizes EVERY
+    candidate and takes the argmin of realized duration. Whether B2 survives
+    as a policy block once B3's argmin already prices conflict is open
+    (TODO-36).
 
 TASK POOL vs. CANDIDATES:
     The pool assembled in update() is NOT a candidate set. Nothing competes at
@@ -91,16 +105,17 @@ STRATEGY (DESIGN-16):
     argument.
 
 STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.md):
-    DESIGN-08 (soft interference penalty in _cost() — hard-gate only for now,
-    see _cost()'s docstring), DESIGN-09 (pre-RESELECT cheap filter — not
-    implemented, every candidate is fully projected and checked), DESIGN-10
-    (interference sampling — discretized_time_sampling() is the current
-    default algorithm; closest_point_of_approach() is a documented,
-    unimplemented alternative — see shared/trajectory_algorithms.py),
-    DESIGN-12 (horizon-projected confidence — relevant only to full_reorder,
-    moot under single_task), DESIGN-13 (obstacle-aware path realization —
-    straight_line_path() is the current default; see
-    shared/trajectory_algorithms.py), DESIGN-16 (see STRATEGY above). None
+    DESIGN-08 is RESOLVED by realization (conflict is priced by construction as
+    hold duration; no penalty formula — see _cost()'s docstring), DESIGN-09
+    (pre-RESELECT cheap filter — B2 realizing the current task alone is that
+    filter; whether B2 survives is TODO-36), DESIGN-10 (interference sampling
+    — discretized_time_sampling() is the current default algorithm;
+    closest_point_of_approach()'s closed form is the earliest_violation
+    realization needs — see shared/trajectory_algorithms.py), DESIGN-12
+    (horizon-projected confidence — relevant only to full_reorder, moot under
+    single_task), DESIGN-13 (partly pulled forward into 4C as the hold-only
+    realization strategy; detour — obstacle_aware_path() — and an
+    off-the-shelf planner remain 4D), DESIGN-16 (see STRATEGY above). None
     block the single_task implementation below.
 """
 
@@ -162,16 +177,22 @@ class MetaPlanner:
                                  candidate infeasible (see _detect_interference()).
                                  Placeholder default, same "needs calibration" status as
                                  assumed_speed — not derived from any domain config yet.
+                                 RESTATED in design as min_separation (TODO-28): the
+                                 clearance realization must ACHIEVE by holding, passed
+                                 into realize() — not an exclusion threshold. Name and
+                                 value stay until realization lands; its value must be
+                                 argued relative to scale, not read off a fixture.
         strategy:                B3's strategy — "single_task" (default, implemented) or
                                  "full_reorder" (not yet functional). Selects what a
                                  candidate is inside _replan_tasks(): an individual task,
                                  or a permuted ordering. See module docstring, DESIGN-16. DESIGN-16.
         gate_strategy:           B2, the mid-task plausibility gate. "none" (default)
                                  skips B2 entirely — update() then behaves exactly as it
-                                 did before the block split. "b2a" (assess current task in
-                                 isolation) and "b2b" (compare current against other tasks
-                                 individually) are not yet implemented. Independent of
-                                 `strategy`; all combinations are intended to be runnable.
+                                 did before the block split. "b2a" (realize the current
+                                 task alone; judge its hold) and "b2b" (realize current
+                                 and each other task; margin — redundant with B3) are not
+                                 yet implemented. Independent of `strategy`; all
+                                 combinations are intended to be runnable.
         interference_algorithm:  function(Segment, Segment) -> List[ConflictPoint].
                                  Defaults to trajectory_algorithms.discretized_time_sampling,
                                  whose spatial resolution (max_spatial_step, world units)
@@ -182,6 +203,10 @@ class MetaPlanner:
                                  rather than sampling at an assumed unit scale.
                                  closest_point_of_approach is a documented, unimplemented
                                  drop-in alternative — same signature, swap here when built.
+                                 Under realization the question changes to "earliest
+                                 violation for this segment at this start time", asked
+                                 inside realize() rather than here; this parameter then
+                                 moves with it.
         human_agent_id:          agent_id of the human this robot observes, for building
                                  the human's predicted projection in update(). Mirrors
                                  RobotAgent.observed_agent_id's existing optionality —
@@ -363,9 +388,12 @@ class MetaPlanner:
         `human_projection` is supplied by the caller, built once per fired
         trigger via update_human_projection(). Not rebuilt here, not recomputed
         per candidate. None means the projection was not admitted: belief
-        confidence below theta, no human observed, or the hypothesis was
-        unresolvable — every candidate is then scored without an interference
-        check, not treated as always-conflicting.
+        confidence below theta, no human observed, `unknown`, or the hypothesis
+        was unresolvable — every candidate is then scored without an
+        interference check, not treated as always-conflicting. A ROUTINE
+        mid-run state, not an edge case: the belief re-initialises at every
+        human task boundary (I4c). Under realization the same rule holds —
+        realize() is not called and cost is the plain projected duration.
 
         TERMINAL STATE: returns UpdateResult(current_task=None, queue=[]) when
         the pool is empty (nothing left to do: queue empty and nothing
@@ -488,10 +516,14 @@ class MetaPlanner:
         Strategies (self._gate_strategy):
             "none" (default) — no gate; always escalate. update() then behaves
                 exactly as it did before the block split.
-            "b2a"  — assess the current task in isolation. Needs a scalar
-                worthiness score derived from the current task's projection
-                against human_projection. NOT IMPLEMENTED.
-            "b2b"  — compare the current task against the other tasks in
+            "b2a"  — assess the current task in isolation: realize the
+                CURRENT TASK ALONE against human_projection and judge its
+                hold δ (one candidate's realization — far cheaper than B3).
+                The scalar this needed now exists in design; what δ is judged
+                AGAINST (the human's remaining horizon, the task's own
+                duration, or nothing — B2 reducing to computation saving and
+                hysteresis) is open, TODO-36. NOT IMPLEMENTED.
+            "b2b"  — realize the current task and each other task in
                 task_pool individually; continue only if it wins by a clear
                 margin. Redundant with B3 under single_task by construction —
                 a redundancy control for ablation, not a fourth policy.
@@ -545,6 +577,12 @@ class MetaPlanner:
         argmin over survivors becomes current_task; the rest form the queue in
         whatever order they happened to iterate — order carries no commitment
         under this strategy, it is re-decided next trigger.
+        DESIGN (wait-decision revision, to be built): project → realize(proj,
+        human_projection, min_separation, now) → cost = realized duration
+        (walking + holds); a candidate with no realization within the human's
+        horizon is skipped; the winner's holds go out on the UpdateResult as
+        an execution hint. "Continue, paying a 2-tick hold" and "switch,
+        paying 19 ticks of walking" then compare on one number.
 
         current_task, if any, is an ordinary member of task_pool and competes
         on identical terms. Continuation vs. reselection falls out of the
@@ -555,6 +593,11 @@ class MetaPlanner:
         The RuntimeError below (every candidate excluded by
         _detect_interference()) is a genuine anomaly and stays an exception,
         deliberately distinguishable from update()'s terminal return.
+        SUPERSEDED IN DESIGN: under realization the condition means "no
+        candidate has a start time within the human's horizon that clears
+        min_separation" — a situation, not an anomaly — and its outcome is
+        OPEN with three readings (TODO-30). The raise stays until realization
+        lands and one is chosen.
         """
         if self._strategy == "full_reorder":
             raise NotImplementedError(
@@ -614,6 +657,15 @@ class MetaPlanner:
         self._min_safe_distance (hard exclusion only — DESIGN-08's soft
         penalty is not applied here, see _cost()).
 
+        SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026): a batch
+        profile over two FIXED trajectories cannot place a hold — holding at
+        the first conflict shifts everything after it — and T1 measured that
+        its aggregates mislead (every conflicted min_dist sat at the END of the
+        shared window, an arrival gap; exposure ranked candidates opposite to
+        the pause they need). Replaced by detection INTERNAL to realize(): per
+        segment, earliest violation at a given start time, at min_separation.
+        Kept until realization lands; still what runs today.
+
         Operates on ProjectedPlan/ProjectedPlanEntry generically via
         entry.segments — unchanged by the single_task vs. full_reorder
         decision; a single_task ProjectedPlan is just a 1-entry instance of
@@ -643,6 +695,14 @@ class MetaPlanner:
         called (see update()) — this returns execution cost only.
         assessment.conflicts is available here but deliberately unused until
         DESIGN-08 is revisited with an actual penalty formula.
+
+        DESIGN-08 is RESOLVED by realization (wait-decision revision, Sept
+        2026) — not with a penalty formula: this becomes the REALIZED duration
+        (walking + holds) and stops being a place where a policy could hide.
+        Conflict is priced by construction because avoiding the human takes
+        longer; there is no conflict weight to tune. Team-level semantic costs
+        stay parked (TODO-15). Until realization lands this returns the plain
+        projected duration.
 
         No carrying parameter, no cancellation branch — cancellation cost is
         already reflected in projection's step count via planner.py's guarded

@@ -15,22 +15,33 @@ WHY THIS IS ITS OWN MODULE:
     _estimate_duration, plus inline human-projection code in update()). But turning a
     task into a trajectory is not selection logic — MetaPlanner merely consumes it.
     Several planned consumers want projection without wanting selection:
-      - DESIGN-13's path-realization estimator (Phase 4D low-level planner)
+      - realization (Phase 4C wait-decision revision; design_decisions.md, "The
+        robot can wait"): realize(projected_plan, human_projection,
+        min_separation, start_tick) -> RealizedPlan | None, hold-only first —
+        DESIGN-13's estimator partly pulled forward; detour and an off-the-shelf
+        planner stay Phase 4D. It belongs on THIS side of the layering, not in
+        MetaPlanner, which supplies min_separation and consumes the result.
       - visualization drawing predicted human/robot paths
       - Phase 5 evaluation measuring prediction quality against actual behaviour
     Under the old structure each would have had to reach into MetaPlanner's privates
     or duplicate the logic.
 
-LAYERING (one-way, no cycles):
-    trajectory_algorithms.py   pure geometry — Segment in, ConflictPoint/Segment out
-            ↓
-    projection.py              task + world → trajectory
-            ↓
-    meta_planner.py            which trajectory to pick
+LAYERING (one-way, no cycles; the realization layer is design, not yet built —
+design_decisions.md, "The robot can wait"):
+    trajectory_algorithms.py   pure geometry   segments in -> earliest violation / conflicts out
+            |
+    realization (hold-only)    "what would this trajectory actually be, given the human?"
+            |
+    projection.py              Projector       task + world -> predicted trajectory
+            |
+    meta_planner.py            MetaPlanner     which trajectory to pick
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT decide which task to do (meta_planner.py)
-    - Does NOT detect interference or compute cost (meta_planner.py)
+    - Does NOT detect interference or compute cost (meta_planner.py today;
+      under realization the interference question is asked inside realize(),
+      on this side, and the cost is the realized duration it returns —
+      meta_planner.py still decides between candidates on that number)
     - Does NOT update beliefs (recognizer.py)
     - Does NOT import from mesa_sim/ or ros_sim/
 """
@@ -185,7 +196,10 @@ class Projector:
           - no human is observed (human_agent_id is None)
           - get_hypothesis() cannot resolve belief.most_likely (e.g. "unknown")
           - the resolved task name is not in the domain's task schemas
-        A None projection means the caller runs no interference check that call.
+        A None projection means the caller runs no interference check that call —
+        a routine mid-run state, since the belief re-initialises at every human
+        task boundary (I4c). MetaPlanner.update_human_projection() also refuses
+        `unknown` before calling this (T8).
         """
         if human_agent_id is None:
             return None
@@ -226,7 +240,9 @@ class Projector:
         targets were removed from the live domain (see domains/kitting/actions.py),
         and this raises explicitly rather than silently mis-estimating if one
         reappears. Obstacle-aware, non-linear realization is DESIGN-13 / TODO-09
-        (Phase 4D) — see trajectory_algorithms.obstacle_aware_path().
+        (Phase 4D) — see trajectory_algorithms.obstacle_aware_path(). Holds
+        against the human (Phase 4C realization) are placed AFTER this pass, on
+        the segments it returns; this builds the unheld trajectory only.
 
         Non-movement actions: trajectory_algorithms.stationary_segment(), held for
         knowledge.get_cost(action_name) steps, falling back to default_action_cost.
