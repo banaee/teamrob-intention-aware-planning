@@ -295,6 +295,18 @@ class UpdateResult:
     # PLANNED (wait-decision revision): the winner's realized holds — see below
 ```
 
+**A continue decision (T5, TODO-43).** `update()` returning a `current_task` whose
+`task_instance_key()` equals that of the `ExecutorState.current_task` it was given is a CONTINUE.
+The embodiment must keep executing without interruption: no lost tick, no restart of the action
+in flight, no observable difference from a tick on which no trigger fired. The task is still
+re-decomposed from the live world (§2.3; plans are never resumed) and the fresh plan replaces the
+one in flight — it may legitimately differ, and under realization it will carry the holds priced
+on this trigger — but execution progress through the current action survives the swap. Identity
+is the key, never object identity (`update()` happens to return the same `TaskInstance` object
+today; the contract does not promise it) and never a domain string. A continue is not a second
+decision path: which task is selected is `update()`'s alone, and the embodiment gains no rule
+about when to re-plan. See design_decisions.md, "A continue decision costs nothing".
+
 **The hold — PLANNED, not yet in the dataclass** (Phase 4C wait-decision revision, September
 2026; design_decisions.md, "The robot can wait"). `update()` will return, with the winning task,
 the HOLDS its realization placed: for each held segment, where the robot stands and for how
@@ -543,6 +555,12 @@ on every call, never a flag kept here; the executor's own bookkeeping lags it by
 
 **Queue invariant:** `self._queue` holds only tasks NOT currently executing; the in-progress
 task lives solely in `ExecutorState.current_task`. Candidates = `[current_task] + queue`.
+
+**Continue (T5).** Whether the winner is the executing task is decided by the caller with
+`task_instance_key()` (§1.9, "A continue decision"); `update()` neither flags it nor treats it
+differently — B2's continuation return and B3 re-selecting the current task are the same
+outcome at the boundary. A continue costs the robot nothing; that is the embodiment's
+obligation (§4.1), not a change to selection.
 
 **Blocks.** 0: pool assembly (above); terminal return if empty. B1.5: no current task → straight
 to B3. B2: `_is_current_task_plausible()`, the mid-task plausibility gate — `gate_strategy`
@@ -814,6 +832,11 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
 - Clears `current_task` on task completion (this is what makes `no_current_task` fire) and
   sets its own `finished` flag when `update()` returns `current_task=None`
 - Executes `GroundedAction` via `action_decomposer.py` → microaction queue → one microaction per step
+- On a continue decision (§1.9: `UpdateResult.current_task` has the executing task's
+  `task_instance_key()`) hands the re-decomposed plan to `Executor.continue_plan()`: the cursor
+  moves to the action in flight if the fresh plan contains it (GroundedAction equality) and the
+  microaction queue is kept; otherwise the plan loads from its start. The tick is spent exactly
+  as it would have been with no trigger — never lost, never a restart (T5, TODO-43)
 - PLANNED (TODO-71): executes the hold `UpdateResult` carries as STAND microactions before the
   held segment; may refine the hold against what the world shows, never decides independently
   whether to wait or drops it silently (§1.9, the hold)

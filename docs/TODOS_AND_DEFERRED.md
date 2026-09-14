@@ -1097,7 +1097,7 @@ Files: shared/types.py (`DomainModel.intentions`), shared/domain_knowledge.py
 (`get_all_intentions`), shared/recognizer.py (`build_hypothesis_space`)
 Reference: assignment-prior session, September 2026
 
-**TODO-43 — A no-op `update()` costs the robot one tick**
+**TODO-43 — A no-op `update()` costs the robot one tick** ✅ RESOLVED (T5)
 When a trigger fires and B3 re-selects the task already executing, `RobotAgent` reloads the
 plan (`[executor] _load_plan`) and the robot loses that tick. scenario_20, assignment_prior
 off: the step-22 `theta_crossed` re-issues item_4 and the robot grasps at step 23; with the
@@ -1106,8 +1106,33 @@ and projection distances shift with it (`task_committed` item_4 min_dist 4.9 vs 
 step of arrival gap). Harmless at today's trigger rate; a real cost once B2 fires often, since
 every "continue" would stall the robot. Fix direction not decided; candidate: keep the
 current plan when `UpdateResult.current_task` is the executing task.
-Files: mesa_sim/sim_agents.py (`RobotAgent.step`), shared/meta_planner.py (`update`)
-Reference: fixture-design session, September 2026
+FOUND (T5, `analysis/t5_continue/`): the loss has exactly one cause and one tick. A reload
+resets the executor's cursor to the fresh plan's first action; if that action is one the world
+already shows complete and the executor had ALREADY acknowledged it (advanced past it on the
+previous tick), the tick is spent acknowledging it again. That is the tick after an arrival
+acknowledgement — the grasp or release tick. Mid-walk a reload costs nothing (`expand()`
+re-derives the same straight path from the current position), and on the acknowledgement tick
+itself the reload does what a no-trigger tick does. At HEAD before the fix no continue in the
+eight sweep conditions landed on a grasp/release tick — the prior-off triple crossings (s00_off
+109/113/115, s20_off 87/91/95) are the HUMAN's grasp stop while the robot walks — so the sweep
+was losing 0 ticks; the step-22 measurement above predates the recognizer rework that moved the
+trigger ticks. Isolated with an injected trigger: a continue on s00_off 6 or 30, s30_off 47 or 85
+lost one tick each before the fix and none after. The scenario_30 cancel-and-return attributed
+to this loss is not in the record (no `deliver_with_return` execution in any baseline log).
+DECIDED: a continue costs nothing; re-decomposition stays (never resumed); identity is
+`task_instance_key()`; no plan cursor in `shared/`; no new decision path (design_decisions.md,
+"A continue decision costs nothing"; io_contracts.md §1.9 / §2.2 / §4.1).
+IMPLEMENTED: `RobotAgent.step` tests `task_instance_key(result.current_task)` against the
+executing task's key (the `is` test is gone) and on a continue hands the fresh plan to
+`Executor.continue_plan()`, which moves the cursor to the in-flight action if the fresh plan
+contains it (GroundedAction equality) and keeps the microaction queue and completion
+bookkeeping; otherwise the plan loads from its start as before (the `task_committed` case,
+where `deliver_already_held` has no `pick_up`). Sweep: decisions and `[IR]`/`[IR-dist]`
+byte-identical to the T7/T8 baselines; `[meta-cand] min_dist` differs in the 14th–16th digit
+where the kept queue's points replace re-interpolated ones. New baselines: `analysis/t5_continue/new/`.
+Files: mesa_sim/sim_agents.py (`RobotAgent.step`), mesa_sim/executor.py (`continue_plan`),
+analysis/t5_continue/ (inject.py, compare.py, summary.md)
+Reference: fixture-design session, September 2026; T5 session, September 2026
 
 **TODO-44 — `assignment_prior` config key and CLI flag are misnamed**
 `configs/experiment.yaml: assignment_prior` and `--assignment_prior` now switch a support

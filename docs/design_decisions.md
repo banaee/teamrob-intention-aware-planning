@@ -1524,3 +1524,52 @@ new realization module (`realize`, `RealizedPlan`), shared/trajectory_algorithms
 (`_replan_tasks`, `_cost`, `_is_current_task_plausible`, `min_separation`), shared/types.py
 (`UpdateResult.hold`), mesa_sim/executor.py (the hint)
 Reference: Phase 4C wait-decision session, September 2026; T1 measurement session
+
+**A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
+When `update()` returns the task the robot is already executing — a CONTINUE, decided by
+`task_instance_key()` equality between `UpdateResult.current_task` and `ExecutorState.current_task`, never by
+object identity and never by a domain string — the robot continues without interruption: no lost tick, no
+restart of the action in flight, no observable difference from a tick on which no trigger fired. This is
+part of the interface contract between `shared/` and the embodiment (io_contracts.md §1.9, §2.2, §4.1), not
+an implementation detail of `sim_agents.py`.
+
+What is NOT changed: "Plans are re-decomposed from scratch, never resumed" (above) stands. The planner still
+decomposes the continued task from the live world on every trigger, and the plan it produces may legitimately
+differ from the one in flight (the world moved; under realization it will carry different holds). There is
+still no plan cursor or resumable plan state in `shared/`. Which task is selected is untouched, and the body
+gains no rule about when to re-plan: the decision is made once, in `shared/`; the body executes it.
+
+The distinction is between DECIDING and RE-STARTING. The loss had one cause, in the executor: `_load_plan`
+resets the cursor to the fresh plan's first action, and on the tick after an arrival acknowledgement — the
+executor has advanced past the completed `move_to` and would grasp or release now — that first action is
+the completed `move_to`, so the tick is spent acknowledging it a second time. Mid-walk nothing was lost (the
+walk is re-expanded to the same straight path from the current position), and on the acknowledgement tick
+itself a reload does what a no-trigger tick does. Measured: no continue in the eight sweep conditions at HEAD
+landed on a grasp/release tick (the prior-off triple `theta_crossed` fires inside the HUMAN's grasp stop while
+the robot walks), so the sweep lost 0 ticks; the mechanism was isolated with an injected trigger (s00_off 6
+and 30, s30_off 47 and 85: one tick lost each before, none after — `analysis/t5_continue/summary.md`). The
+scenario_30 cancel-and-return that motivated the task is not in the record at HEAD.
+
+The rule, on the body side (`Executor.continue_plan`): the fresh plan replaces the in-flight one; if the
+action in flight appears in the fresh plan (GroundedAction dataclass equality — name, bindings, completion
+predicate, schema), the cursor moves to it and the microaction queue and completion bookkeeping are KEPT, so
+the tick proceeds exactly as it would have — a step, an acknowledgement, the grasp; a `stand` in progress
+keeps its countdown. If it does not appear, the decomposition genuinely changed and the plan loads from its
+start, as any new plan does — the `task_committed` continue, where `deliver_already_held` has no `pick_up` to
+acknowledge and the carry starts on the trigger tick (one tick earlier than a no-trigger run, pre-existing,
+unchanged). The world remains the cursor: what the executor carries across the swap is where it is in the
+action it was already doing, never a record of progress the world does not show. Consequence for realization
+(TODO-71): a hold that is re-realized on a continue with a different duration is a different action and is
+executed as the fresh plan says; a hold re-realized identically keeps its countdown.
+
+Rejected: keeping the in-flight plan on a continue (TODO-43's candidate). It would have made a continue free
+too, but the plan the meta-planner priced would then not be the plan executed — the fiction "The robot can
+wait" rules out — and a hold computed on a continue would never reach the executor.
+
+Sweep (PYTHONHASHSEED=0, `analysis/t5_continue/`): decisions, `[IR]`/`[IR-dist]` and the robot's per-tick lines
+are byte-identical to the T7/T8 baselines in all eight conditions; `[meta-cand] min_dist` differs in the
+14th–16th significant digit where the kept queue's step points replace re-interpolated ones on the same
+line. These are the meta-planner-side regression baselines from here on.
+Files: mesa_sim/executor.py (`continue_plan`), mesa_sim/sim_agents.py (`RobotAgent.step`),
+shared/io_contracts.md (§1.9, §2.2, §4.1), analysis/t5_continue/
+Reference: T5 session, September 2026; TODO-43
