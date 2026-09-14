@@ -1,0 +1,15 @@
+{
+ "first_violation_max_abs_diff": 0.009994269456321092,
+ "first_violation_n": 641,
+ "first_violation_n_bad": 0,
+ "sampled_min_d_below_s": 0,
+ "sampled_n": 4129,
+ "sampled_worst_margin": 0.0012756296555433977,
+ "grid_exact_max_abs_diff": 0.04000000000055337,
+ "grid_whole_max_abs_diff": 0.04000000000000625,
+ "grid_status_mismatch": 0,
+ "grid_n": 3432,
+ "pool_order_argmin_matches_log": 66,
+ "pool_order_argmin_mismatch": 4,
+ "one_segment_per_action_violations": 0
+}
