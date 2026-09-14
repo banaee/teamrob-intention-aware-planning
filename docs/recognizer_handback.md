@@ -197,6 +197,7 @@ TODO-54 (`theta_crossed` on `unknown` after a pin): the three are one question �
 | TODO-52's latent crash; s30_off's item_2 at 87 | TODO-52, TODO-67 | meta-planner side |
 | scenario_10 | TODO-52 (and TODO-42) | dropped from the sweep in I2: its step-257 meta-planner RuntimeError is latent and its `[IR-dist]` tie order flaps without `PYTHONHASHSEED=0` |
 | β in centimetres | TODO-58 | layout-scale dependence |
+| `io_contracts.md` §1.3 / §2.1 describe the pre-I2 recognizer | TODO-72 | leg model, cosine kernel, held-item rule; align against §1–§2 here (found Sept 2026, meta-planner side, not edited) |
 
 ## 7. The paper-facing divergence
 

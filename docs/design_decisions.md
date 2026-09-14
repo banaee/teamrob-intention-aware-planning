@@ -843,6 +843,48 @@ held-item refutation is deleted, not moved. (3) The floor is applied to the OUTP
 state is normalized but not floored (it used to be re-floored at every leg base, a once-per-leg
 recovery clamp that was never a stated decision).
 
+**Projection steps are execution ticks; the body supplies the rate, and the sampling resolution has no default in `shared/` (T2)**
+Until T2 the projector ran at `assumed_speed = 1.0`, so one projection step was one world unit
+(cm) of motion and a stationary action was one unit: a candidate's "cost" was its path length
+plus 1 per grasp/place, and a placement that takes a full Mesa tick was 20× shorter in the
+projection than in execution. Costs were comparable between candidates and nothing else —
+not to the human's projection in time, not to the executor's ticks, not to any `wait_at`
+duration — and two agents projected to place at the same table a tick apart never coincided.
+
+Decision. One projection step IS one execution tick. `RobotAgent` constructs
+`Projector(assumed_speed=<Mesa step_size>, default_action_cost=1.0)` (mesa_sim/sim_agents.py,
+`step_size` from mesa_configs.yaml), so a movement action lasts distance/20 ticks and a
+stationary action one tick, for robot and human projections alike, and `[meta-cand] cost=`
+reads in ticks (scenario_20 t=0: 54 / 71 / 103, formerly 1032 / 1372 / 2028). The body
+supplies the rate; `shared/` learns no Mesa constant — the `1.0` defaults on `Projector` are
+unit-less placeholders, not values `shared/` knows to be right. ROS supplies its own rate.
+
+Follow-up, the same principle applied to the sampler: `discretized_time_sampling` spaces its
+samples at `min(interval, max_spatial_step / max(speed_a, speed_b))`, speed read off each
+Segment, so resolution is fixed in WORLD UNITS whatever the step size (a projection built at
+20 units per tick is sampled 20 times per tick when `max_spatial_step` is 1). `max_spatial_step`
+is keyword-only with NO DEFAULT: a resolution in world units is itself a unit-scale assumption
+(1 cm in Mesa is not 1 m in ROS), and that is a fact about the body. The embodiment binds it
+from its own config (`mesa_configs.yaml: simulation.interference_spatial_resolution`, a
+required key) with `functools.partial` and passes the bound callable as
+`MetaPlanner(interference_algorithm=...)`; an unbound call raises `TypeError` rather than
+sampling at an assumed scale. The rule generalises: no world-unit constant in `shared/`.
+Realization's `earliest_violation` is closed-form partly so that it needs no such constant
+(see "The robot can wait").
+
+Consequence measured, not decided: with placement lasting a real tick, both agents' placement
+segments sit at the identical table point in overlapping ticks whenever the arrival gap is
+under a tick, so `min_dist` reaches exactly 0.0 and `min_safe_distance = 1.0` excludes those
+candidates — TODO-30 became exercised by the time-scale fix, not by calibration (scenario_20
+selections change at s20_on 11 and s20_off 24; scenario_10 hits the every-candidate-excluded
+`RuntimeError` at 257, TODO-52). `min_safe_distance` was deliberately left untouched. The T1
+report's costs and pause delays are in pre-T2 projection units (its units note); its distances
+are world units and unchanged. Mesa logs for the follow-up are byte-identical to 2282c83.
+Files: mesa_sim/sim_agents.py (Projector construction, the bound sampler), shared/projection.py
+(`Projector.__init__`), shared/trajectory_algorithms.py (`discretized_time_sampling`),
+mesa_sim/action_decomposer.py (`_get_interference_spatial_resolution`), mesa_sim/mesa_configs.yaml
+Reference: T2 session, September 2026 (commits 2282c83, 3af5953); TODO-28, TODO-30
+
 **Targets, methods and completions are the planner's — the recognizer resolves nothing itself (I2)**
 Until I2 the recognizer resolved a hypothesis's target with its own copy of the lookup: read
 the literal `"?item"`, take `methods[0]`, take the first `Const` bound to a step named

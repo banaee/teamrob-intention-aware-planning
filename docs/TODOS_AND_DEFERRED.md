@@ -1799,6 +1799,24 @@ mesa_sim/sim_agents.py, ros_sim/ (paused)
 Reference: Phase 4C wait-decision session, September 2026; roadmap.md Phase 6 notes
 
 
+**TODO-72 — `io_contracts.md` §1.3 and §2.1 still describe the pre-I2 recognizer** [recognizer side]
+Found while re-aligning the meta-planner sections after T7/T8 and the wait-decision revision
+(September 2026); deliberately not edited then, since it is recognizer-side work. §1.3's
+"scoped exception" paragraph names `direction_consistency_likelihood` and the resolver
+helpers `_get_expected_position` / `_get_target_zone` in `recognizer.py`; §2.1's `update()`
+correction describes the leg model (a discrete observation closes the leg, one chord per
+leg, output = evidence × ω_context with the held-item refutation) and cites "One leg is one
+observation". All of that is superseded by I2–I4d: targets resolve through
+`shared/target_resolution.py` and the planner's `decompose()`; the movement likelihood is
+the excess-path logistic (`excess_path`, `shared/likelihood_functions.py`) with a constant
+`unknown`; there is no leg, no cosine kernel, no held-item rule, no ZONE_BOOST; the belief
+re-initialises at the observed agent's task boundary; `unknown` folds with the stretch.
+`recognizer_handback.md` §1–§2 is the current description to align §2.1 against, and the
+I2–I4d entries in design_decisions.md the record. Also stale in the same passages: the
+constructor paragraph's "persistent assignment prior" wording (it is a support restriction).
+Files: shared/io_contracts.md (§1.3, §2.1), docs/recognizer_handback.md
+Reference: wait-decision documentation session, September 2026
+
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
 (TODO-28's class of defect). The fractional reading — excess as a fraction of C(origin, target) — was
