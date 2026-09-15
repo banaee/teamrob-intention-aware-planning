@@ -216,8 +216,8 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 
 *Validation gaps under 4C, checked against current state (Sept 2026):*
 - TODO-28: DECIDED at R1 — `min_separation` = 2.5 × the robot's motion per tick (50 cm in Mesa),
-  relative to motion so that it scales; the `assumed_speed` / time-scale half was RESOLVED by T2. Lands
-  in code with T10; revisit under TODO-47 and ROS body sizes.
+  relative to motion so that it scales; the `assumed_speed` / time-scale half was RESOLVED by T2. Landed
+  in code in T4 for B2 only; B3 adopts it in T10; revisit under TODO-47 and ROS body sizes.
 - TODO-29: `deliver_with_return` still unexercised under the MetaPlanner for the ROBOT. It is exercised every
   run by the recognizer for rival hypotheses of the human, and whether its guard is the right prediction there
   is now an open domain question (TODO-55 (e)).
@@ -250,10 +250,17 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    `earliest_violation` closed form, `RealizedPlan`), validated against T1b's `whole` realizer on the
    T9 baselines. Open before its numbers are read as exact: TODO-77 (T9 found the projection still
    1–6 ticks ahead of execution through the executor's acknowledgement ticks — a decision, not a fix)
-3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5
+3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5;
+   the hold δ on `UpdateResult`, executed by Mesa as STAND at the robot's position ✅
+   (`analysis/t4_b2a/`; TODO-36, TODO-71, TODO-77)
 4. T10 — B3.A with realized cost T_r + δ; the all-unrealizable fallback (plain cost, logged);
    `min_separation` = 2.5 × motion per tick replaces `min_safe_distance`; the `RuntimeError` removed;
-   the hold δ on `UpdateResult`, executed by Mesa as STAND at the trigger position
+   B3's winner's δ on `UpdateResult.hold` (the field and its Mesa execution were built in T4).
+   Also in T10, deferred from T4: bring `shared/io_contracts.md` up to date (§1.9 the hold is now in
+   `UpdateResult`; §2.2 Blocks, `b2a` built; §2.2c `realize()` consumed; §4.1 the hold executed);
+   one run-log header line naming the parameters a log was produced under, at least `gate_strategy`
+   and θ, plus ρ and `min_separation` (TODO-78). That changes every log, so do it with T10's
+   baseline regeneration
 5. D2 — what a trigger is an event of (TODO-68 / 48 / 54 / 64 / 65), decided from the T4 and T10 logs
 6. T6 — ablation: B2 {none, b2a} × B3.A {plain, realized}, sweeps of ρ and of s (`min_separation`)
 Later, not scheduled: TODO-47 (randomised layouts), TODO-32 (`wait_at` duration in projection),

@@ -291,8 +291,9 @@ a 2-tick hold" and "switch, paying 19 ticks of walking" are compared by the same
 "The robot can wait", below.
 REAFFIRMED AGAIN (R1, September 2026): B2 `b2a` (to be built, T4) is a COMMITMENT gate, not a
 second decision path — it can only prevent a switch B3 would make (continue when the current
-task's hold is small against the human's remaining projection), never select a task or place a
-hold of its own. Inside B3 the current task still competes on its realized cost like any other.
+task's hold is small against the human's remaining projection), never select a task. The hold it
+continues with is realization's, and B2 only carries it on the `UpdateResult` (wording corrected on
+the T4 report). Inside B3 the current task still competes on its realized cost like any other.
 Files: shared/meta_planner.py (Phase 4C)
 
 **Robot's `scheduled_tasks` order is a scenario-authoring convenience, not a schedule**
@@ -1572,6 +1573,15 @@ THE HOLD IS AN EXECUTED HINT: δ travels in `UpdateResult` with the winning task
 trigger re-decides (a fresh `update()` re-realizes from the robot's then-current position; a hold
 re-realized identically keeps its countdown, T5). TODO-71's "hold before the segment it precedes"
 wording is superseded by this: there is one hold, and it is at the trigger position.
+AS BUILT (T4): `UpdateResult.hold` (whole ticks) and `Executor.hold()`. Every decision replaces the
+hold in progress with its own δ, and the ticks not yet run are logged as interrupted. In both
+measured interruptions the fresh δ was exactly the remainder, which is T5's "keeps its countdown".
+RULED (T4 report): A DECISION WITH NO PROJECTION DROPS A HOLD IN PROGRESS. While the robot holds it
+stands, so `task_committed` cannot fire; its task cannot complete, so there is no `no_current_task`,
+which B1.5 would route past B2 anyway. The remaining route is a `theta_crossed` whose projection is
+not admitted (`most_likely` `unknown` or unresolvable, since the crossing clears the gate). The
+recognition behind the hold then no longer stands, and a hold computed against it should not survive.
+Recorded in TODO-71.
 
 `earliest_violation`: per robot segment against each time-overlapping human segment. Both have
 constant velocity, so relative motion is linear and squared distance is a quadratic in time — no real
@@ -1602,7 +1612,10 @@ only prevent a switch B3 would make. `b2a` realizes the current task alone and C
 δ ≤ ρ × (the human's remaining projected duration at the trigger, T_h − trigger); otherwise, or if
 the current task is unrealizable, it escalates to B3. `human_projection is None` still means continue.
 ρ is an explicit `MetaPlanner` policy parameter, default 0.5 — a stated assumption to be varied in the
-ablation (T6), not a calibrated value. `b2b` stays a documented stub. B3 stays `single_task` (B3.A)
+ablation (T6), not a calibrated value. RULED (T4 report): the human's remaining projected duration is
+T_h − 0, from the decision instant to T_h, not T_h minus the observation offset. The human is acting
+from the decision instant; the offset (L2) concerns where its position is known, not how long it is
+still acting. `b2b` stays a documented stub. B3 stays `single_task` (B3.A)
 with realized cost (T10); `full_reorder` stays out of 4C. Under `b2a` a repeated `theta_crossed`
 (TODO-68) mostly ends in a continue, which may also hide a real change of belief (TODO-48) — to be
 decided from the T4 and T10 logs (D2). To be built: `b2a` in T4, B3.A with realized cost in T10.

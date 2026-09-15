@@ -681,8 +681,10 @@ are arrival-tick artefacts; at 20–100 cm holds are rare and short; from 150 cm
 the dominant event is the human's path passing the robot's standing position, which a hold cannot
 resolve. 2.5 ticks of motion sits inside the regime where holds are short and all-unrealizable is
 rare (1 of 43 admitted triggers at 50–100 cm). To be revisited under randomised layouts (TODO-47 (b))
-and real body sizes (ROS). Lands in code with T10 (the constructor keeps `min_safe_distance = 1.0`
-until then). The `assumed_speed` half was resolved by T2 (below).
+and real body sizes (ROS). LANDED in code in T4, for B2 only: `MetaPlanner(min_separation_in_motion_ticks=2.5)`
+× `Projector.assumed_speed` (the body-supplied motion per tick), passed to `realize()` by `b2a`. B3
+adopts it in T10; until then B3 keeps `min_safe_distance = 1.0` (ruling on the T4 report). The
+`assumed_speed` half was resolved by T2 (below).
 The parameter is no longer an exclusion threshold ("a ConflictPoint below it makes a candidate
 infeasible") but the separation realization must achieve by holding: `earliest_violation` is
 asked for the first time the two agents come within `min_separation`, and the robot holds until
@@ -969,7 +971,9 @@ hold δ = 1–7, 39 without; 9 of the 39 had no projection) and 2 escalate, both
 escalation on δ above the bound (largest δ / bound 0.40, s20_off 20). A counterfactual B3 at every
 continue (instrumented run, identical logs otherwise) picks the current task in all 49. So B2 never
 kept a task B3 would have switched away from, and its commitment role is not exercised by these
-fixtures at ρ = 0.5. What the gate changes is that holds are now executed. Repeated prior-off
+fixtures at ρ = 0.5. RULED (T4 report): this is a FINDING FOR T6, where ρ is varied, NOT a reason to
+change `b2a`. What the gate changes on these fixtures is that holds are now executed. Scripts:
+`analysis/t4_b2a/` (`stages.sh`, `cf_b3.py`, `compare.py`). Repeated prior-off
 `theta_crossed` (s00_off 109/113/115, s10_off 29/33/35, s20_off 20/24/30 and 87/91/95) all ended
 in a continue, as expected above (D2).
 Files: shared/meta_planner.py (`update`, `_is_current_task_plausible`)
@@ -1957,17 +1961,23 @@ b2a 75–78, 4 ticks, min 30.87), because the robot now arrives as the human lea
 it; s20 6 ticks, min 11.64 → 3 ticks, min 25.40; s30_off 8 ticks, min 11.70 → 2 ticks, min 38.57.
 Every remaining sub-50 tick falls past the hold decision's T_h, at the human's next task, which is
 the "execution-time avoidance past T_h" assumption (TODO-73), with one exception: s10 tick 75, 49.15
-cm, is inside the assessed window by 0.02–0.29 tick (not decomposed; L2's uncompensated step
-quantisation is the candidate). The measure still samples whole ticks (TODO-79). At the robot's grasp
+cm, is inside the assessed window by 0.02–0.29 tick (step quantisation, a real residual under L2;
+ruled on the T4 report, recorded in TODO-77). The measure still samples whole ticks (TODO-79). At the robot's grasp
 (`task_committed`, or `theta_crossed` on the same tick) after a hold, re-realization added δ = 1 in
 s20 (off and on) and s30_off. Execution was 0.79 / 0.14 ticks AHEAD of the projection that placed the
-first hold, which fits L2's robot-only tick (the carry starts on the trigger tick) net of step
-quantisation (TODO-77). The minimal whole-tick shift has no margin, so without that trigger the robot
-would have run a plan that no longer cleared.
+first hold: the latency the projection charges after `pick_up` is skipped when the `task_committed`
+re-plan starts the carry on that tick. That is deterministic, robot-only and not quantisation (ruled on
+the T4 report; TODO-77, fix with D2). The minimal whole-tick shift has no margin, so clearance currently
+depends on that re-decision.
 STILL OPEN: refinement (the executor shortening or extending a hold against what the world shows),
-and how a refined hold is reported back. Mesa has no refinement: it executes δ as decided. Also
-undecided: whether a hold should survive a later decision that carries no evidence (b2a with no
-projection continues with hold 0 and so drops a hold in progress; not reached in the T4 runs).
+and how a refined hold is reported back. Mesa has no refinement: it executes δ as decided.
+✅ CLOSED (ruling on the T4 report): A DECISION WITH NO PROJECTION DROPS A HOLD IN PROGRESS, and that
+stays. While the robot holds it stands, so its `holding` cannot change (`task_committed` cannot
+fire) and its task cannot complete (`no_current_task` cannot fire, and B1.5 would skip B2 anyway).
+The remaining route is `theta_crossed` whose projection is not admitted. Since the crossing already
+clears the gate, that means `most_likely` is `unknown` or the hypothesis cannot be resolved: the
+recognition behind the hold no longer stands, and a hold computed against it should not survive.
+`b2a` then continues with hold 0, and the executor replaces the hold with that.
 Files: shared/types.py (UpdateResult), mesa_sim/executor.py, mesa_sim/action_decomposer.py,
 mesa_sim/sim_agents.py, ros_sim/ (paused)
 Reference: Phase 4C wait-decision session, September 2026; roadmap.md Phase 6 notes; T4
@@ -2049,6 +2059,10 @@ WHAT REMAINS, deliberately uncompensated:
     can make that walk a whole step longer. Per walk it is under a tick; over a two-walk plan it can
     exceed one (the human's 4-action median is −1.32). Decided at L2: not compensated, and no safety
     margin anywhere to absorb it.
+    T4 (`b2a`, executed holds): a real residual under L2. In s10 (off and on) the actual `[sep]` at tick
+    75 is 49.15 cm, INSIDE the assessed window of the hold decision (step 47 vs T_h 47.29 off, step 51
+    vs 51.02 on), where the realized plan cleared 50 cm (its minimum 50.93 / 55.24 cm). Step
+    quantisation; recorded, not compensated. (`[sep]` samples whole ticks, TODO-79.)
   - THE ROBOT'S SKIPPED ACKNOWLEDGEMENT (4-action plans only, +1 tick, the projection running LONG).
     The projection charges four latencies, but the robot re-plans at its own `task_committed` trigger,
     which fires on the tick that would have acknowledged the `pick_up`; the fresh `deliver_already_held`
@@ -2057,6 +2071,15 @@ WHAT REMAINS, deliberately uncompensated:
     predict the robot's own future triggers, which are decided FROM the projection — circular, and not
     attempted. It partly cancels the quantisation in those rows (median −0.32), which is arithmetic, not
     accuracy. OPEN as a known bias; revisit only if T3/T10 show it mattering.
+    T4 SHOWS IT MATTERING (accepted for now). In s20 (off and on) and s30_off the first hold's
+    clearance depended on the robot's own grasp trigger re-realizing it. The projection that placed
+    the hold charges a latency after `pick_up`; execution skips it, because the `task_committed`
+    re-plan starts the carry on that tick. At that re-decision execution was 0.79 (s20) / 0.14
+    (s30_off) ticks ahead of the placing projection, and `b2a` re-realized δ = 1 (s20_off 30, s20_on
+    30, s30_off 46). Deterministic, robot-only, not quantisation. The minimal whole-tick hold has no
+    margin, so CLEARANCE CURRENTLY DEPENDS ON THAT RE-DECISION: without the grasp trigger's re-plan
+    the robot would execute a plan that no longer clears. Its fix belongs with D2 (what a trigger is
+    an event of; TODO-68 / 48 / 54 / 64 / 65), not with the projection.
 VERIFIED: a discrete-step forward model of the executor, using no execution data, predicts the actual
 release tick exactly for all 68 human and robot 2-action rows and exactly one tick early for all 35
 robot 4-action rows — so the residual is fully attributed, with nothing unexplained.
