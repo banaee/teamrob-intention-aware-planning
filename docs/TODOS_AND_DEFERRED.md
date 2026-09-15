@@ -672,7 +672,17 @@ receives one interval (or none), so there is no list to bound. Closes when reali
 Files: shared/meta_planner.py (_detect_interference), shared/trajectory_algorithms.py, shared/projection.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
-**TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders** — RESTATED (wait-decision revision, Sept 2026): `min_safe_distance` becomes `min_separation`, the clearance realization must ACHIEVE; still uncalibrated
+**TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders** — RESTATED (wait-decision revision, Sept 2026): `min_safe_distance` becomes `min_separation`, the clearance realization must ACHIEVE — ✅ DECIDED (R1, Sept 2026): `min_separation` = 2.5 × the robot's motion per tick
+DECIDED (R1, September 2026, on T1b's data): `min_separation` = 2.5 × the robot's motion per tick,
+i.e. 50 cm on the current layouts (20 cm/tick), EXPRESSED RELATIVE TO MOTION so that it scales with
+the body rather than as an absolute in `shared/`. T1b (`analysis/t1b_realization/REPORT.md`, Finding
+1) bounded the value: below the executor's 30 cm arrival radius nothing is held and the only failures
+are arrival-tick artefacts; at 20–100 cm holds are rare and short; from 150 cm (7.5 ticks of motion)
+the dominant event is the human's path passing the robot's standing position, which a hold cannot
+resolve. 2.5 ticks of motion sits inside the regime where holds are short and all-unrealizable is
+rare (1 of 43 admitted triggers at 50–100 cm). To be revisited under randomised layouts (TODO-47 (b))
+and real body sizes (ROS). Lands in code with T10 (the constructor keeps `min_safe_distance = 1.0`
+until then). The `assumed_speed` half was resolved by T2 (below).
 The parameter is no longer an exclusion threshold ("a ConflictPoint below it makes a candidate
 infeasible") but the separation realization must achieve by holding: `earliest_violation` is
 asked for the first time the two agents come within `min_separation`, and the robot holds until
@@ -759,7 +769,17 @@ Re-testing needs a seed item that is NOT in the robot's candidate pool. Until th
 Files: domains/kitting/tasks.py, mesa_sim/sim_model.py, domains/kitting/scenarios.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
-**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon; the all-candidates outcome is OPEN
+**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable`
+DECIDED (R1, September 2026, with TODO-52): when NO candidate realizes, `update()` selects by plain
+projected cost — the argmin over the pool with no hold, exactly the path taken when there is no human
+projection — and logs the trigger as `all_unrealizable`. The `RuntimeError` is superseded and is
+removed when realization lands in the meta-planner (T10); until then the code still raises. The
+justification is the assumption recorded in design_decisions.md, "Assumption: execution-time
+avoidance past T_h": what realization cannot resolve within the human's projection is the execution
+layer's. Of the three readings below this is (2) without a "least-bad" ranking (an unrealizable
+candidate has no realized cost to rank on), and it records the event so that (3)'s question can be
+asked of the logs. T1b: the condition is absent below 50 cm and occurs once at 50–100 cm (s30_on 21,
+the mirror crossing) on the fixtures; from 150 cm it is the majority case.
 Under realization a candidate is infeasible only when NO start time within the human's projected
 horizon clears `min_separation` — rarer than the current "a ConflictPoint below the threshold",
 and meaningful (e.g. a human standing at the kitting table for longer than the horizon blocks
@@ -887,8 +907,10 @@ continue. B2 is therefore specifically a *mid-task* commitment mechanism; the ro
 re-decides freely at every task boundary.
 Both B2 and B3 to be independent flags, all four combinations runnable. B2.B+B3.A is a
 redundancy control, not a policy — it computes the same argmin twice and selects identically
-to B2.A+B3.A, differing only in projection count. Useful in an ablation table, misleading if
-read as a fourth strategy.
+to `none`+B3.A, differing only in projection count (CORRECTED, R1: the earlier text said
+"identically to B2.A+B3.A", which is wrong — B2.A can continue where B3.A would switch, so those
+two are NOT equivalent; the equivalence is with no gate at all, as TODO-47 already states). Useful
+in an ablation table, misleading if read as a fourth strategy.
 BLOCKER: B2.A needs a scalar worthiness score turning `List[ConflictPoint]` into a number —
 the same missing quantity as DESIGN-08's soft interference penalty. Build once, use for both.
 Candidate formulas: minimum distance across conflicts; count below a radius; proximity
@@ -916,9 +938,21 @@ against a 19-tick switch, expensive against a 3-tick one). Three readings, none 
   - B2 reduces to computation saving and hysteresis, and is not a policy block.
 B2.B (realize current + each other task; margin) is redundant with B3 by construction, as before.
 The "distinct thresholds" question above dissolves: B3 has no exclusion threshold any more, only
-`min_separation` inside realization (TODO-28) and the open all-unrealizable outcome (TODO-30).
-Files: shared/meta_planner.py (`update`)
-Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026
+`min_separation` inside realization (TODO-28) and the all-unrealizable outcome (TODO-30).
+✅ DECIDED (R1, September 2026): `b2a` IS BUILT (task T4). It realizes the current task alone and
+CONTINUES if δ ≤ ρ × (the human's remaining projected duration at the trigger, T_h − trigger) — the
+first reading above; otherwise, or if the current task is unrealizable, it escalates to B3.
+`human_projection is None` still means continue. ρ is an explicit `MetaPlanner` policy parameter,
+default 0.5, a STATED ASSUMPTION to be varied in T6, not a calibrated value. B2's role is
+COMMITMENT: it can only prevent a switch B3 would make, never select or hold on its own. `b2b` stays
+a documented stub. B3 stays `single_task` (B3.A) with realized cost (T10); `full_reorder` stays out
+of 4C. T1b's reference data (§8): under minimal holds no current-task δ at s ≤ 100 cm exceeds 0.20
+of T_h remaining, so at ρ = 0.5 the gate would not have escalated on any held current-task row in the
+fixtures — enough to show it does not fire spuriously, not enough to show when it should (5 held
+rows in two fixtures). Consequence for D2 (TODO-68): under `b2a` repeated `theta_crossed` triggers
+mostly end in a continue, which may also hide a real change of belief (TODO-48).
+Files: shared/meta_planner.py (`update`, `_is_current_task_plausible`)
+Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1
 
 
 **TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places** ✅ RESOLVED (I3)
@@ -1263,6 +1297,11 @@ id the script already used). Proposal, not built (I2 report §6):
     error at hypothesis-space construction.
 (1) is a log line; (2) and (3) are the small validation this needs, in `SimModel._spawn_agents`
 / `build_hypothesis_space`, not a framework.
+NOTE (R1, September 2026): the scenario_10 / `env_layout1.json` statements above PREDATE the cleaned
+`env_layout1` (no obstacles; coffee machine and AC switch side by side at x = −875, item_1 on the
+shelf near them; the human's script and the robot's pool rewritten) and are STALE as descriptions of
+the current fixture. The old layout with obstacles is kept as `env_layout9.json`, not registered.
+The spelling fix itself (`ac_switch`) carries over.
 Files: shared/recognizer.py (build_hypothesis_space), mesa_sim/sim_model.py
 Reference: I1 audit 3.8, F1 report §1, I2 IR foundations session
 
@@ -1321,7 +1360,14 @@ record. I4's path-cost kernel changes the magnitude of the carry refutation, not
 Files: shared/recognizer.py (`_weigh`, `_output`), shared/planner.py (`decompose`)
 Reference: I1 audit §9 (per-tick vs frozen selection); I2 IR foundations session
 
-**TODO-52 — scenario_10's step-257 RuntimeError is latent, not fixed**
+**TODO-52 — scenario_10's step-257 RuntimeError is latent, not fixed** ✅ RESOLVED by decision (R1, Sept 2026; with TODO-30) — the figures below are STALE (old layout)
+R1 (September 2026): (a) the all-candidates outcome is DECIDED — plain projected cost, logged
+`all_unrealizable` (TODO-30); the `RuntimeError` is removed in T10. (b) `env_layout1` was CLEANED
+(no obstacles; coffee machine and AC switch side by side; item_1 near them; scenario_10's script and
+pool rewritten) and the old layout is kept as `env_layout9`, NOT registered. scenario_10 is a SWEEP
+FIXTURE AGAIN from T9 on (ten conditions: s00, s10, s20, s30, s40 × prior off/on). Every step number
+below (257, 260, 142, …) refers to the OLD layout and is stale; what scenario_10 does on the new
+layout is recorded in `analysis/t9_arrival_radius/REPORT.md`. Original entry retained below.
 I1's O1 (`MetaPlanner._replan_tasks`: no feasible candidate, `min_dist=0.0`, at the
 `theta_crossed` on the human's grasp of item_4 at 257) no longer fires after I2 — both prior
 settings run 300 steps to completion — only because the belief at 257 is now `ac_activation`
@@ -1766,6 +1812,12 @@ s00_off 109 / 113 / 115, s20_off 20 / 24 / 30 and 87 / 91 / 95. Three things, ke
     TODO-48 (no trigger on a `most_likely` change above θ) and TODO-54 (`theta_crossed` on `unknown` after
     a pin): all three are the same question — what a trigger is an event OF.
 Prior-on none of this occurs (no live rival flips); one crossing per recognition in every prior-on condition.
+D2 (R1, September 2026 — to be decided from the T4 and T10 logs, together with TODO-48, TODO-54 and
+TODO-64/65): under `b2a` (TODO-36) a repeated `theta_crossed` mostly ends in a CONTINUE — the current
+task's hold is judged small against the human's remaining projection and B3 never runs — which
+removes the re-decision churn recorded in (c) but may also hide a REAL change of belief (TODO-48's
+case: `most_likely` moves while confidence stays above θ, or crosses again on a different task).
+Whether the gate needs to see the hypothesis, not only δ, is D2's question.
 Files: shared/io_contracts.md (`theta_crossed`), shared/meta_planner.py (`evaluate_triggers`)
 Reference: analysis/i4d_fold_unknown/REPORT.md §6(a); analysis/i5_handback/; docs/recognizer_handback.md
 
@@ -1788,10 +1840,27 @@ every hold pushes MORE of the robot's trajectory past the horizon, so the candid
 the most is also the one assessed the least. `RealizedPlan` carries the unassessed share for
 this reason (a confidence on the cost, reading (3), can be computed from it; nothing consumes it
 yet). Still accepted; still not to be closed by reading the script.
+✅ DECIDED (R1, September 2026): reading (1). Realized cost = T_r + δ over the robot's FULL plan, no
+correction for the unassessed tail; the unassessed share is LOGGED per candidate so that the bias can
+be reported, not priced. Beyond T_h the plan is neither clear nor blocked (Property 2 as amended,
+design_decisions.md "The robot can wait"); what happens there is the execution layer's (the
+"execution-time avoidance past T_h" assumption). Readings (2) and (3) stay available as analyses of
+the logged share.
 Files: shared/meta_planner.py (_detect_interference, _cost), shared/projection.py
 Reference: T1 measurement session; Phase 4C wait-decision session, September 2026
 
-**TODO-70 — Per-segment vs whole-trajectory holds: confirm on data**
+**TODO-70 — Per-segment vs whole-trajectory holds: confirm on data** ✅ DECIDED (R1, Sept 2026): whole-trajectory minimal shift; what remains open here is a hold at a chosen point ALONG a segment
+DECIDED (R1, September 2026, on T1b): the hold policy is the WHOLE-TRAJECTORY MINIMAL SHIFT — one
+hold δ at the robot's position at the trigger tick (possibly partway along a segment), every later
+segment shifted by δ, δ the smallest shift ≥ 0 with no violation in [trigger, T_h] including at the
+hold position itself. T1b (`analysis/t1b_realization/REPORT.md` §7, Finding 2): the per-segment
+policy at its minimal hold and the whole shift agree on δ in every row both realize (0 of 87 rows
+differ at any s); per-segment dead-ends where the whole shift does not (4 rows) and never the
+reverse; and the loop as written in the design entry overshot the minimal hold by 5–25 ticks
+(median) and reversed two argmins. Per-segment holds at segment boundaries are OUT. What this item
+still holds open: a hold at a CHOSEN POINT ALONG a segment (walk part way, then stop), which may be
+cheaper still but is a different convergence argument — DEFERRED, not scheduled in 4C. Original
+entry retained below.
 T1 measured ONE pause: the robot holds its start position for δ ticks, then runs its whole
 projected trajectory unshifted against the unshifted human projection (`c_pause_delay.csv`).
 The realization algorithm (design_decisions.md, "The robot can wait") holds PER SEGMENT — each
@@ -1810,7 +1879,10 @@ Reference: Phase 4C wait-decision session, September 2026
 `UpdateResult` will carry the winner's realized holds (where, how long) as an execution HINT
 (io_contracts.md §1.9, §4.1). The embodiment has to consume it, and the single-decision-path
 rule (NOTE above, DESIGN-07's companion) fixes what consuming means: the executor stands still
-for the hold before the segment it precedes, may REFINE it (the human deviated; its own
+for the hold (R1, September 2026: ONE hold δ, at the ROBOT'S POSITION AT THE TRIGGER TICK — the
+"before the segment it precedes" wording of the per-segment design is superseded by the
+whole-trajectory shift, TODO-70; in Mesa: STAND microactions at the trigger position for δ ticks,
+then the plan, unless a later trigger re-decides), may REFINE it (the human deviated; its own
 collision handling found the way clear earlier or later), and must never independently decide
 whether to wait, which task to run, or silently drop the hold — the cost was computed on the
 hold, and a behaviour that departs from it silently makes neither the cost nor the behaviour
@@ -1841,6 +1913,48 @@ I2–I4d entries in design_decisions.md the record. Also stale in the same passa
 constructor paragraph's "persistent assignment prior" wording (it is a support restriction).
 Files: shared/io_contracts.md (§1.3, §2.1), docs/recognizer_handback.md
 Reference: wait-decision documentation session, September 2026
+
+**TODO-73 — Mesa has no execution-time avoidance: agents may overlap** [post-4C; from R1]
+Realization decides only within the human's projection (design_decisions.md, "Assumption:
+execution-time avoidance past T_h"); everything after T_h, and the residual conflict of an
+all-unrealizable trigger, is left to an execution-time avoidance layer that Mesa does not have —
+agents are points and may overlap. T9 adds a per-tick measure of the actual robot–human distance
+(`[sep]` lines in the headless log) so that later tasks can report how often and by how much actual
+separation falls below `min_separation`; nothing avoids anything. To build: Mesa's own local
+avoidance, possibly using realization's output (the hold, the assessed window) as hints — the
+Phase 4D role of a detour-capable realization also serving as execution-time path realization
+(roadmap.md). Must respect the single-decision-path rule: refine motion, never decide whether to
+wait or which task to run.
+Files: mesa_sim/executor.py, mesa_sim/action_decomposer.py, mesa_sim/sim_agents.py
+Reference: R1 decision record, September 2026; T9
+
+**TODO-74 — The kitting table is one point; separate placement positions are a domain modelling question** [later]
+Every delivery, robot's and human's, targets `kitting_table_0`'s single position, so two placements
+within a tick of each other coincide exactly (T2's `min_dist = 0.0`, T1b's table convergences) and
+every hold in the fixtures is a hold at the table. A real table (200 × 100 cm) has room for several
+placement positions. Whether to model them — as several objects, as a parameter of `place`, or as an
+executor-side offset — is a DOMAIN question for later, not a realization one; do not solve it inside
+`shared/`.
+Files: domains/kitting/env_layout*.json, domains/kitting/actions.py, domains/kitting/tasks.py
+Reference: R1 decision record, September 2026
+
+**TODO-75 — `ros_sim/framework_HRI/guide.txt` refers to `env_layout1` with obstacles** [ROS side, paused]
+The ROS/PRIEST guide describes `env_layout1.json` with obstacles and scenario_10 with the robot
+assigned item_5 / item_1 / item_7. Since R1 `env_layout1` is the cleaned layout (no obstacles, new
+scenario_10 pool) and the old layout is `env_layout9.json`, which is NOT registered in
+`domains/kitting/registry.py`. The ROS path would need `env_layout9` registered (or its own copy) to
+reproduce what the guide describes. Not touched: `ros_sim/` is paused.
+Files: ros_sim/framework_HRI/guide.txt, domains/kitting/registry.py
+Reference: R1 decision record, September 2026
+
+**TODO-76 — The trigger name `task_committed` reads as the human's commitment; it is the robot's grasp** [naming only]
+`evaluate_triggers()` fires `task_committed` when the ROBOT's `holding` goes from None to an item —
+the robot has grasped and its method set changes (`deliver_already_held`). Read next to the
+recognizer's vocabulary the name suggests the observed human committing to a task, which it never
+means. Rename (e.g. `robot_grasped`) when a session touches the trigger set; a rename changes every
+`[meta-trig]` / `[meta]` line, so do it with a baseline regeneration, not in passing.
+Files: shared/meta_planner.py (`evaluate_triggers`), shared/io_contracts.md (§2.2)
+Reference: R1 decision record, September 2026
 
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β

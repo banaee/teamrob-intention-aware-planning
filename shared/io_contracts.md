@@ -18,6 +18,13 @@ reach the executor as a hint. Where a paragraph below is marked PLANNED it descr
 contract realization will add; the code at this alignment still runs the superseded
 `_detect_interference()` / `min_safe_distance` path, byte-identically to the T7/T8 baselines.
 
+**Re-aligned after R1 and T9 (September 2026)** for §1.9, §2.2, §2.2b, §4.1 and §6: the realization
+decisions taken after T1b (one hold δ at the trigger position, the whole-trajectory minimal shift;
+realizable = no violation within [trigger, T_h]; cost = T_r + δ; `min_separation` = 2.5 × motion per
+tick; all-unrealizable → plain cost; `b2a` with ρ) and the arrival radius the body now supplies to the
+`Projector`. PLANNED paragraphs describe what T3 / T4 / T10 build; the code at this alignment runs
+the old B3 path (`_detect_interference()`, `min_safe_distance = 1.0`, the `RuntimeError`).
+
 ---
 
 ## 0. Notation (matches paper)
@@ -292,7 +299,9 @@ class TriggerDecision:
 class UpdateResult:
     current_task: Optional[TaskInstance]   # None = all tasks complete (see §2.2, Update)
     queue: List[TaskInstance]
-    # PLANNED (wait-decision revision): the winner's realized holds — see below
+    # PLANNED (wait-decision revision, R1): the winner's hold δ, in ticks, at the robot's
+    # position at the trigger tick — see below. None / 0 when no hold was placed (no human
+    # projection, or the all_unrealizable fallback).
 ```
 
 **A continue decision (T5, TODO-43).** `update()` returning a `current_task` whose
@@ -308,9 +317,11 @@ decision path: which task is selected is `update()`'s alone, and the embodiment 
 about when to re-plan. See design_decisions.md, "A continue decision costs nothing".
 
 **The hold — PLANNED, not yet in the dataclass** (Phase 4C wait-decision revision, September
-2026; design_decisions.md, "The robot can wait"). `update()` will return, with the winning task,
-the HOLDS its realization placed: for each held segment, where the robot stands and for how
-many ticks, before it starts that segment. Semantics across the boundary:
+2026; amended at R1; design_decisions.md, "The robot can wait"). `update()` will return, with the
+winning task, the HOLD its realization placed: ONE δ (ticks), taken at the robot's position at the
+trigger tick — which may be partway along a walk — after which the plan runs unchanged (the
+whole-trajectory minimal shift, TODO-70). There is no per-segment hold. Semantics across the
+boundary:
 
 - It is an execution HINT, in the sense of design_decisions.md's first key decision: a preplan
   that saves the executor solving avoidance from scratch. The human may deviate within a few
@@ -322,10 +333,16 @@ many ticks, before it starts that segment. Semantics across the boundary:
   departs from it silently leaves neither the cost nor the behaviour authoritative (the
   single-decision-path rule, §4.2 and TODOS_AND_DEFERRED.md). Refinement is the whole of the
   executor's latitude.
-- Mesa executes a hold as STAND microactions before the held segment (TODO-71); ROS treats it
-  as a soft constraint on PRIEST, as it treats every hint.
+- Mesa executes the hold as δ STAND microactions at the trigger position, then continues the
+  plan (TODO-71) — unless a later trigger re-decides, in which case the fresh `update()` re-realizes
+  from wherever the robot then is (a hold re-realized identically keeps its countdown, §2.2 Continue).
+  ROS treats it as a soft constraint on PRIEST, as it treats every hint.
 - A hold is a POSITION: the robot waits where it is. Waiting elsewhere is a detour, a different
   realization strategy (Phase 4D).
+- What the hold was computed on: no violation (robot–human distance below `min_separation`) within
+  [trigger, T_h], T_h the end of the human's projection. Beyond T_h the plan is UNASSESSED — neither
+  clear nor blocked — and is the execution layer's (design_decisions.md, "Assumption: execution-time
+  avoidance past T_h").
 
 **`ConflictPoint`** / **`InterferenceAssessment`** — interference-detection output.
 `_detect_interference()` observes; `_cost()` values. The separation is deliberate
@@ -334,8 +351,10 @@ SUPERSEDED IN DESIGN (wait-decision revision): both types describe the batch pro
 realization replaces. Under realization a conflict is priced by construction — as the duration
 of the hold that avoids it — and the observe / value split survives inside realization
 (`earliest_violation` observes; holding values). The types stay until realization lands; a
-`RealizedPlan` (placed segments, holds, duration = walking + holds, unassessed share beyond
-the human's horizon) replaces `InterferenceAssessment` on the meta-planner side.
+`RealizedPlan` (shifted segments; the hold — trigger position, δ; cost = T_r + δ over the full plan;
+the unassessed share beyond T_h, logged and not priced — TODO-69 reading (1)) replaces
+`InterferenceAssessment` on the meta-planner side (T3, T10). `realize()` takes the projected
+segments of whatever ordering it is given — it does not assume a single task.
 
 ```python
 @dataclass
@@ -505,8 +524,19 @@ feasible — mirroring `RobotAgent.observed_agent_id`'s existing optionality.
 **uncalibrated placeholders**, not tuned values (TODO-28). RESTATED by the wait-decision
 revision: the parameter becomes `min_separation`, the clearance realization must ACHIEVE by
 holding, passed into `realize()` — no longer a threshold below which a candidate is excluded.
-Still the single policy value, still uncalibrated; its value is to be argued relative to scale
-(TODO-28). The constructor keeps the old name until realization lands.
+DECIDED (R1): `min_separation` = 2.5 × the robot's motion per tick (50 cm in Mesa), expressed
+relative to motion so that it scales with the body; the constructor keeps the old name and value
+until T10 lands it (the exact parameter form — a multiple of the `Projector`'s rate, or a
+world-unit value the body derives — is T10's). Also PLANNED (T4): `gate_strategy="b2a"` takes a
+policy parameter ρ (default 0.5): B2 continues the current task when its hold δ ≤ ρ × (T_h −
+trigger), the human's remaining projected duration; otherwise, or if the current task is
+unrealizable, B3 runs. `human_projection is None` still means continue.
+
+`Projector` (T9) additionally takes the body's **stopping distance** (`arrival_radius`), supplied
+exactly as `assumed_speed` is: Mesa passes the same constant that makes its `at(agent, object)`
+predicate hold (`PROXIMITY_THRESHOLD`, 30 cm), so a projected walk ends where the executor stops
+and the next action is projected from that point. Its default in `shared/` is a unit-less
+placeholder (0.0), not a value `shared/` knows to be right.
 
 #### Evaluate Triggers
 ```python
@@ -565,9 +595,10 @@ obligation (§4.1), not a change to selection.
 **Blocks.** 0: pool assembly (above); terminal return if empty. B1.5: no current task → straight
 to B3. B2: `_is_current_task_plausible()`, the mid-task plausibility gate — `gate_strategy`
 `"none"` (default) never continues; `"b2a"` / `"b2b"` raise `NotImplementedError` (TODO-36).
-B3: `_replan_tasks()`, selection. PLANNED (wait-decision revision): both B2 and B3 consume
-realization — B2 realizes the current task alone and judges its hold; B3 realizes every
-candidate and takes the argmin of realized duration (walking + holds). When
+B3: `_replan_tasks()`, selection. PLANNED (wait-decision revision, decided at R1): both B2 and
+B3 consume realization — B2 (`b2a`, T4) realizes the current task alone and continues when its
+hold δ ≤ ρ × (T_h − trigger), a COMMITMENT gate that can only prevent a switch B3 would make; B3
+(T10) realizes every candidate and takes the argmin of realized cost T_r + δ. When
 `human_projection` is `None` realization is not called and the cost is the plain projected
 duration, exactly as today.
 
@@ -599,10 +630,11 @@ contract rather than raised for the embodiment layer to catch and reinterpret.
 `update()` does still raise `RuntimeError` when candidates exist but **every** one is
 excluded as infeasible — a genuine anomaly, deliberately distinguishable from exhaustion.
 SUPERSEDED IN DESIGN (wait-decision revision): under realization "every candidate infeasible"
-means no candidate has a start time within the human's horizon that clears `min_separation` —
-a situation, not an anomaly — and the outcome is OPEN with three readings (hold and re-decide;
-least-bad candidate, the executor handling the residue; record as a mis-set parameter or a
-short horizon — TODO-30). The raise stays until realization lands and one is chosen.
+means no candidate has a shift within the human's horizon that clears `min_separation` — a
+situation, not an anomaly. DECIDED (R1, TODO-30): `update()` then selects by PLAIN PROJECTED
+COST (the argmin with no hold, the same path as when there is no human projection), returns no
+hold, and logs the trigger as `all_unrealizable`. Nothing is raised. The raise stays in the code
+until T10 lands realization in B3.
 
 #### Update Human Projection
 ```python
@@ -679,16 +711,22 @@ simulation.interference_spatial_resolution`) and passes the bound callable as
 exact rather than sampled, no interval tradeoff, but with real edge cases (clamping the
 analytic minimum to the overlap window, near-zero relative velocity).
 
-PLANNED (wait-decision revision): realization asks this family a different question —
-"earliest violation for this robot segment, placed at this start time, against the human's
-segments, at `min_separation`" — and CPA's closed form is its answer: both segments have
-constant velocity, so squared distance is a quadratic in time; no real root below
-`min_separation²` means no violation, and the roots give the violation interval and hence the
-earliest clear time. No sampling, no resolution parameter, no world-unit constant in
+PLANNED (wait-decision revision; policy decided at R1, built in T3): realization asks this
+family a different question — "for the robot's segments shifted by d, is there a violation
+against the human's segments at `min_separation` within [trigger, T_h]" — and CPA's closed form
+is its answer: both segments have constant velocity, so squared distance is a quadratic in time;
+no real root below `min_separation²` means no violation, and the roots give the violation
+interval. A VIOLATION IS A DISTANCE: agents are points, and any moment with distance below
+`min_separation` — including during the stationary hold at the trigger position, and including a
+violation cut off by T_h — is one; head-on or same-line conflicts need no special case, they come
+out unrealizable through the hold-position check. `realize()` finds the smallest d ≥ 0 that
+clears (the whole-trajectory minimal shift), refuses a hold that reaches T_h, and returns the
+shifted segments, δ, cost = T_r + δ and the unassessed share; it takes any list of projected
+segments, not one task. No sampling, no resolution parameter, no world-unit constant in
 `shared/`. `discretized_time_sampling()` can serve as a fallback (first sample below the
-threshold) but computes more than a hold needs. Which is built first is an implementation
-choice; the interface is `earliest_violation`. `obstacle_aware_path()` becomes the detour
-strategy of realization (Phase 4D).
+threshold) but computes more than a hold needs. `obstacle_aware_path()` becomes the detour
+strategy of realization (Phase 4D). T1b's `whole` realizer
+(`analysis/t1b_realization/realize.py`) is the reference implementation T3 is validated against.
 
 These functions **measure only and hold no policy**. The single policy decision — what
 distance counts as unsafe — lives in `MetaPlanner._detect_interference()` as
@@ -837,9 +875,16 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
   moves to the action in flight if the fresh plan contains it (GroundedAction equality) and the
   microaction queue is kept; otherwise the plan loads from its start. The tick is spent exactly
   as it would have been with no trigger — never lost, never a restart (T5, TODO-43)
-- PLANNED (TODO-71): executes the hold `UpdateResult` carries as STAND microactions before the
-  held segment; may refine the hold against what the world shows, never decides independently
+- PLANNED (TODO-71, R1): executes the hold δ `UpdateResult` carries as STAND microactions at
+  the robot's position at the trigger tick, then continues the plan — unless a later trigger
+  re-decides; may refine the hold against what the world shows, never decides independently
   whether to wait or drops it silently (§1.9, the hold)
+- Supplies the `Projector` its motion rate (`step_size`, T2) AND its stopping distance (T9): the
+  same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
+  executor stops, for robot and human projections alike
+- Logs the actual robot–human distance once per tick (`[sep]` lines, headless run; T9) so that
+  actual separation below `min_separation` can be reported — Mesa has no execution-time
+  avoidance (TODO-73); the measure is a measure, not a behaviour
 
 ### 4.2 ROS (`ros_sim/`)
 
@@ -881,9 +926,12 @@ Simulators MUST ensure:
 10. A task's `MethodSchema` set covers every world state that task can start *or resume*
     from — plans are re-decomposed from scratch at every trigger, never resumed from a
     cursor (see design_decisions.md)
-11. PLANNED (wait-decision revision): the hold returned by `update()` is executed. The
-    embodiment may refine it; it must not run a parallel heuristic that decides whether to
-    wait or which task to run, and must not drop the hold silently (§1.9, the hold; the
-    single-decision-path NOTE in TODOS_AND_DEFERRED.md)
+11. PLANNED (wait-decision revision): the hold δ returned by `update()` is executed, at the
+    trigger position. The embodiment may refine it; it must not run a parallel heuristic that
+    decides whether to wait or which task to run, and must not drop the hold silently (§1.9,
+    the hold; the single-decision-path NOTE in TODOS_AND_DEFERRED.md)
+12. The stopping distance the embodiment supplies to the `Projector` is the distance at which
+    its own `at(agent, object)` predicate holds — one constant, one source (T9), as the motion
+    rate it supplies is the one its executor moves at (T2)
 
 ---

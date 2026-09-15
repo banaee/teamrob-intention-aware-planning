@@ -21,8 +21,10 @@ current state, parameters and guarantees are in `docs/recognizer_handback.md`; o
 ## Phase 3 — Kitting Domain + Mesa Simulation ✅
 - `domains/kitting/`: `tasks.py`, `actions.py`, `registry.py`, `scenarios.py`
 - Layouts and scenarios (scenario ids are prefixed by layout number):
-  `env_layout0` / `scenario_00` (Phase 4 dev), `env_layout1` / `scenario_10` (foreseeable tasks; **dropped
-  from the validation sweep**, see Phase 4C), `env_layout2` / `scenario_20` (collinear decoys),
+  `env_layout0` / `scenario_00` (Phase 4 dev), `env_layout1` / `scenario_10` (foreseeable tasks; dropped
+  from the validation sweep in I2, **reinstated at R1/T9 on the cleaned layout** — no obstacles, coffee
+  machine and AC switch side by side, item_1 near them; the old layout with obstacles is kept as
+  `env_layout9`, not registered), `env_layout2` / `scenario_20` (collinear decoys),
   `env_layout3` / `scenario_30` (mid-approach reveal), `env_layout4` / `scenario_40` (F1, Sept 2026:
   a scripted deviation sequence — delivery, coffee break, a wander that is no task, a second delivery —
   the positive control for foreseeable-task recognition)
@@ -72,6 +74,12 @@ The robot operates with two planning levels and one recognition module, all in `
 - Interference detection is **geometric, not zone-based** — actual Euclidean distance between projected positions over time. `ProjectedPlanEntry` carries `Segment`s; `ConflictPoint` carries `position` + `distance`, no zone.
 - Cost is measured in execution ticks (T2: projection steps are Mesa ticks; seconds in ROS): moves, detours, pauses all equal cost units. Since the 4C wait-decision revision a candidate's cost is its REALIZED duration — walking plus the holds placed to keep `min_separation` from the human — so a conflict is priced as time by construction (DESIGN-08 resolved). Team-level semantic costs parked as future extension (TODO-15).
 - The robot can WAIT (4C wait-decision revision, Sept 2026): a hold is computed from the human's projection, enters the cost, and reaches the executor as an execution HINT the executor may refine but never re-decide or cancel. Waiting is not a branch — B2 realizes the current task alone and judges its hold; B3 realizes every candidate and takes the argmin. See design_decisions.md, "The robot can wait".
+  Settled at R1 (Sept 2026, after T1b): one hold δ at the trigger position (whole-trajectory minimal
+  shift); a violation is a distance below `min_separation` = 2.5 × motion per tick; realizable = no
+  violation within [trigger, T_h], the tail unassessed; cost = T_r + δ; all-unrealizable → plain cost,
+  logged; `b2a` continues when δ ≤ ρ × (T_h − trigger), ρ = 0.5; B3.A with realized cost.
+- Projected walks end where the executor stops (T9): the body supplies its stopping distance to the
+  `Projector` as it supplies its motion rate; `shared/` holds no simulator constant.
 - Cancellation of a held-item task is handled by HTN method selection, not a meta_planner cost term — see design_decisions.md.
 - The recognizer resolves nothing itself: targets, methods and completions are the planner's (I2). The scenarios are experiments for evaluating the algorithm, never its specification (I-series standing rule).
 
@@ -96,7 +104,7 @@ heading kernel (HIGH 4.0 / LOW 0.1 / NEUTRAL 1.0) that multiplied identical head
 - Recursive decomposer with real guard evaluation, derived variable
   resolution, `?agent` binding propagation
 
-**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built and validated on scenario_00; the recognizer rebuilt and handed back; the meta-planner side resumed with T7/T8 and the wait-decision revision — realization designed and recorded, not yet built)
+**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built and validated on scenario_00; the recognizer rebuilt and handed back; the meta-planner side resumed with T7/T8 and the wait-decision revision — realization designed, measured (T1b), decided (R1) and baselined (T9); to be built in T3 / T4 / T10)
 
 Built and running end-to-end. All three tasks complete, correct terminal state, zero errors.
 
@@ -138,6 +146,22 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
   Whether B2 survives as a policy block is open (TODO-36). The one parameter before implementation is
   `min_separation`'s value, relative to scale (TODO-28). Full record: design_decisions.md, "The robot
   can wait"; new items TODO-70 (per-segment vs whole-trajectory holds), TODO-71 (the hint on the body side)
+- T1b (Sept 2026, `analysis/t1b_realization/`): what realization would produce, measured on the live
+  projections with four throwaway realizers over 13 separations — the design's per-segment loop
+  overshoots the minimal hold and reverses argmins; the whole-trajectory shift and the per-segment
+  minimal hold agree wherever both realize; every hold in the fixtures is a hold into the unassessed
+  tail; all-unrealizable is absent below 50 cm. Measurement only; nothing in `shared/` changed
+- R1 (Sept 2026, documents only): the decisions T1b raised, recorded — whole-trajectory minimal shift
+  (TODO-70), a violation is a distance, Property 2 amended and the hold cap, cost = T_r + δ (TODO-69
+  reading (1)), `realize()` not single-task, the hold as an executed hint at the trigger position
+  (TODO-71), `min_separation` = 2.5 × motion per tick (TODO-28), all-unrealizable → plain cost logged
+  `all_unrealizable` (TODO-30, TODO-52), `b2a` with ρ = 0.5 (TODO-36), B3.A with realized cost; the
+  execution-time-avoidance assumption past T_h; fixtures (env_layout1 cleaned, env_layout9 kept
+  unregistered, scenario_10 back in the sweep); TODO-73 to TODO-76
+- T9 (Sept 2026): projected walks end where the executor stops — the body supplies its stopping
+  distance (`PROXIMITY_THRESHOLD`) to the `Projector` as it supplies its rate; a per-tick actual
+  robot–human distance measure (`[sep]`); new baselines over ten conditions (s00, s10, s20, s30, s40 ×
+  prior off/on) that T3, T4 and T10 are built and judged on — `analysis/t9_arrival_radius/`
 
 *Design questions resolved (Q1–Q4 from July 2026, plus September 2026 session):*
 - Q1: `MetaPlanner` owns the task queue internally (not passed externally)
@@ -191,10 +215,9 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   whatever it observed, so how a method segments a trajectory sets how much evidence a hypothesis can gather.
 
 *Validation gaps under 4C, checked against current state (Sept 2026):*
-- TODO-28: `min_safe_distance` still an uncalibrated placeholder (T1 gives the calibration evidence); the
-  `assumed_speed` / time-scale half was RESOLVED by T2. Restated by the wait-decision revision as
-  `min_separation`, the clearance realization must achieve; its value must be argued relative to scale
-  and is the one open parameter before realization is built.
+- TODO-28: DECIDED at R1 — `min_separation` = 2.5 × the robot's motion per tick (50 cm in Mesa),
+  relative to motion so that it scales; the `assumed_speed` / time-scale half was RESOLVED by T2. Lands
+  in code with T10; revisit under TODO-47 and ROS body sizes.
 - TODO-29: `deliver_with_return` still unexercised under the MetaPlanner for the ROBOT. It is exercised every
   run by the recognizer for rival hypotheses of the human, and whether its guard is the right prediction there
   is now an open domain question (TODO-55 (e)).
@@ -202,7 +225,9 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   (scenario_20 steps 11 / 24) and every-candidate-excluded raises (scenario_10 step 257). Whether those
   exclusions are legitimate is TODO-28's question; what the robot does when everything is excluded is open.
   Under realization those exclusions become short holds; "infeasible" means no realization within the
-  human's horizon, and the all-unrealizable outcome is open with three readings (TODO-30).
+  human's horizon. The all-unrealizable outcome is DECIDED at R1 (TODO-30): plain projected cost,
+  logged `all_unrealizable`; the `RuntimeError` goes with T10. The scenario_10 figures above are from
+  the old layout (stale since R1).
 - TODO-32: `wait_at` duration still ignored in COST estimation (projector side). The recognizer side is done:
   waits are observable (`waited`) and `coffee_break` is recognised mid-walk in scenario_40. Now load-bearing:
   a human's projected occupation is the hold a robot task pays to pass it.
@@ -215,8 +240,25 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   interface decision, not an evidence-model one. Prior-on: one crossing per recognition.
 - θ is a live-set-dependent bar (TODO-64, TODO-65); the guarantee statement (hand-back §3) says what the
   meta-planner may and must not assume, prior-on and prior-off separately.
-- TODO-52's latent crash and TODO-67 (s30_off selects an already-delivered item); the context /
-  knowledge-representation pass (TODO-66).
+- TODO-52's crash is resolved by decision (R1; the fallback is built in T10); TODO-67 (s30_off selects
+  an already-delivered item) was fixed in T7; the context / knowledge-representation pass (TODO-66).
+
+*The 4C queue (from R1, September 2026) — in this order:*
+1. R1 + T9 — the decision record (this), projection ending at the body's stopping distance, the
+   actual-distance measure, new baselines over ten conditions ✅
+2. T3 — `realize()` as a service on the projection / trajectory side (whole-trajectory minimal shift,
+   `earliest_violation` closed form, `RealizedPlan`), validated against T1b's `whole` realizer on the
+   T9 baselines
+3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5
+4. T10 — B3.A with realized cost T_r + δ; the all-unrealizable fallback (plain cost, logged);
+   `min_separation` = 2.5 × motion per tick replaces `min_safe_distance`; the `RuntimeError` removed;
+   the hold δ on `UpdateResult`, executed by Mesa as STAND at the trigger position
+5. D2 — what a trigger is an event of (TODO-68 / 48 / 54 / 64 / 65), decided from the T4 and T10 logs
+6. T6 — ablation: B2 {none, b2a} × B3.A {plain, realized}, sweeps of ρ and of s (`min_separation`)
+Later, not scheduled: TODO-47 (randomised layouts), TODO-32 (`wait_at` duration in projection),
+`full_reorder` with `realize()`, TODO-70 (a hold at a chosen point along a segment), TODO-71 (the
+hint's body-side details), TODO-73 (Mesa execution-time avoidance), TODO-74 (placement positions on
+the table), TODO-75 (the ROS guide and `env_layout9`).
 
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
@@ -232,7 +274,10 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   realization into one function. ROS keeps a two-tier split (this estimator for cost
   estimation, PRIEST for real execution) — still a dedicated design session away from being built
 - The hold hint's consumption on the body side (execute, refine, never re-decide) is TODO-71;
-  Mesa first
+  Mesa first — one hold δ at the trigger position, executed as STAND before the plan continues (R1)
+- Execution-time avoidance past the human's projection is assumed, not built: Mesa's agents may
+  overlap (TODO-73); T9 measures the actual robot–human distance per tick so that the assumption's
+  cost can be reported
 
 ### Prerequisites before implementation
 
