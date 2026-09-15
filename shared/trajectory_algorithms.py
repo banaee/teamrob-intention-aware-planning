@@ -11,10 +11,13 @@ PURPOSE:
     2. INTERFERENCE DETECTION — given two agents' Segments, where/how close do
        they get. Consumed by MetaPlanner._detect_interference() today; under
        the Phase 4C wait-decision revision (design_decisions.md, "The robot can
-       wait") the consumer becomes realize(), on the projection side, asking a
-       narrower question — the EARLIEST VIOLATION of a given min_separation
-       for one robot segment placed at a given start time — and holding until
-       it clears. min_separation is passed in; nothing here holds policy.
+       wait") the consumer is realize() (shared/realization.py, T3), which asks
+       a different question — for which SHIFTS of a robot segment is there a
+       violation of a given min_separation against a human segment
+       (shift_violation_interval), and when does the human first come within
+       it of the robot's standing position (first_approach_step) — and takes
+       the smallest shift that clears. min_separation is passed in; nothing
+       here holds policy.
 
     No classes, no state, no imports from mesa_sim/ or ros_sim/ — same
     mind/body constraint as the rest of shared/.
@@ -25,11 +28,18 @@ WHAT'S IMPLEMENTED VS. PLACEHOLDER:
                                   walker halts a given radius short of its target.
     stationary_segment()       — implemented, for non-movement actions.
     discretized_time_sampling()— implemented, current default interference algorithm.
+    shift_violation_interval() — implemented (T3): the set of SHIFTS of one robot
+                                  segment that violate a separation against one
+                                  human segment, closed form. What realization
+                                  (shared/realization.py) is built on.
+    first_approach_step()      — implemented (T3): when a moving human segment
+                                  first comes within a separation of a fixed
+                                  point — the hold-position check.
     closest_point_of_approach()— NOT IMPLEMENTED. Documented analytic approach
                                   below; swap-in replacement for
                                   discretized_time_sampling(), same signature.
-                                  Its closed form is what realization's
-                                  earliest_violation needs (see its docstring).
+                                  The role its closed form was reserved for is
+                                  taken by shift_violation_interval().
     obstacle_aware_path()      — NOT IMPLEMENTED. DESIGN-13 / TODO-09's future
                                   non-linear path realization; swap-in
                                   replacement for straight_line_path(), and the
@@ -39,7 +49,7 @@ WHAT'S IMPLEMENTED VS. PLACEHOLDER:
     docs — implement when actually needed, not speculatively now.
 """
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 from shared.types import Segment, ConflictPoint
 
@@ -282,6 +292,185 @@ def discretized_time_sampling(
     ))
 
     return conflicts
+
+
+def _roots(a2: float, a1: float, a0: float) -> list:
+    """
+    Real roots of a2 t² + a1 t + a0 = 0, ascending. a2 == 0 returns [] — every
+    caller's a2 is a squared speed, and a zero speed makes a1 zero as well, so
+    the polynomial is then constant and has no isolated root. Evaluated in
+    the numerically stable form (no cancellation between -a1 and the
+    discriminant's root).
+    """
+    if a2 <= 0.0:
+        return []
+    disc = a1 * a1 - 4.0 * a2 * a0
+    if disc < 0.0:
+        return []
+    sq = disc ** 0.5
+    q = -0.5 * (a1 + sq) if a1 >= 0.0 else -0.5 * (a1 - sq)
+    if q == 0.0:
+        return [0.0, 0.0]
+    r1, r2 = q / a2, a0 / q
+    return [r1, r2] if r1 <= r2 else [r2, r1]
+
+
+def shift_violation_interval(
+    robot_segment: Segment,
+    human_segment: Segment,
+    min_separation: float,
+) -> Optional[Tuple[float, float]]:
+    """
+    The shifts d for which `robot_segment`, delayed by d — the same path,
+    occupying [start_step + d, end_step + d] — comes within `min_separation` of
+    `human_segment` at some moment both exist. Closed form, exact: no sampling
+    in time and none in d.
+
+    Returns (lo, hi), the open interval of violating shifts (a violation is a
+    STRICT inequality, distance < min_separation, so the endpoints themselves
+    are clear: the distance touches min_separation there), or None when no
+    shift violates. Either segment of zero duration contributes nothing — its
+    instant is the boundary of its neighbours, which are checked.
+
+    Geometry. With u the robot's time into its segment (0 ≤ u ≤ L) and d the
+    shift, both agents move at constant velocity, so the relative position is
+    affine in (u, d):
+        R − Q  =  C + B u − w d,    C = P0 − Q0 − w (a − c),  B = v − w
+    (P0, v: the robot segment's start and velocity; Q0, w: the human's; a, c:
+    their start steps). The moments both exist are a parallelogram in (u, d):
+    0 ≤ u ≤ L and c − a ≤ u + d ≤ d_h − a. The violating set |R − Q|² < s² is
+    the preimage of an open disc under an affine map, hence convex (an ellipse
+    interior, or a strip when the map is rank-deficient: parallel or equal
+    velocities, a stationary agent). Its intersection with the parallelogram
+    is convex, so its projection onto the d axis is ONE interval, whose
+    endpoints are the extreme d over the closure of that intersection. Those
+    extremes lie at one of: the ellipse's own d-extrema (when inside the
+    parallelogram); a crossing of the ellipse boundary with a parallelogram
+    edge; a parallelogram vertex inside the disc. All are enumerated; the
+    interval is their d-range. Empty enumeration, or a range of zero width
+    (a tangency), means no shift violates.
+
+    `min_separation` is the caller's; nothing here decides what distance is
+    unsafe. Tolerances below are floating-point slack on the enumeration
+    (1e-9 relative), not a safety margin — the minimal shift has none by
+    design (design_decisions.md, "The robot can wait").
+    """
+    a, b = robot_segment.start_step, robot_segment.end_step
+    c, d_h = human_segment.start_step, human_segment.end_step
+    L = b - a
+    Dh = d_h - c
+    if L <= 0.0 or Dh <= 0.0:
+        return None
+
+    P0, P1 = robot_segment.start_pos, robot_segment.end_pos
+    Q0, Q1 = human_segment.start_pos, human_segment.end_pos
+    vx, vy = (P1[0] - P0[0]) / L, (P1[1] - P0[1]) / L
+    wx, wy = (Q1[0] - Q0[0]) / Dh, (Q1[1] - Q0[1]) / Dh
+    Cx = P0[0] - Q0[0] - wx * (a - c)
+    Cy = P0[1] - Q0[1] - wy * (a - c)
+    Bx, By = vx - wx, vy - wy
+    k1, k2 = c - a, d_h - a
+    s2 = min_separation * min_separation
+
+    tol_q = 1e-9 * max(s2, 1.0)                 # on squared distance
+    tol_t = 1e-9 * max(L, Dh, 1.0)              # on u and d
+    shifts = []
+
+    def q(u: float, d: float) -> float:
+        x = Cx + Bx * u - wx * d
+        y = Cy + By * u - wy * d
+        return x * x + y * y
+
+    # Parallelogram vertices inside the disc.
+    for u, d in ((0.0, k1), (0.0, k2), (L, k1 - L), (L, k2 - L)):
+        if q(u, d) <= s2 + tol_q:
+            shifts.append(d)
+
+    # Edges u = 0 and u = L: |(C + B u) − w d|² = s², a quadratic in d.
+    ww = wx * wx + wy * wy
+    for u in (0.0, L):
+        ex, ey = Cx + Bx * u, Cy + By * u
+        for r in _roots(ww, -2.0 * (ex * wx + ey * wy), ex * ex + ey * ey - s2):
+            if k1 - u - tol_t <= r <= k2 - u + tol_t:
+                shifts.append(r)
+
+    # Edges u + d = k (the human segment's start and end): with d = k − u,
+    # R − Q = (C − w k) + v u, a quadratic in u.
+    vv = vx * vx + vy * vy
+    for k in (k1, k2):
+        ex, ey = Cx - wx * k, Cy - wy * k
+        for r in _roots(vv, 2.0 * (ex * vx + ey * vy), ex * ex + ey * ey - s2):
+            if -tol_t <= r <= L + tol_t:
+                shifts.append(k - r)
+
+    # The ellipse's own d-extrema, when the affine map (u, d) -> R − Q has full
+    # rank: M = [[Bx, -wx], [By, -wy]]. d = l · (x − C) over the circle
+    # |x| = s, with l the second row of M⁻¹; extreme at x = ± s l / |l|.
+    det = By * wx - Bx * wy
+    if abs(det) > 1e-12 * (Bx * Bx + By * By + ww):
+        lx, ly = -By / det, Bx / det
+        ln = (lx * lx + ly * ly) ** 0.5
+        for sign in (1.0, -1.0):
+            x = sign * min_separation * lx / ln - Cx
+            y = sign * min_separation * ly / ln - Cy
+            d = lx * x + ly * y
+            u = (-wy * x + wx * y) / det
+            if -tol_t <= u <= L + tol_t and k1 - tol_t <= u + d <= k2 + tol_t:
+                shifts.append(d)
+
+    if not shifts:
+        return None
+    lo, hi = min(shifts), max(shifts)
+    if hi - lo <= tol_t:
+        return None
+    return (lo, hi)
+
+
+def first_approach_step(
+    pos: Tuple[float, float],
+    human_segment: Segment,
+    min_separation: float,
+    from_step: float,
+) -> Optional[float]:
+    """
+    The first step, at or after `from_step` and within `human_segment`'s span,
+    at which the human is STRICTLY within `min_separation` of the fixed point
+    `pos`; None if it never is on this segment. Closed form: the squared
+    distance of a constant-velocity point to a fixed one is a quadratic in
+    step, and the first violation is either the window's start (already
+    inside) or the quadratic's smaller root.
+
+    This is the hold-position check of realization: a hold is a position, and
+    the moment the human first comes within the separation of it bounds how
+    long the robot may stand there. A zero-duration segment contributes
+    nothing (its instant belongs to its neighbours).
+    """
+    c, d_h = human_segment.start_step, human_segment.end_step
+    Dh = d_h - c
+    lo, hi = max(c, from_step), d_h
+    if Dh <= 0.0 or hi - lo <= 0.0:
+        return None
+    Q0, Q1 = human_segment.start_pos, human_segment.end_pos
+    wx, wy = (Q1[0] - Q0[0]) / Dh, (Q1[1] - Q0[1]) / Dh
+    # Q(t) − pos = A + w t
+    Ax = Q0[0] - pos[0] - wx * c
+    Ay = Q0[1] - pos[1] - wy * c
+    s2 = min_separation * min_separation
+    tol_q = 1e-9 * max(s2, 1.0)
+    tol_t = 1e-9 * max(Dh, 1.0)
+
+    x, y = Ax + wx * lo, Ay + wy * lo
+    if x * x + y * y < s2 - tol_q:
+        return lo
+    roots = _roots(wx * wx + wy * wy, 2.0 * (Ax * wx + Ay * wy), Ax * Ax + Ay * Ay - s2)
+    if not roots:
+        return None
+    r1, r2 = roots
+    # The window starts outside the disc, so a violation inside it begins at r1
+    # (r2 ≤ lo means the approach is already over).
+    if r2 - r1 <= tol_t or r1 < lo - tol_t or r1 >= hi - tol_t:
+        return None
+    return max(r1, lo)
 
 
 def closest_point_of_approach(

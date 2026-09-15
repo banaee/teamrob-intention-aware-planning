@@ -535,6 +535,69 @@ class ProjectedPlan:
     total_estimated_cost: int           # sum of durations + any inter-task gap steps
 
 @dataclass
+class RealizedPlan:
+    """
+    Output of shared/realization.realize() for one robot ProjectedPlan against
+    the human's (T3; design_decisions.md, "The robot can wait"). What a
+    candidate's trajectory actually is, given the human: the hold-only
+    realization under the whole-trajectory minimal shift — one hold δ at the
+    robot's position at the decision step, then the projected plan run
+    unchanged, shifted by δ. Realization prices conflict as duration: a
+    conflicted plan costs more because avoiding the human takes longer. No
+    conflict weight, no penalty term.
+
+    realizable:        a shift exists that clears `min_separation` throughout
+                       the assessed window — the steps at which both the
+                       realized plan and the human's projection exist, up to
+                       T_h, the end of the human's projection — including at
+                       the hold position while holding, with the hold ending
+                       before T_h (a hold that reaches T_h clears by outlasting
+                       the assessment, not by avoiding anything, and is refused).
+                       True with delta = 0 when there is no human projection.
+    delta:             the hold, in steps (≥ 0); None when unrealizable.
+    cost:              T_r + delta over the FULL plan, T_r the plain projected
+                       duration (the span of the plan's segments, fractional
+                       steps). The tail beyond T_h is inside T_r and is not
+                       corrected for (TODO-69, reading (1)). None when
+                       unrealizable — an unrealizable plan has no realized cost.
+    projected_duration: T_r.
+    segments:          the realized trajectory, head-to-tail: the stationary
+                       hold at `hold_position` from `hold_start` to the shifted
+                       plan's start (present only when that stretch has
+                       positive duration), then every projected segment shifted
+                       by delta. Empty when unrealizable.
+    hold_position:     where the robot stands during the hold — the plan's
+                       first segment's start, i.e. where the robot is at the
+                       decision step (which may be partway along a walk).
+    hold_start:        the decision step.
+    horizon:           T_h; None when there is no human projection.
+    unassessed_share:  the share of the realized plan's span [hold_start, end]
+                       lying beyond T_h — the part that was neither cleared nor
+                       blocked, logged so that the bias can be reported
+                       (TODO-69). 1.0 when there is no human projection; None
+                       when unrealizable.
+    reason:            "realized"; "no_human_projection" (delta 0, fully
+                       unassessed — the caller treats it as it treats no
+                       projection today); "hold_position_violated" (the human's
+                       projection passes within `min_separation` of the hold
+                       position before the smallest clearing shift — no shift
+                       clears a hold whose position the human passes);
+                       "hold_reaches_horizon" (the smallest clearing shift
+                       holds until T_h or beyond).
+    """
+    realizable: bool
+    delta: Optional[float]
+    cost: Optional[float]
+    projected_duration: float
+    segments: List[Segment]
+    hold_position: Tuple[float, float]
+    hold_start: float
+    horizon: Optional[float]
+    unassessed_share: Optional[float]
+    reason: str
+
+
+@dataclass
 class ConflictPoint:
     """
     A single observed spatial/temporal overlap between the robot's projected

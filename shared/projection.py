@@ -14,10 +14,10 @@ WHY THIS IS ITS OWN MODULE:
     Projection was originally private to MetaPlanner (_project, _build_segments,
     _estimate_duration, plus inline human-projection code in update()). But turning a
     task into a trajectory is not selection logic — MetaPlanner merely consumes it.
-    Several planned consumers want projection without wanting selection:
+    Several consumers want projection without wanting selection:
       - realization (Phase 4C wait-decision revision; design_decisions.md, "The
-        robot can wait"): realize(projected_plan, human_projection,
-        min_separation, start_tick) -> RealizedPlan | None, hold-only first —
+        robot can wait"): shared/realization.py's realize(plan, human_plan,
+        min_separation, decision_step) -> RealizedPlan, hold-only (T3) —
         DESIGN-13's estimator partly pulled forward; detour and an off-the-shelf
         planner stay Phase 4D. It belongs on THIS side of the layering, not in
         MetaPlanner, which supplies min_separation and consumes the result.
@@ -26,11 +26,10 @@ WHY THIS IS ITS OWN MODULE:
     Under the old structure each would have had to reach into MetaPlanner's privates
     or duplicate the logic.
 
-LAYERING (one-way, no cycles; the realization layer is design, not yet built —
-design_decisions.md, "The robot can wait"):
-    trajectory_algorithms.py   pure geometry   segments in -> earliest violation / conflicts out
+LAYERING (one-way, no cycles; design_decisions.md, "The robot can wait"):
+    trajectory_algorithms.py   pure geometry   segments in -> violating shifts / conflicts out
             |
-    realization (hold-only)    "what would this trajectory actually be, given the human?"
+    realization.py (hold-only) "what would this trajectory actually be, given the human?"
             |
     projection.py              Projector       task + world -> predicted trajectory
             |
@@ -39,9 +38,9 @@ design_decisions.md, "The robot can wait"):
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT decide which task to do (meta_planner.py)
     - Does NOT detect interference or compute cost (meta_planner.py today;
-      under realization the interference question is asked inside realize(),
-      on this side, and the cost is the realized duration it returns —
-      meta_planner.py still decides between candidates on that number)
+      realize() in shared/realization.py asks the interference question on
+      this side and returns the realized duration as the cost — once wired in
+      (T4, T10), meta_planner.py decides between candidates on that number)
     - Does NOT update beliefs (recognizer.py)
     - Does NOT import from mesa_sim/ or ros_sim/
 """
