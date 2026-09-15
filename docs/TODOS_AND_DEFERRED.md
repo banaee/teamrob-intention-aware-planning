@@ -1956,6 +1956,24 @@ means. Rename (e.g. `robot_grasped`) when a session touches the trigger set; a r
 Files: shared/meta_planner.py (`evaluate_triggers`), shared/io_contracts.md (§2.2)
 Reference: R1 decision record, September 2026
 
+**TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** [found by T9; decision needed before T3's numbers are read as exact]
+With walks ending at the arrival radius (T9) the projection no longer over-estimates any walk, and
+what remains is on the body side: the executor spends one tick ACKNOWLEDGING each completed action
+(the tick on which `at` / `holding` / `obj_at` is seen true and the cursor advances; `micro=None` in
+the log) — a delivery pays three before its release (the robot two: the `task_committed` continue
+loads `deliver_already_held` and skips the grasp's acknowledgement); each walk also ends on a discrete
+step 10–29 cm from the target rather than at 30 (0 to ~1 tick later, with `ceil`); and the human's
+projection starts from its position AFTER the trigger tick's step (it moves before the robot
+observes), one tick later than the robot's own. Measured (`analysis/t9_arrival_radius/REPORT.md`):
+placement lead −1.0 to −6.4 ticks, never positive; medians robot −1.5 / −3.3 (after / before the
+grasp), human −2.2 / −5.3. Options, none chosen: model the acknowledgement as a body-supplied
+per-action overhead in the `Projector` (as `default_action_cost` is supplied); remove the
+acknowledgement tick from the executor (a behaviour change to both agents, every baseline moves);
+accept it and read T_r and T_h as 1–4 ticks optimistic. It matters for realization because every
+hold is measured against T_h and every arrival gap at the table is of the order of these offsets.
+Files: mesa_sim/executor.py (`step`, `_is_action_complete`), shared/projection.py, mesa_sim/sim_agents.py
+Reference: T9 (`analysis/t9_arrival_radius/REPORT.md`, "The premise, measured")
+
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
 (TODO-28's class of defect). The fractional reading — excess as a fraction of C(origin, target) — was

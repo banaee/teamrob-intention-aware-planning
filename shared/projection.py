@@ -64,7 +64,7 @@ from shared.domain_knowledge import DomainKnowledgeBase
 from shared.planner import AdaptivePlanner
 from shared.recognizer import IntentionRecognizer
 from shared.target_resolution import movement_target_id, movement_target_position
-from shared.trajectory_algorithms import straight_line_path, stationary_segment
+from shared.trajectory_algorithms import straight_line_path, stationary_segment, arrival_point
 
 
 class Projector:
@@ -80,6 +80,7 @@ class Projector:
         knowledge: DomainKnowledgeBase,
         assumed_speed: float = 1.0,
         default_action_cost: float = 1.0,
+        arrival_radius: float = 0.0,
     ):
         """
         knowledge:            HTN domain knowledge, passed through to planner.py calls
@@ -95,11 +96,24 @@ class Projector:
                               entry. Mesa executes one microaction per tick, so 1.0 is
                               exact for pick_up/place there; wait_at's real duration is
                               still not honoured (TODO-32).
+        arrival_radius:       world units short of a movement target at which the
+                              body's executor STOPS — the distance at which its
+                              at(agent, object) predicate holds, so the walk is
+                              complete. A projected walk ends there, not at the
+                              target point, and the next action is projected from
+                              there (T9; design_decisions.md, "Projected walks end
+                              where the executor stops"). Supplied by the embodiment
+                              exactly as assumed_speed is (Mesa: the same
+                              PROXIMITY_THRESHOLD its world-state builder emits `at`
+                              with; ROS its own). The 0.0 default is a unit-less
+                              placeholder (walk to the point), not a value shared/
+                              knows to be right.
         """
         self._knowledge = knowledge
         self._planner = AdaptivePlanner(knowledge=knowledge)
         self._assumed_speed = assumed_speed
         self._default_action_cost = default_action_cost
+        self._arrival_radius = arrival_radius
 
     # =========================================================================
     # Public
@@ -236,7 +250,13 @@ class Projector:
         position comes from shared/target_resolution.py — the same lookup the
         recognizer scores chords against — and the path from
         trajectory_algorithms.straight_line_path(), the current default path
-        realization. Only movement_target_type == "object" is handled; "zone"
+        realization, ending at trajectory_algorithms.arrival_point(): the
+        body's arrival_radius short of the target, where its executor stops
+        (T9). The stationary action that follows, and the next walk, are
+        projected from that point. What is still not modelled: the residual
+        of at most one execution step between the exact radius and the
+        discrete step the executor stops on, and the tick an executor spends
+        acknowledging a completed action. Only movement_target_type == "object" is handled; "zone"
         targets were removed from the live domain (see domains/kitting/actions.py),
         and this raises explicitly rather than silently mis-estimating if one
         reappears. Obstacle-aware, non-linear realization is DESIGN-13 / TODO-09
@@ -279,8 +299,9 @@ class Projector:
                         f"'{movement_target_id(action)}' of action "
                         f"'{action.action_name}'"
                     )
-                segment = straight_line_path(current_pos, current_step, target_pos, self._assumed_speed)
-                current_pos = target_pos
+                stop_pos = arrival_point(current_pos, target_pos, self._arrival_radius)
+                segment = straight_line_path(current_pos, current_step, stop_pos, self._assumed_speed)
+                current_pos = stop_pos
             else:
                 cost = self._knowledge.get_cost(action.action_name)
                 duration = cost if cost is not None else self._default_action_cost

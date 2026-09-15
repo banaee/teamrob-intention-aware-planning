@@ -21,6 +21,8 @@ PURPOSE:
 
 WHAT'S IMPLEMENTED VS. PLACEHOLDER:
     straight_line_path()       — implemented, current default path realization.
+    arrival_point()            — implemented (T9): where a walk stops when the
+                                  walker halts a given radius short of its target.
     stationary_segment()       — implemented, for non-movement actions.
     discretized_time_sampling()— implemented, current default interference algorithm.
     closest_point_of_approach()— NOT IMPLEMENTED. Documented analytic approach
@@ -110,6 +112,33 @@ def straight_line_path(
         end_pos=end_pos,
         end_step=start_step + duration,
     )
+
+
+def arrival_point(
+    start_pos: Tuple[float, float],
+    end_pos: Tuple[float, float],
+    arrival_radius: float,
+) -> Tuple[float, float]:
+    """
+    Where a straight-line walk from start_pos toward end_pos STOPS when the
+    walker halts `arrival_radius` short of its target (T9): the point on the
+    segment at that distance from end_pos, or start_pos itself when the walker
+    is already within the radius (no motion at all — the executor's completion
+    condition already holds). With arrival_radius == 0 this is end_pos.
+
+    `arrival_radius` is in world units and is the caller's (Projector's), who
+    got it from the embodiment: nothing here knows what distance a body stops
+    at. Pure geometry, no policy.
+    """
+    if arrival_radius <= 0.0:
+        return end_pos          # exactly, not start + 1.0 * delta in floating point
+    dx = end_pos[0] - start_pos[0]
+    dy = end_pos[1] - start_pos[1]
+    distance = (dx * dx + dy * dy) ** 0.5
+    if distance <= arrival_radius:
+        return start_pos
+    frac = (distance - arrival_radius) / distance
+    return (start_pos[0] + frac * dx, start_pos[1] + frac * dy)
 
 
 def stationary_segment(

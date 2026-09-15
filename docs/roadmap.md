@@ -248,7 +248,8 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    actual-distance measure, new baselines over ten conditions ✅
 2. T3 — `realize()` as a service on the projection / trajectory side (whole-trajectory minimal shift,
    `earliest_violation` closed form, `RealizedPlan`), validated against T1b's `whole` realizer on the
-   T9 baselines
+   T9 baselines. Open before its numbers are read as exact: TODO-77 (T9 found the projection still
+   1–6 ticks ahead of execution through the executor's acknowledgement ticks — a decision, not a fix)
 3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5
 4. T10 — B3.A with realized cost T_r + δ; the all-unrealizable fallback (plain cost, logged);
    `min_separation` = 2.5 × motion per tick replaces `min_safe_distance`; the `RuntimeError` removed;

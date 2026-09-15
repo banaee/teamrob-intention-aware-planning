@@ -1632,8 +1632,20 @@ gets the same treatment from the same source. What the projection still does not
 of at most one step between "exactly the stopping distance" and the discrete step position the
 executor actually stops on, and the tick the executor spends acknowledging a completed action.
 Measured consequences and the regression record: `analysis/t9_arrival_radius/REPORT.md`.
-Files: shared/projection.py (`Projector.__init__`, `build_segments`), mesa_sim/sim_agents.py
-(Projector construction)
+MEASURED (T9): both agents stop 10–29 cm from every target (the last discrete step inside the
+radius). Before the change the robot's full-task placements executed a median 1.25 ticks BEFORE
+the projection and the human's a median 1.2 ticks AFTER it — the target-point error (1.5 ticks per
+walk, early) was cancelling the executor's acknowledgement ticks (one per completed action, late).
+After it, no placement executes ahead of projection: robot −1.5 / −3.3 ticks (after / before the
+grasp), human −2.2 / −5.3 — the acknowledgement ticks, step quantization, and the human's one-tick
+observation offset, all body facts the projection still does not model (TODO-77). The change
+removed the `min_dist = 0.0` placement coincidence T2 had produced: the four T2 exclusions (s20_off
+20, s20_on 6, s30_off 28, s30_on 21) no longer fire and item_4 wins there on plain cost, as T1b's
+cost argmin predicted; s00, s10, s40 decide identically. `[IR]` lines change only downstream of
+those decisions, through world facts (the completion pin), never through projected positions.
+Files: shared/projection.py (`Projector.__init__`, `build_segments`), shared/trajectory_algorithms.py
+(`arrival_point`), mesa_sim/sim_agents.py (Projector construction), mesa_sim/run_mesa.py (`[sep]`),
+analysis/t9_arrival_radius/
 Reference: R1 decision record and T9 session, September 2026; T1b "Not measured" (the executor's
 actual arrival time vs the projection)
 

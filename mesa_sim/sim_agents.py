@@ -41,7 +41,7 @@ from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance,
 
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
-from mesa_sim.world_state_builder import build_world_state
+from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
 from mesa_sim.executor import Executor
 from mesa_sim.action_decomposer import (  # single reader of mesa_configs.yaml
     _get_step_size,
@@ -209,12 +209,17 @@ class RobotAgent(FactoryAgent):
 
         # Projection time is execution time: one projection step is one Mesa tick.
         # The body supplies the motion rate (step_size world units per tick, from
-        # mesa_configs.yaml) and the duration of a stationary action (one tick per
-        # GRASP/RELEASE microaction); shared/ never learns either constant.
+        # mesa_configs.yaml), the duration of a stationary action (one tick per
+        # GRASP/RELEASE microaction), and the distance at which a walk stops (T9):
+        # the executor completes a move_to when at(agent, object) holds, which
+        # world_state_builder emits within PROXIMITY_THRESHOLD — the same constant,
+        # so projected walks end where execution ends. shared/ never learns any of
+        # these constants.
         self.projector = Projector(
             knowledge=knowledge,
             assumed_speed=_get_step_size(model),
             default_action_cost=1.0,
+            arrival_radius=PROXIMITY_THRESHOLD,
         )
     
         # The interference sampler's spatial resolution is a world-unit quantity

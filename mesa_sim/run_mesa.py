@@ -256,6 +256,14 @@ def run_headless():
                       f"action={robot.current_action} "
                       f"micro={robot.current_microaction} "
                       f"pos={np.round(robot.pos, 2)}")
+            # Actual robot–human separation at the end of the tick (T9): a measure
+            # only, so later tasks can report how often and by how much execution
+            # falls below min_separation. Mesa has no execution-time avoidance
+            # (TODO-73); nothing here reacts to this number.
+            for rid, robot in model.robots.items():
+                for hid, human in model.humans.items():
+                    sep = float(np.hypot(robot.pos[0] - human.pos[0], robot.pos[1] - human.pos[1]))
+                    logging.info(f"[sep] step={step} {rid}-{hid} dist={sep:.2f}")
 
     logging.info("[run_mesa] Headless run complete.")
     
