@@ -102,6 +102,7 @@ Decisions
   default; broad testing with special cases is a separate, later activity.
 - Keep measurement tasks and build tasks apart. A build task is the change plus the check it
   needs, not a characterisation study.
+- When a task delegates a decision, decide from the design: state the reasoning before implementing, then evaluate. If the evaluation contradicts the reasoning, report it; do not switch the decision to fit the results.
 
 ## Workflow rules
 
