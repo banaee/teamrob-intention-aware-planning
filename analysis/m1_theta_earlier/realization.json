@@ -1,0 +1,741 @@
+{
+ "min_separation": 50.0,
+ "rows": [
+  {
+   "condition": "s30_off_t075",
+   "prior": false,
+   "theta": 0.75,
+   "step": 28,
+   "trigger": "theta_crossed",
+   "confidence": 0.7746218698102085,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    58.50326381210874,
+    -130.20391657453047
+   ],
+   "human_pos": [
+    -71.30695180539828,
+    -145.56834216647798
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 42.67628314195646,
+     "T_h": 41.67628314195647,
+     "cost_logged": 43,
+     "logged_feasible": true,
+     "logged_min_dist": 16.624760953661962,
+     "realizable": true,
+     "why": null,
+     "delta": 2.14,
+     "realized_cost": 44.81628314195646,
+     "unassessed": 0.07006382010873105
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 54.96569698117495,
+     "T_h": 41.67628314195647,
+     "cost_logged": 55,
+     "logged_feasible": true,
+     "logged_min_dist": 130.716325118304,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 54.96569698117495,
+     "unassessed": 0.24177650005547893
+    }
+   ]
+  },
+  {
+   "condition": "s30_off_t075",
+   "prior": false,
+   "theta": 0.75,
+   "step": 40,
+   "trigger": "task_committed",
+   "confidence": 0.9734077440705002,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    186.54014374500463,
+    -283.84817249400555
+   ],
+   "human_pos": [
+    -186.54014374500463,
+    -283.84817249400555
+   ],
+   "robot_holding": "item_4",
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 32.53637128236081,
+     "T_h": 32.53637128236081,
+     "cost_logged": 33,
+     "logged_feasible": true,
+     "logged_min_dist": 16.93952481802421,
+     "realizable": true,
+     "why": null,
+     "delta": 3.13,
+     "realized_cost": 35.666371282360814,
+     "unassessed": 0.08775773613807407
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 48.00383215795769,
+     "T_h": 32.53637128236081,
+     "cost_logged": 48,
+     "logged_feasible": true,
+     "logged_min_dist": 299.3450736214021,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 48.00383215795769,
+     "unassessed": 0.3222130438399345
+    }
+   ]
+  },
+  {
+   "condition": "s30_off_t075",
+   "prior": false,
+   "theta": 0.75,
+   "step": 86,
+   "trigger": "theta_crossed",
+   "confidence": 0.7620847323610008,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    111.91469422773912,
+    160.55554054665527
+   ],
+   "human_pos": [
+    -195.7708806918782,
+    267.4199175609984
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 62.822648666014175,
+     "T_h": 29.614779658380545,
+     "cost_logged": 63,
+     "logged_feasible": true,
+     "logged_min_dist": 325.71522544744374,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 62.822648666014175,
+     "unassessed": 0.5285970858086161
+    }
+   ]
+  },
+  {
+   "condition": "s30_off_t075",
+   "prior": false,
+   "theta": 0.75,
+   "step": 114,
+   "trigger": "task_committed",
+   "confidence": 0.9950117872681181,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    387.6780137693875,
+    -280.30111597037035
+   ],
+   "human_pos": [
+    -104.94512577852237,
+    310.47082286881556
+   ],
+   "robot_holding": "item_2",
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 36.49911279860883,
+     "T_h": 5.1071461701427125,
+     "cost_logged": 36,
+     "logged_feasible": true,
+     "logged_min_dist": 644.2139670613135,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 36.49911279860883,
+     "unassessed": 0.8600747859729518
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t075",
+   "prior": true,
+   "theta": 0.75,
+   "step": 21,
+   "trigger": "theta_crossed",
+   "confidence": 0.7609593362683036,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    -31.122552140918458,
+    -22.65293743089785
+   ],
+   "human_pos": [
+    18.318864147628858,
+    -38.01736302284536
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": true,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 49.67628314195646,
+     "T_h": 48.67628314195646,
+     "cost_logged": 50,
+     "logged_feasible": true,
+     "logged_min_dist": 15.37233196754729,
+     "realizable": false,
+     "why": "none:no_feasible_shift",
+     "delta": null,
+     "realized_cost": null,
+     "unassessed": null
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 61.44568403193053,
+     "T_h": 48.67628314195646,
+     "cost_logged": 61,
+     "logged_feasible": true,
+     "logged_min_dist": 22.68288481907288,
+     "realizable": false,
+     "why": "none:no_feasible_shift",
+     "delta": null,
+     "realized_cost": null,
+     "unassessed": null
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t075",
+   "prior": true,
+   "theta": 0.75,
+   "step": 40,
+   "trigger": "task_committed",
+   "confidence": 0.9813636627696009,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    186.54014374500463,
+    -283.84817249400555
+   ],
+   "human_pos": [
+    -186.54014374500463,
+    -283.84817249400555
+   ],
+   "robot_holding": "item_4",
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 32.53637128236081,
+     "T_h": 32.53637128236081,
+     "cost_logged": 33,
+     "logged_feasible": true,
+     "logged_min_dist": 16.93952481802421,
+     "realizable": true,
+     "why": null,
+     "delta": 3.13,
+     "realized_cost": 35.666371282360814,
+     "unassessed": 0.08775773613807407
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 48.00383215795769,
+     "T_h": 32.53637128236081,
+     "cost_logged": 48,
+     "logged_feasible": true,
+     "logged_min_dist": 299.3450736214021,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 48.00383215795769,
+     "unassessed": 0.3222130438399345
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t075",
+   "prior": true,
+   "theta": 0.75,
+   "step": 77,
+   "trigger": "theta_crossed",
+   "confidence": 0.9054545454545454,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    16.45816054024545,
+    313.15976780254874
+   ],
+   "human_pos": [
+    -24.843779186659358,
+    323.846205503983
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": true,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 71.82264866601417,
+     "T_h": 38.61477965838054,
+     "cost_logged": 72,
+     "logged_feasible": true,
+     "logged_min_dist": 42.66204608257219,
+     "realizable": false,
+     "why": "none:no_feasible_shift",
+     "delta": null,
+     "realized_cost": null,
+     "unassessed": null
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t075",
+   "prior": true,
+   "theta": 0.75,
+   "step": 114,
+   "trigger": "task_committed",
+   "confidence": 0.995004000995004,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    387.6780137693875,
+    -280.30111597037035
+   ],
+   "human_pos": [
+    -104.94512577852237,
+    310.47082286881556
+   ],
+   "robot_holding": "item_2",
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 36.49911279860883,
+     "T_h": 5.1071461701427125,
+     "cost_logged": 36,
+     "logged_feasible": true,
+     "logged_min_dist": 644.2139670613135,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 36.49911279860883,
+     "unassessed": 0.8600747859729518
+    }
+   ]
+  },
+  {
+   "condition": "s30_off_t065",
+   "prior": false,
+   "theta": 0.65,
+   "step": 24,
+   "trigger": "theta_crossed",
+   "confidence": 0.6531521895950864,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    7.288511838950342,
+    -68.74621420674043
+   ],
+   "human_pos": [
+    -20.092199832239885,
+    -84.11063979868788
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": true,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 46.67628314195646,
+     "T_h": 45.67628314195646,
+     "cost_logged": 47,
+     "logged_feasible": true,
+     "logged_min_dist": 16.624760953661962,
+     "realizable": false,
+     "why": "none:no_feasible_shift",
+     "delta": null,
+     "realized_cost": null,
+     "unassessed": null
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 58.62897648628389,
+     "T_h": 45.67628314195646,
+     "cost_logged": 59,
+     "logged_feasible": true,
+     "logged_min_dist": 31.396957581768053,
+     "realizable": false,
+     "why": "none:no_feasible_shift",
+     "delta": null,
+     "realized_cost": null,
+     "unassessed": null
+    }
+   ]
+  },
+  {
+   "condition": "s30_off_t065",
+   "prior": false,
+   "theta": 0.65,
+   "step": 40,
+   "trigger": "task_committed",
+   "confidence": 0.9734077440705002,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    186.54014374500463,
+    -283.84817249400555
+   ],
+   "human_pos": [
+    -186.54014374500463,
+    -283.84817249400555
+   ],
+   "robot_holding": "item_4",
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 32.53637128236081,
+     "T_h": 32.53637128236081,
+     "cost_logged": 33,
+     "logged_feasible": true,
+     "logged_min_dist": 16.93952481802421,
+     "realizable": true,
+     "why": null,
+     "delta": 3.13,
+     "realized_cost": 35.666371282360814,
+     "unassessed": 0.08775773613807407
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 48.00383215795769,
+     "T_h": 32.53637128236081,
+     "cost_logged": 48,
+     "logged_feasible": true,
+     "logged_min_dist": 299.3450736214021,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 48.00383215795769,
+     "unassessed": 0.3222130438399345
+    }
+   ]
+  },
+  {
+   "condition": "s30_off_t065",
+   "prior": false,
+   "theta": 0.65,
+   "step": 84,
+   "trigger": "theta_crossed",
+   "confidence": 0.6791855566067734,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    90.70213118607387,
+    194.46759104796493
+   ],
+   "human_pos": [
+    -157.78708035738512,
+    279.9590926594394
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 64.82264866601417,
+     "T_h": 31.61477965838055,
+     "cost_logged": 65,
+     "logged_feasible": true,
+     "logged_min_dist": 262.7844841334333,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 64.82264866601417,
+     "unassessed": 0.5122880612103738
+    }
+   ]
+  },
+  {
+   "condition": "s30_off_t065",
+   "prior": false,
+   "theta": 0.65,
+   "step": 114,
+   "trigger": "task_committed",
+   "confidence": 0.9950117872681181,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    387.6780137693875,
+    -280.30111597037035
+   ],
+   "human_pos": [
+    -104.94512577852237,
+    310.47082286881556
+   ],
+   "robot_holding": "item_2",
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 36.49911279860883,
+     "T_h": 5.1071461701427125,
+     "cost_logged": 36,
+     "logged_feasible": true,
+     "logged_min_dist": 644.2139670613135,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 36.49911279860883,
+     "unassessed": 0.8600747859729518
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t065",
+   "prior": true,
+   "theta": 0.65,
+   "step": 15,
+   "trigger": "theta_crossed",
+   "confidence": 0.6509989676245673,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    -107.94468010065603,
+    69.53361612078726
+   ],
+   "human_pos": [
+    95.14099210736643,
+    54.16919052883972
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 55.67628314195645,
+     "T_h": 54.67628314195646,
+     "cost_logged": 56,
+     "logged_feasible": true,
+     "logged_min_dist": 15.372331967547314,
+     "realizable": true,
+     "why": null,
+     "delta": 2.2600000000000002,
+     "realized_cost": 57.93628314195645,
+     "unassessed": 0.05626871147416006
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 67.18513590186699,
+     "T_h": 54.67628314195646,
+     "cost_logged": 67,
+     "logged_feasible": true,
+     "logged_min_dist": 40.277275799933356,
+     "realizable": true,
+     "why": null,
+     "delta": 0.72,
+     "realized_cost": 67.90513590186698,
+     "unassessed": 0.19481372924469487
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t065",
+   "prior": true,
+   "theta": 0.65,
+   "step": 40,
+   "trigger": "task_committed",
+   "confidence": 0.9813636627696009,
+   "hypothesis": "item_3",
+   "human_actual": "item_3",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    186.54014374500463,
+    -283.84817249400555
+   ],
+   "human_pos": [
+    -186.54014374500463,
+    -283.84817249400555
+   ],
+   "robot_holding": "item_4",
+   "logged_winner": "item_4",
+   "realized_winner": "item_4",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_4",
+     "is_current_task": true,
+     "T_r": 32.53637128236081,
+     "T_h": 32.53637128236081,
+     "cost_logged": 33,
+     "logged_feasible": true,
+     "logged_min_dist": 16.93952481802421,
+     "realizable": true,
+     "why": null,
+     "delta": 3.13,
+     "realized_cost": 35.666371282360814,
+     "unassessed": 0.08775773613807407
+    },
+    {
+     "candidate": "item_2",
+     "is_current_task": false,
+     "T_r": 48.00383215795769,
+     "T_h": 32.53637128236081,
+     "cost_logged": 48,
+     "logged_feasible": true,
+     "logged_min_dist": 299.3450736214021,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 48.00383215795769,
+     "unassessed": 0.3222130438399345
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t065",
+   "prior": true,
+   "theta": 0.65,
+   "step": 77,
+   "trigger": "theta_crossed",
+   "confidence": 0.9054545454545454,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    16.45816054024545,
+    313.15976780254874
+   ],
+   "human_pos": [
+    -24.843779186659358,
+    323.846205503983
+   ],
+   "robot_holding": null,
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": true,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 71.82264866601417,
+     "T_h": 38.61477965838054,
+     "cost_logged": 72,
+     "logged_feasible": true,
+     "logged_min_dist": 42.66204608257219,
+     "realizable": false,
+     "why": "none:no_feasible_shift",
+     "delta": null,
+     "realized_cost": null,
+     "unassessed": null
+    }
+   ]
+  },
+  {
+   "condition": "s30_on_t065",
+   "prior": true,
+   "theta": 0.65,
+   "step": 114,
+   "trigger": "task_committed",
+   "confidence": 0.995004000995004,
+   "hypothesis": "item_7",
+   "human_actual": "item_7",
+   "hyp_matches_actual": true,
+   "robot_pos": [
+    387.6780137693875,
+    -280.30111597037035
+   ],
+   "human_pos": [
+    -104.94512577852237,
+    310.47082286881556
+   ],
+   "robot_holding": "item_2",
+   "logged_winner": "item_2",
+   "realized_winner": "item_2",
+   "all_unrealizable": false,
+   "candidates": [
+    {
+     "candidate": "item_2",
+     "is_current_task": true,
+     "T_r": 36.49911279860883,
+     "T_h": 5.1071461701427125,
+     "cost_logged": 36,
+     "logged_feasible": true,
+     "logged_min_dist": 644.2139670613135,
+     "realizable": true,
+     "why": null,
+     "delta": 0.0,
+     "realized_cost": 36.49911279860883,
+     "unassessed": 0.8600747859729518
+    }
+   ]
+  }
+ ]
+}
