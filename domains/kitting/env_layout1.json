@@ -295,7 +295,7 @@
       "id": "coffee_machine_0",
       "type": "coffee_machine",
       "position": [
-        -975,
+        -875,
         -275
       ],
       "size": [
@@ -309,7 +309,7 @@
       "id": "ac_switch_0",
       "type": "ac_switch",
       "position": [
-        -975,
+        -875,
         -350
       ],
       "size": [
