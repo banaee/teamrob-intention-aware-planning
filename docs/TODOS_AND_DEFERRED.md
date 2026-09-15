@@ -2061,6 +2061,22 @@ PROXIMITY_THRESHOLD (30) sets the geometric slop β must tolerate (×0.85 at β 
 Files: shared/likelihood_functions.py (`BETA`), mesa_sim/world_state_builder.py (`PROXIMITY_THRESHOLD`)
 Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.3
 
+**TODO-79 — The `[sep]` execution measure samples whole ticks and misses minima between ticks** [T10 to decide; from T3]
+`[sep]` (T9; `mesa_sim/run_mesa.py`) logs the robot–human distance once per tick, at the tick's end
+positions. Between ticks both agents move up to 20 cm, so a close pass between two samples is read at
+the nearer sample, not at its minimum. L2 measured the case: scenario_30's head-on pass reads 11.0 cm
+in `[sep]` while the continuous minimum is near 0 (the agents pass through each other between ticks 22
+and 23; `analysis/l2_execution_lag/REPORT.md`). Realization's own definition is continuous — a
+violation is any moment strictly below `min_separation`, along straight-line motion within a segment
+(T3, `shared/realization.py`) — so an evaluation that reads `[sep]` against `min_separation` would
+compare a sampled execution against a continuous decision and under-count violations by up to one
+tick of motion per agent. TO DECIDE IN T10: whether the evaluation measures distance along straight-line
+motion between consecutive tick positions (the minimum over the tick, closed form, the same geometry
+as `shift_violation_interval`) instead of at the tick positions only. Not a change to behaviour either
+way; it is the measure.
+Files: mesa_sim/run_mesa.py (`[sep]`), analysis (T10's evaluation)
+Reference: T3 session, September 2026; L2 report; T9 (`[sep]` introduced)
+
 ---
 
 ## 🧹 Refactoring / Cleanup TODOs
