@@ -81,12 +81,16 @@ class SimModel(model.Model):
                  register_fn,
                  env_layout_path: str = "domains/kitting/env_layout1.json", 
                  seed=None,
-                 assignment_prior: bool = False):
+                 assignment_prior: bool = False,
+                 gate_strategy: str = "none"):
         super().__init__()
 
         # Evaluation switch: give each robot the observed human's assigned_tasks
         # as a persistent IR prior. Off = the robot knows no work order.
         self.assignment_prior = assignment_prior
+        # MetaPlanner B2 strategy for every robot ("none" | "b2a" | "b2b"); a run
+        # option, not a scenario fact.
+        self.gate_strategy = gate_strategy
 
         # ------------------------------------------------------------------
         # Load env layout

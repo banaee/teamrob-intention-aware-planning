@@ -18,6 +18,11 @@ WHAT THIS MODULE DOES:
           continue_plan() without restarting: the action in flight keeps its
           microaction queue, so the tick is spent exactly as if no trigger had
           fired. A plan handed to step() any other way is loaded from its start.
+        - Executes the hold a decision carries (UpdateResult.hold, T4) via
+          hold(): one STAND per tick at the agent's position, starting on the
+          decision tick, before the plan continues. Every decision replaces
+          the hold; the executor never decides on its own whether to wait
+          (TODO-71).
 
     For HumanAgent:
         - Same structure, but driven by script entries instead of AbstractPlan
@@ -90,6 +95,12 @@ class Executor:
         self.current_microaction: Optional[str] = None
         self._queue_was_exhausted: bool = False
 
+        # The decided hold (T4): STAND ticks still to run before the plan
+        # continues, and its planned / executed lengths for the [hold] log.
+        self._hold_remaining: int = 0
+        self._hold_planned: int = 0
+        self._hold_executed: int = 0
+
     # =========================================================================
     # Main step — called once per Mesa step by agent.step()
     # =========================================================================
@@ -101,6 +112,7 @@ class Executor:
         FLOW:
             1. Load plan if new or changed
             2. Get current action
+            2b. Run a decided hold's STAND, if one is in progress
             3. Check if current action is complete → advance if so
             4. Expand microaction queue if empty
             5. Execute one microaction
@@ -126,6 +138,20 @@ class Executor:
         action: GroundedAction = self.current_plan.actions[self.action_index]
         self.current_task = self.current_plan.goal_intention
         self.current_action = action.action_name
+
+        # ------------------------------------------------------------------
+        # 2b. A decided hold runs first: stand where the agent is this tick,
+        #     leaving the plan cursor and microaction queue untouched
+        # ------------------------------------------------------------------
+        if self._hold_remaining > 0:
+            stand = Microaction(name="stand")
+            self.current_microaction = stand.name
+            self._execute(stand)
+            self._hold_remaining -= 1
+            self._hold_executed += 1
+            if self._hold_remaining == 0:
+                self._log_hold_end(interrupted_by=None)
+            return
 
         # ------------------------------------------------------------------
         # 3. Check if current action is already complete
@@ -375,6 +401,34 @@ class Executor:
         self.current_plan = plan
         self.action_index = index
         self.current_task = plan.goal_intention
+
+    def hold(self, ticks: int, trigger: str):
+        """
+        Adopt the hold of the decision just taken (UpdateResult.hold, whole
+        ticks; T4, TODO-71): stand still for `ticks` ticks, starting with this
+        tick's step(), then continue the plan. Called on EVERY decision, so a
+        later trigger's decision replaces a hold in progress — re-realized
+        from where the agent now stands, or 0 when that decision carries none
+        — and the ticks not yet run are logged as interrupted by `trigger`.
+        The executor adds no hold of its own and drops none silently.
+        The STAND carries no `remaining` param, so it records no waited_at:
+        a hold is not a wait_at action and makes no world fact true.
+        """
+        if self._hold_remaining > 0:
+            self._log_hold_end(interrupted_by=trigger)
+        self._hold_remaining = ticks
+        self._hold_planned = ticks
+        self._hold_executed = 0
+        if ticks > 0:
+            logging.info(f"[hold] step={int(self.agent.model.schedule.steps)} {self.agent.unique_id} "
+                         f"start planned={ticks} trigger={trigger} pos={tuple(round(float(c), 2) for c in self.agent.pos)}")
+
+    def _log_hold_end(self, interrupted_by: Optional[str]):
+        logging.info(f"[hold] step={int(self.agent.model.schedule.steps)} {self.agent.unique_id} "
+                     f"end planned={self._hold_planned} executed={self._hold_executed} "
+                     f"interrupted={interrupted_by is not None}"
+                     + (f" by={interrupted_by}" if interrupted_by is not None else ""))
+        self._hold_remaining = 0
 
     def _load_plan(self, plan: AbstractPlan):
         """Load a new plan, resetting action index and queue."""

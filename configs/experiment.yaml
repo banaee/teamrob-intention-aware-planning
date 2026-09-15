@@ -11,3 +11,6 @@ recognizer: uniform_make_domain_model
 
 # Give the robot the observed human's work order as a persistent IR prior (evaluation switch, not a scenario fact)
 assignment_prior: false
+
+# MetaPlanner B2 gate strategy: "none" (default, always escalates to B3) | "b2a" (T4) | "b2b" (stub)
+gate_strategy: "none"

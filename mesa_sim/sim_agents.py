@@ -251,6 +251,7 @@ class RobotAgent(FactoryAgent):
                 max_spatial_step=_get_interference_spatial_resolution(model),
             ),
             human_agent_id=observed_agent_id,
+            gate_strategy=self.model.gate_strategy,
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         )
         self.meta_planner.seed_tasks(assigned_tasks)
@@ -337,6 +338,7 @@ class RobotAgent(FactoryAgent):
             )
 
             if result.current_task is None:
+                self.executor.hold(0, trigger.reason)
                 logging.info(f"[meta] step={int(self.model.schedule.steps)} all tasks complete")
                 self.finished = True
                 self.current_task_instance = None
@@ -371,6 +373,11 @@ class RobotAgent(FactoryAgent):
             )
             if continues:
                 self.executor.continue_plan(self.current_plan)
+            # The decision's hold (T4): executed from this tick on, before the
+            # plan continues; every decision replaces the previous hold (0 when
+            # it carries none), so an interrupted hold is re-decided, never kept
+            # or extended by the body (TODO-71).
+            self.executor.hold(result.hold, trigger.reason)
                             
         self._execute(plan=self.current_plan, world=world)        
     

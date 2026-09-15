@@ -151,6 +151,7 @@ def parse_user_args():
     parser.add_argument("--planner",     type=str,  default=None, help="Planner variant override (e.g. basic, intention_aware)")
     parser.add_argument("--recognizer",  type=str,  default=None, help="Recognizer variant override (e.g. uniform, bayesian)")
     parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
+    parser.add_argument("--gate_strategy", type=str, default=None, choices=["none", "b2a", "b2b"], help="MetaPlanner B2 gate strategy override")
     argv = [a for a in sys.argv[1:] if a != '--']  # strip '--' separator
     return parser.parse_known_args(argv)[0]
 
@@ -179,6 +180,7 @@ def _make_domain_model() -> SimModel:
         "planner":    user_args.planner,
         "recognizer": user_args.recognizer,
         "assignment_prior": user_args.assignment_prior,
+        "gate_strategy": user_args.gate_strategy,
     })
 
     # --------- domain ---------
@@ -213,6 +215,7 @@ def _make_domain_model() -> SimModel:
         register_fn=domain["register_fn"],
         env_layout_path=layout["path"],
         assignment_prior=bool(user_config.get("assignment_prior", False)),
+        gate_strategy=user_config.get("gate_strategy", "none"),
     )
 
 # =============================================================================
@@ -231,6 +234,7 @@ def run_headless():
         "planner":    user_args.planner,
         "recognizer": user_args.recognizer,
         "assignment_prior": user_args.assignment_prior,
+        "gate_strategy": user_args.gate_strategy,
     })
 
     n_steps = user_config["steps"]
@@ -290,6 +294,7 @@ _user_config = load_experiment(_user_args.experiment, {
     "planner":    _user_args.planner,
     "recognizer": _user_args.recognizer,
     "assignment_prior": _user_args.assignment_prior,
+    "gate_strategy": _user_args.gate_strategy,
 })
 
 _domain_args = DOMAIN_REGISTRY[_user_config["domain"]]       #todo later: error handling for nonexistent domain
@@ -299,6 +304,7 @@ _model_params = {
     "register_fn":     _domain_args["register_fn"],
     "env_layout_path": _layout["path"],
     "assignment_prior": bool(_user_config.get("assignment_prior", False)),
+    "gate_strategy": _user_config.get("gate_strategy", "none"),
 }
 
 # print(f"_model_params: {_model_params}")
