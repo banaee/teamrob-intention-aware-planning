@@ -25,11 +25,12 @@ tick; all-unrealizable → plain cost; `b2a` with ρ) and the arrival radius the
 `Projector`. PLANNED paragraphs describe what T3 / T4 / T10 build; the code at this alignment runs
 the old B3 path (`_detect_interference()`, `min_safe_distance = 1.0`, the `RuntimeError`).
 
-**Re-aligned after T3 (September 2026)** for §1.11 and §2.2c: `realize()` and `RealizedPlan` exist
-(`shared/realization.py`, `shared/types.py`) as a standalone service, validated against T1b's `whole`
-realizer on the test set. Nothing consumes them yet: `MetaPlanner` still runs the old B3 path, and the
-sweep is byte-identical to the L2 baselines. The remaining PLANNED paragraphs are T4's (`b2a`) and
-T10's (B3 on realized cost, `UpdateResult.hold`, the executor's hint).
+**Re-aligned after T3 and T3b (September 2026)** for §1.11 and §2.2c: `realize()` and `RealizedPlan`
+exist (`shared/realization.py`, `shared/types.py`) as a standalone service, validated against T1b's
+`whole` realizer on eight conditions; the hold δ is in whole ticks and T_r fractional (T3b). Nothing
+consumes them yet: `MetaPlanner` still runs the old B3 path, and the sweep is byte-identical to the L2
+baselines. The remaining PLANNED paragraphs are T4's (`b2a`) and T10's (B3 on realized cost, the plain
+cost as `projected_duration`, `UpdateResult.hold`, the executor's hint).
 
 ---
 
@@ -406,7 +407,7 @@ whole-trajectory minimal shift (design_decisions.md, "The robot can wait", the R
 @dataclass
 class RealizedPlan:
     realizable: bool                      # a clearing shift exists (see §2.2c); always True without a human projection
-    delta: Optional[float]                # the hold, steps ≥ 0; None when unrealizable
+    delta: Optional[int]                  # the hold, WHOLE ticks ≥ 0 (T3b); None when unrealizable
     cost: Optional[float]                 # T_r + delta over the FULL plan; None when unrealizable
     projected_duration: float             # T_r: the span of the plan's segments (fractional steps)
     segments: List[Segment]               # the hold (stationary, when of positive duration) then every
@@ -429,9 +430,21 @@ class RealizedPlan:
   when no candidate realizes is R1's: plain projected cost, logged `all_unrealizable` (§2.2).
 - `reason == "no_human_projection"` is the shape of "no projection admitted": δ = 0, cost = T_r,
   share 1.0. A caller may treat it exactly as it treats `human_projection is None` today.
-- T_r is the segments' span, fractional, not `ProjectedPlan.total_estimated_cost` (its integer
-  rounding). Whether B3 compares fractional realized costs against integer plain costs in the
-  all-unrealizable fallback is T10's to settle.
+- **Quantisation — DECIDED (T3b; design_decisions.md, "Realization as built").** `delta` is in
+  WHOLE ticks: the smallest whole-tick shift that clears the assessed window, walked over the exact
+  violating intervals (not the fractional minimum rounded up — feasibility in δ is not monotone, so
+  ceil can land in a second violating interval and the walk continues past it). Reasoning: the hold
+  is executed as STAND ticks, so the plan that is checked and costed must be the plan that is
+  executed; rounding at execution would break the separation (down; the minimal shift has no
+  margin) or leave the executed plan unchecked (up). T_r STAYS FRACTIONAL: it is the projection's
+  continuous duration; execution quantises per walk and that is deliberately not compensated (L2);
+  rounding the total would model nothing and could only turn an order into a tie. `cost` is one
+  quantity — the projected duration of the realized trajectory. CONSEQUENCE FOR T10: the plain cost
+  `update()` compares in the no-projection path and the all-unrealizable fallback must be the same
+  T_r, `projected_duration`, not `ProjectedPlan.total_estimated_cost` (its integer rounding).
+- The steps before the human projection's span (the observation offset, L2) are unassessed and NOT
+  in `unassessed_share`, which counts the tail beyond T_h only (T3b ruling).
+- A violation is strict: a single instant at exactly `min_separation` is not one (T3b ruling).
 
 ---
 
@@ -814,10 +827,12 @@ realize(
 at `decision_step` (the plan's first segment's start, which may be partway along a walk), then the
 whole plan shifted by δ. δ is the smallest shift ≥ 0 such that the shifted trajectory — including
 the stationary hold at that position over [decision_step, plan start + δ] — has no violation in the
-assessed window. Exact: δ is the right end of the union of violating shift intervals
-(`shift_violation_interval`, one per robot × human segment pair) that covers 0, or 0 itself. No
-search, no grid: the feasible set in δ is not monotone (a shift can clear one crossing and walk into
-the next), so bisection would be invalid and a grid would make δ sampled.
+assessed window, IN WHOLE TICKS (T3b). Exact: the violating shift intervals
+(`shift_violation_interval`, one per robot × human segment pair) are walked in order of their start;
+δ starts at 0 and, whenever an interval strictly contains it, jumps to the first whole tick at or
+after that interval's end. No search, no grid: the feasible set in δ is not monotone (a shift can
+clear one crossing and walk into the next), so bisection would be invalid, a grid would make δ
+sampled, and the whole-tick δ is not simply the fractional minimum rounded up.
 
 **The assessed window** is where both projections exist and the realized plan lies within
 [decision_step, T_h], T_h the end of the human projection: nothing past T_h is assessed or charged,
@@ -842,11 +857,13 @@ projection today.
 
 **Raises** `ValueError` for a plan with no segments, or one starting before `decision_step`.
 
-**Validated (T3, `analysis/t3_realize/validate.py`)** against T1b's `whole` realizer
-(`analysis/t1b_realization/realize.py`, a 0.01-tick grid over the same shift) at 50 cm on the test
-set (scenario_20, scenario_30, prior off and on): 38 of 38 admitted candidate rows agree on
-realizability, δ and cost to the grid; every realized trajectory is clear by T1b's closed form and
-by dense sampling. Not exercised there: `hold_reaches_horizon` (no test-set row holds that long).
+**Validated (T3, T3b; `analysis/t3_realize/validate.py`)** against T1b's `whole` realizer
+(`analysis/t1b_realization/realize.py`, a 0.01-tick grid over the same shift, fractional δ) at 50 cm
+on eight conditions (scenario_00/10/20/30, prior off and on): 94 of 94 admitted candidate rows agree
+on realizability; 82 are identical and 12 differ only by the whole-tick rounding (each the ceil of
+the fractional δ); every realized trajectory is clear by T1b's closed form and by dense sampling,
+hold included. Not exercised by the fixtures: `hold_reaches_horizon`, and a walk continuing past a
+second interval (both covered by constructed cases only).
 
 ---
 

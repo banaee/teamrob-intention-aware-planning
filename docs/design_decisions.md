@@ -1495,8 +1495,11 @@ selection"):
             |
     meta_planner.py            MetaPlanner     which trajectory to pick
 
-`MetaPlanner` never reaches below `projection.py`; realization never reaches above
-`trajectory_algorithms.py` for its geometry and knows nothing of tasks, beliefs or selection.
+`MetaPlanner` consumes `realize()` from the projection layer — the one call it makes below itself
+besides `Projector`, and it supplies `min_separation` (CORRECTED at T3b: the earlier "never reaches
+below `projection.py`" wording contradicted the `update()` sketch below, which calls `realize()`
+directly); realization never reaches above `trajectory_algorithms.py` for its geometry and knows
+nothing of tasks, beliefs or selection.
 Pluggable strategies, mirroring how `trajectory_algorithms.py` is organised:
 - hold-only — TO BE IMPLEMENTED (later task): stand still until the way is clear, then proceed;
 - detour — documented, unimplemented: go around. Needs a path planner and introduces iteration
@@ -1506,6 +1509,8 @@ Interface (design; the exact signature is the implementer's):
 
     realize(projected_plan, human_projection, min_separation, start_tick)
         -> RealizedPlan | None        # None: no realization within the horizon
+    AS BUILT (T3; ruling T3b): realize(plan, human_plan, min_separation, decision_step)
+        -> RealizedPlan               # never None: `realizable` flag and a `reason`
 
 `RealizedPlan` carries: the placed (shifted) segments; the hold δ (where — the trigger position —
 and how long); the realized cost T_r + δ; and the share of the trajectory lying BEYOND the human's
@@ -1521,6 +1526,7 @@ has no violation in the assessed window. In outline:
               hold at p_trigger for [trigger, trigger + d],
               then the projected segments shifted by d }
     if no such d exists, or the only ones extend the hold to T_h: unrealizable (None)
+    (as built: unrealizable = RealizedPlan(realizable=False, reason); d in WHOLE ticks — T3b, below)
     return RealizedPlan(shifted segments, hold = (p_trigger, δ), cost = T_r + δ, unassessed share)
 
 This REPLACES the per-segment loop written in the first version of this entry (hold each segment at
@@ -1783,6 +1789,70 @@ Files: shared/projection.py (`Projector.__init__`, `build_segments`, `project_hu
 mesa_sim/executor.py (`ACTION_COMPLETION_LATENCY`), mesa_sim/sim_agents.py (`OBSERVATION_OFFSET`,
 Projector construction), analysis/l2_execution_lag/
 Reference: L2 session, September 2026; TODO-77; T9; M1
+
+**Realization as built: RealizedPlan with a flag, the hold in whole ticks, T_r fractional, the horizon and offset edges (T3, T3b)**
+`realize()` exists (`shared/realization.py`, T3) as a standalone service, validated against T1b's
+`whole` realizer, and not yet consumed (T4, T10). Its geometry is exact: for one robot segment
+against one human segment the set of violating SHIFTS is one open interval (with u the robot's time
+into its segment the relative position is affine in (u, d); the violating set is convex and its
+intersection with the moments both exist projects onto d as one interval), enumerated in closed form
+(`trajectory_algorithms.shift_violation_interval`); the hold-position check is
+`first_approach_step`. No sampling in time, none in d. The rulings taken on the T3 report, and the
+quantisation decision, are recorded here.
+
+RULINGS (T3b):
+- `realize()` RETURNS A `RealizedPlan`, never None: `realizable` is a flag and `reason` says why
+  ("realized", "no_human_projection", "hold_position_violated", "hold_reaches_horizon"). The
+  `RealizedPlan | None` in the interface sketch above is superseded. An unrealizable plan has no
+  `delta`, `cost`, segments or share.
+- THE HOLD CAP as implemented: plan start + δ ≥ T_h is unrealizable ("hold_reaches_horizon");
+  δ = 0 is never a hold and is never capped, so a plan that starts at or after T_h is realizable and
+  fully unassessed.
+- THE OBSERVATION OFFSET IS UNASSESSED AND NOT IN THE SHARE: the human's projection starts at the
+  offset (L2), so the first tick of every plan is outside the assessed window — nothing was observed
+  of the human there — and the unassessed share counts only the part of the realized plan beyond T_h,
+  the tail a hold pushes past the horizon (TODO-69). The offset is a property of the observation,
+  the same for every candidate at a trigger.
+- LAYERING WORDING: `MetaPlanner` consumes `realize()` from the projection layer (corrected above).
+- A VIOLATION IS STRICT: a single instant at exactly `min_separation` is not a violation. The
+  violating shift intervals are open, and their endpoints — where the distance touches
+  `min_separation` — are clear.
+
+QUANTISATION OF δ AND COST — DECIDED (T3b), from the design, before the evaluation:
+δ IS IN WHOLE TICKS. `realize()` returns the smallest whole-tick shift that clears the assessed
+window, found by walking the exact violating intervals over the integers (δ starts at 0 and, whenever
+an interval strictly contains it, jumps to the first whole tick at or after that interval's end; one
+sorted pass suffices since δ never decreases). Reasoning: the hold reaches the body as STAND
+microactions, one per tick (T4, TODO-71), so a fractional δ cannot be executed as computed; rounding
+at execution is unsafe both ways — down breaks the separation, because the minimal shift has no
+margin, and up is not guaranteed to clear, because feasibility in δ is not monotone (a shift can
+clear one crossing and walk into the next, so ceil(δ) may sit inside a second violating interval).
+With δ whole the plan that is checked and costed is the plan that is executed. The whole-tick δ is
+therefore NOT ceil of the fractional minimum — where ceil lands inside a later interval the walk
+continues past it. Rejected: fractional δ with the body rounding up (d1), for the reasons above.
+T_r STAYS FRACTIONAL. T_r is the projection's continuous duration (the span of the plan's segments);
+execution quantises per WALK (each walk runs ceil(dur) steps), and L2 decided not to compensate
+that. Rounding the total would be a second quantisation that models nothing — it is neither the
+per-walk ceil execution applies nor anything the body does — and, being monotone, it cannot reorder
+candidates, only turn an order into a tie resolved by pool order. cost = T_r + δ is then ONE
+quantity: the projected duration of the realized trajectory, its hold in whole ticks because the
+hold is executed as ticks. CONSEQUENCE FOR T10: the plain cost `update()` compares in the
+no-projection path and in the all-unrealizable fallback must be the same T_r —
+`RealizedPlan.projected_duration`, the fractional span — not `ProjectedPlan.total_estimated_cost`,
+whose integer rounding is a display convenience and would put the fallback in a different quantity
+from B3's argmin.
+EVALUATED (T3b, `analysis/t3_realize/validation.md`; eight conditions s00/s10/s20/s30 × prior
+off/on, s = 50 cm, 94 admitted candidate rows): realizability agrees with T1b's fractional `whole`
+in every row; 82 rows are identical and 12 differ only by the rounding, every one of them the ceil
+of the fractional δ (no walk continued past a second interval, and no rounding reached T_h or the
+hold bound in the fixtures). The rounding costs 0.05–0.87 tick per held row, moves no argmin, and
+lifts the held rows' minimum distance from exactly 50 cm to 50.9–55.2 cm — a side effect of
+execution's granularity, not a margin. The evaluation is consistent with the reasoning; it did not
+decide it.
+Files: shared/realization.py, shared/types.py (`RealizedPlan`), shared/trajectory_algorithms.py
+(`shift_violation_interval`, `first_approach_step`), shared/io_contracts.md (§1.11, §2.2b, §2.2c),
+analysis/t3_realize/
+Reference: T3 and T3b sessions, September 2026; R1; T1b (`whole`); L2 (the offset, step quantisation)
 
 **A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
 When `update()` returns the task the robot is already executing — a CONTINUE, decided by
