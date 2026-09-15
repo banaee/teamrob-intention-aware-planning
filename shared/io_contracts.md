@@ -492,7 +492,7 @@ MetaPlanner(
     knowledge: DomainKnowledgeBase,
     projector: Projector,
     recognizer: IntentionRecognizer,
-    theta: float = 0.75,
+    theta: float = DEFAULT_THETA,        # 0.75, module-level in shared/meta_planner.py
     min_safe_distance: float = 1.0,
     strategy: Literal["single_task", "full_reorder"] = "single_task",
     gate_strategy: Literal["none", "b2a", "b2b"] = "none",
@@ -509,7 +509,14 @@ the agent); `gate_strategy` selects B2 — `"none"` (default) skips the gate ent
 Owns the task queue internally (Q1) — not passed in on each call. `theta` is a cognitive-
 clock policy parameter (DESIGN-07), kept as an explicit constructor default rather than
 read from `costs.yaml` — `costs.yaml` holds domain-specific step costs, a different concern
-from IR confidence-gating.
+from IR confidence-gating. Its single definition is `shared.meta_planner.DEFAULT_THETA`
+(September 2026; a second, unread copy in `recognizer.py` was deleted — the gate is the
+meta-planner's decision, not a likelihood parameter). No call site passes `theta`, so the
+default governs every run. θ is applied in exactly one private method,
+`_clears_gate(belief) -> bool`, which both `evaluate_triggers()` (as a crossing) and
+`update_human_projection()` (as admission) ask; it is deliberately one method so that a
+derived θ (TODO-64) or a margin gate (TODO-65) would change how the bar is computed without
+changing where it is asked. See design_decisions.md, "θ has one home".
 
 `recognizer` is the **same live instance** the owning agent holds, not a second one built
 here — `get_hypothesis()` is a static lookup built once at recognizer construction and is

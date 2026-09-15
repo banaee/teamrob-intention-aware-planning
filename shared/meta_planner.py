@@ -143,6 +143,29 @@ from shared.planner import AdaptivePlanner
 from shared.projection import Projector
 from shared.trajectory_algorithms import discretized_time_sampling
 
+
+# =============================================================================
+# The cognitive-clock confidence gate (DESIGN-07)
+# =============================================================================
+
+DEFAULT_THETA = 0.75
+"""
+The single definition of theta. The gate is the META-PLANNER's decision — the
+recognizer produces the belief and never judges it (recognizer_handback.md §2)
+— so the value lives beside the one method that applies it, _clears_gate().
+
+Importable by name (`from shared.meta_planner import DEFAULT_THETA`) for
+visualization or evaluation code that wants to draw or report the bar without
+constructing a MetaPlanner. Per-instance overrides go through the constructor's
+`theta` parameter; no call site passes one today — mesa_sim/sim_agents.py is the
+only place a MetaPlanner is constructed, and ros_sim/ (paused) constructs none —
+so this default governs every run.
+
+NOT a settled constant — see _clears_gate() for the two open directions
+(TODO-64, TODO-65) and why they touch only that method.
+"""
+
+
 class MetaPlanner:
     """
     See shared/io_contracts.md §2.2 for the interface contract this class implements.
@@ -153,7 +176,7 @@ class MetaPlanner:
         knowledge: DomainKnowledgeBase,
         projector: Projector,
         recognizer: IntentionRecognizer,
-        theta: float = 0.75,
+        theta: float = DEFAULT_THETA,
         min_safe_distance: float = 1.0,
         strategy: Literal["single_task", "full_reorder"] = "single_task",
         gate_strategy: Literal["none", "b2a", "b2b"] = "none",
@@ -173,6 +196,10 @@ class MetaPlanner:
                                  list that constructing a second instance would add.
         theta:                   cognitive-clock confidence threshold (DESIGN-07). Gate
                                  only — never fed into _cost() as a magnitude.
+                                 Defaults to DEFAULT_THETA (module level, the single
+                                 definition). Applied in exactly one place,
+                                 _clears_gate(); do not compare against self._theta
+                                 anywhere else.
         min_safe_distance:       distance threshold below which a ConflictPoint makes a
                                  candidate infeasible (see _detect_interference()).
                                  Placeholder default, same "needs calibration" status as
@@ -257,10 +284,12 @@ class MetaPlanner:
               existing current_plan=None pattern in RobotAgent.step(). If that
               wiring choice changes, a separate task_completed check would need
               to be reintroduced here.
-            - theta_crossed: belief.confidence crosses self._theta from below to
-              at/above it (DESIGN-07: single threshold, no hysteresis — this is a
-              crossing event, not "confidence >= theta" every tick, or it would
-              refire continuously while confidence stays high).
+            - theta_crossed: the confidence gate goes from closed to open —
+              _clears_gate() is False on the previous belief and True on this
+              one (DESIGN-07: single threshold, no hysteresis; a crossing
+              EVENT, not "the gate is open" every tick, or it would refire
+              continuously while confidence stays high). The bar itself is
+              _clears_gate()'s business, never compared here.
             - task_commit: executor_state.holding transitions from None to
               not-None (robot just picked something up).
 
@@ -272,7 +301,8 @@ class MetaPlanner:
         else:
             theta_crossed = (
                 self._prev_belief is not None
-                and self._prev_belief.confidence < self._theta <= belief.confidence
+                and not self._clears_gate(self._prev_belief)
+                and self._clears_gate(belief)
             )
             task_committed = (
                 self._prev_executor_state is not None
@@ -305,13 +335,16 @@ class MetaPlanner:
         human_projection argument.
 
         Admission is a MetaPlanner decision — Projector holds no policy. A
-        projection is admitted only when belief.confidence >= self._theta: below
-        that the most-likely hypothesis is not evidence, and an interference
-        check against it would be a check against noise. theta is a gate here as
-        it is in evaluate_triggers() (DESIGN-07) — never fed into _cost().
+        projection is admitted only when the belief clears the confidence gate
+        (_clears_gate(), the single place theta is applied): below the bar the
+        most-likely hypothesis is not evidence, and an interference check
+        against it would be a check against noise. Same gate as
+        evaluate_triggers() asks, on the current belief rather than as a
+        crossing (DESIGN-07) — never fed into _cost().
 
         Returns None, in this order, when
-          - belief.confidence is below theta (the projector is not called),
+          - the belief does not clear the gate (_clears_gate(); the projector is
+            not called),
           - no human is observed,
           - belief.most_likely is the recognizer's `unknown` (the projector is
             not called): mass on `unknown` above theta is not a recognition —
@@ -328,7 +361,7 @@ class MetaPlanner:
         caller. Both are recoverable by adjacency — this is called only on a
         fired trigger, so the [meta-trig] line of the same tick precedes it.
         """
-        if belief.confidence < self._theta:
+        if not self._clears_gate(belief):
             reason = "none(below_theta)"
             projection = None
         elif self._human_agent_id is None:
@@ -452,6 +485,43 @@ class MetaPlanner:
     # =========================================================================
     # Internal (not part of io_contracts.md — private to this class)
     # =========================================================================
+
+    def _clears_gate(self, belief: BeliefState) -> bool:
+        """
+        THE confidence gate (DESIGN-07): has this belief cleared the bar the
+        meta-planner is willing to act on? The ONLY place theta is applied.
+        Both consumers ask this question and neither compares numbers itself:
+          - evaluate_triggers(): `theta_crossed` is the CROSSING of this
+            predicate, False on the previous belief and True on this one — an
+            event, not "the gate is open" every tick (or it would refire
+            continuously while confidence stays high);
+          - update_human_projection(): admission, this predicate on the
+            current belief.
+        Kept as one method deliberately. The gate is a decision the
+        meta-planner makes FROM the belief, not a comparison welded into its
+        call sites, because two open directions would change how the bar is
+        computed without changing where it is asked (neither is implemented,
+        and nothing here should be read as favouring either):
+          - theta DERIVED rather than fixed (TODO-64): a function of the live
+            hypothesis set, of layout geometry, or both. A fixed 0.75 is a
+            different evidential bar over a three-hypothesis live set than an
+            eight-hypothesis one, since the reachable ceiling is 1/(1 + u^n).
+          - a MARGIN or likelihood-ratio gate replacing the absolute test
+            (TODO-65): fire when the leading hypothesis is far enough ahead of
+            the runner-up, of `unknown`, or of the rest of the field. 0.5
+            against a field of 0.1s is a stronger signal than 0.6 against a
+            field of 0.2s, and an absolute threshold cannot see the difference.
+        `belief` alone already carries what both need except layout geometry:
+        belief.distribution holds the live set and every rival's mass. A
+        geometry-derived theta would add a `world` argument HERE, and the two
+        call sites above already hold a WorldState to pass.
+
+        Returns True when the belief clears the bar. Deliberately says nothing
+        about what clearing MEANS: reading the crossing as "a task has just
+        become recognised" is a stronger claim than the contract makes
+        (TODO-68), and that reading must not be built into this name.
+        """
+        return belief.confidence >= self._theta
 
     def seed_tasks(self, tasks: List[TaskInstance]) -> None:
         """

@@ -751,6 +751,72 @@ recoverable from the `[meta-trig]` line of the same tick.
 Files: shared/meta_planner.py (`update_human_projection`)
 Reference: evidence-gated projection admission session, September 2026
 
+**θ has one home: the meta-planner owns the gate, and the gate is one method**
+θ had TWO definitions and only one was read. `shared/recognizer.py` held
+`CONFIDENCE_THRESHOLD = 0.75` that nothing imported, and `shared/meta_planner.py` held
+`theta: float = 0.75` as a constructor default that governs every run. That is worse than a
+plain duplicate: the recognizer's copy sat where a reader would look for it and editing it
+did nothing. Grep at the time of the change: `MetaPlanner(` occurs at exactly ONE call site
+in the repo, `mesa_sim/sim_agents.py`, and it does NOT pass `theta` — so the constructor
+default is the real source, not a fossil of a call-site value. `ros_sim/` (paused) constructs
+no MetaPlanner at all.
+
+DECIDED (September 2026). The value lives in `shared/meta_planner.py` as a module-level
+`DEFAULT_THETA = 0.75`, which the constructor takes as its `theta` default. The recognizer's
+constant is DELETED, with a comment in its place saying where θ went and why it is not there.
+
+Why the meta-planner and not the recognizer: the gate is a DECISION, not a likelihood
+parameter. The recognizer produces the belief and never judges it — `recognizer_handback.md`
+§2 already listed θ as "the meta-planner's gate, not a likelihood parameter", so the value
+sitting in `recognizer.py` contradicted the recognizer's own hand-back. Why not a third,
+neutral module: there is no home for it in the existing structure (`types.py` is dataclasses,
+`domain_knowledge.py` is domain knowledge, `likelihood_functions.py` is the evidence model's
+constants) and inventing one for a single value is a config system for a single value. A
+module-level named constant keeps the number beside the one method that applies it while
+staying importable — `from shared.meta_planner import DEFAULT_THETA` — for visualization or
+evaluation code that wants to draw or report the bar without constructing a MetaPlanner.
+
+The shape that matters is not where the number sits but that the gate is asked in ONE place.
+`MetaPlanner._clears_gate(belief) -> bool` is now the only comparison against θ, and both
+consumers ask it rather than comparing numbers themselves: `evaluate_triggers()` fires
+`theta_crossed` when the predicate is False on the previous belief and True on this one (the
+crossing stays an EVENT, DESIGN-07, unchanged), and `update_human_projection()` admits when
+the predicate holds on the current belief. `self._theta` is now read in exactly two places:
+inside `_clears_gate()`, and in the `[meta-proj]` log line that reports the bar.
+
+This is deliberately the shape that survives both open directions, NEITHER of which is
+implemented or favoured here: θ DERIVED rather than fixed (TODO-64) — a function of the live
+hypothesis set, of layout geometry, or both, since a fixed 0.75 is a different evidential bar
+over three live hypotheses than over eight when the reachable ceiling is 1/(1 + uⁿ); and a
+MARGIN or likelihood-ratio gate replacing the absolute test (TODO-65) — fire when the leader
+is far enough ahead of the runner-up, of `unknown`, or of the rest of the field, because 0.5
+against a field of 0.1s is a stronger signal than 0.6 against a field of 0.2s and an absolute
+number cannot see the difference. Both change how the bar is COMPUTED, not where it is asked,
+so both land inside `_clears_gate()`. `belief.distribution` already carries the live set and
+every rival's mass, so the current signature suffices for both; only a geometry-derived θ
+would need a `world` argument, and both call sites already hold a `WorldState` to pass.
+
+Not an argument for either direction: that a lower θ fires earlier. An earlier trigger is not
+better by itself — M1 (`analysis/m1_theta_earlier/`) measured θ = 0.65 on scenario_30 and found
+the first crossing moved 21 → 15 prior-on and 28 → 24 prior-off, with no decision change, no
+extra trigger and byte-identical behaviour; and offline realization at the moved triggers came
+out better in one prior and WORSE in the other, because what decides the outcome is whether the
+trigger lands before, during or after the encounter, not how early it is.
+
+Behaviour unchanged: same value, same comparison, all ten sweep conditions byte-identical.
+Four analysis scripts still hardcode 0.75 to interpret their own logs
+(`analysis/f1_foreseeable_fixture/measure.py`, `analysis/i3_phase_model/check_i3.py`,
+`analysis/i4_evidence_model/check_i4.py`, `analysis/i4_evidence_model/pivot.py`) and are LEFT
+hardcoded ON PURPOSE: they are records of runs made at θ = 0.75, and reading a live value would
+silently reinterpret those logs if θ later changes or becomes derived. `analysis/i1_ir_audit/
+measure.py` read the deleted recognizer constant and now carries the same literal for the same
+reason. Recording θ in each run's log header would fix this properly (TODO-78) — it changes
+logs, so it is not done here.
+Files: shared/meta_planner.py (`DEFAULT_THETA`, `_clears_gate`, `evaluate_triggers`,
+`update_human_projection`), shared/recognizer.py (constant deleted),
+analysis/i1_ir_audit/measure.py
+Reference: theta single-source session, September 2026; TODO-64, TODO-65, TODO-78; M1
+
 **One leg is one observation — replace, do not multiply**
 Measured in every leg of every run (scenarios 00/10/20, switch off and on,
 PYTHONHASHSEED=0): the human's heading varies by **≤ 0.04°** within a movement leg, so

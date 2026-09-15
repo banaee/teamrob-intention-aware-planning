@@ -163,7 +163,12 @@ def run_condition(name, layout, scenario, steps, prior, out_dir):
             "ZONE_BOOST": rec_mod.ZONE_BOOST, "TEMPERATURE_BOOST": rec_mod.TEMPERATURE_BOOST,
             "FATIGUE_BOOST": rec_mod.FATIGUE_BOOST, "HIGH_TEMP_THRESHOLD": rec_mod.HIGH_TEMP_THRESHOLD,
             "LONG_SHIFT_THRESHOLD": rec_mod.LONG_SHIFT_THRESHOLD,
-            "CONFIDENCE_THRESHOLD": rec_mod.CONFIDENCE_THRESHOLD, "BELIEF_FLOOR": rec_mod.BELIEF_FLOOR,
+            # recognizer.CONFIDENCE_THRESHOLD was deleted in September 2026 (it had no
+            # reader; theta's one home is meta_planner.DEFAULT_THETA). The literal is the
+            # value that stood in recognizer.py when these I1 logs were produced, kept so
+            # this record still describes that run — as the other analysis scripts keep
+            # their own hardcoded 0.75. The live gate was, and is, theta_meta_planner below.
+            "CONFIDENCE_THRESHOLD": 0.75, "BELIEF_FLOOR": rec_mod.BELIEF_FLOOR,
             "theta_meta_planner": mp._theta,
             "context_room_temperature": rec.context.room_temperature,
             "context_shift_start_step": rec.context.shift_start_step,

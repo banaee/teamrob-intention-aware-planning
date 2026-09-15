@@ -1735,8 +1735,20 @@ stretch only if the rivals' summed odds fall below 1/3 − u ≈ 0.233 (u = 0.1)
 layout's decoy geometry decide it — s20_off needs the arrival's fold), or only after a verifiable phase
 (then θ is a prefix-length bar, not a fit bar)? Undecided; measure nothing until it is decided together
 with TODO-65.
-Files: shared/recognizer.py (`_output`), shared/meta_planner.py (θ)
-Reference: F1 fixture session; I4b/I4c/I4d reports; I5 hand-back
+RESTATED AS AN OPEN DIRECTION (θ single-source session, September 2026): θ DERIVED RATHER THAN FIXED — a
+function of the SIZE OF THE LIVE HYPOTHESIS SET, of LAYOUT GEOMETRY, or of both, instead of one constant.
+A fixed 0.75 is a different evidential bar over a three-hypothesis live set than over an eight-hypothesis
+one, because the reachable ceiling is 1/(1 + uⁿ) over n observations. OPEN, nothing chosen, nothing
+measured. Where it would land in code: `MetaPlanner._clears_gate(belief)`, now the only place θ is applied
+— `belief.distribution` already carries the live set, and a geometry-derived θ would add a `world`
+argument there, which both call sites already hold. The consolidation that made this a one-method change
+is recorded in design_decisions.md, "θ has one home".
+NOT an argument for lowering θ: that it fires earlier. M1 (`analysis/m1_theta_earlier/`) measured θ = 0.65
+on scenario_30 — the first crossing moved 21 → 15 prior-on and 28 → 24 prior-off with no decision change
+and byte-identical behaviour, and offline realization at the moved triggers was better in one prior and
+worse in the other. An earlier trigger is not better by itself.
+Files: shared/recognizer.py (`_output`), shared/meta_planner.py (`_clears_gate`, `DEFAULT_THETA`)
+Reference: F1 fixture session; I4b/I4c/I4d reports; I5 hand-back; θ single-source session, September 2026
 
 **TODO-65 — Whether the gate should be a likelihood ratio rather than a normalised posterior** [OPEN since I1]
 Confidence is a normalised posterior over the live set, so θ = 0.75 is a different evidential bar in a
@@ -1745,8 +1757,21 @@ with three live rivals and 143 with seven). The recognizer's evidence state alre
 `unknown` (I4d's invariant); a gate on odds_k against `unknown`, or on the ratio of the top two, would be
 live-set-invariant. An interface/design question for the meta-planner side (what `confidence` means at the
 gate), not a likelihood question. Decide with TODO-64 and TODO-68.
-Files: shared/recognizer.py (`_output`, `BeliefState.confidence`), shared/meta_planner.py (`evaluate_triggers`)
-Reference: I1 audit; I5 hand-back
+RESTATED AS AN OPEN DIRECTION (θ single-source session, September 2026): a MARGIN gate replacing the
+absolute test — fire when the leading hypothesis is sufficiently AHEAD, rather than sufficiently HIGH. 0.5
+against a field of 0.1s is a stronger signal than 0.6 against a field of 0.2s, and an absolute threshold
+cannot see the difference. Three candidate references, NONE CHOSEN: the margin against the RUNNER-UP (the
+ratio of the top two); against `unknown` (the odds the evidence state already is, I4d); or against the
+REST OF THE FIELD (the leader's mass over the summed rest). Each is live-set-invariant in a different way
+and they disagree whenever the field is skewed rather than flat; picking one is the decision, and it has
+not been made. OPEN, nothing measured. Where it would land in code: `MetaPlanner._clears_gate(belief)`,
+now the only place the gate is asked — it already receives the whole `BeliefState`, so every one of the
+three references is computable from `belief.distribution` without a signature change, and
+`evaluate_triggers()` keeps asking for a CROSSING of whatever the predicate becomes (DESIGN-07's event
+semantics is unaffected). See design_decisions.md, "θ has one home".
+NOT an argument for any of the three: that a gate fires earlier — see the M1 note under TODO-64.
+Files: shared/recognizer.py (`_output`, `BeliefState.confidence`), shared/meta_planner.py (`_clears_gate`)
+Reference: I1 audit; I5 hand-back; θ single-source session, September 2026
 
 **TODO-66 — The context / knowledge-representation pass: `_context_weight` branches on literal task names** [DEFERRED deliberately]
 `_context_weight` still tests `hyp.task_name == "ac_activation"` and `"coffee_break"` and carries its own
@@ -1973,6 +1998,21 @@ accept it and read T_r and T_h as 1–4 ticks optimistic. It matters for realiza
 hold is measured against T_h and every arrival gap at the table is of the order of these offsets.
 Files: mesa_sim/executor.py (`step`, `_is_action_complete`), shared/projection.py, mesa_sim/sim_agents.py
 Reference: T9 (`analysis/t9_arrival_radius/REPORT.md`, "The premise, measured")
+
+**TODO-78 — A run's log does not record the θ it was produced at** [from the θ single-source session]
+Nothing in a headless log states the gate's value, so a log cannot be interpreted without knowing which
+code produced it. Five analysis scripts therefore hardcode 0.75 to read their own logs
+(`analysis/f1_foreseeable_fixture/measure.py`, `analysis/i3_phase_model/check_i3.py`,
+`analysis/i4_evidence_model/check_i4.py` and `pivot.py`, `analysis/i1_ir_audit/measure.py`) — correctly,
+since they are records of runs made at that value and reading a live constant would silently reinterpret
+old logs the day θ changes or becomes derived (TODO-64, TODO-65). The `[meta-proj]` line does carry
+`theta=`, but only on ticks where a trigger fired and a projection was considered, so it is not a header
+and is absent from runs with no admitted trigger. Proper fix: one run-header line naming the parameters a
+log was produced under (θ at least; `min_separation` and ρ join it when T10 and T4 land). It CHANGES EVERY
+LOG, so it needs a baseline regeneration and does not belong in a behaviour-preserving change; do it when
+a task is regenerating baselines anyway. Until then the hardcoded literals stay, and are correct.
+Files: mesa_sim/run_mesa.py (logging setup), shared/meta_planner.py, analysis/*/ (readers)
+Reference: θ single-source session, September 2026
 
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β

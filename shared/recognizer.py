@@ -179,7 +179,13 @@ FATIGUE_BOOST      = 2.5
 HIGH_TEMP_THRESHOLD    = 26.0
 LONG_SHIFT_THRESHOLD   = 500
 
-CONFIDENCE_THRESHOLD = 0.75
+# theta is NOT here. The confidence gate is the meta-planner's decision, not a
+# likelihood parameter (recognizer_handback.md §2) — this module produces the
+# belief and never judges it. A CONFIDENCE_THRESHOLD = 0.75 sat here until
+# September 2026 with no reader in shared/ or mesa_sim/; editing it looked
+# authoritative and did nothing. The single definition is
+# shared/meta_planner.py's DEFAULT_THETA (design_decisions.md, "theta has one
+# home: the meta-planner owns the gate").
 
 # Floor applied after normalization — prevents belief collapse to exact zero,
 # which otherwise cannot recover through multiplicative Bayesian update.
