@@ -1,8 +1,10 @@
 """
 analysis/t3_realize/validate.py  (T3 — validation of shared/realization.realize())
 
-Runs the four test-set conditions (scenario_20 on env_layout2, scenario_30 on
-env_layout3, assignment prior off and on, 200 steps) with T1b's instance-level
+Runs the eight test-set conditions (T3b: scenario_00 on env_layout0,
+scenario_10 on env_layout1, scenario_20 on env_layout2, scenario_30 on
+env_layout3; assignment prior off and on; the L2 baselines' step counts) with
+T1b's instance-level
 wrappers (analysis/t1b_realization/measure.py: shared/ untouched, no decision
 changed), which record at every fired trigger the human projection and every
 candidate projection B3 built. Then, at every ADMITTED trigger
@@ -22,8 +24,21 @@ candidate projection B3 built. Then, at every ADMITTED trigger
        - the HOLD CAP (R1, decided after T1b): `whole` reports a shift that
          reaches T_h as realized with `shift_past_horizon=True`; here such a
          row counts as UNREALIZABLE, which is what the cap says.
-     Agreement: realizability; δ to within the grid (0.01); cost = T_r + δ
-     likewise.
+     Agreement, with realize()'s δ in WHOLE ticks (T3b) and `whole`'s on a
+     0.01 grid: realizability; δ; cost = T_r + δ. Rows are classified:
+       identical      — same realizability, δ equal (both 0, or whole's δ is
+                        already a whole tick within the grid), cost equal;
+       quantisation   — both realizable, realize()'s δ is the first whole
+                        tick at or above whole's δ (ceil), cost differs by
+                        exactly that;
+       quant:skip     — both realizable, realize()'s δ is LARGER than
+                        ceil(whole's δ): that whole tick sits inside a later
+                        violating interval (non-monotone feasibility), so the
+                        walk continued;
+       quant:cap/hold — whole realizes at a fractional δ but the whole-tick
+                        δ reaches T_h or the hold bound, so realize() reports
+                        unrealizable;
+       DISAGREE       — anything else.
   3. Independent checks of realize()'s realized trajectory (hold + shifted
      segments) against the human projection over the assessed window:
        (a) T1b's closed-form per-pair minimum (segment_clear / hold_clear) at
@@ -66,6 +81,10 @@ from shared.types import (                            # noqa: E402
 )
 
 CONDITIONS = [
+    ("s00_off", "env_layout0", "scenario_00", 300, False),
+    ("s00_on",  "env_layout0", "scenario_00", 300, True),
+    ("s10_off", "env_layout1", "scenario_10", 450, False),
+    ("s10_on",  "env_layout1", "scenario_10", 450, True),
     ("s20_off", "env_layout2", "scenario_20", 200, False),
     ("s20_on",  "env_layout2", "scenario_20", 200, True),
     ("s30_off", "env_layout3", "scenario_30", 200, False),
@@ -160,13 +179,27 @@ def main():
                 wh_cost = wh["end"] if wh_ok else None
                 wh_note = ("shift_past_horizon" if wh["status"] == "realized" and not wh_ok
                            else wh["status"])
+                # classification against `whole` (fractional δ on a 0.01 grid)
+                if res.realizable and wh_ok:
+                    ceil_wh = math.ceil(wh_delta - GRID - 1e-9)      # first whole tick at/above whole's δ
+                    cost_gap_ok = abs((res.cost - wh_cost) - (res.delta - wh_delta)) <= 1e-6
+                    if res.delta == ceil_wh and abs(res.delta - wh_delta) <= GRID + 1e-9 and cost_gap_ok:
+                        cls = "identical"
+                    elif res.delta == ceil_wh and cost_gap_ok:
+                        cls = "quantisation"
+                    elif res.delta > ceil_wh and cost_gap_ok:
+                        cls = "quant:skip"
+                    else:
+                        cls = "DISAGREE"
+                elif (not res.realizable) and (not wh_ok):
+                    cls = "identical"
+                elif wh_ok and not res.realizable and res.reason in ("hold_reaches_horizon", "hold_position_violated"):
+                    cls = "quant:cap/hold"
+                else:
+                    cls = "DISAGREE"
                 agree_r = (res.realizable == wh_ok)
-                agree_d = (res.delta is None and wh_delta is None) or (
-                    res.delta is not None and wh_delta is not None
-                    and abs(res.delta - wh_delta) <= GRID + 1e-9)
-                agree_c = (res.cost is None and wh_cost is None) or (
-                    res.cost is not None and wh_cost is not None
-                    and abs(res.cost - wh_cost) <= GRID + 1e-9)
+                agree_d = cls == "identical"
+                agree_c = cls == "identical"
                 exact_ok = t1b_exact_check(rdict, hdict, res.delta) if res.realizable else None
                 smin, sarg = sampled_check(res.segments, hdict) if res.realizable else (None, None)
                 sampled_ok = (smin >= S - 1e-6) if smin is not None else None
@@ -179,7 +212,7 @@ def main():
                     "share": res.unassessed_share, "reason": res.reason,
                     "wh_realizable": wh_ok, "wh_delta": wh_delta, "wh_cost": wh_cost,
                     "wh_note": wh_note,
-                    "agree": agree_r and agree_d and agree_c,
+                    "agree": cls != "DISAGREE", "cls": cls,
                     "agree_r": agree_r, "agree_d": agree_d, "agree_c": agree_c,
                     "exact_ok": exact_ok, "sampled_min": smin, "sampled_at": sarg,
                     "sampled_ok": sampled_ok,
@@ -202,10 +235,11 @@ def main():
 
     # ---- validation.md -----------------------------------------------------
     out = []
-    out.append("# T3 — realize() validated against T1b's `whole` realizer (test set, s = 50 cm)\n")
-    out.append("Generated by `validate.py`. Conditions: s20_off, s20_on, s30_off, s30_on, 200 steps, "
-               "PYTHONHASHSEED=0. Units: ticks; distances cm. δ = the hold; T_r = projected duration "
-               "(segment span); T_h = end of the human projection; share = unassessed share.\n")
+    out.append("# T3b — realize() (whole-tick δ) validated against T1b's `whole` realizer (eight conditions, s = 50 cm)\n")
+    out.append("Generated by `validate.py`. Conditions: s00, s10, s20, s30 × prior off/on, the L2 baselines' step "
+               "counts, PYTHONHASHSEED=0. Units: ticks; distances cm. δ = the hold (realize(): whole ticks; whole: "
+               "0.01 grid); T_r = projected duration (segment span); T_h = end of the human projection; share = "
+               "unassessed share. Row classes: see the script docstring.\n")
     out.append("## Baseline identity (instrumented log == L2 baseline minus `[sep]`)\n")
     out.append("| condition | identical |\n|---|---|")
     for k, v in identity.items():
@@ -218,29 +252,36 @@ def main():
     n_sm = sum(1 for r in rows if r["sampled_ok"] is True)
     out.append(f"\n## Summary\n\n- rows (admitted trigger × candidate): {n}; triggers: {len(triggers)}")
     out.append(f"- realize(): realizable {n_real}, of which held (δ > 0) {n_held}; unrealizable {n - n_real}")
-    out.append(f"- agreement with `whole` on realizability, δ (±0.01) and cost (±0.01): {n_ag} of {n}")
+    from collections import Counter
+    cc = Counter(r["cls"] for r in rows)
+    out.append(f"- agreement with `whole` (no unexplained difference): {n_ag} of {n}; classes: "
+               + ", ".join(f"{k} {v}" for k, v in sorted(cc.items())))
+    out.append(f"- realizability agrees with `whole`: {sum(r['agree_r'] for r in rows)} of {n}")
+    out.append(f"- per condition: " + "; ".join(
+        f"{c[0]} rows {sum(r['condition'] == c[0] for r in rows)}, held {sum(r['condition'] == c[0] and r['realizable'] and r['delta'] > 0 for r in rows)}, "
+        f"unrealizable {sum(r['condition'] == c[0] and not r['realizable'] for r in rows)}" for c in CONDITIONS))
     out.append(f"- independent checks on realized rows: T1b closed form at δ clear {n_ex} of {n_real}; "
                f"sampled min distance ≥ 50 cm {n_sm} of {n_real}")
     worst = min((r["sampled_min"] for r in rows if r["sampled_min"] is not None), default=None)
     out.append(f"- smallest sampled min distance over realized rows: {fmt(worst, 4)} cm")
     out.append("\n## Rows\n")
     out.append("| condition | step | trigger | candidate | current | T_r | T_h | realize | δ | cost | share "
-               "| whole | whole δ | agree | closed-form check | sampled min (at) |")
+               "| whole | whole δ | class | closed-form check | sampled min (at) |")
     out.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for r in rows:
         out.append(
             f"| {r['condition']} | {r['step']} | {r['trigger']} | {short(r['candidate'])} | "
             f"{'yes' if r['current'] else ''} | {r['T_r']:.2f} | {r['T_h']:.2f} | {r['reason']} | "
-            f"{fmt(r['delta'])} | {fmt(r['cost'])} | {fmt(r['share'])} | {r['wh_note']} | "
-            f"{fmt(r['wh_delta'])} | {'yes' if r['agree'] else 'NO'} | "
+            f"{'–' if r['delta'] is None else r['delta']} | {fmt(r['cost'])} | {fmt(r['share'])} | {r['wh_note']} | "
+            f"{fmt(r['wh_delta'])} | {r['cls']} | "
             f"{'clear' if r['exact_ok'] else ('–' if r['exact_ok'] is None else 'VIOLATED')} | "
             f"{fmt(r['sampled_min'])}{'' if r['sampled_at'] is None else f' ({r[chr(115)+chr(97)+chr(109)+chr(112)+chr(108)+chr(101)+chr(100)+chr(95)+chr(97)+chr(116)]:.2f})'} |")
-    dis = [r for r in rows if not r["agree"]]
-    out.append("\n## Disagreements\n")
+    dis = [r for r in rows if r["cls"] != "identical"]
+    out.append("\n## Differences from `whole` (all rows not classed identical)\n")
     if not dis:
         out.append("none")
     for r in dis:
-        out.append(f"- {r['condition']} {r['step']} {short(r['candidate'])}: realize {r['reason']} "
+        out.append(f"- {r['cls']}: {r['condition']} {r['step']} {short(r['candidate'])}: realize {r['reason']} "
                    f"δ={fmt(r['delta'])} cost={fmt(r['cost'])}; whole {r['wh_note']} "
                    f"δ={fmt(r['wh_delta'])} cost={fmt(r['wh_cost'])}")
     out.append("\n## Selection per trigger (information only)\n")

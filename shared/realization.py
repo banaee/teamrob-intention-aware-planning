@@ -13,15 +13,18 @@ PURPOSE:
 
     Hold-only, whole-trajectory minimal shift (R1, TODO-70): ONE hold δ at the
     robot's position at the decision step, then the whole plan shifted by δ.
-    δ is the smallest shift ≥ 0 such that the shifted trajectory — including
-    the stationary hold at the decision position during the hold — has no
-    violation within the assessed window. A violation is a distance: agents
-    are points, and any moment at which they are strictly closer than
-    `min_separation` is one (head-on, same-line and "the human walks past the
-    standing robot" conflicts need no special case; they come out
+    δ is the smallest WHOLE-TICK shift ≥ 0 such that the shifted trajectory —
+    including the stationary hold at the decision position during the hold —
+    has no violation within the assessed window (T3b: the hold is executed as
+    whole ticks, so the plan that is checked and costed is the plan that is
+    executed; see design_decisions.md, "Realization as built"). A violation
+    is a distance: agents are points, and any moment at which they are
+    strictly closer than `min_separation` is one — a single instant exactly
+    at `min_separation` is not (head-on, same-line and "the human walks past
+    the standing robot" conflicts need no special case; they come out
     unrealizable through the hold-position check). Motion is continuous along
     segments; the computation is exact — closed-form shift intervals per
-    segment pair, no sampling in time and none in δ.
+    segment pair, no sampling in time, and the integer δ read off them.
 
 LAYERING (design_decisions.md, "The robot can wait"; one-way, no cycles):
 
@@ -52,6 +55,7 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT import from mesa_sim/ or ros_sim/
 """
 
+import math
 from typing import List, Optional, Tuple
 
 from shared.types import ProjectedPlan, RealizedPlan, Segment
@@ -99,17 +103,32 @@ def realize(
     charged; nothing before the human's span is assessed either (nothing was
     observed of the human there).
 
-    δ: the smallest shift ≥ 0 that is outside every violating shift interval
-    (trajectory_algorithms.shift_violation_interval, one per robot segment ×
-    human segment pair; each is one open interval by convexity, exact). The
-    intervals are sorted and merged from 0 upward: δ starts at 0 and jumps to
-    the end of any interval that contains it, so the result is the right end
-    of the union of intervals covering 0, or 0 itself. Exact bad-shift
-    intervals rather than a search over δ with a per-δ check, because the
-    feasible set in δ is not monotone (a shift can clear one crossing and
-    walk into the next), so no bisection is valid and a grid would make δ a
-    sampled quantity — the T1b reference realizer's 0.01-tick grid was
-    validation scaffolding, not the design.
+    δ: the smallest WHOLE-TICK shift ≥ 0 that is outside every violating
+    shift interval (trajectory_algorithms.shift_violation_interval, one per
+    robot segment × human segment pair; each is one open interval by
+    convexity, exact). The intervals are walked in order of their start: δ
+    starts at 0 and, whenever an interval strictly contains it, jumps to the
+    first whole tick at or after that interval's end. One pass suffices — δ
+    never decreases, so an interval already passed cannot contain a later δ.
+    Exact bad-shift intervals rather than a search over δ with a per-δ
+    check, because the feasible set in δ is not monotone (a shift can clear
+    one crossing and walk into the next): no bisection is valid, and for the
+    same reason the whole-tick δ is NOT the fractional minimal shift rounded
+    up — rounding up can land in a second interval; the walk continues past
+    it. Whole ticks (T3b, decided from the design, not the data): the hold
+    reaches the body as STAND microactions, one per tick, so a fractional δ
+    could not be executed as computed, and rounding at execution would
+    either break the separation (down: the minimal shift has no margin) or
+    leave the executed plan unchecked (up: non-monotone). T_r stays
+    FRACTIONAL: it is the projection's continuous duration, execution
+    quantises per walk (ceil per walk, L2: deliberately not compensated),
+    and rounding the total would be a second quantisation that models
+    nothing and can only turn an order into a tie. cost = T_r + δ is then
+    ONE quantity — the projected duration of the realized trajectory, its
+    hold in whole ticks because the hold is executed as ticks — and the
+    plain cost a caller compares it with (no projection; all unrealizable)
+    must be the same T_r, `projected_duration`, not ProjectedPlan's
+    integer-rounded `total_estimated_cost`.
 
     THE HOLD: stationary at the plan's start position over
     [decision_step, plan start + δ]. It is a position and is checked like any
@@ -117,14 +136,24 @@ def realize(
     `min_separation` of it during the hold. Since the hold only grows with δ,
     the first step at which the human comes within the separation of the
     hold position (trajectory_algorithms.first_approach_step) bounds δ from
-    above; a minimal clearing δ beyond that bound means NO shift clears, and
-    the plan is unrealizable ("hold_position_violated").
+    above; a smallest clearing δ beyond that bound means NO shift clears, and
+    the plan is unrealizable ("hold_position_violated"). The hold may end at
+    that step exactly (the human then touches `min_separation`, which is
+    not a violation).
 
     THE HOLD CAP: a hold (δ > 0) may not extend to T_h. If the smallest
-    clearing δ holds until T_h or beyond, the plan is unrealizable
+    clearing δ satisfies plan start + δ ≥ T_h, the plan is unrealizable
     ("hold_reaches_horizon"): it would clear by outlasting the assessment,
     not by avoiding anything within it. δ = 0 is never a hold and is not
-    capped — a plan that starts at or after T_h is simply unassessed.
+    capped — a plan that starts at or after T_h is realizable and fully
+    unassessed.
+
+    THE UNASSESSED SHARE counts the part of the realized plan beyond T_h
+    only. The steps before the human projection's span — the observation
+    offset, one tick in Mesa (L2) — are unassessed too but not counted: the
+    share reports the tail the hold pushes past the horizon (TODO-69), and
+    the offset is a property of the observation, the same for every
+    candidate at a trigger.
 
     NO HUMAN PROJECTION (None, or one without segments): realizable, δ = 0,
     cost = T_r, unassessed share 1.0, reason "no_human_projection". The
@@ -154,10 +183,10 @@ def realize(
     if not human_segments:
         return RealizedPlan(
             realizable=True,
-            delta=0.0,
+            delta=0,
             cost=projected_duration,
             projected_duration=projected_duration,
-            segments=_realized_segments(robot_segments, hold_position, decision_step, 0.0),
+            segments=_realized_segments(robot_segments, hold_position, decision_step, 0),
             hold_position=hold_position,
             hold_start=decision_step,
             horizon=None,
@@ -174,10 +203,13 @@ def realize(
             if interval is not None and interval[1] > 0.0:
                 intervals.append(interval)
     intervals.sort()
-    delta = 0.0
+    delta = 0
     for lo, hi in intervals:
-        if lo <= delta + _EPS and hi > delta:
-            delta = hi
+        if lo + _EPS < delta < hi - _EPS:
+            # Strictly inside a violating interval: the first whole tick at
+            # or after its end. Its end itself is clear (the distance touches
+            # min_separation there), hence the slack towards "clear".
+            delta = math.ceil(hi - _EPS)
         elif lo > delta + _EPS:
             break
 
@@ -193,7 +225,7 @@ def realize(
                              "hold_position_violated")
 
     # --- the hold cap: a hold may not extend to T_h -------------------------
-    if delta > 0.0 and plan_start + delta >= horizon - _EPS:
+    if delta > 0 and plan_start + delta >= horizon - _EPS:
         return _unrealizable(projected_duration, hold_position, decision_step, horizon,
                              "hold_reaches_horizon")
 
@@ -220,7 +252,7 @@ def _realized_segments(
     robot_segments: List[Segment],
     hold_position: Tuple[float, float],
     decision_step: float,
-    delta: float,
+    delta: int,
 ) -> List[Segment]:
     """The hold (when it has positive duration), then every segment shifted by delta."""
     shifted_start = robot_segments[0].start_step + delta

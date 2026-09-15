@@ -554,12 +554,22 @@ class RealizedPlan:
                        before T_h (a hold that reaches T_h clears by outlasting
                        the assessment, not by avoiding anything, and is refused).
                        True with delta = 0 when there is no human projection.
-    delta:             the hold, in steps (≥ 0); None when unrealizable.
+    delta:             the hold, in WHOLE steps (≥ 0): the number of STAND
+                       ticks the body executes, so the plan that was checked
+                       is the plan that runs (T3b; design_decisions.md,
+                       "Realization as built"). None when unrealizable.
     cost:              T_r + delta over the FULL plan, T_r the plain projected
-                       duration (the span of the plan's segments, fractional
-                       steps). The tail beyond T_h is inside T_r and is not
-                       corrected for (TODO-69, reading (1)). None when
-                       unrealizable — an unrealizable plan has no realized cost.
+                       duration (the span of the plan's segments, FRACTIONAL
+                       steps — the projection's continuous duration; execution
+                       quantises per walk and that is deliberately not
+                       compensated, L2). One quantity: the projected duration
+                       of the realized trajectory. A caller comparing it with
+                       a plain cost must use the same T_r —
+                       `projected_duration`, not ProjectedPlan's integer
+                       `total_estimated_cost`. The tail beyond T_h is inside
+                       T_r and is not corrected for (TODO-69, reading (1)).
+                       None when unrealizable — an unrealizable plan has no
+                       realized cost.
     projected_duration: T_r.
     segments:          the realized trajectory, head-to-tail: the stationary
                        hold at `hold_position` from `hold_start` to the shifted
@@ -574,7 +584,9 @@ class RealizedPlan:
     unassessed_share:  the share of the realized plan's span [hold_start, end]
                        lying beyond T_h — the part that was neither cleared nor
                        blocked, logged so that the bias can be reported
-                       (TODO-69). 1.0 when there is no human projection; None
+                       (TODO-69). The steps before the human projection's span
+                       (the observation offset, L2) are unassessed too but not
+                       counted. 1.0 when there is no human projection; None
                        when unrealizable.
     reason:            "realized"; "no_human_projection" (delta 0, fully
                        unassessed — the caller treats it as it treats no
@@ -586,7 +598,7 @@ class RealizedPlan:
                        holds until T_h or beyond).
     """
     realizable: bool
-    delta: Optional[float]
+    delta: Optional[int]
     cost: Optional[float]
     projected_duration: float
     segments: List[Segment]
