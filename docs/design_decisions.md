@@ -1715,6 +1715,75 @@ analysis/t9_arrival_radius/
 Reference: R1 decision record and T9 session, September 2026; T1b "Not measured" (the executor's
 actual arrival time vs the projection)
 
+**Projection time includes what the body spends finishing an action, and the human's projection starts when it was observed (L2)**
+T9 removed the projection's own error (walks ending at the target rather than at the body's stopping
+distance) and by doing so exposed the body's: execution ran BEHIND projection by 1.5 to 3.3 ticks for
+the robot and 2.2 to 5.3 for the human (TODO-77). M1 then showed a minimal hold clears with no margin,
+so a lag of that size would have made every hold realization computes wrong from the moment it was
+computed. Realization is built on the projection, so the projection had to match execution first.
+
+DECIDED (September 2026), two causes, each removed at its source, with the body supplying the constant
+exactly as it supplies motion rate and stopping distance — `shared/` learns neither:
+
+ACKNOWLEDGEMENT LATENCY. The executor does not learn an action is finished the instant it finishes: it
+sees the completion predicate in the WorldState it is handed on the NEXT tick, advances its cursor and
+returns, executing no microaction. One tick per action, and a four-action delivery pays four of them.
+`Projector` takes an `action_completion_latency` and charges it once per action as a STATIONARY segment
+at the position that action ended at — the agent is standing still, not moving slowly, and that hold is
+checked by interference like any other. Mesa supplies
+`mesa_sim/executor.ACTION_COMPLETION_LATENCY = 1.0`, which lives in the executor because it is a
+property of that loop, the way `PROXIMITY_THRESHOLD` is a property of `world_state_builder`'s `at`. The
+`shared/` default is 0.0, a unit-less placeholder for an instantaneous body, and at 0.0 no segment is
+emitted, so a bare `Projector` produces exactly the segments it did before. CONSEQUENCE for consumers:
+there are now TWO segments per action, not one — read the count off the segments, never off the plan's
+actions.
+
+OBSERVATION OFFSET. The two projections were not on the same clock. Mesa's scheduler runs the human
+before the robot within a tick, so at the instant the robot decides, the human has already moved and
+the robot has not: the robot's projection started from where the robot stood at the end of the previous
+tick, the human's from where the human stood at the end of THIS one. Comparing them at a common `t`
+compared the robot's position with the human's position one tick later. `Projector` takes an
+`observation_offset` and `project_human()` starts the human's projection there instead of at 0. Mesa
+supplies `mesa_sim/sim_agents.OBSERVATION_OFFSET = 1.0`, beside the scheduler fact that causes it and
+that `observe_initial()` already existed for; ROS would derive it from its own timestamps. The human's
+projection then says nothing about [0, offset) — nothing was observed of the human at the robot's now —
+and that interval is simply outside its span; interference geometry intersects windows, so no hole
+appears anywhere. Not papered over with an invented position.
+
+NOT COMPENSATED, by decision. Step quantisation stays: a walk of projected duration `dur` is executed
+as ceil(dur) discrete steps and the walker stops on the first step INSIDE the arrival radius, not on
+it. Two effects, both left alone — the walk finishes ceil(dur) − dur ticks late, and the next walk
+starts up to one step off the projected start, so it can be a whole step longer. No safety margin is
+added anywhere to absorb any of this.
+
+MEASURED (L2, `analysis/l2_execution_lag/REPORT.md`, TODO-77's own terms). The systematic whole-tick lag
+is gone: medians move from −1.46/−3.32 to −0.46/−0.32 for the robot (2- and 4-action plans) and from
+−2.21/−5.32 to −0.21/−1.32 for the human. What remains is exactly the two things above: a discrete-step
+forward model of the executor, using no execution data, predicts the actual release tick EXACTLY for all
+68 human and robot 2-action rows, and exactly one tick early for all 35 robot 4-action rows. That last
++1 is not quantisation and is not compensated either: the robot re-plans at its own `task_committed`
+trigger, which fires on the tick that would have acknowledged the `pick_up`; the fresh
+`deliver_already_held` plan does not contain that `pick_up`, so `continue_plan()` loads from the start
+and the carry begins on that very tick. One of the four charged latencies is never spent. Modelling it
+would mean the projection predicting the robot's own future triggers, which are decided FROM the
+projection — recorded in TODO-77, not fixed.
+
+CONSEQUENCE, and a correction to the expectation this task was set with. "B3 is plain-cost argmin, so
+any change comes from durations" is not what the code does: B3 is an argmin over candidates that
+`_detect_interference()` has not excluded, and that filter is still live. Across the ten sweep
+conditions the latency changed every cost (by one tick per action) and reordered NO candidate set at any
+of the 93 triggers compared. The single decision change in the sweep comes from the offset instead:
+with the two agents finally in phase, scenario_30's mirror crossing is projected as the near-coincidence
+it is (`min_dist` 15.37 → 0.49 cm, the continuous-time minimum of two agents passing through each other
+— `[sep]`'s 11.0 cm was the closest integer-tick sample), and the superseded `min_safe_distance = 1.0`
+excludes the candidate. Ablation confirms it: latency alone changes no decision, offset alone produces
+the whole change. That threshold is already superseded (R1; removed in T10), so the exclusion is a
+vestigial mechanism firing on a newly-accurate number, not a new policy.
+Files: shared/projection.py (`Projector.__init__`, `build_segments`, `project_human`),
+mesa_sim/executor.py (`ACTION_COMPLETION_LATENCY`), mesa_sim/sim_agents.py (`OBSERVATION_OFFSET`,
+Projector construction), analysis/l2_execution_lag/
+Reference: L2 session, September 2026; TODO-77; T9; M1
+
 **A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
 When `update()` returns the task the robot is already executing — a CONTINUE, decided by
 `task_instance_key()` equality between `UpdateResult.current_task` and `ExecutorState.current_task`, never by

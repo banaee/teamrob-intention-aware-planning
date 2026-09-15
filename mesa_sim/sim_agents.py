@@ -42,7 +42,7 @@ from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance,
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
-from mesa_sim.executor import Executor
+from mesa_sim.executor import Executor, ACTION_COMPLETION_LATENCY
 from mesa_sim.action_decomposer import (  # single reader of mesa_configs.yaml
     _get_step_size,
     _get_interference_spatial_resolution,
@@ -50,6 +50,17 @@ from mesa_sim.action_decomposer import (  # single reader of mesa_configs.yaml
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
+
+
+# Mesa ticks between a robot's own "now" and the time the human it observes was
+# seen in that state. Exactly one: BaseScheduler runs agents in insertion order
+# and the human is spawned first (sim_model._spawn_agents, scenario order), so
+# within a tick the human has already moved when the robot builds its
+# WorldState, while the robot itself has not moved yet. The human's observed
+# position is therefore the position it holds at step 1 of the robot's
+# projection, not at step 0 — the same fact RobotAgent.observe_initial() exists
+# for. Handed to the Projector so the two projections share a clock (L2).
+OBSERVATION_OFFSET = 1.0
 
 
 # =============================================================================
@@ -208,18 +219,24 @@ class RobotAgent(FactoryAgent):
         )
 
         # Projection time is execution time: one projection step is one Mesa tick.
-        # The body supplies the motion rate (step_size world units per tick, from
-        # mesa_configs.yaml), the duration of a stationary action (one tick per
-        # GRASP/RELEASE microaction), and the distance at which a walk stops (T9):
-        # the executor completes a move_to when at(agent, object) holds, which
-        # world_state_builder emits within PROXIMITY_THRESHOLD — the same constant,
-        # so projected walks end where execution ends. shared/ never learns any of
-        # these constants.
+        # The body supplies every constant that makes that true, and shared/ learns
+        # none of them:
+        #   assumed_speed              motion per tick (step_size, mesa_configs.yaml)
+        #   default_action_cost        a stationary action is one tick (GRASP/RELEASE)
+        #   arrival_radius             where a walk stops: the same PROXIMITY_THRESHOLD
+        #                              that makes at(agent, object) hold, so projected
+        #                              walks end where execution ends (T9)
+        #   action_completion_latency  the tick the executor spends learning an action
+        #                              finished, per action (L2)
+        #   observation_offset         how far ahead of this robot's now the observed
+        #                              human's state was seen (L2)
         self.projector = Projector(
             knowledge=knowledge,
             assumed_speed=_get_step_size(model),
             default_action_cost=1.0,
             arrival_radius=PROXIMITY_THRESHOLD,
+            action_completion_latency=ACTION_COMPLETION_LATENCY,
+            observation_offset=OBSERVATION_OFFSET,
         )
     
         # The interference sampler's spatial resolution is a world-unit quantity

@@ -58,6 +58,18 @@ from shared.types import AbstractPlan, GroundedAction, WorldState, Predicate, Pr
 from mesa_sim.action_decomposer import Microaction, expand
 
 
+# Mesa ticks this executor spends LEARNING that an action finished, per action.
+# Exactly one: step() sees the completion predicate hold in the WorldState it was
+# handed, calls _advance_action() and returns, executing no microaction that tick
+# (section 3 of step() below). So a four-action delivery pays four such ticks, and
+# they are as real as the walking. Lives here because it is a property of this
+# loop, the way PROXIMITY_THRESHOLD is a property of world_state_builder's `at`;
+# mesa_sim/sim_agents.py hands it to the Projector so projection time matches
+# execution time (L2). Not a tunable: change step()'s structure and this changes
+# with it.
+ACTION_COMPLETION_LATENCY = 1.0
+
+
 class Executor:
     """
     Execution engine for one agent (human or robot).

@@ -1981,7 +1981,41 @@ means. Rename (e.g. `robot_grasped`) when a session touches the trigger set; a r
 Files: shared/meta_planner.py (`evaluate_triggers`), shared/io_contracts.md (§2.2)
 Reference: R1 decision record, September 2026
 
-**TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** [found by T9; decision needed before T3's numbers are read as exact]
+**TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** ✅ LARGELY RESOLVED (L2, Sept 2026) — the systematic whole-tick lag is removed; what remains is step quantisation (not compensated, by decision) and one robot-only tick (recorded below, not fixed)
+REMOVED (L2): (a) the ACKNOWLEDGEMENT LATENCY is now charged per action, as a stationary segment at the
+position the action ended at, from a constant the body supplies
+(`mesa_sim/executor.ACTION_COMPLETION_LATENCY = 1.0`, passed to `Projector`); (b) the OBSERVATION
+OFFSET is gone — `project_human()` starts the human's projection at
+`mesa_sim/sim_agents.OBSERVATION_OFFSET = 1.0` rather than at 0, so both projections sit on one clock
+(Mesa's scheduler moves the human before the robot observes it). Placement lead medians, this item's
+own measure: robot −1.46/−3.32 → −0.46/−0.32 and human −2.21/−5.32 → −0.21/−1.32 (2-/4-action plans).
+Full record and the method: `analysis/l2_execution_lag/REPORT.md`.
+WHAT REMAINS, deliberately uncompensated:
+  - STEP QUANTISATION. A walk of projected duration `dur` executes as ceil(dur) discrete steps and the
+    walker stops on the first step INSIDE the arrival radius rather than on it, so it finishes
+    ceil(dur) − dur ticks late AND the next walk starts up to one step off the projected start, which
+    can make that walk a whole step longer. Per walk it is under a tick; over a two-walk plan it can
+    exceed one (the human's 4-action median is −1.32). Decided at L2: not compensated, and no safety
+    margin anywhere to absorb it.
+  - THE ROBOT'S SKIPPED ACKNOWLEDGEMENT (4-action plans only, +1 tick, the projection running LONG).
+    The projection charges four latencies, but the robot re-plans at its own `task_committed` trigger,
+    which fires on the tick that would have acknowledged the `pick_up`; the fresh `deliver_already_held`
+    plan does not contain that `pick_up`, so `continue_plan()` loads from the start and the carry begins
+    on that tick. One charged latency is never spent. Modelling it would require the projection to
+    predict the robot's own future triggers, which are decided FROM the projection — circular, and not
+    attempted. It partly cancels the quantisation in those rows (median −0.32), which is arithmetic, not
+    accuracy. OPEN as a known bias; revisit only if T3/T10 show it mattering.
+VERIFIED: a discrete-step forward model of the executor, using no execution data, predicts the actual
+release tick exactly for all 68 human and robot 2-action rows and exactly one tick early for all 35
+robot 4-action rows — so the residual is fully attributed, with nothing unexplained.
+ALSO NOTED at L2, out of scope there: with the two agents in phase the superseded
+`min_safe_distance = 1.0` exclusion fires again (once in the ten-condition sweep, scenario_30 prior-on
+step 21, `min_dist` 0.49 cm at the mirror crossing) and changes that run's decision sequence. The
+threshold is already superseded (R1, TODO-30) and goes with T10; it is a vestigial mechanism reacting
+to a newly-accurate number, not a new policy. And: there are now TWO segments per action, so anything
+indexing a plan's actions by segment position must use the stride (`analysis/t1b_realization/analyze.py`
+`phase_at` does; L2's own scripts read the stride and handle both).
+[original entry]
 With walks ending at the arrival radius (T9) the projection no longer over-estimates any walk, and
 what remains is on the body side: the executor spends one tick ACKNOWLEDGING each completed action
 (the tick on which `at` / `holding` / `obj_at` is seen true and the cursor advances; `micro=None` in

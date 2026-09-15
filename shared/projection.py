@@ -81,6 +81,8 @@ class Projector:
         assumed_speed: float = 1.0,
         default_action_cost: float = 1.0,
         arrival_radius: float = 0.0,
+        action_completion_latency: float = 0.0,
+        observation_offset: float = 0.0,
     ):
         """
         knowledge:            HTN domain knowledge, passed through to planner.py calls
@@ -108,12 +110,45 @@ class Projector:
                               with; ROS its own). The 0.0 default is a unit-less
                               placeholder (walk to the point), not a value shared/
                               knows to be right.
+        action_completion_latency:
+                              execution steps the body spends LEARNING that an action
+                              finished, after its last microaction and before the next
+                              action starts. Charged once per action, as a hold at the
+                              position the action ended at — the agent is standing
+                              still, not moving. Supplied by the embodiment as the
+                              other three are (Mesa: one tick, the step its executor
+                              spends seeing the completion predicate and advancing its
+                              cursor without executing anything —
+                              mesa_sim/executor.ACTION_COMPLETION_LATENCY; ROS its
+                              own). The 0.0 default is a unit-less placeholder (an
+                              instantaneous body), not a value shared/ knows to be
+                              right. See design_decisions.md, "Projection time
+                              includes what the body spends finishing an action" (L2).
+        observation_offset:   execution steps between this agent's own "now" — the
+                              start of a projection, step 0 — and the time the
+                              OBSERVED agent's state was true. project_human() starts
+                              the human's projection there instead of at 0, so both
+                              projections lie on one clock. Supplied by the
+                              embodiment (Mesa: one tick, because the observed human
+                              moves before the robot observes it within a tick, so its
+                              observed position is the position it will hold at step 1
+                              of the robot's projection, not at step 0 —
+                              mesa_sim/sim_agents.OBSERVATION_OFFSET; ROS would derive
+                              it from its own timestamps). The 0.0 default means
+                              "observed at this agent's now". Consequence, deliberately
+                              not papered over: the human's projection says nothing
+                              about [0, observation_offset), because nothing was
+                              observed of the human at this agent's now — the interval
+                              is simply outside its span, and interference geometry
+                              intersects windows.
         """
         self._knowledge = knowledge
         self._planner = AdaptivePlanner(knowledge=knowledge)
         self._assumed_speed = assumed_speed
         self._default_action_cost = default_action_cost
         self._arrival_radius = arrival_radius
+        self._action_completion_latency = action_completion_latency
+        self._observation_offset = observation_offset
 
     # =========================================================================
     # Public
@@ -230,8 +265,14 @@ class Projector:
             schema=human_task_schema,
             bindings={Var(k): Const(v) for k, v in hypothesis.bindings.items()},
         )
+        # Starts at observation_offset, not 0: the projection begins where the
+        # observed agent's state was TRUE, which need not be the projecting
+        # agent's own now (L2). Its duration is unchanged — project() measures
+        # from start_step — but its segments, and so its end, sit on the
+        # projecting agent's clock.
         return self.project(
-            [human_task], world, human_agent_id, belief, start_step=0.0
+            [human_task], world, human_agent_id, belief,
+            start_step=self._observation_offset,
         )
 
     def build_segments(
@@ -263,6 +304,14 @@ class Projector:
         (Phase 4D) — see trajectory_algorithms.obstacle_aware_path(). Holds
         against the human (Phase 4C realization) are placed AFTER this pass, on
         the segments it returns; this builds the unheld trajectory only.
+
+        Every action, movement or not, is then followed by a stationary
+        segment of `action_completion_latency` steps at the position it ended
+        at: the body does not learn an action is finished the instant it is
+        (L2). Omitted entirely when the latency is 0, so a Projector built
+        without one produces exactly the segments it did before. One
+        consequence for consumers: there are then TWO segments per action, not
+        one — read the count off the segments, never off the plan's actions.
 
         Non-movement actions: trajectory_algorithms.stationary_segment(), held for
         knowledge.get_cost(action_name) steps, falling back to default_action_cost.
@@ -309,6 +358,15 @@ class Projector:
 
             segments.append(segment)
             current_step = segment.end_step
+
+            # What the body spends learning the action finished: a hold at the
+            # position it ended at, checked by interference like any other hold.
+            if self._action_completion_latency > 0.0:
+                latency_segment = stationary_segment(
+                    current_pos, current_step, self._action_completion_latency
+                )
+                segments.append(latency_segment)
+                current_step = latency_segment.end_step
 
         return segments
 
