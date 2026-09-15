@@ -72,6 +72,31 @@ Do not explore the whole tree. Start from the files a task names; widen only wit
    when I explicitly say so in the current conversation. Never rewrite history.
 7. Be concise in reports: what changed, where, verification result.
 
+## Cost discipline
+
+Sessions are metered. Keep them cheap by default, without weakening what
+actually protects the work.
+
+Cheap by default:
+- Measure one value, not a sweep, once a value has been decided. Sweep only when
+  the question is genuinely "where does behaviour change".
+- Narrow the conditions to the ones that can answer the question. The full
+  scenario set is for regression, not for every measurement.
+- Do not re-verify what a committed report in `analysis/` already establishes
+  (numerical method checks, grid independence, instrumentation neutrality).
+  Cite it instead.
+
+Never sacrificed, whatever the cost:
+- The regression sweep before a task is called done. Silent behaviour drift is
+  the failure mode this project has actually had.
+- Byte-identity checks when a task claims to change no behaviour.
+- Measuring a premise rather than assuming it. Premises stated in a task
+  description have turned out to be wrong more than once, and measurement is
+  what caught it.
+
+If a task cannot be done within these limits, say so and propose a smaller
+version rather than silently running the large one.
+
 ## Running
 
 ```bash
