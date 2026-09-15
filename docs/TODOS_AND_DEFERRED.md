@@ -890,7 +890,7 @@ Files: shared/meta_planner.py, shared/io_contracts.md
 Reference: Phase 4C meta_planner build session, September 2026
 
 
-**TODO-36 — `MetaPlanner` block restructuring (B1/B2/B3) not yet implemented**
+**TODO-36 — `MetaPlanner` block restructuring (B1/B2/B3) not yet implemented** — B2 `b2a` ✅ BUILT (T4); B3 with realized cost is T10
 `update()` currently runs one flat pipeline: assemble candidates → project each → detect
 interference → filter infeasible → cost → argmin. A block decomposition was designed
 (September 2026) but not built:
@@ -951,8 +951,29 @@ of T_h remaining, so at ρ = 0.5 the gate would not have escalated on any held c
 fixtures — enough to show it does not fire spuriously, not enough to show when it should (5 held
 rows in two fixtures). Consequence for D2 (TODO-68): under `b2a` repeated `theta_crossed` triggers
 mostly end in a continue, which may also hide a real change of belief (TODO-48).
+✅ BUILT (T4, September 2026). `_is_current_task_plausible()` returns the hold to continue with
+(whole ticks) or None to escalate; `update()` returns `UpdateResult(current_task, queue, hold)` on a
+continue. `b2a`: `human_projection is None` → continue, hold 0; otherwise the current task is
+projected alone and realized at decision step 0 (`realize()`, `min_separation` =
+`min_separation_in_motion_ticks` (2.5) × `Projector.assumed_speed`, i.e. 50 cm in Mesa); realizable
+and δ ≤ ρ × (T_h − 0) → continue with hold δ; otherwise escalate to B3. `rho` is a constructor
+parameter, default 0.5. One `[meta-b2]` log line per call (trigger, current task, projection
+admitted, realizable, reason, δ, T_r, remaining, bound, verdict). `gate_strategy` stays `"none"` by
+default (byte-identical to the L2 baselines in all ten regression conditions) and is selected per run
+with `--gate_strategy b2a` or `configs/experiment.yaml`. `b2b` stays a stub (NotImplementedError).
+B3 is unchanged (plain cost, `min_safe_distance` filter) until T10, so a B2 escalation reaches the old
+B3 and a B3 decision carries no hold.
+MEASURED (T4; s00/s10/s20/s30 × prior off/on, `b2a`, ρ = 0.5): 51 B2 calls, 49 continue (10 with a
+hold δ = 1–7, 39 without; 9 of the 39 had no projection) and 2 escalate, both `hold_position_violated`
+(s30_on 21: B3 switches to item_2, as in the `none` run; s20_on 57: B3 re-selects item_4). No
+escalation on δ above the bound (largest δ / bound 0.40, s20_off 20). A counterfactual B3 at every
+continue (instrumented run, identical logs otherwise) picks the current task in all 49. So B2 never
+kept a task B3 would have switched away from, and its commitment role is not exercised by these
+fixtures at ρ = 0.5. What the gate changes is that holds are now executed. Repeated prior-off
+`theta_crossed` (s00_off 109/113/115, s10_off 29/33/35, s20_off 20/24/30 and 87/91/95) all ended
+in a continue, as expected above (D2).
 Files: shared/meta_planner.py (`update`, `_is_current_task_plausible`)
-Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1
+Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1; T4
 
 
 **TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places** ✅ RESOLVED (I3)
@@ -1900,7 +1921,7 @@ convergence argument; and waiting elsewhere, which is a detour (a different stra
 Files: shared/projection.py or the realization module (later task), analysis/t1_conflict_measurement/
 Reference: Phase 4C wait-decision session, September 2026
 
-**TODO-71 — The hold hint on the body side: execute, refine, never re-decide**
+**TODO-71 — The hold hint on the body side: execute, refine, never re-decide** — execution ✅ BUILT in Mesa (T4); refinement and its reporting OPEN
 `UpdateResult` will carry the winner's realized holds (where, how long) as an execution HINT
 (io_contracts.md §1.9, §4.1). The embodiment has to consume it, and the single-decision-path
 rule (NOTE above, DESIGN-07's companion) fixes what consuming means: the executor stands still
@@ -1916,9 +1937,40 @@ robot stationary; nothing says why), and whether a hold that the executor extend
 next trigger should itself be a trigger. Mesa first (a STAND microaction per held tick, next
 to `wait_at`'s existing STAND expansion in `action_decomposer.py`); ROS/PRIEST is Phase 6 and
 treats the hold as a soft constraint, as it treats every hint.
+✅ BUILT in Mesa (T4, September 2026). `UpdateResult.hold: int = 0` (whole ticks) carries δ. On
+every non-terminal decision `RobotAgent.step()` calls `Executor.hold(result.hold, trigger)` after
+the plan is adopted (`continue_plan()` on a continue). From that tick the executor runs one STAND
+microaction per tick (no `remaining` param, so no `waited_at` / `waited()` fact) before it looks at
+the plan. The cursor, microaction queue and completion bookkeeping are untouched, and the plan resumes
+where it stood. The hold is not in `action_decomposer.py`: it is a decision about the task, not a step
+of any action. INTERRUPTION: a later trigger re-decides as usual, and its decision REPLACES the hold
+in progress with its own δ: a b2a continue's fresh realization, or 0 when the decision carries none
+(B3 until T10, or no projection). The ticks not yet run are logged as interrupted. This matches T5's
+"a hold re-realized identically keeps its countdown": in both interruptions measured (s10_off 29→33,
+s20_off 20→24) the fresh δ equalled the planned δ minus the ticks already held (6−4 = 2, 7−4 = 3). The
+executor adds, extends or drops no hold on its own. Logs: `[hold] step= <robot> start planned= trigger=
+pos=` and `[hold] step= <robot> end planned= executed= interrupted= [by=]`.
+MEASURED (T4, `b2a`, ρ = 0.5): 10 holds executed in s10/s20/s30_off (none in s00 or s30_on), 2
+interrupted. Robot deliveries slip by the total hold: s10 +6, s20 +8, s30_off +7 ticks. Actual `[sep]`
+below 50 cm around the held table deliveries: s10 unchanged in size (none 72–75, 4 ticks, min 30.87;
+b2a 75–78, 4 ticks, min 30.87), because the robot now arrives as the human leaves instead of before
+it; s20 6 ticks, min 11.64 → 3 ticks, min 25.40; s30_off 8 ticks, min 11.70 → 2 ticks, min 38.57.
+Every remaining sub-50 tick falls past the hold decision's T_h, at the human's next task, which is
+the "execution-time avoidance past T_h" assumption (TODO-73), with one exception: s10 tick 75, 49.15
+cm, is inside the assessed window by 0.02–0.29 tick (not decomposed; L2's uncompensated step
+quantisation is the candidate). The measure still samples whole ticks (TODO-79). At the robot's grasp
+(`task_committed`, or `theta_crossed` on the same tick) after a hold, re-realization added δ = 1 in
+s20 (off and on) and s30_off. Execution was 0.79 / 0.14 ticks AHEAD of the projection that placed the
+first hold, which fits L2's robot-only tick (the carry starts on the trigger tick) net of step
+quantisation (TODO-77). The minimal whole-tick shift has no margin, so without that trigger the robot
+would have run a plan that no longer cleared.
+STILL OPEN: refinement (the executor shortening or extending a hold against what the world shows),
+and how a refined hold is reported back. Mesa has no refinement: it executes δ as decided. Also
+undecided: whether a hold should survive a later decision that carries no evidence (b2a with no
+projection continues with hold 0 and so drops a hold in progress; not reached in the T4 runs).
 Files: shared/types.py (UpdateResult), mesa_sim/executor.py, mesa_sim/action_decomposer.py,
 mesa_sim/sim_agents.py, ros_sim/ (paused)
-Reference: Phase 4C wait-decision session, September 2026; roadmap.md Phase 6 notes
+Reference: Phase 4C wait-decision session, September 2026; roadmap.md Phase 6 notes; T4
 
 
 **TODO-72 — `io_contracts.md` §1.3 and §2.1 still describe the pre-I2 recognizer** [recognizer side]
