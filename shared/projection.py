@@ -153,6 +153,12 @@ class Projector:
     # Public
     # =========================================================================
 
+    @property
+    def assumed_speed(self) -> float:
+        """The body-supplied motion per execution step (read by MetaPlanner to
+        express min_separation relative to motion, T4)."""
+        return self._assumed_speed
+
     def project(
         self,
         ordering: List[TaskInstance],

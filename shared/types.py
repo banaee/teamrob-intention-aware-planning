@@ -689,10 +689,15 @@ class UpdateResult:
     TaskInstance is defined earlier in the TASK KNOWLEDGE TYPES section, 
     above PLANNING TYPES — matching the existing pattern already used 
     for "AbstractPlan" in ProjectedPlanEntry.
-    PLANNED (wait-decision revision, Sept 2026; io_contracts.md §1.9): will
-    also carry the winner's realized HOLDS (where the robot stands, for how
-    many ticks, before which segment) as an execution hint — the executor
-    may refine a hold, never re-decide or drop it silently (TODO-71).
+    hold: the hold δ the decision carries, in WHOLE ticks (T4): the robot
+    stands where it is for `hold` ticks, starting on the decision tick, then
+    continues the plan — an executed hint (io_contracts.md §1.9, TODO-71).
+    Set by B2 `b2a` when it continues the current task with its realized
+    hold; 0 otherwise (no hold: B2 continuing without a human projection,
+    every B3 decision until T10, the terminal return). The executor may
+    refine a hold, never re-decide or drop it silently; a later trigger's
+    decision replaces it.
     """
-    current_task: "TaskInstance" 
+    current_task: "TaskInstance"
     queue: List["TaskInstance"]
+    hold: int = 0

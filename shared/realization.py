@@ -40,8 +40,8 @@ LAYERING (design_decisions.md, "The robot can wait"; one-way, no cycles):
     nothing of tasks, beliefs, or selection, and holds no simulator constant.
     `min_separation` is passed IN by the caller (MetaPlanner, T4/T10) — the
     single policy value — so no policy enters the geometry below, and this
-    module decides nothing about which plan to run. Not yet wired into
-    MetaPlanner at T3: B2 (T4) and B3 (T10) are its consumers.
+    module decides nothing about which plan to run. Consumed by MetaPlanner's
+    B2 `b2a` (T4); B3 is to consume it at T10.
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT choose between candidates (meta_planner.py)

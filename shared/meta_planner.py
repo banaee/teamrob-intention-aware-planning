@@ -61,15 +61,17 @@ BLOCK STRUCTURE OF update():
     B1.5  current_task is None → nothing to continue; go straight to B3.
           Not an algorithmic block. Task boundaries always re-decide freely.
     B2    _is_current_task_plausible() — a MID-TASK commitment gate. Continue
-          the current task, or escalate to B3. Skipped entirely when
-          self._gate_strategy == "none" (the default), in which case update()
-          behaves exactly as it did before the block split.
+          the current task (with the hold its realization placed), or
+          escalate to B3. Always escalates when self._gate_strategy == "none"
+          (the default), in which case update() behaves exactly as it did
+          before the block split. "b2a" (T4) realizes the current task alone
+          and continues iff δ ≤ ρ × (T_h − now).
     B3    _replan_tasks() — selects the task assignment and commits.
-    Both B2 and B3 will consume realization (design, not yet built): B2
-    realizes the CURRENT task alone and judges its hold; B3 realizes EVERY
-    candidate and takes the argmin of realized duration. Whether B2 survives
-    as a policy block once B3's argmin already prices conflict is open
-    (TODO-36).
+    Both B2 and B3 consume realization: B2 `b2a` (built, T4) realizes the
+    CURRENT task alone and judges its hold; B3 (T10, not yet built) realizes
+    EVERY candidate and takes the argmin of realized duration. B2's role is
+    COMMITMENT (R1, TODO-36): it can only keep the current task where B3
+    might switch, never cause a switch.
 
 TASK POOL vs. CANDIDATES:
     The pool assembled in update() is NOT a candidate set. Nothing competes at
@@ -141,6 +143,7 @@ from shared.domain_knowledge import DomainKnowledgeBase
 from shared.recognizer import IntentionRecognizer, UNKNOWN
 from shared.planner import AdaptivePlanner
 from shared.projection import Projector
+from shared.realization import realize
 from shared.trajectory_algorithms import discretized_time_sampling
 
 
@@ -182,6 +185,8 @@ class MetaPlanner:
         gate_strategy: Literal["none", "b2a", "b2b"] = "none",
         interference_algorithm: Callable[[Segment, Segment], List[ConflictPoint]] = discretized_time_sampling,
         human_agent_id: Optional[str] = None,
+        min_separation_in_motion_ticks: float = 2.5,
+        rho: float = 0.5,
     ):
         """
         knowledge:              HTN domain knowledge, passed through to planner.py calls.
@@ -214,12 +219,12 @@ class MetaPlanner:
                                  candidate is inside _replan_tasks(): an individual task,
                                  or a permuted ordering. See module docstring, DESIGN-16. DESIGN-16.
         gate_strategy:           B2, the mid-task plausibility gate. "none" (default)
-                                 skips B2 entirely — update() then behaves exactly as it
-                                 did before the block split. "b2a" (realize the current
-                                 task alone; judge its hold) and "b2b" (realize current
-                                 and each other task; margin — redundant with B3) are not
-                                 yet implemented. Independent of `strategy`; all
-                                 combinations are intended to be runnable.
+                                 always escalates — update() then behaves exactly as it
+                                 did before the block split. "b2a" (T4) realizes the
+                                 current task alone and judges its hold against rho.
+                                 "b2b" (realize current and each other task; margin —
+                                 redundant with B3) is a documented stub. Independent of
+                                 `strategy`; all combinations are intended to be runnable.
         interference_algorithm:  function(Segment, Segment) -> List[ConflictPoint].
                                  Defaults to trajectory_algorithms.discretized_time_sampling,
                                  whose spatial resolution (max_spatial_step, world units)
@@ -241,6 +246,20 @@ class MetaPlanner:
                                  candidate is scored without an interference check
                                  (treated as feasible by default), matching how
                                  RobotAgent already tolerates no observed human.
+        min_separation_in_motion_ticks:
+                                 the clearance realization must achieve, as a multiple
+                                 of the robot's motion per tick (R1, TODO-28: 2.5). The
+                                 policy value is this unit-less ratio; the world-unit
+                                 min_separation passed to realize() is it times the
+                                 Projector's body-supplied assumed_speed (50 cm in Mesa
+                                 at 20 cm/tick), so shared/ holds no absolute distance.
+                                 Used by B2 `b2a` (T4); B3 still filters on
+                                 min_safe_distance until T10.
+        rho:                     B2 `b2a`'s policy parameter (R1, TODO-36): continue the
+                                 current task iff its realized hold δ ≤ rho × (T_h − now),
+                                 the human's remaining projected duration at the trigger.
+                                 0.5 is a STATED ASSUMPTION to be varied in T6, not a
+                                 calibrated value.
         """
         self._knowledge = knowledge
         self._recognizer = recognizer
@@ -251,6 +270,8 @@ class MetaPlanner:
         self._gate_strategy = gate_strategy
         self._interference_algorithm = interference_algorithm
         self._human_agent_id = human_agent_id
+        self._min_separation = min_separation_in_motion_ticks * projector.assumed_speed
+        self._rho = rho
         # For the pool's completion test only (_is_complete()). Decomposition
         # for projection stays inside Projector; this never plans.
         self._planner = AdaptivePlanner(knowledge=knowledge)
@@ -261,6 +282,10 @@ class MetaPlanner:
         # same as the queue.
         self._prev_belief: Optional[BeliefState] = None
         self._prev_executor_state: Optional[ExecutorState] = None
+        # The reason of the latest evaluate_triggers() decision, for B2's log
+        # line only; update()'s signature carries no trigger, and nothing
+        # decides on this.
+        self._last_trigger_reason: Optional[str] = None
 
         
     # =========================================================================
@@ -319,6 +344,7 @@ class MetaPlanner:
 
         self._prev_belief = belief
         self._prev_executor_state = executor_state
+        self._last_trigger_reason = decision.reason
         return decision
 
 
@@ -458,17 +484,20 @@ class MetaPlanner:
         # B2 is specifically a MID-TASK commitment mechanism.
         if executor_state.current_task is not None:
             # ---- B2: plausibility gate on the current task ------------------
-            if self._is_current_task_plausible(
+            hold = self._is_current_task_plausible(
                 belief=belief,
                 world=world,
                 executor_state=executor_state,
                 human_projection=human_projection,
                 task_pool=task_pool,
-            ):
-                # Continuation: queue untouched, current task keeps executing.
+            )
+            if hold is not None:
+                # Continuation: queue untouched, current task keeps executing,
+                # with the hold its realization placed (0: none).
                 return UpdateResult(
                     current_task=executor_state.current_task,
                     queue=list(self._queue),
+                    hold=hold,
                 )
 
         # ---- B3: replan the task assignment ---------------------------------
@@ -568,10 +597,8 @@ class MetaPlanner:
         executor_state: ExecutorState,
         human_projection: Optional[ProjectedPlan],
         task_pool: List[TaskInstance],
-    ) -> bool:
+    ) -> Optional[int]:
         """
-        SKELETON — not yet implemented (TODO-36).
-
         Decides whether the currently-executing task should keep executing, or
         whether the situation warrants escalating to B3. Called only when
         executor_state.current_task is not None (see update()'s B1.5).
@@ -581,36 +608,78 @@ class MetaPlanner:
         "doable" is not the question. Naming reflects that — "feasible" and
         "should_continue" were both rejected as implying a bare collision test.
 
-        Returns True to continue the current task, False to escalate to B3.
+        Returns the hold (whole ticks, ≥ 0) to CONTINUE the current task with,
+        or None to ESCALATE to B3. B2's role is COMMITMENT (R1, TODO-36): it
+        can only keep the current task where B3 might switch; it never selects
+        another task, and the hold it returns is realization's, not its own.
 
         Strategies (self._gate_strategy):
             "none" (default) — no gate; always escalate. update() then behaves
                 exactly as it did before the block split.
-            "b2a"  — assess the current task in isolation: realize the
-                CURRENT TASK ALONE against human_projection and judge its
-                hold δ (one candidate's realization — far cheaper than B3).
-                The scalar this needed now exists in design; what δ is judged
-                AGAINST (the human's remaining horizon, the task's own
-                duration, or nothing — B2 reducing to computation saving and
-                hysteresis) is open, TODO-36. NOT IMPLEMENTED.
+            "b2a"  (T4) — realize the CURRENT TASK ALONE against
+                human_projection (realize(), decision step 0, this planner's
+                min_separation) and judge its hold δ against the human's
+                remaining projected duration at the trigger, T_h − 0:
+                  human_projection is None     → continue, no hold (0)
+                  realizable and δ ≤ ρ × T_h   → continue, with hold δ
+                  δ above that bound, or unrealizable → escalate (None)
+                ρ is self._rho, a stated assumption (T6 varies it).
             "b2b"  — realize the current task and each other task in
                 task_pool individually; continue only if it wins by a clear
                 margin. Redundant with B3 under single_task by construction —
                 a redundancy control for ablation, not a fourth policy.
-                NOT IMPLEMENTED.
+                NOT IMPLEMENTED (documented stub).
 
         `task_pool` is unused under "b2a" and is present only so the signature
         does not change when "b2b" is filled in.
 
         When `human_projection` is None — not admitted by
-        update_human_projection() (below theta, no human, unresolvable) — B2
-        returns True: continue the current task. B2 escalates on evidence
+        update_human_projection() (below theta, no human, `unknown`,
+        unresolvable) — b2a continues with no hold. B2 escalates on evidence
         AGAINST the current task; no projection means no evidence, and no
-        reason to interrupt committed work. Not yet a branch here, since both
-        real strategies are stubs; to be implemented together with B2 itself.
+        reason to interrupt committed work.
+
+        Logs one [meta-b2] line per call under "b2a" (nothing under "none"):
+        trigger, current task, projection admitted or not, realizable, reason,
+        δ, T_r, the human's remaining projected duration, the bound, verdict
+        (continue_hold | continue | escalate). No step field, as [meta-proj].
         """
         if self._gate_strategy == "none":
-            return False
+            return None
+
+        if self._gate_strategy == "b2a":
+            current = executor_state.current_task
+            head = (f"[meta-b2] trigger={self._last_trigger_reason} "
+                    f"current={task_instance_key(current)}")
+            if human_projection is None:
+                logging.info(f"{head} projection=none verdict=continue hold=0")
+                return 0
+            now = 0.0  # the trigger, on the projection clock
+            projection = self._projector.project(
+                [current], world, executor_state.agent_id, belief, start_step=now
+            )
+            realized = realize(projection, human_projection, self._min_separation, decision_step=now)
+            if realized.horizon is None:
+                # An admitted projection without segments: realize() reads it
+                # as no projection, and so does B2.
+                logging.info(f"{head} projection=admitted reason={realized.reason} verdict=continue hold=0")
+                return 0
+            remaining = realized.horizon - now
+            bound = self._rho * remaining
+            if realized.realizable and realized.delta <= bound:
+                hold = realized.delta
+                verdict = "continue_hold" if hold > 0 else "continue"
+            else:
+                hold = None
+                verdict = "escalate"
+            logging.info(
+                f"{head} projection=admitted realizable={realized.realizable} "
+                f"reason={realized.reason} delta={realized.delta} "
+                f"T_r={realized.projected_duration:.2f} remaining={remaining:.2f} "
+                f"rho={self._rho} bound={bound:.2f} verdict={verdict}"
+                + (f" hold={hold}" if hold is not None else "")
+            )
+            return hold
 
         raise NotImplementedError(
             f"MetaPlanner._is_current_task_plausible: gate_strategy "
