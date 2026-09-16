@@ -418,7 +418,7 @@ AMENDED (R1, September 2026): H is the end of the human's projected task, T_h. R
 assesses the robot's plan only within [trigger, T_h] (Property 2, "The robot can wait"); the
 robot's plan beyond T_h is UNASSESSED — recorded as such, treated neither as clear nor as blocked
 — and what happens there is left to execution-time avoidance (see "Assumption: execution-time
-avoidance past T_h", below).
+avoidance past T_h", below; for Mesa that layer is the separation stop, C).
 
 **Plans are re-decomposed from scratch; the world state is the execution cursor**
 There is no plan cursor, action index, or resumption mechanism. Every cognitive trigger
@@ -608,8 +608,9 @@ September 2026; resolves TODO-30 and TODO-52): when no candidate realizes, `upda
 plain projected cost — the argmin over the pool with no hold, exactly the path taken when there is
 no human projection — and logs the trigger as `all_unrealizable`. Nothing is raised. The
 justification is the assumption recorded under "Assumption: execution-time avoidance past T_h"
-(below): the robot proceeds and the residual conflict is the execution layer's. The raise is
-removed when realization lands in the meta-planner (T10); until then the code still raises.
+(below): the robot proceeds and the residual conflict is the execution layer's. The raise was
+removed at T10. SUPERSEDED AGAIN (F1): no candidate is unrealizable, so the fallback built at T10 was
+removed as well; `update()` never raises and never falls back.
 Files: shared/meta_planner.py (`update`), mesa_sim/sim_agents.py (RobotAgent.finished)
 Reference: Phase 4C meta_planner build session, September 2026
 
@@ -1456,9 +1457,11 @@ WHAT REPLACES WHAT.
   (20 cm/tick) — expressed relative to motion so that it scales with the body, not as an absolute
   in `shared/`. To be revisited under randomised layouts (TODO-47) and real body sizes (ROS).
 - "infeasible" = a ConflictPoint below the threshold: RESTATED — "infeasible" = NO REALIZATION EXISTS
-  within the human's projected horizon. Rarer, and meaningful.
+  within the human's projected horizon. Rarer, and meaningful. SUPERSEDED (F1): nothing is infeasible;
+  a clearing δ always exists.
 - all-candidates-excluded raises `RuntimeError`: SUPERSEDED — the condition changed meaning and the
-  outcome is DECIDED (R1; below): plain-cost argmin, logged `all_unrealizable`.
+  outcome is DECIDED (R1; below): plain-cost argmin, logged `all_unrealizable`. Itself SUPERSEDED (F1):
+  the condition cannot arise and the fallback is gone.
 - interference measured in BATCH over whole trajectories (~900–1500 ConflictPoints, TODO-27):
   SUPERSEDED by PER SEGMENT, earliest violation given a start time.
 - B2 has no scalar to compute (stub, TODO-36): RESOLVED — realization gives B2 the current task's
@@ -1528,7 +1531,8 @@ has no violation in the assessed window. In outline:
               hold at p_trigger for [trigger, trigger + d],
               then the projected segments shifted by d }
     if no such d exists, or the only ones extend the hold to T_h: unrealizable (None)
-    (as built: unrealizable = RealizedPlan(realizable=False, reason); d in WHOLE ticks — T3b, below)
+    (as built: unrealizable = RealizedPlan(realizable=False, reason); d in WHOLE ticks — T3b, below;
+     SUPERSEDED (F1): the unrealizable branch is gone, d always exists)
     return RealizedPlan(shifted segments, hold = (p_trigger, δ), cost = T_r + δ, unassessed share)
 
 This REPLACES the per-segment loop written in the first version of this entry (hold each segment at
@@ -1615,7 +1619,7 @@ matters more now that prior-off `theta_crossed` can fire up to three times per r
 DECIDED (R1, September 2026, TODO-36): B2 SURVIVES, as `b2a`, and its role is COMMITMENT — it can
 only prevent a switch B3 would make. `b2a` realizes the current task alone and CONTINUES if
 δ ≤ ρ × (the human's remaining projected duration at the trigger, T_h − trigger); otherwise, or if
-the current task is unrealizable, it escalates to B3. `human_projection is None` still means continue.
+the current task is unrealizable (a branch gone since F1), it escalates to B3. `human_projection is None` still means continue.
 ρ is an explicit `MetaPlanner` policy parameter, default 0.5 — a stated assumption to be varied in the
 ablation (T6), not a calibrated value. RULED (T4 report): the human's remaining projected duration is
 T_h − 0, from the decision instant to T_h, not T_h minus the observation offset. The human is acting
@@ -1681,6 +1685,9 @@ is an event OF (TODO-68 / 48 / 54 / 64 / 65) — D2, to be decided from the T4 a
 at a chosen point along a segment (TODO-70); the body-side details of the hint beyond "STAND at the
 trigger position" (TODO-71: how a refined hold is reported back, a hold outlasting the next trigger);
 Mesa's own execution-time avoidance (TODO-73). The order of work is in roadmap.md (Phase 4C queue).
+SINCE R1: built in T3 / T4 / T10; F1 deleted the hold cap, the hold-position check and the
+all-unrealizable outcome (realization is total); C built Mesa's execution-time layer (the separation
+stop); D2 remains open.
 Files: docs only at this revision and at R1. To be touched when realization lands: shared/projection.py
 or a new realization module (`realize`, `RealizedPlan`), shared/trajectory_algorithms.py
 (`earliest_violation` — the role reserved for `closest_point_of_approach`), shared/meta_planner.py
@@ -1704,6 +1711,11 @@ output as hints, is TODO-73. The single-decision-path rule is untouched: that la
 it never decides whether to wait or which task to run. F1 fixes the rule that layer must implement — robot-responsible
 separation: stop when the next motion would violate (a) or (b); standing is always safe — so that
 execution and realization obey one definition (TODO-73).
+SINCE C (September 2026): Mesa HAS that layer — the execution-time separation stop, a run option
+(default off, so the earlier baselines stand), applying rule (a)/(b) against the human's actual
+position before every STEP; the tail past T_h is left to it, and a stationary s / v tail in the
+projection was considered and rejected (the C entry). F47b: with well-typed fixtures the stop fires
+only past T_h and on deviations, since every stay the projection carries is priced by realization.
 Files: docs only. Later: mesa_sim/ (TODO-73), ros_sim/ (Phase 6)
 Reference: R1 decision record, September 2026; T1b (every hold in the fixtures is a hold into the
 unassessed tail)
@@ -1885,7 +1897,7 @@ and the winner is the argmin of `RealizedPlan.cost` = T_r + δ over the REALIZAB
 pool order, as before; TODO-42 untouched). The winner's δ goes out as `UpdateResult.hold`, whether the
 winner is the current task or another, and Mesa executes it as it executes B2's (T4). No human
 projection: every candidate realizes with δ = 0 at T_r, so B3 is an argmin over projected durations.
-ALL CANDIDATES UNREALIZABLE (R1, TODO-30 / TODO-52): the argmin of the plain cost — the same fractional
+ALL CANDIDATES UNREALIZABLE (R1, TODO-30 / TODO-52; SUPERSEDED at F1, the fallback removed): the argmin of the plain cost — the same fractional
 T_r, `RealizedPlan.projected_duration`, never `ProjectedPlan.total_estimated_cost` (T3b) — with no
 hold, logged `[meta-b3] ... selection=all_unrealizable`; the `RuntimeError` is gone. REMOVED from
 selection: `_detect_interference()`, `_cost()`, `min_safe_distance`, the `interference_algorithm`
@@ -1933,7 +1945,8 @@ fetch item_6 — six actions) walks away from the human and realizes at δ = 0, 
 item_6. Under plain the robot had delivered item_4 at 54 (no holds earlier); under realized the
 step-6 and step-30 holds placed the robot's arrival exactly where the human departs. Consequence:
 completion 292 vs 228 ticks (+64), item_4 delivered third instead of first, and the human passed the
-robot anyway (56–57: 35.1 cm, past T_h). Mechanism: realizability is a HARD GATE inside B3 whenever
+robot anyway (56–57: 35.1 cm, past T_h). RESOLVED (F1, next entry but one: the flag and the
+hold-position check are gone; item_4 wins at 57 with δ = 2). Mechanism as it was: realizability is a HARD GATE inside B3 whenever
 some candidate realizes — the argmin ranges over realizable candidates only, so an unrealizable
 candidate cannot win however short its plan — and `hold_position_violated` fires here not on a
 projected conflict but on the PRESENT state (the human already within `min_separation` of where the
@@ -2040,39 +2053,14 @@ it as a stationary segment at the end of every projected task, robot candidates 
 projection alike. T_h grows by one tick per human task; every candidate's T_r by one, so plain
 selection cannot reorder.
 
-MEASURED (F1; `analysis/f1_robot_responsible/`; s00/s10/s20/s30 × prior off/on, run to completion,
-PYTHONHASHSEED=0; `plain`+`none`, `realized`+`none`, `realized`+`b2a` at ρ = 0.5):
-- VALIDATION (`validation.md`): 101 admitted candidate rows; every realized trajectory sampled at
-  0.001 tick over its assessed window has 0 rule (a) and 0 rule (b) violations; for all 12 held rows
-  δ − 1 violates (δ minimal); the T10 realizer on the same inputs calls 2 rows unrealizable (s30_on 21,
-  both candidates, hold_position_violated) and gives a larger δ in 4 rows (s10: 7 where F1 gives 0)
-  and a smaller one in none — F1's violating set is a subset of T10's.
-- PLAIN: identical decisions to T10 in every condition (the completion tick shifts every T_r by one).
-- REALIZED against PLAIN — realization's effect: s00 and s10 identical (s10's T10 holds are gone: the
-  robot arrives at the table first and STANDS while the human comes within 50 cm, which is no longer
-  its violation); s20 and s30: the same task order in every condition, reached later by the holds.
-- REALIZED, `none` against `b2a`: identical decisions, greps and holds in all eight conditions, as at T10.
-- s20_on STEP 57: item_4 (T_r 5.95) realizes with δ = 2 — the robot stands two ticks while the human
-  walks off, then places — and wins over item_6 (83.06); completion 239 against T10's 292 and plain's
-  228. Attribution: with the realizer alone (before the completion tick) δ was 0 at 57 and completion
-  236; the completion tick lengthens the step-6 hold from 7 to 8, so the robot reaches the table one
-  tick later and its last walk overlaps the human's departure. The T10 mechanism, corrected: item_4
-  was excluded at T10 not because its walk converged on the human but because its stationary
-  PLACEMENT stood within 50 cm of the departing human — a standing robot, which the joint-state rule
-  counted and the hold-position check then refused to shift.
-- s30_on STEP 21 (the mirror crossing, T10's one all-unrealizable event): item_4 realizes with δ = 7,
-  item_2 with δ = 4; item_4 wins (61.68 vs 70.45). The robot stands while the human passes it at
-  47.8 cm (ticks 22–23, "stand inside": allowed), then walks. Under T10 the fallback ran the robot
-  through the human (continuous minimum 0.00 at tick 23). Completion 162 in both.
-- HOLDS: 10 started, 36 ticks held, 1 interrupted (s20_off 20 → 24, remainder 4 = 8 − 4), identical in
-  both realized configurations: s20_off 20/24/31 → 8, 4, 1; s20_on 6/31/57 → 8, 1, 2; s30_off 28/47 →
-  7, 1; s30_on 21/47 → 7, 1. Every T10 hold at s20/s30 grew by one with the completion tick.
-- ACTUAL SEPARATION, each sub-50 tick classified by the F1 rule at execution (viol | stand | recede)
-  and against the assessed window: NO tick violates rule (a) or (b) inside an assessed window in any
-  run. Inside a window there are only "stand" ticks (s10 72–74, the human arriving at the robot's
-  placement; s30_on 22–23, the head-on pass). Every "viol" tick is past T_h, under no projection, or
-  after the robot finished — the tail (below).
-- s40 (regression sweep only): decisions and greps identical to T10.
+MEASURED (F1; `analysis/f1_robot_responsible/` — validation.md, comparison.md; numbers there, not here):
+every realized trajectory obeys rules (a) and (b) over its assessed window and every δ is minimal; plain
+selection is identical to T10's; realization changes only s20 and s30 (same task order, reached later by
+the holds), `none` and `b2a` decide identically; T10's two over-reactions are corrected — s20_on 57 keeps
+item_4 with δ = 2 (completion 239 against T10's 292) and s30_on 21 realizes both candidates where T10
+had its one all-unrealizable event; no tick violates rule (a) or (b) inside an assessed window in any
+run, every remaining violation being in the tail (past T_h or under no projection). The s10 and s40
+figures there predate TODO-32 and F47b (`analysis/f47_fixtures/README.md`).
 
 THE GAP F1 LEAVES OPEN — recorded, no design proposed here. Past T_h the human vanishes from the
 assessment, so the robot can approach a human still standing where its projection ended: T10's s20_on
@@ -2133,32 +2121,12 @@ last delivery is refused every tick until the step cap. With the stop on, only s
 limit meeting two fixture and domain facts — a scripted human that never leaves (a real one would),
 and a table modelled as a point with a single arrival radius (TODO-74). For the design chat.
 
-MEASURED (C; `analysis/c_separation_stop/comparison.md`; s00/s10/s20/s30 × prior off/on, cost realized,
-gate none, stop off and on, PYTHONHASHSEED=0):
-- OFF equals the F1 realized baselines byte for byte apart from the `[run]` header line, which now
-  names `separation_stop=off` (a run-header field cannot leave a log byte-identical; this is the one
-  difference and it is reported as such).
-- ACCEPTANCE: with the stop on, no robot STEP in any run breaks the F1 rule on Mesa's sequential
-  motion (0 violating steps in every condition; off: s00 3, s10 0, s20_off 8, s20_on 6, s30_off 5,
-  s30_on 2, all in the tail or under no projection). The simultaneous-interpolation figure (the F1
-  evaluation's "viol" label on `[sep] min=`) counts the same ticks, 0 with the stop on; its minima
-  differ where the human's own motion closes the distance during the tick (s30_off tick 23: 0.00 by
-  interpolation, 11.2 sequentially — the head-on pass-through) — measurement, not violation.
-- STOPS (on): s00 off/on 139 each (ticks 161–299), s10 none, s20_off 158 (57–58 and 144–299), s20_on
-  156 (144–299), s30_off 48 (21–24 and 156–199), s30_on 44 (156–199). Every stop is labelled
-  outside the assessed window (past T_h or no projection): none records a human deviating from its
-  projection. The two SHORT episodes are the tail doing its job — s20_off 57–58: prior off, the
-  human's next task not yet recognised, the robot 2 ticks from the table as the human walks off,
-  stopped for 2 ticks, then the delivery completes (decisions shift by 2 ticks, same order); s30_off
-  21–24: the mirror crossing under no projection, stopped 4 ticks while the human passes, where the
-  off run had the pass-through. The four LONG episodes are the indefinite wait above.
-- s20_on ticks 54–60, stop on: no stop. The robot is at 74.98 cm (55) and 55.03 cm (56) — under F1's
-  longer step-6 hold it is one tick further back than at T10, so its approach never comes below 50
-  before the trigger — then the step-57 decision's hold of 2 stands it at 57–58 while the human walks
-  off, it steps at 59 (human at 64 cm, receding) and places at 62. The decided hold covers this
-  episode; the stop is not needed.
-- DECISIONS: identical to off until the first long episode in s00, s20_on and s30; s20_off shifted by
-  2 ticks from 63 on with the same task order; s10 identical throughout.
+MEASURED (C; `analysis/c_separation_stop/comparison.md`, numbers there): the stop-off runs equal the F1
+baselines apart from the `[run]` header; with the stop on no robot STEP in any run breaks the F1 rule
+(acceptance 0, against 2–8 violating steps per run with it off, all in the tail); every stop is labelled
+outside the assessed window — the two short episodes are the tail doing its job (s20_off 57–58, s30_off
+21–24), the four long ones the indefinite wait above; decisions are identical to the stop-off runs until
+the first long episode. The s10 rows there predate TODO-32.
 Files: mesa_sim/executor.py (`_separation_blocked`, `_log_stop`, `set_assessed_window`, step() 5a),
 mesa_sim/sim_agents.py (Executor construction, the window after each decision, `[run]`),
 mesa_sim/sim_model.py, mesa_sim/run_mesa.py (`--separation_stop`), configs/experiment.yaml,
@@ -2183,11 +2151,9 @@ Recorded (R2, September 2026); no decision changed. Measurements: `analysis/c_se
   be reported side by side; the variant fixture comes with TODO-47's harness, not here. Under the first,
   BLOCKED TIME is the outcome (`blocked.py`): completion is reported only when it happens; otherwise the
   run reports "blocked by an occupying human" with the blocked duration, place and action. Measured on
-  the C runs, stop on: s00 139 ticks (161–299), s20_off 158 (57–58, 144–299), s20_on 156 (144–299),
-  s30_off 48 (21–24 at item_4, 156–199), s30_on 44 (156–199), s10 0; every long episode is a walk to
-  kitting_table_0 that ends in the stop. Human-borne proximity (the robot stands, the human within s)
-  with the stop on: s10 72–74 (the robot's own placement, 3 ticks), s30_off tick 22 (a stop while the
-  human passes), s30_on tick 22 (a decided hold); none elsewhere. Robot violations 0 in every run.
+  the C runs (`analysis/c_separation_stop/blocked.md`): with the stop on, s00, s20 and s30 are blocked at
+  the table from their last delivery to the cap, s10 never; human-borne proximity (the robot stands, the
+  human within s) is a few ticks per run at most; robot violations 0 in every run.
 - NOT AN EXCLUSION THRESHOLD. Marking a task not executable because the body refused its step (a
   candidate for D2) introduces no parameter: it reads a fact of execution, not a comparison against a
   distance. The T10 lesson forbids a tunable threshold inside selection; it does not forbid selection

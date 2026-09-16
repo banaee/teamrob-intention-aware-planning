@@ -51,6 +51,10 @@ The `Projector` additionally takes the body's task-completion tick.
 conversion, and a stationary action whose schema names a duration binding (`ActionSchema.duration_key`;
 `wait_at`'s `?duration`) is projected at that duration (TODO-32 closed).
 
+**Re-aligned after F47b (September 2026)** for §4.1 and §6: a scheduled or assigned task's bindings are
+TYPED — every bound object exists in the layout with the type the schema's `parameter_types` declares —
+and the embodiment checks this at spawn (`shared.types.check_task_bindings`), an error, not a warning.
+
 ---
 
 ## 0. Notation (matches paper)
@@ -1063,9 +1067,14 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
   whether to wait and drops none silently (§1.9, the hold). Logs `[hold] ... start planned= trigger=
   pos=` and `[hold] ... end planned= executed= interrupted=`
 - Logs one `[run]` header line per robot at construction naming the policy values the run was
-  produced under: `gate_strategy`, `cost_strategy`, θ, ρ, `min_separation` and its ratio × rate
-  (TODO-78); a run option (`--gate_strategy`, `--cost_strategy`, `configs/experiment.yaml`) is a
-  run fact, never a scenario fact
+  produced under: `gate_strategy`, `cost_strategy`, `separation_stop`, θ, ρ, `min_separation` and its
+  ratio × rate (TODO-78); a run option (`--gate_strategy`, `--cost_strategy`, `--separation_stop`,
+  `configs/experiment.yaml`) is a run fact, never a scenario fact
+- Checks every agent's scheduled and assigned task bindings against the layout at spawn
+  (`shared.types.check_task_bindings`, F47b): the bound object exists and carries the type the schema's
+  `parameter_types` declares; a mismatch raises. A task the domain does not describe is never executed by
+  the human and never invisible to the robot by accident (TODO-49; a declared out-of-domain behaviour is
+  TODO-80)
 - Supplies the `Projector` its motion rate (`step_size`, T2), its stopping distance (T9: the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
   executor stops), its per-action acknowledgement latency and observation offset (L2), and its
@@ -1136,3 +1145,6 @@ Simulators MUST ensure:
     task-completion ticks it supplies are the ticks its executor actually spends (L2, F1)
 
 ---
+13. Every scheduled and assigned task's bindings name objects that exist in the layout with the types
+    the schema's `parameter_types` declares; the embodiment refuses the scenario at spawn otherwise
+    (`check_task_bindings`, F47b). Fixtures may not rely on an ill-typed instance

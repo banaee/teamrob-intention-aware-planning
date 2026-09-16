@@ -21,6 +21,6 @@ Regenerate from the repo root (~1 min):
     $H/sweep.sh $H/realized_b2a  --cost_strategy realized --gate_strategy b2a
     ~/python-envs/teamrob-sp4-env/bin/python $H/evaluate.py > $H/comparison.md
 
-The three directories are the baselines from T10 on: `realized_none/` is the default configuration
+The three directories were the baselines from T10 until F1 (superseded by `analysis/f1_robot_responsible/`, then for s10 by TODO-32 and for s40 by F47b — `analysis/f47_fixtures/`): `realized_none/` is the default configuration
 (the regression sweep, ten conditions), `plain_none/` and `realized_b2a/` the comparison conditions.
 For T6: point `evaluate.py`'s `CONFIGS` at any sweep directories with the same layout.

@@ -26,8 +26,14 @@ current state, parameters and guarantees are in `docs/recognizer_handback.md`; o
   machine and AC switch side by side, item_1 near them; the old layout with obstacles is kept as
   `env_layout9`, not registered), `env_layout2` / `scenario_20` (collinear decoys),
   `env_layout3` / `scenario_30` (mid-approach reveal), `env_layout4` / `scenario_40` (F1, Sept 2026:
-  a scripted deviation sequence — delivery, coffee break, a wander that is no task, a second delivery —
-  the positive control for foreseeable-task recognition)
+  a scripted deviation sequence — delivery, coffee break, two AC-switch legs, a second delivery —
+  the positive control for foreseeable-task recognition; F47b retyped the two legs' waypoints as AC
+  switches so the script is well typed, baseline regenerated in `analysis/f47_fixtures/`).
+  Evaluation fixtures, not in the regression sweep (F47 / F47b): `env_layout5` / `scenario_50`
+  (scenario_20's end-state variant: the human steps aside for a coffee break), `env_layout7` /
+  `scenario_70`, `scenario_71` (a foreseen human stay on the robot's route; alternative beside or
+  across). `env_layout6` / scenario_60/61 (F47) are retired as ill-typed, kept unregistered as a record.
+  Since F47b every scheduled and assigned task's bindings are type-checked at spawn (TODO-49).
 - `mesa_sim/sim_model.py`, `sim_agents.py`, `world_state_builder.py`, `obs_builder.py`
 - `mesa_sim/action_decomposer.py`, `executor.py`, `run_mesa.py`
 - Headless simulation runs correctly: human and robot agents complete full assigned task sequences
@@ -104,25 +110,31 @@ heading kernel (HIGH 4.0 / LOW 0.1 / NEUTRAL 1.0) that multiplied identical head
 - Recursive decomposer with real guard evaluation, derived variable
   resolution, `?agent` binding propagation
 
-**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built and validated on scenario_00; the recognizer rebuilt and handed back; the meta-planner side resumed with T7/T8 and the wait-decision revision — realization designed, measured (T1b), decided (R1) and baselined (T9); to be built in T3 / T4 / T10)
+**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built; the recognizer rebuilt and handed back; realization designed, measured, decided and BUILT — T3 the service, T4 `b2a`, T10 B3 on realized cost — then made total under robot-responsible separation (F1), with the execution-time separation stop in Mesa (C), blocked time as an outcome (R2), schema wait durations in projection (TODO-32) and typed scheduled bindings (F47b). Remaining in the queue: D2, T6)
 
 Built and running end-to-end. All three tasks complete, correct terminal state, zero errors.
 
 *Implemented (meta-planner side):*
 - `shared/meta_planner.py` — public: `evaluate_triggers()`, `update_human_projection()`,
-  `update()`; internal: `seed_tasks()`, `_is_complete()` (T7), `_detect_interference()`, `_cost()`
-  — the last two are superseded in design by realization (below) and stay until it lands
+  `update()`; internal: `seed_tasks()`, `_is_complete()` (T7), `_is_current_task_plausible()` (B2
+  `b2a`, T4), `_replan_tasks()` (B3 on realized cost, T10). `_detect_interference()` and `_cost()`
+  were removed at T10
+- `shared/realization.py` — `realize(plan, human_plan, min_separation, decision_step) -> RealizedPlan`
+  (T3): the whole-trajectory minimal shift on `shift_violation_interval()`; total since F1 (a clearing
+  δ always exists; no `realizable` flag, no hold cap)
 - `shared/projection.py` — `Projector` extracted from `MetaPlanner`: `project()`
   (single-task path), `project_human()`, `build_segments()`, `estimate_duration()`.
   Injected into `MetaPlanner` rather than constructed by it — one instance, held by the
   agent, shareable with viz/evaluation
 - `shared/trajectory_algorithms.py` — `straight_line_path()`, `stationary_segment()`,
   `discretized_time_sampling()`; `closest_point_of_approach()` and `obstacle_aware_path()`
-  documented but deliberately unimplemented — now with assigned roles: the closed-form
-  `earliest_violation` realization needs, and the detour strategy (4D)
-- `shared/types.py` — `Segment`, `ConflictPoint` (retyped, zone-free),
-  `InterferenceAssessment`, `ExecutorState`, `TriggerDecision`, `UpdateResult`,
-  `task_instance_key()`; `ProjectedPlanEntry.spatial_zones` → `segments`
+  documented but deliberately unimplemented; `shift_violation_interval()` (T3, rewritten F1) is the
+  closed form realization is built on; `discretized_time_sampling()` has no consumer in the run path
+  since T10 (TODO-83)
+- `shared/types.py` — `Segment`, `RealizedPlan` (T3), `ExecutorState`, `TriggerDecision`,
+  `UpdateResult` (with `hold`, T4), `task_instance_key()`, `check_task_bindings()` (F47b),
+  `ActionSchema.duration_key` (TODO-32); `ConflictPoint` and `InterferenceAssessment` remain as
+  types only (TODO-83); `ProjectedPlanEntry.spatial_zones` → `segments`
 - `mesa_sim/sim_agents.py` — `RobotAgent` migrated off `replanning.py`; `task_index` and
   `_get_current_task_instance()` removed; `finished` flag added
 - `domains/kitting/tasks.py` — third `MethodSchema` `deliver_already_held`, required by the
@@ -131,8 +143,9 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
 - T1 (conflict-geometry measurement, `analysis/t1_conflict_measurement/`) and T2 (projection in execution
   ticks; `min_safe_distance` exclusion now reachable) — measurement and units, no decision changed
 - T7/T8 (Sept 2026): completed tasks leave the pool by world fact (`AdaptivePlanner.is_complete`);
-  `unknown` is not admitted as a projection. `analysis/t7_t8_meta_bugs/` holds the meta-planner-side
-  regression baselines from here on
+  `unknown` is not admitted as a projection. `analysis/t7_t8_meta_bugs/` held the meta-planner-side
+  regression baselines until T9; the current ones are F1's (`analysis/f1_robot_responsible/realized_none/`,
+  with s10 superseded by TODO-32 and s40 by F47b — `analysis/f47_fixtures/`)
 - WAIT-DECISION REVISION (Sept 2026, documents only): T1 showed the fixtures' interference is a TIMING
   conflict (both agents reach the table within a tick), so the proportionate response is a short wait,
   which the robot could not express — its only lever was which task to do. Decided: the robot can wait.
@@ -217,20 +230,20 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 *Validation gaps under 4C, checked against current state (Sept 2026):*
 - TODO-28: DECIDED at R1 — `min_separation` = 2.5 × the robot's motion per tick (50 cm in Mesa),
   relative to motion so that it scales; the `assumed_speed` / time-scale half was RESOLVED by T2. Landed
-  in code in T4 for B2 only; B3 adopts it in T10; revisit under TODO-47 and ROS body sizes.
+  in B2 (T4) and B3 (T10). R2 records what the one value costs: it governs both crossing in the open and
+  working side by side at a point place, where s ≤ 2r and opposite-side arrival would be needed (50 vs
+  60 cm here: the rim only). Revisit under TODO-47 and ROS body sizes.
 - TODO-29: `deliver_with_return` still unexercised under the MetaPlanner for the ROBOT. It is exercised every
   run by the recognizer for rival hypotheses of the human, and whether its guard is the right prediction there
   is now an open domain question (TODO-55 (e)).
-- TODO-30: the interference exclusion branch is NOW EXERCISED (T2): candidates are excluded at `min_dist = 0`
-  (scenario_20 steps 11 / 24) and every-candidate-excluded raises (scenario_10 step 257). Whether those
-  exclusions are legitimate is TODO-28's question; what the robot does when everything is excluded is open.
-  Under realization those exclusions become short holds; "infeasible" means no realization within the
-  human's horizon. The all-unrealizable outcome is DECIDED at R1 (TODO-30): plain projected cost,
-  logged `all_unrealizable`; the `RuntimeError` goes with T10. The scenario_10 figures above are from
-  the old layout (stale since R1).
-- TODO-32: `wait_at` duration still ignored in COST estimation (projector side). The recognizer side is done:
-  waits are observable (`waited`) and `coffee_break` is recognised mid-walk in scenario_40. Now load-bearing:
-  a human's projected occupation is the hold a robot task pays to pass it.
+- TODO-30: CLOSED (F1). Under robot-responsible separation a clearing hold always exists, so no candidate
+  is unrealizable; the exclusion branch, the all-unrealizable fallback (built at T10) and the `RuntimeError`
+  are all gone. The exclusion T10 still had (s20_on 57, a task 4 ticks from done dropped for a standing
+  placement) was the finding that led to F1.
+- TODO-32: CLOSED (R2). The wait duration is the method schema's (`PT60S`, `PT2S`), read from the grounded
+  action through the schema's `duration_key` and converted by the embodiment's `duration_to_steps`
+  callable; knowledge and behaviour match by construction. A mismatch experiment keeps the robot on the
+  schema value and gives the human's instance its own.
 
 *Waiting on the meta-planner side (from the hand-back):*
 - `theta_crossed` as an interface event (TODO-68, with TODO-48 and TODO-54): prior-off the true task can
@@ -247,28 +260,36 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 1. R1 + T9 — the decision record (this), projection ending at the body's stopping distance, the
    actual-distance measure, new baselines over ten conditions ✅
 2. T3 — `realize()` as a service on the projection / trajectory side (whole-trajectory minimal shift,
-   `earliest_violation` closed form, `RealizedPlan`), validated against T1b's `whole` realizer on the
-   T9 baselines. Open before its numbers are read as exact: TODO-77 (T9 found the projection still
-   1–6 ticks ahead of execution through the executor's acknowledgement ticks — a decision, not a fix)
+   `shift_violation_interval` closed form, `RealizedPlan`), validated against T1b's `whole` realizer ✅
+   (`analysis/t3_realize/`; T3b the whole-tick hold; L2 then removed the acknowledgement lag, TODO-77)
 3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5;
    the hold δ on `UpdateResult`, executed by Mesa as STAND at the robot's position ✅
    (`analysis/t4_b2a/`; TODO-36, TODO-71, TODO-77)
-4. T10 — B3.A with realized cost T_r + δ; the all-unrealizable fallback (plain cost, logged);
-   `min_separation` = 2.5 × motion per tick replaces `min_safe_distance`; the `RuntimeError` removed;
-   B3's winner's δ on `UpdateResult.hold` (the field and its Mesa execution were built in T4).
-   Also in T10, deferred from T4: bring `shared/io_contracts.md` up to date (§1.9 the hold is now in
-   `UpdateResult`; §2.2 Blocks, `b2a` built; §2.2c `realize()` consumed; §4.1 the hold executed);
-   one run-log header line naming the parameters a log was produced under, at least `gate_strategy`
-   and θ, plus ρ and `min_separation` (TODO-78). That changes every log, so do it with T10's
-   baseline regeneration
-5. D2 — what a trigger is an event of (TODO-68 / 48 / 54 / 64 / 65), decided from the T4 and T10 logs;
-   also whether the separation stop is one (C: no trigger on a stop; R2 records it as open for D2)
+4. T10 — B3.A with realized cost T_r + δ; `min_separation` replaces `min_safe_distance`; the
+   `RuntimeError` removed; B3's winner's δ on `UpdateResult.hold`; the `[run]` header (TODO-78) ✅
+   (`analysis/t10_b3_realized/`; its all-unrealizable fallback was removed again at F1)
+   Then, in order (all ✅, September 2026): T5 (a continue costs nothing), L2 (projection time includes
+   the body's acknowledgement and observation offset), F1 (robot-responsible separation: rules (a)/(b),
+   realization total, hold cap and fallback gone, the task-completion tick projected —
+   `analysis/f1_robot_responsible/`), C (the execution-time separation stop in the Mesa executor, default
+   off, same rule; the s / v tail rejected — `analysis/c_separation_stop/`), R2 (the point-place fact,
+   one s for two situations, blocked time and human-borne proximity as outcomes, TODO-32 closed),
+   F47 / F47b (typed scheduled bindings at spawn; the evaluation fixtures; a stay the projection carries
+   is absorbed by realization — `analysis/f47_fixtures/`)
+5. D2 — designed in the design chat. Its main content: what a trigger is an event OF (TODO-68 / 48 /
+   54, the human's task boundary), separating the events that change the evidence from those the current
+   machinery can respond to; admission restricted to evidence-changing events, the remaining churn risk
+   (argmin flips on a re-decision) belonging to B2. The blocked-execution event and its wait-versus-
+   reconsider policy are recorded as design; their evaluation is deferred until a fixture legitimately
+   produces a mid-run block — with valid fixtures none does (F47b), so it waits for TODO-80 or randomised
+   layouts (TODO-47)
 6. T6 — ablation: B2 {none, b2a} × B3.A {plain, realized}, sweeps of ρ and of s (`min_separation`)
-Later, not scheduled: TODO-47 (randomised layouts; (d) the human's end-state variant, R2), TODO-32 ✅ (R2: the
-schema's wait duration in projection, body-converted),
-`full_reorder` with `realize()`, TODO-70 (a hold at a chosen point along a segment), TODO-71 (the
-hint's body-side details), TODO-73 (Mesa execution-time avoidance), TODO-74 (placement positions on
-the table), TODO-75 (the ROS guide and `env_layout9`).
+Later, not scheduled: TODO-80 (declared out-of-domain human behaviour, the principled unforeseen stay),
+TODO-47 (randomised layouts; B3.B fixtures with several remaining robot tasks, (f)), Phase 4D (the detour
+strategy, a hold at a chosen point along a segment TODO-70, human cooperation as the remedy for the
+freezing robot TODO-15), TODO-74 (placement positions on the table), B3.B `full_reorder` with
+`realize()`, TODO-71 (the hint's body-side refinement and its reporting), TODO-75 (the ROS guide and
+`env_layout9`), the housekeeping items TODO-81 / 82 / 83.
 
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
@@ -284,10 +305,14 @@ the table), TODO-75 (the ROS guide and `env_layout9`).
   realization into one function. ROS keeps a two-tier split (this estimator for cost
   estimation, PRIEST for real execution) — still a dedicated design session away from being built
 - The hold hint's consumption on the body side (execute, refine, never re-decide) is TODO-71;
-  Mesa first — one hold δ at the trigger position, executed as STAND before the plan continues (R1)
-- Execution-time avoidance past the human's projection is assumed, not built: Mesa's agents may
-  overlap (TODO-73); T9 measures the actual robot–human distance per tick so that the assumption's
-  cost can be reported
+  Mesa executes it (T4: one hold δ at the trigger position, STAND before the plan continues);
+  refinement and its reporting stay open
+- Execution-time avoidance past the human's projection: for Mesa it is the separation stop (C, a run
+  option, default off) — the body refuses a STEP that would break robot-responsible separation against
+  the human's actual position and stands instead; it cannot detour, so a human occupying the place the
+  robot must reach blocks it until the human leaves (R2: blocked time is the outcome). The detour is
+  4D's; with valid fixtures the stop fires only past T_h and on deviations (F47b). `[sep]` (T9) measures
+  the actual distance per tick; the stop-off baselines contain walk-throughs and support no safety claim
 
 ### Prerequisites before implementation
 
@@ -304,7 +329,7 @@ the table), TODO-75 (the ROS guide and `env_layout9`).
 
 ## Phase 5 — Evaluation & Experiments 🔲
 - Comparative evaluation: IR accuracy vs. ground truth (known human intentions from scripted human)
-- Domains: kitting (the four sweep layouts), dock loading (deferred)
+- Domains: kitting (the five regression fixtures and the evaluation fixtures, roadmap Phase 3), dock loading (deferred)
 - Metrics, restated after 4C-IR (what each now means, and what it cannot mean):
   - IR: **reveal tick** — the first `theta_crossed` on the task actually under way, relative to the grasp
     (pre-/post-grasp); this is the "early recognition step", measured throughout I1–I5. **Wrong-task ticks

@@ -51,6 +51,17 @@ output only, inert in every measured condition).
 Everything below is measured at these values on the four layouts, under the premises in §3.3. "Guarantee"
 means: holds in every measured condition and follows from the model, not from a scenario.
 
+**Figures superseded for scenario_40 (F47b, September 2026).** Every scenario_40 tick below was measured
+with the segment-3 legs scripted as `ac_activation` bound to two `waypoint` objects — an ill-typed script
+that gave the walks no hypothesis. F47b retyped the two targets as AC switches (`ac_switch_1`, `ac_switch_2`)
+at the same coordinates, so `ac_activation` has three hypotheses and the s40 belief differs from tick 0.
+On the regenerated baseline (`analysis/f47_fixtures/README.md`): the coffee crossing is at 153 under both
+priors (peak 0.915 / 0.917, not 0.982 / 0.984; was 135 prior-on, 143 prior-off); the two AC legs ARE
+recognised (205: ac_switch_1 0.784 / 0.878; 221: ac_switch_2 0.772 / 0.853) and pinned complete at 207 and
+228, so their ends are boundaries; an item_6 crossing appears at 266 (off) / 250 (on). The s00 / s20 / s30
+figures stand; scenario_10 was reinstated in the sweep at R1/T9 on the cleaned env_layout1 (its figures here
+were never part of the I5 matrix). The model, its parameters and the guarantees' form are unchanged.
+
 ### 3.1 Prior-on (the observed agent's assignment is known)
 
 The recognizer GUARANTEES:
@@ -125,7 +136,8 @@ bar with 3 and with 8 hypotheses); that `unknown` ≥ θ means the human is idle
 does not contain, or a detour under way); that a robot completion is a human boundary; that the ceiling is
 0.909 (it is 1/(1 + uⁿ)); that confidence is monotone within a task; that a `theta_crossed` on `unknown`
 (TODO-54) or a `most_likely` change without a crossing (TODO-48) carries any recognition; that anything in the
-belief refers to a previous episode; that the segment-3 wander's end is a boundary (nothing fires there).
+belief refers to a previous episode; that the segment-3 wander's end is a boundary (nothing fired there;
+since F47b the legs are AC-switch tasks and their completions ARE boundaries — see the note above §3.1).
 
 ## 4. The characterised limitations (TODO-61 — properties of the chosen model, not defects)
 
@@ -192,10 +204,10 @@ TODO-54 (`theta_crossed` on `unknown` after a pin): the three are one question �
 | `theta_crossed` one-shot vs crossing | TODO-68, with TODO-48, TODO-54 | §5 |
 | the context / knowledge-representation pass | TODO-66 | `_context_weight` names two tasks and carries four constants; output only |
 | the stationarity channel | TODO-59 (deferred paragraph) | standing still as evidence against movement hypotheses; outside dC, not built |
-| the unmodelled segment 3 → 4 boundary | TODO-57 (question 3) | the wander is not a task; no boundary fires; item_6 carries its 3b excess into its own approach (forgiven after two observations under I4d) |
+| the unmodelled segment 3 → 4 boundary | TODO-57 (question 3) | superseded by F47b: the legs are `ac_activation` tasks, their completions pin and re-initialise; a declared unmodelled behaviour is TODO-80 |
 | the two analytical tools | TODO-62 (radius of maximum probability), TODO-63 (rationality measure) | filed, not built, with their triggers |
 | TODO-52's latent crash; s30_off's item_2 at 87 | TODO-52, TODO-67 | meta-planner side |
-| scenario_10 | TODO-52 (and TODO-42) | dropped from the sweep in I2: its step-257 meta-planner RuntimeError is latent and its `[IR-dist]` tie order flaps without `PYTHONHASHSEED=0` |
+| scenario_10 | TODO-52 (and TODO-42) | dropped from the sweep in I2; reinstated at R1/T9 on the cleaned env_layout1 (the RuntimeError path is gone since T10/F1); `PYTHONHASHSEED=0` still required |
 | β in centimetres | TODO-58 | layout-scale dependence |
 | `io_contracts.md` §1.3 / §2.1 describe the pre-I2 recognizer | TODO-72 | leg model, cosine kernel, held-item rule; align against §1–§2 here (found Sept 2026, meta-planner side, not edited) |
 

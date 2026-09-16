@@ -30,4 +30,6 @@ regression sweep, ten conditions), `plain_none/` and `realized_b2a/` the compari
 run with the separation stop off and contain walk-throughs (the tail "viol" ticks in `comparison.md`):
 they are decision baselines and support no safety claim (R2). Since TODO-32 (R2) the s10 and s40 logs
 differ from these at HEAD in `[meta-b3] T_h` and `[meta-cand] share` at the coffee_break triggers only
-(s10 step 123; s40 steps 135/143 and 147); decisions, holds and every other grep are unchanged.
+(s10 step 123; s40 steps 135/143 and 147); decisions, holds and every other grep are unchanged. Since F47b
+(scenario_40 retyped) the s40 logs and md5s here are superseded altogether: the current s40 baseline is
+`analysis/f47_fixtures/baselines_s40/` (same task order and completion, different recognition ticks).

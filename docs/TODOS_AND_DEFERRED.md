@@ -667,7 +667,7 @@ docstring, or chat reference to "DESIGN-14" regarding strategy/reordering means 
 Files: shared/meta_planner.py, shared/io_contracts.md §2.2
 Reference: Phase 4C meta_planner build session, September 2026
 
-**TODO-27 — `conflicts` list volume: no "worth recording" threshold** [Phase 4C, deferred]
+**TODO-27 — `conflicts` list volume: no "worth recording" threshold** — ✅ OBSOLETE (T10: the batch profile is gone)
 `_detect_interference()` concatenates every `ConflictPoint` from every time-overlapping
 segment pair with no filtering. Observed in scenario_00: 900–1500 ConflictPoints for a single
 candidate, since `discretized_time_sampling(interval=1.0)` emits one point per step per pair
@@ -678,7 +678,8 @@ and rejected as premature — the list is bounded and correctness is unaffected.
 profiling shows it matters, or when DESIGN-08's soft penalty needs to actually iterate these.
 SUPERSEDED (wait-decision revision, Sept 2026): the batch profile goes with
 `_detect_interference()`. Realization asks `earliest_violation` per segment at a start time and
-receives one interval (or none), so there is no list to bound. Closes when realization lands.
+receives one interval (or none), so there is no list to bound. ✅ CLOSED (T10): `_detect_interference()`
+is gone; what remains of the sampler and its types is TODO-83.
 Files: shared/meta_planner.py (_detect_interference), shared/trajectory_algorithms.py, shared/projection.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
@@ -790,7 +791,7 @@ Re-testing needs a seed item that is NOT in the robot's candidate pool. Until th
 Files: domains/kitting/tasks.py, mesa_sim/sim_model.py, domains/kitting/scenarios.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
-**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable` — ✅ BUILT (T10): the `RuntimeError` is gone; one event measured — ✅ CLOSED (F1): realization is total, the branch no longer exists
+**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable` — ✅ BUILT (T10): the `RuntimeError` is gone; one event measured — ✅ CLOSED (F1): realization is total, the branch no longer exists — ✅ CLOSED (F1: nothing is unrealizable)
 CLOSED (F1, September 2026): under robot-responsible separation (design_decisions.md,
 "Robot-responsible separation") a clearing hold always exists, `realize()` always returns a cost, and
 there is no unrealizable candidate — neither the exclusion branch nor the all-unrealizable fallback
@@ -1314,7 +1315,7 @@ Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_targ
 `_get_relevant_action_schemas`)
 Reference: leg-level evidence session, September 2026
 
-**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C] — (d) end-state variant and (e) D2 fixtures ✅ BUILT (F47)
+**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C] — (d) end-state variant and (e) evaluation fixtures ✅ BUILT (F47, retyped F47b); (f) B3.B fixtures noted
 Plan: run every B2.X × B3.X combination over hundreds of generated simulations (randomised
 layouts, scenarios, parameters) and compare outcomes. Not seed repetition — the sim is
 deterministic under PYTHONHASHSEED=0, so variation must come from generated inputs.
@@ -1697,7 +1698,10 @@ agent's position; bases, folds and events untouched. Fires at 18/18 human task b
 the robot's completions; coffee_break 0.904 in both prior settings; s00/s20/s30 byte-identical to I4.
 Candidates A'/B/C/D rejected with numbers (`analysis/i4b_boundary/REPORT.md` §2). Open questions (1)
 and (2) below are answered (a retirement the phase state accounts for; origins only). Question (3)
-stands: no boundary sees segment 3's waypoint pauses (1 tick, retire nothing), and a domain whose tasks
+stands: no boundary sees segment 3's waypoint pauses (1 tick, retire nothing) — SINCE F47b the two
+segment-3 legs are well-typed `ac_activation` tasks at `ac_switch_1` / `ac_switch_2`, whose completions
+pin and re-initialise like any other (scenario_40's baseline regenerated, `analysis/f47_fixtures/`), so
+scenario_40 no longer has an unmodelled boundary; a declared unmodelled behaviour is TODO-80 — and a domain whose tasks
 end in a ProcessCompletion has none. What the boundary does NOT fix — a rival's permanent folds from the
 previous task (item_6 stays at the floor; §3 of the report) — is TODO-55's, and what it exposes — a
 lone survivor at 0.909 on zero evidence — is TODO-59.
@@ -1946,7 +1950,13 @@ Files: shared/meta_planner.py (`update`, `_is_complete`), shared/planner.py (`is
 Reference: I4c report ("Flagged, not fixed"); I5 hand-back; T7/T8 session, September 2026; design_decisions.md
 "Task completion is a world fact"
 
-**TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question]
+**TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question] — D2's main content
+D2 SCOPE (wrap-up after F47b, September 2026; designed in the design chat): what a trigger is an event OF
+— this item with TODO-48, TODO-54 and the human's task boundary — separating the events that change the
+evidence from those the current machinery can respond to. Admission is restricted to evidence-changing
+events; the remaining churn risk, an argmin flip on a re-decision, belongs to B2 (`b2a`'s commitment,
+TODO-36). The blocked-execution event and the wait-versus-reconsider policy are recorded as design, their
+evaluation deferred until a fixture legitimately produces a mid-run block (TODO-80, TODO-47).
 Measured (I4d, confirmed at HEAD in I5): prior-off the true task crosses θ three times per recognition —
 s00_off 109 / 113 / 115, s20_off 20 / 24 / 30 and 87 / 91 / 95. Three things, kept separate:
 (a) RECOGNIZER BELIEF: the trajectory is exactly what the stated model implies (the I4d invariant holds to
@@ -1988,6 +1998,9 @@ Sept 2026).
 Three readings, none chosen: (1) ignore, as now; (2) compare candidates only over the common
 assessed window; (3) carry the assessed fraction as a confidence on the cost, not a change to
 its magnitude.
+SINCE (F1, C, F47b): reading (1) stands and the tail is larger than T1 measured, since a hold may now
+extend past T_h (F1: no hold cap). What happens in the tail is the separation stop's (C), and with
+well-typed fixtures every stop so far fell in the tail (F47b) — the tail is where the blocked event lives.
 Not to be closed by projecting the human's NEXT task from `scheduled_tasks`: that is the
 script, not something the robot can know. The horizon can only be extended by observation.
 Related: the "what is H" question (H bounds the human's projection, not the robot's ordering).
@@ -2393,3 +2406,33 @@ type mismatch (F47's waypoint coffee break) or by repurposing an existing task i
 describe. Design question for the design chat; nothing built.
 Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared/types.py
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
+
+**TODO-81 — The Mesa decomposer reads the literal `"?duration"`; the schema names the binding (`duration_key`)** [housekeeping; from R2]
+`action_decomposer._expand_stand` reads `action.bindings.get("?duration", "PT1S")` while the projector reads
+the key the schema declares (`ActionSchema.duration_key`, TODO-32). Two spellings of one key in two layers is
+a mismatch risk; the decomposer should read `action.schema.duration_key` (falling back to one tick when the
+schema names none). Same numbers today; fix when `action_decomposer.py` is next touched, with the regression
+sweep (behaviour-preserving, byte-identical).
+Files: mesa_sim/action_decomposer.py (`_expand_stand`), shared/types.py (`ActionSchema.duration_key`)
+Reference: R2 session, September 2026
+
+**TODO-82 — The planner's debug line prints whole schema objects, so any schema field breaks byte-identity** [housekeeping; from R2]
+`[planner] self.current_plan for ...` logs the `AbstractPlan` repr, which includes every `GroundedAction`'s
+`schema` dataclass. Adding a field to `ActionSchema` (TODO-32's `duration_key`) changed that line in every log
+without any behaviour change, so "byte-identical" had to be qualified. The regression greps do not include
+the line, so drift detection is unaffected. Print the plan's action names and bindings, not the schema, or
+drop the line.
+Files: shared/planner.py (or wherever the `[planner] self.current_plan` line is emitted)
+Reference: R2 session, September 2026
+
+**TODO-83 — Unused interference machinery: `ConflictPoint`, `InterferenceAssessment`, `discretized_time_sampling`, `closest_point_of_approach`, `interference_spatial_resolution`** [housekeeping; from T10 / F1]
+Since T10 nothing in the run path consumes `discretized_time_sampling()` or its `ConflictPoint` list;
+`InterferenceAssessment` is produced by nothing; `closest_point_of_approach()` is an unbuilt stub whose
+`NotImplementedError` message still calls the sampler "the current default interference algorithm";
+`mesa_configs.yaml: simulation.interference_spatial_resolution` and
+`action_decomposer._get_interference_spatial_resolution` bind a resolution nothing samples with. Realization
+uses `shift_violation_interval()` only. Remove or re-home when a task touches these files; the `analysis/t1*`
+reports cite the sampler historically. io_contracts §1.10 / §2.3 describe the types as retired.
+Files: shared/trajectory_algorithms.py, shared/types.py, mesa_sim/action_decomposer.py, mesa_sim/mesa_configs.yaml,
+mesa_sim/sim_agents.py
+Reference: T10; F1; wrap-up, September 2026

@@ -76,12 +76,15 @@ Decisions
 
 ## Current phase and status (affects what you may touch)
 
-- Phase 4C: finishing `MetaPlanner.update()` with realization. The queue and its order are in
-  `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy), Phase 5
-  (evaluation), Phase 6 (ROS / PRIEST execution).
-- `shared/meta_planner.py`: blocks B1 (human projection), B2 (plausibility gate), B3 (task
-  selection) are being built task by task. Change only what the task specifies; do not fill in
-  unspecified block logic, flags or strategies.
+- Phase 4C: realization is built and total (T3, T4, T10, F1), the Mesa executor has the
+  execution-time separation stop (C, run option, default off), wait durations come from the schema
+  (TODO-32), scheduled bindings are type-checked at spawn (F47b). Next in the queue: D2 (what a
+  trigger is an event of; designed in the design chat), then T6 (the ablation). The queue and its
+  order are in `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
+  Phase 5 (evaluation), Phase 6 (ROS / PRIEST execution).
+- `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
+  cost) exist. Change only what the task specifies; do not fill in unspecified block logic, flags or
+  strategies.
 - `shared/recognizer.py`: rebuilt and handed back (`docs/recognizer_handback.md`). Not under
   active change; touch it only if the task says so.
 - ROS side is paused. Do not modify anything under `ros_sim/`.
@@ -173,10 +176,13 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 | scenario_10 | env_layout1 | coffee break and AC activation; needs about 450 steps |
 | scenario_20 | env_layout2 | table convergence; does not finish in 200 steps |
 | scenario_30 | env_layout3 | mirror-symmetric crossing |
-| scenario_40 | env_layout4 | foreseeable task and wander |
+| scenario_40 | env_layout4 | foreseeable task and two AC-switch legs (retyped F47b) |
 
 Use the step counts of the current baselines (the most recent task report that regenerated
-them). Record baselines before changing code, then diff.
+them): F1's `analysis/f1_robot_responsible/realized_none/` for s00, s20, s30 (stop off; C's
+`stop_on/` with the stop on), with s10 superseded by TODO-32 (the difference is stated in the C
+README) and s40 by F47b (`analysis/f47_fixtures/baselines_s40/`). Record baselines before changing
+code, then diff.
 
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
 scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
@@ -192,6 +198,8 @@ grep "^\[IR\] step="    <log>   # most_likely and confidence per tick
 grep "^\[IR-dist\]"     <log>   # full belief distribution per tick
 grep "^\[IR-complete\]" <log>   # task completion pins
 grep "^\[sep\]"         <log>   # actual robot-human distance per tick
+grep "^\[hold\]"        <log>   # decided holds: start, end, planned, executed, interrupted
+grep "^\[stop\]"        <log>   # separation-stop refusals (stop on), with the assessed-window label
 ```
 
 A behaviour-preserving change must leave these greps byte-identical.
