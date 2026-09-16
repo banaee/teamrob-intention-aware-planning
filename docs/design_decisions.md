@@ -1997,6 +1997,17 @@ same rule — stop when your next motion would violate (a) or (b); standing is a
 Mesa's execution-time avoidance must use when it is built (TODO-73), so that the plan realization
 checks and the behaviour execution produces obey one definition.
 
+CONSEQUENCE FOR MESA AND FOR EVALUATION. The Mesa human has no avoidance of its own: it walks its
+scripted straight line whatever the robot does. So while the robot stands, the two agents can come
+arbitrarily close or overlap (agents are points), and such moments are NOT robot violations under
+F1 — they are the human's detour that Mesa does not model (point 1 above). Evaluation of actual
+separation therefore counts as a ROBOT VIOLATION only a moment that breaks rule (a) or (b): the robot
+moved and the distance fell below `min_separation` or failed to increase within it. Moments where the
+robot stands and the human closes are reported separately ("stand"), as are moments where the robot
+moves away ("recede"); neither is a failure. The reference classification is
+`analysis/f1_robot_responsible/evaluate.py` (labels viol | stand | recede, each also placed inside or
+outside the assessed window of the decision in effect).
+
 GROUNDING (documentation of correspondence, not a claim of validation). Two established notions share
 F1's stance.
 - Passive motion safety (Fraichard and colleagues): a robot is held responsible for a collision only

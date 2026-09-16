@@ -159,6 +159,12 @@ Current cost function = Mesa steps (moves, detours, pauses). Team-level costs
 (human waiting time, shared resource conflicts, task dependency violations) are
 intentionally excluded from Phase 4. Add as extension when team efficiency
 metrics are introduced in Phase 5 or later.
+INSTANCE (F1, September 2026): under robot-responsible separation (design_decisions.md,
+"Robot-responsible separation") a standing robot may be in the human's path; in reality the human
+walks around it, and that detour is a team-level cost parked here — realization prices only the
+robot's own time. The Mesa human has no avoidance, so in Mesa the two agents simply come close or
+overlap while the robot stands; those moments are not robot violations and are reported separately in
+the evaluation ("stand"; `analysis/f1_robot_responsible/evaluate.py`).
 Files: `shared/meta_planner.py` (Phase 4 new)
 Reference: Phase 4 design session
 
@@ -2047,6 +2053,13 @@ speed and separation monitoring) and its scope are recorded in that entry. The g
 also recorded there: past T_h the human vanishes from the assessment (s20_on ticks 54–56, 35.1 cm at
 56 in the T10 baselines); in the F1 sweep every remaining rule violation at execution is past T_h or
 under no projection.
+THE STANDING-ROBOT CONSEQUENCE (F1): a standing robot may be in the human's path; the human's detour
+is a team-level cost (TODO-15). The Mesa human has no avoidance, so while the robot stands the two
+agents can come arbitrarily close or overlap — such moments are not robot violations. Evaluation of
+actual separation counts as robot violations only moments breaking rule (a) or (b); moments where the
+robot stands and the human closes are reported separately, not as failures. Reference classification:
+`analysis/f1_robot_responsible/evaluate.py` (viol | stand | recede, inside / outside the assessed
+window).
 Realization decides only within the human's projection (design_decisions.md, "Assumption:
 execution-time avoidance past T_h"); everything after T_h, and the residual conflict of an
 all-unrealizable trigger, is left to an execution-time avoidance layer that Mesa does not have —
