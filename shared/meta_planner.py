@@ -10,7 +10,7 @@ PURPOSE:
 
     See shared/io_contracts.md §2.2 for the authoritative interface contract.
     See design_decisions.md, "Cancellation is not a meta_planner cost term",
-    for why _cost() carries no carrying/cancellation logic.
+    for why the cost carries no carrying/cancellation logic.
     See design_decisions.md, DESIGN-16, for the single_task vs. full_reorder
     strategy decision and the receding-horizon reasoning behind defaulting to
     single_task.
@@ -24,20 +24,16 @@ WHAT THIS MODULE DOES:
     - Decides WHICH task to do next (update); under "full_reorder" (not yet
       implemented) would also decide what order the rest of the queue follows
     - Projects a candidate task — or, under "full_reorder", a candidate
-      ordering — and the human's predicted task, for interference checking,
-      through Projector.project() / project_human(). Never decomposes tasks
-      itself.
-    - Detects interference by comparing straight-line Segments (see
-      shared/trajectory_algorithms.py) between the robot's projection and the
-      human's, via a swappable algorithm — no zone concept involved (see
-      design_decisions.md on why zone-based proximity was rejected).
-      SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026; see
-      design_decisions.md, "The robot can wait"): detection moves INSIDE a
-      per-candidate realize() on the projection side, which holds each robot
-      segment until the way is clear at min_separation and returns the
-      realized duration (walking + holds). This module will supply
-      min_separation and consume the result. _detect_interference() and
-      _cost() below still run the superseded path until realization lands.
+      ordering — and the human's predicted task through Projector.project()
+      / project_human(). Never decomposes tasks itself.
+    - Realizes every candidate against the human's projection through
+      realize() (shared/realization.py; T10) and selects on the realized
+      cost T_r + δ: interference detection is INTERNAL to realization, on the
+      projection side, and conflict is priced by construction as the hold
+      that avoids it (design_decisions.md, "The robot can wait"). This module
+      supplies min_separation and consumes the RealizedPlan; it holds no
+      geometry and no conflict weight. The batch interference profile that
+      preceded it (_detect_interference, min_safe_distance) is gone.
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT decompose a task into actions (that is planner.py)
@@ -68,10 +64,10 @@ BLOCK STRUCTURE OF update():
           and continues iff δ ≤ ρ × (T_h − now).
     B3    _replan_tasks() — selects the task assignment and commits.
     Both B2 and B3 consume realization: B2 `b2a` (built, T4) realizes the
-    CURRENT task alone and judges its hold; B3 (T10, not yet built) realizes
-    EVERY candidate and takes the argmin of realized duration. B2's role is
-    COMMITMENT (R1, TODO-36): it can only keep the current task where B3
-    might switch, never cause a switch.
+    CURRENT task alone and judges its hold; B3 (built, T10) realizes EVERY
+    candidate and takes the argmin of realized cost, carrying the winner's
+    hold. B2's role is COMMITMENT (R1, TODO-36): it can only keep the current
+    task where B3 might switch, never cause a switch.
 
 TASK POOL vs. CANDIDATES:
     The pool assembled in update() is NOT a candidate set. Nothing competes at
@@ -108,12 +104,12 @@ STRATEGY (DESIGN-16):
 
 STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.md):
     DESIGN-08 is RESOLVED by realization (conflict is priced by construction as
-    hold duration; no penalty formula — see _cost()'s docstring), DESIGN-09
+    hold duration; no penalty formula — see _replan_tasks()), DESIGN-09
     (pre-RESELECT cheap filter — B2 realizing the current task alone is that
-    filter; whether B2 survives is TODO-36), DESIGN-10 (interference sampling
-    — discretized_time_sampling() is the current default algorithm;
-    closest_point_of_approach()'s closed form is the earliest_violation
-    realization needs — see shared/trajectory_algorithms.py), DESIGN-12
+    filter; B2 survives as `b2a`, TODO-36), DESIGN-10 (interference geometry
+    — realize() asks shift_violation_interval's closed form; the sampling
+    algorithm discretized_time_sampling() is no longer consumed here — see
+    shared/trajectory_algorithms.py), DESIGN-12
     (horizon-projected confidence — relevant only to full_reorder, moot under
     single_task), DESIGN-13 (partly pulled forward into 4C as the hold-only
     realization strategy; detour — obstacle_aware_path() — and an
@@ -122,19 +118,17 @@ STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.
 """
 
 import logging
-from typing import Callable, List, Literal, Optional
+from typing import List, Literal, Optional, Tuple
 
 from shared.types import (
     BeliefState,
     WorldState,
     TaskInstance,
     ProjectedPlan,
-    InterferenceAssessment,
+    RealizedPlan,
     ExecutorState,
     TriggerDecision,
     UpdateResult,
-    Segment,
-    ConflictPoint,
     task_instance_key,
 )
 
@@ -144,7 +138,6 @@ from shared.recognizer import IntentionRecognizer, UNKNOWN
 from shared.planner import AdaptivePlanner
 from shared.projection import Projector
 from shared.realization import realize
-from shared.trajectory_algorithms import discretized_time_sampling
 
 
 # =============================================================================
@@ -180,10 +173,9 @@ class MetaPlanner:
         projector: Projector,
         recognizer: IntentionRecognizer,
         theta: float = DEFAULT_THETA,
-        min_safe_distance: float = 1.0,
         strategy: Literal["single_task", "full_reorder"] = "single_task",
         gate_strategy: Literal["none", "b2a", "b2b"] = "none",
-        interference_algorithm: Callable[[Segment, Segment], List[ConflictPoint]] = discretized_time_sampling,
+        cost_strategy: Literal["realized", "plain"] = "realized",
         human_agent_id: Optional[str] = None,
         min_separation_in_motion_ticks: float = 2.5,
         rho: float = 0.5,
@@ -200,52 +192,42 @@ class MetaPlanner:
                                  (context/hypotheses) and a redundant, unused _history
                                  list that constructing a second instance would add.
         theta:                   cognitive-clock confidence threshold (DESIGN-07). Gate
-                                 only — never fed into _cost() as a magnitude.
+                                 only — never fed into a cost as a magnitude.
                                  Defaults to DEFAULT_THETA (module level, the single
                                  definition). Applied in exactly one place,
                                  _clears_gate(); do not compare against self._theta
                                  anywhere else.
-        min_safe_distance:       distance threshold below which a ConflictPoint makes a
-                                 candidate infeasible (see _detect_interference()).
-                                 Placeholder default, same "needs calibration" status as
-                                 assumed_speed — not derived from any domain config yet.
-                                 RESTATED in design as min_separation (TODO-28): the
-                                 clearance realization must ACHIEVE by holding, passed
-                                 into realize() — not an exclusion threshold. Name and
-                                 value stay until realization lands; its value must be
-                                 argued relative to scale, not read off a fixture.
         strategy:                B3's strategy — "single_task" (default, implemented) or
                                  "full_reorder" (not yet functional). Selects what a
                                  candidate is inside _replan_tasks(): an individual task,
-                                 or a permuted ordering. See module docstring, DESIGN-16. DESIGN-16.
+                                 or a permuted ordering. See module docstring, DESIGN-16.
         gate_strategy:           B2, the mid-task plausibility gate. "none" (default)
                                  always escalates — update() then behaves exactly as it
                                  did before the block split. "b2a" (T4) realizes the
                                  current task alone and judges its hold against rho.
                                  "b2b" (realize current and each other task; margin —
                                  redundant with B3) is a documented stub. Independent of
-                                 `strategy`; all combinations are intended to be runnable.
-        interference_algorithm:  function(Segment, Segment) -> List[ConflictPoint].
-                                 Defaults to trajectory_algorithms.discretized_time_sampling,
-                                 whose spatial resolution (max_spatial_step, world units)
-                                 has no default: the embodiment layer must bind it from its
-                                 own config (functools.partial) and pass the bound callable
-                                 here, as mesa_sim/sim_agents.py does. Left unbound, the
-                                 first interference check raises TypeError — deliberately,
-                                 rather than sampling at an assumed unit scale.
-                                 closest_point_of_approach is a documented, unimplemented
-                                 drop-in alternative — same signature, swap here when built.
-                                 Under realization the question changes to "earliest
-                                 violation for this segment at this start time", asked
-                                 inside realize() rather than here; this parameter then
-                                 moves with it.
+                                 `strategy` and `cost_strategy`; all combinations are
+                                 intended to be runnable.
+        cost_strategy:           what B3 selects on (T10). "realized" (default): every
+                                 candidate is realized against the human projection
+                                 (realize(), this planner's min_separation) and the
+                                 argmin of the realized cost T_r + δ wins, its δ carried
+                                 as the decision's hold; all candidates unrealizable →
+                                 the argmin of T_r with no hold, logged
+                                 `all_unrealizable`. "plain": the argmin of the projected
+                                 duration T_r alone — no human consideration, no hold, no
+                                 filter — for comparison and the T6 ablation. Both use
+                                 the same quantity for T_r (RealizedPlan.projected_duration,
+                                 the fractional segment span), so their difference is
+                                 realization's effect and nothing else.
         human_agent_id:          agent_id of the human this robot observes, for building
                                  the human's predicted projection in update(). Mirrors
                                  RobotAgent.observed_agent_id's existing optionality —
                                  None means no human projection is built and every
-                                 candidate is scored without an interference check
-                                 (treated as feasible by default), matching how
-                                 RobotAgent already tolerates no observed human.
+                                 candidate realizes with δ = 0 at its plain projected
+                                 duration, matching how RobotAgent already tolerates no
+                                 observed human.
         min_separation_in_motion_ticks:
                                  the clearance realization must achieve, as a multiple
                                  of the robot's motion per tick (R1, TODO-28: 2.5). The
@@ -253,8 +235,8 @@ class MetaPlanner:
                                  min_separation passed to realize() is it times the
                                  Projector's body-supplied assumed_speed (50 cm in Mesa
                                  at 20 cm/tick), so shared/ holds no absolute distance.
-                                 Used by B2 `b2a` (T4); B3 still filters on
-                                 min_safe_distance until T10.
+                                 The one value both B2 `b2a` (T4) and B3 (T10) hand to
+                                 realize().
         rho:                     B2 `b2a`'s policy parameter (R1, TODO-36): continue the
                                  current task iff its realized hold δ ≤ rho × (T_h − now),
                                  the human's remaining projected duration at the trigger.
@@ -265,10 +247,9 @@ class MetaPlanner:
         self._recognizer = recognizer
         self._projector = projector
         self._theta = theta
-        self._min_safe_distance = min_safe_distance
         self._strategy = strategy
         self._gate_strategy = gate_strategy
-        self._interference_algorithm = interference_algorithm
+        self._cost_strategy = cost_strategy
         self._human_agent_id = human_agent_id
         self._min_separation = min_separation_in_motion_ticks * projector.assumed_speed
         self._rho = rho
@@ -312,6 +293,10 @@ class MetaPlanner:
     def gate_strategy(self) -> str:
         return self._gate_strategy
 
+    @property
+    def cost_strategy(self) -> str:
+        return self._cost_strategy
+
     def evaluate_triggers(
         self,
         belief: BeliefState,
@@ -339,7 +324,7 @@ class MetaPlanner:
               not-None (robot just picked something up).
 
         Confidence is a gate here (via theta_crossed), never a magnitude fed into
-        _cost().
+        a cost.
         """
         if executor_state.current_task is None:
             decision = TriggerDecision(fired=True, reason="no_current_task", score=1.0)
@@ -383,10 +368,10 @@ class MetaPlanner:
         Admission is a MetaPlanner decision — Projector holds no policy. A
         projection is admitted only when the belief clears the confidence gate
         (_clears_gate(), the single place theta is applied): below the bar the
-        most-likely hypothesis is not evidence, and an interference check
-        against it would be a check against noise. Same gate as
+        most-likely hypothesis is not evidence, and a realization against it
+        would be a realization against noise. Same gate as
         evaluate_triggers() asks, on the current belief rather than as a
-        crossing (DESIGN-07) — never fed into _cost().
+        crossing (DESIGN-07) — never fed into a cost.
 
         Returns None, in this order, when
           - the belief does not clear the gate (_clears_gate(); the projector is
@@ -399,8 +384,8 @@ class MetaPlanner:
             project. Reachable since the completion pin: a hypothesis retired
             by the robot's own delivery hands its mass to `unknown` (TODO-54),
           - the hypothesis cannot be resolved (project_human() returned None).
-        update() then treats every candidate as feasible and runs no
-        interference check that call.
+        update() then realizes every candidate against no human plan: δ = 0,
+        plain projected cost.
 
         Logs one [meta-proj] line per call. No step or trigger field: step
         counts are a simulator concept, and the TriggerDecision belongs to the
@@ -468,11 +453,10 @@ class MetaPlanner:
         trigger via update_human_projection(). Not rebuilt here, not recomputed
         per candidate. None means the projection was not admitted: belief
         confidence below theta, no human observed, `unknown`, or the hypothesis
-        was unresolvable — every candidate is then scored without an
-        interference check, not treated as always-conflicting. A ROUTINE
-        mid-run state, not an edge case: the belief re-initialises at every
-        human task boundary (I4c). Under realization the same rule holds —
-        realize() is not called and cost is the plain projected duration.
+        was unresolvable — every candidate then realizes with δ = 0 at its
+        plain projected duration (realize() with no human plan), never as
+        always-conflicting. A ROUTINE mid-run state, not an edge case: the
+        belief re-initialises at every human task boundary (I4c).
 
         TERMINAL STATE: returns UpdateResult(current_task=None, queue=[]) when
         the pool is empty (nothing left to do: queue empty and nothing
@@ -730,18 +714,38 @@ class MetaPlanner:
                            NOT IMPLEMENTED; Projector.project() also refuses
                            orderings longer than 1 (DESIGN-16).
 
-        single_task detail: each candidate is projected alone from the live
-        WorldState, interference-checked against human_projection if one was
-        built, infeasible candidates dropped before cost is computed. The
-        argmin over survivors becomes current_task; the rest form the queue in
-        whatever order they happened to iterate — order carries no commitment
-        under this strategy, it is re-decided next trigger.
-        DESIGN (wait-decision revision, to be built): project → realize(proj,
-        human_projection, min_separation, now) → cost = realized duration
-        (walking + holds); a candidate with no realization within the human's
-        horizon is skipped; the winner's holds go out on the UpdateResult as
-        an execution hint. "Continue, paying a 2-tick hold" and "switch,
-        paying 19 ticks of walking" then compare on one number.
+        single_task (B3.A with realized cost, T10): each candidate is projected
+        alone from the live WorldState at decision step 0 (the trigger, on the
+        projection clock) and realized — realize(projection, human_projection,
+        min_separation, 0) — under the whole-trajectory minimal shift. Its cost
+        is RealizedPlan.cost = T_r + δ: T_r the FRACTIONAL projected duration
+        (the segment span), δ the hold in whole ticks. The winner is the argmin
+        over the realizable candidates, ties resolved by pool order (min() keeps
+        the first; TODO-42 — unchanged), and ITS δ goes out as UpdateResult.hold,
+        whether the winner is the current task or another. The rest form the
+        queue in whatever order they happened to iterate — order carries no
+        commitment under this strategy, it is re-decided next trigger.
+        "Continue, paying a 2-tick hold" and "switch, paying 19 ticks of
+        walking" compare on one number, and conflict is priced by construction
+        (design_decisions.md, "The robot can wait").
+
+        No human projection (None, or one without segments): realize() reports
+        `no_human_projection` for every candidate — realizable, δ = 0, cost =
+        T_r — so B3 is then an argmin over projected durations.
+
+        ALL CANDIDATES UNREALIZABLE (R1, TODO-30 / TODO-52): no candidate has a
+        shift within [0, T_h] that clears min_separation. A situation, not an
+        anomaly: the winner is the argmin of the PLAIN cost — the same T_r,
+        RealizedPlan.projected_duration, never ProjectedPlan's integer
+        total_estimated_cost (T3b) — with no hold, and the decision is logged
+        `all_unrealizable`. The residual conflict is the execution layer's
+        (design_decisions.md, "Assumption: execution-time avoidance past T_h").
+        The former RuntimeError is gone.
+
+        cost_strategy "plain": every candidate is realized against NO human
+        plan, whatever was admitted — the argmin of T_r, no hold, no filter. A
+        comparison condition (T6), not a policy; it shares T_r's quantity with
+        "realized" so the two differ by realization alone.
 
         current_task, if any, is an ordinary member of task_pool and competes
         on identical terms. Continuation vs. reselection falls out of the
@@ -749,14 +753,12 @@ class MetaPlanner:
         continuation branch in the design lives in update()'s B2, which decides
         whether this method runs at all — not what it decides once it does.)
 
-        The RuntimeError below (every candidate excluded by
-        _detect_interference()) is a genuine anomaly and stays an exception,
-        deliberately distinguishable from update()'s terminal return.
-        SUPERSEDED IN DESIGN: under realization the condition means "no
-        candidate has a start time within the human's horizon that clears
-        min_separation" — a situation, not an anomaly — and its outcome is
-        OPEN with three readings (TODO-30). The raise stays until realization
-        lands and one is chosen.
+        Logs one [meta-cand] line per candidate (realizable, reason, T_r, δ,
+        cost, unassessed share) and one [meta-b3] line per call (trigger,
+        cost_strategy, selection ∈ realized | no_projection | all_unrealizable
+        | plain, winner, cost, hold, T_h, candidate counts). No step field, as
+        [meta-proj] and [meta-b2]: the [meta-trig] line of the same tick
+        precedes them.
         """
         if self._strategy == "full_reorder":
             raise NotImplementedError(
@@ -767,105 +769,52 @@ class MetaPlanner:
             )
         if self._strategy != "single_task":
             raise ValueError(f"MetaPlanner: unknown strategy '{self._strategy}'")
+        if self._cost_strategy not in ("realized", "plain"):
+            raise ValueError(f"MetaPlanner: unknown cost_strategy '{self._cost_strategy}'")
 
-        scored: List[tuple] = []
+        now = 0.0  # the trigger, on the projection clock
+        against = human_projection if self._cost_strategy == "realized" else None
+        rows: List[Tuple[TaskInstance, RealizedPlan]] = []
         for task in task_pool:
-            projection = self._projector.project([task], world, executor_state.agent_id, belief, start_step=0.0)
-            if human_projection is not None:
-                assessment = self._detect_interference(projection, human_projection)
-            else:
-                assessment = InterferenceAssessment(feasible=True, conflicts=[])
-
+            projection = self._projector.project([task], world, executor_state.agent_id, belief, start_step=now)
+            realized = realize(projection, against, self._min_separation, decision_step=now)
+            rows.append((task, realized))
             logging.info(
                 f"[meta-cand] {task_instance_key(task)} "
-                f"cost={projection.total_estimated_cost} "
-                f"feasible={assessment.feasible} "
-                f"conflicts={len(assessment.conflicts)} "
-                f"min_dist={min((c.distance for c in assessment.conflicts), default=None)}"
-            )
-            if assessment.feasible:
-                scored.append((self._cost(projection, assessment), task))
-
-        if not scored:
-            raise RuntimeError(
-                "MetaPlanner._replan_tasks: no feasible candidate task this "
-                "trigger (every candidate excluded by _detect_interference())."
+                f"realizable={realized.realizable} reason={realized.reason} "
+                f"T_r={realized.projected_duration:.2f} delta={realized.delta} "
+                f"cost={_fmt(realized.cost)} share={_fmt(realized.unassessed_share)}"
             )
 
-        _, winner = min(scored, key=lambda pair: pair[0])
+        realizable = [(task, r) for task, r in rows if r.realizable]
+        if realizable:
+            winner, chosen = min(realizable, key=lambda row: row[1].cost)
+            hold = chosen.delta
+            cost = chosen.cost
+            if self._cost_strategy == "plain":
+                selection = "plain"
+            elif chosen.horizon is None:
+                selection = "no_projection"
+            else:
+                selection = "realized"
+        else:
+            # All unrealizable: plain cost, no hold (R1). Same T_r as above.
+            winner, chosen = min(rows, key=lambda row: row[1].projected_duration)
+            hold = 0
+            cost = chosen.projected_duration
+            selection = "all_unrealizable"
+
+        logging.info(
+            f"[meta-b3] trigger={self._last_trigger_reason} cost_strategy={self._cost_strategy} "
+            f"selection={selection} winner={task_instance_key(winner)} cost={cost:.2f} hold={hold} "
+            f"T_h={_fmt(rows[0][1].horizon)} candidates={len(rows)} realizable={len(realizable)}"
+        )
+
         new_queue = [t for t in task_pool if t is not winner]
         self._queue = new_queue
-        return UpdateResult(current_task=winner, queue=list(new_queue))
-    
-    
-    def _detect_interference(
-        self,
-        robot_projection: ProjectedPlan,
-        human_projection: ProjectedPlan,
-    ) -> InterferenceAssessment:
-        """
-        Compares every Segment in robot_projection against every Segment in
-        human_projection via self._interference_algorithm (default:
-        trajectory_algorithms.discretized_time_sampling — swap to
-        closest_point_of_approach or another algorithm via the constructor's
-        interference_algorithm param once one is implemented). Segment pairs
-        with no step-time overlap contribute no ConflictPoints — the
-        algorithm functions handle that themselves.
+        return UpdateResult(current_task=winner, queue=list(new_queue), hold=hold)
 
-        feasible = no returned ConflictPoint has distance below
-        self._min_safe_distance (hard exclusion only — DESIGN-08's soft
-        penalty is not applied here, see _cost()).
 
-        SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026): a batch
-        profile over two FIXED trajectories cannot place a hold — holding at
-        the first conflict shifts everything after it — and T1 measured that
-        its aggregates mislead (every conflicted min_dist sat at the END of the
-        shared window, an arrival gap; exposure ranked candidates opposite to
-        the pause they need). Replaced by detection INTERNAL to realize(): per
-        segment, earliest violation at a given start time, at min_separation.
-        Kept until realization lands; still what runs today.
-
-        Operates on ProjectedPlan/ProjectedPlanEntry generically via
-        entry.segments — unchanged by the single_task vs. full_reorder
-        decision; a single_task ProjectedPlan is just a 1-entry instance of
-        the same structure this was already designed to consume.
-        """
-        robot_segments = [seg for entry in robot_projection.entries for seg in entry.segments]
-        human_segments = [seg for entry in human_projection.entries for seg in entry.segments]
-
-        conflicts: List[ConflictPoint] = []
-        for robot_seg in robot_segments:
-            for human_seg in human_segments:
-                conflicts.extend(self._interference_algorithm(robot_seg, human_seg))
-
-        feasible = not any(cp.distance < self._min_safe_distance for cp in conflicts)
-
-        return InterferenceAssessment(feasible=feasible, conflicts=conflicts)
-
-    def _cost(
-        self,
-        projection: ProjectedPlan,
-        assessment: InterferenceAssessment,
-    ) -> int:
-        """
-        Hard-gate only, for now (DESIGN-08 — soft interference penalty
-        deferred, see module docstring and TODOS_AND_DEFERRED.md).
-        assessment.feasible already excludes a candidate before this is even
-        called (see update()) — this returns execution cost only.
-        assessment.conflicts is available here but deliberately unused until
-        DESIGN-08 is revisited with an actual penalty formula.
-
-        DESIGN-08 is RESOLVED by realization (wait-decision revision, Sept
-        2026) — not with a penalty formula: this becomes the REALIZED duration
-        (walking + holds) and stops being a place where a policy could hide.
-        Conflict is priced by construction because avoiding the human takes
-        longer; there is no conflict weight to tune. Team-level semantic costs
-        stay parked (TODO-15). Until realization lands this returns the plain
-        projected duration.
-
-        No carrying parameter, no cancellation branch — cancellation cost is
-        already reflected in projection's step count via planner.py's guarded
-        method selection (see design_decisions.md).
-        """
-    
-        return projection.total_estimated_cost
+def _fmt(value: Optional[float]) -> str:
+    """Two decimals, or None, for the log lines above."""
+    return "None" if value is None else f"{value:.2f}"

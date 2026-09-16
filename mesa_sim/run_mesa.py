@@ -152,6 +152,7 @@ def parse_user_args():
     parser.add_argument("--recognizer",  type=str,  default=None, help="Recognizer variant override (e.g. uniform, bayesian)")
     parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
     parser.add_argument("--gate_strategy", type=str, default=None, choices=["none", "b2a", "b2b"], help="MetaPlanner B2 gate strategy override")
+    parser.add_argument("--cost_strategy", type=str, default=None, choices=["realized", "plain"], help="MetaPlanner B3 cost strategy override")
     argv = [a for a in sys.argv[1:] if a != '--']  # strip '--' separator
     return parser.parse_known_args(argv)[0]
 
@@ -181,6 +182,7 @@ def _make_domain_model() -> SimModel:
         "recognizer": user_args.recognizer,
         "assignment_prior": user_args.assignment_prior,
         "gate_strategy": user_args.gate_strategy,
+        "cost_strategy": user_args.cost_strategy,
     })
 
     # --------- domain ---------
@@ -216,11 +218,28 @@ def _make_domain_model() -> SimModel:
         env_layout_path=layout["path"],
         assignment_prior=bool(user_config.get("assignment_prior", False)),
         gate_strategy=user_config.get("gate_strategy", "none"),
+        cost_strategy=user_config.get("cost_strategy", "realized"),
     )
 
 # =============================================================================
 # Headless runner
 # =============================================================================
+
+def _min_separation_over_tick(r0, r1, h0, h1) -> float:
+    """
+    The minimum robot–human distance over one tick when the robot moves in a
+    straight line from r0 to r1 and the human from h0 to h1, simultaneously.
+    The difference D(t) = (r0 − h0) + t ((r1 − h1) − (r0 − h0)) is affine in
+    t ∈ [0, 1], so |D| is minimised at the clamped projection of the origin
+    onto that segment — closed form, no sampling. A measure (TODO-79), not a
+    behaviour: nothing reads it back.
+    """
+    dx0, dy0 = r0[0] - h0[0], r0[1] - h0[1]
+    ex, ey = (r1[0] - h1[0]) - dx0, (r1[1] - h1[1]) - dy0
+    ee = ex * ex + ey * ey
+    t = 0.0 if ee == 0.0 else min(1.0, max(0.0, -(dx0 * ex + dy0 * ey) / ee))
+    return float(np.hypot(dx0 + t * ex, dy0 + t * ey))
+
 
 def run_headless():
     
@@ -235,6 +254,7 @@ def run_headless():
         "recognizer": user_args.recognizer,
         "assignment_prior": user_args.assignment_prior,
         "gate_strategy": user_args.gate_strategy,
+        "cost_strategy": user_args.cost_strategy,
     })
 
     n_steps = user_config["steps"]
@@ -242,6 +262,13 @@ def run_headless():
           f"domain={user_config['domain']} scenario={user_config['scenario']} steps={n_steps}")
 
     model = _make_domain_model()
+
+    # Positions at the end of the previous tick, for the continuous minimum of
+    # the [sep] measure below (TODO-79); the initial positions before step 0.
+    prev_pos = {
+        (rid, hid): (tuple(map(float, robot.pos)), tuple(map(float, human.pos)))
+        for rid, robot in model.robots.items() for hid, human in model.humans.items()
+    }
 
     for step in range(n_steps):
         model.step()
@@ -260,14 +287,23 @@ def run_headless():
                       f"action={robot.current_action} "
                       f"micro={robot.current_microaction} "
                       f"pos={np.round(robot.pos, 2)}")
-            # Actual robot–human separation at the end of the tick (T9): a measure
-            # only, so later tasks can report how often and by how much execution
-            # falls below min_separation. Mesa has no execution-time avoidance
-            # (TODO-73); nothing here reacts to this number.
+            # Actual robot–human separation (T9): a measure only, so later tasks
+            # can report how often and by how much execution falls below
+            # min_separation. Mesa has no execution-time avoidance (TODO-73);
+            # nothing here reacts to this number. `dist` samples the end-of-tick
+            # positions; `min` (T10, TODO-79) is the continuous minimum over the
+            # tick with both agents moving in a straight line from their
+            # previous positions to these — the motion model realization
+            # assumes — so a close pass between two samples is read at its
+            # minimum, not at the nearer sample.
             for rid, robot in model.robots.items():
                 for hid, human in model.humans.items():
-                    sep = float(np.hypot(robot.pos[0] - human.pos[0], robot.pos[1] - human.pos[1]))
-                    logging.info(f"[sep] step={step} {rid}-{hid} dist={sep:.2f}")
+                    r1 = tuple(map(float, robot.pos)); h1 = tuple(map(float, human.pos))
+                    r0, h0 = prev_pos[(rid, hid)]
+                    sep = float(np.hypot(r1[0] - h1[0], r1[1] - h1[1]))
+                    logging.info(f"[sep] step={step} {rid}-{hid} dist={sep:.2f} "
+                                 f"min={_min_separation_over_tick(r0, r1, h0, h1):.2f}")
+                    prev_pos[(rid, hid)] = (r1, h1)
 
     logging.info("[run_mesa] Headless run complete.")
     
@@ -295,6 +331,7 @@ _user_config = load_experiment(_user_args.experiment, {
     "recognizer": _user_args.recognizer,
     "assignment_prior": _user_args.assignment_prior,
     "gate_strategy": _user_args.gate_strategy,
+    "cost_strategy": _user_args.cost_strategy,
 })
 
 _domain_args = DOMAIN_REGISTRY[_user_config["domain"]]       #todo later: error handling for nonexistent domain
@@ -305,6 +342,7 @@ _model_params = {
     "env_layout_path": _layout["path"],
     "assignment_prior": bool(_user_config.get("assignment_prior", False)),
     "gate_strategy": _user_config.get("gate_strategy", "none"),
+    "cost_strategy": _user_config.get("cost_strategy", "realized"),
 }
 
 # print(f"_model_params: {_model_params}")
