@@ -2042,7 +2042,19 @@ constructor paragraph's "persistent assignment prior" wording (it is a support r
 Files: shared/io_contracts.md (§1.3, §2.1), docs/recognizer_handback.md
 Reference: wait-decision documentation session, September 2026
 
-**TODO-73 — Mesa has no execution-time avoidance: agents may overlap** [post-4C; from R1] — the rule it must use is FIXED (F1)
+**TODO-73 — Mesa has no execution-time avoidance: agents may overlap** [post-4C; from R1] — the rule it must use is FIXED (F1) — ✅ CLOSED FOR MESA (C): the execution-time separation stop
+✅ CLOSED FOR MESA (C, September 2026; design_decisions.md, "Execution-time separation stop"): before
+every STEP the robot checks the step against the human's actual position this tick under the F1 rule
+and stands instead when the step would break it (`Executor._separation_blocked`; run option
+`separation_stop`, default off). Additive to the decided hold, no trigger, no rule for the Mesa human,
+one `[stop]` line per refusal with the assessed-window label for D2. ACCEPTANCE: 0 violating robot
+steps in every run with the stop on (`analysis/c_separation_stop/comparison.md`). ROS brings its own
+implementation of the same rule (PRIEST, Phase 6). WHAT THE STOP EXPOSED, not fixed: in s00, s20 and
+s30 the scripted human's last task ends at the shared table and it idles there for the rest of the run,
+so the robot's last delivery is refused every tick and the run does not complete (only s10 does) — the
+accepted indefinite-wait limit meeting a human that never leaves and a point table with one arrival
+radius (TODO-74). F1's gap 2 (the robot approaching a human still at the table past T_h) is closed by
+this for Mesa.
 THE RULE (F1, September 2026): when built, Mesa's execution-time avoidance uses robot-responsible
 separation, the same definition realization checks (design_decisions.md, "Robot-responsible
 separation"): the robot may not move so that the robot–human distance goes from at least

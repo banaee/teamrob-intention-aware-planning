@@ -1063,9 +1063,13 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
   avoidance (TODO-73); the measure is a measure, not a behaviour. `dist=` samples the end-of-tick
   positions; `min=` (T10, TODO-79) is the continuous minimum over the tick with both agents moving
   in a straight line between their consecutive positions, the motion model realization assumes.
-  When that avoidance is built it must apply robot-responsible separation (F1): never move so that
-  the distance drops below `min_separation`, never move within it without the distance increasing;
-  standing is always admissible
+  BUILT (C, `separation_stop` run option, default off): before a STEP microaction the robot checks the
+  step against every human's actual position this tick under robot-responsible separation (F1) and
+  STANDS instead when the step would bring the distance below `min_separation` without it increasing;
+  queue and cursor untouched, retried next tick; only STEP is checked; additive to the decided hold;
+  no trigger; the human gets no rule. One `[stop]` line per refusal (tick, positions, distance, step
+  minimum, delayed action, inside / outside the assessed window of the decision in effect). Off, the
+  log is the same as without the option apart from the `[run]` header naming it
 
 ### 4.2 ROS (`ros_sim/`)
 

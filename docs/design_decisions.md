@@ -2078,13 +2078,92 @@ THE GAP F1 LEAVES OPEN — recorded, no design proposed here. Past T_h the human
 assessment, so the robot can approach a human still standing where its projection ended: T10's s20_on
 ticks 54–56 (35.1 cm at 56, the human idle at the table two ticks past its projected end) is the
 instance; the completion tick covers one of those two ticks, not the other. Every remaining rule
-violation in the F1 sweep is of this kind (past T_h or no projection). Under design discussion.
+violation in the F1 sweep is of this kind (past T_h or no projection). CLOSED for Mesa by C, the
+execution-time separation stop (next entry but one): the body refuses the step on the human's actual
+position; realization stays unchanged.
 Files: shared/trajectory_algorithms.py (`shift_violation_interval`; `first_approach_step` removed),
 shared/realization.py, shared/types.py (`RealizedPlan`), shared/meta_planner.py (B2, B3),
 shared/projection.py (`task_completion_latency`), mesa_sim/executor.py (`TASK_COMPLETION_LATENCY`),
 mesa_sim/sim_agents.py, shared/io_contracts.md, analysis/f1_robot_responsible/
 Reference: F1 session, September 2026; T10 (the s20_on 57 finding); L2 (the unmodelled trailing tick);
 R1; T3b
+
+**Execution-time separation stop: the Mesa body refuses a step that would break robot-responsible separation against the human's actual position (C; closes F1's gap 2 for Mesa)**
+Past T_h realization has no prediction of the human and cannot price the tail (T10's s20_on ticks
+54–56: the robot approached a human still standing at the table, 35.1 cm at 56). CONSIDERED AND
+REJECTED: a tail of s / v ticks stationary at the human's final projected position. The speed bound
+proves only that the human is within a DISC of radius s around that point for s / v ticks; modelling it
+as standing at the POINT is a choice that is wrong both when the human stays longer and when it moves
+toward the robot, and its length (2.5 ticks) happens to fit Mesa's short task transition — a fixture
+fit under a physical-sounding name. Past T_h the robot has observations and no predictions, so the
+layer that acts there acts on observations. DECIDED (C, September 2026): the execution-time separation
+stop, body side, in `mesa_sim/executor.py`. Realization is unchanged; Property 2 stands.
+
+THE RULE AND THE CHECK. Before executing a STEP microaction the robot checks the step against every
+human's ACTUAL position this tick (Mesa's scheduler has already moved the human, so the human stands
+at its new position while the robot steps) under the F1 rule: the step is refused if at any point
+along it the robot–human distance is below `min_separation` and not strictly increasing. Closed form
+(`Executor._separation_blocked`): with the human fixed and the robot on a straight line the distance
+is convex in the step parameter t, minimal at t* = clamp(−(r0 − h)·(r1 − r0) / |r1 − r0|², 0, 1),
+decreasing before t* and increasing after; the step is clear iff t* = 0 (moving away from the first
+instant) or d(t*) ≥ `min_separation` (never within it). Whole step, not endpoint. `min_separation` is
+the MetaPlanner's value, the one `realize()` uses. A refused step is a STAND this tick and is retried
+next tick; the plan cursor and microaction queue are untouched. Only STEP is checked: grasp, release,
+stand and the decided hold are stationary and always admissible. ADDITIVE: the stop never shortens or
+cancels a decided hold and never advances the plan. No trigger fires on a stop; the Mesa human gets no
+avoidance rule. A run option, `separation_stop` (default off, so the F1 baselines stand), named in the
+`[run]` header. One `[stop]` line per refusal: tick, robot and human positions, distance, the step's
+minimum, the delayed action, and whether the tick lies inside the assessed window of the decision in
+effect (inside means the human deviated from its projection) or outside it (past T_h, or no
+projection: the tail) — for D2.
+
+TWO SCOPINGS, recorded. (1) T3b's "the plan checked is the plan executed" holds INSIDE the assessed
+window; outside it the stop may add stand ticks that no cost priced. (2) The stop is a SAFETY category,
+distinct from TODO-71's rule that the executor never decides to wait as a PLANNING choice: it refines
+motion against an observed obstacle, decides nothing about whether to wait for planning reasons or
+which task to run, and the two do not contradict each other.
+
+THE INDEFINITE-WAIT LIMIT, accepted at the decision and MEASURED here to be the dominant effect on the
+fixtures: a robot stopped near a standing human waits until the human leaves; hold-only cannot detour
+(Phase 4D). In scenario_00, _20 and _30 the human's LAST scripted task ends at the shared kitting
+table and the scripted human then idles there for the rest of the run, 20–30 cm from the table point;
+with the 30 cm arrival radius every approach to the table comes within 36–44 cm of it, so the robot's
+last delivery is refused every tick until the step cap. With the stop on, only scenario_10 completes
+(its human ends elsewhere). Not fixed here and not to be fixed by a special case: it is the accepted
+limit meeting two fixture and domain facts — a scripted human that never leaves (a real one would),
+and a table modelled as a point with a single arrival radius (TODO-74). For the design chat.
+
+MEASURED (C; `analysis/c_separation_stop/comparison.md`; s00/s10/s20/s30 × prior off/on, cost realized,
+gate none, stop off and on, PYTHONHASHSEED=0):
+- OFF equals the F1 realized baselines byte for byte apart from the `[run]` header line, which now
+  names `separation_stop=off` (a run-header field cannot leave a log byte-identical; this is the one
+  difference and it is reported as such).
+- ACCEPTANCE: with the stop on, no robot STEP in any run breaks the F1 rule on Mesa's sequential
+  motion (0 violating steps in every condition; off: s00 3, s10 0, s20_off 8, s20_on 6, s30_off 5,
+  s30_on 2, all in the tail or under no projection). The simultaneous-interpolation figure (the F1
+  evaluation's "viol" label on `[sep] min=`) counts the same ticks, 0 with the stop on; its minima
+  differ where the human's own motion closes the distance during the tick (s30_off tick 23: 0.00 by
+  interpolation, 11.2 sequentially — the head-on pass-through) — measurement, not violation.
+- STOPS (on): s00 off/on 139 each (ticks 161–299), s10 none, s20_off 158 (57–58 and 144–299), s20_on
+  156 (144–299), s30_off 48 (21–24 and 156–199), s30_on 44 (156–199). Every stop is labelled
+  outside the assessed window (past T_h or no projection): none records a human deviating from its
+  projection. The two SHORT episodes are the tail doing its job — s20_off 57–58: prior off, the
+  human's next task not yet recognised, the robot 2 ticks from the table as the human walks off,
+  stopped for 2 ticks, then the delivery completes (decisions shift by 2 ticks, same order); s30_off
+  21–24: the mirror crossing under no projection, stopped 4 ticks while the human passes, where the
+  off run had the pass-through. The four LONG episodes are the indefinite wait above.
+- s20_on ticks 54–60, stop on: no stop. The robot is at 74.98 cm (55) and 55.03 cm (56) — under F1's
+  longer step-6 hold it is one tick further back than at T10, so its approach never comes below 50
+  before the trigger — then the step-57 decision's hold of 2 stands it at 57–58 while the human walks
+  off, it steps at 59 (human at 64 cm, receding) and places at 62. The decided hold covers this
+  episode; the stop is not needed.
+- DECISIONS: identical to off until the first long episode in s00, s20_on and s30; s20_off shifted by
+  2 ticks from 63 on with the same task order; s10 identical throughout.
+Files: mesa_sim/executor.py (`_separation_blocked`, `_log_stop`, `set_assessed_window`, step() 5a),
+mesa_sim/sim_agents.py (Executor construction, the window after each decision, `[run]`),
+mesa_sim/sim_model.py, mesa_sim/run_mesa.py (`--separation_stop`), configs/experiment.yaml,
+shared/io_contracts.md (§4.1), analysis/c_separation_stop/
+Reference: C session, September 2026; F1 (the rule; gap 2); TODO-73; TODO-71; TODO-74
 
 **A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
 When `update()` returns the task the robot is already executing — a CONTINUE, decided by
