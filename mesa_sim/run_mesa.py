@@ -153,6 +153,7 @@ def parse_user_args():
     parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
     parser.add_argument("--gate_strategy", type=str, default=None, choices=["none", "b2a", "b2b"], help="MetaPlanner B2 gate strategy override")
     parser.add_argument("--cost_strategy", type=str, default=None, choices=["realized", "plain"], help="MetaPlanner B3 cost strategy override")
+    parser.add_argument("--separation_stop", type=_bool_arg, default=None, help="Execution-time separation stop override: true/false")
     argv = [a for a in sys.argv[1:] if a != '--']  # strip '--' separator
     return parser.parse_known_args(argv)[0]
 
@@ -183,6 +184,7 @@ def _make_domain_model() -> SimModel:
         "assignment_prior": user_args.assignment_prior,
         "gate_strategy": user_args.gate_strategy,
         "cost_strategy": user_args.cost_strategy,
+        "separation_stop": user_args.separation_stop,
     })
 
     # --------- domain ---------
@@ -219,6 +221,7 @@ def _make_domain_model() -> SimModel:
         assignment_prior=bool(user_config.get("assignment_prior", False)),
         gate_strategy=user_config.get("gate_strategy", "none"),
         cost_strategy=user_config.get("cost_strategy", "realized"),
+        separation_stop=bool(user_config.get("separation_stop", False)),
     )
 
 # =============================================================================
@@ -255,6 +258,7 @@ def run_headless():
         "assignment_prior": user_args.assignment_prior,
         "gate_strategy": user_args.gate_strategy,
         "cost_strategy": user_args.cost_strategy,
+        "separation_stop": user_args.separation_stop,
     })
 
     n_steps = user_config["steps"]
@@ -332,6 +336,7 @@ _user_config = load_experiment(_user_args.experiment, {
     "assignment_prior": _user_args.assignment_prior,
     "gate_strategy": _user_args.gate_strategy,
     "cost_strategy": _user_args.cost_strategy,
+    "separation_stop": _user_args.separation_stop,
 })
 
 _domain_args = DOMAIN_REGISTRY[_user_config["domain"]]       #todo later: error handling for nonexistent domain
@@ -343,6 +348,7 @@ _model_params = {
     "assignment_prior": bool(_user_config.get("assignment_prior", False)),
     "gate_strategy": _user_config.get("gate_strategy", "none"),
     "cost_strategy": _user_config.get("cost_strategy", "realized"),
+    "separation_stop": bool(_user_config.get("separation_stop", False)),
 }
 
 # print(f"_model_params: {_model_params}")

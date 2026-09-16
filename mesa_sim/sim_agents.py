@@ -255,6 +255,7 @@ class RobotAgent(FactoryAgent):
         logging.info(
             f"[run] {self.unique_id} gate_strategy={self.meta_planner.gate_strategy} "
             f"cost_strategy={self.meta_planner.cost_strategy} "
+            f"separation_stop={'on' if self.model.separation_stop else 'off'} "
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
             f"min_separation={self.meta_planner.min_separation:.2f} "
             f"(min_separation_in_motion_ticks={self.meta_planner.min_separation / self.projector.assumed_speed:g} "
@@ -270,7 +271,13 @@ class RobotAgent(FactoryAgent):
         self.planner = AdaptivePlanner(knowledge=knowledge)
         self.current_plan: Optional[AbstractPlan] = None
 
-        self.executor = Executor(agent=self)
+        # The execution-time separation stop (C, TODO-73) is a run option; when
+        # on, the executor checks every STEP against the humans' actual
+        # positions at the SAME min_separation realization uses.
+        self.executor = Executor(
+            agent=self,
+            separation_stop=self.meta_planner.min_separation if self.model.separation_stop else None,
+        )
     
     
     def step(self):
@@ -384,6 +391,14 @@ class RobotAgent(FactoryAgent):
             # it carries none), so an interrupted hold is re-decided, never kept
             # or extended by the body (TODO-71).
             self.executor.hold(result.hold, trigger.reason)
+            # The decision's assessed window, for the [stop] log's inside /
+            # outside label: T_h is the human projection's end on this
+            # decision's projection clock — the same value realize() reads.
+            horizon = None
+            if human_projection is not None:
+                segments = [seg for entry in human_projection.entries for seg in entry.segments]
+                horizon = segments[-1].end_step if segments else None
+            self.executor.set_assessed_window(int(self.model.schedule.steps), horizon)
                             
         self._execute(plan=self.current_plan, world=world)        
     

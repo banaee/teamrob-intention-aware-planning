@@ -17,3 +17,6 @@ gate_strategy: "none"
 
 # MetaPlanner B3 cost strategy: "realized" (default: argmin of T_r + hold, T10) | "plain" (argmin of T_r; comparison only)
 cost_strategy: "realized"
+
+# Execution-time separation stop (C, TODO-73): the robot refuses a STEP that would break the F1 rule against the human's actual position. Off keeps the baselines.
+separation_stop: false

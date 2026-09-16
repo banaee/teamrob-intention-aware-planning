@@ -23,6 +23,19 @@ WHAT THIS MODULE DOES:
           decision tick, before the plan continues. Every decision replaces
           the hold; the executor never decides on its own whether to wait
           (TODO-71).
+        - The execution-time SEPARATION STOP (C, TODO-73; a run option,
+          `separation_stop`, off by default): before a STEP microaction is
+          executed, the step is checked against every human's ACTUAL
+          position this tick under the F1 rule (robot-responsible
+          separation, design_decisions.md): the step is refused if at any
+          point along it the robot–human distance is below min_separation
+          and not strictly increasing. A refused step is a STAND this tick
+          and is retried next tick; the plan cursor and microaction queue are
+          untouched. Only STEP is checked — grasp, release, stand and the
+          decided hold are stationary and always admissible. A SAFETY
+          category, not a planning choice: it never shortens or cancels a
+          decided hold, never advances the plan, and decides nothing about
+          whether to wait for planning reasons or which task to run.
 
     For HumanAgent:
         - Same structure, but driven by script entries instead of AbstractPlan
@@ -56,7 +69,7 @@ COMPLETION CHECKING:
 
 from __future__ import annotations
 import logging
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import math
 
 from shared.types import AbstractPlan, GroundedAction, WorldState, Predicate, ProcessCompletion
@@ -94,8 +107,20 @@ class Executor:
     Instantiated per agent, owned by the agent.
     """
 
-    def __init__(self, agent):
+    def __init__(self, agent, separation_stop: Optional[float] = None):
+        """
+        separation_stop: min_separation in world units when the execution-time
+        separation stop is ON for this agent (the robot: the same value its
+        MetaPlanner hands to realize()), None when off or for the human, which
+        gets no avoidance rule.
+        """
         self.agent = agent
+        self._separation_stop = separation_stop
+        # The assessed window of the decision in effect (decision tick, T_h on
+        # that decision's projection clock, or None when no projection was
+        # admitted), set by the agent on every decision; for the [stop] log's
+        # inside / outside label only. Nothing decides on it.
+        self._window: Tuple[Optional[int], Optional[float]] = (None, None)
 
         # Current tracking state
         self.current_plan: Optional[AbstractPlan] = None
@@ -186,6 +211,18 @@ class Executor:
         # 5. Execute one microaction
         # ------------------------------------------------------------------
         microaction = self.microaction_queue[0]
+
+        # 5a. The separation stop (C): a STEP that would break the F1 rule
+        #     against a human's actual position this tick is a STAND instead;
+        #     queue and cursor untouched, retried next tick.
+        if self._separation_stop is not None and microaction.name.lower() == "step":
+            blocked = self._separation_blocked(microaction)
+            if blocked is not None:
+                self.current_microaction = "stand"
+                self._execute(Microaction(name="stand"))
+                self._log_stop(action, blocked)
+                return
+
         self.current_microaction = microaction.name
 
         success = self._execute(microaction)
@@ -435,6 +472,83 @@ class Executor:
         if ticks > 0:
             logging.info(f"[hold] step={int(self.agent.model.schedule.steps)} {self.agent.unique_id} "
                          f"start planned={ticks} trigger={trigger} pos={tuple(round(float(c), 2) for c in self.agent.pos)}")
+
+    # =========================================================================
+    # The execution-time separation stop (C, TODO-73)
+    # =========================================================================
+
+    def set_assessed_window(self, decision_tick: int, horizon: Optional[float]):
+        """The decision in effect: its tick and T_h (None: no projection). Log label only."""
+        self._window = (decision_tick, horizon)
+
+    def _separation_blocked(self, microaction: Microaction):
+        """
+        The F1 rule on one step, against each human's ACTUAL position this tick
+        (Mesa's scheduler has already moved the human, so it stands at `human.pos`
+        while the robot steps): the step from the agent's position r0 to
+        `target_pos` r1 is REFUSED if at any point along it the distance to the
+        human is below min_separation and not strictly increasing. With the
+        human fixed and the robot on a straight line, the distance is convex in
+        the step parameter t ∈ [0, 1] with its minimum at
+        t* = clamp(−(r0 − h)·(r1 − r0) / |r1 − r0|², 0, 1): decreasing before t*,
+        increasing after. So the step is clear iff t* = 0 (the distance
+        increases from the first instant, whatever its value — moving away is
+        never a violation) or the minimum d(t*) ≥ min_separation (the step never
+        comes within it). Otherwise the decreasing stretch up to t* lies below
+        min_separation: rule (a) if the step started at or beyond it, rule (b)
+        if within. Exact; the whole step, not its endpoint. A step starting
+        exactly perpendicular to the human (t* = 0, derivative 0 for one
+        instant) is clear, as realization's interval endpoints are.
+        Returns (human_id, human_pos, distance now, minimum along the step) for
+        the first blocking human, else None.
+        """
+        target = microaction.params.get("target_pos")
+        if target is None:
+            return None
+        s = self._separation_stop
+        r0 = (float(self.agent.pos[0]), float(self.agent.pos[1]))
+        r1 = (float(target[0]), float(target[1]))
+        ex, ey = r1[0] - r0[0], r1[1] - r0[1]
+        ee = ex * ex + ey * ey
+        if ee == 0.0:
+            return None
+        for hid, human in self.agent.model.humans.items():
+            h = (float(human.pos[0]), float(human.pos[1]))
+            dx, dy = r0[0] - h[0], r0[1] - h[1]
+            t = -(dx * ex + dy * ey) / ee
+            if t <= 0.0:
+                continue
+            t = min(1.0, t)
+            d_min = math.hypot(dx + t * ex, dy + t * ey)
+            if d_min < s:
+                return (hid, h, math.hypot(dx, dy), d_min)
+        return None
+
+    def _log_stop(self, action: GroundedAction, blocked):
+        hid, h, d_now, d_min = blocked
+        tick = int(self.agent.model.schedule.steps)
+        decision, horizon = self._window
+        if decision is None:
+            window = "outside(no_decision)"
+        elif horizon is None:
+            window = "outside(no_projection)"
+        else:
+            start, end = tick - decision, tick - decision + 1   # the step on the projection clock
+            if start >= 1.0 and end <= horizon:
+                window = "inside"
+            elif start >= horizon:
+                window = "outside(past_T_h)"
+            elif end <= 1.0:
+                window = "outside(offset)"
+            else:
+                window = "edge"
+        target = ",".join(str(c.value) for c in action.completion_predicate.args) if action.completion_predicate else ""
+        logging.info(
+            f"[stop] step={tick} {self.agent.unique_id} human={hid} "
+            f"pos=({self.agent.pos[0]:.2f}, {self.agent.pos[1]:.2f}) human_pos=({h[0]:.2f}, {h[1]:.2f}) "
+            f"dist={d_now:.2f} step_min={d_min:.2f} action={action.action_name}({target}) "
+            f"window={window} decision={decision} T_h={'None' if horizon is None else f'{horizon:.2f}'}"
+        )
 
     def _log_hold_end(self, interrupted_by: Optional[str]):
         logging.info(f"[hold] step={int(self.agent.model.schedule.steps)} {self.agent.unique_id} "

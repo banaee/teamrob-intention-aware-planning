@@ -83,7 +83,8 @@ class SimModel(model.Model):
                  seed=None,
                  assignment_prior: bool = False,
                  gate_strategy: str = "none",
-                 cost_strategy: str = "realized"):
+                 cost_strategy: str = "realized",
+                 separation_stop: bool = False):
         super().__init__()
 
         # Evaluation switch: give each robot the observed human's assigned_tasks
@@ -95,6 +96,9 @@ class SimModel(model.Model):
         # MetaPlanner B3 cost strategy for every robot ("realized" | "plain");
         # likewise a run option (T10).
         self.cost_strategy = cost_strategy
+        # Execution-time separation stop for every robot (C, TODO-73); a run
+        # option, off by default.
+        self.separation_stop = separation_stop
 
         # ------------------------------------------------------------------
         # Load env layout
