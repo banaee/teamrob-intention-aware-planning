@@ -254,6 +254,17 @@ class RobotAgent(FactoryAgent):
             gate_strategy=self.model.gate_strategy,
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         )
+        # The run header (TODO-78): the policy values this robot's decisions are
+        # taken under, once per run, so a log can be read without knowing which
+        # code produced it. min_separation in world units, with the ratio and
+        # the body's motion per tick it is the product of.
+        logging.info(
+            f"[run] {self.unique_id} gate_strategy={self.meta_planner.gate_strategy} "
+            f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
+            f"min_separation={self.meta_planner.min_separation:.2f} "
+            f"(min_separation_in_motion_ticks={self.meta_planner.min_separation / self.projector.assumed_speed:g} "
+            f"x assumed_speed={self.projector.assumed_speed:g})"
+        )
         self.meta_planner.seed_tasks(assigned_tasks)
         self.current_task_instance: Optional[TaskInstance] = None
         self.finished: bool = False

@@ -292,6 +292,26 @@ class MetaPlanner:
     # Public interface (shared/io_contracts.md §2.2)
     # =========================================================================
 
+    # The policy values a run was produced under, read-only, so the embodiment
+    # can write them into the run's log header (TODO-78). Reading them decides
+    # nothing: theta is still applied only in _clears_gate().
+    @property
+    def theta(self) -> float:
+        return self._theta
+
+    @property
+    def rho(self) -> float:
+        return self._rho
+
+    @property
+    def min_separation(self) -> float:
+        """World units: min_separation_in_motion_ticks x the Projector's assumed_speed."""
+        return self._min_separation
+
+    @property
+    def gate_strategy(self) -> str:
+        return self._gate_strategy
+
     def evaluate_triggers(
         self,
         belief: BeliefState,
