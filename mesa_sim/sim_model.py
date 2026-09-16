@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 from shared.domain_knowledge import DomainKnowledgeBase
-from shared.types import ScenarioConfig
+from shared.types import ScenarioConfig, check_task_bindings
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
 
@@ -262,6 +262,17 @@ class SimModel(model.Model):
         work order, never the script.
         """
         agent_cfgs = {a.agent_id: a for a in scenario.agents}
+
+        # Every scripted and assigned task must be well typed against this layout
+        # (F47b, TODO-49): the bound objects exist, with the types the schema
+        # declares. An error, not a warning.
+        object_type_by_id = {obj_id: obj.type for obj_id, obj in self.objects.items()}
+        for agent_cfg in scenario.agents:
+            for task in list(agent_cfg.scheduled_tasks or []) + list(agent_cfg.assigned_tasks or []):
+                try:
+                    check_task_bindings(task, object_type_by_id)
+                except ValueError as e:
+                    raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
 
         for agent_cfg in scenario.agents:
             start_pos = agent_cfg.start_position

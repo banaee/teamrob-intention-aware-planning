@@ -310,6 +310,33 @@ class TaskInstance:
     schema: "TaskSchema"
     bindings: Dict[Var, Const]  # {Var("?item"): Const("item_1")}
 
+def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str]) -> None:
+    """
+    A scheduled or assigned task must be well typed against the world it runs in: every
+    bound object exists in the layout, and every parameter the schema types
+    (TaskSchema.parameter_types, the same table the recognizer enumerates hypotheses
+    from) is bound to an object of that type. Raises ValueError otherwise — an error,
+    not a warning, because an ill-typed instance is a task the domain does not
+    describe (a coffee break with no coffee machine), which the human would execute
+    and the robot could never recognise (TODO-49 (2), the binding part; F47b). The
+    embodiment supplies the id → type table; shared/ sees no simulator object.
+    """
+    expected_types = task.schema.parameter_types or {}
+    for var, const in task.bindings.items():
+        actual = object_type_by_id.get(const.value)
+        if actual is None:
+            raise ValueError(
+                f"{task_instance_key(task)}: {var.name} is bound to '{const.value}', "
+                f"which is not an object of this layout"
+            )
+        expected = expected_types.get(var.name)
+        if expected is not None and actual != expected:
+            raise ValueError(
+                f"{task_instance_key(task)}: {var.name} is bound to '{const.value}' of type "
+                f"'{actual}', but the schema requires type '{expected}'"
+            )
+
+
 def task_instance_key(task: TaskInstance) -> str:
     """
     Derived identity string for a TaskInstance — schema name + sorted bindings,
