@@ -1512,6 +1512,7 @@ Interface (design; the exact signature is the implementer's):
         -> RealizedPlan | None        # None: no realization within the horizon
     AS BUILT (T3; ruling T3b): realize(plan, human_plan, min_separation, decision_step)
         -> RealizedPlan               # never None: `realizable` flag and a `reason`
+    AS BUILT (F1): the same signature; always a cost, no `realizable` flag
 
 `RealizedPlan` carries: the placed (shifted) segments; the hold δ (where — the trigger position —
 and how long); the realized cost T_r + δ; and the share of the trajectory lying BEYOND the human's
@@ -1547,11 +1548,14 @@ A VIOLATION IS A DISTANCE. Agents are points; a violation is any moment at which
 below `min_separation`. Conflicts of position or of path (for example head-on on the same line, or
 the human's path passing the robot's standing position) need no special case: they come out as
 UNREALIZABLE through the hold-position check, because no shift clears a hold whose position the human
-passes within `min_separation`.
+passes within `min_separation`. SUPERSEDED (F1): a violation is the ROBOT'S MOTION within
+`min_separation` without the distance increasing; the human passing a standing robot is not one, and
+nothing is unrealizable.
 
 PROPERTY 1 (unchanged): A HOLD IS A POSITION — while holding, the robot stands where it is, and that
 stationary stretch is checked like any other segment; T1 found holds that "cleared" only because the
-waiting position was never checked.
+waiting position was never checked. SUPERSEDED (F1, "Robot-responsible separation"): a standing robot
+is never in violation, so the hold is no longer checked — deliberately, not by omission.
 PROPERTY 2 (AMENDED, R1): REALIZABLE means NO VIOLATION WITHIN [trigger, T_h], where T_h is the end
 of the human's projection. The robot's plan beyond T_h is UNASSESSED: recorded as such (the unassessed
 share on `RealizedPlan`), and treated neither as clear nor as blocked. A violation cut off by T_h is
@@ -1560,7 +1564,8 @@ shift has no iteration to terminate — its search is bounded by the hold cap be
 HOLD CAP: a hold may not extend to T_h. A candidate that clears only by waiting until the human's
 projection ends is UNREALIZABLE, not "realized with a long hold" — T1b showed that every hold in the
 fixtures is a hold into the unassessed tail, and a hold reaching T_h would be clearing by outlasting
-the assessment rather than by avoiding anything within it.
+the assessment rather than by avoiding anything within it. DELETED (F1): holding is always admissible;
+a hold to or past T_h is priced as T_r + δ and leaves the plan in the accepted unassessed tail.
 COST: realized cost = T_r + δ over the robot's FULL plan, with T_r the plain projected duration. The
 unassessed tail is inside T_r and is not corrected for (TODO-69 decided as reading (1): no correction;
 the unassessed share is logged).
@@ -1653,7 +1658,8 @@ exactly as today.
       _queue = pool - winner
       return UpdateResult(winner, _queue, hold = winner's δ at the trigger position)
 
-ALL CANDIDATES UNREALIZABLE — the condition means: for every task, no shift within the human's
+ALL CANDIDATES UNREALIZABLE (SUPERSEDED, F1: the condition cannot arise; the fallback built at T10 was
+removed) — the condition means: for every task, no shift within the human's
 horizon clears the separation (e.g. the human's path passes the robot's standing position within
 `min_separation`, or a human at the kitting table blocks every delivery in the pool). DECIDED (R1,
 September 2026; resolves TODO-30 and TODO-52): select by PLAIN PROJECTED COST — the argmin with no
@@ -1695,7 +1701,9 @@ because Mesa has NO such layer today: agents are points that may overlap, so in 
 separation below `min_separation` at execution time is possible and is MEASURED (T9's per-tick
 robot–human distance), never avoided. Building Mesa's avoidance, possibly seeded by realization's
 output as hints, is TODO-73. The single-decision-path rule is untouched: that layer refines motion;
-it never decides whether to wait or which task to run.
+it never decides whether to wait or which task to run. F1 fixes the rule that layer must implement — robot-responsible
+separation: stop when the next motion would violate (a) or (b); standing is always safe — so that
+execution and realization obey one definition (TODO-73).
 Files: docs only. Later: mesa_sim/ (TODO-73), ros_sim/ (Phase 6)
 Reference: R1 decision record, September 2026; T1b (every hold in the fixtures is a hold into the
 unassessed tail)
@@ -1817,10 +1825,11 @@ RULINGS (T3b):
 - `realize()` RETURNS A `RealizedPlan`, never None: `realizable` is a flag and `reason` says why
   ("realized", "no_human_projection", "hold_position_violated", "hold_reaches_horizon"). The
   `RealizedPlan | None` in the interface sketch above is superseded. An unrealizable plan has no
-  `delta`, `cost`, segments or share.
+  `delta`, `cost`, segments or share. SUPERSEDED (F1): the flag and the two unrealizable reasons are
+  gone; every plan has `delta`, `cost`, segments and share.
 - THE HOLD CAP as implemented: plan start + δ ≥ T_h is unrealizable ("hold_reaches_horizon");
   δ = 0 is never a hold and is never capped, so a plan that starts at or after T_h is realizable and
-  fully unassessed.
+  fully unassessed. DELETED (F1).
 - THE OBSERVATION OFFSET IS UNASSESSED AND NOT IN THE SHARE: the human's projection starts at the
   offset (L2), so the first tick of every plan is outside the assessed window — nothing was observed
   of the human there — and the unassessed share counts only the part of the realized plan beyond T_h,
@@ -1829,7 +1838,8 @@ RULINGS (T3b):
 - LAYERING WORDING: `MetaPlanner` consumes `realize()` from the projection layer (corrected above).
 - A VIOLATION IS STRICT: a single instant at exactly `min_separation` is not a violation. The
   violating shift intervals are open, and their endpoints — where the distance touches
-  `min_separation` — are clear.
+  `min_separation` — are clear. (Unchanged under F1, which adds "the robot is moving and the distance
+  is not increasing" to the condition.)
 
 QUANTISATION OF δ AND COST — DECIDED (T3b), from the design, before the evaluation:
 δ IS IN WHOLE TICKS. `realize()` returns the smallest whole-tick shift that clears the assessed
@@ -1912,7 +1922,9 @@ completion, PYTHONHASHSEED=0; `plain`+`none`, `realized`+`none`, `realized`+`b2a
   crossing minima (s30 tick 23: 11.03 → 0.00; s20_off crossing: 11.64 at tick 51 → 9.02 over tick 52) and extends episodes by
   one tick; it moves nothing from outside to inside.
 
-FINDING, recorded for the design chat, not acted on: s20_on, step 57 (`theta_crossed`, the human's next
+FINDING (RESOLVED by F1, "Robot-responsible separation", which redefined the violation; the mechanism
+below is corrected there: it was the robot's stationary placement, not its walk, that the joint-state
+rule counted), recorded at T10: s20_on, step 57 (`theta_crossed`, the human's next
 task admitted). The robot is carrying item_4, 3.95 projected ticks from placing it. The human has just
 placed at the table and is walking away, and at the trigger stands 37.5 cm from the robot — already
 inside `min_separation`. item_4's plan converges on the departing human at δ = 0 and its hold position
@@ -1940,6 +1952,128 @@ mesa_sim/sim_model.py, mesa_sim/run_mesa.py (`--cost_strategy`, `[sep] min=`),
 configs/experiment.yaml, shared/io_contracts.md (§1.9, §2.2, §2.2b, §2.2c, §4.1, §6),
 analysis/t10_b3_realized/
 Reference: T10 session, September 2026; R1; T3b; T4 (`analysis/t4_b2a/comparison.md`)
+
+**Robot-responsible separation: min_separation binds the robot's motion, realization is total, and the body's task-completion tick is projected (F1)**
+T10's s20_on step 57 showed realization was not total: with the human already within `min_separation`
+at the decision, a standing robot was in violation, so a task 3.95 ticks from done was excluded and
+B3 switched to one costing 84.65. Together with the hold cap and the all-unrealizable fallback, the
+`realizable` flag was a hard exclusion threshold at `min_separation`, the very thing "The robot can
+wait" said the design had none of. DECIDED (F1, September 2026): the violation is redefined so that
+realization always yields a cost.
+
+THE VIOLATION. `min_separation` binds the ROBOT'S MOTION, not the joint state. A violation is either
+(a) the robot's motion taking the robot–human distance from at least `min_separation` to below it, or
+(b) the robot moving while within `min_separation` without the distance strictly increasing. Standing
+still within `min_separation` is never a violation. Moving so that the distance strictly increases is
+never a violation. Equivalently, at any moment: the robot is moving, the distance is strictly below
+`min_separation`, and its time derivative is ≤ 0 — (a) is the instant after the crossing, (b) the
+rest. A stationary robot segment (a hold, a grasp, a latency) therefore never violates.
+
+THE GEOMETRY (`trajectory_algorithms.shift_violation_interval`, rewritten; exact, no sampling). For
+one robot segment against one human segment, with u the robot's time into its segment and d the
+shift, the relative position X = C + B u − w d is affine in (u, d). "Within min_separation" is the open
+set |X|² < s² (an ellipse interior, or a strip), "not strictly increasing" is 2 X·B ≤ 0, a CLOSED
+HALF-PLANE in (u, d) (the whole plane when B = 0: equal velocities keep the distance constant, so a
+robot moving within s violates throughout), and "both exist" is the parallelogram. Their intersection
+is convex, so its projection onto d is still ONE interval, whose endpoints lie at a vertex of the
+polygon (parallelogram clipped by the half-plane, at most five vertices) inside the disc, a root of
+|X|² = s² along one of its edges, or the ellipse's own d-extremum inside the polygon. All enumerated;
+the smallest whole-tick δ outside every interval is read off exactly as before. Every interval is
+bounded, so a clearing δ ALWAYS EXISTS.
+
+DELETED. The hold-position check (`first_approach_step`, Property 1's "the hold is checked like any
+other segment"): a standing robot is never in violation. The hold cap ("a hold may not extend to T_h"):
+holding is always admissible, and a hold past T_h leaves the plan in the unassessed tail exactly as any
+plan starting after T_h — this SUPERSEDES the T_h cap ruling (R1, T3b) and makes the design consistent
+with TODO-69's accepted tail. `RealizedPlan.realizable` and the reasons `hold_position_violated` /
+`hold_reaches_horizon`: `realize()` returns a cost always, `reason` ∈ {realized, no_human_projection}.
+B3's all-unrealizable fallback and its `all_unrealizable` log (R1, TODO-30, built T10): there is no
+unrealizable candidate. B2 `b2a`'s escalate-on-unrealizable branch: it escalates only when δ > ρ ×
+(T_h − now). The single-task argmin ranges over EVERY candidate on one quantity, T_r + δ.
+
+STANCE, recorded: a standing robot may be in the human's way; the human's detour around it is a
+team-level cost (TODO-15), not priced by realization, which prices only the robot's own time. This
+same rule — stop when your next motion would violate (a) or (b); standing is always safe — is the one
+Mesa's execution-time avoidance must use when it is built (TODO-73), so that the plan realization
+checks and the behaviour execution produces obey one definition.
+
+GROUNDING (documentation of correspondence, not a claim of validation). Two established notions share
+F1's stance.
+- Passive motion safety (Fraichard and colleagues): a robot is held responsible for a collision only
+  if the collision happens while the robot is moving; a robot at rest when contact occurs is passively
+  safe. F1's "standing still within min_separation is never a violation" is this notion.
+  T. Fraichard, "A Short Paper About Motion Safety", IEEE ICRA 2007 (the motion safety criteria);
+  S. Bouraine, T. Fraichard, H. Salhi, "Provably safe navigation for mobile robots with limited
+  field-of-views in dynamic environments", Autonomous Robots 32(3), 2012 (passive motion safety).
+  Bibliographic details as supplied by Hadi; not independently verified in this session.
+- Speed and separation monitoring, ISO/TS 15066:2016 (collaborative robots, with ISO 10218-1/-2): the
+  robot maintains a protective separation distance from the human and stops when it would be
+  violated; stopping is the safe state. F1 shares the stance that separation is a constraint on the
+  robot's motion and that holding is always admissible.
+Scope of the correspondence: F1 is a planning-level rule applied to projected trajectories, not a
+certified safety function; neither reference validates F1. F1's clause allowing motion within
+`min_separation` that strictly increases the distance is OUR extension — passive motion safety covers
+only being at rest, and whether ISO/TS 15066 permits retreat inside the protective distance is not
+established here. And `min_separation` in F1 is a fixed planning constant (2.5 × motion per tick),
+whereas ISO/TS 15066's protective separation distance is computed from robot and human speeds,
+reaction and stopping times.
+
+THE TASK-COMPLETION TICK. The L2 report left the executor's trailing task-completion tick unmodelled:
+after the last action's acknowledgement, `Executor.step()` spends one tick in `_on_task_complete()`
+before the next task's first microaction. Measured on the T10 logs, both agents pay it (human: release
+54, acknowledgement 55, completion 56, first step 57 in s20_on; robot: release 30, acknowledgement 31,
+completion 32, next task's first step 33 in s00_off). DECIDED: the body supplies it as it supplies the
+acknowledgement latency — `mesa_sim/executor.TASK_COMPLETION_LATENCY = 1.0`, handed to the
+`Projector` as `task_completion_latency` (default 0.0 in `shared/`) — and `Projector.project()` appends
+it as a stationary segment at the end of every projected task, robot candidates and the human's
+projection alike. T_h grows by one tick per human task; every candidate's T_r by one, so plain
+selection cannot reorder.
+
+MEASURED (F1; `analysis/f1_robot_responsible/`; s00/s10/s20/s30 × prior off/on, run to completion,
+PYTHONHASHSEED=0; `plain`+`none`, `realized`+`none`, `realized`+`b2a` at ρ = 0.5):
+- VALIDATION (`validation.md`): 101 admitted candidate rows; every realized trajectory sampled at
+  0.001 tick over its assessed window has 0 rule (a) and 0 rule (b) violations; for all 12 held rows
+  δ − 1 violates (δ minimal); the T10 realizer on the same inputs calls 2 rows unrealizable (s30_on 21,
+  both candidates, hold_position_violated) and gives a larger δ in 4 rows (s10: 7 where F1 gives 0)
+  and a smaller one in none — F1's violating set is a subset of T10's.
+- PLAIN: identical decisions to T10 in every condition (the completion tick shifts every T_r by one).
+- REALIZED against PLAIN — realization's effect: s00 and s10 identical (s10's T10 holds are gone: the
+  robot arrives at the table first and STANDS while the human comes within 50 cm, which is no longer
+  its violation); s20 and s30: the same task order in every condition, reached later by the holds.
+- REALIZED, `none` against `b2a`: identical decisions, greps and holds in all eight conditions, as at T10.
+- s20_on STEP 57: item_4 (T_r 5.95) realizes with δ = 2 — the robot stands two ticks while the human
+  walks off, then places — and wins over item_6 (83.06); completion 239 against T10's 292 and plain's
+  228. Attribution: with the realizer alone (before the completion tick) δ was 0 at 57 and completion
+  236; the completion tick lengthens the step-6 hold from 7 to 8, so the robot reaches the table one
+  tick later and its last walk overlaps the human's departure. The T10 mechanism, corrected: item_4
+  was excluded at T10 not because its walk converged on the human but because its stationary
+  PLACEMENT stood within 50 cm of the departing human — a standing robot, which the joint-state rule
+  counted and the hold-position check then refused to shift.
+- s30_on STEP 21 (the mirror crossing, T10's one all-unrealizable event): item_4 realizes with δ = 7,
+  item_2 with δ = 4; item_4 wins (61.68 vs 70.45). The robot stands while the human passes it at
+  47.8 cm (ticks 22–23, "stand inside": allowed), then walks. Under T10 the fallback ran the robot
+  through the human (continuous minimum 0.00 at tick 23). Completion 162 in both.
+- HOLDS: 10 started, 36 ticks held, 1 interrupted (s20_off 20 → 24, remainder 4 = 8 − 4), identical in
+  both realized configurations: s20_off 20/24/31 → 8, 4, 1; s20_on 6/31/57 → 8, 1, 2; s30_off 28/47 →
+  7, 1; s30_on 21/47 → 7, 1. Every T10 hold at s20/s30 grew by one with the completion tick.
+- ACTUAL SEPARATION, each sub-50 tick classified by the F1 rule at execution (viol | stand | recede)
+  and against the assessed window: NO tick violates rule (a) or (b) inside an assessed window in any
+  run. Inside a window there are only "stand" ticks (s10 72–74, the human arriving at the robot's
+  placement; s30_on 22–23, the head-on pass). Every "viol" tick is past T_h, under no projection, or
+  after the robot finished — the tail (below).
+- s40 (regression sweep only): decisions and greps identical to T10.
+
+THE GAP F1 LEAVES OPEN — recorded, no design proposed here. Past T_h the human vanishes from the
+assessment, so the robot can approach a human still standing where its projection ended: T10's s20_on
+ticks 54–56 (35.1 cm at 56, the human idle at the table two ticks past its projected end) is the
+instance; the completion tick covers one of those two ticks, not the other. Every remaining rule
+violation in the F1 sweep is of this kind (past T_h or no projection). Under design discussion.
+Files: shared/trajectory_algorithms.py (`shift_violation_interval`; `first_approach_step` removed),
+shared/realization.py, shared/types.py (`RealizedPlan`), shared/meta_planner.py (B2, B3),
+shared/projection.py (`task_completion_latency`), mesa_sim/executor.py (`TASK_COMPLETION_LATENCY`),
+mesa_sim/sim_agents.py, shared/io_contracts.md, analysis/f1_robot_responsible/
+Reference: F1 session, September 2026; T10 (the s20_on 57 finding); L2 (the unmodelled trailing tick);
+R1; T3b
 
 **A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
 When `update()` returns the task the robot is already executing — a CONTINUE, decided by

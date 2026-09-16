@@ -776,7 +776,12 @@ Re-testing needs a seed item that is NOT in the robot's candidate pool. Until th
 Files: domains/kitting/tasks.py, mesa_sim/sim_model.py, domains/kitting/scenarios.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
-**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable` — ✅ BUILT (T10): the `RuntimeError` is gone; one event measured
+**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable` — ✅ BUILT (T10): the `RuntimeError` is gone; one event measured — ✅ CLOSED (F1): realization is total, the branch no longer exists
+CLOSED (F1, September 2026): under robot-responsible separation (design_decisions.md,
+"Robot-responsible separation") a clearing hold always exists, `realize()` always returns a cost, and
+there is no unrealizable candidate — neither the exclusion branch nor the all-unrealizable fallback
+exists any more (both removed from `_replan_tasks`). s30_on 21, T10's one event, now realizes item_4
+with δ = 7 (the robot stands while the human passes at 47.8 cm). Nothing left to exercise.
 DECIDED (R1, September 2026, with TODO-52): when NO candidate realizes, `update()` selects by plain
 projected cost — the argmin over the pool with no hold, exactly the path taken when there is no human
 projection — and logs the trigger as `all_unrealizable`. The `RuntimeError` is superseded and is
@@ -2031,7 +2036,17 @@ constructor paragraph's "persistent assignment prior" wording (it is a support r
 Files: shared/io_contracts.md (§1.3, §2.1), docs/recognizer_handback.md
 Reference: wait-decision documentation session, September 2026
 
-**TODO-73 — Mesa has no execution-time avoidance: agents may overlap** [post-4C; from R1]
+**TODO-73 — Mesa has no execution-time avoidance: agents may overlap** [post-4C; from R1] — the rule it must use is FIXED (F1)
+THE RULE (F1, September 2026): when built, Mesa's execution-time avoidance uses robot-responsible
+separation, the same definition realization checks (design_decisions.md, "Robot-responsible
+separation"): the robot may not move so that the robot–human distance goes from at least
+`min_separation` to below it, nor move within `min_separation` without the distance strictly
+increasing; standing is always safe, so "stop" is always an admissible response. One definition for the
+plan checked and the behaviour executed. Grounding of the stance (passive motion safety; ISO/TS 15066
+speed and separation monitoring) and its scope are recorded in that entry. The gap it must cover is
+also recorded there: past T_h the human vanishes from the assessment (s20_on ticks 54–56, 35.1 cm at
+56 in the T10 baselines); in the F1 sweep every remaining rule violation at execution is past T_h or
+under no projection.
 Realization decides only within the human's projection (design_decisions.md, "Assumption:
 execution-time avoidance past T_h"); everything after T_h, and the residual conflict of an
 all-unrealizable trigger, is left to an execution-time avoidance layer that Mesa does not have —
@@ -2073,7 +2088,16 @@ means. Rename (e.g. `robot_grasped`) when a session touches the trigger set; a r
 Files: shared/meta_planner.py (`evaluate_triggers`), shared/io_contracts.md (§2.2)
 Reference: R1 decision record, September 2026
 
-**TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** ✅ LARGELY RESOLVED (L2, Sept 2026) — the systematic whole-tick lag is removed; what remains is step quantisation (not compensated, by decision) and one robot-only tick (recorded below, not fixed)
+**TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** ✅ LARGELY RESOLVED (L2, Sept 2026) — the systematic whole-tick lag is removed; what remains is step quantisation (not compensated, by decision) and one robot-only tick (recorded below, not fixed) — the task-completion tick ✅ ADDED (F1)
+THE TASK-COMPLETION TICK (F1, September 2026): the trailing tick the L2 report left unmodelled — the
+tick `Executor.step()` spends in `_on_task_complete()` after the last action's acknowledgement — is
+now charged once per projected task, for both agents (measured: human release 54 / ack 55 / complete
+56 / first step 57; robot release 30 / ack 31 / complete 32 / first step 33), from
+`mesa_sim/executor.TASK_COMPLETION_LATENCY = 1.0` through `Projector(task_completion_latency=...)`,
+appended by `project()` as a stationary segment at the task's end position. Effect: T_h one tick
+later per human task, every T_r one tick longer; every T10 hold at s20/s30 grew by one; plain
+decisions unchanged. Still uncompensated: step quantisation and the robot's skipped acknowledgement
+(below).
 REMOVED (L2): (a) the ACKNOWLEDGEMENT LATENCY is now charged per action, as a stationary segment at the
 position the action ended at, from a constant the body supplies
 (`mesa_sim/executor.ACTION_COMPLETION_LATENCY = 1.0`, passed to `Projector`); (b) the OBSERVATION

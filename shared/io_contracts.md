@@ -40,6 +40,13 @@ path — `_detect_interference()`, `_cost()`, `min_safe_distance`, the `interfer
 parameter, the `RuntimeError` — is gone; `MetaPlanner` takes `cost_strategy` ("realized" | "plain").
 No PLANNED paragraph remains in these sections.
 
+**Re-aligned after F1 (September 2026)** for §1.11, §2.2, §2.2b, §2.2c, §4.1 and §6: robot-responsible
+separation. A violation is the robot MOVING within `min_separation` without the distance strictly
+increasing; a standing robot never violates. The hold-position check (`first_approach_step`) and the
+hold cap are gone, so `realize()` always returns a cost: `RealizedPlan` has no `realizable` flag and
+only the reasons `realized` / `no_human_projection`; B3 has no fallback, B2 no escalate-on-unrealizable.
+The `Projector` additionally takes the body's task-completion tick.
+
 ---
 
 ## 0. Notation (matches paper)
@@ -415,28 +422,30 @@ whole-trajectory minimal shift (design_decisions.md, "The robot can wait", the R
 ```python
 @dataclass
 class RealizedPlan:
-    realizable: bool                      # a clearing shift exists (see §2.2c); always True without a human projection
-    delta: Optional[int]                  # the hold, WHOLE ticks ≥ 0 (T3b); None when unrealizable
-    cost: Optional[float]                 # T_r + delta over the FULL plan; None when unrealizable
+    delta: int                            # the hold, WHOLE ticks ≥ 0 (T3b); 0 without a human projection
+    cost: float                           # T_r + delta over the FULL plan
     projected_duration: float             # T_r: the span of the plan's segments (fractional steps)
     segments: List[Segment]               # the hold (stationary, when of positive duration) then every
-                                          # projected segment shifted by delta; [] when unrealizable
+                                          # projected segment shifted by delta
     hold_position: Tuple[float, float]    # the plan's first segment's start: where the robot is at the decision step
     hold_start: float                     # the decision step
     horizon: Optional[float]              # T_h, the end of the human projection; None without one
-    unassessed_share: Optional[float]     # share of [hold_start, realized end] beyond T_h; 1.0 without a
-                                          # human projection; None when unrealizable
-    reason: str                           # "realized" | "no_human_projection" |
-                                          # "hold_position_violated" | "hold_reaches_horizon"
+    unassessed_share: float               # share of [hold_start, realized end] beyond T_h; 1.0 without a
+                                          # human projection, or when the hold pushes the plan past T_h
+    reason: str                           # "realized" | "no_human_projection"
 ```
+
+Since F1 (robot-responsible separation, §2.2c) realization is TOTAL: a clearing shift always exists, so
+there is no `realizable` flag and no unrealizable reason. The former `realizable: bool`,
+`hold_position_violated` and `hold_reaches_horizon` are gone.
 
 - `cost` is the ONE number a candidate competes on (T10): T_r + δ, walking plus the hold. The tail
   beyond T_h is inside T_r and not corrected for (TODO-69, reading (1)); the share is logged so the
   bias can be reported, not priced.
 - `delta` is what reaches the executor as the hold hint (§1.9, TODO-71): stand at `hold_position`
   for `delta` steps, then the plan.
-- An unrealizable plan has no realized cost to rank on; `reason` says why. The caller's fallback
-  when no candidate realizes is R1's: plain projected cost, logged `all_unrealizable` (§2.2).
+- Every plan has a realized cost to rank on (F1); the R1 fallback for "no candidate realizes" was
+  built at T10 and removed at F1 (§2.2).
 - `reason == "no_human_projection"` is the shape of "no projection admitted": δ = 0, cost = T_r,
   share 1.0. A caller may treat it exactly as it treats `human_projection is None` today.
 - **Quantisation — DECIDED (T3b; design_decisions.md, "Realization as built").** `delta` is in
@@ -610,9 +619,9 @@ trigger), the human's remaining projected duration; otherwise, or if the current
 unrealizable, B3 runs. `human_projection is None` still means continue. 0.5 is a stated assumption
 (T6 varies it), not a calibrated value.
 
-**`cost_strategy`** (T10): `"realized"` (default) — B3 realizes every candidate and takes the argmin
-of `RealizedPlan.cost` = T_r + δ over the realizable ones, carrying the winner's δ as the hold; when
-none realizes, the argmin of the plain `projected_duration` with no hold, logged `all_unrealizable`.
+**`cost_strategy`** (T10; F1): `"realized"` (default) — B3 realizes every candidate and takes the
+argmin of `RealizedPlan.cost` = T_r + δ over all of them, carrying the winner's δ as the hold (since F1
+every candidate realizes; the T10 all-unrealizable fallback is gone).
 `"plain"` — the argmin of `projected_duration` alone, no human consideration, no hold, no filter; a
 comparison condition for the T6 ablation, not a policy. Both use the same T_r (the fractional
 segment span, never `ProjectedPlan.total_estimated_cost`), so their difference is realization's
@@ -682,18 +691,16 @@ obligation (§4.1), not a change to selection.
 to B3. B2: `_is_current_task_plausible()`, the mid-task plausibility gate — `gate_strategy`
 `"none"` (default) never continues; `"b2a"` (T4) realizes the current task alone (decision step 0,
 `min_separation`) and continues with its hold δ when δ ≤ ρ × (T_h − 0), a COMMITMENT gate that can
-only prevent a switch B3 would make; it escalates when δ is above the bound or the task is
-unrealizable; `human_projection is None` → continue, hold 0. One `[meta-b2]` line per call. `"b2b"`
-raises `NotImplementedError`. B3: `_replan_tasks()` (T10) — every candidate projected alone from the
-live world at decision step 0 and realized against `human_projection`; the argmin of
-`RealizedPlan.cost` over the realizable candidates wins (ties: pool order, `min()` keeps the first),
-its δ goes out as `UpdateResult.hold`; the rest form the queue. No candidate realizable → the argmin
-of `projected_duration`, hold 0, selection `all_unrealizable`. When `human_projection` is `None`
-`realize()` reports `no_human_projection` for every candidate (δ = 0, cost = T_r), so B3 is an argmin
-over projected durations. One `[meta-cand]` line per candidate (`realizable`, `reason`, `T_r`,
-`delta`, `cost`, `share`) and one `[meta-b3]` line per call (`trigger`, `cost_strategy`, `selection`
-∈ `realized` | `no_projection` | `all_unrealizable` | `plain`, `winner`, `cost`, `hold`, `T_h`,
-`candidates`, `realizable`).
+only prevent a switch B3 would make; it escalates when δ is above the bound (since F1 there is no
+unrealizable current task); `human_projection is None` → continue, hold 0. One `[meta-b2]` line per
+call. `"b2b"` raises `NotImplementedError`. B3: `_replan_tasks()` (T10, F1) — every candidate projected
+alone from the live world at decision step 0 and realized against `human_projection`; the argmin of
+`RealizedPlan.cost` over all candidates wins (ties: pool order, `min()` keeps the first), its δ goes
+out as `UpdateResult.hold`; the rest form the queue. When `human_projection` is `None` `realize()`
+reports `no_human_projection` for every candidate (δ = 0, cost = T_r), so B3 is an argmin over
+projected durations. One `[meta-cand]` line per candidate (`reason`, `T_r`, `delta`, `cost`, `share`)
+and one `[meta-b3]` line per call (`trigger`, `cost_strategy`, `selection` ∈ `realized` |
+`no_projection` | `plain`, `winner`, `cost`, `hold`, `T_h`, `candidates`).
 
 **Strategy (DESIGN-16).** "Candidate" means the unit the argmin ranges over — an individual
 task under `single_task`, a permuted ordering under `full_reorder` (design_decisions.md,
@@ -721,12 +728,9 @@ candidates remain — all assigned tasks are complete. Callers check
 done" is a fact `shared/` discovers about its own state, so it is returned through the
 contract rather than raised for the embodiment layer to catch and reinterpret.
 
-**All candidates unrealizable** (R1, TODO-30; built T10): no candidate has a shift within the
-human's horizon that clears `min_separation` — a situation, not an anomaly. `update()` then
-selects by PLAIN PROJECTED COST (the argmin of `projected_duration`, no hold, the same quantity
-as when there is no human projection), returns `hold=0`, and logs the decision as
-`all_unrealizable`. Nothing is raised; the former `RuntimeError` is gone. The residual conflict is
-the execution layer's (design_decisions.md, "Assumption: execution-time avoidance past T_h").
+**No unrealizable candidate** (F1). Under robot-responsible separation a clearing hold always exists,
+so every candidate carries a realized cost and B3 needs no fallback: the T10 `all_unrealizable` path
+(R1, TODO-30) is removed, as the `RuntimeError` was before it. Nothing is raised, nothing is excluded.
 
 #### Update Human Projection
 ```python
@@ -803,28 +807,30 @@ read by `mesa_sim/action_decomposer.py` but no longer passed anywhere since T10 
 exact rather than sampled, no interval tradeoff, but with real edge cases (clamping the
 analytic minimum to the overlap window, near-zero relative velocity).
 
-**Realization's geometry (BUILT, T3)** — realization asks this family a different question from
-"where do two fixed trajectories come close": for which SHIFTS of a robot segment is there a
-violation against a human segment, and when does the human first come within the separation of
-a fixed point. Both are closed form; neither samples.
+**Realization's geometry (BUILT, T3; redefined F1)** — realization asks this family a different
+question from "where do two fixed trajectories come close": for which SHIFTS of a robot segment is
+there a violation against a human segment. Closed form; no sampling.
 ```python
 shift_violation_interval(robot_segment, human_segment, min_separation) -> Optional[Tuple[float, float]]
-first_approach_step(pos, human_segment, min_separation, from_step) -> Optional[float]
 ```
 `shift_violation_interval` returns the open interval of shifts d for which `robot_segment`,
-delayed by d along the same path, is strictly within `min_separation` of `human_segment` at some
-moment both exist, or `None`. It is ONE interval by convexity: with u the robot's time into its
-segment, the relative position is affine in (u, d), so the violating set is an ellipse interior
-(or a strip) and the moments both exist are a parallelogram; their intersection is convex and
-projects onto d as one interval, whose endpoints are enumerated exactly (the ellipse's own
-d-extrema, its crossings with the parallelogram's edges, the vertices inside the disc). A
-VIOLATION IS A DISTANCE: agents are points, and any moment strictly closer than `min_separation`
-is one, including one cut off by T_h; the interval's endpoints are where the distance touches
-`min_separation`, and are clear. `first_approach_step` is the hold-position check: the first step
-at which the human is strictly within the separation of where the robot stands. Tolerances in
-both are floating-point slack (1e-9 relative), not a margin. `closest_point_of_approach()` stays an
-unbuilt drop-in for `discretized_time_sampling()`; `obstacle_aware_path()` becomes the detour
-strategy of realization (Phase 4D).
+delayed by d along the same path, VIOLATES robot-responsible separation against `human_segment` at
+some moment both exist, or `None`. THE VIOLATION (F1; design_decisions.md, "Robot-responsible
+separation"): the robot is MOVING, strictly within `min_separation` of the human, and the distance
+is not strictly increasing — (a) the instant after its motion takes the distance below
+`min_separation`, or (b) moving within it without the distance increasing. A standing robot never
+violates (a stationary robot segment returns `None` at once); moving away never violates. It is ONE
+interval by convexity: with u the robot's time into its segment, the relative position X is affine
+in (u, d); "within `min_separation`" is an ellipse interior (or a strip), "not strictly increasing"
+is the closed half-plane 2 X·B ≤ 0 (the whole plane when the velocities are equal), and the moments
+both exist are a parallelogram; the intersection is convex and projects onto d as one interval,
+whose endpoints are enumerated exactly (the vertices of the parallelogram clipped by the half-plane
+that lie inside the disc, the roots of |X|² = s² along that polygon's edges, the ellipse's own
+d-extrema inside it). Every interval is bounded, so a clearing shift always exists. The interval's
+endpoints are where the violating set is touched, and are clear. `first_approach_step`, the former
+hold-position check, was removed at F1. Tolerances are floating-point slack (1e-9 relative), not a
+margin. `closest_point_of_approach()` stays an unbuilt drop-in for `discretized_time_sampling()`;
+`obstacle_aware_path()` becomes the detour strategy of realization (Phase 4D).
 
 These functions **measure only and hold no policy**. The single policy value is
 `min_separation`, the clearance realization must achieve; `MetaPlanner` supplies it and
@@ -833,7 +839,7 @@ threshold in `MetaPlanner._detect_interference()` is gone, T10).
 
 ---
 
-### 2.2c `realize()` (`shared/realization.py`) — BUILT (T3), consumed by B2 (T4) and B3 (T10)
+### 2.2c `realize()` (`shared/realization.py`) — BUILT (T3), consumed by B2 (T4) and B3 (T10), TOTAL since F1
 
 The realization service (design_decisions.md, "The robot can wait"; the R1 decisions). Sits
 between `trajectory_algorithms.py` and `projection.py` in the one-way layering: it reads
@@ -849,15 +855,16 @@ realize(
     human_plan: Optional[ProjectedPlan],  # the admitted human projection, or None
     min_separation: float,                # world units; the caller's policy value
     decision_step: float,                 # the robot's now on the projection clock (0.0 at a trigger)
-) -> RealizedPlan                         # never None; unrealizable is reported with a reason (§1.11)
+) -> RealizedPlan                         # always, with a cost (§1.11): a clearing shift always exists (F1)
 ```
 
-**Policy (R1, TODO-70): the whole-trajectory minimal shift.** One hold δ at the robot's position
-at `decision_step` (the plan's first segment's start, which may be partway along a walk), then the
-whole plan shifted by δ. δ is the smallest shift ≥ 0 such that the shifted trajectory — including
-the stationary hold at that position over [decision_step, plan start + δ] — has no violation in the
-assessed window, IN WHOLE TICKS (T3b). Exact: the violating shift intervals
-(`shift_violation_interval`, one per robot × human segment pair) are walked in order of their start;
+**Policy (R1, TODO-70; the violation redefined at F1): the whole-trajectory minimal shift.** One hold
+δ at the robot's position at `decision_step` (the plan's first segment's start, which may be partway
+along a walk), then the whole plan shifted by δ. δ is the smallest shift ≥ 0 such that the shifted
+trajectory has no violation in the assessed window, IN WHOLE TICKS (T3b) — a violation being the
+robot's motion within `min_separation` without the distance increasing (§2.2b), so the stationary
+hold is never one. Exact: the violating shift intervals (`shift_violation_interval`, one per MOVING
+robot segment × human segment pair) are walked in order of their start;
 δ starts at 0 and, whenever an interval strictly contains it, jumps to the first whole tick at or
 after that interval's end. No search, no grid: the feasible set in δ is not monotone (a shift can
 clear one crossing and walk into the next), so bisection would be invalid, a grid would make δ
@@ -869,20 +876,18 @@ and nothing before the human projection's span (it starts at the observation off
 assessed either. Segments are taken as they are — L2's stationary latency segments included —
 and no stride is assumed.
 
-**The hold is a position.** The human's projection must not come strictly within
-`min_separation` of the hold position while the robot stands there. Since the hold only grows with
-δ, the first step at which it does (`first_approach_step`) bounds δ from above; a minimal clearing
-δ beyond that bound means no shift clears — `realizable=False`, `reason="hold_position_violated"`.
-This is how head-on, same-line and "the human walks past the standing robot" conflicts come out,
-with no special case.
+**The hold is a position, and a standing robot never violates (F1).** The human may pass within
+`min_separation` of the hold position, or through it, while the robot stands there; nothing bounds δ
+from above. Head-on, same-line and "the human walks past the standing robot" conflicts realize as a
+hold until the robot's own motion is clear. The human's detour around a standing robot is a
+team-level cost (TODO-15), not priced here.
 
-**The hold cap.** A hold (δ > 0) may not extend to T_h: if plan start + δ ≥ T_h the plan is
-unrealizable, `reason="hold_reaches_horizon"` — it would clear by outlasting the assessment. δ = 0
-is not a hold and is never capped; a plan that starts at or after T_h is simply unassessed.
+**No hold cap (F1).** A hold may extend to or past T_h; the shifted plan then lies in the unassessed
+tail, exactly as a plan starting at or after T_h does, and `unassessed_share` reaches 1.0. Every
+violating interval is bounded, so a clearing δ always exists: `realize()` is total.
 
-**No human projection** (`None`, or one without segments): `realizable=True`, δ = 0, cost = T_r,
-`unassessed_share=1.0`, `reason="no_human_projection"`. The caller treats it as it treats an absent
-projection today.
+**No human projection** (`None`, or one without segments): δ = 0, cost = T_r, `unassessed_share=1.0`,
+`reason="no_human_projection"`. The caller treats it as it treats an absent projection today.
 
 **Raises** `ValueError` for a plan with no segments, or one starting before `decision_step`.
 
@@ -891,8 +896,10 @@ projection today.
 on eight conditions (scenario_00/10/20/30, prior off and on): 94 of 94 admitted candidate rows agree
 on realizability; 82 are identical and 12 differ only by the whole-tick rounding (each the ceil of
 the fractional δ); every realized trajectory is clear by T1b's closed form and by dense sampling,
-hold included. Not exercised by the fixtures: `hold_reaches_horizon`, and a walk continuing past a
-second interval (both covered by constructed cases only).
+hold included. **Re-validated under F1 (`analysis/f1_robot_responsible/validate.py`)** on the same
+eight conditions: 101 admitted candidate rows, every realized trajectory sampled at 0.001 tick has no
+rule (a) or (b) violation in its assessed window, every held row's δ − 1 violates (minimal), and F1's
+δ never exceeds the T10 realizer's on the same inputs (its violating set is a subset).
 
 ---
 
@@ -1046,14 +1053,19 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
   produced under: `gate_strategy`, `cost_strategy`, θ, ρ, `min_separation` and its ratio × rate
   (TODO-78); a run option (`--gate_strategy`, `--cost_strategy`, `configs/experiment.yaml`) is a
   run fact, never a scenario fact
-- Supplies the `Projector` its motion rate (`step_size`, T2) AND its stopping distance (T9): the
+- Supplies the `Projector` its motion rate (`step_size`, T2), its stopping distance (T9: the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
-  executor stops, for robot and human projections alike
+  executor stops), its per-action acknowledgement latency and observation offset (L2), and its
+  per-task completion tick (F1: `TASK_COMPLETION_LATENCY`, the tick `Executor.step()` spends in
+  `_on_task_complete()`, paid by both agents), for robot and human projections alike
 - Logs the actual robot–human distance once per tick (`[sep]` lines, headless run; T9) so that
   actual separation below `min_separation` can be reported — Mesa has no execution-time
   avoidance (TODO-73); the measure is a measure, not a behaviour. `dist=` samples the end-of-tick
   positions; `min=` (T10, TODO-79) is the continuous minimum over the tick with both agents moving
-  in a straight line between their consecutive positions, the motion model realization assumes
+  in a straight line between their consecutive positions, the motion model realization assumes.
+  When that avoidance is built it must apply robot-responsible separation (F1): never move so that
+  the distance drops below `min_separation`, never move within it without the distance increasing;
+  standing is always admissible
 
 ### 4.2 ROS (`ros_sim/`)
 
@@ -1102,6 +1114,7 @@ Simulators MUST ensure:
     single-decision-path NOTE in TODOS_AND_DEFERRED.md)
 12. The stopping distance the embodiment supplies to the `Projector` is the distance at which
     its own `at(agent, object)` predicate holds — one constant, one source (T9), as the motion
-    rate it supplies is the one its executor moves at (T2)
+    rate it supplies is the one its executor moves at (T2), and the acknowledgement and
+    task-completion ticks it supplies are the ticks its executor actually spends (L2, F1)
 
 ---
