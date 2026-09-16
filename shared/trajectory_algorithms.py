@@ -15,10 +15,11 @@ PURPOSE:
        (shared/realization.py, T3), which asks
        a different question — for which SHIFTS of a robot segment is there a
        violation of a given min_separation against a human segment
-       (shift_violation_interval), and when does the human first come within
-       it of the robot's standing position (first_approach_step) — and takes
-       the smallest shift that clears. min_separation is passed in; nothing
-       here holds policy.
+       (shift_violation_interval; robot-responsible since F1: a standing
+       robot never violates, a moving one must not be within min_separation
+       without the distance increasing) — and takes the smallest whole-tick
+       shift that clears. min_separation is passed in; nothing here holds
+       policy.
 
     No classes, no state, no imports from mesa_sim/ or ros_sim/ — same
     mind/body constraint as the rest of shared/.
@@ -323,33 +324,50 @@ def shift_violation_interval(
 ) -> Optional[Tuple[float, float]]:
     """
     The shifts d for which `robot_segment`, delayed by d — the same path,
-    occupying [start_step + d, end_step + d] — comes within `min_separation` of
-    `human_segment` at some moment both exist. Closed form, exact: no sampling
-    in time and none in d.
+    occupying [start_step + d, end_step + d] — VIOLATES robot-responsible
+    separation against `human_segment` at some moment both exist. Closed
+    form, exact: no sampling in time and none in d.
 
-    Returns (lo, hi), the open interval of violating shifts (a violation is a
-    STRICT inequality, distance < min_separation, so the endpoints themselves
-    are clear: the distance touches min_separation there), or None when no
-    shift violates. Either segment of zero duration contributes nothing — its
-    instant is the boundary of its neighbours, which are checked.
+    THE VIOLATION (F1; design_decisions.md, "Robot-responsible separation"):
+    min_separation binds the robot's MOTION, not the joint state. The robot
+    violates at a moment when it is moving, the distance to the human is
+    strictly below `min_separation`, and the distance is not strictly
+    increasing — this covers both (a) the robot's motion taking the distance
+    from at least min_separation to below it (the instant after the
+    crossing) and (b) the robot moving while within min_separation without
+    the distance increasing. Standing still is never a violation, whatever
+    the human does; moving so that the distance strictly increases is never
+    a violation. A robot segment of zero velocity (a hold, a grasp, a latency)
+    therefore contributes nothing and returns None at once.
+
+    Returns (lo, hi), the open interval of violating shifts (the endpoints
+    are the moments the violating set is touched, not entered: clear), or
+    None when no shift violates. Either segment of zero duration contributes
+    nothing — its instant is the boundary of its neighbours, which are checked.
 
     Geometry. With u the robot's time into its segment (0 ≤ u ≤ L) and d the
     shift, both agents move at constant velocity, so the relative position is
     affine in (u, d):
-        R − Q  =  C + B u − w d,    C = P0 − Q0 − w (a − c),  B = v − w
+        X = R − Q  =  C + B u − w d,    C = P0 − Q0 − w (a − c),  B = v − w
     (P0, v: the robot segment's start and velocity; Q0, w: the human's; a, c:
-    their start steps). The moments both exist are a parallelogram in (u, d):
-    0 ≤ u ≤ L and c − a ≤ u + d ≤ d_h − a. The violating set |R − Q|² < s² is
-    the preimage of an open disc under an affine map, hence convex (an ellipse
-    interior, or a strip when the map is rank-deficient: parallel or equal
-    velocities, a stationary agent). Its intersection with the parallelogram
-    is convex, so its projection onto the d axis is ONE interval, whose
-    endpoints are the extreme d over the closure of that intersection. Those
-    extremes lie at one of: the ellipse's own d-extrema (when inside the
-    parallelogram); a crossing of the ellipse boundary with a parallelogram
-    edge; a parallelogram vertex inside the disc. All are enumerated; the
-    interval is their d-range. Empty enumeration, or a range of zero width
-    (a tangency), means no shift violates.
+    their start steps). The moments both exist are the parallelogram P:
+    0 ≤ u ≤ L and c − a ≤ u + d ≤ d_h − a. "Within min_separation" is the
+    open set E: |X|² < s², the preimage of a disc under an affine map, hence
+    convex (an ellipse interior, or a strip when the map is rank-deficient).
+    "Not strictly increasing" is d|X|²/du = 2 X · B ≤ 0, a CLOSED HALF-PLANE H
+    in (u, d) — linear, since X is affine — and the whole plane when B = 0
+    (equal velocities: the distance is constant, so a robot moving within
+    min_separation violates throughout). The violating set is E ∩ H ∩ P: an
+    intersection of convex sets, so convex, so its projection onto the d
+    axis is ONE interval, whose endpoints are the extreme d over its closure.
+    Those extremes lie at one of: a vertex of the convex polygon H ∩ P inside
+    the disc; a crossing of the ellipse boundary with an edge of H ∩ P; the
+    ellipse's own d-extrema when inside H ∩ P. H ∩ P is built by clipping the
+    parallelogram against the half-plane (at most five vertices); every edge
+    is a straight segment along which |X|² is a quadratic, so each crossing is
+    a root. All are enumerated; the interval is their d-range. Empty
+    enumeration, or a range of zero width (a tangency), means no shift
+    violates.
 
     `min_separation` is the caller's; nothing here decides what distance is
     unsafe. Tolerances below are floating-point slack on the enumeration
@@ -366,6 +384,8 @@ def shift_violation_interval(
     P0, P1 = robot_segment.start_pos, robot_segment.end_pos
     Q0, Q1 = human_segment.start_pos, human_segment.end_pos
     vx, vy = (P1[0] - P0[0]) / L, (P1[1] - P0[1]) / L
+    if vx == 0.0 and vy == 0.0:
+        return None  # a standing robot never violates
     wx, wy = (Q1[0] - Q0[0]) / Dh, (Q1[1] - Q0[1]) / Dh
     Cx = P0[0] - Q0[0] - wx * (a - c)
     Cy = P0[1] - Q0[1] - wy * (a - c)
@@ -375,40 +395,64 @@ def shift_violation_interval(
 
     tol_q = 1e-9 * max(s2, 1.0)                 # on squared distance
     tol_t = 1e-9 * max(L, Dh, 1.0)              # on u and d
-    shifts = []
+
+    def X(u: float, d: float) -> Tuple[float, float]:
+        return (Cx + Bx * u - wx * d, Cy + By * u - wy * d)
 
     def q(u: float, d: float) -> float:
-        x = Cx + Bx * u - wx * d
-        y = Cy + By * u - wy * d
+        x, y = X(u, d)
         return x * x + y * y
 
-    # Parallelogram vertices inside the disc.
-    for u, d in ((0.0, k1), (0.0, k2), (L, k1 - L), (L, k2 - L)):
+    # The half-plane H: g(u, d) = X · B ≤ 0, linear in (u, d).
+    BB = Bx * Bx + By * By
+    gC, gU, gD = Cx * Bx + Cy * By, BB, -(wx * Bx + wy * By)
+    tol_g = 1e-9 * max(1.0, abs(gC), gU * L, abs(gD) * max(abs(k1), abs(k2), 1.0))
+
+    def g(u: float, d: float) -> float:
+        return gC + gU * u + gD * d
+
+    # The parallelogram P, vertices in cyclic order, clipped against H.
+    poly = [(0.0, k1), (0.0, k2), (L, k2 - L), (L, k1 - L)]
+    if BB > 0.0:
+        clipped = []
+        n = len(poly)
+        for i in range(n):
+            A, Bv = poly[i], poly[(i + 1) % n]
+            gA, gB = g(*A), g(*Bv)
+            inA, inB = gA <= tol_g, gB <= tol_g
+            if inA:
+                clipped.append(A)
+            if inA != inB:
+                t = gA / (gA - gB)
+                clipped.append((A[0] + t * (Bv[0] - A[0]), A[1] + t * (Bv[1] - A[1])))
+        poly = clipped
+    if not poly:
+        return None
+
+    shifts = []
+
+    # Vertices of H ∩ P inside the disc.
+    for u, d in poly:
         if q(u, d) <= s2 + tol_q:
             shifts.append(d)
 
-    # Edges u = 0 and u = L: |(C + B u) − w d|² = s², a quadratic in d.
-    ww = wx * wx + wy * wy
-    for u in (0.0, L):
-        ex, ey = Cx + Bx * u, Cy + By * u
-        for r in _roots(ww, -2.0 * (ex * wx + ey * wy), ex * ex + ey * ey - s2):
-            if k1 - u - tol_t <= r <= k2 - u + tol_t:
-                shifts.append(r)
+    # Edges of H ∩ P: along A + τ (B − A), |X|² is a quadratic in τ.
+    n = len(poly)
+    for i in range(n):
+        (u0, d0), (u1, d1) = poly[i], poly[(i + 1) % n]
+        x0, y0 = X(u0, d0)
+        x1, y1 = X(u1, d1)
+        ex, ey = x1 - x0, y1 - y0
+        for r in _roots(ex * ex + ey * ey, 2.0 * (x0 * ex + y0 * ey), x0 * x0 + y0 * y0 - s2):
+            if -tol_t <= r <= 1.0 + tol_t:
+                shifts.append(d0 + r * (d1 - d0))
 
-    # Edges u + d = k (the human segment's start and end): with d = k − u,
-    # R − Q = (C − w k) + v u, a quadratic in u.
-    vv = vx * vx + vy * vy
-    for k in (k1, k2):
-        ex, ey = Cx - wx * k, Cy - wy * k
-        for r in _roots(vv, 2.0 * (ex * vx + ey * vy), ex * ex + ey * ey - s2):
-            if -tol_t <= r <= L + tol_t:
-                shifts.append(k - r)
-
-    # The ellipse's own d-extrema, when the affine map (u, d) -> R − Q has full
+    # The ellipse's own d-extrema, when the affine map (u, d) -> X has full
     # rank: M = [[Bx, -wx], [By, -wy]]. d = l · (x − C) over the circle
     # |x| = s, with l the second row of M⁻¹; extreme at x = ± s l / |l|.
+    ww = wx * wx + wy * wy
     det = By * wx - Bx * wy
-    if abs(det) > 1e-12 * (Bx * Bx + By * By + ww):
+    if abs(det) > 1e-12 * (BB + ww):
         lx, ly = -By / det, Bx / det
         ln = (lx * lx + ly * ly) ** 0.5
         for sign in (1.0, -1.0):
@@ -416,7 +460,8 @@ def shift_violation_interval(
             y = sign * min_separation * ly / ln - Cy
             d = lx * x + ly * y
             u = (-wy * x + wx * y) / det
-            if -tol_t <= u <= L + tol_t and k1 - tol_t <= u + d <= k2 + tol_t:
+            if (-tol_t <= u <= L + tol_t and k1 - tol_t <= u + d <= k2 + tol_t
+                    and g(u, d) <= tol_g):
                 shifts.append(d)
 
     if not shifts:
@@ -425,53 +470,6 @@ def shift_violation_interval(
     if hi - lo <= tol_t:
         return None
     return (lo, hi)
-
-
-def first_approach_step(
-    pos: Tuple[float, float],
-    human_segment: Segment,
-    min_separation: float,
-    from_step: float,
-) -> Optional[float]:
-    """
-    The first step, at or after `from_step` and within `human_segment`'s span,
-    at which the human is STRICTLY within `min_separation` of the fixed point
-    `pos`; None if it never is on this segment. Closed form: the squared
-    distance of a constant-velocity point to a fixed one is a quadratic in
-    step, and the first violation is either the window's start (already
-    inside) or the quadratic's smaller root.
-
-    This is the hold-position check of realization: a hold is a position, and
-    the moment the human first comes within the separation of it bounds how
-    long the robot may stand there. A zero-duration segment contributes
-    nothing (its instant belongs to its neighbours).
-    """
-    c, d_h = human_segment.start_step, human_segment.end_step
-    Dh = d_h - c
-    lo, hi = max(c, from_step), d_h
-    if Dh <= 0.0 or hi - lo <= 0.0:
-        return None
-    Q0, Q1 = human_segment.start_pos, human_segment.end_pos
-    wx, wy = (Q1[0] - Q0[0]) / Dh, (Q1[1] - Q0[1]) / Dh
-    # Q(t) − pos = A + w t
-    Ax = Q0[0] - pos[0] - wx * c
-    Ay = Q0[1] - pos[1] - wy * c
-    s2 = min_separation * min_separation
-    tol_q = 1e-9 * max(s2, 1.0)
-    tol_t = 1e-9 * max(Dh, 1.0)
-
-    x, y = Ax + wx * lo, Ay + wy * lo
-    if x * x + y * y < s2 - tol_q:
-        return lo
-    roots = _roots(wx * wx + wy * wy, 2.0 * (Ax * wx + Ay * wy), Ax * Ax + Ay * Ay - s2)
-    if not roots:
-        return None
-    r1, r2 = roots
-    # The window starts outside the disc, so a violation inside it begins at r1
-    # (r2 ≤ lo means the approach is already over).
-    if r2 - r1 <= tol_t or r1 < lo - tol_t or r1 >= hi - tol_t:
-        return None
-    return max(r1, lo)
 
 
 def closest_point_of_approach(

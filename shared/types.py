@@ -544,20 +544,17 @@ class RealizedPlan:
     robot's position at the decision step, then the projected plan run
     unchanged, shifted by δ. Realization prices conflict as duration: a
     conflicted plan costs more because avoiding the human takes longer. No
-    conflict weight, no penalty term.
+    conflict weight, no penalty term. Since F1 (robot-responsible separation:
+    a standing robot never violates, and there is no hold cap) realization is
+    TOTAL — every plan realizes, and this carries a cost always; the former
+    `realizable` flag and the reasons "hold_position_violated" /
+    "hold_reaches_horizon" are gone.
 
-    realizable:        a shift exists that clears `min_separation` throughout
-                       the assessed window — the steps at which both the
-                       realized plan and the human's projection exist, up to
-                       T_h, the end of the human's projection — including at
-                       the hold position while holding, with the hold ending
-                       before T_h (a hold that reaches T_h clears by outlasting
-                       the assessment, not by avoiding anything, and is refused).
-                       True with delta = 0 when there is no human projection.
     delta:             the hold, in WHOLE steps (≥ 0): the number of STAND
                        ticks the body executes, so the plan that was checked
                        is the plan that runs (T3b; design_decisions.md,
-                       "Realization as built"). None when unrealizable.
+                       "Realization as built"). 0 when there is no human
+                       projection.
     cost:              T_r + delta over the FULL plan, T_r the plain projected
                        duration (the span of the plan's segments, FRACTIONAL
                        steps — the projection's continuous duration; execution
@@ -568,14 +565,12 @@ class RealizedPlan:
                        `projected_duration`, not ProjectedPlan's integer
                        `total_estimated_cost`. The tail beyond T_h is inside
                        T_r and is not corrected for (TODO-69, reading (1)).
-                       None when unrealizable — an unrealizable plan has no
-                       realized cost.
     projected_duration: T_r.
     segments:          the realized trajectory, head-to-tail: the stationary
                        hold at `hold_position` from `hold_start` to the shifted
                        plan's start (present only when that stretch has
                        positive duration), then every projected segment shifted
-                       by delta. Empty when unrealizable.
+                       by delta.
     hold_position:     where the robot stands during the hold — the plan's
                        first segment's start, i.e. where the robot is at the
                        decision step (which may be partway along a walk).
@@ -584,28 +579,22 @@ class RealizedPlan:
     unassessed_share:  the share of the realized plan's span [hold_start, end]
                        lying beyond T_h — the part that was neither cleared nor
                        blocked, logged so that the bias can be reported
-                       (TODO-69). The steps before the human projection's span
-                       (the observation offset, L2) are unassessed too but not
-                       counted. 1.0 when there is no human projection; None
-                       when unrealizable.
+                       (TODO-69); 1.0 when the hold pushes the whole plan past
+                       T_h. The steps before the human projection's span (the
+                       observation offset, L2) are unassessed too but not
+                       counted. 1.0 when there is no human projection.
     reason:            "realized"; "no_human_projection" (delta 0, fully
                        unassessed — the caller treats it as it treats no
-                       projection today); "hold_position_violated" (the human's
-                       projection passes within `min_separation` of the hold
-                       position before the smallest clearing shift — no shift
-                       clears a hold whose position the human passes);
-                       "hold_reaches_horizon" (the smallest clearing shift
-                       holds until T_h or beyond).
+                       projection today).
     """
-    realizable: bool
-    delta: Optional[int]
-    cost: Optional[float]
+    delta: int
+    cost: float
     projected_duration: float
     segments: List[Segment]
     hold_position: Tuple[float, float]
     hold_start: float
     horizon: Optional[float]
-    unassessed_share: Optional[float]
+    unassessed_share: float
     reason: str
 
 
@@ -638,8 +627,8 @@ class InterferenceAssessment:
     SUPERSEDED and no longer produced (T10): the output of the removed
     meta_planner._detect_interference() — a `feasible` verdict (hard exclusion
     below min_safe_distance) over all observed ConflictPoints. Replaced on the
-    meta-planner side by RealizedPlan: `realizable` means "a shift within the
-    human's horizon clears min_separation", and the detection/valuation split
+    meta-planner side by RealizedPlan (since F1 every plan realizes: a
+    clearing shift always exists), and the detection/valuation split
     survives inside realization (shift_violation_interval observes, holding
     values). Kept as a type only; nothing constructs it.
     """
@@ -684,7 +673,7 @@ class UpdateResult:
     Set by B2 `b2a` when it continues the current task with its realized
     hold, and by B3 to the winner's realized δ (T10), whether the winner is
     the current task or another; 0 otherwise (no hold: no human projection,
-    the all-unrealizable fallback, cost_strategy "plain", the terminal
+    cost_strategy "plain", the terminal
     return). The executor may refine a hold, never re-decide or drop it
     silently; a later trigger's decision replaces it.
     """

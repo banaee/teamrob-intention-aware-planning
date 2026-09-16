@@ -13,18 +13,27 @@ PURPOSE:
 
     Hold-only, whole-trajectory minimal shift (R1, TODO-70): ONE hold δ at the
     robot's position at the decision step, then the whole plan shifted by δ.
-    δ is the smallest WHOLE-TICK shift ≥ 0 such that the shifted trajectory —
-    including the stationary hold at the decision position during the hold —
+    δ is the smallest WHOLE-TICK shift ≥ 0 such that the shifted trajectory
     has no violation within the assessed window (T3b: the hold is executed as
     whole ticks, so the plan that is checked and costed is the plan that is
-    executed; see design_decisions.md, "Realization as built"). A violation
-    is a distance: agents are points, and any moment at which they are
-    strictly closer than `min_separation` is one — a single instant exactly
-    at `min_separation` is not (head-on, same-line and "the human walks past
-    the standing robot" conflicts need no special case; they come out
-    unrealizable through the hold-position check). Motion is continuous along
-    segments; the computation is exact — closed-form shift intervals per
-    segment pair, no sampling in time, and the integer δ read off them.
+    executed; see design_decisions.md, "Realization as built").
+
+    A violation is ROBOT-RESPONSIBLE (F1; design_decisions.md,
+    "Robot-responsible separation"): min_separation binds the robot's motion,
+    not the joint state. The robot violates at a moment when it is MOVING,
+    strictly within `min_separation` of the human, and the distance is not
+    strictly increasing — (a) its motion takes the distance from at least
+    min_separation to below it, or (b) it moves within min_separation without
+    the distance increasing. Standing still is never a violation, whatever
+    the human does; moving so that the distance strictly increases never is.
+    Consequences: the hold itself — a standing robot — is never checked and
+    never violated, there is no hold cap, and a clearing δ ALWAYS exists (a
+    shift past the last violating interval, at the latest past T_h), so
+    realization is TOTAL: every plan has a cost. A standing robot may be in
+    the human's way; the human's detour is a team-level cost (TODO-15), not
+    priced here. Motion is continuous along segments; the computation is
+    exact — closed-form shift intervals per segment pair, no sampling in
+    time, and the integer δ read off them.
 
 LAYERING (design_decisions.md, "The robot can wait"; one-way, no cycles):
 
@@ -49,7 +58,8 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT assess anything beyond T_h, the end of the human's projection:
       the plan there is neither clear nor blocked (Property 2 as amended at
       R1); what happens there is the execution layer's ("Assumption:
-      execution-time avoidance past T_h")
+      execution-time avoidance past T_h"), which is to apply the same
+      robot-responsible rule (TODO-73)
     - Does NOT hold anywhere but where the robot is (a hold elsewhere is a
       detour, Phase 4D), nor partway along a segment (TODO-70, deferred)
     - Does NOT import from mesa_sim/ or ros_sim/
@@ -60,15 +70,14 @@ from typing import List, Optional, Tuple
 
 from shared.types import ProjectedPlan, RealizedPlan, Segment
 from shared.trajectory_algorithms import (
-    first_approach_step,
     shift_violation_interval,
     stationary_segment,
 )
 
 
-# Floating-point slack on step comparisons (merging abutting shift intervals,
-# the hold cap). Not a margin: the minimal shift has none by design, and this
-# is nine orders of magnitude below a tick.
+# Floating-point slack on step comparisons (merging abutting shift intervals).
+# Not a margin: the minimal shift has none by design, and this is nine orders
+# of magnitude below a tick.
 _EPS = 1e-9
 
 
@@ -80,8 +89,9 @@ def realize(
 ) -> RealizedPlan:
     """
     Realizes `plan` against `human_plan` under the hold-only, whole-trajectory
-    minimal shift. Returns a RealizedPlan (shared/types.py) — never None: an
-    unrealizable plan is reported as such, with its reason.
+    minimal shift. Returns a RealizedPlan (shared/types.py) — always, with a
+    cost: under robot-responsible separation (F1) a clearing shift exists for
+    every plan.
 
     plan:            the robot's projection — the segments of whatever ordering
                      it holds (every entry's segments, in order; not assumed to
@@ -105,8 +115,9 @@ def realize(
 
     δ: the smallest WHOLE-TICK shift ≥ 0 that is outside every violating
     shift interval (trajectory_algorithms.shift_violation_interval, one per
-    robot segment × human segment pair; each is one open interval by
-    convexity, exact). The intervals are walked in order of their start: δ
+    MOVING robot segment × human segment pair — a stationary robot segment
+    never violates; each is one open interval by convexity, exact). The
+    intervals are walked in order of their start: δ
     starts at 0 and, whenever an interval strictly contains it, jumps to the
     first whole tick at or after that interval's end. One pass suffices — δ
     never decreases, so an interval already passed cannot contain a later δ.
@@ -126,39 +137,30 @@ def realize(
     nothing and can only turn an order into a tie. cost = T_r + δ is then
     ONE quantity — the projected duration of the realized trajectory, its
     hold in whole ticks because the hold is executed as ticks — and the
-    plain cost a caller compares it with (no projection; all unrealizable)
-    must be the same T_r, `projected_duration`, not ProjectedPlan's
-    integer-rounded `total_estimated_cost`.
+    plain cost a caller compares it with (no projection) must be the same
+    T_r, `projected_duration`, not ProjectedPlan's integer-rounded
+    `total_estimated_cost`.
 
     THE HOLD: stationary at the plan's start position over
-    [decision_step, plan start + δ]. It is a position and is checked like any
-    segment: the human's projection must not come strictly within
-    `min_separation` of it during the hold. Since the hold only grows with δ,
-    the first step at which the human comes within the separation of the
-    hold position (trajectory_algorithms.first_approach_step) bounds δ from
-    above; a smallest clearing δ beyond that bound means NO shift clears, and
-    the plan is unrealizable ("hold_position_violated"). The hold may end at
-    that step exactly (the human then touches `min_separation`, which is
-    not a violation).
-
-    THE HOLD CAP: a hold (δ > 0) may not extend to T_h. If the smallest
-    clearing δ satisfies plan start + δ ≥ T_h, the plan is unrealizable
-    ("hold_reaches_horizon"): it would clear by outlasting the assessment,
-    not by avoiding anything within it. δ = 0 is never a hold and is not
-    capped — a plan that starts at or after T_h is realizable and fully
-    unassessed.
+    [decision_step, plan start + δ]. A standing robot never violates (F1), so
+    the hold is never checked and never bounds δ: the human may pass within
+    `min_separation` of the standing robot, or through it. THERE IS NO HOLD
+    CAP (F1 deleted the T_h cap): a hold may extend to or past T_h, in which
+    case the shifted plan lies in the unassessed tail, exactly as any plan
+    starting at or after T_h does. Every violating interval is bounded, so
+    a clearing δ always exists.
 
     THE UNASSESSED SHARE counts the part of the realized plan beyond T_h
-    only. The steps before the human projection's span — the observation
+    only (it reaches 1.0 when the hold pushes the whole plan past T_h). The steps before the human projection's span — the observation
     offset, one tick in Mesa (L2) — are unassessed too but not counted: the
     share reports the tail the hold pushes past the horizon (TODO-69), and
     the offset is a property of the observation, the same for every
     candidate at a trigger.
 
-    NO HUMAN PROJECTION (None, or one without segments): realizable, δ = 0,
-    cost = T_r, unassessed share 1.0, reason "no_human_projection". The
-    caller may treat this exactly as it treats an absent projection today —
-    plain projected cost, no hold.
+    NO HUMAN PROJECTION (None, or one without segments): δ = 0, cost = T_r,
+    unassessed share 1.0, reason "no_human_projection". The caller may treat
+    this exactly as it treats an absent projection today — plain projected
+    cost, no hold. The only other reason is "realized".
 
     Raises ValueError for a plan with no segments, or one whose first segment
     starts before `decision_step` (it would describe motion already past).
@@ -182,7 +184,6 @@ def realize(
     )
     if not human_segments:
         return RealizedPlan(
-            realizable=True,
             delta=0,
             cost=projected_duration,
             projected_duration=projected_duration,
@@ -196,6 +197,7 @@ def realize(
     horizon = human_segments[-1].end_step
 
     # --- the smallest shift outside every violating shift interval ----------
+    # (stationary robot segments return None: a standing robot never violates)
     intervals: List[Tuple[float, float]] = []
     for robot_seg in robot_segments:
         for human_seg in human_segments:
@@ -213,29 +215,12 @@ def realize(
         elif lo > delta + _EPS:
             break
 
-    # --- the hold is a position: the human must not pass within the ---------
-    # separation of it while the robot stands there
-    first_approach: Optional[float] = None
-    for human_seg in human_segments:
-        first_approach = first_approach_step(hold_position, human_seg, min_separation, decision_step)
-        if first_approach is not None:
-            break
-    if first_approach is not None and plan_start + delta > first_approach + _EPS:
-        return _unrealizable(projected_duration, hold_position, decision_step, horizon,
-                             "hold_position_violated")
-
-    # --- the hold cap: a hold may not extend to T_h -------------------------
-    if delta > 0 and plan_start + delta >= horizon - _EPS:
-        return _unrealizable(projected_duration, hold_position, decision_step, horizon,
-                             "hold_reaches_horizon")
-
     realized_end = plan_end + delta
     span = realized_end - decision_step
     beyond = max(0.0, realized_end - horizon)
     unassessed_share = min(1.0, beyond / span) if span > 0.0 else 0.0
 
     return RealizedPlan(
-        realizable=True,
         delta=delta,
         cost=projected_duration + delta,
         projected_duration=projected_duration,
@@ -267,24 +252,3 @@ def _realized_segments(
             end_step=seg.end_step + delta,
         ))
     return out
-
-
-def _unrealizable(
-    projected_duration: float,
-    hold_position: Tuple[float, float],
-    decision_step: float,
-    horizon: float,
-    reason: str,
-) -> RealizedPlan:
-    return RealizedPlan(
-        realizable=False,
-        delta=None,
-        cost=None,
-        projected_duration=projected_duration,
-        segments=[],
-        hold_position=hold_position,
-        hold_start=decision_step,
-        horizon=horizon,
-        unassessed_share=None,
-        reason=reason,
-    )

@@ -30,7 +30,9 @@ WHAT THIS MODULE DOES:
       realize() (shared/realization.py; T10) and selects on the realized
       cost T_r + δ: interference detection is INTERNAL to realization, on the
       projection side, and conflict is priced by construction as the hold
-      that avoids it (design_decisions.md, "The robot can wait"). This module
+      that avoids it (design_decisions.md, "The robot can wait"). Since F1
+      (robot-responsible separation) realization is total: every candidate
+      has a cost, and nothing here excludes a candidate. This module
       supplies min_separation and consumes the RealizedPlan; it holds no
       geometry and no conflict weight. The batch interference profile that
       preceded it (_detect_interference, min_safe_distance) is gone.
@@ -213,9 +215,7 @@ class MetaPlanner:
                                  candidate is realized against the human projection
                                  (realize(), this planner's min_separation) and the
                                  argmin of the realized cost T_r + δ wins, its δ carried
-                                 as the decision's hold; all candidates unrealizable →
-                                 the argmin of T_r with no hold, logged
-                                 `all_unrealizable`. "plain": the argmin of the projected
+                                 as the decision's hold. "plain": the argmin of the projected
                                  duration T_r alone — no human consideration, no hold, no
                                  filter — for comparison and the T6 ablation. Both use
                                  the same quantity for T_r (RealizedPlan.projected_duration,
@@ -625,8 +625,10 @@ class MetaPlanner:
                 min_separation) and judge its hold δ against the human's
                 remaining projected duration at the trigger, T_h − 0:
                   human_projection is None     → continue, no hold (0)
-                  realizable and δ ≤ ρ × T_h   → continue, with hold δ
-                  δ above that bound, or unrealizable → escalate (None)
+                  δ ≤ ρ × T_h                  → continue, with hold δ
+                  δ above that bound           → escalate (None)
+                (realization is total since F1: there is no unrealizable
+                current task to escalate on)
                 ρ is self._rho, a stated assumption (T6 varies it).
             "b2b"  — realize the current task and each other task in
                 task_pool individually; continue only if it wins by a clear
@@ -644,8 +646,8 @@ class MetaPlanner:
         reason to interrupt committed work.
 
         Logs one [meta-b2] line per call under "b2a" (nothing under "none"):
-        trigger, current task, projection admitted or not, realizable, reason,
-        δ, T_r, the human's remaining projected duration, the bound, verdict
+        trigger, current task, projection admitted or not, reason, δ, T_r,
+        the human's remaining projected duration, the bound, verdict
         (continue_hold | continue | escalate). No step field, as [meta-proj].
         """
         if self._gate_strategy == "none":
@@ -670,14 +672,14 @@ class MetaPlanner:
                 return 0
             remaining = realized.horizon - now
             bound = self._rho * remaining
-            if realized.realizable and realized.delta <= bound:
+            if realized.delta <= bound:
                 hold = realized.delta
                 verdict = "continue_hold" if hold > 0 else "continue"
             else:
                 hold = None
                 verdict = "escalate"
             logging.info(
-                f"{head} projection=admitted realizable={realized.realizable} "
+                f"{head} projection=admitted "
                 f"reason={realized.reason} delta={realized.delta} "
                 f"T_r={realized.projected_duration:.2f} remaining={remaining:.2f} "
                 f"rho={self._rho} bound={bound:.2f} verdict={verdict}"
@@ -719,9 +721,12 @@ class MetaPlanner:
         projection clock) and realized — realize(projection, human_projection,
         min_separation, 0) — under the whole-trajectory minimal shift. Its cost
         is RealizedPlan.cost = T_r + δ: T_r the FRACTIONAL projected duration
-        (the segment span), δ the hold in whole ticks. The winner is the argmin
-        over the realizable candidates, ties resolved by pool order (min() keeps
-        the first; TODO-42 — unchanged), and ITS δ goes out as UpdateResult.hold,
+        (the segment span), δ the hold in whole ticks. Realization is TOTAL
+        (F1, robot-responsible separation: a standing robot never violates and
+        there is no hold cap), so every candidate has a cost and none is
+        excluded. The winner is the argmin over all candidates, ties resolved
+        by pool order (min() keeps the first; TODO-42 — unchanged), and ITS δ
+        goes out as UpdateResult.hold,
         whether the winner is the current task or another. The rest form the
         queue in whatever order they happened to iterate — order carries no
         commitment under this strategy, it is re-decided next trigger.
@@ -730,17 +735,11 @@ class MetaPlanner:
         (design_decisions.md, "The robot can wait").
 
         No human projection (None, or one without segments): realize() reports
-        `no_human_projection` for every candidate — realizable, δ = 0, cost =
-        T_r — so B3 is then an argmin over projected durations.
-
-        ALL CANDIDATES UNREALIZABLE (R1, TODO-30 / TODO-52): no candidate has a
-        shift within [0, T_h] that clears min_separation. A situation, not an
-        anomaly: the winner is the argmin of the PLAIN cost — the same T_r,
-        RealizedPlan.projected_duration, never ProjectedPlan's integer
-        total_estimated_cost (T3b) — with no hold, and the decision is logged
-        `all_unrealizable`. The residual conflict is the execution layer's
-        (design_decisions.md, "Assumption: execution-time avoidance past T_h").
-        The former RuntimeError is gone.
+        `no_human_projection` for every candidate — δ = 0, cost = T_r — so B3
+        is then an argmin over projected durations. The plain cost is the same
+        T_r, RealizedPlan.projected_duration, never ProjectedPlan's integer
+        total_estimated_cost (T3b). There is no all-unrealizable case any more
+        (F1 removed it, and the RuntimeError before it went at T10).
 
         cost_strategy "plain": every candidate is realized against NO human
         plan, whatever was admitted — the argmin of T_r, no hold, no filter. A
@@ -753,12 +752,11 @@ class MetaPlanner:
         continuation branch in the design lives in update()'s B2, which decides
         whether this method runs at all — not what it decides once it does.)
 
-        Logs one [meta-cand] line per candidate (realizable, reason, T_r, δ,
-        cost, unassessed share) and one [meta-b3] line per call (trigger,
-        cost_strategy, selection ∈ realized | no_projection | all_unrealizable
-        | plain, winner, cost, hold, T_h, candidate counts). No step field, as
-        [meta-proj] and [meta-b2]: the [meta-trig] line of the same tick
-        precedes them.
+        Logs one [meta-cand] line per candidate (reason, T_r, δ, cost,
+        unassessed share) and one [meta-b3] line per call (trigger,
+        cost_strategy, selection ∈ realized | no_projection | plain, winner,
+        cost, hold, T_h, candidate count). No step field, as [meta-proj] and
+        [meta-b2]: the [meta-trig] line of the same tick precedes them.
         """
         if self._strategy == "full_reorder":
             raise NotImplementedError(
@@ -780,34 +778,24 @@ class MetaPlanner:
             realized = realize(projection, against, self._min_separation, decision_step=now)
             rows.append((task, realized))
             logging.info(
-                f"[meta-cand] {task_instance_key(task)} "
-                f"realizable={realized.realizable} reason={realized.reason} "
+                f"[meta-cand] {task_instance_key(task)} reason={realized.reason} "
                 f"T_r={realized.projected_duration:.2f} delta={realized.delta} "
-                f"cost={_fmt(realized.cost)} share={_fmt(realized.unassessed_share)}"
+                f"cost={realized.cost:.2f} share={realized.unassessed_share:.2f}"
             )
 
-        realizable = [(task, r) for task, r in rows if r.realizable]
-        if realizable:
-            winner, chosen = min(realizable, key=lambda row: row[1].cost)
-            hold = chosen.delta
-            cost = chosen.cost
-            if self._cost_strategy == "plain":
-                selection = "plain"
-            elif chosen.horizon is None:
-                selection = "no_projection"
-            else:
-                selection = "realized"
+        winner, chosen = min(rows, key=lambda row: row[1].cost)
+        hold = chosen.delta
+        if self._cost_strategy == "plain":
+            selection = "plain"
+        elif chosen.horizon is None:
+            selection = "no_projection"
         else:
-            # All unrealizable: plain cost, no hold (R1). Same T_r as above.
-            winner, chosen = min(rows, key=lambda row: row[1].projected_duration)
-            hold = 0
-            cost = chosen.projected_duration
-            selection = "all_unrealizable"
+            selection = "realized"
 
         logging.info(
             f"[meta-b3] trigger={self._last_trigger_reason} cost_strategy={self._cost_strategy} "
-            f"selection={selection} winner={task_instance_key(winner)} cost={cost:.2f} hold={hold} "
-            f"T_h={_fmt(rows[0][1].horizon)} candidates={len(rows)} realizable={len(realizable)}"
+            f"selection={selection} winner={task_instance_key(winner)} cost={chosen.cost:.2f} hold={hold} "
+            f"T_h={_fmt(rows[0][1].horizon)} candidates={len(rows)}"
         )
 
         new_queue = [t for t in task_pool if t is not winner]
