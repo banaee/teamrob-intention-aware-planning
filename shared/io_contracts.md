@@ -47,6 +47,10 @@ hold cap are gone, so `realize()` always returns a cost: `RealizedPlan` has no `
 only the reasons `realized` / `no_human_projection`; B3 has no fallback, B2 no escalate-on-unrealizable.
 The `Projector` additionally takes the body's task-completion tick.
 
+**Re-aligned after R2 (September 2026):** the `Projector` takes the body's `duration_to_steps`
+conversion, and a stationary action whose schema names a duration binding (`ActionSchema.duration_key`;
+`wait_at`'s `?duration`) is projected at that duration (TODO-32 closed).
+
 ---
 
 ## 0. Notation (matches paper)
@@ -633,6 +637,15 @@ predicate hold (`PROXIMITY_THRESHOLD`, 30 cm), so a projected walk ends where th
 and the next action is projected from that point. Its default in `shared/` is a unit-less
 placeholder (0.0), not a value `shared/` knows to be right.
 
+`Projector` (R2, TODO-32) additionally takes **`duration_to_steps: Callable[[str], float]`**: the
+body's conversion of the duration bound on a grounded action (the value under
+`ActionSchema.duration_key` — `"?duration"` on `wait_at`, an ISO-8601 string the method schema binds)
+into execution steps. Both the parser and the seconds one step lasts are body facts; Mesa hands in
+`action_decomposer._parse_duration_to_steps` (over `mesa_configs.yaml`'s `seconds_per_step`), the
+function its own `STAND*` expansion uses, so the projected wait and the executed wait are one number.
+`shared/` reads the key from the schema and calls the callable; it holds no literal, no parser and no
+constant. `None` (the default) leaves such an action at the cost lookup / `default_action_cost`.
+
 #### Evaluate Triggers
 ```python
 evaluate_triggers(
@@ -1057,7 +1070,8 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
   executor stops), its per-action acknowledgement latency and observation offset (L2), and its
   per-task completion tick (F1: `TASK_COMPLETION_LATENCY`, the tick `Executor.step()` spends in
-  `_on_task_complete()`, paid by both agents), for robot and human projections alike
+  `_on_task_complete()`, paid by both agents), for robot and human projections alike, and its
+  duration-to-steps conversion (R2: `_parse_duration_to_steps`, the one its executor's wait uses)
 - Logs the actual robot–human distance once per tick (`[sep]` lines, headless run; T9) so that
   actual separation below `min_separation` can be reported — Mesa has no execution-time
   avoidance (TODO-73); the measure is a measure, not a behaviour. `dist=` samples the end-of-tick

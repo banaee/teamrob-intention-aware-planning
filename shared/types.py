@@ -277,6 +277,13 @@ class ActionSchema:
     # have no graded in-progress signal, only a completion predicate.
     # Looked up in shared.likelihood_functions.PROGRESS_EVALUATORS by the recognizer.
     # Recognizer dispatches by this name only — never by microaction string.
+    duration_key: Optional[str] = None
+    # Binding key whose value is the action's DURATION, for a stationary action
+    # whose length the domain states (wait_at: "?duration", an ISO-8601 string
+    # bound by the method). None for actions whose duration is the body's own
+    # (pick_up, place: one microaction). The body's decomposer executes it and
+    # the Projector prices it through the body's duration-to-steps callable
+    # (TODO-32), so knowledge and behaviour read the same binding.
 
 @dataclass
 class GroundedAction:

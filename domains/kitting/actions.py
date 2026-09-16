@@ -100,4 +100,5 @@ wait_at = ActionSchema(
     ],
     completion=ConditionSchema("waited", (_agent, _entity)),
     microactions="STAND*",
+    duration_key="?duration",
 )

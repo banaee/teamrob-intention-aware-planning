@@ -41,7 +41,7 @@ from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
 from mesa_sim.executor import Executor, ACTION_COMPLETION_LATENCY, TASK_COMPLETION_LATENCY
-from mesa_sim.action_decomposer import _get_step_size  # single reader of mesa_configs.yaml
+from mesa_sim.action_decomposer import _get_step_size, _parse_duration_to_steps  # single reader of mesa_configs.yaml
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
@@ -227,6 +227,9 @@ class RobotAgent(FactoryAgent):
         #                              per task, both agents (F1)
         #   observation_offset         how far ahead of this robot's now the observed
         #                              human's state was seen (L2)
+        #   duration_to_steps          the ISO-8601 duration bound on wait_at, in ticks:
+        #                              the decomposer's own parser over seconds_per_step,
+        #                              so the projected wait is the executed wait (TODO-32)
         self.projector = Projector(
             knowledge=knowledge,
             assumed_speed=_get_step_size(model),
@@ -235,6 +238,7 @@ class RobotAgent(FactoryAgent):
             action_completion_latency=ACTION_COMPLETION_LATENCY,
             task_completion_latency=TASK_COMPLETION_LATENCY,
             observation_offset=OBSERVATION_OFFSET,
+            duration_to_steps=lambda duration: _parse_duration_to_steps(duration, model),
         )
     
         # B2's gate and B3's cost are run options (configs/experiment.yaml,

@@ -45,7 +45,7 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT import from mesa_sim/ or ros_sim/
 """
 
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from shared.types import (
     BeliefState,
@@ -83,6 +83,7 @@ class Projector:
         action_completion_latency: float = 0.0,
         task_completion_latency: float = 0.0,
         observation_offset: float = 0.0,
+        duration_to_steps: Optional[Callable[[str], float]] = None,
     ):
         """
         knowledge:            HTN domain knowledge, passed through to planner.py calls
@@ -96,8 +97,9 @@ class Projector:
         default_action_cost:  duration, in execution steps, of a non-movement action
                               when knowledge.get_cost(action_name) has no costs.yaml
                               entry. Mesa executes one microaction per tick, so 1.0 is
-                              exact for pick_up/place there; wait_at's real duration is
-                              still not honoured (TODO-32).
+                              exact for pick_up/place there. An action whose schema
+                              names a duration binding (wait_at) is priced through
+                              duration_to_steps instead (TODO-32).
         arrival_radius:       world units short of a movement target at which the
                               body's executor STOPS — the distance at which its
                               at(agent, object) predicate holds, so the walk is
@@ -155,6 +157,26 @@ class Projector:
                               observed of the human at this agent's now — the interval
                               is simply outside its span, and interference geometry
                               intersects windows.
+        duration_to_steps:    converts the duration bound on a grounded action (the
+                              value under ActionSchema.duration_key, an ISO-8601
+                              string in the kitting domain) into execution steps.
+                              Both halves — the string's parser and the seconds one
+                              step lasts — are body facts, so the embodiment hands
+                              the callable in as it hands in assumed_speed and the
+                              latencies (Mesa: action_decomposer._parse_duration_to_steps
+                              over mesa_configs.yaml's seconds_per_step — the same
+                              function its executor's STAND* expansion uses, so the
+                              projected wait and the executed wait are one number by
+                              construction; ROS its own). shared/ calls it and holds
+                              neither the parser nor the constant. None (the default)
+                              means the body supplied no conversion: such an action
+                              falls back to the cost lookup / default_action_cost, the
+                              pre-TODO-32 behaviour — a placeholder, not a value
+                              shared/ knows to be right. The robot's known duration
+                              is the schema's; the human's actual duration comes from
+                              the same schema through the same executor, so the two
+                              match for now (design_decisions.md, "The human's wait
+                              duration in the projection").
         """
         self._knowledge = knowledge
         self._planner = AdaptivePlanner(knowledge=knowledge)
@@ -164,6 +186,7 @@ class Projector:
         self._action_completion_latency = action_completion_latency
         self._task_completion_latency = task_completion_latency
         self._observation_offset = observation_offset
+        self._duration_to_steps = duration_to_steps
 
     # =========================================================================
     # Public
@@ -342,11 +365,11 @@ class Projector:
         one — read the count off the segments, never off the plan's actions.
 
         Non-movement actions: trajectory_algorithms.stationary_segment(), held for
-        knowledge.get_cost(action_name) steps, falling back to default_action_cost.
-        This includes wait_at — its real ISO-8601 ?duration binding is parsed in
-        mesa_sim/action_decomposer.py, which shared/ cannot import, so a 60-second
-        coffee break and a 2-second toggle currently cost the same (TODO-32). Known
-        simplification, not a considered design decision.
+        the action's stated duration when its schema names a duration binding
+        (schema.duration_key, wait_at's ?duration) and the body supplied
+        duration_to_steps — the grounded action's bound value, converted by the
+        body (TODO-32); otherwise for knowledge.get_cost(action_name) steps,
+        falling back to default_action_cost.
         """
         current_pos = world.agent_positions.get(agent_id)
         if current_pos is None:
@@ -380,8 +403,10 @@ class Projector:
                 segment = straight_line_path(current_pos, current_step, stop_pos, self._assumed_speed)
                 current_pos = stop_pos
             else:
-                cost = self._knowledge.get_cost(action.action_name)
-                duration = cost if cost is not None else self._default_action_cost
+                duration = self._stated_duration(action)
+                if duration is None:
+                    cost = self._knowledge.get_cost(action.action_name)
+                    duration = cost if cost is not None else self._default_action_cost
                 segment = stationary_segment(current_pos, current_step, duration)
 
             segments.append(segment)
@@ -397,6 +422,21 @@ class Projector:
                 current_step = latency_segment.end_step
 
         return segments
+
+    def _stated_duration(self, action) -> Optional[float]:
+        """
+        The duration the domain states for `action`, in execution steps, or None
+        when there is none to read: the schema names no duration binding, the
+        grounded action does not carry it, or the body supplied no
+        duration_to_steps (TODO-32). The key is the schema's, never a literal.
+        """
+        key = action.schema.duration_key
+        if key is None or self._duration_to_steps is None:
+            return None
+        value = action.bindings.get(key)
+        if value is None:
+            return None
+        return float(self._duration_to_steps(value))
 
     def estimate_duration(
         self,
