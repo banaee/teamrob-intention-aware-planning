@@ -40,7 +40,7 @@ from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance,
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
-from mesa_sim.executor import Executor, ACTION_COMPLETION_LATENCY
+from mesa_sim.executor import Executor, ACTION_COMPLETION_LATENCY, TASK_COMPLETION_LATENCY
 from mesa_sim.action_decomposer import _get_step_size  # single reader of mesa_configs.yaml
 
 if TYPE_CHECKING:
@@ -223,6 +223,8 @@ class RobotAgent(FactoryAgent):
         #                              walks end where execution ends (T9)
         #   action_completion_latency  the tick the executor spends learning an action
         #                              finished, per action (L2)
+        #   task_completion_latency    the tick the executor spends completing a task,
+        #                              per task, both agents (F1)
         #   observation_offset         how far ahead of this robot's now the observed
         #                              human's state was seen (L2)
         self.projector = Projector(
@@ -231,6 +233,7 @@ class RobotAgent(FactoryAgent):
             default_action_cost=1.0,
             arrival_radius=PROXIMITY_THRESHOLD,
             action_completion_latency=ACTION_COMPLETION_LATENCY,
+            task_completion_latency=TASK_COMPLETION_LATENCY,
             observation_offset=OBSERVATION_OFFSET,
         )
     

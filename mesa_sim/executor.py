@@ -74,6 +74,19 @@ from mesa_sim.action_decomposer import Microaction, expand
 # with it.
 ACTION_COMPLETION_LATENCY = 1.0
 
+# Mesa ticks this executor spends COMPLETING a task, after its last action's
+# acknowledgement and before the next task's first microaction. Exactly one:
+# the tick on which step() finds action_index past the plan's end, calls
+# _on_task_complete() (which advances the agent's script or clears its task)
+# and returns. The next tick loads the next plan and executes its first
+# microaction in the same call. Both agents pay it — the human through
+# advance_script(), the robot through advance_task() and the no_current_task
+# trigger on the following tick. Handed to the Projector as a per-task
+# stationary segment at the end of every projected task (F1; the L2 report
+# left it unmodelled). Not a tunable: change step()'s structure and this
+# changes with it.
+TASK_COMPLETION_LATENCY = 1.0
+
 
 class Executor:
     """

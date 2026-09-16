@@ -81,6 +81,7 @@ class Projector:
         default_action_cost: float = 1.0,
         arrival_radius: float = 0.0,
         action_completion_latency: float = 0.0,
+        task_completion_latency: float = 0.0,
         observation_offset: float = 0.0,
     ):
         """
@@ -123,6 +124,20 @@ class Projector:
                               instantaneous body), not a value shared/ knows to be
                               right. See design_decisions.md, "Projection time
                               includes what the body spends finishing an action" (L2).
+        task_completion_latency:
+                              execution steps the body spends COMPLETING a task, after
+                              its last action's acknowledgement and before the next
+                              task's first microaction. Charged once per projected
+                              task, as a hold at the position the task ended at
+                              (project(), after build_segments()). Supplied by the
+                              embodiment as action_completion_latency is (Mesa: one
+                              tick, the step its executor spends in
+                              _on_task_complete() — mesa_sim/executor.TASK_COMPLETION_LATENCY;
+                              ROS its own). The 0.0 default is a unit-less placeholder,
+                              not a value shared/ knows to be right. Applies to robot
+                              candidates and the human's projection alike, since the
+                              same executor runs both (F1). See design_decisions.md,
+                              "Robot-responsible separation" (the completion tick).
         observation_offset:   execution steps between this agent's own "now" — the
                               start of a projection, step 0 — and the time the
                               OBSERVED agent's state was true. project_human() starts
@@ -147,6 +162,7 @@ class Projector:
         self._default_action_cost = default_action_cost
         self._arrival_radius = arrival_radius
         self._action_completion_latency = action_completion_latency
+        self._task_completion_latency = task_completion_latency
         self._observation_offset = observation_offset
 
     # =========================================================================
@@ -212,6 +228,13 @@ class Projector:
         )
 
         segments = self.build_segments(abstract_plan, world, agent_id, start_step)
+        # What the body spends completing the task (F1): a hold at the position
+        # the task ended at, once per task — a task-level cost, not per action,
+        # so it is placed here and not in build_segments(). Omitted at 0.0.
+        if segments and self._task_completion_latency > 0.0:
+            segments.append(stationary_segment(
+                segments[-1].end_pos, segments[-1].end_step, self._task_completion_latency
+            ))
         duration = int(round(segments[-1].end_step - start_step)) if segments else 0
 
         entry = ProjectedPlanEntry(
