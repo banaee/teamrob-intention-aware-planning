@@ -41,7 +41,7 @@ LAYERING (design_decisions.md, "The robot can wait"; one-way, no cycles):
     `min_separation` is passed IN by the caller (MetaPlanner, T4/T10) — the
     single policy value — so no policy enters the geometry below, and this
     module decides nothing about which plan to run. Consumed by MetaPlanner's
-    B2 `b2a` (T4); B3 is to consume it at T10.
+    B2 `b2a` (T4) and by B3, which selects on RealizedPlan.cost (T10).
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT choose between candidates (meta_planner.py)

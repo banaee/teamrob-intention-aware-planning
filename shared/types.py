@@ -614,14 +614,11 @@ class ConflictPoint:
     """
     A single observed spatial/temporal overlap between the robot's projected
     trajectory and the human's predicted trajectory. Purely observational —
-    carries no cost/penalty judgment; _detect_interference() thresholds
-    `distance` to decide feasibility, _cost() may use it as a soft-penalty
-    magnitude once DESIGN-08 is revisited (not yet — hard-gate only for now).
-    SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026): DESIGN-08 is
-    resolved without a penalty — realization prices a conflict as the
-    duration of the hold that avoids it, and asks for the earliest violation
-    interval per segment rather than a list of samples. This type stays
-    until realization lands.
+    carries no cost/penalty judgment. Still the return type of
+    trajectory_algorithms.discretized_time_sampling(); no longer consumed by
+    MetaPlanner (T10): DESIGN-08 is resolved without a penalty — realization
+    prices a conflict as the duration of the hold that avoids it, and asks for
+    the violating shift interval per segment rather than a list of samples.
 
     No `zone` field — zone-based proximity was rejected as too coarse and
     arbitrary a definition of "close" (see design_decisions.md); replaced by
@@ -638,21 +635,13 @@ class ConflictPoint:
 @dataclass
 class InterferenceAssessment:
     """
-    Output of meta_planner._detect_interference() for one candidate ordering.
-    feasible: hard exclusion — True unless a conflict makes the ordering
-              impossible to execute as projected (e.g. required resource
-              occupied by predicted human position).
-    conflicts: all observed overlap points, feasible or not. _cost() is the
-               sole place that turns these into a numeric penalty — keeps
-               detection (what happened) separate from valuation (how bad
-               is it), per DESIGN-08's requirement that team-level cost
-               extensions not require meta_planner redesign.
-    SUPERSEDED IN DESIGN (wait-decision revision, Sept 2026): to be replaced
-    by a RealizedPlan — placed segments, holds (where, how long), duration =
-    walking + holds, and the share of the trajectory beyond the human's
-    horizon (unassessed, TODO-69). `feasible` then means "a realization
-    exists within the horizon". The detection/valuation split survives inside
-    realization: earliest_violation observes, holding values.
+    SUPERSEDED and no longer produced (T10): the output of the removed
+    meta_planner._detect_interference() — a `feasible` verdict (hard exclusion
+    below min_safe_distance) over all observed ConflictPoints. Replaced on the
+    meta-planner side by RealizedPlan: `realizable` means "a shift within the
+    human's horizon clears min_separation", and the detection/valuation split
+    survives inside realization (shift_violation_interval observes, holding
+    values). Kept as a type only; nothing constructs it.
     """
     feasible: bool
     conflicts: List[ConflictPoint] = field(default_factory=list)

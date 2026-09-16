@@ -37,10 +37,10 @@ LAYERING (one-way, no cycles; design_decisions.md, "The robot can wait"):
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT decide which task to do (meta_planner.py)
-    - Does NOT detect interference or compute cost (meta_planner.py today;
-      realize() in shared/realization.py asks the interference question on
-      this side and returns the realized duration as the cost — once wired in
-      (T4, T10), meta_planner.py decides between candidates on that number)
+    - Does NOT detect interference or compute cost: realize() in
+      shared/realization.py asks the interference question on this side and
+      returns the realized duration as the cost; meta_planner.py decides
+      between candidates on that number (B2 `b2a` T4, B3 T10)
     - Does NOT update beliefs (recognizer.py)
     - Does NOT import from mesa_sim/ or ros_sim/
 """

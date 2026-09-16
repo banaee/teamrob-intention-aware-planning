@@ -9,9 +9,10 @@ PURPOSE:
     1. PATH REALIZATION — how a single action's motion is computed.
        Consumed by MetaPlanner._build_segments().
     2. INTERFERENCE DETECTION — given two agents' Segments, where/how close do
-       they get. Consumed by MetaPlanner._detect_interference() today; under
-       the Phase 4C wait-decision revision (design_decisions.md, "The robot can
-       wait") the consumer is realize() (shared/realization.py, T3), which asks
+       they get. The batch sampler's consumer, MetaPlanner._detect_interference(),
+       was removed at T10; under the Phase 4C wait-decision revision
+       (design_decisions.md, "The robot can wait") the consumer is realize()
+       (shared/realization.py, T3), which asks
        a different question — for which SHIFTS of a robot segment is there a
        violation of a given min_separation against a human segment
        (shift_violation_interval), and when does the human first come within
@@ -248,14 +249,14 @@ def discretized_time_sampling(
     TypeError rather than sampling at an assumed scale.
 
     Returns List[ConflictPoint], one per sample in the overlap window,
-    regardless of how close the sample is — MetaPlanner._detect_interference()
-    is where a `distance` threshold turns these into a feasible/infeasible
-    decision, not here. This function only measures, it doesn't judge.
+    regardless of how close the sample is. This function only measures, it
+    doesn't judge; the caller that thresholded `distance`
+    (MetaPlanner._detect_interference()) was removed at T10, and nothing in
+    the run path consumes this sampler now.
 
-    Under realization (design, not yet built) this is the FALLBACK for
-    earliest_violation: the first sample below min_separation, not the
-    minimum over all of them. It computes more than a hold needs — the
-    closed form in closest_point_of_approach() is the intended answer.
+    Under realization this is at most a FALLBACK for the closed-form
+    shift_violation_interval below: the first sample below min_separation,
+    not the minimum over all of them. It computes more than a hold needs.
 
     Symmetric in segment_a/segment_b — order doesn't affect the result.
     """
