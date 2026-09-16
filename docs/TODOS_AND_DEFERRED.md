@@ -1314,7 +1314,7 @@ Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_targ
 `_get_relevant_action_schemas`)
 Reference: leg-level evidence session, September 2026
 
-**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C]
+**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C] — (d) end-state variant and (e) D2 fixtures ✅ BUILT (F47)
 Plan: run every B2.X × B3.X combination over hundreds of generated simulations (randomised
 layouts, scenarios, parameters) and compare outcomes. Not seed repetition — the sim is
 deterministic under PYTHONHASHSEED=0, so variation must come from generated inputs.
@@ -1329,6 +1329,34 @@ Prerequisites:
     refused until the cap (C). A variant in which the human steps aside after its last task is the
     second condition, to be reported side by side with the first (blocked time,
     `analysis/c_separation_stop/blocked.py`).
+    ✅ BUILT (F47, September 2026): `scenario_50` on `env_layout5` (= env_layout2 + the waypoint
+    `rest_0`, 500 cm east of the table): scenario_20 with a third human task, `coffee_break(rest_0)`,
+    after its last delivery. Stop on: identical to scenario_20 until tick 124, then the human walks
+    off and the run completes at 239 under both priors (scenario_20: refused at the table from 144 to
+    the cap). Read with scenario_20, not instead of it.
+(e) FIXTURES FOR D2 (F47, September 2026): the human blocks the robot MID-RUN, for a finite time,
+    with another task in the pool — the condition on which D2's blocked-execution event and its
+    reaction policy (wait, or reconsider and return) differ. `env_layout6`, `scenario_60` / `_61`: the
+    robot's route to its first shelf runs 800 cm south along x = 0; the human, assigned item_5 at the
+    west end of the aisle y = −550, walks in from the east and stops ON the route at the waypoint
+    `wander_0` for the coffee_break schema's PT60S (no coffee machine on the layout, so no hypothesis
+    carries the stop), then rests at `wander_1` and delivers item_5 last. Measured, stop on: refused
+    on ticks 25–56 (prior off, no projection) / 27–56 (prior on: the single admissible task is at
+    0.906 at tick 0, projected, a 2-tick hold, and the stop is a deviation inside the window), on the
+    robot's first task with the alternative in the pool, completion 203 / 204. THE ONE VARIABLE: the
+    alternative shelf's position at the same 900 cm from the table — `scenario_60` beside the blocked
+    shelf (45° off its bearing; switching from the block point and returning costs ~13 ticks of extra
+    walking against ~32 ticks of remaining occupation: long relative to the switch), `scenario_61`
+    across the table (~53 extra ticks: short relative to the switch). Neither policy is favoured by
+    construction: the occupation is the schema's, the alternative's own cost is identical, only the
+    geometry of the switch differs, and each variant lies on one side of the break-even. WHY A NEW
+    LAYOUT: on every existing layout the shortest switch-and-return detour exceeds the 30-tick
+    occupation, so the "long relative to the switch" variant cannot be placed there. PREMISE
+    MEASURED (control, unregistered): the same block with a coffee machine at the spot (the occupation
+    modelled) produces no stop — B3 switches at the crossing in the beside variant and holds 32 ticks
+    in the across variant. So D2's event is exercised only by an occupation the projection does not
+    carry; a foreseen one is already absorbed by realization. D2's evaluation uses scenario_60/_61
+    (the event and the two policies) and scenario_20/_50 (the end-state pair).
 (c) Fixture gap (T1, `analysis/t1_conflict_measurement/REPORT.md` §(a), §(c)): no current
     scenario has a correct-hypothesis *crossing* on the robot's current task. The only
     correct-hypothesis crossings measured are the never-selected item_7 alternatives in
