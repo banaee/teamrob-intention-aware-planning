@@ -178,6 +178,11 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 Use the step counts of the current baselines (the most recent task report that regenerated
 them). Record baselines before changing code, then diff.
 
+Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
+scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
+(a foreseen human stay on the robot's route; the beside / across alternative). Scripts and baselines:
+`analysis/f47_fixtures/`.
+
 ```bash
 grep "^\[meta\]"        <log>   # meta-planner winner per trigger
 grep "meta-cand"        <log>   # per-candidate evaluation (fields change as realization lands)

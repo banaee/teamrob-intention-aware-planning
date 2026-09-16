@@ -1329,34 +1329,33 @@ Prerequisites:
     refused until the cap (C). A variant in which the human steps aside after its last task is the
     second condition, to be reported side by side with the first (blocked time,
     `analysis/c_separation_stop/blocked.py`).
-    ✅ BUILT (F47, September 2026): `scenario_50` on `env_layout5` (= env_layout2 + the waypoint
-    `rest_0`, 500 cm east of the table): scenario_20 with a third human task, `coffee_break(rest_0)`,
-    after its last delivery. Stop on: identical to scenario_20 until tick 124, then the human walks
-    off and the run completes at 239 under both priors (scenario_20: refused at the table from 144 to
-    the cap). Read with scenario_20, not instead of it.
-(e) FIXTURES FOR D2 (F47, September 2026): the human blocks the robot MID-RUN, for a finite time,
-    with another task in the pool — the condition on which D2's blocked-execution event and its
-    reaction policy (wait, or reconsider and return) differ. `env_layout6`, `scenario_60` / `_61`: the
-    robot's route to its first shelf runs 800 cm south along x = 0; the human, assigned item_5 at the
-    west end of the aisle y = −550, walks in from the east and stops ON the route at the waypoint
-    `wander_0` for the coffee_break schema's PT60S (no coffee machine on the layout, so no hypothesis
-    carries the stop), then rests at `wander_1` and delivers item_5 last. Measured, stop on: refused
-    on ticks 25–56 (prior off, no projection) / 27–56 (prior on: the single admissible task is at
-    0.906 at tick 0, projected, a 2-tick hold, and the stop is a deviation inside the window), on the
-    robot's first task with the alternative in the pool, completion 203 / 204. THE ONE VARIABLE: the
-    alternative shelf's position at the same 900 cm from the table — `scenario_60` beside the blocked
-    shelf (45° off its bearing; switching from the block point and returning costs ~13 ticks of extra
-    walking against ~32 ticks of remaining occupation: long relative to the switch), `scenario_61`
-    across the table (~53 extra ticks: short relative to the switch). Neither policy is favoured by
-    construction: the occupation is the schema's, the alternative's own cost is identical, only the
-    geometry of the switch differs, and each variant lies on one side of the break-even. WHY A NEW
-    LAYOUT: on every existing layout the shortest switch-and-return detour exceeds the 30-tick
-    occupation, so the "long relative to the switch" variant cannot be placed there. PREMISE
-    MEASURED (control, unregistered): the same block with a coffee machine at the spot (the occupation
-    modelled) produces no stop — B3 switches at the crossing in the beside variant and holds 32 ticks
-    in the across variant. So D2's event is exercised only by an occupation the projection does not
-    carry; a foreseen one is already absorbed by realization. D2's evaluation uses scenario_60/_61
-    (the event and the two policies) and scenario_20/_50 (the end-state pair).
+    ✅ BUILT (F47, retyped F47b, September 2026): `scenario_50` on `env_layout5` (= env_layout2 + a
+    coffee machine 500 cm east of the table; a waypoint `rest_0` until F47b, an ill-typed binding):
+    scenario_20 with a third human task, `coffee_break(coffee_machine_0)`, after its last delivery.
+    Stop on: completes at 237 / 239 (prior off / on) where scenario_20 is refused at the table from 144
+    to the cap. The machine makes `coffee_break` a live hypothesis from t=0, so the recognizer's set
+    differs from scenario_20's: prior-on the first crossing and the hold move from 6 to 8. Read with
+    scenario_20, not instead of it. `analysis/f47_fixtures/`.
+(e) FIXTURES FOR D2 (F47 / F47b, September 2026): the condition on which D2's blocked-execution event and
+    its reaction policy (wait, or reconsider and return) would differ is a human stay at a place the robot
+    needs, mid-run, finite, with another task in the pool. F47 produced it with `coffee_break` bound to a
+    waypoint — ill-typed (no coffee machine), retired in F47b (`analysis/f47_fixtures/`). F47b built the
+    natural, well-typed configuration: `env_layout7`, `scenario_70` / `_71` — a real coffee machine on the
+    robot's route to its first shelf, the human's shelf beside it, the human's break there, then its
+    delivery, then the AC switch by the east wall; the alternative shelf beside the blocked one or across
+    the table at the same distance (the F47 one-variable design). MEASURED: `coffee_break` crosses θ at
+    tick 23, two ticks before the stand (25–55), and realization absorbs the projected wait — scenario_70
+    switches to the alternative (no `[stop]`, done 187), scenario_71 holds 32 ticks and then meets only the
+    human's departure (3 refused steps at 57–59 past T_h, done 207). NO VALID FIXTURE PRODUCES A MID-RUN
+    BLOCK: a stay the projection carries is priced, so the blocked event is exercised only past T_h and by
+    deviations (design_decisions.md, "Scheduled bindings are typed; a stay the projection carries is
+    absorbed"). The short / long variants therefore have no valid instance; what varies between 70 and 71 is
+    the planning response (switch vs hold). A principled unforeseen stay needs declared human behaviour
+    outside the robot's domain knowledge (TODO-80). D2's evaluation uses scenario_20 / scenario_50 (the
+    end-state pair, the tail block) and scenario_70 / _71 (the absorbed stay, the departure tail).
+(f) B3.B (`full_reorder`, not in 4C): a future fixture needs SEVERAL remaining robot tasks whose ORDER, not
+    only the next choice, changes cost under a human stay. Not built; every current fixture leaves the robot
+    at most one alternative at the stay.
 (c) Fixture gap (T1, `analysis/t1_conflict_measurement/REPORT.md` §(a), §(c)): no current
     scenario has a correct-hypothesis *crossing* on the robot's current task. The only
     correct-hypothesis crossings measured are the never-selected item_7 alternatives in
@@ -1395,7 +1394,7 @@ trigger on the same tick. DEFERRED ON EVIDENCE: revisit when new scenarios exist
 Files: shared/meta_planner.py (evaluate_triggers)
 Reference: Phase 4C B2/B3 session, September 2026; T1 measurement session, September 2026; I2
 
-**TODO-49 — Type-name mismatch between layout and schema silently empties a task's hypothesis space**
+**TODO-49 — Type-name mismatch between layout and schema silently empties a task's hypothesis space** — (2) binding part ✅ BUILT (F47b); (1) and (3) still proposed
 `build_hypothesis_space()` does `known_objects_by_type.get(type, [])`; a task whose parameter
 type has no object in the layout gets zero hypotheses. Legitimate when the layout genuinely
 lacks the object (s00/s20/s30 have no coffee machine — DESIGN-14), a silent modelling error
@@ -1414,6 +1413,17 @@ id the script already used). Proposal, not built (I2 report §6):
     error at hypothesis-space construction.
 (1) is a log line; (2) and (3) are the small validation this needs, in `SimModel._spawn_agents`
 / `build_hypothesis_space`, not a framework.
+✅ BUILT (F47b, September 2026), the binding part of (2): `shared.types.check_task_bindings(task,
+object_type_by_id)` — every bound object must exist in the layout and every parameter the schema types must
+be bound to an object of that type — is called in `SimModel._spawn_agents` for every agent's scheduled AND
+assigned tasks; a mismatch raises (an error, not a warning). Result over the registered fixtures: scenario_40
+(`ac_activation` at the waypoints wander_0 / wander_1) and scenario_50 as first built (`coffee_break` at the
+waypoint rest_0) failed and were fixed by retyping the targets at the same coordinates (env_layout4:
+`ac_switch_1` / `ac_switch_2`; env_layout5: `coffee_machine_0`); scenario_60/61 failed and were retired
+(`analysis/f47_fixtures/`). STILL PROPOSED: (1) the `[IR-space]` line; (3) the case-insensitive type clash at
+hypothesis-space construction; and the other half of (2), "every scripted task's key is in the hypothesis
+space" — the type check implies it whenever the type has objects, but a scripted task whose parameter type has
+no object at all is still refused only through the missing-object error, not stated as such.
 NOTE (R1, September 2026): the scenario_10 / `env_layout1.json` statements above PREDATE the cleaned
 `env_layout1` (no obstacles; coffee machine and AC switch side by side at x = −875, item_1 on the
 shelf near them; the human's script and the robot's pool rewritten) and are STALE as descriptions of
@@ -1842,6 +1852,11 @@ Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`), shared/recognizer.
 Reference: I4 evidence-model design discussion; I5 hand-back
 
 **TODO-64 — θ's reachability under the current model: the ceiling is 1/(1 + uⁿ), and reachability is a function of the live set** [OPEN]
+NOTE (F47, September 2026; also for TODO-65): with a ONE-task admissible pool (prior on, the human assigned a
+single delivery and no foreseeable task on the layout) the uniform prior over {task, unknown} already puts
+0.906 on the task at tick 0, before the human has moved, and a projection is built at t=0 (retired
+scenario_60/61: `[IR] step=0 ... confidence=0.906`, `[meta-proj] projection=built`, T_h 109.5, a 2-tick hold).
+Prior-on runs on such fixtures therefore do not test recognition; the gate is cleared by the live set's size.
 F1 measured a perfect hypothesis reaching only 0.569 once two foreseeable hypotheses and `unknown` were in
 the space (that figure came from the held-item pin, removed in I3); the 0.797 quoted for months exists only
 in layouts with no foreseeable task. Restated under I4d: a lone fitting task's ceiling is 1/(1 + uⁿ) over
@@ -2366,3 +2381,15 @@ Ordering should be the meta_planner's responsibility. Accepted for Phases 1–3;
 fix in Phase 4 via TODO-14.
 Resolved: the robot's task pool is `AgentConfig.assigned_tasks` (unordered); ordering is the
 meta_planner's (assignment-prior session, September 2026).
+
+**TODO-80 — Declared human behaviour outside the robot's domain knowledge** [later extension; from F47b]
+Every human stay a fixture can script today comes from a task the robot's domain describes, so the robot
+recognises it (at arrival at the latest, the move_to fold) and realization prices it (F47b: no valid fixture
+produces a mid-run block). Testing an unforeseen stay — the case D2's blocked-execution event serves —
+therefore needs human behaviour the ROBOT'S knowledge does not cover, declared as such: a scenario-side
+behaviour vocabulary for the human executor (a stay of a stated length at a stated place) that is NOT a task
+schema and adds no hypothesis, or a domain given to the human that is a superset of the robot's. Never by a
+type mismatch (F47's waypoint coffee break) or by repurposing an existing task in a role its schema does not
+describe. Design question for the design chat; nothing built.
+Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared/types.py
+Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"

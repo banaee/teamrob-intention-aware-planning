@@ -2242,6 +2242,34 @@ Files: shared/types.py (`ActionSchema.duration_key`), domains/kitting/actions.py
 shared/projection.py (`duration_to_steps`, `_stated_duration`), mesa_sim/sim_agents.py, shared/io_contracts.md
 Reference: R2 session, September 2026; TODO-32
 
+**Scheduled bindings are typed; a stay the projection carries is absorbed by realization (F47, F47b)**
+TYPED BINDINGS. A scheduled or assigned task implies that its bound objects exist in the layout with the types
+the schema declares (`TaskSchema.parameter_types`, the table the recognizer enumerates hypotheses from). A
+mismatch is a modelling error, not a tradeoff: it says the human executes a task the domain does not describe
+(a coffee break in a world without a coffee machine), which the robot can never recognise. DECIDED (F47b,
+September 2026): checked at spawn, an error, not a warning — `shared.types.check_task_bindings`, called in
+`SimModel._spawn_agents` for every agent's scheduled and assigned tasks (TODO-49 (2), the binding part). It
+found two registered fixtures ill-typed: scenario_40 (`ac_activation` at the waypoints wander_0 / wander_1) and
+scenario_50 as first built (`coffee_break` at the waypoint rest_0); both were fixed by retyping the targets at
+the same coordinates, and scenario_40's baseline was regenerated (`analysis/f47_fixtures/README.md`: same task
+order and completion, different recognition ticks). The F47 fixtures scenario_60/61, built on the same
+mismatch, are retired. A human behaviour outside the robot's domain knowledge may be a later addition, but it
+must be DECLARED as such (TODO-80), never produced by a type mismatch or by repurposing a task.
+A STAY THE PROJECTION CARRIES IS ABSORBED. Measured on the natural configuration (env_layout7, scenario_70/71:
+a real coffee machine on the robot's route, the human's shelf beside it; F47's control on the retired layout
+agrees): `coffee_break` crosses θ two ticks before the human stands, B3 re-decides on the projected 30-tick
+wait, and the robot either switches to the alternative (beside: 80.15 against item_1 + hold 32 = 89; no
+`[stop]`) or holds 32 ticks (across: 89 against 118) and then meets only the human's departure (3 refused
+steps past T_h). No valid fixture produces a mid-run block at an occupied place: realization prices every stay
+the projection carries, so the separation stop — and D2's blocked-execution event — is exercised only past
+T_h and by deviations from the projection. Consequently the short / long variants of F47 have no valid
+instance; what varies between scenario_70 and _71 is which planning response (switch or hold) the projected
+stay produces. Not a failure of the fixtures but a fact about the design for D2: the event's domain is the
+tail, not the foreseen stay. Fixtures and numbers: `analysis/f47_fixtures/`.
+Files: shared/types.py (`check_task_bindings`), mesa_sim/sim_model.py, domains/kitting/env_layout4/5/7.json,
+domains/kitting/scenarios.py, domains/kitting/registry.py, analysis/f47_fixtures/
+Reference: F47 and F47b sessions, September 2026; TODO-47, TODO-49, TODO-80
+
 **A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
 When `update()` returns the task the robot is already executing — a CONTINUE, decided by
 `task_instance_key()` equality between `UpdateResult.current_task` and `ExecutorState.current_task`, never by
