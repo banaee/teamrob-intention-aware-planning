@@ -323,7 +323,7 @@ class UpdateResult:
     queue: List[TaskInstance]
     hold: int = 0                          # the decision's hold δ, WHOLE ticks, at the robot's position
                                            # at the trigger tick (T4, T10) — see below. 0 when none was
-                                           # placed (no human projection, the all_unrealizable fallback,
+                                           # placed (no human projection,
                                            # cost_strategy "plain", the terminal return).
 ```
 
