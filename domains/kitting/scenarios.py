@@ -213,13 +213,15 @@ scenario_40 = ScenarioConfig(
         "(100, 550), every other target >= 50 deg off the heading - the positive control. "
         "(2) coffee_break at coffee_machine_0 (-40, -250): scheduled, not assigned; from the "
         "kitting table the coffee bearing is >= 49.6 deg off every task target. (3) walk to two "
-        "'waypoint' objects no task enumerates: wander_0 (356, -210) lies on the straight line "
-        "from the coffee machine to shelf_6, so the human first heads toward a shelf it will "
-        "deliver from later; wander_1 (230, -550) is >= 64 deg off every target seen from "
-        "wander_0, so the turn is a retraction case. The two walks are scripted as "
-        "ac_activation instances bound to the waypoints (move_to + a one-tick wait_at): the "
-        "schema only supplies the walk; ac_activation's own hypothesis is bound to "
-        "ac_switch_0, which is never visited. (4) deliver item_6 from shelf_6 (950, -150), so "
+        "AC switches: ac_switch_1 (356, -210) lies on the straight line from the coffee machine to "
+        "shelf_6, so the human first heads toward a shelf it will deliver from later; ac_switch_2 "
+        "(230, -550) is >= 64 deg off every delivery target seen from ac_switch_1, so the turn is a "
+        "retraction case. The two walks are ac_activation instances (move_to + a one-tick wait_at). "
+        "F47b: until then the two targets were 'waypoint' objects wander_0 / wander_1 that no task "
+        "enumerates, bound to ac_activation anyway - an ill-typed script; they were retyped as AC "
+        "switches at the same coordinates, so ac_activation now has three hypotheses (ac_switch_0, "
+        "never visited, plus these two) and the IR lines of this fixture changed (baseline "
+        "regenerated, analysis/f47_fixtures/). (4) deliver item_6 from shelf_6 (950, -150), so "
         "the assigned pool is exactly the deliveries; shelf_5 (robot, undelivered then) is "
         "17 deg off this last approach - a prior-off decoy, inadmissible prior-on. Robot: "
         "item_4, item_7, item_5 from a SW start, ~375 ticks of work so the IR keeps observing "
@@ -234,8 +236,8 @@ scenario_40 = ScenarioConfig(
             scheduled_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")}),
-                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("wander_0")}),   # segment 3, leg 1: toward shelf_6
-                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("wander_1")}),   # segment 3, leg 2: turn away
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_1")}),   # segment 3, leg 1: toward shelf_6 (an AC switch since F47b; was the waypoint wander_0)
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_2")}),   # segment 3, leg 2: turn away
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
             ],
             assigned_tasks=[
@@ -265,11 +267,20 @@ scenario_50 = ScenarioConfig(
     id="scenario_50",
     name="layout5_end_state_steps_aside",
     description=(
-        "End-state variant of scenario_20 (F47). Identical to scenario_20 in every task, position and "
-        "pool; the one change is a third human task after its last delivery: coffee_break bound to "
-        "rest_0, a waypoint 500 cm east of the table (env_layout5 = env_layout2 + rest_0). The human "
-        "leaves the table for rest_0 instead of idling at it, stands there for the schema's PT60S and "
-        "then idles THERE, so the robot's remaining table deliveries meet a free table. Measured (F47, "
+        "End-state variant of scenario_20 (F47, retyped F47b). Identical to scenario_20 in every task, "
+        "position and pool; the one change is a third human task after its last delivery: "
+        "coffee_break at coffee_machine_0, a coffee machine 500 cm east of the table (env_layout5 = "
+        "env_layout2 + the machine; until F47b it was a waypoint rest_0, an ill-typed binding). The human "
+        "leaves the table for the machine instead of idling at it, stands there for the schema's PT60S and "
+        "then idles THERE, so the robot's remaining table deliveries meet a free table. Because the "
+        "machine exists, coffee_break(coffee_machine_0) is a hypothesis for the whole run (both priors), "
+        "which scenario_20 has not - the recognizer's live set differs from scenario_20's from t=0: "
+        "prior-on the first crossing moves from 6 to 8 (the hold of 8 with it, so the robot's whole "
+        "timeline shifts 2 ticks and it now meets the departing human at 57-58 as prior-off does); "
+        "prior-off an extra theta_crossed at 140 (the coffee walk recognised) re-confirms item_6. "
+        "Measured (F47b, stop on): completes at 237 (prior off) / 239 (prior on) under both priors; "
+        "scenario_20 with the stop on is refused at the table from tick 144 to the cap. Stop off: "
+        "235 / 237 (scenario_20: 235 / 239). Earlier measurement with the waypoint (F47): "
     "stop on): identical to scenario_20 until tick 124 (the human's item_2 placement); the human "
     "walks off at 125, stands at (477, 399) on 149-179; the robot's item_6 delivery, refused from "
     "tick 144 to the cap in scenario_20, goes through and the run completes at 239 under both "
@@ -277,9 +288,8 @@ scenario_50 = ScenarioConfig(
     "235 / 239). Reported next "
         "to scenario_20, not instead of it: 'stays at the place' and 'steps aside after its last task' "
         "are the two end-state conditions (design_decisions.md, 'After C'; TODO-47 (d)). The walk to "
-        "rest_0 (bearing 0 deg from the table) is >= 51 deg off every shelf, so no delivery hypothesis "
-        "fits it; 'waypoint' is enumerated by no task, as in scenario_40. No coffee machine on the "
-        "layout: the schema supplies the walk and the stand, the entity is the waypoint."
+        "the machine (bearing 0 deg from the table) is >= 51 deg off every shelf, so no delivery "
+        "hypothesis fits it."
     ),
     agents=[
         AgentConfig(
@@ -289,7 +299,7 @@ scenario_50 = ScenarioConfig(
             scheduled_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
-                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("rest_0")}),   # steps aside; the schema only supplies the walk and the stand
+                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")}),   # steps aside: a coffee break at the machine east of the table
             ],
             assigned_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
@@ -312,47 +322,37 @@ scenario_50 = ScenarioConfig(
 )
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout6" (mid-run blocking, F47).
+# manually defined scenarios, for only "env_layout7" (mid-run stay with a real coffee machine, F47b).
 # ===============================================================
-_F47_DESCRIPTION = (
-    "Mid-run blocking fixture (F47), for D2's evaluation; builds no D2 mechanism. The robot starts "
-    "50 cm south of the table and its cheapest task is item_1 at shelf_1, 800 cm due south along "
-    "x = 0. The human, assigned item_5 at shelf_5 (west end of the aisle y = -550), walks in from "
-    "(510, -550) toward that shelf and STOPS on the robot's route at wander_0 (0, -550) for a "
-    "coffee_break - the schema's PT60S, 30 ticks; no coffee machine exists, so no hypothesis "
-    "explains the stop - then walks east to wander_1, rests there for another PT60S, and only then "
-    "delivers item_5 (leaving the rest spot at ~124, reaching the table at ~241, after the robot's "
-    "last placement at ~206 in the current runs; a slower policy would meet it idle at the table). "
-    "Measured (F47; 20 cm/tick, arrival radius 30, min_separation 50, cost realized, gate none, "
-    "stop on, PYTHONHASHSEED=0, 300 steps): the human stands at (30, -550) on ticks 25-55 and moves "
-    "at 58; the robot's step south from (0, -500) is refused on ticks 25-56 prior-off (32 ticks) "
-    "and 27-56 prior-on (30 ticks) - on its FIRST task, item_1, with the alternative still in the "
-    "pool; then it completes at 203 (scenario_60) / 204 (scenario_61). Prior-on the recognizer has "
-    "one admissible task and puts 0.906 on deliver_item(item_5) at tick 0 before the human has "
-    "moved, so a projection is built at t=0 (T_h 109.5), the robot holds 2 ticks against the "
-    "projected walk crossing its route, and the stop is labelled inside the window - the human "
-    "deviated from its projected delivery. Prior-off shelf_2 (2 deg), shelf_5 (0 deg) and shelf_1 "
-    "(21 deg) share the belief below theta and nothing is projected (outside(no_projection)). With "
-    "the stop off the robot walks through the standing human twice (approach 25-27, carry back "
-    "44-46; 6 violating steps) and completes at 171-174. Control, not a fixture: the same layout "
-    "with a coffee machine at wander_0's position and the break bound to it (the occupation "
-    "modelled) produces no stop at all - the crossing at tick 23 makes B3 switch to the alternative "
-    "in the beside variant (item_2 80.15 vs item_1 + hold 32 = 89; done 185) and hold 32 ticks in "
-    "the across variant (done 204 / 209): a foreseen occupation is absorbed by planning; D2's event "
-    "arises only from an occupation the projection does not carry. THE ONE VARIABLE between "
-    "scenario_60 and _61 is where the "
-    "alternative shelf stands, at the SAME 900 cm from the table (identical task cost, identical "
-    "t=0 choice): "
+_F47B_DESCRIPTION = (
+    "Mid-run stay fixture (F47b), for D2's evaluation; builds no D2 mechanism; every scheduled task "
+    "well typed. The robot starts 50 cm south of the table and its cheapest task is item_1 at "
+    "shelf_1, 800 cm due south along x = 0. coffee_machine_0 stands ON that route at (0, -550) with "
+    "the human's shelf_5 beside it (100 cm west). The human walks in from (510, -550) along the "
+    "aisle, takes a coffee break at the machine (the schema's PT60S, 30 ticks), delivers item_5 from "
+    "the shelf beside it, then switches on the AC by the east wall and stays there. The natural "
+    "configuration, not tuned for the recognizer: whether the stay is recognised before the robot "
+    "reaches it, and so absorbed by realization, is what the fixture measures. MEASURED (F47b; cost "
+    "realized, gate none, stop off and on, both priors, PYTHONHASHSEED=0; analysis/f47_fixtures/): "
+    "coffee_break crosses theta at tick 23 (0.796 prior-off, 0.897 prior-on), two ticks before the "
+    "human stands at (30, -550) on 25-55, and B3 re-decides on the projected 30-tick wait (T_h 34): "
+    "no mid-run block occurs in either scenario. scenario_70 switches to item_2 (80.15 vs item_1 + "
+    "hold 32 = 89), returns to item_1 at 105 after the human has left, completes at 187, no [stop]. "
+    "scenario_71 holds 32 ticks at (0, -40) (item_1 + hold 89 vs item_3 118), walks, and meets the "
+    "human LEAVING the machine: 3 refused steps at 57-59 past T_h, then completes at 207 (204 with "
+    "the stop off). The finding for D2: with well-typed fixtures the stay is recognised before it "
+    "begins and realization absorbs it as a switch or a hold; the separation stop, and so the "
+    "blocked event, is exercised only past T_h, on the human's departure. THE ONE VARIABLE "
+    "between scenario_70 and _71 is where the alternative shelf stands, at the SAME 900 cm from the "
+    "table (identical task cost, identical t=0 choice): "
 )
-scenario_60 = ScenarioConfig(
-    id="scenario_60",
-    name="layout6_block_alternative_beside",
-    description=_F47_DESCRIPTION + (
-        "scenario_60 - shelf_2 BESIDE the blocked shelf (45 deg west of its bearing). Switching from "
-        "the block point to item_2 and returning adds ~13 ticks of walking over doing item_2 from the "
-        "table later, against ~32 ticks of remaining occupation: the occupation is LONG relative to "
-        "the switch. Favours neither policy by construction: the occupation is the schema's and the "
-        "alternative's own cost is the same as in scenario_61; only the geometry differs."
+scenario_70 = ScenarioConfig(
+    id="scenario_70",
+    name="layout7_stay_alternative_beside",
+    description=_F47B_DESCRIPTION + (
+        "scenario_70 - shelf_2 BESIDE the blocked shelf (45 deg west of its bearing): switching from a "
+        "block at (0, -500) to item_2 and returning adds ~13 ticks of walking over doing item_2 from "
+        "the table later; the occupation would be LONG relative to the switch."
     ),
     agents=[
         AgentConfig(
@@ -360,9 +360,9 @@ scenario_60 = ScenarioConfig(
             agent_type="human",
             start_position=(510, -550),
             scheduled_tasks=[
-                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("wander_0")}),   # stops on the robot's route; the schema supplies the walk and the PT60S stand
-                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("wander_1")}),   # steps aside and rests
-                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),   # the assigned delivery, last: after the robot is done in the current runs
+                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_0")}),
             ],
             assigned_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),
@@ -382,14 +382,13 @@ scenario_60 = ScenarioConfig(
     ],
 )
 
-scenario_61 = ScenarioConfig(
-    id="scenario_61",
-    name="layout6_block_alternative_across",
-    description=_F47_DESCRIPTION + (
-        "scenario_61 - shelf_3 ACROSS the table (the opposite bearing). Switching from the block point "
-        "to item_3 and returning adds ~53 ticks of walking (the robot passes the table twice more), "
-        "against ~32 ticks of remaining occupation: the occupation is SHORT relative to the switch. "
-        "Favours neither policy by construction, as scenario_60."
+scenario_71 = ScenarioConfig(
+    id="scenario_71",
+    name="layout7_stay_alternative_across",
+    description=_F47B_DESCRIPTION + (
+        "scenario_71 - shelf_3 ACROSS the table (the opposite bearing): switching from a block at "
+        "(0, -500) to item_3 and returning adds ~53 ticks of walking; the occupation would be SHORT "
+        "relative to the switch."
     ),
     agents=[
         AgentConfig(
@@ -397,9 +396,9 @@ scenario_61 = ScenarioConfig(
             agent_type="human",
             start_position=(510, -550),
             scheduled_tasks=[
-                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("wander_0")}),
-                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("wander_1")}),
+                TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_0")}),
             ],
             assigned_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),

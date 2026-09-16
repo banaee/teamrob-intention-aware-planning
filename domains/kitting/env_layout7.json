@@ -1,0 +1,218 @@
+{
+  "space": {
+    "width": 2000,
+    "height": 2000,
+    "name": "Kitting Domain Layout 7",
+    "units": "cm",
+    "notes": "Mid-run stay fixture with a REAL coffee machine (scenario_70 / _71, F47b; for D2's evaluation). The robot's route from the kitting table T (0, 50) to its first shelf, shelf_1 (0, -750), runs straight south along x = 0. coffee_machine_0 stands ON that route at (0, -550), with the human's shelf_5 (item_5) 100 cm west of it, beside the machine - the natural configuration, not tuned for the recognizer. The human walks in from the east along the aisle y = -550, takes its coffee break at the machine (the schema's PT60S), then delivers item_5 from the shelf beside it and finally switches on the AC by the east wall (ac_switch_0) and stays there. Every scheduled task is well typed (F47b). Two alternative shelves for the robot at the SAME 900 cm from T: shelf_2 beside the blocked shelf (45 deg west of its bearing) and shelf_3 across the table; only the robot's pool differs between the two scenarios. No obstacles."
+  },
+  "zones": [
+    {
+      "id": "zone_NW",
+      "bounds": {
+        "x_min": -1000,
+        "x_max": 0,
+        "y_min": 0,
+        "y_max": 1000
+      },
+      "label": "northwest_work"
+    },
+    {
+      "id": "zone_NE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 1000,
+        "y_min": 0,
+        "y_max": 1000
+      },
+      "label": "northeast_work"
+    },
+    {
+      "id": "zone_SW",
+      "bounds": {
+        "x_min": -1000,
+        "x_max": 0,
+        "y_min": -1000,
+        "y_max": 0
+      },
+      "label": "southwest_storage"
+    },
+    {
+      "id": "zone_SE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 1000,
+        "y_min": -1000,
+        "y_max": 0
+      },
+      "label": "southeast_storage"
+    }
+  ],
+  "doors": [],
+  "robots": [
+    {
+      "id": "robot_0",
+      "type": "mobile_manipulator",
+      "initial_container": "zone_SW",
+      "initial_x": 0,
+      "initial_y": 0
+    }
+  ],
+  "humans": [
+    {
+      "id": "human_0",
+      "type": "worker",
+      "initial_container": "zone_SE",
+      "initial_x": 510,
+      "initial_y": -550
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table_0",
+      "type": "kitting_table",
+      "position": [
+        0,
+        50
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "zone": "zone_NE",
+      "notes": "Shared delivery sink. The robot starts 50 cm south of it, on its route to shelf_1."
+    },
+    {
+      "id": "shelf_1",
+      "type": "shelf",
+      "position": [
+        0,
+        -750
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "The robot's first shelf, 800 cm due south of T (t=0 cost ~80 ticks vs ~92 / ~97 for shelf_2 / shelf_3). Robot arrival point (0, -720)."
+    },
+    {
+      "id": "coffee_machine_0",
+      "type": "coffee_machine",
+      "position": [
+        0,
+        -550
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "zone": "zone_SW",
+      "notes": "On the T -> shelf_1 route, 200 cm short of the shelf. The human's coffee break happens here; arriving from the east it stands at (30, -550). A coffee_break(coffee_machine_0) hypothesis exists (both priors)."
+    },
+    {
+      "id": "shelf_5",
+      "type": "shelf",
+      "position": [
+        -100,
+        -550
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "The human's assigned shelf, beside the coffee machine (100 cm west, same aisle). Delivered after the break."
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [
+        -636,
+        -586
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "Alternative BESIDE the blocked shelf (scenario_70): 900 cm from T at 45 deg west of shelf_1's bearing."
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [
+        0,
+        950
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "zone": "zone_NE",
+      "notes": "Alternative ACROSS the table (scenario_71): 900 cm from T on the opposite bearing."
+    },
+    {
+      "id": "ac_switch_0",
+      "type": "ac_switch",
+      "position": [
+        700,
+        -550
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "zone": "zone_SE",
+      "notes": "The human's last task: switch on the AC by the east wall and stay there, off every robot route."
+    },
+    {
+      "id": "item_1",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Robot task 1."
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_2",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Robot alternative, scenario_70."
+    },
+    {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_3",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Robot alternative, scenario_71."
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_5",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Human's assigned item, delivered after the break."
+    }
+  ]
+}

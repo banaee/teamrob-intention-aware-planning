@@ -4,7 +4,7 @@
     "height": 900,
     "name": "Kitting Domain Layout 5",
     "units": "cm",
-    "notes": "env_layout2 plus one waypoint, rest_0, for the end-state variant of scenario_20 (scenario_50, F47): after its last delivery the human walks to rest_0 and stays there instead of idling at the kitting table, so the robot's last table deliveries are not refused by the separation stop. rest_0 lies due east of the table (bearing 0 deg), >= 51 deg off every shelf bearing from the table (shelf_2 -51, shelf_7 -59, shelf_3 -107, shelf_4 -121, shelf_6 -128), so the walk to it fits no delivery hypothesis; type 'waypoint' is enumerated by no task, so it adds no hypothesis. Everything else is env_layout2 byte for byte. Layout2's notes apply."
+    "notes": "env_layout2 plus one coffee machine, coffee_machine_0, for the end-state variant of scenario_20 (scenario_50, F47/F47b): after its last delivery the human walks to the machine for a coffee break and stays there instead of idling at the kitting table, so the robot's last table deliveries are not refused by the separation stop. The machine lies due east of the table (bearing 0 deg), >= 51 deg off every shelf bearing from the table (shelf_2 -51, shelf_7 -59, shelf_3 -107, shelf_4 -121, shelf_6 -128). Unlike env_layout2 the hypothesis space carries coffee_break(coffee_machine_0) (foreseeable, both priors). Everything else is env_layout2 byte for byte."
   },
   "zones": [
     {
@@ -213,18 +213,18 @@
       "notes": "Human task 2."
     },
     {
-      "id": "rest_0",
-      "type": "waypoint",
+      "id": "coffee_machine_0",
+      "type": "coffee_machine",
       "position": [
         500,
         400
       ],
       "size": [
-        10,
-        10
+        50,
+        50
       ],
       "zone": "zone_NE",
-      "notes": "The human's end-state spot (scenario_50): scripted as coffee_break(rest_0) after its last delivery - the schema supplies the walk and the PT60S stand; the human then idles here. 470 cm east of the table's arrival point, off every robot route (T->shelf_7 leaves the table at -59 deg; the robot passes 340+ cm from here)."
+      "notes": "The human's end-state spot (scenario_50): coffee_break(coffee_machine_0) after its last delivery, PT60S, then it idles here. 470 cm east of the table's arrival point, off every robot route (T->shelf_7 leaves the table at -59 deg; the robot passes 340+ cm from here). A real coffee machine (F47b: a scheduled task's bound object must carry the schema's type), so coffee_break(coffee_machine_0) is a live hypothesis for the whole run, which scenario_20 has not."
     }
   ]
 }
