@@ -165,8 +165,12 @@ walks around it, and that detour is a team-level cost parked here — realizatio
 robot's own time. The Mesa human has no avoidance, so in Mesa the two agents simply come close or
 overlap while the robot stands; those moments are not robot violations and are reported separately in
 the evaluation ("stand"; `analysis/f1_robot_responsible/evaluate.py`).
+FOR 4D (R2, September 2026): the robot that stops safely at an occupied place and cannot progress (C's
+indefinite wait) has human cooperation as its principal remedy — communication, or a model of the human
+making room — a team-level mechanism, parked here with the team-level costs. Related to the freezing
+robot problem (design_decisions.md, "After C", the freezing point).
 Files: `shared/meta_planner.py` (Phase 4 new)
-Reference: Phase 4 design session
+Reference: Phase 4 design session; R2
 
 **TODO-16 — Cost-aware method selection in `_select_method`**
 Currently picks first applicable method (greedy). If multiple methods have
@@ -696,6 +700,10 @@ are removed from `MetaPlanner`; B3 hands `realize()` the same `min_separation` (
 50 cm) B2 uses, and there is no exclusion threshold anywhere in selection. The run header names the
 value (`[run] ... min_separation=50.00 (min_separation_in_motion_ticks=2.5 x assumed_speed=20)`,
 TODO-78). What remains open is the VALUE under randomised layouts (TODO-47 (b)) and real body sizes.
+RECORDED (R2, September 2026): the one value governs two situations — crossing paths in the open and
+working side by side at a shared place — that collaborative practice treats as different modes; and at
+a point place with arrival radius r co-use needs s ≤ 2r and arrival on opposite sides (50 vs 60 cm here:
+the rim only). What the single value costs is in design_decisions.md, "After C". Not changed.
 The parameter is no longer an exclusion threshold ("a ConflictPoint below it makes a candidate
 infeasible") but the separation realization must achieve by holding: `earliest_violation` is
 asked for the first time the two agents come within `min_separation`, and the robot holds until
@@ -873,8 +881,18 @@ are viz or Phase 5 evaluation — either wire it in or delete it.
 Files: shared/projection.py
 Reference: Phase 4C meta_planner build session, September 2026
 
-**TODO-32 — `wait_at` duration ignored in cost estimation**
-`Projector.build_segments()` treats every non-movement action as costing
+**TODO-32 — `wait_at` duration ignored in cost estimation** ✅ CLOSED (R2, September 2026)
+✅ CLOSED (R2): the duration was already domain knowledge — a constant bound by the method schema
+(`coffee_break_default`: `PT60S`; `ac_activation_default`: `PT2S`), not a scenario value — so the human's
+executor and the robot's projector read one source by construction. The projection now uses the duration
+bound on the grounded action (`ActionSchema.duration_key`, `"?duration"` on `wait_at`), converted by a
+body-supplied `duration_to_steps` callable on the `Projector` (Mesa hands in
+`action_decomposer._parse_duration_to_steps`; `shared/` holds neither parser nor seconds-per-tick).
+Effect: s10's coffee_break projection T_h 5 → 34 at step 123, s40's 14.3 → 43.3 / 22.3 → 51.3 and 10.3 →
+39.3; no decision or hold changes anywhere; s00/s20/s30 unchanged. The matched-duration assumption and
+the mismatch experiment's shape are recorded in design_decisions.md, "The human's wait duration in the
+projection".
+ORIGINAL: `Projector.build_segments()` treats every non-movement action as costing
 `knowledge.get_cost(action_name)` or `default_action_cost`, including `wait_at` — so a
 `PT60S` coffee break and a `PT2S` AC toggle currently cost the same. The real ISO-8601
 `?duration` binding is parsed in `mesa_sim/action_decomposer.py`, which `shared/` cannot
@@ -1306,6 +1324,11 @@ Prerequisites:
 (b) Scale-relative calibration — `min_separation` (formerly `min_safe_distance`, TODO-28; and
     any B2 reference for δ, TODO-36) must be expressed relative to layout scale or agent
     speed × steps, not as an absolute read off one fixture.
+(d) The human's end state as a condition (R2): the current scripts leave the human idle at the
+    kitting table after its last task, so with the separation stop on the robot's last delivery is
+    refused until the cap (C). A variant in which the human steps aside after its last task is the
+    second condition, to be reported side by side with the first (blocked time,
+    `analysis/c_separation_stop/blocked.py`).
 (c) Fixture gap (T1, `analysis/t1_conflict_measurement/REPORT.md` §(a), §(c)): no current
     scenario has a correct-hypothesis *crossing* on the robot's current task. The only
     correct-hypothesis crossings measured are the never-selected item_7 alternatives in
@@ -2011,7 +2034,9 @@ re-plan starts the carry on that tick. That is deterministic, robot-only and not
 the T4 report; TODO-77, fix with D2). The minimal whole-tick shift has no margin, so clearance currently
 depends on that re-decision.
 STILL OPEN: refinement (the executor shortening or extending a hold against what the world shows),
-and how a refined hold is reported back. Mesa has no refinement: it executes δ as decided.
+and how a refined hold is reported back. Mesa has no refinement: it executes δ as decided. The
+separation stop (C) is the other body-side stand — a safety refinement, not a hold — and whether the
+mind is told of it is D2's question (TODO-73, R2).
 ✅ CLOSED (ruling on the T4 report): A DECISION WITH NO PROJECTION DROPS A HOLD IN PROGRESS, and that
 stays. While the robot holds it stands, so its `holding` cannot change (`task_committed` cannot
 fire) and its task cannot complete (`no_current_task` cannot fire, and B1.5 would skip B2 anyway).
@@ -2055,6 +2080,13 @@ so the robot's last delivery is refused every tick and the run does not complete
 accepted indefinite-wait limit meeting a human that never leaves and a point table with one arrival
 radius (TODO-74). F1's gap 2 (the robot approaching a human still at the table past T_h) is closed by
 this for Mesa.
+AFTER C (R2, September 2026; design_decisions.md, "After C"): the indefinite wait is correct under the
+rule and the human's end state is an experimental condition (TODO-47 (d)); blocked time is the outcome
+under the current scripts (`analysis/c_separation_stop/blocked.md`: s00 139, s20 156–158, s30 44–48
+blocked ticks, s10 0; with TODO-32 landed, s40 29). OPEN FOR D2: "no trigger fires on a stop" is expected
+to be reversed — the mind does not know the body has stopped; and marking a task not executable because
+the body refused its step would introduce no parameter (not an exclusion threshold in T10's sense). The
+stop-off baselines contain walk-throughs and support decision comparison, not safety claims.
 THE RULE (F1, September 2026): when built, Mesa's execution-time avoidance uses robot-responsible
 separation, the same definition realization checks (design_decisions.md, "Robot-responsible
 separation"): the robot may not move so that the robot–human distance goes from at least
@@ -2092,6 +2124,11 @@ every hold in the fixtures is a hold at the table. A real table (200 × 100 cm) 
 placement positions. Whether to model them — as several objects, as a parameter of `place`, or as an
 executor-side offset — is a DOMAIN question for later, not a realization one; do not solve it inside
 `shared/`.
+THE POINT-PLACE FACT (R2, September 2026): with arrival radius r and min_separation s, two agents at one
+place are at most 2r apart, so co-use requires s ≤ 2r and arrival on opposite sides — 50 vs 60 cm here,
+the rim only, practically unreachable by straight-line arrival. A framework fact about body constants
+against policy (design_decisions.md, "After C"); it is what makes C's indefinite wait the outcome at
+every table delivery with the human standing there.
 Files: domains/kitting/env_layout*.json, domains/kitting/actions.py, domains/kitting/tasks.py
 Reference: R1 decision record, September 2026
 

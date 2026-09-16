@@ -26,4 +26,8 @@ Regenerate from the repo root (~2 min):
     ~/python-envs/teamrob-sp4-env/bin/python $H/evaluate.py > $H/comparison.md
 
 The three directories are the baselines from F1 on: `realized_none/` is the default configuration (the
-regression sweep, ten conditions), `plain_none/` and `realized_b2a/` the comparison conditions.
+regression sweep, ten conditions), `plain_none/` and `realized_b2a/` the comparison conditions. All are
+run with the separation stop off and contain walk-throughs (the tail "viol" ticks in `comparison.md`):
+they are decision baselines and support no safety claim (R2). Since TODO-32 (R2) the s10 and s40 logs
+differ from these at HEAD in `[meta-b3] T_h` and `[meta-cand] share` at the coffee_break triggers only
+(s10 step 123; s40 steps 135/143 and 147); decisions, holds and every other grep are unchanged.

@@ -261,9 +261,11 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    one run-log header line naming the parameters a log was produced under, at least `gate_strategy`
    and θ, plus ρ and `min_separation` (TODO-78). That changes every log, so do it with T10's
    baseline regeneration
-5. D2 — what a trigger is an event of (TODO-68 / 48 / 54 / 64 / 65), decided from the T4 and T10 logs
+5. D2 — what a trigger is an event of (TODO-68 / 48 / 54 / 64 / 65), decided from the T4 and T10 logs;
+   also whether the separation stop is one (C: no trigger on a stop; R2 records it as open for D2)
 6. T6 — ablation: B2 {none, b2a} × B3.A {plain, realized}, sweeps of ρ and of s (`min_separation`)
-Later, not scheduled: TODO-47 (randomised layouts), TODO-32 (`wait_at` duration in projection),
+Later, not scheduled: TODO-47 (randomised layouts; (d) the human's end-state variant, R2), TODO-32 ✅ (R2: the
+schema's wait duration in projection, body-converted),
 `full_reorder` with `realize()`, TODO-70 (a hold at a chosen point along a segment), TODO-71 (the
 hint's body-side details), TODO-73 (Mesa execution-time avoidance), TODO-74 (placement positions on
 the table), TODO-75 (the ROS guide and `env_layout9`).

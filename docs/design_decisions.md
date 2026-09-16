@@ -2165,6 +2165,83 @@ mesa_sim/sim_model.py, mesa_sim/run_mesa.py (`--separation_stop`), configs/exper
 shared/io_contracts.md (§4.1), analysis/c_separation_stop/
 Reference: C session, September 2026; F1 (the rule; gap 2); TODO-73; TODO-71; TODO-74
 
+**After C: point places, one min_separation for two situations, the indefinite wait as a condition, the body's refusal is no threshold, the stop trigger left to D2, freezing, and what the stop-off baselines can support (R2)**
+Recorded (R2, September 2026); no decision changed. Measurements: `analysis/c_separation_stop/blocked.md`.
+- POINT PLACES. With arrival radius r and min_separation s, two agents at one place are at most 2r
+  apart, so co-use of a place requires s ≤ 2r AND arrival on opposite sides. With s = 50 cm and 2r =
+  60 cm co-use is possible only at the rim, and straight-line arrival makes it practically
+  unreachable (C: every approach to the table comes within 36–44 cm of the standing human). A
+  framework fact about body constants against policy, not a kitting fact; the table as one point is
+  TODO-74.
+- ONE VALUE, TWO SITUATIONS. One min_separation governs crossing paths in the open and working side by
+  side at a shared place; collaborative practice treats these as different modes with different
+  clearances. What the single value costs: set for passing, as now, it forbids working side by side at a
+  point place; set for working it would thin the clearance on every crossing. Not changed here.
+- THE INDEFINITE WAIT at an occupied place is correct behaviour under the rule (a stopped robot has no
+  admissible motion; standing is always safe). The human's end state is an EXPERIMENTAL CONDITION:
+  "stays at the place" (the current scripts) and "steps aside after its last task" are two conditions to
+  be reported side by side; the variant fixture comes with TODO-47's harness, not here. Under the first,
+  BLOCKED TIME is the outcome (`blocked.py`): completion is reported only when it happens; otherwise the
+  run reports "blocked by an occupying human" with the blocked duration, place and action. Measured on
+  the C runs, stop on: s00 139 ticks (161–299), s20_off 158 (57–58, 144–299), s20_on 156 (144–299),
+  s30_off 48 (21–24 at item_4, 156–199), s30_on 44 (156–199), s10 0; every long episode is a walk to
+  kitting_table_0 that ends in the stop. Human-borne proximity (the robot stands, the human within s)
+  with the stop on: s10 72–74 (the robot's own placement, 3 ticks), s30_off tick 22 (a stop while the
+  human passes), s30_on tick 22 (a decided hold); none elsewhere. Robot violations 0 in every run.
+- NOT AN EXCLUSION THRESHOLD. Marking a task not executable because the body refused its step (a
+  candidate for D2) introduces no parameter: it reads a fact of execution, not a comparison against a
+  distance. The T10 lesson forbids a tunable threshold inside selection; it does not forbid selection
+  reading what the body did.
+- OPEN, FOR D2: C's "no trigger fires on a stop" is expected to be reversed. The mind does not know the
+  body has stopped (liveness); what event a stop is, and whether an episode length matters, is D2's
+  question with the trigger set (TODO-68 / 48 / 54).
+- FREEZING. A robot that stops safely and cannot progress is related to the freezing robot problem
+  (P. Trautman and A. Krause, "Unfreezing the robot: navigation in dense, interacting crowds", IROS 2010;
+  bibliographic details not verified in this session), though that arises from prediction uncertainty in
+  a crowd, not an occupied goal; the closer analogue is execution monitoring of a failed precondition
+  (the place is occupied). Human cooperation — communication, or a model of the human making room — is
+  the principal remedy, recorded for Phase 4D (TODO-15).
+- BASELINES WITH THE STOP OFF contain walk-throughs (F1's tail violations: s00 3, s20 6–8, s30 2–5
+  violating robot steps per run) and cannot support safety claims. They are decision baselines.
+Files: analysis/c_separation_stop/blocked.py, blocked.md; docs/TODOS_AND_DEFERRED.md (15, 28, 47, 73, 74)
+Reference: R2 session, September 2026; C; F1
+
+**The human's wait duration in the projection is the schema's, converted by the body (TODO-32, R2)**
+FOUND: the duration was already domain knowledge — a constant in the method schema
+(`domains/kitting/tasks.py`: `coffee_break_default` binds `?duration` to `PT60S`, `ac_activation_default`
+to `PT2S`); scenario scripts carry no durations. The human's executor and the robot's projector
+decompose the same schema, so knowledge and behaviour match by construction. TODO-32 was not a script
+leak. DECIDED: the projection uses the wait duration bound on the grounded action the planner produced
+instead of the action's default cost. The binding is named by a schema field (`ActionSchema.duration_key`,
+`"?duration"` on `wait_at`), never by a literal in `shared/`. Converting an ISO-8601 duration to ticks
+needs a parser and seconds per tick, both body facts: as with `assumed_speed` and the latencies, the
+embodiment hands the `Projector` a `duration_to_steps` callable (Mesa: `action_decomposer.
+_parse_duration_to_steps` over `seconds_per_step`, the same function its `STAND*` expansion uses, handed
+in, not moved); `shared/` calls it and holds neither the parser nor the constant. Without one the action
+falls back to the cost lookup / default cost (a placeholder, as the other defaults are).
+ASSUMPTION, recorded: the robot's known duration and the human's actual duration are matched for now.
+If a mismatch experiment is ever wanted, the human's instance gets its own duration in the scenario while
+the robot keeps reading the schema value; the robot never reads the scenario's. A deviation is handled by
+the separation stop and later re-recognition, not by the projection.
+MEASURED (regression sweep, cost realized, gate none, stop off and on, PYTHONHASHSEED=0):
+- s00, s20, s30: every regression grep and per-tick line byte-identical to the C baselines; the only
+  differing lines are the `[planner]` debug repr of the plan, which now prints the new schema field.
+- s10: the coffee_break projection at step 123 (`theta_crossed`, both priors) has T_h 34.00 instead of
+  5.00 — 30 ticks for `PT60S` in place of the 1-tick default. The human's executed wait spans ticks
+  125–155 (30 STAND + the acknowledgement tick), the projection's 30 + 1 latency. `PT2S` is 1 tick before
+  and after.
+- s40: T_h 14.30 → 43.30 (prior off, step 143) and 22.30 → 51.30 (prior on, step 135) at the coffee_break
+  crossing, and 10.30 → 39.30 at step 147 (`no_current_task`, both).
+- No decision, hold, `[meta-proj]`, `[IR]`, `[sep]` or per-tick line changes in any condition; only
+  `[meta-cand] share` (the unassessed share of T_r) falls at those triggers: the longer wait covers more of
+  the robot's plan without touching it, since in these fixtures the robot's candidates never pass the
+  coffee machine. With the stop on: s10 no stops before and after; s40 29 blocked ticks (371–399) at the
+  table before and after — the same indefinite wait as s00/s20/s30 (the human's last delivery ends at
+  the table); s40 was not in C's set.
+Files: shared/types.py (`ActionSchema.duration_key`), domains/kitting/actions.py (`wait_at`),
+shared/projection.py (`duration_to_steps`, `_stated_duration`), mesa_sim/sim_agents.py, shared/io_contracts.md
+Reference: R2 session, September 2026; TODO-32
+
 **A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
 When `update()` returns the task the robot is already executing — a CONTINUE, decided by
 `task_instance_key()` equality between `UpdateResult.current_task` and `ExecutorState.current_task`, never by
