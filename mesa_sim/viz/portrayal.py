@@ -19,6 +19,7 @@ USED BY:
     - mesa_sim/run_mesa.py  → passed to SolaraViz as agent_portrayal
 """
 
+from mesa_sim.mesa_fork import agent
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 
 AGENT_DISPLAY_SIZE = 20  # TODO: read from mesa_configs.yaml if needed
@@ -33,10 +34,18 @@ def agent_portrayal(agent):
 
 
 def _robot_portrayal(agent: RobotAgent) -> dict:
-    text = f"🤖({agent.carrying})" if agent.carrying else "🤖"
-    return {"text": text, "font_size": AGENT_DISPLAY_SIZE, "color": "blue", "Layer": 3}
+    text = "🤖"  # adding carry label will be handled in space_draw
+    # text = f"🤖\n({agent.carrying})" if agent.carrying else "🤖"
+    return {"text": text, 
+            "font_size": AGENT_DISPLAY_SIZE, 
+            "color": "blue", 
+            "Layer": 3}
 
 
 def _human_portrayal(agent: HumanAgent) -> dict:
-    text = f"👷({agent.carrying})" if agent.carrying else "👷"
-    return {"text": text, "font_size": AGENT_DISPLAY_SIZE, "color": "green", "Layer": 3}
+    text = "👷"  # adding carry label will be handled in space_draw
+    # text = f"👷({agent.carrying})" if agent.carrying else "👷"
+    return {"text": text, 
+            "font_size": AGENT_DISPLAY_SIZE, 
+            "color": "green", 
+            "Layer": 3}

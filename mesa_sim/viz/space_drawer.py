@@ -112,17 +112,27 @@ def _draw_zones(model, fig):
 
 
 def _draw_env_objects(model, fig):
-    for obj_id, obj in model.objects.items():
+    for obj_id, obj in model.objects.items():        
         if obj.is_portable:
             continue  # portable objects (items/pallets) are drawn separately
-        if obj.type == "obstacle":
-            _draw_rect(fig, obj.position, obj.size, "dimgray", 0.4, label=None)
-        else:
-            color, opacity = OBJ_COLORS.get(obj.type, ("lightblue", 0.5))
-            _draw_rect(fig, obj.position, obj.size, color, opacity, label=obj_id)
+
+        shap_color = "dimgray" if obj.type == "obstacle" else OBJ_COLORS.get(obj.type, ("lightblue", 0.5))[0]
+        shap_opacity = OBJ_COLORS.get(obj.type, ("lightblue", 0.5))[1]
+        label_color = "gray" if obj.type != "obstacle" else "white"
+        label_x = obj.position[0]
+        label_y = obj.position[1] + obj.size[1]/2 if obj.type == "shelf" else obj.position[1]
+        label_size = 10 if obj.type != "obstacle" else 8
+
+        _draw_rect(fig, obj.position, obj.size, shap_color, shap_opacity, 
+                   label=obj_id, 
+                   label_x=label_x, 
+                   label_y=label_y,
+                   label_size=label_size,
+                   label_color=label_color)
 
 
-def _draw_rect(fig, position, size, color, opacity, label=None):
+def _draw_rect(fig, position, size, color, opacity, 
+               label=None, label_x=None, label_y=None, label_color=None, label_size=None):
     x0 = position[0] - size[0] / 2
     y0 = position[1] - size[1] / 2
     x1 = position[0] + size[0] / 2
@@ -134,8 +144,8 @@ def _draw_rect(fig, position, size, color, opacity, label=None):
     )
     if label:
         fig.add_annotation(
-            x=position[0], y=position[1], text=label,
-            font=dict(color="black", size=9),
+            x=label_x or position[0], y=label_y or position[1], text=label,
+            font=dict(color=label_color or "black", size=label_size or 10),
             showarrow=False,
         )
 
@@ -144,34 +154,71 @@ def _draw_delivery_items(model, fig):
     for item_id, item in model.objects.items():
         if not item.is_portable:
             continue  # non-portable objects are drawn separately
-        color = "red" if item.held_by else "black"
+        
+        if item.held_by:
+            shape_color = "red"  # item is being carried
+            shape_size = 12
+            text_color = "green"
+            text_delta_y = 30  # offset to be below the agent
+            text_size = 12
+        else:
+            shape_color = "black"  
+            shape_size = 15
+            text_color = "black"
+            text_delta_y = 10
+            text_size = 10
+            
+
         x, y = item.position
         fig.add_shape(
             type="circle",
-            x0=x - 12, y0=y - 12, x1=x + 12, y1=y + 12,
-            line=dict(color=color, width=2),
-            fillcolor=color, opacity=0.5,
+            x0=x - shape_size / 2, 
+            y0=y - shape_size / 2, 
+            x1=x + shape_size / 2, 
+            y1=y + shape_size / 2,
+            line=dict(color=shape_color, width=2),
+            fillcolor=shape_color, opacity=0.5,
         )
         fig.add_annotation(
-            x=x, y=y, text=item_id,
-            font=dict(color="white", size=8),
+            x=x, y=y-text_delta_y, text=item_id,
+            font=dict(color=text_color, size=text_size),
             showarrow=False,
         )
 
-
 def _draw_agents(model, fig):
     for agent in model.humans.values():
-        text = f"👷({agent.carrying})" if agent.carrying else "👷"
         fig.add_annotation(
-            x=agent.pos[0], y=agent.pos[1], text=text,
-            font=dict(size=20), showarrow=False,
+            x=agent.pos[0],
+            y=agent.pos[1],
+            text="👷",
+            font=dict(size=20),
+            showarrow=False,
         )
+        # if agent.carrying:
+        #     fig.add_annotation(
+        #         x=agent.pos[0],
+        #         y=agent.pos[1] - 20,
+        #         text=f"({agent.carrying})",
+        #         font=dict(size=12, color="green"),
+        #         showarrow=False,
+        #     )
+
     for agent in model.robots.values():
-        text = f"🤖({agent.carrying})" if agent.carrying else "🤖"
         fig.add_annotation(
-            x=agent.pos[0], y=agent.pos[1], text=text,
-            font=dict(size=20), showarrow=False,
+            x=agent.pos[0],
+            y=agent.pos[1],
+            text="🤖",
+            font=dict(size=20),
+            showarrow=False,
         )
+        # if agent.carrying:
+        #     fig.add_annotation(
+        #         x=agent.pos[0],
+        #         y=agent.pos[1] - 20,
+        #         text=f"({agent.carrying})",
+        #         font=dict(size=12, color="blue"),
+        #         showarrow=False,
+        #     )
 
 
 def _draw_paths(model, fig):
