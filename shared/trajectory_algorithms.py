@@ -29,19 +29,21 @@ WHAT'S IMPLEMENTED VS. PLACEHOLDER:
     arrival_point()            — implemented (T9): where a walk stops when the
                                   walker halts a given radius short of its target.
     stationary_segment()       — implemented, for non-movement actions.
-    discretized_time_sampling()— implemented, current default interference algorithm.
-    shift_violation_interval() — implemented (T3): the set of SHIFTS of one robot
-                                  segment that violate a separation against one
-                                  human segment, closed form. What realization
-                                  (shared/realization.py) is built on.
-    first_approach_step()      — implemented (T3): when a moving human segment
-                                  first comes within a separation of a fixed
-                                  point — the hold-position check.
+    discretized_time_sampling()— implemented; the batch interference sampler the
+                                  pre-T10 B3 used. No consumer in the run path
+                                  since T10 (TODO-83).
+    shift_violation_interval() — implemented (T3, rewritten F1 for robot-
+                                  responsible separation): the set of SHIFTS of
+                                  one robot segment that violate a separation
+                                  against one human segment, closed form. What
+                                  realization (shared/realization.py) is built on.
+    (first_approach_step()     — the hold-position check of T3; REMOVED at F1:
+                                  a standing robot never violates.)
     closest_point_of_approach()— NOT IMPLEMENTED. Documented analytic approach
-                                  below; swap-in replacement for
-                                  discretized_time_sampling(), same signature.
-                                  The role its closed form was reserved for is
-                                  taken by shift_violation_interval().
+                                  below; same signature as
+                                  discretized_time_sampling(). The role its
+                                  closed form was reserved for is taken by
+                                  shift_violation_interval().
     obstacle_aware_path()      — NOT IMPLEMENTED. DESIGN-13 / TODO-09's future
                                   non-linear path realization; swap-in
                                   replacement for straight_line_path(), and the
@@ -477,9 +479,10 @@ def closest_point_of_approach(
     segment_b: Segment,
 ) -> list:
     """
-    NOT IMPLEMENTED. Future analytic alternative to discretized_time_sampling()
-    — same signature, same List[ConflictPoint] return shape, drop-in
-    replacement via MetaPlanner's interference_algorithm constructor param.
+    NOT IMPLEMENTED. Analytic alternative to discretized_time_sampling() — same
+    signature, same List[ConflictPoint] return shape. (The MetaPlanner
+    interference_algorithm parameter it was once a drop-in for was removed at
+    T10; neither function is consumed in the run path — TODO-83.)
 
     Approach (documented, not yet coded): within the two segments' overlapping
     step-time window, each agent's position is a linear function of step
@@ -495,8 +498,8 @@ def closest_point_of_approach(
     Exact rather than sampled — no interval/resolution tradeoff — but has
     edge cases discretized_time_sampling() doesn't (near-zero relative
     velocity between the two agents makes the quadratic near-degenerate).
-    Left unimplemented deliberately: discretized_time_sampling() is the
-    working default until this is worth the edge-case care.
+    Left unimplemented deliberately: realization needs neither (it is built
+    on shift_violation_interval()); kept as the documented swap point only.
 
     ROLE UNDER REALIZATION (Phase 4C wait-decision revision; design_decisions.md,
     "The robot can wait"): this is what the closed form was reserved for. The

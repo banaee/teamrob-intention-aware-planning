@@ -293,8 +293,10 @@ def run_headless():
                       f"pos={np.round(robot.pos, 2)}")
             # Actual robot–human separation (T9): a measure only, so later tasks
             # can report how often and by how much execution falls below
-            # min_separation. Mesa has no execution-time avoidance (TODO-73);
-            # nothing here reacts to this number. `dist` samples the end-of-tick
+            # min_separation. Nothing here reacts to this number; Mesa's
+            # execution-time layer is the executor's separation stop (C, a run
+            # option, default off), which reads the human's actual position
+            # itself. `dist` samples the end-of-tick
             # positions; `min` (T10, TODO-79) is the continuous minimum over the
             # tick with both agents moving in a straight line from their
             # previous positions to these — the motion model realization
