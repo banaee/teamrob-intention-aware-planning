@@ -672,7 +672,7 @@ receives one interval (or none), so there is no list to bound. Closes when reali
 Files: shared/meta_planner.py (_detect_interference), shared/trajectory_algorithms.py, shared/projection.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
-**TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders** — RESTATED (wait-decision revision, Sept 2026): `min_safe_distance` becomes `min_separation`, the clearance realization must ACHIEVE — ✅ DECIDED (R1, Sept 2026): `min_separation` = 2.5 × the robot's motion per tick
+**TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders** — RESTATED (wait-decision revision, Sept 2026): `min_safe_distance` becomes `min_separation`, the clearance realization must ACHIEVE — ✅ DECIDED (R1, Sept 2026): `min_separation` = 2.5 × the robot's motion per tick — ✅ LANDED in B2 (T4) and B3 (T10); `min_safe_distance` removed
 DECIDED (R1, September 2026, on T1b's data): `min_separation` = 2.5 × the robot's motion per tick,
 i.e. 50 cm on the current layouts (20 cm/tick), EXPRESSED RELATIVE TO MOTION so that it scales with
 the body rather than as an absolute in `shared/`. T1b (`analysis/t1b_realization/REPORT.md`, Finding
@@ -685,6 +685,11 @@ and real body sizes (ROS). LANDED in code in T4, for B2 only: `MetaPlanner(min_s
 × `Projector.assumed_speed` (the body-supplied motion per tick), passed to `realize()` by `b2a`. B3
 adopts it in T10; until then B3 keeps `min_safe_distance = 1.0` (ruling on the T4 report). The
 `assumed_speed` half was resolved by T2 (below).
+✅ LANDED FOR B3 (T10, September 2026): `min_safe_distance` and the `interference_algorithm` parameter
+are removed from `MetaPlanner`; B3 hands `realize()` the same `min_separation` (2.5 × `assumed_speed`,
+50 cm) B2 uses, and there is no exclusion threshold anywhere in selection. The run header names the
+value (`[run] ... min_separation=50.00 (min_separation_in_motion_ticks=2.5 x assumed_speed=20)`,
+TODO-78). What remains open is the VALUE under randomised layouts (TODO-47 (b)) and real body sizes.
 The parameter is no longer an exclusion threshold ("a ConflictPoint below it makes a candidate
 infeasible") but the separation realization must achieve by holding: `earliest_violation` is
 asked for the first time the two agents come within `min_separation`, and the robot holds until
@@ -771,7 +776,7 @@ Re-testing needs a seed item that is NOT in the robot's candidate pool. Until th
 Files: domains/kitting/tasks.py, mesa_sim/sim_model.py, domains/kitting/scenarios.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
-**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable`
+**TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable` — ✅ BUILT (T10): the `RuntimeError` is gone; one event measured
 DECIDED (R1, September 2026, with TODO-52): when NO candidate realizes, `update()` selects by plain
 projected cost — the argmin over the pool with no hold, exactly the path taken when there is no human
 projection — and logs the trigger as `all_unrealizable`. The `RuntimeError` is superseded and is
@@ -782,6 +787,20 @@ layer's. Of the three readings below this is (2) without a "least-bad" ranking (
 candidate has no realized cost to rank on), and it records the event so that (3)'s question can be
 asked of the logs. T1b: the condition is absent below 50 cm and occurs once at 50–100 cm (s30_on 21,
 the mirror crossing) on the fixtures; from 150 cm it is the majority case.
+✅ BUILT (T10, September 2026): `_replan_tasks` takes the argmin of `RealizedPlan.cost` over the
+realizable candidates; when none realizes it takes the argmin of `RealizedPlan.projected_duration`
+(the same fractional T_r, never `total_estimated_cost`), returns `hold=0`, and logs
+`[meta-b3] ... selection=all_unrealizable`. The `RuntimeError` is gone. MEASURED (s00/s10/s20/s30 ×
+prior off/on, `realized`, gate `none` and `b2a`): ONE event, s30_on step 21 (`theta_crossed`, the
+mirror crossing: item_4 and item_2 both `hold_position_violated`, T_h 53.68) — the fallback keeps
+item_4 (T_r 53.68 vs 65.45), where the L2 baseline's `min_safe_distance` exclusion had switched to
+item_2. The residual conflict is real and measured: actual separation 36.6 / 11.0 / 14.6 cm at ticks
+21–23 (continuous minimum 0.00 at tick 23, the agents pass through each other), all INSIDE that
+decision's assessed window — exactly the case the execution-time-avoidance assumption (TODO-73) leaves
+to a layer Mesa does not have. Note also the PARTIAL case, which is not this item: when SOME candidate
+realizes, an unrealizable candidate cannot win however short it is (s20_on 57: item_4 at T_r 3.95
+`hold_position_violated` loses to item_6 at 84.65; see design_decisions.md, "B3 selects on realized
+cost", the finding recorded there).
 Under realization a candidate is infeasible only when NO start time within the human's projected
 horizon clears `min_separation` — rarer than the current "a ConflictPoint below the threshold",
 and meaningful (e.g. a human standing at the kitting table for longer than the horizon blocks
@@ -892,7 +911,7 @@ Files: shared/meta_planner.py, shared/io_contracts.md
 Reference: Phase 4C meta_planner build session, September 2026
 
 
-**TODO-36 — `MetaPlanner` block restructuring (B1/B2/B3) not yet implemented** — B2 `b2a` ✅ BUILT (T4); B3 with realized cost is T10
+**TODO-36 — `MetaPlanner` block restructuring (B1/B2/B3) not yet implemented** — B2 `b2a` ✅ BUILT (T4); B3 with realized cost ✅ BUILT (T10); B2 vs none identical on the fixtures at ρ = 0.5
 `update()` currently runs one flat pipeline: assemble candidates → project each → detect
 interference → filter infeasible → cost → argmin. A block decomposition was designed
 (September 2026) but not built:
@@ -976,8 +995,19 @@ change `b2a`. What the gate changes on these fixtures is that holds are now exec
 `analysis/t4_b2a/` (`stages.sh`, `cf_b3.py`, `compare.py`). Repeated prior-off
 `theta_crossed` (s00_off 109/113/115, s10_off 29/33/35, s20_off 20/24/30 and 87/91/95) all ended
 in a continue, as expected above (D2).
-Files: shared/meta_planner.py (`update`, `_is_current_task_plausible`)
-Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1; T4
+✅ B3 BUILT (T10, September 2026): `_replan_tasks` realizes every candidate and selects on
+`RealizedPlan.cost` = T_r + δ, carrying the winner's δ as `UpdateResult.hold`; the all-unrealizable
+fallback (TODO-30) replaces the `RuntimeError`; `cost_strategy` ("realized" | "plain") is the B3 switch
+for the T6 ablation, `gate_strategy` the B2 one; all four combinations run. MEASURED (T10;
+`analysis/t10_b3_realized/`; s00/s10/s20/s30 × prior off/on): the decision sequences of `realized`+`none`
+and `realized`+`b2a` are IDENTICAL in all eight conditions, and so are the regression greps and the
+holds — B2 continued exactly where B3 keeps the current task, and both escalations (s30_on 21
+all-unrealizable, s20_on 57 current task unrealizable) reach a B3 that decides as it would have
+without the gate. So at ρ = 0.5 on these fixtures `b2a` is a computation saving (one realization per
+trigger instead of one per candidate) and nothing else; the commitment role is still unexercised
+(T4's finding holds with the new B3). For T6.
+Files: shared/meta_planner.py (`update`, `_is_current_task_plausible`, `_replan_tasks`)
+Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1; T4; T10
 
 
 **TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places** ✅ RESOLVED (I3)
@@ -2108,7 +2138,7 @@ hold is measured against T_h and every arrival gap at the table is of the order 
 Files: mesa_sim/executor.py (`step`, `_is_action_complete`), shared/projection.py, mesa_sim/sim_agents.py
 Reference: T9 (`analysis/t9_arrival_radius/REPORT.md`, "The premise, measured")
 
-**TODO-78 — A run's log does not record the θ it was produced at** [from the θ single-source session]
+**TODO-78 — A run's log does not record the θ it was produced at** ✅ RESOLVED (T10): one `[run]` header line per robot
 Nothing in a headless log states the gate's value, so a log cannot be interpreted without knowing which
 code produced it. Five analysis scripts therefore hardcode 0.75 to read their own logs
 (`analysis/f1_foreseeable_fixture/measure.py`, `analysis/i3_phase_model/check_i3.py`,
@@ -2120,8 +2150,13 @@ and is absent from runs with no admitted trigger. Proper fix: one run-header lin
 log was produced under (θ at least; `min_separation` and ρ join it when T10 and T4 land). It CHANGES EVERY
 LOG, so it needs a baseline regeneration and does not belong in a behaviour-preserving change; do it when
 a task is regenerating baselines anyway. Until then the hardcoded literals stay, and are correct.
-Files: mesa_sim/run_mesa.py (logging setup), shared/meta_planner.py, analysis/*/ (readers)
-Reference: θ single-source session, September 2026
+✅ BUILT (T10, September 2026): one `[run] <robot> gate_strategy= cost_strategy= theta= rho=
+min_separation= (min_separation_in_motion_ticks= x assumed_speed=)` line per robot at construction
+(`mesa_sim/sim_agents.py`, from read-only `MetaPlanner` properties). Landed in its own commit, the
+rest of the log byte-identical; the T10 baselines carry it. The hardcoded literals in the older
+analysis scripts stay, correctly, as records of runs made before the header existed.
+Files: mesa_sim/sim_agents.py (the `[run]` line), shared/meta_planner.py (parameter properties), analysis/*/ (readers)
+Reference: θ single-source session, September 2026; T10
 
 **TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
@@ -2136,7 +2171,7 @@ PROXIMITY_THRESHOLD (30) sets the geometric slop β must tolerate (×0.85 at β 
 Files: shared/likelihood_functions.py (`BETA`), mesa_sim/world_state_builder.py (`PROXIMITY_THRESHOLD`)
 Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.3
 
-**TODO-79 — The `[sep]` execution measure samples whole ticks and misses minima between ticks** [T10 to decide; from T3]
+**TODO-79 — The `[sep]` execution measure samples whole ticks and misses minima between ticks** ✅ DECIDED (T10): `min=` alongside `dist=`, and sub-min_separation moments classified against the assessed window
 `[sep]` (T9; `mesa_sim/run_mesa.py`) logs the robot–human distance once per tick, at the tick's end
 positions. Between ticks both agents move up to 20 cm, so a close pass between two samples is read at
 the nearer sample, not at its minimum. L2 measured the case: scenario_30's head-on pass reads 11.0 cm
@@ -2149,8 +2184,21 @@ tick of motion per agent. TO DECIDE IN T10: whether the evaluation measures dist
 motion between consecutive tick positions (the minimum over the tick, closed form, the same geometry
 as `shift_violation_interval`) instead of at the tick positions only. Not a change to behaviour either
 way; it is the measure.
-Files: mesa_sim/run_mesa.py (`[sep]`), analysis (T10's evaluation)
-Reference: T3 session, September 2026; L2 report; T9 (`[sep]` introduced)
+✅ DECIDED AND BUILT (T10, September 2026): the `[sep]` line carries both — `dist=` (the tick-sampled
+figure, unchanged) and `min=`, the continuous minimum over the tick with both agents moving in a
+straight line from their previous positions to these, the closed-form clamped projection
+(`run_mesa._min_separation_over_tick`). A small change (one function, one field); the measure only.
+Evaluation (`analysis/t10_b3_realized/evaluate.py`) classifies every tick below `min_separation`
+against the assessed window of the decision in effect: inside (its motion lies in [1, T_h] on that
+decision's projection clock), edge (straddles the offset or T_h), outside (past T_h, no projection, or
+the robot finished). MEASURED on the T10 baselines: the continuous minimum lowers the crossing minima
+(s30 tick 23: 11.03 → 0.00, the pass-through L2 found; s20_off crossing: 11.64 at tick 51 → 9.02 over tick 52) and extends each
+episode by one tick at its end; it moves no tick from outside to inside. The only INSIDE sub-50 tick
+that is not a fallback's is s10 tick 75 at 49.15 cm (dist and min agree — the minimum is at the tick's
+end), TODO-77's step-quantisation residual; every other sub-50 moment is past T_h, under no projection,
+after the robot finished, or inside the s30_on all-unrealizable fallback's window (TODO-30).
+Files: mesa_sim/run_mesa.py (`[sep]`, `_min_separation_over_tick`), analysis/t10_b3_realized/evaluate.py
+Reference: T3 session, September 2026; L2 report; T9 (`[sep]` introduced); T10
 
 ---
 

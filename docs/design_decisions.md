@@ -1867,6 +1867,80 @@ Files: shared/realization.py, shared/types.py (`RealizedPlan`), shared/trajector
 analysis/t3_realize/
 Reference: T3 and T3b sessions, September 2026; R1; T1b (`whole`); L2 (the offset, step quantisation)
 
+**B3 selects on realized cost: the argmin of T_r + δ over the realizable candidates, the winner's hold executed, plain cost when nothing realizes (T10)**
+B3.A as decided at R1 is built (T10, September 2026). `_replan_tasks` projects each candidate alone
+from the live world at decision step 0 and realizes it — `realize(projection, human_projection,
+min_separation, 0)`, the same `min_separation` B2 `b2a` hands in (2.5 × the body's motion per tick) —
+and the winner is the argmin of `RealizedPlan.cost` = T_r + δ over the REALIZABLE candidates (ties by
+pool order, as before; TODO-42 untouched). The winner's δ goes out as `UpdateResult.hold`, whether the
+winner is the current task or another, and Mesa executes it as it executes B2's (T4). No human
+projection: every candidate realizes with δ = 0 at T_r, so B3 is an argmin over projected durations.
+ALL CANDIDATES UNREALIZABLE (R1, TODO-30 / TODO-52): the argmin of the plain cost — the same fractional
+T_r, `RealizedPlan.projected_duration`, never `ProjectedPlan.total_estimated_cost` (T3b) — with no
+hold, logged `[meta-b3] ... selection=all_unrealizable`; the `RuntimeError` is gone. REMOVED from
+selection: `_detect_interference()`, `_cost()`, `min_safe_distance`, the `interference_algorithm`
+constructor parameter and the sampler binding in `sim_agents.py` (all superseded at R1). `ConflictPoint`
+and `InterferenceAssessment` remain in `shared/types.py` as types only; `discretized_time_sampling`
+has no consumer in the run path. A `cost_strategy` run option ("realized", the default; "plain": the
+argmin of T_r alone, no human consideration, no hold, no filter) exists for comparison and the T6
+ablation; both use the same T_r, so their difference is realization's effect and nothing else. The run
+header (`[run]`, TODO-78) names `gate_strategy`, `cost_strategy`, θ, ρ and `min_separation`.
+
+MEASURED (T10; `analysis/t10_b3_realized/comparison.md`; s00/s10/s20/s30 × prior off/on, run to
+completion, PYTHONHASHSEED=0; `plain`+`none`, `realized`+`none`, `realized`+`b2a` with ρ = 0.5):
+- PLAIN against L2: identical in every condition but s30_on, where at step 21 the superseded
+  `min_safe_distance` exclusion no longer fires and item_4 stays selected (the L2 report predicted
+  this). Plain is therefore the old B3 minus the vestigial filter, on the fractional T_r.
+- REALIZED against PLAIN — realization's effect. s00 (both priors): identical; every δ is 0. s10, s20,
+  s30: the same TASK ORDER except s20_on (below), reached later: the holds B2 executed under T4's
+  `b2a` are now B3's, at the same triggers with the same δ (s10 29/33/35 → 6, 2, 0; s20_off 20/24/30
+  → 7, 3, 1; s20_on 6/30 → 7, 1; s30_off 28/46 → 6, 1), plus s30_on 40/77 → 7, 1, which T4 did not
+  have because its old B3 had switched to item_2 at 21. 12 holds, 43 ticks held, 2 interrupted
+  (s10_off 29→33 and s20_off 20→24, the remainder re-decided as at T4). Completion slips by the held
+  ticks: s10 +6, s20_off +8, s30 +7/+8. ONE all-unrealizable event, s30_on 21 (the mirror crossing,
+  both candidates `hold_position_violated`): the fallback keeps item_4 on plain cost, which is what
+  plain does too; its residual conflict is the 0.00 cm pass-through at tick 23, inside that window.
+- REALIZED, `none` against `b2a`: IDENTICAL decision sequences, greps and holds in all eight
+  conditions. B2 continued exactly where B3 keeps the current task, and both escalations reach a B3
+  that decides as it would have without the gate. On these fixtures at ρ = 0.5 `b2a` is a computation
+  saving (one realization per trigger instead of one per candidate) and nothing else (TODO-36).
+- s40 (regression sweep only, `realized`+`none`): byte-identical to L2 on every grep — no δ > 0.
+- ACTUAL SEPARATION (TODO-79, `dist` and the continuous `min`): every moment below 50 cm is past T_h,
+  under no projection, after the robot finished, or inside the s30_on fallback's window, EXCEPT s10
+  tick 75 at 49.15 cm (both priors, both realized configurations) — TODO-77's step-quantisation
+  residual, inside the step-35 decision's window by 0.29 tick. The continuous minimum lowers the
+  crossing minima (s30 tick 23: 11.03 → 0.00; s20_off crossing: 11.64 at tick 51 → 9.02 over tick 52) and extends episodes by
+  one tick; it moves nothing from outside to inside.
+
+FINDING, recorded for the design chat, not acted on: s20_on, step 57 (`theta_crossed`, the human's next
+task admitted). The robot is carrying item_4, 3.95 projected ticks from placing it. The human has just
+placed at the table and is walking away, and at the trigger stands 37.5 cm from the robot — already
+inside `min_separation`. item_4's plan converges on the departing human at δ = 0 and its hold position
+is violated at step 1, so it is UNREALIZABLE; item_6's plan (return item_4 to its shelf first, then
+fetch item_6 — six actions) walks away from the human and realizes at δ = 0, cost 84.65. B3 selects
+item_6. Under plain the robot had delivered item_4 at 54 (no holds earlier); under realized the
+step-6 and step-30 holds placed the robot's arrival exactly where the human departs. Consequence:
+completion 292 vs 228 ticks (+64), item_4 delivered third instead of first, and the human passed the
+robot anyway (56–57: 35.1 cm, past T_h). Mechanism: realizability is a HARD GATE inside B3 whenever
+some candidate realizes — the argmin ranges over realizable candidates only, so an unrealizable
+candidate cannot win however short its plan — and `hold_position_violated` fires here not on a
+projected conflict but on the PRESENT state (the human already within `min_separation` of where the
+robot stands), which no hold can change and which afflicts every candidate whose first step converges.
+This is the over-reaction the wait revision set out to remove, returning through the realizability
+flag: switching cost 64 ticks to avoid a 4-tick completion whose "conflict" was the human leaving.
+The design as decided says this is what B3 does (the all-unrealizable fallback covers only the case
+where NOTHING realizes), so it was built as decided and is reported here. Where it belongs: T6 (the
+ablation will show it as the largest realized-vs-plain difference) and D2 / the R1 follow-up — whether
+an unrealizable current task a few ticks from completion should compete on plain cost, whether a
+present-state violation is a realization question at all, or whether this is `min_separation`'s value
+(TODO-28) at the table. Nothing here was tuned.
+Files: shared/meta_planner.py (`_replan_tasks`, constructor, properties), shared/types.py
+(`UpdateResult.hold` doc), mesa_sim/sim_agents.py (`[run]`, MetaPlanner construction),
+mesa_sim/sim_model.py, mesa_sim/run_mesa.py (`--cost_strategy`, `[sep] min=`),
+configs/experiment.yaml, shared/io_contracts.md (§1.9, §2.2, §2.2b, §2.2c, §4.1, §6),
+analysis/t10_b3_realized/
+Reference: T10 session, September 2026; R1; T3b; T4 (`analysis/t4_b2a/comparison.md`)
+
 **A continue decision costs nothing: the executor adopts the re-decomposed plan without restarting (T5, TODO-43)**
 When `update()` returns the task the robot is already executing — a CONTINUE, decided by
 `task_instance_key()` equality between `UpdateResult.current_task` and `ExecutorState.current_task`, never by

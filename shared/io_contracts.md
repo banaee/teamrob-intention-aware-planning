@@ -32,6 +32,14 @@ consumes them yet: `MetaPlanner` still runs the old B3 path, and the sweep is by
 baselines. The remaining PLANNED paragraphs are T4's (`b2a`) and T10's (B3 on realized cost, the plain
 cost as `projected_duration`, `UpdateResult.hold`, the executor's hint).
 
+**Re-aligned after T4 and T10 (September 2026)** for §1.9, §2.2, §2.2b, §2.2c and §4.1: realization is
+CONSUMED. B2 `b2a` realizes the current task alone (T4); B3 realizes every candidate and selects on
+`RealizedPlan.cost` = T_r + δ, with the all-unrealizable fallback to the plain `projected_duration`
+(T10). `UpdateResult.hold` carries the decision's δ and Mesa executes it as STAND ticks. The old B3
+path — `_detect_interference()`, `_cost()`, `min_safe_distance`, the `interference_algorithm`
+parameter, the `RuntimeError` — is gone; `MetaPlanner` takes `cost_strategy` ("realized" | "plain").
+No PLANNED paragraph remains in these sections.
+
 ---
 
 ## 0. Notation (matches paper)
@@ -306,9 +314,10 @@ class TriggerDecision:
 class UpdateResult:
     current_task: Optional[TaskInstance]   # None = all tasks complete (see §2.2, Update)
     queue: List[TaskInstance]
-    # PLANNED (wait-decision revision, R1): the winner's hold δ, in ticks, at the robot's
-    # position at the trigger tick — see below. None / 0 when no hold was placed (no human
-    # projection, or the all_unrealizable fallback).
+    hold: int = 0                          # the decision's hold δ, WHOLE ticks, at the robot's position
+                                           # at the trigger tick (T4, T10) — see below. 0 when none was
+                                           # placed (no human projection, the all_unrealizable fallback,
+                                           # cost_strategy "plain", the terminal return).
 ```
 
 **A continue decision (T5, TODO-43).** `update()` returning a `current_task` whose
@@ -323,12 +332,13 @@ today; the contract does not promise it) and never a domain string. A continue i
 decision path: which task is selected is `update()`'s alone, and the embodiment gains no rule
 about when to re-plan. See design_decisions.md, "A continue decision costs nothing".
 
-**The hold — PLANNED, not yet in the dataclass** (Phase 4C wait-decision revision, September
-2026; amended at R1; design_decisions.md, "The robot can wait"). `update()` will return, with the
-winning task, the HOLD its realization placed: ONE δ (ticks), taken at the robot's position at the
-trigger tick — which may be partway along a walk — after which the plan runs unchanged (the
-whole-trajectory minimal shift, TODO-70). There is no per-segment hold. Semantics across the
-boundary:
+**The hold** (Phase 4C wait-decision revision, September 2026; amended at R1; BUILT T4 for B2, T10
+for B3; design_decisions.md, "The robot can wait"). `update()` returns, with the winning task, the
+HOLD its realization placed: ONE δ (whole ticks), taken at the robot's position at the trigger tick —
+which may be partway along a walk — after which the plan runs unchanged (the whole-trajectory
+minimal shift, TODO-70). There is no per-segment hold. It is B2's realization of the current task on
+a `b2a` continue, or the winner's realization in B3, whether the winner is the current task or
+another. Semantics across the boundary:
 
 - It is an execution HINT, in the sense of design_decisions.md's first key decision: a preplan
   that saves the executor solving avoidance from scratch. The human may deviate within a few
@@ -351,16 +361,15 @@ boundary:
   clear nor blocked — and is the execution layer's (design_decisions.md, "Assumption: execution-time
   avoidance past T_h").
 
-**`ConflictPoint`** / **`InterferenceAssessment`** — interference-detection output.
-`_detect_interference()` observes; `_cost()` values. The separation is deliberate
-(DESIGN-08): conflicts are computed and carried but not currently priced.
-SUPERSEDED IN DESIGN (wait-decision revision): both types describe the batch profile
-realization replaces. Under realization a conflict is priced by construction — as the duration
-of the hold that avoids it — and the observe / value split survives inside realization
-(`shift_violation_interval` observes; holding values). The types stay until T10 lands realization
-in B3; `RealizedPlan` (§1.11, built at T3) replaces `InterferenceAssessment` on the meta-planner side
-there. `realize()` takes the projected segments of whatever ordering it is given — it does not assume
-a single task.
+**`ConflictPoint`** / **`InterferenceAssessment`** — the output of the batch interference profile
+that realization REPLACED (T10). `ConflictPoint` is still what
+`trajectory_algorithms.discretized_time_sampling()` returns; `InterferenceAssessment` is no longer
+produced by anything — `_detect_interference()` and `_cost()` are gone, and `RealizedPlan` (§1.11)
+is what the meta-planner consumes. Under realization a conflict is priced by construction — as the
+duration of the hold that avoids it — and the observe / value split survives inside realization
+(`shift_violation_interval` observes; holding values). `realize()` takes the projected segments of
+whatever ordering it is given — it does not assume a single task. Both types are kept in
+`shared/types.py` for history only.
 
 ```python
 @dataclass
@@ -534,13 +543,15 @@ Verified against `shared/meta_planner.py` and validated end-to-end against `scen
 (September 2026). The `full_reorder` strategy is **not** implemented — `update()` and
 `_project()` both raise `NotImplementedError` for it (DESIGN-16).
 
-Private methods (`_is_current_task_plausible`, `_replan_tasks`, `_is_complete`,
-`_detect_interference`, `_cost`) are internal to the class and deliberately not part of this
-contract; only the constructor and the public methods below are cross-boundary surface.
+Private methods (`_is_current_task_plausible`, `_replan_tasks`, `_is_complete`, `_clears_gate`)
+are internal to the class and deliberately not part of this contract; only the constructor, the
+public methods below and the read-only parameter properties (`theta`, `rho`, `min_separation`,
+`gate_strategy`, `cost_strategy`; for the run-log header, TODO-78) are cross-boundary surface.
 Projection (`project`, `build_segments`, `estimate_duration`) lives on `Projector`
-(`shared/projection.py`), which is injected. Realization (`realize()`, §2.2c, built at T3 and
-not yet called from here) lives on the projection / trajectory side as well, not on
-`MetaPlanner`, which supplies `min_separation` and consumes the `RealizedPlan` (T4, T10).
+(`shared/projection.py`), which is injected. Realization (`realize()`, §2.2c) lives on the
+projection / trajectory side as well, not on `MetaPlanner`, which supplies `min_separation` and
+consumes the `RealizedPlan` — once per candidate in B3 (T10) and once for the current task in B2
+`b2a` (T4).
 
 #### Constructor
 
@@ -550,18 +561,20 @@ MetaPlanner(
     projector: Projector,
     recognizer: IntentionRecognizer,
     theta: float = DEFAULT_THETA,        # 0.75, module-level in shared/meta_planner.py
-    min_safe_distance: float = 1.0,
     strategy: Literal["single_task", "full_reorder"] = "single_task",
     gate_strategy: Literal["none", "b2a", "b2b"] = "none",
-    interference_algorithm: Callable[[Segment, Segment], List[ConflictPoint]] = discretized_time_sampling,
+    cost_strategy: Literal["realized", "plain"] = "realized",
     human_agent_id: Optional[str] = None,
+    min_separation_in_motion_ticks: float = 2.5,
+    rho: float = 0.5,
 )
 ```
 
 **Correction (September 2026):** `assumed_speed` and `default_action_cost` are `Projector`
 constructor parameters, not `MetaPlanner`'s; `projector` is injected (one instance, held by
-the agent); `gate_strategy` selects B2 — `"none"` (default) skips the gate entirely,
-`"b2a"`/`"b2b"` raise `NotImplementedError` (TODO-36).
+the agent); `gate_strategy` selects B2 — `"none"` (default) skips the gate entirely, `"b2a"` is
+built (T4), `"b2b"` raises `NotImplementedError` (a documented stub). `cost_strategy` selects what
+B3 selects on (T10; below). `min_safe_distance` and `interference_algorithm` were removed at T10.
 
 Owns the task queue internally (Q1) — not passed in on each call. `theta` is a cognitive-
 clock policy parameter (DESIGN-07), kept as an explicit constructor default rather than
@@ -580,21 +593,30 @@ here — `get_hypothesis()` is a static lookup built once at recognizer construc
 stateless with respect to belief, so holding this reference carries no staleness risk. It
 also avoids constructor bloat (`context`, `hypotheses`) and a redundant unused `_history`.
 
-`strategy` and `interference_algorithm` are swap points (DESIGN-16, DESIGN-10).
-`human_agent_id=None` means no human projection is built and every candidate is treated as
-feasible — mirroring `RobotAgent.observed_agent_id`'s existing optionality.
+`strategy`, `gate_strategy` and `cost_strategy` are independent switches; every combination is
+meant to be runnable (DESIGN-16; TODO-36; the T6 ablation). `human_agent_id=None` means no human
+projection is built and every candidate realizes with δ = 0 at its plain projected duration —
+mirroring `RobotAgent.observed_agent_id`'s existing optionality.
 
-`min_safe_distance` here, and `assumed_speed` / `default_action_cost` on `Projector`, are
-**uncalibrated placeholders**, not tuned values (TODO-28). RESTATED by the wait-decision
-revision: the parameter becomes `min_separation`, the clearance realization must ACHIEVE by
-holding, passed into `realize()` — no longer a threshold below which a candidate is excluded.
-DECIDED (R1): `min_separation` = 2.5 × the robot's motion per tick (50 cm in Mesa), expressed
-relative to motion so that it scales with the body; the constructor keeps the old name and value
-until T10 lands it (the exact parameter form — a multiple of the `Projector`'s rate, or a
-world-unit value the body derives — is T10's). Also PLANNED (T4): `gate_strategy="b2a"` takes a
-policy parameter ρ (default 0.5): B2 continues the current task when its hold δ ≤ ρ × (T_h −
+**`min_separation`** (TODO-28; R1; landed T4 for B2, T10 for B3): the clearance realization must
+ACHIEVE by holding, passed into `realize()` — not a threshold below which a candidate is excluded.
+The policy value is the unit-less ratio `min_separation_in_motion_ticks` (2.5); the world-unit
+`min_separation` handed to `realize()` is it × the `Projector`'s body-supplied `assumed_speed`
+(50 cm in Mesa at 20 cm/tick), so `shared/` holds no absolute distance. One value, used by B2 and B3
+alike; readable as `MetaPlanner.min_separation`.
+
+**ρ** (`rho`, T4): `gate_strategy="b2a"` continues the current task when its hold δ ≤ ρ × (T_h −
 trigger), the human's remaining projected duration; otherwise, or if the current task is
-unrealizable, B3 runs. `human_projection is None` still means continue.
+unrealizable, B3 runs. `human_projection is None` still means continue. 0.5 is a stated assumption
+(T6 varies it), not a calibrated value.
+
+**`cost_strategy`** (T10): `"realized"` (default) — B3 realizes every candidate and takes the argmin
+of `RealizedPlan.cost` = T_r + δ over the realizable ones, carrying the winner's δ as the hold; when
+none realizes, the argmin of the plain `projected_duration` with no hold, logged `all_unrealizable`.
+`"plain"` — the argmin of `projected_duration` alone, no human consideration, no hold, no filter; a
+comparison condition for the T6 ablation, not a policy. Both use the same T_r (the fractional
+segment span, never `ProjectedPlan.total_estimated_cost`), so their difference is realization's
+effect alone.
 
 `Projector` (T9) additionally takes the body's **stopping distance** (`arrival_radius`), supplied
 exactly as `assumed_speed` is: Mesa passes the same constant that makes its `at(agent, object)`
@@ -620,7 +642,7 @@ Event-driven only. Exactly three conditions (DESIGN-07, resolved):
 - `task_committed` — `executor_state.holding` transitions `None → not-None`.
 
 θ=0.75, single threshold, no hysteresis. Confidence is a gate here, never a magnitude fed
-into `_cost()`. `MetaPlanner` owns `_prev_belief`/`_prev_executor_state` internally — unlike
+into a cost. `MetaPlanner` owns `_prev_belief`/`_prev_executor_state` internally — unlike
 the retired `should_replan()`, these are not parameters.
 
 #### Update
@@ -658,13 +680,20 @@ obligation (§4.1), not a change to selection.
 
 **Blocks.** 0: pool assembly (above); terminal return if empty. B1.5: no current task → straight
 to B3. B2: `_is_current_task_plausible()`, the mid-task plausibility gate — `gate_strategy`
-`"none"` (default) never continues; `"b2a"` / `"b2b"` raise `NotImplementedError` (TODO-36).
-B3: `_replan_tasks()`, selection. PLANNED (wait-decision revision, decided at R1): both B2 and
-B3 consume realization — B2 (`b2a`, T4) realizes the current task alone and continues when its
-hold δ ≤ ρ × (T_h − trigger), a COMMITMENT gate that can only prevent a switch B3 would make; B3
-(T10) realizes every candidate and takes the argmin of realized cost T_r + δ. When
-`human_projection` is `None` realization is not called and the cost is the plain projected
-duration, exactly as today.
+`"none"` (default) never continues; `"b2a"` (T4) realizes the current task alone (decision step 0,
+`min_separation`) and continues with its hold δ when δ ≤ ρ × (T_h − 0), a COMMITMENT gate that can
+only prevent a switch B3 would make; it escalates when δ is above the bound or the task is
+unrealizable; `human_projection is None` → continue, hold 0. One `[meta-b2]` line per call. `"b2b"`
+raises `NotImplementedError`. B3: `_replan_tasks()` (T10) — every candidate projected alone from the
+live world at decision step 0 and realized against `human_projection`; the argmin of
+`RealizedPlan.cost` over the realizable candidates wins (ties: pool order, `min()` keeps the first),
+its δ goes out as `UpdateResult.hold`; the rest form the queue. No candidate realizable → the argmin
+of `projected_duration`, hold 0, selection `all_unrealizable`. When `human_projection` is `None`
+`realize()` reports `no_human_projection` for every candidate (δ = 0, cost = T_r), so B3 is an argmin
+over projected durations. One `[meta-cand]` line per candidate (`realizable`, `reason`, `T_r`,
+`delta`, `cost`, `share`) and one `[meta-b3]` line per call (`trigger`, `cost_strategy`, `selection`
+∈ `realized` | `no_projection` | `all_unrealizable` | `plain`, `winner`, `cost`, `hold`, `T_h`,
+`candidates`, `realizable`).
 
 **Strategy (DESIGN-16).** "Candidate" means the unit the argmin ranges over — an individual
 task under `single_task`, a permuted ordering under `full_reorder` (design_decisions.md,
@@ -672,18 +701,19 @@ DESIGN-16, terminology). `self._strategy` controls only how much of the queue on
 call rewrites:
 
 - `single_task` (default, implemented) — each candidate is projected alone from the live
-  `WorldState`, infeasible ones dropped, argmin becomes the new `current_task`. The rest of
-  the queue carries no ordering commitment; it is re-decided at the next trigger.
+  `WorldState` and realized; the argmin of realized cost over the realizable candidates becomes
+  the new `current_task`. The rest of the queue carries no ordering commitment; it is re-decided
+  at the next trigger.
 - `full_reorder` (not implemented) — would score permutations of the candidate set and
   replace the whole queue. Blocked on cross-task `WorldState` propagation (TODO-07).
 
 The human's projection is built once per fired trigger by `update_human_projection()` (below)
 and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.
-`human_projection=None` means no interference check runs that call and every candidate is
-treated as feasible — `_replan_tasks()` substitutes `InterferenceAssessment(feasible=True,
-conflicts=[])`. It is never treated as always-conflicting. `None` is a ROUTINE mid-run state,
-not an edge case: the belief re-initialises at every human task boundary (I4c), so most
-`no_current_task` triggers and every trigger between the human's tasks run without a projection.
+`human_projection=None` means every candidate is realized against no human plan — δ = 0, cost =
+T_r (`reason="no_human_projection"`). It is never treated as always-conflicting. `None` is a
+ROUTINE mid-run state, not an edge case: the belief re-initialises at every human task boundary
+(I4c), so most `no_current_task` triggers and every trigger between the human's tasks run without
+a projection.
 
 **Terminal state:** `update()` returns `UpdateResult(current_task=None, queue=[])` when no
 candidates remain — all assigned tasks are complete. Callers check
@@ -691,14 +721,12 @@ candidates remain — all assigned tasks are complete. Callers check
 done" is a fact `shared/` discovers about its own state, so it is returned through the
 contract rather than raised for the embodiment layer to catch and reinterpret.
 
-`update()` does still raise `RuntimeError` when candidates exist but **every** one is
-excluded as infeasible — a genuine anomaly, deliberately distinguishable from exhaustion.
-SUPERSEDED IN DESIGN (wait-decision revision): under realization "every candidate infeasible"
-means no candidate has a shift within the human's horizon that clears `min_separation` — a
-situation, not an anomaly. DECIDED (R1, TODO-30): `update()` then selects by PLAIN PROJECTED
-COST (the argmin with no hold, the same path as when there is no human projection), returns no
-hold, and logs the trigger as `all_unrealizable`. Nothing is raised. The raise stays in the code
-until T10 lands realization in B3.
+**All candidates unrealizable** (R1, TODO-30; built T10): no candidate has a shift within the
+human's horizon that clears `min_separation` — a situation, not an anomaly. `update()` then
+selects by PLAIN PROJECTED COST (the argmin of `projected_duration`, no hold, the same quantity
+as when there is no human projection), returns `hold=0`, and logs the decision as
+`all_unrealizable`. Nothing is raised; the former `RuntimeError` is gone. The residual conflict is
+the execution layer's (design_decisions.md, "Assumption: execution-time avoidance past T_h").
 
 #### Update Human Projection
 ```python
@@ -742,9 +770,9 @@ embodiment layer at agent construction (see TODO-35 on its placement).
 ### 2.2b `trajectory_algorithms` (`shared/trajectory_algorithms.py`)
 
 Pure free functions operating on `Segment` / `ConflictPoint` — no classes, no state, no
-simulator imports. Two families, each a deliberate swap point rather than fixed logic.
-`MetaPlanner` selects the interference algorithm via its `interference_algorithm`
-constructor parameter, so replacing one never requires editing `_detect_interference()`.
+simulator imports. Two families, each a deliberate swap point rather than fixed logic. Since T10
+`MetaPlanner` selects no interference algorithm: realization's closed-form geometry (below) is the
+one consumed in the run path, and `discretized_time_sampling()` is unconsumed there.
 
 **Path realization** — how one action's motion is computed:
 ```python
@@ -768,9 +796,9 @@ speed read off the Segment itself, so resolution is fixed in world units whateve
 embodiment's step size — projection steps are execution ticks (T2, September 2026).
 `max_spatial_step` is keyword-only with **no default**: it is a world-unit quantity and
 therefore a body-side fact; the embodiment layer binds it from its own config
-(`functools.partial`, see `mesa_sim/sim_agents.py` and `mesa_configs.yaml:
-simulation.interference_spatial_resolution`) and passes the bound callable as
-`MetaPlanner(interference_algorithm=...)`. Unbound, the first check raises `TypeError`;
+(`functools.partial`; `mesa_configs.yaml: simulation.interference_spatial_resolution` is still
+read by `mesa_sim/action_decomposer.py` but no longer passed anywhere since T10 removed
+`MetaPlanner(interference_algorithm=...)`). Unbound, the first check raises `TypeError`;
 `closest_point_of_approach()` (CPA) is documented with its analytic approach but unbuilt —
 exact rather than sampled, no interval tradeoff, but with real edge cases (clamping the
 analytic minimum to the overlap window, near-zero relative velocity).
@@ -798,21 +826,22 @@ both are floating-point slack (1e-9 relative), not a margin. `closest_point_of_a
 unbuilt drop-in for `discretized_time_sampling()`; `obstacle_aware_path()` becomes the detour
 strategy of realization (Phase 4D).
 
-These functions **measure only and hold no policy**. The single policy decision — what
-distance counts as unsafe — lives in `MetaPlanner._detect_interference()` as
-`min_safe_distance`. RESTATED (wait-decision revision): the single policy value is
+These functions **measure only and hold no policy**. The single policy value is
 `min_separation`, the clearance realization must achieve; `MetaPlanner` supplies it and
-realization is GIVEN it, so no policy enters the geometry.
+realization is GIVEN it, so no policy enters the geometry (the former `min_safe_distance`
+threshold in `MetaPlanner._detect_interference()` is gone, T10).
 
 ---
 
-### 2.2c `realize()` (`shared/realization.py`) — BUILT (T3), not yet consumed
+### 2.2c `realize()` (`shared/realization.py`) — BUILT (T3), consumed by B2 (T4) and B3 (T10)
 
 The realization service (design_decisions.md, "The robot can wait"; the R1 decisions). Sits
 between `trajectory_algorithms.py` and `projection.py` in the one-way layering: it reads
 `ProjectedPlan`s and `Segment`s only, knows nothing of tasks, beliefs or selection, imports no
-simulator, and holds no policy — `min_separation` is passed in. `MetaPlanner` will call it once per
-candidate (B3, T10) and once for the current task (B2 `b2a`, T4).
+simulator, and holds no policy — `min_separation` is passed in. `MetaPlanner` calls it once per
+candidate in B3 (T10; under `cost_strategy="plain"` with `human_plan=None`, so the plain cost is the
+same `projected_duration`) and once for the current task in B2 `b2a` (T4), always at decision step
+0.0, the trigger.
 
 ```python
 realize(
@@ -1006,16 +1035,25 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
   moves to the action in flight if the fresh plan contains it (GroundedAction equality) and the
   microaction queue is kept; otherwise the plan loads from its start. The tick is spent exactly
   as it would have been with no trigger — never lost, never a restart (T5, TODO-43)
-- PLANNED (TODO-71, R1): executes the hold δ `UpdateResult` carries as STAND microactions at
-  the robot's position at the trigger tick, then continues the plan — unless a later trigger
-  re-decides; may refine the hold against what the world shows, never decides independently
-  whether to wait or drops it silently (§1.9, the hold)
+- Executes the hold δ `UpdateResult` carries (T4, TODO-71) as one STAND microaction per tick at
+  the robot's position, starting on the decision tick, before the plan continues
+  (`Executor.hold()`, called on every non-terminal decision after the plan is adopted). A later
+  decision REPLACES the hold in progress with its own δ (0 when it carries none); the ticks not yet
+  run are logged as interrupted. Mesa does not refine a hold; it never decides independently
+  whether to wait and drops none silently (§1.9, the hold). Logs `[hold] ... start planned= trigger=
+  pos=` and `[hold] ... end planned= executed= interrupted=`
+- Logs one `[run]` header line per robot at construction naming the policy values the run was
+  produced under: `gate_strategy`, `cost_strategy`, θ, ρ, `min_separation` and its ratio × rate
+  (TODO-78); a run option (`--gate_strategy`, `--cost_strategy`, `configs/experiment.yaml`) is a
+  run fact, never a scenario fact
 - Supplies the `Projector` its motion rate (`step_size`, T2) AND its stopping distance (T9): the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
   executor stops, for robot and human projections alike
 - Logs the actual robot–human distance once per tick (`[sep]` lines, headless run; T9) so that
   actual separation below `min_separation` can be reported — Mesa has no execution-time
-  avoidance (TODO-73); the measure is a measure, not a behaviour
+  avoidance (TODO-73); the measure is a measure, not a behaviour. `dist=` samples the end-of-tick
+  positions; `min=` (T10, TODO-79) is the continuous minimum over the tick with both agents moving
+  in a straight line between their consecutive positions, the motion model realization assumes
 
 ### 4.2 ROS (`ros_sim/`)
 
@@ -1057,10 +1095,11 @@ Simulators MUST ensure:
 10. A task's `MethodSchema` set covers every world state that task can start *or resume*
     from — plans are re-decomposed from scratch at every trigger, never resumed from a
     cursor (see design_decisions.md)
-11. PLANNED (wait-decision revision): the hold δ returned by `update()` is executed, at the
-    trigger position. The embodiment may refine it; it must not run a parallel heuristic that
-    decides whether to wait or which task to run, and must not drop the hold silently (§1.9,
-    the hold; the single-decision-path NOTE in TODOS_AND_DEFERRED.md)
+11. The hold δ returned by `update()` (`UpdateResult.hold`, T4/T10) is executed, at the robot's
+    position on the decision tick, before the plan continues; every decision replaces the hold in
+    progress. The embodiment may refine it; it must not run a parallel heuristic that decides
+    whether to wait or which task to run, and must not drop the hold silently (§1.9, the hold; the
+    single-decision-path NOTE in TODOS_AND_DEFERRED.md)
 12. The stopping distance the embodiment supplies to the `Projector` is the distance at which
     its own `at(agent, object)` predicate holds — one constant, one source (T9), as the motion
     rate it supplies is the one its executor moves at (T2)
