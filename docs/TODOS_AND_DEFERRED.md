@@ -2259,8 +2259,11 @@ WHAT REMAINS, deliberately uncompensated:
     (s30_off) ticks ahead of the placing projection, and `b2a` re-realized δ = 1 (s20_off 30, s20_on
     30, s30_off 46). Deterministic, robot-only, not quantisation. The minimal whole-tick hold has no
     margin, so CLEARANCE CURRENTLY DEPENDS ON THAT RE-DECISION: without the grasp trigger's re-plan
-    the robot would execute a plan that no longer clears. Its fix belongs with D2 (what a trigger is
-    an event of; TODO-68 / 48 / 54 / 64 / 65), not with the projection.
+    the robot would execute a plan that no longer clears. ROUTED BY D2 (September 2026): not a trigger
+    question after all — D2 kept this item out of the trigger set deliberately, as a projector
+    accounting item (design_decisions.md, "What a trigger is an event of"). `task_committed` is
+    unchanged by D2, so the dependency above stands as measured; the fix, if one is made, is on the
+    projection side (charge no latency execution does not spend), not a trigger.
 VERIFIED: a discrete-step forward model of the executor, using no execution data, predicts the actual
 release tick exactly for all 68 human and robot 2-action rows and exactly one tick early for all 35
 robot 4-action rows — so the residual is fully attributed, with nothing unexplained.
