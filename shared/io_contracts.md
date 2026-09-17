@@ -600,8 +600,8 @@ from IR confidence-gating. Its single definition is `shared.meta_planner.DEFAULT
 (September 2026; a second, unread copy in `recognizer.py` was deleted — the gate is the
 meta-planner's decision, not a likelihood parameter). No call site passes `theta`, so the
 default governs every run. θ is applied in exactly one private method,
-`_clears_gate(belief) -> bool`, which both `evaluate_triggers()` (as a crossing) and
-`update_human_projection()` (as admission) ask; it is deliberately one method so that a
+`_clears_gate(belief) -> bool`, which both `evaluate_triggers()` (on the entering side of
+`recognition_changed`, D2) and `update_human_projection()` (as admission) ask; it is deliberately one method so that a
 derived θ (TODO-64) or a margin gate (TODO-65) would change how the bar is computed without
 changing where it is asked. See design_decisions.md, "θ has one home".
 
@@ -658,18 +658,34 @@ evaluate_triggers(
     executor_state: ExecutorState,
 ) -> TriggerDecision
 ```
-Event-driven only. Exactly three conditions (DESIGN-07, resolved):
+Event-driven only. Exactly three conditions (DESIGN-07, resolved; the second replaced in D2):
 
 - `no_current_task` — `executor_state.current_task is None`. Covers **both** t=0 and ordinary
   task completion in one condition; there is no separate initialization path. This assumes the
   embodiment layer clears `current_task` when a task's plan finishes.
-- `theta_crossed` — confidence crosses θ from below to at-or-above (`prev < θ ≤ current`).
-  A *crossing event*, not `confidence >= θ` per tick, which would refire continuously.
+- `recognition_changed` (D2) — the belief no longer points at the hypothesis the last decision was
+  projected against. One condition read from two sides, against the **decision record**
+  (`MetaPlanner._projected_hypothesis`: `belief.most_likely` on the tick `update_human_projection()`
+  built a projection; `None` when admission refused or before any trigger fired):
+  - a hypothesis is recorded and `belief.most_likely` is no longer it — replaced by another
+    (TODO-48), the human's task ended and the belief re-initialised (the `[IR-boundary]` tick), or
+    `unknown` took over after a pin (TODO-54). Admission then decides what, if anything, is
+    projected next;
+  - none is recorded and the belief clears `_clears_gate()` on a task hypothesis (not `unknown`,
+    which admission refuses). The first recognition of a task, as `theta_crossed` fired it.
+
+  The gate is asked at admission, never for retention: a recorded hypothesis that dips below θ while
+  staying most likely fires nothing (TODO-68's repeated crossings) and keeps its projection until it
+  is replaced, ends, or the human stops — an accepted consequence, recorded in the D2 entry; a margin
+  or a duration on the dip would be a second threshold. Supersedes `theta_crossed` (the crossing
+  `prev < θ ≤ current`, which fired on every re-crossing and never on a change of hypothesis).
 - `task_committed` — `executor_state.holding` transitions `None → not-None`.
 
 θ=0.75, single threshold, no hysteresis. Confidence is a gate here, never a magnitude fed
-into a cost. `MetaPlanner` owns `_prev_belief`/`_prev_executor_state` internally — unlike
-the retired `should_replan()`, these are not parameters.
+into a cost. `MetaPlanner` owns `_prev_executor_state` and the decision record internally —
+unlike the retired `should_replan()`, these are not parameters. When two conditions hold on one
+tick the order is `no_current_task`, `recognition_changed`, `task_committed`; only the reported
+reason and score differ.
 
 #### Update
 ```python

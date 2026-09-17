@@ -257,12 +257,19 @@ class MetaPlanner:
         # for projection stays inside Projector; this never plans.
         self._planner = AdaptivePlanner(knowledge=knowledge)
         self._queue: List[TaskInstance] = []  # owned internally per Q1; populated by seed_tasks()
-        # Tick-to-tick comparison state for evaluate_triggers()'s theta_crossed and
-        # task_commit checks. evaluate_triggers() has no prev_belief/prev_executor_state
-        # params (unlike replanning.py's should_replan()) — this is owned internally,
-        # same as the queue.
-        self._prev_belief: Optional[BeliefState] = None
+        # Tick-to-tick comparison state for evaluate_triggers()'s task_commit
+        # check. evaluate_triggers() has no prev_executor_state param (unlike
+        # replanning.py's should_replan()) — this is owned internally, same as
+        # the queue.
         self._prev_executor_state: Optional[ExecutorState] = None
+        # The decision record (D2): the hypothesis the last fired trigger's
+        # decision was projected against — belief.most_likely on the tick
+        # update_human_projection() built a projection; None when admission
+        # refused (nothing was projected, so no decision rests on a hypothesis)
+        # or before any trigger has fired. One field, because one reader:
+        # evaluate_triggers()'s recognition_changed. Set in
+        # update_human_projection(), read nowhere else.
+        self._projected_hypothesis: Optional[str] = None
         # The reason of the latest evaluate_triggers() decision, for B2's log
         # line only; update()'s signature carries no trigger, and nothing
         # decides on this.
@@ -306,7 +313,7 @@ class MetaPlanner:
         """
         Replaces replanning.py's should_replan(). Event-driven only.
 
-        Three real triggers:
+        Three real triggers (DESIGN-07; the second replaced in D2):
             - no_current_task: executor_state.current_task is None. Covers BOTH
               t=0 (see seed_tasks()) AND ordinary task completion — this assumes
               whoever builds ExecutorState (sim_agents.py, step 9) clears
@@ -314,40 +321,62 @@ class MetaPlanner:
               existing current_plan=None pattern in RobotAgent.step(). If that
               wiring choice changes, a separate task_completed check would need
               to be reintroduced here.
-            - theta_crossed: the confidence gate goes from closed to open —
-              _clears_gate() is False on the previous belief and True on this
-              one (DESIGN-07: single threshold, no hysteresis; a crossing
-              EVENT, not "the gate is open" every tick, or it would refire
-              continuously while confidence stays high). The bar itself is
-              _clears_gate()'s business, never compared here.
+            - recognition_changed (D2): the belief no longer points at the
+              hypothesis the last decision was projected against. ONE condition
+              read from two sides, against the decision record
+              `_projected_hypothesis`:
+                * a hypothesis is recorded and belief.most_likely is no longer
+                  it: replaced by another (TODO-48), the human's task ended and
+                  the belief re-initialised (the recognizer's [IR-boundary]
+                  tick), or `unknown` took over after a pin (TODO-54). What is
+                  projected next is admission's answer, possibly nothing;
+                * none is recorded and the belief clears _clears_gate() on a
+                  task hypothesis — not `unknown`, which is no hypothesis and
+                  has no projection (admission refuses it). The first
+                  recognition of a task, as `theta_crossed` fired it.
+              The gate is asked at admission, never for retention: a recorded
+              hypothesis that dips below theta while staying most likely fires
+              nothing (TODO-68's repeated crossings) and keeps its projection
+              until it is replaced, ends, or the human stops. That consequence
+              is accepted and recorded (design_decisions.md, D2); a margin or a
+              duration on the dip would be a second threshold, which DESIGN-07
+              rules out. Supersedes `theta_crossed`, the crossing of the gate
+              from below: it fired on every re-crossing and never on a change
+              of hypothesis. The bar itself is _clears_gate()'s business,
+              never compared here.
             - task_commit: executor_state.holding transitions from None to
               not-None (robot just picked something up).
 
-        Confidence is a gate here (via theta_crossed), never a magnitude fed into
-        a cost.
+        When two hold on one tick the order is no_current_task,
+        recognition_changed, task_committed — arbitrary, as before: only the
+        reported reason and score differ, update() runs the same.
+
+        Confidence is a gate here (via _clears_gate(), on the entering side of
+        recognition_changed), never a magnitude fed into a cost.
         """
         if executor_state.current_task is None:
             decision = TriggerDecision(fired=True, reason="no_current_task", score=1.0)
         else:
-            theta_crossed = (
-                self._prev_belief is not None
-                and not self._clears_gate(self._prev_belief)
-                and self._clears_gate(belief)
-            )
+            recorded = self._projected_hypothesis
+            if recorded is not None:
+                recognition_changed = belief.most_likely != recorded
+            else:
+                recognition_changed = (
+                    self._clears_gate(belief) and belief.most_likely != UNKNOWN
+                )
             task_committed = (
                 self._prev_executor_state is not None
                 and self._prev_executor_state.holding is None
                 and executor_state.holding is not None
             )
 
-            if theta_crossed:
-                decision = TriggerDecision(fired=True, reason="theta_crossed", score=belief.confidence)
+            if recognition_changed:
+                decision = TriggerDecision(fired=True, reason="recognition_changed", score=belief.confidence)
             elif task_committed:
                 decision = TriggerDecision(fired=True, reason="task_committed", score=1.0)
             else:
                 decision = TriggerDecision(fired=False, reason="none", score=0.0)
 
-        self._prev_belief = belief
         self._prev_executor_state = executor_state
         self._last_trigger_reason = decision.reason
         return decision
@@ -369,9 +398,16 @@ class MetaPlanner:
         projection is admitted only when the belief clears the confidence gate
         (_clears_gate(), the single place theta is applied): below the bar the
         most-likely hypothesis is not evidence, and a realization against it
-        would be a realization against noise. Same gate as
-        evaluate_triggers() asks, on the current belief rather than as a
-        crossing (DESIGN-07) — never fed into a cost.
+        would be a realization against noise. The same gate
+        evaluate_triggers() asks on the entering side of recognition_changed
+        (DESIGN-07) — never fed into a cost.
+
+        Also sets the decision record (D2): `_projected_hypothesis` becomes
+        belief.most_likely when a projection is built, None when admission
+        refuses. Cleared rather than kept on a refusal because nothing was
+        projected, so no decision rests on the old hypothesis; a stale record
+        would make recognition_changed fire on every later tick the belief
+        points elsewhere, against a hypothesis no decision used.
 
         Returns None, in this order, when
           - the belief does not clear the gate (_clears_gate(); the projector is
@@ -409,6 +445,8 @@ class MetaPlanner:
                 recognizer=self._recognizer,
             )
             reason = "built" if projection is not None else "none(unresolved)"
+
+        self._projected_hypothesis = belief.most_likely if projection is not None else None
 
         logging.info(
             f"[meta-proj] confidence={belief.confidence:.3f} "
@@ -524,10 +562,10 @@ class MetaPlanner:
         THE confidence gate (DESIGN-07): has this belief cleared the bar the
         meta-planner is willing to act on? The ONLY place theta is applied.
         Both consumers ask this question and neither compares numbers itself:
-          - evaluate_triggers(): `theta_crossed` is the CROSSING of this
-            predicate, False on the previous belief and True on this one — an
-            event, not "the gate is open" every tick (or it would refire
-            continuously while confidence stays high);
+          - evaluate_triggers(): `recognition_changed` asks it on its
+            entering side only — a task hypothesis clears the gate while no
+            projected hypothesis is recorded. Retention is by identity, not
+            by this predicate (D2), so it is not asked per tick;
           - update_human_projection(): admission, this predicate on the
             current belief.
         Kept as one method deliberately. The gate is a decision the
@@ -550,9 +588,10 @@ class MetaPlanner:
         call sites above already hold a WorldState to pass.
 
         Returns True when the belief clears the bar. Deliberately says nothing
-        about what clearing MEANS: reading the crossing as "a task has just
-        become recognised" is a stronger claim than the contract makes
-        (TODO-68), and that reading must not be built into this name.
+        about what clearing MEANS: whether a decision still rests on a
+        hypothesis is the decision record's question (`recognition_changed`,
+        D2), not this predicate's, and that reading must not be built into
+        this name.
         """
         return belief.confidence >= self._theta
 
