@@ -162,7 +162,12 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout2 --scena
 ```
 
 Logs go to `logs/run_<timestamp>.log`. Defaults come from `configs/experiment.yaml`; CLI flags
-override.
+override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_prior`
+(true/false), `--gate_strategy` (none | b2a | b2b), `--cost_strategy` (realized | plain),
+`--separation_stop` (true/false), and `--experiment` (another yaml). Parsing is strict: an unknown
+or misspelled flag, an unknown yaml key, or a bad value stops the run. Each robot's `[run]` header
+names the policy and evaluation switches the run took (gate, cost, stop, assignment prior, θ, ρ,
+min_separation).
 
 ## Regression checking
 

@@ -252,14 +252,16 @@ class RobotAgent(FactoryAgent):
             gate_strategy=self.model.gate_strategy,
             cost_strategy=self.model.cost_strategy,
         )
-        # The run header (TODO-78): the policy values this robot's decisions are
-        # taken under, once per run, so a log can be read without knowing which
-        # code produced it. min_separation in world units, with the ratio and
-        # the body's motion per tick it is the product of.
+        # The run header (TODO-78): the policy values and evaluation switches this
+        # robot's decisions are taken under, once per run, so a log can be read
+        # without knowing which code or command produced it. min_separation in
+        # world units, with the ratio and the body's motion per tick it is the
+        # product of.
         logging.info(
             f"[run] {self.unique_id} gate_strategy={self.meta_planner.gate_strategy} "
             f"cost_strategy={self.meta_planner.cost_strategy} "
             f"separation_stop={'on' if self.model.separation_stop else 'off'} "
+            f"assignment_prior={'on' if self.model.assignment_prior else 'off'} "
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
             f"min_separation={self.meta_planner.min_separation:.2f} "
             f"(min_separation_in_motion_ticks={self.meta_planner.min_separation / self.projector.assumed_speed:g} "

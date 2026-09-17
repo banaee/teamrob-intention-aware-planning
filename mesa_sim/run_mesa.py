@@ -25,7 +25,8 @@ USAGE:
 
 WHAT THIS MODULE DOES:
     - Loads configs/experiment.yaml as default run configuration
-    - Accepts CLI args to override individual fields (domain, scenario, steps, etc.)
+    - Accepts CLI args to override individual fields (domain, scenario, steps, etc.);
+      an unknown flag or yaml key, or a value of the wrong kind, stops the run
     - Looks up domain registry to resolve string names to Python objects
     - Instantiates SimModel with chosen domain + scenario
     - Either runs headless loop or launches SolaraViz
@@ -98,38 +99,41 @@ DOMAIN_REGISTRY = {
 
 EXPERIMENT_CONFIG_PATH = "configs/experiment.yaml"
 
+GATE_STRATEGIES = ("none", "b2a", "b2b")
+COST_STRATEGIES = ("realized", "plain")
+BOOL_OPTIONS = ("assignment_prior", "separation_stop")
+
 def load_experiment(experiment_path: str, overrides: dict) -> dict:
     """
     Load experiment.yaml and apply CLI overrides.
     CLI overrides take precedence over file values.
+    `overrides` holds one entry per CLI flag (None when not given); the flags
+    are the run options, so a yaml key that is not one of them is an error
+    rather than a field nothing reads. File values are checked like the flags
+    are: a strategy outside its choices, or a switch that is not a yaml
+    boolean (`"false"` is a string, and bool("false") is True), stops the run.
     """
     with open(experiment_path, "r") as f:
         config = yaml.safe_load(f)
+    unknown = sorted(set(config) - set(overrides))
+    if unknown:
+        raise ValueError(
+            f"{experiment_path}: unknown keys {unknown}. "
+            f"Run options: {sorted(overrides)}"
+        )
     config.update({k: v for k, v in overrides.items() if v is not None})
+    for key, choices in (("gate_strategy", GATE_STRATEGIES), ("cost_strategy", COST_STRATEGIES)):
+        if key in config and config[key] not in choices:
+            raise ValueError(f"{key}={config[key]!r}: expected one of {list(choices)}")
+    for key in BOOL_OPTIONS:
+        if key in config and not isinstance(config[key], bool):
+            raise ValueError(f"{key}={config[key]!r}: expected true or false")
     return config
 
 
 # =============================================================================
 # CLI argument parser
 # =============================================================================
-
-# def parse_user_args():
-#     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
-#     parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH,
-#                         help="Path to experiment YAML config (default: configs/experiment.yaml)")
-#     parser.add_argument("--domain",      type=str,  default=None,
-#                         help="Domain name override (e.g. kitting, dock_loading)")
-#     parser.add_argument("--layout",      type=int,  default=None,
-#                         help="Layout number override (default: 1)")
-#     parser.add_argument("--scenario",    type=str,  default=None,
-#                         help="Scenario ID override (e.g. scenario_11)")
-#     parser.add_argument("--steps",       type=int,  default=None,
-#                         help="Number of steps override for headless run")
-#     parser.add_argument("--planner",     type=str,  default=None,
-#                         help="Planner variant override (e.g. basic, intention_aware)")
-#     parser.add_argument("--recognizer",  type=str,  default=None,
-#                         help="Recognizer variant override (e.g. uniform, bayesian)")
-#     return parser.parse_known_args()[0]
 
 def _bool_arg(value: str) -> bool:
     """argparse type for the true/false override flags. Needed because bool('false')
@@ -141,52 +145,58 @@ def _bool_arg(value: str) -> bool:
     raise argparse.ArgumentTypeError(f"expected true/false, got '{value}'")
 
 
+# `solara run mesa_sim/run_mesa.py -- --domain ...`: solara's own arguments come
+# first in sys.argv, this script's follow the '--'.
+_UNDER_SOLARA = "solara" in Path(sys.argv[0]).parts
+
+
+def _script_argv() -> list:
+    """The command-line arguments meant for this script: everything after the
+    script name headless (a bare '--' dropped), only what follows '--' under
+    solara (nothing when there is none)."""
+    argv = sys.argv[1:]
+    if _UNDER_SOLARA:
+        return argv[argv.index("--") + 1:] if "--" in argv else []
+    return [a for a in argv if a != "--"]
+
+
 def parse_user_args():
+    """Strict: an unknown or misspelled flag exits with an error, so a run never
+    falls back silently to the yaml value of the option it meant to set."""
     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
     parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH)
     parser.add_argument("--domain",      type=str,  default=None, help="Domain name override (e.g. kitting, dock_loading)")
     parser.add_argument("--layout", type=str, default=None, help="Layout name override (e.g. env_layout1)")
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_11)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
-    parser.add_argument("--planner",     type=str,  default=None, help="Planner variant override (e.g. basic, intention_aware)")
-    parser.add_argument("--recognizer",  type=str,  default=None, help="Recognizer variant override (e.g. uniform, bayesian)")
     parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
-    parser.add_argument("--gate_strategy", type=str, default=None, choices=["none", "b2a", "b2b"], help="MetaPlanner B2 gate strategy override")
-    parser.add_argument("--cost_strategy", type=str, default=None, choices=["realized", "plain"], help="MetaPlanner B3 cost strategy override")
+    parser.add_argument("--gate_strategy", type=str, default=None, choices=GATE_STRATEGIES, help="MetaPlanner B2 gate strategy override")
+    parser.add_argument("--cost_strategy", type=str, default=None, choices=COST_STRATEGIES, help="MetaPlanner B3 cost strategy override")
     parser.add_argument("--separation_stop", type=_bool_arg, default=None, help="Execution-time separation stop override: true/false")
-    argv = [a for a in sys.argv[1:] if a != '--']  # strip '--' separator
-    return parser.parse_known_args(argv)[0]
+    return parser.parse_args(_script_argv())
+
+
+def load_user_config() -> dict:
+    """The run configuration: the experiment file the CLI names, every flag given overriding it."""
+    user_args = parse_user_args()
+    overrides = {k: v for k, v in vars(user_args).items() if k != "experiment"}
+    return load_experiment(user_args.experiment, overrides)
 
 
 
 # =============================================================================
 # Model factory — shared by headless and Solara
 # =============================================================================
-def _make_domain_model() -> SimModel:
+def resolve_model_params(user_config: dict) -> dict:
     '''
-    Resolves user config to domain, layout, and scenario objects.
-    Then instantiates SimModel with those objects.
+    Resolves user config to domain, layout, and scenario objects, and returns
+    SimModel's keyword arguments. Used by both the headless factory and the
+    Solara page, so a name the registry does not have fails the same way on both.
     Steps:
-        1. Parse CLI args and load experiment.yaml config
-        2. Look up domain in DOMAIN_REGISTRY
-        3. Look up layout in domain["layouts"]
-        4. Look up scenario in layout["scenarios"]
-        5. Instantiate SimModel with scenario, domain register_fn, and layout path
+        1. Look up domain in DOMAIN_REGISTRY
+        2. Look up layout in domain["layouts"]
+        3. Look up scenario in layout["scenarios"]
     '''
-    user_args = parse_user_args()
-    user_config = load_experiment(user_args.experiment, {
-        "domain":     user_args.domain,
-        "layout":     user_args.layout,
-        "scenario":   user_args.scenario,
-        "steps":      user_args.steps,
-        "planner":    user_args.planner,
-        "recognizer": user_args.recognizer,
-        "assignment_prior": user_args.assignment_prior,
-        "gate_strategy": user_args.gate_strategy,
-        "cost_strategy": user_args.cost_strategy,
-        "separation_stop": user_args.separation_stop,
-    })
-
     # --------- domain ---------
     domain_name = user_config["domain"]
     if domain_name not in DOMAIN_REGISTRY:
@@ -214,15 +224,20 @@ def _make_domain_model() -> SimModel:
         )
     scenario = layout["scenarios"][scenario_id]
 
-    return SimModel(
-        scenario=scenario,
-        register_fn=domain["register_fn"],
-        env_layout_path=layout["path"],
-        assignment_prior=bool(user_config.get("assignment_prior", False)),
-        gate_strategy=user_config.get("gate_strategy", "none"),
-        cost_strategy=user_config.get("cost_strategy", "realized"),
-        separation_stop=bool(user_config.get("separation_stop", False)),
-    )
+    return {
+        "scenario":         scenario,
+        "register_fn":      domain["register_fn"],
+        "env_layout_path":  layout["path"],
+        "assignment_prior": bool(user_config.get("assignment_prior", False)),
+        "gate_strategy":    user_config.get("gate_strategy", "none"),
+        "cost_strategy":    user_config.get("cost_strategy", "realized"),
+        "separation_stop":  bool(user_config.get("separation_stop", False)),
+    }
+
+
+def _make_domain_model() -> SimModel:
+    '''Parses the CLI, loads experiment.yaml, and instantiates SimModel from the resolved config.'''
+    return SimModel(**resolve_model_params(load_user_config()))
 
 # =============================================================================
 # Headless runner
@@ -245,25 +260,11 @@ def _min_separation_over_tick(r0, r1, h0, h1) -> float:
 
 
 def run_headless():
-    
-    
-    user_args = parse_user_args()
-    user_config = load_experiment(user_args.experiment, {
-        "domain":     user_args.domain,
-        "layout":     user_args.layout,
-        "scenario":   user_args.scenario,
-        "steps":      user_args.steps,
-        "planner":    user_args.planner,
-        "recognizer": user_args.recognizer,
-        "assignment_prior": user_args.assignment_prior,
-        "gate_strategy": user_args.gate_strategy,
-        "cost_strategy": user_args.cost_strategy,
-        "separation_stop": user_args.separation_stop,
-    })
+    config = load_user_config()
 
-    n_steps = user_config["steps"]
+    n_steps = config["steps"]
     logging.info(f"[run_mesa] Starting headless run — "
-          f"domain={user_config['domain']} scenario={user_config['scenario']} steps={n_steps}")
+          f"domain={config['domain']} layout={config['layout']} scenario={config['scenario']} steps={n_steps}")
 
     model = _make_domain_model()
 
@@ -327,31 +328,7 @@ from mesa_sim.viz.space_drawer import space_drawer
 from mesa_sim.viz.portrayal import agent_portrayal
 from mesa_sim.mesa_fork.visualization import SolaraViz
 
-_user_args = parse_user_args()  # already uses parse_known_args()[0]
-_user_config = load_experiment(_user_args.experiment, {
-    "domain":     _user_args.domain,
-    "layout":     _user_args.layout,
-    "scenario":   _user_args.scenario,
-    "steps":      _user_args.steps,
-    "planner":    _user_args.planner,
-    "recognizer": _user_args.recognizer,
-    "assignment_prior": _user_args.assignment_prior,
-    "gate_strategy": _user_args.gate_strategy,
-    "cost_strategy": _user_args.cost_strategy,
-    "separation_stop": _user_args.separation_stop,
-})
-
-_domain_args = DOMAIN_REGISTRY[_user_config["domain"]]       #todo later: error handling for nonexistent domain
-_layout = _domain_args["layouts"][_user_config["layout"]]    #todo later: error handling for nonexistent layout
-_model_params = {
-    "scenario":        _layout["scenarios"][_user_config["scenario"]],
-    "register_fn":     _domain_args["register_fn"],
-    "env_layout_path": _layout["path"],
-    "assignment_prior": bool(_user_config.get("assignment_prior", False)),
-    "gate_strategy": _user_config.get("gate_strategy", "none"),
-    "cost_strategy": _user_config.get("cost_strategy", "realized"),
-    "separation_stop": bool(_user_config.get("separation_stop", False)),
-}
+_model_params = resolve_model_params(load_user_config())
 
 # print(f"_model_params: {_model_params}")
 
@@ -371,5 +348,5 @@ page = SolaraViz(
 # =============================================================================
 
 if __name__ == "__main__":
-    if not any("solara" in arg for arg in sys.argv):
+    if not _UNDER_SOLARA:
         run_headless()
