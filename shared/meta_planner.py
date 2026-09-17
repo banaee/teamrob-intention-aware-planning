@@ -56,7 +56,8 @@ BLOCK STRUCTURE OF update():
           minus every task already complete in the WorldState (its terminal
           condition holds — whoever did it; see _is_complete()).
           Terminal return if empty.
-    B1.5  current_task is None → nothing to continue; go straight to B3.
+    B1.5  current_task is None, or the pool has just dropped it as complete
+          in the world → nothing to continue; go straight to B3.
           Not an algorithmic block. Task boundaries always re-decide freely.
     B2    _is_current_task_plausible() — a MID-TASK commitment gate. Continue
           the current task (with the hold its realization placed), or
@@ -483,7 +484,8 @@ class MetaPlanner:
 
         BLOCK STRUCTURE:
             0.    assemble the task pool; terminal return if empty
-            B1.5  no current task → nothing to continue, go straight to B3
+            B1.5  no current task, or the pool dropped it as complete →
+                  nothing to continue, go straight to B3
             B2    _is_current_task_plausible() — continue, or escalate to B3
             B3    _replan_tasks() — select and commit
 
@@ -502,14 +504,18 @@ class MetaPlanner:
         — all assigned tasks are complete. A normal return, not an exception;
         callers check `result.current_task is None`.
         """
+        current = executor_state.current_task
         task_pool: List[TaskInstance] = list(self._queue)
-        if executor_state.current_task is not None:
-            task_pool = [executor_state.current_task] + task_pool
+        if current is not None:
+            task_pool = [current] + task_pool
 
         remaining: List[TaskInstance] = []
+        current_dropped = False
         for task in task_pool:
             if self._is_complete(task, world, executor_state.agent_id):
                 logging.info(f"[meta-pool] {task_instance_key(task)} complete in world: dropped from the pool")
+                if task is current:
+                    current_dropped = True
             else:
                 remaining.append(task)
         task_pool = remaining
@@ -523,8 +529,12 @@ class MetaPlanner:
 
         # ---- B1.5: no current task, so there is nothing to continue --------
         # Not an algorithmic block. Task boundaries always re-decide freely;
-        # B2 is specifically a MID-TASK commitment mechanism.
-        if executor_state.current_task is not None:
+        # B2 is specifically a MID-TASK commitment mechanism. A current task
+        # the pool has just dropped as complete in the world is over, whatever
+        # the executor's bookkeeping still holds: there is nothing to continue
+        # either (one fact, one owner — this decision reads completion from
+        # the pool alone, never from executor_state.current_task).
+        if current is not None and not current_dropped:
             # ---- B2: plausibility gate on the current task ------------------
             hold = self._is_current_task_plausible(
                 belief=belief,
@@ -644,7 +654,8 @@ class MetaPlanner:
         """
         Decides whether the currently-executing task should keep executing, or
         whether the situation warrants escalating to B3. Called only when
-        executor_state.current_task is not None (see update()'s B1.5).
+        executor_state.current_task is not None and not complete in the world
+        (see update()'s B1.5).
 
         This is a WORTHINESS check, not a feasibility check. The current task
         may remain perfectly doable but only via a long pause or detour;

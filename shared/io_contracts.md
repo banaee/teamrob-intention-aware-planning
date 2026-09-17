@@ -720,8 +720,10 @@ differently — B2's continuation return and B3 re-selecting the current task ar
 outcome at the boundary. A continue costs the robot nothing; that is the embodiment's
 obligation (§4.1), not a change to selection.
 
-**Blocks.** 0: pool assembly (above); terminal return if empty. B1.5: no current task → straight
-to B3. B2: `_is_current_task_plausible()`, the mid-task plausibility gate — `gate_strategy`
+**Blocks.** 0: pool assembly (above); terminal return if empty. B1.5: no current task, or the pool
+has just dropped the current task as complete in the world → straight to B3 (one owner of
+completion: `update()` never continues a task its own pool dropped, whatever
+`ExecutorState.current_task` still holds; T6 wrap-up). B2: `_is_current_task_plausible()`, the mid-task plausibility gate — `gate_strategy`
 `"none"` (default) never continues; `"b2a"` (T4) realizes the current task alone (decision step 0,
 `min_separation`) and continues with its hold δ when δ ≤ ρ × (T_h − 0), a COMMITMENT gate that can
 only prevent a switch B3 would make; it escalates when δ is above the bound (since F1 there is no
