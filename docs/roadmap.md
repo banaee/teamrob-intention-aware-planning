@@ -110,7 +110,7 @@ heading kernel (HIGH 4.0 / LOW 0.1 / NEUTRAL 1.0) that multiplied identical head
 - Recursive decomposer with real guard evaluation, derived variable
   resolution, `?agent` binding propagation
 
-**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built; the recognizer rebuilt and handed back; realization designed, measured, decided and BUILT — T3 the service, T4 `b2a`, T10 B3 on realized cost — then made total under robot-responsible separation (F1), with the execution-time separation stop in Mesa (C), blocked time as an outcome (R2), schema wait durations in projection (TODO-32) and typed scheduled bindings (F47b), and the trigger set settled (D2: `recognition_changed` against the decision record). Remaining in the queue: T6)
+**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built; the recognizer rebuilt and handed back; realization designed, measured, decided and BUILT — T3 the service, T4 `b2a`, T10 B3 on realized cost — then made total under robot-responsible separation (F1), with the execution-time separation stop in Mesa (C), blocked time as an outcome (R2), schema wait durations in projection (TODO-32) and typed scheduled bindings (F47b), and the trigger set settled (D2: `recognition_changed` against the decision record), and the policy components ablated (T6). The 4C queue is empty)
 
 Built and running end-to-end. All three tasks complete, correct terminal state, zero errors.
 
@@ -289,7 +289,17 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    built: under wait it cannot change a decision, and reconsider has no valid fixture (F47b), so it
    waits for TODO-80 or TODO-47. TODO-77 stays a projector accounting item. Entry in
    `design_decisions.md`; the re-baselined sweep in `analysis/d2_recognition_trigger/`
-6. T6 — ablation: B2 {none, b2a} × B3.A {plain, realized}, sweeps of ρ and of s (`min_separation`)
+6. T6 ✅ (September 2026) — ablation of the meta-planner's policy components on the eight kitting fixtures:
+   gate {none, b2a} × cost {plain, realized} × separation stop {off, on} × prior, and a ρ existence test.
+   Gate and cost are not independent axes (b2a realizes the current task under either cost); the clean
+   comparisons are none + plain against none + realized (realization) and none + realized against
+   b2a + realized (commitment). Realization holds or switches at each fixture's one crossing; b2a took
+   one commitment decision (s70 at ρ 1.0), which lost to the switch; the stop removes every robot-side
+   violation at the cost of blocked time at the table. The s sweep was dropped: `min_separation` is a
+   safety parameter set outside the planner, and no fixture result selects s, ρ or any other value.
+   The review found one defect, fixed in the wrap-up: `update()` continued a current task its own pool
+   had dropped as complete (B1.5). Completion is measured from the world fact from here on (the declared
+   empty-pool tick minus 2). `analysis/t6_ablation/`; TODO-36
 Later, not scheduled: TODO-80 (declared out-of-domain human behaviour, the principled unforeseen stay),
 TODO-47 (randomised layouts; B3.B fixtures with several remaining robot tasks, (f)), Phase 4D (the detour
 strategy, a hold at a chosen point along a segment TODO-70, human cooperation as the remedy for the

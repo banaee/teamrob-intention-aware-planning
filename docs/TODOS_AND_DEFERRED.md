@@ -1036,6 +1036,20 @@ all-unrealizable, s20_on 57 current task unrealizable) reach a B3 that decides a
 without the gate. So at ρ = 0.5 on these fixtures `b2a` is a computation saving (one realization per
 trigger instead of one per candidate) and nothing else; the commitment role is still unexercised
 (T4's finding holds with the new B3). For T6.
+MEASURED (T6, September 2026; `analysis/t6_ablation/`; s00–s71 × prior, stop off / on; ρ ∈ {0.1, 0.25, 0.5,
+1.0} as an existence test, not a selection). The clean commitment comparison is none + realized against
+b2a + realized; b2a + plain is not an ablation cell, since B2 realizes the current task whatever
+`cost_strategy` is (gate and cost are not independent axes). ONE commitment decision in the whole set:
+s70 at ρ 1.0, tick 23, δ = 32 within the bound 34, b2a keeps item_1 with a 32-tick hold where B3 switches
+to item_2; it lost to the switch (+15 ticks prior on, +13 prior off). At ρ 0.1 / 0.25 / 0.5 and on every
+table convergence (s20, s30, s50) at any ρ, b2a decides as none: a crossing hold is B3's argmin, so
+continuing and re-selecting coincide, and ρ moves the verdict counts without moving a decision. B2's
+remaining purpose, holding the current task against argmin flips on small cost differences, is unexercised
+by any fixture here; its evaluation waits for TODO-47. NOTHING ABOUT B2 IS DECIDED FROM THESE FIXTURES, and
+no value of ρ is selected by them. The review also found a defect, fixed in the T6 wrap-up: `update()`
+called B2 on a current task its own pool had just dropped as complete (s71_off 108: b2a continued item_1 one
+tick after the world fact, two ticks late); B1.5 now treats a dropped current task as no current task, and
+b2a + realized equals none + realized at ρ 0.5 in all 16 conditions.
 Files: shared/meta_planner.py (`update`, `_is_current_task_plausible`, `_replan_tasks`)
 Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1; T4; T10
 

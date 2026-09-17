@@ -1397,6 +1397,13 @@ duplicated: the queue invariant (`_queue` holds only tasks not executing; the in
 drop is the existing terminal return — "all assigned tasks are complete" now means exactly that, including
 tasks someone else finished. `no_current_task` still fires from the executor's clearing; the pool no longer
 depends on it for correctness.
+AMENDED (T6 wrap-up, September 2026): "a completed current task is neither continued nor a candidate" was
+true of B3 only. B1.5 still tested `executor_state.current_task`, so B2 `b2a` was asked about a current task
+the pool had just dropped, and continued it (s71_off 108; the robot's next task started two ticks late).
+One decision read two owners of one fact — a defect, not an accounting item. REQUIREMENT: `update()` never
+continues a task its own pool has dropped as complete. B1.5 treats a current task dropped at pool assembly
+as no current task, so B3 decides. Gate none is byte-identical by construction and measured so; five b2a
+runs change, each to the none decision at that tick (`analysis/t6_ablation/` README, wrap-up).
 
 Companion (T8): `update_human_projection()` refuses `belief.most_likely == UNKNOWN` as `none(unknown)` before
 calling the projector. Mass on `unknown` above θ is not a recognition (recognizer_handback.md §3.4: something

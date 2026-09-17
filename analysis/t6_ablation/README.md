@@ -46,6 +46,15 @@ construction; the only such argument, ρ under gate none, is not a core axis). �
 s71: the fixtures where the core's `[meta-b2]` lines carry a non-zero δ. On s00, s10 and s40 every
 admitted B2 verdict has δ = 0, which continues at any ρ > 0 by construction, so they are not swept. 30 runs.
 
+**Gate and cost are not independent axes (ruled at review).** B2 `b2a` realizes the current task whatever
+`cost_strategy` is, so the cell b2a + plain is realization restricted to the current task, not "commitment
+without realization". The clean comparisons are:
+
+- realization: none + plain against none + realized;
+- commitment: none + realized against b2a + realized.
+
+The b2a + plain cells are kept in `matrix.md` as run, and are read as neither comparison. No change to b2a.
+
 Drift check: the reference cell (gate none, realized, stop off, both priors, all eight fixtures) is
 byte-identical to the D2 baselines (`sweep/`, `fixtures/`) on all ten CLAUDE.md greps.
 
@@ -110,6 +119,9 @@ fires on that same tick. Under none B3 sees the pool without item_1 (candidates 
 once; under b2a B2 judges `executor_state.current_task`, still item_1 (the executor closes it a tick later),
 finds δ = 0 and continues, and item_3 starts on `no_current_task` at 110. Two ticks. So the task's premise
 "never at ρ = 0.5" holds for the T4 / T10 / F1 fixtures and for s50 / s70, and fails on s71 only in this way.
+RULED AT REVIEW: a defect, not a commitment and not an accounting item: one decision read two owners of one
+fact. Fixed in the wrap-up (below); after the fix b2a + realized equals none + realized in all 16 conditions
+at ρ 0.5.
 
 Under plain cost, b2a differs from none on s20, s30 and s50 (both priors, both stop settings): B2 realizes
 the current task on its own, and its `continue_hold` places the crossing hold (8 at 20, 7 at 28, 1 at the
@@ -125,10 +137,11 @@ realization for the current task only.
 | 0.1 | s71_off only (the 108 lag above) | — | s20 / s50's 8-tick crossing hold exceeds the bound (0.1 × 36.24 = 3.62) and escalates; B3 on realized cost picks the same task with the same hold, so the verdict changes and the decision does not |
 | 0.25 | s71_off only | — | every crossing hold is within its bound (8 ≤ 9.06, 7 ≤ its bound) and continues; the stay's 32 escalates as at 0.5; the verdict counts differ from 0.1, the decisions do not |
 | 0.5 | s71_off only | — | the core cell |
-| 1.0 | s70, both priors, and s71_off | s70 at 23: δ = 32 ≤ bound 34, b2a continues item_1 with a 32-tick hold (executed 31, replaced at the boundary 54) where none switches to item_2; order item_1 item_2 against item_1 item_2 item_1; completion 200 against 185 | the only commitment decision in the set: b2a differs from none exactly when the current task's hold is within ρ × (T_h − now) AND B3 would have switched. s71 at ρ 1.0 is identical because B3's realized argmin is the held item_1 anyway |
+| 1.0 | s70, both priors, and s71_off | s70 at 23: δ = 32 ≤ bound 34, b2a continues item_1 with a 32-tick hold (executed 31, replaced at the boundary 54) where none switches to item_2; order item_1 item_2 against item_1 item_2 item_1; completion 200 against 185 (after the fix: 198 prior off, the lag's two ticks removed; 200 prior on) | the only commitment decision in the set: b2a differs from none exactly when the current task's hold is within ρ × (T_h − now) AND B3 would have switched. s71 at ρ 1.0 is identical because B3's realized argmin is the held item_1 anyway |
 
 Answer to the existence question: yes, once, as a commitment (s70 at ρ = 1.0, costing 15 ticks against the
-switch); and once as a two-tick lag (s71_off, any ρ). Never on s20, s30, s50 at any ρ: at a table
+switch; 13 prior off after the fix); and once as a two-tick lag (s71_off, any ρ), the defect fixed in the
+wrap-up. Never on s20, s30, s50 at any ρ: at a table
 convergence the held current task is B3's argmin, so continuing and re-selecting coincide.
 
 What these fixtures cannot show: any case where committing is cheaper than switching (the one switch
@@ -187,7 +200,8 @@ s30 / s40, whose human never leaves the table.
   commits for time, and with the stop on it moves the blocked time into decided holds. Not shown: a hold that
   changes a winner among several alternatives, or a worse order.
 - (b) b2a differs from none once as a commitment (s70 at ρ = 1.0: keep item_1 with a 32-tick hold instead of
-  switching, +15) and once as a two-tick bookkeeping lag (s71_off, any ρ); never on s20 / s30 / s50 at ρ ∈
+  switching, +15; +13 prior off after the fix) and once as a two-tick lag (s71_off, any ρ), a defect fixed
+  in the wrap-up; never on s20 / s30 / s50 at ρ ∈
   {0.1, 0.25, 0.5, 1.0}, since a crossing hold is the argmin's. Under plain cost it acts as realization of
   the current task (s20 / s30 / s50). Fixture-bound: one switchable case, one robot task at a time
   (TODO-47 (c)).
@@ -199,12 +213,43 @@ s30 / s40, whose human never leaves the table.
 
 - B2 judges `executor_state.current_task`, which the executor closes one tick after the world fact; the pool
   drops the task on the fact (T7). When the D2 trigger fires on that tick (s71_off 108), b2a continues a task
-  the pool no longer holds and none starts the next one. Two ticks; a reading of TODO-77's accounting class
-  (which tick a task is over, per component), not a decision difference.
+  the pool no longer holds and none starts the next one. RULED at review: a defect (one decision reading two
+  owners of one fact), fixed in the wrap-up.
 - Under plain cost, b2a's `continue_hold` is the only place a hold enters; the cell "b2a + plain" is
-  therefore realization restricted to the current task, not an ablation of realization.
+  therefore realization restricted to the current task, not an ablation of realization. RULED at review:
+  gate and cost are not independent axes (see the run matrix); no change to b2a.
 - ρ decides only where B3's argmin is not the current task; on these fixtures that is one trigger (s70 at
   23). The ρ verdict counts move (escalations at 0.1 that continue at 0.25) without the decision moving.
+
+## Wrap-up: `update()` never continues a task its own pool dropped as complete
+
+The ruling: `update()` builds its pool from the world fact (T7), so a decision that then consults
+`executor_state.current_task` reads a second, lagging owner of the same fact. Requirement: `update()` never
+continues a task its own pool has dropped as complete. Built at B1.5 in `shared/meta_planner.py`: a current
+task dropped at pool assembly is treated as no current task, so B2 is not asked and B3 decides. Docstrings
+and `shared/io_contracts.md` (§2.2, Blocks) state it. No change to b2a, to B3, or to the executor.
+
+Checked against the T6 logs (the pre-change baselines, same HEAD otherwise) on the CLAUDE.md greps plus
+`[meta-b2]` / `[meta-b3]`, in `post_fix/` (git-ignored): gate none × realized × stop off / on (the regression
+sweep and the evaluation fixtures), b2a × plain / realized × stop off / on, all eight fixtures, both priors,
+and the ρ sweep. Five runs change, every gate-none run is byte-identical:
+
+| run | before | after |
+|---|---|---|
+| b2a + realized, ρ 0.5, s71_off | 108 continues item_1; item_3 at 110; done 201 | 108 item_3, as none; done 199 |
+| ρ 0.1, s71_off | as ρ 0.5 | as none |
+| ρ 0.25, s71_off | as ρ 0.5 | as none |
+| ρ 1.0, s71_off | 108 continues item_1; done 201 | 108 item_3; done 199 |
+| ρ 1.0, s70_off | 108 continues item_1; item_2 at 110; done 200 | 108 item_2; done 198 (the commitment at 23 unchanged) |
+
+s71_off under b2a now equals the none cell on `[meta]`, `[meta-pool]`, `[meta-proj]`, `[IR]`, `[IR-dist]`,
+`[IR-complete]`, `[sep]`, `[hold]` and `[stop]`. `meta-cand` differs only in the B3 candidate lines that none
+computes at mid-task triggers where b2a continues without running B3, as in every b2a run. These five are exactly the
+pre-fix b2a runs in which B2 was called on a trigger whose pool assembly had dropped a task; in no other b2a
+run does a trigger fall on that tick.
+`matrix.md` stays the record of the T6 measurement at 9127b2a.
+
+Regenerate `post_fix/` as the T6 sweeps with `post_fix/` in place of `core/` and `rho/`.
 
 ## Flags
 

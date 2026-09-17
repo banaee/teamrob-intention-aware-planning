@@ -79,8 +79,9 @@ Decisions
 - Phase 4C: realization is built and total (T3, T4, T10, F1), the Mesa executor has the
   execution-time separation stop (C, run option, default off), wait durations come from the schema
   (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
-  (D2: `recognition_changed` against the decision record replaces `theta_crossed`). Next in the
-  queue: T6 (the ablation). The queue and its order are in `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
+  (D2: `recognition_changed` against the decision record replaces `theta_crossed`), and the policy
+  components are ablated (T6, `analysis/t6_ablation/`). The 4C queue is empty. The queue and its order
+  are in `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
   Phase 5 (evaluation), Phase 6 (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. Change only what the task specifies; do not fill in unspecified block logic, flags or
@@ -203,6 +204,11 @@ grep "^\[stop\]"        <log>   # separation-stop refusals (stop on), with the a
 ```
 
 A behaviour-preserving change must leave these greps byte-identical.
+
+Completion is measured from the world fact (T6): the tick after the robot's last release
+(`action=place micro=release`), when the terminal condition is first observable. The empty-pool line
+`[meta] step=N all tasks complete` is the declared tick, N − 2. Report the world tick; older reports
+(D2 and before) give declared ticks. `analysis/t6_ablation/metrics.py` reads it from a log.
 
 ## Conventions and terminology
 
