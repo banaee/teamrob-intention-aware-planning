@@ -1951,7 +1951,7 @@ Reference: I4c report ("Flagged, not fixed"); I5 hand-back; T7/T8 session, Septe
 "Task completion is a world fact"
 
 **TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question] — D2's main content
-D2 SCOPE (wrap-up after F47b, September 2026; designed in the design chat): what a trigger is an event OF
+D2 SCOPE (wrap-up after F47b, September 2026; designed in the design claude chat - we call it cchat): what a trigger is an event OF
 — this item with TODO-48, TODO-54 and the human's task boundary — separating the events that change the
 evidence from those the current machinery can respond to. Admission is restricted to evidence-changing
 events; the remaining churn risk, an argmin flip on a re-decision, belongs to B2 (`b2a`'s commitment,
@@ -2403,7 +2403,7 @@ therefore needs human behaviour the ROBOT'S knowledge does not cover, declared a
 behaviour vocabulary for the human executor (a stay of a stated length at a stated place) that is NOT a task
 schema and adds no hypothesis, or a domain given to the human that is a superset of the robot's. Never by a
 type mismatch (F47's waypoint coffee break) or by repurposing an existing task in a role its schema does not
-describe. Design question for the design chat; nothing built.
+describe. Design question for the design claude chat (we call it cchat); nothing built.
 Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared/types.py
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
 

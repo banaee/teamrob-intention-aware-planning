@@ -2119,7 +2119,7 @@ with the 30 cm arrival radius every approach to the table comes within 36–44 c
 last delivery is refused every tick until the step cap. With the stop on, only scenario_10 completes
 (its human ends elsewhere). Not fixed here and not to be fixed by a special case: it is the accepted
 limit meeting two fixture and domain facts — a scripted human that never leaves (a real one would),
-and a table modelled as a point with a single arrival radius (TODO-74). For the design chat.
+and a table modelled as a point with a single arrival radius (TODO-74). For the design claude chat (we call it cchat).
 
 MEASURED (C; `analysis/c_separation_stop/comparison.md`, numbers there): the stop-off runs equal the F1
 baselines apart from the `[run]` header; with the stop on no robot STEP in any run breaks the F1 rule

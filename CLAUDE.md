@@ -6,7 +6,7 @@ Simulation-agnostic robot cognitive architecture for intention-aware human-robot
 
 ## How sessions work
 
-- The design is made in a separate design chat with Hadi. A task prompt states what is decided
+- The design is made in a separate design claude chat (we call it cchat) with Hadi. Also we may call the working tool of claude-code in local repository as ccode. A task prompt states what is decided
   and what to do. You implement, check, commit, and report. Hadi reviews and pushes.
 - One task per session as a rule. A fresh session starts from what is committed, not from an
   earlier session's reading of it.
@@ -79,7 +79,7 @@ Decisions
 - Phase 4C: realization is built and total (T3, T4, T10, F1), the Mesa executor has the
   execution-time separation stop (C, run option, default off), wait durations come from the schema
   (TODO-32), scheduled bindings are type-checked at spawn (F47b). Next in the queue: D2 (what a
-  trigger is an event of; designed in the design chat), then T6 (the ablation). The queue and its
+  trigger is an event of; designed in the design claude chat (we call it cchat)), then T6 (the ablation). The queue and its
   order are in `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
   Phase 5 (evaluation), Phase 6 (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
