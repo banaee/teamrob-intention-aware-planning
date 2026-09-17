@@ -117,7 +117,10 @@ class HumanAgent(FactoryAgent):
         # for human agent, the plan is scripted and unaffected by belief updates, so no replanning logic needed.
         if self.current_plan is None:
             self.current_plan = self._task_instance_to_plan(task_instance, world)
-            logging.info(f"[planner] self.current_plan for {task_instance.schema.name}: {self.current_plan}")
+            # Action names and bindings only: the plan's repr carries every action's
+            # schema, so a new schema field would change this line (TODO-82).
+            actions = ", ".join(f"{a.action_name}{a.bindings}" for a in self.current_plan.actions)
+            logging.info(f"[planner] self.current_plan for {task_instance.schema.name}: [{actions}]")
 
         self._execute(plan=self.current_plan, world=world)
         
