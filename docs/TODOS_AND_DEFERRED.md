@@ -2128,7 +2128,12 @@ mesa_sim/sim_agents.py, ros_sim/ (paused)
 Reference: Phase 4C wait-decision session, September 2026; roadmap.md Phase 6 notes; T4
 
 
-**TODO-72 — `io_contracts.md` §1.3 and §2.1 still describe the pre-I2 recognizer** [recognizer side]
+**TODO-72 — `io_contracts.md` §1.3 and §2.1 still describe the pre-I2 recognizer** [recognizer side] ✅ RESOLVED (4C housekeeping, Sept 2026)
+RESOLVED: §1.3 now matches `shared/types.py` (field order and defaults) and names the one position lookup
+(`shared/target_resolution.py`) with its two consumers, the `excess_path` evaluator and the `Projector`;
+§2.1 describes the constructor as it is (`path_cost`, the support restriction, the evaluator-registry check)
+and `update()` as the phase / evidence model of `recognizer_handback.md` §1, with the removed mechanisms
+listed. Docs only.
 Found while re-aligning the meta-planner sections after T7/T8 and the wait-decision revision
 (September 2026); deliberately not edited then, since it is recognizer-side work. §1.3's
 "scoped exception" paragraph names `direction_consistency_likelihood` and the resolver
@@ -2212,6 +2217,9 @@ Files: domains/kitting/env_layout*.json, domains/kitting/actions.py, domains/kit
 Reference: R1 decision record, September 2026
 
 **TODO-75 — `ros_sim/framework_HRI/guide.txt` refers to `env_layout1` with obstacles** [ROS side, paused]
+NOT DONE at the 4C housekeeping: both remedies are outside what may be touched now — the guide is under
+`ros_sim/` (paused, not modified), and registering `env_layout9` is excluded by CLAUDE.md (kept, not
+registered). Do it when the ROS side resumes.
 The ROS/PRIEST guide describes `env_layout1.json` with obstacles and scenario_10 with the robot
 assigned item_5 / item_1 / item_7. Since R1 `env_layout1` is the cleaned layout (no obstacles, new
 scenario_10 pool) and the old layout is `env_layout9.json`, which is NOT registered in
@@ -2446,6 +2454,11 @@ Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
 
 **TODO-81 — The Mesa decomposer reads the literal `"?duration"`; the schema names the binding (`duration_key`)** [housekeeping; from R2]
+NOT DONE at the 4C housekeeping, because the fix as filed is not behaviour-preserving: `dock_loading`'s
+`wait_at` is `STAND*` with a `?duration` binding (`PT60S`, `domains/dock_loading/tasks.py`) but declares
+no `duration_key`, so reading `action.schema.duration_key` would shrink its waits to one tick. Kitting is
+unaffected. Needs `duration_key="?duration"` on dock_loading's `wait_at` in the same change (a deferred
+domain; which also makes its Projector price the wait, the mismatch this item is about).
 `action_decomposer._expand_stand` reads `action.bindings.get("?duration", "PT1S")` while the projector reads
 the key the schema declares (`ActionSchema.duration_key`, TODO-32). Two spellings of one key in two layers is
 a mismatch risk; the decomposer should read `action.schema.duration_key` (falling back to one tick when the
@@ -2454,7 +2467,10 @@ sweep (behaviour-preserving, byte-identical).
 Files: mesa_sim/action_decomposer.py (`_expand_stand`), shared/types.py (`ActionSchema.duration_key`)
 Reference: R2 session, September 2026
 
-**TODO-82 — The planner's debug line prints whole schema objects, so any schema field breaks byte-identity** [housekeeping; from R2]
+**TODO-82 — The planner's debug line prints whole schema objects, so any schema field breaks byte-identity** [housekeeping; from R2] ✅ RESOLVED (4C housekeeping, Sept 2026)
+RESOLVED: the line is emitted by `HumanAgent.step()` in `mesa_sim/sim_agents.py` (not `shared/planner.py`)
+and now prints `[action{bindings}, ...]`. Every `[planner] self.current_plan` line changed (2–5 per log in
+the regression sweep); no other line, and none of the regression greps.
 `[planner] self.current_plan for ...` logs the `AbstractPlan` repr, which includes every `GroundedAction`'s
 `schema` dataclass. Adding a field to `ActionSchema` (TODO-32's `duration_key`) changed that line in every log
 without any behaviour change, so "byte-identical" had to be qualified. The regression greps do not include
@@ -2463,7 +2479,13 @@ drop the line.
 Files: shared/planner.py (or wherever the `[planner] self.current_plan` line is emitted)
 Reference: R2 session, September 2026
 
-**TODO-83 — Unused interference machinery: `ConflictPoint`, `InterferenceAssessment`, `discretized_time_sampling`, `closest_point_of_approach`, `interference_spatial_resolution`** [housekeeping; from T10 / F1]
+**TODO-83 — Unused interference machinery: `ConflictPoint`, `InterferenceAssessment`, `discretized_time_sampling`, `closest_point_of_approach`, `interference_spatial_resolution`** [housekeeping; from T10 / F1] ✅ RESOLVED (4C housekeeping, Sept 2026)
+RESOLVED: removed, with the helpers only the sampler used (`_position_at`, `_distance`, `_midpoint`,
+`_speed` in `trajectory_algorithms.py`) and `action_decomposer._get_interference_spatial_resolution`.
+Regression greps byte-identical. `analysis/t1*` scripts that call the sampler or read the config key are
+historical and do not run at HEAD (they already depended on `_detect_interference`, gone since T10); F1's
+`validate.py` reads `types.py` from commit 08b1167 and is unaffected. io_contracts §1.9 / §2.2b and the
+roadmap updated.
 Since T10 nothing in the run path consumes `discretized_time_sampling()` or its `ConflictPoint` list;
 `InterferenceAssessment` is produced by nothing; `closest_point_of_approach()` is an unbuilt stub whose
 `NotImplementedError` message still calls the sampler "the current default interference algorithm";

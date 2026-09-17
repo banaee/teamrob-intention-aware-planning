@@ -131,7 +131,8 @@ class BeliefState:
 
 ### 1.3 `WorldState`
 
-**Produced by simulator**, consumed by `planner.py` and `meta_planner.py`.
+**Produced by simulator** (`mesa_sim/world_state_builder.py`), consumed by `planner.py`,
+`recognizer.py`, `projection.py` and `meta_planner.py`. Ephemeral: rebuilt every tick, never stored.
 
 ```python
 @dataclass
@@ -145,34 +146,33 @@ class AgentState:
 @dataclass
 class WorldState:
     timestamp: float
-    agent_states: Dict[str, AgentState] # {agent_id: AgentState}
-    object_locations: Dict[str, str] # {object_id: location_id} — symbolic
-    object_zones: Dict[str, str] # {item_id: zone_id}
-    object_home_container: Dict[str, str] # {item_id: original container_id} — added for
-    # the deliver_with_return cancellation guard
-    object_positions: Dict[str, Tuple[float, float]] # {item_id: (x, y)} — decided design,
-    # see status note below
-    agent_positions: Dict[str, Tuple[float, float]] # {agent_id: (x, y)} — same status
-    predicates: Set[Predicate] = field(default_factory=set)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    agent_states: Dict[str, AgentState]                          # {agent_id: AgentState}
+    agent_positions: Dict[str, Tuple[float, float]] = {}         # {agent_id: (x, y)}
+    object_locations: Dict[str, str] = {}                        # {object_id: location_id}, symbolic;
+                                                                 # a carried object maps to its holder's agent id
+    predicates: Set[Predicate] = set()
+    object_zones: Dict[str, str] = {}                            # {item_id: zone_id}
+    object_home_container: Dict[str, str] = {}                   # {item_id: original container_id}; static per
+                                                                 # scenario, for the deliver_with_return guard
+    object_positions: Dict[str, Tuple[float, float]] = {}        # {obj_id: (x, y)}: env objects and items
+    metadata: Dict[str, Any] = {}
+# (every `= {}` / `= set()` is a field(default_factory=...) in shared/types.py)
 ```
 
-**Status: RESOLVED (September 2026).** `object_positions`/`agent_positions` were previously
-flagged here as an open discrepancy — documented as decided design, but unconfirmed as
-present in the dataclass. Both are confirmed implemented and live:
-`Projector.build_segments()` (formerly `MetaPlanner._build_segments()`) reads
-`world.agent_positions[agent_id]` and `world.object_positions[target_id]` on every projection,
-and `scenario_00` runs end-to-end without error. No longer a discrepancy.
-
-**Scoped exception, per design_decisions.md:** exists specifically for `move_to`'s latent
-target-parameter inference (trajectory-consistency scoring in the recognizer) — the one case
-where the deterministic μ→a mapping holds at the action-type level but not the parameter
-level. Consumed only by `shared/likelihood_functions.py`'s `direction_consistency_likelihood`
-and target-resolution helpers (`_get_expected_position`, `_get_target_zone`) in
-`recognizer.py` — never by `planner.py` or `executor.py`, which stay fully symbolic.
+**Positions: the scoped exception.** `agent_positions` and `object_positions` are read in `shared/`
+through one lookup, `shared/target_resolution.py`: `movement_target_position(action, world)` resolves a
+grounded movement action's `movement_target_key` binding to the object's CURRENT position (a carried object
+is wherever its holder is: `object_locations` names the holder, whose position is in `agent_positions`).
+Grounding itself (which method, which bindings) is the planner's `decompose()`; target resolution does not
+re-implement it. Two consumers:
+- the recognizer's progress channel: the `excess_path` evaluator (`shared/likelihood_functions.py`,
+  `excess_path_likelihood`) scores a movement stretch against its target's position (§2.1);
+- the `Projector` (`shared/projection.py`), which builds the `Segment`s of a projection (§1.7) from the
+  agent's position and the resolved targets.
+`planner.py` and `executor.py` stay symbolic.
 
 **Predicate naming convention (unchanged):**
-- `in_zone(agent_id, zone_id)` — coarse zone-level context, used by IR context reasoning
+- `in_zone(agent_id, zone_id)` — coarse zone-level context
 - `at(agent_id, object_id)` — fine-grained object proximity, used by executor completion checking
 - `holding(agent_id, item_id)` — agent is carrying item
 - `obj_at(item_id, location_id)` — item rests at location
@@ -180,10 +180,8 @@ and target-resolution helpers (`_get_expected_position`, `_get_target_zone`) in
 `in_zone` and `at` are intentionally distinct predicates. Conflating them caused a semantic
 mismatch where `move_to` completion was never satisfied.
 
-**Design rule:** core planners only use symbolic predicates; geometry stays in simulators —
-subject to the two scoped exceptions above, both now confirmed live: IR's trajectory-
-consistency scoring, and `MetaPlanner`'s duration/interference estimation, which reads
-positions to build `Segment`s (§1.7). `planner.py` and `executor.py` remain fully symbolic.
+**Design rule:** core planners only use symbolic predicates; geometry stays in simulators, subject to the
+scoped exception above (the recognizer's excess-path scoring and the Projector's segments).
 
 ---
 
@@ -376,31 +374,16 @@ another. Semantics across the boundary:
   clear nor blocked — and is the execution layer's (design_decisions.md, "Assumption: execution-time
   avoidance past T_h").
 
-**`ConflictPoint`** / **`InterferenceAssessment`** — the output of the batch interference profile
-that realization REPLACED (T10). `ConflictPoint` is still what
-`trajectory_algorithms.discretized_time_sampling()` returns; `InterferenceAssessment` is no longer
-produced by anything — `_detect_interference()` and `_cost()` are gone, and `RealizedPlan` (§1.11)
-is what the meta-planner consumes. Under realization a conflict is priced by construction — as the
-duration of the hold that avoids it — and the observe / value split survives inside realization
+**`ConflictPoint`** / **`InterferenceAssessment`** — REMOVED (TODO-83). They were the output of the
+batch interference profile that realization REPLACED (T10); nothing produced or consumed them after
+`_detect_interference()`, `_cost()` and `discretized_time_sampling()` went. `RealizedPlan` (§1.11) is what
+the meta-planner consumes. Under realization a conflict is priced by construction — as the duration of the
+hold that avoids it — and the observe / value split survives inside realization
 (`shift_violation_interval` observes; holding values). `realize()` takes the projected segments of
-whatever ordering it is given — it does not assume a single task. Both types are kept in
-`shared/types.py` for history only.
+whatever ordering it is given — it does not assume a single task.
 
-```python
-@dataclass
-class ConflictPoint:
-    step: float                            # may be fractional — continuous sampling
-    position: Tuple[float, float]          # midpoint between the two agents
-    distance: float                        # actual Euclidean separation at this point
-
-@dataclass
-class InterferenceAssessment:
-    feasible: bool                         # False = candidate excluded before costing
-    conflicts: List[ConflictPoint]         # all observed, feasible or not
-```
-
-No `zone` field: zone co-occupancy was rejected as a proximity criterion (zones are
-arbitrary in size, so co-location implies nothing about closeness). See
+Interference stays geometric, never zone co-occupancy (zones are arbitrary in size, so co-location
+implies nothing about closeness). See
 design_decisions.md, "Interference is geometric, not zone-based."
 
 ---
@@ -478,28 +461,36 @@ there is no `realizable` flag and no unrealizable reason. The former `realizable
 
 ### 2.1 `IntentionRecognizer` (`shared/recognizer.py`)
 
+The current model is described in `docs/recognizer_handback.md` §1–§2 (the design record: the I2–I4d
+entries in `design_decisions.md`). This section is the interface.
+
 #### Constructor
 
 ```python
 IntentionRecognizer(
     knowledge: DomainKnowledgeBase,
-    context: ContextKnowledge,                        # background facts for ω_context weighting
+    context: ContextKnowledge,                        # background facts for ω_context weighting (output only)
     hypotheses: List[HypothesisKey],                  # precomputed hypothesis space for this scenario
-    assigned_tasks: Optional[List[TaskInstance]] = None,   # OBSERVED agent's work order; None/empty = prior off
+    assigned_tasks: Optional[List[TaskInstance]] = None,   # OBSERVED agent's work order; None/empty = restriction off
+    path_cost: Optional[PathCost] = None,             # C(a, b) for the excess path; straight line by default
 )
 ```
 
-**Correction from previous version:** this is a 4-argument constructor, not
-`IntentionRecognizer(knowledge)`. `hypotheses` is built once at agent construction time via
-the free function below, from the domain schemas and the objects present in the workspace —
-*not* from the human agent's `scheduled_tasks`, which the robot never sees.
+`hypotheses` is built once at agent construction time via the free function below, from the domain schemas
+and the objects present in the workspace — *not* from the human agent's `scheduled_tasks`, which the robot
+never sees. The recognizer sorts them by `repr` (order-independent of the caller, TODO-42).
 
-`assigned_tasks` carries the observed agent's work order — which tasks it was assigned, never
-in which order it will do them. Identity crosses the boundary as `task_instance_key()` (§1.10),
-which matches `repr(HypothesisKey)` (§1.8); an assigned task matching no hypothesis is logged
-as a warning and ignored. `None` or `[]` switches the persistent assignment prior off entirely
-and `update()` runs its original unweighted path. See `design_decisions.md`, "Assignment
-knowledge: `assigned_tasks` is the work order, `scheduled_tasks` is the script."
+`assigned_tasks` carries the observed agent's work order — which tasks it was assigned, never in which order
+it will do them. It restricts the SUPPORT, not the magnitude: the admissible set is the assigned tasks, every
+foreseeable task (`TaskSchema.is_foreseeable`) and `unknown`; every other hypothesis is pinned at
+`BELIEF_FLOOR` and never scored. Identity crosses the boundary as `task_instance_key()` (§1.10), which matches
+`repr(HypothesisKey)` (§1.8); an assigned task matching no hypothesis is logged as a warning and ignored.
+`None` or `[]` switches the restriction off (`--assignment_prior false`, the default).
+
+`path_cost` is the cost of the walk between two positions that the excess path is measured against.
+Straight-line distance by default (Mesa agents walk through obstacles); a domain or body with a better model
+injects it. The constructor raises `ValueError` if a schema names a `progress_evaluator` not registered in
+`likelihood_functions.PROGRESS_EVALUATORS`.
 
 ```python
 def build_hypothesis_space(
@@ -522,24 +513,40 @@ update(
 ) -> BeliefState
 ```
 
-**Correction (September 2026):** the previous contract omitted `world: WorldState`. It is a
-required positional parameter — the recognizer needs world predicates and positions for
-likelihood evaluation. Confirmed against `shared/recognizer.py` and the call site in
-`mesa_sim/sim_agents.py`.
+`world` is required: the phase is derived from it every tick. The recognizer OWNS its belief; `prev_belief`
+is accepted for signature compatibility and not consulted (the reported distribution carries output-only
+factors that must not be fed back).
 
-**Correction (leg session, September 2026):** the recognizer now OWNS its belief. It keeps
-an evidence state (no context weights, no state refutations) and derives each tick's
-`BeliefState` from it; `prev_belief` is accepted for signature compatibility and not
-consulted — its distribution contains output-only factors that must not be fed back.
-Evidence accounting: a discrete observation (microaction in some action schema's declared
-vocabulary) is an event and multiplies onto the evidence state; a moving observation is one
-chord from the start of the current movement leg, replacing that leg's earlier chords; a
-stationary observation closes the leg. Output = evidence × ω_context, with hypotheses
-refuted by the held item and inadmissible hypotheses pinned at `BELIEF_FLOOR`. See
-`design_decisions.md`, "One leg is one observation".
+Per live hypothesis, every tick:
+1. **Phase, derived.** The planner decomposes the task against the current world for the observed agent (its
+   guards select the method), the grounded actions are walked from the start, and the EXPECTED action is the
+   first whose completion condition does not hold. Nothing stores an index into an action list.
+2. **Completion.** If the task's terminal action's completion holds, the hypothesis is retired and pinned at
+   the floor for the rest of the run, whoever completed it.
+3. **Completion channel (an event).** A microaction in the declared vocabulary of the action the hypothesis
+   expected on the previous tick is scored by detection reliability (`DETECTION_HIT_RATE` if that action's
+   completion predicate holds, `DETECTION_FALSE_ALARM_RATE` if not) and multiplies into the evidence once.
+4. **Phase change.** When the expected action changes, the closing stretch folds into the evidence once as
+   odds L/u against `unknown` (nothing, if the stretch was empty), and the hypothesis's ORIGIN moves to the
+   agent's position and odometer reading.
+5. **Progress channel.** An action with a `progress_evaluator` (`excess_path`: `move_to`) is scored from the
+   origin: excess = walked + C(pos, target) − C(origin, target), L = 2 / (1 + e^{β·excess}); one stretch
+   toward one target is ONE observation, recomputed each tick and replacing the previous tick's value (v/u,
+   on top of the evidence, never into it). An empty stretch is not an observation. An action with no graded
+   signal scores the perfect-fit value.
 
-Dispatches by schema-declared `microactions` membership and `progress_evaluator` name —
-never by hardcoded microaction strings. See `design_decisions.md`, "IR likelihood dispatch."
+`unknown` is the reference with the constant likelihood `UNKNOWN_LIKELIHOOD` (u) and takes no factor. The
+episode is local: when a retirement is the observed agent's own (its expected action on the previous tick was
+the terminal one), the belief re-initialises to the uniform prior over the live set and every origin moves to
+the agent's position. Output = evidence × ω_context (`_context_weight`, output only), normalised, floored at
+`BELIEF_FLOOR`, with completed and inadmissible hypotheses pinned.
+
+Dispatches by schema-declared `microactions` membership and `progress_evaluator` name — never by hardcoded
+microaction strings. See `design_decisions.md`, "IR likelihood dispatch."
+
+Removed and not to return (handback §8): the leg model and the cosine trajectory kernel, the held-item rule,
+`ZONE_BOOST`, the HIGH / LOW / NEUTRAL likelihoods, the 10× assignment multiplier, belief persistence across
+an episode boundary.
 
 #### Get Hypothesis
 
@@ -808,10 +815,12 @@ embodiment layer at agent construction (see TODO-35 on its placement).
 
 ### 2.2b `trajectory_algorithms` (`shared/trajectory_algorithms.py`)
 
-Pure free functions operating on `Segment` / `ConflictPoint` — no classes, no state, no
-simulator imports. Two families, each a deliberate swap point rather than fixed logic. Since T10
-`MetaPlanner` selects no interference algorithm: realization's closed-form geometry (below) is the
-one consumed in the run path, and `discretized_time_sampling()` is unconsumed there.
+Pure free functions operating on `Segment` — no classes, no state, no simulator imports. Two
+families: path realization and realization's closed-form interference geometry. Since T10 `MetaPlanner`
+selects no interference algorithm; the batch sampler `discretized_time_sampling()`, its unbuilt
+analytic alternative `closest_point_of_approach()`, and the body-side
+`mesa_configs.yaml: simulation.interference_spatial_resolution` it was bound with were removed
+(TODO-83).
 
 **Path realization** — how one action's motion is computed:
 ```python
@@ -822,25 +831,6 @@ obstacle_aware_path(...)                                          # NOT IMPLEMEN
 `obstacle_aware_path()` is the documented placeholder for DESIGN-13 / TODO-09's
 non-linear, obstacle-aware realization (Phase 4D). Note it may require `Segment` itself to
 grow (e.g. a waypoint list), since a non-linear path is not captured by a start/end pair.
-
-**Interference detection** — given two `Segment`s, where and how close do they get:
-```python
-discretized_time_sampling(segment_a, segment_b, interval=1.0, *, max_spatial_step) -> List[ConflictPoint]
-closest_point_of_approach(segment_a, segment_b) -> List[ConflictPoint]   # NOT IMPLEMENTED
-```
-Both are symmetric in their arguments and return an empty list when the segments do not
-overlap in step-time. `discretized_time_sampling()` is the current default; its sampling
-spacing is `min(interval, max_spatial_step / max(speed_a, speed_b))` with each Segment's
-speed read off the Segment itself, so resolution is fixed in world units whatever the
-embodiment's step size — projection steps are execution ticks (T2, September 2026).
-`max_spatial_step` is keyword-only with **no default**: it is a world-unit quantity and
-therefore a body-side fact; the embodiment layer binds it from its own config
-(`functools.partial`; `mesa_configs.yaml: simulation.interference_spatial_resolution` is still
-read by `mesa_sim/action_decomposer.py` but no longer passed anywhere since T10 removed
-`MetaPlanner(interference_algorithm=...)`). Unbound, the first check raises `TypeError`;
-`closest_point_of_approach()` (CPA) is documented with its analytic approach but unbuilt —
-exact rather than sampled, no interval tradeoff, but with real edge cases (clamping the
-analytic minimum to the overlap window, near-zero relative velocity).
 
 **Realization's geometry (BUILT, T3; redefined F1)** — realization asks this family a different
 question from "where do two fixed trajectories come close": for which SHIFTS of a robot segment is
@@ -864,8 +854,7 @@ that lie inside the disc, the roots of |X|² = s² along that polygon's edges, t
 d-extrema inside it). Every interval is bounded, so a clearing shift always exists. The interval's
 endpoints are where the violating set is touched, and are clear. `first_approach_step`, the former
 hold-position check, was removed at F1. Tolerances are floating-point slack (1e-9 relative), not a
-margin. `closest_point_of_approach()` stays an unbuilt drop-in for `discretized_time_sampling()`;
-`obstacle_aware_path()` becomes the detour strategy of realization (Phase 4D).
+margin. `obstacle_aware_path()` becomes the detour strategy of realization (Phase 4D).
 
 These functions **measure only and hold no policy**. The single policy value is
 `min_separation`, the clearance realization must achieve; `MetaPlanner` supplies it and

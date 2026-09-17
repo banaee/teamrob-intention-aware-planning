@@ -77,7 +77,7 @@ The robot operates with two planning levels and one recognition module, all in `
 - `meta_planner.py` owns task selection. It calls `planner.py` per candidate task to project action sequences, evaluates costs, and selects the next task. HTN does not schedule — it only decomposes.
 - Selection is **single-task, receding-horizon** (DESIGN-16): one best next task per trigger, re-decided from fresh WorldState and belief at the next trigger — not a search over orderings of the remaining pool. `full_reorder` is retained as a documented, switchable alternative but is not implemented.
 - `ProjectedPlan` (DESIGN-06) is the meta_planner's internal reasoning structure, never handed to the executor. Under `single_task` it always holds exactly one entry; the multi-entry shape is retained for `full_reorder`.
-- Interference detection is **geometric, not zone-based** — actual Euclidean distance between projected positions over time. `ProjectedPlanEntry` carries `Segment`s; `ConflictPoint` carries `position` + `distance`, no zone.
+- Interference detection is **geometric, not zone-based** — actual Euclidean distance between projected positions over time. `ProjectedPlanEntry` carries `Segment`s, no zone.
 - Cost is measured in execution ticks (T2: projection steps are Mesa ticks; seconds in ROS): moves, detours, pauses all equal cost units. Since the 4C wait-decision revision a candidate's cost is its REALIZED duration — walking plus the holds placed to keep `min_separation` from the human — so a conflict is priced as time by construction (DESIGN-08 resolved). Team-level semantic costs parked as future extension (TODO-15).
 - The robot can WAIT (4C wait-decision revision, Sept 2026): a hold is computed from the human's projection, enters the cost, and reaches the executor as an execution HINT the executor may refine but never re-decide or cancel. Waiting is not a branch — B2 realizes the current task alone and judges its hold; B3 realizes every candidate and takes the argmin. See design_decisions.md, "The robot can wait".
   Settled at R1 (Sept 2026, after T1b): one hold δ at the trigger position (whole-trajectory minimal
@@ -126,15 +126,14 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
   (single-task path), `project_human()`, `build_segments()`, `estimate_duration()`.
   Injected into `MetaPlanner` rather than constructed by it — one instance, held by the
   agent, shareable with viz/evaluation
-- `shared/trajectory_algorithms.py` — `straight_line_path()`, `stationary_segment()`,
-  `discretized_time_sampling()`; `closest_point_of_approach()` and `obstacle_aware_path()`
-  documented but deliberately unimplemented; `shift_violation_interval()` (T3, rewritten F1) is the
-  closed form realization is built on; `discretized_time_sampling()` has no consumer in the run path
-  since T10 (TODO-83)
+- `shared/trajectory_algorithms.py` — `straight_line_path()`, `stationary_segment()`, `arrival_point()`;
+  `obstacle_aware_path()` documented but deliberately unimplemented; `shift_violation_interval()` (T3,
+  rewritten F1) is the closed form realization is built on; `discretized_time_sampling()` and
+  `closest_point_of_approach()` removed at the 4C housekeeping (TODO-83)
 - `shared/types.py` — `Segment`, `RealizedPlan` (T3), `ExecutorState`, `TriggerDecision`,
   `UpdateResult` (with `hold`, T4), `task_instance_key()`, `check_task_bindings()` (F47b),
-  `ActionSchema.duration_key` (TODO-32); `ConflictPoint` and `InterferenceAssessment` remain as
-  types only (TODO-83); `ProjectedPlanEntry.spatial_zones` → `segments`
+  `ActionSchema.duration_key` (TODO-32); `ConflictPoint` and `InterferenceAssessment` removed
+  (TODO-83); `ProjectedPlanEntry.spatial_zones` → `segments`
 - `mesa_sim/sim_agents.py` — `RobotAgent` migrated off `replanning.py`; `task_index` and
   `_get_current_task_instance()` removed; `finished` flag added
 - `domains/kitting/tasks.py` — third `MethodSchema` `deliver_already_held`, required by the
@@ -305,7 +304,9 @@ TODO-47 (randomised layouts; B3.B fixtures with several remaining robot tasks, (
 strategy, a hold at a chosen point along a segment TODO-70, human cooperation as the remedy for the
 freezing robot TODO-15), TODO-74 (placement positions on the table), B3.B `full_reorder` with
 `realize()`, TODO-71 (the hint's body-side refinement and its reporting), TODO-75 (the ROS guide and
-`env_layout9`), the housekeeping items TODO-81 / 82 / 83.
+`env_layout9`, with the ROS side), TODO-81 (not behaviour-preserving as filed: dock_loading).
+Phase 4C housekeeping (done): strict run options and the `[run]` header, `analysis/logparse.py`,
+io_contracts §1.3 / §2.1 (TODO-72), TODO-82, TODO-83.
 
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
