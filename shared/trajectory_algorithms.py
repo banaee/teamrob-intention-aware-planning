@@ -2,7 +2,7 @@
 shared/trajectory_algorithms.py
 
 PURPOSE:
-    Pure, simulator-agnostic functions that operate on Segment/ConflictPoint
+    Pure, simulator-agnostic functions that operate on Segment
     (shared/types.py). Two families, both deliberately pluggable — meta_planner.py
     holds a reference to whichever function it's using, never hardcodes a call:
 
@@ -29,9 +29,6 @@ WHAT'S IMPLEMENTED VS. PLACEHOLDER:
     arrival_point()            — implemented (T9): where a walk stops when the
                                   walker halts a given radius short of its target.
     stationary_segment()       — implemented, for non-movement actions.
-    discretized_time_sampling()— implemented; the batch interference sampler the
-                                  pre-T10 B3 used. No consumer in the run path
-                                  since T10 (TODO-83).
     shift_violation_interval() — implemented (T3, rewritten F1 for robot-
                                   responsible separation): the set of SHIFTS of
                                   one robot segment that violate a separation
@@ -39,63 +36,26 @@ WHAT'S IMPLEMENTED VS. PLACEHOLDER:
                                   realization (shared/realization.py) is built on.
     (first_approach_step()     — the hold-position check of T3; REMOVED at F1:
                                   a standing robot never violates.)
-    closest_point_of_approach()— NOT IMPLEMENTED. Documented analytic approach
-                                  below; same signature as
-                                  discretized_time_sampling(). The role its
-                                  closed form was reserved for is taken by
-                                  shift_violation_interval().
     obstacle_aware_path()      — NOT IMPLEMENTED. DESIGN-13 / TODO-09's future
                                   non-linear path realization; swap-in
                                   replacement for straight_line_path(), and the
                                   DETOUR strategy of realization (Phase 4D).
 
-    Both placeholders exist so the swap points are visible in code, not just in
+    (discretized_time_sampling() and closest_point_of_approach() — the batch
+                                  interference sampler the pre-T10 B3 used and
+                                  its unbuilt analytic alternative; REMOVED with
+                                  ConflictPoint / InterferenceAssessment when
+                                  nothing consumed them, TODO-83.
+                                  shift_violation_interval() took the closed
+                                  form's role.)
+
+    The placeholder exists so the swap point is visible in code, not just in
     docs — implement when actually needed, not speculatively now.
 """
 
 from typing import Optional, Tuple
 
-from shared.types import Segment, ConflictPoint
-
-
-# =============================================================================
-# Internal helpers
-# =============================================================================
-
-def _position_at(segment: Segment, step: float) -> Tuple[float, float]:
-    """
-    Linear-interpolated position of `segment` at `step`. Assumes straight-line,
-    constant-speed motion within the segment (matches how every current
-    Segment is built — see straight_line_path(), stationary_segment()).
-    `step` is clamped to [segment.start_step, segment.end_step] — callers are
-    expected to only query within a segment's own span (or an overlap window
-    already intersected with it), clamping is just a safety net against
-    floating-point edge steps.
-    """
-    if segment.end_step <= segment.start_step:
-        return segment.start_pos
-    t = (step - segment.start_step) / (segment.end_step - segment.start_step)
-    t = max(0.0, min(1.0, t))
-    x = segment.start_pos[0] + t * (segment.end_pos[0] - segment.start_pos[0])
-    y = segment.start_pos[1] + t * (segment.end_pos[1] - segment.start_pos[1])
-    return (x, y)
-
-
-def _distance(pos_a: Tuple[float, float], pos_b: Tuple[float, float]) -> float:
-    """Euclidean distance between two positions."""
-    dx = pos_a[0] - pos_b[0]
-    dy = pos_a[1] - pos_b[1]
-    return (dx * dx + dy * dy) ** 0.5
-
-
-def _midpoint(pos_a: Tuple[float, float], pos_b: Tuple[float, float]) -> Tuple[float, float]:
-    """
-    Representative position for a ConflictPoint involving two agents.
-    Interference is symmetric (neither agent's position is more "the conflict"
-    than the other's) — the midpoint is the least-arbitrary single point to
-    report. Not used for any distance math, purely for ConflictPoint.position.
-    """
-    return ((pos_a[0] + pos_b[0]) / 2.0, (pos_a[1] + pos_b[1]) / 2.0)
+from shared.types import Segment
 
 
 # =============================================================================
@@ -212,91 +172,6 @@ def obstacle_aware_path(
 # =============================================================================
 # INTERFERENCE DETECTION
 # =============================================================================
-
-def _speed(segment: Segment) -> float:
-    """World units per step along `segment`; 0.0 for a stationary or zero-duration segment."""
-    duration = segment.end_step - segment.start_step
-    if duration <= 0.0:
-        return 0.0
-    return _distance(segment.start_pos, segment.end_pos) / duration
-
-
-def discretized_time_sampling(
-    segment_a: Segment,
-    segment_b: Segment,
-    interval: float = 1.0,
-    *,
-    max_spatial_step: float,
-) -> list:
-    """
-    Default interference algorithm. Samples both segments at fixed step
-    intervals across their overlapping step-time window and reports the
-    geometric distance at each sample. Zero-length overlap (segments don't
-    share any step-time) returns an empty list — not a conflict.
-
-    interval: sampling spacing in steps (execution ticks). Coarser than 1.0 is
-    cheaper but can miss a close pass between samples; finer catches more but
-    costs more calls. Not tuned — same "placeholder default" status as
-    assumed_speed.
-    max_spatial_step: REQUIRED, keyword-only. Upper bound, in world units, on
-    how far the faster of the two agents moves between consecutive samples.
-    The effective spacing is min(interval, max_spatial_step / max(speed_a,
-    speed_b)), with speed read off each Segment itself (distance / duration),
-    so a projection built at 20 units per tick is sampled 20 times per tick
-    when max_spatial_step is 1. It has no default on purpose: a value in world
-    units is a unit-scale assumption (1 cm in Mesa, 1 m in ROS would not be
-    the same resolution), and that is a fact about the body. The embodiment
-    layer binds it — e.g. functools.partial(discretized_time_sampling,
-    max_spatial_step=<from its config>) — and passes the bound callable to
-    MetaPlanner as interference_algorithm. Calling this without it raises
-    TypeError rather than sampling at an assumed scale.
-
-    Returns List[ConflictPoint], one per sample in the overlap window,
-    regardless of how close the sample is. This function only measures, it
-    doesn't judge; the caller that thresholded `distance`
-    (MetaPlanner._detect_interference()) was removed at T10, and nothing in
-    the run path consumes this sampler now.
-
-    Under realization this is at most a FALLBACK for the closed-form
-    shift_violation_interval below: the first sample below min_separation,
-    not the minimum over all of them. It computes more than a hold needs.
-
-    Symmetric in segment_a/segment_b — order doesn't affect the result.
-    """
-    overlap_start = max(segment_a.start_step, segment_b.start_step)
-    overlap_end = min(segment_a.end_step, segment_b.end_step)
-    if overlap_start >= overlap_end:
-        return []
-
-    max_speed = max(_speed(segment_a), _speed(segment_b))
-    if max_speed > 0.0:
-        interval = min(interval, max_spatial_step / max_speed)
-
-    conflicts = []
-    step = overlap_start
-    while step < overlap_end:
-        pos_a = _position_at(segment_a, step)
-        pos_b = _position_at(segment_b, step)
-        conflicts.append(ConflictPoint(
-            step=step,
-            position=_midpoint(pos_a, pos_b),
-            distance=_distance(pos_a, pos_b),
-        ))
-        step += interval
-
-    # Always include the overlap window's exact end point, even if the fixed
-    # interval didn't land on it — otherwise a close pass right at the
-    # boundary can be missed entirely depending on where sampling started.
-    pos_a = _position_at(segment_a, overlap_end)
-    pos_b = _position_at(segment_b, overlap_end)
-    conflicts.append(ConflictPoint(
-        step=overlap_end,
-        position=_midpoint(pos_a, pos_b),
-        distance=_distance(pos_a, pos_b),
-    ))
-
-    return conflicts
-
 
 def _roots(a2: float, a1: float, a0: float) -> list:
     """
@@ -472,51 +347,3 @@ def shift_violation_interval(
     if hi - lo <= tol_t:
         return None
     return (lo, hi)
-
-
-def closest_point_of_approach(
-    segment_a: Segment,
-    segment_b: Segment,
-) -> list:
-    """
-    NOT IMPLEMENTED. Analytic alternative to discretized_time_sampling() — same
-    signature, same List[ConflictPoint] return shape. (The MetaPlanner
-    interference_algorithm parameter it was once a drop-in for was removed at
-    T10; neither function is consumed in the run path — TODO-83.)
-
-    Approach (documented, not yet coded): within the two segments' overlapping
-    step-time window, each agent's position is a linear function of step
-    (straight-line/constant-speed, same assumption as straight_line_path()).
-    The squared distance between the two agents is therefore a quadratic in
-    step; its minimum has a closed-form solution (vertex of the parabola).
-    That minimum must then be clamped to the actual overlap window, since the
-    unconstrained analytic minimum can fall outside it — in that case the
-    true closest approach is at whichever window boundary is nearer the
-    unconstrained minimum. Returns a single ConflictPoint at that step
-    (empty list if the segments don't overlap in step-time at all).
-
-    Exact rather than sampled — no interval/resolution tradeoff — but has
-    edge cases discretized_time_sampling() doesn't (near-zero relative
-    velocity between the two agents makes the quadratic near-degenerate).
-    Left unimplemented deliberately: realization needs neither (it is built
-    on shift_violation_interval()); kept as the documented swap point only.
-
-    ROLE UNDER REALIZATION (Phase 4C wait-decision revision; design_decisions.md,
-    "The robot can wait"): this is what the closed form was reserved for. The
-    question realization asks is not "the minimum over the window" but the
-    EARLIEST VIOLATION of a given min_separation for one robot segment placed
-    at a given start time, against each time-overlapping human segment. Same
-    quadratic: no real root of d²(t) = min_separation² inside the overlap
-    window means no violation; the roots give the violation interval and
-    hence the earliest clear time, which is where the robot holds until. No
-    sampling, no resolution parameter, no world-unit constant in shared/ —
-    min_separation is passed in. Whether it lands under this name or as an
-    `earliest_violation` beside it is the implementer's; the interface is
-    "earliest violation for this segment at this start time".
-    """
-    raise NotImplementedError(
-        "trajectory_algorithms.closest_point_of_approach: not yet built — "
-        "see the analytic approach documented in this function's docstring. "
-        "discretized_time_sampling() is the current default interference "
-        "algorithm."
-    )

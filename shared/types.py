@@ -633,44 +633,6 @@ class RealizedPlan:
 
 
 @dataclass
-class ConflictPoint:
-    """
-    A single observed spatial/temporal overlap between the robot's projected
-    trajectory and the human's predicted trajectory. Purely observational —
-    carries no cost/penalty judgment. Still the return type of
-    trajectory_algorithms.discretized_time_sampling(); no longer consumed by
-    MetaPlanner (T10): DESIGN-08 is resolved without a penalty — realization
-    prices a conflict as the duration of the hold that avoids it, and asks for
-    the violating shift interval per segment rather than a list of samples.
-
-    No `zone` field — zone-based proximity was rejected as too coarse and
-    arbitrary a definition of "close" (see design_decisions.md); replaced by
-    actual geometric distance between the two agents' projected positions,
-    produced by whichever interference algorithm is in use (discretized
-    time-sampling by default, CPA as a documented future alternative — see
-    shared/interference_algorithms.py).
-    """
-    step: float
-    position: Tuple[float, float]
-    distance: float
-
-
-@dataclass
-class InterferenceAssessment:
-    """
-    SUPERSEDED and no longer produced (T10): the output of the removed
-    meta_planner._detect_interference() — a `feasible` verdict (hard exclusion
-    below min_safe_distance) over all observed ConflictPoints. Replaced on the
-    meta-planner side by RealizedPlan (since F1 every plan realizes: a
-    clearing shift always exists), and the detection/valuation split
-    survives inside realization (shift_violation_interval observes, holding
-    values). Kept as a type only; nothing constructs it.
-    """
-    feasible: bool
-    conflicts: List[ConflictPoint] = field(default_factory=list)
-
-
-@dataclass
 class ExecutorState:
     """
     Single immutable per-tick snapshot passed to both evaluate_triggers() and

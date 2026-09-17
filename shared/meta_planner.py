@@ -111,7 +111,7 @@ STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.
     (pre-RESELECT cheap filter — B2 realizing the current task alone is that
     filter; B2 survives as `b2a`, TODO-36), DESIGN-10 (interference geometry
     — realize() asks shift_violation_interval's closed form; the sampling
-    algorithm discretized_time_sampling() is no longer consumed here — see
+    algorithm discretized_time_sampling() was removed, TODO-83 — see
     shared/trajectory_algorithms.py), DESIGN-12
     (horizon-projected confidence — relevant only to full_reorder, moot under
     single_task), DESIGN-13 (partly pulled forward into 4C as the hold-only
