@@ -78,9 +78,9 @@ Decisions
 
 - Phase 4C: realization is built and total (T3, T4, T10, F1), the Mesa executor has the
   execution-time separation stop (C, run option, default off), wait durations come from the schema
-  (TODO-32), scheduled bindings are type-checked at spawn (F47b). Next in the queue: D2 (what a
-  trigger is an event of; designed in the design claude chat (we call it cchat)), then T6 (the ablation). The queue and its
-  order are in `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
+  (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
+  (D2: `recognition_changed` against the decision record replaces `theta_crossed`). Next in the
+  queue: T6 (the ablation). The queue and its order are in `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
   Phase 5 (evaluation), Phase 6 (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. Change only what the task specifies; do not fill in unspecified block logic, flags or
@@ -211,8 +211,12 @@ A behaviour-preserving change must leave these greps byte-identical.
   `domains/kitting/scenarios.py`, and `domains/kitting/registry.py` (import and `layouts` entry).
 - "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is an
   individual task, never an ordering.
-- Triggers: `no_current_task`; `theta_crossed` (a confidence crossing event); `task_committed`
-  (the robot's own grasp, not the human's commitment).
+- Triggers: `no_current_task`; `recognition_changed` (the belief no longer points at the
+  hypothesis the last decision projected, or first clears the gate on one; replaced
+  `theta_crossed` in D2, which older reports and logs still name); `task_committed` (the robot's
+  own grasp, not the human's commitment). Decision record: the projected hypothesis, one field.
+- cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
+  the repository, which builds and checks; older reports call it Fable.
 - Segment: one straight stretch of one robot or human action in a projection. Leg: the
   recognizer's term for a human walk. Do not mix the two.
 - Hold: the robot stands still for δ ticks. T_r: a projected plan's duration. T_h: the end of

@@ -554,6 +554,10 @@ Files: shared/trajectory_algorithms.py, shared/meta_planner.py
 Reference: Phase 4C meta_planner build session, September 2026
 
 **Three cognitive-clock triggers; θ-crossing is an event, not a threshold test**
+SUPERSEDED IN PART (D2, September 2026): `theta_crossed` is replaced by `recognition_changed`, which tracks the
+identity of the projected hypothesis against the decision record rather than the crossing of the gate; the
+open sub-question (below θ: hold or revert; single threshold or band) is closed as hold, by identity, no band.
+`no_current_task` and `task_committed` stand. See "What a trigger is an event of", below.
 `evaluate_triggers()` implements exactly three conditions (resolving DESIGN-07):
 
 - `no_current_task` — `ExecutorState.current_task is None`. Covers both t=0 and ordinary
@@ -2284,3 +2288,81 @@ line. These are the meta-planner-side regression baselines from here on.
 Files: mesa_sim/executor.py (`continue_plan`), mesa_sim/sim_agents.py (`RobotAgent.step`),
 shared/io_contracts.md (§1.9, §2.2, §4.1), analysis/t5_continue/
 Reference: T5 session, September 2026; TODO-43
+
+**What a trigger is an event of: `recognition_changed` against the decision record replaces `theta_crossed`; the blocked event designed, not built (D2)**
+Decided in cchat from ccode's plan-mode reflection (September 2026); built in D2.
+
+A TRIGGER IS A CHANGE IN WHAT `update()` DECIDED ON. The decision rested on a hypothesis (the one it was
+projected against) and on the robot's own task state. Re-decide when the belief no longer points at that
+hypothesis, or first points at one strongly enough to act on; and when the robot's own task state changes
+(`no_current_task`, `task_committed`, unchanged). Three triggers, as DESIGN-07 had; the second replaced.
+
+THE DECISION RECORD is one field, `MetaPlanner._projected_hypothesis`: `belief.most_likely` on the tick
+`update_human_projection()` built a projection, `None` when admission refused (`none(below_theta)`,
+`none(no_human)`, `none(unknown)`, `none(unresolved)`) or before any trigger fired. Cleared on a refusal
+rather than kept, because nothing was projected, so no decision rests on the old hypothesis; a kept record
+would make the trigger fire on every later tick the belief points elsewhere, against a hypothesis no
+decision used. Nothing else is read by any trigger: T_h and the hold were needed only for the dropped
+expiry event (E2b), and the body keeps its own `(decision tick, T_h)` for the `[stop]` label.
+
+`recognition_changed`: ONE condition read from two sides, never two named triggers. A hypothesis is
+recorded and `belief.most_likely` is no longer it — replaced by another (TODO-48), the human's task ended
+and the belief re-initialised (the recognizer's `[IR-boundary]` tick), or `unknown` took over after a pin
+(TODO-54); or none is recorded and the belief clears `_clears_gate()` on a task hypothesis (`unknown` is
+no hypothesis and has no projection; admission refuses it, so nothing enters on it). The gate is asked at
+admission, as before, and on the entering side only. RETENTION IS BY IDENTITY: a recorded hypothesis that
+dips below θ while staying most likely fires nothing, and keeps its projection until it is replaced, ends,
+or the human stops. That consequence is accepted and written down here; a margin or a duration on the dip
+would be a second threshold, the fix not to make (DESIGN-07: single threshold, no band). The rule is
+justified without fixtures: a trigger on the crossing of a threshold over a noisy scalar chatters in every
+scenario; the identity of what the decision rests on does not. The baseline table (plan-mode reflection,
+before the build) was used to REJECT the design chat's first wording — "the hypothesis the belief supports
+under the gate, or none, differs from the recorded one" — because it fired on every dip and re-crossing,
+contradicting its own goal (s20_off 12 fires against 7 today), not to choose the mechanism. TODO-48, TODO-54
+and TODO-68 are consequences of the one condition, not cases; no latch, no debounce, no odds gate, no
+change to the recognizer or to the contract's event semantics on the recognizer side.
+
+When two conditions hold on one tick the order is `no_current_task`, `recognition_changed`,
+`task_committed` — arbitrary, as before; only the reported reason and score differ.
+
+THE BLOCKED EVENT is designed, not built (recorded in TODO-80, to be built with it): the separation stop's
+refusal of a STEP as a fact in `ExecutorState`, fired once per blocked episode, routed past B2 as
+`no_current_task` is, response policy wait now and reconsider as the recorded alternative. Under wait the
+trigger cannot change a decision, so it fixes no liveness; with the stop on, every block in the current
+fixtures is the human's terminal stay at the table with one task left (R2, `blocked.md`), where neither
+policy has anything to choose. The design chat's earlier claim that D2 removes that deadlock is withdrawn.
+TODO-77 (the projector's pick_up accounting) stays out of D2: a projector item, not a trigger question.
+
+MEASURED (PYTHONHASHSEED=0; the sweep and the evaluation fixtures, prior off / on; baselines at the
+pre-D2 HEAD agree byte-for-byte with F1's and F47b's on the decision grep):
+- Fires of the replaced trigger, old `theta_crossed` → new `recognition_changed`: s00 5→4 / 2→4, s10 6→7 /
+  4→7, s20 7→4 / 2→4, s30 2→4 / 2→4, s40 5→10 / 5→10, s50 8→6 / 3→6, s70 5→6 / 3→6, s71 5→7 / 3→6. The new
+  count is two per human task everywhere (a recognition, then its end) except s71_off, where item_5 enters
+  twice (61 and 72): the robot's own `task_committed` at 69 fell inside item_5's dip (0.572), its admission
+  refused, the record was cleared, and item_5's next clearing of the gate is a new recognition. A property
+  of the rule, stated here: the record is what the LAST decision projected, whichever trigger made it, so
+  the guarantee is "no fire while a projection stands", not one fire per hypothesis. Every fire that retracts — admission `none(below_theta)` or
+  `none(unknown)` — decided a CONTINUE in all 16 conditions.
+- PRIOR-ON: decisions identical modulo the reason string and the added retraction continues in s00, s10,
+  s20, s30, s40, s50, s70 (completion 168 / 420 / 239 / 162 / 378 / 237 / 187, unchanged; `[sep]`
+  byte-identical). s71_on: the retraction at the human's boundary, step 54, replaces the last tick of the
+  32-tick hold placed against the coffee stay that ended on that tick (executed 31, interrupted); the
+  robot leaves one tick earlier, completion 204 → 203. Expected under T4's rule that a later decision
+  replaces the hold in progress.
+- PRIOR-OFF: the repeated crossings no longer decide (s00 113 / 115, s10 33 / 35, s20 and s50 24 / 30 /
+  91 / 95, s70 and s71 65); s20 and s50's first hold runs its 8 ticks in one piece instead of 4 + 4
+  (interrupted and re-realized at 24). Robot motion identical in s00, s10, s20, s30, s40, s50, s70
+  (`[sep]` byte-identical). Completion DECLARED two ticks later in s00, s20, s50 (166 → 168, 235 → 237,
+  235 → 237): the old `theta_crossed` on `unknown` at the robot's own last delivery (TODO-54) declared the
+  empty pool on that tick; nothing enters on `unknown` now, so `no_current_task` declares it when the
+  executor's bookkeeping learns of the completion, two ticks later. The run's behaviour is the same;
+  two trailing `[IR]` lines are the only other difference. s71_off: the boundary retraction at 54
+  interrupts the hold's last tick as prior-on, the switch to item_3 comes at 108 instead of 111,
+  completion 204 → 201.
+These are the meta-planner-side regression baselines from here on: `analysis/d2_recognition_trigger/`
+(`sweep/` for s00–s40, `fixtures/` for s50 / s70 / s71; logs local, README committed).
+Files: shared/meta_planner.py (`evaluate_triggers`, `update_human_projection`, `_projected_hypothesis`),
+shared/io_contracts.md (§2.2), CLAUDE.md, docs/roadmap.md, docs/TODOS_AND_DEFERRED.md (48, 54, 68, 80),
+docs/recognizer_handback.md (§5 pointer), analysis/d2_recognition_trigger/
+Reference: D2 session, September 2026; cchat D2 design; DESIGN-07; TODO-48 / 54 / 68 / 77 / 80; R2
+

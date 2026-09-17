@@ -110,7 +110,7 @@ heading kernel (HIGH 4.0 / LOW 0.1 / NEUTRAL 1.0) that multiplied identical head
 - Recursive decomposer with real guard evaluation, derived variable
   resolution, `?agent` binding propagation
 
-**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built; the recognizer rebuilt and handed back; realization designed, measured, decided and BUILT — T3 the service, T4 `b2a`, T10 B3 on realized cost — then made total under robot-responsible separation (F1), with the execution-time separation stop in Mesa (C), blocked time as an outcome (R2), schema wait durations in projection (TODO-32) and typed scheduled bindings (F47b). Remaining in the queue: D2, T6)
+**Phase 4C — MetaPlanner + recognizer rebuild** 🔄 (`single_task` path built; the recognizer rebuilt and handed back; realization designed, measured, decided and BUILT — T3 the service, T4 `b2a`, T10 B3 on realized cost — then made total under robot-responsible separation (F1), with the execution-time separation stop in Mesa (C), blocked time as an outcome (R2), schema wait durations in projection (TODO-32) and typed scheduled bindings (F47b), and the trigger set settled (D2: `recognition_changed` against the decision record). Remaining in the queue: T6)
 
 Built and running end-to-end. All three tasks complete, correct terminal state, zero errors.
 
@@ -184,7 +184,9 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
 - Q3: `_estimate_duration` uses a self-contained geometric estimate (`distance / assumed_speed`)
 - Q4: `replanning.py` retired in one commit after end-to-end validation ✅ done
 - DESIGN-07 resolved: three triggers (`no_current_task`, `theta_crossed` as a *crossing event*,
-  `task_committed`); θ=0.75, no hysteresis, confidence gate-only
+  `task_committed`); θ=0.75, no hysteresis, confidence gate-only. D2 (September 2026) replaced
+  `theta_crossed` by `recognition_changed`: retention by identity against the decision record, the
+  gate asked at admission only; the below-θ sub-question closed as hold, no band
 - DESIGN-16 resolved: single-task receding-horizon selection; strategy flag for `full_reorder`
 - Cancellation resolved (July): guarded HTN method, not a `_cost()` term
 - Queue invariant: `_queue` excludes the executing task; candidates = `[current_task] + queue`
@@ -250,7 +252,9 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   cross θ three times within one grasp stop, because rivals' `deliver_with_return` phases lift them briefly.
   The recognizer is correctly implementing its model and the contract in `io_contracts.md` promises a
   crossing event, not one crossing per task; whether the meta-planner needs a one-shot semantics is an
-  interface decision, not an evidence-model one. Prior-on: one crossing per recognition.
+  interface decision, not an evidence-model one. Prior-on: one crossing per recognition. DECIDED (D2):
+  the trigger tracks the identity of the projected hypothesis, not the gate; a re-crossing of the same
+  hypothesis fires nothing, a change of hypothesis or its end fires. No change to the recognizer.
 - θ is a live-set-dependent bar (TODO-64, TODO-65); the guarantee statement (hand-back §3) says what the
   meta-planner may and must not assume, prior-on and prior-off separately.
 - TODO-52's crash is resolved by decision (R1; the fallback is built in T10); TODO-67 (s30_off selects
@@ -276,13 +280,15 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    one s for two situations, blocked time and human-borne proximity as outcomes, TODO-32 closed),
    F47 / F47b (typed scheduled bindings at spawn; the evaluation fixtures; a stay the projection carries
    is absorbed by realization — `analysis/f47_fixtures/`)
-5. D2 — designed in the design chat. Its main content: what a trigger is an event OF (TODO-68 / 48 /
-   54, the human's task boundary), separating the events that change the evidence from those the current
-   machinery can respond to; admission restricted to evidence-changing events, the remaining churn risk
-   (argmin flips on a re-decision) belonging to B2. The blocked-execution event and its wait-versus-
-   reconsider policy are recorded as design; their evaluation is deferred until a fixture legitimately
-   produces a mid-run block — with valid fixtures none does (F47b), so it waits for TODO-80 or randomised
-   layouts (TODO-47)
+5. D2 ✅ (September 2026) — what a trigger is an event OF: a change in what `update()` decided on.
+   `recognition_changed` replaces `theta_crossed`: the meta-planner records the hypothesis it projected
+   (the decision record, one field) and fires when `most_likely` leaves it or when a task hypothesis
+   first clears the gate with none recorded; TODO-48 / 54 / 68 are consequences, not cases. Robot-side
+   triggers unchanged. The blocked-execution event (the separation stop's refusal as a fact in
+   `ExecutorState`, per blocked episode, past B2, wait now / reconsider recorded) is designed, not
+   built: under wait it cannot change a decision, and reconsider has no valid fixture (F47b), so it
+   waits for TODO-80 or TODO-47. TODO-77 stays a projector accounting item. Entry in
+   `design_decisions.md`; the re-baselined sweep in `analysis/d2_recognition_trigger/`
 6. T6 — ablation: B2 {none, b2a} × B3.A {plain, realized}, sweeps of ρ and of s (`min_separation`)
 Later, not scheduled: TODO-80 (declared out-of-domain human behaviour, the principled unforeseen stay),
 TODO-47 (randomised layouts; B3.B fixtures with several remaining robot tasks, (f)), Phase 4D (the detour

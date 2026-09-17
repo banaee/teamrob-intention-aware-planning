@@ -167,6 +167,10 @@ rationality-measure alternative, TODO-63).
 
 ## 5. The `theta_crossed` question — three things, kept apart (TODO-68)
 
+DECIDED (D2, September 2026): (c) was decided as the design chat's question, and the answer changed the consumer,
+not the event or the model — `recognition_changed` replaces `theta_crossed` in `evaluate_triggers()`, tracking the
+identity of the projected hypothesis (design_decisions.md, D2 entry). The measurements below stand as recorded.
+
 Measured prior-off: the true task crosses θ three times per recognition (s00_off 109 / 113 / 115; s20_off
 20 / 24 / 30 and 87 / 91 / 95). The bumps existed in I4c below θ; I4d's ceiling made them cross; the
 correction did not create them.
@@ -201,7 +205,7 @@ TODO-54 (`theta_crossed` on `unknown` after a pin): the three are one question �
 | gate as a likelihood ratio | TODO-65 | the posterior gate is live-set dependent; the evidence state already is odds against `unknown` |
 | `deliver_with_return`'s guard | TODO-55 (e) | a stray item vs an assigned one; a domain question, implicated in the prior-off crossings |
 | the evidence model's two properties | TODO-61 (a), (b) | §4 |
-| `theta_crossed` one-shot vs crossing | TODO-68, with TODO-48, TODO-54 | §5 |
+| `theta_crossed` one-shot vs crossing | TODO-68, with TODO-48, TODO-54 — closed by D2 | §5 |
 | the context / knowledge-representation pass | TODO-66 | `_context_weight` names two tasks and carries four constants; output only |
 | the stationarity channel | TODO-59 (deferred paragraph) | standing still as evidence against movement hypotheses; outside dC, not built |
 | the unmodelled segment 3 → 4 boundary | TODO-57 (question 3) | superseded by F47b: the legs are `ac_activation` tasks, their completions pin and re-initialise; a declared unmodelled behaviour is TODO-80 |

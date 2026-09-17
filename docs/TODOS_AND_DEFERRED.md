@@ -1369,7 +1369,9 @@ Files: domains/kitting/registry.py, domains/kitting/scenarios.py, mesa_sim/run_m
 shared/meta_planner.py
 Reference: Phase 4C B2/B3 session, September 2026
 
-**TODO-48 — Hypothesis change above θ fires no trigger**
+**TODO-48 — Hypothesis change above θ fires no trigger** ✅ CLOSED (D2, September 2026)
+✅ CLOSED (D2): `recognition_changed` fires when `belief.most_likely` leaves the hypothesis the last decision was
+projected against, above or below θ — a consequence of the one condition, not a case. design_decisions.md, D2 entry.
 `theta_crossed` fires on a confidence crossing (`prev < θ ≤ now`), not on a change of
 `most_likely`. If belief moves from one hypothesis to another while confidence stays ≥ θ
 (e.g. a grasp pins the old top hypothesis and mass jumps to a new one in the same tick),
@@ -1538,7 +1540,10 @@ decision about what one hypothesis's "stretch" is, to be measured on s40 first.
 Files: shared/recognizer.py (`update`: origin handling)
 Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §4
 
-**TODO-54 — `theta_crossed` fires on `unknown` when a pin shrinks the live set** — admission side ✅ CLOSED (T8); trigger side OPEN (with TODO-68/48)
+**TODO-54 — `theta_crossed` fires on `unknown` when a pin shrinks the live set** — admission side ✅ CLOSED (T8); trigger side ✅ CLOSED (D2, September 2026)
+✅ CLOSED, trigger side (D2): `unknown` taking the top fires `recognition_changed` as a RETRACTION of the recorded
+hypothesis (admission then returns `none(unknown)`, the record is cleared); nothing enters on `unknown`, since
+the entering side asks the gate on a task hypothesis only. design_decisions.md, D2 entry.
 s20_off step 136: the robot delivers item_6, the recognizer pins `deliver_item(item_6)`, and
 `unknown` inherits its mass (0.654 → 0.804 ≥ θ) while the human stands idle. `evaluate_triggers`
 fires `theta_crossed`, the meta-planner builds a projection for `unknown` and replans. Belief-side
@@ -1950,7 +1955,11 @@ Files: shared/meta_planner.py (`update`, `_is_complete`), shared/planner.py (`is
 Reference: I4c report ("Flagged, not fixed"); I5 hand-back; T7/T8 session, September 2026; design_decisions.md
 "Task completion is a world fact"
 
-**TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question] — D2's main content
+**TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question] ✅ CLOSED (D2, September 2026)
+✅ CLOSED (D2): the consumer changed, not the event's definition and not the evidence model. `recognition_changed`
+tracks the identity of the projected hypothesis (the decision record), so a re-crossing of the same hypothesis
+fires nothing and a dip below θ while it stays most likely fires nothing; no latch, no debounce, no odds gate.
+Fires per run: `analysis/d2_recognition_trigger/README.md`. design_decisions.md, D2 entry.
 D2 SCOPE (wrap-up after F47b, September 2026; designed in the design claude chat - we call it cchat): what a trigger is an event OF
 — this item with TODO-48, TODO-54 and the human's task boundary — separating the events that change the
 evidence from those the current machinery can respond to. Admission is restricted to evidence-changing
@@ -2404,6 +2413,18 @@ behaviour vocabulary for the human executor (a stay of a stated length at a stat
 schema and adds no hypothesis, or a domain given to the human that is a superset of the robot's. Never by a
 type mismatch (F47's waypoint coffee break) or by repurposing an existing task in a role its schema does not
 describe. Design question for the design claude chat (we call it cchat); nothing built.
+THE BLOCKED-EXECUTION EVENT, designed in D2 (September 2026), to be built here when a valid fixture blocks
+mid-run: the separation stop's refusal of a STEP becomes a fact in `ExecutorState` (the body reports, it
+decides nothing; no threshold — R2, "not an exclusion threshold"); `evaluate_triggers()` fires `blocked` once
+per blocked EPISODE (the first refused tick), not per refused tick; `update()` routes it past B2 as
+`no_current_task` is routed (B2 is commitment to a plan that is executable; a refused plan is not the case
+B2 judges). Response policy: WAIT now — the decision stands, the robot re-decides at the next trigger;
+RECONSIDER recorded as the alternative — B3 with the blocked task marked not executable now (a mark on the
+candidate, not a cost). Under wait the trigger cannot change a decision, so it fixes no liveness: with the
+stop on, every block in the current fixtures is the human's terminal stay at the table with one task left
+(`analysis/c_separation_stop/blocked.md`), where neither policy has anything to choose. The earlier claim
+that D2 removes that deadlock is withdrawn; the remedy is reconsider with a fixture that has an alternative,
+or 4D's human cooperation (TODO-15).
 Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared/types.py
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
 
