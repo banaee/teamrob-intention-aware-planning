@@ -28,82 +28,22 @@ rho sweep). Per run:
     window of the decision in effect (F1's evaluate.py labelling: inside / edge / past T_h / other,
     where other is no projection, the offset tick, no decision, or the robot done).
   - human-borne proximity: blocked.py's stand < s split (stop / hold / own action / done).
-min_separation (s) is read from each log's [run] header. The parsing functions are blocked.py's and F1
-evaluate.py's, copied because neither is importable without running its main body; the (a)/(b) split
-and the world-fact completion are the extensions.
+min_separation (s) is read from each log's [run] header. Parsing, episodes, the decision in effect and
+the sequential-motion check are analysis/logparse.py's (shared with blocked.py and F1 evaluate.py); the
+(a)/(b) split and the world-fact completion are the extensions.
 """
-import re, sys, math
+import re, sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
-TOL = 0.05
-
-def num(x): return None if x in (None, "None") else float(x)
+sys.path.insert(0, str(HERE.parent))
+import logparse
+from logparse import TOL, fmt_dec, seq, in_effect, episodes
 
 def parse(path):
-    hdr = {}
-    fires, b2, b3, cands = {}, None, None, []
-    decisions, pins, holds, stops, sep, rpos, hpos, ract, rtask, releases = [], {}, [], [], {}, {}, {}, {}, {}, []
-    declared, steps, pool = None, 0, None
-    verdicts = {"continue": 0, "continue_hold": 0, "escalate": 0}
-    for l in open(path, errors="replace"):
-        l = l.rstrip("\n")
-        if l.startswith("[run] "):
-            hdr = dict(re.findall(r"(\w+)=(\S+)", l)); continue
-        m = re.match(r"\[meta-trig\] step=(\d+) trigger=(\S+)", l)
-        if m:
-            b2 = b3 = None; cands = []
-            if m[2] != "none": fires[m[2]] = fires.get(m[2], 0) + 1
-            continue
-        if l.startswith("[meta-b2]"):
-            b2 = dict(re.findall(r"(\w+)=(\S+)", l))
-            v = b2.get("verdict")
-            if v in verdicts: verdicts[v] += 1
-            continue
-        if l.startswith("[meta-b3]"):
-            b3 = dict(re.findall(r"(\w+)=(\S+)", l)); continue
-        m = re.match(r"\[meta\] step=(\d+) trigger=(\S+) winner=\S+\{'\?item': '(item_\d+)'.*queue=(.*)$", l)
-        if m:
-            s, trig, w = int(m[1]), m[2], m[3]
-            if pool is None: pool = [w] + re.findall(r"item_\d+", m[4])
-            if b3 is not None:
-                dec = dict(step=s, trigger=trig, winner=w, selection=b3["selection"], hold=int(b3["hold"]), T_h=num(b3["T_h"]))
-            elif b2 is not None and b2.get("verdict", "").startswith("continue"):
-                dec = dict(step=s, trigger=trig, winner=w, selection="b2_" + b2["verdict"], hold=int(b2.get("hold", 0)), T_h=num(b2.get("remaining")))
-            else:
-                dec = dict(step=s, trigger=trig, winner=w, selection="?", hold=0, T_h=None)
-            decisions.append(dec); continue
-        m = re.match(r"\[meta\] step=(\d+) all tasks complete", l)
-        if m: declared = int(m[1]); decisions.append(dict(step=declared, trigger="done", winner="-", selection="done", hold=0, T_h=None)); continue
-        m = re.match(r"\[IR-complete\] step=(\d+) deliver_item\(\?item=(item_\d+),", l)
-        if m: pins.setdefault(m[2], int(m[1])); continue
-        m = re.match(r"\[hold\] step=(\d+) \S+ start planned=(\d+)", l)
-        if m: holds.append(dict(start=int(m[1]), planned=int(m[2]), executed=None, interrupted=None)); continue
-        m = re.match(r"\[hold\] step=(\d+) \S+ end planned=\d+ executed=(\d+) interrupted=(\w+)", l)
-        if m and holds and holds[-1]["executed"] is None:
-            holds[-1]["executed"] = int(m[2]); holds[-1]["interrupted"] = m[3] == "True"; continue
-        if l.startswith("[stop]"):
-            d = dict(re.findall(r"(\w+)=(\S+)", l))
-            m = re.search(r"action=(\w+)\(([^)]*)\)", l)
-            d["step"] = int(d["step"]); d["action"] = m[1]
-            args = m[2].split(",")
-            d["place"] = args[-1] if len(args) > 1 else m[2]
-            d["dist"] = float(d["dist"]); d["step_min"] = float(d["step_min"])
-            stops.append(d); continue
-        m = re.match(r"\[sep\] step=(\d+) \S+ dist=(\S+)(?: min=(\S+))?", l)
-        if m: sep[int(m[1])] = (float(m[2]), num(m[3])); steps = max(steps, int(m[1]) + 1); continue
-        m = re.match(r"\s*step: (\d+): \[robot_\d+\] task=(\S+) action=(\S+) micro=\S+ pos=\[\s*(\S+)\s+(\S+)\s*\]", l)
-        if m:
-            k = int(m[1]); rtask[k] = m[2]; ract[k] = m[3]; rpos[k] = (float(m[4]), float(m[5]))
-            if m[3] == "place" and "micro=release" in l: releases.append(k)
-            continue
-        m = re.match(r"\s*step: (\d+): \[human_\d+\] .*pos=\[\s*(\S+)\s+(\S+)\s*\]", l)
-        if m: hpos[int(m[1])] = (float(m[2]), float(m[3])); continue
-    hold_ticks = set()
-    for h in holds:
-        hold_ticks.update(range(h["start"], h["start"] + (h["executed"] or 0)))
-    sepv = float(hdr.get("min_separation", 50.0))
-    pool = pool or []
+    run = logparse.parse(path)
+    pool, releases, pins = run["pool"], run["releases"], run["pins"]
+    run["sep_v"] = float(run["hdr"].get("min_separation", 50.0))
     done_world = releases[-1] + 1 if pool and len(releases) >= len(pool) else None
     if len(releases) > len(pool):
         print(f"WARNING {path}: {len(releases)} releases for a pool of {len(pool)}", file=sys.stderr)
@@ -111,17 +51,10 @@ def parse(path):
         robot_pins = [pins[i] for i in pool if i in pins]
         if robot_pins and max(robot_pins) != done_world:
             print(f"WARNING {path}: last pin {max(robot_pins)} != last release + 1 = {done_world}", file=sys.stderr)
-    return dict(hdr=hdr, sep_v=sepv, fires=fires, verdicts=verdicts, decisions=decisions, pins=pins, pool=pool, releases=releases,
-                done_world=done_world, declared=declared, holds=holds, hold_ticks=hold_ticks, stops=stops,
-                sep=sep, rpos=rpos, hpos=hpos, ract=ract, rtask=rtask, steps=steps)
+    run["done_world"] = done_world
+    return run
 
 # ---- decisions -------------------------------------------------------------------------------------
-def fmt_dec(d):
-    tag = "" if d["selection"] == "done" else f"[{d['selection']}" + (f",hold={d['hold']}" if d["hold"] else "") + "]"
-    return f"{d['step']}:{d['trigger']}:{d['winner']}{tag}"
-
-def seq(run): return [(d["step"], d["trigger"], d["winner"]) for d in run["decisions"]]
-
 def order(run):
     out = []
     for d in run["decisions"]:
@@ -140,13 +73,6 @@ def diverge(a, b):
     return f"entry {k}: {ga} vs {gb}" + ("" if oa == ob else f"; ORDER {' '.join(oa)} vs {' '.join(ob)}")
 
 # ---- windows (F1 evaluate.py) ----------------------------------------------------------------------
-def in_effect(run, k):
-    d = None
-    for x in run["decisions"]:
-        if x["step"] <= k: d = x
-        else: break
-    return d
-
 def label(d, k):
     if d is None: return "other"
     if d["selection"] == "done": return "other"
@@ -175,29 +101,9 @@ def stop_windows(run):
 def sequential_violations(run):
     """Ticks on which the robot moved and its step broke the F1 rule; (a) started at or beyond s, (b) within."""
     a, b, s = [], [], run["sep_v"]
-    for k in sorted(run["rpos"]):
-        if k - 1 not in run["rpos"] or k not in run["hpos"]: continue
-        r0, r1, h = run["rpos"][k - 1], run["rpos"][k], run["hpos"][k]
-        ex, ey = r1[0] - r0[0], r1[1] - r0[1]
-        ee = ex * ex + ey * ey
-        if ee == 0.0: continue
-        dx, dy = r0[0] - h[0], r0[1] - h[1]
-        t = -(dx * ex + dy * ey) / ee
-        if t <= 0.0: continue
-        t = min(1.0, t)
-        if math.hypot(dx + t * ex, dy + t * ey) < s - TOL:
-            (a if math.hypot(dx, dy) >= s - TOL else b).append(k)
+    for k, _, start in logparse.sequential_violations(run, s):
+        (a if start >= s - TOL else b).append(k)
     return a, b
-
-def episodes(ticks):
-    eps, cur = [], []
-    for k in ticks:
-        if cur and k == cur[-1] + 1: cur.append(k)
-        else:
-            if cur: eps.append(cur)
-            cur = [k]
-    if cur: eps.append(cur)
-    return eps
 
 def stand_within(run):
     stop_ticks = {d["step"] for d in run["stops"]}
@@ -222,7 +128,7 @@ def outcome(run):
     return f"not done in {run['steps']}"
 
 def stop_rules(run):
-    a = sum(1 for d in run["stops"] if d["dist"] >= run["sep_v"] - TOL)
+    a = sum(1 for d in run["stops"] if float(d["dist"]) >= run["sep_v"] - TOL)
     return a, len(run["stops"]) - a
 
 def fires(run):

@@ -21,45 +21,23 @@ Reads stop_off/ and stop_on/ (sweep.sh; cost realized, gate none) and the F1 rea
     agents moving in a straight line during the tick; "viol" when the robot moved and the continuous
     minimum lies below min_separation and below the tick's starting distance). Where it counts a moment
     the sequential check does not, the human's own motion during the tick is what closed the distance.
-Only the line formats of run_mesa.py / meta_planner.py / executor.py are read; no simulator import.
+Only the line formats of run_mesa.py / meta_planner.py / executor.py are read (analysis/logparse.py); no simulator import.
 """
-import re, sys, hashlib, math
+import sys, hashlib
 from pathlib import Path
 
 HERE = Path(__file__).parent
 ROOT = HERE.parent.parent
+sys.path.insert(0, str(HERE.parent))
+import logparse
 F1 = ROOT / "analysis/f1_robot_responsible/realized_none"
 CONFIGS = ["stop_off", "stop_on"]
 SEP = 50.0
-TOL = 0.05
-
-def lines(p): return [l.rstrip("\n") for l in open(p, errors="replace")]
-def num(x): return None if x in (None, "None") else float(x)
 
 def parse(path):
-    L = lines(path)
-    step = None
-    decisions, stops, sep, rpos, hpos, steps = [], [], {}, {}, {}, 0
-    for l in L:
-        m = re.match(r"\[meta-trig\] step=(\d+) trigger=", l)
-        if m: step = int(m[1]); continue
-        m = re.match(r"\[meta\] step=(\d+) trigger=(\S+) winner=\S+\{'\?item': '(item_\d+)'", l)
-        if m: decisions.append((int(m[1]), m[2], m[3])); continue
-        m = re.match(r"\[meta\] step=(\d+) all tasks complete", l)
-        if m: decisions.append((int(m[1]), "done", "-")); continue
-        if l.startswith("[stop]"):
-            d = dict(re.findall(r"(\w+)=(\S+)", l))
-            m = re.search(r"pos=\(([-\d.]+), ([-\d.]+)\) human_pos=\(([-\d.]+), ([-\d.]+)\)", l)
-            d["rpos"] = (float(m[1]), float(m[2])); d["hpos"] = (float(m[3]), float(m[4]))
-            d["action"] = re.search(r"action=(\S+)", l)[1]
-            stops.append(d); continue
-        m = re.match(r"\[sep\] step=(\d+) \S+ dist=(\S+)(?: min=(\S+))?", l)
-        if m: sep[int(m[1])] = (float(m[2]), num(m[3])); steps = max(steps, int(m[1]) + 1); continue
-        m = re.match(r"\s*step: (\d+): \[robot_\d+\] .*pos=\[\s*(\S+)\s+(\S+)\s*\]", l)
-        if m: rpos[int(m[1])] = (float(m[2]), float(m[3])); continue
-        m = re.match(r"\s*step: (\d+): \[human_\d+\] .*pos=\[\s*(\S+)\s+(\S+)\s*\]", l)
-        if m: hpos[int(m[1])] = (float(m[2]), float(m[3])); continue
-    return dict(lines=L, decisions=decisions, stops=stops, sep=sep, rpos=rpos, hpos=hpos, steps=steps)
+    run = logparse.parse(path)
+    run["decisions"] = logparse.seq(run)
+    return run
 
 def fmt(seq): return " ".join(f"{s}:{t}:{w}" for s, t, w in seq)
 
@@ -70,20 +48,7 @@ def diff_seq(a, b, na, nb):
 
 def sequential_violations(run):
     """Ticks on which the robot moved and its step broke the F1 rule against the human's position that tick."""
-    out = []
-    for k in sorted(run["rpos"]):
-        if k - 1 not in run["rpos"] or k not in run["hpos"]: continue
-        r0, r1, h = run["rpos"][k - 1], run["rpos"][k], run["hpos"][k]
-        ex, ey = r1[0] - r0[0], r1[1] - r0[1]
-        ee = ex * ex + ey * ey
-        if ee == 0.0: continue
-        dx, dy = r0[0] - h[0], r0[1] - h[1]
-        t = -(dx * ex + dy * ey) / ee
-        if t <= 0.0: continue
-        t = min(1.0, t)
-        dmin = math.hypot(dx + t * ex, dy + t * ey)
-        if dmin < SEP - TOL: out.append((k, dmin, math.hypot(dx, dy)))
-    return out
+    return logparse.sequential_violations(run, SEP)
 
 def simultaneous_viol(run):
     """The F1 evaluation's 'viol' ticks on [sep] min=: robot moved, continuous minimum below SEP and below the start distance."""
@@ -95,16 +60,7 @@ def simultaneous_viol(run):
         if d_min is not None and d_min < SEP and d_min < d_prev - 1e-9: out.append((k, d_min))
     return out
 
-def episodes(stops):
-    eps, cur = [], []
-    for d in stops:
-        k = int(d["step"])
-        if cur and k == cur[-1] + 1: cur.append(k)
-        else:
-            if cur: eps.append(cur)
-            cur = [k]
-    if cur: eps.append(cur)
-    return eps
+def episodes(stops): return logparse.episodes([int(d["step"]) for d in stops])
 
 runs = {c: {p.stem: parse(p) for p in sorted((HERE / c).glob("*.log"))} for c in CONFIGS}
 base = {p.stem: parse(p) for p in sorted(F1.glob("*.log"))}
@@ -143,7 +99,7 @@ for c in conds:
             for d in on["stops"]:
                 if e[0] <= int(d["step"]) <= e[-1]: labels[d["window"]] = labels.get(d["window"], 0) + 1
             print(f"- ticks {e[0]}–{e[-1]} ({len(e)}): robot at {first['rpos']}, human at {first['hpos']}, dist {first['dist']}, "
-                  f"step_min {first['step_min']}, delayed {first['action']}; window {', '.join(f'{v} {k}' for k, v in labels.items())}; "
+                  f"step_min {first['step_min']}, delayed {first['call']}; window {', '.join(f'{v} {k}' for k, v in labels.items())}; "
                   f"decision {first['decision']} T_h {first['T_h']}")
         print()
     sv_off, sv_on = sequential_violations(off), sequential_violations(on)

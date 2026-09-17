@@ -24,66 +24,29 @@ Reads plain_none/, realized_none/, realized_b2a/ (sweep.sh) and the T10 baseline
     distance against the previous one;
   - how far the new baselines are from the T10 baselines, per configuration: first differing
     decision, and the first differing line per regression grep ([meta-cand] changed format; [sep] compared on `dist`).
-Only the line formats of run_mesa.py / meta_planner.py / executor.py are read; no simulator import.
+Only the line formats of run_mesa.py / meta_planner.py / executor.py are read (analysis/logparse.py); no simulator import.
 """
 import re, sys, hashlib
 from pathlib import Path
 
 HERE = Path(__file__).parent
 ROOT = HERE.parent.parent
+sys.path.insert(0, str(HERE.parent))
+import logparse
+from logparse import fmt_dec, seq, in_effect
 T10 = ROOT / "analysis/t10_b3_realized"
 CONFIGS = ["plain_none", "realized_none", "realized_b2a"]
 SEP = 50.0
 if "--sep" in sys.argv:
     SEP = float(sys.argv[sys.argv.index("--sep") + 1])
 
-ITEM = re.compile(r"deliver_item\(\?item=(item_\d+),\?kitting_table=kitting_table_0\)")
 GREPS = ["[meta] ", "[meta-proj]", "[meta-pool]", "[IR] step=", "[IR-dist]", "[IR-complete]", "[sep]"]
 
-def short(s): return ITEM.sub(r"\1", s)
-def lines(p): return [l.rstrip("\n") for l in open(p, errors="replace")]
-def num(x): return None if x in (None, "None") else float(x)
-
 def parse(path):
-    L = lines(path)
-    step, b2, b3, cands = None, None, None, []
-    decisions, holds, sep, steps, rpos = [], [], {}, 0, {}
-    for l in L:
-        m = re.match(r"\[meta-trig\] step=(\d+) trigger=", l)
-        if m: step = int(m[1]); b2 = b3 = None; cands = []; continue
-        if l.startswith("[meta-b2]"):
-            d = dict(re.findall(r"(\w+)=(\S+)", l))
-            b2 = d; continue
-        if l.startswith("[meta-cand]"):
-            d = dict(re.findall(r"(\w+)=(\S+)", l)); d["task"] = short(l.split()[1]); cands.append(d); continue
-        if l.startswith("[meta-b3]"):
-            b3 = dict(re.findall(r"(\w+)=(\S+)", l)); continue
-        m = re.match(r"\[meta\] step=(\d+) trigger=(\S+) winner=\S+\{'\?item': '(item_\d+)'", l)
-        if m:
-            s, trig, w = int(m[1]), m[2], m[3]
-            if b3 is not None:
-                dec = dict(step=s, trigger=trig, winner=w, source="b3", selection=b3["selection"],
-                           hold=int(b3["hold"]), T_h=num(b3["T_h"]), cands=cands)
-            elif b2 is not None and b2.get("verdict", "").startswith("continue"):
-                dec = dict(step=s, trigger=trig, winner=w, source="b2", selection="b2_" + b2["verdict"],
-                           hold=int(b2.get("hold", 0)), T_h=num(b2.get("remaining")), cands=[])
-            else:
-                dec = dict(step=s, trigger=trig, winner=w, source="?", selection="?", hold=0, T_h=None, cands=[])
-            decisions.append(dec); continue
-        m = re.match(r"\[meta\] step=(\d+) all tasks complete", l)
-        if m: decisions.append(dict(step=int(m[1]), trigger="done", winner="-", source="done", selection="done", hold=0, T_h=None, cands=[])); continue
-        if l.startswith("[hold]"): holds.append(l); continue
-        m = re.match(r"\[sep\] step=(\d+) \S+ dist=(\S+)(?: min=(\S+))?", l)
-        if m: sep[int(m[1])] = (float(m[2]), num(m[3])); steps = max(steps, int(m[1]) + 1)
-        m = re.match(r"\s*step: (\d+): \[robot_\d+\] .*pos=\[\s*(\S+)\s+(\S+)\s*\]", l)
-        if m: rpos[int(m[1])] = (float(m[2]), float(m[3]))
-    return dict(lines=L, decisions=decisions, holds=holds, sep=sep, steps=steps, rpos=rpos)
+    run = logparse.parse(path)
+    run["holds"] = run["hold_lines"]
+    return run
 
-def fmt_dec(d):
-    tag = "" if d["source"] == "done" else f"[{d['selection']}" + (f",hold={d['hold']}" if d["hold"] else "") + "]"
-    return f"{d['step']}:{d['trigger']}:{d['winner']}{tag}"
-
-def seq(run): return [(d["step"], d["trigger"], d["winner"]) for d in run["decisions"]]
 def order(sq):
     out = []
     for _, _, w in sq:
@@ -98,13 +61,6 @@ def diff_seq(a, b, na, nb):
     gb = fmt_dec(b["decisions"][k]) if k < len(sb) else "-"
     return (f"differs from entry {k} ({na} {ga}; {nb} {gb}); task order "
             f"{'identical' if order(sa) == order(sb) else 'DIFFERS: ' + ' '.join(order(sa)) + ' vs ' + ' '.join(order(sb))}")
-
-def in_effect(run, k):
-    d = None
-    for x in run["decisions"]:
-        if x["step"] <= k: d = x
-        else: break
-    return d
 
 def label(d, k, interval):
     if d is None: return "outside(no_decision)"

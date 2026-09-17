@@ -253,8 +253,10 @@ Regenerate `post_fix/` as the T6 sweeps with `post_fix/` in place of `core/` and
 
 ## Flags
 
-- `metrics.py` copies `blocked.py`'s and F1 `evaluate.py`'s parsers because neither is importable without
-  running its main body; a shared parsing module would be housekeeping, not done here.
+- `metrics.py` copied `blocked.py`'s and F1 `evaluate.py`'s parsers because neither is importable without
+  running its main body. Since the Phase 4C housekeeping all four scripts parse through `analysis/logparse.py`;
+  `matrix.md`, C's `comparison.md` / `blocked.md`, F47's `blocked.md` and F1's `comparison.md` regenerate
+  byte-identically (C's and F1's committed files carry a hand-added superseded note on top).
 - The C `blocked.md` completion column is the declared tick (pre-D2 numbers); this task's tables are world
   ticks, two lower. Nothing in C's findings changes.
 - `run.py`'s `T6_SEP_CM` path is written and smoke-tested but unused after the s sweep was dropped; left in
