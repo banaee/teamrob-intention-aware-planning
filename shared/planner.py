@@ -153,6 +153,11 @@ class AdaptivePlanner:
         if task_schema is None:
             raise ValueError(f"AdaptivePlanner: unknown task '{task_name}'")
 
+        # Parameters the task declares determined by another parameter (e.g.
+        # the item's destination table) are filled before method selection
+        bindings = self._resolve_lookups(
+            task_schema.determined_parameters, bindings, world, f"Task: '{task_schema.name}'")
+
         method, bindings = self._select_method(task_schema, bindings, world)  # returns method + updated bindings
 
         # Resolve derived vars declared on this method before processing steps
@@ -286,13 +291,27 @@ class AdaptivePlanner:
         bindings: Dict[str, str],
         world: WorldState,
     ) -> Dict[str, str]:
+        return self._resolve_lookups(method.derived_vars, bindings, world, f"Method: '{method.name}'")
+
+    def _resolve_lookups(
+        self,
+        lookups: Dict[str, tuple],
+        bindings: Dict[str, str],
+        world: WorldState,
+        where: str,
+    ) -> Dict[str, str]:
+        """
+        Resolve {var_name: (lookup_fn, source_var)} against the world: a
+        method's derived_vars or a task's determined_parameters, the same
+        lookups for both. `where` names the declaring method or task in errors.
+        """
         resolved = dict(bindings)
-        for var_name, (lookup_fn, source_var) in method.derived_vars.items():
+        for var_name, (lookup_fn, source_var) in lookups.items():
             source_val = resolved.get(source_var)
             if source_val is None:
                 raise ValueError(
                     f"AdaptivePlanner: derived var '{var_name}' depends on "
-                    f"'{source_var}' which is not bound. Method: '{method.name}'"
+                    f"'{source_var}' which is not bound. {where}"
                 )
             if lookup_fn == "zone_of":
                 derived_val = world.object_zones.get(source_val)

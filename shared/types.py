@@ -240,12 +240,20 @@ class TaskSchema:
     is_assigned: bool = False
     is_foreseeable: bool = False # TODO: if we need it besides the is_assigned flag in TaskInstance — maybe not.
     parameter_types: Dict[str, str] = field(default_factory=dict)
-    # Maps each enumerable Var name to its object type, e.g.
-    # {"?item": "item", "?destination": "kitting_table"}.
-    # IR's hypothesis space takes the cartesian product over every entry here.
-    # A Var not listed here is not enumerated (fixed at plan time some other way,
-    # or the task has no such parameter). Empty dict = no enumeration (coffee_break
-    # today, one hypothesis total).
+    # The TYPE of each parameter, e.g. {"?item": "item", "?kitting_table":
+    # "kitting_table"}: a bound value is validated against it at load
+    # (check_task_bindings). IR's hypothesis space takes the cartesian product
+    # over every entry here that is NOT in determined_parameters. Empty dict =
+    # no enumeration (coffee_break today, one hypothesis total).
+    determined_parameters: Dict[str, tuple] = field(default_factory=dict)
+    # {var_name: (lookup_fn, source_var_name)} — a parameter whose value is not
+    # free but follows from another parameter through a planner lookup, e.g.
+    # {"?kitting_table": ("destination_of", "?item")}: the item's table is a
+    # fact of the station (T-B1a). Not enumerated by the recognizer; resolved
+    # by the planner before method selection. For "destination_of" an explicit
+    # binding in the task instance is used as given and the lookup fills only
+    # an unbound parameter. Distinct from MethodSchema.derived_vars, which are
+    # variables used inside one method's steps, not task parameters.
 
 @dataclass
 class ActionSchema:
@@ -317,8 +325,9 @@ def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str]) -
     """
     A scheduled or assigned task must be well typed against the world it runs in: every
     bound object exists in the layout, and every parameter the schema types
-    (TaskSchema.parameter_types, the same table the recognizer enumerates hypotheses
-    from) is bound to an object of that type. Raises ValueError otherwise — an error,
+    (TaskSchema.parameter_types, which also types a parameter the recognizer does not
+    enumerate because another parameter determines it) is bound to an object of that
+    type. Raises ValueError otherwise — an error,
     not a warning, because an ill-typed instance is a task the domain does not
     describe (a coffee break with no coffee machine), which the human would execute
     and the robot could never recognise (TODO-49 (2), the binding part; F47b). The
@@ -345,16 +354,13 @@ DESTINATION_LOOKUP = "destination_of"
 
 def destination_derivations(schema: "TaskSchema") -> List[Tuple[str, str]]:
     """
-    The (derived var, source var) pairs a task schema resolves through the
-    "destination_of" lookup, over all its methods, deduplicated in declaration
-    order. Read from MethodSchema.derived_vars, never from a var name.
+    The (parameter, source parameter) pairs a task schema determines through
+    the "destination_of" lookup (TaskSchema.determined_parameters), in
+    declaration order. Read from the schema, never from a var name.
     """
-    pairs: List[Tuple[str, str]] = []
-    for method in schema.methods:
-        for var_name, (lookup_fn, source_var) in method.derived_vars.items():
-            if lookup_fn == DESTINATION_LOOKUP and (var_name, source_var) not in pairs:
-                pairs.append((var_name, source_var))
-    return pairs
+    return [(var_name, source_var)
+            for var_name, (lookup_fn, source_var) in schema.determined_parameters.items()
+            if lookup_fn == DESTINATION_LOOKUP]
 
 
 def check_task_destinations(task: TaskInstance, destination_by_id: Dict[str, str]) -> None:

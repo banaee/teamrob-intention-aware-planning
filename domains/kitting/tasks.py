@@ -24,10 +24,12 @@ _agent = Var("?agent")
 deliver_item = TaskSchema(
     name="deliver_item",
     parameters=[_item, _kitting_table],
-    # ?kitting_table is not enumerated: the item's destination is a fact of the
-    # station (the layout's "destination"), resolved from ?item when the task
-    # instance does not bind it; a bound table is used as given (T-B1a).
-    parameter_types={"?item": "item"},
+    parameter_types={"?item": "item", "?kitting_table": "kitting_table"},
+    # ?kitting_table is not free: the item's destination is a fact of the
+    # station (the layout's "destination"), so it is not enumerated and is
+    # resolved from ?item when the task instance does not bind it; a bound
+    # table is used as given (T-B1a).
+    determined_parameters={"?kitting_table": ("destination_of", "?item")},
     methods=[
         MethodSchema(
             name="deliver_already_held",
@@ -35,7 +37,6 @@ deliver_item = TaskSchema(
             guards=[
                 ConditionSchema("holding", (_agent, _item)),
             ],
-            derived_vars={"?kitting_table": ("destination_of", "?item")},
             step_calls=[
                 StepCall(
                     action_name="move_to",
@@ -54,8 +55,7 @@ deliver_item = TaskSchema(
                 ConditionSchema("holding", (_agent, _other)),
                 ConditionSchema("not_equal", (_other, _item)),
             ],
-            derived_vars={"?other_container": ("home_container_of", "?other"),
-                          "?kitting_table": ("destination_of", "?item")},
+            derived_vars={"?other_container": ("home_container_of", "?other")},
             step_calls=[
                 StepCall(
                     action_name="move_to",
@@ -87,7 +87,6 @@ deliver_item = TaskSchema(
             name="deliver_default",
             parameters=[_item, _kitting_table],
             guards=[],
-            derived_vars={"?kitting_table": ("destination_of", "?item")},
             step_calls=[
                 StepCall(
                     action_name="move_to",

@@ -279,7 +279,10 @@ def build_hypothesis_space(
         if not param_types:
             hypotheses.append(HypothesisKey(task_name=intention_name, bindings={}))
             continue
-        var_names = list(param_types.keys())
+        # A parameter another parameter determines (the item's table) is not
+        # free: enumerating it would split one intention into indistinguishable
+        # hypotheses. The planner resolves it per hypothesis.
+        var_names = [v for v in param_types if v not in task_schema.determined_parameters]
         candidate_lists = [known_objects_by_type.get(param_types[v], []) for v in var_names]
         for combo in itertools.product(*candidate_lists):
             hypotheses.append(HypothesisKey(
