@@ -192,11 +192,12 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 | scenario_40 | env_layout4 | foreseeable task and two AC-switch legs (retyped F47b) |
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
-`analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
-graded-evidence sweep, `analysis/g1_graded_evidence/sweep/` (the five plus s50 / s70 / s71, both
-priors, stop off; logs local, md5s in its README), which superseded D2's
-`analysis/d2_recognition_trigger/`. The stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record
-baselines before changing code, then diff.
+`analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are T-B1a
+follow-up 2's sweep, `analysis/tb1a_destination/sweep/` (the five plus s50 / s70 / s71, both priors,
+stop off; logs local, md5s in its README), which superseded the graded-evidence sweep
+(`analysis/g1_graded_evidence/sweep/`; same world-level behaviour, hypothesis keys no longer carry the table,
+and the `[run]` header changed with T-A1's β commit). The
+stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record baselines before changing code, then diff.
 
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
 scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
