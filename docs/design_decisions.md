@@ -2373,3 +2373,85 @@ shared/io_contracts.md (§2.2), CLAUDE.md, docs/roadmap.md, docs/TODOS_AND_DEFER
 docs/recognizer_handback.md (§5 pointer), analysis/d2_recognition_trigger/
 Reference: D2 session, September 2026; cchat D2 design; DESIGN-07; TODO-48 / 54 / 68 / 77 / 80; R2
 
+
+**A stretch's evidence against `unknown` is graded by the share of the expected path it covers (graded evidence)**
+
+THE DEFECT (handback §4, the open design item since I5): a stretch's evidence against `unknown` was L/u
+whatever its length. One fitting step moved the odds by 1/u, the same as a completed walk; with one live
+hypothesis the gate opened on the human's first step after a boundary (s00_on 81, s20_on 57, s30_on 77,
+s10_on 314). The model counted stretches; it did not grade them by how much they revealed.
+
+DECIDED (cchat, September 2026): the grade is the fraction of the hypothesis's expected path that the stretch
+covers, read from the world and the planner's expected action as the excess already is, no domain fact in
+`shared/`; it enters the stretch's odds against `unknown`, monotone in the grade, equal to L/u when the
+stretch covers the whole expected path, no factor at zero (an unwalked stretch stays uninformative); u, β and
+θ stay; the fold session's accounting invariant holds and is re-checked; acceptance on the regression five
+plus s50 / s70 / s71, prior off and on. The functional shape was ccode's, with its reason.
+
+THE GRADE, as built: f = (C(o, g) − C(p, g)) / C(o, g), the share of the direct cost from the stretch's
+origin o to its target g that the agent at p has closed, clipped to [0, 1]; 0 for an empty expected path
+(`likelihood_functions.covered_fraction`). At a fold whose closing action's completion predicate holds, f = 1
+by that fact: the world says the path is covered, so the grade needs no arrival radius (the body's 30 cm is
+not this layer's, and a distance-only grade would leave every arrival at 1 − 30 cm / C(o, g), a value that
+differs per layout). An observation with no path — an action without evaluator or target: `pick_up`,
+`place`, `wait_at`, an undecomposable hypothesis — is ungraded, one whole observation, as before.
+
+THE FORM: the stretch's likelihood under `unknown` is u^f (`graded_unknown_likelihood`), so its odds are
+L / u^f. Two reasons. (1) Log-linear in f: evidence accrues at a constant rate per unit of expected path, and
+two stretches covering the halves of one path multiply to the whole, so what a path is worth does not depend
+on how the phase machinery segments it (for walks, this is TODO-61 (b)'s "u per unit of evidence", the unit
+being the hypothesis's own expected path). (2) L is untouched: refutation by wasted path is charged in full
+whatever the grade. A stretch walked away from its target (f = 0) pays L alone, so the grade meters
+confirmation only (TODO-61 (a)); the rival's fresh post-grasp stretch, which lifted it by 1/u on its first
+step, now lifts nothing (I4d's regress dips, s00_off 114 / s20_off 25, are gone). Rejected: (L/u)^f, which
+loses refutation at f = 0 and is not monotone in f when L < u; a linear u_f = 1 − f (1 − u), which back-loads
+the walk (its last tenth worth as much as its first nine) and does not compose. Reading: `unknown` now pays u
+per whole expected path covered, not per stretch. Its meaning changed (docstring; handback §2); its value did
+not, and nothing was swept.
+
+WHERE: `IntentionRecognizer._unknown_likelihood`, the one reader of the grade, asked at the fold (with
+`arrived` = the closing action's completion holds, `_completion_holds`) and for the open term; update()'s
+structure is otherwise unchanged. The accounting invariant (I4d) is restated with u^f in update()'s docstring
+and handback §1.5, and re-checked by an independent accumulator on all sixteen conditions: max |Δ log odds|
+7.1e-15 over 12,865 checks (`analysis/g1_graded_evidence/summary.md`); the instrumented logs equal the plain
+sweep on every CLAUDE.md grep.
+
+CLOSED FORMS: a lone live task on its first stretch has confidence 1 / (1 + u^f), so θ = 0.75 is reached at
+f = ln 3 / ln 10 ≈ 0.48 of the path (a little more with pins); n whole observations still give 1 / (1 + uⁿ).
+
+MEASURED (PYTHONHASHSEED=0, sixteen conditions, gate none, realized, stop off; `check.py`):
+- The one-hypothesis reveals moved and follow the walk: s00_on 81 → 95, s20_on 57 → 72, s30_on 77 → 87, s10_on
+  314 → 339, s70_on / s71_on ac_switch_0 98 → 120, s50_on coffee 125 → 136; also s10_on item_5 163 → 202 (two
+  live) and s40_on item_6 250 → 254. Each crosses at odds 3.1–3.4 against `unknown`: about half the walk.
+- The prior-off first-task reveals moved little: s00 39 → 37, s10 29, s20 20, s30 28 → 27, s50 20, s70 / s71
+  23 unchanged. The exception is s40, 21 → 30 in both priors (grasp at 60): the longest first walk, where at 21
+  item_3 had covered a third of its path and its odds were u^{−0.35} ≈ 2.2, not 10.
+- No wrong-task crossing anywhere. The prior-off re-crossings within one recognition mostly go (s00 113 /
+  115, s10 33 / 35, s70 / s71 65 / 72); s20 / s50 keep one each (27, 92).
+- Meta-planner consequences, reported, not judged: the `recognition_changed` fires move with the reveals in
+  every condition; robot motion changes in six (s20_on: the hold decided at 6 is decided at 11, completion
+  237 → 235; s30_off 27; s30_on 23; s50_on 11; s70_on 60; s71_off: the switch to item_3 at 108 is gone,
+  item_1 runs to completion and item_3 enters by `no_current_task` at 110, completion 199 → 201); `[sep]`
+  byte-identical in the other ten.
+- THE θ DATA (deferred: whether θ stays a fixed share, becomes a ratio of the top two, or is derived from the
+  live set or the layout is decided on this): `analysis/g1_graded_evidence/crossings.md`, every crossing ± 2
+  ticks with the top odds against `unknown`, the ratio of the top two and the live-set size. At every walk
+  crossing the top odds are 3.1–4.2 whatever the live set (1 to 9 keys); at every arrival crossing about 100
+  (the fold at f = 1 times the open no-graded phase); the ratio of the top two runs from 3.3 (s20_off 92) to
+  246, and ∞ for a lone task.
+
+NOT BUILT, by scope: no grading of the no-graded-signal phases (`pick_up`, `place`, `wait_at` stay one whole
+observation each; the arrival still counts twice), so TODO-61 (b) stays open for them. A consequence to
+record, not judged: for two targets on one bearing the grade is a distance term — the nearer target's fraction
+grows faster, odds ratio u^{−x (1/d_near − 1/d_far)} after x walked — which is TODO-38's option (a) in
+effect, and its risk (a decoy on the true bearing BEFORE the target) now acts mid-walk, not only at the
+decoy's arrival fold. No fixture has such a decoy (handback §3.3).
+
+BASELINES from here: `analysis/g1_graded_evidence/sweep/` (sixteen conditions, stop off; logs local, md5s in
+the README), replacing D2's. The stop-on baselines (C's, F47's) are pre-grade.
+
+Files: shared/likelihood_functions.py (`covered_fraction`, `graded_unknown_likelihood`, the docstrings),
+shared/recognizer.py (`_unknown_likelihood`, `_completion_holds`, `update()`), docs/recognizer_handback.md
+(§1.4, §1.5, §1.8, §1.9, §2, §3, §4, §6, §9), docs/TODOS_AND_DEFERRED.md (38, 61), CLAUDE.md,
+analysis/g1_graded_evidence/
+Reference: graded-evidence session, September 2026; cchat decision; I4d; TODO-61 / 63 / 64 / 65

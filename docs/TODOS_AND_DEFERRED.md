@@ -1111,7 +1111,15 @@ Deferred deliberately to unblock Phase 4C meta-planning.
 Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_target_zone`)
 Reference: Phase 4C B2 design session, September 2026
 
-**TODO-38 — IR: direction-only likelihood cannot separate collinear decoys** [OPEN DISCUSSION — not decided]
+**TODO-38 — IR: collinear decoys — under the excess path separated only by the arrival fold; under the grade, by distance covered** [OPEN DISCUSSION — not decided]
+Heading restated (graded-evidence session, September 2026). The "direction-only likelihood" below is the
+cosine kernel, gone since I4; the excess-path likelihood also cannot separate targets on one bearing
+(both at zero excess for the whole walk; handback §3.3, §4 (a)) — until the grade: two collinear targets at
+distances d_near < d_far now separate DURING the walk, since the nearer target's covered fraction grows
+faster (odds ratio u^{−x (1/d_near − 1/d_far)} after x walked). That is option (a) below in effect, with
+its risk: a decoy on the true bearing BEFORE the target gains mid-walk, not only at its arrival fold. No
+fixture has such a decoy; the collinear decoys in s20 lie BEHIND the true target, and s20_off's first
+reveal stays at the arrival (20). Options (b)–(d) are as written; nothing decided.
 Observed: scenario_20 (run_20260910_083630). shelf_6 lies nearly behind the human's target
 shelf_3 (9°→20° off heading over the approach). Likelihood is cosine-only — distance plays no
 role — so item_6/item_3 ratio stays 0.97–0.99 per step; confidence plateaus at 0.516 and θ is
@@ -1803,7 +1811,21 @@ Not a retune of u. Out of I4c's scope (the likelihood form).
 Files: shared/recognizer.py (`update`: the fold and `unknown`'s factor), shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`)
 Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §5
 
-**TODO-61 — The evidence model is one-sided and observation-counted: (a) confirmation is length-blind, (b) accumulation is observation-count and decomposition sensitive** [OPEN — characterised in I5; a property of the chosen model, not a defect]
+**TODO-61 — The evidence model is one-sided and observation-counted: (a) confirmation is length-blind, (b) accumulation is observation-count and decomposition sensitive** [(a) CLOSED for walks by graded evidence, September 2026; (b) OPEN for the no-graded-signal phases]
+UPDATE (graded-evidence session, September 2026; design_decisions.md, "A stretch's evidence against
+`unknown` is graded by the share of the expected path it covers"): a stretch's odds against `unknown` are
+now L / u^f, f the fraction of the hypothesis's expected path it has covered (1 at an arrival, by the
+completion fact). (a) is closed for walks: a fitting stretch is worth 1 on its first step and 1/u at its
+arrival, and a lone task clears θ at about half its path, not on one step. (b) is closed for walks in one
+respect — the value of a path no longer depends on how the phase machinery segments it (two half-path
+stretches multiply to the whole) — and OPEN for the no-graded-signal phases: `pick_up`, `place`, `wait_at`
+and an undecomposable hypothesis are still one whole observation (1/u) each, so an arrival still counts
+twice and the decomposition still sets how many such observations a hypothesis can gather. `unknown` now
+pays u per whole expected path covered (its meaning, not its value, changed). The s40 illustrations below
+(wander_0, 187, 203–213) are PRE-F47b — the leg is now `ac_activation(ac_switch_1)`, tied with item_6 until
+its arrival fold at 205 (handback §9) — and pre-grade; the s00_off 114 / s20_off 25 regress dips are gone
+under the grade (the rival's fresh stretch walked away from its target pays L alone). Kept as the record of
+their time.
 Broadened in I5 from (a) alone. DECISION and why: the two are kept under one item because they have one root
 — costdif1 with a constant `unknown`: a fitting stretch scores L = 1 whatever its length, and every scored
 observation is worth L/u against a constant reference — and because any remedy for one changes the other's

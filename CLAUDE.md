@@ -184,11 +184,12 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 | scenario_30 | env_layout3 | mirror-symmetric crossing |
 | scenario_40 | env_layout4 | foreseeable task and two AC-switch legs (retyped F47b) |
 
-Use the step counts of the current baselines (the most recent task report that regenerated
-them): F1's `analysis/f1_robot_responsible/realized_none/` for s00, s20, s30 (stop off; C's
-`stop_on/` with the stop on), with s10 superseded by TODO-32 (the difference is stated in the C
-README) and s40 by F47b (`analysis/f47_fixtures/baselines_s40/`). Record baselines before changing
-code, then diff.
+Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
+`analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
+graded-evidence sweep, `analysis/g1_graded_evidence/sweep/` (the five plus s50 / s70 / s71, both
+priors, stop off; logs local, md5s in its README), which superseded D2's
+`analysis/d2_recognition_trigger/`. The stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record
+baselines before changing code, then diff.
 
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
 scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
