@@ -997,7 +997,13 @@ Files: shared/meta_planner.py, shared/io_contracts.md
 Reference: Phase 4C meta_planner build session, September 2026
 
 
-**TODO-36 — `MetaPlanner` block restructuring (B1/B2/B3) not yet implemented** — B2 `b2a` ✅ BUILT (T4); B3 with realized cost ✅ BUILT (T10); B2 vs none identical on the fixtures at ρ = 0.5
+**TODO-36 — `MetaPlanner` block restructuring (B1/B2/B3) not yet implemented** — B2 `b2a` ✅ BUILT (T4); B3 with realized cost ✅ BUILT (T10); B2 vs none identical on the fixtures at ρ = 0.5 — ✅ CLOSED as a design step (T-A1): B2 is an evaluation factor of T-F
+REVISED (T-A1, September 2026): B2 (`gate_strategy`) is an EVALUATION FACTOR in T-F, not a design step.
+`none` and `b2a` are built and stay; `b2b` stays a stub. Whether the commitment gate earns its place is
+a result of T-F's factorial (cost_strategy × gate_strategy × strategy × separation_stop × prior), not a
+question to settle before other work: no step of the pipeline re-reads B2 first, and B3.B does not wait
+for it (under B3.B `b2a` commits to a task and runs unchanged, open point 2 of the B3.B entry, settled at
+T-B's design time). The entry is closed on that; the record below stands.
 `update()` currently runs one flat pipeline: assemble candidates → project each → detect
 interference → filter infeasible → cost → argmin. A block decomposition was designed
 (September 2026) but not built:
@@ -1107,7 +1113,7 @@ called B2 on a current task its own pool had just dropped as complete (s71_off 1
 tick after the world fact, two ticks late); B1.5 now treats a dropped current task as no current task, and
 b2a + realized equals none + realized at ρ 0.5 in all 16 conditions.
 Files: shared/meta_planner.py (`update`, `_is_current_task_plausible`, `_replan_tasks`)
-Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1; T4; T10
+Reference: Phase 4C block-design session, September 2026; wait-decision session, September 2026; R1; T4; T10; T-A1
 
 
 **TODO-37 — IR: delivered items become geometric decoys; `?item` hardcoded in three places** ✅ RESOLVED (I3)
@@ -1393,7 +1399,13 @@ Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_targ
 `_get_relevant_action_schemas`)
 Reference: leg-level evidence session, September 2026
 
-**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C] — (d) end-state variant and (e) evaluation fixtures ✅ BUILT (F47, retyped F47b); (f) B3.B fixtures noted; (g) the gate's reopening condition noted
+**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C] — (d) end-state variant and (e) evaluation fixtures ✅ BUILT (F47, retyped F47b); (f) B3.B fixtures noted; (g) the gate's reopening condition noted — MOVED to T-F (T-A1); (f) is T-B's two-table fixtures
+REVISED (T-A1, September 2026): the randomised harness is part of T-F (evaluation), not the next step
+after 4C. What stays earlier: (f) is T-B's hand-built two-table layouts (below), and (a) programmatic
+registration is built as the first part of fixture generation, in T-B, for them. (b) is reduced: its
+separation half is removed by the T-A1 decision that `min_separation` is supplied by the body in
+physical units (TODO-28), and β is not a scale-calibration item either (TODO-58). No value is rescaled
+with the layout. (d), (e) stand as built; (g) is carried into T-F.
 Plan: run every B2.X × B3.X combination over hundreds of generated simulations (randomised
 layouts, scenarios, parameters) and compare outcomes. Not seed repetition — the sim is
 deterministic under PYTHONHASHSEED=0, so variation must come from generated inputs.
@@ -1403,6 +1415,9 @@ Prerequisites:
 (b) Scale-relative calibration — `min_separation` (formerly `min_safe_distance`, TODO-28; and
     any B2 reference for δ, TODO-36) must be expressed relative to layout scale or agent
     speed × steps, not as an absolute read off one fixture.
+    REVISED (T-A1): withdrawn for `min_separation`, which is a distance the body supplies (a standard
+    sets it; TODO-28), and for β, a physical tolerance fixed on IR grounds (TODO-58). ρ is already a
+    share of the human's remaining horizon. Nothing of (b) remains to calibrate.
 (d) The human's end state as a condition (R2): the current scripts leave the human idle at the
     kitting table after its last task, so with the separation stop on the robot's last delivery is
     refused until the cap (C). A variant in which the human steps aside after its last task is the
@@ -1446,6 +1461,15 @@ Prerequisites:
     items × tables, so with the prior off the human's belief is expected to split between the two table
     hypotheses of an item until the carry walk. DESIGN-16 (revised); design_decisions.md, "B3.B
     (`full_reorder`) is lookahead for the choice of the next task, built next".
+    T-B1 (T-A1, September 2026): a layout with a second table on the opposite side and each item
+    assigned to one table. Example: items 4 and 6 to the north table, item 7 to the south table; from
+    the north table item 7 is the far task, so (4, 6, 7) and (4, 7, 6) differ in walking cost with no
+    human present, which single-task selection cannot see. DESIGN QUESTION, OPEN, to settle before the
+    layout is written: is an item's destination table a DOMAIN fact (one hypothesis per item; the
+    recognizer knows the table from the domain model) or a WORK-ORDER fact (hypotheses items × tables,
+    restricted by the assignment prior)? Under the second reading the belief is expected to split
+    between an item's two table hypotheses until the carry walk, so the human projection is admitted
+    later. design_decisions.md, "B3.B ... THE FIXTURE SIDE".
 (g) THE GATE'S REOPENING CONDITION (gate ruling, September 2026): a walk crossing of θ with a live rival at
     similar odds (top-two ratio near 1 at the crossing), where the normalised share and a margin gate would
     disagree. No current fixture shows one (lowest top-two ratio at a walk crossing 5.23, s00_off 37).
@@ -2446,7 +2470,16 @@ analysis scripts stay, correctly, as records of runs made before the header exis
 Files: mesa_sim/sim_agents.py (the `[run]` line), shared/meta_planner.py (parameter properties), analysis/*/ (readers)
 Reference: θ single-source session, September 2026; T10
 
-**TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent**
+**TODO-58 — β is in centimetres: the detour tolerance is layout-scale dependent** — REWORDED (T-A1, Sept 2026): β is a physical tolerance on wasted path, fixed; not a scale item
+REWORDED (T-A1, September 2026): β is a PHYSICAL tolerance on the path a walking human wastes against the
+direct path to a target, in length units (0.01 /cm: an excess of 100 cm gives L ≈ 0.54), and it is FIXED.
+A detour of a metre is a metre in a small room or a large one: how much a person strays from a direct
+walk is a property of people walking, not of the layout, so the defect stated below ("a layout twice as
+large needs half the β") is withdrawn. The value is decided on IR grounds (what excess a walker toward a
+target plausibly shows; the 30 cm `PROXIMITY_THRESHOLD` slop it must tolerate), NOT measured or tuned on
+fixtures, and it is not part of TODO-47's calibration. What stays true below: the fractional reading was
+measured and rejected, and the Euclidean path cost is exact only in Mesa (hand-back §3.3). The original
+entry is the record of the scale-dependent reading.
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
 (TODO-28's class of defect). The fractional reading — excess as a fraction of C(origin, target) — was
 measured and rejected: its reference length goes to zero at every origin that sits near its target
@@ -2550,6 +2583,13 @@ behaviour vocabulary for the human executor (a stay of a stated length at a stat
 schema and adds no hypothesis, or a domain given to the human that is a superset of the robot's. Never by a
 type mismatch (F47's waypoint coffee break) or by repurposing an existing task in a role its schema does not
 describe. Design question for the design claude chat (we call it cchat); nothing built.
+REVISED (T-A1, September 2026): the scenario-side vocabulary is T-C's HUMAN ACTION SCRIPT: the human's
+scenario is a sequence of primitive actions (move_to a named object or a point, pick_up, place, wait, stay
+for a stated number of ticks), run by the human executor on the scenario layer. The declared stay is one
+script action (`stay` at the kitting table for N ticks after a delivery), not a mechanism; it adds no
+hypothesis and the robot's mind receives nothing from the script. The blocked-execution event below and
+the wait / reconsider pair are built and evaluated in T-D, on that fixture. design_decisions.md, "The
+human's scenario is an action script" and "Robustness is tested in kitting".
 THE BLOCKED-EXECUTION EVENT, designed in D2 (September 2026), to be built here when a valid fixture blocks
 mid-run: the separation stop's refusal of a STEP becomes a fact in `ExecutorState` (the body reports, it
 decides nothing; no threshold — R2, "not an exclusion threshold"); `evaluate_triggers()` fires `blocked` once
@@ -2608,3 +2648,15 @@ reports cite the sampler historically. io_contracts §1.10 / §2.3 describe the 
 Files: shared/trajectory_algorithms.py, shared/types.py, mesa_sim/action_decomposer.py, mesa_sim/mesa_configs.yaml,
 mesa_sim/sim_agents.py
 Reference: T10; F1; wrap-up, September 2026
+
+**TODO-84 — Selection against the expected realized cost over the belief** [Phase 5 comparison; from T-A1]
+Today the belief is used as a bar, not a magnitude: `_clears_gate` admits the most likely hypothesis's
+projection, and B3 realizes every candidate against that one projection as if it were certain
+("confidence is a gate, never a magnitude"). A belief of 0.76 and one of 0.99 on the same hypothesis give
+the same decision, and a rival at 0.2 prices nothing. Recorded as a limitation in design_decisions.md
+("The belief is used as a bar, not a magnitude"). The comparison to make, later, in Phase 5: selection on
+the EXPECTED realized cost over the belief (each candidate realized against each admitted hypothesis's
+projection, weighted by its probability) against the current bar. A comparison, not a change: nothing in
+the design is changed by recording it.
+Files: shared/meta_planner.py (`_clears_gate`, `update_human_projection`, `_replan_tasks`)
+Reference: T-A1, September 2026

@@ -2709,6 +2709,25 @@ hypotheses of one item share the fetch walk. With the assignment prior off, the 
 split between them until the carry walk discriminates, which would move the admission of the human
 projection later than in one-table layouts. Expected from the code, not measured.
 
+THE FIXTURE SIDE (T-A1, September 2026; T-B1). A kitting layout with a second table on the opposite side
+of the room and each item assigned to one table. Example: items 4 and 6 go to the north table, item 7 to
+the south table. From the north table item 7 is the far task, so the orderings (4, 6, 7) and (4, 7, 6)
+differ in walking cost with no human present: that difference is what single-task selection cannot see,
+and it is the first thing the evaluation looks for (plain cost). Hand-built, registered programmatically
+(TODO-47 (a), built here as the first part of fixture generation).
+ONE DESIGN QUESTION BEFORE THE LAYOUT IS WRITTEN, OPEN: what kind of fact is an item's destination table?
+  - A DOMAIN fact: the domain model says where each item goes. One `deliver_item` hypothesis per item; the
+    recognizer knows the table from the domain, and the belief is as in one-table kitting.
+  - A WORK-ORDER fact: the table is a binding of the task instance, as `?kitting_table` is today. The
+    hypothesis space is items × tables; the assignment prior (when on) restricts it to the assigned
+    pairs. Expected recognizer effect with the prior off: the two table hypotheses of one item share the
+    fetch walk, so the belief splits between them until the carry walk discriminates, and the human
+    projection is admitted later than in one-table layouts. Expected from the code, not measured.
+The two readings put the same layout to different uses (the first tests ordering with the recognizer as
+it behaves now; the second also tests the recognizer on a split it has not met). The choice is cchat's.
+Open points 1 and 2 above are settled at design time in T-B2 (the proposals: the hold at the boundary
+before the task it clears; B2 commits to a task).
+
 Files: docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md (TODO-07, DESIGN-12, DESIGN-16, TODO-47 (f)),
 docs/roadmap.md, shared/meta_planner.py (docstring), shared/projection.py (docstring),
 shared/io_contracts.md (§2.2 strategy paragraph)
@@ -2741,3 +2760,127 @@ and the stop-on s00 / s30 cells (`analysis/c_separation_stop/stop_on/`) are byte
 Files: shared/meta_planner.py, mesa_sim/mesa_configs.yaml, mesa_sim/action_decomposer.py,
 mesa_sim/sim_agents.py, shared/io_contracts.md (§2.2), analysis/t6_ablation/run.py (the keyword)
 Reference: T-A1, September 2026; TODO-28; R1; T6
+
+---
+
+**The pipeline from T-A: what moved, and why (T-A1)**
+
+DECIDED (cchat, September 2026, after reading the state in `analysis/big_picture/STATUS.md`). The plan from
+here is T-A (records) → T-B (B3.B on two tables) → T-C (the human action script) → T-D (robustness in
+kitting) → T-E (demonstration) → T-F (evaluation, Phase 5) → T-G (later: a second domain in Mesa, 4D,
+ROS); `docs/roadmap.md` holds it. Four decisions shape that order.
+1. B2 (`gate_strategy`) IS AN EVALUATION FACTOR, NOT A DESIGN STEP. STATUS.md named "does the commitment
+   gate survive?" as the first question for generated fixtures. It is not a question to answer before
+   other work: `none` and `b2a` are both built, nothing downstream depends on which one wins, and B3.B
+   leaves `b2a` unchanged (it commits to a task). So it is one factor of T-F's factorial, and no step
+   re-reads B2 first. TODO-36 closes on this.
+2. THE RANDOMISED HARNESS (TODO-47) MOVES TO T-F. It was "the next step" because three questions (B2, the
+   gate's reopening condition, the scale of `min_separation` and β) were said to be answerable only there.
+   Of these, B2 is a factor (1), the gate's reopening condition (TODO-47 (g)) is a T-F condition, and the
+   scale question is gone: `min_separation` is a distance the body supplies ("`min_separation` is supplied
+   by the body", above) and β is a physical tolerance ("β is a physical tolerance", below). What was
+   genuinely blocking is the ordering fixture, so TODO-47 (f) stays in T-B as hand-built two-table layouts,
+   with programmatic registration built there as the first part of fixture generation.
+3. THE DEMONSTRATION COMES AFTER T-B, T-C AND T-D. Built now it could show switch and hold (s70 / s71) only.
+   After them it shows what the framework claims: a two-table ordering, a change of mind, `unknown` as an
+   outcome, as well as switch and hold, plain against realized cost, the stop on, prior off.
+4. THE DOCUMENTATION PASS FOR THE PAPER COMES BEFORE THE PAPER, NOT BEFORE THE DEMONSTRATION. The demo is
+   an instrument for seeing behaviour, and it needs the viewer, not polished documents; the paper needs
+   the record consolidated once the evaluation's content is known.
+Reference: T-A1, September 2026; `analysis/big_picture/STATUS.md`; TODO-36; TODO-47
+
+---
+
+**β is a physical tolerance on wasted path, fixed, decided on IR grounds (T-A1)**
+
+DECIDED (cchat, September 2026). β (`BETA` = 0.01 /cm, `shared/likelihood_functions.py`) is the tolerance
+of the excess-path likelihood: how much path a human walking toward a target may waste against the direct
+path before the evidence turns against that target (an excess of 100 cm gives L ≈ 0.54). It is a physical
+quantity about people walking, in length units, and it is fixed. TODO-58 read it as a layout-scale defect
+("a layout twice as large needs half the β"); that reading is withdrawn: a metre of detour is a metre in
+any room, and a larger layout does not make people stray further per walk. The value is set on IR grounds
+(what a walker toward a target plausibly wastes, and the 30 cm arrival slop it must tolerate, I4) and is
+not measured, tuned or rescaled on fixtures; it is not part of TODO-47's calibration. What stays open is
+what the hand-back already says: the Euclidean path cost is exact only in Mesa, and a real cell needs an
+injected path cost (hand-back §3.3).
+Reference: T-A1, September 2026; TODO-58; I4
+
+---
+
+**The belief is used as a bar, not a magnitude: a limitation, recorded (T-A1)**
+
+RECORDED (cchat, September 2026). "Confidence is a gate, never a magnitude" (DESIGN-07; io_contracts §2.2;
+hand-back §3) is a design rule, and it has a cost worth stating: the meta-planner uses the belief only to
+decide WHETHER to admit one hypothesis's projection (`_clears_gate`, θ = 0.75), then prices every candidate
+against that one projection as if it were certain. So a belief of 0.76 and one of 0.99 on the same task
+give the same decision, and a rival hypothesis at 0.2 contributes nothing, even where its projection would
+make a candidate's hold much longer. What the rule buys is that no cost carries a probability that the
+recognizer does not calibrate (its confidence ceiling rises with the observation count, I4), and that the
+decision rests on one hypothesis that can be recorded (D2's decision record). The alternative, selecting on
+the expected realized cost over the belief, is a comparison for Phase 5 (TODO-84), not a change: nothing in
+the design moves by recording it.
+Reference: T-A1, September 2026; DESIGN-07; D2; the gate ruling; TODO-84
+
+---
+
+**The human's scenario is an action script, run on the scenario layer (T-C, recorded in T-A1)**
+
+DECIDED IN DIRECTION (cchat, September 2026); its design is T-C1, its build T-C2. Nothing built.
+
+WHAT CHANGES. Today the human's scenario is a list of tasks, and the human executor loads each task's plan
+from the planner and runs it to completion. So the human can only behave as a robot task looks, and the
+recognizer is only ever tested against behaviour that exactly matches one of its hypotheses. Under the
+change the scenario states a sequence of primitive actions the human performs, in order, and the human
+executor runs that sequence: `move_to` a named object or a point (x, y); `pick_up`; `place`; `wait`; `stay`
+at a place for a stated number of ticks. A part of a script may still be written as a task, which expands
+to its actions, so the existing scenarios stay readable and the regression fixtures are unchanged in
+behaviour (the check T-C2 must pass: byte-identical greps).
+
+WHY. It makes expressible what the framework claims to handle and has never met. Three cases, each an
+expectation from the design, not a measurement:
+  1. CHANGE OF MIND. The human walks toward item_2 and, ten ticks into the walk, turns to the coffee
+     machine. Expected: the item_2 hypothesis is refuted by the geometry of its own expected action (the
+     excess path grows; no completion pin, so no episode boundary and no re-initialisation);
+     `coffee_break` rises; `recognition_changed` fires twice, once for the retraction (most_likely leaves
+     the recorded hypothesis) and once for the new recognition (it clears the gate), and the robot
+     re-decides twice. Never observed, because no script could produce it.
+  2. `unknown` AS THE OUTCOME. The human walks to an empty corner, with no shelf or foreseeable object near
+     it. Expected: every hypothesis accumulates excess, their odds against `unknown` fall below 1,
+     `unknown` leads; admission refuses (T8: `unknown` is not admitted), so the robot plans with no human
+     projection, on plain cost. `unknown` has so far only been refuted, never confirmed, in a live run:
+     this is the first test of the constant-`unknown` design (I4, I4d).
+  3. THE DECLARED STAY. The human stands at the kitting table for N ticks after a delivery. This is
+     TODO-80's declared behaviour outside the robot's domain knowledge, now one script action (`stay`)
+     instead of a mechanism. It is T-D's fixture for the blocked case.
+
+THE BOUNDARY. The script lives on the scenario layer: the Mesa human executor and the scenario files. The
+recognizer and the meta-planner receive nothing from it; they see the trajectory, as now ("the robot knows
+nothing of the human's script"). The recognizer's hypotheses stay task-level. Aligning free actions with
+tasks is what the excess-path evidence does, and the script is how that alignment is tested; no
+hypothesis is added for a script action.
+Reference: T-A1, September 2026; TODO-80; D2; I4; T8
+
+---
+
+**Robustness is tested in kitting, on the script: `unknown` and the blocked case (T-D, recorded in T-A1)**
+
+DECIDED (cchat, September 2026). `unknown` and the blocked case are tested in kitting, now, with T-C's
+script vocabulary; they do not wait for a second domain. T-D builds on T-C.
+
+SCENARIOS. A change of mind mid-task; a walk to an empty corner (`unknown` as outcome); a declared stay at
+the table (the blocked case). The first two need no new mechanism, only the script; they test what is
+built (retraction and re-recognition through `recognition_changed`; `unknown` leading and admission
+refusing).
+
+THE BLOCKED EVENT, built as designed in D2 and recorded under TODO-80: the separation stop's refusal of a
+STEP becomes a fact in `ExecutorState` (the body reports, it decides nothing); `evaluate_triggers()` fires
+once per blocked episode (the first refused tick); `update()` routes it past B2 as `no_current_task` is
+routed. The response policy is a pair: WAIT (stand; the decision stands and the robot re-decides at the
+next trigger) against RECONSIDER (mark the blocked task not executable now, a mark on the candidate and not
+a cost, and select among the others). Under wait the trigger cannot change the decision, so the pair is
+built and evaluated together, with the declared stay as the fixture that makes the comparison possible
+(F47b found that no task-scripted fixture blocks mid-run: a stay the projection carries is priced).
+
+MEASURE. Blocked time and completion (the world fact, T6), wait against reconsider; and on the other two
+scenarios, whether retraction and re-recognition fire as expected and whether `unknown` leads.
+Reference: T-A1, September 2026; D2; TODO-80; F47b; C; R2

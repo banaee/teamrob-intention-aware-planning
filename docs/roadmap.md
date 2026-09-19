@@ -234,7 +234,9 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   relative to motion so that it scales; the `assumed_speed` / time-scale half was RESOLVED by T2. Landed
   in B2 (T4) and B3 (T10). R2 records what the one value costs: it governs both crossing in the open and
   working side by side at a point place, where s ≤ 2r and opposite-side arrival would be needed (50 vs
-  60 cm here: the rim only). Revisit under TODO-47 and ROS body sizes.
+  60 cm here: the rim only). Revisit under TODO-47 and ROS body sizes. REVISED (T-A1): supplied by the
+  body in physical units (Mesa: `mesa_configs.yaml`, 50 cm), not 2.5 × motion per tick; set per body, not
+  a scale-calibration item. Behaviour unchanged.
 - TODO-29: `deliver_with_return` still unexercised under the MetaPlanner for the ROBOT. It is exercised every
   run by the recognizer for rival hypotheses of the human, and whether its guard is the right prediction there
   is now an open domain question (TODO-55 (e)).
@@ -327,14 +329,14 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    B2 commits to. Entry in `design_decisions.md`, "B3.B (`full_reorder`) is lookahead for the choice of
    the next task, built next"; DESIGN-16 (revised), TODO-07, DESIGN-12, TODO-47 (f)
 
-*Next step:* B3.B (`full_reorder`), in this order, each its own task: the two open points decided in
+*Next step (superseded by "The plan from T-A" below, T-A1):* B3.B (`full_reorder`), in this order, each its own task: the two open points decided in
 cchat (the hold placement before the realized-cost step at the latest); the successor state and
 `Projector.project()` for orderings longer than 1; the two-table kitting layouts and scenarios (TODO-47
 (f), hand-built); B3.B on plain cost, then on realized cost; the evaluation of B3.A against B3.B (plain
 first, then realized; the one-table fixtures expected identical in choice). The order of the build steps
 is a proposal of the design entry, not decided.
 
-*After it:* the randomised fixtures (TODO-47: generated layouts and scenarios, its prerequisites (a)
+*After it (superseded, T-A1: the harness moved to T-F):* the randomised fixtures (TODO-47: generated layouts and scenarios, its prerequisites (a)
 programmatic registration and (b) scale-relative calibration). They carry the one condition that reopens
 the gate, a walk crossing with a live rival at similar odds (TODO-47 (g)), which no current fixture shows.
 
@@ -345,6 +347,52 @@ freezing robot TODO-15), TODO-74 (placement positions on the table), TODO-71 (th
 `env_layout9`, with the ROS side), TODO-81 (not behaviour-preserving as filed: dock_loading).
 Phase 4C housekeeping (done): strict run options and the `[run]` header, `analysis/logparse.py`,
 io_contracts §1.3 / §2.1 (TODO-72), TODO-82, TODO-83.
+
+### The plan from T-A (T-A1, September 2026)
+
+The 4C queue above is the record of what was done; this is the plan from here. Each item is a task name
+later sessions use (T-B2, T-C1, ...). The state before this revision: `analysis/big_picture/STATUS.md`.
+Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
+
+- **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
+  physical units, the only code change, byte-identical). Then the handoff to the next design chat.
+- **T-B — B3.B full-queue reordering.**
+  - B1: two-table kitting layouts and scenarios, hand-built, after one design question: is an item's
+    destination table a domain fact or a work-order fact (design_decisions.md, B3.B entry, "THE FIXTURE
+    SIDE"; TODO-47 (f)). Registered programmatically, as the first part of fixture generation (TODO-47 (a)).
+  - B2: the build in the recorded order: the successor state and `project()` for orderings; B3.B on plain
+    cost; then on realized cost; a `strategy` run option. Open points settled at design time: the hold at
+    the boundary before the task it clears; B2 commits to a task.
+  - B3: evaluation of B3.A against B3.B on the two-table fixtures, plain then realized; the one-table
+    fixtures byte-identical for the default run.
+- **T-C — The human action script.** The human's scenario is a sequence of actions (`move_to` a target or
+  a point, `pick_up`, `place`, `wait`, `stay`), run by the human executor on the scenario layer; the mind
+  knows nothing of it; a part may still be written as a task, so the regression fixtures are unchanged.
+  C1 design chat; C2 build. TODO-80's declared stay becomes one script action. design_decisions.md, "The
+  human's scenario is an action script".
+- **T-D — Robustness in kitting, on T-C.** Scenarios for a change of mind mid-task, a walk to an empty
+  corner (`unknown` as outcome), a declared stay at the table (the blocked case); the blocked event in
+  `ExecutorState`, the trigger routed past B2, the reconsider policy (design in TODO-80 and D2); evaluation
+  of retraction and re-recognition firing, `unknown` leading, blocked time and completion under wait
+  against reconsider. design_decisions.md, "Robustness is tested in kitting".
+- **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
+  set covers switch and hold (s70 / s71), a two-table ordering, a change of mind, `unknown`; plain against
+  realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and
+  `unknown`, not only switch and hold.
+- **T-F — Evaluation (Phase 5).** Fixture generation completed (the randomised harness, TODO-47); factors
+  `cost_strategy` × `gate_strategy` × `strategy` × `separation_stop` × prior (B2 is a factor here, not a
+  design step: TODO-36); metrics on `recognition_changed`, completion from the world fact, blocked time,
+  wrong-task ticks. The comparison against expected realized cost over the belief is a later item of this
+  phase (TODO-84).
+- **T-G — Later, in this order:** a second domain in Mesa; 4D (detour); ROS.
+
+The documentation pass for the paper comes before the paper, not before the demonstration.
+
+Decisions recorded with this plan (T-A1), each where its entry lives: B2 is an evaluation factor (TODO-36
+closed); the randomised harness moves to T-F, (f) stays in T-B, the separation half of (b) is removed and
+β is not a scale item (TODO-47); β is a physical tolerance on wasted path, fixed on IR grounds (TODO-58);
+the belief is used as a bar, not a magnitude, recorded as a limitation (design_decisions.md; TODO-84);
+`min_separation` is supplied by the body in physical units (TODO-28; design_decisions.md).
 
 **Phase 4D — Low-level execution adaptation**
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
@@ -382,7 +430,7 @@ io_contracts §1.3 / §2.1 (TODO-72), TODO-82, TODO-83.
 
 ---
 
-## Phase 5 — Evaluation & Experiments 🔲
+## Phase 5 — Evaluation & Experiments 🔲 *(T-F in the plan from T-A; the factors and metrics there supersede the list below where they differ)*
 - Comparative evaluation: IR accuracy vs. ground truth (known human intentions from scripted human)
 - Domains: kitting (the five regression fixtures and the evaluation fixtures, roadmap Phase 3), dock loading (deferred)
 - Metrics, restated after 4C-IR (what each now means, and what it cannot mean):
