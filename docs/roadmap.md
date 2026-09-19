@@ -254,8 +254,10 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
   interface decision, not an evidence-model one. Prior-on: one crossing per recognition. DECIDED (D2):
   the trigger tracks the identity of the projected hypothesis, not the gate; a re-crossing of the same
   hypothesis fires nothing, a change of hypothesis or its end fires. No change to the recognizer.
-- θ is a live-set-dependent bar (TODO-64, TODO-65); the guarantee statement (hand-back §3) says what the
-  meta-planner may and must not assume, prior-on and prior-off separately.
+- θ was a live-set-dependent bar (TODO-64, TODO-65); the guarantee statement (hand-back §3) says what the
+  meta-planner may and must not assume, prior-on and prior-off separately. DECIDED (the gate ruling,
+  September 2026): the dependence was the likelihood's, removed by graded evidence; the gate stays
+  `confidence ≥ 0.75` on the normalised share. TODO-64 / 65 closed.
 - TODO-52's crash is resolved by decision (R1; the fallback is built in T10); TODO-67 (s30_off selects
   an already-delivered item) was fixed in T7; the context / knowledge-representation pass (TODO-66).
 
@@ -299,8 +301,20 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    The review found one defect, fixed in the wrap-up: `update()` continued a current task its own pool
    had dropped as complete (B1.5). Completion is measured from the world fact from here on (the declared
    empty-pool tick minus 2). `analysis/t6_ablation/`; TODO-36
+7. The gate ruling ✅ (September 2026, documentation only) — on the graded-evidence θ data
+   (`analysis/g1_graded_evidence/crossings.md`): the admission gate stays `_clears_gate` on the normalised
+   share, θ = 0.75. The live-set dependence was in the likelihood, not the gate; under the grade a walk
+   crossing sits at about 3:1 or more over `unknown` whatever the live-set size, higher while a rival is
+   unrefuted. Not taken: odds against `unknown`, the ratio of the top two, θ from the live set or the
+   layout, a rate-of-growth gate. TODO-64 / 65 closed; entry in `design_decisions.md`, "The gate stays a
+   fixed share"
+
+*Next step:* the randomised fixtures (TODO-47: generated layouts and scenarios, its prerequisites (a)
+programmatic registration and (b) scale-relative calibration). They carry the one condition that reopens
+the gate, a walk crossing with a live rival at similar odds (TODO-47 (g)), which no current fixture shows.
+
 Later, not scheduled: TODO-80 (declared out-of-domain human behaviour, the principled unforeseen stay),
-TODO-47 (randomised layouts; B3.B fixtures with several remaining robot tasks, (f)), Phase 4D (the detour
+TODO-47's B3.B fixtures with several remaining robot tasks ((f)), Phase 4D (the detour
 strategy, a hold at a chosen point along a segment TODO-70, human cooperation as the remedy for the
 freezing robot TODO-15), TODO-74 (placement positions on the table), B3.B `full_reorder` with
 `realize()`, TODO-71 (the hint's body-side refinement and its reporting), TODO-75 (the ROS guide and

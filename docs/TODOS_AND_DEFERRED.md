@@ -1337,7 +1337,7 @@ Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_targ
 `_get_relevant_action_schemas`)
 Reference: leg-level evidence session, September 2026
 
-**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C] — (d) end-state variant and (e) evaluation fixtures ✅ BUILT (F47, retyped F47b); (f) B3.B fixtures noted
+**TODO-47 — Stress-test harness: randomised layouts, scenarios, parameters** [post-4C] — (d) end-state variant and (e) evaluation fixtures ✅ BUILT (F47, retyped F47b); (f) B3.B fixtures noted; (g) the gate's reopening condition noted
 Plan: run every B2.X × B3.X combination over hundreds of generated simulations (randomised
 layouts, scenarios, parameters) and compare outcomes. Not seed repetition — the sim is
 deterministic under PYTHONHASHSEED=0, so variation must come from generated inputs.
@@ -1379,6 +1379,12 @@ Prerequisites:
 (f) B3.B (`full_reorder`, not in 4C): a future fixture needs SEVERAL remaining robot tasks whose ORDER, not
     only the next choice, changes cost under a human stay. Not built; every current fixture leaves the robot
     at most one alternative at the stay.
+(g) THE GATE'S REOPENING CONDITION (gate ruling, September 2026): a walk crossing of θ with a live rival at
+    similar odds (top-two ratio near 1 at the crossing), where the normalised share and a margin gate would
+    disagree. No current fixture shows one (lowest top-two ratio at a walk crossing 5.23, s00_off 37).
+    Report it where the generated fixtures produce it (the crossing tick, top odds against `unknown`, the
+    ratio of the top two, the live set, as in `analysis/g1_graded_evidence/crossings.md`); do not build a
+    fixture for it. TODO-64 / 65, design_decisions.md, "The gate stays a fixed share".
 (c) Fixture gap (T1, `analysis/t1_conflict_measurement/REPORT.md` §(a), §(c)): no current
     scenario has a correct-hypothesis *crossing* on the robot's current task. The only
     correct-hypothesis crossings measured are the never-selected item_7 alternatives in
@@ -1896,7 +1902,16 @@ remedies, which also change what `unknown` means.
 Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`), shared/recognizer.py
 Reference: I4 evidence-model design discussion; I5 hand-back
 
-**TODO-64 — θ's reachability under the current model: the ceiling is 1/(1 + uⁿ), and reachability is a function of the live set** [OPEN]
+**TODO-64 — θ's reachability under the current model: the ceiling is 1/(1 + uⁿ), and reachability is a function of the live set** ✅ CLOSED (gate ruling, September 2026)
+✅ CLOSED (cchat, on `analysis/g1_graded_evidence/crossings.md`): θ stays a fixed 0.75 on the normalised share,
+not derived from the live set or the layout. The live-set dependence was in the likelihood, not the gate:
+before the grade a stretch was worth L/u whatever its length, so the bar the share set depended on how many
+rivals had to be outvoted by observation count. Under graded evidence a walk refutes its rivals as it goes and
+the crossing odds against `unknown` are independent of the live-set size (25 of 30 walk crossings at 3.1–4.2
+with 1 to 9 live keys; the other five at 5.2–9.4, each with one rival still live). A lone task clears at
+f ≈ 0.48 of its expected path, a fraction, not a distance, so the layout's scale does not enter either.
+Reopened only by a walk crossing with a live rival at similar odds (TODO-47 (g)). design_decisions.md,
+"The gate stays a fixed share". The history below is kept as it was.
 NOTE (F47, September 2026; also for TODO-65): with a ONE-task admissible pool (prior on, the human assigned a
 single delivery and no foreseeable task on the layout) the uniform prior over {task, unknown} already puts
 0.906 on the task at tick 0, before the human has moved, and a projection is built at t=0 (retired
@@ -1927,7 +1942,15 @@ worse in the other. An earlier trigger is not better by itself.
 Files: shared/recognizer.py (`_output`), shared/meta_planner.py (`_clears_gate`, `DEFAULT_THETA`)
 Reference: F1 fixture session; I4b/I4c/I4d reports; I5 hand-back; θ single-source session, September 2026
 
-**TODO-65 — Whether the gate should be a likelihood ratio rather than a normalised posterior** [OPEN since I1]
+**TODO-65 — Whether the gate should be a likelihood ratio rather than a normalised posterior** ✅ CLOSED (gate ruling, September 2026)
+✅ CLOSED (cchat): the gate stays `confidence ≥ θ` on the normalised posterior. Under graded evidence the
+share is odds_top / (1 + odds_top + Σ_rivals odds_j), so θ = 0.75 reads "at least about 3:1 over no model,
+and more while rivals remain"; a later crossing under ambiguity is intended. Not taken: odds against
+`unknown` (drops the rivals' term); the ratio of the top two (infinite for a lone task, adds nothing where
+no rival stays competitive); a rate-of-growth gate (a threshold on the derivative of a noisy quantity).
+The three margin references below are therefore not built. Reopened only by a walk crossing with a live
+rival at similar odds, where share and margin disagree; none in the current fixtures (lowest top-two ratio
+at a walk crossing 5.23, s00_off 37); TODO-47 (g). design_decisions.md, "The gate stays a fixed share".
 Confidence is a normalised posterior over the live set, so θ = 0.75 is a different evidential bar in a
 3-hypothesis run than in an 8-hypothesis one (prior-on vs prior-off: the same coffee walk crosses at 135
 with three live rivals and 143 with seven). The recognizer's evidence state already IS a set of odds against

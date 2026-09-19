@@ -609,8 +609,10 @@ meta-planner's decision, not a likelihood parameter). No call site passes `theta
 default governs every run. θ is applied in exactly one private method,
 `_clears_gate(belief) -> bool`, which both `evaluate_triggers()` (on the entering side of
 `recognition_changed`, D2) and `update_human_projection()` (as admission) ask; it is deliberately one method so that a
-derived θ (TODO-64) or a margin gate (TODO-65) would change how the bar is computed without
-changing where it is asked. See design_decisions.md, "θ has one home".
+change to how the bar is computed would not change where it is asked. See design_decisions.md,
+"θ has one home". The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
+and a margin gate (TODO-65) were considered and not taken; design_decisions.md, "The gate stays
+a fixed share".
 
 `recognizer` is the **same live instance** the owning agent holds, not a second one built
 here — `get_hypothesis()` is a static lookup built once at recognizer construction and is

@@ -431,8 +431,9 @@ included. Therefore:
   0.226 / 0.201 at 19, revealed at the arrival, 20). A decoy on the true bearing BEFORE the target gains
   mid-walk under the grade (TODO-38) and, within 30 cm of the path, folds first: it could cross θ wrongly. No
   fixture has one.
-- **The live set's size**: it sets the prior, the dilution, what θ means, and whether one step clears it
-  (TODO-64, TODO-65).
+- **The live set's size**: it sets the prior and the dilution. Under the grade it no longer sets the crossing
+  odds against `unknown`; unrefuted rivals raise the odds a crossing needs (§5, the gate ruling; TODO-64 / 65
+  closed).
 - **β, u**: they set every reveal tick (I4 / I4b / I4c region analysis, closed).
 - **The scripted human.** A human who hesitates, back-tracks or wanders mid-task is charged as a rival would
   be. Standing still is not evidence (TODO-59's deferred channel, not built). Only behaviour the robot's
@@ -490,14 +491,16 @@ follow the walk; the prior-off first-task reveals moved little except s40 (21 �
 robot motion changed in six of sixteen conditions. Not built, by scope: grading of the no-graded-signal
 phases ((b) above).
 
-**DEFERRED, decided on the data this build reports: what θ is.** Whether θ stays a fixed share, becomes a
-ratio of the top two hypotheses, or is derived from the live-set size or the layout (TODO-64 / 65).
+**DECIDED on the data this build reports: θ stays a fixed share (the gate ruling, September 2026; §5).**
 `analysis/g1_graded_evidence/crossings.md` carries, at every crossing of θ and on the two ticks either
 side, the top hypothesis's odds against `unknown`, the ratio of the top two and the live-set size. Read
-from it: every walk crossing sits at top odds 3.1–4.2 whatever the live set (1 to 9 keys), every arrival
-crossing at about 100; the ratio of the top two runs from 3.3 (s20_off 92) to 246, and is infinite for a
-lone task. Grading changed what `unknown` means (per whole path); the rationality-measure alternative
-(TODO-63) is still to be weighed against it, on the same ground.
+from it: 25 of the 30 walk crossings sit at top odds 3.1–4.2 whatever the live set (1 to 9 keys), the other
+five at 5.2–9.4 with one rival still live (top-two ratio 5.2–12.3); every arrival crossing at about 100. The
+lowest top-two ratio at a walk crossing is 5.23 (s00_off 37); the 3.26 of s20_off / s50_off 92 is a
+post-arrival re-crossing at odds 116. (This paragraph said "every walk crossing at 3.1–4.2" before the
+ruling; corrected.) The live-set dependence was the likelihood's and the grade removed it, so the gate is
+unchanged (TODO-64 / 65 closed). Grading changed what `unknown` means (per whole path); the
+rationality-measure alternative (TODO-63) is still to be weighed against it, on the same ground.
 
 Also stated, lower in consequence:
 - An undecomposable hypothesis scores the perfect fit and is not refuted; no case is logged in the sweep.
@@ -511,7 +514,16 @@ Also stated, lower in consequence:
 `update()` returns a `BeliefState` (`shared/io_contracts.md` §1.2; contract §2.1): `timestamp`, `agent_id`,
 `distribution` (every hypothesis key, pinned ones at 10⁻³, summing to 1), `most_likely` (the argmax key) and
 `confidence` (its value). The meta-planner reads only `most_likely` and `confidence` (io_contracts §2.2):
-- `_clears_gate(belief)`, the one place θ is applied, tests `confidence ≥ θ`.
+- `_clears_gate(belief)`, the one place θ is applied, tests `confidence ≥ θ`, θ = `DEFAULT_THETA` = 0.75,
+  on the normalised share. Under graded evidence the share is
+  $O(k) / (1 + O(k) + \sum_{j \neq k} O(j))$ (§1.9), so θ reads "the top hypothesis at least about 3:1 over
+  no model, and more while unrefuted rivals remain". A lone task clears at $f \approx 0.48$ of its expected
+  path, a fraction, not a distance; a crossing that comes later under ambiguity is intended. The crossing
+  odds do not depend on the live-set size, because the walk refutes the rivals (§4). This is the gate
+  ruling (September 2026; `design_decisions.md`, "The gate stays a fixed share"), which closed TODO-64 / 65.
+  Not taken: odds against `unknown` (drops the rivals' term), the ratio of the top two (infinite for a lone
+  task), θ from the live-set size or the layout, a rate-of-growth gate. What reopens it: a walk crossing
+  with a live rival at similar odds, which no current fixture shows (TODO-47 (g), the randomised fixtures).
 - `evaluate_triggers()` fires `recognition_changed` (D2) when a decision record `_projected_hypothesis`
   exists and `most_likely` is no longer it. That covers a replacement, the human's boundary, or `unknown`
   after a pin. It also fires when no record exists and the belief clears the gate on a task, not `unknown`.
@@ -530,7 +542,7 @@ made to the recognizer or to its event semantics (`design_decisions.md`, the D2 
 | item | where | one line |
 |---|---|---|
 | the no-graded-signal phases under the grade | TODO-61 (b) | §4; `pick_up`, `place`, `wait_at` still one whole observation each; (a) closed for walks |
-| θ's meaning and reachability | TODO-64, TODO-65 | ceiling 1/(1 + uⁿ); a live-set-dependent bar; fixed share, ratio of the top two, or derived: to be decided on `analysis/g1_graded_evidence/crossings.md` (meta-planner side) |
+| the gate's reopening condition | TODO-47 (g) | a walk crossing with a live rival at similar odds; none in the current fixtures; watched for in the randomised fixtures (§5) |
 | collinear decoys under the grade | TODO-38 | the grade is a distance term for targets on one bearing; a decoy before the target gains mid-walk; no fixture has one |
 | `deliver_with_return`'s guard | TODO-55 (e) | a stray item vs an assigned one; a domain question, the producer of the prior-off repeated crossings |
 | β in centimetres | TODO-58 | layout-scale dependence |
@@ -540,7 +552,7 @@ made to the recognizer or to its event semantics (`design_decisions.md`, the D2 
 | the two analytical tools | TODO-62, TODO-63 | radius of maximum probability (diagnostic); rationality measure (competes with `unknown`) |
 | hash-seed dependence | TODO-42 | resolved for the recognizer (sorted keys); runs still need `PYTHONHASHSEED=0` |
 
-Closed since the I5 hand-back: TODO-48 / 54 / 68 (D2); TODO-72 (io_contracts §1.3 / §2.1 aligned with this
+Closed since the I5 hand-back: TODO-48 / 54 / 68 (D2); TODO-64 / 65 (the gate ruling, §5); TODO-72 (io_contracts §1.3 / §2.1 aligned with this
 document); TODO-52 (R1 / T10) and TODO-67 (T7), both meta-planner side; TODO-57's segment-3 question, made
 moot by F47b.
 

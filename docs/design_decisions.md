@@ -2455,3 +2455,55 @@ shared/recognizer.py (`_unknown_likelihood`, `_completion_holds`, `update()`), d
 (§1.4, §1.5, §1.8, §1.9, §2, §3, §4, §6, §9), docs/TODOS_AND_DEFERRED.md (38, 61), CLAUDE.md,
 analysis/g1_graded_evidence/
 Reference: graded-evidence session, September 2026; cchat decision; I4d; TODO-61 / 63 / 64 / 65
+
+
+**The gate stays a fixed share: `_clears_gate` on the normalised belief, θ = 0.75 (the gate ruling)**
+
+DECIDED (cchat, September 2026, on the graded-evidence θ data, `analysis/g1_graded_evidence/crossings.md`):
+the admission gate is unchanged. `MetaPlanner._clears_gate(belief)` tests `confidence ≥ θ` on the normalised
+share, θ = `DEFAULT_THETA` = 0.75, owned by the meta-planner ("θ has one home"). Nothing in code changed.
+
+THE REASON: the pool-size defect was in the likelihood, not in the gate. Before the grade a stretch's odds
+against `unknown` were L/u whatever its length, so a lone task cleared θ on the human's first step and a
+larger live set had to be outvoted by observation count: the bar the share set depended on how many rivals
+there were. Under graded evidence a walk's odds against `unknown` accrue per unit of expected path (u^{−f}),
+and the walk refutes its rivals through L as it goes. The share is then set by the top hypothesis's odds
+against `unknown` plus the residual odds of whatever rivals the walk has not yet refuted:
+confidence = odds_top / (1 + odds_top + Σ_rivals odds_j). θ on the share therefore means "at least about 3:1
+over no model, and more while rivals remain". A crossing that comes later under ambiguity is the intended
+behaviour, not a defect of the gate. A lone task clears at f = ln 3 / ln 10 ≈ 0.48 of its expected path
+(a little more with pins): a fraction of the path, not a distance, so the bar does not depend on the layout's
+scale.
+
+THE DATA it rests on (crossings.md, sixteen conditions): 30 walk crossings, 14 arrival crossings (top odds
+about 100, the fold at f = 1 times the open no-graded phase) and two post-arrival re-crossings (s20_off /
+s50_off 27 and 92, odds 116–136). Of the walk crossings, 25 sit at top odds 3.1–4.2 against `unknown` with
+live sets of 1 to 9 keys (s40_off 30: nine live, odds 3.26); the lone-task crossings at 3.14–3.39, i.e.
+f ≈ 0.50–0.53. The other five sit at 5.2–9.4 (s00_off 37, s10_off 245, s10_on 24, s30_off 27, s40_off 265),
+each with one rival still live at the crossing (top-two ratio 5.2–12.3): the "more while rivals remain"
+term; their live sets (3 to 6 keys) lie inside the first group's range. CORRECTION to the graded-evidence entry
+above (and to hand-back §4 as it stood): "at every walk crossing the top odds are 3.1–4.2" holds for 25 of
+the 30, not for all of them. The ruling's reasoning is not affected; its "3 to 4" is the floor, not the range.
+The lowest top-two ratio at any walk crossing is 5.23 (s00_off 37); the 3.26 of s20_off / s50_off 92 is a
+post-arrival re-crossing at odds 116, not a walk.
+
+NOT TAKEN, one reason each:
+- a gate on the odds against `unknown`: it drops the rivals' term, so a crossing would ignore a rival the
+  walk has not yet refuted;
+- the ratio of the top two: infinite for a lone task, and it adds nothing where no rival stays competitive;
+- θ derived from the live-set size: the crossing odds are independent of it (above);
+- θ derived from layout or world state: the grade already carries the geometry (f is a share of the
+  hypothesis's own expected path);
+- a rate-of-growth gate: a threshold on the derivative of a noisy quantity.
+
+WHAT REOPENS IT: a walk crossing with a live rival at similar odds (top-two ratio near 1 at the crossing),
+where the share and a margin gate would disagree. No current fixture shows it (lowest walk ratio 5.23); it
+belongs to the randomised fixtures (TODO-47), not to a fixture built for it.
+
+CLOSES: TODO-64 (θ's reachability as a function of the live set) and TODO-65 (the gate's form). The
+rationality-measure alternative to `unknown` (TODO-63) is untouched by this ruling.
+
+Files: docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md (47, 64, 65), docs/recognizer_handback.md (§4, §5,
+§6), docs/roadmap.md, shared/io_contracts.md (§2.2 θ paragraph)
+Reference: gate ruling, cchat, September 2026; graded-evidence entry; `analysis/g1_graded_evidence/crossings.md`;
+TODO-47 / 63 / 64 / 65
