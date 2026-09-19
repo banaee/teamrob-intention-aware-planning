@@ -2752,7 +2752,10 @@ AS BUILT. Mesa supplies it from `mesa_sim/mesa_configs.yaml` (`simulation.min_se
 `action_decomposer._get_min_separation()` beside `step_size` and `seconds_per_step`, with no fallback (a
 missing value stops the run rather than running under a value nobody set). The same value reaches
 realization (B2 `b2a`, B3) and the Mesa separation stop, as before. The `[run]` header names the value and
-its source: `min_separation=50.00 (source=mesa_configs.yaml simulation.min_separation, cm)`. The value is
+its source (as first built, `min_separation=50.00 (source=mesa_configs.yaml simulation.min_separation, cm)`;
+since follow-up 2 `min_separation=50.00 min_separation_source=mesa_configs.yaml:simulation.min_separation beta=0.01 beta_source=mesa_configs.yaml:simulation.beta units=cm`, and a run that overrides the value names
+its own source, e.g. the T6 wrapper's `env:T6_SEP_CM`: a header that misstated its source would defeat the
+reason it is printed). The value is
 unchanged, and so is behaviour: the sixteen graded-evidence baselines (`analysis/g1_graded_evidence/sweep/`)
 and the stop-on s00 / s30 cells (`analysis/c_separation_stop/stop_on/`) are byte-identical apart from the
 `[run]` line.
@@ -2803,6 +2806,14 @@ any room, and a larger layout does not make people stray further per walk. The v
 not measured, tuned or rescaled on fixtures; it is not part of TODO-47's calibration. What stays open is
 what the hand-back already says: the Euclidean path cost is exact only in Mesa, and a real cell needs an
 injected path cost (hand-back §3.3).
+SUPPLIED BY THE BODY (T-A1 follow-up 2; built). Because β is physical and carries a unit, its number means
+something only in the body's units. `shared/` is unit-agnostic: it computes in whatever units the body reports
+positions in, and must not hold a value that fixes those units. So β left `shared/likelihood_functions.py`,
+by the same reasoning as `min_separation`: `IntentionRecognizer(beta=...)` is required, with no default;
+Mesa supplies 0.01 /cm from `mesa_configs.yaml` (`simulation.beta`, no fallback) and the `[run]` header
+names value and source. What does not change: one fixed value per embodiment, decided on IR grounds, not a
+per-layout quantity, and no fixture may choose it. Behaviour byte-identical at 0.01 on the regression and
+evaluation fixtures.
 Reference: T-A1, September 2026; TODO-58; I4
 
 ---
@@ -2884,3 +2895,53 @@ built and evaluated together, with the declared stay as the fixture that makes t
 MEASURE. Blocked time and completion (the world fact, T6), wait against reconsider; and on the other two
 scenarios, whether retraction and re-recognition fire as expected and whether `unknown` leads.
 Reference: T-A1, September 2026; D2; TODO-80; F47b; C; R2
+
+---
+
+**A stationary human: what a stay means as evidence, and what the robot does when `unknown` leads (T-C, open; recorded in T-A1)**
+
+RECORDED (cchat, September 2026) as an open item of T-C. Both halves are open; they are one behaviour (what a
+stay means, and what the robot does about it) and are decided together in T-C's design chat (T-C1).
+
+THE MODEL AS IT IS (from the code).
+- The recognizer's evidence is walked path. Each stretch the human walks is compared with the path each
+  hypothesis expects, and the excess is what moves the belief. A tick with nothing walked is not an
+  observation: the empty-stretch rule (I4c; `_progress_likelihood` returns None for an empty stretch and
+  the caller applies no factor). The rule was introduced as a fix: without it a stationary tick counted as
+  a full fitting observation for the top hypothesis and pushed it toward certainty while nothing happened.
+- Consequence: a human who stops, for any length of time, produces no evidence for or against anything.
+  If the human picks up item_2 and stands still for fifty ticks, the belief stays where it was, with
+  `deliver_item(item_2)` on top. `unknown` rises only from walked excess, movement that fits no hypothesis.
+- On the meta-planner side, when `unknown` is on top admission returns `none(unknown)`: no human projection,
+  B3 selects with every candidate realized at δ = 0 (plain cost in effect), and the separation stop is the
+  only thing that reads the human's actual position.
+
+WHY IT IS AN ITEM NOW. The human action script (T-C) makes a stay expressible (`stay`, and any pause in a
+script), so the question can no longer be left implicit. The empty-stretch rule was correct as a fix. Its
+consequence, that duration carries no information about intention, is a simplification of the model, kept
+so that the recognizer and the meta-planner could be built and measured.
+
+HALF (a), THE RECOGNIZER: A STAY AS EVIDENCE. Should standing still for N ticks count against the hypothesis
+of pursuing a task, and in favour of `unknown`? That is a question about the likelihood model: what a stay of
+N ticks looks like under "pursuing task X" against "no model". If it is added, it is a duration term with its
+own form and its own reasoning on IR grounds, not a constant to set, and it is a separate item (T-H), not
+part of T-C's script work. (The recognizer already notes the channel: "stationarity as evidence AGAINST an
+action that predicts movement would be a different observation channel".) Not decided.
+
+HALF (b), THE META-PLANNER: WHAT `update()` DOES WITH `unknown` ON TOP. Today's answer, no projection, was
+chosen when `unknown` meant "the recognizer has nothing". A stationary human at a known position is a
+different case: the mind knows where the human is even though it cannot say what the human intends.
+CANDIDATE, marked as a candidate only: under `unknown`, project the human as stationary at its current
+position for a bounded horizon, so that `realize()` prices holds against where the human is instead of
+leaving that entirely to the separation stop. Not decided (how the horizon is bounded is part of it).
+
+WHAT STAYS FIXED, whichever way it goes: the recognizer judges nothing (it emits a belief and gates nothing);
+the meta-planner owns admission; the separation stop keeps its role for whatever no projection covers.
+
+THE FIXTURE THAT EXPOSES THE CASE (a T-C script): the human picks up an item and stays still mid-carry.
+Expected today, from the code, not measured: the belief is frozen with the carried item's delivery on top,
+so no trigger fires; the robot's hold was placed against a projection of a MOVING human (the carry walk);
+the conflict happens later than realized, where the human actually stands; and the separation stop refuses
+the robot's step inside the assessed window. That is also the first fixture in which the stop and
+realization overlap: so far, with valid fixtures, the stop fires only past T_h and on deviations (F47b).
+Reference: T-A1, September 2026; I4c; T8; D2; C; F47b; TODO-80; TODO-85

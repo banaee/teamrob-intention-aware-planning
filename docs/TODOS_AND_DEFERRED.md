@@ -732,7 +732,8 @@ Reference: Phase 4C scenario_00 validation, September 2026
 REVISED (T-A1, September 2026): `min_separation` is supplied by the body in physical units, a required
 `MetaPlanner(min_separation=...)` argument in world units with no default in `shared/`; Mesa reads it
 from `mesa_configs.yaml` (`simulation.min_separation: 50`, cm) and the `[run]` header names value and
-source (`min_separation=50.00 (source=mesa_configs.yaml simulation.min_separation, cm)`). REASON: a
+source (since T-A1 follow-up 2: `min_separation=50.00 min_separation_source=mesa_configs.yaml:simulation.min_separation beta=0.01 beta_source=mesa_configs.yaml:simulation.beta units=cm`; a run that overrides it, the T6
+wrapper's `T6_SEP_CM`, names that source instead). REASON: a
 standard sets a distance; the R1 form (2.5 × the body's motion per tick) coupled the safety distance
 to the robot's speed, which violates "safety parameters are set from outside the planner" (T6). The
 value is unchanged (50 cm) and so is behaviour: the sixteen graded-evidence baselines and the stop-on
@@ -2480,6 +2481,14 @@ target plausibly shows; the 30 cm `PROXIMITY_THRESHOLD` slop it must tolerate), 
 fixtures, and it is not part of TODO-47's calibration. What stays true below: the fractional reading was
 measured and rejected, and the Euclidean path cost is exact only in Mesa (hand-back §3.3). The original
 entry is the record of the scale-dependent reading.
+✅ BUILT (T-A1 follow-up 2, September 2026): β has left `shared/`. `BETA` is removed from
+`likelihood_functions.py`; `IntentionRecognizer(beta=...)` is a required argument in the body's length units,
+passed to the excess-path evaluator; Mesa supplies 0.01 /cm from `mesa_configs.yaml` (`simulation.beta`, no
+fallback) and the `[run]` header names value and source. Reason: β carries a unit, so its number means
+something only in the body's units, and `shared/` computes in whatever units the body reports positions in
+and must not hold a value that fixes them (the `min_separation` reasoning, TODO-28). One fixed value per
+embodiment, decided on IR grounds; not per layout, and no fixture chooses it. Behaviour byte-identical at 0.01
+on the regression and evaluation fixtures.
 `BETA = 0.01 /cm` was chosen on layouts of 800–2000 cm; a layout twice as large needs half the β
 (TODO-28's class of defect). The fractional reading — excess as a fraction of C(origin, target) — was
 measured and rejected: its reference length goes to zero at every origin that sits near its target
@@ -2489,7 +2498,7 @@ the longest direct distance among the stuck-origin hypotheses (s30's first task 
 grasp). A scale-invariant form would normalise by a layout-level length (workspace diagonal, mean
 inter-target distance), which `WorldState` does not carry. Also load-bearing and in cm:
 PROXIMITY_THRESHOLD (30) sets the geometric slop β must tolerate (×0.85 at β = 0.01).
-Files: shared/likelihood_functions.py (`BETA`), mesa_sim/world_state_builder.py (`PROXIMITY_THRESHOLD`)
+Files: mesa_sim/mesa_configs.yaml (`simulation.beta`, since T-A1), shared/recognizer.py (`beta`), mesa_sim/world_state_builder.py (`PROXIMITY_THRESHOLD`)
 Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.3
 
 **TODO-79 — The `[sep]` execution measure samples whole ticks and misses minima between ticks** ✅ DECIDED (T10): `min=` alongside `dist=`, and sub-min_separation moments classified against the assessed window
@@ -2659,4 +2668,21 @@ the EXPECTED realized cost over the belief (each candidate realized against each
 projection, weighted by its probability) against the current bar. A comparison, not a change: nothing in
 the design is changed by recording it.
 Files: shared/meta_planner.py (`_clears_gate`, `update_human_projection`, `_replan_tasks`)
+Reference: T-A1, September 2026
+
+**TODO-85 — A stationary human: a stay as evidence (a) and the robot's action under `unknown` (b)** [T-C open item; from T-A1]
+A tick with nothing walked is not an observation (the empty-stretch rule, I4c), so a human who stops produces
+no evidence for or against anything, however long: picked up item_2 and stood fifty ticks, the belief stays
+with `deliver_item(item_2)` on top; `unknown` rises only from walked excess. With `unknown` on top, admission
+returns `none(unknown)`: no projection, B3 prices no hold, only the separation stop reads the human's position.
+T-C's script makes a stay expressible, so this can no longer stay implicit. (a) Recognizer: should N ticks
+standing still count against pursuing a task and for `unknown`? A duration term with its own form, on IR
+grounds, not a constant; if taken, a separate item T-H. (b) Meta-planner: under `unknown`, CANDIDATE only,
+project the human as stationary at its current position for a bounded horizon, so realization prices holds
+against where the human is. Both open, decided together in T-C1. Fixed either way: the recognizer judges
+nothing, the meta-planner owns admission, the stop covers what no projection covers. Exposing fixture: pick up
+an item and stay still mid-carry; expected today: frozen belief, no trigger, a hold placed for a moving human,
+the conflict later than realized, refused by the stop inside the assessed window (the first fixture where the
+stop and realization overlap). design_decisions.md, "A stationary human".
+Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026

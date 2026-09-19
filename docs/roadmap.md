@@ -217,7 +217,7 @@ sweep in I2 (its meta-planner crash is latent, TODO-52, and its belief tie order
 What the recognizer is now, in one line: per-hypothesis derived phase, action-level likelihood, excess-path
 cost in logistic form, detection reliability, a constant `unknown`, an episode-local boundary and a terminal
 pin. Four parameters, values and meanings in `shared/likelihood_functions.py` and the hand-back §2:
-β = 0.01 /cm (detour tolerance), u = 0.1 (`unknown`'s per-observation likelihood, the unit of the
+β = 0.01 /cm (detour tolerance; supplied by the body since T-A1, `mesa_configs.yaml`), u = 0.1 (`unknown`'s per-observation likelihood, the unit of the
 confidence ceiling 1/(1 + uⁿ)), detection hit / false-alarm rates 1.0 / 10⁻³, θ = 0.75 (the meta-planner's
 gate, not a likelihood parameter). Two embodiment-side values are load-bearing: `PROXIMITY_THRESHOLD` = 30 cm
 (when `at()` holds, hence when phases advance) and Mesa's straight-line walking (the Euclidean path cost is
@@ -369,7 +369,10 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   a point, `pick_up`, `place`, `wait`, `stay`), run by the human executor on the scenario layer; the mind
   knows nothing of it; a part may still be written as a task, so the regression fixtures are unchanged.
   C1 design chat; C2 build. TODO-80's declared stay becomes one script action. design_decisions.md, "The
-  human's scenario is an action script".
+  human's scenario is an action script". Open item decided in C1: a stationary human (TODO-85): whether a
+  stay is evidence (if so, a duration term, its own item T-H) and what `update()` does with `unknown` on top
+  (candidate: the human projected stationary at its position for a bounded horizon); design_decisions.md,
+  "A stationary human".
 - **T-D — Robustness in kitting, on T-C.** Scenarios for a change of mind mid-task, a walk to an empty
   corner (`unknown` as outcome), a declared stay at the table (the blocked case); the blocked event in
   `ExecutorState`, the trigger routed past B2, the reconsider policy (design in TODO-80 and D2); evaluation
