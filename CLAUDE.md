@@ -81,13 +81,17 @@ Decisions
   (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
   (D2: `recognition_changed` against the decision record replaces `theta_crossed`), and the policy
   components are ablated (T6, `analysis/t6_ablation/`); the recognizer's evidence is graded by path
-  covered and the gate stays a fixed share (graded evidence, the gate ruling). The 4C queue is done; the
-  next step is the randomised fixtures (TODO-47). The queue, its order and the next step are in
-  `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
-  Phase 5 (evaluation), Phase 6 (ROS / PRIEST execution).
+  covered and the gate stays a fixed share (graded evidence, the gate ruling). The 4C queue is done.
+  The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`); the next build is T-B,
+  B3.B (`full_reorder`) on two-table kitting, after its fixture design question. Not to be started
+  unasked: T-C to T-G, i.e. the human action script, robustness, the demonstration, Phase 5
+  (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
+  (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
-  cost) exist. Change only what the task specifies; do not fill in unspecified block logic, flags or
-  strategies.
+  cost) exist. `full_reorder` (B3.B) is designed and is T-B's build, in the recorded order
+  (design_decisions.md, the B3.B entry); build it only in a T-B task, and only the step that task names.
+  B2 is an evaluation factor, not a design step: `b2b` stays a stub. Change only what the task
+  specifies; do not fill in unspecified block logic, flags or strategies.
 - `shared/recognizer.py`: rebuilt and handed back (`docs/recognizer_handback.md`). Not under
   active change; touch it only if the task says so.
 - ROS side is paused. Do not modify anything under `ros_sim/`.
@@ -169,7 +173,7 @@ override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignm
 `--separation_stop` (true/false), and `--experiment` (another yaml). Parsing is strict: an unknown
 or misspelled flag, an unknown yaml key, or a bad value stops the run. Each robot's `[run]` header
 names the policy and evaluation switches the run took (gate, cost, stop, assignment prior, θ, ρ,
-min_separation).
+min_separation with its source: the body supplies it, `mesa_sim/mesa_configs.yaml`, 50 cm).
 
 ## Regression checking
 
@@ -229,6 +233,11 @@ Completion is measured from the world fact (T6): the tick after the robot's last
   hypothesis the last decision projected, or first clears the gate on one; replaced
   `theta_crossed` in D2, which older reports and logs still name); `task_committed` (the robot's
   own grasp, not the human's commitment). Decision record: the projected hypothesis, one field.
+- Plan names (`docs/roadmap.md`, "The plan from T-A"): T-A records (T-A1 the pipeline revision);
+  T-B B3.B on two tables (B1 fixtures, B2 build, B3 evaluation); T-C the human action script (C1
+  design, C2 build); T-D robustness in kitting (change of mind, `unknown`, the blocked case); T-E
+  demonstration; T-F evaluation (Phase 5); T-G later (second domain in Mesa, 4D, ROS). Task prompts
+  and reports use these names.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.
 - Segment: one straight stretch of one robot or human action in a projection. Leg: the
