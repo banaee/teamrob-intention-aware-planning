@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 from shared.domain_knowledge import DomainKnowledgeBase
-from shared.types import ScenarioConfig, check_task_bindings
+from shared.types import ScenarioConfig, check_task_bindings, check_task_destinations
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
 
@@ -69,6 +69,11 @@ class SimObject:
                                  # "initial_container" — the item's origin shelf/bay.
                                  # None for non-portable objects. Never mutated
                                  # afterward, unlike at_location/held_by.
+    destination: Optional[str] = None     # set once at load time from "destination"
+                                 # — where the object is to go (kitting: its
+                                 # designated table), a fact of the station.
+                                 # Required for the types the domain resolves
+                                 # through "destination_of"; never mutated.
                                  
 # =============================================================================
 # SimModel
@@ -146,7 +151,7 @@ class SimModel(model.Model):
         self.objects: Dict[str, SimObject] = {}
         self._objects_by_type: Dict[str, List[str]] = {}
 
-        self._init_objects(env_layout.get("env_objects", []))
+        self._init_objects(env_layout.get("env_objects", []), env_layout_path)
 
 
         # ------------------------------------------------------------------
@@ -192,7 +197,7 @@ class SimModel(model.Model):
     # Initialization helpers
     # =========================================================================
 
-    def _init_objects(self, objects_data: list):
+    def _init_objects(self, objects_data: list, env_layout_path: str):
         """
         Unified loader for all env_objects entries — items and fixed objects alike.
         Two passes: objects with a direct "position" first (shelves, gates, tables,
@@ -240,8 +245,27 @@ class SimModel(model.Model):
                 is_scanned=obj.get("is_scanned", False),
                 is_portable=True,  # items/pallets are portable, even if not currently held
                 home_container=container_id,   # set once at load time, never mutated afterward
+                destination=obj.get("destination"),   # likewise
             )
             # print(f"Loaded portable object {obj['id']} with home_container {container_id}")
+
+        # Every object of a type the domain resolves through "destination_of"
+        # declares its destination, and it names an object of this layout
+        # (T-B1a). An error, not a default.
+        types_with_destination = self.knowledge.get_types_with_destination()
+        for obj_id, obj in self.objects.items():
+            if obj.type not in types_with_destination:
+                continue
+            if obj.destination is None:
+                raise ValueError(
+                    f"layout '{env_layout_path}': {obj.type} '{obj_id}' declares no "
+                    f"\"destination\" (required by task '{types_with_destination[obj.type]}')"
+                )
+            if obj.destination not in self.objects:
+                raise ValueError(
+                    f"layout '{env_layout_path}': {obj.type} '{obj_id}' has destination "
+                    f"'{obj.destination}', which is not an object of this layout"
+                )
 
         # Build type → instance-ids registry, feeds IR's hypothesis space
         for obj_id, obj in self.objects.items():
@@ -271,6 +295,18 @@ class SimModel(model.Model):
             for task in list(agent_cfg.scheduled_tasks or []) + list(agent_cfg.assigned_tasks or []):
                 try:
                     check_task_bindings(task, object_type_by_id)
+                except ValueError as e:
+                    raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
+
+        # Assigned tasks — the robot's pool and the human's work order — agree
+        # with the layout's destinations (T-B1a). The human's scheduled_tasks is
+        # not checked: its script may send an object elsewhere.
+        destination_by_id = {obj_id: obj.destination for obj_id, obj in self.objects.items()
+                             if obj.destination is not None}
+        for agent_cfg in scenario.agents:
+            for task in agent_cfg.assigned_tasks or []:
+                try:
+                    check_task_destinations(task, destination_by_id)
                 except ValueError as e:
                     raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
 

@@ -85,10 +85,10 @@
       "zone": "zone_SE",
       "notes": "Human's second target. At -36.9 deg from the human's start it is angularly far from shelf_3/4/6, so it does not muddy the early ambiguity."
     },
-    { "id": "item_4", "type": "item", "subtype": "part_C", "initial_container": "shelf_4", "size": [25, 25], "notes": "Robot task 1 — the conflicted one." },
-    { "id": "item_3", "type": "item", "subtype": "part_B", "initial_container": "shelf_3", "size": [25, 25], "notes": "Human task 1 — the conflict source." },
-    { "id": "item_6", "type": "item", "subtype": "part_D", "initial_container": "shelf_6", "size": [25, 25], "notes": "Robot task 2 — the clean alternative B2 can escalate to." },
-    { "id": "item_7", "type": "item", "subtype": "part_D", "initial_container": "shelf_7", "size": [25, 25], "notes": "Robot task 3 — never competitive." },
-    { "id": "item_2", "type": "item", "subtype": "part_B", "initial_container": "shelf_2", "size": [25, 25], "notes": "Human task 2." }
+    { "id": "item_4", "type": "item", "subtype": "part_C", "initial_container": "shelf_4", "destination": "kitting_table_0", "size": [25, 25], "notes": "Robot task 1 — the conflicted one." },
+    { "id": "item_3", "type": "item", "subtype": "part_B", "initial_container": "shelf_3", "destination": "kitting_table_0", "size": [25, 25], "notes": "Human task 1 — the conflict source." },
+    { "id": "item_6", "type": "item", "subtype": "part_D", "initial_container": "shelf_6", "destination": "kitting_table_0", "size": [25, 25], "notes": "Robot task 2 — the clean alternative B2 can escalate to." },
+    { "id": "item_7", "type": "item", "subtype": "part_D", "initial_container": "shelf_7", "destination": "kitting_table_0", "size": [25, 25], "notes": "Robot task 3 — never competitive." },
+    { "id": "item_2", "type": "item", "subtype": "part_B", "initial_container": "shelf_2", "destination": "kitting_table_0", "size": [25, 25], "notes": "Human task 2." }
   ]
 }

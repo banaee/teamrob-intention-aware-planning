@@ -33,7 +33,7 @@ USED BY:
 import yaml
 from typing import Dict, List, Optional
 
-from shared.types import DomainModel, TaskSchema, ActionSchema
+from shared.types import DomainModel, TaskSchema, ActionSchema, destination_derivations
 
 # ========================================================================
 # Class domain-specific knowledge bases here, e.g. KittingDomainKnowledgeBase, if we want to add domain-specific helper methods.
@@ -81,6 +81,20 @@ class DomainKnowledgeBase:
     def get_intention_schemas(self) -> List[TaskSchema]:
         """Full TaskSchema objects for all registered intentions."""
         return [self._domain.tasks[name] for name in self._domain.intentions]
+
+    def get_types_with_destination(self) -> Dict[str, str]:
+        """
+        {object type: task name} for every object type some task resolves a
+        var from through the "destination_of" lookup — the types whose objects
+        the layout must give a destination (T-B1a). Read from the schemas.
+        """
+        types: Dict[str, str] = {}
+        for task in self._domain.tasks.values():
+            for _, source_var in destination_derivations(task):
+                source_type = task.parameter_types.get(source_var)
+                if source_type is not None:
+                    types.setdefault(source_type, task.name)
+        return types
 
     # def get_objects_by_type(self, type: str) -> List[str]:
     #     return self._objects_by_type.get(type, [])

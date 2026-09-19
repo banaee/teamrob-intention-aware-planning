@@ -44,7 +44,7 @@ import logging
 from shared.types import (
     ProcessCompletion, Var, Const, Predicate, ConditionSchema,
     GroundedAction, AbstractPlan, BeliefState, WorldState,
-    TaskSchema, ActionSchema, MethodSchema, StepCall,
+    TaskSchema, ActionSchema, MethodSchema, StepCall, DESTINATION_LOOKUP,
 )
 from shared.domain_knowledge import DomainKnowledgeBase
 
@@ -298,6 +298,14 @@ class AdaptivePlanner:
                 derived_val = world.object_zones.get(source_val)
             elif lookup_fn == "home_container_of":
                 derived_val = world.object_home_container.get(source_val)
+            elif lookup_fn == DESTINATION_LOOKUP:
+                # The station's destination is the default: a task instance
+                # that binds the var sends the object where it says (a human's
+                # scripted deviation), so the binding is kept (T-B1a). Only this
+                # lookup yields to a binding; the others always derive.
+                if var_name in resolved:
+                    continue
+                derived_val = world.object_destination.get(source_val)
             else:
                 raise ValueError(
                     f"AdaptivePlanner: unknown lookup function '{lookup_fn}' "

@@ -145,6 +145,9 @@ class WorldState:
     object_zones: Dict[str, str] = field(default_factory=dict)  # {item_id: zone_id}
     object_home_container: Dict[str, str] = field(default_factory=dict)     # {item_id: container_id} — static per scenario, set once at load, 
                                                                             # never updated as item moves (unlike object_locations/object_zones)
+    object_destination: Dict[str, str] = field(default_factory=dict)        # {item_id: destination_id} — static per scenario, set once at load
+                                                                            # from the layout's "destination" (kitting: the item's designated table);
+                                                                            # read through the planner's derived-var lookup "destination_of"
     object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — env objects + items, for IR direction reasoning
     metadata: Dict[str, Any] = field(default_factory=dict)
 
@@ -334,6 +337,45 @@ def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str]) -
             raise ValueError(
                 f"{task_instance_key(task)}: {var.name} is bound to '{const.value}' of type "
                 f"'{actual}', but the schema requires type '{expected}'"
+            )
+
+
+DESTINATION_LOOKUP = "destination_of"
+
+
+def destination_derivations(schema: "TaskSchema") -> List[Tuple[str, str]]:
+    """
+    The (derived var, source var) pairs a task schema resolves through the
+    "destination_of" lookup, over all its methods, deduplicated in declaration
+    order. Read from MethodSchema.derived_vars, never from a var name.
+    """
+    pairs: List[Tuple[str, str]] = []
+    for method in schema.methods:
+        for var_name, (lookup_fn, source_var) in method.derived_vars.items():
+            if lookup_fn == DESTINATION_LOOKUP and (var_name, source_var) not in pairs:
+                pairs.append((var_name, source_var))
+    return pairs
+
+
+def check_task_destinations(task: TaskInstance, destination_by_id: Dict[str, str]) -> None:
+    """
+    An ASSIGNED task that binds a var the schema otherwise resolves through
+    "destination_of" must bind the destination the layout declares for its
+    source object (T-B1a): assigned_tasks is the work order, the reference the
+    robot's mind holds, so it describes the station, not a deviation. Raises
+    ValueError naming the task, the source object and both values. Not applied
+    to a human's scheduled_tasks, which may send an object elsewhere.
+    """
+    bound = {var.name: const.value for var, const in task.bindings.items()}
+    for var_name, source_var in destination_derivations(task.schema):
+        if var_name not in bound or source_var not in bound:
+            continue
+        source = bound[source_var]
+        designated = destination_by_id.get(source)
+        if bound[var_name] != designated:
+            raise ValueError(
+                f"{task_instance_key(task)}: {var_name} is bound to '{bound[var_name]}', "
+                f"but the layout designates '{designated}' for {source_var}='{source}'"
             )
 
 

@@ -218,6 +218,7 @@
       "type": "item",
       "subtype": "part_B",
       "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
       "size": [
         25,
         25
@@ -229,6 +230,7 @@
       "type": "item",
       "subtype": "part_D",
       "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
       "size": [
         25,
         25
@@ -240,6 +242,7 @@
       "type": "item",
       "subtype": "part_C",
       "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
       "size": [
         25,
         25
@@ -251,6 +254,7 @@
       "type": "item",
       "subtype": "part_D",
       "initial_container": "shelf_7",
+      "destination": "kitting_table_0",
       "size": [
         25,
         25
@@ -262,6 +266,7 @@
       "type": "item",
       "subtype": "part_C",
       "initial_container": "shelf_5",
+      "destination": "kitting_table_0",
       "size": [
         25,
         25
