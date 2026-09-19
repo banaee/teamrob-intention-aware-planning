@@ -16,6 +16,12 @@ s40 400 steps) and the evaluation fixtures (s50 / s70 / s71, 300), prior off and
 - `crossings.md` (committed): THE θ DATA for the deferred decision (fixed share / ratio of the top two /
   derived from the live set or layout; TODO-64 / 65): at every crossing of θ and ± 2 ticks, the top
   hypothesis's odds against `unknown`, the ratio of the top two, the live-set size.
+- `unit_checks.py`: the recognizer's unit checks under the grade (G0–G10), restating the I4 / I4c / I4d checks that
+  survive it with graded expectations; the three old `--unit` entry points are retired and print a note. Run:
+  `PYTHONHASHSEED=0 ~/python-envs/teamrob-sp4-env/bin/python analysis/g1_graded_evidence/unit_checks.py`.
+- Stop-on baselines regenerated under the grade: `analysis/c_separation_stop/stop_on/` (s00–s30) and
+  `analysis/f47_fixtures/stop_on/` (s50 / s70 / s71), md5s in their records. Against the post-D2 stop-on cell the
+  `[stop]` grep moves only in s20_on and s30_on; no completion tick moves.
 - `sweep/` (logs, git-ignored): the plain sweep at the graded-evidence HEAD — THE BASELINES from here on,
   replacing `analysis/d2_recognition_trigger/` (`sweep/`, `fixtures/`). `data/`, `logs_instrumented/`:
   git-ignored.

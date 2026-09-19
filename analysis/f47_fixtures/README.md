@@ -49,6 +49,12 @@ recognised (205: ac_switch_1 0.784 / 0.878; 221: ac_switch_2 0.772 / 0.853) and 
 
 ## md5
 
+`stop_on/` rows: the graded-evidence regeneration (September 2026; pre-grade md5s in git history at 5b9cca0).
+Against the post-D2 stop-on reference (T6's `core/gnone_crealized_son`) the grade leaves the `[stop]` grep and
+every completion tick unchanged on s50 / s70 / s71; `[sep]` moves in s50_on (8) and s70_on (60), the decision
+ticks as in `analysis/g1_graded_evidence/summary.md`. `baselines_s40/` and `stop_off/` are pre-grade and
+superseded by `analysis/g1_graded_evidence/sweep/`.
+
 | log | md5 |
 |---|---|
 | baselines_s40/s40_off | a89adcf93b96477c5940bfd09ec65d25 |
@@ -59,9 +65,9 @@ recognised (205: ac_switch_1 0.784 / 0.878; 221: ac_switch_2 0.772 / 0.853) and 
 | stop_off/s70_on | 748e0a1c09080892334e0499b1ed5cf9 |
 | stop_off/s71_off | 9d6741b0ec585403b4b62fc1a55d2eb5 |
 | stop_off/s71_on | 33c5251231d2f7a34cc3c85ad9b2c3cc |
-| stop_on/s50_off | 9c36ae9226089052aa2fa670bbf6cd80 |
-| stop_on/s50_on | c951294d43ebea0d0519b6ed6ca6d090 |
-| stop_on/s70_off | e693981a678e962cb63112b0069f3d41 |
-| stop_on/s70_on | 560c58d344eadac3be62bf6f4c9ba6de |
-| stop_on/s71_off | ff208ee8100ac2e7288d16a65f754872 |
-| stop_on/s71_on | ec9a8de0f29b92cded8c1e225a232a93 |
+| stop_on/s50_off | 04d77ac7fe0001316338d6fbefb378b8 |
+| stop_on/s50_on | de2a0b5c90b8b2f15d41864345a0e0f4 |
+| stop_on/s70_off | dfb486bfe6c034495c9f6d37ef9879f6 |
+| stop_on/s70_on | a55233abd6874d807383a419e2ad630b |
+| stop_on/s71_off | 23a2c4fe1fd8e46818e723d160f56dd9 |
+| stop_on/s71_on | 30df2f20cc631e3f3710e19b417edf7f |

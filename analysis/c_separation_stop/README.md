@@ -23,6 +23,13 @@ Regenerate from the repo root (~1 min):
     ~/python-envs/teamrob-sp4-env/bin/python $H/evaluate.py > $H/comparison.md
     ~/python-envs/teamrob-sp4-env/bin/python $H/blocked.py > $H/blocked.md
 
+STOP-ON BASELINES REGENERATED under graded evidence (September 2026): `stop_on/` is the graded HEAD (md5s in
+`comparison.md`); `stop_off/` is superseded by `analysis/g1_graded_evidence/sweep/`. Against the post-D2 stop-on
+reference (T6's `core/gnone_crealized_son`, byte-identical to D2 on gate none) the grade moves the `[stop]` grep
+in two conditions — s20_on (first at 144; 156 → 158 refusals) and s30_on (first at 156; 44 → 46) — and `[sep]`
+in s20_on (6), s30_off (27); the decision ticks move as in the stop-off sweep (`g1_graded_evidence/summary.md`);
+no run's last release or completion moves. The text below is C's record.
+
 `stop_off/` equals the F1 baselines apart from the header; `stop_on/` is the comparison condition, not a
 baseline: with the stop on, s00, s20 and s30 do not complete (the human idles at the table after its
 script ends; see the design entry). The stop-off runs contain walk-throughs (the acceptance column of

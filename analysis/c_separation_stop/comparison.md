@@ -117,13 +117,17 @@ Simultaneous interpolation ('viol' on [sep] min): off 2 (156: 43.94; 157: 25.28)
 
 ## Baselines (md5)
 
+The `stop_on` column is the graded-evidence regeneration (September 2026; the pre-grade md5s are in git history at
+5b9cca0). The `stop_off` column is pre-grade and superseded by `analysis/g1_graded_evidence/sweep/`; the decision
+listings above are C's record and still name `theta_crossed`.
+
 | condition | stop_off | stop_on |
 |---|---|---|
-| s00_off | 160af984096c0b35d0769f4b1cdff339 | 83c302d200cc6db8c369a2b9eeaeb5a7 |
-| s00_on | 51b872d57839af160ed5fc7d272f7ae1 | c3ef5efa69ac6b1f534077dfaa37220c |
-| s10_off | 427a784cd5987117df816edadcfeb878 | c5af0f718011552efaa2b4f68f83faf5 |
-| s10_on | 9a068c8c891b04b5c54fa9c842477566 | f562e624882fdea5788eb370b99087f8 |
-| s20_off | b591c5013b40a483f95aced314aa9b15 | 3232a365cefba48d77f6e490813a76c9 |
-| s20_on | 43a59dd602a15d57ff47293153d42849 | 44ba8f9436522f0156e26516e59198ec |
-| s30_off | d49df179d41bb76c927371b5da62a0f7 | 53904f88f7157ddaacae0cbe355c03f7 |
-| s30_on | ae6026dfaad5d35bdac9088a59dd4712 | 152b9e3b74d4100d6d420f1f445dca9b |
+| s00_off | 160af984096c0b35d0769f4b1cdff339 | ea201099c207617370b43e64322751bf |
+| s00_on | 51b872d57839af160ed5fc7d272f7ae1 | 6d63839801506de1080f3d776af1d67d |
+| s10_off | 427a784cd5987117df816edadcfeb878 | 25d98936a4eed19cab9c7f17c24a200a |
+| s10_on | 9a068c8c891b04b5c54fa9c842477566 | dd0031ca1b553105993b55f78b644fc4 |
+| s20_off | b591c5013b40a483f95aced314aa9b15 | dcb1f7b7070bd672c5471322b90ab1d9 |
+| s20_on | 43a59dd602a15d57ff47293153d42849 | 3433417e573b6851dee38ccd72f5a7e9 |
+| s30_off | d49df179d41bb76c927371b5da62a0f7 | 9e1ef9a208af4d3db1d3d7d92720870c |
+| s30_on | ae6026dfaad5d35bdac9088a59dd4712 | 49b72da32238057484599baf3491e3c2 |
