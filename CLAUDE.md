@@ -173,7 +173,8 @@ override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignm
 `--separation_stop` (true/false), and `--experiment` (another yaml). Parsing is strict: an unknown
 or misspelled flag, an unknown yaml key, or a bad value stops the run. Each robot's `[run]` header
 names the policy and evaluation switches the run took (gate, cost, stop, assignment prior, θ, ρ,
-min_separation with its source: the body supplies it, `mesa_sim/mesa_configs.yaml`, 50 cm).
+min_separation and β, each with its source: the body supplies both, `mesa_sim/mesa_configs.yaml`, 50 cm
+and 0.01 /cm).
 
 ## Regression checking
 

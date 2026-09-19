@@ -41,7 +41,7 @@ from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
 from mesa_sim.executor import Executor, ACTION_COMPLETION_LATENCY, TASK_COMPLETION_LATENCY
-from mesa_sim.action_decomposer import _get_step_size, _get_min_separation, _parse_duration_to_steps  # single reader of mesa_configs.yaml
+from mesa_sim.action_decomposer import _get_step_size, _get_min_separation, _get_beta, _parse_duration_to_steps  # single reader of mesa_configs.yaml
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
@@ -205,10 +205,17 @@ class RobotAgent(FactoryAgent):
 
         context = ContextKnowledge.default()
 
+        # The body's physical parameters for the mind, each with where it came
+        # from, for the run header below (T-A1): beta in the body's length units
+        # for the recognizer, min_separation for the MetaPlanner.
+        beta, self._beta_source = _get_beta(model)
+        min_separation, self._min_separation_source = _get_min_separation(model)
+
         self.recognizer = IntentionRecognizer(
             knowledge=knowledge,
             hypotheses=hypotheses,
             context=context,
+            beta=beta,
             assigned_tasks=observed_assigned_tasks,
         )
         logging.info(
@@ -251,15 +258,15 @@ class RobotAgent(FactoryAgent):
             knowledge=knowledge,
             projector=self.projector,
             recognizer=self.recognizer,
-            min_separation=_get_min_separation(model),
+            min_separation=min_separation,
             human_agent_id=observed_agent_id,
             gate_strategy=self.model.gate_strategy,
             cost_strategy=self.model.cost_strategy,
         )
         # The run header (TODO-78): the policy values and evaluation switches this
         # robot's decisions are taken under, once per run, so a log can be read
-        # without knowing which code or command produced it. min_separation in
-        # world units, with where the body took it from.
+        # without knowing which code or command produced it. min_separation and
+        # beta in the body's units (cm), each with where the body took it from.
         logging.info(
             f"[run] {self.unique_id} gate_strategy={self.meta_planner.gate_strategy} "
             f"cost_strategy={self.meta_planner.cost_strategy} "
@@ -267,7 +274,8 @@ class RobotAgent(FactoryAgent):
             f"assignment_prior={'on' if self.model.assignment_prior else 'off'} "
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
             f"min_separation={self.meta_planner.min_separation:.2f} "
-            f"(source=mesa_configs.yaml simulation.min_separation, cm)"
+            f"min_separation_source={self._min_separation_source} "
+            f"beta={beta:g} beta_source={self._beta_source} units=cm"
         )
         self.meta_planner.seed_tasks(assigned_tasks)
         self.current_task_instance: Optional[TaskInstance] = None

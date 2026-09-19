@@ -176,9 +176,10 @@ from shared import likelihood_functions
 
 # =============================================================================
 # Recognizer-level constants
-# (the likelihood constants — BETA, UNKNOWN_LIKELIHOOD, the detection rates —
-#  live in likelihood_functions.py, single source of truth, read through the
-#  module at call time rather than redefined here)
+# (the likelihood constants — UNKNOWN_LIKELIHOOD, the detection rates — live
+#  in likelihood_functions.py, single source of truth, read through the module
+#  at call time rather than redefined here; the detour tolerance beta is the
+#  embodiment's, passed to the constructor)
 # =============================================================================
 
 # ω_context boost multipliers
@@ -298,6 +299,7 @@ class IntentionRecognizer:
         knowledge: DomainKnowledgeBase,
         context: ContextKnowledge,
         hypotheses: List[HypothesisKey],
+        beta: float,
         assigned_tasks: Optional[List[TaskInstance]] = None,
         path_cost: Optional[likelihood_functions.PathCost] = None,
     ):
@@ -307,6 +309,10 @@ class IntentionRecognizer:
         hypotheses:     list of (task_name, bindings) pairs for this scenario.
                         Built from the domain schemas and the workspace objects
                         at construction time in sim_agents.py.
+        beta:           the excess-path likelihood's detour tolerance, per unit
+                        of the body's length (Mesa: 0.01 /cm). Supplied by the
+                        embodiment, no default: it carries the body's units,
+                        and shared/ holds none (T-A1; TODO-58).
         assigned_tasks: the OBSERVED agent's work order — which tasks it was
                         assigned, not in which order it will do them. None or
                         empty means the robot has no such knowledge: the
@@ -327,6 +333,7 @@ class IntentionRecognizer:
         self.knowledge = knowledge
         self.context = context
         self._path_cost = path_cost or likelihood_functions.straight_line_cost
+        self._beta = beta
         # A schema naming an evaluator the registry does not have is a domain
         # modelling error, and must not look like uncertainty: without this
         # check every movement under it would silently score the perfect fit.
@@ -848,7 +855,7 @@ class IntentionRecognizer:
             return None
         key = ("progress", action.schema.progress_evaluator, origin, walked, target_pos)
         if key not in memo:
-            memo[key] = evaluator(walked, origin, pos, target_pos, self._path_cost)
+            memo[key] = evaluator(walked, origin, pos, target_pos, self._path_cost, self._beta)
         return memo[key]
 
     def _unknown_likelihood(

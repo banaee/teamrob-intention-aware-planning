@@ -21,7 +21,7 @@ THE EVIDENCE MODEL (I4):
     expected action is located at g, measured from the ORIGIN where it began
     expecting that action:
         excess = walked + C(pos, g) - C(origin, g)
-        L      = 2 / (1 + exp(BETA * excess))     — the logistic, normalised
+        L      = 2 / (1 + exp(beta * excess))     — the logistic, normalised
                  so that L = 1 at zero excess (see PERFECT_FIT_LIKELIHOOD)
     `walked` is the odometer distance since the origin; C is a path cost —
     straight-line by default (Mesa agents walk through obstacles, so observed
@@ -38,13 +38,15 @@ THE EVIDENCE MODEL (I4):
     target can produce it): (0, 2) after the normalisation, (0, 1] for any
     excess ≥ 0.
 
-    BETA — detour tolerance, per cm: how much wasted path makes a target
-    implausible. 1/BETA is the excess at which the likelihood has fallen to
-    2/(1+e) ≈ 0.54 (from 1 at zero excess). Absolute units make it layout-scale
-    dependent (the same defect recorded for min_separation, formerly
-    min_safe_distance, TODO-28); the
-    fractional form (excess as a fraction of C(origin, g)) was measured against
-    it in the I4 sweep — see analysis/i4_evidence_model/REPORT.md.
+    beta — detour tolerance, per unit of length: how much wasted path makes a
+    target implausible. 1/beta is the excess at which the likelihood has fallen
+    to 2/(1+e) ≈ 0.54 (from 1 at zero excess). A physical tolerance about how
+    people walk, in the body's length units, so it is NOT held here: the
+    embodiment supplies it to IntentionRecognizer (Mesa: 0.01 /cm,
+    mesa_configs.yaml), as it supplies min_separation to the MetaPlanner
+    (T-A1; TODO-58). One fixed value per embodiment, decided on IR grounds, not
+    per layout. The fractional form (excess as a fraction of C(origin, g)) was
+    measured against it in the I4 sweep — see analysis/i4_evidence_model/REPORT.md.
 
     PERFECT_FIT_LIKELIHOOD — the value at zero excess, 1.0: the multiplicative
     identity, so that a phase with no wasted path folds NOTHING into the
@@ -105,7 +107,7 @@ DISPATCH:
 """
 
 import math
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Tuple
 
 from shared.types import Predicate
 
@@ -115,9 +117,9 @@ PathCost = Callable[[Position, Position], float]
 
 # =============================================================================
 # The parameter set (single source of truth — recognizer.py reads these through
-# the module, never redefines them)
+# the module, never redefines them). The detour tolerance beta is not here: it
+# carries the body's length unit, so the embodiment supplies it (T-A1).
 # =============================================================================
-BETA                       = 0.01    # detour tolerance, 1/cm (excess of 100 cm → L ≈ 0.54)
 UNKNOWN_LIKELIHOOD         = 0.1     # likelihood under `unknown` per whole expected path covered; ceiling 1/(1+uⁿ)
 DETECTION_HIT_RATE         = 1.0     # P(signal | completed): Mesa reports every completion
 DETECTION_FALSE_ALARM_RATE = 1e-3    # P(signal | not completed): none in Mesa; non-zero for recoverability
@@ -136,17 +138,16 @@ def straight_line_cost(a: Position, b: Position) -> float:
 # Movement — excess-path likelihood
 # =============================================================================
 
-def logistic_of_excess(excess: float, beta: Optional[float] = None) -> float:
+def logistic_of_excess(excess: float, beta: float) -> float:
     """2 / (1 + exp(beta · excess)): 1 at zero excess, → 0 as the excess
     grows, → 2 for a (moving-target) negative excess."""
-    b = BETA if beta is None else beta
-    x = b * excess
+    x = beta * excess
     if x > 700.0:                      # exp overflow guard; the value is 0 to double precision
         return 0.0
     return 2.0 / (1.0 + math.exp(x))
 
 
-PERFECT_FIT_LIKELIHOOD = logistic_of_excess(0.0)    # 1.0: nothing to charge
+PERFECT_FIT_LIKELIHOOD = 1.0    # the logistic at zero excess, for any beta: nothing to charge
 
 
 def excess_path_likelihood(
@@ -154,17 +155,19 @@ def excess_path_likelihood(
     origin: Position,
     pos: Position,
     target_pos: Position,
-    cost: PathCost = straight_line_cost,
+    cost: PathCost,
+    beta: float,
 ) -> float:
     """
     Excess-path likelihood of the movement observed since `origin` under an
     action located at `target_pos`: the agent has walked `walked` (odometer
     since the origin) and is now at `pos`; a perfectly efficient walk would
-    have cost C(origin, target). Registered as "excess_path"; applies to any
+    have cost C(origin, target). `beta` is the embodiment's detour tolerance,
+    in the units of the positions. Registered as "excess_path"; applies to any
     action schema with progress_evaluator="excess_path" (currently: move_to).
     """
     excess = walked + cost(pos, target_pos) - cost(origin, target_pos)
-    return logistic_of_excess(excess)
+    return logistic_of_excess(excess, beta)
 
 
 # =============================================================================

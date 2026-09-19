@@ -32,6 +32,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
 
 from shared import likelihood_functions as LF                                 # noqa: E402
+BETA = 0.01    # Mesa's detour tolerance, mesa_configs.yaml simulation.beta (supplied by the body since T-A1)
 
 UNKNOWN = "unknown"
 
@@ -47,7 +48,7 @@ def unit_checks():
     from shared.recognizer import IntentionRecognizer, HypothesisKey
     from domains.kitting.actions import move_to, pick_up, place
     from domains.kitting.tasks import deliver_item
-    assert LF.BETA == 0.01 and LF.UNKNOWN_LIKELIHOOD == 0.1, "the expectations below are for β = 0.01, u = 0.1"
+    assert BETA == 0.01 and LF.UNKNOWN_LIKELIHOOD == 0.1, "the expectations below are for β = 0.01, u = 0.1"
     u = LF.UNKNOWN_LIKELIHOOD
     out = []
 
@@ -87,15 +88,15 @@ def unit_checks():
                 "u^f: 1 at 0, u at 1, and (u^0.5)² = u", ok, ""))
 
     # G1 — straight walk 200 cm east
-    rec = IntentionRecognizer(knowledge=kb, context=ContextKnowledge.default(), hypotheses=[ha, hb])
+    rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb])
     rec.update(_obs("h", (0.0, 0.0), t=0), _world("h", (0.0, 0.0), objects=objs, locations=locs, t=0))
     for i in range(1, 11):
         b = rec.update(_obs("h", (20.0 * i, 0.0), t=i), _world("h", (20.0 * i, 0.0), objects=objs, locations=locs, t=i))
     d = b.distribution
-    ok = near(odds(d, repr(ha)), u ** -0.5) and near(odds(d, repr(hb)), LF.logistic_of_excess(ex_b(200)))
+    ok = near(odds(d, repr(ha)), u ** -0.5) and near(odds(d, repr(hb)), LF.logistic_of_excess(ex_b(200), BETA))
     out.append(("G1 straight walk 200 of 400 cm: a:u = u^−0.5 (zero excess, half the path); b (walked away from, f = 0) "
                 "pays L(excess) alone", ok, f"a:u {odds(d, repr(ha)):.4f} (expected {u ** -0.5:.4f}), b:u {odds(d, repr(hb)):.4f} "
-                f"(expected {LF.logistic_of_excess(ex_b(200)):.4f})"))
+                f"(expected {LF.logistic_of_excess(ex_b(200), BETA):.4f})"))
 
     # G2 — stationary ticks
     b0 = dict(d)
@@ -105,17 +106,17 @@ def unit_checks():
                 all(abs(b.distribution[k] - b0[k]) < 1e-12 for k in b0), ""))
 
     # G3 — out and back
-    rec = IntentionRecognizer(knowledge=kb, context=ContextKnowledge.default(), hypotheses=[ha, hb])
+    rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb])
     rec.update(_obs("h", (0.0, 0.0), t=0), _world("h", (0.0, 0.0), objects=objs, locations=locs, t=0))
     path = [(20.0 * i, 0.0) for i in range(1, 11)] + [(200.0 - 20.0 * i, 0.0) for i in range(1, 11)]
     for i, p in enumerate(path, 1):
         b = rec.update(_obs("h", p, t=i), _world("h", p, objects=objs, locations=locs, t=i))
-    ok = near(odds(b.distribution, repr(ha)), LF.logistic_of_excess(400.0))
+    ok = near(odds(b.distribution, repr(ha)), LF.logistic_of_excess(400.0, BETA))
     out.append(("G3 out 200 cm and back: excess 400 cm and nothing covered (f = 0) — a:u = L(400), the refutation in full, "
-                "no confirmation", ok, f"a:u {odds(b.distribution, repr(ha)):.4f} (expected {LF.logistic_of_excess(400.0):.4f})"))
+                "no confirmation", ok, f"a:u {odds(b.distribution, repr(ha)):.4f} (expected {LF.logistic_of_excess(400.0, BETA):.4f})"))
 
     # G4 / G10 — the walk to shelf_a, the arrival, the grasp, one carry step
-    rec = IntentionRecognizer(knowledge=kb, context=ContextKnowledge.default(), hypotheses=[ha, hb])
+    rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb])
     rec.update(_obs("h", (0.0, 0.0), "stand", t=0), _world("h", (0.0, 0.0), objects=objs, locations=locs, t=0))
     r = {}
     for i in range(1, 20):
@@ -124,7 +125,7 @@ def unit_checks():
         b = rec.update(_obs("h", p, t=i), _world("h", p, predicates=preds, objects=objs, locations=locs, t=i))
         r[i] = (odds(rec._evidence, repr(ha)), odds(rec._evidence, repr(hb)))
     ok = (near(r[18][0], u ** -0.9) and near(r[19][0], u ** -2) and act_str(rec._expected[repr(ha)]).startswith("pick_up")
-          and near(r[18][1], LF.logistic_of_excess(ex_b(360))) and near(r[19][1], LF.logistic_of_excess(ex_b(380))))
+          and near(r[18][1], LF.logistic_of_excess(ex_b(360), BETA)) and near(r[19][1], LF.logistic_of_excess(ex_b(380), BETA)))
     out.append(("G4 the arrival: a:u = u^−0.9 at 360 cm, 100 at 380 cm — the fold at f = 1 by the completion fact (1/u) × the "
                 "open pick_up (1/u, ungraded); b:u = L(excess) throughout (f = 0)", ok,
                 f"a:u {r[18][0]:.4f} → {r[19][0]:.2f}; b:u {r[18][1]:.4f} → {r[19][1]:.4f}; a expects {act_str(rec._expected[repr(ha)])}"))
@@ -144,7 +145,7 @@ def unit_checks():
     # G5 — the grasp with a rival at the same shelf (I4d's U5'')
     objs2 = {"shelf_0": (200.0, 0.0), "item_a": (200.0, 0.0), "item_b": (200.0, 0.0), "table_0": (0.0, 400.0)}
     locs2 = {"item_a": "shelf_0", "item_b": "shelf_0"}
-    rec = IntentionRecognizer(knowledge=kb, context=ContextKnowledge.default(), hypotheses=[ha, hb])
+    rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb])
     at = [P("at", "h", "shelf_0"), P("at", "h", "item_a"), P("at", "h", "item_b")]
     rec.update(_obs("h", (180.0, 0.0), "stand", t=0), _world("h", (180.0, 0.0), predicates=at, objects=objs2, locations=locs2, t=0))
     rec.update(_obs("h", (180.0, 0.0), "stand", t=1), _world("h", (180.0, 0.0), predicates=at, objects=objs2, locations=locs2, t=1))
@@ -170,12 +171,12 @@ def unit_checks():
                 f"found: {bad}" if bad else ""))
 
     # G7 — t = 0, a stationary tick, the first step
-    rec = IntentionRecognizer(knowledge=kb, context=ContextKnowledge.default(), hypotheses=[ha, hb])
+    rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb])
     d0 = rec.update(_obs("h", (0.0, 0.0), "stand", t=0), _world("h", (0.0, 0.0), objects=objs, locations=locs, t=0)).distribution
     d1 = rec.update(_obs("h", (0.0, 0.0), "stand", t=1), _world("h", (0.0, 0.0), objects=objs, locations=locs, t=1)).distribution
     d2 = rec.update(_obs("h", (20.0, 0.0), t=2), _world("h", (20.0, 0.0), objects=objs, locations=locs, t=2)).distribution
     ok = (all(abs(v - 1 / 3) < 1e-12 for v in d0.values()) and d1 == d0
-          and near(odds(d2, repr(ha)), u ** -0.05) and near(odds(d2, repr(hb)), LF.logistic_of_excess(ex_b(20))))
+          and near(odds(d2, repr(ha)), u ** -0.05) and near(odds(d2, repr(hb)), LF.logistic_of_excess(ex_b(20), BETA)))
     out.append(("G7 t = 0 and a stationary tick report the prior exactly (1/3 each: no factor); the first 20 cm step scores a at "
                 "u^−0.05 = 1.122 (one twentieth of its path) and b at L(excess) (f = 0)", ok,
                 f"t=0 {tuple(round(v, 4) for v in d0.values())}, t=1 same={d1 == d0}, t=2 a:u {odds(d2, repr(ha)):.3f} b:u {odds(d2, repr(hb)):.4f}"))
@@ -184,7 +185,7 @@ def unit_checks():
     hc = HypothesisKey("deliver_item", {"?item": "item_c", "?kitting_table": "table_0"})
     objs3 = {**objs, "item_c": (400.0, 0.0)}
     locs3 = {**locs, "item_c": "shelf_a"}
-    rec = IntentionRecognizer(knowledge=kb, context=ContextKnowledge.default(), hypotheses=[ha, hb, hc])
+    rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb, hc])
     rec.update(_obs("h", (0.0, 0.0), "stand", t=0), _world("h", (0.0, 0.0), objects=objs3, locations=locs3, t=0))
     t = 0
     for i in range(1, 20):
@@ -219,17 +220,17 @@ def unit_checks():
     differed = abs(base_before[repr(hb)] - base_before[repr(hc)]) > 1e-12
     uniform = all(abs(base_after[k] - 1 / 3) < 1e-12 for k in (repr(hb), repr(hc), UNKNOWN))
     reported = all(abs(br.distribution[k] - exp_out[k]) < 1e-12 for k in exp_out) and bs.distribution == br.distribution
-    scored = near(odds(bw.distribution, repr(hb)), u ** -f_b) and near(odds(bw.distribution, repr(hc)), LF.logistic_of_excess(ex_c) * u ** -f_c)
+    scored = near(odds(bw.distribution, repr(hb)), u ** -f_b) and near(odds(bw.distribution, repr(hc)), LF.logistic_of_excess(ex_c, BETA) * u ** -f_c)
     ok = repr(ha) in rec._completed and differed and uniform and reported and scored and all(rec._origin[k] == p for k in rec._origin)
     out.append(("G8 episode boundary: b and c hold different bases before it; on the boundary tick every live base is 1/3, the output is "
                 "the pinned prior and a stationary tick keeps it; one 20 cm step north then scores b at u^−(20/800) and c at "
                 "L(excess) · u^−f_c from the new origin", ok,
                 f"before b {base_before[repr(hb)]:.3e} c {base_before[repr(hc)]:.3e}; after {base_after[repr(hb)]:.4f} / {base_after[repr(hc)]:.4f} / "
                 f"{base_after[UNKNOWN]:.4f}; step b:u {odds(bw.distribution, repr(hb)):.4f} (expected {u ** -f_b:.4f}) c:u "
-                f"{odds(bw.distribution, repr(hc)):.4f} (expected {LF.logistic_of_excess(ex_c) * u ** -f_c:.4f})"))
+                f"{odds(bw.distribution, repr(hc)):.4f} (expected {LF.logistic_of_excess(ex_c, BETA) * u ** -f_c:.4f})"))
 
     # G9 — the pin without the boundary
-    rec = IntentionRecognizer(knowledge=kb, context=ContextKnowledge.default(), hypotheses=[ha, hb])
+    rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb])
     rec.update(_obs("h", (0.0, 0.0), "stand", t=0), _world("h", (0.0, 0.0), objects=objs, locations=locs, t=0))
     for i in range(1, 6):
         b5 = rec.update(_obs("h", (20.0 * i, 0.0), t=i), _world("h", (20.0 * i, 0.0), objects=objs, locations=locs, t=i))

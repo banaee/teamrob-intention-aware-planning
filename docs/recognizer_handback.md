@@ -290,7 +290,7 @@ through the module and never redefines them.
 
 | constant | value | meaning |
 |---|---|---|
-| `BETA` (β) | 0.01 /cm | Detour tolerance. L at an excess of 1/β = 100 cm is 2/(1+e) ≈ 0.54 (the earlier text of this section said ≈ 0.27, which is the raw logistic's value; the logistic is normalised to 1 at zero excess, and the code comment on `BETA` is right). In centimetres, hence layout-scale dependent (TODO-58). |
+| `BETA` (β) | 0.01 /cm | Detour tolerance. L at an excess of 1/β = 100 cm is 2/(1+e) ≈ 0.54 (the earlier text of this section said ≈ 0.27, which is the raw logistic's value; the logistic is normalised to 1 at zero excess, and the code comment on `BETA` is right). In centimetres, hence layout-scale dependent (TODO-58). REVISED (T-A1): a physical tolerance, fixed per embodiment, not per layout; supplied by the body (`IntentionRecognizer(beta=...)`, Mesa `mesa_configs.yaml`), no longer in `likelihood_functions.py`. |
 | `UNKNOWN_LIKELIHOOD` (u) | 0.1 | The likelihood under `unknown` of an observation that covered one whole expected path; a stretch pays u^f for its grade f (§1.4). The bar a hypothesis must clear per whole observation, and the unit of the ceiling 1/(1 + uⁿ) over n whole observations. |
 | `DETECTION_HIT_RATE` | 1.0 | P(signal \| the action completed). Mesa reports every completion. |
 | `DETECTION_FALSE_ALARM_RATE` | 10⁻³ | P(signal \| not completed). Mesa has none; non-zero only so a refuted hypothesis keeps a recoverable base. Set both rates from a real detector's measured rates. |

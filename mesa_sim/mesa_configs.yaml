@@ -5,3 +5,4 @@
       step_size: 20                      # 1 step = 20 centimeters
       seconds_per_step: 2.0
       min_separation: 50                 # centimeters; the clearance realization keeps and the separation stop checks
+      beta: 0.01                         # per centimeter; the recognizer's tolerance on wasted path (how people walk)

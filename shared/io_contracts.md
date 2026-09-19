@@ -471,6 +471,7 @@ IntentionRecognizer(
     knowledge: DomainKnowledgeBase,
     context: ContextKnowledge,                        # background facts for ω_context weighting (output only)
     hypotheses: List[HypothesisKey],                  # precomputed hypothesis space for this scenario
+    beta: float,                                      # detour tolerance, body's length units; no default (T-A1)
     assigned_tasks: Optional[List[TaskInstance]] = None,   # OBSERVED agent's work order; None/empty = restriction off
     path_cost: Optional[PathCost] = None,             # C(a, b) for the excess path; straight line by default
 )
@@ -486,6 +487,11 @@ foreseeable task (`TaskSchema.is_foreseeable`) and `unknown`; every other hypoth
 `BELIEF_FLOOR` and never scored. Identity crosses the boundary as `task_instance_key()` (§1.10), which matches
 `repr(HypothesisKey)` (§1.8); an assigned task matching no hypothesis is logged as a warning and ignored.
 `None` or `[]` switches the restriction off (`--assignment_prior false`, the default).
+
+`beta` is the excess-path likelihood's detour tolerance, per unit of the body's length (Mesa: 0.01 /cm, from
+`mesa_configs.yaml`, named with its source in the `[run]` header). It carries a unit, so the body supplies it
+and `shared/` holds no default (T-A1; TODO-58). It reaches the evaluator as its last argument:
+`PROGRESS_EVALUATORS` functions are called `(walked, origin, pos, target, path_cost, beta)`.
 
 `path_cost` is the cost of the walk between two positions that the excess path is measured against.
 Straight-line distance by default (Mesa agents walk through obstacles); a domain or body with a better model

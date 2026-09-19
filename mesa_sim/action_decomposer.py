@@ -304,10 +304,16 @@ def _get_seconds_per_step(model) -> float:
     return float(cfg.get("simulation", {}).get("seconds_per_step", 2.0))
 
 
-def _get_min_separation(model) -> float:
-    # A safety distance set from outside the planner: no fallback, so a missing
-    # value stops the run instead of running under one nobody set.
+# The body's physical parameters for the mind (T-A1): each returns (value,
+# source) so the run header can name where the value came from. No fallback:
+# a missing value stops the run instead of running under one nobody set.
+def _get_min_separation(model) -> Tuple[float, str]:
     cfg = _load_mesa_config(model)
-    return float(cfg["simulation"]["min_separation"])
+    return float(cfg["simulation"]["min_separation"]), "mesa_configs.yaml:simulation.min_separation"
+
+
+def _get_beta(model) -> Tuple[float, str]:
+    cfg = _load_mesa_config(model)
+    return float(cfg["simulation"]["beta"]), "mesa_configs.yaml:simulation.beta"
 
 
