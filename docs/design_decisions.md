@@ -2725,6 +2725,9 @@ ONE DESIGN QUESTION BEFORE THE LAYOUT IS WRITTEN, OPEN: what kind of fact is an 
     projection is admitted later than in one-table layouts. Expected from the code, not measured.
 The two readings put the same layout to different uses (the first tests ordering with the recognizer as
 it behaves now; the second also tests the recognizer on a split it has not met). The choice is cchat's.
+RESOLVED (T-B1a, September 2026): a fact of the station, declared in the layout; one hypothesis per item.
+See "An item's destination table is a fact of the station". The items × tables consequence above no
+longer applies.
 Open points 1 and 2 above are settled at design time in T-B2 (the proposals: the hold at the boundary
 before the task it clears; B2 commits to a task).
 
@@ -2945,3 +2948,84 @@ the conflict happens later than realized, where the human actually stands; and t
 the robot's step inside the assessed window. That is also the first fixture in which the stop and
 realization overlap: so far, with valid fixtures, the stop fires only past T_h and on deviations (F47b).
 Reference: T-A1, September 2026; I4c; T8; D2; C; F47b; TODO-80; TODO-85
+
+---
+
+**An item's destination table is a fact of the station: a layout declaration, determined from the item, not enumerated (T-B1a, the T-B1 fixture question Q1)**
+
+DECIDED (cchat, September 2026), closing the open question of the B3.B entry's FIXTURE SIDE ("what kind of
+fact is an item's destination table?"): a fact of the station, not of the work order.
+
+WHAT IT RESTS ON. Where a part goes is a fact of the station, known independently of who carries it. Who
+carries it is the work order, and that is what the assignment prior already expresses. With the table as an
+enumerated task parameter, the hypothesis space was items × tables, and the two table hypotheses of one item
+are indistinguishable during the fetch walk, so neither could clear the gate before the carry walk: a
+modelling artefact, not a property of the human's behaviour. Separating the two leaves one `deliver_item`
+hypothesis per item, with the table taken from the station.
+
+THE ROUTE INTO shared/, the one the origin container already takes. Each item in a layout declares
+`"destination"` next to its `"initial_container"`. The Mesa loader stores it on `SimObject.destination`; the
+world-state builder copies it into `WorldState.object_destination` ({item_id: destination_id}, static per
+scenario, like `object_home_container`); the planner reads it through the lookup `destination_of`. `shared/`
+holds no layout knowledge and no domain string: which object types need a destination, and of which type, is
+read from the task schemas (`DomainKnowledgeBase.get_types_with_destination`).
+
+THE PRECEDENCE RULE. `deliver_item`'s `?kitting_table` is resolved from `?item` through `destination_of` when
+the task instance does not bind it. When the task instance binds it, the binding is used as given and the
+layout does not override it. Only `destination_of` behaves this way; `zone_of` and `home_container_of` always
+derive. Reason: the human's `scheduled_tasks` must be able to send an item to a table other than its
+designated one (a deviation the robot is meant to notice later), while the robot's own execution and its
+hypotheses about the human follow the station. A missing destination at grounding is a modelling error
+(`ValueError`), never a world fact to score around (`DecompositionError`): the recognizer must not produce an
+ungrounded hypothesis from it.
+
+THE LOAD-TIME CHECKS (mesa_sim/sim_model.py). (1) Every object of a type the domain resolves through
+`destination_of` declares a destination, naming an object of the layout of the type the schema declares for
+the determined parameter; otherwise an error naming the object and the layout, never a default. (2)
+`check_task_bindings` types every bound parameter, the table included. (3) `check_task_destinations`: every
+agent's `assigned_tasks`, robot and human, must bind the table the layout designates; a disagreement is an
+error naming the task, the item and both tables. `assigned_tasks` on the human side is the reference set the
+robot's mind holds, so it must describe the station, not a deviation. The human's `scheduled_tasks` is
+deliberately not checked against the layout: it is the script, and the script is where a deviation is
+written (its bindings are still typed by (2)).
+
+THE TWO JOBS OF `parameter_types`, SEPARATED (T-B1a follow-up, correction 1). T-B1a first obtained one
+hypothesis per item by removing `?kitting_table` from `parameter_types`, which conflated declaring a
+parameter's type (which binding validation needs) with defining what the recognizer enumerates, and lost the
+type check on a bound table. Now `parameter_types` declares the type of every parameter, and
+`TaskSchema.determined_parameters` ({var: (lookup, source var)}) declares, at the task, which parameters are
+determined by another parameter and through which lookup. The recognizer enumerates `parameter_types` minus
+`determined_parameters`; the planner fills determined parameters before method selection, with the same
+lookup code as a method's `derived_vars`. The declaration sits at the task, not inferred by scanning the
+methods, because it is a property of the task's parameters (it decides the hypothesis space and binding
+validation, which are task-level), and because the reason a parameter is not enumerated should be readable
+where the parameter is declared. `MethodSchema.derived_vars` keeps its own role: variables used inside one
+method's steps (`deliver_with_return`'s return container), not task parameters.
+
+IDENTITY AND THE PRIOR'S MATCHING (T-B1a follow-up 2). A task instance and a hypothesis are built from
+different sources and are deliberately not the same shape. A task instance is written in the scenario and
+names the item and the table it goes to. A hypothesis is one of the robot's guesses about the human, built at
+construction from the schemas and the layout's objects, never from the human's tasks (with the prior off,
+the default, the robot has no work order for the human at all), and it enumerates the item alone. So:
+- `task_instance_key` keeps the table: a key is read by people, and a delivery reads as the item and the
+  table it goes to. Every kitting scenario states the table in `assigned_tasks` and `scheduled_tasks`.
+  (Dropping the table from the key would have bought byte-identity with T-B1a's baselines; a convenience of
+  that task, not an argument about identity.)
+- With the prior on, an assigned task is matched to a hypothesis on what the two share, the enumerated
+  parameters (the task's bindings minus its determined parameters). The table is not compared: what makes a
+  stated table right is agreement with the station, established at load by `check_task_destinations`, which
+  rejects a disagreeing scenario before the recognizer is built. An earlier attempt matched the two as whole
+  strings; with the table restored, every assigned task matched no hypothesis and the prior lost its pool in
+  silence (measured, s00 prior on: the belief differed from step 0).
+Measured: on the eight one-table fixtures, both priors, the world-level behaviour is unchanged through T-B1a
+and both follow-ups; the logs differ only in the key text (`analysis/tb1a_destination/README.md`).
+
+Open consequences, recorded in TODOS_AND_DEFERRED.md: TODO-86 (AgentConfig's key equality blocks a scripted
+delivery to another table) and TODO-87 (the task boundary and the pool drop need the designated completion).
+Files: domains/kitting/env_layout*.json, domains/kitting/tasks.py, domains/kitting/scenarios.py,
+shared/types.py (`WorldState.object_destination`, `TaskSchema.determined_parameters`,
+`check_task_destinations`), shared/planner.py (`_resolve_lookups`), shared/recognizer.py
+(`build_hypothesis_space`, `_build_admissible_keys`), shared/domain_knowledge.py, mesa_sim/sim_model.py,
+mesa_sim/world_state_builder.py
+Reference: T-B1a, T-B1a follow-up, T-B1a follow-up 2, September 2026; B3.B design revision (THE FIXTURE
+SIDE); `analysis/tb1a_destination/`

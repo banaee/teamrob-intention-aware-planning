@@ -1471,6 +1471,9 @@ Prerequisites:
     restricted by the assignment prior)? Under the second reading the belief is expected to split
     between an item's two table hypotheses until the carry walk, so the human projection is admitted
     later. design_decisions.md, "B3.B ... THE FIXTURE SIDE".
+    RESOLVED (T-B1a, September 2026): a fact of the station, the layout's `"destination"` per item; one
+    hypothesis per item, the table determined from the item (`determined_parameters`). design_decisions.md,
+    "An item's destination table is a fact of the station". TODO-86 / TODO-87 record what it leaves open.
 (g) THE GATE'S REOPENING CONDITION (gate ruling, September 2026): a walk crossing of θ with a live rival at
     similar odds (top-two ratio near 1 at the crossing), where the normalised share and a margin gate would
     disagree. No current fixture shows one (lowest top-two ratio at a walk crossing 5.23, s00_off 37).
@@ -2686,3 +2689,31 @@ the conflict later than realized, refused by the stop inside the assessed window
 stop and realization overlap). design_decisions.md, "A stationary human".
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026
+
+**TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a]
+`AgentConfig.__post_init__` (shared/types.py) requires the human's `assigned_tasks` keys to equal the
+non-foreseeable `scheduled_tasks` keys exactly. Since T-B1a the human's `scheduled_tasks` may bind
+`?kitting_table` to a table other than the item's designated one (the precedence rule keeps the binding),
+but such a task has a different `task_instance_key` from its assigned counterpart (which must bind the
+designated table, `check_task_destinations`), so the scenario is rejected at construction ("Scripted but not
+assigned ..."). Checked in T-B1a: with that check bypassed, the scenario loads, and a bound table grounds
+the carry walk to that table. Not in T-B. It is a prerequisite of the deviation case, which arrives with action-level
+scripting of the human (T-C); decide there what the correspondence between work order and script compares.
+Recorded, not fixed.
+Files: shared/types.py (`AgentConfig.__post_init__`)
+Reference: T-B1a, September 2026; design_decisions.md, "An item's destination table is a fact of the station"
+
+**TODO-87 — A delivery to another table: no task boundary, no pin, no pool drop** [deviation case; from T-B1a]
+From the code (T-B1a, report item 10). The observed agent's task boundary fires only inside the retirement
+branch of `IntentionRecognizer.update()`: a hypothesis retires when its TERMINAL action's completion holds
+(`_terminal_complete`), and the retirement is a boundary when the hypothesis expected that action on the
+previous tick (`_task_boundary`). A hypothesis is grounded with the station's table, so its terminal
+completion is `obj_at(item, designated_table)`. If the human places the item on another table, that never
+holds: the hypothesis is not pinned, no boundary fires, the belief is not re-initialised, and every origin
+stays where it was. `MetaPlanner._is_complete` uses the same criterion (`AdaptivePlanner.is_complete`), so
+the pool does not drop the task either. Where it matters: the deviation case (T-C / T-D), in which the
+human delivers an item to a table other than its designated one; not reachable by any current fixture
+(TODO-86). Recorded, nothing changed.
+Files: shared/recognizer.py (`update`, `_terminal_complete`, `_task_boundary`), shared/meta_planner.py
+(`_is_complete`), shared/planner.py (`is_complete`)
+Reference: T-B1a, September 2026
