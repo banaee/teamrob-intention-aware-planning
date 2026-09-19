@@ -301,7 +301,14 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    The review found one defect, fixed in the wrap-up: `update()` continued a current task its own pool
    had dropped as complete (B1.5). Completion is measured from the world fact from here on (the declared
    empty-pool tick minus 2). `analysis/t6_ablation/`; TODO-36
-7. The gate ruling ✅ (September 2026, documentation only) — on the graded-evidence θ data
+7. Graded evidence ✅ (September 2026) — a stretch's evidence against `unknown` is graded by the share of the
+   hypothesis's expected path it covers: L / u^f, f = 1 at an arrival by the completion fact; u, β and θ
+   unchanged, the I4d accounting invariant re-checked (7.1e-15). The one-task reveals follow the walk
+   (θ at f ≈ 0.48) instead of the human's first step; no wrong task at θ; robot motion changed in six of
+   sixteen conditions. New baselines: `analysis/g1_graded_evidence/sweep/`, replacing D2's. Entry in
+   `design_decisions.md`, "A stretch's evidence against `unknown` is graded by the share of the expected
+   path it covers"; `analysis/g1_graded_evidence/`; TODO-61 (a) closed for walks
+8. The gate ruling ✅ (September 2026, documentation only) — on the graded-evidence θ data
    (`analysis/g1_graded_evidence/crossings.md`): the admission gate stays `_clears_gate` on the normalised
    share, θ = 0.75. The live-set dependence was in the likelihood, not the gate; under the grade a walk
    crossing sits at about 3:1 or more over `unknown` whatever the live-set size, higher while a rival is

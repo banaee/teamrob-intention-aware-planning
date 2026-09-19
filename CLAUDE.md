@@ -80,8 +80,10 @@ Decisions
   execution-time separation stop (C, run option, default off), wait durations come from the schema
   (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
   (D2: `recognition_changed` against the decision record replaces `theta_crossed`), and the policy
-  components are ablated (T6, `analysis/t6_ablation/`). The 4C queue is empty. The queue and its order
-  are in `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
+  components are ablated (T6, `analysis/t6_ablation/`); the recognizer's evidence is graded by path
+  covered and the gate stays a fixed share (graded evidence, the gate ruling). The 4C queue is done; the
+  next step is the randomised fixtures (TODO-47). The queue, its order and the next step are in
+  `docs/roadmap.md`. Later phases, not to be started unasked: 4D (detour strategy),
   Phase 5 (evaluation), Phase 6 (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. Change only what the task specifies; do not fill in unspecified block logic, flags or
