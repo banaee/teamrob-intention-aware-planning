@@ -7,7 +7,7 @@ Called once at startup by KnowledgeBase via sim_model.py.
 
 from shared.types import DomainModel
 from domains.kitting.actions import move_to, pick_up, place, wait_at
-from domains.kitting.tasks import deliver_item, coffee_break, ac_activation, deliver_item_old
+from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
 from domains.kitting.scenarios import scenario_00, scenario_10, scenario_20, scenario_21, scenario_30, scenario_40, scenario_50, scenario_70, scenario_71
 
 def register_kitting_domain() -> DomainModel:
@@ -16,7 +16,6 @@ def register_kitting_domain() -> DomainModel:
             "deliver_item":  deliver_item,
             "coffee_break":  coffee_break,
             "ac_activation": ac_activation,
-            "deliver_item_old":  deliver_item_old,
         },
         actions={
             "move_to":   move_to,
@@ -28,7 +27,6 @@ def register_kitting_domain() -> DomainModel:
         intentions={"deliver_item", 
                     "coffee_break", 
                     "ac_activation", 
-                    # "deliver_item_old"
                     },
     )
     

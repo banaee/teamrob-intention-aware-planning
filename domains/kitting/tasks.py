@@ -21,40 +21,6 @@ _other     = Var("?other")   # whatever else the agent may be holding when this 
 _agent = Var("?agent")
 
 
-deliver_item_old = TaskSchema(
-    name="deliver_item_old",
-    parameters=[_item, _kitting_table],
-    parameter_types={"?item": "item", "?kitting_table": "kitting_table"},
-    methods=[
-        MethodSchema(
-            name="deliver_simple",
-            parameters=[_item, _kitting_table],
-            guards=[],
-            step_calls=[
-                StepCall(
-                    action_name="move_to",
-                    bindings={_target: _item},  
-                ),
-                StepCall(
-                    action_name="pick_up",
-                    bindings={_item: _item},
-                ),
-                StepCall(
-                    action_name="move_to",
-                    bindings={_target: _kitting_table}
-                ),
-                StepCall(
-                    action_name="place",
-                    bindings={_item: _item, _target: _kitting_table},
-                ),
-            ],
-        )
-    ],
-    is_assigned=True,
-    is_foreseeable=False,
-)
-
-# replaced with:
 deliver_item = TaskSchema(
     name="deliver_item",
     parameters=[_item, _kitting_table],
