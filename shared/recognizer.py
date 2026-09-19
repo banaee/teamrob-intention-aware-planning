@@ -476,8 +476,14 @@ class IntentionRecognizer:
         the model. Restricting either away would make a deviation unrecognizable
         at the very moment it happens.
 
-        Assignment identity crosses the layer boundary as task_instance_key(),
-        which produces the same string as HypothesisKey.__repr__ by design.
+        An assigned task is matched to the hypothesis space on its ENUMERATED
+        parameters: the hypothesis key built from its bindings minus the
+        schema's determined_parameters (T-B1a follow-up 2). A task instance's
+        identity (task_instance_key) keeps its determined parameters (a
+        delivery reads as item and table); a hypothesis has none, its table is
+        resolved from the station when grounded. Whether a determined binding
+        agrees with the station is the embodiment's load-time conformance
+        check (check_task_destinations), not a matter for this match.
         """
         if not assigned_tasks:
             return None
@@ -488,12 +494,18 @@ class IntentionRecognizer:
             if schema is not None and schema.is_foreseeable:
                 admissible.add(repr(hyp))
 
-        for key in (task_instance_key(t) for t in assigned_tasks):
+        for task in assigned_tasks:
+            key = repr(HypothesisKey(
+                task_name=task.schema.name,
+                bindings={var.name: const.value for var, const in task.bindings.items()
+                          if var.name not in task.schema.determined_parameters},
+            ))
             if key in self._by_key:
                 admissible.add(key)
             else:
                 logging.warning(
-                    "[recognizer] assigned task %s matches no hypothesis — ignored", key
+                    "[recognizer] assigned task %s matches no hypothesis — ignored",
+                    task_instance_key(task)
                 )
         return admissible
 
