@@ -55,6 +55,12 @@ conversion, and a stationary action whose schema names a duration binding (`Acti
 TYPED — every bound object exists in the layout with the type the schema's `parameter_types` declares —
 and the embodiment checks this at spawn (`shared.types.check_task_bindings`), an error, not a warning.
 
+**Re-aligned after T-B1a and its follow-ups (September 2026):** an item's destination table is a layout
+fact (`WorldState.object_destination`, §1.3), reached through the planner lookup `destination_of` (§2.3) and
+declared at the task as a determined parameter (`TaskSchema.determined_parameters`, §1.6); the recognizer
+does not enumerate it (§2.1), and the prior matches assigned tasks on the enumerated parameters only (§2.1).
+design_decisions.md, "An item's destination table is a fact of the station".
+
 ---
 
 ## 0. Notation (matches paper)
@@ -154,6 +160,9 @@ class WorldState:
     object_zones: Dict[str, str] = {}                            # {item_id: zone_id}
     object_home_container: Dict[str, str] = {}                   # {item_id: original container_id}; static per
                                                                  # scenario, for the deliver_with_return guard
+    object_destination: Dict[str, str] = {}                      # {item_id: destination_id}; static per scenario,
+                                                                 # the layout's "destination" (kitting: the item's
+                                                                 # designated table), read via `destination_of` (§2.3)
     object_positions: Dict[str, Tuple[float, float]] = {}        # {obj_id: (x, y)}: env objects and items
     metadata: Dict[str, Any] = {}
 # (every `= {}` / `= set()` is a field(default_factory=...) in shared/types.py)
@@ -234,8 +243,22 @@ representation, distinct from `GroundedAction.bindings` (plain strings, post-gro
 @dataclass
 class TaskInstance:
     schema: "TaskSchema"
-    bindings: Dict[Var, Const]             # {Var("?item"): Const("item_1")}
+    bindings: Dict[Var, Const]             # {Var("?item"): Const("item_1"), Var("?kitting_table"): Const("kitting_table_0")}
 ```
+
+A scenario's delivery task states the table (T-B1a follow-up 2), and its `task_instance_key` (§1.10) carries
+it. The schema side (`TaskSchema`, shared/types.py) has two parameter declarations with separate jobs:
+
+```python
+parameter_types: Dict[str, str]            # the TYPE of every parameter: {"?item": "item", "?kitting_table": "kitting_table"};
+                                           # a bound value is type-checked at spawn (check_task_bindings)
+determined_parameters: Dict[str, tuple]    # {var: (lookup_fn, source_var)}: a parameter that follows from another,
+                                           # e.g. {"?kitting_table": ("destination_of", "?item")}; not enumerated by
+                                           # the recognizer, filled by the planner when unbound (§2.3)
+```
+
+`determined_parameters` is task-level and is distinct from `MethodSchema.derived_vars`, which are variables
+used inside one method's steps (`deliver_with_return`'s `?other_container`), not task parameters.
 
 ---
 
@@ -396,11 +419,14 @@ for a `TaskInstance` (schema name + sorted bindings), used for `ProjectedPlan.ta
 set member or dict key directly.
 
 ```python
-task_instance_key(task: TaskInstance) -> str    # "deliver_item(?item=item_3)"
+task_instance_key(task: TaskInstance) -> str    # "deliver_item(?item=item_3,?kitting_table=kitting_table_0)"
 ```
 
 Two `TaskInstance`s with identical schema+bindings produce the same key by design — that
-is correct, not a collision to guard against. Mirrors `HypothesisKey.__repr__`'s pattern.
+is correct, not a collision to guard against. Mirrors `HypothesisKey.__repr__`'s pattern, but the
+two are not the same shape: a key carries every bound parameter, the determined ones included, while
+a hypothesis carries only the enumerated ones (`deliver_item(?item=item_3)`). They are never compared as
+whole strings (§2.1, the prior's matching).
 
 ---
 
@@ -484,8 +510,12 @@ never sees. The recognizer sorts them by `repr` (order-independent of the caller
 `assigned_tasks` carries the observed agent's work order — which tasks it was assigned, never in which order
 it will do them. It restricts the SUPPORT, not the magnitude: the admissible set is the assigned tasks, every
 foreseeable task (`TaskSchema.is_foreseeable`) and `unknown`; every other hypothesis is pinned at
-`BELIEF_FLOOR` and never scored. Identity crosses the boundary as `task_instance_key()` (§1.10), which matches
-`repr(HypothesisKey)` (§1.8); an assigned task matching no hypothesis is logged as a warning and ignored.
+`BELIEF_FLOOR` and never scored. An assigned task is matched to a hypothesis on the ENUMERATED parameters
+only: the `HypothesisKey` built from its bindings minus its schema's `determined_parameters` (T-B1a follow-up
+2). A determined binding (the table) is not compared here; its agreement with the layout is checked at load
+by the embodiment (`shared.types.check_task_destinations`, §4.1), which rejects a disagreeing scenario before
+the recognizer is built. An assigned task matching no hypothesis is logged as a warning, naming its
+`task_instance_key()`, and ignored.
 `None` or `[]` switches the restriction off (`--assignment_prior false`, the default).
 
 `beta` is the excess-path likelihood's detour tolerance, per unit of the body's length (Mesa: 0.01 /cm, from
@@ -507,7 +537,9 @@ def build_hypothesis_space(
 ```
 
 Takes the cartesian product of `known_objects_by_type[type]` over every entry in each
-task's `TaskSchema.parameter_types`. Degenerates to one hypothesis for parameterless tasks.
+task's `TaskSchema.parameter_types` that is not in its `determined_parameters` (T-B1a follow-up): one
+`deliver_item` hypothesis per item, its table resolved by the planner when the hypothesis is grounded.
+Degenerates to one hypothesis for parameterless tasks.
 
 #### Update
 
@@ -989,6 +1021,14 @@ every tick, per hypothesis, what the observed agent would do if it held that int
 guards hold, a derived var without a value — so callers can treat "unscorable here" apart from
 a schema error, which still raises plainly.
 
+**Lookups** (`_resolve_lookups`), shared by a task's `determined_parameters` (resolved before method
+selection) and a method's `derived_vars` (after it): `zone_of` → `world.object_zones`, `home_container_of` →
+`world.object_home_container`, `destination_of` → `world.object_destination` (T-B1a). Precedence: only
+`destination_of` yields to a binding the task instance already carries (a scripted deviation keeps its
+table); the others always derive. A `destination_of` lookup with no value raises `ValueError`, not
+`DecompositionError`: a destination is a static layout fact required at load, so its absence is a modelling
+error, never a hypothesis left unscorable.
+
 #### Is Complete
 ```python
 is_complete(
@@ -1026,6 +1066,8 @@ Provides read-only access to:
 - `get_tasks_for_action(action_name) -> List[TaskSchema]` — reverse lookup for IR
 - `get_actions_for_microaction(mu) -> List[ActionSchema]` — reverse lookup for IR
 - `get_cost(key) -> Optional[float]` — reads from `costs.yaml` if loaded
+- `get_types_with_destination() -> Dict[str, Tuple[str, Optional[str]]]` — {object type: (task, destination
+  type)} for the types some task determines a parameter from through `destination_of`; the embodiment's load check (T-B1a)
 
 **Deliberately absent:** no `get_objects_by_type()` method. `known_objects_by_type` is
 workspace/layout data, not domain knowledge — it's passed as a parameter into
@@ -1100,6 +1142,12 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
   `parameter_types` declares; a mismatch raises. A task the domain does not describe is never executed by
   the human and never invisible to the robot by accident (TODO-49; a declared out-of-domain behaviour is
   TODO-80)
+- Checks the layout's destinations at load (T-B1a): every object of a type some task determines a parameter
+  from through `destination_of` declares `"destination"`, naming an object of the layout of the type the
+  schema declares (`DomainKnowledgeBase.get_types_with_destination`); and every agent's `assigned_tasks` binds
+  the destination the layout designates (`shared.types.check_task_destinations`), an error naming the task,
+  the item and both tables. The human's `scheduled_tasks` is not checked against the layout: the script may
+  send an item elsewhere
 - Supplies the `Projector` its motion rate (`step_size`, T2), its stopping distance (T9: the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
   executor stops), its per-action acknowledgement latency and observation offset (L2), and its
@@ -1172,4 +1220,5 @@ Simulators MUST ensure:
 ---
 13. Every scheduled and assigned task's bindings name objects that exist in the layout with the types
     the schema's `parameter_types` declares; the embodiment refuses the scenario at spawn otherwise
-    (`check_task_bindings`, F47b). Fixtures may not rely on an ill-typed instance
+    (`check_task_bindings`, F47b). Fixtures may not rely on an ill-typed instance. Every assigned delivery
+    binds the table the layout designates for its item (`check_task_destinations`, T-B1a)
