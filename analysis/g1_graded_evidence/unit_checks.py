@@ -45,7 +45,7 @@ def unit_checks():
     from shared.types import (Const, DomainModel, WorldState, AgentState, Observation, SpatialContext, ActionContext,
                               Predicate)
     from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
-    from shared.recognizer import IntentionRecognizer, HypothesisKey
+    from shared.recognizer import IntentionRecognizer, build_hypothesis_space
     from domains.kitting.actions import move_to, pick_up, place
     from domains.kitting.tasks import deliver_item
     assert BETA == 0.01 and LF.UNKNOWN_LIKELIHOOD == 0.1, "the expectations below are for β = 0.01, u = 0.1"
@@ -62,7 +62,8 @@ def unit_checks():
                           agent_positions={agent: pos}, predicates=set(predicates),
                           object_positions=dict(objects or {}), object_locations=dict(locations or {}),
                           object_zones={k: "z" for k in (objects or {})},
-                          object_home_container=dict(home if home is not None else (locations or {})))
+                          object_home_container=dict(home if home is not None else (locations or {})),
+                          object_destination={k: "table_0" for k in DEST_ITEMS})
 
     kb = DomainKnowledgeBase(DomainModel(tasks={"deliver_item": deliver_item},
                                          actions={"move_to": move_to, "pick_up": pick_up, "place": place},
@@ -70,8 +71,12 @@ def unit_checks():
     objs = {"shelf_a": (400.0, 0.0), "item_a": (400.0, 0.0), "shelf_b": (0.0, 400.0), "item_b": (0.0, 400.0),
             "table_0": (0.0, -400.0)}
     locs = {"item_a": "shelf_a", "item_b": "shelf_b"}
-    ha = HypothesisKey("deliver_item", {"?item": "item_a", "?kitting_table": "table_0"})
-    hb = HypothesisKey("deliver_item", {"?item": "item_b", "?kitting_table": "table_0"})
+    # Hypotheses as the recognizer builds them (T-B1a): one per item, the table
+    # determined by the item's destination in the world, not enumerated.
+    DEST_ITEMS = ("item_a", "item_b", "item_c")
+    hyp = lambda item: build_hypothesis_space(kb, {"item": [item], "kitting_table": ["table_0"]})[0]
+    ha, hb = hyp("item_a"), hyp("item_b")
+    assert ha.bindings == {"?item": "item_a"}, ha
     P = lambda name, *args: Predicate(name, tuple(Const(a) for a in args))
     odds = lambda d, k: d[k] / d[UNKNOWN]
     near = lambda x, y, tol=1e-9: abs(x - y) < tol
@@ -182,7 +187,7 @@ def unit_checks():
                 f"t=0 {tuple(round(v, 4) for v in d0.values())}, t=1 same={d1 == d0}, t=2 a:u {odds(d2, repr(ha)):.3f} b:u {odds(d2, repr(hb)):.4f}"))
 
     # G8 — the episode boundary
-    hc = HypothesisKey("deliver_item", {"?item": "item_c", "?kitting_table": "table_0"})
+    hc = hyp("item_c")
     objs3 = {**objs, "item_c": (400.0, 0.0)}
     locs3 = {**locs, "item_c": "shelf_a"}
     rec = IntentionRecognizer(knowledge=kb, beta=BETA, context=ContextKnowledge.default(), hypotheses=[ha, hb, hc])
