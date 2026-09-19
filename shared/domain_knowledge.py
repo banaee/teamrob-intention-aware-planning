@@ -31,7 +31,7 @@ USED BY:
 """
 
 import yaml
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from shared.types import DomainModel, TaskSchema, ActionSchema, destination_derivations
 
@@ -82,18 +82,20 @@ class DomainKnowledgeBase:
         """Full TaskSchema objects for all registered intentions."""
         return [self._domain.tasks[name] for name in self._domain.intentions]
 
-    def get_types_with_destination(self) -> Dict[str, str]:
+    def get_types_with_destination(self) -> Dict[str, Tuple[str, Optional[str]]]:
         """
-        {object type: task name} for every object type some task resolves a
-        var from through the "destination_of" lookup — the types whose objects
-        the layout must give a destination (T-B1a). Read from the schemas.
+        {object type: (task name, destination type)} for every object type
+        some task determines a parameter from through the "destination_of"
+        lookup — the types whose objects the layout must give a destination,
+        and the type that destination must have (the determined parameter's
+        parameter_types entry; None if the schema types it not). T-B1a.
         """
-        types: Dict[str, str] = {}
+        types: Dict[str, Tuple[str, Optional[str]]] = {}
         for task in self._domain.tasks.values():
-            for _, source_var in destination_derivations(task):
+            for var_name, source_var in destination_derivations(task):
                 source_type = task.parameter_types.get(source_var)
                 if source_type is not None:
-                    types.setdefault(source_type, task.name)
+                    types.setdefault(source_type, (task.name, task.parameter_types.get(var_name)))
         return types
 
     # def get_objects_by_type(self, type: str) -> List[str]:

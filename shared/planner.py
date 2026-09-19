@@ -330,6 +330,14 @@ class AdaptivePlanner:
                     f"AdaptivePlanner: unknown lookup function '{lookup_fn}' "
                     f"for derived var '{var_name}'"
                 )
+            if derived_val is None and lookup_fn == DESTINATION_LOOKUP:
+                # A destination is a static fact of the station, required at
+                # load for every object of the source type: none here is a
+                # modelling error, never a world fact to score around.
+                raise ValueError(
+                    f"AdaptivePlanner: no destination declared for '{source_val}' "
+                    f"(derived var '{var_name}'). {where}"
+                )
             if derived_val is None:
                 raise DecompositionError(
                     f"AdaptivePlanner: lookup '{lookup_fn}({source_val})' "

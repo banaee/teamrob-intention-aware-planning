@@ -250,21 +250,29 @@ class SimModel(model.Model):
             # print(f"Loaded portable object {obj['id']} with home_container {container_id}")
 
         # Every object of a type the domain resolves through "destination_of"
-        # declares its destination, and it names an object of this layout
-        # (T-B1a). An error, not a default.
+        # declares its destination, naming an object of this layout of the
+        # type the schema declares for it (T-B1a). An error, not a default.
         types_with_destination = self.knowledge.get_types_with_destination()
         for obj_id, obj in self.objects.items():
             if obj.type not in types_with_destination:
                 continue
+            task_name, dest_type = types_with_destination[obj.type]
             if obj.destination is None:
                 raise ValueError(
                     f"layout '{env_layout_path}': {obj.type} '{obj_id}' declares no "
-                    f"\"destination\" (required by task '{types_with_destination[obj.type]}')"
+                    f"\"destination\" (required by task '{task_name}')"
                 )
-            if obj.destination not in self.objects:
+            dest = self.objects.get(obj.destination)
+            if dest is None:
                 raise ValueError(
                     f"layout '{env_layout_path}': {obj.type} '{obj_id}' has destination "
                     f"'{obj.destination}', which is not an object of this layout"
+                )
+            if dest_type is not None and dest.type != dest_type:
+                raise ValueError(
+                    f"layout '{env_layout_path}': {obj.type} '{obj_id}' has destination "
+                    f"'{obj.destination}' of type '{dest.type}', but task '{task_name}' "
+                    f"requires type '{dest_type}'"
                 )
 
         # Build type → instance-ids registry, feeds IR's hypothesis space
