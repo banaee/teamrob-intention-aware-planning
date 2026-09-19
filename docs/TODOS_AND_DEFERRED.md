@@ -106,6 +106,17 @@ deserves its own design session — deliberately NOT solved with a narrow positi
 stopgap inside `_project()`, since that would silently fail for any future guard depending
 on a different predicate (dock_loading gate state, `obj_at`, etc.).
 Not blocking: `single_task` projects only from the real live WorldState.
+UPDATED (B3.B design revision, September 2026): B3.B is next in the pipeline, and this entry APPLIES
+TO IT IN PART. Needed, for projection only: effect application with retraction (at `task_committed`
+the live world holds `holding(robot, A)`; in the ordering (A, B) the stale fact would select
+`deliver_with_return` for B), and the location of an object a projected action has moved (in (B, A)
+with A held, A is fetched from its home container after B's return). Both go into a hypothetical
+successor `WorldState` built and discarded inside one `project()` call; the live one is never stored
+or mutated. NOT needed for B3.B: forward chaining and precondition checking in the live planner, which
+is what this entry was filed for and which stays open. The smallest form (retraction marked on
+`ConditionSchema` or add / delete lists; relocation declared on the action schema) is a PROPOSAL for
+cchat, not decided. The warning above against a `holding`-specific stopgap stands.
+design_decisions.md, "B3.B (`full_reorder`) is lookahead for the choice of the next task, built next".
 Files: `shared/planner.py`, `shared/types.py` (ConditionSchema), `shared/meta_planner.py`
 Reference: Phase 4B; Phase 4C meta_planner build session, September 2026
 
@@ -527,6 +538,14 @@ adopted single-task selection, under which no task is ever costed before it star
 candidate is projected from the live WorldState with the live belief. The need disappears.
 This entry becomes live again only if `full_reorder` is ever implemented. Not closed, since
 that strategy is retained as a documented alternative; do not implement in the meantime.
+STATUS UPDATE (B3.B design revision, September 2026): B3.B is now next in the pipeline, and this
+entry DOES NOT APPLY to it as designed. B3.B realizes the robot's whole sequence against the ONE human
+projection admitted at the trigger by the live belief, inside [trigger, T_h]; nothing past T_h is
+assessed or charged, so no confidence at a future horizon is asked for. `single_task` already does the
+same with one long candidate. The sentence above ("live again only if `full_reorder` is ever
+implemented") is superseded: this entry becomes live only under a design that projects the human past
+its current task. Still parked; do not implement. design_decisions.md, "B3.B (`full_reorder`) is
+lookahead for the choice of the next task, built next", (d).
 Original entry retained below.
 
 [original entry, parked, revisit during IR enhancement]
@@ -646,7 +665,33 @@ questions before this task is reliable:
 Files: domains/dock_loading/tasks.py, mesa_sim/world_state_builder.py
 Reference: Phase 4 design session, July 2026
 
-**DESIGN-16 — Single-task RESELECT vs. full queue reordering (strategy flag)** ✅ RESOLVED (Sept 2026)
+**DESIGN-16 — Single-task RESELECT vs. full queue reordering (strategy flag)** ✅ RESOLVED (Sept 2026); REVISED (B3.B design revision, Sept 2026): `full_reorder` designed, to be built next; two open points
+REVISED (cchat, September 2026, after T6): `full_reorder` (B3.B) moves from retained alternative to next
+in the pipeline; `single_task` stays the default and the receding-horizon argument stands. Reason:
+one-table kitting is why order has not mattered (every delivery ends at the one table); two-table
+kitting, which the domain already expresses through `?kitting_table`, couples tasks by geometry with no
+human at all; with a projection admitted the window to T_h can cover a later task of the sequence, so the
+whole sequence is realized against the one human projection; and since the robot's own boundaries
+re-decide, the sequence past the head is a lookahead for the choice of the head, not an order commitment.
+The three prerequisites in the paragraph below ("To implement `full_reorder` ...") are SUPERSEDED:
+  (i)   TODO-07 applies in part: retraction and object relocation in a hypothetical successor state for
+        projection; not the planner's forward chaining (see TODO-07's update);
+  (ii)  DESIGN-12 does not apply: nothing is priced past T_h (see DESIGN-12's update);
+  (iii) brute permutation is acceptable at pools of 3 to 5 (6 to 120 orderings per trigger, prefixes
+        shared); the scalability remark stands for larger pools.
+"Do not implement piecemeal" is replaced by a proposed order: successor state and `project()` for
+orderings, then B3.B on plain cost, then on realized cost.
+OPEN, proposals recorded and marked, to be decided in cchat before the realized-cost step:
+  (1) where a hold that clears a conflict in a later task is placed: one δ at the decision position
+      (`realize()` today) or a hold at the boundary before that task (proposed: the boundary; only the
+      head's δ is executed, so B3.A and B3.B differ in the choice alone);
+  (2) what B2 commits to under B3.B, a task or an order (proposed: a task; `b2a` unchanged).
+Evaluation: B3.A against B3.B on two-table fixtures, plain cost first, then realized; the one-table
+fixtures are expected identical in choice (an expectation with two named exceptions, not an identity);
+byte-identity is the default run with `strategy` = `single_task`. `strategy` needs a run option.
+Full record: design_decisions.md, "B3.B (`full_reorder`) is lookahead for the choice of the next task,
+built next". Fixtures: TODO-47 (f).
+
 RESOLVED in favour of single-task, receding-horizon selection as the implemented default;
 full reordering retained as a documented, switchable alternative. Full rationale in
 design_decisions.md, "Single-task selection (receding horizon), not queue-wide reordering."
@@ -1379,6 +1424,17 @@ Prerequisites:
 (f) B3.B (`full_reorder`, not in 4C): a future fixture needs SEVERAL remaining robot tasks whose ORDER, not
     only the next choice, changes cost under a human stay. Not built; every current fixture leaves the robot
     at most one alternative at the stay.
+    REVISED (B3.B design revision, September 2026): "several remaining robot tasks whose order changes
+    cost" now means TWO-TABLE KITTING LAYOUTS: a second object of type `kitting_table`, items assigned per
+    table through the existing `?kitting_table` binding (no domain change), so that a task's end position,
+    and with it the walking cost of the tasks after it, depends on the order. The coupling is geometric
+    and present with no human; a human stay is not required for the order to matter, only for the
+    realized-cost comparison. Hand-built fixtures for the B3.B build (layout JSON, `scenarios.py`,
+    `registry.py`), before and independent of the randomised harness; not built yet. They evaluate
+    B3.A against B3.B and set no parameter. To measure on them, outside B3.B: the hypothesis space is
+    items × tables, so with the prior off the human's belief is expected to split between the two table
+    hypotheses of an item until the carry walk. DESIGN-16 (revised); design_decisions.md, "B3.B
+    (`full_reorder`) is lookahead for the choice of the next task, built next".
 (g) THE GATE'S REOPENING CONDITION (gate ruling, September 2026): a walk crossing of θ with a live rival at
     similar odds (top-two ratio near 1 at the crossing), where the normalised share and a margin gate would
     disagree. No current fixture shows one (lowest top-two ratio at a walk crossing 5.23, s00_off 37).

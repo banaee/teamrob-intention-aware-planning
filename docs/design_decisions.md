@@ -487,6 +487,15 @@ switchable alternative for that case (see below). Note that if it is ever built 
 larger task set, brute permutation is the wrong shape (O(n!)); it would need bounded-depth
 lookahead, a routing/assignment formulation, or beam search.
 
+REVISED (cchat, September 2026, after T6): `full_reorder` (B3.B) moves from retained alternative to
+next in the pipeline. Two-table kitting couples tasks by geometry inside the domain we have, and the
+sequence past the head is a lookahead for the choice of the next task, re-priced at the next boundary,
+not an order commitment. `single_task` stays the default and the receding-horizon argument above
+stands. The three prerequisites this decision named are re-derived there: the fourth bullet above holds
+in part (retraction is needed; the general planner semantics are not), the DESIGN-12 bullet's asymmetry
+does not arise (nothing is priced past T_h). See "B3.B (`full_reorder`) is lookahead for the choice of
+the next task, built next" at the end of this file.
+
 Terminology, fixed: **"candidate" means the unit being selected** — whatever the argmin
 ranges over. Under `single_task` that is an individual task; under `full_reorder` it is a
 permuted ordering. This keeps `_cost(candidate)`, "feasible candidates," and "argmin over
@@ -2507,3 +2516,201 @@ Files: docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md (47, 64, 65), docs/r
 §6), docs/roadmap.md, shared/io_contracts.md (§2.2 θ paragraph)
 Reference: gate ruling, cchat, September 2026; graded-evidence entry; `analysis/g1_graded_evidence/crossings.md`;
 TODO-47 / 63 / 64 / 65
+
+**B3.B (`full_reorder`) is lookahead for the choice of the next task, built next: geometry couples tasks in two-table kitting (DESIGN-16 revised)**
+
+DECIDED (cchat, September 2026, on the state after T6): B3.B is designed now and built next in the
+pipeline, with two-table kitting layouts and scenarios as its fixtures (later tasks). This entry is the
+design record that build follows. Documentation only; nothing in code changed. It revises the "retained
+alternative" ruling of "Single-task selection (receding horizon), not queue-wide reordering" (DESIGN-16)
+and replaces that entry's three prerequisites.
+
+WHY THE RULING CHANGED.
+1. In one-table kitting order barely matters, and that is a property of the layouts, not of the
+   framework. Every delivery ends at the one table, so every ordering of the remaining tasks walks
+   table → item → table for each task after the first; orderings differ in their first task, which
+   single-task selection already chooses. That is why no current fixture separates B3.A from B3.B.
+   (How exact this is, measured: "THE ONE-TABLE EXPECTATION" below.)
+2. Several stations is a normal kitting layout, and the domain already carries the table as a task
+   parameter: `deliver_item(?item, ?kitting_table)`. With two tables and items assigned per table, a
+   task's end position depends on its table, so the walking cost of the tasks after it depends on which
+   task came first. This is coupling by geometry (DESIGN-16's "travel/setup costs between tasks"),
+   present with no human at all, inside the domain we have. No domain change is needed: a second
+   object of type `kitting_table` in a layout and scenario bindings that name it.
+3. With a human projection admitted, the window from the trigger to T_h can cover the second or third
+   task of an ordering when the robot's tasks are short. So B3.B is not "pick the first task with
+   lookahead on walking cost": the whole robot sequence (the segments of task 1, then task 2, ...) is
+   realized against the ONE human projection, and a conflict, and therefore a hold, can sit in a later
+   task of the sequence. This stays inside the current horizon; nothing past T_h is assessed or charged,
+   exactly as `realize()` is today.
+4. The robot's own boundaries (`task_committed`, `no_current_task`) trigger a re-decision, so the sequence
+   past task 1 is a LOOKAHEAD FOR THE CHOICE OF TASK 1, re-priced at the next boundary. It is not a
+   commitment to the whole order. Pools are 3 to 5 tasks.
+
+WHAT DID NOT CHANGE. `single_task` remains the default, and the receding-horizon argument of DESIGN-16
+stands: decisions are re-made from fresh WorldState and belief at every trigger, and no multi-task
+schedule is committed to against a forecast that will be better informed at the next trigger. B3.B as
+decided here is consistent with that argument, not an exception to it: it changes what the choice of the
+next task is priced on (the cheapest sequence that starts with it, instead of the task alone), not how
+long the choice binds. This narrows what `full_reorder` means. The earlier text ("the argmin permutation
+becomes the entire new queue", "how much of the queue an `update()` call rewrites") described an order
+commitment; under point 4 the order past the head carries none. "Candidate" is still the unit the argmin
+ranges over, an ordering under `full_reorder` (terminology of DESIGN-16, unchanged).
+
+THE PREREQUISITES, RE-DERIVED FROM THE CODE'S SEAMS. DESIGN-16 named three: TODO-07 (cross-task
+WorldState propagation), DESIGN-12 (horizon-projected confidence), a scalable ordering search; "do not
+implement piecemeal". Read against the code as it stands:
+
+(a) `Projector.project()` for orderings longer than 1 (`shared/projection.py`; it raises today). What a
+    later task's projection READS from the WorldState, by seam:
+    - the start position: `build_segments()` reads `world.agent_positions[agent_id]`. For task k+1 this
+      must be where task k's segments end (after T9, a point `arrival_radius` short of the table, on the
+      side task k approached from);
+    - the start step: `start_step` is already a parameter; task k+1 starts where task k's last segment
+      (its task-completion latency, F1) ends;
+    - method selection: `AdaptivePlanner._select_method()` matches guards against `world.predicates`. In
+      kitting the only guards are `holding(?agent, ?item)` (`deliver_already_held`) and
+      `holding(?agent, ?other)` + `not_equal` (`deliver_with_return`);
+    - movement targets: `target_resolution.object_position()` reads `world.object_locations` (a carried
+      object is wherever its holder is) and `world.object_positions`;
+    - derived vars: `object_home_container`, `object_zones` (static per scenario for what is read here).
+    `ProjectedPlan` already holds one entry per task, and `total_estimated_cost` / the entries'
+    `estimated_start_step` chain without a type change.
+(b) THE CHAINED ROBOT STATE. Position and step are geometry: they come from the previous entry's
+    segments, and no predicate is involved. But position is NOT enough, and this is the part of the
+    expected answer that the code contradicts:
+    - `task_committed` is a trigger of every task, and at it the live world holds
+      `holding(robot, A)` for the current task A. In the ordering (A, B), A decomposes as
+      `deliver_already_held`; if B is then decomposed against the live predicates, the stale
+      `holding(robot, A)` selects `deliver_with_return` for B (return A, which is already delivered in
+      that hypothetical world) instead of `deliver_default`. So the chained state must RETRACT
+      `holding` after a `place`. This is exactly the gap TODO-07 names (`place` declares
+      `not_holding(agent, item)` and nothing removes `holding(agent, item)`); it cannot be avoided.
+    - `deliver_with_return` itself can only be selected for the FIRST task of a sequence (every robot
+      task in the pool ends in `place`, so nothing is held at a later boundary), and the first task is
+      decomposed from the live world as today. Its CONSEQUENCE reaches later tasks, though: in the
+      ordering (B, A) with A held, B returns A to its home container, and A is then fetched from there.
+      `object_position(A)` must then resolve to the container, not through the stale
+      `object_locations[A] = robot`, which would put A at the robot's hypothetical position and price
+      the fetch walk at zero: a silent mis-estimate, the failure TODO-07's text warns of. So the chained
+      state must also carry the location of an object a projected action has moved.
+    - Delivered items are not read by any later task of the sequence (each item is delivered once, and
+      the pool is filtered for completion once per `update()`, on the live world). Nothing else in the
+      robot's decomposition reads the human's state; the human's own projected effects inside the window
+      are not applied to the chained state, which is the same limitation `single_task` has today.
+    What this needs is therefore a SUCCESSOR STATE: a new, hypothetical `WorldState` value built inside
+    one `project()` call from the previous one and the entry just projected, and discarded with the
+    call. The live `WorldState` is never stored or mutated (the ephemerality invariant holds). It must
+    be derived from schemas, with no predicate or parameter name in `shared/` (the domain-string
+    invariant), which rules out a `holding`-specific stopgap. PROPOSAL (not decided; for cchat), the
+    smallest form that satisfies the seams above:
+      (i)   effects with retraction: `ActionSchema.effects` applied generically to `predicates`, with a
+            typed way to say "this effect removes a fact" (a flag on `ConditionSchema`, or separate
+            add / delete lists). `place` then deletes `holding(?agent, ?item)`, and the unconsumed
+            `not_holding` predicate goes;
+      (ii)  the agent's position from the entry's last segment (geometry, no schema needed);
+      (iii) object relocation declared on the action schema, as `movement_target_key` declares the
+            movement target today: which binding is the moved object and which is its new holder or
+            place. The fact has two representations in `WorldState` (`obj_at` / `holding` predicates and
+            the `object_locations` / `object_positions` maps the builder derives); the successor must
+            keep the one target resolution reads consistent. How that is declared is the open part.
+(c) TODO-07: APPLIES IN PART. Needed: the effect application with retraction of (b)(i) and the
+    relocation of (b)(iii), for projection only. Not needed: what TODO-07 was filed for, forward
+    chaining and precondition checking in the live planner, and any general theory of effects beyond
+    what the projected actions declare. The expectation that TODO-07's semantics are "more than this
+    case needs" is right about the planner and wrong about retraction: the retraction is needed at the
+    most common trigger.
+(d) DESIGN-12 (horizon-projected confidence): DOES NOT APPLY. It asked for confidence at a future
+    horizon to price tasks further down an ordering. Under point 3 there is one human projection,
+    admitted once at the trigger by the live belief through the gate, and later tasks of the sequence
+    are realized against that same projection inside [trigger, T_h]; past T_h nothing is assessed
+    (`realize()`: "nothing past T_h is assessed or charged"). That is what `single_task` already does
+    with one long candidate: in the current baselines a 93-tick candidate is realized against a
+    projection ending at 59. B3.B asks nothing new of the belief. DESIGN-12 stays parked for a design
+    that would project the human past its current task.
+(e) THE SEARCH: brute permutation is acceptable at this pool size. 3 to 5 tasks are 6 to 120 orderings
+    per trigger, and triggers are events, not ticks. Orderings that share a prefix share its projection
+    and chained state (a tree of 15 / 64 / 325 task projections for 3 / 4 / 5 tasks). DESIGN-16's
+    remark stands for larger pools (bounded-depth lookahead, routing formulation, beam search); no depth
+    cap is introduced now, since it would be a parameter with nothing in the design to set it.
+    Ties: orderings are enumerated in pool order and the first minimum wins, so that on a tie the head is
+    the task `single_task`'s rule would pick (TODO-42, unchanged).
+(f) `realize()` over a multi-task trajectory: the seam exists. `realize()` flattens "every entry's
+    segments, in order; not assumed to be one task" ("The robot can wait", INPUT), and the closed-form
+    shift intervals are per segment pair. What it does today with such a plan is ONE δ at the decision
+    position; whether that is what B3.B wants is the open point below.
+"Do not implement piecemeal" is replaced by an order (PROPOSAL): the successor state and `project()` for
+orderings first, checked alone (a length-1 ordering byte-identical; a later entry equal to the same task
+projected alone from a world in which the earlier task has really been done); then B3.B on plain cost;
+then on realized cost, once the hold placement is decided. This is also the order of the evaluation.
+
+OPEN POINT 1: WHERE A HOLD THAT CLEARS A CONFLICT IN A LATER TASK IS PLACED. Two options:
+  (A) one δ at the decision position, the whole sequence shifted, as T4 / `realize()` does today;
+  (B) a hold at the boundary before the task it clears: δ_1 at the decision position for task 1 (today's
+      realization of task 1, unchanged), δ_2 where task 1 ended (at the table) before task 2 starts, and
+      so on. Each is still "a hold where the robot is", on a segment boundary: not a detour (4D) and not
+      partway along a segment (TODO-70).
+PROPOSAL (not decided): (B), for these reasons.
+  - Point 4. Only the head's hold is executed before the next re-decision. Under (A) a conflict in task 2
+    makes the robot stand NOW, before task 1, on the strength of a lookahead that is re-priced at the
+    next boundary: the executed hold would commit to the order, which point 4 says the order is not.
+    Under (B) `UpdateResult.hold` = δ_1 is exactly the hold `single_task` would execute for the same
+    head, so B3.A and B3.B differ in WHICH task is chosen and in nothing else, which is also what makes
+    the evaluation readable.
+  - Cost. The per-boundary minimal shifts are optimal among boundary placements and never cost more than
+    (A): with Δ_k the cumulative shift of task k, taking Δ_k = the smallest whole tick ≥ Δ_{k−1} outside
+    task k's violating intervals gives, by induction, Δ_k ≤ any feasible non-decreasing sequence's, and
+    (A)'s single δ is one such sequence. Task k's violating intervals do not depend on the earlier shifts
+    (positions are unchanged; the human's projection is fixed), so this is `realize()`'s one-pass walk,
+    once per entry. The cost of an ordering is Σ T_r + Δ_n.
+  - A concrete case in the current baselines (an illustration, not a specification): s00_on, the
+    `recognition_changed` decision with three candidates: item_7 costs 12.58 with δ = 0, T_h = 59.48,
+    and item_6 alone has δ = 8. In (item_7, item_6) a conflict can only lie in item_6; (A) would stand
+    the robot before item_7 for it, (B) at the table after item_7, if it is still there from the new
+    start.
+  AGAINST (B), to be weighed in cchat: the boundary is at a table, where the human converges. A standing
+  robot never violates (F1), but it may be in the human's way there more than at the decision position;
+  that is the team-level cost of TODO-15, not priced by either option. And (B) changes `RealizedPlan`
+  (one `delta` / `hold_position` today) to per-entry holds, where (A) needs no type change.
+
+OPEN POINT 2: WHAT B2 COMMITS TO UNDER B3.B, a task or an order. PROPOSAL (not decided): a task. B2 is a
+mid-task commitment gate on the CURRENT task (`b2a`: realize it alone, continue iff δ ≤ ρ × (T_h − now));
+under point 4 the order past the head was never committed to, so there is nothing of it to keep, and
+`b2a` runs unchanged. Committing to an order would need the order stored as decision state, against the
+one-field decision record (D2) and the unordered queue. Consequence to state in the build: `UpdateResult.queue`
+is then the winning order's tail, informational only; `_queue` order carries no commitment, as today.
+
+THE ONE-TABLE EXPECTATION, MEASURED. Point 1's "B3.A and B3.B cannot differ on any current fixture" is an
+expectation, not an identity. Two mechanisms can separate them on one table:
+  - the arrival point (T9): a delivery ends `arrival_radius` (30 cm in Mesa, 1.5 ticks) short of the
+    table on the side it approached from, so the next walk's length depends on the previous task by up
+    to that scale per boundary;
+  - point 3 itself: where T_h reaches past the head, orderings with the same head differ in the
+    conflicts of their later tasks. Measured on the graded-evidence baselines
+    (`analysis/g1_graded_evidence/sweep/`, the five fixtures, both priors): of the B3 decisions with an
+    admitted projection and more than one candidate, T_h exceeds the winner's cost in s00_on (1 of 3:
+    12.58 against 59.48), s10_off (2 of 3: 45.81 / 48.29, 37.27 / 67.05) and s10_on (3 of 4: 50.81 /
+    53.02, 80.09 / 110.05, 58.27 / 88.05), and in none of s20, s30, s40.
+The candidate gaps at those decisions are tens of ticks, so identical choices are still expected; but a
+difference there is to be traced to one of the two mechanisms, not presumed a bug. The byte-identity
+check is the default run: with `strategy` left at `single_task`, the greps must not move.
+
+THE EVALUATION (B3.A against B3.B, to be run when the build and the fixtures exist):
+  1. plain cost first (`cost_strategy` plain: geometry only, no human consideration) on the two-table
+     fixtures: does the head differ, and the completion tick (world fact, T6);
+  2. then realized cost on the same fixtures, under the hold placement decided from open point 1;
+  3. the current one-table fixtures under B3.B, expected identical in choice (above), as the check that
+     the lookahead adds nothing where geometry does not couple tasks.
+Needed for it and not present today: `strategy` has no run option (`gate_strategy` and `cost_strategy`
+do); the build adds one. The fixtures set no parameter and select no value (as T6).
+A consequence of two tables to MEASURE on those fixtures, outside B3.B: the recognizer's hypothesis space
+is the product over typed parameters, so `deliver_item` has items × tables hypotheses, and the two table
+hypotheses of one item share the fetch walk. With the assignment prior off, the belief is expected to
+split between them until the carry walk discriminates, which would move the admission of the human
+projection later than in one-table layouts. Expected from the code, not measured.
+
+Files: docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md (TODO-07, DESIGN-12, DESIGN-16, TODO-47 (f)),
+docs/roadmap.md, shared/meta_planner.py (docstring), shared/projection.py (docstring),
+shared/io_contracts.md (§2.2 strategy paragraph)
+Reference: B3.B design revision, cchat, September 2026; DESIGN-16; "The robot can wait"; "Realization as
+built"; `analysis/g1_graded_evidence/sweep/`

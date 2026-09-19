@@ -76,6 +76,7 @@ The robot operates with two planning levels and one recognition module, all in `
 - `planner.py` becomes a true recursive HTN decomposer: if a StepCall names a TaskSchema (not a primitive ActionSchema), it recurses. Output remains a flat `AbstractPlan` (single task, executor-facing).
 - `meta_planner.py` owns task selection. It calls `planner.py` per candidate task to project action sequences, evaluates costs, and selects the next task. HTN does not schedule — it only decomposes.
 - Selection is **single-task, receding-horizon** (DESIGN-16): one best next task per trigger, re-decided from fresh WorldState and belief at the next trigger — not a search over orderings of the remaining pool. `full_reorder` is retained as a documented, switchable alternative but is not implemented.
+  REVISED (B3.B design revision, September 2026): `full_reorder` (B3.B) is designed and is the next build: a lookahead for the choice of the next task where geometry couples tasks (two-table kitting), not an order commitment. `single_task` stays the default. Entry in `design_decisions.md`, "B3.B (`full_reorder`) is lookahead for the choice of the next task, built next".
 - `ProjectedPlan` (DESIGN-06) is the meta_planner's internal reasoning structure, never handed to the executor. Under `single_task` it always holds exactly one entry; the multi-entry shape is retained for `full_reorder`.
 - Interference detection is **geometric, not zone-based** — actual Euclidean distance between projected positions over time. `ProjectedPlanEntry` carries `Segment`s, no zone.
 - Cost is measured in execution ticks (T2: projection steps are Mesa ticks; seconds in ROS): moves, detours, pauses all equal cost units. Since the 4C wait-decision revision a candidate's cost is its REALIZED duration — walking plus the holds placed to keep `min_separation` from the human — so a conflict is priced as time by construction (DESIGN-08 resolved). Team-level semantic costs parked as future extension (TODO-15).
@@ -316,15 +317,31 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    layout, a rate-of-growth gate. TODO-64 / 65 closed; entry in `design_decisions.md`, "The gate stays a
    fixed share"
 
-*Next step:* the randomised fixtures (TODO-47: generated layouts and scenarios, its prerequisites (a)
+9. B3.B design revision ✅ (September 2026, documentation only) — `full_reorder` moves from retained
+   alternative to next in the pipeline: one-table kitting is why order has not mattered; two-table kitting
+   couples tasks by geometry; the whole robot sequence is realized against the one human projection inside
+   [trigger, T_h]; the sequence past the head is a lookahead, re-priced at the next boundary. Prerequisites
+   re-derived from the code: TODO-07 applies in part (retraction and object relocation in a hypothetical
+   successor state, for projection only), DESIGN-12 does not apply, brute permutation is acceptable at
+   pools of 3 to 5. Two points open with marked proposals: where a later task's hold is placed, and what
+   B2 commits to. Entry in `design_decisions.md`, "B3.B (`full_reorder`) is lookahead for the choice of
+   the next task, built next"; DESIGN-16 (revised), TODO-07, DESIGN-12, TODO-47 (f)
+
+*Next step:* B3.B (`full_reorder`), in this order, each its own task: the two open points decided in
+cchat (the hold placement before the realized-cost step at the latest); the successor state and
+`Projector.project()` for orderings longer than 1; the two-table kitting layouts and scenarios (TODO-47
+(f), hand-built); B3.B on plain cost, then on realized cost; the evaluation of B3.A against B3.B (plain
+first, then realized; the one-table fixtures expected identical in choice). The order of the build steps
+is a proposal of the design entry, not decided.
+
+*After it:* the randomised fixtures (TODO-47: generated layouts and scenarios, its prerequisites (a)
 programmatic registration and (b) scale-relative calibration). They carry the one condition that reopens
 the gate, a walk crossing with a live rival at similar odds (TODO-47 (g)), which no current fixture shows.
 
 Later, not scheduled: TODO-80 (declared out-of-domain human behaviour, the principled unforeseen stay),
-TODO-47's B3.B fixtures with several remaining robot tasks ((f)), Phase 4D (the detour
+Phase 4D (the detour
 strategy, a hold at a chosen point along a segment TODO-70, human cooperation as the remedy for the
-freezing robot TODO-15), TODO-74 (placement positions on the table), B3.B `full_reorder` with
-`realize()`, TODO-71 (the hint's body-side refinement and its reporting), TODO-75 (the ROS guide and
+freezing robot TODO-15), TODO-74 (placement positions on the table), TODO-71 (the hint's body-side refinement and its reporting), TODO-75 (the ROS guide and
 `env_layout9`, with the ROS side), TODO-81 (not behaviour-preserving as filed: dock_loading).
 Phase 4C housekeeping (done): strict run options and the `[run]` header, `analysis/logparse.py`,
 io_contracts §1.3 / §2.1 (TODO-72), TODO-82, TODO-83.
@@ -360,7 +377,7 @@ io_contracts §1.3 / §2.1 (TODO-72), TODO-82, TODO-83.
 - New simple kitting layout (Layout 0) and scenario for Phase 4 dev ✅ DONE (env_layout0/scenario_00)
 - Q1–Q4 meta_planner design questions ✅ RESOLVED (see Phase 4C above)
 - Typed-parameter object model (SimObject/is_portable/parameter_types) ✅ DONE, verified against scenario_00
-- DESIGN-16: selection strategy (single-task vs. full reorder) ✅ RESOLVED (Sept 2026)
+- DESIGN-16: selection strategy (single-task vs. full reorder) ✅ RESOLVED (Sept 2026); revised Sept 2026: `full_reorder` designed, next build
 - Foreseeable-task / forced-reselection fixture ✅ DONE (F1: env_layout4/scenario_40, in the validation matrix)
 
 ---
