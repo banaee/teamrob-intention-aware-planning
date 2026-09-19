@@ -2,8 +2,9 @@
 shared/meta_planner.py
 
 PURPOSE:
-    Owns robot task scheduling: which task to do next, and (under the not-yet-
-    implemented "full_reorder" strategy) what order the rest follow. Sits above
+    Owns robot task scheduling: which task to do next (under the not-yet-
+    implemented "full_reorder" strategy, chosen with the rest of the pool as
+    lookahead; see STRATEGY). Sits above
     planner.py (decomposes one task) and replaces replanning.py (trigger-only).
     Called by sim_agents.py; projects each candidate task through the injected
     Projector (shared/projection.py), which decomposes via planner.py.
@@ -22,7 +23,7 @@ WHAT THIS MODULE DOES:
       (see update()'s docstring, "queue invariant").
     - Decides WHETHER to re-evaluate (evaluate_triggers)
     - Decides WHICH task to do next (update); under "full_reorder" (not yet
-      implemented) would also decide what order the rest of the queue follows
+      implemented) on the cost of the cheapest ordering that starts with it
     - Projects a candidate task — or, under "full_reorder", a candidate
       ordering — and the human's predicted task through Projector.project()
       / project_human(). Never decomposes tasks itself.
@@ -92,18 +93,38 @@ STRATEGY (DESIGN-16):
             the live WorldState); the argmin feasible candidate becomes the
             new current_task; the rest of the queue is left as an unordered
             pool with no ordering commitment.
-        "full_reorder" (NOT IMPLEMENTED) — score every permutation of
-            candidates; the argmin permutation becomes the entire new queue.
-            Projector.project() raises NotImplementedError for orderings
-            longer than 1, pending the WorldState-continuity design that
-            multi-task projection depends on (guard/effects retraction
-            semantics).
+        "full_reorder" (B3.B; NOT IMPLEMENTED, DESIGNED, the next build) —
+            each ordering of the pool is a candidate: projected as one
+            chained sequence (task 1's segments, then task 2's from where
+            task 1 ended, ...) and realized against the ONE human projection
+            inside [trigger, T_h]; the argmin ordering's FIRST task becomes
+            the new current_task. The sequence past the head is a LOOKAHEAD
+            for that choice, re-priced at the robot's next boundary
+            (task_committed, no_current_task) — not an order commitment; the
+            queue's order carries none, as under single_task. It exists for
+            tasks coupled by geometry (two-table kitting: a task's end
+            position depends on its table, so later walks depend on the
+            order); in one-table layouts it is expected to choose as
+            single_task does. Projector.project() raises NotImplementedError
+            for orderings longer than 1, pending the chained robot state: the
+            next task's start position and step (geometry, from the previous
+            entry's segments), plus — for method selection and target
+            resolution — retraction of facts a projected action ended
+            (holding after place) and the location of an object it moved
+            (TODO-07, the part that applies). DESIGN-12 does not apply:
+            nothing is priced past T_h. Brute permutation is acceptable at
+            pools of 3 to 5. OPEN, not to be resolved inline: where a hold
+            that clears a conflict in a LATER task is placed (one δ at the
+            decision position, as realize() does today, or a hold at the
+            boundary before that task), and what B2 commits to (a task or an
+            order). See design_decisions.md, "B3.B (`full_reorder`) is
+            lookahead for the choice of the next task, built next".
     Rationale for defaulting to single_task: the human-prediction horizon H is
     already belief-bounded and uncertain beyond it — committing to a
     multi-task robot schedule optimized against that same uncertain horizon
     has a weaker justification than re-deciding at each trigger from fresh
     WorldState/belief. See design_decisions.md, DESIGN-16, for the full
-    argument.
+    argument. It stands under B3.B, which re-decides at every trigger too.
 
 STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.md):
     DESIGN-08 is RESOLVED by realization (conflict is priced by construction as
@@ -113,8 +134,8 @@ STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.
     — realize() asks shift_violation_interval's closed form; the sampling
     algorithm discretized_time_sampling() was removed, TODO-83 — see
     shared/trajectory_algorithms.py), DESIGN-12
-    (horizon-projected confidence — relevant only to full_reorder, moot under
-    single_task), DESIGN-13 (partly pulled forward into 4C as the hold-only
+    (horizon-projected confidence — moot under single_task, and not needed by
+    full_reorder as designed: nothing is priced past T_h), DESIGN-13 (partly pulled forward into 4C as the hold-only
     realization strategy; detour — obstacle_aware_path() — and an
     off-the-shelf planner remain 4D), DESIGN-16 (see STRATEGY above). None
     block the single_task implementation below.

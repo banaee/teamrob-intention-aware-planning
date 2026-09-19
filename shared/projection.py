@@ -227,6 +227,16 @@ class Projector:
             semantics; see TODO-07 and design_decisions.md, DESIGN-16). Not solved
             with a narrow position/holding stopgap here, which would silently fail
             for any guard depending on a different predicate.
+            DESIGNED, the next build (design_decisions.md, "B3.B (`full_reorder`)
+            is lookahead for the choice of the next task, built next"): what a
+            later entry reads is the start position (build_segments():
+            world.agent_positions), the start step, the predicates guards match,
+            and object locations (target_resolution). Position and step chain
+            from the previous entry's segments; the other two need a
+            hypothetical successor WorldState with retraction (holding after
+            place) and the location of a moved object, built and discarded
+            inside this call, the live WorldState untouched. Its schema-level
+            form is a proposal there, not decided.
 
         Agent-agnostic: the same call projects a robot candidate or the human's
         predicted task (see project_human()).

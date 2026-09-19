@@ -755,8 +755,15 @@ call rewrites:
   `WorldState` and realized; the argmin of realized cost over the realizable candidates becomes
   the new `current_task`. The rest of the queue carries no ordering commitment; it is re-decided
   at the next trigger.
-- `full_reorder` (not implemented) — would score permutations of the candidate set and
-  replace the whole queue. Blocked on cross-task `WorldState` propagation (TODO-07).
+- `full_reorder` (B3.B; not implemented, designed, the next build) — each ordering of the pool is
+  a candidate, projected as one chained sequence and realized against the one human projection
+  inside [trigger, T_h]; the argmin ordering's first task becomes `current_task`. The sequence past
+  the head is a lookahead for that choice, re-priced at the robot's next boundary, not an order
+  commitment (this supersedes "replace the whole queue"). Needs the chained robot state in
+  `Projector.project()` (the part of TODO-07 that applies: retraction and object relocation in a
+  hypothetical successor state); DESIGN-12 does not apply. Open: where a later task's hold is
+  placed, and what B2 commits to. design_decisions.md, "B3.B (`full_reorder`) is lookahead for the
+  choice of the next task, built next".
 
 The human's projection is built once per fired trigger by `update_human_projection()` (below)
 and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.
