@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+RETIRED (graded evidence, September 2026): the unit checks here encode the pre-grade values (a fitting stretch worth
+1/u on its first step; unknown a constant per observation) and the sweep matrix describes the pre-grade HEAD.
+They are the record of their report and no longer run at HEAD: `--unit` prints this note. The checks that survive
+the grade are restated with graded expectations in analysis/g1_graded_evidence/unit_checks.py, which is the live
+set.
+
 analysis/i4d_fold_unknown/check_i4d.py — the I4d matrix on I4's harness through I4c's helpers: the shipped code
 (unknown's contribution folds with the stretch, TODO-60) against the reversion.
 
@@ -332,6 +338,8 @@ def final():
 
 if __name__ == "__main__":
     if "--unit" in sys.argv:
+        print("RETIRED: the I4d unit checks encode the pre-grade evidence model; run analysis/g1_graded_evidence/unit_checks.py")
+        sys.exit(0)
         for n, ok, d in all_unit_checks():
             print(f"{'PASS' if ok else 'FAIL'}  {n}  {d}")
     else:

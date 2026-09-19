@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+RETIRED (graded evidence, September 2026): the unit checks here encode the pre-grade values (a fitting stretch worth
+1/u on its first step; unknown a constant per observation) and the sweep matrix describes the pre-grade HEAD.
+They are the record of their report and no longer run at HEAD: `--unit` prints this note. The checks that survive
+the grade are restated with graded expectations in analysis/g1_graded_evidence/unit_checks.py, which is the live
+set.
+
 analysis/i4_evidence_model/check_i4.py — the I4 sweep, the acceptance measurements and the variants.
 
 Everything runs the robot's live recognizer inside SimModel (I1–I3's technique); the [IR]/[IR-dist]/
@@ -580,6 +586,8 @@ def final(variants):
 
 if __name__ == "__main__":
     if "--unit" in sys.argv:
+        print("RETIRED: the I4 unit checks encode the pre-grade evidence model; run analysis/g1_graded_evidence/unit_checks.py")
+        sys.exit(0)
         for n, ok, d in unit_checks():
             print(f"{'PASS' if ok else 'FAIL'}  {n}  {d}")
     elif "--sweep" in sys.argv:
