@@ -52,19 +52,28 @@ ALGORITHM:
           contributes NO FACTOR for it (not 1.0: zero excess is a perfectly
           efficient walk, and no walk is not that), and the belief carries
           forward unchanged.
-        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD, per observation —
-          the reference every observation is scored against (I4d). A
-          hypothesis's evidence is its ODDS against 'unknown': the product over
-          its own observations of L/u, closed stretches and events in its base,
-          the open stretch multiplied on top as v/u for this tick. A fold moves
-          one factor from the open term to the base and changes nothing;
-          'unknown' itself takes no factor. The invariant, for every live
-          hypothesis k and tick t within an episode:
-              E_t(k)/E_t(unknown) = [π(k)/π(unknown)] · Π_closed L_k(s)/u
-                                    · Π_events c_k(e) · (v_k(t)/u | 1 if empty)
-          So a lone fitting task's ceiling is 1/(1+uⁿ) over its n observations,
-          and between two tasks of equal fit an extra closed stretch is worth
-          1/u: a phase advance is evidence.
+        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD, per whole expected
+          path covered — the reference every observation is scored against
+          (I4d), GRADED by how much of the hypothesis's expected path the
+          stretch covered (graded evidence): a stretch's likelihood under
+          'unknown' is u^f, f the fraction of C(origin, target) closed so far
+          (likelihood_functions.covered_fraction), or 1 by the world's own
+          fact when the stretch has arrived (its action's completion holds at
+          the fold). An observation with no path — a no-graded-signal action
+          — is ungraded and pays u. A hypothesis's evidence is its ODDS
+          against 'unknown': the product over its own observations of L/u^f,
+          closed stretches and events in its base, the open stretch multiplied
+          on top as v/u^f for this tick. A fold moves one factor from the open
+          term to the base and changes nothing; 'unknown' itself takes no
+          factor. The invariant, for every live hypothesis k and tick t within
+          an episode:
+              E_t(k)/E_t(unknown) = [π(k)/π(unknown)] · Π_closed L_k(s)/u^f_k(s)
+                                    · Π_events c_k(e) · (v_k(t)/u^f_k(t) | 1 if empty)
+          So a lone fitting task's ceiling is 1/(1+uⁿ) over n whole
+          observations; a walk's odds rise with the path covered, from 1 on
+          its first step toward 1/u at its arrival; and between two tasks of
+          equal fit an extra closed stretch is worth 1/u: a phase advance is
+          evidence.
     Normalisation is over every hypothesis AND 'unknown' together, never over
     the hypotheses alone. Two hypotheses whose expected actions share
     evaluator, origin, walked distance and target position receive the same
@@ -361,10 +370,10 @@ class IntentionRecognizer:
         #   _origin_odo[key] the agent's odometer reading at that moment, so
         #                   that walked = odometer − _origin_odo[key]
         #   _base[key]      the hypothesis's closed ODDS against unknown: every
-        #                   closed phase (as L/u) and every event of the CURRENT
+        #                   closed phase (as L/u^f) and every event of the CURRENT
         #                   EPISODE folded in, in one common scale across keys
         #                   (rescaled each tick so that Σ base·open = 1); the
-        #                   open phase's v/u is recomputed from _origin each tick
+        #                   open phase's v/u^f is recomputed from _origin each tick
         #                   and multiplied on top, never into it; re-initialised
         #                   to the prior at every episode boundary.
         #                   _base[UNKNOWN] is the reference and only rescales.
@@ -483,8 +492,8 @@ class IntentionRecognizer:
         Pin every key in `pinned` at BELIEF_FLOOR and rescale the live mass to
         fill what is left, so the result spans the full hypothesis space and
         still sums to 1.0. `distribution` holds the live keys only, normalized.
-        Used for inadmissible hypotheses (restriction) and for hypotheses
-        refuted by the held item (state) alike.
+        Used for inadmissible hypotheses (restriction) and for completed
+        hypotheses (the terminal pin) alike.
 
         Pinned at the floor rather than at zero for the reason the floor exists
         at all: a hypothesis at exact zero can never recover through
@@ -516,11 +525,13 @@ class IntentionRecognizer:
              hypothesis expected on the previous tick, that action's completion
              check multiplies onto its evidence (an event);
           4. if the expected action changed, fold the closing action's final
-             excess-path value, as odds L/u against unknown, into the evidence
-             once (nothing, if its stretch was empty) and move the origin
-             (position and odometer reading) to the agent's (a phase advance —
-             or regress; both are derived facts);
-          5. the open action's excess-path value from the origin, as v/u,
+             excess-path value, as odds L/u^f against unknown — f the fraction
+             of the expected path the stretch covered, 1 if the action's
+             completion holds (_unknown_likelihood) — into the evidence once
+             (nothing, if its stretch was empty) and move the origin (position
+             and odometer reading) to the agent's (a phase advance — or
+             regress; both are derived facts);
+          5. the open action's excess-path value from the origin, as v/u^f,
              multiplies on top of the evidence for this tick only (replaced
              next tick) — or no factor at all if the stretch is empty (nothing
              walked since the origin: not an observation).
@@ -551,7 +562,6 @@ class IntentionRecognizer:
         odo = self._odometer[agent]
 
         unnorm: Dict[str, float] = {}
-        u = likelihood_functions.UNKNOWN_LIKELIHOOD
         boundary = False
         for hyp in self._hypotheses:
             key = repr(hyp)
@@ -592,15 +602,20 @@ class IntentionRecognizer:
                 if closing is not None:
                     # The stretch was one observation: its likelihood under
                     # the hypothesis AND under `unknown` fold together, as the
-                    # odds L/u the open term already held (I4d).
-                    self._base[key] *= closing / u
+                    # odds L/u^f the open term already held (I4d), `unknown`'s
+                    # graded by the path the stretch covered — the whole of
+                    # it, if the action it served is complete.
+                    self._base[key] *= closing / self._unknown_likelihood(
+                        previous, self._origin[key], pos, world, arrived=self._completion_holds(previous, world))
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
                 value = self._progress_likelihood(current, pos, 0.0, pos, world, memo)
             else:
                 value = self._progress_likelihood(
                     current, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
             # The open observation, if there is one, as odds against `unknown`.
-            unnorm[key] = self._base[key] if value is None else self._base[key] * value / u
+            unnorm[key] = (self._base[key] if value is None
+                           else self._base[key] * value / self._unknown_likelihood(
+                               current, self._origin[key], pos, world))
         # `unknown` is the reference: every observation is scored against it
         # inside the hypothesis's own odds, so it takes no factor of its own.
         unnorm[UNKNOWN] = self._base[UNKNOWN]
@@ -742,6 +757,16 @@ class IntentionRecognizer:
         return a.action_name == b.action_name and a.bindings == b.bindings
 
     @staticmethod
+    def _completion_holds(action: Optional[GroundedAction], world: WorldState) -> bool:
+        """Whether `action`'s grounded completion predicate holds in the world:
+        the stretch that served it has arrived. False for no action and for a
+        ProcessCompletion (no predicate: never observably complete)."""
+        if action is None:
+            return False
+        predicate = action.completion_predicate
+        return predicate is not None and predicate in world.predicates
+
+    @staticmethod
     def _in_vocabulary(action: GroundedAction, mu: str) -> bool:
         """Whether `mu` is one of the discrete microactions the action's schema
         declares (pick_up → ["GRASP"], ...). Membership in the schema's own
@@ -826,6 +851,40 @@ class IntentionRecognizer:
             memo[key] = evaluator(walked, origin, pos, target_pos, self._path_cost)
         return memo[key]
 
+    def _unknown_likelihood(
+        self,
+        action: Optional[GroundedAction],
+        origin: Tuple[float, float],
+        pos: Tuple[float, float],
+        world: WorldState,
+        arrived: bool = False,
+    ) -> float:
+        """
+        The likelihood under `unknown` of the observation the open or closing
+        stretch of `action` is — the reference the hypothesis's own value is
+        scored against — GRADED by how much of the hypothesis's expected path
+        the stretch covered (graded evidence): u^f, with f the fraction of
+        C(origin, target) closed by `pos` (likelihood_functions.covered_fraction,
+        the same origin, target and path cost the excess is measured against),
+        or f = 1 when the stretch has `arrived` — the action's completion
+        holds at the fold, so the world itself says the path is covered,
+        whatever the arrival radius (the body's, not this layer's). Ungraded,
+        u, for an observation with no path to grade: no action, no evaluator
+        (pick_up, place, wait_at) or no resolvable target — one whole
+        observation, as before the grade. A step away from the target covers
+        nothing (f = 0, u^0 = 1): such a stretch pays its L alone, so the
+        grade meters confirmation and leaves refutation to the excess.
+        """
+        if arrived:
+            return likelihood_functions.UNKNOWN_LIKELIHOOD
+        if action is None or action.schema.progress_evaluator is None:
+            return likelihood_functions.UNKNOWN_LIKELIHOOD
+        target_pos = movement_target_position(action, world)
+        if target_pos is None:
+            return likelihood_functions.UNKNOWN_LIKELIHOOD
+        return likelihood_functions.graded_unknown_likelihood(
+            likelihood_functions.covered_fraction(origin, pos, target_pos, self._path_cost))
+
     def _grounded_actions(
         self,
         hyp: HypothesisKey,
@@ -842,9 +901,11 @@ class IntentionRecognizer:
         None when the planner cannot decompose hyp here (DecompositionError:
         no applicable method, a derived var without a value). That is a fact
         about this hypothesis in this world, not an error in the recognizer,
-        and the hypothesis is scored at the perfect-fit value (nothing to charge); it is logged once per episode so
-        that a hypothesis that can never be scored is visible in the log
-        rather than indistinguishable from one that is merely uninformative.
+        and the hypothesis is scored at the perfect-fit value (nothing to
+        charge: one ungraded observation, 1/u, per tick it stays so); it is
+        logged once, until the hypothesis decomposes again, so that a
+        hypothesis that can never be scored is visible in the log rather than
+        indistinguishable from one that is merely uninformative.
         Schema errors (unbound variable, unknown lookup) propagate: a domain
         modelling mistake must not look like uncertainty.
         Memoised per tick (cleared at the top of update()).

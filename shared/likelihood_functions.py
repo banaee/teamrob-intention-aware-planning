@@ -40,7 +40,7 @@ THE EVIDENCE MODEL (I4):
 
     BETA — detour tolerance, per cm: how much wasted path makes a target
     implausible. 1/BETA is the excess at which the likelihood has fallen to
-    ≈ 0.27 (from 0.5 at zero excess). Absolute units make it layout-scale
+    2/(1+e) ≈ 0.54 (from 1 at zero excess). Absolute units make it layout-scale
     dependent (the same defect recorded for min_separation, formerly
     min_safe_distance, TODO-28); the
     fractional form (excess as a fraction of C(origin, g)) was measured against
@@ -56,13 +56,30 @@ THE EVIDENCE MODEL (I4):
     no graded signal (pick_up, place, wait_at: the agent is within reach of the
     action's location, or the walk would have regressed to the approach).
 
-    UNKNOWN_LIKELIHOOD — the constant likelihood of every observation under
-    `unknown`. It is the threshold separating "fits badly enough to be called
-    unexplained" from "fits well enough to be a real hypothesis": walk toward
-    something no task targets, every hypothesis's excess grows and its
-    likelihood falls, `unknown`'s does not move, and `unknown` wins. It is also
-    the CEILING on confidence — with one hypothesis fitting perfectly and every
-    rival refuted, the best reachable confidence is 1 / (1 + UNKNOWN_LIKELIHOOD).
+    UNKNOWN_LIKELIHOOD — the likelihood under `unknown` of an observation that
+    covered one whole expected path. It is the threshold separating "fits
+    badly enough to be called unexplained" from "fits well enough to be a real
+    hypothesis": walk toward something no task targets, every hypothesis's
+    excess grows and its likelihood falls, `unknown`'s does not move, and
+    `unknown` wins. It also sets the CEILING on confidence — a lone hypothesis
+    fitting perfectly over n whole observations reaches 1 / (1 + uⁿ), never 1.
+
+    The grade (graded evidence, September 2026). A stretch's evidence against
+    `unknown` is metered by how much of the hypothesis's expected path it
+    covered: f = (C(origin, g) − C(pos, g)) / C(origin, g), the share of the
+    direct cost from the origin that the agent has closed, clipped to [0, 1]
+    (covered_fraction). The stretch's likelihood under `unknown` is u^f
+    (graded_unknown_likelihood), so its odds are L / u^f: log-linear in f,
+    evidence accrues at a constant rate per unit of expected path, and two
+    stretches covering the halves of one path are worth the whole. A stretch
+    that covered a whole path is worth L/u, as before the grade; one that
+    covered nothing (a step away from the target: f = 0) pays L alone, so
+    refutation by wasted path is untouched — the grade meters confirmation
+    only. A stretch that has ARRIVED (its action's completion holds at the
+    fold) is graded 1 by that fact, not by the distances: the world says the
+    path is covered, and the arrival radius is the body's, not this layer's.
+    Scale-free: a ratio of two costs. Observations with no path (an action
+    without evaluator or target) are ungraded and stay at u.
 
     Completion — a detection-reliability model. The observed microaction is in
     the expected action's vocabulary (GRASP for pick_up), so the question is
@@ -101,7 +118,7 @@ PathCost = Callable[[Position, Position], float]
 # the module, never redefines them)
 # =============================================================================
 BETA                       = 0.01    # detour tolerance, 1/cm (excess of 100 cm → L ≈ 0.54)
-UNKNOWN_LIKELIHOOD         = 0.1     # constant likelihood under `unknown`; ceiling 1/(1+u)
+UNKNOWN_LIKELIHOOD         = 0.1     # likelihood under `unknown` per whole expected path covered; ceiling 1/(1+uⁿ)
 DETECTION_HIT_RATE         = 1.0     # P(signal | completed): Mesa reports every completion
 DETECTION_FALSE_ALARM_RATE = 1e-3    # P(signal | not completed): none in Mesa; non-zero for recoverability
 
@@ -148,6 +165,40 @@ def excess_path_likelihood(
     """
     excess = walked + cost(pos, target_pos) - cost(origin, target_pos)
     return logistic_of_excess(excess)
+
+
+# =============================================================================
+# The grade — how much of an expected path a stretch covered (graded evidence)
+# =============================================================================
+
+def covered_fraction(
+    origin: Position,
+    pos: Position,
+    target_pos: Position,
+    cost: PathCost = straight_line_cost,
+) -> float:
+    """
+    The fraction of the expected path C(origin, target) that the stretch has
+    covered by `pos`: the direct cost from the origin less what is still left,
+    over the direct cost. 1 at the target, 0 at the origin and anywhere no
+    nearer to the target than the origin (a step away covers nothing; the
+    excess charges it), clipped to [0, 1]. 0 when the expected path is empty
+    (the origin is at the target). A ratio of two costs: scale-free.
+    """
+    expected = cost(origin, target_pos)
+    if expected <= 0.0:
+        return 0.0
+    return min(1.0, max(0.0, (expected - cost(pos, target_pos)) / expected))
+
+
+def graded_unknown_likelihood(fraction: float) -> float:
+    """
+    The likelihood of a stretch under `unknown`, graded by the fraction of the
+    expected path it covered: u^fraction — u for a whole path, 1 for none.
+    Log-linear, so the odds L / u^fraction accrue at a constant rate per unit
+    of expected path and compose across a path's stretches.
+    """
+    return UNKNOWN_LIKELIHOOD ** fraction
 
 
 # =============================================================================
