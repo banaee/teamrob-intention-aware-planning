@@ -1,10 +1,10 @@
 """
 run.py — run_mesa headless with the MetaPlanner's two policy parameters that have no run option set
-in-process (T6): rho (B2 `b2a`'s bound) and min_separation (in cm, converted to the ratio the
-MetaPlanner takes, min_separation_in_motion_ticks = cm / assumed_speed). Nothing in the code base
+in-process (T6): rho (B2 `b2a`'s bound) and min_separation (in cm; since T-A1 the MetaPlanner takes
+it in world units, where T6 converted it to the former ratio cm / assumed_speed). Nothing in the code base
 changes; the wrapper replaces the keyword defaults at construction, so the `[run]` header records the
 values actually used, and the separation stop (which reads meta_planner.min_separation) follows the
-same s. Unset variables leave the defaults (rho 0.5, 2.5 ticks = 50 cm).
+same s. Unset variables leave the defaults (rho 0.5, 50 cm from mesa_configs.yaml).
 
     T6_RHO=0.25 T6_SEP_CM=70 PYTHONHASHSEED=0 python analysis/t6_ablation/run.py --domain kitting \\
         --layout env_layout2 --scenario scenario_20 --steps 300 --assignment_prior false \\
@@ -22,8 +22,7 @@ def _init(self, *args, **kwargs):
     if rho:
         kwargs["rho"] = float(rho)
     if sep_cm:
-        projector = kwargs["projector"] if "projector" in kwargs else args[1]
-        kwargs["min_separation_in_motion_ticks"] = float(sep_cm) / projector.assumed_speed
+        kwargs["min_separation"] = float(sep_cm)
     _orig_init(self, *args, **kwargs)
 
 _mp.MetaPlanner.__init__ = _init

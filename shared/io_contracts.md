@@ -584,12 +584,12 @@ MetaPlanner(
     knowledge: DomainKnowledgeBase,
     projector: Projector,
     recognizer: IntentionRecognizer,
+    min_separation: float,               # world units, from the body; no default (T-A1)
     theta: float = DEFAULT_THETA,        # 0.75, module-level in shared/meta_planner.py
     strategy: Literal["single_task", "full_reorder"] = "single_task",
     gate_strategy: Literal["none", "b2a", "b2b"] = "none",
     cost_strategy: Literal["realized", "plain"] = "realized",
     human_agent_id: Optional[str] = None,
-    min_separation_in_motion_ticks: float = 2.5,
     rho: float = 0.5,
 )
 ```
@@ -626,10 +626,13 @@ mirroring `RobotAgent.observed_agent_id`'s existing optionality.
 
 **`min_separation`** (TODO-28; R1; landed T4 for B2, T10 for B3): the clearance realization must
 ACHIEVE by holding, passed into `realize()` — not a threshold below which a candidate is excluded.
-The policy value is the unit-less ratio `min_separation_in_motion_ticks` (2.5); the world-unit
-`min_separation` handed to `realize()` is it × the `Projector`'s body-supplied `assumed_speed`
-(50 cm in Mesa at 20 cm/tick), so `shared/` holds no absolute distance. One value, used by B2 and B3
-alike; readable as `MetaPlanner.min_separation`.
+Since T-A1 (September 2026) it is supplied by the body in world units, a required constructor
+argument with no default: a standard sets a distance, and a safety parameter is set from outside the
+planner, so `shared/` neither holds it nor derives it from the body's speed. Mesa reads it from
+`mesa_configs.yaml` (`simulation.min_separation: 50`, cm) and names value and source in the `[run]`
+header. (Until T-A1 it was the ratio `min_separation_in_motion_ticks` = 2.5 × the `Projector`'s
+`assumed_speed`; same 50 cm, same behaviour.) One value, used by B2 and B3 alike and by Mesa's
+separation stop; readable as `MetaPlanner.min_separation`.
 
 **ρ** (`rho`, T4): `gate_strategy="b2a"` continues the current task when its hold δ ≤ ρ × (T_h −
 trigger), the human's remaining projected duration; otherwise, or if the current task is

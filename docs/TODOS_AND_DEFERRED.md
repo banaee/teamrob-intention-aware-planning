@@ -728,7 +728,18 @@ is gone; what remains of the sampler and its types is TODO-83.
 Files: shared/meta_planner.py (_detect_interference), shared/trajectory_algorithms.py, shared/projection.py
 Reference: Phase 4C scenario_00 validation, September 2026
 
-**TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders** — RESTATED (wait-decision revision, Sept 2026): `min_safe_distance` becomes `min_separation`, the clearance realization must ACHIEVE — ✅ DECIDED (R1, Sept 2026): `min_separation` = 2.5 × the robot's motion per tick — ✅ LANDED in B2 (T4) and B3 (T10); `min_safe_distance` removed
+**TODO-28 — `min_safe_distance` and `assumed_speed` are uncalibrated placeholders** — RESTATED (wait-decision revision, Sept 2026): `min_safe_distance` becomes `min_separation`, the clearance realization must ACHIEVE — ✅ DECIDED (R1, Sept 2026): `min_separation` = 2.5 × the robot's motion per tick — ✅ LANDED in B2 (T4) and B3 (T10); `min_safe_distance` removed — REVISED (T-A1, Sept 2026): supplied by the body in physical units, not a ratio × speed
+REVISED (T-A1, September 2026): `min_separation` is supplied by the body in physical units, a required
+`MetaPlanner(min_separation=...)` argument in world units with no default in `shared/`; Mesa reads it
+from `mesa_configs.yaml` (`simulation.min_separation: 50`, cm) and the `[run]` header names value and
+source (`min_separation=50.00 (source=mesa_configs.yaml simulation.min_separation, cm)`). REASON: a
+standard sets a distance; the R1 form (2.5 × the body's motion per tick) coupled the safety distance
+to the robot's speed, which violates "safety parameters are set from outside the planner" (T6). The
+value is unchanged (50 cm) and so is behaviour: the sixteen graded-evidence baselines and the stop-on
+s00 / s30 cells are byte-identical apart from the `[run]` line. The "relative to motion, so that it
+scales" argument below is withdrawn with it: the value is not a scale-calibration item (TODO-47 (b)).
+It is set per body (ROS: its own, from the standard and the body's sizes), not measured on fixtures.
+The text below is the record of the R1 form.
 DECIDED (R1, September 2026, on T1b's data): `min_separation` = 2.5 × the robot's motion per tick,
 i.e. 50 cm on the current layouts (20 cm/tick), EXPRESSED RELATIVE TO MOTION so that it scales with
 the body rather than as an absolute in `shared/`. T1b (`analysis/t1b_realization/REPORT.md`, Finding

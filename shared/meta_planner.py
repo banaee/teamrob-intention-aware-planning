@@ -196,12 +196,12 @@ class MetaPlanner:
         knowledge: DomainKnowledgeBase,
         projector: Projector,
         recognizer: IntentionRecognizer,
+        min_separation: float,
         theta: float = DEFAULT_THETA,
         strategy: Literal["single_task", "full_reorder"] = "single_task",
         gate_strategy: Literal["none", "b2a", "b2b"] = "none",
         cost_strategy: Literal["realized", "plain"] = "realized",
         human_agent_id: Optional[str] = None,
-        min_separation_in_motion_ticks: float = 2.5,
         rho: float = 0.5,
     ):
         """
@@ -250,15 +250,13 @@ class MetaPlanner:
                                  candidate realizes with δ = 0 at its plain projected
                                  duration, matching how RobotAgent already tolerates no
                                  observed human.
-        min_separation_in_motion_ticks:
-                                 the clearance realization must achieve, as a multiple
-                                 of the robot's motion per tick (R1, TODO-28: 2.5). The
-                                 policy value is this unit-less ratio; the world-unit
-                                 min_separation passed to realize() is it times the
-                                 Projector's body-supplied assumed_speed (50 cm in Mesa
-                                 at 20 cm/tick), so shared/ holds no absolute distance.
-                                 The one value both B2 `b2a` (T4) and B3 (T10) hand to
-                                 realize().
+        min_separation:          the clearance realization must achieve, in world
+                                 units, supplied by the body (TODO-28; Mesa: 50 cm,
+                                 mesa_configs.yaml). A standard sets a distance, so it
+                                 is set outside the planner and not derived here from
+                                 the body's speed; no default, since shared/ holds no
+                                 unit-scale value. The one value both B2 `b2a` (T4) and
+                                 B3 (T10) hand to realize().
         rho:                     B2 `b2a`'s policy parameter (R1, TODO-36): continue the
                                  current task iff its realized hold δ ≤ rho × (T_h − now),
                                  the human's remaining projected duration at the trigger.
@@ -273,7 +271,7 @@ class MetaPlanner:
         self._gate_strategy = gate_strategy
         self._cost_strategy = cost_strategy
         self._human_agent_id = human_agent_id
-        self._min_separation = min_separation_in_motion_ticks * projector.assumed_speed
+        self._min_separation = min_separation
         self._rho = rho
         # For the pool's completion test only (_is_complete()). Decomposition
         # for projection stays inside Projector; this never plans.
@@ -315,7 +313,7 @@ class MetaPlanner:
 
     @property
     def min_separation(self) -> float:
-        """World units: min_separation_in_motion_ticks x the Projector's assumed_speed."""
+        """World units, as the body supplied it."""
         return self._min_separation
 
     @property

@@ -4,3 +4,4 @@
       max_steps: 2000
       step_size: 20                      # 1 step = 20 centimeters
       seconds_per_step: 2.0
+      min_separation: 50                 # centimeters; the clearance realization keeps and the separation stop checks

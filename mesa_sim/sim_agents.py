@@ -41,7 +41,7 @@ from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
 from mesa_sim.executor import Executor, ACTION_COMPLETION_LATENCY, TASK_COMPLETION_LATENCY
-from mesa_sim.action_decomposer import _get_step_size, _parse_duration_to_steps  # single reader of mesa_configs.yaml
+from mesa_sim.action_decomposer import _get_step_size, _get_min_separation, _parse_duration_to_steps  # single reader of mesa_configs.yaml
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
@@ -246,11 +246,12 @@ class RobotAgent(FactoryAgent):
     
         # B2's gate and B3's cost are run options (configs/experiment.yaml,
         # --gate_strategy / --cost_strategy), not scenario facts. min_separation
-        # is the MetaPlanner's ratio times the Projector's assumed_speed above.
+        # is the body's, in world units (mesa_configs.yaml), like assumed_speed above.
         self.meta_planner = MetaPlanner(
             knowledge=knowledge,
             projector=self.projector,
             recognizer=self.recognizer,
+            min_separation=_get_min_separation(model),
             human_agent_id=observed_agent_id,
             gate_strategy=self.model.gate_strategy,
             cost_strategy=self.model.cost_strategy,
@@ -258,8 +259,7 @@ class RobotAgent(FactoryAgent):
         # The run header (TODO-78): the policy values and evaluation switches this
         # robot's decisions are taken under, once per run, so a log can be read
         # without knowing which code or command produced it. min_separation in
-        # world units, with the ratio and the body's motion per tick it is the
-        # product of.
+        # world units, with where the body took it from.
         logging.info(
             f"[run] {self.unique_id} gate_strategy={self.meta_planner.gate_strategy} "
             f"cost_strategy={self.meta_planner.cost_strategy} "
@@ -267,8 +267,7 @@ class RobotAgent(FactoryAgent):
             f"assignment_prior={'on' if self.model.assignment_prior else 'off'} "
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
             f"min_separation={self.meta_planner.min_separation:.2f} "
-            f"(min_separation_in_motion_ticks={self.meta_planner.min_separation / self.projector.assumed_speed:g} "
-            f"x assumed_speed={self.projector.assumed_speed:g})"
+            f"(source=mesa_configs.yaml simulation.min_separation, cm)"
         )
         self.meta_planner.seed_tasks(assigned_tasks)
         self.current_task_instance: Optional[TaskInstance] = None

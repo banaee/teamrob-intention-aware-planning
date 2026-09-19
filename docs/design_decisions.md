@@ -2714,3 +2714,30 @@ docs/roadmap.md, shared/meta_planner.py (docstring), shared/projection.py (docst
 shared/io_contracts.md (§2.2 strategy paragraph)
 Reference: B3.B design revision, cchat, September 2026; DESIGN-16; "The robot can wait"; "Realization as
 built"; `analysis/g1_graded_evidence/sweep/`
+
+---
+
+**`min_separation` is supplied by the body in physical units, not derived in `shared/` from the body's speed (T-A1)**
+
+DECIDED (cchat, September 2026; built in T-A1): `min_separation` is a distance the body supplies in world
+units — a required `MetaPlanner(min_separation=...)` argument with no default in `shared/` — instead of the
+R1 form, the ratio `min_separation_in_motion_ticks` = 2.5 times the `Projector`'s `assumed_speed`.
+
+WHY. A standard sets a distance. The R1 form made the safety distance a function of the robot's speed, so a
+faster or slower body would silently change the clearance the planner keeps; that violates "safety
+parameters are set from outside the planner" (T6). The R1 argument for the ratio ("relative to motion, so
+that it scales") treated the value as a scale-calibration item; it is not one (TODO-47 (b), TODO-28): it is
+set per body, not measured on fixtures and not rescaled with layouts.
+
+AS BUILT. Mesa supplies it from `mesa_sim/mesa_configs.yaml` (`simulation.min_separation: 50`, cm), read by
+`action_decomposer._get_min_separation()` beside `step_size` and `seconds_per_step`, with no fallback (a
+missing value stops the run rather than running under a value nobody set). The same value reaches
+realization (B2 `b2a`, B3) and the Mesa separation stop, as before. The `[run]` header names the value and
+its source: `min_separation=50.00 (source=mesa_configs.yaml simulation.min_separation, cm)`. The value is
+unchanged, and so is behaviour: the sixteen graded-evidence baselines (`analysis/g1_graded_evidence/sweep/`)
+and the stop-on s00 / s30 cells (`analysis/c_separation_stop/stop_on/`) are byte-identical apart from the
+`[run]` line.
+
+Files: shared/meta_planner.py, mesa_sim/mesa_configs.yaml, mesa_sim/action_decomposer.py,
+mesa_sim/sim_agents.py, shared/io_contracts.md (§2.2), analysis/t6_ablation/run.py (the keyword)
+Reference: T-A1, September 2026; TODO-28; R1; T6

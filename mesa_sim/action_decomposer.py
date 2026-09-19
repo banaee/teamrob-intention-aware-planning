@@ -304,3 +304,10 @@ def _get_seconds_per_step(model) -> float:
     return float(cfg.get("simulation", {}).get("seconds_per_step", 2.0))
 
 
+def _get_min_separation(model) -> float:
+    # A safety distance set from outside the planner: no fallback, so a missing
+    # value stops the run instead of running under one nobody set.
+    cfg = _load_mesa_config(model)
+    return float(cfg["simulation"]["min_separation"])
+
+
