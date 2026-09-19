@@ -96,6 +96,9 @@ scenario_10 = ScenarioConfig(
     ],
 )
 
+
+
+
 # ===============================================================
 # manually defined scenarios, for only "env_layout2".
 # ===============================================================
@@ -149,6 +152,59 @@ scenario_20 = ScenarioConfig(
         ),
     ],
 )
+
+scenario_21 = ScenarioConfig(
+    id="scenario_21",
+    name="layout2_midapproach_sustained_conflict",
+    description=(
+        "Phase 4C B2/B3 fixture. The robot's cheapest task (item_4: 54 ticks at t=0, vs item_6 "
+        "71 and item_7 103, at 20 cm/tick) is the conflicted one, so the t=0 pick lands on it by "
+        "construction. The conflict comes from matched arrival times at the shared kitting "
+        "table: the robot's approach + carry (447 + 583 cm) and the human's (449 + 617 cm) are "
+        "within a tick of each other, so both carry legs converge into the table and both "
+        "placements overlap there. item_6 (shelf_6, west) is the clean alternative; item_7 "
+        "(shelf_7, far east) never competes. Measured conflict geometry, in the units of the "
+        "day, lives in analysis/t1_conflict_measurement/REPORT.md and TODO-28/TODO-30, not "
+        "here — those figures move whenever the meta-planner does. "
+        "Recognizer behaviour (leg-level recognizer, PYTHONHASHSEED=0): t=0 confidence is "
+        "below theta in both conditions, so no projection is built at t=0. (1) "
+        "assignment_prior off — theta crosses at the human's GRASP (step 22, 0.797), after the "
+        "robot's move_to has completed. (2) assignment_prior on — theta crosses at step 11 "
+        "(0.780) when the human enters zone_SW and ZONE_BOOST applies to item_3; the robot is "
+        "roughly half-way to shelf_4 (its move_to completes at 21), so a projection is built "
+        "mid-approach. (3) t=0 most_likely is a tie-break on layout item order (TODO-42). No "
+        "foreseeable tasks. Human plan is scripted/fixed."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(200, 50),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-500, 300),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
 
 # ===============================================================
 # manually defined scenarios, for only "env_layout3".
