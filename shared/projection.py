@@ -115,9 +115,9 @@ class Projector:
         action_completion_latency:
                               execution steps the body spends LEARNING that an action
                               finished, after its last microaction and before the next
-                              action starts. Charged once per action, as a hold at the
-                              position the action ended at — the agent is standing
-                              still, not moving. Supplied by the embodiment as the
+                              action starts. Charged once per action, as a stationary
+                              stretch at the position the action ended at — the agent is
+                              standing still, not moving. Supplied by the embodiment as the
                               other three are (Mesa: one tick, the step its executor
                               spends seeing the completion predicate and advancing its
                               cursor without executing anything —
@@ -130,8 +130,8 @@ class Projector:
                               execution steps the body spends COMPLETING a task, after
                               its last action's acknowledgement and before the next
                               task's first microaction. Charged once per projected
-                              task, as a hold at the position the task ended at
-                              (project(), after build_segments()). Supplied by the
+                              task, as a stationary stretch at the position the task
+                              ended at (project(), after build_segments()). Supplied by the
                               embodiment as action_completion_latency is (Mesa: one
                               tick, the step its executor spends in
                               _on_task_complete() — mesa_sim/executor.TASK_COMPLETION_LATENCY;
@@ -261,8 +261,8 @@ class Projector:
         )
 
         segments = self.build_segments(abstract_plan, world, agent_id, start_step)
-        # What the body spends completing the task (F1): a hold at the position
-        # the task ended at, once per task — a task-level cost, not per action,
+        # What the body spends completing the task (F1): a stationary stretch at
+        # the position the task ended at, once per task — a task-level cost, not per action,
         # so it is placed here and not in build_segments(). Omitted at 0.0.
         if segments and self._task_completion_latency > 0.0:
             segments.append(stationary_segment(
@@ -344,7 +344,8 @@ class Projector:
         start_step: float = 0.0,
     ) -> List[Segment]:
         """
-        Per-action straight-line motion/hold Segments for `plan`, starting from the
+        Per-action Segments for `plan` — a straight-line motion or a stationary
+        stretch each — starting from the
         agent's live position at `start_step`. Single geometry pass, chained
         head-to-tail in both position and step-time.
 
@@ -422,8 +423,8 @@ class Projector:
             segments.append(segment)
             current_step = segment.end_step
 
-            # What the body spends learning the action finished: a hold at the
-            # position it ended at, checked by interference like any other hold.
+            # What the body spends learning the action finished: a stationary
+            # stretch at the position it ended at, checked like any other segment.
             if self._action_completion_latency > 0.0:
                 latency_segment = stationary_segment(
                     current_pos, current_step, self._action_completion_latency

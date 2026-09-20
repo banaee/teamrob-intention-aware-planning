@@ -11,7 +11,7 @@ ALGORITHM:
     P(obs_t | τ) = P(obs_t | a_φ(τ)) — a task's likelihood IS the likelihood of
     the action it expects now (the phase model, I3). The phase is DERIVED every
     tick, never stored: the planner selects τ's method by guards against the
-    current world for the observed agent (I2), its actions are walked from the
+    current world for the observed agent (I2), its actions are scanned from the
     start, and the expected action is the first whose completion condition does
     not yet hold. A hypothesis remembers which action it expected last tick and
     where the agent was when it began expecting it (its ORIGIN); it never stores
@@ -726,7 +726,7 @@ class IntentionRecognizer:
     ) -> Optional[GroundedAction]:
         """
         The action the observed agent would be on if it held this intention:
-        walk the planner's grounded list from the start and return the first
+        scan the planner's grounded list from the start and return the first
         whose completion condition does not hold in the world. Derived from the
         world every tick, never stored as an index — the method may have been
         re-selected since the last tick, and the same position in a different
@@ -734,7 +734,7 @@ class IntentionRecognizer:
         decomposable here or every completion already holds (the caller has
         then retired it on the terminal condition).
         An action with no completion predicate (ProcessCompletion) never reads
-        as complete, so a walk stops at it.
+        as complete, so the scan stops at it.
         """
         for action in actions or []:
             predicate = action.completion_predicate

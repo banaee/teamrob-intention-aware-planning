@@ -568,8 +568,9 @@ class AbstractPlan:
 @dataclass
 class Segment:
     """
-    One action's straight-line motion (or stationary hold) through space and
-    step-time — the unit interference-detection algorithms operate on.
+    One action's straight-line motion (or stationary stretch) through space and
+    step-time — the unit interference-detection algorithms operate on. Several
+    segments make up one ProjectedPlanEntry.
 
     Straight-line/constant-speed only, matching the same assumption
     Projector.build_segments() already makes (distance / assumed_speed) and
@@ -595,13 +596,14 @@ class Segment:
 @dataclass
 class ProjectedPlanEntry:
     """
-    One task's contribution to a ProjectedPlan.
-    Produced by meta_planner per candidate task in the queue.
+    One task's part of a ProjectedPlan, produced by Projector.project().
+    An ordering of n tasks projects to ONE ProjectedPlan with n entries, in
+    the ordering's order.
     """
     abstract_plan: "AbstractPlan"
     estimated_start_step: int
     estimated_duration: int         # steps to complete this task
-    segments: List[Segment]         # per-action straight-line motion/hold, for interference detection / realization
+    segments: List[Segment]         # per-action motion or stationary stretch, for interference detection / realization
     
     
 @dataclass
@@ -609,10 +611,11 @@ class ProjectedPlan:
     """
     Multi-task lookahead structure for meta_planner reasoning.
     Never handed to the executor — meta_planner internal only.
-    Spans the full projected task queue with timing and spatial footprint per task.
-    Used for interference detection and cost comparison across candidate orderings.
+    Spans one projected ordering, one entry per task, with timing and spatial
+    footprint per task. Used for interference detection and cost comparison
+    across candidates.
     """
-    task_queue: List[str]               # task instance IDs in projected order
+    task_queue: List[str]               # task instance keys, in the ordering's order
     entries: List[ProjectedPlanEntry]
     total_estimated_cost: int           # sum of durations + any inter-task gap steps
 

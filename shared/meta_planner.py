@@ -86,20 +86,22 @@ TASK POOL vs. CANDIDATES:
     B2, which decides whether B3 runs at all, not what B3 decides once it does.
 
 STRATEGY (DESIGN-16):
-    self._strategy controls how much of the queue a given update() call
-    rewrites — it does NOT change what a candidate is:
+    self._strategy selects what a CANDIDATE is inside B3 — an individual task,
+    or one ordering of the pool. Neither strategy commits to an order: the
+    queue carries none under either (see "TASK POOL vs. CANDIDATES" above).
         "single_task" (default, IMPLEMENTED) — receding-horizon selection.
             Score each candidate alone (a length-1 ordering, projected from
             the live WorldState); the argmin feasible candidate becomes the
             new current_task; the rest of the queue is left as an unordered
             pool with no ordering commitment.
         "full_reorder" (B3.B; NOT IMPLEMENTED, DESIGNED, the next build) —
-            each ordering of the pool is a candidate: projected as one
-            chained sequence (task 1's segments, then task 2's from where
-            task 1 ended, ...) and realized against the ONE human projection
-            inside [trigger, T_h]; the argmin ordering's FIRST task becomes
-            the new current_task. The sequence past the head is a LOOKAHEAD
-            for that choice, re-priced at the robot's next boundary
+            each ordering of the pool is a candidate: projected as ONE
+            chained ProjectedPlan, one entry per task (entry 1's segments,
+            then entry 2's from where entry 1 ended, ...) and realized against
+            the ONE human projection inside [trigger, T_h]; the argmin
+            ordering's HEAD becomes the new current_task. The ordering past
+            the head is a LOOKAHEAD for that choice, re-priced at the robot's
+            next boundary
             (task_committed, no_current_task) — not an order commitment; the
             queue's order carries none, as under single_task. It exists for
             tasks coupled by geometry (two-table kitting: a task's end

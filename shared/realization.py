@@ -116,16 +116,16 @@ def realize(
     δ: the smallest WHOLE-TICK shift ≥ 0 that is outside every violating
     shift interval (trajectory_algorithms.shift_violation_interval, one per
     MOVING robot segment × human segment pair — a stationary robot segment
-    never violates; each is one open interval by convexity, exact). The
-    intervals are walked in order of their start: δ
+    never violates; each is one open interval by convexity, exact). THE
+    MINIMAL-SHIFT SEARCH takes the intervals in order of their start: δ
     starts at 0 and, whenever an interval strictly contains it, jumps to the
     first whole tick at or after that interval's end. One pass suffices — δ
     never decreases, so an interval already passed cannot contain a later δ.
     Exact bad-shift intervals rather than a search over δ with a per-δ
     check, because the feasible set in δ is not monotone (a shift can clear
-    one crossing and walk into the next): no bisection is valid, and for the
+    one crossing and run into the next): no bisection is valid, and for the
     same reason the whole-tick δ is NOT the fractional minimal shift rounded
-    up — rounding up can land in a second interval; the walk continues past
+    up — rounding up can land in a second interval; the search continues past
     it. Whole ticks (T3b, decided from the design, not the data): the hold
     reaches the body as STAND microactions, one per tick, so a fractional δ
     could not be executed as computed, and rounding at execution would
@@ -196,8 +196,9 @@ def realize(
         )
     horizon = human_segments[-1].end_step
 
-    # --- the smallest shift outside every violating shift interval ----------
-    # (stationary robot segments return None: a standing robot never violates)
+    # --- the minimal-shift search: the smallest whole tick >= 0 outside -----
+    # every violating shift interval (stationary robot segments return None:
+    # a standing robot never violates)
     intervals: List[Tuple[float, float]] = []
     for robot_seg in robot_segments:
         for human_seg in human_segments:

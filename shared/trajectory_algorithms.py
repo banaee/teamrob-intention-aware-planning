@@ -17,7 +17,8 @@ PURPOSE:
        violation of a given min_separation against a human segment
        (shift_violation_interval; robot-responsible since F1: a standing
        robot never violates, a moving one must not be within min_separation
-       without the distance increasing) — and takes the smallest whole-tick
+       without the distance increasing) — and runs the minimal-shift search
+       over the intervals this module returns, for the smallest whole-tick
        shift that clears. min_separation is passed in; nothing here holds
        policy.
 
