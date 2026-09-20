@@ -229,13 +229,11 @@ Completion is measured from the world fact (T6): the tick after the robot's last
 ## Conventions and terminology
 
 - Scenario ids are prefixed by layout number: `env_layout2` → `scenario_20`, `scenario_21`.
-- Adding a layout by hand needs three edits: `domains/kitting/env_layout<N>.json`,
-  `domains/kitting/scenarios.py`, and `domains/kitting/registry.py` (import and `layouts` entry). A generated
-  fixture needs none of the three by hand (T-B1b, TODO-47 (a)): a fixture module states the geometry and the
-  tasks, builds the layout and the scenarios through `domains/kitting/fixture_generation.py`, writes its
-  JSON, and registers itself with one call in `registry.py` (`domains/kitting/fixture_two_tables.py`:
-  env_layout8, scenario_80 / scenario_81). Its JSON is generated; change the module, not the file. scenario_08
-  (hand-written, in `scenarios.py`) only opens env_layout8 in the viewer: not a fixture, nothing is measured from it.
+- Adding a layout needs three edits: `domains/kitting/env_layout<N>.json`,
+  `domains/kitting/scenarios.py`, and `domains/kitting/registry.py` (import and `layouts` entry).
+  Fixtures are written as literals, because they are read by people; generated fixtures were tried and
+  reversed (T-B1b, TODO-47 (a)). scenario_82 only opens env_layout8 in the viewer: not a fixture, nothing
+  is measured from it.
 - "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is an
   individual task, never an ordering.
 - Triggers: `no_current_task`; `recognition_changed` (the belief no longer points at the

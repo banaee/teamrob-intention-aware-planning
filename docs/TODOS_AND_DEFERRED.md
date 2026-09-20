@@ -1413,14 +1413,15 @@ deterministic under PYTHONHASHSEED=0, so variation must come from generated inpu
 Prerequisites:
 (a) Programmatic layout/scenario registration — adding a layout today needs three manual
     edits (layout JSON, `scenarios.py`, `registry.py`).
-    FIRST PART ✅ BUILT (T-B1b, September 2026): `domains/kitting/fixture_generation.py`: `build_layout`
-    (the env_layout dict from tables, shelves, items with shelf and designated table, starts),
-    `delivery_scenario` (delivery tasks state the table the layout designates), `register_layout` (adds
-    the layout and its scenarios to `domain_config`, and refuses a JSON file that differs from the
-    generated layout). A fixture module holds the data and registers itself with one call in
-    `registry.py`; first user `fixture_two_tables.py` (env_layout8). What remains for the harness (T-F):
-    generating the specs themselves (randomised geometry and assignments), foreseeable-task objects and
-    tasks in the builders, and registration without a committed JSON per layout.
+    TRIED AND REVERSED (T-B1b, September 2026). A generator (`fixture_generation.py`: a layout builder,
+    a delivery-scenario builder, a registration call; `fixture_two_tables.py` as its first user) was built
+    for env_layout8 (e76e4e0) and removed again in the same task. Reason: fixtures are read by people, so
+    they are written as literals. A fixture that cannot be read in `scenarios.py` cannot be checked by a
+    person, and that outweighs saving the three manual edits. scenario_80 / scenario_81 are literals in
+    `scenarios.py`, registered the ordinary way; `env_layout8.json` is an ordinary committed layout. The
+    generator only reproduced what the literals state, so it was deleted rather than kept to drift. Whether
+    the randomised harness (T-F) needs programmatic registration is left to its design; nothing is kept
+    here for it.
 (b) Scale-relative calibration — `min_separation` (formerly `min_safe_distance`, TODO-28; and
     any B2 reference for δ, TODO-36) must be expressed relative to layout scale or agent
     speed × steps, not as an absolute read off one fixture.

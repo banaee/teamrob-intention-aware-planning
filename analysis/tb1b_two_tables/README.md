@@ -1,7 +1,9 @@
 # analysis/tb1b_two_tables — the two-table fixture for B3.B (T-B1b): the cost argument and the baselines
 
-`env_layout8`, `scenario_80` / `scenario_81` (`domains/kitting/fixture_two_tables.py`, generated and registered
-through `domains/kitting/fixture_generation.py`; e76e4e0). env_layout1's room (2000 × 1000 cm) and its eight
+`env_layout8`, `scenario_80` / `scenario_81` (literals in `domains/kitting/scenarios.py`, registered the
+ordinary way; first built through a generator, e76e4e0, which was reversed in the same task: fixtures are
+read by people. The logs are byte-identical across the reversal). `scenario_82` on the same layout only opens
+it in the viewer and is not a fixture. env_layout1's room (2000 × 1000 cm) and its eight
 shelf positions; no coffee machine or AC switch and no item on shelf_2 / shelf_5 (every typed object is a
 hypothesis; item_2 would shadow the human's bearing to item_0). θ, ρ, `min_separation`, β unchanged: the
 fixture sets no parameter.
