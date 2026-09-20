@@ -100,12 +100,19 @@ def write_layout(layout: dict, path: str) -> None:
 def register_layout(domain_config: dict, layout_name: str, path: str, layout: dict,
                     scenarios: List[ScenarioConfig]) -> None:
     """Add a generated layout and its scenarios to `domain_config`. The file at
-    `path` must equal the generated layout (regenerate it with write_layout())."""
-    if layout_name in domain_config["layouts"]:
-        raise ValueError(f"register_layout: layout '{layout_name}' is already registered")
+    `path` must equal the generated layout (regenerate it with write_layout()).
+    A layout entry written by hand in the registry (a viewing scenario) is kept:
+    the generated scenarios are added to it, under the same path."""
+    entry = domain_config["layouts"].get(layout_name)
+    if entry is not None:
+        clash = sorted(set(entry["scenarios"]) & {s.id for s in scenarios})
+        if entry["path"] != path or clash:
+            raise ValueError(f"register_layout: layout '{layout_name}' is already registered with "
+                             f"path '{entry['path']}' and scenarios {sorted(entry['scenarios'])}")
     with open(path, "r") as f:
         on_disk = json.load(f)
     if on_disk != json.loads(json.dumps(layout)):
         raise ValueError(f"register_layout: '{path}' differs from the generated layout '{layout_name}'; "
                          f"regenerate it from its fixture module")
-    domain_config["layouts"][layout_name] = {"path": path, "scenarios": {s.id: s for s in scenarios}}
+    entry = domain_config["layouts"].setdefault(layout_name, {"path": path, "scenarios": {}})
+    entry["scenarios"].update({s.id: s for s in scenarios})

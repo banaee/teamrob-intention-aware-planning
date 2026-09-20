@@ -234,7 +234,8 @@ Completion is measured from the world fact (T6): the tick after the robot's last
   fixture needs none of the three by hand (T-B1b, TODO-47 (a)): a fixture module states the geometry and the
   tasks, builds the layout and the scenarios through `domains/kitting/fixture_generation.py`, writes its
   JSON, and registers itself with one call in `registry.py` (`domains/kitting/fixture_two_tables.py`:
-  env_layout8, scenario_80 / scenario_81). Its JSON is generated; change the module, not the file.
+  env_layout8, scenario_80 / scenario_81). Its JSON is generated; change the module, not the file. scenario_08
+  (hand-written, in `scenarios.py`) only opens env_layout8 in the viewer: not a fixture, nothing is measured from it.
 - "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is an
   individual task, never an ordering.
 - Triggers: `no_current_task`; `recognition_changed` (the belief no longer points at the

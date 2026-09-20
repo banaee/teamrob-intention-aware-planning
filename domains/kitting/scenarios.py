@@ -473,3 +473,43 @@ scenario_71 = ScenarioConfig(
         ),
     ],
 )
+
+
+# ===============================================================
+# manually defined scenario, for only "env_layout8".
+# scenario_08 is for VIEWING env_layout8 (the Solara viewer), one task each:
+# it is not a fixture, nothing is measured from it, and T-B does not use it.
+# The measured fixtures on this layout, scenario_80 / scenario_81, are
+# generated in domains/kitting/fixture_two_tables.py, not written here.
+# ===============================================================
+scenario_08 = ScenarioConfig(
+    id="scenario_08",
+    name="layout8_view",
+    description=(
+        "Minimal scenario for opening env_layout8 in the viewer: one robot task and one human task. "
+        "Not a fixture."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-600, 400),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-100, -400),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
