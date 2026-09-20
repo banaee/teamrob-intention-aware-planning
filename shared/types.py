@@ -645,9 +645,12 @@ class RealizedPlan:
     Output of shared/realization.realize() for one robot ProjectedPlan against
     the human's (T3; design_decisions.md, "The robot can wait"). What a
     candidate's segments actually become, given the human: the hold-only
-    realization under the whole-trajectory minimal shift — one hold δ at the
-    robot's position at the decision step, then the projected plan run
-    unchanged, shifted by δ. Realization prices conflict as duration: a
+    realization under the whole-trajectory minimal shift, applied PER ENTRY
+    (T-B Q2, T-B2c) — before each entry one hold, taken where the previous
+    entry ended (at the robot's position at the decision step for the first),
+    then that entry run unchanged at its cumulative shift. With ONE entry:
+    one hold δ, then the projected plan shifted by δ, as before T-B2c.
+    Realization prices conflict as duration: a
     conflicted plan costs more because avoiding the human takes longer. No
     conflict weight, no penalty term. Since F1 (robot-responsible separation:
     a standing robot never violates, and there is no hold cap) realization is
@@ -655,12 +658,31 @@ class RealizedPlan:
     `realizable` flag and the reasons "hold_position_violated" /
     "hold_reaches_horizon" are gone.
 
-    delta:             the hold, in WHOLE steps (≥ 0): the number of STAND
-                       ticks the body executes, so the plan that was checked
-                       is the plan that runs (T3b; design_decisions.md,
-                       "Realization as built"). 0 when there is no human
-                       projection.
-    cost:              T_r + delta over the FULL plan, T_r the plain projected
+    holds:             THE HOLD BEFORE EACH ENTRY, one per entry in the plan's
+                       order, in WHOLE steps (≥ 0): the ticks the robot stands
+                       still at the boundary before that entry —
+                       cumulative_shifts[k] − cumulative_shifts[k−1] (the
+                       first entry's is cumulative_shifts[0]). Whole steps,
+                       because a hold reaches the body as STAND ticks, so the
+                       plan that was checked is the plan that runs (T3b;
+                       design_decisions.md, "Realization as built"). All 0
+                       when there is no human projection.
+    cumulative_shifts: THE CUMULATIVE SHIFT OF EACH ENTRY: the ticks by which
+                       it starts later than projected — the result of its own
+                       minimal-shift search, whose lower bound is the previous
+                       entry's cumulative shift (0 for the first). Never
+                       decreasing. Not a hold: docs/glossary.md keeps the two
+                       apart, and so do these two fields.
+    delta:             (read-only property) holds[0], the hold before the
+                       FIRST entry. With one entry it is the one hold and the
+                       one shift — what B2 `b2a` and single_task read, exactly
+                       as before T-B2c. With several it is the only hold that
+                       is executed before the next re-decision
+                       (UpdateResult.hold); it is NOT the plan's total shift,
+                       which is cumulative_shifts[-1].
+    cost:              T_r + cumulative_shifts[-1] over the FULL plan — the sum
+                       of the entries' T_r plus the cumulative shift of the
+                       last entry; with one entry, T_r + delta. T_r the plain projected
                        duration (the span of the plan's segments, FRACTIONAL
                        steps — the projection's continuous duration; execution
                        quantises per walk and that is deliberately not
@@ -671,15 +693,18 @@ class RealizedPlan:
                        `total_estimated_cost`. The tail beyond T_h is inside
                        T_r and is not corrected for (TODO-69, reading (1)).
     projected_duration: T_r.
-    segments:          the realized plan's segments, head-to-tail: the stationary
-                       hold at `hold_position` from `hold_start` to the shifted
-                       plan's start (present only when that stretch has
-                       positive duration), then every projected segment shifted
-                       by delta.
-    hold_position:     where the robot stands during the hold — the plan's
+    segments:          the realized plan's segments, head-to-tail: per entry,
+                       the stationary stretch of its hold where the hold is
+                       taken — the entry's first segment's start, which is
+                       where the previous entry ended — up to the entry's
+                       shifted start (present only when that stretch has
+                       positive duration), then the entry's projected segments
+                       shifted by its cumulative shift.
+    hold_position:     where the robot stands during the FIRST hold — the plan's
                        first segment's start, i.e. where the robot is at the
-                       decision step (which may be partway along a walk).
-    hold_start:        the decision step.
+                       decision step (which may be partway along a walk). A
+                       later hold's position is read off `segments`.
+    hold_start:        the decision step (the first hold's start).
     horizon:           T_h; None when there is no human projection.
     unassessed_share:  the share of the realized plan's span [hold_start, end]
                        lying beyond T_h — the part that was neither cleared nor
@@ -688,11 +713,12 @@ class RealizedPlan:
                        T_h. The steps before the human projection's span (the
                        observation offset, L2) are unassessed too but not
                        counted. 1.0 when there is no human projection.
-    reason:            "realized"; "no_human_projection" (delta 0, fully
+    reason:            "realized"; "no_human_projection" (every hold 0, fully
                        unassessed — the caller treats it as it treats no
                        projection today).
     """
-    delta: int
+    holds: List[int]
+    cumulative_shifts: List[int]
     cost: float
     projected_duration: float
     segments: List[Segment]
@@ -701,6 +727,11 @@ class RealizedPlan:
     horizon: Optional[float]
     unassessed_share: float
     reason: str
+
+    @property
+    def delta(self) -> int:
+        """The hold before the first entry (see the class docstring)."""
+        return self.holds[0]
 
 
 @dataclass
