@@ -81,3 +81,7 @@ domain_config = {
         },
     },
 }
+
+# Generated fixtures register themselves (fixture_generation.py, TODO-47 (a)).
+from domains.kitting.fixture_two_tables import register as _register_two_tables
+_register_two_tables(domain_config)
