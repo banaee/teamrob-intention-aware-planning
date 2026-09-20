@@ -404,7 +404,7 @@ class RobotAgent(FactoryAgent):
                 current_plan=self.current_plan if continues else None,
             )
             if continues:
-                self.executor.continue_plan(self.current_plan)
+                self.executor.continue_plan(self.current_plan, world)
             # The decision's hold (T4): executed from this tick on, before the
             # plan continues; every decision replaces the previous hold (0 when
             # it carries none), so an interrupted hold is re-decided, never kept

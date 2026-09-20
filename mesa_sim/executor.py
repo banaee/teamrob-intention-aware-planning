@@ -18,6 +18,13 @@ WHAT THIS MODULE DOES:
           continue_plan() without restarting: the action in flight keeps its
           microaction queue, so the tick is spent exactly as if no trigger had
           fired. A plan handed to step() any other way is loaded from its start.
+          When the fresh decomposition no longer contains the action in flight
+          and the world shows that action COMPLETE — the robot's grasp, whose
+          re-decision replaces the delivery with deliver_already_held — the tick
+          is still spent acknowledging it (T-B Q7), so that the body spends
+          every ACTION_COMPLETION_LATENCY it states to the projection. A hold
+          decided at that same trigger carries the acknowledgement as its first
+          tick rather than adding one (hold()).
         - Executes the hold a decision carries (UpdateResult.hold, T4) via
           hold(): one STAND per tick at the agent's position, starting on the
           decision tick, before the plan continues. Every decision replaces
@@ -139,6 +146,13 @@ class Executor:
         self._hold_planned: int = 0
         self._hold_executed: int = 0
 
+        # An acknowledgement this loop still owes a completed action whose plan
+        # was replaced on the very tick it would have been acknowledged
+        # (continue_plan(), T-B Q7). Spent by step() before the loaded plan's
+        # first microaction, or by a decision's hold, which is the same
+        # standing tick (hold()).
+        self._ack_pending: bool = False
+
     # =========================================================================
     # Main step — called once per Mesa step by agent.step()
     # =========================================================================
@@ -165,6 +179,19 @@ class Executor:
 
         if plan is not self.current_plan:
             self._load_plan(plan)
+
+        # ------------------------------------------------------------------
+        # 1b. An acknowledgement owed to an action the decision's fresh
+        #     decomposition no longer contains (continue_plan(), T-B Q7): this
+        #     tick is spent learning that action finished, executing nothing,
+        #     exactly as section 3 spends it when no decision intervenes. The
+        #     loaded plan's first microaction runs next tick. current_action
+        #     still names the action being acknowledged, as it would there.
+        # ------------------------------------------------------------------
+        if self._ack_pending:
+            self._ack_pending = False
+            self.current_microaction = None
+            return
 
         # ------------------------------------------------------------------
         # 2. Get current action
@@ -421,7 +448,7 @@ class Executor:
     # Plan management helpers
     # =========================================================================
 
-    def continue_plan(self, plan: AbstractPlan):
+    def continue_plan(self, plan: AbstractPlan, world: WorldState):
         """
         Adopt `plan` as the fresh decomposition of the task ALREADY executing
         (a continue decision, TODO-43): re-decomposition stays, execution
@@ -431,11 +458,20 @@ class Executor:
         have with no trigger, whether that is a step, the acknowledgement of
         an action the world already shows complete, or the next grasp. If it
         does not appear — the world moved and the decomposition genuinely
-        changed, e.g. task_committed after a pick_up selects a method with no
+        changed, e.g. the re-decision after a pick_up selects a method with no
         pick_up — the plan is loaded from its start as any new plan is; the
         world remains the cursor. Same-action is dataclass equality on the
         GroundedAction (name, bindings, completion predicate, schema), never
         object identity: the planner builds fresh objects every call.
+
+        On that second branch the action in flight may already be COMPLETE in
+        `world` — the ordinary case, the robot's grasp: the re-decision lands on
+        the tick this loop would have spent acknowledging the pick_up. The
+        acknowledgement is still owed, since the tick is the body's and not the
+        vanished action's: without it the body would spend one latency fewer
+        than the one it states to the projection (ACTION_COMPLETION_LATENCY,
+        T-B Q7). It is recorded here and spent by step(), or by the decision's
+        hold. `world` is read for that one question, exactly as step() reads it.
         """
         if self.current_plan is None or self.action_index >= len(self.current_plan.actions):
             self._load_plan(plan)
@@ -443,7 +479,9 @@ class Executor:
         in_flight = self.current_plan.actions[self.action_index]
         index = next((i for i, a in enumerate(plan.actions) if a == in_flight), None)
         if index is None:
+            owed = self._is_action_complete(in_flight, world)
             self._load_plan(plan)
+            self._ack_pending = owed
             return
         logging.info(f"[executor] continue_plan: {self.agent.unique_id} goal={plan.goal_intention} "
                      f"actions={len(plan.actions)} action_index {self.action_index}->{index} "
@@ -466,6 +504,16 @@ class Executor:
         """
         if self._hold_remaining > 0:
             self._log_hold_end(interrupted_by=trigger)
+        if ticks > 0:
+            # A hold and an owed acknowledgement (continue_plan(), T-B Q7) are
+            # ONE standing tick, not two: the body learns the action finished
+            # while the robot stands where the decision found it, so the hold's
+            # first tick is that acknowledgement. The plan then resumes at
+            # decision + delta — where realization put it — instead of a tick
+            # later. With delta == 0 there is no hold to carry it and the
+            # acknowledgement is spent on its own, which is the one tick by
+            # which execution then trails that decision's own projection.
+            self._ack_pending = False
         self._hold_remaining = ticks
         self._hold_planned = ticks
         self._hold_executed = 0
@@ -566,6 +614,9 @@ class Executor:
         self.microaction_queue = []
         self.current_task = plan.goal_intention
         self._queue_was_exhausted = False
+        # A plan loaded from its start owes nothing; continue_plan() records an
+        # owed acknowledgement after this call, never before it.
+        self._ack_pending = False
 
     def _advance_action(self):
         """Move to next action in plan."""
@@ -594,6 +645,7 @@ class Executor:
         self.current_plan = None
         self.action_index = 0
         self.microaction_queue = []
+        self._ack_pending = False
         self.current_task = None
         self.current_action = None
         self.current_microaction = None
