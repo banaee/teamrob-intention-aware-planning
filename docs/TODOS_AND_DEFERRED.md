@@ -1474,6 +1474,12 @@ Prerequisites:
     test needs. The designations are Hadi's to decide per scenario, not to be left to follow from the
     layout. design_decisions.md, "An item's destination table is a fact of the station" (the fact is the
     station's; which station is a design choice).
+    WHAT THIS SCOPES T-B3a TO. T-B's ordering result rests on a SINGLE against-proximity item in each
+    layout (item_4 in env_layout8, item_1 in env_layout9), so any claim drawn from T-B3a is scoped to that
+    fixture: it shows that ordering matters WHEN AN ITEM IS DESIGNATED AWAY FROM ITS NEAREST TABLE, not
+    that reordering helps in general on a two-table station. An evaluation scenario meant to support the
+    general claim needs SEVERAL against-proximity designations, or a geometry in which proximity does not
+    order the tables cleanly. `analysis/tb1b_two_tables/README.md`, "What this fixture does not settle".
 (f) B3.B (`full_reorder`, not in 4C): a future fixture needs SEVERAL remaining robot tasks whose ORDER, not
     only the next choice, changes cost under a human stay. Not built; every current fixture leaves the robot
     at most one alternative at the stay.

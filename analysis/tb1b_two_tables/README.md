@@ -69,6 +69,14 @@ robot shuttles between the same two endpoints and only the order of interchangea
 layouts settle the choice of head; neither settles the tail, and a geometry that settled it would have to be
 designed for that question.
 
+**What it does not settle either: the generality of the ordering result.** It rests on a single
+against-proximity item in each layout — item_4 in env_layout8 (designated 64.9 ticks farther than its nearer
+table), item_1 in env_layout9 (26.8) — since 5 of 6 items in each go to the table nearest their shelf. A
+claim drawn from T-B3a is therefore scoped to this fixture: it shows that ordering matters when an item is
+designated away from its nearest table, NOT that reordering helps in general on a two-table station. A
+scenario built to support the general claim needs several against-proximity designations, or a geometry in
+which proximity does not order the tables cleanly. TODOS_AND_DEFERRED.md, TODO-47 (f-designations).
+
 **env_layout9, the realistic variant (not a fixture).** Both of layout8's tables stand in open floor; in
 env_layout9 they stand against opposite walls (kitting_table_0 north at (−500, 450), kitting_table_1 south at
 (500, −450)), which was chosen over both-on-the-north-wall because it separates the tables more (67.3 against
