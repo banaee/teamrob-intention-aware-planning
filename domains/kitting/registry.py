@@ -8,7 +8,7 @@ Called once at startup by KnowledgeBase via sim_model.py.
 from shared.types import DomainModel
 from domains.kitting.actions import move_to, pick_up, place, wait_at
 from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
-from domains.kitting.scenarios import scenario_00, scenario_10, scenario_20, scenario_21, scenario_30, scenario_40, scenario_50, scenario_70, scenario_71, scenario_08
+from domains.kitting.scenarios import scenario_00, scenario_10, scenario_20, scenario_21, scenario_30, scenario_40, scenario_50, scenario_70, scenario_71, scenario_80, scenario_81, scenario_82
 
 def register_kitting_domain() -> DomainModel:
     return DomainModel(
@@ -82,12 +82,10 @@ domain_config = {
         "env_layout8": {
             "path":      "domains/kitting/env_layout8.json",
             "scenarios": {
-                "scenario_08": scenario_08,   # for viewing the layout; the fixtures are generated (below)
+                "scenario_80": scenario_80,
+                "scenario_81": scenario_81,
+                "scenario_82": scenario_82,   # for viewing the layout; not a fixture
             },
         },
     },
 }
-
-# Generated fixtures register themselves (fixture_generation.py, TODO-47 (a)).
-from domains.kitting.fixture_two_tables import register as _register_two_tables
-_register_two_tables(domain_config)

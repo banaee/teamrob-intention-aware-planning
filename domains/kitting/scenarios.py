@@ -476,14 +476,94 @@ scenario_71 = ScenarioConfig(
 
 
 # ===============================================================
-# manually defined scenario, for only "env_layout8".
-# scenario_08 is for VIEWING env_layout8 (the Solara viewer), one task each:
-# it is not a fixture, nothing is measured from it, and T-B does not use it.
-# The measured fixtures on this layout, scenario_80 / scenario_81, are
-# generated in domains/kitting/fixture_two_tables.py, not written here.
+# manually defined scenarios, for only "env_layout8" (two kitting tables; T-B1b).
+# scenario_80 / scenario_81 are the two-table fixture for B3.B: the cost
+# argument and the baselines are in analysis/tb1b_two_tables/README.md.
+# The robot's pool: item_6 and item_1 (short, beside kitting_table_0), item_4
+# (far east, to kitting_table_0), item_7 (near the robot's start, to
+# kitting_table_1). From the robot's start the cheapest single task is item_6,
+# but the cheapest full ordering starts with item_7.
 # ===============================================================
-scenario_08 = ScenarioConfig(
-    id="scenario_08",
+scenario_80 = ScenarioConfig(
+    id="scenario_80",
+    name="layout8_two_tables_plain_order",
+    description=(
+        "Two tables, ordering isolated: the robot's cheapest first task (item_6) is not the head of its "
+        "cheapest full ordering (item_7 first). The human works the north shelves, uses both tables and "
+        "stays clear of the robot's paths."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-600, 400),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-100, -400),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_1"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+scenario_81 = ScenarioConfig(
+    id="scenario_81",
+    name="layout8_two_tables_conflict_past_head",
+    description=(
+        "scenario_80 with the human starting further from item_0: its first task spans the robot's two "
+        "short tasks and ends at kitting_table_0 as the second of them does, so the conflict falls in the "
+        "second task of the ordering (item_6, item_1), not in its head."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-300, 200),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-100, -400),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_1"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+# scenario_82 is for VIEWING env_layout8 (the Solara viewer), one task each:
+# it is not a fixture, nothing is measured from it, and T-B does not use it.
+scenario_82 = ScenarioConfig(
+    id="scenario_82",
     name="layout8_view",
     description=(
         "Minimal scenario for opening env_layout8 in the viewer: one robot task and one human task. "
