@@ -91,8 +91,9 @@ STRATEGY (DESIGN-16):
     queue carries none under either (see "TASK POOL vs. CANDIDATES" above).
         "single_task" (default, IMPLEMENTED) — receding-horizon selection.
             Score each candidate alone (a length-1 ordering, projected from
-            the live WorldState); the argmin feasible candidate becomes the
-            new current_task; the rest of the queue is left as an unordered
+            the live WorldState); the argmin becomes the new current_task —
+            every candidate has a cost and none is excluded, since F1 made
+            realization total. The rest of the queue is left as an unordered
             pool with no ordering commitment.
         "full_reorder" (B3.B; NOT IMPLEMENTED, DESIGNED, the next build) —
             each ordering of the pool is a candidate: projected as ONE
@@ -100,9 +101,9 @@ STRATEGY (DESIGN-16):
             then entry 2's from where entry 1 ended, ...) and realized against
             the ONE human projection inside [trigger, T_h]; the argmin
             ordering's HEAD becomes the new current_task. The ordering past
-            the head is a LOOKAHEAD for that choice, re-priced at the robot's
-            next boundary
-            (task_committed, no_current_task) — not an order commitment; the
+            the head is a LOOKAHEAD for that choice, re-priced at the next
+            ROBOT TRIGGER (task_committed, which passes through B2, or
+            no_current_task, which bypasses it) — not an order commitment; the
             queue's order carries none, as under single_task. It exists for
             tasks coupled by geometry (two-table kitting: a task's end
             position depends on its table, so later walks depend on the
@@ -438,7 +439,7 @@ class MetaPlanner:
           - belief.most_likely is the recognizer's `unknown` (the projector is
             not called): mass on `unknown` above theta is not a recognition —
             the human is doing something outside the hypothesis space, is
-            between tasks, or is deviating — and there is no trajectory to
+            between tasks, or is deviating — and there is nothing to
             project. Reachable since the completion pin: a hypothesis retired
             by the robot's own delivery hands its mass to `unknown` (TODO-54),
           - the hypothesis cannot be resolved (project_human() returned None).

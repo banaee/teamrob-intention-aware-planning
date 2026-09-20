@@ -211,8 +211,8 @@ def shift_violation_interval(
     violates at a moment when it is moving, the distance to the human is
     strictly below `min_separation`, and the distance is not strictly
     increasing — this covers both (a) the robot's motion taking the distance
-    from at least min_separation to below it (the instant after the
-    crossing) and (b) the robot moving while within min_separation without
+    from at least min_separation to below it (the instant after it falls
+    below) and (b) the robot moving while within min_separation without
     the distance increasing. Standing still is never a violation, whatever
     the human does; moving so that the distance strictly increases is never
     a violation. A robot segment of zero velocity (a hold, a grasp, a latency)

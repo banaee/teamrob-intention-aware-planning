@@ -2,7 +2,8 @@
 shared/realization.py
 
 PURPOSE:
-    Realization: what a projected trajectory actually is, given the human.
+    Realization: what the segments of a ProjectedPlan actually become, given
+    the human.
     realize() takes a robot ProjectedPlan and the human's, and computes the
     hold the robot must take so that its plan keeps `min_separation` from the
     human's projected plan. The realized duration — walking plus the hold — is
@@ -13,8 +14,8 @@ PURPOSE:
 
     Hold-only, whole-trajectory minimal shift (R1, TODO-70): ONE hold δ at the
     robot's position at the decision step, then the whole plan shifted by δ.
-    δ is the smallest WHOLE-TICK shift ≥ 0 such that the shifted trajectory
-    has no violation within the assessed window (T3b: the hold is executed as
+    δ is the smallest WHOLE-TICK shift ≥ 0 such that the shifted segments
+    have no violation within the assessed window (T3b: the hold is executed as
     whole ticks, so the plan that is checked and costed is the plan that is
     executed; see design_decisions.md, "Realization as built").
 
@@ -39,11 +40,11 @@ LAYERING (design_decisions.md, "The robot can wait"; one-way, no cycles):
 
     trajectory_algorithms.py   pure geometry   segments in -> violating shifts out
             |
-    realization.py             realize()       "what would this trajectory be, given the human?"
+    realization.py             realize()       "what would these segments become, given the human?"
             |
-    projection.py              Projector       task + world -> predicted trajectory
+    projection.py              Projector       task + world -> a ProjectedPlan's segments
             |
-    meta_planner.py            MetaPlanner     which trajectory to pick
+    meta_planner.py            MetaPlanner     which candidate to pick
 
     This module reads ProjectedPlans and Segments and nothing else: it knows
     nothing of tasks, beliefs, or selection, and holds no simulator constant.
@@ -123,7 +124,7 @@ def realize(
     never decreases, so an interval already passed cannot contain a later δ.
     Exact bad-shift intervals rather than a search over δ with a per-δ
     check, because the feasible set in δ is not monotone (a shift can clear
-    one crossing and run into the next): no bisection is valid, and for the
+    one violation and run into the next): no bisection is valid, and for the
     same reason the whole-tick δ is NOT the fractional minimal shift rounded
     up — rounding up can land in a second interval; the search continues past
     it. Whole ticks (T3b, decided from the design, not the data): the hold
@@ -135,7 +136,7 @@ def realize(
     quantises per walk (ceil per walk, L2: deliberately not compensated),
     and rounding the total would be a second quantisation that models
     nothing and can only turn an order into a tie. cost = T_r + δ is then
-    ONE quantity — the projected duration of the realized trajectory, its
+    ONE quantity — the projected duration of the RealizedPlan's segments, its
     hold in whole ticks because the hold is executed as ticks — and the
     plain cost a caller compares it with (no projection) must be the same
     T_r, `projected_duration`, not ProjectedPlan's integer-rounded

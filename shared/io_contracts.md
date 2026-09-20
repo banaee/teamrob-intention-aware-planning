@@ -5,7 +5,9 @@ Implementation details (Bayes, HTN search, etc.) are intentionally omitted.
 All simulators (Mesa, ROS) must translate their internal data into these canonical forms.
 
 Terms are used with the one meaning `docs/glossary.md` gives them (task, pool, ordering, candidate,
-entry, segment, shift, hold, walk, ...); this document is one of the places that glossary points at.
+entry, segment, shift, conflict, hold, walk, ...); this document is one of the places that glossary
+points at. "Trajectory" appears only in the name of the R1 policy, the whole-trajectory minimal
+shift, and in the module name `trajectory_algorithms.py`.
 
 **Last aligned September 2026** against `shared/types.py`, `shared/planner.py`,
 `shared/domain_knowledge.py`, `shared/recognizer.py`, `shared/meta_planner.py`, and
@@ -438,8 +440,10 @@ whole strings (§2.1, the prior's matching).
 ### 1.11 `RealizedPlan` (T3)
 
 **Produced by `realize()` (§2.2c); consumed by `MetaPlanner` (T4's B2, T10's B3).** What a
-candidate's trajectory actually is, given the human: the hold-only realization under the
+candidate's segments actually become, given the human: the hold-only realization under the
 whole-trajectory minimal shift (design_decisions.md, "The robot can wait", the R1 decisions).
+A candidate has a CONFLICT when the shift its entry inherits — 0 with one entry — lies inside one of
+that entry's violating shift intervals, i.e. here exactly when `delta > 0`.
 
 ```python
 @dataclass
@@ -480,9 +484,10 @@ there is no `realizable` flag and no unrealizable reason. The former `realizable
   margin) or leave the executed plan unchecked (up). T_r STAYS FRACTIONAL: it is the projection's
   continuous duration; execution quantises per walk and that is deliberately not compensated (L2);
   rounding the total would model nothing and could only turn an order into a tie. `cost` is one
-  quantity — the projected duration of the realized trajectory. CONSEQUENCE FOR T10: the plain cost
-  `update()` compares in the no-projection path and the all-unrealizable fallback must be the same
-  T_r, `projected_duration`, not `ProjectedPlan.total_estimated_cost` (its integer rounding).
+  quantity — the projected duration of the `RealizedPlan`'s segments. CONSEQUENCE FOR T10: the plain
+  cost `update()` compares in the no-projection path must be the same T_r, `projected_duration`, not
+  `ProjectedPlan.total_estimated_cost` (its integer rounding). (It also had to match the
+  all-unrealizable fallback, which F1 removed.)
 - The steps before the human projection's span (the observation offset, L2) are unassessed and NOT
   in `unassessed_share`, which counts the tail beyond T_h only (T3b ruling).
 - A violation is strict: a single instant at exactly `min_separation` is not one (T3b ruling).
@@ -617,7 +622,7 @@ public methods below and the read-only parameter properties (`theta`, `rho`, `mi
 `gate_strategy`, `cost_strategy`; for the run-log header, TODO-78) are cross-boundary surface.
 Projection (`project`, `build_segments`, `estimate_duration`) lives on `Projector`
 (`shared/projection.py`), which is injected. Realization (`realize()`, §2.2c) lives on the
-projection / trajectory side as well, not on `MetaPlanner`, which supplies `min_separation` and
+projection side as well, not on `MetaPlanner`, which supplies `min_separation` and
 consumes the `RealizedPlan` — once per candidate in B3 (T10) and once for the current task in B2
 `b2a` (T4).
 
@@ -799,15 +804,15 @@ DESIGN-16, terminology; docs/glossary.md). `self._strategy` selects which of the
 is inside B3; neither strategy commits to an order:
 
 - `single_task` (default, implemented) — each candidate is projected alone from the live
-  `WorldState` and realized; the argmin of realized cost over the realizable candidates becomes
-  the new `current_task`. The rest of the queue carries no ordering commitment; it is re-decided
-  at the next trigger.
+  `WorldState` and realized; the argmin of realized cost becomes the new `current_task` — every
+  candidate carries a cost and none is excluded, since F1 made realization total. The rest of the
+  queue carries no ordering commitment; it is re-decided at the next trigger.
 - `full_reorder` (B3.B; not implemented, designed, the next build) — each ordering of the pool is
   a candidate, projected as one chained `ProjectedPlan` (one entry per task, in the ordering's
   order) and realized against the one human projection inside [trigger, T_h]; the argmin ordering's
-  head becomes `current_task`. The ordering past the head is a lookahead for that choice, re-priced
-  at the robot's next boundary, not an order commitment (this supersedes "replace the whole
-  queue"). Needs the chained robot state in
+  head becomes `current_task`. The tail is a lookahead for that choice, re-priced at the next ROBOT
+  TRIGGER (`task_committed`, which passes through B2, or `no_current_task`, which bypasses it), not
+  an order commitment (this supersedes "replace the whole queue"). Needs the chained robot state in
   `Projector.project()` (the part of TODO-07 that applies: retraction and object relocation in a
   hypothetical successor state); DESIGN-12 does not apply. Open: where a later task's hold is
   placed, and what B2 commits to. design_decisions.md, "B3.B (`full_reorder`) is lookahead for the
@@ -848,7 +853,7 @@ Returns `None`, checked in this order, when:
   triggering (DESIGN-07); it still never feeds `_cost()`.
 - `human_agent_id is None` — no human observed.
 - `belief.most_likely` is the recognizer's `unknown` (T8) — the projector is not called. Mass
-  on `unknown` above θ is not a recognition and there is no trajectory to project. Reachable
+  on `unknown` above θ is not a recognition and there is nothing to project. Reachable
   since the completion pin: a hypothesis retired by the robot's own delivery hands its mass to
   `unknown` (TODO-54). The trigger still fires on it (TODO-68).
 - the hypothesis is unresolvable — `Projector.project_human()` returned `None` (its task name
@@ -890,8 +895,8 @@ non-linear, obstacle-aware realization (Phase 4D). Note it may require `Segment`
 grow (e.g. a waypoint list), since a non-linear path is not captured by a start/end pair.
 
 **Realization's geometry (BUILT, T3; redefined F1)** — realization asks this family a different
-question from "where do two fixed trajectories come close": for which SHIFTS of a robot segment is
-there a violation against a human segment. Closed form; no sampling.
+question from "where do two fixed sets of segments come close": for which SHIFTS of a robot segment
+is there a violation against a human segment. Closed form; no sampling.
 ```python
 shift_violation_interval(robot_segment, human_segment, min_separation) -> Optional[Tuple[float, float]]
 ```
@@ -942,13 +947,13 @@ realize(
 **Policy (R1, TODO-70; the violation redefined at F1): the whole-trajectory minimal shift.** One hold
 δ at the robot's position at `decision_step` (the plan's first segment's start, which may be partway
 along a walk), then the whole plan shifted by δ. δ is the smallest shift ≥ 0 such that the shifted
-trajectory has no violation in the assessed window, IN WHOLE TICKS (T3b) — a violation being the
+segments have no violation in the assessed window, IN WHOLE TICKS (T3b) — a violation being the
 robot's motion within `min_separation` without the distance increasing (§2.2b), so the stationary
 hold is never one. Exact: the MINIMAL-SHIFT SEARCH takes the violating shift intervals
 (`shift_violation_interval`, one per MOVING robot segment × human segment pair) in order of their
 start; δ starts at 0 and, whenever an interval strictly contains it, jumps to the first whole tick
 at or after that interval's end. No bisection, no grid: the feasible set in δ is not monotone (a
-shift can clear one crossing and run into the next), so bisection would be invalid, a grid would
+shift can clear one violation and run into the next), so bisection would be invalid, a grid would
 make δ sampled, and the whole-tick δ is not simply the fractional minimum rounded up.
 
 **The assessed window** is where both projections exist and the realized plan lies within
@@ -976,9 +981,9 @@ violating interval is bounded, so a clearing δ always exists: `realize()` is to
 (`analysis/t1b_realization/realize.py`, a 0.01-tick grid over the same shift, fractional δ) at 50 cm
 on eight conditions (scenario_00/10/20/30, prior off and on): 94 of 94 admitted candidate rows agree
 on realizability; 82 are identical and 12 differ only by the whole-tick rounding (each the ceil of
-the fractional δ); every realized trajectory is clear by T1b's closed form and by dense sampling,
+the fractional δ); every realized plan's segments are clear by T1b's closed form and by dense sampling,
 hold included. **Re-validated under F1 (`analysis/f1_robot_responsible/validate.py`)** on the same
-eight conditions: 101 admitted candidate rows, every realized trajectory sampled at 0.001 tick has no
+eight conditions: 101 admitted candidate rows, every realized plan's segments sampled at 0.001 tick have no
 rule (a) or (b) violation in its assessed window, every held row's δ − 1 violates (minimal), and F1's
 δ never exceeds the T10 realizer's on the same inputs (its violating set is a subset).
 

@@ -2,7 +2,7 @@
 shared/projection.py
 
 PURPOSE:
-    Turns a task into a predicted trajectory. Given a TaskInstance, an agent, and a
+    Turns a task into a predicted plan. Given a TaskInstance, an agent, and a
     WorldState, produces a ProjectedPlan: the decomposed AbstractPlan plus per-action
     Segments describing where that agent will be, and when.
 
@@ -13,7 +13,7 @@ PURPOSE:
 WHY THIS IS ITS OWN MODULE:
     Projection was originally private to MetaPlanner (_project, _build_segments,
     _estimate_duration, plus inline human-projection code in update()). But turning a
-    task into a trajectory is not selection logic — MetaPlanner merely consumes it.
+    task into a ProjectedPlan is not selection logic — MetaPlanner merely consumes it.
     Several consumers want projection without wanting selection:
       - realization (Phase 4C wait-decision revision; design_decisions.md, "The
         robot can wait"): shared/realization.py's realize(plan, human_plan,
@@ -29,11 +29,11 @@ WHY THIS IS ITS OWN MODULE:
 LAYERING (one-way, no cycles; design_decisions.md, "The robot can wait"):
     trajectory_algorithms.py   pure geometry   segments in -> violating shifts / conflicts out
             |
-    realization.py (hold-only) "what would this trajectory actually be, given the human?"
+    realization.py (hold-only) "what would these segments actually become, given the human?"
             |
-    projection.py              Projector       task + world -> predicted trajectory
+    projection.py              Projector       task + world -> a ProjectedPlan's segments
             |
-    meta_planner.py            MetaPlanner     which trajectory to pick
+    meta_planner.py            MetaPlanner     which candidate to pick
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT decide which task to do (meta_planner.py)
@@ -291,7 +291,7 @@ class Projector:
         recognizer: IntentionRecognizer,
     ) -> Optional[ProjectedPlan]:
         """
-        Builds the human's predicted trajectory from the current belief.
+        Builds the human's predicted plan from the current belief.
 
         Resolves belief.most_likely back to its HypothesisKey via
         recognizer.get_hypothesis(), rebuilds it as a TaskInstance, and projects it
@@ -299,7 +299,7 @@ class Projector:
         there is no separate human projection path.
 
         Called once per fired cognitive-clock trigger — not per tick, and not per
-        candidate. The human's predicted trajectory is a fact about the world at
+        candidate. The human's predicted plan is a fact about the world at
         this event, independent of which robot task is being evaluated.
 
         Returns None in three distinct cases, all normal rather than errors:
@@ -365,7 +365,7 @@ class Projector:
         reappears. Obstacle-aware, non-linear realization is DESIGN-13 / TODO-09
         (Phase 4D) — see trajectory_algorithms.obstacle_aware_path(). Holds
         against the human (Phase 4C realization) are placed AFTER this pass, on
-        the segments it returns; this builds the unheld trajectory only.
+        the segments it returns; this builds the unheld segments only.
 
         Every action, movement or not, is then followed by a stationary
         segment of `action_completion_latency` steps at the position it ended

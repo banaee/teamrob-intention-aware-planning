@@ -44,11 +44,19 @@ private business.
 COLLISION, not resolved: the older TODO entries use "candidate" as the ordinary adjective — "candidate
 fix", "candidate formulas", "candidate remedy". That is the English word, not the term.
 
-**head** / **tail** of an ordering — its first task, and everything after it. Under `full_reorder`
-the head becomes `current_task` and the tail is lookahead only: it carries no order commitment and
-is re-priced at the robot's next boundary.
+**head** — the first task of an ordering. Under `full_reorder` the head of the argmin ordering
+becomes `current_task`; that choice is what the ordering is priced for.
+
+**tail** — the tasks of an ordering after the head. Lookahead only: it carries no order commitment
+and is re-priced at the next robot trigger.
 → `docs/design_decisions.md`, "B3.B (`full_reorder`) is lookahead for the choice of the next task,
-built next", point 4. (Used in prose; not separately defined there.)
+built next", point 4.
+
+**queue** — the pool without the current task, as carried in `UpdateResult.queue`. Unordered: it
+carries no commitment under either strategy, and is re-decided at the next trigger.
+→ `shared/types.py`, `UpdateResult`; `shared/meta_planner.py`, `update()` ("queue invariant").
+NOTE: the field `ProjectedPlan.task_queue` is a different thing — the tasks of ONE projected
+ordering, in the ordering's order. The identifier is not renamed.
 
 **single_task** / **full_reorder** — B3's two strategies (B3.A and B3.B). `single_task` is the
 default and the implemented one; `full_reorder` is designed and is T-B's build.
@@ -62,8 +70,9 @@ commitment gate (`b2a` built, `b2b` a stub), B3 selection on realized cost.
 
 ## 2. Projection: what a plan looks like before the human is considered
 
-**projection** — turning a task, or an ordering, plus a `WorldState` into a predicted trajectory.
-Agent-agnostic: the same call projects a robot candidate and the human's predicted task.
+**projection** — turning a task, or an ordering, plus a `WorldState` into a `ProjectedPlan`: where
+the agent will be, and when. Agent-agnostic: the same call projects a robot candidate and the
+human's predicted task.
 → `shared/projection.py`, `Projector`.
 
 **entry** — one task's part of a `ProjectedPlan` (`ProjectedPlanEntry`). An ordering of n tasks is
@@ -77,12 +86,13 @@ read, write "the design entry" or "the plan's entry".
 
 **segment** — one `Segment` inside an entry: a straight-line motion, or a stationary stretch,
 between two steps. An entry has several segments — one per action, plus the completion latencies.
-Do not call a segment a "leg" or a "stretch of evidence"; those are the recognizer's.
+Do not call a segment a "stretch of evidence"; that is the recognizer's.
 → `shared/types.py`, `Segment`; `shared/io_contracts.md` §1.7.
-COLLISION, not resolved: scenario_40's human script is described as four numbered "segments" (1, 2,
-3a, 3b, 4) in `domains/kitting/env_layout4.json`, `domains/kitting/scenarios.py` and every I4 / F47
-report that cites them. That is a PART OF A SCRIPT, not a `Segment`. It was left alone because
-renaming it would make the record's "segment 3b" unreadable. New text says "script part".
+IN THE RECORD: scenario_40's human script was described as four numbered "segments" (1, 2, 3a, 3b,
+4). That is a SCRIPT PART, not a `Segment`. "Segment 3a" in `docs/design_decisions.md`,
+`docs/TODOS_AND_DEFERRED.md` and the I4 / F47 reports means script part 3a. The living files
+(`domains/kitting/env_layout4.json`, `domains/kitting/scenarios.py`,
+`docs/recognizer_handback.md`) say "script part"; the record is untouched.
 
 **walk** — an agent's movement, and nothing else: a "fetch walk", a "carry walk", "the human's walk
 to the coffee machine". It is NEVER used for a loop, a search, or an iteration in the code. Where
@@ -108,11 +118,11 @@ assessed or charged.
 
 ## 3. Realization: what a plan costs once the human is in it
 
-**realization** — what a projected trajectory actually is, given the human. It computes the hold the
-robot must take to keep `min_separation` from the human projection, and the realized duration
-T_r + δ is the candidate's cost. Conflict becomes cost by construction; there is no conflict weight
-and no exclusion threshold. Since F1 realization is TOTAL: every plan realizes and every candidate
-has a cost.
+**realization** — what the segments of a `ProjectedPlan` actually become, given the human. It
+computes the hold the robot must take to keep `min_separation` from the human projection, and the
+realized duration T_r + δ is the candidate's cost. Conflict becomes cost by construction; there is
+no conflict weight and no exclusion threshold. Since F1 realization is TOTAL: every plan realizes
+and every candidate has a cost.
 → `shared/realization.py`, `realize()`; `shared/io_contracts.md` §2.2c; `docs/design_decisions.md`,
 "The robot can wait".
 
@@ -127,20 +137,48 @@ distance increasing. One open interval, or none. Computed in closed form by
 segment has none: a standing robot never violates (F1).
 → `shared/trajectory_algorithms.py`, `shift_violation_interval()`; `shared/io_contracts.md` §2.2b.
 
+**conflict** — an entry has a conflict when the shift it INHERITS — 0 for the first entry, the
+cumulative shift of the previous entry otherwise — lies inside one of its violating shift intervals.
+"Its" intervals are those of its own segments against the human projection's segments. Conflict is
+not a separate cost term: it becomes cost because clearing it takes ticks. With one entry the
+inherited shift is 0, so the entry has a conflict exactly when δ > 0 — that is the check `realize()`
+performs today.
+→ `shared/realization.py`, `realize()`; `docs/design_decisions.md`, "The robot can wait".
+
+**cumulative shift of entry k** — the number of ticks by which entry k starts later than projected.
+
+**hold before entry k** — the cumulative shift of entry k minus the cumulative shift of entry k−1
+(entry 0's cumulative shift being 0): the ticks the robot stands still at the boundary before entry
+k. With ONE entry the two quantities are equal, which is why the glossary needed only one term for
+them; they become two because T-B Q2 decided ONE HOLD PER ENTRY, placed at the boundary before the
+entry it clears (to be built in T-B2c). Until then, `RealizedPlan.delta` carries the one hold of the
+one entry and is both.
+→ `docs/design_decisions.md`, "B3.B (`full_reorder`) is lookahead for the choice of the next task,
+built next" (the hold-placement question); `docs/roadmap.md`, T-B.
+
+**hold** — unqualified, the hold before the entry being spoken of. Where there is one entry that is
+δ, `RealizedPlan.delta`: whole ticks, taken at the robot's position at the decision step, executed
+as STAND ticks one per tick, logged as `[hold]`. There is no hold cap.
+→ `shared/io_contracts.md` §1.11; `mesa_sim/executor.py`, `hold()`.
+NOTE: a stationary `Segment` that is NOT a chosen shift — a grasp, a wait, a completion latency — is
+a "stationary stretch" or "stationary segment", not a hold.
+
+**whole-trajectory minimal shift** — the name of the R1 realization policy: the smallest whole-tick
+shift under which the plan has no violation in the assessed window, the robot standing still until
+it. Since T-B Q2 the policy is applied PER ENTRY (one hold before each entry) rather than once over
+the whole plan; the name is kept for the policy. This is the one permitted use of the word
+"trajectory" — see "Not in this glossary".
+→ `docs/design_decisions.md`, "The robot can wait" (the R1 decisions), "Realization as built".
+
 **minimal-shift search** — given a set of violating shift intervals and a lower bound b, the
 smallest whole tick ≥ b that lies inside none of them. It is the loop inside `realize()` today, with
 b = 0: δ starts at 0 and, whenever an interval strictly contains it, jumps to the first whole tick
 at or after that interval's end, the intervals taken in order of their start. Not a bisection and
 not a grid — feasibility in the shift is not monotone, so the whole-tick answer is NOT the
-fractional minimum rounded up. The repo had no name for this; this one is new.
+fractional minimum rounded up. Per entry (T-B Q2) b is the shift the entry inherits, not 0. The repo
+had no name for this; this one is new.
 → `shared/realization.py`, `realize()`; `shared/io_contracts.md` §2.2c.
 
-**hold** — the shift that was chosen, as a number of ticks in which the robot stands still (δ,
-`RealizedPlan.delta`). It is taken at the robot's position at the decision step, it is executed as
-STAND ticks one per tick, and it is logged as `[hold]`. There is no hold cap.
-→ `shared/io_contracts.md` §1.11; `mesa_sim/executor.py`, `hold()`.
-NOTE: a stationary `Segment` that is NOT a chosen shift — a grasp, a wait, a completion latency — is
-a "stationary stretch" or "stationary segment", not a hold.
 
 **assessed window** — the steps at which both the realized plan and the human projection exist:
 [decision step, T_h] intersected with the human projection's span and the realized plan's. Nothing
@@ -177,9 +215,19 @@ refusal that decides nothing.
 against. `recognition_changed` is read against it from both sides.
 → `shared/meta_planner.py`, `_projected_hypothesis`; `shared/io_contracts.md` §2.2.
 
-**boundary** (robot) — a tick at which the robot re-decides freely: `task_committed` or
-`no_current_task`. Distinct from the recognizer's **episode boundary** below; the two are unrelated.
-(Used in prose; not separately defined.)
+**crossing** — a θ crossing, and nothing else: the tick a hypothesis's normalised share first clears
+the gate. For paths the word is **violation** (§3); for two paths meeting in space, say that they
+intersect.
+→ `shared/meta_planner.py`, `_clears_gate()`; `docs/recognizer_handback.md` §3.
+
+**robot trigger** — a trigger raised by the ROBOT's own progress: `task_committed` or
+`no_current_task`. It replaces "the robot's boundary" everywhere in the living documents, so that
+**boundary** keeps one meaning, the recognizer's episode boundary (§5).
+The two are not interchangeable: `no_current_task` goes to B3 through B1.5 and BYPASSES the B2 gate,
+while `task_committed` goes THROUGH B2, which may keep the current task and never reach B3. A
+sentence about re-pricing therefore names the trigger it means, never "the next robot trigger" as if
+both re-priced alike.
+→ `shared/meta_planner.py`, `evaluate_triggers()` and `update()` block B1.5.
 
 ---
 
@@ -194,11 +242,6 @@ yet retired, plus `unknown`.
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
 `Segment` and not a walk: a walk may be cut into several stretches by phase changes.
 → `docs/recognizer_handback.md` §1.4.
-
-**leg** — the recognizer's older word for a human walk, still used in prose for a scripted walk of
-the human's script ("the two AC-switch legs"). The leg MODEL — one global movement leg for all
-hypotheses, closed by stillness — was removed and must not return; the unit is the stretch.
-→ `CLAUDE.md`, "Conventions and terminology"; `docs/recognizer_handback.md` §8.
 
 **graded evidence** — a stretch's evidence against `unknown` is graded by f, the share of the
 hypothesis's expected path the stretch covered: `unknown`'s likelihood for the stretch is u^f. A
@@ -271,5 +314,13 @@ in the repository, which builds and checks; older reports call it Fable.
 
 ## Not in this glossary
 
-**trajectory** is used throughout (`realization.py`, `projection.py`, `io_contracts.md`) and is
-defined nowhere. It is not given a meaning here, because inventing one is a design act.
+**trajectory** has no definition and gets none: inventing one is a design act. In the living
+documents and comments it is replaced by what is actually meant — "the segments of a
+`ProjectedPlan`" or "the segments of a `RealizedPlan`". The ONE permitted use is the name of the R1
+policy, **the whole-trajectory minimal shift** (§3). The module name `trajectory_algorithms.py` is
+an identifier and is not renamed, and the removed "cosine trajectory kernel" keeps its name in the
+record because that is what was removed (`docs/recognizer_handback.md` §8).
+
+**leg** has no definition and is not used. The recognizer has no leg concept — the leg model was
+removed and must not return (`docs/recognizer_handback.md` §8), and its unit is the **stretch**. A
+human's movement is a **walk**.

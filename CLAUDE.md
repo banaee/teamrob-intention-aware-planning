@@ -74,7 +74,8 @@ Decisions
   (`MetaPlanner._clears_gate`). Do not weld comparisons against θ into other call sites.
 - Conflict with the human becomes cost by construction: a conflicted task costs more because
   avoiding the human takes longer. No conflict weight, no exclusion threshold to tune.
-  Realization lives in the projection/trajectory layer; trajectory algorithms hold no policy.
+  Realization lives on the projection side; the geometry in `shared/trajectory_algorithms.py`
+  holds no policy.
 
 ## Current phase and status (affects what you may touch)
 
@@ -187,11 +188,11 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 | fixture | layout | note |
 |---|---|---|
-| scenario_00 | env_layout0 | crossing and table convergence |
+| scenario_00 | env_layout0 | intersecting paths and table convergence |
 | scenario_10 | env_layout1 | coffee break and AC activation; needs about 450 steps |
 | scenario_20 | env_layout2 | table convergence; does not finish in 200 steps |
-| scenario_30 | env_layout3 | mirror-symmetric crossing |
-| scenario_40 | env_layout4 | foreseeable task and two AC-switch legs (retyped F47b) |
+| scenario_30 | env_layout3 | mirror-symmetric intersecting paths |
+| scenario_40 | env_layout4 | foreseeable task and two AC-switch walks (retyped F47b) |
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
 `analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are T-B1a
@@ -255,9 +256,15 @@ Completion is measured from the world fact (T6): the tick after the robot's last
   the repository, which builds and checks; older reports call it Fable.
 - Segment: one straight-line motion, or one stationary stretch, of one robot or human action in a
   projection. Entry: one task's part of a projected plan, with several segments. Stretch: the
-  recognizer's unit of movement evidence. Leg: the recognizer's older word for a human walk. Do not
-  mix them.
-- Hold: the shift that was chosen, as δ ticks in which the robot stands still. Walk: an agent's
+  recognizer's unit of movement evidence. Do not mix them. "Leg" is not used: a human's movement is
+  a walk.
+- Head: the first task of an ordering; tail: the rest of it, lookahead only. Queue: the pool without
+  the current task (`UpdateResult.queue`), unordered.
+- Conflict: an entry's inherited shift lies inside one of its violating shift intervals. Crossing:
+  a θ crossing only; for paths the word is violation. Robot trigger: `task_committed` or
+  `no_current_task` (they differ — `no_current_task` bypasses B2).
+- Hold: with one entry, the shift that was chosen, δ ticks in which the robot stands still; per
+  entry since T-B Q2, the cumulative shift of entry k minus that of entry k−1. Walk: an agent's
   movement, never a loop or a search in the code (the loop in `realize()` is the minimal-shift
   search). T_r: a projected plan's duration. T_h: the end of
   the human's projection. `min_separation`: the distance realization must keep between agents.

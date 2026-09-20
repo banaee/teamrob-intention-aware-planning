@@ -624,7 +624,7 @@ class RealizedPlan:
     """
     Output of shared/realization.realize() for one robot ProjectedPlan against
     the human's (T3; design_decisions.md, "The robot can wait"). What a
-    candidate's trajectory actually is, given the human: the hold-only
+    candidate's segments actually become, given the human: the hold-only
     realization under the whole-trajectory minimal shift — one hold δ at the
     robot's position at the decision step, then the projected plan run
     unchanged, shifted by δ. Realization prices conflict as duration: a
@@ -645,13 +645,13 @@ class RealizedPlan:
                        steps — the projection's continuous duration; execution
                        quantises per walk and that is deliberately not
                        compensated, L2). One quantity: the projected duration
-                       of the realized trajectory. A caller comparing it with
+                       of the RealizedPlan's segments. A caller comparing it with
                        a plain cost must use the same T_r —
                        `projected_duration`, not ProjectedPlan's integer
                        `total_estimated_cost`. The tail beyond T_h is inside
                        T_r and is not corrected for (TODO-69, reading (1)).
     projected_duration: T_r.
-    segments:          the realized trajectory, head-to-tail: the stationary
+    segments:          the realized plan's segments, head-to-tail: the stationary
                        hold at `hold_position` from `hold_start` to the shifted
                        plan's start (present only when that stretch has
                        positive duration), then every projected segment shifted
