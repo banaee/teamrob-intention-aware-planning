@@ -132,3 +132,16 @@ B3.B's chosen head against this table, so it is a tool and not a throwaway.
 | s80_on | cb44b42525e1326ef4c85a2c53ad20f7 |
 | s81_off | 6ee3d48444a72085fb85de60b08cc356 |
 | s81_on | e701876c57a54f3c2e6c0109a7ed0d4b |
+
+### T-B2d (79fb0ee): the `[run]` header names the strategy — the baselines from here on
+
+Regenerated with the same command at 79fb0ee, superseding the table above. Each log differs from its
+predecessor in the `[run]` line alone (` strategy=single_task` added); see `analysis/tb1a_destination/README.md`,
+"T-B2d". `single_task` only: no `full_reorder` baselines before T-B2c.
+
+| log | md5 |
+|---|---|
+| s80_off | 13d435fa54388b1d44a5346d0e23244f |
+| s80_on | 826aca3708633e723e04fa7aaf95033d |
+| s81_off | 70654005c5d5678500f551646e14ef25 |
+| s81_on | be667aadf5717b5787d13d1188d81147 |

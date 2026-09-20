@@ -202,11 +202,13 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 | scenario_40 | env_layout4 | foreseeable task and two AC-switch walks (retyped F47b) |
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
-`analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are T-B1a
-follow-up 2's sweep, `analysis/tb1a_destination/sweep/` (the five plus s50 / s70 / s71, both priors,
-stop off; logs local, md5s in its README), which superseded the graded-evidence sweep
+`analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
+T-B2d regeneration in `analysis/tb1a_destination/sweep/` (the five plus s50 / s70 / s71, both priors,
+stop off, `single_task`; logs local, md5s in its README, the "T-B2d" section) and
+`analysis/tb1b_two_tables/sweep/` (s80 / s81). They differ from T-B1a follow-up 2's in the `[run]` line
+alone, which now names the strategy; follow-up 2's had superseded the graded-evidence sweep
 (`analysis/g1_graded_evidence/sweep/`; same world-level behaviour, hypothesis keys no longer carry the table,
-and the `[run]` header changed with T-A1's β commit). The
+and the `[run]` header changed with T-A1's β commit). No `full_reorder` baselines before T-B2c. The
 stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record baselines before changing code, then diff.
 
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):

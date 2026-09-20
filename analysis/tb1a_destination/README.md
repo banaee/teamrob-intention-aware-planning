@@ -70,3 +70,33 @@ fixture logs `matches no hypothesis`: the assigned tasks are admitted on the ite
 | s70_on | 8ff838519ebac10cb4c3ba831f696afe |
 | s71_off | a93dde2c804f95466829d2d288d98a0a |
 | s71_on | d0d26e17f469f28266158ecb00cf7893 |
+
+## T-B2d — THE BASELINES from here on (79fb0ee): the `[run]` header names the strategy
+
+`sweep/` now holds the sixteen logs regenerated at 79fb0ee (same command, `--strategy` left at its default,
+`single_task`), which supersede follow-up 2's above. T-B2d made B3's strategy a run option and named it in the
+`[run]` header, so that ONE line of every log changed: `[run] robot_0 strategy=single_task gate_strategy=...`.
+Nothing else did: each log differs from follow-up 2's in exactly that line, and removing ` strategy=single_task`
+from it restores follow-up 2's log byte for byte (all sixteen, and the four of `analysis/tb1b_two_tables/sweep/`).
+No `full_reorder` baselines are recorded before T-B2c: until then `full_reorder` with `cost_strategy realized`
+is a hybrid (design_decisions.md, "B3.B on plain cost: the internal queue stays in pool order, and until T-B2c
+`full_reorder` is a hybrid").
+
+| log | md5 |
+|---|---|
+| s00_off | 3230c5bd764e0523e76ceb665b21033e |
+| s00_on | 7edc128545d3b7e50f5463955687709a |
+| s10_off | b0f257001045c95325f2acd57059fa69 |
+| s10_on | 91cc5e87f10a8976f5d49770b9d508ba |
+| s20_off | 210126acefa694ae71e1aed74d9ba068 |
+| s20_on | ea8fa4b76f11a07c93316057bee22646 |
+| s30_off | 84136e8bc0423635aa1c2afcd5178ed2 |
+| s30_on | 821b00ecee2463bce05f9a39a8cb122e |
+| s40_off | 0bf2331b5e4a3c76a74c743957076c7e |
+| s40_on | e0cad83d301bd7c347b396ad6139f77e |
+| s50_off | 0002d7cc30a6da526682268554951f20 |
+| s50_on | 5ee070644ff8b57cd8921b1611bdbdeb |
+| s70_off | 1b51d98d7ab385f7f688e87bc5705601 |
+| s70_on | 2e08ec7003a293de14d1368a5919bcdb |
+| s71_off | 65b336a39b11e239caa99c93644ffcc9 |
+| s71_on | 208d11f64e55323f0db0e099ba6d5042 |
