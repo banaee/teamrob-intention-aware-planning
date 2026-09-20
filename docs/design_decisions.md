@@ -2737,6 +2737,9 @@ Open points 1 and 2 above are settled at design time in T-B2 (the proposals: the
 before the task it clears; B2 commits to a task).
 The proposal of (b), (i) to (iii), is decided and built (T-B2a): see "The successor state is derived from what
 the action schemas declare: a delete list and a declared relocation".
+OPEN POINTS 1 AND 2 ARE DECIDED AND BUILT (T-B Q2, T-B Q3; T-B2c): see "One hold per entry: an ordering is realized
+by one minimal-shift search per entry, and B2 commits to the current task". The argument AGAINST (B) recorded
+above is carried there and stays unpriced.
 
 Files: docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md (TODO-07, DESIGN-12, DESIGN-16, TODO-47 (f)),
 docs/roadmap.md, shared/meta_planner.py (docstring), shared/projection.py (docstring),
@@ -3111,6 +3114,12 @@ next", (a) to (c); TODO-07
 
 **B3.B on plain cost: the internal queue stays in pool order, and until T-B2c `full_reorder` is a hybrid (T-B2b, T-B2d)**
 
+THE HYBRID ENDED AT T-B2C: orderings are now ranked on their realized cost and the hold sent is the hold before
+the first entry of the winning ordering ("One hold per entry", below). The paragraphs "PLAIN COST THROUGH THE
+EXISTING MECHANISM", "THE HOLD", "UNTIL T-B2C ..." and the `[meta-head]` line describe the state between T-B2b
+and T-B2c and are kept as the record of it (ruled: the entry stays, marked as ended). The queue ruling, the
+tie rule, the run option and `[meta-ord]` stand.
+
 DECIDED (cchat rulings on the T-B2b report, September 2026; built in T-B2b / T-B2d).
 
 WHAT IS BUILT. Under `--strategy full_reorder` (a strict run option, default `single_task`, named in the
@@ -3162,3 +3171,115 @@ mesa_sim/sim_model.py, mesa_sim/sim_agents.py (`[run]` header), configs/experime
 shared/io_contracts.md (§1.7, §2.2), docs/glossary.md, docs/roadmap.md, CLAUDE.md
 Reference: T-B2b, T-B2d, September 2026; "B3.B (`full_reorder`) is lookahead for the choice of the next task,
 built next"; T-B Q2, T-B Q3
+
+---
+
+**One hold per entry: an ordering is realized by one minimal-shift search per entry, and B2 commits to the current task (T-B Q2, T-B Q3; T-B2c)**
+
+DECIDED (cchat, September 2026: T-B Q2 and T-B Q3, the two open points of the B3.B entry; built in T-B2c). This
+completes B3.B and ends the hybrid of T-B2b.
+
+THE QUESTION (T-B Q2). B3.B prices an ordering against the ONE human projection inside [trigger, T_h], and a
+conflict can lie in a later entry, not in the first. Which realization defines the ordering's cost? Before
+T-B2c `realize()` pooled the violating shift intervals of every segment of every entry and ran one
+minimal-shift search, so ONE COMMON SHIFT was applied to all entries (option (A) of the B3.B entry).
+
+DECIDED: ONE MINIMAL-SHIFT SEARCH PER ENTRY (option (B)). In the plan's order, search k ranges over the
+violating shift intervals of entry k's own segments, with the cumulative shift of entry k−1 as its lower bound
+(0 for the first entry). Its result is the CUMULATIVE SHIFT of entry k; the HOLD before entry k is the
+difference of the two (docs/glossary.md keeps the terms apart, and `RealizedPlan` does: `cumulative_shifts`,
+`holds`). While it holds before entry k the robot stands where entry k−1 ended, at the decision position for
+the first entry; a standing robot never violates (F1; `shift_violation_interval` returns none for a stationary
+robot segment), so the stretch needs no check. The cost of a plan is the sum of its entries' T_r plus the
+cumulative shift of the last entry. Nothing past T_h is assessed or charged, and the unassessed share keeps its
+definition, on the realized end.
+
+WHY: WEAK DOMINANCE, which holds in general and is not drawn from a fixture. Under one common shift the shift
+must lie outside the violating intervals of EVERY entry, so a conflict in entry 3 delays entries 1 and 2 as
+well, and the shift can be pushed further by an interval of an earlier entry that entry 3's own conflict never
+needed. With one search per entry each entry is delayed only as far as it needs, given what it inherits. Entry
+k's violating intervals do not depend on the earlier shifts (its positions are unchanged; the human projection
+is fixed). By induction, with Δ_k the cumulative shift of entry k: Δ_k is the smallest whole tick ≥ Δ_{k−1}
+outside entry k's intervals; the common shift δ is a whole tick outside them too, and δ ≥ Δ_{k−1} by the
+induction hypothesis, so Δ_k ≤ δ. For every entry the cumulative shift is no larger than the common shift, and
+the ordering's cost is never higher.
+
+THE RELATION TO R1. This is not the per-segment policy R1 rejected. Inside one entry nothing changes: every
+segment of the entry receives the same shift, the R1 whole-trajectory minimal shift, applied per entry (the
+glossary keeps the policy's name). The only new place for a hold is before the first segment of an entry,
+which is a segment boundary where the robot already stands still (the task-completion latency ends there):
+not a detour (4D) and not partway along a segment (TODO-70). A plan of ONE entry is one search with lower
+bound 0, so `single_task` and B2 `b2a`, which pass one entry, read exactly what they read before: an identity,
+and the 20 baselines are byte-identical.
+
+THE ARGUMENT AGAINST, recorded and not answered by this decision. The boundary at which a later hold is taken
+is where the previous entry ended: at a table, where the human converges. A standing robot never violates (F1),
+but it may be in the human's way there more than at the decision position. That is the team-level cost of
+TODO-15 (the human's detour around a standing robot), PRICED BY NEITHER OPTION: not by the common shift, which
+stands at the decision position, and not by one hold per entry, which stands at a table. It weighed against
+(B) in the B3.B entry and still stands; what reduces its weight is that a hold before a later entry is
+lookahead (below): it is priced, and is executed only if the next re-decision places it again as a first hold.
+Also noted there: (B) changes `RealizedPlan` from one `delta` to per-entry lists; done as `holds` and
+`cumulative_shifts`, with `delta` a read-only property, the hold before the first entry.
+
+WHAT IS SENT, AND WHAT B2 COMMITS TO (T-B Q3). The robot's own triggers re-decide, so the tail of the winning
+ordering is lookahead for the choice of the head, not an order commitment. `UpdateResult.hold` is the hold
+before the FIRST entry of the winning ordering's RealizedPlan. It equals the head realized alone — search 1
+ranges over the first entry's own intervals from 0, and the first entry is the head projected from the live
+world — so B3.A and B3.B differ in WHICH task is chosen and in nothing else, and T-B2b's separate realization
+of the head (`[meta-head]`) is removed. Holds before later entries are priced and never sent. B2 commits to
+the CURRENT TASK: `b2a` is unchanged (it realizes the current task alone; continue iff δ ≤ ρ × (T_h − now));
+the winning ordering is not stored, and the internal queue stays in pool order ("B3.B on plain cost: the
+internal queue stays in pool order").
+
+AS BUILT. `shared/realization.py`: `realize()` runs the searches and `_realized_segments()` places each
+entry at its cumulative shift, with the stationary stretch of each hold where it is taken.
+`shared/types.py`: `RealizedPlan.holds`, `.cumulative_shifts`, `.delta` (property). `shared/meta_planner.py`:
+`_replan_orderings()` realizes every ordering against the human projection (`cost_strategy realized`) or none
+(`plain`) and ranks on `RealizedPlan.cost`. Orderings with a common prefix share no work (accepted at
+review, ccode's reasoning): sharing the prefix's
+projection would need a successor state that outlives a `project()` call, which T-B2a rules out; measured, one
+B3 call with a pool of four costs about 32 ms with an admitted projection (8 ms without; `single_task` about
+1 ms), and triggers are events. Log, `full_reorder` only: `[meta-ord]` as in T-B2b; `[meta-win]` for the
+winning ordering (`holds` per entry, `shift` the cumulative shift of the last entry, `T_r`, `cost`, `share`);
+`[meta-b3]` with `selection` as under `single_task` and `ordering=`.
+
+CHECKED (`analysis/tb2c_per_entry_holds/`, scenario_81, both priors; the B3 calls of the `full_reorder` run and
+of the `single_task` run, every ordering of the pool at every call: 402 orderings, 260 against an admitted
+projection).
+- DOMINANCE: 0 rows where the per-entry cost differs from the common-shift cost (computed in the script only),
+  so none where it is higher. A null result, as R1 measured that more places for a hold seldom change the
+  total. It is not vacuous: 12 orderings carry a hold, 8 of them before a LATER entry (item_1 after item_6,
+  holds [0, 2, 0, 0] and [0, 3, 0, 0]); in those 8 the cost equals the common shift's and the hold is taken
+  elsewhere (at the table after entry 1, not at the decision position). All 12 are on the `single_task` run's
+  course; under `full_reorder` no ordering priced on scenario_81 carries any hold.
+- THE HEAD'S HOLD: the hold before the first entry equals the head realized alone in all 402.
+- VALIDITY, by F1's independent method (sampling at 0.001 tick inside [trigger, T_h], rules (a) and (b)): the
+  14 winning orderings with an admitted projection and the 8 orderings with a later hold have no violating
+  sample; each later hold is minimal (its entry at shift − 1 violates).
+- A synthetic two-entry case (literal segments; a check of the code, not a finding): per entry [0, 14], cost
+  34; one common shift 24, cost 44; both clear under sampling; entry 2 at shift − 1 violates.
+- BEHAVIOUR: scenario_80 and scenario_81, both priors: `single_task` heads 6, 1, 7, 4 (completion 261 and 265
+  from the world fact; one 4-tick hold in scenario_81), `full_reorder` heads 7, 4, 6, 1, completion 220, no
+  hold. scenario_00, both priors: identical to `single_task`. The executed behaviour under `full_reorder` is
+  the same as at T-B2b on these fixtures; the full comparison is T-B3.
+- IDENTITY: the 20 baselines byte-identical under the default strategy; `b2a` runs (scenario_20 with executed
+  holds, scenario_81; both priors) byte-identical between the commit before and the change.
+
+A FINDING FOR T-B3. On every current fixture no winning ordering under `full_reorder` carries a hold, so
+T-B2c changes nothing executed. scenario_81 does not exercise realized cost under `full_reorder`: its conflict
+belongs to `single_task`'s course (6, 1, 7, 4), and the course `full_reorder` chooses (7, 4, 6, 1) never meets
+the human, so its saving mixes two causes, the order of the tasks and not meeting the human. A fixture for
+T-B3b must put a conflict into the orderings `full_reorder` would choose; Hadi designs it (TODO-47,
+f-designations).
+
+NOT PART OF THIS DECISION. Entries after the first are projected about one tick late per preceding entry with a
+`pick_up` (TODO-77). It is an error in the input to `realize()`, present under `single_task` too, and is not
+compensated here; cchat decides it. No `full_reorder` baselines are recorded until Hadi confirms T-B2c.
+
+Files: shared/realization.py, shared/types.py (`RealizedPlan`), shared/meta_planner.py (`_replan_orderings`),
+shared/io_contracts.md (§1.11, §2.2, §2.2c), docs/glossary.md, docs/roadmap.md, CLAUDE.md,
+analysis/tb2c_per_entry_holds/
+Reference: T-B Q2, T-B Q3, T-B2c, September 2026; "B3.B (`full_reorder`) is lookahead for the choice of the
+next task, built next" (open points 1 and 2); "The robot can wait" (R1); "Robot-responsible separation" (F1);
+TODO-15, TODO-70, TODO-77

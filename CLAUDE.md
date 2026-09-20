@@ -87,18 +87,18 @@ Decisions
   covered and the gate stays a fixed share (graded evidence, the gate ruling). The 4C queue is done.
   The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`). T-B is under way: T-B2a
   (`Projector.project()` chains the entries of an ordering, through a successor state derived from what the
-  action schemas declare), T-B2b (`full_reorder` on plain cost) and T-B2d (the `--strategy` run option) are
-  built; the next build is T-B2c, an ordering realized against the human projection with one hold per entry,
-  after a cchat question on the projection's extra tick per `pick_up` entry (TODO-77). Not to be started
+  action schemas declare), T-B2b and T-B2c (`full_reorder`: an ordering realized against the human
+  projection, one minimal-shift search and one hold per entry) and T-B2d (the `--strategy` run option) are
+  built, which completes B3.B; next is T-B3, its evaluation. Open for cchat: the projection's extra tick
+  per `pick_up` entry, an error in `realize()`'s input that accumulates over an ordering (TODO-77). Not to be started
   unasked: T-C to T-G, i.e. the human action script, robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
-  cost) exist. `full_reorder` (B3.B) is built ON PLAIN COST (`_replan_orderings()`, T-B2b): until T-B2c,
-  `full_reorder` with `cost_strategy realized` is a HYBRID, orderings ranked on plain cost and only the
-  head's hold realized, and the `[run]` header does not show it; no `full_reorder` baselines are recorded
-  before T-B2c. The rest follows the recorded order (design_decisions.md, the B3.B entry); build it only
-  in a T-B task, and only the step that task names.
+  cost) exist. `full_reorder` (B3.B) is built (`_replan_orderings()`, T-B2b / T-B2c): orderings are ranked
+  on their realized cost, `realize()` running one minimal-shift search per entry (T-B Q2), and the hold sent
+  is the hold before the first entry; no `full_reorder` baselines are recorded until Hadi confirms T-B2c.
+  Touch it only in a T-B task, and only the step that task names.
   B2 is an evaluation factor, not a design step: `b2b` stays a stub. Change only what the task
   specifies; do not fill in unspecified block logic, flags or strategies.
 - `shared/recognizer.py`: rebuilt and handed back (`docs/recognizer_handback.md`). Not under
@@ -222,7 +222,7 @@ cost argument: `analysis/tb1b_two_tables/`.
 grep "^\[meta\]"        <log>   # meta-planner winner per trigger
 grep "meta-cand"        <log>   # per-candidate evaluation (fields change as realization lands)
 grep "^\[meta-ord\]"    <log>   # full_reorder: per possible head, the cheapest ordering that starts with it
-grep "^\[meta-head\]"   <log>   # full_reorder: the chosen head realized alone (the source of the hold)
+grep "^\[meta-win\]"    <log>   # full_reorder: the winning ordering (hold before each entry, last cumulative shift, share)
 grep "^\[meta-b3\]"     <log>   # B3's decision; under full_reorder with ordering= appended
 grep "^\[meta-proj\]"   <log>   # human projection admitted or not, and why
 grep "^\[meta-pool\]"   <log>   # completed tasks dropped from the pool
@@ -276,7 +276,8 @@ Completion is measured from the world fact (T6): the tick after the robot's last
   a θ crossing only; for paths the word is violation. Robot trigger: `task_committed` or
   `no_current_task` (they differ — `no_current_task` bypasses B2).
 - Hold: with one entry, the shift that was chosen, δ ticks in which the robot stands still; per
-  entry since T-B Q2, the cumulative shift of entry k minus that of entry k−1. Walk: an agent's
+  entry since T-B Q2 (`RealizedPlan.holds`), the cumulative shift of entry k
+  (`RealizedPlan.cumulative_shifts`) minus that of entry k−1. Walk: an agent's
   movement, never a loop or a search in the code (the loop in `realize()` is the minimal-shift
   search). T_r: a projected plan's duration. T_h: the end of
   the human's projection. `min_separation`: the distance realization must keep between agents.

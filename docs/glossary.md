@@ -61,12 +61,13 @@ NOTE: the field `ProjectedPlan.task_queue` is a different thing — the tasks of
 ordering, in the ordering's order. The identifier is not renamed.
 
 **single_task** / **full_reorder** — B3's two strategies (B3.A and B3.B), selected by the run option
-`--strategy`. `single_task` is the default. `full_reorder` is built ON PLAIN COST (T-B2b): an ordering
-costs the sum of its entries' T_r, and the hold that goes out is the head's, realized alone. Until T-B2c
-`full_reorder` with `cost_strategy realized` is therefore a HYBRID — orderings ranked on plain cost, only
-the head's hold realized — and the `[run]` header does not show it.
+`--strategy`. `single_task` is the default. Under `full_reorder` (T-B2b, T-B2c) an ordering is realized
+against the one human projection, one minimal-shift search per entry, and costs the sum of its entries' T_r
+plus the cumulative shift of its last entry; the hold that goes out is the hold before the first entry,
+which is the head's hold realized alone.
 → `shared/meta_planner.py`, module docstring, STRATEGY, and `_replan_orderings()`;
-`docs/design_decisions.md`, DESIGN-16 and "B3.B on plain cost: the internal queue stays in pool order".
+`docs/design_decisions.md`, DESIGN-16, "B3.B on plain cost: the internal queue stays in pool order" and
+"One hold per entry".
 
 **successor state** — the hypothetical `WorldState` entry k+1 of an ordering is decomposed against: the
 previous one as entry k's action schemas declare they leave it (`ActionSchema.retracts`, `effects`,
@@ -158,20 +159,25 @@ inherited shift is 0, so the entry has a conflict exactly when δ > 0 — that i
 performs today.
 → `shared/realization.py`, `realize()`; `docs/design_decisions.md`, "The robot can wait".
 
-**cumulative shift of entry k** — the number of ticks by which entry k starts later than projected.
+**cumulative shift of entry k** — the number of ticks by which entry k starts later than projected: the
+result of entry k's own minimal-shift search. Never smaller than entry k−1's.
+→ `shared/types.py`, `RealizedPlan.cumulative_shifts`; `shared/realization.py`, `realize()`.
 
 **hold before entry k** — the cumulative shift of entry k minus the cumulative shift of entry k−1
 (entry 0's cumulative shift being 0): the ticks the robot stands still at the boundary before entry
 k. With ONE entry the two quantities are equal, which is why the glossary needed only one term for
-them; they become two because T-B Q2 decided ONE HOLD PER ENTRY, placed at the boundary before the
-entry it clears (to be built in T-B2c). Until then, `RealizedPlan.delta` carries the one hold of the
-one entry and is both.
-→ `docs/design_decisions.md`, "B3.B (`full_reorder`) is lookahead for the choice of the next task,
-built next" (the hold-placement question); `docs/roadmap.md`, T-B.
+them; they became two because T-B Q2 decided ONE HOLD PER ENTRY, placed at the boundary before the
+entry it clears (built in T-B2c). `RealizedPlan.holds` carries the hold before each entry and
+`RealizedPlan.cumulative_shifts` each entry's cumulative shift; `RealizedPlan.delta` is the hold before
+the FIRST entry — with one entry both quantities, with several the only hold that is executed before the
+next re-decision — and never the plan's total shift.
+→ `shared/types.py`, `RealizedPlan`; `docs/design_decisions.md`, "One hold per entry".
 
 **hold** — unqualified, the hold before the entry being spoken of. Where there is one entry that is
 δ, `RealizedPlan.delta`: whole ticks, taken at the robot's position at the decision step, executed
-as STAND ticks one per tick, logged as `[hold]`. There is no hold cap.
+as STAND ticks one per tick, logged as `[hold]`. A hold before a later entry is taken where the previous
+entry ended; it is priced at the trigger and never executed as such, because the robot re-decides at its
+own triggers first. There is no hold cap.
 → `shared/io_contracts.md` §1.11; `mesa_sim/executor.py`, `hold()`.
 NOTE: a stationary `Segment` that is NOT a chosen shift — a grasp, a wait, a completion latency — is
 a "stationary stretch" or "stationary segment", not a hold.
@@ -184,12 +190,12 @@ the whole plan; the name is kept for the policy. This is the one permitted use o
 → `docs/design_decisions.md`, "The robot can wait" (the R1 decisions), "Realization as built".
 
 **minimal-shift search** — given a set of violating shift intervals and a lower bound b, the
-smallest whole tick ≥ b that lies inside none of them. It is the loop inside `realize()` today, with
-b = 0: δ starts at 0 and, whenever an interval strictly contains it, jumps to the first whole tick
+smallest whole tick ≥ b that lies inside none of them. It is the loop inside `realize()`, run once per
+entry: the shift starts at b and, whenever an interval strictly contains it, jumps to the first whole tick
 at or after that interval's end, the intervals taken in order of their start. Not a bisection and
 not a grid — feasibility in the shift is not monotone, so the whole-tick answer is NOT the
-fractional minimum rounded up. Per entry (T-B Q2) b is the shift the entry inherits, not 0. The repo
-had no name for this; this one is new.
+fractional minimum rounded up. b is the shift the entry inherits: 0 for the first entry, the previous
+entry's cumulative shift otherwise (T-B Q2, T-B2c). The repo had no name for this; this one is new.
 → `shared/realization.py`, `realize()`; `shared/io_contracts.md` §2.2c.
 
 

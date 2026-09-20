@@ -1505,6 +1505,17 @@ Prerequisites:
     that reordering helps in general on a two-table station. An evaluation scenario meant to support the
     general claim needs SEVERAL against-proximity designations, or a geometry in which proximity does not
     order the tables cleanly. `analysis/tb1b_two_tables/README.md`, "What this fixture does not settle".
+    A FINDING FOR T-B3, FROM T-B2c (September 2026): on every current fixture NO WINNING ORDERING UNDER `full_reorder` CARRIES A HOLD (scenario_80, scenario_81,
+    scenario_00, both priors; every hold sent is 0 and every `[meta-win]` line reads `holds=0,...`), so T-B2c
+    changes NOTHING EXECUTED against T-B2b. scenario_81 does not exercise realized cost under `full_reorder`: its
+    conflict belongs to `single_task`'s course (heads 6, 1, 7, 4: the 4-tick hold before item_1 at step 39), and
+    the course `full_reorder` chooses (7, 4, 6, 1) never meets the human (0 of the 206 orderings priced on that
+    course carry any hold; the 12 that do, 8 of them before a later entry, are all priced on `single_task`'s
+    course). Its saving (completion 220 against 265, world fact) therefore MIXES TWO CAUSES, the order of the
+    tasks and not meeting the human, and cannot be attributed to either. A FIXTURE FOR T-B3b MUST PUT A CONFLICT
+    INTO THE ORDERINGS `full_reorder` WOULD CHOOSE. Hadi designs it; no scenario, designation or constant is
+    adjusted to make an effect appear.
+    `analysis/tb2c_per_entry_holds/README.md`; design_decisions.md, "One hold per entry".
 (f) B3.B (`full_reorder`, not in 4C): a future fixture needs SEVERAL remaining robot tasks whose ORDER, not
     only the next choice, changes cost under a human stay. Not built; every current fixture leaves the robot
     at most one alternative at the stay.

@@ -273,7 +273,7 @@ used inside one method's steps (`deliver_with_return`'s `?other_container`), not
 `ProjectedPlan` per candidate: an ordering of n tasks projects to one plan with n ENTRIES, in the
 ordering's order, each entry holding that task's SEGMENTS (docs/glossary.md). Under the
 `single_task` strategy (DESIGN-16, the implemented default) a `ProjectedPlan` always holds exactly
-one entry; under `full_reorder` (built on plain cost, T-B2b) it holds one entry per task of the
+one entry; under `full_reorder` (T-B2b, T-B2c) it holds one entry per task of the
 ordering, each starting at the step and the position the previous one ends at (T-B2a).
 
 ```python
@@ -441,35 +441,49 @@ whole strings (§2.1, the prior's matching).
 
 ---
 
-### 1.11 `RealizedPlan` (T3)
+### 1.11 `RealizedPlan` (T3; per entry since T-B2c)
 
 **Produced by `realize()` (§2.2c); consumed by `MetaPlanner` (T4's B2, T10's B3).** What a
 candidate's segments actually become, given the human: the hold-only realization under the
-whole-trajectory minimal shift (design_decisions.md, "The robot can wait", the R1 decisions).
-A candidate has a CONFLICT when the shift its entry inherits — 0 with one entry — lies inside one of
-that entry's violating shift intervals, i.e. here exactly when `delta > 0`.
+whole-trajectory minimal shift, applied per entry (design_decisions.md, "The robot can wait", the R1
+decisions; "One hold per entry", T-B Q2).
+An ENTRY has a CONFLICT when the shift it inherits — 0 for the first entry, the previous entry's cumulative
+shift otherwise — lies inside one of its own violating shift intervals, i.e. exactly when its hold is > 0.
+With one entry: exactly when `delta > 0`.
 
 ```python
 @dataclass
 class RealizedPlan:
-    delta: int                            # the hold, WHOLE ticks ≥ 0 (T3b); 0 without a human projection
-    cost: float                           # T_r + delta over the FULL plan
-    projected_duration: float             # T_r: the span of the plan's segments (fractional steps)
-    segments: List[Segment]               # the hold (stationary, when of positive duration) then every
-                                          # projected segment shifted by delta
-    hold_position: Tuple[float, float]    # the plan's first segment's start: where the robot is at the decision step
+    holds: List[int]                      # THE HOLD BEFORE EACH ENTRY, whole ticks ≥ 0 (T3b), in the plan's order:
+                                          # cumulative_shifts[k] − cumulative_shifts[k−1]; all 0 without a human projection
+    cumulative_shifts: List[int]          # THE CUMULATIVE SHIFT OF EACH ENTRY: the result of its own minimal-shift
+                                          # search, lower bound the previous entry's (0 for the first); never decreasing
+    cost: float                           # T_r + cumulative_shifts[-1] over the FULL plan (one entry: T_r + delta)
+    projected_duration: float             # T_r: the span of the plan's segments (fractional steps) = the sum of the entries' T_r
+    segments: List[Segment]               # per entry: the stationary stretch of its hold (when of positive duration),
+                                          # where the previous entry ended, then the entry's segments at its cumulative shift
+    hold_position: Tuple[float, float]    # the FIRST hold's: the plan's first segment's start, where the robot is at the decision step
     hold_start: float                     # the decision step
+    # delta (read-only property) = holds[0]: the hold before the first entry. One entry: the one hold and the one
+    # shift, what B2 `b2a` and single_task read, unchanged. Several: the only hold executed before the next
+    # re-decision (UpdateResult.hold). Never the plan's total shift, which is cumulative_shifts[-1].
     horizon: Optional[float]              # T_h, the end of the human projection; None without one
     unassessed_share: float               # share of [hold_start, realized end] beyond T_h; 1.0 without a
                                           # human projection, or when the hold pushes the plan past T_h
     reason: str                           # "realized" | "no_human_projection"
 ```
 
+**WARNING — `delta` is the hold before the FIRST entry.** For a plan of several entries it is NOT the plan's
+total shift. A caller that needs the total reads the cumulative shift of the last entry,
+`cumulative_shifts[-1]` (it is what `cost` adds to T_r). `delta` equals the total only for a plan of one
+entry, which is what B2 `b2a` and `single_task` pass.
+
 Since F1 (robot-responsible separation, §2.2c) realization is TOTAL: a clearing shift always exists, so
 there is no `realizable` flag and no unrealizable reason. The former `realizable: bool`,
 `hold_position_violated` and `hold_reaches_horizon` are gone.
 
-- `cost` is the ONE number a candidate competes on (T10): T_r + δ, walking plus the hold. The tail
+- `cost` is the ONE number a candidate competes on (T10): T_r + δ, walking plus the hold; for an ordering
+  (T-B2c) the sum of its entries' T_r plus the cumulative shift of its last entry. The tail
   beyond T_h is inside T_r and not corrected for (TODO-69, reading (1)); the share is logged so the
   bias can be reported, not priced.
 - `delta` is what reaches the executor as the hold hint (§1.9, TODO-71): stand at `hold_position`
@@ -614,12 +628,12 @@ binding resolution.
 
 ---
 
-### 2.2 `MetaPlanner` (`shared/meta_planner.py`) — IMPLEMENTED (`single_task`; `full_reorder` on plain cost)
+### 2.2 `MetaPlanner` (`shared/meta_planner.py`) — IMPLEMENTED (`single_task`, `full_reorder`)
 
 Verified against `shared/meta_planner.py` and validated end-to-end against `scenario_00`
-(September 2026). The `full_reorder` strategy is built ON PLAIN COST (T-B2b, `_replan_orderings()`), over
-`Projector.project()`'s chained entries (T-B2a); realizing an ordering against the human projection is
-T-B2c, not built. Nothing raises for it any more.
+(September 2026). The `full_reorder` strategy is built (T-B2b, T-B2c; `_replan_orderings()`), over
+`Projector.project()`'s chained entries (T-B2a) and `realize()`'s one search per entry. Nothing raises
+for it any more.
 
 Private methods (`_is_current_task_plausible`, `_replan_tasks`, `_is_complete`, `_clears_gate`)
 are internal to the class and deliberately not part of this contract; only the constructor, the
@@ -812,29 +826,30 @@ is inside B3; neither strategy commits to an order:
   `WorldState` and realized; the argmin of realized cost becomes the new `current_task` — every
   candidate carries a cost and none is excluded, since F1 made realization total. The rest of the
   queue carries no ordering commitment; it is re-decided at the next trigger.
-- `full_reorder` (B3.B; built on plain cost, T-B2b; run option `--strategy`, T-B2d) — each ordering of
+- `full_reorder` (B3.B; built, T-B2b / T-B2c; run option `--strategy`, T-B2d) — each ordering of
   the pool (the same pool, the current task included) is a candidate, projected as one chained
-  `ProjectedPlan` (one entry per task, in the ordering's order; T-B2a); the argmin ordering's head
-  becomes `current_task`. AS BUILT: an ordering costs the sum of its entries' T_r, obtained through the
-  existing plain-cost path (`realize()` against no human plan: the span of the plan's segments, the
-  entries being contiguous), under EITHER `cost_strategy`; orderings are enumerated in pool order and
+  `ProjectedPlan` (one entry per task, in the ordering's order; T-B2a) and realized against the one
+  human projection inside [trigger, T_h] (`cost_strategy` "realized") or against none ("plain") by
+  `realize()`, one minimal-shift search per entry (T-B Q2; §2.2c); the argmin ordering's head becomes
+  `current_task`. An ordering costs `RealizedPlan.cost`: the sum of its entries' T_r plus the cumulative
+  shift of its last entry (with no human plan, the sum alone). Orderings are enumerated in pool order and
   the first minimum wins, so a tie between heads goes to the one earlier in the pool (TODO-42); no cap
-  on the pool, no depth limit. `UpdateResult.hold` is the hold `single_task` would send for the same
-  head: the head projected alone and realized against the human projection (`cost_strategy`
-  "realized") or against none ("plain"). So until T-B2c `full_reorder` with `cost_strategy` "realized" is a
-  HYBRID (ranked on plain cost, only the head's hold realized); the `[run]` header does not show it,
-  `[meta-b3]`'s `selection=plain` does, and no `full_reorder` baselines are recorded. NOT BUILT (T-B2c): the ordering realized against the one
-  human projection inside [trigger, T_h], one hold per entry (T-B Q2). The tail is a lookahead for the
+  on the pool, no depth limit; orderings with a common prefix share no work (that would need a successor
+  state outliving a `project()` call). `UpdateResult.hold` is the hold before the FIRST entry of the
+  winning ordering (`RealizedPlan.delta`), which is the hold `single_task` would send for the same head:
+  search 1 ranges over the first entry's own intervals from 0, and the first entry is the head projected
+  from the live world. Holds before later entries are priced, never sent. The tail is a lookahead for the
   choice of the head, re-priced at the next ROBOT TRIGGER (`task_committed`, which passes through B2,
   or `no_current_task`, which bypasses it), not an order commitment: B2 commits to the current task
   (T-B Q3, `b2a` unchanged), the winning ordering is not stored (the internal queue stays the pool
   without the head, in pool order, as under `single_task`), and `UpdateResult.queue` lists the tail in
   the ordering's order as information only. DESIGN-12 does not apply. Logs per B3 call: `[meta-ord]`
   per possible head, in pool order (`head`, `cost` of the cheapest ordering that starts with it,
-  `orderings` that start with it, `ordering`, keys joined by ` > `); `[meta-head]`, the chosen head
-  realized alone (the fields of `[meta-cand]`; the source of the hold, not a candidate); `[meta-b3]`
-  with `selection=plain`, `cost` the winning ordering's, `candidates` the number of orderings, and
-  `ordering=` appended. `single_task`'s lines are unchanged. design_decisions.md, "B3.B
+  `orderings` that start with it, `ordering`, keys joined by ` > `); `[meta-win]`, the winning ordering
+  (`reason`, `T_r`, `holds` the hold before each entry, `shift` the cumulative shift of the last entry,
+  `cost`, `share`); `[meta-b3]` as under `single_task` (`selection` ∈ realized | no_projection | plain),
+  `cost` the winning ordering's, `hold` the one sent, `candidates` the number of orderings, and
+  `ordering=` appended. (`[meta-head]`, T-B2b's separate realization of the head, is gone.) `single_task`'s lines are unchanged. design_decisions.md, "B3.B
   (`full_reorder`) is lookahead for the choice of the next task, built next".
 
 The human's projection is built once per fired trigger by `update_human_projection()` (below)
@@ -944,19 +959,20 @@ threshold in `MetaPlanner._detect_interference()` is gone, T10).
 
 ---
 
-### 2.2c `realize()` (`shared/realization.py`) — BUILT (T3), consumed by B2 (T4) and B3 (T10), TOTAL since F1
+### 2.2c `realize()` (`shared/realization.py`) — BUILT (T3), consumed by B2 (T4) and B3 (T10), TOTAL since F1, PER ENTRY since T-B2c
 
 The realization service (design_decisions.md, "The robot can wait"; the R1 decisions). Sits
 between `trajectory_algorithms.py` and `projection.py` in the one-way layering: it reads
 `ProjectedPlan`s and `Segment`s only, knows nothing of tasks, beliefs or selection, imports no
 simulator, and holds no policy — `min_separation` is passed in. `MetaPlanner` calls it once per
-candidate in B3 (T10; under `cost_strategy="plain"` with `human_plan=None`, so the plain cost is the
+candidate in B3 (T10: a one-entry plan per task under `single_task`, an n-entry plan per ordering under
+`full_reorder`, T-B2c; under `cost_strategy="plain"` with `human_plan=None`, so the plain cost is the
 same `projected_duration`) and once for the current task in B2 `b2a` (T4), always at decision step
 0.0, the trigger.
 
 ```python
 realize(
-    plan: ProjectedPlan,                  # the robot's; every entry's segments, in order — not assumed one task
+    plan: ProjectedPlan,                  # the robot's; one entry per task, each starting where the previous one ends
     human_plan: Optional[ProjectedPlan],  # the admitted human projection, or None
     min_separation: float,                # world units; the caller's policy value
     decision_step: float,                 # the robot's now on the projection clock (0.0 at a trigger)
@@ -974,6 +990,21 @@ start; δ starts at 0 and, whenever an interval strictly contains it, jumps to t
 at or after that interval's end. No bisection, no grid: the feasible set in δ is not monotone (a
 shift can clear one violation and run into the next), so bisection would be invalid, a grid would
 make δ sampled, and the whole-tick δ is not simply the fractional minimum rounded up.
+
+**One minimal-shift search per entry (T-B Q2, T-B2c).** The policy above is applied PER ENTRY, in the
+plan's order. Search k ranges over the violating shift intervals of entry k's OWN segments, with the
+cumulative shift of entry k−1 as its lower bound (0 for the first entry); its result is the cumulative
+shift of entry k, and the hold before entry k is the difference of the two. While it holds before entry
+k the robot stands where entry k−1 ended (at the decision position for the first entry); a standing robot
+never violates, so that stretch is not checked. An entry's intervals do not depend on the earlier shifts
+(its positions are unchanged, the human projection is fixed), so the searches are independent but for the
+lower bound. `cost` = the sum of the entries' T_r + the cumulative shift of the last entry. WHY NOT ONE
+COMMON SHIFT: it must lie outside the violating intervals of every entry, so a conflict in a later entry
+delays the earlier ones too, and can be pushed further by an earlier entry's interval the later conflict
+never needed; per entry, every cumulative shift is ≤ the common shift and the cost never higher (weak
+dominance, by induction). It is not the per-segment policy R1 rejected: inside an entry every segment
+receives the same shift, and the only new place for a hold is before an entry's first segment. A plan of
+ONE entry is one search from 0: identical to `realize()` before T-B2c, in hold, cost, segments and share.
 
 **The assessed window** is where both projections exist and the realized plan lies within
 [decision_step, T_h], T_h the end of the human projection: nothing past T_h is assessed or charged,
@@ -1005,6 +1036,12 @@ hold included. **Re-validated under F1 (`analysis/f1_robot_responsible/validate.
 eight conditions: 101 admitted candidate rows, every realized plan's segments sampled at 0.001 tick have no
 rule (a) or (b) violation in its assessed window, every held row's δ − 1 violates (minimal), and F1's
 δ never exceeds the T10 realizer's on the same inputs (its violating set is a subset).
+**Per entry (T-B2c; `analysis/tb2c_per_entry_holds/check.py`)**, on every ordering of the pool at every B3
+call of scenario_81 (both priors, the calls of the `full_reorder` run and of the `single_task` run): 402
+orderings, 260 against an admitted projection; the per-entry cost is never higher than the common-shift
+cost (0 rows differ); the hold before the first entry equals the head realized alone in all 402; the 8
+orderings with a hold before a later entry are clear under sampling at 0.001 tick and minimal (shift − 1
+violates); a synthetic two-entry case shows strict dominance (34 against 44).
 
 ---
 
