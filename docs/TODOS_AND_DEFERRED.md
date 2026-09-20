@@ -4,6 +4,11 @@ Collected from Phase 2.1 (dock_loading domain), 2.2 (visualization), and Phase 4
 Each item has a category, priority, and the relevant file(s).
 Items marked **[BLOCKING]** must be resolved before the simulation runs correctly end-to-end.
 
+> **Terms:** `docs/glossary.md` gives each term one meaning. The entries below are the HISTORICAL
+> RECORD and are left exactly as they were written, so some of them use a term differently from the
+> glossary (the conflicts are listed in the glossary task's report). Read an entry in the terms of
+> its own date; write new text in the glossary's.
+
 ---
 
 ## 🐛 Active Bugs

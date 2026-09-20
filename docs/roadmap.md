@@ -2,7 +2,9 @@
 
 Stages and outcomes only. Mechanisms and their rationale are in `docs/design_decisions.md`; the recognizer's
 current state, parameters and guarantees are in `docs/recognizer_handback.md`; open items in
-`docs/TODOS_AND_DEFERRED.md`. Where this file and those disagree, they win.
+`docs/TODOS_AND_DEFERRED.md`. Where this file and those disagree, they win. Terms are used as
+`docs/glossary.md` defines them; the plan below ("The plan from T-A") is written in its terms, the
+phase records above it are as they were written.
 
 ---
 
@@ -356,7 +358,8 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
-- **T-B — B3.B full-queue reordering.**
+- **T-B — B3.B (`full_reorder`): a candidate is an ordering of the pool.** The head of the argmin
+  ordering becomes the next task; the ordering past the head is lookahead, not an order commitment.
   - B1: two-table kitting layouts and scenarios, hand-built, after one design question: is an item's
     destination table a domain fact or a work-order fact (design_decisions.md, B3.B entry, "THE FIXTURE
     SIDE"; TODO-47 (f)). Registered programmatically, as the first part of fixture generation (TODO-47 (a)).

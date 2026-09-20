@@ -68,9 +68,10 @@ byte-identical to the D2 baselines (`sweep/`, `fixtures/`) on all ten CLAUDE.md 
   pinned, which is why the read is from the release. The declared tick (the empty-pool line) is the world
   tick + 2 in all 126 completing runs: one tick of executor bookkeeping, one for `no_current_task`.
   Every completion figure below is the world tick; the D2 README's figures are declared ticks.
-- Decision sequence key: step:trigger:winner. The hold is not in the key, so the first differing entry can
-  come after the first behavioural difference (s20: both cost strategies decide item_4 at 20; realized also
-  holds 8 ticks there, and the sequences first differ at the next entry, the grasp trigger at 23 vs 31).
+- Decision sequence key: step:trigger:winner. The hold is not in the key, so the first differing DECISION
+  can come after the first behavioural difference (s20: both cost strategies decide item_4 at 20; realized
+  also holds 8 ticks there, and the sequences first differ at the next decision, the grasp trigger at 23 vs
+  31). ("Entry" is reserved for a ProjectedPlan's per-task part; docs/glossary.md.)
 - Blocked time, outcome, human-borne proximity and the sequential-motion violations follow
   `analysis/c_separation_stop/blocked.py`; added here: each refusal and each violation split by the rule it
   concerns ((a) the step started at or beyond s; (b) within), and the sub-s ticks labelled against the

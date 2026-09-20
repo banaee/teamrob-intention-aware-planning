@@ -4,6 +4,9 @@ This document defines the **minimal, simulator-agnostic I/O contracts** for the 
 Implementation details (Bayes, HTN search, etc.) are intentionally omitted.
 All simulators (Mesa, ROS) must translate their internal data into these canonical forms.
 
+Terms are used with the one meaning `docs/glossary.md` gives them (task, pool, ordering, candidate,
+entry, segment, shift, hold, walk, ...); this document is one of the places that glossary points at.
+
 **Last aligned September 2026** against `shared/types.py`, `shared/planner.py`,
 `shared/domain_knowledge.py`, `shared/recognizer.py`, `shared/meta_planner.py`, and
 `shared/trajectory_algorithms.py`, following the Phase 4C MetaPlanner build. §2.2 is now
@@ -264,10 +267,12 @@ used inside one method's steps (`deliver_with_return`'s `?other_container`), not
 
 ### 1.7 `ProjectedPlan` — meta_planner-internal only
 
-**Produced and consumed only by `meta_planner.py`.** Never handed to the executor. Under
-the `single_task` strategy (DESIGN-16, the implemented default) a `ProjectedPlan` always
-holds exactly one entry — the multi-entry shape is retained for the deferred
-`full_reorder` strategy, which is not implemented.
+**Produced and consumed only by `meta_planner.py`.** Never handed to the executor. One
+`ProjectedPlan` per candidate: an ordering of n tasks projects to one plan with n ENTRIES, in the
+ordering's order, each entry holding that task's SEGMENTS (docs/glossary.md). Under the
+`single_task` strategy (DESIGN-16, the implemented default) a `ProjectedPlan` always holds exactly
+one entry — the multi-entry shape is there for `full_reorder`, which is designed and not yet
+implemented.
 
 ```python
 @dataclass
@@ -286,7 +291,7 @@ class ProjectedPlanEntry:
 
 @dataclass
 class ProjectedPlan:
-    task_queue: List[str]        # task_instance_key() strings, not TaskInstance objects
+    task_queue: List[str]        # task_instance_key() strings in the ordering's order, not TaskInstance objects
     entries: List[ProjectedPlanEntry]
     total_estimated_cost: int
 ```
@@ -466,9 +471,10 @@ there is no `realizable` flag and no unrealizable reason. The former `realizable
 - `reason == "no_human_projection"` is the shape of "no projection admitted": δ = 0, cost = T_r,
   share 1.0. A caller may treat it exactly as it treats `human_projection is None` today.
 - **Quantisation — DECIDED (T3b; design_decisions.md, "Realization as built").** `delta` is in
-  WHOLE ticks: the smallest whole-tick shift that clears the assessed window, walked over the exact
-  violating intervals (not the fractional minimum rounded up — feasibility in δ is not monotone, so
-  ceil can land in a second violating interval and the walk continues past it). Reasoning: the hold
+  WHOLE ticks: the smallest whole-tick shift that clears the assessed window, found by the
+  minimal-shift search over the exact violating intervals (not the fractional minimum rounded up —
+  feasibility in δ is not monotone, so ceil can land in a second violating interval and the search
+  continues past it). Reasoning: the hold
   is executed as STAND ticks, so the plan that is checked and costed must be the plan that is
   executed; rounding at execution would break the separation (down; the minimal shift has no
   margin) or leave the executed plan unchecked (up). T_r STAYS FRACTIONAL: it is the projection's
@@ -557,7 +563,7 @@ factors that must not be fed back).
 
 Per live hypothesis, every tick:
 1. **Phase, derived.** The planner decomposes the task against the current world for the observed agent (its
-   guards select the method), the grounded actions are walked from the start, and the EXPECTED action is the
+   guards select the method), the grounded actions are scanned from the start, and the EXPECTED action is the
    first whose completion condition does not hold. Nothing stores an index into an action list.
 2. **Completion.** If the task's terminal action's completion holds, the hypothesis is retired and pinned at
    the floor for the rest of the run, whoever completed it.
@@ -788,19 +794,20 @@ and one `[meta-b3]` line per call (`trigger`, `cost_strategy`, `selection` ∈ `
 `no_projection` | `plain`, `winner`, `cost`, `hold`, `T_h`, `candidates`).
 
 **Strategy (DESIGN-16).** "Candidate" means the unit the argmin ranges over — an individual
-task under `single_task`, a permuted ordering under `full_reorder` (design_decisions.md,
-DESIGN-16, terminology). `self._strategy` controls only how much of the queue one `update()`
-call rewrites:
+task under `single_task`, one ordering of the pool under `full_reorder` (design_decisions.md,
+DESIGN-16, terminology; docs/glossary.md). `self._strategy` selects which of the two a candidate
+is inside B3; neither strategy commits to an order:
 
 - `single_task` (default, implemented) — each candidate is projected alone from the live
   `WorldState` and realized; the argmin of realized cost over the realizable candidates becomes
   the new `current_task`. The rest of the queue carries no ordering commitment; it is re-decided
   at the next trigger.
 - `full_reorder` (B3.B; not implemented, designed, the next build) — each ordering of the pool is
-  a candidate, projected as one chained sequence and realized against the one human projection
-  inside [trigger, T_h]; the argmin ordering's first task becomes `current_task`. The sequence past
-  the head is a lookahead for that choice, re-priced at the robot's next boundary, not an order
-  commitment (this supersedes "replace the whole queue"). Needs the chained robot state in
+  a candidate, projected as one chained `ProjectedPlan` (one entry per task, in the ordering's
+  order) and realized against the one human projection inside [trigger, T_h]; the argmin ordering's
+  head becomes `current_task`. The ordering past the head is a lookahead for that choice, re-priced
+  at the robot's next boundary, not an order commitment (this supersedes "replace the whole
+  queue"). Needs the chained robot state in
   `Projector.project()` (the part of TODO-07 that applies: retraction and object relocation in a
   hypothetical successor state); DESIGN-12 does not apply. Open: where a later task's hold is
   placed, and what B2 commits to. design_decisions.md, "B3.B (`full_reorder`) is lookahead for the
@@ -937,12 +944,12 @@ realize(
 along a walk), then the whole plan shifted by δ. δ is the smallest shift ≥ 0 such that the shifted
 trajectory has no violation in the assessed window, IN WHOLE TICKS (T3b) — a violation being the
 robot's motion within `min_separation` without the distance increasing (§2.2b), so the stationary
-hold is never one. Exact: the violating shift intervals (`shift_violation_interval`, one per MOVING
-robot segment × human segment pair) are walked in order of their start;
-δ starts at 0 and, whenever an interval strictly contains it, jumps to the first whole tick at or
-after that interval's end. No search, no grid: the feasible set in δ is not monotone (a shift can
-clear one crossing and walk into the next), so bisection would be invalid, a grid would make δ
-sampled, and the whole-tick δ is not simply the fractional minimum rounded up.
+hold is never one. Exact: the MINIMAL-SHIFT SEARCH takes the violating shift intervals
+(`shift_violation_interval`, one per MOVING robot segment × human segment pair) in order of their
+start; δ starts at 0 and, whenever an interval strictly contains it, jumps to the first whole tick
+at or after that interval's end. No bisection, no grid: the feasible set in δ is not monotone (a
+shift can clear one crossing and run into the next), so bisection would be invalid, a grid would
+make δ sampled, and the whole-tick δ is not simply the fractional minimum rounded up.
 
 **The assessed window** is where both projections exist and the realized plan lies within
 [decision_step, T_h], T_h the end of the human projection: nothing past T_h is assessed or charged,

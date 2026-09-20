@@ -38,6 +38,8 @@ ordering under `full_reorder`. Candidates exist only inside B3; forming them fro
 private business.
 → `docs/design_decisions.md`, DESIGN-16, "Terminology, fixed"; `shared/io_contracts.md` §2.2,
 "Strategy (DESIGN-16)".
+COLLISION, not resolved: the older TODO entries use "candidate" as the ordinary adjective — "candidate
+fix", "candidate formulas", "candidate remedy". That is the English word, not the term.
 
 **head** / **tail** of an ordering — its first task, and everything after it. Under `full_reorder`
 the head becomes `current_task` and the tail is lookahead only: it carries no order commitment and
@@ -65,11 +67,19 @@ Agent-agnostic: the same call projects a robot candidate and the human's predict
 projected to ONE `ProjectedPlan` with n entries, in the ordering's order. An entry is not a task and
 not a plan. (Under `single_task` a `ProjectedPlan` always holds exactly one entry.)
 → `shared/types.py`, `ProjectedPlanEntry`; `shared/io_contracts.md` §1.7.
+COLLISION, not resolved: "entry" is also the ordinary word for a titled section of
+`docs/design_decisions.md` or `docs/TODOS_AND_DEFERRED.md` ("the B3.B entry"), and for an element of
+a dict or a JSON list. Those are the English word; only the plan sense is a term. Where both could be
+read, write "the design entry" or "the plan's entry".
 
 **segment** — one `Segment` inside an entry: a straight-line motion, or a stationary stretch,
 between two steps. An entry has several segments — one per action, plus the completion latencies.
 Do not call a segment a "leg" or a "stretch of evidence"; those are the recognizer's.
 → `shared/types.py`, `Segment`; `shared/io_contracts.md` §1.7.
+COLLISION, not resolved: scenario_40's human script is described as four numbered "segments" (1, 2,
+3a, 3b, 4) in `domains/kitting/env_layout4.json`, `domains/kitting/scenarios.py` and every I4 / F47
+report that cites them. That is a PART OF A SCRIPT, not a `Segment`. It was left alone because
+renaming it would make the record's "segment 3b" unreadable. New text says "script part".
 
 **walk** — an agent's movement, and nothing else: a "fetch walk", a "carry walk", "the human's walk
 to the coffee machine". It is NEVER used for a loop, a search, or an iteration in the code. Where

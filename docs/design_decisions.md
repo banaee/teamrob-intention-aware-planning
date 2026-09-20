@@ -3,6 +3,11 @@
 Key architectural agreements for the Intention-Aware Adaptive Planning Framework.
 This is a living reference of *why* things are designed the way they are.
 
+> **Terms:** `docs/glossary.md` gives each term one meaning. The entries below are the HISTORICAL
+> RECORD and are left exactly as they were written, so some of them use a term differently from the
+> glossary (the conflicts are listed in the glossary task's report). Read an entry in the terms of
+> its own date; write new text in the glossary's.
+
 ---
 
 ## Core Principle: Mind / Body Separation
