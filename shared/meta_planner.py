@@ -2,9 +2,9 @@
 shared/meta_planner.py
 
 PURPOSE:
-    Owns robot task scheduling: which task to do next (under the not-yet-
-    implemented "full_reorder" strategy, chosen with the rest of the pool as
-    lookahead; see STRATEGY). Sits above
+    Owns robot task scheduling: which task to do next (under the
+    "full_reorder" strategy, chosen with the rest of the pool as lookahead;
+    see STRATEGY). Sits above
     planner.py (decomposes one task) and replaces replanning.py (trigger-only).
     Called by sim_agents.py; projects each candidate task through the injected
     Projector (shared/projection.py), which decomposes via planner.py.
@@ -22,8 +22,8 @@ WHAT THIS MODULE DOES:
       the in-progress task lives in ExecutorState.current_task, not the queue
       (see update()'s docstring, "queue invariant").
     - Decides WHETHER to re-evaluate (evaluate_triggers)
-    - Decides WHICH task to do next (update); under "full_reorder" (not yet
-      implemented) on the cost of the cheapest ordering that starts with it
+    - Decides WHICH task to do next (update); under "full_reorder" on the
+      cost of the cheapest ordering that starts with it
     - Projects a candidate task — or, under "full_reorder", a candidate
       ordering — and the human's predicted task through Projector.project()
       / project_human(). Never decomposes tasks itself.
@@ -95,12 +95,16 @@ STRATEGY (DESIGN-16):
             every candidate has a cost and none is excluded, since F1 made
             realization total. The rest of the queue is left as an unordered
             pool with no ordering commitment.
-        "full_reorder" (B3.B; NOT IMPLEMENTED, DESIGNED, the next build) —
-            each ordering of the pool is a candidate: projected as ONE
-            chained ProjectedPlan, one entry per task (entry 1's segments,
-            then entry 2's from where entry 1 ended, ...) and realized against
-            the ONE human projection inside [trigger, T_h]; the argmin
-            ordering's HEAD becomes the new current_task. The ordering past
+        "full_reorder" (B3.B; BUILT ON PLAIN COST, T-B2b; a run option,
+            T-B2d) — each ordering of the pool is a candidate: projected as
+            ONE chained ProjectedPlan, one entry per task (entry 1's segments,
+            then entry 2's from where entry 1 ended, ...); the argmin
+            ordering's HEAD becomes the new current_task. AS BUILT the cost of
+            an ordering is PLAIN, the sum of its entries' T_r, and the hold
+            that goes out is the head's, realized alone as single_task
+            realizes it (_replan_orderings()). DESIGNED, NOT YET BUILT
+            (T-B2c): the ordering realized against the ONE human projection
+            inside [trigger, T_h], one hold per entry. The ordering past
             the head is a LOOKAHEAD for that choice, re-priced at the next
             ROBOT TRIGGER (task_committed, which passes through B2, or
             no_current_task, which bypasses it) — not an order commitment; the
@@ -108,20 +112,20 @@ STRATEGY (DESIGN-16):
             tasks coupled by geometry (two-table kitting: a task's end
             position depends on its table, so later walks depend on the
             order); in one-table layouts it is expected to choose as
-            single_task does. Projector.project() raises NotImplementedError
-            for orderings longer than 1, pending the chained robot state: the
-            next task's start position and step (geometry, from the previous
-            entry's segments), plus — for method selection and target
-            resolution — retraction of facts a projected action ended
-            (holding after place) and the location of an object it moved
-            (TODO-07, the part that applies). DESIGN-12 does not apply:
-            nothing is priced past T_h. Brute permutation is acceptable at
-            pools of 3 to 5. OPEN, not to be resolved inline: where a hold
-            that clears a conflict in a LATER task is placed (one δ at the
-            decision position, as realize() does today, or a hold at the
-            boundary before that task), and what B2 commits to (a task or an
-            order). See design_decisions.md, "B3.B (`full_reorder`) is
-            lookahead for the choice of the next task, built next".
+            single_task does. Projector.project() chains the entries
+            (T-B2a): the next entry starts at the step and position the
+            previous one ends at, and is decomposed against a hypothetical
+            successor state derived from what the action schemas declare
+            (retraction of facts a projected action ended, holding after
+            place, and the location of an object it moved — the part of
+            TODO-07 that applies). DESIGN-12 does not apply: nothing is
+            priced past T_h. Brute permutation is acceptable at pools of 3 to
+            5; there is no cap. DECIDED (T-B Q2, Q3): a hold that clears a
+            conflict in a LATER entry is placed at the boundary before that
+            entry, one hold per entry (to be built in T-B2c); B2 commits to
+            the current task, not to an order (`b2a` unchanged). See
+            design_decisions.md, "B3.B (`full_reorder`) is lookahead for the
+            choice of the next task, built next".
     Rationale for defaulting to single_task: the human-prediction horizon H is
     already belief-bounded and uncertain beyond it — committing to a
     multi-task robot schedule optimized against that same uncertain horizon
@@ -144,8 +148,10 @@ STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.
     block the single_task implementation below.
 """
 
+import itertools
 import logging
-from typing import List, Literal, Optional, Tuple
+from math import factorial
+from typing import Dict, List, Literal, Optional, Tuple
 
 from shared.types import (
     BeliefState,
@@ -224,10 +230,11 @@ class MetaPlanner:
                                  definition). Applied in exactly one place,
                                  _clears_gate(); do not compare against self._theta
                                  anywhere else.
-        strategy:                B3's strategy — "single_task" (default, implemented) or
-                                 "full_reorder" (not yet functional). Selects what a
-                                 candidate is inside _replan_tasks(): an individual task,
-                                 or a permuted ordering. See module docstring, DESIGN-16.
+        strategy:                B3's strategy — "single_task" (default) or
+                                 "full_reorder" (B3.B, built on plain cost, T-B2b).
+                                 Selects what a candidate is inside _replan_tasks(): an
+                                 individual task, or one ordering of the pool. A run
+                                 option (T-B2d). See module docstring, DESIGN-16.
         gate_strategy:           B2, the mid-task plausibility gate. "none" (default)
                                  always escalates — update() then behaves exactly as it
                                  did before the block split. "b2a" (T4) realizes the
@@ -318,6 +325,10 @@ class MetaPlanner:
     def min_separation(self) -> float:
         """World units, as the body supplied it."""
         return self._min_separation
+
+    @property
+    def strategy(self) -> str:
+        return self._strategy
 
     @property
     def gate_strategy(self) -> str:
@@ -784,9 +795,9 @@ class MetaPlanner:
 
         Forming candidates from task_pool is this block's private business:
             single_task  — each task in the pool is a candidate; argmin wins.
-            full_reorder — each permutation of the pool is a candidate.
-                           NOT IMPLEMENTED; Projector.project() also refuses
-                           orderings longer than 1 (DESIGN-16).
+            full_reorder — each ordering of the pool is a candidate; the
+                           head of the cheapest becomes the current task.
+                           Built on plain cost: _replan_orderings() (T-B2b).
 
         single_task (B3.A with realized cost, T10): each candidate is projected
         alone from the live WorldState at decision step 0 (the trigger, on the
@@ -830,20 +841,15 @@ class MetaPlanner:
         cost, hold, T_h, candidate count). No step field, as [meta-proj] and
         [meta-b2]: the [meta-trig] line of the same tick precedes them.
         """
-        if self._strategy == "full_reorder":
-            raise NotImplementedError(
-                "MetaPlanner._replan_tasks: 'full_reorder' strategy is not yet "
-                "implemented — see design_decisions.md, DESIGN-16. "
-                "Projector.project() raises NotImplementedError for orderings "
-                "longer than 1, which this strategy would require."
-            )
-        if self._strategy != "single_task":
+        if self._strategy not in ("single_task", "full_reorder"):
             raise ValueError(f"MetaPlanner: unknown strategy '{self._strategy}'")
         if self._cost_strategy not in ("realized", "plain"):
             raise ValueError(f"MetaPlanner: unknown cost_strategy '{self._cost_strategy}'")
 
         now = 0.0  # the trigger, on the projection clock
         against = human_projection if self._cost_strategy == "realized" else None
+        if self._strategy == "full_reorder":
+            return self._replan_orderings(task_pool, belief, world, executor_state, against)
         rows: List[Tuple[TaskInstance, RealizedPlan]] = []
         for task in task_pool:
             projection = self._projector.project([task], world, executor_state.agent_id, belief, start_step=now)
@@ -873,6 +879,108 @@ class MetaPlanner:
         new_queue = [t for t in task_pool if t is not winner]
         self._queue = new_queue
         return UpdateResult(current_task=winner, queue=list(new_queue), hold=hold)
+
+    def _replan_orderings(
+        self,
+        task_pool: List[TaskInstance],
+        belief: BeliefState,
+        world: WorldState,
+        executor_state: ExecutorState,
+        against: Optional[ProjectedPlan],
+    ) -> UpdateResult:
+        """
+        B3.B, "full_reorder", ON PLAIN COST (T-B2b): a candidate is one ordering
+        of the pool — the same pool single_task ranks, the current task
+        included when there is one — and the HEAD of the cheapest ordering
+        becomes the current task. Everything is computed here, at the trigger,
+        on projections; nothing is executed and `world` is only read.
+
+        THE COST OF AN ORDERING is the sum of its entries' T_r: the ordering is
+        projected as one chained ProjectedPlan (Projector.project(), T-B2a) and
+        priced by the plain-cost path that already exists — realize() against
+        NO human plan, as cost_strategy "plain" does — whose cost is the span
+        of the plan's segments; the entries are contiguous, so the span is that
+        sum. realize() is unchanged. The ordering is NOT realized against the
+        human projection here, under either cost_strategy: that is T-B2c,
+        after the hold per entry (T-B Q2) is built. Until then cost_strategy
+        decides the head's hold and nothing about the ranking.
+
+        ENUMERATION AND TIES: every permutation, in pool order (the pool's own
+        order first, then by position), and the first minimum wins — so on a
+        tie between orderings with different heads, the head is the one
+        earlier in the pool, the task single_task's rule would pick (TODO-42,
+        unchanged). No cap on the pool and no depth limit: nothing in the
+        design sets one (n! projections of n entries; pools are 3 to 5).
+
+        THE HOLD is the one single_task would send for the same head: the head
+        projected ALONE, as one entry, and realized against `against` (the
+        human projection under cost_strategy "realized", none under "plain").
+        Under one hold per entry (T-B Q2) the hold before the first entry is
+        exactly that value, so the robot is never sent out unrealized.
+
+        THE TAIL CARRIES NO COMMITMENT (T-B Q3: B2 commits to the current
+        task, `b2a` unchanged). The winning ordering is not stored: self._queue
+        becomes the pool without the head IN POOL ORDER, exactly as
+        single_task leaves it, so the ordering cannot reach the next call
+        through the pool's order and its tie-breaks. UpdateResult.queue lists
+        the tail in the ordering's order, as information only.
+
+        Logs, per call: one [meta-ord] line per possible head, in pool order
+        (the cheapest ordering that starts with it, its cost, how many
+        orderings start with it); one [meta-head] line, the chosen head
+        realized alone ([meta-cand]'s fields — it is where the hold comes
+        from, and not a candidate); and the [meta-b3] line, with selection
+        `plain` (what the argmin was taken on), cost the winning ordering's,
+        candidates the number of orderings, and `ordering=` appended.
+        """
+        now = 0.0  # the trigger, on the projection clock
+        agent_id = executor_state.agent_id
+
+        # head's index in the pool -> (cost, ordering as pool indices); filled in
+        # enumeration order, a strict < keeping the first minimum per head
+        cheapest: Dict[int, Tuple[float, Tuple[int, ...]]] = {}
+        for indices in itertools.permutations(range(len(task_pool))):
+            projection = self._projector.project(
+                [task_pool[i] for i in indices], world, agent_id, belief, start_step=now
+            )
+            cost = realize(projection, None, self._min_separation, decision_step=now).cost
+            if indices[0] not in cheapest or cost < cheapest[indices[0]][0]:
+                cheapest[indices[0]] = (cost, indices)
+
+        per_head = factorial(len(task_pool) - 1)
+        for head_index, (cost, indices) in cheapest.items():
+            logging.info(
+                f"[meta-ord] head={task_instance_key(task_pool[head_index])} cost={cost:.2f} "
+                f"orderings={per_head} ordering={_fmt_ordering(task_pool[i] for i in indices)}"
+            )
+
+        # min() keeps the first: heads are in pool order
+        cost, indices = min(cheapest.values(), key=lambda row: row[0])
+        ordering = [task_pool[i] for i in indices]
+        head = ordering[0]
+
+        projection = self._projector.project([head], world, agent_id, belief, start_step=now)
+        realized = realize(projection, against, self._min_separation, decision_step=now)
+        hold = realized.delta
+        logging.info(
+            f"[meta-head] {task_instance_key(head)} reason={realized.reason} "
+            f"T_r={realized.projected_duration:.2f} delta={realized.delta} "
+            f"cost={realized.cost:.2f} share={realized.unassessed_share:.2f}"
+        )
+        logging.info(
+            f"[meta-b3] trigger={self._last_trigger_reason} cost_strategy={self._cost_strategy} "
+            f"selection=plain winner={task_instance_key(head)} cost={cost:.2f} hold={hold} "
+            f"T_h={_fmt(realized.horizon)} candidates={per_head * len(task_pool)} "
+            f"ordering={_fmt_ordering(ordering)}"
+        )
+
+        self._queue = [t for t in task_pool if t is not head]
+        return UpdateResult(current_task=head, queue=ordering[1:], hold=hold)
+
+
+def _fmt_ordering(ordering) -> str:
+    """An ordering for the log lines above: its task instance keys, head first."""
+    return " > ".join(task_instance_key(task) for task in ordering)
 
 
 def _fmt(value: Optional[float]) -> str:

@@ -99,6 +99,7 @@ DOMAIN_REGISTRY = {
 
 EXPERIMENT_CONFIG_PATH = "configs/experiment.yaml"
 
+STRATEGIES = ("single_task", "full_reorder")
 GATE_STRATEGIES = ("none", "b2a", "b2b")
 COST_STRATEGIES = ("realized", "plain")
 BOOL_OPTIONS = ("assignment_prior", "separation_stop")
@@ -122,7 +123,8 @@ def load_experiment(experiment_path: str, overrides: dict) -> dict:
             f"Run options: {sorted(overrides)}"
         )
     config.update({k: v for k, v in overrides.items() if v is not None})
-    for key, choices in (("gate_strategy", GATE_STRATEGIES), ("cost_strategy", COST_STRATEGIES)):
+    for key, choices in (("strategy", STRATEGIES), ("gate_strategy", GATE_STRATEGIES),
+                         ("cost_strategy", COST_STRATEGIES)):
         if key in config and config[key] not in choices:
             raise ValueError(f"{key}={config[key]!r}: expected one of {list(choices)}")
     for key in BOOL_OPTIONS:
@@ -170,6 +172,7 @@ def parse_user_args():
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_11)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
     parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
+    parser.add_argument("--strategy", type=str, default=None, choices=STRATEGIES, help="MetaPlanner B3 strategy override")
     parser.add_argument("--gate_strategy", type=str, default=None, choices=GATE_STRATEGIES, help="MetaPlanner B2 gate strategy override")
     parser.add_argument("--cost_strategy", type=str, default=None, choices=COST_STRATEGIES, help="MetaPlanner B3 cost strategy override")
     parser.add_argument("--separation_stop", type=_bool_arg, default=None, help="Execution-time separation stop override: true/false")
@@ -229,6 +232,7 @@ def resolve_model_params(user_config: dict) -> dict:
         "register_fn":      domain["register_fn"],
         "env_layout_path":  layout["path"],
         "assignment_prior": bool(user_config.get("assignment_prior", False)),
+        "strategy":         user_config.get("strategy", "single_task"),
         "gate_strategy":    user_config.get("gate_strategy", "none"),
         "cost_strategy":    user_config.get("cost_strategy", "realized"),
         "separation_stop":  bool(user_config.get("separation_stop", False)),

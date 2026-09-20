@@ -1,7 +1,7 @@
 # configs/experiment.yaml
 # Default experiment configuration.
 # Every key is a run option, and each has a CLI flag of the same name that overrides it:
-# --domain, --layout, --scenario, --steps, --assignment_prior, --gate_strategy, --cost_strategy,
+# --domain, --layout, --scenario, --steps, --assignment_prior, --strategy, --gate_strategy, --cost_strategy,
 # --separation_stop (and --experiment, the path of this file). mesa_sim/run_mesa.py rejects an
 # unknown key or flag, a strategy outside its choices, and a switch that is not true/false.
 
@@ -12,6 +12,9 @@ steps: 50
 
 # Give the robot the observed human's work order: the recognizer's support is restricted to the assigned and foreseeable tasks (evaluation switch, not a scenario fact)
 assignment_prior: false
+
+# MetaPlanner B3 strategy: "single_task" (default: the cheapest next task) | "full_reorder" (B3.B: the head of the cheapest ordering of the pool; on plain cost, T-B2b)
+strategy: "single_task"
 
 # MetaPlanner B2 gate strategy: "none" (default, always escalates to B3) | "b2a" (T4) | "b2b" (stub)
 gate_strategy: "none"

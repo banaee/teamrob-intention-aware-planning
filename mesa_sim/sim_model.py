@@ -87,6 +87,7 @@ class SimModel(model.Model):
                  env_layout_path: str = "domains/kitting/env_layout1.json", 
                  seed=None,
                  assignment_prior: bool = False,
+                 strategy: str = "single_task",
                  gate_strategy: str = "none",
                  cost_strategy: str = "realized",
                  separation_stop: bool = False):
@@ -95,6 +96,9 @@ class SimModel(model.Model):
         # Evaluation switch: give each robot the observed human's assigned_tasks
         # as a persistent IR prior. Off = the robot knows no work order.
         self.assignment_prior = assignment_prior
+        # MetaPlanner B3 strategy for every robot ("single_task" | "full_reorder");
+        # a run option, not a scenario fact (T-B2d).
+        self.strategy = strategy
         # MetaPlanner B2 strategy for every robot ("none" | "b2a" | "b2b"); a run
         # option, not a scenario fact.
         self.gate_strategy = gate_strategy

@@ -251,8 +251,9 @@ class RobotAgent(FactoryAgent):
             duration_to_steps=lambda duration: _parse_duration_to_steps(duration, model),
         )
     
-        # B2's gate and B3's cost are run options (configs/experiment.yaml,
-        # --gate_strategy / --cost_strategy), not scenario facts. min_separation
+        # B3's strategy, B2's gate and B3's cost are run options
+        # (configs/experiment.yaml, --strategy / --gate_strategy /
+        # --cost_strategy), not scenario facts. min_separation
         # is the body's, in world units (mesa_configs.yaml), like assumed_speed above.
         self.meta_planner = MetaPlanner(
             knowledge=knowledge,
@@ -260,6 +261,7 @@ class RobotAgent(FactoryAgent):
             recognizer=self.recognizer,
             min_separation=min_separation,
             human_agent_id=observed_agent_id,
+            strategy=self.model.strategy,
             gate_strategy=self.model.gate_strategy,
             cost_strategy=self.model.cost_strategy,
         )
@@ -268,7 +270,8 @@ class RobotAgent(FactoryAgent):
         # without knowing which code or command produced it. min_separation and
         # beta in the body's units (cm), each with where the body took it from.
         logging.info(
-            f"[run] {self.unique_id} gate_strategy={self.meta_planner.gate_strategy} "
+            f"[run] {self.unique_id} strategy={self.meta_planner.strategy} "
+            f"gate_strategy={self.meta_planner.gate_strategy} "
             f"cost_strategy={self.meta_planner.cost_strategy} "
             f"separation_stop={'on' if self.model.separation_stop else 'off'} "
             f"assignment_prior={'on' if self.model.assignment_prior else 'off'} "
