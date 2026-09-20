@@ -593,3 +593,49 @@ scenario_82 = ScenarioConfig(
         ),
     ],
 )
+
+
+# ===============================================================
+# manually defined scenario, for only "env_layout9" (two kitting tables against
+# opposite walls; the realistic-placement variant of env_layout8).
+# scenario_90 is for VIEWING env_layout9 and running it: it is NOT a measured
+# fixture, nothing is measured from it, and T-B does not use it. The measured
+# two-table fixture is scenario_80 / scenario_81 on env_layout8.
+# ===============================================================
+scenario_90 = ScenarioConfig(
+    id="scenario_90",
+    name="layout9_two_tables_at_the_walls",
+    description=(
+        "env_layout9: kitting_table_0 against the north wall, kitting_table_1 against the south wall. "
+        "The robot's pool is item_5 / item_4 / item_1 (to kitting_table_1) and item_6 (to kitting_table_0); "
+        "the human fetches item_2 to kitting_table_0 and item_3 to kitting_table_1. Not a fixture."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-850, 250),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, 0),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_1"), Var("?kitting_table"): Const("kitting_table_1")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_1")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_1")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)

@@ -1,0 +1,170 @@
+{
+  "space": {
+    "width": 2000,
+    "height": 1000,
+    "name": "Kitting Domain Layout 9",
+    "units": "cm",
+    "notes": "Two kitting tables against opposite walls (kitting_table_0 on the north wall, kitting_table_1 on the south wall): the realistic-placement variant of env_layout8, where both tables stand in open floor. Storage along the side walls. T-B1b follow-up; scenario_90 opens it, and it is not a measured fixture."
+  },
+  "zones": [
+    {
+      "id": "zone_NW",
+      "bounds": { "x_min": -1000, "x_max": 0, "y_min": 0, "y_max": 500 },
+      "label": "northwest_work"
+    },
+    {
+      "id": "zone_NE",
+      "bounds": { "x_min": 0, "x_max": 1000, "y_min": 0, "y_max": 500 },
+      "label": "northeast_work"
+    },
+    {
+      "id": "zone_SW",
+      "bounds": { "x_min": -1000, "x_max": 0, "y_min": -500, "y_max": 0 },
+      "label": "southwest_storage"
+    },
+    {
+      "id": "zone_SE",
+      "bounds": { "x_min": 0, "x_max": 1000, "y_min": -500, "y_max": 0 },
+      "label": "southeast_storage"
+    }
+  ],
+  "doors": [],
+  "robots": [
+    {
+      "id": "robot_0",
+      "type": "mobile_manipulator",
+      "initial_container": "zone_NW",
+      "initial_x": 0,
+      "initial_y": 0
+    }
+  ],
+  "humans": [
+    {
+      "id": "human_0",
+      "type": "worker",
+      "initial_container": "zone_NW",
+      "initial_x": -850,
+      "initial_y": 250
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table_0",
+      "type": "kitting_table",
+      "position": [-500, 450],
+      "size": [200, 100],
+      "zone": "zone_NW",
+      "notes": "Against the north wall, centred in the northwest zone."
+    },
+    {
+      "id": "kitting_table_1",
+      "type": "kitting_table",
+      "position": [500, -450],
+      "size": [200, 100],
+      "zone": "zone_SE",
+      "notes": "Against the south wall, on the opposite side: the arrangement of the two that separates the tables most (67.3 ticks apart)."
+    },
+    {
+      "id": "shelf_1",
+      "type": "shelf",
+      "position": [-950, -350],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "West wall, south end. Robot item, delivered across the room to kitting_table_1."
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [-950, 400],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_NW",
+      "notes": "West wall, north end. Human's first item; no other shelf lies near its bearing from the human's start."
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [700, 450],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_NE",
+      "notes": "North wall, east end. Human's second item."
+    },
+    {
+      "id": "shelf_4",
+      "type": "shelf",
+      "position": [950, -100],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SE",
+      "notes": "East wall. Robot item, short haul to kitting_table_1."
+    },
+    {
+      "id": "shelf_5",
+      "type": "shelf",
+      "position": [950, -350],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SE",
+      "notes": "East wall, south end. Robot item, the shortest single task from the robot's start."
+    },
+    {
+      "id": "shelf_6",
+      "type": "shelf",
+      "position": [-600, -450],
+      "size": [100, 100],
+      "slots": 2,
+      "zone": "zone_SW",
+      "notes": "South wall, west end. The robot's only kitting_table_0 item: its delivery ends at the far table."
+    },
+    {
+      "id": "item_1",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_1",
+      "size": [25, 25]
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_1",
+      "size": [25, 25]
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_1",
+      "size": [25, 25]
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
+      "size": [25, 25]
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [25, 25]
+    },
+    {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_1",
+      "size": [25, 25]
+    }
+  ]
+}
