@@ -273,8 +273,8 @@ used inside one method's steps (`deliver_with_return`'s `?other_container`), not
 `ProjectedPlan` per candidate: an ordering of n tasks projects to one plan with n ENTRIES, in the
 ordering's order, each entry holding that task's SEGMENTS (docs/glossary.md). Under the
 `single_task` strategy (DESIGN-16, the implemented default) a `ProjectedPlan` always holds exactly
-one entry — the multi-entry shape is there for `full_reorder`, which is designed and not yet
-implemented.
+one entry; under `full_reorder` (built on plain cost, T-B2b) it holds one entry per task of the
+ordering, each starting at the step and the position the previous one ends at (T-B2a).
 
 ```python
 @dataclass
@@ -614,16 +614,17 @@ binding resolution.
 
 ---
 
-### 2.2 `MetaPlanner` (`shared/meta_planner.py`) — IMPLEMENTED (`single_task` path)
+### 2.2 `MetaPlanner` (`shared/meta_planner.py`) — IMPLEMENTED (`single_task`; `full_reorder` on plain cost)
 
 Verified against `shared/meta_planner.py` and validated end-to-end against `scenario_00`
-(September 2026). The `full_reorder` strategy is **not** implemented — `update()` and
-`_project()` both raise `NotImplementedError` for it (DESIGN-16).
+(September 2026). The `full_reorder` strategy is built ON PLAIN COST (T-B2b, `_replan_orderings()`), over
+`Projector.project()`'s chained entries (T-B2a); realizing an ordering against the human projection is
+T-B2c, not built. Nothing raises for it any more.
 
 Private methods (`_is_current_task_plausible`, `_replan_tasks`, `_is_complete`, `_clears_gate`)
 are internal to the class and deliberately not part of this contract; only the constructor, the
 public methods below and the read-only parameter properties (`theta`, `rho`, `min_separation`,
-`gate_strategy`, `cost_strategy`; for the run-log header, TODO-78) are cross-boundary surface.
+`strategy`, `gate_strategy`, `cost_strategy`; for the run-log header, TODO-78) are cross-boundary surface.
 Projection (`project`, `build_segments`, `estimate_duration`) lives on `Projector`
 (`shared/projection.py`), which is injected. Realization (`realize()`, §2.2c) lives on the
 projection side as well, not on `MetaPlanner`, which supplies `min_separation` and
@@ -811,16 +812,30 @@ is inside B3; neither strategy commits to an order:
   `WorldState` and realized; the argmin of realized cost becomes the new `current_task` — every
   candidate carries a cost and none is excluded, since F1 made realization total. The rest of the
   queue carries no ordering commitment; it is re-decided at the next trigger.
-- `full_reorder` (B3.B; not implemented, designed, the next build) — each ordering of the pool is
-  a candidate, projected as one chained `ProjectedPlan` (one entry per task, in the ordering's
-  order) and realized against the one human projection inside [trigger, T_h]; the argmin ordering's
-  head becomes `current_task`. The tail is a lookahead for that choice, re-priced at the next ROBOT
-  TRIGGER (`task_committed`, which passes through B2, or `no_current_task`, which bypasses it), not
-  an order commitment (this supersedes "replace the whole queue"). Needs the chained robot state in
-  `Projector.project()` (the part of TODO-07 that applies: retraction and object relocation in a
-  hypothetical successor state); DESIGN-12 does not apply. Open: where a later task's hold is
-  placed, and what B2 commits to. design_decisions.md, "B3.B (`full_reorder`) is lookahead for the
-  choice of the next task, built next".
+- `full_reorder` (B3.B; built on plain cost, T-B2b; run option `--strategy`, T-B2d) — each ordering of
+  the pool (the same pool, the current task included) is a candidate, projected as one chained
+  `ProjectedPlan` (one entry per task, in the ordering's order; T-B2a); the argmin ordering's head
+  becomes `current_task`. AS BUILT: an ordering costs the sum of its entries' T_r, obtained through the
+  existing plain-cost path (`realize()` against no human plan: the span of the plan's segments, the
+  entries being contiguous), under EITHER `cost_strategy`; orderings are enumerated in pool order and
+  the first minimum wins, so a tie between heads goes to the one earlier in the pool (TODO-42); no cap
+  on the pool, no depth limit. `UpdateResult.hold` is the hold `single_task` would send for the same
+  head: the head projected alone and realized against the human projection (`cost_strategy`
+  "realized") or against none ("plain"). So until T-B2c `full_reorder` with `cost_strategy` "realized" is a
+  HYBRID (ranked on plain cost, only the head's hold realized); the `[run]` header does not show it,
+  `[meta-b3]`'s `selection=plain` does, and no `full_reorder` baselines are recorded. NOT BUILT (T-B2c): the ordering realized against the one
+  human projection inside [trigger, T_h], one hold per entry (T-B Q2). The tail is a lookahead for the
+  choice of the head, re-priced at the next ROBOT TRIGGER (`task_committed`, which passes through B2,
+  or `no_current_task`, which bypasses it), not an order commitment: B2 commits to the current task
+  (T-B Q3, `b2a` unchanged), the winning ordering is not stored (the internal queue stays the pool
+  without the head, in pool order, as under `single_task`), and `UpdateResult.queue` lists the tail in
+  the ordering's order as information only. DESIGN-12 does not apply. Logs per B3 call: `[meta-ord]`
+  per possible head, in pool order (`head`, `cost` of the cheapest ordering that starts with it,
+  `orderings` that start with it, `ordering`, keys joined by ` > `); `[meta-head]`, the chosen head
+  realized alone (the fields of `[meta-cand]`; the source of the hold, not a candidate); `[meta-b3]`
+  with `selection=plain`, `cost` the winning ordering's, `candidates` the number of orderings, and
+  `ordering=` appended. `single_task`'s lines are unchanged. design_decisions.md, "B3.B
+  (`full_reorder`) is lookahead for the choice of the next task, built next".
 
 The human's projection is built once per fired trigger by `update_human_projection()` (below)
 and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.

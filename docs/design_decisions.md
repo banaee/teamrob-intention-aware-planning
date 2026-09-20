@@ -3106,3 +3106,59 @@ Files: shared/projection.py (`project`, `_successor_state`), shared/types.py (`A
 (§1.7, §3), docs/TODOS_AND_DEFERRED.md (TODO-07, TODO-77)
 Reference: T-B2a, September 2026; "B3.B (`full_reorder`) is lookahead for the choice of the next task, built
 next", (a) to (c); TODO-07
+
+---
+
+**B3.B on plain cost: the internal queue stays in pool order, and until T-B2c `full_reorder` is a hybrid (T-B2b, T-B2d)**
+
+DECIDED (cchat rulings on the T-B2b report, September 2026; built in T-B2b / T-B2d).
+
+WHAT IS BUILT. Under `--strategy full_reorder` (a strict run option, default `single_task`, named in the
+`[run]` header) B3's candidates are the orderings of the same pool `single_task` ranks, the current task
+included when there is one. Each is projected with T-B2a's chained `project()`; the head of the cheapest
+becomes `current_task`. Orderings are enumerated in pool order and the first minimum wins, so a tie between
+heads goes to the one earlier in the pool, the task `single_task`'s rule would pick (TODO-42 unchanged). No cap
+on the pool and no depth limit: nothing in the design sets one. Measured: one B3 call with a pool of four (24
+orderings) takes about 6 ms, against about 1 ms under `single_task`.
+
+PLAIN COST THROUGH THE EXISTING MECHANISM (accepted). An ordering costs the sum of its entries' T_r, obtained
+as `cost_strategy plain` obtains a task's: `realize(plan, None, ...)`, δ = 0 and cost = the span of the plan's
+segments. The entries of a chained ordering are contiguous, so the span is that sum. `realize()` is unchanged.
+
+THE HOLD is the one `single_task` would send for the same head: the head projected alone, as one entry, and
+realized against the human projection (`cost_strategy realized`) or none (`plain`). Under one hold per entry
+(T-B Q2) the hold before the first entry is exactly that value, so this part already sends what T-B2c will
+send, and the robot is never sent out unrealized.
+
+THE INTERNAL QUEUE STAYS IN POOL ORDER; ONLY `UpdateResult.queue` LISTS THE TAIL (accepted, ccode's reasoning).
+The pool of the next call is the current task plus the internal queue, in that order, and ties are broken by
+pool order. Writing the tail's order into the internal queue would therefore carry the winning ordering into
+the next call's tie-breaks: a commitment to the order, which T-B Q3 excluded (B2 commits to the current task;
+the tail is lookahead, re-priced at the next robot trigger). So `_replan_orderings()` leaves the internal
+queue as `single_task` leaves it, the pool without the head in pool order, and the winning ordering is stored
+nowhere. `UpdateResult.queue` lists the tail in the ordering's order, as information only.
+
+UNTIL T-B2C `full_reorder` WITH `cost_strategy realized` IS A HYBRID: orderings are ranked on PLAIN cost under
+either `cost_strategy`, and only the head's hold is realized. The `[run]` header does not show this
+(`strategy=full_reorder cost_strategy=realized` reads as if orderings were realized); the `[meta-b3]` line
+does (`selection=plain`). For that reason NO `full_reorder` BASELINES ARE RECORDED BEFORE T-B2C.
+
+THE LOG (accepted), under `full_reorder` only, `single_task`'s lines unchanged: `[meta-ord]` per possible head,
+in pool order (the cheapest ordering that starts with it, its cost, how many orderings start with it);
+`[meta-head]`, the chosen head realized alone, with `[meta-cand]`'s fields (the source of the hold; not called
+a candidate, since under `full_reorder` a candidate is an ordering); `[meta-b3]` with `selection=plain`, the
+winning ordering's cost, the number of orderings as `candidates`, and `ordering=` appended.
+
+CHECKED. The 20 baselines under the default differ from the previous ones in the `[run]` line alone; removing
+` strategy=single_task` from it restores each byte for byte. scenario_80, prior off: `single_task` heads 6, 1,
+7, 4, completion 261 (world fact); `full_reorder` heads 7, 4, 6, 1, completion 220; at the first call the head
+is item_7 from 7 > 4 > 6 > 1 at 221.08, the cheapest ordering of `analysis/tb1b_two_tables/permutation_costs.py`,
+and all four per-head costs match its table. scenario_00, both priors: no choice, hold or completion tick
+differs from `single_task` (nor from `single_task` on plain cost, the control): a null result, as expected
+where geometry does not couple tasks. The full comparison is T-B3.
+
+Files: shared/meta_planner.py (`_replan_tasks`, `_replan_orderings`, `strategy`), mesa_sim/run_mesa.py,
+mesa_sim/sim_model.py, mesa_sim/sim_agents.py (`[run]` header), configs/experiment.yaml,
+shared/io_contracts.md (§1.7, §2.2), docs/glossary.md, docs/roadmap.md, CLAUDE.md
+Reference: T-B2b, T-B2d, September 2026; "B3.B (`full_reorder`) is lookahead for the choice of the next task,
+built next"; T-B Q2, T-B Q3

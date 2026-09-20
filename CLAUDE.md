@@ -85,14 +85,20 @@ Decisions
   (D2: `recognition_changed` against the decision record replaces `theta_crossed`), and the policy
   components are ablated (T6, `analysis/t6_ablation/`); the recognizer's evidence is graded by path
   covered and the gate stays a fixed share (graded evidence, the gate ruling). The 4C queue is done.
-  The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`); the next build is T-B,
-  B3.B (`full_reorder`) on two-table kitting, after its fixture design question. Not to be started
+  The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`). T-B is under way: T-B2a
+  (`Projector.project()` chains the entries of an ordering, through a successor state derived from what the
+  action schemas declare), T-B2b (`full_reorder` on plain cost) and T-B2d (the `--strategy` run option) are
+  built; the next build is T-B2c, an ordering realized against the human projection with one hold per entry,
+  after a cchat question on the projection's extra tick per `pick_up` entry (TODO-77). Not to be started
   unasked: T-C to T-G, i.e. the human action script, robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
-  cost) exist. `full_reorder` (B3.B) is designed and is T-B's build, in the recorded order
-  (design_decisions.md, the B3.B entry); build it only in a T-B task, and only the step that task names.
+  cost) exist. `full_reorder` (B3.B) is built ON PLAIN COST (`_replan_orderings()`, T-B2b): until T-B2c,
+  `full_reorder` with `cost_strategy realized` is a HYBRID, orderings ranked on plain cost and only the
+  head's hold realized, and the `[run]` header does not show it; no `full_reorder` baselines are recorded
+  before T-B2c. The rest follows the recorded order (design_decisions.md, the B3.B entry); build it only
+  in a T-B task, and only the step that task names.
   B2 is an evaluation factor, not a design step: `b2b` stays a stub. Change only what the task
   specifies; do not fill in unspecified block logic, flags or strategies.
 - `shared/recognizer.py`: rebuilt and handed back (`docs/recognizer_handback.md`). Not under
@@ -172,10 +178,11 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout2 --scena
 
 Logs go to `logs/run_<timestamp>.log`. Defaults come from `configs/experiment.yaml`; CLI flags
 override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_prior`
-(true/false), `--gate_strategy` (none | b2a | b2b), `--cost_strategy` (realized | plain),
+(true/false), `--strategy` (single_task | full_reorder), `--gate_strategy` (none | b2a | b2b),
+`--cost_strategy` (realized | plain),
 `--separation_stop` (true/false), and `--experiment` (another yaml). Parsing is strict: an unknown
 or misspelled flag, an unknown yaml key, or a bad value stops the run. Each robot's `[run]` header
-names the policy and evaluation switches the run took (gate, cost, stop, assignment prior, θ, ρ,
+names the policy and evaluation switches the run took (strategy, gate, cost, stop, assignment prior, θ, ρ,
 min_separation and β, each with its source: the body supplies both, `mesa_sim/mesa_configs.yaml`, 50 cm
 and 0.01 /cm).
 
@@ -212,6 +219,9 @@ cost argument: `analysis/tb1b_two_tables/`.
 ```bash
 grep "^\[meta\]"        <log>   # meta-planner winner per trigger
 grep "meta-cand"        <log>   # per-candidate evaluation (fields change as realization lands)
+grep "^\[meta-ord\]"    <log>   # full_reorder: per possible head, the cheapest ordering that starts with it
+grep "^\[meta-head\]"   <log>   # full_reorder: the chosen head realized alone (the source of the hold)
+grep "^\[meta-b3\]"     <log>   # B3's decision; under full_reorder with ordering= appended
 grep "^\[meta-proj\]"   <log>   # human projection admitted or not, and why
 grep "^\[meta-pool\]"   <log>   # completed tasks dropped from the pool
 grep "^\[IR\] step="    <log>   # most_likely and confidence per tick

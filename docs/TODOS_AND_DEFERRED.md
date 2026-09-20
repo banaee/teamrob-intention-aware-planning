@@ -111,6 +111,8 @@ deserves its own design session — deliberately NOT solved with a narrow positi
 stopgap inside `_project()`, since that would silently fail for any future guard depending
 on a different predicate (dock_loading gate state, `obj_at`, etc.).
 Not blocking: `single_task` projects only from the real live WorldState.
+(CORRECTED at T-B2b: the two paragraphs above describe the state BEFORE T-B2a. `project()` no longer
+raises for orderings and `full_reorder` runs, on plain cost; see the T-B2a update below.)
 UPDATED (B3.B design revision, September 2026): B3.B is next in the pipeline, and this entry APPLIES
 TO IT IN PART. Needed, for projection only: effect application with retraction (at `task_committed`
 the live world holds `holding(robot, A)`; in the ordering (A, B) the stale fact would select
@@ -720,6 +722,9 @@ Implementation: `MetaPlanner._strategy: Literal["single_task", "full_reorder"]`,
 param, defaults to `"single_task"`. `update()` branches on it; `_project()` raises
 `NotImplementedError` for orderings longer than 1. The seam exists in code, not only in docs,
 so `full_reorder` is a known-cost extension rather than a rewrite.
+(CORRECTED at T-B2b: as of T-B2a `Projector.project()` chains the entries of an ordering and raises
+nothing; as of T-B2b `_replan_tasks()` dispatches `full_reorder` to `_replan_orderings()`, on plain cost,
+and `--strategy` is a run option (T-B2d). Realizing an ordering is T-B2c.)
 
 To implement `full_reorder`, three things are needed: (i) resolve TODO-07's effects/retraction
 semantics for cross-task WorldState propagation, (ii) DESIGN-12's horizon-projected confidence,

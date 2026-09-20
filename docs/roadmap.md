@@ -366,6 +366,12 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   - B2: the build in the recorded order: the successor state and `project()` for orderings; B3.B on plain
     cost; then on realized cost; a `strategy` run option. Open points settled at design time: the hold at
     the boundary before the task it clears; B2 commits to a task.
+    STATE (September 2026): T-B2a ✅ (`project()` chains the entries; the successor state from what the
+    schemas declare), T-B2b ✅ (`full_reorder` on plain cost), T-B2d ✅ (`--strategy`). NEXT: T-B2c (an
+    ordering realized, one hold per entry), after a cchat question: the projection's extra tick per entry
+    with a `pick_up` accumulates over an ordering (TODO-77). Until T-B2c `full_reorder` with
+    `cost_strategy realized` is a hybrid (ranked on plain cost, the head's hold realized), and no
+    `full_reorder` baselines are recorded.
   - B3: evaluation of B3.A against B3.B on the two-table fixtures, plain then realized; the one-table
     fixtures byte-identical for the default run.
 - **T-C — The human action script.** The human's scenario is a sequence of actions (`move_to` a target or

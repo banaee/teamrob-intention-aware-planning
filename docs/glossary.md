@@ -52,15 +52,28 @@ and is re-priced at the next robot trigger.
 → `docs/design_decisions.md`, "B3.B (`full_reorder`) is lookahead for the choice of the next task,
 built next", point 4.
 
-**queue** — the pool without the current task, as carried in `UpdateResult.queue`. Unordered: it
-carries no commitment under either strategy, and is re-decided at the next trigger.
+**queue** — the pool without the current task, as carried in `UpdateResult.queue`. It carries no
+commitment under either strategy, and is re-decided at the next trigger. Under `full_reorder`
+`UpdateResult.queue` lists the winning ordering's tail, as information only; the meta-planner's internal
+queue stays in pool order, so the winning ordering is not stored.
 → `shared/types.py`, `UpdateResult`; `shared/meta_planner.py`, `update()` ("queue invariant").
 NOTE: the field `ProjectedPlan.task_queue` is a different thing — the tasks of ONE projected
 ordering, in the ordering's order. The identifier is not renamed.
 
-**single_task** / **full_reorder** — B3's two strategies (B3.A and B3.B). `single_task` is the
-default and the implemented one; `full_reorder` is designed and is T-B's build.
-→ `shared/meta_planner.py`, module docstring, STRATEGY; `docs/design_decisions.md`, DESIGN-16.
+**single_task** / **full_reorder** — B3's two strategies (B3.A and B3.B), selected by the run option
+`--strategy`. `single_task` is the default. `full_reorder` is built ON PLAIN COST (T-B2b): an ordering
+costs the sum of its entries' T_r, and the hold that goes out is the head's, realized alone. Until T-B2c
+`full_reorder` with `cost_strategy realized` is therefore a HYBRID — orderings ranked on plain cost, only
+the head's hold realized — and the `[run]` header does not show it.
+→ `shared/meta_planner.py`, module docstring, STRATEGY, and `_replan_orderings()`;
+`docs/design_decisions.md`, DESIGN-16 and "B3.B on plain cost: the internal queue stays in pool order".
+
+**successor state** — the hypothetical `WorldState` entry k+1 of an ordering is decomposed against: the
+previous one as entry k's action schemas declare they leave it (`ActionSchema.retracts`, `effects`,
+`moved_object_key` / `moved_to_key`), with the agent where entry k's last segment ends. Built and dropped
+inside one `Projector.project()` call; the live `WorldState` is never written.
+→ `shared/projection.py`, `_successor_state()`; `docs/design_decisions.md`, "The successor state is
+derived from what the action schemas declare: a delete list and a declared relocation".
 
 **B1 / B2 / B3** — the blocks of `MetaPlanner.update()`: B1 the human projection, B2 the mid-task
 commitment gate (`b2a` built, `b2b` a stub), B3 selection on realized cost.
