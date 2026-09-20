@@ -1413,6 +1413,14 @@ deterministic under PYTHONHASHSEED=0, so variation must come from generated inpu
 Prerequisites:
 (a) Programmatic layout/scenario registration — adding a layout today needs three manual
     edits (layout JSON, `scenarios.py`, `registry.py`).
+    FIRST PART ✅ BUILT (T-B1b, September 2026): `domains/kitting/fixture_generation.py`: `build_layout`
+    (the env_layout dict from tables, shelves, items with shelf and designated table, starts),
+    `delivery_scenario` (delivery tasks state the table the layout designates), `register_layout` (adds
+    the layout and its scenarios to `domain_config`, and refuses a JSON file that differs from the
+    generated layout). A fixture module holds the data and registers itself with one call in
+    `registry.py`; first user `fixture_two_tables.py` (env_layout8). What remains for the harness (T-F):
+    generating the specs themselves (randomised geometry and assignments), foreseeable-task objects and
+    tasks in the builders, and registration without a committed JSON per layout.
 (b) Scale-relative calibration — `min_separation` (formerly `min_safe_distance`, TODO-28; and
     any B2 reference for δ, TODO-36) must be expressed relative to layout scale or agent
     speed × steps, not as an absolute read off one fixture.
@@ -1474,6 +1482,12 @@ Prerequisites:
     RESOLVED (T-B1a, September 2026): a fact of the station, the layout's `"destination"` per item; one
     hypothesis per item, the table determined from the item (`determined_parameters`). design_decisions.md,
     "An item's destination table is a fact of the station". TODO-86 / TODO-87 record what it leaves open.
+    ✅ BUILT (T-B1b, September 2026): `env_layout8`, `scenario_80` (plain cost, ordering isolated) and
+    `scenario_81` (a conflict in the second task of an ordering). Robot pool item_1 / 6 / 4 to
+    kitting_table_0, item_7 to kitting_table_1: the cheapest single task from the start is item_6
+    (39.3 ticks), the cheapest full ordering starts with item_7, and greedy is 41.4 ticks worse. The
+    fixture settles the choice of head, not the tail (the two best orderings differ by 2.2 ticks). The
+    permutation table, the runs and the baselines: `analysis/tb1b_two_tables/README.md`.
 (g) THE GATE'S REOPENING CONDITION (gate ruling, September 2026): a walk crossing of θ with a live rival at
     similar odds (top-two ratio near 1 at the crossing), where the normalised share and a margin gate would
     disagree. No current fixture shows one (lowest top-two ratio at a walk crossing 5.23, s00_off 37).

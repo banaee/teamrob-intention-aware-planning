@@ -202,7 +202,9 @@ stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record baselines before
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
 scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
 (a foreseen human stay on the robot's route; the beside / across alternative). Scripts and baselines:
-`analysis/f47_fixtures/`.
+`analysis/f47_fixtures/`. scenario_80 / scenario_81 on env_layout8 (two kitting tables, T-B's fixture: the
+greedy head is not the head of the cheapest ordering; a conflict past the head). Script, baselines and the
+cost argument: `analysis/tb1b_two_tables/`.
 
 ```bash
 grep "^\[meta\]"        <log>   # meta-planner winner per trigger
@@ -227,8 +229,12 @@ Completion is measured from the world fact (T6): the tick after the robot's last
 ## Conventions and terminology
 
 - Scenario ids are prefixed by layout number: `env_layout2` → `scenario_20`, `scenario_21`.
-- Adding a layout needs three edits: `domains/kitting/env_layout<N>.json`,
-  `domains/kitting/scenarios.py`, and `domains/kitting/registry.py` (import and `layouts` entry).
+- Adding a layout by hand needs three edits: `domains/kitting/env_layout<N>.json`,
+  `domains/kitting/scenarios.py`, and `domains/kitting/registry.py` (import and `layouts` entry). A generated
+  fixture needs none of the three by hand (T-B1b, TODO-47 (a)): a fixture module states the geometry and the
+  tasks, builds the layout and the scenarios through `domains/kitting/fixture_generation.py`, writes its
+  JSON, and registers itself with one call in `registry.py` (`domains/kitting/fixture_two_tables.py`:
+  env_layout8, scenario_80 / scenario_81). Its JSON is generated; change the module, not the file.
 - "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is an
   individual task, never an ordering.
 - Triggers: `no_current_task`; `recognition_changed` (the belief no longer points at the
