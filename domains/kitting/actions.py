@@ -67,6 +67,8 @@ pick_up = ActionSchema(
     ],
     completion=ConditionSchema("holding", (_agent, _item)),
     microactions=["GRASP"],
+    moved_object_key="?item",
+    moved_to_key="?agent",      # a held item is wherever its holder is
 )
 
 place = ActionSchema(
@@ -77,10 +79,16 @@ place = ActionSchema(
     ],
     effects=[
         ConditionSchema("obj_at", (_item, _target)),
-        ConditionSchema("not_holding", (_agent, _item)),
+    ],
+    # holding is RETRACTED, not answered by a second fact: not_holding(agent, item)
+    # was an added predicate nothing consumed, and it left holding true (TODO-07).
+    retracts=[
+        ConditionSchema("holding", (_agent, _item)),
     ],
     completion=ConditionSchema("obj_at", (_item, _target)),
     microactions=["RELEASE"],
+    moved_object_key="?item",
+    moved_to_key="?target",
 )
 
 # wait_at's completion is a world fact the body emits when its timer runs out —

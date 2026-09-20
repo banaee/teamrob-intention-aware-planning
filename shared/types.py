@@ -296,6 +296,25 @@ class ActionSchema:
     # (pick_up, place: one microaction). The body's decomposer executes it and
     # the Projector prices it through the body's duration-to-steps callable
     # (TODO-32), so knowledge and behaviour read the same binding.
+    retracts: List[ConditionSchema] = field(default_factory=list)
+    # Facts that are no longer true once the action is done — the delete list
+    # beside `effects`, the add list. e.g. place retracts holding(?agent, ?item).
+    # Its own list and not a negation flag on ConditionSchema, because a
+    # ConditionSchema is also a guard, a precondition and a completion, where
+    # such a flag would be declared and never read. Every Var must be one the
+    # grounded action binds. Read by the Projector's successor state only
+    # (T-B2a; the part of TODO-07 projection needs); the live planner does no
+    # forward chaining.
+    moved_object_key: Optional[str] = None
+    moved_to_key: Optional[str] = None
+    # Binding keys naming the object the action moves and where the action puts
+    # it: an agent that then holds it, or an object it then lies at. e.g.
+    # pick_up ("?item", "?agent"), place ("?item", "?target"). Declared as
+    # movement_target_key declares the movement target. None for an action that
+    # moves no object. Where an object is has two representations in a
+    # WorldState, a predicate and the object_locations / object_positions maps
+    # target resolution reads; this declares the second, which no predicate
+    # name in shared/ could (T-B2a).
 
 @dataclass
 class GroundedAction:

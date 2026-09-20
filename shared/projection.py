@@ -45,7 +45,8 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT import from mesa_sim/ or ros_sim/
 """
 
-from typing import Callable, List, Optional
+from dataclasses import replace
+from typing import Callable, List, Optional, Tuple
 
 from shared.types import (
     BeliefState,
@@ -207,80 +208,151 @@ class Projector:
         start_step: float = 0.0,
     ) -> ProjectedPlan:
         """
-        Builds a ProjectedPlan for `ordering`.
+        Builds a ProjectedPlan for `ordering`: one entry per task, in the
+        ordering's order.
 
-        len(ordering) == 1 — the only implemented path:
-            Decomposes the one task via planner.plan(), starting from the live
-            WorldState — so a partially-executed task is projected from where the
-            agent actually is, not from scratch. No cross-task WorldState chaining
-            involved. `belief` is forwarded to planner.plan() as-is (required, no
-            default on that signature); callers always have a real belief available,
-            unlike the human script path in sim_agents.py which fabricates a dummy
-            one because it has no IR at all.
+        The first entry is decomposed via planner.plan() against the WorldState
+        the caller passes — the live one — so a partially-executed task is
+        projected from where the agent actually is, not from scratch. `belief`
+        is forwarded to planner.plan() as-is (required, no default on that
+        signature); callers always have a real belief available, unlike the
+        human script path in sim_agents.py which fabricates a dummy one because
+        it has no IR at all.
 
-        len(ordering) > 1 — only reachable under MetaPlanner's "full_reorder"
-        strategy:
-            NOT YET IMPLEMENTED, and deliberately so. For task 2+ in an ordering,
-            the WorldState passed to planner.plan() would need to reflect the world
-            as if every prior task in the ordering already completed — blocked on a
-            WorldState-continuity design question (guard/effects retraction
-            semantics; see TODO-07 and design_decisions.md, DESIGN-16). Not solved
-            with a narrow position/holding stopgap here, which would silently fail
-            for any guard depending on a different predicate.
-            DESIGNED, the next build (design_decisions.md, "B3.B (`full_reorder`)
-            is lookahead for the choice of the next task, built next"): what a
-            later entry reads is the start position (build_segments():
-            world.agent_positions), the start step, the predicates guards match,
-            and object locations (target_resolution). Position and step chain
-            from the previous entry's segments; the other two need a
-            hypothetical successor WorldState with retraction (holding after
-            place) and the location of a moved object, built and discarded
-            inside this call, the live WorldState untouched. Its schema-level
-            form is a proposal there, not decided.
+        Entry k+1 (len(ordering) > 1 — MetaPlanner's "full_reorder", T-B2a)
+        follows from entry k: it starts at the step and the position entry k's
+        last segment ends at, and is decomposed against the SUCCESSOR STATE of
+        entry k (_successor_state()) — the world as entry k's actions declare
+        they leave it. That is what a later entry reads: the start position
+        (build_segments(): world.agent_positions), the predicates guards match,
+        and where objects are (target_resolution). Without it a fact the
+        earlier task ended stays true for the later one (after a delivery the
+        agent would still hold the delivered object, and the next task would be
+        decomposed as if it had to put it back). design_decisions.md, "B3.B
+        (`full_reorder`) is lookahead for the choice of the next task, built
+        next", (a)-(c).
+
+        The successor state is HYPOTHETICAL: a new WorldState value, built
+        here between two entries and dropped when this call returns. The
+        WorldState passed in is only read, never written, and no successor
+        state is stored on the Projector or returned — a ProjectedPlan holds
+        plans and segments, no WorldState. An ordering of one task builds none,
+        and is projected exactly as it was before orderings were.
 
         Agent-agnostic: the same call projects a robot candidate or the human's
         predicted task (see project_human()).
         """
-        if len(ordering) > 1:
-            raise NotImplementedError(
-                "Projector.project: multi-task ordering projection requires "
-                "resolving cross-task WorldState continuity — see TODO-07 and "
-                "design_decisions.md, DESIGN-16. Not needed while MetaPlanner's "
-                "strategy is 'single_task'."
+        task_queue: List[str] = []
+        entries: List[ProjectedPlanEntry] = []
+        entry_start = start_step
+
+        for index, task in enumerate(ordering):
+            task_params = {var.name: const.value for var, const in task.bindings.items()}
+
+            abstract_plan = self._planner.plan(
+                my_intention=task.schema.name,
+                task_params=task_params,
+                agent_id=agent_id,
+                belief=belief,
+                world=world,
             )
 
-        task = ordering[0]
-        task_params = {var.name: const.value for var, const in task.bindings.items()}
+            segments = self.build_segments(abstract_plan, world, agent_id, entry_start)
+            # What the body spends completing the task (F1): a stationary stretch at
+            # the position the task ended at, once per task — a task-level cost, not per action,
+            # so it is placed here and not in build_segments(). Omitted at 0.0.
+            if segments and self._task_completion_latency > 0.0:
+                segments.append(stationary_segment(
+                    segments[-1].end_pos, segments[-1].end_step, self._task_completion_latency
+                ))
+            entry_end = segments[-1].end_step if segments else entry_start
+            duration = int(round(entry_end - entry_start))
 
-        abstract_plan = self._planner.plan(
-            my_intention=task.schema.name,
-            task_params=task_params,
-            agent_id=agent_id,
-            belief=belief,
-            world=world,
-        )
-
-        segments = self.build_segments(abstract_plan, world, agent_id, start_step)
-        # What the body spends completing the task (F1): a stationary stretch at
-        # the position the task ended at, once per task — a task-level cost, not per action,
-        # so it is placed here and not in build_segments(). Omitted at 0.0.
-        if segments and self._task_completion_latency > 0.0:
-            segments.append(stationary_segment(
-                segments[-1].end_pos, segments[-1].end_step, self._task_completion_latency
+            task_queue.append(task_instance_key(task))
+            entries.append(ProjectedPlanEntry(
+                abstract_plan=abstract_plan,
+                estimated_start_step=int(entry_start),
+                estimated_duration=duration,
+                segments=segments,
             ))
-        duration = int(round(segments[-1].end_step - start_step)) if segments else 0
 
-        entry = ProjectedPlanEntry(
-            abstract_plan=abstract_plan,
-            estimated_start_step=int(start_step),
-            estimated_duration=duration,
-            segments=segments,
-        )
+            # The next entry follows from this one. `world` is rebound to a new
+            # value; the caller's WorldState is not touched.
+            if index + 1 < len(ordering):
+                end_pos = segments[-1].end_pos if segments else world.agent_positions.get(agent_id)
+                world = self._successor_state(world, abstract_plan, agent_id, end_pos)
+            entry_start = entry_end
 
         return ProjectedPlan(
-            task_queue=[task_instance_key(task)],
-            entries=[entry],
-            total_estimated_cost=duration,
+            task_queue=task_queue,
+            entries=entries,
+            total_estimated_cost=int(round(entry_start - start_step)),
+        )
+
+    def _successor_state(
+        self,
+        world: WorldState,
+        plan: AbstractPlan,
+        agent_id: str,
+        end_pos: Optional[Tuple[float, float]],
+    ) -> WorldState:
+        """
+        The WorldState `plan`'s actions declare they leave behind, as a NEW
+        value: `world` is read and never written, and every container that
+        differs is a copy. Hypothetical — nothing has been executed; it lives
+        between two entries of one project() call and no longer.
+
+        Derived from the action schemas only, action by action in plan order,
+        with each grounded action's own bindings — no predicate, parameter or
+        task name appears here:
+          - ActionSchema.retracts: the grounded fact is no longer true;
+          - ActionSchema.effects:  the grounded fact is true (retract first,
+            then add, so an action may replace a fact);
+          - moved_object_key / moved_to_key: the moved object is where the
+            action put it — object_locations names the agent or object it is
+            now at, and object_positions follows, read at the END of the plan
+            (an object an agent still holds is where the agent ends).
+        The agent's own position is geometry, not a schema fact: `end_pos`, the
+        end of the entry's last segment.
+
+        What it does NOT carry, because no schema declares it: anything the
+        body's world-state builder derives and no action states (zones, a fact
+        a later action of another kind ends), and the observed agent's own
+        projected effects — the limitation a single task has too. The part of
+        TODO-07 projection needs; the planner's forward chaining and
+        precondition checking are not this.
+        """
+        predicates = set(world.predicates)
+        object_locations = dict(world.object_locations)
+        object_positions = dict(world.object_positions)
+        agent_positions = dict(world.agent_positions)
+        if end_pos is not None:
+            agent_positions[agent_id] = end_pos
+
+        moved: List[str] = []
+        for action in plan.actions:
+            schema = action.schema
+            for condition in schema.retracts:
+                predicates.discard(condition.to_predicate(action.bindings))
+            for condition in schema.effects:
+                predicates.add(condition.to_predicate(action.bindings))
+            if schema.moved_object_key is not None:
+                obj_id = action.bindings[schema.moved_object_key]
+                object_locations[obj_id] = action.bindings[schema.moved_to_key]
+                moved.append(obj_id)
+
+        for obj_id in moved:
+            place_id = object_locations[obj_id]
+            position = agent_positions.get(place_id, object_positions.get(place_id))
+            if position is not None:
+                object_positions[obj_id] = position
+
+        return replace(
+            world,
+            agent_positions=agent_positions,
+            object_locations=object_locations,
+            object_positions=object_positions,
+            predicates=predicates,
         )
 
     def project_human(
