@@ -100,3 +100,51 @@ is a hybrid (design_decisions.md, "B3.B on plain cost: the internal queue stays 
 | s70_on | 2e08ec7003a293de14d1368a5919bcdb |
 | s71_off | 65b336a39b11e239caa99c93644ffcc9 |
 | s71_on | 208d11f64e55323f0db0e099ba6d5042 |
+
+## T-B Q7 (de70e98) — THE BASELINES from here on: the body spends every completion tick it states
+
+`sweep/` now holds the sixteen logs regenerated at de70e98, superseding T-B2d's above, from the same command.
+T-B Q7 made the Mesa executor spend the completion ticks a reload used to cancel: the acknowledgement after
+the robot's grasp, and under the general rule a completed action's acknowledgement and a finished task's
+completion tick at any reload (`docs/design_decisions.md`, "A reload never cancels a completion tick the body
+states"). Nothing in `shared/` changed.
+
+FOR A READER COMPARING WITH THE RECORD: every completion tick recorded above — and in the reports that cite
+these fixtures — IS ONE TICK SHORTER PER ROBOT DELIVERY than the behaviour from here on, less where a decided
+hold carried the tick. The robot's plan and its decisions are not otherwise different.
+
+Completion from the world fact (`analysis/t6_ablation/metrics.py`), T-B2d → T-B Q7, each prior off and on:
+
+| fixture | s00 | s10 | s20 | s30 | s40 | s50 | s70 | s71 |
+|---|---|---|---|---|---|---|---|---|
+| T-B2d | 166 | 418 | 235 | 160 | 376 | 235 | 185 | 201 |
+| T-B Q7 | 169 | 422 | 237 | 161 | 379 | 237 | 186 | 203 |
+| deliveries | 3 | 4 | 3 | 2 | 3 | 3 | 2 | 2 |
+
+One tick per delivery, except where a hold carried the tick: s20 / s50 and s30 (δ = 1 at the post-grasp
+decision, the acknowledgement taken as its first tick) and s70 (the hold at 61 / 60 re-realized 2 → 1 from a
+robot standing there one tick later). The human's lines are byte-identical to T-B2d's in all sixteen, and the
+`[IR]` lines are identical with the prior on; with it off they move where the robot's own timing reaches the
+WorldState the recognizer reads — a carried item's position and task completion as a world fact
+(`docs/TODOS_AND_DEFERRED.md`, TODO-88). Two decision sequences change beyond the shift, both traced in
+`docs/design_decisions.md`: s10 (both priors) and s00_on, where a trigger that used to land on a cancelled
+completion tick now lands on a spent one.
+
+| log | md5 |
+|---|---|
+| s00_off | 6f522a03d9cafbc2ac839bab0ee724a3 |
+| s00_on | ab7c0a8528f1607560aa109ebb12143e |
+| s10_off | 7a90201e5e5528104e63a03d4061f9f1 |
+| s10_on | fc32c37a34d01402d88d42d9561110ff |
+| s20_off | 8ed5af00ede1e7f92c4598ba806159d9 |
+| s20_on | a98d844f3d1773f0cfb591b3f994b3ce |
+| s30_off | 14601bfef447afdb0810278fdd5c0188 |
+| s30_on | e0448eca611b4fb12578e00a0f680df5 |
+| s40_off | 609ed0de66f167d266a406a090fd3563 |
+| s40_on | f25b80d87a2e04e6139b0291c3a4de74 |
+| s50_off | a412bb391532b0490ea4ff287734b422 |
+| s50_on | 1e22ee999c5378f38fb25e5709bd3671 |
+| s70_off | d61892811de60b8f128c687b9f2193ff |
+| s70_on | e5596b4d042d170537890d3a56d5c788 |
+| s71_off | 4a6b769e8c46bcabd75af48c43d83d41 |
+| s71_on | 909bcee05faf0be3368381cec7b448be |
