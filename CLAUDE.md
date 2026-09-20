@@ -89,15 +89,16 @@ Decisions
   (`Projector.project()` chains the entries of an ordering, through a successor state derived from what the
   action schemas declare), T-B2b and T-B2c (`full_reorder`: an ordering realized against the human
   projection, one minimal-shift search and one hold per entry) and T-B2d (the `--strategy` run option) are
-  built, which completes B3.B; next is T-B3, its evaluation. Open for cchat: the projection's extra tick
-  per `pick_up` entry, an error in `realize()`'s input that accumulates over an ordering (TODO-77). Not to be started
+  built, which completes B3.B; next is T-B3, its evaluation. The body now spends every completion tick it
+  states to the projection (T-B Q7: a reload never cancels one), which closes TODO-77's residual — what is
+  left of it is step quantisation, uncompensated by decision. Not to be started
   unasked: T-C to T-G, i.e. the human action script, robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. `full_reorder` (B3.B) is built (`_replan_orderings()`, T-B2b / T-B2c): orderings are ranked
   on their realized cost, `realize()` running one minimal-shift search per entry (T-B Q2), and the hold sent
-  is the hold before the first entry; no `full_reorder` baselines are recorded until Hadi confirms T-B2c.
+  is the hold before the first entry; no `full_reorder` baselines are recorded, which stays with T-B3.
   Touch it only in a T-B task, and only the step that task names.
   B2 is an evaluation factor, not a design step: `b2b` stays a stub. Change only what the task
   specifies; do not fill in unspecified block logic, flags or strategies.
@@ -203,13 +204,15 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
 `analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
-T-B2d regeneration in `analysis/tb1a_destination/sweep/` (the five plus s50 / s70 / s71, both priors,
-stop off, `single_task`; logs local, md5s in its README, the "T-B2d" section) and
-`analysis/tb1b_two_tables/sweep/` (s80 / s81). They differ from T-B1a follow-up 2's in the `[run]` line
-alone, which now names the strategy; follow-up 2's had superseded the graded-evidence sweep
-(`analysis/g1_graded_evidence/sweep/`; same world-level behaviour, hypothesis keys no longer carry the table,
-and the `[run]` header changed with T-A1's β commit). No `full_reorder` baselines before T-B2c. The
-stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record baselines before changing code, then diff.
+T-B Q7 regeneration in `analysis/tb1a_destination/sweep/` (the five plus s50 / s70 / s71, both priors,
+stop off, `single_task`; logs local, md5s in its README, the "T-B Q7" section) and
+`analysis/tb1b_two_tables/sweep/` (s80 / s81). They supersede T-B2d's, which the body's completion ticks
+moved (T-B Q7: the robot spends one more tick per delivery, less where a hold carried it); T-B2d's had
+differed from T-B1a follow-up 2's in the `[run]` line alone, which names the strategy, and follow-up 2's had
+superseded the graded-evidence sweep (`analysis/g1_graded_evidence/sweep/`; same world-level behaviour,
+hypothesis keys no longer carry the table, and the `[run]` header changed with T-A1's β commit). No
+`full_reorder` baselines before T-B3. The stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record
+baselines before changing code, then diff.
 
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
 scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
@@ -239,7 +242,11 @@ A behaviour-preserving change must leave these greps byte-identical.
 Completion is measured from the world fact (T6): the tick after the robot's last release
 (`action=place micro=release`), when the terminal condition is first observable. The empty-pool line
 `[meta] step=N all tasks complete` is the declared tick, N − 2. Report the world tick; older reports
-(D2 and before) give declared ticks. `analysis/t6_ablation/metrics.py` reads it from a log.
+(D2 and before) give declared ticks. `analysis/t6_ablation/metrics.py` reads it from a log. Every completion
+tick recorded BEFORE T-B Q7 is one tick shorter per robot delivery than the behaviour from here on (less
+where a decided hold carried the tick): the body used to cancel a completion tick when a reload landed on it
+(design_decisions.md, "A reload never cancels a completion tick the body states"). Do not compare a number
+across that commit without it.
 
 ## Conventions and terminology
 

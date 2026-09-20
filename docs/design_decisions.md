@@ -3283,3 +3283,110 @@ analysis/tb2c_per_entry_holds/
 Reference: T-B Q2, T-B Q3, T-B2c, September 2026; "B3.B (`full_reorder`) is lookahead for the choice of the
 next task, built next" (open points 1 and 2); "The robot can wait" (R1); "Robot-responsible separation" (F1);
 TODO-15, TODO-70, TODO-77
+
+---
+
+**A reload never cancels a completion tick the body states: the Mesa executor spends the acknowledgement after the robot's pick_up (T-B Q7)**
+
+THE FAULT. The Mesa body gives the `Projector` one completion latency for every action
+(`ACTION_COMPLETION_LATENCY`, one tick, L2) and one for every task (`TASK_COMPLETION_LATENCY`, F1), and did
+not spend all of them. On the tick after the robot's grasp a trigger fires, the decision re-decomposes the
+task as `deliver_already_held`, and the fresh plan no longer contains the `pick_up`: `continue_plan()` loaded
+it from its start and the first step of the carry executed on the tick that would have been the
+acknowledgement. The robot's `pick_up` therefore took ONE TICK LESS than the body says it does. The human has
+no triggers and spends every tick the body states. Found as TODO-77's residual, measured at T-B2a (item 8)
+and T-B2b.
+
+WHY IT WAS FIXED NOW. Under `full_reorder` the error accumulates: `project()` chains the entries of an
+ordering, each starting where the previous one ends, so entry k is projected about one tick late per
+preceding entry that contains a `pick_up` and its violating shift intervals are evaluated against the human
+projection at the wrong time. T-B3 records `full_reorder` baselines; they are recorded once, on the corrected
+body.
+
+WHY THE FIX IS THE BODY'S AND NOT THE PROJECTION'S. The framework is simulation-agnostic. The `Projector`
+holds no latency of its own; it uses what the embodiment states, and `shared/io_contracts.md` §6 invariant 12
+already required that what the embodiment supplies be the ticks its executor ACTUALLY SPENDS. The body stated
+a value its own executor did not keep, so the fault was the body's and so is the fix. Teaching the projection
+which acknowledgement is not spent was considered and REJECTED: it would need a latency per action and per
+agent, it would carry a quirk of one body into the interface of `shared/`, and it is circular — the
+projection would have to predict the robot's own future triggers, which are decided FROM the projection
+(TODO-77). Nothing in `shared/` changed and `ACTION_COMPLETION_LATENCY` keeps its value.
+
+THE RULE, decided general rather than for the grasp alone. A RELOAD NEVER CANCELS A COMPLETION TICK THE BODY
+STATES. Those ticks are the execution loop's, not the plan's: a decision landing on one is a decision, not a
+reason for the body to become faster than it says it is. Every path that loads a plan from its start now goes
+through `Executor._reload()`, which asks `_owed_completion()` — in the same terms `step()` asks them, the
+world it was handed this tick — what the replaced plan is still owed, and hands it to `step()` to spend,
+executing nothing, one tick per tick. Three cases, one rule:
+  (a) the decision CONTINUES the task and re-decomposes it past the action in flight — the robot's grasp;
+  (b) the decision SWITCHES task on the tick an action finished;
+  (c) the decision arrives while the finished task's OWN completion tick is still outstanding (a trigger
+      landing on the completion tail, which used to cut it short).
+The trigger's name does not enter: the post-grasp re-decision is attributed to `recognition_changed` rather
+than `task_committed` wherever both fire on the tick (s10_on, s81_off). The trigger fires and the decision is
+made on the tick they always were.
+
+THE TWO-TICK CASE. Where the completed action is the plan's LAST one, the body owes TWO ticks — that action's
+acknowledgement and the task completion tick after it — and spends both, in that order, before the loaded
+plan's first microaction. `_task_completion_spent` keeps the task tick owed ONCE rather than once per reload;
+that is what leaves the human's path untouched, since the human's next plan is always loaded the tick after
+`_on_task_complete()` ran.
+
+THE HOLD CARRIES AN OWED TICK, IT DOES NOT FOLLOW IT. A hold decided at the same trigger and an owed
+completion tick are ONE standing tick, not two: both are the robot standing where the decision found it,
+while the body learns what it learns. So the hold's first tick is the owed tick, and the plan resumes at
+decision + δ — WHERE REALIZATION PUT IT — instead of a tick later. This is the one thing the ordering had to
+preserve: the executed plan equals the plan that was realized. Where two ticks are owed and δ ≥ 2 the hold
+carries both, one per tick.
+
+THE RESIDUAL, WITH A HOLD OF 0. When the decision carries no hold there is nothing to carry the owed tick, so
+the plan resumes ONE TICK AFTER the start that decision's own projection assumed. It is one tick, on the HEAD
+only, at a robot re-decision that reloads (the `task_committed` case in the fixtures), and IT DOES NOT
+ACCUMULATE: the tick is spent once, the entry chain of the ordering is now right, and the next decision
+projects from where the robot actually is. `shared/` cannot see it without predicting the robot's own
+triggers, which is the circularity above. Accepted, recorded, not compensated — the same standing as step
+quantisation.
+
+WHAT REMAINS UNCOMPENSATED. STEP QUANTISATION only (L2's decision, unchanged): a walk of projected duration
+`dur` executes as ceil(dur) steps and the walker stops on the first step inside the arrival radius, so it
+finishes late and the next walk may start up to one step off its projected start. Measured per delivery on
+scenario_80, executed minus projected, before → after: fetch part −0.89 → +0.11, −0.36 → +0.64, −0.60 → +0.40,
++0.41 → +1.41; carry part unchanged (+0.62, +0.67, +0.92, +0.48); total −0.27 → +0.73, +0.31 → +1.31,
++0.32 → +1.32, +0.89 → +1.89. The executed fetch gains EXACTLY one tick in all four deliveries. Before the
+fix three of the four ran SHORTER than projected — the skipped acknowledgement masking quantisation; after
+it every residual is positive, which ceil-per-walk alone produces. TODO-77's residual is closed with that.
+
+MEASURED, the 20 baselines (both priors; `analysis/tb1a_destination/`, `analysis/tb1b_two_tables/`).
+Completion from the world fact moves by one tick per robot delivery, less where a hold carried the tick:
+s00 166 → 169, s10 418 → 422, s20 235 → 237, s30 160 → 161, s40 376 → 379, s50 235 → 237, s70 185 → 186,
+s71 201 → 203, s80 261 → 265, s81 265 → 268. The three carried ticks: s20 / s50 and s30, where the post-grasp
+decision already held for δ = 1; s70, where the hold at step 61 / 60 re-realized 2 → 1, and s81, where the
+hold at step 39 → 40 re-realized 4 → 3 — the robot reaches those decisions one tick later, so one fewer tick
+of shift clears the same human, minimal in both. THE DECISION SEQUENCES ARE OTHERWISE UNCHANGED, with two
+exceptions, both traced to a trigger that used to land on a cancelled completion tick: s10 (both priors) and
+s00_on, where the run now spends it; and one decision that was never separately raised before, s81_off's
+`task_committed` at 132, because the grasp and a belief change no longer share a tick. Changed decisions are
+explained, never adjusted. The human's lines are byte-identical in all 20 runs, and 17 of the 20 were
+byte-identical between the grasp-only fix and the general rule — including the three whose post-grasp hold
+carries the acknowledgement, so moving that absorption from `hold()` into `step()` preserves behaviour.
+
+THE ACCEPTANCE CRITERION THAT WAS WRONG, CORRECTED. The task expected every `[IR]` line to be byte-identical,
+on the ground that the robot does not touch the human and the recognizer observes the human only. The second
+half does not follow: the recognizer reads the `WorldState`, and the robot writes into it (a) a carried
+item's position, which IS the carrier's, so while the robot carries item X the hypothesis `deliver_item(X)`
+is scored against a target that moves with the ROBOT, and (b) task completion as a WORLD FACT, so the pin
+retiring that hypothesis falls on the tick the robot's release makes `obj_at` hold. Measured: with the prior
+ON every `[IR]` line is identical (the support is the human's assigned pool and holds none of the robot's
+items); with it OFF 1 to 29 steps per run differ, by at most 0.165 in confidence where `most_likely` is
+unchanged and by up to 0.497 at the pin ticks. The human's own lines are byte-identical in all 20, so nothing
+reaches the OBSERVATION. The criterion as corrected is met. The recognizer question this exposes — with the
+prior off, a live hypothesis about the human whose item the robot is carrying away — is
+`docs/TODOS_AND_DEFERRED.md`, TODO-88, for cchat; nothing was changed for it.
+
+Files: mesa_sim/executor.py (`_reload`, `_owed_completion`, `step()` 1b, `continue_plan`, `hold`,
+`_on_task_complete`), mesa_sim/sim_agents.py (`continue_plan` call), analysis/tb1a_destination/README.md,
+analysis/tb1b_two_tables/README.md, analysis/tb2c_per_entry_holds/README.md,
+docs/TODOS_AND_DEFERRED.md (TODO-77, TODO-88), CLAUDE.md
+Reference: T-B Q7, September 2026; TODO-77 (L2, T4, T-B2a, T-B2b); "Projection time includes what the body
+spends finishing an action" (L2); "Robot-responsible separation" (F1, the completion tick); "The robot can
+wait" (R1); shared/io_contracts.md §6 invariant 12

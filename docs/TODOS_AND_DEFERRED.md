@@ -2451,7 +2451,7 @@ means. Rename (e.g. `robot_grasped`) when a session touches the trigger set; a r
 Files: shared/meta_planner.py (`evaluate_triggers`), shared/io_contracts.md (§2.2)
 Reference: R1 decision record, September 2026
 
-**TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** ✅ LARGELY RESOLVED (L2, Sept 2026) — the systematic whole-tick lag is removed; what remains is step quantisation (not compensated, by decision) and one robot-only tick (recorded below, not fixed) — the task-completion tick ✅ ADDED (F1)
+**TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** ✅ RESOLVED (L2 Sept 2026; the residual closed at T-B Q7, Sept 2026) — the systematic whole-tick lag was removed at L2; the robot-only tick recorded below as open was the body cancelling a completion tick at a reload, and is fixed in the body at T-B Q7; WHAT REMAINS IS STEP QUANTISATION ALONE, uncompensated by decision (L2) — the task-completion tick ✅ ADDED (F1)
 THE TASK-COMPLETION TICK (F1, September 2026): the trailing tick the L2 report left unmodelled — the
 tick `Executor.step()` spends in `_on_task_complete()` after the last action's acknowledgement — is
 now charged once per projected task, for both agents (measured: human release 54 / ack 55 / complete
@@ -2480,7 +2480,9 @@ WHAT REMAINS, deliberately uncompensated:
     75 is 49.15 cm, INSIDE the assessed window of the hold decision (step 47 vs T_h 47.29 off, step 51
     vs 51.02 on), where the realized plan cleared 50 cm (its minimum 50.93 / 55.24 cm). Step
     quantisation; recorded, not compensated. (`[sep]` samples whole ticks, TODO-79.)
-  - THE ROBOT'S SKIPPED ACKNOWLEDGEMENT (4-action plans only, +1 tick, the projection running LONG).
+  - THE ROBOT'S SKIPPED ACKNOWLEDGEMENT (4-action plans only, +1 tick, the projection running LONG)
+    ✅ FIXED IN THE BODY (T-B Q7, September 2026). This bullet and the ORDERINGS paragraph below are the
+    record as it stood when the item was open; what changed is stated at the end of that paragraph.
     The projection charges four latencies, but the robot re-plans at its own `task_committed` trigger,
     which fires on the tick that would have acknowledged the `pick_up`; the fresh `deliver_already_held`
     plan does not contain that `pick_up`, so `continue_plan()` loads from the start and the carry begins
@@ -2512,6 +2514,23 @@ runs 0.885 long = +1 − 0.115 quantisation. RULED: on plain cost the extra tick
 orderings of one pool, so T-B2b is unaffected. On REALIZED cost it is not harmless: a later entry sits late
 against the human projection, so its violating shift intervals are evaluated at the wrong time. A design
 question for cchat BEFORE T-B2c; not to be fixed unasked.
+RULED AND BUILT (T-B Q7, September 2026; design_decisions.md, "A reload never cancels a completion tick the
+body states"). The fix is the BODY'S, not the projection's: the `Projector` holds no latency of its own, and
+`io_contracts.md` §6 invariant 12 already required the embodiment to supply the ticks its executor actually
+spends — the body stated a value its own executor did not keep. Nothing in `shared/` changed and
+`ACTION_COMPLETION_LATENCY` keeps its value. `Executor._reload()` now keeps whatever completion tick the
+replaced plan is owed and `step()` spends it, executing nothing: a completed action's acknowledgement and a
+finished task's completion tick alike, both of them where the completed action is the plan's last, and
+whichever way the plan is replaced (a continue past the action in flight, a switch, or a trigger landing on
+the completion tail, which used to cut it short). A hold decided at that trigger CARRIES the owed tick as its
+first tick rather than adding one, so the executed plan equals the plan that was realized. RESIDUAL, with a
+hold of 0: the plan resumes one tick after the start that decision's own projection assumed — one tick, on the
+HEAD only, at a robot re-decision that reloads, NOT ACCUMULATING, and invisible to `shared/` without the
+circular prediction above. MEASURED: the executed fetch part of every scenario_80 delivery gains exactly one
+tick and the carry part is untouched (total executed minus projected −0.27 → +0.73, +0.31 → +1.31,
++0.32 → +1.32, +0.89 → +1.89, every residual now positive as ceil-per-walk requires); completion from the
+world fact moves one tick per robot delivery across the 20 baselines, less where a hold carried the tick.
+WHAT IS LEFT OF THIS ITEM IS STEP QUANTISATION, uncompensated by decision (L2), above.
 ALSO NOTED at L2, out of scope there: with the two agents in phase the superseded
 `min_safe_distance = 1.0` exclusion fires again (once in the ten-condition sweep, scenario_30 prior-on
 step 21, `min_dist` 0.49 cm at the mirror crossing) and changes that run's decision sequence. The
