@@ -4,7 +4,7 @@
     "height": 800,
     "name": "Kitting Domain Layout 0",
     "units": "cm",
-    "notes": "Minimal layout for Phase 4 IR and AP development. Symmetric placement guarantees path crossing near center (Scenario 0.1) and KT convergence conflict (Scenario 0.2). No obstacles, no foreseeable tasks."
+    "notes": "Minimal layout for Phase 4 IR and AP development. Symmetric placement guarantees that the paths intersect near center (Scenario 0.1) and KT convergence conflict (Scenario 0.2). No obstacles, no foreseeable tasks."
   },
   "zones": [
     {

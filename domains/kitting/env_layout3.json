@@ -4,7 +4,7 @@
     "height": 800,
     "name": "Kitting Domain Layout 3",
     "units": "cm",
-    "notes": "Crossing fixture (from the edited layout0 geometry, September 2026). Mirror-symmetric about x=0: shelf_3 (-200,-300) for the human and shelf_4 (200,-300) for the robot, so two agents starting at (450,350) and (-450,350) walk mirror-image approaches that cross at the centre line mid-path. Scenario: scenario_30. No obstacles."
+    "notes": "Intersecting-paths fixture (from the edited layout0 geometry, September 2026). Mirror-symmetric about x=0: shelf_3 (-200,-300) for the human and shelf_4 (200,-300) for the robot, so two agents starting at (450,350) and (-450,350) walk mirror-image approaches that intersect at the centre line mid-path. Scenario: scenario_30. No obstacles."
   },
   "zones": [
     {

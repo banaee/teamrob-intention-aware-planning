@@ -239,11 +239,11 @@ def shift_violation_interval(
     intersection of convex sets, so convex, so its projection onto the d
     axis is ONE interval, whose endpoints are the extreme d over its closure.
     Those extremes lie at one of: a vertex of the convex polygon H ∩ P inside
-    the disc; a crossing of the ellipse boundary with an edge of H ∩ P; the
+    the disc; an intersection of the ellipse boundary with an edge of H ∩ P; the
     ellipse's own d-extrema when inside H ∩ P. H ∩ P is built by clipping the
     parallelogram against the half-plane (at most five vertices); every edge
-    is a straight segment along which |X|² is a quadratic, so each crossing is
-    a root. All are enumerated; the interval is their d-range. Empty
+    is a straight segment along which |X|² is a quadratic, so each intersection
+    is a root. All are enumerated; the interval is their d-range. Empty
     enumeration, or a range of zero width (a tangency), means no shift
     violates.
 
