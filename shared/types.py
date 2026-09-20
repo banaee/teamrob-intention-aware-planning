@@ -283,8 +283,9 @@ class ActionSchema:
     # None for non-movement actions.
     progress_evaluator: Optional[str] = None
     # Name of the IR progress-likelihood function to apply while this action is
-    # ongoing (not yet complete). e.g. "directional" for move_to (cosine-similarity
-    # trajectory consistency). None for pick_up, place, wait_at, scan_it — these
+    # ongoing (not yet complete). e.g. "excess_path" for move_to (the wasted-path
+    # likelihood, I4; the earlier "directional" cosine kernel was removed, handback
+    # §8). None for pick_up, place, wait_at, scan_it — these
     # have no graded in-progress signal, only a completion predicate.
     # Looked up in shared.likelihood_functions.PROGRESS_EVALUATORS by the recognizer.
     # Recognizer dispatches by this name only — never by microaction string.

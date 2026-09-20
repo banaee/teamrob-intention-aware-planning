@@ -4,7 +4,7 @@
     "height": 900,
     "name": "Kitting Domain Layout 2",
     "units": "cm",
-    "notes": "Phase 4C B2/B3 fixture layout. Built for sustained interference: the robot's cheapest task (shelf_4) and the human's first task (shelf_3) have near-equal approach + carry totals, so both carry legs converge into the kitting table with a small arrival gap. Measured behaviour and limits: see scenario_20 description. No obstacles, no foreseeable tasks."
+    "notes": "Phase 4C B2/B3 fixture layout. Built for sustained interference: the robot's cheapest task (shelf_4) and the human's first task (shelf_3) have near-equal approach + carry totals, so both carry walks converge into the kitting table with a small arrival gap. Measured behaviour and limits: see scenario_20 description. No obstacles, no foreseeable tasks."
   },
   "zones": [
     { "id": "zone_NW", "bounds": { "x_min": -600, "x_max": 0, "y_min": 0, "y_max": 450 }, "label": "northwest_work" },
@@ -38,7 +38,7 @@
       "position": [0, 400],
       "size": [200, 100],
       "zone": "zone_NW",
-      "notes": "Shared delivery sink. A candidate whose carry leg reaches the table while the human's projection is still running converges here, and its min_dist is set by the projected arrival-time gap (both placements coincide at this point when the gap is under a tick). Candidates arriving after the human's projection ends show no sink conflict. Current figures: analysis/t1_conflict_measurement/REPORT.md, TODO-28/TODO-30."
+      "notes": "Shared delivery sink. A candidate whose carry walk reaches the table while the human's projection is still running converges here, and its min_dist is set by the projected arrival-time gap (both placements coincide at this point when the gap is under a tick). Candidates arriving after the human's projection ends show no sink conflict. Current figures: analysis/t1_conflict_measurement/REPORT.md, TODO-28/TODO-30."
     },
     {
       "id": "shelf_4",

@@ -3,8 +3,8 @@
 Stages and outcomes only. Mechanisms and their rationale are in `docs/design_decisions.md`; the recognizer's
 current state, parameters and guarantees are in `docs/recognizer_handback.md`; open items in
 `docs/TODOS_AND_DEFERRED.md`. Where this file and those disagree, they win. Terms are used as
-`docs/glossary.md` defines them; the plan below ("The plan from T-A") is written in its terms, the
-phase records above it are as they were written.
+`docs/glossary.md` defines them, in the phase records as in the plan: what a record CLAIMS is
+untouched, only the words it claims it in.
 
 ---
 
@@ -28,8 +28,8 @@ phase records above it are as they were written.
   machine and AC switch side by side, item_1 near them; the old layout with obstacles is kept as
   `env_layout99`, not registered), `env_layout2` / `scenario_20` (collinear decoys),
   `env_layout3` / `scenario_30` (mid-approach reveal), `env_layout4` / `scenario_40` (F1, Sept 2026:
-  a scripted deviation sequence — delivery, coffee break, two AC-switch legs, a second delivery —
-  the positive control for foreseeable-task recognition; F47b retyped the two legs' waypoints as AC
+  a scripted deviation sequence — delivery, coffee break, two AC-switch walks, a second delivery —
+  the positive control for foreseeable-task recognition; F47b retyped the two walks' waypoints as AC
   switches so the script is well typed, baseline regenerated in `analysis/f47_fixtures/`).
   Evaluation fixtures, not in the regression sweep (F47 / F47b): `env_layout5` / `scenario_50`
   (scenario_20's end-state variant: the human steps aside for a coffee break), `env_layout7` /
@@ -67,7 +67,7 @@ The robot operates with two planning levels and one recognition module, all in `
 - `shared/likelihood_functions.py` — the evidence model's functions and its four constants
 - `shared/target_resolution.py` — where a movement action's target is now (I2; shared by recognizer and projector)
 - `shared/meta_planner.py` — task scheduling, candidate evaluation, cost comparison; supplies `min_separation` to realization and consumes its result (the 4C wait-decision revision moves interference detection out of it)
-- `shared/projection.py` — `Projector` — task + world → predicted trajectory; consumed by meta_planner, and by viz/evaluation later. Realization (`realize()`, hold-only first) belongs on this side, not in `MetaPlanner`
+- `shared/projection.py` — `Projector` — task + world → a `ProjectedPlan`'s segments; consumed by meta_planner, and by viz/evaluation later. Realization (`realize()`, hold-only first) belongs on this side, not in `MetaPlanner`
 - `shared/trajectory_algorithms.py` — pluggable path-realization and interference-detection functions; `earliest_violation` (closed form, the role reserved for `closest_point_of_approach()`) to be built here for realization
 - `shared/planner.py` — HTN decomposer, called by meta_planner per candidate AND by the recognizer per hypothesis per tick
 - ~~`shared/replanning.py`~~ — **retired Sept 2026**, deleted; trigger role absorbed into `evaluate_triggers()`
@@ -229,7 +229,7 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 - (a) confirmation is length-blind: a fitting stretch scores the perfect fit after 15 cm as after 300 cm;
   evidence is strong at refutation, weak at confirmation;
 - (b) accumulation is observation-count and decomposition sensitive: every fitting observation is worth 1/u
-  whatever it observed, so how a method segments a trajectory sets how much evidence a hypothesis can gather.
+  whatever it observed, so how a method cuts a walk into phases sets how much evidence a hypothesis can gather.
 
 *Validation gaps under 4C, checked against current state (Sept 2026):*
 - TODO-28: DECIDED at R1 — `min_separation` = 2.5 × the robot's motion per tick (50 cm in Mesa),
@@ -269,7 +269,7 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 *The 4C queue (from R1, September 2026) — in this order:*
 1. R1 + T9 — the decision record (this), projection ending at the body's stopping distance, the
    actual-distance measure, new baselines over ten conditions ✅
-2. T3 — `realize()` as a service on the projection / trajectory side (whole-trajectory minimal shift,
+2. T3 — `realize()` as a service on the projection side (whole-trajectory minimal shift,
    `shift_violation_interval` closed form, `RealizedPlan`), validated against T1b's `whole` realizer ✅
    (`analysis/t3_realize/`; T3b the whole-tick hold; L2 then removed the acknowledgement lag, TODO-77)
 3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5;
@@ -323,8 +323,8 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
 
 9. B3.B design revision ✅ (September 2026, documentation only) — `full_reorder` moves from retained
    alternative to next in the pipeline: one-table kitting is why order has not mattered; two-table kitting
-   couples tasks by geometry; the whole robot sequence is realized against the one human projection inside
-   [trigger, T_h]; the sequence past the head is a lookahead, re-priced at the next boundary. Prerequisites
+   couples tasks by geometry; the whole robot ordering is realized against the one human projection inside
+   [trigger, T_h]; the tail is a lookahead, re-priced at the next robot trigger. Prerequisites
    re-derived from the code: TODO-07 applies in part (retraction and object relocation in a hypothetical
    successor state, for projection only), DESIGN-12 does not apply, brute permutation is acceptable at
    pools of 3 to 5. Two points open with marked proposals: where a later task's hold is placed, and what
@@ -408,7 +408,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   (a hold needs only the two projections, no obstacle geometry), returning the placed plan and
   its duration. What remains 4D, as further pluggable strategies of the same function: DETOUR
   (go around — needs a path planner, `obstacle_aware_path()`'s role, and introduces iteration
-  between trajectory and interference) and the OFF-THE-SHELF PLANNER (PRIEST or equivalent,
+  between path realization and interference) and the OFF-THE-SHELF PLANNER (PRIEST or equivalent,
   ROS). For Mesa, a detour-capable realization can also serve as execution-time path
   realization (replacing straight-line `steps_toward`), collapsing cost-time and execution-time
   realization into one function. ROS keeps a two-tier split (this estimator for cost

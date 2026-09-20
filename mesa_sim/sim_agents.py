@@ -424,7 +424,7 @@ class RobotAgent(FactoryAgent):
         starts. Within a tick the human acts before the robot observes it
         (BaseScheduler, scenario order), so the tick-0 observation already
         shows the human one step from where it started; without this the
-        recognizer opened its first leg there and the first step was never
+        recognizer opened its first stretch there and the first step was never
         scored (I1 audit 2.12). The belief this produces is the prior and is
         not stored — the first reported belief is still tick 0's. Called by
         SimModel once all agents exist.

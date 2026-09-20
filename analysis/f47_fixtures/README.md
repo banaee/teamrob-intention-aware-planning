@@ -42,7 +42,7 @@ wander_0 / wander_1 are now `ac_switch_1` / `ac_switch_2` (type `ac_switch`), en
 The retyping changes the hypothesis space (`ac_activation` has three hypotheses instead of one) and so the IR
 lines from tick 0. Against the pre-F47b logs (HEAD after R2): the robot's task order (item_4, item_7, item_5)
 and completion (378) are unchanged in both priors; the first crossing moves 19 → 21; the coffee crossing moves
-from 143 (off) / 135 (on) to 153 (both; peak 0.915 / 0.917 instead of 0.982 / 0.984); the two AC legs are now
+from 143 (off) / 135 (on) to 153 (both; peak 0.915 / 0.917 instead of 0.982 / 0.984); the two AC-switch walks are now
 recognised (205: ac_switch_1 0.784 / 0.878; 221: ac_switch_2 0.772 / 0.853) and pinned complete at 207 and
 228; an item_6 crossing appears at 266 (off) / 250 (on). These supersede the s40 rows of
 `analysis/f1_robot_responsible/comparison.md` and the s40 figures in `docs/recognizer_handback.md`.

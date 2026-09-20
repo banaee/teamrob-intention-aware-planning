@@ -80,7 +80,7 @@
         100
       ],
       "zone": "zone_NW",
-      "notes": "Shared delivery sink. A candidate whose carry leg reaches the table while the human's projection is still running converges here, and its min_dist is set by the projected arrival-time gap (both placements coincide at this point when the gap is under a tick). Candidates arriving after the human's projection ends show no sink conflict. Current figures: analysis/t1_conflict_measurement/REPORT.md, TODO-28/TODO-30."
+      "notes": "Shared delivery sink. A candidate whose carry walk reaches the table while the human's projection is still running converges here, and its min_dist is set by the projected arrival-time gap (both placements coincide at this point when the gap is under a tick). Candidates arriving after the human's projection ends show no sink conflict. Current figures: analysis/t1_conflict_measurement/REPORT.md, TODO-28/TODO-30."
     },
     {
       "id": "shelf_4",

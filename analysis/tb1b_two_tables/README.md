@@ -65,7 +65,7 @@ ticks, which is at the arrival-radius scale (30 cm, 1.5 ticks). The fixture sett
 This is a property of these two-table geometries, not of one layout. env_layout9 (the realistic placement,
 below) is tighter still: its two cheapest orderings differ by 0.31 ticks. With three deliveries to one table
 and one to the other, the tail permutations collapse toward each other, because once the odd task is done the
-robot shuttles between the same two endpoints and only the order of interchangeable legs is left. Both
+robot shuttles between the same two endpoints and only the order of interchangeable tasks is left. Both
 layouts settle the choice of head; neither settles the tail, and a geometry that settled it would have to be
 designed for that question.
 

@@ -8,7 +8,7 @@ baselines.
   s10 450, s20 300, s30 200, s40 400; `CONDS` picks fixtures. Sequential only: each run's log is picked up
   as the newest `logs/run_*.log`.
 - `validate.py`: runs the eight conditions in process, records every B3 `realize()` call, and checks each
-  realized trajectory independently against rules (a) and (b) by dense sampling, checks δ's minimality,
+  realized plan's segments independently against rules (a) and (b) by dense sampling, checks δ's minimality,
   and runs the T10 realizer (extracted from commit 08b1167 with `git show` into `_t10_realizer/`,
   git-ignored) on the same inputs. Output: `validation.md`.
 - `evaluate.py`: per condition, the three configurations' decision sequences and where they differ, every

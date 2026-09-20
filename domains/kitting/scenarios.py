@@ -19,7 +19,7 @@ scenario_00 = ScenarioConfig(
     name="layout0_phase4_collision_baseline",
     description=(
         "Minimal Phase 4 development scenario. Robot and human start symmetric, "
-        "paths cross near center during first moveto (case 0.1 collision). "
+        "paths intersect near center during first moveto (case 0.1 collision). "
         "Both converge on KT after picking (case 0.2 conflict). "
         "No foreseeable tasks. Human plan is scripted/fixed."
     ),
@@ -110,12 +110,12 @@ scenario_20 = ScenarioConfig(
         "71 and item_7 103, at 20 cm/tick) is the conflicted one, so the t=0 pick lands on it by "
         "construction. The conflict comes from matched arrival times at the shared kitting "
         "table: the robot's approach + carry (447 + 583 cm) and the human's (449 + 617 cm) are "
-        "within a tick of each other, so both carry legs converge into the table and both "
+        "within a tick of each other, so both carry walks converge into the table and both "
         "placements overlap there. item_6 (shelf_6, west) is the clean alternative; item_7 "
         "(shelf_7, far east) never competes. Measured conflict geometry, in the units of the "
         "day, lives in analysis/t1_conflict_measurement/REPORT.md and TODO-28/TODO-30, not "
         "here — those figures move whenever the meta-planner does. "
-        "Recognizer behaviour (leg-level recognizer, PYTHONHASHSEED=0): t=0 confidence is "
+        "Recognizer behaviour (pre-I2 recognizer, PYTHONHASHSEED=0): t=0 confidence is "
         "below theta in both conditions, so no projection is built at t=0. (1) "
         "assignment_prior off — theta crosses at the human's GRASP (step 22, 0.797), after the "
         "robot's move_to has completed. (2) assignment_prior on — theta crosses at step 11 "
@@ -161,12 +161,12 @@ scenario_21 = ScenarioConfig(
         "71 and item_7 103, at 20 cm/tick) is the conflicted one, so the t=0 pick lands on it by "
         "construction. The conflict comes from matched arrival times at the shared kitting "
         "table: the robot's approach + carry (447 + 583 cm) and the human's (449 + 617 cm) are "
-        "within a tick of each other, so both carry legs converge into the table and both "
+        "within a tick of each other, so both carry walks converge into the table and both "
         "placements overlap there. item_6 (shelf_6, west) is the clean alternative; item_7 "
         "(shelf_7, far east) never competes. Measured conflict geometry, in the units of the "
         "day, lives in analysis/t1_conflict_measurement/REPORT.md and TODO-28/TODO-30, not "
         "here — those figures move whenever the meta-planner does. "
-        "Recognizer behaviour (leg-level recognizer, PYTHONHASHSEED=0): t=0 confidence is "
+        "Recognizer behaviour (pre-I2 recognizer, PYTHONHASHSEED=0): t=0 confidence is "
         "below theta in both conditions, so no projection is built at t=0. (1) "
         "assignment_prior off — theta crosses at the human's GRASP (step 22, 0.797), after the "
         "robot's move_to has completed. (2) assignment_prior on — theta crosses at step 11 "
@@ -213,7 +213,7 @@ scenario_30 = ScenarioConfig(
     id="scenario_30",
     name="layout3_midpath_crossing",
     description=(
-        "Crossing fixture (TODO-47(c)). Mirror-symmetric approaches force a mid-path crossing "
+        "Intersecting-paths fixture (TODO-47(c)). Mirror-symmetric approaches make the two paths intersect "
         "on the robot's CURRENT task: the human starts at (300, 300) and walks to shelf_3 at "
         "(-200, -300) for item_3; the robot starts at (-300, 300) and walks to shelf_4 at "
         "(200, -300) for item_4, its cheapest task, so the t=0 pick lands on it. The two "
@@ -225,7 +225,7 @@ scenario_30 = ScenarioConfig(
         "side. Under the current linear chord kernel that is still close enough to take most "
         "of the chord credit (TODO-38), so during the approach item_3 holds 0.471, doubles to "
         "0.640 on zone_SW entry at step 23 (ZONE_BOOST), and reaches theta only at the grasp "
-        "(step 39) - the crossing itself is never seen by the meta-planner. Measured with "
+        "(step 39) - the path intersection itself is never seen by the meta-planner. Measured with "
         "PYTHONHASHSEED=0, assignment_prior on. No foreseeable tasks. Human plan is "
         "scripted/fixed. Geometry: env_layout3.json."
     ),
@@ -292,8 +292,8 @@ scenario_40 = ScenarioConfig(
             scheduled_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")}),
-                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_1")}),   # segment 3, leg 1: toward shelf_6 (an AC switch since F47b; was the waypoint wander_0)
-                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_2")}),   # segment 3, leg 2: turn away
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_1")}),   # script part 3, walk 1: toward shelf_6 (an AC switch since F47b; was the waypoint wander_0)
+                TaskInstance(schema=ac_activation, bindings={Var("?ac_switch"): Const("ac_switch_2")}),   # script part 3, walk 2: turn away
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
             ],
             assigned_tasks=[

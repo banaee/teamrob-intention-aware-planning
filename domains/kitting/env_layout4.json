@@ -4,7 +4,7 @@
     "height": 1200,
     "name": "Kitting Domain Layout 4",
     "units": "cm",
-    "notes": "Foreseeable-task fixture (scenario_40). One human run in four segments: (1) an assigned delivery with a 1209 cm approach (positive control); (2) a walk from the kitting table to the coffee machine, >= 49.6 deg off every task target seen from the table; (3) a walk to two AC switches, ac_switch_1 and ac_switch_2 (waypoints wander_0 / wander_1 until F47b, retyped at the same coordinates so the scripted ac_activation instances are well typed; they are ac_activation hypotheses since) - ac_switch_1 lies on the straight line from the coffee machine to shelf_6 (the human heads toward a shelf it will use later), ac_switch_2 is >= 50 deg off every delivery target seen from ac_switch_1 (the human turns away); (4) the delivery from shelf_6. The coffee machine sits alone south of the table; every shelf is on the east or west edge. Every target is >= 50 deg off the segment-1 heading. No obstacles. The ac_switch object uses the type string ac_activation's parameter_types asks for ('ac_switch'); env_layout1 spells it 'AC_switch' and gets no hypothesis (I1 follow-up)."
+    "notes": "Foreseeable-task fixture (scenario_40). One human run in four script parts: (1) an assigned delivery with a 1209 cm approach (positive control); (2) a walk from the kitting table to the coffee machine, >= 49.6 deg off every task target seen from the table; (3) a walk to two AC switches, ac_switch_1 and ac_switch_2 (waypoints wander_0 / wander_1 until F47b, retyped at the same coordinates so the scripted ac_activation instances are well typed; they are ac_activation hypotheses since) - ac_switch_1 lies on the straight line from the coffee machine to shelf_6 (the human heads toward a shelf it will use later), ac_switch_2 is >= 50 deg off every delivery target seen from ac_switch_1 (the human turns away); (4) the delivery from shelf_6. The coffee machine sits alone south of the table; every shelf is on the east or west edge. Every target is >= 50 deg off the script part 1 heading. No obstacles. The ac_switch object uses the type string ac_activation's parameter_types asks for ('ac_switch'); env_layout1 spells it 'AC_switch' and gets no hypothesis (I1 follow-up)."
   },
   "zones": [
     {
@@ -80,7 +80,7 @@
         100
       ],
       "zone": "zone_NW",
-      "notes": "Shared delivery sink, top centre. Segment 2 starts here."
+      "notes": "Shared delivery sink, top centre. Script part 2 starts here."
     },
     {
       "id": "shelf_3",
@@ -95,7 +95,7 @@
       ],
       "slots": 2,
       "zone": "zone_SW",
-      "notes": "Human's first delivery (segment 1). Approach from (100, 550): 1209 cm, bearing -150.3 deg; every other target is >= 50 deg off that heading."
+      "notes": "Human's first delivery (script part 1). Approach from (100, 550): 1209 cm, bearing -150.3 deg; every other target is >= 50 deg off that heading."
     },
     {
       "id": "shelf_6",
@@ -110,7 +110,7 @@
       ],
       "slots": 2,
       "zone": "zone_SE",
-      "notes": "Human's last delivery (segment 4). Segment 3's first waypoint lies on the coffee_machine_0 -> shelf_6 line, 40% of the way."
+      "notes": "Human's last delivery (script part 4). Script part 3's first waypoint lies on the coffee_machine_0 -> shelf_6 line, 40% of the way."
     },
     {
       "id": "shelf_4",
@@ -155,7 +155,7 @@
       ],
       "slots": 2,
       "zone": "zone_SE",
-      "notes": "Robot task 3, the most expensive from the table, so it is done last and keeps the robot busy until ~375 ticks - the IR is only called while the robot has tasks (I1 7.12). Undelivered during the human's segment 4, where it is 17 deg off the heading (prior-off decoy; inadmissible prior-on)."
+      "notes": "Robot task 3, the most expensive from the table, so it is done last and keeps the robot busy until ~375 ticks - the IR is only called while the robot has tasks (I1 7.12). Undelivered during the human's script part 4, where it is 17 deg off the heading (prior-off decoy; inadmissible prior-on)."
     },
     {
       "id": "coffee_machine_0",
@@ -169,7 +169,7 @@
         50
       ],
       "zone": "zone_SW",
-      "notes": "Segment 2 target. From the kitting table: bearing -93.1 deg, 751 cm; nearest task-target bearing from there is shelf_5 at -43.5 deg (49.6 deg off). x = -40 keeps the walk off the x = 0 zone boundary."
+      "notes": "Script part 2 target. From the kitting table: bearing -93.1 deg, 751 cm; nearest task-target bearing from there is shelf_5 at -43.5 deg (49.6 deg off). x = -40 keeps the walk off the x = 0 zone boundary."
     },
     {
       "id": "ac_switch_0",
@@ -197,7 +197,7 @@
         20
       ],
       "zone": "zone_SE",
-      "notes": "Segment 3, leg 1 end (was the waypoint wander_0; retyped as an AC switch in F47b so that scenario_40's scripted ac_activation is well typed - same coordinates). Exactly on the coffee_machine_0 -> shelf_6 line (t = 0.4): the human heads toward shelf_6 for 398 cm, then turns. Since F47b it IS a hypothesis (ac_activation(ac_switch_1))."
+      "notes": "Script part 3, walk 1 end (was the waypoint wander_0; retyped as an AC switch in F47b so that scenario_40's scripted ac_activation is well typed - same coordinates). Exactly on the coffee_machine_0 -> shelf_6 line (t = 0.4): the human heads toward shelf_6 for 398 cm, then turns. Since F47b it IS a hypothesis (ac_activation(ac_switch_1))."
     },
     {
       "id": "ac_switch_2",
@@ -211,7 +211,7 @@
         20
       ],
       "zone": "zone_SE",
-      "notes": "Segment 3, leg 2 end (was the waypoint wander_1; retyped as an AC switch in F47b, same coordinates). From ac_switch_1: bearing -110.3 deg, 362 cm; >= 64 deg off every delivery target (shelf_5 92.6, coffee 64.0, shelf_6 116.1, table 133.1). Since F47b it is a hypothesis (ac_activation(ac_switch_2))."
+      "notes": "Script part 3, walk 2 end (was the waypoint wander_1; retyped as an AC switch in F47b, same coordinates). From ac_switch_1: bearing -110.3 deg, 362 cm; >= 64 deg off every delivery target (shelf_5 92.6, coffee 64.0, shelf_6 116.1, table 133.1). Since F47b it is a hypothesis (ac_activation(ac_switch_2))."
     },
     {
       "id": "item_3",

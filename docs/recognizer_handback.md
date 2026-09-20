@@ -7,7 +7,10 @@ earlier text or a docstring says otherwise, the code wins and the difference is 
 in `docs/design_decisions.md` (entries I2–I5, "θ has one home", F47b, D2, graded evidence); open items in
 `docs/TODOS_AND_DEFERRED.md`; the interface in `shared/io_contracts.md` §1.2 and §2.1.
 
-Section numbers §1–§5 and §8 are cited from code and other docs; keep them stable.
+Section numbers §1–§5 and §8 are cited from code and other docs; keep them stable. Terms are used as
+`docs/glossary.md` defines them: the recognizer's unit of movement evidence is a STRETCH, a human's
+movement is a WALK ("leg" is not used, and the removed leg model keeps its name in §8 only), a
+CROSSING is a θ crossing, and scenario_40's "segment 3" is a SCRIPT PART, not a `Segment`.
 
 ## 1. The model
 
@@ -472,7 +475,7 @@ distance covered before the arrival (§3.3). L itself is unchanged: refutation i
 
 **(b) Accumulation is observation-count and decomposition sensitive — open for the no-graded-signal phases.**
 A stationary `pick_up`, `place` or `wait_at` phase and an undecomposable hypothesis are still one whole
-observation, 1/u, whatever they observed; how a selected method segments the trajectory into such phases
+observation, 1/u, whatever they observed; how a selected method cuts a walk into such phases
 therefore still sets how much evidence a hypothesis can gather. Seen at HEAD:
 - an arrival still counts twice (the fold at f = 1 plus the open no-graded-signal phase), which is what
   finishes the separation of collinear targets and produces the arrival-fold reveals (§3.2);
@@ -553,7 +556,7 @@ made to the recognizer or to its event semantics (`design_decisions.md`, the D2 
 | hash-seed dependence | TODO-42 | resolved for the recognizer (sorted keys); runs still need `PYTHONHASHSEED=0` |
 
 Closed since the I5 hand-back: TODO-48 / 54 / 68 (D2); TODO-64 / 65 (the gate ruling, §5); TODO-72 (io_contracts §1.3 / §2.1 aligned with this
-document); TODO-52 (R1 / T10) and TODO-67 (T7), both meta-planner side; TODO-57's segment-3 question, made
+document); TODO-52 (R1 / T10) and TODO-67 (T7), both meta-planner side; TODO-57's script-part-3 question (the record calls it segment 3), made
 moot by F47b.
 
 ## 7. The paper-facing divergence
@@ -574,13 +577,13 @@ and not a specification. It will need rewriting on this point, and also on:
 | mechanism | why it went | where recorded |
 |---|---|---|
 | hypotheses from the human's `scheduled_tasks` | the robot never reads the human's script; hypotheses come from schemas and workspace objects | July 2026 (typed enumeration) |
-| the previous posterior as the prior (`prev_belief` fed back) | the output carries state-only factors; feeding it back counted them twice | leg-level session; I3 |
+| the previous posterior as the prior (`prev_belief` fed back) | the output carries state-only factors; feeding it back counted them twice | Sept 10 session; I3 |
 | the 10× assignment multiplier | knowledge of the assignment restricts the SUPPORT, not the magnitude | assignment-pool entry |
 | the held-item rule (refute a hypothesis that binds a portable object the agent is not holding) | a domain shortcut the phase model subsumes; wrong in domains with no holding relation | I3 |
 | `ZONE_BOOST` | a soft multiplier standing in for a hard fact; fired for the wrong hypothesis in 28 of 52 measured episodes (I1 §5.4) | I3 |
 | the global leg (one movement leg for all hypotheses, closed by the body's `stand`) | a stretch is per hypothesis, from its own origin; no leg closed by stillness, no decay | I2–I4 |
 | HIGH / LOW / NEUTRAL likelihoods (4.0 / 0.1 / 1.0) | four numbers with no stated meaning; replaced by the excess-path logistic, detection reliability and a stated u | I4 |
-| the cosine trajectory kernel (`"directional"`) | multiplied identical headings tick after tick (4ⁿ from one straight walk); replaced by one observation per stretch | leg session, I4 |
+| the cosine trajectory kernel (`"directional"`) | multiplied identical headings tick after tick (4ⁿ from one straight walk); replaced by one observation per stretch | Sept 10 session, I4 |
 | `methods[0]` and string-parsed bindings | the planner selects the method by guards; bindings are typed | I2 |
 | `CONFIDENCE_THRESHOLD` in the recognizer | θ has one home, the meta-planner's `_clears_gate`; the copy here had no reader | "θ has one home" |
 
@@ -609,7 +612,7 @@ Every element of that has been replaced. In order:
 |---|---|---|---|
 | July (TODO-19; typed params) | literal microaction strings; hypotheses from the human's script | dispatch by schema-declared vocabulary and evaluator name; the typed cartesian space over workspace objects; the belief floor | no simulator strings in `shared/`; the robot must not know the script |
 | Sept 10 (assignment pool) | a 10× prior weight on assigned tasks | the support restriction (§1.1) | knowledge of the work order is a fact about the support, not a magnitude |
-| Sept 10 (leg session) | per-tick multiplication of identical headings (4ⁿ from one walk) | one observation per movement leg; output-only state factors | consecutive steps are duplicates, not independent evidence; the retracted "early reveals" were duplicate counting |
+| Sept 10 | per-tick multiplication of identical headings (4ⁿ from one walk) | one observation per movement leg (the leg model, removed since; §8); output-only state factors | consecutive steps are duplicates, not independent evidence; the retracted "early reveals" were duplicate counting |
 | I1 audit | — | measurement only | 0 of 5,579 likelihood calls evaluated a completion; ZONE_BOOST wrong in 28 of 52 episodes |
 | I2 foundations | the recognizer's own target lookup, `methods[0]`, `"?item"` | targets, methods and completions from the planner and `target_resolution`; `waited` observable; sorted keys; first step scored | one answer to "where is the target"; no domain literals |
 | I3 phase model | a single `holding` check choosing "phase 1 / 2"; the held-item rule; ZONE_BOOST | the derived expected action per hypothesis with its own origin; the terminal-completion pin | a task's likelihood is its current action's; completion is a world fact |
@@ -619,7 +622,7 @@ Every element of that has been replaced. In order:
 | I4d | u charged only while a stretch was open (fold tick 0.905 → 0.498, a false re-trigger) | u folds with the stretch: evidence is odds against `unknown` (§1.5), invariant checked to 7e-15 | the evidence a stretch gave against `unknown` was lost at its fold |
 | I5 hand-back | — | confirmation matrix at HEAD, guarantee statement, limitations (`analysis/i5_handback/`) | — |
 | Sept 15 (θ single source) | `CONFIDENCE_THRESHOLD` in `recognizer.py`, unread | `DEFAULT_THETA` in the meta-planner, applied in `_clears_gate` only | the recognizer emits a belief and gates nothing |
-| Sept 17, F47b (fixture, not model) | scenario_40's segment-3 legs scripted as `ac_activation` bound to two waypoints: ill-typed, so the space had no hypothesis for them | the targets retyped as `ac_switch_1` / `ac_switch_2` at the same coordinates; bindings type-checked at spawn (`check_task_bindings`) | a behaviour the domain does not describe can never be recognised. The I5 matrix's only wrong crossing (item_6, s40 203–213) was that walk: now the leg is its own task, tied with item_6 until its arrival fold (205). All s40 figures in §3 are from the corrected fixture. |
+| Sept 17, F47b (fixture, not model) | scenario_40's script part 3 walks (the record calls it segment 3) scripted as `ac_activation` bound to two waypoints: ill-typed, so the space had no hypothesis for them | the targets retyped as `ac_switch_1` / `ac_switch_2` at the same coordinates; bindings type-checked at spawn (`check_task_bindings`) | a behaviour the domain does not describe can never be recognised. The I5 matrix's only wrong crossing (item_6, s40 203–213) was that walk: now the walk is its own task, tied with item_6 until its arrival fold (205). All s40 figures in §3 are from the corrected fixture. |
 | Sept 17, D2 (consumer) | `theta_crossed` as the trigger | `recognition_changed` against the decision record (§5) | a trigger is a change in what the decision rested on; recognizer unchanged |
 | Sept 19, graded evidence | a stretch's odds against `unknown` L/u whatever its length: one fitting step was a whole observation, and a lone task cleared θ on the human's first step | L / u^f, f the fraction of the expected path the stretch covered, 1 at an arrival by the completion fact (§1.4, §1.5); u, β, θ unchanged; invariant re-checked to 7e-15 | the model counted stretches and did not grade them by how much they revealed; a walk's evidence now accrues per unit of path and does not depend on how the phases cut it. Every figure in §3 is from this HEAD, with the pre-grade value where it moved. |
 
