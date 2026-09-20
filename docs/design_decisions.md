@@ -3041,8 +3041,11 @@ SIDE); `analysis/tb1a_destination/`
 
 **The successor state is derived from what the action schemas declare: a delete list and a declared relocation (T-B2a)**
 
-DECIDED (cchat ruling on the T-B2a report, September 2026; built in T-B2a). This settles the part the B3.B
-entry left as a proposal ((b), (i) to (iii): "how that is declared is the open part").
+DECIDED (September 2026; built in T-B2a). This settles the part the B3.B entry left as a proposal ((b), (i) to
+(iii): "how that is declared is the open part"). WHO DECIDED WHAT: the delete list was ruled in cchat, on the
+T-B2a report, with the reasoning given below. The relocation keys were ccode's proposal, made in the T-B2a
+build and ACCEPTED AT REVIEW: they follow the `movement_target_key` style, name parameters and no domain
+content, and check 5 passed with them.
 
 WHAT IS BUILT. `Projector.project()` accepts an ordering of n tasks and returns one `ProjectedPlan` with n
 entries. Entry k+1 starts at the step and the position at which entry k's last segment ends, and is decomposed
@@ -3054,13 +3057,13 @@ applies, per action: `ActionSchema.retracts` (the grounded fact is no longer tru
 follows, read at the end of the plan). The agent's position is geometry, the end of the entry's last segment.
 No predicate, parameter or task name appears in `shared/`. An ordering of one task builds no successor state.
 
-THE FORM OF A RETRACTION: a delete list on `ActionSchema` (`retracts`), not a negation flag on
+THE FORM OF A RETRACTION (ruled in cchat): a delete list on `ActionSchema` (`retracts`), not a negation flag on
 `ConditionSchema`. A `ConditionSchema` is also a guard, a precondition and a completion; a flag on it would be
 declared in those three roles and read in none of them. A delete list exists only where it has a meaning.
 `place` retracts `holding(?agent, ?item)`; the added predicate `not_holding`, which nothing consumed and which
 left `holding` true (TODO-07), goes from the kitting schemas.
 
-THE FORM OF A RELOCATION: two binding keys on `ActionSchema`, as `movement_target_key` declares the movement
+THE FORM OF A RELOCATION (ccode's proposal, accepted at review): two binding keys on `ActionSchema`, as `movement_target_key` declares the movement
 target. Where an object is has two representations in a `WorldState`, the `obj_at` predicate and the
 `object_locations` / `object_positions` maps target resolution reads. The predicate side is covered by
 `effects` / `retracts`; the map side could not be reached from a predicate name without a domain string in
