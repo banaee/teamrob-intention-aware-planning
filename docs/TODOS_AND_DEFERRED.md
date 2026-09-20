@@ -1440,6 +1440,12 @@ Prerequisites:
     to the cap. The machine makes `coffee_break` a live hypothesis from t=0, so the recognizer's set
     differs from scenario_20's: prior-on the first crossing and the hold move from 6 to 8. Read with
     scenario_20, not instead of it. `analysis/f47_fixtures/`.
+    STILL OPEN FOR env_layout9 (T-B1b follow-up, September 2026): if layout9 ever becomes a measured
+    fixture, its end state needs handling first. In scenario_90 the sampled separation is below
+    `min_separation` (50 cm) from tick 358 to the end of a 500-step run — after the robot's last delivery
+    at 361 — with both agents standing idle near kitting_table_1, which is where the human finished and
+    where three of the robot's four deliveries go. Nothing during the work falls below it. The same
+    end-state condition (d) is about, on a layout that has no variant for it yet.
 (e) FIXTURES FOR D2 (F47 / F47b, September 2026): the condition on which D2's blocked-execution event and
     its reaction policy (wait, or reconsider and return) would differ is a human stay at a place the robot
     needs, mid-run, finite, with another task in the pool. F47 produced it with `coffee_break` bound to a
@@ -1457,6 +1463,17 @@ Prerequisites:
     the planning response (switch vs hold). A principled unforeseen stay needs declared human behaviour
     outside the robot's domain knowledge (TODO-80). D2's evaluation uses scenario_20 / scenario_50 (the
     end-state pair, the tail block) and scenario_70 / _71 (the absorbed stay, the departure tail).
+(f-designations) A DESIGN NOTE FOR ANY SCENARIO WITH MORE THAN ONE DESTINATION (T-B1b follow-up, September
+    2026): in the current two-table scenarios most items are designated to the table NEAREST their shelf —
+    5 of 6 in env_layout8 and 5 of 6 in env_layout9 (measured). That makes the destination fact nearly
+    redundant with geometry: it weakens the ordering difference the fixture is for, and it weakens the
+    recognizer's discrimination on the carry leg, since the table a carry heads for is the one proximity
+    would have guessed. In both layouts the whole ordering effect rests on the single against-proximity
+    item (env_layout8's item_4, farther by 64.9 ticks; env_layout9's item_1, by 26.8). Scenarios built to
+    EVALUATE the algorithms must set designations deliberately, against proximity where that is what the
+    test needs. The designations are Hadi's to decide per scenario, not to be left to follow from the
+    layout. design_decisions.md, "An item's destination table is a fact of the station" (the fact is the
+    station's; which station is a design choice).
 (f) B3.B (`full_reorder`, not in 4C): a future fixture needs SEVERAL remaining robot tasks whose ORDER, not
     only the next choice, changes cost under a human stay. Not built; every current fixture leaves the robot
     at most one alternative at the stay.
