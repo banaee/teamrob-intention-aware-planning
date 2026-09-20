@@ -32,6 +32,9 @@ Say "ordering", not "sequence" and not "queue", whenever a permutation of the po
 → `docs/design_decisions.md`, DESIGN-16 ("Single-task selection (receding horizon), not queue-wide
 reordering") and its revision, "B3.B (`full_reorder`) is lookahead for the choice of the next task,
 built next".
+"Sequence" is not banned outright — it keeps its own two established uses, a **decision sequence**
+(a run's decisions over time, `step:trigger:winner`, the key the analysis scripts diff on) and a
+**grounded action sequence** (an `AbstractPlan`'s actions). Neither is a permutation of the pool.
 
 **candidate** — the unit the argmin ranges over. An individual task under `single_task`; one
 ordering under `full_reorder`. Candidates exist only inside B3; forming them from the pool is B3's
