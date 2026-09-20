@@ -1568,7 +1568,7 @@ no object at all is still refused only through the missing-object error, not sta
 NOTE (R1, September 2026): the scenario_10 / `env_layout1.json` statements above PREDATE the cleaned
 `env_layout1` (no obstacles; coffee machine and AC switch side by side at x = −875, item_1 on the
 shelf near them; the human's script and the robot's pool rewritten) and are STALE as descriptions of
-the current fixture. The old layout with obstacles is kept as `env_layout9.json`, not registered.
+the current fixture. The old layout with obstacles is kept as `env_layout99.json`, not registered.
 The spelling fix itself (`ac_switch`) carries over.
 Files: shared/recognizer.py (build_hypothesis_space), mesa_sim/sim_model.py
 Reference: I1 audit 3.8, F1 report §1, I2 IR foundations session
@@ -1632,7 +1632,7 @@ Reference: I1 audit §9 (per-tick vs frozen selection); I2 IR foundations sessio
 R1 (September 2026): (a) the all-candidates outcome is DECIDED — plain projected cost, logged
 `all_unrealizable` (TODO-30); the `RuntimeError` is removed in T10. (b) `env_layout1` was CLEANED
 (no obstacles; coffee machine and AC switch side by side; item_1 near them; scenario_10's script and
-pool rewritten) and the old layout is kept as `env_layout9`, NOT registered. scenario_10 is a SWEEP
+pool rewritten) and the old layout is kept as `env_layout99`, NOT registered. scenario_10 is a SWEEP
 FIXTURE AGAIN from T9 on (ten conditions: s00, s10, s20, s30, s40 × prior off/on). Every step number
 below (257, 260, 142, …) refers to the OLD layout and is stale; what scenario_10 does on the new
 layout is recorded in `analysis/t9_arrival_radius/REPORT.md`. Original entry retained below.
@@ -2373,12 +2373,12 @@ Reference: R1 decision record, September 2026
 
 **TODO-75 — `ros_sim/framework_HRI/guide.txt` refers to `env_layout1` with obstacles** [ROS side, paused]
 NOT DONE at the 4C housekeeping: both remedies are outside what may be touched now — the guide is under
-`ros_sim/` (paused, not modified), and registering `env_layout9` is excluded by CLAUDE.md (kept, not
+`ros_sim/` (paused, not modified), and registering `env_layout99` is excluded by CLAUDE.md (kept, not
 registered). Do it when the ROS side resumes.
 The ROS/PRIEST guide describes `env_layout1.json` with obstacles and scenario_10 with the robot
 assigned item_5 / item_1 / item_7. Since R1 `env_layout1` is the cleaned layout (no obstacles, new
-scenario_10 pool) and the old layout is `env_layout9.json`, which is NOT registered in
-`domains/kitting/registry.py`. The ROS path would need `env_layout9` registered (or its own copy) to
+scenario_10 pool) and the old layout is `env_layout99.json`, which is NOT registered in
+`domains/kitting/registry.py`. The ROS path would need `env_layout99` registered (or its own copy) to
 reproduce what the guide describes. Not touched: `ros_sim/` is paused.
 Files: ros_sim/framework_HRI/guide.txt, domains/kitting/registry.py
 Reference: R1 decision record, September 2026

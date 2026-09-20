@@ -97,7 +97,7 @@ Decisions
 - ROS side is paused. Do not modify anything under `ros_sim/`.
 - `domains/dock_loading/` is deferred. Do not modify it unless the task says so. It must still
   import without error (`run_mesa.py` imports its registry).
-- `domains/kitting/env_layout9.json` is the old `env_layout1` with obstacles, kept for later and
+- `domains/kitting/env_layout99.json` is the old `env_layout1` with obstacles, kept for later and
   not registered.
 - The code is the source of truth. Docs are maintained but can lag. Do not change code to match
   docs; report the contradiction. Edit docs only when the task says so.

@@ -24,7 +24,7 @@ current state, parameters and guarantees are in `docs/recognizer_handback.md`; o
   `env_layout0` / `scenario_00` (Phase 4 dev), `env_layout1` / `scenario_10` (foreseeable tasks; dropped
   from the validation sweep in I2, **reinstated at R1/T9 on the cleaned layout** — no obstacles, coffee
   machine and AC switch side by side, item_1 near them; the old layout with obstacles is kept as
-  `env_layout9`, not registered), `env_layout2` / `scenario_20` (collinear decoys),
+  `env_layout99`, not registered), `env_layout2` / `scenario_20` (collinear decoys),
   `env_layout3` / `scenario_30` (mid-approach reveal), `env_layout4` / `scenario_40` (F1, Sept 2026:
   a scripted deviation sequence — delivery, coffee break, two AC-switch legs, a second delivery —
   the positive control for foreseeable-task recognition; F47b retyped the two legs' waypoints as AC
@@ -169,7 +169,7 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
   reading (1)), `realize()` not single-task, the hold as an executed hint at the trigger position
   (TODO-71), `min_separation` = 2.5 × motion per tick (TODO-28), all-unrealizable → plain cost logged
   `all_unrealizable` (TODO-30, TODO-52), `b2a` with ρ = 0.5 (TODO-36), B3.A with realized cost; the
-  execution-time-avoidance assumption past T_h; fixtures (env_layout1 cleaned, env_layout9 kept
+  execution-time-avoidance assumption past T_h; fixtures (env_layout1 cleaned, env_layout99 kept
   unregistered, scenario_10 back in the sweep); TODO-73 to TODO-76
 - T9 (Sept 2026): projected walks end where the executor stops — the body supplies its stopping
   distance (`PROXIMITY_THRESHOLD`) to the `Projector` as it supplies its rate; a per-tick actual
@@ -344,7 +344,7 @@ Later, not scheduled: TODO-80 (declared out-of-domain human behaviour, the princ
 Phase 4D (the detour
 strategy, a hold at a chosen point along a segment TODO-70, human cooperation as the remedy for the
 freezing robot TODO-15), TODO-74 (placement positions on the table), TODO-71 (the hint's body-side refinement and its reporting), TODO-75 (the ROS guide and
-`env_layout9`, with the ROS side), TODO-81 (not behaviour-preserving as filed: dock_loading).
+`env_layout99`, with the ROS side), TODO-81 (not behaviour-preserving as filed: dock_loading).
 Phase 4C housekeeping (done): strict run options and the `[run]` header, `analysis/logparse.py`,
 io_contracts §1.3 / §2.1 (TODO-72), TODO-82, TODO-83.
 
