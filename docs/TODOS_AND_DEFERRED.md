@@ -2800,3 +2800,22 @@ human delivers an item to a table other than its designated one; not reachable b
 Files: shared/recognizer.py (`update`, `_terminal_complete`, `_task_boundary`), shared/meta_planner.py
 (`_is_complete`), shared/planner.py (`is_complete`)
 Reference: T-B1a, September 2026
+
+**TODO-88 — With the prior off, an item the robot carries stays a live hypothesis about the human, with a target that moves with the robot** [recognizer finding; from T-B Q7]
+Found while checking T-B Q7's acceptance, which expected a robot-side timing fix to leave every `[IR]` line
+unchanged. It does not, and the two channels are the recognizer's own inputs rather than a defect of the fix.
+(a) A CARRIED ITEM'S POSITION IS THE CARRIER'S (`world_state_builder`: a held object's location is its holder
+and its position follows it), so while the robot carries item X the hypothesis `deliver_item(X)` is scored
+against a target that moves with the ROBOT. (b) TASK COMPLETION IS A WORLD FACT, so the pin retiring
+`deliver_item(X)` falls on the tick the ROBOT's release makes `obj_at(X, table)` hold. MEASURED (the 20
+baseline runs, T-B Q7): with the prior ON every `[IR]` line is identical before and after the fix — the
+support is the human's assigned pool and holds none of the robot's items; with it OFF, 1 to 29 `[IR]` steps
+per run differ, by at most 0.165 in confidence where `most_likely` is unchanged (the moving target) and by up
+to 0.497 at the pin ticks (the retirement arriving 1 to 3 ticks later). The human's own lines are
+byte-identical in all 20, so nothing reaches the OBSERVATION; both channels are the WorldState.
+THE POINT FOR cchat: the human cannot deliver an item the robot holds. With the prior off the live hypothesis
+set therefore carries tasks the observed agent cannot perform, and their movement likelihood is measured
+against a target the robot is carrying away. Whether the robot's `holding` should retire such a hypothesis,
+freeze it, or leave it as it is, is an IR design question and not a bug. Recorded, nothing changed.
+Files: shared/recognizer.py, mesa_sim/world_state_builder.py (held objects' positions and locations)
+Reference: T-B Q7, September 2026; docs/recognizer_handback.md §1.4, §1.6; design_decisions.md, "Robot-responsible separation" (completion as a world fact)
