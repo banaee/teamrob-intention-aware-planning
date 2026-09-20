@@ -122,6 +122,21 @@ is what this entry was filed for and which stays open. The smallest form (retrac
 `ConditionSchema` or add / delete lists; relocation declared on the action schema) is a PROPOSAL for
 cchat, not decided. The warning above against a `holding`-specific stopgap stands.
 design_decisions.md, "B3.B (`full_reorder`) is lookahead for the choice of the next task, built next".
+UPDATED (T-B2a, September 2026): the part projection needs is BUILT and its form DECIDED: a delete list on
+`ActionSchema` (`retracts`) and a declared relocation (`moved_object_key` / `moved_to_key`), applied by
+`Projector._successor_state()`; design_decisions.md, "The successor state is derived from what the action
+schemas declare: a delete list and a declared relocation". Kitting's `place` retracts `holding` and
+`not_holding` is gone there (dock_loading still declares it, deferred). Forward chaining and precondition
+checking in the live planner stay open, as filed.
+OPEN FROM T-B2A, MEASURED: `pick_up` does not end `obj_at(item, shelf)`. The shelf is not a parameter of
+`pick_up`, so a delete list with bound arguments cannot state it; it needs a wildcard or a functional fact
+("an object is in one place"), which changes the fact representation, not a schema. The consequence is ONE
+STALE PREDICATE in the successor state (`obj_at(item_6, shelf_6)` after item_6's delivery, scenario_80; the
+only predicate on the robot or the item that the successor holds and the real world does not), READ BY
+NOTHING TODAY: guards read `holding`, and target resolution reads the maps, which the relocation keeps right.
+IT MUST BE RESOLVED BEFORE ANY CONSUMER READS `obj_at` FOR AN ITEM THAT HAS BEEN PICKED UP in a successor
+state. The same form problem, also read by nothing: `move_to` does not end the previous `at(agent, ·)`, and
+`waited` is ended by a later action of another kind.
 Files: `shared/planner.py`, `shared/types.py` (ConditionSchema), `shared/meta_planner.py`
 Reference: Phase 4B; Phase 4C meta_planner build session, September 2026
 
@@ -2472,6 +2487,15 @@ WHAT REMAINS, deliberately uncompensated:
 VERIFIED: a discrete-step forward model of the executor, using no execution data, predicts the actual
 release tick exactly for all 68 human and robot 2-action rows and exactly one tick early for all 35
 robot 4-action rows — so the residual is fully attributed, with nothing unexplained.
+UNDER ORDERINGS (T-B2a, September 2026; recorded, NOT acted on): the skipped acknowledgement reaches the
+NEXT ENTRY's start step. Every entry projected with a `pick_up` ends one tick later than execution reaches, so
+entry k+1 starts late by about one tick per preceding entry that contains a `pick_up`, cumulative, partly
+masked by quantisation. Measured on scenario_80: from the first decision entry 1 ends at 39.265 projected, the
+real next decision is at 39 ticks; the carry part alone 17.38 projected against 18 real; so the fetch part
+runs 0.885 long = +1 − 0.115 quantisation. RULED: on plain cost the extra tick is nearly constant across the
+orderings of one pool, so T-B2b is unaffected. On REALIZED cost it is not harmless: a later entry sits late
+against the human projection, so its violating shift intervals are evaluated at the wrong time. A design
+question for cchat BEFORE T-B2c; not to be fixed unasked.
 ALSO NOTED at L2, out of scope there: with the two agents in phase the superseded
 `min_safe_distance = 1.0` exclusion fires again (once in the ten-condition sweep, scenario_30 prior-on
 step 21, `min_dist` 0.49 cm at the mirror crossing) and changes that run's decision sequence. The

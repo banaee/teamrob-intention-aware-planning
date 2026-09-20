@@ -2735,6 +2735,8 @@ See "An item's destination table is a fact of the station". The items × tables 
 longer applies.
 Open points 1 and 2 above are settled at design time in T-B2 (the proposals: the hold at the boundary
 before the task it clears; B2 commits to a task).
+The proposal of (b), (i) to (iii), is decided and built (T-B2a): see "The successor state is derived from what
+the action schemas declare: a delete list and a declared relocation".
 
 Files: docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md (TODO-07, DESIGN-12, DESIGN-16, TODO-47 (f)),
 docs/roadmap.md, shared/meta_planner.py (docstring), shared/projection.py (docstring),
@@ -3034,3 +3036,70 @@ shared/types.py (`WorldState.object_destination`, `TaskSchema.determined_paramet
 mesa_sim/world_state_builder.py
 Reference: T-B1a, T-B1a follow-up, T-B1a follow-up 2, September 2026; B3.B design revision (THE FIXTURE
 SIDE); `analysis/tb1a_destination/`
+
+---
+
+**The successor state is derived from what the action schemas declare: a delete list and a declared relocation (T-B2a)**
+
+DECIDED (cchat ruling on the T-B2a report, September 2026; built in T-B2a). This settles the part the B3.B
+entry left as a proposal ((b), (i) to (iii): "how that is declared is the open part").
+
+WHAT IS BUILT. `Projector.project()` accepts an ordering of n tasks and returns one `ProjectedPlan` with n
+entries. Entry k+1 starts at the step and the position at which entry k's last segment ends, and is decomposed
+against the SUCCESSOR STATE of entry k (`Projector._successor_state()`): a new `WorldState` value built from
+the previous one and the entry's grounded actions, in plan order, and dropped when the call returns. It
+applies, per action: `ActionSchema.retracts` (the grounded fact is no longer true), then
+`ActionSchema.effects` (the grounded fact is true), then the relocation declared by `moved_object_key` /
+`moved_to_key` (`object_locations` names the agent or object the moved object is now at; `object_positions`
+follows, read at the end of the plan). The agent's position is geometry, the end of the entry's last segment.
+No predicate, parameter or task name appears in `shared/`. An ordering of one task builds no successor state.
+
+THE FORM OF A RETRACTION: a delete list on `ActionSchema` (`retracts`), not a negation flag on
+`ConditionSchema`. A `ConditionSchema` is also a guard, a precondition and a completion; a flag on it would be
+declared in those three roles and read in none of them. A delete list exists only where it has a meaning.
+`place` retracts `holding(?agent, ?item)`; the added predicate `not_holding`, which nothing consumed and which
+left `holding` true (TODO-07), goes from the kitting schemas.
+
+THE FORM OF A RELOCATION: two binding keys on `ActionSchema`, as `movement_target_key` declares the movement
+target. Where an object is has two representations in a `WorldState`, the `obj_at` predicate and the
+`object_locations` / `object_positions` maps target resolution reads. The predicate side is covered by
+`effects` / `retracts`; the map side could not be reached from a predicate name without a domain string in
+`shared/`, so it is declared. `pick_up` moves `?item` to `?agent`, `place` moves `?item` to `?target`.
+
+THE KITTING SCHEMA EDIT IS PART OF THE REQUIREMENT, not a fix beside it: the successor state is derived from
+what the schemas declare, so a schema that does not declare its retraction is what the requirement needs.
+Measured on scenario_80 with the schemas as they were: entry 2 of every ordering decomposed as
+`deliver_with_return` (the stale `holding`), a moved object stayed where it had been, and in (B, A) with A held
+the fetch of A was priced at 0 ticks.
+
+HYPOTHETICAL, AND HOW THAT WAS ESTABLISHED. The `WorldState` passed in is only read: every container that
+differs in the successor is a copy, bound to a local name inside `project()`. The `Projector` stores no
+`WorldState`, and a `ProjectedPlan` has no field that could carry one. Checked by projecting all 24 orderings
+of scenario_80's pool from a real world with nothing held and from the real `task_committed` world: the world
+afterwards equals a deep copy taken before, and its containers are the same objects.
+
+CHECKED. Entry 2 of (A, B) equals B projected alone (same actions, segments equal under `==`) from the REAL
+world at the robot's own next decision after it delivered A, with only the robot's position set to entry 1's
+projected end (step quantisation is decided uncompensated, TODO-77); the same from the real `task_committed`
+world (entry 1 `deliver_already_held`, entry 2 `deliver_default`); and (B, A) with A held against a ground
+truth set as the executor's release sets it and rebuilt by `build_world_state()` (entry 2 fetches A from its
+home container, a 12.79-tick walk). All 24 orderings agree with `analysis/tb1b_two_tables/permutation_costs.py`
+to 5.7e-14 (summation order). The 20 baseline logs are whole-file identical.
+
+LEFT UNDECLARED, CORRECTLY (ruled). What no projection seam reads today and the present form cannot state:
+`pick_up` does not end `obj_at(item, shelf)` (the shelf is not a parameter of `pick_up`; it needs a wildcard or
+a functional fact, which changes the fact representation rather than a schema; TODO-07 carries the measured
+consequence and the condition under which it must be resolved); `move_to` does not end the previous
+`at(agent, ·)` (same form problem); `waited` is ended by a later action of another kind; `in_zone`,
+`object_zones` and `AgentState` are derived by the body and stated by no action; the observed agent's own
+projected effects are not applied, as under `single_task`.
+
+RECORDED, NOT FIXED. `ProjectedPlanEntry.estimated_start_step` is an int and truncates a later entry's
+fractional start step. Nothing reads it; the segments carry the exact step.
+`domains/dock_loading/actions.py` still declares `not_holding` (deferred, untouched).
+
+Files: shared/projection.py (`project`, `_successor_state`), shared/types.py (`ActionSchema.retracts`,
+`moved_object_key`, `moved_to_key`), domains/kitting/actions.py (`pick_up`, `place`), shared/io_contracts.md
+(§1.7, §3), docs/TODOS_AND_DEFERRED.md (TODO-07, TODO-77)
+Reference: T-B2a, September 2026; "B3.B (`full_reorder`) is lookahead for the choice of the next task, built
+next", (a) to (c); TODO-07

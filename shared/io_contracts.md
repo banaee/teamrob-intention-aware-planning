@@ -298,6 +298,10 @@ class ProjectedPlan:
     total_estimated_cost: int
 ```
 
+`estimated_start_step` is an int: for an entry after the first it TRUNCATES the fractional step at which the
+previous entry ended. Nothing reads it; the entry's segments carry the exact step (recorded at T-B2a, not
+fixed).
+
 `spatial_zones` was removed — zone membership was rejected as a proximity criterion
 (zones are arbitrary in size; co-location in one zone doesn't imply closeness). Replaced
 by `segments`, which carry actual geometry for distance-based interference detection.
@@ -1116,6 +1120,22 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
 - `TaskSchema` = non-primitive task — decomposes via `MethodSchema`
 - `ActionSchema` = primitive task — executable leaf, not decomposed further in HTN layer
 - Mesa expands primitive actions into microactions via `action_decomposer.py` — embodiment detail only
+
+**What an `ActionSchema` declares it changes (T-B2a).** Three declarations, read by
+`Projector._successor_state()` to chain the entries of an ordering and by nothing in a live run:
+- `effects: List[ConditionSchema]` — the add list: the grounded fact is true once the action is done.
+- `retracts: List[ConditionSchema]` (default empty) — the delete list: the grounded fact is no longer true,
+  e.g. `place` retracts `holding(?agent, ?item)`. A list on the action and NOT a negation flag on
+  `ConditionSchema`, because a `ConditionSchema` is also a guard, a precondition and a completion, where the
+  flag would be declared and never read. Applied before `effects`. Every `Var` must be one the grounded
+  action binds; a fact whose argument the action does not bind cannot be retracted in this form (TODO-07).
+- `moved_object_key`, `moved_to_key: Optional[str]` (default `None`) — the binding keys of the object the
+  action moves and of the agent or object it is then at, e.g. `pick_up` (`"?item"`, `"?agent"`), `place`
+  (`"?item"`, `"?target"`). Declared as `movement_target_key` declares the movement target. It keeps
+  `WorldState.object_locations` / `object_positions`, the representation `target_resolution` reads, right in
+  the successor state; the predicate representation (`obj_at`) is covered by `effects` / `retracts` only.
+design_decisions.md, "The successor state is derived from what the action schemas declare: a delete list and
+a declared relocation".
 
 ---
 
