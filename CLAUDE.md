@@ -25,6 +25,8 @@ Relevant (read as needed):
   for readers of a field
 - `domains/kitting/`: the active domain
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
+- `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
+  design record. Use its terms in the code, in the documents and in reports.
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - `analysis/<task>/REPORT.md`: only the reports a task names. Rows in older reports may be
@@ -234,8 +236,12 @@ Completion is measured from the world fact (T6): the tick after the robot's last
   Fixtures are written as literals, because they are read by people; generated fixtures were tried and
   reversed (T-B1b, TODO-47 (a)). scenario_82 only opens env_layout8 in the viewer: not a fixture, nothing
   is measured from it.
-- "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is an
-  individual task, never an ordering.
+- Every term has one meaning: `docs/glossary.md`. The entries below are the ones a task prompt
+  leans on most; the glossary is the full list and carries the pointers.
+- "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is the unit
+  the argmin ranges over: an individual task under `single_task`, one ordering of the pool under
+  `full_reorder` (DESIGN-16, terminology). An ordering is a permutation of the pool; it is never
+  called a sequence.
 - Triggers: `no_current_task`; `recognition_changed` (the belief no longer points at the
   hypothesis the last decision projected, or first clears the gate on one; replaced
   `theta_crossed` in D2, which older reports and logs still name); `task_committed` (the robot's
@@ -247,7 +253,11 @@ Completion is measured from the world fact (T6): the tick after the robot's last
   and reports use these names.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.
-- Segment: one straight stretch of one robot or human action in a projection. Leg: the
-  recognizer's term for a human walk. Do not mix the two.
-- Hold: the robot stands still for δ ticks. T_r: a projected plan's duration. T_h: the end of
+- Segment: one straight-line motion, or one stationary stretch, of one robot or human action in a
+  projection. Entry: one task's part of a projected plan, with several segments. Stretch: the
+  recognizer's unit of movement evidence. Leg: the recognizer's older word for a human walk. Do not
+  mix them.
+- Hold: the shift that was chosen, as δ ticks in which the robot stands still. Walk: an agent's
+  movement, never a loop or a search in the code (the loop in `realize()` is the minimal-shift
+  search). T_r: a projected plan's duration. T_h: the end of
   the human's projection. `min_separation`: the distance realization must keep between agents.
