@@ -384,6 +384,12 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     an error in the input to `realize()` and is not compensated.
   - B3: evaluation of B3.A against B3.B on the two-table fixtures, plain then realized; the one-table
     fixtures byte-identical for the default run.
+    T-B3 ✅ (September 2026): single_task beside full_reorder on s80, s81, s83, s20, s70 (realized, both
+    priors), a comparison table and the first `full_reorder` logs, the diff target from here on (not an
+    evaluation): `analysis/tb3_full_reorder/`.
+- **Two-table re-examination of the recognizer and B2** (a separate task, not scheduled): on two tables the
+  carry walk is discriminative; projections of rival hypotheses diverge spatially; B2's outcome is more
+  sensitive to which hypothesis was admitted; B3.A's own costs differ.
 - **T-C — The human action script.** The human's scenario is a sequence of actions (`move_to` a target or
   a point, `pick_up`, `place`, `wait`, `stay`), run by the human executor on the scenario layer; the mind
   knows nothing of it; a part may still be written as a task, so the regression fixtures are unchanged.
