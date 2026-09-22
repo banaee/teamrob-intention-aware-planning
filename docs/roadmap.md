@@ -379,10 +379,11 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     STATE (September 2026): T-B2a ✅ (`project()` chains the entries; the successor state from what the
     schemas declare), T-B2b ✅ (`full_reorder` on plain cost), T-B2d ✅ (`--strategy`), T-B2c ✅ (an
     ordering realized, one minimal-shift search and one hold per entry; orderings ranked on that cost).
-    B3.B is complete. No `full_reorder` baselines are recorded until Hadi confirms T-B2c. OPEN for cchat:
+    B3.B is complete. ~~No `full_reorder` baselines are recorded until Hadi confirms T-B2c.~~ Superseded by
+    T-B3: the `full_reorder` baselines are in `analysis/tb3_full_reorder/`. OPEN for cchat:
     the projection's extra tick per entry with a `pick_up` accumulates over an ordering (TODO-77); it is
     an error in the input to `realize()` and is not compensated.
-  - B3: evaluation of B3.A against B3.B on the two-table fixtures, plain then realized; the one-table
+  - B3: B3.A against B3.B on the two-table fixtures, realized only, T-B3 (plain was T-B2b); the one-table
     fixtures byte-identical for the default run.
     T-B3 ✅ (September 2026): single_task beside full_reorder on s80, s81, s83, s20, s70 (realized, both
     priors), a comparison table and the first `full_reorder` logs, the diff target from here on (not an

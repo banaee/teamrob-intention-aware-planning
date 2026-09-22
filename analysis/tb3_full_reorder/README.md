@@ -46,7 +46,7 @@ projection (no assessed window):
 The eight single_task logs with a baseline regenerate byte-identical by md5: s20 and s70 against
 `analysis/tb1a_destination/README.md` (T-B Q7), s80 and s81 against `analysis/tb1b_two_tables/README.md`. s83
 has no single_task log in `analysis/tb1c_realized_flip/` (its sweep is full_reorder only), so its two
-single_task logs have no baseline; its two full_reorder realized logs, and s80's, match that record's md5s.
+single_task logs had no baseline (baselined here since, below); its two full_reorder realized logs, and s80's, match that record's md5s.
 
 ## Logs (`sweep/`, local, git-ignored) — the diff target under full_reorder
 
@@ -65,11 +65,19 @@ Regenerated when a fixture changes. md5 at 2a44c65:
 | s83_off | 7b719acbbf4c63020146a83fbd5f3ff8 |
 | s83_on | 36f29241b7f85f0255e14284d98e117e |
 
-(files `sweep/<fixture>_full_reorder_<prior>.log`.) The single_task md5s of s83 at 2a44c65, not a baseline
-record: off 6d696902c38a9356a53c27764c40adc8, on 4ecc5729f47b69195c5e6d67ad5e9ab6.
+(files `sweep/<fixture>_full_reorder_<prior>.log`.)
+
+s83 under single_task (realized, both priors) is baselined here too, since no earlier record holds it (Hadi,
+at T-B3's close): `sweep/s83_single_task_<prior>.log`, md5 at 2a44c65:
+
+| log | md5 |
+|---|---|
+| s83_single_task_off | 6d696902c38a9356a53c27764c40adc8 |
+| s83_single_task_on | 4ecc5729f47b69195c5e6d67ad5e9ab6 |
 
 ## Run (repo root)
 
     analysis/tb3_full_reorder/sweep.sh <out_dir>
 
-All 20 runs; the full_reorder logs go to `sweep/` (`cp <out_dir>/*_full_reorder_*.log analysis/tb3_full_reorder/sweep/`).
+All 20 runs; the full_reorder logs and s83's single_task logs go to `sweep/`
+(`cp <out_dir>/*_full_reorder_*.log <out_dir>/s83_single_task_*.log analysis/tb3_full_reorder/sweep/`).
