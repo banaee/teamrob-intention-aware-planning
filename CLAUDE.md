@@ -218,7 +218,8 @@ moved (T-B Q7: the robot spends one more tick per delivery, less where a hold ca
 differed from T-B1a follow-up 2's in the `[run]` line alone, which names the strategy, and follow-up 2's had
 superseded the graded-evidence sweep (`analysis/g1_graded_evidence/sweep/`; same world-level behaviour,
 hypothesis keys no longer carry the table, and the `[run]` header changed with T-A1's β commit). No
-`full_reorder` baselines before T-B3. The stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record
+`full_reorder` baselines before T-B3. The stop-on baselines (C's, `analysis/c_separation_stop/`, and F47's) predate graded evidence and are not
+regenerated; their logs were dropped in the analysis cleanup, their READMEs stay as frozen records. Record
 baselines before changing code, then diff.
 
 ### Maintained baseline sets

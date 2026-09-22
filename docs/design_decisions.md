@@ -1441,7 +1441,8 @@ item_4 at 87 instead of 93, run end 157 instead of 163; s00_off run end 166 inst
 recognizer reads (s30_off 155, the item_4 pin; s00_off's are a prefix, the run simply ends earlier). The
 recognizer is untouched. These runs are the meta-planner-side regression baselines from here on.
 Files: shared/meta_planner.py (`update`, `_is_complete`, `update_human_projection`), shared/planner.py
-(`is_complete`), analysis/t7_t8_meta_bugs/ (compare.py, stages.sh, summary.md)
+(`is_complete`), analysis/t7_t8_meta_bugs/ (compare.py, stages.sh, summary.md; the folder is deleted in the
+analysis cleanup, September 2026: the numbers above are its record)
 Reference: T7/T8 session, September 2026; TODO-67, TODO-54, TODO-68
 
 **The robot can wait: realization prices a conflict as duration, and B2 and B3 both consume it (Phase 4C wait-decision revision)**

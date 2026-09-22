@@ -148,6 +148,9 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
   `unknown` is not admitted as a projection. `analysis/t7_t8_meta_bugs/` held the meta-planner-side
   regression baselines until T9; the current ones are F1's (`analysis/f1_robot_responsible/realized_none/`,
   with s10 superseded by TODO-32 and s40 by F47b — `analysis/f47_fixtures/`)
+  (Analysis cleanup, September 2026: `analysis/t7_t8_meta_bugs/` is deleted, its numbers carried in
+  design_decisions.md and TODO-67; F1's and F47's logs are dropped; the current baselines are the maintained
+  sets named in CLAUDE.md, "Maintained baseline sets".)
 - WAIT-DECISION REVISION (Sept 2026, documents only): T1 showed the fixtures' interference is a TIMING
   conflict (both agents reach the table within a tick), so the proportionate response is a short wait,
   which the robot could not express — its only lever was which task to do. Decided: the robot can wait.

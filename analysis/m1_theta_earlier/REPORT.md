@@ -1,5 +1,9 @@
 # M1 — An earlier recognition trigger on scenario_30 (θ = 0.65 vs 0.75)
 
+CLEANUP NOTE (September 2026): only this report is kept. The scripts, `realization.md` / `.json`, `why.md` /
+`why.py` and the local logs it names below are deleted; the finding is carried in design_decisions.md ("θ has one
+home") and TODO-64, and the tables here are the record of the rest.
+
 Exploratory, measurement only. Code at HEAD `fd183b3` (R1 + T9). `shared/` untouched: θ is forced
 per process by wrapping `MetaPlanner.__init__` in the analysis scripts (the T1b pattern), and no
 θ change is committed. Four runs, `PYTHONHASHSEED=0`, `env_layout3` / `scenario_30`, 200 steps,

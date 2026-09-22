@@ -2190,7 +2190,8 @@ condition of the guard-selected decomposition holds; the recognizer's `_terminal
 indifferent to who did it) — and `update()` drops every complete task from the pool on every call, logged as
 `[meta-pool] <task> complete in world: dropped from the pool`. Nothing is recorded: the queue invariant is
 unchanged, B3's queue rewrite persists the drop, and an empty pool after the drop is the terminal return.
-Sweep effect (PYTHONHASHSEED=0, analysis/t7_t8_meta_bugs/summary.md): s30_off — item_4 selected at 87
+Sweep effect (PYTHONHASHSEED=0, analysis/t7_t8_meta_bugs/summary.md, deleted in the analysis cleanup; these
+numbers are its record): s30_off — item_4 selected at 87
 (was 93), its `task_committed` at 121 (was 127), delivered at 155 (was 161), run end 157 (was 163); s00_off —
 `all tasks complete` at 166 (was 172). No other condition's decisions move. The recognizer's private
 `_terminal_complete` implements the same test; making it delegate to the planner's method is recognizer-side
