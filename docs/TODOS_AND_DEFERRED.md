@@ -2891,7 +2891,7 @@ modelling question. Recorded, nothing changed.
 Files: shared/projection.py (the arrival radius in a projected walk), mesa_sim/world_state_builder.py (PROXIMITY_THRESHOLD)
 Reference: T-B1c, September 2026; TODO-74
 
-**TODO-90 — Two in-window sub-min_separation approaches under gate `b2a`** [to check in a bounded task before T-C; from D3]
+**TODO-90 — Two in-window sub-min_separation approaches under gate `b2a`** [checked; from D3] ✅ CHECKED (TODO-90 check, Sept 2026): no defect
 Measured in the `task_committed` ablation (`analysis/ablation_task_committed/`), present with and without the
 trigger, identical in both: s10 (both priors) 30.87 cm at ticks 72 to 74, under the B2 continue at step 29
 (δ = 0); s30 prior on 15.47 cm at tick 23 (ticks 23 and 24 below 50 cm), under that tick's decision (a B2
@@ -2903,3 +2903,17 @@ that the body spends the owed ticks). Nothing changed for it. To be checked in a
 decision's realized plan covers those ticks, and whether that plan cleared 50 cm there.
 Files: shared/meta_planner.py (B2, `realize()`), analysis/ablation_task_committed/measure.py (the window rule)
 Reference: D3, September 2026; analysis/ablation_task_committed/ (142deaa); T4 (TODO-71, s10 72–75)
+CHECKED (TODO-90 check, September 2026; `analysis/todo90_b2a_window/README.md`, main at 7f122fd). Neither a hole
+nor, except at one tick, an attribution artefact. The robot STANDS in every sub-min_separation tick inside an
+assessed window: s10 off 72–74 (decision 29) and s10 on 72–73 (decision 24; 74 on the window's edge; the decision is
+at 24 under prior on, not 29 as stated above) are the robot at the table after its last step (move_to acknowledgement,
+release, place acknowledgement) while the human walks in, and that decision's own realization projected them below
+min_separation (47.16 / 42.89 cm; 43.10 / 42.81 cm); its closest moving approach was 67.2 / 80.5 cm. A stationary robot
+segment has no violating shift interval (F1), so δ = 0 was the correct realization; executed 30.87 cm because the
+human's walk stopped 14.26 cm farther along than projected (TODO-89). s30 prior on tick 24 is the robot standing in its
+decided 7-tick hold as the human crosses, projected exactly (15.47 cm min over the tick, both). The one attribution
+artefact is s30 tick 23 (15.47 cm): it covers [0, 1] on the decision's clock, the observation offset, before the human
+projection's span, so it lies in no window; the ablation's `measure.py` tested the tick's end instant against [1, T_h]
+rather than the whole tick, and omitted the realized plan's span (hence also s10 on tick 74). The ablation counted
+distance inside a window; F1 makes the robot responsible for its motion only, and no robot step inside a window came
+within 50 cm. Nothing changed.
