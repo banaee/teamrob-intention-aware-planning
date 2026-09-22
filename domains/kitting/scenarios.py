@@ -560,6 +560,55 @@ scenario_81 = ScenarioConfig(
     ],
 )
 
+# scenario_83 (T-B1c): the existence case in which realized cost changes the
+# HEAD under full_reorder — a conflict in an entry after the head, which the
+# head realized alone cannot see. The robot's side is scenario_80's; only the
+# human's differs. The human fetches item_3 first (a 66-tick walk along the
+# north wall, then the carry to kitting_table_1) and then item_0, so that its
+# carry of item_0 reaches kitting_table_0 while the robot, having delivered
+# item_4 there, is on the second of its two short tasks: in the plain-cost
+# ordering (item_6, item_1) the item_1 entry arrives at the table while the
+# human stands there releasing item_0 (a 3-tick hold before that entry), in
+# (item_1, item_6) the item_6 entry arrives after the human's projection ends.
+# The start position sets that timing; the record is analysis/tb1c_realized_flip/.
+scenario_83 = ScenarioConfig(
+    id="scenario_83",
+    name="layout8_two_tables_realized_flip",
+    description=(
+        "scenario_80 with the human working item_3 then item_0 from the north wall: its item_0 carry reaches "
+        "kitting_table_0 as the second of the robot's two short tasks does, so under full_reorder the plain-cost "
+        "ordering (item_6, item_1) carries a hold before item_1 and realized cost makes item_1 the head."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-430, 400),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-100, -400),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_1"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_1")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
 # scenario_82 is for VIEWING env_layout8 (the Solara viewer), one task each:
 # it is not a fixture, nothing is measured from it, and T-B does not use it.
 scenario_82 = ScenarioConfig(
