@@ -742,10 +742,9 @@ class ExecutorState:
     """
     agent_id: str
     current_task: Optional["TaskInstance"]
-    holding: Optional[str]   # item_id or None — convenience snapshot for evaluate_triggers()'s
-                              # tick-to-tick task-commit detection; WorldState.predicates carries
-                              # the same fact per-agent but is rebuilt fresh each tick with no
-                              # memory to compare against
+    holding: Optional[str]   # item_id or None — convenience snapshot; evaluate_triggers() no
+                              # longer reads it (task_committed removed, D3); kept for the
+                              # analysis scripts that read it
 
 
 @dataclass

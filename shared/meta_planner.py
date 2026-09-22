@@ -104,8 +104,9 @@ STRATEGY (DESIGN-16):
             HEAD becomes the new current_task, and the hold that goes out is
             the hold before the first entry (_replan_orderings()). The ordering past
             the head is a LOOKAHEAD for that choice, re-priced at the next
-            ROBOT TRIGGER (task_committed, which passes through B2, or
-            no_current_task, which bypasses it) — not an order commitment; the
+            trigger (recognition_changed, which passes through B2, or
+            no_current_task, which bypasses it; task_committed is no trigger
+            since D3) — not an order commitment; the
             queue's order carries none, as under single_task. It exists for
             tasks coupled by geometry (two-table kitting: a task's end
             position depends on its table, so later walks depend on the
@@ -285,11 +286,6 @@ class MetaPlanner:
         # for projection stays inside Projector; this never plans.
         self._planner = AdaptivePlanner(knowledge=knowledge)
         self._queue: List[TaskInstance] = []  # owned internally per Q1; populated by seed_tasks()
-        # Tick-to-tick comparison state for evaluate_triggers()'s task_commit
-        # check. evaluate_triggers() has no prev_executor_state param (unlike
-        # replanning.py's should_replan()) — this is owned internally, same as
-        # the queue.
-        self._prev_executor_state: Optional[ExecutorState] = None
         # The decision record (D2): the hypothesis the last fired trigger's
         # decision was projected against — belief.most_likely on the tick
         # update_human_projection() built a projection; None when admission
@@ -345,7 +341,9 @@ class MetaPlanner:
         """
         Replaces replanning.py's should_replan(). Event-driven only.
 
-        Three real triggers (DESIGN-07; the second replaced in D2):
+        Two real triggers (DESIGN-07; the second replaced in D2, the third,
+        task_committed, removed in D3: the robot's own grasp was in the plan
+        the last decision priced, not a change in what it rested on):
             - no_current_task: executor_state.current_task is None. Covers BOTH
               t=0 (see seed_tasks()) AND ordinary task completion — this assumes
               whoever builds ExecutorState (sim_agents.py, step 9) clears
@@ -376,12 +374,10 @@ class MetaPlanner:
               from below: it fired on every re-crossing and never on a change
               of hypothesis. The bar itself is _clears_gate()'s business,
               never compared here.
-            - task_commit: executor_state.holding transitions from None to
-              not-None (robot just picked something up).
 
-        When two hold on one tick the order is no_current_task,
-        recognition_changed, task_committed — arbitrary, as before: only the
-        reported reason and score differ, update() runs the same.
+        When both hold on one tick the order is no_current_task, then
+        recognition_changed — arbitrary, as before: only the reported reason
+        and score differ, update() runs the same.
 
         Confidence is a gate here (via _clears_gate(), on the entering side of
         recognition_changed), never a magnitude fed into a cost.
@@ -396,20 +392,12 @@ class MetaPlanner:
                 recognition_changed = (
                     self._clears_gate(belief) and belief.most_likely != UNKNOWN
                 )
-            task_committed = (
-                self._prev_executor_state is not None
-                and self._prev_executor_state.holding is None
-                and executor_state.holding is not None
-            )
 
             if recognition_changed:
                 decision = TriggerDecision(fired=True, reason="recognition_changed", score=belief.confidence)
-            elif task_committed:
-                decision = TriggerDecision(fired=True, reason="task_committed", score=1.0)
             else:
                 decision = TriggerDecision(fired=False, reason="none", score=0.0)
 
-        self._prev_executor_state = executor_state
         self._last_trigger_reason = decision.reason
         return decision
 
