@@ -94,6 +94,8 @@ completion, and every hold except the two below.
   tick 31 the robot, at the same position, spends the `pick_up` acknowledgement instead (`micro=stand` →
   `action=pick_up micro=None`). Robot lines differ at that tick only.
 - s30 b2a, both priors: likewise the hold 47 (1), at tick 47.
+  (D3 note: the same hold 47 (1) also occurred under gate none, single_task, both priors — tb1a's s30, not a
+  row here — and went the same way at D3's regeneration, `analysis/tb1a_destination/README.md`.)
 - s10 / s20 / s30 b2a: B2 is still reached (7, 4, 4 times; every one continues); the calls removed are the
   `task_committed` ones.
 - In-window sub-min_separation ticks: s10 b2a (72–74, 30.87 cm, under the decision at 29) and s30 b2a prior on
@@ -112,3 +114,7 @@ completion, and every hold except the two below.
 
     analysis/ablation_task_committed/sweep.sh analysis/ablation_task_committed/sweep
     python analysis/ablation_task_committed/measure.py analysis/ablation_task_committed/sweep
+
+D3 note (September 2026): `task_committed` is removed from the code (dd880be), so the `tc` column of the table is
+0 from D3 on, and the run option `--task_committed_trigger` was discarded: `sweep.sh` no longer runs as is.
+This folder is a frozen record at 142deaa.

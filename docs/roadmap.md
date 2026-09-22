@@ -188,7 +188,8 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
 - DESIGN-07 resolved: three triggers (`no_current_task`, `theta_crossed` as a *crossing event*,
   `task_committed`); θ=0.75, no hysteresis, confidence gate-only. D2 (September 2026) replaced
   `theta_crossed` by `recognition_changed`: retention by identity against the decision record, the
-  gate asked at admission only; the below-θ sub-question closed as hold, no band
+  gate asked at admission only; the below-θ sub-question closed as hold, no band. D3 (September 2026)
+  removed `task_committed`: two triggers, `no_current_task` and `recognition_changed`
 - DESIGN-16 resolved: single-task receding-horizon selection; strategy flag for `full_reorder`
 - Cancellation resolved (July): guarded HTN method, not a `_cost()` term
 - Queue invariant: `_queue` excludes the executing task; candidates = `[current_task] + queue`
@@ -290,7 +291,7 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    `recognition_changed` replaces `theta_crossed`: the meta-planner records the hypothesis it projected
    (the decision record, one field) and fires when `most_likely` leaves it or when a task hypothesis
    first clears the gate with none recorded; TODO-48 / 54 / 68 are consequences, not cases. Robot-side
-   triggers unchanged. The blocked-execution event (the separation stop's refusal as a fact in
+   triggers unchanged (until D3, which removed `task_committed`). The blocked-execution event (the separation stop's refusal as a fact in
    `ExecutorState`, per blocked episode, past B2, wait now / reconsider recorded) is designed, not
    built: under wait it cannot change a decision, and reconsider has no valid fixture (F47b), so it
    waits for TODO-80 or TODO-47. TODO-77 stays a projector accounting item. Entry in
@@ -388,6 +389,12 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     T-B3 ✅ (September 2026): single_task beside full_reorder on s80, s81, s83, s20, s70 (realized, both
     priors), a comparison table and the first `full_reorder` logs, the diff target from here on (not an
     evaluation): `analysis/tb3_full_reorder/`.
+- **D3** ✅ (September 2026): `task_committed` is not a trigger. A trigger is a change in what the last decision
+  rested on (the human's hypothesis, the robot's task set); the robot's grasp was in the plan it priced. The
+  trigger set is {`recognition_changed`, `no_current_task`}; no re-timing mechanism added. The ablation
+  (`analysis/ablation_task_committed/`) changed nothing in the world in 26 pairs; the maintained baselines
+  (tb1a, tb1b, tb1c, tb3) are regenerated. design_decisions.md, "D3: task_committed is not a trigger";
+  TODO-90 (two in-window approaches under `b2a`) to be checked in a bounded task before T-C.
 - **Two-table re-examination of the recognizer and B2** (a separate task, not scheduled): on two tables the
   carry walk is discriminative; projections of rival hypotheses diverge spatially; B2's outcome is more
   sensitive to which hypothesis was admitted; B3.A's own costs differ.
@@ -450,7 +457,8 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
 
 - DESIGN-06: define `ProjectedPlan` type in `shared/types.py` ✅ DONE
 - TODO-14: `AgentConfig.scheduled_tasks` semantics split by agent type ✅ DONE (resolution text corrected Sept 2026 — robot list is an unordered *pool*, not a prioritised queue)
-- DESIGN-07: cognitive clock triggers + θ policy settled ✅ DONE (no hysteresis; three triggers implemented)
+- DESIGN-07: cognitive clock triggers + θ policy settled ✅ DONE (no hysteresis; three triggers implemented;
+  two since D3, `task_committed` removed)
 - New simple kitting layout (Layout 0) and scenario for Phase 4 dev ✅ DONE (env_layout0/scenario_00)
 - Q1–Q4 meta_planner design questions ✅ RESOLVED (see Phase 4C above)
 - Typed-parameter object model (SimObject/is_portable/parameter_types) ✅ DONE, verified against scenario_00

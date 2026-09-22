@@ -262,3 +262,6 @@ Regenerate `post_fix/` as the T6 sweeps with `post_fix/` in place of `core/` and
   ticks, two lower. Nothing in C's findings changes.
 - `run.py`'s `T6_SEP_CM` path is written and smoke-tested but unused after the s sweep was dropped; left in
   as the record of the wrapper, not as an invitation to sweep s.
+
+D3 note (September 2026): `task_committed` is removed from the trigger set (dd880be), so the task_committed count
+in `metrics.py`'s decisions column (no_current_task / recognition_changed / task_committed) is 0 from D3 on.

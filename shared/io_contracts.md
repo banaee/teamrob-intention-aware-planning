@@ -738,7 +738,9 @@ evaluate_triggers(
     executor_state: ExecutorState,
 ) -> TriggerDecision
 ```
-Event-driven only. Exactly three conditions (DESIGN-07, resolved; the second replaced in D2):
+Event-driven only. Exactly two conditions (DESIGN-07, resolved; the second replaced in D2, the third,
+`task_committed`, removed in D3: the robot's own grasp was in the plan the last decision priced, not a change
+in what that decision rested on):
 
 - `no_current_task` — `executor_state.current_task is None`. Covers **both** t=0 and ordinary
   task completion in one condition; there is no separate initialization path. This assumes the
@@ -759,13 +761,17 @@ Event-driven only. Exactly three conditions (DESIGN-07, resolved; the second rep
   is replaced, ends, or the human stops — an accepted consequence, recorded in the D2 entry; a margin
   or a duration on the dip would be a second threshold. Supersedes `theta_crossed` (the crossing
   `prev < θ ≤ current`, which fired on every re-crossing and never on a change of hypothesis).
-- `task_committed` — `executor_state.holding` transitions `None → not-None`.
+- `task_committed` — `executor_state.holding` transitions `None → not-None`. REMOVED BY D3 (September 2026);
+  kept here as history. `ExecutorState.holding` stays, read by no trigger.
 
 θ=0.75, single threshold, no hysteresis. Confidence is a gate here, never a magnitude fed
 into a cost. `MetaPlanner` owns `_prev_executor_state` and the decision record internally —
 unlike the retired `should_replan()`, these are not parameters. When two conditions hold on one
 tick the order is `no_current_task`, `recognition_changed`, `task_committed`; only the reported
 reason and score differ.
+SUPERSEDED (D3): `_prev_executor_state` is gone with `task_committed`; `MetaPlanner` owns the decision record
+alone. When both conditions hold on one tick the order is `no_current_task`, then `recognition_changed`; only
+the reported reason and score differ.
 
 #### Update
 ```python
@@ -840,7 +846,8 @@ is inside B3; neither strategy commits to an order:
   search 1 ranges over the first entry's own intervals from 0, and the first entry is the head projected
   from the live world. Holds before later entries are priced, never sent. The tail is a lookahead for the
   choice of the head, re-priced at the next ROBOT TRIGGER (`task_committed`, which passes through B2,
-  or `no_current_task`, which bypasses it), not an order commitment: B2 commits to the current task
+  or `no_current_task`, which bypasses it; D3: re-priced at the next trigger, `recognition_changed`
+  through B2 or `no_current_task` past it, `task_committed` removed), not an order commitment: B2 commits to the current task
   (T-B Q3, `b2a` unchanged), the winning ordering is not stored (the internal queue stays the pool
   without the head, in pool order, as under `single_task`), and `UpdateResult.queue` lists the tail in
   the ordering's order as information only. DESIGN-12 does not apply. Logs per B3 call: `[meta-ord]`

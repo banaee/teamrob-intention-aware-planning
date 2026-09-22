@@ -442,6 +442,9 @@ cover every world state the task can legitimately start *or resume* from. Guards
 handling — the trigger design guarantees mid-task re-decomposition (`task_committed` fires
 immediately after every successful `pick_up`), so the partially-executed states are reached
 on every task, every run.
+SUPERSEDED IN PART (D3, September 2026): `task_committed` is not a trigger, so re-decomposition after the grasp
+is no longer guaranteed on every task; it happens at any re-decision while a task runs (a `recognition_changed`
+whose B2 continues, the `continue_plan` 2->0 in the baselines). The requirement on domain authoring stands.
 
 `deliver_item`'s three methods are complete under this rule, ordered most-specific-first
 since `_select_method` returns the first method whose guards pass:
@@ -468,6 +471,8 @@ and will miss such cases. The argument for accepting that loss:
   Optimizing the robot's *entire* future queue against a prediction we know will be better
   informed at the next trigger inverts that premise. Triggers fire often (task completion,
   θ-crossing, task-commit), so decisions are re-made from fresh evidence continuously.
+  (D3: task-commit is no trigger since September 2026; the triggers are `no_current_task` and
+  `recognition_changed`, "D3: task_committed is not a trigger".)
 - Prediction horizon H is already belief-bounded and task-bounded (see above). Committing to
   a multi-task robot schedule optimized against an uncertain horizon has weaker justification
   than re-deciding within it. A mathematically optimal permutation under an inaccurate
@@ -572,6 +577,9 @@ SUPERSEDED IN PART (D2, September 2026): `theta_crossed` is replaced by `recogni
 identity of the projected hypothesis against the decision record rather than the crossing of the gate; the
 open sub-question (below θ: hold or revert; single threshold or band) is closed as hold, by identity, no band.
 `no_current_task` and `task_committed` stand. See "What a trigger is an event of", below.
+SUPERSEDED IN PART (D3, September 2026): `task_committed` is removed; `evaluate_triggers()` has two conditions,
+`no_current_task` and `recognition_changed`, and `_prev_executor_state` is gone with it. See "D3: task_committed
+is not a trigger", below.
 `evaluate_triggers()` implements exactly three conditions (resolving DESIGN-07):
 
 - `no_current_task` — `ExecutorState.current_task is None`. Covers both t=0 and ordinary
@@ -1616,6 +1624,8 @@ which B1.5 would route past B2 anyway. The remaining route is a `theta_crossed` 
 not admitted (`most_likely` `unknown` or unresolvable, since the crossing clears the gate). The
 recognition behind the hold then no longer stands, and a hold computed against it should not survive.
 Recorded in TODO-71.
+(D3, September 2026: `task_committed` is no trigger at all now; the ruling stands, and its remaining route is a
+`recognition_changed` whose projection is not admitted.)
 
 `earliest_violation`: per robot segment against each time-overlapping human segment. Both have
 constant velocity, so relative motion is linear and squared distance is a quadratic in time — no real
@@ -1630,7 +1640,8 @@ realizer is the reference: `analysis/t1b_realization/realize.py`, validated by s
 THE ROLE OF REALIZATION IN B2 AND B3 — BOTH CONSUME IT. This changes what each block IS.
 B2 = PLAUSIBILITY. Mid-task, is the current task still worth continuing? A gate: continue, or
 escalate to B3. Reached only by `theta_crossed` and `task_committed` (`no_current_task` bypasses via
-B1.5 — there is nothing to continue). B3 = REORDER / SELECTION. Under `single_task` (the only
+B1.5 — there is nothing to continue). (Since D2 and D3: reached only by `recognition_changed`;
+`task_committed` is removed by D3.) B3 = REORDER / SELECTION. Under `single_task` (the only
 implemented strategy, DESIGN-16) it picks the best NEXT task; the rest of the pool becomes the queue,
 unordered. `full_reorder` stays a documented flag. REALIZATION IS SHARED MACHINERY, NOT OWNED BY
 EITHER BLOCK. Both consume it; they differ in how many tasks they realize and what they do with the
@@ -2291,7 +2302,7 @@ action in flight appears in the fresh plan (GroundedAction dataclass equality �
 predicate, schema), the cursor moves to it and the microaction queue and completion bookkeeping are KEPT, so
 the tick proceeds exactly as it would have — a step, an acknowledgement, the grasp; a `stand` in progress
 keeps its countdown. If it does not appear, the decomposition genuinely changed and the plan loads from its
-start, as any new plan does — the `task_committed` continue, where `deliver_already_held` has no `pick_up` to
+start, as any new plan does — the `task_committed` continue (a case removed by D3), where `deliver_already_held` has no `pick_up` to
 acknowledge and the carry starts on the trigger tick (one tick earlier than a no-trigger run, pre-existing,
 unchanged). The world remains the cursor: what the executor carries across the swap is where it is in the
 action it was already doing, never a record of progress the world does not show. Consequence for realization
@@ -2317,6 +2328,9 @@ A TRIGGER IS A CHANGE IN WHAT `update()` DECIDED ON. The decision rested on a hy
 projected against) and on the robot's own task state. Re-decide when the belief no longer points at that
 hypothesis, or first points at one strongly enough to act on; and when the robot's own task state changes
 (`no_current_task`, `task_committed`, unchanged). Three triggers, as DESIGN-07 had; the second replaced.
+SUPERSEDED (D3, September 2026): "three triggers, as DESIGN-07 had" no longer holds. The robot's own grasp is
+not a change in what the decision rested on, and `task_committed` is removed; the trigger set is
+{`recognition_changed`, `no_current_task`}. See "D3: task_committed is not a trigger", below.
 
 THE DECISION RECORD is one field, `MetaPlanner._projected_hypothesis`: `belief.most_likely` on the tick
 `update_human_projection()` built a projection, `None` when admission refused (`none(below_theta)`,
@@ -2345,6 +2359,8 @@ change to the recognizer or to the contract's event semantics on the recognizer 
 
 When two conditions hold on one tick the order is `no_current_task`, `recognition_changed`,
 `task_committed` — arbitrary, as before; only the reported reason and score differ.
+SUPERSEDED (D3, September 2026): two conditions remain; on a shared tick the order is `no_current_task`, then
+`recognition_changed`.
 
 THE BLOCKED EVENT is designed, not built (recorded in TODO-80, to be built with it): the separation stop's
 refusal of a STEP as a fact in `ExecutorState`, fired once per blocked episode, routed past B2 as
@@ -2551,6 +2567,9 @@ WHY THE RULING CHANGED.
 4. The robot's own boundaries (`task_committed`, `no_current_task`) trigger a re-decision, so the sequence
    past task 1 is a LOOKAHEAD FOR THE CHOICE OF TASK 1, re-priced at the next boundary. It is not a
    commitment to the whole order. Pools are 3 to 5 tasks.
+   CORRECTED (D3, September 2026): `task_committed` is not a trigger. The tail is re-priced at the next
+   trigger, which is one of two: `no_current_task` (the robot's own boundary, past B2) or
+   `recognition_changed` (through B2, which may keep the current task and never reach B3).
 
 WHAT DID NOT CHANGE. `single_task` remains the default, and the receding-horizon argument of DESIGN-16
 stands: decisions are re-made from fresh WorldState and belief at every trigger, and no multi-task
@@ -2585,7 +2604,9 @@ implement piecemeal". Read against the code as it stands:
     segments, and no predicate is involved. But position is NOT enough, and this is the part of the
     expected answer that the code contradicts:
     - `task_committed` is a trigger of every task, and at it the live world holds
-      `holding(robot, A)` for the current task A. In the ordering (A, B), A decomposes as
+      `holding(robot, A)` for the current task A. (D3: `task_committed` is no trigger now; the same
+      holds at any re-decision while the robot carries A, so the point stands.) In the ordering (A, B),
+      A decomposes as
       `deliver_already_held`; if B is then decomposed against the live predicates, the stale
       `holding(robot, A)` selects `deliver_with_return` for B (return A, which is already delivered in
       that hypothetical world) instead of `deliver_default`. So the chained state must RETRACT
@@ -3346,6 +3367,9 @@ ACCUMULATE: the tick is spent once, the entry chain of the ordering is now right
 projects from where the robot actually is. `shared/` cannot see it without predicting the robot's own
 triggers, which is the circularity above. Accepted, recorded, not compensated — the same standing as step
 quantisation.
+GONE WITH THE TRIGGER (D3, September 2026): the case the fixtures showed, the reload at `task_committed`, no
+longer occurs; the residual measured at those decisions is gone with them. The body's rule stands for any other
+re-decision that reloads on an owed tick.
 
 WHAT REMAINS UNCOMPENSATED. STEP QUANTISATION only (L2's decision, unchanged): a walk of projected duration
 `dur` executes as ceil(dur) steps and the walker stops on the first step inside the arrival radius, so it
@@ -3390,3 +3414,41 @@ docs/TODOS_AND_DEFERRED.md (TODO-77, TODO-88), CLAUDE.md
 Reference: T-B Q7, September 2026; TODO-77 (L2, T4, T-B2a, T-B2b); "Projection time includes what the body
 spends finishing an action" (L2); "Robot-responsible separation" (F1, the completion tick); "The robot can
 wait" (R1); shared/io_contracts.md §6 invariant 12
+
+
+**D3: `task_committed` is not a trigger**
+RULED (cchat, September 2026). A TRIGGER IS A CHANGE IN WHAT THE LAST DECISION RESTED ON: the human's hypothesis
+(`recognition_changed`, against the decision record) or the robot's task set (`no_current_task`). The robot's own
+grasp is neither: it was in the plan the last decision priced, which projected the `pick_up` and everything after
+it. The trigger set is {`recognition_changed`, `no_current_task`}; on a shared tick the order is
+`no_current_task`, then `recognition_changed`, arbitrary as before (only the reported reason and score differ).
+No re-timing mechanism is added in its place, and the trigger is deleted, not made optional: the ablation's run
+option is discarded.
+
+THE ABLATION it rests on (`analysis/ablation_task_committed/`, 142deaa; on the corrected body, T-B Q7): 26 pairs,
+with and without the trigger. Nothing in the world changes in any of them: every `[sep]` line, every human line,
+every `[IR] step=` line and completion are byte-identical. The 1-tick holds the trigger placed at the grasp
+(s20 at 31, s30 b2a at 47) were the owed acknowledgement tick: without the trigger the robot spends the
+`pick_up` acknowledgement there instead, at the same position. No clearance depends on the re-decision (TODO-77's
+T4 dependency, stale after T-B Q7), and B2 is still reached, from `recognition_changed` alone.
+
+AS BUILT (dd880be): `evaluate_triggers()` asks two conditions; the `task_committed` branch and
+`_prev_executor_state`, which it alone read, are gone. `ExecutorState.holding` stays (analysis scripts read it;
+nothing on the run path does). The regenerated baselines (tb1a 16, tb1b 4, tb1c 8, tb3 12, at 36b3978) differ
+from the previous ones only in the removed decisions' `[meta*]` lines (133 decisions), the six 1-tick holds they
+placed (tb1a: s20 and s50 at tick 31, s30 at tick 47, both priors; the robot's line at that tick reads the
+acknowledged `pick_up` instead of a stand), and the executor's bookkeeping of the reload that no longer happens
+(no `_load_plan` at the grasp; a later `continue_plan` maps `2->0` / `3->1`; `_on_task_complete` on the
+4-action plan). `[sep]`, human, `[IR]` lines, the `[run]` header and completion are byte-identical.
+
+NOT TRIGGERS EITHER, and where they would live: a hold the executor extends past the next trigger (TODO-71) and
+the hold's expiry (E2b, dropped at D2). If either is ever needed, its home is a body-side event (T-D), not the
+trigger set.
+
+OPEN (TODO-90): two in-window sub-`min_separation` approaches under gate `b2a`, present with and without the
+trigger, to be checked in a bounded task before T-C.
+Files: shared/meta_planner.py (`evaluate_triggers`), shared/types.py (`ExecutorState.holding` comment),
+shared/io_contracts.md (§2.2), docs/glossary.md, docs/TODOS_AND_DEFERRED.md (TODO-71, 76, 77, 90), CLAUDE.md,
+docs/roadmap.md, analysis/tb1a_destination/, analysis/tb1b_two_tables/, analysis/tb1c_realized_flip/,
+analysis/tb3_full_reorder/ (READMEs)
+Reference: D3, September 2026; cchat ruling; analysis/ablation_task_committed/ (142deaa); D2; DESIGN-07

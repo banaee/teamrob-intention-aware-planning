@@ -82,7 +82,8 @@ Decisions
 - Phase 4C: realization is built and total (T3, T4, T10, F1), the Mesa executor has the
   execution-time separation stop (C, run option, default off), wait durations come from the schema
   (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
-  (D2: `recognition_changed` against the decision record replaces `theta_crossed`), and the policy
+  (D2: `recognition_changed` against the decision record replaces `theta_crossed`; D3: `task_committed`
+  removed, the robot's grasp is no trigger), and the policy
   components are ablated (T6, `analysis/t6_ablation/`); the recognizer's evidence is graded by path
   covered and the gate stays a fixed share (graded evidence, the gate ruling). The 4C queue is done.
   The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`). T-B is under way: T-B2a
@@ -207,9 +208,12 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
 `analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
-T-B Q7 regeneration in `analysis/tb1a_destination/sweep/` (the five plus s50 / s70 / s71, both priors,
-stop off, `single_task`; logs local, md5s in its README, the "T-B Q7" section) and
-`analysis/tb1b_two_tables/sweep/` (s80 / s81). They supersede T-B2d's, which the body's completion ticks
+D3 regeneration (dd880be) of the four maintained sets below: `analysis/tb1a_destination/sweep/` (the five
+plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "D3"
+section), `analysis/tb1b_two_tables/sweep/` (s80 / s81), `analysis/tb1c_realized_flip/sweep/` and
+`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They supersede the T-B Q7 regeneration, from
+which they differ in the removed `task_committed` decisions and the executor's reload bookkeeping alone, the
+world lines byte-identical. The T-B Q7 set superseded T-B2d's, which the body's completion ticks
 moved (T-B Q7: the robot spends one more tick per delivery, less where a hold carried it); T-B2d's had
 differed from T-B1a follow-up 2's in the `[run]` line alone, which names the strategy, and follow-up 2's had
 superseded the graded-evidence sweep (`analysis/g1_graded_evidence/sweep/`; same world-level behaviour,
@@ -217,10 +221,18 @@ hypothesis keys no longer carry the table, and the `[run]` header changed with T
 `full_reorder` baselines before T-B3. The stop-on baselines (C's `stop_on/`, F47's) are pre-grade. Record
 baselines before changing code, then diff.
 
+### Maintained baseline sets
+
+`analysis/tb1a_destination/` (16 logs), `analysis/tb1b_two_tables/` (4), `analysis/tb1c_realized_flip/` (8)
+and `analysis/tb3_full_reorder/` (12) are the regression baselines. They are regenerated on every behaviour
+change, with new md5s in a new section of each README (the commands are in those READMEs and their
+`sweep.sh`). Every other `analysis/` folder is a frozen record at the commit its README states: never
+regenerated, and never edited except for a superseding note.
+
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
 scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
-(a foreseen human stay on the robot's route; the beside / across alternative). Scripts and baselines:
-`analysis/f47_fixtures/`. scenario_80 / scenario_81 on env_layout8 (two kitting tables, T-B's fixture: the
+(a foreseen human stay on the robot's route; the beside / across alternative). Scripts:
+`analysis/f47_fixtures/` (its baselines are frozen; the current ones are tb1a's). scenario_80 / scenario_81 on env_layout8 (two kitting tables, T-B's fixture: the
 greedy head is not the head of the cheapest ordering; a conflict past the head). Script, baselines and the
 cost argument: `analysis/tb1b_two_tables/`.
 
@@ -267,8 +279,9 @@ across that commit without it.
   called a sequence.
 - Triggers: `no_current_task`; `recognition_changed` (the belief no longer points at the
   hypothesis the last decision projected, or first clears the gate on one; replaced
-  `theta_crossed` in D2, which older reports and logs still name); `task_committed` (the robot's
-  own grasp, not the human's commitment). Decision record: the projected hypothesis, one field.
+  `theta_crossed` in D2, which older reports and logs still name). Two, and only two (D3):
+  `task_committed` (the robot's own grasp) is not a trigger; older reports and logs still name it.
+  Decision record: the projected hypothesis, one field.
 - Plan names (`docs/roadmap.md`, "The plan from T-A"): T-A records (T-A1 the pipeline revision);
   T-B B3.B on two tables (B1 fixtures, B2 build, B3 evaluation); T-C the human action script (C1
   design, C2 build); T-D robustness in kitting (change of mind, `unknown`, the blocked case); T-E
@@ -283,8 +296,8 @@ across that commit without it.
 - Head: the first task of an ordering; tail: the rest of it, lookahead only. Queue: the pool without
   the current task (`UpdateResult.queue`), unordered.
 - Conflict: an entry's inherited shift lies inside one of its violating shift intervals. Crossing:
-  a θ crossing only; for paths the word is violation. Robot trigger: `task_committed` or
-  `no_current_task` (they differ — `no_current_task` bypasses B2).
+  a θ crossing only; for paths the word is violation. Robot trigger:
+  `no_current_task`, the only one since D3; it bypasses B2, `recognition_changed` goes through it.
 - Hold: with one entry, the shift that was chosen, δ ticks in which the robot stands still; per
   entry since T-B Q2 (`RealizedPlan.holds`), the cumulative shift of entry k
   (`RealizedPlan.cumulative_shifts`) minus that of entry k−1. Walk: an agent's

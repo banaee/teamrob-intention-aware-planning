@@ -114,7 +114,8 @@ Not blocking: `single_task` projects only from the real live WorldState.
 (CORRECTED at T-B2b: the two paragraphs above describe the state BEFORE T-B2a. `project()` no longer
 raises for orderings and `full_reorder` runs, on plain cost; see the T-B2a update below.)
 UPDATED (B3.B design revision, September 2026): B3.B is next in the pipeline, and this entry APPLIES
-TO IT IN PART. Needed, for projection only: effect application with retraction (at `task_committed`
+TO IT IN PART. Needed, for projection only: effect application with retraction (at `task_committed` [D3: no
+trigger now; the same holds at any re-decision mid-carry]
 the live world holds `holding(robot, A)`; in the ordering (A, B) the stale fact would select
 `deliver_with_return` for B), and the location of an object a projected action has moved (in (B, A)
 with A held, A is fetched from its home container after B's return). Both go into a hypothetical
@@ -408,6 +409,9 @@ human-enters-zone pre-trigger, within-action decision points) were NOT implement
 remain available as future additions — none is required for Phase 4C. Also unresolved and
 low-stakes: `theta_crossed` wins arbitrarily if it and `task_committed` fire on the same
 tick (only the unused `score` field differs).
+SUPERSEDED (D2, D3; September 2026): `theta_crossed` was replaced by `recognition_changed` (D2) and
+`task_committed` is removed (D3). `evaluate_triggers()` has two conditions, `no_current_task` then
+`recognition_changed`; `_prev_executor_state` is gone. design_decisions.md, "D3: task_committed is not a trigger".
 Original entry retained below.
 
 [original entry, Phase 4 prereq]
@@ -1063,7 +1067,8 @@ UPDATE (wait-decision revision, Sept 2026) — the BLOCKER is resolved and the b
 in question. The scalar exists: the last candidate formula above is the one taken — B2.A
 realizes the CURRENT TASK ALONE and reads its hold δ (one candidate's realization, far cheaper
 than B3). The block split as built (B1.5 bypass on `no_current_task`, B2 reached only by
-`theta_crossed` / `task_committed`, `human_projection is None` → continue) stands. But B3's
+`theta_crossed` / `task_committed` [since D2 / D3: `recognition_changed` alone], `human_projection is None` →
+continue) stands. But B3's
 argmin over REALIZED costs already accounts for conflict, so B2's original rationale — that B3
 could not express "close is bad" — is gone; its remaining candidate roles are computation
 saving and hysteresis (which matters more now that prior-off `theta_crossed` fires up to three
@@ -1356,7 +1361,7 @@ executing task's key (the `is` test is gone) and on a continue hands the fresh p
 `Executor.continue_plan()`, which moves the cursor to the in-flight action if the fresh plan
 contains it (GroundedAction equality) and keeps the microaction queue and completion
 bookkeeping; otherwise the plan loads from its start as before (the `task_committed` case,
-where `deliver_already_held` has no `pick_up`). Sweep: decisions and `[IR]`/`[IR-dist]`
+where `deliver_already_held` has no `pick_up`; the case is removed by D3). Sweep: decisions and `[IR]`/`[IR-dist]`
 byte-identical to the T7/T8 baselines; `[meta-cand] min_dist` differs in the 14th–16th digit
 where the kept queue's points replace re-interpolated ones. New baselines: `analysis/t5_continue/new/`.
 Files: mesa_sim/sim_agents.py (`RobotAgent.step`), mesa_sim/executor.py (`continue_plan`),
@@ -2337,17 +2342,26 @@ first hold: the latency the projection charges after `pick_up` is skipped when t
 re-plan starts the carry on that tick. That is deterministic, robot-only and not quantisation (ruled on
 the T4 report; TODO-77, fix with D2). The minimal whole-tick shift has no margin, so clearance currently
 depends on that re-decision.
+STALE AFTER T-B Q7, CLOSED BY D3 (September 2026): the body now spends the acknowledgement it states, so the
+executed plan is the realized one, and the ablation (`analysis/ablation_task_committed/`, 26 pairs) removed the
+trigger with no change in the world: `[sep]`, human and `[IR] step=` lines and completion byte-identical; the
+1-tick holds at the grasp (s20 at 31, s30 b2a at 47) were the owed acknowledgement tick. No clearance depends on
+the re-decision; the trigger is removed (design_decisions.md, "D3: task_committed is not a trigger").
 STILL OPEN: refinement (the executor shortening or extending a hold against what the world shows),
 and how a refined hold is reported back. Mesa has no refinement: it executes δ as decided. The
 separation stop (C) is the other body-side stand — a safety refinement, not a hold — and whether the
 mind is told of it is D2's question (TODO-73, R2).
 ✅ CLOSED (ruling on the T4 report): A DECISION WITH NO PROJECTION DROPS A HOLD IN PROGRESS, and that
 stays. While the robot holds it stands, so its `holding` cannot change (`task_committed` cannot
-fire) and its task cannot complete (`no_current_task` cannot fire, and B1.5 would skip B2 anyway).
+fire; removed by D3) and its task cannot complete (`no_current_task` cannot fire, and B1.5 would skip B2 anyway).
 The remaining route is `theta_crossed` whose projection is not admitted. Since the crossing already
 clears the gate, that means `most_likely` is `unknown` or the hypothesis cannot be resolved: the
 recognition behind the hold no longer stands, and a hold computed against it should not survive.
 `b2a` then continues with hold 0, and the executor replaces the hold with that.
+D3 (September 2026): whether a hold the executor extends past the next trigger should itself be a trigger — not a
+trigger; if ever needed, its home is a body-side event (T-D), not the trigger set.
+E2b, the hold's expiry event (dropped at D2; it has no entry of its own): not a trigger either; if ever needed,
+its home is a body-side event (T-D).
 Files: shared/types.py (UpdateResult), mesa_sim/executor.py, mesa_sim/action_decomposer.py,
 mesa_sim/sim_agents.py, ros_sim/ (paused)
 Reference: Phase 4C wait-decision session, September 2026; roadmap.md Phase 6 notes; T4
@@ -2459,6 +2473,7 @@ the robot has grasped and its method set changes (`deliver_already_held`). Read 
 recognizer's vocabulary the name suggests the observed human committing to a task, which it never
 means. Rename (e.g. `robot_grasped`) when a session touches the trigger set; a rename changes every
 `[meta-trig]` / `[meta]` line, so do it with a baseline regeneration, not in passing.
+✅ MOOT (D3, September 2026): the trigger is removed, so there is nothing to rename.
 Files: shared/meta_planner.py (`evaluate_triggers`), shared/io_contracts.md (§2.2)
 Reference: R1 decision record, September 2026
 
@@ -2513,6 +2528,13 @@ WHAT REMAINS, deliberately uncompensated:
     accounting item (design_decisions.md, "What a trigger is an event of"). `task_committed` is
     unchanged by D2, so the dependency above stands as measured; the fix, if one is made, is on the
     projection side (charge no latency execution does not spend), not a trigger.
+    STALE AFTER T-B Q7, CLOSED BY D3 (September 2026): "clearance currently depends on that re-decision" no longer
+    holds. T-B Q7 made the body spend the acknowledgement, and the ablation on that body
+    (`analysis/ablation_task_committed/`, 26 pairs, with and without `task_committed`) changed nothing in the
+    world: `[sep]`, human and `[IR] step=` lines and completion byte-identical, in-window sub-min_separation ticks
+    unchanged (TODO-90); the 1-tick holds at the grasp (s20 at 31, s30 b2a at 47) were the owed acknowledgement
+    tick, spent as the `pick_up` acknowledgement at the same position without the trigger. The trigger is removed
+    (design_decisions.md, "D3: task_committed is not a trigger").
 VERIFIED: a discrete-step forward model of the executor, using no execution data, predicts the actual
 release tick exactly for all 68 human and robot 2-action rows and exactly one tick early for all 35
 robot 4-action rows — so the residual is fully attributed, with nothing unexplained.
@@ -2542,6 +2564,9 @@ tick and the carry part is untouched (total executed minus projected −0.27 →
 +0.32 → +1.32, +0.89 → +1.89, every residual now positive as ceil-per-walk requires); completion from the
 world fact moves one tick per robot delivery across the 20 baselines, less where a hold carried the tick.
 WHAT IS LEFT OF THIS ITEM IS STEP QUANTISATION, uncompensated by decision (L2), above.
+GONE WITH THE TRIGGER (D3, September 2026): the "RESIDUAL, with a hold of 0" above was measured at the
+`task_committed` reload; that decision no longer exists, and without it the release residual is the whole plan's
+quantisation (the ablation's table). The body's rule stands for any other re-decision that reloads on an owed tick.
 ALSO NOTED at L2, out of scope there: with the two agents in phase the superseded
 `min_safe_distance = 1.0` exclusion fires again (once in the ten-condition sweep, scenario_30 prior-on
 step 21, `min_dist` 0.49 cm at the mirror crossing) and changes that run's decision sequence. The
@@ -2864,3 +2889,16 @@ point-place fact that co-use needs s ≤ 2r): this is its consequence for realiz
 modelling question. Recorded, nothing changed.
 Files: shared/projection.py (the arrival radius in a projected walk), mesa_sim/world_state_builder.py (PROXIMITY_THRESHOLD)
 Reference: T-B1c, September 2026; TODO-74
+
+**TODO-90 — Two in-window sub-min_separation approaches under gate `b2a`** [to check in a bounded task before T-C; from D3]
+Measured in the `task_committed` ablation (`analysis/ablation_task_committed/`), present with and without the
+trigger, identical in both: s10 (both priors) 30.87 cm at ticks 72 to 74, under the B2 continue at step 29
+(δ = 0); s30 prior on 15.47 cm at tick 23 (ticks 23 and 24 below 50 cm), under that tick's decision (a B2
+continue that placed the 7-tick hold 23 (7)). Both lie inside the assessed window of the
+decision in effect, where realization should have kept min_separation. Either a hole in realization under
+`b2a` (a continue re-realizes the current task alone, and its δ = 0 is not re-checked against a later projection)
+or an attribution artefact of "decision in effect" after T-B Q7 (which decision's window a tick belongs to, now
+that the body spends the owed ticks). Nothing changed for it. To be checked in a bounded task before T-C: which
+decision's realized plan covers those ticks, and whether that plan cleared 50 cm there.
+Files: shared/meta_planner.py (B2, `realize()`), analysis/ablation_task_committed/measure.py (the window rule)
+Reference: D3, September 2026; analysis/ablation_task_committed/ (142deaa); T4 (TODO-71, s10 72–75)

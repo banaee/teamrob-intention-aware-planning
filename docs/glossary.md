@@ -222,12 +222,14 @@ refusal that decides nothing.
 
 ## 4. Triggers and the decision record
 
-**trigger** — the condition on which `MetaPlanner.update()` re-decides. Three, and only three:
+**trigger** — the condition on which `MetaPlanner.update()` re-decides: a change in what the last decision
+rested on, the human's hypothesis or the robot's task set. Two, and only two (D3):
 - `no_current_task` — there is nothing running.
 - `recognition_changed` — the belief no longer points at the hypothesis the last decision projected,
   or first clears the gate on one. Replaced `theta_crossed` at D2; older reports and logs still name
   `theta_crossed`.
-- `task_committed` — the ROBOT's own grasp, not the human's commitment.
+- `task_committed` — the ROBOT's own grasp, not the human's commitment. REMOVED BY D3: the grasp was in the
+  plan the last decision priced. Older reports and logs still name it.
 → `shared/meta_planner.py`, `evaluate_triggers()`; `shared/io_contracts.md` §2.2.
 
 **decision record** — one field: the hypothesis the last fired trigger's decision was projected
@@ -239,13 +241,14 @@ the gate. For paths the word is **violation** (§3); for two paths meeting in sp
 intersect.
 → `shared/meta_planner.py`, `_clears_gate()`; `docs/recognizer_handback.md` §3.
 
-**robot trigger** — a trigger raised by the ROBOT's own progress: `task_committed` or
-`no_current_task`. It replaces "the robot's boundary" everywhere in the living documents, so that
+**robot trigger** — a trigger raised by the ROBOT's own progress: `no_current_task` (since D3 the only one;
+`task_committed` was the other). It replaces "the robot's boundary" everywhere in the living documents, so that
 **boundary** keeps one meaning, the recognizer's episode boundary (§5).
 The two are not interchangeable: `no_current_task` goes to B3 through B1.5 and BYPASSES the B2 gate,
 while `task_committed` goes THROUGH B2, which may keep the current task and never reach B3. A
 sentence about re-pricing therefore names the trigger it means, never "the next robot trigger" as if
-both re-priced alike.
+both re-priced alike. Since D3 the same holds between the two triggers: `no_current_task` bypasses B2,
+`recognition_changed` goes through it.
 → `shared/meta_planner.py`, `evaluate_triggers()` and `update()` block B1.5.
 
 ---
