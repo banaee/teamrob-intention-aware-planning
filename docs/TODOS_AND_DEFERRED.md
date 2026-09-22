@@ -2891,7 +2891,7 @@ modelling question. Recorded, nothing changed.
 Files: shared/projection.py (the arrival radius in a projected walk), mesa_sim/world_state_builder.py (PROXIMITY_THRESHOLD)
 Reference: T-B1c, September 2026; TODO-74
 
-**TODO-90 — Two in-window sub-min_separation approaches under gate `b2a`** [checked; from D3] ✅ CHECKED (TODO-90 check, Sept 2026): no defect
+**TODO-90 — Two in-window sub-min_separation approaches under gate `b2a`** [from D3] ✅ CLOSED (TODO-90 check, Sept 2026): no defect
 Measured in the `task_committed` ablation (`analysis/ablation_task_committed/`), present with and without the
 trigger, identical in both: s10 (both priors) 30.87 cm at ticks 72 to 74, under the B2 continue at step 29
 (δ = 0); s30 prior on 15.47 cm at tick 23 (ticks 23 and 24 below 50 cm), under that tick's decision (a B2
@@ -2917,3 +2917,17 @@ projection's span, so it lies in no window; the ablation's `measure.py` tested t
 rather than the whole tick, and omitted the realized plan's span (hence also s10 on tick 74). The ablation counted
 distance inside a window; F1 makes the robot responsible for its motion only, and no robot step inside a window came
 within 50 cm. Nothing changed.
+CLOSED (Hadi's ruling, September 2026): the verdict above stands. The evaluation rule, corrected where it is written
+(`analysis/tb3_full_reorder/README.md`, `analysis/todo90_b2a_window/README.md`; superseding note in
+`analysis/ablation_task_committed/README.md`): a defect is a robot STEP (a moving tick) inside an assessed window that
+ends below min_separation; standing ticks are judged by whether realization projected them (F1: the robot answers for
+its own motion only). The label difference found here is TODO-91.
+
+**TODO-91 — The executor's `[stop]` window label uses T_h alone** [label only; from TODO-90]
+`Executor.set_assessed_window()` / `_log_stop()` (`mesa_sim/executor.py`, window set in `mesa_sim/sim_agents.py`)
+label a tick inside when it lies in [1, T_h] on the decision's clock. The glossary ("assessed window") and
+`realize()` intersect the window with the realized plan's span as well. The two differ only at the plan's tail
+(scenario_10 b2a prior on, tick 74: [50, 51] straddles the realized end 50.81, inside by the label, edge by the
+glossary). Label only: the stop's refusal does not read it, no behaviour depends on it. Not fixed.
+Files: mesa_sim/executor.py (`set_assessed_window`, `_log_stop`), mesa_sim/sim_agents.py
+Reference: TODO-90 check, September 2026; analysis/todo90_b2a_window/README.md

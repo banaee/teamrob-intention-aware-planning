@@ -30,6 +30,11 @@ holds as start tick (ticks executed); none interrupted.
 
 ## R3 — separation inside the assessed window
 
+Evaluation rule (corrected, TODO-90 check, `analysis/todo90_b2a_window/`): a defect is a robot STEP (a moving tick)
+inside an assessed window that ends below min_separation; standing ticks are judged by whether realization projected
+them (F1: the robot answers for its own motion only). The finding below is the stronger one, no sub-min_separation
+tick inside a window at all.
+
 No `[sep]` distance below min_separation (50 cm) falls inside the assessed window [trigger, T_h] of the decision
 in effect, in any of the 20 runs. For information, every sub-s tick falls under a decision with no admitted
 projection (no assessed window):

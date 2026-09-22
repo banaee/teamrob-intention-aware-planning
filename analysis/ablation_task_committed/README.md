@@ -1,5 +1,14 @@
 # The trigger set without task_committed — an ablation, measured on the corrected body (T-B Q7)
 
+SUPERSEDED IN PART (TODO-90 check, September 2026; `analysis/todo90_b2a_window/`). Under prior on, the s10 b2a
+decision is at tick 24, not 29. The in-window counts include tick 23 of s30 b2a prior on (15.47 cm), which lies
+outside every window: it is the observation offset of the decision at 23, and `measure.py` checked the end of the
+tick, not the whole tick. The remaining in-window sub-50 ticks (s10 72–74, s30 24) are standing ticks that realization
+itself projected below min_separation; no robot step inside a window came below min_separation. The evaluation rule
+from here on: a defect is a robot STEP (a moving tick) inside an assessed window that ends below min_separation;
+standing ticks are judged by whether realization projected them (F1: the robot answers for its own motion only).
+Nothing else in this folder is changed.
+
 A measurement, nothing decided here. Each condition run with the trigger (the default) and without it
 (`--task_committed_trigger false`): s80, s81, s83 (env_layout8, 340 steps), s20 (300), s70 (300) × `--strategy`
 single_task / full_reorder × assignment prior off / on, gate none; and s10 (450), s20, s30 (200) under gate b2a,

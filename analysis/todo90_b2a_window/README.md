@@ -109,6 +109,10 @@ inside by both rules, so case (1) does not dispose of the rest.
 
 ## Verdict
 
+Evaluation rule (Hadi's ruling on this check): a defect is a robot STEP (a moving tick) inside an assessed window that
+ends below min_separation; standing ticks are judged by whether realization projected them (F1: the robot answers for
+its own motion only).
+
 - s10 prior off: neither (1) nor (2) as posed: ticks 72–74 are in decision 29's window, and they are not a hole
   but F1 "stand" ticks that realization itself projected below 50 cm; the ablation counted distance inside a
   window, not robot responsibility.
