@@ -33,3 +33,8 @@ differ from these at HEAD in `[meta-b3] T_h` and `[meta-cand] share` at the coff
 (s10 step 123; s40 steps 135/143 and 147); decisions, holds and every other grep are unchanged. Since F47b
 (scenario_40 retyped) the s40 logs and md5s here are superseded altogether: the current s40 baseline is
 `analysis/f47_fixtures/baselines_s40/` (same task order and completion, different recognition ticks).
+
+CLEANUP NOTE (September 2026): `sweep.sh` is live (it regenerates `analysis/tb1a_destination/`). `evaluate.py`'s "vs T10"
+section reads `analysis/t10_b3_realized/`, deleted in the analysis cleanup, and `validate.py` reads `_t10_realizer/`,
+whose local copy was dropped (`git show 08b1167` recreates it); their results stay in `comparison.md` and
+`validation.md`. This folder's logs are dropped; the baselines are the maintained sets (CLAUDE.md).

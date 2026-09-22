@@ -100,7 +100,7 @@ the full distribution, `most_likely` and `confidence`; `BELIEF_FLOOR = 1e-3` aga
 the assignment restricting the belief's SUPPORT, not its magnitude (the 10× multiplier removed).
 
 Not delivered as described. 4A was recorded as "schema-driven dispatch via `PROGRESS_EVALUATORS`, no
-hardcoded microaction strings in recognizer.py". The I1 audit (Sept 2026, `analysis/i1_ir_audit/`) measured
+hardcoded microaction strings in recognizer.py". The I1 audit (Sept 2026, `analysis/i1_ir_audit/` (deleted in the analysis cleanup, September 2026; carried in the I2 and I3 entries of design_decisions.md)) measured
 the likelihood that actually ran: 0 of 5,579 likelihood calls in any condition ever reached a completion
 check; nine domain literals in the recognizer (`"?item"`, `"move_to"`, `"holding"`, `"in_zone"`, the two
 foreseeable task names, …); the decomposition taken from `methods[0]`; and the belief carried by a cosine
@@ -275,13 +275,13 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    actual-distance measure, new baselines over ten conditions ✅
 2. T3 — `realize()` as a service on the projection side (whole-trajectory minimal shift,
    `shift_violation_interval` closed form, `RealizedPlan`), validated against T1b's `whole` realizer ✅
-   (`analysis/t3_realize/`; T3b the whole-tick hold; L2 then removed the acknowledgement lag, TODO-77)
+   (`analysis/t3_realize/` (deleted in the analysis cleanup, September 2026; carried in the T3 / T3b entry of design_decisions.md; realize() is re-validated by analysis/f1_robot_responsible/validate.py); T3b the whole-tick hold; L2 then removed the acknowledgement lag, TODO-77)
 3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5;
    the hold δ on `UpdateResult`, executed by Mesa as STAND at the robot's position ✅
-   (`analysis/t4_b2a/`; TODO-36, TODO-71, TODO-77)
+   (`analysis/t4_b2a/` (deleted in the analysis cleanup, September 2026; carried in TODO-36 and TODO-71); TODO-36, TODO-71, TODO-77)
 4. T10 — B3.A with realized cost T_r + δ; `min_separation` replaces `min_safe_distance`; the
    `RuntimeError` removed; B3's winner's δ on `UpdateResult.hold`; the `[run]` header (TODO-78) ✅
-   (`analysis/t10_b3_realized/`; its all-unrealizable fallback was removed again at F1)
+   (`analysis/t10_b3_realized/` (deleted in the analysis cleanup, September 2026; carried in the T10 entry of design_decisions.md, TODO-36 and TODO-79); its all-unrealizable fallback was removed again at F1)
    Then, in order (all ✅, September 2026): T5 (a continue costs nothing), L2 (projection time includes
    the body's acknowledgement and observation offset), F1 (robot-responsible separation: rules (a)/(b),
    realization total, hold cap and fallback gone, the task-completion tick projected —

@@ -1,5 +1,0 @@
-# raw per-tick capture (12 MB) and instrumented run logs — regenerate with measure.py
-captures.json
-logs_instrumented/
-# per-tick table (1.6k rows) is regenerable with analyze.py; kept out of git
-i_ticks.csv

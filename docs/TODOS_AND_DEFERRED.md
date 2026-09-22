@@ -1115,14 +1115,14 @@ continue (instrumented run, identical logs otherwise) picks the current task in 
 kept a task B3 would have switched away from, and its commitment role is not exercised by these
 fixtures at ρ = 0.5. RULED (T4 report): this is a FINDING FOR T6, where ρ is varied, NOT a reason to
 change `b2a`. What the gate changes on these fixtures is that holds are now executed. Scripts:
-`analysis/t4_b2a/` (`stages.sh`, `cf_b3.py`, `compare.py`). Repeated prior-off
+`analysis/t4_b2a/` (deleted in the analysis cleanup, September 2026; carried in TODO-36 and TODO-71) (`stages.sh`, `cf_b3.py`, `compare.py`). Repeated prior-off
 `theta_crossed` (s00_off 109/113/115, s10_off 29/33/35, s20_off 20/24/30 and 87/91/95) all ended
 in a continue, as expected above (D2).
 ✅ B3 BUILT (T10, September 2026): `_replan_tasks` realizes every candidate and selects on
 `RealizedPlan.cost` = T_r + δ, carrying the winner's δ as `UpdateResult.hold`; the all-unrealizable
 fallback (TODO-30) replaces the `RuntimeError`; `cost_strategy` ("realized" | "plain") is the B3 switch
 for the T6 ablation, `gate_strategy` the B2 one; all four combinations run. MEASURED (T10;
-`analysis/t10_b3_realized/`; s00/s10/s20/s30 × prior off/on): the decision sequences of `realized`+`none`
+`analysis/t10_b3_realized/` (deleted in the analysis cleanup, September 2026; carried in the T10 entry of design_decisions.md, TODO-36 and TODO-79); s00/s10/s20/s30 × prior off/on): the decision sequences of `realized`+`none`
 and `realized`+`b2a` are IDENTICAL in all eight conditions, and so are the regression greps and the
 holds — B2 continued exactly where B3 keeps the current task, and both escalations (s30_on 21
 all-unrealizable, s20_on 57 current task unrealizable) reach a B3 that decides as it would have
@@ -1158,7 +1158,7 @@ UPDATE (I2, September 2026): the `?item` literals are gone — the recognizer na
 parameter; targets come from the planner's grounded actions (design_decisions.md, I2
 entry). (b) is fixed by construction: the target zone is the zone of the chord target, so
 the carried item's hypothesis gets ZONE_BOOST when the human enters the table's zone
-(measured: 20–50 new firings per condition, `analysis/i2_ir_foundations/zone_boost_episodes.csv`).
+(measured: 20–50 new firings per condition, `analysis/i2_ir_foundations/zone_boost_episodes.csv` (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays)).
 (a) is SHARPER, not fixed: the carry chord now scores (it was NEUTRAL, TODO-46), so a
 delivered item leads by ≈ 0.8 : 0.05 after the release instead of ≈ 0.35 : 0.3, and the
 next task's approach is credited to it until the grasp — s00_on's second θ crossing moved
@@ -1340,7 +1340,7 @@ and projection distances shift with it (`task_committed` item_4 min_dist 4.9 vs 
 step of arrival gap). Harmless at today's trigger rate; a real cost once B2 fires often, since
 every "continue" would stall the robot. Fix direction not decided; candidate: keep the
 current plan when `UpdateResult.current_task` is the executing task.
-FOUND (T5, `analysis/t5_continue/`): the loss has exactly one cause and one tick. A reload
+FOUND (T5, `analysis/t5_continue/` (deleted in the analysis cleanup, September 2026; carried in TODO-43 and the T5 entry of design_decisions.md)): the loss has exactly one cause and one tick. A reload
 resets the executor's cursor to the fresh plan's first action; if that action is one the world
 already shows complete and the executor had ALREADY acknowledged it (advanced past it on the
 previous tick), the tick is spent acknowledging it again. That is the tick after an arrival
@@ -1363,9 +1363,9 @@ contains it (GroundedAction equality) and keeps the microaction queue and comple
 bookkeeping; otherwise the plan loads from its start as before (the `task_committed` case,
 where `deliver_already_held` has no `pick_up`; the case is removed by D3). Sweep: decisions and `[IR]`/`[IR-dist]`
 byte-identical to the T7/T8 baselines; `[meta-cand] min_dist` differs in the 14th–16th digit
-where the kept queue's points replace re-interpolated ones. New baselines: `analysis/t5_continue/new/`.
+where the kept queue's points replace re-interpolated ones. New baselines: `analysis/t5_continue/new/` (deleted in the analysis cleanup, September 2026; carried in TODO-43 and the T5 entry of design_decisions.md).
 Files: mesa_sim/sim_agents.py (`RobotAgent.step`), mesa_sim/executor.py (`continue_plan`),
-analysis/t5_continue/ (inject.py, compare.py, summary.md)
+analysis/t5_continue/ (deleted in the analysis cleanup, September 2026; carried in TODO-43 and the T5 entry of design_decisions.md) (inject.py, compare.py, summary.md)
 Reference: fixture-design session, September 2026; T5 session, September 2026
 
 **TODO-44 — `assignment_prior` config key and CLI flag are misnamed**
@@ -1394,13 +1394,13 @@ Reference: evidence-gated projection admission session, September 2026
 **TODO-46 — IR has never used completion evidence; only phase-1 shelf approach ever scores** ✅ RESOLVED (I2: (2), (3); I3: (1))
 I3: the likelihood is that of the action the hypothesis expects now, so `pick_up`'s completion is
 evaluated at every grasp for the hypothesis that expected it — `holding(human_0, item_X)` HIGH,
-×4, in all eight conditions (`analysis/i3_phase_model/completion_events.csv`). `place` is never
+×4, in all eight conditions (`analysis/i3_phase_model/completion_events.csv` (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays)). `place` is never
 reached by the channel: the task's terminal completion holds on the same tick and the pin
 preempts it. No completion check ever returned LOW in the sweep (items sit on distinct shelves, so
 no two hypotheses expect a grasp at once; check U4 shows the ×40 discrimination when they do).
 I2: `_get_expected_position()` is gone; the target is the first movement action of the
 planner's guard-selected method, grounded through task and step bindings and resolved by
-`shared/target_resolution.py`. Measured (`analysis/i2_ir_foundations/summary.md`): 0 unresolved
+`shared/target_resolution.py`. Measured (`analysis/i2_ir_foundations/summary.md` (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays)): 0 unresolved
 targets in all eight conditions (was 64/261/61/54 per scenario); the carry chord scores
 (0.797 → 0.966 mid-carry in s00/s20/s30); `coffee_break` gets the coffee walk (s40: 0.81, θ at
 142). (1) — completion evidence at GRASP/RELEASE — is still unreachable because `move_to`
@@ -1660,7 +1660,7 @@ Since I2 `coffee_break`'s target resolves, so it collects the coffee walk (corre
 keeps its lead for the rest of scenario_40: it is never refuted by a grasp (no portable object
 in its bindings), nothing marks it complete, and later legs still hand it moderate chord
 credit (the walk away from the machine is 64° off it, L ≈ 2.9, better than any shelf). Measured
-(`analysis/i2_ir_foundations/f1_traces/`): `most_likely` from step 118 to the end of the run,
+(`analysis/i2_ir_foundations/f1_traces/` (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays)): `most_likely` from step 118 to the end of the run,
 0.96 at the human's grasp of item_6 (272), 0.89–0.90 while the human is idle. This is I1's C5
 (no completion event) in its clearest form and the reason I2 made `wait_at` observable
 (`waited(agent, entity)`, visible at steps 184–186): I3's phase model can complete
@@ -1841,7 +1841,7 @@ Remaining candidates: (b), (d), (e). The evidence that separates them: whether t
 after a release should carry the previous task's refutation at all ((b) says no; (d) says only until
 the method re-selects; (e) says the method is wrong). Decide together with TODO-57.
 
-RE-MEASURED after I4b's boundary (`analysis/i4b_boundary/REPORT.md` §7), still no reading chosen:
+RE-MEASURED after I4b's boundary (`analysis/i4b_boundary/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in design_decisions.md, the I4b / I4c entry, and TODO-55 to TODO-59) §7), still no reading chosen:
 (a) unchanged — never, in all eight (the rival's carry folds are in its base; the boundary keeps them).
 (c) `ownshelf` + boundary is no longer identical to (a): with no method flip there is no fold, the
 rival's approach excess from t = 0 is dropped at the human's release, and next-task reveals appear
@@ -1878,7 +1878,7 @@ RESOLVED in I4c (`analysis/i4c_episode/REPORT.md`), reading by reading:
   observations the human never made.
 
 **TODO-56 — The completion channel's gate is the old model's, and it is a decision** ✅ RESOLVED (I4b) — the gate stays, with its exclusion stated
-Decided in I4b (`analysis/i4b_boundary/REPORT.md` §6): under the detection model a hit is ×1.0, so the
+Decided in I4b (`analysis/i4b_boundary/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in design_decisions.md, the I4b / I4c entry, and TODO-55 to TODO-59) §6): under the detection model a hit is ×1.0, so the
 ungated channel adds exactly one thing — the permanent ×10⁻³ false-alarm charge on every hypothesis
 whose expected action is elsewhere at a discrete tick (108 of 124 ungated events, all on `move_to`; the
 "rival expecting move_to(shelf_X) at a grasp at shelf_X" case is a hit, ×1.0, no information). That
@@ -1897,7 +1897,7 @@ every live task at every grasp and release and ends at 0.96–0.99 after every c
 crossing in any condition. The asymmetry is `unknown`'s flat likelihood, not the gate. If I4 gives
 `unknown` a likelihood of its own, revisit the gate with it.
 Files: shared/recognizer.py (`_in_vocabulary`)
-Reference: I3 phase-model session; analysis/i3_phase_model/summary.md
+Reference: I3 phase-model session; analysis/i3_phase_model/summary.md (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays)
 
 RE-CHECKED under I4's constants (variant `ungated`, `analysis/i4_evidence_model/REPORT.md` §7): the
 `unknown` sweep does not occur — `unknown`'s likelihood is a per-tick constant never multiplied into
@@ -1914,7 +1914,7 @@ Shipped in I4b: a retirement whose hypothesis expected its terminal action on th
 observed agent's own derived phase reached the completing action) moves every live origin to the
 agent's position; bases, folds and events untouched. Fires at 18/18 human task boundaries, at none of
 the robot's completions; coffee_break 0.904 in both prior settings; s00/s20/s30 byte-identical to I4.
-Candidates A'/B/C/D rejected with numbers (`analysis/i4b_boundary/REPORT.md` §2). Open questions (1)
+Candidates A'/B/C/D rejected with numbers (`analysis/i4b_boundary/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in design_decisions.md, the I4b / I4c entry, and TODO-55 to TODO-59) §2). Open questions (1)
 and (2) below are answered (a retirement the phase state accounts for; origins only). Question (3)
 stands: no boundary sees segment 3's waypoint pauses (1 tick, retire nothing) — SINCE F47b the two
 segment-3 legs are well-typed `ac_activation` tasks at `ac_switch_1` / `ac_switch_2`, whose completions
@@ -1971,7 +1971,7 @@ unit walked, so that an unwalked stretch is uninformative for everyone), or re-p
 no folds from the prior at a boundary (TODO-55 (b), restricted). Not a retune of u (any u < 1/3
 reproduces it). Out of I4b's scope (the likelihood form).
 Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`, `logistic_of_excess`), shared/recognizer.py (`update`)
-Reference: I4b task-boundary session; analysis/i4b_boundary/REPORT.md §5, §8
+Reference: I4b task-boundary session; analysis/i4b_boundary/REPORT.md (deleted in the analysis cleanup, September 2026; carried in design_decisions.md, the I4b / I4c entry, and TODO-55 to TODO-59) §5, §8
 
 **TODO-60 — `unknown`'s u is charged per OPEN observation and never folded: the belief with no observation is the base ratio** ✅ RESOLVED (I4d)
 The accounting: for every live hypothesis k and tick t within an episode,
@@ -2120,7 +2120,7 @@ measured. Where it would land in code: `MetaPlanner._clears_gate(belief)`, now t
 — `belief.distribution` already carries the live set, and a geometry-derived θ would add a `world`
 argument there, which both call sites already hold. The consolidation that made this a one-method change
 is recorded in design_decisions.md, "θ has one home".
-NOT an argument for lowering θ: that it fires earlier. M1 (`analysis/m1_theta_earlier/`) measured θ = 0.65
+NOT an argument for lowering θ: that it fires earlier. M1 (`analysis/m1_theta_earlier/` (deleted in the analysis cleanup, September 2026; its numbers are the ones given here)) measured θ = 0.65
 on scenario_30 — the first crossing moved 21 → 15 prior-on and 28 → 24 prior-off with no decision change
 and byte-identical behaviour, and offline realization at the moved triggers was better in one prior and
 worse in the other. An earlier trigger is not better by itself.
@@ -2495,7 +2495,7 @@ OFFSET is gone — `project_human()` starts the human's projection at
 `mesa_sim/sim_agents.OBSERVATION_OFFSET = 1.0` rather than at 0, so both projections sit on one clock
 (Mesa's scheduler moves the human before the robot observes it). Placement lead medians, this item's
 own measure: robot −1.46/−3.32 → −0.46/−0.32 and human −2.21/−5.32 → −0.21/−1.32 (2-/4-action plans).
-Full record and the method: `analysis/l2_execution_lag/REPORT.md`.
+Full record and the method: `analysis/l2_execution_lag/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in the L2 entry of design_decisions.md and TODO-77).
 WHAT REMAINS, deliberately uncompensated:
   - STEP QUANTISATION. A walk of projected duration `dur` executes as ceil(dur) discrete steps and the
     walker stops on the first step INSIDE the arrival radius rather than on it, so it finishes
@@ -2596,8 +2596,8 @@ Reference: T9 (`analysis/t9_arrival_radius/REPORT.md`, "The premise, measured")
 **TODO-78 — A run's log does not record the θ it was produced at** ✅ RESOLVED (T10): one `[run]` header line per robot
 Nothing in a headless log states the gate's value, so a log cannot be interpreted without knowing which
 code produced it. Five analysis scripts therefore hardcode 0.75 to read their own logs
-(`analysis/f1_foreseeable_fixture/measure.py`, `analysis/i3_phase_model/check_i3.py`,
-`analysis/i4_evidence_model/check_i4.py` and `pivot.py`, `analysis/i1_ir_audit/measure.py`) — correctly,
+(`analysis/f1_foreseeable_fixture/measure.py` (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays), `analysis/i3_phase_model/check_i3.py` (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays),
+`analysis/i4_evidence_model/check_i4.py` and `pivot.py` (deleted in the analysis cleanup, September 2026; the folder's REPORT.md stays), `analysis/i1_ir_audit/measure.py` (deleted in the analysis cleanup, September 2026; carried in the I2 and I3 entries of design_decisions.md)) — correctly,
 since they are records of runs made at that value and reading a live constant would silently reinterpret
 old logs the day θ changes or becomes derived (TODO-64, TODO-65). The `[meta-proj]` line does carry
 `theta=`, but only on ticks where a trigger fired and a projection was considered, so it is not a header
@@ -2648,7 +2648,7 @@ Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.3
 positions. Between ticks both agents move up to 20 cm, so a close pass between two samples is read at
 the nearer sample, not at its minimum. L2 measured the case: scenario_30's head-on pass reads 11.0 cm
 in `[sep]` while the continuous minimum is near 0 (the agents pass through each other between ticks 22
-and 23; `analysis/l2_execution_lag/REPORT.md`). Realization's own definition is continuous — a
+and 23; `analysis/l2_execution_lag/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in the L2 entry of design_decisions.md and TODO-77)). Realization's own definition is continuous — a
 violation is any moment strictly below `min_separation`, along straight-line motion within a segment
 (T3, `shared/realization.py`) — so an evaluation that reads `[sep]` against `min_separation` would
 compare a sampled execution against a continuous decision and under-count violations by up to one
@@ -2660,7 +2660,7 @@ way; it is the measure.
 figure, unchanged) and `min=`, the continuous minimum over the tick with both agents moving in a
 straight line from their previous positions to these, the closed-form clamped projection
 (`run_mesa._min_separation_over_tick`). A small change (one function, one field); the measure only.
-Evaluation (`analysis/t10_b3_realized/evaluate.py`) classifies every tick below `min_separation`
+Evaluation (`analysis/t10_b3_realized/evaluate.py` (deleted in the analysis cleanup, September 2026; carried in the T10 entry of design_decisions.md, TODO-36 and TODO-79)) classifies every tick below `min_separation`
 against the assessed window of the decision in effect: inside (its motion lies in [1, T_h] on that
 decision's projection clock), edge (straddles the offset or T_h), outside (past T_h, no projection, or
 the robot finished). MEASURED on the T10 baselines: the continuous minimum lowers the crossing minima
@@ -2669,7 +2669,7 @@ episode by one tick at its end; it moves no tick from outside to inside. The onl
 that is not a fallback's is s10 tick 75 at 49.15 cm (dist and min agree — the minimum is at the tick's
 end), TODO-77's step-quantisation residual; every other sub-50 moment is past T_h, under no projection,
 after the robot finished, or inside the s30_on all-unrealizable fallback's window (TODO-30).
-Files: mesa_sim/run_mesa.py (`[sep]`, `_min_separation_over_tick`), analysis/t10_b3_realized/evaluate.py
+Files: mesa_sim/run_mesa.py (`[sep]`, `_min_separation_over_tick`), analysis/t10_b3_realized/evaluate.py (deleted in the analysis cleanup, September 2026; carried in the T10 entry of design_decisions.md, TODO-36 and TODO-79)
 Reference: T3 session, September 2026; L2 report; T9 (`[sep]` introduced); T10
 
 ---

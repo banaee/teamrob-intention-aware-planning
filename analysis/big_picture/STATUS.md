@@ -1,5 +1,10 @@
 # Where the framework stands
 
+CLEANUP NOTE (September 2026): this is a frozen snapshot. Of the folders it names, `analysis/t3_realize/`,
+`analysis/t4_b2a/`, `analysis/t10_b3_realized/` and `analysis/l2_execution_lag/` are deleted in the analysis
+cleanup; their rulings and numbers are carried in design_decisions.md (the T3 / T3b, T10 and L2 entries) and in
+TODO-36, TODO-71 and TODO-77.
+
 A big-picture reading of the repository on 2026-09-19, at commit `2d5fc2c`. Written to be read
 without the entry numbers: labels appear in brackets only so that an entry can be found, and
 section 6 maps plain names to labels. Nothing was run for this document; it is distilled from

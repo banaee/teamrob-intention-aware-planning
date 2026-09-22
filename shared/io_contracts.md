@@ -1034,7 +1034,7 @@ violating interval is bounded, so a clearing δ always exists: `realize()` is to
 
 **Raises** `ValueError` for a plan with no segments, or one starting before `decision_step`.
 
-**Validated (T3, T3b; `analysis/t3_realize/validate.py`)** against T1b's `whole` realizer
+**Validated (T3, T3b; `analysis/t3_realize/validate.py` (deleted in the analysis cleanup, September 2026; carried in the T3 / T3b entry of design_decisions.md; realize() is re-validated by analysis/f1_robot_responsible/validate.py))** against T1b's `whole` realizer
 (`analysis/t1b_realization/realize.py`, a 0.01-tick grid over the same shift, fractional δ) at 50 cm
 on eight conditions (scenario_00/10/20/30, prior off and on): 94 of 94 admitted candidate rows agree
 on realizability; 82 are identical and 12 differ only by the whole-tick rounding (each the ceil of
