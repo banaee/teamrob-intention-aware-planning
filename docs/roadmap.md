@@ -363,6 +363,12 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   - B1: two-table kitting layouts and scenarios, hand-built, after one design question: is an item's
     destination table a domain fact or a work-order fact (design_decisions.md, B3.B entry, "THE FIXTURE
     SIDE"; TODO-47 (f)). Registered programmatically, as the first part of fixture generation (TODO-47 (a)).
+    T-B1c ✅ (September 2026): `scenario_83` on env_layout8, a fixture (Hadi's ruling): the existence case in
+    which realized cost changes the head under `full_reorder` (a conflict after the head; step 159, head
+    item_6 under plain cost, item_1 under realized, gap 1.44 < shift 3). `analysis/tb1c_realized_flip/`.
+    KNOWN LIMIT: `analysis/tb1b_two_tables/permutation_costs.py` prices only from the robot's start over its
+    assigned tasks, not from the position and pool at a decision; not extended. T-B1d (`scenario_84`, several
+    against-proximity designations) is its own task, not started.
   - B2: the build in the recorded order: the successor state and `project()` for orderings; B3.B on plain
     cost; then on realized cost; a `strategy` run option. Open points settled at design time: the hold at
     the boundary before the task it clears; B2 commits to a task.

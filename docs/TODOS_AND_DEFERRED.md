@@ -1548,6 +1548,9 @@ Prerequisites:
     (39.3 ticks), the cheapest full ordering starts with item_7, and greedy is 41.4 ticks worse. The
     fixture settles the choice of head, not the tail (the two best orderings differ by 2.2 ticks). The
     permutation table, the runs and the baselines: `analysis/tb1b_two_tables/README.md`.
+    ✅ T-B1c (September 2026): `scenario_83` exists as the existence case in which realized cost changes the
+    head under `full_reorder`; `analysis/tb1c_realized_flip/`. `scenario_84` (several against-proximity
+    designations) is T-B1d, not started.
 (g) THE GATE'S REOPENING CONDITION (gate ruling, September 2026): a walk crossing of θ with a live rival at
     similar odds (top-two ratio near 1 at the crossing), where the normalised share and a margin gate would
     disagree. No current fixture shows one (lowest top-two ratio at a walk crossing 5.23, s00_off 37).
@@ -2838,3 +2841,18 @@ against a target the robot is carrying away. Whether the robot's `holding` shoul
 freeze it, or leave it as it is, is an IR design question and not a bug. Recorded, nothing changed.
 Files: shared/recognizer.py, mesa_sim/world_state_builder.py (held objects' positions and locations)
 Reference: T-B Q7, September 2026; docs/recognizer_handback.md §1.4, §1.6; design_decisions.md, "Robot-responsible separation" (completion as a world fact)
+
+**TODO-89 — Where within the arrival radius an approach stops decides a conflict at s, with a margin of the order of the projection's stop-point error** [observation; from T-B1c]
+An observation, not a proposal. A walk to a target stops at the first point within the arrival radius (30 cm)
+along its straight line, so two approaches to one table from different sides stop at different points of the
+radius. Against a human standing at the table, which of them comes within min_separation (s = 50 cm) is then
+decided by that stop point, and the margin can be far smaller than the difference between the projected and the
+executed stop point (10 to 15 cm, step quantisation of the arrival). ILLUSTRATION, scenario_83 at step 159: the
+human's projection stands at (−709.8, −221.6); the robot's item_1 carry (from shelf_1, south-west) is projected to
+stop 49.22 cm from it and its item_6 carry (from shelf_6, south-east) 58.54 cm. The conflict that makes realized
+cost change the head is decided by 0.78 cm against s; executed, the two stops were 37.48 and 42.87 cm from the
+human. `analysis/tb1c_realized_flip/README.md`. The same subject as TODO-74 (the table is one point; the
+point-place fact that co-use needs s ≤ 2r): this is its consequence for realization's verdict, not a separate
+modelling question. Recorded, nothing changed.
+Files: shared/projection.py (the arrival radius in a projected walk), mesa_sim/world_state_builder.py (PROXIMITY_THRESHOLD)
+Reference: T-B1c, September 2026; TODO-74

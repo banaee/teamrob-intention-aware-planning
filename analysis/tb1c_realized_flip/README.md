@@ -6,8 +6,20 @@ TODO-47 (f-designations)) no winning ordering under `full_reorder` carried a hol
 the head. scenario_83 is a scenario in which it does, in the way T-B2c was built for: a conflict in an entry AFTER
 the head of the plain-cost winning ordering, inside the assessed window, which the head realized alone cannot see.
 
-The scenario literal (`domains/kitting/scenarios.py`, registered in `domains/kitting/registry.py`) is proposed and
-becomes a fixture on Hadi's ruling; until then it is uncommitted and this folder's script needs it registered to run.
+The scenario literal (`domains/kitting/scenarios.py`, registered in `domains/kitting/registry.py`) is a fixture on
+Hadi's ruling (option (i), 8aec522).
+
+**What this case is and is not.** scenario_83 is an EXISTENCE CASE: it shows that realized cost can change the head
+under `full_reorder` through a conflict after the head, not that doing so helps. It is fragile on two numbers: the
+conflict is decided by 0.78 cm against s = 50 cm (the item_1 carry projected to stop 49.22 cm from the human, the
+item_6 carry 58.54 cm; TODO-89), and the timing window is about 3 ticks wide (human start x −410 to −430 flips the
+head; −390 and −450 do not). On env_layout8 any case (b) is a TABLE CONVERGENCE: the human's routes touch the robot's
+only at the tables, so a conflict after the head can only be a meeting at a table. In execution both orderings meet
+the human at kitting_table_0 (37.48 cm under plain cost, inside the assessed window; 42.87 cm under realized, a
+quarter tick past T_h), because T_h ends at the human's release and the human, done, stands there. That is the known
+horizon limitation — the robot approaching a human still at the table past its projection, scenario_81's finding
+(`analysis/tb1b_two_tables/README.md`, the closest approach past the human's projection) — and it is why the
+completion ticks below carry no benefit claim.
 
 ## The requirements the case is checked against (the T-B1c prompt)
 
