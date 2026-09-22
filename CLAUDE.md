@@ -120,6 +120,9 @@ Decisions
   than once; measurement caught it. If a premise is wrong, report it.
 - Findings are drawn only from the test set a task names. Few, well-understood scenarios are the
   default; broad testing with special cases is a separate, later activity.
+- Layouts, scenarios and the saved logs are debugging examples, not a settled evaluation reference.
+  Hadi may change or rearrange any of them at any time; the logs are then regenerated; no design
+  argument rests on them.
 - Keep measurement tasks and build tasks apart. A build task is the change plus the check it
   needs, not a characterisation study.
 - When a task delegates a decision, decide from the design: state the reasoning before implementing, then evaluate. If the evaluation contradicts the reasoning, report it; do not switch the decision to fit the results.
