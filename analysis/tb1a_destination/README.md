@@ -148,3 +148,39 @@ completion tick now lands on a spent one.
 | s70_on | e5596b4d042d170537890d3a56d5c788 |
 | s71_off | 4a6b769e8c46bcabd75af48c43d83d41 |
 | s71_on | 909bcee05faf0be3368381cec7b448be |
+
+## D3 (dd880be) — THE BASELINES from here on: `task_committed` is not a trigger
+
+Regenerated at dd880be with the same command, superseding the table above. Only the trigger set changed
+(`shared/meta_planner.py`, `evaluate_triggers()`: `task_committed` removed; `docs/design_decisions.md`, "D3:
+task_committed is not a trigger"). Against the previous logs, checked per tick: every `[sep]` line, every human
+line, every `[IR] step=` and `[IR-dist]` line and the `[run]` header are byte-identical, and so is completion. What
+changed: the `[meta*]` lines of the removed `task_committed` decisions (43 in these logs); and the executor's
+bookkeeping, positions and ticks identical — no `_load_plan` at the grasp (the removed decision's reload of
+`deliver_already_held`), a later `continue_plan` mapping `action_index 2->0` / `3->1` instead of `0->0` / `1->1`,
+and `_on_task_complete` on the 4-action plan (`action_index=4 plan_len=4`) instead of the 2-action one.
+
+HOLDS PLACED BY `task_committed` in the previous baselines (their `[hold] … trigger=` field), all 1 tick, all gone:
+s20_off / s20_on at tick 31, s50_off / s50_on at tick 31, s30_off / s30_on at tick 47. At each of those ticks the
+robot, at the same position, spends the `pick_up` acknowledgement instead of the stand (`action=move_to
+micro=stand` → `action=pick_up micro=None`), and the hold's `[hold]` start / end lines are gone. Every other hold
+is unchanged.
+
+| log | md5 |
+|---|---|
+| s00_off | 16f4c3ffb63b94c3ad5c361454e5cfef |
+| s00_on | f60b6783ddb06d13688f09afd737669a |
+| s10_off | 6e55ff7907c6e0917c2949ebf740d547 |
+| s10_on | 774e1ca891c726de0a1c1581dd5ba103 |
+| s20_off | d1dea6a5f4fed9140b07044ea1ef7a1b |
+| s20_on | 36e8f7cab47250cf91c412bfeda56933 |
+| s30_off | 6610f3822d250906aebc216ad78b0d59 |
+| s30_on | b0bb633ffd8aeb3563e1ef7b5e37cfda |
+| s40_off | b39736f56d97621237580c1316daaff1 |
+| s40_on | dd2bcac3a6a6082f7cc6cab4fb142108 |
+| s50_off | f0ff48006e743e3b8902d385a4a37988 |
+| s50_on | 3d2fdebda9988ac0fc5b856962508e2c |
+| s70_off | e02a25a2cff90eaf1dce9afa071ebc42 |
+| s70_on | 8c24b8e30e4d5d69ed7681d63e171d88 |
+| s71_off | 04dc790078cc570fc3c35cdff02b7b86 |
+| s71_on | 1ae17d985f9a4cb92fefebc9d19e9187 |

@@ -165,3 +165,30 @@ registered:
 | s80_realized_on | ab6e64456ff45a03c4e49d4e9e101aed |
 | s80_plain_off | 3cde041d12b07f80d18b521318a511bb |
 | s80_plain_on | 5efac49ff330314119ab05e16a25a1fd |
+
+## D3 (dd880be): `task_committed` is not a trigger — the logs from here on
+
+Regenerated at dd880be with the same command, superseding the table above. Only the trigger set changed
+(`shared/meta_planner.py`, `evaluate_triggers()`: `task_committed` removed; `docs/design_decisions.md`, "D3:
+task_committed is not a trigger"). Against the previous logs, checked per tick: every `[sep]` line, every human
+line, every `[IR] step=` and `[IR-dist]` line and the `[run]` header are byte-identical, and so is completion. What
+changed: the `[meta*]` lines of the removed `task_committed` decisions (32 in these logs); and the executor's
+bookkeeping, positions and ticks identical — no `_load_plan` at the grasp (the removed decision's reload of
+`deliver_already_held`), a later `continue_plan` mapping `action_index 2->0` / `3->1` instead of `0->0` / `1->1`,
+and `_on_task_complete` on the 4-action plan (`action_index=4 plan_len=4`) instead of the 2-action one.
+
+HOLDS PLACED BY `task_committed` in the previous logs (their `[hold] … trigger=` field): none; no hold changed.
+
+`check.py`'s defect test "the decision's trigger is task_committed" (R2) is vacuous from D3 on: that trigger no
+longer exists. The script is not edited.
+
+| log | md5 |
+|---|---|
+| s80_plain_off | 601f4ef4120ecc390d80966f01c3d698 |
+| s80_plain_on | d16efce5728e7698c56cb56b40930863 |
+| s80_realized_off | 977403dd962b42a6209f51494afb7483 |
+| s80_realized_on | 121f2fe5b1f793019c1203ed1a83b868 |
+| s83_plain_off | 02d1d91f37f53dfbb4876030cd860350 |
+| s83_plain_on | ebd19106e7a441b77fdc8de5973f91b3 |
+| s83_realized_off | 0a5a2bc13ab3c5705c9f767e84f8427a |
+| s83_realized_on | 7f3d9a97489fbfa4f2ae5825a771efd5 |

@@ -186,3 +186,23 @@ head order 7, 4, 6, 1, no hold), against 220 before T-B Q7.
 | s80_on | e30f83e0cc804d75232ece20f206377b |
 | s81_off | 13eba624a5baf541de912ecc82246c98 |
 | s81_on | 42c25ac908b18965de087bbc84760a21 |
+
+### D3 (dd880be): `task_committed` is not a trigger — the baselines from here on
+
+Regenerated at dd880be with the same command, superseding the table above. Only the trigger set changed
+(`shared/meta_planner.py`, `evaluate_triggers()`: `task_committed` removed; `docs/design_decisions.md`, "D3:
+task_committed is not a trigger"). Against the previous logs, checked per tick: every `[sep]` line, every human
+line, every `[IR] step=` and `[IR-dist]` line and the `[run]` header are byte-identical, and so is completion. What
+changed: the `[meta*]` lines of the removed `task_committed` decisions (16 in these logs); and the executor's
+bookkeeping, positions and ticks identical — no `_load_plan` at the grasp (the removed decision's reload of
+`deliver_already_held`), a later `continue_plan` mapping `action_index 2->0` / `3->1` instead of `0->0` / `1->1`,
+and `_on_task_complete` on the 4-action plan (`action_index=4 plan_len=4`) instead of the 2-action one.
+
+HOLDS PLACED BY `task_committed` in the previous logs (their `[hold] … trigger=` field): none; no hold changed.
+
+| log | md5 |
+|---|---|
+| s80_off | 19a59f492213be5402ca918dcf26d128 |
+| s80_on | 6b6227b77d4623160894f6443c38b9f1 |
+| s81_off | c24ce309cc4a1aef054111d8b34c3404 |
+| s81_on | 656847aceea194d6d4990f243dfab2be |
