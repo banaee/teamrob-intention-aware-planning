@@ -1499,7 +1499,15 @@ Prerequisites:
     test needs. The designations are Hadi's to decide per scenario, not to be left to follow from the
     layout. design_decisions.md, "An item's destination table is a fact of the station" (the fact is the
     station's; which station is a design choice).
-    WHAT THIS SCOPES T-B3a TO. T-B's ordering result rests on a SINGLE against-proximity item in each
+    WHAT THIS SCOPES T-B3a TO (T-B1d, September 2026; supersedes the paragraph below). single_task takes the
+    cheapest task from the robot's position; full_reorder takes the task whose delivery leaves the robot best
+    placed for the remaining shelves; the two heads differ exactly when the cheapest-from-here task ends at a
+    table far from the remaining shelves, which the destination fact decides. Across nine designation sets
+    priced on env_layout8's geometry the heads differ in seven (gaps 14 to 78 ticks) and coincide in two;
+    every flip traces to the one designation that moves the cheapest single task — the mechanism, not a
+    weakness of any fixture. Generality across layouts is T-F's (randomised layouts), not a hand-built
+    scenario's. `analysis/tb1d_designations/README.md`.
+    SUPERSEDED (T-B1d): T-B's ordering result rests on a SINGLE against-proximity item in each
     layout (item_4 in env_layout8, item_1 in env_layout9), so any claim drawn from T-B3a is scoped to that
     fixture: it shows that ordering matters WHEN AN ITEM IS DESIGNATED AWAY FROM ITS NEAREST TABLE, not
     that reordering helps in general on a two-table station. An evaluation scenario meant to support the

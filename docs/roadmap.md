@@ -367,8 +367,12 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     which realized cost changes the head under `full_reorder` (a conflict after the head; step 159, head
     item_6 under plain cost, item_1 under realized, gap 1.44 < shift 3). `analysis/tb1c_realized_flip/`.
     KNOWN LIMIT: `analysis/tb1b_two_tables/permutation_costs.py` prices only from the robot's start over its
-    assigned tasks, not from the position and pool at a decision; not extended. T-B1d (`scenario_84`, several
-    against-proximity designations) is its own task, not started.
+    assigned tasks, not from the position and pool at a decision; not extended.
+    T-B1d ✅ closed as a record (September 2026, Hadi's ruling (ii)): no `scenario_84`, no layout variant; the
+    designation pricing and the mechanism (the heads differ when the cheapest-from-here task ends at a table
+    far from the remaining shelves, which the destination fact decides): `analysis/tb1d_designations/`.
+    T-B1 IS COMPLETE. The fixtures for T-B3: scenario_80, scenario_81 (two tables), scenario_83 (the
+    realized-cost existence case) and the one-table regression set.
   - B2: the build in the recorded order: the successor state and `project()` for orderings; B3.B on plain
     cost; then on realized cost; a `strategy` run option. Open points settled at design time: the hold at
     the boundary before the task it clears; B2 commits to a task.
