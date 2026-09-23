@@ -3490,6 +3490,9 @@ decomposition of the task against the initial world (an optional `method=` selec
 each primitive the task it came from (provenance, set automatically). A primitive carries no intent label and
 the list carries no task-boundary marker. A coordinate-valued `MoveTo` is admitted by the executed form, for
 Phase 7's exporter; authors never write waypoints.
+CORRECTED (Hadi's ruling (iii), cchat, T-C2a): `Stay` grounds to nothing (the executor idles), not to `wait_at`;
+`expand` yields one element per action of the method, so `wait_at` stays a task-level action inside `coffee_break`
+and grounds to `wait_at` as before. Authors write four: `MoveTo`, `PickUp`, `Place`, `Stay`.
 
 THE AUTHOR VOCABULARY. Edits on the work order:
 - `interrupt(task, after=|before=, with_=[...])`: insert content inside a task, at an anchor.
@@ -3498,6 +3501,9 @@ THE AUTHOR VOCABULARY. Edits on the work order:
 - free `Stay(n)` (n omitted: until the run ends) and `MoveTo(landmark)`.
 Anchors name an action of the task by action name or by index. Injected content may mix `TaskInstance`s and
 primitives. In T-C every injection sits at an action boundary.
+AS BUILT (T-C2a): a scenario is built at import, where no world exists, so the vocabulary returns a deferred edit
+that the loader applies to the task's expansion; `expand()` and the list helpers are usable directly only where a
+world exists (the loader, tests, a later generator). A consequence of expansion at load, not a change to it.
 
 LANDMARKS. A layout may declare symbolic places (`corner_NE`, `door`, `window`) as objects of a type of their
 own. No `TaskSchema` in any domain types a parameter as that type, and a domain that does is rejected at load;
