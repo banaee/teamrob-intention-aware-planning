@@ -90,6 +90,7 @@ scenario_01 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_02 = ScenarioConfig(
     id="scenario_02",
@@ -296,6 +297,7 @@ scenario_11 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_12 = ScenarioConfig(
     id="scenario_12",
@@ -399,6 +401,7 @@ scenario_20 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_22 = ScenarioConfig(
     id="scenario_22",
@@ -621,6 +624,7 @@ scenario_30 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_31 = ScenarioConfig(
     id="scenario_31",
@@ -758,6 +762,7 @@ scenario_40 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_41 = ScenarioConfig(
     id="scenario_41",
@@ -804,6 +809,7 @@ scenario_41 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_42 = ScenarioConfig(
     id="scenario_42",
@@ -907,6 +913,7 @@ scenario_50 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_51 = ScenarioConfig(
     id="scenario_51",
@@ -1123,6 +1130,7 @@ scenario_71 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_72 = ScenarioConfig(
     id="scenario_72",
@@ -1373,6 +1381,7 @@ scenario_82 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_84 = ScenarioConfig(
     id="scenario_84",
@@ -1501,6 +1510,7 @@ scenario_90 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_91 = ScenarioConfig(
     id="scenario_91",
@@ -1624,6 +1634,7 @@ scenario_93 = ScenarioConfig(
 )
 
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
+# Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
 scenario_94 = ScenarioConfig(
     id="scenario_94",

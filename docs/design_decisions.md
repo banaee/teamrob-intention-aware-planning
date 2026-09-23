@@ -3560,6 +3560,14 @@ agent's `current_task` (checked by grep: `WorldState.agent_states` is read nowhe
 human's `current_task = None` reaches no decision. Fixture results: every human line identical up to the dropped per-task
 tick in all ten runs (s00, s20, s70, s80, s83; `single_task`, `full_reorder`; prior on).
 
+AS BUILT (T-C2c): SCENARIO-AUTHORING CONVENTION (Hadi, cchat, 23 September 2026). A human's script ends with the
+human leaving the workspace (`MoveTo("door")` or a corner, then the empty list's stand), unless the scenario is
+about the terminal stand at a table (TODO-80's blocked case, stated in the scenario's description). Reason: a human
+standing at a table after its script deadlocks the robot with the stop on; that is the scenario's artefact, not a
+design result, and a stay that ends is waited out (scenario_94). The 22 play scripts and the two C2c fixtures
+(scenario_11, scenario_01) are not edited: they are examples and TODO-80 fixtures. New scenarios follow the
+convention.
+
 T-C2, THE BUILD: C2a the script layer (primitives, `expand`, the vocabulary, landmarks, the provenance check);
 C2b the human executor, action-level (both built). Fixtures s00, s20, s70, s80, s83, prior on; the check is identity up to
 the dropped per-task completion tick; the baselines are regenerated once. Then two literal scenarios, an

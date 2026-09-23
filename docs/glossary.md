@@ -364,6 +364,9 @@ tasks and primitives; in T-C every injection sits at an action boundary. A devia
 expanded work order, not a task of its own. Written at import, where there is no world, each returns a deferred
 edit (`[Deviation]`) that the loader applies to the task's expansion with the list helpers (`insert_after`,
 `insert_before`, `retarget`, `truncate`).
+AUTHOR CONVENTION (T-C2c, Hadi): a script ends with the human leaving the workspace (`MoveTo("door")` or a corner),
+unless the scenario is about the terminal stand at a table (TODO-80's blocked case, said in its description): a
+human left standing at a table deadlocks the robot with the stop on, an artefact of the scenario.
 AUTHOR NOTE (T-C2b): content injected by `interrupt` is expanded sequentially, but the interrupted task's
 remaining actions are not: a task injected after a pick-up that returns the held item (`deliver_with_return`)
 leaves the resumed `place` failing at run time. Write the return explicitly, or use `abandon`.

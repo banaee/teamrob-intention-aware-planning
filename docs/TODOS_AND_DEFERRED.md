@@ -2756,6 +2756,11 @@ or 4D's human cooperation (TODO-15).
 OBSERVED (T-C2c, `analysis/tc2c_scripts/`, scenario_01): the declared stay is scriptable; after `Stay(40)` the script
 ends and the human stands at the table, so with the stop on the robot is refused from 79 to the end (121 ticks), the
 terminal-stay block above; a stay that ends needs content after it.
+T-D (the play, `analysis/tc2c_scripts/play.md`): T-D's blocked fixture uses a stay that ENDS. A stay that ends is waited out with the stop on
+(scenario_94: refused 144–186, completion 413 against 370; scenario_23's mid-run stay likewise); only the human's
+end-of-script stand at a table deadlocks (01, 02, 04, 23). Scenario-authoring convention since 23 Sept 2026: a
+script ends with the human leaving the workspace, unless the scenario is about that terminal stand
+(design_decisions.md, "The human action script (T-C1, decided)", AS BUILT convention).
 Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared/types.py
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
 
@@ -2834,6 +2839,11 @@ item_2) freezes the belief (`deliver_item(item_2)` 0.550, `coffee_break` 0.345, 
 as expected. For (b), observed in scenario_01: once the human's hypothesis space is exhausted (its last assigned
 task pinned), `unknown` reads 0.995 and no projection exists, so a finished work order and unmodelled behaviour are
 indistinguishable to `update()`. T-D decides.
+THE GENERAL FORM OF (b) (the play, `analysis/tc2c_scripts/play.md`): the robot is blind after EVERY human task completion, not only when the
+hypothesis space is exhausted. The episode boundary resets the belief to the prior, below θ, so no projection is
+admitted, while the human stands at the table it just delivered to, which is where the robot delivers. scenario_72:
+the robot's carry passes 0.78 cm from the standing human (tick 100), before the robot's own completion; 01, 02, 04,
+22, 24, 52 show 1–15 cm at the end of the run (stop off). Only the separation stop covers it. T-D's opening item.
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026
 
@@ -2861,6 +2871,10 @@ stays where it was. `MetaPlanner._is_complete` uses the same criterion (`Adaptiv
 the pool does not drop the task either. Where it matters: the deviation case (T-C / T-D), in which the
 human delivers an item to a table other than its designated one; not reachable by any current fixture
 (TODO-86). Recorded, nothing changed.
+REPRODUCED (the play, `analysis/tc2c_scripts/play.md`; reachable since T-C2a's `deviate`): scenario_85 (env_layout8) and scenario_92
+(env_layout9). No pin and no boundary at the misdelivery; after the next boundary `deliver_item(item)` leads again
+(about 0.9: the item lies on the wrong table, so its delivery is still open), and the robot plans against a projected
+human carrying it back, who stands still.
 Files: shared/recognizer.py (`update`, `_terminal_complete`, `_task_boundary`), shared/meta_planner.py
 (`_is_complete`), shared/planner.py (`is_complete`)
 Reference: T-B1a, September 2026
@@ -2957,5 +2971,27 @@ belief falls from `deliver_item(item_2)` 0.550 to 0.248 (four-way tie) and the d
 scratch (it clears θ at 100). Nothing is wrong by the current rule (docs/recognizer_handback.md §1.6: the observed
 agent finished a task); whether a task completed INSIDE another, with its item in hand, should end the episode is
 for T-D. Recorded, nothing changed.
+REPRODUCED (the play, `analysis/tc2c_scripts/play.md`): scenario_12, scenario_41 and scenario_72, on layouts 1, 4 and 7.
 Files: shared/recognizer.py (`update`, `_task_boundary`)
 Reference: T-C2c, September 2026; docs/recognizer_handback.md §1.6
+
+**TODO-94 — Re-recognition inside an episode depends on the length of the misleading walk** [T-D; from the T-C2c play]
+Observed (`analysis/tc2c_scripts/play.md`). The evidence a walk lays against the hypotheses it does not serve (refutation by wasted path)
+persists until an episode boundary, and only a task completion makes one: nothing else resets excess path. So a
+change of mind, or a detour mid-task, is recognised again only if the misleading walk was short. Short (12–22 ticks:
+scenario_51, scenario_24, the return in scenario_31, scenario_52's near corner): the task the human now does recovers,
+sometimes a few ticks before its release. Long (the 77-tick walks of scenario_84 and scenario_91; the long detours
+of scenario_93 and scenario_22): it never recovers, and the robot sees `unknown` (0.994) for the whole second
+delivery. scenario_02's return is the same pattern (`deliver_item(item_2)` leads two ticks before its release). The
+same mechanism hides a foreseeable task: in scenario_41 `coffee_break` never rose on the walk to the machine (the walk
+to item_3 had refuted it), where in scenario_11 it rose to 0.345. The recognizer judges nothing; whether evidence
+should decay, be reset by another event, or stand, is a recognizer question for T-D. Recorded, nothing changed.
+Files: shared/recognizer.py
+Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
+
+**T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
+1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).
+2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.
+3. Reproduced: TODO-93 (a foreseeable completion ends the episode mid-delivery) and TODO-87 (a delivery to another
+   table: no pin, no boundary, a projection of a task the human will not do).
+4. T-D's blocked fixture uses a stay that ends (TODO-80; the scenario-authoring convention).
