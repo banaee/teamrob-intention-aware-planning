@@ -73,7 +73,8 @@ which is the head's hold realized alone.
 previous one as entry k's action schemas declare they leave it (`ActionSchema.retracts`, `effects`,
 `moved_object_key` / `moved_to_key`), with the agent where entry k's last segment ends. Built and dropped
 inside one `Projector.project()` call; the live `WorldState` is never written.
-→ `shared/projection.py`, `_successor_state()`; `docs/design_decisions.md`, "The successor state is
+The same derivation advances the human script's symbolic state at load (sequential expansion, T-C2b, §6).
+→ `shared/projection.py`, `successor_state()`; `docs/design_decisions.md`, "The successor state is
 derived from what the action schemas declare: a delete list and a declared relocation".
 
 **B1 / B2 / B3** — the blocks of `MetaPlanner.update()`: B1 the human projection, B2 the mid-task
@@ -120,7 +121,8 @@ integer and is not `ProjectedPlan.total_estimated_cost`.
 "Realization as built".
 
 **human projection** — the human's `ProjectedPlan`: the one task the meta-planner admitted for the
-observed human at this trigger, projected exactly as a robot candidate is. It ends at **T_h**.
+observed human at this trigger, projected as a robot candidate is, with the human body's own per-task
+completion tick (0 since T-C2b: its executor is action-level). It ends at **T_h**.
 Admission is logged as `[meta-proj]`; there is at most one, and there may be none.
 → `shared/meta_planner.py`, `update_human_projection()`; `shared/io_contracts.md` §2.2.
 
@@ -321,9 +323,9 @@ developer's execution script (which order). The robot never reads `scheduled_tas
 `assigned_tasks` is its task pool and `scheduled_tasks` is unread.
 → `shared/types.py`, `AgentConfig`.
 
-The five entries below are decided (T-C1). The scenario layer is built (T-C2a): the script is written, expanded,
-edited and checked at load. The human executor still runs tasks until T-C2b (a script with a primitive or a
-deviation is refused at load until then).
+The five entries below are decided (T-C1) and built: the scenario layer (T-C2a), the script written, expanded,
+edited and checked at load; sequential expansion and the action-level human executor (T-C2b), which runs the
+primitives one by one, tracks no task and spends no per-task completion tick.
 
 **primitive** — one entry of the human's executed script: a `ScriptAction` (an action of the domain by schema
 name, one element type per action schema) or a `Stay`. Authors write four: `MoveTo`, `PickUp`, `Place` (kitting:
@@ -336,8 +338,10 @@ write one.
 `docs/design_decisions.md`, "The human action script (T-C1, decided)".
 
 **expand** — `expand(task)`: turning a `TaskInstance` in the script into primitives at load, by the planner's own
-decomposition against the initial world (optional `method=`). Sets provenance on each primitive. It needs a
-world, so it runs where one exists (the loader, tests, a later generator), not in a scenario file.
+decomposition (optional `method=`). Sequential (T-C2b): each task against the symbolic state the script's
+elements before it leave behind, the initial world advanced by the **successor state** (§1). Sets provenance on
+each primitive. It needs a world, so it runs where one exists (the loader, tests, a later generator), not in a
+scenario file.
 → `domains/script.py`, `expand()`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
 
 **provenance** — the task a primitive came from, recorded automatically by `expand`, one per expansion. The script
@@ -360,6 +364,9 @@ tasks and primitives; in T-C every injection sits at an action boundary. A devia
 expanded work order, not a task of its own. Written at import, where there is no world, each returns a deferred
 edit (`[Deviation]`) that the loader applies to the task's expansion with the list helpers (`insert_after`,
 `insert_before`, `retarget`, `truncate`).
+AUTHOR NOTE (T-C2b): content injected by `interrupt` is expanded sequentially, but the interrupted task's
+remaining actions are not: a task injected after a pick-up that returns the held item (`deliver_with_return`)
+leaves the resumed `place` failing at run time. Write the return explicitly, or use `abandon`.
 → `domains/script.py`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
 
 ---

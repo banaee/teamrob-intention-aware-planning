@@ -415,11 +415,13 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   `Stay(n)` and `MoveTo(landmark)`; the human executor is action-level. TODO-86 closed. Not decided in C1:
   TODO-85 (half (b) with T-D; half (a), if taken, T-H) and TODO-88, their own items.
   - **T-C2 — the build.** C2a the script layer: primitives, `expand`, the vocabulary, landmarks, the
-    provenance check (built, T-C2a). C2b the human executor, action-level; its first requirement (ruling, T-C2a):
-    sequential expansion against the successor state, not the initial world, so a task after an abandoned
-    pick-up expands from what the human holds; no change-of-mind scenario is written before it. Fixtures s00, s20, s70, s80, s83, prior on;
-    identity up to the dropped per-task completion tick; the baselines regenerated once. Then two literal
-    scenarios, an interrupt and a stay, one run each, observed, not judged.
+    provenance check (built, T-C2a). C2b the human executor, action-level, and sequential expansion against the
+    successor state (`shared.projection.successor_state()`), not the initial world, so a task after an abandoned
+    pick-up expands from what the human holds (built, T-C2b). Fixtures s00, s20, s70, s80, s83, prior on:
+    the human's lines identical up to the dropped per-task completion tick; the human projection also loses that
+    tick (the human's body reports 0), which moved one hold before the first dropped tick (s20 `single_task`);
+    the baselines regenerated once. C2a and C2b closed.
+    Next: two literal scenarios, an interrupt and a stay, one run each, observed, not judged.
   - From here debugging runs use prior on only; off / on returns for the paper.
 - **T-D — Robustness in kitting, on T-C.** Scenarios for a change of mind mid-task, a walk to an empty
   corner (`unknown` as outcome), a declared stay at the table (the blocked case); the blocked event in

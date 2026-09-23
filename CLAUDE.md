@@ -27,7 +27,8 @@ Relevant (read as needed):
 - `shared/*.py`: cognitive layer
 - `mesa_sim/*.py` (top level only); `mesa_sim/viz/` only for visualization or when grepping
   for readers of a field
-- `domains/kitting/`: the active domain; `domains/script.py`: the human action script (T-C2a), domain-generic
+- `domains/kitting/`: the active domain; `domains/script.py`: the human action script (T-C2a; sequential
+  expansion, T-C2b), domain-generic; `mesa_sim/sim_agents.py` `HumanAgent`: the action-level human executor (T-C2b)
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
   design record. Use its terms in the code, in the documents and in reports.
@@ -96,8 +97,10 @@ Decisions
   projection, one minimal-shift search and one hold per entry) and T-B2d (the `--strategy` run option) are
   built, which completes B3.B; next is T-B3, its evaluation. The body now spends every completion tick it
   states to the projection (T-B Q7: a reload never cancels one), which closes TODO-77's residual — what is
-  left of it is step quantisation, uncompensated by decision. Not to be started
-  unasked: T-C to T-G, i.e. the human action script, robustness, the demonstration, Phase 5
+  left of it is step quantisation, uncompensated by decision. T-C2 (the human action script: C2a the scenario
+  layer, C2b sequential expansion and the action-level human executor, which spends no per-task completion
+  tick and reports 0 for it to the projector) is built; next are its two literal scenarios. Not to be started
+  unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized

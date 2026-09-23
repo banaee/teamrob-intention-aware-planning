@@ -510,7 +510,7 @@ there is no `realizable` flag and no unrealizable reason. The former `realizable
   in `unassessed_share`, which counts the tail beyond T_h only (T3b ruling).
 - A violation is strict: a single instant at exactly `min_separation` is not one (T3b ruling).
 
-### 1.12 The human action script — scenario layer (T-C1, built in T-C2a)
+### 1.12 The human action script — scenario layer (T-C1, built in T-C2a and T-C2b)
 
 An input contract of the scenario layer: what a scenario author writes as a human's
 `AgentConfig.scheduled_tasks`, and what the loader makes of it. Nothing in it reaches the recognizer or the
@@ -547,8 +547,14 @@ injected content may mix tasks and primitives. Anchors: an action name occurring
 expansion, or a 0-based index into it; nothing else.
 
 **The executed form.** At load (`SimModel._resolve_human_scripts`) `resolve_script()` turns the written form
-into `ScriptAction`s and `Stay`s only, against the initial world: `expand(task, planner, world, agent_id,
-method=None)` is the planner's own decomposition (`AdaptivePlanner.decompose`, §2.3), one `ScriptAction` per
+into `ScriptAction`s and `Stay`s only. Expansion is SEQUENTIAL (T-C2b): each element is resolved against the
+initial world advanced by every element before it — each `ScriptAction` grounded and its declared effects,
+retracts and relocation applied by `shared.projection.successor_state()`, the same derivation the entries of an
+ordering are projected through (T-B2a), with the agent at the target of its last walk; a `Stay` changes nothing.
+So a task after a change of mind expands as the executor would have decided at run time (after an abandoned
+pick-up, the next delivery is `deliver_with_return`). Content a deviation injects is resolved against the state
+its task's expansion leaves at the anchor (after the kept part, for `abandon`); anchors are still resolved against
+the task's own expansion. `expand(task, planner, world, agent_id, method=None)` is the planner's own decomposition (`AdaptivePlanner.decompose`, §2.3), one `ScriptAction` per
 action of the selected method (a `wait_at` inside `coffee_break` stays a `wait_at` element; it is not a
 `Stay`), all sharing one `Provenance`; a deviation expands its task and applies a list helper to that
 expansion (`insert_after` / `insert_before` for interrupt, `truncate` plus the content for abandon,
@@ -570,9 +576,16 @@ whose `TaskSchema`s types a parameter as `landmark` is rejected at load (`check_
 hypothesis binds one and no robot action grounds to one. `MoveTo(landmark)` is how a script names a place no
 task explains. env_layout0 declares five (`corner_NE`, `corner_NW`, `corner_SE`, `corner_SW`, `door`).
 
-**Until T-C2b** the human executor is task-level: a script written as `TaskInstance`s only runs as before
-(compatibility path, removed in C2b); a script with a primitive or a deviation loads, is resolved and checked,
-and is then refused with an error naming T-C2b.
+**The human executor (T-C2b).** Its input is the executed form: a list of primitives, handed to
+`HumanAgent.load_script()` by the loader. `HumanAgent` runs them one by one: a `ScriptAction` is grounded when it
+is reached (`ground()`; the target position is resolved by the executor at that moment, so an item the robot has
+taken is not where the script expected it) and handed to the shared `Executor` as a one-action plan; the next
+primitive loads on the tick after the acknowledgement of the last (the executor is handed no plan first, so it
+owes nothing). `Stay(n)` stands n ticks, `Stay()` to the end of the run; an empty list stands. It tracks no task
+(`current_task` stays `None`, so `AgentState.current_task` is `None` for the human), logs no task completion and
+spends no per-task completion tick; one `[human] step= ... primitive i: ...` line per primitive reached. Every
+human runs through this path; the task-level compatibility path of T-C2a is removed. The robot's mind learns
+the human's task completions from the world, as before.
 
 ---
 
@@ -1252,7 +1265,8 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
 - Mesa expands primitive actions into microactions via `action_decomposer.py` — embodiment detail only
 
 **What an `ActionSchema` declares it changes (T-B2a).** Three declarations, read by
-`Projector._successor_state()` to chain the entries of an ordering and by nothing in a live run:
+`shared.projection.successor_state()` to chain the entries of an ordering, and by the human script's sequential
+expansion at load (§1.12, T-C2b); by nothing in a live run:
 - `effects: List[ConditionSchema]` — the add list: the grounded fact is true once the action is done.
 - `retracts: List[ConditionSchema]` (default empty) — the delete list: the grounded fact is no longer true,
   e.g. `place` retracts `holding(?agent, ?item)`. A list on the action and NOT a negation flag on
@@ -1312,14 +1326,16 @@ a declared relocation".
   the script may send an item elsewhere. Its elements are checked for binding (`check_script_bindings`, T-C2a):
   every task in it (a deviation's task, its content, and for `deviate` the task rebound to the new destination)
   as above, and every object a primitive names exists
-- Resolves each human's script against the initial world after spawning (§1.12, T-C2a), checks the work order
-  on the executed form, and keeps it in `SimModel.human_scripts`; rejects a domain that types a task parameter
-  as a landmark
+- Resolves each human's script from the initial world after spawning, sequentially (§1.12, T-C2a, T-C2b),
+  checks the work order on the executed form, and hands it to the `HumanAgent` (`load_script()`), whose
+  executor is action-level; rejects a domain that types a task parameter as a landmark
 - Supplies the `Projector` its motion rate (`step_size`, T2), its stopping distance (T9: the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
   executor stops), its per-action acknowledgement latency and observation offset (L2), and its
-  per-task completion tick (F1: `TASK_COMPLETION_LATENCY`, the tick `Executor.step()` spends in
-  `_on_task_complete()`, paid by both agents), for robot and human projections alike, and its
+  per-task completion tick per body: the robot's (F1: `TASK_COMPLETION_LATENCY`, the tick `Executor.step()`
+  spends in `_on_task_complete()`) for its own candidates, the human's (`observed_task_completion_latency`:
+  `HUMAN_TASK_COMPLETION_LATENCY` = 0, `mesa_sim/sim_agents.py`; its executor is action-level, T-C2b) for the
+  human projection; the per-action acknowledgement is the same for both; and its
   duration-to-steps conversion (R2: `_parse_duration_to_steps`, the one its executor's wait uses)
 - Logs the actual robot–human distance once per tick (`[sep]` lines, headless run; T9) so that
   actual separation below `min_separation` can be reported — Mesa has no execution-time
