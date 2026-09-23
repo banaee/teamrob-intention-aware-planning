@@ -4,6 +4,10 @@ Simulation-agnostic robot cognitive architecture for intention-aware human-robot
 (Scania kitting). Pipeline per robot step:
 `obs_builder → recognizer → meta_planner → planner → executor`.
 
+What the framework is about: how the robot reads the human and plans around them. What it is not
+about: what the human produces. An abandoned delivery is in scope for what it does to the robot
+(retraction, `unknown`, re-planning), not for the human's output (Hadi, T-C1).
+
 ## How sessions work
 
 - The design is made in a separate design claude chat (we call it cchat) with Hadi. Also we may call the working tool of claude-code in local repository as ccode. A task prompt states what is decided

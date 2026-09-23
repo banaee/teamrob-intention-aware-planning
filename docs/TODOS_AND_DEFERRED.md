@@ -2829,7 +2829,7 @@ stop and realization overlap). design_decisions.md, "A stationary human".
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026
 
-**TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a]
+**TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a] ✅ CLOSED by T-C1 (23 Sept 2026): the work order and the script are compared by provenance (every assigned task exactly once), not by key equality; a delivery to another table is a `deviate` edit of an assigned task. design_decisions.md, "The human action script (T-C1, decided)"; built in T-C2
 `AgentConfig.__post_init__` (shared/types.py) requires the human's `assigned_tasks` keys to equal the
 non-foreseeable `scheduled_tasks` keys exactly. Since T-B1a the human's `scheduled_tasks` may bind
 `?kitting_table` to a table other than the item's designated one (the precedence rule keeps the binding),
@@ -2931,3 +2931,11 @@ label a tick inside when it lies in [1, T_h] on the decision's clock. The glossa
 glossary). Label only: the stop's refusal does not read it, no behaviour depends on it. Not fixed.
 Files: mesa_sim/executor.py (`set_assessed_window`, `_log_stop`), mesa_sim/sim_agents.py
 Reference: TODO-90 check, September 2026; analysis/todo90_b2a_window/README.md
+
+**TODO-92 — An observed history of the human's tasks in the robot's mind** [T-D; from T-C1]
+The robot's mind keeps nothing from the human's script (T-C1), and today it keeps no record of what it has
+observed of the human either: completions reach it as world facts, retractions and `unknown` episodes as
+belief changes, and nothing accumulates them. Recorded for evaluation: a history, in the robot's mind, of the
+human's tasks as observed — completed, dropped, `unknown` episodes. Built from what the robot observes, never
+from the script. Designed in T-D. The robot taking over an abandoned task is a separate item (TODO-15).
+Reference: T-C1, 23 September 2026; design_decisions.md, "The human action script (T-C1, decided)"
