@@ -11,5 +11,8 @@ starlette==0.48.0
 plotly
 matplotlib
 
+# Development (tests/)
+pytest
+
 # NOTE: Mesa is NOT installed via pip.
 # The fork is bundled at mesa_sim/mesa_fork/ and imported directly.

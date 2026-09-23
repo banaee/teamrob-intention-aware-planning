@@ -423,6 +423,148 @@ def task_instance_key(task: TaskInstance) -> str:
     )
     return f"{task.schema.name}({params})"
 
+
+# =============================================================================
+# THE HUMAN ACTION SCRIPT (T-C1; scenario layer, built in T-C2a)
+# The executed form of a human's scheduled_tasks is a flat list of ScriptAction
+# and Stay. Nothing here reaches the recognizer or the meta-planner.
+# The functions (expand, the vocabulary, resolution) are in domains/script.py.
+# =============================================================================
+
+# The object type of a landmark: a symbolic place a layout may declare, which no
+# TaskSchema may type a parameter as (check_no_landmark_parameters), so no
+# hypothesis binds one and no robot action grounds to one. A framework term,
+# not a domain one.
+LANDMARK_TYPE = "landmark"
+
+
+def check_no_landmark_parameters(domain: "DomainModel") -> None:
+    """Reject a domain one of whose TaskSchemas types a parameter as a landmark."""
+    for task in domain.tasks.values():
+        for var_name, type_name in (task.parameter_types or {}).items():
+            if type_name == LANDMARK_TYPE:
+                raise ValueError(
+                    f"task '{task.name}': parameter {var_name} is typed '{LANDMARK_TYPE}'; a landmark is a "
+                    f"place for a human's script only, and no task may bind one"
+                )
+
+
+@dataclass(eq=False)
+class Provenance:
+    """
+    The task a script element came from, set by expand(). Compared by identity:
+    one Provenance per expansion, shared by every element of it, so a task
+    expanded twice is two occurrences (the work-order check counts them).
+    Scenario-layer bookkeeping only.
+    """
+    task: TaskInstance
+
+    @property
+    def key(self) -> str:
+        return task_instance_key(self.task)
+
+    def __repr__(self):
+        return f"<{self.key}>"
+
+
+@dataclass(frozen=True)
+class ScriptAction:
+    """
+    One primitive of a human's script: an action of the domain by schema name,
+    with its bindings (var name -> object id; a coordinate pair is admitted for a
+    movement target, and grounds to no object). One element type per action
+    schema, generically: expand() yields one per action of the method, and a
+    domain's author primitives (kitting: MoveTo, PickUp, Place) construct the
+    same thing. Grounded by domains/script.ground() when the executor reaches it.
+    `provenance` is set by expand() only; it does not take part in equality.
+    """
+    action_name: str
+    bindings: Tuple[Tuple[str, Any], ...]      # sorted by var name
+    provenance: Optional[Provenance] = field(default=None, compare=False)
+
+    @classmethod
+    def of(cls, action_name: str, bindings: Dict[str, Any],
+           provenance: Optional[Provenance] = None) -> "ScriptAction":
+        return cls(action_name, tuple(sorted(bindings.items())), provenance)
+
+    def __repr__(self):
+        args = ",".join(f"{k}={v}" for k, v in self.bindings)
+        return f"{self.action_name}({args})"
+
+
+@dataclass(frozen=True)
+class Stay:
+    """
+    Standing still: the absence of an action, grounding to nothing (an executor
+    instruction). `ticks` omitted: until the run ends. Never produced by expand().
+    """
+    ticks: Optional[int] = None
+
+    def __repr__(self):
+        return f"Stay({'' if self.ticks is None else self.ticks})"
+
+
+@dataclass
+class Deviation:
+    """
+    A deferred edit of one task's expansion (interrupt / deviate / abandon),
+    written in a scenario at import, where no world exists, and applied at load
+    by domains/script.resolve_script(). `content` may mix TaskInstances and
+    primitives. Built by the vocabulary functions, not directly.
+    """
+    kind: str                                   # "interrupt" | "deviate" | "abandon"
+    task: TaskInstance
+    after: Optional[Union[str, int]] = None
+    before: Optional[Union[str, int]] = None
+    content: List[Any] = field(default_factory=list)
+    destination: Optional[str] = None
+
+
+def script_task_occurrences(script: List[Any]) -> Dict[str, int]:
+    """
+    How many times each task occurs in a script, by provenance: a TaskInstance
+    once, a Deviation's task once (its content recursively), and every distinct
+    Provenance among the ScriptActions once. Stay counts nothing. Works on the
+    written form and on the executed (resolved) form alike.
+    """
+    counts: Dict[str, int] = {}
+    seen: List[Provenance] = []
+
+    def walk(elements):
+        for e in elements:
+            if isinstance(e, TaskInstance):
+                k = task_instance_key(e)
+                counts[k] = counts.get(k, 0) + 1
+            elif isinstance(e, Deviation):
+                k = task_instance_key(e.task)
+                counts[k] = counts.get(k, 0) + 1
+                walk(e.content)
+            elif isinstance(e, ScriptAction) and e.provenance is not None:
+                if not any(e.provenance is p for p in seen):
+                    seen.append(e.provenance)
+                    counts[e.provenance.key] = counts.get(e.provenance.key, 0) + 1
+
+    walk(script)
+    return counts
+
+
+def check_work_order(agent_id: str, script: List[Any], assigned_tasks: List[TaskInstance]) -> None:
+    """
+    The work order in the script (T-C1): every assigned task occurs exactly once,
+    by provenance. Present is not completed (an abandoned task passes);
+    foreseeable tasks and hand-written primitives are free.
+    """
+    counts = script_task_occurrences(script)
+    assigned_keys = [task_instance_key(t) for t in assigned_tasks]
+    missing = [k for k in assigned_keys if counts.get(k, 0) == 0]
+    repeated = [f"{k} x{counts[k]}" for k in assigned_keys if counts.get(k, 0) > 1]
+    if missing or repeated:
+        raise ValueError(
+            f"AgentConfig '{agent_id}': every assigned task must occur exactly once in "
+            f"scheduled_tasks. Assigned but not scripted: {missing}. Scripted more than once: {repeated}."
+        )
+
+
 @dataclass
 class AgentConfig:
     """
@@ -430,11 +572,14 @@ class AgentConfig:
     Two task fields, with semantics differing by agent type:
       - human:  assigned_tasks  — the work order the human was given. A fact the
                                   robot may know: WHICH tasks, never their order.
-                scheduled_tasks — the developer's execution script: fixed ordered
-                                  sequence (assigned + foreseeable interleaved).
-                                  Order encodes when deviations occur. Never
-                                  reordered at runtime. Drives HumanAgent only;
-                                  the robot has no access to it.
+                scheduled_tasks — the developer's execution script (T-C1): a flat
+                                  list of primitives (ScriptAction, Stay),
+                                  TaskInstances and deviations in any mix,
+                                  resolved at load into primitives only
+                                  (domains/script.py). Every assigned task
+                                  occurs in it exactly once, by provenance.
+                                  Never reordered at runtime. Drives HumanAgent
+                                  only; the robot has no access to it.
       - robot:  assigned_tasks  — its task pool, seeded into the meta_planner.
                                   Unordered: the meta_planner produces Q0 and every
                                   later ordering from IR output.
@@ -446,7 +591,7 @@ class AgentConfig:
     agent_id: str
     agent_type: str                      # "human" or "robot"
     start_position: Tuple[float, float]
-    scheduled_tasks: List[TaskInstance] = field(default_factory=list)  # human execution script; unread for robot
+    scheduled_tasks: List[Any] = field(default_factory=list)  # human execution script (see docstring); unread for robot
     observes: List[str] = field(default_factory=list)  # agent_ids this agent observes
     assigned_tasks: List[TaskInstance] = field(default_factory=list)   # the work order — see docstring
 
@@ -472,27 +617,9 @@ class AgentConfig:
         if self.agent_type != "human":
             return
 
-        scripted_keys = [
-            task_instance_key(t)
-            for t in self.scheduled_tasks
-            if not t.schema.is_foreseeable
-        ]
-        scripted_dupes = sorted({k for k in scripted_keys if scripted_keys.count(k) > 1})
-        if scripted_dupes:
-            raise ValueError(
-                f"AgentConfig '{self.agent_id}': duplicate non-foreseeable "
-                f"scheduled_tasks keys: {scripted_dupes}"
-            )
-
-        missing = sorted(set(scripted_keys) - set(assigned_keys))
-        extra = sorted(set(assigned_keys) - set(scripted_keys))
-        if missing or extra:
-            raise ValueError(
-                f"AgentConfig '{self.agent_id}': assigned_tasks must match the "
-                f"non-foreseeable scheduled_tasks exactly. "
-                f"Scripted but not assigned: {missing}. "
-                f"Assigned but not scripted: {extra}."
-            )
+        # The work order in the script, by provenance (T-C1; replaced the key
+        # equality with the non-foreseeable scheduled tasks, TODO-86).
+        check_work_order(self.agent_id, self.scheduled_tasks, self.assigned_tasks)
 
 
 @dataclass

@@ -96,11 +96,15 @@ class AdaptivePlanner:
         task_params: Dict[str, str],
         agent_id: str,
         world: WorldState,
+        method: Optional[str] = None,
     ) -> List[GroundedAction]:
         """
         The flat GroundedAction list for one task, grounded for `agent_id`
         against `world`: guard-selected method, derived vars, every step Var
-        resolved through the task and step bindings. plan() wraps this for the
+        resolved through the task and step bindings. `method` names one of the
+        task's methods to use instead of the first applicable one; it must
+        apply in `world` (the human action script's expand(task, method=),
+        T-C2a). Sub-tasks are selected as always. plan() wraps this for the
         executor; the recognizer calls it directly, once per hypothesis and
         tick, to learn which actions the observed agent would perform if it
         held that intention — the same selection, not a parallel one.
@@ -109,7 +113,7 @@ class AdaptivePlanner:
         # Build initial bindings: task params + agent injection
         bindings: Dict[str, str] = {"?agent": agent_id}
         bindings.update(task_params)
-        return self._decompose_task(task_name, bindings, world)
+        return self._decompose_task(task_name, bindings, world, method)
 
     def is_complete(
         self,
@@ -144,6 +148,7 @@ class AdaptivePlanner:
         task_name: str,
         bindings: Dict[str, str],
         world: WorldState,
+        method_name: Optional[str] = None,
     ) -> List[GroundedAction]:
         """
         Recursively decompose a task into a flat list of GroundedActions.
@@ -158,7 +163,7 @@ class AdaptivePlanner:
         bindings = self._resolve_lookups(
             task_schema.determined_parameters, bindings, world, f"Task: '{task_schema.name}'")
 
-        method, bindings = self._select_method(task_schema, bindings, world)  # returns method + updated bindings
+        method, bindings = self._select_method(task_schema, bindings, world, method_name)  # returns method + updated bindings
 
         # Resolve derived vars declared on this method before processing steps
         resolved_bindings = self._resolve_derived_vars(method, bindings, world)
@@ -193,15 +198,23 @@ class AdaptivePlanner:
         task_schema: TaskSchema,
         bindings: Dict[str, str],
         world: WorldState,
+        method_name: Optional[str] = None,
         ) -> Tuple[MethodSchema, Dict[str, str]]:
         """
         Return the first method whose guards are all satisfied in world, along
         with bindings updated to include any vars discovered by existential
-        guard matching.
+        guard matching. With `method_name`, only that method is considered.
         Empty guard list = unconditional (always passes).
         Raises DecompositionError if no method is applicable.
         """
-        for method in task_schema.methods:
+        methods = task_schema.methods
+        if method_name is not None:
+            methods = [m for m in methods if m.name == method_name]
+            if not methods:
+                raise ValueError(
+                    f"AdaptivePlanner: task '{task_schema.name}' has no method '{method_name}'"
+                )
+        for method in methods:
             resolved = self._guards_satisfied(method, bindings, world)
             if resolved is not None:
                 return method, resolved

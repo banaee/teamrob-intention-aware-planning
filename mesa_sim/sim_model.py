@@ -28,13 +28,17 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 from shared.domain_knowledge import DomainKnowledgeBase
-from shared.types import ScenarioConfig, check_task_bindings, check_task_destinations
+from shared.planner import AdaptivePlanner
+from shared.types import (ScenarioConfig, TaskInstance, check_task_bindings, check_task_destinations,
+                          check_no_landmark_parameters, check_work_order)
+from domains.script import check_script_bindings, resolve_script
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
 
 
 from mesa_sim.mesa_fork import model, space, time, datacollection
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
+from mesa_sim.world_state_builder import build_world_state
 
 import logging 
 logger = logging.getLogger(__name__)
@@ -146,7 +150,10 @@ class SimModel(model.Model):
         # ------------------------------------------------------------------
         # DomainKnowledgeBase — loaded once, shared across agents
         # ------------------------------------------------------------------
-        self.knowledge = DomainKnowledgeBase.from_domain(register_fn())
+        domain = register_fn()
+        # No task may bind a landmark (T-C1): it is a place for a human's script only.
+        check_no_landmark_parameters(domain)
+        self.knowledge = DomainKnowledgeBase.from_domain(domain)
 
 
         # ------------------------------------------------------------------
@@ -302,13 +309,16 @@ class SimModel(model.Model):
         # Every scripted and assigned task must be well typed against this layout
         # (F47b, TODO-49): the bound objects exist, with the types the schema
         # declares. An error, not a warning.
+        # A human's script is checked element by element: every task in it
+        # (a deviation's too), and every object a primitive names (T-C2a).
         object_type_by_id = {obj_id: obj.type for obj_id, obj in self.objects.items()}
         for agent_cfg in scenario.agents:
-            for task in list(agent_cfg.scheduled_tasks or []) + list(agent_cfg.assigned_tasks or []):
-                try:
+            try:
+                check_script_bindings(agent_cfg.scheduled_tasks or [], object_type_by_id, self.knowledge)
+                for task in agent_cfg.assigned_tasks or []:
                     check_task_bindings(task, object_type_by_id)
-                except ValueError as e:
-                    raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
+            except ValueError as e:
+                raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
 
         # Assigned tasks — the robot's pool and the human's work order — agree
         # with the layout's destinations (T-B1a). The human's scheduled_tasks is
@@ -363,6 +373,40 @@ class SimModel(model.Model):
                 self.space.place_agent(agent, start_pos)
                 self.schedule.add(agent)
                 self.robots[agent_cfg.agent_id] = agent
+
+        self._resolve_human_scripts(scenario)
+
+    def _resolve_human_scripts(self, scenario: ScenarioConfig):
+        """
+        Each human's script resolved against the initial world (T-C1, T-C2a):
+        every TaskInstance expanded by the planner's decomposition, every
+        deviation applied, so the executed form is primitives only; the work
+        order checked again on it, by provenance. Kept in `human_scripts` for
+        the action-level human executor (T-C2b).
+        COMPATIBILITY PATH, removed in T-C2b: HumanAgent still runs a list of
+        TaskInstances, planning each at its start, so a script written as tasks
+        only is handed to it as written; a script with a primitive or a
+        deviation cannot run before T-C2b and is refused here.
+        """
+        world = build_world_state(self)
+        planner = AdaptivePlanner(knowledge=self.knowledge)
+        self.human_scripts: Dict[str, list] = {}
+        for agent_cfg in scenario.agents:
+            if agent_cfg.agent_type != "human":
+                continue
+            where = f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}'"
+            try:
+                resolved = resolve_script(agent_cfg.scheduled_tasks or [], planner, world, agent_cfg.agent_id)
+                if agent_cfg.assigned_tasks:
+                    check_work_order(agent_cfg.agent_id, resolved, agent_cfg.assigned_tasks)
+            except ValueError as e:
+                raise ValueError(f"{where}: {e}") from e
+            if not all(isinstance(e, TaskInstance) for e in agent_cfg.scheduled_tasks or []):
+                raise ValueError(
+                    f"{where}: the script holds primitives or deviations, which the task-level "
+                    f"HumanAgent cannot run; the action-level human executor is T-C2b"
+                )
+            self.human_scripts[agent_cfg.agent_id] = resolved
 
     # =========================================================================
     # Public query methods
