@@ -86,7 +86,7 @@ after="pick_up")`.
 - Robot: item_7, item_6, item_4 (0, 34, 97); no hold. Stop off: [sep] minimum 22.8 cm (166), 135 ticks below 50 cm,
   at the table. Stop on: refused from 165 to the end (135, all `outside(no_projection)`), item_4 never delivered.
 - Completion: 169 stop off; none in 300 stop on.
-- Odd: the walk to the door is not read as `unknown` (the one live hypothesis and `unknown` stay near a tie).
+- Odd: the walk to the door is not read as `unknown`: the one live hypothesis keeps 0.58–0.61 against `unknown`.
 
 ## Across the six
 - The script mechanism held: every shape loaded, expanded and ran; the return in 2 came from sequential expansion.

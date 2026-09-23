@@ -69,6 +69,22 @@ condition its belief on situation, not only on walked path.
 - Viewer: T-E, not built.
 - Replay: not built; small once the event log exists.
 
+Run-time checks from the code after T-C2b (read-only, no build; T-C2c, 23 September 2026):
+- (a) The human's remaining primitive list can be modified by an outside caller: yes as is.
+  `HumanAgent.script` is a plain list read at `script_index` each time a primitive is reached, so
+  editing `script[script_index + 1:]` takes effect at the next boundary; `load_script()` replaces the
+  list but resets the index to 0, so an event path wants its own splice call, not `load_script()`.
+- (b) The current primitive can be cut mid-walk and the next `MoveTo` grounds from where the human
+  is: yes in mechanism, needs a small public `HumanAgent` method. Clearing is `executor.step(plan=None)`
+  plus `current_plan = None` and `_stay_remaining = None` (all exist; two are private); the next
+  primitive is grounded when reached and its STEP queue is expanded from `agent.pos` at that moment
+  (`Executor._expand_queue()` → `action_decomposer.expand(action, model, agent.pos)`).
+- (c) `expand()` against the live world for a task injected during the run: yes as is.
+  `expand(task, planner, world, agent_id)` takes any `WorldState`; `build_world_state(model)` is the
+  live one, so the method is chosen from what the human holds now (as sequential expansion does at
+  load). The event path should also run `check_script_bindings` on the injected content, which the
+  loader does for load-time scripts.
+
 ## 5. Cost, rough
 
 Moderate for the live-deviation demo: the queue, a few buttons on T-E's viewer, the export to a
