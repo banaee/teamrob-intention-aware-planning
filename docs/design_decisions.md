@@ -2872,6 +2872,7 @@ Reference: T-A1, September 2026; DESIGN-07; D2; the gate ruling; TODO-84
 **The human's scenario is an action script, run on the scenario layer (T-C, recorded in T-A1)**
 
 DECIDED IN DIRECTION (cchat, September 2026); its design is T-C1, its build T-C2. Nothing built.
+SUPERSEDED where they differ by "The human action script (T-C1, decided)" (23 September 2026).
 
 WHAT CHANGES. Today the human's scenario is a list of tasks, and the human executor loads each task's plan
 from the planner and runs it to completion. So the human can only behave as a robot task looks, and the
@@ -3470,3 +3471,66 @@ vocabulary, nothing free-form), every event is logged with its tick and argument
 exports its event log as a pre-loaded script that reproduces it from a fresh start. Live runs demonstrate;
 every evaluation number comes from pre-loaded scripts.
 Reference: docs/handoffs/phase7_interactive_deviations.md; T-C ("The human's scenario is an action script"); T-E
+
+---
+
+**The human action script (T-C1, decided)**
+
+DECIDED (cchat, Hadi, 23 September 2026). Nothing built; the build is T-C2. Supersedes "The human's scenario
+is an action script, run on the scenario layer" (T-A1) where the two differ: the primitive set (no separate
+`wait`; a stay is `Stay`), who writes a point-valued `MoveTo` (the exporter, never an author), the human
+executor (action-level, no longer loading a task's plan and running it to completion) and T-C2's check
+(identity up to the dropped per-task completion tick, not byte-identity). The boundary of the T-A1 entry
+stands: the script lives on the scenario layer, and the robot's mind receives nothing from it.
+
+THE EXECUTED FORM. At run time the human's `scheduled_tasks` is a flat list of primitives: `MoveTo`, `PickUp`,
+`Place`, `Stay`, each grounding to an existing action schema of the domain (in kitting `move_to`, `pick_up`,
+`place`, `wait_at`). A `TaskInstance` in the list is expanded at load by `expand(task)`: the planner's own
+decomposition of the task against the initial world (an optional `method=` selects the method), which records on
+each primitive the task it came from (provenance, set automatically). A primitive carries no intent label and
+the list carries no task-boundary marker. A coordinate-valued `MoveTo` is admitted by the executed form, for
+Phase 7's exporter; authors never write waypoints.
+
+THE AUTHOR VOCABULARY. Edits on the work order:
+- `interrupt(task, after=|before=, with_=[...])`: insert content inside a task, at an anchor.
+- `deviate(task, destination=)`: the task's carry goes to another destination.
+- `abandon(task, after=|before=, then=[...])`: the task stops at an anchor; optional content follows.
+- free `Stay(n)` (n omitted: until the run ends) and `MoveTo(landmark)`.
+Anchors name an action of the task by action name or by index. Injected content may mix `TaskInstance`s and
+primitives. In T-C every injection sits at an action boundary.
+
+LANDMARKS. A layout may declare symbolic places (`corner_NE`, `door`, `window`) as objects of a type of their
+own. No `TaskSchema` in any domain types a parameter as that type, and a domain that does is rejected at load;
+so no hypothesis binds a landmark and no robot action grounds to one. A landmark is a place for the human's
+script to go to, nothing more.
+
+THE WORK ORDER. `scheduled_tasks` must contain every assigned task exactly once, checked by provenance. The
+assigned tasks are expanded first, in the author's order; deviations are edits of that expansion. A task
+present in the script is not thereby completed: completion stays the world fact. A change of mind needs both
+tasks assigned (the one left and the one taken up). Today's task-list scenarios are the unedited case and pass
+unchanged. TODO-86 (AgentConfig's key equality) is closed by this: the correspondence between work order and
+script is compared by provenance, not by key equality, so a `deviate` to another table is an edit of an
+assigned task. TODO-87 (no boundary, pin or pool drop on a delivery to another table) stays open, for T-D.
+
+THE HUMAN EXECUTOR: ACTION-LEVEL. It runs the primitives one by one. It tracks no task, logs no task completion
+and spends no per-task completion tick; the human's body reports 0 for that tick to the projector. The robot's
+executor is unchanged. The robot's mind learns the human's task completions from the world (the terminal
+condition holds), as it does today.
+
+THE ROBOT'S MIND KEEPS NOTHING FROM THE SCRIPT. Provenance lives on the scenario layer; no primitive, label or
+marker reaches the recognizer or the meta-planner. The framework statement (Hadi): the framework shows how the
+robot reads and plans around the human; what the human produces is not the object. An abandoned delivery is in
+scope for what it does to the robot (retraction, `unknown`, re-planning), not for the human's output.
+
+RECORDED FOR T-D, not designed here: an observed history of the human's tasks in the robot's mind (completed,
+dropped, `unknown` episodes), for evaluation (TODO-92). The robot taking over an abandoned task is TODO-15.
+Not decided in T-C1 and left where they are: TODO-85 (a stationary human; half (b), the robot's action under
+`unknown`, with T-D) and TODO-88 (its own item).
+
+T-C2, THE BUILD: C2a the script layer (primitives, `expand`, the vocabulary, landmarks, the provenance check);
+C2b the human executor, action-level. Fixtures s00, s20, s70, s80, s83, prior on; the check is identity up to
+the dropped per-task completion tick; the baselines are regenerated once. Then two literal scenarios, an
+interrupt and a stay, one run each, observed and not judged. From here debugging runs use prior on only; off /
+on returns for the paper.
+Reference: T-C1, 23 September 2026; "The human's scenario is an action script" (T-A1); "A run-time deviation is
+the same operation as a load-time edit" (Phase 7); TODO-86, TODO-87, TODO-85, TODO-88, TODO-15, TODO-92
