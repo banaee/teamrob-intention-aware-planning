@@ -104,7 +104,11 @@ scenario_02 = ScenarioConfig(
             agent_type="human",
             start_position=(350, 200),
             scheduled_tasks=[
-                *abandon(TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}), after="pick_up", then=[TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")})]),
+                *abandon(
+                    TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                    after="pick_up",
+                    then=[TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")})],
+                ),
             ],
             assigned_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
@@ -139,7 +143,11 @@ scenario_03 = ScenarioConfig(
             agent_type="human",
             start_position=(350, 200),
             scheduled_tasks=[
-                *interrupt(TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}), after="pick_up", with_=[MoveTo("corner_NE"), Stay(30)]),
+                *interrupt(
+                    TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                    after="pick_up",
+                    with_=[MoveTo("corner_NE"), Stay(30)],
+                ),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
             ],
             assigned_tasks=[
@@ -302,9 +310,16 @@ scenario_12 = ScenarioConfig(
             agent_type="human",
             start_position=(-400, -300),
             scheduled_tasks=[
-                *interrupt(TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}), after="pick_up", with_=[TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")})]),
+                *interrupt(
+                    TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
+                    after="pick_up",
+                    with_=[TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")})],
+                ),
                 Stay(20),
-                *abandon(TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}), after="pick_up"),
+                *abandon(
+                    TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),
+                    after="pick_up",
+                ),
             ],
             assigned_tasks=[
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
@@ -888,7 +903,10 @@ scenario_84 = ScenarioConfig(
             agent_type="human",
             start_position=(-600, 400),
             scheduled_tasks=[
-                *abandon(TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}), before="pick_up"),
+                *abandon(
+                    TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
+                    before="pick_up",
+                ),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
             ],
             assigned_tasks=[
@@ -925,7 +943,10 @@ scenario_85 = ScenarioConfig(
             agent_type="human",
             start_position=(-600, 400),
             scheduled_tasks=[
-                *deviate(TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}), destination="kitting_table_1"),
+                *deviate(
+                    TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_0"), Var("?kitting_table"): Const("kitting_table_0")}),
+                    destination="kitting_table_1",
+                ),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_1")}),
             ],
             assigned_tasks=[
