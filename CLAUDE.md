@@ -215,10 +215,12 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
 `analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
-D3 regeneration (dd880be) of the four maintained sets below: `analysis/tb1a_destination/sweep/` (the five
-plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "D3"
+T-C2b regeneration (06093ee) of the four maintained sets below: `analysis/tb1a_destination/sweep/` (the five
+plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "T-C2b"
 section), `analysis/tb1b_two_tables/sweep/` (s80 / s81), `analysis/tb1c_realized_flip/sweep/` and
-`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They supersede the T-B Q7 regeneration, from
+`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They supersede the D3 regeneration (dd880be) by
+the human's dropped per-task completion tick (T-C2b: the human one tick earlier per task it completed, a hold
+one tick shorter where the human projection's end reaches it). The D3 set superseded the T-B Q7 regeneration, from
 which they differ in the removed `task_committed` decisions and the executor's reload bookkeeping alone, the
 world lines byte-identical. The T-B Q7 set superseded T-B2d's, which the body's completion ticks
 moved (T-B Q7: the robot spends one more tick per delivery, less where a hold carried it); T-B2d's had

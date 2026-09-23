@@ -192,3 +192,37 @@ longer exists. The script is not edited.
 | s83_plain_on | ebd19106e7a441b77fdc8de5973f91b3 |
 | s83_realized_off | 0a5a2bc13ab3c5705c9f767e84f8427a |
 | s83_realized_on | 7f3d9a97489fbfa4f2ae5825a771efd5 |
+
+## T-C2b (06093ee): the action-level human executor — the logs from here on
+
+Regenerated at 06093ee with the same command, superseding the table above. CAUSE: the human's per-task completion
+tick is dropped (`docs/design_decisions.md`, "The human action script (T-C1, decided)", AS BUILT T-C2b): its
+executor is action-level and spends no tick between two tasks, and the human projection no longer carries that tick
+(`HUMAN_TASK_COMPLETION_LATENCY` = 0). Against the previous logs every human line is identical once the human is
+one tick earlier per task it completed before that tick (`task=` now `None`; the `_on_task_complete: human_0`
+line and the human's `[planner]` lines are gone, one `[human] … primitive` line per primitive is new). Where the
+human projection's shorter end reaches a hold, the hold is one tick shorter — the ruling in the AS BUILT note, not a
+defect. Per log: the human's dropped ticks | first tick a world line (`[sep]`, `[IR] step=`, robot) differs |
+completion (world tick) old -> new | holds (start:planned) old -> new.
+
+| log | dropped | first diff | completion | holds old | holds new |
+|---|---|---|---|---|---|
+| s80_plain_off | 55, 174 | 55 | 224 -> 224 | - | - |
+| s80_plain_on | 55, 174 | 55 | 224 -> 224 | - | - |
+| s80_realized_off | 55, 174 | 55 | 224 -> 224 | - | - |
+| s80_realized_on | 55, 174 | 55 | 224 -> 224 | - | - |
+| s83_plain_off | 98, 223 | 98 | 224 -> 224 | - | - |
+| s83_plain_on | 98, 223 | 98 | 224 -> 224 | - | - |
+| s83_realized_off | 98, 223 | 98 | 226 -> 226 | - | 190:2 |
+| s83_realized_on | 98, 223 | 98 | 226 -> 226 | - | 190:2 |
+
+| log | md5 |
+|---|---|
+| s80_plain_off | f79cdae4584d13ac8124e37eb4bcfc64 |
+| s80_plain_on | 3dd3960ca84ac61c99490974d499db30 |
+| s80_realized_off | 5b7fb8a80b4bd906c2fffbf472d5f413 |
+| s80_realized_on | 452d508e29aac60c33228e20038e1fc8 |
+| s83_plain_off | e2493ddc29dae06681486b6714bf1678 |
+| s83_plain_on | 8e0d42f4c59676904a925f4516465b15 |
+| s83_realized_off | 2fc8cf8de5c4f9863ea28d7d522f6bde |
+| s83_realized_on | 730bfd280ce78befb0fed3301692b36a |

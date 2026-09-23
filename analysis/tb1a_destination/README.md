@@ -184,3 +184,53 @@ is unchanged.
 | s70_on | 8c24b8e30e4d5d69ed7681d63e171d88 |
 | s71_off | 04dc790078cc570fc3c35cdff02b7b86 |
 | s71_on | 1ae17d985f9a4cb92fefebc9d19e9187 |
+
+## T-C2b (06093ee): the action-level human executor — the logs from here on
+
+Regenerated at 06093ee with the same command, superseding the table above. CAUSE: the human's per-task completion
+tick is dropped (`docs/design_decisions.md`, "The human action script (T-C1, decided)", AS BUILT T-C2b): its
+executor is action-level and spends no tick between two tasks, and the human projection no longer carries that tick
+(`HUMAN_TASK_COMPLETION_LATENCY` = 0). Against the previous logs every human line is identical once the human is
+one tick earlier per task it completed before that tick (`task=` now `None`; the `_on_task_complete: human_0`
+line and the human's `[planner]` lines are gone, one `[human] … primitive` line per primitive is new). Where the
+human projection's shorter end reaches a hold, the hold is one tick shorter — the ruling in the AS BUILT note, not a
+defect. Per log: the human's dropped ticks | first tick a world line (`[sep]`, `[IR] step=`, robot) differs |
+completion (world tick) old -> new | holds (start:planned) old -> new.
+
+| log | dropped | first diff | completion | holds old | holds new |
+|---|---|---|---|---|---|
+| s00_off | 80, 144 | 80 | 169 -> 169 | - | - |
+| s00_on | 80, 144 | 80 | 169 -> 169 | - | - |
+| s10_off | 77, 156, 313, 367 | 77 | 422 -> 422 | - | - |
+| s10_on | 77, 156, 313, 367 | 77 | 422 -> 422 | - | - |
+| s20_off | 56, 124 | 27 | 237 -> 236 | 20:8 | 20:7 |
+| s20_on | 56, 124 | 18 | 237 -> 236 | 11:8 | 11:7 |
+| s30_off | 76, 123 | 33 | 161 -> 160 | 27:7 | 27:6 |
+| s30_on | 76, 123 | 29 | 161 -> 160 | 23:7 | 23:6 |
+| s40_off | 117, 186, 209, 230, 333 | 117 | 379 -> 379 | - | - |
+| s40_on | 117, 186, 209, 230, 333 | 117 | 379 -> 379 | - | - |
+| s50_off | 56, 124, 180 | 27 | 237 -> 236 | 20:8 | 20:7 |
+| s50_on | 56, 124, 180 | 18 | 237 -> 236 | 11:8 | 11:7 |
+| s70_off | 56, 97, 145 | 56 | 186 -> 185 | 61:1 | - |
+| s70_on | 56, 97, 145 | 56 | 186 -> 185 | 60:1 | - |
+| s71_off | 56, 97, 145 | 56 | 203 -> 203 | 23:32 | 23:31 |
+| s71_on | 56, 97, 145 | 56 | 203 -> 203 | 23:32 | 23:31 |
+
+| log | md5 |
+|---|---|
+| s00_off | 0a1373714b265d9bd74ffeba9345460b |
+| s00_on | 357c21b0d80dec9f0c2bddc382067bb0 |
+| s10_off | 59089a5b605f2182d3a474873cd155a4 |
+| s10_on | 90a6b95db50183ea16d4172aa087ee13 |
+| s20_off | e7b13670c6b384ad1113da38885c2746 |
+| s20_on | a43cfcaea0d171713e50c575d8edd8e0 |
+| s30_off | 7c5a7d40ab3c89394af3dc7ac74af624 |
+| s30_on | 5b9a8bbe87246849934fb4fad788593e |
+| s40_off | 98344452c657a8c5009d4c72b0aec5d4 |
+| s40_on | ab3875e49cdbc98129040b6de204ec03 |
+| s50_off | 3108b07ed64975872c9d867301841ddb |
+| s50_on | 98499f8f8bd224e9aeb55a79866142c5 |
+| s70_off | ba4ed101f2177b0ae037352d64b8f875 |
+| s70_on | cac5f1f9ce11892656a21b7e9960bde4 |
+| s71_off | 962f51ae814cdbdf71edd0546784cea8 |
+| s71_on | d47cc020e9d358ff2712e0a72db5bcca |

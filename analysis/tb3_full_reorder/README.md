@@ -114,3 +114,45 @@ HOLDS PLACED BY `task_committed` in the previous logs (their `[hold] … trigger
 | s83_full_reorder_on | 7f3d9a97489fbfa4f2ae5825a771efd5 |
 | s83_single_task_off | 00ed1992da92e01570d97bfcb6c3bf0f |
 | s83_single_task_on | 669c440dcc011d6c9d9bed5d02dd9e13 |
+
+## T-C2b (06093ee): the action-level human executor — the logs from here on
+
+Regenerated at 06093ee with the same command, superseding the table above. CAUSE: the human's per-task completion
+tick is dropped (`docs/design_decisions.md`, "The human action script (T-C1, decided)", AS BUILT T-C2b): its
+executor is action-level and spends no tick between two tasks, and the human projection no longer carries that tick
+(`HUMAN_TASK_COMPLETION_LATENCY` = 0). Against the previous logs every human line is identical once the human is
+one tick earlier per task it completed before that tick (`task=` now `None`; the `_on_task_complete: human_0`
+line and the human's `[planner]` lines are gone, one `[human] … primitive` line per primitive is new). Where the
+human projection's shorter end reaches a hold, the hold is one tick shorter — the ruling in the AS BUILT note, not a
+defect. Per log: the human's dropped ticks | first tick a world line (`[sep]`, `[IR] step=`, robot) differs |
+completion (world tick) old -> new | holds (start:planned) old -> new.
+
+| log | dropped | first diff | completion | holds old | holds new |
+|---|---|---|---|---|---|
+| s20_full_reorder_off | 56, 124 | 56 | 221 -> 221 | - | - |
+| s20_full_reorder_on | 56, 124 | 56 | 221 -> 221 | - | - |
+| s70_full_reorder_off | 56, 97, 145 | 56 | 186 -> 185 | 61:1 | - |
+| s70_full_reorder_on | 56, 97, 145 | 56 | 186 -> 185 | 60:1 | - |
+| s80_full_reorder_off | 55, 174 | 55 | 224 -> 224 | - | - |
+| s80_full_reorder_on | 55, 174 | 55 | 224 -> 224 | - | - |
+| s81_full_reorder_off | 72, 191 | 72 | 224 -> 224 | - | - |
+| s81_full_reorder_on | 72, 191 | 72 | 224 -> 224 | - | - |
+| s83_full_reorder_off | 98, 223 | 98 | 226 -> 226 | - | 190:2 |
+| s83_full_reorder_on | 98, 223 | 98 | 226 -> 226 | - | 190:2 |
+| s83_single_task_off | 98, 223 | 98 | 265 -> 265 | - | - |
+| s83_single_task_on | 98, 223 | 98 | 265 -> 265 | - | - |
+
+| log | md5 |
+|---|---|
+| s20_full_reorder_off | 190da00725e30e50955e4eb78ccd32f3 |
+| s20_full_reorder_on | 37a0c82c9fd83bcf2e904040e07026a7 |
+| s70_full_reorder_off | 7e08e1592e37715b0fea9725c649a12a |
+| s70_full_reorder_on | 93a48953330beacdbb0efcba54c4538c |
+| s80_full_reorder_off | 5b7fb8a80b4bd906c2fffbf472d5f413 |
+| s80_full_reorder_on | 452d508e29aac60c33228e20038e1fc8 |
+| s81_full_reorder_off | 47c131b72434a24837ed4d6536fe8922 |
+| s81_full_reorder_on | c377e23a84e31adf834e098fe3198056 |
+| s83_full_reorder_off | 2fc8cf8de5c4f9863ea28d7d522f6bde |
+| s83_full_reorder_on | 730bfd280ce78befb0fed3301692b36a |
+| s83_single_task_off | 3728b49a074a8cd630a43b539ac59a87 |
+| s83_single_task_on | 1a45e0d17e477f34ee25d00221a2bb1a |

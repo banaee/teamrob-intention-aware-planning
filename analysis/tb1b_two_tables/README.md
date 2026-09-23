@@ -206,3 +206,29 @@ HOLDS PLACED BY `task_committed` in the previous logs (their `[hold] … trigger
 | s80_on | 6b6227b77d4623160894f6443c38b9f1 |
 | s81_off | c24ce309cc4a1aef054111d8b34c3404 |
 | s81_on | 656847aceea194d6d4990f243dfab2be |
+
+## T-C2b (06093ee): the action-level human executor — the logs from here on
+
+Regenerated at 06093ee with the same command, superseding the table above. CAUSE: the human's per-task completion
+tick is dropped (`docs/design_decisions.md`, "The human action script (T-C1, decided)", AS BUILT T-C2b): its
+executor is action-level and spends no tick between two tasks, and the human projection no longer carries that tick
+(`HUMAN_TASK_COMPLETION_LATENCY` = 0). Against the previous logs every human line is identical once the human is
+one tick earlier per task it completed before that tick (`task=` now `None`; the `_on_task_complete: human_0`
+line and the human's `[planner]` lines are gone, one `[human] … primitive` line per primitive is new). Where the
+human projection's shorter end reaches a hold, the hold is one tick shorter — the ruling in the AS BUILT note, not a
+defect. Per log: the human's dropped ticks | first tick a world line (`[sep]`, `[IR] step=`, robot) differs |
+completion (world tick) old -> new | holds (start:planned) old -> new.
+
+| log | dropped | first diff | completion | holds old | holds new |
+|---|---|---|---|---|---|
+| s80_off | 55, 174 | 55 | 265 -> 265 | - | - |
+| s80_on | 55, 174 | 55 | 265 -> 265 | - | - |
+| s81_off | 72, 191 | 42 | 268 -> 267 | 40:3 | 40:2 |
+| s81_on | 72, 191 | 42 | 268 -> 267 | 40:3 | 40:2 |
+
+| log | md5 |
+|---|---|
+| s80_off | ff694fedefc908f409160547a8620659 |
+| s80_on | 7d0d540fbf873e48d79a26f8b8f7ca1d |
+| s81_off | 5687bdadecf377af8cd257f3a25bc53d |
+| s81_on | 9fb470e4e11fa6494e86314dfaf1986d |
