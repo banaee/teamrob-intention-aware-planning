@@ -90,9 +90,72 @@ after="pick_up")`.
 - Completion: 169 stop off; none in 300 stop on.
 - Odd: the walk to the door is not read as `unknown`: the one live hypothesis keeps 0.58–0.61 against `unknown`.
 
-## Across the six
+## Four more, on layouts the script had not touched (7–10)
+
+Same form: one run each, prior on, `single_task`, cost realized, gate none, stop off, 450 steps; `play.py 7` … `10`.
+env_layout9 (tables against the walls, base s90) gained the five landmarks of env_layout0 for 9: corners 50 cm in
+from both walls (±950, ±450), the door 20 cm inside the south wall (0, -480). scenario_90 is byte-identical with
+and without them. The coffee-break shape runs on env_layout4 (base s40): its human has two assigned deliveries,
+s70's on env_layout7 has one. No script failed to load, no primitive failed at run time.
+
+### 7. Change of mind before the pick-up, tables at the walls (scenario_91, env_layout9)
+`abandon(deliver(item_3), before="pick_up")`, `deliver(item_2)`.
+- Human: walks to item_3 (0–77), turns, walks back to item_2 (78), picks it up (159), places it on kitting_table_0
+  (182), stands there.
+- Belief: `deliver_item(item_3)` leads to 91 (gate at 37); `unknown` 92–181 at 0.994, `deliver_item(item_2)` never
+  recovers; after 182 the abandoned item_3 at 0.497. recognition_changed: 37, 92.
+- Robot: item_5, item_4, item_6, item_1 (0, 79, 139, 245); no hold. [sep] minimum 30.2 cm (240), 8 ticks below 50 cm:
+  its item_6 delivery at kitting_table_0, where the human stands.
+- Completion: 365.
+- Odd: as 1: the change of mind is not recognised.
+
+### 8. Wrong destination, tables at the walls (scenario_92, env_layout9)
+`deviate(deliver(item_2), destination=kitting_table_1)`, `deliver(item_3)`.
+- Human: item_2 picked (9), carried the length of the room to kitting_table_1 (94), item_3 picked (142), placed on
+  kitting_table_1 (189), stands there.
+- Belief: `deliver_item(item_2)` leads to 40 (gate at 5); `unknown` 41–188; no pin at 94 (TODO-87); after item_3's
+  pin at 189 `deliver_item(item_2)` leads again (item_2 lies on the wrong table). recognition_changed: 5, 41, 190.
+- Robot: item_5, item_4, item_6, item_1 (0, 79, 139, 245); from 190 it plans against a projected human carrying item_2
+  back (T_h 72.1), who stands; no hold. [sep] minimum 39.7 cm (362), 88 ticks below 50 cm, its last delivery at
+  kitting_table_1 where the human stands.
+- Completion: 365.
+- Odd: as 3.
+
+### 9. Landmark walk and stay mid-carry, tables at the walls (scenario_93, env_layout9)
+`interrupt(deliver(item_2), after="pick_up", with_=[MoveTo(corner_NE), Stay(30)])`, `deliver(item_3)`.
+- Human: item_2 picked (9), carried to corner_NE across the room (11–104), stands 30 (105–134), carries it back to
+  kitting_table_0 (206), then item_3 to kitting_table_1 (315), stands there.
+- Belief: `deliver_item(item_2)` leads to 47 (gate at 5); `unknown` 48–205, through the stay and the whole carry back
+  (item_2 never recovers); after 206 `deliver_item(item_3)` (gate at 236); after 315 `unknown` 0.994 (hypothesis
+  space exhausted). recognition_changed: 5, 48, 236, 315.
+- Robot: item_5, item_4, item_6, item_1 (0, 79, 139, 245); no hold. [sep] minimum 33.2 cm (362), 88 ticks below 50 cm,
+  at kitting_table_1.
+- Completion: 365.
+- Odd: unlike 4, the delivery is not recognised again when the human carries the item back: on this layout the detour
+  is long enough that the evidence against it is not recovered before the release.
+
+### 10. Coffee break, stay at the table, abandon after pick-up (scenario_41, env_layout4)
+`interrupt(deliver(item_3), after="pick_up", with_=[coffee_break])`, `Stay(20)`, `abandon(deliver(item_6),
+after="pick_up")`.
+- Human: item_3 picked (60), carried to the coffee machine (62–107), waits (108–137), delivers item_3 (176), stands at
+  the table 178–197, picks up item_6 (255) and stands there holding it to the end.
+- Belief: `deliver_item(item_3)` leads (0.982 at the pick-up); on the walk to the machine it falls (0.811 at 100,
+  0.539 at 130) and `unknown` rises (0.453 at 130); `coffee_break` stays at or below 0.001 from the pick-up on (0.076
+  at 20). The coffee break's pin at 137 ends the episode (TODO-93); `deliver_item(item_3)` leads again and is pinned
+  at 176; `deliver_item(item_6)` from 201, 0.982 frozen while the human holds it. recognition_changed: 30, 137, 170,
+  176, 233.
+- Robot: item_4, item_7, item_5 (0, 148, 247); no hold. [sep] minimum 177.6 cm: the robot never comes near.
+- Completion: 379.
+- Odd: `coffee_break` does not rise on the walk to the machine, unlike scenario_11 (0.345): the walk to item_3 had
+  already refuted it, and nothing resets it before the detour.
+
+## Across the ten
 - The script mechanism held: every shape loaded, expanded and ran; the return in 2 came from sequential expansion.
 - A change of mind is not re-recognised (1, 2): the evidence the first walk laid against the second task persists
   with no boundary between them, so the robot sees `unknown` until the second task's release.
 - The human's end-of-script stand at the table is the recurring proximity case, and with the stop on it deadlocks
   (2, 6, as scenario_01): the terminal stay of TODO-80.
+- 7–10 add the same pattern from another side: evidence a walk lays against a hypothesis is not recovered without a
+  boundary, so a change of mind (7), a long detour (9) and a foreseeable task after an unrelated walk (10) read as
+  `unknown` rather than as the task the human is doing. Stop-on runs were not repeated for 7–9 (the human's terminal
+  stand at a table the robot delivers to, as in 2 and 6).

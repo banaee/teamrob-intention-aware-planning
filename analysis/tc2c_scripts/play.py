@@ -1,4 +1,4 @@
-"""analysis/tc2c_scripts/play.py <n> [run_mesa flags...] — T-C2c play: runs play scenario n (1-6) of play.md.
+"""analysis/tc2c_scripts/play.py <n> [run_mesa flags...] — T-C2c play: runs play scenario n (1-10) of play.md.
 
 The six scripts are registered script examples in domains/kitting/scenarios.py (not measured fixtures); this only
 maps play.md's numbering to them and calls the normal headless runner. Run from the repo root, e.g.
@@ -18,6 +18,10 @@ PLAY = {
     "4": ("env_layout0", "scenario_03"),   # landmark walk and stay mid-carry
     "5": ("env_layout1", "scenario_12"),   # coffee break, stay at the table, abandon after pick-up
     "6": ("env_layout0", "scenario_04"),   # free actions, then the one delivery
+    "7": ("env_layout9", "scenario_91"),   # change of mind before the pick-up, tables at the walls
+    "8": ("env_layout9", "scenario_92"),   # wrong destination, tables at the walls
+    "9": ("env_layout9", "scenario_93"),   # landmark walk and stay mid-carry, tables at the walls
+    "10": ("env_layout4", "scenario_41"),  # coffee break, stay at the table, abandon after pick-up
 }
 
 layout, scenario = PLAY[sys.argv[1]]
