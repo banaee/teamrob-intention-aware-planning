@@ -29,7 +29,7 @@ from typing import Dict, List, Optional, Tuple
 
 from shared.domain_knowledge import DomainKnowledgeBase
 from shared.planner import AdaptivePlanner
-from shared.types import (ScenarioConfig, TaskInstance, check_task_bindings, check_task_destinations,
+from shared.types import (ScenarioConfig, check_task_bindings, check_task_destinations,
                           check_no_landmark_parameters, check_work_order)
 from domains.script import check_script_bindings, resolve_script
 # from domains.kitting.registry import register_kitting_domain
@@ -299,7 +299,8 @@ class SimModel(model.Model):
     def _spawn_agents(self, scenario: ScenarioConfig):
         """
         Spawn agents from ScenarioConfig.
-        HumanAgent receives its scheduled_tasks as script — its execution order.
+        HumanAgent receives its scheduled_tasks, resolved into primitives, as
+        its script — its execution order (_resolve_human_scripts()).
         RobotAgent receives its assigned_tasks as its task pool, plus (when the
         assignment_prior switch is on) the observed human's assigned_tasks: the
         work order, never the script.
@@ -336,11 +337,12 @@ class SimModel(model.Model):
             start_pos = agent_cfg.start_position
 
             if agent_cfg.agent_type == "human":
+                # Its script is resolved once every agent is placed
+                # (_resolve_human_scripts(), below): expansion needs the initial world.
                 agent = HumanAgent(
                     unique_id=agent_cfg.agent_id,
                     model=self,
                     pos=start_pos,
-                    script=agent_cfg.scheduled_tasks,  # List[TaskInstance]
                 )
                 self.space.place_agent(agent, start_pos)
                 self.schedule.add(agent)
@@ -378,19 +380,15 @@ class SimModel(model.Model):
 
     def _resolve_human_scripts(self, scenario: ScenarioConfig):
         """
-        Each human's script resolved against the initial world (T-C1, T-C2a):
-        every TaskInstance expanded by the planner's decomposition, every
-        deviation applied, so the executed form is primitives only; the work
-        order checked again on it, by provenance. Kept in `human_scripts` for
-        the action-level human executor (T-C2b).
-        COMPATIBILITY PATH, removed in T-C2b: HumanAgent still runs a list of
-        TaskInstances, planning each at its start, so a script written as tasks
-        only is handed to it as written; a script with a primitive or a
-        deviation cannot run before T-C2b and is refused here.
+        Each human's script resolved from the initial world (T-C1, T-C2a):
+        every TaskInstance expanded by the planner's decomposition, each against
+        the state the elements before it leave behind (T-C2b), every deviation
+        applied, so the executed form is primitives only; the work order checked
+        again on it, by provenance. Handed to the HumanAgent, whose executor is
+        action-level (T-C2b); every human runs through it.
         """
         world = build_world_state(self)
         planner = AdaptivePlanner(knowledge=self.knowledge)
-        self.human_scripts: Dict[str, list] = {}
         for agent_cfg in scenario.agents:
             if agent_cfg.agent_type != "human":
                 continue
@@ -401,12 +399,7 @@ class SimModel(model.Model):
                     check_work_order(agent_cfg.agent_id, resolved, agent_cfg.assigned_tasks)
             except ValueError as e:
                 raise ValueError(f"{where}: {e}") from e
-            if not all(isinstance(e, TaskInstance) for e in agent_cfg.scheduled_tasks or []):
-                raise ValueError(
-                    f"{where}: the script holds primitives or deviations, which the task-level "
-                    f"HumanAgent cannot run; the action-level human executor is T-C2b"
-                )
-            self.human_scripts[agent_cfg.agent_id] = resolved
+            self.humans[agent_cfg.agent_id].load_script(resolved)
 
     # =========================================================================
     # Public query methods

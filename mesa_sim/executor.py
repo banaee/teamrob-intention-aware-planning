@@ -47,9 +47,11 @@ WHAT THIS MODULE DOES:
           decided hold, never advances the plan, and decides nothing about
           whether to wait for planning reasons or which task to run.
 
-    For HumanAgent:
-        - Same structure, but driven by script entries instead of AbstractPlan
-        - Script entry is converted to a minimal GroundedAction plan internally
+    For HumanAgent (action-level, T-C2b):
+        - The same loop, handed one primitive of the human's script at a time as
+          a one-action plan (mesa_sim/sim_agents.HumanAgent). The agent hands it
+          no plan before the next primitive, so _on_task_complete() is never
+          reached for the human and no per-task completion tick is spent
 
 WHAT THIS MODULE DOES NOT DO:
     - Does NOT do planning or replanning — that is shared/planner.py
@@ -102,11 +104,12 @@ ACTION_COMPLETION_LATENCY = 1.0
 # the tick on which step() finds action_index past the plan's end, calls
 # _on_task_complete() (which advances the agent's script or clears its task)
 # and returns. The next tick loads the next plan and executes its first
-# microaction in the same call. Both agents pay it — the human through
-# advance_script(), the robot through advance_task() and the no_current_task
-# trigger on the following tick. Handed to the Projector as a per-task
-# stationary segment at the end of every projected task (F1; the L2 report
-# left it unmodelled). Not a tunable: change step()'s structure and this
+# microaction in the same call. The robot pays it, through advance_task() and
+# the no_current_task trigger on the following tick; the human does not (its
+# executor is action-level, T-C2b: HUMAN_TASK_COMPLETION_LATENCY = 0 in
+# mesa_sim/sim_agents.py). Handed to the Projector as a per-task stationary
+# segment at the end of every projected robot task (F1; the L2 report left it
+# unmodelled). Not a tunable: change step()'s structure and this
 # changes with it.
 TASK_COMPLETION_LATENCY = 1.0
 

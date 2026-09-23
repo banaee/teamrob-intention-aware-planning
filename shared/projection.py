@@ -46,13 +46,14 @@ WHAT THIS MODULE DOES NOT DO:
 """
 
 from dataclasses import replace
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple
 
 from shared.types import (
     BeliefState,
     WorldState,
     TaskInstance,
     AbstractPlan,
+    GroundedAction,
     ProjectedPlan,
     ProjectedPlanEntry,
     Segment,
@@ -83,6 +84,7 @@ class Projector:
         arrival_radius: float = 0.0,
         action_completion_latency: float = 0.0,
         task_completion_latency: float = 0.0,
+        observed_task_completion_latency: float = 0.0,
         observation_offset: float = 0.0,
         duration_to_steps: Optional[Callable[[str], float]] = None,
     ):
@@ -137,10 +139,18 @@ class Projector:
                               tick, the step its executor spends in
                               _on_task_complete() — mesa_sim/executor.TASK_COMPLETION_LATENCY;
                               ROS its own). The 0.0 default is a unit-less placeholder,
-                              not a value shared/ knows to be right. Applies to robot
-                              candidates and the human's projection alike, since the
-                              same executor runs both (F1). See design_decisions.md,
-                              "Robot-responsible separation" (the completion tick).
+                              not a value shared/ knows to be right. Applies to this
+                              agent's own projections (the robot's candidates). See
+                              design_decisions.md, "Robot-responsible separation" (the
+                              completion tick).
+        observed_task_completion_latency:
+                              the same, for the OBSERVED agent's body: charged per task
+                              of the human's projection (project_human()). Each body
+                              states its own (T-C2b): the human's executor is
+                              action-level, tracks no task and spends no per-task tick,
+                              so Mesa's human reports 0 (mesa_sim/sim_agents.py). Its
+                              per-action acknowledgement is the same executor's, and
+                              action_completion_latency applies to both.
         observation_offset:   execution steps between this agent's own "now" — the
                               start of a projection, step 0 — and the time the
                               OBSERVED agent's state was true. project_human() starts
@@ -186,6 +196,7 @@ class Projector:
         self._arrival_radius = arrival_radius
         self._action_completion_latency = action_completion_latency
         self._task_completion_latency = task_completion_latency
+        self._observed_task_completion_latency = observed_task_completion_latency
         self._observation_offset = observation_offset
         self._duration_to_steps = duration_to_steps
 
@@ -206,10 +217,13 @@ class Projector:
         agent_id: str,
         belief: BeliefState,
         start_step: float = 0.0,
+        task_completion_latency: Optional[float] = None,
     ) -> ProjectedPlan:
         """
         Builds a ProjectedPlan for `ordering`: one entry per task, in the
-        ordering's order.
+        ordering's order. `task_completion_latency` is the projected agent's
+        body's per-task tick; omitted, this agent's own (project_human() passes
+        the observed agent's).
 
         The first entry is decomposed via planner.plan() against the WorldState
         the caller passes — the live one — so a partially-executed task is
@@ -222,7 +236,7 @@ class Projector:
         Entry k+1 (len(ordering) > 1 — MetaPlanner's "full_reorder", T-B2a)
         follows from entry k: it starts at the step and the position entry k's
         last segment ends at, and is decomposed against the SUCCESSOR STATE of
-        entry k (_successor_state()) — the world as entry k's actions declare
+        entry k (successor_state()) — the world as entry k's actions declare
         they leave it. That is what a later entry reads: the start position
         (build_segments(): world.agent_positions), the predicates guards match,
         and where objects are (target_resolution). Without it a fact the
@@ -242,6 +256,8 @@ class Projector:
         Agent-agnostic: the same call projects a robot candidate or the human's
         predicted task (see project_human()).
         """
+        if task_completion_latency is None:
+            task_completion_latency = self._task_completion_latency
         task_queue: List[str] = []
         entries: List[ProjectedPlanEntry] = []
         entry_start = start_step
@@ -261,9 +277,9 @@ class Projector:
             # What the body spends completing the task (F1): a stationary stretch at
             # the position the task ended at, once per task — a task-level cost, not per action,
             # so it is placed here and not in build_segments(). Omitted at 0.0.
-            if segments and self._task_completion_latency > 0.0:
+            if segments and task_completion_latency > 0.0:
                 segments.append(stationary_segment(
-                    segments[-1].end_pos, segments[-1].end_step, self._task_completion_latency
+                    segments[-1].end_pos, segments[-1].end_step, task_completion_latency
                 ))
             entry_end = segments[-1].end_step if segments else entry_start
             duration = int(round(entry_end - entry_start))
@@ -280,79 +296,13 @@ class Projector:
             # value; the caller's WorldState is not touched.
             if index + 1 < len(ordering):
                 end_pos = segments[-1].end_pos if segments else world.agent_positions.get(agent_id)
-                world = self._successor_state(world, abstract_plan, agent_id, end_pos)
+                world = successor_state(world, abstract_plan.actions, agent_id, end_pos)
             entry_start = entry_end
 
         return ProjectedPlan(
             task_queue=task_queue,
             entries=entries,
             total_estimated_cost=int(round(entry_start - start_step)),
-        )
-
-    def _successor_state(
-        self,
-        world: WorldState,
-        plan: AbstractPlan,
-        agent_id: str,
-        end_pos: Optional[Tuple[float, float]],
-    ) -> WorldState:
-        """
-        The WorldState `plan`'s actions declare they leave behind, as a NEW
-        value: `world` is read and never written, and every container that
-        differs is a copy. Hypothetical — nothing has been executed; it lives
-        between two entries of one project() call and no longer.
-
-        Derived from the action schemas only, action by action in plan order,
-        with each grounded action's own bindings — no predicate, parameter or
-        task name appears here:
-          - ActionSchema.retracts: the grounded fact is no longer true;
-          - ActionSchema.effects:  the grounded fact is true (retract first,
-            then add, so an action may replace a fact);
-          - moved_object_key / moved_to_key: the moved object is where the
-            action put it — object_locations names the agent or object it is
-            now at, and object_positions follows, read at the END of the plan
-            (an object an agent still holds is where the agent ends).
-        The agent's own position is geometry, not a schema fact: `end_pos`, the
-        end of the entry's last segment.
-
-        What it does NOT carry, because no schema declares it: anything the
-        body's world-state builder derives and no action states (zones, a fact
-        a later action of another kind ends), and the observed agent's own
-        projected effects — the limitation a single task has too. The part of
-        TODO-07 projection needs; the planner's forward chaining and
-        precondition checking are not this.
-        """
-        predicates = set(world.predicates)
-        object_locations = dict(world.object_locations)
-        object_positions = dict(world.object_positions)
-        agent_positions = dict(world.agent_positions)
-        if end_pos is not None:
-            agent_positions[agent_id] = end_pos
-
-        moved: List[str] = []
-        for action in plan.actions:
-            schema = action.schema
-            for condition in schema.retracts:
-                predicates.discard(condition.to_predicate(action.bindings))
-            for condition in schema.effects:
-                predicates.add(condition.to_predicate(action.bindings))
-            if schema.moved_object_key is not None:
-                obj_id = action.bindings[schema.moved_object_key]
-                object_locations[obj_id] = action.bindings[schema.moved_to_key]
-                moved.append(obj_id)
-
-        for obj_id in moved:
-            place_id = object_locations[obj_id]
-            position = agent_positions.get(place_id, object_positions.get(place_id))
-            if position is not None:
-                object_positions[obj_id] = position
-
-        return replace(
-            world,
-            agent_positions=agent_positions,
-            object_locations=object_locations,
-            object_positions=object_positions,
-            predicates=predicates,
         )
 
     def project_human(
@@ -406,6 +356,7 @@ class Projector:
         return self.project(
             [human_task], world, human_agent_id, belief,
             start_step=self._observation_offset,
+            task_completion_latency=self._observed_task_completion_latency,
         )
 
     def build_segments(
@@ -541,3 +492,73 @@ class Projector:
         if not segments:
             return 0
         return int(round(segments[-1].end_step - segments[0].start_step))
+
+
+def successor_state(
+    world: WorldState,
+    actions: Sequence[GroundedAction],
+    agent_id: str,
+    end_pos: Optional[Tuple[float, float]],
+) -> WorldState:
+    """
+    The WorldState `actions` declare they leave behind, as a NEW
+    value: `world` is read and never written, and every container that
+    differs is a copy. Hypothetical — nothing has been executed. Two readers:
+    Projector.project(), between two entries of one call and no longer (T-B2a);
+    and the human action script's resolution at load (domains/script.py,
+    resolve_script(), T-C2b), each task expanded against the state the
+    elements before it leave behind. A module function so that both read one
+    successor state, not two.
+
+    Derived from the action schemas only, action by action in plan order,
+    with each grounded action's own bindings — no predicate, parameter or
+    task name appears here:
+      - ActionSchema.retracts: the grounded fact is no longer true;
+      - ActionSchema.effects:  the grounded fact is true (retract first,
+        then add, so an action may replace a fact);
+      - moved_object_key / moved_to_key: the moved object is where the
+        action put it — object_locations names the agent or object it is
+        now at, and object_positions follows, read at the END of the plan
+        (an object an agent still holds is where the agent ends).
+    The agent's own position is geometry, not a schema fact: `end_pos`, the
+    end of the entry's last segment (None: left where it is).
+
+    What it does NOT carry, because no schema declares it: anything the
+    body's world-state builder derives and no action states (zones, a fact
+    a later action of another kind ends), and the observed agent's own
+    projected effects — the limitation a single task has too. The part of
+    TODO-07 projection needs; the planner's forward chaining and
+    precondition checking are not this.
+    """
+    predicates = set(world.predicates)
+    object_locations = dict(world.object_locations)
+    object_positions = dict(world.object_positions)
+    agent_positions = dict(world.agent_positions)
+    if end_pos is not None:
+        agent_positions[agent_id] = end_pos
+
+    moved: List[str] = []
+    for action in actions:
+        schema = action.schema
+        for condition in schema.retracts:
+            predicates.discard(condition.to_predicate(action.bindings))
+        for condition in schema.effects:
+            predicates.add(condition.to_predicate(action.bindings))
+        if schema.moved_object_key is not None:
+            obj_id = action.bindings[schema.moved_object_key]
+            object_locations[obj_id] = action.bindings[schema.moved_to_key]
+            moved.append(obj_id)
+
+    for obj_id in moved:
+        place_id = object_locations[obj_id]
+        position = agent_positions.get(place_id, object_positions.get(place_id))
+        if position is not None:
+            object_positions[obj_id] = position
+
+    return replace(
+        world,
+        agent_positions=agent_positions,
+        object_locations=object_locations,
+        object_positions=object_positions,
+        predicates=predicates,
+    )

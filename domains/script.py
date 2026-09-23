@@ -4,10 +4,14 @@ The human action script, scenario layer (T-C1, built in T-C2a). Domain-generic.
 
 A human's scheduled_tasks is written as a flat list of primitives, TaskInstances
 and deviations (interrupt / deviate / abandon), in any mix. At load it is
-resolved against the initial world into primitives only: every TaskInstance is
-expanded by the planner's own decomposition (expand), every deviation is applied
-to its task's expansion by the list helpers below. The robot's mind receives
-nothing from any of it.
+resolved into primitives only: every TaskInstance is expanded by the planner's
+own decomposition (expand), every deviation is applied to its task's expansion by
+the list helpers below. Expansion is SEQUENTIAL (T-C2b): each task is expanded
+against the symbolic state the elements before it leave behind, the initial world
+advanced by what their action schemas declare (shared/projection.py,
+successor_state(), the successor state the robot's orderings are projected
+through), so the script is what the executor would have decided at run time and
+is fully known at load. The robot's mind receives nothing from any of it.
 
 Where a world is needed: expand() and resolve_script() take the world, so they
 run only where one exists (the loader, tests, a later scenario generator). The
@@ -23,6 +27,8 @@ beside AgentConfig, whose work-order check reads provenance.
 
 from typing import Dict, List, Optional, Sequence, Union
 
+from shared.projection import successor_state
+from shared.target_resolution import movement_target_position
 from shared.types import (
     ConditionSchema, Const, Deviation, GroundedAction, Provenance, ScriptAction, Stay,
     TaskInstance, Var, WorldState, check_task_bindings, destination_derivations,
@@ -186,31 +192,62 @@ def deviation_destination(dev: Deviation, world: WorldState):
 def resolve_script(elements: Sequence, planner, world: WorldState, agent_id: str) -> List[Union[ScriptAction, Stay]]:
     """
     The executed form of a script: TaskInstances expanded, deviations applied,
-    primitives kept, in order. Content injected by a deviation is resolved first,
-    so it may mix tasks and primitives.
+    primitives kept, in order. Sequential (T-C2b): each element is resolved
+    against `world` advanced by every element before it (after()), so a task
+    that follows a change of mind is expanded with the return the planner would
+    choose at run time. Content injected by a deviation is resolved first, at
+    its anchor, so it may mix tasks and primitives.
     """
     out: List[Union[ScriptAction, Stay]] = []
     for e in elements:
         if isinstance(e, TaskInstance):
-            out.extend(expand(e, planner, world, agent_id))
+            resolved = expand(e, planner, world, agent_id)
         elif isinstance(e, (ScriptAction, Stay)):
-            out.append(e)
+            resolved = [e]
         elif isinstance(e, Deviation):
-            out.extend(_apply(e, planner, world, agent_id))
+            resolved = _apply(e, planner, world, agent_id)
         else:
             raise TypeError(f"script element {e!r}: not a primitive, a TaskInstance or a deviation")
+        out.extend(resolved)
+        world = after(resolved, world, agent_id, planner.knowledge)
     return out
 
 
+def after(elements: Sequence, world: WorldState, agent_id: str, knowledge) -> WorldState:
+    """
+    The symbolic state `elements` (primitives) leave `world` in, for `agent_id`:
+    each ScriptAction grounded and handed to successor_state(), the one the
+    projection of an ordering uses, so the script's state and the robot's
+    projected state are one derivation; the agent stands at the target of its
+    last walk. A Stay changes nothing. A new value; `world` is not written.
+    """
+    actions = [ground(e, agent_id, knowledge) for e in elements if isinstance(e, ScriptAction)]
+    end_pos = None
+    for action in actions:
+        if action.schema.movement_target_key is not None:
+            end_pos = movement_target_position(action, world) or end_pos
+    return successor_state(world, actions, agent_id, end_pos) if actions else world
+
+
 def _apply(dev: Deviation, planner, world: WorldState, agent_id: str) -> list:
+    """
+    A deviation applied to its task's expansion against `world`; injected
+    content is resolved against the state the expansion's part before the
+    anchor leaves behind (after the truncated part, for `abandon`).
+    """
     base = expand(dev.task, planner, world, agent_id)
-    content = resolve_script(dev.content, planner, world, agent_id)
+    knowledge = planner.knowledge
     if dev.kind == "interrupt":
+        i = anchor_index(base, dev.after if dev.after is not None else dev.before)
+        prefix = base[:i + 1] if dev.after is not None else base[:i]
+        content = resolve_script(dev.content, planner, after(prefix, world, agent_id, knowledge), agent_id)
         if dev.after is not None:
             return insert_after(base, dev.after, content)
         return insert_before(base, dev.before, content)
     if dev.kind == "abandon":
-        return truncate(base, after=dev.after, before=dev.before) + content
+        kept = truncate(base, after=dev.after, before=dev.before)
+        content = resolve_script(dev.content, planner, after(kept, world, agent_id, knowledge), agent_id)
+        return kept + content
     if dev.kind == "deviate":
         _, old = deviation_destination(dev, world)
         return retarget(base, old, dev.destination)

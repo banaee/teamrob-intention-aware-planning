@@ -6,8 +6,8 @@ PURPOSE:
     Bridges the Mesa simulation loop with the shared cognitive layer.
 
 AGENTS:
-    HumanAgent  — scripted agent, executes a fixed TaskInstance sequence.
-                  Provides ground truth for IR evaluation.
+    HumanAgent  — scripted agent, action-level (T-C2b): runs the resolved
+                  list of primitives of its script one by one. Tracks no task.
                   Robot has no access to this script.
 
     RobotAgent  — cognitive agent. Each step:
@@ -35,7 +35,8 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothes
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
-from shared.types import AbstractPlan, BeliefState, ExecutorState, TaskInstance, task_instance_key
+from shared.types import AbstractPlan, BeliefState, ExecutorState, Stay, TaskInstance, task_instance_key
+from domains.script import ground
 
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
@@ -56,6 +57,15 @@ if TYPE_CHECKING:
 # projection, not at step 0 — the same fact RobotAgent.observe_initial() exists
 # for. Handed to the Projector so the two projections share a clock (L2).
 OBSERVATION_OFFSET = 1.0
+
+# Mesa ticks the HUMAN's body spends completing a task: none. Its executor is
+# action-level (HumanAgent, T-C2b): it runs primitives, knows no task, and
+# hands the next primitive to the Executor on the tick after the last one's
+# acknowledgement, so no tick is spent between the end of one task and the
+# start of the next. Handed to the robot's Projector for the human's projection
+# beside the robot's own TASK_COMPLETION_LATENCY; the per-action
+# acknowledgement (ACTION_COMPLETION_LATENCY) is the same executor's for both.
+HUMAN_TASK_COMPLETION_LATENCY = 0.0
 
 
 # =============================================================================
@@ -82,94 +92,78 @@ class FactoryAgent(agent.Agent):
 
 class HumanAgent(FactoryAgent):
     """
-    Scripted human worker. Executes a fixed List[TaskInstance] sequence.
-    Robot has no reference to this script.
+    Scripted human worker, action-level (T-C1, built in T-C2b). Holds the
+    resolved list of primitives of its script (domains/script.resolve_script(),
+    set by SimModel once the initial world exists). A ScriptAction is grounded
+    when it is reached — schema, bindings, completion predicate; its target
+    position is resolved by the executor at that moment, so an item the robot
+    has already taken is not there — and handed to the same Executor as a
+    one-action plan. Stay(n) idles n ticks, Stay() idles to the end of the run,
+    an empty list stands. No task, no task completion, no per-task completion
+    tick: the next primitive starts on the tick after the last one's
+    acknowledgement. Robot has no reference to this script.
     """
 
-    def __init__(self, unique_id: str, model: "SimModel",
-                 pos: tuple, script: List[TaskInstance]):
+    def __init__(self, unique_id: str, model: "SimModel", pos: tuple):
         super().__init__(unique_id, model, pos)
 
-        self.script: List[TaskInstance] = script
+        self.script: List = []                   # ScriptAction | Stay, resolved at load
         self.script_index: int = 0
-        self.finished: bool = False
-
-        self.planner = AdaptivePlanner(knowledge=model.knowledge)
-        self.current_plan: Optional[AbstractPlan] = None
+        self.current_plan: Optional[AbstractPlan] = None   # the primitive in hand, as a one-action plan
+        self._stay_remaining: Optional[int] = None         # ticks left of the Stay in hand (-1: Stay()); None: no Stay
 
         self.executor = Executor(agent=self)
 
+    def load_script(self, primitives: List):
+        """The resolved script (SimModel._resolve_human_scripts()), before step 0."""
+        self.script = list(primitives)
+        self.script_index = 0
 
     def step(self):
-        if self.finished:
-            return
-
-        task_instance = self.get_current_task_instance()
-        if task_instance is None:
-            self.finished = True
-            self.current_task = None
-            return
-
         world = build_world_state(self.model)
-        
 
-        # Build plan once per task — reuse until advance_script() clears it: 
-        # for human agent, the plan is scripted and unaffected by belief updates, so no replanning logic needed.
-        if self.current_plan is None:
-            self.current_plan = self._task_instance_to_plan(task_instance, world)
-            # Action names and bindings only: the plan's repr carries every action's
-            # schema, so a new schema field would change this line (TODO-82).
-            actions = ", ".join(f"{a.action_name}{a.bindings}" for a in self.current_plan.actions)
-            logging.info(f"[planner] self.current_plan for {task_instance.schema.name}: [{actions}]")
+        # The primitive in hand is done once its action is acknowledged: the
+        # executor's cursor is past the plan's one action. Handing the executor
+        # no plan clears it, so the next primitive loads from a clean executor
+        # and owes nothing (the per-task completion tick is the robot's).
+        if self.current_plan is not None and self.executor.action_index >= len(self.current_plan.actions):
+            self.current_plan = None
+            self.executor.step(plan=None, world=world)
+            self.script_index += 1
 
-        self._execute(plan=self.current_plan, world=world)
-        
+        while self.current_plan is None and self._stay_remaining is None:
+            if self.script_index >= len(self.script):
+                self._idle()
+                return
+            element = self.script[self.script_index]
+            logging.info(f"[human] step={int(self.model.schedule.steps)} {self.unique_id} "
+                         f"primitive {self.script_index}: {element}")
+            if isinstance(element, Stay):
+                if element.ticks == 0:
+                    self.script_index += 1
+                    continue
+                self._stay_remaining = element.ticks if element.ticks is not None else -1
+            else:
+                action = ground(element, self.unique_id, self.model.knowledge)
+                self.current_plan = AbstractPlan(goal_intention=action.action_name, actions=[action])
 
-    def _execute(self, plan, world):
-        self.executor.step(plan=plan, world=world)
-        self.current_task = self.executor.current_task
+        if self._stay_remaining is not None:
+            # A Stay: this tick stands. Stay() (-1) never ends.
+            self._idle()
+            if self._stay_remaining > 0:
+                self._stay_remaining -= 1
+                if self._stay_remaining == 0:
+                    self._stay_remaining = None
+                    self.script_index += 1
+            return
+
+        self.executor.step(plan=self.current_plan, world=world)
         self.current_action = self.executor.current_action
         self.current_microaction = self.executor.current_microaction
 
-    def get_current_task_instance(self) -> Optional[TaskInstance]:
-        """Return current TaskInstance. Used by obs_builder."""
-        if self.script_index < len(self.script):
-            return self.script[self.script_index]
-        return None
-
-    def advance_script(self):
-        """Called by executor when current task completes."""
-        self.script_index += 1
-        self.current_plan = None  # Clear plan to trigger new plan generation for next task
-        if self.script_index >= len(self.script):
-            self.finished = True
-
-    def _task_instance_to_plan(
-        self, task_instance: TaskInstance, world
-    ) -> AbstractPlan:
-        """
-        Convert a TaskInstance into an AbstractPlan via the planner.
-        Bindings are already Dict[Var, Const] — no string manipulation.
-        Uses a dummy belief since human script has no IR.
-        """
-        # Convert Dict[Var, Const] → Dict[str, str] for planner
-        task_params = {k.name: v.value for k, v in task_instance.bindings.items()}
-
-        dummy_belief = BeliefState(
-            timestamp=float(self.model.schedule.steps),
-            agent_id=self.unique_id,
-            distribution={},
-            most_likely="unknown",
-            confidence=0.0,
-        )
-
-        return self.planner.plan(
-            my_intention=task_instance.schema.name,
-            task_params=task_params,
-            agent_id=self.unique_id,
-            belief=dummy_belief,
-            world=world,
-        )
+    def _idle(self):
+        self.current_action = None
+        self.current_microaction = None
 
 
 # =============================================================================
@@ -234,7 +228,10 @@ class RobotAgent(FactoryAgent):
         #   action_completion_latency  the tick the executor spends learning an action
         #                              finished, per action (L2)
         #   task_completion_latency    the tick the executor spends completing a task,
-        #                              per task, both agents (F1)
+        #                              per task, the robot's (F1)
+        #   observed_task_completion_latency
+        #                              the human's per-task tick: 0, its executor is
+        #                              action-level (T-C2b)
         #   observation_offset         how far ahead of this robot's now the observed
         #                              human's state was seen (L2)
         #   duration_to_steps          the ISO-8601 duration bound on wait_at, in ticks:
@@ -247,6 +244,7 @@ class RobotAgent(FactoryAgent):
             arrival_radius=PROXIMITY_THRESHOLD,
             action_completion_latency=ACTION_COMPLETION_LATENCY,
             task_completion_latency=TASK_COMPLETION_LATENCY,
+            observed_task_completion_latency=HUMAN_TASK_COMPLETION_LATENCY,
             observation_offset=OBSERVATION_OFFSET,
             duration_to_steps=lambda duration: _parse_duration_to_steps(duration, model),
         )
