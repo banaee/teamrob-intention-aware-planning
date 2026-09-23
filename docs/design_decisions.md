@@ -3453,3 +3453,21 @@ shared/io_contracts.md (§2.2), docs/glossary.md, docs/TODOS_AND_DEFERRED.md (TO
 docs/roadmap.md, analysis/tb1a_destination/, analysis/tb1b_two_tables/, analysis/tb1c_realized_flip/,
 analysis/tb3_full_reorder/ (READMEs)
 Reference: D3, September 2026; cchat ruling; analysis/ablation_task_committed/ (142deaa); D2; DESIGN-07
+
+---
+
+**A run-time deviation is the same operation as a load-time edit (Phase 7, recorded)**
+
+RECORDED, NOT DECIDED (cchat, Hadi, 23 September 2026). A later phase, after T-G (roadmap, Phase 7).
+
+The human executor's injection path serves both: a deviation from T-C's vocabulary applied to the action script
+at load, and the same deviation arriving as an event during the run (from a viewer), applied at the next action
+boundary. Only the source and the tick differ. The robot's mind receives nothing from either; it sees the
+trajectory, as now ("the robot knows nothing of the human's script").
+
+THE FIRST DECISION OF THE PHASE, the replay rule: the viewer offers a fixed set of events (the deviation
+vocabulary, nothing free-form), every event is logged with its tick and arguments, and a finished live run
+exports its event log as a pre-loaded script that reproduces it from a fresh start. Live runs demonstrate;
+every evaluation number comes from pre-loaded scripts.
+Reference: docs/handoffs/phase6_interactive_deviations.md (it calls the phase Phase 6; Phase 6 is ROS
+Embodiment); T-C ("The human's scenario is an action script"); T-E

@@ -519,3 +519,11 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
     world predicates; the recognizer reads nothing else.
   - The completion channel's detection rates (hit 1.0, false alarm 10⁻³) describe Mesa's perfect reporting;
     set them from the real microaction classifier's measured rates.
+
+## Phase 7 (recorded, not scheduled): interactive deviations and a context stream 🔲 *(after T-G; nothing decided)*
+- Run-time deviation events into the human executor from a viewer, replayable as pre-loaded scripts: live runs
+  demonstrate, pre-loaded scripts evaluate.
+- A context-knowledge stream into the world state, read by the recognizer: its own task.
+- Communication as a robot action under a live `unknown` or block: its own task.
+- Handoff: `docs/handoffs/phase6_interactive_deviations.md` (written before the number was checked; it calls
+  this Phase 6, which is ROS Embodiment above; its tasks would be P7-T-A, P7-T-B, ...).
