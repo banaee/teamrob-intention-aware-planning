@@ -510,6 +510,70 @@ there is no `realizable` flag and no unrealizable reason. The former `realizable
   in `unassessed_share`, which counts the tail beyond T_h only (T3b ruling).
 - A violation is strict: a single instant at exactly `min_separation` is not one (T3b ruling).
 
+### 1.12 The human action script — scenario layer (T-C1, built in T-C2a)
+
+An input contract of the scenario layer: what a scenario author writes as a human's
+`AgentConfig.scheduled_tasks`, and what the loader makes of it. Nothing in it reaches the recognizer or the
+meta-planner; the robot sees the trajectory. Types in `shared/types.py` (beside `AgentConfig`, whose check
+reads them); functions in `domains/script.py` (domain-generic); kitting's author primitives in
+`domains/kitting/script.py`.
+
+```python
+@dataclass(frozen=True)
+class ScriptAction:                        # one primitive: an action of the domain, by schema name
+    action_name: str                       # "move_to", "pick_up", "place", "wait_at", ...
+    bindings: Tuple[Tuple[str, Any], ...]  # sorted (var name, object id); a coordinate pair admitted for a movement target
+    provenance: Optional[Provenance]       # set by expand() only; not part of equality
+
+@dataclass(frozen=True)
+class Stay:                                # standing still; grounds to nothing (an executor instruction)
+    ticks: Optional[int] = None            # None: until the run ends
+
+@dataclass(eq=False)
+class Provenance:                          # the task an element came from; one per expansion, compared by identity
+    task: TaskInstance                     # .key = task_instance_key(task)
+
+@dataclass
+class Deviation:                           # a deferred edit, built by interrupt / deviate / abandon
+    kind: str; task: TaskInstance; after; before; content: list; destination
+```
+
+**The written form.** A flat list whose elements are primitives, `TaskInstance`s and deviations, in any mix.
+A `TaskInstance` is sugar for its expansion. Kitting's author primitives are `MoveTo(target)`, `PickUp(item)`,
+`Place(item, table)` (each a `ScriptAction` of `move_to` / `pick_up` / `place`) and `Stay(n)` / `Stay()`. The
+vocabulary: `interrupt(task, after=|before=, with_=[...])`, `deviate(task, destination=)`,
+`abandon(task, after=|before=, then=[...])`, each returning a one-element list `[Deviation]` to be spliced in;
+injected content may mix tasks and primitives. Anchors: an action name occurring exactly once in the task's
+expansion, or a 0-based index into it; nothing else.
+
+**The executed form.** At load (`SimModel._resolve_human_scripts`) `resolve_script()` turns the written form
+into `ScriptAction`s and `Stay`s only, against the initial world: `expand(task, planner, world, agent_id,
+method=None)` is the planner's own decomposition (`AdaptivePlanner.decompose`, §2.3), one `ScriptAction` per
+action of the selected method (a `wait_at` inside `coffee_break` stays a `wait_at` element; it is not a
+`Stay`), all sharing one `Provenance`; a deviation expands its task and applies a list helper to that
+expansion (`insert_after` / `insert_before` for interrupt, `truncate` plus the content for abandon,
+`retarget(old, new)` of the destination value for deviate). Anchor errors are raised there, naming the
+scenario and printing the expansion. `ground(element, agent_id, knowledge)` gives the `GroundedAction` an
+element stands for, with the completion predicate grounded as `decompose()` grounds it. The vocabulary is
+deferred because a scenario is built at import, where there is no world: `expand()`, `resolve_script()` and
+the list helpers on an expansion are usable only where a world exists (the loader, tests, a later scenario
+generator).
+
+**The work order** (`check_work_order`, run by `AgentConfig.__post_init__` on the written form and by the
+loader on the executed form): every assigned task occurs exactly once in the script, by provenance (a
+`TaskInstance`, a deviation's task, or one distinct `Provenance`); foreseeable tasks and hand-written primitives
+are free, and an unassigned non-foreseeable task is a legitimate departure (ruling, T-C2a); present is not
+completed. Empty `assigned_tasks` skips it. Replaced the key equality (TODO-86).
+
+**Landmarks.** A layout may declare objects of type `landmark` (`shared.types.LANDMARK_TYPE`); a domain one of
+whose `TaskSchema`s types a parameter as `landmark` is rejected at load (`check_no_landmark_parameters`), so no
+hypothesis binds one and no robot action grounds to one. `MoveTo(landmark)` is how a script names a place no
+task explains. env_layout0 declares five (`corner_NE`, `corner_NW`, `corner_SE`, `corner_SW`, `door`).
+
+**Until T-C2b** the human executor is task-level: a script written as `TaskInstance`s only runs as before
+(compatibility path, removed in C2b); a script with a primitive or a deviation loads, is resolved and checked,
+and is then refused with an error naming T-C2b.
+
 ---
 
 ## 2. Module Contracts
@@ -1087,9 +1151,12 @@ decompose(
     task_params: Dict[str, str],
     agent_id: str,
     world: WorldState,
+    method: Optional[str] = None,
 ) -> List[GroundedAction]
 ```
-The bare decomposition `plan()` wraps — the same guard-selected method, derived vars and step
+`method` (T-C2a, for the script's `expand(task, method=)`) names one of the task's methods to use instead of
+the first applicable one: an unknown name raises `ValueError`, a method whose guards fail here
+`DecompositionError`; sub-tasks select as always. The bare decomposition `plan()` wraps — the same guard-selected method, derived vars and step
 grounding — without the `AbstractPlan` envelope. Added in I2 for the recognizer, which asks it
 every tick, per hypothesis, what the observed agent would do if it held that intention. Raises
 `DecompositionError` (a `ValueError` subclass) only for world-dependent failures — no method's
@@ -1167,9 +1234,13 @@ domains/kitting/
     actions.py          # ActionSchema definitions — HTN primitive tasks (leaves)
     registry.py        # builds DomainModel, declares intention set
     scenarios.py       # ScenarioConfig objects — typed Python, no YAML
+    script.py          # the author primitives MoveTo / PickUp / Place (and Stay, the vocabulary), §1.12
     env_layout0.json   # environment spatial layout (one file per layout)
     env_layout1.json
 ```
+
+`domains/script.py` is domain-generic: `expand`, `ground`, the vocabulary, the list helpers and the
+resolution of a human's script (§1.12).
 
 **Corrections from previous versions:** the file is `actions.py`, not `ActionSchemas.py`;
 layout files are `env_layout0.json` / `env_layout1.json`, not `env1_layout.json`. Each
@@ -1237,8 +1308,13 @@ a declared relocation".
   from through `destination_of` declares `"destination"`, naming an object of the layout of the type the
   schema declares (`DomainKnowledgeBase.get_types_with_destination`); and every agent's `assigned_tasks` binds
   the destination the layout designates (`shared.types.check_task_destinations`), an error naming the task,
-  the item and both tables. The human's `scheduled_tasks` is not checked against the layout: the script may
-  send an item elsewhere
+  the item and both tables. The human's `scheduled_tasks` is not checked against the layout's destinations:
+  the script may send an item elsewhere. Its elements are checked for binding (`check_script_bindings`, T-C2a):
+  every task in it (a deviation's task, its content, and for `deviate` the task rebound to the new destination)
+  as above, and every object a primitive names exists
+- Resolves each human's script against the initial world after spawning (§1.12, T-C2a), checks the work order
+  on the executed form, and keeps it in `SimModel.human_scripts`; rejects a domain that types a task parameter
+  as a landmark
 - Supplies the `Projector` its motion rate (`step_size`, T2), its stopping distance (T9: the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
   executor stops), its per-action acknowledgement latency and observation offset (L2), and its

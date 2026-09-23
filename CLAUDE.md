@@ -27,7 +27,7 @@ Relevant (read as needed):
 - `shared/*.py`: cognitive layer
 - `mesa_sim/*.py` (top level only); `mesa_sim/viz/` only for visualization or when grepping
   for readers of a field
-- `domains/kitting/`: the active domain
+- `domains/kitting/`: the active domain; `domains/script.py`: the human action script (T-C2a), domain-generic
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
   design record. Use its terms in the code, in the documents and in reports.

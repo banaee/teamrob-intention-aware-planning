@@ -2829,7 +2829,7 @@ stop and realization overlap). design_decisions.md, "A stationary human".
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026
 
-**TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a] ✅ CLOSED by T-C1 (23 Sept 2026): the work order and the script are compared by provenance (every assigned task exactly once), not by key equality; a delivery to another table is a `deviate` edit of an assigned task. design_decisions.md, "The human action script (T-C1, decided)"; built in T-C2
+**TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a] ✅ CLOSED by T-C1 (23 Sept 2026): the work order and the script are compared by provenance (every assigned task exactly once), not by key equality; a delivery to another table is a `deviate` edit of an assigned task. design_decisions.md, "The human action script (T-C1, decided)". ✅ BUILT (T-C2a): `shared.types.check_work_order`, run by `AgentConfig.__post_init__` and by the loader on the resolved script; a `deviate` to another table keeps the assigned task's provenance
 `AgentConfig.__post_init__` (shared/types.py) requires the human's `assigned_tasks` keys to equal the
 non-foreseeable `scheduled_tasks` keys exactly. Since T-B1a the human's `scheduled_tasks` may bind
 `?kitting_table` to a table other than the item's designated one (the precedence rule keeps the binding),

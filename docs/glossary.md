@@ -321,34 +321,46 @@ developer's execution script (which order). The robot never reads `scheduled_tas
 `assigned_tasks` is its task pool and `scheduled_tasks` is unread.
 → `shared/types.py`, `AgentConfig`.
 
-The five entries below are decided (T-C1) and not yet built (T-C2); until then `scheduled_tasks` is a list of
-tasks.
+The five entries below are decided (T-C1). The scenario layer is built (T-C2a): the script is written, expanded,
+edited and checked at load. The human executor still runs tasks until T-C2b (a script with a primitive or a
+deviation is refused at load until then).
 
-**primitive** — one entry of the human's executed script: `MoveTo`, `PickUp`, `Place` or `Stay`, each grounding
-to an existing action schema of the domain (kitting: `move_to`, `pick_up`, `place`, `wait_at`). The executed
-`scheduled_tasks` is a flat list of primitives, with no intent label and no task-boundary marker. A
-coordinate-valued `MoveTo` exists for Phase 7's exporter; authors never write one.
-→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+**primitive** — one entry of the human's executed script: a `ScriptAction` (an action of the domain by schema
+name, one element type per action schema) or a `Stay`. Authors write four: `MoveTo`, `PickUp`, `Place` (kitting:
+`move_to`, `pick_up`, `place`) and `Stay`, which grounds to nothing (the executor idles). `expand` yields one
+element per action of the method, so a `coffee_break` gives a `wait_at` element, which grounds to `wait_at` as
+before; `wait_at` is never a `Stay`. The executed `scheduled_tasks` is a flat list of primitives, with no intent
+label and no task-boundary marker. A coordinate-valued `MoveTo` exists for Phase 7's exporter; authors never
+write one.
+→ `shared/types.py`, `ScriptAction`, `Stay`; `domains/kitting/script.py`; `shared/io_contracts.md` §1.12;
+`docs/design_decisions.md`, "The human action script (T-C1, decided)".
 
 **expand** — `expand(task)`: turning a `TaskInstance` in the script into primitives at load, by the planner's own
-decomposition against the initial world (optional `method=`). Sets provenance on each primitive.
-→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+decomposition against the initial world (optional `method=`). Sets provenance on each primitive. It needs a
+world, so it runs where one exists (the loader, tests, a later generator), not in a scenario file.
+→ `domains/script.py`, `expand()`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
 
-**provenance** — the task a primitive came from, recorded automatically by `expand`. The script layer's own
-bookkeeping: the work-order check reads it (every assigned task exactly once); nothing in the robot's mind does.
-→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+**provenance** — the task a primitive came from, recorded automatically by `expand`, one per expansion. The script
+layer's own bookkeeping: the work-order check reads it (every assigned task exactly once); nothing in the robot's
+mind does.
+→ `shared/types.py`, `Provenance`, `check_work_order()`; `docs/design_decisions.md`, "The human action script
+(T-C1, decided)".
 
 **landmark** — a symbolic place a layout may declare (`corner_NE`, `door`), an object of a type of its own that
 no `TaskSchema` types a parameter as (rejected at load). So no hypothesis binds one and no robot action grounds
-to one; the human's script may walk to it (`MoveTo(landmark)`).
-→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+to one; the human's script may walk to it (`MoveTo(landmark)`). The type is `landmark`; env_layout0 declares
+`corner_NE`, `corner_NW`, `corner_SE`, `corner_SW` and `door`.
+→ `shared/types.py`, `LANDMARK_TYPE`, `check_no_landmark_parameters()`; `docs/design_decisions.md`, "The human
+action script (T-C1, decided)".
 
 **deviation vocabulary** — the author's edits of the work order: `interrupt(task, after=|before=, with_=[...])`,
 `deviate(task, destination=)`, `abandon(task, after=|before=, then=[...])`, plus free `Stay(n)` (n omitted:
 until the run ends) and `MoveTo(landmark)`. Anchors name an action by name or index; injected content may mix
 tasks and primitives; in T-C every injection sits at an action boundary. A deviation is an edit of the
-expanded work order, not a task of its own.
-→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+expanded work order, not a task of its own. Written at import, where there is no world, each returns a deferred
+edit (`[Deviation]`) that the loader applies to the task's expansion with the list helpers (`insert_after`,
+`insert_before`, `retarget`, `truncate`).
+→ `domains/script.py`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
 
 ---
 

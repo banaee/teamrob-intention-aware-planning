@@ -415,7 +415,9 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   `Stay(n)` and `MoveTo(landmark)`; the human executor is action-level. TODO-86 closed. Not decided in C1:
   TODO-85 (half (b) with T-D; half (a), if taken, T-H) and TODO-88, their own items.
   - **T-C2 — the build.** C2a the script layer: primitives, `expand`, the vocabulary, landmarks, the
-    provenance check. C2b the human executor, action-level. Fixtures s00, s20, s70, s80, s83, prior on;
+    provenance check (built, T-C2a). C2b the human executor, action-level; its first requirement (ruling, T-C2a):
+    sequential expansion against the successor state, not the initial world, so a task after an abandoned
+    pick-up expands from what the human holds; no change-of-mind scenario is written before it. Fixtures s00, s20, s70, s80, s83, prior on;
     identity up to the dropped per-task completion tick; the baselines regenerated once. Then two literal
     scenarios, an interrupt and a stay, one run each, observed, not judged.
   - From here debugging runs use prior on only; off / on returns for the paper.
