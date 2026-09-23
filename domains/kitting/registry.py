@@ -8,7 +8,7 @@ Called once at startup by KnowledgeBase via sim_model.py.
 from shared.types import DomainModel
 from domains.kitting.actions import move_to, pick_up, place, wait_at
 from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
-from domains.kitting.scenarios import scenario_00, scenario_01, scenario_10, scenario_11, scenario_20, scenario_21, scenario_30, scenario_40, scenario_50, scenario_70, scenario_71, scenario_80, scenario_81, scenario_82, scenario_83, scenario_90
+from domains.kitting.scenarios import scenario_00, scenario_01, scenario_02, scenario_03, scenario_04, scenario_10, scenario_11, scenario_12, scenario_20, scenario_21, scenario_30, scenario_40, scenario_50, scenario_70, scenario_71, scenario_80, scenario_81, scenario_82, scenario_83, scenario_84, scenario_85, scenario_90
 
 def register_kitting_domain() -> DomainModel:
     return DomainModel(
@@ -39,6 +39,9 @@ domain_config = {
             "scenarios": {
                 "scenario_00": scenario_00,
                 "scenario_01": scenario_01,
+                "scenario_02": scenario_02,   # script example (T-C2c play), not a measured fixture
+                "scenario_03": scenario_03,   # script example
+                "scenario_04": scenario_04,   # script example
             },
         },
         
@@ -47,6 +50,7 @@ domain_config = {
             "scenarios": {
                 "scenario_10": scenario_10,
                 "scenario_11": scenario_11,
+                "scenario_12": scenario_12,   # script example (T-C2c play), not a measured fixture
             },
         },
         "env_layout2": {
@@ -88,6 +92,8 @@ domain_config = {
                 "scenario_81": scenario_81,
                 "scenario_82": scenario_82,   # for viewing the layout; not a fixture
                 "scenario_83": scenario_83,
+                "scenario_84": scenario_84,   # script example (T-C2c play), not a measured fixture
+                "scenario_85": scenario_85,   # script example
             },
         },
         "env_layout9": {
