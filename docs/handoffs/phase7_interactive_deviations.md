@@ -42,9 +42,13 @@ condition its belief on situation, not only on walked path.
    its event log as a pre-loaded script that reproduces the run exactly from a fresh start. Live
    runs are for demonstration; every number in an evaluation table comes from pre-loaded scripts.
 2. The event path in the human executor: a queue drained at the start of each step; an event
-   takes effect at the next action boundary (mid-action interruption deferred, as in C1).
-   Mesa's step loop is synchronous; an in-process viewer needs no asynchronous machinery. A
-   separate UI process would need a socket and the same queue.
+   takes effect at the tick it arrives and may cut the current action (a click during the
+   carry walk stops the walk there). This is required, not deferred: it is the point of the
+   phase. The export records the human's position at that tick as the split point, so the
+   replayed script contains a coordinate-valued move_to there followed by the original
+   remaining action; C1's executed form already admits this. Mesa's step loop is synchronous;
+   an in-process viewer needs no asynchronous machinery. A separate UI process would need a
+   socket and the same queue.
 3. The viewer: which buttons, what it shows (belief, admitted projection, decision, hold,
    refusal, the event marks). Builds on T-E's viewer.
 4. The context stream (its own task): what a context item is, how the world state carries it
