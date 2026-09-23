@@ -525,5 +525,4 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   demonstrate, pre-loaded scripts evaluate.
 - A context-knowledge stream into the world state, read by the recognizer: its own task.
 - Communication as a robot action under a live `unknown` or block: its own task.
-- Handoff: `docs/handoffs/phase6_interactive_deviations.md` (written before the number was checked; it calls
-  this Phase 6, which is ROS Embodiment above; its tasks would be P7-T-A, P7-T-B, ...).
+- Handoff: `docs/handoffs/phase7_interactive_deviations.md`.

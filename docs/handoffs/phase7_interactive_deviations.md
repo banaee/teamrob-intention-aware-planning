@@ -1,4 +1,4 @@
-# Handoff: Phase 6, interactive deviations and a context stream
+# Handoff: Phase 7, interactive deviations and a context stream
 
 Recorded 23 September 2026 (cchat, Hadi). An idea for a later phase, after the planned pipeline
 T-A to T-G. Nothing here is decided; it is recorded so that the phase opens with its own chat
@@ -8,7 +8,7 @@ docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md) are authoritative over thi
 ## 0. The idea in plain words
 
 Today every human behaviour in a run is pre-loaded: a script written before the run (T-C makes
-that script a list of primitive actions with controlled deviations applied at load). Phase 6
+that script a list of primitive actions with controlled deviations applied at load). Phase 7
 adds a second source of deviations: events arriving during the run. A person watching the
 simulation in the viewer clicks a button ("coffee break now", "stay here", "change mind: item_5",
 "walk to the corner") and the human executor injects that deviation at the next action boundary.
@@ -32,7 +32,7 @@ condition its belief on situation, not only on walked path.
   `pick_up`, `place`, `stay`), produced by `expand(task)` and edited by a small deviation
   vocabulary (interrupt, deviate, abandon, stay) applied at action boundaries.
 - A run-time event is the same operation as a load-time edit; only its source and its tick
-  differ. So Phase 6 does not redesign the script; it adds an input path to the human executor.
+  differ. So Phase 7 does not redesign the script; it adds an input path to the human executor.
 - The robot's mind receives nothing from the script or from events. Unchanged.
 
 ## 3. Decisions to take when the phase opens (the first is the design rule)
@@ -53,7 +53,7 @@ condition its belief on situation, not only on walked path.
    Scientific item, not a simulator one.
 5. Communication as an action (its own task): when the robot, facing a live `unknown` or a
    block, raises communication instead of adapting its plan; how that enters B3's candidates.
-6. Phase and task naming: Phase 6 if free, tasks P6-T-A, P6-T-B, ... (T-H is reserved for the
+6. Phase and task naming: Phase 7 if free, tasks P7-T-A, P7-T-B, ... (T-H is reserved for the
    recognizer's duration term, TODO-85 half a).
 
 ## 4. Readiness of the components, as of 23 September 2026
@@ -73,7 +73,7 @@ world-state extension, plus fixtures that make context matter.
 
 ## 6. What to read first when the phase opens
 
-docs/roadmap.md (the pipeline and where Phase 6 sits), docs/design_decisions.md ("The human's
+docs/roadmap.md (the pipeline and where Phase 7 sits), docs/design_decisions.md ("The human's
 scenario is an action script", "Robustness is tested in kitting", the T-C entries), the C2 record
 (the human executor's action-level path), T-E's viewer record, TODO-85 (the stationary human),
 TODO-15 (human cooperation), TODO-80 (the blocked event and reconsider).

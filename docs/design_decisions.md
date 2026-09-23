@@ -3469,5 +3469,4 @@ THE FIRST DECISION OF THE PHASE, the replay rule: the viewer offers a fixed set 
 vocabulary, nothing free-form), every event is logged with its tick and arguments, and a finished live run
 exports its event log as a pre-loaded script that reproduces it from a fresh start. Live runs demonstrate;
 every evaluation number comes from pre-loaded scripts.
-Reference: docs/handoffs/phase6_interactive_deviations.md (it calls the phase Phase 6; Phase 6 is ROS
-Embodiment); T-C ("The human's scenario is an action script"); T-E
+Reference: docs/handoffs/phase7_interactive_deviations.md; T-C ("The human's scenario is an action script"); T-E
