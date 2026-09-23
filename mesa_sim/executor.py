@@ -102,7 +102,7 @@ ACTION_COMPLETION_LATENCY = 1.0
 # Mesa ticks this executor spends COMPLETING a task, after its last action's
 # acknowledgement and before the next task's first microaction. Exactly one:
 # the tick on which step() finds action_index past the plan's end, calls
-# _on_task_complete() (which advances the agent's script or clears its task)
+# _on_task_complete() (which clears the robot's task)
 # and returns. The next tick loads the next plan and executes its first
 # microaction in the same call. The robot pays it, through advance_task() and
 # the no_current_task trigger on the following tick; the human does not (its
@@ -687,8 +687,6 @@ class Executor:
 
         if hasattr(self.agent, "advance_task"):
             self.agent.advance_task()
-        elif hasattr(self.agent, "advance_script"):
-            self.agent.advance_script()
 
     def _clear(self):
         """Clear all execution state."""

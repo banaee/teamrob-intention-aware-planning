@@ -8,6 +8,7 @@ is_foreseeable is declared on TaskSchema — not repeated here.
 
 from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig
 from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
+from domains.kitting.script import Stay, interrupt
 
 
 
@@ -46,6 +47,42 @@ scenario_00 = ScenarioConfig(
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
                 TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+# T-C2c scenario B, declared stay: a fixture, not a baseline (analysis/tc2c_scripts/).
+# The human delivers item_3 and stays at the table 40 ticks; the robot's one
+# delivery goes to that table. The stay is not projected (TODO-85).
+scenario_01 = ScenarioConfig(
+    id="scenario_01",
+    name="layout0_declared_stay",
+    description=(
+        "T-C2c scenario B. Human delivers item_3, then Stay(40) at kitting_table_0. "
+        "The robot's one task delivers item_4 to the same table."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(350, 200),
+            scheduled_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+                Stay(40),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_3"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-350, 200),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
             ],
             observes=["human_0"],
         ),
@@ -96,6 +133,49 @@ scenario_10 = ScenarioConfig(
     ],
 )
 
+# T-C2c scenario A, interrupted delivery: a fixture, not a baseline (analysis/tc2c_scripts/).
+# The human picks item_2, walks away from the table to the coffee machine with it,
+# waits, then resumes the delivery; item_5 follows so the work order is s10's.
+scenario_11 = ScenarioConfig(
+    id="scenario_11",
+    name="layout1_interrupted_delivery",
+    description=(
+        "T-C2c scenario A. interrupt(deliver(item_2), after=pick_up, with_=[coffee_break]), "
+        "then deliver(item_5). Robot side and assigned tasks as scenario_10."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-400, -300),
+            scheduled_tasks=[
+                *interrupt(
+                    TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
+                    after="pick_up",
+                    with_=[TaskInstance(schema=coffee_break, bindings={Var("?coffee_machine"): Const("coffee_machine_0")})],
+                ),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_2"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(200, 0),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_1"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_7"), Var("?kitting_table"): Const("kitting_table_0")}),
+                TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_6"), Var("?kitting_table"): Const("kitting_table_0")}),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
 
 
 

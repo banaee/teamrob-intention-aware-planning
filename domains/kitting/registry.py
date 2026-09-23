@@ -8,7 +8,7 @@ Called once at startup by KnowledgeBase via sim_model.py.
 from shared.types import DomainModel
 from domains.kitting.actions import move_to, pick_up, place, wait_at
 from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
-from domains.kitting.scenarios import scenario_00, scenario_10, scenario_20, scenario_21, scenario_30, scenario_40, scenario_50, scenario_70, scenario_71, scenario_80, scenario_81, scenario_82, scenario_83, scenario_90
+from domains.kitting.scenarios import scenario_00, scenario_01, scenario_10, scenario_11, scenario_20, scenario_21, scenario_30, scenario_40, scenario_50, scenario_70, scenario_71, scenario_80, scenario_81, scenario_82, scenario_83, scenario_90
 
 def register_kitting_domain() -> DomainModel:
     return DomainModel(
@@ -38,6 +38,7 @@ domain_config = {
             "path":      "domains/kitting/env_layout0.json",
             "scenarios": {
                 "scenario_00": scenario_00,
+                "scenario_01": scenario_01,
             },
         },
         
@@ -45,6 +46,7 @@ domain_config = {
             "path":      "domains/kitting/env_layout1.json",
             "scenarios": {
                 "scenario_10": scenario_10,
+                "scenario_11": scenario_11,
             },
         },
         "env_layout2": {
