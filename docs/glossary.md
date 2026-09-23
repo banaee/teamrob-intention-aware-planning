@@ -321,6 +321,35 @@ developer's execution script (which order). The robot never reads `scheduled_tas
 `assigned_tasks` is its task pool and `scheduled_tasks` is unread.
 → `shared/types.py`, `AgentConfig`.
 
+The five entries below are decided (T-C1) and not yet built (T-C2); until then `scheduled_tasks` is a list of
+tasks.
+
+**primitive** — one entry of the human's executed script: `MoveTo`, `PickUp`, `Place` or `Stay`, each grounding
+to an existing action schema of the domain (kitting: `move_to`, `pick_up`, `place`, `wait_at`). The executed
+`scheduled_tasks` is a flat list of primitives, with no intent label and no task-boundary marker. A
+coordinate-valued `MoveTo` exists for Phase 7's exporter; authors never write one.
+→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+
+**expand** — `expand(task)`: turning a `TaskInstance` in the script into primitives at load, by the planner's own
+decomposition against the initial world (optional `method=`). Sets provenance on each primitive.
+→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+
+**provenance** — the task a primitive came from, recorded automatically by `expand`. The script layer's own
+bookkeeping: the work-order check reads it (every assigned task exactly once); nothing in the robot's mind does.
+→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+
+**landmark** — a symbolic place a layout may declare (`corner_NE`, `door`), an object of a type of its own that
+no `TaskSchema` types a parameter as (rejected at load). So no hypothesis binds one and no robot action grounds
+to one; the human's script may walk to it (`MoveTo(landmark)`).
+→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+
+**deviation vocabulary** — the author's edits of the work order: `interrupt(task, after=|before=, with_=[...])`,
+`deviate(task, destination=)`, `abandon(task, after=|before=, then=[...])`, plus free `Stay(n)` (n omitted:
+until the run ends) and `MoveTo(landmark)`. Anchors name an action by name or index; injected content may mix
+tasks and primitives; in T-C every injection sits at an action boundary. A deviation is an edit of the
+expanded work order, not a task of its own.
+→ `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+
 ---
 
 ## 7. Sessions
