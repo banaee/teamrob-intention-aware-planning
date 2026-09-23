@@ -429,6 +429,8 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   `ExecutorState`, the trigger routed past B2, the reconsider policy (design in TODO-80 and D2); evaluation
   of retraction and re-recognition firing, `unknown` leading, blocked time and completion under wait
   against reconsider. design_decisions.md, "Robustness is tested in kitting".
+  The recognizer pass (Q2 to Q4) opens with TODO-95: rule whether the stationarity channel joins it or stays
+  recorded for T-H.
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
   set covers switch and hold (s70 / s71), a two-table ordering, a change of mind, `unknown`; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and

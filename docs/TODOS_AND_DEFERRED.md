@@ -1972,6 +1972,7 @@ no folds from the prior at a boundary (TODO-55 (b), restricted). Not a retune of
 reproduces it). Out of I4b's scope (the likelihood form).
 Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`, `logistic_of_excess`), shared/recognizer.py (`update`)
 Reference: I4b task-boundary session; analysis/i4b_boundary/REPORT.md (deleted in the analysis cleanup, September 2026; carried in design_decisions.md, the I4b / I4c entry, and TODO-55 to TODO-59) §5, §8
+See TODO-95 (23 Sept 2026): the deferred stationarity channel is taken up there as a design task.
 
 **TODO-60 — `unknown`'s u is charged per OPEN observation and never folded: the belief with no observation is the base ratio** ✅ RESOLVED (I4d)
 The accounting: for every live hypothesis k and tick t within an episode,
@@ -2846,6 +2847,7 @@ the robot's carry passes 0.78 cm from the standing human (tick 100), before the 
 22, 24, 52 show 1–15 cm at the end of the run (stop off). Only the separation stop covers it. T-D's opening item.
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026
+See TODO-95 (23 Sept 2026): the deferred stationarity channel is taken up there as a design task.
 
 **TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a] ✅ CLOSED by T-C1 (23 Sept 2026): the work order and the script are compared by provenance (every assigned task exactly once), not by key equality; a delivery to another table is a `deviate` edit of an assigned task. design_decisions.md, "The human action script (T-C1, decided)". ✅ BUILT (T-C2a): `shared.types.check_work_order`, run by `AgentConfig.__post_init__` and by the loader on the resolved script; a `deviate` to another table keeps the assigned task's provenance
 `AgentConfig.__post_init__` (shared/types.py) requires the human's `assigned_tasks` keys to equal the
@@ -2989,9 +2991,114 @@ should decay, be reset by another event, or stand, is a recognizer question for 
 Files: shared/recognizer.py
 Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
 
+**TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN]
+Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
+the pass or stays recorded for T-H.
+
+Origin. While ruling T-D Q1, Hadi questioned whether projecting the human as stationary right
+after a human task completion is a principled response or a device that gives the meta-planner
+something to cost against. The discussion moved from the projection to the underlying question:
+what the robot should reason and plan for human behaviour its models do not cover (standing
+still, walking to a corner or window, leaving by the door for lunch or the WC), which it can
+neither recognise as a modelled hypothesis nor project, and so has no basis for choosing a
+response (continue with a hold, switch task, stop, communicate).
+
+Observation (Hadi). A kitting worker standing in one place for 5 minutes is behaviour, not the
+absence of behaviour; a human colleague would notice and interpret it. It is either
+foreseeable (a break, a wait) or unknown (unmodelled), and the robot should recognise it in one
+of those forms.
+
+Current state.
+- I4c Decision 4: an empty stretch is not an observation. A stationary tick contributes no
+  factor to any hypothesis, and `unknown`'s likelihood applies only on ticks where some
+  hypothesis was scored on an observation. The core of the decision fixed a real defect
+  (TODO-59: standing scored as a perfect walk, a lone hypothesis at 1/(1+u) = 0.909 on
+  nothing) and stands: standing must never confirm a movement-phase hypothesis. Its deferred
+  part, stationarity as evidence in its own right, is what this TODO takes up.
+- Consequence: after an episode boundary, a human who stands keeps the belief at the uniform
+  prior indefinitely. `unknown` rises only from walking that wastes path against every
+  hypothesis, never from standing. A stationary unknown behaviour leaves no evidence.
+- Planner side: before T-D Q1, with no admitted hypothesis the meta-planner gives `realize()`
+  no human projection. T-D Q1 (option 1, ruled) projects the human as standing at its observed
+  position over each candidate's own span. That is the decision-time response to a standing
+  human the recognizer cannot interpret; it stays valid whatever this TODO decides. T-D Q1 adds
+  no trigger: a human task completion does not by itself re-decide; the projection is used only
+  at decisions that fire for the existing reasons.
+
+The limitation has two parts.
+1. Recognition. `unknown` is the residual: the probability mass not explained by any modelled
+   hypothesis. The residual cannot be emptied (a model of unmodelled behaviour in general is a
+   contradiction). It can be narrowed by modelling more foreseeable tasks (for example leaving
+   by the door at a meal time as a lunch-break schema), and the evidence feeding it can be
+   improved. The present gap is narrow: stationary behaviours leave no evidence.
+2. Projection and response. With no model there is no projected trajectory, but the human's
+   observed position is known at every tick. The response under `unknown` is a design space
+   with four levels (recorded, not decided):
+   1. Decision level: cost candidates against the observed position (T-D Q1).
+   2. Execution level: the blocked event, WAIT against RECONSIDER (T-D Q5).
+   3. Interaction level: communicate, ask, alarm (TODO-96; no channel exists).
+   4. Recognition level: give sustained standing evidential meaning (this TODO), so part of
+      today's `unknown` becomes an admitted stay with its own projection.
+
+Hadi's proposed flow, to be weighed when this is taken up: after a human task completion, do
+not project and re-decide at once; give the standing time; let the recognizer raise a stay or
+`unknown` from the standing; when admitted, trigger; project it as stationary as the observed
+history supports; then respond (continue with a hold, switch task, stop, communicate). Notes:
+under the current recognizer this sequence cannot occur (Decision 4). Even with the channel
+there is a window between the boundary and the channel's θ crossing in which decisions are
+taken; T-D Q1 covers that window. A waiting period before projecting would be a constant with
+no source.
+
+Design questions to rule.
+1. The observation: a stand of n ticks at position p as a second observation type beside the
+   stretch; where its clock starts (t = 0, a phase advance, an episode boundary); whether a
+   stand folds when walking resumes.
+2. Direction per hypothesis: standing confirms a hypothesis whose current phase expects
+   standing (`wait_at`), disconfirms one whose phase expects motion (`MoveTo`), and is brief
+   and within reach for `pick_up` / `place`. Derivable from the action type; rule whether any
+   schema change is needed.
+3. The likelihood form (the hard part): time is the only measure of a stand, so evidence per
+   tick needs a rate, and a bare rate is a constant with no source. Candidate form: wasted
+   time, symmetric to wasted path; standing beyond every hypothesis's expected stationary
+   duration (task models carry them, for example `wait_at` inside `coffee_break`) is scored as
+   waste, with a tolerance in the role β has for path. Requires re-deriving the
+   odds-against-`unknown` invariant (docs/recognizer_handback.md §1.5) with two observation
+   types, and extending the independent accumulator that verifies it.
+4. TODO-59 must not return: standing never confirms a movement-phase hypothesis, and
+   `unknown`'s charging follows the new grading.
+5. What an admitted stay, or `unknown` read as stationary, means to the meta-planner: its
+   projection (stationary by its meaning), and which response level it selects.
+6. Whether a stay is a new foreseeable hypothesis (a stay schema), a reading of `unknown`, or
+   both. Constraint from T-D: no hypothesis is added for a script action.
+
+Research questions (Hadi, framework level).
+- What should the robot reason and plan for human behaviour it has no prior knowledge of:
+  stationary, directed to a landmark, or leaving the workspace?
+- How much of the response should rest on the little that is observed (position), and what
+  should it do beyond that?
+- Framework purpose, as stated in CLAUDE.md (T-C1) and discussed again here: a container that
+  shows IR dealing with assigned, foreseeable and unknown behaviour and a planner adapting to
+  what IR reports; not a perfect simulator. Making the residual explicit and giving it a
+  graded, principled response is part of the contribution.
+
+Size, estimated at recording: comparable to I4c plus I4d; one to two design rounds and one to
+two build-and-verify rounds (i4d-style invariant check with a reversion variant), all
+baselines regenerated; about the size of the T-D Q2 to Q4 pass itself.
+Related: TODO-59 (deferred part), TODO-85 half (a), TODO-80, TODO-92, TODO-96, T-D Q1, T-D Q5.
+
+**TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN, recorded only]
+Status: open, recorded only. Hadi: under unknown behaviour the robot may stop and communicate
+(ask the human what is happening, raise an alarm) instead of, or after, re-planning. No
+communication channel exists in the framework. Level 3 of the response structure in TODO-95.
+Its condition (sustained `unknown`, or a blocked event WAIT and RECONSIDER do not resolve)
+must be defensible without a constant taken from a scenario. To be argued at T-D Q5 or after;
+not part of T-D Q1.
+
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).
 2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.
 3. Reproduced: TODO-93 (a foreseeable completion ends the episode mid-delivery) and TODO-87 (a delivery to another
    table: no pin, no boundary, a projection of a task the human will not do).
 4. T-D's blocked fixture uses a stay that ends (TODO-80; the scenario-authoring convention).
+5. At the recognizer pass (T-D Q2 to Q4): raise TODO-95 (stationarity channel) and rule whether it joins the pass or
+   stays recorded for T-H.
