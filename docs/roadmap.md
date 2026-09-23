@@ -421,7 +421,8 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     the human's lines identical up to the dropped per-task completion tick; the human projection also loses that
     tick (the human's body reports 0), which moved one hold before the first dropped tick (s20 `single_task`);
     the baselines regenerated once. C2a and C2b closed.
-    Next: two literal scenarios, an interrupt and a stay, one run each, observed, not judged.
+    T-C2c ✅: the two literal scenarios (scenario_11, an interrupted delivery; scenario_01, a declared stay), one
+    run each, observed (`analysis/tc2c_scripts/`). T-C closed.
   - From here debugging runs use prior on only; off / on returns for the paper.
 - **T-D — Robustness in kitting, on T-C.** Scenarios for a change of mind mid-task, a walk to an empty
   corner (`unknown` as outcome), a declared stay at the table (the blocked case); the blocked event in

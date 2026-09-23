@@ -2753,6 +2753,9 @@ stop on, every block in the current fixtures is the human's terminal stay at the
 (`analysis/c_separation_stop/blocked.md`), where neither policy has anything to choose. The earlier claim
 that D2 removes that deadlock is withdrawn; the remedy is reconsider with a fixture that has an alternative,
 or 4D's human cooperation (TODO-15).
+OBSERVED (T-C2c, `analysis/tc2c_scripts/`, scenario_01): the declared stay is scriptable; after `Stay(40)` the script
+ends and the human stands at the table, so with the stop on the robot is refused from 79 to the end (121 ticks), the
+terminal-stay block above; a stay that ends needs content after it.
 Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared/types.py
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
 
@@ -2826,6 +2829,11 @@ nothing, the meta-planner owns admission, the stop covers what no projection cov
 an item and stay still mid-carry; expected today: frozen belief, no trigger, a hold placed for a moving human,
 the conflict later than realized, refused by the stop inside the assessed window (the first fixture where the
 stop and realization overlap). design_decisions.md, "A stationary human".
+OBSERVED (T-C2c, `analysis/tc2c_scripts/`, scenario_11): a stay mid-carry (30 ticks at the coffee machine holding
+item_2) freezes the belief (`deliver_item(item_2)` 0.550, `coffee_break` 0.345, `unknown` 0.088) with no trigger,
+as expected. For (b), observed in scenario_01: once the human's hypothesis space is exhausted (its last assigned
+task pinned), `unknown` reads 0.995 and no projection exists, so a finished work order and unmodelled behaviour are
+indistinguishable to `update()`. T-D decides.
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026
 
@@ -2939,3 +2947,15 @@ belief changes, and nothing accumulates them. Recorded for evaluation: a history
 human's tasks as observed — completed, dropped, `unknown` episodes. Built from what the robot observes, never
 from the script. Designed in T-D. The robot taking over an abandoned task is a separate item (TODO-15).
 Reference: T-C1, 23 September 2026; design_decisions.md, "The human action script (T-C1, decided)"
+
+**TODO-93 — The completion of a foreseeable task ends the episode while an assigned delivery is visibly in progress** [T-D; from T-C2c]
+Observed in scenario_11 (`analysis/tc2c_scripts/`): the human picks up item_2, walks to the coffee machine holding
+it and waits there. At 75 `waited(human_0, coffee_machine_0)` pins `coffee_break`, and because that hypothesis
+expected its terminal action on the previous tick, the retirement is an episode boundary: every base becomes the
+uniform prior and every origin moves, although the human still holds item_2 and the delivery is in progress. The
+belief falls from `deliver_item(item_2)` 0.550 to 0.248 (four-way tie) and the delivery is recognised again from
+scratch (it clears θ at 100). Nothing is wrong by the current rule (docs/recognizer_handback.md §1.6: the observed
+agent finished a task); whether a task completed INSIDE another, with its item in hand, should end the episode is
+for T-D. Recorded, nothing changed.
+Files: shared/recognizer.py (`update`, `_task_boundary`)
+Reference: T-C2c, September 2026; docs/recognizer_handback.md §1.6
