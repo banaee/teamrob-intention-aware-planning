@@ -149,7 +149,129 @@ after="pick_up")`.
 - Odd: `coffee_break` does not rise on the walk to the machine, unlike scenario_11 (0.345): the walk to item_3 had
   already refuted it, and nothing resets it before the detour.
 
-## Across the ten
+## Twelve more, across layouts 2, 3, 4, 5, 7 and 9 (11–22)
+
+Same form, 500 steps; `play.py 11` … `22`. Layouts 2, 3, 4, 5 and 7 gained the five landmarks (corners 50 cm in from
+both walls, the door 20 cm inside the south wall); every regression fixture on them (s20, s30, s40, s50, s70, s71,
+both priors; s20 and s70 under `full_reorder`) is byte-identical to its baseline with them. `scenario_21` exists (a
+Phase 4C fixture), so layout2's three are 22–24. layout5 has one table, so its "wrong destination" is a change of
+mind before the pick-up. s70's human is assigned one delivery; scenario_72 assigns it item_3 as well, for the
+abandon. [sep] minima are given up to the robot's last release (after it, both stand at the table). No script failed
+to load, no primitive failed at run time.
+
+### 11. Landmark stay after the pick-up (scenario_22, env_layout2)
+- Human: item_3 picked (22), carried to corner_SE (24–60), stands 30, back to the table (139), item_2 (205), stands.
+- Belief: `deliver_item(item_3)` to 42; `unknown` 43–138 (not recovered on the carry back); item_2 after the pin;
+  `unknown` 0.995 after 205. recognition_changed: 11, 43, 156, 205.
+- Robot: item_4, item_6, item_7 (0, 62, 147); hold 7 at 11 (s20's). [sep] minimum 1.99 cm (233), the last delivery
+  at the table the human stands at.
+- Completion: 236.
+- Odd: as 9.
+
+### 12. Table stay, robot converging (scenario_23, env_layout2)
+`deliver(item_3)`, `Stay(40)`, `deliver(item_2)`.
+- Human: item_3 placed (54), stands at the table 56–95, item_2 placed (161), stands.
+- Belief: item_3 pinned at 54, boundary; `deliver_item(item_2)` leads from 54 at the prior (0.498), clears θ at 111
+  (on the walk); `unknown` 0.995 after 161. The stay is not evidence: the belief sits at the prior through it.
+  recognition_changed: 11, 54, 111, 161.
+- Robot: item_4, item_6, item_7 (0, 62, 147); holds 7 at 11 and 16 at 147, the second at the table, against the
+  human's projected arrival with item_2. Stop off: [sep] minimum 3.85 cm (247). Stop on: 40 refusals during the stay
+  (56–95), item_4 delivered at 101 once the human left, then refused from 161 to the end (316) at the human's final
+  stand; one delivery of three.
+- Completion: 250 stop off; none in 500 stop on.
+- Odd: the mid-run stay is survived with the stop on; the end-of-script stand is not.
+
+### 13. Change of mind before the pick-up (scenario_24, env_layout2)
+- Human: walks toward item_3 (0–21), turns to item_2 (22), picks it (50), places it (84), stands.
+- Belief: item_3 to 35; `unknown` 36–78; `deliver_item(item_2)` recovers at 79 (0.509), 5 ticks before its release;
+  after 84 the abandoned item_3. recognition_changed: 11, 36, 82, 84.
+- Robot: item_4, item_6, item_7; hold 7 at 11. [sep] minimum 1.1 cm (233), at the table.
+- Completion: 236.
+- Odd: a short first walk (22 ticks) lets the second task recover, late; in 1 and 7 (77 ticks) it never does.
+
+### 14. Change of mind after the pick-up, the return (scenario_31, env_layout3)
+- Human: item_3 picked (39), returned to shelf_3 (41–42), item_7 picked (70), placed (93), stands.
+- Belief: item_3 to 63; `unknown` 64–67; `deliver_item(item_7)` 0.900 from 68. recognition_changed: 23, 64, 68, 93.
+- Robot: item_4, item_2 (0, 83); hold 6 at 23. [sep] minimum 8.47 cm (23): s30's own crossing, the same tick and
+  distance as s30's baseline, not the script's.
+- Completion: 160.
+- Odd: recovery is quick here (the return is 2 ticks).
+
+### 15. Free actions, then the deliveries (scenario_32, env_layout3)
+`MoveTo(door)`, `Stay(20)`, `MoveTo(corner_SW)`, `deliver(item_3)`, `deliver(item_7)`.
+- Human: door (0–36), stands 20, corner_SW (57–79), item_3 (placed 128), item_7, stands.
+- Belief: item_3 at ~0.35–0.5 through the free part, `unknown` 69–105, item_3 from 106, item_7 after 128.
+  recognition_changed: 123, 128, 139.
+- Robot: item_4, item_2 (0, 77); no hold. [sep] minimum 83.5 cm.
+- Completion: 154.
+- Odd: none.
+
+### 16. Abandon after the pick-up, to a corner holding the item (scenario_42, env_layout4)
+`deliver(item_3)`, `abandon(deliver(item_6), after="pick_up", then=[MoveTo(corner_SE)])`.
+- Human: item_3 placed (115), item_6 picked (175), walks to corner_SE with it (177–) and stands there to the end.
+- Belief: item_3 (low shares, 0.157 at the start: s40's wide space); item_6 from 121; `unknown` 0.517 from 192 on
+  the walk to the corner, frozen there. recognition_changed: 30, 115, 153, 192.
+- Robot: item_4, item_7, item_5 (0, 148, 247); no hold. [sep] minimum 73.3 cm.
+- Completion: 379.
+- Odd: none; the carried item never reaches a table and the belief stays `unknown`.
+
+### 17. Change of mind before the pick-up (scenario_51, env_layout5)
+- Human: toward item_2 (0–11), turns to item_3 (12), picks it (40), places it (72), stands.
+- Belief: item_2 to 25; `unknown` 26–37; `deliver_item(item_3)` 0.865 from 38. After 72 `coffee_break` leads (0.332,
+  the prior over the two hypotheses left). recognition_changed: 8, 26, 38, 72.
+- Robot: item_4, item_6, item_7 (0, 55, 140); no hold. [sep] minimum 8.8 cm (140).
+- Completion: 229.
+- Odd: the first walk is 12 ticks and the second task is recognised 32 ticks before its release (cf. 13, 1).
+
+### 18. Landmark stay mid-carry (scenario_52, env_layout5)
+- Human: item_3 picked (22), to corner_NW (24–58), stands 30, back to the table (116), item_2 (184), stands.
+- Belief: item_3 to 54; `unknown` 55–97; item_3 again from 98 (recovered on the carry back); item_2; `coffee_break`
+  at the prior after 184. recognition_changed: 11, 55, 113, 116, 136, 184.
+- Robot: item_4, item_6, item_7; hold 7 at 11. [sep] minimum 3.67 cm (233), at the table.
+- Completion: 236.
+- Odd: recovered here (a nearer corner), not in 9 and 11.
+
+### 19. Table stay after the deliveries, then coffee (scenario_53, env_layout5)
+`deliver(item_3)`, `deliver(item_2)`, `Stay(40)`, `coffee_break`.
+- Human: item_3 (54), item_2 (121), stands 40 at the table (123–162), coffee break (216), stays at the machine.
+- Belief: after 121 `coffee_break` leads at the prior (0.497) through the stay; pinned at 216; `unknown` 0.994 after.
+  recognition_changed: 11, 54, 74, 121, 174, 216.
+- Robot: item_4, item_6, item_7; hold 7 at 11. [sep] minimum 30.1 cm (147).
+- Completion: 236.
+- Odd: the stay ends by a walk the robot recognises, so the table is free for its last delivery (s50's design).
+
+### 20. Coffee break, table stay, abandon (scenario_72, env_layout7)
+- Human: item_5 picked (30), coffee machine 3 ticks away, waits (35–65), places item_5 (96), stands at the table 98–117,
+  picks item_3 (far north) and stands holding it.
+- Belief: `coffee_break` 0.985 at 33 (the machine is next to the shelf); pinned at 64, boundary (TODO-93); item_5
+  0.762 by 81, pinned at 96; then `ac_activation` at the prior 0.332, below θ, through the table stay; item_3 from 118.
+  recognition_changed: 23, 28, 33, 64, 81, 96, 140.
+- Robot: item_1, item_2, item_1, item_2 (0, 23, 28, 105); holds 16 at 33 and 3 at 81. [sep] minimum 0.78 cm (100):
+  after the boundary at 96 no projection is admitted, and the robot's carry to the table passes through the human
+  standing at it.
+- Completion: 195.
+- Odd: the closest pass in the play set, and before the robot's completion (see below).
+
+### 21. Free actions, then the delivery (scenario_73, env_layout7)
+`MoveTo(door)`, `Stay(20)`, `MoveTo(corner_NW)`, `deliver(item_5)`.
+- Human: door (0–32), stands 20, corner_NW across the whole room (53–159), item_5 (placed 277).
+- Belief: `unknown` leads from 14 to the robot's end (173). recognition_changed: none.
+- Robot: item_1, item_2 (0, 80); no hold. [sep] minimum 135.7 cm.
+- Completion: 171 (the robot finishes before the human's delivery).
+- Odd: none.
+
+### 22. Table stay, robot converging (scenario_94, env_layout9)
+`deliver(item_2)`, `deliver(item_3)`, `Stay(40)`, `MoveTo(corner_SE)`.
+- Human: item_2 (33), item_3 to kitting_table_1 (144), stands there 146–185, walks to corner_SE, stands.
+- Belief: item_3 at the prior from 33, clears θ at 64; `unknown` 0.994 after 144. recognition_changed: 5, 33, 64, 144.
+- Robot: item_5, item_4, item_6, item_1 (0, 79, 139, 250); hold 7 at 139, at kitting_table_1 after its item_4
+  delivery, against the human's projected arrival there: the robot stands at the human's destination and the human
+  walks up to it (interrupted at 144 by the boundary). Stop off: [sep] minimum 1.1 cm (145). Stop on: refused 144–186
+  (43) while the human stands, then continues.
+- Completion: 370 stop off; 413 stop on.
+- Odd: the first stop-on run in the play set that completes: the stay ends, and the stop waits it out.
+
+## Across the twenty-two
 - The script mechanism held: every shape loaded, expanded and ran; the return in 2 came from sequential expansion.
 - A change of mind is not re-recognised (1, 2): the evidence the first walk laid against the second task persists
   with no boundary between them, so the robot sees `unknown` until the second task's release.
@@ -159,3 +281,8 @@ after="pick_up")`.
   boundary, so a change of mind (7), a long detour (9) and a foreseeable task after an unrelated walk (10) read as
   `unknown` rather than as the task the human is doing. Stop-on runs were not repeated for 7–9 (the human's terminal
   stand at a table the robot delivers to, as in 2 and 6).
+- 11–22: a change of mind or a detour is recovered when the misleading walk is short (13, 14, 17, 18) and not when it
+  is long (1, 7, 9, 11). After every episode boundary the belief sits at the prior, below θ, so no projection is
+  admitted while the human stands where it just delivered; the robot's next carry to that table passes within
+  centimetres of it (20: 0.78 cm, before the robot's completion). With the stop on, a stay that ends is waited out
+  (12 in its middle part, 22); only the end-of-script stand deadlocks.

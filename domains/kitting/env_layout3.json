@@ -101,6 +101,46 @@
       "zone": "zone_SE",
       "notes": "Human second task item. Symmetric to shelf_6."
     },
+    {
+      "id": "corner_NE",
+      "type": "landmark",
+      "position": [450, 350],
+      "size": [20, 20],
+      "zone": "zone_NE",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_NW",
+      "type": "landmark",
+      "position": [-450, 350],
+      "size": [20, 20],
+      "zone": "zone_NW",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SE",
+      "type": "landmark",
+      "position": [450, -350],
+      "size": [20, 20],
+      "zone": "zone_SE",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SW",
+      "type": "landmark",
+      "position": [-450, -350],
+      "size": [20, 20],
+      "zone": "zone_SW",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "door",
+      "type": "landmark",
+      "position": [0, -380],
+      "size": [80, 20],
+      "zone": "zone_SE",
+      "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
+    },
         {
       "id": "item_3",
       "type": "item",

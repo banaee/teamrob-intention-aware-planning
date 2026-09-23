@@ -171,6 +171,46 @@
       "notes": "The human's last task: switch on the AC by the east wall and stay there, off every robot route."
     },
     {
+      "id": "corner_NE",
+      "type": "landmark",
+      "position": [950, 950],
+      "size": [20, 20],
+      "zone": "zone_NE",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_NW",
+      "type": "landmark",
+      "position": [-950, 950],
+      "size": [20, 20],
+      "zone": "zone_NW",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SE",
+      "type": "landmark",
+      "position": [950, -950],
+      "size": [20, 20],
+      "zone": "zone_SE",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SW",
+      "type": "landmark",
+      "position": [-950, -950],
+      "size": [20, 20],
+      "zone": "zone_SW",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "door",
+      "type": "landmark",
+      "position": [0, -980],
+      "size": [80, 20],
+      "zone": "zone_SE",
+      "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
+    },
+    {
       "id": "item_1",
       "type": "item",
       "subtype": "part_A",

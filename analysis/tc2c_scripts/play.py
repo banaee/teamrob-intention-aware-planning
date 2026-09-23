@@ -1,6 +1,6 @@
-"""analysis/tc2c_scripts/play.py <n> [run_mesa flags...] — T-C2c play: runs play scenario n (1-10) of play.md.
+"""analysis/tc2c_scripts/play.py <n> [run_mesa flags...] — T-C2c play: runs play scenario n (1-22) of play.md.
 
-The six scripts are registered script examples in domains/kitting/scenarios.py (not measured fixtures); this only
+The scripts are registered script examples in domains/kitting/scenarios.py (not measured fixtures); this only
 maps play.md's numbering to them and calls the normal headless runner. Run from the repo root, e.g.
 
     PYTHONHASHSEED=0 ~/python-envs/teamrob-sp4-env/bin/python analysis/tc2c_scripts/play.py 1 --steps 340 \\
@@ -22,6 +22,18 @@ PLAY = {
     "8": ("env_layout9", "scenario_92"),   # wrong destination, tables at the walls
     "9": ("env_layout9", "scenario_93"),   # landmark walk and stay mid-carry, tables at the walls
     "10": ("env_layout4", "scenario_41"),  # coffee break, stay at the table, abandon after pick-up
+    "11": ("env_layout2", "scenario_22"),  # landmark stay after pick-up
+    "12": ("env_layout2", "scenario_23"),  # table stay, robot converging
+    "13": ("env_layout2", "scenario_24"),  # change of mind before the pick-up
+    "14": ("env_layout3", "scenario_31"),  # change of mind after the pick-up (the return)
+    "15": ("env_layout3", "scenario_32"),  # free actions, then the deliveries
+    "16": ("env_layout4", "scenario_42"),  # abandon after pick-up, to a corner holding the item
+    "17": ("env_layout5", "scenario_51"),  # change of mind before the pick-up
+    "18": ("env_layout5", "scenario_52"),  # landmark stay mid-carry
+    "19": ("env_layout5", "scenario_53"),  # table stay after the deliveries, then coffee
+    "20": ("env_layout7", "scenario_72"),  # coffee break, table stay, abandon
+    "21": ("env_layout7", "scenario_73"),  # free actions, then the delivery
+    "22": ("env_layout9", "scenario_94"),  # table stay, robot converging
 }
 
 layout, scenario = PLAY[sys.argv[1]]

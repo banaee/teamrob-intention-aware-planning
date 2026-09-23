@@ -158,6 +158,46 @@
       "notes": "Human's second target. At -36.9 deg from the human's start it is angularly far from shelf_3/4/6, so it does not muddy the early ambiguity."
     },
     {
+      "id": "corner_NE",
+      "type": "landmark",
+      "position": [550, 400],
+      "size": [20, 20],
+      "zone": "zone_NE",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_NW",
+      "type": "landmark",
+      "position": [-550, 400],
+      "size": [20, 20],
+      "zone": "zone_NW",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SE",
+      "type": "landmark",
+      "position": [550, -400],
+      "size": [20, 20],
+      "zone": "zone_SE",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SW",
+      "type": "landmark",
+      "position": [-550, -400],
+      "size": [20, 20],
+      "zone": "zone_SW",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "door",
+      "type": "landmark",
+      "position": [0, -430],
+      "size": [80, 20],
+      "zone": "zone_SE",
+      "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
+    },
+    {
       "id": "item_4",
       "type": "item",
       "subtype": "part_C",
