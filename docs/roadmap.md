@@ -409,6 +409,16 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   stay is evidence (if so, a duration term, its own item T-H) and what `update()` does with `unknown` on top
   (candidate: the human projected stationary at its position for a bounded horizon); design_decisions.md,
   "A stationary human".
+  T-C1 ✅ (23 September 2026): design_decisions.md, "The human action script (T-C1, decided)". The executed
+  script is a flat list of primitives (`MoveTo`, `PickUp`, `Place`, `Stay`), a task expanded at load by
+  `expand(task)` with provenance on each primitive; the author writes `interrupt`, `deviate`, `abandon`, free
+  `Stay(n)` and `MoveTo(landmark)`; the human executor is action-level. TODO-86 closed. Not decided in C1:
+  TODO-85 (half (b) with T-D; half (a), if taken, T-H) and TODO-88, their own items.
+  - **T-C2 — the build.** C2a the script layer: primitives, `expand`, the vocabulary, landmarks, the
+    provenance check. C2b the human executor, action-level. Fixtures s00, s20, s70, s80, s83, prior on;
+    identity up to the dropped per-task completion tick; the baselines regenerated once. Then two literal
+    scenarios, an interrupt and a stay, one run each, observed, not judged.
+  - From here debugging runs use prior on only; off / on returns for the paper.
 - **T-D — Robustness in kitting, on T-C.** Scenarios for a change of mind mid-task, a walk to an empty
   corner (`unknown` as outcome), a declared stay at the table (the blocked case); the blocked event in
   `ExecutorState`, the trigger routed past B2, the reconsider policy (design in TODO-80 and D2); evaluation
