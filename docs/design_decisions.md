@@ -3598,3 +3598,42 @@ the Q2 to Q4 pass, the existing fixtures show enough decision ticks with the lea
 the smallest set of task hypotheses (`unknown` excluded) reaching θ has two or more members (S_ε at ε = 1 − θ).
 Nothing in Q1's build is shaped for it; its only seam is sub-ruling 4c (`realize()` not special-cased, the projection passed through `update_human_projection()`).
 Reference: TODO-97; TODO-84; "The belief is used as a bar, not a magnitude" (T-A1); DESIGN-07; D3; T-D Q1
+
+---
+
+**Terms for human behaviour, model coverage and the robot's inference (ruled)**
+
+RULED (Hadi, 24 September 2026). Terminology only: no behaviour, identifier, constant, log tag or log text changes,
+and the ruling does not prejudge the pending architecture decision on whether `unknown` stays in the Bayesian
+hypothesis space.
+
+Why. "Unknown" named two things: (a) a property of the human's behaviour in the world, that it lies outside the
+robot's models, and (b) the robot's belief, the mass on the residual hypothesis `unknown`. They diverge: a standing
+human is unmodelled and produces no evidence (I4c), and a finished work order leaves `unknown` near 0.995 with
+nothing unmodelled occurring (handoff_T-D_onward.md, item 6). The decision on `unknown` has to be stated in terms
+that keep them apart.
+
+The ruling. Two groups, WORLD and ROBOT; a term of one is never used for the other.
+- WORLD, three independent labels, ground truth, computable from the script and the hypothesis space, never received
+  by the robot's mind. Label A, work order: assigned task or deviation (any departure from the work order); the
+  script edits `interrupt`, `deviate`, `abandon` each produce a deviation and are operations, not kinds of deviation;
+  a foreseeable task is a task-level deviation that is modelled, not a third value of label A. Label B, model
+  coverage: modelled behaviour (a `HypothesisKey` in the robot's hypothesis space describes it) or unmodelled
+  behaviour (none does), judged at the hypothesis level, not at the schema level and not by provenance (a
+  `coffee_break` interrupt declared foreseeable is modelled; a wrong-table delivery, TODO-87, is unmodelled). Label
+  C, experimental intent, a property of the scenario: the declared experimental condition in its description; a
+  mismatch with the coverage labels means unintended unmodelled behaviour (the terminal stand, TODO-80). "Scripted"
+  is not a behaviour class.
+- ROBOT. Recognizer belief: task hypotheses and `unknown`, the residual hypothesis (code font; identifiers unchanged).
+  Recognizer finding: unexplained, evidence that no live task hypothesis explains the observations. Meta-planner
+  gate outcome: admitted (existing).
+- Usage rule in prose: the implementation, "the `unknown` hypothesis"; the human's behaviour, "unmodelled
+  behaviour"; the robot's inference result, "unexplained". Unmodelled and unexplained can disagree at a given time;
+  that is why both exist.
+- Not introduced: "unresolved", "recognised", "exhausted". They belong to the pending decision on `unknown`;
+  "recognised" would also suggest that the recognizer performs the θ gate.
+
+Where it lives. `docs/glossary.md` §7 (authoritative); `docs/terminology_revision.md` (diagrams, the case table,
+the divergences, the label-C check). Computing the coverage label is not built; recorded under TODO-92. Older
+entries keep their text; TODO-95, TODO-96 and TODO-97 carry a pointer.
+Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TODO-95; I4c

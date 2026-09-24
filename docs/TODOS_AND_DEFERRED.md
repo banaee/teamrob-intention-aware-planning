@@ -2962,6 +2962,14 @@ observed of the human either: completions reach it as world facts, retractions a
 belief changes, and nothing accumulates them. Recorded for evaluation: a history, in the robot's mind, of the
 human's tasks as observed — completed, dropped, `unknown` episodes. Built from what the robot observes, never
 from the script. Designed in T-D. The robot taking over an abandoned task is a separate item (TODO-15).
+NOTE (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7): the evaluation will also need the WORLD labels
+of each human behaviour, label A (assigned task or deviation) and label B (modelled or unmodelled behaviour: whether a
+`HypothesisKey` of the robot's hypothesis space describes it), and the label-C check of a scenario (its declared
+experimental condition against the computed coverage; a mismatch means unintended unmodelled behaviour). They are
+ground truth, computable from the script (with its provenance) and the hypothesis space, and kept OUTSIDE the
+robot's mind, unlike this history, which is built from observation. Not built; recorded here because the
+evaluation compares the two: unexplained (the robot's finding) against unmodelled (the label).
+`docs/terminology_revision.md`, sections 2 and 4.
 Reference: T-C1, 23 September 2026; design_decisions.md, "The human action script (T-C1, decided)"
 
 **TODO-93 — The completion of a foreseeable task ends the episode while an assigned delivery is visibly in progress** [T-D; from T-C2c]
@@ -2994,6 +3002,10 @@ Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1
 **TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN]
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
 the pass or stays recorded for T-H.
+TERMS (24 Sept 2026, `docs/glossary.md` §7): this entry predates the terminology ruling. Where it says "unknown
+(unmodelled)", "unknown behaviour" or "assigned, foreseeable and unknown behaviour", read unmodelled behaviour (a
+world label); `unknown` in code font is the residual hypothesis of the belief. The two are not the same thing: a
+stand is unmodelled and leaves `unknown` unmoved. `docs/terminology_revision.md`.
 
 Origin. While ruling T-D Q1, Hadi questioned whether projecting the human as stationary right
 after a human task completion is a principled response or a device that gives the meta-planner
@@ -3087,6 +3099,8 @@ baselines regenerated; about the size of the T-D Q2 to Q4 pass itself.
 Related: TODO-59 (deferred part), TODO-85 half (a), TODO-80, TODO-92, TODO-96, T-D Q1, T-D Q5.
 
 **TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN, recorded only]
+TERMS (24 Sept 2026, `docs/glossary.md` §7): "unknown behaviour" below means unmodelled behaviour; "sustained
+`unknown`" is the belief's residual mass, which is not the same condition.
 Status: open, recorded only. Hadi: under unknown behaviour the robot may stop and communicate
 (ask the human what is happening, raise an alarm) instead of, or after, re-planning. No
 communication channel exists in the framework. Level 3 of the response structure in TODO-95.
@@ -3100,6 +3114,9 @@ Status: open, recorded only. Not on the T-D agenda, not in the handoff order.
 Claim it would support: robustness to intention AMBIGUITY, two or more live hypotheses sharing the
 mass and none clearing θ. Not robustness to intention uncertainty in general: a confident wrong
 belief (T-D Q4) and unmodelled behaviour (`unknown`) are untouched by it.
+TERMS (24 Sept 2026, `docs/glossary.md` §7): "unmodelled behaviour (`unknown`)" pairs a world label with the belief's
+residual hypothesis; they diverge (a stand is unmodelled with `unknown` unmoved; a finished work order has `unknown`
+high by normalisation). `docs/terminology_revision.md`, section 3.
 
 Mechanism, one candidate, not decided.
 - The covering set S_ε: the smallest set of hypotheses holding at least 1 − ε of the belief mass.
