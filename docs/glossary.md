@@ -124,6 +124,7 @@ integer and is not `ProjectedPlan.total_estimated_cost`.
 observed human at this trigger, projected as a robot candidate is, with the human body's own per-task
 completion tick (0 since T-C2b: its executor is action-level). It ends at **T_h**.
 Admission is logged as `[meta-proj]`; there is at most one, and there may be none.
+See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 → `shared/meta_planner.py`, `update_human_projection()`; `shared/io_contracts.md` §2.2.
 
 **T_h** — the end of the human projection: its last segment's end step. Nothing past T_h is

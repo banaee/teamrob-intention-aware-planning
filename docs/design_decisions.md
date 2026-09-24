@@ -400,6 +400,7 @@ explicit after reviewing an alternative implementation that fed decayed belief
 directly into cost as a multiplier. Whether *horizon-projected* confidence (for
 tasks further down a multi-task candidate ordering) should ever feed cost is a
 separate, deliberately open question — see TODOS_AND_DEFERRED.md DESIGN-12.
+See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 
 **Prediction horizon H bounds the lookahead**
 IR produces a predicted human action sequence with confidence decaying over horizon H.
@@ -760,6 +761,7 @@ insertion order (TODO-42) — and an interference check against it is a check ag
 `update()` already handled `human_projection=None` (every candidate feasible, no
 interference check), so the gate needed no downstream change. Admission is a MetaPlanner
 decision; `Projector` stays a pure projection service holding no policy.
+See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 
 The gate is only meaningful because of the restriction above: with the 10× multiplier,
 `belief.confidence` crossed θ on prior mass, so gating on it would have admitted a
@@ -2865,6 +2867,7 @@ recognizer does not calibrate (its confidence ceiling rises with the observation
 decision rests on one hypothesis that can be recorded (D2's decision record). The alternative, selecting on
 the expected realized cost over the belief, is a comparison for Phase 5 (TODO-84), not a change: nothing in
 the design moves by recording it.
+See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 Reference: T-A1, September 2026; DESIGN-07; D2; the gate ruling; TODO-84
 
 ---
@@ -3575,3 +3578,23 @@ interrupt and a stay, one run each, observed and not judged. From here debugging
 on returns for the paper.
 Reference: T-C1, 23 September 2026; "The human's scenario is an action script" (T-A1); "A run-time deviation is
 the same operation as a load-time edit" (Phase 7); TODO-86, TODO-87, TODO-85, TODO-88, TODO-15, TODO-92
+
+---
+
+**Belief-aware planning: a joint realization against the hypotheses that cover the belief (later, recorded)**
+
+RECORDED, NOT DECIDED (cchat, Hadi, 24 September 2026). A later pipeline task, after the T-D Q2 to Q4
+recognizer pass; not on the T-D agenda. TODO-97 holds it in full.
+
+What it would support is robustness to intention ambiguity (two or more live hypotheses sharing the mass, none
+clearing θ), not to intention uncertainty in general: a confident wrong belief (Q4) and `unknown` are untouched.
+One candidate mechanism: the covering set S_ε, the smallest set of hypotheses holding at least 1 − ε of the
+mass; each candidate realized once against all projections in S_ε jointly (not a criterion over per-hypothesis
+costs, which is TODO-84); `unknown` in S_ε projects the Q1 stationary object; the guarantee stated in belief
+mass, never as a probability of safety. Above the gate it equals today's mechanism with ε = 1 − θ; the two
+differ only below θ. ε, and `recognition_changed` redefined as "S_ε changed", reopen DESIGN-07 and D3 and are
+argued then. It presumes hypotheses reach the robot only through interference. It is taken up only if, after
+the Q2 to Q4 pass, the existing fixtures show enough decision ticks with the leading share below θ and two or
+more tasks each holding substantial mass. Nothing in Q1's build is shaped for it; its only seam is sub-ruling
+4c (`realize()` not special-cased, the projection passed through `update_human_projection()`).
+Reference: TODO-97; TODO-84; "The belief is used as a bar, not a magnitude" (T-A1); DESIGN-07; D3; T-D Q1

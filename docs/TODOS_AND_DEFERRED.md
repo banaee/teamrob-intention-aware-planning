@@ -3094,6 +3094,41 @@ Its condition (sustained `unknown`, or a blocked event WAIT and RECONSIDER do no
 must be defensible without a constant taken from a scenario. To be argued at T-D Q5 or after;
 not part of T-D Q1.
 
+**TODO-97: Belief-aware planning: a joint realization against the hypotheses that cover the belief (recorded, 24 Sept 2026)** [OPEN, recorded only; later, after the T-D Q2 to Q4 recognizer pass]
+Status: open, recorded only. Not on the T-D agenda, not in the handoff order.
+
+Claim it would support: robustness to intention AMBIGUITY, two or more live hypotheses sharing the
+mass and none clearing θ. Not robustness to intention uncertainty in general: a confident wrong
+belief (T-D Q4) and unmodelled behaviour (`unknown`) are untouched by it.
+
+Mechanism, one candidate, not decided.
+- The covering set S_ε: the smallest set of hypotheses holding at least 1 − ε of the belief mass.
+- One realization per candidate against all projections in S_ε JOINTLY: a joint-realization
+  criterion, not a criterion over per-hypothesis costs (that is TODO-84's expected realized cost,
+  a different comparison).
+- `unknown` in S_ε projects the T-D Q1 stationary object.
+- The guarantee is stated in belief mass, never as a probability of safety.
+
+Equivalence. Above the gate it equals today's mechanism with ε = 1 − θ. The two differ only below
+θ: today the T-D Q1 stationary projection, here the union of the projections in S_ε.
+
+Constants that remain: ε, and the condition that redefines `recognition_changed` as "S_ε changed".
+Both reopen DESIGN-07 and D3, and are argued at that time.
+
+Precondition: hypotheses affect the robot only through interference. Shared-resource conflicts,
+or the robot taking over an abandoned task (TODO-15), would need more than realized duration.
+
+Gate on doing it: after the Q2 to Q4 pass, measure on the existing fixtures the count of decision
+ticks at which the leading share is below θ and two or more tasks each hold substantial mass. A
+small count closes this TODO.
+
+Evaluation, if opened: one shared-corridor ambiguity fixture and one conservatism fixture, a
+comparison table in the T-B3 style.
+
+Nothing in T-D Q1's build is shaped for it. Sub-ruling 4c of Q1 (`realize()` not special-cased, the
+projection passed through `update_human_projection()`) is the only seam it needs.
+Related: TODO-84, TODO-95, TODO-15, DESIGN-07, D3; design_decisions.md, "Belief-aware planning".
+
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).
 2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.

@@ -534,7 +534,7 @@ Also stated, lower in consequence:
   `unknown`. It resolves the key through `recognizer.get_hypothesis()` (the same live instance, held by
   reference) to project the human's task, and records the hypothesis it projected.
 
-Confidence is a gate, never a magnitude in any cost; `distribution` is logged and not read. The one-shot
+Confidence is a gate, never a magnitude in any cost; `distribution` is logged and not read. (See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.) The one-shot
 question of the I5 hand-back (TODO-68, with TODO-48 and TODO-54) is closed by D2 on the consumer side. A
 re-crossing of the recorded hypothesis fires nothing; a change of hypothesis or its end fires. No change was
 made to the recognizer or to its event semantics (`design_decisions.md`, the D2 entry;

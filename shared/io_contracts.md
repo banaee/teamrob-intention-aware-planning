@@ -842,7 +842,7 @@ in what that decision rested on):
   kept here as history. `ExecutorState.holding` stays, read by no trigger.
 
 θ=0.75, single threshold, no hysteresis. Confidence is a gate here, never a magnitude fed
-into a cost. `MetaPlanner` owns `_prev_executor_state` and the decision record internally —
+into a cost. (See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.) `MetaPlanner` owns `_prev_executor_state` and the decision record internally —
 unlike the retired `should_replan()`, these are not parameters. When two conditions hold on one
 tick the order is `no_current_task`, `recognition_changed`, `task_committed`; only the reported
 reason and score differ.
@@ -968,7 +968,7 @@ MetaPlanner policy, not a `Projector` one — then delegated to `Projector.proje
 Returns `None`, checked in this order, when:
 
 - `belief.confidence < theta` — the projector is not called. θ gates admission as it gates
-  triggering (DESIGN-07); it still never feeds `_cost()`.
+  triggering (DESIGN-07); it still never feeds `_cost()`. See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 - `human_agent_id is None` — no human observed.
 - `belief.most_likely` is the recognizer's `unknown` (T8) — the projector is not called. Mass
   on `unknown` above θ is not a recognition and there is nothing to project. Reachable
