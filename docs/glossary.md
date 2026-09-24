@@ -271,7 +271,8 @@ measured from its origin, per hypothesis. ONE observation however many ticks it 
 
 **graded evidence** — a stretch's evidence against `unknown` is graded by f, the share of the
 hypothesis's expected path the stretch covered: `unknown`'s likelihood for the stretch is u^f. A
-walk's odds accrue per unit of expected path and do not depend on how the phases cut it. The grade
+walk's odds accrue per unit of expected path and do not depend on how the phases cut it. f is the covered
+fraction (`covered_fraction`), unrelated to model coverage (label B, §7). The grade
 meters confirmation only; refutation by wasted path is unchanged.
 → `docs/recognizer_handback.md` §1.4 (THE GRADE) and §1.5; `docs/design_decisions.md`, "A stretch's
 evidence against `unknown` is graded by the share of the expected path it covers".
@@ -416,6 +417,10 @@ Coverage is judged at the hypothesis level: not at the schema level, and not by 
 interrupt declared foreseeable is modelled: its provenance is `coffee_break` and a hypothesis exists. A
 wrong-table delivery (TODO-87) is unmodelled: its provenance is `deliver_item` and its schema is modelled, but no
 hypothesis describes it, since a hypothesis carries the item's designated table (a **determined parameter**, §6).
+"Model coverage" is unrelated to the covered fraction f of **graded evidence** (§5, `covered_fraction`): f is the
+share of one hypothesis's expected path a stretch has closed, a quantity inside the robot's evidence; coverage is
+whether any hypothesis describes a behaviour, a world label. Say "coverage" for label B and "covered fraction" (or
+"the grade", f) for the evidence, never one for the other.
 
 **label C, experimental intent** — a property of the scenario, not of one behaviour.
 - **declared experimental condition** — what the scenario's description says it tests, e.g. "unmodelled-behaviour

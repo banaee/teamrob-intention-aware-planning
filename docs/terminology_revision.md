@@ -83,6 +83,9 @@ wrong-table delivery      deliver_item      yes                    no (the hypot
 (TODO-87)                                                           the designated table)
 ```
 
+"Model coverage" is unrelated to the covered fraction f of graded evidence (`covered_fraction`, the share of one
+hypothesis's expected path a stretch has closed). f lives inside the robot's evidence; coverage is a world label.
+
 "Scripted" is not a behaviour class: in the simulator every behaviour is scripted. The word only contrasts
 simulation with a real deployment.
 
