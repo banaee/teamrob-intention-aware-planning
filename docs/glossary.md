@@ -99,7 +99,7 @@ COLLISION, not resolved: "entry" is also the ordinary word for a titled section 
 a dict or a JSON list. Those are the English word; only the plan sense is a term. Where both could be
 read, write "the design entry" or "the plan's entry".
 
-**segment** — one `Segment` inside an entry: a straight-line motion, or a stationary stretch,
+**segment** — one `Segment` inside an entry: a straight-line motion, or a stationary interval (a stationary segment),
 between two steps. An entry has several segments — one per action, plus the completion latencies.
 Do not call a segment a "stretch of evidence"; that is the recognizer's.
 → `shared/types.py`, `Segment`; `shared/io_contracts.md` §1.7.
@@ -183,7 +183,7 @@ entry ended; it is priced at the trigger and never executed as such, because the
 own triggers first. There is no hold cap.
 → `shared/io_contracts.md` §1.11; `mesa_sim/executor.py`, `hold()`.
 NOTE: a stationary `Segment` that is NOT a chosen shift — a grasp, a wait, a completion latency — is
-a "stationary stretch" or "stationary segment", not a hold.
+a "stationary segment", not a hold ("stationary stretch" is not used: **stretch** is the recognizer's).
 
 **whole-trajectory minimal shift** — the name of the R1 realization policy: the smallest whole-tick
 shift under which the plan has no violation in the assessed window, the robot standing still until
@@ -315,9 +315,15 @@ planner fills it before method selection; the recognizer does not enumerate it.
 `docs/design_decisions.md`, "An item's destination table is a fact of the station".
 
 **foreseeable task** — a task the domain declares as a deviation the robot can anticipate
-(`schema.is_foreseeable`). Foreseeable tasks sit inline in the human's `scheduled_tasks` and never in
-`assigned_tasks`. On the labels of §7: a deviation (label A) that is modelled (label B).
-→ `shared/types.py`, `TaskSchema` and `AgentConfig`.
+(`schema.is_foreseeable`). In the human's script it is written as a `TaskInstance`, either directly or as content
+injected by `interrupt` / `abandon`, and `expand()` turns it at load into primitives carrying its provenance; the
+executed `scheduled_tasks` holds only primitives, so the task is visible in the script's provenance, not as an
+element. The work-order check treats it as free (`check_work_order`); it belongs to no work order, which is why it is
+not listed in `assigned_tasks` (a convention: the code does not reject it there). The recognizer keeps its hypothesis
+admissible under the assignment prior (`_build_admissible_keys`). On the labels of §7: a deviation (label A) that
+is modelled (label B).
+→ `shared/types.py`, `TaskSchema`, `check_work_order()`; `domains/script.py`, `expand()`;
+`shared/recognizer.py`, `_build_admissible_keys()`.
 
 **task completion** — a fact about the world: the task's terminal condition holds, whoever made it
 hold (`planner.is_complete()`). Not a fact about who performed it. Measured from the world tick, the
@@ -375,7 +381,9 @@ edit (`[Deviation]`) that the loader applies to the task's expansion with the li
 `insert_before`, `retarget`, `truncate`).
 AUTHOR CONVENTION (T-C2c, Hadi): a script ends with the human leaving the workspace (`MoveTo("door")` or a corner),
 unless the scenario is about the terminal stand at a table (TODO-80's blocked case, said in its description): a
-human left standing at a table deadlocks the robot with the stop on, an artefact of the scenario.
+human left standing at a table deadlocks the robot with the stop on, an artefact of the scenario. The terminal exit
+walk is intended unmodelled behaviour (no hypothesis binds a landmark): by this convention it is a declared
+unmodelled behaviour of every scenario, so the label-C check (§7) excludes it.
 AUTHOR NOTE (T-C2b): content injected by `interrupt` is expanded sequentially, but the interrupted task's
 remaining actions are not: a task injected after a pick-up that returns the held item (`deliver_with_return`)
 leaves the resumed `place` failing at run time. Write the return explicitly, or use `abandon`.
@@ -388,7 +396,7 @@ leaves the resumed `place` failing at run time. Write the return explicitly, or 
 Ruled by Hadi, 24 September 2026. "Unknown" used to name two different things: what the human does (behaviour
 outside the robot's models) and what the robot believes (the mass on the residual hypothesis `unknown`). The two
 diverge: a standing human is unmodelled but produces no evidence, and a finished work order leaves `unknown` near
-0.995 while nothing unmodelled occurs. The terms below keep four things apart: what behaviour occurs in the world,
+0.995 while nothing is unexplained. The terms below keep four things apart: what behaviour occurs in the world,
 whether the robot's models cover it, whether the scenario author intended it as an experimental condition, and
 what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is never used for the other.
 Diagrams, a table of cases and the divergences: `docs/terminology_revision.md` (explanatory; this section is
@@ -405,6 +413,9 @@ robot's hypothesis space. The robot's mind never receives them. Computing them i
 The script edits `interrupt`, `deviate` and `abandon` (**deviation vocabulary**, §6) each PRODUCE a deviation.
 They are operations, not kinds of deviation: `deviate` is one edit, and "deviation" is the condition that results
 from any of them.
+Label A applies only while the work order has open tasks. Once the work order is finished, label A has no value: a
+human who stands idle after its last assigned task is neither doing an assigned task nor departing from one (its
+stand is still labelled on label B: unmodelled).
 
 **foreseeable task** (on the labels) — a task-level deviation that is modelled: a task in the robot's hypothesis
 space that is not assigned (§6). A deviation on label A and modelled on label B, NOT a third value of label A.
@@ -417,6 +428,11 @@ Coverage is judged at the hypothesis level: not at the schema level, and not by 
 interrupt declared foreseeable is modelled: its provenance is `coffee_break` and a hypothesis exists. A
 wrong-table delivery (TODO-87) is unmodelled: its provenance is `deliver_item` and its schema is modelled, but no
 hypothesis describes it, since a hypothesis carries the item's designated table (a **determined parameter**, §6).
+Coverage is judged against the full hypothesis space H (`build_hypothesis_space()`), not against the support that
+`--assignment_prior` narrows. The prior is part of the belief, not of the model, so a prior-on and a prior-off run
+of the same script have the same ground truth. Consequence: under prior-on, an unassigned, non-foreseeable task is
+modelled, and its hypothesis is suppressed by the prior (pinned at the floor); that is a belief-side matter, not a
+coverage one.
 "Model coverage" is unrelated to the covered fraction f of **graded evidence** (§5, `covered_fraction`): f is the
 share of one hypothesis's expected path a stretch has closed, a quantity inside the robot's evidence; coverage is
 whether any hypothesis describes a behaviour, a world label. Say "coverage" for label B and "covered fraction" (or
@@ -426,8 +442,10 @@ whether any hypothesis describes a behaviour, a world label. Say "coverage" for 
 - **declared experimental condition** — what the scenario's description says it tests, e.g. "unmodelled-behaviour
   condition".
 A mismatch between the declared condition and the coverage labels of the run's behaviours means that the run
-contains unintended unmodelled behaviour. Example: the terminal stand at a table (TODO-80), which the authoring
-convention (§6, **deviation vocabulary**) avoids unless the description declares it.
+contains unintended unmodelled behaviour. The check excludes the authoring convention's terminal exit walk
+(`MoveTo` to the door or a corner, §6, **deviation vocabulary**): the convention declares it as unmodelled behaviour
+of every scenario. The terminal stand at a table (TODO-80) is not declared by the convention and stays a label-C
+mismatch unless the scenario's description declares it.
 "Scripted" is not a behaviour class: every behaviour in the simulator is scripted. Use "scripted" only to
 contrast simulation with a real deployment.
 
@@ -448,7 +466,9 @@ finished (prior on).
 observations. A finding about evidence, not a value of the belief. `unknown` can be high with nothing unexplained
 (a finished work order, by normalisation), and a stand produces no evidence (I4c), so a stand is not unexplained,
 however long it lasts. The recognizer has no separate output for it today; how it is represented belongs to the
-pending decision on `unknown`.
+pending decision on `unknown`. The evidence window the finding is judged over (every observation since the episode
+began, or only the current ones) is not yet defined; it is the retraction question (T-D Q2) and part of that
+decision.
 
 **admitted** — the meta-planner's gate outcome: a task hypothesis cleared θ at admission and its projection was
 built (`[meta-proj] projection=built`). `unknown` above θ is never admitted (`none(unknown)`). The gate is the

@@ -341,8 +341,10 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
    waited out (scenario_94 stop on: refused 144 to 186, completed 413 against 370). T-D's blocked
    fixture uses a stay that ends; the authoring convention covers the rest. The blocked event and
    WAIT/RECONSIDER are then built on it (T-D Q5, the recorded design).
-6. `unknown` with no task hypothesis left live (the human finished its work order) reads 0.995 by
-   normalisation and is indistinguishable from the high `unknown` that unmodelled behaviour produces
+6. `unknown` with no task hypothesis left live (the human finished its work order and stands idle) reads 0.995
+   by normalisation, with nothing unexplained. The idle stand is itself unmodelled behaviour (no hypothesis
+   describes a stand; label A has no value once the work order is finished). To `update()` it is
+   indistinguishable from a high `unknown` raised by evidence, a walk no live task hypothesis explains
    (scenario_01, 06; terms: `docs/glossary.md` §7). T-D decides whether
    the distinction matters for `update()` (part of T-D Q1).
 7. Smaller: a hold can put the robot at the human's projected destination (scenario_94: hold placed

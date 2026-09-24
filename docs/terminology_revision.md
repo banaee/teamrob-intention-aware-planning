@@ -9,7 +9,8 @@ Why the terms exist. "Unknown" named two things:
 - (b) the robot's belief: the mass on the residual hypothesis `unknown`.
 
 The two diverge. A standing human is unmodelled but produces no evidence, so (a) holds and (b) does not move. A
-finished work order leaves `unknown` near 0.995 while nothing unmodelled occurs, so (b) is high without (a). The
+finished work order leaves `unknown` near 0.995 by normalisation while nothing is unexplained, so (b) is high with no
+evidence behind it. The
 next design decision, whether `unknown` stays in the Bayesian hypothesis space, has to be stated in terms that
 keep them apart. This file fixes those terms. It does not prejudge that decision (section 6).
 
@@ -72,7 +73,13 @@ two labels, not a third value of label A.
                     | (a coffee_break interrupt       | walk to corner_NE               |
                     |  declared foreseeable)          | a stand of 5 minutes            |
                     +---------------------------------+---------------------------------+
+ label A: no value  |                                 | the idle stand after the        |
+ (work order        |                                 | finished work order             |
+  finished)         |                                 |                                 |
+                    +---------------------------------+---------------------------------+
 ```
+
+Label A applies only while the work order has open tasks; once it is finished, label A has no value (the last row).
 
 Coverage is judged at the hypothesis level: not at the schema level, and not by provenance.
 
@@ -82,6 +89,11 @@ coffee_break interrupt    coffee_break      yes                    yes          
 wrong-table delivery      deliver_item      yes                    no (the hypothesis carries      unmodelled
 (TODO-87)                                                           the designated table)
 ```
+
+Coverage is judged against the full hypothesis space H (`build_hypothesis_space()`), not against the support that
+`--assignment_prior` narrows: the prior is part of the belief, not of the model, so prior-on and prior-off runs of
+the same script have the same ground truth. Under prior-on an unassigned, non-foreseeable task is therefore
+modelled, and its hypothesis is suppressed by the prior; that is a belief-side matter.
 
 "Model coverage" is unrelated to the covered fraction f of graded evidence (`covered_fraction`, the share of one
 hypothesis's expected path a stretch has closed). f lives inside the robot's evidence; coverage is a world label.
@@ -133,20 +145,17 @@ fixtures named. The finding column applies the definition of "unexplained" to th
 | case | label A | label B | belief (current recognizer) | finding |
 |---|---|---|---|---|
 | an assigned delivery (`deliver(item_3)`) | assigned task | modelled | its hypothesis rises along the walk and clears θ at about half of it; admitted | nothing unexplained |
-| a `coffee_break` interrupt declared foreseeable (`interrupt(..., with_=[coffee_break])`) | deviation, produced by `interrupt` | modelled (a foreseeable task) | `coffee_break` rises on the walk to the machine (scenario_11: 0.345), unless an earlier misleading walk refuted it (scenario_41: `coffee_break` ≤ 0.001, `unknown` 0.453; TODO-94) | nothing unexplained in scenario_11; unexplained in scenario_41, although the behaviour is modelled |
+| a `coffee_break` interrupt declared foreseeable (`interrupt(..., with_=[coffee_break])`) | deviation, produced by `interrupt` | modelled (a foreseeable task) | `coffee_break` rises on the walk to the machine (scenario_11: 0.345), unless an earlier misleading walk refuted it (scenario_41: `coffee_break` ≤ 0.001, `unknown` 0.453; TODO-94) | nothing unexplained in scenario_11; in scenario_41 (modelled, suppressed by earlier evidence): undecided, depends on the evidence window (pending decision, T-D Q2) |
 | a wrong-table delivery (`deviate(deliver(item_0), destination=kitting_table_1)`, TODO-87) | deviation, produced by `deviate` | unmodelled | the item's delivery leads while the carry still fits it; `unknown` leads once the carry wastes path; no pin, no boundary at the place; after the next boundary the item's delivery leads again (scenario_85, section 3.3) | unexplained only in the middle stretch; not before, not after |
 | a walk to corner_NE (`MoveTo("corner_NE")`) | deviation (free primitive) | unmodelled (a landmark: no hypothesis binds one) | `unknown` rises with walked excess path and leads (0.99 in the play's long detours); a walk that stays in line with a live hypothesis does not raise it (scenario_04's walk to the door: the one live hypothesis at 0.58 to 0.61) | unexplained (when the walk wastes path against every live hypothesis) |
 | a human standing for 5 minutes (`Stay(n)`) | deviation (a stay the work order does not contain) | unmodelled (no hypothesis describes standing) | frozen where the last walk left it: mid-carry, the carried item's delivery on top (TODO-85); after a boundary, the uniform prior; `unknown` does not rise (I4c) | nothing unexplained: a stand is no evidence |
-| a finished work order, idle human | none (the work order is complete; see the note) | no unmodelled behaviour (as ruled; see the note) | `unknown` 0.995 by normalisation: no task hypothesis is left live (scenario_01, prior on); not admitted, `none(unknown)` | nothing unexplained |
+| a finished work order, idle human | none (work order finished) | unmodelled (no `HypothesisKey` describes a stand) | `unknown` about 0.995 by normalisation: no task hypothesis is left live (scenario_01, prior on); not admitted, `none(unknown)` | nothing unexplained |
 
-NOTE on the last row. It is labelled as ruled: the point of the row is that `unknown` is high with nothing
-unmodelled to cause it. Two things are open and are for Hadi: label A has no value for it (nothing is departed
-from, and no task is performed), and by the hypothesis-level criterion an idle human who stands has no
-`HypothesisKey` describing the stand either, which is the 5-minute row's label B. The row assumes that idleness
-after a finished work order is not labelled as behaviour.
-
-The coffee row shows a fourth pattern besides the three of section 3: modelled behaviour that the robot's evidence
-does not explain. Unexplained and unmodelled disagree in both directions.
+The coffee row in scenario_41 is a pattern of its own: MODELLED, SUPPRESSED BY EARLIER EVIDENCE. The `coffee_break`
+hypothesis is live and fits the walk to the machine, but the earlier walk to item_3 refuted it, and `unknown` rose
+instead. Whether the robot's finding is "unexplained" depends on the evidence window, every observation since the
+episode began or only the current ones. That window is the retraction question (T-D Q2) and belongs to the pending
+decision on `unknown`; the definition of "unexplained" does not settle it.
 
 ---
 
@@ -200,19 +209,22 @@ At 17 to 49 and from 159 on the belief is high on a task hypothesis while the be
 is confidently wrong, and "unexplained" does not fire. From 159 the meta-planner admits it and projects a human
 carrying item_0 back, while the human stands (TODO-87).
 
-### 3.4 A finished work order: no unmodelled behaviour / `unknown` high by normalisation / nothing unexplained
+### 3.4 A finished work order: unmodelled / `unknown` high by normalisation / nothing unexplained
 
 scenario_01, prior on:
 
 ```
-the human    last assigned delivery      | release: pinned, episode boundary | idle
-B            modelled                    |                                   | (no unmodelled behaviour, as ruled)
+the human    last assigned delivery      | release: pinned, episode boundary | stands idle
+A            assigned task               |                                   | no value (work order finished)
+B            modelled                    |                                   | unmodelled (no hypothesis describes a stand)
 live set     {that task, `unknown`}      | {`unknown`} (the rest pinned)     |
 `unknown`    0.498 at the prior, falls   | 0.995                             | 0.995
 finding      nothing unexplained         | nothing unexplained               | nothing unexplained
 ```
 
-`unknown` is high because nothing else is live, not because of evidence: the mass follows from normalisation.
+`unknown` is high because nothing else is live, not because of evidence: the mass follows from normalisation. The
+stand is unmodelled, as in 3.1, and produces no evidence, so nothing is unexplained. Here `unknown` is high; in 3.1,
+mid-carry, it stays low. The belief differs because of what is live, not because of what the human does.
 
 ---
 
@@ -228,9 +240,13 @@ script + robot's hypothesis space  -->  label B per behaviour ----+
                                    ==> the run contains UNINTENDED unmodelled behaviour
 ```
 
-Example: a script that ends with the human standing at a table. The terminal stand is unmodelled. If the scenario
-does not declare the blocked case (TODO-80), the stand is unintended, and the run's results carry it. The authoring
-convention (glossary §6, **deviation vocabulary**) exists to avoid exactly this.
+Declared by convention, for every scenario: the authoring convention's terminal exit walk (`MoveTo` to the door or
+a corner, glossary §6, **deviation vocabulary**). It is intended unmodelled behaviour, and the check excludes it by
+that declaration.
+
+Not declared by the convention: the terminal stand at a table (TODO-80). A script that ends with the human standing
+at a table has unmodelled behaviour; unless the scenario's description declares the blocked case, the stand is
+unintended, it is a label-C mismatch, and the run's results carry it. The convention exists to avoid exactly this.
 
 The check reads the script and the hypothesis space only. Computing the labels is not built; it is recorded under
 TODO-92, since the evaluation will need it.
@@ -296,3 +312,5 @@ gives the precise term.
 | `analysis/tc2c_scripts/README.md` | a human who departs from the model mid-task; recognised again | a deviation (label A) by a modelled foreseeable task; clears θ again | frozen |
 | `analysis/tc2c_scripts/play.md` | (not) recognised, re-recognised; hypothesis space exhausted | the hypothesis (never) leads / clears θ; no task hypothesis left live | frozen |
 | `analysis/t6_ablation/README.md`, `analysis/big_picture/STATUS.md` | a deviation from the projection; on deviations | a departure from the projection | frozen |
+| `CLAUDE.md`, `shared/io_contracts.md`, `shared/projection.py`, `shared/realization.py`, `shared/types.py`, `analysis/tb1c_realized_flip/README.md` | stationary stretch (a `Segment`) | stationary segment | living (follow-up, 24 Sept 2026) |
+| `docs/handoffs/handoff_T-D_onward.md` item 6 (second revision) | indistinguishable from the high `unknown` that unmodelled behaviour produces | the idle stand is itself unmodelled; nothing is unexplained; indistinguishable to `update()` from a high `unknown` raised by evidence | living (follow-up, 24 Sept 2026) |

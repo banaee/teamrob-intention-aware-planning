@@ -3632,7 +3632,7 @@ hypothesis space.
 Why. "Unknown" named two things: (a) a property of the human's behaviour in the world, that it lies outside the
 robot's models, and (b) the robot's belief, the mass on the residual hypothesis `unknown`. They diverge: a standing
 human is unmodelled and produces no evidence (I4c), and a finished work order leaves `unknown` near 0.995 with
-nothing unmodelled occurring (handoff_T-D_onward.md, item 6). The decision on `unknown` has to be stated in terms
+nothing unexplained (handoff_T-D_onward.md, item 6). The decision on `unknown` has to be stated in terms
 that keep them apart.
 
 The ruling. Two groups, WORLD and ROBOT; a term of one is never used for the other.
@@ -3660,4 +3660,20 @@ the divergences, the label-C check, and the table of phrase corrections). Comput
 built; recorded under TODO-92. A repo-wide scan corrected the living files in place; frozen records keep their text
 and carry a superseding note (this file and TODOS_AND_DEFERRED.md at the top, TODO-95, TODO-96 and TODO-97 next to
 the entry, and the analysis records named in the table).
+
+FOLLOW-UP RULINGS (Hadi, 24 September 2026, on the report's flags).
+- The finished work order: the idle stand is unmodelled (no `HypothesisKey` describes a stand). Label A applies
+  only while the work order has open tasks; after it is finished, label A has no value (no new term). Its pattern
+  is "unmodelled / `unknown` high by normalisation / nothing unexplained". The first ruling's "nothing unmodelled
+  occurs" was wrong and is corrected here, in the glossary, in terminology_revision.md and in the handoff.
+- The authoring convention's terminal exit walk (`MoveTo` to the door or a corner) is intended unmodelled
+  behaviour, declared by the convention for every scenario; the label-C check excludes it. TODO-80's terminal
+  stand stays undeclared and is still a label-C mismatch.
+- scenario_41's `coffee_break` (live, fits the walk, suppressed by earlier evidence): "modelled, suppressed by
+  earlier evidence". Whether it is unexplained depends on the evidence window (since the episode began, or the
+  current observations only), which is the retraction question (T-D Q2) and part of the pending decision; the
+  definition of "unexplained" does not settle it.
+- Coverage is judged against the full hypothesis space H, not the support `--assignment_prior` narrows: the prior
+  is part of the belief, not of the model, and prior-on and prior-off runs of one script share one ground truth.
+  Under prior-on an unassigned, non-foreseeable task is modelled and suppressed by the prior, a belief-side matter.
 Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TODO-95; I4c

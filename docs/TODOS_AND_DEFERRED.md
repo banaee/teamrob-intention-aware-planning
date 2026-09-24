@@ -2989,6 +2989,9 @@ experimental condition against the computed coverage; a mismatch means unintende
 ground truth, computable from the script (with its provenance) and the hypothesis space, and kept OUTSIDE the
 robot's mind, unlike this history, which is built from observation. Not built; recorded here because the
 evaluation compares the two: unexplained (the robot's finding) against unmodelled (the label).
+The I4 harness (`analysis/i4_evidence_model/check_i4.py`, reused by I4c, I4d and I5) labels its ground truth
+`"unknown"` while the human is idle or wandering, and so counts `unknown` leading as correct on those ticks. Any
+evaluation that reuses the harness must rescore against labels A and B.
 `docs/terminology_revision.md`, sections 2 and 4.
 Reference: T-C1, 23 September 2026; design_decisions.md, "The human action script (T-C1, decided)"
 
