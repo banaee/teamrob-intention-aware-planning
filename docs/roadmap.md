@@ -440,6 +440,10 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   design step: TODO-36); metrics on `recognition_changed`, completion from the world fact, blocked time,
   wrong-task ticks. The comparison against expected realized cost over the belief is a later item of this
   phase (TODO-84).
+  θ sensitivity analysis: runs across several θ values on the fixture set, reporting decision differences and
+  `[sep]` violations; the gate is kept and justified by this sweep, with TODO-84 (the expected-cost branch,
+  over per-hypothesis costs) and TODO-97 (the joint-realization branch) as the two recorded alternatives.
+  The θ values for the sweep are chosen at T-F, not now.
 - **T-G — Later, in this order:** a second domain in Mesa; 4D (detour); ROS.
 
 The documentation pass for the paper comes before the paper, not before the demonstration.

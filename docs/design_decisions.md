@@ -3594,7 +3594,7 @@ costs, which is TODO-84); `unknown` in S_ε projects the Q1 stationary object; t
 mass, never as a probability of safety. Above the gate it equals today's mechanism with ε = 1 − θ; the two
 differ only below θ. ε, and `recognition_changed` redefined as "S_ε changed", reopen DESIGN-07 and D3 and are
 argued then. It presumes hypotheses reach the robot only through interference. It is taken up only if, after
-the Q2 to Q4 pass, the existing fixtures show enough decision ticks with the leading share below θ and two or
-more tasks each holding substantial mass. Nothing in Q1's build is shaped for it; its only seam is sub-ruling
-4c (`realize()` not special-cased, the projection passed through `update_human_projection()`).
+the Q2 to Q4 pass, the existing fixtures show enough decision ticks with the leading share below θ at which
+the smallest set of task hypotheses (`unknown` excluded) reaching θ has two or more members (S_ε at ε = 1 − θ).
+Nothing in Q1's build is shaped for it; its only seam is sub-ruling 4c (`realize()` not special-cased, the projection passed through `update_human_projection()`).
 Reference: TODO-97; TODO-84; "The belief is used as a bar, not a magnitude" (T-A1); DESIGN-07; D3; T-D Q1

@@ -3118,9 +3118,11 @@ Both reopen DESIGN-07 and D3, and are argued at that time.
 Precondition: hypotheses affect the robot only through interference. Shared-resource conflicts,
 or the robot taking over an abandoned task (TODO-15), would need more than realized duration.
 
-Gate on doing it: after the Q2 to Q4 pass, measure on the existing fixtures the count of decision
-ticks at which the leading share is below θ and two or more tasks each hold substantial mass. A
-small count closes this TODO.
+Gate on doing it: after the Q2 to Q4 pass, measure on the existing fixtures, on the decision ticks
+at which the leading share is below θ, the count of those at which the smallest set of task
+hypotheses (`unknown` excluded) whose mass reaches θ has two or more members. That is the covering
+set at ε = 1 − θ, the mechanism's own definition: no new constant. Report the count and, beside it,
+the distribution of the second-leading share on those ticks. A small count closes this TODO.
 
 Evaluation, if opened: one shared-corridor ambiguity fixture and one conservatism fixture, a
 comparison table in the T-B3 style.
