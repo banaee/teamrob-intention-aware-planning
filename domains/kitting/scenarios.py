@@ -1064,6 +1064,8 @@ scenario_70 = ScenarioConfig(
         "scenario_70 - shelf_2 BESIDE the blocked shelf (45 deg west of its bearing): switching from a "
         "block at (0, -500) to item_2 and returning adds ~13 ticks of walking over doing item_2 from "
         "the table later; the occupation would be LONG relative to the switch."
+        " Declared experimental condition (label C, docs/glossary.md §7): the script ends with an unmodelled "
+        "stand at the AC switch (ac_activation completes, then the human stays there to the end of the run)."
     ),
     agents=[
         AgentConfig(
@@ -1100,6 +1102,8 @@ scenario_71 = ScenarioConfig(
         "scenario_71 - shelf_3 ACROSS the table (the opposite bearing): switching from a block at "
         "(0, -500) to item_3 and returning adds ~53 ticks of walking; the occupation would be SHORT "
         "relative to the switch."
+        " Declared experimental condition (label C, docs/glossary.md §7): the script ends with an unmodelled "
+        "stand at the AC switch (ac_activation completes, then the human stays there to the end of the run)."
     ),
     agents=[
         AgentConfig(

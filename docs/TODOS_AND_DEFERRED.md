@@ -3174,6 +3174,14 @@ Nothing in T-D Q1's build is shaped for it. Sub-ruling 4c of Q1 (`realize()` not
 projection passed through `update_human_projection()`) is the only seam it needs.
 Related: TODO-84, TODO-95, TODO-15, DESIGN-07, D3; design_decisions.md, "Belief-aware planning".
 
+**TODO-98: A foreseeable task is kept out of `assigned_tasks` by convention only (recorded, 24 Sept 2026)** [OPEN, recorded only]
+Nothing checks it: `check_work_order` treats a foreseeable task in the script as free, and neither `AgentConfig` nor
+the loader rejects one listed in `assigned_tasks`. If one were placed there, the behaviour would be both an assigned
+task and a foreseeable task, which label A (assigned task or deviation; a foreseeable task is a modelled deviation)
+cannot express. Recorded only; no check added.
+Files: shared/types.py (`AgentConfig`, `check_work_order`)
+Reference: terminology follow-up, 24 September 2026; `docs/glossary.md` §6 (foreseeable task), §7 (label A)
+
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).
 2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.
