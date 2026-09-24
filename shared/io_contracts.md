@@ -388,8 +388,8 @@ a `b2a` continue, or the winner's realization in B3, whether the winner is the c
 another. Semantics across the boundary:
 
 - It is an execution HINT, in the sense of design_decisions.md's first key decision: a preplan
-  that saves the executor solving avoidance from scratch. The human may deviate within a few
-  ticks, and each embodiment's own collision handling differs, so the executor may REFINE a
+  that saves the executor solving avoidance from scratch. The human may depart from its projection
+  within a few ticks, and each embodiment's own collision handling differs, so the executor may REFINE a
   hold (shorten or extend it as the world shows the way clear or blocked).
 - It is not optional. The decision — which task, and that it waits — is made ONCE, in `shared/`.
   The embodiment must not decide independently whether to wait, which task to run, or drop the
@@ -831,7 +831,7 @@ in what that decision rested on):
     `unknown` took over after a pin (TODO-54). Admission then decides what, if anything, is
     projected next;
   - none is recorded and the belief clears `_clears_gate()` on a task hypothesis (not `unknown`,
-    which admission refuses). The first recognition of a task, as `theta_crossed` fired it.
+    which admission refuses). The first time a task hypothesis clears the gate, as `theta_crossed` fired it.
 
   The gate is asked at admission, never for retention: a recorded hypothesis that dips below θ while
   staying most likely fires nothing (TODO-68's repeated crossings) and keeps its projection until it
@@ -971,7 +971,7 @@ Returns `None`, checked in this order, when:
   triggering (DESIGN-07); it still never feeds `_cost()`. See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 - `human_agent_id is None` — no human observed.
 - `belief.most_likely` is the recognizer's `unknown` (T8) — the projector is not called. Mass
-  on `unknown` above θ is not a recognition and there is nothing to project. Reachable
+  on `unknown` above θ is not admitted and there is nothing to project. Reachable
   since the completion pin: a hypothesis retired by the robot's own delivery hands its mass to
   `unknown` (TODO-54). The trigger still fires on it (TODO-68).
 - the hypothesis is unresolvable — `Projector.project_human()` returned `None` (its task name
@@ -1316,7 +1316,7 @@ a declared relocation".
 - Checks every agent's scheduled and assigned task bindings against the layout at spawn
   (`shared.types.check_task_bindings`, F47b): the bound object exists and carries the type the schema's
   `parameter_types` declares; a mismatch raises. A task the domain does not describe is never executed by
-  the human and never invisible to the robot by accident (TODO-49; a declared out-of-domain behaviour is
+  the human and never invisible to the robot by accident (TODO-49; declared unmodelled behaviour is
   TODO-80)
 - Checks the layout's destinations at load (T-B1a): every object of a type some task determines a parameter
   from through `destination_of` declares `"destination"`, naming an object of the layout of the type the

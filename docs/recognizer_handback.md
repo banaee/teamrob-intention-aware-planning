@@ -439,9 +439,10 @@ included. Therefore:
   odds against `unknown`; unrefuted rivals raise the odds a crossing needs (§5, the gate ruling; TODO-64 / 65
   closed).
 - **β, u**: they set every reveal tick (I4 / I4b / I4c region analysis, closed).
-- **The scripted human.** A human who hesitates, back-tracks or wanders mid-task is charged as a rival would
-  be. Standing still is not evidence (TODO-59's deferred channel, not built). Only behaviour the robot's
-  domain describes is scripted (F47b); an undeclared behaviour is TODO-80.
+- **The human's script.** A human who hesitates, back-tracks or wanders mid-task is charged as a rival would
+  be. Standing still is not evidence (TODO-59's deferred channel, not built). Every task in the script is one
+  the domain describes (well typed, F47b); unmodelled behaviour in a run is either a declared experimental
+  condition (TODO-80) or unintended (glossary §7, label C).
 
 ### 3.4 What the meta-planner may assume, and must not
 
@@ -551,7 +552,7 @@ made to the recognizer or to its event semantics (`design_decisions.md`, the D2 
 | `deliver_with_return`'s guard | TODO-55 (e) | a stray item vs an assigned one; a domain question, the producer of the prior-off repeated crossings |
 | β in centimetres | TODO-58 | layout-scale dependence |
 | the stationarity channel | TODO-59 (deferred paragraph) | standing still as evidence against movement hypotheses; not built |
-| declared behaviour outside the domain | TODO-80 | a human stay the robot's knowledge does not cover, declared as such; not built |
+| declared unmodelled behaviour | TODO-80 | a human stay no hypothesis describes, declared as the scenario's experimental condition; not built |
 | the context / knowledge-representation pass | TODO-66 | `_context_weight` names two tasks and carries four constants; output only, inert |
 | the two analytical tools | TODO-62, TODO-63 | radius of maximum probability (diagnostic); rationality measure (competes with `unknown`) |
 | hash-seed dependence | TODO-42 | resolved for the recognizer (sorted keys); runs still need `PYTHONHASHSEED=0` |

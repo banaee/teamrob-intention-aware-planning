@@ -363,7 +363,8 @@ class MetaPlanner:
                 * none is recorded and the belief clears _clears_gate() on a
                   task hypothesis — not `unknown`, which is no task hypothesis
                   and has no projection (admission refuses it). The first
-                  recognition of a task, as `theta_crossed` fired it.
+                  time a task hypothesis clears the gate, as `theta_crossed`
+                  fired it.
               The gate is asked at admission, never for retention: a recorded
               hypothesis that dips below theta while staying most likely fires
               nothing (TODO-68's repeated crossings) and keeps its projection
@@ -434,7 +435,7 @@ class MetaPlanner:
             not called),
           - no human is observed,
           - belief.most_likely is the recognizer's `unknown` (the projector is
-            not called): mass on `unknown` above theta is not a recognition —
+            not called): mass on `unknown` above theta is not admitted —
             the human's behaviour is unmodelled, or no task hypothesis is
             left live and the mass is `unknown`'s by normalisation — and
             there is nothing to project. Reachable since the completion pin:

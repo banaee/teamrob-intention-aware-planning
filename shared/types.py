@@ -350,8 +350,9 @@ def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str]) -
     type. Raises ValueError otherwise — an error,
     not a warning, because an ill-typed instance is a task the domain does not
     describe (a coffee break with no coffee machine), which the human would execute
-    and the robot could never recognise (TODO-49 (2), the binding part; F47b). The
-    embodiment supplies the id → type table; shared/ sees no simulator object.
+    and no hypothesis could describe: unmodelled behaviour by accident (TODO-49
+    (2), the binding part; F47b). The embodiment supplies the id → type table;
+    shared/ sees no simulator object.
     """
     expected_types = task.schema.parameter_types or {}
     for var, const in task.bindings.items():

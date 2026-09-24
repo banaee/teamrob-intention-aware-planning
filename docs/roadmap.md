@@ -346,7 +346,7 @@ is a proposal of the design entry, not decided.
 programmatic registration and (b) scale-relative calibration). They carry the one condition that reopens
 the gate, a walk crossing with a live rival at similar odds (TODO-47 (g)), which no current fixture shows.
 
-Later, not scheduled: TODO-80 (declared out-of-domain human behaviour, the principled unforeseen stay),
+Later, not scheduled: TODO-80 (a declared unmodelled-behaviour condition: a stay no hypothesis describes),
 Phase 4D (the detour
 strategy, a hold at a chosen point along a segment TODO-70, human cooperation as the remedy for the
 freezing robot TODO-15), TODO-74 (placement positions on the table), TODO-71 (the hint's body-side refinement and its reporting), TODO-75 (the ROS guide and
@@ -474,7 +474,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   option, default off) — the body refuses a STEP that would break robot-responsible separation against
   the human's actual position and stands instead; it cannot detour, so a human occupying the place the
   robot must reach blocks it until the human leaves (R2: blocked time is the outcome). The detour is
-  4D's; with valid fixtures the stop fires only past T_h and on deviations (F47b). `[sep]` (T9) measures
+  4D's; with valid fixtures the stop fires only past T_h and where the human departs from its projection (F47b). `[sep]` (T9) measures
   the actual distance per tick; the stop-off baselines contain walk-throughs and support no safety claim
 
 ### Prerequisites before implementation
