@@ -460,7 +460,7 @@ class RealizedPlan:
                                           # search, lower bound the previous entry's (0 for the first); never decreasing
     cost: float                           # T_r + cumulative_shifts[-1] over the FULL plan (one entry: T_r + delta)
     projected_duration: float             # T_r: the span of the plan's segments (fractional steps) = the sum of the entries' T_r
-    segments: List[Segment]               # per entry: the stationary stretch of its hold (when of positive duration),
+    segments: List[Segment]               # per entry: the stationary segment of its hold (when of positive duration),
                                           # where the previous entry ended, then the entry's segments at its cumulative shift
     hold_position: Tuple[float, float]    # the FIRST hold's: the plan's first segment's start, where the robot is at the decision step
     hold_start: float                     # the decision step

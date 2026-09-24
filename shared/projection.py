@@ -133,7 +133,7 @@ class Projector:
                               execution steps the body spends COMPLETING a task, after
                               its last action's acknowledgement and before the next
                               task's first microaction. Charged once per projected
-                              task, as a stationary stretch at the position the task
+                              task, as a stationary segment at the position the task
                               ended at (project(), after build_segments()). Supplied by the
                               embodiment as action_completion_latency is (Mesa: one
                               tick, the step its executor spends in
@@ -274,7 +274,7 @@ class Projector:
             )
 
             segments = self.build_segments(abstract_plan, world, agent_id, entry_start)
-            # What the body spends completing the task (F1): a stationary stretch at
+            # What the body spends completing the task (F1): a stationary segment at
             # the position the task ended at, once per task — a task-level cost, not per action,
             # so it is placed here and not in build_segments(). Omitted at 0.0.
             if segments and task_completion_latency > 0.0:

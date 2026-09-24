@@ -301,7 +301,7 @@ across that commit without it.
   and reports use these names.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.
-- Segment: one straight-line motion, or one stationary stretch, of one robot or human action in a
+- Segment: one straight-line motion, or one stationary interval (a stationary segment), of one robot or human action in a
   projection. Entry: one task's part of a projected plan, with several segments. Stretch: the
   recognizer's unit of movement evidence. Do not mix them. "Leg" is not used: a human's movement is
   a walk.

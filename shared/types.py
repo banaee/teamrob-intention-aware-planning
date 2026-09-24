@@ -585,9 +585,11 @@ class AgentConfig:
                                   Unordered: the meta_planner produces Q0 and every
                                   later ordering from IR output.
                 scheduled_tasks — not read for robots.
-    Foreseeable tasks sit inline in scheduled_tasks at the correct position;
-    schema.is_foreseeable identifies them — no special-casing needed. They never
-    appear in assigned_tasks: a deviation is not part of a work order.
+    A foreseeable task (schema.is_foreseeable) is written in the script as a
+    TaskInstance, directly or injected by interrupt / abandon, and expanded at
+    load into primitives carrying its provenance; check_work_order treats it as
+    free. It is not listed in assigned_tasks, by convention (not rejected there):
+    a deviation is not part of a work order.
     """
     agent_id: str
     agent_type: str                      # "human" or "robot"
@@ -716,7 +718,7 @@ class AbstractPlan:
 @dataclass
 class Segment:
     """
-    One action's straight-line motion (or stationary stretch) through space and
+    One action's straight-line motion (or stationary segment) through space and
     step-time — the unit interference-detection algorithms operate on. Several
     segments make up one ProjectedPlanEntry.
 
@@ -751,7 +753,7 @@ class ProjectedPlanEntry:
     abstract_plan: "AbstractPlan"
     estimated_start_step: int
     estimated_duration: int         # steps to complete this task
-    segments: List[Segment]         # per-action motion or stationary stretch, for interference detection / realization
+    segments: List[Segment]         # per-action motion or stationary segment, for interference detection / realization
     
     
 @dataclass
@@ -822,7 +824,7 @@ class RealizedPlan:
                        T_r and is not corrected for (TODO-69, reading (1)).
     projected_duration: T_r.
     segments:          the realized plan's segments, head-to-tail: per entry,
-                       the stationary stretch of its hold where the hold is
+                       the stationary segment of its hold where the hold is
                        taken — the entry's first segment's start, which is
                        where the previous entry ended — up to the entry's
                        shifted start (present only when that stretch has

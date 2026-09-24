@@ -50,7 +50,7 @@ Why this script and this timing. The robot's side fixes where a flip can be chea
 7, 4, 6, 1 and the only decision with a small gap between heads is the `no_current_task` after item_4's delivery at
 kitting_table_0 (step 159), pool {item_1, item_6}, where (6, 1) costs 64.86 and (1, 6) 66.30 — a gap of 1.44 ticks
 (at the first decision the gap between item_7-headed and item_6-headed orderings is 39.9 ticks, after item_7 about
-117; no hold of that size exists in this domain, whose stationary stretches are one tick each). On env_layout8 the
+117; no hold of that size exists in this domain, whose stationary segments are one tick each). On env_layout8 the
 human's walks (item_0: shelf_0 → kitting_table_0 from the north-west; item_3: shelf_3 → kitting_table_1) and the
 robot's short tasks (kitting_table_0 ↔ shelf_1 to the south-west, ↔ shelf_6 to the south-east) meet only at the
 table itself, so the conflict is a table convergence: the human must be standing at kitting_table_0 releasing item_0

@@ -282,7 +282,7 @@ def _realized_segments(
     cumulative_shifts: List[int],
 ) -> List[Segment]:
     """
-    Per entry: the stationary stretch of its hold (when it has positive
+    Per entry: the stationary segment of its hold (when it has positive
     duration), taken at the entry's first segment's start — where the previous
     entry ended, or where the robot is at the decision step — then the entry's
     segments at its cumulative shift.
