@@ -256,3 +256,43 @@ TODO-92, since the evaluation will need it.
 
 All three wait for the architecture decision on whether `unknown` stays in the Bayesian hypothesis space. Where
 older records use them as ordinary words, they are not terms.
+
+---
+
+## 7. Phrase corrections made in the repo (24 September 2026)
+
+LIVING: corrected in place. FROZEN: text kept; a superseding note at the top of the file (or next to the entry)
+gives the precise term.
+
+| file | old phrase | new phrase | kind |
+|---|---|---|---|
+| `CLAUDE.md` (plan names) | T-D robustness (change of mind, `unknown`, the blocked case) | … change of mind, unmodelled behaviour, the blocked case | living |
+| `docs/roadmap.md` (T-E) | the run set covers … a change of mind, `unknown` | … a change of mind, unmodelled behaviour | living |
+| `docs/roadmap.md` (T-E) | shows ordering, change of mind and `unknown` | … and unmodelled behaviour (and the belief's `unknown` leading) | living |
+| `docs/roadmap.md` (later items) | declared out-of-domain human behaviour, the principled unforeseen stay | a declared unmodelled-behaviour condition: a stay no hypothesis describes | living |
+| `docs/roadmap.md` (C) | the stop fires only past T_h and on deviations | … and where the human departs from its projection | living |
+| `docs/handoffs/handoff_T-D_onward.md` item 6 | `unknown` with an exhausted hypothesis space … indistinguishable from `unknown` as unmodelled behaviour | `unknown` with no task hypothesis left live … by normalisation … indistinguishable from the high `unknown` that unmodelled behaviour produces | living |
+| `docs/recognizer_handback.md` §1.1 | `unknown`, the hypothesis that the behaviour is none of them | `unknown`, the residual hypothesis: … (coverage is a world label the recognizer never receives) | living |
+| `docs/recognizer_handback.md` §1.4 | no better than unexplained | scores no better than `unknown` | living |
+| `docs/recognizer_handback.md` §3 | `unknown` ≥ θ … also means a task the space does not contain, a detour under way, or every task pinned | … also means unmodelled behaviour (…), or every task pinned, where the mass is `unknown`'s by normalisation | living |
+| `docs/recognizer_handback.md` §4 | The scripted human. … Only behaviour the robot's domain describes is scripted; an undeclared behaviour is TODO-80 | The human's script. … Every task in the script is one the domain describes; unmodelled behaviour in a run is a declared experimental condition (TODO-80) or unintended | living |
+| `docs/recognizer_handback.md` §7 | declared behaviour outside the domain; a human stay the robot's knowledge does not cover | declared unmodelled behaviour; a human stay no hypothesis describes, declared as the scenario's experimental condition | living |
+| `shared/io_contracts.md` §1.9 | The human may deviate within a few ticks | The human may depart from its projection within a few ticks | living |
+| `shared/io_contracts.md` §2.2 | The first recognition of a task | The first time a task hypothesis clears the gate | living |
+| `shared/io_contracts.md` §2.2 | Mass on `unknown` above θ is not a recognition | … is not admitted | living |
+| `shared/io_contracts.md` §4 | a declared out-of-domain behaviour is TODO-80 | declared unmodelled behaviour is TODO-80 | living |
+| `shared/meta_planner.py` (`evaluate_triggers`) | not `unknown`, which is no hypothesis | not `unknown`, which is no task hypothesis | living |
+| `shared/meta_planner.py` (`evaluate_triggers`) | The first recognition of a task | The first time a task hypothesis clears the gate | living |
+| `shared/meta_planner.py` (`update_human_projection`) | not a recognition — the human is doing something outside the hypothesis space, is between tasks, or is deviating | not admitted — the human's behaviour is unmodelled, or no task hypothesis is left live and the mass is `unknown`'s by normalisation | living |
+| `shared/recognizer.py` (`_build_admissible_keys`) | 'unknown' is the escape hatch for behaviour outside the model | 'unknown' is the residual hypothesis, which takes the mass when no task hypothesis explains the observations | living |
+| `shared/types.py` (`check_task_bindings`) | which … the robot could never recognise | which … no hypothesis could describe: unmodelled behaviour by accident | living |
+| `domains/kitting/scenarios.py` (scenario_50) | the coffee walk recognised | coffee_break clears theta on the walk | living |
+| `domains/kitting/scenarios.py` (scenario_70/71) | whether the stay is recognised before the robot reaches it; the stay is recognised before it begins | the stay's hypothesis is admitted … | living |
+| `docs/design_decisions.md` | escape hatch for behaviour outside the model; no better than unexplained; unexplained behaviour; recognises no task / is recognised at 274; not a recognition (outside the hypothesis space, between tasks, or a deviation); deviate / deviations from the projection; which the robot can never recognise; `unknown` are untouched | see the note at the top of the file | frozen |
+| `docs/TODOS_AND_DEFERRED.md` | unknown behaviour; assigned, foreseeable and unknown behaviour; unmodelled behaviour (`unknown`); hypothesis space is exhausted; recognised (θ); a task the robot cannot recognise; by deviations / the human deviated; behaviour outside the robot's domain knowledge, unforeseen stay | see the note at the top of the file (and the pointers on TODO-95, 96, 97) | frozen |
+| `analysis/i4_evidence_model`, `i4c_episode`, `i4d_fold_unknown`, `i5_handback` REPORT.md | ground truth `"unknown"` (finished script, s40 wander); winner ≠ truth; unknown when idle | a finished work order / unmodelled behaviour (WORLD); `unknown` leading counted as correct; the `unknown` hypothesis's mass while the work order is finished | frozen |
+| `analysis/i2_ir_foundations/REPORT.md` | the coffee walk is recognised; a task the robot cannot recognise | the hypothesis clears θ; a task no hypothesis describes (unmodelled) | frozen |
+| `analysis/f47_fixtures/README.md`, `analysis/t9_arrival_radius/REPORT.md` | recognised (at a tick) | the hypothesis clears θ | frozen |
+| `analysis/tc2c_scripts/README.md` | a human who departs from the model mid-task; recognised again | a deviation (label A) by a modelled foreseeable task; clears θ again | frozen |
+| `analysis/tc2c_scripts/play.md` | (not) recognised, re-recognised; hypothesis space exhausted | the hypothesis (never) leads / clears θ; no task hypothesis left live | frozen |
+| `analysis/t6_ablation/README.md`, `analysis/big_picture/STATUS.md` | a deviation from the projection; on deviations | a departure from the projection | frozen |

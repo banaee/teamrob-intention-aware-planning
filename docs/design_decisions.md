@@ -3656,6 +3656,8 @@ The ruling. Two groups, WORLD and ROBOT; a term of one is never used for the oth
   "recognised" would also suggest that the recognizer performs the θ gate.
 
 Where it lives. `docs/glossary.md` §7 (authoritative); `docs/terminology_revision.md` (diagrams, the case table,
-the divergences, the label-C check). Computing the coverage label is not built; recorded under TODO-92. Older
-entries keep their text; TODO-95, TODO-96 and TODO-97 carry a pointer.
+the divergences, the label-C check, and the table of phrase corrections). Computing the coverage label is not
+built; recorded under TODO-92. A repo-wide scan corrected the living files in place; frozen records keep their text
+and carry a superseding note (this file and TODOS_AND_DEFERRED.md at the top, TODO-95, TODO-96 and TODO-97 next to
+the entry, and the analysis records named in the table).
 Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TODO-95; I4c
