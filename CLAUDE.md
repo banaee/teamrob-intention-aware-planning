@@ -32,6 +32,8 @@ Relevant (read as needed):
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
   design record. Use its terms in the code, in the documents and in reports.
+  `docs/terminology_revision.md` is its explanatory companion for glossary §7 (human behaviour, model
+  coverage, the `unknown` hypothesis and "unexplained"); the glossary stays authoritative.
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - `analysis/<task>/REPORT.md`: only the reports a task names. Rows in older reports may be
@@ -294,7 +296,7 @@ across that commit without it.
   Decision record: the projected hypothesis, one field.
 - Plan names (`docs/roadmap.md`, "The plan from T-A"): T-A records (T-A1 the pipeline revision);
   T-B B3.B on two tables (B1 fixtures, B2 build, B3 evaluation); T-C the human action script (C1
-  design, C2 build); T-D robustness in kitting (change of mind, `unknown`, the blocked case); T-E
+  design, C2 build); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case); T-E
   demonstration; T-F evaluation (Phase 5); T-G later (second domain in Mesa, 4D, ROS). Task prompts
   and reports use these names.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in

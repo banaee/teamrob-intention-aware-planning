@@ -260,7 +260,8 @@ both re-priced alike. Since D3 the same holds between the two triggers: `no_curr
 
 **hypothesis** — one candidate task of the observed agent, keyed by `HypothesisKey` (schema plus its
 ENUMERATED bindings; determined parameters are not enumerated). The live set is the hypotheses not
-yet retired, plus `unknown`.
+yet retired, plus `unknown`, the residual hypothesis (§7). A hypothesis belongs to the robot's belief; whether a
+behaviour of the human is described by one is its coverage (label B, §7).
 → `shared/io_contracts.md` §1.8; `docs/recognizer_handback.md` §1.1.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
@@ -282,16 +283,19 @@ base once, and moving the origin. A fold moves a factor without changing it.
 **pin** / **episode boundary** — a hypothesis whose terminal condition holds is retired and pinned at
 the floor (`[IR-complete]`). If the retiring hypothesis expected its terminal action on the previous
 tick, the OBSERVED AGENT finished a task and the episode ends (`[IR-boundary]`): every base becomes
-the uniform prior and every origin moves. The two criteria are deliberately different.
+the uniform prior and every origin moves. The two criteria are deliberately different. After a boundary `unknown`
+holds 1/|Live| by normalisation, not from evidence (§7).
 → `docs/recognizer_handback.md` §1.6.
 
 **θ (theta)** — the confidence gate. It belongs to the meta-planner, not the recognizer, and is
-asked in exactly one place. The recognizer emits a belief distribution and gates nothing.
+asked in exactly one place. The recognizer emits a belief distribution and gates nothing. The gate's outcome is
+**admitted** (§7); the recognizer's own finding is **unexplained** (§7), never a gate outcome.
 → `shared/meta_planner.py`, `DEFAULT_THETA` and `_clears_gate()`; `docs/design_decisions.md`, "θ has
 one home", "The gate stays a fixed share".
 
 **β, u, ρ** — β the tolerance on wasted path in the movement likelihood (0.01 /cm, supplied by the
-body); u `UNKNOWN_LIKELIHOOD`; ρ B2 `b2a`'s policy parameter.
+body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, not a measure of unmodelled
+behaviour (§7); ρ B2 `b2a`'s policy parameter.
 → `docs/recognizer_handback.md` §2; `shared/meta_planner.py`, the `rho` constructor argument.
 
 ---
@@ -311,7 +315,7 @@ planner fills it before method selection; the recognizer does not enumerate it.
 
 **foreseeable task** — a task the domain declares as a deviation the robot can anticipate
 (`schema.is_foreseeable`). Foreseeable tasks sit inline in the human's `scheduled_tasks` and never in
-`assigned_tasks`.
+`assigned_tasks`. On the labels of §7: a deviation (label A) that is modelled (label B).
 → `shared/types.py`, `TaskSchema` and `AgentConfig`.
 
 **task completion** — a fact about the world: the task's terminal condition holds, whoever made it
@@ -321,7 +325,8 @@ tick after the robot's last release; the empty-pool `[meta]` line is the DECLARE
 
 **assigned_tasks / scheduled_tasks** — for the human, the work order (which tasks) and the
 developer's execution script (which order). The robot never reads `scheduled_tasks`. For the robot,
-`assigned_tasks` is its task pool and `scheduled_tasks` is unread.
+`assigned_tasks` is its task pool and `scheduled_tasks` is unread. A behaviour compared with the human's
+`assigned_tasks` is label A (§7): an assigned task or a deviation.
 → `shared/types.py`, `AgentConfig`.
 
 The five entries below are decided (T-C1) and built: the scenario layer (T-C2a), the script written, expanded,
@@ -361,8 +366,10 @@ action script (T-C1, decided)".
 **deviation vocabulary** — the author's edits of the work order: `interrupt(task, after=|before=, with_=[...])`,
 `deviate(task, destination=)`, `abandon(task, after=|before=, then=[...])`, plus free `Stay(n)` (n omitted:
 until the run ends) and `MoveTo(landmark)`. Anchors name an action by name or index; injected content may mix
-tasks and primitives; in T-C every injection sits at an action boundary. A deviation is an edit of the
-expanded work order, not a task of its own. Written at import, where there is no world, each returns a deferred
+tasks and primitives; in T-C every injection sits at an action boundary. The edits are operations on the
+expanded work order: each PRODUCES a deviation (§7, label A), the resulting departure from the work order, and is
+not a kind of deviation; a deviation is not a task of its own. NOTE: the class `Deviation` names the deferred edit,
+not the condition; the identifier is not renamed. Written at import, where there is no world, each returns a deferred
 edit (`[Deviation]`) that the loader applies to the task's expansion with the list helpers (`insert_after`,
 `insert_before`, `retarget`, `truncate`).
 AUTHOR CONVENTION (T-C2c, Hadi): a script ends with the human leaving the workspace (`MoveTo("door")` or a corner),
@@ -375,7 +382,87 @@ leaves the resumed `place` failing at run time. Write the return explicitly, or 
 
 ---
 
-## 7. Sessions
+## 7. Human behaviour, model coverage and the robot's inference
+
+Ruled by Hadi, 24 September 2026. "Unknown" used to name two different things: what the human does (behaviour
+outside the robot's models) and what the robot believes (the mass on the residual hypothesis `unknown`). The two
+diverge: a standing human is unmodelled but produces no evidence, and a finished work order leaves `unknown` near
+0.995 while nothing unmodelled occurs. The terms below keep four things apart: what behaviour occurs in the world,
+whether the robot's models cover it, whether the scenario author intended it as an experimental condition, and
+what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is never used for the other.
+Diagrams, a table of cases and the divergences: `docs/terminology_revision.md` (explanatory; this section is
+authoritative).
+→ `docs/design_decisions.md`, "Terms for human behaviour, model coverage and the robot's inference".
+
+WORLD: three independent labels. Every behaviour of the observed human has one value on label A and one on label
+B; label C belongs to a scenario. The labels are ground truth, computable from the scenario's script and the
+robot's hypothesis space. The robot's mind never receives them. Computing them is not built (TODO-92).
+
+**label A, work order** — a behaviour compared with the human's assigned tasks (`assigned_tasks`, §6). Two values:
+- **assigned task** — the behaviour is a task of the work order, performed as assigned.
+- **deviation** — any departure from the work order.
+The script edits `interrupt`, `deviate` and `abandon` (**deviation vocabulary**, §6) each PRODUCE a deviation.
+They are operations, not kinds of deviation: `deviate` is one edit, and "deviation" is the condition that results
+from any of them.
+
+**foreseeable task** (on the labels) — a task-level deviation that is modelled: a task in the robot's hypothesis
+space that is not assigned (§6). A deviation on label A and modelled on label B, NOT a third value of label A.
+
+**label B, model coverage** — a behaviour compared with the robot's hypothesis space (§5, **hypothesis**). Two
+values:
+- **modelled behaviour** — a `HypothesisKey` in the robot's hypothesis space describes it.
+- **unmodelled behaviour** — no `HypothesisKey` describes it.
+Coverage is judged at the hypothesis level: not at the schema level, and not by provenance (§6). A `coffee_break`
+interrupt declared foreseeable is modelled: its provenance is `coffee_break` and a hypothesis exists. A
+wrong-table delivery (TODO-87) is unmodelled: its provenance is `deliver_item` and its schema is modelled, but no
+hypothesis describes it, since a hypothesis carries the item's designated table (a **determined parameter**, §6).
+
+**label C, experimental intent** — a property of the scenario, not of one behaviour.
+- **declared experimental condition** — what the scenario's description says it tests, e.g. "unmodelled-behaviour
+  condition".
+A mismatch between the declared condition and the coverage labels of the run's behaviours means that the run
+contains unintended unmodelled behaviour. Example: the terminal stand at a table (TODO-80), which the authoring
+convention (§6, **deviation vocabulary**) avoids unless the description declares it.
+"Scripted" is not a behaviour class: every behaviour in the simulator is scripted. Use "scripted" only to
+contrast simulation with a real deployment.
+
+ROBOT: what the robot's mind holds and decides.
+
+**recognizer belief** — a distribution over the live **task hypotheses** (one per `HypothesisKey`, §5) and
+`unknown`. The recognizer emits it and gates nothing.
+
+**`unknown`** — the residual hypothesis: the hypothesis that the behaviour is none of the task hypotheses. Always
+live; its likelihood is the reference u (`UNKNOWN_LIKELIHOOD`, §5), and it takes no factor of its own. Written in
+code font. The constant `UNKNOWN` and the identifiers keep their names. Its mass is a quantity of the belief, not
+a label of the world. It rises from walked excess path, and it is also high BY NORMALISATION when few task
+hypotheses are live: it holds 1/|Live| after every **episode boundary** (§5), and 0.995 once the work order is
+finished (prior on).
+→ `docs/recognizer_handback.md` §1.1, §1.5.
+
+**unexplained** — the recognizer's finding that it has evidence that no live task hypothesis explains the
+observations. A finding about evidence, not a value of the belief. `unknown` can be high with nothing unexplained
+(a finished work order, by normalisation), and a stand produces no evidence (I4c), so a stand is not unexplained,
+however long it lasts. The recognizer has no separate output for it today; how it is represented belongs to the
+pending decision on `unknown`.
+
+**admitted** — the meta-planner's gate outcome: a task hypothesis cleared θ at admission and its projection was
+built (`[meta-proj] projection=built`). `unknown` above θ is never admitted (`none(unknown)`). The gate is the
+meta-planner's, not the recognizer's (**θ**, §5).
+→ `shared/meta_planner.py`, `update_human_projection()`.
+
+USAGE RULE, in prose:
+- about the implementation: "the `unknown` hypothesis";
+- about the human's behaviour: "unmodelled behaviour";
+- about the robot's inference result: "unexplained".
+Unmodelled (ground truth) and unexplained (the robot's finding) can disagree at a given time; that disagreement
+is why both terms exist. Not written: "unknown behaviour", "an unknown task", "`unknown` as unmodelled behaviour".
+NOT INTRODUCED: "unresolved", "recognised" and "exhausted" are not terms. They belong to the pending architecture
+decision on `unknown` (`docs/terminology_revision.md`, §6). The log reason `none(unresolved)` is log text with its
+own meaning (the projector could not resolve the admitted hypothesis's task), not this word.
+
+---
+
+## 8. Sessions
 
 **cchat** — the design chat with Hadi, where design is decided. **ccode** — the Claude Code session
 in the repository, which builds and checks; older reports call it Fable.
