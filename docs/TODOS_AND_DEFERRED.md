@@ -19,6 +19,9 @@ Items marked **[BLOCKING]** must be resolved before the simulation runs correctl
 > - "unmodelled behaviour (`unknown`)" (TODO-97) → unmodelled behaviour (WORLD); `unknown` is the residual
 >   hypothesis (ROBOT), and the two diverge.
 > - "the hypothesis space is exhausted" (TODO-85) → no task hypothesis is left live ("exhausted" is not a term).
+> - "a finished work order and unmodelled behaviour are indistinguishable to `update()`" (TODO-85) → the idle
+>   stand after a finished work order IS unmodelled (label A has no value then); what `update()` cannot tell apart
+>   is `unknown` high by normalisation (nothing unexplained) from `unknown` raised by evidence (unexplained).
 > - "Foreseeable tasks are recognised (… crosses θ)" (TODO-32 update), "a task has just become recognised"
 >   (TODO-68), "one recognised task" (TODO-69), "the robot recognises it" (TODO-80), "recognised again" (TODO-93,
 >   TODO-94) → the task's hypothesis clears θ / is admitted (ROBOT).
