@@ -5,6 +5,8 @@ CLEANUP NOTE (September 2026): this is a frozen snapshot. Of the folders it name
 cleanup; their rulings and numbers are carried in design_decisions.md (the T3 / T3b, T10 and L2 entries) and in
 TODO-36, TODO-71 and TODO-77.
 
+TERMS NOTE (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "the stop fires … past the end of the projection and on deviations" → where the human departs from its projection; "deviation" means a departure from the work order only (label A).
+
 A big-picture reading of the repository on 2026-09-19, at commit `2d5fc2c`. Written to be read
 without the entry numbers: labels appear in brackets only so that an entry can be found, and
 section 6 maps plain names to labels. Nothing was run for this document; it is distilled from

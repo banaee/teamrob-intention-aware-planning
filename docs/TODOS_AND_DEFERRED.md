@@ -8,6 +8,26 @@ Items marked **[BLOCKING]** must be resolved before the simulation runs correctl
 > RECORD and are left exactly as they were written, so some of them use a term differently from the
 > glossary (the conflicts are listed in the glossary task's report). Read an entry in the terms of
 > its own date; write new text in the glossary's.
+>
+> **Terms for human behaviour, model coverage and the robot's inference (superseding note, 24 Sept 2026;
+> `docs/glossary.md` §7, `docs/terminology_revision.md`).** Entries written before that ruling use these
+> phrases; read them as follows (WORLD terms describe the human, ROBOT terms the robot's mind):
+> - "unknown behaviour", "a stationary unknown behaviour", "unknown (unmodelled)", "assigned, foreseeable and
+>   unknown behaviour" (TODO-95, TODO-96) → unmodelled behaviour (WORLD). Assigned / foreseeable / unknown are
+>   not three categories of intention: label A (assigned task / deviation) and label B (modelled / unmodelled)
+>   are independent, and a foreseeable task is a deviation that is modelled.
+> - "unmodelled behaviour (`unknown`)" (TODO-97) → unmodelled behaviour (WORLD); `unknown` is the residual
+>   hypothesis (ROBOT), and the two diverge.
+> - "the hypothesis space is exhausted" (TODO-85) → no task hypothesis is left live ("exhausted" is not a term).
+> - "Foreseeable tasks are recognised (… crosses θ)" (TODO-32 update), "a task has just become recognised"
+>   (TODO-68), "one recognised task" (TODO-69), "the robot recognises it" (TODO-80), "recognised again" (TODO-93,
+>   TODO-94) → the task's hypothesis clears θ / is admitted (ROBOT).
+> - "a task the robot cannot recognise" (TODO-49) → a task no hypothesis describes: unmodelled behaviour (WORLD).
+> - "exercised only past T_h and by deviations" (TODO-47 (e)), "(the human deviated; …)" (TODO-71) → by the
+>   human's departures from its projection. "Deviation" means a departure from the work order only (label A).
+> - "declared human behaviour outside the robot's domain knowledge", "an unforeseen stay", "human behaviour the
+>   ROBOT'S knowledge does not cover" (TODO-80, TODO-47 (e)) → declared unmodelled behaviour: a declared
+>   experimental condition (label C) whose behaviour is unmodelled (label B).
 
 ---
 

@@ -1,5 +1,7 @@
 # I4c — episode semantics and the empty stretch
 
+> Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): the harness (`analysis/i4_evidence_model/check_i4.py`, reused by I4c, I4d and I5) labels the human's ground truth `"unknown"` when the human's script is finished and for scenario_40's wander (`S40_TRUTH`: seg3a, seg3b, done). That is a WORLD fact written with the ROBOT's hypothesis name: read it as a finished work order, or unmodelled behaviour (the wander), respectively. So the "`!` = winner ≠ truth" marks and "wrong-θ" counts treat `unknown` leading as the correct reading of those ticks, and "unknown when idle" / `unknown_when_idle` is the `unknown` hypothesis's mass while the work order is finished (high by normalisation, not evidence of unmodelled behaviour).
+
 Built on `d040e6d` (I4b). Sweep: s00 (300 steps), s20 (200), s30 (200), s40 (400) × assignment_prior off/on,
 `PYTHONHASHSEED=0`, interpreter `~/python-envs/teamrob-sp4-env/bin/python`. scenario_10 stays dropped (TODO-52).
 β = 0.01 /cm and u = 0.1 unchanged. Baseline = I4b's `run_mesa.py` logs at `d040e6d` (`baseline/`, the same files

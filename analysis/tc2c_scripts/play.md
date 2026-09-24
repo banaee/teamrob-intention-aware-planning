@@ -1,5 +1,7 @@
 # analysis/tc2c_scripts/play.md — T-C2c play: six scratch scripts
 
+> Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "never recognised", "not recognised", "not re-recognised", "recognised … before its release", "a walk the robot recognises" → the task's hypothesis never (or does) lead or clear θ (ROBOT). "hypothesis space exhausted" → no task hypothesis left live ("exhausted" is not a term). "reads as `unknown`" is correct as written: the belief's `unknown` leads.
+
 Play, cheap form: nothing measured, nothing judged, nothing a fixture. The six scripts were run unregistered (built in
 memory from s00 / s10 / s80, the robot side unchanged); since registered as SCRIPT EXAMPLES in the author form, not
 measured fixtures: 1 `scenario_84`, 2 `scenario_02`, 3 `scenario_85`, 4 `scenario_03`, 5 `scenario_12`, 6

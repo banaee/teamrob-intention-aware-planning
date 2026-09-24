@@ -1,5 +1,7 @@
 # T9 — Projection ends where the executor stops; new baselines over ten conditions
 
+> Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "the coffee break is recognised at 123", "recognised at 334 / 314" → the hypothesis clears θ at that tick (ROBOT).
+
 Code before: `aefebc7` (R1 docs; projection walks to the target point). Code after: HEAD (this
 directory's commit). Ten runs per side, `PYTHONHASHSEED=0`: s00 (`env_layout0`, 300 steps), s10
 (`env_layout1` as cleaned at R1, 450 steps), s20 (200), s30 (200), s40 (400) × assignment prior

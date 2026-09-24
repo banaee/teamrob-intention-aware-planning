@@ -7,6 +7,28 @@ This is a living reference of *why* things are designed the way they are.
 > RECORD and are left exactly as they were written, so some of them use a term differently from the
 > glossary (the conflicts are listed in the glossary task's report). Read an entry in the terms of
 > its own date; write new text in the glossary's.
+>
+> **Terms for human behaviour, model coverage and the robot's inference (superseding note, 24 Sept 2026;
+> `docs/glossary.md` §7, `docs/terminology_revision.md`).** Entries written before that ruling use these
+> phrases; read them as follows (WORLD terms describe the human, ROBOT terms the robot's mind):
+> - "`unknown` is the escape hatch for behaviour outside the model" (the assignment-prior entry) → `unknown` is
+>   the residual hypothesis (ROBOT); unmodelled behaviour (WORLD) is one thing that moves mass to it.
+> - "fits badly enough to be unexplained", "no better than unexplained" (I4) and "this task rather than
+>   unexplained behaviour" (I4d) → no better than, or rather than, the `unknown` hypothesis (ROBOT).
+> - "recognises no task after the observed agent's first one" (I4) and "item_6 is recognised at 274" (I4d) →
+>   no later task hypothesis clears θ; item_6's hypothesis clears θ at 274 (ROBOT; the gate's outcome is
+>   "admitted").
+> - "Mass on `unknown` above θ is not a recognition (… something outside the hypothesis space, between tasks,
+>   or a deviation)" (T8 companion) → is not admitted; it follows unmodelled behaviour (WORLD) or is `unknown`'s
+>   by normalisation when few task hypotheses are live (ROBOT).
+> - "the human may deviate within a few ticks" (the robot can wait), "the stop fires only past T_h and on
+>   deviations" / "by deviations from the projection" (C, F47b, T-A1 stationary human), "the human deviated from
+>   its projection" (C) → the human departs from its projection. "Deviation" means a departure from the work
+>   order only (label A).
+> - "a task the domain does not describe … which the robot can never recognise" (F47b) → which no hypothesis
+>   describes: unmodelled behaviour (WORLD).
+> - "a confident wrong belief (Q4) and `unknown` are untouched" (belief-aware planning) → unmodelled behaviour
+>   (WORLD), whose effect on the belief is `unknown` mass, is untouched.
 
 ---
 

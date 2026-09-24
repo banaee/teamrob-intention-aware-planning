@@ -1,5 +1,7 @@
 # T6 — ablation of the meta-planner's policy components
 
+> Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "a deviation from the projection" → a departure from the projection; "deviation" means a departure from the work order only (label A).
+
 What each component does on the kitting fixtures, and why: realization (B3 `cost_strategy` realized against
 plain), commitment (B2 `gate_strategy` b2a against none, with a ρ existence test), and the execution-time
 separation stop (C, on against off). HEAD 9127b2a, no code change; PYTHONHASHSEED=0; θ 0.75, s = min_separation
