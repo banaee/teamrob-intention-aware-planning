@@ -361,8 +361,8 @@ class MetaPlanner:
                   tick), or `unknown` took over after a pin (TODO-54). What is
                   projected next is admission's answer, possibly nothing;
                 * none is recorded and the belief clears _clears_gate() on a
-                  task hypothesis — not `unknown`, which is no hypothesis and
-                  has no projection (admission refuses it). The first
+                  task hypothesis — not `unknown`, which is no task hypothesis
+                  and has no projection (admission refuses it). The first
                   recognition of a task, as `theta_crossed` fired it.
               The gate is asked at admission, never for retention: a recorded
               hypothesis that dips below theta while staying most likely fires
@@ -435,10 +435,11 @@ class MetaPlanner:
           - no human is observed,
           - belief.most_likely is the recognizer's `unknown` (the projector is
             not called): mass on `unknown` above theta is not a recognition —
-            the human is doing something outside the hypothesis space, is
-            between tasks, or is deviating — and there is nothing to
-            project. Reachable since the completion pin: a hypothesis retired
-            by the robot's own delivery hands its mass to `unknown` (TODO-54),
+            the human's behaviour is unmodelled, or no task hypothesis is
+            left live and the mass is `unknown`'s by normalisation — and
+            there is nothing to project. Reachable since the completion pin:
+            a hypothesis retired by the robot's own delivery hands its mass
+            to `unknown` (TODO-54),
           - the hypothesis cannot be resolved (project_human() returned None).
         update() then realizes every candidate against no human plan: δ = 0,
         plain projected cost.

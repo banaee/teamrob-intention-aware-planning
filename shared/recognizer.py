@@ -472,9 +472,10 @@ class IntentionRecognizer:
         Foreseeable tasks and 'unknown' are admissible by construction. A
         foreseeable task is a deviation, and deviations are exactly what a work
         order does not list — identified by schema.is_foreseeable, so no task
-        name is named here. 'unknown' is the escape hatch for behaviour outside
-        the model. Restricting either away would make a deviation unrecognizable
-        at the very moment it happens.
+        name is named here. 'unknown' is the residual hypothesis, which takes
+        the mass when no task hypothesis explains the observations.
+        Restricting either away would make a deviation unrecognizable at the
+        very moment it happens.
 
         An assigned task is matched to the hypothesis space on its ENUMERATED
         parameters: the hypothesis key built from its bindings minus the

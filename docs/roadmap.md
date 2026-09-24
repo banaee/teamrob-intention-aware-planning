@@ -432,9 +432,9 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   The recognizer pass (Q2 to Q4) opens with TODO-95: rule whether the stationarity channel joins it or stays
   recorded for T-H.
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
-  set covers switch and hold (s70 / s71), a two-table ordering, a change of mind, `unknown`; plain against
+  set covers switch and hold (s70 / s71), a two-table ordering, a change of mind, unmodelled behaviour; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and
-  `unknown`, not only switch and hold.
+  unmodelled behaviour (and the belief's `unknown` leading), not only switch and hold.
 - **T-F — Evaluation (Phase 5).** Fixture generation completed (the randomised harness, TODO-47); factors
   `cost_strategy` × `gate_strategy` × `strategy` × `separation_stop` × prior (B2 is a factor here, not a
   design step: TODO-36); metrics on `recognition_changed`, completion from the world fact, blocked time,

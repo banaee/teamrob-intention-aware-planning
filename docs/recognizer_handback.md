@@ -23,8 +23,9 @@ $$
 H = \{ (\tau, b) : \tau \text{ a task schema},\ b \in \Pi_{v \in \mathrm{params}(\tau)} \mathrm{Objects}(\mathrm{type}(v)) \} \cup \{ \mathrm{unknown} \}
 $$
 
-one hypothesis per task and typed binding (`TaskSchema.parameter_types`), plus `unknown`, the hypothesis that
-the behaviour is none of them. Keys are `repr(HypothesisKey)` strings and are sorted at construction, so every
+one hypothesis per task and typed binding (`TaskSchema.parameter_types`), plus `unknown`, the residual
+hypothesis: the hypothesis that the behaviour is none of them (glossary §7; whether a behaviour is described by
+a hypothesis is its coverage, a world label the recognizer never receives). Keys are `repr(HypothesisKey)` strings and are sorted at construction, so every
 order-dependent step (ties, log order) depends on the space alone.
 
 The SUPPORT S is H when nothing is known of the observed agent's work order (prior-off, the default). With
@@ -279,7 +280,7 @@ completion predicate. Two items on one shelf therefore receive identical values 
   arrival ($f = 1$) that bound is 0.233; after one fold, $10 \times$ that (TODO-64).
 - Two targets on one bearing at distances $d_1 < d_2$: equal excess, but after $x$ walked the nearer has odds
   $u^{-x(1/d_1 - 1/d_2)}$ over the farther (the grade is a distance term for collinear targets; TODO-38).
-- $L = u$ at $e = \ln(2/u - 1)/\beta \approx 294\,\mathrm{cm}$: a stretch that wasted about $294\,\mathrm{cm}$ is no better than unexplained.
+- $L = u$ at $e = \ln(2/u - 1)/\beta \approx 294\,\mathrm{cm}$: a stretch that wasted about $294\,\mathrm{cm}$ scores no better than `unknown`.
   $L(30\,\mathrm{cm}) = 0.85$, the slop at the proximity threshold (TODO-58).
 - A step change of k's expected action, as at an arrival, is a fold of the closing stretch (at f = 1, L/u)
   plus, for a no-graded-signal next action, an open 1/u. An arrival at a shelf is therefore worth two
@@ -454,8 +455,8 @@ MUST NOT assume, either setting:
 - that confidence is comparable across live-set sizes (0.75 is a different bar over 2 and over 8 keys);
 - that confidence ≥ θ implies more than half a walk (a lone live task clears θ at f ≈ 0.48 of its first
   stretch, from a prior of 0.5);
-- that `unknown` ≥ θ means the human is idle: it also means a task the space does not contain, a detour under
-  way, or every task pinned;
+- that `unknown` ≥ θ means the human is idle: it also means unmodelled behaviour (a task the space does not
+  contain, a detour under way), or every task pinned, where the mass is `unknown`'s by normalisation (glossary §7);
 - that a robot completion is a human boundary;
 - that the ceiling is a constant (it is 1/(1 + uⁿ));
 - that confidence is monotone within a task;
