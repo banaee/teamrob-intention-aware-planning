@@ -8,7 +8,7 @@ Why the terms exist. "Unknown" named two things:
 - (a) a property of what the human does in the world: the behaviour is outside the robot's models;
 - (b) the robot's belief: the mass on the residual hypothesis `unknown`.
 
-The two diverge. A standing human is unmodelled but produces no evidence, so (a) holds and (b) does not move. A
+The two diverge. An unmodelled stand produces no evidence, so (a) holds and (b) does not move. A
 finished work order leaves `unknown` near 0.995 by normalisation while nothing is unexplained, so (b) is high with no
 evidence behind it. The
 next design decision, whether `unknown` stays in the Bayesian hypothesis space, has to be stated in terms that
@@ -148,7 +148,7 @@ fixtures named. The finding column applies the definition of "unexplained" to th
 | a `coffee_break` interrupt declared foreseeable (`interrupt(..., with_=[coffee_break])`) | deviation, produced by `interrupt` | modelled (a foreseeable task) | `coffee_break` rises on the walk to the machine (scenario_11: 0.345), unless an earlier misleading walk refuted it (scenario_41: `coffee_break` ≤ 0.001, `unknown` 0.453; TODO-94) | nothing unexplained in scenario_11; in scenario_41 (modelled, suppressed by earlier evidence): undecided, depends on the evidence window (pending decision, T-D Q2) |
 | a wrong-table delivery (`deviate(deliver(item_0), destination=kitting_table_1)`, TODO-87) | deviation, produced by `deviate` | unmodelled | the item's delivery leads while the carry still fits it; `unknown` leads once the carry wastes path; no pin, no boundary at the place; after the next boundary the item's delivery leads again (scenario_85, section 3.3) | unexplained only in the middle stretch; not before, not after |
 | a walk to corner_NE (`MoveTo("corner_NE")`) | deviation (free primitive) | unmodelled (a landmark: no hypothesis binds one) | `unknown` rises with walked excess path and leads (0.99 in the play's long detours); a walk that stays in line with a live hypothesis does not raise it (scenario_04's walk to the door: the one live hypothesis at 0.58 to 0.61) | unexplained (when the walk wastes path against every live hypothesis) |
-| a human standing for 5 minutes (`Stay(n)`) | deviation (a stay the work order does not contain) | unmodelled (no hypothesis describes standing) | frozen where the last walk left it: mid-carry, the carried item's delivery on top (TODO-85); after a boundary, the uniform prior; `unknown` does not rise (I4c) | nothing unexplained: a stand is no evidence |
+| a human standing for 5 minutes (`Stay(n)`) | deviation (a stay the work order does not contain) | unmodelled (no hypothesis describes standing) | frozen where the last walk left it: mid-carry, the carried item's delivery on top (TODO-85); after a boundary, the uniform prior; `unknown` does not rise (I4c) | nothing unexplained: an unmodelled stand is no evidence |
 | a finished work order, idle human | none (work order finished) | unmodelled (no `HypothesisKey` describes a stand) | `unknown` about 0.995 by normalisation: no task hypothesis is left live (scenario_01, prior on); not admitted, `none(unknown)` | nothing unexplained |
 
 The coffee row in scenario_41 is a pattern of its own: MODELLED, SUPPRESSED BY EARLIER EVIDENCE. The `coffee_break`
@@ -174,7 +174,10 @@ belief       delivery rising, on top    |  unchanged (no stretch, no observation
 finding      nothing unexplained        |  nothing unexplained yet (no evidence arrives)     |
 ```
 
-The world has changed and the robot has received nothing that says so. After an episode boundary the same stand
+The world has changed and the robot has received nothing that says so. This holds for an UNMODELLED stand: every
+live hypothesis expects a walk, and a stand adds nothing to a walk's stretch (an empty stretch is no observation;
+a stretch that stops keeps its value). A stand inside a modelled `wait_at` phase (a `coffee_break`) is different:
+that hypothesis scores it as a no-graded-signal observation, the perfect fit against u. After an episode boundary the same stand
 leaves the belief at the uniform prior (0.498 each over one task and `unknown`), below θ, again with nothing
 unexplained.
 
@@ -223,7 +226,7 @@ finding      nothing unexplained         | nothing unexplained               | n
 ```
 
 `unknown` is high because nothing else is live, not because of evidence: the mass follows from normalisation. The
-stand is unmodelled, as in 3.1, and produces no evidence, so nothing is unexplained. Here `unknown` is high; in 3.1,
+stand is unmodelled, as in 3.1, and an unmodelled stand produces no evidence, so nothing is unexplained. Here `unknown` is high; in 3.1,
 mid-carry, it stays low. The belief differs because of what is live, not because of what the human does.
 
 ---

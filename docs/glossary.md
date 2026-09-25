@@ -395,7 +395,7 @@ leaves the resumed `place` failing at run time. Write the return explicitly, or 
 
 Ruled by Hadi, 24 September 2026. "Unknown" used to name two different things: what the human does (behaviour
 outside the robot's models) and what the robot believes (the mass on the residual hypothesis `unknown`). The two
-diverge: a standing human is unmodelled but produces no evidence, and a finished work order leaves `unknown` near
+diverge: an unmodelled stand produces no evidence, and a finished work order leaves `unknown` near
 0.995 while nothing is unexplained. The terms below keep four things apart: what behaviour occurs in the world,
 whether the robot's models cover it, whether the scenario author intended it as an experimental condition, and
 what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is never used for the other.
@@ -464,8 +464,9 @@ finished (prior on).
 
 **unexplained** — the recognizer's finding that it has evidence that no live task hypothesis explains the
 observations. A finding about evidence, not a value of the belief. `unknown` can be high with nothing unexplained
-(a finished work order, by normalisation), and a stand produces no evidence (I4c), so a stand is not unexplained,
-however long it lasts. The recognizer has no separate output for it today; how it is represented belongs to the
+(a finished work order, by normalisation), and an unmodelled stand produces no evidence (I4c: an empty stretch), so
+it is not unexplained, however long it lasts. A stand inside a modelled `wait_at` phase is different: that
+hypothesis scores it as a no-graded-signal observation (perfect fit against u). The recognizer has no separate output for it today; how it is represented belongs to the
 pending decision on `unknown`. The evidence window the finding is judged over (every observation since the episode
 began, or only the current ones) is not yet defined; it is the retraction question (T-D Q2) and part of that
 decision.

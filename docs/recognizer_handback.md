@@ -440,7 +440,8 @@ included. Therefore:
   closed).
 - **β, u**: they set every reveal tick (I4 / I4b / I4c region analysis, closed).
 - **The human's script.** A human who hesitates, back-tracks or wanders mid-task is charged as a rival would
-  be. Standing still is not evidence (TODO-59's deferred channel, not built). Every task in the script is one
+  be. An unmodelled stand is not evidence (TODO-59's deferred channel, not built); a stand inside a modelled
+  `wait_at` phase is that hypothesis's no-graded-signal observation (§1.5). Every task in the script is one
   the domain describes (well typed, F47b); unmodelled behaviour in a run is either a declared experimental
   condition (TODO-80) or unintended (glossary §7, label C).
 
