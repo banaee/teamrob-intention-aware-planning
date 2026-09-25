@@ -7,7 +7,7 @@ simulator-specific implementations.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Any, Set, Union
+from typing import Callable, Dict, List, Optional, Tuple, Any, Set, Union
 from enum import Enum
 
 
@@ -200,15 +200,39 @@ class ProcessCompletion:
 
 
 @dataclass
-class StepCall:
+class Step:
     """
-    One step in an HTN method body — a call to an action schema with bindings.
-    bindings map the action schema's Var parameters to Terms (Vars or Consts).
-    Unresolved Vars are grounded by the planner against WorldState at plan time.
-    e.g. StepCall('goto_zone', {Var('?zone'): Var('?item_zone')})
+    One step in an HTN method body (T-H): an ActionStep (a primitive action) or a
+    TaskStep (a compound sub-task). The step holds the schema OBJECT it calls,
+    never its name; the planner branches on the step's class. Not constructed
+    directly.
     """
-    action_name: str
+    def __post_init__(self):
+        if type(self) is Step:
+            raise TypeError("Step is not constructed directly: write an ActionStep or a TaskStep")
+
+
+@dataclass
+class ActionStep(Step):
+    """
+    A call to an action schema. bindings map the action schema's Var parameters
+    to Terms (Vars or Consts); unresolved Vars are grounded by the planner
+    against WorldState at plan time.
+    e.g. ActionStep(move_to, {Var('?target'): Var('?item')})
+    """
+    action: "ActionSchema"
     bindings: Dict[Var, Term]  # may be partial — unresolved Vars grounded later
+
+
+@dataclass
+class TaskStep(Step):
+    """
+    A call to a compound sub-task: bindings map the sub-task's Var parameters to
+    Terms, and the planner decomposes it recursively into the same flat action
+    list. No domain writes one today.
+    """
+    task: "TaskSchema"
+    bindings: Dict[Var, Term]
 
 
 @dataclass
@@ -224,7 +248,7 @@ class MethodSchema:
     name: str
     parameters: List[Var]
     guards: List[ConditionSchema]       # empty = unconditional
-    step_calls: List[StepCall]               # ordered decomposition
+    steps: List[Step]                   # ordered decomposition
     derived_vars: Dict[str, tuple] = field(default_factory=dict)
     # {var_name: (lookup_fn, source_var_name)} e.g. {"?item_zone": ("zone_of", "?item")}
 
@@ -233,12 +257,13 @@ class TaskSchema:
     """
     HTN compound task with one or more decomposition methods.
     The planner selects an applicable method and expands it into grounded actions.
+    The base of the tree's three classes (T-H): every schema is a WorkTask, a
+    PersonalTask or a HumanOnlyTask, and the class is the declaration. Not
+    constructed directly.
     """
     name: str                           # e.g. 'deliver_item'
     parameters: List[Var]
     methods: List[MethodSchema]         # one now; multiple for conditional decomposition later
-    is_assigned: bool = False
-    is_foreseeable: bool = False # TODO: if we need it besides the is_assigned flag in TaskInstance — maybe not.
     parameter_types: Dict[str, str] = field(default_factory=dict)
     # The TYPE of each parameter, e.g. {"?item": "item", "?kitting_table":
     # "kitting_table"}: a bound value is validated against it at load
@@ -254,6 +279,31 @@ class TaskSchema:
     # binding in the task instance is used as given and the lookup fills only
     # an unbound parameter. Distinct from MethodSchema.derived_vars, which are
     # variables used inside one method's steps, not task parameters.
+
+    def __post_init__(self):
+        if type(self) is TaskSchema:
+            raise TypeError(
+                f"task '{self.name}': a TaskSchema is not constructed directly; declare a "
+                f"WorkTask, a PersonalTask or a HumanOnlyTask"
+            )
+
+
+@dataclass
+class WorkTask(TaskSchema):
+    """May appear in a human's assigned tasks (deliver_item); a robot's own
+    assigned tasks are WorkTasks. Never left out of a robot's task model."""
+
+
+@dataclass
+class PersonalTask(TaskSchema):
+    """Never assigned (coffee_break, ac_activation). A PersonalTask in a robot's
+    task model is a foreseeable task; one may be omitted from a task model."""
+
+
+@dataclass
+class HumanOnlyTask(PersonalTask):
+    """A PersonalTask never given to any robot (go_to, stand): rejected when a
+    task model is built. The only class that may type a parameter as a landmark."""
 
 @dataclass
 class ActionSchema:
@@ -336,12 +386,13 @@ class TaskInstance:
     A concrete instantiation of a TaskSchema with specific parameter bindings.
     Used in scenario definitions and agent task assignments.
     bindings map Vars declared in the schema to concrete Const values.
-    is_foreseeable is read from schema — not declared here.
+    Its class (WorkTask, PersonalTask, HumanOnlyTask) is its schema's.
     """
     schema: "TaskSchema"
     bindings: Dict[Var, Const]  # {Var("?item"): Const("item_1")}
 
-def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str]) -> None:
+def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str],
+                        check_duration: Callable[[str], Any]) -> None:
     """
     A scheduled or assigned task must be well typed against the world it runs in: every
     bound object exists in the layout, and every parameter the schema types
@@ -353,9 +404,23 @@ def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str]) -
     and no hypothesis could describe: unmodelled behaviour by accident (TODO-49
     (2), the binding part; F47b). The embodiment supplies the id → type table;
     shared/ sees no simulator object.
+    A duration parameter (duration_parameters(), typed through an action's
+    duration_key, not parameter_types) names no object: its value is handed to
+    `check_duration`, the body's own duration parser, which raises ValueError on
+    a value it cannot read (T-H).
     """
     expected_types = task.schema.parameter_types or {}
+    durations = duration_parameters(task.schema)
     for var, const in task.bindings.items():
+        if var in durations:
+            try:
+                check_duration(const.value)
+            except ValueError as e:
+                raise ValueError(
+                    f"{task_instance_key(task)}: {var.name} is bound to '{const.value}', "
+                    f"which is not a duration: {e}"
+                ) from e
+            continue
         actual = object_type_by_id.get(const.value)
         if actual is None:
             raise ValueError(
@@ -368,6 +433,24 @@ def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str]) -
                 f"{task_instance_key(task)}: {var.name} is bound to '{const.value}' of type "
                 f"'{actual}', but the schema requires type '{expected}'"
             )
+
+
+def duration_parameters(schema: TaskSchema) -> Set[Var]:
+    """
+    The task parameters that are durations: those a method step binds to its
+    action's duration_key (stand(?duration) -> the stand action's ?duration). The
+    type of a duration parameter is declared through the action's duration_key,
+    not parameter_types (T-H, item 9); read from the typed step, never from a name.
+    """
+    params = set(schema.parameters)
+    found: Set[Var] = set()
+    for method in schema.methods:
+        for step in method.steps:
+            if isinstance(step, ActionStep) and step.action.duration_key is not None:
+                term = step.bindings.get(Var(step.action.duration_key))
+                if isinstance(term, Var) and term in params:
+                    found.add(term)
+    return found
 
 
 DESTINATION_LOOKUP = "destination_of"
@@ -388,8 +471,8 @@ def check_task_destinations(task: TaskInstance, destination_by_id: Dict[str, str
     """
     An ASSIGNED task that binds a var the schema otherwise resolves through
     "destination_of" must bind the destination the layout declares for its
-    source object (T-B1a): assigned_tasks is the work order, the reference the
-    robot's mind holds, so it describes the station, not a deviation. Raises
+    source object (T-B1a): assigned_tasks are the assigned tasks, the reference
+    the robot's mind holds, so they describe the station, not a deviation. Raises
     ValueError naming the task, the source object and both values. Not applied
     to a human's scheduled_tasks, which may send an object elsewhere.
     """
@@ -432,22 +515,11 @@ def task_instance_key(task: TaskInstance) -> str:
 # The functions (expand, the vocabulary, resolution) are in domains/script.py.
 # =============================================================================
 
-# The object type of a landmark: a symbolic place a layout may declare, which no
-# TaskSchema may type a parameter as (check_no_landmark_parameters), so no
+# The object type of a landmark: a symbolic place a layout may declare. Only a
+# HumanOnlyTask may type a parameter as one (Tree's constructor, T-H), so no
 # hypothesis binds one and no robot action grounds to one. A framework term,
 # not a domain one.
 LANDMARK_TYPE = "landmark"
-
-
-def check_no_landmark_parameters(domain: "DomainModel") -> None:
-    """Reject a domain one of whose TaskSchemas types a parameter as a landmark."""
-    for task in domain.tasks.values():
-        for var_name, type_name in (task.parameter_types or {}).items():
-            if type_name == LANDMARK_TYPE:
-                raise ValueError(
-                    f"task '{task.name}': parameter {var_name} is typed '{LANDMARK_TYPE}'; a landmark is a "
-                    f"place for a human's script only, and no task may bind one"
-                )
 
 
 @dataclass(eq=False)
@@ -571,8 +643,8 @@ class AgentConfig:
     """
     Configuration for one agent in a scenario.
     Two task fields, with semantics differing by agent type:
-      - human:  assigned_tasks  — the work order the human was given. A fact the
-                                  robot may know: WHICH tasks, never their order.
+      - human:  assigned_tasks  — the assigned tasks the human was given. A fact
+                                  the robot may know: WHICH tasks, never their order.
                 scheduled_tasks — the developer's execution script (T-C1): a flat
                                   list of primitives (ScriptAction, Stay),
                                   TaskInstances and deviations in any mix,
@@ -585,18 +657,18 @@ class AgentConfig:
                                   Unordered: the meta_planner produces Q0 and every
                                   later ordering from IR output.
                 scheduled_tasks — not read for robots.
-    A foreseeable task (schema.is_foreseeable) is written in the script as a
-    TaskInstance, directly or injected by interrupt / abandon, and expanded at
-    load into primitives carrying its provenance; check_work_order treats it as
-    free. It is not listed in assigned_tasks, by convention (not rejected there):
-    a deviation is not part of a work order.
+    Every assigned task, for either agent type, is a WorkTask instance (T-H;
+    rejected otherwise). A PersonalTask or a HumanOnlyTask is written in the
+    script as a TaskInstance, directly or injected by interrupt / abandon, and
+    expanded at load into primitives carrying its provenance; check_work_order
+    treats it as free.
     """
     agent_id: str
     agent_type: str                      # "human" or "robot"
     start_position: Tuple[float, float]
     scheduled_tasks: List[Any] = field(default_factory=list)  # human execution script (see docstring); unread for robot
     observes: List[str] = field(default_factory=list)  # agent_ids this agent observes
-    assigned_tasks: List[TaskInstance] = field(default_factory=list)   # the work order — see docstring
+    assigned_tasks: List[TaskInstance] = field(default_factory=list)   # the assigned tasks — see docstring
 
     def __post_init__(self):
         """
@@ -610,6 +682,13 @@ class AgentConfig:
         if not self.assigned_tasks:
             return
 
+        not_work = [task_instance_key(t) for t in self.assigned_tasks if not isinstance(t.schema, WorkTask)]
+        if not_work:
+            raise ValueError(
+                f"AgentConfig '{self.agent_id}': an assigned task is a WorkTask instance; "
+                f"these are not: {not_work}"
+            )
+
         assigned_keys = [task_instance_key(t) for t in self.assigned_tasks]
         dupes = sorted({k for k in assigned_keys if assigned_keys.count(k) > 1})
         if dupes:
@@ -620,7 +699,7 @@ class AgentConfig:
         if self.agent_type != "human":
             return
 
-        # The work order in the script, by provenance (T-C1; replaced the key
+        # The assigned tasks in the script, by provenance (T-C1; replaced the key
         # equality with the non-foreseeable scheduled tasks, TODO-86).
         check_work_order(self.agent_id, self.scheduled_tasks, self.assigned_tasks)
 
@@ -638,40 +717,6 @@ class ScenarioConfig:
     # env_layout: str                      # removed. will be handled in domains/<domain>/registry.py 
     
     
-@dataclass
-class DomainModel:
-    """
-    The complete HTN planning domain: all task schemas and action schemas.
-    Defined once in shared/domain.py, injected into KnowledgeBase at startup.
-    Consumed by planner (top-down decomposition) and recognizer (bottom-up inference).
-    """
-    tasks: Dict[str, TaskSchema]        # {task_name: TaskSchema}
-    actions: Dict[str, ActionSchema]  # {action_name: ActionSchema}
-    microactions: List[str]             # terminal symbols e.g. ['STEP', 'GRASP', ...]
-    intentions: Set[str]                # set of all intention IDs (task names that can be root tasks). in practice top-lelev HTN tasks.
-
-    def get_tasks_for_action(self, action_name: str) -> List[TaskSchema]:
-        """Return all tasks whose methods contain a step calling this action."""
-        result = []
-        for task in self.tasks.values():
-            for method in task.methods:
-                if any(step.action_name == action_name for step in method.step_calls):
-                    result.append(task)
-                    break
-        return result
-
-    def get_actions_for_microaction(self, mu: str) -> List[ActionSchema]:
-        """Return all action schemas that decompose to this microaction."""
-        result = []
-        for op in self.actions.values():
-            if isinstance(op.microactions, list) and mu in op.microactions:
-                result.append(op)
-            elif isinstance(op.microactions, str) and op.microactions.startswith(mu):
-                result.append(op)
-        return result
-    
-
-
 # =============================================================================
 # PLANNING TYPES
 # =============================================================================

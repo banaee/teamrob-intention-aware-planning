@@ -7,12 +7,13 @@ PURPOSE:
     adapted to the current belief about what the human intends to do.
 
 WHAT THIS MODULE DOES:
-    - Fetches TaskSchema from DomainKnowledgeBase
+    - Fetches TaskSchema from its ProceduralKnowledge (a robot's TaskModel, or the
+      Tree for the human's script)
     - Selects applicable method (first method whose guards hold in WorldState);
       decompose() exposes that selection to the recognizer, which must never
       pick a method by position
-    - Grounds each StepCall: resolves Var bindings to Const values
-    - Recursively decomposes StepCalls that name a TaskSchema (not a primitive ActionSchema)
+    - Grounds each ActionStep: resolves Var bindings to Const values
+    - Recursively decomposes each TaskStep (a compound sub-task)
     - Returns a flat AbstractPlan (single task, executor-facing)
 
 WHAT THIS MODULE DOES NOT DO:
@@ -24,17 +25,18 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT schedule across tasks (that is meta_planner.py)
 
 GROUNDING:
-    Task parameters arrive as Dict[str, str] e.g. {"?item": "item_3"}.
+    A task arrives as a TaskInstance: its schema object (held by this planner's
+    knowledge, by identity) and its bindings, e.g. {Var("?item"): Const("item_3")}.
     agent_id is passed explicitly as execution context — injected as ?agent.
-    The planner resolves each StepCall's bindings:
-        Var("?item")           → looked up in task_params / accumulated bindings
+    The planner resolves each step's bindings:
+        Var("?item")           → looked up in the task bindings / accumulated bindings
         Const("kitting_table") → used as-is
     All GroundedActions carry a fully instantiated completion_predicate
     (Predicate with Const args only) — executor checks set membership directly.
 
 RECURSION:
-    If a StepCall names a TaskSchema (not a primitive ActionSchema), the planner
-    recurses into that sub-task with the current bindings. The result is flattened
+    A TaskStep holds a sub-task's TaskSchema; the planner recurses into it with
+    the step's bindings. The result is flattened
     into the same action list. Output is always a flat AbstractPlan.
 """
 
@@ -44,9 +46,9 @@ import logging
 from shared.types import (
     ProcessCompletion, Var, Const, Predicate, ConditionSchema,
     GroundedAction, AbstractPlan, BeliefState, WorldState,
-    TaskSchema, ActionSchema, MethodSchema, StepCall, DESTINATION_LOOKUP,
+    TaskSchema, TaskInstance, ActionSchema, MethodSchema, Step, ActionStep, TaskStep, DESTINATION_LOOKUP,
 )
-from shared.domain_knowledge import DomainKnowledgeBase
+from shared.knowledge import ProceduralKnowledge
 
 logger = logging.getLogger(__name__)
 
@@ -66,14 +68,13 @@ class DecompositionError(ValueError):
 
 class AdaptivePlanner:
 
-    def __init__(self, knowledge: DomainKnowledgeBase):
+    def __init__(self, knowledge: ProceduralKnowledge):
         self.knowledge = knowledge
 
     def plan(
         self,
-        my_intention: str,
-        task_params: Dict[str, str],    # {"?item": "item_3"} — task-level bindings only
-        agent_id: str,                  # executing agent — injected as ?agent, not in task_params
+        task: TaskInstance,
+        agent_id: str,                  # executing agent — injected as ?agent, not a task binding
         belief: BeliefState,
         world: WorldState,
         current_plan: AbstractPlan | None = None,
@@ -83,17 +84,16 @@ class AdaptivePlanner:
         Recursively decomposes sub-tasks until all steps are primitive ActionSchemas.
         Guard evaluation selects the applicable method per task/sub-task.
         """
-        actions = self.decompose(my_intention, task_params, agent_id, world)
+        actions = self.decompose(task, agent_id, world)
 
         return AbstractPlan(
-            goal_intention=my_intention,
+            goal_intention=task.schema.name,
             actions=actions,
         )
 
     def decompose(
         self,
-        task_name: str,
-        task_params: Dict[str, str],
+        task: TaskInstance,
         agent_id: str,
         world: WorldState,
         method: Optional[str] = None,
@@ -109,16 +109,22 @@ class AdaptivePlanner:
         tick, to learn which actions the observed agent would perform if it
         held that intention — the same selection, not a parallel one.
         Raises DecompositionError when no method applies in this world.
+        The task's schema must be one this planner's knowledge holds, by
+        identity (a robot's planner decomposes only its task model's schemas);
+        a schema it does not hold is a ValueError.
         """
-        # Build initial bindings: task params + agent injection
+        if not self.knowledge.holds(task.schema):
+            raise ValueError(
+                f"AdaptivePlanner: task '{task.schema.name}' is not a task schema of this planner's knowledge"
+            )
+        # Build initial bindings: task bindings + agent injection
         bindings: Dict[str, str] = {"?agent": agent_id}
-        bindings.update(task_params)
-        return self._decompose_task(task_name, bindings, world, method)
+        bindings.update({var.name: const.value for var, const in task.bindings.items()})
+        return self._decompose_schema(task.schema, bindings, world, method)
 
     def is_complete(
         self,
-        task_name: str,
-        task_params: Dict[str, str],
+        task: TaskInstance,
         agent_id: str,
         world: WorldState,
     ) -> bool:
@@ -135,7 +141,7 @@ class AdaptivePlanner:
         DecompositionError as decompose() does: a task that cannot be
         decomposed here cannot be planned here either.
         """
-        actions = self.decompose(task_name, task_params, agent_id, world)
+        actions = self.decompose(task, agent_id, world)
         predicate = actions[-1].completion_predicate if actions else None
         return predicate is not None and predicate in world.predicates
 
@@ -143,21 +149,18 @@ class AdaptivePlanner:
     # Internal decomposition
     # ------------------------------------------------------------------
 
-    def _decompose_task(
+    def _decompose_schema(
         self,
-        task_name: str,
+        task_schema: TaskSchema,
         bindings: Dict[str, str],
         world: WorldState,
         method_name: Optional[str] = None,
     ) -> List[GroundedAction]:
         """
-        Recursively decompose a task into a flat list of GroundedActions.
-        Raises if no applicable method is found.
+        The flat GroundedAction list for one task schema: a TaskStep recurses
+        into its sub-task's schema, an ActionStep grounds its action schema.
+        The step holds the schema object; no name is looked up.
         """
-        task_schema = self.knowledge.get_task_schema(task_name)
-        if task_schema is None:
-            raise ValueError(f"AdaptivePlanner: unknown task '{task_name}'")
-
         # Parameters the task declares determined by another parameter (e.g.
         # the item's destination table) are filled before method selection
         bindings = self._resolve_lookups(
@@ -169,26 +172,17 @@ class AdaptivePlanner:
         resolved_bindings = self._resolve_derived_vars(method, bindings, world)
 
         actions: List[GroundedAction] = []
-        for step in method.step_calls:
+        for step in method.steps:
             step_bindings = self._resolve_step_bindings(step, resolved_bindings)
-            step_name = step.action_name
 
-            if self.knowledge.get_task_schema(step_name) is not None:
-                # StepCall names a TaskSchema — recurse
-                sub_actions = self._decompose_task(step_name, step_bindings, world)
-                actions.extend(sub_actions)
-
-            elif self.knowledge.get_action_schema(step_name) is not None:
-                # StepCall names a primitive ActionSchema — ground and append
-                action_schema = self.knowledge.get_action_schema(step_name)
-                grounded = self._ground_action(action_schema, step_bindings)
-                actions.append(grounded)
-
+            if isinstance(step, TaskStep):
+                actions.extend(self._decompose_schema(step.task, step_bindings, world))
+            elif isinstance(step, ActionStep):
+                actions.append(self._ground_action(step.action, step_bindings))
             else:
-                raise ValueError(
-                    f"AdaptivePlanner: step '{step_name}' in method "
-                    f"'{method.name}' of task '{task_schema.name}' "
-                    f"is neither a known task nor a known action"
+                raise TypeError(
+                    f"AdaptivePlanner: step {step!r} in method '{method.name}' of task "
+                    f"'{task_schema.name}' is neither an ActionStep nor a TaskStep"
                 )
 
         return actions
@@ -361,7 +355,7 @@ class AdaptivePlanner:
     
     def _resolve_step_bindings(
         self,
-        step: StepCall,
+        step: Step,
         bindings: Dict[str, str],
     ) -> Dict[str, str]:
         # Always carry ?agent forward — it's execution context, not a step parameter
@@ -378,7 +372,7 @@ class AdaptivePlanner:
                 if val is None:
                     raise ValueError(
                         f"AdaptivePlanner: unbound variable '{term.name}' "
-                        f"in step '{step.action_name}'"
+                        f"in a step of '{_step_schema_name(step)}'"
                     )
                 step_bindings[key] = val
             else:
@@ -432,3 +426,7 @@ class AdaptivePlanner:
                 raise TypeError(f"AdaptivePlanner: unexpected term type {type(term)}")
 
         return Predicate(condition.name, tuple(grounded_args))
+
+def _step_schema_name(step: Step) -> str:
+    """The name of the schema a step calls, for error text only."""
+    return step.action.name if isinstance(step, ActionStep) else step.task.name
