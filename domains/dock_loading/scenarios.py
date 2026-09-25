@@ -5,7 +5,7 @@ Task assignments reference domain schemas directly — no string parsing, no YAM
 A task's class (WorkTask, PersonalTask, HumanOnlyTask) is declared in tasks.py — not repeated here.
 """
 
-from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig
+from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig, Script
 from domains.dock_loading.tasks import (
     deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break
 )
@@ -23,18 +23,18 @@ scenario_10 = ScenarioConfig(
             agent_id="human_0",
             agent_type="human",
             start_position=(0, 0),
-            scheduled_tasks=[
+            scheduled_tasks=Script([
                 TaskInstance(schema=office_break, bindings={}),
-            ],
+            ]),
             observes=[],
         ),
         AgentConfig(
             agent_id="robot_0",
             agent_type="robot",
             start_position=(0, -370),
-            scheduled_tasks=[
+            scheduled_tasks=Script([
                 TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_3"), Var("?delivery_bay"): Const("frozen_delivery_bay_0")}),            
-            ],
+            ]),
             observes=["human_0"],
         ),
     ],
@@ -57,19 +57,19 @@ scenario_11 = ScenarioConfig(
             agent_id="human_0",
             agent_type="human",
             start_position=(0, 0),
-            scheduled_tasks=[
+            scheduled_tasks=Script([
                 TaskInstance(schema=office_break, bindings={Var("?office_chair"): Const("office_chair")}),
                 TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?pallet"): Const("pallet_0"), Var("?delivery_bay"): Const("dry_delivery_bay_0")}),
                 TaskInstance(schema=coffee_break,     bindings={Var("?coffee_machine"): Const("coffee_machine_0")}),
                 TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?pallet"): Const("pallet_3"), Var("?delivery_bay"): Const("frozen_delivery_bay_0")}),
-            ],
+            ]),
             observes=[],
         ),
         AgentConfig(
             agent_id="robot_0",
             agent_type="robot",
             start_position=(0, -370),
-            scheduled_tasks=[
+            scheduled_tasks=Script([
                 # Deliver full pallets: dry to dry_delivery_area
                 TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_0"), Var("?delivery_bay"): Const("dry_delivery_bay_0")}),
                 # TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_1"), Var("?delivery_bay"): Const("dry_delivery_bay_0")}),
@@ -79,7 +79,7 @@ scenario_11 = ScenarioConfig(
                 # Load empty pallets back to truck
                 TaskInstance(schema=load_return, bindings={Var("?pallet"): Const("pallet_6")}), # 6 is innitially empty ib empty_bay_dry
                 TaskInstance(schema=load_return, bindings={Var("?pallet"): Const("pallet_8")}), # 8 is innitially empty in empty_bay_frozen
-            ],
+            ]),
             observes=["human_0"],
         ),
     ],

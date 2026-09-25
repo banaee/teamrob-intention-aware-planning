@@ -8,12 +8,12 @@ Called once at startup by sim_model.py.
 
 from shared.knowledge import Tree
 from domains.kitting.actions import move_to, pick_up, place, wait_at, stand
-from domains.kitting.tasks import deliver_item, coffee_break, ac_activation, go_to, stand_task
+from domains.kitting.tasks import deliver_item, coffee_break, ac_activation, go_to, stand_task, go_to_and_stand
 from domains.kitting.scenarios import scenario_00, scenario_01, scenario_02, scenario_03, scenario_04, scenario_10, scenario_11, scenario_12, scenario_20, scenario_22, scenario_23, scenario_24, scenario_21, scenario_30, scenario_31, scenario_32, scenario_40, scenario_41, scenario_42, scenario_50, scenario_51, scenario_52, scenario_53, scenario_70, scenario_71, scenario_72, scenario_73, scenario_80, scenario_81, scenario_82, scenario_83, scenario_84, scenario_85, scenario_90, scenario_91, scenario_92, scenario_93, scenario_94
 
 def register_kitting_domain() -> Tree:
     return Tree(
-        tasks=[deliver_item, coffee_break, ac_activation, go_to, stand_task],
+        tasks=[deliver_item, coffee_break, ac_activation, go_to, stand_task, go_to_and_stand],
         actions=[move_to, pick_up, place, wait_at, stand],
         microactions=["STEP", "GRASP", "RELEASE", "STAND"],
     )

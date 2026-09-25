@@ -146,3 +146,22 @@ stand_task = HumanOnlyTask(
         )
     ],
 )
+
+# Walking to a landmark and standing there, as one decision (T-H3): the
+# interruption a script starts when the human steps away to a place and stays.
+go_to_and_stand = HumanOnlyTask(
+    name="go_to_and_stand",
+    parameters=[_landmark, _duration],
+    parameter_types={"?landmark": LANDMARK_TYPE},
+    methods=[
+        MethodSchema(
+            name="go_to_and_stand_default",
+            parameters=[_landmark, _duration],
+            guards=[],
+            steps=[
+                ActionStep(move_to, {_target: _landmark}),
+                ActionStep(stand, {_duration: _duration}),
+            ],
+        )
+    ],
+)
