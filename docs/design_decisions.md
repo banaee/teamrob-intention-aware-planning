@@ -3497,6 +3497,8 @@ Reference: D3, September 2026; cchat ruling; analysis/ablation_task_committed/ (
 
 **A run-time deviation is the same operation as a load-time edit (Phase 7, recorded)**
 
+SUPERSEDED IN PART by "T-H: the human behaviour model" (25 September 2026), item 8: events are typed and may cut mid-action (`DuringAction`), not only at the next action boundary; `inject` and the export are built in T-H2; an injection on an empty stack is exported as a plain script entry.
+
 RECORDED, NOT DECIDED (cchat, Hadi, 23 September 2026). A later phase, after T-G (roadmap, Phase 7).
 
 The human executor's injection path serves both: a deviation from T-C's vocabulary applied to the action script
@@ -3699,11 +3701,13 @@ Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TOD
 
 **T-H: the human behaviour model**
 
-RULED (Hadi, 25 September 2026). Nothing built; the build is T-H1 to T-H4. Supersedes, where they differ, "The human
-action script (T-C1, decided)" (the executed form, the author vocabulary, provenance, landmarks as a parameter type no
-schema may use, the work-order check) and the WORLD half of "Terms for human behaviour, model coverage and the robot's
-inference (ruled)" (labels A and B become queries on the record; "deviation" gets the definition of item 1). The robot's
-mind is unchanged: T-H changes what the human is, how a scenario is written, and what ground truth is.
+RULED (Hadi, 25 September 2026; the design, then the rulings on ccode's conceptual review of it, folded in below).
+Nothing built; the build is T-H1 to T-H4. Supersedes, where they differ, "The human action script (T-C1, decided)"
+(the executed form, the author vocabulary, provenance, landmarks as a parameter type no schema may use, the work-order
+check), the WORLD half of "Terms for human behaviour, model coverage and the robot's inference (ruled)" (labels A and
+B become queries on the record; "deviation" gets the definition of item 1), and, in part, "A run-time deviation is the
+same operation as a load-time edit" (Phase 7; item 8). The robot's mind is unchanged: T-H changes what the human is,
+how a scenario is written, and what ground truth is.
 
 Why. The human's script (T-C1) holds the meaning of the human's behaviour in edits of task expansions, so provenance,
 string anchors, a kind-string `Deviation` class, key-based checks and two booleans on `TaskSchema` were needed to
@@ -3711,111 +3715,143 @@ recover it. The terminology of 24 September named the resulting distinctions but
 replaces the representation.
 
 1. DEFINITION. A deviation is a node of the human's realised plan tree that the robot's tree does not contain.
-   Coverage is read at three levels: the task schema is absent, the method is absent, or the binding is absent.
+   Coverage is read at two levels: the task schema is absent, or the binding is absent.
 
 2. ONE TREE OF TASK SCHEMAS PER USE CASE, all with the full HTN structure:
    ```
    TaskSchema
-   ├── WorkTask          may appear in a human's assigned tasks (deliver_item)
+   ├── WorkTask          may appear in a human's assigned tasks (deliver_item); a robot's own assigned tasks are WorkTasks
    └── PersonalTask      never assigned (coffee_break, ac_activation)
-         └── HumanOnlyTask   never given to any robot (go_to(?landmark), stand(?ticks))
+         └── HumanOnlyTask   never given to any robot (go_to(?landmark), stand(?duration))
    ```
    `TaskSchema.is_assigned` and `is_foreseeable` are removed. A `HumanOnlyTask` may type a parameter as a landmark;
    no other schema may (this replaces `check_no_landmark_parameters`).
 
-3. THE ROBOT'S TASK MODEL (new term): the subset of the tree the robot is given, chosen per experiment. A
-   `HumanOnlyTask` is rejected when a task model is built. "Foreseeable" is defined, not declared: a `PersonalTask` in
-   the task model. The hypothesis space is built from the task model and the layout, as today. The class is read in
-   one place, the support restriction:
+3. THE ROBOT'S TASK MODEL (new term): the subset of the tree a robot is given, chosen per experiment, by WHOLE SCHEMAS.
+   A `WorkTask` is never left out of a task model, since the robot plans its own tasks with it; a `PersonalTask` may
+   be omitted per experiment; a `HumanOnlyTask` is rejected when a task model is built. "Foreseeable" is defined, not
+   declared: a `PersonalTask` in the task model. The hypothesis space is built from the task model and the layout, as
+   today. The class is read in one place, the support restriction:
    ```
    admissible = { hypotheses of WorkTask instances in the assigned tasks }
               ∪ { every hypothesis of a PersonalTask in the task model }
               ∪ { unknown }
    ```
-   Nothing in the robot's mind may read which schemas are human-only.
+   It compares `HypothesisKey` values, not key strings.
+   TWO KNOWLEDGE OBJECTS: the world's tree, and one task model per robot built from it in the embodiment loader, where
+   the `HumanOnlyTask` rejection runs. The human executor's planner uses the tree; the robot's recognizer, projector and
+   planner use its task model only. Nothing in `shared/` reads human-only-ness.
 
 4. ASSIGNED TASKS: a set the robot is told. The term "work order" is renamed "assigned tasks" throughout the glossary
    and the living documents. The ordering lives only in the human's script.
 
-5. THE HUMAN'S SCRIPT: an ordered list of `TaskInstance`s of the tree, with events attached to a task:
+5. THE HUMAN'S SCRIPT: an ordered list of `TaskInstance`s of the tree, fully bound (the author writes the machine;
+   a determined parameter follows from its lookup unless the author states it), with events attached to a task.
+   An event is typed: a `Trigger` and a `Decision`, no unions and no sentinels.
+   - `Decision`: `Start(task)` (any `TaskInstance` of the tree) or `Drop`.
+   - `Trigger`: `AfterAction(action, occurrence)`, `DuringAction(action, ticks)`, or `Now` (live only, item 8).
    ```
-   deliver_item("item_1", table="table_2")                a binding-level deviation is a plain instance
-   deliver_item("item_3").at(pick_up, coffee_break())    an event: a decision fired by a trigger
-   deliver_item("item_3").at(pick_up, drop)               abandon
-   stand(50), go_to("door")                               HumanOnlyTask instances as plain entries
+   deliver_item("item_1", table="kitting_table_2")                       a binding-level deviation is a plain instance
+   deliver_item("item_3").at(pick_up, Start(coffee_break("coffee_machine_0")))   an event
+   deliver_item("item_3").at(pick_up, Drop())                             abandon
+   stand("PT50S"), go_to("door")                                          HumanOnlyTask instances as plain entries
    ```
-   `at(action, decision)`: `action` is a reference to an `ActionSchema` object of the task's decomposition (an
-   occurrence index when the method repeats it); `decision` is any `TaskInstance` of the tree, or `drop`. Verified at
-   load: the action occurs in the decomposition, the instance is well typed against the layout. The check that a
-   stated table agrees with the station (`check_task_destinations`) applies to the assigned tasks and the robot's
-   plans only; the human's script is checked for types only.
-   `during(action, ticks=n, do=...)` is the trigger for a cut inside an action. Designed now, built when the live-run
-   exporter needs it. No fraction or position forms.
-   `Stay` and the hand-written primitives (`MoveTo`, `PickUp`, `Place`) are removed; standing is `stand(?ticks)`,
-   walking to a landmark is `go_to(?landmark)`.
+   (The spelling of the authored surface is T-H2's; the types are ruled.)
+   `at(action, decision)` makes an `AfterAction` trigger: it fires AFTER the action completes. `action` is a reference
+   to an `ActionSchema` object of the task's decomposition, with an occurrence index when the method repeats it. The
+   boundary before a task's first action is the previous entry's last action; before the whole script, a plain entry.
+   An event fires once per script entry and is then consumed.
+   `during(action, ticks=n, do=...)` makes a `DuringAction` trigger: a cut n ticks into the action. No fraction or
+   position forms. Built in T-H2.
+   Verified at load: every anchor is checked against the load-time sequential expansion of the script (events and
+   resumptions included), which the executor must reproduce exactly; an anchor absent from a re-expansion (e.g. a
+   `pick_up` anchor on a delivery that resumes as `deliver_already_held`) is a load error. Every instance is well typed
+   against the layout. The check that a stated table agrees with the station (`check_task_destinations`) applies to the
+   assigned tasks and the robot's plans only; the human's script is checked for types only.
+   `Stay` and the hand-written primitives (`MoveTo`, `PickUp`, `Place`) are removed; standing is the task
+   `stand(?duration)`, walking to a landmark is `go_to(?landmark)`.
+   NOTE (C27): a free placement or a handover, if ever wanted, is a task of the tree; walks from the viewer go to
+   landmarks only.
 
-6. THE HUMAN'S EXECUTOR OWNS A STACK, one level deep: on an event it suspends the current task, runs the decision's
-   task, and resumes the suspended task by re-expanding it in the current state (sequential expansion through the
-   successor state stays; `deliver_already_held` follows from the held item). `drop` applies to the task it is written
-   on. The executor can stop an action mid-way and resume from there. Outcomes (completed, suspended, abandoned) are
-   computed from what the stack did, never authored.
+6. THE HUMAN'S EXECUTOR OWNS A STACK, one level deep. On an event with `Start(task)` it suspends the current task and
+   runs the decision's task. `Drop` removes the top of the stack, authored or injected. The executor can stop an action
+   mid-way. ON RESUMPTION it first completes the cut action with what remains of it (the rest of the walk from the
+   current position; the remaining duration of a stand), then re-expands the task in the resulting state (sequential
+   expansion through the successor state; `deliver_already_held` follows from the held item). One rule for every action
+   type. OUTCOMES, computed from what the stack did and the world, never authored: completed, suspended, abandoned,
+   infeasible. Completion is a world fact whoever caused it; a resumption with nothing left to do is completed; a task
+   with no applicable method is infeasible, recorded, and the executor moves on.
+   ACCEPTED BY DESIGN (C25): one world behaviour can be written two ways with different records (`A.at(x, Start(B))`
+   against `A.at(x, Drop()), B, A`). The record is of the human's decisions, not of the body.
 
 7. THE RECORD: the executor writes, per tick, the stack (top first), the action and its progress. It is the ground
-   truth. Queries on it, each typed: `switches`, `resumptions`, `assigned(task)`, `coverage(task, robot)` with values
-   `COVERED | TASK_ABSENT | METHOD_ABSENT | BINDING_ABSENT`, and `truth_at(tick)`. These replace labels A and B,
-   `Provenance`, `Deviation`, string anchors and the key-counting `check_work_order`.
+   truth, its own stream, diffable in the sweep. Queries on it, each typed: `switches`, `resumptions`, `assigned(task)`,
+   `unperformed(assigned_tasks)`, `coverage(task, robot)` with values `COVERED | TASK_ABSENT | BINDING_ABSENT`, and
+   `truth_at(tick)`. Coverage is judged per task instance on the stack: an interrupted task is `COVERED` when its own
+   instance is, and its interruption is judged on its own. `TASK_ABSENT` arises from human-only tasks and from
+   `PersonalTask`s omitted per experiment. The queries replace labels A and B, `Provenance`, `Deviation`, string anchors
+   and the key-counting `check_work_order` (`unperformed` replaces it).
+   Format (ccode's choice): one line per tick in a file of its own beside the run log,
+   `[rec] step=<n> stack=<top>;<suspended> action=<action>#<occurrence> progress=<done>/<total>`, tasks by their task
+   instance key, `stack=-` when empty; the sweep diffs it as it diffs the greps.
+   `world_state_builder` exposes nothing of the human's stack; a test guards it (T-H2).
+   SIMULATION ONLY: the record, coverage and the oracle IR exist in simulation only. A real human needs annotation of
+   the same form.
 
-8. LIVE RUNS: `executor.inject(task | drop)` builds an event with the trigger "now"; buttons are a fixed set of inject
-   calls. Export rewrites "now" as `at(...)` or `during(..., ticks=n)` from the record; an exported run must replay
-   byte-identically.
+8. LIVE RUNS: `executor.inject(Start(task) | Drop())` builds an event with the trigger `Now`; buttons are a fixed set of
+   inject calls. Export rewrites `Now` as `AfterAction` or `DuringAction` from the record; an injection on an empty
+   stack is exported as a plain script entry. An exported run must replay byte-identically. This updates Phase 7:
+   events may cut mid-action.
 
-9. ACTIONS: `wait_at` is renamed `stand(?ticks)`: no location; where the agent stands follows from the method's
-   preceding `move_to`, with the same precondition mechanism as `pick_up` when a method needs it. Used both in
-   `coffee_break` and as the single action of the `stand` task. Recognizer phase logic unchanged.
+9. ACTIONS: `wait_at(?entity, ?duration)` stays as it is: located, it completes `waited(agent, entity)` and is the
+   expected action of `coffee_break` and `ac_activation`. A second action `stand(?duration)` is added: no entity,
+   process completion only, it emits no world fact. The human-only task `stand` uses it. Durations are in the physical
+   form `wait_at` already uses (ISO-8601, converted by the body); the type of a duration parameter is declared through
+   the existing `duration_key` mechanism, not `parameter_types`. The projector takes a stand's duration from the
+   instance's binding.
 
 10. NOT PART OF T-H.
     - IR is not redesigned. T-D resumes on this structure; T-D Q1 stays "what the robot infers and does when no
       hypothesis explains the evidence, inside `unknown` or outside it", now with ground-truth cases: a switch to a
-      modelled task, a switch to an unmodelled task, a binding-level deviation, no task on the stack, an episode's
-      first ticks.
+      modelled task, a switch to a modelled task outside the support, a switch to an unmodelled task, a binding-level
+      deviation, no task on the stack, an episode's first ticks.
     - Oracle-IR evaluation: its own pipeline task after T-H (TODO-101). Three conditions on the same scenario: no IR;
-      IR; oracle IR, where the meta-planner receives `truth_at(tick)` instead of the belief. The interface it needs is
-      recorded in TODO-101.
+      IR; oracle IR, where the meta-planner receives `truth_at(tick)` instead of the belief. `truth_at` enters the
+      robot's mind only through that condition's explicit adapter.
     - Alternative 1 (a human mind that generates events; a stack-aware IR): recorded as the next architecture
       direction, not scheduled (roadmap).
     - Nested interruptions beyond one level: the stack allows them; the restriction is lifted only when a scenario
       needs it (TODO-100).
 
 11. ACCEPTANCE ACROSS T-H: after each build, the 40 maintained baseline logs are rerun; robot-side lines (`[IR]`,
-    `[IR-dist]`, `[meta-*]`, decisions) must be byte-identical except for the `wait_at` → `stand` rename; human-side
-    differences are listed and each explained. At the end of T-H3 the new logs replace the stored baselines.
+    `[IR-dist]`, `[meta-*]`, decisions) must be byte-identical; human-side differences are listed and each explained. At
+    the end of T-H3 the new logs replace the stored baselines.
 
-THE BUILD, one session each:
-- T-H1 the tree and the task model (items 2, 3, 9, and the destination check's move).
-- T-H2 the executor: `Event`, `at`, `drop`, `inject`, the stack, the mid-action cut, the record (items 5 to 8, without
-  `during`'s authored form, TODO-99).
+THE BUILD, one session each, each under CLAUDE.md's BUILD DISCIPLINE (a plan step confirmed by Hadi, then the build):
+- T-H1 the tree, the task model and the two knowledge objects (items 2, 3, 9), and the destination check's move; the
+  migration of `domains/dock_loading/` and `ros_sim/` to the tree begins here (finished in T-H3). Its planning step
+  shows methods referencing `ActionSchema` objects and the support restriction comparing `HypothesisKey` values.
+- T-H2 the executor: `Event`, `Decision` (`Start`, `Drop`), `Trigger` (`AfterAction`, `DuringAction`, `Now`), `at`,
+  `during`, `inject`, the stack, the mid-action cut and the resumption rule, the record and its stream, the test that
+  `world_state_builder` exposes nothing of the stack (items 5 to 8). Its planning step shows how the cut and the resume
+  sit in the shared `Executor` without touching the robot's paths.
 - T-H3 the migration of the scenarios; deletion of the C1 vocabulary, `Deviation`, `Provenance`, `expand` /
-  `resolve_script` as a separate form, the key-based checks, `Stay`, `MoveTo` / `PickUp` / `Place`.
-- T-H4 the record's queries and coverage (item 7); supersedes TODO-92.
+  `resolve_script` as a separate form, the key-based checks, `Stay`, `MoveTo` / `PickUp` / `Place`; `dock_loading`
+  and `ros_sim` migrated.
+- T-H4 the record's queries, `unperformed` and coverage (item 7); supersedes TODO-92.
 
-RECORDED AT WRITING (ccode, 25 September 2026), points the ruling leaves to the build; not decided here:
-- (T-H1) `wait_at`'s completion is the world fact `waited(agent, entity)` and is the terminal condition of
-  `coffee_break` and `ac_activation` (the recognizer pins them on it, `[IR-complete]`; the pool reads it through
-  `is_complete()`). A `stand(?ticks)` with no location has no entity to state it with. Which fact completes `stand`,
-  and how `coffee_break(coffee_machine_0)`'s terminal condition names the machine, is to be settled in T-H1 under
-  item 11's rule (robot-side lines unchanged but for the rename).
+RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leaves to the build:
 - (T-H1) In the code at 19e7b8b `check_task_destinations` already runs on `assigned_tasks` only, for both agents, and
   not on the human's `scheduled_tasks` (`mesa_sim/sim_model.py`, the T-B1a block). The move is to where the task model
   and the robot's plans are checked.
 - (T-H1) `is_foreseeable` is read in the robot's mind at one place (`IntentionRecognizer._build_admissible_keys`);
   `DomainKnowledge.get_assigned_intentions()` and `get_foreseeable_intentions()` read the two booleans and have no
-  caller. The per-domain `DomainModel.intentions` set is the nearest existing thing to the task model.
-- (T-H2) An injection that lands inside an action exports as `during(..., ticks=n)`, whose authored form is TODO-99;
-  until it is built the byte-identical replay of item 8 covers injections at an action boundary (exported as `at`).
+  caller. The per-domain `DomainModel.intentions` set is the nearest existing thing to the task model; today one
+  `DomainKnowledge` serves the robot and the human's script resolver alike.
 - (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
-  table="table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance or its
-  enumerated bindings is part of the query's type, settled in T-H4.
-Reference: Hadi's ruling, 25 September 2026; docs/handoffs/handoff_T-H.md; "The human action script (T-C1, decided)";
-"Terms for human behaviour, model coverage and the robot's inference (ruled)"; "A run-time deviation is the same
-operation as a load-time edit" (Phase 7); TODO-80, TODO-85, TODO-86, TODO-87, TODO-92, TODO-98, TODO-99, TODO-100,
-TODO-101
+  table="kitting_table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance
+  or its enumerated bindings is part of the query's type, settled in T-H4.
+Reference: Hadi's ruling and the rulings on the review, 25 September 2026; docs/handoffs/handoff_T-H.md; "The human
+action script (T-C1, decided)"; "Terms for human behaviour, model coverage and the robot's inference (ruled)"; "A
+run-time deviation is the same operation as a load-time edit" (Phase 7); TODO-80, TODO-85, TODO-86, TODO-87, TODO-92,
+TODO-98, TODO-99, TODO-100, TODO-101

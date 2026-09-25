@@ -337,10 +337,10 @@ divergence diagrams as statements about the belief (section 3) and the terms not
 
 ```
 24 September (sections 1.1, 2, 4)             T-H (glossary §6, §7)
-label A, work order: assigned task |           assigned(task): true | false; no value on an empty stack
-  deviation
+label A, work order: assigned task |           assigned(task): true | false; no value on an empty stack;
+  deviation                                      unperformed(assigned_tasks): the assigned tasks never on a stack
 label B: modelled | unmodelled                 coverage(task, robot): COVERED | TASK_ABSENT |
-  (a HypothesisKey describes it, or not)         METHOD_ABSENT | BINDING_ABSENT
+  (a HypothesisKey describes it, or not)         BINDING_ABSENT, per task instance on the stack
 label C: declared experimental condition       unchanged; the check reads coverage from the record
 computed from script + provenance +            read from the executor's record: the stack (top first),
   hypothesis space (TODO-92, not built)          the action, its progress; built T-H2, queried T-H4
@@ -350,33 +350,34 @@ computed from script + provenance +            read from the executor's record: 
 
 On 24 September a deviation was any departure from the work order (label A), and a foreseeable task was "a deviation
 that is modelled". Under T-H a deviation is a node of the human's realised plan tree that the robot's tree does not
-contain, at one of three levels (task schema, method, binding). So:
+contain, at one of two levels (task schema, binding). So:
 - the foreseeable-task cell of the 1.1 table (label A deviation, label B modelled) is, under T-H, a switch to a
   `PersonalTask` in the robot's task model: `assigned` false, `coverage` `COVERED`, and no deviation;
 - "foreseeable" is defined, not declared: a `PersonalTask` in the task model (the `is_foreseeable` flag goes, T-H1);
 - `interrupt`, `deviate`, `abandon` (the operations of the 1.1 diagram) are replaced by an event (`task.at(action,
-  decision)`), a plain instance with the other binding, and `drop`.
+  Start(task))`), a plain instance with the other binding, and `Drop`.
 
 ### 8.3 The cases of section 2 under T-H
 
 | case (section 2) | written under T-H | `assigned` | `coverage` |
 |---|---|---|---|
 | an assigned delivery | `deliver_item("item_3")` | true | `COVERED` |
-| a `coffee_break` interrupt | `deliver_item("item_3").at(pick_up, coffee_break())`; the delivery suspended, then resumed by re-expansion | false (the coffee break, on top of the stack) | `COVERED` if the task model holds `coffee_break`, else `TASK_ABSENT` |
+| a `coffee_break` interrupt | `deliver_item("item_3").at(pick_up, Start(coffee_break("coffee_machine_0")))`; the delivery suspended, then resumed | false (the coffee break, on top of the stack) | the coffee break: `COVERED` if the task model holds `coffee_break`, else `TASK_ABSENT`; the interrupted delivery, judged on its own instance: `COVERED` |
 | a wrong-table delivery (TODO-87) | `deliver_item("item_0", table="kitting_table_1")`, a plain instance | settled in T-H4 (the query's type) | `BINDING_ABSENT` |
 | a walk to corner_NE | `go_to("corner_NE")` | false | `TASK_ABSENT` (a `HumanOnlyTask`) |
-| a stand of 5 minutes | `stand(n)` | false | `TASK_ABSENT` |
+| a stand of 5 minutes | `stand("PT5M")` (the stand task, its stand action emits no world fact) | false | `TASK_ABSENT` |
 | the idle human after the script | nothing on the stack | no value | no value |
 
 The belief and finding columns of section 2 are unchanged: T-H does not touch the robot's mind.
 
 The last row differs from the 24 September follow-up ruling, which called the idle stand unmodelled. Under T-H coverage
 is a query on a task, and after the script there is none: the empty stack is its own ground-truth case (T-D Q1's "no
-task on the stack"). A stand the script writes is `stand(n)`, `TASK_ABSENT`.
+task on the stack"). A stand the script writes is the `stand` task, `TASK_ABSENT`.
 
 ### 8.4 The label-C check (section 4)
 
-It reads the record instead of the script and the hypothesis space: every task on the record whose coverage is not
+It reads the record (in simulation only; a real human needs annotation of the same form) instead of the script and
+the hypothesis space: every task on the record whose coverage is not
 `COVERED` must be covered by the scenario's declared condition. The convention's terminal exit walk is now
 `go_to("door")` or a corner, declared for every scenario as before; the terminal stand at a table (TODO-80) stays a
 mismatch unless declared. Built with the queries in T-H4 (TODO-92 superseded).
@@ -386,7 +387,9 @@ mismatch unless declared. Built with the queries in T-H4 (TODO-92 superseded).
 - Removed by T-H3, kept in sections 1 to 7 as the vocabulary of their date: `Stay`, `MoveTo`, `PickUp`, `Place`,
   `expand` / `resolve_script` as a separate form, provenance, the class `Deviation`, string anchors,
   `check_work_order`.
-- Renamed by T-H1: the action `wait_at` becomes `stand(?ticks)`. Where sections 1 to 7 cite `wait_at` as a no-graded-signal
-  phase, the phase logic is unchanged.
+- `wait_at` is unchanged (located; it completes `waited(agent, entity)`; the expected action of `coffee_break` and
+  `ac_activation`). T-H1 adds a second action, `stand(?duration)`: no entity, process completion only, no world fact;
+  the human-only task `stand` uses it. Sections 1 to 7 say "a stand" for a human standing still, which the record now
+  splits into a `wait_at` inside a task, the `stand` task, or an empty stack.
 - "work order" → "assigned tasks" (a set the robot is told; the ordering lives only in the human's script).
 
