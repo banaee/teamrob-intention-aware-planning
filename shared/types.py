@@ -7,7 +7,7 @@ simulator-specific implementations.
 """
 
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Tuple, Any, Set, Union
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Any, Set, Union
 from enum import Enum
 
 
@@ -391,6 +391,19 @@ class TaskInstance:
     schema: "TaskSchema"
     bindings: Dict[Var, Const]  # {Var("?item"): Const("item_1")}
 
+    # The authored forms of an event on a script entry (T-H, item 5; built in
+    # T-H2): sugar that constructs Event(AfterAction | DuringAction, Start | Drop)
+    # on a ScriptEntry holding this task. `what` is the TaskInstance to start or
+    # `drop`; `occurrence` selects the k-th (0-based) occurrence of `action` in
+    # the entry's expansion when the method repeats it.
+    def at(self, action: "ActionSchema", what: "Union[TaskInstance, Decision]",
+           occurrence: Optional[int] = None) -> "ScriptEntry":
+        return ScriptEntry(self, ()).at(action, what, occurrence)
+
+    def during(self, action: "ActionSchema", time: str, what: "Union[TaskInstance, Decision]",
+               occurrence: Optional[int] = None) -> "ScriptEntry":
+        return ScriptEntry(self, ()).during(action, time, what, occurrence)
+
 def check_task_bindings(task: TaskInstance, object_type_by_id: Dict[str, str],
                         check_duration: Callable[[str], Any]) -> None:
     """
@@ -638,6 +651,161 @@ def check_work_order(agent_id: str, script: List[Any], assigned_tasks: List[Task
         )
 
 
+# =============================================================================
+# THE HUMAN'S SCRIPT (T-H, item 5; built in T-H2)
+# An ordered list of fully bound task instances of the tree with typed events
+# attached. An event is a Trigger and a Decision: no unions, no sentinels, no
+# kind strings. Nothing here reaches the robot's mind. The stack machine that
+# runs a Script is world/human_executor.py; the record it writes is
+# world/record.py.
+# =============================================================================
+
+@dataclass(frozen=True)
+class Trigger:
+    """What fires an event (the glossary's "event trigger"). Not constructed
+    directly: an AfterAction, a DuringAction or Now."""
+    def __post_init__(self):
+        if type(self) is Trigger:
+            raise TypeError("Trigger is not constructed directly: write AfterAction, DuringAction or Now")
+
+
+@dataclass(frozen=True)
+class AfterAction(Trigger):
+    """Fires after `action` of the entry's expansion completes (written with
+    `at`). `occurrence` is the 0-based occurrence of the schema in the
+    expansion; None means it must occur exactly once (else a load error)."""
+    action: "ActionSchema"
+    occurrence: Optional[int] = None
+
+    def __repr__(self):
+        return f"at({_anchor_text(self.action, self.occurrence)})"
+
+
+@dataclass(frozen=True)
+class DuringAction(Trigger):
+    """A cut `time` (ISO-8601, the form durations use; the body converts it)
+    into `action` of the entry's expansion (written with `during`). The cut
+    happens once that many of the body's ticks of the action are executed."""
+    action: "ActionSchema"
+    time: str
+    occurrence: Optional[int] = None
+
+    def __repr__(self):
+        return f"during({_anchor_text(self.action, self.occurrence)},{self.time})"
+
+
+@dataclass(frozen=True)
+class Now(Trigger):
+    """A live event (inject): fires on the tick it is applied."""
+
+    def __repr__(self):
+        return "now"
+
+
+def _anchor_text(action: "ActionSchema", occurrence: Optional[int]) -> str:
+    return action.name if occurrence is None else f"{action.name}#{occurrence}"
+
+
+@dataclass(frozen=True)
+class Decision:
+    """What an event does. Not constructed directly: a Start or a Drop."""
+    def __post_init__(self):
+        if type(self) is Decision:
+            raise TypeError("Decision is not constructed directly: write Start(task) or drop")
+
+
+@dataclass(frozen=True)
+class Start(Decision):
+    """Suspend the current task and run `task` (any TaskInstance of the tree).
+    It holds a TaskInstance, never a ScriptEntry: a decision's task carries no
+    events, so the one-level stack is a property of the type (TODO-100)."""
+    task: TaskInstance
+
+    def __repr__(self):
+        return f"start({task_instance_key(self.task)})"
+
+
+@dataclass(frozen=True)
+class Drop(Decision):
+    """Remove the top of the stack: the task in hand is abandoned."""
+
+    def __repr__(self):
+        return "drop"
+
+
+drop = Drop()
+
+
+@dataclass(frozen=True)
+class Event:
+    trigger: Trigger
+    decision: Decision
+
+    def __repr__(self):
+        return f"{self.trigger!r}->{self.decision!r}"
+
+
+def _decision_of(what: "Union[TaskInstance, Decision]") -> Decision:
+    """The sugar's one dispatch on the class of what the author wrote: a
+    TaskInstance is started, a Decision is taken as it is."""
+    if isinstance(what, TaskInstance):
+        return Start(what)
+    if isinstance(what, Decision):
+        return what
+    raise TypeError(f"an event starts a TaskInstance or is `drop`; got {what!r}")
+
+
+@dataclass(frozen=True)
+class ScriptEntry:
+    """One entry of a human's script: a task instance with its events, in
+    authored order. Each event fires once, when its anchor is reached, and is
+    then consumed."""
+    task: TaskInstance
+    events: Tuple[Event, ...] = ()
+
+    def at(self, action: "ActionSchema", what: "Union[TaskInstance, Decision]",
+           occurrence: Optional[int] = None) -> "ScriptEntry":
+        event = Event(AfterAction(action, occurrence), _decision_of(what))
+        return ScriptEntry(self.task, self.events + (event,))
+
+    def during(self, action: "ActionSchema", time: str, what: "Union[TaskInstance, Decision]",
+               occurrence: Optional[int] = None) -> "ScriptEntry":
+        event = Event(DuringAction(action, time, occurrence), _decision_of(what))
+        return ScriptEntry(self.task, self.events + (event,))
+
+    def __repr__(self):
+        return f"{task_instance_key(self.task)}{list(self.events) if self.events else ''}"
+
+
+class Script:
+    """
+    The human's script (T-H): its entries in order. A plain TaskInstance is an
+    entry with no events. Its own type, so that the loader dispatches on it: a
+    list is the C1 form, kept until T-H3 deletes it.
+    """
+
+    def __init__(self, entries: Sequence["Union[TaskInstance, ScriptEntry]"]):
+        self.entries: List[ScriptEntry] = []
+        for e in entries:
+            if isinstance(e, TaskInstance):
+                self.entries.append(ScriptEntry(e, ()))
+            elif isinstance(e, ScriptEntry):
+                self.entries.append(e)
+            else:
+                raise TypeError(f"script entry {e!r}: not a TaskInstance or a ScriptEntry")
+
+    def tasks(self) -> List[TaskInstance]:
+        """Every task the script names: each entry's, and each Start's."""
+        out: List[TaskInstance] = []
+        for entry in self.entries:
+            out.append(entry.task)
+            out.extend(ev.decision.task for ev in entry.events if isinstance(ev.decision, Start))
+        return out
+
+    def __repr__(self):
+        return f"Script({self.entries})"
+
+
 @dataclass
 class AgentConfig:
     """
@@ -666,7 +834,8 @@ class AgentConfig:
     agent_id: str
     agent_type: str                      # "human" or "robot"
     start_position: Tuple[float, float]
-    scheduled_tasks: List[Any] = field(default_factory=list)  # human execution script (see docstring); unread for robot
+    scheduled_tasks: "Union[List[Any], Script]" = field(default_factory=list)  # human execution script (see docstring); unread for robot
+                                         # a Script (T-H2): the new form; a list: the C1 form, until T-H3
     observes: List[str] = field(default_factory=list)  # agent_ids this agent observes
     assigned_tasks: List[TaskInstance] = field(default_factory=list)   # the assigned tasks — see docstring
 
@@ -700,7 +869,11 @@ class AgentConfig:
             return
 
         # The assigned tasks in the script, by provenance (T-C1; replaced the key
-        # equality with the non-foreseeable scheduled tasks, TODO-86).
+        # equality with the non-foreseeable scheduled tasks, TODO-86). A Script
+        # (T-H2) is not checked here: the record's `unperformed` query replaces
+        # this check (T-H4); an assigned task may legitimately go unperformed.
+        if isinstance(self.scheduled_tasks, Script):
+            return
         check_work_order(self.agent_id, self.scheduled_tasks, self.assigned_tasks)
 
 
