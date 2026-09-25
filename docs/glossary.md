@@ -314,31 +314,31 @@ planner fills it before method selection; the recognizer does not enumerate it.
 → `shared/types.py`, `TaskSchema.determined_parameters`; `shared/io_contracts.md` §1.6;
 `docs/design_decisions.md`, "An item's destination table is a fact of the station".
 
-**foreseeable task** — a task the domain declares as a deviation the robot can anticipate
-(`schema.is_foreseeable`). In the human's script it is written as a `TaskInstance`, either directly or as content
-injected by `interrupt` / `abandon`, and `expand()` turns it at load into primitives carrying its provenance; the
-executed `scheduled_tasks` holds only primitives, so the task is visible in the script's provenance, not as an
-element. The work-order check treats it as free (`check_work_order`); it belongs to no work order, which is why it is
-not listed in `assigned_tasks` (a convention: the code does not reject it there). The recognizer keeps its hypothesis
-admissible under the assignment prior (`_build_admissible_keys`). On the labels of §7: a deviation (label A) that
-is modelled (label B).
-→ `shared/types.py`, `TaskSchema`, `check_work_order()`; `domains/script.py`, `expand()`;
-`shared/recognizer.py`, `_build_admissible_keys()`.
+**foreseeable task** — defined, not declared (T-H): a `PersonalTask` in the robot's **task model**. It is never
+assigned. The support restriction keeps every hypothesis of it admissible under the assignment prior. On the queries
+of §7: a switch to it is not a deviation, since the robot's tree contains it (`assigned` false, `coverage` `COVERED`).
+AS BUILT until T-H1: declared on the schema (`schema.is_foreseeable`), read in the robot's mind at one place
+(`_build_admissible_keys`); kept out of `assigned_tasks` by convention only (TODO-98).
+→ `docs/design_decisions.md`, "T-H: the human behaviour model", item 3; `shared/recognizer.py`,
+`_build_admissible_keys()`.
 
 **task completion** — a fact about the world: the task's terminal condition holds, whoever made it
 hold (`planner.is_complete()`). Not a fact about who performed it. Measured from the world tick, the
 tick after the robot's last release; the empty-pool `[meta]` line is the DECLARED tick, two later.
 → `shared/planner.py`, `is_complete()`; `CLAUDE.md`, "Regression checking".
 
-**assigned_tasks / scheduled_tasks** — for the human, the work order (which tasks) and the
-developer's execution script (which order). The robot never reads `scheduled_tasks`. For the robot,
-`assigned_tasks` is its task pool and `scheduled_tasks` is unread. A behaviour compared with the human's
-`assigned_tasks` is label A (§7): an assigned task or a deviation.
-→ `shared/types.py`, `AgentConfig`.
+**assigned tasks** — a set the robot is told: for the human, which tasks it was assigned (every one a `WorkTask`
+instance, T-H), never in which order; the ordering lives only in the human's script. Replaces "work order" (T-H,
+25 Sept 2026; older records say "work order"). For the robot, `assigned_tasks` is its task pool.
 
-The five entries below are decided (T-C1) and built: the scenario layer (T-C2a), the script written, expanded,
-edited and checked at load; sequential expansion and the action-level human executor (T-C2b), which runs the
-primitives one by one, tracks no task and spends no per-task completion tick.
+**assigned_tasks / scheduled_tasks** — the `AgentConfig` fields: the assigned tasks, and the human's script. The robot
+never reads `scheduled_tasks`; for the robot it is unread.
+→ `shared/types.py`, `AgentConfig`; `docs/design_decisions.md`, "T-H: the human behaviour model", item 4.
+
+SUPERSEDED BY T-H (25 Sept 2026). The five entries below are decided (T-C1) and built: the scenario layer (T-C2a), the
+script written, expanded, edited and checked at load; sequential expansion and the action-level human executor
+(T-C2b). T-H replaces them (the tree, the script of task instances, events, the stack, the record, below); they are
+kept until T-H3 deletes the code, and describe the code until then.
 
 **primitive** — one entry of the human's executed script: a `ScriptAction` (an action of the domain by schema
 name, one element type per action schema) or a `Stay`. Authors write four: `MoveTo`, `PickUp`, `Place` (kitting:
@@ -370,11 +370,11 @@ to one; the human's script may walk to it (`MoveTo(landmark)`). The type is `lan
 → `shared/types.py`, `LANDMARK_TYPE`, `check_no_landmark_parameters()`; `docs/design_decisions.md`, "The human
 action script (T-C1, decided)".
 
-**deviation vocabulary** — the author's edits of the work order: `interrupt(task, after=|before=, with_=[...])`,
+**deviation vocabulary** — the author's edits of the assigned tasks' expansion: `interrupt(task, after=|before=, with_=[...])`,
 `deviate(task, destination=)`, `abandon(task, after=|before=, then=[...])`, plus free `Stay(n)` (n omitted:
 until the run ends) and `MoveTo(landmark)`. Anchors name an action by name or index; injected content may mix
 tasks and primitives; in T-C every injection sits at an action boundary. The edits are operations on the
-expanded work order: each PRODUCES a deviation (§7, label A), the resulting departure from the work order, and is
+expanded assigned tasks: each PRODUCED a deviation in the 24 September sense (label A), a departure from the assigned tasks, and is
 not a kind of deviation; a deviation is not a task of its own. NOTE: the class `Deviation` names the deferred edit,
 not the condition; the identifier is not renamed. Written at import, where there is no world, each returns a deferred
 edit (`[Deviation]`) that the loader applies to the task's expansion with the list helpers (`insert_after`,
@@ -386,70 +386,150 @@ walk is intended unmodelled behaviour (no hypothesis binds a landmark): by this 
 unmodelled behaviour of every scenario, so the label-C check (§7) excludes it.
 AUTHOR NOTE (T-C2b): content injected by `interrupt` is expanded sequentially, but the interrupted task's
 remaining actions are not: a task injected after a pick-up that returns the held item (`deliver_with_return`)
-leaves the resumed `place` failing at run time. Write the return explicitly, or use `abandon`.
+leaves the resumed `place` failing at run time. Write the return explicitly, or use `abandon`. (Under T-H the
+suspended task is re-expanded in the current state on resumption, **stack** below.)
 → `domains/script.py`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
+
+THE HUMAN BEHAVIOUR MODEL (T-H). Ruled by Hadi, 25 September 2026; not built (T-H1 to T-H4). The entries below are
+the meaning from here; the pointers name the design entry until the code exists.
+→ `docs/design_decisions.md`, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`.
+
+**WorkTask / PersonalTask / HumanOnlyTask** — the three classes of the one tree of task schemas per use case, each
+with the full HTN structure. A `WorkTask` may appear in a human's assigned tasks (`deliver_item`). A `PersonalTask` is
+never assigned (`coffee_break`, `ac_activation`). A `HumanOnlyTask` is a `PersonalTask` never given to any robot
+(`go_to(?landmark)`, `stand(?ticks)`); it is the only class that may type a parameter as a landmark. Replace
+`TaskSchema.is_assigned` and `is_foreseeable`.
+
+**task model** — the robot's task model: the subset of the tree the robot is given, chosen per experiment. A
+`HumanOnlyTask` is rejected when one is built. The hypothesis space is built from the task model and the layout. The
+class of a schema is read in one place in the robot's mind, the support restriction: admissible = the hypotheses of
+the `WorkTask` instances in the assigned tasks, every hypothesis of a `PersonalTask` in the task model, and
+`unknown`. Nothing in the robot's mind reads which schemas are human-only.
+
+**human's script** (T-H) — an ordered list of `TaskInstance`s of the tree, with **events** attached to a task. A
+binding-level deviation is a plain instance (`deliver_item("item_1", table="table_2")`); a `HumanOnlyTask` instance
+is a plain entry (`stand(50)`, `go_to("door")`). Checked at load for types only; the check that a stated table agrees
+with the station (`check_task_destinations`) applies to the assigned tasks and the robot's plans.
+AUTHOR CONVENTION (T-C2c, carried over): a script ends with the human leaving the workspace (`go_to("door")` or a
+corner), unless the scenario is about the terminal stand at a table (TODO-80), said in its description.
+
+**event** — a decision attached to a task of the script, fired by an event trigger: `task.at(action, decision)`, or,
+live, `inject(...)`. The decision is any `TaskInstance` of the tree, or `drop`.
+COLLISION: T-D's "blocked event" (the body's report that the robot cannot proceed, `ExecutorState`) is not an event
+in this sense.
+
+**event trigger** — what fires an event: `at` (an action of the task's decomposition is reached), `during` (a number
+of ticks into an action), or "now" (`inject`). The ruling calls it "trigger"; in prose write "event trigger", because
+**trigger** (§4) is the meta-planner's re-decision condition.
+
+**at** — `at(action, decision)`: the event trigger at an action of the task's decomposition. `action` is a reference
+to an `ActionSchema` object (an occurrence index when the method repeats it), never a name string. Verified at load:
+the action occurs in the decomposition, the decision is well typed against the layout.
+COLLISION: the world predicate `at(agent, object)` (executor completion) is a different thing; say "the `at` event
+trigger" where both could be read.
+
+**during** — `during(action, ticks=n, do=...)`: the event trigger for a cut inside an action, n ticks into it. No
+fraction or position forms. Designed, built when the live-run exporter needs it (TODO-99).
+
+**drop** — the decision that abandons the task it is written on (`task.at(pick_up, drop)`). Replaces `abandon`.
+
+**inject** — `executor.inject(task | drop)`: a live event with the event trigger "now"; the viewer's buttons are a
+fixed set of inject calls. Export rewrites "now" as `at(...)` or `during(..., ticks=n)` from the record, and an
+exported run replays byte-identically.
+
+**stack** — the human executor's stack of tasks, one level deep in T-H (nesting is allowed by the structure and
+lifted only when a scenario needs it, TODO-100). On an event the executor suspends the current task, runs the
+decision's task, and resumes the suspended one by re-expanding it in the current state (sequential expansion through
+the **successor state**, §1). It can stop an action mid-way and resume from there. Outcomes (completed, suspended,
+abandoned) are computed from what the stack did, never authored.
+
+**record** — the human executor's record: per tick, the stack (top first), the action and its progress. The ground
+truth. Its typed queries are `switches`, `resumptions`, `assigned(task)`, `coverage(task, robot)` and
+`truth_at(tick)`; they replace labels A and B, provenance, `Deviation`, string anchors and the key-counting
+`check_work_order`. Built in T-H2, queried in T-H4.
+COLLISION: the **decision record** (§4) is the meta-planner's one field; "the design record" is the documents. Write
+"the executor's record" where either could be read.
+
+**deviation** (T-H) — a node of the human's realised plan tree that the robot's tree does not contain. Its level is
+the **coverage** value. Supersedes the 24 September meaning (any departure from the work order, label A): a switch to
+a `PersonalTask` in the task model is not a deviation.
+
+**coverage** — `coverage(task, robot)`, a query on the record against the robot's task model and layout (not against
+the support the assignment prior narrows). Values: `COVERED`; `TASK_ABSENT` (the task schema is not in the task
+model: every `HumanOnlyTask`, and a `PersonalTask` left out of it); `METHOD_ABSENT` (the schema is, the method the
+human used is not); `BINDING_ABSENT` (schema and method are, the binding is not: a wrong-table delivery, since a
+hypothesis carries the item's designated table). Unrelated to the covered fraction f of **graded evidence** (§5).
+
+**stand** — the action `stand(?ticks)`, renamed from `wait_at`: no location; where the agent stands follows from the
+method's preceding `move_to`, with the same precondition mechanism as `pick_up` when a method needs it. Used in
+`coffee_break` and as the single action of the `HumanOnlyTask` `stand(?ticks)`. Recognizer phase logic unchanged.
+Where the action and the task could both be read, write "the stand action" or "the stand task".
+COLLISION: "a stand" in §7 and the older records is the ordinary word for a human standing still (in the record, a
+`stand` task, a stand action inside a task, or an empty stack); the hold's STAND ticks are a microaction.
+AS BUILT until T-H1: `wait_at(?entity)`, whose completion `waited(agent, entity)` is the terminal condition of
+`coffee_break` and `ac_activation` (the open point in the design entry).
+
+**go_to** — the `HumanOnlyTask` `go_to(?landmark)`: walking to a landmark (`move_to` the landmark). Replaces
+`MoveTo(landmark)`.
+
 
 ---
 
 ## 7. Human behaviour, model coverage and the robot's inference
 
-Ruled by Hadi, 24 September 2026. "Unknown" used to name two different things: what the human does (behaviour
-outside the robot's models) and what the robot believes (the mass on the residual hypothesis `unknown`). The two
-diverge: a stand adds no evidence of its own, and a finished work order leaves `unknown` near
-0.995 while nothing is unexplained. The terms below keep four things apart: what behaviour occurs in the world,
-whether the robot's models cover it, whether the scenario author intended it as an experimental condition, and
-what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is never used for the other.
-Diagrams, a table of cases and the divergences: `docs/terminology_revision.md` (explanatory; this section is
-authoritative).
-→ `docs/design_decisions.md`, "Terms for human behaviour, model coverage and the robot's inference".
+Ruled by Hadi, 24 September 2026; the WORLD half revised by T-H (25 September 2026). "Unknown" used to name two
+different things: what the human does (behaviour outside the robot's models) and what the robot believes (the mass on
+the residual hypothesis `unknown`). The two diverge: a stand adds no evidence of its own, and a finished set of
+assigned tasks leaves `unknown` near 0.995 while nothing is unexplained. The terms below keep four things apart: what
+behaviour occurs in the world, whether the robot's models cover it, whether the scenario author intended it as an
+experimental condition, and what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is
+never used for the other. Diagrams, a table of cases and the divergences: `docs/terminology_revision.md`
+(explanatory; this section is authoritative; its section 8 states what T-H changed).
+→ `docs/design_decisions.md`, "Terms for human behaviour, model coverage and the robot's inference" and "T-H: the
+human behaviour model".
 
-WORLD: three independent labels. Every behaviour of the observed human has one value on label A and one on label
-B; label C belongs to a scenario. The labels are ground truth, computable from the scenario's script and the
-robot's hypothesis space. The robot's mind never receives them. Computing them is not built (TODO-92).
+WORLD: ground truth, read from the human executor's **record** (§6) by typed queries (T-H4; before T-H, labels A and
+B, computed from the script and the hypothesis space, never built: TODO-92, superseded by T-H4). The robot's mind never
+receives them. The query `truth_at(tick)` gives the stack at a tick; the behaviour at a tick is the task on top of the
+stack, or no task.
 
-**label A, work order** — a behaviour compared with the human's assigned tasks (`assigned_tasks`, §6). Two values:
-- **assigned task** — the behaviour is a task of the work order, performed as assigned.
-- **deviation** — any departure from the work order.
-The script edits `interrupt`, `deviate` and `abandon` (**deviation vocabulary**, §6) each PRODUCE a deviation.
-They are operations, not kinds of deviation: `deviate` is one edit, and "deviation" is the condition that results
-from any of them.
-Label A applies only while the work order has open tasks. Once the work order is finished, label A has no value: a
-human who stands idle after its last assigned task is neither doing an assigned task nor departing from one (its
-stand is still labelled on label B: unmodelled).
+**label A, assigned** — the query `assigned(task)`: whether the task on the stack is one of the human's **assigned
+tasks** (§6). Replaces "label A, work order", whose values were "assigned task" and "deviation". A task that is not
+assigned is a `PersonalTask` (a **foreseeable task** when the robot's task model holds it), a `HumanOnlyTask`, or a
+`WorkTask` instance the assigned tasks do not contain. With no task on the stack (the script finished, the human idle)
+the query has no value. The word "deviation" no longer names a value of label A (§6, **deviation**). Whether a
+binding-level deviation of an assigned task answers true or false is part of the query's type, settled in T-H4.
 
-**foreseeable task** (on the labels) — a task-level deviation that is modelled: a task in the robot's hypothesis
-space that is not assigned (§6). A deviation on label A and modelled on label B, NOT a third value of label A.
-
-**label B, model coverage** — a behaviour compared with the robot's hypothesis space (§5, **hypothesis**). Two
-values:
-- **modelled behaviour** — a `HypothesisKey` in the robot's hypothesis space describes it.
-- **unmodelled behaviour** — no `HypothesisKey` describes it.
-Coverage is judged at the hypothesis level: not at the schema level, and not by provenance (§6). A `coffee_break`
-interrupt declared foreseeable is modelled: its provenance is `coffee_break` and a hypothesis exists. A
-wrong-table delivery (TODO-87) is unmodelled: its provenance is `deliver_item` and its schema is modelled, but no
-hypothesis describes it, since a hypothesis carries the item's designated table (a **determined parameter**, §6).
-Coverage is judged against the full hypothesis space H (`build_hypothesis_space()`), not against the support that
-`--assignment_prior` narrows. The prior is part of the belief, not of the model, so a prior-on and a prior-off run
-of the same script have the same ground truth. Consequence: under prior-on, an unassigned, non-foreseeable task is
-modelled, and its hypothesis is suppressed by the prior (pinned at the floor); that is a belief-side matter, not a
-coverage one.
-"Model coverage" is unrelated to the covered fraction f of **graded evidence** (§5, `covered_fraction`): f is the
-share of one hypothesis's expected path a stretch has closed, a quantity inside the robot's evidence; coverage is
-whether any hypothesis describes a behaviour, a world label. Say "coverage" for label B and "covered fraction" (or
-"the grade", f) for the evidence, never one for the other.
+**label B, coverage** — the query `coverage(task, robot)` (§6, **coverage**): whether the robot's tree contains the
+task's nodes, and if not, at which level. Two classes of behaviour, in prose:
+- **modelled behaviour** — the task on the stack has coverage `COVERED`: a hypothesis of the robot's hypothesis space
+  describes it.
+- **unmodelled behaviour** — coverage `TASK_ABSENT`, `METHOD_ABSENT` or `BINDING_ABSENT`; the node the robot's tree
+  lacks is a **deviation** (§6). Examples: a walk to a corner (`go_to`, `TASK_ABSENT`), a stand of five minutes
+  (`stand(n)`, `TASK_ABSENT`), a wrong-table delivery (`BINDING_ABSENT`, TODO-87: the schema and method are modelled,
+  but a hypothesis carries the item's designated table, a **determined parameter**, §6).
+With no task on the stack there is no task to judge: the idle human after the script is its own case (T-D Q1's "no
+task on the stack"), neither modelled nor unmodelled. (The 24 September follow-up ruling called the idle stand
+unmodelled; under T-H a stand the script writes is `stand(n)`, `TASK_ABSENT`, and the empty stack has no coverage.)
+Coverage is judged against the robot's task model and layout, not against the support that `--assignment_prior`
+narrows. The prior is part of the belief, not of the model, so a prior-on and a prior-off run of the same script have
+the same ground truth. Consequence: under prior-on, an unassigned `WorkTask` instance is modelled, and its hypothesis
+is suppressed by the prior; a belief-side matter.
+"Model coverage" is unrelated to the covered fraction f of **graded evidence** (§5, `covered_fraction`). Say
+"coverage" for label B and "covered fraction" (or "the grade", f) for the evidence, never one for the other.
 
 **label C, experimental intent** — a property of the scenario, not of one behaviour.
 - **declared experimental condition** — what the scenario's description says it tests, e.g. "unmodelled-behaviour
   condition".
-A mismatch between the declared condition and the coverage labels of the run's behaviours means that the run
-contains unintended unmodelled behaviour. The check excludes the authoring convention's terminal exit walk
-(`MoveTo` to the door or a corner, §6, **deviation vocabulary**): the convention declares it as unmodelled behaviour
-of every scenario. The terminal stand at a table (TODO-80) is not declared by the convention and stays a label-C
-mismatch unless the scenario's description declares it.
+An unmodelled behaviour in the record that the declared condition does not cover means that the run contains
+unintended unmodelled behaviour. The check excludes the authoring convention's terminal `go_to` to the door or a
+corner (§6, **human's script**): the convention declares it for every scenario. The terminal stand at a table
+(TODO-80) is not declared by the convention and stays a label-C mismatch unless the scenario's description declares
+it.
 "Scripted" is not a behaviour class: every behaviour in the simulator is scripted. Use "scripted" only to
 contrast simulation with a real deployment.
 
-ROBOT: what the robot's mind holds and decides.
+ROBOT: what the robot's mind holds and decides. Unchanged by T-H.
 
 **recognizer belief** — a distribution over the live **task hypotheses** (one per `HypothesisKey`, §5) and
 `unknown`. The recognizer emits it and gates nothing.
@@ -458,13 +538,12 @@ ROBOT: what the robot's mind holds and decides.
 live; its likelihood is the reference u (`UNKNOWN_LIKELIHOOD`, §5), and it takes no factor of its own. Written in
 code font. The constant `UNKNOWN` and the identifiers keep their names. Its mass is a quantity of the belief, not
 a label of the world. It rises from walked excess path, and it is also high BY NORMALISATION when few task
-hypotheses are live: it holds 1/|Live| after every **episode boundary** (§5), and 0.995 once the work order is
-finished (prior on).
+hypotheses are live: it holds 1/|Live| after every **episode boundary** (§5), and 0.995 once every assigned task is
+done (prior on).
 → `docs/recognizer_handback.md` §1.1, §1.5.
-
 **unexplained** — the recognizer's finding that it has evidence that no live task hypothesis explains the
 observations. A finding about evidence, not a value of the belief. `unknown` can be high with nothing unexplained
-(a finished work order, by normalisation). A stand adds no evidence of its own (I4c: an empty stretch is no
+(every assigned task done, by normalisation). A stand adds no evidence of its own (I4c: an empty stretch is no
 observation). A live hypothesis in a no-graded-signal phase (`wait_at`, `pick_up`, `place`) receives one fitting
 observation, 1/u, for that phase, whether or not the human performs that task. So an unmodelled stand can support a
 hypothesis whose current phase happens at that place, and it is not unexplained; otherwise it changes nothing,
@@ -496,7 +575,8 @@ own meaning (the projector could not resolve the admitted hypothesis's task), no
 in the repository, which builds and checks; older reports call it Fable.
 → `CLAUDE.md`, "Conventions and terminology".
 
-**T-A … T-G** — the plan names task prompts and reports use.
+**T-A … T-H** — the plan names task prompts and reports use (T-H, the human behaviour model, runs before T-D; T-H1 to
+T-H4 its build).
 → `docs/roadmap.md`, "The plan from T-A".
 
 ---

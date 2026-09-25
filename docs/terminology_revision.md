@@ -4,6 +4,10 @@ Companion to `docs/glossary.md` §7. It explains, and the glossary decides: wher
 right and this file is to be corrected. Ruled by Hadi on 24 September 2026; recorded in `docs/design_decisions.md`,
 "Terms for human behaviour, model coverage and the robot's inference".
 
+REVISED BY T-H (25 September 2026; `docs/design_decisions.md`, "T-H: the human behaviour model"). Sections 1 to 7 are
+the explanation as ruled on 24 September and are kept as written; section 8 states what T-H changes in them. Read
+"work order" as "assigned tasks", and the WORLD labels as the queries of section 8. The ROBOT group is unchanged.
+
 Why the terms exist. "Unknown" named two things:
 - (a) a property of what the human does in the world: the behaviour is outside the robot's models;
 - (b) the robot's belief: the mass on the residual hypothesis `unknown`.
@@ -319,3 +323,70 @@ gives the precise term.
 | `analysis/t6_ablation/README.md`, `analysis/big_picture/STATUS.md` | a deviation from the projection; on deviations | a departure from the projection | frozen |
 | `CLAUDE.md`, `shared/io_contracts.md`, `shared/projection.py`, `shared/realization.py`, `shared/types.py`, `analysis/tb1c_realized_flip/README.md` | stationary stretch (a `Segment`) | stationary segment | living (follow-up, 24 Sept 2026) |
 | `docs/handoffs/handoff_T-D_onward.md` item 6 (second revision) | indistinguishable from the high `unknown` that unmodelled behaviour produces | the idle stand is itself unmodelled; nothing is unexplained; indistinguishable to `update()` from a high `unknown` raised by evidence | living (follow-up, 24 Sept 2026) |
+
+---
+
+## 8. What T-H changes here (25 September 2026)
+
+T-H replaces the representation the WORLD labels were read from: the script of primitives with provenance and edits
+(T-C1) becomes an ordered list of task instances of one tree of task schemas, with events, run by a human executor
+with a stack that writes a record per tick. The terms of the ROBOT group (section 1.2), the usage rule (1.3), the
+divergence diagrams as statements about the belief (section 3) and the terms not introduced (section 6) are unchanged.
+
+### 8.1 The labels become queries on the record
+
+```
+24 September (sections 1.1, 2, 4)             T-H (glossary §6, §7)
+label A, work order: assigned task |           assigned(task): true | false; no value on an empty stack
+  deviation
+label B: modelled | unmodelled                 coverage(task, robot): COVERED | TASK_ABSENT |
+  (a HypothesisKey describes it, or not)         METHOD_ABSENT | BINDING_ABSENT
+label C: declared experimental condition       unchanged; the check reads coverage from the record
+computed from script + provenance +            read from the executor's record: the stack (top first),
+  hypothesis space (TODO-92, not built)          the action, its progress; built T-H2, queried T-H4
+```
+
+### 8.2 "Deviation" moves
+
+On 24 September a deviation was any departure from the work order (label A), and a foreseeable task was "a deviation
+that is modelled". Under T-H a deviation is a node of the human's realised plan tree that the robot's tree does not
+contain, at one of three levels (task schema, method, binding). So:
+- the foreseeable-task cell of the 1.1 table (label A deviation, label B modelled) is, under T-H, a switch to a
+  `PersonalTask` in the robot's task model: `assigned` false, `coverage` `COVERED`, and no deviation;
+- "foreseeable" is defined, not declared: a `PersonalTask` in the task model (the `is_foreseeable` flag goes, T-H1);
+- `interrupt`, `deviate`, `abandon` (the operations of the 1.1 diagram) are replaced by an event (`task.at(action,
+  decision)`), a plain instance with the other binding, and `drop`.
+
+### 8.3 The cases of section 2 under T-H
+
+| case (section 2) | written under T-H | `assigned` | `coverage` |
+|---|---|---|---|
+| an assigned delivery | `deliver_item("item_3")` | true | `COVERED` |
+| a `coffee_break` interrupt | `deliver_item("item_3").at(pick_up, coffee_break())`; the delivery suspended, then resumed by re-expansion | false (the coffee break, on top of the stack) | `COVERED` if the task model holds `coffee_break`, else `TASK_ABSENT` |
+| a wrong-table delivery (TODO-87) | `deliver_item("item_0", table="kitting_table_1")`, a plain instance | settled in T-H4 (the query's type) | `BINDING_ABSENT` |
+| a walk to corner_NE | `go_to("corner_NE")` | false | `TASK_ABSENT` (a `HumanOnlyTask`) |
+| a stand of 5 minutes | `stand(n)` | false | `TASK_ABSENT` |
+| the idle human after the script | nothing on the stack | no value | no value |
+
+The belief and finding columns of section 2 are unchanged: T-H does not touch the robot's mind.
+
+The last row differs from the 24 September follow-up ruling, which called the idle stand unmodelled. Under T-H coverage
+is a query on a task, and after the script there is none: the empty stack is its own ground-truth case (T-D Q1's "no
+task on the stack"). A stand the script writes is `stand(n)`, `TASK_ABSENT`.
+
+### 8.4 The label-C check (section 4)
+
+It reads the record instead of the script and the hypothesis space: every task on the record whose coverage is not
+`COVERED` must be covered by the scenario's declared condition. The convention's terminal exit walk is now
+`go_to("door")` or a corner, declared for every scenario as before; the terminal stand at a table (TODO-80) stays a
+mismatch unless declared. Built with the queries in T-H4 (TODO-92 superseded).
+
+### 8.5 Identifiers and wording
+
+- Removed by T-H3, kept in sections 1 to 7 as the vocabulary of their date: `Stay`, `MoveTo`, `PickUp`, `Place`,
+  `expand` / `resolve_script` as a separate form, provenance, the class `Deviation`, string anchors,
+  `check_work_order`.
+- Renamed by T-H1: the action `wait_at` becomes `stand(?ticks)`. Where sections 1 to 7 cite `wait_at` as a no-graded-signal
+  phase, the phase logic is unchanged.
+- "work order" → "assigned tasks" (a set the robot is told; the ordering lives only in the human's script).
+
