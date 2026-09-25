@@ -113,14 +113,16 @@ Decisions
   layer, C2b sequential expansion and the action-level human executor, which spends no per-task completion
   tick and reports 0 for it to the projector) is built, and T-C2c's two literal scenarios are run. T-H (the human
   behaviour model, ruled 25 Sept 2026: one tree of task schemas, the robot's task model, the script of task
-  instances with events, the human executor's stack and record) is built in four sessions T-H1 to T-H4, before
+  instances with events, the human executor's stack and record) was built in four sessions T-H1 to T-H4, before
   T-D. T-H1 (the tree, the task model) and T-H2 (the executor: `Script` of `TaskInstance`s with typed events,
   `at` / `during` / `inject`, the one-level stack in `world/human_executor.py`, the mid-action cut through the shared
   Mesa `Executor`'s `suspend` / `resume`, the load-time replay `check_script`, the record and its `[rec]` stream in
   `logs/run_<timestamp>.rec`) are built, and T-H3 (every scenario migrated to the `Script` in the kitting call form,
   the `HumanOnlyTask` `go_to_and_stand` added, the C1 script layer deleted) and T-H4 (the record's typed queries in
   `world/queries.py`: `truth_at`, `switches`, `resumptions`, `assigned`, `unperformed`, `coverage`, on the in-memory
-  record; task equality `same_task`; the `[coverage]` line at load) are built. T-H is complete; T-D resumes on it. Not to be
+  record; task equality `same_task`; the `[coverage]` line at load) are built. T-H is closed (26 Sept 2026; the
+  close-out in `docs/handoffs/handoff_T-H.md`: commits, acceptance, deferred items). Next is T-D, on T-H's structure
+  (`docs/handoffs/handoff_T-D_onward.md`, "What T-D now stands on"); it starts with its design in cchat. Not to be
   started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
