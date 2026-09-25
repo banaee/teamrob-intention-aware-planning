@@ -565,7 +565,7 @@ deferred because a scenario is built at import, where there is no world: `expand
 the list helpers on an expansion are usable only where a world exists (the loader, tests, a later scenario
 generator).
 
-**The work order** (`check_work_order`, run by `AgentConfig.__post_init__` on the written form and by the
+**The assigned tasks** (`check_work_order`, run by `AgentConfig.__post_init__` on the written form and by the
 loader on the executed form): every assigned task occurs exactly once in the script, by provenance (a
 `TaskInstance`, a deviation's task, or one distinct `Provenance`); foreseeable tasks and hand-written primitives
 are free, and an unassigned non-foreseeable task is a legitimate departure (ruling, T-C2a); present is not
@@ -613,7 +613,7 @@ IntentionRecognizer(
 and the objects present in the workspace — *not* from the human agent's `scheduled_tasks`, which the robot
 never sees. The recognizer sorts them by `repr` (order-independent of the caller, TODO-42).
 
-`assigned_tasks` carries the observed agent's work order — which tasks it was assigned, never in which order
+`assigned_tasks` carries the observed agent's assigned tasks — which tasks it was assigned, never in which order
 it will do them. It restricts the SUPPORT, not the magnitude: the admissible set is the assigned tasks, every
 foreseeable task (`TaskSchema.is_foreseeable`) and `unknown`; every other hypothesis is pinned at
 `BELIEF_FLOOR` and never scored. An assigned task is matched to a hypothesis on the ENUMERATED parameters
@@ -1327,7 +1327,7 @@ a declared relocation".
   every task in it (a deviation's task, its content, and for `deviate` the task rebound to the new destination)
   as above, and every object a primitive names exists
 - Resolves each human's script from the initial world after spawning, sequentially (§1.12, T-C2a, T-C2b),
-  checks the work order on the executed form, and hands it to the `HumanAgent` (`load_script()`), whose
+  checks the assigned tasks against the executed form, and hands it to the `HumanAgent` (`load_script()`), whose
   executor is action-level; rejects a domain that types a task parameter as a landmark
 - Supplies the `Projector` its motion rate (`step_size`, T2), its stopping distance (T9: the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the

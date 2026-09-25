@@ -28,7 +28,7 @@ hypothesis: the hypothesis that the behaviour is none of them (glossary §7; whe
 a hypothesis is its coverage, a world label the recognizer never receives). Keys are `repr(HypothesisKey)` strings and are sorted at construction, so every
 order-dependent step (ties, log order) depends on the space alone.
 
-The SUPPORT S is H when nothing is known of the observed agent's work order (prior-off, the default). With
+The SUPPORT S is H when nothing is known of the observed agent's assigned tasks (prior-off, the default). With
 `--assignment_prior true` (prior-on) it is restricted: S = assigned tasks ∪ foreseeable tasks
 (`TaskSchema.is_foreseeable`) ∪ {unknown}; every other hypothesis is pinned at the floor and never scored.
 The knowledge restricts the support; it is not a weight.
@@ -616,7 +616,7 @@ Every element of that has been replaced. In order:
 | when | what it replaced | by | why |
 |---|---|---|---|
 | July (TODO-19; typed params) | literal microaction strings; hypotheses from the human's script | dispatch by schema-declared vocabulary and evaluator name; the typed cartesian space over workspace objects; the belief floor | no simulator strings in `shared/`; the robot must not know the script |
-| Sept 10 (assignment pool) | a 10× prior weight on assigned tasks | the support restriction (§1.1) | knowledge of the work order is a fact about the support, not a magnitude |
+| Sept 10 (assignment pool) | a 10× prior weight on assigned tasks | the support restriction (§1.1) | knowledge of the assigned tasks is a fact about the support, not a magnitude |
 | Sept 10 | per-tick multiplication of identical headings (4ⁿ from one walk) | one observation per movement leg (the leg model, removed since; §8); output-only state factors | consecutive steps are duplicates, not independent evidence; the retracted "early reveals" were duplicate counting |
 | I1 audit | — | measurement only | 0 of 5,579 likelihood calls evaluated a completion; ZONE_BOOST wrong in 28 of 52 episodes |
 | I2 foundations | the recognizer's own target lookup, `methods[0]`, `"?item"` | targets, methods and completions from the planner and `target_resolution`; `waited` observable; sorted keys; first step scored | one answer to "where is the target"; no domain literals |

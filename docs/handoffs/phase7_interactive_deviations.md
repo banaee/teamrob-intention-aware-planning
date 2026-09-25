@@ -5,6 +5,13 @@ T-A to T-G. Nothing here is decided; it is recorded so that the phase opens with
 from this document. The committed documents (CLAUDE.md, docs/glossary.md, docs/roadmap.md,
 docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md) are authoritative over this handoff.
 
+> UPDATED BY T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model", item 8). The injection path is
+> built in T-H2: `executor.inject(Start(task) | Drop())` makes a typed event with the trigger `Now`; events may cut
+> mid-action (`DuringAction`), not only at the next action boundary; export rewrites `Now` as `AfterAction` or
+> `DuringAction` from the record, and an injection on an empty stack as a plain script entry. Viewer walks go to
+> landmarks only. The "deviation vocabulary" and `script[script_index + 1:]` below are T-C's, replaced by T-H's script
+> and stack. What stays for Phase 7: the viewer and its buttons, the context stream, communication.
+
 ## 0. The idea in plain words
 
 Today every human behaviour in a run is pre-loaded: a script written before the run (T-C makes
@@ -57,8 +64,8 @@ condition its belief on situation, not only on walked path.
    Scientific item, not a simulator one.
 5. Communication as an action (its own task): when the robot, facing a live `unknown` or a
    block, raises communication instead of adapting its plan; how that enters B3's candidates.
-6. Phase and task naming: Phase 7 if free, tasks P7-T-A, P7-T-B, ... (T-H is reserved for the
-   recognizer's duration term, TODO-85 half a).
+6. Phase and task naming: Phase 7 if free, tasks P7-T-A, P7-T-B, ... (T-H now names the human
+   behaviour model, 25 Sept 2026; the recognizer's duration term, TODO-85 half a, is TODO-95).
 
 ## 4. Readiness of the components, as of 23 September 2026
 

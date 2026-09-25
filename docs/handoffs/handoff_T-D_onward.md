@@ -256,7 +256,7 @@ its AS BUILT notes is authoritative; summary):
 - Landmarks: four corners and one door per layout (`corner_NE/NW/SE/SW`, `door`), type `landmark`;
   no `TaskSchema` may type a parameter as `landmark` (rejected at load); only a scripted `MoveTo`
   targets one.
-- Work order: every assigned task appears exactly once in the script, by provenance; foreseeable
+- Assigned tasks (the work order, renamed by T-H): every assigned task appears exactly once in the script, by provenance; foreseeable
   tasks, unassigned non-foreseeable tasks and hand-written primitives are free; present is not
   completed (abandon passes); a change of mind needs both tasks assigned; empty `assigned_tasks`
   skips the check. The old key-equality check is gone (TODO-86 closed); TODO-87 stays.
@@ -265,7 +265,8 @@ its AS BUILT notes is authoritative; summary):
   `current_task` (the human's is `None` now, checked by grep).
 - Recorded for T-D: TODO-92, the robot's mind keeps an observed history of the human's tasks
   (completed / dropped / `unknown` episodes) for evaluation; the robot taking over an abandoned task is
-  TODO-15, not now. TODO-85 half (a) (a stay as evidence, a duration term) is T-H if ever taken up.
+  TODO-15, not now. TODO-85 half (a) (a stay as evidence, a duration term) is TODO-95 if ever taken up (it was named T-H before T-H,
+  the human behaviour model, took the name on 25 Sept 2026).
 - Authoring convention: a script ends with the human leaving the workspace unless the scenario is
   about the terminal stand.
 - Author note (glossary): an injected task that returns the held item leaves the resumed `place`
@@ -341,9 +342,10 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
    waited out (scenario_94 stop on: refused 144 to 186, completed 413 against 370). T-D's blocked
    fixture uses a stay that ends; the authoring convention covers the rest. The blocked event and
    WAIT/RECONSIDER are then built on it (T-D Q5, the recorded design).
-6. `unknown` with no task hypothesis left live (the human finished its work order and stands idle) reads 0.995
+6. `unknown` with no task hypothesis left live (the human finished its assigned tasks and stands idle) reads 0.995
    by normalisation, with nothing unexplained. The idle stand is itself unmodelled behaviour (no hypothesis
-   describes a stand; label A has no value once the work order is finished). To `update()` it is
+   describes a stand; label A has no value once the assigned tasks are done; under T-H the empty stack is its
+   own ground-truth case). To `update()` it is
    indistinguishable from a high `unknown` raised by evidence, a walk no live task hypothesis explains
    (scenario_01, 06; terms: `docs/glossary.md` §7). T-D decides whether
    the distinction matters for `update()` (part of T-D Q1).

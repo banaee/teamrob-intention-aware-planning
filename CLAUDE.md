@@ -36,6 +36,9 @@ Relevant (read as needed):
   coverage, the `unknown` hypothesis and "unexplained"); the glossary stays authoritative.
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
+- `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
+  human behaviour model"; glossary §6 and §7). Read it in every T-H session. `docs/terminology_revision.md` §8 states
+  what T-H changed in the 24 Sept terms.
 - `analysis/<task>/REPORT.md`: only the reports a task names. Rows in older reports may be
   stale (earlier projection, recognizer or layouts); their findings are cited, not re-derived.
 
@@ -101,8 +104,10 @@ Decisions
   states to the projection (T-B Q7: a reload never cancels one), which closes TODO-77's residual — what is
   left of it is step quantisation, uncompensated by decision. T-C2 (the human action script: C2a the scenario
   layer, C2b sequential expansion and the action-level human executor, which spends no per-task completion
-  tick and reports 0 for it to the projector) is built; next are its two literal scenarios. Not to be started
-  unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
+  tick and reports 0 for it to the projector) is built, and T-C2c's two literal scenarios are run. T-H (the human
+  behaviour model, ruled 25 Sept 2026: one tree of task schemas, the robot's task model, the script of task
+  instances with events, the human executor's stack and record) is next, in four build sessions T-H1 to T-H4, before
+  T-D; nothing of it is built. Not to be started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
@@ -152,6 +157,21 @@ Decisions
 6. Report in the chat reply, concisely: commits; what changed and where; the numbers the task
    asked for; contradictions with the task or the docs; flags. Do not create a REPORT.md, an
    analysis directory, checksums or regeneration scripts unless the task asks for them.
+
+## BUILD DISCIPLINE
+
+A standing convention for every build or refactor session.
+
+- Two steps. Step 1, plan only: report the intended structure (classes, fields, what is removed, which files), the
+  cases the design does not cover, and the tests to run. No code, no commit; wait for Hadi's confirmation. Step 2:
+  build what was confirmed.
+- No hidden assumptions: where the design is silent, ask.
+- No shortcut to reach a running state; a run that works by a workaround is a failure of the task.
+- Nothing left untyped: no `List[Any]`, no `Union` of unrelated types, no kind strings, no booleans standing for a
+  class.
+- No new check function that works by string or key matching, and no patch that goes around the conceptual design;
+  identity is object identity or value equality of typed objects.
+- If a rule above blocks progress, stop and report why; that report is the deliverable.
 
 ## Cost discipline
 
@@ -296,7 +316,7 @@ across that commit without it.
   Decision record: the projected hypothesis, one field.
 - Plan names (`docs/roadmap.md`, "The plan from T-A"): T-A records (T-A1 the pipeline revision);
   T-B B3.B on two tables (B1 fixtures, B2 build, B3 evaluation); T-C the human action script (C1
-  design, C2 build); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case); T-E
+  design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case); T-E
   demonstration; T-F evaluation (Phase 5); T-G later (second domain in Mesa, 4D, ROS). Task prompts
   and reports use these names.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
