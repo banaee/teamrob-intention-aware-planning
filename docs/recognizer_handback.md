@@ -440,8 +440,10 @@ included. Therefore:
   closed).
 - **β, u**: they set every reveal tick (I4 / I4b / I4c region analysis, closed).
 - **The human's script.** A human who hesitates, back-tracks or wanders mid-task is charged as a rival would
-  be. An unmodelled stand is not evidence (TODO-59's deferred channel, not built); a stand inside a modelled
-  `wait_at` phase is that hypothesis's no-graded-signal observation (§1.5). Every task in the script is one
+  be. A stand adds no evidence of its own (TODO-59's deferred channel, not built). A live hypothesis in a
+  no-graded-signal phase (`wait_at`, `pick_up`, `place`) receives one fitting observation, 1/u, for that phase,
+  whether or not the human performs that task (§1.5). So an unmodelled stand can support a hypothesis whose
+  current phase happens at that place, and it is not unexplained; otherwise it changes nothing. (`shared/recognizer.py`: `_progress_likelihood` returns the perfect fit for a phase with no evaluator (lines 865-866) and `None` for an empty stretch (870-871); `_unknown_likelihood` returns the ungraded u for it (903-904); the open term (638-641) and the fold at a phase change (623-631).) Every task in the script is one
   the domain describes (well typed, F47b); unmodelled behaviour in a run is either a declared experimental
   condition (TODO-80) or unintended (glossary §7, label C).
 

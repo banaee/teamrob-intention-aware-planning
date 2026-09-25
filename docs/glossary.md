@@ -395,7 +395,7 @@ leaves the resumed `place` failing at run time. Write the return explicitly, or 
 
 Ruled by Hadi, 24 September 2026. "Unknown" used to name two different things: what the human does (behaviour
 outside the robot's models) and what the robot believes (the mass on the residual hypothesis `unknown`). The two
-diverge: an unmodelled stand produces no evidence, and a finished work order leaves `unknown` near
+diverge: a stand adds no evidence of its own, and a finished work order leaves `unknown` near
 0.995 while nothing is unexplained. The terms below keep four things apart: what behaviour occurs in the world,
 whether the robot's models cover it, whether the scenario author intended it as an experimental condition, and
 what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is never used for the other.
@@ -464,9 +464,11 @@ finished (prior on).
 
 **unexplained** — the recognizer's finding that it has evidence that no live task hypothesis explains the
 observations. A finding about evidence, not a value of the belief. `unknown` can be high with nothing unexplained
-(a finished work order, by normalisation), and an unmodelled stand produces no evidence (I4c: an empty stretch), so
-it is not unexplained, however long it lasts. A stand inside a modelled `wait_at` phase is different: that
-hypothesis scores it as a no-graded-signal observation (perfect fit against u). The recognizer has no separate output for it today; how it is represented belongs to the
+(a finished work order, by normalisation). A stand adds no evidence of its own (I4c: an empty stretch is no
+observation). A live hypothesis in a no-graded-signal phase (`wait_at`, `pick_up`, `place`) receives one fitting
+observation, 1/u, for that phase, whether or not the human performs that task. So an unmodelled stand can support a
+hypothesis whose current phase happens at that place, and it is not unexplained; otherwise it changes nothing,
+however long it lasts. (`shared/recognizer.py`: `_progress_likelihood` returns the perfect fit for a phase with no evaluator (lines 865-866) and `None` for an empty stretch (870-871); `_unknown_likelihood` returns the ungraded u for it (903-904); the open term (638-641) and the fold at a phase change (623-631).) The recognizer has no separate output for it today; how it is represented belongs to the
 pending decision on `unknown`. The evidence window the finding is judged over (every observation since the episode
 began, or only the current ones) is not yet defined; it is the retraction question (T-D Q2) and part of that
 decision.
