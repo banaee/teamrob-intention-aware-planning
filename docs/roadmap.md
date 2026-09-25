@@ -365,7 +365,7 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
 - **T-B — B3.B (`full_reorder`): a candidate is an ordering of the pool.** The head of the argmin
   ordering becomes the next task; the ordering past the head is lookahead, not an order commitment.
   - B1: two-table kitting layouts and scenarios, hand-built, after one design question: is an item's
-    destination table a domain fact or a work-order fact (design_decisions.md, B3.B entry, "THE FIXTURE
+    destination table a domain fact or a fact of the assigned tasks (design_decisions.md, B3.B entry, "THE FIXTURE
     SIDE"; TODO-47 (f)). Registered programmatically, as the first part of fixture generation (TODO-47 (a)).
     T-B1c ✅ (September 2026): `scenario_83` on env_layout8, a fixture (Hadi's ruling): the existence case in
     which realized cost changes the head under `full_reorder` (a conflict after the head; step 159, head
@@ -406,14 +406,14 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   knows nothing of it; a part may still be written as a task, so the regression fixtures are unchanged.
   C1 design chat; C2 build. TODO-80's declared stay becomes one script action. design_decisions.md, "The
   human's scenario is an action script". Open item decided in C1: a stationary human (TODO-85): whether a
-  stay is evidence (if so, a duration term, its own item T-H) and what `update()` does with `unknown` on top
+  stay is evidence (if so, a duration term, its own item, TODO-95; it was named T-H before 25 Sept 2026) and what `update()` does with `unknown` on top
   (candidate: the human projected stationary at its position for a bounded horizon); design_decisions.md,
   "A stationary human".
   T-C1 ✅ (23 September 2026): design_decisions.md, "The human action script (T-C1, decided)". The executed
   script is a flat list of primitives (`MoveTo`, `PickUp`, `Place`, `Stay`), a task expanded at load by
   `expand(task)` with provenance on each primitive; the author writes `interrupt`, `deviate`, `abandon`, free
   `Stay(n)` and `MoveTo(landmark)`; the human executor is action-level. TODO-86 closed. Not decided in C1:
-  TODO-85 (half (b) with T-D; half (a), if taken, T-H) and TODO-88, their own items.
+  TODO-85 (half (b) with T-D; half (a), if taken, TODO-95) and TODO-88, their own items.
   - **T-C2 — the build.** C2a the script layer: primitives, `expand`, the vocabulary, landmarks, the
     provenance check (built, T-C2a). C2b the human executor, action-level, and sequential expansion against the
     successor state (`shared.projection.successor_state()`), not the initial world, so a task after an abandoned
@@ -424,13 +424,35 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     T-C2c ✅: the two literal scenarios (scenario_11, an interrupted delivery; scenario_01, a declared stay), one
     run each, observed (`analysis/tc2c_scripts/`). T-C closed.
   - From here debugging runs use prior on only; off / on returns for the paper.
-- **T-D — Robustness in kitting, on T-C.** Scenarios for a change of mind mid-task, a walk to an empty
+- **T-H — The human behaviour model** (ruled by Hadi, 25 September 2026; before T-D). design_decisions.md, "T-H: the
+  human behaviour model"; `docs/handoffs/handoff_T-H.md`. One tree of task schemas per use case (`WorkTask`,
+  `PersonalTask`, `HumanOnlyTask`); the robot's task model, a subset of it chosen per experiment; the assigned tasks, a
+  set; the human's script, an ordered list of task instances with events (`at`, `during`, `drop`); the human executor
+  owns a stack and writes a record, the ground truth; coverage at three levels. The robot's mind is unchanged. Each
+  subtask is one session and follows CLAUDE.md's build discipline (plan, confirmation, build):
+  - T-H1 the tree and the task model; `wait_at` → `stand(?ticks)`; the destination check's move.
+  - T-H2 the executor: `Event`, `at`, `drop`, `inject`, the stack, the mid-action cut, the record (without
+    `during`'s authored form, TODO-99).
+  - T-H3 the migration of the scenarios; deletion of the C1 vocabulary, `Deviation`, `Provenance`, `expand` /
+    `resolve_script` as a separate form, the key-based checks, `Stay`, `MoveTo` / `PickUp` / `Place`.
+  - T-H4 the record's queries and coverage; supersedes TODO-92.
+  Acceptance after each build: the 40 maintained baseline logs rerun; robot-side lines byte-identical but for the
+  `wait_at` → `stand` rename; human-side differences listed and each explained; at the end of T-H3 the new logs
+  replace the stored baselines.
+- **Oracle-IR evaluation** (after T-H, its own pipeline task; TODO-101): three conditions on the same scenario, no IR,
+  IR, and oracle IR (the meta-planner receives the record's `truth_at(tick)` instead of the belief).
+- **Alternative 1** (recorded as the next architecture direction, not scheduled): a human mind that generates the
+  events, and a stack-aware IR.
+- **T-D — Robustness in kitting, on T-C.** (Resumes on T-H's structure: T-D Q1 stays "what the robot infers and does
+  when no hypothesis explains the evidence, inside `unknown` or outside it", with the record's ground-truth cases: a
+  switch to a modelled task, a switch to an unmodelled task, a binding-level deviation, no task on the stack, an
+  episode's first ticks.) Scenarios for a change of mind mid-task, a walk to an empty
   corner (`unknown` as outcome), a declared stay at the table (the blocked case); the blocked event in
   `ExecutorState`, the trigger routed past B2, the reconsider policy (design in TODO-80 and D2); evaluation
   of retraction and re-recognition firing, `unknown` leading, blocked time and completion under wait
   against reconsider. design_decisions.md, "Robustness is tested in kitting".
   The recognizer pass (Q2 to Q4) opens with TODO-95: rule whether the stationarity channel joins it or stays
-  recorded for T-H.
+  recorded (TODO-95; "T-H" named it before 25 Sept 2026).
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
   set covers switch and hold (s70 / s71), a two-table ordering, a change of mind, unmodelled behaviour; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and
@@ -543,7 +565,8 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
 
 ## Phase 7 (recorded, not scheduled): interactive deviations and a context stream 🔲 *(after T-G; nothing decided)*
 - Run-time deviation events into the human executor from a viewer, replayable as pre-loaded scripts: live runs
-  demonstrate, pre-loaded scripts evaluate.
+  demonstrate, pre-loaded scripts evaluate. PULLED FORWARD IN PART by T-H (25 Sept 2026): `executor.inject(task |
+  drop)` and the export of "now" as `at` / `during` are T-H2's; the viewer's buttons stay here.
 - A context-knowledge stream into the world state, read by the recognizer: its own task.
 - Communication as a robot action under a live `unknown` or block: its own task.
 - Handoff: `docs/handoffs/phase7_interactive_deviations.md`.
