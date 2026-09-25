@@ -13,6 +13,42 @@ The committed documents are authoritative over this handoff:
 
 Read the glossary first.
 
+## Close-out (26 September 2026): T-H is closed
+
+T-H1 to T-H4 are built and committed on `main` (not pushed at writing; Hadi reviews and pushes). Sections 0 to 5 below
+are the record of the ruling and the plan as written on 25 September; where they say "to be built", read this section.
+
+| subtask | commits | closed by |
+|---|---|---|
+| T-H1 the tree, the task model, the two knowledge objects | `c5cd1a0`, `99958c1`, `e571eed`, `a2c2a5b` | `shared/knowledge.py` (`Tree`, `TaskModel`); the schema classes; the stand action; `go_to` / `stand` |
+| T-H2 the executor | `c1c1089`, `448f38a`, `1b6c83d` | `world/human_executor.py` (the stack machine, `check_script`), `world/record.py`, the `[rec]` stream, `Executor.suspend` / `resume` |
+| T-H3 the migration | `39b59a5`, `60ab8dc`, `0af3c0a` | every scenario on the `Script` in the kitting call form; `go_to_and_stand`; the C1 layer deleted |
+| T-H4 the record's queries | `da4c61f`, `e4fe110` | `world/queries.py`; task equality `same_task`; `Departure`; the `[coverage]` line |
+
+ACCEPTANCE (section 4), as measured:
+- T-H1: no baseline regenerated; the T-C2b baselines stood through T-H1 and T-H2, and T-H2's check against them was
+  byte-identical.
+- T-H2: the 40 maintained logs and tb3's 8 unstored `single_task` runs byte-identical; the `.rec` files empty.
+- T-H3: the 40 maintained logs byte-identical to the T-C2b baselines outside the `[human]` lines (the record's
+  transitions replace the C1 primitive lines); the first non-empty `.rec` baselines; the four sets regenerated (T-H3
+  md5 sections).
+- T-H4: the 40 maintained logs and the 8 `single_task` runs byte-identical to T-H3's outside the new `[coverage]`
+  lines; every `.rec` byte-identical; the four sets regenerated (T-H4 md5 sections, the `.rec` md5s unchanged). Every
+  entry of the maintained fixtures is `covered`.
+- Robot-side lines were byte-identical at every step: T-H changed nothing in the robot's mind.
+
+DEFERRED, each recorded:
+- TODO-100: nested interruptions; the stack stays one level deep until a scenario needs more.
+- TODO-101: the oracle-IR evaluation; its seam is recorded (`truth_at`, then `coverage`, a `Covered` carries the
+  hypothesis), the adapter is not built.
+- TODO-102: a per-robot task model on the robot's `AgentConfig`; today every robot gets the use case's declared one.
+- TODO-105: a resumed fetch walk goes to an item the robot has already delivered (the cut action finishes first).
+- TODO-106: the load-time replay cannot see body-derived facts (`waited` retraction, `at` for a held object).
+- TODO-109: the `[rec]` stream carries no agent id; two humans would interleave.
+- The exporter (Phase 7): rewriting `Now` as `at` / `during` from the record, and the viewer's buttons; `inject` exists.
+- The label-C check: a scenario's declared condition is free text in its description; the queries it would read are
+  built, the check is not.
+
 ## 0. Push state
 
 - `origin/main` is at `19e7b8b` (the stand rule stated in full). Everything up to that commit is pushed.
@@ -135,7 +171,7 @@ The rules for both steps:
 
 The subtasks:
 
-- **T-H1: the tree, the task model and the two knowledge objects.** It covers the `stand` action, the destination
+- **T-H1: the tree, the task model and the two knowledge objects.** CLOSED (`c5cd1a0` to `a2c2a5b`). It covers the `stand` action, the destination
   check's move, and the start of the `dock_loading` / `ros_sim` migration. Its planning step shows:
   - methods referencing `ActionSchema` objects (today `StepCall.action_name` is a string);
   - the support restriction comparing `HypothesisKey` values (today it matches `repr` strings).
@@ -145,7 +181,7 @@ The subtasks:
   - `is_foreseeable` is read in the mind only in `_build_admissible_keys`;
   - the `DomainKnowledge` getters for the two booleans have no caller;
   - one `DomainKnowledge` serves the robot and the script resolver today.
-- **T-H2: the executor.** It builds:
+- **T-H2: the executor.** CLOSED (`c1c1089` to `1b6c83d`). It builds:
   - `Event`, `Decision` (`Start`, `Drop`) and `Trigger` (`AfterAction`, `DuringAction`, `Now`);
   - `at`, `during` and `inject`;
   - the stack, the mid-action cut and the resumption rule;
@@ -155,7 +191,7 @@ The subtasks:
 
   Its planning step shows how the cut and the resume sit in the shared `Executor` without touching the robot's paths
   (reload and completion-tick bookkeeping, hold, separation stop).
-- **T-H3: the migration.** The scenarios are rewritten in the new script, and `dock_loading` and `ros_sim` are
+- **T-H3: the migration.** CLOSED (`39b59a5` to `0af3c0a`). The scenarios are rewritten in the new script, and `dock_loading` and `ros_sim` are
   migrated. It deletes:
   - the C1 vocabulary: `interrupt`, `deviate` and `abandon`;
   - `Deviation` and `Provenance`;
@@ -164,7 +200,7 @@ The subtasks:
   - `Stay`, `MoveTo`, `PickUp` and `Place`.
 
   The glossary's T-C1 entries go with the code.
-- **T-H4: the record's queries, `unperformed` and coverage.** This supersedes TODO-92's ground-truth half. The type of
+- **T-H4: the record's queries, `unperformed` and coverage.** CLOSED (`da4c61f`, `e4fe110`). This supersedes TODO-92's ground-truth half. The type of
   `assigned(task)` for a binding-level deviation of an assigned task is settled here.
 
 ## 4. Acceptance across T-H
