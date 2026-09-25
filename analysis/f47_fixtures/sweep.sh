@@ -16,5 +16,6 @@ for c in $CONDS; do
     PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --domain kitting --layout "$lay" --scenario "$sc" \
       --steps "$st" --assignment_prior $p "$@" > /dev/null 2>&1 || echo "$tag: exit $?"
     cp "$(ls -t logs/run_*.log | head -1)" "$OUT/$tag.log"
+    cp "$(ls -t logs/run_*.rec | head -1)" "$OUT/$tag.rec"    # the human executor's record stream (T-H2)
   done
 done

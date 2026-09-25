@@ -520,6 +520,14 @@ there is no `realizable` flag and no unrealizable reason. The former `realizable
 
 ### 1.12 The human action script — scenario layer (T-C1, built in T-C2a and T-C2b)
 
+> T-H2 (25 Sept 2026): the T-H form is built beside this one and coexists with it until T-H3 deletes the C1 layer.
+> A human's `scheduled_tasks` may be a `Script` (`shared/types.py`): entries of `TaskInstance`s with typed events,
+> `Event(Trigger, Decision)`, written `task.at(action, task | drop, occurrence=)` / `task.during(action, time,
+> task | drop, occurrence=)`. The loader dispatches on the type: a `Script` is checked by the symbolic replay
+> (`world/human_executor.check_script`) and run by the stack machine (`world/human_executor.StackMachine`) through
+> `HumanAgent`; the record (`world/record.py`) is streamed as `[rec]` lines to `logs/run_<timestamp>.rec`. The
+> section below describes the list form. Design: `docs/design_decisions.md`, "T-H: the human behaviour model".
+
 An input contract of the scenario layer: what a scenario author writes as a human's
 `AgentConfig.scheduled_tasks`, and what the loader makes of it. Nothing in it reaches the recognizer or the
 meta-planner; the robot sees the trajectory. Types in `shared/types.py` (beside `AgentConfig`, whose check

@@ -3702,7 +3702,7 @@ Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TOD
 **T-H: the human behaviour model**
 
 RULED (Hadi, 25 September 2026; the design, then the rulings on ccode's conceptual review of it, folded in below).
-Nothing built; the build is T-H1 to T-H4. Supersedes, where they differ, "The human action script (T-C1, decided)"
+T-H1 and T-H2 built (the "as built" lines at the end); T-H3 and T-H4 remain. Supersedes, where they differ, "The human action script (T-C1, decided)"
 (the executed form, the author vocabulary, provenance, landmarks as a parameter type no schema may use, the work-order
 check), the WORLD half of "Terms for human behaviour, model coverage and the robot's inference (ruled)" (labels A and
 B become queries on the record; "deviation" gets the definition of item 1), and, in part, "A run-time deviation is the
@@ -3866,6 +3866,60 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   its schema against their knowledge by identity (`ProceduralKnowledge.holds`); no task is looked up by name. A
   `HypothesisKey` holds its schema object (its `task_name` is the schema's name), so the recognizer and the projector
   pass objects too.
+- (T-H2, as built) THE FOUR HOMES. The human's executor is not the robot's mind and not a use case: a new top-level
+  package `world/` holds the world's side (the stack machine and the load-time replay, `world/human_executor.py`; the
+  record, `world/record.py`), importing `shared/` only, no body and no use case; `shared/` is the robot's mind,
+  `domains/` the use cases, `mesa_sim/` and `ros_sim/` the bodies (CLAUDE.md, "Layering: four homes"). The name:
+  glossary §7 already splits the terms into WORLD (ground truth, the human's decisions, the record) and ROBOT (the
+  mind); the package names that side. The script types (`Trigger`: `AfterAction`, `DuringAction`, `Now`; `Decision`:
+  `Start`, `Drop`; `Event`; `ScriptEntry`; `Script`) are data contracts in `shared/types.py` beside `AgentConfig`,
+  which holds a `Script` as the human's `scheduled_tasks` (a list is the C1 form, kept and dispatched by type until
+  T-H3). The sugar `.at(action, task | drop, occurrence=)` and `.during(action, time, task | drop, occurrence=)` on
+  `TaskInstance` and `ScriptEntry` constructs the typed event; it is the one place that accepts a task or `drop`.
+- (T-H2, as built) ONE MACHINE, TWO DRIVERS. `StackMachine` holds every transition rule and is driven by the body
+  (`HumanAgent._step_stack`, one tick at a time, one action handed to the shared Mesa `Executor` as a one-action
+  plan, so no per-task completion tick is spent) and by the symbolic replay at load (`check_script`: each action
+  completes at once, the state advancing by `successor_state()`; a during honoured as a cut at its tick, the walk's
+  step count and the cut position from the body's own `steps_toward`). The run-time expansion is therefore the
+  load-time one by construction for everything the human decides; the two differ only where the live world differs
+  from the symbolic state (TODO-106). The shared `Executor` gains `suspend()`, `resume()` and `progress()`, called by
+  the human driver only; `step()` is unchanged and the 40 maintained logs plus tb3's 8 unstored single_task runs are
+  byte-identical (their `.rec` files empty).
+- (T-H2, as built) TICKS. `at` fires on the tick after the action's acknowledgement tick, when the next action would
+  have loaded; the started task's first microaction runs on that tick. `during` at n = the body's ticks of the stated
+  time fires at the start of the tick on which n of the action's ticks are executed and it has ticks left; the
+  started task's first microaction runs on that tick, no acknowledgement tick. An injection (`Now`) is applied at the
+  start of the human's next step, before the body runs; with 0 executed ticks of the action in hand it is a boundary,
+  so an exported replay lands on the same tick (D4: the record keeps ticks; the exporter, Phase 7's, converts once and
+  must refuse an unrepresentable time). On resumption the cut action is completed first (a walk re-expanded from the
+  human's position toward the target's current position, a stand's or wait_at's remaining STANDs kept, a GRASP /
+  RELEASE untouched), then the task is re-expanded in the resulting state; an action of the re-expansion that already
+  holds costs its one acknowledgement tick, as any complete action does in this loop.
+- (T-H2, as built) WHERE THE RULE AND ITS REASON PARTED (rulings of 25 Sept 2026 on the plan, D1 to D5, and one found
+  in the build, D6):
+  D1 an event on an entry's last action fires after the entry's outcome `COMPLETED` is recorded and the started task
+  runs on the empty stack (nothing is suspended that has nothing to come back to); a `Drop` there is a load error
+  (`refused:drop:empty_stack`).
+  D2 the load check uses the body's geometry for a walk's tick count (the loader is the body); the check is exact for
+  the human's own decisions and up to the robot's effects.
+  D3 the cut action finishes first even when the robot has moved the item meanwhile: a resumed fetch walk goes to
+  where the item now is, and the re-expansion then finds the task complete (TODO-105, the alternative named).
+  D5 a second `Start` cannot be authored: `Start` holds a `TaskInstance`, not an entry, so a decision's task carries no
+  events; live it is refused (`stack_full`) and recorded.
+  D6 "a resumption with nothing left to do is completed" cannot be read from the world for a task with process
+  completion (`stand` leaves no fact): after a cut stand finished, the re-expansion was a fresh full stand. Built:
+  when the cut action was the LAST of the task's expansion the task is completed on finishing it, a fact of the
+  expansion; otherwise the re-expansion, and the world's terminal condition, decide. Corollary: the terminal
+  condition is judged on a RE-expansion only; a task's first expansion runs as written (the script says it is done),
+  which also keeps the replay from reading a stale `waited` of an earlier coffee break as completion.
+- (T-H2, as built) OUTCOMES AND THE RECORD. `Left(task, COMPLETED | SUSPENDED | ABANDONED | INFEASIBLE)`,
+  `Started(task, trigger, where)` with `where` a `Boundary(action, occurrence)`, a `Cut(action, occurrence, done)`, a
+  `Beginning`, or None on an empty stack; `Entered`, `Resumed`, `Refused(decision, reason)`, `Unfired(task, event,
+  reason)`; per tick a `Snapshot`. The stream: `[rec] step=<n> stack=<top>;<below> action=<name>#<occurrence>
+  progress=<done>/<total> events=<transitions>`, `-` where empty, in `logs/run_<timestamp>.rec`. At load every
+  `Unfired`, `Refused` and `INFEASIBLE` of the replay is a `ScriptError`; at run time they are recorded (the robot's
+  effects). Several events per entry fire in authored order, each replayed against the state the previous one
+  leaves. The exporter and the viewer's buttons are Phase 7's; `inject` is `HumanAgent.inject(decision)`.
 - (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
   table="kitting_table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance
   or its enumerated bindings is part of the query's type, settled in T-H4.

@@ -390,9 +390,14 @@ leaves the resumed `place` failing at run time. Write the return explicitly, or 
 suspended task is re-expanded in the current state on resumption, **stack** below.)
 → `domains/script.py`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
 
-THE HUMAN BEHAVIOUR MODEL (T-H). Ruled by Hadi, 25 September 2026 (with the rulings on the review); not built (T-H1 to
-T-H4). The entries below are the meaning from here; the pointers name the design entry until the code exists.
-→ `docs/design_decisions.md`, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`.
+THE HUMAN BEHAVIOUR MODEL (T-H). Ruled by Hadi, 25 September 2026 (with the rulings on the review); T-H1 and T-H2
+built, T-H3 and T-H4 remain. The entries below are the meaning from here.
+→ `docs/design_decisions.md`, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`. Code (T-H2): the
+script types in `shared/types.py` (`Trigger`, `Decision`, `Event`, `ScriptEntry`, `Script`, the `at` / `during`
+sugar); the stack machine and the load-time replay in `world/human_executor.py`; the record in `world/record.py`;
+the body-side driver `HumanAgent._step_stack` and `HumanAgent.inject` in `mesa_sim/sim_agents.py`; the cut in
+`mesa_sim/executor.py` (`suspend`, `resume`, `progress`). `world/` is the world's side (CLAUDE.md, "Layering: four
+homes"): it imports `shared/` only.
 
 **WorkTask / PersonalTask / HumanOnlyTask** — the three classes of the one tree of task schemas per use case, each
 with the full HTN structure. A `WorkTask` may appear in a human's assigned tasks (`deliver_item`); a robot's own

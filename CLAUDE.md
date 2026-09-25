@@ -24,11 +24,14 @@ about: what the human produces. An abandoned delivery is in scope for what it do
 Do not explore the whole tree. Start from the files a task names; widen only with a reason.
 
 Relevant (read as needed):
-- `shared/*.py`: cognitive layer
+- `shared/*.py`: cognitive layer (the robot's mind)
+- `world/*.py`: the world's side (T-H2): the human's executor (`world/human_executor.py`, the stack machine and
+  the load-time replay) and its record (`world/record.py`)
 - `mesa_sim/*.py` (top level only); `mesa_sim/viz/` only for visualization or when grepping
   for readers of a field
-- `domains/kitting/`: the active domain; `domains/script.py`: the human action script (T-C2a; sequential
-  expansion, T-C2b), domain-generic; `mesa_sim/sim_agents.py` `HumanAgent`: the action-level human executor (T-C2b)
+- `domains/kitting/`: the active domain; `domains/script.py`: the C1 human action script (T-C2a; sequential
+  expansion, T-C2b), domain-generic, kept until T-H3; `mesa_sim/sim_agents.py` `HumanAgent`: the human's body-side
+  driver, of the C1 list (action-level, T-C2b) and of the T-H `Script` (the stack machine's driver, T-H2)
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
   design record. Use its terms in the code, in the documents and in reports.
@@ -56,9 +59,15 @@ Skip in the current phase; read only if the task explicitly requires it:
 
 ## Architecture invariants (never violate)
 
-Layering
-- `shared/` is the pure cognitive layer. It never imports from `mesa_sim/` or `ros_sim/`.
-  `mesa_sim/` may import from `shared/`.
+Layering: four homes
+- `shared/` is the robot's mind, the pure cognitive layer. It never imports from `world/`, `domains/`,
+  `mesa_sim/` or `ros_sim/`.
+- `world/` is the world's side (T-H2): simulator-agnostic, use-case-agnostic code about what the human is and
+  does (the human's executor and stack machine, the executor's record; what remains of `domains/script.py`
+  after T-H3). It imports `shared/` only: no body, no use case. The robot's mind never reads it.
+- `domains/` holds the use cases (kitting, dock_loading): schemas, layouts, scenarios.
+- `mesa_sim/` and `ros_sim/` are the bodies. A body may import from `shared/`, `world/` and `domains/`;
+  it drives the human's executor and executes the robot's decisions.
 - `shared/` holds no simulator constant and no unit-scale default. Whatever depends on the body
   (speed, arrival radius, execution latency, spatial resolution) is supplied by the embodiment
   layer and passed in.
@@ -107,7 +116,11 @@ Decisions
   tick and reports 0 for it to the projector) is built, and T-C2c's two literal scenarios are run. T-H (the human
   behaviour model, ruled 25 Sept 2026: one tree of task schemas, the robot's task model, the script of task
   instances with events, the human executor's stack and record) is next, in four build sessions T-H1 to T-H4, before
-  T-D; nothing of it is built. Not to be started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
+  T-D. T-H1 (the tree, the task model) and T-H2 (the executor: `Script` of `TaskInstance`s with typed events,
+  `at` / `during` / `inject`, the one-level stack in `world/human_executor.py`, the mid-action cut through the shared
+  Mesa `Executor`'s `suspend` / `resume`, the load-time replay `check_script`, the record and its `[rec]` stream in
+  `logs/run_<timestamp>.rec`) are built; the C1 script path is kept and dispatched by the script's type until T-H3
+  (every registered scenario still uses it). Next is T-H3, the migration. Not to be started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
@@ -282,9 +295,14 @@ grep "^\[IR-complete\]" <log>   # task completion pins
 grep "^\[sep\]"         <log>   # actual robot-human distance per tick
 grep "^\[hold\]"        <log>   # decided holds: start, end, planned, executed, interrupted
 grep "^\[stop\]"        <log>   # separation-stop refusals (stop on), with the assessed-window label
+grep "^\[rec\]"         <log .rec>   # the human executor's record (T-H2): per tick the stack (top first), the action
+                                  # in hand with its occurrence and progress, and the tick's transitions; its own
+                                  # file beside the run log (logs/run_<timestamp>.rec), empty for a C1-script human
+grep "^\[human\]"       <log>   # the record's transitions, repeated in the run log (T-H path); the C1 path's primitives
 ```
 
-A behaviour-preserving change must leave these greps byte-identical.
+A behaviour-preserving change must leave these greps byte-identical, the `.rec` stream included (T-H2; the
+sweep scripts copy it beside each log).
 
 Completion is measured from the world fact (T6): the tick after the robot's last release
 (`action=place micro=release`), when the terminal condition is first observable. The empty-pool line

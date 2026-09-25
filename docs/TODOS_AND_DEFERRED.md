@@ -3248,6 +3248,24 @@ T-C2b removed. Error text:
 The case goes with the C1 vocabulary in T-H3, or is deleted before.
 Files: tests/test_script_layer.py
 
+**TODO-105: A resumed fetch walk toward an item the robot has delivered (recorded, T-H2, 25 Sept 2026)** [OPEN, recorded only]
+The resumption rule completes the cut action first, one rule for every action type. A delivery cut during its fetch
+walk, and the item delivered by the robot meanwhile: on resumption the human walks to where the item now is (the
+table) and the re-expansion then finds the task complete. The rule's reason holds (no world fact about progress is
+needed); the walk is for nothing. The alternative, named and not taken: judge the terminal condition before
+finishing the cut action, which breaks "one rule for every action type". Revisit if a T-D scenario meets it.
+Reference: design_decisions.md, "T-H: the human behaviour model", as built (T-H2), D3.
+
+**TODO-106: The load-time replay cannot see body-derived facts (recorded, T-H2, 25 Sept 2026)** [OPEN, recorded only]
+The replay advances the symbolic state by what the schemas declare (`successor_state`). Two facts of the Mesa body
+are not declared: `waited(agent, entity)` is retracted by the body on the agent's next step / grasp / release
+(no schema retracts it), so the replay keeps it, and a later coffee_break RESUMED before its own wait would read as
+completed at load; and `at(agent, object)` is never emitted for an object the agent holds, so a walk to an item in
+hand never completes in Mesa while the replay adds the effect (an authoring hazard, met in a T-H2 test). The
+robot's projection has the same limitation (TODO-07's remainder). Options, not decided: declare the retraction on
+the movement schemas (needs a wildcard on the entity), or a body-supplied fact filter for the replay.
+Reference: world/human_executor.py, `advance()`; mesa_sim/world_state_builder.py.
+
 **TODO-104: dock_loading's two scenarios do not load (recorded, T-H1, 25 Sept 2026)** [OPEN; domain deferred]
 Both fail at load at ea4446c (before T-H1) and identically after it; the domain imports, and its tree and task model
 build. Error text:
