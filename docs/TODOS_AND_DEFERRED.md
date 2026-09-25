@@ -2797,7 +2797,7 @@ script ends with the human leaving the workspace, unless the scenario is about t
 (design_decisions.md, "The human action script (T-C1, decided)", AS BUILT convention).
 Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared/types.py
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
-T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the declared behaviour this item asks for is a `HumanOnlyTask` instance in the human's script, `stand(?ticks)` for a stay of a stated length where the preceding `go_to` or `move_to` put the human, `go_to(?landmark)` for a walk; it is in the tree and never in a robot's task model, so it adds no hypothesis (coverage `TASK_ABSENT`). The scenario-side vocabulary and the superset domain of the text above become one tree and a task model. The terminal stand at a table stays undeclared by the authoring convention.
+T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the declared behaviour this item asks for is a `HumanOnlyTask` instance in the human's script, `stand(?duration)` for a stay of a stated length wherever the human is (its stand action emits no world fact), `go_to(?landmark)` for a walk; it is in the tree and never in a robot's task model, so it adds no hypothesis (coverage `TASK_ABSENT`). The scenario-side vocabulary and the superset domain of the text above become one tree and a task model. The terminal stand at a table stays undeclared by the authoring convention.
 
 **TODO-81 — The Mesa decomposer reads the literal `"?duration"`; the schema names the binding (`duration_key`)** [housekeeping; from R2]
 NOT DONE at the 4C housekeeping, because the fix as filed is not behaviour-preserving: `dock_loading`'s
@@ -2882,7 +2882,7 @@ the robot's carry passes 0.78 cm from the standing human (tick 100), before the 
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
 Reference: T-A1, September 2026
 See TODO-95 (23 Sept 2026): the deferred stationarity channel is taken up there as a design task.
-T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): half (a)'s "separate item T-H" is TODO-95; the name T-H now means the human behaviour model. The stay is written `stand(n)`, and the record says whether the human is standing inside a task (a stand action of `coffee_break`), in a `stand` task (`TASK_ABSENT`) or with nothing on the stack; "a finished work order" reads "every assigned task done". Half (b) stays T-D Q1, whose ground-truth cases the record now gives.
+T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): half (a)'s "separate item T-H" is TODO-95; the name T-H now means the human behaviour model. The stay is written as the `stand` task, and the record says whether the human is standing inside a task (the `wait_at` of `coffee_break`), in a `stand` task (`TASK_ABSENT`) or with nothing on the stack; "a finished work order" reads "every assigned task done". Half (b) stays T-D Q1, whose ground-truth cases the record now gives.
 
 **TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a] ✅ CLOSED by T-C1 (23 Sept 2026): the work order and the script are compared by provenance (every assigned task exactly once), not by key equality; a delivery to another table is a `deviate` edit of an assigned task. design_decisions.md, "The human action script (T-C1, decided)". ✅ BUILT (T-C2a): `shared.types.check_work_order`, run by `AgentConfig.__post_init__` and by the loader on the resolved script; a `deviate` to another table keeps the assigned task's provenance
 `AgentConfig.__post_init__` (shared/types.py) requires the human's `assigned_tasks` keys to equal the
@@ -2896,7 +2896,7 @@ scripting of the human (T-C); decide there what the correspondence between work 
 Recorded, not fixed.
 Files: shared/types.py (`AgentConfig.__post_init__`)
 Reference: T-B1a, September 2026; design_decisions.md, "An item's destination table is a fact of the station"
-T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the correspondence between the assigned tasks and the script is no longer checked by provenance: `check_work_order` and `Provenance` are deleted in T-H3, and a delivery to another table is a plain instance `deliver_item("item_1", table=...)`, checked for types only. Whether it counts as an assigned task is `assigned(task)`'s type, settled in T-H4.
+T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the correspondence between the assigned tasks and the script is no longer checked by provenance: `check_work_order` and `Provenance` are deleted in T-H3 and the record's query `unperformed(assigned_tasks)` replaces the check, and a delivery to another table is a plain instance `deliver_item("item_1", table=...)`, checked for types only. Whether it counts as an assigned task is `assigned(task)`'s type, settled in T-H4.
 
 **TODO-87 — A delivery to another table: no task boundary, no pin, no pool drop** [deviation case; from T-B1a]
 From the code (T-B1a, report item 10). The observed agent's task boundary fires only inside the retirement
@@ -3197,7 +3197,7 @@ Files: shared/types.py (`AgentConfig`, `check_work_order`)
 Reference: terminology follow-up, 24 September 2026; `docs/glossary.md` §6 (foreseeable task), §7 (label A)
 T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): resolved by the tree: a `PersonalTask` is never assigned and foreseeable is defined as a `PersonalTask` in the task model, so a foreseeable task in the assigned tasks is a type error, checked when T-H1 builds the classes.
 
-**TODO-99: `during`'s authored form (recorded, T-H, 25 Sept 2026)** [OPEN; built when the live-run exporter needs it]
+**TODO-99: `during`'s authored form (recorded, T-H, 25 Sept 2026)** [OPEN; built when the live-run exporter needs it] ✅ CLOSED by the rulings on the T-H review (25 Sept 2026): the authored form `during(action, ticks=n, do=...)`, a `DuringAction` trigger, is built in T-H2, not deferred; the text below is the record of the first ruling.
 `during(action, ticks=n, do=...)` is the event trigger for a cut inside an action, n ticks into it; no fraction or
 position forms (T-H item 5). T-H2 builds the mid-action cut (reached by `inject`) but not the authored form. Until it
 is built, an injection that lands inside an action cannot be exported, so the byte-identical replay of T-H item 8
@@ -3216,6 +3216,9 @@ the recognizer's errors cost.
 The interface it needs (recorded, not designed):
 - from the record (T-H2, T-H4): `truth_at(tick)`, the stack at a tick, top first (the task on top, or none), and
   `coverage(task, robot)`;
+- `truth_at` enters the robot's mind only through this condition's explicit adapter (ruling, 25 Sept 2026); nothing
+  else in the mind reads the record, and `world_state_builder` exposes nothing of the human's stack (T-H2's test);
+- simulation only: the record exists for a simulated human; a real human needs annotation of the same form;
 - in the robot's mind: one seam where the belief enters. Today the `BeliefState` is taken by
   `MetaPlanner.evaluate_triggers()`, `update_human_projection()` and `update()`; the oracle condition substitutes its
   source there, as a belief with all mass on the `HypothesisKey` of the task on top when its coverage is `COVERED`.

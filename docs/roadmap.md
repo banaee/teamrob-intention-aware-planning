@@ -424,28 +424,34 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     T-C2c ✅: the two literal scenarios (scenario_11, an interrupted delivery; scenario_01, a declared stay), one
     run each, observed (`analysis/tc2c_scripts/`). T-C closed.
   - From here debugging runs use prior on only; off / on returns for the paper.
-- **T-H — The human behaviour model** (ruled by Hadi, 25 September 2026; before T-D). design_decisions.md, "T-H: the
-  human behaviour model"; `docs/handoffs/handoff_T-H.md`. One tree of task schemas per use case (`WorkTask`,
-  `PersonalTask`, `HumanOnlyTask`); the robot's task model, a subset of it chosen per experiment; the assigned tasks, a
-  set; the human's script, an ordered list of task instances with events (`at`, `during`, `drop`); the human executor
-  owns a stack and writes a record, the ground truth; coverage at three levels. The robot's mind is unchanged. Each
-  subtask is one session and follows CLAUDE.md's build discipline (plan, confirmation, build):
-  - T-H1 the tree and the task model; `wait_at` → `stand(?ticks)`; the destination check's move.
-  - T-H2 the executor: `Event`, `at`, `drop`, `inject`, the stack, the mid-action cut, the record (without
-    `during`'s authored form, TODO-99).
-  - T-H3 the migration of the scenarios; deletion of the C1 vocabulary, `Deviation`, `Provenance`, `expand` /
-    `resolve_script` as a separate form, the key-based checks, `Stay`, `MoveTo` / `PickUp` / `Place`.
-  - T-H4 the record's queries and coverage; supersedes TODO-92.
-  Acceptance after each build: the 40 maintained baseline logs rerun; robot-side lines byte-identical but for the
-  `wait_at` → `stand` rename; human-side differences listed and each explained; at the end of T-H3 the new logs
-  replace the stored baselines.
+- **T-H — The human behaviour model** (ruled by Hadi, 25 September 2026, with the rulings on the review; before
+  T-D). design_decisions.md, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`. One tree of task
+  schemas per use case (`WorkTask`, `PersonalTask`, `HumanOnlyTask`); each robot's task model, whole schemas of it
+  chosen per experiment, a knowledge object of its own; the assigned tasks, a set; the human's script, an ordered list
+  of fully bound task instances with typed events (`AfterAction` / `DuringAction` / `Now`; `Start` / `Drop`); the human
+  executor owns a stack and writes a record, the ground truth (simulation only); coverage at two levels. `wait_at`
+  stays; a `stand(?duration)` action is added. The robot's mind is unchanged. Each subtask is one session and follows
+  CLAUDE.md's BUILD DISCIPLINE (a plan step confirmed by Hadi, then the build):
+  - T-H1 the tree, the task model and the two knowledge objects; the `stand` action; the destination check's move;
+    `dock_loading` and `ros_sim` begin their migration.
+  - T-H2 the executor: `Event`, `Decision`, `Trigger`, `at`, `during`, `drop`, `inject`, the stack, the mid-action
+    cut and the resumption rule, the record and its stream, the test that `world_state_builder` exposes nothing of the
+    stack.
+  - T-H3 the migration of the scenarios (and of `dock_loading`, `ros_sim`); deletion of the C1 vocabulary,
+    `Deviation`, `Provenance`, `expand` / `resolve_script` as a separate form, the key-based checks, `Stay`,
+    `MoveTo` / `PickUp` / `Place`.
+  - T-H4 the record's queries, `unperformed` and coverage; supersedes TODO-92.
+  Acceptance after each build: the 40 maintained baseline logs rerun; robot-side lines byte-identical; human-side
+  differences listed and each explained; at the end of T-H3 the new logs replace the stored baselines.
 - **Oracle-IR evaluation** (after T-H, its own pipeline task; TODO-101): three conditions on the same scenario, no IR,
-  IR, and oracle IR (the meta-planner receives the record's `truth_at(tick)` instead of the belief).
+  IR, and oracle IR (the meta-planner receives the record's `truth_at(tick)` instead of the belief, through that
+  condition's explicit adapter only). Simulation only: a real human needs annotation of the record's form.
 - **Alternative 1** (recorded as the next architecture direction, not scheduled): a human mind that generates the
   events, and a stack-aware IR.
 - **T-D — Robustness in kitting, on T-C.** (Resumes on T-H's structure: T-D Q1 stays "what the robot infers and does
   when no hypothesis explains the evidence, inside `unknown` or outside it", with the record's ground-truth cases: a
-  switch to a modelled task, a switch to an unmodelled task, a binding-level deviation, no task on the stack, an
+  switch to a modelled task, a switch to a modelled task outside the support, a switch to an unmodelled task, a
+  binding-level deviation, no task on the stack, an
   episode's first ticks.) Scenarios for a change of mind mid-task, a walk to an empty
   corner (`unknown` as outcome), a declared stay at the table (the blocked case); the blocked event in
   `ExecutorState`, the trigger routed past B2, the reconsider policy (design in TODO-80 and D2); evaluation
@@ -565,8 +571,10 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
 
 ## Phase 7 (recorded, not scheduled): interactive deviations and a context stream 🔲 *(after T-G; nothing decided)*
 - Run-time deviation events into the human executor from a viewer, replayable as pre-loaded scripts: live runs
-  demonstrate, pre-loaded scripts evaluate. PULLED FORWARD IN PART by T-H (25 Sept 2026): `executor.inject(task |
-  drop)` and the export of "now" as `at` / `during` are T-H2's; the viewer's buttons stay here.
+  demonstrate, pre-loaded scripts evaluate. PULLED FORWARD IN PART by T-H (25 Sept 2026): `executor.inject(Start(task) |
+  Drop())` and the export of `Now` as `AfterAction` / `DuringAction` are T-H2's; events may cut mid-action; an
+  injection on an empty stack is exported as a plain script entry; viewer walks go to landmarks only. The viewer's
+  buttons stay here.
 - A context-knowledge stream into the world state, read by the recognizer: its own task.
 - Communication as a robot action under a live `unknown` or block: its own task.
 - Handoff: `docs/handoffs/phase7_interactive_deviations.md`.
