@@ -166,7 +166,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from shared.types import (
     Observation, BeliefState, WorldState, GroundedAction,
-    TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask,
+    TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, same_task,
 )
 from shared.knowledge import TaskModel, ContextKnowledge
 from shared.planner import AdaptivePlanner, DecompositionError
@@ -465,31 +465,26 @@ class IntentionRecognizer:
         explains the observations. This is the one place the recognizer reads a
         schema's class.
 
-        An assigned task is matched to the hypothesis space on its ENUMERATED
-        parameters: the hypothesis key built from its bindings minus the
-        schema's determined_parameters (T-B1a follow-up 2). A task instance's
-        identity (task_instance_key) keeps its determined parameters (a
-        delivery reads as item and table); a hypothesis has none, its table is
-        resolved from the station when grounded. Whether a determined binding
-        agrees with the station is the embodiment's load-time conformance
-        check (check_task_destinations), not a matter for this match.
+        An assigned task is matched to the hypothesis space by task equality
+        (same_task, T-H4): the hypothesis that is the same task, on the goal
+        bindings (its bindings minus the schema's determined and duration
+        parameters; T-B1a follow-up 2). A hypothesis has no determined
+        parameter, its table is resolved from the station when grounded.
+        Whether a determined binding agrees with the station is the
+        embodiment's load-time conformance check (check_task_destinations),
+        not a matter for this match.
         """
         if not assigned_tasks:
             return None
 
-        space = set(self._hypotheses)
         admissible: Set[HypothesisKey] = {
             hyp for hyp in self._hypotheses
             if isinstance(hyp.schema, PersonalTask)
         }
 
         for task in assigned_tasks:
-            key = HypothesisKey(
-                schema=task.schema,
-                bindings={var.name: const.value for var, const in task.bindings.items()
-                          if var.name not in task.schema.determined_parameters},
-            )
-            if key in space:
+            key = next((hyp for hyp in self._hypotheses if same_task(hyp.task_instance(), task)), None)
+            if key is not None:
                 admissible.add(key)
             else:
                 logging.warning(

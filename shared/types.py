@@ -380,13 +380,15 @@ class GroundedAction:
     schema: ActionSchema            # back-reference for decomposer
 
 
-@dataclass
+@dataclass(eq=False)
 class TaskInstance:
     """
     A concrete instantiation of a TaskSchema with specific parameter bindings.
     Used in scenario definitions and agent task assignments.
     bindings map Vars declared in the schema to concrete Const values.
     Its class (WorkTask, PersonalTask, HumanOnlyTask) is its schema's.
+    `==` is object identity (eq=False): whether two instances are the same
+    task is `same_task` (T-H4), the one task equality.
     """
     schema: "TaskSchema"
     bindings: Dict[Var, Const]  # {Var("?item"): Const("item_1")}
@@ -480,26 +482,92 @@ def destination_derivations(schema: "TaskSchema") -> List[Tuple[str, str]]:
             if lookup_fn == DESTINATION_LOOKUP]
 
 
+@dataclass(frozen=True)
+class Departure:
+    """
+    A stated determined binding that is not the station's (T-H4): `var` is
+    bound to `stated` where the layout designates `designated` for its source
+    object. The binding-level deviation of a delivery to another table
+    (deliver_item(item_1, table=kitting_table_2)): the task is the same task
+    (same_task), performed with a binding the station does not give.
+    """
+    var: Var
+    designated: Const
+    stated: Const
+
+    def __repr__(self):
+        return f"{self.var.name}={self.stated.value}(designated {self.designated.value})"
+
+
+def destination_departures(task: TaskInstance, destination_by_id: Dict[str, str]) -> Tuple[Departure, ...]:
+    """
+    The task's departures from the station: each var it binds that the schema
+    otherwise resolves through "destination_of", bound to something other than
+    the destination the layout declares for its source object, in declaration
+    order. An unbound determined parameter follows from the lookup and departs
+    from nothing. Raises ValueError when the source object has no designated
+    destination (the loader requires one for every object of such a type).
+    """
+    bound = {var.name: const.value for var, const in task.bindings.items()}
+    departures: List[Departure] = []
+    for var_name, source_var in destination_derivations(task.schema):
+        if var_name not in bound or source_var not in bound:
+            continue
+        source = bound[source_var]
+        designated = destination_by_id.get(source)
+        if designated is None:
+            raise ValueError(
+                f"{task_instance_key(task)}: {var_name} is bound to '{bound[var_name]}', "
+                f"but the layout designates no destination for {source_var}='{source}'"
+            )
+        if bound[var_name] != designated:
+            departures.append(Departure(Var(var_name), Const(designated), Const(bound[var_name])))
+    return tuple(departures)
+
+
 def check_task_destinations(task: TaskInstance, destination_by_id: Dict[str, str]) -> None:
     """
     An ASSIGNED task that binds a var the schema otherwise resolves through
     "destination_of" must bind the destination the layout declares for its
     source object (T-B1a): assigned_tasks are the assigned tasks, the reference
     the robot's mind holds, so they describe the station, not a deviation. Raises
-    ValueError naming the task, the source object and both values. Not applied
-    to a human's scheduled_tasks, which may send an object elsewhere.
+    ValueError naming the task, the source object and both values: a departure
+    (destination_departures) is refused. Not applied to a human's
+    scheduled_tasks, which may send an object elsewhere.
     """
+    source_of = dict(destination_derivations(task.schema))
     bound = {var.name: const.value for var, const in task.bindings.items()}
-    for var_name, source_var in destination_derivations(task.schema):
-        if var_name not in bound or source_var not in bound:
-            continue
-        source = bound[source_var]
-        designated = destination_by_id.get(source)
-        if bound[var_name] != designated:
-            raise ValueError(
-                f"{task_instance_key(task)}: {var_name} is bound to '{bound[var_name]}', "
-                f"but the layout designates '{designated}' for {source_var}='{source}'"
-            )
+    for d in destination_departures(task, destination_by_id):
+        source_var = source_of[d.var.name]
+        raise ValueError(
+            f"{task_instance_key(task)}: {d.var.name} is bound to '{d.stated.value}', "
+            f"but the layout designates '{d.designated.value}' for {source_var}='{bound[source_var]}'"
+        )
+
+
+def goal_bindings(task: TaskInstance) -> Dict[Var, Const]:
+    """
+    What identifies a task (T-H4): its bindings minus its schema's determined
+    parameters (they follow from another parameter through the station) and
+    its duration parameters (how long is not what: stand("PT10S") and
+    stand("PT50S") are one task). The bindings a hypothesis carries, for a
+    schema whose other parameters are typed.
+    """
+    durations = duration_parameters(task.schema)
+    return {var: const for var, const in task.bindings.items()
+            if var.name not in task.schema.determined_parameters and var not in durations}
+
+
+def same_task(a: TaskInstance, b: TaskInstance) -> bool:
+    """
+    Task equality (T-H4, TODO-107), the one place it is defined: the same
+    schema by identity and equal goal bindings (goal_bindings). A stated
+    determined binding is not part of a task's identity: it is the station's
+    or a Departure. Read by the duplicate check on assigned tasks, the
+    recognizer's support restriction, the robot's continue decision, and the
+    record's queries (world/queries.py: assigned, unperformed, coverage).
+    """
+    return a.schema is b.schema and goal_bindings(a) == goal_bindings(b)
 
 
 def task_instance_key(task: TaskInstance) -> str:
@@ -717,8 +785,8 @@ class AgentConfig:
         Validate what this agent declares: scheduled_tasks is a Script, and
         assigned_tasks are WorkTask instances without duplicates.
         Empty assigned_tasks skips their validation.
-        The duplicate check compares task_instance_key() strings: TaskInstance
-        is deliberately unhashable (TODO-107: settled with T-H4's task equality).
+        Duplicates are judged by task equality (same_task, T-H4; TODO-107):
+        two deliveries of one item are one task whatever tables they state.
         """
         if not isinstance(self.scheduled_tasks, Script):
             raise TypeError(
@@ -734,11 +802,12 @@ class AgentConfig:
                 f"these are not: {not_work}"
             )
 
-        assigned_keys = [task_instance_key(t) for t in self.assigned_tasks]
-        dupes = sorted({k for k in assigned_keys if assigned_keys.count(k) > 1})
+        tasks = self.assigned_tasks
+        pairs = [(a, b) for i, a in enumerate(tasks) for b in tasks[i + 1:] if same_task(a, b)]
+        dupes = sorted({task_instance_key(t) for pair in pairs for t in pair})
         if dupes:
             raise ValueError(
-                f"AgentConfig '{self.agent_id}': duplicate assigned_tasks keys: {dupes}"
+                f"AgentConfig '{self.agent_id}': duplicate assigned tasks (same_task): {dupes}"
             )
 
 

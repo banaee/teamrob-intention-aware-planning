@@ -29,8 +29,10 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from shared.knowledge import Tree, TaskModel
 from shared.planner import AdaptivePlanner
-from shared.types import ScenarioConfig, TaskSchema, check_task_bindings, check_task_destinations
+from shared.recognizer import build_hypothesis_space
+from shared.types import ScenarioConfig, Start, TaskSchema, check_task_bindings, check_task_destinations, task_instance_key
 from world.human_executor import check_script
+from world.queries import ObservingRobot, coverage
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
 
@@ -171,6 +173,10 @@ class SimModel(model.Model):
         # ------------------------------------------------------------------
         self.humans: Dict[str, HumanAgent] = {}
         self.robots: Dict[str, RobotAgent] = {}
+        # Per robot, what the record's coverage is judged against (T-H4,
+        # world/queries.py): its task model, its hypothesis space and the
+        # station's destinations. The world's side; the robot never holds it.
+        self.observing: Dict[str, ObservingRobot] = {}
 
         self._spawn_agents(scenario)
         # First observation before the clock starts: the human acts before the
@@ -304,7 +310,9 @@ class SimModel(model.Model):
         run by its stack machine (_load_human_scripts()).
         RobotAgent receives its assigned_tasks as its task pool, plus (when the
         assignment_prior switch is on) the observed human's assigned_tasks,
-        never the script; and its task model, built from the tree (T-H).
+        never the script; and its task model, built from the tree (T-H), with
+        the hypothesis space built from it here, kept with the station's
+        destinations as the robot's ObservingRobot (T-H4).
         """
         agent_cfgs = {a.agent_id: a for a in scenario.agents}
 
@@ -345,6 +353,9 @@ class SimModel(model.Model):
                 # Every robot is given the use case's declared task model
                 # (TODO-102: a per-robot task model on the robot's AgentConfig).
                 task_model = TaskModel(self.tree, self._task_model_schemas)
+                hypotheses = build_hypothesis_space(task_model=task_model, known_objects_by_type=self._objects_by_type)
+                self.observing[agent_cfg.agent_id] = ObservingRobot(task_model, frozenset(hypotheses),
+                                                                    self._destination_by_id())
                 self._check_destinations(scenario, agent_cfg, agent_cfgs)
                 observed_id = agent_cfg.observes[0] if agent_cfg.observes else None
                 observed_cfg = agent_cfgs.get(observed_id) if observed_id else None
@@ -365,7 +376,7 @@ class SimModel(model.Model):
                     pos=start_pos,
                     task_model=task_model,
                     assigned_tasks=agent_cfg.assigned_tasks,  # List[TaskInstance]
-                    known_objects_by_type=self._objects_by_type,
+                    hypotheses=hypotheses,
                     observed_agent_id=observed_id,
                     observed_assigned_tasks=observed_assigned,
                 )
@@ -383,8 +394,7 @@ class SimModel(model.Model):
         be told. The human's script is not checked: it may send an object
         elsewhere (T-H: types only).
         """
-        destination_by_id = {obj_id: obj.destination for obj_id, obj in self.objects.items()
-                             if obj.destination is not None}
+        destination_by_id = self._destination_by_id()
         checked = [robot_cfg] + [agent_cfgs[a] for a in robot_cfg.observes if a in agent_cfgs]
         for agent_cfg in checked:
             for task in agent_cfg.assigned_tasks or []:
@@ -393,13 +403,18 @@ class SimModel(model.Model):
                 except ValueError as e:
                     raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
 
+    def _destination_by_id(self) -> Dict[str, str]:
+        """The station: each object with a designated destination, and that destination."""
+        return {obj_id: obj.destination for obj_id, obj in self.objects.items() if obj.destination is not None}
+
     def _load_human_scripts(self, scenario: ScenarioConfig):
         """
         Each human's script (T-H) checked against the initial world by the
         load-time replay (world/human_executor.check_script): every anchor
         against the sequential expansion, events and resumptions included, by
         the same stack machine the agent runs; then handed to the HumanAgent.
-        Expanded with the world's tree.
+        Expanded with the world's tree. Then one `[coverage]` line per script
+        entry for each robot observing the human (_log_coverage).
         """
         world = build_world_state(self)
         planner = AdaptivePlanner(knowledge=self.tree)
@@ -415,6 +430,26 @@ class SimModel(model.Model):
             except ValueError as e:
                 raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
             self.humans[agent_cfg.agent_id].load_stack(agent_cfg.scheduled_tasks, planner)
+            self._log_coverage(scenario, agent_cfg)
+
+    def _log_coverage(self, scenario: ScenarioConfig, human_cfg) -> None:
+        """
+        Which script entries the observing robots' models cover (T-H4): one
+        line per entry per robot observing the human, the entry's task and each
+        of its events' started tasks (an interruption is judged on its own),
+        each with its coverage (world/queries.coverage), in the run log beside
+        the [IR] lines it is read against. Information for the reader: no run
+        reads it, and it is the same with the assignment prior on and off.
+        """
+        observers = [a.agent_id for a in scenario.agents
+                     if a.agent_type == "robot" and human_cfg.agent_id in a.observes]
+        for robot_id in observers:
+            robot = self.observing[robot_id]
+            for i, entry in enumerate(human_cfg.scheduled_tasks.entries):
+                judged = [f"{task_instance_key(entry.task)}={coverage(entry.task, robot)!r}"]
+                judged += [f"start:{task_instance_key(ev.decision.task)}={coverage(ev.decision.task, robot)!r}"
+                           for ev in entry.events if isinstance(ev.decision, Start)]
+                logger.info(f"[coverage] {human_cfg.agent_id} {robot_id} entry={i} " + " ".join(judged))
 
     # =========================================================================
     # Public query methods

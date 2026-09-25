@@ -33,12 +33,12 @@ from typing import TYPE_CHECKING, List, Optional, Dict
 
 from shared.knowledge import TaskModel, ContextKnowledge
 from shared.projection import Projector
-from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothesis_space
+from shared.recognizer import IntentionRecognizer, HypothesisKey
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
 from shared.types import (AbstractPlan, BeliefState, Decision, ExecutorState, GroundedAction, Script, Start,
-                          TaskInstance, task_instance_key)
+                          TaskInstance, same_task, task_instance_key)
 from world.record import Record, Snapshot
 from world.human_executor import StackMachine, RunAction, ResumeAction
 
@@ -246,8 +246,7 @@ class RobotAgent(FactoryAgent):
                  pos: tuple,
                  task_model: TaskModel,
                  assigned_tasks: List[TaskInstance],
-                 # known_item_ids=List[str],
-                 known_objects_by_type: Dict[str, List[str]],
+                 hypotheses: List[HypothesisKey],
                  observed_agent_id: Optional[str] = None,
                  observed_assigned_tasks: Optional[List[TaskInstance]] = None):
         super().__init__(unique_id, model, pos)
@@ -259,8 +258,9 @@ class RobotAgent(FactoryAgent):
         self.observed_agent_id = observed_agent_id
         self.assigned_tasks: List[TaskInstance] = assigned_tasks
 
-        # Build hypothesis space from the robot's task model and the workspace objects
-        hypotheses = build_hypothesis_space(task_model=task_model, known_objects_by_type=known_objects_by_type)
+        # The hypothesis space: built by the loader from the robot's task model
+        # and the workspace objects (SimModel._spawn_agents), which judges the
+        # record's coverage against the same space (T-H4).
 
         context = ContextKnowledge.default()
 
@@ -448,13 +448,13 @@ class RobotAgent(FactoryAgent):
                 f"queue={[t.schema.name + str({k.name: v.value for k, v in t.bindings.items()}) for t in result.queue]}"
             )
             # A CONTINUE decision: the winner is the task already executing, by
-            # task identity (task_instance_key), never object identity. The plan
+            # task equality (same_task, T-H4), never object identity. The plan
             # is still re-decomposed from the live world (settled: never resumed),
             # but the executor adopts it without restarting — a continue costs
             # nothing (io_contracts.md §1.9, TODO-43).
             continues = (
                 self.current_task_instance is not None
-                and task_instance_key(result.current_task) == task_instance_key(self.current_task_instance)
+                and same_task(result.current_task, self.current_task_instance)
             )
             self.current_task_instance = result.current_task
             self.current_plan = self.planner.plan(

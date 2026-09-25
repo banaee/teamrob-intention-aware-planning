@@ -123,11 +123,13 @@ def holds(world, name, *args):
 # ---------------------------------------------------------------------------
 
 def test_sugar_builds_typed_events():
-    e = deliver("item_3").at(pick_up, coffee()).during(move_to, "PT6S", drop, occurrence=1)
+    # a TaskInstance's == is object identity (T-H4): the events hold the objects written
+    d, c = deliver("item_3"), coffee()
+    e = d.at(pick_up, c).during(move_to, "PT6S", drop, occurrence=1)
     assert isinstance(e, ScriptEntry) and len(e.events) == 2
-    assert e.events[0] == Event(AfterAction(pick_up, None), Start(coffee()))
+    assert e.events[0] == Event(AfterAction(pick_up, None), Start(c))
     assert e.events[1] == Event(DuringAction(move_to, "PT6S", 1), Drop())
-    assert Script([deliver("item_3")]).entries[0] == ScriptEntry(deliver("item_3"), ())
+    assert Script([d]).entries[0] == ScriptEntry(d, ())
     for base in (Trigger, Decision):
         with pytest.raises(TypeError, match="not constructed directly"):
             base()
@@ -208,11 +210,12 @@ def test_during_walk_cuts_and_resumes_from_the_position():
 
 
 def test_during_stand_keeps_the_remaining_stands():
-    m = model_for("env_layout0", "scenario_00", Script([st("PT20S").during(stand, "PT4S", st("PT4S"))]), robot=False)
+    long, short = st("PT20S"), st("PT4S")
+    m = model_for("env_layout0", "scenario_00", Script([long.during(stand, "PT4S", short)]), robot=False)
     h = run(m)
-    outer = [(s.done, s.total) for s in h.record.snapshots if s.stack and s.stack[0] == st("PT20S")]
+    outer = [(s.done, s.total) for s in h.record.snapshots if s.stack and s.stack[0] is long]
     assert outer == [(1, 10), (2, 10)] + [(k, 10) for k in range(3, 11)] + [(10, 10)]
-    inner = [(s.done, s.total) for s in h.record.snapshots if s.stack and s.stack[0] == st("PT4S")]
+    inner = [(s.done, s.total) for s in h.record.snapshots if s.stack and s.stack[0] is short]
     assert inner == [(1, 2), (2, 2), (2, 2)]
     assert [k[2] for k in kinds(h.record) if k[0] == "left"] == [Outcome.SUSPENDED, Outcome.COMPLETED, Outcome.COMPLETED]
 
@@ -227,17 +230,18 @@ def test_during_wait_at_keeps_the_countdown_and_records_waited():
 
 
 def test_second_start_is_refused_and_recorded():
-    m = model_for("env_layout1", "scenario_10", Script([deliver("item_2").at(pick_up, coffee())]), robot=False)
+    d, c, s4 = deliver("item_2"), coffee(), st("PT4S")
+    m = model_for("env_layout1", "scenario_10", Script([d.at(pick_up, c)]), robot=False)
     h = m.humans[H]
     while not any(isinstance(t, Started) for t in h.record.transitions):
         m.step()
     m.step()
     before = [(s.done, s.total) for s in h.record.snapshots][-1]
-    h.inject(Start(st("PT4S")))
+    h.inject(Start(s4))
     m.step()
     tick = int(m.schedule.steps) - 1
-    assert h.record.transitions_at(tick) == [Refused(tick, Start(st("PT4S")), RefusalReason.STACK_FULL)]
-    assert h.machine.stack_tasks() == [coffee(), deliver("item_2")]
+    assert h.record.transitions_at(tick) == [Refused(tick, Start(s4), RefusalReason.STACK_FULL)]
+    assert h.machine.stack_tasks() == [c, d]
     after = [(s.done, s.total) for s in h.record.snapshots][-1]
     assert after == (before[0] + 1, before[1])          # the body was not stopped
     run(m)
@@ -263,10 +267,11 @@ def test_inject_start_drop_and_empty_stack():
     m.step()
     t = int(m.schedule.steps) - 1
     assert h.record.transitions_at(t) == [Refused(t, Drop(), RefusalReason.EMPTY_STACK)]
-    h.inject(Start(st("PT4S")))                               # a plain entry on the empty stack
+    s4 = st("PT4S")
+    h.inject(Start(s4))                                       # a plain entry on the empty stack
     m.step()
     t = int(m.schedule.steps) - 1
-    assert h.record.transitions_at(t) == [Started(t, st("PT4S"), Now(), None)]
+    assert h.record.transitions_at(t) == [Started(t, s4, Now(), None)]
     for _ in range(3):
         m.step()
     assert kinds(h.record)[-1] == ("left", key(st("PT4S")), Outcome.COMPLETED)

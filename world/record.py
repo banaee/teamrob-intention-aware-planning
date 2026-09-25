@@ -10,7 +10,8 @@ PURPOSE:
     and by the load-time replay (domains/human_executor.check_script); streamed
     as one `[rec]` line per tick in a file beside the run log, diffed in the
     sweep. Its typed queries (switches, resumptions, assigned, unperformed,
-    coverage, truth_at) are T-H4's and are not here.
+    coverage, truth_at) are world/queries.py (T-H4); they run on this in-memory
+    Record, never on the stream read back.
 
 WHAT THIS MODULE DOES NOT DO:
     - Nothing here reaches the robot's mind: world_state_builder and obs_builder
