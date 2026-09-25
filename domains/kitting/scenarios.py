@@ -3,7 +3,7 @@
 Scenario definitions for the kitting domain.
 Task assignments reference domain schemas directly — no string parsing,
 no YAML, no ? prefix conventions.
-is_foreseeable is declared on TaskSchema — not repeated here.
+A task's class (WorkTask, PersonalTask, HumanOnlyTask) is declared in tasks.py — not repeated here.
 """
 
 from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig
@@ -254,7 +254,7 @@ scenario_10 = ScenarioConfig(
 
 # T-C2c scenario A, interrupted delivery: a fixture, not a baseline (analysis/tc2c_scripts/).
 # The human picks item_2, walks away from the table to the coffee machine with it,
-# waits, then resumes the delivery; item_5 follows so the work order is s10's.
+# waits, then resumes the delivery; item_5 follows so the assigned tasks are s10's.
 scenario_11 = ScenarioConfig(
     id="scenario_11",
     name="layout1_interrupted_delivery",

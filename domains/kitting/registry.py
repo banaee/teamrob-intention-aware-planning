@@ -1,38 +1,29 @@
 # domains/kitting/registry.py
 """
-Assembles the kitting DomainModel from tasks and actions.
-Entry point: build_kitting_domain()
-Called once at startup by KnowledgeBase via sim_model.py.
+Assembles the kitting tree of task schemas (T-H) from tasks and actions, and
+declares the task model a robot is given.
+Entry point: register_kitting_domain()
+Called once at startup by sim_model.py.
 """
 
-from shared.types import DomainModel
-from domains.kitting.actions import move_to, pick_up, place, wait_at
-from domains.kitting.tasks import deliver_item, coffee_break, ac_activation
+from shared.knowledge import Tree
+from domains.kitting.actions import move_to, pick_up, place, wait_at, stand
+from domains.kitting.tasks import deliver_item, coffee_break, ac_activation, go_to, stand_task
 from domains.kitting.scenarios import scenario_00, scenario_01, scenario_02, scenario_03, scenario_04, scenario_10, scenario_11, scenario_12, scenario_20, scenario_22, scenario_23, scenario_24, scenario_21, scenario_30, scenario_31, scenario_32, scenario_40, scenario_41, scenario_42, scenario_50, scenario_51, scenario_52, scenario_53, scenario_70, scenario_71, scenario_72, scenario_73, scenario_80, scenario_81, scenario_82, scenario_83, scenario_84, scenario_85, scenario_90, scenario_91, scenario_92, scenario_93, scenario_94
 
-def register_kitting_domain() -> DomainModel:
-    return DomainModel(
-        tasks={
-            "deliver_item":  deliver_item,
-            "coffee_break":  coffee_break,
-            "ac_activation": ac_activation,
-        },
-        actions={
-            "move_to":   move_to,
-            "pick_up":   pick_up,
-            "place":     place,
-            "wait_at":   wait_at,
-        },
+def register_kitting_domain() -> Tree:
+    return Tree(
+        tasks=[deliver_item, coffee_break, ac_activation, go_to, stand_task],
+        actions=[move_to, pick_up, place, wait_at, stand],
         microactions=["STEP", "GRASP", "RELEASE", "STAND"],
-        intentions={"deliver_item", 
-                    "coffee_break", 
-                    "ac_activation", 
-                    },
     )
-    
+
 
 domain_config = {
     "register_fn": register_kitting_domain,
+    # The task model every robot is given (T-H): every WorkTask and the
+    # PersonalTasks it foresees; no HumanOnlyTask.
+    "task_model":  [deliver_item, coffee_break, ac_activation],
     "layouts": {
         "env_layout0": {
             "path":      "domains/kitting/env_layout0.json",

@@ -92,4 +92,5 @@ wait_at = ActionSchema(
     effects=[],
     completion=ProcessCompletion(),
     microactions="STAND*",
+    duration_key="?duration",   # the body reads the stated duration through it (T-H1)
 )

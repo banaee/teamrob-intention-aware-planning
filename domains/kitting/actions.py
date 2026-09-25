@@ -14,7 +14,7 @@ PREDICATE NAMING NOTE:
 
 """
 
-from shared.types import Var, Const, ConditionSchema, ActionSchema
+from shared.types import Var, Const, ConditionSchema, ActionSchema, ProcessCompletion
 
 _agent  = Var("?agent")
 _item   = Var("?item")
@@ -107,6 +107,20 @@ wait_at = ActionSchema(
         ConditionSchema("waited", (_agent, _entity)),
     ],
     completion=ConditionSchema("waited", (_agent, _entity)),
+    microactions="STAND*",
+    duration_key="?duration",
+)
+# stand (T-H): standing still for a stated time, with no entity. Process
+# completion only: it emits no world fact (the body attaches no `remaining` to
+# its STANDs, so no waited(...) is recorded). The duration is in the physical
+# form wait_at uses, declared through duration_key. Used by the HumanOnlyTask
+# stand(?duration) only.
+stand = ActionSchema(
+    name="stand",
+    parameters=[],
+    preconditions=[],
+    effects=[],
+    completion=ProcessCompletion(),
     microactions="STAND*",
     duration_key="?duration",
 )

@@ -2,7 +2,7 @@
 """
 Scenario definitions for the dock_loading domain.
 Task assignments reference domain schemas directly — no string parsing, no YAML.
-is_foreseeable is declared on TaskSchema — not repeated here.
+A task's class (WorkTask, PersonalTask, HumanOnlyTask) is declared in tasks.py — not repeated here.
 """
 
 from shared.types import Var, Const, TaskInstance, AgentConfig, ScenarioConfig

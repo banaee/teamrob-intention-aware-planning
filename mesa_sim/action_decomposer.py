@@ -44,10 +44,11 @@ from dataclasses import dataclass, field
 import logging
 from typing import List, Dict, Any, Tuple, Optional
 import math
+import re
 import yaml
 from pathlib import Path
 
-from shared.types import GroundedAction
+from shared.types import ConditionSchema, GroundedAction
 
 
 # =============================================================================
@@ -145,11 +146,18 @@ def _expand_stand(
 ) -> List[Microaction]:
     """
     Expand a STAND* action into N stand microactions.
-    Duration comes from ?duration binding if present, else defaults to 1 step.
-    TODO Phase 4: parse ISO 8601 duration from binding if domain uses it.
+    Duration comes from the binding the schema's duration_key names, if the
+    schema declares one and the action binds it; else it defaults to 1 step.
     """
-    duration_str = action.bindings.get("?duration", "PT1S")
+    key = action.schema.duration_key
+    duration_str = action.bindings.get(key, "PT1S") if key is not None else "PT1S"
     n_steps = _parse_duration_to_steps(duration_str, model)
+    # An action with process completion only (the stand action, T-H) emits no
+    # world fact: its STANDs carry no `remaining`, as a hold's do, so the
+    # executor records no waited_at and the action completes when its queue
+    # runs out.
+    if not isinstance(action.schema.completion, ConditionSchema):
+        return [Microaction(name="stand", params={}) for _ in range(n_steps)]
     # Distinct objects counting down to 1 — the executor recognises the last
     # STAND of a wait by remaining == 1 (it was one shared dict repeated n times).
     return [Microaction(name="stand", params={"remaining": n_steps - i}) for i in range(n_steps)]
@@ -257,21 +265,22 @@ def steps_toward(
 # Duration parsing
 # =============================================================================
 
+_DURATION = re.compile(r"PT(?:(\d+)M)?(?:(\d+)S)?")
+
+
 def _parse_duration_to_steps(duration_str: str, model) -> int:
     """
     Convert ISO 8601 duration string to number of Mesa steps.
     PT5M = 5 minutes, PT20S = 20 seconds.
     Step duration read from mesa_configs.yaml (seconds_per_step).
+    Raises ValueError on a string of any other form (PT<n>M<n>S, either part
+    optional, one required): the loader validates a scripted duration with this
+    parser (T-H), so it must refuse what it cannot read.
     """
-    seconds = 0
-    duration_str = duration_str.upper().replace("PT", "")
-
-    if "M" in duration_str:
-        parts = duration_str.split("M")
-        seconds += int(parts[0]) * 60
-        duration_str = parts[1] if len(parts) > 1 else ""
-    if "S" in duration_str:
-        seconds += int(duration_str.replace("S", ""))
+    match = _DURATION.fullmatch(duration_str.upper())
+    if match is None or match.group(1) is None and match.group(2) is None:
+        raise ValueError(f"'{duration_str}' is not a duration of the form PT<n>M<n>S")
+    seconds = int(match.group(1) or 0) * 60 + int(match.group(2) or 0)
 
     seconds_per_step = _get_seconds_per_step(model)
     return max(1, int(seconds / seconds_per_step))

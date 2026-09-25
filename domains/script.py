@@ -25,8 +25,9 @@ The data types (ScriptAction, Stay, Provenance, Deviation) live in shared/types.
 beside AgentConfig, whose work-order check reads provenance.
 """
 
-from typing import Dict, List, Optional, Sequence, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
+from shared.knowledge import Tree
 from shared.projection import successor_state
 from shared.target_resolution import movement_target_position
 from shared.types import (
@@ -51,8 +52,7 @@ def expand(task: TaskInstance, planner, world: WorldState, agent_id: str,
     the planner chooses as it does for any plan. ?agent is execution context and
     is not kept: it is injected again when the element is grounded.
     """
-    params = {var.name: const.value for var, const in task.bindings.items()}
-    actions = planner.decompose(task.schema.name, params, agent_id, world, method=method)
+    actions = planner.decompose(task, agent_id, world, method=method)
     provenance = Provenance(task)
     return [
         ScriptAction.of(a.action_name,
@@ -62,14 +62,14 @@ def expand(task: TaskInstance, planner, world: WorldState, agent_id: str,
     ]
 
 
-def ground(element: ScriptAction, agent_id: str, knowledge) -> GroundedAction:
+def ground(element: ScriptAction, agent_id: str, tree: Tree) -> GroundedAction:
     """
     The GroundedAction a ScriptAction stands for, for `agent_id`: its action
     schema and a fully grounded completion predicate, the substitution decompose()
     applies to the same action inside a method. A Stay grounds to nothing and is
     not accepted here; a coordinate-valued target has no object to ground to.
     """
-    schema = knowledge.get_action_schema(element.action_name)
+    schema = tree.get_action_schema(element.action_name)
     if schema is None:
         raise ValueError(f"{element}: '{element.action_name}' is not an action of this domain")
     bindings: Dict[str, str] = {"?agent": agent_id}
@@ -213,7 +213,7 @@ def resolve_script(elements: Sequence, planner, world: WorldState, agent_id: str
     return out
 
 
-def after(elements: Sequence, world: WorldState, agent_id: str, knowledge) -> WorldState:
+def after(elements: Sequence, world: WorldState, agent_id: str, tree: Tree) -> WorldState:
     """
     The symbolic state `elements` (primitives) leave `world` in, for `agent_id`:
     each ScriptAction grounded and handed to successor_state(), the one the
@@ -221,7 +221,7 @@ def after(elements: Sequence, world: WorldState, agent_id: str, knowledge) -> Wo
     projected state are one derivation; the agent stands at the target of its
     last walk. A Stay changes nothing. A new value; `world` is not written.
     """
-    actions = [ground(e, agent_id, knowledge) for e in elements if isinstance(e, ScriptAction)]
+    actions = [ground(e, agent_id, tree) for e in elements if isinstance(e, ScriptAction)]
     end_pos = None
     for action in actions:
         if action.schema.movement_target_key is not None:
@@ -236,17 +236,17 @@ def _apply(dev: Deviation, planner, world: WorldState, agent_id: str) -> list:
     anchor leaves behind (after the truncated part, for `abandon`).
     """
     base = expand(dev.task, planner, world, agent_id)
-    knowledge = planner.knowledge
+    tree = planner.knowledge
     if dev.kind == "interrupt":
         i = anchor_index(base, dev.after if dev.after is not None else dev.before)
         prefix = base[:i + 1] if dev.after is not None else base[:i]
-        content = resolve_script(dev.content, planner, after(prefix, world, agent_id, knowledge), agent_id)
+        content = resolve_script(dev.content, planner, after(prefix, world, agent_id, tree), agent_id)
         if dev.after is not None:
             return insert_after(base, dev.after, content)
         return insert_before(base, dev.before, content)
     if dev.kind == "abandon":
         kept = truncate(base, after=dev.after, before=dev.before)
-        content = resolve_script(dev.content, planner, after(kept, world, agent_id, knowledge), agent_id)
+        content = resolve_script(dev.content, planner, after(kept, world, agent_id, tree), agent_id)
         return kept + content
     if dev.kind == "deviate":
         _, old = deviation_destination(dev, world)
@@ -254,26 +254,29 @@ def _apply(dev: Deviation, planner, world: WorldState, agent_id: str) -> list:
     raise ValueError(f"unknown deviation kind '{dev.kind}'")
 
 
-def check_script_bindings(script: Sequence, object_type_by_id: Dict[str, str], knowledge) -> None:
+def check_script_bindings(script: Sequence, object_type_by_id: Dict[str, str], tree: Tree,
+                          check_duration: Callable[[str], Any]) -> None:
     """
     Every task in a script is well typed against the layout (check_task_bindings,
     F47b), including a deviation's task, its content and, for `deviate`, the task
     rebound to its new destination; every object a primitive names exists. A
-    coordinate and a schema's duration binding name no object.
+    coordinate and a schema's duration binding name no object; a task's duration
+    parameter is read by `check_duration`, the body's parser (T-H).
     """
     for e in script:
         if isinstance(e, TaskInstance):
-            check_task_bindings(e, object_type_by_id)
+            check_task_bindings(e, object_type_by_id, check_duration)
         elif isinstance(e, Deviation):
-            check_task_bindings(e.task, object_type_by_id)
+            check_task_bindings(e.task, object_type_by_id, check_duration)
             if e.kind == "deviate":
                 var_name, _ = destination_derivations(e.task.schema)[0]
                 bindings = {v: c for v, c in e.task.bindings.items() if v.name != var_name}
                 bindings[Var(var_name)] = Const(e.destination)
-                check_task_bindings(TaskInstance(schema=e.task.schema, bindings=bindings), object_type_by_id)
-            check_script_bindings(e.content, object_type_by_id, knowledge)
+                check_task_bindings(TaskInstance(schema=e.task.schema, bindings=bindings), object_type_by_id,
+                                    check_duration)
+            check_script_bindings(e.content, object_type_by_id, tree, check_duration)
         elif isinstance(e, ScriptAction):
-            schema = knowledge.get_action_schema(e.action_name)
+            schema = tree.get_action_schema(e.action_name)
             if schema is None:
                 raise ValueError(f"{e}: '{e.action_name}' is not an action of this domain")
             for var_name, value in e.bindings:
