@@ -29,6 +29,19 @@ This is a living reference of *why* things are designed the way they are.
 >   describes: unmodelled behaviour (WORLD).
 > - "a confident wrong belief (Q4) and `unknown` are untouched" (belief-aware planning) → unmodelled behaviour
 >   (WORLD), whose effect on the belief is `unknown` mass, is untouched.
+>
+> **T-H: the human behaviour model (superseding note, 25 Sept 2026; the entry of that name at the end of this file,
+> `docs/glossary.md` §6 and §7).** Entries written before that ruling are read as follows:
+> - "work order" → the assigned tasks (a set the robot is told; the ordering lives only in the human's script).
+> - "deviation" in the 24 Sept terms entry (label A: any departure from the work order; a foreseeable task is "a
+>   deviation that is modelled") → since T-H a deviation is a node of the human's realised plan tree that the robot's
+>   tree does not contain. A switch to a `PersonalTask` in the robot's task model is not a deviation under T-H.
+>   Labels A and B are queries on the executor's record (`assigned(task)`, `coverage(task, robot)`).
+> - "T-H" as the name of the recognizer's duration term for a stay (TODO-85 half (a), the "A stationary human" part of
+>   "Robustness is tested in kitting") → that item is TODO-95; the name T-H now means the human behaviour model.
+> - The T-C1 entry's executed form (primitives, `Stay`, `expand`, provenance, `interrupt` / `deviate` / `abandon`,
+>   landmarks typed by no schema, the work-order check) is superseded by T-H's tree, script, events and stack; the
+>   code keeps it until T-H3.
 
 ---
 
@@ -3501,6 +3514,8 @@ Reference: docs/handoffs/phase7_interactive_deviations.md; T-C ("The human's sce
 
 **The human action script (T-C1, decided)**
 
+SUPERSEDED IN PART by "T-H: the human behaviour model" (25 September 2026), where the two differ; see the note at the top of this file.
+
 DECIDED (cchat, Hadi, 23 September 2026). Nothing built; the build is T-C2. Supersedes "The human's scenario
 is an action script, run on the scenario layer" (T-A1) where the two differ: the primitive set (no separate
 `wait`; a stay is `Stay`), who writes a point-valued `MoveTo` (the exporter, never an author), the human
@@ -3625,6 +3640,8 @@ Reference: TODO-97; TODO-84; "The belief is used as a bar, not a magnitude" (T-A
 
 **Terms for human behaviour, model coverage and the robot's inference (ruled)**
 
+SUPERSEDED IN PART by "T-H: the human behaviour model" (25 September 2026), where the two differ; see the note at the top of this file.
+
 RULED (Hadi, 24 September 2026). Terminology only: no behaviour, identifier, constant, log tag or log text changes,
 and the ruling does not prejudge the pending architecture decision on whether `unknown` stays in the Bayesian
 hypothesis space.
@@ -3677,3 +3694,128 @@ FOLLOW-UP RULINGS (Hadi, 24 September 2026, on the report's flags).
   is part of the belief, not of the model, and prior-on and prior-off runs of one script share one ground truth.
   Under prior-on an unassigned, non-foreseeable task is modelled and suppressed by the prior, a belief-side matter.
 Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TODO-95; I4c
+
+---
+
+**T-H: the human behaviour model**
+
+RULED (Hadi, 25 September 2026). Nothing built; the build is T-H1 to T-H4. Supersedes, where they differ, "The human
+action script (T-C1, decided)" (the executed form, the author vocabulary, provenance, landmarks as a parameter type no
+schema may use, the work-order check) and the WORLD half of "Terms for human behaviour, model coverage and the robot's
+inference (ruled)" (labels A and B become queries on the record; "deviation" gets the definition of item 1). The robot's
+mind is unchanged: T-H changes what the human is, how a scenario is written, and what ground truth is.
+
+Why. The human's script (T-C1) holds the meaning of the human's behaviour in edits of task expansions, so provenance,
+string anchors, a kind-string `Deviation` class, key-based checks and two booleans on `TaskSchema` were needed to
+recover it. The terminology of 24 September named the resulting distinctions but could not remove their cause. T-H
+replaces the representation.
+
+1. DEFINITION. A deviation is a node of the human's realised plan tree that the robot's tree does not contain.
+   Coverage is read at three levels: the task schema is absent, the method is absent, or the binding is absent.
+
+2. ONE TREE OF TASK SCHEMAS PER USE CASE, all with the full HTN structure:
+   ```
+   TaskSchema
+   ├── WorkTask          may appear in a human's assigned tasks (deliver_item)
+   └── PersonalTask      never assigned (coffee_break, ac_activation)
+         └── HumanOnlyTask   never given to any robot (go_to(?landmark), stand(?ticks))
+   ```
+   `TaskSchema.is_assigned` and `is_foreseeable` are removed. A `HumanOnlyTask` may type a parameter as a landmark;
+   no other schema may (this replaces `check_no_landmark_parameters`).
+
+3. THE ROBOT'S TASK MODEL (new term): the subset of the tree the robot is given, chosen per experiment. A
+   `HumanOnlyTask` is rejected when a task model is built. "Foreseeable" is defined, not declared: a `PersonalTask` in
+   the task model. The hypothesis space is built from the task model and the layout, as today. The class is read in
+   one place, the support restriction:
+   ```
+   admissible = { hypotheses of WorkTask instances in the assigned tasks }
+              ∪ { every hypothesis of a PersonalTask in the task model }
+              ∪ { unknown }
+   ```
+   Nothing in the robot's mind may read which schemas are human-only.
+
+4. ASSIGNED TASKS: a set the robot is told. The term "work order" is renamed "assigned tasks" throughout the glossary
+   and the living documents. The ordering lives only in the human's script.
+
+5. THE HUMAN'S SCRIPT: an ordered list of `TaskInstance`s of the tree, with events attached to a task:
+   ```
+   deliver_item("item_1", table="table_2")                a binding-level deviation is a plain instance
+   deliver_item("item_3").at(pick_up, coffee_break())    an event: a decision fired by a trigger
+   deliver_item("item_3").at(pick_up, drop)               abandon
+   stand(50), go_to("door")                               HumanOnlyTask instances as plain entries
+   ```
+   `at(action, decision)`: `action` is a reference to an `ActionSchema` object of the task's decomposition (an
+   occurrence index when the method repeats it); `decision` is any `TaskInstance` of the tree, or `drop`. Verified at
+   load: the action occurs in the decomposition, the instance is well typed against the layout. The check that a
+   stated table agrees with the station (`check_task_destinations`) applies to the assigned tasks and the robot's
+   plans only; the human's script is checked for types only.
+   `during(action, ticks=n, do=...)` is the trigger for a cut inside an action. Designed now, built when the live-run
+   exporter needs it. No fraction or position forms.
+   `Stay` and the hand-written primitives (`MoveTo`, `PickUp`, `Place`) are removed; standing is `stand(?ticks)`,
+   walking to a landmark is `go_to(?landmark)`.
+
+6. THE HUMAN'S EXECUTOR OWNS A STACK, one level deep: on an event it suspends the current task, runs the decision's
+   task, and resumes the suspended task by re-expanding it in the current state (sequential expansion through the
+   successor state stays; `deliver_already_held` follows from the held item). `drop` applies to the task it is written
+   on. The executor can stop an action mid-way and resume from there. Outcomes (completed, suspended, abandoned) are
+   computed from what the stack did, never authored.
+
+7. THE RECORD: the executor writes, per tick, the stack (top first), the action and its progress. It is the ground
+   truth. Queries on it, each typed: `switches`, `resumptions`, `assigned(task)`, `coverage(task, robot)` with values
+   `COVERED | TASK_ABSENT | METHOD_ABSENT | BINDING_ABSENT`, and `truth_at(tick)`. These replace labels A and B,
+   `Provenance`, `Deviation`, string anchors and the key-counting `check_work_order`.
+
+8. LIVE RUNS: `executor.inject(task | drop)` builds an event with the trigger "now"; buttons are a fixed set of inject
+   calls. Export rewrites "now" as `at(...)` or `during(..., ticks=n)` from the record; an exported run must replay
+   byte-identically.
+
+9. ACTIONS: `wait_at` is renamed `stand(?ticks)`: no location; where the agent stands follows from the method's
+   preceding `move_to`, with the same precondition mechanism as `pick_up` when a method needs it. Used both in
+   `coffee_break` and as the single action of the `stand` task. Recognizer phase logic unchanged.
+
+10. NOT PART OF T-H.
+    - IR is not redesigned. T-D resumes on this structure; T-D Q1 stays "what the robot infers and does when no
+      hypothesis explains the evidence, inside `unknown` or outside it", now with ground-truth cases: a switch to a
+      modelled task, a switch to an unmodelled task, a binding-level deviation, no task on the stack, an episode's
+      first ticks.
+    - Oracle-IR evaluation: its own pipeline task after T-H (TODO-101). Three conditions on the same scenario: no IR;
+      IR; oracle IR, where the meta-planner receives `truth_at(tick)` instead of the belief. The interface it needs is
+      recorded in TODO-101.
+    - Alternative 1 (a human mind that generates events; a stack-aware IR): recorded as the next architecture
+      direction, not scheduled (roadmap).
+    - Nested interruptions beyond one level: the stack allows them; the restriction is lifted only when a scenario
+      needs it (TODO-100).
+
+11. ACCEPTANCE ACROSS T-H: after each build, the 40 maintained baseline logs are rerun; robot-side lines (`[IR]`,
+    `[IR-dist]`, `[meta-*]`, decisions) must be byte-identical except for the `wait_at` → `stand` rename; human-side
+    differences are listed and each explained. At the end of T-H3 the new logs replace the stored baselines.
+
+THE BUILD, one session each:
+- T-H1 the tree and the task model (items 2, 3, 9, and the destination check's move).
+- T-H2 the executor: `Event`, `at`, `drop`, `inject`, the stack, the mid-action cut, the record (items 5 to 8, without
+  `during`'s authored form, TODO-99).
+- T-H3 the migration of the scenarios; deletion of the C1 vocabulary, `Deviation`, `Provenance`, `expand` /
+  `resolve_script` as a separate form, the key-based checks, `Stay`, `MoveTo` / `PickUp` / `Place`.
+- T-H4 the record's queries and coverage (item 7); supersedes TODO-92.
+
+RECORDED AT WRITING (ccode, 25 September 2026), points the ruling leaves to the build; not decided here:
+- (T-H1) `wait_at`'s completion is the world fact `waited(agent, entity)` and is the terminal condition of
+  `coffee_break` and `ac_activation` (the recognizer pins them on it, `[IR-complete]`; the pool reads it through
+  `is_complete()`). A `stand(?ticks)` with no location has no entity to state it with. Which fact completes `stand`,
+  and how `coffee_break(coffee_machine_0)`'s terminal condition names the machine, is to be settled in T-H1 under
+  item 11's rule (robot-side lines unchanged but for the rename).
+- (T-H1) In the code at 19e7b8b `check_task_destinations` already runs on `assigned_tasks` only, for both agents, and
+  not on the human's `scheduled_tasks` (`mesa_sim/sim_model.py`, the T-B1a block). The move is to where the task model
+  and the robot's plans are checked.
+- (T-H1) `is_foreseeable` is read in the robot's mind at one place (`IntentionRecognizer._build_admissible_keys`);
+  `DomainKnowledge.get_assigned_intentions()` and `get_foreseeable_intentions()` read the two booleans and have no
+  caller. The per-domain `DomainModel.intentions` set is the nearest existing thing to the task model.
+- (T-H2) An injection that lands inside an action exports as `during(..., ticks=n)`, whose authored form is TODO-99;
+  until it is built the byte-identical replay of item 8 covers injections at an action boundary (exported as `at`).
+- (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
+  table="table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance or its
+  enumerated bindings is part of the query's type, settled in T-H4.
+Reference: Hadi's ruling, 25 September 2026; docs/handoffs/handoff_T-H.md; "The human action script (T-C1, decided)";
+"Terms for human behaviour, model coverage and the robot's inference (ruled)"; "A run-time deviation is the same
+operation as a load-time edit" (Phase 7); TODO-80, TODO-85, TODO-86, TODO-87, TODO-92, TODO-98, TODO-99, TODO-100,
+TODO-101
