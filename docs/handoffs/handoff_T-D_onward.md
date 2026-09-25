@@ -5,6 +5,37 @@ T-B Q6, T-B3, the `task_committed` debate and its removal (D3), the TODO-90 chec
 T-C2a/b/c (build), the script play across nine layouts, and the recording of Phase 7. Everything in
 it is committed and pushed; nothing is open in ccode.
 
+## What T-D now stands on (added 26 September 2026, after T-H)
+
+T-H (the human behaviour model, T-H1 to T-H4; `docs/handoffs/handoff_T-H.md`, its close-out) ran between this handoff
+and T-D. It changed nothing in the robot's mind; it changed what the human is, how a scenario is written, and what
+ground truth is. Read the body below with the T-H terms (`docs/glossary.md` §6, §7):
+- THE TREE AND THE TASK MODEL. One tree of task schemas per use case (`WorkTask`, `PersonalTask`, `HumanOnlyTask`), and
+  one task model per robot built from it (`shared/knowledge.py`). "Foreseeable" is a `PersonalTask` in the task model;
+  "work order" is "assigned tasks".
+- THE SCRIPT AND THE RECORD. A human's script is a `Script` of task instances with typed events (`.at`, `.during`,
+  `drop`; the kitting call forms in `domains/kitting/script.py`), run by a one-level stack (`world/human_executor.py`).
+  The executor's record (`world/record.py`) is the ground truth, streamed per tick as `[rec]` lines in
+  `logs/run_<timestamp>.rec`. Where the body below says "anchor", "abandon", "stay" or `Stay(n)`, read `.at(action,
+  task | drop)`, `drop` and the `stand` task.
+- THE QUERIES (`world/queries.py`, on the in-memory record): `truth_at(record, tick)`, `switches`, `resumptions`,
+  `assigned(task, …)` (the assigned task and its departures, or `None`), `unperformed(record, …)` and
+  `coverage(task, robot)` (`Covered`, `TaskAbsent`, `BindingAbsent`). Task equality is `same_task`. An offline analysis
+  reruns a baseline in-process and checks its `.rec` md5 first; the stream is never read back.
+- THE COVERAGE LINE: `[coverage] <human> <robot> entry=<i> <task>=<value> …` in the run log at load, one per script
+  entry for each observing robot; the same with the prior on and off.
+
+T-D Q1's ground-truth cases (design_decisions.md, "T-H", item 10), restated as record queries:
+- a switch to a modelled task: a `Started` in `switches(record)` whose task's `coverage` is `Covered`;
+- a switch to a modelled task outside the support: the same, with `assigned(task)` `None` for a `WorkTask` instance
+  (its hypothesis is refuted under the prior: a belief-side matter, not a coverage one);
+- a switch to an unmodelled task: a `Started` whose task's `coverage` is `TaskAbsent` or `BindingAbsent`;
+- a binding-level deviation: the task on top has `assigned(task)` with a departure and `coverage` `BindingAbsent`
+  (scenario_85, scenario_92);
+- no task on the stack: `truth_at(record, tick).stack == []` (scenario_70 / 71 after the AC switch);
+- an episode's first ticks: the ticks after a `Left(task, COMPLETED)`, where `truth_at` gives the task entered or
+  resumed that tick while the recognizer restarts from the prior.
+
 ## 0. How to use this document
 
 - The repo on `main` at `528924d` (pushed after the authoring-convention records) is the base. The
