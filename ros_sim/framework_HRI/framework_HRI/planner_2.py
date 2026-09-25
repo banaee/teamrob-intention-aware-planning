@@ -249,7 +249,7 @@ class PlannerVisualizer(Node):
         robot_agent = next(
             a for a in scenario_10.agents if a.agent_id == "robot_0"
         )
-        self.task_queue = list(robot_agent.scheduled_tasks)  # list of TaskInstance
+        self.task_queue = robot_agent.scheduled_tasks.tasks()  # list of TaskInstance (a Script since T-H3)
         self.task_index  = 0
 
         # --- ContinuousExecutor -------------------------------------------

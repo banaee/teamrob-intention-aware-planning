@@ -494,10 +494,10 @@ def successor_state(
     value: `world` is read and never written, and every container that
     differs is a copy. Hypothetical — nothing has been executed. Two readers:
     Projector.project(), between two entries of one call and no longer (T-B2a);
-    and the human action script's resolution at load (domains/script.py,
-    resolve_script(), T-C2b), each task expanded against the state the
-    elements before it leave behind. A module function so that both read one
-    successor state, not two.
+    and the load-time replay of the human's script (world/human_executor.py,
+    check_script(), T-H2), each action advancing the symbolic state the
+    script's tasks are expanded against. A module function so that both read
+    one successor state, not two.
 
     Derived from the action schemas only, action by action in plan order,
     with each grounded action's own bindings — no predicate, parameter or

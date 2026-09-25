@@ -6,10 +6,9 @@ PURPOSE:
     Bridges the Mesa simulation loop with the shared cognitive layer.
 
 AGENTS:
-    HumanAgent  — scripted agent. Two script forms until T-H3: the C1 resolved
-                  list of primitives, run one by one (T-C2b); and the T-H Script,
-                  run by the stack machine (world/human_executor.py, T-H2),
-                  this agent being its body-side driver. Exposes no task to the
+    HumanAgent  — scripted agent. Its script (T-H) is run by the stack machine
+                  (world/human_executor.py, T-H2), this agent being its
+                  body-side driver. Exposes no task to the
                   world: the robot has no access to the script, the stack or
                   the record.
 
@@ -38,10 +37,9 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothes
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
-from shared.types import (AbstractPlan, BeliefState, Decision, ExecutorState, GroundedAction, Script, Start, Stay,
+from shared.types import (AbstractPlan, BeliefState, Decision, ExecutorState, GroundedAction, Script, Start,
                           TaskInstance, task_instance_key)
 from world.record import Record, Snapshot
-from domains.script import ground
 from world.human_executor import StackMachine, RunAction, ResumeAction
 
 from mesa_sim.mesa_fork import agent
@@ -68,10 +66,10 @@ OBSERVATION_OFFSET = 1.0
 # logger so that mesa_sim/run_mesa.py can send it to a file beside the run log.
 _REC = logging.getLogger("rec")
 
-# Mesa ticks the HUMAN's body spends completing a task: none. Its executor is
-# action-level (HumanAgent, T-C2b): it runs primitives, knows no task, and
-# hands the next primitive to the Executor on the tick after the last one's
-# acknowledgement, so no tick is spent between the end of one task and the
+# Mesa ticks the HUMAN's body spends completing a task: none. Its body runs
+# one action at a time (HumanAgent, T-C2b; the stack machine's driver since
+# T-H2) and hands the next action to the Executor on the tick after the last
+# one's acknowledgement, so no tick is spent between the end of one task and the
 # start of the next. Handed to the robot's Projector for the human's projection
 # beside the robot's own TASK_COMPLETION_LATENCY; the per-action
 # acknowledgement (ACTION_COMPLETION_LATENCY) is the same executor's for both.
@@ -102,31 +100,24 @@ class FactoryAgent(agent.Agent):
 
 class HumanAgent(FactoryAgent):
     """
-    Scripted human worker, action-level (T-C1, built in T-C2b). Holds the
-    resolved list of primitives of its script (domains/script.resolve_script(),
-    set by SimModel once the initial world exists). A ScriptAction is grounded
-    when it is reached — schema, bindings, completion predicate; its target
-    position is resolved by the executor at that moment, so an item the robot
-    has already taken is not there — and handed to the same Executor as a
-    one-action plan. Stay(n) idles n ticks, Stay() idles to the end of the run,
-    an empty list stands. No task, no task completion, no per-task completion
-    tick: the next primitive starts on the tick after the last one's
-    acknowledgement. Robot has no reference to this script.
+    Scripted human worker (T-H): the body-side driver of the stack machine
+    (world/human_executor.StackMachine), which holds the human's script, its
+    stack and its record, set by SimModel once the initial world exists
+    (load_stack). Each action the machine hands over is run by the same
+    Executor as a one-action plan, its target resolved at that moment (an
+    item the robot has already taken is not there). No per-task completion
+    tick: the next action starts on the tick after the last one's
+    acknowledgement. An empty stack stands. Robot has no reference to the
+    script, the stack or the record.
     """
 
     def __init__(self, unique_id: str, model: "SimModel", pos: tuple):
         super().__init__(unique_id, model, pos)
 
-        self.script: List = []                   # ScriptAction | Stay, resolved at load
-        self.script_index: int = 0
-        self.current_plan: Optional[AbstractPlan] = None   # the primitive in hand, as a one-action plan
-        self._stay_remaining: Optional[int] = None         # ticks left of the Stay in hand (-1: Stay()); None: no Stay
-
-        # The T-H path (T-H2): the stack machine and its record, set by
-        # load_stack(); the action in hand (a one-action plan, as the C1 path
-        # hands it); the body's remainder of the one suspended action (the
-        # stack is one level deep, so one); the live decisions to apply on the
-        # next tick (inject).
+        # The stack machine and its record, set by load_stack(); the action in
+        # hand (a one-action plan); the body's remainder of the one suspended
+        # action (the stack is one level deep, so one); the live decisions to
+        # apply on the next tick (inject).
         self.machine: Optional[StackMachine] = None
         self.record: Optional[Record] = None
         self._in_hand: Optional[GroundedAction] = None
@@ -135,13 +126,8 @@ class HumanAgent(FactoryAgent):
 
         self.executor = Executor(agent=self)
 
-    def load_script(self, primitives: List):
-        """The resolved script (SimModel._resolve_human_scripts()), before step 0."""
-        self.script = list(primitives)
-        self.script_index = 0
-
     def load_stack(self, script: Script, planner: AdaptivePlanner):
-        """The T-H script, checked at load (world/human_executor.check_script),
+        """The script, checked at load (world/human_executor.check_script),
         before step 0. The planner is on the world's tree."""
         self.record = Record()
         self.machine = StackMachine(script, planner, self.unique_id,
@@ -154,56 +140,14 @@ class HumanAgent(FactoryAgent):
         self._injections.append(decision)
 
     def step(self):
-        if self.machine is not None:
-            self._step_stack()
-            return
-        world = build_world_state(self.model)
-
-        # The primitive in hand is done once its action is acknowledged: the
-        # executor's cursor is past the plan's one action. Handing the executor
-        # no plan clears it, so the next primitive loads from a clean executor
-        # and owes nothing (the per-task completion tick is the robot's).
-        if self.current_plan is not None and self.executor.action_index >= len(self.current_plan.actions):
-            self.current_plan = None
-            self.executor.step(plan=None, world=world)
-            self.script_index += 1
-
-        while self.current_plan is None and self._stay_remaining is None:
-            if self.script_index >= len(self.script):
-                self._idle()
-                return
-            element = self.script[self.script_index]
-            logging.info(f"[human] step={int(self.model.schedule.steps)} {self.unique_id} "
-                         f"primitive {self.script_index}: {element}")
-            if isinstance(element, Stay):
-                if element.ticks == 0:
-                    self.script_index += 1
-                    continue
-                self._stay_remaining = element.ticks if element.ticks is not None else -1
-            else:
-                action = ground(element, self.unique_id, self.model.tree)
-                self.current_plan = AbstractPlan(goal_intention=action.action_name, actions=[action])
-
-        if self._stay_remaining is not None:
-            # A Stay: this tick stands. Stay() (-1) never ends.
-            self._idle()
-            if self._stay_remaining > 0:
-                self._stay_remaining -= 1
-                if self._stay_remaining == 0:
-                    self._stay_remaining = None
-                    self.script_index += 1
-            return
-
-        self.executor.step(plan=self.current_plan, world=world)
-        self.current_action = self.executor.current_action
-        self.current_microaction = self.executor.current_microaction
+        self._step_stack()
 
     def _idle(self):
         self.current_action = None
         self.current_microaction = None
 
     # ------------------------------------------------------------------
-    # The T-H path: the body-side driver of the stack machine (T-H2)
+    # The body-side driver of the stack machine (T-H2)
     # ------------------------------------------------------------------
 
     def _step_stack(self):
@@ -213,8 +157,8 @@ class HumanAgent(FactoryAgent):
         decisions are applied; a DuringAction whose tick is reached cuts the
         action in hand; then the machine says what to run and the body runs one
         microaction of it. The record gets this tick's snapshot and its `[rec]`
-        line. The per-task completion tick is never spent (one action at a time,
-        as the C1 path), so the human projection's 0 stays true.
+        line. The per-task completion tick is never spent (one action at a
+        time), so the human projection's 0 stays true.
         """
         world = build_world_state(self.model)
         tick = int(self.model.schedule.steps)

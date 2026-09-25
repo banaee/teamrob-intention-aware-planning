@@ -34,7 +34,7 @@ USED BY:
     - shared/recognizer.py, shared/projection.py, shared/meta_planner.py → TaskModel
     - shared/planner.py      → ProceduralKnowledge (a Tree for the human's
                                script, a TaskModel for the robot)
-    - domains/script.py      → Tree
+    - world/human_executor.py → Tree (through the planner)
     - mesa_sim/sim_model.py  → builds the Tree and one TaskModel per robot
     - mesa_sim/sim_agents.py → TaskModel, ContextKnowledge.default()
 """
@@ -109,10 +109,6 @@ class ProceduralKnowledge:
     # ----------------------------------------------------------------------
     # Action queries
     # ----------------------------------------------------------------------
-
-    def get_action_schema(self, action_name: str) -> Optional[ActionSchema]:
-        """Return ActionSchema for an action type, or None if not found."""
-        return self._actions.get(action_name)
 
     def get_all_actions(self) -> List[ActionSchema]:
         """Every ActionSchema held (schema validation at construction)."""

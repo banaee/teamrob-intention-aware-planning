@@ -47,10 +47,10 @@ WHAT THIS MODULE DOES:
           decided hold, never advances the plan, and decides nothing about
           whether to wait for planning reasons or which task to run.
 
-    For HumanAgent (action-level, T-C2b):
-        - The same loop, handed one primitive of the human's script at a time as
-          a one-action plan (mesa_sim/sim_agents.HumanAgent). The agent hands it
-          no plan before the next primitive, so _on_task_complete() is never
+    For HumanAgent (action-level, T-C2b; the stack machine's driver, T-H2):
+        - The same loop, handed one action of the human's stack machine at a
+          time as a one-action plan (mesa_sim/sim_agents.HumanAgent). The agent
+          hands it no plan before the next action, so _on_task_complete() is never
           reached for the human and no per-task completion tick is spent
 
 WHAT THIS MODULE DOES NOT DO:

@@ -29,9 +29,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from shared.knowledge import Tree, TaskModel
 from shared.planner import AdaptivePlanner
-from shared.types import (ScenarioConfig, Script, TaskSchema, check_task_bindings, check_task_destinations,
-                          check_work_order)
-from domains.script import check_script_bindings, resolve_script
+from shared.types import ScenarioConfig, TaskSchema, check_task_bindings, check_task_destinations
 from world.human_executor import check_script
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
@@ -302,8 +300,8 @@ class SimModel(model.Model):
     def _spawn_agents(self, scenario: ScenarioConfig):
         """
         Spawn agents from ScenarioConfig.
-        HumanAgent receives its scheduled_tasks, resolved into primitives, as
-        its script — its execution order (_resolve_human_scripts()).
+        HumanAgent receives its scheduled_tasks, a Script, checked at load and
+        run by its stack machine (_load_human_scripts()).
         RobotAgent receives its assigned_tasks as its task pool, plus (when the
         assignment_prior switch is on) the observed human's assigned_tasks,
         never the script; and its task model, built from the tree (T-H).
@@ -314,19 +312,14 @@ class SimModel(model.Model):
         # (F47b, TODO-49): the bound objects exist, with the types the schema
         # declares, and a duration parameter is a duration the body's own parser
         # reads (T-H). An error, not a warning.
-        # A human's script is checked element by element: every task in it
-        # (a deviation's too), and every object a primitive names (T-C2a).
+        # A script is checked for types only (T-H): every task it names, an
+        # entry's or a Start's.
         object_type_by_id = {obj_id: obj.type for obj_id, obj in self.objects.items()}
         check_duration = lambda duration: _parse_duration_to_steps(duration, self)
         for agent_cfg in scenario.agents:
             try:
-                if isinstance(agent_cfg.scheduled_tasks, Script):
-                    # the T-H form: every task it names, an entry's or a Start's
-                    for task in agent_cfg.scheduled_tasks.tasks():
-                        check_task_bindings(task, object_type_by_id, check_duration)
-                else:
-                    check_script_bindings(agent_cfg.scheduled_tasks or [], object_type_by_id, self.tree,
-                                          check_duration)
+                for task in agent_cfg.scheduled_tasks.tasks():
+                    check_task_bindings(task, object_type_by_id, check_duration)
                 for task in agent_cfg.assigned_tasks or []:
                     check_task_bindings(task, object_type_by_id, check_duration)
             except ValueError as e:
@@ -336,8 +329,8 @@ class SimModel(model.Model):
             start_pos = agent_cfg.start_position
 
             if agent_cfg.agent_type == "human":
-                # Its script is resolved once every agent is placed
-                # (_resolve_human_scripts(), below): expansion needs the initial world.
+                # Its script is checked and loaded once every agent is placed
+                # (_load_human_scripts(), below): the replay needs the initial world.
                 agent = HumanAgent(
                     unique_id=agent_cfg.agent_id,
                     model=self,
@@ -360,7 +353,7 @@ class SimModel(model.Model):
                     if (self.assignment_prior and observed_cfg is not None)
                     else None
                 )
-                if agent_cfg.scheduled_tasks and not agent_cfg.assigned_tasks:
+                if agent_cfg.scheduled_tasks.entries and not agent_cfg.assigned_tasks:
                     logger.warning(
                         "Robot %s declares scheduled_tasks but no assigned_tasks — "
                         "its task pool is empty (robot scheduled_tasks is not read; see TODO-39)",
@@ -380,7 +373,7 @@ class SimModel(model.Model):
                 self.schedule.add(agent)
                 self.robots[agent_cfg.agent_id] = agent
 
-        self._resolve_human_scripts(scenario)
+        self._load_human_scripts(scenario)
 
     def _check_destinations(self, scenario: ScenarioConfig, robot_cfg, agent_cfgs: Dict) -> None:
         """
@@ -400,44 +393,28 @@ class SimModel(model.Model):
                 except ValueError as e:
                     raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
 
-    def _resolve_human_scripts(self, scenario: ScenarioConfig):
+    def _load_human_scripts(self, scenario: ScenarioConfig):
         """
-        Each human's script resolved from the initial world (T-C1, T-C2a):
-        every TaskInstance expanded by the planner's decomposition, each against
-        the state the elements before it leave behind (T-C2b), every deviation
-        applied, so the executed form is primitives only; the assigned tasks
-        checked again on it, by provenance. Expanded with the world's tree (T-H).
-        Handed to the HumanAgent, whose executor is action-level (T-C2b); every
-        human runs through it.
+        Each human's script (T-H) checked against the initial world by the
+        load-time replay (world/human_executor.check_script): every anchor
+        against the sequential expansion, events and resumptions included, by
+        the same stack machine the agent runs; then handed to the HumanAgent.
+        Expanded with the world's tree.
         """
         world = build_world_state(self)
         planner = AdaptivePlanner(knowledge=self.tree)
-        # The body's conversions for the load-time replay of a T-H Script: a
-        # duration to ticks, a walk to its step positions (the same functions
-        # the executor runs).
+        # The body's conversions for the replay: a duration to ticks, a walk to
+        # its step positions (the same functions the executor runs).
         ticks_of = lambda duration: _parse_duration_to_steps(duration, self)
         walk = lambda start, target: [m.params["target_pos"] for m in steps_toward(start, target, _get_step_size(self))]
         for agent_cfg in scenario.agents:
             if agent_cfg.agent_type != "human":
                 continue
-            where = f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}'"
-            if isinstance(agent_cfg.scheduled_tasks, Script):
-                # The T-H form (T-H2): every anchor checked against the
-                # sequential expansion, events and resumptions included, by the
-                # same stack machine the agent runs; then handed to it.
-                try:
-                    check_script(agent_cfg.scheduled_tasks, planner, world, agent_cfg.agent_id, ticks_of, walk)
-                except ValueError as e:
-                    raise ValueError(f"{where}: {e}") from e
-                self.humans[agent_cfg.agent_id].load_stack(agent_cfg.scheduled_tasks, planner)
-                continue
             try:
-                resolved = resolve_script(agent_cfg.scheduled_tasks or [], planner, world, agent_cfg.agent_id)
-                if agent_cfg.assigned_tasks:
-                    check_work_order(agent_cfg.agent_id, resolved, agent_cfg.assigned_tasks)
+                check_script(agent_cfg.scheduled_tasks, planner, world, agent_cfg.agent_id, ticks_of, walk)
             except ValueError as e:
-                raise ValueError(f"{where}: {e}") from e
-            self.humans[agent_cfg.agent_id].load_script(resolved)
+                raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
+            self.humans[agent_cfg.agent_id].load_stack(agent_cfg.scheduled_tasks, planner)
 
     # =========================================================================
     # Public query methods

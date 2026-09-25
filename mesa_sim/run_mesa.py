@@ -80,7 +80,6 @@ logging.basicConfig(
 )
 # The human executor's record (T-H2): its own stream, one `[rec]` line per tick,
 # in a file beside the run log (logs/run_<timestamp>.rec), never in the run log.
-# Empty while every human runs the C1 script (until T-H3).
 rec_filename = f"logs/run_{timestamp}.rec"
 _rec_logger = logging.getLogger("rec")
 _rec_logger.propagate = False
