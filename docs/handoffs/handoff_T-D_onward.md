@@ -35,6 +35,8 @@ T-D Q1's ground-truth cases (design_decisions.md, "T-H", item 10), restated as r
 - no task on the stack: `truth_at(record, tick).stack == []` (scenario_70 / 71 after the AC switch);
 - an episode's first ticks: the ticks after a `Left(task, COMPLETED)`, where `truth_at` gives the task entered or
   resumed that tick while the recognizer restarts from the prior.
+  The recognizer's episode boundary is its own attribution and may not coincide tick for tick with the
+  `Left(COMPLETED)`; the misalignment is part of what T-D Q1 measures.
 
 ## 0. How to use this document
 

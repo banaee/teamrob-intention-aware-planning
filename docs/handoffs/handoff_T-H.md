@@ -26,8 +26,9 @@ are the record of the ruling and the plan as written on 25 September; where they
 | T-H4 the record's queries | `da4c61f`, `e4fe110` | `world/queries.py`; task equality `same_task`; `Departure`; the `[coverage]` line |
 
 ACCEPTANCE (section 4), as measured:
-- T-H1: no baseline regenerated; the T-C2b baselines stood through T-H1 and T-H2, and T-H2's check against them was
-  byte-identical.
+- T-H1: no baseline regenerated; T-H1's report (the session report to Hadi) found the 48 logs (the 40 maintained and
+  tb3's 8 `single_task` runs) byte-identical to those before its commits; the T-C2b baselines stood through T-H1 and
+  T-H2, and T-H2's check against them was byte-identical.
 - T-H2: the 40 maintained logs and tb3's 8 unstored `single_task` runs byte-identical; the `.rec` files empty.
 - T-H3: the 40 maintained logs byte-identical to the T-C2b baselines outside the `[human]` lines (the record's
   transitions replace the C1 primitive lines); the first non-empty `.rec` baselines; the four sets regenerated (T-H3
