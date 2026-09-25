@@ -263,3 +263,29 @@ non-empty `.rec` baselines), git-ignored like the logs.
 | s70_on | be162273ccbb0afa69dd7a18133476ac | dab078d5ca51e5b378054ee6a60ccca7 |
 | s71_off | 6f56274520131c22fa3e4357c0f42cc5 | dab078d5ca51e5b378054ee6a60ccca7 |
 | s71_on | 6d3d29b11454fa41f93dcfda5e6fd0cc | dab078d5ca51e5b378054ee6a60ccca7 |
+
+## T-H4: the record's queries and the coverage line — the logs from here on
+
+Regenerated after T-H4 with the same command, superseding the T-H3 table. CAUSE: the loader prints one `[coverage]`
+line per script entry for each robot observing the human, after the `[run]` headers (`docs/design_decisions.md`, "T-H:
+the human behaviour model", as built T-H4). Against the T-H3 logs every other line is byte-identical, and every `.rec`
+stream is byte-identical (its md5 unchanged).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s00_off | 51ef9d8cf71995533902b222c357169d | 5c7835ba3417ff28b5d3caf1d00d906e |
+| s00_on | f4bf6bd1e50ff7fbf2114b8f8f632a76 | 5c7835ba3417ff28b5d3caf1d00d906e |
+| s10_off | f4f5df8d0b2c62f99cf9c541b8fb9f13 | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| s10_on | 68301538d51f66a3652a8f3f9eebb538 | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| s20_off | 455f722656e202a9e6fbe6a16ddcbbbc | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s20_on | fc4bc808ef9afc32b4253b491ed06418 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s30_off | 8994efea289233a561bb0af359486fd6 | 65d234649396c9ab242841050082e9b0 |
+| s30_on | 9f2f3ccdaba00d980ebdec7c2a730812 | 65d234649396c9ab242841050082e9b0 |
+| s40_off | d874e4aa63d47730d2c1053799e5fdc2 | f6da9d345530212df9b0446aa53d1f1e |
+| s40_on | babc3bea02577c8f5af322debc32830d | f6da9d345530212df9b0446aa53d1f1e |
+| s50_off | b70d55ef7723c1a62ebbe792283a9074 | 3e4fd412ba39ddd3267d1d37089beaac |
+| s50_on | 307d8b5b24718c2f7da300043fe5735a | 3e4fd412ba39ddd3267d1d37089beaac |
+| s70_off | 557a61441bd29b30960302be3d70d730 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s70_on | be391644cd03f4ba324b66ddef6e9596 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s71_off | a961d30bb772d1f935f28bf3e5771411 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s71_on | ef9e2b2cea9d8f9a83b22218f9403a49 | dab078d5ca51e5b378054ee6a60ccca7 |

@@ -249,3 +249,17 @@ non-empty `.rec` baselines), git-ignored like the logs.
 | s80_on | cfdb673f72a5fb7eb1ddac9b621daea0 | 8cf0930761924a3aab1f1713f3f4bf29 |
 | s81_off | 0483180acbe5ae39ef08a13b73d0b0e4 | 329590c9c1249859bfe20d107588c50a |
 | s81_on | d2a27a4d972bfd48d7a5781db354fd76 | 329590c9c1249859bfe20d107588c50a |
+
+## T-H4: the record's queries and the coverage line — the logs from here on
+
+Regenerated after T-H4 with the same command, superseding the T-H3 table. CAUSE: the loader prints one `[coverage]`
+line per script entry for each robot observing the human, after the `[run]` headers (`docs/design_decisions.md`, "T-H:
+the human behaviour model", as built T-H4). Against the T-H3 logs every other line is byte-identical, and every `.rec`
+stream is byte-identical (its md5 unchanged).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s80_off | f3408a14ac20412e64f938ff6e7432b2 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_on | 2ed5dcf1ea92ec89051b224fbf87ce74 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s81_off | 39686f37181674b300991b610098f4d3 | 329590c9c1249859bfe20d107588c50a |
+| s81_on | 206682a2db1ee59e4dcc3ed5c1b8290d | 329590c9c1249859bfe20d107588c50a |

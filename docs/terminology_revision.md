@@ -337,8 +337,9 @@ divergence diagrams as statements about the belief (section 3) and the terms not
 
 ```
 24 September (sections 1.1, 2, 4)             T-H (glossary §6, §7)
-label A, work order: assigned task |           assigned(task): true | false; no value on an empty stack;
-  deviation                                      unperformed(assigned_tasks): the assigned tasks never on a stack
+label A, work order: assigned task |           assigned(task): the assigned task and its departures | None;
+  deviation                                      no value on an empty stack; unperformed(assigned_tasks): the
+                                                 assigned tasks never completed without a departure (T-H4)
 label B: modelled | unmodelled                 coverage(task, robot): COVERED | TASK_ABSENT |
   (a HypothesisKey describes it, or not)         BINDING_ABSENT, per task instance on the stack
 label C: declared experimental condition       unchanged; the check reads coverage from the record
@@ -361,11 +362,11 @@ contain, at one of two levels (task schema, binding). So:
 
 | case (section 2) | written under T-H | `assigned` | `coverage` |
 |---|---|---|---|
-| an assigned delivery | `deliver_item("item_3")` | true | `COVERED` |
-| a `coffee_break` interrupt | `deliver_item("item_3").at(pick_up, coffee_break("coffee_machine_0"))`; the delivery suspended, then resumed | false (the coffee break, on top of the stack) | the coffee break: `COVERED` if the task model holds `coffee_break`, else `TASK_ABSENT`; the interrupted delivery, judged on its own instance: `COVERED` |
-| a wrong-table delivery (TODO-87) | `deliver_item("item_0", table="kitting_table_1")`, a plain instance | settled in T-H4 (the query's type) | `BINDING_ABSENT` |
-| a walk to corner_NE | `go_to("corner_NE")` | false | `TASK_ABSENT` (a `HumanOnlyTask`) |
-| a stand of 5 minutes | `stand("PT5M")` (the stand task, its stand action emits no world fact) | false | `TASK_ABSENT` |
+| an assigned delivery | `deliver_item("item_3")` | the assigned task, no departure | `COVERED` |
+| a `coffee_break` interrupt | `deliver_item("item_3").at(pick_up, coffee_break("coffee_machine_0"))`; the delivery suspended, then resumed | `None` (the coffee break, on top of the stack) | the coffee break: `COVERED` if the task model holds `coffee_break`, else `TASK_ABSENT`; the interrupted delivery, judged on its own instance: `COVERED` |
+| a wrong-table delivery (TODO-87) | `deliver_item("item_0", table="kitting_table_1")`, a plain instance | the assigned task with a departure, `?kitting_table=kitting_table_1` (T-H4) | `BINDING_ABSENT` |
+| a walk to corner_NE | `go_to("corner_NE")` | `None` | `TASK_ABSENT` (a `HumanOnlyTask`) |
+| a stand of 5 minutes | `stand("PT5M")` (the stand task, its stand action emits no world fact) | `None` | `TASK_ABSENT` |
 | the idle human after the script | nothing on the stack | no value | no value |
 
 The belief and finding columns of section 2 are unchanged: T-H does not touch the robot's mind.
@@ -380,7 +381,8 @@ It reads the record (in simulation only; a real human needs annotation of the sa
 the hypothesis space: every task on the record whose coverage is not
 `COVERED` must be covered by the scenario's declared condition. The convention's terminal exit walk is now
 `go_to("door")` or a corner, declared for every scenario as before; the terminal stand at a table (TODO-80) stays a
-mismatch unless declared. Built with the queries in T-H4 (TODO-92 superseded).
+mismatch unless declared. The queries it reads are built (T-H4; TODO-92 superseded); the check itself is not: a
+scenario's declared condition is free text in its description.
 
 ### 8.5 Identifiers and wording
 

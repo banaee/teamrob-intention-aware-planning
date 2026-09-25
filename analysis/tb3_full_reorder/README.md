@@ -181,3 +181,25 @@ non-empty `.rec` baselines), git-ignored like the logs.
 | s83_full_reorder_on | b3913816203cb94cabc51562e64e4993 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_single_task_off | 7d5c69a760b717a400f356800cdbd600 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_single_task_on | 186db58f357d2bb33bd457e2a45287d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-H4: the record's queries and the coverage line — the logs from here on
+
+Regenerated after T-H4 with the same command, superseding the T-H3 table. CAUSE: the loader prints one `[coverage]`
+line per script entry for each robot observing the human, after the `[run]` headers (`docs/design_decisions.md`, "T-H:
+the human behaviour model", as built T-H4). Against the T-H3 logs every other line is byte-identical, and every `.rec`
+stream is byte-identical (its md5 unchanged).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s20_full_reorder_off | dfc33d336deffe06c2626674fb7ca21c | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s20_full_reorder_on | 009c18643ee3fc659731df9682fe3c62 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s70_full_reorder_off | 42ffc9736db93ef773aa84cbed210a97 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s70_full_reorder_on | d939139ba4e430c7299dfd6b4dd7f575 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s80_full_reorder_off | 0ae7239c50a1efb172a6dd195e546204 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_full_reorder_on | 8acd7f0596cfb665e9807fece14c80ff | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s81_full_reorder_off | bfad725788fa38e54e5fde6eed338bb4 | 329590c9c1249859bfe20d107588c50a |
+| s81_full_reorder_on | c1a7845370c9c96b51ad66bba88dbacf | 329590c9c1249859bfe20d107588c50a |
+| s83_full_reorder_off | 938770a788056decfea88a712c85b965 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_full_reorder_on | d71f1095f56a7256eee1e406acc9f9dc | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_single_task_off | 48a58e60036bc20165bdf7d3d52e0f15 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_single_task_on | 1a5f59042de2d4c00c074fea014ed923 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

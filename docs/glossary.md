@@ -303,10 +303,25 @@ behaviour (§7); ρ B2 `b2a`'s policy parameter.
 
 ## 6. Tasks, schemas and the world
 
-**task instance key** — a `TaskInstance`'s derived identity string: schema name plus its sorted
+**task instance key** — a `TaskInstance`'s derived label string: schema name plus its sorted
 bindings, e.g. `deliver_item(?item=item_3,?kitting_table=kitting_table_0)`. It carries ALL bindings,
-including determined ones; a `HypothesisKey` carries the enumerated ones only.
+including determined ones; a `HypothesisKey` carries the enumerated ones only. A label for logs and the `[rec]`
+stream since T-H4, not an identity: whether two instances are the same task is **task equality**.
 → `shared/types.py`, `task_instance_key()`; `shared/io_contracts.md` §1.10.
+
+**task equality** (T-H4) — `same_task(a, b)`: the same schema by identity and equal **goal bindings**, a task's
+bindings minus its determined parameters (they follow from the station) and its duration parameters (how long is
+not what: `stand("PT10S")` and `stand("PT50S")` are one task). The one definition, read by the duplicate check on
+assigned tasks, the recognizer's support restriction, the robot's continue decision and the record's queries. A
+`TaskInstance`'s `==` is object identity. A stated determined binding is not part of a task's identity: it is the
+station's, or a **departure**. Replaces the `task_instance_key` comparisons (TODO-107).
+→ `shared/types.py`, `same_task()`, `goal_bindings()`.
+
+**departure** (T-H4) — `Departure(var, designated, stated)`: a stated determined binding that is not the station's
+(`deliver_item("item_1", table="kitting_table_2")` where the layout designates `kitting_table_0`). The binding-level
+deviation of a delivery to another table; `assigned` reports it, and it makes coverage `BINDING_ABSENT`.
+`check_task_destinations` refuses an assigned task with one.
+→ `shared/types.py`, `destination_departures()`.
 
 **determined parameter** — a task parameter that follows from another by a declared lookup
 (`TaskSchema.determined_parameters`, e.g. an item's destination table through `destination_of`). The
@@ -337,7 +352,8 @@ never reads `scheduled_tasks`; for the robot it is unread.
 
 THE HUMAN BEHAVIOUR MODEL (T-H). Ruled by Hadi, 25 September 2026 (with the rulings on the review); T-H1 to T-H3
 built (T-H3 migrated every scenario and deleted the T-C1 script layer: primitives, `Stay`, `expand`, provenance, the
-deviation vocabulary), T-H4 remains. The entries below are the meaning from here.
+deviation vocabulary), T-H4 built the record's queries (`world/queries.py`). The entries below are the meaning
+from here.
 → `docs/design_decisions.md`, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`. Code (T-H2): the
 script types in `shared/types.py` (`Trigger`, `Decision`, `Event`, `ScriptEntry`, `Script`, the `at` / `during`
 sugar); the stack machine and the load-time replay in `world/human_executor.py`; the record in `world/record.py`;
@@ -430,7 +446,11 @@ nothing left to do is completed; a task with no applicable method is infeasible,
 truth, written as its own stream (a file beside the run log, one `[rec]` line per tick) and diffed in the sweep. Its
 typed queries are `switches`, `resumptions`, `assigned(task)`, `unperformed(assigned_tasks)`, `coverage(task, robot)`
 and `truth_at(tick)`; they replace labels A and B, provenance, `Deviation`, string anchors and the key-counting
-`check_work_order` (`unperformed` replaces it). Built in T-H2, queried in T-H4. `world_state_builder` exposes nothing
+`check_work_order` (`unperformed` replaces it). Built in T-H2, queried in T-H4 (`world/queries.py`, pure functions on
+the in-memory `Record`; the `[rec]` stream is never read back): `truth_at(record, tick)` is the tick's `Snapshot`;
+`switches` every applied `Start` (authored or injected, on a task or on the empty stack; a `Drop` is not a switch, it
+is `Left(ABANDONED)`); `resumptions` every `Resumed`; `assigned` and `unperformed` are label A (§7), `coverage`
+label B. `world_state_builder` exposes nothing
 of the stack; `truth_at` enters the robot's mind only through the oracle condition's explicit adapter (TODO-101).
 SIMULATION ONLY: the record, coverage and the oracle IR exist in simulation; a real human needs annotation of the same
 form.
@@ -450,6 +470,15 @@ robot's task model and layout (not against the support the assignment prior narr
 experiment); `BINDING_ABSENT` (the schema is, the binding is not: a wrong-table delivery, since a hypothesis carries the
 item's designated table). An interrupted task is `COVERED` when its own instance is; its interruption is judged on its
 own. Unrelated to the covered fraction f of **graded evidence** (§5).
+AS BUILT (T-H4): typed results `Covered(hypothesis)`, `TaskAbsent(schema)`, `BindingAbsent(var, value)` (the binding
+no hypothesis carries), judged against an `ObservingRobot` (the robot's task model, its hypothesis space, the
+station's destinations) the body builds at spawn. In order: the schema not in the task model, `TASK_ABSENT`; no
+hypothesis the same task (**task equality**), `BINDING_ABSENT` with the first goal binding, in parameter order, no
+hypothesis of the schema carries; a **departure**, `BINDING_ABSENT` with its stated binding; else `COVERED` with the
+hypothesis. The loader prints one `[coverage]` line per script entry for each observing robot, in the run log: the
+entry's task and each event's started task, each with its value. Information for the reader, the same with the prior
+on and off.
+→ `world/queries.py`; `mesa_sim/sim_model.py`, `_log_coverage()`.
 
 **wait_at / stand** — two actions. `wait_at(?entity, ?duration)`, unchanged: located, it completes `waited(agent,
 entity)` and is the expected action of `coffee_break` and `ac_activation`. `stand(?duration)`, added by T-H: no
@@ -494,11 +523,17 @@ receives them. The query `truth_at(tick)` gives the stack at a tick; the behavio
 stack, or no task.
 
 **label A, assigned** — the query `assigned(task)`: whether the task on the stack is one of the human's **assigned
-tasks** (§6); with `unperformed(assigned_tasks)`, the assigned tasks no stack ever held. Replaces "label A, work order", whose values were "assigned task" and "deviation". A task that is not
+tasks** (§6); with `unperformed(assigned_tasks)`, the assigned tasks never performed: no task left the stack
+`COMPLETED` that is that assigned task with no **departure** (an abandoned one, one delivered to another table, one
+never begun and one the run ended in are unperformed). Replaces "label A, work order", whose values were "assigned task" and "deviation". A task that is not
 assigned is a `PersonalTask` (a **foreseeable task** when the robot's task model holds it), a `HumanOnlyTask`, or a
 `WorkTask` instance the assigned tasks do not contain. With no task on the stack (the script finished, the human idle)
-the query has no value. The word "deviation" no longer names a value of label A (§6, **deviation**). Whether a
-binding-level deviation of an assigned task answers true or false is part of the query's type, settled in T-H4.
+the query has no value. The word "deviation" no longer names a value of label A (§6, **deviation**).
+AS BUILT (T-H4): `assigned` returns `Assignment(assigned, departures)` or `None` (not assigned): the assigned task that
+is the same task (**task equality**, §6), and the bindings the assignment did not give. A binding-level deviation of
+an assigned task is the assigned task with a departure: `deliver_item("item_1", table="kitting_table_2")` against the
+assigned `deliver_item("item_1")` gives that assigned task and `?kitting_table=kitting_table_2(designated
+kitting_table_0)`. Neither a boolean nor a separate value.
 
 **label B, coverage** — the query `coverage(task, robot)` (§6, **coverage**): whether the robot's tree contains the
 task's nodes, and if not, at which level. Two classes of behaviour, in prose:

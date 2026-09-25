@@ -542,7 +542,7 @@ against the layout (`check_task_bindings`; a duration through the body's parser)
 (`world/human_executor.check_script`) drives the stack machine symbolically through the whole script, the state
 advancing by `shared.projection.successor_state()`: every anchor is checked against the sequential expansion, events
 and resumptions included; an unfired or refused event, or an infeasible task, is a load error naming the scenario.
-Nothing ties the assigned tasks to the script at load (the record's `unperformed` query, T-H4).
+Nothing ties the assigned tasks to the script at load (the record's `unperformed` query, T-H4, `world/queries.py`).
 
 **Landmarks.** A layout may declare objects of type `landmark` (`shared.types.LANDMARK_TYPE`); only a `HumanOnlyTask`
 may type a parameter as one (`Tree`'s constructor), so no hypothesis binds one and no robot action grounds to one.

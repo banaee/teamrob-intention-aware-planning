@@ -441,7 +441,9 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     `Deviation`, `Provenance`, `expand` / `resolve_script` as a separate form, the key-based checks, `Stay`,
     `MoveTo` / `PickUp` / `Place`. Built (25 Sept 2026): every scenario on the kitting call form; the `HumanOnlyTask`
     `go_to_and_stand` added to the kitting tree (design_decisions.md, T-H as built).
-  - T-H4 the record's queries, `unperformed` and coverage; supersedes TODO-92.
+  - T-H4 the record's queries, `unperformed` and coverage; supersedes TODO-92. Built (26 Sept 2026): `world/queries.py`
+    on the in-memory record, task equality `same_task`, the `[coverage]` line at load (design_decisions.md, T-H as
+    built).
   Acceptance after each build: the 40 maintained baseline logs rerun; robot-side lines byte-identical; human-side
   differences listed and each explained; at the end of T-H3 the new logs replace the stored baselines.
 - **Oracle-IR evaluation** (after T-H, its own pipeline task; TODO-101): three conditions on the same scenario, no IR,

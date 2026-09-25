@@ -3702,7 +3702,7 @@ Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TOD
 **T-H: the human behaviour model**
 
 RULED (Hadi, 25 September 2026; the design, then the rulings on ccode's conceptual review of it, folded in below).
-T-H1 to T-H3 built (the "as built" lines at the end); T-H4 remains. Supersedes, where they differ, "The human action script (T-C1, decided)"
+T-H1 to T-H4 built (the "as built" lines at the end). Supersedes, where they differ, "The human action script (T-C1, decided)"
 (the executed form, the author vocabulary, provenance, landmarks as a parameter type no schema may use, the work-order
 check), the WORLD half of "Terms for human behaviour, model coverage and the robot's inference (ruled)" (labels A and
 B become queries on the record; "deviation" gets the definition of item 1), and, in part, "A run-time deviation is the
@@ -3949,6 +3949,44 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
 - (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
   table="kitting_table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance
   or its enumerated bindings is part of the query's type, settled in T-H4.
+- (T-H4, as built) THE QUERIES. `world/queries.py`, pure functions on the in-memory `Record`, importing `shared/` only:
+  `truth_at(record, tick)` (the tick's `Snapshot`), `switches(record)` (every applied `Start`, authored or injected, on
+  a task or on the empty stack; a `Drop` is not a switch but `Left(ABANDONED)`), `resumptions(record)`,
+  `assigned(task, assigned_tasks, destinations)`, `unperformed(record, assigned_tasks, destinations)` and
+  `coverage(task, robot)`. They run on the in-memory record only: the `[rec]` stream is never read back (rebuilding
+  task instances from key strings would be string parsing and a lookup by name), and its format is unchanged. An
+  offline analysis of a baseline run reruns it in-process (the runs are deterministic) and checks its `.rec` against
+  the stored md5 before querying. `world_state_builder` still exposes nothing of the stack; `shared/` imports nothing of
+  `world/`.
+  TASK EQUALITY (TODO-107): `same_task(a, b)` in `shared/types.py`, the one definition: the same schema by identity and
+  equal goal bindings (the bindings minus the determined parameters and the duration parameters; ruling on the plan:
+  a duration is not part of a task's goal). `TaskInstance`'s `==` is object identity (`eq=False`). Readers: the
+  duplicate check on `assigned_tasks` (was `task_instance_key` strings; now two deliveries of one item stating
+  different tables are duplicates), the recognizer's support restriction (was an inline `HypothesisKey` of the
+  bindings minus the determined ones; byte-identical), the robot's continue decision (`mesa_sim/sim_agents.py`, was
+  `task_instance_key` strings; byte-identical), and the queries.
+  THE BINDING-LEVEL DEVIATION: `Departure(var, designated, stated)`, a stated determined binding that is not the
+  station's (`destination_departures`, which `check_task_destinations` now raises on, same text).
+  `assigned` returns `Assignment(assigned, departures)` or `None`: the assigned task that is the same task, and the
+  bindings the assignment did not give; `()` when the task is that assigned task. `unperformed` (ruling on the plan):
+  the assigned tasks, in assigned order, that no `Left(T, COMPLETED)` performs with no departure; an abandoned one
+  (s02), one delivered to another table (s85, s92), one never begun and one the run ended in are unperformed.
+  COVERAGE: `Covered(hypothesis)`, `TaskAbsent(schema)`, `BindingAbsent(var, value)`, judged against an
+  `ObservingRobot` (the task model, the whole hypothesis space, the station's destinations) that `SimModel` builds per
+  robot at spawn (`SimModel.observing`; the loader now builds the hypothesis space and hands it to `RobotAgent`, one
+  owner). The rule, in order: the schema not in the task model, `TaskAbsent`; no hypothesis the same task,
+  `BindingAbsent` with the first goal binding, in parameter order, no hypothesis of the schema carries; a departure,
+  `BindingAbsent` with its stated binding (ruling on the plan, Q1: the prompt's two-step rule gave s85's wrong-table
+  delivery `COVERED`, since the table is determined and never enumerated); else `Covered`. A determined parameter
+  with a lookup other than `destination_of` is an error, never silently `COVERED`.
+  THE COVERAGE LINE: `[coverage] <human> <robot> entry=<i> <task>=<value> start:<task>=<value>`, one per script entry
+  for each robot observing the human, printed by `SimModel._log_coverage` in the run log after the `[run]` headers
+  (read against the `[IR]` lines; the `.rec` unchanged). Information only; the same with the prior on and off. Every
+  entry of the maintained fixtures is `covered`.
+  THE ORACLE SEAM (TODO-101, recorded, not built): the adapter takes `truth_at(record, tick).stack[0]` and
+  `coverage(top, robot)`; a `Covered` carries the `HypothesisKey` to put the belief's mass on.
+  CHECKED: the 40 maintained logs and tb3's 8 unstored `single_task` runs are byte-identical to the T-H3 baselines
+  outside the new `[coverage]` lines, and every `.rec` is byte-identical.
 Reference: Hadi's ruling and the rulings on the review, 25 September 2026; docs/handoffs/handoff_T-H.md; "The human
 action script (T-C1, decided)"; "Terms for human behaviour, model coverage and the robot's inference (ruled)"; "A
 run-time deviation is the same operation as a load-time edit" (Phase 7); TODO-80, TODO-85, TODO-86, TODO-87, TODO-92,

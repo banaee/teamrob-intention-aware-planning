@@ -2997,7 +2997,7 @@ glossary). Label only: the stop's refusal does not read it, no behaviour depends
 Files: mesa_sim/executor.py (`set_assessed_window`, `_log_stop`), mesa_sim/sim_agents.py
 Reference: TODO-90 check, September 2026; analysis/todo90_b2a_window/README.md
 
-**TODO-92 — An observed history of the human's tasks in the robot's mind** [T-D; from T-C1] ⛔ SUPERSEDED by T-H4 (25 Sept 2026) for its ground-truth half: the WORLD labels are queries on the human executor's record (`assigned(task)`, `coverage(task, robot)`, `truth_at(tick)`), not computed from the script and provenance. The history in the robot's mind, built from observation, is not part of T-H and stays with T-D.
+**TODO-92 — An observed history of the human's tasks in the robot's mind** [T-D; from T-C1] ⛔ SUPERSEDED by T-H4 (25 Sept 2026) for its ground-truth half: the WORLD labels are queries on the human executor's record (`assigned(task)`, `coverage(task, robot)`, `truth_at(tick)`), not computed from the script and provenance. The history in the robot's mind, built from observation, is not part of T-H and stays with T-D. T-H4 built the queries (`world/queries.py`; design_decisions.md, "T-H: the human behaviour model", as built T-H4).
 The robot's mind keeps nothing from the human's script (T-C1), and today it keeps no record of what it has
 observed of the human either: completions reach it as world facts, retractions and `unknown` episodes as
 belief changes, and nothing accumulates them. Recorded for evaluation: a history, in the robot's mind, of the
@@ -3230,6 +3230,12 @@ The interface it needs (recorded, not designed):
 - open for that task: what the oracle hands over when the task on top is not covered (the projector resolves a task
   through the recognizer's hypothesis, so an uncovered task has none) or the stack is empty; and what "no IR" feeds the
   three calls (no belief: no admitted projection, `recognition_changed` never fires).
+- THE SEAM (recorded at T-H4, not built): `world/queries.py` gives `truth_at(record, tick)`, the tick's `Snapshot`
+  (`stack[0]` the task on top, or an empty stack), and `coverage(top, robot)` against the robot's `ObservingRobot`
+  (`SimModel.observing[robot_id]`). A `Covered` result carries the `HypothesisKey` that describes the task: the
+  adapter's belief puts all mass on it. The adapter is the body's (it holds the record and the robot's side) and hands
+  the meta-planner a `BeliefState` as today; `TaskAbsent`, `BindingAbsent` and the empty stack are the open cases
+  above.
 Reference: design_decisions.md, "T-H: the human behaviour model", item 10; roadmap, "The plan from T-A"
 
 **TODO-102: A per-robot task model on the robot's `AgentConfig` (recorded, T-H1, 25 Sept 2026)** [OPEN, recorded only]
@@ -3279,7 +3285,8 @@ T-H3: the scripts were wrapped as `Script([...])` syntactically, the robots' `sc
 belong in `assigned_tasks`); the domain imports; both scenarios still fail with the same two errors.
 
 **TODO-107: The duplicate check on assigned tasks compares task instance keys (recorded, T-H3, 25 Sept 2026)**
-[OPEN, recorded only]
+[CLOSED, T-H4: task equality is `same_task` (same schema by identity, equal goal bindings), the duplicate check and
+every other comparison of tasks read it; design_decisions.md, "T-H: the human behaviour model", as built T-H4]
 `AgentConfig.__post_init__` refuses duplicate `assigned_tasks` by comparing `task_instance_key()` strings, since
 `TaskInstance` is unhashable. It served the assigned tasks, not the C1 form, so T-H3 kept it; its identity is to be
 settled with T-H4's task equality (whether `assigned(task)` compares the whole instance or its enumerated bindings).
@@ -3293,6 +3300,14 @@ Reference: design_decisions.md, "T-H: the human behaviour model", as built (T-H3
 queue is empty. T-H3 only kept it compiling (`.scheduled_tasks.tasks()`, the list form deleted). Fix when ros_sim
 resumes: read `assigned_tasks`.
 Files: ros_sim/framework_HRI/framework_HRI/planner_2.py
+
+**TODO-109: The `[rec]` stream carries no agent id (recorded, T-H4, 26 Sept 2026)** [OPEN, recorded only]
+`HumanAgent` writes one `[rec] step=<n> stack=… action=… progress=… events=…` line per tick to the run's `.rec` file,
+with no agent id. With two humans the lines of both interleave and cannot be told apart. No scenario has two humans.
+Adding the id changes every `.rec` baseline; do it when a scenario with two humans is written. The queries are
+unaffected: they run on each human's in-memory `Record`.
+Files: world/record.py (`Record.line`), mesa_sim/sim_agents.py (`HumanAgent._step_stack`)
+Reference: design_decisions.md, "T-H: the human behaviour model", as built T-H4
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).
