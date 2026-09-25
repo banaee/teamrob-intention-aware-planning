@@ -281,3 +281,5 @@ so everything below is one of the two changes or the meta-planner reacting to a 
   it. Not reachable under the shipped code in these scenarios; still latent.
 - The harness labels the last boundary tick and the one after with the human's finished task (2 "wrong-θ"
   ticks prior-on in s00/s20/s30, `unknown` 0.995 vs a truth of the just-completed task). A labelling artefact.
+
+SUPERSEDING NOTE (T-H1, 25 Sept 2026): the script here predates T-H1 and no longer imports (`DomainModel`, `DomainKnowledgeBase`, `StepCall`, a directly constructed `TaskSchema` were replaced by `shared/knowledge.py` and the typed tree); the record stands at its commit.

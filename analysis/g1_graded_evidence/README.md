@@ -69,3 +69,5 @@ Regenerate from the repo root (~4 min for the sweep, ~4 min for the check):
 | s70_on | 2a77939c1058426d678acb0fa2713259 |
 | s71_off | 4afe316e1f4e3d1dd6f16b4035cd3707 |
 | s71_on | 46f6df8edbe033a096d51f2b57398e87 |
+
+SUPERSEDING NOTE (T-H1, 25 Sept 2026): the script here predates T-H1 and no longer imports (`DomainModel`, `DomainKnowledgeBase`, `StepCall`, a directly constructed `TaskSchema` were replaced by `shared/knowledge.py` and the typed tree); the record stands at its commit.

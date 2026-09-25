@@ -419,3 +419,5 @@ two folds), 2524 (s00 item_2, two folds).
 **(d) The grasp is no longer a reveal.** Under the gate a hit multiplies by 1.0 and rivals are not
 judged; the approach carries every reveal. If a grasp-tick reveal is wanted back, it is the ungated
 reading (§7), not a constant.
+
+SUPERSEDING NOTE (T-H1, 25 Sept 2026): the script here predates T-H1 and no longer imports (`DomainModel`, `DomainKnowledgeBase`, `StepCall`, a directly constructed `TaskSchema` were replaced by `shared/knowledge.py` and the typed tree); the record stands at its commit.

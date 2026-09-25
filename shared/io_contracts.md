@@ -10,7 +10,7 @@ points at. "Trajectory" appears only in the name of the R1 policy, the whole-tra
 shift, and in the module name `trajectory_algorithms.py`.
 
 **Last aligned September 2026** against `shared/types.py`, `shared/planner.py`,
-`shared/domain_knowledge.py`, `shared/recognizer.py`, `shared/meta_planner.py`, and
+`shared/knowledge.py` (was `shared/domain_knowledge.py`; T-H1), `shared/recognizer.py`, `shared/meta_planner.py`, and
 `shared/trajectory_algorithms.py`, following the Phase 4C MetaPlanner build. §2.2 is now
 verified implementation, not proposed design; §2.2a (the retired `replanning.py` trigger)
 has been deleted along with the module. The previously-flagged §1.3 discrepancy
@@ -214,8 +214,8 @@ class GroundedAction:
 
 **Correction from previous version:** the back-reference field is `schema: ActionSchema`
 (current name), not `operator: ActionOperator` (an older name found in some stale indexed
-chunks — `ActionSchema` is confirmed current via `domain_knowledge.py`'s
-`get_action_schema() -> Optional[ActionSchema]`). `completion_predicate` is `Optional` —
+chunks — `ActionSchema` is confirmed current via `knowledge.py`'s
+`ProceduralKnowledge.get_action_schema() -> Optional[ActionSchema]`). `completion_predicate` is `Optional` —
 `None` specifically for `ProcessCompletion`-based actions (e.g. `wait_at`), not always present
 as the previous contract implied.
 
@@ -264,6 +264,12 @@ determined_parameters: Dict[str, tuple]    # {var: (lookup_fn, source_var)}: a p
 
 `determined_parameters` is task-level and is distinct from `MethodSchema.derived_vars`, which are variables
 used inside one method's steps (`deliver_with_return`'s `?other_container`), not task parameters.
+
+Since T-H1 a `TaskSchema` is one of three classes, `WorkTask`, `PersonalTask` or `HumanOnlyTask` (a kind of
+`PersonalTask`); the base is not constructed directly and `is_assigned` / `is_foreseeable` are removed. A
+method's `steps` are `ActionStep(action: ActionSchema, bindings)` or `TaskStep(task: TaskSchema, bindings)`,
+holding the schema object (`StepCall.action_name` removed). A duration parameter (`stand(?duration)`) is typed
+through the step's action's `duration_key`, not `parameter_types`, and checked at load by the body's parser.
 
 ---
 
@@ -320,11 +326,13 @@ See TODO-26 for the open question of whether it should move to `types.py`.
 specific (task, parameter-binding) combination the recognizer tracks belief over.
 
 ```python
-@dataclass
 class HypothesisKey:
-    task_name: str
+    schema: TaskSchema                     # a schema of the robot's task model, by identity (T-H1)
     bindings: Dict[str, str]               # {} for parameterless tasks (e.g. coffee_break)
+    task_name -> str                       # property: schema.name, for the key's string
+    task_instance() -> TaskInstance        # the hypothesis as a task, determined parameters unbound
 ```
+Equal keys have the same schema (identity) and equal bindings; `repr` is `task_name(bindings)` as before.
 
 One `HypothesisKey` exists per combination in the cartesian product of a task's
 `parameter_types` over `known_objects_by_type` — see `build_hypothesis_space()`, §2.1.
@@ -600,22 +608,23 @@ entries in `design_decisions.md`). This section is the interface.
 
 ```python
 IntentionRecognizer(
-    knowledge: DomainKnowledgeBase,
+    task_model: TaskModel,                            # the robot's task model (T-H), §2.4
     context: ContextKnowledge,                        # background facts for ω_context weighting (output only)
     hypotheses: List[HypothesisKey],                  # precomputed hypothesis space for this scenario
     beta: float,                                      # detour tolerance, body's length units; no default (T-A1)
-    assigned_tasks: Optional[List[TaskInstance]] = None,   # OBSERVED agent's work order; None/empty = restriction off
+    assigned_tasks: Optional[List[TaskInstance]] = None,   # OBSERVED agent's assigned tasks; None/empty = restriction off
     path_cost: Optional[PathCost] = None,             # C(a, b) for the excess path; straight line by default
 )
 ```
 
-`hypotheses` is built once at agent construction time via the free function below, from the domain schemas
-and the objects present in the workspace — *not* from the human agent's `scheduled_tasks`, which the robot
+`hypotheses` is built once at agent construction time via the free function below, from the robot's task
+model and the objects present in the workspace — *not* from the human agent's `scheduled_tasks`, which the robot
 never sees. The recognizer sorts them by `repr` (order-independent of the caller, TODO-42).
 
 `assigned_tasks` carries the observed agent's assigned tasks — which tasks it was assigned, never in which order
-it will do them. It restricts the SUPPORT, not the magnitude: the admissible set is the assigned tasks, every
-foreseeable task (`TaskSchema.is_foreseeable`) and `unknown`; every other hypothesis is pinned at
+it will do them. It restricts the SUPPORT, not the magnitude: the admissible set is the hypotheses of the assigned
+`WorkTask` instances, every hypothesis of a `PersonalTask` in the task model (a foreseeable task) and `unknown`,
+compared as `HypothesisKey` values (T-H); every other hypothesis is pinned at
 `BELIEF_FLOOR` and never scored. An assigned task is matched to a hypothesis on the ENUMERATED parameters
 only: the `HypothesisKey` built from its bindings minus its schema's `determined_parameters` (T-B1a follow-up
 2). A determined binding (the table) is not compared here; its agreement with the layout is checked at load
@@ -636,7 +645,7 @@ injects it. The constructor raises `ValueError` if a schema names a `progress_ev
 
 ```python
 def build_hypothesis_space(
-    knowledge: DomainKnowledgeBase,
+    task_model: TaskModel,
     known_objects_by_type: Dict[str, List[str]],   # workspace/layout data, not domain knowledge
 ) -> List[HypothesisKey]:
     ...
@@ -726,7 +735,7 @@ consumes the `RealizedPlan` — once per candidate in B3 (T10) and once for the 
 
 ```python
 MetaPlanner(
-    knowledge: DomainKnowledgeBase,
+    task_model: TaskModel,
     projector: Projector,
     recognizer: IntentionRecognizer,
     min_separation: float,               # world units, from the body; no default (T-A1)
@@ -1133,25 +1142,24 @@ violates); a synthetic two-entry case shows strict dominance (34 against 44).
 
 #### Constructor
 ```python
-AdaptivePlanner(knowledge: DomainKnowledgeBase)
+AdaptivePlanner(knowledge: ProceduralKnowledge)   # a TaskModel for the robot, the Tree for the human's script
 ```
+Every entry point takes a `TaskInstance` and decomposes its schema OBJECT; the schema must be one the planner's
+knowledge holds, by identity (`ProceduralKnowledge.holds`), else `ValueError`. No task is looked up by name, so a
+robot's planner decomposes only its task model's schemas (T-H1). A method step is an `ActionStep` (grounded) or a
+`TaskStep` (decomposed recursively into the same flat list).
 
 #### Plan
 ```python
 plan(
-    my_intention: str,
-    task_params: Dict[str, str],           # {"?item": "item_3"} — task-level bindings only
-    agent_id: str,                         # executing agent, injected as ?agent, not in task_params
+    task: TaskInstance,                    # schema object + bindings (§1.6)
+    agent_id: str,                         # executing agent, injected as ?agent, not a task binding
     belief: BeliefState,
     world: WorldState,
     current_plan: AbstractPlan | None = None,
-) -> AbstractPlan
+) -> AbstractPlan                          # goal_intention = task.schema.name
 ```
-
-**Confirmed unchanged from the previous contract** — this signature matches the live
-`shared/planner.py` exactly, including `task_params` as a flat `Dict[str, str]` (not
-`Dict[Var, Const]` — that representation is `TaskInstance.bindings`, §1.6, a different,
-earlier stage than what `plan()` consumes).
+Changed in T-H1 from `(my_intention: str, task_params: Dict[str, str], ...)`.
 
 **Status:** guard evaluation, recursive decomposition, derived variable resolution, and
 `?agent` binding propagation are all implemented (Phase 4B, complete). **Still TODO:**
@@ -1160,8 +1168,7 @@ cost-aware method selection (TODO-16) — deferred until `meta_planner.py`'s cos
 #### Decompose
 ```python
 decompose(
-    task_name: str,
-    task_params: Dict[str, str],
+    task: TaskInstance,
     agent_id: str,
     world: WorldState,
     method: Optional[str] = None,
@@ -1187,8 +1194,7 @@ error, never a hypothesis left unscorable.
 #### Is Complete
 ```python
 is_complete(
-    task_name: str,
-    task_params: Dict[str, str],
+    task: TaskInstance,
     agent_id: str,
     world: WorldState,
 ) -> bool
@@ -1204,24 +1210,32 @@ private copy that should delegate here — the recognizer's terminal pin (`_term
 
 ---
 
-### 2.4 `DomainKnowledgeBase` (`shared/domain_knowledge.py`)
+### 2.4 `ProceduralKnowledge`, `Tree`, `TaskModel` (`shared/knowledge.py`)
+
+The two knowledge objects of T-H, two forms of one base. `shared/knowledge.py` was `shared/domain_knowledge.py`,
+and `ProceduralKnowledge` was `DomainKnowledgeBase` (with `DomainModel` and its `intentions`, removed in T-H1).
 
 ```python
-DomainKnowledgeBase.from_domain(domain: DomainModel, costs_path: str = None) -> DomainKnowledgeBase
+ProceduralKnowledge            # base, never constructed directly: how things are done
+Tree(tasks: Sequence[TaskSchema], actions: Sequence[ActionSchema], microactions: List[str],
+     costs: Optional[Dict[str, float]] = None)          # the world's tree, one per use case; built by the registry
+TaskModel(tree: Tree, schemas: Sequence[TaskSchema])     # one robot's task model, by whole schemas
 ```
 
+Construction checks: every method step calls a schema held by the object, by identity; `Tree` — only a
+`HumanOnlyTask` may type a parameter as a landmark; `TaskModel` — every schema is the tree's (identity), every
+`WorkTask` of the tree is in it, a `HumanOnlyTask` is rejected; it shares the tree's actions, microactions and
+costs. The robot's inference (recognizer, projector, planner, meta-planner) reads no human-only-ness; only this
+construction-time validation does.
+
 Provides read-only access to:
-- `get_task_schema(name) -> Optional[TaskSchema]`
-- `get_all_intentions() -> List[str]`
-- `get_assigned_intentions() -> List[str]`
-- `get_foreseeable_intentions() -> List[str]`
-- `get_intention_schemas() -> List[TaskSchema]`
-- `get_action_schema(name) -> Optional[ActionSchema]`
+- `holds(schema) -> bool` — identity membership of a task schema
+- `task_schemas() -> List[TaskSchema]` — the hypothesis space is built from a `TaskModel`'s
+- `get_action_schema(name) -> Optional[ActionSchema]` — read by the C1 script layer (by name) until T-H3
+- `get_all_actions() -> List[ActionSchema]`
 - `get_microactions() -> List[str]`
-- `get_tasks_for_action(action_name) -> List[TaskSchema]` — reverse lookup for IR
-- `get_actions_for_microaction(mu) -> List[ActionSchema]` — reverse lookup for IR
-- `get_cost(key) -> Optional[float]` — reads from `costs.yaml` if loaded
-- `get_types_with_destination() -> Dict[str, Tuple[str, Optional[str]]]` — {object type: (task, destination
+- `get_cost(key) -> Optional[float]` — per-action costs; empty in Mesa
+- `Tree.get_types_with_destination() -> Dict[str, Tuple[str, Optional[str]]]` — {object type: (task, destination
   type)} for the types some task determines a parameter from through `destination_of`; the embodiment's load check (T-B1a)
 
 **Deliberately absent:** no `get_objects_by_type()` method. `known_objects_by_type` is
@@ -1245,7 +1259,7 @@ Domain knowledge lives outside `shared/` in domain-specific Python packages.
 domains/kitting/
     tasks.py           # TaskSchema definitions — HTN non-primitive tasks
     actions.py          # ActionSchema definitions — HTN primitive tasks (leaves)
-    registry.py        # builds DomainModel, declares intention set
+    registry.py        # builds the Tree (T-H), declares the task model a robot is given
     scenarios.py       # ScenarioConfig objects — typed Python, no YAML
     script.py          # the author primitives MoveTo / PickUp / Place (and Stay, the vocabulary), §1.12
     env_layout0.json   # environment spatial layout (one file per layout)
@@ -1320,8 +1334,8 @@ a declared relocation".
   TODO-80)
 - Checks the layout's destinations at load (T-B1a): every object of a type some task determines a parameter
   from through `destination_of` declares `"destination"`, naming an object of the layout of the type the
-  schema declares (`DomainKnowledgeBase.get_types_with_destination`); and every agent's `assigned_tasks` binds
-  the destination the layout designates (`shared.types.check_task_destinations`), an error naming the task,
+  schema declares (`Tree.get_types_with_destination`); and, where each robot's task model is built, the robot's
+  own `assigned_tasks` and those of the agent it observes bind the destination the layout designates (`shared.types.check_task_destinations`), an error naming the task,
   the item and both tables. The human's `scheduled_tasks` is not checked against the layout's destinations:
   the script may send an item elsewhere. Its elements are checked for binding (`check_script_bindings`, T-C2a):
   every task in it (a deviation's task, its content, and for `deviate` the task rebound to the new destination)
@@ -1382,7 +1396,7 @@ Simulators MUST ensure:
 4. `WorldState.predicates` contains at minimum `in_zone` predicates for all active agents
 5. `AbstractPlan.actions` is a non-empty list of fully grounded `GroundedAction` objects
 6. No `Var` objects remain in any `GroundedAction.bindings` or `completion_predicate`
-7. All intention names in `BeliefState.distribution` are registered in `DomainModel.intentions`
+7. Every hypothesis key in `BeliefState.distribution` names a task schema of the robot's `TaskModel` (or is `unknown`)
 8. `ExecutorState` is built once per cognitive-clock event and passed unchanged to both
    `evaluate_triggers()` and `update()`
 9. `ExecutorState.current_task` is cleared to `None` when a task's plan completes — omitting

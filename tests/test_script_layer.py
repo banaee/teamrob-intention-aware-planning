@@ -16,12 +16,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
 
 from shared.planner import AdaptivePlanner, DecompositionError
+from shared.knowledge import Tree
 from shared.types import (
-    AgentConfig, DomainModel, ScenarioConfig, ScriptAction, TaskInstance, TaskSchema, Var, Const,
-    check_no_landmark_parameters, check_work_order,
+    ActionStep, AgentConfig, MethodSchema, PersonalTask, ScenarioConfig, ScriptAction, TaskInstance, Var, Const,
+    check_work_order,
 )
 from domains.script import expand, ground, resolve_script
 from domains.kitting.registry import domain_config, register_kitting_domain
+from domains.kitting.actions import move_to
 from domains.kitting.tasks import deliver_item, coffee_break
 from domains.kitting.script import MoveTo, PickUp, Place, Stay, interrupt, deviate, abandon
 from mesa_sim.sim_model import SimModel
@@ -33,12 +35,12 @@ H = "human_0"
 def model_for(layout, scenario):
     lay = domain_config["layouts"][layout]
     return SimModel(scenario=lay["scenarios"][scenario], register_fn=register_kitting_domain,
-                    env_layout_path=lay["path"])
+                    task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])
 
 
 def ctx(layout, scenario):
     m = model_for(layout, scenario)
-    return m, AdaptivePlanner(knowledge=m.knowledge), build_world_state(m)
+    return m, AdaptivePlanner(knowledge=m.tree), build_world_state(m)
 
 
 def deliver(item, table="kitting_table_0"):
@@ -70,9 +72,9 @@ def test_expand_deliver_item(l0):
     assert all(e.provenance is got[0].provenance for e in got)
     assert got[0].provenance.key == "deliver_item(?item=item_3,?kitting_table=kitting_table_0)"
     # grounding reproduces the planner's own grounded actions
-    planned = planner.decompose("deliver_item", {"?item": "item_3", "?kitting_table": "kitting_table_0"}, H, world)
+    planned = planner.decompose(t, H, world)
     for e, g in zip(got, planned):
-        ge = ground(e, H, m.knowledge)
+        ge = ground(e, H, m.tree)
         assert (ge.action_name, ge.bindings, ge.completion_predicate) == (g.action_name, g.bindings, g.completion_predicate)
 
 
@@ -87,7 +89,7 @@ def test_expand_coffee_break():
     got = expand(coffee(), planner, world, H)
     assert got == [MoveTo("coffee_machine_0"), WaitAt("coffee_machine_0", "PT60S")]
     assert got[0].provenance.key == "coffee_break(?coffee_machine=coffee_machine_0)"
-    assert str(ground(got[1], H, m.knowledge).completion_predicate) == "waited(human_0, coffee_machine_0)"
+    assert str(ground(got[1], H, m.tree).completion_predicate) == "waited(human_0, coffee_machine_0)"
 
 
 def test_expand_method(l0):
@@ -171,16 +173,13 @@ def test_anchor_errors(l0):
 # ---------------------------------------------------------------------------
 
 def test_landmark_parameter_rejected():
-    bad = TaskSchema(name="go_to_corner", parameters=[Var("?place")], methods=[],
-                     parameter_types={"?place": "landmark"})
-    domain = register_kitting_domain()
-    check_no_landmark_parameters(domain)          # kitting as it is: accepted
-    domain.tasks["go_to_corner"] = bad
-    with pytest.raises(ValueError, match="typed 'landmark'"):
-        check_no_landmark_parameters(domain)
-    lay = domain_config["layouts"]["env_layout0"]
-    with pytest.raises(ValueError, match="typed 'landmark'"):
-        SimModel(scenario=lay["scenarios"]["scenario_00"], register_fn=lambda: domain, env_layout_path=lay["path"])
+    # T-H: only a HumanOnlyTask may type a parameter as a landmark (Tree's constructor).
+    _place = Var("?place")
+    bad = PersonalTask(name="go_to_corner", parameters=[_place], parameter_types={"?place": "landmark"},
+                       methods=[MethodSchema("m", [_place], [], [ActionStep(move_to, {Var("?target"): _place})])])
+    tree = register_kitting_domain()              # kitting as it is (go_to a HumanOnlyTask): accepted
+    with pytest.raises(ValueError, match="only a HumanOnlyTask may type a parameter as a landmark"):
+        Tree(tasks=tree.task_schemas() + [bad], actions=tree.get_all_actions(), microactions=tree.get_microactions())
 
 
 def test_layout0_landmarks(l0):
@@ -200,7 +199,7 @@ def test_every_registered_scenario_loads():
         for sid in lay["scenarios"]:
             m = model_for(layout, sid)
             for h in m.humans:
-                assert all(isinstance(e, (ScriptAction, Stay)) for e in m.human_scripts[h])
+                assert all(isinstance(e, (ScriptAction, Stay)) for e in m.humans[h].script)
 
 
 def test_work_order_accepts_abandoned_assigned_task(l0):
@@ -236,10 +235,13 @@ def test_loader_errors_name_the_scenario():
 
     with pytest.raises(ValueError, match=r"scenario 'scenario_test', agent 'human_0': anchor 'move_to'.*expansion \[0: move_to"):
         SimModel(scenario=with_script([*interrupt(deliver("item_3"), after="move_to", with_=[Stay(3)]), deliver("item_2")]),
-                 register_fn=register_kitting_domain, env_layout_path=lay["path"])
+                 register_fn=register_kitting_domain,
+                 task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])
     with pytest.raises(ValueError, match="T-C2b"):   # compatibility path: primitives wait for C2b
         SimModel(scenario=with_script([*abandon(deliver("item_3"), after="pick_up"), deliver("item_2")]),
-                 register_fn=register_kitting_domain, env_layout_path=lay["path"])
+                 register_fn=register_kitting_domain,
+                 task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])
     with pytest.raises(ValueError, match="not an object of this layout"):
         SimModel(scenario=with_script([deliver("item_3"), deliver("item_2"), MoveTo("window")]),
-                 register_fn=register_kitting_domain, env_layout_path=lay["path"])
+                 register_fn=register_kitting_domain,
+                 task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])

@@ -1362,6 +1362,9 @@ Candidate fix: give `get_all_intentions()` a deterministic order (e.g. `sorted()
 after fixing, do not treat that diff as a behaviour change.
 Files: shared/types.py (`DomainModel.intentions`), shared/domain_knowledge.py
 (`get_all_intentions`), shared/recognizer.py (`build_hypothesis_space`)
+T-H1 (25 Sept 2026): `DomainModel.intentions` and `get_all_intentions()` are removed; `build_hypothesis_space`
+iterates `TaskModel.task_schemas()` (shared/knowledge.py, `ProceduralKnowledge`), which is in declaration order, so
+this source of order is gone; the recognizer's sort by key stays.
 Reference: assignment-prior session, September 2026
 
 **TODO-43 — A no-op `update()` costs the robot one tick** ✅ RESOLVED (T5)
@@ -2200,7 +2203,8 @@ not touch the evidence state or the accounting. Deferred because fixing it prope
 and knowledge-representation questions (what a context fact is, which schema field declares a task's
 sensitivity to it, where the constants live — a `ContextSchema`, not a branch). Not a bug in any measured
 condition (no scenario sets the temperature or a long shift).
-Files: shared/recognizer.py (`_context_weight`, the four constants), shared/domain_knowledge.py
+Files: shared/recognizer.py (`_context_weight`, the four constants), shared/knowledge.py (`ContextKnowledge`;
+was shared/domain_knowledge.py)
 Reference: I1 audit (architecture invariant "no domain-specific strings in shared/"); I5 hand-back
 
 **TODO-67 — s30_off: the meta-planner selects the already-delivered item_2 at 87** ✅ FIXED (T7)
@@ -3195,7 +3199,7 @@ task and a foreseeable task, which label A (assigned task or deviation; a forese
 cannot express. Recorded only; no check added.
 Files: shared/types.py (`AgentConfig`, `check_work_order`)
 Reference: terminology follow-up, 24 September 2026; `docs/glossary.md` §6 (foreseeable task), §7 (label A)
-T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): resolved by the tree: a `PersonalTask` is never assigned and foreseeable is defined as a `PersonalTask` in the task model, so a foreseeable task in the assigned tasks is a type error, checked when T-H1 builds the classes.
+T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): resolved by the tree: a `PersonalTask` is never assigned and foreseeable is defined as a `PersonalTask` in the task model, so a foreseeable task in the assigned tasks is a type error, checked when T-H1 builds the classes. ✅ CLOSED by T-H1: `AgentConfig` rejects an assigned task whose schema is not a `WorkTask`.
 
 **TODO-99: `during`'s authored form (recorded, T-H, 25 Sept 2026)** [OPEN; built when the live-run exporter needs it] ✅ CLOSED by the rulings on the T-H review (25 Sept 2026): the authored form `during(action, ticks=n, do=...)`, a `DuringAction` trigger, is built in T-H2, not deferred; the text below is the record of the first ruling.
 `during(action, ticks=n, do=...)` is the event trigger for a cut inside an action, n ticks into it; no fraction or
@@ -3227,6 +3231,31 @@ The interface it needs (recorded, not designed):
   through the recognizer's hypothesis, so an uncovered task has none) or the stack is empty; and what "no IR" feeds the
   three calls (no belief: no admitted projection, `recognition_changed` never fires).
 Reference: design_decisions.md, "T-H: the human behaviour model", item 10; roadmap, "The plan from T-A"
+
+**TODO-102: A per-robot task model on the robot's `AgentConfig` (recorded, T-H1, 25 Sept 2026)** [OPEN, recorded only]
+T-H1 gives every robot the task model its use case declares (`domain_config["task_model"]` in the registry), built per
+robot by the loader. "Chosen per experiment" (T-H item 3) needs a place to state it: a task model on the robot's
+`AgentConfig`, the `PersonalTask`s kept (every `WorkTask` is in it by construction). Needed first when an experiment
+omits a `PersonalTask` (coverage `TASK_ABSENT`, T-H4; T-D Q1's switch to an unmodelled task).
+Files: shared/types.py (`AgentConfig`), mesa_sim/sim_model.py (`_spawn_agents`), domains/*/registry.py
+Reference: design_decisions.md, "T-H: the human behaviour model", item 3; Hadi's ruling on the T-H1 plan (Q3)
+
+**TODO-103: A stale test in tests/test_script_layer.py (recorded, T-H1, 25 Sept 2026)** [OPEN]
+`test_loader_errors_name_the_scenario` fails at ea4446c (before T-H1) and after it: its second case expects the
+loader to refuse a script that abandons a task after `pick_up` with "T-C2b" (the compatibility path of T-C2a), which
+T-C2b removed. Error text:
+`tests/test_script_layer.py:240: Failed: DID NOT RAISE ValueError` (at `pytest.raises(ValueError, match="T-C2b")`).
+The case goes with the C1 vocabulary in T-H3, or is deleted before.
+Files: tests/test_script_layer.py
+
+**TODO-104: dock_loading's two scenarios do not load (recorded, T-H1, 25 Sept 2026)** [OPEN; domain deferred]
+Both fail at load at ea4446c (before T-H1) and identically after it; the domain imports, and its tree and task model
+build. Error text:
+- scenario_10: `scenario 'scenario_10', agent 'human_0': AdaptivePlanner: no applicable method for task
+  'office_break' in current world state. Bindings: {'?agent': 'human_0'}`
+- scenario_11: `scenario 'scenario_11', agent 'human_0': office_break(?office_chair=office_chair): ?office_chair is
+  bound to 'office_chair' of type 'chair', but the schema requires type 'office_chair'`
+Files: domains/dock_loading/scenarios.py, domains/dock_loading/tasks.py (`office_break`), its layout
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).

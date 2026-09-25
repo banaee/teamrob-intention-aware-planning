@@ -3852,6 +3852,20 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   `DomainKnowledge.get_assigned_intentions()` and `get_foreseeable_intentions()` read the two booleans and have no
   caller. The per-domain `DomainModel.intentions` set is the nearest existing thing to the task model; today one
   `DomainKnowledge` serves the robot and the human's script resolver alike.
+- (T-H1, as built) The knowledge objects live in one module, `shared/knowledge.py` (was `shared/domain_knowledge.py`):
+  `ProceduralKnowledge` (was `DomainKnowledgeBase`; with `DomainModel` and its `intentions` it replaces: tasks,
+  methods, actions, microactions, costs, how things are done), whose two forms are `Tree` and `TaskModel`, and
+  `ContextKnowledge` beside them. "Domain" names the use case and is not used for the knowledge classes. A method step
+  is an `ActionStep(action)` or a `TaskStep(task)` holding the schema object (`StepCall.action_name` removed); the
+  landmark rule is checked in `Tree`'s constructor, the `HumanOnlyTask` rejection and the every-`WorkTask`
+  requirement in `TaskModel`'s: the robot's inference reads no human-only-ness, construction-time validation of the
+  knowledge objects may.
+- (T-H1, as built) The destination check runs where each robot's task model is built, on the robot's own assigned
+  tasks and those of the agent it observes; a human no robot observes is no longer checked (no scenario has one).
+- (T-H1, as built) The planner's entry points (`plan`, `decompose`, `is_complete`) take a `TaskInstance` and check
+  its schema against their knowledge by identity (`ProceduralKnowledge.holds`); no task is looked up by name. A
+  `HypothesisKey` holds its schema object (its `task_name` is the schema's name), so the recognizer and the projector
+  pass objects too.
 - (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
   table="kitting_table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance
   or its enumerated bindings is part of the query's type, settled in T-H4.

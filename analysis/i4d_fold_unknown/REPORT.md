@@ -168,3 +168,5 @@ behaviour, not touched.
 TODO-61, untouched by decision, now with two more instances (§6(a) tick 114, §6(b)). TODO-55 (e), the
 domain question, now with an interface consequence (§6(a)). TODO-48's crossing rule meets the prior-off
 triple crossings. The unmodelled segment 3 → 4 boundary. The stationarity channel (deferred).
+
+SUPERSEDING NOTE (T-H1, 25 Sept 2026): the script here predates T-H1 and no longer imports (`DomainModel`, `DomainKnowledgeBase`, `StepCall`, a directly constructed `TaskSchema` were replaced by `shared/knowledge.py` and the typed tree); the record stands at its commit.

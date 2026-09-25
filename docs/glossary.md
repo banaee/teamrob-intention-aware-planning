@@ -406,11 +406,20 @@ planner uses it.
 **task model** — a robot's task model: the subset of the tree the robot is given, chosen per experiment by whole
 schemas; the other knowledge object, one per robot, built from the tree in the embodiment loader. A `WorkTask` is never
 left out (the robot plans its own tasks with it); a `PersonalTask` may be omitted per experiment; a `HumanOnlyTask` is
-rejected when a task model is built, in the loader. The robot's recognizer, projector and planner use the task model
-only; nothing in `shared/` reads human-only-ness. The hypothesis space is built from the task model and the layout. The
+rejected when a task model is built (`TaskModel`'s constructor, T-H1 ruling). The robot's recognizer, projector and
+planner use the task model only; the robot's inference reads no human-only-ness, only the construction-time
+validation of the knowledge objects does. The hypothesis space is built from the task model and the layout. The
 class of a schema is read in one place in the robot's mind, the support restriction: admissible = the hypotheses of
 the `WorkTask` instances in the assigned tasks, every hypothesis of a `PersonalTask` in the task model, and `unknown`,
 compared as `HypothesisKey` values.
+
+**ProceduralKnowledge** — how things are done: task schemas with their methods, action schemas, microactions and
+costs. The base class of the two knowledge objects, **tree** and **task model**, which are its two forms (`Tree`,
+`TaskModel`); never constructed directly. Validated at construction (every method step calls a schema of the object,
+by identity; the landmark rule in `Tree`; the `HumanOnlyTask` rejection and the every-`WorkTask` requirement in
+`TaskModel`). Not "domain knowledge": "domain" names the use case. Beside it, `ContextKnowledge` holds background
+facts for the recognizer's context weight.
+→ `shared/knowledge.py` (was `shared/domain_knowledge.py`, `DomainKnowledgeBase`; T-H1)
 
 **human's script** (T-H) — an ordered list of fully bound `TaskInstance`s of the tree (the author writes the machine;
 a determined parameter follows from its lookup unless the author states it), with **events** attached to a task. A
