@@ -425,7 +425,8 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     run each, observed (`analysis/tc2c_scripts/`). T-C closed.
   - From here debugging runs use prior on only; off / on returns for the paper.
 - **T-H — The human behaviour model** (ruled by Hadi, 25 September 2026, with the rulings on the review; before
-  T-D). design_decisions.md, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`. One tree of task
+  T-D). CLOSED (26 September 2026): T-H1 to T-H4 built; the commits, the acceptance as measured and the deferred items
+  (TODO-100, 101, 102, 105, 106, 109, the exporter, the label-C check) in `docs/handoffs/handoff_T-H.md`, its close-out. design_decisions.md, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`. One tree of task
   schemas per use case (`WorkTask`, `PersonalTask`, `HumanOnlyTask`); each robot's task model, whole schemas of it
   chosen per experiment, a knowledge object of its own; the assigned tasks, a set; the human's script, an ordered list
   of fully bound task instances with typed events (`AfterAction` / `DuringAction` / `Now`; `Start` / `Drop`); the human
@@ -451,7 +452,8 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   condition's explicit adapter only). Simulation only: a real human needs annotation of the record's form.
 - **Alternative 1** (recorded as the next architecture direction, not scheduled): a human mind that generates the
   events, and a stack-aware IR.
-- **T-D — Robustness in kitting, on T-C.** (Resumes on T-H's structure: T-D Q1 stays "what the robot infers and does
+- **T-D — Robustness in kitting, on T-C.** NEXT (after T-H's close-out; `docs/handoffs/handoff_T-D_onward.md`, its
+  section "What T-D now stands on"). (Resumes on T-H's structure: T-D Q1 stays "what the robot infers and does
   when no hypothesis explains the evidence, inside `unknown` or outside it", with the record's ground-truth cases: a
   switch to a modelled task, a switch to a modelled task outside the support, a switch to an unmodelled task, a
   binding-level deviation, no task on the stack, an
