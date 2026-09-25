@@ -62,9 +62,14 @@ is written, and what ground truth is.
 
 5. **The script.** An ordered list of fully bound task instances, with typed events attached. An event is a
    `Trigger` plus a `Decision`:
-   - `Trigger`: `AfterAction(action, occurrence)` (written with `at`), `DuringAction(action, ticks)` (written with
-     `during`, built in T-H2), or `Now` (`inject`);
+   - `Trigger`: `AfterAction(action, occurrence)` (written with `at`), `DuringAction(action, time)` (written with
+     `during`, built in T-H2; physical time in the form durations use, converted by the body, the exporter converting
+     the recorded tick once), or `Now` (`inject`);
    - `Decision`: `Start(task)` or `Drop`.
+
+   The authored forms are `.at(action, task_instance)`, `.at(action, drop)` and `.during(action, time, task_instance |
+   drop)`: sugar that constructs `Event(AfterAction | DuringAction, Start | Drop)`. The types are fixed; T-H2's plan
+   shows the sugar.
 
    Rules for `at`:
    - it fires after the action completes;

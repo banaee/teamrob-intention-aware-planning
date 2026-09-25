@@ -362,7 +362,7 @@ contain, at one of two levels (task schema, binding). So:
 | case (section 2) | written under T-H | `assigned` | `coverage` |
 |---|---|---|---|
 | an assigned delivery | `deliver_item("item_3")` | true | `COVERED` |
-| a `coffee_break` interrupt | `deliver_item("item_3").at(pick_up, Start(coffee_break("coffee_machine_0")))`; the delivery suspended, then resumed | false (the coffee break, on top of the stack) | the coffee break: `COVERED` if the task model holds `coffee_break`, else `TASK_ABSENT`; the interrupted delivery, judged on its own instance: `COVERED` |
+| a `coffee_break` interrupt | `deliver_item("item_3").at(pick_up, coffee_break("coffee_machine_0"))`; the delivery suspended, then resumed | false (the coffee break, on top of the stack) | the coffee break: `COVERED` if the task model holds `coffee_break`, else `TASK_ABSENT`; the interrupted delivery, judged on its own instance: `COVERED` |
 | a wrong-table delivery (TODO-87) | `deliver_item("item_0", table="kitting_table_1")`, a plain instance | settled in T-H4 (the query's type) | `BINDING_ABSENT` |
 | a walk to corner_NE | `go_to("corner_NE")` | false | `TASK_ABSENT` (a `HumanOnlyTask`) |
 | a stand of 5 minutes | `stand("PT5M")` (the stand task, its stand action emits no world fact) | false | `TASK_ABSENT` |

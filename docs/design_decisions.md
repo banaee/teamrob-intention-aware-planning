@@ -3749,20 +3749,24 @@ replaces the representation.
    a determined parameter follows from its lookup unless the author states it), with events attached to a task.
    An event is typed: a `Trigger` and a `Decision`, no unions and no sentinels.
    - `Decision`: `Start(task)` (any `TaskInstance` of the tree) or `Drop`.
-   - `Trigger`: `AfterAction(action, occurrence)`, `DuringAction(action, ticks)`, or `Now` (live only, item 8).
+   - `Trigger`: `AfterAction(action, occurrence)`, `DuringAction(action, time)`, or `Now` (live only, item 8).
    ```
-   deliver_item("item_1", table="kitting_table_2")                       a binding-level deviation is a plain instance
-   deliver_item("item_3").at(pick_up, Start(coffee_break("coffee_machine_0")))   an event
-   deliver_item("item_3").at(pick_up, Drop())                             abandon
-   stand("PT50S"), go_to("door")                                          HumanOnlyTask instances as plain entries
+   deliver_item("item_1", table="kitting_table_2")                  a binding-level deviation is a plain instance
+   deliver_item("item_3").at(pick_up, coffee_break("coffee_machine_0"))   an event
+   deliver_item("item_3").at(pick_up, drop)                          abandon
+   deliver_item("item_3").during(move_to, "PT3S", stand("PT10S"))   a cut inside an action
+   stand("PT50S"), go_to("door")                                     HumanOnlyTask instances as plain entries
    ```
-   (The spelling of the authored surface is T-H2's; the types are ruled.)
+   THE AUTHORED FORMS are `.at(action, task_instance)`, `.at(action, drop)` and `.during(action, time, task_instance |
+   drop)`: sugar that constructs `Event(AfterAction | DuringAction, Start | Drop)`. The types are fixed; T-H2's plan
+   shows the sugar.
    `at(action, decision)` makes an `AfterAction` trigger: it fires AFTER the action completes. `action` is a reference
    to an `ActionSchema` object of the task's decomposition, with an occurrence index when the method repeats it. The
    boundary before a task's first action is the previous entry's last action; before the whole script, a plain entry.
    An event fires once per script entry and is then consumed.
-   `during(action, ticks=n, do=...)` makes a `DuringAction` trigger: a cut n ticks into the action. No fraction or
-   position forms. Built in T-H2.
+   `.during(action, time, ...)` makes a `DuringAction` trigger: a cut a stated physical time into the action, in the
+   form durations use (ISO-8601); the body converts it, and the exporter converts the recorded tick once. No fraction
+   or position forms. Built in T-H2.
    Verified at load: every anchor is checked against the load-time sequential expansion of the script (events and
    resumptions included), which the executor must reproduce exactly; an anchor absent from a re-expansion (e.g. a
    `pick_up` anchor on a delivery that resumes as `deliver_already_held`) is a load error. Every instance is well typed
@@ -3781,8 +3785,8 @@ replaces the representation.
    type. OUTCOMES, computed from what the stack did and the world, never authored: completed, suspended, abandoned,
    infeasible. Completion is a world fact whoever caused it; a resumption with nothing left to do is completed; a task
    with no applicable method is infeasible, recorded, and the executor moves on.
-   ACCEPTED BY DESIGN (C25): one world behaviour can be written two ways with different records (`A.at(x, Start(B))`
-   against `A.at(x, Drop()), B, A`). The record is of the human's decisions, not of the body.
+   ACCEPTED BY DESIGN (C25): one world behaviour can be written two ways with different records (`A.at(x, B)`
+   against `A.at(x, drop), B, A`). The record is of the human's decisions, not of the body.
 
 7. THE RECORD: the executor writes, per tick, the stack (top first), the action and its progress. It is the ground
    truth, its own stream, diffable in the sweep. Queries on it, each typed: `switches`, `resumptions`, `assigned(task)`,

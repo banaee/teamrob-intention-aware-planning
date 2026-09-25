@@ -431,20 +431,24 @@ in this sense.
 tree) or `Drop`.
 
 **event trigger** — what fires an event: `AfterAction(action, occurrence)` (written with `at`), `DuringAction(action,
-ticks)` (written with `during`), or `Now` (`inject`). The ruling calls it "trigger"; in prose write "event trigger",
+time)` (written with `during`), or `Now` (`inject`). The ruling calls it "trigger"; in prose write "event trigger",
 because **trigger** (§4) is the meta-planner's re-decision condition.
 
-**at** — `at(action, decision)`: an `AfterAction` event trigger, which fires AFTER the action completes. `action` is a
+**at** — `.at(action, task_instance)` / `.at(action, drop)`: sugar for an event with an `AfterAction` event trigger
+and a `Start` / `Drop` decision; the trigger which fires AFTER the action completes. `action` is a
 reference to an `ActionSchema` object of the task's decomposition (an occurrence index when the method repeats it),
 never a name string. The boundary before a task's first action is the previous entry's last action; before the whole
 script, a plain entry. An anchor absent from a re-expansion is a load error.
 COLLISION: the world predicate `at(agent, object)` (executor completion) is a different thing; say "the `at` event
 trigger" where both could be read.
 
-**during** — `during(action, ticks=n, do=...)`: a `DuringAction` event trigger, a cut n ticks into the action. No
-fraction or position forms. Built in T-H2.
+**during** — `.during(action, time, task_instance | drop)`: sugar for an event with a `DuringAction` event trigger, a
+cut a stated physical time into the action (ISO-8601, the form durations use; the body converts it, the exporter
+converts the recorded tick once), and a `Start` / `Drop` decision. No fraction or position forms. Built in T-H2.
+The authored forms (`at`, `during`) are sugar that constructs `Event(AfterAction | DuringAction, Start | Drop)`; the
+types are fixed, T-H2's plan shows the sugar.
 
-**drop** — the decision `Drop`: it removes the top of the stack, authored or injected (`task.at(pick_up, Drop())`
+**drop** — the decision `Drop`: it removes the top of the stack, authored or injected (`task.at(pick_up, drop)`
 abandons `task`). Replaces `abandon`.
 
 **inject** — `executor.inject(Start(task) | Drop())`: a live event with the event trigger `Now`; the viewer's buttons
@@ -468,7 +472,7 @@ and `truth_at(tick)`; they replace labels A and B, provenance, `Deviation`, stri
 of the stack; `truth_at` enters the robot's mind only through the oracle condition's explicit adapter (TODO-101).
 SIMULATION ONLY: the record, coverage and the oracle IR exist in simulation; a real human needs annotation of the same
 form.
-One world behaviour may have two records (`A.at(x, Start(B))` against `A.at(x, Drop()), B, A`): accepted, the record
+One world behaviour may have two records (`A.at(x, B)` against `A.at(x, drop), B, A`): accepted, the record
 is of the human's decisions, not of the body.
 COLLISION: the **decision record** (§4) is the meta-planner's one field; "the design record" is the documents. Write
 "the executor's record" where either could be read.
