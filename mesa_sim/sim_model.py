@@ -29,9 +29,10 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from shared.knowledge import Tree, TaskModel
 from shared.planner import AdaptivePlanner
-from shared.types import (ScenarioConfig, TaskSchema, check_task_bindings, check_task_destinations,
+from shared.types import (ScenarioConfig, Script, TaskSchema, check_task_bindings, check_task_destinations,
                           check_work_order)
 from domains.script import check_script_bindings, resolve_script
+from world.human_executor import check_script
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
 
@@ -39,7 +40,7 @@ from domains.script import check_script_bindings, resolve_script
 from mesa_sim.mesa_fork import model, space, time, datacollection
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 from mesa_sim.world_state_builder import build_world_state
-from mesa_sim.action_decomposer import _parse_duration_to_steps
+from mesa_sim.action_decomposer import _parse_duration_to_steps, _get_step_size, steps_toward
 
 import logging 
 logger = logging.getLogger(__name__)
@@ -319,8 +320,13 @@ class SimModel(model.Model):
         check_duration = lambda duration: _parse_duration_to_steps(duration, self)
         for agent_cfg in scenario.agents:
             try:
-                check_script_bindings(agent_cfg.scheduled_tasks or [], object_type_by_id, self.tree,
-                                      check_duration)
+                if isinstance(agent_cfg.scheduled_tasks, Script):
+                    # the T-H form: every task it names, an entry's or a Start's
+                    for task in agent_cfg.scheduled_tasks.tasks():
+                        check_task_bindings(task, object_type_by_id, check_duration)
+                else:
+                    check_script_bindings(agent_cfg.scheduled_tasks or [], object_type_by_id, self.tree,
+                                          check_duration)
                 for task in agent_cfg.assigned_tasks or []:
                     check_task_bindings(task, object_type_by_id, check_duration)
             except ValueError as e:
@@ -406,10 +412,25 @@ class SimModel(model.Model):
         """
         world = build_world_state(self)
         planner = AdaptivePlanner(knowledge=self.tree)
+        # The body's conversions for the load-time replay of a T-H Script: a
+        # duration to ticks, a walk to its step positions (the same functions
+        # the executor runs).
+        ticks_of = lambda duration: _parse_duration_to_steps(duration, self)
+        walk = lambda start, target: [m.params["target_pos"] for m in steps_toward(start, target, _get_step_size(self))]
         for agent_cfg in scenario.agents:
             if agent_cfg.agent_type != "human":
                 continue
             where = f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}'"
+            if isinstance(agent_cfg.scheduled_tasks, Script):
+                # The T-H form (T-H2): every anchor checked against the
+                # sequential expansion, events and resumptions included, by the
+                # same stack machine the agent runs; then handed to it.
+                try:
+                    check_script(agent_cfg.scheduled_tasks, planner, world, agent_cfg.agent_id, ticks_of, walk)
+                except ValueError as e:
+                    raise ValueError(f"{where}: {e}") from e
+                self.humans[agent_cfg.agent_id].load_stack(agent_cfg.scheduled_tasks, planner)
+                continue
             try:
                 resolved = resolve_script(agent_cfg.scheduled_tasks or [], planner, world, agent_cfg.agent_id)
                 if agent_cfg.assigned_tasks:

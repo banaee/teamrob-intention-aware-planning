@@ -6,9 +6,12 @@ PURPOSE:
     Bridges the Mesa simulation loop with the shared cognitive layer.
 
 AGENTS:
-    HumanAgent  — scripted agent, action-level (T-C2b): runs the resolved
-                  list of primitives of its script one by one. Tracks no task.
-                  Robot has no access to this script.
+    HumanAgent  — scripted agent. Two script forms until T-H3: the C1 resolved
+                  list of primitives, run one by one (T-C2b); and the T-H Script,
+                  run by the stack machine (world/human_executor.py, T-H2),
+                  this agent being its body-side driver. Exposes no task to the
+                  world: the robot has no access to the script, the stack or
+                  the record.
 
     RobotAgent  — cognitive agent. Each step:
                     1. builds Observation of human via obs_builder
@@ -35,13 +38,16 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothes
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
-from shared.types import AbstractPlan, BeliefState, ExecutorState, Stay, TaskInstance, task_instance_key
+from shared.types import (AbstractPlan, BeliefState, Decision, ExecutorState, GroundedAction, Script, Start, Stay,
+                          TaskInstance, task_instance_key)
+from world.record import Record, Snapshot
 from domains.script import ground
+from world.human_executor import StackMachine, RunAction, ResumeAction
 
 from mesa_sim.mesa_fork import agent
 from mesa_sim.obs_builder import build_observation
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
-from mesa_sim.executor import Executor, ACTION_COMPLETION_LATENCY, TASK_COMPLETION_LATENCY
+from mesa_sim.executor import Executor, Suspended, ACTION_COMPLETION_LATENCY, TASK_COMPLETION_LATENCY
 from mesa_sim.action_decomposer import _get_step_size, _get_min_separation, _get_beta, _parse_duration_to_steps  # single reader of mesa_configs.yaml
 
 if TYPE_CHECKING:
@@ -57,6 +63,10 @@ if TYPE_CHECKING:
 # projection, not at step 0 — the same fact RobotAgent.observe_initial() exists
 # for. Handed to the Projector so the two projections share a clock (L2).
 OBSERVATION_OFFSET = 1.0
+
+# The human executor's record stream (T-H2): one `[rec]` line per tick, its own
+# logger so that mesa_sim/run_mesa.py can send it to a file beside the run log.
+_REC = logging.getLogger("rec")
 
 # Mesa ticks the HUMAN's body spends completing a task: none. Its executor is
 # action-level (HumanAgent, T-C2b): it runs primitives, knows no task, and
@@ -112,6 +122,17 @@ class HumanAgent(FactoryAgent):
         self.current_plan: Optional[AbstractPlan] = None   # the primitive in hand, as a one-action plan
         self._stay_remaining: Optional[int] = None         # ticks left of the Stay in hand (-1: Stay()); None: no Stay
 
+        # The T-H path (T-H2): the stack machine and its record, set by
+        # load_stack(); the action in hand (a one-action plan, as the C1 path
+        # hands it); the body's remainder of the one suspended action (the
+        # stack is one level deep, so one); the live decisions to apply on the
+        # next tick (inject).
+        self.machine: Optional[StackMachine] = None
+        self.record: Optional[Record] = None
+        self._in_hand: Optional[GroundedAction] = None
+        self._suspended: Optional[Suspended] = None
+        self._injections: List[Decision] = []
+
         self.executor = Executor(agent=self)
 
     def load_script(self, primitives: List):
@@ -119,7 +140,23 @@ class HumanAgent(FactoryAgent):
         self.script = list(primitives)
         self.script_index = 0
 
+    def load_stack(self, script: Script, planner: AdaptivePlanner):
+        """The T-H script, checked at load (world/human_executor.check_script),
+        before step 0. The planner is on the world's tree."""
+        self.record = Record()
+        self.machine = StackMachine(script, planner, self.unique_id,
+                                    lambda duration: _parse_duration_to_steps(duration, self.model), self.record)
+
+    def inject(self, decision: Decision) -> None:
+        """A live event (trigger Now): applied at the start of this agent's
+        next step(), before the body runs. Refused when a task is already
+        suspended (Start) or the stack is empty (Drop), and recorded."""
+        self._injections.append(decision)
+
     def step(self):
+        if self.machine is not None:
+            self._step_stack()
+            return
         world = build_world_state(self.model)
 
         # The primitive in hand is done once its action is acknowledged: the
@@ -164,6 +201,90 @@ class HumanAgent(FactoryAgent):
     def _idle(self):
         self.current_action = None
         self.current_microaction = None
+
+    # ------------------------------------------------------------------
+    # The T-H path: the body-side driver of the stack machine (T-H2)
+    # ------------------------------------------------------------------
+
+    def _step_stack(self):
+        """
+        One tick. In order: the action in hand that the body acknowledged last
+        tick is reported done (its AfterAction events fire now); the injected
+        decisions are applied; a DuringAction whose tick is reached cuts the
+        action in hand; then the machine says what to run and the body runs one
+        microaction of it. The record gets this tick's snapshot and its `[rec]`
+        line. The per-task completion tick is never spent (one action at a time,
+        as the C1 path), so the human projection's 0 stays true.
+        """
+        world = build_world_state(self.model)
+        tick = int(self.model.schedule.steps)
+        machine, executor = self.machine, self.executor
+
+        # 1. the action in hand was acknowledged: the executor's cursor is past
+        #    its one action
+        if self._in_hand is not None and executor.action_index >= 1:
+            machine.action_done(world, tick)
+            executor.step(plan=None, world=world)
+            self._in_hand = None
+
+        # 2. live decisions
+        for decision in self._injections:
+            if machine.refusal(decision) is not None:
+                machine.inject(decision, world, tick, 0)
+                continue
+            done = 0
+            if self._in_hand is not None:
+                suspended = executor.suspend()
+                self._in_hand = None
+                done = suspended.done
+                if isinstance(decision, Start):
+                    # the remainder of the task now suspended; a Drop's is
+                    # discarded, and the one below the dropped task is kept
+                    self._suspended = suspended if done > 0 else None
+            machine.inject(decision, world, tick, done)
+        self._injections = []
+
+        # 3. a during cut on the action in hand: that many of its ticks are
+        #    executed and it has ticks left
+        if self._in_hand is not None and executor.microaction_queue and machine.cut_due(executor.progress().done):
+            self._suspended = executor.suspend()
+            self._in_hand = None
+            machine.cut(world, tick, self._suspended.done)
+
+        # 4. run: one microaction of the action in hand, handed to the executor
+        #    as a one-action plan (a new plan loads from its start on a cleared
+        #    executor, which owes nothing; a resumed one is the executor's own)
+        plan = executor.current_plan
+        if self._in_hand is None:
+            nxt = machine.next(world, tick)
+            if isinstance(nxt, RunAction):
+                self._in_hand = nxt.action
+                plan = AbstractPlan(goal_intention=nxt.action.action_name, actions=[nxt.action])
+            elif isinstance(nxt, ResumeAction):
+                executor.resume(self._suspended)
+                self._in_hand = nxt.cut.action
+                plan = executor.current_plan
+            else:
+                self._idle()
+        before = executor.progress()
+        if self._in_hand is not None:
+            executor.step(plan=plan, world=world)
+        self.current_action = executor.current_action
+        self.current_microaction = executor.current_microaction
+
+        # 5. the record. On the acknowledgement tick the executor's cursor is
+        #    past the action and its queue reset: the progress shown is the
+        #    one before the step, the full count.
+        current = machine.current()
+        if current is not None and self._in_hand is not None:
+            progress = before if executor.action_index >= 1 else executor.progress()
+            snap = Snapshot(tick, machine.stack_tasks(), current[0], current[1], progress.done, progress.total)
+        else:
+            snap = Snapshot(tick, machine.stack_tasks(), None, 0, 0, 0)
+        self.record.snapshot(snap)
+        for transition in self.record.transitions_at(tick):
+            logging.info(f"[human] step={tick} {self.unique_id} {transition!r}")
+        _REC.info(self.record.line(tick))
 
 
 # =============================================================================

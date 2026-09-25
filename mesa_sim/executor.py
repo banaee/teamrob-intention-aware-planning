@@ -84,6 +84,8 @@ import logging
 from typing import List, Optional, Tuple
 import math
 
+from dataclasses import dataclass
+
 from shared.types import AbstractPlan, GroundedAction, WorldState, Predicate, ProcessCompletion
 from mesa_sim.action_decomposer import Microaction, expand
 
@@ -112,6 +114,27 @@ ACTION_COMPLETION_LATENCY = 1.0
 # unmodelled). Not a tunable: change step()'s structure and this
 # changes with it.
 TASK_COMPLETION_LATENCY = 1.0
+
+
+@dataclass(frozen=True)
+class Suspended:
+    """
+    An action stopped where it is (Executor.suspend(), the human's mid-action
+    cut, T-H2): the GroundedAction, the microactions not yet executed, how many
+    were, and whether the queue had run out. The body's own remainder; the
+    stack machine keeps only the count (world/record.Cut).
+    """
+    action: GroundedAction
+    remaining: List[Microaction]
+    done: int
+    exhausted: bool
+
+
+@dataclass(frozen=True)
+class Progress:
+    """Of the action in hand: microactions executed over its expansion."""
+    done: int
+    total: int
 
 
 class Executor:
@@ -145,6 +168,12 @@ class Executor:
         self.current_action: Optional[str] = None
         self.current_microaction: Optional[str] = None
         self._queue_was_exhausted: bool = False
+        # The length of the microaction queue when it was expanded, plus what a
+        # resumed action had already executed before its cut (_done_before,
+        # T-H2): progress() reads them. Set in _expand_queue() and resume(),
+        # reset with the queue; step() writes them nowhere.
+        self._queue_total: int = 0
+        self._done_before: int = 0
 
         # The decided hold (T4): STAND ticks still to run before the plan
         # continues, and its planned / executed lengths for the [hold] log.
@@ -315,6 +344,50 @@ class Executor:
         Target resolution for movement actions is handled inside expand().
         """
         self.microaction_queue = expand(action, self.agent.model, self.agent.pos)
+        self._queue_total = self._done_before + len(self.microaction_queue)
+
+    # =========================================================================
+    # The mid-action cut (T-H2): the human's stack machine stops an action
+    # where it is and resumes it later. Called by the human driver only
+    # (mesa_sim/sim_agents.HumanAgent); the robot's path never reaches them,
+    # and step() is unchanged.
+    # =========================================================================
+
+    def progress(self) -> Progress:
+        """Microactions executed of the action in hand over its expansion."""
+        return Progress(done=self._queue_total - len(self.microaction_queue), total=self._queue_total)
+
+    def suspend(self) -> Suspended:
+        """
+        Stop the action in hand where it is: what remains of it is returned and
+        the executor is cleared. No microaction executes. The one-action plan
+        the human driver hands this executor holds exactly the action in hand.
+        """
+        action = self.current_plan.actions[self.action_index]
+        suspended = Suspended(action=action, remaining=list(self.microaction_queue),
+                              done=self._queue_total - len(self.microaction_queue),
+                              exhausted=self._queue_was_exhausted)
+        self._clear()
+        return suspended
+
+    def resume(self, suspended: Suspended):
+        """
+        Take the cut action up again with what remains of it, one rule read
+        from the schema (T-H, item 6): a movement action gets an EMPTY queue, so
+        the next step() re-expands the rest of the walk from the agent's
+        current position toward the target's current position; any other action
+        gets its kept microactions back — the remaining STANDs of a stand or a
+        wait_at (their `remaining` countdown intact, so the last still records
+        waited_at), or the untouched GRASP / RELEASE. `done` is carried, so the
+        progress the record shows continues rather than restarting.
+        """
+        self._load_plan(AbstractPlan(goal_intention=suspended.action.action_name, actions=[suspended.action]))
+        self._done_before = suspended.done
+        if suspended.action.schema.movement_target_key is not None:
+            return
+        self.microaction_queue = list(suspended.remaining)
+        self._queue_was_exhausted = suspended.exhausted
+        self._queue_total = suspended.done + len(suspended.remaining)
 
 
 
@@ -664,12 +737,16 @@ class Executor:
         self.current_task = plan.goal_intention
         self._queue_was_exhausted = False
         self._completion_pending = []
+        self._queue_total = 0
+        self._done_before = 0
         self._task_completion_spent = False
 
     def _advance_action(self):
         """Move to next action in plan."""
         self.action_index += 1
         self.microaction_queue = []
+        self._queue_total = 0
+        self._done_before = 0
         self.current_microaction = None
         self._queue_was_exhausted = False
         # logging.info(f"[executor] _advance_action: {self.agent.unique_id} {self.action_index} → {self.action_index+1}")
@@ -694,6 +771,8 @@ class Executor:
         self.action_index = 0
         self.microaction_queue = []
         self._completion_pending = []
+        self._queue_total = 0
+        self._done_before = 0
         self._task_completion_spent = False
         self.current_task = None
         self.current_action = None

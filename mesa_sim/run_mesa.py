@@ -78,6 +78,15 @@ logging.basicConfig(
         logging.StreamHandler(),  # still prints to terminal
     ]
 )
+# The human executor's record (T-H2): its own stream, one `[rec]` line per tick,
+# in a file beside the run log (logs/run_<timestamp>.rec), never in the run log.
+# Empty while every human runs the C1 script (until T-H3).
+rec_filename = f"logs/run_{timestamp}.rec"
+_rec_logger = logging.getLogger("rec")
+_rec_logger.propagate = False
+_rec_handler = logging.FileHandler(rec_filename, mode="w")
+_rec_handler.setFormatter(logging.Formatter("%(message)s"))
+_rec_logger.addHandler(_rec_handler)
 
 
 # =============================================================================
