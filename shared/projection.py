@@ -57,11 +57,9 @@ from shared.types import (
     ProjectedPlan,
     ProjectedPlanEntry,
     Segment,
-    Var,
-    Const,
     task_instance_key,
 )
-from shared.domain_knowledge import DomainKnowledgeBase
+from shared.knowledge import TaskModel
 from shared.planner import AdaptivePlanner
 from shared.recognizer import IntentionRecognizer
 from shared.target_resolution import movement_target_id, movement_target_position
@@ -78,7 +76,7 @@ class Projector:
 
     def __init__(
         self,
-        knowledge: DomainKnowledgeBase,
+        task_model: TaskModel,
         assumed_speed: float = 1.0,
         default_action_cost: float = 1.0,
         arrival_radius: float = 0.0,
@@ -89,8 +87,8 @@ class Projector:
         duration_to_steps: Optional[Callable[[str], float]] = None,
     ):
         """
-        knowledge:            HTN domain knowledge, passed through to planner.py calls
-                              and used for per-action cost lookup.
+        task_model:           the robot's task model (T-H), passed through to planner.py
+                              calls and used for per-action cost lookup.
         assumed_speed:        world units the agent moves per execution step, so a
                               movement action lasts distance / assumed_speed steps.
                               Supplied by the embodiment layer (Mesa: its step_size,
@@ -98,7 +96,7 @@ class Projector:
                               The 1.0 default is a unit-less placeholder, not a value
                               shared/ knows to be right.
         default_action_cost:  duration, in execution steps, of a non-movement action
-                              when knowledge.get_cost(action_name) has no costs.yaml
+                              when task_model.get_cost(action_name) has no costs.yaml
                               entry. Mesa executes one microaction per tick, so 1.0 is
                               exact for pick_up/place there. An action whose schema
                               names a duration binding (wait_at) is priced through
@@ -189,8 +187,8 @@ class Projector:
                               match for now (design_decisions.md, "The human's wait
                               duration in the projection").
         """
-        self._knowledge = knowledge
-        self._planner = AdaptivePlanner(knowledge=knowledge)
+        self._task_model = task_model
+        self._planner = AdaptivePlanner(knowledge=task_model)
         self._assumed_speed = assumed_speed
         self._default_action_cost = default_action_cost
         self._arrival_radius = arrival_radius
@@ -263,11 +261,8 @@ class Projector:
         entry_start = start_step
 
         for index, task in enumerate(ordering):
-            task_params = {var.name: const.value for var, const in task.bindings.items()}
-
             abstract_plan = self._planner.plan(
-                my_intention=task.schema.name,
-                task_params=task_params,
+                task=task,
                 agent_id=agent_id,
                 belief=belief,
                 world=world,
@@ -324,10 +319,11 @@ class Projector:
         candidate. The human's predicted plan is a fact about the world at
         this event, independent of which robot task is being evaluated.
 
-        Returns None in three distinct cases, all normal rather than errors:
+        Returns None in two distinct cases, both normal rather than errors:
           - no human is observed (human_agent_id is None)
           - get_hypothesis() cannot resolve belief.most_likely (e.g. "unknown")
-          - the resolved task name is not in the domain's task schemas
+        A hypothesis holds a schema of the task model (T-H1), so its task is
+        always one this projector's planner decomposes.
         A None projection means the caller runs no interference check that call —
         a routine mid-run state, since the belief re-initialises at every human
         task boundary (I4c). MetaPlanner.update_human_projection() also refuses
@@ -340,14 +336,7 @@ class Projector:
         if hypothesis is None:
             return None
 
-        human_task_schema = self._knowledge.get_task_schema(hypothesis.task_name)
-        if human_task_schema is None:
-            return None
-
-        human_task = TaskInstance(
-            schema=human_task_schema,
-            bindings={Var(k): Const(v) for k, v in hypothesis.bindings.items()},
-        )
+        human_task = hypothesis.task_instance()
         # Starts at observation_offset, not 0: the projection begins where the
         # observed agent's state was TRUE, which need not be the projecting
         # agent's own now (L2). Its duration is unchanged — project() measures
@@ -402,7 +391,7 @@ class Projector:
         the action's stated duration when its schema names a duration binding
         (schema.duration_key, wait_at's ?duration) and the body supplied
         duration_to_steps — the grounded action's bound value, converted by the
-        body (TODO-32); otherwise for knowledge.get_cost(action_name) steps,
+        body (TODO-32); otherwise for task_model.get_cost(action_name) steps,
         falling back to default_action_cost.
         """
         current_pos = world.agent_positions.get(agent_id)
@@ -439,7 +428,7 @@ class Projector:
             else:
                 duration = self._stated_duration(action)
                 if duration is None:
-                    cost = self._knowledge.get_cost(action.action_name)
+                    cost = self._task_model.get_cost(action.action_name)
                     duration = cost if cost is not None else self._default_action_cost
                 segment = stationary_segment(current_pos, current_step, duration)
 

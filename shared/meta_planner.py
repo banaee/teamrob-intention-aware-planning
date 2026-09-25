@@ -165,7 +165,7 @@ from shared.types import (
 )
 
 
-from shared.domain_knowledge import DomainKnowledgeBase
+from shared.knowledge import TaskModel
 from shared.recognizer import IntentionRecognizer, UNKNOWN
 from shared.planner import AdaptivePlanner
 from shared.projection import Projector
@@ -201,7 +201,7 @@ class MetaPlanner:
 
     def __init__(
         self,
-        knowledge: DomainKnowledgeBase,
+        task_model: TaskModel,
         projector: Projector,
         recognizer: IntentionRecognizer,
         min_separation: float,
@@ -213,7 +213,7 @@ class MetaPlanner:
         rho: float = 0.5,
     ):
         """
-        knowledge:              HTN domain knowledge, passed through to planner.py calls.
+        task_model:             the robot's task model (T-H), passed through to planner.py calls.
         recognizer:              the SAME live IntentionRecognizer instance the owning
                                  RobotAgent already constructed and calls .update() on —
                                  not a second instance built here. get_hypothesis() is
@@ -272,7 +272,7 @@ class MetaPlanner:
                                  0.5 is a STATED ASSUMPTION to be varied in T6, not a
                                  calibrated value.
         """
-        self._knowledge = knowledge
+        self._task_model = task_model
         self._recognizer = recognizer
         self._projector = projector
         self._theta = theta
@@ -284,7 +284,7 @@ class MetaPlanner:
         self._rho = rho
         # For the pool's completion test only (_is_complete()). Decomposition
         # for projection stays inside Projector; this never plans.
-        self._planner = AdaptivePlanner(knowledge=knowledge)
+        self._planner = AdaptivePlanner(knowledge=task_model)
         self._queue: List[TaskInstance] = []  # owned internally per Q1; populated by seed_tasks()
         # The decision record (D2): the hypothesis the last fired trigger's
         # decision was projected against — belief.most_likely on the tick
@@ -656,8 +656,7 @@ class MetaPlanner:
         indifferent to who did it. Derived from the task's own schema through
         the decomposition — no predicate name is known here.
         """
-        task_params = {var.name: const.value for var, const in task.bindings.items()}
-        return self._planner.is_complete(task.schema.name, task_params, agent_id, world)
+        return self._planner.is_complete(task, agent_id, world)
 
 
     # =========================================================================

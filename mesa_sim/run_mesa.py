@@ -230,6 +230,7 @@ def resolve_model_params(user_config: dict) -> dict:
     return {
         "scenario":         scenario,
         "register_fn":      domain["register_fn"],
+        "task_model_schemas": domain["task_model"],
         "env_layout_path":  layout["path"],
         "assignment_prior": bool(user_config.get("assignment_prior", False)),
         "strategy":         user_config.get("strategy", "single_task"),

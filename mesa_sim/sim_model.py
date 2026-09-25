@@ -25,12 +25,12 @@ COORDINATE SYSTEM:
 
 import json
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
-from shared.domain_knowledge import DomainKnowledgeBase
+from shared.knowledge import Tree, TaskModel
 from shared.planner import AdaptivePlanner
-from shared.types import (ScenarioConfig, check_task_bindings, check_task_destinations,
-                          check_no_landmark_parameters, check_work_order)
+from shared.types import (ScenarioConfig, TaskSchema, check_task_bindings, check_task_destinations,
+                          check_work_order)
 from domains.script import check_script_bindings, resolve_script
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
@@ -39,6 +39,7 @@ from domains.script import check_script_bindings, resolve_script
 from mesa_sim.mesa_fork import model, space, time, datacollection
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 from mesa_sim.world_state_builder import build_world_state
+from mesa_sim.action_decomposer import _parse_duration_to_steps
 
 import logging 
 logger = logging.getLogger(__name__)
@@ -88,6 +89,7 @@ class SimModel(model.Model):
     def __init__(self,
                  scenario: ScenarioConfig,
                  register_fn,
+                 task_model_schemas: Sequence[TaskSchema],
                  env_layout_path: str = "domains/kitting/env_layout1.json", 
                  seed=None,
                  assignment_prior: bool = False,
@@ -98,7 +100,7 @@ class SimModel(model.Model):
         super().__init__()
 
         # Evaluation switch: give each robot the observed human's assigned_tasks
-        # as a persistent IR prior. Off = the robot knows no work order.
+        # as a persistent IR prior. Off = the robot knows no assigned tasks of it.
         self.assignment_prior = assignment_prior
         # MetaPlanner B3 strategy for every robot ("single_task" | "full_reorder");
         # a run option, not a scenario fact (T-B2d).
@@ -148,12 +150,12 @@ class SimModel(model.Model):
         }
 
         # ------------------------------------------------------------------
-        # DomainKnowledgeBase — loaded once, shared across agents
+        # The two knowledge objects (T-H): the world's tree, loaded once, which
+        # the human's script uses; one task model per robot, built from it in
+        # _spawn_agents() from the schemas the domain declares for a robot.
         # ------------------------------------------------------------------
-        domain = register_fn()
-        # No task may bind a landmark (T-C1): it is a place for a human's script only.
-        check_no_landmark_parameters(domain)
-        self.knowledge = DomainKnowledgeBase.from_domain(domain)
+        self.tree: Tree = register_fn()
+        self._task_model_schemas = list(task_model_schemas)
 
 
         # ------------------------------------------------------------------
@@ -263,7 +265,7 @@ class SimModel(model.Model):
         # Every object of a type the domain resolves through "destination_of"
         # declares its destination, naming an object of this layout of the
         # type the schema declares for it (T-B1a). An error, not a default.
-        types_with_destination = self.knowledge.get_types_with_destination()
+        types_with_destination = self.tree.get_types_with_destination()
         for obj_id, obj in self.objects.items():
             if obj.type not in types_with_destination:
                 continue
@@ -302,36 +304,27 @@ class SimModel(model.Model):
         HumanAgent receives its scheduled_tasks, resolved into primitives, as
         its script — its execution order (_resolve_human_scripts()).
         RobotAgent receives its assigned_tasks as its task pool, plus (when the
-        assignment_prior switch is on) the observed human's assigned_tasks: the
-        work order, never the script.
+        assignment_prior switch is on) the observed human's assigned_tasks,
+        never the script; and its task model, built from the tree (T-H).
         """
         agent_cfgs = {a.agent_id: a for a in scenario.agents}
 
         # Every scripted and assigned task must be well typed against this layout
         # (F47b, TODO-49): the bound objects exist, with the types the schema
-        # declares. An error, not a warning.
+        # declares, and a duration parameter is a duration the body's own parser
+        # reads (T-H). An error, not a warning.
         # A human's script is checked element by element: every task in it
         # (a deviation's too), and every object a primitive names (T-C2a).
         object_type_by_id = {obj_id: obj.type for obj_id, obj in self.objects.items()}
+        check_duration = lambda duration: _parse_duration_to_steps(duration, self)
         for agent_cfg in scenario.agents:
             try:
-                check_script_bindings(agent_cfg.scheduled_tasks or [], object_type_by_id, self.knowledge)
+                check_script_bindings(agent_cfg.scheduled_tasks or [], object_type_by_id, self.tree,
+                                      check_duration)
                 for task in agent_cfg.assigned_tasks or []:
-                    check_task_bindings(task, object_type_by_id)
+                    check_task_bindings(task, object_type_by_id, check_duration)
             except ValueError as e:
                 raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
-
-        # Assigned tasks — the robot's pool and the human's work order — agree
-        # with the layout's destinations (T-B1a). The human's scheduled_tasks is
-        # not checked: its script may send an object elsewhere.
-        destination_by_id = {obj_id: obj.destination for obj_id, obj in self.objects.items()
-                             if obj.destination is not None}
-        for agent_cfg in scenario.agents:
-            for task in agent_cfg.assigned_tasks or []:
-                try:
-                    check_task_destinations(task, destination_by_id)
-                except ValueError as e:
-                    raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
 
         for agent_cfg in scenario.agents:
             start_pos = agent_cfg.start_position
@@ -349,6 +342,11 @@ class SimModel(model.Model):
                 self.humans[agent_cfg.agent_id] = agent
 
             elif agent_cfg.agent_type == "robot":
+                # The robot's task model (T-H): built from the tree, per robot.
+                # Every robot is given the use case's declared task model
+                # (TODO-102: a per-robot task model on the robot's AgentConfig).
+                task_model = TaskModel(self.tree, self._task_model_schemas)
+                self._check_destinations(scenario, agent_cfg, agent_cfgs)
                 observed_id = agent_cfg.observes[0] if agent_cfg.observes else None
                 observed_cfg = agent_cfgs.get(observed_id) if observed_id else None
                 observed_assigned = (
@@ -366,7 +364,7 @@ class SimModel(model.Model):
                     unique_id=agent_cfg.agent_id,
                     model=self,
                     pos=start_pos,
-                    knowledge=self.knowledge,
+                    task_model=task_model,
                     assigned_tasks=agent_cfg.assigned_tasks,  # List[TaskInstance]
                     known_objects_by_type=self._objects_by_type,
                     observed_agent_id=observed_id,
@@ -378,17 +376,36 @@ class SimModel(model.Model):
 
         self._resolve_human_scripts(scenario)
 
+    def _check_destinations(self, scenario: ScenarioConfig, robot_cfg, agent_cfgs: Dict) -> None:
+        """
+        The tasks the robot's mind holds agree with the layout's destinations
+        (T-B1a), checked where its task model is built: its own assigned tasks,
+        its plans, and the assigned tasks of the agent it observes, which it may
+        be told. The human's script is not checked: it may send an object
+        elsewhere (T-H: types only).
+        """
+        destination_by_id = {obj_id: obj.destination for obj_id, obj in self.objects.items()
+                             if obj.destination is not None}
+        checked = [robot_cfg] + [agent_cfgs[a] for a in robot_cfg.observes if a in agent_cfgs]
+        for agent_cfg in checked:
+            for task in agent_cfg.assigned_tasks or []:
+                try:
+                    check_task_destinations(task, destination_by_id)
+                except ValueError as e:
+                    raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
+
     def _resolve_human_scripts(self, scenario: ScenarioConfig):
         """
         Each human's script resolved from the initial world (T-C1, T-C2a):
         every TaskInstance expanded by the planner's decomposition, each against
         the state the elements before it leave behind (T-C2b), every deviation
-        applied, so the executed form is primitives only; the work order checked
-        again on it, by provenance. Handed to the HumanAgent, whose executor is
-        action-level (T-C2b); every human runs through it.
+        applied, so the executed form is primitives only; the assigned tasks
+        checked again on it, by provenance. Expanded with the world's tree (T-H).
+        Handed to the HumanAgent, whose executor is action-level (T-C2b); every
+        human runs through it.
         """
         world = build_world_state(self)
-        planner = AdaptivePlanner(knowledge=self.knowledge)
+        planner = AdaptivePlanner(knowledge=self.tree)
         for agent_cfg in scenario.agents:
             if agent_cfg.agent_type != "human":
                 continue

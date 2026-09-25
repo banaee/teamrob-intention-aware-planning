@@ -129,11 +129,12 @@ ALGORITHM:
           consulted — see update())
 
     Admissibility restriction (optional, off by default):
-        When the robot knows which tasks the observed agent is assigned — a work
-        order, not a plan — that knowledge restricts the SUPPORT of the belief;
-        it is not a magnitude. The admissible set is the assigned tasks, plus
-        every foreseeable task (schema.is_foreseeable — a deviation is never part
-        of a work order, and must stay recognizable), plus 'unknown'. Admissible
+        When the robot knows which tasks the observed agent is assigned — its
+        assigned tasks, not a plan — that knowledge restricts the SUPPORT of the
+        belief; it is not a magnitude. The admissible set is the hypotheses of
+        the assigned WorkTask instances, plus every hypothesis of a PersonalTask
+        in the task model (a foreseeable task: never assigned, and must stay
+        recognizable), plus 'unknown'; compared as HypothesisKey values (T-H). Admissible
         hypotheses take the ordinary update above, normalized over admissible
         mass only; inadmissible ones are refuted — pinned at BELIEF_FLOOR, never
         accumulating evidence. No weight, no boost: confidence is then a function
@@ -143,9 +144,9 @@ ALGORITHM:
     Normalization: posterior sums to 1.0 after each update.
 
 HYPOTHESIS SPACE:
-    One hypothesis per (task_name, param_bindings) pair derived from the domain
-    schemas and the objects present in the workspace, plus 'unknown'.
-    Hypotheses include both assigned and foreseeable tasks.
+    One hypothesis per (task_name, param_bindings) pair derived from the robot's
+    task model and the objects present in the workspace, plus 'unknown'.
+    Hypotheses include both WorkTasks and the PersonalTasks the model holds.
 
 INPUTS:
     - Observation:      detected_microaction, spatial_context.position
@@ -153,7 +154,7 @@ INPUTS:
                         object_positions, agent_positions (target resolution)
     - ContextKnowledge: shift_start_step, room_temperature
     - prev_belief:      previous BeliefState (None → initial prior)
-    - assigned_tasks:   observed agent's work order (None/empty → restriction is off)
+    - assigned_tasks:   observed agent's assigned tasks (None/empty → restriction is off)
 
 OUTPUTS:
     - BeliefState: distribution, most_likely, confidence
@@ -165,9 +166,9 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from shared.types import (
     Observation, BeliefState, WorldState, GroundedAction,
-    TaskInstance, task_instance_key,
+    TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask,
 )
-from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
+from shared.knowledge import TaskModel, ContextKnowledge
 from shared.planner import AdaptivePlanner, DecompositionError
 from shared.target_resolution import movement_target_position
 from shared import likelihood_functions
@@ -210,12 +211,25 @@ UNKNOWN = "unknown"
 
 class HypothesisKey:
     """
-    Identifies one IR hypothesis: a task with specific parameter bindings.
+    Identifies one IR hypothesis: a task schema of the robot's task model with
+    specific parameter bindings (the enumerated ones).
     e.g. deliver_item(?item=item_3), coffee_break()
+    Holds the schema OBJECT (T-H1): equal keys have the same schema by identity
+    and equal bindings. `task_name` is the schema's name, for the key's string.
     """
-    def __init__(self, task_name: str, bindings: Dict[str, str]):
-        self.task_name = task_name
+    def __init__(self, schema: TaskSchema, bindings: Dict[str, str]):
+        self.schema = schema
         self.bindings = bindings
+
+    @property
+    def task_name(self) -> str:
+        return self.schema.name
+
+    def task_instance(self) -> TaskInstance:
+        """The task this hypothesis names, as a TaskInstance of its schema (its
+        determined parameters unbound: the planner resolves them)."""
+        return TaskInstance(schema=self.schema,
+                            bindings={Var(k): Const(v) for k, v in self.bindings.items()})
 
     def __repr__(self):
         if self.bindings:
@@ -225,7 +239,7 @@ class HypothesisKey:
 
     def __eq__(self, other):
         return (isinstance(other, HypothesisKey)
-                and self.task_name == other.task_name
+                and self.schema is other.schema
                 and self.bindings == other.bindings)
 
     def __hash__(self):
@@ -234,50 +248,19 @@ class HypothesisKey:
 # ============================================================================
 #  Functions
 # ============================================================================ 
-# def build_hypothesis_space(
-#     knowledge: DomainKnowledgeBase,
-#     known_item_ids: List[str],
-# ) -> List[HypothesisKey]:
-#     """
-#     Build the full hypothesis space for IR.
-#     One HypothesisKey per (intention, parameter_binding) combination.
-
-#     For tasks with ?item parameter: one hypothesis per known item in workspace.
-#     For parameterless tasks (coffee_break, ac_activation): one hypothesis total.
-
-#     Called once at agent construction. Item IDs come from workspace layout —
-#     the robot observes all items exist, but not which are assigned to the human.
-#     """
-#     hypotheses = []
-#     for intention_name in knowledge.get_all_intentions():
-#         task_schema = knowledge.get_task_schema(intention_name)
-#         if task_schema is None:
-#             continue
-#         param_types = task_schema.parameter_types
-#         if not param_types:
-#             hypotheses.append(HypothesisKey(task_name=intention_name, bindings={}))
-#             continue
-#         var_names = list(param_types.keys())
-#         candidate_lists = [knowledge.get_objects_by_type(param_types[v]) for v in var_names]
-#         for combo in itertools.product(*candidate_lists):
-#             hypotheses.append(HypothesisKey(
-#                 task_name=intention_name,
-#                 bindings=dict(zip(var_names, combo)),
-#             ))
-#     return hypotheses
-
 def build_hypothesis_space(
-    knowledge: DomainKnowledgeBase,
-    known_objects_by_type: Dict[str, List[str]],   # was: known_item_ids: List[str]
+    task_model: TaskModel,
+    known_objects_by_type: Dict[str, List[str]],
 ) -> List[HypothesisKey]:
+    """
+    One HypothesisKey per task schema of the robot's task model and each
+    combination of workspace objects for its enumerated parameters.
+    """
     hypotheses = []
-    for intention_name in knowledge.get_all_intentions():
-        task_schema = knowledge.get_task_schema(intention_name)
-        if task_schema is None:
-            continue
+    for task_schema in task_model.task_schemas():
         param_types = task_schema.parameter_types
         if not param_types:
-            hypotheses.append(HypothesisKey(task_name=intention_name, bindings={}))
+            hypotheses.append(HypothesisKey(schema=task_schema, bindings={}))
             continue
         # A parameter another parameter determines (the item's table) is not
         # free: enumerating it would split one intention into indistinguishable
@@ -286,7 +269,7 @@ def build_hypothesis_space(
         candidate_lists = [known_objects_by_type.get(param_types[v], []) for v in var_names]
         for combo in itertools.product(*candidate_lists):
             hypotheses.append(HypothesisKey(
-                task_name=intention_name,
+                schema=task_schema,
                 bindings=dict(zip(var_names, combo)),
             ))
     return hypotheses
@@ -299,7 +282,7 @@ class IntentionRecognizer:
 
     def __init__(
         self,
-        knowledge: DomainKnowledgeBase,
+        task_model: TaskModel,
         context: ContextKnowledge,
         hypotheses: List[HypothesisKey],
         beta: float,
@@ -307,7 +290,7 @@ class IntentionRecognizer:
         path_cost: Optional[likelihood_functions.PathCost] = None,
     ):
         """
-        knowledge:      HTN domain knowledge
+        task_model:     the robot's task model (T-H): its HTN knowledge
         context:        background context facts for ω_context weighting
         hypotheses:     list of (task_name, bindings) pairs for this scenario.
                         Built from the domain schemas and the workspace objects
@@ -316,7 +299,7 @@ class IntentionRecognizer:
                         of the body's length (Mesa: 0.01 /cm). Supplied by the
                         embodiment, no default: it carries the body's units,
                         and shared/ holds none (T-A1; TODO-58).
-        assigned_tasks: the OBSERVED agent's work order — which tasks it was
+        assigned_tasks: the OBSERVED agent's assigned tasks — which tasks it was
                         assigned, not in which order it will do them. None or
                         empty means the robot has no such knowledge: the
                         admissibility restriction is off and update() runs its
@@ -333,14 +316,14 @@ class IntentionRecognizer:
         so `prior` has one consistent type throughout update(), whether it
         comes from prev_belief.distribution or this fallback.
         """
-        self.knowledge = knowledge
+        self.task_model = task_model
         self.context = context
         self._path_cost = path_cost or likelihood_functions.straight_line_cost
         self._beta = beta
         # A schema naming an evaluator the registry does not have is a domain
         # modelling error, and must not look like uncertainty: without this
         # check every movement under it would silently score the perfect fit.
-        for schema in knowledge.get_all_actions():
+        for schema in task_model.get_all_actions():
             name = schema.progress_evaluator
             if name is not None and name not in likelihood_functions.PROGRESS_EVALUATORS:
                 raise ValueError(
@@ -351,8 +334,8 @@ class IntentionRecognizer:
         # insertion order of the evidence and output dicts, hence max()'s
         # tie-break for most_likely and the order of tied entries in the log —
         # is a function of the hypothesis space alone, not of the order the
-        # caller enumerated it in (which followed DomainModel.intentions, a
-        # set, hence the process's hash seed; TODO-42).
+        # caller enumerated it in (which once followed a set of task names,
+        # hence the process's hash seed; TODO-42).
         self._hypotheses = sorted(hypotheses, key=repr)
         self._history: List[Observation] = []
         self._by_key: Dict[str, HypothesisKey] = {repr(h): h for h in self._hypotheses}  # this is used to look up HypothesisKey by string repr in update()
@@ -362,7 +345,7 @@ class IntentionRecognizer:
         # which method its guards admit for the observed agent, and what each
         # step then targets. Held privately for the same reason the projector
         # holds one — decomposition is stateless and world-driven.
-        self._planner = AdaptivePlanner(knowledge=knowledge)
+        self._planner = AdaptivePlanner(knowledge=task_model)
         # Per-tick memo of the grounded action list per hypothesis key (None =
         # not decomposable this tick). Cleared at the top of update().
         self._tick_actions: Dict[str, Optional[List[GroundedAction]]] = {}
@@ -403,7 +386,7 @@ class IntentionRecognizer:
         # context weights and no pins in it; _output() derives the report from it.
         self._evidence: Dict[str, float] = {}
 
-        self._admissible: Optional[Set[str]] = self._build_admissible_keys(assigned_tasks)
+        self._admissible: Optional[Set[HypothesisKey]] = self._build_admissible(assigned_tasks)
 
         if self._admissible is None:
             # Uniform prior over all hypotheses + unknown
@@ -414,13 +397,13 @@ class IntentionRecognizer:
             # agree. Built in hypothesis order (then unknown), the order update()
             # produces, not in the admissible set's iteration order.
             self._initial_prior = self._pin(
-                self._prior([repr(h) for h in self._hypotheses if repr(h) in self._admissible]),
-                {k for k in self._by_key if k not in self._admissible},
+                self._prior([repr(h) for h in self._hypotheses if h in self._admissible]),
+                {repr(h) for h in self._hypotheses if h not in self._admissible},
             )
         # Keys pinned at BELIEF_FLOOR on every output because of the restriction.
         self._inadmissible: Set[str] = (
             set() if self._admissible is None
-            else {k for k in self._by_key if k not in self._admissible}
+            else {repr(h) for h in self._hypotheses if h not in self._admissible}
         )
         self._evidence = {k: v for k, v in self._initial_prior.items() if k not in self._inadmissible}
         self._base = dict(self._evidence)
@@ -458,24 +441,29 @@ class IntentionRecognizer:
         for key in self._origin:
             self._origin[key], self._origin_odo[key] = pos, odo
 
-    def _build_admissible_keys(
+    def _build_admissible(
         self,
         assigned_tasks: Optional[List[TaskInstance]],
-    ) -> Optional[Set[str]]:
+    ) -> Optional[Set[HypothesisKey]]:
         """
-        The set of hypothesis keys the observed agent's intention may lie in:
-        its assigned tasks, plus every foreseeable task, plus 'unknown'. Returns
-        None when nothing is known, which switches the mechanism off entirely
-        rather than admitting everything explicitly — equivalent in effect, but
-        None keeps update() on its original, unrestricted path.
+        The support restriction (T-H, item 3): the hypotheses the observed
+        agent's intention may lie in,
+            admissible = { hypotheses of the WorkTask instances in the assigned tasks }
+                       ∪ { every hypothesis of a PersonalTask in the task model }
+                       ∪ { unknown }
+        compared as HypothesisKey values. 'unknown' is admissible by
+        construction and is not a HypothesisKey, so the returned set holds the
+        task hypotheses only. Every assigned task is a WorkTask instance (checked
+        at load, AgentConfig). Returns None when nothing is known, which switches
+        the mechanism off entirely rather than admitting everything explicitly —
+        equivalent in effect, but None keeps update() on its original,
+        unrestricted path.
 
-        Foreseeable tasks and 'unknown' are admissible by construction. A
-        foreseeable task is a deviation, and deviations are exactly what a work
-        order does not list — identified by schema.is_foreseeable, so no task
-        name is named here. 'unknown' is the residual hypothesis, which takes
-        the mass when no task hypothesis explains the observations.
-        Restricting either away would make a deviation unrecognizable at the
-        very moment it happens.
+        A PersonalTask in the task model is a foreseeable task: never assigned,
+        so it must stay recognizable when the human switches to it. 'unknown' is
+        the residual hypothesis, which takes the mass when no task hypothesis
+        explains the observations. This is the one place the recognizer reads a
+        schema's class.
 
         An assigned task is matched to the hypothesis space on its ENUMERATED
         parameters: the hypothesis key built from its bindings minus the
@@ -489,19 +477,19 @@ class IntentionRecognizer:
         if not assigned_tasks:
             return None
 
-        admissible: Set[str] = {UNKNOWN}
-        for hyp in self._hypotheses:
-            schema = self.knowledge.get_task_schema(hyp.task_name)
-            if schema is not None and schema.is_foreseeable:
-                admissible.add(repr(hyp))
+        space = set(self._hypotheses)
+        admissible: Set[HypothesisKey] = {
+            hyp for hyp in self._hypotheses
+            if isinstance(hyp.schema, PersonalTask)
+        }
 
         for task in assigned_tasks:
-            key = repr(HypothesisKey(
-                task_name=task.schema.name,
+            key = HypothesisKey(
+                schema=task.schema,
                 bindings={var.name: const.value for var, const in task.bindings.items()
                           if var.name not in task.schema.determined_parameters},
-            ))
-            if key in self._by_key:
+            )
+            if key in space:
                 admissible.add(key)
             else:
                 logging.warning(
@@ -937,7 +925,7 @@ class IntentionRecognizer:
         if key in self._tick_actions:
             return self._tick_actions[key]
         try:
-            actions = self._planner.decompose(hyp.task_name, hyp.bindings, agent_id, world)
+            actions = self._planner.decompose(hyp.task_instance(), agent_id, world)
             self._undecomposable.discard(key)
         except DecompositionError as e:
             actions = None

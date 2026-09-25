@@ -26,8 +26,8 @@ if REPO_PATH not in sys.path:
 
 from shared.types import Var, Const, BeliefState, WorldState
 from shared.planner import AdaptivePlanner
-from shared.domain_knowledge import DomainKnowledgeBase
-from domains.kitting.registry import register_kitting_domain
+from shared.knowledge import TaskModel
+from domains.kitting.registry import register_kitting_domain, domain_config as kitting_config
 from domains.kitting.scenarios import scenario_10
 # ---------------------------------------------------------------------------
 
@@ -240,9 +240,9 @@ class PlannerVisualizer(Node):
         self.robot_holding: str = None   # item_id or None
 
         # --- Repo: domain knowledge + planner -----------------------------
-        domain_model   = register_kitting_domain()
-        self.knowledge = DomainKnowledgeBase.from_domain(domain_model)
-        self.planner   = AdaptivePlanner(self.knowledge)
+        tree           = register_kitting_domain()
+        self.task_model = TaskModel(tree, kitting_config["task_model"])   # the robot's task model (T-H)
+        self.planner   = AdaptivePlanner(self.task_model)
 
         # --- Repo: get robot task list from scenario_10 -------------------
         # scenario_10 robot_0: deliver_item(item_5), deliver_item(item_1), deliver_item(item_7)
@@ -304,7 +304,7 @@ class PlannerVisualizer(Node):
 
         task_instance = self.task_queue[self.task_index]
 
-        # Convert TaskInstance bindings to Dict[str, str] for planner
+        # For the log line below
         task_params = {
             var.name: const.value
             for var, const in task_instance.bindings.items()
@@ -326,8 +326,7 @@ class PlannerVisualizer(Node):
 
         # Get AbstractPlan from repo's planner
         plan = self.planner.plan(
-            my_intention=task_instance.schema.name,
-            task_params=task_params,
+            task=task_instance,
             agent_id=self.layout["robot"]["id"],
             belief=belief,
             world=world_state,

@@ -29,7 +29,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, List, Optional, Dict
 
-from shared.domain_knowledge import DomainKnowledgeBase, ContextKnowledge
+from shared.knowledge import TaskModel, ContextKnowledge
 from shared.projection import Projector
 from shared.recognizer import IntentionRecognizer, HypothesisKey, build_hypothesis_space
 
@@ -144,7 +144,7 @@ class HumanAgent(FactoryAgent):
                     continue
                 self._stay_remaining = element.ticks if element.ticks is not None else -1
             else:
-                action = ground(element, self.unique_id, self.model.knowledge)
+                action = ground(element, self.unique_id, self.model.tree)
                 self.current_plan = AbstractPlan(goal_intention=action.action_name, actions=[action])
 
         if self._stay_remaining is not None:
@@ -179,7 +179,7 @@ class RobotAgent(FactoryAgent):
                  unique_id: str, 
                  model: "SimModel",
                  pos: tuple,
-                 knowledge: DomainKnowledgeBase,
+                 task_model: TaskModel,
                  assigned_tasks: List[TaskInstance],
                  # known_item_ids=List[str],
                  known_objects_by_type: Dict[str, List[str]],
@@ -194,8 +194,8 @@ class RobotAgent(FactoryAgent):
         self.observed_agent_id = observed_agent_id
         self.assigned_tasks: List[TaskInstance] = assigned_tasks
 
-        # Build hypothesis space from the domain schemas and the workspace objects
-        hypotheses = build_hypothesis_space(knowledge=knowledge, known_objects_by_type=known_objects_by_type)
+        # Build hypothesis space from the robot's task model and the workspace objects
+        hypotheses = build_hypothesis_space(task_model=task_model, known_objects_by_type=known_objects_by_type)
 
         context = ContextKnowledge.default()
 
@@ -206,7 +206,7 @@ class RobotAgent(FactoryAgent):
         min_separation, self._min_separation_source = _get_min_separation(model)
 
         self.recognizer = IntentionRecognizer(
-            knowledge=knowledge,
+            task_model=task_model,
             hypotheses=hypotheses,
             context=context,
             beta=beta,
@@ -238,7 +238,7 @@ class RobotAgent(FactoryAgent):
         #                              the decomposer's own parser over seconds_per_step,
         #                              so the projected wait is the executed wait (TODO-32)
         self.projector = Projector(
-            knowledge=knowledge,
+            task_model=task_model,
             assumed_speed=_get_step_size(model),
             default_action_cost=1.0,
             arrival_radius=PROXIMITY_THRESHOLD,
@@ -254,7 +254,7 @@ class RobotAgent(FactoryAgent):
         # --cost_strategy), not scenario facts. min_separation
         # is the body's, in world units (mesa_configs.yaml), like assumed_speed above.
         self.meta_planner = MetaPlanner(
-            knowledge=knowledge,
+            task_model=task_model,
             projector=self.projector,
             recognizer=self.recognizer,
             min_separation=min_separation,
@@ -285,7 +285,7 @@ class RobotAgent(FactoryAgent):
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
 
-        self.planner = AdaptivePlanner(knowledge=knowledge)
+        self.planner = AdaptivePlanner(knowledge=task_model)
         self.current_plan: Optional[AbstractPlan] = None
 
         # The execution-time separation stop (C, TODO-73) is a run option; when
@@ -392,10 +392,8 @@ class RobotAgent(FactoryAgent):
                 and task_instance_key(result.current_task) == task_instance_key(self.current_task_instance)
             )
             self.current_task_instance = result.current_task
-            task_params = {k.name: v.value for k, v in self.current_task_instance.bindings.items()}
             self.current_plan = self.planner.plan(
-                my_intention=self.current_task_instance.schema.name,
-                task_params=task_params,
+                task=self.current_task_instance,
                 agent_id=self.unique_id,
                 belief=belief_for_meta_planner,
                 world=world,
