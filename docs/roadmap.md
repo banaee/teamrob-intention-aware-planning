@@ -439,7 +439,8 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     stack.
   - T-H3 the migration of the scenarios (and of `dock_loading`, `ros_sim`); deletion of the C1 vocabulary,
     `Deviation`, `Provenance`, `expand` / `resolve_script` as a separate form, the key-based checks, `Stay`,
-    `MoveTo` / `PickUp` / `Place`.
+    `MoveTo` / `PickUp` / `Place`. Built (25 Sept 2026): every scenario on the kitting call form; the `HumanOnlyTask`
+    `go_to_and_stand` added to the kitting tree (design_decisions.md, T-H as built).
   - T-H4 the record's queries, `unperformed` and coverage; supersedes TODO-92.
   Acceptance after each build: the 40 maintained baseline logs rerun; robot-side lines byte-identical; human-side
   differences listed and each explained; at the end of T-H3 the new logs replace the stored baselines.

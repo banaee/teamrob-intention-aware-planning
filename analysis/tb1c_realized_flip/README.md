@@ -226,3 +226,24 @@ completion (world tick) old -> new | holds (start:planned) old -> new.
 | s83_plain_on | 8e0d42f4c59676904a925f4516465b15 |
 | s83_realized_off | 2fc8cf8de5c4f9863ea28d7d522f6bde |
 | s83_realized_on | 730bfd280ce78befb0fed3301692b36a |
+
+## T-H3: the human's script on the stack machine — the logs from here on
+
+Regenerated after T-H3 with the same command, superseding the T-C2b table. CAUSE: every scenario's human script is a
+`Script` run by the human's stack machine (`docs/design_decisions.md`, "T-H: the human behaviour model", as built
+T-H3); the C1 list form is deleted. Against the T-C2b logs every line outside `[human]` is byte-identical, the human's
+step lines included: the robot sees the same body. The `[human] … primitive k: <action>` lines are replaced by the
+record's transitions (`entered:<task>`, `completed:<task>`), the step-0 one printed after the executor's `_load_plan`
+line. Each log now has its `.rec` stream beside it (the human executor's record, one `[rec]` line per tick; the first
+non-empty `.rec` baselines), git-ignored like the logs.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s80_plain_off | 341630559a75efc01c31301002c1c970 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_plain_on | 0ea6185153e9cf92364cabc22e21c0df | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_realized_off | 45131c21bdf6a70155eb55d06f7c1995 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_realized_on | 61d72d8c85e8f4bdbba12bbae4cdcb7e | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s83_plain_off | b14941d5ac19fde74e736840c7b43ce7 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_plain_on | 4a122858982c7c868c81a8dea9d003bd | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_realized_off | 7e5218e4e8640b0688729b857dac47e1 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_realized_on | b3913816203cb94cabc51562e64e4993 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

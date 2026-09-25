@@ -156,3 +156,28 @@ completion (world tick) old -> new | holds (start:planned) old -> new.
 | s83_full_reorder_on | 730bfd280ce78befb0fed3301692b36a |
 | s83_single_task_off | 3728b49a074a8cd630a43b539ac59a87 |
 | s83_single_task_on | 1a45e0d17e477f34ee25d00221a2bb1a |
+
+## T-H3: the human's script on the stack machine — the logs from here on
+
+Regenerated after T-H3 with the same command, superseding the T-C2b table. CAUSE: every scenario's human script is a
+`Script` run by the human's stack machine (`docs/design_decisions.md`, "T-H: the human behaviour model", as built
+T-H3); the C1 list form is deleted. Against the T-C2b logs every line outside `[human]` is byte-identical, the human's
+step lines included: the robot sees the same body. The `[human] … primitive k: <action>` lines are replaced by the
+record's transitions (`entered:<task>`, `completed:<task>`), the step-0 one printed after the executor's `_load_plan`
+line. Each log now has its `.rec` stream beside it (the human executor's record, one `[rec]` line per tick; the first
+non-empty `.rec` baselines), git-ignored like the logs.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s20_full_reorder_off | 51d7e28f1250ec00fb0c04b53efc6f36 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s20_full_reorder_on | 365aabf47468dd71ee75090eab258a36 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s70_full_reorder_off | b021e2607f56832cdc43cb90de09e8bb | dab078d5ca51e5b378054ee6a60ccca7 |
+| s70_full_reorder_on | 136b8f2838cbb0a1dd8c99bffa5d3d85 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s80_full_reorder_off | 45131c21bdf6a70155eb55d06f7c1995 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_full_reorder_on | 61d72d8c85e8f4bdbba12bbae4cdcb7e | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s81_full_reorder_off | 9bbdb15562d6c83b21bdf6a98f43ec45 | 329590c9c1249859bfe20d107588c50a |
+| s81_full_reorder_on | 3f7b3786eb420a89c2b323b7f1407b52 | 329590c9c1249859bfe20d107588c50a |
+| s83_full_reorder_off | 7e5218e4e8640b0688729b857dac47e1 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_full_reorder_on | b3913816203cb94cabc51562e64e4993 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_single_task_off | 7d5c69a760b717a400f356800cdbd600 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_single_task_on | 186db58f357d2bb33bd457e2a45287d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

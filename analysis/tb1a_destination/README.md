@@ -234,3 +234,32 @@ completion (world tick) old -> new | holds (start:planned) old -> new.
 | s70_on | cac5f1f9ce11892656a21b7e9960bde4 |
 | s71_off | 962f51ae814cdbdf71edd0546784cea8 |
 | s71_on | d47cc020e9d358ff2712e0a72db5bcca |
+
+## T-H3: the human's script on the stack machine — the logs from here on
+
+Regenerated after T-H3 with the same command, superseding the T-C2b table. CAUSE: every scenario's human script is a
+`Script` run by the human's stack machine (`docs/design_decisions.md`, "T-H: the human behaviour model", as built
+T-H3); the C1 list form is deleted. Against the T-C2b logs every line outside `[human]` is byte-identical, the human's
+step lines included: the robot sees the same body. The `[human] … primitive k: <action>` lines are replaced by the
+record's transitions (`entered:<task>`, `completed:<task>`), the step-0 one printed after the executor's `_load_plan`
+line. Each log now has its `.rec` stream beside it (the human executor's record, one `[rec]` line per tick; the first
+non-empty `.rec` baselines), git-ignored like the logs.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s00_off | 9015bf77def82770c083fbc12b98bbb3 | 5c7835ba3417ff28b5d3caf1d00d906e |
+| s00_on | 1021b473b4cb063cb036068eb388724c | 5c7835ba3417ff28b5d3caf1d00d906e |
+| s10_off | 7fe951f958c1a15fd637ce0429f1607e | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| s10_on | 28cee0b23d7d79d121ca73ff23526f89 | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| s20_off | 11e95a9c54575913174d945387f671c9 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s20_on | cb9390c69b72708feaf61643776d96c8 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s30_off | 1bb96f0e36db67a7568e1eac538bc30b | 65d234649396c9ab242841050082e9b0 |
+| s30_on | 67a17f9e5cf5d26f94719992dff113be | 65d234649396c9ab242841050082e9b0 |
+| s40_off | 4c9a27a98fb4f8b303c2aab968d16e3e | f6da9d345530212df9b0446aa53d1f1e |
+| s40_on | 5f623007f875b4baf5e3a4f2d4253812 | f6da9d345530212df9b0446aa53d1f1e |
+| s50_off | 389fb15adeed493a4665a7a922b90ea6 | 3e4fd412ba39ddd3267d1d37089beaac |
+| s50_on | 73446fc4205d0ad660b229eb620d80d7 | 3e4fd412ba39ddd3267d1d37089beaac |
+| s70_off | fb674a86b3957a4c62be2a17712870a0 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s70_on | be162273ccbb0afa69dd7a18133476ac | dab078d5ca51e5b378054ee6a60ccca7 |
+| s71_off | 6f56274520131c22fa3e4357c0f42cc5 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s71_on | 6d3d29b11454fa41f93dcfda5e6fd0cc | dab078d5ca51e5b378054ee6a60ccca7 |

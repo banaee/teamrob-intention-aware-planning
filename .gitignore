@@ -22,6 +22,7 @@ Thumbs.db
 
 # Project specific
 *.log
+*.rec
 .pytest_cache/
 
 # Generated file from scripts/env_layout_assembler.py

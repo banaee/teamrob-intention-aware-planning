@@ -40,8 +40,8 @@ This is a living reference of *why* things are designed the way they are.
 > - "T-H" as the name of the recognizer's duration term for a stay (TODO-85 half (a), the "A stationary human" part of
 >   "Robustness is tested in kitting") → that item is TODO-95; the name T-H now means the human behaviour model.
 > - The T-C1 entry's executed form (primitives, `Stay`, `expand`, provenance, `interrupt` / `deviate` / `abandon`,
->   landmarks typed by no schema, the work-order check) is superseded by T-H's tree, script, events and stack; the
->   code keeps it until T-H3.
+>   landmarks typed by no schema, the work-order check) is superseded by T-H's tree, script, events and stack; T-H3
+>   deleted its code and migrated every scenario.
 
 ---
 
@@ -3702,7 +3702,7 @@ Reference: handoff_T-D_onward.md item 6; TODO-80, TODO-85, TODO-87, TODO-92, TOD
 **T-H: the human behaviour model**
 
 RULED (Hadi, 25 September 2026; the design, then the rulings on ccode's conceptual review of it, folded in below).
-T-H1 and T-H2 built (the "as built" lines at the end); T-H3 and T-H4 remain. Supersedes, where they differ, "The human action script (T-C1, decided)"
+T-H1 to T-H3 built (the "as built" lines at the end); T-H4 remains. Supersedes, where they differ, "The human action script (T-C1, decided)"
 (the executed form, the author vocabulary, provenance, landmarks as a parameter type no schema may use, the work-order
 check), the WORLD half of "Terms for human behaviour, model coverage and the robot's inference (ruled)" (labels A and
 B become queries on the record; "deviation" gets the definition of item 1), and, in part, "A run-time deviation is the
@@ -3920,6 +3920,32 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   `Unfired`, `Refused` and `INFEASIBLE` of the replay is a `ScriptError`; at run time they are recorded (the robot's
   effects). Several events per entry fire in authored order, each replayed against the state the previous one
   leaves. The exporter and the viewer's buttons are Phase 7's; `inject` is `HumanAgent.inject(decision)`.
+- (T-H3, as built) THE MIGRATION. Every registered scenario's human script is a `Script` (the list form is refused
+  by `AgentConfig`); `domains/kitting/scenarios.py` is written wholly in the kitting call form (`deliver_item("item_3",
+  table="kitting_table_0")`, `coffee_break(...)`, `ac_activation(...)`, `go_to(...)`, `stand(...)`, `go_to_and_stand(...)`),
+  explicit typed functions in `domains/kitting/script.py`, each building a `TaskInstance` of its schema with the
+  `Var`s read from the schema's parameters. They are kitting's (its schemas, its word `table=`): `world/` holds no use
+  case; the generic sugar (`Script`, `.at`, `.during`, `drop`) stays in `shared/types.py`. `table=` is written wherever
+  the old instance bound it (every kitting instance), so every task instance key, and every robot-side line, is
+  unchanged. The translation, per old edit: `interrupt(t, after=x, with_=[Y])` → `t.at(x, Y)`; `abandon(t, after=x,
+  then=[...])` → `t.at(x, drop)` then plain entries; `abandon(t, before=pick_up)` → `t.at(move_to, drop,
+  occurrence=0)` (the action before the anchor; `deliver_default` has two walks); `deviate(t, destination=k)` → the
+  instance with `table=k`; `MoveTo(landmark)` → `go_to(landmark)`; `Stay(n)` → `stand("PT<2n>S")` (n standing ticks at
+  the body's 2 s per step).
+  RULINGS ON THE PLAN (Hadi, 25 Sept 2026): (Q1) an interruption made of a walk to a landmark and a stay (scenarios
+  03, 22, 52, 93) is one decision: the `HumanOnlyTask` `go_to_and_stand(?landmark, ?duration)` (proposed as `pause_at`,
+  renamed at the report's confirmation for the literal name) = [`move_to(?landmark)`,
+  `stand(?duration)`] is added to the kitting tree and started by the event (suspend, walk and stand, resume); compound
+  behaviour belongs in the tree, not in `Start` or in a drop that records an abandon nobody decided. (Q2) `PT<2n>S`;
+  the stand's acknowledgement tick is accepted, not compensated: a stand is n + 1 ticks where `Stay(n)` was n, so
+  every script with a stand not at its end runs one tick later after it (play examples only; no maintained log has
+  one). (Q3) scenario_70 / 71's declared condition is "the script ends at the AC switch, then no task on the stack to
+  the end of the run": the empty stack is the state a stand with no duration would have stood for, so no such stand
+  exists. The duplicate check on `assigned_tasks` stays on task instance keys (TODO-107, settled with T-H4's task
+  equality). `ProceduralKnowledge.get_action_schema(name)` removed with its last reader.
+  CHECKED: the 40 maintained logs and tb3's 8 unstored `single_task` runs are byte-identical to the T-C2b baselines
+  outside the `[human]` lines, the human's step lines included; the C1 `[human] primitive k:` lines are replaced by the
+  record's transitions (`entered:`, `completed:`); the `.rec` streams are the first non-empty baselines.
 - (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
   table="kitting_table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance
   or its enumerated bindings is part of the query's type, settled in T-H4.

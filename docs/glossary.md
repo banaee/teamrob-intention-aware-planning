@@ -73,7 +73,7 @@ which is the head's hold realized alone.
 previous one as entry k's action schemas declare they leave it (`ActionSchema.retracts`, `effects`,
 `moved_object_key` / `moved_to_key`), with the agent where entry k's last segment ends. Built and dropped
 inside one `Projector.project()` call; the live `WorldState` is never written.
-The same derivation advances the human script's symbolic state at load (sequential expansion, T-C2b, §6).
+The same derivation advances the human script's symbolic state at load (the load-time replay, `check_script`, §6).
 → `shared/projection.py`, `successor_state()`; `docs/design_decisions.md`, "The successor state is
 derived from what the action schemas declare: a delete list and a declared relocation".
 
@@ -335,74 +335,22 @@ instance, T-H), never in which order; the ordering lives only in the human's scr
 never reads `scheduled_tasks`; for the robot it is unread.
 → `shared/types.py`, `AgentConfig`; `docs/design_decisions.md`, "T-H: the human behaviour model", item 4.
 
-SUPERSEDED BY T-H (25 Sept 2026). The five entries below are decided (T-C1) and built: the scenario layer (T-C2a), the
-script written, expanded, edited and checked at load; sequential expansion and the action-level human executor
-(T-C2b). T-H replaces them (the tree, the script of task instances, events, the stack, the record, below); they are
-kept until T-H3 deletes the code, and describe the code until then.
-
-**primitive** — one entry of the human's executed script: a `ScriptAction` (an action of the domain by schema
-name, one element type per action schema) or a `Stay`. Authors write four: `MoveTo`, `PickUp`, `Place` (kitting:
-`move_to`, `pick_up`, `place`) and `Stay`, which grounds to nothing (the executor idles). `expand` yields one
-element per action of the method, so a `coffee_break` gives a `wait_at` element, which grounds to `wait_at` as
-before; `wait_at` is never a `Stay`. The executed `scheduled_tasks` is a flat list of primitives, with no intent
-label and no task-boundary marker. A coordinate-valued `MoveTo` exists for Phase 7's exporter; authors never
-write one.
-→ `shared/types.py`, `ScriptAction`, `Stay`; `domains/kitting/script.py`; `shared/io_contracts.md` §1.12;
-`docs/design_decisions.md`, "The human action script (T-C1, decided)".
-
-**expand** — `expand(task)`: turning a `TaskInstance` in the script into primitives at load, by the planner's own
-decomposition (optional `method=`). Sequential (T-C2b): each task against the symbolic state the script's
-elements before it leave behind, the initial world advanced by the **successor state** (§1). Sets provenance on
-each primitive. It needs a world, so it runs where one exists (the loader, tests, a later generator), not in a
-scenario file.
-→ `domains/script.py`, `expand()`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
-
-**provenance** — the task a primitive came from, recorded automatically by `expand`, one per expansion. The script
-layer's own bookkeeping: the work-order check reads it (every assigned task exactly once); nothing in the robot's
-mind does.
-→ `shared/types.py`, `Provenance`, `check_work_order()`; `docs/design_decisions.md`, "The human action script
-(T-C1, decided)".
-
-**landmark** — a symbolic place a layout may declare (`corner_NE`, `door`), an object of a type of its own that
-no `TaskSchema` types a parameter as (rejected at load). So no hypothesis binds one and no robot action grounds
-to one; the human's script may walk to it (`MoveTo(landmark)`). The type is `landmark`; env_layout0 declares
-`corner_NE`, `corner_NW`, `corner_SE`, `corner_SW` and `door`.
-→ `shared/types.py`, `LANDMARK_TYPE`, `check_no_landmark_parameters()`; `docs/design_decisions.md`, "The human
-action script (T-C1, decided)".
-
-**deviation vocabulary** — the author's edits of the assigned tasks' expansion: `interrupt(task, after=|before=, with_=[...])`,
-`deviate(task, destination=)`, `abandon(task, after=|before=, then=[...])`, plus free `Stay(n)` (n omitted:
-until the run ends) and `MoveTo(landmark)`. Anchors name an action by name or index; injected content may mix
-tasks and primitives; in T-C every injection sits at an action boundary. The edits are operations on the
-expanded assigned tasks: each PRODUCED a deviation in the 24 September sense (label A), a departure from the assigned tasks, and is
-not a kind of deviation; a deviation is not a task of its own. NOTE: the class `Deviation` names the deferred edit,
-not the condition; the identifier is not renamed. Written at import, where there is no world, each returns a deferred
-edit (`[Deviation]`) that the loader applies to the task's expansion with the list helpers (`insert_after`,
-`insert_before`, `retarget`, `truncate`).
-AUTHOR CONVENTION (T-C2c, Hadi): a script ends with the human leaving the workspace (`MoveTo("door")` or a corner),
-unless the scenario is about the terminal stand at a table (TODO-80's blocked case, said in its description): a
-human left standing at a table deadlocks the robot with the stop on, an artefact of the scenario. The terminal exit
-walk is intended unmodelled behaviour (no hypothesis binds a landmark): by this convention it is a declared
-unmodelled behaviour of every scenario, so the label-C check (§7) excludes it.
-AUTHOR NOTE (T-C2b): content injected by `interrupt` is expanded sequentially, but the interrupted task's
-remaining actions are not: a task injected after a pick-up that returns the held item (`deliver_with_return`)
-leaves the resumed `place` failing at run time. Write the return explicitly, or use `abandon`. (Under T-H the
-suspended task is re-expanded in the current state on resumption, **stack** below.)
-→ `domains/script.py`; `docs/design_decisions.md`, "The human action script (T-C1, decided)".
-
-THE HUMAN BEHAVIOUR MODEL (T-H). Ruled by Hadi, 25 September 2026 (with the rulings on the review); T-H1 and T-H2
-built, T-H3 and T-H4 remain. The entries below are the meaning from here.
+THE HUMAN BEHAVIOUR MODEL (T-H). Ruled by Hadi, 25 September 2026 (with the rulings on the review); T-H1 to T-H3
+built (T-H3 migrated every scenario and deleted the T-C1 script layer: primitives, `Stay`, `expand`, provenance, the
+deviation vocabulary), T-H4 remains. The entries below are the meaning from here.
 → `docs/design_decisions.md`, "T-H: the human behaviour model"; `docs/handoffs/handoff_T-H.md`. Code (T-H2): the
 script types in `shared/types.py` (`Trigger`, `Decision`, `Event`, `ScriptEntry`, `Script`, the `at` / `during`
 sugar); the stack machine and the load-time replay in `world/human_executor.py`; the record in `world/record.py`;
 the body-side driver `HumanAgent._step_stack` and `HumanAgent.inject` in `mesa_sim/sim_agents.py`; the cut in
-`mesa_sim/executor.py` (`suspend`, `resume`, `progress`). `world/` is the world's side (CLAUDE.md, "Layering: four
+`mesa_sim/executor.py` (`suspend`, `resume`, `progress`); the kitting call forms (`deliver_item("item_3")`,
+`coffee_break(...)`, `go_to(...)`, `stand(...)`, `go_to_and_stand(...)`, T-H3) in `domains/kitting/script.py`. `world/` is the world's side (CLAUDE.md, "Layering: four
 homes"): it imports `shared/` only.
 
 **WorkTask / PersonalTask / HumanOnlyTask** — the three classes of the one tree of task schemas per use case, each
 with the full HTN structure. A `WorkTask` may appear in a human's assigned tasks (`deliver_item`); a robot's own
 assigned tasks are `WorkTask`s. A `PersonalTask` is never assigned (`coffee_break`, `ac_activation`). A
-`HumanOnlyTask` is a `PersonalTask` never given to any robot (`go_to(?landmark)`, `stand(?duration)`); it is the only
+`HumanOnlyTask` is a `PersonalTask` never given to any robot (`go_to(?landmark)`, `stand(?duration)`,
+`go_to_and_stand(?landmark, ?duration)`); it is the only
 class that may type a parameter as a landmark. Replace `TaskSchema.is_assigned` and `is_foreseeable`.
 
 **tree** — the world's tree of task schemas, one per use case: one of the two knowledge objects. The human executor's
@@ -512,8 +460,18 @@ Where the action and the task could both be read, write "the stand action" or "t
 COLLISION: "a stand" in §7 and the older records is the ordinary word for a human standing still (in the record, a
 `stand` task, a `wait_at` inside a task, or an empty stack); the hold's STAND ticks are a microaction.
 
+**landmark** — a symbolic place a layout may declare (`corner_NE`, `door`), an object of the type `landmark`. Only a
+`HumanOnlyTask` may type a parameter as one (`go_to(?landmark)`, `go_to_and_stand(?landmark, ?duration)`; `Tree`'s
+constructor rejects any other), so no hypothesis binds one and no robot action grounds to one. env_layout0 declares
+`corner_NE`, `corner_NW`, `corner_SE`, `corner_SW` and `door`.
+→ `shared/types.py`, `LANDMARK_TYPE`; `shared/knowledge.py`, `Tree`.
+
 **go_to** — the `HumanOnlyTask` `go_to(?landmark)`: walking to a landmark (`move_to` the landmark). Replaces
 `MoveTo(landmark)`. Walks from the viewer go to landmarks only.
+
+**go_to_and_stand** — the `HumanOnlyTask` `go_to_and_stand(?landmark, ?duration)`: walking to a landmark and standing there
+(`move_to` the landmark, then the stand action), one decision (T-H3). Started by an event, it is the interruption in
+which the human steps away to a place and stays, and the suspended task resumes after it.
 
 ---
 

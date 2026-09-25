@@ -20,7 +20,7 @@ from shared.planner import AdaptivePlanner
 from shared.recognizer import HypothesisKey, IntentionRecognizer, build_hypothesis_space
 from shared.types import (
     ActionSchema, ActionStep, AgentConfig, ConditionSchema, MethodSchema, PersonalTask, ScenarioConfig,
-    Step, TaskInstance, TaskSchema, TaskStep, Var, Const, WorkTask,
+    Script, Step, TaskInstance, TaskSchema, TaskStep, Var, Const, WorkTask,
 )
 from domains.kitting.actions import move_to
 from domains.kitting.registry import domain_config, register_kitting_domain
@@ -45,7 +45,7 @@ def registered(layout, sid):
 def with_human_script(base, script):
     human = next(a for a in base.agents if a.agent_type == "human")
     cfg = AgentConfig(agent_id=human.agent_id, agent_type="human", start_position=human.start_position,
-                      scheduled_tasks=script, assigned_tasks=[])
+                      scheduled_tasks=Script(script), assigned_tasks=[])
     return ScenarioConfig(id="scenario_test", name="t", description="t",
                           agents=[cfg] + [a for a in base.agents if a is not human])
 
@@ -66,7 +66,7 @@ def test_base_classes_are_not_constructed():
 def test_kitting_tree_classes():
     tree = register_kitting_domain()
     assert [type(t).__name__ for t in tree.task_schemas()] == \
-        ["WorkTask", "PersonalTask", "PersonalTask", "HumanOnlyTask", "HumanOnlyTask"]
+        ["WorkTask", "PersonalTask", "PersonalTask", "HumanOnlyTask", "HumanOnlyTask", "HumanOnlyTask"]
 
 
 def test_step_outside_the_tree_is_rejected():
@@ -167,7 +167,7 @@ def test_planner_is_bound_to_its_knowledge_by_identity():
 
 
 # ---------------------------------------------------------------------------
-# go_to and stand through the C1 script layer
+# go_to and stand through the human's script
 # ---------------------------------------------------------------------------
 
 def stand(duration):
@@ -182,7 +182,7 @@ def test_stand_and_go_to_run():
     base = registered("env_layout0", "scenario_00")
     m = model_for("env_layout0", with_human_script(base, [stand("PT10S"), goto("door")]))
     human = m.humans[H]
-    assert [repr(e) for e in human.script] == ["stand(?duration=PT10S)", "move_to(?target=door)"]
+    assert [repr(e) for e in human.machine.entries] == ["stand(?duration=PT10S)", "go_to(?landmark=door)"]
     start = human.pos
     stood = 0
     for _ in range(200):

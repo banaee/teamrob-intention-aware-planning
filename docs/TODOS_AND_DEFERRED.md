@@ -3240,7 +3240,8 @@ omits a `PersonalTask` (coverage `TASK_ABSENT`, T-H4; T-D Q1's switch to an unmo
 Files: shared/types.py (`AgentConfig`), mesa_sim/sim_model.py (`_spawn_agents`), domains/*/registry.py
 Reference: design_decisions.md, "T-H: the human behaviour model", item 3; Hadi's ruling on the T-H1 plan (Q3)
 
-**TODO-103: A stale test in tests/test_script_layer.py (recorded, T-H1, 25 Sept 2026)** [OPEN]
+**TODO-103: A stale test in tests/test_script_layer.py (recorded, T-H1, 25 Sept 2026)** [CLOSED, T-H3: the file
+was deleted with the C1 layer; its surviving checks are in tests/test_th3_scenarios.py]
 `test_loader_errors_name_the_scenario` fails at ea4446c (before T-H1) and after it: its second case expects the
 loader to refuse a script that abandons a task after `pick_up` with "T-C2b" (the compatibility path of T-C2a), which
 T-C2b removed. Error text:
@@ -3274,6 +3275,24 @@ build. Error text:
 - scenario_11: `scenario 'scenario_11', agent 'human_0': office_break(?office_chair=office_chair): ?office_chair is
   bound to 'office_chair' of type 'chair', but the schema requires type 'office_chair'`
 Files: domains/dock_loading/scenarios.py, domains/dock_loading/tasks.py (`office_break`), its layout
+T-H3: the scripts were wrapped as `Script([...])` syntactically, the robots' `scheduled_tasks` too (TODO-39: they
+belong in `assigned_tasks`); the domain imports; both scenarios still fail with the same two errors.
+
+**TODO-107: The duplicate check on assigned tasks compares task instance keys (recorded, T-H3, 25 Sept 2026)**
+[OPEN, recorded only]
+`AgentConfig.__post_init__` refuses duplicate `assigned_tasks` by comparing `task_instance_key()` strings, since
+`TaskInstance` is unhashable. It served the assigned tasks, not the C1 form, so T-H3 kept it; its identity is to be
+settled with T-H4's task equality (whether `assigned(task)` compares the whole instance or its enumerated bindings).
+Files: shared/types.py (`AgentConfig`)
+Reference: design_decisions.md, "T-H: the human behaviour model", as built (T-H3)
+
+**TODO-108: ros_sim's planner_2 reads the robot's scheduled_tasks where assigned_tasks is meant (recorded, T-H3,
+26 Sept 2026)** [OPEN; ros_sim paused]
+`ros_sim/framework_HRI/framework_HRI/planner_2.py` seeds its task queue from kitting scenario_10's robot
+`scheduled_tasks`, which the robot never reads and which is empty (the robot's tasks are its `assigned_tasks`), so the
+queue is empty. T-H3 only kept it compiling (`.scheduled_tasks.tasks()`, the list form deleted). Fix when ros_sim
+resumes: read `assigned_tasks`.
+Files: ros_sim/framework_HRI/framework_HRI/planner_2.py
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).

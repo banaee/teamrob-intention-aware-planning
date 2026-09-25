@@ -518,90 +518,41 @@ there is no `realizable` flag and no unrealizable reason. The former `realizable
   in `unassessed_share`, which counts the tail beyond T_h only (T3b ruling).
 - A violation is strict: a single instant at exactly `min_separation` is not one (T3b ruling).
 
-### 1.12 The human action script — scenario layer (T-C1, built in T-C2a and T-C2b)
+### 1.12 The human's script (T-H; built in T-H2, the only form since T-H3)
 
-> T-H2 (25 Sept 2026): the T-H form is built beside this one and coexists with it until T-H3 deletes the C1 layer.
-> A human's `scheduled_tasks` may be a `Script` (`shared/types.py`): entries of `TaskInstance`s with typed events,
-> `Event(Trigger, Decision)`, written `task.at(action, task | drop, occurrence=)` / `task.during(action, time,
-> task | drop, occurrence=)`. The loader dispatches on the type: a `Script` is checked by the symbolic replay
-> (`world/human_executor.check_script`) and run by the stack machine (`world/human_executor.StackMachine`) through
-> `HumanAgent`; the record (`world/record.py`) is streamed as `[rec]` lines to `logs/run_<timestamp>.rec`. The
-> section below describes the list form. Design: `docs/design_decisions.md`, "T-H: the human behaviour model".
+An input contract of the scenario layer: what a scenario author writes as a human's `AgentConfig.scheduled_tasks`,
+and what the loader makes of it. Nothing in it reaches the recognizer or the meta-planner; the robot sees the
+trajectory. Design: `docs/design_decisions.md`, "T-H: the human behaviour model". (The T-C1 list form, its
+primitives, `Stay`, `expand` / `resolve_script`, provenance, the deviation vocabulary and `check_work_order`, was
+deleted in T-H3.)
 
-An input contract of the scenario layer: what a scenario author writes as a human's
-`AgentConfig.scheduled_tasks`, and what the loader makes of it. Nothing in it reaches the recognizer or the
-meta-planner; the robot sees the trajectory. Types in `shared/types.py` (beside `AgentConfig`, whose check
-reads them); functions in `domains/script.py` (domain-generic); kitting's author primitives in
-`domains/kitting/script.py`.
+**The written form.** A `Script` (`shared/types.py`): an ordered list of fully bound `TaskInstance`s of the tree, each
+an entry with its events. An event is `Event(Trigger, Decision)`: `Trigger` is `AfterAction(action, occurrence)`,
+`DuringAction(action, time, occurrence)` or `Now` (live only); `Decision` is `Start(task)` or `Drop`. Authored as
+`task.at(action, task | drop, occurrence=)` and `task.during(action, time, task | drop, occurrence=)`; `action` is an
+`ActionSchema` object of the task's decomposition, `occurrence` the 0-based occurrence when the method repeats it.
+`AgentConfig` refuses any other type (`TypeError`); the default is an empty `Script`. Kitting's call forms
+(`domains/kitting/script.py`): `deliver_item(item, table=None)`, `coffee_break(machine)`, `ac_activation(switch)`,
+`go_to(landmark)`, `stand(duration)`, `go_to_and_stand(landmark, duration)`; a determined parameter is bound only when
+stated.
 
-```python
-@dataclass(frozen=True)
-class ScriptAction:                        # one primitive: an action of the domain, by schema name
-    action_name: str                       # "move_to", "pick_up", "place", "wait_at", ...
-    bindings: Tuple[Tuple[str, Any], ...]  # sorted (var name, object id); a coordinate pair admitted for a movement target
-    provenance: Optional[Provenance]       # set by expand() only; not part of equality
+**At load** (`SimModel`): every task the script names (`Script.tasks()`: each entry's and each `Start`'s) is type-checked
+against the layout (`check_task_bindings`; a duration through the body's parser); the destination check
+(`check_task_destinations`) applies to the assigned tasks, never to the script. Then the load-time replay
+(`world/human_executor.check_script`) drives the stack machine symbolically through the whole script, the state
+advancing by `shared.projection.successor_state()`: every anchor is checked against the sequential expansion, events
+and resumptions included; an unfired or refused event, or an infeasible task, is a load error naming the scenario.
+Nothing ties the assigned tasks to the script at load (the record's `unperformed` query, T-H4).
 
-@dataclass(frozen=True)
-class Stay:                                # standing still; grounds to nothing (an executor instruction)
-    ticks: Optional[int] = None            # None: until the run ends
+**Landmarks.** A layout may declare objects of type `landmark` (`shared.types.LANDMARK_TYPE`); only a `HumanOnlyTask`
+may type a parameter as one (`Tree`'s constructor), so no hypothesis binds one and no robot action grounds to one.
 
-@dataclass(eq=False)
-class Provenance:                          # the task an element came from; one per expansion, compared by identity
-    task: TaskInstance                     # .key = task_instance_key(task)
-
-@dataclass
-class Deviation:                           # a deferred edit, built by interrupt / deviate / abandon
-    kind: str; task: TaskInstance; after; before; content: list; destination
-```
-
-**The written form.** A flat list whose elements are primitives, `TaskInstance`s and deviations, in any mix.
-A `TaskInstance` is sugar for its expansion. Kitting's author primitives are `MoveTo(target)`, `PickUp(item)`,
-`Place(item, table)` (each a `ScriptAction` of `move_to` / `pick_up` / `place`) and `Stay(n)` / `Stay()`. The
-vocabulary: `interrupt(task, after=|before=, with_=[...])`, `deviate(task, destination=)`,
-`abandon(task, after=|before=, then=[...])`, each returning a one-element list `[Deviation]` to be spliced in;
-injected content may mix tasks and primitives. Anchors: an action name occurring exactly once in the task's
-expansion, or a 0-based index into it; nothing else.
-
-**The executed form.** At load (`SimModel._resolve_human_scripts`) `resolve_script()` turns the written form
-into `ScriptAction`s and `Stay`s only. Expansion is SEQUENTIAL (T-C2b): each element is resolved against the
-initial world advanced by every element before it — each `ScriptAction` grounded and its declared effects,
-retracts and relocation applied by `shared.projection.successor_state()`, the same derivation the entries of an
-ordering are projected through (T-B2a), with the agent at the target of its last walk; a `Stay` changes nothing.
-So a task after a change of mind expands as the executor would have decided at run time (after an abandoned
-pick-up, the next delivery is `deliver_with_return`). Content a deviation injects is resolved against the state
-its task's expansion leaves at the anchor (after the kept part, for `abandon`); anchors are still resolved against
-the task's own expansion. `expand(task, planner, world, agent_id, method=None)` is the planner's own decomposition (`AdaptivePlanner.decompose`, §2.3), one `ScriptAction` per
-action of the selected method (a `wait_at` inside `coffee_break` stays a `wait_at` element; it is not a
-`Stay`), all sharing one `Provenance`; a deviation expands its task and applies a list helper to that
-expansion (`insert_after` / `insert_before` for interrupt, `truncate` plus the content for abandon,
-`retarget(old, new)` of the destination value for deviate). Anchor errors are raised there, naming the
-scenario and printing the expansion. `ground(element, agent_id, knowledge)` gives the `GroundedAction` an
-element stands for, with the completion predicate grounded as `decompose()` grounds it. The vocabulary is
-deferred because a scenario is built at import, where there is no world: `expand()`, `resolve_script()` and
-the list helpers on an expansion are usable only where a world exists (the loader, tests, a later scenario
-generator).
-
-**The assigned tasks** (`check_work_order`, run by `AgentConfig.__post_init__` on the written form and by the
-loader on the executed form): every assigned task occurs exactly once in the script, by provenance (a
-`TaskInstance`, a deviation's task, or one distinct `Provenance`); foreseeable tasks and hand-written primitives
-are free, and an unassigned non-foreseeable task is a legitimate departure (ruling, T-C2a); present is not
-completed. Empty `assigned_tasks` skips it. Replaced the key equality (TODO-86).
-
-**Landmarks.** A layout may declare objects of type `landmark` (`shared.types.LANDMARK_TYPE`); a domain one of
-whose `TaskSchema`s types a parameter as `landmark` is rejected at load (`check_no_landmark_parameters`), so no
-hypothesis binds one and no robot action grounds to one. `MoveTo(landmark)` is how a script names a place no
-task explains. env_layout0 declares five (`corner_NE`, `corner_NW`, `corner_SE`, `corner_SW`, `door`).
-
-**The human executor (T-C2b).** Its input is the executed form: a list of primitives, handed to
-`HumanAgent.load_script()` by the loader. `HumanAgent` runs them one by one: a `ScriptAction` is grounded when it
-is reached (`ground()`; the target position is resolved by the executor at that moment, so an item the robot has
-taken is not where the script expected it) and handed to the shared `Executor` as a one-action plan; the next
-primitive loads on the tick after the acknowledgement of the last (the executor is handed no plan first, so it
-owes nothing). `Stay(n)` stands n ticks, `Stay()` to the end of the run; an empty list stands. It tracks no task
-(`current_task` stays `None`, so `AgentState.current_task` is `None` for the human), logs no task completion and
-spends no per-task completion tick; one `[human] step= ... primitive i: ...` line per primitive reached. Every
-human runs through this path; the task-level compatibility path of T-C2a is removed. The robot's mind learns
-the human's task completions from the world, as before.
+**The human executor.** `HumanAgent` is the body-side driver of the stack machine (`world/human_executor.StackMachine`):
+one action at a time handed to the shared `Executor` as a one-action plan, its target resolved at that moment; the
+next action starts on the tick after the acknowledgement of the last, so no per-task completion tick is spent; an
+empty stack stands. The record (`world/record.py`) is streamed as one `[rec]` line per tick to
+`logs/run_<timestamp>.rec`, and its transitions as `[human]` lines in the run log. `current_task` stays `None` for
+the human. The robot's mind learns the human's task completions from the world.
 
 ---
 
@@ -1239,7 +1190,6 @@ construction-time validation does.
 Provides read-only access to:
 - `holds(schema) -> bool` — identity membership of a task schema
 - `task_schemas() -> List[TaskSchema]` — the hypothesis space is built from a `TaskModel`'s
-- `get_action_schema(name) -> Optional[ActionSchema]` — read by the C1 script layer (by name) until T-H3
 - `get_all_actions() -> List[ActionSchema]`
 - `get_microactions() -> List[str]`
 - `get_cost(key) -> Optional[float]` — per-action costs; empty in Mesa
@@ -1269,13 +1219,13 @@ domains/kitting/
     actions.py          # ActionSchema definitions — HTN primitive tasks (leaves)
     registry.py        # builds the Tree (T-H), declares the task model a robot is given
     scenarios.py       # ScenarioConfig objects — typed Python, no YAML
-    script.py          # the author primitives MoveTo / PickUp / Place (and Stay, the vocabulary), §1.12
+    script.py          # the call forms of the human's script: deliver_item(...), go_to(...), stand(...), ... §1.12
     env_layout0.json   # environment spatial layout (one file per layout)
     env_layout1.json
 ```
 
-`domains/script.py` is domain-generic: `expand`, `ground`, the vocabulary, the list helpers and the
-resolution of a human's script (§1.12).
+The human's stack machine and its load-time replay are world-side, use-case-agnostic
+(`world/human_executor.py`, §1.12); `domains/script.py` was deleted in T-H3.
 
 **Corrections from previous versions:** the file is `actions.py`, not `ActionSchemas.py`;
 layout files are `env_layout0.json` / `env_layout1.json`, not `env1_layout.json`. Each
@@ -1287,8 +1237,8 @@ layout carries its own scenarios, registered in `registry.py`'s `domain_config["
 - Mesa expands primitive actions into microactions via `action_decomposer.py` — embodiment detail only
 
 **What an `ActionSchema` declares it changes (T-B2a).** Three declarations, read by
-`shared.projection.successor_state()` to chain the entries of an ordering, and by the human script's sequential
-expansion at load (§1.12, T-C2b); by nothing in a live run:
+`shared.projection.successor_state()` to chain the entries of an ordering, and by the load-time replay of the
+human's script (§1.12, `check_script`); by nothing in a live run:
 - `effects: List[ConditionSchema]` — the add list: the grounded fact is true once the action is done.
 - `retracts: List[ConditionSchema]` (default empty) — the delete list: the grounded fact is no longer true,
   e.g. `place` retracts `holding(?agent, ?item)`. A list on the action and NOT a negation flag on
@@ -1345,12 +1295,11 @@ a declared relocation".
   schema declares (`Tree.get_types_with_destination`); and, where each robot's task model is built, the robot's
   own `assigned_tasks` and those of the agent it observes bind the destination the layout designates (`shared.types.check_task_destinations`), an error naming the task,
   the item and both tables. The human's `scheduled_tasks` is not checked against the layout's destinations:
-  the script may send an item elsewhere. Its elements are checked for binding (`check_script_bindings`, T-C2a):
-  every task in it (a deviation's task, its content, and for `deviate` the task rebound to the new destination)
-  as above, and every object a primitive names exists
-- Resolves each human's script from the initial world after spawning, sequentially (§1.12, T-C2a, T-C2b),
-  checks the assigned tasks against the executed form, and hands it to the `HumanAgent` (`load_script()`), whose
-  executor is action-level; rejects a domain that types a task parameter as a landmark
+  the script may send an item elsewhere. Every task the script names (`Script.tasks()`) is checked for binding
+  as above (T-H: types only)
+- Checks each human's script from the initial world after spawning by the load-time replay (§1.12,
+  `check_script`), and hands it to the `HumanAgent` (`load_stack()`), the stack machine's driver; the landmark
+  rule is `Tree`'s
 - Supplies the `Projector` its motion rate (`step_size`, T2), its stopping distance (T9: the
   same `PROXIMITY_THRESHOLD` that makes `at(agent, object)` hold, so projected walks end where the
   executor stops), its per-action acknowledgement latency and observation offset (L2), and its

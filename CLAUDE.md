@@ -29,9 +29,8 @@ Relevant (read as needed):
   the load-time replay) and its record (`world/record.py`)
 - `mesa_sim/*.py` (top level only); `mesa_sim/viz/` only for visualization or when grepping
   for readers of a field
-- `domains/kitting/`: the active domain; `domains/script.py`: the C1 human action script (T-C2a; sequential
-  expansion, T-C2b), domain-generic, kept until T-H3; `mesa_sim/sim_agents.py` `HumanAgent`: the human's body-side
-  driver, of the C1 list (action-level, T-C2b) and of the T-H `Script` (the stack machine's driver, T-H2)
+- `domains/kitting/`: the active domain (`domains/kitting/script.py`: the call forms a scenario is written in, T-H3);
+  `mesa_sim/sim_agents.py` `HumanAgent`: the human's body-side driver of the stack machine (T-H2)
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
   design record. Use its terms in the code, in the documents and in reports.
@@ -63,8 +62,7 @@ Layering: four homes
 - `shared/` is the robot's mind, the pure cognitive layer. It never imports from `world/`, `domains/`,
   `mesa_sim/` or `ros_sim/`.
 - `world/` is the world's side (T-H2): simulator-agnostic, use-case-agnostic code about what the human is and
-  does (the human's executor and stack machine, the executor's record; what remains of `domains/script.py`
-  after T-H3). It imports `shared/` only: no body, no use case. The robot's mind never reads it.
+  does (the human's executor and stack machine, the executor's record). It imports `shared/` only: no body, no use case. The robot's mind never reads it.
 - `domains/` holds the use cases (kitting, dock_loading): schemas, layouts, scenarios.
 - `mesa_sim/` and `ros_sim/` are the bodies. A body may import from `shared/`, `world/` and `domains/`;
   it drives the human's executor and executes the robot's decisions.
@@ -115,12 +113,13 @@ Decisions
   layer, C2b sequential expansion and the action-level human executor, which spends no per-task completion
   tick and reports 0 for it to the projector) is built, and T-C2c's two literal scenarios are run. T-H (the human
   behaviour model, ruled 25 Sept 2026: one tree of task schemas, the robot's task model, the script of task
-  instances with events, the human executor's stack and record) is next, in four build sessions T-H1 to T-H4, before
+  instances with events, the human executor's stack and record) is built in four sessions T-H1 to T-H4, before
   T-D. T-H1 (the tree, the task model) and T-H2 (the executor: `Script` of `TaskInstance`s with typed events,
   `at` / `during` / `inject`, the one-level stack in `world/human_executor.py`, the mid-action cut through the shared
   Mesa `Executor`'s `suspend` / `resume`, the load-time replay `check_script`, the record and its `[rec]` stream in
-  `logs/run_<timestamp>.rec`) are built; the C1 script path is kept and dispatched by the script's type until T-H3
-  (every registered scenario still uses it). Next is T-H3, the migration. Not to be started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
+  `logs/run_<timestamp>.rec`) are built, and T-H3 (every scenario migrated to the `Script` in the kitting call form,
+  the `HumanOnlyTask` `go_to_and_stand` added, the C1 script layer deleted). Next is T-H4, the record's queries. Not to be
+  started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
@@ -250,10 +249,12 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
 `analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
-T-C2b regeneration (06093ee) of the four maintained sets below: `analysis/tb1a_destination/sweep/` (the five
-plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "T-C2b"
+T-H3 regeneration of the four maintained sets below, with their `.rec` streams: `analysis/tb1a_destination/sweep/`
+(the five plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "T-H3"
 section), `analysis/tb1b_two_tables/sweep/` (s80 / s81), `analysis/tb1c_realized_flip/sweep/` and
-`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They supersede the D3 regeneration (dd880be) by
+`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They differ from the T-C2b regeneration (06093ee) in the
+`[human]` lines alone (the record's transitions for the C1 primitives) and are the first non-empty `.rec`
+baselines. The T-C2b set superseded the D3 regeneration (dd880be) by
 the human's dropped per-task completion tick (T-C2b: the human one tick earlier per task it completed, a hold
 one tick shorter where the human projection's end reaches it). The D3 set superseded the T-B Q7 regeneration, from
 which they differ in the removed `task_committed` decisions and the executor's reload bookkeeping alone, the
@@ -297,8 +298,8 @@ grep "^\[hold\]"        <log>   # decided holds: start, end, planned, executed, 
 grep "^\[stop\]"        <log>   # separation-stop refusals (stop on), with the assessed-window label
 grep "^\[rec\]"         <log .rec>   # the human executor's record (T-H2): per tick the stack (top first), the action
                                   # in hand with its occurrence and progress, and the tick's transitions; its own
-                                  # file beside the run log (logs/run_<timestamp>.rec), empty for a C1-script human
-grep "^\[human\]"       <log>   # the record's transitions, repeated in the run log (T-H path); the C1 path's primitives
+                                  # file beside the run log (logs/run_<timestamp>.rec)
+grep "^\[human\]"       <log>   # the record's transitions, repeated in the run log
 ```
 
 A behaviour-preserving change must leave these greps byte-identical, the `.rec` stream included (T-H2; the
