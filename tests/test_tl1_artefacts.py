@@ -33,7 +33,7 @@ def model(scenario, layout_path, setup_path):
 
 
 def test_a_missing_home_container_is_refused(tmp_path):
-    with open(domain_config["setups"]["env_setup0"]) as f:
+    with open(domain_config["setups"]["env_setup_01"]) as f:
         setup = json.load(f)
     broken = next(o for o in setup["env_objects"] if o["id"] == "item_3")
     broken["initial_container"] = "shelf_99"
@@ -60,17 +60,17 @@ def test_an_out_of_bounds_start_is_refused():
 
 
 def test_a_mismatched_setup_in_the_run_file_is_refused(run_mesa):
-    with pytest.raises(ValueError, match=r"setup 'env_setup1': scenario 'scenario_00' "
-                                         r"declares setup 'env_setup0'"):
+    with pytest.raises(ValueError, match=r"setup 'env_setup_02': scenario 'scenario_00' "
+                                         r"declares setup 'env_setup_01'"):
         run_mesa.resolve_triple({"domain": "kitting", "scenario": "scenario_00",
-                                 "setup": "env_setup1"})
+                                 "setup": "env_setup_02"})
 
 
 def test_no_layout_takes_the_first_reference_layout(run_mesa):
     _, layout_id, setup_id, scenario = run_mesa.resolve_triple(
         {"domain": "kitting", "scenario": "scenario_30"})
     assert layout_id == "env_layout3"
-    assert setup_id == "env_setup3"
+    assert setup_id == "env_setup_01"
     assert scenario.id == "scenario_30"
 
 
