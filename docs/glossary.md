@@ -698,8 +698,9 @@ reference layout is run. The viewer reads and edits the same file.
 overrides block or `--override <path>=<value>`. A closed list of three: an agent's `start_position`; a fixed
 object's position (a movable object's position is its container's); a movable object's home container. Not
 overridable: `assigned_tasks` (a variant is a new scenario), a designated destination (a different designation set is
-a different setup), the script, and every id inside an artefact. Choosing the layout is selection, not an
-override. Each override is printed as one line next to the triple in
+a different setup), the script, and every id inside an artefact: an object's own id, its identity. A reference held
+as a value (the container id in a movable object's home container) may be overridden; the override changes which
+object is referenced, not what any object is. Choosing the layout is selection, not an override. Each override is printed as one line next to the triple in
 the run log. A run with an override is never a fixture or a baseline. Not an injection: a change during a run is Phase
 7's injection path (**inject**, §6).
 

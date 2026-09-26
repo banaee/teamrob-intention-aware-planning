@@ -4034,8 +4034,8 @@ facts through the same seam (`WorldState`); the recognizer, the planner and the 
 PURPOSE. Today one layout JSON holds facts about three different things: the room, the shift's objects, and dead agent
 spawn entries (the `"robots"` / `"humans"` lists, read by nothing in Mesa). A scenario is bound to one layout by a
 hand-maintained registry, and every id encodes that binding. The refactor separates the facts by what they are about,
-so that one scenario can run on several rearranged rooms, one room can serve several designation sets, and T-F can
-sample each level independently.
+so that one scenario can run on several rearranged rooms, one room can serve several designation sets, and T-F
+samples the layout level independently; it generates a scenario together with its setup.
 
 THE RULINGS.
 
@@ -4107,7 +4107,9 @@ THE RULINGS.
      override is for fixed objects only. NOT overridable: an agent's `assigned_tasks` (a task instance has no typed
      textual form; a variant is a new scenario, one literal in Python) and a movable object's designated destination (a
      different designation set is a different setup); the script; and every id inside an artefact ("no id is
-     overridable" concerns those ids; choosing the layout is selection, ruling 3). The loader reads the three
+     overridable" means an object's own id, its identity; choosing the layout is selection, ruling 3). A reference
+     held as a value, such as the container id in a movable object's home container, may be overridden: the override
+     changes which object is referenced, not what any object is. The loader reads the three
      artefacts, applies the overrides, then validates and loads as for any run; each override is printed as one line
      next to the triple in the run log. A run with an override is never a fixture or a baseline. The CLI form
      `--override <path>=<value>` covers a single tweak. The viewer reads and edits the same file. Overrides apply at
