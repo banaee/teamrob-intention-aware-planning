@@ -38,6 +38,23 @@ T-D Q1's ground-truth cases (design_decisions.md, "T-H", item 10), restated as r
   The recognizer's episode boundary is its own attribution and may not coincide tick for tick with the
   `Left(COMPLETED)`; the misalignment is part of what T-D Q1 measures.
 
+T-L (the three artefacts of a run, stages 1 to 4, built 26 September 2026; design_decisions.md, "Layouts, setups and
+scenarios"; glossary §9) ran after T-H. It changed nothing in the robot's mind either; it changed what a run is made
+of and how one is stated:
+- THE THREE ARTEFACTS. A layout (the room: `domains/<d>/layouts/env_layout_KK.json`), a setup (the shift: the movable
+  objects, their home containers and designated destinations, `setups/env_setup_NN.json`) and a scenario (the episode,
+  a `ScenarioConfig` literal in `scenarios/scenarios_sNN.py`, id `scenario_sNN_MM`, declaring its `setup` and its
+  `reference_layouts`, registered by discovery). A run is the triple plus the run facts, printed on the `[run_mesa]`
+  start line. `docs/rename_table.md` maps the ids this handoff's body uses to the serial ids.
+- THE RUN FILE AND OVERRIDES. A run is stated by a run file: `configs/experiment.yaml`, or the yaml `--run` names (the
+  triple, the run options, an `overrides:` block). An override changes one fact at load, before every check, from the
+  block or `--override <path>=<value>`: `scenario.<agent>.start_position`, `layout.<fixed object>.position`,
+  `setup.<movable object>.initial_container`, nothing else. Each is printed as `[run_mesa] override <path>=<value>`
+  after the start line. A variant T-D needs for a test (the human a little elsewhere, a shelf moved, an item on
+  another shelf) is an override, not a new artefact; a run with an override is never a fixture or a baseline, so a
+  variant that becomes a fixture is written as its own scenario (or layout, or setup). The viewer shows the run file
+  and edits the three kinds in it. Not an injection: a change during a run stays Phase 7's.
+
 ## 0. How to use this document
 
 - The repo on `main` at `528924d` (pushed after the authoring-convention records) is the base. The

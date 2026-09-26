@@ -126,8 +126,9 @@ Decisions
   the `HumanOnlyTask` `go_to_and_stand` added, the C1 script layer deleted) and T-H4 (the record's typed queries in
   `world/queries.py`: `truth_at`, `switches`, `resumptions`, `assigned`, `unperformed`, `coverage`, on the in-memory
   record; task equality `same_task`; the `[coverage]` line at load) are built. T-H is closed (26 Sept 2026; the
-  close-out in `docs/handoffs/handoff_T-H.md`: commits, acceptance, deferred items). Next is T-L (the three artefacts
-  of a run, stages 1 to 4; design_decisions.md, "Layouts, setups and scenarios"), then T-D, on T-H's structure
+  close-out in `docs/handoffs/handoff_T-H.md`: commits, acceptance, deferred items). T-L (the three artefacts
+  of a run, stages 1 to 4; design_decisions.md, "Layouts, setups and scenarios") is built (26 Sept 2026; stage 4: the
+  run file, `--run`, and the overrides, `--override`, `mesa_sim/overrides.py`). Next is T-D, on T-H's structure
   (`docs/handoffs/handoff_T-D_onward.md`, "What T-D now stands on"); T-D starts with its design in cchat. Not to be
   started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
@@ -224,7 +225,8 @@ silently running the large one.
 
 ## Running
 
-Interpreter: `~/python-envs/teamrob-sp4-env/bin/python`.
+Interpreter: `~/python-envs/teamrob-sp4-env/bin/python`. It needs `ruamel.yaml` (in `requirements.txt` since T-L
+stage 4): the viewer writes the run file's overrides block round-trip, so the file's comments are kept.
 
 ```bash
 # headless; --layout is optional (T-L stage 1): a run that names none takes the scenario's first reference layout.
@@ -232,19 +234,33 @@ Interpreter: `~/python-envs/teamrob-sp4-env/bin/python`.
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout_04 --scenario scenario_s01_06 --steps 200
 # evaluation switch (default off): robot knows the observed human's assigned-task pool
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout_04 --scenario scenario_s01_06 --steps 200 --assignment_prior true
+# another run file, and one override of a fact of the run's artefacts (T-L stage 4; repeatable)
+PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run my_run.yaml --override layout.shelf_2.position=-300,-300
 # visualization
 solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout_03 --scenario scenario_s03_01
 ```
 
-Logs go to `logs/run_<timestamp>.log`. Defaults come from `configs/experiment.yaml`; CLI flags
-override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_prior`
+Logs go to `logs/run_<timestamp>.log`. Defaults come from the run file, `configs/experiment.yaml` or the yaml
+`--run` names; CLI flags override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_prior`
 (true/false), `--strategy` (single_task | full_reorder), `--gate_strategy` (none | b2a | b2b),
 `--cost_strategy` (realized | plain),
-`--separation_stop` (true/false), and `--experiment` (another yaml). Parsing is strict: an unknown
+`--separation_stop` (true/false), `--run` (another run file; it replaced `--experiment` in T-L stage 4, no alias) and
+`--override <path>=<value>` (repeatable). Parsing is strict: an unknown
 or misspelled flag, an unknown yaml key, or a bad value stops the run. Each robot's `[run]` header
 names the policy and evaluation switches the run took (strategy, gate, cost, stop, assignment prior, θ, ρ,
 min_separation and β, each with its source: the body supplies both, `mesa_sim/mesa_configs.yaml`, 50 cm
 and 0.01 /cm).
+
+Overrides (T-L stage 4; design_decisions.md, "Layouts, setups and scenarios", ruling 7; glossary §9): a closed list of
+three, one path each, the same in the run file's `overrides:` block (a mapping path: value) and in `--override`:
+`scenario.<agent>.start_position` (two numbers), `layout.<fixed object>.position` (two numbers),
+`setup.<movable object>.initial_container` (an id); every other path is refused. `mesa_sim/overrides.py` reads them
+into typed classes, the loader (`SimModel`) applies them to the artefacts as read, before any check, and each is
+printed as `[run_mesa] override <path>=<value>` after the start line, sorted by path, in the `--override` form. A run
+with an override is never a fixture or a baseline. The viewer (`solara run`) shows the run file's triple and overrides,
+and its form writes the three kinds into the run file it was started from, then reloads: started on
+`configs/experiment.yaml`, an override it writes there reaches every run that takes the default file, the sweeps
+included (their diffs show it on the override lines); start the viewer on a copy (`-- --run my_run.yaml`).
 
 ## Regression checking
 

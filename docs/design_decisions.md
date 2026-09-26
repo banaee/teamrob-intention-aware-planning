@@ -4160,6 +4160,26 @@ THE RULINGS.
      `sweep.sh`; tb3 keeps all 20 runs), differing from the stage-2 logs in the `[run_mesa]` line alone, every `.rec`
      byte-identical; one superseding line in each frozen analysis README pointing to the rename table.
    - stage 4: the run file and the override mechanism, with the viewer reading it.
+     BUILT (26 September 2026): `--run <path>` (replacing `--experiment`, no alias) and `--override
+     <path>=<value>` (repeatable) in `mesa_sim/run_mesa.py`; a path is `<artefact>.<id>.<fact>`, the same in the run
+     file's flat `overrides:` block (path: value) and on the command line, read once at the input boundary into one of
+     three typed classes (`mesa_sim/overrides.py`: `StartPositionOverride` for `scenario.<agent>.start_position`,
+     `FixedPositionOverride` for `layout.<object>.position`, `HomeContainerOverride` for
+     `setup.<object>.initial_container`, the file keys), every other path refused with the path named; the value typed
+     by the fact (two numbers, an id); a command-line override replaces the file's for the same path. `SimModel`
+     applies them to the artefacts as read, before `_init_objects` and `_spawn_agents` (the registered scenario is
+     copied, never changed); an unknown agent or object, or a layout position for a setup's object, is an error naming
+     the path; bounds, container existence, destinations and the replay are the existing checks. Each override is
+     printed after the start line as `[run_mesa] override <path>=<value>`, sorted by path, in the `--override` form.
+     The viewer's `Page` reads the run file it is started from on every reload and shows the triple and the overrides
+     (`mesa_sim/viz/run_file_panel.py`); its form, limited to the three kinds, builds the run first, writes the file's
+     block only if it loads (a path the command line gives is refused: its value, not the file's, is run) (round-trip through `ruamel.yaml`, comments kept, a new dependency) and reloads. A run with
+     no overrides is byte-identical to stage 3, and the four maintained sweeps are unchanged. NOT COVERED, as built: a
+     fixed object moved out of the space or onto another object is not checked (ruling 7: the checks of any run); a
+     moved fixed object keeps its declared `zone`, which nothing in the run reads; a duplicate path in the yaml block
+     is PyYAML's last-one-wins; the viewer prints no `[run_mesa]` line (as before), so an override applied in the
+     viewer is not in its log; a viewer started on `configs/experiment.yaml` writes its overrides there, where every
+     run that takes the default file (the sweeps included) picks them up.
 
 ACCEPTANCE, at every stage: the four maintained sweeps (tb1a, tb1b, tb1c, tb3) are run from scratch and diffed against
 the previous stage's logs, with no difference outside the lines the stage names (the triple line, the ids); AND pytest

@@ -651,8 +651,8 @@ T-H4 its build).
 
 ## 9. Runs: what a run is made of
 
-Ruled by Hadi, 26 September 2026 (T-L). Built in T-L's stages 1 to 4; until then the code holds one layout JSON per
-room and shift, and a registry that binds each scenario to one layout. The definitions are domain-neutral; kitting and
+Ruled by Hadi, 26 September 2026 (T-L). Built in T-L's stages 1 to 4 (26 September 2026); before them the code held
+one layout JSON per room and shift, and a registry that bound each scenario to one layout. The definitions are domain-neutral; kitting and
 dock_loading appear as examples only.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 
@@ -698,7 +698,8 @@ id, plus the run options present; the setup is implied by the scenario (one setu
 
 **run file** — a yaml (`configs/experiment.yaml`, or any yaml given by path) that states a run: the triple, the run
 options and an overrides block. It may name all three artefacts; when it omits the layout, the scenario's first
-reference layout is run. The viewer reads and edits the same file.
+reference layout is run. The viewer reads and edits the same file. `--run <path>` names another.
+→ `mesa_sim/run_mesa.py`, `load_experiment()`; `mesa_sim/viz/run_file_panel.py`.
 
 **override** — a change to one fact of a run's artefacts, applied at load before validation, from the run file's
 overrides block or `--override <path>=<value>`. A closed list of three: an agent's `start_position`; a fixed
@@ -708,7 +709,9 @@ a different setup), the script, and every id inside an artefact: an object's own
 as a value (the container id in a movable object's home container) may be overridden; the override changes which
 object is referenced, not what any object is. Choosing the layout is selection, not an override. Each override is printed as one line next to the triple in
 the run log. A run with an override is never a fixture or a baseline. Not an injection: a change during a run is Phase
-7's injection path (**inject**, §6).
+7's injection path (**inject**, §6). A path is `<artefact>.<id>.<fact>` (`scenario.<agent>.start_position`,
+`layout.<object>.position`, `setup.<object>.initial_container`), read into a typed class at the input boundary.
+→ `mesa_sim/overrides.py`; `mesa_sim/sim_model.py`, `SimModel.__init__` (where they are applied).
 
 ---
 

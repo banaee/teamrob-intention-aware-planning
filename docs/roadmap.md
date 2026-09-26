@@ -452,8 +452,8 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   condition's explicit adapter only). Simulation only: a real human needs annotation of the record's form.
 - **Alternative 1** (recorded as the next architecture direction, not scheduled): a human mind that generates the
   events, and a stack-aware IR.
-- **T-L — Layouts, setups and scenarios: the three artefacts of a run** (ruled by Hadi, 26 September 2026). NEXT,
-  before T-D. The facts one layout JSON holds today are separated by what they are about: the layout (the room: space,
+- **T-L — Layouts, setups and scenarios: the three artefacts of a run** (ruled by Hadi, 26 September 2026). BUILT
+  (26 September 2026, stages 1 to 4), before T-D. The facts one layout JSON holds today are separated by what they are about: the layout (the room: space,
   zones, fixed objects), the setup (the shift: movable objects, home containers, designated destinations), the
   scenario (the episode: agents, script, purpose, the setup it binds, its reference layouts); a run is the triple plus
   the run facts, validated at load. The mind receives the same facts through `WorldState`; the recognizer, planner and
@@ -488,6 +488,11 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     byte-identical; one superseding line in each frozen analysis README.
   - stage 4: the run file and the override mechanism (three overridable facts: an agent's `start_position`, a fixed
     object's position, a movable object's home container), the viewer reading it.
+    BUILT (26 Sept 2026): `--run` (replacing `--experiment`) and `--override <path>=<value>`, the paths
+    `scenario.<agent>.start_position`, `layout.<object>.position`, `setup.<object>.initial_container`, the same in the
+    run file's `overrides:` block (`mesa_sim/overrides.py`); applied by the loader before every check; printed as
+    `[run_mesa] override …` after the start line; the viewer shows the run file and writes the three kinds into it
+    (`ruamel.yaml`, comments kept). A run with no overrides byte-identical to stage 3; the four sweeps unchanged.
   Acceptance at every stage: the four maintained sweeps run from scratch and diffed against the previous stage's
   logs, no difference outside the lines the stage names (the triple line, the ids); AND pytest green. dock_loading's
   TODO-104 stands and T-L must not worsen it. design_decisions.md, "Layouts, setups and scenarios: the three artefacts
