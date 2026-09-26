@@ -1488,6 +1488,11 @@ Prerequisites:
     generator only reproduced what the literals state, so it was deleted rather than kept to drift. Whether
     the randomised harness (T-F) needs programmatic registration is left to its design; nothing is kept
     here for it.
+    DISTINCTION (T-L, 26 September 2026): what was reversed is a generator that PRODUCED fixtures, not a
+    mechanism that LISTS them. T-L registers hand-written `ScenarioConfig` literals by discovery at import of the
+    domain package (no side effect beyond adding to a dict; a duplicate id is an error), and layouts and setups by
+    their files; the fixtures stay literals, read by people. design_decisions.md, "Layouts, setups and scenarios:
+    the three artefacts of a run", ruling 5.
 (b) Scale-relative calibration — `min_separation` (formerly `min_safe_distance`, TODO-28; and
     any B2 reference for δ, TODO-36) must be expressed relative to layout scale or agent
     speed × steps, not as an absolute read off one fixture.
@@ -3318,6 +3323,20 @@ built. What a selector calls: `world/composition.scenario_composition(script, ro
 over the registry. Never a tag stored on `ScenarioConfig`.
 Files: world/composition.py, mesa_sim/list_scenarios.py; the batch harness (TODO-47), the viewer
 Reference: design_decisions.md, "T-H: the human behaviour model", as built (T-H follow-up); glossary §7
+POINTER (T-L, 26 September 2026): selection runs after T-L, over the declared (layout, scenario) pairs, never the
+product of artefacts; the run file and its overrides are ruling 7 of design_decisions.md, "Layouts, setups and
+scenarios: the three artefacts of a run".
+
+**TODO-111: ros_sim's layout readers move to T-L's sources when ros_sim resumes (recorded, T-L, 26 Sept 2026)**
+[OPEN; ros_sim paused]
+T-L splits each layout JSON into a layout (the room) and a setup (the shift) and deletes the dead `"robots"` /
+`"humans"` spawn entries; agent start positions live on the scenario. ros_sim reads the old single file directly and
+reads those spawn entries: `planner_2.py` (`LAYOUT_PATH`, `load_layout`, `raw["robots"][0]`, `raw["humans"][0]`),
+`planner_3.py` (the same, on dock_loading's layout), `world_con.py` (`ContinuousWorld`, `layout.get("robots")`,
+`layout.get("humans")`), `run_continuous.py` (`LAYOUT_PATH`). When ros_sim resumes, these read the layout, the setup
+and the scenario through the same loader as Mesa, together with TODO-108. T-L's stages do not touch ros_sim.
+Files: ros_sim/framework_HRI/framework_HRI/{planner_2,planner_3,world_con,run_continuous}.py
+Reference: design_decisions.md, "Layouts, setups and scenarios: the three artefacts of a run", ruling 8; TODO-108
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).
