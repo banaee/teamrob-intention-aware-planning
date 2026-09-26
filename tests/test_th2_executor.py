@@ -63,15 +63,17 @@ def key(task):
 def model_for(layout, sid, script, robot=True):
     """The registered scenario with the human's script replaced (and, without
     `robot`, the human alone)."""
-    lay = domain_config["layouts"][layout]
-    base = lay["scenarios"][sid]
+    base = domain_config["scenarios"][sid]
     human = next(a for a in base.agents if a.agent_type == "human")
     cfg = AgentConfig(agent_id=human.agent_id, agent_type="human", start_position=human.start_position,
                       scheduled_tasks=script, assigned_tasks=human.assigned_tasks)
     others = [a for a in base.agents if a is not human] if robot else []
-    scenario = ScenarioConfig(id="scenario_test", name="t", description="t", agents=[cfg] + others)
+    scenario = ScenarioConfig(id="scenario_test", description="t", agents=[cfg] + others,
+                              setup=base.setup, reference_layouts=base.reference_layouts)
     return SimModel(scenario=scenario, register_fn=register_kitting_domain,
-                    task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])
+                    task_model_schemas=domain_config["task_model"],
+                    layout_path=domain_config["layouts"][layout],
+                    setup_path=domain_config["setups"][base.setup])
 
 
 def run(m, max_steps=400):
@@ -365,15 +367,18 @@ def test_anchor_absent_from_the_re_expansion_is_a_load_error():
     # a grab during the fetch walk leaves the item in hand: the delivery resumes
     # as deliver_already_held, and its pick_up anchor is absent
     tree, grab = _grab_tree()
-    lay = domain_config["layouts"]["env_layout1"]
-    base = lay["scenarios"]["scenario_10"]
+    base = domain_config["scenarios"]["scenario_10"]
     human = next(a for a in base.agents if a.agent_type == "human")
     took = TaskInstance(schema=grab, bindings={Var("?item"): Const("item_2")})
 
     def model(script):
         cfg = AgentConfig(agent_id=H, agent_type="human", start_position=human.start_position, scheduled_tasks=script)
-        return SimModel(scenario=ScenarioConfig(id="scenario_test", name="t", description="t", agents=[cfg]),
-                        register_fn=lambda: tree, task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])
+        scenario = ScenarioConfig(id="scenario_test", description="t", agents=[cfg],
+                                  setup=base.setup, reference_layouts=base.reference_layouts)
+        return SimModel(scenario=scenario, register_fn=lambda: tree,
+                        task_model_schemas=domain_config["task_model"],
+                        layout_path=domain_config["layouts"]["env_layout1"],
+                        setup_path=domain_config["setups"][base.setup])
 
     with pytest.raises(ValueError, match="anchor_absent"):
         model(Script([deliver("item_2").at(move_to, took, occurrence=0).at(pick_up, st("PT2S"))]))

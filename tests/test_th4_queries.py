@@ -37,14 +37,16 @@ H, R = "human_0", "robot_0"
 
 
 def model_for(layout, sid, prior=False):
-    lay = domain_config["layouts"][layout]
-    return SimModel(scenario=lay["scenarios"][sid], register_fn=register_kitting_domain,
-                    task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"],
+    cfg = domain_config["scenarios"][sid]
+    return SimModel(scenario=cfg, register_fn=register_kitting_domain,
+                    task_model_schemas=domain_config["task_model"],
+                    layout_path=domain_config["layouts"][layout],
+                    setup_path=domain_config["setups"][cfg.setup],
                     assignment_prior=prior)
 
 
 def human_cfg(layout, sid):
-    return next(a for a in domain_config["layouts"][layout]["scenarios"][sid].agents if a.agent_id == H)
+    return next(a for a in domain_config["scenarios"][sid].agents if a.agent_id == H)
 
 
 def run_script(m, max_steps=600):

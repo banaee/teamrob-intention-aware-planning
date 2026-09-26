@@ -35,19 +35,21 @@ _x = Var("?x")
 def model_for(layout, scenario_cfg):
     return SimModel(scenario=scenario_cfg, register_fn=register_kitting_domain,
                     task_model_schemas=domain_config["task_model"],
-                    env_layout_path=domain_config["layouts"][layout]["path"])
+                    layout_path=domain_config["layouts"][layout],
+                    setup_path=domain_config["setups"][scenario_cfg.setup])
 
 
 def registered(layout, sid):
-    return domain_config["layouts"][layout]["scenarios"][sid]
+    return domain_config["scenarios"][sid]
 
 
 def with_human_script(base, script):
     human = next(a for a in base.agents if a.agent_type == "human")
     cfg = AgentConfig(agent_id=human.agent_id, agent_type="human", start_position=human.start_position,
                       scheduled_tasks=Script(script), assigned_tasks=[])
-    return ScenarioConfig(id="scenario_test", name="t", description="t",
-                          agents=[cfg] + [a for a in base.agents if a is not human])
+    return ScenarioConfig(id="scenario_test", description="t",
+                          agents=[cfg] + [a for a in base.agents if a is not human],
+                          setup=base.setup, reference_layouts=base.reference_layouts)
 
 
 # ---------------------------------------------------------------------------

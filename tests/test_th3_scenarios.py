@@ -32,16 +32,18 @@ H = "human_0"
 
 
 def model_for(layout, scenario):
-    lay = domain_config["layouts"][layout]
-    return SimModel(scenario=lay["scenarios"][scenario], register_fn=register_kitting_domain,
-                    task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])
+    cfg = domain_config["scenarios"][scenario]
+    return SimModel(scenario=cfg, register_fn=register_kitting_domain,
+                    task_model_schemas=domain_config["task_model"],
+                    layout_path=domain_config["layouts"][layout],
+                    setup_path=domain_config["setups"][cfg.setup])
 
 
 def test_every_registered_scenario_loads():
-    for layout, lay in domain_config["layouts"].items():
-        for sid, scenario in lay["scenarios"].items():
-            for agent in scenario.agents:
-                assert isinstance(agent.scheduled_tasks, Script), (sid, agent.agent_id)
+    for sid, scenario in domain_config["scenarios"].items():
+        for agent in scenario.agents:
+            assert isinstance(agent.scheduled_tasks, Script), (sid, agent.agent_id)
+        for layout in scenario.reference_layouts:
             m = model_for(layout, sid)
             for human in m.humans.values():
                 assert human.machine is not None, sid
@@ -98,17 +100,19 @@ def test_go_to_and_stand_interrupts_and_the_delivery_resumes():
 
 
 def test_loader_errors_name_the_scenario():
-    lay = domain_config["layouts"]["env_layout0"]
-    base = lay["scenarios"]["scenario_00"]
+    base = domain_config["scenarios"]["scenario_00"]
     human = base.agents[0]
     # a delivery has no wait_at: the anchor is absent from its expansion
     cfg = AgentConfig(agent_id=human.agent_id, agent_type="human", start_position=human.start_position,
                       scheduled_tasks=Script([deliver_item("item_3", table="kitting_table_0").at(wait_at, stand("PT4S"))]),
                       assigned_tasks=human.assigned_tasks)
-    scenario = ScenarioConfig(id="scenario_test", name="t", description="t", agents=[cfg, base.agents[1]])
+    scenario = ScenarioConfig(id="scenario_test", description="t", agents=[cfg, base.agents[1]],
+                              setup=base.setup, reference_layouts=base.reference_layouts)
     with pytest.raises(ValueError, match=r"scenario 'scenario_test', agent 'human_0': .*wait_at"):
         SimModel(scenario=scenario, register_fn=register_kitting_domain,
-                 task_model_schemas=domain_config["task_model"], env_layout_path=lay["path"])
+                 task_model_schemas=domain_config["task_model"],
+                 layout_path=domain_config["layouts"]["env_layout0"],
+                 setup_path=domain_config["setups"][base.setup])
 
 
 def test_landmark_parameter_rejected():
@@ -128,7 +132,6 @@ def test_layout0_landmarks():
 
 def test_dock_loading_imports():
     from domains.dock_loading.registry import domain_config as dock_config
-    for lay in dock_config["layouts"].values():
-        for scenario in lay["scenarios"].values():
-            for agent in scenario.agents:
-                assert isinstance(agent.scheduled_tasks, Script)
+    for scenario in dock_config["scenarios"].values():
+        for agent in scenario.agents:
+            assert isinstance(agent.scheduled_tasks, Script)
