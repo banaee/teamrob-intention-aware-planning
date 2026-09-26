@@ -138,6 +138,9 @@ Decisions
 - ROS side is paused. Do not modify anything under `ros_sim/`.
 - `domains/dock_loading/` is deferred. Do not modify it unless the task says so. It must still
   import without error (`run_mesa.py` imports its registry).
+  SUPERSEDED FOR T-L'S STAGES ONLY (26 Sept 2026): kitting and dock_loading migrate together, so T-L's stages may
+  touch `domains/dock_loading/`; it must still import and run (design_decisions.md, "Layouts, setups and scenarios",
+  ruling 8).
 - `domains/kitting/env_layout99.json` is the old `env_layout1` with obstacles, kept for later and
   not registered.
 - The code is the source of truth. Docs are maintained but can lag. Do not change code to match
@@ -326,11 +329,18 @@ across that commit without it.
 ## Conventions and terminology
 
 - Scenario ids are prefixed by layout number: `env_layout2` → `scenario_20`, `scenario_21`.
+  SUPERSEDED (T-L, 26 Sept 2026; ruling 4, built in stage 3): descriptive snake_case ids, nothing encoded, unique
+  within the domain and artefact kind, for layouts, setups and scenarios alike; `docs/rename_table.md` maps the old
+  ids.
 - Adding a layout needs three edits: `domains/kitting/env_layout<N>.json`,
   `domains/kitting/scenarios.py`, and `domains/kitting/registry.py` (import and `layouts` entry).
   Fixtures are written as literals, because they are read by people; generated fixtures were tried and
   reversed (T-B1b, TODO-47 (a)). scenario_82 only opens env_layout8 in the viewer: not a fixture, nothing
   is measured from it.
+  SUPERSEDED IN PART (T-L, 26 Sept 2026; rulings 1, 3 and 5, built in stages 1 and 2): the three edits and the
+  registry entry. A layout (the room) and a setup (the shift) are files registered by their files; a scenario
+  declares its setup and its reference layouts and is registered by discovery at import. Fixtures stay hand-written
+  literals.
 - Every term has one meaning: `docs/glossary.md`. The entries below are the ones a task prompt
   leans on most; the glossary is the full list and carries the pointers.
 - "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is the unit

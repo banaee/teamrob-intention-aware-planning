@@ -129,6 +129,9 @@ Rules Hadi set, standing (added in this chat are marked NEW):
   for the paper's evaluation.
 - Fixtures are readable: hand-written literals in `scenarios.py` with ordinary registry entries.
   Scenario naming: a scenario on layout X is numbered X0, X1, X2 (layout9 owns 90 to 99).
+  SUPERSEDED (T-L, 26 Sept 2026; design_decisions.md, "Layouts, setups and scenarios: the three artefacts of a
+  run", rulings 4 and 5): fixtures stay hand-written literals, registered by discovery at import, not by registry
+  entries; ids are descriptive, nothing encoded, so no numbering by layout (`docs/rename_table.md` maps the old ids).
 - Hadi rules on every evaluation scenario; ccode may propose one within limits, reported as an
   existence case, not an evaluation.
 - Design questions of a task are named "T-D Q1", never plain "Q1".
