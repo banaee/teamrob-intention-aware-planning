@@ -11,6 +11,7 @@ tqdm==4.66.5
 
 # Visualization (solara run only)
 solara==1.57.3
+starlette==0.48.0     # not imported by the repo: holds solara on a compatible starlette for a fresh install
 reacton==1.9.1        # imported directly by mesa_sim/mesa_fork/visualization/solara_viz.py
 plotly==5.23.0
 matplotlib==3.9.0

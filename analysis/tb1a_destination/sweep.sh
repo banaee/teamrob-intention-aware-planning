@@ -6,7 +6,7 @@
 # (default: all eight) restricts the runs to the scenario ids it names. Sequential: each run's log is picked up as the
 # newest logs/run_*.log. Run from the repo root.
 set -e
-OUT=$1; shift; PY=~/python-envs/teamrob-sp4-env/bin/python; mkdir -p "$OUT"
+OUT=$1; shift; PY=~/python-envs/ir-nomesa-env/bin/python; mkdir -p "$OUT"
 RUNS="env_layout_01 scenario_s01_01 300
 env_layout_02 scenario_s02_01 450
 env_layout_03 scenario_s03_01 300

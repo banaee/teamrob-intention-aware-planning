@@ -6,7 +6,7 @@
 # (full_reorder baselines are T-B3's). Sequential: each run's log is picked up as the newest logs/run_*.log. Run from
 # the repo root.
 set -e
-OUT=$1; shift; PY=~/python-envs/teamrob-sp4-env/bin/python; mkdir -p "$OUT"
+OUT=$1; shift; PY=~/python-envs/ir-nomesa-env/bin/python; mkdir -p "$OUT"
 LAY=env_layout_08
 for sc in scenario_s06_03 scenario_s06_01; do
   for cost in realized plain; do

@@ -5,7 +5,7 @@
 # assignment prior off/on, 340 steps each (both complete by 265). Extra args go to run_mesa.py. Sequential: each run's
 # log is picked up as the newest logs/run_*.log. Run from the repo root.
 set -e
-OUT=$1; shift; PY=~/python-envs/teamrob-sp4-env/bin/python; mkdir -p "$OUT"
+OUT=$1; shift; PY=~/python-envs/ir-nomesa-env/bin/python; mkdir -p "$OUT"
 RUNS="env_layout_08 scenario_s06_01 340
 env_layout_08 scenario_s06_02 340"
 while read -r lay sc st; do
