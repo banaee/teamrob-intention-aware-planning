@@ -3335,6 +3335,8 @@ reads those spawn entries: `planner_2.py` (`LAYOUT_PATH`, `load_layout`, `raw["r
 `planner_3.py` (the same, on dock_loading's layout), `world_con.py` (`ContinuousWorld`, `layout.get("robots")`,
 `layout.get("humans")`), `run_continuous.py` (`LAYOUT_PATH`). When ros_sim resumes, these read the layout, the setup
 and the scenario through the same loader as Mesa, together with TODO-108. T-L's stages do not touch ros_sim.
+Stage 2 adds: `planner_2.py`'s `from domains.kitting.scenarios import scenario_10` stops resolving (scenarios.py is
+now a package whose names live in its modules); it joins the readers above for the resume.
 Files: ros_sim/framework_HRI/framework_HRI/{planner_2,planner_3,world_con,run_continuous}.py
 Reference: design_decisions.md, "Layouts, setups and scenarios: the three artefacts of a run", ruling 8; TODO-108
 

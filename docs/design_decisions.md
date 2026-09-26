@@ -4096,12 +4096,18 @@ THE RULINGS.
      is an authoring convention stated in CLAUDE.md, and an author who moves a scenario to another setup renames it.
    - A layout's serial is never in a scenario id (a scenario has one or more reference layouts).
    - Stage 3 merges the identical setups (env_setup0 = env_setup3, env_setup2 = env_setup5) before numbering, so
-     numbering is done once.
+     numbering is done once. SUPERSEDED (Hadi, 26 Sept 2026, the stage-2 task): the merge and the setup ids
+     `env_setup_NN` are stage 2's, because the module division (one module per setup, `scenarios_sNN.py`) keys on
+     the setup serial and a stage-3 rename would touch every module twice; scenario and layout ids stay old until
+     stage 3.
    - Baseline file names: `<layout id>_<scenario id>_<run options>.log`, as ruling 6 states.
 
 5. REGISTRATION BY DISCOVERY: a `ScenarioConfig` is registered at import of the domain package (a decorator or a module
    scan; ccode chooses in stage 2), with no side effect beyond adding to a dict; a duplicate id is an error. Layouts
-   and setups are registered by their files. Scenarios stay hand-written literals; T-B1b's ruling (TODO-47 (a))
+   and setups are registered by their files. BUILT (stage 2): a module scan (`domains/discovery.py`) — a decorator
+   can be forgotten on a new scenario, which recreates the omission this ruling closes; registration runs at import
+   of `domains.<domain>.registry`, the one entry every reader uses (importing the bare domain package registers
+   nothing). Scenarios stay hand-written literals; T-B1b's ruling (TODO-47 (a))
    reversed a generator that produced fixtures, not a mechanism that lists them. That distinction is recorded under
    TODO-47 (a).
 
@@ -4140,8 +4146,11 @@ THE RULINGS.
      id; the tests' helpers move with the registry shape; the setup id added to the `[run_mesa]` line; the docs pass
      on the lines the survey listed (roadmap, T-L, stage 1).
    - stage 2: the scenarios package (one module per theme) and registration by discovery; `list_scenarios` and the
-     tests' helpers on the declared pairs.
-   - stage 3: the rename to the serial ids (ruling 4 as amended), the identical setups merged before numbering,
+     tests' helpers on the declared pairs. AMENDED (Hadi, 26 Sept 2026, the stage-2 task): one module per SETUP,
+     `scenarios_sNN.py`, and the setups finished here — the merge and the final ids `env_setup_NN` — because the
+     module division keys on the setup serial.
+   - stage 3: the rename to the serial ids (ruling 4 as amended), the identical setups merged before numbering
+     [DONE IN STAGE 2, with the setup ids],
      `docs/rename_table.md`, the four maintained sets regenerated under the new names, sweep scripts and READMEs.
    - stage 4: the run file and the override mechanism, with the viewer reading it.
 

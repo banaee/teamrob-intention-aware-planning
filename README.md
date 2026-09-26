@@ -144,13 +144,14 @@ teamrob-intention-aware-planning/
 │   └── io_contracts.md             # Interface specifications
 │
 ├── domains/                     # Domain-specific knowledge (Python)
+│   ├── discovery.py                # Registration by discovery (T-L stage 2)
 │   ├── kitting/
 │   │   ├── actions.py              # HTN primitive tasks
 │   │   ├── tasks.py                # HTN non-primitive tasks
-│   │   ├── registry.py             # Tree construction; layouts, setups, scenarios
-│   │   ├── scenarios.py            # Scenario definitions
-│   │   ├── env_layout0.json        # A layout — the room
-│   │   └── env_setup0.json         # A setup — the shift
+│   │   ├── registry.py             # Tree construction; discovers layouts, setups, scenarios
+│   │   ├── scenarios/              # Scenario definitions — one module per setup (scenarios_sNN.py)
+│   │   ├── layouts/                # The layouts — the room (env_layout0.json, ...)
+│   │   └── setups/                 # The setups — the shift (env_setup_01.json, ...)
 │   └── dock_loading/               # Same structure
 │
 ├── mesa_sim/                    # Mesa embodiment layer

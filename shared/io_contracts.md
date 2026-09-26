@@ -1219,19 +1219,23 @@ domains/kitting/
     tasks.py           # TaskSchema definitions — HTN non-primitive tasks
     actions.py          # ActionSchema definitions — HTN primitive tasks (leaves)
     registry.py        # builds the Tree (T-H), declares the task model a robot is given,
-                       # and lists layouts and setups by id and file and the scenarios (T-L)
-    scenarios.py       # ScenarioConfig objects — typed Python, no YAML
+                       # and discovers layouts, setups and scenarios (T-L stage 2, domains/discovery.py)
+    scenarios/         # ScenarioConfig objects — typed Python, no YAML; a package, one module per
+                       # setup (scenarios_sNN.py: every scenario whose setup is env_setup_NN and no other)
     script.py          # the call forms of the human's script: deliver_item(...), go_to(...), stand(...), ... §1.12
-    env_layout0.json   # a layout — the room: space, zones, fixed objects with positions (one file per layout)
-    env_setup0.json    # a setup — the shift: the movable objects, each with its home container,
-                       # its designated destination and its other per-object state (one file per setup)
+    layouts/           # the layouts — the room: space, zones, fixed objects with positions (one file per layout)
+    setups/            # the setups — the shift: the movable objects, each with its home container,
+                       # its designated destination and its other per-object state (one file per setup,
+                       # env_setup_NN.json; the file stem is the id)
 ```
 
 The three artefacts of a run (T-L, `docs/glossary.md` §9): the layout (the room), the setup (the
 shift) and the scenario (the episode). A scenario declares its `setup` (one id) and its
 `reference_layouts` (one or more layout ids); the run's triple is (layout, setup, scenario), the
-layout the run names or the scenario's first reference layout. The registry lists layouts and
-setups by id and file; the scenario list is hand-written until T-L's stage 2 (discovery).
+layout the run names or the scenario's first reference layout. The registry discovers all three
+(T-L stage 2): layouts and setups by the files in their folders (the file stem is the id), scenarios
+by a module scan of the scenarios package at import of `domains.<domain>.registry` — no hand-written
+list, and a duplicate scenario id is an error at import.
 
 The human's stack machine and its load-time replay are world-side, use-case-agnostic
 (`world/human_executor.py`, §1.12); `domains/script.py` was deleted in T-H3.

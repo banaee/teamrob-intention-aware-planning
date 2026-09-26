@@ -473,9 +473,13 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     agents)", to be marked superseded; the `env_layout` comment on `ScenarioConfig` in `shared/types.py`; and
     `domains/README.md`, `README.md`, `shared/io_contracts.md`, which stage 1 rewrites.
   - stage 2: the scenarios package (one module per theme), registration by discovery; `list_scenarios` and the tests'
-    helpers on the declared pairs.
-  - stage 3: the serial ids (ruling 4 as amended 26 Sept 2026: `env_layout_KK`, `env_setup_NN`, `scenario_sNN_MM`),
-    the identical setups (0 = 3, 2 = 5) merged before numbering so numbering is done once, `docs/rename_table.md`
+    helpers on the declared pairs. AMENDED (Hadi, 26 Sept 2026, the stage-2 task): the division is one module per
+    setup, `scenarios_sNN.py`, and the setups are finished in stage 2 — the identical setups merged and the final
+    ids `env_setup_NN` given — because the module division keys on the setup serial; scenario and layout ids stay
+    old until stage 3.
+  - stage 3: the serial ids (ruling 4 as amended 26 Sept 2026: `env_layout_KK`, `env_setup_NN`, `scenario_sNN_MM`;
+    the setup ids were finished in stage 2),
+    the identical setups (0 = 3, 2 = 5) merged before numbering so numbering is done once [DONE IN STAGE 2], `docs/rename_table.md`
     (which says in one line that the frozen analysis scripts stay
     frozen at their commit), the four maintained sets regenerated under the new names, sweep scripts and READMEs.
   - stage 4: the run file and the override mechanism (three overridable facts: an agent's `start_position`, a fixed

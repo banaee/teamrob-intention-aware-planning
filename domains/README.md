@@ -23,13 +23,22 @@ domains/<your_domain>/
     __init__.py
     tasks.py            # TaskSchema definitions  — HTN compound tasks
     actions.py          # ActionSchema defs     — HTN primitive actions (leaves)
-    registry.py         # builds the Tree, declares the task model; lists layouts,
-                        # setups and scenarios (domain_config)
-    scenarios.py        # ScenarioConfig objects  — concrete agent assignments
+    registry.py         # builds the Tree, declares the task model; discovers
+                        # layouts, setups and scenarios (domain_config)
+    scenarios/          # a package (T-L stage 2): one module per setup,
+                        # scenarios_sNN.py — every scenario whose setup is
+                        # env_setup_NN and no other
     script.py           # the call forms the scenarios are written in (kitting)
-    env_layout<N>.json  # a layout — the room (one file per layout)
-    env_setup<N>.json   # a setup — the shift (one file per setup)
+    layouts/            # the layout files — the room (one file per layout)
+    setups/             # the setup files — the shift (one file per setup,
+                        # env_setup_NN.json; the file stem is the id)
 ```
+
+Registration is by discovery (`domains/discovery.py`, T-L stage 2): layouts and setups by
+the files in their folders, scenarios by a module scan of the scenarios package at import
+of `domains.<domain>.registry`. No hand-written list; a duplicate scenario id is an error
+at import. The serial in a module's name repeats its scenarios' validated `setup` field —
+an authoring convention the code does not check.
 
 ---
 
@@ -37,21 +46,23 @@ domains/<your_domain>/
 
 A run is a triple (layout, setup, scenario) plus the run options.
 
-**Layout — the room** (`env_layout<N>.json`): the space, its zones, and the fixed objects
+**Layout — the room** (`layouts/env_layout<N>.json`): the space, its zones, and the fixed objects
 with their positions (tables, shelves, machines, switches, landmarks; a fixed container
 such as a truck belongs here too). No movable object and no agent. Coordinates use a
 center-origin system `(0,0)` that matches the simulator grid directly. Zones use the
 convention `zone_<descriptor>`. Top-level keys: `"space"`, `"zones"`, `"env_objects"`.
 Every fixed object has a `"position"` and never an `"initial_container"`.
 
-**Setup — the shift** (`env_setup<N>.json`): the movable objects that exist, in one
+**Setup — the shift** (`setups/env_setup_NN.json`; the final serial ids since T-L stage 2,
+which merged the content-identical env_setup3 into env_setup_01 and env_setup5 into
+env_setup_03): the movable objects that exist, in one
 `"env_objects"` list. Each entry has an `"initial_container"` (its home container, an
 object of the layout), a `"destination"` where the domain determines one through
 `destination_of` (kitting: the item's designated table), and any other per-object state
 the domain declares (dock_loading: `subtype`, `is_empty`, `is_scanned`). A different
 designation set is a different setup.
 
-**Scenario — the episode** (`scenarios.py`): per agent its `start_position`,
+**Scenario — the episode** (`scenarios/scenarios_sNN.py`, its setup's module): per agent its `start_position`,
 `assigned_tasks`, `observes` and, for a human, the script; the purpose as `description`;
 the one `setup` it binds; and its `reference_layouts` (one or more layout ids). A run that
 names no layout takes the scenario's first reference layout; `--layout` selects another
@@ -123,13 +134,13 @@ The registry assembles all tasks and actions into a `DomainModel` and declares t
 
 ---
 
-## 7. scenarios.py — concrete agent assignments
+## 7. scenarios/ — concrete agent assignments
 
-A `ScenarioConfig` assigns concrete task instances to each agent, with all parameters bound to specific values; it declares its `setup` and its `reference_layouts` (section 2). The human's script is a `Script` of task instances with events (T-H). See `domains/kitting/scenarios.py` for the pattern.
+A `ScenarioConfig` assigns concrete task instances to each agent, with all parameters bound to specific values; it declares its `setup` and its `reference_layouts` (section 2). The human's script is a `Script` of task instances with events (T-H). Each scenario is one hand-written literal in its setup's module (`scenarios/scenarios_sNN.py`), registered by discovery at import — no list to maintain. See `domains/kitting/scenarios/` for the pattern.
 
 ### Scenario ids
 
-Scenario ids are currently prefixed by their layout number (`scenario_30` on `env_layout3`); T-L's stage 3 renames every layout, setup and scenario to a descriptive snake_case id with nothing encoded.
+Scenario ids are currently prefixed by their layout number (`scenario_30` on `env_layout3`); T-L's stage 3 renames layouts and scenarios to the serial ids (`env_layout_KK`, `scenario_sNN_MM`; the setups got theirs in stage 2).
 
 ---
 

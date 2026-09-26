@@ -29,7 +29,11 @@ Relevant (read as needed):
   the load-time replay) and its record (`world/record.py`)
 - `mesa_sim/*.py` (top level only); `mesa_sim/viz/` only for visualization or when grepping
   for readers of a field
-- `domains/kitting/`: the active domain (`domains/kitting/script.py`: the call forms a scenario is written in, T-H3);
+- `domains/kitting/`: the active domain (`domains/kitting/script.py`: the call forms a scenario is written in, T-H3).
+  T-L stage 2: `layouts/` and `setups/` hold the layout and setup files (setups under their final ids
+  `env_setup_NN`; env_setup3 and env_setup5 merged into env_setup_01 and env_setup_03); `scenarios/` is a package,
+  one module per setup (`scenarios_sNN.py`); the registry discovers all three (`domains/discovery.py`) — no hand
+  list; `env_layout6.json` and `env_layout99.json` stay at the domain root, unsplit and unregistered;
   `mesa_sim/sim_agents.py` `HumanAgent`: the human's body-side driver of the stack machine (T-H2)
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
@@ -222,7 +226,8 @@ silently running the large one.
 Interpreter: `~/python-envs/teamrob-sp4-env/bin/python`.
 
 ```bash
-# headless; --layout is optional (T-L stage 1): a run that names none takes the scenario's first reference layout
+# headless; --layout is optional (T-L stage 1): a run that names none takes the scenario's first reference layout.
+# The [run_mesa] start line names the triple; setup ids are env_setup_NN since stage 2 (the setup is the scenario's, never a flag).
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout3 --scenario scenario_30 --steps 200
 # evaluation switch (default off): robot knows the observed human's assigned-task pool
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout3 --scenario scenario_30 --steps 200 --assignment_prior true
@@ -339,8 +344,12 @@ across that commit without it.
   reversed (T-B1b, TODO-47 (a)). scenario_82 only opens env_layout8 in the viewer: not a fixture, nothing
   is measured from it.
   SUPERSEDED IN PART (T-L, 26 Sept 2026; rulings 1, 3 and 5, built in stages 1 and 2): the three edits and the
-  registry entry. A layout (the room) and a setup (the shift) are files registered by their files; a scenario
-  declares its setup and its reference layouts and is registered by discovery at import. Fixtures stay hand-written
+  registry entry. A layout (the room) and a setup (the shift) are files registered by their files
+  (`domains/<d>/layouts/`, `domains/<d>/setups/`); a scenario
+  declares its setup and its reference layouts and is registered by discovery at import (stage 2): a new scenario is
+  one literal in its setup's module `scenarios_sNN.py`, no registry edit; a duplicate id is an error at import. The
+  serial in a module's name repeats its scenarios' `setup` field — an authoring convention the code does not check,
+  as the serial in a scenario id is. Fixtures stay hand-written
   literals.
 - Every term has one meaning: `docs/glossary.md`. The entries below are the ones a task prompt
   leans on most; the glossary is the full list and carries the pointers.
