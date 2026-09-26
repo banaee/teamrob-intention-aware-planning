@@ -3345,6 +3345,13 @@ Stage 3 adds: the import names change again (kitting scenario_10 is `scenario_s0
 Files: ros_sim/framework_HRI/framework_HRI/{planner_2,planner_3,world_con,run_continuous}.py
 Reference: design_decisions.md, "Layouts, setups and scenarios: the three artefacts of a run", ruling 8; TODO-108
 
+**TODO-112: A run file without `steps` fails with a bare KeyError (recorded, T-L stage 4, 26 Sept 2026)**
+[OPEN] A headless run whose run file states no `steps`, and no `--steps` given, stops at `config["steps"]` in
+`run_headless()` with `KeyError: 'steps'` instead of an error naming the run file and the missing key. Older than stage
+4; recorded now because the run file is a user-facing artefact (`--run`, `docs/artefacts_user_guide.md`).
+Files: mesa_sim/run_mesa.py (`run_headless`, `load_experiment`)
+Reference: design_decisions.md, "Layouts, setups and scenarios", ruling 7
+
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
 2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.
