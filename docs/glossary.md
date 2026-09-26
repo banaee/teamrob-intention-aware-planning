@@ -103,10 +103,10 @@ read, write "the design entry" or "the plan's entry".
 between two steps. An entry has several segments — one per action, plus the completion latencies.
 Do not call a segment a "stretch of evidence"; that is the recognizer's.
 → `shared/types.py`, `Segment`; `shared/io_contracts.md` §1.7.
-IN THE RECORD: scenario_40's human script was described as four numbered "segments" (1, 2, 3a, 3b,
-4). That is a SCRIPT PART, not a `Segment`. "Segment 3a" in `docs/design_decisions.md`,
+IN THE RECORD: scenario_40's (now scenario_s04_01) human script was described as four numbered "segments" (1, 2,
+3a, 3b, 4). That is a SCRIPT PART, not a `Segment`. "Segment 3a" in `docs/design_decisions.md`,
 `docs/TODOS_AND_DEFERRED.md` and the I4 / F47 reports means script part 3a. The living files
-(`domains/kitting/env_layout4.json`, `domains/kitting/scenarios.py`,
+(`domains/kitting/layouts/env_layout_05.json`, `domains/kitting/scenarios/scenarios_s04.py`,
 `docs/recognizer_handback.md`) say "script part"; the record is untouched.
 
 **walk** — an agent's movement, and nothing else: a "fetch walk", a "carry walk", "the human's walk
@@ -493,7 +493,7 @@ COLLISION: "a stand" in §7 and the older records is the ordinary word for a hum
 
 **landmark** — a symbolic place a layout may declare (`corner_NE`, `door`), an object of the type `landmark`. Only a
 `HumanOnlyTask` may type a parameter as one (`go_to(?landmark)`, `go_to_and_stand(?landmark, ?duration)`; `Tree`'s
-constructor rejects any other), so no hypothesis binds one and no robot action grounds to one. env_layout0 declares
+constructor rejects any other), so no hypothesis binds one and no robot action grounds to one. env_layout_01 declares
 `corner_NE`, `corner_NW`, `corner_SE`, `corner_SW` and `door`.
 → `shared/types.py`, `LANDMARK_TYPE`; `shared/knowledge.py`, `Tree`.
 
@@ -579,7 +579,7 @@ types, no new words. The task classes it names (`WorkTask`, `PersonalTask`, `Hum
 **scenario coverage** — label B lifted from one task to the scenario: `MODELLED_ONLY`, `TASK_ABSENT`,
 `BINDING_ABSENT` or `BOTH`, by which non-covered results its tasks have (the composition's coverage set, less the exit
 walk). It depends on the robot's task model, so it is a property of the run configuration, not of the script: a task
-model without `coffee_break` moves s11 from `MODELLED_ONLY` to `TASK_ABSENT`. The same with the prior on and off. It
+model without `coffee_break` moves scenario_s02_02 from `MODELLED_ONLY` to `TASK_ABSENT`. The same with the prior on and off. It
 states what the script contains, never what the scenario is for (that is the purpose).
 ONE EXEMPTION, stated here only: the **exit walk**, the script's last entry when its task is a `HumanOnlyTask` whose
 only goal binding (§6, **task equality**) is a landmark, that decomposes to exactly one movement action to that

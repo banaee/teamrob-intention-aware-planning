@@ -111,7 +111,7 @@ Files: mesa_sim/sim_model.py
 **TODO-04 — Rename `"space"` key to `"environment"` in layout JSONs**
 `"space"` (renamed from `"room"`) still implies a single room.
 `"environment"` better captures the full spatial extent (hall + dock + truck + office).
-Files: `domains/kitting/env_layout1.json`, `domains/dock_loading/env_layout1.json`, `mesa_sim/sim_model.py`
+Files: `domains/kitting/layouts/env_layout_KK.json`, `domains/dock_loading/layouts/env_layout_01.json`, `mesa_sim/sim_model.py`
 Reference: TODO #15
 
 **TODO-05 — Rename `FactoryModel` → `SimModel` sweep**
@@ -167,7 +167,7 @@ checking in the live planner stay open, as filed.
 OPEN FROM T-B2A, MEASURED: `pick_up` does not end `obj_at(item, shelf)`. The shelf is not a parameter of
 `pick_up`, so a delete list with bound arguments cannot state it; it needs a wildcard or a functional fact
 ("an object is in one place"), which changes the fact representation, not a schema. The consequence is ONE
-STALE PREDICATE in the successor state (`obj_at(item_6, shelf_6)` after item_6's delivery, scenario_80; the
+STALE PREDICATE in the successor state (`obj_at(item_6, shelf_6)` after item_6's delivery, scenario_s06_01; the
 only predicate on the robot or the item that the successor holds and the real world does not), READ BY
 NOTHING TODAY: guards read `holding`, and target resolution reads the maps, which the relocation keeps right.
 IT MUST BE RESOLVED BEFORE ANY CONSUMER READS `obj_at` FOR AN ITEM THAT HAS BEEN PICKED UP in a successor
@@ -308,7 +308,7 @@ Files: shared/recognizer.py
 Reference: Phase 4A validation, HCM_AAAI26 paper Hypothesis Generation section
 
 **TODO-21 — Post-completion belief plateau: healthy uncertainty vs. artifact** [needs dedicated IR session]
-Observed in a manual test run (scenario_00, item_6-carrying seed for deliver_with_return
+Observed in a manual test run (scenario_s01_01, item_6-carrying seed for deliver_with_return
 validation, not an IR-focused test): after human_0 completes its scheduled tasks, belief
 distribution over remaining robot task hypotheses settles at a near-even split (e.g.
 item_3/item_4 ~0.498/0.498) and stays there for the rest of the run. Two explanations
@@ -714,7 +714,7 @@ Reference: Phase 4 design session, July 2026
 Task renamed from `go_to_office` to `office_break` (dock_loading). Three open
 questions before this task is reliable:
 1. `parameter_types={"?office_chair": "office_chair"}` doesn't match the
-   office_chair object's actual "type": "chair" in env_layout1.json — one
+   office_chair object's actual "type": "chair" in env_layout_01.json — one
    needs to change to match the other before this task can enumerate.
 2. `door_is_open` guard has no fallback method and no confirmed emitter in
    world_state_builder.py — same unresolved-predicate class as gate_is_open
@@ -841,22 +841,22 @@ not on the fixtures. Original entry retained below.
 Both default to `1.0` in `MetaPlanner.__init__` with no calibration against Mesa's actual
 distance/step scale (agent positions span roughly ±400 units; `interval` in
 `discretized_time_sampling` is likewise `1.0`). `min_safe_distance=1.0` proved permissive in
-scenario_00 — nothing was ever excluded, closest observed approach was ~2.9 — so the
+scenario_s01_01 — nothing was ever excluded, closest observed approach was ~2.9 — so the
 infeasibility branch is effectively untested (see TODO-30). A too-large value would exclude
 every candidate; a too-small one makes interference detection inert.
 Needs a calibration pass against real layout geometry, ideally alongside `default_action_cost`.
 Files: shared/projection.py (init — assumed_speed, default_action_cost), shared/meta_planner.py (init — min_safe_distance)
-Reference: Phase 4C scenario_00 validation, September 2026
+Reference: Phase 4C scenario_s01_01 validation, September 2026
 
 Calibration order (fixture-design session): calibrate only after the meta_planner's
 confidence-gated human projection lands. Under today's ungated projection,
-min_safe_distance=50 would exclude scenario_20's item_4 at t=0 against a 0.167 tie-break
+min_safe_distance=50 would exclude scenario_s03_01's item_4 at t=0 against a 0.167 tie-break
 projection (min_dist 20) — an exclusion, but not a legitimate one.
 
 Update (evidence-gated projection admission session): the gate has landed; calibration is
-unblocked. Findings from scenario_20, 200 steps, PYTHONHASHSEED=0, runs 20260910_144814
+unblocked. Findings from scenario_s03_01, 200 steps, PYTHONHASHSEED=0, runs 20260910_144814
 (switch off) and 20260910_144816 (switch on):
-- scenario_20 now has two valid fixture conditions. Switch ON is the mid-approach-reveal
+- scenario_s03_01 now has two valid fixture conditions. Switch ON is the mid-approach-reveal
   condition: first admitted projection at step 2 (confidence 0.881, evidence-based — two
   directional updates over three admissible hypotheses), item_4 min_dist 14.98 vs item_6
   321.9, at ~9% of the robot's approach. Switch OFF is the late-reveal condition: first
@@ -888,12 +888,12 @@ agent moves at most that many units between them (speed read off the Segment); t
 bound on the body side from `mesa_configs.yaml: simulation.interference_spatial_resolution`
 (1 cm) and has no default in `shared/`, since a world-unit resolution is itself a unit-scale
 assumption. `[meta-cand] cost=` now
-reads in ticks (scenario_20 t=0: 54 / 71 / 103, formerly 1032 / 1372 / 2028). The T1 evidence
+reads in ticks (scenario_s03_01 t=0: 54 / 71 / 103, formerly 1032 / 1372 / 2028). The T1 evidence
 above and in `analysis/t1_conflict_measurement/REPORT.md` is in world units and unchanged.
 Consequence: with placement lasting a real tick, both agents' placement segments sit at the
 identical table position in overlapping ticks whenever the arrival gap is under a tick, so
 `min_dist` reaches exactly 0.0 and `min_safe_distance = 1.0` now EXCLUDES those candidates
-(TODO-30 is exercised; scenario_10 step 257 hits the every-candidate-excluded `RuntimeError`).
+(TODO-30 is exercised; scenario_s02_01 step 257 hits the every-candidate-excluded `RuntimeError`).
 `min_safe_distance` itself stays OPEN and was deliberately not touched.
 Post-T2 regression baselines (PYTHONHASHSEED=0): runs 20260911_082601 (s00 off), _082604
 (s00 on), _082606 (s10 off, aborts at step 257), _082609 (s10 on, aborts at 257), _082612
@@ -908,7 +908,7 @@ anyway: a held item that is also one of the robot's own candidate tasks always w
 Re-testing needs a seed item that is NOT in the robot's candidate pool. Until then,
 `deliver_with_return` is unexercised under the current selection mechanism.
 Files: domains/kitting/tasks.py, mesa_sim/sim_model.py, domains/kitting/scenarios.py
-Reference: Phase 4C scenario_00 validation, September 2026
+Reference: Phase 4C scenario_s01_01 validation, September 2026
 
 **TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable` — ✅ BUILT (T10): the `RuntimeError` is gone; one event measured — ✅ CLOSED (F1): realization is total, the branch no longer exists — ✅ CLOSED (F1: nothing is unrealizable)
 CLOSED (F1, September 2026): under robot-responsible separation (design_decisions.md,
@@ -1034,11 +1034,11 @@ Reference: Phase 4C meta_planner build session, September 2026
 `RobotAgent.finished` was added (mirroring `HumanAgent.finished`) so the terminal state is
 reachable, but nothing outside `sim_agents.py` reads either flag — confirmed by grep. A
 200-step run continues stepping both agents as no-ops long after all tasks complete
-(scenario_00: everything done by step 147).
+(scenario_s01_01: everything done by step 147).
 Harmless, but wasteful and makes log tails uninformative. Fix belongs in the run loop
 (`run_mesa.py` / `SimModel.step()`), not in the agents.
 Files: mesa_sim/run_mesa.py, mesa_sim/sim_model.py
-Reference: Phase 4C scenario_00 validation, September 2026
+Reference: Phase 4C scenario_s01_01 validation, September 2026
 
 **TODO-34 — Pre-existing `obs` fragility in `RobotAgent.step()` logging**
 The IR logging block guards on `self.belief is not None and human is not None`, then reads
@@ -1047,7 +1047,7 @@ non-None, while `self.belief` persists across steps. If `human is not None` and
 `build_observation()` returns `None` on a step where a belief already exists, `obs` is either
 stale or unbound — `AttributeError`/`UnboundLocalError`.
 Not introduced by the MetaPlanner migration; pre-existing, spotted while editing the
-surrounding block. Not observed firing in scenario_00.
+surrounding block. Not observed firing in scenario_s01_01.
 Files: mesa_sim/sim_agents.py (`RobotAgent.step`)
 Reference: Phase 4C meta_planner build session, September 2026
 
@@ -1244,9 +1244,9 @@ cosine kernel, gone since I4; the excess-path likelihood also cannot separate ta
 distances d_near < d_far now separate DURING the walk, since the nearer target's covered fraction grows
 faster (odds ratio u^{−x (1/d_near − 1/d_far)} after x walked). That is option (a) below in effect, with
 its risk: a decoy on the true bearing BEFORE the target gains mid-walk, not only at its arrival fold. No
-fixture has such a decoy; the collinear decoys in s20 lie BEHIND the true target, and s20_off's first
+fixture has such a decoy; the collinear decoys in scenario_s03_01 lie BEHIND the true target, and s20_off's first
 reveal stays at the arrival (20). Options (b)–(d) are as written; nothing decided.
-Observed: scenario_20 (run_20260910_083630). shelf_6 lies nearly behind the human's target
+Observed: scenario_s03_01 (run_20260910_083630). shelf_6 lies nearly behind the human's target
 shelf_3 (9°→20° off heading over the approach). Likelihood is cosine-only — distance plays no
 role — so item_6/item_3 ratio stays 0.97–0.99 per step; confidence plateaus at 0.516 and θ is
 crossed only by GRASP at step 22. A side decoy (shelf_4, angle opens to 60°) resolves fine.
@@ -1263,12 +1263,12 @@ Decide on IR-quality grounds with a controlled IR-only test, not to make a fixtu
 Files: shared/likelihood_functions.py, shared/recognizer.py
 Reference: Phase 4C fixture-design session, September 2026
 
-Update (fixture-design session): scenario_20 no longer depends on this — its early reveal is
+Update (fixture-design session): scenario_s03_01 no longer depends on this — its early reveal is
 planned via assignment_prior on plus a confidence-gated human projection (meta_planner,
 pending). Decide TODO-38 on IR-quality grounds only.
 
 Update (evidence-gated projection admission session): first MEASURED instance of
-"confidence ≠ correctness" — previously only a noted risk. scenario_10, assignment_prior on,
+"confidence ≠ correctness" — previously only a noted risk. scenario_s02_01, assignment_prior on,
 run_20260910_144817, step 80: the human has finished item_2 and is walking to the coffee
 machine; belief goes to `deliver_item(item_6)` at 0.783 (0.991 by step 85), `theta_crossed`
 fires, and `update_human_projection()` admits a projection for a task the human is not
@@ -1481,10 +1481,10 @@ Prerequisites:
     edits (layout JSON, `scenarios.py`, `registry.py`).
     TRIED AND REVERSED (T-B1b, September 2026). A generator (`fixture_generation.py`: a layout builder,
     a delivery-scenario builder, a registration call; `fixture_two_tables.py` as its first user) was built
-    for env_layout8 (e76e4e0) and removed again in the same task. Reason: fixtures are read by people, so
+    for env_layout_08 (e76e4e0) and removed again in the same task. Reason: fixtures are read by people, so
     they are written as literals. A fixture that cannot be read in `scenarios.py` cannot be checked by a
-    person, and that outweighs saving the three manual edits. scenario_80 / scenario_81 are literals in
-    `scenarios.py`, registered the ordinary way; `env_layout8.json` is an ordinary committed layout. The
+    person, and that outweighs saving the three manual edits. scenario_s06_01 / scenario_s06_02 are literals in
+    `scenarios.py`, registered the ordinary way; `env_layout_08.json` is an ordinary committed layout. The
     generator only reproduced what the literals state, so it was deleted rather than kept to drift. Whether
     the randomised harness (T-F) needs programmatic registration is left to its design; nothing is kept
     here for it.
@@ -1504,15 +1504,15 @@ Prerequisites:
     refused until the cap (C). A variant in which the human steps aside after its last task is the
     second condition, to be reported side by side with the first (blocked time,
     `analysis/c_separation_stop/blocked.py`).
-    ✅ BUILT (F47, retyped F47b, September 2026): `scenario_50` on `env_layout5` (= env_layout2 + a
+    ✅ BUILT (F47, retyped F47b, September 2026): `scenario_s03_06` on `env_layout_06` (= env_layout_03 + a
     coffee machine 500 cm east of the table; a waypoint `rest_0` until F47b, an ill-typed binding):
-    scenario_20 with a third human task, `coffee_break(coffee_machine_0)`, after its last delivery.
-    Stop on: completes at 237 / 239 (prior off / on) where scenario_20 is refused at the table from 144
+    scenario_s03_01 with a third human task, `coffee_break(coffee_machine_0)`, after its last delivery.
+    Stop on: completes at 237 / 239 (prior off / on) where scenario_s03_01 is refused at the table from 144
     to the cap. The machine makes `coffee_break` a live hypothesis from t=0, so the recognizer's set
-    differs from scenario_20's: prior-on the first crossing and the hold move from 6 to 8. Read with
-    scenario_20, not instead of it. `analysis/f47_fixtures/`.
-    STILL OPEN FOR env_layout9 (T-B1b follow-up, September 2026): if layout9 ever becomes a measured
-    fixture, its end state needs handling first. In scenario_90 the sampled separation is below
+    differs from scenario_s03_01's: prior-on the first crossing and the hold move from 6 to 8. Read with
+    scenario_s03_01, not instead of it. `analysis/f47_fixtures/`.
+    STILL OPEN FOR env_layout_09 (T-B1b follow-up, September 2026): if env_layout_09 ever becomes a measured
+    fixture, its end state needs handling first. In scenario_s07_01 the sampled separation is below
     `min_separation` (50 cm) from tick 358 to the end of a 500-step run — after the robot's last delivery
     at 361 — with both agents standing idle near kitting_table_1, which is where the human finished and
     where three of the robot's four deliveries go. Nothing during the work falls below it. The same
@@ -1521,26 +1521,26 @@ Prerequisites:
     its reaction policy (wait, or reconsider and return) would differ is a human stay at a place the robot
     needs, mid-run, finite, with another task in the pool. F47 produced it with `coffee_break` bound to a
     waypoint — ill-typed (no coffee machine), retired in F47b (`analysis/f47_fixtures/`). F47b built the
-    natural, well-typed configuration: `env_layout7`, `scenario_70` / `_71` — a real coffee machine on the
+    natural, well-typed configuration: `env_layout_07`, `scenario_s05_01` / `scenario_s05_02` — a real coffee machine on the
     robot's route to its first shelf, the human's shelf beside it, the human's break there, then its
     delivery, then the AC switch by the east wall; the alternative shelf beside the blocked one or across
     the table at the same distance (the F47 one-variable design). MEASURED: `coffee_break` crosses θ at
-    tick 23, two ticks before the stand (25–55), and realization absorbs the projected wait — scenario_70
-    switches to the alternative (no `[stop]`, done 187), scenario_71 holds 32 ticks and then meets only the
+    tick 23, two ticks before the stand (25–55), and realization absorbs the projected wait — scenario_s05_01
+    switches to the alternative (no `[stop]`, done 187), scenario_s05_02 holds 32 ticks and then meets only the
     human's departure (3 refused steps at 57–59 past T_h, done 207). NO VALID FIXTURE PRODUCES A MID-RUN
     BLOCK: a stay the projection carries is priced, so the blocked event is exercised only past T_h and by
     deviations (design_decisions.md, "Scheduled bindings are typed; a stay the projection carries is
     absorbed"). The short / long variants therefore have no valid instance; what varies between 70 and 71 is
     the planning response (switch vs hold). A principled unforeseen stay needs declared human behaviour
-    outside the robot's domain knowledge (TODO-80). D2's evaluation uses scenario_20 / scenario_50 (the
-    end-state pair, the tail block) and scenario_70 / _71 (the absorbed stay, the departure tail).
+    outside the robot's domain knowledge (TODO-80). D2's evaluation uses scenario_s03_01 / scenario_s03_06 (the
+    end-state pair, the tail block) and scenario_s05_01 / scenario_s05_02 (the absorbed stay, the departure tail).
 (f-designations) A DESIGN NOTE FOR ANY SCENARIO WITH MORE THAN ONE DESTINATION (T-B1b follow-up, September
     2026): in the current two-table scenarios most items are designated to the table NEAREST their shelf —
-    5 of 6 in env_layout8 and 5 of 6 in env_layout9 (measured). That makes the destination fact nearly
+    5 of 6 in env_layout_08 and 5 of 6 in env_layout_09 (measured). That makes the destination fact nearly
     redundant with geometry: it weakens the ordering difference the fixture is for, and it weakens the
     recognizer's discrimination on the carry leg, since the table a carry heads for is the one proximity
     would have guessed. In both layouts the whole ordering effect rests on the single against-proximity
-    item (env_layout8's item_4, farther by 64.9 ticks; env_layout9's item_1, by 26.8). Scenarios built to
+    item (env_layout_08's item_4, farther by 64.9 ticks; env_layout_09's item_1, by 26.8). Scenarios built to
     EVALUATE the algorithms must set designations deliberately, against proximity where that is what the
     test needs. The designations are Hadi's to decide per scenario, not to be left to follow from the
     layout. design_decisions.md, "An item's destination table is a fact of the station" (the fact is the
@@ -1549,19 +1549,19 @@ Prerequisites:
     cheapest task from the robot's position; full_reorder takes the task whose delivery leaves the robot best
     placed for the remaining shelves; the two heads differ exactly when the cheapest-from-here task ends at a
     table far from the remaining shelves, which the destination fact decides. Across nine designation sets
-    priced on env_layout8's geometry the heads differ in seven (gaps 14 to 78 ticks) and coincide in two;
+    priced on env_layout_08's geometry the heads differ in seven (gaps 14 to 78 ticks) and coincide in two;
     every flip traces to the one designation that moves the cheapest single task — the mechanism, not a
     weakness of any fixture. Generality across layouts is T-F's (randomised layouts), not a hand-built
     scenario's. `analysis/tb1d_designations/README.md`.
     SUPERSEDED (T-B1d): T-B's ordering result rests on a SINGLE against-proximity item in each
-    layout (item_4 in env_layout8, item_1 in env_layout9), so any claim drawn from T-B3a is scoped to that
+    layout (item_4 in env_layout_08, item_1 in env_layout_09), so any claim drawn from T-B3a is scoped to that
     fixture: it shows that ordering matters WHEN AN ITEM IS DESIGNATED AWAY FROM ITS NEAREST TABLE, not
     that reordering helps in general on a two-table station. An evaluation scenario meant to support the
     general claim needs SEVERAL against-proximity designations, or a geometry in which proximity does not
     order the tables cleanly. `analysis/tb1b_two_tables/README.md`, "What this fixture does not settle".
-    A FINDING FOR T-B3, FROM T-B2c (September 2026): on every current fixture NO WINNING ORDERING UNDER `full_reorder` CARRIES A HOLD (scenario_80, scenario_81,
-    scenario_00, both priors; every hold sent is 0 and every `[meta-win]` line reads `holds=0,...`), so T-B2c
-    changes NOTHING EXECUTED against T-B2b. scenario_81 does not exercise realized cost under `full_reorder`: its
+    A FINDING FOR T-B3, FROM T-B2c (September 2026): on every current fixture NO WINNING ORDERING UNDER `full_reorder` CARRIES A HOLD (scenario_s06_01, scenario_s06_02,
+    scenario_s01_01, both priors; every hold sent is 0 and every `[meta-win]` line reads `holds=0,...`), so T-B2c
+    changes NOTHING EXECUTED against T-B2b. scenario_s06_02 does not exercise realized cost under `full_reorder`: its
     conflict belongs to `single_task`'s course (heads 6, 1, 7, 4: the 4-tick hold before item_1 at step 39), and
     the course `full_reorder` chooses (7, 4, 6, 1) never meets the human (0 of the 206 orderings priced on that
     course carry any hold; the 12 that do, 8 of them before a later entry, are all priced on `single_task`'s
@@ -1596,14 +1596,14 @@ Prerequisites:
     RESOLVED (T-B1a, September 2026): a fact of the station, the layout's `"destination"` per item; one
     hypothesis per item, the table determined from the item (`determined_parameters`). design_decisions.md,
     "An item's destination table is a fact of the station". TODO-86 / TODO-87 record what it leaves open.
-    ✅ BUILT (T-B1b, September 2026): `env_layout8`, `scenario_80` (plain cost, ordering isolated) and
-    `scenario_81` (a conflict in the second task of an ordering). Robot pool item_1 / 6 / 4 to
+    ✅ BUILT (T-B1b, September 2026): `env_layout_08`, `scenario_s06_01` (plain cost, ordering isolated) and
+    `scenario_s06_02` (a conflict in the second task of an ordering). Robot pool item_1 / 6 / 4 to
     kitting_table_0, item_7 to kitting_table_1: the cheapest single task from the start is item_6
     (39.3 ticks), the cheapest full ordering starts with item_7, and greedy is 41.4 ticks worse. The
     fixture settles the choice of head, not the tail (the two best orderings differ by 2.2 ticks). The
     permutation table, the runs and the baselines: `analysis/tb1b_two_tables/README.md`.
-    ✅ T-B1c (September 2026): `scenario_83` exists as the existence case in which realized cost changes the
-    head under `full_reorder`; `analysis/tb1c_realized_flip/`. `scenario_84` (several against-proximity
+    ✅ T-B1c (September 2026): `scenario_s06_03` exists as the existence case in which realized cost changes the
+    head under `full_reorder`; `analysis/tb1c_realized_flip/`. `scenario_s06_05` (several against-proximity
     designations) is T-B1d, not started.
 (g) THE GATE'S REOPENING CONDITION (gate ruling, September 2026): a walk crossing of θ with a live rival at
     similar odds (top-two ratio near 1 at the crossing), where the normalised share and a margin gate would
@@ -1614,7 +1614,7 @@ Prerequisites:
 (c) Fixture gap (T1, `analysis/t1_conflict_measurement/REPORT.md` §(a), §(c)): no current
     scenario has a correct-hypothesis *crossing* on the robot's current task. The only
     correct-hypothesis crossings measured are the never-selected item_7 alternatives in
-    scenario_20 (robot approach across the human's carry path); every conflict on a current
+    scenario_s03_01 (robot approach across the human's carry path); every conflict on a current
     task is co-directional convergence into the kitting table. B2 continuation will therefore
     only be exercised on table convergence until a crossing fixture exists.
 Also: B2.B+B3.A must select identically to none+B3.A under the same `_cost()` — treat as an
@@ -1654,9 +1654,9 @@ Reference: Phase 4C B2/B3 session, September 2026; T1 measurement session, Septe
 **TODO-49 — Type-name mismatch between layout and schema silently empties a task's hypothesis space** — (2) binding part ✅ BUILT (F47b); (1) and (3) still proposed
 `build_hypothesis_space()` does `known_objects_by_type.get(type, [])`; a task whose parameter
 type has no object in the layout gets zero hypotheses. Legitimate when the layout genuinely
-lacks the object (s00/s20/s30 have no coffee machine — DESIGN-14), a silent modelling error
-when it is a spelling mismatch: `env_layout1.json` declared `AC_switch` against
-`parameter_types` `ac_switch`, so scenario_10's scripted `ac_activation` was unrecognisable
+lacks the object (scenario_s01_01 / scenario_s03_01 / scenario_s01_06 have no coffee machine — DESIGN-14), a silent modelling error
+when it is a spelling mismatch: `env_layout_02.json` declared `AC_switch` against
+`parameter_types` `ac_switch`, so scenario_s02_01's scripted `ac_activation` was unrecognisable
 for the whole life of the scenario and every audit count said "coffee_break is the only
 foreseeable hypothesis" (fixed in I2: the layout now spells `ac_switch_0` / `ac_switch`, the
 id the script already used). Proposal, not built (I2 report §6):
@@ -1673,16 +1673,16 @@ id the script already used). Proposal, not built (I2 report §6):
 ✅ BUILT (F47b, September 2026), the binding part of (2): `shared.types.check_task_bindings(task,
 object_type_by_id)` — every bound object must exist in the layout and every parameter the schema types must
 be bound to an object of that type — is called in `SimModel._spawn_agents` for every agent's scheduled AND
-assigned tasks; a mismatch raises (an error, not a warning). Result over the registered fixtures: scenario_40
-(`ac_activation` at the waypoints wander_0 / wander_1) and scenario_50 as first built (`coffee_break` at the
-waypoint rest_0) failed and were fixed by retyping the targets at the same coordinates (env_layout4:
-`ac_switch_1` / `ac_switch_2`; env_layout5: `coffee_machine_0`); scenario_60/61 failed and were retired
+assigned tasks; a mismatch raises (an error, not a warning). Result over the registered fixtures: scenario_s04_01
+(`ac_activation` at the waypoints wander_0 / wander_1) and scenario_s03_06 as first built (`coffee_break` at the
+waypoint rest_0) failed and were fixed by retyping the targets at the same coordinates (env_layout_05:
+`ac_switch_1` / `ac_switch_2`; env_layout_06: `coffee_machine_0`); scenario_60/61 failed and were retired
 (`analysis/f47_fixtures/`). STILL PROPOSED: (1) the `[IR-space]` line; (3) the case-insensitive type clash at
 hypothesis-space construction; and the other half of (2), "every scripted task's key is in the hypothesis
 space" — the type check implies it whenever the type has objects, but a scripted task whose parameter type has
 no object at all is still refused only through the missing-object error, not stated as such.
-NOTE (R1, September 2026): the scenario_10 / `env_layout1.json` statements above PREDATE the cleaned
-`env_layout1` (no obstacles; coffee machine and AC switch side by side at x = −875, item_1 on the
+NOTE (R1, September 2026): the scenario_s02_01 / `env_layout_02.json` statements above PREDATE the cleaned
+`env_layout_02` (no obstacles; coffee machine and AC switch side by side at x = −875, item_1 on the
 shelf near them; the human's script and the robot's pool rewritten) and are STALE as descriptions of
 the current fixture. The old layout with obstacles is kept as `env_layout99.json`, not registered.
 The spelling fix itself (`ac_switch`) carries over.
@@ -2504,8 +2504,8 @@ NOT DONE at the 4C housekeeping: both remedies are outside what may be touched n
 `ros_sim/` (paused, not modified), and registering `env_layout99` is excluded by CLAUDE.md (kept, not
 registered). Do it when the ROS side resumes.
 The ROS/PRIEST guide describes `env_layout1.json` with obstacles and scenario_10 with the robot
-assigned item_5 / item_1 / item_7. Since R1 `env_layout1` is the cleaned layout (no obstacles, new
-scenario_10 pool) and the old layout is `env_layout99.json`, which is NOT registered in
+assigned item_5 / item_1 / item_7. Since R1 `env_layout1` (since T-L stage 3 `env_layout_02`) is the cleaned layout
+(no obstacles, new scenario_10 pool; now scenario_s02_01) and the old layout is `env_layout99.json`, which is NOT registered in
 `domains/kitting/registry.py`. The ROS path would need `env_layout99` registered (or its own copy) to
 reproduce what the guide describes. Not touched: `ros_sim/` is paused.
 Files: ros_sim/framework_HRI/guide.txt, domains/kitting/registry.py
@@ -2689,7 +2689,7 @@ Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.3
 **TODO-79 — The `[sep]` execution measure samples whole ticks and misses minima between ticks** ✅ DECIDED (T10): `min=` alongside `dist=`, and sub-min_separation moments classified against the assessed window
 `[sep]` (T9; `mesa_sim/run_mesa.py`) logs the robot–human distance once per tick, at the tick's end
 positions. Between ticks both agents move up to 20 cm, so a close pass between two samples is read at
-the nearer sample, not at its minimum. L2 measured the case: scenario_30's head-on pass reads 11.0 cm
+the nearer sample, not at its minimum. L2 measured the case: scenario_s01_06's head-on pass reads 11.0 cm
 in `[sep]` while the continuous minimum is near 0 (the agents pass through each other between ticks 22
 and 23; `analysis/l2_execution_lag/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in the L2 entry of design_decisions.md and TODO-77)). Realization's own definition is continuous — a
 violation is any moment strictly below `min_separation`, along straight-line motion within a segment
@@ -2796,11 +2796,11 @@ stop on, every block in the current fixtures is the human's terminal stay at the
 (`analysis/c_separation_stop/blocked.md`), where neither policy has anything to choose. The earlier claim
 that D2 removes that deadlock is withdrawn; the remedy is reconsider with a fixture that has an alternative,
 or 4D's human cooperation (TODO-15).
-OBSERVED (T-C2c, `analysis/tc2c_scripts/`, scenario_01): the declared stay is scriptable; after `Stay(40)` the script
+OBSERVED (T-C2c, `analysis/tc2c_scripts/`, scenario_s01_02): the declared stay is scriptable; after `Stay(40)` the script
 ends and the human stands at the table, so with the stop on the robot is refused from 79 to the end (121 ticks), the
 terminal-stay block above; a stay that ends needs content after it.
 T-D (the play, `analysis/tc2c_scripts/play.md`): T-D's blocked fixture uses a stay that ENDS. A stay that ends is waited out with the stop on
-(scenario_94: refused 144–186, completion 413 against 370; scenario_23's mid-run stay likewise); only the human's
+(scenario_s07_05: refused 144–186, completion 413 against 370; scenario_s03_03's mid-run stay likewise); only the human's
 end-of-script stand at a table deadlocks (01, 02, 04, 23). Scenario-authoring convention since 23 Sept 2026: a
 script ends with the human leaving the workspace, unless the scenario is about that terminal stand
 (design_decisions.md, "The human action script (T-C1, decided)", AS BUILT convention).
@@ -2878,14 +2878,14 @@ nothing, the meta-planner owns admission, the stop covers what no projection cov
 an item and stay still mid-carry; expected today: frozen belief, no trigger, a hold placed for a moving human,
 the conflict later than realized, refused by the stop inside the assessed window (the first fixture where the
 stop and realization overlap). design_decisions.md, "A stationary human".
-OBSERVED (T-C2c, `analysis/tc2c_scripts/`, scenario_11): a stay mid-carry (30 ticks at the coffee machine holding
+OBSERVED (T-C2c, `analysis/tc2c_scripts/`, scenario_s02_02): a stay mid-carry (30 ticks at the coffee machine holding
 item_2) freezes the belief (`deliver_item(item_2)` 0.550, `coffee_break` 0.345, `unknown` 0.088) with no trigger,
-as expected. For (b), observed in scenario_01: once the human's hypothesis space is exhausted (its last assigned
+as expected. For (b), observed in scenario_s01_02: once the human's hypothesis space is exhausted (its last assigned
 task pinned), `unknown` reads 0.995 and no projection exists, so a finished work order and unmodelled behaviour are
 indistinguishable to `update()`. T-D decides.
 THE GENERAL FORM OF (b) (the play, `analysis/tc2c_scripts/play.md`): the robot is blind after EVERY human task completion, not only when the
 hypothesis space is exhausted. The episode boundary resets the belief to the prior, below θ, so no projection is
-admitted, while the human stands at the table it just delivered to, which is where the robot delivers. scenario_72:
+admitted, while the human stands at the table it just delivered to, which is where the robot delivers. scenario_s05_03:
 the robot's carry passes 0.78 cm from the standing human (tick 100), before the robot's own completion; 01, 02, 04,
 22, 24, 52 show 1–15 cm at the end of the run (stop off). Only the separation stop covers it. T-D's opening item.
 Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`update_human_projection`)
@@ -2918,8 +2918,8 @@ stays where it was. `MetaPlanner._is_complete` uses the same criterion (`Adaptiv
 the pool does not drop the task either. Where it matters: the deviation case (T-C / T-D), in which the
 human delivers an item to a table other than its designated one; not reachable by any current fixture
 (TODO-86). Recorded, nothing changed.
-REPRODUCED (the play, `analysis/tc2c_scripts/play.md`; reachable since T-C2a's `deviate`): scenario_85 (env_layout8) and scenario_92
-(env_layout9). No pin and no boundary at the misdelivery; after the next boundary `deliver_item(item)` leads again
+REPRODUCED (the play, `analysis/tc2c_scripts/play.md`; reachable since T-C2a's `deviate`): scenario_s06_06 (env_layout_08) and scenario_s07_03
+(env_layout_09). No pin and no boundary at the misdelivery; after the next boundary `deliver_item(item)` leads again
 (about 0.9: the item lies on the wrong table, so its delivery is still open), and the robot plans against a projected
 human carrying it back, who stands still.
 Files: shared/recognizer.py (`update`, `_terminal_complete`, `_task_boundary`), shared/meta_planner.py
@@ -2951,7 +2951,7 @@ An observation, not a proposal. A walk to a target stops at the first point with
 along its straight line, so two approaches to one table from different sides stop at different points of the
 radius. Against a human standing at the table, which of them comes within min_separation (s = 50 cm) is then
 decided by that stop point, and the margin can be far smaller than the difference between the projected and the
-executed stop point (10 to 15 cm, step quantisation of the arrival). ILLUSTRATION, scenario_83 at step 159: the
+executed stop point (10 to 15 cm, step quantisation of the arrival). ILLUSTRATION, scenario_s06_03 at step 159: the
 human's projection stands at (−709.8, −221.6); the robot's item_1 carry (from shelf_1, south-west) is projected to
 stop 49.22 cm from it and its item_6 carry (from shelf_6, south-east) 58.54 cm. The conflict that makes realized
 cost change the head is decided by 0.78 cm against s; executed, the two stops were 37.48 and 42.87 cm from the
@@ -2997,7 +2997,7 @@ its own motion only). The label difference found here is TODO-91.
 `Executor.set_assessed_window()` / `_log_stop()` (`mesa_sim/executor.py`, window set in `mesa_sim/sim_agents.py`)
 label a tick inside when it lies in [1, T_h] on the decision's clock. The glossary ("assessed window") and
 `realize()` intersect the window with the realized plan's span as well. The two differ only at the plan's tail
-(scenario_10 b2a prior on, tick 74: [50, 51] straddles the realized end 50.81, inside by the label, edge by the
+(scenario_s02_01 b2a prior on, tick 74: [50, 51] straddles the realized end 50.81, inside by the label, edge by the
 glossary). Label only: the stop's refusal does not read it, no behaviour depends on it. Not fixed.
 Files: mesa_sim/executor.py (`set_assessed_window`, `_log_stop`), mesa_sim/sim_agents.py
 Reference: TODO-90 check, September 2026; analysis/todo90_b2a_window/README.md
@@ -3022,7 +3022,7 @@ evaluation that reuses the harness must rescore against labels A and B.
 Reference: T-C1, 23 September 2026; design_decisions.md, "The human action script (T-C1, decided)"
 
 **TODO-93 — The completion of a foreseeable task ends the episode while an assigned delivery is visibly in progress** [T-D; from T-C2c]
-Observed in scenario_11 (`analysis/tc2c_scripts/`): the human picks up item_2, walks to the coffee machine holding
+Observed in scenario_s02_02 (`analysis/tc2c_scripts/`): the human picks up item_2, walks to the coffee machine holding
 it and waits there. At 75 `waited(human_0, coffee_machine_0)` pins `coffee_break`, and because that hypothesis
 expected its terminal action on the previous tick, the retirement is an episode boundary: every base becomes the
 uniform prior and every origin moves, although the human still holds item_2 and the delivery is in progress. The
@@ -3030,7 +3030,7 @@ belief falls from `deliver_item(item_2)` 0.550 to 0.248 (four-way tie) and the d
 scratch (it clears θ at 100). Nothing is wrong by the current rule (docs/recognizer_handback.md §1.6: the observed
 agent finished a task); whether a task completed INSIDE another, with its item in hand, should end the episode is
 for T-D. Recorded, nothing changed.
-REPRODUCED (the play, `analysis/tc2c_scripts/play.md`): scenario_12, scenario_41 and scenario_72, on layouts 1, 4 and 7.
+REPRODUCED (the play, `analysis/tc2c_scripts/play.md`): scenario_s02_03, scenario_s04_02 and scenario_s05_03, on env_layout_02, env_layout_05 and env_layout_07.
 Files: shared/recognizer.py (`update`, `_task_boundary`)
 Reference: T-C2c, September 2026; docs/recognizer_handback.md §1.6
 
@@ -3038,12 +3038,12 @@ Reference: T-C2c, September 2026; docs/recognizer_handback.md §1.6
 Observed (`analysis/tc2c_scripts/play.md`). The evidence a walk lays against the hypotheses it does not serve (refutation by wasted path)
 persists until an episode boundary, and only a task completion makes one: nothing else resets excess path. So a
 change of mind, or a detour mid-task, is recognised again only if the misleading walk was short. Short (12–22 ticks:
-scenario_51, scenario_24, the return in scenario_31, scenario_52's near corner): the task the human now does recovers,
-sometimes a few ticks before its release. Long (the 77-tick walks of scenario_84 and scenario_91; the long detours
-of scenario_93 and scenario_22): it never recovers, and the robot sees `unknown` (0.994) for the whole second
-delivery. scenario_02's return is the same pattern (`deliver_item(item_2)` leads two ticks before its release). The
-same mechanism hides a foreseeable task: in scenario_41 `coffee_break` never rose on the walk to the machine (the walk
-to item_3 had refuted it), where in scenario_11 it rose to 0.345. The recognizer judges nothing; whether evidence
+scenario_s03_07, scenario_s03_04, the return in scenario_s01_07, scenario_s03_08's near corner): the task the human now does recovers,
+sometimes a few ticks before its release. Long (the 77-tick walks of scenario_s06_05 and scenario_s07_02; the long detours
+of scenario_s07_04 and scenario_s03_02): it never recovers, and the robot sees `unknown` (0.994) for the whole second
+delivery. scenario_s01_03's return is the same pattern (`deliver_item(item_2)` leads two ticks before its release). The
+same mechanism hides a foreseeable task: in scenario_s04_02 `coffee_break` never rose on the walk to the machine (the walk
+to item_3 had refuted it), where in scenario_s02_02 it rose to 0.345. The recognizer judges nothing; whether evidence
 should decay, be reset by another event, or stand, is a recognizer question for T-D. Recorded, nothing changed.
 Files: shared/recognizer.py
 Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
@@ -3280,12 +3280,15 @@ Reference: world/human_executor.py, `advance()`; mesa_sim/world_state_builder.py
 
 **TODO-104: dock_loading's two scenarios do not load (recorded, T-H1, 25 Sept 2026)** [OPEN; domain deferred]
 Both fail at load at ea4446c (before T-H1) and identically after it; the domain imports, and its tree and task model
-build. Error text:
-- scenario_10: `scenario 'scenario_10', agent 'human_0': AdaptivePlanner: no applicable method for task
-  'office_break' in current world state. Bindings: {'?agent': 'human_0'}`
-- scenario_11: `scenario 'scenario_11', agent 'human_0': office_break(?office_chair=office_chair): ?office_chair is
-  bound to 'office_chair' of type 'chair', but the schema requires type 'office_chair'`
-Files: domains/dock_loading/scenarios.py, domains/dock_loading/tasks.py (`office_break`), its layout
+build. Error text (current at T-L stage 3, 26 Sept 2026, under the serial ids; scenario_10 and scenario_11 before it,
+`docs/rename_table.md`):
+- scenario_s01_01: `scenario 'scenario_s01_01', agent 'human_0': the script cannot run as written:
+  infeasible:office_break()` (recorded at T-H1 as `AdaptivePlanner: no applicable method for task 'office_break' in
+  current world state. Bindings: {'?agent': 'human_0'}`; the same failure, now reported by the load-time replay)
+- scenario_s01_02: `scenario 'scenario_s01_02', agent 'human_0': office_break(?office_chair=office_chair):
+  ?office_chair is bound to 'office_chair' of type 'chair', but the schema requires type 'office_chair'`
+Files: domains/dock_loading/scenarios/scenarios_s01.py, domains/dock_loading/tasks.py (`office_break`), its layout
+(`layouts/env_layout_01.json`) and setup (`setups/env_setup_01.json`)
 T-H3: the scripts were wrapped as `Script([...])` syntactically, the robots' `scheduled_tasks` too (TODO-39: they
 belong in `assigned_tasks`); the domain imports; both scenarios still fail with the same two errors.
 
@@ -3337,11 +3340,13 @@ reads those spawn entries: `planner_2.py` (`LAYOUT_PATH`, `load_layout`, `raw["r
 and the scenario through the same loader as Mesa, together with TODO-108. T-L's stages do not touch ros_sim.
 Stage 2 adds: `planner_2.py`'s `from domains.kitting.scenarios import scenario_10` stops resolving (scenarios.py is
 now a package whose names live in its modules); it joins the readers above for the resume.
+Stage 3 adds: the import names change again (kitting scenario_10 is `scenario_s02_01`, in
+`domains/kitting/scenarios/scenarios_s02.py`; the layout files are `layouts/env_layout_KK.json`; `docs/rename_table.md`).
 Files: ros_sim/framework_HRI/framework_HRI/{planner_2,planner_3,world_con,run_continuous}.py
 Reference: design_decisions.md, "Layouts, setups and scenarios: the three artefacts of a run", ruling 8; TODO-108
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
-1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).
+1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
 2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.
 3. Reproduced: TODO-93 (a foreseeable completion ends the episode mid-delivery) and TODO-87 (a delivery to another
    table: no pin, no boundary, a projection of a task the human will not do).

@@ -31,8 +31,8 @@ T-D Q1's ground-truth cases (design_decisions.md, "T-H", item 10), restated as r
   (its hypothesis is refuted under the prior: a belief-side matter, not a coverage one);
 - a switch to an unmodelled task: a `Started` whose task's `coverage` is `TaskAbsent` or `BindingAbsent`;
 - a binding-level deviation: the task on top has `assigned(task)` with a departure and `coverage` `BindingAbsent`
-  (scenario_85, scenario_92);
-- no task on the stack: `truth_at(record, tick).stack == []` (scenario_70 / 71 after the AC switch);
+  (scenario_s06_06, scenario_s07_03);
+- no task on the stack: `truth_at(record, tick).stack == []` (scenario_s05_01 / scenario_s05_02 after the AC switch);
 - an episode's first ticks: the ticks after a `Left(task, COMPLETED)`, where `truth_at` gives the task entered or
   resumed that tick while the recognizer restarts from the prior.
   The recognizer's episode boundary is its own attribution and may not coincide tick for tick with the
@@ -356,7 +356,7 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
 
 1. **The robot is blind after every human task completion** (TODO-85 (b), general form). The
    episode boundary resets the belief to the prior, below θ; no projection is admitted; the human is
-   standing at the table it just delivered to, which is where the robot delivers. scenario_72: the
+   standing at the table it just delivered to, which is where the robot delivers. scenario_s05_03: the
    robot's carry passed 0.78 cm from the standing human mid-run; six other scripts show 1 to 15 cm at
    the end of the run with the stop off. The stop is the only guard. The recorded candidate: under
    `unknown` (or no admitted hypothesis) project the human as stationary at its current position for a
@@ -366,18 +366,19 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
    excess path a walk lays against the hypotheses it does not serve persists until a task completion
    resets legs and origins. A short misleading walk (12 to 22 ticks) lets the new task recover; a
    long one (77 ticks) never does and the robot sees `unknown` for the whole second delivery. The same
-   mechanism hides a foreseeable task (scenario_41's `coffee_break`). This is the retraction case T-D
+   mechanism hides a foreseeable task (scenario_s04_02's `coffee_break`). This is the retraction case T-D
    was meant to test; the recognizer has no mechanism for it. Recognizer-side (T-D Q2). Note the
    anchors cannot express a turn mid-walk; "change of mind before the pick-up" means the human reaches
    the item first and then turns.
 3. **TODO-93**: a foreseeable task finishing inside an assigned delivery ends the episode and resets
-   the belief while the item is visibly in hand (scenarios 11, 12, 41, 72). Recognizer-side (T-D Q3).
+   the belief while the item is visibly in hand (scenario_s02_02, scenario_s02_03, scenario_s04_02,
+   scenario_s05_03). Recognizer-side (T-D Q3).
 4. **TODO-87**: a wrong-table delivery pins nothing and ends no episode; afterwards the assigned
    delivery leads again at about 0.9 and the robot projects a human carrying the item back to its
-   designated table while the human stands (scenarios 85, 92). A stale projection under a frozen
+   designated table while the human stands (scenario_s06_06, scenario_s07_03). A stale projection under a frozen
    belief. Recognizer and meta-planner (T-D Q4).
 5. **The stop's deadlock comes only from the end-of-script stand** (TODO-80); a stay that ends is
-   waited out (scenario_94 stop on: refused 144 to 186, completed 413 against 370). T-D's blocked
+   waited out (scenario_s07_05 stop on: refused 144 to 186, completed 413 against 370). T-D's blocked
    fixture uses a stay that ends; the authoring convention covers the rest. The blocked event and
    WAIT/RECONSIDER are then built on it (T-D Q5, the recorded design).
 6. `unknown` with no task hypothesis left live (the human finished its assigned tasks and stands idle) reads 0.995
@@ -385,11 +386,11 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
    describes a stand; label A has no value once the assigned tasks are done; under T-H the empty stack is its
    own ground-truth case). To `update()` it is
    indistinguishable from a high `unknown` raised by evidence, a walk no live task hypothesis explains
-   (scenario_01, 06; terms: `docs/glossary.md` §7). T-D decides whether
+   (scenario_s01_02, 06; terms: `docs/glossary.md` §7). T-D decides whether
    the distinction matters for `update()` (part of T-D Q1).
-7. Smaller: a hold can put the robot at the human's projected destination (scenario_94: hold placed
+7. Smaller: a hold can put the robot at the human's projected destination (scenario_s07_05: hold placed
    at kitting_table_1, the human walked up to the standing robot, 1.1 cm; consistent with F1, but
-   matters for how the demonstration looks). Layout4's beliefs are diffuse (wide hypothesis space).
+   matters for how the demonstration looks). env_layout_05's beliefs are diffuse (wide hypothesis space).
 
 Proposed order for the new chat (Hadi rules): T-D Q1 (stationary human under no admitted
 hypothesis) first, since it is the safety gap and every other item shows through it; then T-D Q5

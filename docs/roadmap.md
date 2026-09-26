@@ -22,18 +22,18 @@ untouched, only the words it claims it in.
 
 ## Phase 3 — Kitting Domain + Mesa Simulation ✅
 - `domains/kitting/`: `tasks.py`, `actions.py`, `registry.py`, `scenarios.py`
-- Layouts and scenarios (scenario ids are prefixed by layout number):
-  `env_layout0` / `scenario_00` (Phase 4 dev), `env_layout1` / `scenario_10` (foreseeable tasks; dropped
+- Layouts and scenarios (serial ids since T-L stage 3; `docs/rename_table.md` maps the old ids, which the records
+  below keep): `env_layout_01` / `scenario_s01_01` (Phase 4 dev), `env_layout_02` / `scenario_s02_01` (foreseeable tasks; dropped
   from the validation sweep in I2, **reinstated at R1/T9 on the cleaned layout** — no obstacles, coffee
   machine and AC switch side by side, item_1 near them; the old layout with obstacles is kept as
-  `env_layout99`, not registered), `env_layout2` / `scenario_20` (collinear decoys),
-  `env_layout3` / `scenario_30` (mid-approach reveal), `env_layout4` / `scenario_40` (F1, Sept 2026:
+  `env_layout99`, not registered), `env_layout_03` / `scenario_s03_01` (collinear decoys),
+  `env_layout_04` / `scenario_s01_06` (mid-approach reveal), `env_layout_05` / `scenario_s04_01` (F1, Sept 2026:
   a scripted deviation sequence — delivery, coffee break, two AC-switch walks, a second delivery —
   the positive control for foreseeable-task recognition; F47b retyped the two walks' waypoints as AC
   switches so the script is well typed, baseline regenerated in `analysis/f47_fixtures/`).
-  Evaluation fixtures, not in the regression sweep (F47 / F47b): `env_layout5` / `scenario_50`
-  (scenario_20's end-state variant: the human steps aside for a coffee break), `env_layout7` /
-  `scenario_70`, `scenario_71` (a foreseen human stay on the robot's route; alternative beside or
+  Evaluation fixtures, not in the regression sweep (F47 / F47b): `env_layout_06` / `scenario_s03_06`
+  (scenario_s03_01's end-state variant: the human steps aside for a coffee break), `env_layout_07` /
+  `scenario_s05_01`, `scenario_s05_02` (a foreseen human stay on the robot's route; alternative beside or
   across). `env_layout6` / scenario_60/61 (F47) are retired as ill-typed, kept unregistered as a record.
   Since F47b every scheduled and assigned task's bindings are type-checked at spawn (TODO-49).
 - `mesa_sim/sim_model.py`, `sim_agents.py`, `world_state_builder.py`, `obs_builder.py`
@@ -482,6 +482,10 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     the identical setups (0 = 3, 2 = 5) merged before numbering so numbering is done once [DONE IN STAGE 2], `docs/rename_table.md`
     (which says in one line that the frozen analysis scripts stay
     frozen at their commit), the four maintained sets regenerated under the new names, sweep scripts and READMEs.
+    BUILT (26 Sept 2026): layouts `env_layout_KK` and scenarios `scenario_sNN_MM` in both domains, the variable the
+    id; `docs/rename_table.md`; the four sets regenerated as `<layout id>_<scenario id>_<run options>.log` (tb1a gained
+    its own `sweep.sh`; tb3 keeps all 20 runs), differing from stage 2 in the `[run_mesa]` line alone, every `.rec`
+    byte-identical; one superseding line in each frozen analysis README.
   - stage 4: the run file and the override mechanism (three overridable facts: an agent's `start_position`, a fixed
     object's position, a movable object's home container), the viewer reading it.
   Acceptance at every stage: the four maintained sweeps run from scratch and diffed against the previous stage's
@@ -501,7 +505,7 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   The recognizer pass (Q2 to Q4) opens with TODO-95: rule whether the stationarity channel joins it or stays
   recorded (TODO-95; "T-H" named it before 25 Sept 2026).
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
-  set covers switch and hold (s70 / s71), a two-table ordering, a change of mind, unmodelled behaviour; plain against
+  set covers switch and hold (scenario_s05_01 / scenario_s05_02), a two-table ordering, a change of mind, unmodelled behaviour; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and
   unmodelled behaviour (and the belief's `unknown` leading), not only switch and hold.
 - **T-F — Evaluation (Phase 5).** Fixture generation completed (the randomised harness, TODO-47); factors

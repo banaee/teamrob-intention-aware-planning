@@ -31,7 +31,8 @@ Relevant (read as needed):
   for readers of a field
 - `domains/kitting/`: the active domain (`domains/kitting/script.py`: the call forms a scenario is written in, T-H3).
   T-L stage 2: `layouts/` and `setups/` hold the layout and setup files (setups under their final ids
-  `env_setup_NN`; env_setup3 and env_setup5 merged into env_setup_01 and env_setup_03); `scenarios/` is a package,
+  `env_setup_NN`; env_setup3 and env_setup5 merged into env_setup_01 and env_setup_03; layouts under `env_layout_KK`
+  and scenarios under `scenario_sNN_MM` since stage 3, `docs/rename_table.md` maps the old ids); `scenarios/` is a package,
   one module per setup (`scenarios_sNN.py`); the registry discovers all three (`domains/discovery.py`) — no hand
   list; `env_layout6.json` and `env_layout99.json` stay at the domain root, unsplit and unregistered;
   `mesa_sim/sim_agents.py` `HumanAgent`: the human's body-side driver of the stack machine (T-H2)
@@ -228,11 +229,11 @@ Interpreter: `~/python-envs/teamrob-sp4-env/bin/python`.
 ```bash
 # headless; --layout is optional (T-L stage 1): a run that names none takes the scenario's first reference layout.
 # The [run_mesa] start line names the triple; setup ids are env_setup_NN since stage 2 (the setup is the scenario's, never a flag).
-PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout3 --scenario scenario_30 --steps 200
+PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout_04 --scenario scenario_s01_06 --steps 200
 # evaluation switch (default off): robot knows the observed human's assigned-task pool
-PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout3 --scenario scenario_30 --steps 200 --assignment_prior true
+PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout_04 --scenario scenario_s01_06 --steps 200 --assignment_prior true
 # visualization
-solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout2 --scenario scenario_20
+solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout_03 --scenario scenario_s03_01
 ```
 
 Logs go to `logs/run_<timestamp>.log`. Defaults come from `configs/experiment.yaml`; CLI flags
@@ -254,20 +255,25 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 | fixture | layout | note |
 |---|---|---|
-| scenario_00 | env_layout0 | intersecting paths and table convergence |
-| scenario_10 | env_layout1 | coffee break and AC activation; needs about 450 steps |
-| scenario_20 | env_layout2 | table convergence; does not finish in 200 steps |
-| scenario_30 | env_layout3 | mirror-symmetric intersecting paths |
-| scenario_40 | env_layout4 | foreseeable task and two AC-switch walks (retyped F47b) |
+| scenario_s01_01 | env_layout_01 | intersecting paths and table convergence |
+| scenario_s02_01 | env_layout_02 | coffee break and AC activation; needs about 450 steps |
+| scenario_s03_01 | env_layout_03 | table convergence; does not finish in 200 steps |
+| scenario_s01_06 | env_layout_04 | mirror-symmetric intersecting paths |
+| scenario_s04_01 | env_layout_05 | foreseeable task and two AC-switch walks (retyped F47b) |
 
-Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
-`analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
-T-H follow-up regeneration of the four maintained sets below, with their `.rec` streams: `analysis/tb1a_destination/sweep/`
-(the five plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "T-H
-follow-up" section), `analysis/tb1b_two_tables/sweep/` (s80 / s81), `analysis/tb1c_realized_flip/sweep/` and
-`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They differ from the T-H4 regeneration (e4fe110) by the
-`[scenario-coverage]` line at load alone (the scenario's composition and scenario coverage), the `.rec` streams
-byte-identical. The T-H4 set differed from the T-H3 regeneration (0af3c0a) by the `[coverage]` lines at load alone,
+Old ids (scenario_00 on env_layout0 and so on) are mapped in `docs/rename_table.md`; the frozen records keep them.
+
+Use the step counts of the sweep scripts (`analysis/tb1a_destination/sweep.sh` for the five and the evaluation
+fixtures; before T-L stage 3, the frozen `analysis/f1_robot_responsible/sweep.sh` and `analysis/f47_fixtures/sweep.sh`,
+on the old ids). The current baselines are the T-L stage 3 regeneration of the four maintained sets below, with their
+`.rec` streams, named `<layout id>_<scenario id>_<run options>.log`: `analysis/tb1a_destination/sweep/` (the five plus
+scenario_s03_06 / scenario_s05_01 / scenario_s05_02, both priors, stop off, `single_task`; logs local, md5s in its
+README, the "T-L stage 3" section), `analysis/tb1b_two_tables/sweep/` (scenario_s06_01 / scenario_s06_02),
+`analysis/tb1c_realized_flip/sweep/` and `analysis/tb3_full_reorder/sweep/` (both strategies). They differ from the
+stage-2 logs (99563cc) in the `[run_mesa]` line alone (the ids), the `.rec` streams byte-identical; T-L stages 1 and 2
+had changed the same line alone (the setup id), with no README section. The T-H follow-up set differed from the T-H4
+regeneration (e4fe110) by the `[scenario-coverage]` line at load alone (the scenario's composition and scenario
+coverage), the `.rec` streams byte-identical. The T-H4 set differed from the T-H3 regeneration (0af3c0a) by the `[coverage]` lines at load alone,
 the `.rec` streams byte-identical. The T-H3 set differed from the T-C2b regeneration
 (06093ee) in the `[human]` lines alone (the record's transitions for the C1 primitives) and has the first non-empty
 `.rec` baselines. The T-C2b set superseded the D3 regeneration (dd880be) by
@@ -286,15 +292,15 @@ baselines before changing code, then diff.
 ### Maintained baseline sets
 
 `analysis/tb1a_destination/` (16 logs), `analysis/tb1b_two_tables/` (4), `analysis/tb1c_realized_flip/` (8)
-and `analysis/tb3_full_reorder/` (12) are the regression baselines. They are regenerated on every behaviour
+and `analysis/tb3_full_reorder/` (20) are the regression baselines. They are regenerated on every behaviour
 change, with new md5s in a new section of each README (the commands are in those READMEs and their
 `sweep.sh`). Every other `analysis/` folder is a frozen record at the commit its README states: never
 regenerated, and never edited except for a superseding note.
 
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
-scenario_50 on env_layout5 (scenario_20's end-state variant), scenario_70 / scenario_71 on env_layout7
-(a foreseen human stay on the robot's route; the beside / across alternative). Scripts:
-`analysis/f47_fixtures/` (its baselines are frozen; the current ones are tb1a's). scenario_80 / scenario_81 on env_layout8 (two kitting tables, T-B's fixture: the
+scenario_s03_06 on env_layout_06 (scenario_s03_01's end-state variant), scenario_s05_01 / scenario_s05_02 on
+env_layout_07 (a foreseen human stay on the robot's route; the beside / across alternative). Script:
+`analysis/tb1a_destination/sweep.sh` (the record: `analysis/f47_fixtures/`, frozen). scenario_s06_01 / scenario_s06_02 on env_layout_08 (two kitting tables, T-B's fixture: the
 greedy head is not the head of the cheapest ordering; a conflict past the head). Script, baselines and the
 cost argument: `analysis/tb1b_two_tables/`.
 
@@ -335,13 +341,15 @@ across that commit without it.
 ## Conventions and terminology
 
 - Scenario ids are prefixed by layout number: `env_layout2` → `scenario_20`, `scenario_21`.
-  SUPERSEDED (T-L, 26 Sept 2026; ruling 4, built in stage 3): descriptive snake_case ids, nothing encoded, unique
-  within the domain and artefact kind, for layouts, setups and scenarios alike; `docs/rename_table.md` maps the old
-  ids.
+  SUPERSEDED (T-L, 26 Sept 2026; ruling 4 as amended, built in stages 2 and 3): serial ids, nothing encoded beyond
+  order of writing, unique within the domain and artefact kind: layouts `env_layout_KK`, setups `env_setup_NN`,
+  scenarios `scenario_sNN_MM` (NN the scenario's setup serial, MM a counter per setup); the Python variable equals the
+  id. The setup serial in a scenario id repeats its `setup` field, an authoring convention the code does not check;
+  an author who moves a scenario to another setup renames it. `docs/rename_table.md` maps the old ids.
 - Adding a layout needs three edits: `domains/kitting/env_layout<N>.json`,
   `domains/kitting/scenarios.py`, and `domains/kitting/registry.py` (import and `layouts` entry).
   Fixtures are written as literals, because they are read by people; generated fixtures were tried and
-  reversed (T-B1b, TODO-47 (a)). scenario_82 only opens env_layout8 in the viewer: not a fixture, nothing
+  reversed (T-B1b, TODO-47 (a)). scenario_s06_04 only opens env_layout_08 in the viewer: not a fixture, nothing
   is measured from it.
   SUPERSEDED IN PART (T-L, 26 Sept 2026; rulings 1, 3 and 5, built in stages 1 and 2): the three edits and the
   registry entry. A layout (the room) and a setup (the shift) are files registered by their files

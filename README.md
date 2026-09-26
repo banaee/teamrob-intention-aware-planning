@@ -106,8 +106,8 @@ Use any IDE (e.g., [VS Code](https://code.visualstudio.com/)) or editor of your 
 
 ```bash
 python mesa_sim/run_mesa.py
-python mesa_sim/run_mesa.py --scenario scenario_00 --steps 200
-python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_10
+python mesa_sim/run_mesa.py --scenario scenario_s01_01 --steps 200
+python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_s01_01
 ```
 
 `--layout` is optional: a run that names none takes the scenario's first reference layout.
@@ -150,7 +150,7 @@ teamrob-intention-aware-planning/
 │   │   ├── tasks.py                # HTN non-primitive tasks
 │   │   ├── registry.py             # Tree construction; discovers layouts, setups, scenarios
 │   │   ├── scenarios/              # Scenario definitions — one module per setup (scenarios_sNN.py)
-│   │   ├── layouts/                # The layouts — the room (env_layout0.json, ...)
+│   │   ├── layouts/                # The layouts — the room (env_layout_01.json, ...)
 │   │   └── setups/                 # The setups — the shift (env_setup_01.json, ...)
 │   └── dock_loading/               # Same structure
 │

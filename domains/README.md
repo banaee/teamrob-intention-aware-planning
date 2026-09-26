@@ -140,7 +140,7 @@ A `ScenarioConfig` assigns concrete task instances to each agent, with all param
 
 ### Scenario ids
 
-Scenario ids are currently prefixed by their layout number (`scenario_30` on `env_layout3`); T-L's stage 3 renames layouts and scenarios to the serial ids (`env_layout_KK`, `scenario_sNN_MM`; the setups got theirs in stage 2).
+Serial ids, nothing encoded beyond order of writing (T-L, ruling 4 as amended; built in stages 2 and 3): layouts `env_layout_KK`, setups `env_setup_NN`, scenarios `scenario_sNN_MM`, NN the serial of the scenario's `setup` and MM a counter per setup (`scenario_s01_06` is the sixth scenario of `scenarios_s01.py`, on `env_setup_01`). The Python variable equals the id. The setup serial in a scenario id repeats the `setup` field by convention; the code checks nothing about it, and an author who moves a scenario to another setup renames it. No layout serial is in a scenario id: a scenario has one or more reference layouts. `docs/rename_table.md` maps the old ids (`scenario_30` on `env_layout3`, and so on).
 
 ---
 

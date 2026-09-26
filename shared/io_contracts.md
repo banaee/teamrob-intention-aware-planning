@@ -676,7 +676,7 @@ binding resolution.
 
 ### 2.2 `MetaPlanner` (`shared/meta_planner.py`) — IMPLEMENTED (`single_task`, `full_reorder`)
 
-Verified against `shared/meta_planner.py` and validated end-to-end against `scenario_00`
+Verified against `shared/meta_planner.py` and validated end-to-end against `scenario_s01_01`
 (September 2026). The `full_reorder` strategy is built (T-B2b, T-B2c; `_replan_orderings()`), over
 `Projector.project()`'s chained entries (T-B2a) and `realize()`'s one search per entry. Nothing raises
 for it any more.
@@ -1082,7 +1082,7 @@ violating interval is bounded, so a clearing δ always exists: `realize()` is to
 
 **Validated (T3, T3b; `analysis/t3_realize/validate.py` (deleted in the analysis cleanup, September 2026; carried in the T3 / T3b entry of design_decisions.md; realize() is re-validated by analysis/f1_robot_responsible/validate.py))** against T1b's `whole` realizer
 (`analysis/t1b_realization/realize.py`, a 0.01-tick grid over the same shift, fractional δ) at 50 cm
-on eight conditions (scenario_00/10/20/30, prior off and on): 94 of 94 admitted candidate rows agree
+on eight conditions (scenario_s01_01, scenario_s02_01, scenario_s03_01, scenario_s01_06, prior off and on): 94 of 94 admitted candidate rows agree
 on realizability; 82 are identical and 12 differ only by the whole-tick rounding (each the ceil of
 the fractional δ); every realized plan's segments are clear by T1b's closed form and by dense sampling,
 hold included. **Re-validated under F1 (`analysis/f1_robot_responsible/validate.py`)** on the same
@@ -1090,7 +1090,7 @@ eight conditions: 101 admitted candidate rows, every realized plan's segments sa
 rule (a) or (b) violation in its assessed window, every held row's δ − 1 violates (minimal), and F1's
 δ never exceeds the T10 realizer's on the same inputs (its violating set is a subset).
 **Per entry (T-B2c; `analysis/tb2c_per_entry_holds/check.py`)**, on every ordering of the pool at every B3
-call of scenario_81 (both priors, the calls of the `full_reorder` run and of the `single_task` run): 402
+call of scenario_s06_02 (both priors, the calls of the `full_reorder` run and of the `single_task` run): 402
 orderings, 260 against an admitted projection; the per-entry cost is never higher than the common-shift
 cost (0 rows differ); the hold before the first entry equals the head realized alone in all 402; the 8
 orderings with a hold before a later entry are clear under sampling at 0.001 tick and minimal (shift − 1
@@ -1241,7 +1241,7 @@ The human's stack machine and its load-time replay are world-side, use-case-agno
 (`world/human_executor.py`, §1.12); `domains/script.py` was deleted in T-H3.
 
 **Corrections from previous versions:** the file is `actions.py`, not `ActionSchemas.py`;
-layout files are `env_layout0.json` / `env_layout1.json`, not `env1_layout.json`. Until T-L's
+layout files are `layouts/env_layout_01.json`, `layouts/env_layout_02.json` (serial ids since T-L stage 3), not `env1_layout.json`. Until T-L's
 stage 1 one layout JSON also held the setup's objects and dead agent spawn entries, and each
 layout carried its own scenarios in `registry.py`'s nested `domain_config["layouts"]`.
 

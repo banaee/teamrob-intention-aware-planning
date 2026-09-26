@@ -4091,6 +4091,9 @@ THE RULINGS.
      serial and MM a counter per setup. KK, NN, MM are independent serials with no meaning beyond order of writing.
      Example: `env_layout_07`, `env_setup_04`, `scenario_s04_01` (today's env_layout7, env_setup7, scenario_70);
      scenario_71 becomes `scenario_s04_02`.
+     NOTE (Hadi, 26 September 2026, the stage-3 task): the example's serials were illustrative. The built numbering is
+     the rule's: stage 2 numbered env_setup7 as `env_setup_05`, so scenario_70 is `scenario_s05_01` and scenario_71
+     `scenario_s05_02`; env_layout7 is `env_layout_07`. `docs/rename_table.md` holds every id.
    - The setup serial in a scenario id repeats the validated `setup` field. The code does not check that they agree
      (a check that reads an id out of an id string is string matching, which BUILD DISCIPLINE forbids); the agreement
      is an authoring convention stated in CLAUDE.md, and an author who moves a scenario to another setup renames it.
@@ -4152,6 +4155,10 @@ THE RULINGS.
    - stage 3: the rename to the serial ids (ruling 4 as amended), the identical setups merged before numbering
      [DONE IN STAGE 2, with the setup ids],
      `docs/rename_table.md`, the four maintained sets regenerated under the new names, sweep scripts and READMEs.
+     BUILT (26 September 2026): the layouts and scenarios of both domains under their serial ids, `docs/rename_table.md`,
+     the four maintained sets regenerated as `<layout id>_<scenario id>_<run options>.log` (tb1a gained its own
+     `sweep.sh`; tb3 keeps all 20 runs), differing from the stage-2 logs in the `[run_mesa]` line alone, every `.rec`
+     byte-identical; one superseding line in each frozen analysis README pointing to the rename table.
    - stage 4: the run file and the override mechanism, with the viewer reading it.
 
 ACCEPTANCE, at every stage: the four maintained sweeps (tb1a, tb1b, tb1c, tb3) are run from scratch and diffed against
