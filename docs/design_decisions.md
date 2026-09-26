@@ -4085,6 +4085,19 @@ THE RULINGS.
 4. NAMING: descriptive ids, nothing encoded. One id per artefact, snake_case, unique within the domain and artefact
    kind; the Python variable of a `ScenarioConfig` equals its id; the `name` field is dropped; `description` holds the
    purpose. The same rule for layout and setup ids.
+   FORM AMENDED (Hadi, 26 September 2026; the principle stands — the variable equals the id, `name` dropped,
+   `description` holds the purpose, nothing about the script's content in an id): serial ids.
+   - Layout ids `env_layout_KK`; setup ids `env_setup_NN`; scenario ids `scenario_sNN_MM`, NN the scenario's setup
+     serial and MM a counter per setup. KK, NN, MM are independent serials with no meaning beyond order of writing.
+     Example: `env_layout_07`, `env_setup_04`, `scenario_s04_01` (today's env_layout7, env_setup7, scenario_70);
+     scenario_71 becomes `scenario_s04_02`.
+   - The setup serial in a scenario id repeats the validated `setup` field. The code does not check that they agree
+     (a check that reads an id out of an id string is string matching, which BUILD DISCIPLINE forbids); the agreement
+     is an authoring convention stated in CLAUDE.md, and an author who moves a scenario to another setup renames it.
+   - A layout's serial is never in a scenario id (a scenario has one or more reference layouts).
+   - Stage 3 merges the identical setups (env_setup0 = env_setup3, env_setup2 = env_setup5) before numbering, so
+     numbering is done once.
+   - Baseline file names: `<layout id>_<scenario id>_<run options>.log`, as ruling 6 states.
 
 5. REGISTRATION BY DISCOVERY: a `ScenarioConfig` is registered at import of the domain package (a decorator or a module
    scan; ccode chooses in stage 2), with no side effect beyond adding to a dict; a duplicate id is an error. Layouts
@@ -4128,8 +4141,8 @@ THE RULINGS.
      on the lines the survey listed (roadmap, T-L, stage 1).
    - stage 2: the scenarios package (one module per theme) and registration by discovery; `list_scenarios` and the
      tests' helpers on the declared pairs.
-   - stage 3: the rename to descriptive ids, `docs/rename_table.md`, the four maintained sets regenerated under the new
-     names, sweep scripts and READMEs.
+   - stage 3: the rename to the serial ids (ruling 4 as amended), the identical setups merged before numbering,
+     `docs/rename_table.md`, the four maintained sets regenerated under the new names, sweep scripts and READMEs.
    - stage 4: the run file and the override mechanism, with the viewer reading it.
 
 ACCEPTANCE, at every stage: the four maintained sweeps (tb1a, tb1b, tb1c, tb3) are run from scratch and diffed against

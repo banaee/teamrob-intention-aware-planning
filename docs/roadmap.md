@@ -474,7 +474,9 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
     `domains/README.md`, `README.md`, `shared/io_contracts.md`, which stage 1 rewrites.
   - stage 2: the scenarios package (one module per theme), registration by discovery; `list_scenarios` and the tests'
     helpers on the declared pairs.
-  - stage 3: descriptive ids, `docs/rename_table.md` (which says in one line that the frozen analysis scripts stay
+  - stage 3: the serial ids (ruling 4 as amended 26 Sept 2026: `env_layout_KK`, `env_setup_NN`, `scenario_sNN_MM`),
+    the identical setups (0 = 3, 2 = 5) merged before numbering so numbering is done once, `docs/rename_table.md`
+    (which says in one line that the frozen analysis scripts stay
     frozen at their commit), the four maintained sets regenerated under the new names, sweep scripts and READMEs.
   - stage 4: the run file and the override mechanism (three overridable facts: an agent's `start_position`, a fixed
     object's position, a movable object's home container), the viewer reading it.

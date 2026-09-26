@@ -657,7 +657,8 @@ dock_loading appear as examples only.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 
 **layout** — the room: the space, its zones, and the fixed objects with their positions, a fixed container
-included. No movable object and no agent. Static. One file per layout, with a descriptive id. (Kitting: tables,
+included. No movable object and no agent. Static. One file per layout, with a serial id (`env_layout_KK`, KK a serial
+with no meaning beyond order of writing; ruling 4 as amended, 26 September 2026). (Kitting: tables,
 shelves, machines, switches, landmarks; dock_loading: bays, the gate, and the truck, a fixed container of the room as a
 shelf is.)
 Until T-L's stage 1 the layout JSON also held the setup's objects and dead agent spawn entries.
@@ -666,7 +667,7 @@ Until T-L's stage 1 the layout JSON also held the setup's objects and dead agent
 one through `destination_of`, its designated destination, and any other initial state the domain declares per movable
 object. Its container and destination ids name objects of a layout: a home container must exist in the layout; a
 designated destination must also have the type the schema declares for it. A different designation set is a different
-setup. One file per setup, with a descriptive id.
+setup. One file per setup, with a serial id (`env_setup_NN`; ruling 4 as amended).
 (Kitting: the items, each on a shelf with its designated table; dock_loading: the pallets, with `subtype`, `is_empty`,
 `is_scanned`.) A new term.
 COLLISION, not resolved: DESIGN-16 (`docs/design_decisions.md`) says "travel/setup costs between tasks", the
@@ -675,7 +676,10 @@ scheduling sense (a cost of switching between tasks). That is the English word, 
 **scenario** — the episode: per agent its `start_position`, `assigned_tasks`, `observes` and, for a human, the
 human's script; the purpose, as description text (label C, §7); the one setup it binds (`setup`, required); and its
 reference layouts. A hand-written `ScenarioConfig` literal, registered by discovery at import of the domain package.
-Its id is descriptive and equals its Python variable; nothing is encoded in it. Its assigned tasks and script state the
+Its id equals its Python variable: `scenario_sNN_MM` (ruling 4 as amended), NN its setup's serial — a repetition of the
+validated `setup` field, an authoring convention the code does not check; an author who moves a scenario to another
+setup renames it — and MM a counter per setup. No layout serial is in it (a scenario has one or more reference
+layouts), and nothing about the script's content. Its assigned tasks and script state the
 table explicitly (a readability choice, not required by the model), checked against the setup's designations: a
 scenario fits a setup whose designations agree with its stated tables.
 → `shared/types.py`, `ScenarioConfig`.
