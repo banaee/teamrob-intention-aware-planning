@@ -452,7 +452,25 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   condition's explicit adapter only). Simulation only: a real human needs annotation of the record's form.
 - **Alternative 1** (recorded as the next architecture direction, not scheduled): a human mind that generates the
   events, and a stack-aware IR.
-- **T-D — Robustness in kitting, on T-C.** NEXT (after T-H's close-out; `docs/handoffs/handoff_T-D_onward.md`, its
+- **T-L — Layouts, setups and scenarios: the three artefacts of a run** (ruled by Hadi, 26 September 2026). NEXT,
+  before T-D. The facts one layout JSON holds today are separated by what they are about: the layout (the room: space,
+  zones, fixed objects), the setup (the shift: movable objects, home containers, designated destinations), the
+  scenario (the episode: agents, script, purpose, the setup it binds, its reference layouts); a run is the triple plus
+  the run facts, validated at load. The mind receives the same facts through `WorldState`; the recognizer, planner and
+  projector do not change. kitting and dock_loading migrate together; ros_sim stays parked (TODO-111). Each stage is
+  its own ccode task:
+  - stage 1: types (`ScenarioConfig` gains `setup` and `reference_layouts`, loses `name`), loader, resolver,
+    validator; every layout split into a layout file and a setup file, object ids unchanged, the dead spawn entries
+    deleted; scenarios unchanged in content and id.
+  - stage 2: the scenarios package (one module per theme), registration by discovery; `list_scenarios` and the tests'
+    helpers on the declared pairs.
+  - stage 3: descriptive ids, `docs/rename_table.md`, the four maintained sets regenerated under the new names, sweep
+    scripts and READMEs.
+  - stage 4: the run file and the override mechanism, the viewer reading it.
+  Acceptance after each stage: the four maintained sweeps run from scratch and diffed against the previous stage's
+  logs; no difference outside the lines the stage names (the triple line, the ids). design_decisions.md, "Layouts,
+  setups and scenarios: the three artefacts of a run".
+- **T-D — Robustness in kitting, on T-C.** NEXT after T-L (was next after T-H's close-out; `docs/handoffs/handoff_T-D_onward.md`, its
   section "What T-D now stands on"). (Resumes on T-H's structure: T-D Q1 stays "what the robot infers and does
   when no hypothesis explains the evidence, inside `unknown` or outside it", with the record's ground-truth cases: a
   switch to a modelled task, a switch to a modelled task outside the support, a switch to an unmodelled task, a
