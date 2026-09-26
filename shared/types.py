@@ -578,7 +578,7 @@ def task_instance_key(task: TaskInstance) -> str:
     against — see design_decisions.md). Mirrors HypothesisKey.__repr__ in
     shared/recognizer.py; introduced here rather than as a stored id field
     on TaskInstance (would touch every construction site in
-    domains/*/scenarios.py for no benefit).
+    domains/*/scenarios/ for no benefit).
     """
     if not task.bindings:
         return f"{task.schema.name}()"
@@ -819,7 +819,7 @@ class ScenarioConfig:
     description text; the one setup it binds (`setup`, an id); and the layouts
     it declares it runs on (`reference_layouts`, one or more ids). The id
     identifies; the description holds the purpose.
-    Lives in domains/<domain>/scenarios.py, not in configs/.
+    Lives in domains/<domain>/scenarios/ (one module per setup, T-L stage 2), not in configs/.
     """
     id: str
     description: str

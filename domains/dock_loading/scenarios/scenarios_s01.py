@@ -1,6 +1,7 @@
-# domains/dock_loading/scenarios.py
+# domains/dock_loading/scenarios/scenarios_s01.py
 """
-Scenario definitions for the dock_loading domain.
+Dock_loading scenarios on env_setup_01 — the scenarios of the old env_setup1.
+One module per setup; scenario ids keep their old form until stage 3.
 Task assignments reference domain schemas directly — no string parsing, no YAML.
 A task's class (WorkTask, PersonalTask, HumanOnlyTask) is declared in tasks.py — not repeated here.
 """
@@ -16,7 +17,7 @@ from domains.dock_loading.tasks import (
 # ===============================================================
 scenario_10 = ScenarioConfig(
     id="scenario_10",
-    setup="env_setup1",
+    setup="env_setup_01",
     reference_layouts=["env_layout1"],
     description="Human goes to office. Robot delivers one pallet.",
     agents=[
@@ -34,7 +35,7 @@ scenario_10 = ScenarioConfig(
             agent_type="robot",
             start_position=(0, -370),
             scheduled_tasks=Script([
-                TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_3"), Var("?delivery_bay"): Const("frozen_delivery_bay_0")}),            
+                TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_3"), Var("?delivery_bay"): Const("frozen_delivery_bay_0")}),
             ]),
             observes=["human_0"],
         ),
@@ -46,7 +47,7 @@ scenario_10 = ScenarioConfig(
 # ===============================================================
 scenario_11 = ScenarioConfig(
     id="scenario_11",
-    setup="env_setup1",
+    setup="env_setup_01",
     reference_layouts=["env_layout1"],
     description=(
         "Robot delivers 6 full pallets from truck to hall (3 dry, 3 frozen), "

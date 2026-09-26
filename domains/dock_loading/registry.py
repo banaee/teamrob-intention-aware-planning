@@ -6,10 +6,13 @@ Entry point: register_dock_loading_domain()
 Called once at startup by sim_model.py.
 """
 
+from pathlib import Path
+
 from shared.knowledge import Tree
+from domains.discovery import discover_files, discover_scenarios
 from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it
 from domains.dock_loading.tasks import deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break
-from domains.dock_loading.scenarios import scenario_10, scenario_11
+import domains.dock_loading.scenarios as _scenarios
 
 def register_dock_loading_domain() -> Tree:
     return Tree(
@@ -19,20 +22,17 @@ def register_dock_loading_domain() -> Tree:
     )
 
 
+_HERE = Path(__file__).parent
+
 domain_config = {
     "register_fn": register_dock_loading_domain,
     # The task model every robot is given (T-H).
     "task_model":  [deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break],
-    # The three artefacts of a run (T-L, stage 1): layouts and setups by id and
-    # file; the scenarios flat — each declares its setup and reference layouts.
-    "layouts": {
-        "env_layout1": "domains/dock_loading/env_layout1.json",
-    },
-    "setups": {
-        "env_setup1": "domains/dock_loading/env_setup1.json",
-    },
-    "scenarios": {
-        "scenario_10": scenario_10,
-        "scenario_11": scenario_11,
-    },
+    # The three artefacts of a run (T-L, stage 2): layouts and setups are
+    # registered by the files in their folders, the scenarios by discovery
+    # over the scenarios package (domains/discovery.py) — no hand-written
+    # list, a duplicate scenario id is an error at import.
+    "layouts":   discover_files(_HERE / "layouts"),
+    "setups":    discover_files(_HERE / "setups"),
+    "scenarios": discover_scenarios(_scenarios),
 }
