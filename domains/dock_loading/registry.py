@@ -23,13 +23,16 @@ domain_config = {
     "register_fn": register_dock_loading_domain,
     # The task model every robot is given (T-H).
     "task_model":  [deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break],
+    # The three artefacts of a run (T-L, stage 1): layouts and setups by id and
+    # file; the scenarios flat — each declares its setup and reference layouts.
     "layouts": {
-        "env_layout1": {
-            "path":      "domains/dock_loading/env_layout1.json",
-            "scenarios": {
-                "scenario_10": scenario_10,
-                "scenario_11": scenario_11,
-            },
-        },
+        "env_layout1": "domains/dock_loading/env_layout1.json",
+    },
+    "setups": {
+        "env_setup1": "domains/dock_loading/env_setup1.json",
+    },
+    "scenarios": {
+        "scenario_10": scenario_10,
+        "scenario_11": scenario_11,
     },
 }

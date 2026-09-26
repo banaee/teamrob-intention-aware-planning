@@ -3,11 +3,13 @@ mesa_sim/sim_model.py
 
 PURPOSE:
     Mesa embodiment of the factory environment.
-    Loads env_layout1.json, receives a ScenarioConfig, builds the physical
-    space, spawns agents, and drives the simulation step loop.
+    Loads a layout JSON (the room) and a setup JSON (the shift, T-L), receives
+    a ScenarioConfig, builds the physical space, spawns agents, and drives the
+    simulation step loop.
 
 WHAT THIS MODULE DOES:
-    - Reads env_layout1.json for environment layout
+    - Reads the layout JSON (space, zones, fixed objects) and the setup JSON
+      (movable objects with their home containers and destinations)
     - Receives a ScenarioConfig (Python object) — no YAML scenario parsing
     - Creates Mesa ContinuousSpace with center-origin (0,0)
     - Instantiates env objects as plain dataclasses (not Mesa agents)
@@ -20,7 +22,7 @@ WHAT THIS MODULE DOES NOT DO:
     - No YAML parsing for scenarios or action schema definitions
 
 COORDINATE SYSTEM:
-    Matches env_layout1.json exactly: origin (0,0) at center of room.
+    Matches the layout JSON exactly: origin (0,0) at center of room.
 """
 
 import json
@@ -92,7 +94,8 @@ class SimModel(model.Model):
                  scenario: ScenarioConfig,
                  register_fn,
                  task_model_schemas: Sequence[TaskSchema],
-                 env_layout_path: str = "domains/kitting/env_layout1.json", 
+                 layout_path: str,
+                 setup_path: str,
                  seed=None,
                  assignment_prior: bool = False,
                  strategy: str = "single_task",
@@ -118,10 +121,12 @@ class SimModel(model.Model):
         self.separation_stop = separation_stop
 
         # ------------------------------------------------------------------
-        # Load env layout
+        # Load the layout (the room) and the setup (the shift) — T-L, stage 1
         # ------------------------------------------------------------------
-        with open(env_layout_path, "r") as f:
+        with open(layout_path, "r") as f:
             env_layout = json.load(f)
+        with open(setup_path, "r") as f:
+            env_setup = json.load(f)
 
         # ------------------------------------------------------------------
         # Space
@@ -166,7 +171,8 @@ class SimModel(model.Model):
         self.objects: Dict[str, SimObject] = {}
         self._objects_by_type: Dict[str, List[str]] = {}
 
-        self._init_objects(env_layout.get("env_objects", []), env_layout_path)
+        self._init_objects(env_layout.get("env_objects", []), env_setup.get("env_objects", []),
+                           layout_path, setup_path)
 
 
         # ------------------------------------------------------------------
@@ -216,18 +222,36 @@ class SimModel(model.Model):
     # Initialization helpers
     # =========================================================================
 
-    def _init_objects(self, objects_data: list, env_layout_path: str):
+    def _init_objects(self, layout_objects: list, setup_objects: list,
+                      layout_path: str, setup_path: str):
         """
-        Unified loader for all env_objects entries — items and fixed objects alike.
-        Two passes: objects with a direct "position" first (shelves, gates, tables,
-        machines...), then objects with "initial_container" (items, pallets), whose
-        position/zone are derived from their container. Two-pass avoids depending
-        on JSON array order — items may appear before or after their container.
+        Unified loader for all env_objects entries. Two passes, as before the
+        split (T-L, stage 1): the layout's fixed objects first (shelves, gates,
+        tables, machines...), then the setup's movable objects (items,
+        pallets), whose position/zone are derived from their home container.
+        A layout entry has a "position" and no "initial_container"; a setup
+        entry has an "initial_container"; every home container named by the
+        setup is an object of the layout — each an error naming the artefact
+        and the mismatch.
         """
-        direct = [o for o in objects_data if "initial_container" not in o]
-        contained = [o for o in objects_data if "initial_container" in o]
+        for obj in layout_objects:
+            if "initial_container" in obj:
+                raise ValueError(
+                    f"layout '{layout_path}': object '{obj['id']}' declares "
+                    f"\"initial_container\"; a movable object belongs to the setup"
+                )
+            if "position" not in obj:
+                raise ValueError(
+                    f"layout '{layout_path}': object '{obj['id']}' has no \"position\""
+                )
+        for obj in setup_objects:
+            if "initial_container" not in obj:
+                raise ValueError(
+                    f"setup '{setup_path}': object '{obj['id']}' has no "
+                    f"\"initial_container\"; a fixed object belongs to the layout"
+                )
 
-        for obj in direct:
+        for obj in layout_objects:
             self.objects[obj["id"]] = SimObject(
                 obj_id=obj["id"],
                 type=obj["type"],
@@ -240,23 +264,22 @@ class SimModel(model.Model):
                 is_portable=False,  # direct-position objects are not portable
             )
 
-        for obj in contained:
+        layout_ids = {obj["id"] for obj in layout_objects}
+
+        for obj in setup_objects:
             container_id = obj["initial_container"]
-            container = self.objects.get(container_id)
+            container = self.objects.get(container_id) if container_id in layout_ids else None
             if container is None:
-                # container itself missing a position (shouldn't happen — direct
-                # pass above should have created it) — fall back, but this is a
-                # layout authoring bug, not expected at runtime.
-                logger.warning(
-                    "Object %s references unknown/unresolved container %s",
-                    obj["id"], container_id,
+                raise ValueError(
+                    f"setup '{setup_path}': object '{obj['id']}' has home container "
+                    f"'{container_id}', which is not an object of layout '{layout_path}'"
                 )
             self.objects[obj["id"]] = SimObject(
                 obj_id=obj["id"],
                 type=obj["type"],
-                position=container.position if container else (0.0, 0.0),
+                position=container.position,
                 size=tuple(obj["size"]),
-                zone=container.zone if container else None,
+                zone=container.zone,
                 subtype=obj.get("subtype"),
                 held_by=None,
                 at_location=container_id,
@@ -269,7 +292,7 @@ class SimModel(model.Model):
             # print(f"Loaded portable object {obj['id']} with home_container {container_id}")
 
         # Every object of a type the domain resolves through "destination_of"
-        # declares its destination, naming an object of this layout of the
+        # declares its destination, naming an object of the layout of the
         # type the schema declares for it (T-B1a). An error, not a default.
         types_with_destination = self.tree.get_types_with_destination()
         for obj_id, obj in self.objects.items():
@@ -278,18 +301,18 @@ class SimModel(model.Model):
             task_name, dest_type = types_with_destination[obj.type]
             if obj.destination is None:
                 raise ValueError(
-                    f"layout '{env_layout_path}': {obj.type} '{obj_id}' declares no "
+                    f"setup '{setup_path}': {obj.type} '{obj_id}' declares no "
                     f"\"destination\" (required by task '{task_name}')"
                 )
-            dest = self.objects.get(obj.destination)
+            dest = self.objects.get(obj.destination) if obj.destination in layout_ids else None
             if dest is None:
                 raise ValueError(
-                    f"layout '{env_layout_path}': {obj.type} '{obj_id}' has destination "
-                    f"'{obj.destination}', which is not an object of this layout"
+                    f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
+                    f"'{obj.destination}', which is not an object of layout '{layout_path}'"
                 )
             if dest_type is not None and dest.type != dest_type:
                 raise ValueError(
-                    f"layout '{env_layout_path}': {obj.type} '{obj_id}' has destination "
+                    f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
                     f"'{obj.destination}' of type '{dest.type}', but task '{task_name}' "
                     f"requires type '{dest_type}'"
                 )
@@ -323,6 +346,17 @@ class SimModel(model.Model):
         # reads (T-H). An error, not a warning.
         # A script is checked for types only (T-H): every task it names, an
         # entry's or a Start's.
+        # Every start position lies inside the space's bounds (T-L, ruling a:
+        # bounds only, objects are not obstacles for a start), checked with the
+        # body's own bounds test before any agent is placed.
+        for agent_cfg in scenario.agents:
+            if self.space.out_of_bounds(agent_cfg.start_position):
+                raise ValueError(
+                    f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': start_position "
+                    f"{agent_cfg.start_position} lies outside the space's bounds "
+                    f"[{self.space.x_min}, {self.space.x_max}) x [{self.space.y_min}, {self.space.y_max})"
+                )
+
         object_type_by_id = {obj_id: obj.type for obj_id, obj in self.objects.items()}
         check_duration = lambda duration: _parse_duration_to_steps(duration, self)
         for agent_cfg in scenario.agents:

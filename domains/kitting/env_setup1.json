@@ -1,0 +1,100 @@
+{
+  "env_objects": [
+    {
+      "id": "item_0",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_0",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_1",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90 
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": -90
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": 0
+    },
+    {
+      "id": "item_7",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "orientation_deg": 0
+    }
+  ]
+}

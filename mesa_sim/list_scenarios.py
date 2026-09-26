@@ -3,10 +3,11 @@ mesa_sim/list_scenarios.py
 
 Lists every registered kitting scenario with its composition and its scenario
 coverage (world/composition.scenario_composition), one line per human and
-observing robot, on the layout it is registered under and the domain's
-declared task model. Each scenario is loaded as a run loads it (SimModel: the
-bindings check, the load-time replay, the robot's ObservingRobot); nothing is
-stepped and no log is written.
+observing robot, on each of its declared reference layouts (the declared
+pairs, T-L) with its declared setup and the domain's declared task model.
+Each scenario is loaded as a run loads it (SimModel: the bindings check, the
+load-time replay, the robot's ObservingRobot); nothing is stepped and no log
+is written.
 
 Usage (from the repo root):
     PYTHONHASHSEED=0 python mesa_sim/list_scenarios.py
@@ -24,18 +25,20 @@ from world.composition import scenario_composition
 
 
 def main():
-    for layout_name, layout in domain_config["layouts"].items():
-        for scenario_id, scenario in layout["scenarios"].items():
+    for scenario_id, scenario in domain_config["scenarios"].items():
+        for layout_id in scenario.reference_layouts:
             model = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
-                             task_model_schemas=domain_config["task_model"], env_layout_path=layout["path"])
+                             task_model_schemas=domain_config["task_model"],
+                             layout_path=domain_config["layouts"][layout_id],
+                             setup_path=domain_config["setups"][scenario.setup])
             pairs = [(h, r) for r in scenario.agents if r.agent_type == "robot"
                      for h in scenario.agents if h.agent_type == "human" and h.agent_id in r.observes]
             if not pairs:
-                print(f"{scenario_id} {layout_name} no robot observes a human")
+                print(f"{scenario_id} {layout_id} no robot observes a human")
             for human_cfg, robot_cfg in pairs:
                 composition, scenario_coverage = scenario_composition(human_cfg.scheduled_tasks,
                                                                       model.observing[robot_cfg.agent_id])
-                print(f"{scenario_id} {layout_name} {human_cfg.agent_id} {robot_cfg.agent_id} "
+                print(f"{scenario_id} {layout_id} {human_cfg.agent_id} {robot_cfg.agent_id} "
                       f"scenario_coverage={scenario_coverage.value} {composition!r}")
 
 

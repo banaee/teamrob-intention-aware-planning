@@ -28,25 +28,6 @@
       "label": "southeast_storage"
     }
   ],
-  "doors": [],
-  "robots": [
-    {
-      "id": "robot_0",
-      "type": "mobile_manipulator",
-      "initial_container": "zone_NW",
-      "initial_x": -350,
-      "initial_y": 200
-    }
-  ],
-  "humans": [
-    {
-      "id": "human_0",
-      "type": "worker",
-      "initial_container": "zone_NE",
-      "initial_x": 350,
-      "initial_y": 200
-    }
-  ],
   "env_objects": [
     {
       "id": "kitting_table_0",
@@ -140,51 +121,6 @@
       "size": [80, 20],
       "zone": "zone_SE",
       "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
-    },
-        {
-      "id": "item_3",
-      "type": "item",
-      "subtype": "part_B",
-      "initial_container": "shelf_3",
-      "destination": "kitting_table_0",
-      "size": [25, 25],
-      "notes": "..."
-    },
-    {
-      "id": "item_4",
-      "type": "item",
-      "subtype": "part_C",
-      "initial_container": "shelf_4",
-      "destination": "kitting_table_0",
-      "size": [25, 25],
-      "notes": "..."
-    },
-    {
-      "id": "item_6",
-      "type": "item",
-      "subtype": "part_D",
-      "initial_container": "shelf_6",
-      "destination": "kitting_table_0",
-      "size": [25, 25],
-      "notes": "..."
-    },
-    {
-      "id": "item_7",
-      "type": "item",
-      "subtype": "part_D",
-      "initial_container": "shelf_7",
-      "destination": "kitting_table_0",
-      "size": [25, 25],
-      "notes": "..."
-    },
-    {
-      "id": "item_2",
-      "type": "item",
-      "subtype": "part_B",
-      "initial_container": "shelf_2",
-      "destination": "kitting_table_0",
-      "size": [25, 25],
-      "notes": "..."
     }
   ]
 }

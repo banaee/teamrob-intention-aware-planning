@@ -124,11 +124,14 @@ def load_experiment(experiment_path: str, overrides: dict) -> dict:
     """
     with open(experiment_path, "r") as f:
         config = yaml.safe_load(f)
-    unknown = sorted(set(config) - set(overrides))
+    # "setup" may be named by the run file; there is no --setup flag (T-L,
+    # ruling c: one setup per scenario), so it is not an override.
+    allowed = set(overrides) | {"setup"}
+    unknown = sorted(set(config) - allowed)
     if unknown:
         raise ValueError(
             f"{experiment_path}: unknown keys {unknown}. "
-            f"Run options: {sorted(overrides)}"
+            f"Run options: {sorted(allowed)}"
         )
     config.update({k: v for k, v in overrides.items() if v is not None})
     for key, choices in (("strategy", STRATEGIES), ("gate_strategy", GATE_STRATEGIES),
@@ -176,7 +179,7 @@ def parse_user_args():
     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
     parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH)
     parser.add_argument("--domain",      type=str,  default=None, help="Domain name override (e.g. kitting, dock_loading)")
-    parser.add_argument("--layout", type=str, default=None, help="Layout name override (e.g. env_layout1)")
+    parser.add_argument("--layout", type=str, default=None, help="Layout selection (default: the scenario's first reference layout)")
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_11)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
     parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
@@ -198,15 +201,15 @@ def load_user_config() -> dict:
 # =============================================================================
 # Model factory — shared by headless and Solara
 # =============================================================================
-def resolve_model_params(user_config: dict) -> dict:
+def resolve_triple(user_config: dict):
     '''
-    Resolves user config to domain, layout, and scenario objects, and returns
-    SimModel's keyword arguments. Used by both the headless factory and the
-    Solara page, so a name the registry does not have fails the same way on both.
-    Steps:
-        1. Look up domain in DOMAIN_REGISTRY
-        2. Look up layout in domain["layouts"]
-        3. Look up scenario in layout["scenarios"]
+    Resolves the run's triple (T-L, glossary §9): the scenario from the
+    domain's registry, the setup the scenario declares, and the layout — the
+    one the run names, or the scenario's first reference layout when it names
+    none. Every reference layout and the scenario's setup must be registered;
+    a given layout must be registered but need not be a reference layout; a
+    setup named by the run file must equal the scenario's.
+    Returns (domain, layout_id, setup_id, scenario).
     '''
     # --------- domain ---------
     domain_name = user_config["domain"]
@@ -217,29 +220,66 @@ def resolve_model_params(user_config: dict) -> dict:
         )
     domain = DOMAIN_REGISTRY[domain_name]
 
-    # --------- layout ---------
-    layout_name = user_config["layout"]
-    if layout_name not in domain["layouts"]:
-        raise ValueError(
-            f"Unknown layout '{layout_name}' for domain '{domain_name}'. "
-            f"Available: {list(domain['layouts'].keys())}"
-        )
-    layout = domain["layouts"][layout_name]
-
     # --------- scenario ---------
     scenario_id = user_config["scenario"]
-    if scenario_id not in layout["scenarios"]:
+    if scenario_id not in domain["scenarios"]:
         raise ValueError(
-            f"Unknown scenario '{scenario_id}' for layout '{layout_name}'. "
-            f"Available: {list(layout['scenarios'].keys())}"
+            f"Unknown scenario '{scenario_id}' for domain '{domain_name}'. "
+            f"Available: {list(domain['scenarios'].keys())}"
         )
-    scenario = layout["scenarios"][scenario_id]
+    scenario = domain["scenarios"][scenario_id]
+
+    # --------- what the scenario declares is registered ---------
+    for ref in scenario.reference_layouts:
+        if ref not in domain["layouts"]:
+            raise ValueError(
+                f"scenario '{scenario_id}': reference layout '{ref}' is not a "
+                f"registered layout of domain '{domain_name}'. "
+                f"Available: {list(domain['layouts'].keys())}"
+            )
+    if scenario.setup not in domain["setups"]:
+        raise ValueError(
+            f"scenario '{scenario_id}': setup '{scenario.setup}' is not a "
+            f"registered setup of domain '{domain_name}'. "
+            f"Available: {list(domain['setups'].keys())}"
+        )
+
+    # --------- setup: the run file may name it; it must be the scenario's ---------
+    named_setup = user_config.get("setup")
+    if named_setup is not None and named_setup != scenario.setup:
+        raise ValueError(
+            f"setup '{named_setup}': scenario '{scenario_id}' declares setup "
+            f"'{scenario.setup}'; a run file's setup must equal the scenario's "
+            f"(one setup per scenario, T-L)"
+        )
+
+    # --------- layout: selection, or the first reference layout ---------
+    layout_id = user_config.get("layout")
+    if layout_id is None:
+        layout_id = scenario.reference_layouts[0]
+    elif layout_id not in domain["layouts"]:
+        raise ValueError(
+            f"Unknown layout '{layout_id}' for domain '{domain_name}'. "
+            f"Available: {list(domain['layouts'].keys())}"
+        )
+
+    return domain, layout_id, scenario.setup, scenario
+
+
+def resolve_model_params(user_config: dict) -> dict:
+    '''
+    Resolves user config to the run's triple (resolve_triple) and returns
+    SimModel's keyword arguments. Used by both the headless factory and the
+    Solara page, so a name the registry does not have fails the same way on both.
+    '''
+    domain, layout_id, setup_id, scenario = resolve_triple(user_config)
 
     return {
         "scenario":         scenario,
         "register_fn":      domain["register_fn"],
         "task_model_schemas": domain["task_model"],
-        "env_layout_path":  layout["path"],
+        "layout_path":      domain["layouts"][layout_id],
+        "setup_path":       domain["setups"][setup_id],
         "assignment_prior": bool(user_config.get("assignment_prior", False)),
         "strategy":         user_config.get("strategy", "single_task"),
         "gate_strategy":    user_config.get("gate_strategy", "none"),
@@ -276,8 +316,11 @@ def run_headless():
     config = load_user_config()
 
     n_steps = config["steps"]
+    # The triple is the run's identity (T-L): the start line names the
+    # RESOLVED layout, setup and scenario ids.
+    _, layout_id, setup_id, scenario = resolve_triple(config)
     logging.info(f"[run_mesa] Starting headless run — "
-          f"domain={config['domain']} layout={config['layout']} scenario={config['scenario']} steps={n_steps}")
+          f"domain={config['domain']} layout={layout_id} setup={setup_id} scenario={scenario.id} steps={n_steps}")
 
     model = _make_domain_model()
 

@@ -814,14 +814,23 @@ class AgentConfig:
 @dataclass
 class ScenarioConfig:
     """
-    Complete scenario definition — agents, their tasks, and environment reference.
+    The episode (T-L, glossary §9): per agent its start position, assigned
+    tasks, observes and, for a human, the human's script; the purpose as
+    description text; the one setup it binds (`setup`, an id); and the layouts
+    it declares it runs on (`reference_layouts`, one or more ids). The id
+    identifies; the description holds the purpose.
     Lives in domains/<domain>/scenarios.py, not in configs/.
     """
     id: str
-    name: str
     description: str
     agents: List[AgentConfig]
-    # env_layout: str                      # removed. will be handled in domains/<domain>/registry.py 
+    setup: str
+    reference_layouts: List[str]
+
+    def __post_init__(self):
+        if not self.reference_layouts:
+            raise ValueError(f"ScenarioConfig '{self.id}': reference_layouts is empty; "
+                             f"a scenario declares at least one reference layout")
     
     
 # =============================================================================

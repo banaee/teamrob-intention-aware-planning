@@ -1,0 +1,64 @@
+{
+  "env_objects": [
+    {
+      "id": "item_1",
+      "type": "item",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_7",
+      "type": "item",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_0",
+      "type": "item",
+      "initial_container": "shelf_0",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_3",
+      "type": "item",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "env_objects": [
+    {
+      "id": "pallet_0",
+      "type": "pallet",
+      "subtype": "dry",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_1",
+      "type": "pallet",
+      "subtype": "dry",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_2",
+      "type": "pallet",
+      "subtype": "dry",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_3",
+      "type": "pallet",
+      "subtype": "frozen",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_4",
+      "type": "pallet",
+      "subtype": "frozen",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_5",
+      "type": "pallet",
+      "subtype": "frozen",
+      "is_empty": false,
+      "is_scanned": false,
+      "initial_container": "truck_interior",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_6",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "dry_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_7",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "dry_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_8",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "frozen_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_9",
+      "type": "pallet",
+      "subtype": null,
+      "is_empty": true,
+      "is_scanned": true,
+      "initial_container": "frozen_empty_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    }
+  ]
+}

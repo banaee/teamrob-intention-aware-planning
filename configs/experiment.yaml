@@ -4,9 +4,10 @@
 # --domain, --layout, --scenario, --steps, --assignment_prior, --strategy, --gate_strategy, --cost_strategy,
 # --separation_stop (and --experiment, the path of this file). mesa_sim/run_mesa.py rejects an
 # unknown key or flag, a strategy outside its choices, and a switch that is not true/false.
+# layout is optional (here and on the CLI): a run that names none takes the scenario's first
+# reference layout. setup may be named here (no CLI flag); it must equal the scenario's (T-L).
 
 domain: kitting
-layout: env_layout0
 scenario: scenario_00
 steps: 50
 

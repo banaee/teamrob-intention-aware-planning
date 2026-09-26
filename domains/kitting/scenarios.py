@@ -18,7 +18,8 @@ from domains.kitting.script import deliver_item, coffee_break, ac_activation, go
 # ===============================================================
 scenario_00 = ScenarioConfig(
     id="scenario_00",
-    name="layout0_phase4_collision_baseline",
+    setup="env_setup0",
+    reference_layouts=["env_layout0"],
     description=(
         "Minimal Phase 4 development scenario. Robot and human start symmetric, "
         "paths intersect near center during first moveto (case 0.1 collision). "
@@ -59,7 +60,8 @@ scenario_00 = ScenarioConfig(
 # delivery goes to that table. The stay is not projected (TODO-85).
 scenario_01 = ScenarioConfig(
     id="scenario_01",
-    name="layout0_declared_stay",
+    setup="env_setup0",
+    reference_layouts=["env_layout0"],
     description=(
         "T-C2c scenario B. Human delivers item_3, then stands 40 ticks at kitting_table_0 (stand PT80S). "
         "The robot's one task delivers item_4 to the same table."
@@ -95,7 +97,8 @@ scenario_01 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_02 = ScenarioConfig(
     id="scenario_02",
-    name="layout0_change_of_mind_after_pickup",
+    setup="env_setup0",
+    reference_layouts=["env_layout0"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, abandons it (the next delivery returns it to its shelf first, deliver_with_return), delivers item_2."
@@ -131,7 +134,8 @@ scenario_02 = ScenarioConfig(
 
 scenario_03 = ScenarioConfig(
     id="scenario_03",
-    name="layout0_landmark_stay_mid_carry",
+    setup="env_setup0",
+    reference_layouts=["env_layout0"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, walks to corner_NE with it and stays 30 ticks, finishes the delivery, then delivers item_2."
@@ -167,7 +171,8 @@ scenario_03 = ScenarioConfig(
 
 scenario_04 = ScenarioConfig(
     id="scenario_04",
-    name="layout0_free_actions_then_delivery",
+    setup="env_setup0",
+    reference_layouts=["env_layout0"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to the door, stays 20, walks to corner_SW, then delivers item_3, its one assigned task."
@@ -208,7 +213,8 @@ scenario_04 = ScenarioConfig(
 # ===============================================================
 scenario_10 = ScenarioConfig(
     id="scenario_10",
-    name="basic_kitting_with_coffee_break",
+    setup="env_setup1",
+    reference_layouts=["env_layout1"],
     description=(
         "Human and robot each deliver items to the kitting table. "
         "Human deviates to a coffee break after completing their first delivery. "
@@ -251,7 +257,8 @@ scenario_10 = ScenarioConfig(
 # waits, then resumes the delivery; item_5 follows so the assigned tasks are s10's.
 scenario_11 = ScenarioConfig(
     id="scenario_11",
-    name="layout1_interrupted_delivery",
+    setup="env_setup1",
+    reference_layouts=["env_layout1"],
     description=(
         "T-C2c scenario A. deliver(item_2).at(pick_up, coffee_break): suspended for the coffee break, then resumed; "
         "then deliver(item_5). Robot side and assigned tasks as scenario_10."
@@ -291,7 +298,8 @@ scenario_11 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_12 = ScenarioConfig(
     id="scenario_12",
-    name="layout1_coffee_stay_abandon",
+    setup="env_setup1",
+    reference_layouts=["env_layout1"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human takes a coffee break with item_2 in hand, delivers it, stays 20 at the table, then picks up item_5 and abandons it."
@@ -334,7 +342,8 @@ scenario_12 = ScenarioConfig(
 # ===============================================================
 scenario_20 = ScenarioConfig(
     id="scenario_20",
-    name="layout2_midapproach_sustained_conflict",
+    setup="env_setup2",
+    reference_layouts=["env_layout2"],
     description=(
         "Phase 4C B2/B3 fixture. The robot's cheapest task (item_4: 54 ticks at t=0, vs item_6 "
         "71 and item_7 103, at 20 cm/tick) is the conflicted one, so the t=0 pick lands on it by "
@@ -388,7 +397,8 @@ scenario_20 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_22 = ScenarioConfig(
     id="scenario_22",
-    name="layout2_landmark_stay_after_pickup",
+    setup="env_setup2",
+    reference_layouts=["env_layout2"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, walks to corner_SE with it and stays 30 ticks, finishes the delivery, then delivers item_2."
@@ -424,7 +434,8 @@ scenario_22 = ScenarioConfig(
 
 scenario_23 = ScenarioConfig(
     id="scenario_23",
-    name="layout2_table_stay_robot_converging",
+    setup="env_setup2",
+    reference_layouts=["env_layout2"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_3, stays 40 ticks at the table while the robot converges on it, then delivers item_2."
@@ -461,7 +472,8 @@ scenario_23 = ScenarioConfig(
 
 scenario_24 = ScenarioConfig(
     id="scenario_24",
-    name="layout2_change_of_mind_before_pickup",
+    setup="env_setup2",
+    reference_layouts=["env_layout2"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to item_3, turns without picking it up, delivers item_2."
@@ -497,7 +509,8 @@ scenario_24 = ScenarioConfig(
 
 scenario_21 = ScenarioConfig(
     id="scenario_21",
-    name="layout2_midapproach_sustained_conflict",
+    setup="env_setup2",
+    reference_layouts=["env_layout2"],
     description=(
         "Phase 4C B2/B3 fixture. The robot's cheapest task (item_4: 54 ticks at t=0, vs item_6 "
         "71 and item_7 103, at 20 cm/tick) is the conflicted one, so the t=0 pick lands on it by "
@@ -553,7 +566,8 @@ scenario_21 = ScenarioConfig(
 # ===============================================================
 scenario_30 = ScenarioConfig(
     id="scenario_30",
-    name="layout3_midpath_crossing",
+    setup="env_setup3",
+    reference_layouts=["env_layout3"],
     description=(
         "Intersecting-paths fixture (TODO-47(c)). Mirror-symmetric approaches make the two paths intersect "
         "on the robot's CURRENT task: the human starts at (300, 300) and walks to shelf_3 at "
@@ -604,7 +618,8 @@ scenario_30 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_31 = ScenarioConfig(
     id="scenario_31",
-    name="layout3_change_of_mind_after_pickup",
+    setup="env_setup3",
+    reference_layouts=["env_layout3"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, abandons it (the next delivery returns it to its shelf first, deliver_with_return), delivers item_7."
@@ -639,7 +654,8 @@ scenario_31 = ScenarioConfig(
 
 scenario_32 = ScenarioConfig(
     id="scenario_32",
-    name="layout3_free_actions_then_deliveries",
+    setup="env_setup3",
+    reference_layouts=["env_layout3"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to the door, stays 20, walks to corner_SW, then delivers item_3 and item_7."
@@ -680,7 +696,8 @@ scenario_32 = ScenarioConfig(
 # ===============================================================================
 scenario_40 = ScenarioConfig(
     id="scenario_40",
-    name="layout4_foreseeable_and_unmodelled",
+    setup="env_setup4",
+    reference_layouts=["env_layout4"],
     description=(
         "Foreseeable-task fixture (I1 follow-up; baseline for I3/I4). One human run in four "
         "script parts. (1) deliver item_3 from shelf_3 (-950, -50): 1209 cm approach from "
@@ -739,7 +756,8 @@ scenario_40 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_41 = ScenarioConfig(
     id="scenario_41",
-    name="layout4_coffee_stay_abandon",
+    setup="env_setup4",
+    reference_layouts=["env_layout4"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human takes a coffee break with item_3 in hand, delivers it, stays 20 at the table, then picks up item_6 and abandons it."
@@ -779,7 +797,8 @@ scenario_41 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_42 = ScenarioConfig(
     id="scenario_42",
-    name="layout4_abandon_to_corner_holding",
+    setup="env_setup4",
+    reference_layouts=["env_layout4"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_3, then picks up item_6, abandons it and walks to corner_SE holding it, where it stands."
@@ -819,7 +838,8 @@ scenario_42 = ScenarioConfig(
 # ===============================================================
 scenario_50 = ScenarioConfig(
     id="scenario_50",
-    name="layout5_end_state_steps_aside",
+    setup="env_setup5",
+    reference_layouts=["env_layout5"],
     description=(
         "End-state variant of scenario_20 (F47, retyped F47b). Identical to scenario_20 in every task, "
         "position and pool; the one change is a third human task after its last delivery: "
@@ -880,7 +900,8 @@ scenario_50 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_51 = ScenarioConfig(
     id="scenario_51",
-    name="layout5_change_of_mind_before_pickup",
+    setup="env_setup5",
+    reference_layouts=["env_layout5"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "One table, so no wrong destination: human walks to item_2, turns without picking it up, delivers item_3."
@@ -916,7 +937,8 @@ scenario_51 = ScenarioConfig(
 
 scenario_52 = ScenarioConfig(
     id="scenario_52",
-    name="layout5_landmark_stay_mid_carry",
+    setup="env_setup5",
+    reference_layouts=["env_layout5"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, walks to corner_NW with it and stays 30 ticks, finishes the delivery, then delivers item_2."
@@ -952,7 +974,8 @@ scenario_52 = ScenarioConfig(
 
 scenario_53 = ScenarioConfig(
     id="scenario_53",
-    name="layout5_table_stay_after_delivery",
+    setup="env_setup5",
+    reference_layouts=["env_layout5"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_3 and item_2, stays 40 ticks at the table, then takes a coffee break."
@@ -1015,7 +1038,8 @@ _F47B_DESCRIPTION = (
 )
 scenario_70 = ScenarioConfig(
     id="scenario_70",
-    name="layout7_stay_alternative_beside",
+    setup="env_setup7",
+    reference_layouts=["env_layout7"],
     description=_F47B_DESCRIPTION + (
         "scenario_70 - shelf_2 BESIDE the blocked shelf (45 deg west of its bearing): switching from a "
         "block at (0, -500) to item_2 and returning adds ~13 ticks of walking over doing item_2 from "
@@ -1053,7 +1077,8 @@ scenario_70 = ScenarioConfig(
 
 scenario_71 = ScenarioConfig(
     id="scenario_71",
-    name="layout7_stay_alternative_across",
+    setup="env_setup7",
+    reference_layouts=["env_layout7"],
     description=_F47B_DESCRIPTION + (
         "scenario_71 - shelf_3 ACROSS the table (the opposite bearing): switching from a block at "
         "(0, -500) to item_3 and returning adds ~53 ticks of walking; the occupation would be SHORT "
@@ -1094,7 +1119,8 @@ scenario_71 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_72 = ScenarioConfig(
     id="scenario_72",
-    name="layout7_coffee_stay_abandon",
+    setup="env_setup7",
+    reference_layouts=["env_layout7"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human takes a coffee break with item_5 in hand, delivers it, stays 20 at the table, then picks up item_3 and abandons it (item_3 assigned to the human here, not in scenario_70)."
@@ -1130,7 +1156,8 @@ scenario_72 = ScenarioConfig(
 
 scenario_73 = ScenarioConfig(
     id="scenario_73",
-    name="layout7_free_actions_then_delivery",
+    setup="env_setup7",
+    reference_layouts=["env_layout7"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to the door, stays 20, walks to corner_NW, then delivers item_5, its one assigned task."
@@ -1176,7 +1203,8 @@ scenario_73 = ScenarioConfig(
 # ===============================================================
 scenario_80 = ScenarioConfig(
     id="scenario_80",
-    name="layout8_two_tables_plain_order",
+    setup="env_setup8",
+    reference_layouts=["env_layout8"],
     description=(
         "Two tables, ordering isolated: the robot's cheapest first task (item_6) is not the head of its "
         "cheapest full ordering (item_7 first). The human works the north shelves, uses both tables and "
@@ -1214,7 +1242,8 @@ scenario_80 = ScenarioConfig(
 
 scenario_81 = ScenarioConfig(
     id="scenario_81",
-    name="layout8_two_tables_conflict_past_head",
+    setup="env_setup8",
+    reference_layouts=["env_layout8"],
     description=(
         "scenario_80 with the human starting further from item_0: its first task spans the robot's two "
         "short tasks and ends at kitting_table_0 as the second of them does, so the conflict falls in the "
@@ -1263,7 +1292,8 @@ scenario_81 = ScenarioConfig(
 # The start position sets that timing; the record is analysis/tb1c_realized_flip/.
 scenario_83 = ScenarioConfig(
     id="scenario_83",
-    name="layout8_two_tables_realized_flip",
+    setup="env_setup8",
+    reference_layouts=["env_layout8"],
     description=(
         "scenario_80 with the human working item_3 then item_0 from the north wall: its item_0 carry reaches "
         "kitting_table_0 as the second of the robot's two short tasks does, so under full_reorder the plain-cost "
@@ -1303,7 +1333,8 @@ scenario_83 = ScenarioConfig(
 # it is not a fixture, nothing is measured from it, and T-B does not use it.
 scenario_82 = ScenarioConfig(
     id="scenario_82",
-    name="layout8_view",
+    setup="env_setup8",
+    reference_layouts=["env_layout8"],
     description=(
         "Minimal scenario for opening env_layout8 in the viewer: one robot task and one human task. "
         "Not a fixture."
@@ -1338,7 +1369,8 @@ scenario_82 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_84 = ScenarioConfig(
     id="scenario_84",
-    name="layout8_change_of_mind_before_pickup",
+    setup="env_setup8",
+    reference_layouts=["env_layout8"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to item_3, turns without picking it up, delivers item_0."
@@ -1375,7 +1407,8 @@ scenario_84 = ScenarioConfig(
 
 scenario_85 = ScenarioConfig(
     id="scenario_85",
-    name="layout8_wrong_destination",
+    setup="env_setup8",
+    reference_layouts=["env_layout8"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_0 to kitting_table_1 instead of its table (kitting_table_0), then delivers item_3."
@@ -1420,7 +1453,8 @@ scenario_85 = ScenarioConfig(
 # ===============================================================
 scenario_90 = ScenarioConfig(
     id="scenario_90",
-    name="layout9_two_tables_at_the_walls",
+    setup="env_setup9",
+    reference_layouts=["env_layout9"],
     description=(
         "env_layout9: kitting_table_0 against the north wall, kitting_table_1 against the south wall. "
         "The robot's pool is item_5 / item_4 / item_1 (to kitting_table_1) and item_6 (to kitting_table_0); "
@@ -1461,7 +1495,8 @@ scenario_90 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_91 = ScenarioConfig(
     id="scenario_91",
-    name="layout9_change_of_mind_before_pickup",
+    setup="env_setup9",
+    reference_layouts=["env_layout9"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to item_3, turns without picking it up, delivers item_2."
@@ -1498,7 +1533,8 @@ scenario_91 = ScenarioConfig(
 
 scenario_92 = ScenarioConfig(
     id="scenario_92",
-    name="layout9_wrong_destination",
+    setup="env_setup9",
+    reference_layouts=["env_layout9"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_2 to kitting_table_1 instead of its table (kitting_table_0), then delivers item_3."
@@ -1535,7 +1571,8 @@ scenario_92 = ScenarioConfig(
 
 scenario_93 = ScenarioConfig(
     id="scenario_93",
-    name="layout9_landmark_stay_mid_carry",
+    setup="env_setup9",
+    reference_layouts=["env_layout9"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_2, walks to corner_NE with it and stays 30 ticks, finishes the delivery, then delivers item_3."
@@ -1575,7 +1612,8 @@ scenario_93 = ScenarioConfig(
 # The robot side is the layout's base scenario's.
 scenario_94 = ScenarioConfig(
     id="scenario_94",
-    name="layout9_table_stay_robot_converging",
+    setup="env_setup9",
+    reference_layouts=["env_layout9"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_2 and item_3, stays 40 ticks at kitting_table_1 while the robot converges on it, then walks to corner_SE."

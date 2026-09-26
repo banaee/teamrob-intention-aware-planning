@@ -1,0 +1,52 @@
+{
+  "env_objects": [
+    {
+      "id": "item_1",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Robot task 1."
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Robot alternative, scenario_70."
+    },
+    {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Robot alternative, scenario_71."
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "Human's assigned item, delivered after the break."
+    }
+  ]
+}

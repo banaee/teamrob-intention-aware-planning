@@ -16,7 +16,8 @@ from domains.dock_loading.tasks import (
 # ===============================================================
 scenario_10 = ScenarioConfig(
     id="scenario_10",
-    name="minimal_debug",
+    setup="env_setup1",
+    reference_layouts=["env_layout1"],
     description="Human goes to office. Robot delivers one pallet.",
     agents=[
         AgentConfig(
@@ -45,7 +46,8 @@ scenario_10 = ScenarioConfig(
 # ===============================================================
 scenario_11 = ScenarioConfig(
     id="scenario_11",
-    name="basic_dock_loading_with_coffee_break",
+    setup="env_setup1",
+    reference_layouts=["env_layout1"],
     description=(
         "Robot delivers 6 full pallets from truck to hall (3 dry, 3 frozen), "
         "then loads 4 empty pallets from bays back to truck. "

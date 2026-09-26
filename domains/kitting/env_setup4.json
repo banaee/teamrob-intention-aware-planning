@@ -1,0 +1,64 @@
+{
+  "env_objects": [
+    {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "human, segment 1"
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "human, segment 4"
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "robot"
+    },
+    {
+      "id": "item_7",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "robot"
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "robot"
+    }
+  ]
+}
