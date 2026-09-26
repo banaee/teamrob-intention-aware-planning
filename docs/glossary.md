@@ -642,6 +642,53 @@ in the repository, which builds and checks; older reports call it Fable.
 **T-A … T-H** — the plan names task prompts and reports use (T-H, the human behaviour model, runs before T-D; T-H1 to
 T-H4 its build).
 → `docs/roadmap.md`, "The plan from T-A".
+**T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
+→ `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
+
+---
+
+## 9. Runs: what a run is made of
+
+Ruled by Hadi, 26 September 2026 (T-L). Built in T-L's stages 1 to 4; until then the code holds one layout JSON per
+room and shift, and a registry that binds each scenario to one layout. The definitions are domain-neutral; kitting and
+dock_loading appear as examples only.
+→ `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
+
+**layout** — the room: the space, its zones, and the fixed objects with their positions. No movable object and no
+agent. Static. One file per layout, with a descriptive id. (Kitting: tables, shelves, machines, switches, landmarks.)
+Until T-L's stage 1 the layout JSON also held the setup's objects and dead agent spawn entries.
+
+**setup** — the shift: the movable objects that exist, each with its home container and, where the domain determines
+one through `destination_of`, its designated destination, and any other initial state the domain declares per movable
+object. Its container and destination ids name objects of a layout. One file per setup, with a descriptive id.
+(Kitting: the items, each on a shelf with its designated table; dock_loading: the pallets, with `subtype`, `is_empty`,
+`is_scanned`.) A new term.
+COLLISION, not resolved: DESIGN-16 (`docs/design_decisions.md`) says "travel/setup costs between tasks", the
+scheduling sense (a cost of switching between tasks). That is the English word, not the term.
+
+**scenario** — the episode: per agent its `start_position`, `assigned_tasks`, `observes` and, for a human, the
+human's script; the purpose, as description text (label C, §7); the one setup it binds (`setup`, required); and its
+reference layouts. A hand-written `ScenarioConfig` literal, registered by discovery at import of the domain package.
+Its id is descriptive and equals its Python variable; nothing is encoded in it.
+→ `shared/types.py`, `ScenarioConfig`.
+
+**reference layout** — a layout a scenario declares it runs on (`reference_layouts`, one or more). A binding the
+author makes, validated at load. A run that names no layout runs the scenario's first reference layout. The listing
+and batch runs enumerate the declared (layout, scenario) pairs, never the product of artefacts.
+
+**run** — a triple (layout, setup, scenario) plus the run facts (gate, cost strategy, prior, θ), which stay run
+facts as ruled before. Validated at load before anything is built; the load-time replay follows. Baselines are keyed by the
+run: the layout id and the scenario id, plus the run options present; the setup is implied by the scenario.
+
+**run file** — a yaml (`configs/experiment.yaml`, or any yaml given by path) that states a run: the triple, the run
+options and an overrides block. The viewer reads and edits the same file.
+
+**override** — a change to one fact of a run's artefacts, applied at load before validation, from the run file's
+overrides block or `--override <path>=<value>`. A closed list: an agent's `start_position`; an agent's
+`assigned_tasks`; an object's position; a movable object's home container; a movable object's designated
+destination. The script and every id are not overridable. Each override is printed as one line next to the triple in
+the run log. A run with an override is never a fixture or a baseline. Not an injection: a change during a run is Phase
+7's injection path (**inject**, §6).
 
 ---
 
