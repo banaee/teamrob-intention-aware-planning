@@ -1,5 +1,7 @@
 # I2 — IR foundations: term → location resolution, guard-selected methods, observable wait_at
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 > Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "The coffee walk is recognised" → `coffee_break`'s hypothesis clears θ (ROBOT). "A human about to execute a task the robot cannot recognise" → a task no hypothesis describes: unmodelled behaviour (WORLD); "declared as such" → a declared experimental condition (label C).
 
 Built on `ff78636` (F1). Sweep: s00 (300 steps), s20 (200), s30 (200), s40 (400) × assignment_prior

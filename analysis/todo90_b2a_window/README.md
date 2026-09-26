@@ -1,5 +1,7 @@
 # TODO-90: the two in-window approaches under gate b2a (attribution or hole)
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 A check, nothing fixed. s10 prior off / on, s30 prior on; `--gate_strategy b2a --strategy single_task
 --cost_strategy realized --separation_stop false`, PYTHONHASHSEED=0, main at 7f122fd (post-D3), 450 / 200 steps.
 `capture.py` runs `run_mesa.py` unchanged and records each `realize()` call's segments (log byte-identical apart

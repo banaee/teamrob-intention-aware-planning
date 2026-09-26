@@ -1,5 +1,7 @@
 # T1b — What realization would produce (measurement only)
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 Code at HEAD `51b7cee` (main). `shared/` untouched. Eight runs, `PYTHONHASHSEED=0`, the T5
 sweep conditions (s00, s20, s30, s40 × assignment prior off/on; scenario_10 dropped, TODO-52).
 No decision, default, threshold or cost was changed; nothing below proposes a value.

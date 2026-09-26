@@ -84,8 +84,8 @@ at T-B3's close): `sweep/s83_single_task_<prior>.log`, md5 at 2a44c65:
 
     analysis/tb3_full_reorder/sweep.sh <out_dir>
 
-All 20 runs; the full_reorder logs and s83's single_task logs go to `sweep/`
-(`cp <out_dir>/*_full_reorder_*.log <out_dir>/s83_single_task_*.log analysis/tb3_full_reorder/sweep/`).
+All 20 runs, and all 20 go to `sweep/` (T-L stage 3; before it, the full_reorder logs and s83's single_task logs
+only): `cp <out_dir>/*.log <out_dir>/*.rec analysis/tb3_full_reorder/sweep/`, or give `sweep/` as `<out_dir>`.
 
 ## D3 (dd880be): `task_committed` is not a trigger — the logs from here on
 
@@ -225,3 +225,39 @@ the T-H4 logs every other line is byte-identical, and every `.rec` stream is byt
 | s83_full_reorder_on | 5d93baad6ee5ac87a483bf9ea99787d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_single_task_off | 3402d6b87cb5ada4b0573f1602d000b3 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_single_task_on | 11b9532998fa4a1d4cc8a9c74022f5d1 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-L stage 3: the serial ids — the logs from here on
+
+Regenerated after T-L stage 3, superseding the T-H follow-up table. CAUSE: the rename to the serial ids (`docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of
+a run", ruling 4 as amended, ruling 6); the runs do not change. Logs are named `<layout id>_<scenario id>_<run
+options>.log` (ruling 6), each `.rec` beside its log; `docs/rename_table.md` maps the old tags (its last table).
+Against the stage-2 logs (99563cc, run from scratch under the old ids and paired through the rename table) every log
+differs in the `[run_mesa]` line alone (`layout=` and `scenario=`), and every `.rec` stream is byte-identical. T-L
+stages 1 and 2 had changed the same line alone (the setup id added, then its serial id), with no section here; the
+`.rec` md5s equal the T-H follow-up table's.
+
+Regenerate from the repo root with `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`: all 20
+runs are kept in `sweep/` from here on (Hadi, T-L stage 3), the `single_task` runs included.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_off | b5e0cf7207297420ea16b108b4a30416 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_full_reorder_on | 1132659d63d79ad4db19ae65d7ffe3ad | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_off | 5cd1f49a2092a4107b8e3182afbac780 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_on | 604dcb96d1a664ff29414be1df5fa7d6 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_07_scenario_s05_01_full_reorder_off | 32c5a5067fb2aa40a9d27d4bf79c905e | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 641da8acb13fa2052f7640b85ad8cdce | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_off | e154df49456562debdaa4dd0836d8d48 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_on | 1ed075ccd307f73d36288b394d62cac9 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_08_scenario_s06_01_full_reorder_off | fda5316eded9f2afdf3dc190c9001350 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_full_reorder_on | 38c80f2e69dc4fd4129a5668ed7d32ec | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_off | 0054b641ab77c15ef52fbd0e9b9a7737 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_on | bd4dea4c79485e202f2eda2b29a4f96f | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_full_reorder_off | 9dab2dbf04d3b10b6c83a48f62994c0c | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_full_reorder_on | 9f34a635646c527ba0c2805aa2ac6c4b | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_off | 41301096d8fa57a0691ac4b88139c97b | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_on | 0d8db6fb4067284052360722ca4756fe | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_03_full_reorder_off | 1eb4be9d9268bbbe68a472a85fe78b8f | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_full_reorder_on | ebe3d1cda8a8d81b9726503e16643f92 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_off | a13559d3096bea7722d04b0042128eaf | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_on | 5c32517b00b75d0be3cf293c4beb5f27 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

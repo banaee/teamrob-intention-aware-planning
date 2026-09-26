@@ -1,5 +1,7 @@
 # analysis/f47_fixtures — evaluation fixtures for D2 (F47, F47b)
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 > Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "recognised (205: ac_switch_1 0.784 / 0.878; …)" → the hypothesis clears θ (ROBOT; the gate's outcome is "admitted").
 
 Scripts and records behind TODO-47 (d)/(e), TODO-49 and the design entry "Scheduled bindings are typed; a stay

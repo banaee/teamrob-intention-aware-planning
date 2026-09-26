@@ -1,5 +1,7 @@
 # analysis/tc2c_scripts — T-C2c: the first two scripted scenarios
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 > Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "a human who departs from the model mid-task (A)" → a human whose work order is interrupted (a deviation, label A) by a foreseeable task, which is modelled (label B): scenario_11's `coffee_break` has a hypothesis. "recognised again from scratch" → the delivery's hypothesis clears θ again (ROBOT).
 
 Two literal scenarios on the human action script (T-C2a) and the action-level human (T-C2b): a human who departs

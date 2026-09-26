@@ -1,5 +1,7 @@
 # I3 — the phase model: a task's likelihood is the likelihood of the action it expects now
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 Built on `5a8c480` (I2). Sweep: s00 (300 steps), s20 (200), s30 (200), s40 (400) × assignment_prior
 off/on, `PYTHONHASHSEED=0`, interpreter `~/python-envs/teamrob-sp4-env/bin/python`. scenario_10 stays
 dropped (TODO-52; run once, outside the sweep, for the `waited` check — §6). Baselines recorded at

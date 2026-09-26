@@ -1,5 +1,7 @@
 # T6 — ablation of the meta-planner's policy components
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 > Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "a deviation from the projection" → a departure from the projection; "deviation" means a departure from the work order only (label A).
 
 What each component does on the kitting fixtures, and why: realization (B3 `cost_strategy` realized against

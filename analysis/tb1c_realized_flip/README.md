@@ -283,3 +283,28 @@ the T-H4 logs every other line is byte-identical, and every `.rec` stream is byt
 | s83_plain_on | 47a70872338b3eb232ac47a2ae958ded | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_realized_off | cc6125e8898e55b42f3faa36cee487a8 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_realized_on | 5d93baad6ee5ac87a483bf9ea99787d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-L stage 3: the serial ids — the logs from here on
+
+Regenerated after T-L stage 3, superseding the T-H follow-up table. CAUSE: the rename to the serial ids (`docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of
+a run", ruling 4 as amended, ruling 6); the runs do not change. Logs are named `<layout id>_<scenario id>_<run
+options>.log` (ruling 6), each `.rec` beside its log; `docs/rename_table.md` maps the old tags (its last table).
+Against the stage-2 logs (99563cc, run from scratch under the old ids and paired through the rename table) every log
+differs in the `[run_mesa]` line alone (`layout=` and `scenario=`), and every `.rec` stream is byte-identical. T-L
+stages 1 and 2 had changed the same line alone (the setup id added, then its serial id), with no section here; the
+`.rec` md5s equal the T-H follow-up table's.
+
+Regenerate from the repo root with `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`.
+`check.py` is left as it stands (a record at its commit; it reads the registry shape from before T-L stage 1 and
+the old log names).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | 81be85f96870cf5dd54af9b35ec62920 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_plain_on | e91542f57a1d053878059fe975d6cfa1 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_off | fda5316eded9f2afdf3dc190c9001350 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_on | 38c80f2e69dc4fd4129a5668ed7d32ec | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_03_plain_off | ef0d7f0388c6178b5a68c7667ec66873 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_plain_on | a3e7fd437eab365a1fdc120d4bbba475 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_off | 1eb4be9d9268bbbe68a472a85fe78b8f | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_on | ebe3d1cda8a8d81b9726503e16643f92 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

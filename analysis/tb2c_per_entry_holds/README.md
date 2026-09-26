@@ -1,5 +1,7 @@
 # T-B2c — one minimal-shift search per entry: the checks
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 `check.py` regenerates `checks.md` (about 25 s):
 
     PYTHONHASHSEED=0 ~/python-envs/teamrob-sp4-env/bin/python analysis/tb2c_per_entry_holds/check.py \

@@ -277,3 +277,26 @@ the T-H4 logs every other line is byte-identical, and every `.rec` stream is byt
 | s80_on | 1801536e2024853d4a9c62ec6a7cfb2a | 8cf0930761924a3aab1f1713f3f4bf29 |
 | s81_off | 49ca6dc210be42feef6714bbc4caf040 | 329590c9c1249859bfe20d107588c50a |
 | s81_on | e66b645c2bdffcee8549203daf5c3ee0 | 329590c9c1249859bfe20d107588c50a |
+
+## T-L stage 3: the serial ids — the logs from here on
+
+Regenerated after T-L stage 3, superseding the T-H follow-up table. CAUSE: the rename to the serial ids (`docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of
+a run", ruling 4 as amended, ruling 6); the runs do not change. Logs are named `<layout id>_<scenario id>_<run
+options>.log` (ruling 6), each `.rec` beside its log; `docs/rename_table.md` maps the old tags (its last table).
+Against the stage-2 logs (99563cc, run from scratch under the old ids and paired through the rename table) every log
+differs in the `[run_mesa]` line alone (`layout=` and `scenario=`), and every `.rec` stream is byte-identical. T-L
+stages 1 and 2 had changed the same line alone (the setup id added, then its serial id), with no section here; the
+`.rec` md5s equal the T-H follow-up table's.
+
+Regenerate from the repo root (arguments as before; without them the defaults of `configs/experiment.yaml` are the
+same, and the `[run]` line does not record which):
+
+    analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep \
+        --cost_strategy realized --gate_strategy none --separation_stop false
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_off | 0054b641ab77c15ef52fbd0e9b9a7737 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_on | bd4dea4c79485e202f2eda2b29a4f96f | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_off | 41301096d8fa57a0691ac4b88139c97b | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_on | 0d8db6fb4067284052360722ca4756fe | 329590c9c1249859bfe20d107588c50a |

@@ -1,5 +1,7 @@
 # analysis/g1_graded_evidence — graded evidence: the checks, the θ data, and the re-baselined sweep
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 The build: a stretch's evidence against `unknown` is graded by the fraction of the hypothesis's expected path
 it covers — its odds are L / u^f instead of L / u (`docs/design_decisions.md`, "A stretch's evidence against
 `unknown` is graded by the share of the expected path it covers"; `docs/recognizer_handback.md` §1.4–§1.5).

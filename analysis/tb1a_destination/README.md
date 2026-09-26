@@ -315,3 +315,37 @@ the T-H4 logs every other line is byte-identical, and every `.rec` stream is byt
 | s70_on | 6386bab6d4ba67728b269f2290149457 | dab078d5ca51e5b378054ee6a60ccca7 |
 | s71_off | 09ef3397c91b2d8ca528daa18f06b3d0 | dab078d5ca51e5b378054ee6a60ccca7 |
 | s71_on | c6b7af0dda5637f011cd3fbbe6e63961 | dab078d5ca51e5b378054ee6a60ccca7 |
+
+## T-L stage 3: the serial ids — the logs from here on
+
+Regenerated after T-L stage 3, superseding the T-H follow-up table. CAUSE: the rename to the serial ids (`docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of
+a run", ruling 4 as amended, ruling 6); the runs do not change. Logs are named `<layout id>_<scenario id>_<run
+options>.log` (ruling 6), each `.rec` beside its log; `docs/rename_table.md` maps the old tags (its last table).
+Against the stage-2 logs (99563cc, run from scratch under the old ids and paired through the rename table) every log
+differs in the `[run_mesa]` line alone (`layout=` and `scenario=`), and every `.rec` stream is byte-identical. T-L
+stages 1 and 2 had changed the same line alone (the setup id added, then its serial id), with no section here; the
+`.rec` md5s equal the T-H follow-up table's.
+
+Regenerate from the repo root with this folder's own script, which replaces the two frozen scripts named at the top
+(on the old ids, they no longer run): same eight runs, step counts and arguments.
+
+    analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_01_scenario_s01_01_off | eb439e4707079b99d46ce5fd3ca834b4 | 5c7835ba3417ff28b5d3caf1d00d906e |
+| env_layout_01_scenario_s01_01_on | 25ab42480fed9919b3abb42838b67fe0 | 5c7835ba3417ff28b5d3caf1d00d906e |
+| env_layout_02_scenario_s02_01_off | b6f9cdb463181f49267f251600fe89be | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| env_layout_02_scenario_s02_01_on | 0184784bccbe6b90b82874a5ccb9098e | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| env_layout_03_scenario_s03_01_off | 5cd1f49a2092a4107b8e3182afbac780 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_on | 604dcb96d1a664ff29414be1df5fa7d6 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_04_scenario_s01_06_off | 521c60fdc540ece9bacc7e287d6628fa | 65d234649396c9ab242841050082e9b0 |
+| env_layout_04_scenario_s01_06_on | b60292eab4afef3a273dc44ddd3fabee | 65d234649396c9ab242841050082e9b0 |
+| env_layout_05_scenario_s04_01_off | dde9decd185e744a094ff2675529134b | f6da9d345530212df9b0446aa53d1f1e |
+| env_layout_05_scenario_s04_01_on | 5a6dbd008db83e9f2fbd5418a1b2cc21 | f6da9d345530212df9b0446aa53d1f1e |
+| env_layout_06_scenario_s03_06_off | 07945e1f678d21b5047cc94ee23fe04d | 3e4fd412ba39ddd3267d1d37089beaac |
+| env_layout_06_scenario_s03_06_on | a0de9513b8e465e9ec459feeb64d3951 | 3e4fd412ba39ddd3267d1d37089beaac |
+| env_layout_07_scenario_s05_01_off | e154df49456562debdaa4dd0836d8d48 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_on | 1ed075ccd307f73d36288b394d62cac9 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_02_off | 468fdfb6a06efbab7e9da80978cf2810 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_02_on | 68de2a7466b384e0213814bbe63e1f1f | dab078d5ca51e5b378054ee6a60ccca7 |

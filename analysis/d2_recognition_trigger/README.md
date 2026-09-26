@@ -1,5 +1,7 @@
 # D2 — `recognition_changed` replaces `theta_crossed`: the re-baselined sweep
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 Regression sweep (`sweep/`: s00–s40, prior off / on, `analysis/f1_robot_responsible/sweep.sh` step counts)
 and the evaluation fixtures (`fixtures/`: s50, s70, s71, `analysis/f47_fixtures/sweep.sh`) at the D2 HEAD,
 PYTHONHASHSEED=0, gate_strategy none, cost_strategy realized, separation stop off. Logs are local

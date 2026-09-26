@@ -1,5 +1,7 @@
 # F1 — Foreseeable-task fixture: `env_layout4` / `scenario_40` (baseline on the current recognizer)
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 Built on top of `819b44f` (I1 audit). `shared/` untouched. Files changed: `domains/kitting/env_layout4.json`
 (new), `domains/kitting/scenarios.py` (`scenario_40` appended), `domains/kitting/registry.py`
 (import + `layouts` entry). Two baseline runs, `PYTHONHASHSEED=0`, 400 steps, assignment_prior off and

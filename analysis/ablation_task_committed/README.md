@@ -1,5 +1,7 @@
 # The trigger set without task_committed — an ablation, measured on the corrected body (T-B Q7)
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 SUPERSEDED IN PART (TODO-90 check, September 2026; `analysis/todo90_b2a_window/`). Under prior on, the s10 b2a
 decision is at tick 24, not 29. The in-window counts include tick 23 of s30 b2a prior on (15.47 cm), which lies
 outside every window: it is the observation offset of the decision at 23, and `measure.py` checked the end of the

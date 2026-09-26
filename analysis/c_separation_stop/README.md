@@ -1,5 +1,7 @@
 # analysis/c_separation_stop — the execution-time separation stop (C)
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 Scripts that produced the C numbers recorded in design_decisions.md ("Execution-time separation stop")
 and TODO-73. Logs are git-ignored; the md5s at the end of `comparison.md` identify the runs.
 

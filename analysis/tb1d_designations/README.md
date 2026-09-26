@@ -1,5 +1,7 @@
 # analysis/tb1d_designations — T-B1d closed as a record: which designations separate the greedy head from the ordering head
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 T-B1d was to add scenario_84, a two-table fixture whose ordering effect (single_task's greedy head differs from the
 head of the cheapest ordering, plain cost) survives the removal of any single against-proximity designation, so that
 T-B3a's claim would not rest on item_4 alone (TODO-47 (f-designations)). Ruling (Hadi, option (ii)): no scenario_84,

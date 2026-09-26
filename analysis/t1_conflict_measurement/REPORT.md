@@ -1,5 +1,7 @@
 # T1 — Conflict-geometry measurement for MetaPlanner (measurement only)
 
+> Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
+
 > **Units note (added after T2, commit `2282c83`):** every cost, step count, T_r/T_h and pause
 > delay δ in this report is in pre-T2 projection units (1 unit = 1 cm of motion, ≈ 20 units per
 > Mesa tick; stationary actions 1 unit). Since T2 the projector runs in execution ticks.
