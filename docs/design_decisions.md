@@ -4025,8 +4025,11 @@ TODO-98, TODO-99, TODO-100, TODO-101
 
 **Layouts, setups and scenarios: the three artefacts of a run (T-L, 26 September 2026)**
 
-DECIDED (cchat, 26 September 2026). A refactor of what a run is made of. The mind receives the same facts through the
-same seam (`WorldState`); the recognizer, the planner and the projector do not change. Terms: `docs/glossary.md` §9.
+DECIDED (cchat, 26 September 2026). AMENDED the same day by Hadi's rulings a to d on ccode's survey and review of the
+first text (rulings a to d are folded into rulings 1, 3, 6, 7 and 8 below; the wording answers to the rest of the
+survey likewise); the text below is the amended form. A refactor of what a run is made of. The mind receives the same
+facts through the same seam (`WorldState`); the recognizer, the planner and the projector do not change. Terms:
+`docs/glossary.md` §9.
 
 PURPOSE. Today one layout JSON holds facts about three different things: the room, the shift's objects, and dead agent
 spawn entries (the `"robots"` / `"humans"` lists, read by nothing in Mesa). A scenario is bound to one layout by a
@@ -4038,21 +4041,30 @@ THE RULINGS.
 
 1. THREE ARTEFACTS BETWEEN THE DOMAIN AND A RUN.
    - Layout, the room: space, zones, the fixed objects with positions (in kitting: tables, shelves, machines,
-     switches, landmarks). No movable objects, no agents. Static.
+     switches, landmarks; in dock_loading: bays, the gate, the truck: a truck with a position is a fixed container of
+     the room, as a shelf is). No movable objects, no agents. Static.
    - Setup, the shift: the movable objects that exist, each with its home container and, where the domain determines
      one through `destination_of`, its designated destination; any other initial state a domain declares per movable
      object (dock_loading's `subtype`, `is_empty`, `is_scanned`) goes with it. Binds container and destination ids of a
      layout.
    - Scenario, the episode: per agent, `start_position`, `assigned_tasks`, `observes`, and the human's script; the
      purpose as description text; the setup it binds; its reference layouts.
-   - A run is the triple (layout, setup, scenario) plus the run facts (gate, cost strategy, prior, θ), which stay run
-     facts as ruled before.
-   - Validation of a triple at load, before anything is built: the setup's containers and destinations are objects of
-     the layout with the types the schemas require; every task binding names an object of the setup or the layout with
-     the schema's type (`check_task_bindings` as today); every assigned task agrees with the setup's designations
-     (`check_task_destinations` as today); every `start_position` lies inside the space and outside every object of
-     the layout. A failure names the mismatch. The load-time replay follows as today. Validity is not selection:
-     nothing ever enumerates the product of artefacts; runs are chosen explicitly.
+   - A run is the triple (layout, setup, scenario) plus the run facts, as the existing records define them: gate, cost
+     strategy, strategy, prior, separation stop. The robot's task model is a run fact too: an evaluation condition
+     chosen by whole schemas ("T-H: the human behaviour model", item 3); its default stays in the domain registry
+     (TODO-102 unchanged). θ is a constant (`DEFAULT_THETA`), not a run fact.
+   - Validation of a triple at load, before anything is built: every home container of the setup is an object of the
+     layout (existence; no schema declares a container's type), and every designated destination is an object of the
+     layout with the type the schema declares for it (the one place a schema declares one); every task binding names
+     an object of the setup or the layout with the schema's type (`check_task_bindings` as today); every assigned task
+     agrees with the setup's designations (`check_task_destinations` as today); every `start_position` lies inside the
+     space's bounds (ruling a: objects are not obstacles for a start, since a walk ends at an object's position, T9;
+     shapes and footprints are outside T-L). A failure names the mismatch. The load-time replay follows as today.
+     Validity is not selection: nothing ever enumerates the product of artefacts; runs are chosen explicitly.
+   - THE STATED TABLE (ruling b): the stated table stays explicit in a scenario's assigned tasks and script, validated
+     against the setup's designations as today. A readability choice: the HTN model does not require it ("T-H: the
+     human behaviour model", item 5; the T-B1a precedence rule). Consequence: a scenario fits a setup whose
+     designations agree with its stated tables, and that is what the check says.
    - Domain independence: no domain string enters `shared/` or the loader; which types need a designation is read from
      the schemas (`Tree.get_types_with_destination`), as T-B1a ruled.
 
@@ -4061,8 +4073,13 @@ THE RULINGS.
 
 3. A SCENARIO DECLARES `setup` (one id, required) AND `reference_layouts` (one or more layout ids). Both are bindings
    the author makes, like `assigned_tasks`, so the "computed, never declared" principle of the T-H follow-up does not
-   apply to them; both are validated at load. A manual run that names no layout runs the first reference layout;
-   `--layout` overrides it and is validated. Listing and batch enumerate the declared (layout, scenario) pairs.
+   apply to them; both are validated at load. Listing and batch enumerate the declared (layout, scenario) pairs.
+   ONE SETUP PER SCENARIO (ruling c, standing as first recorded): names omit the setup; there is no `--setup`
+   selection. T-F generates its scenarios with their setups.
+   SELECTING THE LAYOUT (ruling d): `--layout` selects a registered artefact; it is selection, not an override. A run
+   file (`configs/experiment.yaml` included) may name all three artefacts; when it omits the layout, the run takes the
+   scenario's first reference layout. A run on a layout outside the scenario's `reference_layouts` is valid and is not
+   a baseline; to make it one, the author adds the layout's id to `reference_layouts`.
 
 4. NAMING: descriptive ids, nothing encoded. One id per artefact, snake_case, unique within the domain and artefact
    kind; the Python variable of a `ScenarioConfig` equals its id; the `name` field is dropped; `description` holds the
@@ -4075,54 +4092,60 @@ THE RULINGS.
    TODO-47 (a).
 
 6. BASELINES ARE KEYED BY THE RUN. File names carry the layout id and the scenario id plus the run options already
-   present (prior, strategy); the setup is omitted from names because ruling 3 gives a scenario exactly one setup; the
-   `[run]` header prints all three. The four maintained sets are regenerated under the new names in stage 3, `.rec`
+   present (prior, strategy); the setup is omitted from names because ruling 3 gives a scenario exactly one setup.
+   THE TRIPLE LINE: the `[run_mesa]` start line, where the layout and scenario ids are printed today, prints all three
+   ids; stage 1 adds the setup to it. The four maintained sets are regenerated under the new names in stage 3, `.rec`
    streams byte-identical, a new md5 section in each README. Frozen records are not touched; one file
-   `docs/rename_table.md` maps every old layout and scenario id to its new id; each frozen README gets one superseding
-   line pointing to it.
+   `docs/rename_table.md` maps every old layout and scenario id to its new id, and says in one line that the frozen
+   analysis scripts stay frozen at their commit; each frozen README gets one superseding line pointing to it.
 
 7. SELECTION AND OVERRIDES.
    - Selection by composition and coverage is TODO-110, after this refactor, over the declared pairs.
    - A run file (`configs/experiment.yaml`, or any yaml given by path) states the triple, the run options and an
-     overrides block. Overridable, a closed list: an agent's `start_position`; an agent's `assigned_tasks`; an
-     object's position; a movable object's home container; a movable object's designated destination. The script and
-     every id are not overridable. The loader reads the three artefacts, applies the overrides, then validates and
-     loads as for any run; each override is printed as one line next to the triple in the run log. A run with an
-     override is never a fixture or a baseline. The CLI form `--override <path>=<value>` covers a single tweak. The
-     viewer reads and edits the same file. Overrides apply at load only; a change during a run is Phase 7's injection
-     path, not an override.
+     overrides block. Overridable, a closed list of three (ruling d): an agent's `start_position`; a fixed object's
+     position; a movable object's home container. A movable object's position is its container's, so the position
+     override is for fixed objects only. NOT overridable: an agent's `assigned_tasks` (a task instance has no typed
+     textual form; a variant is a new scenario, one literal in Python) and a movable object's designated destination (a
+     different designation set is a different setup); the script; and every id inside an artefact ("no id is
+     overridable" concerns those ids; choosing the layout is selection, ruling 3). The loader reads the three
+     artefacts, applies the overrides, then validates and loads as for any run; each override is printed as one line
+     next to the triple in the run log. A run with an override is never a fixture or a baseline. The CLI form
+     `--override <path>=<value>` covers a single tweak. The viewer reads and edits the same file. Overrides apply at
+     load only; a change during a run is Phase 7's injection path, not an override.
 
 8. SEQUENCING: T-L precedes T-D. kitting and dock_loading migrate together (this task and its stages may touch
-   `domains/dock_loading/`; it must still import and run). ros_sim stays parked: TODO-111, with TODO-108, records that
-   its layout readers move to the same sources when it resumes. The stages after this record task, each its own ccode
-   task, each ending in the one acceptance check below:
+   `domains/dock_loading/`; it must still import). dock_loading's two scenarios fail at load before T-L (TODO-104);
+   TODO-104 stands and T-L must not worsen it. ros_sim stays parked: TODO-111, with TODO-108, records that its layout
+   readers move to the same sources when it resumes. The stages after this record task, each its own ccode task, each
+   ending in the acceptance check below:
    - stage 1: types (`ScenarioConfig` gains `setup` and `reference_layouts`, loses `name`), loader, resolver,
-     validator; every current layout split into a layout file and a setup file with the object ids unchanged and the
-     dead spawn entries deleted; scenarios unchanged in content and id.
+     validator; every registered layout split into a layout file and a setup file with the object ids unchanged and the
+     dead spawn entries deleted (`env_layout99.json` stays an unregistered file); scenarios unchanged in content and
+     id; the tests' helpers move with the registry shape; the setup id added to the `[run_mesa]` line; the docs pass
+     on the lines the survey listed (roadmap, T-L, stage 1).
    - stage 2: the scenarios package (one module per theme) and registration by discovery; `list_scenarios` and the
      tests' helpers on the declared pairs.
    - stage 3: the rename to descriptive ids, `docs/rename_table.md`, the four maintained sets regenerated under the new
      names, sweep scripts and READMEs.
    - stage 4: the run file and the override mechanism, with the viewer reading it.
 
-ACCEPTANCE, the only check: after each stage the four maintained sweeps (tb1a, tb1b, tb1c, tb3) are run from scratch
-and diffed against the previous stage's logs; no difference outside the lines the stage names (the triple line, the
-ids). Nothing is aligned to older analyses.
+ACCEPTANCE, at every stage: the four maintained sweeps (tb1a, tb1b, tb1c, tb3) are run from scratch and diffed against
+the previous stage's logs, with no difference outside the lines the stage names (the triple line, the ids); AND pytest
+is green. Nothing is aligned to older analyses.
 
 SUPERSEDES IN PART: "An item's destination table is a fact of the station" (T-B1a): the storage of the destination
 moves from the layout to the setup; the form stands (note in place). CLAUDE.md's and
 `docs/handoffs/handoff_T-D_onward.md`'s rules on fixture registration and scenario numbering, and, for T-L's stages
 only, CLAUDE.md's rule that `domains/dock_loading/` is not modified (notes in place).
 
-MEASURED AT RECORD TIME, NOT RESOLVED (read-only, the registered scenarios against their registered layouts'
-`"env_objects"` without `"initial_container"`, a footprint being the object's `size` centred on its `position`):
-the `start_position` check of ruling 1 would refuse scenario_40, scenario_41 and scenario_42 (robot_0 at (-950, -550),
-the centre of the landmark `corner_SW`, 20 × 20); and scenario_40 to 42's human_0 at (100, 550) and scenario_70 to
-73's robot_0 at (0, 0) lie exactly on the edge of `kitting_table_0`'s footprint, which the ruling's "outside" does
-not decide. scenario_40 is a maintained regression fixture, and stage 1 keeps scenarios unchanged in content. For
-cchat, before stage 1.
+MEASURED AT RECORD TIME, CLOSED BY RULING a (read-only, the registered scenarios against their registered layouts'
+fixed objects, a footprint being the object's `size` centred on its `position`): an object check would have refused
+scenario_40, scenario_41 and scenario_42 (robot_0 at (-950, -550), the centre of the landmark `corner_SW`), and left
+undecided the starts on the edge of `kitting_table_0` (scenario_40 to 42's human_0, scenario_70 to 73's robot_0).
+Every registered start lies inside its space's bounds.
 Files (stage 1 onward): shared/types.py (`ScenarioConfig`), mesa_sim/sim_model.py (the loader and validator),
 mesa_sim/run_mesa.py (`resolve_model_params`), mesa_sim/list_scenarios.py, domains/kitting/ and domains/dock_loading/
 (`env_layout*.json`, `scenarios.py`, `registry.py`), configs/experiment.yaml, tests/
-Reference: cchat, 26 September 2026; "An item's destination table is a fact of the station"; "T-H: the human behaviour
-model" (the T-H follow-up); TODO-47 (a), TODO-104, TODO-108, TODO-110, TODO-111
+Reference: cchat, 26 September 2026 (the rulings, and rulings a to d on ccode's survey and review); "An item's
+destination table is a fact of the station"; "T-H: the human behaviour model" (items 3 and 5; the T-H follow-up); T9;
+TODO-47 (a), TODO-102, TODO-104, TODO-108, TODO-110, TODO-111

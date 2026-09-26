@@ -460,16 +460,28 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   projector do not change. kitting and dock_loading migrate together; ros_sim stays parked (TODO-111). Each stage is
   its own ccode task:
   - stage 1: types (`ScenarioConfig` gains `setup` and `reference_layouts`, loses `name`), loader, resolver,
-    validator; every layout split into a layout file and a setup file, object ids unchanged, the dead spawn entries
-    deleted; scenarios unchanged in content and id.
+    validator; every registered layout split into a layout file and a setup file, object ids unchanged, the dead spawn
+    entries deleted (`env_layout99.json` stays an unregistered file); scenarios unchanged in content and id; the tests'
+    helpers move with the registry shape; the setup id added to the `[run_mesa]` line. Its docs pass covers the lines
+    the T-L survey found contradicted (kept here so it is not lost): CLAUDE.md, `domains/` holds "schemas, layouts,
+    scenarios" (no setups); CLAUDE.md, "Current phase", "Next is T-D"; CLAUDE.md, Running and the regression table
+    (`--layout` given as required; the old ids, until stage 3); CLAUDE.md, the `env_layout99.json` line;
+    `docs/handoffs/handoff_T-D_onward.md` §3, T-B1d, "the destination is a layout fact", and §5, "Next, in order: 1.
+    T-D"; `docs/glossary.md` §6 **departure** ("where the layout designates") and **task model** ("built from the task
+    model and the layout"), §6 **coverage** and §7 label B ("task model and layout"), all to read layout and setup;
+    the T-H follow-up entry of design_decisions.md, "`ScenarioConfig` keeps its fields (id, name, description,
+    agents)", to be marked superseded; the `env_layout` comment on `ScenarioConfig` in `shared/types.py`; and
+    `domains/README.md`, `README.md`, `shared/io_contracts.md`, which stage 1 rewrites.
   - stage 2: the scenarios package (one module per theme), registration by discovery; `list_scenarios` and the tests'
     helpers on the declared pairs.
-  - stage 3: descriptive ids, `docs/rename_table.md`, the four maintained sets regenerated under the new names, sweep
-    scripts and READMEs.
-  - stage 4: the run file and the override mechanism, the viewer reading it.
-  Acceptance after each stage: the four maintained sweeps run from scratch and diffed against the previous stage's
-  logs; no difference outside the lines the stage names (the triple line, the ids). design_decisions.md, "Layouts,
-  setups and scenarios: the three artefacts of a run".
+  - stage 3: descriptive ids, `docs/rename_table.md` (which says in one line that the frozen analysis scripts stay
+    frozen at their commit), the four maintained sets regenerated under the new names, sweep scripts and READMEs.
+  - stage 4: the run file and the override mechanism (three overridable facts: an agent's `start_position`, a fixed
+    object's position, a movable object's home container), the viewer reading it.
+  Acceptance at every stage: the four maintained sweeps run from scratch and diffed against the previous stage's
+  logs, no difference outside the lines the stage names (the triple line, the ids); AND pytest green. dock_loading's
+  TODO-104 stands and T-L must not worsen it. design_decisions.md, "Layouts, setups and scenarios: the three artefacts
+  of a run".
 - **T-D — Robustness in kitting, on T-C.** NEXT after T-L (was next after T-H's close-out; `docs/handoffs/handoff_T-D_onward.md`, its
   section "What T-D now stands on"). (Resumes on T-H's structure: T-D Q1 stays "what the robot infers and does
   when no hypothesis explains the evidence, inside `unknown` or outside it", with the record's ground-truth cases: a

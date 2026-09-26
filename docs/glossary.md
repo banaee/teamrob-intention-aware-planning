@@ -556,9 +556,9 @@ is suppressed by the prior; a belief-side matter.
 "coverage" for label B and "covered fraction" (or "the grade", f) for the evidence, never one for the other.
 
 **label C, purpose** — a property of the scenario, not of one behaviour: what the scenario's description says it is
-for, as text (e.g. "an unmodelled walk mid-delivery"). The only thing the author declares; what the script already
-holds is computed (**scenario composition**, **scenario coverage**, below), never declared, so no tag can drift from
-the script. CHANGED (T-H follow-up, 26 September 2026): label C was "experimental intent", with the value "declared
+for, as text (e.g. "an unmodelled walk mid-delivery"). The author declares the purpose and the scenario's two
+bindings, its setup and its reference layouts (§9, T-L); what the script contains is still computed (**scenario
+composition**, **scenario coverage**, below), never declared, so no tag can drift from the script. CHANGED (T-H follow-up, 26 September 2026): label C was "experimental intent", with the value "declared
 experimental condition"; it is now the purpose alone, and "condition" no longer names it (the word keeps its other
 meanings: an evaluation condition such as the prior or the oracle, and a predicate condition of a schema).
 An unmodelled behaviour in the record that the purpose does not cover means that the run contains unintended
@@ -654,13 +654,17 @@ room and shift, and a registry that binds each scenario to one layout. The defin
 dock_loading appear as examples only.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 
-**layout** — the room: the space, its zones, and the fixed objects with their positions. No movable object and no
-agent. Static. One file per layout, with a descriptive id. (Kitting: tables, shelves, machines, switches, landmarks.)
+**layout** — the room: the space, its zones, and the fixed objects with their positions, a fixed container
+included. No movable object and no agent. Static. One file per layout, with a descriptive id. (Kitting: tables,
+shelves, machines, switches, landmarks; dock_loading: bays, the gate, and the truck, a fixed container of the room as a
+shelf is.)
 Until T-L's stage 1 the layout JSON also held the setup's objects and dead agent spawn entries.
 
 **setup** — the shift: the movable objects that exist, each with its home container and, where the domain determines
 one through `destination_of`, its designated destination, and any other initial state the domain declares per movable
-object. Its container and destination ids name objects of a layout. One file per setup, with a descriptive id.
+object. Its container and destination ids name objects of a layout: a home container must exist in the layout; a
+designated destination must also have the type the schema declares for it. A different designation set is a different
+setup. One file per setup, with a descriptive id.
 (Kitting: the items, each on a shelf with its designated table; dock_loading: the pallets, with `subtype`, `is_empty`,
 `is_scanned`.) A new term.
 COLLISION, not resolved: DESIGN-16 (`docs/design_decisions.md`) says "travel/setup costs between tasks", the
@@ -669,24 +673,33 @@ scheduling sense (a cost of switching between tasks). That is the English word, 
 **scenario** — the episode: per agent its `start_position`, `assigned_tasks`, `observes` and, for a human, the
 human's script; the purpose, as description text (label C, §7); the one setup it binds (`setup`, required); and its
 reference layouts. A hand-written `ScenarioConfig` literal, registered by discovery at import of the domain package.
-Its id is descriptive and equals its Python variable; nothing is encoded in it.
+Its id is descriptive and equals its Python variable; nothing is encoded in it. Its assigned tasks and script state the
+table explicitly (a readability choice, not required by the model), checked against the setup's designations: a
+scenario fits a setup whose designations agree with its stated tables.
 → `shared/types.py`, `ScenarioConfig`.
 
 **reference layout** — a layout a scenario declares it runs on (`reference_layouts`, one or more). A binding the
-author makes, validated at load. A run that names no layout runs the scenario's first reference layout. The listing
-and batch runs enumerate the declared (layout, scenario) pairs, never the product of artefacts.
+author makes, validated at load. A run whose run file names no layout runs the scenario's first reference layout;
+`--layout` selects another registered layout (selection, not an override). A run on a layout outside the reference
+layouts is valid and is never a baseline; to make it one, the author adds the id. The listing and batch runs enumerate
+the declared (layout, scenario) pairs, never the product of artefacts.
 
-**run** — a triple (layout, setup, scenario) plus the run facts (gate, cost strategy, prior, θ), which stay run
-facts as ruled before. Validated at load before anything is built; the load-time replay follows. Baselines are keyed by the
-run: the layout id and the scenario id, plus the run options present; the setup is implied by the scenario.
+**run** — a triple (layout, setup, scenario) plus the run facts: gate, cost strategy, strategy, prior, separation
+stop, and the robot's task model (an evaluation condition chosen by whole schemas, §6; its default in the domain
+registry). θ is a constant, not a run fact. Validated at load before anything is built; the load-time replay follows.
+The triple is printed on the `[run_mesa]` start line. Baselines are keyed by the run: the layout id and the scenario
+id, plus the run options present; the setup is implied by the scenario (one setup per scenario).
 
 **run file** — a yaml (`configs/experiment.yaml`, or any yaml given by path) that states a run: the triple, the run
-options and an overrides block. The viewer reads and edits the same file.
+options and an overrides block. It may name all three artefacts; when it omits the layout, the scenario's first
+reference layout is run. The viewer reads and edits the same file.
 
 **override** — a change to one fact of a run's artefacts, applied at load before validation, from the run file's
-overrides block or `--override <path>=<value>`. A closed list: an agent's `start_position`; an agent's
-`assigned_tasks`; an object's position; a movable object's home container; a movable object's designated
-destination. The script and every id are not overridable. Each override is printed as one line next to the triple in
+overrides block or `--override <path>=<value>`. A closed list of three: an agent's `start_position`; a fixed
+object's position (a movable object's position is its container's); a movable object's home container. Not
+overridable: `assigned_tasks` (a variant is a new scenario), a designated destination (a different designation set is
+a different setup), the script, and every id inside an artefact. Choosing the layout is selection, not an
+override. Each override is printed as one line next to the triple in
 the run log. A run with an override is never a fixture or a baseline. Not an injection: a change during a run is Phase
 7's injection path (**inject**, §6).
 
