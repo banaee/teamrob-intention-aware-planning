@@ -189,7 +189,8 @@ What changed in this chat (details in sections 3 and 4):
   that is the mechanism (`single_task` takes the cheapest task from here; `full_reorder` takes the
   task whose delivery leaves the robot best placed for the remaining shelves), not a weakness. R1 of
   the prompt was wrong (a scenario cannot change a designation; the destination is a layout fact,
-  T-B Q1). `analysis/tb1d_designations/README.md`; TODO-47 (f) corrected. (The number 84 was later
+  T-B Q1 — SUPERSEDED IN STORAGE by T-L stage 1: the designation is stored in the setup, the form
+  stands). `analysis/tb1d_designations/README.md`; TODO-47 (f) corrected. (The number 84 was later
   reused for a play script on layout8; no conflict, T-B1d registered nothing.)
 - **T-B Q6** (cchat): reduced to a table and a regression set; no claim sentences; see section 4.
 - **T-B3** (`25ccb1b` CLAUDE.md fixtures rule, `58eb347` record, `e76f2d8` follow-up): 20 runs (s80,
@@ -323,7 +324,8 @@ method; (c) `expand()` accepts any `WorldState`, run `check_script_bindings` on 
 Done: Phase 4C; T-A; T-B (T-B1a to T-B1d, T-B2a to T-B2d, T-B Q6, T-B Q7, T-B3); D3; TODO-90; T-C
 (T-C1, T-C2a, T-C2b, T-C2c, play).
 
-Next, in order, for the new chat:
+Next, in order, for the new chat (T-L inserted before T-D, ruled 26 Sept 2026; design_decisions.md,
+"Layouts, setups and scenarios"):
 1. **T-D**, robustness in kitting on the script: the opening agenda in section 6.
 2. **T-E**, the viewer: shows belief, admitted projection, decision, hold, refusal, and now the
    script's events; check `mesa_sim/viz/` first.

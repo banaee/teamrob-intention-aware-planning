@@ -3995,7 +3995,8 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
 - (T-H follow-up, as built) SCENARIO COMPOSITION AND SCENARIO COVERAGE (Hadi, cchat, 26 September 2026). Batch runs
   and the viewer will select scenarios by what they contain; a tag declared on the scenario would be a second copy of
   the script and could drift, so both are computed at load and never stored: `ScenarioConfig` keeps its fields (id,
-  name, description, agents). `world/composition.py`: `scenario_composition(script, robot) -> (Composition,
+  name, description, agents) [SUPERSEDED, T-L stage 1: `name` is dropped and `setup` / `reference_layouts` are added
+  ("Layouts, setups and scenarios", rulings 3 and 4); the computed-never-stored principle stands]. `world/composition.py`: `scenario_composition(script, robot) -> (Composition,
   ScenarioCoverage)`, against an `ObservingRobot`. `Composition` holds four sets of existing types: the task classes
   (`WorkTask` / `PersonalTask` / `HumanOnlyTask`, the most specific, over `Script.tasks()`), the decisions (`Start` /
   `Drop`) and the triggers (`AfterAction` / `DuringAction`) over the entries' events, and the coverage results

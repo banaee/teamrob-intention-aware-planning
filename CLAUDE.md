@@ -63,7 +63,7 @@ Layering: four homes
   `mesa_sim/` or `ros_sim/`.
 - `world/` is the world's side (T-H2): simulator-agnostic, use-case-agnostic code about what the human is and
   does (the human's executor and stack machine, the executor's record). It imports `shared/` only: no body, no use case. The robot's mind never reads it.
-- `domains/` holds the use cases (kitting, dock_loading): schemas, layouts, scenarios.
+- `domains/` holds the use cases (kitting, dock_loading): schemas, layouts, setups, scenarios.
 - `mesa_sim/` and `ros_sim/` are the bodies. A body may import from `shared/`, `world/` and `domains/`;
   it drives the human's executor and executes the robot's decisions.
 - `shared/` holds no simulator constant and no unit-scale default. Whatever depends on the body
@@ -121,8 +121,9 @@ Decisions
   the `HumanOnlyTask` `go_to_and_stand` added, the C1 script layer deleted) and T-H4 (the record's typed queries in
   `world/queries.py`: `truth_at`, `switches`, `resumptions`, `assigned`, `unperformed`, `coverage`, on the in-memory
   record; task equality `same_task`; the `[coverage]` line at load) are built. T-H is closed (26 Sept 2026; the
-  close-out in `docs/handoffs/handoff_T-H.md`: commits, acceptance, deferred items). Next is T-D, on T-H's structure
-  (`docs/handoffs/handoff_T-D_onward.md`, "What T-D now stands on"); it starts with its design in cchat. Not to be
+  close-out in `docs/handoffs/handoff_T-H.md`: commits, acceptance, deferred items). Next is T-L (the three artefacts
+  of a run, stages 1 to 4; design_decisions.md, "Layouts, setups and scenarios"), then T-D, on T-H's structure
+  (`docs/handoffs/handoff_T-D_onward.md`, "What T-D now stands on"); T-D starts with its design in cchat. Not to be
   started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
@@ -142,7 +143,7 @@ Decisions
   touch `domains/dock_loading/`; it must still import and run (design_decisions.md, "Layouts, setups and scenarios",
   ruling 8).
 - `domains/kitting/env_layout99.json` is the old `env_layout1` with obstacles, kept for later and
-  not registered.
+  not registered; it stays unsplit (T-L stage 1).
 - The code is the source of truth. Docs are maintained but can lag. Do not change code to match
   docs; report the contradiction. Edit docs only when the task says so.
 
@@ -221,7 +222,7 @@ silently running the large one.
 Interpreter: `~/python-envs/teamrob-sp4-env/bin/python`.
 
 ```bash
-# headless; --domain/--layout/--scenario are all needed for non-default scenarios
+# headless; --layout is optional (T-L stage 1): a run that names none takes the scenario's first reference layout
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout3 --scenario scenario_30 --steps 200
 # evaluation switch (default off): robot knows the observed human's assigned-task pool
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout3 --scenario scenario_30 --steps 200 --assignment_prior true

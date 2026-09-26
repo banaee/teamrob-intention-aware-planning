@@ -16,50 +16,53 @@ The `kitting/` domain is the authoritative reference. When in doubt, look there 
 
 ## 1. Folder structure
 
-Each domain package contains the same five files:
+Each domain package contains the same files:
 
 ```
 domains/<your_domain>/
     __init__.py
     tasks.py            # TaskSchema definitions  — HTN compound tasks
     actions.py          # ActionSchema defs     — HTN primitive actions (leaves)
-    registry.py         # assembles DomainModel, declares intention set
+    registry.py         # builds the Tree, declares the task model; lists layouts,
+                        # setups and scenarios (domain_config)
     scenarios.py        # ScenarioConfig objects  — concrete agent assignments
-    env_layout.json     # named locations and zones in the environment
+    script.py           # the call forms the scenarios are written in (kitting)
+    env_layout<N>.json  # a layout — the room (one file per layout)
+    env_setup<N>.json   # a setup — the shift (one file per setup)
 ```
 
 ---
 
-## 2. env_layout.json — spatial constants
+## 2. The three artefacts of a run (T-L; docs/glossary.md §9)
 
-This file defines the named locations, zones, and fixed objects in the environment. Coordinates use a center-origin system `(0,0)` that matches the simulator grid directly.
+A run is a triple (layout, setup, scenario) plus the run options.
 
-Every named location or object that appears in `tasks.py` or `actions.py` must have an entry here. Zones use the convention `zone_<descriptor>`. This file contains no logic — only named spatial anchors.
+**Layout — the room** (`env_layout<N>.json`): the space, its zones, and the fixed objects
+with their positions (tables, shelves, machines, switches, landmarks; a fixed container
+such as a truck belongs here too). No movable object and no agent. Coordinates use a
+center-origin system `(0,0)` that matches the simulator grid directly. Zones use the
+convention `zone_<descriptor>`. Top-level keys: `"space"`, `"zones"`, `"env_objects"`.
+Every fixed object has a `"position"` and never an `"initial_container"`.
 
-**JSON structure rules:**
-All static physical objects — shelves, tables, machines, obstacles, delivery areas,
-gates, doors — go in the `"env_objects"` list with a `"type"` field. Do not create
-new top-level sections for new object types.
-Only these top-level keys are valid alongside `"env_objects"`:
+**Setup — the shift** (`env_setup<N>.json`): the movable objects that exist, in one
+`"env_objects"` list. Each entry has an `"initial_container"` (its home container, an
+object of the layout), a `"destination"` where the domain determines one through
+`destination_of` (kitting: the item's designated table), and any other per-object state
+the domain declares (dock_loading: `subtype`, `is_empty`, `is_scanned`). A different
+designation set is a different setup.
 
-- `"space"` — dimensions and units of entire environment space
-- `"zones"` — IR context zones with bounds
-- `"items"` — movable objects with runtime state
-- `"robots"` — robot agent spawn configs
-- `"humans"` — human agent spawn configs
+**Scenario — the episode** (`scenarios.py`): per agent its `start_position`,
+`assigned_tasks`, `observes` and, for a human, the script; the purpose as `description`;
+the one `setup` it binds; and its `reference_layouts` (one or more layout ids). A run that
+names no layout takes the scenario's first reference layout; `--layout` selects another
+registered layout.
 
-**`items` vs `env_objects` — the actual criterion:** not "movable vs static."
-An object goes in `items` if a task schema references it via an unbound `Var`
-that IR must enumerate over multiple candidates (e.g. `deliver_item(?item)` —
-could be any known item, one hypothesis per instance). An object goes in
-`env_objects` if a task schema references it as a fixed `Const` already
-resolved at design time (e.g. `coffee_break`'s target is `Const("coffee_machine_0")`,
-not `Var`) — singular and unambiguous, nothing to enumerate. If a domain ever
-needs multiple instances of something currently modeled as a fixed `Const`
-(e.g. a second coffee machine), it conceptually belongs in `items`, regardless
-of which JSON key it's under. `items` is a generic term for "enumerable
-deliverable/target thing" across domains — not kitting-specific; dock_loading's
-pallets are also `items` under this convention.
+The loader validates the triple at load: every home container of the setup is an object of
+the layout; every designated destination is an object of the layout with the type the
+schema declares; every task binding names an object of the layout or setup with the
+schema's type; every assigned task agrees with the setup's designations; every
+`start_position` lies inside the space's bounds. A failure names the artefact and the
+mismatch.
 
 ---
 
@@ -122,14 +125,11 @@ The registry assembles all tasks and actions into a `DomainModel` and declares t
 
 ## 7. scenarios.py — concrete agent assignments
 
-A `ScenarioConfig` assigns concrete task instances to each agent, with all parameters bound to specific values. Foreseeable tasks sit inline in the human's task list at the position where the deviation is expected. See `domains/kitting/scenarios.py` for the pattern.
+A `ScenarioConfig` assigns concrete task instances to each agent, with all parameters bound to specific values; it declares its `setup` and its `reference_layouts` (section 2). The human's script is a `Script` of task instances with events (T-H). See `domains/kitting/scenarios.py` for the pattern.
 
-### Scenario Naming Convention
+### Scenario ids
 
-Scenario names are prefixed by their layout number so the layout–scenario relationship is visible from the name alone:
-
-- `env_layout0` → `scenario_00`, `scenario_01`, ...
-- `env_layout1` → `scenario_10`, `scenario_11`, ...
+Scenario ids are currently prefixed by their layout number (`scenario_30` on `env_layout3`); T-L's stage 3 renames every layout, setup and scenario to a descriptive snake_case id with nothing encoded.
 
 ---
 

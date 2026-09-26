@@ -43,8 +43,8 @@ Each domain defines:
 
 - **Action schemas** — HTN primitive tasks (directly executable)
 - **Task schemas** — HTN non-primitive tasks (decompose via methods)
-- **Scenarios** — typed agent assignments and task instances
-- **Environment layout** — JSON spatial configuration
+- **Scenarios** — typed agent assignments and task instances; each declares its setup and its reference layouts
+- **Layouts and setups** — JSON files: the room (space, zones, fixed objects) and the shift (movable objects, home containers, designated destinations); a run is the triple (layout, setup, scenario)
 
 Currently implemented: `domains/kitting/` (industrial kitting), `domains/dock_loading/`
 (truck unloading, modeled on HITS3 Scenario 2)
@@ -107,8 +107,10 @@ Use any IDE (e.g., [VS Code](https://code.visualstudio.com/)) or editor of your 
 ```bash
 python mesa_sim/run_mesa.py
 python mesa_sim/run_mesa.py --scenario scenario_00 --steps 200
-python mesa_sim/run_mesa.py --domain dock_loading --layout env_layout1 --scenario scenario_10
+python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_10
 ```
+
+`--layout` is optional: a run that names none takes the scenario's first reference layout.
 
 Logs are written to `logs/run_<timestamp>.log` as well as stdout.
 
@@ -145,10 +147,10 @@ teamrob-intention-aware-planning/
 │   ├── kitting/
 │   │   ├── actions.py              # HTN primitive tasks
 │   │   ├── tasks.py                # HTN non-primitive tasks
-│   │   ├── registry.py             # DomainModel construction
+│   │   ├── registry.py             # Tree construction; layouts, setups, scenarios
 │   │   ├── scenarios.py            # Scenario definitions
-│   │   ├── env_layout0.json        # Environment spatial layout
-│   │   └── env_layout1.json
+│   │   ├── env_layout0.json        # A layout — the room
+│   │   └── env_setup0.json         # A setup — the shift
 │   └── dock_loading/               # Same structure
 │
 ├── mesa_sim/                    # Mesa embodiment layer

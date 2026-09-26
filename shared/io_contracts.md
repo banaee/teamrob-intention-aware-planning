@@ -57,11 +57,12 @@ conversion, and a stationary action whose schema names a duration binding (`Acti
 `wait_at`'s `?duration`) is projected at that duration (TODO-32 closed).
 
 **Re-aligned after F47b (September 2026)** for §4.1 and §6: a scheduled or assigned task's bindings are
-TYPED — every bound object exists in the layout with the type the schema's `parameter_types` declares —
-and the embodiment checks this at spawn (`shared.types.check_task_bindings`), an error, not a warning.
+TYPED — every bound object exists in the run's layout or setup with the type the schema's `parameter_types`
+declares — and the embodiment checks this at spawn (`shared.types.check_task_bindings`), an error, not a warning.
 
-**Re-aligned after T-B1a and its follow-ups (September 2026):** an item's destination table is a layout
-fact (`WorldState.object_destination`, §1.3), reached through the planner lookup `destination_of` (§2.3) and
+**Re-aligned after T-B1a and its follow-ups (September 2026):** an item's destination table is a fact of the
+station, stored in the setup since T-L's stage 1
+(`WorldState.object_destination`, §1.3), reached through the planner lookup `destination_of` (§2.3) and
 declared at the task as a determined parameter (`TaskSchema.determined_parameters`, §1.6); the recognizer
 does not enumerate it (§2.1), and the prior matches assigned tasks on the enumerated parameters only (§2.1).
 design_decisions.md, "An item's destination table is a fact of the station".
@@ -165,8 +166,8 @@ class WorldState:
     object_zones: Dict[str, str] = {}                            # {item_id: zone_id}
     object_home_container: Dict[str, str] = {}                   # {item_id: original container_id}; static per
                                                                  # scenario, for the deliver_with_return guard
-    object_destination: Dict[str, str] = {}                      # {item_id: destination_id}; static per scenario,
-                                                                 # the layout's "destination" (kitting: the item's
+    object_destination: Dict[str, str] = {}                      # {item_id: destination_id}; static per run,
+                                                                 # the setup's "destination" (kitting: the item's
                                                                  # designated table), read via `destination_of` (§2.3)
     object_positions: Dict[str, Tuple[float, float]] = {}        # {obj_id: (x, y)}: env objects and items
     metadata: Dict[str, Any] = {}
@@ -537,7 +538,7 @@ an entry with its events. An event is `Event(Trigger, Decision)`: `Trigger` is `
 stated.
 
 **At load** (`SimModel`): every task the script names (`Script.tasks()`: each entry's and each `Start`'s) is type-checked
-against the layout (`check_task_bindings`; a duration through the body's parser); the destination check
+against the run's layout and setup (`check_task_bindings`; a duration through the body's parser); the destination check
 (`check_task_destinations`) applies to the assigned tasks, never to the script. Then the load-time replay
 (`world/human_executor.check_script`) drives the stack machine symbolically through the whole script, the state
 advancing by `shared.projection.successor_state()`: every anchor is checked against the sequential expansion, events
@@ -586,7 +587,7 @@ it will do them. It restricts the SUPPORT, not the magnitude: the admissible set
 compared as `HypothesisKey` values (T-H); every other hypothesis is pinned at
 `BELIEF_FLOOR` and never scored. An assigned task is matched to a hypothesis on the ENUMERATED parameters
 only: the `HypothesisKey` built from its bindings minus its schema's `determined_parameters` (T-B1a follow-up
-2). A determined binding (the table) is not compared here; its agreement with the layout is checked at load
+2). A determined binding (the table) is not compared here; its agreement with the setup's designations is checked at load
 by the embodiment (`shared.types.check_task_destinations`, §4.1), which rejects a disagreeing scenario before
 the recognizer is built. An assigned task matching no hypothesis is logged as a warning, naming its
 `task_instance_key()`, and ignored.
@@ -1147,8 +1148,8 @@ selection) and a method's `derived_vars` (after it): `zone_of` → `world.object
 `world.object_home_container`, `destination_of` → `world.object_destination` (T-B1a). Precedence: only
 `destination_of` yields to a binding the task instance already carries (a scripted deviation keeps its
 table); the others always derive. A `destination_of` lookup with no value raises `ValueError`, not
-`DecompositionError`: a destination is a static layout fact required at load, so its absence is a modelling
-error, never a hypothesis left unscorable.
+`DecompositionError`: a destination is a static fact of the run's setup required at load, so its absence is a
+modelling error, never a hypothesis left unscorable.
 
 #### Is Complete
 ```python
@@ -1217,19 +1218,28 @@ Domain knowledge lives outside `shared/` in domain-specific Python packages.
 domains/kitting/
     tasks.py           # TaskSchema definitions — HTN non-primitive tasks
     actions.py          # ActionSchema definitions — HTN primitive tasks (leaves)
-    registry.py        # builds the Tree (T-H), declares the task model a robot is given
+    registry.py        # builds the Tree (T-H), declares the task model a robot is given,
+                       # and lists layouts and setups by id and file and the scenarios (T-L)
     scenarios.py       # ScenarioConfig objects — typed Python, no YAML
     script.py          # the call forms of the human's script: deliver_item(...), go_to(...), stand(...), ... §1.12
-    env_layout0.json   # environment spatial layout (one file per layout)
-    env_layout1.json
+    env_layout0.json   # a layout — the room: space, zones, fixed objects with positions (one file per layout)
+    env_setup0.json    # a setup — the shift: the movable objects, each with its home container,
+                       # its designated destination and its other per-object state (one file per setup)
 ```
+
+The three artefacts of a run (T-L, `docs/glossary.md` §9): the layout (the room), the setup (the
+shift) and the scenario (the episode). A scenario declares its `setup` (one id) and its
+`reference_layouts` (one or more layout ids); the run's triple is (layout, setup, scenario), the
+layout the run names or the scenario's first reference layout. The registry lists layouts and
+setups by id and file; the scenario list is hand-written until T-L's stage 2 (discovery).
 
 The human's stack machine and its load-time replay are world-side, use-case-agnostic
 (`world/human_executor.py`, §1.12); `domains/script.py` was deleted in T-H3.
 
 **Corrections from previous versions:** the file is `actions.py`, not `ActionSchemas.py`;
-layout files are `env_layout0.json` / `env_layout1.json`, not `env1_layout.json`. Each
-layout carries its own scenarios, registered in `registry.py`'s `domain_config["layouts"]`.
+layout files are `env_layout0.json` / `env_layout1.json`, not `env1_layout.json`. Until T-L's
+stage 1 one layout JSON also held the setup's objects and dead agent spawn entries, and each
+layout carried its own scenarios in `registry.py`'s nested `domain_config["layouts"]`.
 
 **HTN alignment:**
 - `TaskSchema` = non-primitive task — decomposes via `MethodSchema`
@@ -1285,16 +1295,22 @@ a declared relocation".
   produced under: `gate_strategy`, `cost_strategy`, `separation_stop`, θ, ρ, `min_separation` and its
   ratio × rate (TODO-78); a run option (`--gate_strategy`, `--cost_strategy`, `--separation_stop`,
   `configs/experiment.yaml`) is a run fact, never a scenario fact
-- Checks every agent's scheduled and assigned task bindings against the layout at spawn
+- Loads the run's layout (space, zones, fixed objects) and setup (movable objects) and validates the
+  triple before anything is built (T-L, stage 1): a layout entry has a position and no home container, a
+  setup entry has one; every home container the setup names is an object of the layout; every agent's
+  `start_position` lies inside the space's bounds (the body's own `out_of_bounds`, half-open; objects are
+  not obstacles for a start, ruling a). A failure names the artefact and the mismatch
+- Checks every agent's scheduled and assigned task bindings against the run's layout and setup at spawn
   (`shared.types.check_task_bindings`, F47b): the bound object exists and carries the type the schema's
   `parameter_types` declares; a mismatch raises. A task the domain does not describe is never executed by
   the human and never invisible to the robot by accident (TODO-49; declared unmodelled behaviour is
   TODO-80)
-- Checks the layout's destinations at load (T-B1a): every object of a type some task determines a parameter
+- Checks the setup's destinations at load (T-B1a; stored in the setup since T-L's stage 1): every object of
+  a type some task determines a parameter
   from through `destination_of` declares `"destination"`, naming an object of the layout of the type the
   schema declares (`Tree.get_types_with_destination`); and, where each robot's task model is built, the robot's
-  own `assigned_tasks` and those of the agent it observes bind the destination the layout designates (`shared.types.check_task_destinations`), an error naming the task,
-  the item and both tables. The human's `scheduled_tasks` is not checked against the layout's destinations:
+  own `assigned_tasks` and those of the agent it observes bind the destination the setup designates (`shared.types.check_task_destinations`), an error naming the task,
+  the item and both tables. The human's `scheduled_tasks` is not checked against the setup's destinations:
   the script may send an item elsewhere. Every task the script names (`Script.tasks()`) is checked for binding
   as above (T-H: types only)
 - Checks each human's script from the initial world after spawning by the load-time replay (§1.12,
@@ -1372,7 +1388,7 @@ Simulators MUST ensure:
     task-completion ticks it supplies are the ticks its executor actually spends (L2, F1)
 
 ---
-13. Every scheduled and assigned task's bindings name objects that exist in the layout with the types
-    the schema's `parameter_types` declares; the embodiment refuses the scenario at spawn otherwise
+13. Every scheduled and assigned task's bindings name objects that exist in the run's layout or setup with
+    the types the schema's `parameter_types` declares; the embodiment refuses the scenario at spawn otherwise
     (`check_task_bindings`, F47b). Fixtures may not rely on an ill-typed instance. Every assigned delivery
-    binds the table the layout designates for its item (`check_task_destinations`, T-B1a)
+    binds the table the setup designates for its item (`check_task_destinations`, T-B1a)

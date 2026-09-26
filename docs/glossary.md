@@ -318,7 +318,8 @@ station's, or a **departure**. Replaces the `task_instance_key` comparisons (TOD
 → `shared/types.py`, `same_task()`, `goal_bindings()`.
 
 **departure** (T-H4) — `Departure(var, designated, stated)`: a stated determined binding that is not the station's
-(`deliver_item("item_1", table="kitting_table_2")` where the layout designates `kitting_table_0`). The binding-level
+(`deliver_item("item_1", table="kitting_table_2")` where the setup designates `kitting_table_0`; the layout stored the
+designation until T-L's stage 1). The binding-level
 deviation of a delivery to another table; `assigned` reports it, and it makes coverage `BINDING_ABSENT`.
 `check_task_destinations` refuses an assigned task with one.
 → `shared/types.py`, `destination_departures()`.
@@ -377,7 +378,8 @@ schemas; the other knowledge object, one per robot, built from the tree in the e
 left out (the robot plans its own tasks with it); a `PersonalTask` may be omitted per experiment; a `HumanOnlyTask` is
 rejected when a task model is built (`TaskModel`'s constructor, T-H1 ruling). The robot's recognizer, projector and
 planner use the task model only; the robot's inference reads no human-only-ness, only the construction-time
-validation of the knowledge objects does. The hypothesis space is built from the task model and the layout. The
+validation of the knowledge objects does. The hypothesis space is built from the task model and the run's layout and
+setup (until T-L's stage 1, one layout file held both). The
 class of a schema is read in one place in the robot's mind, the support restriction: admissible = the hypotheses of
 the `WorkTask` instances in the assigned tasks, every hypothesis of a `PersonalTask` in the task model, and `unknown`,
 compared as `HypothesisKey` values.
@@ -465,7 +467,7 @@ meaning (any departure from the work order, label A): a switch to a `PersonalTas
 deviation.
 
 **coverage** — `coverage(task, robot)`, a query on the record, judged per task instance on the stack against the
-robot's task model and layout (not against the support the assignment prior narrows). Values: `COVERED`;
+robot's task model and the run's layout and setup (not against the support the assignment prior narrows). Values: `COVERED`;
 `TASK_ABSENT` (the schema is not in the task model: every `HumanOnlyTask`, and a `PersonalTask` omitted per
 experiment); `BINDING_ABSENT` (the schema is, the binding is not: a wrong-table delivery, since a hypothesis carries the
 item's designated table). An interrupted task is `COVERED` when its own instance is; its interruption is judged on its
@@ -548,7 +550,7 @@ task on the stack"), neither modelled nor unmodelled. (The 24 September follow-u
 unmodelled; under T-H a stand the script writes is the `stand` task, `TASK_ABSENT`, and the empty stack has no
 coverage.) Coverage is judged per task instance on the stack: an interrupted delivery is `COVERED`, its interruption is
 judged on its own.
-Coverage is judged against the robot's task model and layout, not against the support that `--assignment_prior`
+Coverage is judged against the robot's task model and the run's layout and setup, not against the support that `--assignment_prior`
 narrows. The prior is part of the belief, not of the model, so a prior-on and a prior-off run of the same script have
 the same ground truth. Consequence: under prior-on, an unassigned `WorkTask` instance is modelled, and its hypothesis
 is suppressed by the prior; a belief-side matter.
