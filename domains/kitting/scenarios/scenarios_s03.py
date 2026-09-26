@@ -15,12 +15,12 @@ from domains.kitting.script import deliver_item, coffee_break, stand, go_to_and_
 
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout2".
+# manually defined scenarios, for only "env_layout_03".
 # ===============================================================
-scenario_20 = ScenarioConfig(
-    id="scenario_20",
+scenario_s03_01 = ScenarioConfig(
+    id="scenario_s03_01",
     setup="env_setup_03",
-    reference_layouts=["env_layout2"],
+    reference_layouts=["env_layout_03"],
     description=(
         "Phase 4C B2/B3 fixture. The robot's cheapest task (item_4: 54 ticks at t=0, vs item_6 "
         "71 and item_7 103, at 20 cm/tick) is the conflicted one, so the t=0 pick lands on it by "
@@ -72,10 +72,10 @@ scenario_20 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_22 = ScenarioConfig(
-    id="scenario_22",
+scenario_s03_02 = ScenarioConfig(
+    id="scenario_s03_02",
     setup="env_setup_03",
-    reference_layouts=["env_layout2"],
+    reference_layouts=["env_layout_03"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, walks to corner_SE with it and stays 30 ticks, finishes the delivery, then delivers item_2."
@@ -110,10 +110,10 @@ scenario_22 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_23 = ScenarioConfig(
-    id="scenario_23",
+scenario_s03_03 = ScenarioConfig(
+    id="scenario_s03_03",
     setup="env_setup_03",
-    reference_layouts=["env_layout2"],
+    reference_layouts=["env_layout_03"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_3, stays 40 ticks at the table while the robot converges on it, then delivers item_2."
@@ -149,10 +149,10 @@ scenario_23 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_24 = ScenarioConfig(
-    id="scenario_24",
+scenario_s03_04 = ScenarioConfig(
+    id="scenario_s03_04",
     setup="env_setup_03",
-    reference_layouts=["env_layout2"],
+    reference_layouts=["env_layout_03"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to item_3, turns without picking it up, delivers item_2."
@@ -186,10 +186,10 @@ scenario_24 = ScenarioConfig(
     ],
 )
 
-scenario_21 = ScenarioConfig(
-    id="scenario_21",
+scenario_s03_05 = ScenarioConfig(
+    id="scenario_s03_05",
     setup="env_setup_03",
-    reference_layouts=["env_layout2"],
+    reference_layouts=["env_layout_03"],
     description=(
         "Phase 4C B2/B3 fixture. The robot's cheapest task (item_4: 54 ticks at t=0, vs item_6 "
         "71 and item_7 103, at 20 cm/tick) is the conflicted one, so the t=0 pick lands on it by "
@@ -241,33 +241,33 @@ scenario_21 = ScenarioConfig(
 
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout5" (env_layout2 + rest_0).
+# manually defined scenarios, for only "env_layout_06" (env_layout_03 + rest_0).
 # ===============================================================
-scenario_50 = ScenarioConfig(
-    id="scenario_50",
+scenario_s03_06 = ScenarioConfig(
+    id="scenario_s03_06",
     setup="env_setup_03",
-    reference_layouts=["env_layout5"],
+    reference_layouts=["env_layout_06"],
     description=(
-        "End-state variant of scenario_20 (F47, retyped F47b). Identical to scenario_20 in every task, "
+        "End-state variant of scenario_s03_01 (F47, retyped F47b). Identical to scenario_s03_01 in every task, "
         "position and pool; the one change is a third human task after its last delivery: "
-        "coffee_break at coffee_machine_0, a coffee machine 500 cm east of the table (env_layout5 = "
-        "env_layout2 + the machine; until F47b it was a waypoint rest_0, an ill-typed binding). The human "
+        "coffee_break at coffee_machine_0, a coffee machine 500 cm east of the table (env_layout_06 = "
+        "env_layout_03 + the machine; until F47b it was a waypoint rest_0, an ill-typed binding). The human "
         "leaves the table for the machine instead of idling at it, stands there for the schema's PT60S and "
         "then idles THERE, so the robot's remaining table deliveries meet a free table. Because the "
         "machine exists, coffee_break(coffee_machine_0) is a hypothesis for the whole run (both priors), "
-        "which scenario_20 has not - the recognizer's live set differs from scenario_20's from t=0: "
+        "which scenario_s03_01 has not - the recognizer's live set differs from scenario_s03_01's from t=0: "
         "prior-on the first crossing moves from 6 to 8 (the hold of 8 with it, so the robot's whole "
         "timeline shifts 2 ticks and it now meets the departing human at 57-58 as prior-off does); "
         "prior-off an extra theta_crossed at 140 (coffee_break clears theta on the walk) re-confirms item_6. "
         "Measured (F47b, stop on): completes at 237 (prior off) / 239 (prior on) under both priors; "
-        "scenario_20 with the stop on is refused at the table from tick 144 to the cap. Stop off: "
-        "235 / 237 (scenario_20: 235 / 239). Earlier measurement with the waypoint (F47): "
-    "stop on): identical to scenario_20 until tick 124 (the human's item_2 placement); the human "
+        "scenario_s03_01 with the stop on is refused at the table from tick 144 to the cap. Stop off: "
+        "235 / 237 (scenario_s03_01: 235 / 239). Earlier measurement with the waypoint (F47): "
+    "stop on): identical to scenario_s03_01 until tick 124 (the human's item_2 placement); the human "
     "walks off at 125, stands at (477, 399) on 149-179; the robot's item_6 delivery, refused from "
-    "tick 144 to the cap in scenario_20, goes through and the run completes at 239 under both "
-    "priors (prior-off keeps scenario_20's 2-tick stop at 57-58). Stop off: 237 / 239 (scenario_20: "
+    "tick 144 to the cap in scenario_s03_01, goes through and the run completes at 239 under both "
+    "priors (prior-off keeps scenario_s03_01's 2-tick stop at 57-58). Stop off: 237 / 239 (scenario_s03_01: "
     "235 / 239). Reported next "
-        "to scenario_20, not instead of it: 'stays at the place' and 'steps aside after its last task' "
+        "to scenario_s03_01, not instead of it: 'stays at the place' and 'steps aside after its last task' "
         "are the two end-state conditions (design_decisions.md, 'After C'; TODO-47 (d)). The walk to "
         "the machine (bearing 0 deg from the table) is >= 51 deg off every shelf, so no delivery "
         "hypothesis fits it."
@@ -305,10 +305,10 @@ scenario_50 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_51 = ScenarioConfig(
-    id="scenario_51",
+scenario_s03_07 = ScenarioConfig(
+    id="scenario_s03_07",
     setup="env_setup_03",
-    reference_layouts=["env_layout5"],
+    reference_layouts=["env_layout_06"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "One table, so no wrong destination: human walks to item_2, turns without picking it up, delivers item_3."
@@ -343,10 +343,10 @@ scenario_51 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_52 = ScenarioConfig(
-    id="scenario_52",
+scenario_s03_08 = ScenarioConfig(
+    id="scenario_s03_08",
     setup="env_setup_03",
-    reference_layouts=["env_layout5"],
+    reference_layouts=["env_layout_06"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, walks to corner_NW with it and stays 30 ticks, finishes the delivery, then delivers item_2."
@@ -381,10 +381,10 @@ scenario_52 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_53 = ScenarioConfig(
-    id="scenario_53",
+scenario_s03_09 = ScenarioConfig(
+    id="scenario_s03_09",
     setup="env_setup_03",
-    reference_layouts=["env_layout5"],
+    reference_layouts=["env_layout_06"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_3 and item_2, stays 40 ticks at the table, then takes a coffee break."

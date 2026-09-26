@@ -2,8 +2,9 @@
 """
 A scenario's composition and its scenario coverage (world/composition.py; T-H
 follow-up), computed at load from the script and an observing robot: the
-scenario coverage of s11, s02, s85, s04, s03; s11 against a task model without
-coffee_break; the exit-walk exemption; the four sets of s11; the
+scenario coverage of scenario_s02_02, scenario_s01_03, scenario_s06_06,
+scenario_s01_05, scenario_s01_04; scenario_s02_02 against a task model without
+coffee_break; the exit-walk exemption; the four sets of scenario_s02_02; the
 [scenario-coverage] line.
 Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_th_composition.py
 """
@@ -45,11 +46,11 @@ def script_of(layout, sid):
 
 
 @pytest.mark.parametrize("layout,sid,expected", [
-    ("env_layout1", "scenario_11", ScenarioCoverage.MODELLED_ONLY),
-    ("env_layout0", "scenario_02", ScenarioCoverage.MODELLED_ONLY),
-    ("env_layout8", "scenario_85", ScenarioCoverage.BINDING_ABSENT),
-    ("env_layout0", "scenario_04", ScenarioCoverage.TASK_ABSENT),
-    ("env_layout0", "scenario_03", ScenarioCoverage.TASK_ABSENT),
+    ("env_layout_02", "scenario_s02_02", ScenarioCoverage.MODELLED_ONLY),
+    ("env_layout_01", "scenario_s01_03", ScenarioCoverage.MODELLED_ONLY),
+    ("env_layout_08", "scenario_s06_06", ScenarioCoverage.BINDING_ABSENT),
+    ("env_layout_01", "scenario_s01_05", ScenarioCoverage.TASK_ABSENT),
+    ("env_layout_01", "scenario_s01_04", ScenarioCoverage.TASK_ABSENT),
 ])
 def test_scenario_coverage(layout, sid, expected):
     _, scenario_coverage = scenario_composition(script_of(layout, sid), model_for(layout, sid).observing[R])
@@ -57,17 +58,17 @@ def test_scenario_coverage(layout, sid, expected):
 
 
 def test_a_task_model_without_coffee_break_moves_s11_to_task_absent():
-    m = model_for("env_layout1", "scenario_11")
+    m = model_for("env_layout_02", "scenario_s02_02")
     model = TaskModel(m.tree, [s for s in domain_config["task_model"] if s is not tasks.coffee_break])
     without = ObservingRobot(model, frozenset(build_hypothesis_space(model, m._objects_by_type)),
                              m.observing[R].destinations)
-    composition, scenario_coverage = scenario_composition(script_of("env_layout1", "scenario_11"), without)
+    composition, scenario_coverage = scenario_composition(script_of("env_layout_02", "scenario_s02_02"), without)
     assert scenario_coverage is ScenarioCoverage.TASK_ABSENT
     assert composition.coverage == frozenset({Covered, TaskAbsent})
 
 
 def test_the_exit_walk_is_not_counted():
-    robot = model_for("env_layout0", "scenario_04").observing[R]
+    robot = model_for("env_layout_01", "scenario_s01_05").observing[R]
     composition, scenario_coverage = scenario_composition(Script([deliver_item("item_3"), go_to("door")]), robot)
     assert scenario_coverage is ScenarioCoverage.MODELLED_ONLY
     assert composition.coverage == frozenset({Covered, TaskAbsent})    # the composition still holds it
@@ -81,8 +82,8 @@ def test_the_exit_walk_is_not_counted():
 
 
 def test_the_four_sets_of_s11():
-    composition, _ = scenario_composition(script_of("env_layout1", "scenario_11"),
-                                          model_for("env_layout1", "scenario_11").observing[R])
+    composition, _ = scenario_composition(script_of("env_layout_02", "scenario_s02_02"),
+                                          model_for("env_layout_02", "scenario_s02_02").observing[R])
     assert composition == Composition(task_classes=frozenset({WorkTask, PersonalTask}),
                                       decisions=frozenset({Start}),
                                       triggers=frozenset({AfterAction}),
@@ -91,7 +92,7 @@ def test_the_four_sets_of_s11():
 
 def test_the_scenario_coverage_line(caplog):
     with caplog.at_level(logging.INFO):
-        model_for("env_layout0", "scenario_03")
+        model_for("env_layout_01", "scenario_s01_04")
     lines = [r.getMessage() for r in caplog.records if r.getMessage().startswith("[scenario-coverage]")]
     assert lines == ["[scenario-coverage] human_0 robot_0 scenario_coverage=task_absent tasks=WorkTask,HumanOnlyTask "
                      "decisions=Start triggers=AfterAction coverage=Covered,TaskAbsent"]

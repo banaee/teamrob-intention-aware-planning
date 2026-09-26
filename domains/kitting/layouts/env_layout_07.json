@@ -4,7 +4,7 @@
     "height": 2000,
     "name": "Kitting Domain Layout 7",
     "units": "cm",
-    "notes": "Mid-run stay fixture with a REAL coffee machine (scenario_70 / _71, F47b; for D2's evaluation). The robot's route from the kitting table T (0, 50) to its first shelf, shelf_1 (0, -750), runs straight south along x = 0. coffee_machine_0 stands ON that route at (0, -550), with the human's shelf_5 (item_5) 100 cm west of it, beside the machine - the natural configuration, not tuned for the recognizer. The human walks in from the east along the aisle y = -550, takes its coffee break at the machine (the schema's PT60S), then delivers item_5 from the shelf beside it and finally switches on the AC by the east wall (ac_switch_0) and stays there. Every scheduled task is well typed (F47b). Two alternative shelves for the robot at the SAME 900 cm from T: shelf_2 beside the blocked shelf (45 deg west of its bearing) and shelf_3 across the table; only the robot's pool differs between the two scenarios. No obstacles."
+    "notes": "Mid-run stay fixture with a REAL coffee machine (scenario_s05_01 / _71, F47b; for D2's evaluation). The robot's route from the kitting table T (0, 50) to its first shelf, shelf_1 (0, -750), runs straight south along x = 0. coffee_machine_0 stands ON that route at (0, -550), with the human's shelf_5 (item_5) 100 cm west of it, beside the machine - the natural configuration, not tuned for the recognizer. The human walks in from the east along the aisle y = -550, takes its coffee break at the machine (the schema's PT60S), then delivers item_5 from the shelf beside it and finally switches on the AC by the east wall (ac_switch_0) and stays there. Every scheduled task is well typed (F47b). Two alternative shelves for the robot at the SAME 900 cm from T: shelf_2 beside the blocked shelf (45 deg west of its bearing) and shelf_3 across the table; only the robot's pool differs between the two scenarios. No obstacles."
   },
   "zones": [
     {
@@ -120,7 +120,7 @@
       ],
       "slots": 2,
       "zone": "zone_SW",
-      "notes": "Alternative BESIDE the blocked shelf (scenario_70): 900 cm from T at 45 deg west of shelf_1's bearing."
+      "notes": "Alternative BESIDE the blocked shelf (scenario_s05_01): 900 cm from T at 45 deg west of shelf_1's bearing."
     },
     {
       "id": "shelf_3",
@@ -135,7 +135,7 @@
       ],
       "slots": 2,
       "zone": "zone_NE",
-      "notes": "Alternative ACROSS the table (scenario_71): 900 cm from T on the opposite bearing."
+      "notes": "Alternative ACROSS the table (scenario_s05_02): 900 cm from T on the opposite bearing."
     },
     {
       "id": "ac_switch_0",

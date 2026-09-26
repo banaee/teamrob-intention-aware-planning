@@ -15,12 +15,12 @@ from domains.kitting.script import deliver_item, go_to, stand, go_to_and_stand
 
 
 # ===============================================================
-# manually defined scenario, for only "env_layout0".
+# manually defined scenario, for only "env_layout_01".
 # ===============================================================
-scenario_00 = ScenarioConfig(
-    id="scenario_00",
+scenario_s01_01 = ScenarioConfig(
+    id="scenario_s01_01",
     setup="env_setup_01",
-    reference_layouts=["env_layout0"],
+    reference_layouts=["env_layout_01"],
     description=(
         "Minimal Phase 4 development scenario. Robot and human start symmetric, "
         "paths intersect near center during first moveto (case 0.1 collision). "
@@ -59,10 +59,10 @@ scenario_00 = ScenarioConfig(
 # T-C2c scenario B, declared stay: a fixture, not a baseline (analysis/tc2c_scripts/).
 # The human delivers item_3 and stays at the table 40 ticks; the robot's one
 # delivery goes to that table. The stay is not projected (TODO-85).
-scenario_01 = ScenarioConfig(
-    id="scenario_01",
+scenario_s01_02 = ScenarioConfig(
+    id="scenario_s01_02",
     setup="env_setup_01",
-    reference_layouts=["env_layout0"],
+    reference_layouts=["env_layout_01"],
     description=(
         "T-C2c scenario B. Human delivers item_3, then stands 40 ticks at kitting_table_0 (stand PT80S). "
         "The robot's one task delivers item_4 to the same table."
@@ -96,10 +96,10 @@ scenario_01 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_02 = ScenarioConfig(
-    id="scenario_02",
+scenario_s01_03 = ScenarioConfig(
+    id="scenario_s01_03",
     setup="env_setup_01",
-    reference_layouts=["env_layout0"],
+    reference_layouts=["env_layout_01"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, abandons it (the next delivery returns it to its shelf first, deliver_with_return), delivers item_2."
@@ -134,10 +134,10 @@ scenario_02 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_03 = ScenarioConfig(
-    id="scenario_03",
+scenario_s01_04 = ScenarioConfig(
+    id="scenario_s01_04",
     setup="env_setup_01",
-    reference_layouts=["env_layout0"],
+    reference_layouts=["env_layout_01"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, walks to corner_NE with it and stays 30 ticks, finishes the delivery, then delivers item_2."
@@ -172,10 +172,10 @@ scenario_03 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_04 = ScenarioConfig(
-    id="scenario_04",
+scenario_s01_05 = ScenarioConfig(
+    id="scenario_s01_05",
     setup="env_setup_01",
-    reference_layouts=["env_layout0"],
+    reference_layouts=["env_layout_01"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to the door, stays 20, walks to corner_SW, then delivers item_3, its one assigned task."
@@ -212,12 +212,12 @@ scenario_04 = ScenarioConfig(
 
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout3".
+# manually defined scenarios, for only "env_layout_04".
 # ===============================================================
-scenario_30 = ScenarioConfig(
-    id="scenario_30",
+scenario_s01_06 = ScenarioConfig(
+    id="scenario_s01_06",
     setup="env_setup_01",
-    reference_layouts=["env_layout3"],
+    reference_layouts=["env_layout_04"],
     description=(
         "Intersecting-paths fixture (TODO-47(c)). Mirror-symmetric approaches make the two paths intersect "
         "on the robot's CURRENT task: the human starts at (300, 300) and walks to shelf_3 at "
@@ -233,7 +233,7 @@ scenario_30 = ScenarioConfig(
         "0.640 on zone_SW entry at step 23 (ZONE_BOOST), and reaches theta only at the grasp "
         "(step 39) - the path intersection itself is never seen by the meta-planner. Measured with "
         "PYTHONHASHSEED=0, assignment_prior on. No foreseeable tasks. Human plan is "
-        "scripted/fixed. Geometry: env_layout3.json."
+        "scripted/fixed. Geometry: env_layout_04.json."
     ),
     agents=[
         AgentConfig(
@@ -266,10 +266,10 @@ scenario_30 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_31 = ScenarioConfig(
-    id="scenario_31",
+scenario_s01_07 = ScenarioConfig(
+    id="scenario_s01_07",
     setup="env_setup_01",
-    reference_layouts=["env_layout3"],
+    reference_layouts=["env_layout_04"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_3, abandons it (the next delivery returns it to its shelf first, deliver_with_return), delivers item_7."
@@ -303,10 +303,10 @@ scenario_31 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_32 = ScenarioConfig(
-    id="scenario_32",
+scenario_s01_08 = ScenarioConfig(
+    id="scenario_s01_08",
     setup="env_setup_01",
-    reference_layouts=["env_layout3"],
+    reference_layouts=["env_layout_04"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to the door, stays 20, walks to corner_SW, then delivers item_3 and item_7."

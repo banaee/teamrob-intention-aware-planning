@@ -14,18 +14,18 @@ from domains.kitting.script import deliver_item, go_to, stand, go_to_and_stand
 
 
 # ===============================================================
-# manually defined scenario, for only "env_layout9" (two kitting tables against
-# opposite walls; the realistic-placement variant of env_layout8).
-# scenario_90 is for VIEWING env_layout9 and running it: it is NOT a measured
+# manually defined scenario, for only "env_layout_09" (two kitting tables against
+# opposite walls; the realistic-placement variant of env_layout_08).
+# scenario_s07_01 is for VIEWING env_layout_09 and running it: it is NOT a measured
 # fixture, nothing is measured from it, and T-B does not use it. The measured
-# two-table fixture is scenario_80 / scenario_81 on env_layout8.
+# two-table fixture is scenario_s06_01 / scenario_s06_02 on env_layout_08.
 # ===============================================================
-scenario_90 = ScenarioConfig(
-    id="scenario_90",
+scenario_s07_01 = ScenarioConfig(
+    id="scenario_s07_01",
     setup="env_setup_07",
-    reference_layouts=["env_layout9"],
+    reference_layouts=["env_layout_09"],
     description=(
-        "env_layout9: kitting_table_0 against the north wall, kitting_table_1 against the south wall. "
+        "env_layout_09: kitting_table_0 against the north wall, kitting_table_1 against the south wall. "
         "The robot's pool is item_5 / item_4 / item_1 (to kitting_table_1) and item_6 (to kitting_table_0); "
         "the human fetches item_2 to kitting_table_0 and item_3 to kitting_table_1. Not a fixture."
     ),
@@ -62,10 +62,10 @@ scenario_90 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_91 = ScenarioConfig(
-    id="scenario_91",
+scenario_s07_02 = ScenarioConfig(
+    id="scenario_s07_02",
     setup="env_setup_07",
-    reference_layouts=["env_layout9"],
+    reference_layouts=["env_layout_09"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to item_3, turns without picking it up, delivers item_2."
@@ -101,10 +101,10 @@ scenario_91 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_92 = ScenarioConfig(
-    id="scenario_92",
+scenario_s07_03 = ScenarioConfig(
+    id="scenario_s07_03",
     setup="env_setup_07",
-    reference_layouts=["env_layout9"],
+    reference_layouts=["env_layout_09"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_2 to kitting_table_1 instead of its table (kitting_table_0), then delivers item_3."
@@ -140,10 +140,10 @@ scenario_92 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_93 = ScenarioConfig(
-    id="scenario_93",
+scenario_s07_04 = ScenarioConfig(
+    id="scenario_s07_04",
     setup="env_setup_07",
-    reference_layouts=["env_layout9"],
+    reference_layouts=["env_layout_09"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human picks up item_2, walks to corner_NE with it and stays 30 ticks, finishes the delivery, then delivers item_3."
@@ -181,10 +181,10 @@ scenario_93 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_94 = ScenarioConfig(
-    id="scenario_94",
+scenario_s07_05 = ScenarioConfig(
+    id="scenario_s07_05",
     setup="env_setup_07",
-    reference_layouts=["env_layout9"],
+    reference_layouts=["env_layout_09"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_2 and item_3, stays 40 ticks at kitting_table_1 while the robot converges on it, then walks to corner_SE."

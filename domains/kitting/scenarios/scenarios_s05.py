@@ -14,7 +14,7 @@ from domains.kitting.script import deliver_item, coffee_break, ac_activation, go
 
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout7" (mid-run stay with a real coffee machine, F47b).
+# manually defined scenarios, for only "env_layout_07" (mid-run stay with a real coffee machine, F47b).
 # ===============================================================
 _F47B_DESCRIPTION = (
     "Mid-run stay fixture (F47b), for D2's evaluation; builds no D2 mechanism; every scheduled task "
@@ -28,22 +28,22 @@ _F47B_DESCRIPTION = (
     "realized, gate none, stop off and on, both priors, PYTHONHASHSEED=0; analysis/f47_fixtures/): "
     "coffee_break crosses theta at tick 23 (0.796 prior-off, 0.897 prior-on), two ticks before the "
     "human stands at (30, -550) on 25-55, and B3 re-decides on the projected 30-tick wait (T_h 34): "
-    "no mid-run block occurs in either scenario. scenario_70 switches to item_2 (80.15 vs item_1 + "
+    "no mid-run block occurs in either scenario. scenario_s05_01 switches to item_2 (80.15 vs item_1 + "
     "hold 32 = 89), returns to item_1 at 105 after the human has left, completes at 187, no [stop]. "
-    "scenario_71 holds 32 ticks at (0, -40) (item_1 + hold 89 vs item_3 118), walks, and meets the "
+    "scenario_s05_02 holds 32 ticks at (0, -40) (item_1 + hold 89 vs item_3 118), walks, and meets the "
     "human LEAVING the machine: 3 refused steps at 57-59 past T_h, then completes at 207 (204 with "
     "the stop off). The finding for D2: with well-typed fixtures the stay's hypothesis is admitted before it "
     "begins and realization absorbs it as a switch or a hold; the separation stop, and so the "
     "blocked event, is exercised only past T_h, on the human's departure. THE ONE VARIABLE "
-    "between scenario_70 and _71 is where the alternative shelf stands, at the SAME 900 cm from the "
+    "between scenario_s05_01 and scenario_s05_02 is where the alternative shelf stands, at the SAME 900 cm from the "
     "table (identical task cost, identical t=0 choice): "
 )
-scenario_70 = ScenarioConfig(
-    id="scenario_70",
+scenario_s05_01 = ScenarioConfig(
+    id="scenario_s05_01",
     setup="env_setup_05",
-    reference_layouts=["env_layout7"],
+    reference_layouts=["env_layout_07"],
     description=_F47B_DESCRIPTION + (
-        "scenario_70 - shelf_2 BESIDE the blocked shelf (45 deg west of its bearing): switching from a "
+        "scenario_s05_01 - shelf_2 BESIDE the blocked shelf (45 deg west of its bearing): switching from a "
         "block at (0, -500) to item_2 and returning adds ~13 ticks of walking over doing item_2 from "
         "the table later; the occupation would be LONG relative to the switch."
         " Purpose (label C, docs/glossary.md §7): the script ends at the AC switch "
@@ -77,12 +77,12 @@ scenario_70 = ScenarioConfig(
     ],
 )
 
-scenario_71 = ScenarioConfig(
-    id="scenario_71",
+scenario_s05_02 = ScenarioConfig(
+    id="scenario_s05_02",
     setup="env_setup_05",
-    reference_layouts=["env_layout7"],
+    reference_layouts=["env_layout_07"],
     description=_F47B_DESCRIPTION + (
-        "scenario_71 - shelf_3 ACROSS the table (the opposite bearing): switching from a block at "
+        "scenario_s05_02 - shelf_3 ACROSS the table (the opposite bearing): switching from a block at "
         "(0, -500) to item_3 and returning adds ~53 ticks of walking; the occupation would be SHORT "
         "relative to the switch."
         " Purpose (label C, docs/glossary.md §7): the script ends at the AC switch "
@@ -119,13 +119,13 @@ scenario_71 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_72 = ScenarioConfig(
-    id="scenario_72",
+scenario_s05_03 = ScenarioConfig(
+    id="scenario_s05_03",
     setup="env_setup_05",
-    reference_layouts=["env_layout7"],
+    reference_layouts=["env_layout_07"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
-        "Human takes a coffee break with item_5 in hand, delivers it, stays 20 at the table, then picks up item_3 and abandons it (item_3 assigned to the human here, not in scenario_70)."
+        "Human takes a coffee break with item_5 in hand, delivers it, stays 20 at the table, then picks up item_3 and abandons it (item_3 assigned to the human here, not in scenario_s05_01)."
     ),
     agents=[
         AgentConfig(
@@ -157,10 +157,10 @@ scenario_72 = ScenarioConfig(
 )
 
 # Script example (T-C2c play), not a measured fixture.
-scenario_73 = ScenarioConfig(
-    id="scenario_73",
+scenario_s05_04 = ScenarioConfig(
+    id="scenario_s05_04",
     setup="env_setup_05",
-    reference_layouts=["env_layout7"],
+    reference_layouts=["env_layout_07"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human walks to the door, stays 20, walks to corner_NW, then delivers item_5, its one assigned task."

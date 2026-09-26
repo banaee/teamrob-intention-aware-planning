@@ -86,7 +86,7 @@ def test_task_step_recurses():
                     methods=[MethodSchema("m", [Var("?item")], [], [TaskStep(deliver_item, {Var("?item"): Var("?item")})])])
     kit = register_kitting_domain()
     tree = Tree(tasks=kit.task_schemas() + [wrap], actions=kit.get_all_actions(), microactions=kit.get_microactions())
-    m = model_for("env_layout0", registered("env_layout0", "scenario_00"))
+    m = model_for("env_layout_01", registered("env_layout_01", "scenario_s01_01"))
     world = build_world_state(m)
     planner = AdaptivePlanner(knowledge=tree)
     item = {Var("?item"): Const("item_3")}
@@ -125,7 +125,7 @@ def test_assigned_personal_task_is_rejected():
 
 
 def test_hypothesis_space_from_the_task_model():
-    m = model_for("env_layout1", registered("env_layout1", "scenario_10"))
+    m = model_for("env_layout_02", registered("env_layout_02", "scenario_s02_01"))
     robot = next(iter(m.robots.values()))
     hyps = set(build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type))
     by_type = m._objects_by_type
@@ -136,9 +136,9 @@ def test_hypothesis_space_from_the_task_model():
 
 
 def test_support_restriction_on_hypothesis_keys():
-    m = model_for("env_layout4", registered("env_layout4", "scenario_40"))
+    m = model_for("env_layout_05", registered("env_layout_05", "scenario_s04_01"))
     robot = next(iter(m.robots.values()))
-    human = next(a for a in registered("env_layout4", "scenario_40").agents if a.agent_type == "human")
+    human = next(a for a in registered("env_layout_05", "scenario_s04_01").agents if a.agent_type == "human")
     rec = IntentionRecognizer(task_model=robot.recognizer.task_model, context=ContextKnowledge.default(),
                               hypotheses=build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type),
                               beta=0.01, assigned_tasks=human.assigned_tasks)
@@ -154,7 +154,7 @@ def test_support_restriction_on_hypothesis_keys():
 
 
 def test_planner_is_bound_to_its_knowledge_by_identity():
-    m = model_for("env_layout0", registered("env_layout0", "scenario_00"))
+    m = model_for("env_layout_01", registered("env_layout_01", "scenario_s01_01"))
     world = build_world_state(m)
     robot = next(iter(m.robots.values()))
     walk = TaskInstance(schema=go_to, bindings={Var("?landmark"): Const("door")})
@@ -181,8 +181,8 @@ def goto(landmark):
 
 
 def test_stand_and_go_to_run():
-    base = registered("env_layout0", "scenario_00")
-    m = model_for("env_layout0", with_human_script(base, [stand("PT10S"), goto("door")]))
+    base = registered("env_layout_01", "scenario_s01_01")
+    m = model_for("env_layout_01", with_human_script(base, [stand("PT10S"), goto("door")]))
     human = m.humans[H]
     assert [repr(e) for e in human.machine.entries] == ["stand(?duration=PT10S)", "go_to(?landmark=door)"]
     start = human.pos
@@ -201,8 +201,8 @@ def test_stand_and_go_to_run():
 
 
 def test_bad_duration_is_a_load_error():
-    base = registered("env_layout0", "scenario_00")
+    base = registered("env_layout_01", "scenario_s01_01")
     with pytest.raises(ValueError, match="scenario 'scenario_test', agent 'human_0': stand\\(\\?duration=soon\\).*not a duration"):
-        model_for("env_layout0", with_human_script(base, [stand("soon")]))
+        model_for("env_layout_01", with_human_script(base, [stand("soon")]))
     with pytest.raises(ValueError, match="not an object of this layout"):
-        model_for("env_layout0", with_human_script(base, [goto("window")]))
+        model_for("env_layout_01", with_human_script(base, [goto("window")]))

@@ -13,12 +13,12 @@ from domains.dock_loading.tasks import (
 
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout1".
+# manually defined scenarios, for only "env_layout_01".
 # ===============================================================
-scenario_10 = ScenarioConfig(
-    id="scenario_10",
+scenario_s01_01 = ScenarioConfig(
+    id="scenario_s01_01",
     setup="env_setup_01",
-    reference_layouts=["env_layout1"],
+    reference_layouts=["env_layout_01"],
     description="Human goes to office. Robot delivers one pallet.",
     agents=[
         AgentConfig(
@@ -43,12 +43,12 @@ scenario_10 = ScenarioConfig(
 )
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout1".
+# manually defined scenarios, for only "env_layout_01".
 # ===============================================================
-scenario_11 = ScenarioConfig(
-    id="scenario_11",
+scenario_s01_02 = ScenarioConfig(
+    id="scenario_s01_02",
     setup="env_setup_01",
-    reference_layouts=["env_layout1"],
+    reference_layouts=["env_layout_01"],
     description=(
         "Robot delivers 6 full pallets from truck to hall (3 dry, 3 frozen), "
         "then loads 4 empty pallets from bays back to truck. "

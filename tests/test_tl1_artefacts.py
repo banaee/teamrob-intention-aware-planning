@@ -41,12 +41,12 @@ def test_a_missing_home_container_is_refused(tmp_path):
     path.write_text(json.dumps(setup))
     with pytest.raises(ValueError, match=r"setup .*'item_3' has home container 'shelf_99', "
                                          r"which is not an object of layout"):
-        model(domain_config["scenarios"]["scenario_00"],
-              domain_config["layouts"]["env_layout0"], str(path))
+        model(domain_config["scenarios"]["scenario_s01_01"],
+              domain_config["layouts"]["env_layout_01"], str(path))
 
 
 def test_an_out_of_bounds_start_is_refused():
-    base = domain_config["scenarios"]["scenario_00"]
+    base = domain_config["scenarios"]["scenario_s01_01"]
     agents = [a if a.agent_type == "human" else
               AgentConfig(agent_id=a.agent_id, agent_type="robot", start_position=(10000.0, 0.0),
                           assigned_tasks=a.assigned_tasks, observes=a.observes)
@@ -55,26 +55,26 @@ def test_an_out_of_bounds_start_is_refused():
                               setup=base.setup, reference_layouts=base.reference_layouts)
     with pytest.raises(ValueError, match=r"scenario 'scenario_test', agent 'robot_0': "
                                          r"start_position .* outside the space's bounds"):
-        model(scenario, domain_config["layouts"]["env_layout0"],
+        model(scenario, domain_config["layouts"]["env_layout_01"],
               domain_config["setups"][base.setup])
 
 
 def test_a_mismatched_setup_in_the_run_file_is_refused(run_mesa):
-    with pytest.raises(ValueError, match=r"setup 'env_setup_02': scenario 'scenario_00' "
+    with pytest.raises(ValueError, match=r"setup 'env_setup_02': scenario 'scenario_s01_01' "
                                          r"declares setup 'env_setup_01'"):
-        run_mesa.resolve_triple({"domain": "kitting", "scenario": "scenario_00",
+        run_mesa.resolve_triple({"domain": "kitting", "scenario": "scenario_s01_01",
                                  "setup": "env_setup_02"})
 
 
 def test_no_layout_takes_the_first_reference_layout(run_mesa):
     _, layout_id, setup_id, scenario = run_mesa.resolve_triple(
-        {"domain": "kitting", "scenario": "scenario_30"})
-    assert layout_id == "env_layout3"
+        {"domain": "kitting", "scenario": "scenario_s01_06"})
+    assert layout_id == "env_layout_04"
     assert setup_id == "env_setup_01"
-    assert scenario.id == "scenario_30"
+    assert scenario.id == "scenario_s01_06"
 
 
 def test_a_non_reference_registered_layout_resolves(run_mesa):
     _, layout_id, _, _ = run_mesa.resolve_triple(
-        {"domain": "kitting", "scenario": "scenario_30", "layout": "env_layout0"})
-    assert layout_id == "env_layout0"
+        {"domain": "kitting", "scenario": "scenario_s01_06", "layout": "env_layout_01"})
+    assert layout_id == "env_layout_01"

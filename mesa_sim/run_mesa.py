@@ -15,7 +15,7 @@ USAGE:
     python mesa_sim/run_mesa.py --domain dock_loading
 
     # Headless with full overrides:
-    python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_11 --steps 400
+    python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_s01_02 --steps 400
 
     # Visualization (uses configs/experiment.yaml):
     solara run mesa_sim/run_mesa.py
@@ -54,9 +54,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from mesa_sim.sim_model import SimModel
 # from domains.kitting.registry import register_kitting_domain
-# from domains.kitting.scenarios import scenario_11 as kitting_scenario_11
+# from domains.kitting.scenarios import scenario_s02_02 as kitting_scenario_s02_02
 # from domains.dock_loading.registry import register_dock_loading_domain
-# from domains.dock_loading.scenarios import scenario_10 as dock_scenario_10, scenario_11 as dock_scenario_11
+# from domains.dock_loading.scenarios import scenario_s01_01 as dock_scenario_s01_01, scenario_s01_02 as dock_scenario_s01_02
 
 from domains.kitting.registry import domain_config as kitting_config
 from domains.dock_loading.registry import domain_config as dock_config
@@ -180,7 +180,7 @@ def parse_user_args():
     parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH)
     parser.add_argument("--domain",      type=str,  default=None, help="Domain name override (e.g. kitting, dock_loading)")
     parser.add_argument("--layout", type=str, default=None, help="Layout selection (default: the scenario's first reference layout)")
-    parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_11)")
+    parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_s02_02)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
     parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
     parser.add_argument("--strategy", type=str, default=None, choices=STRATEGIES, help="MetaPlanner B3 strategy override")

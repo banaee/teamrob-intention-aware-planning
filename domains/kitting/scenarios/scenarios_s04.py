@@ -14,12 +14,12 @@ from domains.kitting.script import deliver_item, coffee_break, ac_activation, go
 
 
 # ===============================================================================
-# manually defined scenario, for only "env_layout4".
+# manually defined scenario, for only "env_layout_05".
 # ===============================================================================
-scenario_40 = ScenarioConfig(
-    id="scenario_40",
+scenario_s04_01 = ScenarioConfig(
+    id="scenario_s04_01",
     setup="env_setup_04",
-    reference_layouts=["env_layout4"],
+    reference_layouts=["env_layout_05"],
     description=(
         "Foreseeable-task fixture (I1 follow-up; baseline for I3/I4). One human run in four "
         "script parts. (1) deliver item_3 from shelf_3 (-950, -50): 1209 cm approach from "
@@ -76,10 +76,10 @@ scenario_40 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_41 = ScenarioConfig(
-    id="scenario_41",
+scenario_s04_02 = ScenarioConfig(
+    id="scenario_s04_02",
     setup="env_setup_04",
-    reference_layouts=["env_layout4"],
+    reference_layouts=["env_layout_05"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human takes a coffee break with item_3 in hand, delivers it, stays 20 at the table, then picks up item_6 and abandons it."
@@ -117,10 +117,10 @@ scenario_41 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_42 = ScenarioConfig(
-    id="scenario_42",
+scenario_s04_03 = ScenarioConfig(
+    id="scenario_s04_03",
     setup="env_setup_04",
-    reference_layouts=["env_layout4"],
+    reference_layouts=["env_layout_05"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human delivers item_3, then picks up item_6, abandons it and walks to corner_SE holding it, where it stands."

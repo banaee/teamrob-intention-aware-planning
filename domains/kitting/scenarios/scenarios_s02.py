@@ -14,12 +14,12 @@ from domains.kitting.script import deliver_item, coffee_break, ac_activation, st
 
 
 # ===============================================================
-# manually defined scenarios, for only "env_layout1".
+# manually defined scenarios, for only "env_layout_02".
 # ===============================================================
-scenario_10 = ScenarioConfig(
-    id="scenario_10",
+scenario_s02_01 = ScenarioConfig(
+    id="scenario_s02_01",
     setup="env_setup_02",
-    reference_layouts=["env_layout1"],
+    reference_layouts=["env_layout_02"],
     description=(
         "Human and robot each deliver items to the kitting table. "
         "Human deviates to a coffee break after completing their first delivery. "
@@ -59,14 +59,14 @@ scenario_10 = ScenarioConfig(
 
 # T-C2c scenario A, interrupted delivery: a fixture, not a baseline (analysis/tc2c_scripts/).
 # The human picks item_2, walks away from the table to the coffee machine with it,
-# waits, then resumes the delivery; item_5 follows so the assigned tasks are s10's.
-scenario_11 = ScenarioConfig(
-    id="scenario_11",
+# waits, then resumes the delivery; item_5 follows so the assigned tasks are scenario_s02_01's.
+scenario_s02_02 = ScenarioConfig(
+    id="scenario_s02_02",
     setup="env_setup_02",
-    reference_layouts=["env_layout1"],
+    reference_layouts=["env_layout_02"],
     description=(
         "T-C2c scenario A. deliver(item_2).at(pick_up, coffee_break): suspended for the coffee break, then resumed; "
-        "then deliver(item_5). Robot side and assigned tasks as scenario_10."
+        "then deliver(item_5). Robot side and assigned tasks as scenario_s02_01."
     ),
     agents=[
         AgentConfig(
@@ -101,10 +101,10 @@ scenario_11 = ScenarioConfig(
 # T-C2c play: script examples in the author form, not measured fixtures (analysis/tc2c_scripts/play.md).
 # Convention for NEW scripts (23 Sept 2026): end with the human leaving (door or a corner); these predate it.
 # The robot side is the layout's base scenario's.
-scenario_12 = ScenarioConfig(
-    id="scenario_12",
+scenario_s02_03 = ScenarioConfig(
+    id="scenario_s02_03",
     setup="env_setup_02",
-    reference_layouts=["env_layout1"],
+    reference_layouts=["env_layout_02"],
     description=(
         "Script example (T-C2c play), not a measured fixture: nothing is recorded from it. "
         "Human takes a coffee break with item_2 in hand, delivers it, stays 20 at the table, then picks up item_5 and abandons it."

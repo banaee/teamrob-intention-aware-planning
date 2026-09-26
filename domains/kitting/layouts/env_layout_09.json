@@ -4,7 +4,7 @@
     "height": 1000,
     "name": "Kitting Domain Layout 9",
     "units": "cm",
-    "notes": "Two kitting tables against opposite walls (kitting_table_0 on the north wall, kitting_table_1 on the south wall): the realistic-placement variant of env_layout8, where both tables stand in open floor. Storage along the side walls. T-B1b follow-up; scenario_90 opens it, and it is not a measured fixture."
+    "notes": "Two kitting tables against opposite walls (kitting_table_0 on the north wall, kitting_table_1 on the south wall): the realistic-placement variant of env_layout_08, where both tables stand in open floor. Storage along the side walls. T-B1b follow-up; scenario_s07_01 opens it, and it is not a measured fixture."
   },
   "zones": [
     {

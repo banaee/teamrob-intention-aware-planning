@@ -148,7 +148,7 @@ def test_sugar_builds_typed_events():
 # ---------------------------------------------------------------------------
 
 def test_at_pick_up_start_suspends_and_resumes_re_expanded():
-    m = model_for("env_layout1", "scenario_10", Script([deliver("item_2").at(pick_up, coffee()), deliver("item_5")]))
+    m = model_for("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(pick_up, coffee()), deliver("item_5")]))
     h = run(m)
     assert kinds(h.record) == [
         ("entered", key(deliver("item_2")), None),
@@ -173,7 +173,7 @@ def test_at_pick_up_start_suspends_and_resumes_re_expanded():
 
 
 def test_at_pick_up_drop_abandons_and_keeps_the_item():
-    m = model_for("env_layout1", "scenario_10", Script([deliver("item_2").at(pick_up, drop), deliver("item_5")]))
+    m = model_for("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(pick_up, drop), deliver("item_5")]))
     h = run(m)
     assert kinds(h.record)[:3] == [
         ("entered", key(deliver("item_2")), None),
@@ -192,7 +192,7 @@ def test_at_pick_up_drop_abandons_and_keeps_the_item():
 
 def test_during_walk_cuts_and_resumes_from_the_position():
     script = Script([deliver("item_2").during(move_to, "PT6S", st("PT10S"), occurrence=0), deliver("item_5")])
-    m = model_for("env_layout1", "scenario_10", script)
+    m = model_for("env_layout_02", "scenario_s02_01", script)
     h = m.humans[H]
     positions = []
     for _ in range(12):
@@ -213,7 +213,7 @@ def test_during_walk_cuts_and_resumes_from_the_position():
 
 def test_during_stand_keeps_the_remaining_stands():
     long, short = st("PT20S"), st("PT4S")
-    m = model_for("env_layout0", "scenario_00", Script([long.during(stand, "PT4S", short)]), robot=False)
+    m = model_for("env_layout_01", "scenario_s01_01", Script([long.during(stand, "PT4S", short)]), robot=False)
     h = run(m)
     outer = [(s.done, s.total) for s in h.record.snapshots if s.stack and s.stack[0] is long]
     assert outer == [(1, 10), (2, 10)] + [(k, 10) for k in range(3, 11)] + [(10, 10)]
@@ -223,7 +223,7 @@ def test_during_stand_keeps_the_remaining_stands():
 
 
 def test_during_wait_at_keeps_the_countdown_and_records_waited():
-    m = model_for("env_layout1", "scenario_10", Script([coffee().during(wait_at, "PT10S", st("PT4S"))]), robot=False)
+    m = model_for("env_layout_02", "scenario_s02_01", Script([coffee().during(wait_at, "PT10S", st("PT4S"))]), robot=False)
     h = run(m)
     waits = [(s.done, s.total) for s in h.record.snapshots if s.action is not None and s.action.action_name == "wait_at"]
     assert waits[:5] == [(1, 30), (2, 30), (3, 30), (4, 30), (5, 30)] and waits[5] == (6, 30) and waits[-1] == (30, 30)
@@ -233,7 +233,7 @@ def test_during_wait_at_keeps_the_countdown_and_records_waited():
 
 def test_second_start_is_refused_and_recorded():
     d, c, s4 = deliver("item_2"), coffee(), st("PT4S")
-    m = model_for("env_layout1", "scenario_10", Script([d.at(pick_up, c)]), robot=False)
+    m = model_for("env_layout_02", "scenario_s02_01", Script([d.at(pick_up, c)]), robot=False)
     h = m.humans[H]
     while not any(isinstance(t, Started) for t in h.record.transitions):
         m.step()
@@ -250,7 +250,7 @@ def test_second_start_is_refused_and_recorded():
 
 
 def test_inject_start_drop_and_empty_stack():
-    m = model_for("env_layout1", "scenario_10", Script([deliver("item_2")]), robot=False)
+    m = model_for("env_layout_02", "scenario_s02_01", Script([deliver("item_2")]), robot=False)
     h = m.humans[H]
     for _ in range(5):
         m.step()
@@ -280,7 +280,7 @@ def test_inject_start_drop_and_empty_stack():
 
 
 def test_start_on_the_last_action_runs_after_completion():
-    m = model_for("env_layout1", "scenario_10", Script([deliver("item_2").at(place, coffee()), deliver("item_5")]), robot=False)
+    m = model_for("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(place, coffee()), deliver("item_5")]), robot=False)
     h = run(m)
     assert kinds(h.record)[:4] == [
         ("entered", key(deliver("item_2")), None),
@@ -309,7 +309,7 @@ def _carry_tree():
 
 def test_infeasible_resumption_is_recorded_and_the_executor_moves_on():
     tree, carry = _carry_tree()
-    m = model_for("env_layout0", "scenario_00", Script([deliver("item_3")]), robot=False)
+    m = model_for("env_layout_01", "scenario_s01_01", Script([deliver("item_3")]), robot=False)
     world = build_world_state(m)
     held = replace(world, predicates=world.predicates | {Predicate("holding", (Const(H), Const("item_3")))},
                    object_locations={**world.object_locations, "item_3": H})
@@ -343,13 +343,13 @@ def load(layout, sid, script):
 
 def test_ambiguous_anchor_needs_an_occurrence():
     with pytest.raises(ValueError, match="scenario 'scenario_test', agent 'human_0'.*anchor_ambiguous"):
-        load("env_layout1", "scenario_10", Script([deliver("item_2").at(move_to, coffee())]))
-    m = load("env_layout1", "scenario_10", Script([deliver("item_2").at(move_to, coffee(), occurrence=1)]))
+        load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(move_to, coffee())]))
+    m = load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(move_to, coffee(), occurrence=1)]))
     h = run(m)
     started = next(t for t in h.record.transitions if isinstance(t, Started))
     assert started.where == Boundary(started.where.action, 1) and started.where.action.action_name == "move_to"
     with pytest.raises(ValueError, match="anchor_out_of_range"):
-        load("env_layout1", "scenario_10", Script([deliver("item_2").at(move_to, coffee(), occurrence=2)]))
+        load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(move_to, coffee(), occurrence=2)]))
 
 
 def _grab_tree():
@@ -367,7 +367,7 @@ def test_anchor_absent_from_the_re_expansion_is_a_load_error():
     # a grab during the fetch walk leaves the item in hand: the delivery resumes
     # as deliver_already_held, and its pick_up anchor is absent
     tree, grab = _grab_tree()
-    base = domain_config["scenarios"]["scenario_10"]
+    base = domain_config["scenarios"]["scenario_s02_01"]
     human = next(a for a in base.agents if a.agent_type == "human")
     took = TaskInstance(schema=grab, bindings={Var("?item"): Const("item_2")})
 
@@ -377,7 +377,7 @@ def test_anchor_absent_from_the_re_expansion_is_a_load_error():
                                   setup=base.setup, reference_layouts=base.reference_layouts)
         return SimModel(scenario=scenario, register_fn=lambda: tree,
                         task_model_schemas=domain_config["task_model"],
-                        layout_path=domain_config["layouts"]["env_layout1"],
+                        layout_path=domain_config["layouts"]["env_layout_02"],
                         setup_path=domain_config["setups"][base.setup])
 
     with pytest.raises(ValueError, match="anchor_absent"):
@@ -390,32 +390,32 @@ def test_anchor_absent_from_the_re_expansion_is_a_load_error():
 
 def test_during_outside_its_action_is_a_load_error():
     with pytest.raises(ValueError, match="past_action"):
-        load("env_layout1", "scenario_10", Script([deliver("item_2").during(pick_up, "PT2S", st("PT2S"))]))
+        load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").during(pick_up, "PT2S", st("PT2S"))]))
     with pytest.raises(ValueError, match="past_action"):
-        load("env_layout0", "scenario_00", Script([st("PT4S").during(stand, "PT10S", st("PT2S"))]))
+        load("env_layout_01", "scenario_s01_01", Script([st("PT4S").during(stand, "PT10S", st("PT2S"))]))
     with pytest.raises(ValueError, match="past_action"):
-        load("env_layout1", "scenario_10", Script([deliver("item_2").during(move_to, "PT2M", st("PT2S"), occurrence=0)]))
+        load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").during(move_to, "PT2M", st("PT2S"), occurrence=0)]))
     with pytest.raises(ValueError, match="not a duration"):
-        load("env_layout1", "scenario_10", Script([deliver("item_2").during(move_to, "soon", st("PT2S"), occurrence=0)]))
+        load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").during(move_to, "soon", st("PT2S"), occurrence=0)]))
 
 
 def test_drop_after_the_last_action_and_never_reached_anchors_are_load_errors():
     with pytest.raises(ValueError, match="refused:drop:empty_stack"):
-        load("env_layout1", "scenario_10", Script([deliver("item_2").at(place, drop)]))
+        load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(place, drop)]))
     with pytest.raises(ValueError, match="never_reached"):
-        load("env_layout1", "scenario_10", Script([deliver("item_2").at(pick_up, drop).at(place, coffee())]))
+        load("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(pick_up, drop).at(place, coffee())]))
 
 
 def test_ill_typed_tasks_in_a_script_are_load_errors():
     with pytest.raises(ValueError, match="not an object of this layout"):
-        load("env_layout0", "scenario_00", Script([deliver("item_3").at(pick_up, goto("window"))]))
+        load("env_layout_01", "scenario_s01_01", Script([deliver("item_3").at(pick_up, goto("window"))]))
     with pytest.raises(ValueError, match="not a duration"):
-        load("env_layout0", "scenario_00", Script([st("soon")]))
+        load("env_layout_01", "scenario_s01_01", Script([st("soon")]))
 
 
 def test_infeasible_at_load_is_an_error():
     tree, carry = _carry_tree()
-    m = load("env_layout0", "scenario_00", Script([deliver("item_3")]))
+    m = load("env_layout_01", "scenario_s01_01", Script([deliver("item_3")]))
     task = TaskInstance(schema=carry, bindings={Var("?item"): Const("item_3"), Var("?target"): Const("kitting_table_0")})
     with pytest.raises(ValueError, match="infeasible"):
         check_script(Script([task]), AdaptivePlanner(knowledge=tree), build_world_state(m), H,
@@ -433,7 +433,7 @@ def test_infeasible_at_load_is_an_error():
     Script([coffee().during(wait_at, "PT10S", st("PT4S")), deliver("item_2").at(place, coffee())]),
 ])
 def test_replay_equals_run(script):
-    m = model_for("env_layout1", "scenario_10", script, robot=False)
+    m = model_for("env_layout_02", "scenario_s02_01", script, robot=False)
     h = m.humans[H]
     from mesa_sim.action_decomposer import _parse_duration_to_steps, _get_step_size, steps_toward
     replay = check_script(script, h.machine.planner, build_world_state(m), H,
@@ -469,7 +469,7 @@ def _walk(value, seen=None):
 
 
 def test_world_state_and_observation_expose_nothing_of_the_stack():
-    m = model_for("env_layout1", "scenario_10", Script([deliver("item_2").at(pick_up, coffee())]))
+    m = model_for("env_layout_02", "scenario_s02_01", Script([deliver("item_2").at(pick_up, coffee())]))
     h = m.humans[H]
     while len(h.machine.stack) < 2:
         m.step()

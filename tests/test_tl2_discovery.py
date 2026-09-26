@@ -6,7 +6,7 @@ module and one module per setup, on the registry's content and the module
 namespaces, never on strings inside ids (the module-name serial is an
 authoring convention the code does not check, T-L ruling 4); the merged
 setups (env_setup_01 from env_setup0/3, env_setup_03 from env_setup2/5) load
-the scenarios that were on env_layout3 and env_layout5.
+the scenarios that were on env_layout_04 and env_layout_06.
 
 Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_tl2_discovery.py
 """
@@ -65,8 +65,8 @@ def test_the_registry_is_the_union_of_the_modules():
 
 
 @pytest.mark.parametrize("scenario_id,layout_id", [
-    ("scenario_30", "env_layout3"),   # was on env_setup3, merged into env_setup_01
-    ("scenario_50", "env_layout5"),   # was on env_setup5, merged into env_setup_03
+    ("scenario_s01_06", "env_layout_04"),   # was on env_setup3, merged into env_setup_01
+    ("scenario_s03_06", "env_layout_06"),   # was on env_setup5, merged into env_setup_03
 ])
 def test_the_merged_setups_load(scenario_id, layout_id):
     scenario = domain_config["scenarios"][scenario_id]

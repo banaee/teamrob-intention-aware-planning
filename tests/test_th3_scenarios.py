@@ -81,8 +81,8 @@ def test_go_to_and_stand_is_human_only_and_kept_out_of_a_task_model():
 
 
 def test_go_to_and_stand_interrupts_and_the_delivery_resumes():
-    # scenario_03: deliver(item_3).at(pick_up, go_to_and_stand(corner_NE, PT60S)), then deliver(item_2)
-    m = model_for("env_layout0", "scenario_03")
+    # scenario_s01_04: deliver(item_3).at(pick_up, go_to_and_stand(corner_NE, PT60S)), then deliver(item_2)
+    m = model_for("env_layout_01", "scenario_s01_04")
     for _ in range(200):
         m.step()
     record = m.humans[H].record
@@ -100,7 +100,7 @@ def test_go_to_and_stand_interrupts_and_the_delivery_resumes():
 
 
 def test_loader_errors_name_the_scenario():
-    base = domain_config["scenarios"]["scenario_00"]
+    base = domain_config["scenarios"]["scenario_s01_01"]
     human = base.agents[0]
     # a delivery has no wait_at: the anchor is absent from its expansion
     cfg = AgentConfig(agent_id=human.agent_id, agent_type="human", start_position=human.start_position,
@@ -111,7 +111,7 @@ def test_loader_errors_name_the_scenario():
     with pytest.raises(ValueError, match=r"scenario 'scenario_test', agent 'human_0': .*wait_at"):
         SimModel(scenario=scenario, register_fn=register_kitting_domain,
                  task_model_schemas=domain_config["task_model"],
-                 layout_path=domain_config["layouts"]["env_layout0"],
+                 layout_path=domain_config["layouts"]["env_layout_01"],
                  setup_path=domain_config["setups"][base.setup])
 
 
@@ -125,8 +125,8 @@ def test_landmark_parameter_rejected():
         Tree(tasks=tree.task_schemas() + [bad], actions=tree.get_all_actions(), microactions=tree.get_microactions())
 
 
-def test_layout0_landmarks():
-    m = model_for("env_layout0", "scenario_00")
+def test_env_layout_01_landmarks():
+    m = model_for("env_layout_01", "scenario_s01_01")
     assert sorted(m._objects_by_type["landmark"]) == ["corner_NE", "corner_NW", "corner_SE", "corner_SW", "door"]
 
 
