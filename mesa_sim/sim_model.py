@@ -32,6 +32,7 @@ from shared.planner import AdaptivePlanner
 from shared.recognizer import build_hypothesis_space
 from shared.types import ScenarioConfig, Start, TaskSchema, check_task_bindings, check_task_destinations, task_instance_key
 from world.human_executor import check_script
+from world.composition import scenario_composition
 from world.queries import ObservingRobot, coverage
 # from domains.kitting.registry import register_kitting_domain
 # from domains.dock_loading.registry import register_dock_loading_domain
@@ -414,7 +415,8 @@ class SimModel(model.Model):
         against the sequential expansion, events and resumptions included, by
         the same stack machine the agent runs; then handed to the HumanAgent.
         Expanded with the world's tree. Then one `[coverage]` line per script
-        entry for each robot observing the human (_log_coverage).
+        entry for each robot observing the human, and its [scenario-coverage]
+        line (_log_coverage).
         """
         world = build_world_state(self)
         planner = AdaptivePlanner(knowledge=self.tree)
@@ -440,6 +442,8 @@ class SimModel(model.Model):
         each with its coverage (world/queries.coverage), in the run log beside
         the [IR] lines it is read against. Information for the reader: no run
         reads it, and it is the same with the assignment prior on and off.
+        Then one `[scenario-coverage]` line per robot: the script's composition
+        and its scenario coverage (world/composition.scenario_composition).
         """
         observers = [a.agent_id for a in scenario.agents
                      if a.agent_type == "robot" and human_cfg.agent_id in a.observes]
@@ -450,6 +454,9 @@ class SimModel(model.Model):
                 judged += [f"start:{task_instance_key(ev.decision.task)}={coverage(ev.decision.task, robot)!r}"
                            for ev in entry.events if isinstance(ev.decision, Start)]
                 logger.info(f"[coverage] {human_cfg.agent_id} {robot_id} entry={i} " + " ".join(judged))
+            composition, scenario_coverage = scenario_composition(human_cfg.scheduled_tasks, robot)
+            logger.info(f"[scenario-coverage] {human_cfg.agent_id} {robot_id} "
+                        f"scenario_coverage={scenario_coverage.value} {composition!r}")
 
     # =========================================================================
     # Public query methods
