@@ -44,6 +44,7 @@ from mesa_sim.mesa_fork import model, space, time, datacollection
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 from mesa_sim.world_state_builder import build_world_state
 from mesa_sim.action_decomposer import _parse_duration_to_steps, _get_step_size, steps_toward
+from mesa_sim.overrides import Override, apply_overrides
 
 import logging 
 logger = logging.getLogger(__name__)
@@ -101,7 +102,8 @@ class SimModel(model.Model):
                  strategy: str = "single_task",
                  gate_strategy: str = "none",
                  cost_strategy: str = "realized",
-                 separation_stop: bool = False):
+                 separation_stop: bool = False,
+                 overrides: Sequence[Override] = ()):
         super().__init__()
 
         # Evaluation switch: give each robot the observed human's assigned_tasks
@@ -127,6 +129,9 @@ class SimModel(model.Model):
             env_layout = json.load(f)
         with open(setup_path, "r") as f:
             env_setup = json.load(f)
+        # The run file's overrides (T-L stage 4, ruling 7): applied to the
+        # artefacts as read, before anything below validates or builds them.
+        scenario = apply_overrides(overrides, scenario, env_layout, env_setup, layout_path, setup_path)
 
         # ------------------------------------------------------------------
         # Space

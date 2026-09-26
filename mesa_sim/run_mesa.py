@@ -17,6 +17,9 @@ USAGE:
     # Headless with full overrides:
     python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_s01_02 --steps 400
 
+    # Another run file, and one override of a fact of the run's artefacts (T-L stage 4):
+    python mesa_sim/run_mesa.py --run my_run.yaml --override layout.shelf_2.position=-300,-300
+
     # Visualization (uses configs/experiment.yaml):
     solara run mesa_sim/run_mesa.py
 
@@ -27,6 +30,8 @@ WHAT THIS MODULE DOES:
     - Loads configs/experiment.yaml as default run configuration
     - Accepts CLI args to override individual fields (domain, scenario, steps, etc.);
       an unknown flag or yaml key, or a value of the wrong kind, stops the run
+    - Reads the run file's overrides block and --override (mesa_sim/overrides.py),
+      prints each on the start line's block, and hands them to the loader
     - Looks up domain registry to resolve string names to Python objects
     - Instantiates SimModel with chosen domain + scenario
     - Either runs headless loop or launches SolaraViz
@@ -53,6 +58,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))  
 
 from mesa_sim.sim_model import SimModel
+from mesa_sim.overrides import run_overrides
 # from domains.kitting.registry import register_kitting_domain
 # from domains.kitting.scenarios import scenario_s02_02 as kitting_scenario_s02_02
 # from domains.dock_loading.registry import register_dock_loading_domain
@@ -112,28 +118,33 @@ GATE_STRATEGIES = ("none", "b2a", "b2b")
 COST_STRATEGIES = ("realized", "plain")
 BOOL_OPTIONS = ("assignment_prior", "separation_stop")
 
-def load_experiment(experiment_path: str, overrides: dict) -> dict:
+def load_experiment(run_path: str, flags: dict, cli_overrides=()) -> dict:
     """
-    Load experiment.yaml and apply CLI overrides.
-    CLI overrides take precedence over file values.
-    `overrides` holds one entry per CLI flag (None when not given); the flags
+    Load the run file (configs/experiment.yaml, or the yaml --run names) and
+    apply the CLI flags. Flags take precedence over file values.
+    `flags` holds one entry per CLI flag (None when not given); the flags
     are the run options, so a yaml key that is not one of them is an error
     rather than a field nothing reads. File values are checked like the flags
     are: a strategy outside its choices, or a switch that is not a yaml
     boolean (`"false"` is a string, and bool("false") is True), stops the run.
+    The run file's overrides block and the --override texts are read into the
+    run's overrides (overrides.run_overrides): config["overrides"], a tuple,
+    empty when there are none.
     """
-    with open(experiment_path, "r") as f:
+    with open(run_path, "r") as f:
         config = yaml.safe_load(f)
     # "setup" may be named by the run file; there is no --setup flag (T-L,
-    # ruling c: one setup per scenario), so it is not an override.
-    allowed = set(overrides) | {"setup"}
+    # ruling c: one setup per scenario), so it is not a flag. "overrides" is the
+    # run file's overrides block (T-L stage 4); --override adds to it.
+    allowed = set(flags) | {"setup", "overrides"}
     unknown = sorted(set(config) - allowed)
     if unknown:
         raise ValueError(
-            f"{experiment_path}: unknown keys {unknown}. "
+            f"{run_path}: unknown keys {unknown}. "
             f"Run options: {sorted(allowed)}"
         )
-    config.update({k: v for k, v in overrides.items() if v is not None})
+    config.update({k: v for k, v in flags.items() if v is not None})
+    config["overrides"] = run_overrides(config.get("overrides"), cli_overrides)
     for key, choices in (("strategy", STRATEGIES), ("gate_strategy", GATE_STRATEGIES),
                          ("cost_strategy", COST_STRATEGIES)):
         if key in config and config[key] not in choices:
@@ -177,7 +188,10 @@ def parse_user_args():
     """Strict: an unknown or misspelled flag exits with an error, so a run never
     falls back silently to the yaml value of the option it meant to set."""
     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
-    parser.add_argument("--experiment",  type=str,  default=EXPERIMENT_CONFIG_PATH)
+    parser.add_argument("--run",         type=str,  default=EXPERIMENT_CONFIG_PATH, help="The run file (default: configs/experiment.yaml)")
+    parser.add_argument("--override",    type=str,  action="append", default=[], metavar="PATH=VALUE",
+                        help="Override one fact of the run's artefacts (repeatable): scenario.<agent>.start_position=x,y | "
+                             "layout.<object>.position=x,y | setup.<object>.initial_container=<id>")
     parser.add_argument("--domain",      type=str,  default=None, help="Domain name override (e.g. kitting, dock_loading)")
     parser.add_argument("--layout", type=str, default=None, help="Layout selection (default: the scenario's first reference layout)")
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_s02_02)")
@@ -191,10 +205,11 @@ def parse_user_args():
 
 
 def load_user_config() -> dict:
-    """The run configuration: the experiment file the CLI names, every flag given overriding it."""
+    """The run configuration: the run file the CLI names, every flag given overriding it,
+    its overrides block and every --override read into config["overrides"]."""
     user_args = parse_user_args()
-    overrides = {k: v for k, v in vars(user_args).items() if k != "experiment"}
-    return load_experiment(user_args.experiment, overrides)
+    flags = {k: v for k, v in vars(user_args).items() if k not in ("run", "override")}
+    return load_experiment(user_args.run, flags, user_args.override)
 
 
 
@@ -285,6 +300,7 @@ def resolve_model_params(user_config: dict) -> dict:
         "gate_strategy":    user_config.get("gate_strategy", "none"),
         "cost_strategy":    user_config.get("cost_strategy", "realized"),
         "separation_stop":  bool(user_config.get("separation_stop", False)),
+        "overrides":        tuple(user_config.get("overrides", ())),
     }
 
 
@@ -321,6 +337,10 @@ def run_headless():
     _, layout_id, setup_id, scenario = resolve_triple(config)
     logging.info(f"[run_mesa] Starting headless run — "
           f"domain={config['domain']} layout={layout_id} setup={setup_id} scenario={scenario.id} steps={n_steps}")
+    # Each override on the start line's block (T-L stage 4, ruling 7), in the
+    # --override form, so the world the mind saw is reconstructible from the log.
+    for override in config["overrides"]:
+        logging.info(f"[run_mesa] override {override.line()}")
 
     model = _make_domain_model()
 
@@ -380,22 +400,51 @@ def run_headless():
 # NOTE: solara cannot be wrapped in a run_solara() function 
 # because it needs to be at the top level, module load time to properly register the page.
 
+import solara
 from mesa_sim.viz.space_drawer import space_drawer
 from mesa_sim.viz.portrayal import agent_portrayal
+from mesa_sim.viz.run_file_panel import RunFilePanel
 from mesa_sim.mesa_fork.visualization import SolaraViz
 
-_model_params = resolve_model_params(load_user_config())
 
-# print(f"_model_params: {_model_params}")
+@solara.component
+def Page():
+    """
+    The viewer (T-L stage 4, ruling 7): the run file it is started from, read
+    again on every reload, with its triple and overrides shown and the three
+    override kinds editable (RunFilePanel), which writes them into that run
+    file and reloads. SolaraViz keeps its parameters in its own state, so a
+    reload remounts it under a new key: a fresh model on the new run.
+    """
+    reload_count = solara.use_reactive(0)
+    user_args = parse_user_args()
+    config = solara.use_memo(load_user_config, dependencies=[reload_count.value])
+    model_params = resolve_model_params(config)
+    _, layout_id, setup_id, scenario = resolve_triple(config)
 
-page = SolaraViz(
-    model_class=SimModel,
-    model_params=_model_params,
-    space_drawer=space_drawer,
-    agent_portrayal=agent_portrayal,
-    name="TeamRob Simulation",
-    play_interval=5,
-)
+    def reload():
+        reload_count.value += 1
+
+    with solara.Sidebar():
+        RunFilePanel(
+            run_path=user_args.run,
+            domain=config["domain"],
+            layout_id=layout_id,
+            setup_id=setup_id,
+            scenario=scenario,
+            model_params=model_params,
+            overrides=config["overrides"],
+            cli_overrides=user_args.override,
+            on_reload=reload,
+        )
+    SolaraViz(
+        model_class=SimModel,
+        model_params=model_params,
+        space_drawer=space_drawer,
+        agent_portrayal=agent_portrayal,
+        name="TeamRob Simulation",
+        play_interval=5,
+    ).key(f"run-{reload_count.value}")
 
 
 

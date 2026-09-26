@@ -3,6 +3,7 @@ numpy
 pandas
 networkx
 PyYAML
+ruamel.yaml   # the viewer writes the run file's overrides block, comments kept (T-L stage 4)
 tqdm
 
 # Visualization (solara run only)

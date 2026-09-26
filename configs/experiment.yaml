@@ -2,10 +2,17 @@
 # Default experiment configuration.
 # Every key is a run option, and each has a CLI flag of the same name that overrides it:
 # --domain, --layout, --scenario, --steps, --assignment_prior, --strategy, --gate_strategy, --cost_strategy,
-# --separation_stop (and --experiment, the path of this file). mesa_sim/run_mesa.py rejects an
+# --separation_stop (and --run, the path of this file: the run file). mesa_sim/run_mesa.py rejects an
 # unknown key or flag, a strategy outside its choices, and a switch that is not true/false.
 # layout is optional (here and on the CLI): a run that names none takes the scenario's first
 # reference layout. setup may be named here (no CLI flag); it must equal the scenario's (T-L).
+# overrides (T-L stage 4): an optional block, one fact of the run's artefacts per line, the same
+# paths as --override <path>=<value>; each is printed on the [run_mesa] start block, and a run
+# with an override is never a fixture or a baseline. The closed list:
+#   overrides:
+#     scenario.human_0.start_position: [460, 350]    # an agent's start, two numbers
+#     layout.shelf_2.position: [-300, -300]          # a fixed object's position, two numbers
+#     setup.item_4.initial_container: shelf_5        # a movable object's home container, an id
 
 domain: kitting
 scenario: scenario_s01_01
