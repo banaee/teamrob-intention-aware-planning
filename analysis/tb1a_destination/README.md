@@ -289,3 +289,29 @@ stream is byte-identical (its md5 unchanged).
 | s70_on | be391644cd03f4ba324b66ddef6e9596 | dab078d5ca51e5b378054ee6a60ccca7 |
 | s71_off | a961d30bb772d1f935f28bf3e5771411 | dab078d5ca51e5b378054ee6a60ccca7 |
 | s71_on | ef9e2b2cea9d8f9a83b22218f9403a49 | dab078d5ca51e5b378054ee6a60ccca7 |
+
+## T-H follow-up: the scenario-coverage line — the logs from here on
+
+Regenerated after the T-H follow-up with the same command, superseding the T-H4 table. CAUSE: the loader prints
+one `[scenario-coverage]` line per robot observing the human, after its `[coverage]` lines: the script's composition
+and scenario coverage (`docs/design_decisions.md`, "T-H: the human behaviour model", as built T-H follow-up). Against
+the T-H4 logs every other line is byte-identical, and every `.rec` stream is byte-identical (its md5 unchanged).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s00_off | 92de8c98c88f05c015041d2b1ae2d87e | 5c7835ba3417ff28b5d3caf1d00d906e |
+| s00_on | 9090b8fb68581fa0d5cc63a45eecdc9b | 5c7835ba3417ff28b5d3caf1d00d906e |
+| s10_off | 23769792c689a779beb433840757d42c | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| s10_on | c190fd7536f11fd3321297d06687c69d | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| s20_off | cd87b734b4930eb4fec3b87ba9937b2b | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s20_on | 00988b879c197f405c11f20b1c381432 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s30_off | 837446a89ed22d082a19dbdabdf610b7 | 65d234649396c9ab242841050082e9b0 |
+| s30_on | 4f289a8a6cbe85eebbee31c1f7e2fc5a | 65d234649396c9ab242841050082e9b0 |
+| s40_off | 2f36acdbcd1b59b50b1f34ce56d1624c | f6da9d345530212df9b0446aa53d1f1e |
+| s40_on | d25227bf1144778b98c5da0c74d5dfcd | f6da9d345530212df9b0446aa53d1f1e |
+| s50_off | ea3b2206ef22e639a3e7eaff24ea8077 | 3e4fd412ba39ddd3267d1d37089beaac |
+| s50_on | 0dfbb71a383d4a672c1856fbba6d86fb | 3e4fd412ba39ddd3267d1d37089beaac |
+| s70_off | 646ff5fb694db55f2aad6bc931d1196a | dab078d5ca51e5b378054ee6a60ccca7 |
+| s70_on | 6386bab6d4ba67728b269f2290149457 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s71_off | 09ef3397c91b2d8ca528daa18f06b3d0 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s71_on | c6b7af0dda5637f011cd3fbbe6e63961 | dab078d5ca51e5b378054ee6a60ccca7 |

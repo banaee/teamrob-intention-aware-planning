@@ -265,3 +265,21 @@ stream is byte-identical (its md5 unchanged).
 | s83_plain_on | b871144601a54d9bb230481d99c11b2d | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_realized_off | 938770a788056decfea88a712c85b965 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_realized_on | d71f1095f56a7256eee1e406acc9f9dc | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-H follow-up: the scenario-coverage line — the logs from here on
+
+Regenerated after the T-H follow-up with the same command, superseding the T-H4 table. CAUSE: the loader prints
+one `[scenario-coverage]` line per robot observing the human, after its `[coverage]` lines: the script's composition
+and scenario coverage (`docs/design_decisions.md`, "T-H: the human behaviour model", as built T-H follow-up). Against
+the T-H4 logs every other line is byte-identical, and every `.rec` stream is byte-identical (its md5 unchanged).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s80_plain_off | 6e227a559305055f3c41202f80e9941d | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_plain_on | 942417aae5f2a563e4ddee946ee68aea | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_realized_off | c479c77be59788c3523827a624949197 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_realized_on | 1a66f2d38ef2db57b897ac163fc59edf | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s83_plain_off | 702584d73230367f9f77d7b8a478810a | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_plain_on | 47a70872338b3eb232ac47a2ae958ded | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_realized_off | cc6125e8898e55b42f3faa36cee487a8 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_realized_on | 5d93baad6ee5ac87a483bf9ea99787d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

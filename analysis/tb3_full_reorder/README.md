@@ -203,3 +203,25 @@ stream is byte-identical (its md5 unchanged).
 | s83_full_reorder_on | d71f1095f56a7256eee1e406acc9f9dc | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_single_task_off | 48a58e60036bc20165bdf7d3d52e0f15 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | s83_single_task_on | 1a5f59042de2d4c00c074fea014ed923 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-H follow-up: the scenario-coverage line — the logs from here on
+
+Regenerated after the T-H follow-up with the same command, superseding the T-H4 table. CAUSE: the loader prints
+one `[scenario-coverage]` line per robot observing the human, after its `[coverage]` lines: the script's composition
+and scenario coverage (`docs/design_decisions.md`, "T-H: the human behaviour model", as built T-H follow-up). Against
+the T-H4 logs every other line is byte-identical, and every `.rec` stream is byte-identical (its md5 unchanged).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| s20_full_reorder_off | fd3219fea3ac0f2c2200a4819a228b0c | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s20_full_reorder_on | 88a9a818b2f3c638508badc5fe3c92d2 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| s70_full_reorder_off | f74c5d6eba853ee26299226e80b19245 | dab078d5ca51e5b378054ee6a60ccca7 |
+| s70_full_reorder_on | 018df5bab595de1f17393780f173682d | dab078d5ca51e5b378054ee6a60ccca7 |
+| s80_full_reorder_off | c479c77be59788c3523827a624949197 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s80_full_reorder_on | 1a66f2d38ef2db57b897ac163fc59edf | 8cf0930761924a3aab1f1713f3f4bf29 |
+| s81_full_reorder_off | 0bc9f94d93ae8a56442e9fd9d4657634 | 329590c9c1249859bfe20d107588c50a |
+| s81_full_reorder_on | 4ba9fa0ae49750d3951a8fdb11b103c1 | 329590c9c1249859bfe20d107588c50a |
+| s83_full_reorder_off | cc6125e8898e55b42f3faa36cee487a8 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_full_reorder_on | 5d93baad6ee5ac87a483bf9ea99787d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_single_task_off | 3402d6b87cb5ada4b0573f1602d000b3 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| s83_single_task_on | 11b9532998fa4a1d4cc8a9c74022f5d1 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
