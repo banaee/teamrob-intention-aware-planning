@@ -29,8 +29,8 @@ Items marked **[BLOCKING]** must be resolved before the simulation runs correctl
 > - "exercised only past T_h and by deviations" (TODO-47 (e)), "(the human deviated; …)" (TODO-71) → by the
 >   human's departures from its projection. "Deviation" means a departure from the work order only (label A).
 > - "declared human behaviour outside the robot's domain knowledge", "an unforeseen stay", "human behaviour the
->   ROBOT'S knowledge does not cover" (TODO-80, TODO-47 (e)) → declared unmodelled behaviour: a declared
->   experimental condition (label C) whose behaviour is unmodelled (label B).
+>   ROBOT'S knowledge does not cover" (TODO-80, TODO-47 (e)) → declared unmodelled behaviour: a scenario's
+>   purpose (label C) whose behaviour is unmodelled (label B).
 >
 > **T-H: the human behaviour model (superseding note, 25 Sept 2026; design_decisions.md, the entry of that name;
 > `docs/glossary.md` §6, §7).**
@@ -3005,8 +3005,8 @@ human's tasks as observed — completed, dropped, `unknown` episodes. Built from
 from the script. Designed in T-D. The robot taking over an abandoned task is a separate item (TODO-15).
 NOTE (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7): the evaluation will also need the WORLD labels
 of each human behaviour, label A (assigned task or deviation) and label B (modelled or unmodelled behaviour: whether a
-`HypothesisKey` of the robot's hypothesis space describes it), and the label-C check of a scenario (its declared
-experimental condition against the computed coverage; a mismatch means unintended unmodelled behaviour). They are
+`HypothesisKey` of the robot's hypothesis space describes it), and the label-C check of a scenario (its purpose
+against the computed coverage; a mismatch means unintended unmodelled behaviour). They are
 ground truth, computable from the script (with its provenance) and the hypothesis space, and kept OUTSIDE the
 robot's mind, unlike this history, which is built from observation. Not built; recorded here because the
 evaluation compares the two: unexplained (the robot's finding) against unmodelled (the label).
@@ -3308,6 +3308,16 @@ Adding the id changes every `.rec` baseline; do it when a scenario with two huma
 unaffected: they run on each human's in-memory `Record`.
 Files: world/record.py (`Record.line`), mesa_sim/sim_agents.py (`HumanAgent._step_stack`)
 Reference: design_decisions.md, "T-H: the human behaviour model", as built T-H4
+
+**TODO-110: Selecting scenarios by composition or scenario coverage (recorded, T-H follow-up, 26 Sept 2026)**
+[OPEN, recorded only]
+Batch runs and the viewer are to select scenarios by what they contain ("modelled only", "has an interruption"). Not
+built. What a selector calls: `world/composition.scenario_composition(script, robot)`, which returns the scenario's
+`Composition` (task classes, decisions, triggers, coverage results) and its `ScenarioCoverage`, against the
+`ObservingRobot` a `SimModel` builds at load (`SimModel.observing`); `mesa_sim/list_scenarios.py` is its one reader
+over the registry. Never a tag stored on `ScenarioConfig`.
+Files: world/composition.py, mesa_sim/list_scenarios.py; the batch harness (TODO-47), the viewer
+Reference: design_decisions.md, "T-H: the human behaviour model", as built (T-H follow-up); glossary §7
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_72, 0.78 cm).

@@ -3987,6 +3987,30 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   `coverage(top, robot)`; a `Covered` carries the `HypothesisKey` to put the belief's mass on.
   CHECKED: the 40 maintained logs and tb3's 8 unstored `single_task` runs are byte-identical to the T-H3 baselines
   outside the new `[coverage]` lines, and every `.rec` is byte-identical.
+- (T-H follow-up, as built) SCENARIO COMPOSITION AND SCENARIO COVERAGE (Hadi, cchat, 26 September 2026). Batch runs
+  and the viewer will select scenarios by what they contain; a tag declared on the scenario would be a second copy of
+  the script and could drift, so both are computed at load and never stored: `ScenarioConfig` keeps its fields (id,
+  name, description, agents). `world/composition.py`: `scenario_composition(script, robot) -> (Composition,
+  ScenarioCoverage)`, against an `ObservingRobot`. `Composition` holds four sets of existing types: the task classes
+  (`WorkTask` / `PersonalTask` / `HumanOnlyTask`, the most specific, over `Script.tasks()`), the decisions (`Start` /
+  `Drop`) and the triggers (`AfterAction` / `DuringAction`) over the entries' events, and the coverage results
+  (`Covered` / `TaskAbsent` / `BindingAbsent`, `coverage()` over `Script.tasks()`). `ScenarioCoverage` is
+  `MODELLED_ONLY`, `TASK_ABSENT`, `BINDING_ABSENT` or `BOTH`, from the coverage results alone, the exit walk not
+  counted: the script's last entry when its task is a `HumanOnlyTask` whose only goal binding is a landmark, that
+  decomposes to exactly one movement action to it (every method one `ActionStep` whose action's
+  `movement_target_key` is bound to the landmark variable), and that carries no events (a rule on type, structure and
+  position, never on a schema's name; a terminal `go_to_and_stand` is counted, `TASK_ABSENT`; the composition still
+  holds the exit walk). It depends on the task model, so it
+  is a property of the run configuration. Label C is reduced to the purpose, the description's text (glossary §7;
+  was "declared experimental condition"; "condition" kept for the evaluation and predicate senses, where the name
+  first ruled for the enum collided). THE LINE: `[scenario-coverage] <human> <robot> scenario_coverage=<value>
+  tasks=… decisions=… triggers=… coverage=…` (`-` for an empty set), one per observing robot after its `[coverage]`
+  lines, printed by `SimModel._log_coverage`; information only. THE LISTING: `mesa_sim/list_scenarios.py` prints
+  every registered kitting scenario in the same form, on its registered layout and the declared task model.
+  Selection by composition or scenario coverage is not built (TODO-110). Of the registered scenarios, s42 is the one
+  whose scenario coverage the exemption decides (`MODELLED_ONLY`; its script ends with `go_to(corner_SE)`).
+  CHECKED: the 40 maintained logs are byte-identical to the T-H4 baselines outside the new `[scenario-coverage]`
+  lines, and every `.rec` is byte-identical.
 Reference: Hadi's ruling and the rulings on the review, 25 September 2026; docs/handoffs/handoff_T-H.md; "The human
 action script (T-C1, decided)"; "Terms for human behaviour, model coverage and the robot's inference (ruled)"; "A
 run-time deviation is the same operation as a load-time edit" (Phase 7); TODO-80, TODO-85, TODO-86, TODO-87, TODO-92,

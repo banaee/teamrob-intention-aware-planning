@@ -47,8 +47,9 @@ DEFERRED, each recorded:
 - TODO-106: the load-time replay cannot see body-derived facts (`waited` retraction, `at` for a held object).
 - TODO-109: the `[rec]` stream carries no agent id; two humans would interleave.
 - The exporter (Phase 7): rewriting `Now` as `at` / `during` from the record, and the viewer's buttons; `inject` exists.
-- The label-C check: a scenario's declared condition is free text in its description; the queries it would read are
-  built, the check is not.
+- The label-C check: a scenario's purpose is free text in its description (label C, glossary §7; was "declared
+  condition"); the queries it would read are built, and so are the scenario's composition and scenario coverage (T-H
+  follow-up, `world/composition.py`); the check is not.
 
 ## 0. Push state
 

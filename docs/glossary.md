@@ -510,8 +510,8 @@ Ruled by Hadi, 24 September 2026; the WORLD half revised by T-H (25 September 20
 different things: what the human does (behaviour outside the robot's models) and what the robot believes (the mass on
 the residual hypothesis `unknown`). The two diverge: a stand adds no evidence of its own, and a finished set of
 assigned tasks leaves `unknown` near 0.995 while nothing is unexplained. The terms below keep four things apart: what
-behaviour occurs in the world, whether the robot's models cover it, whether the scenario author intended it as an
-experimental condition, and what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is
+behaviour occurs in the world, whether the robot's models cover it, whether the scenario's author intended it (its
+purpose), and what the robot believes. They form two groups, WORLD and ROBOT. A term from one group is
 never used for the other. Diagrams, a table of cases and the divergences: `docs/terminology_revision.md`
 (explanatory; this section is authoritative; its section 8 states what T-H changed).
 → `docs/design_decisions.md`, "Terms for human behaviour, model coverage and the robot's inference" and "T-H: the
@@ -555,14 +555,41 @@ is suppressed by the prior; a belief-side matter.
 "Model coverage" is unrelated to the covered fraction f of **graded evidence** (§5, `covered_fraction`). Say
 "coverage" for label B and "covered fraction" (or "the grade", f) for the evidence, never one for the other.
 
-**label C, experimental intent** — a property of the scenario, not of one behaviour.
-- **declared experimental condition** — what the scenario's description says it tests, e.g. "unmodelled-behaviour
-  condition".
-An unmodelled behaviour in the record that the declared condition does not cover means that the run contains
-unintended unmodelled behaviour. The check excludes the authoring convention's terminal `go_to` to the door or a
-corner (§6, **human's script**): the convention declares it for every scenario. The terminal stand at a table
-(TODO-80) is not declared by the convention and stays a label-C mismatch unless the scenario's description declares
+**label C, purpose** — a property of the scenario, not of one behaviour: what the scenario's description says it is
+for, as text (e.g. "an unmodelled walk mid-delivery"). The only thing the author declares; what the script already
+holds is computed (**scenario composition**, **scenario coverage**, below), never declared, so no tag can drift from
+the script. CHANGED (T-H follow-up, 26 September 2026): label C was "experimental intent", with the value "declared
+experimental condition"; it is now the purpose alone, and "condition" no longer names it (the word keeps its other
+meanings: an evaluation condition such as the prior or the oracle, and a predicate condition of a schema).
+An unmodelled behaviour in the record that the purpose does not cover means that the run contains unintended
+unmodelled behaviour. The check excludes the **exit walk** (below; the authoring convention's terminal `go_to` to the
+door or a corner, §6, **human's script**): the convention declares it for every scenario. The terminal stand at a
+table (TODO-80) is not declared by the convention and stays a label-C mismatch unless the scenario's purpose states
 it.
+
+**scenario composition** — what a scenario's script is made of, against one observing robot: four sets of existing
+types, no new words. The task classes it names (`WorkTask`, `PersonalTask`, `HumanOnlyTask`), over `Script.tasks()`
+(each entry's task and each `Start`'s); its decisions (`Start`, `Drop`) and its triggers (`AfterAction`,
+`DuringAction`; `Now` never appears in a script), over the entries' events; and the coverage results of its tasks
+(`Covered`, `TaskAbsent`, `BindingAbsent`; label B), over `Script.tasks()`. Computed at load, never stored on the
+`ScenarioConfig`. What a selector for batch runs or the viewer reads (TODO-110, not built).
+
+**scenario coverage** — label B lifted from one task to the scenario: `MODELLED_ONLY`, `TASK_ABSENT`,
+`BINDING_ABSENT` or `BOTH`, by which non-covered results its tasks have (the composition's coverage set, less the exit
+walk). It depends on the robot's task model, so it is a property of the run configuration, not of the script: a task
+model without `coffee_break` moves s11 from `MODELLED_ONLY` to `TASK_ABSENT`. The same with the prior on and off. It
+states what the script contains, never what the scenario is for (that is the purpose).
+ONE EXEMPTION, stated here only: the **exit walk**, the script's last entry when its task is a `HumanOnlyTask` whose
+only goal binding (§6, **task equality**) is a landmark, that decomposes to exactly one movement action to that
+landmark (every method of its schema: one action step, whose action declares a movement target bound to the
+landmark), and that carries no events, is not counted. A rule on type, structure and position, never on a schema's
+name: `go_to("door")` or `go_to("corner_SE")` last is the exit walk; the same walk earlier in the script, or carrying
+an event, is counted, and so are a terminal `stand` (no landmark; TODO-80) and a terminal `go_to_and_stand` (a walk
+and a stand: `TASK_ABSENT`).
+AS BUILT: `world/composition.py`, `scenario_composition(script, robot) -> (Composition, ScenarioCoverage)`; the
+`[scenario-coverage]` line at load, one per observing robot, after its `[coverage]` lines; the listing
+`mesa_sim/list_scenarios.py`.
+
 "Scripted" is not a behaviour class: every behaviour in the simulator is scripted. Use "scripted" only to
 contrast simulation with a real deployment.
 

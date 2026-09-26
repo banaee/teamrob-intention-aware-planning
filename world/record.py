@@ -7,7 +7,7 @@ PURPOSE:
     position. Per tick a Snapshot: the stack (top first), the action in hand and
     its progress; and the transitions the stack made on that tick, each typed.
     Written by the embodiment's human driver (mesa_sim/sim_agents.HumanAgent)
-    and by the load-time replay (domains/human_executor.check_script); streamed
+    and by the load-time replay (world/human_executor.check_script); streamed
     as one `[rec]` line per tick in a file beside the run log, diffed in the
     sweep. Its typed queries (switches, resumptions, assigned, unperformed,
     coverage, truth_at) are world/queries.py (T-H4); they run on this in-memory

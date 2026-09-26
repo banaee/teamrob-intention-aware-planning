@@ -253,11 +253,13 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 Use the step counts of the sweep scripts (`analysis/f1_robot_responsible/sweep.sh` for s00–s40,
 `analysis/f47_fixtures/sweep.sh` for the evaluation fixtures). The current baselines are the
-T-H4 regeneration of the four maintained sets below, with their `.rec` streams: `analysis/tb1a_destination/sweep/`
-(the five plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "T-H4"
-section), `analysis/tb1b_two_tables/sweep/` (s80 / s81), `analysis/tb1c_realized_flip/sweep/` and
-`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They differ from the T-H3 regeneration (0af3c0a) by the
-`[coverage]` lines at load alone, the `.rec` streams byte-identical. The T-H3 set differed from the T-C2b regeneration
+T-H follow-up regeneration of the four maintained sets below, with their `.rec` streams: `analysis/tb1a_destination/sweep/`
+(the five plus s50 / s70 / s71, both priors, stop off, `single_task`; logs local, md5s in its README, the "T-H
+follow-up" section), `analysis/tb1b_two_tables/sweep/` (s80 / s81), `analysis/tb1c_realized_flip/sweep/` and
+`analysis/tb3_full_reorder/sweep/` (the `full_reorder` logs). They differ from the T-H4 regeneration (e4fe110) by the
+`[scenario-coverage]` line at load alone (the scenario's composition and scenario coverage), the `.rec` streams
+byte-identical. The T-H4 set differed from the T-H3 regeneration (0af3c0a) by the `[coverage]` lines at load alone,
+the `.rec` streams byte-identical. The T-H3 set differed from the T-C2b regeneration
 (06093ee) in the `[human]` lines alone (the record's transitions for the C1 primitives) and has the first non-empty
 `.rec` baselines. The T-C2b set superseded the D3 regeneration (dd880be) by
 the human's dropped per-task completion tick (T-C2b: the human one tick earlier per task it completed, a hold
@@ -306,6 +308,7 @@ grep "^\[rec\]"         <log .rec>   # the human executor's record (T-H2): per t
                                   # file beside the run log (logs/run_<timestamp>.rec)
 grep "^\[human\]"       <log>   # the record's transitions, repeated in the run log
 grep "^\[coverage\]"    <log>   # at load, per script entry and observing robot: each task's coverage (T-H4)
+grep "^\[scenario-coverage\]" <log>   # at load, per observing robot: the script's composition and scenario coverage
 ```
 
 A behaviour-preserving change must leave these greps byte-identical, the `.rec` stream included (T-H2; the

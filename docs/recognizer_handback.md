@@ -444,8 +444,8 @@ included. Therefore:
   no-graded-signal phase (`wait_at`, `pick_up`, `place`) receives one fitting observation, 1/u, for that phase,
   whether or not the human performs that task (§1.5). So an unmodelled stand can support a hypothesis whose
   current phase happens at that place, and it is not unexplained; otherwise it changes nothing. (`shared/recognizer.py`: `_progress_likelihood` returns the perfect fit for a phase with no evaluator (lines 865-866) and `None` for an empty stretch (870-871); `_unknown_likelihood` returns the ungraded u for it (903-904); the open term (638-641) and the fold at a phase change (623-631).) Every task in the script is one
-  the domain describes (well typed, F47b); unmodelled behaviour in a run is either a declared experimental
-  condition (TODO-80) or unintended (glossary §7, label C).
+  the domain describes (well typed, F47b); unmodelled behaviour in a run is either stated by the scenario's
+  purpose (TODO-80) or unintended (glossary §7, label C).
 
 ### 3.4 What the meta-planner may assume, and must not
 
@@ -555,7 +555,7 @@ made to the recognizer or to its event semantics (`design_decisions.md`, the D2 
 | `deliver_with_return`'s guard | TODO-55 (e) | a stray item vs an assigned one; a domain question, the producer of the prior-off repeated crossings |
 | β in centimetres | TODO-58 | layout-scale dependence |
 | the stationarity channel | TODO-59 (deferred paragraph) | standing still as evidence against movement hypotheses; not built |
-| declared unmodelled behaviour | TODO-80 | a human stay no hypothesis describes, declared as the scenario's experimental condition; not built |
+| declared unmodelled behaviour | TODO-80 | a human stay no hypothesis describes, stated by the scenario's purpose (label C); not built |
 | the context / knowledge-representation pass | TODO-66 | `_context_weight` names two tasks and carries four constants; output only, inert |
 | the two analytical tools | TODO-62, TODO-63 | radius of maximum probability (diagnostic); rationality measure (competes with `unknown`) |
 | hash-seed dependence | TODO-42 | resolved for the recognizer (sorted keys); runs still need `PYTHONHASHSEED=0` |

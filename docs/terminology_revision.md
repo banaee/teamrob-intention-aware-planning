@@ -57,10 +57,9 @@ WORLD
 |     +-- modelled behaviour     (a HypothesisKey describes it)
 |     +-- unmodelled behaviour   (no HypothesisKey describes it)
 |
-+-- label C: experimental intent (a property of the SCENARIO, not of one behaviour)
-      |
-      +-- declared experimental condition   (written in the scenario's description,
-                                             e.g. "unmodelled-behaviour condition")
++-- label C: purpose             (a property of the SCENARIO, not of one behaviour:
+                                  the scenario's description, as text; was "declared
+                                  experimental condition", glossary §7)
 ```
 
 Every behaviour has one value on label A and one on label B. The two are independent. The foreseeable task is
@@ -240,12 +239,12 @@ mid-carry, it stays low. The belief differs because of what is live, not because
 ## 4. The label-C check
 
 ```
-scenario description  ------------------------------->  declared experimental condition   (label C)
-                                                                  |
+scenario description  ------------------------------->  purpose   (label C)
+                                                            |
 script + robot's hypothesis space  -->  label B per behaviour ----+
-                                                                  |
-                                                                  v
-                                   an unmodelled behaviour the declared condition does not cover
+                                                            |
+                                                            v
+                                   an unmodelled behaviour the purpose does not cover
                                    ==> the run contains UNINTENDED unmodelled behaviour
 ```
 
@@ -254,7 +253,7 @@ a corner, glossary §6, **deviation vocabulary**). It is intended unmodelled beh
 that declaration.
 
 Not declared by the convention: the terminal stand at a table (TODO-80). A script that ends with the human standing
-at a table has unmodelled behaviour; unless the scenario's description declares the blocked case, the stand is
+at a table has unmodelled behaviour; unless the scenario's purpose states the blocked case, the stand is
 unintended, it is a label-C mismatch, and the run's results carry it. The convention exists to avoid exactly this.
 
 The check reads the script and the hypothesis space only. Computing the labels is not built; it is recorded under
@@ -300,8 +299,8 @@ gives the precise term.
 | `docs/recognizer_handback.md` §1.1 | `unknown`, the hypothesis that the behaviour is none of them | `unknown`, the residual hypothesis: … (coverage is a world label the recognizer never receives) | living |
 | `docs/recognizer_handback.md` §1.4 | no better than unexplained | scores no better than `unknown` | living |
 | `docs/recognizer_handback.md` §3 | `unknown` ≥ θ … also means a task the space does not contain, a detour under way, or every task pinned | … also means unmodelled behaviour (…), or every task pinned, where the mass is `unknown`'s by normalisation | living |
-| `docs/recognizer_handback.md` §4 | The scripted human. … Only behaviour the robot's domain describes is scripted; an undeclared behaviour is TODO-80 | The human's script. … Every task in the script is one the domain describes; unmodelled behaviour in a run is a declared experimental condition (TODO-80) or unintended | living |
-| `docs/recognizer_handback.md` §7 | declared behaviour outside the domain; a human stay the robot's knowledge does not cover | declared unmodelled behaviour; a human stay no hypothesis describes, declared as the scenario's experimental condition | living |
+| `docs/recognizer_handback.md` §4 | The scripted human. … Only behaviour the robot's domain describes is scripted; an undeclared behaviour is TODO-80 | The human's script. … Every task in the script is one the domain describes; unmodelled behaviour in a run is stated by the scenario's purpose (TODO-80) or unintended | living |
+| `docs/recognizer_handback.md` §7 | declared behaviour outside the domain; a human stay the robot's knowledge does not cover | declared unmodelled behaviour; a human stay no hypothesis describes, stated by the scenario's purpose (label C) | living |
 | `shared/io_contracts.md` §1.9 | The human may deviate within a few ticks | The human may depart from its projection within a few ticks | living |
 | `shared/io_contracts.md` §2.2 | The first recognition of a task | The first time a task hypothesis clears the gate | living |
 | `shared/io_contracts.md` §2.2 | Mass on `unknown` above θ is not a recognition | … is not admitted | living |
@@ -342,7 +341,7 @@ label A, work order: assigned task |           assigned(task): the assigned task
                                                  assigned tasks never completed without a departure (T-H4)
 label B: modelled | unmodelled                 coverage(task, robot): COVERED | TASK_ABSENT |
   (a HypothesisKey describes it, or not)         BINDING_ABSENT, per task instance on the stack
-label C: declared experimental condition       unchanged; the check reads coverage from the record
+label C: declared experimental condition       purpose (the description's text); the check reads coverage
 computed from script + provenance +            read from the executor's record: the stack (top first),
   hypothesis space (TODO-92, not built)          the action, its progress; built T-H2, queried T-H4
 ```
@@ -379,10 +378,11 @@ task on the stack"). A stand the script writes is the `stand` task, `TASK_ABSENT
 
 It reads the record (in simulation only; a real human needs annotation of the same form) instead of the script and
 the hypothesis space: every task on the record whose coverage is not
-`COVERED` must be covered by the scenario's declared condition. The convention's terminal exit walk is now
+`COVERED` must be covered by the scenario's purpose. The convention's terminal exit walk is now
 `go_to("door")` or a corner, declared for every scenario as before; the terminal stand at a table (TODO-80) stays a
-mismatch unless declared. The queries it reads are built (T-H4; TODO-92 superseded); the check itself is not: a
-scenario's declared condition is free text in its description.
+mismatch unless the purpose states it. The queries it reads are built (T-H4; TODO-92 superseded); the check itself is
+not: a scenario's purpose is free text in its description. What the script contains is computed, never declared (T-H
+follow-up): the scenario's composition and its scenario coverage, the exit walk not counted (glossary §7).
 
 ### 8.5 Identifiers and wording
 
