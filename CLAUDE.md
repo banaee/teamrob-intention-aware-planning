@@ -225,8 +225,9 @@ silently running the large one.
 
 ## Running
 
-Interpreter: `~/python-envs/teamrob-sp4-env/bin/python`. It needs `ruamel.yaml` (in `requirements.txt` since T-L
-stage 4): the viewer writes the run file's overrides block round-trip, so the file's comments are kept.
+Interpreter: `~/python-envs/ir-nomesa-env/bin/python`, the working environment; `requirements.txt` is pinned to it.
+It needs `ruamel.yaml` (in `requirements.txt` since T-L stage 4): the viewer writes the run file's overrides block
+round-trip, so the file's comments are kept.
 
 ```bash
 # headless; --layout is optional (T-L stage 1): a run that names none takes the scenario's first reference layout.

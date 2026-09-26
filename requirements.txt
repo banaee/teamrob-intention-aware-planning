@@ -1,19 +1,22 @@
+# What the repo imports (shared/, world/, domains/, mesa_sim/ with the vendored fork's run path, tests/,
+# analysis/), pinned to the versions of ~/python-envs/ir-nomesa-env, the working environment (Python 3.10).
+
 # Core simulation
-numpy
-pandas
-networkx
-PyYAML
-ruamel.yaml   # the viewer writes the run file's overrides block, comments kept (T-L stage 4)
-tqdm
+numpy==2.0.1
+pandas==2.2.2
+networkx==3.3
+PyYAML==6.0.3
+ruamel.yaml==0.19.1   # the viewer writes the run file's overrides block, comments kept (T-L stage 4)
+tqdm==4.66.5
 
 # Visualization (solara run only)
 solara==1.57.3
-starlette==0.48.0
-plotly
-matplotlib
+reacton==1.9.1        # imported directly by mesa_sim/mesa_fork/visualization/solara_viz.py
+plotly==5.23.0
+matplotlib==3.9.0
 
 # Development (tests/)
-pytest
+pytest==9.0.3
 
 # NOTE: Mesa is NOT installed via pip.
 # The fork is bundled at mesa_sim/mesa_fork/ and imported directly.
