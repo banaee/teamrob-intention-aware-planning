@@ -419,3 +419,29 @@ Check and measurements: `analysis/tb2b_exposed_interval/` (`baseline_diff.txt`, 
 | env_layout_08_scenario_s06_03_plain_on | 653a7bec2ebdd3d10444d1e5c9b38de1 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_off | 726a0c8a87a9b4db210d96a7eb016bd6 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_on | 825dd5add61122d239b199f5b42ce1f5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## L-build: T-D L, the belief lifecycle — the logs from here on
+
+Regenerated at L-build (28 September 2026), superseding the TB.2b table above. CAUSE: design_decisions.md, "T-D L: the
+belief lifecycle", as amended on the L-records report: the episode boundary is the observed agent's completion of a
+terminal action (L1); a hypothesis is retired while its terminal fact holds and re-enters at 1/|H| (L4, `[IR-reentry]`,
+new); `recognition_changed` also fires on the belief's episode boundary (L5 B) and on the recorded hypothesis's
+inadequacy (retraction, L2 (ii)). Two format changes reach every log: `[meta-trig]` names the condition of a
+`recognition_changed` (` cause=entered | replaced | boundary | retraction`), and `[IR-boundary]` names the completed
+action (`completed place(item_2,kitting_table_0):` for `completed a task:`); so every md5 changed. No criterion of
+identity (L changes behaviour); the `.rec` streams are byte-identical to the table above in all 8. With the two
+format changes undone (`analysis/l_build/baseline_diff.py`): identical in 6 of 8 (L08 s06_01_plain_on, L08 s06_01_realized_on, L08 s06_03_plain_off, L08 s06_03_plain_on, L08 s06_03_realized_off, L08 s06_03_realized_on); the
+recognizer's lines and the triggers moved, the robot's behaviour not, in none; the robot's behaviour
+(`[meta]`, `[hold]`, `[sep]`, its lines) moved in L08 s06_01_plain_off, L08 s06_01_realized_off. Each moved number with its ticks and cause:
+`analysis/l_build/REPORT.md`. Command: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | 69168a8c4d73bfddac370b723b1ed24b | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_plain_on | d4a82dce9007513a8e5d607495d77f29 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_off | 5b3c13c90958233b456b6e704d65e2f6 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_on | 28eb0514c3371c34114d56cca6e13517 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_03_plain_off | c1f76dbbe5ca1cad3a6a9d11838c47c0 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_plain_on | 5089a5b28d8ae6c95f1be858c798acf7 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_off | 658eae46cb4e4d2f044791fc83a38481 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_on | 526f6fa31a183744edbf616cfb10dfd0 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

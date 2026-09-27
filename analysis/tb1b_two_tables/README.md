@@ -391,3 +391,25 @@ Check and measurements: `analysis/tb2b_exposed_interval/` (`baseline_diff.txt`, 
 | env_layout_08_scenario_s06_01_on | 33775f4d11d09f121657e15658ca7d09 | 8cf0930761924a3aab1f1713f3f4bf29 |
 | env_layout_08_scenario_s06_02_off | b6b8d3f7ea45baaf305a8ce403035bb7 | 329590c9c1249859bfe20d107588c50a |
 | env_layout_08_scenario_s06_02_on | ea5d850cad1da96d4bb1955dfce212c6 | 329590c9c1249859bfe20d107588c50a |
+
+## L-build: T-D L, the belief lifecycle — the logs from here on
+
+Regenerated at L-build (28 September 2026), superseding the TB.2b table above. CAUSE: design_decisions.md, "T-D L: the
+belief lifecycle", as amended on the L-records report: the episode boundary is the observed agent's completion of a
+terminal action (L1); a hypothesis is retired while its terminal fact holds and re-enters at 1/|H| (L4, `[IR-reentry]`,
+new); `recognition_changed` also fires on the belief's episode boundary (L5 B) and on the recorded hypothesis's
+inadequacy (retraction, L2 (ii)). Two format changes reach every log: `[meta-trig]` names the condition of a
+`recognition_changed` (` cause=entered | replaced | boundary | retraction`), and `[IR-boundary]` names the completed
+action (`completed place(item_2,kitting_table_0):` for `completed a task:`); so every md5 changed. No criterion of
+identity (L changes behaviour); the `.rec` streams are byte-identical to the table above in all 4. With the two
+format changes undone (`analysis/l_build/baseline_diff.py`): identical in 2 of 4 (L08 s06_01_on, L08 s06_02_on); the
+recognizer's lines and the triggers moved, the robot's behaviour not, in none; the robot's behaviour
+(`[meta]`, `[hold]`, `[sep]`, its lines) moved in L08 s06_01_off, L08 s06_02_off. Each moved number with its ticks and cause:
+`analysis/l_build/REPORT.md`. Command: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_off | a376a7d307bd268647f91d2dc2c38ec3 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_on | 890bcb753853e38ee7150cdf833e448c | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_off | 82c68826f001529d8cff41530d8fb835 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_on | bb5d442ae6ade49f2ef213c9659ff303 | 329590c9c1249859bfe20d107588c50a |
