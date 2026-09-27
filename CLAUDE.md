@@ -144,7 +144,10 @@ Decisions
   recognizer reports every live hypothesis's hypothesis adequacy, adequate | inadequate | no observation; the gate,
   `_clears_gate`, now returns a `GateOutcome` and also requires the leader's to be adequate; refusals
   `none(leader_no_observation)`, `none(leader_inadequate)`). The four maintained baseline sets are regenerated under
-  it; acceptance is `analysis/td_stage1b/REPORT.md`. Next: L, P, the rest of G, and X, each ruled on these results.
+  it; acceptance is `analysis/td_stage1b/REPORT.md`. Session 1.5c closed cycle 1 (27 Sept 2026): E6 amended a second
+  time (a stationary tick within the priced standing of any phase with s_exp > 0 is an observation at S = 1; no
+  member on a boundary tick), zero false unexplained on modelled ticks; the 1.5b findings are cycle 2 inputs
+  (TODO-87, TODO-118, TODO-119). Next: cycle 2, L, P, the rest of G, and X, each ruled on these results.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6

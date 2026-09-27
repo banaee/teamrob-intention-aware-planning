@@ -4,8 +4,10 @@ hypothesis, u, the grade and the odds accounting are gone (R1); the recognizer r
 lifecycle state beside the belief (R2 to R4, E1 to E7). The earlier text is in git history (before commit 367a3a7).
 REWRITTEN TO HEAD at the cycle 1.5b build (27 September 2026; design_decisions.md, "T-D R and E", "1.5 rulings"):
 E8 (the advance tick), E9 (s_exp by the Projector's attribution), E10 (the belief's evidence per phase is L(v·D))
-and G1 (the guard on admission, the meta-planner's side, §5). Figures in §3 are from the regeneration at 1.5b, with
-the 1.3b value where it moved (1.3b → 1.5b); acceptance in `analysis/td_stage1b/REPORT.md`.
+and G1 (the guard on admission, the meta-planner's side, §5). UPDATED at 1.5c (27 September 2026): E6's second
+amendment (a stationary tick within the priced standing of any phase with s_exp > 0 is an observation) and the
+boundary tick (no member on it), §1.10. Figures in §3 are from the 1.5c regeneration, with earlier values where they
+moved; acceptance in `analysis/td_stage1b/REPORT.md` (sections 1.5b and 1.5c).
 
 What `shared/recognizer.py` and `shared/likelihood_functions.py` do at HEAD (September 2026), for two readers:
 later sessions of this project, and colleagues who last saw the recognizer before July 2026 (start with §9,
@@ -341,25 +343,28 @@ movement likelihood's β, not retuned (its second meaning). At $v = 20$ cm/tick 
 $vD = 334.5$ cm (17 ticks of standing in a walk; 167 cm walked straight away from the target), $S < 0.01$ from
 496.8 cm (25 ticks).
 
-MEMBERSHIP (E4, E6 as amended, E8; the complete rule recorded in the entry at 1.5b). A live hypothesis is a MEMBER
-of the test on a tick iff it has a derived phase this tick (an expected action) and that phase holds an
-observation: walked path since its origin, or standing beyond $s_{\mathrm{exp}}$, or — in a stationary phase (`pick_up`,
-`place`, `wait_at`: no movement target) — a stationary tick within its priced duration ($s \le s_{\mathrm{exp}}$), which is
-an observation with $D \le 0$ and $S_k = 1$: a hypothesis whose priced standing has not ended explains the behaviour
-exactly. And (E8) on the tick a hypothesis's expected action completes (the phase change where the previous
-expected action's completion predicate holds), that hypothesis is a member with $S_k = 1$, whatever phase it
-advances into: the completion is an observation consistent with it. Not on a boundary tick: the hypotheses
-entering the new episode hold no observation there. A stationary phase is
+MEMBERSHIP (E4, E6 as amended twice, E8; the complete rule recorded in the entry). A live hypothesis is a MEMBER of
+the test on a tick iff it has a derived phase this tick (an expected action), the tick is not a boundary tick, and
+that phase holds an observation: walked path since its origin; or standing beyond $s_{\mathrm{exp}}$; or a stationary
+tick within the priced standing ($s \le s_{\mathrm{exp}}$) in a stationary phase (`pick_up`, `place`, `wait_at`: no
+movement target) or in ANY phase with $s_{\mathrm{exp}} > 0$ (E6's second amendment, 1.5c), which is an observation with
+$D \le 0$ and $S_k = 1$: a hypothesis whose priced standing has not ended explains the behaviour exactly. The second
+amendment covers the latency tick E9 prices to a walk entered from a completion. And (E8) on the tick a hypothesis's
+expected action completes (the phase change where the previous expected action's completion predicate holds), that
+hypothesis is a member with $S_k = 1$, whatever phase it advances into: the completion is an observation
+consistent with it. On a boundary tick no hypothesis is a member, a stationary phase the boundary opens included
+(E8's boundary clause applied generally, 1.5c; it supersedes reading 3 of 1.3b). A stationary phase is
 derived only once its location is reached (the preceding walk's `at()` holds), so the agent is at the phase's
 location. The entry tick of a stationary phase counts as its first stationary tick ($s = 0$): the arrival step
 of that tick belongs to the closing walk's stretch, and nothing has been walked since the new origin. A
-`move_to` phase with nothing walked since its origin and no standing beyond its $s_{\mathrm{exp}}$ holds no
-observation, so the boundary tick and the latency tick after it stay unresolved, and the finding resolves on the
-first walking tick (or, for an idle human, on the first standing tick beyond the latency). The same holds on the
-latency tick after a grasp: the true hypothesis's carry walk holds no observation there (s = 1 = s_exp), and a
-refuted rival alone decides the finding (scenario_s02_01 on 248, scenario_s04_01 on 269, scenario_s03_06 on 89:
-unexplained at every α; `analysis/td_stage1b/REPORT.md`, C). An observation whose D is not surprising is
-still one. A non-member contributes no $S_k$ (absent from `tails`); a hypothesis with no expected action
+walk with $s_{\mathrm{exp}} = 0$ (the initial walk at step 0, or one entered by a regress) with nothing walked holds no
+observation; the initial walk stays unresolved until walking evidence occurs. At a boundary the derived sequence is
+unresolved (b), adequate (b + 1, the latency tick: s = 1 = s_exp, S = 1), adequate (65 of 65 live boundaries in the
+maintained baselines); under 1.5b it was unresolved, unresolved, adequate. On the latency tick after a grasp the true
+hypothesis's carry walk is a member at S = 1 (under 1.5b it held no observation there and a refuted rival alone made
+the finding unexplained: scenario_s02_01 on 248, scenario_s04_01 on 269, scenario_s03_06 on 89). False unexplained
+on modelled ticks: 0 at every α, both priors (`analysis/td_stage1b/REPORT.md`, 1.5c). An observation whose D is not
+surprising is still one. A non-member contributes no $S_k$ (absent from `tails`); a hypothesis with no expected action
 (undecomposable) is never a member.
 
 FINDING. UNRESOLVED iff there is no member; UNEXPLAINED iff every member has $S_k < \alpha$
@@ -456,8 +461,9 @@ The recognizer GUARANTEES:
 - **At a boundary with one live task left, that task is at θ on the boundary tick**, by normalisation (R1):
   scenario_s01_01 item_2 at 78, scenario_s03_01 item_2 at 54, scenario_s01_06 item_7 at 74, scenario_s05_01 /
   _02 ac_switch_0 at 94. Its confidence is $1 - 0.001\cdot|pinned|$ (0.996) on no evidence, and its hypothesis
-  adequacy is NO_OBSERVATION on the boundary tick and the latency tick after it: the meta-planner's gate refuses it
-  there (G1) and admits it on the first walking tick (78 → 80, 54 → 56, 74 → 76, 94 → 96).
+  adequacy is NO_OBSERVATION on the boundary tick: the meta-planner's gate refuses it there (G1) and admits it on
+  the latency tick b + 1, on a belief of 1.0 by normalisation and one priced standing tick (79, 55, 75, 95; at 1.5b
+  the first walking tick b + 2; TODO-119).
 - **The first task, and a task among several live ones, is revealed on the walk**: every walk reveal precedes
   the grasp (the table). With R1 an even prior over two or three keys needs only the rivals refuted, so first
   reveals moved earlier (scenario_s01_01 item_3 20 → 9, scenario_s03_01 11 → 5).
@@ -470,8 +476,8 @@ The recognizer GUARANTEES:
   scenario_s02_01 from 362, scenario_s03_01 from 121, scenario_s01_06 from 120, scenario_s03_06 from 176,
   scenario_s05_01 / _02 from 141), unless a foreseeable task
   never performed stays live: in scenario_s04_01 `ac_activation(ac_switch_0)` is then the lone live task and
-  at θ from 327, with the human idle — a crossing of a task the human is not executing. It is refused on 327–328
-  (no observation), admitted at 329 (its walk charged one standing tick: adequate), and inadequate from 345.
+  at θ from 327, with the human idle — a crossing of a task the human is not executing. It is refused on 327
+  (the boundary tick), admitted at 328 (the priced latency tick, S = 1), and inadequate from 345.
 - **A completed task is at the floor for the rest of the run**, whoever completed it.
 
 ### 3.2 Prior-off (no assignment known)
@@ -488,10 +494,10 @@ included. Therefore:
   the human idle: scenario_s01_01 item_4 at 141, scenario_s03_01 item_7 at 145, scenario_s01_06 item_6 at 160,
   scenario_s03_06 item_7 at 176, scenario_s05_01 item_3 at 171, scenario_s05_02 item_2 at 172, scenario_s04_01
   `ac_activation(ac_switch_0)` at 379. Before R1, `unknown` held half the mass there and nothing crossed. Its
-  hypothesis adequacy follows the idle stand: no observation on the boundary and latency ticks, adequate for the
-  next 16 ticks (standing charged beyond s_exp = 1), inadequate after. The gate (G1) therefore admits it where it is
-  still adequate (scenario_s01_01 at 143, hold 31, which runs to 173 though the leader is inadequate from 159: a
-  projection is retained by identity, D2) and refuses it where it is already inadequate (scenario_s03_01 at 147,
+  hypothesis adequacy follows the idle stand: no observation on the boundary tick, adequate on the latency tick and
+  the next 16 ticks (standing charged beyond s_exp = 1), inadequate after. The gate (G1) therefore admits it where
+  it is still adequate (scenario_s01_01 at 142, hold 32, which runs to 173 though the leader is inadequate from 159:
+  a projection is retained by identity, D2; TODO-118, TODO-119) and refuses it where it is already inadequate (scenario_s03_01 at 147,
   `none(leader_inadequate)`: no hold, the run completes at 236). See §5.
 - **An idle human sits at the uniform prior over what is still live** until a pin or exhaustion; the robot's
   deliveries shrink the set without re-initialising it.
@@ -555,9 +561,8 @@ count per run grows with the number of phases of the true hypothesis. Under the 
 ruled, a finding could be unexplained while the true hypothesis was a non-member (standing within its priced
 duration) and only a refuted rival a member (scenario_s01_01 prior-on, steps 76–77, the human placing item_3);
 the E6 amendment of 27 September 2026 makes that hypothesis a member with S = 1, and the finding there reads
-adequate. E8 does the same for the advance tick (the grasp), but under E9 the latency tick after it holds no
-observation for the true hypothesis's carry walk, and the three false unexplained ticks of Stage 1 moved there
-(§1.10).
+adequate. E8 does the same for the advance tick (the grasp), and E6's second amendment for the latency tick after
+it (1.5c): no false unexplained remains on modelled ticks (§1.10).
 
 Also stated, lower in consequence:
 - An undecomposable hypothesis scores the perfect fit in the belief and is never a member of the adequacy
@@ -578,12 +583,12 @@ exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`
   (G1): CLEARS iff `confidence ≥ θ` (θ = `DEFAULT_THETA` = 0.75, unchanged) and the leader's hypothesis adequacy
   is ADEQUATE; otherwise, in this order, BELOW_THETA, LEADER_NO_OBSERVATION, LEADER_INADEQUATE. A guard refusal
   behaves as below θ. The gate's input changed meaning with R1 (the leader's share over H); the gate ruling
-  (September 2026) stands and its justification is G's. Measured at the 1.5b regeneration
+  (September 2026) stands and its justification is G's. Measured at the 1.5b and 1.5c regenerations
   (`analysis/td_stage1b/REPORT.md`): every boundary admission of a lone live task moves from the boundary tick to
-  the first walking tick (two ticks later); the wrong-table delivery is refused at 76 / 79
+  the latency tick after it (b + 1; b + 2 at 1.5b); the wrong-table delivery is refused at 76 / 79
   (`none(leader_inadequate)`); coffee_break is admitted during its stand; prior off the robot's own remaining item is
-  admitted where the idle human's stand has not yet made it inadequate (scenario_s01_01 at 143, hold 31, completion
-  200) and refused where it has (scenario_s03_01: completes at 236).
+  admitted where the idle human's stand has not yet made it inadequate (scenario_s01_01 at 142, hold 32, completion
+  201) and refused where it has (scenario_s03_01: completes at 236).
 - `evaluate_triggers()` fires `recognition_changed` (D2) when a decision record `_projected_hypothesis`
   exists and `most_likely` is no longer it: a replacement, the human's boundary, or no hypothesis live. It also
   fires when no record exists and the belief clears the gate (θ and the guard, one condition).
@@ -602,9 +607,9 @@ re-crossing of the recorded hypothesis fires nothing; a change of hypothesis or 
 
 | item | where | one line |
 |---|---|---|
-| the latency tick after a grasp | cycle 1.5b acceptance (`analysis/td_stage1b/REPORT.md`) | under E8 + E9 the true carry walk holds no observation on it; a refuted rival alone makes it unexplained (3 ticks, prior on) |
-| an admitted projection retained while its leader turns inadequate | G; D2 | the gate is asked at admission only (scenario_s01_01 prior off, 159–173) |
-| a misdelivered item's hypothesis admitted after the release | L (1.4 finding 5) | scenario_s06_06 at 103, scenario_s07_03 at 94: S = 1 in a stationary phase at the item's new place |
+| an admitted projection retained while its leader turns inadequate | TODO-118 (L); D2 | the gate is asked at admission only (scenario_s01_01 prior off, 159–173) |
+| a lone hypothesis admitted at b + 1 on a belief of 1.0 and one priced standing tick | TODO-119 (P, G) | prior off the idle lone item is adequate for about 16 ticks after the boundary |
+| a misdelivered item's hypothesis admitted after the release | TODO-87 (L) | scenario_s06_06 at 103, scenario_s07_03 at 94: S = 1 in a stationary phase at the item's new place |
 | what the meta-planner does with the finding and lifecycle | G, X (T-D) | R5; TODO-97 on its own gate; G1 built |
 | the gate's justification after R1 | G | the gate stands; its reason is re-derived from Stage 1's admissions (§5) |
 | s_exp of `pick_up` / `place` as a schema fact | TODO-113 | one source for the Projector and the recognizer, when the Projector is in scope |
@@ -696,6 +701,7 @@ Every element of that has been replaced. In order:
 
 | Sept 27, T-D R and E Stage 1 | the `unknown` hypothesis, u, the grade and the odds accounting; one number carrying four meanings | the belief normalised over the live set H only (§1.5); beside it the adequacy finding, per live hypothesis per derived phase, D and its tail S at the test level α (§1.10), and the lifecycle state (EXHAUSTED when H is empty) | the relative test could not express "the best of my models is wrong"; `unknown` at 0.995 was normalisation, not evidence. |
 | Sept 27, T-D cycle 1.5b | the stand counted in adequacy only; s_exp the action's own segment; the completing hypothesis out of the test on its advance tick; admission on the leader's share alone | E10: the belief's evidence per phase is L(v·D) (§1.4); E9: s_exp the Projector's priced stationary ticks within the phase (§1.10); E8: the advance tick a member at S = 1; G1: per-hypothesis adequacy, read by the meta-planner's gate for the leader (§5) | the foreseen stay was no longer foreseen (1.4 finding 4); the latency tick was charged to the walk (finding 2); grasp-tick false unexplained (finding 1); a lone hypothesis admitted on no evidence and the wrong table admitted while unexplained (finding 3). Every figure in §3 is from this HEAD, with earlier values where they moved. |
+| Sept 27, T-D cycle 1.5c | the latency tick after a completion holding no observation (the three false unexplained of 1.5b, at grasp + 1) | E6's second amendment: a stationary tick within the priced standing of any phase with s_exp > 0 is an observation at S = 1; no member on a boundary tick (§1.10) | zero false unexplained on modelled ticks; the boundary reads unresolved, adequate, adequate |
 
 Superseded figures (the I5 matrix, any s40 figure before F47b, and the graded-evidence figures before the T-D
 Stage 1 build) are not carried here. Where they are cited
