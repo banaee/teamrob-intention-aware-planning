@@ -230,8 +230,96 @@ def test_the_finding_clears_at_a_phase_advance(model):
     for s in range(18):
         b = rec.update(obs(s, p), w)
     assert b.finding is AdequacyFinding.UNEXPLAINED
-    # the agent is at the item: the derived phase advances to pick_up, the origin moves
+    # the agent is at the item: the derived phase advances to pick_up, the origin moves;
+    # a stationary phase within its priced duration is a member with S = 1 (E6 amended):
+    # the unexplained finding clears to adequate
     b = rec.update(obs(18, p), world_with(w, add=[pred("at", H, "item_3")]))
+    assert b.finding is AdequacyFinding.ADEQUATE and b.tails == {repr(item("item_3")): 1.0}
+
+
+def test_the_finding_clears_to_unresolved_at_an_advance_into_a_walk(model):
+    w = build_world_state(model)
+    p = w.agent_positions[H]
+    rec = recognizer(model, [item("item_3")])
+    for s in range(18):
+        b = rec.update(obs(s, p), w)
+    assert b.finding is AdequacyFinding.UNEXPLAINED
+    # the item is picked up: the derived phase advances to move_to(table), nothing walked yet
+    held = world_with(w, add=[pred("holding", H, "item_3")], remove=[pred("obj_at", "item_3", "shelf_3")])
+    b = rec.update(obs(18, p), held)
+    assert b.finding is AdequacyFinding.UNRESOLVED and b.tails == {}
+
+
+# ---------------------------------------------------------------------------
+# E6 as amended (27 Sept 2026): a stationary phase within its priced duration
+# ---------------------------------------------------------------------------
+
+def test_a_stationary_phase_within_its_priced_duration_is_a_member_with_s_one(model):
+    # pick_up: s_exp = default_action_cost = 1 tick. At the item, standing: s = 0 and s = 1
+    # are within the priced duration (D <= 0, S = 1); s = 2 is D = 1, S = S(v·1).
+    w = world_with(build_world_state(model), add=[pred("at", H, "item_3")])
+    p = w.object_positions["item_3"]
+    rec = recognizer(model, [item("item_3")])
+    for s, expected in ((0, 1.0), (1, 1.0), (2, likelihood_functions.tail_probability(SPEED, BETA))):
+        b = rec.update(obs(s, p), w)
+        assert b.finding is AdequacyFinding.ADEQUATE
+        assert math.isclose(b.tails[repr(item("item_3"))], expected)
+
+
+def test_a_wait_at_phase_is_a_member_with_s_one_for_its_bound_duration():
+    # wait_at of coffee_break: s_exp = PT60S at 2 s/tick = 30 ticks.
+    m = model_for("env_layout_05", registered("env_layout_05", "scenario_s04_01"))
+    robot = next(iter(m.robots.values()))
+    coffee = next(h for h in build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type)
+                  if h.task_name == "coffee_break")
+    machine = coffee.bindings["?coffee_machine"]
+    w = world_with(build_world_state(m), add=[pred("at", H, machine)])
+    p = w.object_positions[machine]
+    rec = recognizer(m, [coffee])
+    for s in range(32):
+        b = rec.update(obs(s, p), w)
+        expected = 1.0 if s <= 30 else likelihood_functions.tail_probability(SPEED * (s - 30), BETA)
+        assert b.finding is AdequacyFinding.ADEQUATE
+        assert math.isclose(b.tails[repr(coffee)], expected), s
+
+
+def test_a_refuted_rival_does_not_make_the_finding_unexplained_during_the_true_ones_standing(model):
+    # The scenario_s01_01 case: the human carries item_3 from its shelf to the table and stands
+    # there to place it. Under the carry, item_2's phase is deliver_with_return's return walk to
+    # shelf_3, refuted by the walk away from it (S < alpha); on arrival item_3's phase is place,
+    # within its priced duration: a member with S = 1, so the finding is adequate, not unexplained.
+    w = build_world_state(model)
+    carrying = world_with(w, add=[pred("holding", H, "item_3")], remove=[pred("obj_at", "item_3", "shelf_3")])
+    sx, sy = w.object_positions["shelf_3"]
+    tx, ty = w.object_positions[TABLE]
+    start = (sx, sy + 30.0)
+    d = math.hypot(tx - start[0], ty - start[1])
+    ux, uy = (tx - start[0]) / d, (ty - start[1]) / d
+    rec = recognizer(model, [item("item_3"), item("item_2")])
+    n = int(d // SPEED)
+    for k in range(n):
+        b = rec.update(obs(k, (start[0] + SPEED * k * ux, start[1] + SPEED * k * uy)), carrying)
+    assert b.tails[repr(item("item_2"))] < 0.05          # the rival is refuted by the carry
+    at_table = world_with(carrying, add=[pred("at", H, TABLE)])
+    for k in range(n, n + 2):                             # the arrival tick, then one stationary tick
+        b = rec.update(obs(k, (tx, ty)), at_table)
+        assert b.tails[repr(item("item_3"))] == 1.0
+        assert b.tails[repr(item("item_2"))] < 0.05
+        assert b.finding is AdequacyFinding.ADEQUATE
+
+
+def test_the_first_tick_after_a_boundary_is_still_unresolved(model):
+    # after the boundary every origin moves; the remaining hypothesis's phase is a walk
+    # (move_to its item) with nothing walked and no standing: no member
+    w = build_world_state(model)
+    p = w.object_positions[TABLE]
+    placing = world_with(w, add=[pred("holding", H, "item_3"), pred("at", H, TABLE)],
+                         remove=[pred("obj_at", "item_3", "shelf_3")])
+    placed = world_with(placing, add=[pred("obj_at", "item_3", TABLE)], remove=[pred("holding", H, "item_3")])
+    rec = recognizer(model, [item("item_3"), item("item_2")])
+    rec.update(obs(0, p), placing)
+    b = rec.update(obs(1, p), placed)
+    assert rec._expected[repr(item("item_2"))].action_name == "move_to"
     assert b.finding is AdequacyFinding.UNRESOLVED and b.tails == {}
 
 
