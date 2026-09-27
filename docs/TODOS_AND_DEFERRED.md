@@ -2898,6 +2898,7 @@ Files: shared/meta_planner.py (`_clears_gate`, `update_human_projection`, `_repl
 Reference: T-A1, September 2026
 
 **TODO-85 — A stationary human: a stay as evidence (a) and the robot's action under `unknown` (b)** [T-C open item; from T-A1] (a) ✅ CLOSED by decision (T-D R and E, 27 September 2026: E2, E3; time enters adequacy, not the belief); (b) OPEN (T-D Q1, P)
+SUPERSEDED IN PART (E10, 1.5 rulings, 27 September 2026): (a)'s "time enters adequacy, not the belief": standing beyond a phase's priced duration enters the belief through L(v·D) as well as adequacy through S(v·D); (a) stays closed. design_decisions.md, "T-D R and E", "1.5 rulings".
 A tick with nothing walked is not an observation (the empty-stretch rule, I4c), so a human who stops produces
 no evidence for or against anything, however long: picked up item_2 and stood fifty ticks, the belief stays
 with `deliver_item(item_2)` on top; `unknown` rises only from walked excess. With `unknown` on top, admission

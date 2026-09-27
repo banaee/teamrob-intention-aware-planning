@@ -662,8 +662,12 @@ a label of the world. It rises from walked excess path, and it is also high BY N
 hypotheses are live: it holds 1/|Live| after every **episode boundary** (§5), and 0.995 once every assigned task is
 done (prior on).
 → `docs/recognizer_handback.md` §1.1, §1.5.
+SUPERSEDED IN PART (E10, 1.5 rulings, 27 September 2026): "a stand enters adequacy only (E3)": standing beyond a phase's
+priced duration enters the belief through L(v·D) as well as adequacy through S(v·D). design_decisions.md, "T-D R and E",
+"1.5 rulings".
 
-The four entries below are ruled (T-D R and E, 27 September 2026) and built (T-D Stage 1, 27 September 2026).
+The entries below are ruled (T-D R and E, 27 September 2026) and built (T-D Stage 1, 27 September 2026); **hypothesis
+adequacy** is ruled in the 1.5 rulings (G1) and built in cycle 1.5b.
 
 **adequacy finding** — the recognizer's second output, beside the **recognizer belief** (R2): one of three values,
 **unresolved**, **adequate** or **unexplained**, with the **tail probabilities** S_k (§5) of the live hypotheses beside
@@ -685,16 +689,30 @@ no observation on the boundary tick. PER-HYPOTHESIS ADEQUACY (G1): beside the fi
 hypothesis, a categorical value: adequate (a member with S_k ≥ α), inadequate (a member with S_k < α) or no
 observation (not a member). The finding is existential over the live hypotheses; the per-hypothesis value answers
 whether one hypothesis explains its own phase, and the meta-planner reads it for the leader at admission
-(**admitted**), never α or S_k. Its term is proposed and not yet confirmed; this entry names it by description.
+(**admitted**), never α or S_k. Its term is **hypothesis adequacy** (below).
 → the same entry, "1.5 rulings", E8, G1.
+RELATION TO HYPOTHESIS ADEQUACY (ruled by Hadi, 27 September 2026): the aggregate adequacy finding is **adequate** when
+at least one live hypothesis has hypothesis adequacy adequate; otherwise it is **unresolved** (no live hypothesis is a
+member) or **unexplained** (every member is inadequate), by the aggregate rule (E4, E6).
 
-**unresolved** — the value of the **adequacy finding** while no live hypothesis's current derived phase holds an
-observation (E6). For adequacy an observation exists once the phase holds walked path since its origin, or standing
-beyond the priced standing s_exp; a stationary tick within the priced duration is not an observation; an observation
-whose projected completion delay is not surprising is still an observation. No band, no constant. The log reason
-`none(unresolved)` is log text with its own meaning (the projector could not resolve the admitted hypothesis's task),
-not this word.
-→ the same entry, E6.
+**hypothesis adequacy** — per live hypothesis, a categorical value the recognizer reports beside the **adequacy
+finding** (G1): **adequate** (a member of the test with S_k ≥ α), **inadequate** (a member with S_k < α) or **no
+observation** (not a member: its derived phase holds no observation this tick, or it has no derived phase). It answers
+whether one hypothesis explains its own derived phase; the finding is its existential aggregate over the live
+hypotheses (above). The meta-planner reads it for the leader only, at admission (**admitted**), and never receives α
+or S_k. Membership is the complete rule of E6 (as amended, with E8).
+→ `docs/design_decisions.md`, "T-D R and E", E6, "1.5 rulings", E8, G1.
+
+**unresolved** — the value of the **adequacy finding** while no live hypothesis is a member of the test: no live
+hypothesis's current derived phase holds an observation (E6, as amended). A phase holds an observation once it holds
+walked path since its origin, or standing beyond the priced standing s_exp, or, in a stationary phase (`pick_up`,
+`place`, `wait_at`), a stationary tick within its priced duration (D ≤ 0, S_k = 1); and, on the tick a hypothesis's
+expected action completes, that hypothesis is a member with S_k = 1 (E8). A walk with nothing walked since its origin
+and no standing beyond s_exp holds none, so the first tick after a boundary stays unresolved; a hypothesis with no
+derived phase is never a member. An observation whose projected completion delay is not surprising is still an
+observation. No band, no constant. The log reason `none(unprojectable)` (the projector could not resolve the admitted
+hypothesis's task; `none(unresolved)` before the Stage 1 build) is log text with its own meaning, not this word.
+→ the same entry, E6 (amended, and the complete membership rule), "1.5 rulings", E8.
 
 **adequate** — the value of the **adequacy finding** when some live hypothesis's current derived phase holds an
 observation and not every live hypothesis has S_k < α: at least one live hypothesis explains its phase at the test
@@ -725,6 +743,10 @@ hypothesis's current derived phase (E1, E7); retraction and resumption are L. Th
 (1/u for a no-graded-signal phase, a stand adding nothing) is the recognizer as built until the Stage 1 build; under E a
 stand in a `move_to` phase counts for adequacy beyond s_exp = 0 (E3, E6).
 → `docs/design_decisions.md`, "T-D R and E: the recognizer's output under a removed `unknown` hypothesis".
+SUPERSEDED IN PART (E10, 1.5 rulings, 27 September 2026): "a stand adds no evidence of its own" and a stand counting
+"for adequacy" only: standing beyond a phase's priced duration enters the belief through L(v·D) as well as adequacy
+through S(v·D); a stationary tick within the priced standing is not a charge (I4c narrowed). design_decisions.md,
+"T-D R and E", "1.5 rulings".
 
 **admitted** — the meta-planner's gate outcome: a task hypothesis cleared θ at admission and its projection was
 built (`[meta-proj] projection=built`). `unknown` above θ is never admitted (`none(unknown)`). The gate is the
@@ -745,8 +767,8 @@ Unmodelled (ground truth) and unexplained (the robot's finding) can disagree at 
 is why both terms exist. Not written: "unknown behaviour", "an unknown task", "`unknown` as unmodelled behaviour".
 INTRODUCED BY T-D R AND E (27 September 2026), replacing the "not introduced" note of 24 September: "unresolved" and
 "exhausted" are terms (**unresolved**, **exhausted**, above), with **adequacy finding** and **adequate**. "Recognised"
-stays not a term: it would suggest that the recognizer performs the θ gate. The log reason `none(unresolved)` is log
-text with its own meaning (the projector could not resolve the admitted hypothesis's task), not the finding's value
+stays not a term: it would suggest that the recognizer performs the θ gate. The log reason `none(unprojectable)`
+(`none(unresolved)` before the Stage 1 build) is log text with its own meaning (the projector could not resolve the admitted hypothesis's task), not the finding's value
 **unresolved**.
 
 ---

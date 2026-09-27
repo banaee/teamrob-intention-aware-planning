@@ -1275,6 +1275,7 @@ Reference: I4 evidence-model session, September 2026
 
 **The recognizer estimates the intention of the current behavioural episode — and an empty stretch is not an observation (I4b, I4c)**
 SUPERSEDED IN PART (T-D R and E, 27 September 2026): `unknown`'s constant and share (1/(1+u), the prior over {…, `unknown`}) leave with R1; the empty-stretch rule stands for the belief (R6); the deferred stationarity channel is closed by decision, time entering adequacy only (E3). design_decisions.md, "T-D R and E".
+SUPERSEDED IN PART (E10, 1.5 rulings, 27 September 2026): "time entering adequacy only" is superseded; standing beyond a phase's priced duration is belief evidence through L(v·D), and the empty-stretch rule narrows to "a stationary tick within a phase's priced standing is not a charge". design_decisions.md, "T-D R and E", "1.5 rulings".
 I4 left one defect: a hypothesis's origin moved only when its expected ACTION changed, never when the
 observed agent finished a TASK, so every task the agent had not started carried the whole previous task
 as wasted path (coffee entered its own walk with 2144 cm of excess). I4b's principle for the fix — "reset
@@ -4247,6 +4248,13 @@ E, ruled.
   AMENDED (Hadi, 27 September 2026, on the 1.3 report): (1) a stationary tick inside a stationary phase (`pick_up`, `place`, `wait_at`) at the phase's location, within its priced duration (s ≤ s_exp), is an observation with D ≤ 0: the hypothesis is a member on that tick, with S_k = 1;
   (2) a `move_to` phase with no walked path since its origin and no standing beyond s_exp = 0 holds no observation, as before, and the first tick after a boundary stays unresolved; (3) the finding rule is unchanged (unresolved iff no member; unexplained iff every member has S_k < α; adequate otherwise; a non-member contributes no S_k).
   Reason: a hypothesis whose priced standing has not ended is explaining the behaviour exactly (E5: in a stationary phase before its priced duration ends, D < 0 and S = 1); under the previous rule the true hypothesis dropped out of the test during its own priced standing and a refuted rival alone produced "unexplained" (scenario_s01_01 prior-on, steps 76 and 77, the human placing item_3).
+  THE COMPLETE MEMBERSHIP RULE (ruled by Hadi, 27 September 2026, at the Stage 1 plan step; recorded here in session 1.5b,
+  until then in `docs/recognizer_handback.md` §1.10): a live hypothesis is a MEMBER of the test on a tick iff it has a
+  derived phase this tick (an expected action) and that phase holds an observation. A hypothesis with no expected action
+  (undecomposable) or no derived phase this tick is never a member, and contributes no S_k. The observation criterion
+  is this entry as amended above, (1) to (3), plus E8 (1.5 rulings, below): on the tick at which a hypothesis's
+  expected action completes, the completing hypothesis is a member with S_k = 1, whatever phase it advances into; on a
+  boundary tick the hypotheses entering the new episode hold no observation.
 - E7. The finding has no memory beyond each live hypothesis's current phase; it clears when every live hypothesis advances its phase or an episode boundary moves every origin. Retraction and resumption are L.
 - Limitations recorded, not built: (a) sub-threshold waste is not summed across phases; an episode-level test by convolution of the phase density is the form to add if a ground-truth case demands it; (b) a regress at the proximity threshold (30 cm) is a phase change and resets that hypothesis's test; (c) the aggregate false-unexplained count per run grows with the number of phases of the true hypothesis; reopening condition: data establishing a null whose spread depends on phase duration reopens the reference distribution and the per-phase unit of α together.
 - Dependencies to verify in the build, not design questions: the schema durations of `pick_up` and `place`; the body's speed and its duration-to-ticks conversion supplied to the adequacy computation (the Projector already receives both); β remains body-supplied as established in T-A1.
