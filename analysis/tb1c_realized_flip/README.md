@@ -397,3 +397,25 @@ REPORT.md, section 1.5c).
 | env_layout_08_scenario_s06_03_plain_on | f43e7991c139e225943de42539b1e024 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_off | 762b472bae87c0f4114403e7f4a884ec | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_on | 5346b3572f22bf62287d6d648aa012d9 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## TB.2b: the cognitive loop does not end with the task pool — the logs from here on
+
+Regenerated at TB.2b (27 September 2026), superseding the 1.5c table above. CAUSE: the robot observes and recognizes
+on every tick; after its terminal return it evaluates no trigger, decides nothing and does not step the executor
+(design_decisions.md, "The cognitive loop does not end with the task pool"). Each log gains `[IR]` and `[IR-dist]`
+lines from the tick after the declared completion tick to the run's last tick, and within every tick the robot's
+`[IR]` and `[IR-dist]` lines now precede its `[meta-trig]` line, so every md5 changed. Criterion, met in all 8: the
+log with every `[IR*]` line removed is byte-identical to the 1.5c log, the `[IR*]` lines are byte-identical up to and
+including the declared tick, and the `.rec` streams are byte-identical to the table above. Command: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`.
+Check and measurements: `analysis/tb2b_exposed_interval/` (`baseline_diff.txt`, REPORT.md).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | 547ee8a37348c9cead0b34ffbf2ee1a6 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_plain_on | 60051eb91578846687040f757e308fe7 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_off | 9c72f9afa843ff8a10318457b7ddd560 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_on | 80e4303594ab810034033fb1243f35ee | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_03_plain_off | ec90ea660c72f930248d5bc925601c04 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_plain_on | 653a7bec2ebdd3d10444d1e5c9b38de1 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_off | 726a0c8a87a9b4db210d96a7eb016bd6 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_on | 825dd5add61122d239b199f5b42ce1f5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

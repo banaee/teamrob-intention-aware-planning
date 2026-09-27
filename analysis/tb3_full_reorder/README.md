@@ -398,3 +398,38 @@ REPORT.md, section 1.5c).
 | env_layout_08_scenario_s06_03_full_reorder_on | 5346b3572f22bf62287d6d648aa012d9 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_single_task_off | 0fe101800bf026ff5f7c19fc0c9cbb91 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_single_task_on | 3080642740a0e1c84180c4d2c9a93f7a | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## TB.2b: the cognitive loop does not end with the task pool — the logs from here on
+
+Regenerated at TB.2b (27 September 2026), superseding the 1.5c table above. CAUSE: the robot observes and recognizes
+on every tick; after its terminal return it evaluates no trigger, decides nothing and does not step the executor
+(design_decisions.md, "The cognitive loop does not end with the task pool"). Each log gains `[IR]` and `[IR-dist]`
+lines from the tick after the declared completion tick to the run's last tick (all but
+env_layout_03_scenario_s03_01_full_reorder_off, whose robot does not complete: TODO-118), and within every tick the robot's
+`[IR]` and `[IR-dist]` lines now precede its `[meta-trig]` line, so every md5 changed. Criterion, met in all 20: the
+log with every `[IR*]` line removed is byte-identical to the 1.5c log, the `[IR*]` lines are byte-identical up to and
+including the declared tick, and the `.rec` streams are byte-identical to the table above. Command: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`.
+Check and measurements: `analysis/tb2b_exposed_interval/` (`baseline_diff.txt`, REPORT.md).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_off | 6713aefbe6f089c2f01c6fcf9a3397e6 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_full_reorder_on | 67936925fd7712dcf33667cd2808147a | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_off | 2deffa36ed5510eb23e6bfb1797d63fd | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_on | cd0c43a79ff4dd79a388d25c15d6b3b7 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_07_scenario_s05_01_full_reorder_off | 3184614616b190510a25493b0b5d9a69 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 92281b29b5c2afa3ae6bb3befb2f12ef | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_off | ee5495dcf581dbf806f744269090dc5d | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_on | 6625b270bec3d306ecd2619affc99c1b | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_08_scenario_s06_01_full_reorder_off | 9c72f9afa843ff8a10318457b7ddd560 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_full_reorder_on | 80e4303594ab810034033fb1243f35ee | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_off | 38cd2f289ad21f63152c9e58841f5d16 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_on | 33775f4d11d09f121657e15658ca7d09 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_full_reorder_off | 86f0855ccbfb0d019bb9eade41fd3f14 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_full_reorder_on | fa0f65f613a46b95abaaf60d9e459b39 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_off | b6b8d3f7ea45baaf305a8ce403035bb7 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_on | ea5d850cad1da96d4bb1955dfce212c6 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_03_full_reorder_off | 726a0c8a87a9b4db210d96a7eb016bd6 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_full_reorder_on | 825dd5add61122d239b199f5b42ce1f5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_off | 76dd0fdce3805e7e6318907ddf84cb34 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_on | e7d1079712b0f6b544a34e5f24060c31 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
