@@ -308,3 +308,26 @@ the old log names).
 | env_layout_08_scenario_s06_03_plain_on | a3e7fd437eab365a1fdc120d4bbba475 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_off | 1eb4be9d9268bbbe68a472a85fe78b8f | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_on | ebe3d1cda8a8d81b9726503e16643f92 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-D R and E Stage 1: the recognizer without `unknown` — the logs from here on
+
+Regenerated at the T-D Stage 1 build (27 September 2026, cycle 1 session 1.3), superseding the T-L stage 3 table.
+CAUSE: a behaviour change of the recognizer (`docs/design_decisions.md`, "T-D R and E"): the `unknown` hypothesis,
+u and the grade are gone and the belief is normalised over the live hypothesis set H (R1, R6); the `[IR]` line
+carries the lifecycle state, the adequacy finding and the members' tail probabilities; the `[run]` header names
+the test level and the body's speed; the `[IR-boundary]` line no longer says "+ unknown"; `none(unknown)` refusals
+are gone. The `.rec` streams are byte-identical to the stage 3 ones (the human does not react to the robot). The
+gate is unchanged; its input is now the leader's share over H, so admissions moved, and in prior-off runs the
+robot's own remaining item is admitted once it is the lone live task after the human's last task (world lines
+differ from that tick). Measured in session 1.4, not corrected here. Command: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | ce35aa74a3e5e1389d30e8d62a142dd6 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_plain_on | 353d3b6e043b131792b4b66095a96c1f | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_off | d1be76378eb7238911194a6b844ee99e | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_on | d0898e09833691bb85152ca1f4fad03a | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_03_plain_off | 8ed88de1916b53875d81006259202a6f | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_plain_on | 2de792c8229ec8bc70ee1e2e7c05372a | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_off | 0e6eae85c312d4da0471ec2960c6f79f | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_on | 358511c6c9c6198045ea644eeec4e0d4 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

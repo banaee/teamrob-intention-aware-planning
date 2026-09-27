@@ -261,3 +261,38 @@ runs are kept in `sweep/` from here on (Hadi, T-L stage 3), the `single_task` ru
 | env_layout_08_scenario_s06_03_full_reorder_on | ebe3d1cda8a8d81b9726503e16643f92 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_single_task_off | a13559d3096bea7722d04b0042128eaf | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_single_task_on | 5c32517b00b75d0be3cf293c4beb5f27 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-D R and E Stage 1: the recognizer without `unknown` — the logs from here on
+
+Regenerated at the T-D Stage 1 build (27 September 2026, cycle 1 session 1.3), superseding the T-L stage 3 table.
+CAUSE: a behaviour change of the recognizer (`docs/design_decisions.md`, "T-D R and E"): the `unknown` hypothesis,
+u and the grade are gone and the belief is normalised over the live hypothesis set H (R1, R6); the `[IR]` line
+carries the lifecycle state, the adequacy finding and the members' tail probabilities; the `[run]` header names
+the test level and the body's speed; the `[IR-boundary]` line no longer says "+ unknown"; `none(unknown)` refusals
+are gone. The `.rec` streams are byte-identical to the stage 3 ones (the human does not react to the robot). The
+gate is unchanged; its input is now the leader's share over H, so admissions moved, and in prior-off runs the
+robot's own remaining item is admitted once it is the lone live task after the human's last task (world lines
+differ from that tick). Measured in session 1.4, not corrected here. Command: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_off | 0287781445c0771c49fe8d43572b058e | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_full_reorder_on | c9b69d11c05798eb0dea8fc97bc7fa88 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_off | fed4cfcb7688034d07df4a0291ab3d22 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_on | 9c37ad92ed42bbdd86cd313aa48a7c81 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_07_scenario_s05_01_full_reorder_off | 54b85368a5e96c26a49867ca89762e78 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_full_reorder_on | c66a587a070c1ef15529a71e72b8b320 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_off | e7f104adff968cfb4ee628abf241d389 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_on | c8477df1c0fe1b857012ea7db39f59b1 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_08_scenario_s06_01_full_reorder_off | d1be76378eb7238911194a6b844ee99e | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_full_reorder_on | d0898e09833691bb85152ca1f4fad03a | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_off | 3fabb9df8c1bdbe4330ac035f290c33e | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_on | fda3109d2104c80d9d9b9a0d9e9c44e3 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_full_reorder_off | 50257f19df3fbce7482da3d4fcf17324 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_full_reorder_on | a98099bdca62e7e31da9985d7e8588c3 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_off | c27ccea8afd0bcb8d60efa80f751ff39 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_on | e784144f2905a0bcb1f4a53512f272a8 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_03_full_reorder_off | 0e6eae85c312d4da0471ec2960c6f79f | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_full_reorder_on | 358511c6c9c6198045ea644eeec4e0d4 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_off | 266dff09277761f18987200b1d540d15 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_on | 00a2702674df81f76c4ea50d2c1d5538 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

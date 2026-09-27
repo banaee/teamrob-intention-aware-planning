@@ -300,3 +300,22 @@ same, and the `[run]` line does not record which):
 | env_layout_08_scenario_s06_01_on | bd4dea4c79485e202f2eda2b29a4f96f | 8cf0930761924a3aab1f1713f3f4bf29 |
 | env_layout_08_scenario_s06_02_off | 41301096d8fa57a0691ac4b88139c97b | 329590c9c1249859bfe20d107588c50a |
 | env_layout_08_scenario_s06_02_on | 0d8db6fb4067284052360722ca4756fe | 329590c9c1249859bfe20d107588c50a |
+
+## T-D R and E Stage 1: the recognizer without `unknown` — the logs from here on
+
+Regenerated at the T-D Stage 1 build (27 September 2026, cycle 1 session 1.3), superseding the T-L stage 3 table.
+CAUSE: a behaviour change of the recognizer (`docs/design_decisions.md`, "T-D R and E"): the `unknown` hypothesis,
+u and the grade are gone and the belief is normalised over the live hypothesis set H (R1, R6); the `[IR]` line
+carries the lifecycle state, the adequacy finding and the members' tail probabilities; the `[run]` header names
+the test level and the body's speed; the `[IR-boundary]` line no longer says "+ unknown"; `none(unknown)` refusals
+are gone. The `.rec` streams are byte-identical to the stage 3 ones (the human does not react to the robot). The
+gate is unchanged; its input is now the leader's share over H, so admissions moved, and in prior-off runs the
+robot's own remaining item is admitted once it is the lone live task after the human's last task (world lines
+differ from that tick). Measured in session 1.4, not corrected here. Command: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep --cost_strategy realized --gate_strategy none --separation_stop false`.
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_off | 3fabb9df8c1bdbe4330ac035f290c33e | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_on | fda3109d2104c80d9d9b9a0d9e9c44e3 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_off | c27ccea8afd0bcb8d60efa80f751ff39 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_on | e784144f2905a0bcb1f4a53512f272a8 | 329590c9c1249859bfe20d107588c50a |
