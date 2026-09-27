@@ -124,8 +124,10 @@ ALGORITHM:
     S = likelihood_functions.tail_probability(v·D, beta). A live hypothesis is
     a MEMBER of the test on a tick iff it has a derived phase this tick (an
     expected action) and that phase holds an observation: walked path since
-    its origin, or standing beyond s_exp (a stationary tick within the priced
-    duration is not one). The finding: unresolved iff there is no member;
+    its origin, or standing beyond s_exp, or, in a stationary phase (pick_up,
+    place, wait_at), a stationary tick within the priced duration (D <= 0,
+    S = 1; E6 amended 27 Sept 2026). A walk with nothing walked and no
+    standing is not one. The finding: unresolved iff there is no member;
     unexplained iff every member has S < alpha (intersection-union); adequate
     otherwise. A non-member contributes no S. Computed from scratch every
     tick, with no memory beyond each hypothesis's current phase: an
@@ -736,8 +738,9 @@ class IntentionRecognizer:
         H empty: EXHAUSTED, no finding, no tails (R4). Otherwise, per live
         hypothesis in hypothesis order: a MEMBER iff it has a derived phase
         this tick (an expected action) and that phase holds an observation —
-        walked path since its origin, or standing beyond the priced standing
-        s_exp (E6). A member's projected completion delay
+        walked path since its origin, standing beyond the priced standing
+        s_exp, or a stationary tick within s_exp in a stationary phase
+        (E6, amended 27 Sept 2026: then D <= 0 and S = 1). A member's projected completion delay
             D = e/v + (s − s_exp)
         and its tail S = tail_probability(v·D, beta) (E2, E5). Unresolved iff
         there is no member; unexplained iff every member has S < alpha (E4);
@@ -754,7 +757,13 @@ class IntentionRecognizer:
             walked = odo - self._origin_odo[key]
             s = still - self._origin_still[key]
             s_exp = self._priced_standing(action)
-            if not (walked > 0.0 or s > s_exp):
+            # A stationary phase (no movement target: pick_up, place, wait_at)
+            # is derived only at its location; a stationary tick in it within
+            # the priced duration is an observation with D <= 0 (E6, amended
+            # 27 Sept 2026). Its entry tick counts: the arrival step belongs
+            # to the closing walk's stretch.
+            stationary_phase = action.schema.movement_target_key is None
+            if not (walked > 0.0 or s > s_exp or (stationary_phase and s <= s_exp)):
                 continue                    # the phase holds no observation
             e = self._excess(action, self._origin[key], walked, pos, world)
             delay = e / self._speed + (s - s_exp)

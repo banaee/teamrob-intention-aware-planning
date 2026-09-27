@@ -54,8 +54,9 @@ class AdequacyFinding(Enum):
     The recognizer's adequacy finding (T-D R2, E4 to E7): whether some live
     hypothesis explains its current derived phase. A member of the test on a
     tick is a live hypothesis with a derived phase (an expected action) whose
-    phase holds an observation (walked path since its origin, or standing
-    beyond the priced standing s_exp).
+    phase holds an observation (walked path since its origin, standing
+    beyond the priced standing s_exp, or, in a stationary phase, a stationary
+    tick within s_exp: D <= 0, S = 1; E6 amended 27 Sept 2026).
     UNRESOLVED   no member;
     UNEXPLAINED  every member's tail probability is below the test level alpha;
     ADEQUATE     otherwise.
