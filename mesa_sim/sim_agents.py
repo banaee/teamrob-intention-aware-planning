@@ -362,7 +362,7 @@ class RobotAgent(FactoryAgent):
         )
         self.meta_planner.seed_tasks(assigned_tasks)
         self.current_task_instance: Optional[TaskInstance] = None
-        self.finished: bool = False
+        self.finished: bool = False   # no work remains (the terminal return); the robot still observes
 
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
@@ -382,9 +382,11 @@ class RobotAgent(FactoryAgent):
     def step(self):
         """
         Full cognitive loop: observe → recognize → replan? → plan → execute.
+        Observation and recognition run on every tick; once the task pool is
+        empty (`finished`, the terminal return) no trigger is evaluated,
+        nothing is decided and the executor is not stepped (design_decisions.md,
+        "The cognitive loop does not end with the task pool").
         """
-        if self.finished:
-            return
         human = self._get_observed_human()
 
         world = build_world_state(model=self.model)
@@ -402,26 +404,6 @@ class RobotAgent(FactoryAgent):
                     world=world,
                     prev_belief=self.prev_belief
                 )
-
-        # Note the "seed initial plan" block is gone as a separate step 
-        # — evaluate_triggers()'s no_current_task condition already covers both t=0 and post-advance_task(), 
-        # so the old two-block structure (seed-if-None, then separate should_replan check) collapses 
-        # into one trigger-driven block. 
-        # That's intentional, not an oversight — matches how evaluate_triggers() was designed.
-        
-        executor_state = ExecutorState(
-            agent_id=self.unique_id,
-            current_task=self.current_task_instance,
-            holding=self.carrying,
-        )
-        belief_for_meta_planner = self.belief or self._make_dummy_belief()
-
-        trigger = self.meta_planner.evaluate_triggers(
-            belief=belief_for_meta_planner,
-            world=world,
-            executor_state=executor_state,
-        )
-        logging.info(f"[meta-trig] step={int(self.model.schedule.steps)} trigger={trigger.reason}")
 
         if self.belief is not None and human is not None:
             # The recognizer's three outputs (T-D R2 to R4): the belief's
@@ -451,6 +433,32 @@ class RobotAgent(FactoryAgent):
                 f"confidence={self.belief.confidence:.3f} "
                 f"dist=[{dist_str}]"
             )
+
+        # The empty task pool stops planning and execution only: after the
+        # terminal return no trigger is evaluated (no_current_task would refire
+        # on every tick), nothing is decided, the executor is not stepped.
+        if self.finished:
+            return
+
+        # Note the "seed initial plan" block is gone as a separate step 
+        # — evaluate_triggers()'s no_current_task condition already covers both t=0 and post-advance_task(), 
+        # so the old two-block structure (seed-if-None, then separate should_replan check) collapses 
+        # into one trigger-driven block. 
+        # That's intentional, not an oversight — matches how evaluate_triggers() was designed.
+        
+        executor_state = ExecutorState(
+            agent_id=self.unique_id,
+            current_task=self.current_task_instance,
+            holding=self.carrying,
+        )
+        belief_for_meta_planner = self.belief or self._make_dummy_belief()
+
+        trigger = self.meta_planner.evaluate_triggers(
+            belief=belief_for_meta_planner,
+            world=world,
+            executor_state=executor_state,
+        )
+        logging.info(f"[meta-trig] step={int(self.model.schedule.steps)} trigger={trigger.reason}")
 
         if trigger.fired:
             human_projection = self.meta_planner.update_human_projection(
