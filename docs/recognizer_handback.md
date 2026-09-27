@@ -2,6 +2,10 @@
 REWRITTEN TO HEAD at the T-D Stage 1 build (27 September 2026; design_decisions.md, "T-D R and E"): the `unknown`
 hypothesis, u, the grade and the odds accounting are gone (R1); the recognizer reports an adequacy finding and a
 lifecycle state beside the belief (R2 to R4, E1 to E7). The earlier text is in git history (before commit 367a3a7).
+REWRITTEN TO HEAD at the cycle 1.5b build (27 September 2026; design_decisions.md, "T-D R and E", "1.5 rulings"):
+E8 (the advance tick), E9 (s_exp by the Projector's attribution), E10 (the belief's evidence per phase is L(v·D))
+and G1 (the guard on admission, the meta-planner's side, §5). Figures in §3 are from the regeneration at 1.5b, with
+the 1.3b value where it moved (1.3b → 1.5b); acceptance in `analysis/td_stage1b/REPORT.md`.
 
 What `shared/recognizer.py` and `shared/likelihood_functions.py` do at HEAD (September 2026), for two readers:
 later sessions of this project, and colleagues who last saw the recognizer before July 2026 (start with §9,
@@ -63,25 +67,36 @@ A task's likelihood is the likelihood of the action it expects now: $P(o_t \mid 
 
 ### 1.4 Likelihoods
 
-MOVEMENT (actions with `progress_evaluator = "excess_path"`, in kitting `move_to`). Measured from the origin $o$,
-with $w$ the distance walked since $o$ (per-agent odometer: the sum of straight-line steps between observed
-positions), $p$ the current position and $g$ the target's current position (`shared/target_resolution.py`; a
-carried object resolves through its holder):
+THE PHASE (T-D E10, 1.5 rulings). Every live hypothesis's derived phase is scored by one statistic, its projected
+completion delay in ticks, measured from the phase's origin $o$:
 
 $$
- e = w + C(p, g) - C(o, g) \qquad \text{(the path wasted under the hypothesis; } \texttt{excess\_path}\text{)}
+D = e / v + (s - s_{\mathrm{exp}}), \qquad e = w + C(p, g) - C(o, g) \quad \text{(the path wasted under the hypothesis; } \texttt{excess\_path}\text{)}
 $$
 
+$w$ the distance walked since $o$ (per-agent odometer: the sum of straight-line steps between observed positions),
+$p$ the current position, $g$ the target's current position (`shared/target_resolution.py`; a carried object
+resolves through its holder); $e = 0$ for an action with no `progress_evaluator` (`pick_up`, `place`, `wait_at`) or
+no resolvable target. $s$ the ticks the agent stood since $o$ (per-agent standing clock), $s_{\mathrm{exp}}$ the
+Projector's priced stationary ticks within the phase (§1.10, E9), $v$ the body's speed. The belief's evidence for
+the phase is the logistic of $v \cdot D$, clipped at 1:
+
 $$
-L = \frac{2}{1 + \exp(\beta \cdot e)} \qquad L(0)=1,\quad L(1/\beta)=\frac{2}{1+e}\approx 0.54,\quad L\to 0 \text{ as } e\text{ grows}
+L = \frac{2}{1 + \exp(\beta \cdot v D)} \text{ for } vD > 0, \qquad L = 1 \text{ for } vD \le 0
+\qquad L(1/\beta)=\frac{2}{1+e}\approx 0.54,\quad L\to 0 \text{ as } vD\text{ grows}
 $$
 
-$C$ is the path cost, straight-line by default and injectable (`IntentionRecognizer(path_cost=…)`). With a
-static target and a metric $C$, $e \ge 0$ and $L \in (0, 1]$; a moving target can make $e$ negative, $L \in (0, 2)$. One
-stretch toward one target is ONE observation however many ticks it spans: its value is recomputed from the
-origin every tick and replaces the previous tick's. A stationary tick mid-stretch leaves $e$ where it was. The
-excess $e$ is computed once (`likelihood_functions.excess_path`, registered in `EXCESS_MEASURES` under the
-evaluator's name) and read by both the likelihood and the adequacy test (§1.10).
+(`likelihood_functions.delay_likelihood`). For a walk with no standing beyond its $s_{\mathrm{exp}}$, $vD = e$ and
+$L = L(e)$: walking evidence is the excess-path likelihood, unchanged (asserted on a walking-only span in
+`tests/test_td15_build.py`; the maintained baselines' walking-only `[IR-dist]` lines are byte-identical). Standing
+beyond $s_{\mathrm{exp}}$ is charged $v$ per tick, as excess path is. Standing within it is no charge (I4c
+narrowed). The clip: a moving target's negative excess ($e < 0$, which gave $L \in (1, 2)$ before 1.5b) reads 1, the
+moving target being outside the model; in the maintained baselines, prior off, $e < 0$ occurs only at rounding
+($|e| \le 7 \cdot 10^{-13}$ cm; `analysis/td_stage1b/clip_ticks.txt`). $C$ is the path cost, straight-line by default
+and injectable (`IntentionRecognizer(path_cost=…)`). One phase is ONE observation however many ticks it spans: its
+value is recomputed from the origin every tick and replaces the previous tick's. The excess $e$ is computed once
+(`likelihood_functions.excess_path`, registered in `EXCESS_MEASURES` under the evaluator's name) and $vD$ once
+(`_delay_length`), read by both the belief (L) and the adequacy test (S, §1.10).
 
 COMPLETION SIGNAL (an event). If the observed microaction is in the declared vocabulary of the action the
 hypothesis expected on the PREVIOUS tick (`pick_up` → GRASP, `place` → RELEASE), the event factor is
@@ -98,16 +113,16 @@ It multiplies into the evidence once. It is judged on the previous tick's action
 grasp already satisfies `pick_up`'s completion, so the derived action has moved on. A terminal action's
 signal never reaches this channel: the completion pin (§1.6) retires the hypothesis first.
 
-NO GRADED SIGNAL. An action with no evaluator (`pick_up`, `place`, `wait_at`), a target with no resolvable
-position, or a hypothesis the planner cannot decompose in this world (`DecompositionError`, logged once)
-scores the perfect-fit value L = 1: nothing to charge. An undecomposable hypothesis is therefore not refuted;
-it is treated as fitting.
+NO DERIVED PHASE. A hypothesis the planner cannot decompose in this world (`DecompositionError`, logged once) has
+no phase and scores the perfect-fit value L = 1: nothing to charge. It is therefore not refuted; it is treated as
+fitting (and it is never a member of the adequacy test).
 
-EMPTY STRETCH. A graded action whose stretch is empty (w ≤ 0: the tick a hypothesis enters the action, the
-ticks after a boundary before the agent moves) is not an observation. It contributes no factor. That is not
-the value 1: 1 is a perfectly efficient walk, and here there is no walk. On such a tick the hypothesis pays
-nothing while a rival with an open stretch pays its L (accepted, I4d point 4). Time never enters the belief:
-a stand is charged in the adequacy test only (§1.10; E3).
+AN EMPTY PHASE. A phase with nothing walked and no standing beyond its $s_{\mathrm{exp}}$ (the tick a hypothesis
+enters an action, the ticks after a boundary before the agent moves) has $vD \le 0$ and pays L = 1: no charge,
+the belief carries forward. Before 1.5b this was "no factor" (I4c: an empty stretch is not an observation);
+the value is the same. On such a tick the hypothesis pays nothing while a rival with an open, charged phase
+pays its L (accepted, I4d point 4). Standing now enters the belief (E10, superseding E3's "time enters adequacy
+only"), through D and only beyond the priced standing.
 
 ### 1.5 Evidence: normalised likelihood over H
 
@@ -116,17 +131,17 @@ H. For every live $k$ and tick $t$:
 
 $$
 E_t(k) \propto \pi(k)
-\cdot \prod_{s \in \mathrm{stretches\ of\ } k \mathrm{\ closed\ by\ } t} L_k(s)
+\cdot \prod_{\phi \in \mathrm{phases\ of\ } k \mathrm{\ closed\ by\ } t} L(v D_k(\phi))
 \cdot \prod_{e \in \mathrm{events\ of\ } k} c_k(e)
-\cdot \left(v_k(t) \text{ if } k\text{'s open stretch is an observation, else }1\right),
+\cdot L(v D_k(t)),
 \qquad \sum_{k \in H} E_t(k) = 1
 $$
 
-- The open stretch's current value v multiplies on top for this tick only.
-- A phase change FOLDS the closing stretch's final value into the base once — or nothing if that stretch was
-  empty — and moves the origin to the agent's position, odometer and standing-clock readings. A fold moves a
-  factor from the open term to the base without changing it. A regress folds too; a no-graded-signal phase
-  folds 1.
+- The open phase's current value L(v·D) multiplies on top for this tick only.
+- A phase change FOLDS the closing phase's final value L(v·D) into the base once (1 if its delay was not
+  positive) and moves the origin to the agent's position, odometer and standing-clock readings. The final value
+  is computed with the tick of the change included (the grasp tick's standing belongs to the closing `pick_up`,
+  s = 2 = s_exp). A fold moves a factor from the open term to the base without changing it. A regress folds too.
 - Events enter as c.
 
 One normalisation, over H. The stored bases are rescaled by the same total each tick, so they stay in one
@@ -180,8 +195,9 @@ belief mass, so it does not sum to 1 — `most_likely` is `None` and `confidence
 the lifecycle state EXHAUSTED. The meta-planner's gate reads 0.0 and refuses admission as `none(below_theta)`:
 the expected, measured behaviour in this cycle, not a design (G).
 
-Beside the belief, `BeliefState` carries the adequacy finding, the lifecycle state and the members' tail
-probabilities (§1.10). Belief and finding are independent outputs (R3).
+Beside the belief, `BeliefState` carries the adequacy finding, the lifecycle state, the members' tail
+probabilities and every live hypothesis's hypothesis adequacy (§1.10). Belief and finding are independent outputs
+(R3); since E10 they read one statistic, D, through two functions (L and S).
 
 ### 1.8 `update()` in pseudocode
 
@@ -209,8 +225,9 @@ for k in sorted(hypotheses):
         continue
 
     a = first action in A whose completion not in world.predicates  # None if A is None
-    if k never observed:  # enters its action: empty stretch
+    if k never observed:  # enters its action from no completion: an empty phase
         expected[k], origin[k], origin_odo[k], origin_still[k] = a, pos, odo, still
+        entry_latency[k] = 0
         U[k] = base[k]
         continue
 
@@ -219,15 +236,13 @@ for k in sorted(hypotheses):
         base[k] *= HIT if a_prev.completion in world.predicates else FALSE_ALARM
 
     if a_prev != a:  # phase advance or regress
-        L = lambda_(a_prev, origin[k], odo - origin_odo[k], pos)
-        if L is not None:
-            base[k] *= L  # fold
+        base[k] *= lambda_(k, a_prev)  # fold: the closing phase's L(v·D), this tick included
         expected[k], origin[k], origin_odo[k], origin_still[k] = a, pos, odo, still
-        v = lambda_(a, pos, 0, pos)  # None if graded; 1 if not
-    else:
-        v = lambda_(a, origin[k], odo - origin_odo[k], pos)
-
-    U[k] = base[k] * (v if v is not None else 1)
+        completed = a_prev is not None and a_prev.completion in world.predicates
+        entry_latency[k] = ACTION_LATENCY if completed else 0  # E9
+        if completed:
+            advanced.add(k)  # E8
+    U[k] = base[k] * lambda_(k, a)  # the open phase's L(v·D)
 
 Z = sum(U.values())                               # over H only
 base = {k: v / Z for k, v in base.items()}
@@ -238,26 +253,28 @@ if boundary:  # episode ends
     E = base.copy()
     for k in live_keys:
         origin[k], origin_odo[k], origin_still[k] = pos, odo, still
+        entry_latency[k] = ACTION_LATENCY + OBSERVED_TASK_LATENCY  # E9
+    advanced = {}  # E8: no observation on the boundary tick
 
 P = output(E)  # §1.7
 most_likely, confidence = (argmax over H of P, its value) if E else (None, 0.0)
-finding, lifecycle, tails = adequacy(pos, odo, still)  # §1.10
-return BeliefState(P, most_likely, confidence, finding, lifecycle, tails)
+finding, lifecycle, tails, hypothesis_adequacy = adequacy(pos, odo, still, advanced)  # §1.10
+return BeliefState(P, most_likely, confidence, finding, lifecycle, tails, hypothesis_adequacy)
 ```
 
-The progress term used in the pseudocode is:
+The phase term used in the pseudocode (`_phase_likelihood`) is, from $k$'s origin $o$, walked $w$ and standing $s$:
 
 $$
-\lambda(a, o, w, p)=
+\lambda(k, a)=
 \begin{cases}
-1, & \text{if } a = \mathrm{None} \text{ or } a \text{ has no progress\_evaluator or } a\text{'s target has no position},\\
-\mathrm{none}, & \text{if } w \le 0,\\
-\frac{2}{1 + \exp(\beta \cdot e)}, & \text{where } e = w + C(p,g) - C(o,g).
+1, & \text{if } a = \mathrm{None} \text{ (no derived phase)},\\
+\mathrm{delay\_likelihood}(e + v\,(s - s_{\mathrm{exp}}(k, a)),\ \beta), & \text{otherwise, } e = w + C(p,g) - C(o,g) \text{ (0 without evaluator or target, or if } w \le 0\text{)},
 \end{cases}
 $$
 
-Likelihoods are memoised per tick by their inputs: (evaluator, origin, walked, target) and the grounded
-completion predicate. Two items on one shelf therefore receive identical values from the same origin.
+with $s_{\mathrm{exp}}(k, a)$ = entry_latency[k] + the action's own stationary duration (§1.10). The excess is
+memoised per tick by (evaluator, origin, walked, target), and the completion likelihood by the grounded
+predicate. Two items on one shelf therefore share one excess from the same origin.
 
 ### 1.9 Closed forms
 
@@ -271,9 +288,13 @@ completion predicate. Two items on one shelf therefore receive identical values 
   ratios against $k$: θ needs $\sum_j R_j \le 1/3$. Confirmation is by refutation of the rivals alone: the true
   hypothesis on a straight walk has L = 1 and gains nothing on its own; an arrival fold adds nothing (L = 1).
 - $L(30\,\mathrm{cm}) = 0.85$, the slop at the proximity threshold (TODO-58).
+- Standing (E10): one tick beyond $s_{\mathrm{exp}}$ is worth $L(v) = L(20\,\mathrm{cm}) = 0.90$. A hypothesis within its
+  priced standing (coffee_break's `wait_at`, 31 ticks after its walk) against a walk rival at an even tie clears θ
+  when the rival's $L \le 1/3$: $v\,(s - s_{\mathrm{exp}}) \ge \ln 5 / \beta = 160.9$ cm, 9 standing ticks
+  (scenario_s05_01 / _02 prior on: arrival 23, crossing 32).
 - There is no ceiling below 1 (the ceiling $1/(1 + u^n)$ went with u).
 
-### 1.10 The adequacy finding (T-D E1 to E7)
+### 1.10 The adequacy finding (T-D E1 to E9, G1)
 
 The recognizer's second output, computed after the belief, from scratch every tick (`_adequacy`).
 
@@ -281,21 +302,37 @@ UNIT (E1). Each live hypothesis's DERIVED PHASE: from its existing origin to its
 episode constant. A regress at the proximity threshold is a phase change and restarts that hypothesis's test
 (limitation (b) of the entry).
 
-STATISTIC (E2, E3). Per live hypothesis $k$ in its derived phase, the projected completion delay, in ticks:
+STATISTIC (E2, E9). Per live hypothesis $k$ in its derived phase, the projected completion delay of §1.4, in ticks:
 
 $$
 D_k = e_k / v + (s_k - s_{\mathrm{exp}})
 $$
 
-$e_k$ the excess path from the origin exactly as the movement likelihood computes it (0 for a phase with no
-evaluator or no resolvable target: `pick_up`, `place`, `wait_at`); $v$ the body's speed; $s_k$ the ticks without
-movement since the origin; $s_{\mathrm{exp}}$ the standing the Projector prices for the phase, by the Projector's own
-rule and source (`_priced_standing`; ruled on the Stage 1 plan, 27 September 2026: one source): 0 for a walk (the
-schema names a movement target), the bound duration through the body's `duration_to_steps` for an action whose
-schema names a duration binding (`wait_at`: PT60S → 30 ticks, PT2S → 1 tick), otherwise
-`task_model.get_cost(action)` (no costs in kitting), and failing that the body's `default_action_cost`, 1 tick
-(`pick_up`, `place`). A stand in a `move_to` phase is charged against $s_{\mathrm{exp}} = 0$. $D$ is non-decreasing within a
-phase (e and s only grow for a static target). Time enters here only, never the belief's likelihood.
+the same statistic the belief reads (E10). $s_{\mathrm{exp}}$ is the Projector's priced stationary ticks that fall
+within the phase's span (E9, `_priced_standing(key, action)`), read from the Projector's own sequence and source:
+per action its own segment, then the body's `action_completion_latency`; the latency falls in the phase the
+completion opens. So $s_{\mathrm{exp}}$ = the latency priced after the completion that opened the phase
+(`_entry_latency`: `action_completion_latency` when the previous expected action's completion predicate holds on
+the tick the phase is entered; that plus the observed agent's `observed_task_completion_latency` for every phase a
+boundary opens; 0 for the phase a hypothesis is first observed in, and after a regress or a method flip that
+completed nothing) + the action's own stationary duration (`_action_duration`: 0 for a walk; the bound duration
+through the body's `duration_to_steps` for an action whose schema names a duration binding, `wait_at`: PT60S → 30
+ticks, PT2S → 1 tick; otherwise `task_model.get_cost(action)`, no costs in kitting; failing that the body's
+`default_action_cost`, 1 tick, `pick_up`, `place`). The derived values in kitting (Mesa: latency 1, the human's
+task latency 0):
+
+| phase | s_exp |
+|---|---|
+| the initial walk (first observed, no completion before it) | 0 |
+| `pick_up` / `place` after its walk | 1 + 1 = 2 |
+| a walk entered from a completion (the carry after a grasp; the first walk after a boundary) | 1 |
+| `wait_at` after its walk | 1 + 30 = 31 |
+| a stationary phase first observed (the agent starts there) | its own duration only (1; 30) |
+
+The body stands 3 ticks at a shelf or table (the walk's latency, the action, the action's latency); the recognizer
+now charges the same ticks to the same phases as the Projector (`analysis/td_stage1b/g_priced_standing.txt`): the
+true hypothesis's D on its walking ticks is exactly 0 on every tick (3891 of 3891 per prior), where under Stage 1
+it was 1 on 77.5% (the latency tick charged to the walk). $D$ is non-decreasing within a phase.
 
 TAIL (E5). $S_k = S(v D_k)$ with $S(x) = \ln(1 + e^{-\beta x}) / \ln 2$ for $x > 0$ and $S = 1$ for $x \le 0$
 (`tail_probability`): the tail of the belief's own likelihood shape read as a density on $x \ge 0$,
@@ -304,29 +341,39 @@ movement likelihood's β, not retuned (its second meaning). At $v = 20$ cm/tick 
 $vD = 334.5$ cm (17 ticks of standing in a walk; 167 cm walked straight away from the target), $S < 0.01$ from
 496.8 cm (25 ticks).
 
-MEMBERSHIP (E4, E6; ruled by Hadi, 27 September 2026, the precise form, to be recorded in the entry at 1.5;
-E6 AMENDED the same day on the 1.3 report). A live hypothesis is a MEMBER of the test on a tick iff it has a
-derived phase this tick (an expected action) and that phase holds an observation: walked path since its origin,
-or standing beyond $s_{\mathrm{exp}}$, or — in a stationary phase (`pick_up`, `place`, `wait_at`: no movement target) —
-a stationary tick within its priced duration ($s \le s_{\mathrm{exp}}$), which is an observation with $D \le 0$ and
-$S_k = 1$: a hypothesis whose priced standing has not ended explains the behaviour exactly. A stationary phase is
+MEMBERSHIP (E4, E6 as amended, E8; the complete rule recorded in the entry at 1.5b). A live hypothesis is a MEMBER
+of the test on a tick iff it has a derived phase this tick (an expected action) and that phase holds an
+observation: walked path since its origin, or standing beyond $s_{\mathrm{exp}}$, or — in a stationary phase (`pick_up`,
+`place`, `wait_at`: no movement target) — a stationary tick within its priced duration ($s \le s_{\mathrm{exp}}$), which is
+an observation with $D \le 0$ and $S_k = 1$: a hypothesis whose priced standing has not ended explains the behaviour
+exactly. And (E8) on the tick a hypothesis's expected action completes (the phase change where the previous
+expected action's completion predicate holds), that hypothesis is a member with $S_k = 1$, whatever phase it
+advances into: the completion is an observation consistent with it. Not on a boundary tick: the hypotheses
+entering the new episode hold no observation there. A stationary phase is
 derived only once its location is reached (the preceding walk's `at()` holds), so the agent is at the phase's
 location. The entry tick of a stationary phase counts as its first stationary tick ($s = 0$): the arrival step
 of that tick belongs to the closing walk's stretch, and nothing has been walked since the new origin. A
-`move_to` phase with nothing walked since its origin and no standing beyond $s_{\mathrm{exp}} = 0$ holds no
-observation, so the first tick after a boundary stays unresolved. An observation whose D is not surprising is
+`move_to` phase with nothing walked since its origin and no standing beyond its $s_{\mathrm{exp}}$ holds no
+observation, so the boundary tick and the latency tick after it stay unresolved, and the finding resolves on the
+first walking tick (or, for an idle human, on the first standing tick beyond the latency). The same holds on the
+latency tick after a grasp: the true hypothesis's carry walk holds no observation there (s = 1 = s_exp), and a
+refuted rival alone decides the finding (scenario_s02_01 on 248, scenario_s04_01 on 269, scenario_s03_06 on 89:
+unexplained at every α; `analysis/td_stage1b/REPORT.md`, C). An observation whose D is not surprising is
 still one. A non-member contributes no $S_k$ (absent from `tails`); a hypothesis with no expected action
 (undecomposable) is never a member.
 
 FINDING. UNRESOLVED iff there is no member; UNEXPLAINED iff every member has $S_k < \alpha$
-(intersection-union); ADEQUATE otherwise. No memory beyond each live hypothesis's current phase (E7): an
+(intersection-union); ADEQUATE otherwise. HYPOTHESIS ADEQUACY (G1), per live hypothesis: ADEQUATE (a member with
+$S_k \ge \alpha$), INADEQUATE (a member with $S_k < \alpha$), NO_OBSERVATION (not a member); the finding is adequate
+exactly when some live hypothesis's is. No memory beyond each live hypothesis's current phase (E7): an
 unexplained finding clears when a member reaches $S_k \ge \alpha$, or when a phase advance or an episode boundary
 empties the membership. α is the run option `test_level`, default 0.05, never chosen from a scenario; it is not
 a meta-planner threshold. LIFECYCLE: EXHAUSTED iff H is empty, and then no finding (R4).
 
-What nothing does with it yet: the meta-planner reads `confidence` and `most_likely` only; the finding is for
-Stage 1's measurement (session 1.4) and for G. The `[IR]` log line carries `lifecycle=`, `finding=` (absent when
-exhausted) and `tails=[key=S …]` over the members, to four decimals.
+What reads it: the meta-planner reads the leader's hypothesis adequacy at its gate (G1, §5), never α or $S_k$;
+the finding itself, the lifecycle and the tails are for evaluation and for the rest of G. The `[IR]` log line
+carries `lifecycle=`, `finding=` and `leader_adequacy=` (both absent when exhausted) and `tails=[key=S …]` over the
+members, to four decimals; every other hypothesis's adequacy follows from the tails and α.
 
 ## 2. Parameters
 
@@ -335,10 +382,12 @@ rest are the body's or the run's, passed to the constructor. `shared/` holds no 
 
 | parameter | value (Mesa) | source | meaning |
 |---|---|---|---|
-| β | 0.01 /cm | body, `mesa_configs.yaml` `simulation.beta` | Detour tolerance: L at an excess of 1/β = 100 cm is 2/(1+e) ≈ 0.54. Since T-D E5 also the scale of the adequacy test's reference distribution. A physical tolerance per embodiment, not per layout (T-A1). |
-| v (`speed`) | 20 cm/tick | body, `mesa_configs.yaml` `simulation.step_size` (the Projector's `assumed_speed`) | converts the excess to ticks in D |
+| β | 0.01 /cm | body, `mesa_configs.yaml` `simulation.beta` | Detour tolerance: L at v·D = 1/β = 100 cm is 2/(1+e) ≈ 0.54. Since T-D E5 also the scale of the adequacy test's reference distribution. A physical tolerance per embodiment, not per layout (T-A1). |
+| v (`speed`) | 20 cm/tick | body, `mesa_configs.yaml` `simulation.step_size` (the Projector's `assumed_speed`) | converts between excess and ticks in D; one standing tick beyond s_exp is v·1 = 20 cm |
 | `duration_to_steps` | seconds / 2.0, at least 1 | body, `_parse_duration_to_steps` over `simulation.seconds_per_step` (the Projector's) | a duration binding in ticks, for s_exp |
-| `default_action_cost` | 1 tick | body, `RobotAgent` (the Projector's) | s_exp of `pick_up` and `place` (TODO-113: a schema fact later) |
+| `default_action_cost` | 1 tick | body, `RobotAgent` (the Projector's) | the own stationary duration of `pick_up` and `place` in s_exp (TODO-113: a schema fact later) |
+| `action_completion_latency` | 1 tick | body, `mesa_sim/executor.ACTION_COMPLETION_LATENCY` (the Projector's) | E9: priced to the phase a completion opens |
+| `observed_task_completion_latency` | 0 ticks | body, `mesa_sim/sim_agents.HUMAN_TASK_COMPLETION_LATENCY` (the Projector's, for the observed agent) | E9: priced, with the action latency, to the phases a boundary opens |
 | α (`alpha`) | 0.05 | run option `test_level` (`configs/experiment.yaml`, `--test_level`) | the adequacy test's level per derived phase; reported at 0.01, 0.05 and 0.1 |
 | `DETECTION_HIT_RATE` | 1.0 | `likelihood_functions.py` | P(signal \| the action completed). Mesa reports every completion. |
 | `DETECTION_FALSE_ALARM_RATE` | 10⁻³ | `likelihood_functions.py` | P(signal \| not completed). Mesa has none; non-zero only so a refuted hypothesis keeps a recoverable base. Set both rates from a real detector's measured rates. |
@@ -363,13 +412,13 @@ LOAD-BEARING, NOT PARAMETERS:
   (TODO-66). Inert in every run: Mesa builds `ContextKnowledge.default()` (21.0 °C, shift from step 0) and no
   run reaches 500 steps.
 
-## 3. The guarantee statement (β = 0.01 /cm, θ = 0.75, T-D Stage 1)
+## 3. The guarantee statement (β = 0.01 /cm, θ = 0.75, T-D cycle 1.5b)
 
 "Guarantee" means: holds in every measured condition and follows from the model, not from a scenario. The
-conditions are the `analysis/tb1a_destination/` set at the T-D Stage 1 regeneration (the five regression
+conditions are the `analysis/tb1a_destination/` set at the cycle 1.5b regeneration (the five regression
 fixtures and the three evaluation fixtures × assignment prior off/on, `single_task`, stop off,
-PYTHONHASHSEED=0; logs local, md5s in its README). Where a figure moved with R1 the value before the build (the
-T-L stage 3 logs) is given as old → new. Ticks are `[IR] step=` values. A reveal is the first tick the task the
+PYTHONHASHSEED=0; logs local, md5s in its README). The reveal columns give the value before R1 (the T-L stage 3
+logs), at Stage 1 / 1.3b, and at 1.5b, as old → 1.3b → 1.5b where the last moved; old → new where only R1 moved it. Ticks are `[IR] step=` values. A reveal is the first tick the task the
 human is executing is `most_likely` with confidence ≥ θ; the human's task is read from the record's
 transitions, which land 2 ticks after the world fact the recognizer's boundary reads (all 48 runs). The
 adequacy finding's figures (false-unexplained, missed findings, detection delay) are session 1.4's
@@ -378,25 +427,25 @@ measurement, not stated here.
 | fixture | task (human, in order) | reveal prior-on | reveal prior-off | grasp / done |
 |---|---|---|---|---|
 | scenario_s01_01 | item_3 | 20 → 9 | 37 | grasp 41 |
-|  | item_2 | 94 → 78 | 108 → 114 | grasp 110 |
-| scenario_s02_01 | item_2 | 24 → 23 | 29 → 35 | grasp 31 |
-|  | coffee_break | 122 → none | 122 → none | done 155 |
+|  | item_2 | 94 → 78 | 108 → 114 → 113 | grasp 110 |
+| scenario_s02_01 | item_2 | 24 → 23 | 29 → 35 → 34 | grasp 31 |
+|  | coffee_break | 122 → none → 130 | 122 → none → 134 | done 155 |
 |  | item_5 | 200 → 160 | 243 → 242 | grasp 247 |
 |  | ac_activation(ac_switch_0) | 336 → 309 | 338 → 328 | done 364 |
-| scenario_s03_01 | item_3 | 11 → 5 | 20 → 30 | grasp 22 |
-|  | item_2 | 71 → 54 | 86 → 94 | grasp 88 |
+| scenario_s03_01 | item_3 | 11 → 5 | 20 → 30 → 29 | grasp 22 |
+|  | item_2 | 71 → 54 | 86 → 94 → 93 | grasp 88 |
 | scenario_s01_06 | item_3 | 23 → 18 | 27 → 26 | grasp 39 |
 |  | item_7 | 86 → 74 | 87 → 84 | grasp 97 |
 | scenario_s04_01 | item_3 | 30 → 19 | 30 → 19 | grasp 60 |
-|  | coffee_break | 152 → none | 152 → none | done 185 |
+|  | coffee_break | 152 → none → 158 | 152 → none → 158 | done 185 |
 |  | ac_activation(ac_switch_1) | 203 → none | 203 → none | done 207 |
 |  | ac_activation(ac_switch_2) | 216 → 214 | 217 | done 227 |
 |  | item_6 | 250 → 243 | 261 → 260 | grasp 268 |
-| scenario_s03_06 | item_3 | 11 → 6 | 20 → 30 | grasp 22 |
-|  | item_2 | 74 → 69 | 86 → 94 | grasp 88 |
+| scenario_s03_06 | item_3 | 11 → 6 | 20 → 30 → 29 | grasp 22 |
+|  | item_2 | 74 → 69 | 86 → 94 → 93 | grasp 88 |
 |  | coffee_break | 134 → 121 | 137 → 135 | done 178 |
-| scenario_s05_01 / _02 | coffee_break | 23 → none | 23 → none | done 56 |
-|  | item_5 | 59 → 60 | 60 → 71 | grasp 62 |
+| scenario_s05_01 / _02 | coffee_break | 23 → none → 32 | 23 → none → 36 | done 56 |
+|  | item_5 | 59 → 60 | 60 → 71 → 70 | grasp 62 |
 |  | ac_activation(ac_switch_0) | 118 → 94 | 120 / 118 → 104 | done 143 |
 
 ### 3.1 Prior-on (the observed agent's assignment is known)
@@ -406,34 +455,44 @@ The recognizer GUARANTEES:
   scored.
 - **At a boundary with one live task left, that task is at θ on the boundary tick**, by normalisation (R1):
   scenario_s01_01 item_2 at 78, scenario_s03_01 item_2 at 54, scenario_s01_06 item_7 at 74, scenario_s05_01 /
-  _02 ac_switch_0 at 94. Its confidence is $1 - 0.001\cdot|pinned|$ (0.996) on no evidence.
+  _02 ac_switch_0 at 94. Its confidence is $1 - 0.001\cdot|pinned|$ (0.996) on no evidence, and its hypothesis
+  adequacy is NO_OBSERVATION on the boundary tick and the latency tick after it: the meta-planner's gate refuses it
+  there (G1) and admits it on the first walking tick (78 → 80, 54 → 56, 74 → 76, 94 → 96).
 - **The first task, and a task among several live ones, is revealed on the walk**: every walk reveal precedes
   the grasp (the table). With R1 an even prior over two or three keys needs only the rivals refuted, so first
   reveals moved earlier (scenario_s01_01 item_3 20 → 9, scenario_s03_01 11 → 5).
-- **Not every foreseeable task is revealed**: `coffee_break` is never at θ in scenario_s02_01, scenario_s04_01
-  or scenario_s05_01 / _02 (it was, at its arrival fold, before R1: the fold was worth 1/u against `unknown`,
-  and at L = 1 it is worth nothing against rivals no longer refuted), nor is ac_switch_1 in scenario_s04_01.
+- **A foreseen stay is revealed during its stand** (E10): `coffee_break` clears θ in scenario_s02_01 at 130,
+  scenario_s04_01 at 158 and scenario_s05_01 / _02 at 32, each during its priced `wait_at`, when the rival on its
+  bearing has stood about 9 ticks beyond its own priced standing (§1.9). Under Stage 1 it was never at θ (the stand
+  moved only the finding). `ac_activation(ac_switch_1)` in scenario_s04_01 is still never at θ: its stand is one tick
+  (PT2S), and it peaks at 0.475 (204) before completing (205).
 - **After every admissible task is complete**, the recognizer is EXHAUSTED (scenario_s01_01 from 141,
   scenario_s02_01 from 362, scenario_s03_01 from 121, scenario_s01_06 from 120, scenario_s03_06 from 176,
   scenario_s05_01 / _02 from 141), unless a foreseeable task
   never performed stays live: in scenario_s04_01 `ac_activation(ac_switch_0)` is then the lone live task and
-  at θ from 327, with the human idle — a crossing of a task the human is not executing.
+  at θ from 327, with the human idle — a crossing of a task the human is not executing. It is refused on 327–328
+  (no observation), admitted at 329 (its walk charged one standing tick: adequate), and inadequate from 345.
 - **A completed task is at the floor for the rest of the run**, whoever completed it.
 
 ### 3.2 Prior-off (no assignment known)
 
 The same model over a larger live set: every task of every object, the robot's own undelivered items
 included. Therefore:
-- **Reveals are later, and several now follow the grasp**: scenario_s01_01 item_2 at 114 (grasp 110),
-  scenario_s02_01 item_2 at 35 (31), scenario_s03_01 / _06 item_3 at 30 (22) and item_2 at 94 (88),
-  scenario_s05_01 / _02 item_5 at 71 (62). Before R1 these were the arrival-fold reveals (§1.9 of the earlier
-  text: an arrival counted two observations against `unknown`); now an arrival folds L = 1 and adds nothing, so
-  the true task is separated only when the rivals' carry phases are refuted.
+- **Reveals are later, and several now follow the grasp**: scenario_s01_01 item_2 at 113 (grasp 110),
+  scenario_s02_01 item_2 at 34 (31), scenario_s03_01 / _06 item_3 at 29 (22) and item_2 at 93 (88),
+  scenario_s05_01 / _02 item_5 at 70 (62) — each one tick earlier than at Stage 1, the rivals now charged the
+  standing tick they are not priced for (E10). Before R1 these were the arrival-fold reveals (an arrival counted
+  two observations against `unknown`); an arrival folds L = 1, so the true task is separated when the rivals'
+  carry phases are refuted or their standing is charged.
 - **After the human's last task, the robot's own remaining item is at θ** once it is the lone live task, with
   the human idle: scenario_s01_01 item_4 at 141, scenario_s03_01 item_7 at 145, scenario_s01_06 item_6 at 160,
   scenario_s03_06 item_7 at 176, scenario_s05_01 item_3 at 171, scenario_s05_02 item_2 at 172, scenario_s04_01
-  `ac_activation(ac_switch_0)` at 379. Before R1, `unknown` held half the mass there and nothing crossed. The
-  meta-planner admits these (R1's admission shift, measured in 1.4, not corrected): see §5.
+  `ac_activation(ac_switch_0)` at 379. Before R1, `unknown` held half the mass there and nothing crossed. Its
+  hypothesis adequacy follows the idle stand: no observation on the boundary and latency ticks, adequate for the
+  next 16 ticks (standing charged beyond s_exp = 1), inadequate after. The gate (G1) therefore admits it where it is
+  still adequate (scenario_s01_01 at 143, hold 31, which runs to 173 though the leader is inadequate from 159: a
+  projection is retained by identity, D2) and refuses it where it is already inadequate (scenario_s03_01 at 147,
+  `none(leader_inadequate)`: no hold, the run completes at 236). See §5.
 - **An idle human sits at the uniform prior over what is still live** until a pin or exhaustion; the robot's
   deliveries shrink the set without re-initialising it.
 - **Dilution**: more live rivals mean less confidence from the same evidence and later reveals (item_5 in
@@ -453,8 +512,8 @@ included. Therefore:
   normalisation.
 - **β**: it sets every reveal tick and the scale of the adequacy test.
 - **The human's script.** A human who hesitates, back-tracks or wanders mid-task is charged as a rival would
-  be. A stand adds no evidence to the belief (I4c); it is charged in the adequacy test against the phase's
-  priced standing (§1.10). Every task in the script is one the domain describes (well typed, F47b).
+  be. A stand beyond the phase's priced standing is charged in the belief and in the adequacy test alike (E10,
+  §1.4, §1.10); a real human's pauses would refute the true task as they refute a rival. Every task in the script is one the domain describes (well typed, F47b).
 
 ### 3.4 What the meta-planner may assume, and must not
 
@@ -467,7 +526,10 @@ MUST NOT assume, either setting:
   human does (§3.1, §3.2);
 - that confidence is comparable across live-set sizes (0.75 is a different bar over 1, 2 and 8 keys);
 - that confidence says anything absolute: the belief is relative over the robot's models; whether the best of
-  them is wrong is the adequacy finding (§1.10), which the meta-planner does not read in this cycle;
+  them is wrong is the adequacy finding (§1.10); the meta-planner reads the leader's hypothesis adequacy at its
+  gate (G1), not the finding;
+- that an admitted hypothesis stays adequate: the gate is asked at admission only (D2), and a projection is kept
+  while the leader turns inadequate (scenario_s01_01 prior off, 159–173);
 - that a robot completion is a human boundary;
 - that confidence is monotone within a task;
 - that anything in the belief refers to a previous episode.
@@ -483,8 +545,9 @@ walk's odds against `unknown` grow with the path covered, went with u (R1).
 
 **(b) Accumulation is decomposition sensitive.** How a selected method cuts a walk into phases sets when a
 rival's excess is folded; the prior-off reveals after the grasp (§3.2) are the rivals' carry phases doing the
-refuting. A no-graded-signal phase (`pick_up`, `place`, `wait_at`) folds L = 1 and is evidence for nothing in
-the belief; it is assessed in the adequacy test against its priced standing.
+refuting. A stationary phase (`pick_up`, `place`, `wait_at`) is evidence in the belief only through standing
+beyond its priced duration (E10), and for a rival only through its own charges; a stay is revealed as the rivals on
+its bearing are charged their standing (§1.9).
 
 **(c) The adequacy test's limitations, recorded in the entry and not built**: sub-threshold waste is not
 summed across phases; a regress at the proximity threshold restarts a hypothesis's test; the false-unexplained
@@ -492,7 +555,9 @@ count per run grows with the number of phases of the true hypothesis. Under the 
 ruled, a finding could be unexplained while the true hypothesis was a non-member (standing within its priced
 duration) and only a refuted rival a member (scenario_s01_01 prior-on, steps 76–77, the human placing item_3);
 the E6 amendment of 27 September 2026 makes that hypothesis a member with S = 1, and the finding there reads
-adequate.
+adequate. E8 does the same for the advance tick (the grasp), but under E9 the latency tick after it holds no
+observation for the true hypothesis's carry walk, and the three false unexplained ticks of Stage 1 moved there
+(§1.10).
 
 Also stated, lower in consequence:
 - An undecomposable hypothesis scores the perfect fit in the belief and is never a member of the adequacy
@@ -506,25 +571,28 @@ Also stated, lower in consequence:
 
 `update()` returns a `BeliefState` (`shared/io_contracts.md` §1.2; contract §2.1): `timestamp`, `agent_id`,
 `distribution` (every hypothesis key, pinned ones at 10⁻³), `most_likely` (the argmax over H, `None` when
-exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle` and `tails`. The meta-planner
-reads only `most_likely` and `confidence` (io_contracts §2.2); it does not read the finding, the lifecycle or
-the tails in this cycle (R5: what it does with them is G and X, open):
-- `_clears_gate(belief)`, the one place θ is applied, tests `confidence ≥ θ`, θ = `DEFAULT_THETA` = 0.75,
-  unchanged. Its input changed meaning with R1: the leader's share over H. The gate ruling (September 2026)
-  stands; its reason, the crossing odds against `unknown`, is superseded by R1, and its justification is
-  re-derived from Stage 1's admission measurement (G). Measured at the regeneration: no admission at tick 0 in
-  any of the 48 baseline logs (no fixture starts with one live task); the admission shift occurs at the boundary
-  that leaves one task live, and prior-off it admits the robot's own remaining item with the human idle
-  (§3.2), which delays the robot (scenario_s01_01 prior-off completes at 202 instead of 169; scenario_s03_01
-  prior-off does not complete in 300 steps).
+exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`, `tails` and
+`hypothesis_adequacy`. The meta-planner reads `most_likely`, `confidence` and the leader's `hypothesis_adequacy`
+(io_contracts §2.2), never α or the tails; the finding and the lifecycle are for the rest of G and X (R5):
+- `_clears_gate(belief) -> GateOutcome`, the one place θ is applied and the one home of the guard on admission
+  (G1): CLEARS iff `confidence ≥ θ` (θ = `DEFAULT_THETA` = 0.75, unchanged) and the leader's hypothesis adequacy
+  is ADEQUATE; otherwise, in this order, BELOW_THETA, LEADER_NO_OBSERVATION, LEADER_INADEQUATE. A guard refusal
+  behaves as below θ. The gate's input changed meaning with R1 (the leader's share over H); the gate ruling
+  (September 2026) stands and its justification is G's. Measured at the 1.5b regeneration
+  (`analysis/td_stage1b/REPORT.md`): every boundary admission of a lone live task moves from the boundary tick to
+  the first walking tick (two ticks later); the wrong-table delivery is refused at 76 / 79
+  (`none(leader_inadequate)`); coffee_break is admitted during its stand; prior off the robot's own remaining item is
+  admitted where the idle human's stand has not yet made it inadequate (scenario_s01_01 at 143, hold 31, completion
+  200) and refused where it has (scenario_s03_01: completes at 236).
 - `evaluate_triggers()` fires `recognition_changed` (D2) when a decision record `_projected_hypothesis`
   exists and `most_likely` is no longer it: a replacement, the human's boundary, or no hypothesis live. It also
-  fires when no record exists and the belief clears the gate.
+  fires when no record exists and the belief clears the gate (θ and the guard, one condition).
 - `update_human_projection()` admits a projection only when the gate clears. It resolves the key through
   `recognizer.get_hypothesis()` (the same live instance, held by reference) to project the human's task, and
-  records the hypothesis it projected. Its refusal reasons are `none(below_theta)`, `none(no_human)` and
-  `none(unprojectable)` (the projector could not resolve the task; `none(unresolved)` before the Stage 1 build).
-  When the recognizer is exhausted it refuses as `none(below_theta)`.
+  records the hypothesis it projected. Its refusal reasons are `none(below_theta)`, `none(leader_no_observation)`,
+  `none(leader_inadequate)` (G1), `none(no_human)` and `none(unprojectable)` (the projector could not resolve the
+  task; `none(unresolved)` before the Stage 1 build). When the recognizer is exhausted it refuses as
+  `none(below_theta)`.
 
 Confidence is a gate, never a magnitude in any cost; `distribution` is logged and not read. (See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.) A
 re-crossing of the recorded hypothesis fires nothing; a change of hypothesis or its end fires
@@ -534,8 +602,10 @@ re-crossing of the recorded hypothesis fires nothing; a change of hypothesis or 
 
 | item | where | one line |
 |---|---|---|
-| Stage 1 verification | TODO-101; session 1.4 | the R6 invariant, recognizer outputs per ground-truth case against oracle IR, admissions before and after, false-unexplained / missed findings / detection delay at every α |
-| what the meta-planner does with belief, finding and lifecycle | G, X (T-D) | R5; TODO-97 on its own gate |
+| the latency tick after a grasp | cycle 1.5b acceptance (`analysis/td_stage1b/REPORT.md`) | under E8 + E9 the true carry walk holds no observation on it; a refuted rival alone makes it unexplained (3 ticks, prior on) |
+| an admitted projection retained while its leader turns inadequate | G; D2 | the gate is asked at admission only (scenario_s01_01 prior off, 159–173) |
+| a misdelivered item's hypothesis admitted after the release | L (1.4 finding 5) | scenario_s06_06 at 103, scenario_s07_03 at 94: S = 1 in a stationary phase at the item's new place |
+| what the meta-planner does with the finding and lifecycle | G, X (T-D) | R5; TODO-97 on its own gate; G1 built |
 | the gate's justification after R1 | G | the gate stands; its reason is re-derived from Stage 1's admissions (§5) |
 | s_exp of `pick_up` / `place` as a schema fact | TODO-113 | one source for the Projector and the recognizer, when the Projector is in scope |
 | collinear decoys | TODO-38 | targets on one bearing tie until one is refuted; no distance term since the grade went |
@@ -549,7 +619,9 @@ re-crossing of the recorded hypothesis fires nothing; a change of hypothesis or 
 Closed since the I5 hand-back: TODO-48 / 54 / 68 (D2); TODO-64 / 65 (the gate ruling, §5); TODO-72 (io_contracts
 §1.3 / §2.1 aligned with this document); TODO-52 (R1 / T10) and TODO-67 (T7), both meta-planner side; TODO-57's
 script-part-3 question, made moot by F47b; TODO-95's recognition level and TODO-59's deferred stationarity
-channel (closed by decision, T-D R and E: time enters adequacy only); TODO-61 (b) (reason superseded by R1).
+channel (closed by decision, T-D R and E: time enters adequacy only; superseded in part by E10 at 1.5b: standing
+beyond the priced standing is belief evidence through D, not a channel of its own); TODO-61 (b) (reason superseded
+by R1).
 
 ## 7. The paper-facing divergence
 
@@ -580,12 +652,13 @@ and not a specification. It will need rewriting on this point, and also on:
 | `CONFIDENCE_THRESHOLD` in the recognizer | θ has one home, the meta-planner's `_clears_gate`; the copy here had no reader | "θ has one home" |
 | the `unknown` hypothesis, u (`UNKNOWN_LIKELIHOOD`), the odds accounting against it and its invariant | one number carried four meanings (evidence against every hypothesis, the prior share, the mass left at exhaustion, nothing for a stand); the relative test could not say "the best of my models is wrong" | T-D R and E (R1, R6) |
 | the grade (`covered_fraction`, `graded_unknown_likelihood`) | it graded evidence against `unknown`, which is gone | T-D R and E (R1) |
-| a reserved "duration" progress evaluator | time enters the adequacy test, never the belief's likelihood | T-D R and E (E3) |
+| a reserved "duration" progress evaluator | standing enters through D beside the excess (E10), not as an evaluator of its own | T-D R and E (E3, E10) |
+| `PROGRESS_EVALUATORS` and `excess_path_likelihood` | the belief reads the excess through D (`delay_likelihood`), not through a likelihood of the excess alone; no reader was left | T-D R and E (E10), cycle 1.5b |
 
 Also gone and not to be re-added:
 - any persistence of belief across an episode boundary (I4c; I4b's "reset the geometry, keep the belief" was
   measured and found wrong);
-- any scoring of an empty stretch (I4c);
+- any charge for an empty phase or for standing within the priced standing (I4c, narrowed by E10);
 - a residual hypothesis in the belief, or any reference likelihood the live hypotheses are scored against (T-D R1);
 - a raw, unnormalised logistic (I4: every advance halved a hypothesis that had done nothing wrong).
 
@@ -621,7 +694,8 @@ Every element of that has been replaced. In order:
 | Sept 17, D2 (consumer) | `theta_crossed` as the trigger | `recognition_changed` against the decision record (§5) | a trigger is a change in what the decision rested on; recognizer unchanged |
 | Sept 19, graded evidence | a stretch's odds against `unknown` L/u whatever its length: one fitting step was a whole observation, and a lone task cleared θ on the human's first step | L / u^f, f the fraction of the expected path the stretch covered, 1 at an arrival by the completion fact (§1.4, §1.5); u, β, θ unchanged; invariant re-checked to 7e-15 | the model counted stretches and did not grade them by how much they revealed; a walk's evidence now accrues per unit of path and does not depend on how the phases cut it. Every figure in §3 is from this HEAD, with the pre-grade value where it moved. |
 
-| Sept 27, T-D R and E Stage 1 | the `unknown` hypothesis, u, the grade and the odds accounting; one number carrying four meanings | the belief normalised over the live set H only (§1.5); beside it the adequacy finding, per live hypothesis per derived phase, D and its tail S at the test level α (§1.10), and the lifecycle state (EXHAUSTED when H is empty) | the relative test could not express "the best of my models is wrong"; `unknown` at 0.995 was normalisation, not evidence. Every figure in §3 is from this HEAD, with the pre-build value where it moved. |
+| Sept 27, T-D R and E Stage 1 | the `unknown` hypothesis, u, the grade and the odds accounting; one number carrying four meanings | the belief normalised over the live set H only (§1.5); beside it the adequacy finding, per live hypothesis per derived phase, D and its tail S at the test level α (§1.10), and the lifecycle state (EXHAUSTED when H is empty) | the relative test could not express "the best of my models is wrong"; `unknown` at 0.995 was normalisation, not evidence. |
+| Sept 27, T-D cycle 1.5b | the stand counted in adequacy only; s_exp the action's own segment; the completing hypothesis out of the test on its advance tick; admission on the leader's share alone | E10: the belief's evidence per phase is L(v·D) (§1.4); E9: s_exp the Projector's priced stationary ticks within the phase (§1.10); E8: the advance tick a member at S = 1; G1: per-hypothesis adequacy, read by the meta-planner's gate for the leader (§5) | the foreseen stay was no longer foreseen (1.4 finding 4); the latency tick was charged to the walk (finding 2); grasp-tick false unexplained (finding 1); a lone hypothesis admitted on no evidence and the wrong table admitted while unexplained (finding 3). Every figure in §3 is from this HEAD, with earlier values where they moved. |
 
 Superseded figures (the I5 matrix, any s40 figure before F47b, and the graded-evidence figures before the T-D
 Stage 1 build) are not carried here. Where they are cited

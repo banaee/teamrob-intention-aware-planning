@@ -134,13 +134,18 @@ Decisions
   gone, the belief is normalised over the live hypothesis set H only (R1, R6), and beside it the recognizer reports
   the adequacy finding (unresolved | adequate | unexplained, from the projected completion delay D and its tail
   probability S per live hypothesis per derived phase, at the test level α, the run option `--test_level`, default
-  0.05), the lifecycle state (live | exhausted) and the members' tail probabilities; the meta-planner reads
-  `confidence` and `most_likely` only, the gate unchanged, its input now the leader's share over H. The four
-  maintained baseline sets are regenerated under it. Session 1.4 verified it (`analysis/td_stage1/REPORT.md`), and
-  cycle 1.5 is ruled on it (27 Sept 2026; design_decisions.md, "T-D R and E", "1.5 rulings"): E8 (the advance tick),
-  E9 (s_exp from the Projector's attribution), E10 (standing as belief evidence) and G1 (the guard on admission, the
-  first ruling of G), recorded in session 1.5r. Next: session 1.5b builds the four together; then L, P, the rest of G,
-  and X, each ruled on Stage 1's results. Not to be
+  0.05), the lifecycle state (live | exhausted) and the members' tail probabilities. Session 1.4 verified it
+  (`analysis/td_stage1/REPORT.md`), and cycle 1.5 is ruled on it (27 Sept 2026; design_decisions.md, "T-D R and E",
+  "1.5 rulings"), and built in session 1.5b (27 Sept 2026): E8 (on the tick a hypothesis's expected action completes
+  it is a member with S = 1), E9 (s_exp is the Projector's priced stationary ticks within the phase: 2 for `pick_up`
+  and `place`, 1 for a walk entered from a completion, 0 for the initial walk; the recognizer receives the body's
+  action and observed-task completion latencies), E10 (the belief's evidence per phase is L(v·D), the same D the
+  adequacy test reads through S; walking evidence unchanged, standing beyond the priced standing charged) and G1 (the
+  recognizer reports every live hypothesis's hypothesis adequacy, adequate | inadequate | no observation; the gate,
+  `_clears_gate`, now returns a `GateOutcome` and also requires the leader's to be adequate; refusals
+  `none(leader_no_observation)`, `none(leader_inadequate)`). The four maintained baseline sets are regenerated under
+  it; acceptance is `analysis/td_stage1b/REPORT.md`. Next: L, P, the rest of G, and X, each ruled on these results.
+  Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
@@ -343,9 +348,9 @@ grep "meta-cand"        <log>   # per-candidate evaluation (fields change as rea
 grep "^\[meta-ord\]"    <log>   # full_reorder: per possible head, the cheapest ordering that starts with it
 grep "^\[meta-win\]"    <log>   # full_reorder: the winning ordering (hold before each entry, last cumulative shift, share)
 grep "^\[meta-b3\]"     <log>   # B3's decision; under full_reorder with ordering= appended
-grep "^\[meta-proj\]"   <log>   # human projection admitted or not, and why
+grep "^\[meta-proj\]"   <log>   # human projection admitted or not, and why (G1: none(leader_no_observation), none(leader_inadequate))
 grep "^\[meta-pool\]"   <log>   # completed tasks dropped from the pool
-grep "^\[IR\] step="    <log>   # most_likely, confidence, lifecycle, finding and the members' tails per tick
+grep "^\[IR\] step="    <log>   # most_likely, confidence, lifecycle, finding, the leader's hypothesis adequacy, the members' tails
 grep "^\[IR-dist\]"     <log>   # full belief distribution per tick
 grep "^\[IR-complete\]" <log>   # task completion pins
 grep "^\[sep\]"         <log>   # actual robot-human distance per tick

@@ -133,15 +133,17 @@ class BeliefState:
     finding: Optional[AdequacyFinding]     # UNRESOLVED | ADEQUATE | UNEXPLAINED; None exactly when exhausted
     lifecycle: RecognizerLifecycle         # LIVE | EXHAUSTED
     tails: Dict[str, float]                # S_k of each member of the adequacy test this tick
+    hypothesis_adequacy: Dict[str, HypothesisAdequacy]   # ADEQUATE | INADEQUATE | NO_OBSERVATION per live hypothesis
     # predicted_next_actions: Dict[str, List[str]] — DEPRECATED, commented out in the
     # dataclass itself. Multi-step prediction now goes through ProjectedPlan (§1.7) and
     # IntentionRecognizer.get_hypothesis() (§2.1), not this field. Do not use in new code.
 ```
 
 Three independent outputs (T-D R2 to R4, 27 September 2026): the belief (`distribution`, `most_likely`,
-`confidence`), the adequacy finding with the members' tail probabilities, and the lifecycle state. The
-meta-planner reads `confidence` and `most_likely` only; `finding`, `lifecycle` and `tails` exist for evaluation
-and for G, and nothing consumes them yet.
+`confidence`), the adequacy finding with the members' tail probabilities and every live hypothesis's hypothesis
+adequacy (G1, T-D 1.5 rulings), and the lifecycle state. The meta-planner reads `confidence`, `most_likely` and the
+leader's `hypothesis_adequacy` (its gate, `_clears_gate`, G1); it never reads alpha or `tails`. `finding`, `lifecycle`
+and `tails` exist for evaluation and for the rest of G.
 
 **Invariants:**
 - the belief is over the live hypothesis set H (no residual hypothesis, T-D R1). At two levels (R6, as read on
@@ -149,8 +151,11 @@ and for G, and nothing consumes them yet.
   the returned `distribution` sums to 1.0 (within numerical tolerance) with every retired or inadmissible
   hypothesis at exactly `BELIEF_FLOOR` and the live keys carrying the rest
 - EXHAUSTED (H empty): `distribution` holds the pins alone (the output convention, not belief mass; it does
-  not sum to 1), `most_likely` is `None`, `confidence` 0.0, `finding` `None`, `tails` empty
-- otherwise `most_likely` is a key of H in `distribution`; `tails` keys are a subset of H
+  not sum to 1), `most_likely` is `None`, `confidence` 0.0, `finding` `None`, `tails` and `hypothesis_adequacy`
+  empty
+- otherwise `most_likely` is a key of H in `distribution`; `tails` keys are a subset of H; `hypothesis_adequacy`
+  keys are exactly H, a key is ADEQUATE / INADEQUATE iff it is in `tails` with S_k ≥ / < alpha, NO_OBSERVATION iff
+  it is not; `finding` is ADEQUATE iff some value is ADEQUATE
 
 ---
 
@@ -588,6 +593,8 @@ IntentionRecognizer(
     speed: float,                                     # v, the body's motion per tick (the Projector's assumed_speed)
     duration_to_steps: Callable[[str], float],        # the body's duration-to-ticks conversion (the Projector's)
     default_action_cost: float,                       # the Projector's priced standing of a stationary action, ticks
+    action_completion_latency: float,                 # the Projector's per-action latency, ticks (T-D E9)
+    observed_task_completion_latency: float,          # the Projector's per-task latency of the observed agent, ticks
     alpha: float,                                     # the adequacy test level, a run option (--test_level)
     assigned_tasks: Optional[List[TaskInstance]] = None,   # OBSERVED agent's assigned tasks; None/empty = restriction off
     path_cost: Optional[PathCost] = None,             # C(a, b) for the excess path; straight line by default
@@ -610,21 +617,25 @@ the recognizer is built. An assigned task matching no hypothesis is logged as a 
 `task_instance_key()`, and ignored.
 `None` or `[]` switches the restriction off (`--assignment_prior false`, the default).
 
-`beta` is the excess-path likelihood's detour tolerance, per unit of the body's length (Mesa: 0.01 /cm, from
+`beta` is the phase likelihood's detour tolerance, per unit of the body's length (Mesa: 0.01 /cm, from
 `mesa_configs.yaml`, named with its source in the `[run]` header). It carries a unit, so the body supplies it
-and `shared/` holds no default (T-A1; TODO-58). It reaches the evaluator as its last argument:
-`PROGRESS_EVALUATORS` functions are called `(walked, origin, pos, target, path_cost, beta)`. β is also the scale
-of the adequacy test's reference distribution (T-D E5).
+and `shared/` holds no default (T-A1; TODO-58). The belief's value per phase is
+`likelihood_functions.delay_likelihood(v·D, beta)` (T-D E10). β is also the scale of the adequacy test's
+reference distribution (T-D E5).
 
-`speed`, `duration_to_steps` and `default_action_cost` are the values the body hands the `Projector`
-(`assumed_speed`, `duration_to_steps`, `default_action_cost`; Mesa: `mesa_configs.yaml` `step_size` 20 cm/tick,
-`seconds_per_step` 2.0, and 1.0 tick), read once in `RobotAgent` so that the adequacy test and the projection
-take one source. `alpha` is the run option `test_level` (default 0.05). None has a default in `shared/`.
+`speed`, `duration_to_steps`, `default_action_cost`, `action_completion_latency` and
+`observed_task_completion_latency` are the values the body hands the `Projector` (`assumed_speed`,
+`duration_to_steps`, `default_action_cost`, `action_completion_latency`, `observed_task_completion_latency`;
+Mesa: `mesa_configs.yaml` `step_size` 20 cm/tick, `seconds_per_step` 2.0, 1.0 tick, `executor.ACTION_COMPLETION_LATENCY`
+1 tick and `sim_agents.HUMAN_TASK_COMPLETION_LATENCY` 0), read once in `RobotAgent` so that the belief, the
+adequacy test and the projection take one source (T-D E9: s_exp is the Projector's priced stationary ticks within
+the phase). `alpha` is the run option `test_level` (default 0.05). None has a default in `shared/`.
 
 `path_cost` is the cost of the walk between two positions that the excess path is measured against.
 Straight-line distance by default (Mesa agents walk through obstacles); a domain or body with a better model
 injects it. The constructor raises `ValueError` if a schema names a `progress_evaluator` not registered in
-`likelihood_functions.PROGRESS_EVALUATORS`.
+`likelihood_functions.EXCESS_MEASURES` (`PROGRESS_EVALUATORS` and `excess_path_likelihood` were removed in cycle 1.5b:
+the belief reads the excess through D, not through a likelihood of the excess alone).
 
 ```python
 def build_hypothesis_space(
@@ -662,14 +673,19 @@ Per live hypothesis, every tick:
 3. **Completion channel (an event).** A microaction in the declared vocabulary of the action the hypothesis
    expected on the previous tick is scored by detection reliability (`DETECTION_HIT_RATE` if that action's
    completion predicate holds, `DETECTION_FALSE_ALARM_RATE` if not) and multiplies into the evidence once.
-4. **Phase change.** When the expected action changes, the closing stretch's L folds into the evidence once
-   (nothing, if the stretch was empty), and the hypothesis's ORIGIN moves to the agent's position, odometer
-   reading and standing-clock reading.
-5. **Progress channel.** An action with a `progress_evaluator` (`excess_path`: `move_to`) is scored from the
-   origin: excess = walked + C(pos, target) − C(origin, target), L = 2 / (1 + e^{β·excess}); one stretch
-   toward one target is ONE observation, recomputed each tick and replacing the previous tick's value (on top
-   of the evidence, never into it). An empty stretch is not an observation. An action with no graded signal
-   scores the perfect-fit value.
+4. **Phase change.** When the expected action changes, the closing phase's L(v·D) folds into the evidence once
+   (1, if its delay was not positive), and the hypothesis's ORIGIN moves to the agent's position, odometer
+   reading and standing-clock reading. A phase entered from the completion of the previous expected action (its
+   completion predicate holds now) is priced the body's action latency beside its own standing (T-D E9), and the
+   completing hypothesis is a member of the adequacy test with S = 1 on this tick (E8).
+5. **Phase channel (T-D E10).** Every phase is scored from the origin by its projected completion delay
+   D = e/v + (s − s_exp): L(v·D) = 2 / (1 + e^{β·v·D}), and 1 for v·D ≤ 0 (the clip). e = walked +
+   C(pos, target) − C(origin, target) for an action with a `progress_evaluator` (`excess_path`: `move_to`), 0
+   otherwise; s the ticks stood since the origin; s_exp the Projector's priced stationary ticks within the phase.
+   One phase is ONE observation, recomputed each tick and replacing the previous tick's value (on top of the
+   evidence, never into it). For a walk with no standing beyond s_exp, v·D = e: the excess-path likelihood.
+   Standing beyond s_exp is charged v per tick; standing within it is not a charge. A hypothesis with no
+   derived phase (undecomposable) scores the perfect-fit value.
 
 The evidence is normalised over the live set H (T-D R1): no residual hypothesis, no reference likelihood. The
 episode is local: when a retirement is the observed agent's own (its expected action on the previous tick was
@@ -677,15 +693,21 @@ the terminal one), the belief re-initialises to the uniform prior over the live 
 the agent's position. Output = evidence × ω_context (`_context_weight`, output only), normalised, floored at
 `BELIEF_FLOOR`, with completed and inadmissible hypotheses pinned.
 
-**Adequacy** (T-D E1 to E7), after the belief. Per live hypothesis, per derived phase (origin to phase advance),
-D = e/v + (s − s_exp) in ticks: e the excess path from the origin (`likelihood_functions.EXCESS_MEASURES`, the
-excess the movement likelihood reads; 0 without an evaluator or a target), s the ticks without movement since
-the origin, s_exp the Projector's priced standing (0 for a movement action; the bound duration through
-`duration_to_steps`; else `task_model.get_cost()`, else `default_action_cost`). S = `tail_probability(v·D, beta)`.
-A member (ruled 27 September 2026; E6 amended the same day) is a live hypothesis with a derived phase whose
+**Adequacy** (T-D E1 to E9), after the belief, over the same D. Per live hypothesis, per derived phase (origin to
+phase advance), D = e/v + (s − s_exp) in ticks: e the excess path from the origin (`likelihood_functions.EXCESS_MEASURES`;
+0 without an evaluator or a target), s the ticks without movement since the origin, s_exp the Projector's priced
+stationary ticks within the phase's span (E9): the action latency priced after the completion that opened the
+phase (with the observed agent's task latency at a boundary; 0 for the phase a hypothesis is first observed in,
+and after a regress), plus the action's own stationary duration (0 for a movement action; the bound duration
+through `duration_to_steps`; else `task_model.get_cost()`, else `default_action_cost`). In kitting: 2 for
+`pick_up` and `place`, 1 for a walk entered from a completion, 0 for the initial walk. S = `tail_probability(v·D, beta)`.
+A member (the complete membership rule, E6 as amended, with E8) is a live hypothesis with a derived phase whose
 phase holds an observation: walked path since the origin, or s > s_exp, or — in a stationary phase (no movement
-target) — s ≤ s_exp, an observation with D ≤ 0 and S = 1. `finding`: UNRESOLVED iff no member; UNEXPLAINED iff every member
-has S < alpha; ADEQUATE otherwise. Computed from scratch every tick. `lifecycle` EXHAUSTED iff H is empty.
+target) — s ≤ s_exp, an observation with D ≤ 0 and S = 1; or whose expected action completed on this tick (S = 1,
+E8; not on a boundary tick). `finding`: UNRESOLVED iff no member; UNEXPLAINED iff every member has S < alpha;
+ADEQUATE otherwise. `hypothesis_adequacy` per live hypothesis (G1): ADEQUATE (a member with S ≥ alpha), INADEQUATE
+(a member with S < alpha), NO_OBSERVATION (not a member). Computed from scratch every tick. `lifecycle` EXHAUSTED iff
+H is empty.
 
 Dispatches by schema-declared `microactions` membership and `progress_evaluator` name — never by hardcoded
 microaction strings. See `design_decisions.md`, "IR likelihood dispatch."
@@ -754,9 +776,12 @@ from IR confidence-gating. Its single definition is `shared.meta_planner.DEFAULT
 (September 2026; a second, unread copy in `recognizer.py` was deleted — the gate is the
 meta-planner's decision, not a likelihood parameter). No call site passes `theta`, so the
 default governs every run. θ is applied in exactly one private method,
-`_clears_gate(belief) -> bool`, which both `evaluate_triggers()` (on the entering side of
+`_clears_gate(belief) -> GateOutcome`, which both `evaluate_triggers()` (on the entering side of
 `recognition_changed`, D2) and `update_human_projection()` (as admission) ask; it is deliberately one method so that a
-change to how the bar is computed would not change where it is asked. See design_decisions.md,
+change to how the bar is computed would not change where it is asked. Since G1 (T-D 1.5 rulings, cycle 1.5b) it is
+also the one home of the guard on admission: the belief clears the gate (`GateOutcome.CLEARS`) when `confidence ≥ θ`
+AND the leader's `hypothesis_adequacy` is ADEQUATE; otherwise it answers, in this order, `BELOW_THETA`,
+`LEADER_NO_OBSERVATION` or `LEADER_INADEQUATE`. The meta-planner receives no alpha and no S_k. See design_decisions.md,
 "θ has one home". The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
 and a margin gate (TODO-65) were considered and not taken; design_decisions.md, "The gate stays
 a fixed share".
@@ -969,14 +994,16 @@ MetaPlanner policy, not a `Projector` one — then delegated to `Projector.proje
 
 Returns `None`, checked in this order, when:
 
-- `belief.confidence < theta` — the projector is not called. θ gates admission as it gates
-  triggering (DESIGN-07); it still never feeds `_cost()`. See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
+- the belief does not clear the gate (`_clears_gate()`: `confidence < theta`, or the leader's hypothesis adequacy
+  is not ADEQUATE, G1) — the projector is not called. The gate gates admission as it gates
+  triggering (DESIGN-07); it still never feeds `_cost()`. A guard refusal behaves as below θ. See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 - `human_agent_id is None` — no human observed.
 - the hypothesis is unresolvable — `Projector.project_human()` returned `None` (its task name
   is not in the domain).
 
 Emits one `[meta-proj] confidence=<c> theta=<θ> projection=<reason>` line per call, with
-`reason` ∈ `built`, `none(below_theta)`, `none(no_human)`, `none(unprojectable)` (T-D Stage 1: renamed from
+`reason` ∈ `built`, `none(below_theta)`, `none(leader_no_observation)`, `none(leader_inadequate)` (G1, cycle 1.5b),
+`none(no_human)`, `none(unprojectable)` (T-D Stage 1: renamed from
 `none(unresolved)`, which collided with the adequacy finding's value; `none(unknown)` is gone with the `unknown`
 hypothesis). When the recognizer is exhausted, `confidence` is 0.0 and admission refuses as `none(below_theta)`:
 the expected, measured behaviour of this cycle, not a design (G).
