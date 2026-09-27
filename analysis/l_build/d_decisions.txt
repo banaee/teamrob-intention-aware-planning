@@ -1,0 +1,465 @@
+
+D. Decisions against the pre-build baseline (L-build: the TB.2b logs), prior on primary, prior off after, then the four
+supplementary runs. The POST trigger carries its cause (`cause=` since L-build: entered, replaced, boundary,
+retraction); the cause is shown, not compared (PRE has none).
+
+Per run, one line per tick on which the decision differs: a [meta] decision present on one side only, or present on
+both with a different trigger, admission ([meta-proj] projection=, the meta-planner's reason string), winner,
+B3 selection, hold or ordering; and every [hold] start that differs. Each line carries, at that tick, the post-build
+recognizer state (leader, confidence, finding at α = 0.05, the leader's hypothesis adequacy, lifecycle) and the
+pre-build one (leader, confidence, finding; 1.5b adapts the two state strings to the logs' fields, the logic is 1.4's). Runs with identical decision streams on both sides are printed once. Then the completion ticks:
+the world tick (T6: the tick after the robot's last release) and the declared empty-pool tick, before and after.
+
+
+# prior on (primary)
+
+## tb1a_destination/env_layout_01_scenario_s01_01_on: 0 differing entries; admissions built/decisions pre 4/7 post 4/7; completion world pre 169 post 169, declared pre 171 post 171
+
+## tb1a_destination/env_layout_02_scenario_s02_01_on: 7 differing entries; admissions built/decisions pre 6/12 post 6/12; completion world pre 426 post 426, declared pre 428 post 428
+  t=160 PRE recognition_changed proj=built win=item_6 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_5)(0.678) A lead=adequate live | pre deliver_item(?item=item_5)(0.801) A
+  t=162 PRE -
+        POST recognition_changed(entered) proj=built win=item_6 sel=realized hold=0
+        post deliver_item(?item=item_5)(0.809) A lead=adequate live | pre deliver_item(?item=item_5)(0.886) A
+  t=309 PRE recognition_changed proj=none(leader_no_observation) win=item_4 sel=no_projection hold=0
+        POST recognition_changed(replaced) proj=none(below_theta) win=item_4 sel=no_projection hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.496) U lead=no_observation live | pre ac_activation(?ac_switch=ac_switch_0)(0.991) U
+  t=310 PRE recognition_changed proj=built win=item_4 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.496) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.991) A
+  t=362 PRE recognition_changed proj=none(below_theta) win=item_4 sel=no_projection hold=0
+        POST -
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.991) U lead=no_observation live | pre none(0.000) -
+  t=363 PRE -
+        POST recognition_changed(entered) proj=built win=item_4 sel=realized hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.991) A lead=adequate live | pre none(0.000) -
+  t=380 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_4 sel=no_projection hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.991) X lead=inadequate live | pre none(0.000) -
+
+## tb1a_destination/env_layout_03_scenario_s03_01_on: 0 differing entries; admissions built/decisions pre 3/7 post 3/7; completion world pre 238 post 238, declared pre 240 post 240
+
+## tb1a_destination/env_layout_04_scenario_s01_06_on: 0 differing entries; admissions built/decisions pre 3/6 post 3/6; completion world pre 160 post 160, declared pre 162 post 162
+
+## tb1a_destination/env_layout_05_scenario_s04_01_on: 7 differing entries; admissions built/decisions pre 6/12 post 4/10; completion world pre 379 post 379, declared pre 381 post 381
+  t=214 PRE recognition_changed proj=built win=item_7 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_2)(0.556) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_2)(0.797) A
+  t=218 PRE -
+        POST recognition_changed(entered) proj=built win=item_7 sel=realized hold=0
+        post ac_activation(?ac_switch=ac_switch_2)(0.771) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_2)(0.933) A
+  t=243 PRE recognition_changed proj=built win=item_7 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_6)(0.673) A lead=adequate live | pre deliver_item(?item=item_6)(0.768) A
+  t=246 PRE -
+        POST recognition_changed(entered) proj=built win=item_5 sel=realized hold=0
+        post deliver_item(?item=item_6)(0.775) A lead=adequate live | pre deliver_item(?item=item_6)(0.825) A
+  t=247 PRE no_current_task proj=built win=item_5 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_6)(0.803) A lead=adequate live | pre deliver_item(?item=item_6)(0.842) A
+  t=327 PRE recognition_changed proj=none(leader_no_observation) win=item_5 sel=no_projection hold=0
+        POST recognition_changed(replaced) proj=none(below_theta) win=item_5 sel=no_projection hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.249) U lead=no_observation live | pre ac_activation(?ac_switch=ac_switch_0)(0.992) U
+  t=328 PRE recognition_changed proj=built win=item_5 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.249) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.992) A
+
+## tb1a_destination/env_layout_06_scenario_s03_06_on: 0 differing entries; admissions built/decisions pre 4/9 post 4/9; completion world pre 236 post 236, declared pre 238 post 238
+
+## tb1a_destination/env_layout_07_scenario_s05_01_on: 13 differing entries; admissions built/decisions pre 4/8 post 4/10; completion world pre 197 post 194, declared pre 199 post 196
+  t= 60 PRE recognition_changed proj=built win=item_1 sel=realized hold=3
+        POST -
+        post deliver_item(?item=item_5)(0.508) A lead=adequate live | pre deliver_item(?item=item_5)(0.804) A
+  t= 67 PRE -
+        POST recognition_changed(entered) proj=built win=item_1 sel=realized hold=3
+        post deliver_item(?item=item_5)(0.788) A lead=adequate live | pre deliver_item(?item=item_5)(0.933) A
+  t= 94 PRE recognition_changed proj=none(leader_no_observation) win=item_1 sel=no_projection hold=0
+        POST recognition_changed(replaced) proj=none(below_theta) win=item_1 sel=no_projection hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.498) U lead=no_observation live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) U
+  t= 95 PRE recognition_changed proj=built win=item_1 sel=realized hold=3
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.498) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=103 PRE -
+        POST no_current_task proj=none(below_theta) win=item_2 sel=no_projection hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.605) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=106 PRE no_current_task proj=built win=item_2 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.667) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=110 PRE -
+        POST recognition_changed(entered) proj=built win=item_2 sel=realized hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.765) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=141 PRE recognition_changed proj=none(below_theta) win=item_2 sel=no_projection hold=0
+        POST recognition_changed(replaced) proj=none(leader_no_observation) win=item_2 sel=no_projection hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) U lead=no_observation live | pre none(0.000) -
+  t=142 PRE -
+        POST recognition_changed(entered) proj=built win=item_2 sel=realized hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) A lead=adequate live | pre none(0.000) -
+  t=159 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_2 sel=no_projection hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) X lead=inadequate live | pre none(0.000) -
+  t= 67 hold start planned=3 POST only | post deliver_item(?item=item_5)(0.788) A lead=adequate live
+  t= 60 hold start planned=3 PRE only | pre deliver_item(?item=item_5)(0.804) A
+  t= 95 hold start planned=3 PRE only | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+
+## tb1a_destination/env_layout_07_scenario_s05_02_on: 13 differing entries; admissions built/decisions pre 4/8 post 4/10; completion world pre 198 post 195, declared pre 200 post 197
+  t= 60 PRE recognition_changed proj=built win=item_1 sel=realized hold=3
+        POST -
+        post deliver_item(?item=item_5)(0.508) A lead=adequate live | pre deliver_item(?item=item_5)(0.804) A
+  t= 67 PRE -
+        POST recognition_changed(entered) proj=built win=item_1 sel=realized hold=3
+        post deliver_item(?item=item_5)(0.788) A lead=adequate live | pre deliver_item(?item=item_5)(0.933) A
+  t= 94 PRE recognition_changed proj=none(leader_no_observation) win=item_1 sel=no_projection hold=0
+        POST recognition_changed(replaced) proj=none(below_theta) win=item_1 sel=no_projection hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.498) U lead=no_observation live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) U
+  t= 95 PRE recognition_changed proj=built win=item_1 sel=realized hold=3
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.498) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=103 PRE -
+        POST no_current_task proj=none(below_theta) win=item_3 sel=no_projection hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.605) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=106 PRE no_current_task proj=built win=item_3 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.667) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=110 PRE -
+        POST recognition_changed(entered) proj=built win=item_3 sel=realized hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.765) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=141 PRE recognition_changed proj=none(below_theta) win=item_3 sel=no_projection hold=0
+        POST recognition_changed(replaced) proj=none(leader_no_observation) win=item_3 sel=no_projection hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) U lead=no_observation live | pre none(0.000) -
+  t=142 PRE -
+        POST recognition_changed(entered) proj=built win=item_3 sel=realized hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) A lead=adequate live | pre none(0.000) -
+  t=159 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_3 sel=no_projection hold=0
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) X lead=inadequate live | pre none(0.000) -
+  t= 67 hold start planned=3 POST only | post deliver_item(?item=item_5)(0.788) A lead=adequate live
+  t= 60 hold start planned=3 PRE only | pre deliver_item(?item=item_5)(0.804) A
+  t= 95 hold start planned=3 PRE only | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+
+## tb1b_two_tables/env_layout_08_scenario_s06_01_on: 0 differing entries; admissions built/decisions pre 5/8 post 5/8; completion world pre 265 post 265, declared pre 267 post 267
+
+## tb1b_two_tables/env_layout_08_scenario_s06_02_on: 0 differing entries; admissions built/decisions pre 5/8 post 5/8; completion world pre 267 post 267, declared pre 269 post 269
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on: 0 differing entries; admissions built/decisions pre 3/7 post 3/7; completion world pre 224 post 224, declared pre 226 post 226
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_on: identical to tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_on: identical to tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_on: 0 differing entries; admissions built/decisions pre 5/8 post 5/8; completion world pre 226 post 226, declared pre 228 post 228
+
+## tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_on: 0 differing entries; admissions built/decisions pre 3/7 post 3/7; completion world pre 221 post 221, declared pre 223 post 223
+
+## tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_on: identical to tb1a_destination/env_layout_03_scenario_s03_01_on
+
+## tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_on: 13 differing entries; admissions built/decisions pre 4/8 post 4/10; completion world pre 197 post 194, declared pre 199 post 196
+  t= 60 PRE recognition_changed proj=built win=item_1 sel=realized hold=3 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        POST -
+        post deliver_item(?item=item_5)(0.508) A lead=adequate live | pre deliver_item(?item=item_5)(0.804) A
+  t= 67 PRE -
+        POST recognition_changed(entered) proj=built win=item_1 sel=realized hold=3 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        post deliver_item(?item=item_5)(0.788) A lead=adequate live | pre deliver_item(?item=item_5)(0.933) A
+  t= 94 PRE recognition_changed proj=none(leader_no_observation) win=item_1 sel=no_projection hold=0 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        POST recognition_changed(replaced) proj=none(below_theta) win=item_1 sel=no_projection hold=0 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        post ac_activation(?ac_switch=ac_switch_0)(0.498) U lead=no_observation live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) U
+  t= 95 PRE recognition_changed proj=built win=item_1 sel=realized hold=3 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.498) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=103 PRE -
+        POST no_current_task proj=none(below_theta) win=item_2 sel=no_projection hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        post ac_activation(?ac_switch=ac_switch_0)(0.605) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=106 PRE no_current_task proj=built win=item_2 sel=realized hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.667) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=110 PRE -
+        POST recognition_changed(entered) proj=built win=item_2 sel=realized hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        post ac_activation(?ac_switch=ac_switch_0)(0.765) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+  t=141 PRE recognition_changed proj=none(below_theta) win=item_2 sel=no_projection hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        POST recognition_changed(replaced) proj=none(leader_no_observation) win=item_2 sel=no_projection hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) U lead=no_observation live | pre none(0.000) -
+  t=142 PRE -
+        POST recognition_changed(entered) proj=built win=item_2 sel=realized hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) A lead=adequate live | pre none(0.000) -
+  t=159 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_2 sel=no_projection hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.995) X lead=inadequate live | pre none(0.000) -
+  t= 67 hold start planned=3 POST only | post deliver_item(?item=item_5)(0.788) A lead=adequate live
+  t= 60 hold start planned=3 PRE only | pre deliver_item(?item=item_5)(0.804) A
+  t= 95 hold start planned=3 PRE only | pre ac_activation(?ac_switch=ac_switch_0)(0.995) A
+
+## tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_on: identical to tb1a_destination/env_layout_07_scenario_s05_01_on
+
+## tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_on: identical to tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on
+
+## tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_on: identical to tb1b_two_tables/env_layout_08_scenario_s06_01_on
+
+## tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_on: identical to tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on
+
+## tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_on: identical to tb1b_two_tables/env_layout_08_scenario_s06_02_on
+
+## tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_on: identical to tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_on
+
+## tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_on: identical to tb1b_two_tables/env_layout_08_scenario_s06_01_on
+
+# prior off (appendix)
+
+## tb1a_destination/env_layout_01_scenario_s01_01_off: 1 differing entries; admissions built/decisions pre 3/8 post 3/9; completion world pre 201 post 186, declared pre 201 post 188
+  t=159 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_4 sel=no_projection hold=0
+        post deliver_item(?item=item_4)(0.996) X lead=inadequate live | pre deliver_item(?item=item_4)(0.996) X
+
+## tb1a_destination/env_layout_02_scenario_s02_01_off: 2 differing entries; admissions built/decisions pre 5/11 post 4/9; completion world pre 422 post 422, declared pre 424 post 424
+  t=328 PRE recognition_changed proj=built win=item_4 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.431) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.759) A
+  t=362 PRE recognition_changed proj=none(below_theta) win=item_4 sel=no_projection hold=0
+        POST -
+        post coffee_break(?coffee_machine=coffee_machine_0)(0.248) U lead=no_observation live | pre deliver_item(?item=item_0)(0.331) U
+
+## tb1a_destination/env_layout_03_scenario_s03_01_off: 0 differing entries; admissions built/decisions pre 2/7 post 2/7; completion world pre 236 post 236, declared pre 238 post 238
+
+## tb1a_destination/env_layout_04_scenario_s01_06_off: 0 differing entries; admissions built/decisions pre 2/6 post 2/6; completion world pre 160 post 160, declared pre 162 post 162
+
+## tb1a_destination/env_layout_05_scenario_s04_01_off: 2 differing entries; admissions built/decisions pre 4/11 post 4/11; completion world pre 379 post 379, declared pre 381 post 381
+  t=217 PRE recognition_changed proj=built win=item_7 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_2)(0.648) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_2)(0.793) A
+  t=219 PRE -
+        POST recognition_changed(entered) proj=built win=item_7 sel=realized hold=0
+        post ac_activation(?ac_switch=ac_switch_2)(0.758) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_2)(0.873) A
+
+## tb1a_destination/env_layout_06_scenario_s03_06_off: 1 differing entries; admissions built/decisions pre 5/10 post 5/11; completion world pre 236 post 236, declared pre 236 post 238
+  t=194 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_7 sel=no_projection hold=0
+        post deliver_item(?item=item_7)(0.995) X lead=inadequate live | pre deliver_item(?item=item_7)(0.995) X
+
+## tb1a_destination/env_layout_07_scenario_s05_01_off: 6 differing entries; admissions built/decisions pre 3/8 post 3/8; completion world pre 194 post 194, declared pre 196 post 196
+  t= 70 PRE recognition_changed proj=built win=item_1 sel=realized hold=5
+        POST -
+        post deliver_item(?item=item_5)(0.719) A lead=adequate live | pre deliver_item(?item=item_5)(0.758) A
+  t= 71 PRE -
+        POST recognition_changed(entered) proj=built win=item_1 sel=realized hold=5
+        post deliver_item(?item=item_5)(0.784) A lead=adequate live | pre deliver_item(?item=item_5)(0.816) A
+  t=104 PRE recognition_changed proj=built win=item_2 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.528) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.770) A
+  t=111 PRE -
+        POST recognition_changed(entered) proj=built win=item_2 sel=realized hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.767) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.958) A
+  t= 71 hold start planned=5 POST only | post deliver_item(?item=item_5)(0.784) A lead=adequate live
+  t= 70 hold start planned=5 PRE only | pre deliver_item(?item=item_5)(0.758) A
+
+## tb1a_destination/env_layout_07_scenario_s05_02_off: 6 differing entries; admissions built/decisions pre 3/8 post 3/8; completion world pre 195 post 195, declared pre 197 post 197
+  t= 70 PRE recognition_changed proj=built win=item_1 sel=realized hold=5
+        POST -
+        post deliver_item(?item=item_5)(0.719) A lead=adequate live | pre deliver_item(?item=item_5)(0.758) A
+  t= 71 PRE -
+        POST recognition_changed(entered) proj=built win=item_1 sel=realized hold=5
+        post deliver_item(?item=item_5)(0.784) A lead=adequate live | pre deliver_item(?item=item_5)(0.816) A
+  t=104 PRE recognition_changed proj=built win=item_3 sel=realized hold=0
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.528) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.770) A
+  t=111 PRE -
+        POST recognition_changed(entered) proj=built win=item_3 sel=realized hold=0
+        post ac_activation(?ac_switch=ac_switch_0)(0.767) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.958) A
+  t= 71 hold start planned=5 POST only | post deliver_item(?item=item_5)(0.784) A lead=adequate live
+  t= 70 hold start planned=5 PRE only | pre deliver_item(?item=item_5)(0.758) A
+
+## tb1b_two_tables/env_layout_08_scenario_s06_01_off: 1 differing entries; admissions built/decisions pre 5/9 post 5/10; completion world pre 265 post 265, declared pre 265 post 267
+  t=189 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_4 sel=no_projection hold=0
+        post deliver_item(?item=item_4)(0.995) X lead=inadequate live | pre deliver_item(?item=item_4)(0.995) X
+
+## tb1b_two_tables/env_layout_08_scenario_s06_02_off: 1 differing entries; admissions built/decisions pre 5/9 post 5/10; completion world pre 267 post 267, declared pre 267 post 269
+  t=206 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_4 sel=no_projection hold=0
+        post deliver_item(?item=item_4)(0.995) X lead=inadequate live | pre deliver_item(?item=item_4)(0.995) X
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_off: 1 differing entries; admissions built/decisions pre 4/7 post 4/8; completion world pre 224 post 224, declared pre 224 post 226
+  t=189 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_1 sel=plain hold=0 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        post deliver_item(?item=item_1)(0.995) X lead=inadequate live | pre deliver_item(?item=item_1)(0.995) X
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_off: 1 differing entries; admissions built/decisions pre 4/7 post 4/8; completion world pre 224 post 224, declared pre 224 post 226
+  t=189 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_1 sel=no_projection hold=0 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        post deliver_item(?item=item_1)(0.995) X lead=inadequate live | pre deliver_item(?item=item_1)(0.995) X
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_off: 0 differing entries; admissions built/decisions pre 6/9 post 6/9; completion world pre 224 post 224, declared pre 224 post 224
+
+## tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_off: 0 differing entries; admissions built/decisions pre 6/9 post 6/9; completion world pre 238 post 238, declared pre 238 post 238
+
+## tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_off: 1 differing entries; admissions built/decisions pre 3/7 post 3/8; completion world pre 131 post 227, declared pre None post 229
+  t=139 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_7 sel=no_projection hold=0 ord=deliver_item(?item=item_7,?kitting_table=kitting_table_0)
+        post deliver_item(?item=item_7)(0.996) X lead=inadequate live | pre deliver_item(?item=item_7)(0.996) X
+
+## tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_off: identical to tb1a_destination/env_layout_03_scenario_s03_01_off
+
+## tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_off: 6 differing entries; admissions built/decisions pre 3/8 post 3/8; completion world pre 194 post 194, declared pre 196 post 196
+  t= 70 PRE recognition_changed proj=built win=item_1 sel=realized hold=5 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        POST -
+        post deliver_item(?item=item_5)(0.719) A lead=adequate live | pre deliver_item(?item=item_5)(0.758) A
+  t= 71 PRE -
+        POST recognition_changed(entered) proj=built win=item_1 sel=realized hold=5 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        post deliver_item(?item=item_5)(0.784) A lead=adequate live | pre deliver_item(?item=item_5)(0.816) A
+  t=104 PRE recognition_changed proj=built win=item_2 sel=realized hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        POST -
+        post ac_activation(?ac_switch=ac_switch_0)(0.528) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.770) A
+  t=111 PRE -
+        POST recognition_changed(entered) proj=built win=item_2 sel=realized hold=0 ord=deliver_item(?item=item_2,?kitting_table=kitting_table_0)
+        post ac_activation(?ac_switch=ac_switch_0)(0.767) A lead=adequate live | pre ac_activation(?ac_switch=ac_switch_0)(0.958) A
+  t= 71 hold start planned=5 POST only | post deliver_item(?item=item_5)(0.784) A lead=adequate live
+  t= 70 hold start planned=5 PRE only | pre deliver_item(?item=item_5)(0.758) A
+
+## tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_off: identical to tb1a_destination/env_layout_07_scenario_s05_01_off
+
+## tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_off: identical to tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_off
+
+## tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_off: identical to tb1b_two_tables/env_layout_08_scenario_s06_01_off
+
+## tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_off: 1 differing entries; admissions built/decisions pre 5/8 post 5/9; completion world pre 224 post 224, declared pre 224 post 226
+  t=206 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_1 sel=no_projection hold=0 ord=deliver_item(?item=item_1,?kitting_table=kitting_table_0)
+        post deliver_item(?item=item_1)(0.995) X lead=inadequate live | pre deliver_item(?item=item_1)(0.995) X
+
+## tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_off: identical to tb1b_two_tables/env_layout_08_scenario_s06_02_off
+
+## tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_off: identical to tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_off
+
+## tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_off: 1 differing entries; admissions built/decisions pre 5/8 post 5/9; completion world pre 316 post 282, declared pre 316 post 284
+  t=238 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_4 sel=no_projection hold=0
+        post deliver_item(?item=item_4)(0.995) X lead=inadequate live | pre deliver_item(?item=item_4)(0.995) X
+
+# prior supp: the supplementary runs, both priors
+
+## supp/env_layout_08_scenario_s06_06_off: 5 differing entries; admissions built/decisions pre 4/9 post 3/8; completion world pre 265 post 265, declared pre 267 post 267
+  t= 41 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_1 sel=no_projection hold=0
+        post deliver_item(?item=item_0)(0.995) X lead=inadequate live | pre deliver_item(?item=item_0)(0.995) X
+  t=103 PRE recognition_changed proj=built win=item_7 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_0)(0.249) U lead=no_observation live | pre deliver_item(?item=item_0)(0.995) A
+  t=113 PRE -
+        POST recognition_changed(entered) proj=built win=item_7 sel=realized hold=0
+        post deliver_item(?item=item_3)(0.756) A lead=adequate live | pre deliver_item(?item=item_0)(0.995) A
+  t=151 PRE recognition_changed proj=none(below_theta) win=item_7 sel=no_projection hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.995) A lead=adequate live | pre deliver_item(?item=item_3)(0.508) A
+  t=154 PRE recognition_changed proj=built win=item_7 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.995) A lead=adequate live | pre deliver_item(?item=item_3)(0.772) A
+
+## supp/env_layout_08_scenario_s06_06_on: 6 differing entries; admissions built/decisions pre 6/10 post 5/10; completion world pre 265 post 265, declared pre 267 post 267
+  t= 41 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_1 sel=no_projection hold=0
+        post deliver_item(?item=item_0)(0.995) X lead=inadequate live | pre deliver_item(?item=item_0)(0.995) X
+  t=103 PRE recognition_changed proj=built win=item_7 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_0)(0.498) U lead=no_observation live | pre deliver_item(?item=item_0)(0.995) A
+  t=111 PRE -
+        POST recognition_changed(entered) proj=built win=item_7 sel=realized hold=0
+        post deliver_item(?item=item_3)(0.799) A lead=adequate live | pre deliver_item(?item=item_0)(0.995) A
+  t=151 PRE recognition_changed proj=none(below_theta) win=item_7 sel=no_projection hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.995) A lead=adequate live | pre deliver_item(?item=item_3)(0.508) A
+  t=154 PRE recognition_changed proj=built win=item_7 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.995) A lead=adequate live | pre deliver_item(?item=item_3)(0.772) A
+  t=177 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_4 sel=no_projection hold=0
+        post deliver_item(?item=item_0)(0.995) X lead=inadequate live | pre deliver_item(?item=item_0)(0.995) X
+
+## supp/env_layout_09_scenario_s07_03_off: 5 differing entries; admissions built/decisions pre 4/9 post 3/8; completion world pre 243 post 243, declared pre None post None
+  t= 34 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_5 sel=no_projection hold=0
+        post deliver_item(?item=item_2)(0.995) X lead=inadequate live | pre deliver_item(?item=item_2)(0.995) X
+  t= 94 PRE recognition_changed proj=built win=item_4 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_1)(0.200) U lead=no_observation live | pre deliver_item(?item=item_2)(0.995) A
+  t=113 PRE -
+        POST recognition_changed(entered) proj=built win=item_4 sel=realized hold=0
+        post deliver_item(?item=item_3)(0.777) A lead=adequate live | pre deliver_item(?item=item_2)(0.960) A
+  t=122 PRE recognition_changed proj=none(below_theta) win=item_4 sel=no_projection hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.992) A lead=adequate live | pre deliver_item(?item=item_3)(0.546) A
+  t=125 PRE recognition_changed proj=built win=item_4 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.995) A lead=adequate live | pre deliver_item(?item=item_3)(0.798) A
+
+## supp/env_layout_09_scenario_s07_03_on: 6 differing entries; admissions built/decisions pre 5/10 post 4/10; completion world pre 243 post 243, declared pre None post None
+  t= 34 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_5 sel=no_projection hold=0
+        post deliver_item(?item=item_2)(0.995) X lead=inadequate live | pre deliver_item(?item=item_2)(0.995) X
+  t= 94 PRE recognition_changed proj=built win=item_4 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_2)(0.498) U lead=no_observation live | pre deliver_item(?item=item_2)(0.995) A
+  t=101 PRE -
+        POST recognition_changed(entered) proj=built win=item_4 sel=realized hold=0
+        post deliver_item(?item=item_3)(0.796) A lead=adequate live | pre deliver_item(?item=item_2)(0.995) A
+  t=122 PRE recognition_changed proj=none(below_theta) win=item_4 sel=no_projection hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.995) A lead=adequate live | pre deliver_item(?item=item_3)(0.546) A
+  t=125 PRE recognition_changed proj=built win=item_4 sel=realized hold=0
+        POST -
+        post deliver_item(?item=item_3)(0.995) A lead=adequate live | pre deliver_item(?item=item_3)(0.798) A
+  t=208 PRE -
+        POST recognition_changed(retraction) proj=none(leader_inadequate) win=item_6 sel=no_projection hold=0
+        post deliver_item(?item=item_2)(0.995) X lead=inadequate live | pre deliver_item(?item=item_2)(0.995) X
+
+# completion ticks (world tick T6 / declared), before -> after
+run                                                                    world      declared admitted pre   post diffs
+tb1a_destination/env_layout_01_scenario_s01_01_on                   169->169      171->171       4/7      4/7       0
+tb1a_destination/env_layout_02_scenario_s02_01_on                   426->426      428->428       6/12     6/12      7
+tb1a_destination/env_layout_03_scenario_s03_01_on                   238->238      240->240       3/7      3/7       0
+tb1a_destination/env_layout_04_scenario_s01_06_on                   160->160      162->162       3/6      3/6       0
+tb1a_destination/env_layout_05_scenario_s04_01_on                   379->379      381->381       6/12     4/10      7
+tb1a_destination/env_layout_06_scenario_s03_06_on                   236->236      238->238       4/9      4/9       0
+tb1a_destination/env_layout_07_scenario_s05_01_on                   197->194      199->196       4/8      4/10     13
+tb1a_destination/env_layout_07_scenario_s05_02_on                   198->195      200->197       4/8      4/10     13
+tb1b_two_tables/env_layout_08_scenario_s06_01_on                    265->265      267->267       5/8      5/8       0
+tb1b_two_tables/env_layout_08_scenario_s06_02_on                    267->267      269->269       5/8      5/8       0
+tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on           224->224      226->226       3/7      3/7       0
+tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_on        224->224      226->226       3/7      3/7       0
+tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_on           224->224      226->226       5/8      5/8       0
+tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_on        226->226      228->228       5/8      5/8       0
+tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_on      221->221      223->223       3/7      3/7       0
+tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_on       238->238      240->240       3/7      3/7       0
+tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_on      197->194      199->196       4/8      4/10     13
+tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_on       197->194      199->196       4/8      4/10     13
+tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_on      224->224      226->226       3/7      3/7       0
+tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_on       265->265      267->267       5/8      5/8       0
+tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_on      224->224      226->226       4/7      4/7       0
+tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_on       267->267      269->269       5/8      5/8       0
+tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_on      226->226      228->228       5/8      5/8       0
+tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_on       265->265      267->267       5/8      5/8       0
+tb1a_destination/env_layout_01_scenario_s01_01_off                  201->186      201->188       3/8      3/9       1
+tb1a_destination/env_layout_02_scenario_s02_01_off                  422->422      424->424       5/11     4/9       2
+tb1a_destination/env_layout_03_scenario_s03_01_off                  236->236      238->238       2/7      2/7       0
+tb1a_destination/env_layout_04_scenario_s01_06_off                  160->160      162->162       2/6      2/6       0
+tb1a_destination/env_layout_05_scenario_s04_01_off                  379->379      381->381       4/11     4/11      2
+tb1a_destination/env_layout_06_scenario_s03_06_off                  236->236      236->238       5/10     5/11      1
+tb1a_destination/env_layout_07_scenario_s05_01_off                  194->194      196->196       3/8      3/8       6
+tb1a_destination/env_layout_07_scenario_s05_02_off                  195->195      197->197       3/8      3/8       6
+tb1b_two_tables/env_layout_08_scenario_s06_01_off                   265->265      265->267       5/9      5/10      1
+tb1b_two_tables/env_layout_08_scenario_s06_02_off                   267->267      267->269       5/9      5/10      1
+tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_off          224->224      224->226       4/7      4/8       1
+tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_off       224->224      224->226       4/7      4/8       1
+tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_off          224->224      224->224       6/9      6/9       0
+tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_off       238->238      238->238       6/9      6/9       0
+tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_off      131->227     None->229       3/7      3/8       1
+tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_off      236->236      238->238       2/7      2/7       0
+tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_off      194->194      196->196       3/8      3/8       6
+tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_off      194->194      196->196       3/8      3/8       6
+tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_off      224->224      224->226       4/7      4/8       1
+tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_off      265->265      265->267       5/9      5/10      1
+tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_off      224->224      224->226       5/8      5/9       1
+tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_off      267->267      267->269       5/9      5/10      1
+tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_off      238->238      238->238       6/9      6/9       0
+tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_off      316->282      316->284       5/8      5/9       1
+supp/env_layout_08_scenario_s06_06_off                              265->265      267->267       4/9      3/8       5
+supp/env_layout_08_scenario_s06_06_on                               265->265      267->267       6/10     5/10      6
+supp/env_layout_09_scenario_s07_03_off                              243->243    None->None       4/9      3/8       5
+supp/env_layout_09_scenario_s07_03_on                               243->243    None->None       5/10     4/10      6

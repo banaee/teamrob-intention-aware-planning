@@ -1,0 +1,183 @@
+
+H. The five named cases of the T-D R and E entry, walked through with ticks under current scenario ids.
+  H1 a walk to a target no hypothesis expects; H2 the longest stand in the fixtures (modelled: a wait_at; and the
+  idle human with no task on the stack); H3 the wrong table (scenario_s06_06, scenario_s07_03: supplementary runs);
+  H4 the finished work order (scenario_s01_01 prior on, exhausted at 141); H5 the first ticks after a boundary.
+Per tick: the human's action/micro, the record's top task (raw), leader(confidence), lifecycle, the finding at
+α = .01/.05/.10 and the members' S; the meta-planner's decisions on those ticks (post-build, and pre-build where the
+case exists before the build).
+
+columns: t  human action/micro  rec=top task (raw)  leader(confidence) lifecycle  finding@.01/.05/.10  members(S)
+
+## H1 a walk to a target no hypothesis expects
+  none of the 48 runs has one: every script entry is COVERED (0 entries are not), and no script has a go_to / an exit walk. The nearest measured case is the wrong-table carry walk (H3): a walk to a table no live hypothesis expects the item at.
+
+## H2 the longest stand
+  modelled: the coffee_break wait_at, PT60S -> 30 ticks (s_exp = 30) plus the acknowledgement tick; scenario_s05_01 prior on, arrival 23, stand 25-54:
+   22 move_to /step    rec=coffee         coffee(0.498) live      AAA ac_switch_0=0.0001 coffee=1.0000 item_5=1.0000
+   23 move_to /step    rec=coffee         coffee(0.498) live      AAA ac_switch_0=0.0001 coffee=1.0000 item_5=1.0000
+   24 move_to /None    rec=coffee         coffee(0.524) live      AAA ac_switch_0=0.0001 coffee=1.0000 item_5=0.8629
+   25 wait_at /stand   rec=coffee         coffee(0.553) live      AAA ac_switch_0=0.0001 coffee=1.0000 item_5=0.7401
+   26 wait_at /stand   rec=coffee         coffee(0.583) live      AAA ac_switch_0=0.0001 coffee=1.0000 item_5=0.6312
+   39 wait_at /stand   rec=coffee         coffee(0.924) live      AAA ac_switch_0=0.0000 coffee=1.0000 item_5=0.0576
+   40 wait_at /stand   rec=coffee         coffee(0.936) live      AAA ac_switch_0=0.0000 coffee=1.0000 item_5=0.0474
+   41 wait_at /stand   rec=coffee         coffee(0.946) live      AAA ac_switch_0=0.0000 coffee=1.0000 item_5=0.0389
+   53 wait_at /stand   rec=coffee         coffee(0.991) live      AAA ac_switch_0=0.0000 coffee=1.0000 item_5=0.0036
+   54 wait_at /stand   rec=coffee         ac_switch_0(0.498) live      UUU 
+   55 wait_at /None    rec=coffee         ac_switch_0(0.498) live      AAA ac_switch_0=1.0000 item_5=1.0000
+   56 move_to /step    rec=item_5         item_5(0.553) live      AAA ac_switch_0=0.7401 item_5=1.0000
+      POST [meta] step=32 recognition_changed proj=built (conf 0.776) winner=item_1 sel=realized hold=20
+      POST [meta] step=54 recognition_changed proj=none(below_theta) (conf 0.498) winner=item_1 sel=no_projection hold=0
+      POST [hold] step=32 start {'planned': '20', 'trigger': 'recognition_changed', 'pos': '(0.0,'}
+      POST [hold] step=51 end {'planned': '20', 'executed': '20', 'interrupted': 'False'}
+      PRE  [meta] step=32 recognition_changed proj=built (conf 0.776) winner=item_1 sel=realized hold=20
+      PRE  [meta] step=54 recognition_changed proj=none(below_theta) (conf 0.498) winner=item_1 sel=no_projection hold=0
+      PRE  [hold] step=32 start {'planned': '20', 'trigger': 'recognition_changed', 'pos': '(0.0,'}
+      PRE  [hold] step=51 end {'planned': '20', 'executed': '20', 'interrupted': 'False'}
+  no task on the stack (the idle human after the script): the longest is scenario_s03_01 prior off, the record's
+  stack empty from 123 to the run's end (300): 178 ticks; leader the robot's own remaining items:
+  119 move_to /step    rec=item_2         item_2(0.996) live      AAA item_2=1.0000 item_6=0.0000 item_7=0.0000
+  120 move_to /None    rec=item_2         item_2(0.996) live      AAA item_2=1.0000 item_6=0.0000 item_7=0.0000
+  121 place   /release rec=item_2         item_6(0.498) live      UUU 
+  122 place   /None    rec=item_2         item_6(0.498) live      AAA item_6=1.0000 item_7=1.0000
+  123 None    /None    rec=no_task        item_6(0.498) live      AAA item_6=0.8629 item_7=0.8629
+  124 None    /None    rec=no_task        item_6(0.498) live      AAA item_6=0.7401 item_7=0.7401
+  137 None    /None    rec=no_task        item_6(0.498) live      AAX item_6=0.0701 item_7=0.0701
+  138 None    /None    rec=no_task        item_6(0.498) live      AAX item_6=0.0576 item_7=0.0576
+  139 None    /None    rec=no_task        item_6(0.498) live      AXX item_6=0.0474 item_7=0.0474
+  145 None    /None    rec=no_task        item_7(0.996) live      AXX item_7=0.0144
+  146 None    /None    rec=no_task        item_7(0.996) live      AXX item_7=0.0118
+  200 None    /None    rec=no_task        item_7(0.996) live      XXX item_7=0.0000
+  233 None    /None    rec=no_task        item_7(0.996) live      XXX item_7=0.0000
+  234 None    /None    rec=no_task        item_7(0.996) live      XXX item_7=0.0000
+  299 None    /None    rec=no_task        none(0.000) exhausted EEE 
+      POST [meta] step=121 recognition_changed proj=none(below_theta) (conf 0.498) winner=item_6 sel=no_projection hold=0
+      POST [meta] step=147 no_current_task proj=none(leader_inadequate) (conf 0.996) winner=item_7 sel=no_projection hold=0
+      PRE  [meta] step=121 recognition_changed proj=none(below_theta) (conf 0.498) winner=item_6 sel=no_projection hold=0
+      PRE  [meta] step=147 no_current_task proj=none(leader_inadequate) (conf 0.996) winner=item_7 sel=no_projection hold=0
+  prior on, the same idle stand with a foreseeable task left live: scenario_s04_01, ac_switch_0 alone from 327:
+  326 move_to /None    rec=item_6         item_6(0.992) live      AAA ac_switch_0=0.0000 item_6=1.0000
+  327 place   /release rec=item_6         ac_switch_0(0.992) live      UUU 
+  328 place   /None    rec=item_6         ac_switch_0(0.992) live      AAA ac_switch_0=1.0000
+  329 None    /None    rec=no_task        ac_switch_0(0.992) live      AAA ac_switch_0=0.8629
+  330 None    /None    rec=no_task        ac_switch_0(0.992) live      AAA ac_switch_0=0.7401
+  343 None    /None    rec=no_task        ac_switch_0(0.992) live      AAX ac_switch_0=0.0701
+  344 None    /None    rec=no_task        ac_switch_0(0.992) live      AAX ac_switch_0=0.0576
+  345 None    /None    rec=no_task        ac_switch_0(0.992) live      AXX ac_switch_0=0.0474
+  381 None    /None    rec=no_task        ac_switch_0(0.992) live      XXX ac_switch_0=0.0000
+      POST [meta] step=327 recognition_changed proj=none(leader_no_observation) (conf 0.992) winner=item_5 sel=no_projection hold=0
+      POST [meta] step=328 recognition_changed proj=built (conf 0.992) winner=item_5 sel=realized hold=0
+      PRE  [meta] step=327 recognition_changed proj=none(leader_no_observation) (conf 0.992) winner=item_5 sel=no_projection hold=0
+      PRE  [meta] step=328 recognition_changed proj=built (conf 0.992) winner=item_5 sel=realized hold=0
+
+## H3 the wrong table (supplementary runs; BINDING_ABSENT, the item's hypothesis carries its designated table)
+
+  scenario_s06_06 on:
+    0 move_to /step    rec=binding_absent item_0(0.553) live      AAA item_0=1.0000 item_3=0.7401
+   16 move_to /None    rec=binding_absent item_0(0.993) live      AAA item_0=1.0000 item_3=0.0020
+   17 pick_up /grasp   rec=binding_absent item_0(0.994) live      AAA item_0=1.0000 item_3=1.0000
+   18 pick_up /None    rec=binding_absent item_0(0.994) live      AAA item_0=1.0000 item_3=1.0000
+   19 move_to /step    rec=binding_absent item_0(0.994) live      AAA item_0=0.9369
+   20 move_to /step    rec=binding_absent item_0(0.994) live      AAA item_0=0.8738 item_3=0.7412
+   36 move_to /step    rec=binding_absent item_0(0.995) live      AAA item_0=0.1232 item_3=0.0016
+   37 move_to /step    rec=binding_absent item_0(0.995) live      AAA item_0=0.1022 item_3=0.0011
+   39 move_to /step    rec=binding_absent item_0(0.995) live      AAX item_0=0.0686 item_3=0.0005
+   40 move_to /step    rec=binding_absent item_0(0.995) live      AAX item_0=0.0556 item_3=0.0003
+   46 move_to /step    rec=binding_absent item_0(0.995) live      AXX item_0=0.0134 item_3=0.0000
+   47 move_to /step    rec=binding_absent item_0(0.995) live      AXX item_0=0.0103 item_3=0.0000
+  100 move_to /step    rec=binding_absent item_0(0.995) live      XXX item_0=0.0000 item_3=0.0000
+  101 move_to /step    rec=binding_absent item_0(0.995) live      XXX item_0=0.0000 item_3=0.0000
+  102 move_to /None    rec=binding_absent item_0(0.995) live      XXX item_0=0.0000 item_3=0.0000
+  103 place   /release rec=binding_absent item_0(0.995) live      AAA item_0=1.0000
+  104 place   /None    rec=binding_absent item_0(0.995) live      AAA item_0=1.0000 item_3=0.8629
+  105 move_to /step    rec=item_3         item_0(0.995) live      AAA item_0=1.0000 item_3=0.8629
+      POST [meta] step=0 no_current_task proj=none(below_theta) (conf 0.553) winner=item_6 sel=no_projection hold=0
+      POST [meta] step=4 recognition_changed proj=built (conf 0.804) winner=item_6 sel=realized hold=0
+      POST [meta] step=40 no_current_task proj=built (conf 0.995) winner=item_1 sel=realized hold=0
+      POST [meta] step=76 no_current_task proj=none(leader_inadequate) (conf 0.995) winner=item_7 sel=no_projection hold=0
+      POST [meta] step=103 recognition_changed proj=built (conf 0.995) winner=item_7 sel=realized hold=0
+      PRE  [meta] step=0 no_current_task proj=none(below_theta) (conf 0.553) winner=item_6 sel=no_projection hold=0
+      PRE  [meta] step=4 recognition_changed proj=built (conf 0.804) winner=item_6 sel=realized hold=0
+      PRE  [meta] step=40 no_current_task proj=built (conf 0.995) winner=item_1 sel=realized hold=0
+      PRE  [meta] step=76 no_current_task proj=none(leader_inadequate) (conf 0.995) winner=item_7 sel=no_projection hold=0
+      PRE  [meta] step=103 recognition_changed proj=built (conf 0.995) winner=item_7 sel=realized hold=0
+      completion world tick pre 265 post 265; declared pre 267 post 267
+
+  scenario_s07_03 on:
+    0 move_to /step    rec=binding_absent item_2(0.537) live      AAA item_2=1.0000 item_3=0.8061
+    8 move_to /None    rec=binding_absent item_2(0.872) live      AAA item_2=1.0000 item_3=0.1061
+    9 pick_up /grasp   rec=binding_absent item_2(0.891) live      AAA item_2=1.0000 item_3=1.0000
+   10 pick_up /None    rec=binding_absent item_2(0.891) live      AAA item_2=1.0000 item_3=1.0000
+   11 move_to /step    rec=binding_absent item_2(0.889) live      AAA item_2=0.9673
+   12 move_to /step    rec=binding_absent item_2(0.906) live      AAA item_2=0.9327 item_3=0.7422
+   30 move_to /step    rec=binding_absent item_2(0.995) live      AAA item_2=0.1264 item_3=0.0007
+   31 move_to /step    rec=binding_absent item_2(0.995) live      AAX item_2=0.0999 item_3=0.0005
+   32 move_to /step    rec=binding_absent item_2(0.995) live      AAX item_2=0.0778 item_3=0.0003
+   33 move_to /step    rec=binding_absent item_2(0.995) live      AAX item_2=0.0597 item_3=0.0002
+   38 move_to /step    rec=binding_absent item_2(0.995) live      AXX item_2=0.0135 item_3=0.0000
+   39 move_to /step    rec=binding_absent item_2(0.995) live      XXX item_2=0.0098 item_3=0.0000
+   92 move_to /step    rec=binding_absent item_2(0.995) live      XXX item_2=0.0000 item_3=0.0000
+   93 move_to /None    rec=binding_absent item_2(0.995) live      XXX item_2=0.0000 item_3=0.0000
+   94 place   /release rec=binding_absent item_2(0.995) live      AAA item_2=1.0000
+   95 place   /None    rec=binding_absent item_2(0.995) live      AAA item_2=1.0000 item_3=0.8629
+   96 move_to /step    rec=item_3         item_2(0.995) live      AAA item_3=0.8629
+      POST [meta] step=0 no_current_task proj=none(below_theta) (conf 0.537) winner=item_5 sel=no_projection hold=0
+      POST [meta] step=5 recognition_changed proj=built (conf 0.771) winner=item_5 sel=realized hold=0
+      POST [meta] step=79 no_current_task proj=none(leader_inadequate) (conf 0.995) winner=item_4 sel=no_projection hold=0
+      POST [meta] step=94 recognition_changed proj=built (conf 0.995) winner=item_4 sel=realized hold=0
+      PRE  [meta] step=0 no_current_task proj=none(below_theta) (conf 0.537) winner=item_5 sel=no_projection hold=0
+      PRE  [meta] step=5 recognition_changed proj=built (conf 0.771) winner=item_5 sel=realized hold=0
+      PRE  [meta] step=79 no_current_task proj=none(leader_inadequate) (conf 0.995) winner=item_4 sel=no_projection hold=0
+      PRE  [meta] step=94 recognition_changed proj=built (conf 0.995) winner=item_4 sel=realized hold=0
+      completion world tick pre 243 post 243; declared pre None post None
+  scenario_s06_06 off: completion world tick pre 265 post 265; declared pre 267 post 267 (ticks in B4 and C)
+  scenario_s07_03 off: completion world tick pre 243 post 243; declared pre None post None (ticks in B4 and C)
+
+  decision differences against the pre-build logs (d_decisions.diff):
+  scenario_s06_06 off: 0 differing entries; admitted/decisions pre 4/9 post 4/9
+  scenario_s06_06 on: 0 differing entries; admitted/decisions pre 6/10 post 6/10
+  scenario_s07_03 off: 0 differing entries; admitted/decisions pre 4/9 post 4/9
+  scenario_s07_03 on: 0 differing entries; admitted/decisions pre 5/10 post 5/10
+
+## H4 the finished work order: scenario_s01_01 prior on
+  138 move_to /step    rec=item_2         item_2(0.996) live      AAA item_2=1.0000
+  139 move_to /step    rec=item_2         item_2(0.996) live      AAA item_2=1.0000
+  140 move_to /None    rec=item_2         item_2(0.996) live      AAA item_2=1.0000
+  141 place   /release rec=item_2         none(0.000) exhausted EEE 
+  142 place   /None    rec=item_2         none(0.000) exhausted EEE 
+  143 None    /None    rec=no_task        none(0.000) exhausted EEE 
+  144 None    /None    rec=no_task        none(0.000) exhausted EEE 
+  170 None    /None    rec=no_task        none(0.000) exhausted EEE 
+  171 None    /None    rec=no_task        none(0.000) exhausted EEE 
+      POST [meta] step=141 recognition_changed proj=none(below_theta) (conf 0.0) winner=item_4 sel=no_projection hold=0
+      PRE  [meta] step=141 recognition_changed proj=none(below_theta) (conf 0.0) winner=item_4 sel=no_projection hold=0
+
+## H5 the first ticks after a boundary (every boundary of the 48 reads U on its tick, A from the next: B6)
+  scenario_s01_01 prior on, boundary 78 (one live hypothesis left):
+   76 move_to /step    rec=item_3         item_3(0.996) live      AAA item_2=0.0000 item_3=1.0000
+   77 move_to /None    rec=item_3         item_3(0.996) live      AAA item_2=0.0000 item_3=1.0000
+   78 place   /release rec=item_3         item_2(0.996) live      UUU 
+   79 place   /None    rec=item_3         item_2(0.996) live      AAA item_2=1.0000
+   80 move_to /step    rec=item_2         item_2(0.996) live      AAA item_2=1.0000
+   81 move_to /step    rec=item_2         item_2(0.996) live      AAA item_2=1.0000
+      POST [meta] step=78 recognition_changed proj=none(leader_no_observation) (conf 0.996) winner=item_6 sel=no_projection hold=0
+      POST [meta] step=79 recognition_changed proj=built (conf 0.996) winner=item_6 sel=realized hold=0
+      PRE  [meta] step=78 recognition_changed proj=none(leader_no_observation) (conf 0.996) winner=item_6 sel=no_projection hold=0
+      PRE  [meta] step=79 recognition_changed proj=built (conf 0.996) winner=item_6 sel=realized hold=0
+  scenario_s01_01 prior off, boundary 78 (three live):
+   76 move_to /step    rec=item_3         item_3(0.996) live      AAA item_2=0.0000 item_3=1.0000 item_4=0.0000 item_6=0.0000
+   77 move_to /None    rec=item_3         item_3(0.996) live      AAA item_2=0.0000 item_3=1.0000 item_4=0.0000 item_6=0.0000
+   78 place   /release rec=item_3         item_2(0.333) live      UUU 
+   79 place   /None    rec=item_3         item_2(0.333) live      AAA item_2=1.0000 item_4=1.0000 item_6=1.0000
+   80 move_to /step    rec=item_2         item_2(0.344) live      AAA item_2=1.0000 item_4=0.9933 item_6=0.8669
+   81 move_to /step    rec=item_2         item_2(0.358) live      AAA item_2=1.0000 item_4=0.9862 item_6=0.7365
+      POST [meta] step=78 recognition_changed proj=none(below_theta) (conf 0.333) winner=item_6 sel=no_projection hold=0
+      PRE  [meta] step=78 recognition_changed proj=none(below_theta) (conf 0.333) winner=item_6 sel=no_projection hold=0
+  scenario_s02_01 prior on, boundary 75 (item_2 placed; coffee, item_5, ac_switch_0 live):
+   74 move_to /None    rec=item_2         item_2(0.991) live      AAA ac_switch_0=0.0000 coffee=0.0000 item_2=1.0000 item_5=0.0000
+   75 place   /release rec=item_2         ac_switch_0(0.331) live      UUU 
+   76 place   /None    rec=item_2         ac_switch_0(0.331) live      AAA ac_switch_0=1.0000 coffee=1.0000 item_5=1.0000
+   77 move_to /step    rec=coffee         coffee(0.348) live      AAA ac_switch_0=0.9998 coffee=1.0000 item_5=0.8063
+   78 move_to /step    rec=coffee         coffee(0.365) live      AAA ac_switch_0=0.9996 coffee=1.0000 item_5=0.6408
+      POST [meta] step=75 recognition_changed proj=none(below_theta) (conf 0.331) winner=item_7 sel=no_projection hold=0
+      PRE  [meta] step=75 recognition_changed proj=none(below_theta) (conf 0.331) winner=item_7 sel=no_projection hold=0
