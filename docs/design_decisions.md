@@ -4495,3 +4495,13 @@ Reference: cchat, 27 September 2026 (TB); "T-D R and E" (R1 to R6, E1 to E10, G1
 twice); "Layouts, setups and scenarios: the three artefacts of a run"; "T-H: the human behaviour model";
 `docs/handoff_T-D_cycle2_and_IR_testbed.md` §8 (the layered plan); TODO-101, TODO-117, TODO-122;
 `docs/recognizer_handback.md` §1.10
+
+TRACK COMPLETE (TB close-out, 27 September 2026): TB.2b, TB.3b and TB.4b are built; sixteen scenarios (scenario_s08_01
+to _04 on env_layout_10, scenario_s09_01 to _12 on env_layout_11), zero disagreements at 1e-9 between the recognizer's
+public outputs and the independent oracle; the instrument is independent of the layout, and its record is
+`analysis/ir_testbed/README.md` (the results in `REPORT.md`). Two facts for cycle 2, stated without ruling: (1) E8's
+member clause is covered by E6's second amendment whenever the action completion latency is 1 (every phase an advance
+opens then has s_exp ≥ 1, so its entry tick is already a member; removing the clause changed no output in TB.3b); (2) at
+the current β (0.01 /cm) and v (20 cm/tick), two targets 10.4° apart as seen from the start are not separated by a
+28-tick walk (the rival's S 0.765 at the arrival), while 30.4° separates them three ticks before the arrival (S < α at
+tick 25 of 28; scenario_s09_10, shallow runs of TB.4b).

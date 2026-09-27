@@ -2975,6 +2975,7 @@ T-D 1.5b (27 Sept 2026; `analysis/td_stage1b/REPORT.md`, finding 5): G1 refuses 
 `none(leader_inadequate)`), but after the release the misdelivered item's hypothesis is admitted again at 0.995
 (scenario_s06_06 at 103, scenario_s07_03 at 94, both priors): with no boundary at a misdelivery, its new derived phase
 (pick the item up where it now lies) is a member at S = 1. Cycle 2 input (L).
+IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_08, prior on): item_1 released on kitting_table_1 at 75, no pin and no boundary; `deliver_item(item_1)` keeps leading into the next delivery (0.997 at 86, 0.897 at 120) while the true `deliver_item(item_2)` never reaches θ (at most 0.483, at 130); it is never pinned in the run.
 
 **TODO-88 — With the prior off, an item the robot carries stays a live hypothesis about the human, with a target that moves with the robot** [recognizer finding; from T-B Q7]
 Found while checking T-B Q7's acceptance, which expected a robot-side timing fix to leave every `[IR]` line
@@ -3097,6 +3098,7 @@ to item_3 had refuted it), where in scenario_s02_02 it rose to 0.345. The recogn
 should decay, be reset by another event, or stand, is a recognizer question for T-D. Recorded, nothing changed.
 Files: shared/recognizer.py
 Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
+IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_05, prior on): the corner walk mid-delivery, 32 to 79; `deliver_item(item_1)`'s one derived phase `move_to(kitting_table_0)` runs 30 to 125, its S below α from 48; the finding is unexplained 48 to 125, through the resumed carry (80 to 125), where the delivery reaches θ at 87 while inadequate; adequate again at 126 (its advance to `place`).
 
 **TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN; its recognition level CLOSED by decision, T-D R and E, 27 Sept 2026]
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
@@ -3214,6 +3216,7 @@ Size, estimated at recording: comparable to I4c plus I4d; one to two design roun
 two build-and-verify rounds (i4d-style invariant check with a reversion variant), all
 baselines regenerated; about the size of the T-D Q2 to Q4 pass itself.
 Related: TODO-59 (deferred part), TODO-85 half (a), TODO-80, TODO-92, TODO-96, T-D Q1, T-D Q5.
+IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_06, prior on): `stand(PT80S)` at shelf_1 30 to 70, inside `deliver_item(item_1)`'s `pick_up` phase (s_exp 2); its S below α at 47 (17 standing ticks beyond s_exp); the finding unexplained 47 to 71 while the belief holds at about 0.92 (the rival is charged for the same ticks); adequate at the grasp, 72.
 
 **TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN, recorded only]
 SUPERSEDED IN PART (T-D R, 27 September 2026): the condition "sustained `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".
@@ -3504,6 +3507,7 @@ per run. The pin retires a hypothesis for the rest of the run once its terminal 
 action starts; so a second coffee break in the same run has no live hypothesis.
 Files: shared/recognizer.py (the live set H)
 Reference: design_decisions.md, "T-D R and E", R4; `analysis/td_stage1/REPORT.md` §H
+IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`): scenario_s09_01 (as scenario_s08_01) and scenario_s09_10, prior on: `coffee_break` lone live at 0.997 after the last delivery (from 124 and from 107), its S below α on the exit walk (157 and 141), the finding unexplained from there to the end of the run, the idle human included.
 
 **TODO-118: Retraction of an admitted projection when its leader turns inadequate (recorded for L, T-D 1.5c, 27 Sept 2026)**
 [OPEN; cycle 2 input, L]
@@ -3551,13 +3555,14 @@ moved tick lies in the exposed interval.
 Files: analysis/td_stage1/, analysis/td_stage1b/ (the scripts rerun on the regenerated baselines)
 Reference: design_decisions.md, "The cognitive loop does not end with the task pool"
 
-**TODO-122: The IR test-bed's deviation scenarios, layer 4 (recorded, TB.1r, 27 Sept 2026)** [OPEN; with P and X]
+**TODO-122: The IR test-bed's deviation scenarios, layer 4 (recorded, TB.1r, 27 Sept 2026)** [CLOSED; TB.4b, 27 Sept 2026]
 The test-bed's first scenarios hold modelled behaviour and the exit walk only. The deviations are authored later, with
 P and X: the corner walk (`TASK_ABSENT`, the case Design B was ruled for), a switch outside the support, the wrong
 table (`BINDING_ABSENT`), the long stand, the finished assigned tasks. Same rules as the test-bed's first scenarios:
 the layout is not adjusted to a desired result, and the expectations are derived from the entry before the run.
 Files: domains/kitting/ (scenarios), analysis/ir_testbed/
 Reference: design_decisions.md, "The IR test-bed"; TODO-101; `docs/handoff_T-D_cycle2_and_IR_testbed.md` §8, layer 4
+CLOSED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, its TB.4b section): layer 4 built on the enlarged room (env_layout_11, env_setup_09), ahead of P and X: the corner walk (scenario_s09_05, `TASK_ABSENT`), the long stand (_06), the change of mind (_07), the wrong table (_08, `BINDING_ABSENT`), a delivery outside the support (_09, covered, outside the support); the finished assigned tasks are the exit walks of _01 and _10 (TODO-117). Zero disagreements at 1e-9 against the recognizer's public outputs.
 
 **TODO-123: `SimModel._spawn_agents`'s docstring misdescribes the robot's pool under the prior (recorded, TB.2b, 27 Sept 2026)** [OPEN; docstring only]
 The docstring says the robot "receives its assigned_tasks as its task pool, plus (when the assignment_prior switch is
@@ -3567,6 +3572,28 @@ robot's pool is its own `assigned_tasks` (`meta_planner.seed_tasks(assigned_task
 is right, the text is stale.
 Files: mesa_sim/sim_model.py (`_spawn_agents`)
 Reference: TB.2b plan step, 27 Sept 2026
+
+**TODO-124: The run log prints S to four decimals (recorded, TB close-out, 27 Sept 2026)** [OPEN; recorded only]
+The `[IR]` line prints the members' tail probabilities to four decimals, so a hypothesis adequacy read from the log is
+undetermined within 5·10⁻⁵ of α: scenario_s09_07 at tick 35, `coffee_break`'s S = 0.0499824 printed `0.0500` and read
+from the log as adequate, where the recognizer's own output is inadequate. The in-process `BeliefState` is
+authoritative; the IR test-bed compares against it at 1e-9 and against the log at print precision only.
+Files: mesa_sim/sim_agents.py (the `[IR]` line's `tails=` format); analysis/ir_testbed/actual.py (the log reader)
+Reference: `analysis/ir_testbed/REPORT.md`, TB.4b, "Disagreements, classified"
+
+**TODO-125: tdlib.py cannot parse a `[coverage]` line with a `start:` entry (recorded, TB close-out, 27 Sept 2026)** [OPEN; recorded only]
+`analysis/td_stage1b/tdlib.py`'s `[coverage]` pattern does not match a line that carries a `start:` entry (any script
+with a `Start` event), and `parse` then raises. tdlib is a frozen record and is not edited; the IR test-bed's log reader
+hands it a copy of the log without its `[coverage]` lines, which nothing there reads.
+Files: analysis/td_stage1b/tdlib.py (frozen); analysis/ir_testbed/actual.py (`from_log`)
+Reference: `analysis/ir_testbed/REPORT.md`, TB.3b flags
+
+**TODO-126: The registry inventory literal in the discovery test (recorded, TB close-out, 27 Sept 2026)** [OPEN; recorded only]
+`tests/test_tl2_discovery.py::test_the_registry_is_the_union_of_the_modules` pins the registry's inventory as literals
+(the scenario count and the set of setup ids), so it must be edited with every new scenario or setup: 38 to 42 in TB.3b,
+42 to 54 and setups 01 to 09 in TB.4b.
+Files: tests/test_tl2_discovery.py
+Reference: `analysis/ir_testbed/REPORT.md`, TB.3b and TB.4b, "Runs and tests that disagree with the mechanism"
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
