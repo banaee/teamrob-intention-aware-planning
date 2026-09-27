@@ -682,8 +682,9 @@ D = e/v + (s − s_exp) in ticks: e the excess path from the origin (`likelihood
 excess the movement likelihood reads; 0 without an evaluator or a target), s the ticks without movement since
 the origin, s_exp the Projector's priced standing (0 for a movement action; the bound duration through
 `duration_to_steps`; else `task_model.get_cost()`, else `default_action_cost`). S = `tail_probability(v·D, beta)`.
-A member (ruled 27 September 2026) is a live hypothesis with a derived phase whose phase holds an observation
-(walked path since the origin, or s > s_exp). `finding`: UNRESOLVED iff no member; UNEXPLAINED iff every member
+A member (ruled 27 September 2026; E6 amended the same day) is a live hypothesis with a derived phase whose
+phase holds an observation: walked path since the origin, or s > s_exp, or — in a stationary phase (no movement
+target) — s ≤ s_exp, an observation with D ≤ 0 and S = 1. `finding`: UNRESOLVED iff no member; UNEXPLAINED iff every member
 has S < alpha; ADEQUATE otherwise. Computed from scratch every tick. `lifecycle` EXHAUSTED iff H is empty.
 
 Dispatches by schema-declared `microactions` membership and `progress_evaluator` name — never by hardcoded

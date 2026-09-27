@@ -304,12 +304,19 @@ movement likelihood's β, not retuned (its second meaning). At $v = 20$ cm/tick 
 $vD = 334.5$ cm (17 ticks of standing in a walk; 167 cm walked straight away from the target), $S < 0.01$ from
 496.8 cm (25 ticks).
 
-MEMBERSHIP (E4, E6; ruled by Hadi, 27 September 2026, the precise form, to be recorded in the entry at 1.5). A
-live hypothesis is a MEMBER of the test on a tick iff it has a derived phase this tick (an expected action) and
-that phase holds an observation: walked path since its origin, or standing beyond $s_{\mathrm{exp}}$. A stationary tick
-within the priced duration is not an observation; an observation whose D is not surprising is still one. A
-non-member contributes no $S_k$ (absent from `tails`); a hypothesis with no expected action (undecomposable) is
-never a member.
+MEMBERSHIP (E4, E6; ruled by Hadi, 27 September 2026, the precise form, to be recorded in the entry at 1.5;
+E6 AMENDED the same day on the 1.3 report). A live hypothesis is a MEMBER of the test on a tick iff it has a
+derived phase this tick (an expected action) and that phase holds an observation: walked path since its origin,
+or standing beyond $s_{\mathrm{exp}}$, or — in a stationary phase (`pick_up`, `place`, `wait_at`: no movement target) —
+a stationary tick within its priced duration ($s \le s_{\mathrm{exp}}$), which is an observation with $D \le 0$ and
+$S_k = 1$: a hypothesis whose priced standing has not ended explains the behaviour exactly. A stationary phase is
+derived only once its location is reached (the preceding walk's `at()` holds), so the agent is at the phase's
+location. The entry tick of a stationary phase counts as its first stationary tick ($s = 0$): the arrival step
+of that tick belongs to the closing walk's stretch, and nothing has been walked since the new origin. A
+`move_to` phase with nothing walked since its origin and no standing beyond $s_{\mathrm{exp}} = 0$ holds no
+observation, so the first tick after a boundary stays unresolved. An observation whose D is not surprising is
+still one. A non-member contributes no $S_k$ (absent from `tails`); a hypothesis with no expected action
+(undecomposable) is never a member.
 
 FINDING. UNRESOLVED iff there is no member; UNEXPLAINED iff every member has $S_k < \alpha$
 (intersection-union); ADEQUATE otherwise. No memory beyond each live hypothesis's current phase (E7): an
@@ -481,9 +488,11 @@ the belief; it is assessed in the adequacy test against its priced standing.
 
 **(c) The adequacy test's limitations, recorded in the entry and not built**: sub-threshold waste is not
 summed across phases; a regress at the proximity threshold restarts a hypothesis's test; the false-unexplained
-count per run grows with the number of phases of the true hypothesis. Under the membership ruling a finding can
-be unexplained while the true hypothesis is a non-member (standing within its priced duration) and only a
-refuted rival is a member (scenario_s01_01 prior-on, steps 76–77, the human placing item_3); measured in 1.4.
+count per run grows with the number of phases of the true hypothesis. Under the membership rule as first
+ruled, a finding could be unexplained while the true hypothesis was a non-member (standing within its priced
+duration) and only a refuted rival a member (scenario_s01_01 prior-on, steps 76–77, the human placing item_3);
+the E6 amendment of 27 September 2026 makes that hypothesis a member with S = 1, and the finding there reads
+adequate.
 
 Also stated, lower in consequence:
 - An undecomposable hypothesis scores the perfect fit in the belief and is never a member of the adequacy
