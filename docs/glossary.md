@@ -698,6 +698,11 @@ whether one hypothesis explains its own phase, and the meta-planner reads it for
 RELATION TO HYPOTHESIS ADEQUACY (ruled by Hadi, 27 September 2026): the aggregate adequacy finding is **adequate** when
 at least one live hypothesis has hypothesis adequacy adequate; otherwise it is **unresolved** (no live hypothesis is a
 member) or **unexplained** (every member is inadequate), by the aggregate rule (E4, E6).
+SUPERSEDED IN PART (wording; TB.1r, Hadi, 27 September 2026): "it clears when every live hypothesis advances its phase
+or an episode boundary moves every origin (E7)" was loose. The finding has no memory beyond each live hypothesis's
+current derived phase; it is recomputed every tick; one member with S_k ≥ α makes it adequate; a boundary empties the
+membership. No change to the mechanism.
+→ `docs/design_decisions.md`, "T-D R and E", E7 (its superseding note); `docs/recognizer_handback.md` §1.10.
 
 **hypothesis adequacy** — per live hypothesis, a categorical value the recognizer reports beside the **adequacy
 finding** (G1): **adequate** (a member of the test with S_k ≥ α), **inadequate** (a member with S_k < α) or **no

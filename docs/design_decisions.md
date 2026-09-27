@@ -4273,6 +4273,11 @@ E, ruled.
   stationary phase, or in any phase with s_exp > 0 (then D ≤ 0, S_k = 1); or the completion of its expected action on
   this tick (E8, S_k = 1) — and the tick is not a boundary tick.
 - E7. The finding has no memory beyond each live hypothesis's current phase; it clears when every live hypothesis advances its phase or an episode boundary moves every origin. Retraction and resumption are L.
+  SUPERSEDED IN PART (wording; TB.1r, Hadi, 27 September 2026): "it clears when every live hypothesis advances its
+  phase or an episode boundary moves every origin" was loose. The mechanism, as recorded in
+  `docs/recognizer_handback.md` §1.10, is per-tick recomputation: the finding has no memory beyond each live
+  hypothesis's current phase; it is recomputed every tick; one member with S_k ≥ α makes it adequate; a boundary
+  empties the membership. No change to the mechanism.
 - Properties recorded (1.5c, from the 1.5b acceptance): a foreseen stay is revealed about 9 standing ticks after its
   arrival, not on it (scenario_s05_01 / _02 prior on: arrival 23, crossing 32; scenario_s02_01 130, scenario_s04_01
   158): a rival on the same bearing is refuted only as its unpriced standing is charged, L ≤ 1/3 at
