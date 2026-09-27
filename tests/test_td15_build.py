@@ -121,11 +121,13 @@ def test_the_grasp_tick_is_a_member_with_s_one(model5):
     assert b.finding is AdequacyFinding.ADEQUATE
 
 
-def test_the_grasps_latency_tick_holds_no_observation_for_the_carry_walk(model5):
-    # E9 with E6 (2): the tick after the grasp is the pick_up's latency, priced to the carry walk
-    # (s = 1 = s_exp), and the walk has nothing walked: the true hypothesis is not a member.
-    # The finding is then the refuted rival's alone: unexplained. The first carry tick makes the
-    # true hypothesis a member again at D = 0 (a straight walk, no standing beyond s_exp).
+def test_the_grasps_latency_tick_is_a_member_with_s_one(model5):
+    # E9 with E6's second amendment (1.5c; the scenario_s02_01 248 pattern): the tick after the grasp
+    # is the pick_up's latency, priced to the carry walk (s = 1 = s_exp > 0), a stationary tick
+    # within the priced standing: an observation with D = 0, the true hypothesis a member with S = 1,
+    # and the finding adequate though the only other member is a refuted rival. (Under 1.5b it held
+    # no observation there and the rival alone made the finding unexplained.) The first carry tick
+    # keeps it a member at D = 0 (a straight walk, no standing beyond s_exp).
     rival = foreseeable(model5, "ac_activation(?ac_switch=ac_switch_0)")
     rec = recognizer(model5, [item("item_3"), rival])
     k3 = repr(item("item_3"))
@@ -133,8 +135,9 @@ def test_the_grasps_latency_tick_holds_no_observation_for_the_carry_walk(model5)
     for t, (p, w) in enumerate(steps):
         b = rec.update(obs(t, p), w)
         if t == GRASP + 1:
-            assert b.hypothesis_adequacy[k3] is HypothesisAdequacy.NO_OBSERVATION and k3 not in b.tails
-            assert b.finding is AdequacyFinding.UNEXPLAINED
+            assert b.tails[k3] == 1.0 and b.hypothesis_adequacy[k3] is HypothesisAdequacy.ADEQUATE
+            assert b.tails[repr(rival)] < 0.05
+            assert b.finding is AdequacyFinding.ADEQUATE
         if t == GRASP + 2:
             assert b.tails[k3] == 1.0 and b.finding is AdequacyFinding.ADEQUATE
 
@@ -175,10 +178,12 @@ def test_s_exp_is_the_projectors_attribution(model):
     assert list(seen.values()) == derived[:3]
 
 
-def test_the_ticks_after_a_boundary_stay_unresolved_until_the_walk(model):
-    # E9: after the release (the boundary), the place's latency tick is priced to the next walk
-    # (s_exp = 1): unresolved on the boundary tick and on the latency tick, adequate from the
-    # first walking tick (item_2's walk from the table, straight: D = 0, S = 1).
+def test_the_boundary_sequence_is_unresolved_adequate_adequate(model):
+    # E9 with E6's second amendment and E8's boundary clause (1.5c): no hypothesis is a member on the
+    # boundary tick (unresolved); the place's latency tick is priced to the next walk (s_exp = 1,
+    # s = 1): an observation with D = 0, S = 1 (adequate); the first walking tick (item_2's walk from
+    # the table, straight: D = 0, S = 1) adequate. The 1.5b expectation "unresolved, unresolved,
+    # adequate" is superseded by this derivation.
     w = build_world_state(model)
     p = w.object_positions[TABLE]
     placing = world_with(w, add=[pred("holding", H, "item_3"), pred("at", H, TABLE)],
@@ -191,8 +196,8 @@ def test_the_ticks_after_a_boundary_stay_unresolved_until_the_walk(model):
     assert b.finding is AdequacyFinding.UNRESOLVED
     assert rec._priced_standing(k2, rec._expected[k2]) == ACTION_COMPLETION_LATENCY + HUMAN_TASK_COMPLETION_LATENCY
     b = rec.update(obs(2, p), placed)                                  # the latency tick
-    assert b.finding is AdequacyFinding.UNRESOLVED and b.tails == {}
-    assert b.hypothesis_adequacy == {k2: HypothesisAdequacy.NO_OBSERVATION}
+    assert b.finding is AdequacyFinding.ADEQUATE and b.tails == {k2: 1.0}
+    assert b.hypothesis_adequacy == {k2: HypothesisAdequacy.ADEQUATE}
     gx, gy = w.object_positions["item_2"]
     d = math.hypot(gx - p[0], gy - p[1])
     q = (p[0] + SPEED * (gx - p[0]) / d, p[1] + SPEED * (gy - p[1]) / d)
@@ -200,6 +205,28 @@ def test_the_ticks_after_a_boundary_stay_unresolved_until_the_walk(model):
     assert b.finding is AdequacyFinding.ADEQUATE
     assert math.isclose(b.tails[k2], 1.0)
     check_r6(rec, b)
+
+
+def test_a_stationary_phase_opened_by_a_boundary_is_no_member_on_the_boundary_tick(model):
+    # E8's boundary clause applied generally (1.5c; supersedes reading 3 of 1.3b): item_2's phase at
+    # the boundary is pick_up (the human is at item_2 by hand-built predicate), a stationary phase
+    # within its priced standing; it is still no member on the boundary tick. On the next tick it is
+    # (s = 1 <= s_exp = latency + its own tick = 2).
+    w = build_world_state(model)
+    p = w.object_positions[TABLE]
+    placing = world_with(w, add=[pred("holding", H, "item_3"), pred("at", H, TABLE), pred("at", H, "item_2")],
+                         remove=[pred("obj_at", "item_3", "shelf_3")])
+    placed = world_with(placing, add=[pred("obj_at", "item_3", TABLE)], remove=[pred("holding", H, "item_3")])
+    rec = recognizer(model, [item("item_3"), item("item_2")])
+    k2 = repr(item("item_2"))
+    rec.update(obs(0, p), placing)
+    b = rec.update(obs(1, p), placed)                                  # the boundary
+    assert rec._expected[k2].action_name == "pick_up"
+    assert b.finding is AdequacyFinding.UNRESOLVED and b.tails == {}
+    assert b.hypothesis_adequacy == {k2: HypothesisAdequacy.NO_OBSERVATION}
+    b = rec.update(obs(2, p), placed)
+    assert rec._priced_standing(k2, rec._expected[k2]) == ACTION_COMPLETION_LATENCY + 1.0
+    assert b.tails == {k2: 1.0} and b.finding is AdequacyFinding.ADEQUATE
 
 
 def test_standing_beyond_the_priced_duration_charges_the_belief_by_v_per_tick(model):
@@ -288,6 +315,12 @@ def test_the_guard_refuses_a_lone_hypothesis_at_a_boundary(model):
     assert b.most_likely == repr(item("item_2")) and b.confidence >= DEFAULT_THETA
     assert b.hypothesis_adequacy[b.most_likely] is HypothesisAdequacy.NO_OBSERVATION
     assert gate(model)._clears_gate(b) is GateOutcome.LEADER_NO_OBSERVATION
+    # the latency tick after it: one priced standing tick, an observation at S = 1 (E6, second
+    # amendment), so the lone hypothesis clears the gate at b + 1 on a belief of 1.0 by
+    # normalisation (TODO-119)
+    b = rec.update(obs(2, p), placed)
+    assert b.hypothesis_adequacy[b.most_likely] is HypothesisAdequacy.ADEQUATE
+    assert gate(model)._clears_gate(b) is GateOutcome.CLEARS
 
 
 def test_the_guard_refuses_an_inadequate_leader(model):
