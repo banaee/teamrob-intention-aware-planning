@@ -1,4 +1,5 @@
 # The intention recognizer — current description
+SUPERSEDED IN PART (T-D R, 27 September 2026): this document describes the recognizer at HEAD, with the `unknown` hypothesis, u, the grade and the odds accounting; R and E remove them, and the Stage 1 build rewrites it. The sections marked below are the plain cases. design_decisions.md, "T-D R and E".
 
 What `shared/recognizer.py` and `shared/likelihood_functions.py` do at HEAD (September 2026), for two readers:
 later sessions of this project, and colleagues who last saw the recognizer before July 2026 (start with §9,
@@ -15,6 +16,7 @@ CROSSING is a θ crossing, and scenario_40's "segment 3" is a SCRIPT PART, not a
 ## 1. The model
 
 ### 1.1 Hypotheses and support
+SUPERSEDED IN PART (T-D R, 27 September 2026): "plus `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1). design_decisions.md, "T-D R and E".
 
 The hypothesis space is built once, at robot construction, from the domain schemas and the workspace objects
 (`build_hypothesis_space`), never from the human's script:
@@ -37,6 +39,7 @@ The LIVE set at tick t is S minus the tasks completed by t (§1.6). One recogniz
 the odometer is kept per agent, the phase state per hypothesis only.
 
 ### 1.2 Prior
+SUPERSEDED IN PART (T-D R, 27 September 2026): "`unknown` included": the prior is uniform over the live task hypotheses (R1). design_decisions.md, "T-D R and E".
 
 Uniform over the live set, `unknown` included: $\pi(k) = 1 / |\mathrm{Live}|$, at construction and again at every
 episode boundary (§1.6), recomputed over what is still live. Nothing else is stored to restart from.
@@ -57,6 +60,7 @@ change. Two actions are the same when their name and grounded bindings are.
 A task's likelihood is the likelihood of the action it expects now: $P(o_t \mid \tau) = P(o_t \mid a_\phi(\tau))$.
 
 ### 1.4 Likelihoods
+SUPERSEDED IN PART (T-D R, 27 September 2026): THE GRADE: the grade leaves the belief (R1); the excess-path likelihood stands (R6). design_decisions.md, "T-D R and E".
 
 MOVEMENT (actions with `progress_evaluator = "excess_path"`, in kitting `move_to`). Measured from the origin $o$,
 with $w$ the distance walked since $o$ (per-agent odometer: the sum of straight-line steps between observed
@@ -115,6 +119,7 @@ the value 1: 1 is a perfectly efficient walk, and here there is no walk. On such
 nothing while a rival with an open stretch pays its L/u^f (accepted, I4d point 4).
 
 ### 1.5 Evidence: odds against `unknown`
+SUPERSEDED IN PART (T-D R, 27 September 2026): the odds-against-`unknown` accounting and its invariant no longer exist; the invariant is sum-to-1 over the live hypothesis set H (R6); the fold stands (R6). design_decisions.md, "T-D R and E".
 
 `unknown` is the reference, and it takes no factor of its own. Its likelihood for a stretch is graded,
 $u^{f}$ with $u = \mathrm{UNKNOWN\_LIKELIHOOD}$ and $f$ the stretch's grade (§1.4, `graded_unknown_likelihood`):
@@ -165,6 +170,7 @@ assumes that an agent whose phase reached the terminal action is the one that co
 no authorship.
 
 ### 1.7 Output
+SUPERSEDED IN PART (T-D R, 27 September 2026): the tie-break against `unknown`: the `unknown` hypothesis leaves the hypothesis space (R1); the adequacy finding and the lifecycle state are new outputs beside the belief (R2 to R4). design_decisions.md, "T-D R and E".
 
 $$
 \tilde{P}(k) = E(k) \cdot \omega(k) \qquad \omega: \text{context weight, output only, never fed back};\ \omega(\mathrm{unknown})=1
@@ -268,6 +274,7 @@ Likelihoods are memoised per tick by their inputs: (evaluator, origin, walked, t
 completion predicate. Two items on one shelf therefore receive identical values from the same origin.
 
 ### 1.9 Closed forms
+SUPERSEDED IN PART (T-D R, 27 September 2026): every closed form in u (the ceiling 1/(1 + uⁿ), 1/(1 + u^f), L = u at 294 cm): u leaves the belief (R1). design_decisions.md, "T-D R and E".
 
 - A lone live task on its first fitting stretch: $O = u^{-f}$, so confidence $= 1/(1 + u^{f})$ times the
   pinned-mass factor $(1 - 0.001 \cdot |pinned|)$: 0.5 at the first step, $\theta = 0.75$ at $f = \ln 3 / \ln 10 \approx 0.48$
@@ -288,6 +295,7 @@ completion predicate. Two items on one shelf therefore receive identical values 
   the no-graded-signal phases.
 
 ## 2. Parameters
+SUPERSEDED IN PART (T-D R, 27 September 2026): the `UNKNOWN_LIKELIHOOD` row: u leaves the belief (R1); β gains a second meaning, the scale of the reference distribution (E5), and α is new (E5). design_decisions.md, "T-D R and E".
 
 Four constants in `shared/likelihood_functions.py`, each with a physical meaning; `recognizer.py` reads them
 through the module and never redefines them.
@@ -322,6 +330,7 @@ LOAD-BEARING, NOT PARAMETERS:
   run reaches 500 steps.
 
 ## 3. The guarantee statement (β = 0.01 /cm, u = 0.1, θ = 0.75)
+SUPERSEDED IN PART (T-D R, 27 September 2026): the figures are conditional on u and the grade, which leave the belief (R1); "`unknown` takes 0.995" (§3.1, §3.2) is the lifecycle state exhausted (R4); "`unknown` ≥ θ" (§3.4) no longer occurs. Stage 1 measures again. design_decisions.md, "T-D R and E".
 
 "Guarantee" means: holds in every measured condition and follows from the model, not from a scenario. The
 conditions are the five regression fixtures and the three evaluation fixtures (s50, s70, s71) × assignment
@@ -565,6 +574,7 @@ document); TODO-52 (R1 / T10) and TODO-67 (T7), both meta-planner side; TODO-57'
 moot by F47b.
 
 ## 7. The paper-facing divergence
+SUPERSEDED IN PART (T-D R, 27 September 2026): "the constant `unknown` and the odds accounting": removed (R1, R6). design_decisions.md, "T-D R and E".
 
 The HCM paper writes P(task | O) with O a sequence of ACTIONS. The recognizer never observes an action: it
 observes a microaction and a position, and the action is LATENT. P(o | τ) = P(o | a_φ(τ)) is a

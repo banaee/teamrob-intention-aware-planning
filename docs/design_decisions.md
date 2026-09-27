@@ -254,6 +254,7 @@ each cognitive-clock event; the remaining pool carries no ordering commitment at
 The scenario file's robot `scheduled_tasks` order is never consumed as an execution order.
 
 **Assignment knowledge: `assigned_tasks` is the work order, `scheduled_tasks` is the script**
+SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` in the admissible set (D2 bullet; "never restricted away"): the `unknown` hypothesis leaves the hypothesis space (R1); the support restriction stands (R6). design_decisions.md, "T-D R and E".
 The robot may know *which* tasks the observed human was assigned without knowing the
 human's *plan* — order, timing, deviations. Three decisions make that separation concrete:
 
@@ -743,6 +744,7 @@ Files: shared/projection.py, shared/meta_planner.py, mesa_sim/sim_agents.py
 Reference: Phase 4C meta_planner build session, September 2026
 
 **Assigned-task pool is a support restriction, not a prior**
+SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` in the admissible set, "the escape hatch for behaviour outside the model": the `unknown` hypothesis leaves the hypothesis space (R1); the support restriction stands (R6). design_decisions.md, "T-D R and E".
 What the robot knows when it knows the human's `assigned_tasks` is *"the human's task lies
 in this set"* — a restriction on the support of the belief. The first build encoded it as a
 magnitude: hypotheses in the pool weighed `ASSIGNED_TASK_PRIOR` = 10.0, all others 1.0. A
@@ -1115,6 +1117,7 @@ mesa_sim/sim_agents.py, mesa_sim/sim_model.py, domains/kitting/env_layout1.json
 Reference: I2 IR foundations session, September 2026; analysis/i2_ir_foundations/REPORT.md
 
 **A task's likelihood is the likelihood of the action it expects now (I3, the phase model)**
+SUPERSEDED IN PART (T-D R, 27 September 2026): the one normalisation "over every hypothesis and `unknown`" is over the live task hypotheses only (R1). design_decisions.md, "T-D R and E".
 Until I3 the recognizer decided "which action is the human on" with a single `holding` check that
 worked for `deliver_item`'s two stages and generalised to nothing: the first action of the selected
 method answered for every observation, so no completion predicate was ever evaluated (I1: 0 of
@@ -1189,6 +1192,7 @@ Files: shared/recognizer.py; analysis/i3_phase_model/ (check_i3.py, REPORT.md)
 Reference: I3 phase-model session, September 2026
 
 **The evidence model: excess-path likelihood, detection reliability, a stated `unknown` (I4)**
+SUPERSEDED IN PART (T-D R, 27 September 2026): the stated constant `unknown` (u, normalisation over the hypotheses and `unknown`, the ceiling) leaves the belief (R1); the excess-path likelihood stands (R6). design_decisions.md, "T-D R and E".
 Until I4 the recognizer's belief rested on four numbers with no stated meaning — the cosine kernel's
 HIGH 4.0 / LOW 0.1, NEUTRAL 1.0 (also `unknown`'s flat value), ZONE_BOOST 2.0 before it — and I1/I3
 traced every asymmetry they exposed to `unknown` paying nothing while wrong hypotheses averaged 2.3–3.1
@@ -1270,6 +1274,7 @@ analysis/i4_evidence_model/ (check_i4.py, REPORT.md, sweeps, chain.py)
 Reference: I4 evidence-model session, September 2026
 
 **The recognizer estimates the intention of the current behavioural episode — and an empty stretch is not an observation (I4b, I4c)**
+SUPERSEDED IN PART (T-D R and E, 27 September 2026): `unknown`'s constant and share (1/(1+u), the prior over {…, `unknown`}) leave with R1; the empty-stretch rule stands for the belief (R6); the deferred stationarity channel is closed by decision, time entering adequacy only (E3). design_decisions.md, "T-D R and E".
 I4 left one defect: a hypothesis's origin moved only when its expected ACTION changed, never when the
 observed agent finished a TASK, so every task the agent had not started carried the whole previous task
 as wasted path (coffee entered its own walk with 2144 cm of excess). I4b's principle for the fix — "reset
@@ -1357,6 +1362,7 @@ Files: shared/recognizer.py (`update`, `_begin_episode`, `_prior`, `_progress_li
 Reference: I4b task-boundary session and I4c episode-semantics session, September 2026
 
 **`unknown` folds with the stretch: a hypothesis's evidence is its odds against `unknown` over its own observations (I4d)**
+SUPERSEDED IN PART (T-D R, 27 September 2026): the odds-against-`unknown` accounting and its invariant no longer exist; the invariant is sum-to-1 over the live hypothesis set H (R6); the fold at the phase advance stands (R6). design_decisions.md, "T-D R and E".
 The defect (TODO-60) was a FALSE EVENT at the IR / meta-planner interface: a task's stretch folded into its
 base as L alone, `unknown`'s u for that same stretch was charged only while the stretch was open, so on the
 fold tick the task's odds against `unknown` fell from 1/u to 1 — a lone live hypothesis dropped from 0.905
@@ -2443,6 +2449,7 @@ Reference: D2 session, September 2026; cchat D2 design; DESIGN-07; TODO-48 / 54 
 
 
 **A stretch's evidence against `unknown` is graded by the share of the expected path it covers (graded evidence)**
+SUPERSEDED (T-D R, 27 September 2026): the grade f and `graded_unknown_likelihood` leave the belief; per stretch each live hypothesis pays L (R1). design_decisions.md, "T-D R and E".
 
 THE DEFECT (handback §4, the open design item since I5): a stretch's evidence against `unknown` was L/u
 whatever its length. One fitting step moved the odds by 1/u, the same as a completed walk; with one live
@@ -2908,6 +2915,7 @@ Reference: T-A1, September 2026; DESIGN-07; D2; the gate ruling; TODO-84
 ---
 
 **The human's scenario is an action script, run on the scenario layer (T-C, recorded in T-A1)**
+SUPERSEDED IN PART (T-D R, 27 September 2026): scenario 2's expected outcome (`unknown` leads, admission refuses): the `unknown` hypothesis leaves the hypothesis space (R1); a walk no live hypothesis explains is read by the adequacy finding (R2, E4). design_decisions.md, "T-D R and E".
 
 DECIDED IN DIRECTION (cchat, September 2026); its design is T-C1, its build T-C2. Nothing built.
 SUPERSEDED where they differ by "The human action script (T-C1, decided)" (23 September 2026).
@@ -2948,6 +2956,7 @@ Reference: T-A1, September 2026; TODO-80; D2; I4; T8
 ---
 
 **Robustness is tested in kitting, on the script: `unknown` and the blocked case (T-D, recorded in T-A1)**
+SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` as outcome, and "whether `unknown` leads" as a measure: the `unknown` hypothesis leaves the hypothesis space (R1); the outcome is the adequacy finding (R2); the blocked case is X. design_decisions.md, "T-D R and E".
 
 DECIDED (cchat, September 2026). `unknown` and the blocked case are tested in kitting, now, with T-C's
 script vocabulary; they do not wait for a second domain. T-D builds on T-C.
@@ -2973,6 +2982,7 @@ Reference: T-A1, September 2026; D2; TODO-80; F47b; C; R2
 ---
 
 **A stationary human: what a stay means as evidence, and what the robot does when `unknown` leads (T-C, open; recorded in T-A1)**
+SUPERSEDED IN PART (T-D R and E, 27 September 2026): half (a) is closed by decision, time entering adequacy only (E3); half (b)'s "`unknown` on top" no longer occurs (R1), and what the robot does is T-D Q1 (option 1), G and X. design_decisions.md, "T-D R and E".
 
 RECORDED (cchat, September 2026) as an open item of T-C. Both halves are open; they are one behaviour (what a
 stay means, and what the robot does about it) and are decided together in T-C's design chat (T-C1).
@@ -3646,6 +3656,7 @@ Reference: TODO-97; TODO-84; "The belief is used as a bar, not a magnitude" (T-A
 ---
 
 **Terms for human behaviour, model coverage and the robot's inference (ruled)**
+SUPERSEDED IN PART (T-D R, 27 September 2026): the pending decision on `unknown` is taken (R1); "unresolved" and "exhausted" are terms now (glossary §7), "recognised" is still not. design_decisions.md, "T-D R and E".
 
 SUPERSEDED IN PART by "T-H: the human behaviour model" (25 September 2026), where the two differ; see the note at the top of this file.
 

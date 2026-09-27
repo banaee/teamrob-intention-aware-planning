@@ -64,6 +64,7 @@ condition its belief on situation, not only on walked path.
    Scientific item, not a simulator one.
 5. Communication as an action (its own task): when the robot, facing a live `unknown` or a
    block, raises communication instead of adapting its plan; how that enters B3's candidates.
+   SUPERSEDED IN PART (T-D R, 27 September 2026): "a live `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".
 6. Phase and task naming: Phase 7 if free, tasks P7-T-A, P7-T-B, ... (T-H now names the human
    behaviour model, 25 Sept 2026; the recognizer's duration term, TODO-85 half a, is TODO-95).
 

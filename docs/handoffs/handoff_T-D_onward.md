@@ -171,6 +171,7 @@ likely hypothesis at θ = 0.75, projects the human to T_h, and chooses the robot
 (`single_task` default, `full_reorder` under `--strategy`); `realize()` prices each candidate against
 the human projection with one hold per entry; the Mesa body executes the plan and the hold; the
 separation stop (off by default in debugging runs) refuses a robot step below `min_separation`.
+SUPERSEDED IN PART (T-D R, 27 September 2026): "one hypothesis per human task and `unknown`" and "graded evidence": the `unknown` hypothesis and the grade leave the belief (R1). design_decisions.md, "T-D R and E".
 
 What changed in this chat (details in sections 3 and 4):
 - `task_committed` is gone (D3). Trigger set {`recognition_changed`, `no_current_task`}. No re-timing

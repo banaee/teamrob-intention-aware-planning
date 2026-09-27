@@ -263,6 +263,7 @@ ENUMERATED bindings; determined parameters are not enumerated). The live set is 
 yet retired, plus `unknown`, the residual hypothesis (§7). A hypothesis belongs to the robot's belief; whether a
 behaviour of the human is described by one is its coverage (label B, §7).
 → `shared/io_contracts.md` §1.8; `docs/recognizer_handback.md` §1.1.
+SUPERSEDED IN PART (T-D R, 27 September 2026): "plus `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1). design_decisions.md, "T-D R and E".
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -287,6 +288,7 @@ tick, the OBSERVED AGENT finished a task and the episode ends (`[IR-boundary]`):
 the uniform prior and every origin moves. The two criteria are deliberately different. After a boundary `unknown`
 holds 1/|Live| by normalisation, not from evidence (§7).
 → `docs/recognizer_handback.md` §1.6.
+SUPERSEDED IN PART (T-D R, 27 September 2026): "`unknown` holds 1/|Live|": the `unknown` hypothesis leaves the hypothesis space (R1). design_decisions.md, "T-D R and E".
 
 **θ (theta)** — the confidence gate. It belongs to the meta-planner, not the recognizer, and is
 asked in exactly one place. The recognizer emits a belief distribution and gates nothing. The gate's outcome is
@@ -298,6 +300,7 @@ one home", "The gate stays a fixed share".
 body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, not a measure of unmodelled
 behaviour (§7); ρ B2 `b2a`'s policy parameter.
 → `docs/recognizer_handback.md` §2; `shared/meta_planner.py`, the `rho` constructor argument.
+SUPERSEDED IN PART (T-D R, 27 September 2026): u leaves the belief (R1); β gains a second meaning, the scale of the reference distribution (E5, **tail probability**). design_decisions.md, "T-D R and E".
 
 The four entries below are ruled (T-D R and E, 27 September 2026) and not built; the Stage 1 build builds them. They
 belong to the **adequacy finding** (§7).
@@ -417,6 +420,7 @@ setup (until T-L's stage 1, one layout file held both). The
 class of a schema is read in one place in the robot's mind, the support restriction: admissible = the hypotheses of
 the `WorkTask` instances in the assigned tasks, every hypothesis of a `PersonalTask` in the task model, and `unknown`,
 compared as `HypothesisKey` values.
+SUPERSEDED IN PART (T-D R, 27 September 2026): "and `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1). design_decisions.md, "T-D R and E".
 
 **ProceduralKnowledge** — how things are done: task schemas with their methods, action schemas, microactions and
 costs. The base class of the two knowledge objects, **tree** and **task model**, which are its two forms (`Tree`,
@@ -633,6 +637,7 @@ ROBOT: what the robot's mind holds and decides. Unchanged by T-H.
 
 **recognizer belief** — a distribution over the live **task hypotheses** (one per `HypothesisKey`, §5) and
 `unknown`. The recognizer emits it and gates nothing.
+SUPERSEDED IN PART (T-D R, 27 September 2026): "and `unknown`": the belief is normalised over the live task hypotheses only (R1); the adequacy finding is a separate output (R2, R3). design_decisions.md, "T-D R and E".
 
 **`unknown`** — HISTORICAL (T-D R1, ruled by Hadi, 26 to 27 September 2026): the `unknown` hypothesis leaves the
 hypothesis space; the belief is normalised over the live task hypotheses only, and u, `graded_unknown_likelihood` and

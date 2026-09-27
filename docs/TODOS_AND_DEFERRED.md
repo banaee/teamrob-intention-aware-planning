@@ -1238,6 +1238,7 @@ Files: shared/recognizer.py (`_likelihood`, `_get_expected_position`, `_get_targ
 Reference: Phase 4C B2 design session, September 2026
 
 **TODO-38 — IR: collinear decoys — under the excess path separated only by the arrival fold; under the grade, by distance covered** [OPEN DISCUSSION — not decided]
+SUPERSEDED IN PART (T-D R, 27 September 2026): the separation "under the grade" (the title; the odds ratio u^{−x (1/d_near − 1/d_far)}): the grade leaves the belief (R1). design_decisions.md, "T-D R and E".
 Heading restated (graded-evidence session, September 2026). The "direction-only likelihood" below is the
 cosine kernel, gone since I4; the excess-path likelihood also cannot separate targets on one bearing
 (both at zero excess for the whole walk; handback §3.3, §4 (a)) — until the grade: two collinear targets at
@@ -2023,6 +2024,7 @@ the live hypothesis set, not by scoring; the symptom this TODO measured (a lone 
 thus returns in another form, expected by R1 and measured in Stage 1, not corrected. This TODO is not reopened by it.
 
 **TODO-60 — `unknown`'s u is charged per OPEN observation and never folded: the belief with no observation is the base ratio** ✅ RESOLVED (I4d)
+SUPERSEDED (T-D R, 27 September 2026): u and the odds-against-`unknown` accounting leave the belief (R1); the invariant is sum-to-1 over the live hypothesis set H (R6). design_decisions.md, "T-D R and E".
 The accounting: for every live hypothesis k and tick t within an episode,
     E_t(k)/E_t(unknown) = [π(k)/π(unknown)] · Π_{closed stretches s of k} L_k(s)/u · Π_{events} c_k(e) · (v_k(t)/u | 1 if empty).
 `unknown` is the reference; a task's odds against it are the product over the task's own observations of
@@ -2145,6 +2147,7 @@ model before the model is judged wrong. Still DEFERRED, not built. Trigger to re
 per-phase test cannot express (limitation (a)). The trigger above is superseded by this one.
 
 **TODO-64 — θ's reachability under the current model: the ceiling is 1/(1 + uⁿ), and reachability is a function of the live set** ✅ CLOSED (gate ruling, September 2026)
+SUPERSEDED IN PART (T-D R, 27 September 2026): the ceiling 1/(1 + uⁿ) is gone; a lone live hypothesis reads 1.0 at zero evidence (R1). design_decisions.md, "T-D R and E".
 ✅ CLOSED (cchat, on `analysis/g1_graded_evidence/crossings.md`): θ stays a fixed 0.75 on the normalised share,
 not derived from the live set or the layout. The live-set dependence was in the likelihood, not the gate:
 before the grade a stretch was worth L/u whatever its length, so the bar the share set depended on how many
@@ -3189,6 +3192,7 @@ baselines regenerated; about the size of the T-D Q2 to Q4 pass itself.
 Related: TODO-59 (deferred part), TODO-85 half (a), TODO-80, TODO-92, TODO-96, T-D Q1, T-D Q5.
 
 **TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN, recorded only]
+SUPERSEDED IN PART (T-D R, 27 September 2026): the condition "sustained `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".
 TERMS (24 Sept 2026, `docs/glossary.md` §7): "unknown behaviour" below means unmodelled behaviour; "sustained
 `unknown`" is the belief's residual mass, which is not the same condition.
 Status: open, recorded only. Hadi: under unknown behaviour the robot may stop and communicate

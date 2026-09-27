@@ -228,6 +228,7 @@ confidence ceiling 1/(1 + uⁿ)), detection hit / false-alarm rates 1.0 / 10⁻�
 gate, not a likelihood parameter). Two embodiment-side values are load-bearing: `PROXIMITY_THRESHOLD` = 30 cm
 (when `at()` holds, hence when phases advance) and Mesa's straight-line walking (the Euclidean path cost is
 exact only because of it).
+  SUPERSEDED IN PART (T-D R, 27 September 2026): the constant `unknown`, u and the ceiling 1/(1 + uⁿ) in the table, the one line and the parameters; the I4d row's odds against `unknown` (R1, R6). design_decisions.md, "T-D R and E".
 
 Known properties of the evidence model — characterised, not defects (TODO-61; hand-back §4):
 - (a) confirmation is length-blind: a fitting stretch scores the perfect fit after 15 cm as after 300 cm;
@@ -317,6 +318,7 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    sixteen conditions. New baselines: `analysis/g1_graded_evidence/sweep/`, replacing D2's. Entry in
    `design_decisions.md`, "A stretch's evidence against `unknown` is graded by the share of the expected
    path it covers"; `analysis/g1_graded_evidence/`; TODO-61 (a) closed for walks
+   SUPERSEDED (T-D R, 27 September 2026): the grade leaves the belief (R1). design_decisions.md, "T-D R and E".
 8. The gate ruling ✅ (September 2026, documentation only) — on the graded-evidence θ data
    (`analysis/g1_graded_evidence/crossings.md`): the admission gate stays `_clears_gate` on the normalised
    share, θ = 0.75. The live-set dependence was in the likelihood, not the gate; under the grade a walk
@@ -409,6 +411,7 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   stay is evidence (if so, a duration term, its own item, TODO-95; it was named T-H before 25 Sept 2026) and what `update()` does with `unknown` on top
   (candidate: the human projected stationary at its position for a bounded horizon); design_decisions.md,
   "A stationary human".
+  SUPERSEDED IN PART (T-D R and E, 27 September 2026): whether a stay is evidence: time enters adequacy only, not the belief's likelihood (E3); "`unknown` on top" no longer occurs (R1). design_decisions.md, "T-D R and E".
   T-C1 ✅ (23 September 2026): design_decisions.md, "The human action script (T-C1, decided)". The executed
   script is a flat list of primitives (`MoveTo`, `PickUp`, `Place`, `Stay`), a task expanded at load by
   `expand(task)` with provenance on each primitive; the author writes `interrupt`, `deviate`, `abandon`, free
@@ -509,10 +512,12 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   against reconsider. design_decisions.md, "Robustness is tested in kitting".
   The recognizer pass (Q2 to Q4) opens with TODO-95: rule whether the stationarity channel joins it or stays
   recorded (TODO-95; "T-H" named it before 25 Sept 2026).
+  SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` as outcome and `unknown` leading as a measure: the `unknown` hypothesis leaves the hypothesis space (R1); the outcome is the adequacy finding (R2). T-D R and E is ruled; its Stage 1 is next. design_decisions.md, "T-D R and E".
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
   set covers switch and hold (scenario_s05_01 / scenario_s05_02), a two-table ordering, a change of mind, unmodelled behaviour; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and
   unmodelled behaviour (and the belief's `unknown` leading), not only switch and hold.
+  SUPERSEDED IN PART (T-D R, 27 September 2026): "the belief's `unknown` leading" no longer occurs (R1); what the demonstration shows in its place is not ruled. design_decisions.md, "T-D R and E".
 - **T-F — Evaluation (Phase 5).** Fixture generation completed (the randomised harness, TODO-47); factors
   `cost_strategy` × `gate_strategy` × `strategy` × `separation_stop` × prior (B2 is a factor here, not a
   design step: TODO-36); metrics on `recognition_changed`, completion from the world fact, blocked time,
@@ -581,6 +586,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
     measure the layout and the prior setting, not the recognizer. "Accuracy at task completion" is not
     measurable: at completion the task is pinned and the belief re-initialises; measure accuracy DURING
     execution (ticks above θ with the right winner), prior-on and prior-off separately.
+    SUPERSEDED IN PART (T-D R, 27 September 2026): "its ceiling 1/(1 + uⁿ)": the ceiling is gone (R1). design_decisions.md, "T-D R and E".
   - AP: plan adaptation latency (ticks from `theta_crossed` to new queue adopted), reordering frequency —
     noting that prior-off a recognition can fire several crossings (TODO-68)
   - Team efficiency: total ticks to complete all tasks vs. baseline (no IR, fixed queue)
@@ -627,4 +633,5 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   buttons stay here.
 - A context-knowledge stream into the world state, read by the recognizer: its own task.
 - Communication as a robot action under a live `unknown` or block: its own task.
+  SUPERSEDED IN PART (T-D R, 27 September 2026): "a live `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".
 - Handoff: `docs/handoffs/phase7_interactive_deviations.md`.

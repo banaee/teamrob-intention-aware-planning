@@ -95,6 +95,7 @@ is written, and what ground truth is.
    "Foreseeable" means a `PersonalTask` in the task model. The support restriction is the hypotheses of the assigned
    `WorkTask` instances, plus every `PersonalTask` hypothesis in the task model, plus `unknown`, compared as
    `HypothesisKey` values.
+   SUPERSEDED IN PART (T-D R, 27 September 2026): "plus `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1). design_decisions.md, "T-D R and E".
 
 4. **Assigned tasks.** A set the robot is told ("work order" is renamed). The ordering lives only in the script.
 
