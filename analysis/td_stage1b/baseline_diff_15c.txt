@@ -1,0 +1,65 @@
+
+The baseline diff of cycle 1.5b (the regeneration, item 1g): per maintained set and prior, the runs whose [IR] lines
+changed, the runs whose world lines changed (the agents' per-tick lines: position, task, action, microaction), and
+the robot's completion (T6: the world tick after its last release) before and after. PRE: the 1.3b baselines
+(pre/<set>/), POST: the regenerated sets (analysis/<set>/sweep/).
+
+set                  prior runs [IR] changed world changed  completion pre->post (changed only)
+tb1a_destination     on       8            8             3  -
+tb1a_destination     off      8            8             1  L01_s01_01_off 200->201
+tb1b_two_tables      on       2            2             0  -
+tb1b_two_tables      off      2            2             0  -
+tb1c_realized_flip   on       4            4             0  -
+tb1c_realized_flip   off      4            4             1  L08_s06_03_realized_off 236->238
+tb3_full_reorder     on      10           10             3  -
+tb3_full_reorder     off     10           10             2  L08_s06_03_full_reorder_off 236->238; L08_s06_03_single_task_off 315->316
+
+per run (world changed: first differing world tick)
+  tb1a_destination/env_layout_01_scenario_s01_01_off: world first differs at 142
+  tb1a_destination/env_layout_01_scenario_s01_01_on: world first differs at None
+  tb1a_destination/env_layout_02_scenario_s02_01_off: world first differs at None
+  tb1a_destination/env_layout_02_scenario_s02_01_on: world first differs at None
+  tb1a_destination/env_layout_03_scenario_s03_01_off: world first differs at None
+  tb1a_destination/env_layout_03_scenario_s03_01_on: world first differs at 55
+  tb1a_destination/env_layout_04_scenario_s01_06_off: world first differs at None
+  tb1a_destination/env_layout_04_scenario_s01_06_on: world first differs at None
+  tb1a_destination/env_layout_05_scenario_s04_01_off: world first differs at None
+  tb1a_destination/env_layout_05_scenario_s04_01_on: world first differs at None
+  tb1a_destination/env_layout_06_scenario_s03_06_off: world first differs at None
+  tb1a_destination/env_layout_06_scenario_s03_06_on: world first differs at None
+  tb1a_destination/env_layout_07_scenario_s05_01_off: world first differs at None
+  tb1a_destination/env_layout_07_scenario_s05_01_on: world first differs at 95
+  tb1a_destination/env_layout_07_scenario_s05_02_off: world first differs at None
+  tb1a_destination/env_layout_07_scenario_s05_02_on: world first differs at 95
+  tb1b_two_tables/env_layout_08_scenario_s06_01_off: world first differs at None
+  tb1b_two_tables/env_layout_08_scenario_s06_01_on: world first differs at None
+  tb1b_two_tables/env_layout_08_scenario_s06_02_off: world first differs at None
+  tb1b_two_tables/env_layout_08_scenario_s06_02_on: world first differs at None
+  tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_off: world first differs at None
+  tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on: world first differs at None
+  tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_off: world first differs at None
+  tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_on: world first differs at None
+  tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_off: world first differs at None
+  tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_on: world first differs at None
+  tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_off: world first differs at 221
+  tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_on: world first differs at None
+  tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_off: world first differs at None
+  tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_on: world first differs at None
+  tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_off: world first differs at None
+  tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_on: world first differs at 55
+  tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_off: world first differs at None
+  tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_on: world first differs at 95
+  tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_off: world first differs at None
+  tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_on: world first differs at 95
+  tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_off: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_on: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_off: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_on: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_off: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_on: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_off: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_on: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_off: world first differs at 221
+  tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_on: world first differs at None
+  tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_off: world first differs at 221
+  tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_on: world first differs at None

@@ -18,6 +18,10 @@ import math, re
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+# PRE: `pre/` (the 1.3b logs) for the 1.5b acceptance; TD_PRE=pre15b (the 1.5b logs, copied before the 1.5c
+# regeneration) for the 1.5c section. POST is always the maintained sets and `post/supp/`.
+import os
+PRE = os.environ.get("TD_PRE", "pre")
 ROOT = HERE.parents[1]
 SETS = ["tb1a_destination", "tb1b_two_tables", "tb1c_realized_flip", "tb3_full_reorder"]
 ALPHAS = (0.01, 0.05, 0.1)
@@ -31,11 +35,11 @@ def runs(supp=False):
     out = []
     if supp:
         for p in sorted((HERE / "post" / "supp").glob("*.log")):
-            out.append(_run("supp", p, HERE / "pre" / "supp" / p.name))
+            out.append(_run("supp", p, HERE / PRE / "supp" / p.name))
         return out
     for s in SETS:
         for p in sorted((ROOT / "analysis" / s / "sweep").glob("*.log")):
-            out.append(_run(s, p, HERE / "pre" / s / p.name))
+            out.append(_run(s, p, HERE / PRE / s / p.name))
     return out
 
 

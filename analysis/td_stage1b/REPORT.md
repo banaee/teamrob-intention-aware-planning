@@ -215,3 +215,83 @@ as worded (C moved, F reduced, prior-off s01_01) are consequences the entry deri
 
 Flags: the `unknown` column in `e_reveals.txt` is 1.4's and reads 0.000 on the PRE side (no such key since
 Stage 1); G's item_2 table reads the first s_exp seen in the run (above).
+
+---
+
+# 1.5c: the second E6 amendment (cycle 1, session 1.5c; closes cycle 1)
+
+27 September 2026, at dd7a4fd (the membership condition), 3bfc293 (tests), 096408e (baselines).
+
+THE RULING, AS RECORDED (design_decisions.md, "T-D R and E", E6, "AMENDED A SECOND TIME" and "THE BOUNDARY TICK"): a
+stationary tick with s ≤ s_exp in any phase whose s_exp > 0 is an observation with D ≤ 0, the hypothesis a member with
+S = 1 (and L = 1); it covers the latency tick E9 prices to a walk entered from a completion; the initial walk at
+step 0 (s_exp = 0) is unchanged and stays unresolved until walking evidence occurs; no exception for phases opened by
+a boundary. No hypothesis is a member on a boundary tick, a stationary phase the boundary opens included (E8's
+boundary clause applied generally; reading 3 of 1.3b superseded).
+
+THE CHANGED CONDITION (`IntentionRecognizer._adequacy`):
+`walked > 0.0 or s > s_exp or (stationary_phase and s <= s_exp)` became
+`walked > 0.0 or s > s_exp or ((stationary_phase or s_exp > 0.0) and s <= s_exp)`, and no hypothesis is a member when
+the tick is a boundary tick (`if action is None or boundary: continue`). Nothing else changed; the belief is untouched
+(L = 1 on these ticks before and after).
+
+MATERIAL: PRE = the 1.5b logs (copied to `pre15b/` before the regeneration; `TD_PRE=pre15b` selects them in
+`tdlib.py`, the only script change), POST = the regenerated sets and `post/supp/`. Outputs `*_15c.txt`. The 52 `.rec`
+streams are byte-identical to 1.5b's.
+
+## The boundary sequence (asked at the plan step)
+Derived: b unresolved (no member on a boundary tick), b + 1 adequate (the latency tick: s = 1 = s_exp by E9, S = 1),
+b + 2 adequate. This conflicted with 1.5b's expectation "unresolved, unresolved, adequate" and with the ruling's first
+closing sentence; Hadi corrected the sentence to the initial walk at step 0 and superseded the expectation by
+derivation. MEASURED (`b_cases_15c.txt`, B6): every boundary that leaves a task live reads U, A, A (64 groups `UAAAAA`,
+one `UAAAE` cut by exhaustion; 15 exhaust); step 0 reads A in all 32 groups. `h_cases_15c.txt`, H5: s01_01 on 78 U,
+79 A (item_2 S = 1, the place's latency), 80 A.
+
+## C. False unexplained (`c_findings_15c.txt`) — expected 0 at every α. MET.
+0 / 4352 modelled ticks and 0 / 204 phase instances, prior on and prior off, at α = 0.01, 0.05 and 0.1, raw and
+lag-corrected; every phase 0. The 1.5b ticks (s02_01 on 248, s04_01 on 269, s03_06 on 89) read adequate, the true
+carry walk a member at S = 1. BINDING_ABSENT (the wrong table) unchanged from 1.5b: first unexplained s06_06 48 / 41 /
+38, s07_03 39 / 34 / 31 (α .01 / .05 / .10).
+
+A (`a_invariant_15c.txt`): 12,929 ticks, 0 violations (A1–A8).
+
+## D. Decisions against 1.5b (`d_decisions_15c.txt`, `baseline_diff_15c.txt`) — expected: only one-tick-earlier admissions.
+Every differing decision is an admission (`built`) that moves from b + 2 to b + 1, the latency tick after a boundary
+([IR-boundary] at b checked for each), the leader adequate there on a belief of 0.99x by normalisation and one priced
+standing tick. No refusal, trigger kind, winner or selection changed otherwise. Prior ON (all completion ticks
+unchanged):
+
+| run | admission 1.5b → 1.5c | hold |
+|---|---|---|
+| s01_01 | 80 → 79 | 0 |
+| s02_01 | 311 → 310 | 0 |
+| s03_01 (single_task ×2) | 56 → 55 | 2 (the same hold, one tick earlier; completion 238) |
+| s03_01 full_reorder | 56 → 55 | 0 |
+| s01_06 | 76 → 75 | 0 |
+| s04_01 | 329 → 328 | 0 |
+| s03_06 | 123 → 122 | 0 |
+| s05_01 (×3), s05_02 | 96 → 95 | 3 (one tick earlier) |
+| s06_01 (tb1b, tb1c ×2, tb3 ×2) | 55 → 54 | 0 |
+| s06_02 (tb1b, tb3 ×2) | 72 → 71 | 0 |
+| s06_03 (tb1c ×2, tb3 ×2) | 98 → 97 | 0 |
+
+APPENDIX, PRIOR OFF: the same move at s03_06 178 → 177, s06_01 173 → 172, s06_02 190 → 189, s06_03 plain 222 → 221
+(hold 0), and three admissions whose hold grows as it starts a tick earlier, with the robot's completion later:
+
+| run | admission | hold | completion (world tick) |
+|---|---|---|---|
+| s01_01 off | 143 → 142 | 31 → 32 (still ends at 173; leader inadequate from 159) | 200 → 201 |
+| s06_03 realized / full_reorder off | 222 → 221 | 10 → 12 | 236 → 238 |
+| s06_03 single_task off | 222 → 221 | 50 → 51 | 315 → 316 |
+
+The holds are the realization's answer to a projection made one tick earlier (not analysed further). `[IR-dist]` is
+identical on every common tick of all 48 runs; four runs end later and add exhausted ticks.
+
+## Runs and tests that disagree with the mechanism
+None. Two tests of 1.5b encoded the superseded expectations and were updated by derivation in 3bfc293 (the grasp's
+latency tick now a member at S = 1; the boundary sequence U, A, A); dd7a4fd, the condition alone, was committed with
+those two failing, as the task staged build and tests in separate commits.
+
+## Cycle 2 inputs recorded (Step 0, 0bc1347)
+1.5b finding 2 → TODO-118 (retraction under L); finding 3 → TODO-119 (P, G), with the b + 1 admission above; finding 4
+→ the entry's properties; finding 5 → TODO-87; the three flags → TODO-120.
