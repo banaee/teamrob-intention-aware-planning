@@ -2950,7 +2950,7 @@ Files: shared/types.py (`AgentConfig.__post_init__`)
 Reference: T-B1a, September 2026; design_decisions.md, "An item's destination table is a fact of the station"
 T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the correspondence between the assigned tasks and the script is no longer checked by provenance: `check_work_order` and `Provenance` are deleted in T-H3 and the record's query `unperformed(assigned_tasks)` replaces the check, and a delivery to another table is a plain instance `deliver_item("item_1", table=...)`, checked for types only. Whether it counts as an assigned task is `assigned(task)`'s type, settled in T-H4.
 
-**TODO-87 — A delivery to another table: no task boundary, no pin, no pool drop** [deviation case; from T-B1a]
+**TODO-87 — A delivery to another table: no task boundary, no pin, no pool drop** [deviation case; from T-B1a] [RULED (T-D L1, 27 Sept 2026); built in L-build]
 From the code (T-B1a, report item 10). The observed agent's task boundary fires only inside the retirement
 branch of `IntentionRecognizer.update()`: a hypothesis retires when its TERMINAL action's completion holds
 (`_terminal_complete`), and the retirement is a boundary when the hypothesis expected that action on the
@@ -2976,6 +2976,11 @@ T-D 1.5b (27 Sept 2026; `analysis/td_stage1b/REPORT.md`, finding 5): G1 refuses 
 (scenario_s06_06 at 103, scenario_s07_03 at 94, both priors): with no boundary at a misdelivery, its new derived phase
 (pick the item up where it now lies) is a member at S = 1. Cycle 2 input (L).
 IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_08, prior on): item_1 released on kitting_table_1 at 75, no pin and no boundary; `deliver_item(item_1)` keeps leading into the next delivery (0.997 at 86, 0.897 at 120) while the true `deliver_item(item_2)` never reaches θ (at most 0.483, at 130); it is never pinned in the run.
+RULED (T-D L1, Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): the episode boundary fires when
+the observed agent completes an action that is terminal in the task model (`place`, `wait_at`), read from the completion
+channel, whatever its binding; the pin stays the world's terminal fact. The misdelivery is a boundary (scenario_s09_08 at
+75), no pin: `deliver_item(item_1)` stays live and starts the next episode at the prior. The pool side (no pool drop) is
+unchanged: the task is not complete in the world. Built in L-build.
 
 **TODO-88 — With the prior off, an item the robot carries stays a live hypothesis about the human, with a target that moves with the robot** [recognizer finding; from T-B Q7]
 Found while checking T-B Q7's acceptance, which expected a robot-side timing fix to leave every `[IR]` line
@@ -3071,7 +3076,7 @@ evaluation that reuses the harness must rescore against labels A and B.
 `docs/terminology_revision.md`, sections 2 and 4.
 Reference: T-C1, 23 September 2026; design_decisions.md, "The human action script (T-C1, decided)"
 
-**TODO-93 — The completion of a foreseeable task ends the episode while an assigned delivery is visibly in progress** [T-D; from T-C2c]
+**TODO-93 — The completion of a foreseeable task ends the episode while an assigned delivery is visibly in progress** [T-D; from T-C2c] [CLOSED by design (T-D L3, 27 Sept 2026)]
 Observed in scenario_s02_02 (`analysis/tc2c_scripts/`): the human picks up item_2, walks to the coffee machine holding
 it and waits there. At 75 `waited(human_0, coffee_machine_0)` pins `coffee_break`, and because that hypothesis
 expected its terminal action on the previous tick, the retirement is an episode boundary: every base becomes the
@@ -3083,8 +3088,14 @@ for T-D. Recorded, nothing changed.
 REPRODUCED (the play, `analysis/tc2c_scripts/play.md`): scenario_s02_03, scenario_s04_02 and scenario_s05_03, on env_layout_02, env_layout_05 and env_layout_07.
 Files: shared/recognizer.py (`update`, `_task_boundary`)
 Reference: T-C2c, September 2026; docs/recognizer_handback.md §1.6
+CLOSED BY DESIGN (T-D L3, Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): no change under L1.
+Every terminal action is a boundary regardless of task class; the suspension is carried by the world (the held item
+re-derives both hypotheses from the first tick of the new episode: scenario_s09_03 from 84, `deliver_item(item_1)` at θ
+again at 100), not by the belief; empty-handed (scenario_s09_04 from 82) nothing persists (I4c Decision 2). The belief
+near 0.5 after a break is genuine ambiguity. Set aside: a class exception for foreseeable terminal actions; a
+suspended-task representation.
 
-**TODO-94 — Re-recognition inside an episode depends on the length of the misleading walk** [T-D; from the T-C2c play]
+**TODO-94 — Re-recognition inside an episode depends on the length of the misleading walk** [T-D; from the T-C2c play] [RULED (T-D L2, 27 Sept 2026); the meta-planner side built in L-build]
 SUPERSEDED IN PART (T-D R1, 27 September 2026): wording superseded by R1; the case stays L. design_decisions.md, "T-D R and E".
 Observed (`analysis/tc2c_scripts/play.md`). The evidence a walk lays against the hypotheses it does not serve (refutation by wasted path)
 persists until an episode boundary, and only a task completion makes one: nothing else resets excess path. So a
@@ -3100,6 +3111,12 @@ Files: shared/recognizer.py
 Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
 IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_05, prior on): the corner walk mid-delivery, 32 to 79; `deliver_item(item_1)`'s one derived phase `move_to(kitting_table_0)` runs 30 to 125, its S below α from 48; the finding is unexplained 48 to 125, through the resumed carry (80 to 125), where the delivery reaches θ at 87 while inadequate; adequate again at 126 (its advance to `place`).
 IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_07, prior on): the change of mind: after item_1's grasp (30) `deliver_item(item_2)` is started (32) and returns item_1 to its shelf (33); `deliver_item(item_2)`, whose S the first walk had put below α at 14, rises from 0.000 at 35 to θ at 64, 32 ticks after the switch, adequate throughout; `deliver_item(item_1)` falls below α at 44 and, resumed at 110 after the boundary at 108, reaches θ again at 135. The finding stays adequate until the exit walk (204).
+RULED (T-D L2, Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): (i) recognizer, no change: the
+evidence of a misleading walk stands; inadequacy attaches to the phase and is not retracted when behaviour becomes
+consistent again (scenario_s09_05: inadequate 48 to 125, adequate at the advance, 126); no reopening on the finding, no
+turn-back rule, no window. (ii) meta-planner: `recognition_changed` also fires when the projected hypothesis leaves
+adequate (retraction; TODO-118). (iii) "consistent again" is meaningful at the next phase advance; a resumed carry is
+unprojected until its advance (46 ticks in scenario_s09_05).
 
 **TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN; its recognition level CLOSED by decision, T-D R and E, 27 Sept 2026]
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
@@ -3491,7 +3508,7 @@ Files: shared/projection.py
 Reference: design_decisions.md, "T-D R and E", R1
 
 **TODO-117: Do foreseeable hypotheses count as live after the work order? (recorded for L, T-D 1.5r, 27 Sept 2026)**
-[OPEN; L's question]
+[RULED (T-D L4, 27 Sept 2026); built in L-build]
 With the prior on, the hypothesis space is the assigned pool plus the foreseeable tasks. Once every assigned task is
 complete, a foreseeable hypothesis still live keeps the recognizer from reading exhausted: scenario_s04_01 prior on,
 `ac_switch_0` alone live at 0.992 from 327, admitted at 327, the finding adequate to 343 and unexplained from 344
@@ -3509,9 +3526,15 @@ action starts; so a second coffee break in the same run has no live hypothesis.
 Files: shared/recognizer.py (the live set H)
 Reference: design_decisions.md, "T-D R and E", R4; `analysis/td_stage1/REPORT.md` §H
 IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`): scenario_s09_01 (as scenario_s08_01) and scenario_s09_10, prior on: `coffee_break` lone live at 0.997 after the last delivery (from 124 and from 107), its S below α on the exit walk (157 and 141), the finding unexplained from there to the end of the run, the idle human included.
+RULED (T-D L4, Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): yes. Retirement lasts exactly as
+long as the hypothesis's terminal fact holds, read from the world on every tick (T7's criterion); a hypothesis whose
+fact stops holding re-enters the live set with the prior base and the current position as origin. `coffee_break` is
+live again when `waited` clears, so the once-per-run fact above dissolves; after the work order the live set is the
+foreseeable tasks in every scenario and the exit walk reads unexplained; exhausted becomes rare (scenario_s09_02 to _04,
+exhausted today from 201, 191, 202). Set aside: foreseeable retirement on an exhausted assigned pool.
 
 **TODO-118: Retraction of an admitted projection when its leader turns inadequate (recorded for L, T-D 1.5c, 27 Sept 2026)**
-[OPEN; cycle 2 input, L]
+[RULED (T-D L2 (ii), 27 Sept 2026); built in L-build]
 An admitted projection outlives its leader's adequacy: the gate (G1) is asked at admission only, and D2 retains the
 decision record by identity, so no trigger fires when the recorded hypothesis turns inadequate. The recognizer already
 reports it (`leader_adequacy=inadequate`); the meta-planner has no event for it. Measured (1.5b, prior off):
@@ -3519,6 +3542,11 @@ scenario_s01_01 admitted at 143, inadequate from 159, the 31-tick hold runs to 1
 admitted at 131, inadequate from 139, the 89-tick hold runs to 219 and the run does not complete.
 Files: shared/meta_planner.py (`evaluate_triggers`, the decision record)
 Reference: `analysis/td_stage1b/REPORT.md`, D and finding 2; design_decisions.md, D2, "T-D R and E", G1
+RULED (T-D L2 (ii), Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): `recognition_changed` also
+fires when the hypothesis the decision was projected against leaves adequate, that hypothesis only, never a rival's
+transition (the grasp flicker, scenario_s09_09 83 to 87). Admission is re-asked, G1 refuses, the decision realizes
+against no human plan (P's fallback replaces the projection); re-admission through D2's entering side. The act is
+retraction (glossary §4); the recognizer retracts nothing.
 
 **TODO-119: A lone hypothesis is adequate right after a boundary with the human idle (recorded for P and G, T-D 1.5c, 27 Sept 2026)**
 [OPEN; cycle 2 input, P and G]
@@ -3530,6 +3558,10 @@ admitted at b + 1 on a belief of 1.0 and one priced standing tick. Whether admis
 the projection come from observation, is P's and G's.
 Files: shared/meta_planner.py (`_clears_gate`), shared/recognizer.py (membership)
 Reference: `analysis/td_stage1b/REPORT.md`, D, finding 3 and section 1.5c; design_decisions.md, "T-D R and E", G1
+NOT RULED BY L (27 Sept 2026): its P part stays open. Under L2 (ii) such an admission is retracted once the lone
+hypothesis leaves adequate (scenario_s01_01 prior off: admitted at 143, inadequate from 159; TODO-118), which bounds the
+hold, not the admission. Under L4 the case widens: a foreseeable hypothesis that re-enters the live set is a lone
+hypothesis after the work order in every scenario. design_decisions.md, "T-D L: the belief lifecycle".
 
 **TODO-120: Three small flags from the 1.5b acceptance (recorded, T-D 1.5c, 27 Sept 2026)** [OPEN; documentation]
 - `analysis/td_stage1/supp_sweep.sh` was committed without the executable bit (made executable in 1.5c; run it with
@@ -3595,6 +3627,16 @@ Reference: `analysis/ir_testbed/REPORT.md`, TB.3b flags
 42 to 54 and setups 01 to 09 in TB.4b.
 Files: tests/test_tl2_discovery.py
 Reference: `analysis/ir_testbed/REPORT.md`, TB.3b and TB.4b, "Runs and tests that disagree with the mechanism"
+
+**TODO-127: `d_decisions.txt`'s world completion tick equals the declared one prior off, declared − 2 prior on (recorded, L-records, 27 Sept 2026)** [OPEN; recorded only]
+Flagged in TB.2b (`analysis/tb2b_exposed_interval/REPORT.md`, flags) and not examined: for the prior-off runs
+`d_decisions.txt` prints a world completion tick (`tdlib.robot_completion`, T6) equal to the declared one (scenario_s06_02
+off: world 267, declared 267), where the prior-on runs read world = declared − 2 (scenario_s01_01 on: 169 / 171), the
+relation CLAUDE.md states for every run. Identical before and after TB.2b, so not TB.2b's. Either `tdlib.robot_completion`
+reads another line prior off, or the declared tick differs by prior; to be checked before a completion tick from
+`analysis/td_stage1b/tdlib.py` is compared across priors (the 1.5c and TB.2b measures rerun in L-build).
+Files: analysis/td_stage1b/tdlib.py (frozen), analysis/td_stage1b/d_decisions.py
+Reference: `analysis/tb2b_exposed_interval/REPORT.md`, "Flags (not fixed)"; CLAUDE.md, "Regression checking" (completion)
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
