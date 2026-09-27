@@ -147,7 +147,13 @@ Decisions
   it; acceptance is `analysis/td_stage1b/REPORT.md`. Session 1.5c closed cycle 1 (27 Sept 2026): E6 amended a second
   time (a stationary tick within the priced standing of any phase with s_exp > 0 is an observation at S = 1; no
   member on a boundary tick), zero false unexplained on modelled ticks; the 1.5b findings are cycle 2 inputs
-  (TODO-87, TODO-118, TODO-119). Next: cycle 2, L, P, the rest of G, and X, each ruled on these results.
+  (TODO-87, TODO-118, TODO-119). Next: the IR test-bed track, then cycle 2, L, P, the rest of G, and X, each ruled
+  on these results. The IR test-bed (TB, ruled 27 Sept 2026; design_decisions.md, "The IR test-bed") tests the
+  recognizer in isolation, on a layout, setup and scenarios written for it, against expectations derived from the entry
+  before the run, in three sessions: TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the
+  expectation generator, the runs, the report; `analysis/ir_testbed/`). The cognitive loop does not end with the task
+  pool (ruled 27 Sept 2026; design_decisions.md, the entry of that name; to be built in TB.2b): observation and
+  recognition run on every tick, and an empty pool stops planning and execution only.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6

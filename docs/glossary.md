@@ -24,6 +24,8 @@ never an entry, never a plan.
 **pool** — the robot's remaining tasks at the trigger: `current_task` (if any) plus the queue,
 minus every task whose terminal condition already holds in the `WorldState`, whoever made it hold.
 The pool is not a candidate set; nothing competes at that level.
+An empty pool prevents planning and execution only; the robot's observation and recognition go on every tick (ruled
+27 September 2026, built in TB.2b; `docs/design_decisions.md`, "The cognitive loop does not end with the task pool").
 → `shared/meta_planner.py`, `update()` block 0 and "TASK POOL vs. CANDIDATES";
 `shared/io_contracts.md` §2.2.
 
@@ -795,6 +797,11 @@ T-H4 its build).
 → `docs/roadmap.md`, "The plan from T-A".
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
+**TB** — the IR test-bed track (ruled 27 September 2026), before cycle 2 of T-D: the recognizer tested in isolation,
+on a layout, setup and scenarios written for it, against expectations derived from the entry "T-D R and E" before the
+run. Sessions TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the expectation generator,
+the runs, the report).
+→ `docs/design_decisions.md`, "The IR test-bed" and "The cognitive loop does not end with the task pool".
 
 ---
 
