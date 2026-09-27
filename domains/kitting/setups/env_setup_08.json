@@ -1,0 +1,22 @@
+{
+  "env_objects": [
+    {
+      "id": "item_1",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [25, 25],
+      "notes": "The IR test-bed (TB): on the west shelf, designated to the kitting table."
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [25, 25],
+      "notes": "The IR test-bed (TB): on the east shelf, designated to the kitting table."
+    }
+  ]
+}
