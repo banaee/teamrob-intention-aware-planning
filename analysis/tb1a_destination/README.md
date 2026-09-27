@@ -440,3 +440,33 @@ Command (from the repo root; the same as the sections above; restated because 7f
 | env_layout_07_scenario_s05_01_on | 24d53d63e6a5fccbd14c13e05e5c74e8 | dab078d5ca51e5b378054ee6a60ccca7 |
 | env_layout_07_scenario_s05_02_off | 827a7a7aa07ad8370fba7a2f8ea662a0 | dab078d5ca51e5b378054ee6a60ccca7 |
 | env_layout_07_scenario_s05_02_on | dd7e7b22357386a157663163bfbadcc9 | dab078d5ca51e5b378054ee6a60ccca7 |
+
+## T-D cycle 1.5c: E6 second amendment — the logs from here on
+
+Regenerated at cycle 1 session 1.5c (27 September 2026), superseding the 1.5b table above. CAUSE: E6 amended a second
+time (design_decisions.md, "T-D R and E"): a stationary tick with s ≤ s_exp in any phase with s_exp > 0 is an
+observation with S = 1 (the latency tick after a grasp and after a boundary), and no hypothesis is a member on a
+boundary tick. `[IR]` lines differ in the finding, the leader's adequacy and the tails on those ticks; `[IR-dist]`
+is identical on every common tick (L = 1 there before and after; runs that end later add exhausted ticks); admissions that waited for the first walking tick after a boundary now
+come on the latency tick (b + 1). World lines changed in 4 of 16 (s01_01 off, s03_01 on, s05_01 on, s05_02 on). The `.rec` streams are byte-identical to the
+table above. Same command as the 1.5b section. Diff and acceptance: `analysis/td_stage1b/` (`baseline_diff_15c.txt`,
+REPORT.md, section 1.5c).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_01_scenario_s01_01_off | 7005393abafd1558c57ef5aef914d3ec | 5c7835ba3417ff28b5d3caf1d00d906e |
+| env_layout_01_scenario_s01_01_on | 021adffa0616efbf89f4b877aad6b555 | 5c7835ba3417ff28b5d3caf1d00d906e |
+| env_layout_02_scenario_s02_01_off | 9cec6242f6fdca71dcdde73fcc2d9739 | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| env_layout_02_scenario_s02_01_on | e816c93f11800b45ac08b4321816db62 | 3e5fd9cd96dad4e0c56cfc626a770ff4 |
+| env_layout_03_scenario_s03_01_off | 79b7def70dce00ec7e697500d5a5a76a | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_on | 0cf93e422dccf00ea52c688ad1e7411d | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_04_scenario_s01_06_off | 0a24e2575dfe8f54e67ed231a69e5ec9 | 65d234649396c9ab242841050082e9b0 |
+| env_layout_04_scenario_s01_06_on | e61c191070f4d818e93959d53aec9bdf | 65d234649396c9ab242841050082e9b0 |
+| env_layout_05_scenario_s04_01_off | fe0308d7240ccd04fcf88efd338ce445 | f6da9d345530212df9b0446aa53d1f1e |
+| env_layout_05_scenario_s04_01_on | c222dc432f3c54128d8b95cdd56eeb6c | f6da9d345530212df9b0446aa53d1f1e |
+| env_layout_06_scenario_s03_06_off | 0706f67cceabe9b9e1ae1f9443014cae | 3e4fd412ba39ddd3267d1d37089beaac |
+| env_layout_06_scenario_s03_06_on | a516e7a2ef17e4e73ba011d24b6bf260 | 3e4fd412ba39ddd3267d1d37089beaac |
+| env_layout_07_scenario_s05_01_off | 4fe0a73cb66172b723134540f8e453cd | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_on | 6908379e1152c6ea74813cf39bea418f | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_02_off | 787978bfd9f53fc1e87ac95aeadfa69c | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_02_on | b05ee64b21791267c8be72d53293d87e | dab078d5ca51e5b378054ee6a60ccca7 |

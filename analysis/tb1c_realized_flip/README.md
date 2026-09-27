@@ -375,3 +375,25 @@ Command (from the repo root; the same as the sections above; restated because 7f
 | env_layout_08_scenario_s06_03_plain_on | 965c827855eaa688a3fc51ba64099e79 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_off | 3ade34d4da811f67c654b7a1a2f7ac8c | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_on | dbd8e0e7adab2415edd8d7db9209c7f7 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-D cycle 1.5c: E6 second amendment — the logs from here on
+
+Regenerated at cycle 1 session 1.5c (27 September 2026), superseding the 1.5b table above. CAUSE: E6 amended a second
+time (design_decisions.md, "T-D R and E"): a stationary tick with s ≤ s_exp in any phase with s_exp > 0 is an
+observation with S = 1 (the latency tick after a grasp and after a boundary), and no hypothesis is a member on a
+boundary tick. `[IR]` lines differ in the finding, the leader's adequacy and the tails on those ticks; `[IR-dist]`
+is identical on every common tick (L = 1 there before and after; runs that end later add exhausted ticks); admissions that waited for the first walking tick after a boundary now
+come on the latency tick (b + 1). World lines changed in 1 of 8 (s06_03 realized off). The `.rec` streams are byte-identical to the
+table above. Same command as the 1.5b section. Diff and acceptance: `analysis/td_stage1b/` (`baseline_diff_15c.txt`,
+REPORT.md, section 1.5c).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | 7bad04298efabe9f433814f1b052a7b3 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_plain_on | 56b9fd35be350824d5a179ed372a920b | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_off | a57beb0042671d6f864617087709388f | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_realized_on | 6665cba47edcc0ffe5c4c33b893b9274 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_03_plain_off | 50933ea7e5eebaa8e3ba1409bbcdfceb | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_plain_on | f43e7991c139e225943de42539b1e024 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_off | 762b472bae87c0f4114403e7f4a884ec | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_realized_on | 5346b3572f22bf62287d6d648aa012d9 | b9f1a0ec26cfa8c022b9951e9ec1b34b |

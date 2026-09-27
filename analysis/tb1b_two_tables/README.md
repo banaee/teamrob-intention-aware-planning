@@ -355,3 +355,21 @@ Command (from the repo root; the same as the sections above; restated because 7f
 | env_layout_08_scenario_s06_01_on | 2c2a9d79ef4932252f3afffe47c0887b | 8cf0930761924a3aab1f1713f3f4bf29 |
 | env_layout_08_scenario_s06_02_off | 2824fd4ef817d8b87e358ea8ceca09dc | 329590c9c1249859bfe20d107588c50a |
 | env_layout_08_scenario_s06_02_on | 5cafd2c3debfef3eece74af7be7f1073 | 329590c9c1249859bfe20d107588c50a |
+
+## T-D cycle 1.5c: E6 second amendment — the logs from here on
+
+Regenerated at cycle 1 session 1.5c (27 September 2026), superseding the 1.5b table above. CAUSE: E6 amended a second
+time (design_decisions.md, "T-D R and E"): a stationary tick with s ≤ s_exp in any phase with s_exp > 0 is an
+observation with S = 1 (the latency tick after a grasp and after a boundary), and no hypothesis is a member on a
+boundary tick. `[IR]` lines differ in the finding, the leader's adequacy and the tails on those ticks; `[IR-dist]`
+is identical on every common tick (L = 1 there before and after; runs that end later add exhausted ticks); admissions that waited for the first walking tick after a boundary now
+come on the latency tick (b + 1). World lines changed in none. The `.rec` streams are byte-identical to the
+table above. Same command as the 1.5b section. Diff and acceptance: `analysis/td_stage1b/` (`baseline_diff_15c.txt`,
+REPORT.md, section 1.5c).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_08_scenario_s06_01_off | 7b2858b5209cbb3132914b9a0fbfef29 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_on | badc5d849f98902b889bb4ba53454f40 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_off | c78a186d38f508fde6938a6ef0de4237 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_on | 56d53436e78a880d0492d927a8b86997 | 329590c9c1249859bfe20d107588c50a |

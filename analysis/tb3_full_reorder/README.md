@@ -364,3 +364,37 @@ Command (from the repo root; the same as the sections above; restated because 7f
 | env_layout_08_scenario_s06_03_full_reorder_on | dbd8e0e7adab2415edd8d7db9209c7f7 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_single_task_off | 7730d87a85035f48362cc265d34666b5 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_single_task_on | 3a15f70a05d37e5e4d8e56134c6eccce | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## T-D cycle 1.5c: E6 second amendment — the logs from here on
+
+Regenerated at cycle 1 session 1.5c (27 September 2026), superseding the 1.5b table above. CAUSE: E6 amended a second
+time (design_decisions.md, "T-D R and E"): a stationary tick with s ≤ s_exp in any phase with s_exp > 0 is an
+observation with S = 1 (the latency tick after a grasp and after a boundary), and no hypothesis is a member on a
+boundary tick. `[IR]` lines differ in the finding, the leader's adequacy and the tails on those ticks; `[IR-dist]`
+is identical on every common tick (L = 1 there before and after; runs that end later add exhausted ticks); admissions that waited for the first walking tick after a boundary now
+come on the latency tick (b + 1). World lines changed in 5 of 20 (s03_01 single_task on, s05_01 both strategies on, s06_03 both strategies off). The `.rec` streams are byte-identical to the
+table above. Same command as the 1.5b section. Diff and acceptance: `analysis/td_stage1b/` (`baseline_diff_15c.txt`,
+REPORT.md, section 1.5c).
+
+| log | md5 (.log) | md5 (.rec) |
+|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_off | 7c24077db74b82836a134a91ae698447 | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_full_reorder_on | a681cf00d32963379921a590f9ec2a3c | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_off | 79b7def70dce00ec7e697500d5a5a76a | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_03_scenario_s03_01_single_task_on | 0cf93e422dccf00ea52c688ad1e7411d | 9f6d010e2fbc537952fa6ece4e96f469 |
+| env_layout_07_scenario_s05_01_full_reorder_off | 8572a86a65397b7bc1b0f582696d84bf | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 6ee26f2d59644c700bbf9c81fb0db5a0 | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_off | 4fe0a73cb66172b723134540f8e453cd | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_07_scenario_s05_01_single_task_on | 6908379e1152c6ea74813cf39bea418f | dab078d5ca51e5b378054ee6a60ccca7 |
+| env_layout_08_scenario_s06_01_full_reorder_off | a57beb0042671d6f864617087709388f | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_full_reorder_on | 6665cba47edcc0ffe5c4c33b893b9274 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_off | 7b2858b5209cbb3132914b9a0fbfef29 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_01_single_task_on | badc5d849f98902b889bb4ba53454f40 | 8cf0930761924a3aab1f1713f3f4bf29 |
+| env_layout_08_scenario_s06_02_full_reorder_off | e5c29001b3851bb48bbf2be8291765d9 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_full_reorder_on | 3417807b96cf69e68e9579928b4957f8 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_off | c78a186d38f508fde6938a6ef0de4237 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_02_single_task_on | 56d53436e78a880d0492d927a8b86997 | 329590c9c1249859bfe20d107588c50a |
+| env_layout_08_scenario_s06_03_full_reorder_off | 762b472bae87c0f4114403e7f4a884ec | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_full_reorder_on | 5346b3572f22bf62287d6d648aa012d9 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_off | 0fe101800bf026ff5f7c19fc0c9cbb91 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+| env_layout_08_scenario_s06_03_single_task_on | 3080642740a0e1c84180c4d2c9a93f7a | b9f1a0ec26cfa8c022b9951e9ec1b34b |
