@@ -1841,6 +1841,9 @@ effect exists, not how large it is under the likelihood that will be in place.
 Five readings, none chosen:
 (a) correct as is — the domain says a human who wanted Y while holding X would return X first, and
     the belief after a release honestly favours `unknown` (0.38–0.71);
+    SUPERSEDED IN PART (T-D R1, 27 September 2026): after a release the belief is uniform over the remaining live
+    hypotheses with the finding unresolved (E6), or exhausted when none remain (R4); the window is P's.
+    design_decisions.md, "T-D R and E".
 (b) reset the prior over the remaining tasks on the observed agent's task completion (the C5 event
     now exists: `[IR-complete]`), so a finished task's carry does not bury the next one —
     TODO-18/20's "reset-to-uniform", now implementable;
