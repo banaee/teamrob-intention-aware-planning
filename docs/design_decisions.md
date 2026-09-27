@@ -4505,3 +4505,101 @@ opens then has s_exp ≥ 1, so its entry tick is already a member; removing the 
 the current β (0.01 /cm) and v (20 cm/tick), two targets 10.4° apart as seen from the start are not separated by a
 28-tick walk (the rival's S 0.765 at the arrival), while 30.4° separates them three ticks before the arrival (S < α at
 tick 25 of 28; scenario_s09_10, shallow runs of TB.4b).
+
+---
+
+**T-D L: the belief lifecycle (ruled by Hadi, 27 September 2026)**
+
+Cycle 2, L: when an episode ends, when an admitted projection is withdrawn, what a suspended task keeps, when a
+hypothesis is live, and what persists. Ruled in cchat on the IR test-bed's results (`analysis/ir_testbed/REPORT.md`,
+TB.4b; prior on, α = 0.05, θ = 0.75). The design does not change to fit the test-bed; the cases are evidence. Records
+only (session L-records); built in L-build.
+
+- L1, the boundary criterion.
+  Problem. The episode boundary fires only inside the retirement branch: a hypothesis whose terminal condition holds is
+  pinned, and the pin is a boundary when that hypothesis expected its terminal action on the previous tick
+  (`docs/recognizer_handback.md` §1.6; I4c, Decision 1). "Boundary iff pin" was a shortcut: I4c Decision 3 gave the
+  boundary its own question (did the OBSERVED AGENT change episode?), but the only observable it was given is the pin,
+  so an episode whose task ends without its terminal fact never ends.
+  Cases. The misdelivery, scenario_s09_08: item_1 released on kitting_table_1 at 75, no pin and no boundary;
+  `deliver_item(item_1)` leads at 0.997 to 0.897 across item_2's delivery (0.997 at 86, 0.897 at 120), and the true
+  `deliver_item(item_2)` never exceeds 0.483 (at 130); it is never pinned (TODO-87). The unassigned delivery,
+  scenario_s09_09: `deliver_item(item_3)`, outside the support, released on kitting_table_0 at 107, no pin and no
+  boundary. The return of a change of mind, scenario_s09_07: item_1 released back on shelf_1 at 33, the first action of
+  `deliver_item(item_2)` under `deliver_with_return`, no boundary.
+  Set aside. No change (the cases stand as they are). A release pins (a release is not the world's terminal fact of
+  any live hypothesis in these cases). An evidence-based reset (DESIGN-07). A boundary on re-decomposition.
+  Ruling. The episode boundary fires when the observed agent completes an action that is terminal in the task model
+  (`place`, `wait_at`), read from the completion channel, whatever its binding. The pin stays the world's terminal fact
+  of a live hypothesis; a boundary at a pin is the special case where the terminal action also produces that fact.
+  Consequence: a task whose execution ends without its terminal fact stays live and starts the next episode at the
+  prior; "live" and "being executed" are separated.
+
+- L2, retraction, three parts.
+  Problem. An admitted projection outlives its leader's adequacy (TODO-118): G1 is asked at admission only and D2
+  retains the decision record by identity, so no trigger fires when the recorded hypothesis turns inadequate; and the
+  recognizer's inadequacy persists through behaviour that is consistent again (TODO-94).
+  Case. The corner walk mid-delivery, scenario_s09_05: `deliver_item(item_1)`'s one derived phase
+  `move_to(kitting_table_0)` runs 30 to 125; it is inadequate from 48 (e 347 cm), through the rest of the corner walk
+  and through the resumed carry (80 to 125); the belief recovers to 0.997 by the rivals' refutation (θ again at 87,
+  0.767, while inadequate); adequate at the advance to `place`, 126 (E8). The grasp flicker, scenario_s09_09 83 to 87:
+  the finding turns unexplained at 83, adequate at 84, unexplained at 86, adequate at 87, by rivals' transitions.
+  (i) Recognizer: no change. Inadequacy attaches to the phase and is not retracted when behaviour becomes consistent
+  again. Set aside: reopening a phase on the finding (degenerate: a fresh stretch is adequate the next tick); a
+  turn-back rule or a window (each a constant).
+  (ii) Meta-planner: `recognition_changed` also fires when the hypothesis the decision was projected against leaves
+  adequate — that hypothesis only, never a rival's transition (the grasp flicker, scenario_s09_09 at 83 to 87, would
+  otherwise fire). Admission is re-asked, G1 refuses, the decision realizes against no human plan, P's fallback
+  replaces the projection; re-admission is through D2's existing second side when the leader clears the gate again.
+  The act is called retraction; the recognizer retracts nothing.
+  (iii) "Consistent again" is evidentially meaningful at the next phase advance (E8 makes the advancing hypothesis a
+  member); a resumed walk in the right direction repairs nothing mid-phase. Cost stated: a resumed carry is
+  unprojected until its advance (46 ticks in scenario_s09_05, 80 to 125).
+
+- L3, resumption: no change under L1.
+  Problem. The completion of a foreseeable task inside a suspended delivery ends the episode while the delivery is
+  visibly in progress (TODO-93).
+  Cases. The coffee break after the pick-up, scenario_s09_03: the `coffee_break` pin at 84 is a boundary with item_1 in
+  hand; both deliveries restart at 0.4990; `deliver_item(item_1)` resumes at 86 and clears θ again at 100 (0.7772). The
+  coffee break before the pick-up, scenario_s09_04: the pin at 82 is a boundary, empty-handed; the resumed delivery
+  clears θ again at 91 (0.7846).
+  Ruling. Every terminal action is a boundary regardless of task class. The suspension is carried by the world (the
+  held item re-derives both hypotheses from the first tick of the new episode, scenario_s09_03 from 84), not by the
+  belief; empty-handed (scenario_s09_04 from 82) nothing persists, by I4c Decision 2. The belief near 0.5 after a break
+  is genuine ambiguity. TODO-93 closes by design.
+  Set aside. A class exception for foreseeable terminal actions (its phase would carry the break's excess, inadequate
+  as in L2). A suspended-task representation (I4c).
+
+- L4, liveness.
+  Problem. A pin retires a hypothesis for the rest of the run (`_completed`), although its terminal fact can stop
+  holding (`waited(agent, machine)` is cleared on the agent's next step); so a foreseeable task is recognisable once per
+  run (TB close-out), and whether a foreseeable hypothesis stays live after the work order (TODO-117) depends on whether
+  it was ever performed.
+  Cases. scenario_s09_01 and scenario_s09_10 (coffee never taken): `coffee_break` lone live after the last delivery,
+  unexplained from 157 and from 141 on the exit walk, to the end of the run. scenario_s09_02 to _04 (coffee taken):
+  exhausted from 201, 191 and 202; the exit walk has no finding.
+  Ruling. Retirement lasts exactly as long as the hypothesis's terminal fact holds, read from the world on every tick,
+  the criterion the robot's pool already uses (T7). A hypothesis whose fact stops holding re-enters the live set with
+  the prior base and the current position as origin; the others are renormalised (R6). Deliveries: unchanged while the
+  item stays; a moved item makes the delivery live again. `coffee_break`: retired on the pin tick, live again when
+  `waited` clears; a second break in a run is recognisable. The once-per-run fact dissolves; after the work order the
+  live set is the foreseeable tasks in every scenario and the exit walk reads unexplained (a stand charged against the
+  walk phase, E10), the honest statement; exhausted is about the current world and becomes rare.
+  Set aside. No change. Foreseeable retirement on an exhausted assigned pool.
+
+- L5, persistence: no change.
+  The world persists, the recognizer does not: a boundary resets bases, origins, standing clocks and the completion
+  events; the live set is a function of the world's terminal facts on every tick; derived phases re-derive from the
+  world on the first tick of the new episode. The meta-planner needs nothing beyond D2 at a boundary.
+
+Staging for L-build. The recognizer (L1, L4) and the meta-planner (L2 ii) are built; the IR test-bed's oracle is
+updated by derivation from this entry (not fitted to the runs); the sixteen test-bed scenarios (scenario_s08_01 to _04,
+scenario_s09_01 to _12) are recompared; the four maintained baseline sets are regenerated; the 1.5c and TB.2b measures
+are rerun; every moved number is reported.
+
+Files (L-build): shared/recognizer.py (`update`, `_task_boundary`, `_completed`, `_begin_episode`, `_adequacy`),
+shared/meta_planner.py (`evaluate_triggers`), analysis/ir_testbed/ (the oracle), the four maintained baseline sets.
+Reference: cchat, 27 September 2026 (L); "T-D R and E" (R4, R6, E1, E7, E8, E9, E10, G1); "The IR test-bed" (its
+close-out); I4c (Decisions 1 to 4); D2; T7; DESIGN-07; `docs/recognizer_handback.md` §1.1, §1.6, §1.8, §5;
+`analysis/ir_testbed/REPORT.md` (scenario_s09_01, _03, _04, _05, _07, _08, _09, _10); TODO-87, TODO-93, TODO-94,
+TODO-117, TODO-118, TODO-119
