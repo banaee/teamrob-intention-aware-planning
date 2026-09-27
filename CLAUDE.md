@@ -6,7 +6,7 @@ Simulation-agnostic robot cognitive architecture for intention-aware human-robot
 
 What the framework is about: how the robot reads the human and plans around them. What it is not
 about: what the human produces. An abandoned delivery is in scope for what it does to the robot
-(retraction, `unknown`, re-planning), not for the human's output (Hadi, T-C1).
+(retraction, the adequacy finding, re-planning), not for the human's output (Hadi, T-C1).
 
 ## How sessions work
 
@@ -40,7 +40,7 @@ Relevant (read as needed):
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
   design record. Use its terms in the code, in the documents and in reports.
   `docs/terminology_revision.md` is its explanatory companion for glossary §7 (human behaviour, model
-  coverage, the `unknown` hypothesis and "unexplained"); the glossary stays authoritative.
+  coverage, the adequacy finding and "unexplained"); the glossary stays authoritative.
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
@@ -136,8 +136,11 @@ Decisions
   probability S per live hypothesis per derived phase, at the test level α, the run option `--test_level`, default
   0.05), the lifecycle state (live | exhausted) and the members' tail probabilities; the meta-planner reads
   `confidence` and `most_likely` only, the gate unchanged, its input now the leader's share over H. The four
-  maintained baseline sets are regenerated under it. Next: session 1.4, Stage 1's verification analysis (TODO-101),
-  then L, P, G and X, each ruled on Stage 1's results. Not to be
+  maintained baseline sets are regenerated under it. Session 1.4 verified it (`analysis/td_stage1/REPORT.md`), and
+  cycle 1.5 is ruled on it (27 Sept 2026; design_decisions.md, "T-D R and E", "1.5 rulings"): E8 (the advance tick),
+  E9 (s_exp from the Projector's attribution), E10 (standing as belief evidence) and G1 (the guard on admission, the
+  first ruling of G), recorded in session 1.5r. Next: session 1.5b builds the four together; then L, P, the rest of G,
+  and X, each ruled on Stage 1's results. Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
@@ -174,6 +177,11 @@ Decisions
   argument rests on them.
 - Keep measurement tasks and build tasks apart. A build task is the change plus the check it
   needs, not a characterisation study.
+- Prior. Runs, tests, debugging and the ccode reports assume the prior ON: the robot knows the human's assigned tasks,
+  and the hypothesis space is that pool plus the foreseeable tasks. Prior OFF (the robot does not know the human's
+  assigned tasks) is a later test mode, run once the framework is stable, when both modes are tested and reported.
+  Until then a prior-OFF measurement is an appendix, never the primary set, and no ruling is made on prior-OFF numbers
+  alone.
 - When a task delegates a decision, decide from the design: state the reasoning before implementing, then evaluate. If the evaluation contradicts the reasoning, report it; do not switch the decision to fit the results.
 
 ## Workflow rules
