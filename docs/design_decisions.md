@@ -4366,8 +4366,14 @@ is a real case. Keeping triggers alive after the terminal return: `no_current_ta
 D3's definition of a trigger as a change in what the last decision rested on.
 
 Consequences recorded.
-- The existing baselines stay byte-identical in every robot, `[meta*]` and `[sep]` line, and gain `[IR]` and
-  `[IR-dist]` lines after the robot's completion tick.
+- After the terminal return the body calls neither `evaluate_triggers` nor the executor. The existing baselines stay
+  byte-identical once every `[IR*]` line is removed, and their `[IR*]` lines stay byte-identical up to and including
+  the declared completion tick; the new lines begin the tick after it and include `[IR-complete]` and `[IR-boundary]`
+  as well as `[IR]` and `[IR-dist]`. (Refined in TB.2b records, Hadi on the TB.1r report, 27 September 2026.)
+- Within a tick, the robot's `[IR]` and `[IR-dist]` lines now precede its `[meta-trig]` line, on every tick (observation,
+  recognition and their logging come before the guard, the guard before the trigger evaluation); before TB.2b the
+  `[meta-trig]` line came first. Every log's md5 changes with it, a run whose robot never finishes included; the
+  comparison above is unaffected. (TB.2b plan, confirmed by Hadi.)
 - The 1.4 and 1.5b measurements (`analysis/td_stage1/`, `analysis/td_stage1b/`) were taken over the truncated
   interval. They are rerun over the newly exposed interval in TB.2b, with every change reported and no previous
   statistic preserved for comparability (TODO-121).
@@ -4403,16 +4409,19 @@ adjusted only if a derivation needs it; never rearranged):
 - one kitting_table KT at the top centre;
 - two shelves, west and east, at the same height, symmetric about KT's vertical axis;
 - the coffee machine near the south wall, offset west of centre;
-- the four corner landmarks and the door (required by the layout rule; the scripts never use the door, which is placed
-  on no bearing the scenarios use);
+- one landmark, corner_SE, the exit walk's target; no other corner and no door (landmarks are optional under the layout
+  rule);
 - no AC switch, so no `ac_activation` hypothesis exists in this room.
 Stated consequences:
 - from KT the two delivery hypotheses have equal path cost, so the first walk separates them by excess alone;
 - the coffee machine's bearing from KT differs from corner_SE's, so a walk to the machine and the exit walk are
   distinguishable;
-- with the prior on, the hypothesis space is the two deliveries plus `coffee_break`, so after both deliveries
-  `coffee_break` is the lone live hypothesis at 1.0 by normalisation and the exit walk is charged against its walk to
-  the machine (TODO-117's case by construction).
+- with the prior on, the hypothesis space is the two deliveries plus `coffee_break`. `coffee_break` is retired for the
+  run once `waited` holds (the completion pin, `docs/recognizer_handback.md` §1.6), so in the three coffee scenarios no
+  hypothesis is live after the second delivery: the lifecycle reads exhausted and the exit walk has no finding. Only
+  in the two-deliveries scenario (`scenario_s08_01`) is `coffee_break` the lone live hypothesis after both deliveries,
+  at 1.0 by normalisation, and the exit walk is charged against its walk to the machine (TODO-117's case by
+  construction).
 
 The setup (the shift). item_1 on the west shelf, item_2 on the east shelf, both designated to KT.
 
@@ -4420,18 +4429,20 @@ The scenarios. Prior ON in every run. The robot at the top left with an empty ta
 observing the human. The human starts at KT, assigned `deliver_item(item_1)` and `deliver_item(item_2)`, never in an
 order. Every script ends with the exit walk to corner_SE (the authoring convention), which is itself an unmodelled walk
 and part of every expectation.
-1. `scenario_ir_two_deliveries`: deliver item_1, deliver item_2, exit.
-2. `scenario_ir_coffee_between`: deliver item_1, `coffee_break`, deliver item_2, exit.
-3a. `scenario_ir_coffee_after_pickup`: `coffee_break` started after the `pick_up` of item_1 (the item in hand during
-   the break; resumption re-expands the carry), then deliver item_2, exit.
-3b. `scenario_ir_coffee_before_pickup`: `coffee_break` started after the first `move_to` of item_1's delivery, before
-   its `pick_up` (empty-handed at the shelf; resumption re-expands the walk back to the shelf, then the pick-up), then
-   deliver item_2, exit.
+1. `scenario_s08_01` (two deliveries): deliver item_1, deliver item_2, exit.
+2. `scenario_s08_02` (coffee between): deliver item_1, `coffee_break`, deliver item_2, exit.
+3a. `scenario_s08_03` (coffee after the pick-up): `coffee_break` started after the `pick_up` of item_1 (the item in
+   hand during the break; resumption re-expands the carry), then deliver item_2, exit.
+3b. `scenario_s08_04` (coffee before the pick-up): `coffee_break` started after the first `move_to` of item_1's
+   delivery, before its `pick_up` (empty-handed at the shelf; resumption re-expands the walk back to the shelf, then
+   the pick-up), then deliver item_2, exit.
 3a and 3b are separate scenarios because they test different suspended task states, not parameter variations of one
 scenario. Both are L's subject; their expectations are generated mechanically from the current entry, and the test-bed
 does not resolve L. The deviations (the corner walk, a switch outside the support, the wrong table, the long stand,
 the finished assigned tasks) are authored later with P and X (TODO-122).
-Ids: `env_layout_ir_testbed`, `setup_ir_testbed`, and the scenario ids above (descriptive, nothing encoded). The
+Ids: serial, as every existing artefact: the layout `env_layout_10`, the setup `env_setup_08`, and the scenario ids
+above (`scenario_s08_01` to `scenario_s08_04`, in the order listed); each scenario's purpose is stated in its
+`description` field. The
 coffee break's duration is the schema's; no scenario constant. One run file per scenario: steps enough to include the
 exit walk, `separation_stop` off, `test_level` 0.05, `assignment_prior` on.
 
@@ -4441,13 +4452,16 @@ The expectations. Per scenario one CSV:
 - per tick: the human's position, the world facts the phase rule reads, the finding, the lifecycle state, the pin and
   boundary ticks.
 Two files per scenario, expected and actual, and a diff. The source of the human's trajectory and world facts is the
-load-time replay (`check_script`), which T-H proved equal to the run; the run's human lines are asserted equal to the
-replay's positions as a separate check.
-Independence boundary. The generator implements from the entry the recognition mathematics and the membership and
-finding rules: e as the straight-line excess from the origin, s, s_exp by E9's attribution, D, L clipped at 1, the
-normalisation over H, S, membership as amended twice with the boundary-tick rule, the finding, the pin, the boundary,
-the retirement. It imports nothing from `shared/recognizer.py` or `shared/likelihood_functions.py`. It may use the
-planner's decomposition and the domain's method guards to obtain each hypothesis's expected action sequence, which is
+load-time replay (`check_script`), expanded per tick with the body's walker (`steps_toward`, the step size, the
+proximity threshold, the action and task latencies). TB.3b asserts per-tick equality of that trajectory with the run's
+human lines; if the assertion fails, the generator reads the run's human lines instead and the report says so.
+Independence boundary. The generator implements the belief from all recognizer records at HEAD, not from one entry:
+this file's "T-D R and E" (e as the straight-line excess from the origin, s, s_exp by E9's attribution, D, L clipped
+at 1, S, membership as amended twice with the boundary-tick rule, the finding) and `docs/recognizer_handback.md`
+§§1.2 to 1.7 (the uniform prior, the proximity regress, the fold and prefix accumulation, the normalisation over H,
+the completion signal, the pin, the boundary and the retirement, `BELIEF_FLOOR`, target resolution for a carried
+item). The TB.3b report lists each rule the generator implements with its source. It imports nothing from
+`shared/recognizer.py` or `shared/likelihood_functions.py`. It may use the planner's decomposition and the domain's method guards to obtain each hypothesis's expected action sequence, which is
 the domain's structure, not the recognizer's. The expected-action table per hypothesis per scenario is written out in
 the report, so the oracle is inspectable.
 
@@ -4467,6 +4481,12 @@ Sessions (the TB track; the IR test-bed first, cycle 2 (L) second): TB.1r record
 ruling (records only); TB.2b builds the cognitive-loop correction ("The cognitive loop does not end with the task
 pool", above), which the test-bed's runs need; TB.3b builds the artefacts and the expectation generator, runs the
 scenarios and writes the report.
+
+CORRECTED IN PLACE (TB.2b records; Hadi on the TB.1r report, 27 September 2026): the landmarks (corner_SE only, no
+door; TB.1r had them required), the ids (serial; TB.1r had descriptive ids), the generator's source (all recognizer
+records at HEAD; TB.1r had the one entry), the trajectory (the replay expanded per tick with the body's walker, and the
+fallback to the run's human lines), and the third stated consequence (`coffee_break` is retired once `waited` holds, so
+TODO-117's case arises in the two-deliveries scenario only; TB.1r had it in every scenario).
 
 Files: domains/kitting/ (the layout, setup and scenarios, hand-written literals registered by discovery), the run files
 where T-L keeps them, analysis/ir_testbed/ (the generator, the log reader reusing `analysis/td_stage1b/tdlib.py`,

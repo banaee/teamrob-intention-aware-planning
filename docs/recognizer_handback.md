@@ -372,7 +372,10 @@ FINDING. UNRESOLVED iff there is no member; UNEXPLAINED iff every member has $S_
 $S_k \ge \alpha$), INADEQUATE (a member with $S_k < \alpha$), NO_OBSERVATION (not a member); the finding is adequate
 exactly when some live hypothesis's is. No memory beyond each live hypothesis's current phase (E7): an
 unexplained finding clears when a member reaches $S_k \ge \alpha$, or when a phase advance or an episode boundary
-empties the membership. α is the run option `test_level`, default 0.05, never chosen from a scenario; it is not
+empties the membership. SUPERSEDED IN PART (TB.2b records, 27 September 2026): "a phase advance ... empties the membership"
+is wrong under E8: on the tick a hypothesis's expected action completes, the completing hypothesis is a member with
+$S_k = 1$ whatever phase it advances into, so an advance never empties the membership on its tick; only a boundary
+tick does (no hypothesis is a member on it, 1.5c). The finding is recomputed every tick (E7 as worded in TB.1r). α is the run option `test_level`, default 0.05, never chosen from a scenario; it is not
 a meta-planner threshold. LIFECYCLE: EXHAUSTED iff H is empty, and then no finding (R4).
 
 What reads it: the meta-planner reads the leader's hypothesis adequacy at its gate (G1, §5), never α or $S_k$;

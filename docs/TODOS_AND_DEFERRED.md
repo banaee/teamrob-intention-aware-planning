@@ -3493,9 +3493,15 @@ complete, a foreseeable hypothesis still live keeps the recognizer from reading 
 `ac_switch_0` alone live at 0.992 from 327, admitted at 327, the finding adequate to 343 and unexplained from 344
 (α = 0.05; `analysis/td_stage1/REPORT.md` §H case 2), while the human is idle. Whether a foreseeable hypothesis stays
 live after the work order is complete is for L.
-THE IR TEST-BED (TB, ruled 27 Sept 2026): its room has no AC switch, so with the prior on the hypothesis space is the
-two deliveries plus `coffee_break`, and the test-bed constructs this case by its stated consequences
-(design_decisions.md, "The IR test-bed"). Its expectations are generated from the current entry; it does not resolve L.
+THE IR TEST-BED (TB, ruled 27 Sept 2026; corrected in TB.2b records): its room has no AC switch, so with the prior on
+the hypothesis space is the two deliveries plus `coffee_break`. The test-bed constructs this case in its two-deliveries
+scenario only (`scenario_s08_01`): in the three coffee scenarios `coffee_break` is retired once `waited` holds, no
+hypothesis is live after the second delivery, and the lifecycle reads exhausted (design_decisions.md, "The IR
+test-bed"). Its expectations are generated from the current records; it does not resolve L.
+A FACT FOR L (TB.2b records, 27 Sept 2026): under the current completion pin a foreseeable task is recognisable once
+per run. The pin retires a hypothesis for the rest of the run once its terminal completion predicate holds
+(`docs/recognizer_handback.md` §1.6), although `waited(agent, machine)` itself is cleared when the agent's next
+action starts; so a second coffee break in the same run has no live hypothesis.
 Files: shared/recognizer.py (the live set H)
 Reference: design_decisions.md, "T-D R and E", R4; `analysis/td_stage1/REPORT.md` §H
 
@@ -3545,6 +3551,15 @@ table (`BINDING_ABSENT`), the long stand, the finished assigned tasks. Same rule
 the layout is not adjusted to a desired result, and the expectations are derived from the entry before the run.
 Files: domains/kitting/ (scenarios), analysis/ir_testbed/
 Reference: design_decisions.md, "The IR test-bed"; TODO-101; `docs/handoff_T-D_cycle2_and_IR_testbed.md` §8, layer 4
+
+**TODO-123: `SimModel._spawn_agents`'s docstring misdescribes the robot's pool under the prior (recorded, TB.2b, 27 Sept 2026)** [OPEN; docstring only]
+The docstring says the robot "receives its assigned_tasks as its task pool, plus (when the assignment_prior switch is
+on) the observed human's assigned_tasks". The observed human's assigned tasks go to the recognizer only, as its
+support restriction (`RobotAgent.__init__`, `IntentionRecognizer(assigned_tasks=observed_assigned_tasks)`); the
+robot's pool is its own `assigned_tasks` (`meta_planner.seed_tasks(assigned_tasks)`), with the prior on or off. The code
+is right, the text is stale.
+Files: mesa_sim/sim_model.py (`_spawn_agents`)
+Reference: TB.2b plan step, 27 Sept 2026
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
