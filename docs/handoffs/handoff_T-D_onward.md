@@ -61,6 +61,9 @@ leaves the hypothesis space, and the recognizer reports an adequacy finding (unr
 lifecycle state exhausted beside the belief. Staging: Stage 1 builds the recognizer side, the gate left as it is, and
 is evaluated (TODO-101); then L, P, G and X, each ruled on Stage 1's results and recorded before its build. T-D Q1
 (option 1) is unchanged and is P's building block.
+Stage 1 is built and verified (session 1.4, `analysis/td_stage1/REPORT.md`); Hadi's rulings on it, E8, E9, E10 and G1
+(27 September 2026, cycle 1.5), are in design_decisions.md, "T-D R and E", section "1.5 rulings"; session 1.5b builds
+them.
 
 ## 0. How to use this document
 
