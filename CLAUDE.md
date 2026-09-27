@@ -161,6 +161,9 @@ Decisions
   same-side alternates; the s08 artefacts and outputs unchanged): zero disagreements at 1e-9 on all twelve.
   The IR test-bed track is closed (TB close-out, 27 Sept 2026; design_decisions.md, "The IR test-bed", its foot); next
   is cycle 2, L.
+  L, the belief lifecycle, is ruled (L-records, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle", L1 to
+  L5: the boundary on a terminal action's completion, retraction by the meta-planner, liveness while the terminal fact
+  holds); next is L-build.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
