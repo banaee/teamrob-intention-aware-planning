@@ -682,10 +682,14 @@ categorical finding, and what it does with it is G and X, open. A ROBOT term: it
 the two can disagree.
 → `docs/design_decisions.md`, "T-D R and E: the recognizer's output under a removed `unknown` hypothesis", R2 to R5,
 E1 to E7.
-RULED (1.5 rulings, 27 September 2026; to be built in cycle 1.5b). MEMBERSHIP (E8): on the tick at which a hypothesis's
-expected action completes, that hypothesis stays a member with S_k = 1, whatever phase it advances into; the
-completion is an observation consistent with it. The boundary is unchanged: hypotheses entering the new episode have
-no observation on the boundary tick. PER-HYPOTHESIS ADEQUACY (G1): beside the finding the recognizer reports, per live
+RULED (1.5 rulings, 27 September 2026; built in cycle 1.5b, amended in 1.5c). MEMBERSHIP (E6 as amended twice, E8): a
+live hypothesis is a member on a tick iff its derived phase holds an observation — walked path since its origin;
+standing beyond s_exp; a stationary tick with s ≤ s_exp in a stationary phase or in any phase with s_exp > 0 (D ≤ 0,
+S_k = 1; this covers the latency tick E9 prices to a walk entered from a completion); or, on the tick at which its
+expected action completes, the completion (E8: S_k = 1, whatever phase it advances into) — and the tick is not a
+boundary tick: no hypothesis is a member on a boundary tick (E8's boundary clause applied generally). At a boundary the
+sequence is unresolved (b), adequate (b + 1, the latency tick), adequate; only the initial walk at step 0
+(s_exp = 0) stays unresolved until walking evidence occurs. PER-HYPOTHESIS ADEQUACY (G1): beside the finding the recognizer reports, per live
 hypothesis, a categorical value: adequate (a member with S_k ≥ α), inadequate (a member with S_k < α) or no
 observation (not a member). The finding is existential over the live hypotheses; the per-hypothesis value answers
 whether one hypothesis explains its own phase, and the meta-planner reads it for the leader at admission
@@ -700,19 +704,21 @@ finding** (G1): **adequate** (a member of the test with S_k ≥ α), **inadequat
 observation** (not a member: its derived phase holds no observation this tick, or it has no derived phase). It answers
 whether one hypothesis explains its own derived phase; the finding is its existential aggregate over the live
 hypotheses (above). The meta-planner reads it for the leader only, at admission (**admitted**), and never receives α
-or S_k. Membership is the complete rule of E6 (as amended, with E8).
+or S_k. Membership is the complete rule of E6 (as amended twice, with E8; **adequacy finding**, above).
 → `docs/design_decisions.md`, "T-D R and E", E6, "1.5 rulings", E8, G1.
 
 **unresolved** — the value of the **adequacy finding** while no live hypothesis is a member of the test: no live
-hypothesis's current derived phase holds an observation (E6, as amended). A phase holds an observation once it holds
-walked path since its origin, or standing beyond the priced standing s_exp, or, in a stationary phase (`pick_up`,
-`place`, `wait_at`), a stationary tick within its priced duration (D ≤ 0, S_k = 1); and, on the tick a hypothesis's
-expected action completes, that hypothesis is a member with S_k = 1 (E8). A walk with nothing walked since its origin
-and no standing beyond s_exp holds none, so the first tick after a boundary stays unresolved; a hypothesis with no
-derived phase is never a member. An observation whose projected completion delay is not surprising is still an
+hypothesis's current derived phase holds an observation (E6, as amended twice). A phase holds an observation once it
+holds walked path since its origin, or standing beyond the priced standing s_exp, or a stationary tick with s ≤ s_exp
+in a stationary phase (`pick_up`, `place`, `wait_at`) or in any phase with s_exp > 0 (D ≤ 0, S_k = 1: the latency tick
+a walk entered from a completion is priced); and, on the tick a hypothesis's expected action completes, that
+hypothesis is a member with S_k = 1 (E8). No hypothesis is a member on a boundary tick (E8's boundary clause applied
+generally), so the boundary tick is unresolved and the latency tick after it adequate; the initial walk at step 0
+(s_exp = 0) with nothing walked holds no observation and stays unresolved until walking evidence occurs; a hypothesis
+with no derived phase is never a member. An observation whose projected completion delay is not surprising is still an
 observation. No band, no constant. The log reason `none(unprojectable)` (the projector could not resolve the admitted
 hypothesis's task; `none(unresolved)` before the Stage 1 build) is log text with its own meaning, not this word.
-→ the same entry, E6 (amended, and the complete membership rule), "1.5 rulings", E8.
+→ the same entry, E6 (amended twice, and the complete membership rule), "1.5 rulings", E8.
 
 **adequate** — the value of the **adequacy finding** when some live hypothesis's current derived phase holds an
 observation and not every live hypothesis has S_k < α: at least one live hypothesis explains its phase at the test

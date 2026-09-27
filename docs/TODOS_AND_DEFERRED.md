@@ -2970,6 +2970,10 @@ Reference: T-B1a, September 2026
 T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the wrong-table delivery is written as a plain instance with the other binding and is labelled on the record `coverage` `BINDING_ABSENT`. The recognizer-side behaviour recorded here (no pin, no boundary, no pool drop) is unchanged by T-H and stays with T-D Q4, now with ground truth for it.
 T-D Stage 1 (27 Sept 2026; `analysis/td_stage1/REPORT.md`, 1.4 finding 5): the item's hypothesis keeps leading at 0.995
 into the human's next task (scenario_s06_06 prior on after the release at 103, scenario_s07_03 after 94). Cycle 2 (L).
+T-D 1.5b (27 Sept 2026; `analysis/td_stage1b/REPORT.md`, finding 5): G1 refuses the wrong-table carry (76, 79:
+`none(leader_inadequate)`), but after the release the misdelivered item's hypothesis is admitted again at 0.995
+(scenario_s06_06 at 103, scenario_s07_03 at 94, both priors): with no boundary at a misdelivery, its new derived phase
+(pick the item up where it now lies) is a member at S = 1. Cycle 2 input (L).
 
 **TODO-88 — With the prior off, an item the robot carries stays a live hypothesis about the human, with a target that moves with the robot** [recognizer finding; from T-B Q7]
 Found while checking T-B Q7's acceptance, which expected a robot-side timing fix to leave every `[IR]` line
@@ -3486,6 +3490,36 @@ complete, a foreseeable hypothesis still live keeps the recognizer from reading 
 live after the work order is complete is for L.
 Files: shared/recognizer.py (the live set H)
 Reference: design_decisions.md, "T-D R and E", R4; `analysis/td_stage1/REPORT.md` §H
+
+**TODO-118: Retraction of an admitted projection when its leader turns inadequate (recorded for L, T-D 1.5c, 27 Sept 2026)**
+[OPEN; cycle 2 input, L]
+An admitted projection outlives its leader's adequacy: the gate (G1) is asked at admission only, and D2 retains the
+decision record by identity, so no trigger fires when the recorded hypothesis turns inadequate. The recognizer already
+reports it (`leader_adequacy=inadequate`); the meta-planner has no event for it. Measured (1.5b, prior off):
+scenario_s01_01 admitted at 143, inadequate from 159, the 31-tick hold runs to 173; scenario_s03_01 full_reorder
+admitted at 131, inadequate from 139, the 89-tick hold runs to 219 and the run does not complete.
+Files: shared/meta_planner.py (`evaluate_triggers`, the decision record)
+Reference: `analysis/td_stage1b/REPORT.md`, D and finding 2; design_decisions.md, D2, "T-D R and E", G1
+
+**TODO-119: A lone hypothesis is adequate right after a boundary with the human idle (recorded for P and G, T-D 1.5c, 27 Sept 2026)**
+[OPEN; cycle 2 input, P and G]
+Prior off, after the human's last task the robot's own remaining item is the lone live hypothesis (belief 1.0 by
+normalisation), and the idle stand leaves its walk adequate for about 16 ticks (S from 0.86 down to α) before it
+turns inadequate; the gate admits it in that window (scenario_s01_01 prior off at 143 in 1.5b, a 31-tick hold). Under
+the second E6 amendment (1.5c) the latency tick b + 1 is itself an observation at S = 1, so a lone hypothesis is
+admitted at b + 1 on a belief of 1.0 and one priced standing tick. Whether admission should need walking evidence, or
+the projection come from observation, is P's and G's.
+Files: shared/meta_planner.py (`_clears_gate`), shared/recognizer.py (membership)
+Reference: `analysis/td_stage1b/REPORT.md`, D, finding 3 and section 1.5c; design_decisions.md, "T-D R and E", G1
+
+**TODO-120: Three small flags from the 1.5b acceptance (recorded, T-D 1.5c, 27 Sept 2026)** [OPEN; documentation]
+- `analysis/td_stage1/supp_sweep.sh` was committed without the executable bit (made executable in 1.5c; run it with
+  `bash` at older commits).
+- 1.4's `e_reveals.py` prints an `unknown` column; on logs after the Stage 1 build it reads 0.000 (no such key).
+- `analysis/td_stage1b/g_priced_standing.py` shows, per action of an admitted projection, the first s_exp the
+  recognizer took for it in the run, not the one in force when the projection was made (item_2 projected at 80: its
+  initial walk's 0, not the post-boundary 1).
+Reference: `analysis/td_stage1b/REPORT.md`, flags
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).

@@ -4255,7 +4255,28 @@ E, ruled.
   is this entry as amended above, (1) to (3), plus E8 (1.5 rulings, below): on the tick at which a hypothesis's
   expected action completes, the completing hypothesis is a member with S_k = 1, whatever phase it advances into; on a
   boundary tick the hypotheses entering the new episode hold no observation.
+  AMENDED A SECOND TIME (Hadi, 27 September 2026, on the 1.5b report; built in session 1.5c): an extension of the first
+  amendment, not a change to E9. A stationary tick with s ≤ s_exp in ANY phase whose s_exp > 0 is an observation with
+  D ≤ 0: the hypothesis is a member with S_k = 1 (and L = 1). This covers the priced latency tick E9 assigns to a walk
+  entered from a completion. The initial walk at step 0 (s_exp = 0) is unchanged: it stays unresolved until walking
+  evidence occurs. There is no exception for phases opened by a boundary: the walk a boundary opens has s_exp = 1 (E9),
+  so its latency tick b + 1 is an observation, and the derived sequence at a boundary is unresolved (b), adequate
+  (b + 1), adequate (b + 2); the 1.5b expectation "unresolved, unresolved, adequate" is superseded by derivation.
+  THE BOUNDARY TICK (Hadi, 27 September 2026, 1.5c): no hypothesis is a member on a boundary tick, including a
+  stationary phase the boundary opens: E8's boundary clause applied generally. It supersedes reading 3 of 1.3b (below).
+  Reason: E8 protects the completion tick and E9 prices the following latency tick to the new walk; on that tick the
+  true hypothesis held no observation and a refuted rival alone gave unexplained (scenario_s02_01 prior-on 248,
+  scenario_s04_01 prior-on 269, scenario_s03_06 prior-on 89; `analysis/td_stage1b/REPORT.md`, C). Objective: zero
+  false unexplained on modelled ticks.
+  THE MEMBERSHIP RULE, AS AMENDED TWICE: a live hypothesis with a derived phase is a member on a tick iff that phase
+  holds an observation — walked path since its origin; standing beyond s_exp; a stationary tick with s ≤ s_exp in a
+  stationary phase, or in any phase with s_exp > 0 (then D ≤ 0, S_k = 1); or the completion of its expected action on
+  this tick (E8, S_k = 1) — and the tick is not a boundary tick.
 - E7. The finding has no memory beyond each live hypothesis's current phase; it clears when every live hypothesis advances its phase or an episode boundary moves every origin. Retraction and resumption are L.
+- Properties recorded (1.5c, from the 1.5b acceptance): a foreseen stay is revealed about 9 standing ticks after its
+  arrival, not on it (scenario_s05_01 / _02 prior on: arrival 23, crossing 32; scenario_s02_01 130, scenario_s04_01
+  158): a rival on the same bearing is refuted only as its unpriced standing is charged, L ≤ 1/3 at
+  v·(s − s_exp) ≥ ln 5 / β = 160.9 cm. The price of the gradient E10 chose over a cliff; a design property, not a defect.
 - Limitations recorded, not built: (a) sub-threshold waste is not summed across phases; an episode-level test by convolution of the phase density is the form to add if a ground-truth case demands it; (b) a regress at the proximity threshold (30 cm) is a phase change and resets that hypothesis's test; (c) the aggregate false-unexplained count per run grows with the number of phases of the true hypothesis; reopening condition: data establishing a null whose spread depends on phase duration reopens the reference distribution and the per-phase unit of α together.
 - Dependencies to verify in the build, not design questions: the schema durations of `pick_up` and `place`; the body's speed and its duration-to-ticks conversion supplied to the adequacy computation (the Projector already receives both); β remains body-supplied as established in T-A1.
 
@@ -4280,6 +4301,10 @@ session 1.4), its "Findings for cycle 1.5". The four rulings, verbatim:
 - E9, s_exp from the Projector's attribution (from 1.4 finding 2). s_exp for a phase equals the Projector's priced stationary ticks that fall within that phase's span, derived from the Projector's own execution sequence (walk latency, action, action latency; for wait_at, walk latency, the bound duration, action latency). In kitting this gives 2 for pick_up and place; a walk phase entered from a completion receives the preceding completion's latency tick; the initial walk, with no preceding completion, receives 0. No new duration constant; the body's and the Projector's timing remain authoritative. Consequence: the recognizer and the Projector charge the same physical ticks to the same phase; the apparent "resolved" tick after a boundary disappears, and the finding stays unresolved until the walk has produced evidence. I3's phase rule is unchanged: this is an attribution correction inside the existing phase structure.
 - E10, standing as belief evidence (from 1.4 finding 4; revises E3 and narrows I4c). The belief and adequacy use the same phase-level statistic D through two functions: the belief's evidence per phase is L(v·D), adequacy's is S(v·D). For a walking phase without standing D = e/v and L(v·D) = L(e), so ordinary walking evidence is unchanged. In a stationary phase, standing within the Projector-priced duration gives D <= 0, hence L = 1, no belief penalty (D < 0 is clipped to L = 1, the moving-target case being outside the model); standing beyond the priced duration contributes v·(s − s_exp) and penalises the hypothesis in the belief as excess path does. D replaces the previous value within a phase and folds at the advance, as the excess does: one observation per phase. E3's "time enters adequacy only" is superseded; I4c narrows to "a stationary tick within a phase's priced standing is not a charge". Measured: the coffee walk ties with item_5 at 0.498 and the 30-tick stand moved only the finding, so coffee_break was never revealed and s05_02's 31-tick hold was lost. Rejected: charging rivals through the completion channel's false-alarm rate on an arrival (a cliff where the design has a gradient).
 - G1, the guard on admission (from 1.4 finding 3; the first ruling of G, ahead of the cycle order because it is one condition). Admission requires the leader to be adequate in its own phase: the leader is a member and S_leader >= alpha. The recognizer reports per-hypothesis adequacy as a categorical value beside the finding (adequate, inadequate, no observation); the meta-planner still receives no alpha and no S_k. Aggregate adequacy is existential over the live hypotheses, while admission concerns the one hypothesis the planner proposes to act on; these are different questions, and the aggregate finding would admit a stale leader whose own phase is inadequate whenever a weaker hypothesis is adequate. _clears_gate stays the one home of the rule, so recognition_changed fires and refuses on the same condition. When the guard refuses, the behaviour is today's below-theta behaviour; the observation-based projection is P. TODO-97 unchanged. Measured: a lone hypothesis admitted at the boundary on no evidence; the wrong-table delivery admitted at 76 and 79 while unexplained; prior off, the robot's own remaining item admitted with holds of 33 to 89 ticks.
+  CYCLE 2 INPUT (1.5c; with 1.5b finding 3, TODO-119): under the second E6 amendment a lone hypothesis is admitted at
+  b + 1, on a belief of 1.0 by normalisation and one priced standing tick (its latency tick is an observation with
+  S = 1). The boundary admissions of 1.5b (at b + 2) move one tick earlier; they are expected and listed in
+  `analysis/td_stage1b/REPORT.md`, section 1.5c.
 
 Three rulings made at the Stage 1 plan step (cycle 1, session 1.3; Hadi, 27 September 2026), recorded until now in
 `docs/recognizer_handback.md` (§1.5, §1.7, §1.10) and not in this entry:
@@ -4303,6 +4328,8 @@ Three readings from the E6 amendment's build (cycle 1, session 1.3b), recorded a
   (kitting's methods), not a check the recognizer makes.
 - A stationary phase directly after a boundary would be a member on the first tick, so "unresolved on the first tick
   after a boundary" (E6 amended, (2)) is a property of walk-first phases, not a rule of the finding.
+  SUPERSEDED (1.5c, 27 September 2026): no hypothesis is a member on a boundary tick, a stationary phase the boundary
+  opens included (E8's boundary clause applied generally; E6, second amendment, above).
 
 Staging, cycle 1.5: session 1.5r records these rulings (records only). Cycle 1.5b builds E8, E9, E10 and G1 together;
 acceptance is 1.4's scripts (`analysis/td_stage1/`) rerun on the regenerated baselines.
