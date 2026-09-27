@@ -2984,6 +2984,9 @@ unchanged: the task is not complete in the world. Built in L-build.
 AMENDED (Hadi, on the L-records report, 27 Sept 2026): not "read from the completion channel": the boundary fires when a terminal action's
 own completion condition becomes true for the observed agent (the item it held on the previous tick placed at a
 container; `waited(agent, ·)` starting). A bare RELEASE is no boundary. design_decisions.md, "T-D L", L1 as amended.
+BUILT (L-build, 28 Sept 2026; 2c54c4a): the misdeliveries are boundaries without a pin (scenario_s09_08 at 75,
+scenario_s06_06 at 103, scenario_s07_03 at 94); the delivery stays live; `analysis/l_build/REPORT.md`. The pool side
+unchanged, as ruled.
 
 **TODO-88 — With the prior off, an item the robot carries stays a live hypothesis about the human, with a target that moves with the robot** [recognizer finding; from T-B Q7]
 Found while checking T-B Q7's acceptance, which expected a robot-side timing fix to leave every `[IR]` line
@@ -3540,6 +3543,9 @@ foreseeable tasks in every scenario and the exit walk reads unexplained; exhaust
 exhausted today from 201, 191, 202). Set aside: foreseeable retirement on an exhausted assigned pool.
 AMENDED (Hadi, on the L-records report, 27 Sept 2026): re-entry takes exactly 1/|H|, the incumbents keep their proportions (arithmetic C);
 the criterion is T7's test, not its permanence (the pool side: TODO-128). design_decisions.md, "T-D L", L4 as amended.
+BUILT (L-build, 28 Sept 2026; 2c54c4a): `coffee_break` re-enters the tick `waited` clears; after the work order the
+test-bed's coffee scenarios read unexplained on the exit walk (exhausted 80 → 0 ticks each); scenario_s04_01 prior on
+reads four foreseeable hypotheses live at 0.249 after its work order (`analysis/l_build/REPORT.md`).
 
 **TODO-118: Retraction of an admitted projection when its leader turns inadequate (recorded for L, T-D 1.5c, 27 Sept 2026)**
 [RULED (T-D L2 (ii), 27 Sept 2026); built in L-build]
@@ -3558,6 +3564,9 @@ retraction (glossary §4); the recognizer retracts nothing.
 AMENDED (Hadi, on the L-records report, 27 Sept 2026): "leaves adequate" is adequate to inadequate (built as the state "the recorded
 hypothesis is inadequate"); SUPERSEDES "(P's fallback replaces the projection)": there is no P fallback, the decision
 realizes against no human plan, as below θ. `[meta-trig] … cause=retraction`. design_decisions.md, "T-D L", L2.
+BUILT (L-build, 28 Sept 2026; 493c095): the two measured cases retract at the tick the leader turns inadequate:
+scenario_s01_01 prior off at 159 (completion 201 → 186), scenario_s03_01 full_reorder prior off at 139 (it now completes,
+world 227); 23 retractions over the 52 baseline runs (`analysis/l_build/REPORT.md`).
 
 **TODO-119: A lone hypothesis is adequate right after a boundary with the human idle (recorded for P and G, T-D 1.5c, 27 Sept 2026)**
 [OPEN; cycle 2 input, P and G]
@@ -3646,13 +3655,19 @@ Reference: `analysis/ir_testbed/REPORT.md`, TB.3b flags
 Files: tests/test_tl2_discovery.py
 Reference: `analysis/ir_testbed/REPORT.md`, TB.3b and TB.4b, "Runs and tests that disagree with the mechanism"
 
-**TODO-127: `d_decisions.txt`'s world completion tick equals the declared one prior off, declared − 2 prior on (recorded, L-records, 27 Sept 2026)** [OPEN; recorded only]
+**TODO-127: `d_decisions.txt`'s world completion tick equals the declared one prior off, declared − 2 prior on (recorded, L-records, 27 Sept 2026)** [CHECKED (L-build, 28 Sept 2026): not a reader defect; CLAUDE.md's wording flagged]
 Flagged in TB.2b (`analysis/tb2b_exposed_interval/REPORT.md`, flags) and not examined: for the prior-off runs
 `d_decisions.txt` prints a world completion tick (`tdlib.robot_completion`, T6) equal to the declared one (scenario_s06_02
 off: world 267, declared 267), where the prior-on runs read world = declared − 2 (scenario_s01_01 on: 169 / 171), the
 relation CLAUDE.md states for every run. Identical before and after TB.2b, so not TB.2b's. Either `tdlib.robot_completion`
 reads another line prior off, or the declared tick differs by prior; to be checked before a completion tick from
 `analysis/td_stage1b/tdlib.py` is compared across priors (the 1.5c and TB.2b measures rerun in L-build).
+CHECKED (L-build, 28 Sept 2026; `analysis/l_build/REPORT.md`, "Completion ticks"): not a reader defect. The declared
+tick equals the world tick when the pool empties on a `recognition_changed` of that tick (the robot's own item pinned
+changes most_likely and `update()` drops the completed task, T7), and is world + 2 when `no_current_task` ends the pool;
+prior off, the robot's remaining item is often the recorded leader, hence the pattern. CLAUDE.md's "declared = N,
+world = N − 2" holds for `no_current_task` endings only (flagged, CLAUDE.md not edited). Under L2 (ii) several of these
+runs now end by `no_current_task` (declared + 2, world unchanged).
 Files: analysis/td_stage1b/tdlib.py (frozen), analysis/td_stage1b/d_decisions.py
 Reference: `analysis/tb2b_exposed_interval/REPORT.md`, "Flags (not fixed)"; CLAUDE.md, "Regression checking" (completion)
 

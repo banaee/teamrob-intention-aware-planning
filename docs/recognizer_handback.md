@@ -54,7 +54,7 @@ origin, the others renormalised (R6): a moved item makes its delivery live again
 AMENDED (Hadi, on the L-records report, 27 September 2026): re-entry takes exactly 1/|H| (H with the returning hypothesis; k
 returning on one tick take 1/|H| each), the incumbents share the rest in this tick's proportions; origin the current
 position, entry latency 0 (a first observation), the derived action the world's; a re-entry on a boundary tick is
-governed by the boundary. Logged `[IR-reentry]`.
+governed by the boundary. Logged `[IR-reentry]`. BUILT IN L-BUILD (28 September 2026; 2c54c4a, 493c095, 5129d90, 3d65ca6).
 
 ### 1.2 Prior
 
@@ -195,7 +195,8 @@ when a terminal action's own completion condition becomes true for the observed 
 that agent on the previous tick and a grounding of its completion condition under that binding holds now and did not
 then (`place`: `holding(agent, x)` then `obj_at(x, c)`; `wait_at`: `at(agent, e)` then `waited(agent, e)`). No
 microaction is read. A terminal `place` inside a decomposition (the return of `deliver_with_return`, scenario_s09_07 at
-33) is a boundary. The boundary tick is flagged on the belief (`episode_boundary`, L5 B).
+33) is a boundary. The boundary tick is flagged on the belief (`episode_boundary`, L5 B). BUILT IN L-BUILD (28 September 2026; 2c54c4a, 493c095, 5129d90, 3d65ca6);
+`[IR-boundary]` names the action (`completed place(item_1,shelf_1):`).
 
 ### 1.7 Output
 

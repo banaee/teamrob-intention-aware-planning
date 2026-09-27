@@ -163,7 +163,9 @@ Decisions
   is cycle 2, L.
   L, the belief lifecycle, is ruled (L-records, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle", L1 to
   L5: the boundary on a terminal action's completion, retraction by the meta-planner, liveness while the terminal fact
-  holds); next is L-build.
+  holds); L-build built it (28 Sept 2026: the boundary on the observed agent's completion of a terminal action, the
+  live set read from the terminal facts every tick with re-entry at 1/|H|, retraction and the boundary flag in
+  `recognition_changed`; `analysis/l_build/REPORT.md`, the IR test-bed agreeing at 1e-9); next is P.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
@@ -371,7 +373,8 @@ grep "^\[meta-proj\]"   <log>   # human projection admitted or not, and why (G1:
 grep "^\[meta-pool\]"   <log>   # completed tasks dropped from the pool
 grep "^\[IR\] step="    <log>   # most_likely, confidence, lifecycle, finding, the leader's hypothesis adequacy, the members' tails
 grep "^\[IR-dist\]"     <log>   # full belief distribution per tick
-grep "^\[IR-complete\]" <log>   # task completion pins
+grep "^\[IR-complete\]" <log>   # task completion pins (a pin lasts while the terminal fact holds, T-D L4)
+grep "^\[IR-reentry\]"  <log>   # a retired hypothesis live again, its terminal fact no longer holding (L4)
 grep "^\[sep\]"         <log>   # actual robot-human distance per tick
 grep "^\[hold\]"        <log>   # decided holds: start, end, planned, executed, interrupted
 grep "^\[stop\]"        <log>   # separation-stop refusals (stop on), with the assessed-window label

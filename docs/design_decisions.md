@@ -4670,6 +4670,15 @@ updated by derivation from this entry (not fitted to the runs); the sixteen test
 scenario_s09_01 to _12) are recompared; the four maintained baseline sets are regenerated; the 1.5c and TB.2b measures
 are rerun; every moved number is reported.
 
+BUILT (L-build, 28 September 2026): c4beb1d (records), 2c54c4a (L1, L4, the flag: `ProceduralKnowledge.
+terminal_actions`, `AdaptivePlanner.enabled_groundings` / `completed_groundings`, `_observed_terminal_completion`,
+`_retired`), 493c095 (L2 (ii), L5 B: `RecognitionChange`, `TriggerDecision.cause`), 5129d90 and 3d65ca6 (the re-entry
+kept in hypothesis order, the tie-break; found by the IR test-bed), 013cd35 (tests). Verified: `analysis/l_build/
+REPORT.md` and `analysis/ir_testbed/REPORT.md`, "L-build" (the sixteen agree with the derived generator at 1e-9). Two
+readings stated there: a retired hypothesis the planner cannot decompose stays retired (its fact cannot be read); L5 B
+fired in no baseline run (at every boundary that met a record, most_likely changed). Measured wording: `coffee_break`
+re-enters on the tick `waited` clears, the human's first step after the break, two ticks after its pin (133 → 135 in
+scenario_s09_02); "one tick after its break" above reads so.
 Files (L-build): shared/recognizer.py (`update`, `_task_boundary`, `_completed`, `_begin_episode`, `_adequacy`),
 shared/meta_planner.py (`evaluate_triggers`), analysis/ir_testbed/ (the oracle), the four maintained baseline sets.
 Reference: cchat, 27 September 2026 (L); "T-D R and E" (R4, R6, E1, E7, E8, E9, E10, G1); "The IR test-bed" (its

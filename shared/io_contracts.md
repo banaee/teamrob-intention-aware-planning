@@ -134,6 +134,7 @@ class BeliefState:
     lifecycle: RecognizerLifecycle         # LIVE | EXHAUSTED
     tails: Dict[str, float]                # S_k of each member of the adequacy test this tick
     hypothesis_adequacy: Dict[str, HypothesisAdequacy]   # ADEQUATE | INADEQUATE | NO_OBSERVATION per live hypothesis
+    episode_boundary: bool                 # the belief was re-initialised at an episode boundary on this tick (T-D L1, L5)
     # predicted_next_actions: Dict[str, List[str]] — DEPRECATED, commented out in the
     # dataclass itself. Multi-step prediction now goes through ProjectedPlan (§1.7) and
     # IntentionRecognizer.get_hypothesis() (§2.1), not this field. Do not use in new code.
@@ -156,6 +157,11 @@ and `tails` exist for evaluation and for the rest of G.
 - otherwise `most_likely` is a key of H in `distribution`; `tails` keys are a subset of H; `hypothesis_adequacy`
   keys are exactly H, a key is ADEQUATE / INADEQUATE iff it is in `tails` with S_k ≥ / < alpha, NO_OBSERVATION iff
   it is not; `finding` is ADEQUATE iff some value is ADEQUATE
+- `episode_boundary` is true exactly on the tick the observed agent completed a terminal action of the task model
+  (T-D L1 as amended: its preconditions held for the agent on the previous tick and a grounding of its completion
+  condition holds now and did not then); the belief is then the prior over H and no hypothesis is a member. H is the
+  support minus the hypotheses whose terminal fact holds on this tick (L4); a hypothesis whose fact stops holding
+  re-enters at exactly 1/|H| (`[IR-reentry]`). BUILT IN L-BUILD (28 September 2026; 2c54c4a, 493c095, 5129d90, 3d65ca6)
 
 ---
 
@@ -383,6 +389,8 @@ class TriggerDecision:
                                            # renamed: the consequence is the caller's business)
     reason: str
     score: Optional[float] = None
+    cause: Optional[RecognitionChange] = None   # ENTERED | REPLACED | BOUNDARY | RETRACTION; set exactly when
+                                                # reason is "recognition_changed" (logged on [meta-trig] as cause=)
 
 @dataclass
 class UpdateResult:
@@ -873,6 +881,9 @@ in what that decision rested on):
   trigger, `_clears_gate()` refuses on the guard (G1), the record is cleared, and `update()` realizes against no human
   plan until the leader clears the gate again, which the entering side above detects. Retention by identity is
   otherwise unchanged: a dip below θ still fires nothing. The recognizer retracts nothing (L2 (i)).
+  BUILT IN L-BUILD (28 September 2026; 2c54c4a, 493c095, 5129d90, 3d65ca6): `evaluate_triggers()` asks, with a record, REPLACED (most_likely
+  differs), then BOUNDARY (`belief.episode_boundary`), then RETRACTION (the recorded hypothesis INADEQUATE); without one,
+  ENTERED (the gate clears). The decision's `cause` names it.
   AMENDED (Hadi, on the L-records report, 27 September 2026): "leaves adequate" is adequate to
   inadequate, for the recorded hypothesis only (leaving for no observation fires nothing); built as the state "the
   recorded hypothesis's `hypothesis_adequacy` is INADEQUATE", which a record set only while adequate (G1) and cleared on
@@ -1265,6 +1276,10 @@ Provides read-only access to:
 - `holds(schema) -> bool` — identity membership of a task schema
 - `task_schemas() -> List[TaskSchema]` — the hypothesis space is built from a `TaskModel`'s
 - `get_all_actions() -> List[ActionSchema]`
+- `terminal_actions() -> List[ActionSchema]` — the action schemas that end some method of a task schema held (a
+  TaskStep followed); kitting's robot task model: `place`, `wait_at`. The recognizer's episode boundary is the
+  observed agent's completion of one (T-D L1; L-build). `AdaptivePlanner.enabled_groundings(action, agent_id, world)`
+  and `completed_groundings(action, bindings, world)` ground them for the observed agent (§2.3)
 - `get_microactions() -> List[str]`
 - `get_cost(key) -> Optional[float]` — per-action costs; empty in Mesa
 - `Tree.get_types_with_destination() -> Dict[str, Tuple[str, Optional[str]]]` — {object type: (task, destination
