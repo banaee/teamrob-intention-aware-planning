@@ -153,7 +153,10 @@ Decisions
   before the run, in three sessions: TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the
   expectation generator, the runs, the report; `analysis/ir_testbed/`). The cognitive loop does not end with the task
   pool (ruled 27 Sept 2026; design_decisions.md, the entry of that name; built in TB.2b): observation and
-  recognition run on every tick, and an empty pool stops planning and execution only.
+  recognition run on every tick, and an empty pool stops planning and execution only. TB.3b built the IR test-bed
+  (27 Sept 2026; env_layout_10, env_setup_08, scenario_s08_01 to _04, run files in `configs/ir_testbed/`, the
+  instrument and its report in `analysis/ir_testbed/`): the recognizer's public outputs agree with the independent
+  oracle on every compared tick of the four runs.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
