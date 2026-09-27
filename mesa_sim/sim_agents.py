@@ -458,7 +458,9 @@ class RobotAgent(FactoryAgent):
             world=world,
             executor_state=executor_state,
         )
-        logging.info(f"[meta-trig] step={int(self.model.schedule.steps)} trigger={trigger.reason}")
+        # recognition_changed names the condition that fired (D2; T-D L2 (ii), L5 B)
+        cause = "" if trigger.cause is None else f" cause={trigger.cause.value}"
+        logging.info(f"[meta-trig] step={int(self.model.schedule.steps)} trigger={trigger.reason}{cause}")
 
         if trigger.fired:
             human_projection = self.meta_planner.update_human_projection(
@@ -561,6 +563,7 @@ class RobotAgent(FactoryAgent):
             lifecycle=RecognizerLifecycle.LIVE,
             tails={},
             hypothesis_adequacy={},
+            episode_boundary=False,
         )
 
 

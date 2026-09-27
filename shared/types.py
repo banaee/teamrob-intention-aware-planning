@@ -1113,6 +1113,24 @@ class ExecutorState:
                               # analysis scripts that read it
 
 
+class RecognitionChange(Enum):
+    """
+    Which condition of `recognition_changed` fired (D2; T-D L2 (ii), L5 B),
+    read against the decision record:
+    ENTERED     none is recorded and the belief clears the gate (D2);
+    REPLACED    a hypothesis is recorded and most_likely is no longer it (D2);
+    BOUNDARY    a hypothesis is recorded and the belief was re-initialised at
+                an episode boundary on this tick (L5 B);
+    RETRACTION  a hypothesis is recorded and its hypothesis adequacy is
+                inadequate (L2 (ii)).
+    Logged on the [meta-trig] line; nothing decides on it.
+    """
+    ENTERED = "entered"
+    REPLACED = "replaced"
+    BOUNDARY = "boundary"
+    RETRACTION = "retraction"
+
+
 @dataclass
 class TriggerDecision:
     """Return type of MetaPlanner.evaluate_triggers()."""
@@ -1121,6 +1139,7 @@ class TriggerDecision:
                          # presumed the consequence — inherited from should_replan())
     reason: str
     score: Optional[float] = None
+    cause: Optional[RecognitionChange] = None   # set exactly when reason is recognition_changed
 
 
 @dataclass

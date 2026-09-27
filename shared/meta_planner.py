@@ -161,6 +161,7 @@ from shared.types import (
     RealizedPlan,
     ExecutorState,
     TriggerDecision,
+    RecognitionChange,
     UpdateResult,
     task_instance_key,
     HypothesisAdequacy,
@@ -387,10 +388,29 @@ class MetaPlanner:
                 * none is recorded and the belief clears _clears_gate(). The
                   first time a task hypothesis clears the gate, as
                   `theta_crossed` fired it.
+              With a hypothesis recorded and still most likely, two more
+              conditions (T-D L5 B, L2 (ii)), read against the recorded
+              hypothesis only:
+                * the belief was re-initialised at an episode boundary on this
+                  tick (belief.episode_boundary), whether or not most_likely
+                  changed: a decision resting on a belief that was reset rests
+                  on nothing;
+                * RETRACTION: the recorded hypothesis's hypothesis adequacy is
+                  inadequate. A record is set only while its hypothesis is
+                  adequate (G1, at admission) and the fire clears it, so this
+                  is its adequate-to-inadequate event, at most once per phase;
+                  leaving adequate for no observation (every boundary, every
+                  proximity regress) fires nothing, and a rival's adequacy and
+                  the aggregate finding are never read.
+              On either, admission is re-asked and refuses (no member on a
+              boundary tick; the leader inadequate), so the record clears and
+              update() realizes against no human plan until the entering side
+              fires again. The condition that fired is the decision's `cause`
+              (RecognitionChange), in the order written here.
               The gate is asked at admission, never for retention: a recorded
               hypothesis that dips below theta while staying most likely fires
               nothing (TODO-68's repeated crossings) and keeps its projection
-              until it is replaced, ends, or the human stops. That consequence
+              until it is replaced, ends, turns inadequate, or the human stops. That consequence
               is accepted and recorded (design_decisions.md, D2); a margin or a
               duration on the dip would be a second threshold, which DESIGN-07
               rules out. Supersedes `theta_crossed`, the crossing of the gate
@@ -409,13 +429,20 @@ class MetaPlanner:
             decision = TriggerDecision(fired=True, reason="no_current_task", score=1.0)
         else:
             recorded = self._projected_hypothesis
+            cause: Optional[RecognitionChange] = None
             if recorded is not None:
-                recognition_changed = belief.most_likely != recorded
-            else:
-                recognition_changed = self._clears_gate(belief) is GateOutcome.CLEARS
+                if belief.most_likely != recorded:
+                    cause = RecognitionChange.REPLACED
+                elif belief.episode_boundary:
+                    cause = RecognitionChange.BOUNDARY
+                elif belief.hypothesis_adequacy.get(recorded) is HypothesisAdequacy.INADEQUATE:
+                    cause = RecognitionChange.RETRACTION
+            elif self._clears_gate(belief) is GateOutcome.CLEARS:
+                cause = RecognitionChange.ENTERED
 
-            if recognition_changed:
-                decision = TriggerDecision(fired=True, reason="recognition_changed", score=belief.confidence)
+            if cause is not None:
+                decision = TriggerDecision(fired=True, reason="recognition_changed", score=belief.confidence,
+                                           cause=cause)
             else:
                 decision = TriggerDecision(fired=False, reason="none", score=0.0)
 
