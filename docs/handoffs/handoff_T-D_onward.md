@@ -387,6 +387,7 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
    `unknown` (or no admitted hypothesis) project the human as stationary at its current position for a
    bounded horizon, so that `realize()` prices holds against where the human is; how the horizon is
    bounded is part of it. This is T-D's first design question (T-D Q1) and is meta-planner-side.
+   SETTLED BY T-D R (27 September 2026): "under `unknown` (or no admitted hypothesis)": outside; the adequacy finding takes the explanatory role; T-D Q1 itself unchanged, P's building block. design_decisions.md, "T-D R and E".
 2. **Re-recognition inside an episode depends on the length of the misleading walk** (TODO-94). The
    excess path a walk lays against the hypotheses it does not serve persists until a task completion
    resets legs and origins. A short misleading walk (12 to 22 ticks) lets the new task recover; a
@@ -395,6 +396,7 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
    was meant to test; the recognizer has no mechanism for it. Recognizer-side (T-D Q2). Note the
    anchors cannot express a turn mid-walk; "change of mind before the pick-up" means the human reaches
    the item first and then turns.
+   SUPERSEDED IN PART (T-D R1, 27 September 2026): wording superseded by R1; the case stays L. design_decisions.md, "T-D R and E".
 3. **TODO-93**: a foreseeable task finishing inside an assigned delivery ends the episode and resets
    the belief while the item is visibly in hand (scenario_s02_02, scenario_s02_03, scenario_s04_02,
    scenario_s05_03). Recognizer-side (T-D Q3).

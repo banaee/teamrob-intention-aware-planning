@@ -105,6 +105,7 @@ hypothesis's expected path a stretch has closed). f lives inside the robot's evi
 simulation with a real deployment.
 
 ### 1.2 ROBOT
+SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` under the belief, `none(unknown)` under the gate outcome, and "the recognizer has no separate output for unexplained … pending decision": the `unknown` hypothesis leaves the hypothesis space (R1); the adequacy finding (unresolved, adequate, unexplained) is a separate output beside the belief, with the lifecycle state exhausted (R2 to R4); glossary §7. design_decisions.md, "T-D R and E".
 
 ```
 ROBOT
@@ -141,6 +142,7 @@ Not written: "unknown behaviour", "an unknown task", "`unknown` as unmodelled be
 ---
 
 ## 2. The cases
+SUPERSEDED IN PART (T-D R, 27 September 2026): the `unknown` readings of the belief column, and the evidence window left to "the pending decision on `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); the finding is judged over each live hypothesis's current derived phase (E1, E7); the finished work order is the lifecycle state exhausted (R4). design_decisions.md, "T-D R and E".
 
 Label A and label B are the world. The belief column is what the current recognizer does, from the play or the
 fixtures named. The finding column applies the definition of "unexplained" to that behaviour of the belief.
@@ -163,6 +165,7 @@ decision on `unknown`; the definition of "unexplained" does not settle it.
 ---
 
 ## 3. Divergence diagrams
+SUPERSEDED IN PART (T-D R, 27 September 2026): the `unknown` rows describe the recognizer as built; the `unknown` hypothesis leaves the hypothesis space (R1), and 3.4's "`unknown` high by normalisation" is the lifecycle state exhausted (R4). design_decisions.md, "T-D R and E".
 
 Time runs left to right. "B" is label B (the world), `unknown` is the belief's residual mass, "finding" is the
 recognizer's finding.
@@ -271,6 +274,7 @@ TODO-92, since the evaluation will need it.
 ---
 
 ## 6. Terms deliberately not introduced
+SUPERSEDED IN PART (T-D R and E, 27 September 2026): "unresolved" and "exhausted" are terms now (glossary §7), with "adequacy finding" and "adequate"; "recognised" is still not a term; the `none(unresolved)` log reason is renamed in the Stage 1 build. design_decisions.md, "T-D R and E".
 
 | word | why not now |
 |---|---|

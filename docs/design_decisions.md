@@ -1410,6 +1410,7 @@ Files: shared/recognizer.py (`update`: the fold and the open term); analysis/i4d
 Reference: I4d fold-unknown session, September 2026
 
 **I5 — confirmation and hand-back: what the recognizer guarantees, what is a characterised limitation, what travels to the meta-planner work**
+SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1 (the grade leaves the belief). Not reopened. design_decisions.md, "T-D R and E".
 No model change. The final matrix at HEAD (`analysis/i5_handback/`) reproduces I4d's logs byte-for-byte, the
 I4d reversion reproduces I4c's, the invariant holds to 7e-15, and every result carried forward from I4–I4d is
 asserted (`criteria.md`). The hand-back — `docs/recognizer_handback.md` — is the central artifact: the model
@@ -1477,6 +1478,7 @@ projector had been returning None for it by accident — `unknown` has no hypoth
 the `none(unresolved)` reason, so admission was correct by the resolver's ignorance rather than by decision;
 `none(unresolved)` again means an unresolvable hypothesis only. The trigger still fires on `unknown`; whether it
 should, and the one-shot semantics, are TODO-68's interface question, deliberately not decided here.
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 
 Sweep (PYTHONHASHSEED=0, analysis/t7_t8_meta_bugs/): decisions move only where the re-delivery was — s30_off
 item_4 at 87 instead of 93, run end 157 instead of 163; s00_off run end 166 instead of 172 — and `[IR]` /
@@ -1668,6 +1670,7 @@ which B1.5 would route past B2 anyway. The remaining route is a `theta_crossed` 
 not admitted (`most_likely` `unknown` or unresolvable, since the crossing clears the gate). The
 recognition behind the hold then no longer stands, and a hold computed against it should not survive.
 Recorded in TODO-71.
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 (D3, September 2026: `task_committed` is no trigger at all now; the ruling stands, and its remaining route is a
 `recognition_changed` whose projection is not admitted.)
 
@@ -2366,6 +2369,7 @@ shared/io_contracts.md (§1.9, §2.2, §4.1), analysis/t5_continue/ (deleted in 
 Reference: T5 session, September 2026; TODO-43
 
 **What a trigger is an event of: `recognition_changed` against the decision record replaces `theta_crossed`; the blocked event designed, not built (D2)**
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 Decided in cchat from ccode's plan-mode reflection (September 2026); built in D2.
 
 A TRIGGER IS A CHANGE IN WHAT `update()` DECIDED ON. The decision rested on a hypothesis (the one it was
@@ -2533,6 +2537,7 @@ Reference: graded-evidence session, September 2026; cchat decision; I4d; TODO-61
 
 
 **The gate stays a fixed share: `_clears_gate` on the normalised belief, θ = 0.75 (the gate ruling)**
+SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1; the gate stands; its justification is re-derived from Stage 1's admission measurement (G). Not reopened. design_decisions.md, "T-D R and E".
 
 DECIDED (cchat, September 2026, on the graded-evidence θ data, `analysis/g1_graded_evidence/crossings.md`):
 the admission gate is unchanged. `MetaPlanner._clears_gate(belief)` tests `confidence ≥ θ` on the normalised
@@ -2866,6 +2871,7 @@ ROS); `docs/roadmap.md` holds it. Four decisions shape that order.
 3. THE DEMONSTRATION COMES AFTER T-B, T-C AND T-D. Built now it could show switch and hold (s70 / s71) only.
    After them it shows what the framework claims: a two-table ordering, a change of mind, `unknown` as an
    outcome, as well as switch and hold, plain against realized cost, the stop on, prior off.
+   SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 4. THE DOCUMENTATION PASS FOR THE PAPER COMES BEFORE THE PAPER, NOT BEFORE THE DEMONSTRATION. The demo is
    an instrument for seeing behaviour, and it needs the viewer, not polished documents; the paper needs
    the record consolidated once the evaluation's content is known.
@@ -3636,6 +3642,7 @@ the same operation as a load-time edit" (Phase 7); TODO-86, TODO-87, TODO-85, TO
 ---
 
 **Belief-aware planning: a joint realization against the hypotheses that cover the belief (later, recorded)**
+SUPERSEDED IN PART (T-D R1, 27 September 2026): `unknown` is not a member of S_ε; the finding's role in belief-aware planning is G; TODO-97's gate is unchanged. design_decisions.md, "T-D R and E".
 
 RECORDED, NOT DECIDED (cchat, Hadi, 24 September 2026). A later pipeline task, after the T-D Q2 to Q4
 recognizer pass; not on the T-D agenda. TODO-97 holds it in full.
@@ -3835,6 +3842,7 @@ replaces the representation.
       hypothesis explains the evidence, inside `unknown` or outside it", now with ground-truth cases: a switch to a
       modelled task, a switch to a modelled task outside the support, a switch to an unmodelled task, a binding-level
       deviation, no task on the stack, an episode's first ticks.
+      SETTLED BY T-D R (27 September 2026): "inside `unknown` or outside it": outside; the adequacy finding takes the explanatory role; T-D Q1 itself unchanged, P's building block. design_decisions.md, "T-D R and E".
     - Oracle-IR evaluation: its own pipeline task after T-H (TODO-101). Three conditions on the same scenario: no IR;
       IR; oracle IR, where the meta-planner receives `truth_at(tick)` instead of the belief. `truth_at` enters the
       robot's mind only through that condition's explicit adapter.
@@ -4217,32 +4225,32 @@ TODO-47 (a), TODO-102, TODO-104, TODO-108, TODO-110, TODO-111
 
 **T-D R and E: the recognizer's output under a removed `unknown` hypothesis (ruled by Hadi, 26 to 27 September 2026)**
 
-Problem. One number, the share of the `unknown` hypothesis, carried four meanings: evidence against every live task hypothesis, the prior share at every reset, the mass left by normalisation at exhaustion, and nothing for a stand (I4c). The meta-planner never read it (`update_human_projection` refuses `unknown`). The relative test cannot express "the best of my models is wrong". Cases: the corner walk (scenario_01, 06), the 5-minute stand, the wrong table (scenario_85, 92; TODO-87), a finished work order (`unknown` at 0.995 by normalisation), the first ticks after a boundary. Ground truth per tick from T-H; oracle IR from TODO-101.
+Problem. One number, the share of the `unknown` hypothesis, carried four meanings: evidence against every live task hypothesis, the prior share at every reset, the mass left by normalisation at exhaustion, and nothing for a stand (I4c). The meta-planner never read it (`update_human_projection` refuses `unknown`). The relative test cannot express "the best of my models is wrong". Cases: the corner walk (scenario_s01_02, 06), the 5-minute stand, the wrong table (scenario_s06_06, scenario_s07_03; TODO-87), a finished work order (`unknown` at 0.995 by normalisation), the first ticks after a boundary. Ground truth per tick from T-H; oracle IR from TODO-101.
 
 R, ruled.
-- R1. The `unknown` hypothesis leaves the hypothesis space. The belief is normalised over live task hypotheses only. u (`UNKNOWN_LIKELIHOOD`), `graded_unknown_likelihood` and the grade f leave the belief; per stretch each live hypothesis pays L. A lone live hypothesis reads 1.0 at zero evidence; two rivals start at 0.5. The ceiling 1/(1 + u^n) is gone. Expected and measured in Stage 1, not corrected.
+- R1. The `unknown` hypothesis leaves the hypothesis space. The belief is normalised over live task hypotheses only. u (`UNKNOWN_LIKELIHOOD`), `graded_unknown_likelihood` and the grade f leave the belief; per stretch each live hypothesis pays L. A lone live hypothesis reads 1.0 at zero evidence; two rivals start at 0.5. The ceiling 1/(1 + uⁿ) is gone. Expected and measured in Stage 1, not corrected.
 - R2. The recognizer reports an adequacy finding beside the belief: unresolved, adequate, unexplained (E5 to E7 define it), and beside the finding the per-hypothesis tail probabilities S_k for evaluation.
 - R3. Belief and finding are independent outputs. The recognizer's state is their product plus the lifecycle state; combinations are examples of what the outputs jointly express, not a state machine, and no transitions are defined.
 - R4. Exhausted is a lifecycle state, reported when no task hypothesis is live; no finding is reported in it; nothing is unexplained in it. It replaces the reading "`unknown` at 0.995".
 - R5. The recognizer decides nothing about action. What the meta-planner does with belief, finding and lifecycle is G and X, open.
-- R6. Unchanged: the excess-path likelihood, beta as a body-supplied tolerance, the per-hypothesis origin and fold at the phase advance, "an empty stretch is not an observation" for the belief (I4c), the terminal pin and the boundary rule as built. The verified invariant "belief equals odds against `unknown`" no longer exists. The primary arithmetic invariant after `unknown` is removed: on every tick the returned probabilities sum to 1 over exactly the live hypothesis set H, and retired (pinned) hypotheses stay outside H under the existing support restriction. Stage 1 verifies this invariant and, separately, the adequacy accounting.
+- R6. Unchanged: the excess-path likelihood, β as a body-supplied tolerance, the per-hypothesis origin and fold at the phase advance, "an empty stretch is not an observation" for the belief (I4c), the terminal pin and the boundary rule as built. The verified invariant "belief equals odds against `unknown`" no longer exists. The primary arithmetic invariant after `unknown` is removed: on every tick the returned probabilities sum to 1 over exactly the live hypothesis set H, and retired (pinned) hypotheses stay outside H under the existing support restriction. Stage 1 verifies this invariant and, separately, the adequacy accounting.
 
 E, ruled.
 - E1. Unit: each live hypothesis's derived phase, from its existing origin to its phase advance. No window, no episode constant.
-- E2. One statistic per hypothesis per phase, the projected completion delay D = e/v + (s - s_exp): e the excess path from the origin as computed today, v the body's speed, s the ticks without movement since the origin, s_exp the Projector's priced standing for the phase (0 for `move_to`, 1 tick for `pick_up` and `place`, the bound duration for `wait_at`). Path and standing are two components of one statistic, not two tests. A detour is counted once.
+- E2. One statistic per hypothesis per phase, the projected completion delay D = e/v + (s − s_exp): e the excess path from the origin as computed today, v the body's speed, s the ticks without movement since the origin, s_exp the Projector's priced standing for the phase (0 for `move_to`, 1 tick for `pick_up` and `place`, the bound duration for `wait_at`). Path and standing are two components of one statistic, not two tests. A detour is counted once.
 - E3. A stand in a `move_to` phase is charged against s_exp = 0. Time enters adequacy only; the belief's likelihood is unchanged.
-- E4. Every live hypothesis is assessed against its own phase. The finding is unexplained only when every live hypothesis has S_k < alpha (intersection-union test), otherwise adequate.
-- E5. Reference distribution: the belief's own likelihood shape read as a density, p(x) = beta L(x) / (2 ln 2) on x >= 0, applied to v*D; tail S(x) = ln(1 + exp(-beta x)) / ln 2, S = 1 for x <= 0. A modelling assumption, stated as one: it criticises the model the belief uses; its empirical adequacy is open and cannot be tested on the scripted human (D near zero). D is non-decreasing within a phase, so the threshold can be crossed at most once; evaluating it every tick introduces no repeated threshold-crossing opportunities and requires no sequential correction. alpha is a per-phase test level, recognizer configuration (a run option), default 0.05 as a convention, reported at every level (0.01, 0.05, 0.1) and never chosen from a scenario. alpha is not a meta-planner threshold and does not touch DESIGN-07; the meta-planner receives a categorical finding. At v = 20 cm/tick, beta = 0.01/cm: threshold v*D = 334 cm at alpha = 0.05 (17 ticks of standing; 167 cm walked straight away from every live target), 497 cm at alpha = 0.01. beta gains a second meaning, the scale of the reference distribution; it is not retuned for adequacy (the I4 rule stands).
+- E4. Every live hypothesis is assessed against its own phase. The finding is unexplained only when every live hypothesis has S_k < α (intersection-union test), otherwise adequate.
+- E5. Reference distribution: the belief's own likelihood shape read as a density, p(x) = βL(x) / (2 ln 2) on x ≥ 0, applied to v·D; tail S(x) = ln(1 + e^(−βx)) / ln 2, S = 1 for x ≤ 0. A modelling assumption, stated as one: it criticises the model the belief uses; its empirical adequacy is open and cannot be tested on the scripted human (D near zero). D is non-decreasing within a phase, so the threshold can be crossed at most once; evaluating it every tick introduces no repeated threshold-crossing opportunities and requires no sequential correction. α is a per-phase test level, recognizer configuration (a run option), default 0.05 as a convention, reported at every level (0.01, 0.05, 0.1) and never chosen from a scenario. α is not a meta-planner threshold and does not touch DESIGN-07; the meta-planner receives a categorical finding. At v = 20 cm/tick, β = 0.01 /cm: threshold v·D = 334 cm at α = 0.05 (17 ticks of standing; 167 cm walked straight away from every live target), 497 cm at α = 0.01. β gains a second meaning, the scale of the reference distribution; it is not retuned for adequacy (the I4 rule stands).
 - E6. Unresolved while no live hypothesis's current phase holds an observation. An observation exists once the phase holds walked path since its origin, or standing beyond s_exp; a stationary tick within the priced duration is not an observation; an observation whose D is not surprising is still an observation. No band, no constant.
 - E7. The finding has no memory beyond each live hypothesis's current phase; it clears when every live hypothesis advances its phase or an episode boundary moves every origin. Retraction and resumption are L.
-- Limitations recorded, not built: (a) sub-threshold waste is not summed across phases; an episode-level test by convolution of the phase density is the form to add if a ground-truth case demands it; (b) a regress at the proximity threshold (30 cm) is a phase change and resets that hypothesis's test; (c) the aggregate false-unexplained count per run grows with the number of phases of the true hypothesis; reopening condition: data establishing a null whose spread depends on phase duration reopens the reference distribution and the per-phase unit of alpha together.
-- Dependencies to verify in the build, not design questions: the schema durations of `pick_up` and `place`; the body's speed and its duration-to-ticks conversion supplied to the adequacy computation (the Projector already receives both); beta remains body-supplied as established in T-A1.
+- Limitations recorded, not built: (a) sub-threshold waste is not summed across phases; an episode-level test by convolution of the phase density is the form to add if a ground-truth case demands it; (b) a regress at the proximity threshold (30 cm) is a phase change and resets that hypothesis's test; (c) the aggregate false-unexplained count per run grows with the number of phases of the true hypothesis; reopening condition: data establishing a null whose spread depends on phase duration reopens the reference distribution and the per-phase unit of α together.
+- Dependencies to verify in the build, not design questions: the schema durations of `pick_up` and `place`; the body's speed and its duration-to-ticks conversion supplied to the adequacy computation (the Projector already receives both); β remains body-supplied as established in T-A1.
 
 Staging (ruled).
-- Stage 1: this record; then build the recognizer side and regenerate the baselines. The gate is left exactly as it is; its input changes meaning (the leader's share over H), so admissions are expected to shift; the shift is measured, not corrected. Verify: the arithmetic invariant of R6; recognizer outputs per ground-truth case against oracle IR (TODO-101); admissions before and after on the 40 baselines; false-unexplained per phase and per run, missed findings, detection delay, at every alpha.
+- Stage 1: this record; then build the recognizer side and regenerate the baselines. The gate is left exactly as it is; its input changes meaning (the leader's share over H), so admissions are expected to shift; the shift is measured, not corrected. Verify: the arithmetic invariant of R6; recognizer outputs per ground-truth case against oracle IR (TODO-101); admissions before and after on the maintained baseline sets (`analysis/tb1a_destination/`, `analysis/tb1b_two_tables/`, `analysis/tb1c_realized_flip/`, `analysis/tb3_full_reorder/`: 48 logs, 36 distinct by md5); false-unexplained per phase and per run, missed findings, detection delay, at every α.
 - Then L (boundary at a misdelivery, retraction, resumption), P (projection from observation; the moving human; the staleness trigger), G (consumption of belief, finding and lifecycle; TODO-97 on its own gate), X (WAIT against RECONSIDER; the occupied target; communication on a persistent finding). Each ruled on Stage 1's results, recorded before its build. The relation to Alternative 1 stays open. T-D Q1 (option 1) is unchanged and is P's building block.
 
-For the Stage 1 build (not part of this record task): the docstring of `UNKNOWN_LIKELIHOOD` ("the threshold separating unexplained from a real hypothesis") is false under R; the registry's reserved "duration" evaluator is not what E builds, since time enters adequacy and not the belief's likelihood.
+For the Stage 1 build: the docstring of `UNKNOWN_LIKELIHOOD` ("the threshold separating unexplained from a real hypothesis") is false under R; the registry's reserved "duration" evaluator is not what E builds, since time enters adequacy and not the belief's likelihood. The log reason `none(unresolved)` is renamed in the Stage 1 build, since it collides with the finding's value unresolved; the string is chosen there.
 
 Reference: TODO-95 (its recognition level closed by this entry), TODO-59 (deferred part), TODO-85 (a), TODO-63, TODO-101,
 TODO-97, TODO-87; handoff_T-D_onward.md item 6; `docs/glossary.md` §5 and §7; I4c; T-A1; "Terms for human behaviour,

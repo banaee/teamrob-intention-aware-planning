@@ -713,6 +713,7 @@ stand in a `move_to` phase counts for adequacy beyond s_exp = 0 (E3, E6).
 built (`[meta-proj] projection=built`). `unknown` above θ is never admitted (`none(unknown)`). The gate is the
 meta-planner's, not the recognizer's (**θ**, §5).
 → `shared/meta_planner.py`, `update_human_projection()`.
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 
 USAGE RULE, in prose:
 - about the implementation: "the `unknown` hypothesis";

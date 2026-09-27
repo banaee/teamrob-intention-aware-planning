@@ -326,6 +326,7 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    unrefuted. Not taken: odds against `unknown`, the ratio of the top two, θ from the live set or the
    layout, a rate-of-growth gate. TODO-64 / 65 closed; entry in `design_decisions.md`, "The gate stays a
    fixed share"
+   SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1; the gate stands; its justification is re-derived from Stage 1's admission measurement (G). Not reopened. design_decisions.md, "T-D R and E".
 
 9. B3.B design revision ✅ (September 2026, documentation only) — `full_reorder` moves from retained
    alternative to next in the pipeline: one-table kitting is why order has not mattered; two-table kitting
@@ -513,6 +514,7 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   The recognizer pass (Q2 to Q4) opens with TODO-95: rule whether the stationarity channel joins it or stays
   recorded (TODO-95; "T-H" named it before 25 Sept 2026).
   SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` as outcome and `unknown` leading as a measure: the `unknown` hypothesis leaves the hypothesis space (R1); the outcome is the adequacy finding (R2). T-D R and E is ruled; its Stage 1 is next. design_decisions.md, "T-D R and E".
+  SETTLED BY T-D R (27 September 2026): "inside `unknown` or outside it": outside; the adequacy finding takes the explanatory role; T-D Q1 itself unchanged, P's building block. design_decisions.md, "T-D R and E".
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
   set covers switch and hold (scenario_s05_01 / scenario_s05_02), a two-table ordering, a change of mind, unmodelled behaviour; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and

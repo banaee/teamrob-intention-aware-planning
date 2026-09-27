@@ -527,6 +527,7 @@ Also stated, lower in consequence:
   within-episode flip is the observed agent's own grasp or release, TODO-55 (d)).
 
 ## 5. The interface to the meta-planner
+SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1; the gate stands; its justification is re-derived from Stage 1's admission measurement (G). Not reopened. design_decisions.md, "T-D R and E".
 
 `update()` returns a `BeliefState` (`shared/io_contracts.md` §1.2; contract §2.1): `timestamp`, `agent_id`,
 `distribution` (every hypothesis key, pinned ones at 10⁻³, summing to 1), `most_likely` (the argmax key) and

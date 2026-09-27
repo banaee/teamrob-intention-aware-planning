@@ -1239,6 +1239,7 @@ Reference: Phase 4C B2 design session, September 2026
 
 **TODO-38 — IR: collinear decoys — under the excess path separated only by the arrival fold; under the grade, by distance covered** [OPEN DISCUSSION — not decided]
 SUPERSEDED IN PART (T-D R, 27 September 2026): the separation "under the grade" (the title; the odds ratio u^{−x (1/d_near − 1/d_far)}): the grade leaves the belief (R1). design_decisions.md, "T-D R and E".
+SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1 (the grade leaves the belief). Not reopened. design_decisions.md, "T-D R and E".
 Heading restated (graded-evidence session, September 2026). The "direction-only likelihood" below is the
 cosine kernel, gone since I4; the excess-path likelihood also cannot separate targets on one bearing
 (both at zero excess for the whole walk; handback §3.3, §4 (a)) — until the grade: two collinear targets at
@@ -1417,6 +1418,7 @@ mesa_sim/sim_agents.py
 Reference: evidence-gated projection admission session, September 2026
 
 **TODO-45 — Deferred idea: admit a projection when the admissible non-`unknown` set is a singleton**
+✅ CLOSED by R1 (T-D R, 27 September 2026): a singleton admissible set reads 1.0 by normalisation over the live hypothesis set (R1), so the projection this idea asked for is admitted without it; the guard against admitting on no evidence is now the adequacy finding, under G. design_decisions.md, "T-D R and E".
 With the restriction on, a human with one remaining assigned task has an admissible set of
 {that task, foreseeable tasks, `unknown`}. The idea: treat "the human has one task, so we
 know what they're doing" as sufficient to admit a projection without waiting for
@@ -1612,6 +1614,7 @@ Prerequisites:
     Report it where the generated fixtures produce it (the crossing tick, top odds against `unknown`, the
     ratio of the top two, the live set, as in `analysis/g1_graded_evidence/crossings.md`); do not build a
     fixture for it. TODO-64 / 65, design_decisions.md, "The gate stays a fixed share".
+    SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 (c) Fixture gap (T1, `analysis/t1_conflict_measurement/REPORT.md` §(a), §(c)): no current
     scenario has a correct-hypothesis *crossing* on the robot's current task. The only
     correct-hypothesis crossings measured are the never-selected item_7 alternatives in
@@ -1625,6 +1628,7 @@ shared/meta_planner.py
 Reference: Phase 4C B2/B3 session, September 2026
 
 **TODO-48 — Hypothesis change above θ fires no trigger** ✅ CLOSED (D2, September 2026)
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 ✅ CLOSED (D2): `recognition_changed` fires when `belief.most_likely` leaves the hypothesis the last decision was
 projected against, above or below θ — a consequence of the one condition, not a case. design_decisions.md, D2 entry.
 `theta_crossed` fires on a confidence crossing (`prev < θ ≤ now`), not on a change of
@@ -1796,6 +1800,7 @@ Files: shared/recognizer.py (`update`: origin handling)
 Reference: I3 phase-model session; analysis/i3_phase_model/REPORT.md §4
 
 **TODO-54 — `theta_crossed` fires on `unknown` when a pin shrinks the live set** — admission side ✅ CLOSED (T8); trigger side ✅ CLOSED (D2, September 2026)
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 ✅ CLOSED, trigger side (D2): `unknown` taking the top fires `recognition_changed` as a RETRACTION of the recorded
 hypothesis (admission then returns `none(unknown)`, the record is cleared); nothing enters on `unknown`, since
 the entering side asks the gate on a task hypothesis only. design_decisions.md, D2 entry.
@@ -1920,6 +1925,7 @@ RESOLVED in I4c (`analysis/i4c_episode/REPORT.md`), reading by reading:
   observations the human never made.
 
 **TODO-56 — The completion channel's gate is the old model's, and it is a decision** ✅ RESOLVED (I4b) — the gate stays, with its exclusion stated
+SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1 (the grade leaves the belief). Not reopened. design_decisions.md, "T-D R and E".
 Decided in I4b (`analysis/i4b_boundary/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in design_decisions.md, the I4b / I4c entry, and TODO-55 to TODO-59) §6): under the detection model a hit is ×1.0, so the
 ungated channel adds exactly one thing — the permanent ×10⁻³ false-alarm charge on every hypothesis
 whose expected action is elsewhere at a discrete tick (108 of 124 ungated events, all on `move_to`; the
@@ -1988,7 +1994,7 @@ a boundary is an event, and an event is allowed to multiply and to move origins.
 Files: shared/recognizer.py (`update`: retirement branch, `_origin`, `_origin_odo`, `_base`)
 Reference: I4 evidence-model session; analysis/i4_evidence_model/REPORT.md §4.2, §6, §10
 
-**TODO-59 — A zero-length stretch is scored as a perfect fit: a lone surviving hypothesis is at 1/(1+u) before the agent moves** ✅ RESOLVED (I4c)
+**TODO-59 — A zero-length stretch is scored as a perfect fit: a lone surviving hypothesis is at 1/(1+u) before the agent moves** ✅ RESOLVED (I4c); its deferred part (stationarity as evidence) ✅ CLOSED by decision (T-D R and E, 27 September 2026: E2, E3; time enters adequacy, not the belief)
 An empty stretch — nothing walked since the origin — is not an observation: the movement channel
 contributes no factor for it (not 1.0, not a neutral constant), and `unknown`'s constant applies only on
 a tick on which some hypothesis was scored on an observation. Applies to a stationary tick after any
@@ -2054,6 +2060,8 @@ Files: shared/recognizer.py (`update`: the fold and `unknown`'s factor), shared/
 Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §5
 
 **TODO-61 — The evidence model is one-sided and observation-counted: (a) confirmation is length-blind, (b) accumulation is observation-count and decomposition sensitive** [(a) CLOSED for walks by graded evidence, September 2026; (b) OPEN for the no-graded-signal phases]
+SUPERSEDED IN PART (T-D R1, 27 September 2026): (a): its closure for walks by the grade — reason superseded by R1 (the grade leaves the belief). Not reopened. design_decisions.md, "T-D R and E".
+SUPERSEDED IN PART (T-D R1, 27 September 2026): (b): the grade-based mechanism and reason — the 1/u per no-graded-signal phase, and the grade's closure of (b) for walks — are superseded by R1; the measurements and the questions stand. design_decisions.md, "T-D R and E".
 UPDATE (graded-evidence session, September 2026; design_decisions.md, "A stretch's evidence against
 `unknown` is graded by the share of the expected path it covers"): a stretch's odds against `unknown` are
 now L / u^f, f the fraction of the hypothesis's expected path it has covered (1 at an arrival, by the
@@ -2117,6 +2125,7 @@ Files: shared/likelihood_functions.py (`excess_path_likelihood`)
 Reference: I4c episode-semantics session; analysis/i4c_episode/REPORT.md §4
 
 **TODO-62 — Radius of maximum probability (Masters & Sardina, JAIR 64, 2019): a diagnostic ON the model, not built** [DEFERRED for scope]
+SUPERSEDED IN PART (T-D R1, 27 September 2026): "the fold's 1/u at each phase advance": u leaves the belief (R1); the diagnostic and its question stand. design_decisions.md, "T-D R and E".
 Computes, from geometry alone, the cost-distance at which a goal becomes the most probable — so a reveal
 location can be PREDICTED from the layout and the parameters and then checked against a run, instead of
 being discovered by sweeping. A diagnostic on the evidence model, never called by the recognizer. Considered
@@ -2188,6 +2197,7 @@ Files: shared/recognizer.py (`_output`), shared/meta_planner.py (`_clears_gate`,
 Reference: F1 fixture session; I4b/I4c/I4d reports; I5 hand-back; θ single-source session, September 2026
 
 **TODO-65 — Whether the gate should be a likelihood ratio rather than a normalised posterior** ✅ CLOSED (gate ruling, September 2026)
+SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1; the gate stands; its justification is re-derived from Stage 1's admission measurement (G). Not reopened. design_decisions.md, "T-D R and E".
 ✅ CLOSED (cchat): the gate stays `confidence ≥ θ` on the normalised posterior. Under graded evidence the
 share is odds_top / (1 + odds_top + Σ_rivals odds_j), so θ = 0.75 reads "at least about 3:1 over no model,
 and more while rivals remain"; a later crossing under ambiguity is intended. Not taken: odds against
@@ -2262,6 +2272,7 @@ Reference: I4c report ("Flagged, not fixed"); I5 hand-back; T7/T8 session, Septe
 "Task completion is a world fact"
 
 **TODO-68 — `theta_crossed` as an interface event: repeated crossings per recognition prior-off** [INTERFACE / DESIGN question — not an evidence-model question] ✅ CLOSED (D2, September 2026)
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 ✅ CLOSED (D2): the consumer changed, not the event's definition and not the evidence model. `recognition_changed`
 tracks the identity of the projected hypothesis (the decision record), so a re-crossing of the same hypothesis
 fires nothing and a dip below θ while it stays most likely fires nothing; no latch, no debounce, no odds gate.
@@ -2361,6 +2372,7 @@ Files: shared/projection.py or the realization module (later task), analysis/t1_
 Reference: Phase 4C wait-decision session, September 2026
 
 **TODO-71 — The hold hint on the body side: execute, refine, never re-decide** — execution ✅ BUILT in Mesa (T4); refinement and its reporting OPEN
+SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
 `UpdateResult` will carry the winner's realized holds (where, how long) as an execution HINT
 (io_contracts.md §1.9, §4.1). The embodiment has to consume it, and the single-decision-path
 rule (NOTE above, DESIGN-07's companion) fixes what consuming means: the executor stands still
@@ -2882,7 +2894,7 @@ the design is changed by recording it.
 Files: shared/meta_planner.py (`_clears_gate`, `update_human_projection`, `_replan_tasks`)
 Reference: T-A1, September 2026
 
-**TODO-85 — A stationary human: a stay as evidence (a) and the robot's action under `unknown` (b)** [T-C open item; from T-A1]
+**TODO-85 — A stationary human: a stay as evidence (a) and the robot's action under `unknown` (b)** [T-C open item; from T-A1] (a) ✅ CLOSED by decision (T-D R and E, 27 September 2026: E2, E3; time enters adequacy, not the belief); (b) OPEN (T-D Q1, P)
 A tick with nothing walked is not an observation (the empty-stretch rule, I4c), so a human who stops produces
 no evidence for or against anything, however long: picked up item_2 and stood fifty ticks, the belief stays
 with `deliver_item(item_2)` on top; `unknown` rises only from walked excess. With `unknown` on top, admission
@@ -3061,6 +3073,7 @@ Files: shared/recognizer.py (`update`, `_task_boundary`)
 Reference: T-C2c, September 2026; docs/recognizer_handback.md §1.6
 
 **TODO-94 — Re-recognition inside an episode depends on the length of the misleading walk** [T-D; from the T-C2c play]
+SUPERSEDED IN PART (T-D R1, 27 September 2026): wording superseded by R1; the case stays L. design_decisions.md, "T-D R and E".
 Observed (`analysis/tc2c_scripts/play.md`). The evidence a walk lays against the hypotheses it does not serve (refutation by wasted path)
 persists until an episode boundary, and only a task completion makes one: nothing else resets excess path. So a
 change of mind, or a detour mid-task, is recognised again only if the misleading walk was short. Short (12–22 ticks:
@@ -3203,6 +3216,7 @@ must be defensible without a constant taken from a scenario. To be argued at T-D
 not part of T-D Q1.
 
 **TODO-97: Belief-aware planning: a joint realization against the hypotheses that cover the belief (recorded, 24 Sept 2026)** [OPEN, recorded only; later, after the T-D Q2 to Q4 recognizer pass]
+SUPERSEDED IN PART (T-D R1, 27 September 2026): `unknown` is not a member of S_ε; the finding's role in belief-aware planning is G; TODO-97's gate is unchanged. design_decisions.md, "T-D R and E".
 Status: open, recorded only. Not on the T-D agenda, not in the handoff order.
 
 Claim it would support: robustness to intention AMBIGUITY, two or more live hypotheses sharing the
