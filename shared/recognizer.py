@@ -563,7 +563,9 @@ class IntentionRecognizer:
         being executed now, not what the agent is disposed to do next, and
         there is no representation here for the latter.
         """
-        self._base = self._prior(list(self._base))
+        # In hypothesis order, whatever order the bases were set in (a re-entry
+        # sets its base after the others): the tie-break, handback §1.7.
+        self._base = self._prior([repr(h) for h in self._hypotheses if repr(h) in self._base])
         self._evidence = dict(self._base)
         for key in self._origin:
             self._origin[key], self._origin_odo[key], self._origin_still[key] = pos, odo, still

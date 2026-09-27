@@ -302,3 +302,11 @@ def test_a_re_entry_keeps_the_tie_break_in_hypothesis_order(model):
     assert rec._evidence == {repr(c): 0.5, repr(item("item_2")): 0.5}
     assert list(rec._evidence) == [repr(c), repr(item("item_2"))]
     assert b.most_likely == repr(c)
+    # and at a later boundary, the prior over the live set is in hypothesis order too (item_2 delivered to kitting_table_1,
+    # a boundary without a pin: coffee_break and item_2 at 1/2 again)
+    q = w.object_positions[KT1]
+    held = carrying(w, "item_2", "shelf_2")
+    rec.update(obs(3, q), held)
+    b = rec.update(obs(4, q), placed(held, "item_2", KT1))
+    assert b.episode_boundary
+    assert list(rec._evidence) == [repr(c), repr(item("item_2"))] and b.most_likely == repr(c)
