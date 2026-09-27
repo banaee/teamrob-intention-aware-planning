@@ -299,6 +299,40 @@ body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, 
 behaviour (§7); ρ B2 `b2a`'s policy parameter.
 → `docs/recognizer_handback.md` §2; `shared/meta_planner.py`, the `rho` constructor argument.
 
+The four entries below are ruled (T-D R and E, 27 September 2026) and not built; the Stage 1 build builds them. They
+belong to the **adequacy finding** (§7).
+
+**derived phase** — the unit of the adequacy test: one live hypothesis's current phase, from its existing origin to its
+phase advance (E1). One per live hypothesis at a time; no window, no episode constant. It is bounded as the hypothesis's
+**stretch** is (the origin moves at a **fold** and at an **episode boundary**), but a stretch is the belief's unit of
+movement evidence, and a derived phase holds standing as well as walked path. A regress at the proximity threshold is a
+phase change and restarts it (limitation (b)). Not a `Segment`, not an entry.
+→ `docs/design_decisions.md`, "T-D R and E: the recognizer's output under a removed `unknown` hypothesis", E1.
+
+**projected completion delay** (D) — the adequacy test's one statistic per live hypothesis per **derived phase**:
+D = e/v + (s − s_exp), with e the excess path from the origin as the movement likelihood computes it, v the body's
+speed, s the ticks without movement since the origin and s_exp the standing the Projector prices for the phase (0 for
+`move_to`, 1 tick for `pick_up` and `place`, the bound duration for `wait_at`). In ticks. Path and standing are two
+components of one statistic, not two tests; a detour is counted once. A stand in a `move_to` phase is charged against
+s_exp = 0 (E3). Non-decreasing within a phase. Time enters here only, never the belief's likelihood.
+→ the same entry, E2, E3.
+
+**tail probability** (S_k) — hypothesis k's tail of the reference distribution at v·D:
+S(x) = ln(1 + e^(−βx)) / ln 2, and S = 1 for x ≤ 0. The reference distribution is the belief's own likelihood shape
+read as a density, p(x) = βL(x) / (2 ln 2) on x ≥ 0: a modelling assumption, stated as one, whose empirical adequacy is
+open. β is the movement likelihood's tolerance (above), not retuned for adequacy; this is its second meaning, the
+scale of the reference distribution. The recognizer reports S_k per live hypothesis beside the finding, for
+evaluation; it is not a belief and not a share.
+→ the same entry, R2, E5.
+
+**test level** (α) — the level the tail probabilities are tested at, per derived phase: a live hypothesis is
+inadequate in its phase when S_k < α. Recognizer configuration (a run option), default 0.05 as a convention, reported
+at every level (0.01, 0.05, 0.1), never chosen from a scenario. Not a meta-planner threshold and not θ: it does not
+touch DESIGN-07, and the meta-planner receives the categorical finding, never α or S_k. At v = 20 cm/tick and
+β = 0.01 /cm the threshold is v·D = 334 cm at α = 0.05 (17 ticks of standing, or 167 cm walked straight away from every
+live target), 497 cm at α = 0.01.
+→ the same entry, E4, E5.
+
 ---
 
 ## 6. Tasks, schemas and the world
@@ -600,13 +634,58 @@ ROBOT: what the robot's mind holds and decides. Unchanged by T-H.
 **recognizer belief** — a distribution over the live **task hypotheses** (one per `HypothesisKey`, §5) and
 `unknown`. The recognizer emits it and gates nothing.
 
-**`unknown`** — the residual hypothesis: the hypothesis that the behaviour is none of the task hypotheses. Always
+**`unknown`** — HISTORICAL (T-D R1, ruled by Hadi, 26 to 27 September 2026): the `unknown` hypothesis leaves the
+hypothesis space; the belief is normalised over the live task hypotheses only, and u, `graded_unknown_likelihood` and
+the grade f leave the belief. Of the four readings its share carried, evidence against every live task hypothesis goes
+to the **adequacy finding** (below), the mass left at exhaustion to the lifecycle state **exhausted** (below), and a
+stand enters adequacy only (E3). The text below describes the recognizer as built until the T-D Stage 1 build; so do
+the mentions of `unknown` and u in §5 (**hypothesis**, **graded evidence**, **pin** / **episode boundary**, **β, u, ρ**)
+and in **recognizer belief** above. → `docs/design_decisions.md`, "T-D R and E: the recognizer's output under a
+removed `unknown` hypothesis".
+The residual hypothesis: the hypothesis that the behaviour is none of the task hypotheses. Always
 live; its likelihood is the reference u (`UNKNOWN_LIKELIHOOD`, §5), and it takes no factor of its own. Written in
 code font. The constant `UNKNOWN` and the identifiers keep their names. Its mass is a quantity of the belief, not
 a label of the world. It rises from walked excess path, and it is also high BY NORMALISATION when few task
 hypotheses are live: it holds 1/|Live| after every **episode boundary** (§5), and 0.995 once every assigned task is
 done (prior on).
 → `docs/recognizer_handback.md` §1.1, §1.5.
+
+The four entries below are ruled (T-D R and E, 27 September 2026) and not built; the Stage 1 build builds them.
+
+**adequacy finding** — the recognizer's second output, beside the **recognizer belief** (R2): one of three values,
+**unresolved**, **adequate** or **unexplained**, with the **tail probabilities** S_k (§5) of the live hypotheses beside
+it, for evaluation. It answers what the belief's relative test cannot express: whether the best of the robot's models
+is wrong. Belief and finding are independent outputs (R3); the recognizer's state is their product plus the lifecycle
+state (**exhausted**, below); their combinations are examples of what the outputs jointly express, not a state machine,
+and no transitions are defined. Each live hypothesis is assessed against its own **derived phase** (§5) by its
+**projected completion delay** (§5), at the **test level** α (§5). The finding has no memory beyond each live
+hypothesis's current derived phase: it clears when every live hypothesis advances its phase or an episode boundary
+moves every origin (E7). The recognizer decides nothing about action with it (R5); the meta-planner receives the
+categorical finding, and what it does with it is G and X, open. A ROBOT term: it is not model coverage (label B), and
+the two can disagree.
+→ `docs/design_decisions.md`, "T-D R and E: the recognizer's output under a removed `unknown` hypothesis", R2 to R5,
+E1 to E7.
+
+**unresolved** — the value of the **adequacy finding** while no live hypothesis's current derived phase holds an
+observation (E6). For adequacy an observation exists once the phase holds walked path since its origin, or standing
+beyond the priced standing s_exp; a stationary tick within the priced duration is not an observation; an observation
+whose projected completion delay is not surprising is still an observation. No band, no constant. The log reason
+`none(unresolved)` is log text with its own meaning (the projector could not resolve the admitted hypothesis's task),
+not this word.
+→ the same entry, E6.
+
+**adequate** — the value of the **adequacy finding** when some live hypothesis's current derived phase holds an
+observation and not every live hypothesis has S_k < α: at least one live hypothesis explains its phase at the test
+level (E4). It says nothing about which hypothesis leads (that is the belief) and is not admission (that is the
+meta-planner's gate, **admitted**).
+→ the same entry, E4.
+
+**exhausted** — the recognizer's lifecycle state when no task hypothesis is live (R4): every hypothesis retired. No
+finding is reported in it, and nothing is unexplained in it. It replaces the reading "`unknown` at 0.995" (a finished
+set of assigned tasks, prior on). A ROBOT term: the world's counterparts (every assigned task done, the empty stack)
+are ground truth read from the record and can differ from it.
+→ the same entry, R3, R4.
+
 **unexplained** — the recognizer's finding that it has evidence that no live task hypothesis explains the
 observations. A finding about evidence, not a value of the belief. `unknown` can be high with nothing unexplained
 (every assigned task done, by normalisation). A stand adds no evidence of its own (I4c: an empty stretch is no
@@ -617,6 +696,13 @@ however long it lasts. (`shared/recognizer.py`: `_progress_likelihood` returns t
 pending decision on `unknown`. The evidence window the finding is judged over (every observation since the episode
 began, or only the current ones) is not yet defined; it is the retraction question (T-D Q2) and part of that
 decision.
+RULED (T-D R and E, 27 September 2026): unexplained is a value of the **adequacy finding** (above), reported only
+when every live hypothesis has S_k < α in its own derived phase (E4), and never in the lifecycle state **exhausted**
+(R4). The "pending decision" and the evidence window named in this entry are settled by it: the window is each live
+hypothesis's current derived phase (E1, E7); retraction and resumption are L. The mechanism described in this entry
+(1/u for a no-graded-signal phase, a stand adding nothing) is the recognizer as built until the Stage 1 build; under E a
+stand in a `move_to` phase counts for adequacy beyond s_exp = 0 (E3, E6).
+→ `docs/design_decisions.md`, "T-D R and E: the recognizer's output under a removed `unknown` hypothesis".
 
 **admitted** — the meta-planner's gate outcome: a task hypothesis cleared θ at admission and its projection was
 built (`[meta-proj] projection=built`). `unknown` above θ is never admitted (`none(unknown)`). The gate is the
@@ -629,9 +715,11 @@ USAGE RULE, in prose:
 - about the robot's inference result: "unexplained".
 Unmodelled (ground truth) and unexplained (the robot's finding) can disagree at a given time; that disagreement
 is why both terms exist. Not written: "unknown behaviour", "an unknown task", "`unknown` as unmodelled behaviour".
-NOT INTRODUCED: "unresolved", "recognised" and "exhausted" are not terms. They belong to the pending architecture
-decision on `unknown` (`docs/terminology_revision.md`, §6). The log reason `none(unresolved)` is log text with its
-own meaning (the projector could not resolve the admitted hypothesis's task), not this word.
+INTRODUCED BY T-D R AND E (27 September 2026), replacing the "not introduced" note of 24 September: "unresolved" and
+"exhausted" are terms (**unresolved**, **exhausted**, above), with **adequacy finding** and **adequate**. "Recognised"
+stays not a term: it would suggest that the recognizer performs the θ gate. The log reason `none(unresolved)` is log
+text with its own meaning (the projector could not resolve the admitted hypothesis's task), not the finding's value
+**unresolved**.
 
 ---
 

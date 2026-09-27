@@ -2014,6 +2014,13 @@ reproduces it). Out of I4b's scope (the likelihood form).
 Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`, `logistic_of_excess`), shared/recognizer.py (`update`)
 Reference: I4b task-boundary session; analysis/i4b_boundary/REPORT.md (deleted in the analysis cleanup, September 2026; carried in design_decisions.md, the I4b / I4c entry, and TODO-55 to TODO-59) §5, §8
 See TODO-95 (23 Sept 2026): the deferred stationarity channel is taken up there as a design task.
+T-D R AND E (27 Sept 2026; design_decisions.md, "T-D R and E: the recognizer's output under a removed `unknown`
+hypothesis"): the deferred part is CLOSED BY DECISION. Stationarity is not evidence in the belief: a stand in a
+`move_to` phase is charged in the adequacy finding, against s_exp = 0, as the standing component of the projected
+completion delay (E2, E3); the belief's likelihood and the empty-stretch rule are unchanged (R6). No second observation
+channel is added to the belief. Note: under R1 a lone live hypothesis reads 1.0 at zero evidence, by normalisation over
+the live hypothesis set, not by scoring; the symptom this TODO measured (a lone hypothesis high before the agent moves)
+thus returns in another form, expected by R1 and measured in Stage 1, not corrected. This TODO is not reopened by it.
 
 **TODO-60 — `unknown`'s u is charged per OPEN observation and never folded: the belief with no observation is the base ratio** ✅ RESOLVED (I4d)
 The accounting: for every live hypothesis k and tick t within an episode,
@@ -2128,6 +2135,14 @@ nothing (a wrong task above θ on a walk that fits no task, sustained). Decide t
 remedies, which also change what `unknown` means.
 Files: shared/likelihood_functions.py (`UNKNOWN_LIKELIHOOD`), shared/recognizer.py
 Reference: I4 evidence-model design discussion; I5 hand-back
+REFRAMED (T-D R and E, 27 Sept 2026; design_decisions.md, "T-D R and E: the recognizer's output under a removed
+`unknown` hypothesis"). The constant `unknown` leaves the hypothesis space (R1); the job it competed for, holding the
+line on behaviour that fits nothing, is now the adequacy finding's (R2, E4): unexplained when every live hypothesis's
+tail probability is below the test level. A rationality measure would compete with the adequacy finding's reference
+distribution (E5), not with `unknown`: another statement of how far observed behaviour may fall from a hypothesis's
+model before the model is judged wrong. Still DEFERRED, not built. Trigger to revisit: E5's reopening condition
+(limitation (c): data establishing a null whose spread depends on phase duration), or a ground-truth case the
+per-phase test cannot express (limitation (a)). The trigger above is superseded by this one.
 
 **TODO-64 — θ's reachability under the current model: the ceiling is 1/(1 + uⁿ), and reachability is a function of the live set** ✅ CLOSED (gate ruling, September 2026)
 ✅ CLOSED (cchat, on `analysis/g1_graded_evidence/crossings.md`): θ stays a fixed 0.75 on the normalised share,
@@ -2892,6 +2907,14 @@ Files: shared/recognizer.py (`_progress_likelihood`), shared/meta_planner.py (`u
 Reference: T-A1, September 2026
 See TODO-95 (23 Sept 2026): the deferred stationarity channel is taken up there as a design task.
 T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): half (a)'s "separate item T-H" is TODO-95; the name T-H now means the human behaviour model. The stay is written as the `stand` task, and the record says whether the human is standing inside a task (the `wait_at` of `coffee_break`), in a `stand` task (`TASK_ABSENT`) or with nothing on the stack; "a finished work order" reads "every assigned task done". Half (b) stays T-D Q1, whose ground-truth cases the record now gives.
+T-D R AND E (27 Sept 2026; design_decisions.md, "T-D R and E: the recognizer's output under a removed `unknown`
+hypothesis"): half (a) is CLOSED BY DECISION. Standing counts against pursuing a task whose phase prices no standing,
+but in the adequacy finding, not in the belief and not for `unknown`, which leaves the hypothesis space (R1): the
+standing component of the projected completion delay against the phase's priced standing (E2, E3), read against the
+reference distribution (E5); the belief's likelihood is unchanged (R6). Half (b) stays open: T-D Q1 (option 1) is
+unchanged and is P's building block; what the meta-planner does with belief, finding and lifecycle is G and X (R5).
+The observation "once the hypothesis space is exhausted `unknown` reads 0.995" is replaced by the lifecycle state
+exhausted (R4), in which no finding is reported.
 
 **TODO-86 — AgentConfig's key equality blocks a scripted delivery to another table** [deviation-case prerequisite; from T-B1a] ✅ CLOSED by T-C1 (23 Sept 2026): the work order and the script are compared by provenance (every assigned task exactly once), not by key equality; a delivery to another table is a `deviate` edit of an assigned task. design_decisions.md, "The human action script (T-C1, decided)". ✅ BUILT (T-C2a): `shared.types.check_work_order`, run by `AgentConfig.__post_init__` and by the loader on the resolved script; a `deviate` to another table keeps the assigned task's provenance
 `AgentConfig.__post_init__` (shared/types.py) requires the human's `assigned_tasks` keys to equal the
@@ -3048,9 +3071,27 @@ should decay, be reset by another event, or stand, is a recognizer question for 
 Files: shared/recognizer.py
 Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
 
-**TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN]
+**TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN; its recognition level CLOSED by decision, T-D R and E, 27 Sept 2026]
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
 the pass or stays recorded for T-H.
+T-D R AND E (Hadi, 26 to 27 Sept 2026; design_decisions.md, "T-D R and E: the recognizer's output under a removed
+unknown hypothesis"). Supersedes the status line above. The RECOGNITION LEVEL (level 4 below) is CLOSED BY DECISION
+(E3, E5): a stand does not become evidence in the belief. Time enters the adequacy finding only (E3), as the standing
+component of the projected completion delay D against the phase's priced standing s_exp (E2), read against the
+reference distribution of E5; the belief's likelihood and the empty-stretch rule stand (R6), and the `unknown`
+hypothesis leaves the hypothesis space (R1). The design questions below, as answered there: 1 (the observation) by
+E1, E2 and E6: the unit is each live hypothesis's derived phase, from its origin; standing beyond s_exp is an
+observation for adequacy, not for the belief; the finding clears at a phase advance or a boundary (E7). 2 (direction
+per hypothesis) by E2's s_exp per action (0 for move_to, 1 tick for pick_up and place, the bound duration for
+wait_at); the schema durations of pick_up and place are a dependency to verify in the build. 3 (the likelihood form):
+not a likelihood; D and the tail S of E5; the odds-against-`unknown` invariant no longer exists, replaced by R6's
+sum-to-1 over the live hypothesis set H. 4 (TODO-59 must not return): standing confirms nothing in the belief (E3,
+R6); R1's lone live hypothesis at 1.0 on zero evidence is by normalisation, expected and measured in Stage 1 (R1). 5
+(what it means to the meta-planner) is G, open. 6: "a reading of `unknown`" is gone with R1; whether a stay is ever
+written as a foreseeable task is not ruled by R and E.
+THE OTHER LEVELS STAY OPEN: level 1 (decision level) is T-D Q1 (option 1), unchanged, P's building block, not built;
+level 2 (the blocked event, WAIT against RECONSIDER) and level 3 (communication on a persistent finding, TODO-96) are
+X; what the meta-planner does with belief, finding and lifecycle is G (R5). Each is ruled on Stage 1's results.
 TERMS (24 Sept 2026, `docs/glossary.md` §7): this entry predates the terminology ruling. Where it says "unknown
 (unmodelled)", "unknown behaviour" or "assigned, foreseeable and unknown behaviour", read unmodelled behaviour (a
 world label); `unknown` in code font is the residual hypothesis of the belief. The two are not the same thing: a
@@ -3241,6 +3282,14 @@ The interface it needs (recorded, not designed):
   adapter's belief puts all mass on it. The adapter is the body's (it holds the record and the robot's side) and hands
   the meta-planner a `BeliefState` as today; `TaskAbsent`, `BindingAbsent` and the empty stack are the open cases
   above.
+- THE T-D STAGE 1 EVALUATION (T-D R and E, 27 Sept 2026; design_decisions.md, "T-D R and E: the recognizer's output
+  under a removed `unknown` hypothesis", Staging): after the Stage 1 build (the recognizer side, the baselines
+  regenerated, the gate left as it is), verify the arithmetic invariant of R6 (on every tick the returned
+  probabilities sum to 1 over exactly the live hypothesis set H) and, separately, the adequacy accounting; the
+  recognizer's outputs (belief, adequacy finding, lifecycle state) per ground-truth case against oracle IR; admissions
+  before and after on the maintained baselines; false-unexplained per phase and per run, missed findings and detection
+  delay, at every test level α (0.01, 0.05, 0.1). The ground truth is the record's (`truth_at`, `coverage`); the oracle
+  interface above serves it.
 Reference: design_decisions.md, "T-H: the human behaviour model", item 10; roadmap, "The plan from T-A"
 
 **TODO-102: A per-robot task model on the robot's `AgentConfig` (recorded, T-H1, 25 Sept 2026)** [OPEN, recorded only]

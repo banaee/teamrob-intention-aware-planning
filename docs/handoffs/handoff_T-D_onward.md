@@ -55,6 +55,13 @@ of and how one is stated:
   variant that becomes a fixture is written as its own scenario (or layout, or setup). The viewer shows the run file
   and edits the three kinds in it. Not an injection: a change during a run stays Phase 7's.
 
+T-D R and E (ruled by Hadi, 26 to 27 September 2026; design_decisions.md, "T-D R and E: the recognizer's output under
+a removed `unknown` hypothesis"; glossary §5 and §7) is T-D's first ruling on this structure: the `unknown` hypothesis
+leaves the hypothesis space, and the recognizer reports an adequacy finding (unresolved, adequate, unexplained) and the
+lifecycle state exhausted beside the belief. Staging: Stage 1 builds the recognizer side, the gate left as it is, and
+is evaluated (TODO-101); then L, P, G and X, each ruled on Stage 1's results and recorded before its build. T-D Q1
+(option 1) is unchanged and is P's building block.
+
 ## 0. How to use this document
 
 - The repo on `main` at `528924d` (pushed after the authoring-convention records) is the base. The
@@ -405,6 +412,11 @@ TODOS_AND_DEFERRED.md), so T-D starts from observations, not expectations:
    indistinguishable from a high `unknown` raised by evidence, a walk no live task hypothesis explains
    (scenario_s01_02, 06; terms: `docs/glossary.md` §7). T-D decides whether
    the distinction matters for `update()` (part of T-D Q1).
+   RESOLVED by R4 (T-D R and E, 27 September 2026): exhausted is a lifecycle state of the recognizer, reported when
+   no task hypothesis is live; no finding is reported in it and nothing is unexplained in it; it replaces the reading
+   "`unknown` at 0.995". A high `unknown` raised by evidence becomes the finding unexplained (R2, E4). What `update()`
+   does with either is G, open. design_decisions.md, "T-D R and E: the recognizer's output under a removed `unknown`
+   hypothesis".
 7. Smaller: a hold can put the robot at the human's projected destination (scenario_s07_05: hold placed
    at kitting_table_1, the human walked up to the standing robot, 1.1 cm; consistent with F1, but
    matters for how the demonstration looks). env_layout_05's beliefs are diffuse (wide hypothesis space).
