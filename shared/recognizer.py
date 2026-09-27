@@ -70,9 +70,15 @@ ALGORITHM:
 
     Completed tasks: judged on the TERMINAL action's completion condition
     directly (obj_at(item, table), waited(agent, machine)), whatever the phase
-    walk did and whoever did it — the task is done and nobody can do it again.
-    A completed hypothesis is skipped in the update (it accumulates no more
-    evidence) AND pinned at BELIEF_FLOOR on output, for the rest of the run.
+    walk did and whoever did it — the task is done and nobody can do it again
+    while that holds. A completed hypothesis is RETIRED: skipped in the update
+    (it accumulates no more evidence) AND pinned at BELIEF_FLOOR on output,
+    for as long as its terminal fact holds, read from the world on every tick
+    (T-D L4). When the fact stops holding (waited(agent, machine) clears on
+    the agent's next step; a delivered item is moved) the hypothesis is live
+    again: it re-enters as a first observation (origin the current position,
+    no entry latency, its derived action from the world) with exactly 1/|H|
+    of the evidence, the incumbents keeping their proportions (arithmetic C).
 
     Episodes (I4b, I4c): the recognizer estimates the intention of the
     observed agent's CURRENT BEHAVIOURAL EPISODE — deliver_item(item_3) means
@@ -81,27 +87,32 @@ ALGORITHM:
     seems uninterested in shelf_9" could live. Within a task, a phase advance
     ends a PHASE: the closing phase's value folds into the evidence and is
     retained, so a task grows more likely as more of its actions verifiably
-    complete (prefix accumulation). A task boundary ends the EPISODE: when a
-    completion retires a hypothesis whose expected action on the previous tick
-    WAS its terminal action — the observed agent's own derived phase had
-    reached the completing action — the observed agent has finished a task,
-    and the belief re-initialises to the prior over the hypotheses still live,
+    complete (prefix accumulation). An episode boundary ends the EPISODE
+    (T-D L1 as amended): when the observed agent completes an action that is
+    terminal in the task model (place, wait_at) — its preconditions held for
+    the agent on the previous tick and a grounding of its completion
+    condition under that binding holds now and did not then — whatever its
+    binding and wherever it sits in a decomposition (a misdelivery, the
+    return of deliver_with_return, a delivery outside the support), the
+    belief re-initialises to the prior over the hypotheses still live,
     uniformly, with no dependence on any hypothesis's fold history; every
-    origin moves to the agent's current position; completed tasks stay
-    pinned. Nothing crosses the boundary, and no persistence layer carries
-    anything across it: cross-episode information is outside the
-    task-hypothesis model by decision, and would need its own representation.
-    The pin and the boundary answer different questions and deliberately do
-    not share a criterion: the pin asks whether the task is complete in the
-    world (whoever did it — the normalisation set shrinks, the belief does
-    not re-initialise); the boundary asks whether the observed agent changed
-    episode, and another agent completing a task is not such a moment. The
-    attribution is the recognizer's own phase state — no authorship in the
-    world state, no microaction vocabulary — and it assumes that an agent
-    whose derived phase reached the terminal action is the one who completed
-    it.
+    origin moves to the agent's current position; retired tasks stay pinned.
+    Nothing crosses the boundary, and no persistence layer carries anything
+    across it: cross-episode information is outside the task-hypothesis model
+    by decision, and would need its own representation; the world carries
+    what persists (L5). The pin and the boundary answer different questions
+    and each has its own observable: the pin asks whether a live
+    hypothesis's task is complete in the world (whoever did it — the
+    normalisation set shrinks, the belief does not re-initialise); the
+    boundary asks whether the observed agent completed a terminal action,
+    read through the action's own binding to that agent — another agent
+    completing a task is not such a moment, and no microaction is read (a
+    bare RELEASE is no boundary). A boundary at a pin is the case where the
+    terminal action also produces the task's terminal fact; a task whose
+    execution ends without it stays live. The boundary tick is flagged on
+    the belief (episode_boundary).
 
-    Output belief = evidence × ω_context, with inadmissible and completed
+    Output belief = evidence × ω_context, with inadmissible and retired
     hypotheses pinned at BELIEF_FLOOR and the floor applied. ω_context is a fact
     about the current state, not an event: applied to the output only, never
     fed back. The distribution is over TASKS; the phase is internal. The R6
@@ -200,10 +211,11 @@ OUTPUTS:
 
 import itertools
 import logging
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from dataclasses import dataclass
+from typing import Callable, Dict, FrozenSet, List, Optional, Set, Tuple
 
 from shared.types import (
-    Observation, BeliefState, WorldState, GroundedAction,
+    Observation, BeliefState, WorldState, GroundedAction, ActionSchema, Predicate,
     TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, same_task,
     AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy,
 )
@@ -311,6 +323,21 @@ def build_hypothesis_space(
                 bindings=dict(zip(var_names, combo)),
             ))
     return hypotheses
+
+@dataclass
+class EnabledTerminal:
+    """
+    A terminal action the observed agent could complete on the next tick
+    (T-D L1): `action`'s preconditions hold for the agent under `bindings`
+    on this tick, and `held` are the groundings of its completion condition
+    under them that already hold. The recognizer's own derived state, kept
+    one tick, never the world state: on the next tick a grounding of the
+    completion outside `held` is the agent's completion of the action.
+    """
+    action: ActionSchema
+    bindings: Dict[str, str]
+    held: FrozenSet[Predicate]
+
 
 # =============================================================================
 # IntentionRecognizer
@@ -453,15 +480,21 @@ class IntentionRecognizer:
         #                   phase's value is recomputed from _origin each tick
         #                   and multiplied on top, never into it; re-initialised
         #                   to the prior at every episode boundary.
-        #   _completed      keys whose terminal completion condition has held:
-        #                   skipped and pinned for the rest of the run
+        #   _retired        keys whose terminal completion condition holds on
+        #                   this tick (T-D L4): skipped and pinned while it holds,
+        #                   live again (a first observation) when it stops
         self._expected: Dict[str, Optional[GroundedAction]] = {}
         self._origin: Dict[str, Tuple[float, float]] = {}
         self._origin_odo: Dict[str, float] = {}
         self._origin_still: Dict[str, int] = {}
         self._entry_latency: Dict[str, float] = {}
         self._base: Dict[str, float] = {}
-        self._completed: Set[str] = set()
+        self._retired: Set[str] = set()
+        # The terminal actions of the task model (T-D L1): the observed agent's
+        # completion of one is the episode boundary. Per observed agent, the
+        # ones it could complete on the next tick (EnabledTerminal).
+        self._terminal_actions: List[ActionSchema] = task_model.terminal_actions()
+        self._enabled: Dict[str, List[EnabledTerminal]] = {}
         # Per observed agent: total path length walked since its first
         # observation (the sum of straight-line steps between consecutive
         # observed positions) and the position that total was last advanced to.
@@ -511,8 +544,8 @@ class IntentionRecognizer:
 
     def _begin_episode(self, pos: Tuple[float, float], odo: float, still: int) -> None:
         """
-        An episode boundary: the observed agent has completed a task, and the
-        intention the recognizer estimates — the task of the CURRENT
+        An episode boundary: the observed agent has completed a terminal
+        action (T-D L1), and the intention the recognizer estimates — the task of the CURRENT
         behavioural episode — is a new question. The ended episode's evidence
         (every fold, every event) is discarded uniformly: every live
         hypothesis's base becomes the prior over the hypotheses still live,
@@ -523,8 +556,9 @@ class IntentionRecognizer:
         Every phase is empty, so the belief IS the prior until the agent moves.
         On this tick no hypothesis is a member of the adequacy test (the
         finding is unresolved, or the lifecycle exhausted); on the next, the
-        priced latency tick is an observation (E6, second amendment). Completed hypotheses are not
-        live and stay pinned.
+        priced latency tick is an observation (E6, second amendment). Retired hypotheses are not
+        live and stay pinned. The latency at a boundary that ends no task is
+        priced as at any boundary.
         Nothing crosses the boundary: a task hypothesis says which task is
         being executed now, not what the agent is disposed to do next, and
         there is no representation here for the latter.
@@ -588,7 +622,7 @@ class IntentionRecognizer:
         Pin every key in `pinned` at BELIEF_FLOOR and rescale the live mass to
         fill what is left, so the result spans the full hypothesis space and
         still sums to 1.0. `distribution` holds the live keys only, normalized.
-        Used for inadmissible hypotheses (restriction) and for completed
+        Used for inadmissible hypotheses (restriction) and for retired
         hypotheses (the terminal pin) alike.
 
         Pinned at the floor rather than at zero for the reason the floor exists
@@ -616,7 +650,9 @@ class IntentionRecognizer:
              guard-selected method, walked from the start to the first action
              whose completion condition does not hold);
           2. if the TERMINAL action's completion holds, the task is complete:
-             retire the hypothesis (skipped here, pinned in _output) for good;
+             retire the hypothesis (skipped here, pinned in _output) while it
+             holds; a retired hypothesis whose fact no longer holds re-enters
+             as a first observation, at 1/|H| (L4);
           3. if the observed microaction is in the vocabulary of the action the
              hypothesis expected on the previous tick, that action's completion
              check multiplies onto its evidence (an event);
@@ -634,12 +670,12 @@ class IntentionRecognizer:
              this tick only (replaced next tick): 1 while D <= 0 (nothing
              walked and no standing beyond the priced standing — not a
              charge).
-        Then normalize over the live hypothesis set H (T-D R1, R6). If a
-        retirement this tick was the observed agent's own (step 2, terminal
-        action expected on the previous tick), the episode ends: the belief
+        Then normalize over the live hypothesis set H (T-D R1, R6). If the
+        observed agent completed a terminal action on this tick
+        (_observed_terminal_completion, L1), the episode ends: the belief
         re-initialises to the prior over H and every origin moves to the
         agent's position (_begin_episode); this tick reports the re-initialised
-        belief. Last, the adequacy finding and the lifecycle state are read
+        belief, flagged episode_boundary. Last, the adequacy finding and the lifecycle state are read
         from the phase state as it stands (_adequacy).
 
         ω_context is applied to the output only (see _output()). The recognizer
@@ -667,38 +703,58 @@ class IntentionRecognizer:
         odo = self._odometer[agent]
         still = self._still[agent]
 
+        # The episode boundary (T-D L1): the observed agent completed a
+        # terminal action on this tick, read from the world's completion
+        # conditions, whatever the hypotheses expected.
+        completed_terminal = self._observed_terminal_completion(agent, world)
+        boundary = completed_terminal is not None
+
         unnorm: Dict[str, float] = {}
-        boundary = False
         # The hypotheses whose expected action completed on this tick (E8).
         advanced: Set[str] = set()
+        # Retired hypotheses whose terminal fact stopped holding (L4).
+        returning: List[str] = []
         for hyp in self._hypotheses:
             key = repr(hyp)
-            if key in self._inadmissible or key in self._completed:
+            if key in self._inadmissible:
                 continue
             actions = self._grounded_actions(hyp, obs.agent_id, world)
             if actions is not None and self._terminal_complete(actions, world):
-                if self._task_boundary(self._expected.get(key), actions):
-                    boundary = True
-                self._completed.add(key)
-                self._base.pop(key, None)
-                self._expected.pop(key, None)
-                self._origin.pop(key, None)
-                self._origin_odo.pop(key, None)
-                self._origin_still.pop(key, None)
-                self._entry_latency.pop(key, None)
-                logging.info("[IR-complete] step=%d %s completed: %s holds",
-                             int(obs.timestamp), key, actions[-1].completion_predicate)
+                # The terminal pin: retired while its terminal fact holds (L4).
+                if key not in self._retired:
+                    self._retired.add(key)
+                    self._base.pop(key, None)
+                    self._expected.pop(key, None)
+                    self._origin.pop(key, None)
+                    self._origin_odo.pop(key, None)
+                    self._origin_still.pop(key, None)
+                    self._entry_latency.pop(key, None)
+                    logging.info("[IR-complete] step=%d %s completed: %s holds",
+                                 int(obs.timestamp), key, actions[-1].completion_predicate)
                 continue
+            if key in self._retired:
+                if actions is None:
+                    # Not decomposable here: its terminal fact cannot be read,
+                    # so nothing says it stopped holding; it stays retired.
+                    continue
+                # Its terminal fact no longer holds: live again (L4), entering
+                # as a first observation; its share is set after the loop.
+                self._retired.discard(key)
+                returning.append(key)
+                logging.info("[IR-reentry] step=%d %s live again: %s no longer holds",
+                             int(obs.timestamp), key, actions[-1].completion_predicate)
             current = self._expected_action(actions, world)
 
             if key not in self._expected:
-                # First observation of this hypothesis: it enters its current
-                # action here, from no completion (E9: nothing priced before
-                # its own standing). Its phase is empty: D <= 0, no charge.
+                # First observation of this hypothesis (or its re-entry, L4):
+                # it enters its current action here, from no completion (E9:
+                # nothing priced before its own standing). Its phase is empty:
+                # D <= 0, no charge.
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
                 self._origin_still[key] = still
                 self._entry_latency[key] = 0.0
-                unnorm[key] = self._base[key]
+                if key not in returning:
+                    unnorm[key] = self._base[key]
                 continue
 
             previous = self._expected[key]
@@ -725,6 +781,17 @@ class IntentionRecognizer:
             # The open phase's value (E10): 1 while its delay is not positive.
             unnorm[key] = self._base[key] * self._phase_likelihood(key, current, pos, odo, still, world, memo)
 
+        if returning:
+            # Re-entry (L4, arithmetic C): each returning hypothesis takes
+            # exactly 1/|H| of the evidence, H the live set with it; the
+            # incumbents share the rest in this tick's proportions. With k
+            # returning and n incumbents, a returning value of (the
+            # incumbents' total) / n normalises to 1/(n + k).
+            share = sum(unnorm.values()) / len(unnorm) if unnorm else 1.0
+            for key in returning:
+                unnorm[key] = share
+                self._base[key] = share
+
         # One normalization, at the task layer, over the live hypothesis set H
         # (T-D R1): the keys of unnorm are exactly H. The bases are rescaled by the same total so they stay in one scale
         # with each other (ratios are untouched) and so that
@@ -735,17 +802,18 @@ class IntentionRecognizer:
         self._evidence = {k: v / total for k, v in unnorm.items()}
 
         if boundary:
-            # The observed agent's task boundary ends the behavioural episode:
-            # the next one's inference starts from the prior, here, and this
-            # tick already reports it (the ended episode's closing values are
-            # not a belief the model holds any more).
+            # The observed agent's episode boundary ends the behavioural
+            # episode: the next one's inference starts from the prior, here,
+            # and this tick already reports it (the ended episode's closing
+            # values are not a belief the model holds any more). A re-entry on
+            # this tick is governed by it.
             self._begin_episode(pos, odo, still)
             # The boundary is unchanged by E8: the hypotheses entering the new
             # episode hold no observation on this tick.
             advanced = set()
-            logging.info("[IR-boundary] step=%d %s completed a task: belief re-initialised to the "
+            logging.info("[IR-boundary] step=%d %s completed %s: belief re-initialised to the "
                          "prior over %d hypotheses, origins reset",
-                         int(obs.timestamp), agent, len(self._origin))
+                         int(obs.timestamp), agent, self._action_label(completed_terminal), len(self._origin))
 
         distribution = self._output(obs, world)
         if self._evidence:
@@ -770,6 +838,7 @@ class IntentionRecognizer:
             lifecycle=lifecycle,
             tails=tails,
             hypothesis_adequacy=hypothesis_adequacy,
+            episode_boundary=boundary,
         )
 
     # -------------------------------------------------------------------------
@@ -984,18 +1053,18 @@ class IntentionRecognizer:
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
         The belief reported this tick: evidence × ω_context, with the
-        inadmissible and the completed hypotheses pinned at BELIEF_FLOOR and the
+        inadmissible and the retired hypotheses pinned at BELIEF_FLOOR and the
         floor applied. State factors only — nothing here is fed back.
         """
         unnorm: Dict[str, float] = {}
         for key, p in self._evidence.items():
             unnorm[key] = p * self._context_weight(obs, world, self._by_key[key])
-        return self._finalize(unnorm, self._inadmissible | self._completed)
+        return self._finalize(unnorm, self._inadmissible | self._retired)
 
     def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:
         """Normalize, floor, and pin an unnormalized posterior over the live
         keys — the output step. `pinned` defaults to the inadmissible set;
-        _output() adds the completed hypotheses."""
+        _output() adds the retired hypotheses."""
         total = sum(unnorm.values()) or 1.0
         distribution = {k: v / total for k, v in unnorm.items()}
 
@@ -1061,20 +1130,49 @@ class IntentionRecognizer:
         predicate = actions[-1].completion_predicate
         return predicate is not None and predicate in world.predicates
 
+    def _observed_terminal_completion(self, agent: str, world: WorldState) -> Optional[GroundedAction]:
+        """
+        The episode boundary's observable (T-D L1 as amended): the terminal
+        action the observed agent completed on this tick, or None. A terminal
+        action (the task model's, terminal_actions()) is completed by the
+        agent iff its preconditions held for the agent on the previous tick
+        (EnabledTerminal, kept from then) and a grounding of its completion
+        condition under that binding holds now and did not then: place,
+        holding(agent, x) then obj_at(x, c) — the release leaves the object
+        placed at a container, whichever; wait_at, at(agent, e) then
+        waited(agent, e). Read from the world through the planner (I2), for
+        the observed agent by the action's own binding: another agent's
+        delivery is no completion of this agent's, a bare RELEASE changes no
+        completion condition, and no hypothesis's phase is consulted. Then
+        records this tick's enabled terminal groundings for the next. The
+        first of several completions on one tick is returned (terminal
+        actions in declaration order, bindings sorted); none on the first
+        observation.
+        """
+        completed: Optional[GroundedAction] = None
+        for enabled in self._enabled.get(agent, []):
+            for grounded in self._planner.completed_groundings(enabled.action, enabled.bindings, world):
+                if completed is None and grounded.completion_predicate not in enabled.held:
+                    completed = grounded
+        self._enabled[agent] = [
+            EnabledTerminal(
+                action=action,
+                bindings=bindings,
+                held=frozenset(g.completion_predicate
+                               for g in self._planner.completed_groundings(action, bindings, world)),
+            )
+            for action in self._terminal_actions
+            for bindings in self._planner.enabled_groundings(action, agent, world)
+        ]
+        return completed
+
     @staticmethod
-    def _task_boundary(previous: Optional[GroundedAction], actions: List[GroundedAction]) -> bool:
-        """
-        Whether a retirement is the OBSERVED AGENT's task boundary: the
-        hypothesis expected the terminal action on the previous tick, i.e. the
-        agent's own derived phase had reached the action whose completion now
-        holds. A completion that arrives while the hypothesis still expected an
-        earlier action (another agent delivered the item; the agent was never
-        there) retires the hypothesis (the pin) but is nobody's boundary here.
-        Assumes an agent whose phase reached the terminal action is the one
-        who completed it — the recognizer's own evidence, not authorship in
-        the world state (I1 finding 5: there is none).
-        """
-        return IntentionRecognizer._same_action(previous, actions[-1])
+    def _action_label(action: GroundedAction) -> str:
+        """A grounded action as the [IR-boundary] line names it: its name and
+        its parameters' values in the schema's order, e.g.
+        place(item_1,kitting_table_1)."""
+        values = ",".join(action.bindings.get(p.name, p.name) for p in action.schema.parameters)
+        return f"{action.action_name}({values})"
 
     @staticmethod
     def _same_action(a: Optional[GroundedAction], b: Optional[GroundedAction]) -> bool:

@@ -117,6 +117,11 @@ class BeliefState:
                   categorical reading of its membership and S_k against alpha.
                   Empty exactly when EXHAUSTED. The meta-planner reads the
                   leader's value only (its gate, _clears_gate).
+    episode_boundary
+                  whether this tick is an episode boundary: the observed agent
+                  completed a terminal action (T-D L1) and the belief was
+                  re-initialised to the prior over H (L5). The meta-planner
+                  reads it against its decision record (L5 B).
     """
     timestamp: float
     agent_id: str
@@ -127,6 +132,7 @@ class BeliefState:
     lifecycle: RecognizerLifecycle
     tails: Dict[str, float]  # {intention_id: S_k}, members of the adequacy test only
     hypothesis_adequacy: Dict[str, HypothesisAdequacy]  # {intention_id: value}, every live hypothesis
+    episode_boundary: bool  # the belief was re-initialised at an episode boundary on this tick
     # predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}  
                             # OUTDATED: current design uses ProjectedPlan for multi-step prediction; 
                             # this field is retained for backward compatibility but should not be used in new code.

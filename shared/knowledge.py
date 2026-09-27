@@ -114,6 +114,37 @@ class ProceduralKnowledge:
         """Every ActionSchema held (schema validation at construction)."""
         return list(self._actions.values())
 
+    def terminal_actions(self) -> List[ActionSchema]:
+        """
+        The action schemas that are TERMINAL in this knowledge: the last step
+        of some method of a task schema held here, a TaskStep's sub-task
+        followed to its own methods' last steps. Once each, by identity, in
+        declaration order. Terminal is a property of the schema, whatever its
+        binding and wherever else it is called (kitting's robot task model:
+        place and wait_at; place is also the second step of
+        deliver_with_return). The recognizer's episode boundary is the observed
+        agent's completion of one (T-D L1).
+        """
+        found: List[ActionSchema] = []
+        seen: List[TaskSchema] = []
+
+        def visit(task: TaskSchema) -> None:
+            if any(t is task for t in seen):
+                return
+            seen.append(task)
+            for method in task.methods:
+                if not method.steps:
+                    continue
+                last = method.steps[-1]
+                if isinstance(last, TaskStep):
+                    visit(last.task)
+                elif not any(a is last.action for a in found):
+                    found.append(last.action)
+
+        for task in self._tasks.values():
+            visit(task)
+        return found
+
     def get_microactions(self) -> List[str]:
         """Terminal microactions: ['STEP', 'GRASP', 'RELEASE', 'STAND']."""
         return self._microactions

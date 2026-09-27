@@ -145,6 +145,83 @@ class AdaptivePlanner:
         predicate = actions[-1].completion_predicate if actions else None
         return predicate is not None and predicate in world.predicates
 
+    def enabled_groundings(
+        self,
+        action: ActionSchema,
+        agent_id: str,
+        world: WorldState,
+    ) -> List[Dict[str, str]]:
+        """
+        Every binding under which `action`'s preconditions hold for `agent_id`
+        in `world` (?agent injected as decompose() does): what the agent could
+        complete next. All of them, not the guards' first sorted match — an
+        agent standing between two objects is at both. Sorted, so the order is
+        a function of the world alone. The recognizer asks it of the terminal
+        actions for the observed agent (T-D L1); `place` binds ?item through
+        holding(?agent, ?item), `wait_at` ?entity through at(?agent, ?entity).
+        """
+        return self._satisfying(action.preconditions, {"?agent": agent_id}, world)
+
+    def completed_groundings(
+        self,
+        action: ActionSchema,
+        bindings: Dict[str, str],
+        world: WorldState,
+    ) -> List[GroundedAction]:
+        """
+        `action` grounded under every extension of `bindings` by which its
+        completion condition holds in `world`: the completions of this action
+        the world shows, e.g. place(?item=item_1, ?target=kitting_table_1) for
+        obj_at(item_1, kitting_table_1) when `bindings` holds ?item only. Empty
+        for a ProcessCompletion (nothing outside the executor observes it).
+        Sorted by the grounded bindings.
+        """
+        if not isinstance(action.completion, ConditionSchema):
+            return []
+        return [self._ground_action(action, b)
+                for b in self._satisfying([action.completion], bindings, world)]
+
+    def _satisfying(
+        self,
+        conditions: List[ConditionSchema],
+        bindings: Dict[str, str],
+        world: WorldState,
+    ) -> List[Dict[str, str]]:
+        """
+        Every extension of `bindings` under which all `conditions` hold in
+        `world`: each condition matched against world.predicates by name,
+        arity and the values of its bound arguments, binding its free Vars
+        (any number; a Var repeated must match one value), or the built-in
+        'not_equal', as in _guards_satisfied(). Depth-first, in condition
+        order; the result deduplicated and sorted by its items.
+        """
+        partial: List[Dict[str, str]] = [dict(bindings)]
+        for condition in conditions:
+            extended: List[Dict[str, str]] = []
+            for current in partial:
+                if condition.name == "not_equal":
+                    left, right = condition.args
+                    left_val = current[left.name] if isinstance(left, Var) else left.value
+                    right_val = current[right.name] if isinstance(right, Var) else right.value
+                    if left_val != right_val:
+                        extended.append(current)
+                    continue
+                for pred in world.predicates:
+                    if pred.name != condition.name or len(pred.args) != len(condition.args):
+                        continue
+                    candidate = dict(current)
+                    for arg, value in zip(condition.args, pred.args):
+                        if isinstance(arg, Const):
+                            if arg.value != value.value:
+                                break
+                        elif candidate.setdefault(arg.name, value.value) != value.value:
+                            break
+                    else:
+                        extended.append(candidate)
+            partial = extended
+        unique = {tuple(sorted(b.items())): b for b in partial}
+        return [unique[k] for k in sorted(unique)]
+
     # ------------------------------------------------------------------
     # Internal decomposition
     # ------------------------------------------------------------------

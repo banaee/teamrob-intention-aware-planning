@@ -70,7 +70,7 @@ def obs(t, pos):
 
 
 def live_set(rec):
-    return {repr(h) for h in rec._hypotheses} - rec._inadmissible - rec._completed
+    return {repr(h) for h in rec._hypotheses} - rec._inadmissible - rec._retired
 
 
 def check_r6(rec, belief):
@@ -143,7 +143,7 @@ def test_r6_invariant_every_tick_with_pins_and_a_retirement(model):
         check_r6(rec, b)
         if t >= 20:
             retired = repr(item("item_2"))
-            assert retired in rec._completed
+            assert retired in rec._retired
             assert retired not in rec._evidence and retired not in b.tails
             assert b.distribution[retired] == BELIEF_FLOOR
     assert retired is not None
