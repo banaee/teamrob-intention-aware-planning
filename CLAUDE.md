@@ -152,7 +152,7 @@ Decisions
   recognizer in isolation, on a layout, setup and scenarios written for it, against expectations derived from the entry
   before the run, in three sessions: TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the
   expectation generator, the runs, the report; `analysis/ir_testbed/`). The cognitive loop does not end with the task
-  pool (ruled 27 Sept 2026; design_decisions.md, the entry of that name; to be built in TB.2b): observation and
+  pool (ruled 27 Sept 2026; design_decisions.md, the entry of that name; built in TB.2b): observation and
   recognition run on every tick, and an empty pool stops planning and execution only.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5

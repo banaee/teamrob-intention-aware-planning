@@ -1,0 +1,121 @@
+
+F. The adequate-below-θ pattern: ticks where the finding is adequate, the true hypothesis (the lag-corrected truth's)
+is a member with S = 1, and its belief is below θ (0.75). Per run (IR-identical runs once), at each α (the finding
+is recomputed per α; the member condition does not depend on α), split by the phase the human is in (the record's
+action at t: wait_at, pick_up, place, move_to), with the ticks as ranges and the rival that holds the belief.
+
+
+scenario_s01_01 on
+  move_to  ticks α=.01/.05/.10: 9/9/9  at 0-8
+
+scenario_s02_01 on
+  move_to  ticks α=.01/.05/.10: 75/75/75  at 0-22,77-123,155-159
+  place    ticks α=.01/.05/.10: 1/1/1  at 76  leader elsewhere: ac_switch_0
+  wait_at  ticks α=.01/.05/.10: 7/7/7  at 124-129,154  leader elsewhere: ac_switch_0
+
+scenario_s03_01 on  [x3]
+  move_to  ticks α=.01/.05/.10: 5/5/5  at 0-4
+
+scenario_s01_06 on
+  move_to  ticks α=.01/.05/.10: 18/18/18  at 0-17
+
+scenario_s04_01 on
+  move_to  ticks α=.01/.05/.10: 99/99/99  at 0-18,117-153,185-204,207-213,227-242
+  place    ticks α=.01/.05/.10: 1/1/1  at 116  leader elsewhere: ac_switch_0
+  wait_at  ticks α=.01/.05/.10: 7/7/7  at 154-157,184,206,226  leader elsewhere: ac_switch_0
+
+scenario_s03_06 on
+  move_to  ticks α=.01/.05/.10: 19/19/19  at 0-5,56-68
+  place    ticks α=.01/.05/.10: 1/1/1  at 55  leader elsewhere: coffee_machine_0
+
+scenario_s05_01 on  [x4]
+  move_to  ticks α=.01/.05/.10: 29/29/29  at 0-24,56-59
+  wait_at  ticks α=.01/.05/.10: 8/8/8  at 25-31,55  leader elsewhere: ac_switch_0
+
+scenario_s06_01 on  [x5]
+  move_to  ticks α=.01/.05/.10: 4/4/4  at 0-3
+
+scenario_s06_02 on  [x3]
+  move_to  ticks α=.01/.05/.10: 4/4/4  at 0-3
+
+scenario_s06_03 plain on  [x4]
+  move_to  ticks α=.01/.05/.10: 4/4/4  at 0-3
+
+scenario_s01_01 off
+  move_to  ticks α=.01/.05/.10: 68/68/68  at 0-36,80-109,112
+  pick_up  ticks α=.01/.05/.10: 2/2/2  at 110-111
+  place    ticks α=.01/.05/.10: 1/1/1  at 79
+
+scenario_s02_01 off
+  move_to  ticks α=.01/.05/.10: 183/183/183  at 0-30,33,77-123,155-241,311-327
+  pick_up  ticks α=.01/.05/.10: 2/2/2  at 31-32
+  place    ticks α=.01/.05/.10: 2/2/2  at 76,310  leader elsewhere: ac_switch_0
+  wait_at  ticks α=.01/.05/.10: 11/11/11  at 124-133,154  leader elsewhere: ac_switch_0
+
+scenario_s03_01 off  [x2]
+  move_to  ticks α=.01/.05/.10: 62/62/62  at 0-21,24-28,56-87,90-92
+  pick_up  ticks α=.01/.05/.10: 4/4/4  at 22-23,88-89
+  place    ticks α=.01/.05/.10: 1/1/1  at 55
+
+scenario_s01_06 off
+  move_to  ticks α=.01/.05/.10: 34/34/34  at 0-25,76-83
+  place    ticks α=.01/.05/.10: 1/1/1  at 75  leader elsewhere: item_2
+
+scenario_s04_01 off
+  move_to  ticks α=.01/.05/.10: 119/119/119  at 0-18,117-153,185-204,207-216,227-259
+  place    ticks α=.01/.05/.10: 1/1/1  at 116  leader elsewhere: ac_switch_0
+  wait_at  ticks α=.01/.05/.10: 7/7/7  at 154-157,184,206,226  leader elsewhere: ac_switch_0
+
+scenario_s03_06 off
+  move_to  ticks α=.01/.05/.10: 74/74/74  at 0-21,24-28,56-87,90-92,123-134
+  pick_up  ticks α=.01/.05/.10: 4/4/4  at 22-23,88-89
+  place    ticks α=.01/.05/.10: 2/2/2  at 55,122  leader elsewhere: coffee_machine_0
+
+scenario_s05_01 off  [x3]
+  move_to  ticks α=.01/.05/.10: 45/45/45  at 0-24,56-61,64-69,96-103
+  pick_up  ticks α=.01/.05/.10: 2/2/2  at 62-63
+  place    ticks α=.01/.05/.10: 1/1/1  at 95
+  wait_at  ticks α=.01/.05/.10: 12/12/12  at 25-35,55  leader elsewhere: ac_switch_0
+
+scenario_s05_02 off
+  move_to  ticks α=.01/.05/.10: 45/45/45  at 0-24,56-61,64-69,96-103
+  pick_up  ticks α=.01/.05/.10: 2/2/2  at 62-63
+  place    ticks α=.01/.05/.10: 1/1/1  at 95
+  wait_at  ticks α=.01/.05/.10: 12/12/12  at 25-35,55  leader elsewhere: ac_switch_0
+
+scenario_s06_01 off  [x2]
+  move_to  ticks α=.01/.05/.10: 61/61/61  at 0-12,55-102
+  place    ticks α=.01/.05/.10: 1/1/1  at 54  leader elsewhere: item_1
+
+scenario_s06_02 off  [x2]
+  move_to  ticks α=.01/.05/.10: 62/62/62  at 0-13,72-119
+  place    ticks α=.01/.05/.10: 1/1/1  at 71  leader elsewhere: item_1
+
+scenario_s06_01 plain off  [x3]
+  move_to  ticks α=.01/.05/.10: 53/53/53  at 0-12,55-94
+  place    ticks α=.01/.05/.10: 1/1/1  at 54  leader elsewhere: item_1
+
+scenario_s06_03 plain off
+  move_to  ticks α=.01/.05/.10: 92/92/92  at 0-44,98-144
+  place    ticks α=.01/.05/.10: 1/1/1  at 97
+
+scenario_s06_03 realized off  [x2]
+  move_to  ticks α=.01/.05/.10: 92/92/92  at 0-44,98-144
+  place    ticks α=.01/.05/.10: 1/1/1  at 97
+
+scenario_s03_01 full_reorder off
+  move_to  ticks α=.01/.05/.10: 62/62/62  at 0-21,24-28,56-87,90-92
+  pick_up  ticks α=.01/.05/.10: 4/4/4  at 22-23,88-89
+  place    ticks α=.01/.05/.10: 1/1/1  at 55
+
+scenario_s06_02 full_reorder off
+  move_to  ticks α=.01/.05/.10: 49/49/49  at 0-13,72-106
+  place    ticks α=.01/.05/.10: 1/1/1  at 71  leader elsewhere: item_1
+
+scenario_s06_03 single_task off
+  move_to  ticks α=.01/.05/.10: 52/52/52  at 0-39,98-109
+  place    ticks α=.01/.05/.10: 1/1/1  at 97
+
+Totals over the 48 runs (groups weighted by size), ticks by phase, α=.01/.05/.10:
+  prior on: move_to 399/399/399; place 3/3/3; wait_at 46/46/46
+  prior off: move_to 1626/1626/1626; pick_up 28/28/28; place 26/26/26; wait_at 66/66/66

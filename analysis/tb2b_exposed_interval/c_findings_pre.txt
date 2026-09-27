@@ -1,0 +1,131 @@
+
+C. Finding statistics per run and aggregated, at each α in {0.01, 0.05, 0.1}, recomputed from the logged tails.
+
+FALSE UNEXPLAINED: ticks where the truth is a task on the stack with coverage COVERED (a modelled task with its
+expected binding) and the finding is unexplained. Per run and per phase of the truth (the record's action: move_to#0
+the walk to the object, pick_up#0, move_to#1 the carry walk, place#0, wait_at#0), as ticks and as phase instances
+(a phase instance = one (task, action) run of consecutive ticks in the record; counted once if any tick in it reads
+unexplained; the per-phase unit of α). Raw truth (the record at t) and lag-corrected (the record at t + 2).
+Denominators: the modelled ticks and phase instances.
+
+MISSED UNEXPLAINED: ticks on TASK_ABSENT and outside-support tasks after the shared prefix where the finding is not
+unexplained. Neither occurs in the 48 runs nor in the four supplementary ones (B2, B3). BINDING_ABSENT, the one
+unmodelled case measured (the supplementary wrong-table runs), is reported in its place. SHARED PREFIX: the part of
+the wrong-table task whose actions the modelled hypothesis of the same item (the item to its designated table) also
+expects, with the same targets: its walk to the item and its pick_up (the record's move_to#0 and pick_up#0). The
+prefix ends on the first tick of the record's move_to#1, the carry walk to the other table (actions are aligned with
+the body at lag 0). Cross-check from the evidence: the tick the item hypothesis's S first falls below the one-tick
+latency value 0.8629 (C prints both).
+
+DETECTION DELAY: from the record's switch tick (the `entered:` of the unmodelled task) and from the prefix end, to the
+first unexplained tick, per α.
+
+
+## false unexplained per run, truth lag-corrected (t + 2)
+   modelled ticks / phase instances; then per α: unexplained ticks / instances, and the phases they fall in
+  scenario_s01_01 on                  141/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s02_01 on                  362/ 12  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_01 on                  121/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s01_06 on                  120/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s04_01 on                  327/ 14  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_06 on                  176/ 10  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s05_01 on                  141/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s05_02 on                  141/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_01 on                  171/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_02 on                  188/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_01 plain on            171/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s06_03 plain on            220/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 realized on         220/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s03_01 full_reorder on     121/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_02 full_reorder on     188/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 single_task on      220/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s01_01 off                 141/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s02_01 off                 362/ 12  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_01 off                 121/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s01_06 off                 120/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s04_01 off                 327/ 14  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_06 off                 176/ 10  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s05_01 off                 141/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s05_02 off                 141/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_01 off                 171/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_02 off                 188/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_01 plain off           171/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s06_03 plain off           220/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 realized off        220/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s03_01 full_reorder off    121/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_02 full_reorder off    188/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 single_task off     220/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  aggregate over the 48 runs (groups weighted by their size):
+    prior on: α=0.01: 0/4352 ticks (0.00%), 0/204 instances (0.00%)   α=0.05: 0/4352 ticks (0.00%), 0/204 instances (0.00%)   α=0.1: 0/4352 ticks (0.00%), 0/204 instances (0.00%)
+    prior off: α=0.01: 0/4352 ticks (0.00%), 0/204 instances (0.00%)   α=0.05: 0/4352 ticks (0.00%), 0/204 instances (0.00%)   α=0.1: 0/4352 ticks (0.00%), 0/204 instances (0.00%)
+
+## false unexplained per run, truth raw (t)
+   modelled ticks / phase instances; then per α: unexplained ticks / instances, and the phases they fall in
+  scenario_s01_01 on                  143/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s02_01 on                  364/ 12  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_01 on                  123/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s01_06 on                  122/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s04_01 on                  329/ 14  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_06 on                  178/ 10  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s05_01 on                  143/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s05_02 on                  143/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_01 on                  173/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_02 on                  190/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_01 plain on            173/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s06_03 plain on            222/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 realized on         222/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s03_01 full_reorder on     123/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_02 full_reorder on     190/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 single_task on      222/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s01_01 off                 143/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s02_01 off                 364/ 12  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_01 off                 123/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s01_06 off                 122/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s04_01 off                 329/ 14  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s03_06 off                 178/ 10  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s05_01 off                 143/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s05_02 off                 143/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_01 off                 173/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_02 off                 190/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s06_01 plain off           173/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x3]
+  scenario_s06_03 plain off           222/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 realized off        222/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0  [x2]
+  scenario_s03_01 full_reorder off    123/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_02 full_reorder off    190/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  scenario_s06_03 single_task off     222/  8  α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  aggregate over the 48 runs (groups weighted by their size):
+    prior on: α=0.01: 0/4400 ticks (0.00%), 0/204 instances (0.00%)   α=0.05: 0/4400 ticks (0.00%), 0/204 instances (0.00%)   α=0.1: 0/4400 ticks (0.00%), 0/204 instances (0.00%)
+    prior off: α=0.01: 0/4400 ticks (0.00%), 0/204 instances (0.00%)   α=0.05: 0/4400 ticks (0.00%), 0/204 instances (0.00%)   α=0.1: 0/4400 ticks (0.00%), 0/204 instances (0.00%)
+
+## false unexplained per phase, aggregated over the 48 runs, lag-corrected truth: ticks / instances
+  prior on:
+    move_to#0    2543 ticks   58 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    pick_up#0      88 ticks   44 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    move_to#1    1402 ticks   44 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    place#0        88 ticks   44 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    wait_at#0     231 ticks   14 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+  prior off:
+    move_to#0    2543 ticks   58 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    pick_up#0      88 ticks   44 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    move_to#1    1402 ticks   44 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    place#0        88 ticks   44 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+    wait_at#0     231 ticks   14 instances   α=0.01: 0/0   α=0.05: 0/0   α=0.1: 0/0
+
+## missed unexplained and detection delay: TASK_ABSENT and outside-support ticks: none (B2, B3).
+   BINDING_ABSENT in its place (the supplementary wrong-table runs), lag-corrected truth for the task span
+  scenario_s06_06 off: task deliver_item(?item=item_0,?kitting_table=kitting_table_1); switch (record) 0; prefix end 19 (record move_to#1), evidence cross-check 21; unmodelled span after the prefix 19-102 (84 ticks)
+    α=0.01: missed 29/84 (34.5%); first unexplained 48; delay from switch 48, from prefix end 29
+    α=0.05: missed 22/84 (26.2%); first unexplained 41; delay from switch 41, from prefix end 22
+    α=0.1: missed 19/84 (22.6%); first unexplained 38; delay from switch 38, from prefix end 19
+  scenario_s06_06 on: task deliver_item(?item=item_0,?kitting_table=kitting_table_1); switch (record) 0; prefix end 19 (record move_to#1), evidence cross-check 21; unmodelled span after the prefix 19-102 (84 ticks)
+    α=0.01: missed 29/84 (34.5%); first unexplained 48; delay from switch 48, from prefix end 29
+    α=0.05: missed 22/84 (26.2%); first unexplained 41; delay from switch 41, from prefix end 22
+    α=0.1: missed 19/84 (22.6%); first unexplained 38; delay from switch 38, from prefix end 19
+  scenario_s07_03 off: task deliver_item(?item=item_2,?kitting_table=kitting_table_1); switch (record) 0; prefix end 11 (record move_to#1), evidence cross-check 14; unmodelled span after the prefix 11-93 (83 ticks)
+    α=0.01: missed 28/83 (33.7%); first unexplained 39; delay from switch 39, from prefix end 28
+    α=0.05: missed 23/83 (27.7%); first unexplained 34; delay from switch 34, from prefix end 23
+    α=0.1: missed 20/83 (24.1%); first unexplained 31; delay from switch 31, from prefix end 20
+  scenario_s07_03 on: task deliver_item(?item=item_2,?kitting_table=kitting_table_1); switch (record) 0; prefix end 11 (record move_to#1), evidence cross-check 14; unmodelled span after the prefix 11-93 (83 ticks)
+    α=0.01: missed 28/83 (33.7%); first unexplained 39; delay from switch 39, from prefix end 28
+    α=0.05: missed 23/83 (27.7%); first unexplained 34; delay from switch 34, from prefix end 23
+    α=0.1: missed 20/83 (24.1%); first unexplained 31; delay from switch 31, from prefix end 20

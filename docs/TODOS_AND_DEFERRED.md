@@ -3535,12 +3535,19 @@ Reference: `analysis/td_stage1b/REPORT.md`, D, finding 3 and section 1.5c; desig
   initial walk's 0, not the post-boundary 1).
 Reference: `analysis/td_stage1b/REPORT.md`, flags
 
-**TODO-121: The 1.4 and 1.5b measurements cover the truncated interval (recorded, TB.1r, 27 Sept 2026)** [OPEN; TB.2b]
+**TODO-121: The 1.4 and 1.5b measurements cover the truncated interval (recorded, TB.1r, 27 Sept 2026)** [CLOSED; TB.2b, 27 Sept 2026]
 In every run the robot stopped observing at its terminal return (`RobotAgent.finished`): the `[IR]` and `[IR-dist]`
 lines end at the robot's completion, and the recognizer's output over the human's remaining behaviour is in no
 baseline. The measurements of 1.4 (`analysis/td_stage1/`) and of 1.5b and 1.5c (`analysis/td_stage1b/`) were taken
 over that truncated interval. Once the cognitive-loop correction is built, they are rerun over the newly exposed
 interval in TB.2b, with every change reported and no previous statistic preserved for comparability.
+CLOSED (TB.2b, 27 Sept 2026; `analysis/tb2b_exposed_interval/REPORT.md`): the scripts are rerun over the exposed
+interval (the tick after the robot's declared completion to the run's end). In every baseline run that interval is the
+idle human after its script: no modelled tick, boundary, pin or decision lies in it, so false unexplained (0 at every
+α), non-member, adequate-below-θ, boundaries and admissions are unchanged; what moved is the output over the idle
+human: exhausted ticks (+1,983 prior on) and unexplained ticks against a lone live hypothesis nothing will complete
+(+50 prior on: scenario_s04_01's `ac_switch_0`, TODO-117; scenario_s06_06's wrong-table `item_0`, TODO-87). Every
+moved tick lies in the exposed interval.
 Files: analysis/td_stage1/, analysis/td_stage1b/ (the scripts rerun on the regenerated baselines)
 Reference: design_decisions.md, "The cognitive loop does not end with the task pool"
 
