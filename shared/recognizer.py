@@ -52,30 +52,16 @@ ALGORITHM:
           contributes NO FACTOR for it (not 1.0: zero excess is a perfectly
           efficient walk, and no walk is not that), and the belief carries
           forward unchanged.
-        - 'unknown': a stated constant, UNKNOWN_LIKELIHOOD, per whole expected
-          path covered — the reference every observation is scored against
-          (I4d), GRADED by how much of the hypothesis's expected path the
-          stretch covered (graded evidence): a stretch's likelihood under
-          'unknown' is u^f, f the fraction of C(origin, target) closed so far
-          (likelihood_functions.covered_fraction), or 1 by the world's own
-          fact when the stretch has arrived (its action's completion holds at
-          the fold). An observation with no path — a no-graded-signal action
-          — is ungraded and pays u. A hypothesis's evidence is its ODDS
-          against 'unknown': the product over its own observations of L/u^f,
-          closed stretches and events in its base, the open stretch multiplied
-          on top as v/u^f for this tick. A fold moves one factor from the open
-          term to the base and changes nothing; 'unknown' itself takes no
-          factor. The invariant, for every live hypothesis k and tick t within
-          an episode:
-              E_t(k)/E_t(unknown) = [π(k)/π(unknown)] · Π_closed L_k(s)/u^f_k(s)
-                                    · Π_events c_k(e) · (v_k(t)/u^f_k(t) | 1 if empty)
-          So a lone fitting task's ceiling is 1/(1+uⁿ) over n whole
-          observations; a walk's odds rise with the path covered, from 1 on
-          its first step toward 1/u at its arrival; and between two tasks of
-          equal fit an extra closed stretch is worth 1/u: a phase advance is
-          evidence.
-    Normalisation is over every hypothesis AND 'unknown' together, never over
-    the hypotheses alone. Two hypotheses whose expected actions share
+    There is no reference hypothesis (T-D R1, 27 September 2026): each live
+    hypothesis pays its own likelihood per stretch — its closed stretches and
+    events in its base, the open stretch's value multiplied on top for this
+    tick — and the evidence is normalised over the live hypothesis set H
+    only. The invariant (R6): on every tick the normalised evidence sums to 1
+    over exactly H, and a retired or inadmissible hypothesis is never in H.
+    The belief is therefore RELATIVE: a lone live hypothesis reads 1.0 on no
+    evidence, two rivals start at 0.5; there is no ceiling below 1. Whether
+    the best of the models is wrong is the adequacy finding's question
+    (below), not the belief's. Two hypotheses whose expected actions share
     evaluator, origin, walked distance and target position receive the same
     value, computed once per tick.
 
@@ -115,7 +101,39 @@ ALGORITHM:
     Output belief = evidence × ω_context, with inadmissible and completed
     hypotheses pinned at BELIEF_FLOOR and the floor applied. ω_context is a fact
     about the current state, not an event: applied to the output only, never
-    fed back. The distribution is over TASKS; the phase is internal.
+    fed back. The distribution is over TASKS; the phase is internal. The R6
+    invariant holds at two levels: the normalised evidence sums to 1 over
+    exactly H (before the floor); the returned distribution sums to 1 with the
+    pinned keys at exactly BELIEF_FLOOR and the live keys carrying the rest.
+    When no hypothesis is live (lifecycle EXHAUSTED) the belief over H has no
+    members: the distribution holds the pins alone (the output convention, not
+    belief mass), most_likely is None and confidence 0.0.
+
+    Adequacy (T-D E1 to E7): the recognizer's second output, independent of
+    the belief. Per live hypothesis, per DERIVED PHASE (from its origin to its
+    phase advance — the unit, no window), the projected completion delay
+        D = e/v + (s − s_exp)
+    in ticks: e the excess path from the origin as the movement likelihood
+    computes it (0 for a phase with no evaluator or no resolvable target), v
+    the body's speed, s the ticks without movement since the origin, s_exp
+    the standing the Projector prices for the phase (0 for a walk; the bound
+    duration for an action whose schema names one, through the body's
+    duration_to_steps; otherwise the task model's cost for the action, else
+    the body's default_action_cost — the Projector's own rule, one source).
+    D is non-decreasing within a phase. Its tail probability
+    S = likelihood_functions.tail_probability(v·D, beta). A live hypothesis is
+    a MEMBER of the test on a tick iff it has a derived phase this tick (an
+    expected action) and that phase holds an observation: walked path since
+    its origin, or standing beyond s_exp (a stationary tick within the priced
+    duration is not one). The finding: unresolved iff there is no member;
+    unexplained iff every member has S < alpha (intersection-union); adequate
+    otherwise. A non-member contributes no S. Computed from scratch every
+    tick, with no memory beyond each hypothesis's current phase: an
+    unexplained finding clears when a member reaches S ≥ alpha or a phase
+    advance or episode boundary empties the membership. Time enters adequacy
+    only; the belief's likelihood is unchanged by it (E3). alpha, the test
+    level, is a run option the embodiment passes in. The recognizer decides
+    nothing about action with the finding (R5).
 
     Context weight ω_context(τ, context, world):
         - TEMPERATURE_BOOST if room_temperature is high and τ is ac_activation
@@ -123,8 +141,8 @@ ALGORITHM:
         - 1.0 otherwise
 
     Prior:
-        - Uniform over the live hypotheses + unknown at t=0 and at every
-          episode boundary (the admissible prior, over the current support)
+        - Uniform over the live hypotheses at t=0 and at every episode
+          boundary (the admissible prior, over the current support)
         - The recognizer's own evidence state at t>0 (prev_belief is not
           consulted — see update())
 
@@ -134,18 +152,19 @@ ALGORITHM:
         belief; it is not a magnitude. The admissible set is the hypotheses of
         the assigned WorkTask instances, plus every hypothesis of a PersonalTask
         in the task model (a foreseeable task: never assigned, and must stay
-        recognizable), plus 'unknown'; compared as HypothesisKey values (T-H). Admissible
+        recognizable); compared as HypothesisKey values (T-H). Admissible
         hypotheses take the ordinary update above, normalized over admissible
         mass only; inadmissible ones are refuted — pinned at BELIEF_FLOOR, never
         accumulating evidence. No weight, no boost: confidence is then a function
         of the admissible set size and of the evidence, with no tunable magnitude
         in it. With no assignment known, this whole mechanism is inert.
 
-    Normalization: posterior sums to 1.0 after each update.
+    Normalization: the evidence sums to 1.0 over H after each update.
 
 HYPOTHESIS SPACE:
     One hypothesis per (task_name, param_bindings) pair derived from the robot's
-    task model and the objects present in the workspace, plus 'unknown'.
+    task model and the objects present in the workspace. No residual
+    hypothesis (T-D R1).
     Hypotheses include both WorkTasks and the PersonalTasks the model holds.
 
 INPUTS:
@@ -157,16 +176,19 @@ INPUTS:
     - assigned_tasks:   observed agent's assigned tasks (None/empty → restriction is off)
 
 OUTPUTS:
-    - BeliefState: distribution, most_likely, confidence
+    - BeliefState: distribution, most_likely, confidence (the belief over H);
+      finding, lifecycle, tails (the adequacy finding, the lifecycle state,
+      the members' tail probabilities)
 """
 
 import itertools
 import logging
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from shared.types import (
     Observation, BeliefState, WorldState, GroundedAction,
     TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, same_task,
+    AdequacyFinding, RecognizerLifecycle,
 )
 from shared.knowledge import TaskModel, ContextKnowledge
 from shared.planner import AdaptivePlanner, DecompositionError
@@ -177,10 +199,11 @@ from shared import likelihood_functions
 
 # =============================================================================
 # Recognizer-level constants
-# (the likelihood constants — UNKNOWN_LIKELIHOOD, the detection rates — live
-#  in likelihood_functions.py, single source of truth, read through the module
-#  at call time rather than redefined here; the detour tolerance beta is the
-#  embodiment's, passed to the constructor)
+# (the likelihood constants — the detection rates — live in
+#  likelihood_functions.py, single source of truth, read through the module
+#  at call time rather than redefined here; the detour tolerance beta, the
+#  body's speed and duration conversion, the priced standing and the test
+#  level alpha are the embodiment's, passed to the constructor)
 # =============================================================================
 
 # ω_context boost multipliers
@@ -201,8 +224,6 @@ LONG_SHIFT_THRESHOLD   = 500
 # Floor applied after normalization — prevents belief collapse to exact zero,
 # which otherwise cannot recover through multiplicative Bayesian update.
 BELIEF_FLOOR = 1e-3
-
-UNKNOWN = "unknown"
 
 
 # =============================================================================
@@ -286,6 +307,10 @@ class IntentionRecognizer:
         context: ContextKnowledge,
         hypotheses: List[HypothesisKey],
         beta: float,
+        speed: float,
+        duration_to_steps: Callable[[str], float],
+        default_action_cost: float,
+        alpha: float,
         assigned_tasks: Optional[List[TaskInstance]] = None,
         path_cost: Optional[likelihood_functions.PathCost] = None,
     ):
@@ -298,7 +323,22 @@ class IntentionRecognizer:
         beta:           the excess-path likelihood's detour tolerance, per unit
                         of the body's length (Mesa: 0.01 /cm). Supplied by the
                         embodiment, no default: it carries the body's units,
-                        and shared/ holds none (T-A1; TODO-58).
+                        and shared/ holds none (T-A1; TODO-58). Also the scale
+                        of the adequacy test's reference distribution (T-D E5).
+        speed:          v, the body's motion per tick, in its length units: the
+                        value the embodiment hands the Projector as
+                        assumed_speed. Converts the excess path to ticks in the
+                        projected completion delay (T-D E2).
+        duration_to_steps: the body's conversion of a duration binding (wait_at's
+                        ?duration) to ticks, the callable the Projector
+                        receives. Prices the standing of such a phase.
+        default_action_cost: the standing, in ticks, the Projector prices for a
+                        stationary action with no stated duration and no task-
+                        model cost (pick_up, place): the same value the body
+                        hands the Projector (one source; ruled 27 Sept 2026).
+        alpha:          the adequacy test's level, per derived phase (T-D E5): a
+                        run option, no default here, never chosen from a
+                        scenario.
         assigned_tasks: the OBSERVED agent's assigned tasks — which tasks it was
                         assigned, not in which order it will do them. None or
                         empty means the robot has no such knowledge: the
@@ -309,7 +349,7 @@ class IntentionRecognizer:
                         distance by default (Mesa agents walk through obstacles);
                         a domain with a better model injects it here.
 
-        _initial_prior is the t=0 prior over all hypotheses + unknown: uniform
+        _initial_prior is the t=0 prior over all hypotheses: uniform
         when the restriction is off; uniform over the admissible set, with the
         inadmissible pinned, when it is on.
         Keyed by repr(hyp) strings — same key space as BeliefState.distribution,
@@ -320,15 +360,20 @@ class IntentionRecognizer:
         self.context = context
         self._path_cost = path_cost or likelihood_functions.straight_line_cost
         self._beta = beta
+        self._speed = speed
+        self._duration_to_steps = duration_to_steps
+        self._default_action_cost = default_action_cost
+        self._alpha = alpha
         # A schema naming an evaluator the registry does not have is a domain
         # modelling error, and must not look like uncertainty: without this
         # check every movement under it would silently score the perfect fit.
         for schema in task_model.get_all_actions():
             name = schema.progress_evaluator
-            if name is not None and name not in likelihood_functions.PROGRESS_EVALUATORS:
+            if name is not None and (name not in likelihood_functions.PROGRESS_EVALUATORS
+                                     or name not in likelihood_functions.EXCESS_MEASURES):
                 raise ValueError(
                     f"action '{schema.name}' names progress_evaluator '{name}', which is not "
-                    f"registered in likelihood_functions.PROGRESS_EVALUATORS "
+                    f"registered in likelihood_functions.PROGRESS_EVALUATORS and EXCESS_MEASURES "
                     f"({sorted(likelihood_functions.PROGRESS_EVALUATORS)})")
         # Sorted by key so that every order-dependent step downstream — the
         # insertion order of the evidence and output dicts, hence max()'s
@@ -362,39 +407,47 @@ class IntentionRecognizer:
         #                   expected one — where its excess path is measured from
         #   _origin_odo[key] the agent's odometer reading at that moment, so
         #                   that walked = odometer − _origin_odo[key]
-        #   _base[key]      the hypothesis's closed ODDS against unknown: every
-        #                   closed phase (as L/u^f) and every event of the CURRENT
-        #                   EPISODE folded in, in one common scale across keys
-        #                   (rescaled each tick so that Σ base·open = 1); the
-        #                   open phase's v/u^f is recomputed from _origin each tick
+        #   _origin_still[key] the agent's count of ticks without movement at
+        #                   that moment, so that s = _still − _origin_still[key]
+        #                   (the standing in the adequacy test's delay D)
+        #   _base[key]      the hypothesis's closed evidence: every closed phase
+        #                   (as L) and every event of the CURRENT EPISODE folded
+        #                   in, in one common scale across keys (rescaled each
+        #                   tick so that Σ base·open = 1 over H); the open
+        #                   phase's value is recomputed from _origin each tick
         #                   and multiplied on top, never into it; re-initialised
         #                   to the prior at every episode boundary.
-        #                   _base[UNKNOWN] is the reference and only rescales.
         #   _completed      keys whose terminal completion condition has held:
         #                   skipped and pinned for the rest of the run
         self._expected: Dict[str, Optional[GroundedAction]] = {}
         self._origin: Dict[str, Tuple[float, float]] = {}
         self._origin_odo: Dict[str, float] = {}
+        self._origin_still: Dict[str, int] = {}
         self._base: Dict[str, float] = {}
         self._completed: Set[str] = set()
         # Per observed agent: total path length walked since its first
         # observation (the sum of straight-line steps between consecutive
         # observed positions) and the position that total was last advanced to.
         self._odometer: Dict[str, float] = {}
+        # Per observed agent: the count of observed ticks on which it did not
+        # move (a zero step), since its first observation — the standing clock
+        # the adequacy test reads, as the odometer is the walking one.
+        self._still: Dict[str, int] = {}
         self._last_pos: Dict[str, Tuple[float, float]] = {}
-        # Normalized evidence over the live keys + unknown — the belief with no
+        # Normalized evidence over the live hypothesis set H — the belief with no
         # context weights and no pins in it; _output() derives the report from it.
+        # Its keys ARE H.
         self._evidence: Dict[str, float] = {}
 
         self._admissible: Optional[Set[HypothesisKey]] = self._build_admissible(assigned_tasks)
 
         if self._admissible is None:
-            # Uniform prior over all hypotheses + unknown
+            # Uniform prior over all hypotheses
             self._initial_prior: Dict[str, float] = self._prior([repr(h) for h in self._hypotheses])
         else:
             # Uniform over the admissible set only, then pinned — the same shape
             # as every distribution update() produces, so prior and posterior
-            # agree. Built in hypothesis order (then unknown), the order update()
+            # agree. Built in hypothesis order, the order update()
             # produces, not in the admissible set's iteration order.
             self._initial_prior = self._pin(
                 self._prior([repr(h) for h in self._hypotheses if h in self._admissible]),
@@ -411,18 +464,15 @@ class IntentionRecognizer:
     @staticmethod
     def _prior(live: List[str]) -> Dict[str, float]:
         """
-        The prior over the hypotheses in `live` (keys, in hypothesis order)
-        and 'unknown': uniform. The one prior the recognizer has — used at
+        The prior over the hypotheses in `live` (keys, in hypothesis order):
+        uniform. The one prior the recognizer has — used at
         construction over the admissible set and at every episode boundary
         over the hypotheses still live. Nothing else is stored to re-start
         from.
         """
-        n = len(live) + 1
-        out = {k: 1.0 / n for k in live}
-        out[UNKNOWN] = 1.0 / n
-        return out
+        return {k: 1.0 / len(live) for k in live}
 
-    def _begin_episode(self, pos: Tuple[float, float], odo: float) -> None:
+    def _begin_episode(self, pos: Tuple[float, float], odo: float, still: int) -> None:
         """
         An episode boundary: the observed agent has completed a task, and the
         intention the recognizer estimates — the task of the CURRENT
@@ -431,15 +481,17 @@ class IntentionRecognizer:
         hypothesis's base becomes the prior over the hypotheses still live,
         whatever its phase history was, and every origin moves to the agent's
         position. Every stretch is now empty, so the belief IS the prior until
-        the agent moves. Completed hypotheses are not live and stay pinned.
+        the agent moves, and no phase holds an observation for the adequacy
+        test (its membership is empty: the finding is unresolved, or the
+        lifecycle exhausted). Completed hypotheses are not live and stay pinned.
         Nothing crosses the boundary: a task hypothesis says which task is
         being executed now, not what the agent is disposed to do next, and
         there is no representation here for the latter.
         """
-        self._base = self._prior([k for k in self._base if k != UNKNOWN])
+        self._base = self._prior(list(self._base))
         self._evidence = dict(self._base)
         for key in self._origin:
-            self._origin[key], self._origin_odo[key] = pos, odo
+            self._origin[key], self._origin_odo[key], self._origin_still[key] = pos, odo, still
 
     def _build_admissible(
         self,
@@ -450,19 +502,15 @@ class IntentionRecognizer:
         agent's intention may lie in,
             admissible = { hypotheses of the WorkTask instances in the assigned tasks }
                        ∪ { every hypothesis of a PersonalTask in the task model }
-                       ∪ { unknown }
-        compared as HypothesisKey values. 'unknown' is admissible by
-        construction and is not a HypothesisKey, so the returned set holds the
-        task hypotheses only. Every assigned task is a WorkTask instance (checked
+        compared as HypothesisKey values. Every assigned task is a WorkTask instance (checked
         at load, AgentConfig). Returns None when nothing is known, which switches
         the mechanism off entirely rather than admitting everything explicitly —
         equivalent in effect, but None keeps update() on its original,
         unrestricted path.
 
         A PersonalTask in the task model is a foreseeable task: never assigned,
-        so it must stay recognizable when the human switches to it. 'unknown' is
-        the residual hypothesis, which takes the mass when no task hypothesis
-        explains the observations. This is the one place the recognizer reads a
+        so it must stay recognizable when the human switches to it. This is the
+        one place the recognizer reads a
         schema's class.
 
         An assigned task is matched to the hypothesis space by task equality
@@ -531,22 +579,21 @@ class IntentionRecognizer:
              hypothesis expected on the previous tick, that action's completion
              check multiplies onto its evidence (an event);
           4. if the expected action changed, fold the closing action's final
-             excess-path value, as odds L/u^f against unknown — f the fraction
-             of the expected path the stretch covered, 1 if the action's
-             completion holds (_unknown_likelihood) — into the evidence once
-             (nothing, if its stretch was empty) and move the origin (position
-             and odometer reading) to the agent's (a phase advance — or
+             excess-path value L into the evidence once (nothing, if its
+             stretch was empty) and move the origin (position, odometer and
+             standing-clock readings) to the agent's (a phase advance — or
              regress; both are derived facts);
-          5. the open action's excess-path value from the origin, as v/u^f,
-             multiplies on top of the evidence for this tick only (replaced
-             next tick) — or no factor at all if the stretch is empty (nothing
-             walked since the origin: not an observation).
-        `unknown` is the reference and takes no factor. Then normalize over the
-        live keys + unknown together. If a retirement this tick was the observed agent's
-        own (step 2, terminal action expected on the previous tick), the
-        episode ends: the belief re-initialises to the prior over the live
-        keys + unknown and every origin moves to the agent's position
-        (_begin_episode); this tick reports the re-initialised belief.
+          5. the open action's excess-path value from the origin multiplies on
+             top of the evidence for this tick only (replaced next tick) — or
+             no factor at all if the stretch is empty (nothing walked since
+             the origin: not an observation).
+        Then normalize over the live hypothesis set H (T-D R1, R6). If a
+        retirement this tick was the observed agent's own (step 2, terminal
+        action expected on the previous tick), the episode ends: the belief
+        re-initialises to the prior over H and every origin moves to the
+        agent's position (_begin_episode); this tick reports the re-initialised
+        belief. Last, the adequacy finding and the lifecycle state are read
+        from the phase state as it stands (_adequacy).
 
         ω_context is applied to the output only (see _output()). The recognizer
         therefore owns its belief; `prev_belief` is accepted for contract
@@ -559,13 +606,19 @@ class IntentionRecognizer:
         pos = obs.spatial_context.position
         mu = (obs.detected_microaction or "").upper()
         # Advance the observed agent's odometer by the step just observed.
+        # A zero step advances the standing clock instead.
         agent = obs.agent_id
         if agent in self._last_pos:
-            self._odometer[agent] += likelihood_functions.straight_line_cost(self._last_pos[agent], pos)
+            step = likelihood_functions.straight_line_cost(self._last_pos[agent], pos)
+            self._odometer[agent] += step
+            if step <= 0.0:
+                self._still[agent] += 1
         else:
             self._odometer[agent] = 0.0
+            self._still[agent] = 0
         self._last_pos[agent] = pos
         odo = self._odometer[agent]
+        still = self._still[agent]
 
         unnorm: Dict[str, float] = {}
         boundary = False
@@ -582,6 +635,7 @@ class IntentionRecognizer:
                 self._expected.pop(key, None)
                 self._origin.pop(key, None)
                 self._origin_odo.pop(key, None)
+                self._origin_still.pop(key, None)
                 logging.info("[IR-complete] step=%d %s completed: %s holds",
                              int(obs.timestamp), key, actions[-1].completion_predicate)
                 continue
@@ -591,6 +645,7 @@ class IntentionRecognizer:
                 # First observation of this hypothesis: it enters its current
                 # action here. Its stretch is empty: no observation, no factor.
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
+                self._origin_still[key] = still
                 unnorm[key] = self._base[key]
                 continue
 
@@ -606,28 +661,20 @@ class IntentionRecognizer:
                 closing = self._progress_likelihood(
                     previous, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
                 if closing is not None:
-                    # The stretch was one observation: its likelihood under
-                    # the hypothesis AND under `unknown` fold together, as the
-                    # odds L/u^f the open term already held (I4d), `unknown`'s
-                    # graded by the path the stretch covered — the whole of
-                    # it, if the action it served is complete.
-                    self._base[key] *= closing / self._unknown_likelihood(
-                        previous, self._origin[key], pos, world, arrived=self._completion_holds(previous, world))
+                    # The stretch was one observation: its likelihood folds
+                    # into the evidence once.
+                    self._base[key] *= closing
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
+                self._origin_still[key] = still
                 value = self._progress_likelihood(current, pos, 0.0, pos, world, memo)
             else:
                 value = self._progress_likelihood(
                     current, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
-            # The open observation, if there is one, as odds against `unknown`.
-            unnorm[key] = (self._base[key] if value is None
-                           else self._base[key] * value / self._unknown_likelihood(
-                               current, self._origin[key], pos, world))
-        # `unknown` is the reference: every observation is scored against it
-        # inside the hypothesis's own odds, so it takes no factor of its own.
-        unnorm[UNKNOWN] = self._base[UNKNOWN]
+            # The open observation, if there is one.
+            unnorm[key] = self._base[key] if value is None else self._base[key] * value
 
-        # One normalization, at the task layer, over the live keys AND unknown.
-        # The bases are rescaled by the same total so they stay in one scale
+        # One normalization, at the task layer, over the live hypothesis set H
+        # (T-D R1): the keys of unnorm are exactly H. The bases are rescaled by the same total so they stay in one scale
         # with each other (ratios are untouched) and so that
         # evidence == base × open value exactly.
         total = sum(unnorm.values()) or 1.0
@@ -640,14 +687,23 @@ class IntentionRecognizer:
             # the next one's inference starts from the prior, here, and this
             # tick already reports it (the ended episode's closing values are
             # not a belief the model holds any more).
-            self._begin_episode(pos, odo)
+            self._begin_episode(pos, odo, still)
             logging.info("[IR-boundary] step=%d %s completed a task: belief re-initialised to the "
-                         "prior over %d hypotheses + unknown, origins reset",
+                         "prior over %d hypotheses, origins reset",
                          int(obs.timestamp), agent, len(self._origin))
 
         distribution = self._output(obs, world)
-        most_likely = max(distribution, key=lambda k: distribution[k])
-        confidence = distribution[most_likely]
+        if self._evidence:
+            # The argmax over H, in the distribution's order (the live keys
+            # first, in hypothesis order: the tie-break as before).
+            most_likely = max((k for k in distribution if k in self._evidence),
+                              key=lambda k: distribution[k])
+            confidence = distribution[most_likely]
+        else:
+            # Exhausted: the belief over H has no members; the pins are the
+            # output convention, not belief mass (T-D R4).
+            most_likely, confidence = None, 0.0
+        finding, lifecycle, tails = self._adequacy(pos, odo, still, world)
 
         return BeliefState(
             timestamp=obs.timestamp,
@@ -655,7 +711,104 @@ class IntentionRecognizer:
             distribution=distribution,
             most_likely=most_likely,
             confidence=confidence,
+            finding=finding,
+            lifecycle=lifecycle,
+            tails=tails,
         )
+
+    # -------------------------------------------------------------------------
+    # Adequacy (T-D E1 to E7)
+    # -------------------------------------------------------------------------
+
+    def _adequacy(
+        self,
+        pos: Tuple[float, float],
+        odo: float,
+        still: int,
+        world: WorldState,
+    ) -> Tuple[Optional[AdequacyFinding], RecognizerLifecycle, Dict[str, float]]:
+        """
+        The adequacy finding, the lifecycle state and the members' tail
+        probabilities, read from scratch from the phase state after this
+        tick's update (and boundary): no memory beyond each live hypothesis's
+        current derived phase (E7).
+
+        H empty: EXHAUSTED, no finding, no tails (R4). Otherwise, per live
+        hypothesis in hypothesis order: a MEMBER iff it has a derived phase
+        this tick (an expected action) and that phase holds an observation —
+        walked path since its origin, or standing beyond the priced standing
+        s_exp (E6). A member's projected completion delay
+            D = e/v + (s − s_exp)
+        and its tail S = tail_probability(v·D, beta) (E2, E5). Unresolved iff
+        there is no member; unexplained iff every member has S < alpha (E4);
+        adequate otherwise. A non-member contributes no S.
+        """
+        live = [repr(h) for h in self._hypotheses if repr(h) in self._evidence]
+        if not live:
+            return None, RecognizerLifecycle.EXHAUSTED, {}
+        tails: Dict[str, float] = {}
+        for key in live:
+            action = self._expected.get(key)
+            if action is None:
+                continue                    # no derived phase this tick
+            walked = odo - self._origin_odo[key]
+            s = still - self._origin_still[key]
+            s_exp = self._priced_standing(action)
+            if not (walked > 0.0 or s > s_exp):
+                continue                    # the phase holds no observation
+            e = self._excess(action, self._origin[key], walked, pos, world)
+            delay = e / self._speed + (s - s_exp)
+            tails[key] = likelihood_functions.tail_probability(self._speed * delay, self._beta)
+        if not tails:
+            finding = AdequacyFinding.UNRESOLVED
+        elif all(v < self._alpha for v in tails.values()):
+            finding = AdequacyFinding.UNEXPLAINED
+        else:
+            finding = AdequacyFinding.ADEQUATE
+        return finding, RecognizerLifecycle.LIVE, tails
+
+    def _priced_standing(self, action: GroundedAction) -> float:
+        """
+        s_exp: the standing, in ticks, the Projector prices for `action`'s
+        phase (E2), by the Projector's own rule so that adequacy and
+        projection read one source: 0 for a walk (the schema names a movement
+        target: priced by distance, not by standing); the bound duration,
+        through the body's duration_to_steps, when the schema names a duration
+        binding (wait_at); otherwise the task model's cost for the action, and
+        failing that the body's default_action_cost (pick_up, place).
+        """
+        schema = action.schema
+        if schema.movement_target_key is not None:
+            return 0.0
+        if schema.duration_key is not None:
+            value = action.bindings.get(schema.duration_key)
+            if value is not None:
+                return float(self._duration_to_steps(value))
+        cost = self.task_model.get_cost(action.action_name)
+        return cost if cost is not None else self._default_action_cost
+
+    def _excess(
+        self,
+        action: GroundedAction,
+        origin: Tuple[float, float],
+        walked: float,
+        pos: Tuple[float, float],
+        world: WorldState,
+    ) -> float:
+        """
+        e: the excess path from the origin exactly as the movement likelihood
+        computes it (likelihood_functions.EXCESS_MEASURES, under the name the
+        schema's progress_evaluator gives the likelihood). 0 for a phase the
+        likelihood charges no excess in: no evaluator (pick_up, place,
+        wait_at) or no resolvable target.
+        """
+        name = action.schema.progress_evaluator
+        if name is None:
+            return 0.0
+        target_pos = movement_target_position(action, world)
+        if target_pos is None:
+            return 0.0
+        return likelihood_functions.EXCESS_MEASURES[name](walked, origin, pos, target_pos, self._path_cost)
 
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
@@ -665,9 +818,7 @@ class IntentionRecognizer:
         """
         unnorm: Dict[str, float] = {}
         for key, p in self._evidence.items():
-            hyp = self._by_key.get(key)
-            omega = self._context_weight(obs, world, hyp) if hyp is not None else 1.0
-            unnorm[key] = p * omega
+            unnorm[key] = p * self._context_weight(obs, world, self._by_key[key])
         return self._finalize(unnorm, self._inadmissible | self._completed)
 
     def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:
@@ -763,16 +914,6 @@ class IntentionRecognizer:
         return a.action_name == b.action_name and a.bindings == b.bindings
 
     @staticmethod
-    def _completion_holds(action: Optional[GroundedAction], world: WorldState) -> bool:
-        """Whether `action`'s grounded completion predicate holds in the world:
-        the stretch that served it has arrived. False for no action and for a
-        ProcessCompletion (no predicate: never observably complete)."""
-        if action is None:
-            return False
-        predicate = action.completion_predicate
-        return predicate is not None and predicate in world.predicates
-
-    @staticmethod
     def _in_vocabulary(action: GroundedAction, mu: str) -> bool:
         """Whether `mu` is one of the discrete microactions the action's schema
         declares (pick_up → ["GRASP"], ...). Membership in the schema's own
@@ -857,40 +998,6 @@ class IntentionRecognizer:
             memo[key] = evaluator(walked, origin, pos, target_pos, self._path_cost, self._beta)
         return memo[key]
 
-    def _unknown_likelihood(
-        self,
-        action: Optional[GroundedAction],
-        origin: Tuple[float, float],
-        pos: Tuple[float, float],
-        world: WorldState,
-        arrived: bool = False,
-    ) -> float:
-        """
-        The likelihood under `unknown` of the observation the open or closing
-        stretch of `action` is — the reference the hypothesis's own value is
-        scored against — GRADED by how much of the hypothesis's expected path
-        the stretch covered (graded evidence): u^f, with f the fraction of
-        C(origin, target) closed by `pos` (likelihood_functions.covered_fraction,
-        the same origin, target and path cost the excess is measured against),
-        or f = 1 when the stretch has `arrived` — the action's completion
-        holds at the fold, so the world itself says the path is covered,
-        whatever the arrival radius (the body's, not this layer's). Ungraded,
-        u, for an observation with no path to grade: no action, no evaluator
-        (pick_up, place, wait_at) or no resolvable target — one whole
-        observation, as before the grade. A step away from the target covers
-        nothing (f = 0, u^0 = 1): such a stretch pays its L alone, so the
-        grade meters confirmation and leaves refutation to the excess.
-        """
-        if arrived:
-            return likelihood_functions.UNKNOWN_LIKELIHOOD
-        if action is None or action.schema.progress_evaluator is None:
-            return likelihood_functions.UNKNOWN_LIKELIHOOD
-        target_pos = movement_target_position(action, world)
-        if target_pos is None:
-            return likelihood_functions.UNKNOWN_LIKELIHOOD
-        return likelihood_functions.graded_unknown_likelihood(
-            likelihood_functions.covered_fraction(origin, pos, target_pos, self._path_cost))
-
     def _grounded_actions(
         self,
         hyp: HypothesisKey,
@@ -908,7 +1015,8 @@ class IntentionRecognizer:
         no applicable method, a derived var without a value). That is a fact
         about this hypothesis in this world, not an error in the recognizer,
         and the hypothesis is scored at the perfect-fit value (nothing to
-        charge: one ungraded observation, 1/u, per tick it stays so); it is
+        charge); it has no derived phase, so it is never a member of the
+        adequacy test while it stays so; it is
         logged once, until the hypothesis decomposes again, so that a
         hypothesis that can never be scored is visible in the log rather than
         indistinguishable from one that is merely uninformative.

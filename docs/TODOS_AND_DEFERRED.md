@@ -3422,6 +3422,18 @@ Reference: design_decisions.md, "Layouts, setups and scenarios: the three artefa
 Files: mesa_sim/run_mesa.py (`run_headless`, `load_experiment`)
 Reference: design_decisions.md, "Layouts, setups and scenarios", ruling 7
 
+**TODO-113: The standing duration of `pick_up` and `place` as a schema fact (recorded, T-D Stage 1 build, 27 Sept 2026)**
+[OPEN, deferred until the Projector is in scope] The adequacy test's priced standing s_exp (T-D E2) is "the Projector's
+priced standing for the phase": 1 tick for `pick_up` and `place`. The schema states no duration for either action; the
+Projector prices them by the body's `default_action_cost` (1.0, `mesa_sim/sim_agents.py`, "a stationary action is one
+tick"), after `task_model.get_cost()` (no costs in kitting). Ruled by Hadi on the Stage 1 plan (27 Sept 2026): the
+recognizer reads the same source as the Projector (the body's value, one source), not a new schema field the Projector
+would not read. The standing duration of an action is a domain fact: it should become a schema fact read by both the
+Projector and the recognizer (one source), which changes the Projector and so waits for a cycle that has it in scope.
+Files: shared/types.py (`ActionSchema`), domains/kitting/actions.py, shared/projection.py (`build_segments`),
+shared/recognizer.py (`_priced_standing`), mesa_sim/sim_agents.py
+Reference: design_decisions.md, "T-D R and E", E2 and "Dependencies to verify in the build"
+
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
 2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.

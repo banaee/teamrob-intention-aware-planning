@@ -37,8 +37,8 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
-from shared.types import (AbstractPlan, BeliefState, Decision, ExecutorState, GroundedAction, Script, Start,
-                          TaskInstance, same_task, task_instance_key)
+from shared.types import (AbstractPlan, AdequacyFinding, BeliefState, Decision, ExecutorState, GroundedAction, Script, Start,
+                          RecognizerLifecycle, TaskInstance, same_task, task_instance_key)
 from world.record import Record, Snapshot
 from world.human_executor import StackMachine, RunAction, ResumeAction
 
@@ -270,11 +270,23 @@ class RobotAgent(FactoryAgent):
         beta, self._beta_source = _get_beta(model)
         min_separation, self._min_separation_source = _get_min_separation(model)
 
+        # The adequacy test's inputs (T-D E2): the speed, the duration-to-ticks
+        # conversion and the priced standing of a stationary action are the
+        # values handed to the Projector below, read once here so projection
+        # and adequacy take one source; the test level alpha is a run option
+        # (--test_level).
+        speed = _get_step_size(model)
+        duration_to_steps = lambda duration: _parse_duration_to_steps(duration, model)
+        default_action_cost = 1.0     # a stationary action is one tick (GRASP/RELEASE)
         self.recognizer = IntentionRecognizer(
             task_model=task_model,
             hypotheses=hypotheses,
             context=context,
             beta=beta,
+            speed=speed,
+            duration_to_steps=duration_to_steps,
+            default_action_cost=default_action_cost,
+            alpha=self.model.test_level,
             assigned_tasks=observed_assigned_tasks,
         )
         logging.info(
@@ -304,14 +316,14 @@ class RobotAgent(FactoryAgent):
         #                              so the projected wait is the executed wait (TODO-32)
         self.projector = Projector(
             task_model=task_model,
-            assumed_speed=_get_step_size(model),
-            default_action_cost=1.0,
+            assumed_speed=speed,
+            default_action_cost=default_action_cost,
             arrival_radius=PROXIMITY_THRESHOLD,
             action_completion_latency=ACTION_COMPLETION_LATENCY,
             task_completion_latency=TASK_COMPLETION_LATENCY,
             observed_task_completion_latency=HUMAN_TASK_COMPLETION_LATENCY,
             observation_offset=OBSERVATION_OFFSET,
-            duration_to_steps=lambda duration: _parse_duration_to_steps(duration, model),
+            duration_to_steps=duration_to_steps,
         )
     
         # B3's strategy, B2's gate and B3's cost are run options
@@ -341,7 +353,8 @@ class RobotAgent(FactoryAgent):
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
             f"min_separation={self.meta_planner.min_separation:.2f} "
             f"min_separation_source={self._min_separation_source} "
-            f"beta={beta:g} beta_source={self._beta_source} units=cm"
+            f"beta={beta:g} beta_source={self._beta_source} units=cm "
+            f"test_level={self.model.test_level:g} speed={speed:g}"
         )
         self.meta_planner.seed_tasks(assigned_tasks)
         self.current_task_instance: Optional[TaskInstance] = None
@@ -407,7 +420,18 @@ class RobotAgent(FactoryAgent):
         logging.info(f"[meta-trig] step={int(self.model.schedule.steps)} trigger={trigger.reason}")
 
         if self.belief is not None and human is not None:
-            logging.info(f"[IR] step={int(obs.timestamp)} most_likely={self.belief.most_likely} confidence={self.belief.confidence:.3f}")
+            # The recognizer's three outputs (T-D R2 to R4): the belief's
+            # leader, the lifecycle state, the adequacy finding (absent when
+            # exhausted) and the members' tail probabilities, in hypothesis
+            # order, to 4 decimals so a finding can be re-read at any alpha.
+            most_likely = self.belief.most_likely or "none"
+            finding = "" if self.belief.finding is None else f" finding={self.belief.finding.value}"
+            tails_str = "  ".join(f"{k}={v:.4f}" for k, v in self.belief.tails.items())
+            logging.info(
+                f"[IR] step={int(obs.timestamp)} most_likely={most_likely} "
+                f"confidence={self.belief.confidence:.3f} "
+                f"lifecycle={self.belief.lifecycle.value}{finding} tails=[{tails_str}]"
+            )
      
             dist_str = "  ".join(
             f"{k}={v:.3f}"
@@ -415,7 +439,7 @@ class RobotAgent(FactoryAgent):
             )
             logging.info(
                 f"[IR-dist] step={int(obs.timestamp)} "
-                f"most_likely={self.belief.most_likely} "
+                f"most_likely={most_likely} "
                 f"confidence={self.belief.confidence:.3f} "
                 f"dist=[{dist_str}]"
             )
@@ -509,12 +533,17 @@ class RobotAgent(FactoryAgent):
     # =========================================================================
 
     def _make_dummy_belief(self) -> BeliefState:
+        """The belief before the recognizer's first observation: no leader, no
+        confidence, nothing observed yet (unresolved)."""
         return BeliefState(
             timestamp=float(self.model.schedule.steps),
             agent_id=self.unique_id,
             distribution={},
-            most_likely="unknown",
+            most_likely=None,
             confidence=0.0,
+            finding=AdequacyFinding.UNRESOLVED,
+            lifecycle=RecognizerLifecycle.LIVE,
+            tails={},
         )
 
 

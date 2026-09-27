@@ -166,7 +166,7 @@ from shared.types import (
 
 
 from shared.knowledge import TaskModel
-from shared.recognizer import IntentionRecognizer, UNKNOWN
+from shared.recognizer import IntentionRecognizer
 from shared.planner import AdaptivePlanner
 from shared.projection import Projector
 from shared.realization import realize
@@ -358,13 +358,12 @@ class MetaPlanner:
                 * a hypothesis is recorded and belief.most_likely is no longer
                   it: replaced by another (TODO-48), the human's task ended and
                   the belief re-initialised (the recognizer's [IR-boundary]
-                  tick), or `unknown` took over after a pin (TODO-54). What is
-                  projected next is admission's answer, possibly nothing;
-                * none is recorded and the belief clears _clears_gate() on a
-                  task hypothesis — not `unknown`, which is no task hypothesis
-                  and has no projection (admission refuses it). The first
-                  time a task hypothesis clears the gate, as `theta_crossed`
-                  fired it.
+                  tick), or no hypothesis is left live (most_likely None).
+                  What is projected next is admission's answer, possibly
+                  nothing;
+                * none is recorded and the belief clears _clears_gate(). The
+                  first time a task hypothesis clears the gate, as
+                  `theta_crossed` fired it.
               The gate is asked at admission, never for retention: a recorded
               hypothesis that dips below theta while staying most likely fires
               nothing (TODO-68's repeated crossings) and keeps its projection
@@ -390,9 +389,7 @@ class MetaPlanner:
             if recorded is not None:
                 recognition_changed = belief.most_likely != recorded
             else:
-                recognition_changed = (
-                    self._clears_gate(belief) and belief.most_likely != UNKNOWN
-                )
+                recognition_changed = self._clears_gate(belief)
 
             if recognition_changed:
                 decision = TriggerDecision(fired=True, reason="recognition_changed", score=belief.confidence)
@@ -434,13 +431,6 @@ class MetaPlanner:
           - the belief does not clear the gate (_clears_gate(); the projector is
             not called),
           - no human is observed,
-          - belief.most_likely is the recognizer's `unknown` (the projector is
-            not called): mass on `unknown` above theta is not admitted —
-            the human's behaviour is unmodelled, or no task hypothesis is
-            left live and the mass is `unknown`'s by normalisation — and
-            there is nothing to project. Reachable since the completion pin:
-            a hypothesis retired by the robot's own delivery hands its mass
-            to `unknown` (TODO-54),
           - the hypothesis cannot be resolved (project_human() returned None).
         update() then realizes every candidate against no human plan: δ = 0,
         plain projected cost.
@@ -456,9 +446,6 @@ class MetaPlanner:
         elif self._human_agent_id is None:
             reason = "none(no_human)"
             projection = None
-        elif belief.most_likely == UNKNOWN:
-            reason = "none(unknown)"
-            projection = None
         else:
             projection = self._projector.project_human(
                 belief=belief,
@@ -466,7 +453,7 @@ class MetaPlanner:
                 human_agent_id=self._human_agent_id,
                 recognizer=self._recognizer,
             )
-            reason = "built" if projection is not None else "none(unresolved)"
+            reason = "built" if projection is not None else "none(unprojectable)"
 
         self._projected_hypothesis = belief.most_likely if projection is not None else None
 
@@ -513,7 +500,7 @@ class MetaPlanner:
         `human_projection` is supplied by the caller, built once per fired
         trigger via update_human_projection(). Not rebuilt here, not recomputed
         per candidate. None means the projection was not admitted: belief
-        confidence below theta, no human observed, `unknown`, or the hypothesis
+        confidence below theta, no human observed, or the hypothesis
         was unresolvable — every candidate then realizes with δ = 0 at its
         plain projected duration (realize() with no human plan), never as
         always-conflicting. A ROUTINE mid-run state, not an edge case: the
@@ -607,10 +594,10 @@ class MetaPlanner:
           - theta DERIVED rather than fixed (TODO-64): a function of the live
             hypothesis set, of layout geometry, or both. A fixed 0.75 is a
             different evidential bar over a three-hypothesis live set than an
-            eight-hypothesis one, since the reachable ceiling is 1/(1 + u^n).
+            eight-hypothesis one.
           - a MARGIN or likelihood-ratio gate replacing the absolute test
             (TODO-65): fire when the leading hypothesis is far enough ahead of
-            the runner-up, of `unknown`, or of the rest of the field. 0.5
+            the runner-up, or of the rest of the field. 0.5
             against a field of 0.1s is a stronger signal than 0.6 against a
             field of 0.2s, and an absolute threshold cannot see the difference.
         `belief` alone already carries what both need except layout geometry:
@@ -710,8 +697,8 @@ class MetaPlanner:
         does not change when "b2b" is filled in.
 
         When `human_projection` is None — not admitted by
-        update_human_projection() (below theta, no human, `unknown`,
-        unresolvable) — b2a continues with no hold. B2 escalates on evidence
+        update_human_projection() (below theta, no human, unresolvable) —
+        b2a continues with no hold. B2 escalates on evidence
         AGAINST the current task; no projection means no evidence, and no
         reason to interrupt committed work.
 

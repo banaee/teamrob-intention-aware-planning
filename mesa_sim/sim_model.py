@@ -103,6 +103,7 @@ class SimModel(model.Model):
                  gate_strategy: str = "none",
                  cost_strategy: str = "realized",
                  separation_stop: bool = False,
+                 test_level: float = 0.05,
                  overrides: Sequence[Override] = ()):
         super().__init__()
 
@@ -121,6 +122,9 @@ class SimModel(model.Model):
         # Execution-time separation stop for every robot (C, TODO-73); a run
         # option, off by default.
         self.separation_stop = separation_stop
+        # The recognizer's adequacy test level alpha for every robot (T-D E5); a
+        # run option, 0.05 by convention, never chosen from a scenario.
+        self.test_level = test_level
 
         # ------------------------------------------------------------------
         # Load the layout (the room) and the setup (the shift) — T-L, stage 1

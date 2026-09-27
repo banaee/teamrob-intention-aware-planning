@@ -49,17 +49,59 @@ class Observation:
 # BELIEF STATE TYPES
 # =============================================================================
 
+class AdequacyFinding(Enum):
+    """
+    The recognizer's adequacy finding (T-D R2, E4 to E7): whether some live
+    hypothesis explains its current derived phase. A member of the test on a
+    tick is a live hypothesis with a derived phase (an expected action) whose
+    phase holds an observation (walked path since its origin, or standing
+    beyond the priced standing s_exp).
+    UNRESOLVED   no member;
+    UNEXPLAINED  every member's tail probability is below the test level alpha;
+    ADEQUATE     otherwise.
+    Not reported in the lifecycle state EXHAUSTED.
+    """
+    UNRESOLVED = "unresolved"
+    ADEQUATE = "adequate"
+    UNEXPLAINED = "unexplained"
+
+
+class RecognizerLifecycle(Enum):
+    """
+    The recognizer's lifecycle state (T-D R3, R4): LIVE while some task
+    hypothesis is live, EXHAUSTED when none is (every hypothesis retired or
+    outside the support). No adequacy finding is reported when EXHAUSTED.
+    """
+    LIVE = "live"
+    EXHAUSTED = "exhausted"
+
+
 @dataclass
 class BeliefState:
     """
-    Robot's belief distribution over human intentions.
-    Output of intention recognition.
+    The recognizer's output (T-D R2 to R4): the belief, the adequacy finding and
+    the lifecycle state, independent outputs.
+    distribution  over the live hypothesis set H, normalised there, floored, with
+                  the retired and inadmissible hypotheses pinned at the floor
+                  (the output convention, not belief mass). When EXHAUSTED it
+                  holds the pins only and does not sum to 1.
+    most_likely   the argmax over H; None when EXHAUSTED.
+    confidence    the share of most_likely; 0.0 when EXHAUSTED.
+    finding       the adequacy finding; None exactly when EXHAUSTED.
+    lifecycle     LIVE or EXHAUSTED.
+    tails         the tail probability S_k of each member of the adequacy test
+                  this tick (a live hypothesis without an observation in its
+                  derived phase is absent), for evaluation. Not a belief, not a
+                  share; the meta-planner does not read it.
     """
     timestamp: float
     agent_id: str
     distribution: Dict[str, float]  # {intention_id: probability}
-    most_likely: str  # intention_id with highest probability
-    confidence: float  # overall confidence in belief
+    most_likely: Optional[str]  # intention_id with highest probability; None when exhausted
+    confidence: float  # the share of most_likely
+    finding: Optional[AdequacyFinding]
+    lifecycle: RecognizerLifecycle
+    tails: Dict[str, float]  # {intention_id: S_k}, members of the adequacy test only
     # predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}  
                             # OUTDATED: current design uses ProjectedPlan for multi-step prediction; 
                             # this field is retained for backward compatibility but should not be used in new code.

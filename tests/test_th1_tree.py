@@ -141,7 +141,8 @@ def test_support_restriction_on_hypothesis_keys():
     human = next(a for a in registered("env_layout_05", "scenario_s04_01").agents if a.agent_type == "human")
     rec = IntentionRecognizer(task_model=robot.recognizer.task_model, context=ContextKnowledge.default(),
                               hypotheses=build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type),
-                              beta=0.01, assigned_tasks=human.assigned_tasks)
+                              beta=0.01, speed=20.0, duration_to_steps=float, default_action_cost=1.0, alpha=0.05,
+                              assigned_tasks=human.assigned_tasks)
     assigned = {HypothesisKey(deliver_item, {"?item": t.bindings[Var("?item")].value}) for t in human.assigned_tasks}
     personal = {h for h in rec._hypotheses if h.schema is coffee_break or h.schema is ac_activation}
     assert rec._admissible == assigned | personal
@@ -149,7 +150,8 @@ def test_support_restriction_on_hypothesis_keys():
     small = TaskModel(m.tree, [deliver_item, coffee_break])
     rec2 = IntentionRecognizer(task_model=small, context=ContextKnowledge.default(),
                                hypotheses=build_hypothesis_space(small, m._objects_by_type),
-                               beta=0.01, assigned_tasks=human.assigned_tasks)
+                               beta=0.01, speed=20.0, duration_to_steps=float, default_action_cost=1.0, alpha=0.05,
+                               assigned_tasks=human.assigned_tasks)
     assert {h.task_name for h in rec2._admissible} == {"deliver_item", "coffee_break"}
 
 

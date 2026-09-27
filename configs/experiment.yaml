@@ -2,7 +2,7 @@
 # Default experiment configuration.
 # Every key is a run option, and each has a CLI flag of the same name that overrides it:
 # --domain, --layout, --scenario, --steps, --assignment_prior, --strategy, --gate_strategy, --cost_strategy,
-# --separation_stop (and --run, the path of this file: the run file). mesa_sim/run_mesa.py rejects an
+# --separation_stop, --test_level (and --run, the path of this file: the run file). mesa_sim/run_mesa.py rejects an
 # unknown key or flag, a strategy outside its choices, and a switch that is not true/false.
 # layout is optional (here and on the CLI): a run that names none takes the scenario's first
 # reference layout. setup may be named here (no CLI flag); it must equal the scenario's (T-L).
@@ -32,3 +32,6 @@ cost_strategy: "realized"
 
 # Execution-time separation stop (C, TODO-73): the robot refuses a STEP that would break the F1 rule against the human's actual position. Off keeps the baselines.
 separation_stop: false
+
+# The recognizer's adequacy test level alpha, per derived phase (T-D E5): 0.05 by convention, reported at 0.01, 0.05 and 0.1; never chosen from a scenario
+test_level: 0.05

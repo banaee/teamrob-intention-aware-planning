@@ -58,30 +58,22 @@ THE EVIDENCE MODEL (I4):
     no graded signal (pick_up, place, wait_at: the agent is within reach of the
     action's location, or the walk would have regressed to the approach).
 
-    UNKNOWN_LIKELIHOOD — the likelihood under `unknown` of an observation that
-    covered one whole expected path. It is the threshold separating "fits
-    badly enough to be called unexplained" from "fits well enough to be a real
-    hypothesis": walk toward something no task targets, every hypothesis's
-    excess grows and its likelihood falls, `unknown`'s does not move, and
-    `unknown` wins. It also sets the CEILING on confidence — a lone hypothesis
-    fitting perfectly over n whole observations reaches 1 / (1 + uⁿ), never 1.
+    The belief has no reference hypothesis (T-D R1, 27 September 2026): each live
+    hypothesis pays its own likelihood per stretch, and the recognizer
+    normalises over the live hypothesis set H only. The absolute question —
+    whether the best of the robot's models is wrong — is not the belief's; it is
+    the adequacy finding's (below, and shared/recognizer.py).
 
-    The grade (graded evidence, September 2026). A stretch's evidence against
-    `unknown` is metered by how much of the hypothesis's expected path it
-    covered: f = (C(origin, g) − C(pos, g)) / C(origin, g), the share of the
-    direct cost from the origin that the agent has closed, clipped to [0, 1]
-    (covered_fraction). The stretch's likelihood under `unknown` is u^f
-    (graded_unknown_likelihood), so its odds are L / u^f: log-linear in f,
-    evidence accrues at a constant rate per unit of expected path, and two
-    stretches covering the halves of one path are worth the whole. A stretch
-    that covered a whole path is worth L/u, as before the grade; one that
-    covered nothing (a step away from the target: f = 0) pays L alone, so
-    refutation by wasted path is untouched — the grade meters confirmation
-    only. A stretch that has ARRIVED (its action's completion holds at the
-    fold) is graded 1 by that fact, not by the distances: the world says the
-    path is covered, and the arrival radius is the body's, not this layer's.
-    Scale-free: a ratio of two costs. Observations with no path (an action
-    without evaluator or target) are ungraded and stay at u.
+    Adequacy — the tail probability (T-D E5). The same logistic read as a
+    density on x >= 0, p(x) = beta·L(x) / (2 ln 2), is the reference
+    distribution the adequacy test reads a hypothesis's projected completion
+    delay against, in length units (x = v·D, v the body's speed):
+        S(x) = ln(1 + exp(-beta·x)) / ln 2   for x > 0,   S = 1 for x <= 0.
+    A modelling assumption, stated as one: it criticises the model the belief
+    uses, and its empirical adequacy is open. beta gains here its second
+    meaning, the scale of the reference distribution; it is not retuned for
+    adequacy. The test level alpha is the recognizer's run option, not held
+    here.
 
     Completion — a detection-reliability model. The observed microaction is in
     the expected action's vocabulary (GRASP for pick_up), so the question is
@@ -120,7 +112,6 @@ PathCost = Callable[[Position, Position], float]
 # the module, never redefines them). The detour tolerance beta is not here: it
 # carries the body's length unit, so the embodiment supplies it (T-A1).
 # =============================================================================
-UNKNOWN_LIKELIHOOD         = 0.1     # likelihood under `unknown` per whole expected path covered; ceiling 1/(1+uⁿ)
 DETECTION_HIT_RATE         = 1.0     # P(signal | completed): Mesa reports every completion
 DETECTION_FALSE_ALARM_RATE = 1e-3    # P(signal | not completed): none in Mesa; non-zero for recoverability
 
@@ -166,42 +157,39 @@ def excess_path_likelihood(
     in the units of the positions. Registered as "excess_path"; applies to any
     action schema with progress_evaluator="excess_path" (currently: move_to).
     """
-    excess = walked + cost(pos, target_pos) - cost(origin, target_pos)
-    return logistic_of_excess(excess, beta)
+    return logistic_of_excess(excess_path(walked, origin, pos, target_pos, cost), beta)
 
 
-# =============================================================================
-# The grade — how much of an expected path a stretch covered (graded evidence)
-# =============================================================================
-
-def covered_fraction(
+def excess_path(
+    walked: float,
     origin: Position,
     pos: Position,
     target_pos: Position,
-    cost: PathCost = straight_line_cost,
+    cost: PathCost,
 ) -> float:
     """
-    The fraction of the expected path C(origin, target) that the stretch has
-    covered by `pos`: the direct cost from the origin less what is still left,
-    over the direct cost. 1 at the target, 0 at the origin and anywhere no
-    nearer to the target than the origin (a step away covers nothing; the
-    excess charges it), clipped to [0, 1]. 0 when the expected path is empty
-    (the origin is at the target). A ratio of two costs: scale-free.
+    The wasted path since `origin` under an action located at `target_pos`:
+    walked + C(pos, target) - C(origin, target). The one computation the
+    excess-path likelihood and the adequacy test's projected completion delay
+    both read (T-D E2: "the excess path from the origin as computed today").
     """
-    expected = cost(origin, target_pos)
-    if expected <= 0.0:
-        return 0.0
-    return min(1.0, max(0.0, (expected - cost(pos, target_pos)) / expected))
+    return walked + cost(pos, target_pos) - cost(origin, target_pos)
 
 
-def graded_unknown_likelihood(fraction: float) -> float:
+# =============================================================================
+# Adequacy — the tail of the reference distribution (T-D E5)
+# =============================================================================
+
+def tail_probability(x: float, beta: float) -> float:
     """
-    The likelihood of a stretch under `unknown`, graded by the fraction of the
-    expected path it covered: u^fraction — u for a whole path, 1 for none.
-    Log-linear, so the odds L / u^fraction accrue at a constant rate per unit
-    of expected path and compose across a path's stretches.
+    S(x) = ln(1 + exp(-beta·x)) / ln 2 for x > 0, and 1 for x <= 0: the tail of
+    the reference distribution p(x) = beta·L(x) / (2 ln 2) at x = v·D, the
+    projected completion delay in the body's length units. 1 at x = 0,
+    decreasing to 0. beta is the excess-path likelihood's own tolerance.
     """
-    return UNKNOWN_LIKELIHOOD ** fraction
+    if x <= 0.0:
+        return 1.0
+    return math.log1p(math.exp(-beta * x)) / math.log(2.0)
 
 
 # =============================================================================
@@ -228,5 +216,11 @@ def completion_predicate_likelihood(
 
 PROGRESS_EVALUATORS: Dict[str, Callable[..., float]] = {
     "excess_path": excess_path_likelihood,
-    # Future: "duration": duration_consistency_likelihood,  (for wait_at-style actions)
+}
+
+# The excess each registered evaluator's likelihood is a function of, under the
+# same name: what the adequacy test reads as e (T-D E2). Time is not an
+# evaluator: it enters adequacy only, never the belief's likelihood (T-D E3).
+EXCESS_MEASURES: Dict[str, Callable[[float, Position, Position, Position, PathCost], float]] = {
+    "excess_path": excess_path,
 }

@@ -152,6 +152,11 @@ def load_experiment(run_path: str, flags: dict, cli_overrides=()) -> dict:
     for key in BOOL_OPTIONS:
         if key in config and not isinstance(config[key], bool):
             raise ValueError(f"{key}={config[key]!r}: expected true or false")
+    # The adequacy test's level (T-D E5): a probability strictly between 0 and 1.
+    if "test_level" in config:
+        level = config["test_level"]
+        if isinstance(level, bool) or not isinstance(level, (int, float)) or not 0.0 < level < 1.0:
+            raise ValueError(f"test_level={level!r}: expected a number strictly between 0 and 1")
     return config
 
 
@@ -201,6 +206,7 @@ def parse_user_args():
     parser.add_argument("--gate_strategy", type=str, default=None, choices=GATE_STRATEGIES, help="MetaPlanner B2 gate strategy override")
     parser.add_argument("--cost_strategy", type=str, default=None, choices=COST_STRATEGIES, help="MetaPlanner B3 cost strategy override")
     parser.add_argument("--separation_stop", type=_bool_arg, default=None, help="Execution-time separation stop override: true/false")
+    parser.add_argument("--test_level", type=float, default=None, help="The recognizer's adequacy test level alpha, per derived phase (T-D E5)")
     return parser.parse_args(_script_argv())
 
 
@@ -300,6 +306,7 @@ def resolve_model_params(user_config: dict) -> dict:
         "gate_strategy":    user_config.get("gate_strategy", "none"),
         "cost_strategy":    user_config.get("cost_strategy", "realized"),
         "separation_stop":  bool(user_config.get("separation_stop", False)),
+        "test_level":       float(user_config.get("test_level", 0.05)),
         "overrides":        tuple(user_config.get("overrides", ())),
     }
 
