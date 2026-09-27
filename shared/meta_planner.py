@@ -149,6 +149,7 @@ STILL OPEN (do not resolve inline while implementing — see TODOS_AND_DEFERRED.
 
 import itertools
 import logging
+from enum import Enum
 from math import factorial
 from typing import Dict, List, Literal, Optional, Tuple
 
@@ -162,6 +163,7 @@ from shared.types import (
     TriggerDecision,
     UpdateResult,
     task_instance_key,
+    HypothesisAdequacy,
 )
 
 
@@ -192,6 +194,27 @@ so this default governs every run.
 NOT a settled constant — see _clears_gate() for the two open directions
 (TODO-64, TODO-65) and why they touch only that method.
 """
+
+
+class GateOutcome(Enum):
+    """
+    The confidence gate's answer (_clears_gate(), its one home): the belief
+    clears it, or the reason it does not, in the order the gate asks. A
+    refusal's value is the [meta-proj] reason admission logs for it; CLEARS
+    is never logged as one (admission then logs what the projection became).
+    CLEARS                  the leader's share reaches theta and its
+                            hypothesis adequacy is adequate (G1);
+    BELOW_THETA             the leader's share is below theta (0.0 when the
+                            recognizer is exhausted: no leader);
+    LEADER_NO_OBSERVATION   at theta, but the leader's derived phase holds no
+                            observation this tick (G1);
+    LEADER_INADEQUATE       at theta, but the leader is inadequate in its own
+                            derived phase (G1).
+    """
+    CLEARS = "clears"
+    BELOW_THETA = "none(below_theta)"
+    LEADER_NO_OBSERVATION = "none(leader_no_observation)"
+    LEADER_INADEQUATE = "none(leader_inadequate)"
 
 
 class MetaPlanner:
@@ -389,7 +412,7 @@ class MetaPlanner:
             if recorded is not None:
                 recognition_changed = belief.most_likely != recorded
             else:
-                recognition_changed = self._clears_gate(belief)
+                recognition_changed = self._clears_gate(belief) is GateOutcome.CLEARS
 
             if recognition_changed:
                 decision = TriggerDecision(fired=True, reason="recognition_changed", score=belief.confidence)
@@ -429,7 +452,9 @@ class MetaPlanner:
 
         Returns None, in this order, when
           - the belief does not clear the gate (_clears_gate(); the projector is
-            not called),
+            not called; the refusal's reason is the gate's outcome: below theta,
+            or the leader with no observation or inadequate in its own phase,
+            G1),
           - no human is observed,
           - the hypothesis cannot be resolved (project_human() returned None).
         update() then realizes every candidate against no human plan: δ = 0,
@@ -440,8 +465,9 @@ class MetaPlanner:
         caller. Both are recoverable by adjacency — this is called only on a
         fired trigger, so the [meta-trig] line of the same tick precedes it.
         """
-        if not self._clears_gate(belief):
-            reason = "none(below_theta)"
+        gate = self._clears_gate(belief)
+        if gate is not GateOutcome.CLEARS:
+            reason = gate.value
             projection = None
         elif self._human_agent_id is None:
             reason = "none(no_human)"
@@ -575,10 +601,17 @@ class MetaPlanner:
     # Internal (not part of io_contracts.md — private to this class)
     # =========================================================================
 
-    def _clears_gate(self, belief: BeliefState) -> bool:
+    def _clears_gate(self, belief: BeliefState) -> GateOutcome:
         """
         THE confidence gate (DESIGN-07): has this belief cleared the bar the
-        meta-planner is willing to act on? The ONLY place theta is applied.
+        meta-planner is willing to act on? The ONLY place theta is applied,
+        and the one home of the guard on admission (G1, T-D 1.5 rulings): the
+        leader must also be adequate in its own derived phase — a member of
+        the recognizer's adequacy test with its tail at or above the test
+        level — read as the leader's categorical hypothesis adequacy
+        (belief.hypothesis_adequacy). The meta-planner receives no alpha and
+        no tail probability. Asked in this order: theta, then the guard, so a
+        belief below theta refuses as it did before G1.
         Both consumers ask this question and neither compares numbers itself:
           - evaluate_triggers(): `recognition_changed` asks it on its
             entering side only — a task hypothesis clears the gate while no
@@ -605,13 +638,20 @@ class MetaPlanner:
         geometry-derived theta would add a `world` argument HERE, and the two
         call sites above already hold a WorldState to pass.
 
-        Returns True when the belief clears the bar. Deliberately says nothing
-        about what clearing MEANS: whether a decision still rests on a
-        hypothesis is the decision record's question (`recognition_changed`,
-        D2), not this predicate's, and that reading must not be built into
-        this name.
+        Returns GateOutcome.CLEARS when the belief clears the bar, otherwise
+        the reason it does not. Deliberately says nothing about what clearing
+        MEANS: whether a decision still rests on a hypothesis is the decision
+        record's question (`recognition_changed`, D2), not this predicate's,
+        and that reading must not be built into this name.
         """
-        return belief.confidence >= self._theta
+        if belief.confidence < self._theta:
+            return GateOutcome.BELOW_THETA
+        leader = belief.hypothesis_adequacy.get(belief.most_likely)
+        if leader is HypothesisAdequacy.ADEQUATE:
+            return GateOutcome.CLEARS
+        if leader is HypothesisAdequacy.INADEQUATE:
+            return GateOutcome.LEADER_INADEQUATE
+        return GateOutcome.LEADER_NO_OBSERVATION
 
     def seed_tasks(self, tasks: List[TaskInstance]) -> None:
         """
