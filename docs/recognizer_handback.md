@@ -51,6 +51,10 @@ whose terminal fact holds AT t, read from the world on every tick; "completed by
 no longer. A hypothesis whose terminal fact stops holding re-enters H with the prior base and the current position as
 origin, the others renormalised (R6): a moved item makes its delivery live again, `coffee_break` is live again when
 `waited` clears. design_decisions.md, "T-D L: the belief lifecycle", L4.
+AMENDED (Hadi, on the L-records report, 27 September 2026): re-entry takes exactly 1/|H| (H with the returning hypothesis; k
+returning on one tick take 1/|H| each), the incumbents share the rest in this tick's proportions; origin the current
+position, entry latency 0 (a first observation), the derived action the world's; a re-entry on a boundary tick is
+governed by the boundary. Logged `[IR-reentry]`.
 
 ### 1.2 Prior
 
@@ -186,6 +190,12 @@ A task whose execution ends without its terminal fact (the misdelivery, scenario
 the next episode at the prior. RETIREMENT (L4): "for the rest of the run" no longer; a hypothesis is retired while its
 terminal fact holds and re-enters when it stops holding (§1.1). What a boundary does is unchanged (L5).
 design_decisions.md, "T-D L: the belief lifecycle", L1, L4, L5.
+AMENDED (Hadi, on the L-records report, 27 September 2026): "read from the completion channel" no longer: the boundary fires
+when a terminal action's own completion condition becomes true for the observed agent — its preconditions held for
+that agent on the previous tick and a grounding of its completion condition under that binding holds now and did not
+then (`place`: `holding(agent, x)` then `obj_at(x, c)`; `wait_at`: `at(agent, e)` then `waited(agent, e)`). No
+microaction is read. A terminal `place` inside a decomposition (the return of `deliver_with_return`, scenario_s09_07 at
+33) is a boundary. The boundary tick is flagged on the belief (`episode_boundary`, L5 B).
 
 ### 1.7 Output
 
@@ -226,6 +236,8 @@ before L-build. Under L4 the `k completed` skip and `completed.add(k)` become a 
 retired key whose fact no longer holds re-enters H with the prior base and the current position as origin); under L1
 `boundary` is set by the observed agent's completion of a terminal action read from the completion channel, not
 inside the retirement branch by `expected[k] == A[-1]`. design_decisions.md, "T-D L: the belief lifecycle", L1, L4.
+AMENDED (Hadi, on the L-records report, 27 September 2026): `boundary` is set from the world's completion conditions for the
+observed agent (above, §1.6), not from the completion channel.
 
 ```python
 # update(obs, world)
@@ -620,6 +632,9 @@ exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`
   hypothesis leaves adequate (its `hypothesis_adequacy`), that hypothesis only, never a rival's transition: RETRACTION,
   the meta-planner's act. Admission is re-asked and G1 refuses; re-admission through the entering side. The recognizer
   retracts nothing (L2 (i)). design_decisions.md, "T-D L: the belief lifecycle", L2.
+  AMENDED (Hadi, on the L-records report, 27 September 2026): "leaves adequate" is adequate to inadequate
+  (built as the state: the recorded hypothesis is inadequate); no P fallback. It also fires on a belief re-initialised
+  at an episode boundary (`belief.episode_boundary`), whether or not most_likely changed (L5 B).
 - `update_human_projection()` admits a projection only when the gate clears. It resolves the key through
   `recognizer.get_hypothesis()` (the same live instance, held by reference) to project the human's task, and
   records the hypothesis it projected. Its refusal reasons are `none(below_theta)`, `none(leader_no_observation)`,

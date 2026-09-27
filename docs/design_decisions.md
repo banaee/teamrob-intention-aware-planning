@@ -1299,6 +1299,15 @@ in these data only because a place stop lasts one tick longer than a grasp stop 
 accident; 9,531 cm dropped; the waypoint pauses are invisible to it too); D fires 74 times, two ticks
 before every grasp and release, neutralises every fold by timing and collapses the excess to the current
 leg (132,250 cm dropped, wrong reveals prior-off).
+SUPERSEDED (T-D L1, ruled 27 September 2026, built in L-build): criterion A (a retirement whose hypothesis expected
+its terminal action on the previous tick) no longer defines the boundary. The boundary fires when a terminal action's
+own completion condition becomes true for the observed agent: its preconditions held for that agent on the previous
+tick and its completion holds now and did not then. It needs no pin, which A did (the misdelivery, the return of a
+change of mind and a delivery outside the support had no boundary), and it reads the agent from the action's own
+binding rather than from the recognizer's phase, so the named assumption of A (authorship inferred from the phase) is
+gone; the cost is one tick of the recognizer's own memory (the observed agent's enabled terminal groundings). A' is
+still rejected: the criterion reads the world's completion condition, not a microaction. design_decisions.md, "T-D L:
+the belief lifecycle", L1 as amended.
 
 Decision 2 — what a boundary does: the episode's inference ends (I4c). A task hypothesis —
 `deliver_item(item_3)` — means "this is the task being executed now". It is not a standing disposition,
@@ -1329,6 +1338,11 @@ whether the OBSERVED AGENT changed episode. A ROBOT completion therefore pins (t
 shrinks) but does not re-initialise: with the human idle after its last task, prior-off, the belief steps
 from 1/3 each over {ac, item_5, unknown} to 1/2 each when the robot delivers item_5 (s40_off, tick 376).
 That is correct, it looks odd in a log, and the two are deliberately not unified.
+SUPERSEDED IN PART (T-D L1 and L4, ruled 27 September 2026, built in L-build): the pin and the boundary still answer
+different questions, and now each has its own observable: the pin is a live hypothesis's terminal fact, the boundary
+the observed agent's completion of a terminal action (L1); a boundary at a pin is the special case where the terminal
+action also produces the fact. "Completed tasks stay pinned" (Decision 2) holds while the terminal fact holds (L4).
+design_decisions.md, "T-D L: the belief lifecycle".
 
 Decision 4 — an empty stretch is not an observation (I4c). dC = 0 used to mean two things: a perfectly
 efficient walk, and no walk at all. A stationary tick after an origin reset produced the second and was
@@ -1464,6 +1478,10 @@ duplicated: the queue invariant (`_queue` holds only tasks not executing; the in
 drop is the existing terminal return — "all assigned tasks are complete" now means exactly that, including
 tasks someone else finished. `no_current_task` still fires from the executor's clearing; the pool no longer
 depends on it for correctness.
+SUPERSEDED IN PART, FOR THE RECOGNIZER (T-D L4, ruled 27 September 2026, built in L-build): the recognizer's live
+set uses this test on every tick, not its permanence: a hypothesis is retired while its terminal fact holds and
+re-enters when it stops holding. The pool keeps its permanence: a task dropped as complete is not re-added when its
+fact stops holding (a moved item; TODO-128). design_decisions.md, "T-D L: the belief lifecycle", L4.
 AMENDED (T6 wrap-up, September 2026): "a completed current task is neither continued nor a candidate" was
 true of B3 only. B1.5 still tested `executor_state.current_task`, so B2 `b2a` was asked about a current task
 the pool had just dropped, and continued it (s71_off 108; the robot's next task started two ticks late).
@@ -2405,6 +2423,12 @@ under the gate, or none, differs from the recorded one" — because it fired on 
 contradicting its own goal (s20_off 12 fires against 7 today), not to choose the mechanism. TODO-48, TODO-54
 and TODO-68 are consequences of the one condition, not cases; no latch, no debounce, no odds gate, no
 change to the recognizer or to the contract's event semantics on the recognizer side.
+SUPERSEDED IN PART (T-D L2 (ii) and L5 B, ruled 27 September 2026, built in L-build): retention is by identity
+except in two conditions, each read against the recorded hypothesis only: the belief re-initialised at an episode
+boundary (`BeliefState.episode_boundary`), whether or not most_likely changed; and the recorded hypothesis's hypothesis
+adequacy is inadequate (retraction). Both fire `recognition_changed`; admission is re-asked and, the leader having no
+observation on a boundary tick or being inadequate, refuses, so the record clears. A dip below θ still fires nothing.
+The `[meta-trig]` line names the condition (`cause=`). design_decisions.md, "T-D L: the belief lifecycle", L2, L5.
 
 When two conditions hold on one tick the order is `no_current_task`, `recognition_changed`,
 `task_committed` — arbitrary, as before; only the reported reason and score differ.
@@ -4422,6 +4446,9 @@ Stated consequences:
   in the two-deliveries scenario (`scenario_s08_01`) is `coffee_break` the lone live hypothesis after both deliveries,
   at 1.0 by normalisation, and the exit walk is charged against its walk to the machine (TODO-117's case by
   construction).
+  SUPERSEDED (T-D L4, ruled 27 September 2026, built in L-build): `coffee_break` is retired while `waited` holds, not
+  for the run; it is live again the tick `waited` clears, so after the work order it is the lone live hypothesis in
+  every scenario and the exit walk reads unexplained. design_decisions.md, "T-D L: the belief lifecycle", L4.
 
 The setup (the shift). item_1 on the west shelf, item_2 on the east shelf, both designated to KT.
 
@@ -4534,6 +4561,20 @@ only (session L-records); built in L-build.
   of a live hypothesis; a boundary at a pin is the special case where the terminal action also produces that fact.
   Consequence: a task whose execution ends without its terminal fact stays live and starts the next episode at the
   prior; "live" and "being executed" are separated.
+  AMENDED (Hadi, on the L-records report, 27 Sept 2026; supersedes "read from the completion channel" above): the
+  boundary fires when a terminal action's own completion condition becomes true for the observed agent (`place`: the
+  release leaves the object placed at a container; `wait_at`: `waited(observed agent, ·)` starts holding). Why: the
+  completion channel has no event for a wait, and a bare RELEASE is a channel event that can be a false alarm; the
+  domain's completion condition, read for the observed agent, cannot be spoofed by the channel. Read, as built (L-build,
+  confirmed at its plan step): a terminal action (the last action of some method of a task schema in the robot's task
+  model; kitting: `place`, `wait_at`) is completed by the observed agent on tick t iff its preconditions held for that
+  agent on t − 1 (`holding(agent, x)`; `at(agent, e)`) and, under that binding, a grounding of its completion condition
+  holds at t that did not hold at t − 1 (`obj_at(x, c)`; `waited(agent, e)`). `place`'s completion names no agent: the
+  agent enters through its precondition. The recognizer keeps, from one tick to the next, the observed agent's enabled
+  terminal groundings with the completions that already held (its own derived state, not the world state).
+  Consequence D: a terminal `place` is a boundary wherever it sits in a decomposition: scenario_s09_07's return at 33
+  (item_1 back on shelf_1, the first `place` of `deliver_with_return`) ends an episode inside `deliver_item(item_2)`'s
+  execution. The phase evidence discarded there is accepted: the release ended what the human was doing.
 
 - L2, retraction, three parts.
   Problem. An admitted projection outlives its leader's adequacy (TODO-118): G1 is asked at admission only and D2
@@ -4555,6 +4596,15 @@ only (session L-records); built in L-build.
   (iii) "Consistent again" is evidentially meaningful at the next phase advance (E8 makes the advancing hypothesis a
   member); a resumed walk in the right direction repairs nothing mid-phase. Cost stated: a resumed carry is
   unprojected until its advance (46 ticks in scenario_s09_05, 80 to 125).
+  AMENDED (Hadi, on the L-records report, 27 Sept 2026). (ii): "leaves adequate" is adequate to inadequate, for the
+  recorded hypothesis only. Why: D grows within a phase, so this fires at most once per phase; leaving adequate for no
+  observation, or a regress, would fire on every boundary and every proximity regress (scenario_s09_04 at 31, a
+  one-tick retraction). Built as a state (L-build plan, confirmed): the recorded hypothesis's hypothesis adequacy is
+  inadequate. A record is set only when its hypothesis is adequate (G1) and the fire clears it, so this is the
+  adequate-to-inadequate event with no memory in the meta-planner, and it also fires when a no-observation tick lies
+  between (a regress, then a walk away). SUPERSEDES "P's fallback replaces the projection" above: there is no P
+  fallback; a retraction realizes against no human plan, as below θ today. (iii): "consistent again" arrives at the
+  next phase change, advance or regress: a regress opens a phase too.
 
 - L3, resumption: no change under L1.
   Problem. The completion of a foreseeable task inside a suspended delivery ends the episode while the delivery is
@@ -4586,11 +4636,34 @@ only (session L-records); built in L-build.
   live set is the foreseeable tasks in every scenario and the exit walk reads unexplained (a stand charged against the
   walk phase, E10), the honest statement; exhausted is about the current world and becomes rare.
   Set aside. No change. Foreseeable retirement on an exhausted assigned pool.
+  AMENDED (Hadi, on the L-records report, 27 Sept 2026). Re-entry, C: the returning hypothesis takes exactly 1/|H| (H
+  the live set with it); the incumbents share the rest in their existing proportions (this tick's, after their update);
+  its origin is the current position; its entry latency is that of an ordinary first observation (0); its derived
+  action comes from the world. Why: re-entering is "live again", never "remembering old mass", and one arithmetic
+  leaves the build no choice. As built (L-build plan, confirmed): k hypotheses returning on one tick take 1/|H| each and
+  the incumbents share 1 − k/|H|; a re-entry on a boundary tick is governed by the boundary (the prior 1/|H|, the
+  boundary's latency, no member). Wording: the criterion is T7's test, not its permanence: the robot's pool drops a
+  completed task for good, and a moved item does not re-enter the pool (TODO-128). The exit walk turns unexplained by
+  walking excess, and the idle stand after it keeps it so (not "a stand charged against the walk phase" alone).
+  Consequences recorded, not ruled: `coffee_break` returns one tick after its break as a third rival, so L3's numbers
+  (both deliveries at 0.4990 after the break) move; after the work order a lone foreseeable hypothesis is admitted at
+  1.0 by normalisation on the tick after the boundary and retracted later wherever the robot still works (G's
+  question, TODO-119). Re-entering while the human is still within reach of the machine, `coffee_break` re-enters in
+  its `wait_at` phase with its priced standing, a member at S = 1 for a tick or two as the human walks away, before the
+  regress and the excess (G's, recorded at the L-build plan step).
 
 - L5, persistence: no change.
   The world persists, the recognizer does not: a boundary resets bases, origins, standing clocks and the completion
   events; the live set is a function of the world's terminal facts on every tick; derived phases re-derive from the
   world on the first tick of the new episode. The meta-planner needs nothing beyond D2 at a boundary.
+  AMENDED (Hadi, on the L-records report, 27 Sept 2026; supersedes "The meta-planner needs nothing beyond D2 at a
+  boundary"). Consequence B: a belief re-initialisation at an episode boundary fires `recognition_changed` for any
+  recorded decision, whether or not most_likely changes; the BeliefState carries the boundary as a flag
+  (`episode_boundary`). Why: under L1 a boundary without a pin can leave the recorded hypothesis the leader by
+  tie-break, and a decision resting on a belief that was reset rests on nothing. Consequence recorded for G (L-build
+  plan step): no hypothesis is a member on a boundary tick, so admission refuses there (G1) and every human boundary
+  that meets a recorded decision clears the projection; the decision on the boundary tick is unprojected, and a lone
+  hypothesis is re-admitted at b + 1 (TODO-119): two decisions per such boundary.
 
 Staging for L-build. The recognizer (L1, L4) and the meta-planner (L2 ii) are built; the IR test-bed's oracle is
 updated by derivation from this entry (not fitted to the runs); the sixteen test-bed scenarios (scenario_s08_01 to _04,

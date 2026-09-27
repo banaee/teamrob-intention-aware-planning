@@ -2981,6 +2981,9 @@ the observed agent completes an action that is terminal in the task model (`plac
 channel, whatever its binding; the pin stays the world's terminal fact. The misdelivery is a boundary (scenario_s09_08 at
 75), no pin: `deliver_item(item_1)` stays live and starts the next episode at the prior. The pool side (no pool drop) is
 unchanged: the task is not complete in the world. Built in L-build.
+AMENDED (Hadi, on the L-records report, 27 Sept 2026): not "read from the completion channel": the boundary fires when a terminal action's
+own completion condition becomes true for the observed agent (the item it held on the previous tick placed at a
+container; `waited(agent, ·)` starting). A bare RELEASE is no boundary. design_decisions.md, "T-D L", L1 as amended.
 
 **TODO-88 — With the prior off, an item the robot carries stays a live hypothesis about the human, with a target that moves with the robot** [recognizer finding; from T-B Q7]
 Found while checking T-B Q7's acceptance, which expected a robot-side timing fix to leave every `[IR]` line
@@ -3117,6 +3120,9 @@ consistent again (scenario_s09_05: inadequate 48 to 125, adequate at the advance
 turn-back rule, no window. (ii) meta-planner: `recognition_changed` also fires when the projected hypothesis leaves
 adequate (retraction; TODO-118). (iii) "consistent again" is meaningful at the next phase advance; a resumed carry is
 unprojected until its advance (46 ticks in scenario_s09_05).
+AMENDED (Hadi, on the L-records report, 27 Sept 2026): (ii) "leaves adequate" is adequate to inadequate, the recorded hypothesis only (built
+as the state: it is inadequate); no P fallback. (iii) "consistent again" arrives at the next phase change, advance or
+regress. design_decisions.md, "T-D L", L2 as amended.
 
 **TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN; its recognition level CLOSED by decision, T-D R and E, 27 Sept 2026]
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
@@ -3532,6 +3538,8 @@ fact stops holding re-enters the live set with the prior base and the current po
 live again when `waited` clears, so the once-per-run fact above dissolves; after the work order the live set is the
 foreseeable tasks in every scenario and the exit walk reads unexplained; exhausted becomes rare (scenario_s09_02 to _04,
 exhausted today from 201, 191, 202). Set aside: foreseeable retirement on an exhausted assigned pool.
+AMENDED (Hadi, on the L-records report, 27 Sept 2026): re-entry takes exactly 1/|H|, the incumbents keep their proportions (arithmetic C);
+the criterion is T7's test, not its permanence (the pool side: TODO-128). design_decisions.md, "T-D L", L4 as amended.
 
 **TODO-118: Retraction of an admitted projection when its leader turns inadequate (recorded for L, T-D 1.5c, 27 Sept 2026)**
 [RULED (T-D L2 (ii), 27 Sept 2026); built in L-build]
@@ -3547,6 +3555,9 @@ fires when the hypothesis the decision was projected against leaves adequate, th
 transition (the grasp flicker, scenario_s09_09 83 to 87). Admission is re-asked, G1 refuses, the decision realizes
 against no human plan (P's fallback replaces the projection); re-admission through D2's entering side. The act is
 retraction (glossary §4); the recognizer retracts nothing.
+AMENDED (Hadi, on the L-records report, 27 Sept 2026): "leaves adequate" is adequate to inadequate (built as the state "the recorded
+hypothesis is inadequate"); SUPERSEDES "(P's fallback replaces the projection)": there is no P fallback, the decision
+realizes against no human plan, as below θ. `[meta-trig] … cause=retraction`. design_decisions.md, "T-D L", L2.
 
 **TODO-119: A lone hypothesis is adequate right after a boundary with the human idle (recorded for P and G, T-D 1.5c, 27 Sept 2026)**
 [OPEN; cycle 2 input, P and G]
@@ -3562,6 +3573,13 @@ NOT RULED BY L (27 Sept 2026): its P part stays open. Under L2 (ii) such an admi
 hypothesis leaves adequate (scenario_s01_01 prior off: admitted at 143, inadequate from 159; TODO-118), which bounds the
 hold, not the admission. Under L4 the case widens: a foreseeable hypothesis that re-enters the live set is a lone
 hypothesis after the work order in every scenario. design_decisions.md, "T-D L: the belief lifecycle".
+CONSEQUENCES FOR G (L-records amendments and the L-build plan step, 27 Sept 2026, recorded, not ruled): after the work
+order a lone foreseeable hypothesis is admitted at 1.0 by normalisation on the tick after the boundary (b + 1) and
+retracted later wherever the robot still works. Under L5 B every human boundary that meets a recorded decision clears
+the projection (no member on the boundary tick, G1 refuses): the decision on the boundary tick is unprojected and a
+lone hypothesis is re-admitted at b + 1, two decisions per such boundary. A re-entering `coffee_break` still within
+reach of its machine re-enters in its `wait_at` phase and is a member at S = 1 for a tick or two as the human walks
+away. design_decisions.md, "T-D L", L4 and L5 as amended.
 
 **TODO-120: Three small flags from the 1.5b acceptance (recorded, T-D 1.5c, 27 Sept 2026)** [OPEN; documentation]
 - `analysis/td_stage1/supp_sweep.sh` was committed without the executable bit (made executable in 1.5c; run it with
@@ -3637,6 +3655,14 @@ reads another line prior off, or the declared tick differs by prior; to be check
 `analysis/td_stage1b/tdlib.py` is compared across priors (the 1.5c and TB.2b measures rerun in L-build).
 Files: analysis/td_stage1b/tdlib.py (frozen), analysis/td_stage1b/d_decisions.py
 Reference: `analysis/tb2b_exposed_interval/REPORT.md`, "Flags (not fixed)"; CLAUDE.md, "Regression checking" (completion)
+
+**TODO-128: A moved item does not re-enter the robot's pool (recorded, L-build records, 27 Sept 2026)** [OPEN; recorded only]
+The recognizer's live set uses T7's completion test on every tick, not its permanence (T-D L4): a delivery whose item
+leaves its table is live again. The robot's pool keeps the permanence: `update()` drops a task complete in the world
+and B3's queue rewrite persists the drop, so a task whose terminal fact later stops holding is not re-added. Whether
+the pool should follow the world both ways is for later; nothing in the current scenarios moves a delivered item.
+Files: shared/meta_planner.py (`update`, the pool)
+Reference: design_decisions.md, "T-D L: the belief lifecycle", L4 as amended; T7
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).

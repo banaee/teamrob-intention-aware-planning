@@ -249,6 +249,10 @@ recognizer retracts nothing: inadequacy attaches to the derived phase and stays 
 recognizer's side has no term. Older texts use the word for the recognizer's side (T-D Q2; E7's "retraction and
 resumption are L"; the **unexplained** entry, §7); L2 (i) rules that side out. Ruled in L2 (ii), built in L-build.
 → `docs/design_decisions.md`, "T-D L: the belief lifecycle", L2; `shared/io_contracts.md` §2.2.
+AMENDED (Hadi, on the L-records report, 27 September 2026): "leaves adequate" is ADEQUATE to INADEQUATE, never to
+no observation (which every boundary and every proximity regress would produce). Built as the state "the recorded
+hypothesis is inadequate": a record is set only while its hypothesis is adequate (G1) and the fire clears it. There is
+no P fallback: the decision realizes against no human plan, as below θ. Logged `[meta-trig] … cause=retraction`.
 
 **crossing** — a θ crossing, and nothing else: the tick a hypothesis's normalised share first clears
 the gate. For paths the word is **violation** (§3); for two paths meeting in space, say that they
@@ -280,6 +284,10 @@ hypotheses whose terminal fact holds on this tick, read from the world on every 
 as the fact holds, and a hypothesis whose fact stops holding re-enters with the prior base and the current position as
 origin (the others renormalised). "Not yet retired" no longer means "never completed". design_decisions.md, "T-D L:
 the belief lifecycle", L4.
+AMENDED (Hadi, on the L-records report, 27 September 2026): RE-ENTRY takes exactly 1/|H| (H the live set with the
+returning hypothesis; k returning on one tick take 1/|H| each), the incumbents share the rest in this tick's
+proportions; the origin is the current position, the entry latency that of a first observation (0), the derived action
+the world's. Logged `[IR-reentry]`. A re-entry on a boundary tick is governed by the boundary.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -313,6 +321,14 @@ execution ends without its terminal fact (a misdelivery) stays live and starts t
 and "being executed" are separate. The pin retires "for the rest of the run" no longer (L4): a pinned hypothesis
 stays retired while its terminal fact holds and re-enters the live set when it stops holding (**hypothesis**, above).
 design_decisions.md, "T-D L: the belief lifecycle", L1, L4.
+AMENDED (Hadi, on the L-records report, 27 September 2026; supersedes "read from the completion channel"): the
+boundary fires when a terminal action's own completion condition becomes true for the observed agent: the action's
+preconditions held for that agent on the previous tick (`holding(agent, x)`; `at(agent, e)`) and a grounding of its
+completion condition under that binding holds now and did not then (`obj_at(x, c)`: the release leaves the object
+placed at a container; `waited(agent, e)` starts holding). No microaction is read: a bare RELEASE is no boundary. A
+terminal `place` is a boundary wherever it sits in a decomposition (a return inside `deliver_with_return`). The
+boundary tick is flagged on the belief (`BeliefState.episode_boundary`), and `recognition_changed` fires on it for any
+recorded decision (L5 B). `[IR-boundary]` names the completed action.
 
 **θ (theta)** — the confidence gate. It belongs to the meta-planner, not the recognizer, and is
 asked in exactly one place. The recognizer emits a belief distribution and gates nothing. The gate's outcome is

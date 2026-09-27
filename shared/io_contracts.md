@@ -873,6 +873,12 @@ in what that decision rested on):
   trigger, `_clears_gate()` refuses on the guard (G1), the record is cleared, and `update()` realizes against no human
   plan until the leader clears the gate again, which the entering side above detects. Retention by identity is
   otherwise unchanged: a dip below θ still fires nothing. The recognizer retracts nothing (L2 (i)).
+  AMENDED (Hadi, on the L-records report, 27 September 2026): "leaves adequate" is adequate to
+  inadequate, for the recorded hypothesis only (leaving for no observation fires nothing); built as the state "the
+  recorded hypothesis's `hypothesis_adequacy` is INADEQUATE", which a record set only while adequate (G1) and cleared on
+  the fire makes the same event. No P fallback. And (L5 B) `recognition_changed` also fires when a hypothesis is recorded
+  and the belief was re-initialised at an episode boundary on this tick (`belief.episode_boundary`), whether or not
+  most_likely changed: on a boundary tick no hypothesis is a member, so admission refuses and the record clears.
 - `task_committed` — `executor_state.holding` transitions `None → not-None`. REMOVED BY D3 (September 2026);
   kept here as history. `ExecutorState.holding` stays, read by no trigger.
 
