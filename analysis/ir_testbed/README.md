@@ -263,3 +263,63 @@ fe16c489944f62e41dabeb29a16ca44f  runs/env_layout_11_scenario_s09_11_on.log
 4338cf7d2c454d27cbe98f18bc63150d  runs/env_layout_11_scenario_s09_12_on.log
 606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
 ```
+
+## L-build: the generator derived from "T-D L" (28 September 2026)
+
+The recognizer changed under design_decisions.md, "T-D L: the belief lifecycle", as amended on the L-records report
+(DL). The generator was changed by derivation from DL before the recomparison, rule by rule; nothing was fitted to a
+run. The recognizer reads L1 generically, through each terminal action schema's preconditions and completion condition
+(`AdaptivePlanner.enabled_groundings` / `completed_groundings`); the generator reads it in the entry's own words for the
+domain's two terminal actions, and computes re-entry after its normalisation where the recognizer computes it before.
+
+| # | rule (changed or new) | source |
+|---|---|---|
+| 5 (replaced) | The terminal pin: the terminal action's completion holds → retired, WHILE it holds, read on every tick over every admissible key; a retired key whose fact no longer holds is live again (a retired key the planner cannot decompose stays retired: its fact cannot be read). The boundary is no longer read from the pin | DL L4; HB §1.6 (superseding note) |
+| 5b (new) | The boundary (DL L1 as amended): the item the human held on the previous tick is no longer held and is `obj_at` a location that is not an agent (the release leaves the object placed at a container: `place`), or `waited(human, ·)` holds and did not on the previous tick (`wait_at`). The world facts only; no microaction; none on the first observation | DL L1 (amended) |
+| 21 (new) | Re-entry, arithmetic C: a returning key enters as a first observation (origin the current position, entry latency 0, its derived action from the world); after the normalisation over the incumbents, with n = \|H\| including the k returning keys, each returning key's evidence and base are 1/n and the incumbents' are scaled by (n − k)/n. A re-entry on a boundary tick is governed by the boundary (rule 14) | DL L4 (amended) |
+| column | `reentries`: the keys that re-enter on the tick (`[IR-reentry]`), compared as a per-tick column in both comparisons | DL L4 |
+
+The log reader: `actual.py` reads the log with `analysis/l_build/tdlib.py` (the frozen `analysis/td_stage1b/tdlib.py`
+has no `[IR-reentry]`); the live set on a tick is the support minus the keys retired on that tick (the last
+`[IR-complete]` later than the last `[IR-reentry]`). `summary.py`'s event table gains the re-entries and marks a boundary
+without a pin. Running every run file regenerated the s08 folders' `summary.md` and `figure.png` in the TB.4b
+presentation (see above).
+
+### Runs (git-ignored logs; md5s at L-build)
+
+The `.rec` streams are byte-identical to the TB.3b and TB.4b tables above: the same ground truth.
+
+```
+9a36fb06f087da46d4a1e56b79ffc591  runs/env_layout_10_scenario_s08_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_10_scenario_s08_01_on.rec
+0049af9dc8db2c66fc9fbb8ec2418abf  runs/env_layout_10_scenario_s08_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_10_scenario_s08_02_on.rec
+aacf368e3c327b4a369315c2990ec7e1  runs/env_layout_10_scenario_s08_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_10_scenario_s08_03_on.rec
+58ba7c6ae3c13da29ca9cd8755e007e4  runs/env_layout_10_scenario_s08_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_10_scenario_s08_04_on.rec
+aa5da7bb2fc0f675caffc55e98fcd547  runs/env_layout_11_scenario_s09_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_11_scenario_s09_01_on.rec
+5d81043d74972af03f1467171c73a970  runs/env_layout_11_scenario_s09_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_11_scenario_s09_02_on.rec
+0656a6d56c183c5e414f9639ee6a28e4  runs/env_layout_11_scenario_s09_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_11_scenario_s09_03_on.rec
+ace2ca9fbc23190dfa3b4ab97fc0d941  runs/env_layout_11_scenario_s09_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_11_scenario_s09_04_on.rec
+be0da8567ecf85fe9eafdd58d9407a78  runs/env_layout_11_scenario_s09_05_on.log
+c715db44f68926f3bb6b8fa387525f1a  runs/env_layout_11_scenario_s09_05_on.rec
+b8c0d2ef82a1676f6ef041f2926f7f3d  runs/env_layout_11_scenario_s09_06_on.log
+703b2c62e484b7db940f36166548a88c  runs/env_layout_11_scenario_s09_06_on.rec
+90af534c2795eb5a0108b08bd7f822a4  runs/env_layout_11_scenario_s09_07_on.log
+a2ece1d231a6c071c20efdea470c4c9f  runs/env_layout_11_scenario_s09_07_on.rec
+c72ff48aac72ba69e77f8651f4c2b97f  runs/env_layout_11_scenario_s09_08_on.log
+529f6f2019682be19b77f4e1152b1ea5  runs/env_layout_11_scenario_s09_08_on.rec
+2c279ff1272f92acc0964182ba92445e  runs/env_layout_11_scenario_s09_09_on.log
+e252b7b8e703da1492b52df3ae4df3dc  runs/env_layout_11_scenario_s09_09_on.rec
+956be2616c8b13ba0f9694e3d9042a6d  runs/env_layout_11_scenario_s09_10_on.log
+c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
+bd0bc2848e3cda44cf4deac350566929  runs/env_layout_11_scenario_s09_11_on.log
+9a4309d36ae6a47d9f1e36f512b711b2  runs/env_layout_11_scenario_s09_11_on.rec
+a13dfaf332631c16610f71df1f578b98  runs/env_layout_11_scenario_s09_12_on.log
+606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
+```

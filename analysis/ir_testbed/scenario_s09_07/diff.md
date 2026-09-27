@@ -20,6 +20,7 @@ Rows (tick, live hypothesis) present on one side only: 0
 | finding | 252 | 0 |
 | lifecycle | 252 | 0 |
 | pins | 252 | 0 |
+| reentries | 252 | 0 |
 | boundary | 252 | 0 |
 | belief | 531 | 0 |
 | S | 531 | 0 |
@@ -42,18 +43,15 @@ Rows (tick, live hypothesis) present on one side only: 0
 | finding | 252 | 0 |
 | lifecycle | 252 | 0 |
 | pins | 252 | 0 |
+| reentries | 252 | 0 |
 | boundary | 252 | 0 |
 | belief | 531 | 0 |
 | S | 531 | 0 |
 | member | 531 | 0 |
-| adequacy | 531 | 1 |
+| adequacy | 531 | 0 |
 
-Disagreements: 1
-
-| tick | hypothesis | column | expected | actual |
-|---|---|---|---|---|
-| 35 | coffee_break(?coffee_machine=coffee_machine_0) | adequacy | inadequate | adequate |
+Disagreements: 0
 
 ## Classification
 
-(written after investigation)
+None to classify.

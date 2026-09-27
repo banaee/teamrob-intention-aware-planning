@@ -20,6 +20,7 @@ Rows (tick, live hypothesis) present on one side only: 0
 | finding | 211 | 0 |
 | lifecycle | 211 | 0 |
 | pins | 211 | 0 |
+| reentries | 211 | 0 |
 | boundary | 211 | 0 |
 | belief | 553 | 0 |
 | S | 553 | 0 |
@@ -42,6 +43,7 @@ Rows (tick, live hypothesis) present on one side only: 0
 | finding | 211 | 0 |
 | lifecycle | 211 | 0 |
 | pins | 211 | 0 |
+| reentries | 211 | 0 |
 | boundary | 211 | 0 |
 | belief | 553 | 0 |
 | S | 553 | 0 |

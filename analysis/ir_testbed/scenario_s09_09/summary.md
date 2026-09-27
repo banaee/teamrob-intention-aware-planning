@@ -51,7 +51,8 @@ Events (actual):
 | 86 | finding turns unexplained |
 | 87 | finding turns adequate (from unexplained) |
 | 95 | finding turns unexplained |
-| 108 | finding turns adequate (from unexplained) |
+| 107 | boundary (no pin) |
+| 107 | finding turns unresolved (from unexplained) |
 | 172 | boundary |
 | 172 | pin deliver_item(item_2) |
 | 205 | finding turns unexplained |
@@ -64,7 +65,7 @@ True hypothesis and θ (actual): per contiguous stretch of ticks on which the hy
 |---|---|---|---|---|---|
 | deliver_item(item_1) | 0 to 62 | 25 | 0.7544 | yes | adequate |
 | deliver_item(item_3) | 63 to 108 | outside the support (at the floor) | - | - | - |
-| deliver_item(item_2) | 109 to 173 | 147 | 0.7521 | yes | adequate |
+| deliver_item(item_2) | 109 to 173 | 123 | 0.7717 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 
@@ -76,6 +77,7 @@ Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 
 | 73 | deliver_item(item_2) | move_to(item_2) | 0.1314 | 0.0399 | 357.5 | 357.5 | 0.0 | deliver_item(item_3) |
 | 83 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.9690 | 0.0468 | 341.3 | 321.3 | 20.0 | deliver_item(item_3) |
 | 95 | deliver_item(item_2) | move_to(shelf_3) | 0.0166 | 0.0389 | 360.0 | 360.0 | 0.0 | deliver_item(item_3) |
+| 132 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0627 | 0.0492 | 336.2 | 336.2 | 0.0 | deliver_item(item_2) |
 | 205 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.9970 | 0.0483 | 338.1 | 338.1 | 0.0 | - |
 
 Finding transitions (actual; `exhausted` is the lifecycle state, no finding):
@@ -90,7 +92,8 @@ Finding transitions (actual; `exhausted` is the lifecycle state, no finding):
 | 86 | adequate | unexplained | deliver_item(item_3) |
 | 87 | unexplained | adequate | deliver_item(item_3) |
 | 95 | adequate | unexplained | deliver_item(item_3) |
-| 108 | unexplained | adequate | deliver_item(item_3) |
+| 107 | unexplained | unresolved | deliver_item(item_3) |
+| 108 | unresolved | adequate | deliver_item(item_3) |
 | 172 | adequate | unresolved | deliver_item(item_2) |
 | 173 | unresolved | adequate | deliver_item(item_2) |
 | 205 | adequate | unexplained | - |

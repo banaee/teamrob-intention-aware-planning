@@ -13,7 +13,12 @@ structure, not the recognizer's. Its input is the per-tick trajectory and world 
 parameters it carries, and α from the run file.
 
 Each rule is marked with its source: HB = docs/recognizer_handback.md, DD = design_decisions.md "T-D R and E" (with
-its "1.5 rulings"), and the four readings confirmed at the TB.3b plan step (R1 to R4, analysis/ir_testbed/README.md).
+its "1.5 rulings"), DL = design_decisions.md "T-D L: the belief lifecycle" as amended on the L-records report (L-build,
+27 September 2026), and the four readings confirmed at the TB.3b plan step (R1 to R4, analysis/ir_testbed/README.md).
+L-build changed three rules by derivation from DL (README, "L-build"): the boundary (DL L1, in the entry's own words
+for the domain's two terminal actions, not through the schemas' preconditions as the recognizer reads it), liveness
+and re-entry (DL L4, arithmetic C, computed after the normalisation over the incumbents rather than before it), and a
+new per-tick column, the re-entries.
 """
 import csv
 import json
@@ -118,6 +123,7 @@ class Oracle:
         self.expected, self.origin, self.entry = {}, {}, {}
         self.observed, self.completed = set(), set()
         self.last_pos, self.odo, self.still = None, 0.0, 0
+        self.prev_facts = None                         # the previous tick's world facts, for the boundary (DL L1)
 
     # ---- the phase term (HB §1.4, §1.8, §1.10; DD E2, E9, E10) ---------------------------------------------------
     def s_exp(self, k, a):
@@ -163,24 +169,30 @@ class Oracle:
         self.still += (step == 0)
         self.last_pos = pos
         mu = None if row["micro"] is None else row["micro"].upper()
-        boundary, pins, advanced, U, folds = False, [], set(), {}, {}
-        for k in sorted(self.base):                        # live: admissible and not completed
+        boundary = self.terminal_completed(row["facts"])                     # DL L1
+        pins, reentries, advanced, U, folds = [], [], set(), {}, {}
+        for k in sorted(self.admissible):                  # every admissible key; live: its terminal fact not holding
             try:
                 A = self.planner.decompose(self.space[k], self.agent, world)
             except DecompositionError:
                 A = None
             if A is not None and holds(A[-1].completion_predicate):             # the terminal pin (HB §1.6)
-                if sig(self.expected.get(k)) == sig(A[-1]):
-                    boundary = True                                              # the observed agent's completion
-                self.completed.add(k); pins.append(k)
-                for d in (self.base, self.expected, self.origin, self.entry):
-                    d.pop(k, None)
+                if k not in self.completed:                # retired while the fact holds (DL L4)
+                    self.completed.add(k); pins.append(k)
+                    for d in (self.base, self.expected, self.origin, self.entry):
+                        d.pop(k, None)
+                    self.observed.discard(k)
                 continue
+            if k in self.completed:
+                if A is None:                              # its fact cannot be read: nothing says it stopped
+                    continue
+                self.completed.discard(k); reentries.append(k)                  # live again (DL L4)
             a = next((x for x in A if not holds(x.completion_predicate)), None) if A is not None else None
             if k not in self.observed:                   # enters its action from no completion: an empty phase
                 self.observed.add(k)
                 self.expected[k], self.origin[k], self.entry[k] = a, (pos, self.odo, self.still), 0.0
-                U[k] = self.base[k]
+                if k not in reentries:
+                    U[k] = self.base[k]
                 continue
             a_prev = self.expected[k]
             # the completion signal (HB §1.4; reading R1: only a declared microaction list, GRASP / RELEASE)
@@ -199,10 +211,21 @@ class Oracle:
             U[k] = self.base[k] * self.phase(k, a, pos, world)["L"]
         Z = sum(U.values())                                # one normalisation, over H (HB §1.5)
         if Z > 0:
-            self.base = {k: v / Z for k, v in self.base.items()}
+            self.base = {k: v / Z for k, v in self.base.items() if k not in reentries}
             E = {k: v / Z for k, v in U.items()}
         else:
+            self.base = {k: v for k, v in self.base.items() if k not in reentries}
             E = {}
+        if reentries:
+            # DL L4, re-entry C: each returning hypothesis takes exactly 1/|H| (H with it); the incumbents share the rest
+            # in their existing proportions (this tick's, after their update); the base of a first observation is its
+            # evidence (open value 1)
+            n = len(E) + len(reentries)
+            scale = (n - len(reentries)) / n
+            E = {k: v * scale for k, v in E.items()}
+            self.base = {k: v * scale for k, v in self.base.items()}
+            for k in reentries:
+                E[k] = self.base[k] = 1.0 / n
         if boundary and self.base:                         # the episode boundary (HB §1.6, §1.8)
             n = len(self.base)
             self.base = {k: 1.0 / n for k in self.base}
@@ -211,7 +234,24 @@ class Oracle:
                 self.origin[k] = (pos, self.odo, self.still)
                 self.entry[k] = self.lat_action + self.lat_task                  # E9
             advanced = set()                                                     # E8: no observation on it
-        return world, E, pins, boundary, advanced, folds
+        return world, E, pins, reentries, boundary, advanced, folds
+
+    def terminal_completed(self, facts):
+        """DL L1 as amended, in the entry's words: the observed agent completes a terminal action on this tick iff the
+        release leaves the object it held on the previous tick placed at a container (`place`: holding(h, x) held, and
+        now x is no longer held and obj_at(x, c) holds for a c that is not an agent), or waited(h, ·) starts holding
+        (`wait_at`). Read from the world's facts; no microaction. None on the first observation."""
+        now = {tuple(f) for f in facts}
+        prev, self.prev_facts = self.prev_facts, now
+        if prev is None:
+            return False
+        h = self.agent
+        agents = {self.agent} | {f[1] for f in now | prev if f[0] == "holding"}
+        for f in prev:
+            if f[0] == "holding" and f[1] == h and ("holding", h, f[2]) not in now:
+                if any(g[0] == "obj_at" and g[1] == f[2] and g[2] not in agents for g in now):
+                    return True
+        return any(f[0] == "waited" and f[1] == h and f not in prev for f in now)
 
     def output(self, E):
         """HB §1.7 (reading R2): normalise over H, the floor, the pinned keys at the floor, the live keys scaled to
@@ -242,7 +282,7 @@ class Oracle:
 
 
 COLUMNS = ["tick", "human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence",
-           "finding", "lifecycle", "pins", "boundary", "key", "expected_action", "origin_x", "origin_y", "e", "s",
+           "finding", "lifecycle", "pins", "reentries", "boundary", "key", "expected_action", "origin_x", "origin_y", "e", "s",
            "s_exp", "D", "L", "evidence", "belief", "S", "member", "adequacy"]
 
 
@@ -250,7 +290,7 @@ def run(traj, alpha):
     orc = Oracle(traj, alpha)
     rows, phases = [], {k: [] for k in orc.space}
     for r in traj["rows"]:
-        world, E, pins, boundary, advanced, folds = orc.update(r)
+        world, E, pins, reentries, boundary, advanced, folds = orc.update(r)
         P, ml, conf = orc.output(E)
         pos = (r["x"], r["y"])
         live = sorted(orc.base)
@@ -276,7 +316,8 @@ def run(traj, alpha):
         common = dict(tick=r["tick"], human_x=r["x"], human_y=r["y"], micro=r["micro"], holding=r["holding"],
                       waited=r["waited"], obj_at=";".join(f"{i}@{l}" for i, l in sorted(r["item_loc"].items())),
                       at=";".join(f[2] for f in r["facts"] if f[0] == "at"), most_likely=ml, confidence=conf,
-                      finding=finding, lifecycle=lifecycle, pins=";".join(pins), boundary=int(boundary))
+                      finding=finding, lifecycle=lifecycle, pins=";".join(pins), reentries=";".join(reentries),
+                      boundary=int(boundary))
         if not live:
             rows.append(dict(common))
         for k in live:

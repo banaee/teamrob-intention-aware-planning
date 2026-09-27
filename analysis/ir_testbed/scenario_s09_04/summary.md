@@ -25,6 +25,7 @@ Expected action per hypothesis (the oracle's derived phases; ticks inclusive, -1
 |---|---|---|
 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | -1 to 50 |
 | coffee_break(coffee_machine_0) | wait_at(PT60S,coffee_machine_0) | 51 to 81 |
+| coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 84 to 281 |
 | deliver_item(item_1) | move_to(item_1) | -1 to 27 |
 | deliver_item(item_1) | pick_up(item_1) | 28 to 30 |
 | deliver_item(item_1) | move_to(item_1) | 31 to 103 |
@@ -45,13 +46,14 @@ Events (actual):
 |---|---|
 | 82 | boundary |
 | 82 | pin coffee_break(coffee_machine_0) |
+| 84 | re-entry coffee_break(coffee_machine_0) |
 | 139 | boundary |
 | 139 | pin deliver_item(item_1) |
 | 202 | boundary |
-| 202 | exhausted (no live hypothesis) from here |
 | 202 | pin deliver_item(item_2) |
+| 235 | finding turns unexplained |
 
-Never pinned: none. At the last entry (go_to(corner_SE), ticks 204 to 251): lifecycle and finding exhausted; on the idle ticks after it: exhausted.
+Never pinned: none. At the last entry (go_to(corner_SE), ticks 204 to 251): lifecycle and finding adequate, unexplained; on the idle ticks after it: unexplained.
 
 True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ, its belief and hypothesis adequacy there, and whether it leads.
 
@@ -59,8 +61,8 @@ True hypothesis and θ (actual): per contiguous stretch of ticks on which the hy
 |---|---|---|---|---|---|
 | deliver_item(item_1) | 0 to 29 | 25 | 0.7544 | yes | adequate |
 | coffee_break(coffee_machine_0) | 30 to 83 | 40 | 0.7671 | yes | adequate |
-| deliver_item(item_1) | 84 to 140 | 91 | 0.7846 | yes | adequate |
-| deliver_item(item_2) | 141 to 203 | 141 | 0.9970 | yes | adequate |
+| deliver_item(item_1) | 84 to 140 | 92 | 0.7734 | yes | adequate |
+| deliver_item(item_2) | 141 to 203 | 154 | 0.7511 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 
@@ -68,8 +70,11 @@ Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 
 |---|---|---|---|---|---|---|---|---|
 | 14 | deliver_item(item_2) | move_to(item_2) | 0.0315 | 0.0399 | 357.3 | 357.3 | 0.0 | deliver_item(item_1) |
 | 40 | deliver_item(item_1) | move_to(item_1) | 0.2309 | 0.0422 | 351.8 | 351.8 | 0.0 | coffee_break(coffee_machine_0) |
-| 97 | deliver_item(item_2) | move_to(item_2) | 0.0577 | 0.0450 | 345.2 | 345.2 | 0.0 | deliver_item(item_1) |
+| 93 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0412 | 0.0389 | 360.0 | 360.0 | 0.0 | deliver_item(item_1) |
+| 97 | deliver_item(item_2) | move_to(item_2) | 0.0572 | 0.0450 | 345.2 | 345.2 | 0.0 | deliver_item(item_1) |
 | 118 | deliver_item(item_2) | move_to(shelf_1) | 0.0010 | 0.0395 | 358.3 | 358.3 | 0.0 | deliver_item(item_1) |
+| 164 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0611 | 0.0478 | 339.0 | 339.0 | 0.0 | deliver_item(item_2) |
+| 235 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.9970 | 0.0456 | 343.9 | 343.9 | 0.0 | - |
 
 Finding transitions (actual; `exhausted` is the lifecycle state, no finding):
 
@@ -80,7 +85,9 @@ Finding transitions (actual; `exhausted` is the lifecycle state, no finding):
 | 83 | unresolved | adequate | coffee_break(coffee_machine_0) |
 | 139 | adequate | unresolved | deliver_item(item_1) |
 | 140 | unresolved | adequate | deliver_item(item_1) |
-| 202 | adequate | exhausted | deliver_item(item_2) |
+| 202 | adequate | unresolved | deliver_item(item_2) |
+| 203 | unresolved | adequate | deliver_item(item_2) |
+| 235 | adequate | unexplained | - |
 
 Across the started task coffee_break(coffee_machine_0) (covered; actual): on top of the stack from 30 to 83, its hypothesis pinned at 82; the suspended task resumes at 84.
 
@@ -94,9 +101,11 @@ Across the started task coffee_break(coffee_machine_0) (covered; actual): on top
 | 81 | wait_at stand | coffee_break(coffee_machine_0) | 0.9970 / 1.0000 | 0.0010 / 0.0000 | 0.0010 / 0.0000 | adequate |
 | 82 | wait_at stand | coffee_break(coffee_machine_0) | retired | 0.4990 / - | 0.4990 / - | unresolved |
 | 83 | wait_at  | coffee_break(coffee_machine_0) | retired | 0.4990 / 1.0000 | 0.4990 / 1.0000 | adequate |
-| 84 | move_to step | deliver_item(item_1) | retired | 0.5268 / 1.0000 | 0.4712 / 0.8554 | adequate |
-| 85 | move_to step | deliver_item(item_1) | retired | 0.5579 / 1.0000 | 0.4401 / 0.7235 | adequate |
-| 86 | move_to step | deliver_item(item_1) | retired | 0.5923 / 1.0000 | 0.4057 / 0.6050 | adequate |
+| 84 | move_to step | deliver_item(item_1) | 0.3330 / - | 0.3515 / 1.0000 | 0.3145 / 0.8554 | adequate |
+| 85 | move_to step | deliver_item(item_1) | 0.2980 / 0.7402 | 0.3919 / 1.0000 | 0.3091 / 0.7235 | adequate |
+| 86 | move_to step | deliver_item(item_1) | 0.2582 / 0.5354 | 0.4396 / 1.0000 | 0.3012 / 0.6050 | adequate |
 
-The last entry (go_to(corner_SE)): first step 204, last step 250, acknowledgement 251; the idle human from 252. Live at its first tick: none (exhausted).
+The last entry (go_to(corner_SE)): first step 204, last step 250, acknowledgement 251; the idle human from 252. Live at its first tick: coffee_break(coffee_machine_0).
+
+- coffee_break(coffee_machine_0): belief 0.9970 at 204; S < α from 235 (belief 0.9970; v·D 343.9 cm); the finding unexplained from 235.
 

@@ -2031,3 +2031,89 @@ The last entry (go_to(corner_SE)): first step 126, last step 173, acknowledgemen
 4. **Flags carried from TB.3b:**
    - tdlib's `[coverage]` parse fails on `start:` entries; a copy of the log without those lines is handed to it.
    - E8 is not exercised independently.
+
+## L-build: the sixteen recompared under "T-D L" (28 September 2026)
+
+The recognizer was changed under design_decisions.md, "T-D L: the belief lifecycle", as amended on the L-records report;
+the generator was changed by derivation from the entry (README, "L-build": rules 5, 5b, 21 and the `reentries` column)
+before the recomparison. The sixteen run files were rerun at L-build; the outputs in the scenario folders are
+regenerated in place (the TB.3b and TB.4b numbers above are the history). The `.rec` streams are byte-identical to
+TB's; the trajectory equals the run's human lines on every tick in all sixteen; the in-process `[IR*]` lines are
+byte-identical to the logged runs'.
+
+**Result: 0 disagreements at 1e-9 against the in-process BeliefState and 0 at print precision against the log, in all
+sixteen**, after two build defects the comparison found were fixed (below).
+
+### Disagreements, classified (the recomparison's history)
+
+- First pass (the recognizer at 493c095): one disagreement in each of the seven coffee scenarios, all in
+  `most_likely` on a tick where `coffee_break` and one delivery stand at exactly 1/2 in the evidence: expected
+  `coffee_break(coffee_machine_0)`, actual the delivery. s08_02, s09_02, s09_11 at 135, the re-entry tick (one
+  incumbent); s08_03, s09_03 at 127 and s08_04, s09_04 at 139, the next boundary (the prior over the two live). The
+  records determine the value: handback §1.7, "ties go to the first live key in sorted order". THE RECOGNIZER DISAGREED
+  WITH THE RECORDS, twice by one cause: the build set the returning key's evidence and base after the loop, so neither
+  the evidence (the argmax's order at the re-entry) nor the bases (the order the boundary's prior is built over) were in
+  hypothesis order any more. Fixed in 5129d90 (the returning key's evidence entry made in hypothesis order), with a test.
+- Second pass (5129d90): the four boundary cases remained (s08_03, s09_03 at 127; s08_04, s09_04 at 139). Fixed in
+  3d65ca6 (the prior at a boundary built in hypothesis order), the test extended to a later boundary.
+- Third pass (HEAD): none. No disagreement was classified "the generator misread the entry" or "the entry does not
+  determine the value".
+
+### The comparison with TB (`analysis/l_build/tb_compare.py`: the in-process actual.csv, TB at ec155f3 against L-build)
+
+Moved ticks are the ticks on which any public output differs (most_likely, confidence, finding, lifecycle, or a live
+hypothesis's belief, S or adequacy); the leaders at θ are listed from the first moved tick on.
+
+| scenario | first moved tick | moved ticks | exhausted TB → L | unexplained TB → L | leaders at θ, TB | leaders at θ, L |
+|---|---|---|---|---|---|---|
+| scenario_s08_01 | - | 0 | 0 → 0 | 47 → 47 | - | - |
+| scenario_s08_02 | 135 | 146 | 80 → 0 | 0 → 47 | - | 140 item_2, 201 coffee:coffee_machine_0 |
+| scenario_s08_03 | 86 | 185 | 80 → 0 | 0 → 47 | 100 item_1, 127 item_2 | 100 item_1, 142 item_2, 191 coffee:coffee_machine_0 |
+| scenario_s08_04 | 84 | 198 | 80 → 0 | 0 → 47 | 91 item_1, 139 item_2 | 92 item_1, 154 item_2, 202 coffee:coffee_machine_0 |
+| scenario_s09_01 | - | 0 | 0 → 0 | 47 → 47 | - | - |
+| scenario_s09_02 | 135 | 146 | 80 → 0 | 0 → 47 | - | 140 item_2, 201 coffee:coffee_machine_0 |
+| scenario_s09_03 | 86 | 185 | 80 → 0 | 0 → 47 | 100 item_1, 127 item_2 | 100 item_1, 142 item_2, 191 coffee:coffee_machine_0 |
+| scenario_s09_04 | 84 | 198 | 80 → 0 | 0 → 47 | 91 item_1, 139 item_2 | 92 item_1, 154 item_2, 202 coffee:coffee_machine_0 |
+| scenario_s09_05 | - | 0 | 0 → 0 | 125 → 125 | - | - |
+| scenario_s09_06 | - | 0 | 0 → 0 | 72 → 72 | - | - |
+| scenario_s09_07 | 33 | 75 | 0 → 0 | 48 → 48 | 64 item_2, 135 item_1, 171 coffee:coffee_machine_0 | 46 item_2, 135 item_1, 171 coffee:coffee_machine_0 |
+| scenario_s09_08 | 75 | 56 | 0 → 0 | 56 → 56 | 144 coffee:coffee_machine_0 | 96 item_2, 144 coffee:coffee_machine_0 |
+| scenario_s09_09 | 107 | 65 | 0 → 0 | 62 → 61 | 147 item_2, 172 coffee:coffee_machine_0 | 123 item_2, 172 coffee:coffee_machine_0 |
+| scenario_s09_10 | - | 0 | 0 → 0 | 47 → 47 | - | - |
+| scenario_s09_11 | 135 | 141 | 81 → 0 | 0 → 47 | - | 140 item_3, 195 coffee:coffee_machine_0 |
+| scenario_s09_12 | - | 0 | 0 → 0 | 48 → 48 | - | - |
+
+Unchanged (0 moved ticks): s08_01, s09_01, s09_05, s09_06, s09_10, s09_12: no terminal action without its fact, no
+foreseeable task performed. The robot's pool is empty in every test-bed run, so L2 (ii) and L5 B are not exercised here
+(the maintained baselines carry them: `analysis/l_build/REPORT.md`).
+
+By cause:
+- L1, a boundary without a pin.
+  - scenario_s09_07 (the change of mind): the return of item_1 to shelf_1 at 33 (the first `place` of
+    `deliver_with_return`, inside `deliver_item(item_2)`'s execution) is a boundary; TB had none. All three at 0.3329 on
+    33 (unresolved), adequate from 34; `deliver_item(item_2)` reaches θ at 46 (0.7524), 18 ticks earlier than TB's 64,
+    the first walk's refutation of it discarded at the boundary; `deliver_item(item_1)` reaches θ again at 135 as in TB.
+  - scenario_s09_08 (the misdelivery): the release of item_1 on kitting_table_1 at 75 is a boundary without a pin;
+    TB's stale leader (`deliver_item(item_1)` at 0.997 across item_2's delivery) is gone: all three at 0.3329 on 75,
+    and `deliver_item(item_2)` reaches θ at 96 (0.7521), where TB's never exceeded 0.483. `deliver_item(item_1)` stays
+    live (its fact `obj_at(item_1, kitting_table_0)` never holds), refuted by the walk to item_2 (0.0009 at 96), and is
+    never pinned. The finding: unexplained 66 to 74 as in TB, unresolved at 75 (TB: adequate at 75), adequate from 76.
+  - scenario_s09_09 (item_3 delivered, outside the support): the release on kitting_table_0 at 107 is a boundary without
+    a pin; coffee_break and `deliver_item(item_2)` at 0.499 on 107; item_2 reaches θ at 123 (TB 147). The unexplained
+    stretch 95 to 106 ends at the boundary (unresolved at 107; TB: 95 to 107, adequate at 108): 62 → 61 unexplained ticks.
+- L4, re-entry. In the seven coffee scenarios `coffee_break` is pinned when `waited` holds and re-enters on the tick
+  `waited` clears, the human's first step after its latency tick (pin → re-entry: 133 → 135, 84 → 86, 82 → 84), at
+  exactly 1/|H|: 0.4995 (s08_02, one incumbent) and 0.3333 (s08_03, _04, two). It re-enters in its walk phase
+  (`move_to(coffee_machine_0)`: the human already outside the 30 cm radius), no observation on the re-entry tick, then
+  refuted by the walk away (S 0.747 → 0.543 over the next two ticks). Its wait_at phase at re-entry (the case recorded
+  for G at the plan step) did not occur. Consequences, each as the entry states them:
+  - exhausted: 80 → 0 ticks (81 → 0 in s09_11): after the work order `coffee_break` is the lone live hypothesis, and the
+    exit walk and the idle human read unexplained, 47 ticks each (from 234, 224, 235, 234, 224, 235, 229).
+  - L3's numbers move (recorded in the entry): after the break at 84 (s09_03) both deliveries stand at 0.4990 on 84 and
+    85 as in TB; coffee returns at 86 as a third rival (the deliveries 0.338 / 0.328); `deliver_item(item_1)` still
+    reaches θ at 100. scenario_s09_04: θ again at 92 (TB 91).
+  - the later deliveries: `deliver_item(item_2)` reaches θ at 142 (s09_03; TB 127, when it was the lone live
+    hypothesis at the boundary) and 154 (s09_04; TB 139); in s08_02, s09_02 and s09_11 at 140 (TB: lone from 133,
+    never re-crossing).
+  - after the last delivery `coffee_break` is the lone live hypothesis at 0.997 (leader at θ from 201, 191, 202, 195),
+    unexplained from the exit walk on.

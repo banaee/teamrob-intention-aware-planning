@@ -42,7 +42,8 @@ Events (actual):
 | tick | event |
 |---|---|
 | 66 | finding turns unexplained |
-| 75 | finding turns adequate (from unexplained) |
+| 75 | boundary (no pin) |
+| 75 | finding turns unresolved (from unexplained) |
 | 131 | boundary |
 | 131 | pin deliver_item(item_2) |
 | 164 | finding turns unexplained |
@@ -53,7 +54,7 @@ True hypothesis and θ (actual): per contiguous stretch of ticks on which the hy
 
 | true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |
 |---|---|---|---|---|---|
-| deliver_item(item_2) | 77 to 132 | not reached | - | - | - |
+| deliver_item(item_2) | 77 to 132 | 96 | 0.7522 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 
@@ -63,8 +64,9 @@ Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 
 | 35 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0561 | 0.0427 | 350.5 | 290.5 | 60.0 | - |
 | 41 | deliver_item(item_2) | move_to(shelf_1) | 0.0010 | 0.0391 | 359.4 | 359.4 | 0.0 | - |
 | 66 | deliver_item(item_1) | move_to(kitting_table_0) | 0.9970 | 0.0453 | 344.5 | 344.5 | 0.0 | - |
-| 86 | deliver_item(item_1) | move_to(item_1) | 0.9970 | 0.0410 | 354.8 | 354.8 | 0.0 | deliver_item(item_2) |
-| 110 | deliver_item(item_1) | move_to(shelf_2) | 0.9788 | 0.0394 | 358.8 | 358.8 | 0.0 | deliver_item(item_2) |
+| 86 | deliver_item(item_1) | move_to(item_1) | 0.0322 | 0.0410 | 354.8 | 354.8 | 0.0 | deliver_item(item_2) |
+| 106 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0586 | 0.0457 | 343.7 | 283.7 | 60.0 | deliver_item(item_2) |
+| 110 | deliver_item(item_1) | move_to(shelf_2) | 0.0010 | 0.0394 | 358.8 | 358.8 | 0.0 | deliver_item(item_2) |
 | 149 | deliver_item(item_1) | move_to(item_1) | 0.1001 | 0.0384 | 361.2 | 361.2 | 0.0 | - |
 | 164 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.9934 | 0.0482 | 338.2 | 338.2 | 0.0 | - |
 
@@ -74,7 +76,8 @@ Finding transitions (actual; `exhausted` is the lifecycle state, no finding):
 |---|---|---|---|
 | 0 | - | adequate | - |
 | 66 | adequate | unexplained | - |
-| 75 | unexplained | adequate | - |
+| 75 | unexplained | unresolved | - |
+| 76 | unresolved | adequate | - |
 | 131 | adequate | unresolved | deliver_item(item_2) |
 | 132 | unresolved | adequate | deliver_item(item_2) |
 | 164 | adequate | unexplained | - |

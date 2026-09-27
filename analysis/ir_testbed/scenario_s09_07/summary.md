@@ -47,6 +47,7 @@ Events (actual):
 
 | tick | event |
 |---|---|
+| 33 | boundary (no pin) |
 | 108 | boundary |
 | 108 | pin deliver_item(item_2) |
 | 171 | boundary |
@@ -60,7 +61,7 @@ True hypothesis and θ (actual): per contiguous stretch of ticks on which the hy
 | true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |
 |---|---|---|---|---|---|
 | deliver_item(item_1) | 0 to 31 | 25 | 0.7544 | yes | adequate |
-| deliver_item(item_2) | 32 to 109 | 64 | 0.7796 | yes | adequate |
+| deliver_item(item_2) | 32 to 109 | 46 | 0.7524 | yes | adequate |
 | deliver_item(item_1) | 110 to 172 | 135 | 0.7638 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
@@ -68,8 +69,8 @@ Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 
 | tick | hypothesis | expected action | belief | S | v·D (cm) | e (cm) | v·(s − s_exp) (cm) | truth |
 |---|---|---|---|---|---|---|---|---|
 | 14 | deliver_item(item_2) | move_to(item_2) | 0.0315 | 0.0399 | 357.3 | 357.3 | 0.0 | deliver_item(item_1) |
-| 35 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0781 | 0.0500 | 334.5 | 214.5 | 120.0 | deliver_item(item_2) |
-| 44 | deliver_item(item_1) | move_to(item_1) | 0.6845 | 0.0406 | 355.7 | 355.7 | 0.0 | deliver_item(item_2) |
+| 44 | deliver_item(item_1) | move_to(item_1) | 0.0377 | 0.0406 | 355.7 | 355.7 | 0.0 | deliver_item(item_2) |
+| 53 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0625 | 0.0490 | 336.5 | 336.5 | 0.0 | deliver_item(item_2) |
 | 87 | deliver_item(item_1) | move_to(shelf_2) | 0.0010 | 0.0399 | 357.4 | 357.4 | 0.0 | deliver_item(item_2) |
 | 144 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.0542 | 0.0420 | 352.2 | 292.2 | 60.0 | deliver_item(item_1) |
 | 204 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 0.9970 | 0.0468 | 341.2 | 341.2 | 0.0 | - |
@@ -79,6 +80,8 @@ Finding transitions (actual; `exhausted` is the lifecycle state, no finding):
 | tick | from | to | truth |
 |---|---|---|---|
 | 0 | - | adequate | deliver_item(item_1) |
+| 33 | adequate | unresolved | deliver_item(item_2) |
+| 34 | unresolved | adequate | deliver_item(item_2) |
 | 108 | adequate | unresolved | deliver_item(item_2) |
 | 109 | unresolved | adequate | deliver_item(item_2) |
 | 171 | adequate | unresolved | deliver_item(item_1) |
@@ -92,8 +95,8 @@ Across the started task deliver_item(item_2,kitting_table_0) (covered; actual): 
 | 30 | pick_up grasp | deliver_item(item_1) | 0.1373 / 0.1199 | 0.8608 / 1.0000 | 0.0010 / 1.0000 | adequate |
 | 31 | pick_up  | deliver_item(item_1) | 0.1167 / 0.0989 | 0.8813 / 1.0000 | 0.0010 / 1.0000 | adequate |
 | 32 | move_to  | deliver_item(item_2) | 0.1085 / 0.0814 | 0.8895 / 0.8629 | 0.0010 / 0.8629 | adequate |
-| 33 | place release | deliver_item(item_2) | 0.1014 / 0.0670 | 0.8966 / 1.0000 | 0.0010 / 1.0000 | adequate |
-| 34 | place  | deliver_item(item_2) | 0.0852 / 0.0551 | 0.9128 / 1.0000 | 0.0010 / 1.0000 | adequate |
+| 33 | place release | deliver_item(item_2) | 0.3330 / - | 0.3330 / - | 0.3330 / - | unresolved |
+| 34 | place  | deliver_item(item_2) | 0.3330 / 1.0000 | 0.3330 / 1.0000 | 0.3330 / 1.0000 | adequate |
 | 107 | move_to  | deliver_item(item_2) | 0.0010 / 0.0000 | 0.0010 / 0.0000 | 0.9970 / 1.0000 | adequate |
 | 108 | place release | deliver_item(item_2) | 0.4990 / - | 0.4990 / - | retired | unresolved |
 | 109 | place  | deliver_item(item_2) | 0.4990 / 1.0000 | 0.4990 / 1.0000 | retired | adequate |

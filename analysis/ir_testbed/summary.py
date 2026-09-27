@@ -109,7 +109,10 @@ def main(d, log):
     # events
     pins = [(t, p) for t in sorted(by) for p in tick0(t)["pins"].split(";") if p]
     bounds = [t for t in sorted(by) if tick0(t)["boundary"] == "1"]
-    ev = [(t, f"pin {short(p)}") for t, p in pins] + [(t, "boundary") for t in bounds]
+    reentries = [(t, p) for t in sorted(by) for p in tick0(t).get("reentries", "").split(";") if p]
+    # since L-build: a boundary may fall without a pin (T-D L1), a retired hypothesis re-enters (L4)
+    ev = [(t, f"pin {short(p)}") for t, p in pins] + [(t, f"re-entry {short(p)}") for t, p in reentries] \
+        + [(t, "boundary" if any(s == t for s, _ in pins) else "boundary (no pin)") for t in bounds]
     last = None
     for t in sorted(by):
         s = state(t)

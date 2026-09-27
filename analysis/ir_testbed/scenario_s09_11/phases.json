@@ -15,6 +15,11 @@
     "wait_at(?duration=PT60S,?entity=coffee_machine_0)",
     102,
     132
+   ],
+   [
+    "move_to(?target=coffee_machine_0)",
+    135,
+    275
    ]
   ],
   "deliver_item(?item=item_1)": [

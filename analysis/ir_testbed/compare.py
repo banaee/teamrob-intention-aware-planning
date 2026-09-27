@@ -20,11 +20,12 @@ import math
 import sys
 
 TICK = ["human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence", "finding",
-        "lifecycle", "pins", "boundary"]
+        "lifecycle", "pins", "reentries", "boundary"]
 HYP = ["belief", "S", "member", "adequacy"]
 NUMERIC = {"human_x", "human_y", "confidence", "belief", "S"}
 PRINTED = {"human_x": 5e-3, "human_y": 5e-3, "confidence": 5e-4, "belief": 5e-4, "S": 5e-5}
-LOG_COLUMNS = ["human_x", "human_y", "micro", "most_likely", "confidence", "finding", "lifecycle", "pins", "boundary",
+LOG_COLUMNS = ["human_x", "human_y", "micro", "most_likely", "confidence", "finding", "lifecycle", "pins", "reentries",
+               "boundary",
                "belief", "S", "member", "adequacy"]
 SKIPPED = ["expected_action", "origin_x", "origin_y", "e", "s", "s_exp", "D", "L", "evidence"]
 

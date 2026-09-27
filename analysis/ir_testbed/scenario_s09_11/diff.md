@@ -20,11 +20,12 @@ Rows (tick, live hypothesis) present on one side only: 0
 | finding | 276 | 0 |
 | lifecycle | 276 | 0 |
 | pins | 276 | 0 |
+| reentries | 276 | 0 |
 | boundary | 276 | 0 |
-| belief | 389 | 0 |
-| S | 389 | 0 |
-| member | 389 | 0 |
-| adequacy | 389 | 0 |
+| belief | 530 | 0 |
+| S | 530 | 0 |
+| member | 530 | 0 |
+| adequacy | 530 | 0 |
 
 Disagreements: 0
 
@@ -42,11 +43,12 @@ Rows (tick, live hypothesis) present on one side only: 0
 | finding | 276 | 0 |
 | lifecycle | 276 | 0 |
 | pins | 276 | 0 |
+| reentries | 276 | 0 |
 | boundary | 276 | 0 |
-| belief | 389 | 0 |
-| S | 389 | 0 |
-| member | 389 | 0 |
-| adequacy | 389 | 0 |
+| belief | 530 | 0 |
+| S | 530 | 0 |
+| member | 530 | 0 |
+| adequacy | 530 | 0 |
 
 Disagreements: 0
 

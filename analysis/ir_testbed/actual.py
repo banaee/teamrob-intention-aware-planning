@@ -3,9 +3,11 @@
 actual.py — the recognizer's outputs per tick, for the IR test-bed's comparison (TB.3b), from two sources (the plan
 step's option B, confirmed by Hadi):
 
-  actual_log.csv  read from the run log with analysis/td_stage1b/tdlib.py: `[IR]` (most_likely, confidence to 3
-                  decimals, lifecycle, finding, the members' tails to 4 decimals), `[IR-dist]` (the belief to 3
-                  decimals), `[IR-complete]`, `[IR-boundary]`, the human's lines (position to 2 decimals, micro);
+  actual_log.csv  read from the run log with analysis/l_build/tdlib.py (since L-build; before it
+                  analysis/td_stage1b/tdlib.py, frozen, which has no `[IR-reentry]`): `[IR]` (most_likely, confidence
+                  to 3 decimals, lifecycle, finding, the members' tails to 4 decimals), `[IR-dist]` (the belief to 3
+                  decimals), `[IR-complete]`, `[IR-reentry]`, `[IR-boundary]`, the human's lines (position to 2
+                  decimals, micro); the live set on a tick is the support minus the keys retired then (T-D L4);
   actual.csv      the same run re-executed in-process from its run file, reading after every tick the robot's public
                   `BeliefState` at full precision (distribution, tails, hypothesis_adequacy, finding, lifecycle,
                   most_likely, confidence) and the world the robot built that tick (the human's position and facts).
@@ -27,7 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "mesa_sim"))
-sys.path.insert(0, str(ROOT / "analysis" / "td_stage1b"))
+sys.path.insert(0, str(ROOT / "analysis" / "l_build"))
 
 import yaml
 import tdlib
@@ -61,8 +63,8 @@ def support(keys, known):
 
 
 def from_log(log_path, alpha):
-    # tdlib's [coverage] pattern does not match a line with a `start:` entry (scenario_s08_03 / _04); tdlib is a
-    # frozen record, so it is handed the log without its [coverage] lines, which nothing here reads
+    # tdlib's [coverage] pattern does not match a line with a `start:` entry (scenario_s08_03 / _04; TODO-125), so it
+    # is handed the log without its [coverage] lines, which nothing here reads
     import tempfile
     with tempfile.NamedTemporaryFile("w", suffix=".log", delete=False) as f:
         f.writelines(l for l in open(log_path) if not l.startswith("[coverage]"))
@@ -73,13 +75,14 @@ def from_log(log_path, alpha):
     rows = []
     for t in sorted(log["ir"]):
         ir, dist = log["ir"][t], log["dist"][t]
-        pins = [k for k, s in log["complete"].items() if s == t]
-        live = [k for k in admissible if not (k in log["complete"] and log["complete"][k] <= t)]
+        pins = [k for s, k in log["pins"] if s == t]
+        reentries = [k for s, k in log["reentries"] if s == t]
+        live = [k for k in admissible if not tdlib.retired(log, k, t)]
         act, micro, (x, y), _ = log["human"][t]
         common = dict(tick=t, human_x=x, human_y=y, micro=None if micro == "None" else micro,
                       most_likely=None if ir["ml"] == "none" else ir["ml"], confidence=ir["conf"],
                       finding=ir["finding"], lifecycle=ir["lifecycle"], pins=";".join(sorted(pins)),
-                      boundary=int(t in log["boundary"]))
+                      reentries=";".join(sorted(reentries)), boundary=int(t in log["boundary"]))
         if not live:
             rows.append(common)
         for k in live:
@@ -127,6 +130,7 @@ def in_process(run_file, steps, alpha):
         b = robot.belief
         new = collect.lines[n0:]
         pins = sorted(l.split()[2] for l in new if l.startswith("[IR-complete]"))
+        reentries = sorted(l.split()[2] for l in new if l.startswith("[IR-reentry]"))
         world = build_world_state(m)
         facts = world.predicates
         at = sorted(p.args[1].value for p in facts if p.name == "at" and p.args[0].value == H)
@@ -136,7 +140,8 @@ def in_process(run_file, steps, alpha):
                       obj_at=";".join(f"{i}@{l}" for i, l in sorted(world.object_locations.items())),
                       at=";".join(at), most_likely=b.most_likely, confidence=b.confidence,
                       finding=None if b.finding is None else b.finding.value, lifecycle=b.lifecycle.value,
-                      pins=";".join(pins), boundary=int(any(l.startswith("[IR-boundary]") for l in new)))
+                      pins=";".join(pins), reentries=";".join(reentries),
+                      boundary=int(any(l.startswith("[IR-boundary]") for l in new)))
         live = sorted(b.hypothesis_adequacy)
         if not live:
             rows.append(common)
