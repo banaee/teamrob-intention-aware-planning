@@ -865,6 +865,14 @@ in what that decision rested on):
   is replaced, ends, or the human stops — an accepted consequence, recorded in the D2 entry; a margin
   or a duration on the dip would be a second threshold. Supersedes `theta_crossed` (the crossing
   `prev < θ ≤ current`, which fired on every re-crossing and never on a change of hypothesis).
+
+  RULED, BUILT IN L-BUILD (T-D L2 (ii), 27 September 2026; design_decisions.md, "T-D L: the belief lifecycle"):
+  `recognition_changed` also fires when a hypothesis is recorded and its `belief.hypothesis_adequacy` leaves adequate —
+  the recorded hypothesis only, never a rival's transition (a rival's adequacy and the aggregate `finding` are not
+  read). This is retraction, the meta-planner's act: admission (`update_human_projection()`) is re-asked on the fired
+  trigger, `_clears_gate()` refuses on the guard (G1), the record is cleared, and `update()` realizes against no human
+  plan until the leader clears the gate again, which the entering side above detects. Retention by identity is
+  otherwise unchanged: a dip below θ still fires nothing. The recognizer retracts nothing (L2 (i)).
 - `task_committed` — `executor_state.holding` transitions `None → not-None`. REMOVED BY D3 (September 2026);
   kept here as history. `ExecutorState.holding` stays, read by no trigger.
 

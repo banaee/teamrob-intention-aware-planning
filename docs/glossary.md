@@ -241,6 +241,15 @@ rested on, the human's hypothesis or the robot's task set. Two, and only two (D3
 against. `recognition_changed` is read against it from both sides.
 → `shared/meta_planner.py`, `_projected_hypothesis`; `shared/io_contracts.md` §2.2.
 
+**retraction** — the meta-planner's act of withdrawing an admitted projection when the hypothesis the decision was
+projected against leaves adequate (its **hypothesis adequacy**, §7): `recognition_changed` fires on that hypothesis
+only, never on a rival's transition; admission is re-asked and G1 refuses, so the decision realizes against no human
+plan; re-admission is through the entering side of `recognition_changed` when the leader clears the gate again. The
+recognizer retracts nothing: inadequacy attaches to the derived phase and stays until its advance (L2 (i)), and the
+recognizer's side has no term. Older texts use the word for the recognizer's side (T-D Q2; E7's "retraction and
+resumption are L"; the **unexplained** entry, §7); L2 (i) rules that side out. Ruled in L2 (ii), built in L-build.
+→ `docs/design_decisions.md`, "T-D L: the belief lifecycle", L2; `shared/io_contracts.md` §2.2.
+
 **crossing** — a θ crossing, and nothing else: the tick a hypothesis's normalised share first clears
 the gate. For paths the word is **violation** (§3); for two paths meeting in space, say that they
 intersect.
@@ -266,6 +275,11 @@ yet retired, plus `unknown`, the residual hypothesis (§7). A hypothesis belongs
 behaviour of the human is described by one is its coverage (label B, §7).
 → `shared/io_contracts.md` §1.8; `docs/recognizer_handback.md` §1.1.
 SUPERSEDED IN PART (T-D R, 27 September 2026): "plus `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1). design_decisions.md, "T-D R and E".
+SUPERSEDED IN PART (T-D L4, ruled 27 September 2026, built in L-build): the LIVE SET is the support minus the
+hypotheses whose terminal fact holds on this tick, read from the world on every tick: retirement lasts exactly as long
+as the fact holds, and a hypothesis whose fact stops holding re-enters with the prior base and the current position as
+origin (the others renormalised). "Not yet retired" no longer means "never completed". design_decisions.md, "T-D L:
+the belief lifecycle", L4.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -291,6 +305,14 @@ the uniform prior and every origin moves. The two criteria are deliberately diff
 holds 1/|Live| by normalisation, not from evidence (§7).
 → `docs/recognizer_handback.md` §1.6.
 SUPERSEDED IN PART (T-D R, 27 September 2026): "`unknown` holds 1/|Live|": the `unknown` hypothesis leaves the hypothesis space (R1). design_decisions.md, "T-D R and E".
+SUPERSEDED IN PART (T-D L1 and L4, ruled 27 September 2026, built in L-build). EPISODE BOUNDARY (L1): it fires when the
+observed agent completes an action that is terminal in the task model (`place`, `wait_at`), read from the completion
+channel, whatever its binding; it no longer needs a pin. TERMINAL PIN: it stays the world's terminal fact of a live
+hypothesis; a boundary at a pin is the special case where the terminal action also produces that fact. A task whose
+execution ends without its terminal fact (a misdelivery) stays live and starts the next episode at the prior: "live"
+and "being executed" are separate. The pin retires "for the rest of the run" no longer (L4): a pinned hypothesis
+stays retired while its terminal fact holds and re-enters the live set when it stops holding (**hypothesis**, above).
+design_decisions.md, "T-D L: the belief lifecycle", L1, L4.
 
 **θ (theta)** — the confidence gate. It belongs to the meta-planner, not the recognizer, and is
 asked in exactly one place. The recognizer emits a belief distribution and gates nothing. The gate's outcome is
@@ -738,6 +760,10 @@ finding is reported in it, and nothing is unexplained in it. It replaces the rea
 set of assigned tasks, prior on). A ROBOT term: the world's counterparts (every assigned task done, the empty stack)
 are ground truth read from the record and can differ from it.
 → the same entry, R3, R4.
+AMENDED (T-D L4, ruled 27 September 2026, built in L-build): exhausted is about the current world — no hypothesis of
+the support whose terminal fact does not hold on this tick — and becomes rare: a foreseeable task is live again once its
+fact clears, so after the work order the live set is the foreseeable tasks and the exit walk reads **unexplained**.
+design_decisions.md, "T-D L: the belief lifecycle", L4.
 
 **unexplained** — the recognizer's finding that it has evidence that no live task hypothesis explains the
 observations. A finding about evidence, not a value of the belief. `unknown` can be high with nothing unexplained

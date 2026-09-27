@@ -46,6 +46,12 @@ restricts the support; it is not a weight.
 The LIVE set H at tick t is the support minus the tasks completed by t (§1.6). One recognizer instance observes
 one agent: the odometer and the standing clock are kept per agent, the phase state per hypothesis only.
 
+SUPERSEDED IN PART (T-D L4, ruled 27 September 2026, built in L-build): H at tick t is the support minus the hypotheses
+whose terminal fact holds AT t, read from the world on every tick; "completed by t" (once, for the rest of the run)
+no longer. A hypothesis whose terminal fact stops holding re-enters H with the prior base and the current position as
+origin, the others renormalised (R6): a moved item makes its delivery live again, `coffee_break` is live again when
+`waited` clears. design_decisions.md, "T-D L: the belief lifecycle", L4.
+
 ### 1.2 Prior
 
 Uniform over the live set: $\pi(k) = 1 / |H|$, at construction and again at every episode boundary (§1.6),
@@ -172,6 +178,15 @@ different criteria. A robot completion pins (prior-off) but is not the human's b
 assumes that an agent whose phase reached the terminal action is the one that completed it; the world carries
 no authorship.
 
+SUPERSEDED (T-D L1 and L4, ruled 27 September 2026, built in L-build). BOUNDARY (L1): the episode boundary fires when
+the observed agent completes an action that is terminal in the task model (`place`, `wait_at`), read from the
+completion channel, whatever its binding; it no longer requires a retirement. PIN: unchanged as the world's terminal
+fact of a live hypothesis; a boundary at a pin is the special case where the terminal action also produces that fact.
+A task whose execution ends without its terminal fact (the misdelivery, scenario_s09_08 at 75) stays live and starts
+the next episode at the prior. RETIREMENT (L4): "for the rest of the run" no longer; a hypothesis is retired while its
+terminal fact holds and re-enters when it stops holding (§1.1). What a boundary does is unchanged (L5).
+design_decisions.md, "T-D L: the belief lifecycle", L1, L4, L5.
+
 ### 1.7 Output
 
 $$
@@ -205,6 +220,12 @@ probabilities and every live hypothesis's hypothesis adequacy (§1.10). Belief a
 
 Close enough to `IntentionRecognizer.update()` to check line by line; λ is `_progress_likelihood`, and ≡ is
 identity of name and bindings.
+
+SUPERSEDED IN PART (T-D L1 and L4, ruled 27 September 2026, built in L-build): the pseudocode below is the recognizer
+before L-build. Under L4 the `k completed` skip and `completed.add(k)` become a per-tick test of the terminal fact (a
+retired key whose fact no longer holds re-enters H with the prior base and the current position as origin); under L1
+`boundary` is set by the observed agent's completion of a terminal action read from the completion channel, not
+inside the retirement branch by `expected[k] == A[-1]`. design_decisions.md, "T-D L: the belief lifecycle", L1, L4.
 
 ```python
 # update(obs, world)
@@ -595,6 +616,10 @@ exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`
 - `evaluate_triggers()` fires `recognition_changed` (D2) when a decision record `_projected_hypothesis`
   exists and `most_likely` is no longer it: a replacement, the human's boundary, or no hypothesis live. It also
   fires when no record exists and the belief clears the gate (θ and the guard, one condition).
+  SUPERSEDED IN PART (T-D L2 (ii), ruled 27 September 2026, built in L-build): it also fires when the recorded
+  hypothesis leaves adequate (its `hypothesis_adequacy`), that hypothesis only, never a rival's transition: RETRACTION,
+  the meta-planner's act. Admission is re-asked and G1 refuses; re-admission through the entering side. The recognizer
+  retracts nothing (L2 (i)). design_decisions.md, "T-D L: the belief lifecycle", L2.
 - `update_human_projection()` admits a projection only when the gate clears. It resolves the key through
   `recognizer.get_hypothesis()` (the same live instance, held by reference) to project the human's task, and
   records the hypothesis it projected. Its refusal reasons are `none(below_theta)`, `none(leader_no_observation)`,
