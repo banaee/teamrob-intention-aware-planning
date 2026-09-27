@@ -1,0 +1,76 @@
+{
+ "space": [
+  "coffee_break(?coffee_machine=coffee_machine_0)",
+  "deliver_item(?item=item_1)",
+  "deliver_item(?item=item_3)"
+ ],
+ "phases": {
+  "coffee_break(?coffee_machine=coffee_machine_0)": [
+   [
+    "move_to(?target=coffee_machine_0)",
+    -1,
+    187
+   ]
+  ],
+  "deliver_item(?item=item_1)": [
+   [
+    "move_to(?target=item_1)",
+    -1,
+    27
+   ],
+   [
+    "pick_up(?item=item_1)",
+    28,
+    29
+   ],
+   [
+    "move_to(?target=kitting_table_0)",
+    30,
+    58
+   ],
+   [
+    "place(?item=item_1,?target=kitting_table_0)",
+    59,
+    60
+   ]
+  ],
+  "deliver_item(?item=item_2)": [],
+  "deliver_item(?item=item_3)": [
+   [
+    "move_to(?target=item_3)",
+    -1,
+    29
+   ],
+   [
+    "place(?item=item_1,?target=shelf_1)",
+    30,
+    31
+   ],
+   [
+    "move_to(?target=shelf_1)",
+    32,
+    60
+   ],
+   [
+    "move_to(?target=item_3)",
+    61,
+    81
+   ],
+   [
+    "pick_up(?item=item_3)",
+    82,
+    83
+   ],
+   [
+    "move_to(?target=kitting_table_0)",
+    84,
+    104
+   ],
+   [
+    "place(?item=item_3,?target=kitting_table_0)",
+    105,
+    106
+   ]
+  ]
+ }
+}

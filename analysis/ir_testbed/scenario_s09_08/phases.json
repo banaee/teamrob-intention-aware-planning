@@ -1,0 +1,96 @@
+{
+ "space": [
+  "coffee_break(?coffee_machine=coffee_machine_0)",
+  "deliver_item(?item=item_1)",
+  "deliver_item(?item=item_2)"
+ ],
+ "phases": {
+  "coffee_break(?coffee_machine=coffee_machine_0)": [
+   [
+    "move_to(?target=coffee_machine_0)",
+    -1,
+    210
+   ]
+  ],
+  "deliver_item(?item=item_1)": [
+   [
+    "move_to(?target=item_1)",
+    -1,
+    27
+   ],
+   [
+    "pick_up(?item=item_1)",
+    28,
+    29
+   ],
+   [
+    "move_to(?target=kitting_table_0)",
+    30,
+    74
+   ],
+   [
+    "pick_up(?item=item_1)",
+    75,
+    76
+   ],
+   [
+    "move_to(?target=item_1)",
+    77,
+    98
+   ],
+   [
+    "place(?item=item_2,?target=shelf_2)",
+    99,
+    100
+   ],
+   [
+    "move_to(?target=shelf_2)",
+    101,
+    130
+   ],
+   [
+    "move_to(?target=item_1)",
+    131,
+    210
+   ]
+  ],
+  "deliver_item(?item=item_2)": [
+   [
+    "move_to(?target=item_2)",
+    -1,
+    29
+   ],
+   [
+    "place(?item=item_1,?target=shelf_1)",
+    30,
+    31
+   ],
+   [
+    "move_to(?target=shelf_1)",
+    32,
+    74
+   ],
+   [
+    "move_to(?target=item_2)",
+    75,
+    96
+   ],
+   [
+    "pick_up(?item=item_2)",
+    97,
+    98
+   ],
+   [
+    "move_to(?target=kitting_table_0)",
+    99,
+    128
+   ],
+   [
+    "place(?item=item_2,?target=kitting_table_0)",
+    129,
+    130
+   ]
+  ],
+  "deliver_item(?item=item_3)": []
+ }
+}

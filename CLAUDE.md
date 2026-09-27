@@ -156,7 +156,9 @@ Decisions
   recognition run on every tick, and an empty pool stops planning and execution only. TB.3b built the IR test-bed
   (27 Sept 2026; env_layout_10, env_setup_08, scenario_s08_01 to _04, run files in `configs/ir_testbed/`, the
   instrument and its report in `analysis/ir_testbed/`): the recognizer's public outputs agree with the independent
-  oracle on every compared tick of the four runs.
+  oracle on every compared tick of the four runs. TB.4b made the instrument independent of the layout and added the
+  enlarged room (env_layout_11, env_setup_09, scenario_s09_01 to _12: the TB.3b scripts, the deviations and the
+  same-side alternates; the s08 artefacts and outputs unchanged): zero disagreements at 1e-9 on all twelve.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
