@@ -1,0 +1,50 @@
+
+# minimum separation ([sep] min over the run, cm), before -> after; post-only holds with the admitted belief
+tb1a_destination/env_layout_01_scenario_s01_01_off                8.15 ->    8.15  hold 31 at 143: deliver_item(?item=item_4)(0.996) adequate, keys above the floor 1
+tb1a_destination/env_layout_01_scenario_s01_01_on                 8.15 ->    8.15  
+tb1a_destination/env_layout_02_scenario_s02_01_off               30.87 ->   30.87  
+tb1a_destination/env_layout_02_scenario_s02_01_on                30.87 ->   30.87  
+tb1a_destination/env_layout_03_scenario_s03_01_off               30.12 ->    3.85  hold 7 at 29: deliver_item(?item=item_3)(0.759) adequate, keys above the floor 3
+tb1a_destination/env_layout_03_scenario_s03_01_on                 3.85 ->    3.85  hold 2 at 56: deliver_item(?item=item_2)(0.996) adequate, keys above the floor 1
+tb1a_destination/env_layout_04_scenario_s01_06_off                0.00 ->    0.00  
+tb1a_destination/env_layout_04_scenario_s01_06_on                25.28 ->   25.28  
+tb1a_destination/env_layout_05_scenario_s04_01_off                4.56 ->    4.56  
+tb1a_destination/env_layout_05_scenario_s04_01_on                 4.56 ->    4.56  
+tb1a_destination/env_layout_06_scenario_s03_06_off               36.35 ->   36.35  hold 7 at 29: deliver_item(?item=item_3)(0.759) adequate, keys above the floor 3
+tb1a_destination/env_layout_06_scenario_s03_06_on                36.35 ->   36.35  
+tb1a_destination/env_layout_07_scenario_s05_01_off               30.00 ->   25.75  hold 24 at 36: coffee_break(?coffee_machine=coffee_machine_0)(0.759) adequate, keys above the floor 5; hold 5 at 70: deliver_item(?item=item_5)(0.758) adequate, keys above the floor 5
+tb1a_destination/env_layout_07_scenario_s05_01_on                30.00 ->   30.00  hold 20 at 32: coffee_break(?coffee_machine=coffee_machine_0)(0.776) adequate, keys above the floor 2; hold 3 at 60: deliver_item(?item=item_5)(0.804) adequate, keys above the floor 2; hold 3 at 96: ac_activation(?ac_switch=ac_switch_0)(0.995) adequate, keys above the floor 1
+tb1a_destination/env_layout_07_scenario_s05_02_off               30.00 ->   25.75  hold 24 at 36: coffee_break(?coffee_machine=coffee_machine_0)(0.759) adequate, keys above the floor 5; hold 5 at 70: deliver_item(?item=item_5)(0.758) adequate, keys above the floor 5
+tb1a_destination/env_layout_07_scenario_s05_02_on                30.00 ->   30.00  hold 20 at 32: coffee_break(?coffee_machine=coffee_machine_0)(0.776) adequate, keys above the floor 2; hold 3 at 60: deliver_item(?item=item_5)(0.804) adequate, keys above the floor 2; hold 3 at 96: ac_activation(?ac_switch=ac_switch_0)(0.995) adequate, keys above the floor 1
+tb1b_two_tables/env_layout_08_scenario_s06_01_off               153.74 ->  153.74  
+tb1b_two_tables/env_layout_08_scenario_s06_01_on                153.74 ->  153.74  
+tb1b_two_tables/env_layout_08_scenario_s06_02_off                63.37 ->   63.37  
+tb1b_two_tables/env_layout_08_scenario_s06_02_on                 63.37 ->   63.37  
+tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_off      412.25 ->  412.25  
+tb1c_realized_flip/env_layout_08_scenario_s06_01_plain_on       412.25 ->  412.25  
+tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_off   412.25 ->  412.25  
+tb1c_realized_flip/env_layout_08_scenario_s06_01_realized_on    412.25 ->  412.25  
+tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_off       37.48 ->   37.48  
+tb1c_realized_flip/env_layout_08_scenario_s06_03_plain_on        37.48 ->   37.48  
+tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_off    37.48 ->   37.48  hold 10 at 222: deliver_item(?item=item_1)(0.995) adequate, keys above the floor 1
+tb1c_realized_flip/env_layout_08_scenario_s06_03_realized_on     37.48 ->   37.48  
+tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_off   17.89 ->   17.89  
+tb3_full_reorder/env_layout_03_scenario_s03_01_full_reorder_on    3.84 ->    3.84  
+tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_off   30.12 ->    3.85  hold 7 at 29: deliver_item(?item=item_3)(0.759) adequate, keys above the floor 3
+tb3_full_reorder/env_layout_03_scenario_s03_01_single_task_on     3.85 ->    3.85  hold 2 at 56: deliver_item(?item=item_2)(0.996) adequate, keys above the floor 1
+tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_off   30.00 ->   25.75  hold 24 at 36: coffee_break(?coffee_machine=coffee_machine_0)(0.759) adequate, keys above the floor 5; hold 5 at 70: deliver_item(?item=item_5)(0.758) adequate, keys above the floor 5
+tb3_full_reorder/env_layout_07_scenario_s05_01_full_reorder_on   30.00 ->   30.00  hold 20 at 32: coffee_break(?coffee_machine=coffee_machine_0)(0.776) adequate, keys above the floor 2; hold 3 at 60: deliver_item(?item=item_5)(0.804) adequate, keys above the floor 2; hold 3 at 96: ac_activation(?ac_switch=ac_switch_0)(0.995) adequate, keys above the floor 1
+tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_off   30.00 ->   25.75  hold 24 at 36: coffee_break(?coffee_machine=coffee_machine_0)(0.759) adequate, keys above the floor 5; hold 5 at 70: deliver_item(?item=item_5)(0.758) adequate, keys above the floor 5
+tb3_full_reorder/env_layout_07_scenario_s05_01_single_task_on    30.00 ->   30.00  hold 20 at 32: coffee_break(?coffee_machine=coffee_machine_0)(0.776) adequate, keys above the floor 2; hold 3 at 60: deliver_item(?item=item_5)(0.804) adequate, keys above the floor 2; hold 3 at 96: ac_activation(?ac_switch=ac_switch_0)(0.995) adequate, keys above the floor 1
+tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_off  412.25 ->  412.25  
+tb3_full_reorder/env_layout_08_scenario_s06_01_full_reorder_on  412.25 ->  412.25  
+tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_off  153.74 ->  153.74  
+tb3_full_reorder/env_layout_08_scenario_s06_01_single_task_on   153.74 ->  153.74  
+tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_off  346.07 ->  346.07  
+tb3_full_reorder/env_layout_08_scenario_s06_02_full_reorder_on  346.07 ->  346.07  
+tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_off   63.37 ->   63.37  
+tb3_full_reorder/env_layout_08_scenario_s06_02_single_task_on    63.37 ->   63.37  
+tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_off   37.48 ->   37.48  hold 10 at 222: deliver_item(?item=item_1)(0.995) adequate, keys above the floor 1
+tb3_full_reorder/env_layout_08_scenario_s06_03_full_reorder_on   37.48 ->   37.48  
+tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_off   39.69 ->   39.69  hold 50 at 222: deliver_item(?item=item_4)(0.995) adequate, keys above the floor 1
+tb3_full_reorder/env_layout_08_scenario_s06_03_single_task_on    39.69 ->   39.69  

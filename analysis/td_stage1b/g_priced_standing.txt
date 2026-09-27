@@ -1,0 +1,21 @@
+admitted at step 9: deliver_item(?item=item_3)
+  entry start=1 duration=68 actions=4 segments=8
+    move_to  walk  own= 29.50 latency(stand)=1.00 projected standing at its location= 1.00 E9 attribution (previous latency + own stationary)=0.00 recognizer s_exp=0.00
+    pick_up  stand own=  1.00 latency(stand)=1.00 projected standing at its location= 2.00 E9 attribution (previous latency + own stationary)=2.00 recognizer s_exp=2.00
+    move_to  walk  own= 32.97 latency(stand)=1.00 projected standing at its location= 1.00 E9 attribution (previous latency + own stationary)=1.00 recognizer s_exp=1.00
+    place    stand own=  1.00 latency(stand)=1.00 projected standing at its location= 2.00 E9 attribution (previous latency + own stationary)=2.00 recognizer s_exp=2.00
+admitted at step 80: deliver_item(?item=item_2)
+  entry start=1 duration=60 actions=4 segments=8
+    move_to  walk  own= 27.24 latency(stand)=1.00 projected standing at its location= 1.00 E9 attribution (previous latency + own stationary)=0.00 recognizer s_exp=0.00
+    pick_up  stand own=  1.00 latency(stand)=1.00 projected standing at its location= 2.00 E9 attribution (previous latency + own stationary)=2.00 recognizer s_exp=-
+    move_to  walk  own= 27.10 latency(stand)=1.00 projected standing at its location= 1.00 E9 attribution (previous latency + own stationary)=1.00 recognizer s_exp=-
+    place    stand own=  1.00 latency(stand)=1.00 projected standing at its location= 2.00 E9 attribution (previous latency + own stationary)=2.00 recognizer s_exp=-
+
+observed body (the fixture's baseline log, human_0): the stationary ticks at each location
+  steps 40-42 (3 ticks): move_to/None pick_up/grasp pick_up/None
+  steps 77-79 (3 ticks): move_to/None place/release place/None
+  steps 109-111 (3 ticks): move_to/None pick_up/grasp pick_up/None
+
+the true hypothesis's D on the human's walking ticks where it is a member (48 runs, lag-corrected truth)
+  prior on: 3891 ticks: D=0 3891 (100.0%)
+  prior off: 3891 ticks: D=0 3891 (100.0%)
