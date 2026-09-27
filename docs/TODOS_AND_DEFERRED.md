@@ -1037,6 +1037,7 @@ reachable, but nothing outside `sim_agents.py` reads either flag — confirmed b
 (scenario_s01_01: everything done by step 147).
 Harmless, but wasteful and makes log tails uninformative. Fix belongs in the run loop
 (`run_mesa.py` / `SimModel.step()`), not in the agents.
+NOTE (TB.1r, 27 Sept 2026): the cognitive-loop ruling (design_decisions.md, "The cognitive loop does not end with the task pool") does not touch this item.
 Files: mesa_sim/run_mesa.py, mesa_sim/sim_model.py
 Reference: Phase 4C scenario_s01_01 validation, September 2026
 
@@ -3318,6 +3319,10 @@ The interface it needs (recorded, not designed):
   before and after on the maintained baselines; false-unexplained per phase and per run, missed findings and detection
   delay, at every test level α (0.01, 0.05, 0.1). The ground truth is the record's (`truth_at`, `coverage`); the oracle
   interface above serves it.
+- THE IR TEST-BED (TB, ruled 27 Sept 2026; design_decisions.md, "The IR test-bed"): the recognizer tested in
+  isolation against expectations derived from the entry "T-D R and E" before the run, not through this oracle
+  adapter, which stays unbuilt. The cases the 48 fixtures lack (the corner walk, a switch outside the support) are its
+  layer 4, TODO-122.
 - 1.4 (27 Sept 2026, `analysis/td_stage1/REPORT.md`) measured against the record directly (`truth_at`, `coverage`);
   oracle IR is still unbuilt.
 - The 48 logs of the maintained baseline sets contain no `TASK_ABSENT` case and no case outside the hypothesis
@@ -3488,6 +3493,9 @@ complete, a foreseeable hypothesis still live keeps the recognizer from reading 
 `ac_switch_0` alone live at 0.992 from 327, admitted at 327, the finding adequate to 343 and unexplained from 344
 (α = 0.05; `analysis/td_stage1/REPORT.md` §H case 2), while the human is idle. Whether a foreseeable hypothesis stays
 live after the work order is complete is for L.
+THE IR TEST-BED (TB, ruled 27 Sept 2026): its room has no AC switch, so with the prior on the hypothesis space is the
+two deliveries plus `coffee_break`, and the test-bed constructs this case by its stated consequences
+(design_decisions.md, "The IR test-bed"). Its expectations are generated from the current entry; it does not resolve L.
 Files: shared/recognizer.py (the live set H)
 Reference: design_decisions.md, "T-D R and E", R4; `analysis/td_stage1/REPORT.md` §H
 
@@ -3520,6 +3528,23 @@ Reference: `analysis/td_stage1b/REPORT.md`, D, finding 3 and section 1.5c; desig
   recognizer took for it in the run, not the one in force when the projection was made (item_2 projected at 80: its
   initial walk's 0, not the post-boundary 1).
 Reference: `analysis/td_stage1b/REPORT.md`, flags
+
+**TODO-121: The 1.4 and 1.5b measurements cover the truncated interval (recorded, TB.1r, 27 Sept 2026)** [OPEN; TB.2b]
+In every run the robot stopped observing at its terminal return (`RobotAgent.finished`): the `[IR]` and `[IR-dist]`
+lines end at the robot's completion, and the recognizer's output over the human's remaining behaviour is in no
+baseline. The measurements of 1.4 (`analysis/td_stage1/`) and of 1.5b and 1.5c (`analysis/td_stage1b/`) were taken
+over that truncated interval. Once the cognitive-loop correction is built, they are rerun over the newly exposed
+interval in TB.2b, with every change reported and no previous statistic preserved for comparability.
+Files: analysis/td_stage1/, analysis/td_stage1b/ (the scripts rerun on the regenerated baselines)
+Reference: design_decisions.md, "The cognitive loop does not end with the task pool"
+
+**TODO-122: The IR test-bed's deviation scenarios, layer 4 (recorded, TB.1r, 27 Sept 2026)** [OPEN; with P and X]
+The test-bed's first scenarios hold modelled behaviour and the exit walk only. The deviations are authored later, with
+P and X: the corner walk (`TASK_ABSENT`, the case Design B was ruled for), a switch outside the support, the wrong
+table (`BINDING_ABSENT`), the long stand, the finished assigned tasks. Same rules as the test-bed's first scenarios:
+the layout is not adjusted to a desired result, and the expectations are derived from the entry before the run.
+Files: domains/kitting/ (scenarios), analysis/ir_testbed/
+Reference: design_decisions.md, "The IR test-bed"; TODO-101; `docs/handoff_T-D_cycle2_and_IR_testbed.md` §8, layer 4
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
