@@ -3099,6 +3099,7 @@ should decay, be reset by another event, or stand, is a recognizer question for 
 Files: shared/recognizer.py
 Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
 IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_05, prior on): the corner walk mid-delivery, 32 to 79; `deliver_item(item_1)`'s one derived phase `move_to(kitting_table_0)` runs 30 to 125, its S below α from 48; the finding is unexplained 48 to 125, through the resumed carry (80 to 125), where the delivery reaches θ at 87 while inadequate; adequate again at 126 (its advance to `place`).
+IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_07, prior on): the change of mind: after item_1's grasp (30) `deliver_item(item_2)` is started (32) and returns item_1 to its shelf (33); `deliver_item(item_2)`, whose S the first walk had put below α at 14, rises from 0.000 at 35 to θ at 64, 32 ticks after the switch, adequate throughout; `deliver_item(item_1)` falls below α at 44 and, resumed at 110 after the boundary at 108, reaches θ again at 135. The finding stays adequate until the exit walk (204).
 
 **TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN; its recognition level CLOSED by decision, T-D R and E, 27 Sept 2026]
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
