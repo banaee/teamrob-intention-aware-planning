@@ -106,8 +106,8 @@ Decisions
   (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
   (D2: `recognition_changed` against the decision record replaces `theta_crossed`; D3: `task_committed`
   removed, the robot's grasp is no trigger), and the policy
-  components are ablated (T6, `analysis/t6_ablation/`); the recognizer's evidence is graded by path
-  covered and the gate stays a fixed share (graded evidence, the gate ruling). The 4C queue is done.
+  components are ablated (T6, `analysis/t6_ablation/`); the gate stays a fixed share (the gate ruling). The 4C
+  queue is done.
   The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`). T-B is under way: T-B2a
   (`Projector.project()` chains the entries of an ordering, through a successor state derived from what the
   action schemas declare), T-B2b and T-B2c (`full_reorder`: an ordering realized against the human
@@ -128,9 +128,17 @@ Decisions
   record; task equality `same_task`; the `[coverage]` line at load) are built. T-H is closed (26 Sept 2026; the
   close-out in `docs/handoffs/handoff_T-H.md`: commits, acceptance, deferred items). T-L (the three artefacts
   of a run, stages 1 to 4; design_decisions.md, "Layouts, setups and scenarios") is built (26 Sept 2026; stage 4: the
-  run file, `--run`, and the overrides, `--override`, `mesa_sim/overrides.py`). Next is T-D, on T-H's structure
-  (`docs/handoffs/handoff_T-D_onward.md`, "What T-D now stands on"); T-D starts with its design in cchat. Not to be
-  started unasked: T-D to T-G, i.e. robustness, the demonstration, Phase 5
+  run file, `--run`, and the overrides, `--override`, `mesa_sim/overrides.py`). T-D is under way, on T-H's structure
+  (`docs/handoffs/handoff_T-D_onward.md`, "What T-D now stands on"). T-D R and E (design_decisions.md, ruled 26 to
+  27 Sept 2026) Stage 1 is built (27 Sept 2026, cycle 1 session 1.3): the `unknown` hypothesis, u and the grade are
+  gone, the belief is normalised over the live hypothesis set H only (R1, R6), and beside it the recognizer reports
+  the adequacy finding (unresolved | adequate | unexplained, from the projected completion delay D and its tail
+  probability S per live hypothesis per derived phase, at the test level α, the run option `--test_level`, default
+  0.05), the lifecycle state (live | exhausted) and the members' tail probabilities; the meta-planner reads
+  `confidence` and `most_likely` only, the gate unchanged, its input now the leader's share over H. The four
+  maintained baseline sets are regenerated under it. Next: session 1.4, Stage 1's verification analysis (TODO-101),
+  then L, P, G and X, each ruled on Stage 1's results. Not to be
+  started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
   (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
@@ -140,8 +148,8 @@ Decisions
   Touch it only in a T-B task, and only the step that task names.
   B2 is an evaluation factor, not a design step: `b2b` stays a stub. Change only what the task
   specifies; do not fill in unspecified block logic, flags or strategies.
-- `shared/recognizer.py`: rebuilt and handed back (`docs/recognizer_handback.md`). Not under
-  active change; touch it only if the task says so.
+- `shared/recognizer.py`: rebuilt and handed back (`docs/recognizer_handback.md`, rewritten to HEAD at the T-D
+  Stage 1 build). Touch it only if the task says so.
 - ROS side is paused. Do not modify anything under `ros_sim/`.
 - `domains/dock_loading/` is deferred. Do not modify it unless the task says so. It must still
   import without error (`run_mesa.py` imports its registry).
@@ -245,12 +253,12 @@ Logs go to `logs/run_<timestamp>.log`. Defaults come from the run file, `configs
 `--run` names; CLI flags override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_prior`
 (true/false), `--strategy` (single_task | full_reorder), `--gate_strategy` (none | b2a | b2b),
 `--cost_strategy` (realized | plain),
-`--separation_stop` (true/false), `--run` (another run file; it replaced `--experiment` in T-L stage 4, no alias) and
+`--separation_stop` (true/false), `--test_level` (the recognizer's adequacy test level α, strictly between 0 and 1), `--run` (another run file; it replaced `--experiment` in T-L stage 4, no alias) and
 `--override <path>=<value>` (repeatable). Parsing is strict: an unknown
 or misspelled flag, an unknown yaml key, or a bad value stops the run. Each robot's `[run]` header
 names the policy and evaluation switches the run took (strategy, gate, cost, stop, assignment prior, θ, ρ,
 min_separation and β, each with its source: the body supplies both, `mesa_sim/mesa_configs.yaml`, 50 cm
-and 0.01 /cm).
+and 0.01 /cm; since T-D Stage 1 also the test level α and the body's speed, 20 cm/tick).
 
 Overrides (T-L stage 4; design_decisions.md, "Layouts, setups and scenarios", ruling 7; glossary §9): a closed list of
 three, one path each, the same in the run file's `overrides:` block (a mapping path: value) and in `--override`:
@@ -329,7 +337,7 @@ grep "^\[meta-win\]"    <log>   # full_reorder: the winning ordering (hold befor
 grep "^\[meta-b3\]"     <log>   # B3's decision; under full_reorder with ordering= appended
 grep "^\[meta-proj\]"   <log>   # human projection admitted or not, and why
 grep "^\[meta-pool\]"   <log>   # completed tasks dropped from the pool
-grep "^\[IR\] step="    <log>   # most_likely and confidence per tick
+grep "^\[IR\] step="    <log>   # most_likely, confidence, lifecycle, finding and the members' tails per tick
 grep "^\[IR-dist\]"     <log>   # full belief distribution per tick
 grep "^\[IR-complete\]" <log>   # task completion pins
 grep "^\[sep\]"         <log>   # actual robot-human distance per tick
