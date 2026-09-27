@@ -753,8 +753,10 @@ class IntentionRecognizer:
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
                 self._origin_still[key] = still
                 self._entry_latency[key] = 0.0
-                if key not in returning:
-                    unnorm[key] = self._base[key]
+                # A returning key's share is set after the loop; its entry is
+                # made here so that the evidence stays in hypothesis order (the
+                # tie-break for most_likely, handback §1.7).
+                unnorm[key] = self._base[key] if key not in returning else 0.0
                 continue
 
             previous = self._expected[key]
@@ -787,7 +789,8 @@ class IntentionRecognizer:
             # incumbents share the rest in this tick's proportions. With k
             # returning and n incumbents, a returning value of (the
             # incumbents' total) / n normalises to 1/(n + k).
-            share = sum(unnorm.values()) / len(unnorm) if unnorm else 1.0
+            incumbents = [v for k, v in unnorm.items() if k not in returning]
+            share = sum(incumbents) / len(incumbents) if incumbents else 1.0
             for key in returning:
                 unnorm[key] = share
                 self._base[key] = share

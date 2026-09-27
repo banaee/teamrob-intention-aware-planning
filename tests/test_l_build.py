@@ -286,3 +286,19 @@ def test_a_replacement_is_still_reported_as_replaced(recorded):
     mp, w, ex = recorded
     b = belief(I2, {I1: HypothesisAdequacy.ADEQUATE, I2: HypothesisAdequacy.ADEQUATE}, boundary=True)
     assert mp.evaluate_triggers(b, w, ex).cause is RecognitionChange.REPLACED
+
+
+def test_a_re_entry_keeps_the_tie_break_in_hypothesis_order(model):
+    # one incumbent and coffee_break returning: 1/2 each exactly; ties go to the first live key in sorted order
+    # (handback §1.7), coffee_break(...) before deliver_item(...), whatever order the re-entry was computed in
+    w = build_world_state(model)
+    p = w.object_positions[MACHINE]
+    standing = world_with(w, add=[pred("at", H, MACHINE)])
+    c = coffee(model)
+    rec = recognizer(model, [c, item("item_2")])
+    rec.update(obs(0, p), standing)
+    rec.update(obs(1, p), world_with(standing, add=[pred("waited", H, MACHINE)]))
+    b = rec.update(obs(2, (p[0] + 20.0, p[1])), w)
+    assert rec._evidence == {repr(c): 0.5, repr(item("item_2")): 0.5}
+    assert list(rec._evidence) == [repr(c), repr(item("item_2"))]
+    assert b.most_likely == repr(c)
