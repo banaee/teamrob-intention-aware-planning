@@ -1,0 +1,535 @@
+
+B. The recognizer's outputs per ground-truth case of the record, against the truth (no oracle IR: TODO-101 is not
+built; the truth is the record's stack and the loader's [coverage] value per script entry).
+
+Runs are grouped by identical recognizer output and record (tdlib.ir_groups); one representative per group, the
+group's other runs named. Prior on first. Ticks are [IR] steps. Truth "raw" is the record at t, "lag" the record at
+t + 2 (the task transitions land 2 ticks after the world fact the recognizer reads).
+
+Cases (the record's): B1 a switch to a modelled task (every applied Start whose task is COVERED: in these scripts
+each entry of the script, the first on the empty stack); B2 a switch outside the support; B3 TASK_ABSENT;
+B4 BINDING_ABSENT; B5 no task on the stack; B6 an episode's first ticks (step 0 and every [IR-boundary]).
+Finding letters: A adequate, U unresolved, X unexplained, E exhausted (lifecycle), at α = 0.05 unless a column
+names the level. A disagreement is a tick where the finding (at any α) contradicts the truth: X on a COVERED task
+with its expected binding, or anything but X on a BINDING_ABSENT / TASK_ABSENT tick after the shared prefix (C
+states the prefix). Every disagreement is listed with its members and their S.
+
+
+## B1 a switch to a modelled task: the window around each switch, world tick w = record tick - 2
+columns: ticks w-1 .. w+3, each 'leader(confidence) finding'; the truth raw / lag at w and w+2
+
+### scenario_s01_01 on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.513) A | 1:item_3(0.529) A | 2:item_3(0.548) A | 3:item_3(0.570) A
+  switch rec=80 -> item_2; at w=78 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     77:item_3(0.996) A | 78:item_2(0.996) U | 79:item_2(0.996) A | 80:item_2(0.996) A | 81:item_2(0.996) A
+
+### scenario_s02_01 on
+  switch rec=0 -> item_2; at w=0 truth raw=item_2/move_to#0 lag=item_2/move_to#0; boundary at w: False
+     0:item_2(0.262) A | 1:item_2(0.276) A | 2:item_2(0.290) A | 3:item_2(0.305) A
+  switch rec=77 -> coffee; at w=75 truth raw=item_2/place#0 lag=coffee/move_to#0; boundary at w: True
+     74:item_2(0.991) A | 75:ac_switch_0(0.331) U | 76:ac_switch_0(0.331) A | 77:coffee(0.348) A | 78:coffee(0.365) A
+  switch rec=155 -> item_5; at w=153 truth raw=coffee/wait_at#0 lag=item_5/move_to#0; boundary at w: True
+     152:coffee(0.516) A | 153:ac_switch_0(0.496) U | 154:ac_switch_0(0.496) A | 155:item_5(0.533) A | 156:item_5(0.578) A
+  switch rec=311 -> ac_switch_0; at w=309 truth raw=item_5/place#0 lag=ac_switch_0/move_to#0; boundary at w: True
+     308:item_5(0.991) A | 309:ac_switch_0(0.991) U | 310:ac_switch_0(0.991) A | 311:ac_switch_0(0.991) A | 312:ac_switch_0(0.991) A
+
+### scenario_s03_01 on = scenario_s03_01 single_task on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.535) A | 1:item_3(0.579) A | 2:item_3(0.627) A | 3:item_3(0.679) A
+  switch rec=56 -> item_2; at w=54 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     53:item_3(0.996) A | 54:item_2(0.996) U | 55:item_2(0.996) A | 56:item_2(0.996) A | 57:item_2(0.996) A
+
+### scenario_s01_06 on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.505) A | 1:item_3(0.512) A | 2:item_3(0.520) A | 3:item_3(0.529) A
+  switch rec=76 -> item_7; at w=74 truth raw=item_3/place#0 lag=item_7/move_to#0; boundary at w: True
+     73:item_3(0.996) A | 74:item_7(0.996) U | 75:item_7(0.996) A | 76:item_7(0.996) A | 77:item_7(0.996) A
+
+### scenario_s04_01 on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.181) A | 1:item_3(0.199) A | 2:item_3(0.219) A | 3:item_3(0.242) A
+  switch rec=117 -> coffee; at w=115 truth raw=item_3/place#0 lag=coffee/move_to#0; boundary at w: True
+     114:item_3(0.992) A | 115:ac_switch_0(0.199) U | 116:ac_switch_0(0.199) A | 117:coffee(0.207) A | 118:coffee(0.215) A
+  switch rec=185 -> ac_switch_1; at w=183 truth raw=coffee/wait_at#0 lag=ac_switch_1/move_to#0; boundary at w: True
+     182:coffee(0.568) A | 183:ac_switch_0(0.249) U | 184:ac_switch_0(0.249) A | 185:ac_switch_1(0.254) A | 186:ac_switch_1(0.261) A
+  switch rec=207 -> ac_switch_2; at w=205 truth raw=ac_switch_1/wait_at#0 lag=ac_switch_2/move_to#0; boundary at w: True
+     204:ac_switch_1(0.445) A | 205:ac_switch_0(0.331) U | 206:ac_switch_0(0.331) A | 207:ac_switch_2(0.373) A | 208:ac_switch_2(0.424) A
+  switch rec=227 -> item_6; at w=225 truth raw=ac_switch_2/wait_at#0 lag=item_6/move_to#0; boundary at w: True
+     224:ac_switch_2(0.983) A | 225:ac_switch_0(0.496) U | 226:ac_switch_0(0.496) A | 227:item_6(0.507) A | 228:item_6(0.518) A
+
+### scenario_s03_06 on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.374) A | 1:item_3(0.424) A | 2:item_3(0.484) A | 3:item_3(0.550) A
+  switch rec=56 -> item_2; at w=54 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     53:item_3(0.995) A | 54:coffee(0.498) U | 55:coffee(0.498) A | 56:item_2(0.508) A | 57:item_2(0.519) A
+  switch rec=123 -> coffee; at w=121 truth raw=item_2/place#0 lag=coffee/move_to#0; boundary at w: True
+     120:item_2(0.995) A | 121:coffee(0.995) U | 122:coffee(0.995) A | 123:coffee(0.995) A | 124:coffee(0.995) A
+
+### scenario_s05_01 on = scenario_s05_01 full_reorder on, scenario_s05_01 single_task on
+  switch rec=0 -> coffee; at w=0 truth raw=coffee/move_to#0 lag=coffee/move_to#0; boundary at w: False
+     0:coffee(0.356) A | 1:coffee(0.381) A | 2:coffee(0.405) A | 3:coffee(0.427) A
+  switch rec=56 -> item_5; at w=54 truth raw=coffee/wait_at#0 lag=item_5/move_to#0; boundary at w: True
+     53:coffee(0.498) A | 54:ac_switch_0(0.498) U | 55:ac_switch_0(0.498) A | 56:item_5(0.553) A | 57:item_5(0.615) A
+  switch rec=96 -> ac_switch_0; at w=94 truth raw=item_5/place#0 lag=ac_switch_0/move_to#0; boundary at w: True
+     93:item_5(0.995) A | 94:ac_switch_0(0.995) U | 95:ac_switch_0(0.995) A | 96:ac_switch_0(0.995) A | 97:ac_switch_0(0.995) A
+
+### scenario_s05_02 on
+  switch rec=0 -> coffee; at w=0 truth raw=coffee/move_to#0 lag=coffee/move_to#0; boundary at w: False
+     0:coffee(0.356) A | 1:coffee(0.381) A | 2:coffee(0.405) A | 3:coffee(0.427) A
+  switch rec=56 -> item_5; at w=54 truth raw=coffee/wait_at#0 lag=item_5/move_to#0; boundary at w: True
+     53:coffee(0.498) A | 54:ac_switch_0(0.498) U | 55:ac_switch_0(0.498) A | 56:item_5(0.553) A | 57:item_5(0.615) A
+  switch rec=96 -> ac_switch_0; at w=94 truth raw=item_5/place#0 lag=ac_switch_0/move_to#0; boundary at w: True
+     93:item_5(0.995) A | 94:ac_switch_0(0.995) U | 95:ac_switch_0(0.995) A | 96:ac_switch_0(0.995) A | 97:ac_switch_0(0.995) A
+
+### scenario_s06_01 on = scenario_s06_01 single_task on
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.553) A | 1:item_0(0.615) A | 2:item_0(0.681) A | 3:item_0(0.746) A
+  switch rec=55 -> item_3; at w=53 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     52:item_0(0.995) A | 53:item_3(0.995) U | 54:item_3(0.995) A | 55:item_3(0.995) A | 56:item_3(0.995) A
+
+### scenario_s06_02 on = scenario_s06_02 single_task on
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.550) A | 1:item_0(0.608) A | 2:item_0(0.671) A | 3:item_0(0.733) A
+  switch rec=72 -> item_3; at w=70 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     69:item_0(0.995) A | 70:item_3(0.995) U | 71:item_3(0.995) A | 72:item_3(0.995) A | 73:item_3(0.995) A
+
+### scenario_s06_01 plain on = scenario_s06_01 realized on, scenario_s06_01 full_reorder on
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.553) A | 1:item_0(0.615) A | 2:item_0(0.681) A | 3:item_0(0.746) A
+  switch rec=55 -> item_3; at w=53 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     52:item_0(0.995) A | 53:item_3(0.995) U | 54:item_3(0.995) A | 55:item_3(0.995) A | 56:item_3(0.995) A
+
+### scenario_s06_03 plain on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.553) A | 1:item_3(0.615) A | 2:item_3(0.681) A | 3:item_3(0.746) A
+  switch rec=98 -> item_0; at w=96 truth raw=item_3/place#0 lag=item_0/move_to#0; boundary at w: True
+     95:item_3(0.995) A | 96:item_0(0.995) U | 97:item_0(0.995) A | 98:item_0(0.995) A | 99:item_0(0.995) A
+
+### scenario_s06_03 realized on = scenario_s06_03 full_reorder on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.553) A | 1:item_3(0.615) A | 2:item_3(0.681) A | 3:item_3(0.746) A
+  switch rec=98 -> item_0; at w=96 truth raw=item_3/place#0 lag=item_0/move_to#0; boundary at w: True
+     95:item_3(0.995) A | 96:item_0(0.995) U | 97:item_0(0.995) A | 98:item_0(0.995) A | 99:item_0(0.995) A
+
+### scenario_s03_01 full_reorder on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.535) A | 1:item_3(0.579) A | 2:item_3(0.627) A | 3:item_3(0.679) A
+  switch rec=56 -> item_2; at w=54 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     53:item_3(0.996) A | 54:item_2(0.996) U | 55:item_2(0.996) A | 56:item_2(0.996) A | 57:item_2(0.996) A
+
+### scenario_s06_02 full_reorder on
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.550) A | 1:item_0(0.608) A | 2:item_0(0.671) A | 3:item_0(0.733) A
+  switch rec=72 -> item_3; at w=70 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     69:item_0(0.995) A | 70:item_3(0.995) U | 71:item_3(0.995) A | 72:item_3(0.995) A | 73:item_3(0.995) A
+
+### scenario_s06_03 single_task on
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.553) A | 1:item_3(0.615) A | 2:item_3(0.681) A | 3:item_3(0.746) A
+  switch rec=98 -> item_0; at w=96 truth raw=item_3/place#0 lag=item_0/move_to#0; boundary at w: True
+     95:item_3(0.995) A | 96:item_0(0.995) U | 97:item_0(0.995) A | 98:item_0(0.995) A | 99:item_0(0.995) A
+
+### scenario_s01_01 off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.204) A | 1:item_3(0.209) A | 2:item_3(0.215) A | 3:item_3(0.221) A
+  switch rec=80 -> item_2; at w=78 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     77:item_3(0.996) A | 78:item_2(0.333) U | 79:item_2(0.333) A | 80:item_2(0.344) A | 81:item_2(0.358) A
+
+### scenario_s02_01 off
+  switch rec=0 -> item_2; at w=0 truth raw=item_2/move_to#0 lag=item_2/move_to#0; boundary at w: False
+     0:item_2(0.110) A | 1:item_2(0.121) A | 2:item_2(0.133) A | 3:item_2(0.147) A
+  switch rec=77 -> coffee; at w=75 truth raw=item_2/place#0 lag=coffee/move_to#0; boundary at w: True
+     74:item_2(0.991) A | 75:ac_switch_0(0.125) U | 76:ac_switch_0(0.125) A | 77:coffee(0.133) A | 78:coffee(0.141) A
+  switch rec=155 -> item_5; at w=153 truth raw=coffee/wait_at#0 lag=item_5/move_to#0; boundary at w: True
+     152:coffee(0.346) A | 153:ac_switch_0(0.142) U | 154:ac_switch_0(0.142) A | 155:item_5(0.151) A | 156:item_5(0.162) A
+  switch rec=311 -> ac_switch_0; at w=309 truth raw=item_5/place#0 lag=ac_switch_0/move_to#0; boundary at w: True
+     308:item_5(0.991) A | 309:ac_switch_0(0.248) U | 310:ac_switch_0(0.248) A | 311:ac_switch_0(0.270) A | 312:ac_switch_0(0.295) A
+
+### scenario_s03_01 off = scenario_s03_01 single_task off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.210) A | 1:item_3(0.222) A | 2:item_3(0.234) A | 3:item_3(0.248) A
+  switch rec=56 -> item_2; at w=54 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     53:item_3(0.996) A | 54:item_2(0.250) U | 55:item_2(0.250) A | 56:item_2(0.261) A | 57:item_2(0.279) A
+
+### scenario_s01_06 off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.205) A | 1:item_3(0.210) A | 2:item_3(0.216) A | 3:item_3(0.223) A
+  switch rec=76 -> item_7; at w=74 truth raw=item_3/place#0 lag=item_7/move_to#0; boundary at w: True
+     73:item_3(0.996) A | 74:item_2(0.250) U | 75:item_2(0.250) A | 76:item_7(0.277) A | 77:item_7(0.315) A
+
+### scenario_s04_01 off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.124) A | 1:item_3(0.140) A | 2:item_3(0.160) A | 3:item_3(0.182) A
+  switch rec=117 -> coffee; at w=115 truth raw=item_3/place#0 lag=coffee/move_to#0; boundary at w: True
+     114:item_3(0.992) A | 115:ac_switch_0(0.125) U | 116:ac_switch_0(0.125) A | 117:coffee(0.131) A | 118:coffee(0.138) A
+  switch rec=185 -> ac_switch_1; at w=183 truth raw=coffee/wait_at#0 lag=ac_switch_1/move_to#0; boundary at w: True
+     182:coffee(0.557) A | 183:ac_switch_0(0.166) U | 184:ac_switch_0(0.166) A | 185:ac_switch_1(0.169) A | 186:ac_switch_1(0.172) A
+  switch rec=207 -> ac_switch_2; at w=205 truth raw=ac_switch_1/wait_at#0 lag=ac_switch_2/move_to#0; boundary at w: True
+     204:ac_switch_1(0.271) A | 205:ac_switch_0(0.199) U | 206:ac_switch_0(0.199) A | 207:ac_switch_2(0.228) A | 208:ac_switch_2(0.265) A
+  switch rec=227 -> item_6; at w=225 truth raw=ac_switch_2/wait_at#0 lag=item_6/move_to#0; boundary at w: True
+     224:ac_switch_2(0.957) A | 225:ac_switch_0(0.249) U | 226:ac_switch_0(0.249) A | 227:item_6(0.255) A | 228:item_6(0.261) A
+
+### scenario_s03_06 off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.180) A | 1:item_3(0.195) A | 2:item_3(0.211) A | 3:item_3(0.228) A
+  switch rec=56 -> item_2; at w=54 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     53:item_3(0.995) A | 54:coffee(0.200) U | 55:coffee(0.200) A | 56:item_2(0.209) A | 57:item_2(0.222) A
+  switch rec=123 -> coffee; at w=121 truth raw=item_2/place#0 lag=coffee/move_to#0; boundary at w: True
+     120:item_2(0.995) A | 121:coffee(0.332) U | 122:coffee(0.332) A | 123:coffee(0.359) A | 124:coffee(0.390) A
+
+### scenario_s05_01 off = scenario_s05_01 full_reorder off, scenario_s05_01 single_task off
+  switch rec=0 -> coffee; at w=0 truth raw=coffee/move_to#0 lag=coffee/move_to#0; boundary at w: False
+     0:coffee(0.175) A | 1:coffee(0.183) A | 2:coffee(0.191) A | 3:coffee(0.199) A
+  switch rec=56 -> item_5; at w=54 truth raw=coffee/wait_at#0 lag=item_5/move_to#0; boundary at w: True
+     53:coffee(0.271) A | 54:ac_switch_0(0.200) U | 55:ac_switch_0(0.200) A | 56:item_5(0.216) A | 57:item_5(0.236) A
+  switch rec=96 -> ac_switch_0; at w=94 truth raw=item_5/place#0 lag=ac_switch_0/move_to#0; boundary at w: True
+     93:item_5(0.995) A | 94:ac_switch_0(0.332) U | 95:ac_switch_0(0.332) A | 96:ac_switch_0(0.366) A | 97:ac_switch_0(0.405) A
+
+### scenario_s05_02 off
+  switch rec=0 -> coffee; at w=0 truth raw=coffee/move_to#0 lag=coffee/move_to#0; boundary at w: False
+     0:coffee(0.175) A | 1:coffee(0.183) A | 2:coffee(0.191) A | 3:coffee(0.199) A
+  switch rec=56 -> item_5; at w=54 truth raw=coffee/wait_at#0 lag=item_5/move_to#0; boundary at w: True
+     53:coffee(0.271) A | 54:ac_switch_0(0.200) U | 55:ac_switch_0(0.200) A | 56:item_5(0.216) A | 57:item_5(0.236) A
+  switch rec=96 -> ac_switch_0; at w=94 truth raw=item_5/place#0 lag=ac_switch_0/move_to#0; boundary at w: True
+     93:item_5(0.995) A | 94:ac_switch_0(0.332) U | 95:ac_switch_0(0.332) A | 96:ac_switch_0(0.366) A | 97:ac_switch_0(0.405) A
+
+### scenario_s06_01 off = scenario_s06_01 single_task off
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.190) A | 1:item_0(0.219) A | 2:item_0(0.254) A | 3:item_0(0.294) A
+  switch rec=55 -> item_3; at w=53 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     52:item_0(0.995) A | 53:item_1(0.249) U | 54:item_1(0.249) A | 55:item_3(0.264) A | 56:item_3(0.279) A
+
+### scenario_s06_02 off = scenario_s06_02 single_task off
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.190) A | 1:item_0(0.218) A | 2:item_0(0.252) A | 3:item_0(0.291) A
+  switch rec=72 -> item_3; at w=70 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     69:item_0(0.995) A | 70:item_1(0.249) U | 71:item_1(0.249) A | 72:item_3(0.263) A | 73:item_3(0.277) A
+
+### scenario_s06_01 plain off = scenario_s06_01 realized off, scenario_s06_01 full_reorder off
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.190) A | 1:item_0(0.219) A | 2:item_0(0.254) A | 3:item_0(0.294) A
+  switch rec=55 -> item_3; at w=53 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     52:item_0(0.995) A | 53:item_1(0.249) U | 54:item_1(0.249) A | 55:item_3(0.267) A | 56:item_3(0.287) A
+
+### scenario_s06_03 plain off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.182) A | 1:item_3(0.200) A | 2:item_3(0.219) A | 3:item_3(0.240) A
+  switch rec=98 -> item_0; at w=96 truth raw=item_3/place#0 lag=item_0/move_to#0; boundary at w: True
+     95:item_3(0.995) A | 96:item_0(0.249) U | 97:item_0(0.249) A | 98:item_0(0.255) A | 99:item_0(0.260) A
+
+### scenario_s06_03 realized off = scenario_s06_03 full_reorder off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.182) A | 1:item_3(0.200) A | 2:item_3(0.219) A | 3:item_3(0.240) A
+  switch rec=98 -> item_0; at w=96 truth raw=item_3/place#0 lag=item_0/move_to#0; boundary at w: True
+     95:item_3(0.995) A | 96:item_0(0.249) U | 97:item_0(0.249) A | 98:item_0(0.255) A | 99:item_0(0.260) A
+
+### scenario_s03_01 full_reorder off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.210) A | 1:item_3(0.222) A | 2:item_3(0.234) A | 3:item_3(0.248) A
+  switch rec=56 -> item_2; at w=54 truth raw=item_3/place#0 lag=item_2/move_to#0; boundary at w: True
+     53:item_3(0.996) A | 54:item_2(0.250) U | 55:item_2(0.250) A | 56:item_2(0.260) A | 57:item_2(0.272) A
+
+### scenario_s06_02 full_reorder off
+  switch rec=0 -> item_0; at w=0 truth raw=item_0/move_to#0 lag=item_0/move_to#0; boundary at w: False
+     0:item_0(0.190) A | 1:item_0(0.218) A | 2:item_0(0.252) A | 3:item_0(0.291) A
+  switch rec=72 -> item_3; at w=70 truth raw=item_0/place#0 lag=item_3/move_to#0; boundary at w: True
+     69:item_0(0.995) A | 70:item_1(0.249) U | 71:item_1(0.249) A | 72:item_3(0.267) A | 73:item_3(0.287) A
+
+### scenario_s06_03 single_task off
+  switch rec=0 -> item_3; at w=0 truth raw=item_3/move_to#0 lag=item_3/move_to#0; boundary at w: False
+     0:item_3(0.182) A | 1:item_3(0.200) A | 2:item_3(0.219) A | 3:item_3(0.240) A
+  switch rec=98 -> item_0; at w=96 truth raw=item_3/place#0 lag=item_0/move_to#0; boundary at w: True
+     95:item_3(0.995) A | 96:item_0(0.332) U | 97:item_0(0.332) A | 98:item_0(0.360) A | 99:item_0(0.392) A
+
+## B2 a switch outside the support, B3 TASK_ABSENT
+  script entries outside the support (prior on, COVERED, neither assigned nor foreseeable): 0
+  script entries TASK_ABSENT: 0  (over the 48 runs and the four supplementary ones)
+
+## B4 BINDING_ABSENT (the supplementary runs; none among the 48)
+
+### scenario_s06_06 off (env_layout_08)
+    0- 16 move_to#0  leader item_0(0.190..0.836) finding .01/.05/.10=AAA members item_0=1.0000 item_1=0.9122 item_3=0.7401 item_4=0.7503 item_6=0.8464 item_7=0.7718 .. item_0=1.0000 item_1=0.0927 item_3=0.0020 item_4=0.0025 item_6=0.0190 item_7=0.0040
+   17- 17 pick_up#0  leader item_0(0.836..0.836) finding .01/.05/.10=AAA members item_1=1.0000 item_3=1.0000 item_4=1.0000 item_6=1.0000 item_7=1.0000 .. item_1=1.0000 item_3=1.0000 item_4=1.0000 item_6=1.0000 item_7=1.0000
+   18- 18 pick_up#0  leader item_0(0.836..0.836) finding .01/.05/.10=AAA members item_0=0.8629 item_1=1.0000 item_3=1.0000 item_4=1.0000 item_6=1.0000 item_7=1.0000 .. item_0=0.8629 item_1=1.0000 item_3=1.0000 item_4=1.0000 item_6=1.0000 item_7=1.0000
+   19- 19 move_to#1  leader item_0(0.830..0.830) finding .01/.05/.10=AAA members item_0=0.8062 .. item_0=0.8062
+   20- 36 move_to#1  leader item_0(0.852..0.994) finding .01/.05/.10=AAA members item_0=0.7499 item_1=0.7412 item_3=0.7412 item_4=0.7412 item_6=0.7412 item_7=0.7412 .. item_0=0.1016 item_1=0.0016 item_3=0.0016 item_4=0.0016 item_6=0.0016 item_7=0.0016
+   37- 37 move_to#1  leader item_0(0.994..0.994) finding .01/.05/.10=AAX members item_0=0.0842 item_1=0.0011 item_3=0.0011 item_4=0.0011 item_6=0.0011 item_7=0.0011 .. item_0=0.0842 item_1=0.0011 item_3=0.0011 item_4=0.0011 item_6=0.0011 item_7=0.0011
+   38- 39 move_to#1  leader item_0(0.995..0.995) finding .01/.05/.10=AAX members item_0=0.0692 item_1=0.0007 item_3=0.0007 item_4=0.0007 item_7=0.0007 .. item_0=0.0564 item_1=0.0005 item_3=0.0005 item_4=0.0005 item_7=0.0005
+   40- 46 move_to#1  leader item_0(0.995..0.995) finding .01/.05/.10=AXX members item_0=0.0456 item_1=0.0003 item_3=0.0003 item_4=0.0003 item_7=0.0003 .. item_0=0.0110 item_1=0.0000 item_3=0.0000 item_4=0.0000 item_7=0.0000
+   47- 73 move_to#1  leader item_0(0.995..0.995) finding .01/.05/.10=XXX members item_0=0.0085 item_1=0.0000 item_3=0.0000 item_4=0.0000 item_7=0.0000 .. item_0=0.0000 item_1=0.0000 item_3=0.0000 item_4=0.0000 item_7=0.0000
+   74-102 move_to#1  leader item_0(0.995..0.995) finding .01/.05/.10=XXX members item_0=0.0000 item_3=0.0000 item_4=0.0000 item_7=0.0000 .. item_0=0.0000 item_3=0.0000 item_4=0.0000 item_7=0.0000
+
+### scenario_s06_06 on (env_layout_08)
+    0- 16 move_to#0  leader item_0(0.553..0.993) finding .01/.05/.10=AAA members item_0=1.0000 item_3=0.7401 .. item_0=1.0000 item_3=0.0020
+   17- 17 pick_up#0  leader item_0(0.993..0.993) finding .01/.05/.10=AAA members item_3=1.0000 .. item_3=1.0000
+   18- 18 pick_up#0  leader item_0(0.993..0.993) finding .01/.05/.10=AAA members item_0=0.8629 item_3=1.0000 .. item_0=0.8629 item_3=1.0000
+   19- 19 move_to#1  leader item_0(0.993..0.993) finding .01/.05/.10=AAA members item_0=0.8062 .. item_0=0.8062
+   20- 36 move_to#1  leader item_0(0.993..0.995) finding .01/.05/.10=AAA members item_0=0.7499 item_3=0.7412 .. item_0=0.1016 item_3=0.0016
+   37- 39 move_to#1  leader item_0(0.995..0.995) finding .01/.05/.10=AAX members item_0=0.0842 item_3=0.0011 .. item_0=0.0564 item_3=0.0005
+   40- 46 move_to#1  leader item_0(0.995..0.995) finding .01/.05/.10=AXX members item_0=0.0456 item_3=0.0003 .. item_0=0.0110 item_3=0.0000
+   47-102 move_to#1  leader item_0(0.995..0.995) finding .01/.05/.10=XXX members item_0=0.0085 item_3=0.0000 .. item_0=0.0000 item_3=0.0000
+
+### scenario_s07_03 off (env_layout_09)
+    0-  8 move_to#0  leader item_2(0.194..0.630) finding .01/.05/.10=AAA members item_1=0.7711 item_2=1.0000 item_3=0.8061 item_4=0.7748 item_5=0.7646 item_6=0.7435 .. item_1=0.0668 item_2=1.0000 item_3=0.1061 item_4=0.0730 item_5=0.0644 item_6=0.0492
+    9-  9 pick_up#0  leader item_2(0.630..0.630) finding .01/.05/.10=AAA members item_1=1.0000 item_3=1.0000 item_4=1.0000 item_5=1.0000 item_6=1.0000 .. item_1=1.0000 item_3=1.0000 item_4=1.0000 item_5=1.0000 item_6=1.0000
+   10- 10 pick_up#0  leader item_2(0.630..0.630) finding .01/.05/.10=AAA members item_1=1.0000 item_2=0.8629 item_3=1.0000 item_4=1.0000 item_5=1.0000 item_6=1.0000 .. item_1=1.0000 item_2=0.8629 item_3=1.0000 item_4=1.0000 item_5=1.0000 item_6=1.0000
+   11- 11 move_to#1  leader item_2(0.625..0.625) finding .01/.05/.10=AAA members item_2=0.8335 .. item_2=0.8335
+   12- 30 move_to#1  leader item_2(0.669..0.995) finding .01/.05/.10=AAA members item_1=0.7422 item_2=0.8025 item_3=0.7422 item_4=0.7422 item_5=0.7422 item_6=0.7422 .. item_1=0.0007 item_2=0.1043 item_3=0.0007 item_4=0.0007 item_5=0.0007 item_6=0.0007
+   31- 32 move_to#1  leader item_2(0.995..0.995) finding .01/.05/.10=AAX members item_1=0.0005 item_2=0.0823 item_3=0.0005 item_4=0.0005 item_5=0.0005 item_6=0.0005 .. item_1=0.0003 item_2=0.0640 item_3=0.0003 item_4=0.0003 item_5=0.0003 item_6=0.0003
+   33- 38 move_to#1  leader item_2(0.995..0.995) finding .01/.05/.10=AXX members item_1=0.0002 item_2=0.0491 item_3=0.0002 item_4=0.0002 item_5=0.0002 item_6=0.0002 .. item_1=0.0000 item_2=0.0111 item_3=0.0000 item_4=0.0000 item_5=0.0000 item_6=0.0000
+   39- 76 move_to#1  leader item_2(0.995..0.995) finding .01/.05/.10=XXX members item_1=0.0000 item_2=0.0080 item_3=0.0000 item_4=0.0000 item_5=0.0000 item_6=0.0000 .. item_1=0.0000 item_2=0.0000 item_3=0.0000 item_4=0.0000 item_5=0.0000 item_6=0.0000
+   77- 93 move_to#1  leader item_2(0.995..0.995) finding .01/.05/.10=XXX members item_1=0.0000 item_2=0.0000 item_3=0.0000 item_4=0.0000 item_6=0.0000 .. item_1=0.0000 item_2=0.0000 item_3=0.0000 item_4=0.0000 item_6=0.0000
+
+### scenario_s07_03 on (env_layout_09)
+    0-  8 move_to#0  leader item_2(0.537..0.851) finding .01/.05/.10=AAA members item_2=1.0000 item_3=0.8061 .. item_2=1.0000 item_3=0.1061
+    9-  9 pick_up#0  leader item_2(0.851..0.851) finding .01/.05/.10=AAA members item_3=1.0000 .. item_3=1.0000
+   10- 10 pick_up#0  leader item_2(0.851..0.851) finding .01/.05/.10=AAA members item_2=0.8629 item_3=1.0000 .. item_2=0.8629 item_3=1.0000
+   11- 11 move_to#1  leader item_2(0.848..0.848) finding .01/.05/.10=AAA members item_2=0.8335 .. item_2=0.8335
+   12- 30 move_to#1  leader item_2(0.871..0.995) finding .01/.05/.10=AAA members item_2=0.8025 item_3=0.7422 .. item_2=0.1043 item_3=0.0007
+   31- 32 move_to#1  leader item_2(0.995..0.995) finding .01/.05/.10=AAX members item_2=0.0823 item_3=0.0005 .. item_2=0.0640 item_3=0.0003
+   33- 38 move_to#1  leader item_2(0.995..0.995) finding .01/.05/.10=AXX members item_2=0.0491 item_3=0.0002 .. item_2=0.0111 item_3=0.0000
+   39- 93 move_to#1  leader item_2(0.995..0.995) finding .01/.05/.10=XXX members item_2=0.0080 item_3=0.0000 .. item_2=0.0000 item_3=0.0000
+
+## B5 no task on the stack (lag-corrected: the record at t + 2 has an empty stack)
+run                                          ticks first lifecycle         leader(s)                    finding @.01/.05/.10
+scenario_s01_01 on                              31   141 exhausted:31      none:31                      E:31 / E:31 / E:31
+scenario_s02_01 on                              67   362 exhausted:67      none:67                      E:67 / E:67 / E:67
+scenario_s03_01 on                             119   121 exhausted:119     none:119                     E:119 / E:119 / E:119   [scenario_s03_01 single_task on]
+scenario_s01_06 on                              43   120 exhausted:43      none:43                      E:43 / E:43 / E:43
+scenario_s04_01 on                              55   327 live:55           ac_switch_0:55               X:30,A:24,U:1 / X:38,A:16,U:1 / X:41,A:13,U:1
+                                             first X at α=.01/.05/.10: 352 / 344 / 341  (stack empty in the record from 329)
+scenario_s03_06 on                              63   176 exhausted:63      none:63                      E:63 / E:63 / E:63
+scenario_s05_01 on                              33   141 exhausted:33      none:33                      E:33 / E:33 / E:33   [scenario_s05_01 full_reorder on, scenario_s05_01 single_task on]
+scenario_s05_02 on                              34   141 exhausted:34      none:34                      E:34 / E:34 / E:34
+scenario_s06_01 on                              97   171 exhausted:97      none:97                      E:97 / E:97 / E:97   [scenario_s06_01 single_task on]
+scenario_s06_02 on                              82   188 exhausted:82      none:82                      E:82 / E:82 / E:82   [scenario_s06_02 single_task on]
+scenario_s06_01 plain on                        56   171 exhausted:56      none:56                      E:56 / E:56 / E:56   [scenario_s06_01 realized on, scenario_s06_01 full_reorder on]
+scenario_s06_03 plain on                         7   220 exhausted:7       none:7                       E:7 / E:7 / E:7
+scenario_s06_03 realized on                      9   220 exhausted:9       none:9                       E:9 / E:9 / E:9   [scenario_s06_03 full_reorder on]
+scenario_s03_01 full_reorder on                103   121 exhausted:103     none:103                     E:103 / E:103 / E:103
+scenario_s06_02 full_reorder on                 39   188 exhausted:39      none:39                      E:39 / E:39 / E:39
+scenario_s06_03 single_task on                  48   220 exhausted:48      none:48                      E:48 / E:48 / E:48
+scenario_s01_01 off                             62   141 live:61,exhausted:1 item_4:61,none:1             X:36,A:24,U:1,E:1 / X:44,A:16,U:1,E:1 / X:47,A:13,U:1,E:1
+                                             first X at α=.01/.05/.10: 166 / 158 / 155  (stack empty in the record from 143)
+scenario_s02_01 off                             63   362 live:63           item_0:63                    X:38,A:24,U:1 / X:46,A:16,U:1 / X:49,A:13,U:1
+                                             first X at α=.01/.05/.10: 387 / 379 / 376  (stack empty in the record from 364)
+scenario_s03_01 off                            179   121 live:179          item_7:155,item_6:24         X:154,A:24,U:1 / X:162,A:16,U:1 / X:165,A:13,U:1   [scenario_s03_01 single_task off]
+                                             first X at α=.01/.05/.10: 146 / 138 / 135  (stack empty in the record from 123)
+scenario_s01_06 off                             41   120 live:41           item_2:40,item_6:1           A:24,X:16,U:1 / X:24,A:16,U:1 / X:27,A:13,U:1
+                                             first X at α=.01/.05/.10: 145 / 137 / 134  (stack empty in the record from 122)
+scenario_s04_01 off                             53   327 live:53           ac_switch_0:53               X:28,A:24,U:1 / X:36,A:16,U:1 / X:39,A:13,U:1
+                                             first X at α=.01/.05/.10: 352 / 344 / 341  (stack empty in the record from 329)
+scenario_s03_06 off                             61   176 live:60,exhausted:1 item_7:60,none:1             X:35,A:24,U:1,E:1 / X:43,A:16,U:1,E:1 / X:46,A:13,U:1,E:1
+                                             first X at α=.01/.05/.10: 201 / 193 / 190  (stack empty in the record from 178)
+scenario_s05_01 off                             31   141 live:31           item_2:30,item_3:1           A:24,X:6,U:1 / A:16,X:14,U:1 / X:17,A:13,U:1   [scenario_s05_01 full_reorder off, scenario_s05_01 single_task off]
+                                             first X at α=.01/.05/.10: 166 / 158 / 155  (stack empty in the record from 143)
+scenario_s05_02 off                             32   141 live:32           item_2:32                    A:24,X:7,U:1 / A:16,X:15,U:1 / X:18,A:13,U:1
+                                             first X at α=.01/.05/.10: 166 / 158 / 155  (stack empty in the record from 143)
+scenario_s06_01 off                             95   171 live:94,exhausted:1 item_4:94,none:1             X:69,A:24,U:1,E:1 / X:77,A:16,U:1,E:1 / X:80,A:13,U:1,E:1   [scenario_s06_01 single_task off]
+                                             first X at α=.01/.05/.10: 196 / 188 / 185  (stack empty in the record from 173)
+scenario_s06_02 off                             80   188 live:79,exhausted:1 item_4:79,none:1             X:54,A:24,U:1,E:1 / X:62,A:16,U:1,E:1 / X:65,A:13,U:1,E:1   [scenario_s06_02 single_task off]
+                                             first X at α=.01/.05/.10: 213 / 205 / 202  (stack empty in the record from 190)
+scenario_s06_01 plain off                       54   171 live:53,exhausted:1 item_1:53,none:1             X:28,A:24,U:1,E:1 / X:36,A:16,U:1,E:1 / X:39,A:13,U:1,E:1   [scenario_s06_01 realized off, scenario_s06_01 full_reorder off]
+                                             first X at α=.01/.05/.10: 196 / 188 / 185  (stack empty in the record from 173)
+scenario_s06_03 plain off                        5   220 live:4,exhausted:1 item_1:4,none:1              A:3,U:1,E:1 / A:3,U:1,E:1 / A:3,U:1,E:1
+scenario_s06_03 realized off                    20   220 live:19,exhausted:1 item_1:19,none:1             A:18,U:1,E:1 / A:16,X:2,U:1,E:1 / A:13,X:5,U:1,E:1   [scenario_s06_03 full_reorder off]
+                                             first X at α=.01/.05/.10: - / 237 / 234  (stack empty in the record from 222)
+scenario_s03_01 full_reorder off               179   121 live:179          item_7:169,item_4:10         X:154,A:24,U:1 / X:162,A:16,U:1 / X:165,A:13,U:1
+                                             first X at α=.01/.05/.10: 146 / 138 / 135  (stack empty in the record from 123)
+scenario_s06_02 full_reorder off                37   188 live:36,exhausted:1 item_1:36,none:1             A:24,X:11,U:1,E:1 / X:19,A:16,U:1,E:1 / X:22,A:13,U:1,E:1
+                                             first X at α=.01/.05/.10: 213 / 205 / 202  (stack empty in the record from 190)
+scenario_s06_03 single_task off                 98   220 live:97,exhausted:1 item_4:97,none:1             X:72,A:24,U:1,E:1 / X:80,A:16,U:1,E:1 / X:83,A:13,U:1,E:1
+                                             first X at α=.01/.05/.10: 245 / 237 / 234  (stack empty in the record from 222)
+scenario_s06_06 off                            108   158 live:108          item_0:108                   X:82,A:26 / X:90,A:18 / X:93,A:15
+                                             first X at α=.01/.05/.10: 184 / 176 / 173  (stack empty in the record from 160)
+scenario_s06_06 on                             110   158 live:110          item_0:110                   X:84,A:26 / X:92,A:18 / X:95,A:15
+                                             first X at α=.01/.05/.10: 184 / 176 / 173  (stack empty in the record from 160)
+scenario_s07_03 off                            111   189 live:111          item_1:111                   X:85,A:26 / X:93,A:18 / X:96,A:15
+                                             first X at α=.01/.05/.10: 215 / 207 / 204  (stack empty in the record from 191)
+scenario_s07_03 on                             111   189 live:111          item_2:111                   X:85,A:26 / X:93,A:18 / X:96,A:15
+                                             first X at α=.01/.05/.10: 215 / 207 / 204  (stack empty in the record from 191)
+
+## B6 an episode's first ticks (step 0 and each [IR-boundary] b): finding letters b .. b+5, members at the
+   first resolved tick, the leader at b; 'true' = the lag-corrected truth's hypothesis
+
+### scenario_s01_01 on
+  b=  0 true=item_3       leader item_3(0.513) live      seq=AAAAAA first member at 0: item_2=0.9221 item_3=1.0000
+  b= 78 true=item_2       leader item_2(0.996) live      seq=UAAAAA first member at 79: item_2=0.8629
+  b=141 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s02_01 on
+  b=  0 true=item_2       leader item_2(0.262) live      seq=AAAAAA first member at 0: ac_switch_0=0.9737 coffee=0.9853 item_2=1.0000 item_5=0.7688
+  b= 75 true=coffee       leader ac_switch_0(0.331) live      seq=UAAAAA first member at 76: ac_switch_0=0.8629 coffee=0.8629 item_5=0.8629
+  b=153 true=item_5       leader ac_switch_0(0.496) live      seq=UAAAAA first member at 154: ac_switch_0=0.8629 item_5=0.8629
+  b=309 true=ac_switch_0  leader ac_switch_0(0.991) live      seq=UAAAAA first member at 310: ac_switch_0=0.8629
+  b=362 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s03_01 on = scenario_s03_01 single_task on
+  b=  0 true=item_3       leader item_3(0.535) live      seq=AAAAAA first member at 0: item_2=0.8134 item_3=1.0000
+  b= 54 true=item_2       leader item_2(0.996) live      seq=UAAAAA first member at 55: item_2=0.8629
+  b=121 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s01_06 on
+  b=  0 true=item_3       leader item_3(0.505) live      seq=AAAAAA first member at 0: item_3=1.0000 item_7=0.9624
+  b= 74 true=item_7       leader item_7(0.996) live      seq=UAAAAA first member at 75: item_7=0.8629
+  b=120 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s04_01 on
+  b=  0 true=item_3       leader item_3(0.181) live      seq=AAAAAA first member at 0: ac_switch_0=0.7546 ac_switch_1=0.8867 ac_switch_2=0.9137 coffee=0.9477 item_3=1.0000 item_6=0.8168
+  b=115 true=coffee       leader ac_switch_0(0.199) live      seq=UAAAAA first member at 116: ac_switch_0=0.8629 ac_switch_1=0.8629 ac_switch_2=0.8629 coffee=0.8629 item_6=0.8629
+  b=183 true=ac_switch_1  leader ac_switch_0(0.249) live      seq=UAAAAA first member at 184: ac_switch_0=0.8629 ac_switch_1=0.8629 ac_switch_2=0.8629 item_6=0.8629
+  b=205 true=ac_switch_2  leader ac_switch_0(0.331) live      seq=UAAAAA first member at 206: ac_switch_0=0.8629 ac_switch_2=0.8629 item_6=0.8629
+  b=225 true=item_6       leader ac_switch_0(0.496) live      seq=UAAAAA first member at 226: ac_switch_0=0.8629 item_6=0.8629
+  b=327 true=none         leader ac_switch_0(0.992) live      seq=UAAAAA first member at 328: ac_switch_0=0.8629
+
+### scenario_s03_06 on
+  b=  0 true=item_3       leader item_3(0.374) live      seq=AAAAAA first member at 0: coffee=0.7451 item_2=0.8134 item_3=1.0000
+  b= 54 true=item_2       leader coffee(0.498) live      seq=UAAAAA first member at 55: coffee=0.8629 item_2=0.8629
+  b=121 true=coffee       leader coffee(0.995) live      seq=UAAAAA first member at 122: coffee=0.8629
+  b=176 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s05_01 on = scenario_s05_01 full_reorder on, scenario_s05_01 single_task on
+  b=  0 true=coffee       leader coffee(0.356) live      seq=AAAAAA first member at 0: ac_switch_0=0.7401 coffee=1.0000 item_5=1.0000
+  b= 54 true=item_5       leader ac_switch_0(0.498) live      seq=UAAAAA first member at 55: ac_switch_0=0.8629 item_5=0.8629
+  b= 94 true=ac_switch_0  leader ac_switch_0(0.995) live      seq=UAAAAA first member at 95: ac_switch_0=0.8629
+  b=141 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s05_02 on
+  b=  0 true=coffee       leader coffee(0.356) live      seq=AAAAAA first member at 0: ac_switch_0=0.7401 coffee=1.0000 item_5=1.0000
+  b= 54 true=item_5       leader ac_switch_0(0.498) live      seq=UAAAAA first member at 55: ac_switch_0=0.8629 item_5=0.8629
+  b= 94 true=ac_switch_0  leader ac_switch_0(0.995) live      seq=UAAAAA first member at 95: ac_switch_0=0.8629
+  b=141 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s06_01 on = scenario_s06_01 single_task on
+  b=  0 true=item_0       leader item_0(0.553) live      seq=AAAAAA first member at 0: item_0=1.0000 item_3=0.7401
+  b= 53 true=item_3       leader item_3(0.995) live      seq=UAAAAA first member at 54: item_3=0.8629
+  b=171 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s06_02 on = scenario_s06_02 single_task on
+  b=  0 true=item_0       leader item_0(0.550) live      seq=AAAAAA first member at 0: item_0=1.0000 item_3=0.7519
+  b= 70 true=item_3       leader item_3(0.995) live      seq=UAAAAA first member at 71: item_3=0.8629
+  b=188 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s06_01 plain on = scenario_s06_01 realized on, scenario_s06_01 full_reorder on
+  b=  0 true=item_0       leader item_0(0.553) live      seq=AAAAAA first member at 0: item_0=1.0000 item_3=0.7401
+  b= 53 true=item_3       leader item_3(0.995) live      seq=UAAAAA first member at 54: item_3=0.8629
+  b=171 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s06_03 plain on
+  b=  0 true=item_3       leader item_3(0.553) live      seq=AAAAAA first member at 0: item_0=0.7401 item_3=1.0000
+  b= 96 true=item_0       leader item_0(0.995) live      seq=UAAAAA first member at 97: item_0=0.8629
+  b=220 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s06_03 realized on = scenario_s06_03 full_reorder on
+  b=  0 true=item_3       leader item_3(0.553) live      seq=AAAAAA first member at 0: item_0=0.7401 item_3=1.0000
+  b= 96 true=item_0       leader item_0(0.995) live      seq=UAAAAA first member at 97: item_0=0.8629
+  b=220 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s03_01 full_reorder on
+  b=  0 true=item_3       leader item_3(0.535) live      seq=AAAAAA first member at 0: item_2=0.8134 item_3=1.0000
+  b= 54 true=item_2       leader item_2(0.996) live      seq=UAAAAA first member at 55: item_2=0.8629
+  b=121 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s06_02 full_reorder on
+  b=  0 true=item_0       leader item_0(0.550) live      seq=AAAAAA first member at 0: item_0=1.0000 item_3=0.7519
+  b= 70 true=item_3       leader item_3(0.995) live      seq=UAAAAA first member at 71: item_3=0.8629
+  b=188 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s06_03 single_task on
+  b=  0 true=item_3       leader item_3(0.553) live      seq=AAAAAA first member at 0: item_0=0.7401 item_3=1.0000
+  b= 96 true=item_0       leader item_0(0.995) live      seq=UAAAAA first member at 97: item_0=0.8629
+  b=220 true=none         leader none(0.000) exhausted seq=EEEEEE first member at None: -
+
+### scenario_s01_01 off
+  b=  0 true=item_3       leader item_3(0.204) live      seq=AAAAAA first member at 0: item_2=0.9221 item_3=1.0000 item_4=0.9538 item_6=0.9944 item_7=0.9804
+  b= 78 true=item_2       leader item_2(0.333) live      seq=UAAAAA first member at 79: item_2=0.8629 item_4=0.8629 item_6=0.8629
+  b=141 true=none         leader item_4(0.996) live      seq=UAAAAA first member at 142: item_4=0.8629
+
+### scenario_s02_01 off
+  b=  0 true=item_2       leader item_2(0.110) live      seq=AAAAAA first member at 0: ac_switch_0=0.9737 coffee=0.9853 item_0=0.9881 item_1=0.9591 item_2=1.0000 item_3=0.7920 item_4=0.7542 item_5=0.7688 item_6=0.8672 item_7=0.7448
+  b= 75 true=coffee       leader ac_switch_0(0.125) live      seq=UAAAAA first member at 76: ac_switch_0=0.8629 coffee=0.8629 item_0=0.8629 item_1=0.8629 item_3=0.8629 item_4=0.8629 item_5=0.8629 item_6=0.8629
+  b=153 true=item_5       leader ac_switch_0(0.142) live      seq=UAAAAA first member at 154: ac_switch_0=0.8629 item_0=0.8629 item_1=0.8629 item_3=0.8629 item_4=0.8629 item_5=0.8629 item_6=0.8629
+  b=309 true=ac_switch_0  leader ac_switch_0(0.248) live      seq=UAAAAA first member at 310: ac_switch_0=0.8629 item_0=0.8629 item_3=0.8629 item_4=0.8629
+  b=362 true=none         leader item_0(0.331) live      seq=UAAAAA first member at 363: item_0=0.8629 item_3=0.8629 item_4=0.8629
+
+### scenario_s03_01 off = scenario_s03_01 single_task off
+  b=  0 true=item_3       leader item_3(0.210) live      seq=AAAAAA first member at 0: item_2=0.8134 item_3=1.0000 item_4=0.9945 item_6=0.9981 item_7=0.8608
+  b= 54 true=item_2       leader item_2(0.250) live      seq=UAAAAA first member at 55: item_2=0.8629 item_4=0.8629 item_6=0.8629 item_7=0.8629
+  b=121 true=none         leader item_6(0.498) live      seq=UAAAAA first member at 122: item_6=0.8629 item_7=0.8629
+
+### scenario_s01_06 off
+  b=  0 true=item_3       leader item_3(0.205) live      seq=AAAAAA first member at 0: item_2=0.9494 item_3=1.0000 item_4=0.9798 item_6=0.9398 item_7=0.9624
+  b= 74 true=item_7       leader item_2(0.250) live      seq=UAAAAA first member at 75: item_2=0.8629 item_4=0.8629 item_6=0.8629 item_7=0.8629
+  b=120 true=none         leader item_2(0.498) live      seq=UAAAAA first member at 121: item_2=0.8629 item_6=0.8629
+
+### scenario_s04_01 off
+  b=  0 true=item_3       leader item_3(0.124) live      seq=AAAAAA first member at 0: ac_switch_0=0.7546 ac_switch_1=0.8867 ac_switch_2=0.9137 coffee=0.9477 item_3=1.0000 item_4=0.7948 item_5=0.8351 item_6=0.8168 item_7=0.7626
+  b=115 true=coffee       leader ac_switch_0(0.125) live      seq=UAAAAA first member at 116: ac_switch_0=0.8629 ac_switch_1=0.8629 ac_switch_2=0.8629 coffee=0.8629 item_4=0.8629 item_5=0.8629 item_6=0.8629 item_7=0.8629
+  b=183 true=ac_switch_1  leader ac_switch_0(0.166) live      seq=UAAAAA first member at 184: ac_switch_0=0.8629 ac_switch_1=0.8629 ac_switch_2=0.8629 item_5=0.8629 item_6=0.8629 item_7=0.8629
+  b=205 true=ac_switch_2  leader ac_switch_0(0.199) live      seq=UAAAAA first member at 206: ac_switch_0=0.8629 ac_switch_2=0.8629 item_5=0.8629 item_6=0.8629 item_7=0.8629
+  b=225 true=item_6       leader ac_switch_0(0.249) live      seq=UAAAAA first member at 226: ac_switch_0=0.8629 item_5=0.8629 item_6=0.8629 item_7=0.8629
+  b=327 true=none         leader ac_switch_0(0.496) live      seq=UAAAAA first member at 328: ac_switch_0=0.8629 item_5=0.8629
+
+### scenario_s03_06 off
+  b=  0 true=item_3       leader item_3(0.180) live      seq=AAAAAA first member at 0: coffee=0.7451 item_2=0.8134 item_3=1.0000 item_4=0.9945 item_6=0.9981 item_7=0.8608
+  b= 54 true=item_2       leader coffee(0.200) live      seq=UAAAAA first member at 55: coffee=0.8629 item_2=0.8629 item_4=0.8629 item_6=0.8629 item_7=0.8629
+  b=121 true=coffee       leader coffee(0.332) live      seq=UAAAAA first member at 122: coffee=0.8629 item_6=0.8629 item_7=0.8629
+  b=176 true=none         leader item_7(0.995) live      seq=UAAAAA first member at 177: item_7=0.8629
+
+### scenario_s05_01 off = scenario_s05_01 full_reorder off, scenario_s05_01 single_task off
+  b=  0 true=coffee       leader coffee(0.175) live      seq=AAAAAA first member at 0: ac_switch_0=0.7401 coffee=1.0000 item_1=0.9897 item_2=0.9999 item_3=0.9047 item_5=1.0000
+  b= 54 true=item_5       leader ac_switch_0(0.200) live      seq=UAAAAA first member at 55: ac_switch_0=0.8629 item_1=0.8629 item_2=0.8629 item_3=0.8629 item_5=0.8629
+  b= 94 true=ac_switch_0  leader ac_switch_0(0.332) live      seq=UAAAAA first member at 95: ac_switch_0=0.8629 item_2=0.8629 item_3=0.8629
+  b=141 true=none         leader item_2(0.498) live      seq=UAAAAA first member at 142: item_2=0.8629 item_3=0.8629
+
+### scenario_s05_02 off
+  b=  0 true=coffee       leader coffee(0.175) live      seq=AAAAAA first member at 0: ac_switch_0=0.7401 coffee=1.0000 item_1=0.9897 item_2=0.9999 item_3=0.9047 item_5=1.0000
+  b= 54 true=item_5       leader ac_switch_0(0.200) live      seq=UAAAAA first member at 55: ac_switch_0=0.8629 item_1=0.8629 item_2=0.8629 item_3=0.8629 item_5=0.8629
+  b= 94 true=ac_switch_0  leader ac_switch_0(0.332) live      seq=UAAAAA first member at 95: ac_switch_0=0.8629 item_2=0.8629 item_3=0.8629
+  b=141 true=none         leader item_2(0.498) live      seq=UAAAAA first member at 142: item_2=0.8629 item_3=0.8629
+
+### scenario_s06_01 off = scenario_s06_01 single_task off
+  b=  0 true=item_0       leader item_0(0.190) live      seq=AAAAAA first member at 0: item_0=1.0000 item_1=0.9122 item_3=0.7401 item_4=0.7503 item_6=0.8464 item_7=0.7718
+  b= 53 true=item_3       leader item_1(0.249) live      seq=UAAAAA first member at 54: item_1=0.8629 item_3=0.8629 item_4=0.8629 item_7=0.8629
+  b=171 true=none         leader item_4(0.995) live      seq=UAAAAA first member at 172: item_4=0.8629
+
+### scenario_s06_02 off = scenario_s06_02 single_task off
+  b=  0 true=item_0       leader item_0(0.190) live      seq=AAAAAA first member at 0: item_0=1.0000 item_1=0.9241 item_3=0.7519 item_4=0.7405 item_6=0.8610 item_7=0.7556
+  b= 70 true=item_3       leader item_1(0.249) live      seq=UAAAAA first member at 71: item_1=0.8629 item_3=0.8629 item_4=0.8629 item_7=0.8629
+  b=188 true=none         leader item_4(0.995) live      seq=UAAAAA first member at 189: item_4=0.8629
+
+### scenario_s06_01 plain off = scenario_s06_01 realized off, scenario_s06_01 full_reorder off
+  b=  0 true=item_0       leader item_0(0.190) live      seq=AAAAAA first member at 0: item_0=1.0000 item_1=0.9122 item_3=0.7401 item_4=0.7503 item_6=0.8464 item_7=0.7718
+  b= 53 true=item_3       leader item_1(0.249) live      seq=UAAAAA first member at 54: item_1=0.8629 item_3=0.8629 item_4=0.8629 item_6=0.8629
+  b=171 true=none         leader item_1(0.498) live      seq=UAAAAA first member at 172: item_1=0.8629 item_6=0.8629
+
+### scenario_s06_03 plain off
+  b=  0 true=item_3       leader item_3(0.182) live      seq=AAAAAA first member at 0: item_0=0.7401 item_1=0.7962 item_3=1.0000 item_4=0.9843 item_6=0.8508 item_7=0.9499
+  b= 96 true=item_0       leader item_0(0.249) live      seq=UAAAAA first member at 97: item_0=0.8629 item_1=0.8629 item_4=0.8629 item_6=0.8629
+  b=220 true=none         leader item_1(0.995) live      seq=UAAAE  first member at 221: item_1=0.8629
+
+### scenario_s06_03 realized off = scenario_s06_03 full_reorder off
+  b=  0 true=item_3       leader item_3(0.182) live      seq=AAAAAA first member at 0: item_0=0.7401 item_1=0.7962 item_3=1.0000 item_4=0.9843 item_6=0.8508 item_7=0.9499
+  b= 96 true=item_0       leader item_0(0.249) live      seq=UAAAAA first member at 97: item_0=0.8629 item_1=0.8629 item_4=0.8629 item_6=0.8629
+  b=220 true=none         leader item_1(0.995) live      seq=UAAAAA first member at 221: item_1=0.8629
+
+### scenario_s03_01 full_reorder off
+  b=  0 true=item_3       leader item_3(0.210) live      seq=AAAAAA first member at 0: item_2=0.8134 item_3=1.0000 item_4=0.9945 item_6=0.9981 item_7=0.8608
+  b= 54 true=item_2       leader item_2(0.250) live      seq=UAAAAA first member at 55: item_2=0.8629 item_4=0.8629 item_6=0.8629 item_7=0.8629
+  b=121 true=none         leader item_4(0.498) live      seq=UAAAAA first member at 122: item_4=0.8629 item_7=0.8629
+
+### scenario_s06_02 full_reorder off
+  b=  0 true=item_0       leader item_0(0.190) live      seq=AAAAAA first member at 0: item_0=1.0000 item_1=0.9241 item_3=0.7519 item_4=0.7405 item_6=0.8610 item_7=0.7556
+  b= 70 true=item_3       leader item_1(0.249) live      seq=UAAAAA first member at 71: item_1=0.8629 item_3=0.8629 item_4=0.8629 item_6=0.8629
+  b=188 true=none         leader item_1(0.995) live      seq=UAAAAA first member at 189: item_1=0.8629
+
+### scenario_s06_03 single_task off
+  b=  0 true=item_3       leader item_3(0.182) live      seq=AAAAAA first member at 0: item_0=0.7401 item_1=0.7962 item_3=1.0000 item_4=0.9843 item_6=0.8508 item_7=0.9499
+  b= 96 true=item_0       leader item_0(0.332) live      seq=UAAAAA first member at 97: item_0=0.8629 item_4=0.8629 item_7=0.8629
+  b=220 true=none         leader item_4(0.995) live      seq=UAAAAA first member at 221: item_4=0.8629
+
+## disagreements on COVERED ticks: unexplained (any α) while the truth is a modelled task with its binding
+  scenario_s02_01 on t=247 truth raw=item_5/pick_up#0 lag=item_5/move_to#1 leader=item_5(0.991) finding .01/.05/.10=XXX members: ac_switch_0=0.0000; true hypothesis a member: False; human pick_up/grasp
+  scenario_s04_01 on t=268 truth raw=item_6/pick_up#0 lag=item_6/move_to#1 leader=item_6(0.988) finding .01/.05/.10=XXX members: ac_switch_0=0.0021; true hypothesis a member: False; human pick_up/grasp
+  scenario_s03_06 on t=88 truth raw=item_2/pick_up#0 lag=item_2/move_to#1 leader=item_2(0.992) finding .01/.05/.10=XXX members: coffee=0.0016; true hypothesis a member: False; human pick_up/grasp
