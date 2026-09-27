@@ -4335,3 +4335,138 @@ Staging, cycle 1.5: session 1.5r records these rulings (records only). Cycle 1.5
 acceptance is 1.4's scripts (`analysis/td_stage1/`) rerun on the regenerated baselines.
 Reference: `analysis/td_stage1/REPORT.md` (findings 1 to 5); `docs/recognizer_handback.md` §1.5, §1.7, §1.10; I3; I4c;
 TODO-97, TODO-113; TODO-87 (1.4 finding 5, L)
+
+---
+
+**The cognitive loop does not end with the task pool (TB, ruled by Hadi, 27 September 2026)**
+
+Problem, as found in the repo. With an empty task pool, `no_current_task` fires at tick 0, `update()` returns its
+terminal result (correct, unchanged), and `RobotAgent` sets `finished = True`; `RobotAgent.step()` then returns at its
+first line on every later tick, so the robot stops observing and the recognizer stops updating. The same happens after
+the robot's last delivery in every existing run: the `[IR]` lines end at the robot's completion, and the recognizer's
+output over the human's remaining behaviour is in no baseline. One flag carried two facts: "no work remains" and "the
+cognitive loop is finished".
+
+Ruling (c), as stated by Hadi. This is a lifecycle correction of the body, not an IR change; the recognizer was already
+meant to operate independently of whether the robot has a task.
+- Observation and recognition run on every tick, unconditionally.
+- The empty task pool prevents further planning and execution only.
+- `no_current_task` does not refire merely because `current_task` is None on a permanently empty pool.
+- The existing terminal return remains the planner's statement that there is currently nothing to execute.
+- Future mechanisms (X: a response with no task of the robot's own) attach to the post-completion cognitive loop,
+  without a special "observe-only" mode.
+
+Alternatives set aside. An observe-only run mode: a switch around the design, it hides the defect, and the empty pool
+is a real case. Keeping triggers alive after the terminal return: `no_current_task` would fire on every tick, against
+D3's definition of a trigger as a change in what the last decision rested on.
+
+Consequences recorded.
+- The existing baselines stay byte-identical in every robot, `[meta*]` and `[sep]` line, and gain `[IR]` and
+  `[IR-dist]` lines after the robot's completion tick.
+- The 1.4 and 1.5b measurements (`analysis/td_stage1/`, `analysis/td_stage1b/`) were taken over the truncated
+  interval. They are rerun over the newly exposed interval in TB.2b, with every change reported and no previous
+  statistic preserved for comparability (TODO-121).
+- With an empty pool, tick 0 still produces one `no_current_task`, one `[meta-proj]` line and one "all tasks complete"
+  line.
+- TODO-33 (the run loop does not stop when all agents are finished) is untouched: the run's length is the run file's
+  steps.
+
+Files: mesa_sim/sim_agents.py (`RobotAgent.step`, `finished`). Built in TB.2b.
+Reference: cchat, 27 September 2026 (TB); D3; "The IR test-bed" (below), whose runs need it; TODO-33, TODO-121;
+`docs/handoff_T-D_cycle2_and_IR_testbed.md` §8 (the idle-robot run mode, the question this rules)
+
+---
+
+**The IR test-bed (TB, ruled by Hadi, 27 September 2026)**
+
+Purpose. Test the recognizer in isolation on scenarios written for it, with expectations derived from the entry "T-D
+R and E" before the run, so that a result can say "the recognizer disagrees with the design" rather than "the run looks
+odd". The 48 maintained fixtures cannot: the robot acts in them, the layouts vary, and the cases Design B was ruled for
+(the corner walk, a switch outside the support) are absent (TODO-101's note). Hadi's requirement: the simplest cases
+first, to see whether the new design produces what we expect.
+
+Rules.
+- The layout is not designed to produce a desired IR result. Its geometric consequences are stated and feed the
+  independently derived expectations; an unexpected recognizer behaviour on a resulting trajectory is evidence to
+  investigate, never a reason to adjust the layout.
+- A test-bed finding enters a cycle as a design question with its ticks, as 1.4's findings did; it never changes the
+  mechanism on its own.
+- Any result that contradicts E5's reference distribution or E10's unit is a cycle 1 reopening, put to Hadi as such.
+
+The layout (the room). Deliberately simple, square, the proportions from Hadi's sketch, to be kept (a distance is
+adjusted only if a derivation needs it; never rearranged):
+- one kitting_table KT at the top centre;
+- two shelves, west and east, at the same height, symmetric about KT's vertical axis;
+- the coffee machine near the south wall, offset west of centre;
+- the four corner landmarks and the door (required by the layout rule; the scripts never use the door, which is placed
+  on no bearing the scenarios use);
+- no AC switch, so no `ac_activation` hypothesis exists in this room.
+Stated consequences:
+- from KT the two delivery hypotheses have equal path cost, so the first walk separates them by excess alone;
+- the coffee machine's bearing from KT differs from corner_SE's, so a walk to the machine and the exit walk are
+  distinguishable;
+- with the prior on, the hypothesis space is the two deliveries plus `coffee_break`, so after both deliveries
+  `coffee_break` is the lone live hypothesis at 1.0 by normalisation and the exit walk is charged against its walk to
+  the machine (TODO-117's case by construction).
+
+The setup (the shift). item_1 on the west shelf, item_2 on the east shelf, both designated to KT.
+
+The scenarios. Prior ON in every run. The robot at the top left with an empty task pool (`assigned_tasks` empty),
+observing the human. The human starts at KT, assigned `deliver_item(item_1)` and `deliver_item(item_2)`, never in an
+order. Every script ends with the exit walk to corner_SE (the authoring convention), which is itself an unmodelled walk
+and part of every expectation.
+1. `scenario_ir_two_deliveries`: deliver item_1, deliver item_2, exit.
+2. `scenario_ir_coffee_between`: deliver item_1, `coffee_break`, deliver item_2, exit.
+3a. `scenario_ir_coffee_after_pickup`: `coffee_break` started after the `pick_up` of item_1 (the item in hand during
+   the break; resumption re-expands the carry), then deliver item_2, exit.
+3b. `scenario_ir_coffee_before_pickup`: `coffee_break` started after the first `move_to` of item_1's delivery, before
+   its `pick_up` (empty-handed at the shelf; resumption re-expands the walk back to the shelf, then the pick-up), then
+   deliver item_2, exit.
+3a and 3b are separate scenarios because they test different suspended task states, not parameter variations of one
+scenario. Both are L's subject; their expectations are generated mechanically from the current entry, and the test-bed
+does not resolve L. The deviations (the corner walk, a switch outside the support, the wrong table, the long stand,
+the finished assigned tasks) are authored later with P and X (TODO-122).
+Ids: `env_layout_ir_testbed`, `setup_ir_testbed`, and the scenario ids above (descriptive, nothing encoded). The
+coffee break's duration is the schema's; no scenario constant. One run file per scenario: steps enough to include the
+exit walk, `separation_stop` off, `test_level` 0.05, `assignment_prior` on.
+
+The expectations. Per scenario one CSV:
+- per tick, per live hypothesis: the expected action (derived phase), the origin, e, s, s_exp, D, L, the normalised
+  belief value, S, member, hypothesis adequacy;
+- per tick: the human's position, the world facts the phase rule reads, the finding, the lifecycle state, the pin and
+  boundary ticks.
+Two files per scenario, expected and actual, and a diff. The source of the human's trajectory and world facts is the
+load-time replay (`check_script`), which T-H proved equal to the run; the run's human lines are asserted equal to the
+replay's positions as a separate check.
+Independence boundary. The generator implements from the entry the recognition mathematics and the membership and
+finding rules: e as the straight-line excess from the origin, s, s_exp by E9's attribution, D, L clipped at 1, the
+normalisation over H, S, membership as amended twice with the boundary-tick rule, the finding, the pin, the boundary,
+the retirement. It imports nothing from `shared/recognizer.py` or `shared/likelihood_functions.py`. It may use the
+planner's decomposition and the domain's method guards to obtain each hypothesis's expected action sequence, which is
+the domain's structure, not the recognizer's. The expected-action table per hypothesis per scenario is written out in
+the report, so the oracle is inspectable.
+
+The comparison.
+- Categorical values (expected action, member, hypothesis adequacy, finding, lifecycle, most_likely, pin and boundary
+  ticks) exactly; numeric values at relative tolerance 1e-9.
+- Every disagreement is listed with its tick and classified as one of: the generator misread the entry; the recognizer
+  disagrees with the entry; the entry does not determine the expected value for that case. "The entry is silent" is
+  used only when the entry genuinely does not determine the value, never for a case the generator finds unspecified or
+  inconvenient.
+- No same-session adjustment of the generator or the recognizer to make the comparison pass; the standing rule
+  applies (the entry's mechanism stands over runs, baselines and tests; a disagreement is reported, not fitted).
+- The report distinguishes "the recognizer currently behaves this way" from "this behaviour is correct by the current
+  design".
+
+Sessions (the TB track; the IR test-bed first, cycle 2 (L) second): TB.1r records these rulings and the cognitive-loop
+ruling (records only); TB.2b builds the cognitive-loop correction ("The cognitive loop does not end with the task
+pool", above), which the test-bed's runs need; TB.3b builds the artefacts and the expectation generator, runs the
+scenarios and writes the report.
+
+Files: domains/kitting/ (the layout, setup and scenarios, hand-written literals registered by discovery), the run files
+where T-L keeps them, analysis/ir_testbed/ (the generator, the log reader reusing `analysis/td_stage1b/tdlib.py`,
+expected.csv, actual.csv and diff.md per scenario, REPORT.md). Built in TB.2b and TB.3b.
+Reference: cchat, 27 September 2026 (TB); "T-D R and E" (R1 to R6, E1 to E10, G1, the membership rule as amended
+twice); "Layouts, setups and scenarios: the three artefacts of a run"; "T-H: the human behaviour model";
+`docs/handoff_T-D_cycle2_and_IR_testbed.md` §8 (the layered plan); TODO-101, TODO-117, TODO-122;
+`docs/recognizer_handback.md` §1.10
