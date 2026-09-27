@@ -302,7 +302,7 @@ behaviour (§7); ρ B2 `b2a`'s policy parameter.
 → `docs/recognizer_handback.md` §2; `shared/meta_planner.py`, the `rho` constructor argument.
 SUPERSEDED IN PART (T-D R, 27 September 2026): u leaves the belief (R1); β gains a second meaning, the scale of the reference distribution (E5, **tail probability**). design_decisions.md, "T-D R and E".
 
-The four entries below are ruled (T-D R and E, 27 September 2026) and not built; the Stage 1 build builds them. They
+The four entries below are ruled (T-D R and E, 27 September 2026) and built (T-D Stage 1, 27 September 2026). They
 belong to the **adequacy finding** (§7).
 
 **derived phase** — the unit of the adequacy test: one live hypothesis's current phase, from its existing origin to its
@@ -319,6 +319,12 @@ speed, s the ticks without movement since the origin and s_exp the standing the 
 components of one statistic, not two tests; a detour is counted once. A stand in a `move_to` phase is charged against
 s_exp = 0 (E3). Non-decreasing within a phase. Time enters here only, never the belief's likelihood.
 → the same entry, E2, E3.
+RULED (1.5 rulings, 27 September 2026; to be built in cycle 1.5b): also the belief's evidence per phase through L(v·D) (E10),
+beside adequacy's S(v·D); "time enters here only, never the belief's likelihood" is superseded by it. For a walk
+without standing L(v·D) = L(e), walking evidence unchanged; standing within the priced duration gives D ≤ 0 and L = 1.
+s_exp is the Projector's priced stationary ticks within the phase's span (E9): 2 for `pick_up` and `place` in kitting;
+a walk entered from a completion receives that completion's latency tick, the initial walk 0.
+→ the same entry, "1.5 rulings", E9, E10.
 
 **tail probability** (S_k) — hypothesis k's tail of the reference distribution at v·D:
 S(x) = ln(1 + e^(−βx)) / ln 2, and S = 1 for x ≤ 0. The reference distribution is the belief's own likelihood shape
@@ -331,7 +337,9 @@ evaluation; it is not a belief and not a share.
 **test level** (α) — the level the tail probabilities are tested at, per derived phase: a live hypothesis is
 inadequate in its phase when S_k < α. Recognizer configuration (a run option), default 0.05 as a convention, reported
 at every level (0.01, 0.05, 0.1), never chosen from a scenario. Not a meta-planner threshold and not θ: it does not
-touch DESIGN-07, and the meta-planner receives the categorical finding, never α or S_k. At v = 20 cm/tick and
+touch DESIGN-07, and the meta-planner receives the categorical finding and, since G1 (1.5 rulings, 27 September 2026;
+to be built in cycle 1.5b), the categorical per-hypothesis adequacy of the leader (**adequacy finding**, §7), never α or
+S_k: the rule is unchanged, restated. At v = 20 cm/tick and
 β = 0.01 /cm the threshold is v·D = 334 cm at α = 0.05 (17 ticks of standing, or 167 cm walked straight away from every
 live target), 497 cm at α = 0.01.
 → the same entry, E4, E5.
@@ -655,7 +663,7 @@ hypotheses are live: it holds 1/|Live| after every **episode boundary** (§5), a
 done (prior on).
 → `docs/recognizer_handback.md` §1.1, §1.5.
 
-The four entries below are ruled (T-D R and E, 27 September 2026) and not built; the Stage 1 build builds them.
+The four entries below are ruled (T-D R and E, 27 September 2026) and built (T-D Stage 1, 27 September 2026).
 
 **adequacy finding** — the recognizer's second output, beside the **recognizer belief** (R2): one of three values,
 **unresolved**, **adequate** or **unexplained**, with the **tail probabilities** S_k (§5) of the live hypotheses beside
@@ -670,6 +678,15 @@ categorical finding, and what it does with it is G and X, open. A ROBOT term: it
 the two can disagree.
 → `docs/design_decisions.md`, "T-D R and E: the recognizer's output under a removed `unknown` hypothesis", R2 to R5,
 E1 to E7.
+RULED (1.5 rulings, 27 September 2026; to be built in cycle 1.5b). MEMBERSHIP (E8): on the tick at which a hypothesis's
+expected action completes, that hypothesis stays a member with S_k = 1, whatever phase it advances into; the
+completion is an observation consistent with it. The boundary is unchanged: hypotheses entering the new episode have
+no observation on the boundary tick. PER-HYPOTHESIS ADEQUACY (G1): beside the finding the recognizer reports, per live
+hypothesis, a categorical value: adequate (a member with S_k ≥ α), inadequate (a member with S_k < α) or no
+observation (not a member). The finding is existential over the live hypotheses; the per-hypothesis value answers
+whether one hypothesis explains its own phase, and the meta-planner reads it for the leader at admission
+(**admitted**), never α or S_k. Its term is proposed and not yet confirmed; this entry names it by description.
+→ the same entry, "1.5 rulings", E8, G1.
 
 **unresolved** — the value of the **adequacy finding** while no live hypothesis's current derived phase holds an
 observation (E6). For adequacy an observation exists once the phase holds walked path since its origin, or standing
@@ -714,6 +731,11 @@ built (`[meta-proj] projection=built`). `unknown` above θ is never admitted (`n
 meta-planner's, not the recognizer's (**θ**, §5).
 → `shared/meta_planner.py`, `update_human_projection()`.
 SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
+RULED (G1, 1.5 rulings, 27 September 2026; to be built in cycle 1.5b): admission also requires the leader to be adequate in
+its own derived phase: the leader is a member and S_leader ≥ α, read by the meta-planner as the categorical
+per-hypothesis adequacy (**adequacy finding**), never α or S_k. `_clears_gate` stays the one home of the rule, so
+`recognition_changed` fires and refuses on the same condition; a refusal behaves as below θ. The first ruling of G.
+design_decisions.md, "T-D R and E", "1.5 rulings".
 
 USAGE RULE, in prose:
 - about the implementation: "the `unknown` hypothesis";
