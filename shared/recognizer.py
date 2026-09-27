@@ -132,11 +132,13 @@ ALGORITHM:
     a MEMBER of the test on a tick iff it has a derived phase this tick (an
     expected action) and that phase holds an observation: walked path since
     its origin, or standing beyond s_exp, or, in a stationary phase (pick_up,
-    place, wait_at), a stationary tick within the priced duration (D <= 0,
-    S = 1; E6 amended 27 Sept 2026), or its expected action completed on
-    this tick (a member with S = 1 whatever phase it advances into, E8; not
-    on a boundary tick). A walk with nothing walked and no standing beyond
-    s_exp is not one. The finding: unresolved iff there is no member;
+    place, wait_at) or in any phase with s_exp > 0, a stationary tick within
+    the priced standing (D <= 0, S = 1; E6 amended 27 Sept 2026, and a
+    second time in 1.5c: the latency tick E9 prices to a walk entered from a
+    completion), or its expected action completed on this tick (a member
+    with S = 1 whatever phase it advances into, E8); and no hypothesis is a
+    member on a boundary tick (E8's boundary clause applied generally). The
+    initial walk (s_exp = 0) with nothing walked is not one. The finding: unresolved iff there is no member;
     unexplained iff every member has S < alpha (intersection-union); adequate
     otherwise. A non-member contributes no S. Beside it, every live
     hypothesis's hypothesis adequacy (G1): adequate (a member with
@@ -518,9 +520,10 @@ class IntentionRecognizer:
         position. Every phase is now entered from the observed agent's
         completion, so each is priced the standing the Projector attributes to
         it (the action latency and the observed agent's task latency, T-D E9).
-        Every phase is empty, so the belief IS the prior until the agent moves,
-        and no walk holds an observation for the adequacy test (the finding is
-        unresolved, or the lifecycle exhausted). Completed hypotheses are not
+        Every phase is empty, so the belief IS the prior until the agent moves.
+        On this tick no hypothesis is a member of the adequacy test (the
+        finding is unresolved, or the lifecycle exhausted); on the next, the
+        priced latency tick is an observation (E6, second amendment). Completed hypotheses are not
         live and stay pinned.
         Nothing crosses the boundary: a task hypothesis says which task is
         being executed now, not what the agent is disposed to do next, and
@@ -755,7 +758,7 @@ class IntentionRecognizer:
             # Exhausted: the belief over H has no members; the pins are the
             # output convention, not belief mass (T-D R4).
             most_likely, confidence = None, 0.0
-        finding, lifecycle, tails, hypothesis_adequacy = self._adequacy(pos, odo, still, world, advanced, memo)
+        finding, lifecycle, tails, hypothesis_adequacy = self._adequacy(pos, odo, still, world, advanced, boundary, memo)
 
         return BeliefState(
             timestamp=obs.timestamp,
@@ -780,6 +783,7 @@ class IntentionRecognizer:
         still: int,
         world: WorldState,
         advanced: Set[str],
+        boundary: bool,
         memo: Dict[tuple, float],
     ) -> Tuple[Optional[AdequacyFinding], RecognizerLifecycle, Dict[str, float],
                Dict[str, HypothesisAdequacy]]:
@@ -793,12 +797,16 @@ class IntentionRecognizer:
         H empty: EXHAUSTED, no finding, no tails, no hypothesis adequacy (R4).
         Otherwise, per live hypothesis in hypothesis order: a MEMBER iff it has
         a derived phase this tick (an expected action) and that phase holds an
-        observation (E6 as amended, the complete membership rule) — walked
-        path since its origin, standing beyond the priced standing s_exp, or a
-        stationary tick within s_exp in a stationary phase (then D <= 0 and
-        S = 1) — or its expected action completed on this tick (`advanced`,
-        E8: a member with S = 1, whatever phase it advanced into; empty on a
-        boundary tick). A member's tail S = tail_probability(v·D, beta) (E2,
+        observation (E6 as amended twice, the complete membership rule) —
+        walked path since its origin, standing beyond the priced standing
+        s_exp, or a stationary tick with s <= s_exp in a stationary phase or in
+        any phase with s_exp > 0 (then D <= 0 and S = 1: the latency tick E9
+        prices to a walk entered from a completion) — or its expected action
+        completed on this tick (`advanced`, E8: a member with S = 1, whatever
+        phase it advanced into) — and this is not a boundary tick: on a
+        boundary tick no hypothesis is a member (E8's boundary clause applied
+        generally, 1.5c), a stationary phase the boundary opens included. The
+        initial walk (s_exp = 0) with nothing walked holds no observation. A member's tail S = tail_probability(v·D, beta) (E2,
         E5). Unresolved iff there is no member; unexplained iff every member
         has S < alpha (E4); adequate otherwise. A non-member contributes no S.
         Hypothesis adequacy (G1): ADEQUATE for a member with S >= alpha,
@@ -812,8 +820,8 @@ class IntentionRecognizer:
         tails: Dict[str, float] = {}
         for key in live:
             action = self._expected.get(key)
-            if action is None:
-                continue                    # no derived phase this tick
+            if action is None or boundary:
+                continue                    # no derived phase, or a boundary tick: no observation
             if key in advanced:
                 tails[key] = 1.0            # the completion is an observation consistent with it (E8)
                 continue
@@ -824,9 +832,12 @@ class IntentionRecognizer:
             # is derived only at its location; a stationary tick in it within
             # the priced duration is an observation with D <= 0 (E6, amended
             # 27 Sept 2026). Its entry tick counts: the arrival step belongs
-            # to the closing walk's stretch.
+            # to the closing walk's stretch. So is a stationary tick within the
+            # priced standing of any phase with s_exp > 0 (E6, second
+            # amendment): the latency tick of a walk entered from a completion.
+            # With nothing walked, every tick since the origin is stationary.
             stationary_phase = action.schema.movement_target_key is None
-            if not (walked > 0.0 or s > s_exp or (stationary_phase and s <= s_exp)):
+            if not (walked > 0.0 or s > s_exp or ((stationary_phase or s_exp > 0.0) and s <= s_exp)):
                 continue                    # the phase holds no observation
             tails[key] = likelihood_functions.tail_probability(
                 self._delay_length(key, action, pos, odo, still, world, memo), self._beta)
