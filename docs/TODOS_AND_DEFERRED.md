@@ -2967,6 +2967,8 @@ Files: shared/recognizer.py (`update`, `_terminal_complete`, `_task_boundary`), 
 (`_is_complete`), shared/planner.py (`is_complete`)
 Reference: T-B1a, September 2026
 T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the wrong-table delivery is written as a plain instance with the other binding and is labelled on the record `coverage` `BINDING_ABSENT`. The recognizer-side behaviour recorded here (no pin, no boundary, no pool drop) is unchanged by T-H and stays with T-D Q4, now with ground truth for it.
+T-D Stage 1 (27 Sept 2026; `analysis/td_stage1/REPORT.md`, 1.4 finding 5): the item's hypothesis keeps leading at 0.995
+into the human's next task (scenario_s06_06 prior on after the release at 103, scenario_s07_03 after 94). Cycle 2 (L).
 
 **TODO-88 — With the prior off, an item the robot carries stays a live hypothesis about the human, with a target that moves with the robot** [recognizer finding; from T-B Q7]
 Found while checking T-B Q7's acceptance, which expected a robot-side timing fix to leave every `[IR]` line
@@ -3311,6 +3313,11 @@ The interface it needs (recorded, not designed):
   before and after on the maintained baselines; false-unexplained per phase and per run, missed findings and detection
   delay, at every test level α (0.01, 0.05, 0.1). The ground truth is the record's (`truth_at`, `coverage`); the oracle
   interface above serves it.
+- 1.4 (27 Sept 2026, `analysis/td_stage1/REPORT.md`) measured against the record directly (`truth_at`, `coverage`);
+  oracle IR is still unbuilt.
+- The 48 logs of the maintained baseline sets contain no `TASK_ABSENT` case and no case outside the hypothesis
+  space's support (every entry `COVERED`, no `go_to`, no exit walk; 1.4 §H case 1). The IR test bed, a separate
+  track, will.
 Reference: design_decisions.md, "T-H: the human behaviour model", item 10; roadmap, "The plan from T-A"
 
 **TODO-102: A per-robot task model on the robot's `AgentConfig` (recorded, T-H1, 25 Sept 2026)** [OPEN, recorded only]
@@ -3433,6 +3440,51 @@ Projector and the recognizer (one source), which changes the Projector and so wa
 Files: shared/types.py (`ActionSchema`), domains/kitting/actions.py, shared/projection.py (`build_segments`),
 shared/recognizer.py (`_priced_standing`), mesa_sim/sim_agents.py
 Reference: design_decisions.md, "T-D R and E", E2 and "Dependencies to verify in the build"
+REVISED BY E9 (1.5 rulings, 27 Sept 2026): s_exp is the Projector's priced stationary ticks within the phase's span,
+2 for `pick_up` and `place` (the walk's latency tick and the action's own); the source stays the body's
+`default_action_cost` through the Projector's rule, and this TODO's schema-fact form is unchanged.
+
+**TODO-114: `_get_step_size` falls back to 20.0 in code (recorded, T-D 1.5r, 27 Sept 2026)** [OPEN; remove when the
+body is next in scope]
+`mesa_sim/action_decomposer.py` `_get_step_size` returns `simulation.step_size` with an in-code fallback of 20.0 when
+the key is absent, against T-A1's rule for the body's parameters to the mind (no fallback: a missing value stops the
+run; `_get_min_separation`, `_get_beta`). It predates the T-D Stage 1 build, which hands the same value to the
+recognizer as v (D = e/v + (s − s_exp)) besides the Projector's `assumed_speed`. `_get_seconds_per_step` beside it has
+the same form (fallback 2.0; it feeds `duration_to_steps`, so s_exp of `wait_at`). No behaviour changes today: both keys
+are set in `mesa_configs.yaml`.
+Files: mesa_sim/action_decomposer.py (`_get_step_size`, `_get_seconds_per_step`)
+Reference: T-A1 (the body supplies β and `min_separation`, no default); design_decisions.md, "T-D R and E", E2
+
+**TODO-115: Six frozen analysis scripts import symbols the T-D Stage 1 build removed (recorded, T-D 1.5r, 27 Sept 2026)**
+[OPEN, recorded only; no fix: the folders are frozen records]
+The Stage 1 build (367a3a7) deleted `UNKNOWN`, `UNKNOWN_LIKELIHOOD`, `graded_unknown_likelihood`, `covered_fraction` and
+the recognizer's `_unknown_likelihood`, `_completion_holds` and `_begin_episode`. These scripts use them and no longer
+run at HEAD: `analysis/g1_graded_evidence/check.py` and `unit_checks.py` (`UNKNOWN_LIKELIHOOD`, `covered_fraction`),
+`analysis/i4_evidence_model/check_i4.py` (`UNKNOWN_LIKELIHOOD`, the `unknown` key), `analysis/i4c_episode/check_i4c.py`
+(`_begin_episode`, `UNKNOWN_LIKELIHOOD`), `analysis/i4d_fold_unknown/check_i4d.py` (`UNKNOWN_LIKELIHOOD`, the `unknown`
+key) and `analysis/t1b_realization/measure.py` (`from shared.recognizer import UNKNOWN`). Three of them
+(`unit_checks.py`, `check_i4c.py`, `check_i4d.py`) already failed before the build, since T-H1 (c5cd1a0) removed
+`shared.domain_knowledge` and `shared.types.DomainModel`. Their READMEs record the commit they ran at.
+Files: the six scripts named
+Reference: design_decisions.md, "T-D R and E", R1
+
+**TODO-116: The projector's docstring still names `unknown` (recorded, T-D 1.5r, 27 Sept 2026)** [OPEN; fix when the
+projector is in scope]
+`shared/projection.py` around lines 324 and 330 (the docstring of the hypothesis-resolving call): "cannot resolve
+belief.most_likely (e.g. "unknown")" and "`unknown` before calling this (T8)". The `unknown` hypothesis left the
+hypothesis space with R1 and the meta-planner's `none(unknown)` refusal is gone; the text is stale, the code unaffected.
+Files: shared/projection.py
+Reference: design_decisions.md, "T-D R and E", R1
+
+**TODO-117: Do foreseeable hypotheses count as live after the work order? (recorded for L, T-D 1.5r, 27 Sept 2026)**
+[OPEN; L's question]
+With the prior on, the hypothesis space is the assigned pool plus the foreseeable tasks. Once every assigned task is
+complete, a foreseeable hypothesis still live keeps the recognizer from reading exhausted: scenario_s04_01 prior on,
+`ac_switch_0` alone live at 0.992 from 327, admitted at 327, the finding adequate to 343 and unexplained from 344
+(α = 0.05; `analysis/td_stage1/REPORT.md` §H case 2), while the human is idle. Whether a foreseeable hypothesis stays
+live after the work order is complete is for L.
+Files: shared/recognizer.py (the live set H)
+Reference: design_decisions.md, "T-D R and E", R4; `analysis/td_stage1/REPORT.md` §H
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
