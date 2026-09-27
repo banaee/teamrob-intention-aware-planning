@@ -31,7 +31,6 @@ from shared.knowledge import TaskModel
 from shared.planner import AdaptivePlanner, DecompositionError
 from domains.kitting.registry import domain_config, register_kitting_domain
 
-H = "human_0"
 # HB §2: the recognizer's constants; HB §1.7 / §2: BELIEF_FLOOR (output only).
 HIT, FALSE_ALARM, FLOOR = 1.0, 1e-3, 1e-3
 
@@ -70,13 +69,13 @@ def support(space, assigned):
 
 
 # ---- the world of a tick, from the trajectory --------------------------------------------------------------------
-def world_of(row, traj):
+def world_of(row, traj, agent):
     preds = {Predicate(f[0], tuple(Const(a) for a in f[1:])) for f in row["facts"]}
     positions = {i: tuple(p) for i, p in traj["fixed"].items()}
     positions.update({i: tuple(p) for i, p in row["item_pos"].items()})
     return WorldState(timestamp=float(row["tick"]),
-                      agent_states={H: AgentState(agent_id=H, current_zone="unknown", holding=row["holding"])},
-                      agent_positions={H: (row["x"], row["y"])},
+                      agent_states={agent: AgentState(agent_id=agent, current_zone="unknown", holding=row["holding"])},
+                      agent_positions={agent: (row["x"], row["y"])},
                       object_locations=dict(row["item_loc"]), predicates=preds,
                       object_home_container=dict(traj["home"]), object_destination=dict(traj["dest"]),
                       object_positions=positions)
@@ -111,6 +110,7 @@ class Oracle:
         self.planner = AdaptivePlanner(knowledge=task_model)
         self.space = hypothesis_space(task_model, traj["types"])
         human = next(a for a in domain_config["scenarios"][traj["scenario"]].agents if a.agent_type == "human")
+        self.agent = human.agent_id                    # the observed human: the scenario's one human
         self.admissible = support(self.space, human.assigned_tasks)
         live = sorted(self.admissible)
         # HB §1.2: the uniform prior over the live set at construction
@@ -155,7 +155,7 @@ class Oracle:
 
     # ---- one update (HB §1.8) ---------------------------------------------------------------------------------------
     def update(self, row):
-        world = world_of(row, self.traj)
+        world = world_of(row, self.traj, self.agent)
         holds = lambda p: p is not None and p in world.predicates
         pos = (row["x"], row["y"])
         step = 0.0 if self.last_pos is None else math.dist(pos, self.last_pos)   # 0 on the first observation
@@ -166,7 +166,7 @@ class Oracle:
         boundary, pins, advanced, U, folds = False, [], set(), {}, {}
         for k in sorted(self.base):                        # live: admissible and not completed
             try:
-                A = self.planner.decompose(self.space[k], H, world)
+                A = self.planner.decompose(self.space[k], self.agent, world)
             except DecompositionError:
                 A = None
             if A is not None and holds(A[-1].completion_predicate):             # the terminal pin (HB §1.6)

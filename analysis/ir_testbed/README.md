@@ -3,7 +3,8 @@
 The recognizer tested in isolation, on a layout, a setup and scenarios written for it, against expectations derived
 from the recognizer records before the run (design_decisions.md, "The IR test-bed"; glossary §8, TB). This file is
 the instrument: what it runs, what it derives, from which record, and how it compares. The results are in
-`REPORT.md`. Built at the commit that adds this file (27 September 2026).
+`REPORT.md`. Built in TB.3b (27 September 2026) on env_layout_10; made independent of the layout in TB.4b, which added
+the enlarged room and its twelve scenarios (the section "TB.4b" below).
 
 Standing rule: the records' mechanism stands over runs, baselines and tests. An expectation changes only by
 derivation from the records. A disagreement is reported, not fitted.
@@ -47,16 +48,20 @@ Hand-written literals in `domains/kitting/`, registered by discovery; prior ON i
 To run one scenario by hand:
 
 ```bash
-PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run configs/ir_testbed/scenario_s08_01.yaml   # _02, _03, _04 likewise
+PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run configs/ir_testbed/scenario_s08_01.yaml   # every run file likewise
 ```
 
-To run the whole instrument (the runs, trajectories, expectations, actual outputs, comparisons and figures) from the
-repo root:
+To run the whole instrument (the run lengths, runs, trajectories, expectations, actual outputs, comparisons, figures
+and summaries) from the repo root (since TB.4b; before it, run.sh took scenario ids and summary.py ran separately):
 
 ```bash
-analysis/ir_testbed/run.sh                    # all four; or name scenario ids
-for s in scenario_s08_0{1,2,3,4}; do python analysis/ir_testbed/summary.py analysis/ir_testbed/$s > analysis/ir_testbed/$s/summary.md; done
+analysis/ir_testbed/run.sh                                            # every run file in configs/ir_testbed/
+analysis/ir_testbed/run.sh configs/ir_testbed/scenario_s09_*.yaml     # the enlarged room's twelve
+analysis/ir_testbed/run.sh -o <dir> configs/ir_testbed/scenario_s08_0{1,2,3,4}.yaml   # into another folder
 ```
+
+Running every run file regenerates the s08 folders' `figure.png` and `summary.md` in the TB.4b presentation (below);
+their committed TB.3b versions are kept by running the s09 files only.
 
 ## The pipeline, per scenario (`run.sh`)
 
@@ -178,4 +183,83 @@ d0dbdbd69c01d7989150ae0bd27f039f  runs/env_layout_10_scenario_s08_03_on.log
 93551c8fa122df7c3ad6a028f9717845  runs/env_layout_10_scenario_s08_03_on.rec
 26e2cc6d9052ee572b7e117be366c9c1  runs/env_layout_10_scenario_s08_04_on.log
 b2d33459410319657e1f47791c1e180e  runs/env_layout_10_scenario_s08_04_on.rec
+```
+
+## TB.4b: independent of the layout; the enlarged room
+
+Built in TB.4b (27 September 2026). Hadi's constraint: the instrument reads the room, the shift and the scripts from
+the artefacts; no coordinate, id or tick appears in the generator, the comparison or the plots; a changed layout means
+rerunning, nothing else.
+
+- **What changed in the instrument.**
+  - `trajectory.py` takes the run file (its layout, or the scenario's first reference layout, and its scenario); the
+    observed human is the scenario's one human; the grasped object is the one the action's schema moves
+    (`moved_object_key`); the body's ticks of a duration are computed for every duration bound in the methods of the
+    task model's schemas that this room can instantiate. `--length` prints the replay's last acknowledgement tick.
+  - `oracle.py` and `actual.py` take the observed human from the scenario; `actual.py` takes the run's steps.
+  - `plot.py` and `summary.py` read θ, α, β and v from the run's `[run]` header and label a key without its parameter
+    names. `summary.py` reads the truth's coverage from the loader's `[coverage]` lines, generalises the coffee boundary
+    to every task started by an event (its start, its pin, the resumption), and calls the script's last entry the exit
+    walk by position (the authoring convention). Its event table adds the ticks the finding turns unexplained and back,
+    the admissible hypotheses never pinned, and the lifecycle and finding on the last entry and the idle ticks after it.
+  - `run.sh` runs every run file (or those named), computes the run length by TB.3b's rule from the replay and passes
+    it as `--steps`, printing a notice when a run file's own `steps` differs (Q3 of the TB.4b plan).
+  - One new body rule in the trajectory: an action with process completion (`stand`) records nothing on its STANDs and
+    is complete once they have run (`Executor._is_action_complete`; `action_decomposer._expand_stand`).
+  - One reader fix in `actual.py`: the log reader's live set is the support (the `[IR-prior]` known tasks' hypotheses
+    and every PersonalTask hypothesis, handback §1.1), not every key not yet pinned. The defect appeared with the first
+    room holding a hypothesis outside the support (item_3); the in-process source never had it.
+- **The check on the TB.3b runs.** s08_01 to _04 rerun through the changed instrument into another folder: the logs,
+  `.rec` streams, `trajectory.json`, `expected.csv`, `actual.csv`, `actual_log.csv`, `diff.md` and `phases.json` are
+  byte-identical to the committed ones; `figure.png` and `summary.md` differ in presentation only (the generic labels,
+  the added coverage and stack-depth columns, the support line, the event-table additions), their numbers unchanged.
+- **The enlarged room.** `env_layout_11` is env_layout_10 plus kitting_table_1 at (350, 420) (the north wall, bearing
+  0° from kitting_table_0, 46.3° from its nearest target, shelf_2) and shelf_3 at (−420, 300) (the west wall 320 cm
+  above shelf_1, bearing −164.1°, 30.4° from shelf_1 and 62.3° from coffee_machine_0). `env_setup_09`: item_1, item_2
+  and item_3 on shelf_1, shelf_2 and shelf_3, all designated to kitting_table_0. `scenarios_s09.py`: _01 to _04 the TB.3b
+  scripts re-authored on this room; _05 the corner walk mid-delivery; _06 the long stand (`stand("PT80S")`, the
+  migration of Stay(40)); _07 the change of mind (`deliver_item(item_1).at(pick_up, deliver_item(item_2))`); _08 the
+  misdelivery to kitting_table_1; _09 a delivery of item_3, outside the support; _10 and _11 both deliveries west
+  (item_1, item_3 assigned; item_2 outside the support), _11 with coffee between; _12 the reverse order of _01.
+- **shelf_3's position, chosen for observability** (the TB.4b addendum). The criterion, stated before any run: in _10,
+  on the walk to item_1 (the only place both west deliveries are rivals), the rival delivery of item_3 is refuted
+  (S < α, from the oracle) after the first quarter of the walk's ticks and before its arrival. Tried first: (−420, −220)
+  (10.4° from shelf_1): not met; the rival's excess at the arrival (tick 28) was 35.8 cm (S = 0.765), and S fell below α
+  only at 41, on the carry after the grasp. Kept: (−420, 300), the first position up the west wall that meets it (the
+  analytic screen: (−420, 240) reaches the threshold only at the arrival tick): S < α at tick 25, the arrival at 28, the
+  first quarter ending at 7 (shallow run 2 with the oracle; the rival's excess 443.4 cm at the arrival). Chosen for the
+  phenomenon's observability, never for a belief or finding value; the expectations were derived after it was fixed.
+  The human of the TB.3b scripts never comes within 221 cm of shelf_3 or 253 cm of kitting_table_1, and on the new
+  scripts each new object is reached only where a script targets it.
+- **Run lengths**, by the rule: s09_01 to _12: 204, 281, 271, 282, 270, 246, 252, 211, 252, 188, 276, 205 steps.
+
+### Runs of the enlarged room (git-ignored logs; md5s at TB.4b)
+
+The s09_01 to _04 `.rec` streams are byte-identical to s08_01 to _04's: the same ground truth.
+
+```
+72aa02bcfe5372057f3f293ba53f7e12  runs/env_layout_11_scenario_s09_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_11_scenario_s09_01_on.rec
+009f1a56e9dd44021cf98c6434debaac  runs/env_layout_11_scenario_s09_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_11_scenario_s09_02_on.rec
+daa2de0bda0e8b61002e338fb39e0283  runs/env_layout_11_scenario_s09_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_11_scenario_s09_03_on.rec
+7734174519c6d6e519b6256de44f029c  runs/env_layout_11_scenario_s09_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_11_scenario_s09_04_on.rec
+d05c73bcf7ba5b558c3797826f897a69  runs/env_layout_11_scenario_s09_05_on.log
+c715db44f68926f3bb6b8fa387525f1a  runs/env_layout_11_scenario_s09_05_on.rec
+5d8a020b61cf49c5d23db4668053d3c7  runs/env_layout_11_scenario_s09_06_on.log
+703b2c62e484b7db940f36166548a88c  runs/env_layout_11_scenario_s09_06_on.rec
+d39f1766c59f60131af1e656e8f4a561  runs/env_layout_11_scenario_s09_07_on.log
+a2ece1d231a6c071c20efdea470c4c9f  runs/env_layout_11_scenario_s09_07_on.rec
+0a552ed661eca67c4e58a05637cf6b55  runs/env_layout_11_scenario_s09_08_on.log
+529f6f2019682be19b77f4e1152b1ea5  runs/env_layout_11_scenario_s09_08_on.rec
+03e68253f59d1f21ef8f2b69811beff6  runs/env_layout_11_scenario_s09_09_on.log
+e252b7b8e703da1492b52df3ae4df3dc  runs/env_layout_11_scenario_s09_09_on.rec
+649fd08e6e21fcb668e413ab68759117  runs/env_layout_11_scenario_s09_10_on.log
+c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
+fe16c489944f62e41dabeb29a16ca44f  runs/env_layout_11_scenario_s09_11_on.log
+9a4309d36ae6a47d9f1e36f512b711b2  runs/env_layout_11_scenario_s09_11_on.rec
+4338cf7d2c454d27cbe98f18bc63150d  runs/env_layout_11_scenario_s09_12_on.log
+606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
 ```

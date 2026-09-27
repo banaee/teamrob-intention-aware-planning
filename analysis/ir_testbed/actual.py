@@ -14,7 +14,10 @@ step's option B, confirmed by Hadi):
 Nothing in the recognizer is read beyond its output. The columns the recognizer does not output are left empty in
 both files and skipped by the comparison: expected_action, origin_x, origin_y, e, s, s_exp, D, L, evidence.
 
-    actual.py <run file> <run.log> <actual.csv> <actual_log.csv>
+    actual.py <run file> <steps> <run.log> <actual.csv> <actual_log.csv>
+
+The steps are the run's (run.sh computes them from the replay and runs with them); the layout is the run file's, or
+the scenario's first reference layout when it names none; the observed human is the scenario's one human.
 """
 import csv
 import logging
@@ -30,7 +33,6 @@ import yaml
 import tdlib
 from oracle import COLUMNS
 
-H = "human_0"
 
 
 def _write(path, rows):
@@ -42,6 +44,22 @@ def _write(path, rows):
                         for c in COLUMNS})
 
 
+def support(keys, known):
+    """The support under the prior (docs/recognizer_handback.md §1.1): the known (assigned) tasks' hypotheses and every
+    PersonalTask hypothesis of the task model; the log prints the known tasks with their determined parameters
+    ([IR-prior]), the hypothesis keys without them. A key outside it is pinned at the floor and never live."""
+    import re
+    from domains.kitting.registry import domain_config
+    from shared.types import PersonalTask
+    schemas = {s.name: s for s in domain_config["task_model"]}
+    def key(task):
+        m = re.match(r"(\w+)\((.*)\)$", task)
+        det = schemas[m[1]].determined_parameters or {}
+        return f"{m[1]}(" + ",".join(b for b in m[2].split(",") if b and b.split("=")[0] not in det) + ")"
+    known_keys = {key(t) for t in known}
+    return [k for k in keys if k in known_keys or isinstance(schemas[k.split("(")[0]], PersonalTask)]
+
+
 def from_log(log_path, alpha):
     # tdlib's [coverage] pattern does not match a line with a `start:` entry (scenario_s08_03 / _04); tdlib is a
     # frozen record, so it is handed the log without its [coverage] lines, which nothing here reads
@@ -51,11 +69,12 @@ def from_log(log_path, alpha):
     log = tdlib.parse(f.name)
     Path(f.name).unlink()
     keys = sorted(next(iter(log["dist"].values())))
+    admissible = support(keys, log["known"])
     rows = []
     for t in sorted(log["ir"]):
         ir, dist = log["ir"][t], log["dist"][t]
         pins = [k for k, s in log["complete"].items() if s == t]
-        live = [k for k in keys if not (k in log["complete"] and log["complete"][k] <= t)]
+        live = [k for k in admissible if not (k in log["complete"] and log["complete"][k] <= t)]
         act, micro, (x, y), _ = log["human"][t]
         common = dict(tick=t, human_x=x, human_y=y, micro=None if micro == "None" else micro,
                       most_likely=None if ir["ml"] == "none" else ir["ml"], confidence=ir["conf"],
@@ -79,12 +98,14 @@ class Collect(logging.Handler):
         self.lines.append(record.getMessage())
 
 
-def in_process(run_file, alpha):
+def in_process(run_file, steps, alpha):
     from domains.kitting.registry import domain_config, register_kitting_domain
     from mesa_sim.sim_model import SimModel
     from mesa_sim.world_state_builder import build_world_state
     cfg = yaml.safe_load(open(run_file))
     scenario = domain_config["scenarios"][cfg["scenario"]]
+    layout = cfg.get("layout") or scenario.reference_layouts[0]
+    H = next(a for a in scenario.agents if a.agent_type == "human").agent_id
     collect = Collect()
     root = logging.getLogger()
     root.setLevel(logging.INFO)
@@ -92,7 +113,7 @@ def in_process(run_file, alpha):
     logging.getLogger("rec").propagate = False
     m = SimModel(scenario=scenario, register_fn=register_kitting_domain,
                  task_model_schemas=domain_config["task_model"],
-                 layout_path=domain_config["layouts"][cfg["layout"]],
+                 layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
                  assignment_prior=bool(cfg["assignment_prior"]), strategy=cfg["strategy"],
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
@@ -100,7 +121,7 @@ def in_process(run_file, alpha):
     robot = next(iter(m.robots.values()))
     human = m.humans[H]
     rows = []
-    for t in range(int(cfg["steps"])):
+    for t in range(steps):
         n0 = len(collect.lines)
         m.step()
         b = robot.belief
@@ -128,10 +149,10 @@ def in_process(run_file, alpha):
 
 
 if __name__ == "__main__":
-    run_file, log_path, out_full, out_log = sys.argv[1:5]
+    run_file, steps, log_path, out_full, out_log = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
     alpha = float(yaml.safe_load(open(run_file))["test_level"])
     _write(out_log, from_log(log_path, alpha))
-    rows, ir_lines = in_process(run_file, alpha)
+    rows, ir_lines = in_process(run_file, steps, alpha)
     logged = [l.rstrip("\n") for l in open(log_path) if l.startswith("[IR")]
     same = ir_lines == logged
     print(f"{run_file}: in-process [IR*] lines {'byte-identical to' if same else 'DIFFER from'} the logged run's "

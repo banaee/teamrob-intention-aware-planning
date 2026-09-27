@@ -2,12 +2,15 @@
 """
 plot.py — one figure per scenario for the IR test-bed (TB.3b): the belief per hypothesis and S per hypothesis over
 ticks (expected as lines, actual as markers every fifth tick), the finding and the lifecycle as a band, and the
-script's action boundaries (trajectory.json) as thin vertical lines, the task starts labelled.
+script's action boundaries (trajectory.json) as thin vertical lines, the task starts labelled. θ and α are read from
+the run's [run] header; a hypothesis or task is labelled by its key without the parameter names. No id, coordinate or
+tick is written here (TB.4b).
 
-    plot.py <scenario dir>
+    plot.py <scenario dir> <run.log>
 """
 import csv
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -19,7 +22,15 @@ from matplotlib.patches import Patch
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a"]          # categorical slots 1 to 3 (all-pairs valid), fixed order by key
 BAND = {"unresolved": "#cfcdc6", "adequate": "#eeede9", "unexplained": "#e34948", "exhausted": "#8a8880"}
 INK, MUTED = "#0b0b0b", "#8a8880"
-THETA = 0.75
+
+
+def header(log):
+    """θ and α from the run's [run] header."""
+    for l in open(log):
+        if l.startswith("[run] "):
+            h = dict(re.findall(r"(\w+)=(\S+)", l))
+            return float(h["theta"]), float(h["test_level"])
+    raise ValueError(f"{log}: no [run] header")
 
 
 def read(path):
@@ -35,15 +46,17 @@ def series(rows, col):
 
 
 def short(k):
-    return k.replace("deliver_item(?item=", "deliver ").replace("coffee_break(?coffee_machine=coffee_machine_0)",
-                                                               "coffee_break").rstrip(")")
+    """A key without its parameter names: deliver_item(?item=x) -> deliver_item(x)."""
+    return re.sub(r"\?\w+=", "", k)
 
 
-def main(d):
+def main(d, log):
     d = Path(d)
+    THETA, alpha = header(log)
     exp, act = read(d / "expected.csv"), read(d / "actual.csv")
     traj = json.load(open(d / "trajectory.json"))
     keys = sorted({r["key"] for r in exp if r["key"]})
+    assert len(keys) <= len(SERIES), f"{len(keys)} hypotheses; the palette validates {len(SERIES)} all-pairs"
     color = dict(zip(keys, SERIES))
     T = max(int(r["tick"]) for r in exp)
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 7.2), sharex=True,
@@ -62,10 +75,9 @@ def main(d):
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
     ax1.axhline(THETA, color=MUTED, lw=0.8, ls="--")
-    ax1.text(T, THETA + 0.015, "θ = 0.75", ha="right", va="bottom", fontsize=8, color=MUTED)
-    alpha = 0.05
+    ax1.text(T, THETA + 0.015, f"θ = {THETA:g}", ha="right", va="bottom", fontsize=8, color=MUTED)
     ax2.axhline(alpha, color=MUTED, lw=0.8, ls="--")
-    ax2.text(T, alpha + 0.015, "α = 0.05", ha="right", va="bottom", fontsize=8, color=MUTED)
+    ax2.text(T, alpha + 0.015, f"α = {alpha:g}", ha="right", va="bottom", fontsize=8, color=MUTED)
     ax1.legend(loc="upper left", bbox_to_anchor=(1.0, 1.0), frameon=False, fontsize=9,
                title="lines expected, dots actual", title_fontsize=8)
     # the band: the finding, or the lifecycle when exhausted
@@ -86,13 +98,11 @@ def main(d):
         for ax in (ax1, ax2):
             ax.axvline(b["tick"], color="#d9d8d2", lw=0.6, zorder=0)
         if b["task"] != last_task:
-            ax1.text(b["tick"] + 1, 1.05, short(b["task"].split(",?kitting_table")[0] + ")")
-                     .replace("go_to(?landmark=corner_SE)", "exit walk").replace("go_to(?landmark=corner_SE", "exit walk"),
-                     fontsize=7.5, color=INK, va="bottom", rotation=0)
+            ax1.text(b["tick"] + 1, 1.05, short(b["task"]), fontsize=7.5, color=INK, va="bottom", rotation=0)
             last_task = b["task"]
     fig.suptitle(f"{traj['scenario']} on {traj['layout']}, prior on", x=0.06, ha="left", fontsize=11, color=INK)
     fig.savefig(d / "figure.png", dpi=130, bbox_inches="tight")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2])

@@ -5,8 +5,12 @@ the load-time replay (world/human_executor.check_script) expanded per tick with 
 the world facts the phase rule reads, per tick. The body side of the test-bed; the expectation generator
 (oracle.py) reads its output and imports nothing of the body.
 
-    trajectory.py <scenario_id> <steps> <out.json>            the expansion
-    trajectory.py <scenario_id> <steps> <out.json> <run.log>  ... and its check against the run's human lines
+    trajectory.py <run file> --length                          the replay's last acknowledgement tick
+    trajectory.py <run file> <steps> <out.json>                the expansion
+    trajectory.py <run file> <steps> <out.json> <run.log>      ... and its check against the run's human lines
+
+Independent of the layout (TB.4b): the room, the shift and the script are read from the artefacts the run file names,
+the observed human is the scenario's one human, and no id, coordinate or tick is written here.
 
 The replay is loaded as tests/test_th2_executor.py loads it: the registered scenario with the human alone (no robot
 is constructed, so no recognizer runs), check_script with the body's conversions (`steps_toward` at the body's step
@@ -19,8 +23,10 @@ of each, read from mesa_sim/executor.Executor.step and mesa_sim/sim_agents.Human
   - STEP* (a walk): the `steps_toward` positions from where the action starts to the target's position; the walk
     ends when the agent is within PROXIMITY_THRESHOLD of the target (`at` holds), short of the target point;
   - GRASP: the item is held, at the holder's position; RELEASE: the item is at the nearest fixed object, at its
-    position; STAND* with a duration (wait_at): that many STANDs, the last recording the nearest fixed object as
-    waited_at (cleared by the next step, grasp or release);
+    position; STAND* with a duration: that many STANDs; for an action whose completion is a world fact (wait_at) the
+    last records the nearest fixed object as waited_at (cleared by the next step, grasp or release); for an action
+    with process completion (stand) no STAND records anything and the action is complete once its STANDs have run
+    (mesa_sim/action_decomposer._expand_stand, Executor._is_action_complete; TB.4b);
   - after the script: the human stands, action=None, micro=None.
 The world facts (mesa_sim/world_state_builder.build_world_state, the human's part): at(human, o) for every
 non-held object within PROXIMITY_THRESHOLD; holding(human, item); obj_at(item, location), the location a holder
@@ -43,7 +49,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "mesa_sim"))
 
 import yaml
-from shared.types import ScenarioConfig, task_instance_key
+from shared.types import ActionStep, ConditionSchema, ProcessCompletion, ScenarioConfig, task_instance_key
 from world.human_executor import check_script
 from domains.kitting.registry import domain_config, register_kitting_domain
 from mesa_sim.sim_model import SimModel
@@ -52,27 +58,47 @@ from mesa_sim.action_decomposer import steps_toward, _get_step_size, _parse_dura
 from mesa_sim.executor import ACTION_COMPLETION_LATENCY
 from mesa_sim.sim_agents import HUMAN_TASK_COMPLETION_LATENCY
 
-H = "human_0"
-LAYOUT = "env_layout_10"
 
-
-def load(sid):
-    """The registered scenario with the human alone; the model (not stepped) and the human's config."""
-    base = domain_config["scenarios"][sid]
+def load(run_file):
+    """The run file's scenario with the human alone, on the run file's layout (the scenario's first reference layout
+    when it names none); the model (not stepped), the human's config, the scenario and the layout id."""
+    cfg = yaml.safe_load(open(run_file))
+    base = domain_config["scenarios"][cfg["scenario"]]
+    layout = cfg.get("layout") or base.reference_layouts[0]
     human = next(a for a in base.agents if a.agent_type == "human")
     scenario = ScenarioConfig(id=base.id, description=base.description, agents=[human],
                               setup=base.setup, reference_layouts=base.reference_layouts)
     m = SimModel(scenario=scenario, register_fn=register_kitting_domain,
                  task_model_schemas=domain_config["task_model"],
-                 layout_path=domain_config["layouts"][LAYOUT],
+                 layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][base.setup])
-    return m, human
+    return m, human, base, layout
+
+
+def hypothesis_durations(m, ticks_of):
+    """The body's ticks of every duration a hypothesis of this room can expect: the constants bound to a duration
+    key in the methods of the task model's schemas whose every enumerated parameter has an object of its type here."""
+    types = {o.type for o in m.objects.values()}
+    out = {}
+    for schema in domain_config["task_model"]:
+        params = [p.name for p in schema.parameters if p.name not in (schema.determined_parameters or {})]
+        if not all(schema.parameter_types[p] in types for p in params):
+            continue
+        for method in schema.methods:
+            for step in method.steps:
+                if not isinstance(step, ActionStep) or step.action.duration_key is None:
+                    continue
+                for var, val in step.bindings.items():
+                    if var.name == step.action.duration_key and hasattr(val, "value"):
+                        out[val.value] = ticks_of(val.value)
+    return dict(sorted(out.items()))
 
 
 class Body:
     """The human's body state the facts are read from: position, what it carries, where it waited, the items."""
 
-    def __init__(self, m, start):
+    def __init__(self, m, start, agent):
+        self.agent = agent
         self.pos = tuple(start)
         self.carrying = None
         self.waited_at = None
@@ -97,6 +123,7 @@ class Body:
         return math.dist(self.pos, self.position_of(obj)) <= PROXIMITY_THRESHOLD
 
     def facts(self):
+        H = self.agent
         out = [["at", H, o] for o in sorted(list(self.fixed) + list(self.item_loc)) if self.at(o)]
         if self.carrying:
             out.append(["holding", H, self.carrying])
@@ -107,6 +134,7 @@ class Body:
         return out
 
     def row(self, tick, action, micro, top):
+        H = self.agent
         return dict(tick=tick, x=self.pos[0], y=self.pos[1], action=action, micro=micro, task=top,
                     holding=self.carrying, waited=self.waited_at,
                     item_loc={i: (H if l is None else l) for i, l in self.item_loc.items()},
@@ -131,8 +159,11 @@ class Body:
         self.waited_at = None
 
 
-def complete(action, body):
-    """The action's completion, from the body state (the world the executor checks at the tick's start)."""
+def complete(action, body, exhausted):
+    """The action's completion, from the body state (the world the executor checks at the tick's start); a process
+    completion holds once the action's microactions have all run."""
+    if isinstance(action.schema.completion, ProcessCompletion):
+        return exhausted
     pred = action.completion_predicate
     args = [a.value for a in pred.args]
     if pred.name == "at":
@@ -146,27 +177,28 @@ def complete(action, body):
     raise ValueError(f"no body rule for the completion {pred}")
 
 
-def expand(sid, steps):
-    m, human = load(sid)
+def expand(run_file, steps=None):
+    m, human, base, layout = load(run_file)
+    H = human.agent_id
     step_size = _get_step_size(m)
     ticks_of = lambda d: _parse_duration_to_steps(d, m)
     walk = lambda a, b: [mu.params["target_pos"] for mu in steps_toward(a, b, step_size)]
     record = check_script(human.scheduled_tasks, m.humans[H].machine.planner, build_world_state(m), H, ticks_of, walk)
-    body = Body(m, human.start_position)
+    body = Body(m, human.start_position, H)
     rows = [body.row(-1, None, None, None)]
     tick = 0
     boundaries = []
     for snap in record.snapshots:
         a = snap.action
         if snap.done != 0:
-            raise ValueError(f"{sid}: a mid-action cut in the replay ({snap}); the expansion has no rule for it")
+            raise ValueError(f"{base.id}: a mid-action cut in the replay ({snap}); the expansion has no rule for it")
         top = task_instance_key(snap.stack[0])
         boundaries.append(dict(tick=tick, action=a.action_name, occurrence=snap.occurrence, task=top,
                                stack=[task_instance_key(t) for t in snap.stack]))
         spec = a.schema.microactions
         queue = None
         while True:
-            if complete(a, body):                       # the acknowledgement tick
+            if complete(a, body, queue == []):                       # the acknowledgement tick
                 rows.append(body.row(tick, a.action_name, None, top)); tick += 1
                 break
             if spec == "STEP*":
@@ -174,19 +206,21 @@ def expand(sid, steps):
                     queue = walk(body.pos, body.position_of(a.bindings[a.schema.movement_target_key]))
                 body.step(queue.pop(0)); micro = "step"
             elif spec == ["GRASP"]:
-                body.grasp(a.bindings["?item"]); micro = "grasp"
+                body.grasp(a.bindings[a.schema.moved_object_key]); micro = "grasp"
             elif spec == ["RELEASE"]:
                 body.release(); micro = "release"
             elif spec == "STAND*" and a.schema.duration_key is not None:
                 if queue is None:
                     queue = list(range(ticks_of(a.bindings[a.schema.duration_key]), 0, -1))
-                if queue.pop(0) == 1:
+                if queue.pop(0) == 1 and isinstance(a.schema.completion, ConditionSchema):
                     body.waited_at = body.nearest_fixed()
                 micro = "stand"
             else:
-                raise ValueError(f"{sid}: no body rule for the action {a.action_name} ({spec})")
+                raise ValueError(f"{base.id}: no body rule for the action {a.action_name} ({spec})")
             rows.append(body.row(tick, a.action_name, micro, top)); tick += 1
     last_ack = tick - 1
+    if steps is None:
+        return last_ack
     while tick < steps:
         rows.append(body.row(tick, None, None, None)); tick += 1
     cfg = yaml.safe_load(open(ROOT / "mesa_sim" / "mesa_configs.yaml"))["simulation"]
@@ -194,21 +228,19 @@ def expand(sid, steps):
                   action_completion_latency=ACTION_COMPLETION_LATENCY,
                   observed_task_completion_latency=HUMAN_TASK_COMPLETION_LATENCY,
                   default_action_cost=1.0,        # mesa_sim/sim_agents.RobotAgent: a stationary action is one tick
-                  duration_ticks={d: ticks_of(d) for d in ("PT60S",)})
-    return dict(scenario=sid, layout=LAYOUT, steps=steps, last_ack=last_ack, params=params,
+                  duration_ticks=hypothesis_durations(m, ticks_of))
+    return dict(scenario=base.id, layout=layout, steps=steps, last_ack=last_ack, params=params,
                 fixed={i: list(p) for i, p in body.fixed.items()}, home=body.home, dest=body.dest,
                 types={i: o.type for i, o in m.objects.items()},
-                robot_start=list(next(a for a in domain_config["scenarios"][sid].agents
-                                      if a.agent_type == "robot").start_position),
+                robot_start=list(next(a for a in base.agents if a.agent_type == "robot").start_position),
                 actions=boundaries, rows=rows)
 
 
-AGENT = re.compile(r"\s*step: (\d+): \[human_0\] task=(\S+) action=(\S+) micro=(\S+) pos=\[\s*(\S+)\s+(\S+)\s*\]")
-
-
-def check(traj, log):
+def check(traj, log, agent):
     """Per tick: the expanded position rounded to the log's 2 decimals, the action and the micro, against the run's
     human lines. Returns the list of mismatches (empty: equal on every tick)."""
+    AGENT = re.compile(r"\s*step: (\d+): \[" + re.escape(agent) +
+                       r"\] task=(\S+) action=(\S+) micro=(\S+) pos=\[\s*(\S+)\s+(\S+)\s*\]")
     logged = {}
     for l in open(log):
         mm = AGENT.match(l)
@@ -228,12 +260,18 @@ def check(traj, log):
 
 
 if __name__ == "__main__":
-    sid, steps, out = sys.argv[1], int(sys.argv[2]), Path(sys.argv[3])
-    traj = expand(sid, steps)
+    run_file = sys.argv[1]
+    if sys.argv[2] == "--length":
+        print(expand(run_file))
+        sys.exit(0)
+    steps, out = int(sys.argv[2]), Path(sys.argv[3])
+    traj = expand(run_file, steps)
+    sid = traj["scenario"]
     json.dump(traj, open(out, "w"))
     print(f"{sid}: last acknowledgement tick {traj['last_ack']}, {steps} ticks")
     if len(sys.argv) > 4:
-        bad = check(traj, sys.argv[4])
+        human = next(a for a in domain_config["scenarios"][sid].agents if a.agent_type == "human")
+        bad = check(traj, sys.argv[4], human.agent_id)
         print(f"{sid}: trajectory against the run's human lines: "
               + ("equal on every tick" if not bad else f"{len(bad)} mismatches, first {bad[:3]}"))
         sys.exit(1 if bad else 0)
