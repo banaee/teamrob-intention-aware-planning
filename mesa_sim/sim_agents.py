@@ -270,10 +270,12 @@ class RobotAgent(FactoryAgent):
         beta, self._beta_source = _get_beta(model)
         min_separation, self._min_separation_source = _get_min_separation(model)
 
-        # The adequacy test's inputs (T-D E2): the speed, the duration-to-ticks
-        # conversion and the priced standing of a stationary action are the
-        # values handed to the Projector below, read once here so projection
-        # and adequacy take one source; the test level alpha is a run option
+        # The phase's projected completion delay D (T-D E2, E9, E10), read by
+        # the belief and the adequacy test: the speed, the duration-to-ticks
+        # conversion, the priced standing of a stationary action and the
+        # action and observed-task completion latencies are the values handed
+        # to the Projector below, read once here so projection, belief and
+        # adequacy take one source; the test level alpha is a run option
         # (--test_level).
         speed = _get_step_size(model)
         duration_to_steps = lambda duration: _parse_duration_to_steps(duration, model)
@@ -286,6 +288,8 @@ class RobotAgent(FactoryAgent):
             speed=speed,
             duration_to_steps=duration_to_steps,
             default_action_cost=default_action_cost,
+            action_completion_latency=ACTION_COMPLETION_LATENCY,
+            observed_task_completion_latency=HUMAN_TASK_COMPLETION_LATENCY,
             alpha=self.model.test_level,
             assigned_tasks=observed_assigned_tasks,
         )
@@ -421,16 +425,20 @@ class RobotAgent(FactoryAgent):
 
         if self.belief is not None and human is not None:
             # The recognizer's three outputs (T-D R2 to R4): the belief's
-            # leader, the lifecycle state, the adequacy finding (absent when
-            # exhausted) and the members' tail probabilities, in hypothesis
-            # order, to 4 decimals so a finding can be re-read at any alpha.
+            # leader, the lifecycle state, the adequacy finding and the
+            # leader's hypothesis adequacy (G1; both absent when exhausted) and
+            # the members' tail probabilities, in hypothesis order, to 4
+            # decimals so a finding can be re-read at any alpha. The other
+            # hypotheses' adequacy follows from the tails and alpha.
             most_likely = self.belief.most_likely or "none"
             finding = "" if self.belief.finding is None else f" finding={self.belief.finding.value}"
+            leader = self.belief.hypothesis_adequacy.get(self.belief.most_likely)
+            leader_adequacy = "" if leader is None else f" leader_adequacy={leader.value}"
             tails_str = "  ".join(f"{k}={v:.4f}" for k, v in self.belief.tails.items())
             logging.info(
                 f"[IR] step={int(obs.timestamp)} most_likely={most_likely} "
                 f"confidence={self.belief.confidence:.3f} "
-                f"lifecycle={self.belief.lifecycle.value}{finding} tails=[{tails_str}]"
+                f"lifecycle={self.belief.lifecycle.value}{finding}{leader_adequacy} tails=[{tails_str}]"
             )
      
             dist_str = "  ".join(
@@ -544,6 +552,7 @@ class RobotAgent(FactoryAgent):
             finding=AdequacyFinding.UNRESOLVED,
             lifecycle=RecognizerLifecycle.LIVE,
             tails={},
+            hypothesis_adequacy={},
         )
 
 

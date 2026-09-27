@@ -38,6 +38,16 @@ THE EVIDENCE MODEL (I4):
     target can produce it): (0, 2) after the normalisation, (0, 1] for any
     excess ≥ 0.
 
+    The belief's evidence per phase (T-D E10, 1.5 rulings, 27 September 2026)
+    is this logistic applied not to the excess alone but to v·D, the phase's
+    projected completion delay in length units (D = e/v + (s − s_exp), the
+    statistic the adequacy test reads, below): delay_likelihood. For a walk
+    without standing beyond its priced standing v·D = e and the value is the
+    excess-path likelihood above; standing beyond the priced standing is
+    charged as excess path is; v·D ≤ 0 (standing within the priced standing,
+    or a moving target's negative excess, outside the model) reads 1, the
+    clip.
+
     beta — detour tolerance, per unit of length: how much wasted path makes a
     target implausible. 1/beta is the excess at which the likelihood has fallen
     to 2/(1+e) ≈ 0.54 (from 1 at zero excess). A physical tolerance about how
@@ -54,12 +64,14 @@ THE EVIDENCE MODEL (I4):
     logistic, 0.5 at zero excess, every advance halved the evidence of a
     hypothesis that had done nothing wrong — measured as a 0.83 → 0.71 drop at
     the grasp tick of s40's positive control, I4 report §1). Also the value of a
-    tick that offers nothing to charge: the expected action has no location or
-    no graded signal (pick_up, place, wait_at: the agent is within reach of the
-    action's location, or the walk would have regressed to the approach).
+    tick that offers nothing to charge: a phase whose delay is not positive
+    (v·D <= 0: nothing wasted, no standing beyond the priced standing — in
+    pick_up, place, wait_at the agent is within reach of the action's location,
+    or the walk would have regressed to the approach), and a hypothesis with no
+    derived phase (not decomposable here).
 
     The belief has no reference hypothesis (T-D R1, 27 September 2026): each live
-    hypothesis pays its own likelihood per stretch, and the recognizer
+    hypothesis pays its own likelihood per derived phase, and the recognizer
     normalises over the live hypothesis set H only. The absolute question —
     whether the best of the robot's models is wrong — is not the belief's; it is
     the adequacy finding's (below, and shared/recognizer.py).
@@ -91,11 +103,13 @@ THE EVIDENCE MODEL (I4):
     MULTIPLIES onto the hypothesis's evidence, unlike the movement value.
 
 DISPATCH:
-    recognizer.py selects a progress evaluator by NAME (ActionSchema.progress_evaluator),
-    never by inspecting raw microaction strings. PROGRESS_EVALUATORS is the registry
-    mapping those names to functions here. Adding a new ongoing-action type means:
-    write one function, register it below, name it in the relevant ActionSchema.
-    Zero changes to recognizer.py's orchestration logic.
+    recognizer.py selects an excess measure by NAME (ActionSchema.progress_evaluator),
+    never by inspecting raw microaction strings. EXCESS_MEASURES is the registry
+    mapping those names to functions here; the measure's excess enters the phase's
+    projected completion delay D, read by delay_likelihood (the belief) and
+    tail_probability (adequacy). Adding a new ongoing-action type means: write one
+    function, register it below, name it in the relevant ActionSchema. Zero changes
+    to recognizer.py's orchestration logic.
 """
 
 import math
@@ -141,23 +155,17 @@ def logistic_of_excess(excess: float, beta: float) -> float:
 PERFECT_FIT_LIKELIHOOD = 1.0    # the logistic at zero excess, for any beta: nothing to charge
 
 
-def excess_path_likelihood(
-    walked: float,
-    origin: Position,
-    pos: Position,
-    target_pos: Position,
-    cost: PathCost,
-    beta: float,
-) -> float:
+def delay_likelihood(x: float, beta: float) -> float:
     """
-    Excess-path likelihood of the movement observed since `origin` under an
-    action located at `target_pos`: the agent has walked `walked` (odometer
-    since the origin) and is now at `pos`; a perfectly efficient walk would
-    have cost C(origin, target). `beta` is the embodiment's detour tolerance,
-    in the units of the positions. Registered as "excess_path"; applies to any
-    action schema with progress_evaluator="excess_path" (currently: move_to).
+    The belief's evidence for one derived phase (T-D E10): L(x) at x = v·D,
+    the projected completion delay in the body's length units, and 1 for
+    x <= 0 (the clip: standing within the priced standing is not a charge,
+    and a moving target's negative excess is outside the model). The
+    belief's counterpart of tail_probability, over the same x.
     """
-    return logistic_of_excess(excess_path(walked, origin, pos, target_pos, cost), beta)
+    if x <= 0.0:
+        return PERFECT_FIT_LIKELIHOOD
+    return logistic_of_excess(x, beta)
 
 
 def excess_path(
@@ -169,9 +177,11 @@ def excess_path(
 ) -> float:
     """
     The wasted path since `origin` under an action located at `target_pos`:
-    walked + C(pos, target) - C(origin, target). The one computation the
-    excess-path likelihood and the adequacy test's projected completion delay
-    both read (T-D E2: "the excess path from the origin as computed today").
+    walked + C(pos, target) - C(origin, target). The excess term of the
+    projected completion delay D, which the belief (delay_likelihood) and the
+    adequacy test (tail_probability) both read (T-D E2, E10). Registered as
+    "excess_path"; applies to any action schema with
+    progress_evaluator="excess_path" (currently: move_to).
     """
     return walked + cost(pos, target_pos) - cost(origin, target_pos)
 
@@ -214,13 +224,10 @@ def completion_predicate_likelihood(
 # Registry — dispatch key is ActionSchema.progress_evaluator, never a mu string
 # =============================================================================
 
-PROGRESS_EVALUATORS: Dict[str, Callable[..., float]] = {
-    "excess_path": excess_path_likelihood,
-}
-
-# The excess each registered evaluator's likelihood is a function of, under the
-# same name: what the adequacy test reads as e (T-D E2). Time is not an
-# evaluator: it enters adequacy only, never the belief's likelihood (T-D E3).
+# The excess measure named by ActionSchema.progress_evaluator: e in the
+# projected completion delay D = e/v + (s − s_exp) (T-D E2). Standing is not a
+# measure: it enters D beside the excess, for the belief and adequacy alike
+# (T-D E10).
 EXCESS_MEASURES: Dict[str, Callable[[float, Position, Position, Position, PathCost], float]] = {
     "excess_path": excess_path,
 }

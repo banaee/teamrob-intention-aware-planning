@@ -61,10 +61,28 @@ class AdequacyFinding(Enum):
     UNEXPLAINED  every member's tail probability is below the test level alpha;
     ADEQUATE     otherwise.
     Not reported in the lifecycle state EXHAUSTED.
+    On the tick a hypothesis's expected action completes, that hypothesis is a
+    member with S = 1 (E8). The finding is ADEQUATE exactly when some live
+    hypothesis's HypothesisAdequacy is ADEQUATE (its existential aggregate).
     """
     UNRESOLVED = "unresolved"
     ADEQUATE = "adequate"
     UNEXPLAINED = "unexplained"
+
+
+class HypothesisAdequacy(Enum):
+    """
+    Hypothesis adequacy (T-D G1, 1.5 rulings): per live hypothesis, whether it
+    explains its own derived phase this tick.
+    ADEQUATE        a member of the adequacy test with S >= alpha;
+    INADEQUATE      a member with S < alpha;
+    NO_OBSERVATION  not a member (its phase holds no observation this tick, or
+                    it has no derived phase).
+    The meta-planner reads the leader's value at admission, never alpha or S.
+    """
+    ADEQUATE = "adequate"
+    INADEQUATE = "inadequate"
+    NO_OBSERVATION = "no_observation"
 
 
 class RecognizerLifecycle(Enum):
@@ -94,6 +112,11 @@ class BeliefState:
                   this tick (a live hypothesis without an observation in its
                   derived phase is absent), for evaluation. Not a belief, not a
                   share; the meta-planner does not read it.
+    hypothesis_adequacy
+                  the hypothesis adequacy of every live hypothesis (G1): the
+                  categorical reading of its membership and S_k against alpha.
+                  Empty exactly when EXHAUSTED. The meta-planner reads the
+                  leader's value only (its gate, _clears_gate).
     """
     timestamp: float
     agent_id: str
@@ -103,6 +126,7 @@ class BeliefState:
     finding: Optional[AdequacyFinding]
     lifecycle: RecognizerLifecycle
     tails: Dict[str, float]  # {intention_id: S_k}, members of the adequacy test only
+    hypothesis_adequacy: Dict[str, HypothesisAdequacy]  # {intention_id: value}, every live hypothesis
     # predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}  
                             # OUTDATED: current design uses ProjectedPlan for multi-step prediction; 
                             # this field is retained for backward compatibility but should not be used in new code.
@@ -375,12 +399,14 @@ class ActionSchema:
     # "zone" or "object" — tells decomposer how to resolve the movement target.
     # None for non-movement actions.
     progress_evaluator: Optional[str] = None
-    # Name of the IR progress-likelihood function to apply while this action is
-    # ongoing (not yet complete). e.g. "excess_path" for move_to (the wasted-path
-    # likelihood, I4; the earlier "directional" cosine kernel was removed, handback
-    # §8). None for pick_up, place, wait_at, scan_it — these
-    # have no graded in-progress signal, only a completion predicate.
-    # Looked up in shared.likelihood_functions.PROGRESS_EVALUATORS by the recognizer.
+    # Name of the IR excess measure to apply while this action is ongoing (not
+    # yet complete). e.g. "excess_path" for move_to (the wasted path, I4; the
+    # earlier "directional" cosine kernel was removed, handback §8). None for
+    # pick_up, place, wait_at, scan_it — these have no graded in-progress
+    # signal, only a completion predicate. Looked up in
+    # shared.likelihood_functions.EXCESS_MEASURES by the recognizer: the excess
+    # enters the phase's projected completion delay D, which both the belief
+    # (L(v·D)) and the adequacy test (S(v·D)) read (T-D E2, E10).
     # Recognizer dispatches by this name only — never by microaction string.
     duration_key: Optional[str] = None
     # Binding key whose value is the action's DURATION, for a stationary action

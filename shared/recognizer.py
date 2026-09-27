@@ -28,33 +28,36 @@ ALGORITHM:
           already satisfies pick_up's completion, so the derived action has
           moved on). An event is a fact at a moment: it MULTIPLIES onto the
           hypothesis's evidence.
-        - progress channel: a has a progress_evaluator (move_to) → the
-          excess-path likelihood: the distance the agent has walked since the
-          hypothesis's origin (a per-agent odometer, read at the origin), plus
-          the remaining cost to a's target, minus the direct cost from the
-          origin — the path WASTED under the hypothesis — through a logistic.
-          The target is the object's current location
-          (shared/target_resolution.py). One stretch of movement toward one
-          target is one observation however many ticks it spans: the value is
-          recomputed from the origin and REPLACES the previous tick's, it is
-          not multiplied on it. When the expected action changes (phase
-          advance, or regress — derived, so both happen), the closing action's
-          final value is folded into the evidence once and the origin (position
-          and odometer reading) moves to the agent's.
-        - no graded signal (an action without target or evaluator — pick_up,
-          place, wait_at: the agent is within reach of where it happens — or a
-          hypothesis the planner cannot decompose here): the perfect-fit value,
-          nothing to charge. A stationary tick mid-stretch changes nothing:
-          the excess is what it was.
-        - an EMPTY stretch — nothing walked since the origin: the tick a
-          hypothesis enters an action, the ticks after an episode boundary
-          before the agent moves, t = 0 — is not an observation. The channel
-          contributes NO FACTOR for it (not 1.0: zero excess is a perfectly
-          efficient walk, and no walk is not that), and the belief carries
-          forward unchanged.
+        - phase channel (T-D E10, 1.5 rulings, 27 September 2026): the
+          phase's projected completion delay, in ticks,
+              D = e/v + (s − s_exp)
+          through the logistic, L(v·D) = 2 / (1 + exp(beta·v·D)), and 1 for
+          v·D <= 0 (the clip). e is the path WASTED under the hypothesis: the
+          distance the agent has walked since the hypothesis's origin (a
+          per-agent odometer, read at the origin), plus the remaining cost to
+          a's target, minus the direct cost from the origin — for an action
+          with a progress_evaluator (move_to), 0 otherwise. The target is the
+          object's current location (shared/target_resolution.py). s is the
+          ticks the agent stood since the origin (a per-agent standing clock),
+          s_exp the standing the Projector prices within the phase (E9: the
+          latency after the completion that opened the phase, plus the
+          action's own stationary duration). One phase is one observation
+          however many ticks it spans: the value is recomputed from the
+          origin and REPLACES the previous tick's, it is not multiplied on
+          it. When the expected action changes (phase advance, or regress —
+          derived, so both happen), the closing phase's final value is folded
+          into the evidence once and the origin (position, odometer and
+          standing-clock readings) moves to the agent's. For a walk with no
+          standing beyond its s_exp, v·D = e and the value is the excess-path
+          likelihood; standing beyond s_exp is charged v per tick, as excess
+          path is; a stationary tick within the priced standing is not a
+          charge (I4c narrowed), nor is a phase with nothing walked and no
+          standing (D <= 0: the value 1, the belief carries forward).
+        - a hypothesis the planner cannot decompose here has no phase: the
+          perfect-fit value, nothing to charge.
     There is no reference hypothesis (T-D R1, 27 September 2026): each live
-    hypothesis pays its own likelihood per stretch — its closed stretches and
-    events in its base, the open stretch's value multiplied on top for this
+    hypothesis pays its own likelihood per phase — its closed phases and
+    events in its base, the open phase's value multiplied on top for this
     tick — and the evidence is normalised over the live hypothesis set H
     only. The invariant (R6): on every tick the normalised evidence sums to 1
     over exactly H, and a retired or inadmissible hypothesis is never in H.
@@ -62,8 +65,8 @@ ALGORITHM:
     evidence, two rivals start at 0.5; there is no ceiling below 1. Whether
     the best of the models is wrong is the adequacy finding's question
     (below), not the belief's. Two hypotheses whose expected actions share
-    evaluator, origin, walked distance and target position receive the same
-    value, computed once per tick.
+    evaluator, origin, walked distance and target position share one excess,
+    computed once per tick.
 
     Completed tasks: judged on the TERMINAL action's completion condition
     directly (obj_at(item, table), waited(agent, machine)), whatever the phase
@@ -76,7 +79,7 @@ ALGORITHM:
     "this is the task being executed now", not a disposition or a belief
     about later tasks; there is no representation here in which "the agent
     seems uninterested in shelf_9" could live. Within a task, a phase advance
-    ends a STRETCH: the closing stretch's value folds into the evidence and is
+    ends a PHASE: the closing phase's value folds into the evidence and is
     retained, so a task grows more likely as more of its actions verifiably
     complete (prefix accumulation). A task boundary ends the EPISODE: when a
     completion retires a hypothesis whose expected action on the previous tick
@@ -109,33 +112,42 @@ ALGORITHM:
     members: the distribution holds the pins alone (the output convention, not
     belief mass), most_likely is None and confidence 0.0.
 
-    Adequacy (T-D E1 to E7): the recognizer's second output, independent of
-    the belief. Per live hypothesis, per DERIVED PHASE (from its origin to its
-    phase advance — the unit, no window), the projected completion delay
-        D = e/v + (s − s_exp)
-    in ticks: e the excess path from the origin as the movement likelihood
-    computes it (0 for a phase with no evaluator or no resolvable target), v
+    Adequacy (T-D E1 to E9, G1): the recognizer's second output, independent
+    of the belief, over the same statistic. Per live hypothesis, per DERIVED
+    PHASE (from its origin to its phase advance — the unit, no window), the
+    projected completion delay D = e/v + (s − s_exp) above, in ticks: e the
+    excess path (0 for a phase with no evaluator or no resolvable target), v
     the body's speed, s the ticks without movement since the origin, s_exp
-    the standing the Projector prices for the phase (0 for a walk; the bound
-    duration for an action whose schema names one, through the body's
-    duration_to_steps; otherwise the task model's cost for the action, else
-    the body's default_action_cost — the Projector's own rule, one source).
-    D is non-decreasing within a phase. Its tail probability
+    the Projector's priced stationary ticks within the phase's span (E9),
+    read from the Projector's own sequence and source — per action its own
+    segment (0 for a walk; the bound duration for an action whose schema
+    names one, through the body's duration_to_steps; otherwise the task
+    model's cost for the action, else the body's default_action_cost), then
+    the body's action latency, which falls in the phase the completion
+    opens (and at an episode boundary with it the observed agent's task
+    latency). In kitting: 2 for pick_up and place, 1 for a walk entered from
+    a completion (the first walk after a boundary included), 0 for the
+    initial walk. D is non-decreasing within a phase. Its tail probability
     S = likelihood_functions.tail_probability(v·D, beta). A live hypothesis is
     a MEMBER of the test on a tick iff it has a derived phase this tick (an
     expected action) and that phase holds an observation: walked path since
     its origin, or standing beyond s_exp, or, in a stationary phase (pick_up,
     place, wait_at), a stationary tick within the priced duration (D <= 0,
-    S = 1; E6 amended 27 Sept 2026). A walk with nothing walked and no
-    standing is not one. The finding: unresolved iff there is no member;
+    S = 1; E6 amended 27 Sept 2026), or its expected action completed on
+    this tick (a member with S = 1 whatever phase it advances into, E8; not
+    on a boundary tick). A walk with nothing walked and no standing beyond
+    s_exp is not one. The finding: unresolved iff there is no member;
     unexplained iff every member has S < alpha (intersection-union); adequate
-    otherwise. A non-member contributes no S. Computed from scratch every
-    tick, with no memory beyond each hypothesis's current phase: an
-    unexplained finding clears when a member reaches S ≥ alpha or a phase
-    advance or episode boundary empties the membership. Time enters adequacy
-    only; the belief's likelihood is unchanged by it (E3). alpha, the test
-    level, is a run option the embodiment passes in. The recognizer decides
-    nothing about action with the finding (R5).
+    otherwise. A non-member contributes no S. Beside it, every live
+    hypothesis's hypothesis adequacy (G1): adequate (a member with
+    S >= alpha), inadequate (a member with S < alpha), no observation (not a
+    member); the finding is adequate exactly when some hypothesis's is.
+    Computed from scratch every tick, with no memory beyond each
+    hypothesis's current phase: an unexplained finding clears when a member
+    reaches S ≥ alpha or a phase advance or episode boundary empties the
+    membership. alpha, the test level, is a run option the embodiment passes
+    in. The recognizer decides nothing about action with the finding (R5);
+    the meta-planner reads the leader's hypothesis adequacy at its gate.
 
     Context weight ω_context(τ, context, world):
         - TEMPERATURE_BOOST if room_temperature is high and τ is ac_activation
@@ -179,8 +191,9 @@ INPUTS:
 
 OUTPUTS:
     - BeliefState: distribution, most_likely, confidence (the belief over H);
-      finding, lifecycle, tails (the adequacy finding, the lifecycle state,
-      the members' tail probabilities)
+      finding, lifecycle, tails, hypothesis_adequacy (the adequacy finding,
+      the lifecycle state, the members' tail probabilities, every live
+      hypothesis's hypothesis adequacy)
 """
 
 import itertools
@@ -190,7 +203,7 @@ from typing import Callable, Dict, List, Optional, Set, Tuple
 from shared.types import (
     Observation, BeliefState, WorldState, GroundedAction,
     TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, same_task,
-    AdequacyFinding, RecognizerLifecycle,
+    AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy,
 )
 from shared.knowledge import TaskModel, ContextKnowledge
 from shared.planner import AdaptivePlanner, DecompositionError
@@ -312,6 +325,8 @@ class IntentionRecognizer:
         speed: float,
         duration_to_steps: Callable[[str], float],
         default_action_cost: float,
+        action_completion_latency: float,
+        observed_task_completion_latency: float,
         alpha: float,
         assigned_tasks: Optional[List[TaskInstance]] = None,
         path_cost: Optional[likelihood_functions.PathCost] = None,
@@ -322,15 +337,15 @@ class IntentionRecognizer:
         hypotheses:     list of (task_name, bindings) pairs for this scenario.
                         Built from the domain schemas and the workspace objects
                         at construction time in sim_agents.py.
-        beta:           the excess-path likelihood's detour tolerance, per unit
+        beta:           the phase likelihood's detour tolerance, per unit
                         of the body's length (Mesa: 0.01 /cm). Supplied by the
                         embodiment, no default: it carries the body's units,
                         and shared/ holds none (T-A1; TODO-58). Also the scale
                         of the adequacy test's reference distribution (T-D E5).
         speed:          v, the body's motion per tick, in its length units: the
                         value the embodiment hands the Projector as
-                        assumed_speed. Converts the excess path to ticks in the
-                        projected completion delay (T-D E2).
+                        assumed_speed. Converts between the excess path and
+                        ticks in the projected completion delay (T-D E2).
         duration_to_steps: the body's conversion of a duration binding (wait_at's
                         ?duration) to ticks, the callable the Projector
                         receives. Prices the standing of such a phase.
@@ -338,6 +353,16 @@ class IntentionRecognizer:
                         stationary action with no stated duration and no task-
                         model cost (pick_up, place): the same value the body
                         hands the Projector (one source; ruled 27 Sept 2026).
+        action_completion_latency: the ticks the Projector prices after every
+                        action, standing where it ended (the body's value, the
+                        one it hands the Projector). Attributed to the phase the
+                        completion opens (T-D E9): a phase entered from a
+                        completion is priced this much standing beside its own.
+        observed_task_completion_latency: the ticks the Projector prices after
+                        the observed agent's last action of a task (the body's
+                        value for the observed agent, the one it hands the
+                        Projector; Mesa's human: 0). Attributed with the action
+                        latency to the phases a boundary opens (T-D E9).
         alpha:          the adequacy test's level, per derived phase (T-D E5): a
                         run option, no default here, never chosen from a
                         scenario.
@@ -365,18 +390,19 @@ class IntentionRecognizer:
         self._speed = speed
         self._duration_to_steps = duration_to_steps
         self._default_action_cost = default_action_cost
+        self._action_completion_latency = action_completion_latency
+        self._observed_task_completion_latency = observed_task_completion_latency
         self._alpha = alpha
         # A schema naming an evaluator the registry does not have is a domain
         # modelling error, and must not look like uncertainty: without this
         # check every movement under it would silently score the perfect fit.
         for schema in task_model.get_all_actions():
             name = schema.progress_evaluator
-            if name is not None and (name not in likelihood_functions.PROGRESS_EVALUATORS
-                                     or name not in likelihood_functions.EXCESS_MEASURES):
+            if name is not None and name not in likelihood_functions.EXCESS_MEASURES:
                 raise ValueError(
                     f"action '{schema.name}' names progress_evaluator '{name}', which is not "
-                    f"registered in likelihood_functions.PROGRESS_EVALUATORS and EXCESS_MEASURES "
-                    f"({sorted(likelihood_functions.PROGRESS_EVALUATORS)})")
+                    f"registered in likelihood_functions.EXCESS_MEASURES "
+                    f"({sorted(likelihood_functions.EXCESS_MEASURES)})")
         # Sorted by key so that every order-dependent step downstream — the
         # insertion order of the evidence and output dicts, hence max()'s
         # tie-break for most_likely and the order of tied entries in the log —
@@ -411,7 +437,13 @@ class IntentionRecognizer:
         #                   that walked = odometer − _origin_odo[key]
         #   _origin_still[key] the agent's count of ticks without movement at
         #                   that moment, so that s = _still − _origin_still[key]
-        #                   (the standing in the adequacy test's delay D)
+        #                   (the standing in the phase's delay D)
+        #   _entry_latency[key] the standing the Projector prices after the
+        #                   completion that opened the phase (T-D E9): the
+        #                   action latency if the phase was entered from a
+        #                   completion, plus the observed agent's task latency
+        #                   at an episode boundary; 0 for the phase a hypothesis
+        #                   is first observed in, and after a regress
         #   _base[key]      the hypothesis's closed evidence: every closed phase
         #                   (as L) and every event of the CURRENT EPISODE folded
         #                   in, in one common scale across keys (rescaled each
@@ -425,6 +457,7 @@ class IntentionRecognizer:
         self._origin: Dict[str, Tuple[float, float]] = {}
         self._origin_odo: Dict[str, float] = {}
         self._origin_still: Dict[str, int] = {}
+        self._entry_latency: Dict[str, float] = {}
         self._base: Dict[str, float] = {}
         self._completed: Set[str] = set()
         # Per observed agent: total path length walked since its first
@@ -482,10 +515,13 @@ class IntentionRecognizer:
         (every fold, every event) is discarded uniformly: every live
         hypothesis's base becomes the prior over the hypotheses still live,
         whatever its phase history was, and every origin moves to the agent's
-        position. Every stretch is now empty, so the belief IS the prior until
-        the agent moves, and no phase holds an observation for the adequacy
-        test (its membership is empty: the finding is unresolved, or the
-        lifecycle exhausted). Completed hypotheses are not live and stay pinned.
+        position. Every phase is now entered from the observed agent's
+        completion, so each is priced the standing the Projector attributes to
+        it (the action latency and the observed agent's task latency, T-D E9).
+        Every phase is empty, so the belief IS the prior until the agent moves,
+        and no walk holds an observation for the adequacy test (the finding is
+        unresolved, or the lifecycle exhausted). Completed hypotheses are not
+        live and stay pinned.
         Nothing crosses the boundary: a task hypothesis says which task is
         being executed now, not what the agent is disposed to do next, and
         there is no representation here for the latter.
@@ -494,6 +530,7 @@ class IntentionRecognizer:
         self._evidence = dict(self._base)
         for key in self._origin:
             self._origin[key], self._origin_odo[key], self._origin_still[key] = pos, odo, still
+            self._entry_latency[key] = self._action_completion_latency + self._observed_task_completion_latency
 
     def _build_admissible(
         self,
@@ -580,15 +617,20 @@ class IntentionRecognizer:
           3. if the observed microaction is in the vocabulary of the action the
              hypothesis expected on the previous tick, that action's completion
              check multiplies onto its evidence (an event);
-          4. if the expected action changed, fold the closing action's final
-             excess-path value L into the evidence once (nothing, if its
-             stretch was empty) and move the origin (position, odometer and
+          4. if the expected action changed, fold the closing phase's final
+             value L(v·D) into the evidence once (1, if its delay was not
+             positive) and move the origin (position, odometer and
              standing-clock readings) to the agent's (a phase advance — or
-             regress; both are derived facts);
-          5. the open action's excess-path value from the origin multiplies on
-             top of the evidence for this tick only (replaced next tick) — or
-             no factor at all if the stretch is empty (nothing walked since
-             the origin: not an observation).
+             regress; both are derived facts). A phase entered from the
+             completion of the previous expected action (its completion
+             predicate holds now) is priced the action latency beside its own
+             standing (T-D E9), and the completing hypothesis is a member of
+             the adequacy test with S = 1 on this tick (E8);
+          5. the open phase's value L(v·D), D its projected completion delay
+             from the origin (T-D E10), multiplies on top of the evidence for
+             this tick only (replaced next tick): 1 while D <= 0 (nothing
+             walked and no standing beyond the priced standing — not a
+             charge).
         Then normalize over the live hypothesis set H (T-D R1, R6). If a
         retirement this tick was the observed agent's own (step 2, terminal
         action expected on the previous tick), the episode ends: the belief
@@ -624,6 +666,8 @@ class IntentionRecognizer:
 
         unnorm: Dict[str, float] = {}
         boundary = False
+        # The hypotheses whose expected action completed on this tick (E8).
+        advanced: Set[str] = set()
         for hyp in self._hypotheses:
             key = repr(hyp)
             if key in self._inadmissible or key in self._completed:
@@ -638,6 +682,7 @@ class IntentionRecognizer:
                 self._origin.pop(key, None)
                 self._origin_odo.pop(key, None)
                 self._origin_still.pop(key, None)
+                self._entry_latency.pop(key, None)
                 logging.info("[IR-complete] step=%d %s completed: %s holds",
                              int(obs.timestamp), key, actions[-1].completion_predicate)
                 continue
@@ -645,9 +690,11 @@ class IntentionRecognizer:
 
             if key not in self._expected:
                 # First observation of this hypothesis: it enters its current
-                # action here. Its stretch is empty: no observation, no factor.
+                # action here, from no completion (E9: nothing priced before
+                # its own standing). Its phase is empty: D <= 0, no charge.
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
                 self._origin_still[key] = still
+                self._entry_latency[key] = 0.0
                 unnorm[key] = self._base[key]
                 continue
 
@@ -655,25 +702,25 @@ class IntentionRecognizer:
             if previous is not None and self._in_vocabulary(previous, mu):
                 self._base[key] *= self._completion_likelihood(previous, world, memo)
             if not self._same_action(previous, current):
-                # The closing stretch's final value folds into the evidence
-                # once — nothing folds if the stretch was empty. The new
-                # action's stretch begins here, empty: no factor this tick
-                # unless the action has no graded signal (then, as on every
-                # tick, the perfect-fit value: nothing to charge).
-                closing = self._progress_likelihood(
-                    previous, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
-                if closing is not None:
-                    # The stretch was one observation: its likelihood folds
-                    # into the evidence once.
-                    self._base[key] *= closing
+                # The closing phase was one observation: its final value
+                # L(v·D) folds into the evidence once (1 if its delay was not
+                # positive). The new phase begins here, empty.
+                self._base[key] *= self._phase_likelihood(key, previous, pos, odo, still, world, memo)
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
                 self._origin_still[key] = still
-                value = self._progress_likelihood(current, pos, 0.0, pos, world, memo)
-            else:
-                value = self._progress_likelihood(
-                    current, self._origin[key], odo - self._origin_odo[key], pos, world, memo)
-            # The open observation, if there is one.
-            unnorm[key] = self._base[key] if value is None else self._base[key] * value
+                # Entered from a completion — the previous expected action's
+                # completion predicate holds now — the phase is priced the
+                # action latency the Projector charges after that action (E9),
+                # and the completing hypothesis is a member of the adequacy
+                # test with S = 1 on this tick (E8). A regress, or a method
+                # flip that completed nothing, prices none.
+                completed = (previous is not None and previous.completion_predicate is not None
+                             and previous.completion_predicate in world.predicates)
+                self._entry_latency[key] = self._action_completion_latency if completed else 0.0
+                if completed:
+                    advanced.add(key)
+            # The open phase's value (E10): 1 while its delay is not positive.
+            unnorm[key] = self._base[key] * self._phase_likelihood(key, current, pos, odo, still, world, memo)
 
         # One normalization, at the task layer, over the live hypothesis set H
         # (T-D R1): the keys of unnorm are exactly H. The bases are rescaled by the same total so they stay in one scale
@@ -690,6 +737,9 @@ class IntentionRecognizer:
             # tick already reports it (the ended episode's closing values are
             # not a belief the model holds any more).
             self._begin_episode(pos, odo, still)
+            # The boundary is unchanged by E8: the hypotheses entering the new
+            # episode hold no observation on this tick.
+            advanced = set()
             logging.info("[IR-boundary] step=%d %s completed a task: belief re-initialised to the "
                          "prior over %d hypotheses, origins reset",
                          int(obs.timestamp), agent, len(self._origin))
@@ -705,7 +755,7 @@ class IntentionRecognizer:
             # Exhausted: the belief over H has no members; the pins are the
             # output convention, not belief mass (T-D R4).
             most_likely, confidence = None, 0.0
-        finding, lifecycle, tails = self._adequacy(pos, odo, still, world)
+        finding, lifecycle, tails, hypothesis_adequacy = self._adequacy(pos, odo, still, world, advanced, memo)
 
         return BeliefState(
             timestamp=obs.timestamp,
@@ -716,10 +766,11 @@ class IntentionRecognizer:
             finding=finding,
             lifecycle=lifecycle,
             tails=tails,
+            hypothesis_adequacy=hypothesis_adequacy,
         )
 
     # -------------------------------------------------------------------------
-    # Adequacy (T-D E1 to E7)
+    # Adequacy (T-D E1 to E7, E8, G1)
     # -------------------------------------------------------------------------
 
     def _adequacy(
@@ -728,35 +779,47 @@ class IntentionRecognizer:
         odo: float,
         still: int,
         world: WorldState,
-    ) -> Tuple[Optional[AdequacyFinding], RecognizerLifecycle, Dict[str, float]]:
+        advanced: Set[str],
+        memo: Dict[tuple, float],
+    ) -> Tuple[Optional[AdequacyFinding], RecognizerLifecycle, Dict[str, float],
+               Dict[str, HypothesisAdequacy]]:
         """
-        The adequacy finding, the lifecycle state and the members' tail
-        probabilities, read from scratch from the phase state after this
-        tick's update (and boundary): no memory beyond each live hypothesis's
-        current derived phase (E7).
+        The adequacy finding, the lifecycle state, the members' tail
+        probabilities and every live hypothesis's hypothesis adequacy, read
+        from scratch from the phase state after this tick's update (and
+        boundary): no memory beyond each live hypothesis's current derived
+        phase (E7).
 
-        H empty: EXHAUSTED, no finding, no tails (R4). Otherwise, per live
-        hypothesis in hypothesis order: a MEMBER iff it has a derived phase
-        this tick (an expected action) and that phase holds an observation —
-        walked path since its origin, standing beyond the priced standing
-        s_exp, or a stationary tick within s_exp in a stationary phase
-        (E6, amended 27 Sept 2026: then D <= 0 and S = 1). A member's projected completion delay
-            D = e/v + (s − s_exp)
-        and its tail S = tail_probability(v·D, beta) (E2, E5). Unresolved iff
-        there is no member; unexplained iff every member has S < alpha (E4);
-        adequate otherwise. A non-member contributes no S.
+        H empty: EXHAUSTED, no finding, no tails, no hypothesis adequacy (R4).
+        Otherwise, per live hypothesis in hypothesis order: a MEMBER iff it has
+        a derived phase this tick (an expected action) and that phase holds an
+        observation (E6 as amended, the complete membership rule) — walked
+        path since its origin, standing beyond the priced standing s_exp, or a
+        stationary tick within s_exp in a stationary phase (then D <= 0 and
+        S = 1) — or its expected action completed on this tick (`advanced`,
+        E8: a member with S = 1, whatever phase it advanced into; empty on a
+        boundary tick). A member's tail S = tail_probability(v·D, beta) (E2,
+        E5). Unresolved iff there is no member; unexplained iff every member
+        has S < alpha (E4); adequate otherwise. A non-member contributes no S.
+        Hypothesis adequacy (G1): ADEQUATE for a member with S >= alpha,
+        INADEQUATE for a member with S < alpha, NO_OBSERVATION for a
+        non-member; the finding is adequate exactly when some live
+        hypothesis's is ADEQUATE.
         """
         live = [repr(h) for h in self._hypotheses if repr(h) in self._evidence]
         if not live:
-            return None, RecognizerLifecycle.EXHAUSTED, {}
+            return None, RecognizerLifecycle.EXHAUSTED, {}, {}
         tails: Dict[str, float] = {}
         for key in live:
             action = self._expected.get(key)
             if action is None:
                 continue                    # no derived phase this tick
+            if key in advanced:
+                tails[key] = 1.0            # the completion is an observation consistent with it (E8)
+                continue
             walked = odo - self._origin_odo[key]
             s = still - self._origin_still[key]
-            s_exp = self._priced_standing(action)
+            s_exp = self._priced_standing(key, action)
             # A stationary phase (no movement target: pick_up, place, wait_at)
             # is derived only at its location; a stationary tick in it within
             # the priced duration is an observation with D <= 0 (E6, amended
@@ -765,26 +828,99 @@ class IntentionRecognizer:
             stationary_phase = action.schema.movement_target_key is None
             if not (walked > 0.0 or s > s_exp or (stationary_phase and s <= s_exp)):
                 continue                    # the phase holds no observation
-            e = self._excess(action, self._origin[key], walked, pos, world)
-            delay = e / self._speed + (s - s_exp)
-            tails[key] = likelihood_functions.tail_probability(self._speed * delay, self._beta)
+            tails[key] = likelihood_functions.tail_probability(
+                self._delay_length(key, action, pos, odo, still, world, memo), self._beta)
+        hypothesis_adequacy = {
+            key: (HypothesisAdequacy.NO_OBSERVATION if key not in tails
+                  else HypothesisAdequacy.INADEQUATE if tails[key] < self._alpha
+                  else HypothesisAdequacy.ADEQUATE)
+            for key in live
+        }
         if not tails:
             finding = AdequacyFinding.UNRESOLVED
         elif all(v < self._alpha for v in tails.values()):
             finding = AdequacyFinding.UNEXPLAINED
         else:
             finding = AdequacyFinding.ADEQUATE
-        return finding, RecognizerLifecycle.LIVE, tails
+        return finding, RecognizerLifecycle.LIVE, tails, hypothesis_adequacy
 
-    def _priced_standing(self, action: GroundedAction) -> float:
+    # -------------------------------------------------------------------------
+    # The phase's projected completion delay D (T-D E2, E9, E10)
+    # -------------------------------------------------------------------------
+
+    def _phase_likelihood(
+        self,
+        key: str,
+        action: Optional[GroundedAction],
+        pos: Tuple[float, float],
+        odo: float,
+        still: int,
+        world: WorldState,
+        memo: Dict[tuple, float],
+    ) -> float:
         """
-        s_exp: the standing, in ticks, the Projector prices for `action`'s
-        phase (E2), by the Projector's own rule so that adequacy and
-        projection read one source: 0 for a walk (the schema names a movement
+        The belief's evidence for `key`'s phase of `action`, from its origin
+        (T-D E10): L(v·D), 1 for v·D <= 0 (likelihood_functions.
+        delay_likelihood). For a walk with no standing beyond its priced
+        standing v·D is the excess and this is the excess-path likelihood;
+        standing beyond it is charged as excess path is; standing within it
+        is no charge (I4c narrowed). No expected action (not decomposable
+        here): the perfect-fit value, nothing to charge.
+        """
+        if action is None:
+            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
+        return likelihood_functions.delay_likelihood(
+            self._delay_length(key, action, pos, odo, still, world, memo), self._beta)
+
+    def _delay_length(
+        self,
+        key: str,
+        action: GroundedAction,
+        pos: Tuple[float, float],
+        odo: float,
+        still: int,
+        world: WorldState,
+        memo: Dict[tuple, float],
+    ) -> float:
+        """
+        v·D, the projected completion delay of `key`'s phase of `action` in
+        the body's length units (E2):
+            v·D = e + v·(s − s_exp)
+        e the excess path from the origin (_excess), s the ticks without
+        movement since the origin, s_exp the priced standing of the phase
+        (_priced_standing). The one statistic the belief (L, E10) and the
+        adequacy test (S, E5) read. Non-decreasing within a phase for a
+        static target.
+        """
+        walked = odo - self._origin_odo[key]
+        s = still - self._origin_still[key]
+        e = self._excess(action, self._origin[key], walked, pos, world, memo)
+        return e + self._speed * (s - self._priced_standing(key, action))
+
+    def _priced_standing(self, key: str, action: GroundedAction) -> float:
+        """
+        s_exp: the Projector's priced stationary ticks that fall within
+        `key`'s current phase of `action` (T-D E9), from the Projector's own
+        sequence — per action its own segment, then the action latency:
+        the latency priced after the completion that opened the phase
+        (_entry_latency: the action latency when entered from a completion,
+        with the observed agent's task latency at a boundary; 0 for the
+        phase first observed, and after a regress), plus the action's own
+        stationary duration (_action_duration). In kitting: 2 for pick_up and
+        place after their walk, 1 for a walk entered from a completion, 0
+        for the initial walk.
+        """
+        return self._entry_latency[key] + self._action_duration(action)
+
+    def _action_duration(self, action: GroundedAction) -> float:
+        """
+        The stationary ticks the Projector prices for `action`'s own segment,
+        by its own rule and source: 0 for a walk (the schema names a movement
         target: priced by distance, not by standing); the bound duration,
-        through the body's duration_to_steps, when the schema names a duration
-        binding (wait_at); otherwise the task model's cost for the action, and
-        failing that the body's default_action_cost (pick_up, place).
+        through the body's duration_to_steps, when the schema names a
+        duration binding (wait_at); otherwise the task model's cost for the
+        action, and failing that the body's default_action_cost (pick_up,
+        place).
         """
         schema = action.schema
         if schema.movement_target_key is not None:
@@ -803,21 +939,36 @@ class IntentionRecognizer:
         walked: float,
         pos: Tuple[float, float],
         world: WorldState,
+        memo: Dict[tuple, float],
     ) -> float:
         """
-        e: the excess path from the origin exactly as the movement likelihood
-        computes it (likelihood_functions.EXCESS_MEASURES, under the name the
-        schema's progress_evaluator gives the likelihood). 0 for a phase the
-        likelihood charges no excess in: no evaluator (pick_up, place,
-        wait_at) or no resolvable target.
+        e: the excess path from `origin` under `action`
+        (likelihood_functions.EXCESS_MEASURES, under the name the schema's
+        progress_evaluator gives): the distance `walked` since the origin plus
+        the remaining cost to the action's target (its current position,
+        shared/target_resolution.py, the lookup the projector uses) minus the
+        direct cost from the origin, with the injected path cost. Measured
+        FROM THE ORIGIN, not tick to tick: a τ-walker would have gone straight
+        from where it began, and a passed target must not re-import
+        accumulation one step at a time. 0 for a phase with no excess to
+        charge: no evaluator (pick_up, place, wait_at), no resolvable target,
+        or nothing walked since the origin (then the agent is at the origin).
+        Memoised by (evaluator, origin, walked, target position): two
+        hypotheses whose expected actions head for the same place from the
+        same origin at the same odometer reading — two items on one shelf —
+        share one value.
         """
         name = action.schema.progress_evaluator
         if name is None:
             return 0.0
         target_pos = movement_target_position(action, world)
-        if target_pos is None:
+        if target_pos is None or walked <= 0.0:
             return 0.0
-        return likelihood_functions.EXCESS_MEASURES[name](walked, origin, pos, target_pos, self._path_cost)
+        memo_key = ("excess", name, origin, walked, target_pos)
+        if memo_key not in memo:
+            memo[memo_key] = likelihood_functions.EXCESS_MEASURES[name](
+                walked, origin, pos, target_pos, self._path_cost)
+        return memo[memo_key]
 
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
@@ -957,54 +1108,6 @@ class IntentionRecognizer:
             memo[key] = likelihood_functions.completion_predicate_likelihood(
                 predicate, frozenset(world.predicates)
             )
-        return memo[key]
-
-    def _progress_likelihood(
-        self,
-        action: Optional[GroundedAction],
-        origin: Tuple[float, float],
-        walked: float,
-        pos: Tuple[float, float],
-        world: WorldState,
-        memo: Dict[tuple, float],
-    ) -> Optional[float]:
-        """
-        Progress channel: delegate to the evaluator named by
-        action.schema.progress_evaluator with the distance `walked` since
-        `origin` (where the hypothesis entered this action), the agent's
-        position, the target's current position (shared/target_resolution.py,
-        the lookup the projector uses) and the injected path cost. The excess
-        is measured FROM THE ORIGIN, not tick to tick: a τ-walker would have
-        gone straight from where it began, and a passed target must not
-        re-import accumulation one step at a time.
-
-        None when the stretch is EMPTY — nothing walked since the origin. An
-        empty stretch is not an observation: it is not a perfectly efficient
-        walk (zero excess), it is no walk, and the channel has nothing to say.
-        The caller applies no factor for it. (Stationarity as evidence AGAINST
-        an action that predicts movement would be a different observation
-        channel; it is not this one.)
-
-        The perfect-fit value when there is no action, no evaluator (pick_up,
-        place, wait_at: no graded in-progress signal) or no resolvable target.
-        Memoised by (evaluator, origin, walked, target position): two
-        hypotheses whose expected actions head for the same place from the
-        same origin at the same odometer reading — two items on one shelf —
-        share one value; two that share a position but not the reading do not.
-        """
-        if action is None:
-            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
-        evaluator = likelihood_functions.PROGRESS_EVALUATORS.get(action.schema.progress_evaluator)
-        if evaluator is None:
-            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
-        target_pos = movement_target_position(action, world)
-        if target_pos is None:
-            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
-        if walked <= 0.0:
-            return None
-        key = ("progress", action.schema.progress_evaluator, origin, walked, target_pos)
-        if key not in memo:
-            memo[key] = evaluator(walked, origin, pos, target_pos, self._path_cost, self._beta)
         return memo[key]
 
     def _grounded_actions(

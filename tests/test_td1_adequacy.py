@@ -51,7 +51,8 @@ def recognizer(m, hypotheses, alpha=0.05, assigned_tasks=None):
     return IntentionRecognizer(
         task_model=robot.recognizer.task_model, context=ContextKnowledge.default(), hypotheses=hypotheses,
         beta=BETA, speed=SPEED, duration_to_steps=lambda d: _parse_duration_to_steps(d, m),
-        default_action_cost=1.0, alpha=alpha, assigned_tasks=assigned_tasks)
+        default_action_cost=1.0, action_completion_latency=1.0, observed_task_completion_latency=0.0,
+        alpha=alpha, assigned_tasks=assigned_tasks)
 
 
 def pred(name, *args):
@@ -184,7 +185,7 @@ def test_a_stand_in_a_move_to_phase_is_charged_17_ticks(model):
             assert b.finding is expected, (alpha, s)
             assert math.isclose(b.tails[repr(item("item_3"))],
                                 likelihood_functions.tail_probability(SPEED * s, BETA))
-            assert b.confidence == 1.0                # time enters adequacy only (E3)
+            assert b.confidence == 1.0                # a lone live hypothesis: 1 by normalisation, whatever it pays (R1)
 
 
 def test_a_walk_straight_away_is_charged_twice_its_length(model):
