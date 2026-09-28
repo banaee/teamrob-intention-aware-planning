@@ -482,7 +482,8 @@ def test_world_state_and_observation_expose_nothing_of_the_stack():
                                                     "predicates", "object_zones", "object_home_container",
                                                     "object_destination", "object_positions", "metadata",
                                                     # T-D P: the room, and the robot's own perception of motion
-                                                    "fixed_object_positions", "workspace", "agent_displacements"}
+                                                    "fixed_object_positions", "workspace", "agent_displacements",
+                                                    "agent_run_lengths", "agent_standing_counts"}
     assert world.agent_states[H].metadata == {} and world.metadata == {}
 
 
