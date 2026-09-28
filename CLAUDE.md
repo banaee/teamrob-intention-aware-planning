@@ -171,6 +171,10 @@ Decisions
   (standing, or a straight continuation to the wall or the first fixed object) over each candidate's span; a
   candidate whose violation is cleared only by the projection's end is refused, and with none eligible the robot
   waits without a task (16 of the 48 baselines end waiting at an occupied target, X). P3 is open. Next is G.
+  P4 (persistence, ruled 28 Sept 2026; design_decisions.md, "T-D P", P4 and Q6) reopens P: the fallback projects the
+  observed persistence only (a straight run of k ticks projects k ticks, a stand of k ticks k ticks), the refusal and
+  the wait are dropped, and a third trigger, `projection_expired`, re-decides when the fallback a decision rested on
+  runs out.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
@@ -434,9 +438,11 @@ across that commit without it.
   called a sequence.
 - Triggers: `no_current_task`; `recognition_changed` (the belief no longer points at the
   hypothesis the last decision projected, or first clears the gate on one; replaced
-  `theta_crossed` in D2, which older reports and logs still name). Two, and only two (D3):
-  `task_committed` (the robot's own grasp) is not a trigger; older reports and logs still name it.
-  Decision record: the projected hypothesis, one field.
+  `theta_crossed` in D2, which older reports and logs still name); `projection_expired` (T-D P4 / Q6: the fallback
+  projection the last decision rested on has reached its end; after `recognition_changed`, through B2). Three since
+  P4 (two, and only two, from D3): `task_committed` (the robot's own grasp) is not a trigger; older reports and logs
+  still name it. Decision record: the projected hypothesis, and since P4 the tick at which the fallback it rested on
+  expires.
 - Plan names (`docs/roadmap.md`, "The plan from T-A"): T-A records (T-A1 the pipeline revision);
   T-B B3.B on two tables (B1 fixtures, B2 build, B3 evaluation); T-C the human action script (C1
   design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case); T-E

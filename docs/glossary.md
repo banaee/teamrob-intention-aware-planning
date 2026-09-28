@@ -132,19 +132,25 @@ AMENDED (T-D P, 28 September 2026): when admission refuses and a human is observ
 takes its place.
 
 **fallback projection** — the short-term physical projection of T-D P, built when admission refuses and a human is
-observed: where to expect the human during this candidate's realization, from what was observed, claiming nothing
-about intention. One mechanism, two cases, from the human's last observed displacement (one tick,
-`WorldState.agent_displacements`; absent before a second observation, read as standing): STANDING, the human
-stationary at the observed position; MOVING, a straight continuation along the last displacement at the observed step
-length until the ray meets the workspace boundary or enters the arrival radius of the first fixed object along it,
-then stationary there. Over [observation offset, the candidate's end], built per candidate (under `full_reorder` per
-ordering), rebuilt at every decision. Nothing is admitted, so the decision record stays empty. Under it a candidate
-is REFUSED iff its violation is cleared only by the end of the projection (a stationary segment ending, or the moving
-segment cut by the horizon); a violation cleared by the projected motion within the horizon is priced as a hold (F1).
-With none eligible the robot waits without a task. Logged `[meta-proj] … projection=fallback refused=<reason>`.
-AMENDED (P Q2, 28 September 2026): the first form was stationary only; superseded.
-→ `docs/design_decisions.md`, "T-D P: the fallback projection"; `shared/projection.py`, `FallbackProjection`;
-`shared/io_contracts.md` §2.2.
+observed: where to expect the human, from what was observed and for as long as it was observed, claiming nothing
+about intention (P4). From the robot's perception facts (`WorldState.agent_displacements`, `agent_run_lengths`,
+`agent_standing_counts`): MOVING, the last displacement continued for as many ticks as the current straight run has
+lasted, ended earlier where the ray meets the workspace boundary or enters the first fixed object's arrival radius,
+with no stand after it; STANDING, a stand at the observed position for as many ticks as the human has stood; no
+previous observation, no fallback. From the observation offset; one per decision, the same for every candidate.
+Beyond it the human is unassessed. `realize()` prices it as any projection (F1: a finite hold or none). Nothing is
+admitted, so the recorded hypothesis stays empty; its end (T_h) is recorded, and reaching it fires
+`projection_expired`. Logged `[meta-proj] … projection=fallback refused=<reason>`.
+AMENDED (P4, 28 September 2026): the tail to the wall, the stand for the candidate's whole span, the refusal (rule 5)
+and the wait of the earlier forms are superseded.
+→ `docs/design_decisions.md`, "T-D P: the fallback projection" (P4, Q6); `shared/projection.py`,
+`Projector.project_fallback()`; `shared/io_contracts.md` §2.2.
+
+**run length** / **standing count** — the robot's perception facts of an observed agent's motion (T-D P4): the
+number of consecutive ticks of the current straight run (unit directions equal within 1e-9, the body's numerical
+resolution; a turn sets it to 1, a stop to 0), and of consecutive zero displacements (a step resets it). Written by
+`RobotAgent` from its consecutive observations, beside the last displacement; a bounded memory, not a history.
+→ `shared/types.py`, `WorldState`; `mesa_sim/sim_agents.py`, `RobotAgent._perceive()`.
 
 **occupied target** — X's case (proposed as a term, T-D P-build, 28 September 2026): with nothing realizable under
 the fallback, the robot waits because the human stands at the robot's target. What to do then is X's. ("Blocked
@@ -252,17 +258,23 @@ refusal that decides nothing.
 ## 4. Triggers and the decision record
 
 **trigger** — the condition on which `MetaPlanner.update()` re-decides: a change in what the last decision
-rested on, the human's hypothesis or the robot's task set. Two, and only two (D3):
+rested on, the human's hypothesis, the robot's task set, or the fallback projection it was realized against. Three
+since T-D P4 / Q6 (two, and only two, from D3 to P4):
 - `no_current_task` — there is nothing running.
 - `recognition_changed` — the belief no longer points at the hypothesis the last decision projected,
   or first clears the gate on one. Replaced `theta_crossed` at D2; older reports and logs still name
   `theta_crossed`.
+- `projection_expired` — the fallback projection the last decision rested on has reached its end (its T_h, where the
+  projection is truncated, not where its evidence would have taken it); after `recognition_changed` on a shared tick,
+  through B2. Scoped to fallbacks: an admitted projection's end is P3's question (T-D P, Q6).
 - `task_committed` — the ROBOT's own grasp, not the human's commitment. REMOVED BY D3: the grasp was in the
   plan the last decision priced. Older reports and logs still name it.
 → `shared/meta_planner.py`, `evaluate_triggers()`; `shared/io_contracts.md` §2.2.
 
 **decision record** — one field: the hypothesis the last fired trigger's decision was projected
 against. `recognition_changed` is read against it from both sides.
+AMENDED (T-D P4 / Q6, 28 September 2026): a second value, the tick at which the fallback projection the last decision
+rested on reaches its T_h, read by `projection_expired`; set when admission returns a fallback, cleared otherwise.
 → `shared/meta_planner.py`, `_projected_hypothesis`; `shared/io_contracts.md` §2.2.
 
 **retraction** — the meta-planner's act of withdrawing an admitted projection when the hypothesis the decision was

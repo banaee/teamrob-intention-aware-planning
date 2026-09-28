@@ -2429,6 +2429,9 @@ boundary (`BeliefState.episode_boundary`), whether or not most_likely changed; a
 adequacy is inadequate (retraction). Both fire `recognition_changed`; admission is re-asked and, the leader having no
 observation on a boundary tick or being inadequate, refuses, so the record clears. A dip below θ still fires nothing.
 The `[meta-trig]` line names the condition (`cause=`). design_decisions.md, "T-D L: the belief lifecycle", L2, L5.
+SUPERSEDED IN PART (T-D P4 / Q6, 28 September 2026): the decision record holds a second value, the tick at which the
+fallback projection the last decision rested on reaches its T_h (`projection_expired`); the projected hypothesis stays
+the one value `recognition_changed` reads.
 SUPERSEDED IN PART (T-D P, ruled 28 September 2026): a refusal no longer means "no human plan" when a human is
 observed; the decision then realizes against the fallback projection, and the decision record stays empty as before
 (nothing is admitted). The trigger set and the record are unchanged. design_decisions.md, "T-D P: the fallback
@@ -3507,6 +3510,9 @@ wait" (R1); shared/io_contracts.md §6 invariant 12
 
 
 **D3: `task_committed` is not a trigger**
+SUPERSEDED IN PART (T-D P4 / Q6, ruled 28 September 2026): the trigger set gains a third, `projection_expired`, the
+expiry of the fallback projection the last decision rested on; order on a shared tick `no_current_task`,
+`recognition_changed`, `projection_expired`. design_decisions.md, "T-D P", Q6.
 RULED (cchat, September 2026). A TRIGGER IS A CHANGE IN WHAT THE LAST DECISION RESTED ON: the human's hypothesis
 (`recognition_changed`, against the decision record) or the robot's task set (`no_current_task`). The robot's own
 grasp is neither: it was in the plan the last decision priced, which projected the `pick_up` and everything after
@@ -4748,6 +4754,11 @@ it moved last".
   Boundary condition: no human observed means no fallback (no position to build it from).
   Set aside: no fallback (before P); a fixed horizon (a constant); the recognizer's standing scale (α is a test level,
   not a horizon); the fallback's hold priced as a cost (the table); iterating the horizon until the shifts settle.
+  SUPERSEDED IN PART BY P4 (28 September 2026): the horizon (the candidate's own T_r) and the refusal rule (rule 5) are
+  gone; the fallback's span is the evidence's (P4), every candidate realizes with a finite hold or none as under F1, and
+  nothing is refused. The wait goes with the refusal. What stands of P1: a fallback where admission refuses and a human
+  is observed, the record left empty, `realize()` unchanged, and the table as the measurement that showed a stand
+  assumed for the candidate's whole span prices nothing the robot has evidence for.
 
 - P2, the shape: one mechanism, two cases (P Q2, reopened and ruled 28 September 2026; supersedes the first P2, "the
   fallback does not extrapolate motion").
@@ -4764,6 +4775,9 @@ it moved last".
   acknowledgement tick reads as standing for a decision on that tick.
   Set aside: a window of x ticks; a fitted velocity; the tail through objects to the wall; the tail stopping at a
   footprint; no fallback for a moving human (the first P2); constant-velocity extrapolation without a stop.
+  SUPERSEDED IN PART BY P4 (28 September 2026): the tail's persistence (a line to the wall from one step, a stand for
+  the candidate's whole span from one standing tick) is replaced by the observed one; the stop at the boundary or the
+  first fixed object's arrival radius stands, with no stand after it.
 
 Mechanics ruled.
 - The fallback is a `ProjectedPlan` per candidate; `realize()` is unchanged; the decision record stays empty under a
@@ -4779,13 +4793,17 @@ Mechanics ruled.
 - The workspace and the fixed objects are static facts of the layout, filled by the builder:
   `WorldState.workspace` (the rectangle) and `WorldState.fixed_object_positions`. "Enters the arrival radius" uses
   `Projector.arrival_radius`, the body's radius a projected walk already stops at (T9).
-- The wait, a mechanical consequence of P1: a planner outcome, not a terminal state. `update()` returns no current task
+- SUPERSEDED BY P4 (28 September 2026), with rule 5 that produced it: the wait, the body's wait branch and the
+  executor's owed-ticks handling for it are removed as unreachable; the terminal test is again "no current task".
+  As first ruled: the wait, a mechanical consequence of P1: a planner outcome, not a terminal state. `update()` returns no current task
   with the whole pool as the queue; the terminal return is no current task AND an empty queue, and the body tests both.
   The body executes the wait by running no plan that tick. Completion ticks the body already owes (T-B Q7) are kept:
   the wait carries them as a hold carries them (the robot standing where the decision found it), and what a wait does
   not spend passes to the next plan loaded.
 - `UpdateResult.horizon` carries the winner's assessed horizon (its `RealizedPlan.horizon`) to the body, which passes
   it to `set_assessed_window` and derives nothing.
+- SUPERSEDED IN PART BY P4: the `HumanProjection` types are removed (their reason was the per-candidate span and the
+  refusal); the human projection is again `Optional[ProjectedPlan]`.
 - Confirmed at the P plan step: the types (`HumanProjection`: `AdmittedProjection`, `FallbackProjection`);
   `ProjectedPlanEntry.abstract_plan` Optional, None only for the fallback's entry; "a human observed" = a
   `human_agent_id` and a position for it in the world; unprojectable → the fallback, the record empty; the logs
@@ -4807,6 +4825,53 @@ Consequence of ruling 3 (the candidate's own horizon), recorded: a fallback can 
 while the human walks, and the robot then waits by polling until the tail frees one. scenario_s05_01 under
 `full_reorder` waits 23 ticks from tick 0 in both priors (every ordering refused under the human's moving tail). It is
 evidence for G's staleness question (TODO-132), not a defect of P.
+
+P4, PERSISTENCE (P reopened on design grounds, ruled by Hadi, 28 September 2026; supersedes P2's tail rule, P1's
+stand-for-the-candidate horizon, and rule 5).
+Why. P2's tail projected persistence the robot has no evidence for: one observed step became a line to the wall, one
+standing tick a stand for the candidate's whole duration, and P's refusal rule then had to reject candidates against
+those stands. Measured on the P-build baselines: 16 end in a wait at an occupied table; scenario_s05_01 `full_reorder`
+waits 23 ticks from tick 0 because a first step was projected to cross every ordering. P4 replaces the assumed
+persistence by the observed one.
+Ruling.
+- Perception facts. The robot's world model keeps, per observed agent, the last position, the last displacement, the
+  length of the current straight run (consecutive steps in the same direction; a turn or a stop resets it) and the
+  current standing count (consecutive zero displacements; a step resets it). Computed on `RobotAgent` from consecutive
+  observations, as the displacement is, and written into the WorldState it builds (`agent_positions`,
+  `agent_displacements`, `agent_run_lengths`, `agent_standing_counts`); a bounded memory of four numbers, not a
+  history. "Same direction": the unit directions agree within 1e-9, the body's numerical resolution, not a margin
+  (objection 1 at the P4 plan step: under exact equality Mesa's own arithmetic, which recomputes each step's direction
+  toward the target, broke 83, 44 and 92 runs in s01_06, s05_01 and s01_01 by rounding under 1e-9 and none by a turn,
+  so nearly every run read 1; within 1e-9 the runs are the scripted walks, their largest deviation 8.7e-15). Sensor
+  noise is the body's matter.
+- Moving human: the current straight motion along the last displacement for as long as the human has maintained it (a
+  run of k ticks projects k ticks). If the ray meets the workspace boundary or enters the first fixed object's arrival
+  radius before those k ticks, the projected motion ends there; no stand is inferred. Beyond the projection the human
+  is unassessed.
+- Standing human: standing at the observed position for as long as the human has already stood (a count of k projects
+  k ticks). Beyond that, unassessed.
+- No previous observation: no projection (P1's initialisation convention superseded by "unassessed").
+- Realization: `realize()` unchanged; every candidate gets a finite hold or none; rule 5 is dropped, since a hold that
+  ends where an evidence-based projection ends is meaningful ("as long as observed"). The refused / eligible partition,
+  the wait and the body's wait branch go, nothing producing them; the executor's owed-ticks handling for the wait goes
+  with it (reachable only from a wait).
+- Admitted projections are unchanged by P4; P3 stays open.
+Set aside: P2 as built (its persistence has no evidence); a bound derived elsewhere; a cone.
+Known error, recorded: little evidence protects little (a human one step into a walk across the robot's route is
+projected 20 cm); the body's stop and X's blocked event cover the residual, as before.
+
+Q6, THE EXPIRY TRIGGER (ruled by Hadi, 28 September 2026). The expiry of the assessed span of the fallback projection
+the current decision rested on is a trigger: `projection_expired`, a trigger of its own (nothing in the recognition
+changes; what ran out is the projection the decision rested on), after `recognition_changed` on a shared tick, and
+through B2 as `recognition_changed` is. The assessed span ends at the projection's truncation, not at the evidence
+horizon: the fallback's T_h. Its record, beside the projected hypothesis: the tick at which the fallback the last
+decision rested on reaches its T_h, set when admission returns a fallback, cleared otherwise. Scoped to fallbacks: an
+admitted projection's expiry is P3's question. Q5 follows: no wait state; the robot chooses, holds if the realization
+says so, and reconsiders when the projection it planned against runs out. What happens when a human keeps standing
+follows from the evidence growing between reconsiderations; nothing encodes it.
+Why a trigger: a decision taken against an evidence-bounded projection rests on nothing once the projection ends; the
+robot's next decision needs the evidence the human has produced since.
+Supersedes D3's "two, and only two" triggers (a third) and D2's "one field" decision record (a second value).
 
 P3, OPEN (recorded, not built): what the meta-planner projects when an admitted projection reaches its horizon. Case:
 scenario_s05_01 prior on, tick 92: an admitted projection with T_h = 4.00 and δ = 0; the robot walks off the table past

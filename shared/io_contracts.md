@@ -202,6 +202,12 @@ class WorldState:
                                                                  # the robot's world model, written by the robot from
                                                                  # its consecutive observations, never by the builder;
                                                                  # ABSENT for an agent with no previous observation
+    agent_run_lengths: Dict[str, int] = {}                       # {agent_id: k}: ticks of the current straight run
+                                                                 # (unit directions equal within 1e-9, the body's
+                                                                 # numerical resolution; a turn sets 1, a stop 0) (P4)
+    agent_standing_counts: Dict[str, int] = {}                   # {agent_id: k}: consecutive zero displacements (P4)
+                                                                 # both perception facts as agent_displacements, and
+                                                                 # absent with it
     metadata: Dict[str, Any] = {}
 # (every `= {}` / `= set()` is a field(default_factory=...) in shared/types.py)
 
@@ -210,7 +216,8 @@ class Workspace:
     x_min: float; x_max: float; y_min: float; y_max: float
 ```
 WorldState is the robot's world model, not simulator state (T-D P): most of it is built from the simulator by the
-builder, and `agent_displacements` is the robot's own perception fact, added to it before the mind reads it.
+builder, and `agent_displacements`, `agent_run_lengths` and `agent_standing_counts` are the robot's own perception
+facts, added to it before the mind reads it (P4: a bounded memory on `RobotAgent`, not a history).
 
 **Positions: the scoped exception.** `agent_positions` and `object_positions` are read in `shared/`
 through one lookup, `shared/target_resolution.py`: `movement_target_position(action, world)` resolves a
@@ -408,17 +415,17 @@ class TriggerDecision:
 
 @dataclass
 class UpdateResult:
-    current_task: Optional[TaskInstance]   # None with an empty queue = all tasks complete; None with a
-                                           # non-empty queue = the wait (T-D P1; see §2.2, Update)
+    current_task: Optional[TaskInstance]   # None = all tasks complete (see §2.2, Update; the wait of
+                                           # T-D P1 is superseded by P4)
     queue: List[TaskInstance]
     hold: int = 0                          # the decision's hold δ, WHOLE ticks, at the robot's position
                                            # at the trigger tick (T4, T10) — see below. 0 when none was
                                            # placed (no human projection,
-                                           # cost_strategy "plain", the wait, the
+                                           # cost_strategy "plain", the
                                            # terminal return).
     horizon: Optional[float] = None        # the winner's assessed horizon, its RealizedPlan.horizon: T_h on
                                            # this decision's projection clock (T-D P). None when the decision
-                                           # was realized against no human plan, and for the wait and the
+                                           # was realized against no human plan, and for the
                                            # terminal return. The body passes it to its [stop] label and
                                            # derives nothing.
 ```
@@ -912,6 +919,11 @@ in what that decision rested on):
   refused decision realizes against the fallback projection; the retraction is unchanged). And (L5 B) `recognition_changed` also fires when a hypothesis is recorded
   and the belief was re-initialised at an episode boundary on this tick (`belief.episode_boundary`), whether or not
   most_likely changed: on a boundary tick no hypothesis is a member, so admission refuses and the record clears.
+- `projection_expired` (T-D P4 / Q6, 28 September 2026) — the fallback projection the last decision rested on has
+  reached its T_h (its truncation, not its evidence horizon): `MetaPlanner._fallback_expiry`, the tick
+  `world.timestamp` + T_h recorded when `update_human_projection()` returned a fallback (cleared otherwise), is reached
+  (`world.timestamp` ≥ it). Asked after `recognition_changed`; passes through B2 as `recognition_changed` does.
+  Scoped to fallbacks: an admitted projection's end is P3's question. Supersedes D3's "two, and only two".
 - `task_committed` — `executor_state.holding` transitions `None → not-None`. REMOVED BY D3 (September 2026);
   kept here as history. `ExecutorState.holding` stays, read by no trigger.
 
@@ -930,13 +942,12 @@ update(
     belief: BeliefState,
     world: WorldState,
     executor_state: ExecutorState,
-    human_projection: Optional[HumanProjection],
+    human_projection: Optional[ProjectedPlan],
 ) -> UpdateResult
 ```
 `human_projection` is required (no default): the result of `update_human_projection()` for
-this trigger, or `None`. A `HumanProjection` (T-D P, `shared/projection.py`) gives each candidate the human plan
-it is realized against (`for_candidate()`): the admitted `ProjectedPlan` for every candidate
-(`AdmittedProjection`), or the fallback projection built over the candidate's own span (`FallbackProjection`).
+this trigger, or `None`: the admitted projection or the fallback projection (T-D P4), one `ProjectedPlan` for every
+candidate.
 `current_task` competes as just another candidate — no special-case WAIT/RESELECT branch;
 continuation vs. reselection falls out of cost comparison across the full candidate set. Under
 the wait-decision revision that remains true with waiting added: a wait is a HOLD inside a
@@ -1014,7 +1025,10 @@ is inside B3; neither strategy commits to an order:
 
 The human's projection is built once per fired trigger by `update_human_projection()` (below)
 and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.
-AMENDED (T-D P, 28 September 2026): an admitted projection is the same `ProjectedPlan` for every candidate; a
+SUPERSEDED BY P4 (28 September 2026): the per-candidate fallback, the refusal (rule 5), the eligible / refused
+partition and its log additions, and the wait below are removed; the fallback projection is one `ProjectedPlan` from
+the evidence (design_decisions.md, "T-D P", P4), realized as any projection (F1: a finite hold or none). As first
+amended (T-D P, 28 September 2026): an admitted projection is the same `ProjectedPlan` for every candidate; a
 fallback projection is built per candidate over [observation offset, the candidate's end] (under `full_reorder`, the
 ordering's), from the observed position and the last displacement the call recorded (P2: standing, or a straight
 continuation stopped at the workspace boundary or the first fixed object's arrival radius, then stationary). Under a
@@ -1037,8 +1051,7 @@ a projection.
 
 **Terminal state:** `update()` returns `UpdateResult(current_task=None, queue=[])` when no
 candidates remain — all assigned tasks are complete. Callers check
-`result.current_task is None` and an empty `result.queue` (since T-D P: `current_task` None with a non-empty queue
-is the wait, above). Task exhaustion is never signalled by exception; "all tasks
+`result.current_task is None` (T-D P's wait, which needed an empty `result.queue` too, is superseded by P4). Task exhaustion is never signalled by exception; "all tasks
 done" is a fact `shared/` discovers about its own state, so it is returned through the
 contract rather than raised for the embodiment layer to catch and reinterpret.
 
@@ -1051,18 +1064,19 @@ so every candidate carries a realized cost and B3 needs no fallback: the T10 `al
 update_human_projection(
     belief: BeliefState,
     world: WorldState,
-) -> Optional[HumanProjection]
+) -> Optional[ProjectedPlan]
 ```
 Called once per fired trigger, between `evaluate_triggers()` and `update()`; the result is
 `update()`'s `human_projection` argument. Projection **admission** is decided here — a
 MetaPlanner policy, not a `Projector` one — then delegated to `Projector.project_human()`.
 
-AMENDED (T-D P, 28 September 2026). Returns an `AdmittedProjection` when admission builds a projection (the record
-set to `belief.most_likely`); in every refused case below with a human observed (the meta-planner has a
-`human_agent_id` and the world holds its position), the FALLBACK PROJECTION (`FallbackProjection`, built by
-`Projector.project_fallback()`: the observed position, the last displacement if observed, the observation offset,
-the workspace, the fixed objects and the arrival radius), the decision record left empty;
-`None` only when no human is observed. The refusals, checked in this order:
+AMENDED (T-D P, 28 September 2026; P4). Returns the admitted projection when admission builds one (the record set to
+`belief.most_likely`); in every refused case below with a human observed (the meta-planner has a `human_agent_id` and
+the world holds its position and its perception facts), the FALLBACK PROJECTION (`Projector.project_fallback()`, P4:
+the last displacement continued for the current run's length, cut at the workspace boundary or the first fixed
+object's arrival radius, or a stand for the standing count, from the observation offset), the recorded hypothesis
+left empty and its end recorded for `projection_expired`; `None` when no human is observed or it has no previous
+observation (unassessed). The refusals, checked in this order:
 
 - the belief does not clear the gate (`_clears_gate()`: `confidence < theta`, or the leader's hypothesis adequacy
   is not ADEQUATE, G1) — the projector is not called. The gate gates admission as it gates

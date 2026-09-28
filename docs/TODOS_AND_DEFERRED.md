@@ -3710,20 +3710,25 @@ WorldState is the robot's world model, not simulator state (T-D P). Today `Robot
 recognizer, the meta-planner and, since P, the human's previous observed position, from which it writes
 `WorldState.agent_displacements` each tick. The form to build: a robot-mind object in `shared/` owning the world model
 and the cognition components, the Mesa agent as its body. Its robot-internal record stays bounded to what components
-read (the previous position now; a standing count when G asks for it), never a growing history.
+read, never a growing history: since P4 (28 Sept 2026) four numbers per observed agent, the previous position, the
+previous unit direction, the run length and the standing count, from which `RobotAgent` writes
+`agent_displacements`, `agent_run_lengths` and `agent_standing_counts`.
 Files: mesa_sim/sim_agents.py (`RobotAgent`), shared/ (the new object)
 Reference: design_decisions.md, "T-D P: the fallback projection", mechanics
 
 **TODO-132: G's first questions after P (recorded, T-D P, 28 Sept 2026)** [OPEN; G]
 (a) The staleness of a fallback: the human stopped, turned or walked past what the fallback projected; what
 observation establishes it (a departure from the projected position by `min_separation` is one candidate, not a
-ruling, because `min_separation` is the body's safety constraint), and whether it is a trigger. (b) TODO-95's sustained
+ruling, because `min_separation` is the body's safety constraint), and whether it is a trigger. RULED IN PART by P4 /
+Q6 (28 Sept 2026): the fallback's own end is a trigger (`projection_expired`); a departure from it before its end is
+still G's. (b) TODO-95's sustained
 stand. (c) The no-decision on a reset tick (every boundary that meets a record clears the projection, L5 B). (d)
 Whether the wait's polling by `no_current_task` stands, or a staleness or reconsideration trigger replaces it (P1:
-provisional until G). (e) Whether the lone-hypothesis admission at b + 1 stands (TODO-119's G part).
+provisional until G). CLOSED by P4 / Q6: there is no wait; the robot reconsiders when the fallback it planned against
+runs out (`projection_expired`). (e) Whether the lone-hypothesis admission at b + 1 stands (TODO-119's G part).
 Evidence for (a) and (d), measured on the P-build baselines: a fallback can refuse every candidate while the human
 walks, a consequence of P's ruling 3 (the candidate's own horizon); scenario_s05_01 under `full_reorder` waits 23
-ticks from tick 0 in both priors. P3 (open, design_decisions.md, "T-D P"): what the meta-planner projects when an
+ticks from tick 0 in both priors (the ground for P4, which removes the refusal). P3 (open, design_decisions.md, "T-D P"): what the meta-planner projects when an
 admitted projection reaches its horizon, the open part being a projection ending at a non-terminal action
 (scenario_s05_01 prior on, tick 92: T_h 4.00, δ 0, `[sep]` 6.96 cm).
 Files: shared/meta_planner.py (`evaluate_triggers`, `_clears_gate`, `update_human_projection`)
