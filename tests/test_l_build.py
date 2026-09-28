@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
 from tests.test_td1_adequacy import H, check_r6, item, obs, pred, recognizer, world_with
 from tests.test_th1_tree import model_for, registered
 from shared.meta_planner import DEFAULT_THETA
+from shared.projection import FallbackProjection
 from shared.recognizer import build_hypothesis_space
 from shared.types import (
     ActionContext, AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, Observation,
@@ -243,8 +244,9 @@ def test_the_recorded_hypothesis_turning_inadequate_fires_a_retraction(recorded,
     d = mp.evaluate_triggers(b, w, ex)
     assert d.fired and d.reason == "recognition_changed" and d.cause is RecognitionChange.RETRACTION
     with caplog.at_level(logging.INFO):
-        assert mp.update_human_projection(b, w) is None
-    assert "projection=none(leader_inadequate)" in caplog.text
+        # re-derived by T-D P: the refusal with the human observed yields the fallback, the record still clears
+        assert isinstance(mp.update_human_projection(b, w), FallbackProjection)
+    assert "projection=fallback refused=none(leader_inadequate)" in caplog.text
     assert mp._projected_hypothesis is None
     # retracted once: nothing recorded, and the inadequate leader does not clear the gate
     assert not mp.evaluate_triggers(b, w, ex).fired
@@ -271,8 +273,9 @@ def test_a_boundary_fires_without_a_leader_change(recorded, caplog):
     d = mp.evaluate_triggers(b, w, ex)
     assert d.fired and d.cause is RecognitionChange.BOUNDARY
     with caplog.at_level(logging.INFO):
-        assert mp.update_human_projection(b, w) is None
-    assert "projection=none(leader_no_observation)" in caplog.text
+        # re-derived by T-D P: the refusal with the human observed yields the fallback, the record still clears
+        assert isinstance(mp.update_human_projection(b, w), FallbackProjection)
+    assert "projection=fallback refused=none(leader_no_observation)" in caplog.text
     assert mp._projected_hypothesis is None
 
 

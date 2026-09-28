@@ -480,7 +480,9 @@ def test_world_state_and_observation_expose_nothing_of_the_stack():
     assert world.agent_states[H].current_task is None and h.current_task is None
     assert {f.name for f in fields(WorldState)} == {"timestamp", "agent_states", "agent_positions", "object_locations",
                                                     "predicates", "object_zones", "object_home_container",
-                                                    "object_destination", "object_positions", "metadata"}
+                                                    "object_destination", "object_positions", "metadata",
+                                                    # T-D P: the room, and the robot's own perception of motion
+                                                    "fixed_object_positions", "workspace", "agent_displacements"}
     assert world.agent_states[H].metadata == {} and world.metadata == {}
 
 
