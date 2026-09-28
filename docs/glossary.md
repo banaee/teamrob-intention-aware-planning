@@ -146,9 +146,10 @@ AMENDED (P Q2, 28 September 2026): the first form was stationary only; supersede
 → `docs/design_decisions.md`, "T-D P: the fallback projection"; `shared/projection.py`, `FallbackProjection`;
 `shared/io_contracts.md` §2.2.
 
-**occupied target** / **blocked route** — X's two cases (proposed as terms, T-D P-build, 28 September 2026): with
-nothing realizable under the fallback, the robot waits because the human stands at the robot's target (occupied
-target), or on the robot's walk to it (blocked route). What to do then is X's.
+**occupied target** — X's case (proposed as a term, T-D P-build, 28 September 2026): with nothing realizable under
+the fallback, the robot waits because the human stands at the robot's target. What to do then is X's. ("Blocked
+route", the human standing on the robot's walk to its target, has no instance in the fixtures and stays one of X's
+categories in the design record, not a term here.)
 → `docs/design_decisions.md`, "T-D P", the deadlock.
 
 **T_h** — the end of the human projection: its last segment's end step. Nothing past T_h is

@@ -4793,19 +4793,40 @@ Mechanics ruled.
   winner's).
 Unchanged: `realize()`, `_clears_gate()`, G1, the trigger set, the recognizer, the IR test-bed's oracle.
 
-The deadlock (P-build report, measured under the first P2, ruled (b)). Under P1, 18 of the 48 maintained logs end in
-a wait that never ends: six scripts end with the human standing where the robot's last task needs it (T-C2c's
-authoring convention covers new scenarios only, and these six predate it: no retroactive scope change, the scripts
-are not edited). Five end at the robot's delivery table, an OCCUPIED TARGET (scenario_s01_01, s03_01, s01_06, s04_01,
-s06_03); scenario_s02_01 ends at ac_switch_0, 145 cm from shelf_1, where the robot's last item is, and the robot's
-walk there passes within `min_separation` of the standing human, a BLOCKED ROUTE. The READMEs record "waits:
-occupied target (X)" and "waits: blocked route (X)" in place of a completion tick; both cases carry into X.
+The deadlock (ruled (b); measured on the P-build baselines, under P2 as ruled). 16 of the 48 maintained logs end in a
+wait that never ends, all an OCCUPIED TARGET: five scripts end with the human standing at the robot's delivery table
+while the robot's last task delivers there (scenario_s01_01, s03_01, s01_06, s04_01, s06_03). T-C2c's authoring
+convention covers new scenarios only, and these predate it: no retroactive scope change, the scripts are not edited.
+The READMEs record "waits: occupied target (X)" in place of a completion tick; the case carries into X. Under the first
+P2 (stationary only) scenario_s02_01 waited too, at a BLOCKED ROUTE (the human standing at ac_switch_0, 145 cm from
+shelf_1, the robot's walk there within `min_separation` of it); under P2 as ruled it completes in both priors (425 /
+428), the robot's earlier decisions having moved. The blocked route has no instance in the fixtures; it stays one of
+X's categories beside the occupied target, not a glossary term.
+
+Consequence of ruling 3 (the candidate's own horizon), recorded: a fallback can refuse every candidate at a decision
+while the human walks, and the robot then waits by polling until the tail frees one. scenario_s05_01 under
+`full_reorder` waits 23 ticks from tick 0 in both priors (every ordering refused under the human's moving tail). It is
+evidence for G's staleness question (TODO-132), not a defect of P.
+
+P3, OPEN (recorded, not built): what the meta-planner projects when an admitted projection reaches its horizon. Case:
+scenario_s05_01 prior on, tick 92: an admitted projection with T_h = 4.00 and δ = 0; the robot walks off the table past
+the arriving human, `[sep]` 6.96 cm. The bound: when the projected end is a terminal action, L1's boundary re-decides
+within the human's completion latency, so the exposure is those few ticks and the body's stop; the open part is a
+projection ending at a non-terminal action.
 
 Consequence recorded. After L an admitted projection cannot go stale beyond the finding's threshold (the leader is
 retracted when its phase turns inadequate); P adds no staleness rule for admitted projections. For G: the staleness
 of a fallback (the human stopped, turned or walked past; a departure from the projected position by `min_separation`
 is one candidate, not a ruling, because `min_separation` is the body's safety constraint); TODO-95's sustained
 stand; the no-decision on a reset tick; whether the wait's polling stands.
+
+BUILT (P-build, 28 September 2026): b19b5e2 and 4470708 (records), e93cbd9 (the build), 5e853a0 (tests;
+tests/test_p_build.py, and four tests re-derived by P), 15cb99f (TB.2b's mid-run pool test moved to scenario_s03_06),
+fa26176 (the four maintained sets, a "P-build" section each). Verified on the P-build baselines: `.rec` streams
+byte-identical in all 48; the recognizer's lines byte-identical prior on; the first difference of every changed run at
+tick 0, a decision under the fallback; the IR test-bed's sixteen logs differ in the step-0 `[meta-proj]` line alone
+(no oracle rerun: the recognizer is untouched and the robot is idle there). Measured, not examined: scenario_s06_01
+`single_task` prior off does not finish in 340 steps, with no wait (TODO-133). P is closed; next is G.
 
 Reference: cchat, 28 September 2026 (P, P Q2 reopened); T-D Q1 (handoff_T-D_onward.md, item 1, and its SETTLED
 note: P's building block); F1; R1; T3b; T9; T-B Q7; D2; "T-D L" (L2 (ii), L5 B); "T-D R and E" (G1); T-C2c's

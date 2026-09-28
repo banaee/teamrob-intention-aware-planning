@@ -3721,8 +3721,20 @@ ruling, because `min_separation` is the body's safety constraint), and whether i
 stand. (c) The no-decision on a reset tick (every boundary that meets a record clears the projection, L5 B). (d)
 Whether the wait's polling by `no_current_task` stands, or a staleness or reconsideration trigger replaces it (P1:
 provisional until G). (e) Whether the lone-hypothesis admission at b + 1 stands (TODO-119's G part).
+Evidence for (a) and (d), measured on the P-build baselines: a fallback can refuse every candidate while the human
+walks, a consequence of P's ruling 3 (the candidate's own horizon); scenario_s05_01 under `full_reorder` waits 23
+ticks from tick 0 in both priors. P3 (open, design_decisions.md, "T-D P"): what the meta-planner projects when an
+admitted projection reaches its horizon, the open part being a projection ending at a non-terminal action
+(scenario_s05_01 prior on, tick 92: T_h 4.00, δ 0, `[sep]` 6.96 cm).
 Files: shared/meta_planner.py (`evaluate_triggers`, `_clears_gate`, `update_human_projection`)
 Reference: design_decisions.md, "T-D P", consequence recorded; TODO-95, TODO-119
+
+**TODO-133: scenario_s06_01 `single_task` prior off does not finish in 340 steps, with no wait (recorded, P-build, 28 Sept 2026)** [OPEN; unexamined]
+On the P-build baselines (`analysis/tb1b_two_tables/`, `analysis/tb3_full_reorder/`), env_layout_08 scenario_s06_01
+`single_task` prior off completed at 265 before P and does not complete within the sweep's 340 steps after it, with no
+wait logged. Prior off is an appendix; not examined.
+Files: analysis/tb1b_two_tables/sweep/, analysis/tb3_full_reorder/sweep/
+Reference: design_decisions.md, "T-D P", BUILT
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
