@@ -23,7 +23,7 @@ from tests.test_th1_tree import model_for, registered
 from shared import likelihood_functions
 from shared.meta_planner import DEFAULT_THETA, GateOutcome
 from shared.planner import AdaptivePlanner
-from shared.projection import FallbackProjection, Projector
+from shared.projection import Projector
 from shared.recognizer import build_hypothesis_space
 from shared.types import AdequacyFinding, HypothesisAdequacy
 from mesa_sim.executor import ACTION_COMPLETION_LATENCY
@@ -350,8 +350,7 @@ def test_the_guard_admits_the_coffee_leader_during_its_priced_stand(model5):
 
 
 def test_the_guard_refusal_is_logged_and_clears_the_record(model, caplog):
-    # admission refuses as below theta does: nothing admitted, no decision record, the reason logged
-    # (re-derived by T-D P: with the human observed the refusal yields the fallback projection)
+    # admission refuses as below theta does: no projection, no decision record, the reason logged
     w = build_world_state(model)
     p = w.agent_positions[H]
     rec = recognizer(model, [item("item_3")])
@@ -359,6 +358,6 @@ def test_the_guard_refusal_is_logged_and_clears_the_record(model, caplog):
         b = rec.update(obs(s, p), w)
     mp = gate(model)
     with caplog.at_level(logging.INFO):
-        assert isinstance(mp.update_human_projection(b, w), FallbackProjection)
-    assert "projection=fallback refused=none(leader_inadequate)" in caplog.text
+        assert mp.update_human_projection(b, w) is None
+    assert "projection=none(leader_inadequate)" in caplog.text
     assert mp._projected_hypothesis is None

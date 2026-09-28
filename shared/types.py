@@ -240,6 +240,12 @@ class WorldState:
                                                                                         # world model), written by the robot from its consecutive
                                                                                         # observations, never by the builder; ABSENT (not zero)
                                                                                         # for an agent with no previous observation
+    agent_run_lengths: Dict[str, int] = field(default_factory=dict)       # {agent_id: k} — ticks of the current straight run (T-D P4;
+                                                                          # unit directions equal within the body's numerical
+                                                                          # resolution; a turn sets 1, a stop 0); as and with
+                                                                          # agent_displacements
+    agent_standing_counts: Dict[str, int] = field(default_factory=dict)   # {agent_id: k} — consecutive zero displacements (T-D P4);
+                                                                          # as and with agent_displacements
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 # =============================================================================
@@ -1176,17 +1182,12 @@ class UpdateResult:
     Set by B2 `b2a` when it continues the current task with its realized
     hold, and by B3 to the winner's realized δ (T10), whether the winner is
     the current task or another; 0 otherwise (no hold: no human projection,
-    cost_strategy "plain", a fallback decision, the wait, the terminal
+    cost_strategy "plain", the terminal
     return). The executor may refine a hold, never re-decide or drop it
     silently; a later trigger's decision replaces it.
-    current_task None: the terminal return when the queue is empty (the
-    pool is empty); THE WAIT when it is not (T-D P1: under a fallback
-    projection no candidate is eligible, the robot stands without a task and
-    no_current_task re-asks on the next tick).
     horizon: the winner's assessed horizon, its RealizedPlan.horizon — T_h on
-    this decision's projection clock (T-D P; under a fallback projection the
-    winner's own end). None when the decision was realized against no human
-    plan, and for the wait and the terminal return. The body passes it to its
+    this decision's projection clock (T-D P). None when the decision was
+    realized against no human plan, and for the terminal return. The body passes it to its
     [stop] label and derives nothing.
     """
     current_task: Optional["TaskInstance"]

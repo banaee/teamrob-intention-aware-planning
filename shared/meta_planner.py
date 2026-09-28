@@ -171,7 +171,7 @@ from shared.types import (
 from shared.knowledge import TaskModel
 from shared.recognizer import IntentionRecognizer
 from shared.planner import AdaptivePlanner
-from shared.projection import Projector, HumanProjection, AdmittedProjection
+from shared.projection import Projector
 from shared.realization import realize
 
 
@@ -318,6 +318,13 @@ class MetaPlanner:
         # evaluate_triggers()'s recognition_changed. Set in
         # update_human_projection(), read nowhere else.
         self._projected_hypothesis: Optional[str] = None
+        # The decision record's second value (T-D P4 / Q6): the tick at which the
+        # fallback projection the last decision rested on reaches its end (the
+        # WorldState's timestamp at the decision plus the fallback's T_h); None
+        # when the last admission returned no fallback. Set in
+        # update_human_projection(), read by evaluate_triggers()'s
+        # projection_expired only.
+        self._fallback_expiry: Optional[float] = None
         # The reason of the latest evaluate_triggers() decision, for B2's log
         # line only; update()'s signature carries no trigger, and nothing
         # decides on this.
@@ -421,9 +428,19 @@ class MetaPlanner:
               of hypothesis. The bar itself is _clears_gate()'s business,
               never compared here.
 
-        When both hold on one tick the order is no_current_task, then
-        recognition_changed — arbitrary, as before: only the reported reason
-        and score differ, update() runs the same.
+            - projection_expired (T-D P4 / Q6): the fallback projection the last
+              decision rested on has reached its end — its T_h, where the
+              projection is truncated, not where its evidence would have taken
+              it: the recorded expiry tick (_fallback_expiry) is reached by the
+              world's timestamp. The decision rested on a projection of what was
+              observed, for as long as it was observed; past its end the human
+              is unassessed, and the next decision needs the evidence produced
+              since. Scoped to fallbacks: an admitted projection's end is P3's
+              question. Admission is re-asked and sets or clears the record.
+
+        When several hold on one tick the order is no_current_task, then
+        recognition_changed, then projection_expired — arbitrary, as before:
+        only the reported reason and score differ, update() runs the same.
 
         Confidence is a gate here (via _clears_gate(), on the entering side of
         recognition_changed), never a magnitude fed into a cost.
@@ -446,6 +463,8 @@ class MetaPlanner:
             if cause is not None:
                 decision = TriggerDecision(fired=True, reason="recognition_changed", score=belief.confidence,
                                            cause=cause)
+            elif self._fallback_expiry is not None and world.timestamp >= self._fallback_expiry:
+                decision = TriggerDecision(fired=True, reason="projection_expired", score=1.0)
             else:
                 decision = TriggerDecision(fired=False, reason="none", score=0.0)
 
@@ -457,7 +476,7 @@ class MetaPlanner:
         self,
         belief: BeliefState,
         world: WorldState,
-    ) -> Optional[HumanProjection]:
+    ) -> Optional[ProjectedPlan]:
         """
         Projection admission, then a thin wrapper over Projector.project_human(),
         supplying the recognizer and human_agent_id this MetaPlanner was
@@ -480,23 +499,22 @@ class MetaPlanner:
         would make recognition_changed fire on every later tick the belief
         points elsewhere, against a hypothesis no decision used.
 
-        Returns an AdmittedProjection when a projection is built. Refuses, in
-        this order, when
+        Refuses, in this order, when
           - the belief does not clear the gate (_clears_gate(); the projector is
             not called; the refusal's reason is the gate's outcome: below theta,
             or the leader with no observation or inadequate in its own phase,
             G1),
           - no human is observed (no human_agent_id),
           - the hypothesis cannot be resolved (project_human() returned None).
-        On a refusal with a human observed — a human_agent_id, and a position
-        for it in the world — it returns the FALLBACK PROJECTION (T-D P,
-        Projector.project_fallback()): the short-term physical projection from
-        the observed position and the last displacement, over each candidate's
-        own span; the decision record stays
-        empty, since nothing was admitted, so the entering side of
-        recognition_changed still fires on the next admission. None only when
-        no human is observed: update() then realizes every candidate against
-        no human plan, δ = 0, plain projected cost.
+        On a refusal it returns the FALLBACK PROJECTION (T-D P, P4;
+        Projector.project_fallback()): where to expect the human from what was
+        observed, for as long as it was observed — None when no human is
+        observed or it has no previous observation (unassessed); update() then
+        realizes every candidate against no human plan, δ = 0, plain projected
+        cost. Nothing is admitted under a fallback, so the recorded hypothesis
+        stays empty and the entering side of recognition_changed still fires
+        on the next admission; the fallback's end is recorded for
+        projection_expired (the record's second value, Q6).
 
         Logs one [meta-proj] line per call; a fallback as
         `fallback refused=<the refusal's reason>`. No step or trigger field: step
@@ -505,33 +523,37 @@ class MetaPlanner:
         fired trigger, so the [meta-trig] line of the same tick precedes it.
         """
         gate = self._clears_gate(belief)
-        projection: Optional[HumanProjection] = None
+        projection: Optional[ProjectedPlan] = None
         refused: Optional[str] = None
         if gate is not GateOutcome.CLEARS:
             refused = gate.value
         elif self._human_agent_id is None:
             refused = "none(no_human)"
         else:
-            plan = self._projector.project_human(
+            projection = self._projector.project_human(
                 belief=belief,
                 world=world,
                 human_agent_id=self._human_agent_id,
                 recognizer=self._recognizer,
             )
-            if plan is None:
+            if projection is None:
                 refused = "none(unprojectable)"
-            else:
-                projection = AdmittedProjection(plan=plan)
 
-        # The record: set on admission only; a fallback admits nothing (T-D P).
+        # The record: the hypothesis on admission only; a fallback admits nothing,
+        # and its end is the record's second value (T-D P4 / Q6).
         self._projected_hypothesis = belief.most_likely if refused is None else None
-
+        self._fallback_expiry = None
         if refused is None:
             reason = "built"
         else:
             if self._human_agent_id is not None:
                 projection = self._projector.project_fallback(world, self._human_agent_id)
-            reason = refused if projection is None else f"fallback refused={refused}"
+            if projection is None:
+                reason = refused
+            else:
+                reason = f"fallback refused={refused}"
+                segments = [seg for entry in projection.entries for seg in entry.segments]
+                self._fallback_expiry = world.timestamp + segments[-1].end_step
         self._last_projection_reason = reason
 
         logging.info(
@@ -546,7 +568,7 @@ class MetaPlanner:
         belief: BeliefState,
         world: WorldState,
         executor_state: ExecutorState,
-        human_projection: Optional[HumanProjection]
+        human_projection: Optional[ProjectedPlan]
     ) -> UpdateResult:
         """
         Main entry point when evaluate_triggers() fires. Dispatch only — the
@@ -575,24 +597,19 @@ class MetaPlanner:
             B3    _replan_tasks() — select and commit
 
         `human_projection` is supplied by the caller, built once per fired
-        trigger via update_human_projection(). Not rebuilt here; each
-        candidate is realized against human_projection.for_candidate() of its
-        own projection — the admitted ProjectedPlan, the same for every
-        candidate, or the fallback projection over the candidate's own span
-        (T-D P). Under a fallback a candidate whose violation is cleared only
-        by the projection's end is not realizable (realizable(), P1 rule 5),
-        and with none eligible B3 returns THE WAIT.
-        None means no human is observed — every candidate then realizes with
-        δ = 0 at its plain projected duration (realize() with no human plan).
-        A refused admission is a ROUTINE mid-run state, not an edge case: the
+        trigger via update_human_projection(). Not rebuilt here, not recomputed
+        per candidate. It is the admitted projection, or on a refused admission
+        the fallback projection (T-D P4), realized alike. None means no human
+        is observed or it has no previous observation (unassessed) — every
+        candidate then realizes with δ = 0 at its plain projected duration
+        (realize() with no human plan), never as always-conflicting. A ROUTINE mid-run state, not an edge case: the
         belief re-initialises at every human task boundary (I4c).
 
         TERMINAL STATE: returns UpdateResult(current_task=None, queue=[]) when
         the pool is empty (nothing left to do: queue empty and nothing
         executing, or everything remaining is already complete in the world)
         — all assigned tasks are complete. A normal return, not an exception;
-        callers check `result.current_task is None` with an empty queue: with
-        a non-empty one it is the wait (T-D P1, _wait()).
+        callers check `result.current_task is None`.
         """
         current = executor_state.current_task
         task_pool: List[TaskInstance] = list(self._queue)
@@ -627,7 +644,8 @@ class MetaPlanner:
         if current is not None and not current_dropped:
             # ---- B2: plausibility gate on the current task ------------------
             # Continuation: queue untouched, current task keeps executing, with
-            # the hold its realization placed (0: none). None: escalate.
+            # the hold its realization placed (0: none) and that realization's
+            # horizon. None: escalate.
             continuation = self._is_current_task_plausible(
                 belief=belief,
                 world=world,
@@ -747,7 +765,7 @@ class MetaPlanner:
         belief: BeliefState,
         world: WorldState,
         executor_state: ExecutorState,
-        human_projection: Optional[HumanProjection],
+        human_projection: Optional[ProjectedPlan],
         task_pool: List[TaskInstance],
     ) -> Optional[UpdateResult]:
         """
@@ -763,7 +781,8 @@ class MetaPlanner:
 
         Returns the continuation — the current task, the queue untouched, the
         hold (whole ticks, ≥ 0) to CONTINUE it with and the assessed horizon
-        of that realization — or None to ESCALATE to B3. B2's role is COMMITMENT (R1, TODO-36): it
+        of that realization (UpdateResult.horizon, T-D P) — or None to ESCALATE
+        to B3. B2's role is COMMITMENT (R1, TODO-36): it
         can only keep the current task where B3 might switch; it never selects
         another task, and the hold it returns is realization's, not its own.
 
@@ -775,10 +794,6 @@ class MetaPlanner:
                 min_separation) and judge its hold δ against the human's
                 remaining projected duration at the trigger, T_h − 0:
                   human_projection is None     → continue, no hold (0)
-                  not realizable under it      → escalate (None): under a
-                                                 fallback projection, a
-                                                 violation cleared only by
-                                                 the projection's end (T-D P1)
                   δ ≤ ρ × T_h                  → continue, with hold δ
                   δ above that bound           → escalate (None)
                 (realization is total since F1: there is no unrealizable
@@ -793,13 +808,13 @@ class MetaPlanner:
         `task_pool` is unused under "b2a" and is present only so the signature
         does not change when "b2b" is filled in.
 
-        When `human_projection` is None — no human observed — b2a continues
-        with no hold. B2 escalates on evidence AGAINST the current task; no
-        projection means no evidence, and no reason to interrupt committed
-        work. A fallback projection (T-D P) is read as any projection is, its
-        span the current task's own; the current task escalates when the
-        fallback refuses it (P1 rule 5) and is otherwise judged as under an
-        admitted projection.
+        When `human_projection` is None — not admitted by
+        update_human_projection() (below theta, no human, unresolvable) —
+        b2a continues with no hold. B2 escalates on evidence
+        AGAINST the current task; no projection means no evidence, and no
+        reason to interrupt committed work.
+
+        A fallback projection (T-D P4) is read as any projection is.
 
         Logs one [meta-b2] line per call under "b2a" (nothing under "none"):
         trigger, current task, the admission's [meta-proj] reason, reason, δ, T_r,
@@ -824,8 +839,7 @@ class MetaPlanner:
             projection = self._projector.project(
                 [current], world, executor_state.agent_id, belief, start_step=now
             )
-            realized = realize(projection, human_projection.for_candidate(projection),
-                               self._min_separation, decision_step=now)
+            realized = realize(projection, human_projection, self._min_separation, decision_step=now)
             if realized.horizon is None:
                 # An admitted projection without segments: realize() reads it
                 # as no projection, and so does B2.
@@ -833,11 +847,7 @@ class MetaPlanner:
                 return continuation(0, None)
             remaining = realized.horizon - now
             bound = self._rho * remaining
-            refused = not human_projection.realizable(projection, realized, self._min_separation)
-            if refused:
-                hold = None
-                verdict = "escalate"
-            elif realized.delta <= bound:
+            if realized.delta <= bound:
                 hold = realized.delta
                 verdict = "continue_hold" if hold > 0 else "continue"
             else:
@@ -848,7 +858,6 @@ class MetaPlanner:
                 f"reason={realized.reason} delta={realized.delta} "
                 f"T_r={realized.projected_duration:.2f} remaining={remaining:.2f} "
                 f"rho={self._rho} bound={bound:.2f} verdict={verdict}"
-                + (" refused=fallback" if refused else "")
                 + (f" hold={hold}" if hold is not None else "")
             )
             return None if hold is None else continuation(hold, realized.horizon)
@@ -869,7 +878,7 @@ class MetaPlanner:
         belief: BeliefState,
         world: WorldState,
         executor_state: ExecutorState,
-        human_projection: Optional[HumanProjection],
+        human_projection: Optional[ProjectedPlan],
     ) -> UpdateResult:
         """
         Selects the task assignment: which task executes now, and what remains
@@ -900,18 +909,6 @@ class MetaPlanner:
         walking" compare on one number, and conflict is priced by construction
         (design_decisions.md, "The robot can wait").
 
-        THE FALLBACK PROJECTION (T-D P): each candidate is realized against
-        human_projection.for_candidate() of its own projection — the human
-        where it was observed and as it moved last, over the candidate's span
-        — and a candidate whose violation is cleared only by the projection's
-        end is NOT REALIZABLE (realizable(), P1 rule 5): the shift would only
-        move the violation past T_h, where the projection ends. A violation
-        cleared by the projected motion within the horizon keeps its hold, as
-        F1. The argmin ranges over the eligible candidates; a refused
-        candidate's [meta-cand] line ends ` refused=fallback`. With none
-        eligible the decision is THE WAIT (_wait()). An admitted projection
-        refuses nothing (F1).
-
         No human projection (None, or one without segments): realize() reports
         `no_human_projection` for every candidate — δ = 0, cost = T_r — so B3
         is then an argmin over projected durations. The plain cost is the same
@@ -932,9 +929,9 @@ class MetaPlanner:
 
         Logs one [meta-cand] line per candidate (reason, T_r, δ, cost,
         unassessed share) and one [meta-b3] line per call (trigger,
-        cost_strategy, selection ∈ realized | no_projection | plain | wait,
-        winner, cost, hold, T_h the winner's, candidate count). The winner's
-        T_h goes out as UpdateResult.horizon. No step field, as [meta-proj] and
+        cost_strategy, selection ∈ realized | no_projection | plain, winner,
+        cost, hold, T_h the winner's, candidate count). The winner's T_h goes
+        out as UpdateResult.horizon (T-D P), the body's [stop] label. No step field, as [meta-proj] and
         [meta-b2]: the [meta-trig] line of the same tick precedes them.
         """
         if self._strategy not in ("single_task", "full_reorder"):
@@ -946,23 +943,16 @@ class MetaPlanner:
         against = human_projection if self._cost_strategy == "realized" else None
         if self._strategy == "full_reorder":
             return self._replan_orderings(task_pool, belief, world, executor_state, against)
-        rows: List[Tuple[TaskInstance, RealizedPlan]] = []  # the eligible candidates
+        rows: List[Tuple[TaskInstance, RealizedPlan]] = []
         for task in task_pool:
             projection = self._projector.project([task], world, executor_state.agent_id, belief, start_step=now)
-            human_plan = against.for_candidate(projection) if against is not None else None
-            realized = realize(projection, human_plan, self._min_separation, decision_step=now)
-            refused = against is not None and not against.realizable(projection, realized, self._min_separation)
-            if not refused:
-                rows.append((task, realized))
+            realized = realize(projection, against, self._min_separation, decision_step=now)
+            rows.append((task, realized))
             logging.info(
                 f"[meta-cand] {task_instance_key(task)} reason={realized.reason} "
                 f"T_r={realized.projected_duration:.2f} delta={realized.delta} "
                 f"cost={realized.cost:.2f} share={realized.unassessed_share:.2f}"
-                + (" refused=fallback" if refused else "")
             )
-
-        if not rows:
-            return self._wait(task_pool, candidates=len(task_pool))
 
         winner, chosen = min(rows, key=lambda row: row[1].cost)
         hold = chosen.delta
@@ -976,32 +966,12 @@ class MetaPlanner:
         logging.info(
             f"[meta-b3] trigger={self._last_trigger_reason} cost_strategy={self._cost_strategy} "
             f"selection={selection} winner={task_instance_key(winner)} cost={chosen.cost:.2f} hold={hold} "
-            f"T_h={_fmt(chosen.horizon)} candidates={len(task_pool)}"
+            f"T_h={_fmt(chosen.horizon)} candidates={len(rows)}"
         )
 
         new_queue = [t for t in task_pool if t is not winner]
         self._queue = new_queue
         return UpdateResult(current_task=winner, queue=list(new_queue), hold=hold, horizon=chosen.horizon)
-
-    def _wait(self, task_pool: List[TaskInstance], candidates: int) -> UpdateResult:
-        """
-        THE WAIT (T-D P1): under a fallback projection no candidate is
-        compatible with the stationary human, so the robot takes no task
-        rather than shift a candidate through the human. The whole pool — the
-        current task included, if there was one — becomes the queue (no task
-        is executing), current_task is None, and no_current_task re-asks on
-        the next tick: polling, provisional until G rules whether a staleness
-        or reconsideration trigger is needed. No hold: with no task there is
-        no plan to hold before; the robot stands because it has none, for the
-        tick until the re-ask. Not the terminal return: the queue is not
-        empty. Logged as a [meta-b3] line with selection=wait.
-        """
-        logging.info(
-            f"[meta-b3] trigger={self._last_trigger_reason} cost_strategy={self._cost_strategy} "
-            f"selection=wait winner=none cost=None hold=0 T_h=None candidates={candidates}"
-        )
-        self._queue = list(task_pool)
-        return UpdateResult(current_task=None, queue=list(task_pool), hold=0, horizon=None)
 
     def _replan_orderings(
         self,
@@ -1009,7 +979,7 @@ class MetaPlanner:
         belief: BeliefState,
         world: WorldState,
         executor_state: ExecutorState,
-        against: Optional[HumanProjection],
+        against: Optional[ProjectedPlan],
     ) -> UpdateResult:
         """
         B3.B, "full_reorder" (T-B2b, T-B2c): a candidate is one ordering of the
@@ -1029,15 +999,6 @@ class MetaPlanner:
         delayed for it. Nothing past T_h is assessed or charged. With no human
         plan (not admitted, or "plain") every hold is 0 and the cost is the
         plain one, the sum of the entries' T_r.
-
-        UNDER A FALLBACK PROJECTION (T-D P): the candidate is the ordering, so
-        the fallback spans the ORDERING (against.for_candidate() of the chained
-        projection), and an ordering whose violation, in any entry, is cleared
-        only by the projection's end is not realizable under it (realizable():
-        every entry's shift checked against the fallback over the realized
-        ordering's span); it does not compete. A head with no eligible
-        ordering logs `[meta-ord] head=<task> refused=fallback orderings=<n>`.
-        With no eligible ordering the decision is THE WAIT (_wait()).
 
         ENUMERATION AND TIES: every permutation, in pool order (the pool's own
         order first, then by position), and the first minimum wins — so on a
@@ -1084,29 +1045,16 @@ class MetaPlanner:
             projection = self._projector.project(
                 [task_pool[i] for i in indices], world, agent_id, belief, start_step=now
             )
-            human_plan = against.for_candidate(projection) if against is not None else None
-            realized = realize(projection, human_plan, self._min_separation, decision_step=now)
-            if against is not None and not against.realizable(projection, realized, self._min_separation):
-                continue
+            realized = realize(projection, against, self._min_separation, decision_step=now)
             if indices[0] not in cheapest or realized.cost < cheapest[indices[0]][0].cost:
                 cheapest[indices[0]] = (realized, indices)
 
         per_head = factorial(len(task_pool) - 1)
-        for head_index in range(len(task_pool)):  # heads in pool order
-            if head_index not in cheapest:
-                logging.info(
-                    f"[meta-ord] head={task_instance_key(task_pool[head_index])} refused=fallback "
-                    f"orderings={per_head}"
-                )
-                continue
-            realized, indices = cheapest[head_index]
+        for head_index, (realized, indices) in cheapest.items():
             logging.info(
                 f"[meta-ord] head={task_instance_key(task_pool[head_index])} cost={realized.cost:.2f} "
                 f"orderings={per_head} ordering={_fmt_ordering(task_pool[i] for i in indices)}"
             )
-
-        if not cheapest:
-            return self._wait(task_pool, candidates=per_head * len(task_pool))
 
         # min() keeps the first: heads are in pool order
         chosen, indices = min(cheapest.values(), key=lambda row: row[0].cost)

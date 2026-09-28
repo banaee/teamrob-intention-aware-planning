@@ -29,6 +29,7 @@ STEP ORDER (RobotAgent):
 
 from __future__ import annotations
 import logging
+import math
 from dataclasses import replace
 from typing import TYPE_CHECKING, List, Optional, Dict, Tuple
 
@@ -75,6 +76,14 @@ _REC = logging.getLogger("rec")
 # beside the robot's own TASK_COMPLETION_LATENCY; the per-action
 # acknowledgement (ACTION_COMPLETION_LATENCY) is the same executor's for both.
 HUMAN_TASK_COMPLETION_LATENCY = 0.0
+
+# The body's numerical resolution on a step's unit direction (T-D P4): two
+# consecutive steps continue one straight run when their unit directions agree
+# within it. Not a margin: Mesa recomputes each step's direction toward the
+# target, and on a straight walk the rounding of that arithmetic is under 1e-14
+# (measured at the P4 plan step), eight orders of magnitude below a turn of any
+# size an agent makes; exact equality would read nearly every run as 1.
+DIRECTION_RESOLUTION = 1e-9
 
 
 # =============================================================================
@@ -367,11 +376,16 @@ class RobotAgent(FactoryAgent):
 
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
-        # The observed human's position as this robot last observed it (T-D P): the
-        # one field the robot keeps to write WorldState.agent_displacements, a
-        # perception fact of its world model. The robot-mind object that will own
-        # it is TODO-131.
+        # What this robot keeps of the observed human's motion (T-D P4), a bounded
+        # memory of four numbers from which _perceive() writes the perception facts
+        # of its world model: the position it last observed, the unit direction of
+        # the last step (None after a stop or before any step), the length of the
+        # current straight run and the current standing count. The robot-mind
+        # object that will own them is TODO-131.
         self._previous_human_position: Optional[Tuple[float, float]] = None
+        self._previous_human_direction: Optional[Tuple[float, float]] = None
+        self._human_run_length: int = 0
+        self._human_standing_count: int = 0
 
         self.planner = AdaptivePlanner(knowledge=task_model)
         self.current_plan: Optional[AbstractPlan] = None
@@ -480,30 +494,13 @@ class RobotAgent(FactoryAgent):
                 human_projection=human_projection,
             )
 
-            if result.current_task is None and not result.queue:
+            if result.current_task is None:
                 self.executor.hold(0, trigger.reason)
                 logging.info(f"[meta] step={int(self.model.schedule.steps)} all tasks complete")
                 self.finished = True
                 self.current_task_instance = None
                 self.current_plan = None
                 self.current_task = None
-                return
-
-            if result.current_task is None:
-                # THE WAIT (T-D P1): no candidate is compatible with the
-                # stationary human under the fallback projection. The robot
-                # takes no task: no plan is executed this tick, so it stands,
-                # and no_current_task re-asks on the next. Decided in shared/;
-                # the body only executes it.
-                self.executor.hold(result.hold, trigger.reason)
-                logging.info(
-                    f"[meta] step={int(self.model.schedule.steps)} trigger={trigger.reason} wait "
-                    f"queue={[t.schema.name + str({k.name: v.value for k, v in t.bindings.items()}) for t in result.queue]}"
-                )
-                self.current_task_instance = None
-                self.current_plan = None
-                self.executor.set_assessed_window(int(self.model.schedule.steps), result.horizon)
-                self._execute(plan=self.current_plan, world=world)
                 return
 
             logging.info(
@@ -572,12 +569,19 @@ class RobotAgent(FactoryAgent):
 
     def _perceive(self, world: WorldState, human: Optional["HumanAgent"]) -> WorldState:
         """
-        The robot's world model for this tick (T-D P): the builder's WorldState
-        plus what this robot perceives of motion, the observed human's last
-        one-tick displacement (WorldState.agent_displacements) — its position
-        now minus the position this robot observed last. Absent, not zero,
-        when there is no previous observation. Computed here from the robot's
-        own consecutive observations, never by the builder from the model. The
+        The robot's world model for this tick (T-D P, P4): the builder's
+        WorldState plus what this robot perceives of the observed human's
+        motion, from its own consecutive observations, never from the model —
+        the last one-tick displacement (its position now minus the position it
+        observed last), the length of the current straight run and the current
+        standing count (WorldState.agent_displacements, agent_run_lengths,
+        agent_standing_counts). All three are absent before a second
+        observation. A zero displacement is a standing tick: the count grows,
+        the run is 0. A step continues the run when its unit direction equals
+        the last step's within DIRECTION_RESOLUTION, the body's numerical
+        resolution (Mesa recomputes each step's direction toward its target, so
+        exact equality fails by rounding), and starts a run of 1 otherwise (a
+        turn, or the first step after a stop); a step ends a stand. The
         pre-clock observation (observe_initial) is an observation, so tick 0
         has a displacement.
         """
@@ -588,9 +592,25 @@ class RobotAgent(FactoryAgent):
         self._previous_human_position = position
         if previous is None:
             return world
-        return replace(world, agent_displacements={
-            human.unique_id: (position[0] - previous[0], position[1] - previous[1])
-        })
+        displacement = (position[0] - previous[0], position[1] - previous[1])
+        if displacement == (0.0, 0.0):
+            self._human_standing_count += 1
+            self._human_run_length = 0
+            self._previous_human_direction = None
+        else:
+            length = math.hypot(*displacement)
+            direction = (displacement[0] / length, displacement[1] / length)
+            last = self._previous_human_direction
+            if last is not None and math.dist(direction, last) <= DIRECTION_RESOLUTION:
+                self._human_run_length += 1
+            else:
+                self._human_run_length = 1
+            self._human_standing_count = 0
+            self._previous_human_direction = direction
+        return replace(world,
+                       agent_displacements={human.unique_id: displacement},
+                       agent_run_lengths={human.unique_id: self._human_run_length},
+                       agent_standing_counts={human.unique_id: self._human_standing_count})
 
     def _make_dummy_belief(self) -> BeliefState:
         """The belief before the recognizer's first observation: no leader, no
