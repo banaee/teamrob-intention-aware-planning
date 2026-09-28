@@ -61,8 +61,10 @@ def test_an_empty_pool_observes_every_tick_and_completes_once_at_tick_0(caplog):
 
 
 def test_a_pool_that_empties_mid_run_keeps_observing_and_evaluates_no_trigger(caplog):
-    steps = 200
-    lines = run_lines(model_for("env_layout_04", "scenario_s01_06"), steps, caplog)
+    # scenario_s03_06 (scenario_s03_01's end-state variant: the human's script ends away from the robot's table), not
+    # scenario_s01_06 as before T-D P: under P that pool never empties (the robot waits, occupied target, X)
+    steps = 300
+    lines = run_lines(model_for("env_layout_06", "scenario_s03_06"), steps, caplog)
     done = [int(DONE.match(l)[1]) for l in lines if DONE.match(l)]
     assert len(done) == 1 and done[0] < steps - 1
     d = done[0]
