@@ -2429,6 +2429,10 @@ boundary (`BeliefState.episode_boundary`), whether or not most_likely changed; a
 adequacy is inadequate (retraction). Both fire `recognition_changed`; admission is re-asked and, the leader having no
 observation on a boundary tick or being inadequate, refuses, so the record clears. A dip below θ still fires nothing.
 The `[meta-trig]` line names the condition (`cause=`). design_decisions.md, "T-D L: the belief lifecycle", L2, L5.
+SUPERSEDED IN PART (T-D P, ruled 28 September 2026): a refusal no longer means "no human plan" when a human is
+observed; the decision then realizes against the fallback projection, and the decision record stays empty as before
+(nothing is admitted). The trigger set and the record are unchanged. design_decisions.md, "T-D P: the fallback
+projection".
 
 When two conditions hold on one tick the order is `no_current_task`, `recognition_changed`,
 `task_committed` — arbitrary, as before; only the reported reason and score differ.
@@ -4605,6 +4609,10 @@ only (session L-records); built in L-build.
   between (a regress, then a walk away). SUPERSEDES "P's fallback replaces the projection" above: there is no P
   fallback; a retraction realizes against no human plan, as below θ today. (iii): "consistent again" arrives at the
   next phase change, advance or regress: a regress opens a phase too.
+  SUPERSEDED IN PART (T-D P, ruled by Hadi, 28 September 2026): "there is no P fallback" and "a retraction realizes
+  against no human plan" no longer hold. A retraction refuses admission like any refusal; with a human observed the
+  decision realizes against the fallback projection (P1). The retraction itself is unchanged. design_decisions.md,
+  "T-D P: the fallback projection".
 
 - L3, resumption: no change under L1.
   Problem. The completion of a foreseeable task inside a suspended delivery ends the episode while the delivery is
@@ -4685,3 +4693,91 @@ Reference: cchat, 27 September 2026 (L); "T-D R and E" (R4, R6, E1, E7, E8, E9, 
 close-out); I4c (Decisions 1 to 4); D2; T7; DESIGN-07; `docs/recognizer_handback.md` §1.1, §1.6, §1.8, §5;
 `analysis/ir_testbed/REPORT.md` (scenario_s09_01, _03, _04, _05, _07, _08, _09, _10); TODO-87, TODO-93, TODO-94,
 TODO-117, TODO-118, TODO-119
+
+---
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)**
+
+Problem. When no hypothesis is admitted (below θ, the leader inadequate, a retraction, exhausted), the human
+projection was None and every candidate realized with δ = 0: the robot planned as if the workspace were empty, and
+the separation stop (a body option) was the only protection. After L this state covers every boundary tick, every
+retraction, every unexplained interval and the time after the work order (+634 unexplained ticks prior on in the
+baselines, `analysis/l_build/REPORT.md`). P gives `realize()` a projection built from what the mind knows for certain,
+the human's observed position, and nothing it does not know. Records (session P, records step); built in P-build.
+
+- P1, the fallback projection, as corrected (Hadi, 28 September 2026, on the P plan's flag 1).
+  Ruling. When admission refuses and a human is observed, the meta-planner builds a fallback projection: the human
+  stationary at the last observed position over [observation offset, candidate end], the candidate's own T_r.
+  `realize()` is unchanged and determines whether the candidate needs δ > 0. Under a fallback, δ > 0 means the
+  candidate cannot be realized while the stationary-human assumption holds: a shift only moves the violation to the
+  end of the assessed horizon, into the tail where the plan walks into the assumed human. Such a candidate is not
+  admissible under the fallback; this is a statement about realizability, not a cost. Candidates with δ = 0 are
+  eligible, and the decision chooses among them as usual. If no candidate is compatible with the stationary human,
+  the robot waits (no task, a hold) rather than shifting a candidate through the human; current_task is then None,
+  so `no_current_task` re-asks on the next tick. This polling is provisional until G rules whether a staleness or
+  reconsideration trigger is needed; P does not decide that `no_current_task` is the general response to blocked
+  candidates. The rule is specific to the fallback: an admitted projection keeps F1's realization semantics
+  unchanged (every candidate realizes, its hold priced as cost).
+  Why. `realize()` needs a projection that ends (F1's clearing hold exists only if the violation interval ends); the
+  candidate is the only horizon that introduces no temporal constant; and the assumption "the human stays where it
+  was last seen while this candidate would run" is the only one with no invented content. The refusal rule, from the
+  plan's measurement: against a stand that ends at T_h, the minimal shift `realize()` returns is ⌈T_h − t_onset⌉,
+  t_onset the candidate's first violating moment, so every hold "clears" only by pushing the violation to T_h, where
+  the assumed stand ends and the realized plan meets the assumed human in the unassessed tail. Priced as a cost, the
+  fallback would rank candidates by how late they meet the human, not by whether they avoid them. `realize()`
+  unchanged, synthetic plans, v = 20 cm/tick, `min_separation` = 50 cm, the human standing at (400, 0), the robot
+  from (0, 0), each candidate ending with three stationary ticks (the Projector's priced standing and completion):
+
+  | candidate | T_r | δ | cost T_r + δ | unassessed share |
+  |---|---|---|---|---|
+  | target where the human stands (the walk ends 30 cm short) | 21.50 | 4 | 25.50 | 0.16 |
+  | crossing the human early, then 600 cm on | 53.00 | 36 | 89.00 | 0.40 |
+  | crossing, target just past the human | 28.00 | 11 | 39.00 | 0.28 |
+  | away from the human | 23.00 | 0 | 23.00 | 0.00 |
+
+  The candidate walking to where the human stands pays the smallest hold of the three that meet the human (its
+  violation starts latest), and every positive δ leaves the plan walking into the assumed human past T_h. The first
+  wording of P1 ("a candidate whose target is where the human stands pays a hold of its own length and is chosen
+  last") was wrong on this table and is withdrawn; a hold of the candidate's own length arises only when the
+  violation starts at the decision step (the robot already within `min_separation`, its first motion not increasing
+  the distance).
+  Boundary condition: no human observed means no fallback (no position to build it from).
+  Set aside: no fallback (today); a fixed horizon (a constant); the recognizer's standing scale (α is a test level,
+  not a horizon); the fallback's hold priced as a cost (the table).
+
+- P2, no extrapolation of motion.
+  Ruling. The fallback does not extrapolate motion.
+  Why. An unexplained walk is behaviour the mind has no model for; a velocity model would invent one exactly where R
+  refused to, and would need a horizon constant. Motion is covered at execution by the separation stop and, once
+  built, by X's blocked event.
+  Set aside: constant-velocity extrapolation; no fallback for a moving human.
+
+Consequence recorded. After L an admitted projection cannot go stale beyond the finding's threshold (the leader is
+retracted when its phase turns inadequate); P adds no staleness rule for admitted projections.
+For G: whether a stationary fallback becoming stale is itself a trigger, and what observation establishes it; a
+departure of the observed position from the assumed one by `min_separation` is one candidate, not a ruling, because
+`min_separation` is the body's safety constraint. And whether the wait's polling by `no_current_task` stands (P1).
+
+Mechanics ruled. The fallback is a `ProjectedPlan` (per candidate); `realize()` is unchanged; the decision record
+stays empty under a fallback (nothing is admitted, so D2's first admission, ENTERED, still fires later); the
+`[meta-proj]` line names the fallback as its own reason; the hold a fallback decision carries is executed as any hold
+(under the refusal rule a fallback decision's winner carries none; the wait is the robot without a task).
+Unchanged: `realize()`, `_clears_gate()`, G1, the trigger set, the recognizer, the IR test-bed's oracle, the body's
+behaviour beyond receiving the decision's horizon and executing the wait.
+
+Confirmed at the P plan step (Hadi, 28 September 2026).
+- The span: [observation offset, the candidate's last segment's end], on the decision's projection clock (L2); not
+  [offset, offset + T_r]. Under `full_reorder` the candidate is the ordering, so the stand spans the ordering.
+- The types: the meta-planner's human projection is a `HumanProjection`, an `AdmittedProjection` (the admitted
+  `ProjectedPlan`, the same for every candidate) or a `FallbackProjection` (the observed position and the offset; the
+  stationary `ProjectedPlan` built per candidate). `ProjectedPlanEntry.abstract_plan` is Optional, None only for the
+  fallback's entry, which has no task (no reader assumes an abstract task per entry).
+- "A human observed": the meta-planner has a `human_agent_id` and the world holds that agent's position.
+- Unprojectable (the gate clears, `project_human()` returns None): the fallback, with the record left empty.
+- Logs: `[meta-proj] … projection=fallback refused=<the refusal's reason>`; `[meta-b2]` names the admission's reason;
+  `[meta-b3]`'s T_h is the winner's.
+- `UpdateResult.horizon` carries the winner's assessed horizon (its `RealizedPlan.horizon`) to the body, which passes
+  it to `set_assessed_window` and derives nothing.
+
+Reference: cchat, 28 September 2026 (P); T-D Q1 (handoff_T-D_onward.md, item 1, and its SETTLED note: P's building
+block); F1; R1; T3b; D2; "T-D L" (L2 (ii), L5 B); "T-D R and E" (G1); TODO-119

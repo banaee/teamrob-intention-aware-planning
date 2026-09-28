@@ -3569,7 +3569,7 @@ scenario_s01_01 prior off at 159 (completion 201 → 186), scenario_s03_01 full_
 world 227); 23 retractions over the 52 baseline runs (`analysis/l_build/REPORT.md`).
 
 **TODO-119: A lone hypothesis is adequate right after a boundary with the human idle (recorded for P and G, T-D 1.5c, 27 Sept 2026)**
-[OPEN; cycle 2 input, P and G]
+[P PART CLOSED by T-D P1 and P2 (28 Sept 2026) as far as a refusal goes; G PART OPEN]
 Prior off, after the human's last task the robot's own remaining item is the lone live hypothesis (belief 1.0 by
 normalisation), and the idle stand leaves its walk adequate for about 16 ticks (S from 0.86 down to α) before it
 turns inadequate; the gate admits it in that window (scenario_s01_01 prior off at 143 in 1.5b, a 31-tick hold). Under
@@ -3589,6 +3589,16 @@ the projection (no member on the boundary tick, G1 refuses): the decision on the
 lone hypothesis is re-admitted at b + 1, two decisions per such boundary. A re-entering `coffee_break` still within
 reach of its machine re-enters in its `wait_at` phase and is a member at S = 1 for a tick or two as the human walks
 away. design_decisions.md, "T-D L", L4 and L5 as amended.
+P PART CLOSED (T-D P, ruled by Hadi, 28 Sept 2026), as far as a refusal goes: where admission refuses and a human is
+observed, the decision realizes against the fallback projection, the human standing at its observed position over the
+candidate's span (P1), with no motion extrapolated (P2); a candidate that would need a hold under it is refused, and
+with none eligible the robot waits. Whether the lone-hypothesis admission at b + 1 should stand is G: P leaves it, and
+an admitted projection outranks the fallback.
+G PART, restated: whether that admission should stand (walking evidence before admission, or another guard); whether
+a stationary fallback becoming stale is itself a trigger, and what observation establishes it (a departure of the
+observed position from the assumed one by `min_separation` is one candidate, not a ruling, because `min_separation` is
+the body's safety constraint); and whether the wait's polling by `no_current_task` stands (P1: provisional until G).
+design_decisions.md, "T-D P: the fallback projection".
 
 **TODO-120: Three small flags from the 1.5b acceptance (recorded, T-D 1.5c, 27 Sept 2026)** [OPEN; documentation]
 - `analysis/td_stage1/supp_sweep.sh` was committed without the executable bit (made executable in 1.5c; run it with
@@ -3655,7 +3665,7 @@ Reference: `analysis/ir_testbed/REPORT.md`, TB.3b flags
 Files: tests/test_tl2_discovery.py
 Reference: `analysis/ir_testbed/REPORT.md`, TB.3b and TB.4b, "Runs and tests that disagree with the mechanism"
 
-**TODO-127: `d_decisions.txt`'s world completion tick equals the declared one prior off, declared − 2 prior on (recorded, L-records, 27 Sept 2026)** [CHECKED (L-build, 28 Sept 2026): not a reader defect; CLAUDE.md's wording flagged]
+**TODO-127: `d_decisions.txt`'s world completion tick equals the declared one prior off, declared − 2 prior on (recorded, L-records, 27 Sept 2026)** [RESOLVED as wording (T-D P records, 28 Sept 2026): CLAUDE.md's sentence fixed]
 Flagged in TB.2b (`analysis/tb2b_exposed_interval/REPORT.md`, flags) and not examined: for the prior-off runs
 `d_decisions.txt` prints a world completion tick (`tdlib.robot_completion`, T6) equal to the declared one (scenario_s06_02
 off: world 267, declared 267), where the prior-on runs read world = declared − 2 (scenario_s01_01 on: 169 / 171), the
@@ -3668,6 +3678,9 @@ changes most_likely and `update()` drops the completed task, T7), and is world +
 prior off, the robot's remaining item is often the recorded leader, hence the pattern. CLAUDE.md's "declared = N,
 world = N − 2" holds for `no_current_task` endings only (flagged, CLAUDE.md not edited). Under L2 (ii) several of these
 runs now end by `no_current_task` (declared + 2, world unchanged).
+RESOLVED AS WORDING (T-D P records, 28 Sept 2026): CLAUDE.md, "Regression checking", now states that the declared tick
+is the world tick + 2 only when `no_current_task` ends the pool, and equals it when a `recognition_changed` of that tick
+ends it.
 Files: analysis/td_stage1b/tdlib.py (frozen), analysis/td_stage1b/d_decisions.py
 Reference: `analysis/tb2b_exposed_interval/REPORT.md`, "Flags (not fixed)"; CLAUDE.md, "Regression checking" (completion)
 
@@ -3678,6 +3691,22 @@ and B3's queue rewrite persists the drop, so a task whose terminal fact later st
 the pool should follow the world both ways is for later; nothing in the current scenarios moves a delivered item.
 Files: shared/meta_planner.py (`update`, the pool)
 Reference: design_decisions.md, "T-D L: the belief lifecycle", L4 as amended; T7
+
+**TODO-129: A retired hypothesis whose terminal fact cannot be read on a later tick stays retired (recorded, T-D P records, 28 Sept 2026)** [OPEN; recorded only]
+L-build's reading (flagged there): the live set is read from the terminal facts every tick (T-D L4), but a retired
+hypothesis the planner cannot decompose on a later tick has no terminal fact to read, and stays retired. No scenario
+reaches it.
+Files: shared/recognizer.py (`_retired`)
+Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
+
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [OPEN; a track note]
+Rooms of the s08 and s09 kind with the robot given its own deliveries, layered in the IR test-bed's order (assigned
+only, a foreseeable task between, the deviations), each scenario exposing one decision: an admission, a hold, a
+retraction, a boundary re-admission, a lone-hypothesis projection after the work order, a blocked target. Its oracle is
+the decision rule, derived from the human's trajectory and the belief. It needs the oracle extension that reads a run
+log's world with the robot's acts.
+Files: analysis/ir_testbed/ (the oracle, to extend), domains/kitting/ (layouts, setups, scenarios)
+Reference: design_decisions.md, "The IR test-bed"; "T-D P"
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).

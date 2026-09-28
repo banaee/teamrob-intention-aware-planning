@@ -394,12 +394,19 @@ class TriggerDecision:
 
 @dataclass
 class UpdateResult:
-    current_task: Optional[TaskInstance]   # None = all tasks complete (see §2.2, Update)
+    current_task: Optional[TaskInstance]   # None with an empty queue = all tasks complete; None with a
+                                           # non-empty queue = the wait (T-D P1; see §2.2, Update)
     queue: List[TaskInstance]
     hold: int = 0                          # the decision's hold δ, WHOLE ticks, at the robot's position
                                            # at the trigger tick (T4, T10) — see below. 0 when none was
                                            # placed (no human projection,
-                                           # cost_strategy "plain", the terminal return).
+                                           # cost_strategy "plain", a fallback decision, the wait, the
+                                           # terminal return).
+    horizon: Optional[float] = None        # the winner's assessed horizon, its RealizedPlan.horizon: T_h on
+                                           # this decision's projection clock (T-D P). None when the decision
+                                           # was realized against no human plan, and for the wait and the
+                                           # terminal return. The body passes it to its [stop] label and
+                                           # derives nothing.
 ```
 
 **A continue decision (T5, TODO-43).** `update()` returning a `current_task` whose
@@ -887,7 +894,8 @@ in what that decision rested on):
   AMENDED (Hadi, on the L-records report, 27 September 2026): "leaves adequate" is adequate to
   inadequate, for the recorded hypothesis only (leaving for no observation fires nothing); built as the state "the
   recorded hypothesis's `hypothesis_adequacy` is INADEQUATE", which a record set only while adequate (G1) and cleared on
-  the fire makes the same event. No P fallback. And (L5 B) `recognition_changed` also fires when a hypothesis is recorded
+  the fire makes the same event. No P fallback (SUPERSEDED by T-D P, 28 September 2026: with a human observed the
+  refused decision realizes against the fallback projection; the retraction is unchanged). And (L5 B) `recognition_changed` also fires when a hypothesis is recorded
   and the belief was re-initialised at an episode boundary on this tick (`belief.episode_boundary`), whether or not
   most_likely changed: on a boundary tick no hypothesis is a member, so admission refuses and the record clears.
 - `task_committed` — `executor_state.holding` transitions `None → not-None`. REMOVED BY D3 (September 2026);
@@ -908,11 +916,13 @@ update(
     belief: BeliefState,
     world: WorldState,
     executor_state: ExecutorState,
-    human_projection: Optional[ProjectedPlan],
+    human_projection: Optional[HumanProjection],
 ) -> UpdateResult
 ```
 `human_projection` is required (no default): the result of `update_human_projection()` for
-this trigger, or `None`.
+this trigger, or `None`. A `HumanProjection` (T-D P, `shared/projection.py`) gives each candidate the human plan
+it is realized against (`for_candidate()`): the admitted `ProjectedPlan` for every candidate
+(`AdmittedProjection`), or the fallback projection built over the candidate's own span (`FallbackProjection`).
 `current_task` competes as just another candidate — no special-case WAIT/RESELECT branch;
 continuation vs. reselection falls out of cost comparison across the full candidate set. Under
 the wait-decision revision that remains true with waiting added: a wait is a HOLD inside a
@@ -990,6 +1000,17 @@ is inside B3; neither strategy commits to an order:
 
 The human's projection is built once per fired trigger by `update_human_projection()` (below)
 and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.
+AMENDED (T-D P, 28 September 2026): an admitted projection is the same `ProjectedPlan` for every candidate; a
+fallback projection is built per candidate over [observation offset, the candidate's end] (under `full_reorder`, the
+ordering's), from the observed position the call recorded. Under a fallback a candidate whose realization needs a
+hold is REFUSED (under `full_reorder`, an ordering with any hold before any entry): the shift would only move its
+violation to T_h, where the assumed stand ends (design_decisions.md, "T-D P", P1). The argmin ranges over the
+eligible candidates; `[meta-cand]` appends ` refused=fallback` to a refused candidate's line, and under
+`full_reorder` a head with no eligible ordering logs `[meta-ord] head=<task> refused=fallback orderings=<n>`. With
+none eligible, `update()` returns THE WAIT: `UpdateResult(current_task=None, queue=<the whole pool>, hold=0)`,
+logged `[meta-b3] … selection=wait winner=none`; the robot stands without a task and `no_current_task` re-asks on
+the next tick (provisional until G). B2 `b2a` under a fallback continues only with δ = 0 and escalates otherwise.
+An admitted projection keeps F1's semantics: nothing is refused.
 `human_projection=None` means every candidate is realized against no human plan — δ = 0, cost =
 T_r (`reason="no_human_projection"`). It is never treated as always-conflicting. `None` is a
 ROUTINE mid-run state, not an edge case: the belief re-initialises at every human task boundary
@@ -998,7 +1019,8 @@ a projection.
 
 **Terminal state:** `update()` returns `UpdateResult(current_task=None, queue=[])` when no
 candidates remain — all assigned tasks are complete. Callers check
-`result.current_task is None`. Task exhaustion is never signalled by exception; "all tasks
+`result.current_task is None` and an empty `result.queue` (since T-D P: `current_task` None with a non-empty queue
+is the wait, above). Task exhaustion is never signalled by exception; "all tasks
 done" is a fact `shared/` discovers about its own state, so it is returned through the
 contract rather than raised for the embodiment layer to catch and reinterpret.
 
@@ -1011,13 +1033,17 @@ so every candidate carries a realized cost and B3 needs no fallback: the T10 `al
 update_human_projection(
     belief: BeliefState,
     world: WorldState,
-) -> Optional[ProjectedPlan]
+) -> Optional[HumanProjection]
 ```
 Called once per fired trigger, between `evaluate_triggers()` and `update()`; the result is
 `update()`'s `human_projection` argument. Projection **admission** is decided here — a
 MetaPlanner policy, not a `Projector` one — then delegated to `Projector.project_human()`.
 
-Returns `None`, checked in this order, when:
+AMENDED (T-D P, 28 September 2026). Returns an `AdmittedProjection` when admission builds a projection (the record
+set to `belief.most_likely`); in every refused case below with a human observed (the meta-planner has a
+`human_agent_id` and the world holds its position), the FALLBACK PROJECTION (`FallbackProjection`, built by
+`Projector.project_stationary()`: the observed position and the observation offset), the decision record left empty;
+`None` only when no human is observed. The refusals, checked in this order:
 
 - the belief does not clear the gate (`_clears_gate()`: `confidence < theta`, or the leader's hypothesis adequacy
   is not ADEQUATE, G1) — the projector is not called. The gate gates admission as it gates
@@ -1027,7 +1053,7 @@ Returns `None`, checked in this order, when:
   is not in the domain).
 
 Emits one `[meta-proj] confidence=<c> theta=<θ> projection=<reason>` line per call, with
-`reason` ∈ `built`, `none(below_theta)`, `none(leader_no_observation)`, `none(leader_inadequate)` (G1, cycle 1.5b),
+`reason` ∈ `built`, `fallback refused=<the refusal's reason>` (T-D P), `none(below_theta)`, `none(leader_no_observation)`, `none(leader_inadequate)` (G1, cycle 1.5b),
 `none(no_human)`, `none(unprojectable)` (T-D Stage 1: renamed from
 `none(unresolved)`, which collided with the adequacy finding's value; `none(unknown)` is gone with the `unknown`
 hypothesis). When the recognizer is exhausted, `confidence` is 0.0 and admission refuses as `none(below_theta)`:

@@ -128,9 +128,21 @@ completion tick (0 since T-C2b: its executor is action-level). It ends at **T_h*
 Admission is logged as `[meta-proj]`; there is at most one, and there may be none.
 See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the hypotheses covering 1 − ε of the mass, recorded for after the T-D recognizer pass, not decided.
 → `shared/meta_planner.py`, `update_human_projection()`; `shared/io_contracts.md` §2.2.
+AMENDED (T-D P, 28 September 2026): when admission refuses and a human is observed, the **fallback projection**
+takes its place.
+
+**fallback projection** — the stationary `ProjectedPlan` of T-D P1: the observed human standing at its last
+observed position over [observation offset, the candidate's end], built per candidate (under `full_reorder` per
+ordering), when admission refuses and a human is observed. Nothing is admitted, so the decision record stays empty.
+Under it a candidate whose realization needs a hold (δ > 0) is refused, not priced: the shift would only move the
+violation to T_h, where the assumed stand ends; the candidates with δ = 0 are eligible, and with none eligible the
+robot waits without a task. It extrapolates no motion (P2). Logged `[meta-proj] … projection=fallback refused=<reason>`.
+→ `docs/design_decisions.md`, "T-D P: the fallback projection"; `shared/projection.py`, `FallbackProjection`;
+`shared/io_contracts.md` §2.2.
 
 **T_h** — the end of the human projection: its last segment's end step. Nothing past T_h is
-assessed or charged.
+assessed or charged. Under a fallback projection T_h is the candidate's own end, so it differs per candidate;
+`UpdateResult.horizon` carries the winner's (T-D P).
 → `shared/io_contracts.md` §1.11, `RealizedPlan.horizon`.
 
 ---
@@ -253,6 +265,8 @@ AMENDED (Hadi, on the L-records report, 27 September 2026): "leaves adequate" is
 no observation (which every boundary and every proximity regress would produce). Built as the state "the recorded
 hypothesis is inadequate": a record is set only while its hypothesis is adequate (G1) and the fire clears it. There is
 no P fallback: the decision realizes against no human plan, as below θ. Logged `[meta-trig] … cause=retraction`.
+SUPERSEDED IN PART (T-D P, 28 September 2026): "there is no P fallback" no longer holds; with a human observed the
+decision after a retraction realizes against the **fallback projection**. The retraction itself is unchanged.
 
 **crossing** — a θ crossing, and nothing else: the tick a hypothesis's normalised share first clears
 the gate. For paths the word is **violation** (§3); for two paths meeting in space, say that they

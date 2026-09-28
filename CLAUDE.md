@@ -166,6 +166,9 @@ Decisions
   holds); L-build built it (28 Sept 2026: the boundary on the observed agent's completion of a terminal action, the
   live set read from the terminal facts every tick with re-entry at 1/|H|, retraction and the boundary flag in
   `recognition_changed`; `analysis/l_build/REPORT.md`, the IR test-bed agreeing at 1e-9); next is P.
+  P, the fallback projection, is ruled (28 Sept 2026; design_decisions.md, "T-D P"): when admission refuses and a
+  human is observed, the human stands at its observed position over each candidate's span, a candidate needing a hold
+  under it is refused, and with none eligible the robot waits without a task.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
@@ -391,7 +394,9 @@ sweep scripts copy it beside each log).
 
 Completion is measured from the world fact (T6): the tick after the robot's last release
 (`action=place micro=release`), when the terminal condition is first observable. The empty-pool line
-`[meta] step=N all tasks complete` is the declared tick, N − 2. Report the world tick; older reports
+`[meta] step=N all tasks complete` is the declared tick: the world tick is N − 2 when `no_current_task` ends the
+pool, and N when a `recognition_changed` of that tick ends it (the robot's own last item changes the belief and
+`update()` drops the completed task; TODO-127). Report the world tick; older reports
 (D2 and before) give declared ticks. `analysis/t6_ablation/metrics.py` reads it from a log. Every completion
 tick recorded BEFORE T-B Q7 is one tick shorter per robot delivery than the behaviour from here on (less
 where a decided hold carried the tick): the body used to cancel a completion tick when a reload landed on it
