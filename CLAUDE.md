@@ -167,8 +167,9 @@ Decisions
   live set read from the terminal facts every tick with re-entry at 1/|H|, retraction and the boundary flag in
   `recognition_changed`; `analysis/l_build/REPORT.md`, the IR test-bed agreeing at 1e-9); next is P.
   P, the fallback projection, is ruled (28 Sept 2026; design_decisions.md, "T-D P"): when admission refuses and a
-  human is observed, the human stands at its observed position over each candidate's span, a candidate needing a hold
-  under it is refused, and with none eligible the robot waits without a task.
+  human is observed, a short-term physical projection from the observed position and the last displacement (standing,
+  or a straight continuation to the wall or the first fixed object) over each candidate's span; a candidate whose
+  violation is cleared only by the projection's end is refused, and with none eligible the robot waits without a task.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6

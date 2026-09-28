@@ -194,9 +194,23 @@ class WorldState:
                                                                  # the setup's "destination" (kitting: the item's
                                                                  # designated table), read via `destination_of` (§2.3)
     object_positions: Dict[str, Tuple[float, float]] = {}        # {obj_id: (x, y)}: env objects and items
+    fixed_object_positions: Dict[str, Tuple[float, float]] = {}  # {obj_id: (x, y)}: the fixed objects only (T-D P);
+                                                                 # static facts of the layout, filled by the builder
+    workspace: Optional[Workspace] = None                        # the room's rectangle (T-D P); static, the builder
+    agent_displacements: Dict[str, Tuple[float, float]] = {}     # {agent_id: (dx, dy)}: the agent's last observed
+                                                                 # one-tick displacement (T-D P); a perception fact of
+                                                                 # the robot's world model, written by the robot from
+                                                                 # its consecutive observations, never by the builder;
+                                                                 # ABSENT for an agent with no previous observation
     metadata: Dict[str, Any] = {}
 # (every `= {}` / `= set()` is a field(default_factory=...) in shared/types.py)
+
+@dataclass(frozen=True)
+class Workspace:
+    x_min: float; x_max: float; y_min: float; y_max: float
 ```
+WorldState is the robot's world model, not simulator state (T-D P): most of it is built from the simulator by the
+builder, and `agent_displacements` is the robot's own perception fact, added to it before the mind reads it.
 
 **Positions: the scoped exception.** `agent_positions` and `object_positions` are read in `shared/`
 through one lookup, `shared/target_resolution.py`: `movement_target_position(action, world)` resolves a
@@ -400,7 +414,7 @@ class UpdateResult:
     hold: int = 0                          # the decision's hold δ, WHOLE ticks, at the robot's position
                                            # at the trigger tick (T4, T10) — see below. 0 when none was
                                            # placed (no human projection,
-                                           # cost_strategy "plain", a fallback decision, the wait, the
+                                           # cost_strategy "plain", the wait, the
                                            # terminal return).
     horizon: Optional[float] = None        # the winner's assessed horizon, its RealizedPlan.horizon: T_h on
                                            # this decision's projection clock (T-D P). None when the decision
@@ -1002,14 +1016,18 @@ The human's projection is built once per fired trigger by `update_human_projecti
 and passed in as `human_projection`; it is reused for every candidate, never rebuilt here.
 AMENDED (T-D P, 28 September 2026): an admitted projection is the same `ProjectedPlan` for every candidate; a
 fallback projection is built per candidate over [observation offset, the candidate's end] (under `full_reorder`, the
-ordering's), from the observed position the call recorded. Under a fallback a candidate whose realization needs a
-hold is REFUSED (under `full_reorder`, an ordering with any hold before any entry): the shift would only move its
-violation to T_h, where the assumed stand ends (design_decisions.md, "T-D P", P1). The argmin ranges over the
+ordering's), from the observed position and the last displacement the call recorded (P2: standing, or a straight
+continuation stopped at the workspace boundary or the first fixed object's arrival radius, then stationary). Under a
+fallback a candidate is REFUSED iff its violation is cleared only by the projection's end (P1, rule 5): the shifts
+`realize()` found are checked by a second `realize()` against the fallback rebuilt over the realized plan's own span,
+and differing shifts refuse it (`HumanProjection.realizable()`; under `full_reorder` every entry's shift is checked);
+a violation cleared by the projected motion within the horizon keeps its hold (design_decisions.md, "T-D P"). The argmin ranges over the
 eligible candidates; `[meta-cand]` appends ` refused=fallback` to a refused candidate's line, and under
 `full_reorder` a head with no eligible ordering logs `[meta-ord] head=<task> refused=fallback orderings=<n>`. With
 none eligible, `update()` returns THE WAIT: `UpdateResult(current_task=None, queue=<the whole pool>, hold=0)`,
 logged `[meta-b3] … selection=wait winner=none`; the robot stands without a task and `no_current_task` re-asks on
-the next tick (provisional until G). B2 `b2a` under a fallback continues only with δ = 0 and escalates otherwise.
+the next tick (provisional until G). B2 `b2a` under a fallback escalates when the current task is refused, and otherwise judges its δ against the bound as
+under an admitted projection.
 An admitted projection keeps F1's semantics: nothing is refused.
 `human_projection=None` means every candidate is realized against no human plan — δ = 0, cost =
 T_r (`reason="no_human_projection"`). It is never treated as always-conflicting. `None` is a
@@ -1042,7 +1060,8 @@ MetaPlanner policy, not a `Projector` one — then delegated to `Projector.proje
 AMENDED (T-D P, 28 September 2026). Returns an `AdmittedProjection` when admission builds a projection (the record
 set to `belief.most_likely`); in every refused case below with a human observed (the meta-planner has a
 `human_agent_id` and the world holds its position), the FALLBACK PROJECTION (`FallbackProjection`, built by
-`Projector.project_stationary()`: the observed position and the observation offset), the decision record left empty;
+`Projector.project_fallback()`: the observed position, the last displacement if observed, the observation offset,
+the workspace, the fixed objects and the arrival radius), the decision record left empty;
 `None` only when no human is observed. The refusals, checked in this order:
 
 - the belief does not clear the gate (`_clears_gate()`: `confidence < theta`, or the leader's hypothesis adequacy

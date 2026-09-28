@@ -131,14 +131,25 @@ See TODO-97 (24 Sept 2026): belief-aware planning, one realization against the h
 AMENDED (T-D P, 28 September 2026): when admission refuses and a human is observed, the **fallback projection**
 takes its place.
 
-**fallback projection** — the stationary `ProjectedPlan` of T-D P1: the observed human standing at its last
-observed position over [observation offset, the candidate's end], built per candidate (under `full_reorder` per
-ordering), when admission refuses and a human is observed. Nothing is admitted, so the decision record stays empty.
-Under it a candidate whose realization needs a hold (δ > 0) is refused, not priced: the shift would only move the
-violation to T_h, where the assumed stand ends; the candidates with δ = 0 are eligible, and with none eligible the
-robot waits without a task. It extrapolates no motion (P2). Logged `[meta-proj] … projection=fallback refused=<reason>`.
+**fallback projection** — the short-term physical projection of T-D P, built when admission refuses and a human is
+observed: where to expect the human during this candidate's realization, from what was observed, claiming nothing
+about intention. One mechanism, two cases, from the human's last observed displacement (one tick,
+`WorldState.agent_displacements`; absent before a second observation, read as standing): STANDING, the human
+stationary at the observed position; MOVING, a straight continuation along the last displacement at the observed step
+length until the ray meets the workspace boundary or enters the arrival radius of the first fixed object along it,
+then stationary there. Over [observation offset, the candidate's end], built per candidate (under `full_reorder` per
+ordering), rebuilt at every decision. Nothing is admitted, so the decision record stays empty. Under it a candidate
+is REFUSED iff its violation is cleared only by the end of the projection (a stationary segment ending, or the moving
+segment cut by the horizon); a violation cleared by the projected motion within the horizon is priced as a hold (F1).
+With none eligible the robot waits without a task. Logged `[meta-proj] … projection=fallback refused=<reason>`.
+AMENDED (P Q2, 28 September 2026): the first form was stationary only; superseded.
 → `docs/design_decisions.md`, "T-D P: the fallback projection"; `shared/projection.py`, `FallbackProjection`;
 `shared/io_contracts.md` §2.2.
+
+**occupied target** / **blocked route** — X's two cases (proposed as terms, T-D P-build, 28 September 2026): with
+nothing realizable under the fallback, the robot waits because the human stands at the robot's target (occupied
+target), or on the robot's walk to it (blocked route). What to do then is X's.
+→ `docs/design_decisions.md`, "T-D P", the deadlock.
 
 **T_h** — the end of the human projection: its last segment's end step. Nothing past T_h is
 assessed or charged. Under a fallback projection T_h is the candidate's own end, so it differs per candidate;

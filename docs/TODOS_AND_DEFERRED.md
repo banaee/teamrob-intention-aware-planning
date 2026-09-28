@@ -3589,15 +3589,12 @@ the projection (no member on the boundary tick, G1 refuses): the decision on the
 lone hypothesis is re-admitted at b + 1, two decisions per such boundary. A re-entering `coffee_break` still within
 reach of its machine re-enters in its `wait_at` phase and is a member at S = 1 for a tick or two as the human walks
 away. design_decisions.md, "T-D L", L4 and L5 as amended.
-P PART CLOSED (T-D P, ruled by Hadi, 28 Sept 2026), as far as a refusal goes: where admission refuses and a human is
-observed, the decision realizes against the fallback projection, the human standing at its observed position over the
-candidate's span (P1), with no motion extrapolated (P2); a candidate that would need a hold under it is refused, and
-with none eligible the robot waits. Whether the lone-hypothesis admission at b + 1 should stand is G: P leaves it, and
-an admitted projection outranks the fallback.
-G PART, restated: whether that admission should stand (walking evidence before admission, or another guard); whether
-a stationary fallback becoming stale is itself a trigger, and what observation establishes it (a departure of the
-observed position from the assumed one by `min_separation` is one candidate, not a ruling, because `min_separation` is
-the body's safety constraint); and whether the wait's polling by `no_current_task` stands (P1: provisional until G).
+P PART CLOSED FOR REFUSALS (T-D P, ruled by Hadi, 28 Sept 2026): where admission refuses and a human is observed, the
+decision realizes against the fallback projection, the short-term physical projection from the observed position and
+the last displacement (P1, P2 as reopened); a candidate whose violation is cleared only by the projection's end is
+refused, and with none eligible the robot waits. The lone-hypothesis admission at b + 1 is G: P leaves it, and an
+admitted projection outranks the fallback.
+G PART: whether that admission should stand; the rest of G's first questions are TODO-132.
 design_decisions.md, "T-D P: the fallback projection".
 
 **TODO-120: Three small flags from the 1.5b acceptance (recorded, T-D 1.5c, 27 Sept 2026)** [OPEN; documentation]
@@ -3707,6 +3704,25 @@ the decision rule, derived from the human's trajectory and the belief. It needs 
 log's world with the robot's acts.
 Files: analysis/ir_testbed/ (the oracle, to extend), domains/kitting/ (layouts, setups, scenarios)
 Reference: design_decisions.md, "The IR test-bed"; "T-D P"
+
+**TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
+WorldState is the robot's world model, not simulator state (T-D P). Today `RobotAgent` (the Mesa body) holds the
+recognizer, the meta-planner and, since P, the human's previous observed position, from which it writes
+`WorldState.agent_displacements` each tick. The form to build: a robot-mind object in `shared/` owning the world model
+and the cognition components, the Mesa agent as its body. Its robot-internal record stays bounded to what components
+read (the previous position now; a standing count when G asks for it), never a growing history.
+Files: mesa_sim/sim_agents.py (`RobotAgent`), shared/ (the new object)
+Reference: design_decisions.md, "T-D P: the fallback projection", mechanics
+
+**TODO-132: G's first questions after P (recorded, T-D P, 28 Sept 2026)** [OPEN; G]
+(a) The staleness of a fallback: the human stopped, turned or walked past what the fallback projected; what
+observation establishes it (a departure from the projected position by `min_separation` is one candidate, not a
+ruling, because `min_separation` is the body's safety constraint), and whether it is a trigger. (b) TODO-95's sustained
+stand. (c) The no-decision on a reset tick (every boundary that meets a record clears the projection, L5 B). (d)
+Whether the wait's polling by `no_current_task` stands, or a staleness or reconsideration trigger replaces it (P1:
+provisional until G). (e) Whether the lone-hypothesis admission at b + 1 stands (TODO-119's G part).
+Files: shared/meta_planner.py (`evaluate_triggers`, `_clears_gate`, `update_human_projection`)
+Reference: design_decisions.md, "T-D P", consequence recorded; TODO-95, TODO-119
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
