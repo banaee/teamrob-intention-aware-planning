@@ -60,7 +60,7 @@ import logging
 from typing import TYPE_CHECKING, Dict, Set, Tuple
 import math
 
-from shared.types import AgentState, WorldState, Predicate, Const
+from shared.types import AgentState, WorldState, Workspace, Predicate, Const
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
@@ -96,6 +96,7 @@ def build_world_state(model: SimModel) -> WorldState:
     object_home_container: Dict[str, str] = {}
     object_destination: Dict[str, str] = {}
     object_positions: Dict[str, Tuple[float, float]] = {}
+    fixed_object_positions: Dict[str, Tuple[float, float]] = {}
     predicates: Set[Predicate] = set()
 
     # ------------------------------------------------------------------
@@ -190,6 +191,7 @@ def build_world_state(model: SimModel) -> WorldState:
         else:
             # Fixed object — direct position/zone, no held_by/at_location semantics.
             object_positions[obj_id] = tuple(obj.position)
+            fixed_object_positions[obj_id] = tuple(obj.position)   # static, for the fallback projection (T-D P)
             object_zones[obj_id] = model.get_zone_of_position(obj.position[0], obj.position[1]) or "unknown"
 
     # ------------------------------------------------------------------
@@ -217,6 +219,10 @@ def build_world_state(model: SimModel) -> WorldState:
         object_home_container=object_home_container,
         object_destination=object_destination,
         object_positions=object_positions,
+        fixed_object_positions=fixed_object_positions,
+        # The room's rectangle, static (T-D P): the body's space, built from the layout's width and height.
+        workspace=Workspace(x_min=model.space.x_min, x_max=model.space.x_max,
+                            y_min=model.space.y_min, y_max=model.space.y_max),
         predicates=predicates,
     )
 

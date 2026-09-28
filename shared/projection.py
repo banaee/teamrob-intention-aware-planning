@@ -45,7 +45,9 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT import from mesa_sim/ or ros_sim/
 """
 
-from dataclasses import replace
+import math
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, replace
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from shared.types import (
@@ -56,7 +58,9 @@ from shared.types import (
     GroundedAction,
     ProjectedPlan,
     ProjectedPlanEntry,
+    RealizedPlan,
     Segment,
+    Workspace,
     task_instance_key,
 )
 from shared.knowledge import TaskModel
@@ -64,6 +68,7 @@ from shared.planner import AdaptivePlanner
 from shared.recognizer import IntentionRecognizer
 from shared.target_resolution import movement_target_id, movement_target_position
 from shared.trajectory_algorithms import straight_line_path, stationary_segment, arrival_point
+from shared.realization import realize
 
 
 class Projector:
@@ -348,6 +353,35 @@ class Projector:
             task_completion_latency=self._observed_task_completion_latency,
         )
 
+    def project_fallback(
+        self,
+        world: WorldState,
+        human_agent_id: str,
+    ) -> Optional["FallbackProjection"]:
+        """
+        The fallback projection (T-D P): what the world model holds of the
+        observed human — its position, true at the observation offset (L2), as
+        project_human() starts there; its last one-tick displacement, absent
+        before a second observation — with the room it moves in: the workspace,
+        the fixed objects, and this projector's arrival radius (T9, the radius
+        a projected walk stops at). Its end is each candidate's own
+        (FallbackProjection.for_candidate()), so nothing here sets a horizon.
+
+        Returns None when the world holds no position for `human_agent_id`:
+        no human observed, nothing to build it from.
+        """
+        position = world.agent_positions.get(human_agent_id)
+        if position is None:
+            return None
+        return FallbackProjection(
+            position=position,
+            displacement=world.agent_displacements.get(human_agent_id),
+            start_step=self._observation_offset,
+            workspace=world.workspace,
+            fixed_objects=tuple(world.fixed_object_positions.values()),
+            arrival_radius=self._arrival_radius,
+        )
+
     def build_segments(
         self,
         plan: AbstractPlan,
@@ -481,6 +515,173 @@ class Projector:
         if not segments:
             return 0
         return int(round(segments[-1].end_step - segments[0].start_step))
+
+
+# =============================================================================
+# The human projection a candidate is realized against (T-D P)
+# =============================================================================
+
+class HumanProjection(ABC):
+    """
+    What admission (MetaPlanner.update_human_projection()) hands update(): the
+    human's plan a candidate is realized against, one per fired trigger, and
+    whether a candidate so realized is realizable under it. Two kinds (T-D P,
+    design_decisions.md, "T-D P: the fallback projection"):
+      AdmittedProjection   the admitted hypothesis's projection, the same
+                           ProjectedPlan for every candidate; F1's semantics:
+                           every candidate realizes, its hold priced as cost.
+      FallbackProjection   admission refused with a human observed: the human
+                           where it was observed and as it moved last (P2),
+                           over each candidate's own span; a candidate whose
+                           violation is cleared only by the projection's end
+                           is not realizable (P1).
+    realize() is not told which it is given: it reads the ProjectedPlan.
+    """
+
+    @abstractmethod
+    def for_candidate(self, candidate: ProjectedPlan) -> ProjectedPlan:
+        """The human's ProjectedPlan to realize `candidate` against."""
+
+    @abstractmethod
+    def realizable(self, candidate: ProjectedPlan, realized: RealizedPlan, min_separation: float) -> bool:
+        """Whether `realized` — `candidate` realized against
+        for_candidate(candidate) at `min_separation` — is realizable under this
+        projection."""
+
+
+@dataclass(frozen=True)
+class AdmittedProjection(HumanProjection):
+    """The admitted hypothesis's projection (Projector.project_human())."""
+    plan: ProjectedPlan
+
+    def for_candidate(self, candidate: ProjectedPlan) -> ProjectedPlan:
+        return self.plan
+
+    def realizable(self, candidate: ProjectedPlan, realized: RealizedPlan, min_separation: float) -> bool:
+        # F1: realization is total; a hold is priced as cost, never refused.
+        return True
+
+
+@dataclass(frozen=True)
+class FallbackProjection(HumanProjection):
+    """
+    The fallback projection (T-D P): a short-term physical projection of the
+    observed human, from what was observed, claiming nothing about intention.
+    Built by Projector.project_fallback(). One mechanism, two cases, read from
+    `displacement`, the human's last observed one-tick displacement (P2 (1)):
+      STANDING (a zero displacement; or none observed yet, the initialisation
+        convention): stationary at `position`;
+      MOVING: a straight continuation from `position` along the displacement
+        at its length per tick, until the ray meets the workspace boundary or
+        enters the arrival radius of the first fixed object along it (an
+        object whose radius contains the ray's start is skipped), then
+        stationary there (P2 (2)).
+    Over [start_step, the candidate's end] — start_step the observation offset
+    (L2), the end the candidate's last segment's end, its own T_r on the
+    decision's projection clock (under full_reorder the candidate is the
+    ordering; P2 (3)). One entry, which has no task (abstract_plan None).
+    Known errors, recorded and not fixed: a human passing an object on the way
+    elsewhere is projected to stop there; an acknowledgement tick reads as
+    standing for a decision on that tick.
+
+    REALIZABLE (P1, rule 5) iff the candidate's violation is cleared by the
+    projected motion within the horizon, not only by the projection's end (a
+    stationary segment ending, or the moving segment cut by the horizon). Exact
+    form: the shifts realize() found are checked by a second realize() against
+    this projection rebuilt over the realized plan's own span (the candidate's
+    end plus the last entry's cumulative shift); differing shifts refuse it.
+    The rebuilt projection only extends the first one, so its violating
+    intervals contain the first's and its shifts are never smaller: equal
+    shifts mean the realized plan is clear of the human over its whole span. A
+    consistency check; nothing iterates.
+    """
+    position: Tuple[float, float]
+    displacement: Optional[Tuple[float, float]]
+    start_step: float
+    workspace: Optional[Workspace]
+    fixed_objects: Tuple[Tuple[float, float], ...]
+    arrival_radius: float
+
+    def for_candidate(self, candidate: ProjectedPlan) -> ProjectedPlan:
+        return self._over(_end_of(candidate))
+
+    def realizable(self, candidate: ProjectedPlan, realized: RealizedPlan, min_separation: float) -> bool:
+        realized_end = _end_of(candidate) + realized.cumulative_shifts[-1]
+        again = realize(candidate, self._over(realized_end), min_separation, decision_step=realized.hold_start)
+        return again.cumulative_shifts == realized.cumulative_shifts
+
+    def _over(self, end: float) -> ProjectedPlan:
+        """The projection over [start_step, end]: the continued walk, cut at
+        `end` if it has not stopped by then, then the stand to `end`."""
+        if end < self.start_step:
+            raise ValueError(
+                f"FallbackProjection: the span ends at step {end}, before the observation offset {self.start_step}"
+            )
+        segments: List[Segment] = []
+        position, step = self.position, self.start_step
+        if self.displacement is not None and self.displacement != (0.0, 0.0):
+            length = math.hypot(*self.displacement)
+            direction = (self.displacement[0] / length, self.displacement[1] / length)
+            step = min(self.start_step + self._reach(direction) / length, end)
+            travelled = (step - self.start_step) * length
+            stop = (position[0] + direction[0] * travelled, position[1] + direction[1] * travelled)
+            if step > self.start_step:
+                segments.append(Segment(start_pos=position, start_step=self.start_step, end_pos=stop, end_step=step))
+            position = stop
+        if end > step or not segments:
+            segments.append(stationary_segment(position, step, end - step))
+        duration = end - self.start_step
+        return ProjectedPlan(
+            task_queue=[],
+            entries=[ProjectedPlanEntry(
+                abstract_plan=None,
+                estimated_start_step=int(self.start_step),
+                estimated_duration=int(round(duration)),
+                segments=segments,
+            )],
+            total_estimated_cost=int(round(duration)),
+        )
+
+    def _reach(self, direction: Tuple[float, float]) -> float:
+        """Distance along the ray from `position` in `direction` (a unit
+        vector) to where the continued walk stops: the nearer of the
+        workspace boundary and the entry into the first fixed object's arrival
+        radius (an object whose radius contains the start skipped)."""
+        if self.workspace is None:
+            raise ValueError("FallbackProjection: a moving human needs the workspace, and the world holds none")
+        px, py = self.position
+        dx, dy = direction
+        ws = self.workspace
+        reach = math.inf
+        if dx > 0.0:
+            reach = min(reach, (ws.x_max - px) / dx)
+        elif dx < 0.0:
+            reach = min(reach, (ws.x_min - px) / dx)
+        if dy > 0.0:
+            reach = min(reach, (ws.y_max - py) / dy)
+        elif dy < 0.0:
+            reach = min(reach, (ws.y_min - py) / dy)
+        reach = max(0.0, reach)
+        r = self.arrival_radius
+        for cx, cy in self.fixed_objects:
+            wx, wy = px - cx, py - cy
+            c = wx * wx + wy * wy - r * r
+            if c <= 0.0:
+                continue   # the ray starts inside this object's arrival radius
+            b = wx * dx + wy * dy
+            disc = b * b - c
+            if disc < 0.0 or b >= 0.0:
+                continue   # the ray misses the disc, or points away from it
+            reach = min(reach, -b - math.sqrt(disc))
+        return reach
+
+
+def _end_of(candidate: ProjectedPlan) -> float:
+    """The candidate's end: its last segment's end step."""
+    segments = [seg for entry in candidate.entries for seg in entry.segments]
+    if not segments:
+        raise ValueError("FallbackProjection: the candidate has no segments")
+    return segments[-1].end_step
 
 
 def successor_state(

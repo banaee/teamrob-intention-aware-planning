@@ -29,7 +29,8 @@ STEP ORDER (RobotAgent):
 
 from __future__ import annotations
 import logging
-from typing import TYPE_CHECKING, List, Optional, Dict
+from dataclasses import replace
+from typing import TYPE_CHECKING, List, Optional, Dict, Tuple
 
 from shared.knowledge import TaskModel, ContextKnowledge
 from shared.projection import Projector
@@ -366,6 +367,11 @@ class RobotAgent(FactoryAgent):
 
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
+        # The observed human's position as this robot last observed it (T-D P): the
+        # one field the robot keeps to write WorldState.agent_displacements, a
+        # perception fact of its world model. The robot-mind object that will own
+        # it is TODO-131.
+        self._previous_human_position: Optional[Tuple[float, float]] = None
 
         self.planner = AdaptivePlanner(knowledge=task_model)
         self.current_plan: Optional[AbstractPlan] = None
@@ -389,7 +395,7 @@ class RobotAgent(FactoryAgent):
         """
         human = self._get_observed_human()
 
-        world = build_world_state(model=self.model)
+        world = self._perceive(build_world_state(model=self.model), human)
 
         if human is not None:
             obs = build_observation(
@@ -474,13 +480,30 @@ class RobotAgent(FactoryAgent):
                 human_projection=human_projection,
             )
 
-            if result.current_task is None:
+            if result.current_task is None and not result.queue:
                 self.executor.hold(0, trigger.reason)
                 logging.info(f"[meta] step={int(self.model.schedule.steps)} all tasks complete")
                 self.finished = True
                 self.current_task_instance = None
                 self.current_plan = None
                 self.current_task = None
+                return
+
+            if result.current_task is None:
+                # THE WAIT (T-D P1): no candidate is compatible with the
+                # stationary human under the fallback projection. The robot
+                # takes no task: no plan is executed this tick, so it stands,
+                # and no_current_task re-asks on the next. Decided in shared/;
+                # the body only executes it.
+                self.executor.hold(result.hold, trigger.reason)
+                logging.info(
+                    f"[meta] step={int(self.model.schedule.steps)} trigger={trigger.reason} wait "
+                    f"queue={[t.schema.name + str({k.name: v.value for k, v in t.bindings.items()}) for t in result.queue]}"
+                )
+                self.current_task_instance = None
+                self.current_plan = None
+                self.executor.set_assessed_window(int(self.model.schedule.steps), result.horizon)
+                self._execute(plan=self.current_plan, world=world)
                 return
 
             logging.info(
@@ -514,13 +537,10 @@ class RobotAgent(FactoryAgent):
             # or extended by the body (TODO-71).
             self.executor.hold(result.hold, trigger.reason)
             # The decision's assessed window, for the [stop] log's inside /
-            # outside label: T_h is the human projection's end on this
-            # decision's projection clock — the same value realize() reads.
-            horizon = None
-            if human_projection is not None:
-                segments = [seg for entry in human_projection.entries for seg in entry.segments]
-                horizon = segments[-1].end_step if segments else None
-            self.executor.set_assessed_window(int(self.model.schedule.steps), horizon)
+            # outside label: T_h is the winner's assessed horizon on this
+            # decision's projection clock (UpdateResult.horizon, T-D P) — the
+            # value realize() read for it; the body derives nothing.
+            self.executor.set_assessed_window(int(self.model.schedule.steps), result.horizon)
                             
         self._execute(plan=self.current_plan, world=world)        
     
@@ -538,7 +558,7 @@ class RobotAgent(FactoryAgent):
         human = self._get_observed_human()
         if human is None:
             return
-        world = build_world_state(model=self.model)
+        world = self._perceive(build_world_state(model=self.model), human)
         obs = build_observation(
             human_agent=human,
             model=self.model,
@@ -549,6 +569,28 @@ class RobotAgent(FactoryAgent):
     # =========================================================================
     # Internal helpers
     # =========================================================================
+
+    def _perceive(self, world: WorldState, human: Optional["HumanAgent"]) -> WorldState:
+        """
+        The robot's world model for this tick (T-D P): the builder's WorldState
+        plus what this robot perceives of motion, the observed human's last
+        one-tick displacement (WorldState.agent_displacements) — its position
+        now minus the position this robot observed last. Absent, not zero,
+        when there is no previous observation. Computed here from the robot's
+        own consecutive observations, never by the builder from the model. The
+        pre-clock observation (observe_initial) is an observation, so tick 0
+        has a displacement.
+        """
+        if human is None:
+            return world
+        position = world.agent_positions[human.unique_id]
+        previous = self._previous_human_position
+        self._previous_human_position = position
+        if previous is None:
+            return world
+        return replace(world, agent_displacements={
+            human.unique_id: (position[0] - previous[0], position[1] - previous[1])
+        })
 
     def _make_dummy_belief(self) -> BeliefState:
         """The belief before the recognizer's first observation: no leader, no

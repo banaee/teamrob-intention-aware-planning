@@ -200,6 +200,15 @@ class Predicate:
 # WORLD STATE TYPES
 # =============================================================================
 
+@dataclass(frozen=True)
+class Workspace:
+    """The room's rectangle, a static fact of the layout (T-D P): the boundary a
+    fallback projection's continued walk stops at. Filled by the builder."""
+    x_min: float
+    x_max: float
+    y_min: float
+    y_max: float
+
     
 @dataclass
 class WorldState:
@@ -222,6 +231,15 @@ class WorldState:
                                                                             # from the layout's "destination" (kitting: the item's designated table);
                                                                             # read through the planner's derived-var lookup "destination_of"
     object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — env objects + items, for IR direction reasoning
+    fixed_object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — the fixed objects only (T-D P):
+                                                                                        # static facts of the layout, filled by the builder
+    workspace: Optional[Workspace] = None       # the room's rectangle (T-D P), static, filled by the builder
+    agent_displacements: Dict[str, Tuple[float, float]] = field(default_factory=dict)   # {agent_id: (dx, dy)} — the agent's last observed
+                                                                                        # one-tick displacement (T-D P): a perception fact of
+                                                                                        # the robot's world model (WorldState read as the robot's
+                                                                                        # world model), written by the robot from its consecutive
+                                                                                        # observations, never by the builder; ABSENT (not zero)
+                                                                                        # for an agent with no previous observation
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 # =============================================================================
@@ -985,8 +1003,11 @@ class ProjectedPlanEntry:
     One task's part of a ProjectedPlan, produced by Projector.project().
     An ordering of n tasks projects to ONE ProjectedPlan with n entries, in
     the ordering's order.
+    abstract_plan is None only for the one entry of a fallback projection
+    (T-D P1; shared/projection.py, FallbackProjection): the observed human
+    standing, which is no task and has no plan.
     """
-    abstract_plan: "AbstractPlan"
+    abstract_plan: Optional["AbstractPlan"]
     estimated_start_step: int
     estimated_duration: int         # steps to complete this task
     segments: List[Segment]         # per-action motion or stationary segment, for interference detection / realization
@@ -1155,10 +1176,20 @@ class UpdateResult:
     Set by B2 `b2a` when it continues the current task with its realized
     hold, and by B3 to the winner's realized δ (T10), whether the winner is
     the current task or another; 0 otherwise (no hold: no human projection,
-    cost_strategy "plain", the terminal
+    cost_strategy "plain", a fallback decision, the wait, the terminal
     return). The executor may refine a hold, never re-decide or drop it
     silently; a later trigger's decision replaces it.
+    current_task None: the terminal return when the queue is empty (the
+    pool is empty); THE WAIT when it is not (T-D P1: under a fallback
+    projection no candidate is eligible, the robot stands without a task and
+    no_current_task re-asks on the next tick).
+    horizon: the winner's assessed horizon, its RealizedPlan.horizon — T_h on
+    this decision's projection clock (T-D P; under a fallback projection the
+    winner's own end). None when the decision was realized against no human
+    plan, and for the wait and the terminal return. The body passes it to its
+    [stop] label and derives nothing.
     """
-    current_task: "TaskInstance"
+    current_task: Optional["TaskInstance"]
     queue: List["TaskInstance"]
     hold: int = 0
+    horizon: Optional[float] = None

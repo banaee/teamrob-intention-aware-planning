@@ -214,7 +214,7 @@ class Executor:
         # 1. Load or update plan
         # ------------------------------------------------------------------
         if plan is None:
-            self._clear()
+            self._no_plan(world)
             return
 
         if plan is not self.current_plan:
@@ -699,7 +699,9 @@ class Executor:
         action finished, or arrived while the finished task's own completion
         tick was still outstanding.
         """
-        owed = self._owed_completion(world)
+        # With no plan in hand (after a wait, T-D P1) the debt is what the wait
+        # has not spent yet; otherwise what the plan being replaced is owed.
+        owed = self._owed_completion(world) if self.current_plan is not None else list(self._completion_pending)
         self._load_plan(plan)
         self._completion_pending = owed
 
@@ -777,3 +779,19 @@ class Executor:
         self.current_task = None
         self.current_action = None
         self.current_microaction = None
+
+    def _no_plan(self, world: WorldState):
+        """
+        A tick with no plan: THE WAIT (T-D P1), the decision that took no task.
+        The plan in hand, if any, is dropped, KEEPING the completion ticks the
+        body still owes it (T-B Q7, as _reload() keeps them): the wait carries
+        them as a hold carries them — the robot standing where the decision
+        found it — one per tick, executing nothing. What the wait has not spent
+        when a plan is loaded passes to it (_reload()).
+        """
+        if self.current_plan is not None:
+            owed = self._owed_completion(world)
+            self._clear()
+            self._completion_pending = owed
+        if self._completion_pending:
+            self._completion_pending.pop(0)
