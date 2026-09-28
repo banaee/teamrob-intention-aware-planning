@@ -534,3 +534,39 @@ recognizer's lines and the triggers moved, the robot's behaviour not, in none; t
 | env_layout_07_scenario_s05_01_on | c22a3812a7fd4d189cacec6b3fadd13d | dab078d5ca51e5b378054ee6a60ccca7 |
 | env_layout_07_scenario_s05_02_off | a753da1d7a1332e36dd45fb3f82ee413 | dab078d5ca51e5b378054ee6a60ccca7 |
 | env_layout_07_scenario_s05_02_on | d32941ece6de62c692af93d9a6c5c5a6 | dab078d5ca51e5b378054ee6a60ccca7 |
+
+## P-build: T-D P, the fallback projection — the logs from here on
+
+Regenerated at P-build (28 September 2026), superseding the L-build table above. CAUSE: design_decisions.md, "T-D P:
+the fallback projection": where admission refuses and a human is observed, the decision realizes against the fallback
+projection (the human's observed position and last displacement: standing, or a straight continuation to the
+workspace boundary or the first fixed object's arrival radius, over each candidate's span); a candidate whose violation
+is cleared only by the projection's end is refused (` refused=fallback` on `[meta-cand]`), and with none eligible the
+robot waits without a task (`[meta] … wait`, `[meta-b3] … selection=wait`). Format: `[meta-proj]` names a fallback as
+`projection=fallback refused=<the refusal's reason>`, so every log whose run refused an admission changed md5. No
+criterion of identity (P changes behaviour). The `.rec` streams are byte-identical to the table above in all 16; with
+the prior on, the recognizer's lines (`[IR]`, `[IR-…]`) are byte-identical in every run; with P's format additions
+undone, the first differing line of every changed run is at tick 0, a decision under the fallback. WAITS: a run whose
+robot is still waiting at its last tick has no completion tick; the table records "waits: occupied target (X)" for it
+(the human's script ends standing at the robot's delivery table; the six scripts predate T-C2c's authoring convention
+and are not edited; design_decisions.md, "T-D P", the deadlock). Completion is the world tick (T6), before (L-build) and
+after. Command: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before | completion after |
+|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_off | 7bb53e45820c35605aaf45a7473f2355 | 5c7835ba3417ff28b5d3caf1d00d906e | 186 | waits: occupied target (X), from 159 |
+| env_layout_01_scenario_s01_01_on | a908874e359fd1a3a961deeb1cf10a16 | 5c7835ba3417ff28b5d3caf1d00d906e | 169 | waits: occupied target (X), from 141 |
+| env_layout_02_scenario_s02_01_off | 8cce0eecdd4b493c574817808356dda9 | 3e5fd9cd96dad4e0c56cfc626a770ff4 | 422 | 425 |
+| env_layout_02_scenario_s02_01_on | 6924c54376c261c378fb6ed8d4a8b08a | 3e5fd9cd96dad4e0c56cfc626a770ff4 | 426 | 428 |
+| env_layout_03_scenario_s03_01_off | 105842090c70cdc6b9994257a9acfbf7 | 9f6d010e2fbc537952fa6ece4e96f469 | 236 | waits: occupied target (X), from 121 |
+| env_layout_03_scenario_s03_01_on | 3679a675eab527fd729ce624de65057f | 9f6d010e2fbc537952fa6ece4e96f469 | 238 | waits: occupied target (X), from 121 |
+| env_layout_04_scenario_s01_06_off | 94872cda9d29fb134cbf76465a5505da | 65d234649396c9ab242841050082e9b0 | 160 | waits: occupied target (X), from 120 |
+| env_layout_04_scenario_s01_06_on | 867613e1cd1deca6757ced82d9d620c1 | 65d234649396c9ab242841050082e9b0 | 160 | waits: occupied target (X), from 120 |
+| env_layout_05_scenario_s04_01_off | 7f38389fcb3d3093afb1d6e8a151e2f9 | f6da9d345530212df9b0446aa53d1f1e | 379 | waits: occupied target (X), from 327 |
+| env_layout_05_scenario_s04_01_on | 750ab2cbc7cddf4086b6ea7c040396b9 | f6da9d345530212df9b0446aa53d1f1e | 379 | waits: occupied target (X), from 327 |
+| env_layout_06_scenario_s03_06_off | 029a9cc5a0e6e37867678cf6f896e407 | 3e4fd412ba39ddd3267d1d37089beaac | 236 | 240 |
+| env_layout_06_scenario_s03_06_on | aa689613c8c24a78b56cf56f108ce875 | 3e4fd412ba39ddd3267d1d37089beaac | 236 | 239 |
+| env_layout_07_scenario_s05_01_off | 8fb8f82652c1648218fa08677ac94263 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 175 |
+| env_layout_07_scenario_s05_01_on | dcb6b9a015d7ea7537920c998ced312d | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 175 |
+| env_layout_07_scenario_s05_02_off | cbd8211886b8be735fa33dc008a267cc | dab078d5ca51e5b378054ee6a60ccca7 | 195 | 179 |
+| env_layout_07_scenario_s05_02_on | bd96d93a8deb4a15ae32de4523801f1d | dab078d5ca51e5b378054ee6a60ccca7 | 195 | 179 |

@@ -445,3 +445,31 @@ recognizer's lines and the triggers moved, the robot's behaviour not, in none; t
 | env_layout_08_scenario_s06_03_plain_on | 5089a5b28d8ae6c95f1be858c798acf7 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_off | 658eae46cb4e4d2f044791fc83a38481 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_realized_on | 526f6fa31a183744edbf616cfb10dfd0 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
+
+## P-build: T-D P, the fallback projection — the logs from here on
+
+Regenerated at P-build (28 September 2026), superseding the L-build table above. CAUSE: design_decisions.md, "T-D P:
+the fallback projection": where admission refuses and a human is observed, the decision realizes against the fallback
+projection (the human's observed position and last displacement: standing, or a straight continuation to the
+workspace boundary or the first fixed object's arrival radius, over each candidate's span); a candidate whose violation
+is cleared only by the projection's end is refused (` refused=fallback` on `[meta-cand]`), and with none eligible the
+robot waits without a task (`[meta] … wait`, `[meta-b3] … selection=wait`). Format: `[meta-proj]` names a fallback as
+`projection=fallback refused=<the refusal's reason>`, so every log whose run refused an admission changed md5. No
+criterion of identity (P changes behaviour). The `.rec` streams are byte-identical to the table above in all 8; with
+the prior on, the recognizer's lines (`[IR]`, `[IR-…]`) are byte-identical in every run; with P's format additions
+undone, the first differing line of every changed run is at tick 0, a decision under the fallback. WAITS: a run whose
+robot is still waiting at its last tick has no completion tick; the table records "waits: occupied target (X)" for it
+(the human's script ends standing at the robot's delivery table; the six scripts predate T-C2c's authoring convention
+and are not edited; design_decisions.md, "T-D P", the deadlock). Completion is the world tick (T6), before (L-build) and
+after. Command: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before | completion after |
+|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | 0a9a0bf95dcc56444178b02e2188748a | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 |
+| env_layout_08_scenario_s06_01_plain_on | 62bc4b9fe47f3912bf2b48585801efe1 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 |
+| env_layout_08_scenario_s06_01_realized_off | 70b0875d92c479be9af11b195ebfe5c2 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 225 |
+| env_layout_08_scenario_s06_01_realized_on | ef34c4c39f7dd5a4e30e35e83dcf3d9a | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 |
+| env_layout_08_scenario_s06_03_plain_off | e6c4c856657bd3445180a6e0abb495e1 | b9f1a0ec26cfa8c022b9951e9ec1b34b | 340 | 340 |
+| env_layout_08_scenario_s06_03_plain_on | dcf509e637bcf411ea1b83c12b8ac73c | b9f1a0ec26cfa8c022b9951e9ec1b34b | 224 | 224 |
+| env_layout_08_scenario_s06_03_realized_off | 5b3ee082a1e6cc81102aaabe822a6f87 | b9f1a0ec26cfa8c022b9951e9ec1b34b | 340 | 240 |
+| env_layout_08_scenario_s06_03_realized_on | 96cc0b0eff7c5766894e22079ceeae19 | b9f1a0ec26cfa8c022b9951e9ec1b34b | 226 | waits: occupied target (X), from 220 |

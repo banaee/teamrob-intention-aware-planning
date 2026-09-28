@@ -413,3 +413,27 @@ recognizer's lines and the triggers moved, the robot's behaviour not, in none; t
 | env_layout_08_scenario_s06_01_on | 890bcb753853e38ee7150cdf833e448c | 8cf0930761924a3aab1f1713f3f4bf29 |
 | env_layout_08_scenario_s06_02_off | 82c68826f001529d8cff41530d8fb835 | 329590c9c1249859bfe20d107588c50a |
 | env_layout_08_scenario_s06_02_on | bb5d442ae6ade49f2ef213c9659ff303 | 329590c9c1249859bfe20d107588c50a |
+
+## P-build: T-D P, the fallback projection — the logs from here on
+
+Regenerated at P-build (28 September 2026), superseding the L-build table above. CAUSE: design_decisions.md, "T-D P:
+the fallback projection": where admission refuses and a human is observed, the decision realizes against the fallback
+projection (the human's observed position and last displacement: standing, or a straight continuation to the
+workspace boundary or the first fixed object's arrival radius, over each candidate's span); a candidate whose violation
+is cleared only by the projection's end is refused (` refused=fallback` on `[meta-cand]`), and with none eligible the
+robot waits without a task (`[meta] … wait`, `[meta-b3] … selection=wait`). Format: `[meta-proj]` names a fallback as
+`projection=fallback refused=<the refusal's reason>`, so every log whose run refused an admission changed md5. No
+criterion of identity (P changes behaviour). The `.rec` streams are byte-identical to the table above in all 4; with
+the prior on, the recognizer's lines (`[IR]`, `[IR-…]`) are byte-identical in every run; with P's format additions
+undone, the first differing line of every changed run is at tick 0, a decision under the fallback. WAITS: a run whose
+robot is still waiting at its last tick has no completion tick; the table records "waits: occupied target (X)" for it
+(the human's script ends standing at the robot's delivery table; the six scripts predate T-C2c's authoring convention
+and are not edited; design_decisions.md, "T-D P", the deadlock). Completion is the world tick (T6), before (L-build) and
+after. Command: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before | completion after |
+|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_off | cdb5bb197539112033717b0e5608dbba | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | not complete in 340 steps |
+| env_layout_08_scenario_s06_01_on | 7ec8c5862d00214b9d0a172bd94eb533 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 267 |
+| env_layout_08_scenario_s06_02_off | 7e1444ef0c42696d515d9cd138c7dc2d | 329590c9c1249859bfe20d107588c50a | 267 | 262 |
+| env_layout_08_scenario_s06_02_on | 6c39f3d1d31e1f6a1199be193ca6790f | 329590c9c1249859bfe20d107588c50a | 267 | 269 |
