@@ -473,3 +473,30 @@ after. Command: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_fli
 | env_layout_08_scenario_s06_03_plain_on | dcf509e637bcf411ea1b83c12b8ac73c | b9f1a0ec26cfa8c022b9951e9ec1b34b | 224 | 224 |
 | env_layout_08_scenario_s06_03_realized_off | 5b3ee082a1e6cc81102aaabe822a6f87 | b9f1a0ec26cfa8c022b9951e9ec1b34b | 340 | 240 |
 | env_layout_08_scenario_s06_03_realized_on | 96cc0b0eff7c5766894e22079ceeae19 | b9f1a0ec26cfa8c022b9951e9ec1b34b | 226 | waits: occupied target (X), from 220 |
+
+## P4-build: T-D P4, persistence, and projection_expired — the logs from here on
+
+Regenerated at P4-build (28 September 2026), superseding the P-build table above. CAUSE: design_decisions.md, "T-D P",
+P4 and Q6: the fallback projects the observed persistence only (a straight run of k ticks continued k ticks, cut at the
+workspace boundary or the first fixed object with no stand after it; a stand of k ticks held k ticks; no previous
+observation, none), realized as any projection (F1), and `projection_expired` re-decides when the fallback a decision
+rested on reaches its end (`[meta-trig] … trigger=projection_expired`, new); the refusal and the wait of the P-build
+are removed. No criterion of identity (P4 changes behaviour). The `.rec` streams are byte-identical to the table above
+in all 8; with the prior on, the recognizer's lines are byte-identical to the L-build table's. A run whose robot has
+not delivered its last item at the run's last tick is recorded as "does not complete: occupied target (X), holds
+lengthening, from <tick>": the human's script ends standing at the robot's delivery table (the scripts predate T-C2c's
+authoring convention and are not edited), and from the first hold on that final stand the robot holds and
+reconsiders at each expiry of a longer stand (scenario_s01_06 prior on, 800 steps: expiries at 165, 213, 309, 501,
+holds 48, 96, 192, 384, never complete). Completion is the world tick (T6), before (P-build; "waits" there) and after.
+Command: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (P-build) | completion after (P4) |
+|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | e24c084e2348d583eeeac0e491f02590 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 |
+| env_layout_08_scenario_s06_01_plain_on | f64583f1d55c4ba836b23f6a28197779 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 |
+| env_layout_08_scenario_s06_01_realized_off | 01738643503d860be585f4b3c1be17f7 | 8cf0930761924a3aab1f1713f3f4bf29 | 225 | 224 |
+| env_layout_08_scenario_s06_01_realized_on | bfaeba739db5cb7f578f5f0e7ca84750 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 |
+| env_layout_08_scenario_s06_03_plain_off | cdfa4e703859001ab4393d3cb455833c | b9f1a0ec26cfa8c022b9951e9ec1b34b | 340 | 340 |
+| env_layout_08_scenario_s06_03_plain_on | 47ceaa56bbc8d1a53d2c43ba0e9d39d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b | 224 | 224 |
+| env_layout_08_scenario_s06_03_realized_off | 0dd6d1f4aeab7a8dab96987ee884da8b | b9f1a0ec26cfa8c022b9951e9ec1b34b | 240 | 340 |
+| env_layout_08_scenario_s06_03_realized_on | 9bdf7aed2df3252bf2c26a8f08a9b7e5 | b9f1a0ec26cfa8c022b9951e9ec1b34b | waits: occupied target (X) | 226 |

@@ -570,3 +570,38 @@ after. Command: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sw
 | env_layout_07_scenario_s05_01_on | dcb6b9a015d7ea7537920c998ced312d | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 175 |
 | env_layout_07_scenario_s05_02_off | cbd8211886b8be735fa33dc008a267cc | dab078d5ca51e5b378054ee6a60ccca7 | 195 | 179 |
 | env_layout_07_scenario_s05_02_on | bd96d93a8deb4a15ae32de4523801f1d | dab078d5ca51e5b378054ee6a60ccca7 | 195 | 179 |
+
+## P4-build: T-D P4, persistence, and projection_expired — the logs from here on
+
+Regenerated at P4-build (28 September 2026), superseding the P-build table above. CAUSE: design_decisions.md, "T-D P",
+P4 and Q6: the fallback projects the observed persistence only (a straight run of k ticks continued k ticks, cut at the
+workspace boundary or the first fixed object with no stand after it; a stand of k ticks held k ticks; no previous
+observation, none), realized as any projection (F1), and `projection_expired` re-decides when the fallback a decision
+rested on reaches its end (`[meta-trig] … trigger=projection_expired`, new); the refusal and the wait of the P-build
+are removed. No criterion of identity (P4 changes behaviour). The `.rec` streams are byte-identical to the table above
+in all 16; with the prior on, the recognizer's lines are byte-identical to the L-build table's. A run whose robot has
+not delivered its last item at the run's last tick is recorded as "does not complete: occupied target (X), holds
+lengthening, from <tick>": the human's script ends standing at the robot's delivery table (the scripts predate T-C2c's
+authoring convention and are not edited), and from the first hold on that final stand the robot holds and
+reconsiders at each expiry of a longer stand (scenario_s01_06 prior on, 800 steps: expiries at 165, 213, 309, 501,
+holds 48, 96, 192, 384, never complete). Completion is the world tick (T6), before (P-build; "waits" there) and after.
+Command: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (P-build) | completion after (P4) |
+|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_off | 46467edd3e86799a32cc301b2c334d3b | 5c7835ba3417ff28b5d3caf1d00d906e | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 142 |
+| env_layout_01_scenario_s01_01_on | 3d471a2383a0530519a8e6f7bb20efe2 | 5c7835ba3417ff28b5d3caf1d00d906e | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 162 |
+| env_layout_02_scenario_s02_01_off | d7f526d7eb1bb63d3b3fd4448578e373 | 3e5fd9cd96dad4e0c56cfc626a770ff4 | 425 | 422 |
+| env_layout_02_scenario_s02_01_on | afb11c14864e2bf472d3a97ba832fcd6 | 3e5fd9cd96dad4e0c56cfc626a770ff4 | 428 | 426 |
+| env_layout_03_scenario_s03_01_off | 928621c9a18cea06b1b17ecf2f5143df | 9f6d010e2fbc537952fa6ece4e96f469 | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 142 |
+| env_layout_03_scenario_s03_01_on | d0cd58ea792b33693a990d4f079bff5a | 9f6d010e2fbc537952fa6ece4e96f469 | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 142 |
+| env_layout_04_scenario_s01_06_off | bafd30be06fd65aaa649e69326079648 | 65d234649396c9ab242841050082e9b0 | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 141 |
+| env_layout_04_scenario_s01_06_on | f67708bffdffb3c8b97a9f6eb9647260 | 65d234649396c9ab242841050082e9b0 | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 141 |
+| env_layout_05_scenario_s04_01_off | 88ea09c9bf8a02aee6cf284d7471f551 | f6da9d345530212df9b0446aa53d1f1e | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 372 |
+| env_layout_05_scenario_s04_01_on | 623f2bcb225581c1cf2d55f2b71fcf5f | f6da9d345530212df9b0446aa53d1f1e | waits: occupied target (X) | does not complete: occupied target (X), holds lengthening, from 372 |
+| env_layout_06_scenario_s03_06_off | 927366706bc5f7f4a1b3515f09376ef0 | 3e4fd412ba39ddd3267d1d37089beaac | 240 | 237 |
+| env_layout_06_scenario_s03_06_on | 35e1a2d12c84d34dcb3616816abda34f | 3e4fd412ba39ddd3267d1d37089beaac | 239 | 237 |
+| env_layout_07_scenario_s05_01_off | 2e09c47f47e86276a1c590e9c2b3beae | dab078d5ca51e5b378054ee6a60ccca7 | 175 | 198 |
+| env_layout_07_scenario_s05_01_on | 29861d94faf3dec03cb4165471d65b5f | dab078d5ca51e5b378054ee6a60ccca7 | 175 | 194 |
+| env_layout_07_scenario_s05_02_off | 8d2ccf8c010c262e80bf0580b61adad8 | dab078d5ca51e5b378054ee6a60ccca7 | 179 | 218 |
+| env_layout_07_scenario_s05_02_on | fb47d44872ffee0930a1403f311886f2 | dab078d5ca51e5b378054ee6a60ccca7 | 179 | 214 |

@@ -437,3 +437,26 @@ after. Command: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/swee
 | env_layout_08_scenario_s06_01_on | 7ec8c5862d00214b9d0a172bd94eb533 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 267 |
 | env_layout_08_scenario_s06_02_off | 7e1444ef0c42696d515d9cd138c7dc2d | 329590c9c1249859bfe20d107588c50a | 267 | 262 |
 | env_layout_08_scenario_s06_02_on | 6c39f3d1d31e1f6a1199be193ca6790f | 329590c9c1249859bfe20d107588c50a | 267 | 269 |
+
+## P4-build: T-D P4, persistence, and projection_expired — the logs from here on
+
+Regenerated at P4-build (28 September 2026), superseding the P-build table above. CAUSE: design_decisions.md, "T-D P",
+P4 and Q6: the fallback projects the observed persistence only (a straight run of k ticks continued k ticks, cut at the
+workspace boundary or the first fixed object with no stand after it; a stand of k ticks held k ticks; no previous
+observation, none), realized as any projection (F1), and `projection_expired` re-decides when the fallback a decision
+rested on reaches its end (`[meta-trig] … trigger=projection_expired`, new); the refusal and the wait of the P-build
+are removed. No criterion of identity (P4 changes behaviour). The `.rec` streams are byte-identical to the table above
+in all 4; with the prior on, the recognizer's lines are byte-identical to the L-build table's. A run whose robot has
+not delivered its last item at the run's last tick is recorded as "does not complete: occupied target (X), holds
+lengthening, from <tick>": the human's script ends standing at the robot's delivery table (the scripts predate T-C2c's
+authoring convention and are not edited), and from the first hold on that final stand the robot holds and
+reconsiders at each expiry of a longer stand (scenario_s01_06 prior on, 800 steps: expiries at 165, 213, 309, 501,
+holds 48, 96, 192, 384, never complete). Completion is the world tick (T6), before (P-build; "waits" there) and after.
+Command: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (P-build) | completion after (P4) |
+|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_off | 1aff98e410789949a7ab283f8b972609 | 8cf0930761924a3aab1f1713f3f4bf29 | not complete in 340 steps | 265 |
+| env_layout_08_scenario_s06_01_on | 1618a7efff2c9193f6204f54015f910d | 8cf0930761924a3aab1f1713f3f4bf29 | 267 | 265 |
+| env_layout_08_scenario_s06_02_off | d7506eae987c2276028a9d5374692659 | 329590c9c1249859bfe20d107588c50a | 262 | 267 |
+| env_layout_08_scenario_s06_02_on | aa88a8cd08807205b66829d1e1b402d9 | 329590c9c1249859bfe20d107588c50a | 269 | 267 |

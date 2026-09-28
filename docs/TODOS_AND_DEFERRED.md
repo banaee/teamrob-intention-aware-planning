@@ -3734,10 +3734,13 @@ admitted projection reaches its horizon, the open part being a projection ending
 Files: shared/meta_planner.py (`evaluate_triggers`, `_clears_gate`, `update_human_projection`)
 Reference: design_decisions.md, "T-D P", consequence recorded; TODO-95, TODO-119
 
-**TODO-133: scenario_s06_01 `single_task` prior off does not finish in 340 steps, with no wait (recorded, P-build, 28 Sept 2026)** [OPEN; unexamined]
+**TODO-133: scenario_s06_01 `single_task` prior off does not finish in 340 steps, with no wait (recorded, P-build, 28 Sept 2026)** [CLOSED (P4-build, 28 Sept 2026): no longer reproduces]
 On the P-build baselines (`analysis/tb1b_two_tables/`, `analysis/tb3_full_reorder/`), env_layout_08 scenario_s06_01
 `single_task` prior off completed at 265 before P and does not complete within the sweep's 340 steps after it, with no
 wait logged. Prior off is an appendix; not examined.
+CLOSED (P4-build, 28 Sept 2026): under P4 the run completes at 265, as before P (the P4-build sections of
+`analysis/tb1b_two_tables/README.md` and `analysis/tb3_full_reorder/README.md`); the P-build behaviour behind it is
+gone with the refusal it came from. Not examined further.
 Files: analysis/tb1b_two_tables/sweep/, analysis/tb3_full_reorder/sweep/
 Reference: design_decisions.md, "T-D P", BUILT
 
