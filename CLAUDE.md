@@ -174,7 +174,8 @@ Decisions
   P4 (persistence, ruled 28 Sept 2026; design_decisions.md, "T-D P", P4 and Q6) reopens P: the fallback projects the
   observed persistence only (a straight run of k ticks projects k ticks, a stand of k ticks k ticks), the refusal and
   the wait are dropped, and a third trigger, `projection_expired`, re-decides when the fallback a decision rested on
-  runs out.
+  runs out. P is closed with P4 (P4-build, 28 Sept 2026; the four maintained sets regenerated, six prior-on logs not
+  completing at the occupied target with holds lengthening, X's case); P3 and TODO-134 stay open. Next is G.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6

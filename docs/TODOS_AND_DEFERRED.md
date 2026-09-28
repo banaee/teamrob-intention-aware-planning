@@ -3744,6 +3744,16 @@ gone with the refusal it came from. Not examined further.
 Files: analysis/tb1b_two_tables/sweep/, analysis/tb3_full_reorder/sweep/
 Reference: design_decisions.md, "T-D P", BUILT
 
+**TODO-134: Does L2's observation offset apply to a fallback stand? (recorded, P4-build, 28 Sept 2026)** [OPEN]
+Every human projection starts at the observation offset (L2: the observed position is true at step 1 of the robot's
+projection), so the robot's first tick after a decision is unassessed against the human (T3b). For a fallback stand
+the position at the decision tick is the observation itself: the human stood there and, standing, is there on the
+robot's first tick too. Measured: scenario_s03_01 `single_task` (both priors) passes 30.12 cm from the standing human
+at tick 171 inside that first tick (violating shifts (0.06, 53) from the offset, (−0.94, 53) from step 0). Whether the
+stand should start at step 0 is the question; a design decision, not a fix.
+Files: shared/projection.py (`Projector.project_fallback`), shared/realization.py (the assessed window)
+Reference: design_decisions.md, "T-D P", BUILT (P4-build), the observation-offset gap; L2; T3b
+
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
 2. Re-recognition inside an episode depends on the length of the misleading walk: TODO-94.

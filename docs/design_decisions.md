@@ -4892,6 +4892,38 @@ byte-identical in all 48; the recognizer's lines byte-identical prior on; the fi
 tick 0, a decision under the fallback; the IR test-bed's sixteen logs differ in the step-0 `[meta-proj]` line alone
 (no oracle rerun: the recognizer is untouched and the robot is idle there). Measured, not examined: scenario_s06_01
 `single_task` prior off does not finish in 340 steps, with no wait (TODO-133). P is closed; next is G.
+SUPERSEDED: P was reopened by P4 and closed with it (BUILT (P4-build), below).
+
+BUILT (P4-build, 28 September 2026): 57600e2 (records: P4, Q6, the superseding notes), 179a503 (the build: the
+perception facts on `RobotAgent`, `Projector.project_fallback()` from the evidence, the record's second value and
+`projection_expired`; the refusal, the wait, the body's wait branch, the executor's wait handling and the
+`HumanProjection` types removed), f0ead6e (tests; tests/test_p_build.py re-derived, the three "refusal returns None"
+tests back to None, the WorldState field set), d7c98b5 (the four maintained sets, a "P4-build" section each;
+TODO-133 closed). Verified: `.rec` streams byte-identical in all 48; the recognizer's lines prior on byte-identical to
+L-build's; the IR test-bed's sixteen logs differ in the step-0 `[meta-proj]` line alone; the suite 170 passed.
+Accepted on scenario_s05_01 (the 23-tick wait gone under both strategies; complete at 194 as before P),
+scenario_s01_06 and scenario_s06_06 (complete at 265, `[sep]` 26.0 cm, as before P).
+- The occupied target, under P4: six prior-on logs do not complete (and the same six prior off): scenario_s01_01,
+  scenario_s03_01 (`single_task` and `full_reorder`, in `analysis/tb1a_destination/` and `analysis/tb3_full_reorder/`),
+  scenario_s01_06 and scenario_s04_01. The human's script ends standing at the robot's delivery table; the robot holds
+  and reconsiders at each expiry of a longer stand (scenario_s01_06 prior on, 800 steps: expiries at 165, 213, 309,
+  501, holds 48, 96, 192, 384, 63.42 cm from the human, never complete). The READMEs record "does not complete:
+  occupied target (X), holds lengthening, from <first hold on the final stand>". The case is X's.
+- The observation-offset gap, recorded (scenario_s03_01 `single_task`, both priors, `[sep]` 30.12 cm at tick 171).
+  The decision at 171 (`no_current_task`) rested on a fallback stand (count 52, [1, 53] on the decision clock) and
+  chose item_7 with δ = 0; its first step, from 35.5 cm of the standing human, passes 30.12 cm from it (rule (b):
+  moving within `min_separation`, the distance falling) entirely inside the robot's first tick, [0, 1), before the
+  human projection begins at the observation offset (L2); its violating shifts are (0.06, 53), so δ = 0 is clear, where
+  a stand known from step 0 gives (−0.94, 53). Not P4's recorded error, not P3, not a defect: the gap predates P (T3b,
+  L2: the robot's first tick after a decision is unassessed against the human), made visible by a decision taken
+  within reach of a standing human. TODO-134: whether L2's offset applies to a fallback stand, whose position at the
+  decision tick is the observation itself.
+- P4's separation cost, recorded (scenario_s05_02 prior on, completion 195 before P, 214 under P4). The human reaches
+  its stay beside the robot's route at tick 24; before P, unprojected, the robot walked on and passed about 30 cm from
+  the standing human (ticks 26 to 27); under P4 the first standing tick is evidence, the robot holds before the human
+  and waits out the stay (42 ticks held against 23). The 19 ticks buy the separation: `[sep]` minimum 28.16 cm before
+  P, 50.99 cm under P4.
+P is closed with P4; P3 stays open; next is G.
 
 Reference: cchat, 28 September 2026 (P, P Q2 reopened); T-D Q1 (handoff_T-D_onward.md, item 1, and its SETTLED
 note: P's building block); F1; R1; T3b; T9; T-B Q7; D2; "T-D L" (L2 (ii), L5 B); "T-D R and E" (G1); T-C2c's
