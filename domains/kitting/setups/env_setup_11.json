@@ -47,6 +47,18 @@
         25
       ],
       "notes": "MPB: a robot item, NE work area (scenario_s11_02)."
+    },
+    {
+      "id": "item_12",
+      "type": "item",
+      "subtype": "part_L",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB part (iv): the human's assigned delivery in scenario_s11_01 and _02, never performed (an assigned task the human does not execute, carrying commitment warrant); on the human's west shelf. On shelf_2 first: scenario_s11_02's exit walk passes within 2.3 cm of shelf_2 and the delivery was admitted at 97 (a class-4 authoring artefact, analysis/mpb/authoring.md, part (iv))."
     }
   ]
 }

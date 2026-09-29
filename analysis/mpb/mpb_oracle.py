@@ -9,7 +9,8 @@ trajectory.py, the load-time replay expanded per tick with the body's timing, it
 Prior on only: the IR test-bed's oracle derives the support under the prior (its rule 1), and MPB-6 compares no
 prior-off run against the oracle.
 
-Per tick: the leader, the boundary, every live hypothesis's hypothesis adequacy and the gate's outcome (the IR
+Per tick: the leader, the boundary, the adequacy finding, every live hypothesis's hypothesis adequacy and the gate's
+outcome (the IR
 test-bed's oracle, analysis/ir_testbed/oracle.py, its rules 1 to 23 with their sources, imported unchanged); the
 leader's warrant sources when the gate clears; P4's perception facts and the fallback projection a decision on the
 tick would rest on (mpblib); and, when the gate clears, the admitted projection's identity: the leader's key and the
@@ -108,7 +109,7 @@ def derive(traj, run_file, alpha, theta):
                 admitted = Admitted(leader, tuple(Action(a.action_name, tuple(sorted(a.bindings.items())))
                                                   for a in actions))
         pos = (trow["x"], trow["y"])
-        out.append(TickRow(t, leader, bool(head["boundary"]), gate, adequacy, ow, warrant, perc[i],
+        out.append(TickRow(t, leader, bool(head["boundary"]), head["finding"] or None, gate, adequacy, ow, warrant, perc[i],
                            fallback(t, pos, perc[i], rm, OBSERVATION_OFFSET), admitted))
     return out
 

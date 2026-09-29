@@ -22,11 +22,12 @@ For every run:
 The declared properties (the scenarios' descriptions; analysis/mpb/authoring.md):
 - scenario_s10_02: P2a, at the decision admitting deliver_item(item_1) through recognition_changed with cause entered,
   the robot's task carries a positive hold; P2b, no F1 robot violation within that decision's assessed window.
-- scenario_s10_03 (Hadi's addition, AD3; its "observation warrant lost from the cut" clause pending, see REPORT.md):
-  P3a, no decision between the cut into the carry and the retraction; P3b, the decision record keeps
-  deliver_item(item_1) on every tick of that interval (so the admitted projection is unchanged: admission is asked on a
-  fired trigger only); P3c, the leader is deliver_item(item_1), an assigned task (commitment warrant), on every tick of
-  it. The delivery's observation warrant over the interval is measured and reported.
+- scenario_s10_03 (single_task; relabelled in part (iv): D2's retention by identity through a deviation, until its
+  retraction, T-D L2 (ii); AD3 is not exercisable in the MPB set, design_decisions.md, "T-D G", AD3): P3a, no decision
+  between the cut into the carry and the retraction; P3b, the decision record keeps deliver_item(item_1) on every tick of
+  that interval (so the admitted projection is unchanged: admission is asked on a fired trigger only); P3c, the leader
+  is deliver_item(item_1), an assigned task (commitment warrant), on every tick of it. The delivery's observation
+  warrant over the interval is measured and reported (entry-warranted: it persists).
 - scenario_s11_01: P6.1, the winner switches to deliver_item(item_9) at a projection_expired decision, before the
   robot's first grasp of item_8, while the human stands where it started; P6.2 (single_task: the candidates' holds are
   logged), at that decision item_8's hold exceeds the layout's cost difference, and at every earlier decision it does
@@ -36,6 +37,9 @@ The declared properties (the scenarios' descriptions; analysis/mpb/authoring.md)
   per-tick positions equal the reference run's.
 - scenario_s11_02: evidence for TODO-132 (a), no property: the decisions on the stand, their holds, the tick the
   stand's persistence broke and the end of the projection the last of them rested on.
+- scenario_s10_09 (part (iv)): X5's ground (1), measured, not a mechanism (design_decisions.md, "T-D X", X5): per
+  stretch of ticks on which the adequacy finding is unexplained, the decisions inside it whose admission refused, and the
+  first tick on which the finding is still unexplained after such a decision (the finding has outlived a re-decision).
 """
 import json
 import math
@@ -91,6 +95,23 @@ def plain_difference(p, a, b, traj):
         shelf, table = fixed[traj["home"][item]], fixed[traj["dest"][item]]
         return math.dist(p, shelf) + math.dist(arrival(p, shelf, r), table)
     return (path(b) - path(a)) / v
+
+
+def x5_ground1(ticks, decisions):
+    """X5's ground (1), reconstructed: the stretches of consecutive ticks with the finding unexplained; in each, the
+    decisions (a trigger fired) whose admission refused; and the first tick of the stretch after such a decision, where the
+    finding has outlived a re-decision. A measurement over the run's own outputs."""
+    out, stretch = [], []
+    for t in sorted(ticks, key=lambda x: x["tick"]) + [None]:
+        if t is not None and t["finding"] == "unexplained" and (not stretch or t["tick"] == stretch[-1] + 1):
+            stretch.append(t["tick"])
+            continue
+        if stretch:
+            refused = [x.tick for x in decisions if stretch[0] <= x.tick <= stretch[-1] and x.admitted is None]
+            outlived = next((k for k in stretch if refused and k > refused[0]), None)
+            out.append(dict(first=stretch[0], last=stretch[-1], refused_decisions=refused, ground1_from=outlived))
+        stretch = [t["tick"]] if t is not None and t["finding"] == "unexplained" else []
+    return out
 
 
 def evaluate(sid, d, log_path, run_file):
@@ -165,7 +186,7 @@ def evaluate(sid, d, log_path, run_file):
             assigned = {c.value for t in human.assigned_tasks for v, c in t.bindings.items() if v.name == "?item"}
             prop("P3c", all(k["leader"] == key for k in span) and "item_1" in assigned,
                  f"leaders on the interval: {sorted(set(str(k['leader']) for k in span))}; item_1 assigned")
-            out["measures"]["ad3_observation_warrant"] = [(k["tick"], k["observation_warrant"].get(key)) for k in span]
+            out["measures"]["retention_observation_warrant"] = [(k["tick"], k["observation_warrant"].get(key)) for k in span]
     if sid == "scenario_s11_01":
         start = traj["rows"][0]
         standing = lambda t: (human_rows[t]["x"], human_rows[t]["y"]) == (start["x"], start["y"])
@@ -197,6 +218,9 @@ def evaluate(sid, d, log_path, run_file):
              f"completion {out['completion']}, the reference's {ref['completion']}")
         diff = [a["tick"] for a, r in zip(agents, ref["ticks"]) if tuple(a["robot"]) != (r["x"], r["y"])]
         prop("P8c", not diff, f"ticks where the robot's positions differ: {diff[:10]}")
+    if sid == "scenario_s10_09":
+        out["measures"]["x5_ground1"] = [s_ for s_ in x5_ground1([t for t in ticks if t["tick"] < obs["horizon"]],
+                                                                decisions) if s_["refused_decisions"]]
     if sid == "scenario_s11_02":
         stand = next(a["tick"] for a in traj["actions"] if a["action"] == "stand")
         rows = traj["rows"]
@@ -225,7 +249,7 @@ def markdown(r):
     lines += ["", "## Detectors", "", f"- TODO-134 (a decision on a fallback stand whose first robot tick violates): "
               f"{r['detectors']['todo134'] or 'none'}", f"- The arrival-tick ray: "
               f"{r['detectors']['arrival_tick_rays'] or 'none'}"]
-    for k in ("ad3_observation_warrant", "todo132a"):
+    for k in ("retention_observation_warrant", "todo132a", "x5_ground1"):
         if k in m:
             lines += ["", f"## {k}", "", f"{m[k]}"]
     lines += ["", "## Decisions", "", "| tick | trigger | cause | gate | leader | projection | winner | hold |",

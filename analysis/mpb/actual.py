@@ -108,6 +108,7 @@ def in_process(run_file, steps, strategy, prior):
             perception = dict(displacement=list(world.agent_displacements[H]),
                               run_length=world.agent_run_lengths[H], standing_count=world.agent_standing_counts[H])
         ticks.append(dict(tick=t, leader=b.most_likely, boundary=bool(b.episode_boundary),
+                          finding=None if b.finding is None else b.finding.value,
                           gate=mp._clears_gate(b).value,
                           adequacy={k: v.value for k, v in b.hypothesis_adequacy.items()},
                           observation_warrant={k: v.value for k, v in b.observation_warrant.items()},

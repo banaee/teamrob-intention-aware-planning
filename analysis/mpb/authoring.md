@@ -211,3 +211,134 @@ belief is below θ, and there is no human_agent_id. Every decision is `selection
 | full_reorder | 139 | 137 | 0, 35, 72, 116, 139 |
 
 Logs: `analysis/mpb/runs/` (git-ignored).
+
+# Part (iv): scenarios 6 and 7 re-authored, three scenarios added (29 September 2026)
+
+Hadi's rulings of 29 September 2026 on part (iii): scenarios 6 and 7 re-authored (class 4, not parked); three scenarios
+added for coverage. As above, every number here is an authoring check made before any MPB run. Most come from the MPB
+oracle's own per-tick table chained with the robot-alone decisions (`reference.py`); the oracle's values in the runs are
+the expectations.
+
+**Provenance.** The three scenarios were added for a coverage gap found in review, not because a run failed.
+
+**The coverage principle** (recorded in the MPB entry). Each materially distinct mapping from a deviation kind to a
+decision chain that the MPB claims to verify has one authored instance; a different location of the same chain is
+covered by type.
+
+## Scenarios 6 and 7 re-authored: an assigned delivery the human does not execute
+
+**The first authoring and its case.** The first authoring gave the human no assigned tasks. An empty assignment
+switches the support restriction off (`shared/io_contracts.md` §2.1), which made the robot's items live hypotheses of the
+human and broke MPB-3's precondition (part (iii), class 4).
+
+**The re-authoring.**
+- `env_setup_11` gains `item_12`, designated to kitting_table_0. The human is assigned `deliver_item(item_12)` and never
+  performs it.
+- This is a different in-scope case: an assigned task the human does not execute, which carries commitment warrant.
+- It is not the original "no assigned work". The framework has no representation of an observed human with no work
+  under the prior on, since an empty list is the diagnostic mode (TODO-143, recorded only).
+- Disjointness: the human's item_12 (shelf_1) against the robot's items 8 to 11 (shelves 3, 6, 4, 7).
+
+### The derivation from the records
+
+- **The live set.** With the restriction on, the live set is deliver_item(item_12) and coffee_break. The robot's items
+  are outside the support.
+- **The stand (scenario_s11_01, ticks 0 to 59).**
+  - Both hypotheses are in their initial walk phases (origin at the start, s_exp = 0). With nothing walked, e = 0, so
+    both have D = s and the same L(v·s) every tick: the prior's 1/2 each.
+  - With 4 keys held at the output floor, the confidence is 0.5 × 0.996 = 0.498 < θ.
+  - Both turn inadequate at s = 17, tick 16: S(340) = 0.047 < α.
+  - On the exit walk D ≥ s; D cannot fall within a phase, and the human reaches neither target.
+- **The walk north (scenario_s11_02)**, with item_12 on shelf_1:
+  - the delivery leads the coffee break, at a highest share while adequate of 0.627 at tick 9 (below θ);
+  - coffee_break is inadequate from 8 and the delivery from 10;
+  - no phase changes afterwards.
+- **Every decision rests on the fallback.** Checked on the oracle's table over the whole run: the gate clears on no tick
+  of either scenario. The pre-run chains, per strategy, contain `no_current_task` and `projection_expired` decisions
+  only, all refused.
+
+### The shelf_2 case: a class-4 authoring artefact
+
+`item_12` was first placed on shelf_2. The oracle's table, before any run, showed an admission:
+- scenario_s11_02's exit walk (spot_E → corner_SE) passes within 2.3 cm of shelf_2 (19.3 cm at 97, 2.3 at 98);
+- at 97, deliver_item(item_12)'s `move_to` completes and it advances to `pick_up` (a member at S = 1, warranted by
+  entry and by commitment), leading at 0.886, so the gate clears and it is entered;
+- after the regress at 100, the fresh walk phase clears again at 101 (0.905).
+
+The hand derivation had checked only scenario 6's exit walk (214 cm from shelf_2). Stopped and reported; Hadi ruled
+option (a), shelf_1, which neither script approaches.
+
+## scenario_s10_07, the sudden stand mid-carry
+
+- **The authoring.** A stand of 60 ticks (`stand("PT120S")`) cut into the carry of item_1 at PT28S (14 of its 28
+  steps), as scenario_s09_13 cuts it. The carry's phase is a walk, s_exp = 0.
+- **The stand's length** was derived before the check, with no robot decision assumed:
+  - the retraction falls 17 standing ticks into the stand (v·17 = 340 > 334 cm): 46 + 16 = 62;
+  - the standing fallback k = 17 ends at 80 (inside the stand), k = 35 ends at 116;
+  - a stand ending between 102 and 115 puts that expiry in the resumed walk: 60 ticks, ending at 106.
+- **The chain as derived** (the oracle's table, the robot-alone decisions):
+  - single_task (decisions 0, 29, 67, 110, 163):
+    - 25 entered (deliver_item(item_1));
+    - **62 retraction** (standing fallback, k = 17);
+    - 67 `no_current_task` (standing, k = 22);
+    - **90 expiry** (standing, k = 45: the doubling);
+    - 110 `no_current_task` and **115 expiry** (the resumed walk: moving, k = 4 and 9);
+    - **120 entered** (the delivery again, only at its carry's advance to `place`, L2 (iii));
+    - **123 replaced** (the boundary at the place);
+    - 127 and 131 expiries;
+    - **138 entered** (item_2).
+  - full_reorder (decisions 0, 35, 72, 116, 139): 62 retraction; 72 `no_current_task` (standing, k = 27); **100 expiry**
+    (k = 55); 116 `no_current_task` (moving, k = 10); 120 entered; 123 replaced; 138 entered.
+- **item_2 is admitted at b + 15 (138), not at b + 1.** coffee_break is live after the boundary (it was never taken),
+  so the prior gives each 1/2 and θ is not cleared: MPB-2's note on scenarios 4 and 5 applies. This is the oracle's
+  value, and it stands over the ruling's text.
+
+## scenario_s10_08, the change of mind between assigned tasks
+
+scenario_s09_07's script:
+- 25 entered (item_1);
+- **33 replaced**: the return of item_1 to shelf_1 is a terminal place, a boundary (L1, consequence D). All three
+  hypotheses fall back to the prior, and coffee_break leads on its tie order. So the human's change from delivery 1 to
+  delivery 2 passes through the coffee hypothesis in the recognizer's chain;
+- expiries;
+- **47 entered** (item_2, commitment and observation);
+- 108 replaced;
+- 135 entered (item_1 again);
+- then the exit.
+
+The IR test-bed's 46 was on env_layout_11. Here env_setup_10's five inadmissible robot items at the output floor lower
+the confidence enough to move the crossing to 47: the oracle's value, and it stands. No retraction. AD3 has no
+property here: it is not exercisable in the MPB set (design_decisions.md, "T-D G", AD3).
+
+## scenario_s10_09, the misdelivery
+
+- **The script.** scenario_s09_08's, with this room's wrong table: `kitting_table_2`, which the robot does not use in
+  this scenario.
+- **The geometry.** From the grasp at (−400.4, −199.5), the carry to kitting_table_2 (829.8 cm, arriving at 71) makes
+  item_1's hypothesis (target kitting_table_0) accumulate excess: e(560) = 319.9, e(580) = 345.3. So it is inadequate at
+  w ≈ 570, tick 60.
+- **The unexplained interval.** From 60 to the place at about 73, with every member inadequate. It is chosen for its
+  length: it exposes X5's ground (1), measured.
+- **The chain:**
+  - 25 entered;
+  - **60 retraction** (moving fallback, k = 29, cut at kitting_table_2's radius, end 71.99);
+  - the robot's `no_current_task` at 67 (single_task) or 72 (full_reorder), refused inside the interval;
+  - 72 to 93 expiries;
+  - no re-admission of item_1, whose terminal fact never holds;
+  - **102 entered** (item_2).
+
+## The pre-run timing check, per strategy
+
+A start moves when a robot `no_current_task` decision falls within 3 ticks of a decision the scenario exposes; the
+terminal decision masks nothing. The robot alone, no hold:
+
+| scenario | start | single_task | full_reorder | exposed | result |
+|---|---|---|---|---|---|
+| scenario_s10_07 | (460, 480) | 0, 29, 67, 110, 163 | 0, 35, 72, 116, 139 | 25, 62, 120, 123, 138 | kept (139 is full_reorder's terminal) |
+| scenario_s10_08 | **(−165, 490)**, moved from (460, 480) | 0, 37, 74, 118, 169 | 0, 43, 94, 137, 160 | 25, 33, 47 | moved: at (460, 480) full_reorder's first completion is at 35, 2 ticks after 33; (−165, 490) is the first start of the search clear under both strategies |
+| scenario_s10_09 | (460, 480) | 0, 29, 67, 110, 163 | 0, 35, 72, 116, 139 | 25, 60, 102 | kept |
+| scenario_s11_01 | (−420, 280) | 0, 30, 50 | 0, 30, 50 | 2, 6, 14 | kept |
+| scenario_s11_02 | (−100, 600) | 0, 52, 105 | 0, 58, 101 | the cadence | kept, as in part (i) (authored for holds) |
+
+Caps (MPB-5): scenario_s10_07 410, scenario_s10_08 419, scenario_s10_09 383; scenario_s11_01 212 and scenario_s11_02 254
+are unchanged.

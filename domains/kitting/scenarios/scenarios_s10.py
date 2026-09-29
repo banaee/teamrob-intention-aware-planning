@@ -13,10 +13,12 @@ Disjointness (MPB-3): in every scenario the robot's items and shelves are disjoi
 Every human script ends with the exit walk to corner_SE. The coffee break's duration is the schema's.
 _01 admission after theta; _02 the hold against an admitted projection; _03 the planning side of the mid-action change;
 _04 boundary re-admission on commitment; _05 the lone foreseeable hypothesis after the assigned tasks; _06 the control.
+Added in MPB part (iv) for coverage (Hadi, 29 September 2026; a coverage gap found in review, not a failed run): _07 the
+sudden stand mid-carry; _08 the change of mind between assigned tasks; _09 the misdelivery.
 """
 
 from shared.types import AgentConfig, ScenarioConfig, Script
-from domains.kitting.actions import move_to
+from domains.kitting.actions import move_to, pick_up
 from domains.kitting.script import deliver_item, coffee_break, go_to, stand
 
 
@@ -226,6 +228,101 @@ scenario_s10_06 = ScenarioConfig(
                 go_to("corner_SE"),
             ]),
             assigned_tasks=[deliver_item("item_2", table="kitting_table_0")],
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+scenario_s10_07 = ScenarioConfig(
+    id="scenario_s10_07",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_07, the sudden stand mid-carry (MPB part (iv), coverage): a stand of 60 ticks (stand PT120S, "
+        "unmodelled, declared here) cut into the carry of item_1 mid-walk (PT28S, 14 of the carry's 28 steps, as "
+        "scenario_s09_13 cuts it), then the carry resumed, deliver item_2, exit. Authored to expose: the admitted "
+        "delivery retracted about 17 standing ticks into the stand (s_exp = 0 for the walk; recognition_changed, cause "
+        "retraction), a standing fallback doubling at each expiry, the resumed walk as a moving fallback, no "
+        "re-admission of the delivery before its place (within a phase D cannot fall; T-D L, L2), then the boundary "
+        "at the place and item_2's admission on commitment. The stand's length is derived so that one expiry falls "
+        "within the stand and the next within the resumed walk (analysis/mpb/authoring.md, part (iv))."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").during(
+                    move_to, "PT28S", stand("PT120S"), occurrence=1),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+scenario_s10_08 = ScenarioConfig(
+    id="scenario_s10_08",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_08, the change of mind between assigned tasks (MPB part (iv), coverage; scenario_s09_07's "
+        "script on this room): the human picks up item_1 and changes to deliver_item(item_2), returning item_1 to "
+        "shelf_1 first (deliver_with_return), then delivers item_2 and item_1, exit. Authored to expose: no "
+        "retraction; at the return's place (a terminal place, a boundary: T-D L, L1) the recorded delivery of item_1 is "
+        "no longer the leader, which after the boundary is coffee_break on the prior's tie order, so "
+        "recognition_changed fires with cause replaced and admission refuses (below theta, a fallback); item_2 is then "
+        "admitted when it clears theta (entered, commitment and observation). The human's change from delivery 1 to "
+        "delivery 2 passes through the coffee hypothesis in the recognizer's chain. The robot starts at (-165, 490), the "
+        "start the pre-run timing check chose for both strategies (analysis/mpb/authoring.md, part (iv)). Modelled "
+        "behaviour only, besides the exit walk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").at(
+                    pick_up, deliver_item("item_2", table="kitting_table_0")),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-165, 490), _NE_POOL),
+    ],
+)
+
+scenario_s10_09 = ScenarioConfig(
+    id="scenario_s10_09",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_09, the misdelivery (MPB part (iv), coverage; scenario_s09_08's script on this room): item_1 "
+        "delivered to kitting_table_2 (a departure from its designated kitting_table_0; the robot does not use that "
+        "table here), then deliver item_2, exit. Authored to expose: the admitted delivery retracted as its carry "
+        "heads away from kitting_table_0 (cause retraction), the fallback, no re-admission (the delivery's terminal "
+        "fact never holds); and the unexplained interval before the place at the wrong table, chosen for its length "
+        "(analysis/mpb/authoring.md, part (iv)), which exposes X5's ground (1) (the finding unexplained and outliving at "
+        "least one re-decision), measured from the run, not a mechanism."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_2"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
             observes=[],
         ),
         _robot((460, 480), _NE_POOL),

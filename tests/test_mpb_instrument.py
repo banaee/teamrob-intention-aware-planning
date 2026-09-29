@@ -83,7 +83,7 @@ FB = lambda t, n: Fallback(Mode.STANDING, n, float(n), t + 1.0 + n)
 
 
 def row(t, leader="h(?x=a)", gate=Gate.BELOW_THETA, boundary=False, adequacy="adequate", fb=None):
-    return TickRow(t, leader, boundary, gate, {leader: adequacy} if leader else {}, {}, (),
+    return TickRow(t, leader, boundary, "adequate", gate, {leader: adequacy} if leader else {}, {}, (),
                    None, fb if fb is not None else FB(t, 1), A if gate is Gate.CLEARS else None)
 
 
@@ -104,7 +104,8 @@ def test_replaced_before_boundary_and_boundary_when_the_leader_stays():
 
 
 def test_retraction_reads_the_recorded_hypothesis_only():
-    rival = TickRow(1, "h(?x=a)", False, Gate.CLEARS, {"h(?x=a)": "adequate", "h(?x=b)": "inadequate"}, {}, (), None,
+    rival = TickRow(1, "h(?x=a)", False, "adequate", Gate.CLEARS, {"h(?x=a)": "adequate", "h(?x=b)": "inadequate"}, {},
+                    (), None,
                     None, A)
     assert chain([row(0, gate=Gate.CLEARS), rival]) == [(0, "no_current_task", None)]
     rows = [row(0, gate=Gate.CLEARS), row(1, gate=Gate.LEADER_INADEQUATE, adequacy="inadequate", fb=FB(1, 50))]
@@ -128,14 +129,29 @@ def test_no_current_task_masks_the_others_and_nothing_follows_the_terminal_decis
 # ---- the compare ---------------------------------------------------------------------------------------------
 def test_identical_sides_agree_and_one_altered_cell_is_one_disagreement():
     exp = [row(0, gate=Gate.CLEARS), row(1)]
-    act = [dict(tick=0, leader="h(?x=a)", boundary=False, gate="clears", adequacy={"h(?x=a)": "adequate"},
-                observation_warrant={}, evaluated=False, perception=None),
-           dict(tick=1, leader="h(?x=a)", boundary=False, gate="none(below_theta)",
+    act = [dict(tick=0, leader="h(?x=a)", boundary=False, finding="adequate", gate="clears",
+                adequacy={"h(?x=a)": "adequate"}, observation_warrant={}, evaluated=False, perception=None),
+           dict(tick=1, leader="h(?x=a)", boundary=False, finding="adequate", gate="none(below_theta)",
                 adequacy={"h(?x=a)": "adequate"}, observation_warrant={}, evaluated=False, perception=None)]
     assert compare_ticks(exp, act, 10)[1] == []
     act[1]["gate"] = "clears"
     bad = compare_ticks(exp, act, 10)[1]
     assert [(t, c) for t, c, _, _ in bad] == [(1, "gate")]
+    act[1]["gate"], act[0]["finding"] = "none(below_theta)", "unexplained"
+    assert [(t, c) for t, c, _, _ in compare_ticks(exp, act, 10)[1]] == [(0, "finding")]
+
+
+# ---- X5's ground (1), measured (T-D X, X5) -------------------------------------------------------------------
+def test_x5_ground1_needs_an_unexplained_finding_outliving_a_refused_re_decision():
+    from properties import x5_ground1
+    ticks = [dict(tick=t, finding=f) for t, f in enumerate(
+        ["adequate", "unexplained", "unexplained", "unexplained", "adequate", "unexplained", "unexplained"])]
+    refused = lambda t: Decision(t, Trigger.PROJECTION_EXPIRED, None, Gate.LEADER_INADEQUATE, "h", (), None, FB(t, 1))
+    admitted = Decision(5, Trigger.RECOGNITION_CHANGED, Cause.ENTERED, Gate.CLEARS, "h", ("commitment",), A, None)
+    out = x5_ground1(ticks, [refused(2), admitted])
+    assert out == [dict(first=1, last=3, refused_decisions=[2], ground1_from=3),
+                   dict(first=5, last=6, refused_decisions=[], ground1_from=None)]
+    assert x5_ground1(ticks, [refused(3)])[0]["ground1_from"] is None     # nothing after the re-decision
 
 
 def test_a_missing_decision_and_a_different_fallback_are_disagreements():

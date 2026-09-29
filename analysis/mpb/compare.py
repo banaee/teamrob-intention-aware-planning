@@ -11,8 +11,8 @@ and every disagreement). The classification of each disagreement (MPB-4's five c
 investigation, in diff.md's last section and in REPORT.md.
 
 Compared, exactly unless stated:
-- per tick (in-process): the leader, the boundary flag, the gate's outcome, every live hypothesis's hypothesis adequacy
-  and observation warrant; on the ticks the robot evaluated its triggers, P4's perception facts (the displacement at
+- per tick (in-process): the leader, the boundary flag, the adequacy finding (added in part (iv)), the gate's outcome,
+  every live hypothesis's hypothesis adequacy and observation warrant; on the ticks the robot evaluated its triggers, P4's perception facts (the displacement at
   absolute 1e-9, the run length and the standing count exactly);
 - part 1: the set of (tick, trigger, cause) of the decisions that are not no_current_task (the no_current_task ticks are
   the run's, listed);
@@ -38,7 +38,8 @@ def close(a, b):
 
 
 def compare_ticks(exp, act, horizon):
-    out, counts = [], {c: [0, 0] for c in ("leader", "boundary", "gate", "adequacy", "observation_warrant", "perception")}
+    out, counts = [], {c: [0, 0] for c in ("leader", "boundary", "finding", "gate", "adequacy", "observation_warrant",
+                                           "perception")}
     act = {a["tick"]: a for a in act}
 
     def check(col, t, e, a):
@@ -54,6 +55,7 @@ def compare_ticks(exp, act, horizon):
         a = act[t]
         check("leader", t, e.leader, a["leader"])
         check("boundary", t, e.boundary, a["boundary"])
+        check("finding", t, e.finding, a["finding"])
         check("gate", t, e.gate.value, a["gate"])
         check("adequacy", t, dict(sorted(e.adequacy.items())), dict(sorted(a["adequacy"].items())))
         check("observation_warrant", t, dict(sorted(e.observation_warrant.items())),

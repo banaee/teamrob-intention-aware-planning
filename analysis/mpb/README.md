@@ -15,7 +15,9 @@ from the records; a disagreement is classified under MPB-4's five classes.
 
 - The room: `env_layout_12`.
 - The setups: `env_setup_10` and `env_setup_11`.
-- The scenarios: `scenario_s10_01` to `_06` and `scenario_s11_01`, `_02`.
+- The scenarios: `scenario_s10_01` to `_09` and `scenario_s11_01`, `_02` (eleven). `scenario_s10_07` to `_09` were added
+  in part (iv) for coverage; `scenario_s11_01` and `_02` were re-authored in part (iv): the human's assigned delivery,
+  never performed.
 - The run files: `configs/mpb/`.
 
 `authoring.md` gives the geometry, the disjointness check (MPB-3), the pre-run timing check and the control's fact.
@@ -80,7 +82,7 @@ GL = `docs/glossary.md`; IR = `analysis/ir_testbed/README.md`.
 | # | rule | source |
 |---|---|---|
 | M0 | The support: the assigned tasks and every PersonalTask hypothesis; an empty assignment switches the restriction off, and the table is then not derivable before the run (the robot's items' deliveries are live): the oracle refuses (exit 3). Added in part (iii), class 1 | `shared/io_contracts.md` (the recognizer's `assigned_tasks`: None or [] switches the restriction off); MPB-3, MPB-6 |
-| M1 | The belief's leader, the boundary, every live hypothesis's hypothesis adequacy and observation warrant, the gate's outcome per tick | IR rules 1 to 23 (its oracle, imported unchanged) |
+| M1 | The belief's leader, the boundary, the adequacy finding (added in part (iv)), every live hypothesis's hypothesis adequacy and observation warrant, the gate's outcome per tick | IR rules 1 to 23 (its oracle, imported unchanged) |
 | M2 | The warrant sources when the gate clears: commitment if the leader is an assigned task (IR rule 1's keys), observation if its observation warrant holds; in that order | DG AD1, AD4 |
 | M3 | Perception facts from consecutive observed positions (the first the observation before the clock): the displacement; a zero displacement is a standing tick (the count grows, the run is 0); a step continues the run when its unit direction agrees with the previous step's within 1e-9 (the Euclidean distance of the unit vectors; the records name no norm), else starts a run of 1; a step resets the count | DP P4; GL §9 |
 | M4 | The ray: the nearer of the workspace rectangle and the entry into the arrival radius (the body's, 30 cm) of the first fixed object along it (every object of the layout, landmarks included); an object whose radius contains the start is skipped | DP P2 (kept by P4), P4 AS BUILT |
@@ -101,7 +103,7 @@ ticks. The robot enters there only (MPB-3).
 
 Everything is exact unless stated.
 - **Per tick (in-process):**
-  - the leader, the boundary flag, the gate's outcome, every live hypothesis's hypothesis adequacy and observation
+  - the leader, the boundary flag, the adequacy finding, the gate's outcome, every live hypothesis's hypothesis adequacy and observation
     warrant;
   - on the ticks the robot evaluated its triggers, the perception facts (the displacement at 1e-9 absolute).
 - **Part 1:** the set of (tick, trigger, cause) of the decisions other than `no_current_task` (those ticks are the
@@ -124,10 +126,12 @@ These are booleans over the logged robot state.
 | scenario | property |
 |---|---|
 | scenario_s10_02 | P2a, the decision admitting deliver_item(item_1) (entered) carries a positive hold; P2b, no F1 robot violation within its assessed window |
-| scenario_s10_03 | Hadi's addition (AD3): P3a, no decision between the cut into the carry and the retraction; P3b, the decision record keeps the delivery; P3c, the leader is the delivery, an assigned task (commitment). The delivery's observation warrant over the interval is measured and reported (its "lost from the cut" clause is pending: REPORT.md). Defined for single_task: the pre-run timing check that keeps the robot's own triggers out of the interval is single_task's |
+| scenario_s10_03 | Retention through a deviation (D2's retention by identity until the retraction, L2 (ii); relabelled in part (iv): AD3 is not exercisable in the MPB set, "T-D G", AD3): P3a, no decision between the cut into the carry and the retraction; P3b, the decision record keeps the delivery; P3c, the leader is the delivery, an assigned task (commitment). The delivery's observation warrant over the interval is measured (entry-warranted: it persists). Defined for single_task: the pre-run timing check that keeps the robot's own triggers out of the interval is single_task's |
 | scenario_s11_01 | P6.1, the switch to the alternative at a `projection_expired` decision, before the grasp of item_8, the human standing; P6.2 (single_task), at the switch item_8's hold exceeds the layout's cost difference, and at every earlier decision it does not (X1; the stand ends at 1 + k, so the hold is at most k + 1) |
 | scenario_s10_06 | P8a, no hold at any decision; P8b, the completion equals the reference run's; P8c, the robot's per-tick positions equal the reference run's |
 | scenario_s11_02 | none: TODO-132 (a)'s evidence (the decisions on the stand, the holds, the tick the persistence broke) |
+| scenario_s10_07, _08 | none: the chain (retraction in the carry, the standing fallback's doubling, re-admission only at the place; replaced through the coffee hypothesis, then entered) is parts 1 to 3 |
+| scenario_s10_09 | X5's ground (1), measured, not a mechanism: the stretches of the finding unexplained, the refused re-decisions inside them, and the first tick the finding has outlived one |
 
 **The detectors** are recorded and classified by hand:
 - TODO-134: a decision on a fallback stand whose first robot tick is an F1 violation;

@@ -102,6 +102,7 @@ class TickRow:
     tick: int
     leader: Optional[str]
     boundary: bool
+    finding: Optional[str]                        # the adequacy finding: unresolved | adequate | unexplained; None exhausted
     gate: Gate
     adequacy: Dict[str, str]                      # live hypothesis -> adequate | inadequate | no_observation
     observation_warrant: Dict[str, str]           # live hypothesis -> observation | none (DG AD1, AD2)
@@ -240,7 +241,8 @@ def _admitted(d):
 
 
 def load_ticks(path) -> List[TickRow]:
-    return [TickRow(d["tick"], d["leader"], d["boundary"], Gate(d["gate"]), d["adequacy"], d["observation_warrant"],
+    return [TickRow(d["tick"], d["leader"], d["boundary"], d["finding"], Gate(d["gate"]), d["adequacy"],
+                    d["observation_warrant"],
                     tuple(d["warrant"]),
                     _perception(d["perception"]), _fallback(d["fallback"]), _admitted(d["admitted"]))
             for d in json.load(open(path))]

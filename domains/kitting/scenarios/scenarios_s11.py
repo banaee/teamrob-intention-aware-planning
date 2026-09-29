@@ -3,23 +3,32 @@
 Kitting scenarios on env_setup_11 — the meta-planner test-bed (MPB; design_decisions.md, "The meta-planner test-bed
 (MPB)"; analysis/mpb/), the fallback projection's scenarios. One module per setup; the kitting call form
 (domains/kitting/script.py).
-The room is env_layout_12; the shift env_setup_11 holds robot items only: item_8 (shelf_3 -> kitting_table_2) and
-item_9 (shelf_6 -> kitting_table_4), the occupied target's pair; item_10 (shelf_4) and item_11 (shelf_7), both to
-kitting_table_1, the NE route. The human has no assigned tasks (an authoring choice, stated per scenario): with the
-prior on, coffee_break is the lone live hypothesis, refused throughout (unwarranted, then inadequate), so every
-decision rests on the fallback projection. Disjointness (MPB-3) holds trivially: the human has no items.
+The room is env_layout_12; the shift env_setup_11: the robot's item_8 (shelf_3 -> kitting_table_2) and item_9
+(shelf_6 -> kitting_table_4), the occupied target's pair; item_10 (shelf_4) and item_11 (shelf_7), both to
+kitting_table_1, the NE route; and the human's item_12 (shelf_1 -> kitting_table_0).
+The human is assigned deliver_item(item_12) and never performs it (re-authored in MPB part (iv), Hadi's ruling of 29
+September 2026, from the first authoring's human with no assigned tasks, whose empty assignment switched the support
+restriction off: shared/io_contracts.md §2.1). This is a different in-scope case, not "no assigned work": an assigned task
+the human does not execute, carrying commitment warrant. With the restriction on, the live set is that delivery and
+coffee_break; neither reaches theta while adequate (analysis/mpb/authoring.md, part (iv)), so every decision rests on the
+fallback projection. Disjointness (MPB-3): the human's item_12 (shelf_1) against the robot's items 8 to 11 (shelves 3,
+6, 4, 7).
 _01 the occupied target with an alternative task (X1); _02 the fallback against a walker and a stander.
 """
 
 from shared.types import AgentConfig, ScenarioConfig, Script
 from domains.kitting.script import deliver_item, go_to, go_to_and_stand, stand
 
+# The human's assigned delivery, never performed (commitment warrant, never admitted: authoring.md, part (iv)).
+_UNPERFORMED = [deliver_item("item_12", table="kitting_table_0")]
+
 
 _MPB = (
     "Meta-planner test-bed (MPB), env_layout_12: the recognition-to-planning chain with a working robot, against an "
     "oracle that states the expected decision (trigger and cause, gate, projection) before the run (analysis/mpb/). "
-    "The human has no assigned tasks (authoring choice): coffee_break is the lone live hypothesis and is refused "
-    "throughout, so every decision rests on the fallback projection. "
+    "The human is assigned deliver_item(item_12) and never performs it (an assigned task the human does not execute, "
+    "carrying commitment warrant; re-authored in part (iv)). The live set is that delivery and coffee_break; neither "
+    "reaches theta while adequate, so every decision rests on the fallback projection. "
 )
 
 scenario_s11_01 = ScenarioConfig(
@@ -46,7 +55,7 @@ scenario_s11_01 = ScenarioConfig(
                 stand("PT120S"),
                 go_to("corner_SE"),
             ]),
-            assigned_tasks=[],
+            assigned_tasks=list(_UNPERFORMED),
             observes=[],
         ),
         AgentConfig(
@@ -85,7 +94,7 @@ scenario_s11_02 = ScenarioConfig(
                 go_to_and_stand("spot_E", "PT60S"),
                 go_to("corner_SE"),
             ]),
-            assigned_tasks=[],
+            assigned_tasks=list(_UNPERFORMED),
             observes=[],
         ),
         AgentConfig(
