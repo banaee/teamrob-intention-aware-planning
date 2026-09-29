@@ -13,7 +13,7 @@ Completion (world tick) 163; terminal decision 164. [sep] minimum 385.96 (4), co
 - TODO-134 (a decision on a fallback stand whose first robot tick violates): none
 - The arrival-tick ray: none
 
-## ad3_observation_warrant
+## retention_observation_warrant
 
 [(46, 'observation'), (47, 'observation'), (48, 'observation'), (49, 'observation'), (50, 'observation'), (51, 'observation'), (52, 'observation'), (53, 'observation'), (54, 'observation')]
 

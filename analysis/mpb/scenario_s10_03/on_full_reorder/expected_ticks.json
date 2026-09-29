@@ -3,6 +3,7 @@
 "tick": 0,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -35,6 +36,7 @@
 "tick": 1,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -67,6 +69,7 @@
 "tick": 2,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -99,6 +102,7 @@
 "tick": 3,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -131,6 +135,7 @@
 "tick": 4,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -163,6 +168,7 @@
 "tick": 5,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -195,6 +201,7 @@
 "tick": 6,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -227,6 +234,7 @@
 "tick": 7,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -259,6 +267,7 @@
 "tick": 8,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -291,6 +300,7 @@
 "tick": 9,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -323,6 +333,7 @@
 "tick": 10,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -355,6 +366,7 @@
 "tick": 11,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -387,6 +399,7 @@
 "tick": 12,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -419,6 +432,7 @@
 "tick": 13,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -451,6 +465,7 @@
 "tick": 14,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -483,6 +498,7 @@
 "tick": 15,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -515,6 +531,7 @@
 "tick": 16,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -547,6 +564,7 @@
 "tick": 17,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -579,6 +597,7 @@
 "tick": 18,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -611,6 +630,7 @@
 "tick": 19,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -643,6 +663,7 @@
 "tick": 20,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -675,6 +696,7 @@
 "tick": 21,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -707,6 +729,7 @@
 "tick": 22,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -739,6 +762,7 @@
 "tick": 23,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -771,6 +795,7 @@
 "tick": 24,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -803,6 +828,7 @@
 "tick": 25,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -898,6 +924,7 @@
 "tick": 26,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -993,6 +1020,7 @@
 "tick": 27,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -1088,6 +1116,7 @@
 "tick": 28,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -1183,6 +1212,7 @@
 "tick": 29,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -1278,6 +1308,7 @@
 "tick": 30,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -1347,6 +1378,7 @@
 "tick": 31,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -1416,6 +1448,7 @@
 "tick": 32,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -1485,6 +1518,7 @@
 "tick": 33,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -1554,6 +1588,7 @@
 "tick": 34,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -1623,6 +1658,7 @@
 "tick": 35,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -1692,6 +1728,7 @@
 "tick": 36,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -1761,6 +1798,7 @@
 "tick": 37,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -1830,6 +1868,7 @@
 "tick": 38,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -1899,6 +1938,7 @@
 "tick": 39,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -1968,6 +2008,7 @@
 "tick": 40,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2037,6 +2078,7 @@
 "tick": 41,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2106,6 +2148,7 @@
 "tick": 42,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2175,6 +2218,7 @@
 "tick": 43,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2244,6 +2288,7 @@
 "tick": 44,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2313,6 +2358,7 @@
 "tick": 45,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2382,6 +2428,7 @@
 "tick": 46,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2451,6 +2498,7 @@
 "tick": 47,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2520,6 +2568,7 @@
 "tick": 48,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2589,6 +2638,7 @@
 "tick": 49,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2658,6 +2708,7 @@
 "tick": 50,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2727,6 +2778,7 @@
 "tick": 51,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2796,6 +2848,7 @@
 "tick": 52,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2865,6 +2918,7 @@
 "tick": 53,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -2934,6 +2988,7 @@
 "tick": 54,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3003,6 +3058,7 @@
 "tick": 55,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3035,6 +3091,7 @@
 "tick": 56,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3067,6 +3124,7 @@
 "tick": 57,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3099,6 +3157,7 @@
 "tick": 58,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3131,6 +3190,7 @@
 "tick": 59,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3163,6 +3223,7 @@
 "tick": 60,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3195,6 +3256,7 @@
 "tick": 61,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3227,6 +3289,7 @@
 "tick": 62,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3259,6 +3322,7 @@
 "tick": 63,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3291,6 +3355,7 @@
 "tick": 64,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3323,6 +3388,7 @@
 "tick": 65,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3355,6 +3421,7 @@
 "tick": 66,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3387,6 +3454,7 @@
 "tick": 67,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3419,6 +3487,7 @@
 "tick": 68,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3451,6 +3520,7 @@
 "tick": 69,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3483,6 +3553,7 @@
 "tick": 70,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3515,6 +3586,7 @@
 "tick": 71,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3547,6 +3619,7 @@
 "tick": 72,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3579,6 +3652,7 @@
 "tick": 73,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -3611,6 +3685,7 @@
 "tick": 74,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -3679,6 +3754,7 @@
 "tick": 75,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -3747,6 +3823,7 @@
 "tick": 76,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -3815,6 +3892,7 @@
 "tick": 77,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -3883,6 +3961,7 @@
 "tick": 78,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -3951,6 +4030,7 @@
 "tick": 79,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4019,6 +4099,7 @@
 "tick": 80,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4087,6 +4168,7 @@
 "tick": 81,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4155,6 +4237,7 @@
 "tick": 82,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4223,6 +4306,7 @@
 "tick": 83,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4291,6 +4375,7 @@
 "tick": 84,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4359,6 +4444,7 @@
 "tick": 85,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4427,6 +4513,7 @@
 "tick": 86,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4495,6 +4582,7 @@
 "tick": 87,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4563,6 +4651,7 @@
 "tick": 88,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4631,6 +4720,7 @@
 "tick": 89,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4699,6 +4789,7 @@
 "tick": 90,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4767,6 +4858,7 @@
 "tick": 91,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4835,6 +4927,7 @@
 "tick": 92,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4903,6 +4996,7 @@
 "tick": 93,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -4971,6 +5065,7 @@
 "tick": 94,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5039,6 +5134,7 @@
 "tick": 95,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5107,6 +5203,7 @@
 "tick": 96,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5175,6 +5272,7 @@
 "tick": 97,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5243,6 +5341,7 @@
 "tick": 98,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5311,6 +5410,7 @@
 "tick": 99,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5379,6 +5479,7 @@
 "tick": 100,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5447,6 +5548,7 @@
 "tick": 101,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5515,6 +5617,7 @@
 "tick": 102,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5583,6 +5686,7 @@
 "tick": 103,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5651,6 +5755,7 @@
 "tick": 104,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5719,6 +5824,7 @@
 "tick": 105,
 "leader": "deliver_item(?item=item_1)",
 "boundary": true,
+"finding": "unresolved",
 "gate": "none(below_theta)",
 "adequacy": {
 "deliver_item(?item=item_1)": "no_observation",
@@ -5749,6 +5855,7 @@
 "tick": 106,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "deliver_item(?item=item_1)": "adequate",
@@ -5779,6 +5886,7 @@
 "tick": 107,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "no_observation",
@@ -5811,6 +5919,7 @@
 "tick": 108,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5843,6 +5952,7 @@
 "tick": 109,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5875,6 +5985,7 @@
 "tick": 110,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5907,6 +6018,7 @@
 "tick": 111,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5939,6 +6051,7 @@
 "tick": 112,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -5971,6 +6084,7 @@
 "tick": 113,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -6003,6 +6117,7 @@
 "tick": 114,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -6035,6 +6150,7 @@
 "tick": 115,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -6067,6 +6183,7 @@
 "tick": 116,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6099,6 +6216,7 @@
 "tick": 117,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6131,6 +6249,7 @@
 "tick": 118,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6163,6 +6282,7 @@
 "tick": 119,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6195,6 +6315,7 @@
 "tick": 120,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6227,6 +6348,7 @@
 "tick": 121,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6296,6 +6418,7 @@
 "tick": 122,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6365,6 +6488,7 @@
 "tick": 123,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6434,6 +6558,7 @@
 "tick": 124,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6503,6 +6628,7 @@
 "tick": 125,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6572,6 +6698,7 @@
 "tick": 126,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6641,6 +6768,7 @@
 "tick": 127,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6710,6 +6838,7 @@
 "tick": 128,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6779,6 +6908,7 @@
 "tick": 129,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6848,6 +6978,7 @@
 "tick": 130,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6917,6 +7048,7 @@
 "tick": 131,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -6986,6 +7118,7 @@
 "tick": 132,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7055,6 +7188,7 @@
 "tick": 133,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7124,6 +7258,7 @@
 "tick": 134,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7193,6 +7328,7 @@
 "tick": 135,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7262,6 +7398,7 @@
 "tick": 136,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7331,6 +7468,7 @@
 "tick": 137,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7400,6 +7538,7 @@
 "tick": 138,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7469,6 +7608,7 @@
 "tick": 139,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7538,6 +7678,7 @@
 "tick": 140,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7607,6 +7748,7 @@
 "tick": 141,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7676,6 +7818,7 @@
 "tick": 142,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7745,6 +7888,7 @@
 "tick": 143,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7814,6 +7958,7 @@
 "tick": 144,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7883,6 +8028,7 @@
 "tick": 145,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -7952,6 +8098,7 @@
 "tick": 146,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -8021,6 +8168,7 @@
 "tick": 147,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -8090,6 +8238,7 @@
 "tick": 148,
 "leader": "deliver_item(?item=item_1)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -8159,6 +8308,7 @@
 "tick": 149,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": true,
+"finding": "unresolved",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "no_observation",
@@ -8189,6 +8339,7 @@
 "tick": 150,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8219,6 +8370,7 @@
 "tick": 151,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8249,6 +8401,7 @@
 "tick": 152,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8279,6 +8432,7 @@
 "tick": 153,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8309,6 +8463,7 @@
 "tick": 154,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8339,6 +8494,7 @@
 "tick": 155,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8369,6 +8525,7 @@
 "tick": 156,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8399,6 +8556,7 @@
 "tick": 157,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8429,6 +8587,7 @@
 "tick": 158,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8459,6 +8618,7 @@
 "tick": 159,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8489,6 +8649,7 @@
 "tick": 160,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8519,6 +8680,7 @@
 "tick": 161,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8549,6 +8711,7 @@
 "tick": 162,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8579,6 +8742,7 @@
 "tick": 163,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(below_theta)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8609,6 +8773,7 @@
 "tick": 164,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8702,6 +8867,7 @@
 "tick": 165,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8795,6 +8961,7 @@
 "tick": 166,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8888,6 +9055,7 @@
 "tick": 167,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -8981,6 +9149,7 @@
 "tick": 168,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -9074,6 +9243,7 @@
 "tick": 169,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -9167,6 +9337,7 @@
 "tick": 170,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -9260,6 +9431,7 @@
 "tick": 171,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -9353,6 +9525,7 @@
 "tick": 172,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -9446,6 +9619,7 @@
 "tick": 173,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
@@ -9539,6 +9713,7 @@
 "tick": 174,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -9632,6 +9807,7 @@
 "tick": 175,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -9725,6 +9901,7 @@
 "tick": 176,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -9818,6 +9995,7 @@
 "tick": 177,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -9911,6 +10089,7 @@
 "tick": 178,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10004,6 +10183,7 @@
 "tick": 179,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10097,6 +10277,7 @@
 "tick": 180,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10190,6 +10371,7 @@
 "tick": 181,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10257,6 +10439,7 @@
 "tick": 182,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10324,6 +10507,7 @@
 "tick": 183,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10391,6 +10575,7 @@
 "tick": 184,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10458,6 +10643,7 @@
 "tick": 185,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10525,6 +10711,7 @@
 "tick": 186,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10592,6 +10779,7 @@
 "tick": 187,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10659,6 +10847,7 @@
 "tick": 188,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10726,6 +10915,7 @@
 "tick": 189,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10793,6 +10983,7 @@
 "tick": 190,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10860,6 +11051,7 @@
 "tick": 191,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10927,6 +11119,7 @@
 "tick": 192,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -10994,6 +11187,7 @@
 "tick": 193,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11061,6 +11255,7 @@
 "tick": 194,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11128,6 +11323,7 @@
 "tick": 195,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11195,6 +11391,7 @@
 "tick": 196,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11262,6 +11459,7 @@
 "tick": 197,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11329,6 +11527,7 @@
 "tick": 198,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11396,6 +11595,7 @@
 "tick": 199,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11463,6 +11663,7 @@
 "tick": 200,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11530,6 +11731,7 @@
 "tick": 201,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11597,6 +11799,7 @@
 "tick": 202,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11664,6 +11867,7 @@
 "tick": 203,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11731,6 +11935,7 @@
 "tick": 204,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11798,6 +12003,7 @@
 "tick": 205,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11865,6 +12071,7 @@
 "tick": 206,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11932,6 +12139,7 @@
 "tick": 207,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -11999,6 +12207,7 @@
 "tick": 208,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -12066,6 +12275,7 @@
 "tick": 209,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -12133,6 +12343,7 @@
 "tick": 210,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -12200,6 +12411,7 @@
 "tick": 211,
 "leader": "deliver_item(?item=item_2)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
@@ -12267,6 +12479,7 @@
 "tick": 212,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": true,
+"finding": "unresolved",
 "gate": "none(leader_no_observation)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "no_observation"
@@ -12295,6 +12508,7 @@
 "tick": 213,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "none(leader_unwarranted)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12323,6 +12537,7 @@
 "tick": 214,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12387,6 +12602,7 @@
 "tick": 215,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12451,6 +12667,7 @@
 "tick": 216,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12515,6 +12732,7 @@
 "tick": 217,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12579,6 +12797,7 @@
 "tick": 218,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12643,6 +12862,7 @@
 "tick": 219,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12707,6 +12927,7 @@
 "tick": 220,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12771,6 +12992,7 @@
 "tick": 221,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12835,6 +13057,7 @@
 "tick": 222,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12899,6 +13122,7 @@
 "tick": 223,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -12963,6 +13187,7 @@
 "tick": 224,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13027,6 +13252,7 @@
 "tick": 225,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13091,6 +13317,7 @@
 "tick": 226,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13155,6 +13382,7 @@
 "tick": 227,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13219,6 +13447,7 @@
 "tick": 228,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13283,6 +13512,7 @@
 "tick": 229,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13347,6 +13577,7 @@
 "tick": 230,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13411,6 +13642,7 @@
 "tick": 231,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13475,6 +13707,7 @@
 "tick": 232,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13539,6 +13772,7 @@
 "tick": 233,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13603,6 +13837,7 @@
 "tick": 234,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13667,6 +13902,7 @@
 "tick": 235,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13731,6 +13967,7 @@
 "tick": 236,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13795,6 +14032,7 @@
 "tick": 237,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13859,6 +14097,7 @@
 "tick": 238,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13923,6 +14162,7 @@
 "tick": 239,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -13987,6 +14227,7 @@
 "tick": 240,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -14051,6 +14292,7 @@
 "tick": 241,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -14115,6 +14357,7 @@
 "tick": 242,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -14179,6 +14422,7 @@
 "tick": 243,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -14243,6 +14487,7 @@
 "tick": 244,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "adequate",
 "gate": "clears",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
@@ -14307,6 +14552,7 @@
 "tick": 245,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14335,6 +14581,7 @@
 "tick": 246,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14363,6 +14610,7 @@
 "tick": 247,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14391,6 +14639,7 @@
 "tick": 248,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14419,6 +14668,7 @@
 "tick": 249,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14447,6 +14697,7 @@
 "tick": 250,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14475,6 +14726,7 @@
 "tick": 251,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14503,6 +14755,7 @@
 "tick": 252,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14531,6 +14784,7 @@
 "tick": 253,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14559,6 +14813,7 @@
 "tick": 254,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14587,6 +14842,7 @@
 "tick": 255,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14615,6 +14871,7 @@
 "tick": 256,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14643,6 +14900,7 @@
 "tick": 257,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14671,6 +14929,7 @@
 "tick": 258,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14699,6 +14958,7 @@
 "tick": 259,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14727,6 +14987,7 @@
 "tick": 260,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14755,6 +15016,7 @@
 "tick": 261,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14783,6 +15045,7 @@
 "tick": 262,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14811,6 +15074,7 @@
 "tick": 263,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14839,6 +15103,7 @@
 "tick": 264,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14867,6 +15132,7 @@
 "tick": 265,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14895,6 +15161,7 @@
 "tick": 266,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14923,6 +15190,7 @@
 "tick": 267,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14951,6 +15219,7 @@
 "tick": 268,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -14979,6 +15248,7 @@
 "tick": 269,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15007,6 +15277,7 @@
 "tick": 270,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15035,6 +15306,7 @@
 "tick": 271,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15063,6 +15335,7 @@
 "tick": 272,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15091,6 +15364,7 @@
 "tick": 273,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15119,6 +15393,7 @@
 "tick": 274,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15147,6 +15422,7 @@
 "tick": 275,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15175,6 +15451,7 @@
 "tick": 276,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15203,6 +15480,7 @@
 "tick": 277,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15231,6 +15509,7 @@
 "tick": 278,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15259,6 +15538,7 @@
 "tick": 279,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15287,6 +15567,7 @@
 "tick": 280,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15315,6 +15596,7 @@
 "tick": 281,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15343,6 +15625,7 @@
 "tick": 282,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15371,6 +15654,7 @@
 "tick": 283,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15399,6 +15683,7 @@
 "tick": 284,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15427,6 +15712,7 @@
 "tick": 285,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15455,6 +15741,7 @@
 "tick": 286,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15483,6 +15770,7 @@
 "tick": 287,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15511,6 +15799,7 @@
 "tick": 288,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15539,6 +15828,7 @@
 "tick": 289,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15567,6 +15857,7 @@
 "tick": 290,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15595,6 +15886,7 @@
 "tick": 291,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15623,6 +15915,7 @@
 "tick": 292,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15651,6 +15944,7 @@
 "tick": 293,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15679,6 +15973,7 @@
 "tick": 294,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15707,6 +16002,7 @@
 "tick": 295,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15735,6 +16031,7 @@
 "tick": 296,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15763,6 +16060,7 @@
 "tick": 297,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15791,6 +16089,7 @@
 "tick": 298,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15819,6 +16118,7 @@
 "tick": 299,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15847,6 +16147,7 @@
 "tick": 300,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15875,6 +16176,7 @@
 "tick": 301,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15903,6 +16205,7 @@
 "tick": 302,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15931,6 +16234,7 @@
 "tick": 303,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15959,6 +16263,7 @@
 "tick": 304,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -15987,6 +16292,7 @@
 "tick": 305,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16015,6 +16321,7 @@
 "tick": 306,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16043,6 +16350,7 @@
 "tick": 307,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16071,6 +16379,7 @@
 "tick": 308,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16099,6 +16408,7 @@
 "tick": 309,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16127,6 +16437,7 @@
 "tick": 310,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16155,6 +16466,7 @@
 "tick": 311,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16183,6 +16495,7 @@
 "tick": 312,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16211,6 +16524,7 @@
 "tick": 313,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16239,6 +16553,7 @@
 "tick": 314,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16267,6 +16582,7 @@
 "tick": 315,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16295,6 +16611,7 @@
 "tick": 316,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16323,6 +16640,7 @@
 "tick": 317,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16351,6 +16669,7 @@
 "tick": 318,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16379,6 +16698,7 @@
 "tick": 319,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16407,6 +16727,7 @@
 "tick": 320,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16435,6 +16756,7 @@
 "tick": 321,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16463,6 +16785,7 @@
 "tick": 322,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16491,6 +16814,7 @@
 "tick": 323,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16519,6 +16843,7 @@
 "tick": 324,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16547,6 +16872,7 @@
 "tick": 325,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16575,6 +16901,7 @@
 "tick": 326,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16603,6 +16930,7 @@
 "tick": 327,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16631,6 +16959,7 @@
 "tick": 328,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16659,6 +16988,7 @@
 "tick": 329,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16687,6 +17017,7 @@
 "tick": 330,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16715,6 +17046,7 @@
 "tick": 331,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16743,6 +17075,7 @@
 "tick": 332,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16771,6 +17104,7 @@
 "tick": 333,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16799,6 +17133,7 @@
 "tick": 334,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16827,6 +17162,7 @@
 "tick": 335,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16855,6 +17191,7 @@
 "tick": 336,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16883,6 +17220,7 @@
 "tick": 337,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16911,6 +17249,7 @@
 "tick": 338,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16939,6 +17278,7 @@
 "tick": 339,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16967,6 +17307,7 @@
 "tick": 340,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -16995,6 +17336,7 @@
 "tick": 341,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17023,6 +17365,7 @@
 "tick": 342,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17051,6 +17394,7 @@
 "tick": 343,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17079,6 +17423,7 @@
 "tick": 344,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17107,6 +17452,7 @@
 "tick": 345,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17135,6 +17481,7 @@
 "tick": 346,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17163,6 +17510,7 @@
 "tick": 347,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17191,6 +17539,7 @@
 "tick": 348,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17219,6 +17568,7 @@
 "tick": 349,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17247,6 +17597,7 @@
 "tick": 350,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17275,6 +17626,7 @@
 "tick": 351,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17303,6 +17655,7 @@
 "tick": 352,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17331,6 +17684,7 @@
 "tick": 353,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17359,6 +17713,7 @@
 "tick": 354,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17387,6 +17742,7 @@
 "tick": 355,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17415,6 +17771,7 @@
 "tick": 356,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17443,6 +17800,7 @@
 "tick": 357,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17471,6 +17829,7 @@
 "tick": 358,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17499,6 +17858,7 @@
 "tick": 359,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17527,6 +17887,7 @@
 "tick": 360,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17555,6 +17916,7 @@
 "tick": 361,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17583,6 +17945,7 @@
 "tick": 362,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17611,6 +17974,7 @@
 "tick": 363,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17639,6 +18003,7 @@
 "tick": 364,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17667,6 +18032,7 @@
 "tick": 365,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17695,6 +18061,7 @@
 "tick": 366,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17723,6 +18090,7 @@
 "tick": 367,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17751,6 +18119,7 @@
 "tick": 368,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17779,6 +18148,7 @@
 "tick": 369,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17807,6 +18177,7 @@
 "tick": 370,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17835,6 +18206,7 @@
 "tick": 371,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17863,6 +18235,7 @@
 "tick": 372,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17891,6 +18264,7 @@
 "tick": 373,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17919,6 +18293,7 @@
 "tick": 374,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17947,6 +18322,7 @@
 "tick": 375,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -17975,6 +18351,7 @@
 "tick": 376,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18003,6 +18380,7 @@
 "tick": 377,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18031,6 +18409,7 @@
 "tick": 378,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18059,6 +18438,7 @@
 "tick": 379,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18087,6 +18467,7 @@
 "tick": 380,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18115,6 +18496,7 @@
 "tick": 381,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18143,6 +18525,7 @@
 "tick": 382,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18171,6 +18554,7 @@
 "tick": 383,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18199,6 +18583,7 @@
 "tick": 384,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18227,6 +18612,7 @@
 "tick": 385,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18255,6 +18641,7 @@
 "tick": 386,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18283,6 +18670,7 @@
 "tick": 387,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18311,6 +18699,7 @@
 "tick": 388,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18339,6 +18728,7 @@
 "tick": 389,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18367,6 +18757,7 @@
 "tick": 390,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18395,6 +18786,7 @@
 "tick": 391,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18423,6 +18815,7 @@
 "tick": 392,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18451,6 +18844,7 @@
 "tick": 393,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18479,6 +18873,7 @@
 "tick": 394,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18507,6 +18902,7 @@
 "tick": 395,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18535,6 +18931,7 @@
 "tick": 396,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18563,6 +18960,7 @@
 "tick": 397,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18591,6 +18989,7 @@
 "tick": 398,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18619,6 +19018,7 @@
 "tick": 399,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18647,6 +19047,7 @@
 "tick": 400,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18675,6 +19076,7 @@
 "tick": 401,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18703,6 +19105,7 @@
 "tick": 402,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18731,6 +19134,7 @@
 "tick": 403,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18759,6 +19163,7 @@
 "tick": 404,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18787,6 +19192,7 @@
 "tick": 405,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18815,6 +19221,7 @@
 "tick": 406,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18843,6 +19250,7 @@
 "tick": 407,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18871,6 +19279,7 @@
 "tick": 408,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18899,6 +19308,7 @@
 "tick": 409,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18927,6 +19337,7 @@
 "tick": 410,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18955,6 +19366,7 @@
 "tick": 411,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -18983,6 +19395,7 @@
 "tick": 412,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19011,6 +19424,7 @@
 "tick": 413,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19039,6 +19453,7 @@
 "tick": 414,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19067,6 +19482,7 @@
 "tick": 415,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19095,6 +19511,7 @@
 "tick": 416,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19123,6 +19540,7 @@
 "tick": 417,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19151,6 +19569,7 @@
 "tick": 418,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19179,6 +19598,7 @@
 "tick": 419,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19207,6 +19627,7 @@
 "tick": 420,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19235,6 +19656,7 @@
 "tick": 421,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19263,6 +19685,7 @@
 "tick": 422,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19291,6 +19714,7 @@
 "tick": 423,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19319,6 +19743,7 @@
 "tick": 424,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19347,6 +19772,7 @@
 "tick": 425,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19375,6 +19801,7 @@
 "tick": 426,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19403,6 +19830,7 @@
 "tick": 427,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19431,6 +19859,7 @@
 "tick": 428,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19459,6 +19888,7 @@
 "tick": 429,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19487,6 +19917,7 @@
 "tick": 430,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19515,6 +19946,7 @@
 "tick": 431,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19543,6 +19975,7 @@
 "tick": 432,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19571,6 +20004,7 @@
 "tick": 433,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19599,6 +20033,7 @@
 "tick": 434,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19627,6 +20062,7 @@
 "tick": 435,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19655,6 +20091,7 @@
 "tick": 436,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19683,6 +20120,7 @@
 "tick": 437,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19711,6 +20149,7 @@
 "tick": 438,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19739,6 +20178,7 @@
 "tick": 439,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19767,6 +20207,7 @@
 "tick": 440,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19795,6 +20236,7 @@
 "tick": 441,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19823,6 +20265,7 @@
 "tick": 442,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19851,6 +20294,7 @@
 "tick": 443,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19879,6 +20323,7 @@
 "tick": 444,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19907,6 +20352,7 @@
 "tick": 445,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19935,6 +20381,7 @@
 "tick": 446,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19963,6 +20410,7 @@
 "tick": 447,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -19991,6 +20439,7 @@
 "tick": 448,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20019,6 +20468,7 @@
 "tick": 449,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20047,6 +20497,7 @@
 "tick": 450,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20075,6 +20526,7 @@
 "tick": 451,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20103,6 +20555,7 @@
 "tick": 452,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20131,6 +20584,7 @@
 "tick": 453,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20159,6 +20613,7 @@
 "tick": 454,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20187,6 +20642,7 @@
 "tick": 455,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20215,6 +20671,7 @@
 "tick": 456,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20243,6 +20700,7 @@
 "tick": 457,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20271,6 +20729,7 @@
 "tick": 458,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20299,6 +20758,7 @@
 "tick": 459,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20327,6 +20787,7 @@
 "tick": 460,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20355,6 +20816,7 @@
 "tick": 461,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
@@ -20383,6 +20845,7 @@
 "tick": 462,
 "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
 "boundary": false,
+"finding": "unexplained",
 "gate": "none(leader_inadequate)",
 "adequacy": {
 "coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"

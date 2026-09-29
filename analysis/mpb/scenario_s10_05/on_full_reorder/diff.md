@@ -8,6 +8,7 @@ Horizon: ticks 0 to 264 (the first observed completion point + 30, capped at the
 |---|---|---|
 | leader | 265 | 0 |
 | boundary | 265 | 0 |
+| finding | 265 | 0 |
 | gate | 265 | 0 |
 | adequacy | 265 | 0 |
 | observation_warrant | 265 | 0 |

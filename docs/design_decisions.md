@@ -4891,6 +4891,12 @@ Ruling.
 Set aside: P2 as built (its persistence has no evidence); a bound derived elsewhere; a cone.
 Known error, recorded: little evidence protects little (a human one step into a walk across the robot's route is
 projected 20 cm); the body's stop and X's blocked event cover the residual, as before.
+THE SKIP RULE, A DESIGN QUESTION (recorded 29 September 2026, MPB part (iv); class 3 of MPB-4; TODO-142). The rule's
+stated reason ("an object whose arrival radius contains the ray's start is skipped: the human is leaving it") does not
+match its activation condition. It changes the fallback only on an arrival or pass-through tick; a ray leaving an
+object is already excluded by the direction test. No decision fell on such a tick in the MPB runs, and the MPB's
+alteration test detects its removal in none of the eleven scenarios. Kept as built. The question of what principle the
+skip implements, and whether P4 needs it, is open, to be ruled on an instance or a design analysis.
 
 Q6, THE EXPIRY TRIGGER (ruled by Hadi, 28 September 2026). The expiry of the assessed span of the fallback projection
 the current decision rested on is a trigger: `projection_expired`, a trigger of its own (nothing in the recognition
@@ -5027,6 +5033,9 @@ every boundary that meets a recorded decision (TODO-119's G part).
   case: `coffee_break` re-entering in its `wait_at` phase while the human walks away from the machine (L4's recorded
   consequence), lone at about 1.0 and adequate at S = 1 within its priced standing, would be admitted. A magnitude
   threshold on the gain (a constant).
+  CONSEQUENCE RECORDED (MPB part (iii), 29 September 2026; analysis/mpb/REPORT.md): observation warrant obtained through
+  entry by completion persists for the whole phase; loss by the gain is possible only in a phase not entered by
+  completion.
 
 - AD2, three outputs.
   Ruling. Warrant is a third independent dimension beside belief and adequacy; R3 is amended from two independent
@@ -5045,6 +5054,12 @@ every boundary that meets a recorded decision (TODO-119's G part).
   Why. Warrant answers whether a hypothesis has earned admission, not whether it is still valid; a second retraction
   criterion would reopen L2's rejection of a turn-back rule and fire on every small reversal.
   Consequence. After a turn-back the exposure is bounded by L2's inadequacy delay, as today.
+  NOT EXERCISABLE IN THE MPB SET (Hadi, 29 September 2026, on the MPB part (iv) plan). Loss of observation warrant
+  while the hypothesis is still adequate requires an admission after less than about 167 cm of gain (at α = 0.05): the
+  gain falls by at most v per tick and e = w − gain, so a loss at gain ≤ 0 has e ≥ w ≥ w_a + g_a, which adequacy bounds
+  by 334 cm. This occurs only for a lone hypothesis admitted at once (a foreseeable task on its first step; a delivery
+  on commitment at b + 1), followed by a turn back. Hypotheses admitted through θ among rivals are practically excluded
+  from it. No AD3 property is declared in the MPB; the instance belongs to the evaluation's authored deviations.
 
 - AD4, representation.
   Ruling. The `[IR]` line prints, per live hypothesis, `warrant=none|observation` (commitment warrant is the gate's
@@ -5378,48 +5393,73 @@ classification; TODO-33, TODO-130, TODO-132, TODO-134, TODO-137, TODO-138, TODO-
 
 Next: step 2.
 
-BUILT IN PART (MPB step 2, 29 September 2026): e9f33ce (part (i), authoring), 787cee1 (part (ii), the instrument and
-its tests), and the part (iii) commit (the runs, the classification, the alteration test, these records).
+BUILT (MPB step 2, 29 September 2026; parts (i) to (iv)): e9f33ce (part (i), authoring), 787cee1 (part (ii), the
+instrument and its tests), b5c7387 (part (iii), the runs, the classification, the records, then "built in part"),
+8149f1d (part (iv), authoring: scenarios 6 and 7 re-authored, three scenarios added), and the part (iv) runs-and-records
+commit.
 
 The artefacts:
 - env_layout_12: the 10/11 pattern translated by (0, -200), plus the robot's work areas.
 - env_setup_10, env_setup_11.
-- scenario_s10_01 to _05: MPB scenarios 1 to 5; scenario_s10_06: the control (8); scenario_s11_01, _02: 6 and 7.
+- Eleven scenarios:
+  - scenario_s10_01 to _05: MPB scenarios 1 to 5;
+  - scenario_s10_06: the control (8);
+  - scenario_s11_01, _02: 6 and 7, re-authored;
+  - scenario_s10_07: the sudden stand mid-carry; scenario_s10_08: the change of mind; scenario_s10_09: the misdelivery.
 - configs/mpb/, whose steps are MPB-5's safety cap.
-- analysis/mpb/: authoring.md, README.md, REPORT.md.
+- analysis/mpb/: authoring.md, README.md, REPORT.md, the md5s of every run.
 
 The control's fact: a robot-only scenario is representable and loads and runs with no code change. The reference is
-built in-process and not registered; run: completion 161 with single_task, 137 with full_reorder.
+built in-process and not registered; completion 161 (single_task), 137 (full_reorder).
 
-Verified, prior on, both strategies: scenarios 1 to 5 and 8, with zero disagreements on parts 1 to 3 at exact equality
-(every tick's leader, boundary, gate, hypothesis adequacy, observation warrant and perception facts; every decision's
-trigger and cause, gate, leader, warrant and projection), against the in-process run and the log. Every declared part-4
-property holds under single_task.
+Verified, prior on, both strategies: all eleven, with zero disagreements on parts 1 to 3 at exact equality (every
+tick's leader, boundary, adequacy finding, gate, hypothesis adequacy, observation warrant and perception facts; every
+decision's trigger and cause, gate, leader, warrant and projection), against the in-process run and the log. Every
+declared part-4 property holds under single_task. The expected per-tick tables are byte-identical across strategies.
 - Scenario 1: entered at 25 and 76.
 - Scenario 2: the hold 5 at the admission at 25; no F1 violation in its window.
-- Scenario 3: retraction 55, fallback expiry 66, re-admission (entered) 74.
-- Scenario 4: at the coffee break's boundary 133 the cause is replaced (the recorded coffee_break pinned) and admission
-  refuses; at 134, b + 1, the delivery is admitted on commitment.
-- Scenario 5: `none(leader_unwarranted)` at the expiry of 127 (standing); entered at 132 on the first step.
+- Scenario 3: retraction 55, expiry 66, entered 74.
+- Scenario 4: replaced and refused at the coffee break's boundary 133; entered on commitment at 134.
+- Scenario 5: `none(leader_unwarranted)` at the expiry of 127, on standing; entered at 132.
+- Scenario 6: the switch by cost at the expiry of 14. item_8's hold, 7, exceeds the layout's cost difference, 3.5; the
+  fallback stand ends at 1 + k, so the hold is at most k + 1.
+- Scenario 7: the walk's and the stand's expiry cadence.
 - The control: no hold; completion and every position equal to the reference.
+- scenario_s10_07: retraction at 62, 17 standing ticks into the stand; the standing fallback's doubling at the expiry
+  of 90 (k = 22 → 45); the resumed walk as a moving fallback at 110 and 115; re-admission only at the carry's advance to
+  `place`, 120; replaced at the boundary, 123; item_2 entered at b + 15, 138 (coffee_break live after the boundary: 1/2
+  each).
+- scenario_s10_08: replaced at 33 (the return's place, a boundary; coffee_break leads on the prior's tie order, so the
+  human's change from delivery 1 to delivery 2 passes through the coffee hypothesis in the recognizer's chain);
+  entered at 47 (commitment and observation; the IR test-bed's 46 moved by this setup's output floor); no retraction.
+- scenario_s10_09: retraction at 60; no re-admission of the misdelivered item; X5's ground (1) measured, the finding
+  unexplained from 60 to 72 and outliving a refused re-decision from 61.
 
-Scenarios 6 and 7 are not verified, as class 1 and class 4. Their human has no assigned tasks; an empty assignment
-switches the support restriction off (shared/io_contracts.md §2.1), so the robot's items' deliveries are live and
-MPB-3's pre-run independence fails. The oracle is corrected by derivation (rule M0 refuses such a scenario). The
-re-authoring or parking is Hadi's (REPORT.md, the proposal).
+Classified:
+- Part (iii): scenarios 6 and 7 as first authored (a human with no assigned tasks), class 1 (the oracle's support rule
+  lacked io_contracts §2.1's empty-list clause; rule M0) and class 4 (MPB-3's precondition); re-authored in part (iv).
+- Part (iv), before any run: item_12 on shelf_2, class 4 (scenario 7's exit walk within 2.3 cm of it, admitted at 97);
+  moved to shelf_1.
+- scenario_s10_03's P3 under full_reorder: not a disagreement; P3 is declared for single_task.
 
-As observations from those runs: scenario 6's switch by cost occurs at the expiry of 14. item_8's hold, 7, exceeds the
-layout's cost difference, 3.5; the fallback stand ends at 1 + k, so the hold is at most k + 1, not "at most the
-observed standing count" (X1's wording, corrected on the plan).
+The alteration test detects every altered rule in some scenario except the skip rule (B2), class 3 (P4's dated line;
+TODO-142). AD3 is not exercisable in the MPB set (the AD3 line in "T-D G"). TODO-134: no instance.
 
-The alteration test detects every altered rule in some scenario except the skip rule (B2). The skip rule changes the
-fallback only when the human moves toward an object inside its radius (an arrival or a pass through), the case its
-stated reason does not describe; no decision fell on one (the plan's objection 1, a question to Hadi).
+TODO-132 (a) evidence (scenario 7, single_task): the stand's holds double, 4, 8, 16, 32, and the last runs 30 ticks past
+the stay.
 
-Hadi's AD3 addition to scenario 3 is not exercised: the carry is warranted by its entry (AD1) through the cut. No
-recorded hypothesis loses observation warrant in any run; a question to Hadi.
+The primary set's run logs (prior on, single_task; every run's md5 in analysis/mpb/REPORT.md):
+9a35a1b15f37d877e865c301494d604c scenario_s10_01, 261221bbaaf4639801652a2b8003b69e scenario_s10_02,
+a9901a7af59ad78a65afc3179434a2e9 scenario_s10_03, 751eedb2c3ad3dbdeccf2b6abbdb3151 scenario_s10_04,
+bacc21befccd638cfcd0f1101f805443 scenario_s10_05, 65a9facce7cdd1621a081aa1f7980890 scenario_s10_06,
+86a511f42b9eb6756cdcd6fb6e8d65fe scenario_s10_07, 3edb658f33a62c60ecb8296c14b9c8c4 scenario_s10_08,
+5728f8b4f018b256af74c47aa3de9744 scenario_s10_09, 60987425011281575480cc73a7c093ab scenario_s11_01,
+580ae9fd3ae2455d251086223a6c5867 scenario_s11_02.
 
-TODO-134: no instance. The arrival-tick ray: no decision rested on one. The invariant across strategies holds: the
-per-tick tables are byte-identical.
+The suite: 211 passed. The 48 maintained logs and their .rec streams are byte-identical to G-build's.
 
-The suite: 210 passed. The 48 maintained logs and their .rec streams are byte-identical to G-build's.
+COVERAGE PRINCIPLE (Hadi, 29 September 2026): each materially distinct mapping from a deviation kind to a decision chain
+that the MPB claims to verify has one authored instance; a different location of the same chain is covered by type.
+Provenance: scenario_s10_07 to _09 were added for a coverage gap found in review, not because a run failed.
+RECORD LINE (part (iv)): the framework has no representation of an observed human with no work under the prior on, since
+an empty assigned list is the diagnostic mode (shared/io_contracts.md §2.1). TODO-143, recorded only.

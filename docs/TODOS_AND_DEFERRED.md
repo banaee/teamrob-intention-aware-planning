@@ -3738,7 +3738,7 @@ reaches it.
 Files: shared/recognizer.py (`_retired`)
 Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
 
-**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [BUILT IN PART (MPB step 2, 29 Sept 2026): scenarios 1 to 5 and the control verified; scenarios 6 and 7 class 4, re-authoring pending Hadi]
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [BUILT (MPB step 2, parts (i) to (iv), 29 Sept 2026): eleven scenarios verified]
 REWRITTEN (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"): the earlier track
 note and its X amendment are superseded by the entry; their content is in it.
 The recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
@@ -3767,6 +3767,12 @@ MPB STEP 2 (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"
 - Verified: scenarios 1 to 5 and the control, zero disagreements on parts 1 to 3 under both strategies, prior on.
 - Not verified: scenarios 6 and 7 (scenario_s11_01, _02). Their human has no assigned tasks, which switches the support restriction off, so MPB-3's precondition fails (class 4; the oracle corrected, class 1).
 - Open: the re-authoring of scenarios 6 and 7; the AD3 addition (not exercised); the skip rule on an arrival tick (objection 1).
+MPB PART (iv) (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", BUILT): all eleven verified (zero
+disagreements on parts 1 to 3, both strategies, prior on; every declared part-4 property under single_task).
+- Scenarios 6 and 7 re-authored: an assigned delivery the human never performs.
+- scenario_s10_07 to _09 added for coverage.
+- AD3 recorded as not exercisable in the MPB set.
+- The skip rule is TODO-142; the observed human with no work under the prior on is TODO-143.
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
@@ -3819,6 +3825,11 @@ G-RECORDS (T-D G, ruled by Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admi
   - no hold ran past the break.
   scenario_s11_01 after its switch: a hold of 23 at 33 against a stand projected to 68, the human standing until 59.
   To be re-taken on the re-authored scenario.
+  MPB PART (iv) EVIDENCE (29 Sept 2026; analysis/mpb/REPORT.md), scenario_s11_02 re-authored (verified), single_task:
+  - the stand at spot_E from 26; its persistence broke at 57;
+  - the decisions on it at 27, 31, 39 and 55 (a stand of k = 3, 7, 15, 31) sent holds of 4, 8, 16 and 32;
+  - the last runs to 87, 30 ticks past the stay.
+  Under full_reorder the robot was elsewhere at the stand: no hold. The question returns to the design chat.
 - (b) CLOSED into X's occupied-target item (`docs/handoffs/handoff_G_X_onward.md` §5).
 - (c) CLOSED as answered: L5 B refuses on the boundary tick (no hypothesis is a member there), and the decision at
   b + 1 is AD1's.
@@ -3936,6 +3947,26 @@ MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5
 in the meta-planner test-bed; `full_reorder` is not required to reproduce every part-4 property there.
 Files: shared/meta_planner.py (`_replan_orderings`, its log lines)
 Reference: design_decisions.md, "T-D X: response", X5; TODO-96
+
+**TODO-142: The fallback's skip rule: what principle does it implement, and does P4 need it? (recorded, MPB part (iv), 29 Sept 2026)** [OPEN; a design question]
+P2's rule, kept by P4 (`Projector.project_fallback`, `_reach`): "an object whose arrival radius contains the ray's start
+is skipped (the human is leaving it)". Its stated reason does not match its activation condition. A ray leaving an
+object is already excluded by the direction test (the object lies behind it), so the skip changes the fallback only
+when the human moves toward an object inside its radius: an arrival or a pass-through tick, where the projected walk
+then runs through the object for up to the observed run length. No decision fell on such a tick in the meta-planner
+test-bed's runs, and its alteration test detects the rule's removal in none of the eleven scenarios (classified 3 under
+MPB-4). Kept as built. To be ruled on an instance or a design analysis.
+Files: shared/projection.py (`_reach`)
+Reference: design_decisions.md, "T-D P", P4 (the dated line on the skip rule); analysis/mpb/REPORT.md
+
+**TODO-143: An observed human with no work under the prior on (recorded, MPB part (iv), 29 Sept 2026)** [OPEN; recorded only]
+The framework has no representation of an observed human with no work under the prior on. The robot is given the
+human's assigned tasks, and an empty list switches the support restriction off (shared/io_contracts.md §2.1): the
+diagnostic mode, with every hypothesis admissible, the robot's own items' deliveries included. Found in the MPB (part
+(iii), scenarios 6 and 7 as first authored, class 4); the scenarios were re-authored with an assigned task the human
+never performs. Recorded only.
+Files: shared/recognizer.py (`_build_admissible`), mesa_sim/sim_model.py (`observed_assigned`)
+Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the record line); analysis/mpb/REPORT.md
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).

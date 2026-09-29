@@ -40,7 +40,7 @@
   "near_encounters": 0,
   "holds": [],
   "hold_ticks": 0,
-  "ad3_observation_warrant": [
+  "retention_observation_warrant": [
    [
     46,
     "observation"

@@ -3,77 +3,98 @@
 "tick": 0,
 "trigger": "no_current_task",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
+"leader": "deliver_item(?item=item_12)",
 "projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 2,
 "trigger": "projection_expired",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
+"leader": "deliver_item(?item=item_12)",
 "projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 6,
 "trigger": "projection_expired",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
+"leader": "deliver_item(?item=item_12)",
 "projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 14,
 "trigger": "projection_expired",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
+"leader": "deliver_item(?item=item_12)",
 "projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 20,
 "trigger": "projection_expired",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
+"leader": "deliver_item(?item=item_12)",
 "projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 22,
-"trigger": "recognition_changed",
-"cause": "entered",
-"leader": "deliver_item(?item=item_10)",
-"projection": "built warrant=observation"
-},
-{
-"tick": 32,
-"trigger": "recognition_changed",
-"cause": "retraction",
-"leader": "deliver_item(?item=item_10)",
-"projection": "fallback refused=none(leader_inadequate)"
-},
-{
-"tick": 41,
 "trigger": "projection_expired",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
-"projection": "fallback refused=none(leader_inadequate)"
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 25,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 27,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 31,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 39,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 55,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 58,
 "trigger": "no_current_task",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
-"projection": "fallback refused=none(leader_inadequate)"
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 61,
 "trigger": "projection_expired",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
-"projection": "fallback refused=none(leader_inadequate)"
+"leader": "deliver_item(?item=item_12)",
+"projection": "fallback refused=none(below_theta)"
 },
 {
 "tick": 67,
 "trigger": "projection_expired",
 "cause": null,
-"leader": "deliver_item(?item=item_10)",
+"leader": "deliver_item(?item=item_12)",
 "projection": "fallback refused=none(below_theta)"
 },
 {

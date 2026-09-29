@@ -201,13 +201,14 @@ Decisions
   Track 3, the meta-planner test-bed (MPB), is ruled (29 Sept 2026; design_decisions.md, "The meta-planner test-bed
   (MPB)", MPB-1 to MPB-6), records only: eight scenarios on env_layout_12, an oracle for the trigger and cause, the
   gate and the projection (per-tick tables pre-run, the chain assembled with the run's `no_current_task` ticks), part 4
-  as declared properties; prior off a diagnostic appendix. Its step 2 is built in part (29 Sept 2026; `analysis/mpb/`,
-  REPORT.md; env_layout_12, env_setup_10/11, scenario_s10_01 to _06 and s11_01, _02, `configs/mpb/`): scenarios 1 to 5
-  and the control are verified (zero disagreements on parts 1 to 3 under both strategies, prior on; every declared
-  part-4 property holds). Scenarios 6 and 7 are class 4: their human has no assigned tasks, and an empty assignment
-  switches the support restriction off. Their re-authoring is Hadi's, as are the AD3 addition (not exercised) and the
-  skip rule on an arrival tick. Next: scenarios 6 and 7 as Hadi rules; then the evaluation, T-F, or track 4, as Hadi
-  rules.
+  as declared properties; prior off a diagnostic appendix. MPB is built (29 Sept 2026; step 2, parts (i) to (iv);
+  `analysis/mpb/`, REPORT.md; env_layout_12, env_setup_10/11, scenario_s10_01 to _09 and s11_01, _02, `configs/mpb/`):
+  - all eleven scenarios verified: zero disagreements on parts 1 to 3 under both strategies, prior on; every declared
+    part-4 property holds under single_task;
+  - AD3 is not exercisable in the MPB set (the AD3 line);
+  - the skip rule is a design question (P4's dated line, TODO-142);
+  - an observed human with no work under the prior on has no representation (TODO-143).
+  Next, as Hadi rules: the evaluation, T-F, or track 4.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6

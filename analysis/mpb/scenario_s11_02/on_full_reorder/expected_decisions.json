@@ -1,0 +1,257 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 5.0,
+"end": 20.0
+}
+},
+{
+"tick": 20,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 22.0
+}
+},
+{
+"tick": 22,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 1.2169905660283027,
+"end": 24.216990566028304
+}
+},
+{
+"tick": 25,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 27.0
+}
+},
+{
+"tick": 27,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 31.0
+}
+},
+{
+"tick": 31,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 39.0
+}
+},
+{
+"tick": 39,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 55.0
+}
+},
+{
+"tick": 55,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 87.0
+}
+},
+{
+"tick": 58,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 61.0
+}
+},
+{
+"tick": 61,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 67.0
+}
+},
+{
+"tick": 67,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "deliver_item(?item=item_12)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 79.0
+}
+},
+{
+"tick": 79,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 23,
+"duration": 17.46476309009849,
+"end": 97.46476309009849
+}
+},
+{
+"tick": 98,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 42,
+"duration": 20.012995970887932,
+"end": 119.01299597088793
+}
+},
+{
+"tick": 101,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 45,
+"duration": 17.012995970887914,
+"end": 119.01299597088791
+}
+}
+]
