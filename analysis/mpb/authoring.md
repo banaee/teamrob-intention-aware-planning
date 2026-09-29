@@ -106,6 +106,13 @@ assigned tasks, the script's items and the setup's item placement):
 | scenario_s11_01 | 6, the occupied target | none | item_8, item_9 (shelf_3, shelf_6) | yes |
 | scenario_s11_02 | 7, walker and stander | none | item_10, item_11 (shelf_4, shelf_7) | yes |
 
+SUPERSEDED IN PART (29 September 2026): the two env_setup_11 rows are part (i)'s first authoring. Since part (iv) the
+human of scenario_s11_01 and scenario_s11_02 is assigned `deliver_item(item_12)` (shelf_1), never performed; the check
+against the robot's items 8 to 11 (shelves 3, 6, 4, 7) is in part (iv), below. The three scenarios added in part (iv)
+(scenario_s10_07 to _09) keep the rows above for env_setup_10: the human's item_1 and item_2 (shelf_1, shelf_2) against
+the robot's NE pool, item_3 to item_6 (shelf_4, 7, 8, 9); scenario_s10_09's wrong table, kitting_table_2, is used by no
+robot task in it (checked on the committed literals, 29 September 2026).
+
 Scenarios 6 and 7 give the human no assigned tasks: an accepted authoring choice (Hadi, point 3). With the prior on,
 coffee_break is the lone live hypothesis and is refused throughout, so every decision rests on the fallback. Scenario
 5's ten-tick stand is the other accepted choice: it puts a decision on standing. Each scenario's description states

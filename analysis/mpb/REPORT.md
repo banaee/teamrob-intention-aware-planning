@@ -228,6 +228,22 @@ scenario_s10_06's robot alone was built in-process and not registered.
     stood until 59.
   - Nothing is concluded; the question returns to the design chat.
 
+## Coverage (post-(iv) records, 29 September 2026)
+
+The coverage matrix is `coverage.md`: 47 rows, derived from the committed outputs of the 22 prior-on runs (no run).
+31 verified, 5 unreachable with a derivation, 4 out of coverage with a reason, 5 reachable and claimed with no
+instance (ruled by Hadi for part (v)), 1 reachable and not claimed (P3), 1 not a distinct path.
+
+Three facts of the whole set:
+- The cause boundary fired in no run.
+- Every admitted record ended before its T_h (at a replaced boundary, a retraction or the robot's own decision).
+- No record was kept through a dip below θ: on every tick a record stood, its hypothesis led and the gate cleared.
+
+X5's ground (2), measured (new at this step): in scenario_s11_02, single_task, every candidate's realized plan holds at
+the expiries of 25, 27, 31, 39 and 55 (two candidates each; `[meta-cand] delta=`), so the ground holds at a decision and
+at the next re-decision from 25 on, until 87 (hold 0). An evidence line, not a mechanism; full_reorder logs no
+per-candidate hold (TODO-141).
+
 ## The independence boundary, demonstrated
 
 - The oracle's process imports `shared.types`, `shared.knowledge`, `shared.planner`, `domains.kitting.registry` and
