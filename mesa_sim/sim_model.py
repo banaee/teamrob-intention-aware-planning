@@ -341,9 +341,11 @@ class SimModel(model.Model):
         Spawn agents from ScenarioConfig.
         HumanAgent receives its scheduled_tasks, a Script, checked at load and
         run by its stack machine (_load_human_scripts()).
-        RobotAgent receives its assigned_tasks as its task pool, plus (when the
-        assignment_prior switch is on) the observed human's assigned_tasks,
-        never the script; and its task model, built from the tree (T-H), with
+        RobotAgent receives its assigned_tasks as its task pool (with the prior
+        on or off); when the assignment_prior switch is on, also the observed
+        human's assigned_tasks, which go to its recognizer (the support
+        restriction) and its meta-planner (commitment warrant, T-D G), never to
+        its pool, and never the script; and its task model, built from the tree (T-H), with
         the hypothesis space built from it here, kept with the station's
         destinations as the robot's ObservingRobot (T-H4).
         """

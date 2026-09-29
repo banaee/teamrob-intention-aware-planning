@@ -85,6 +85,26 @@ class HypothesisAdequacy(Enum):
     NO_OBSERVATION = "no_observation"
 
 
+class ObservationWarrant(Enum):
+    """
+    Observation warrant (T-D G, AD1, AD2): per live hypothesis, whether its
+    current derived phase holds evidence for it — a third output beside the
+    belief and the adequacy, not a kind of adequacy.
+    OBSERVATION  the phase was entered by the completion of the hypothesis's
+                 previous expected action in this episode (the completion E8
+                 reads), or, for a phase with a movement target whose position
+                 is resolved, the path-cost gain toward it since the phase
+                 origin is positive, C(o, g) - C(p, g) > 0;
+    NONE         otherwise (no derived phase, a boundary tick, a stationary
+                 phase not entered by a completion, an unresolved target, or no
+                 positive gain).
+    Commitment warrant (the observed human's assigned tasks) is the
+    meta-planner's knowledge, never reported here.
+    """
+    NONE = "none"
+    OBSERVATION = "observation"
+
+
 class RecognizerLifecycle(Enum):
     """
     The recognizer's lifecycle state (T-D R3, R4): LIVE while some task
@@ -117,6 +137,11 @@ class BeliefState:
                   categorical reading of its membership and S_k against alpha.
                   Empty exactly when EXHAUSTED. The meta-planner reads the
                   leader's value only (its gate, _clears_gate).
+    observation_warrant
+                  the observation warrant of every live hypothesis (T-D G,
+                  AD1, AD2): a third output, independent of the belief and of
+                  the adequacy. Empty exactly when EXHAUSTED. The meta-planner
+                  reads the leader's value only (its gate, _clears_gate).
     episode_boundary
                   whether this tick is an episode boundary: the observed agent
                   completed a terminal action (T-D L1) and the belief was
@@ -132,6 +157,7 @@ class BeliefState:
     lifecycle: RecognizerLifecycle
     tails: Dict[str, float]  # {intention_id: S_k}, members of the adequacy test only
     hypothesis_adequacy: Dict[str, HypothesisAdequacy]  # {intention_id: value}, every live hypothesis
+    observation_warrant: Dict[str, ObservationWarrant]  # {intention_id: value}, every live hypothesis
     episode_boundary: bool  # the belief was re-initialised at an episode boundary on this tick
     # predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}  
                             # OUTDATED: current design uses ProjectedPlan for multi-step prediction; 

@@ -353,6 +353,7 @@ class RobotAgent(FactoryAgent):
             strategy=self.model.strategy,
             gate_strategy=self.model.gate_strategy,
             cost_strategy=self.model.cost_strategy,
+            observed_assigned_tasks=observed_assigned_tasks,
         )
         # The run header (TODO-78): the policy values and evaluation switches this
         # robot's decisions are taken under, once per run, so a log can be read
@@ -431,16 +432,21 @@ class RobotAgent(FactoryAgent):
             # leader's hypothesis adequacy (G1; both absent when exhausted) and
             # the members' tail probabilities, in hypothesis order, to 4
             # decimals so a finding can be re-read at any alpha. The other
-            # hypotheses' adequacy follows from the tails and alpha.
+            # hypotheses' adequacy follows from the tails and alpha. Last,
+            # every live hypothesis's observation warrant (T-D G, AD4), in
+            # hypothesis order; empty when exhausted. Commitment warrant is the
+            # gate's knowledge and is not printed here.
             most_likely = self.belief.most_likely or "none"
             finding = "" if self.belief.finding is None else f" finding={self.belief.finding.value}"
             leader = self.belief.hypothesis_adequacy.get(self.belief.most_likely)
             leader_adequacy = "" if leader is None else f" leader_adequacy={leader.value}"
             tails_str = "  ".join(f"{k}={v:.4f}" for k, v in self.belief.tails.items())
+            warrant_str = "  ".join(f"{k}={v.value}" for k, v in self.belief.observation_warrant.items())
             logging.info(
                 f"[IR] step={int(obs.timestamp)} most_likely={most_likely} "
                 f"confidence={self.belief.confidence:.3f} "
-                f"lifecycle={self.belief.lifecycle.value}{finding}{leader_adequacy} tails=[{tails_str}]"
+                f"lifecycle={self.belief.lifecycle.value}{finding}{leader_adequacy} tails=[{tails_str}] "
+                f"warrant=[{warrant_str}]"
             )
      
             dist_str = "  ".join(
@@ -625,6 +631,7 @@ class RobotAgent(FactoryAgent):
             lifecycle=RecognizerLifecycle.LIVE,
             tails={},
             hypothesis_adequacy={},
+            observation_warrant={},
             episode_boundary=False,
         )
 

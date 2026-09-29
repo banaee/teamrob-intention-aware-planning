@@ -206,7 +206,8 @@ OUTPUTS:
     - BeliefState: distribution, most_likely, confidence (the belief over H);
       finding, lifecycle, tails, hypothesis_adequacy (the adequacy finding,
       the lifecycle state, the members' tail probabilities, every live
-      hypothesis's hypothesis adequacy)
+      hypothesis's hypothesis adequacy); observation_warrant (every live
+      hypothesis's observation warrant, T-D G)
 """
 
 import itertools
@@ -217,7 +218,7 @@ from typing import Callable, Dict, FrozenSet, List, Optional, Set, Tuple
 from shared.types import (
     Observation, BeliefState, WorldState, GroundedAction, ActionSchema, Predicate,
     TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, same_task,
-    AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy,
+    AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy, ObservationWarrant,
 )
 from shared.knowledge import TaskModel, ContextKnowledge
 from shared.planner import AdaptivePlanner, DecompositionError
@@ -483,6 +484,11 @@ class IntentionRecognizer:
         #   _retired        keys whose terminal completion condition holds on
         #                   this tick (T-D L4): skipped and pinned while it holds,
         #                   live again (a first observation) when it stops
+        #   _entered_by_completion keys whose current phase was entered by the
+        #                   completion of their previous expected action in
+        #                   this episode (the completion E8 reads): the entry
+        #                   source of observation warrant (T-D G, AD1); emptied
+        #                   at a boundary, with the origins
         self._expected: Dict[str, Optional[GroundedAction]] = {}
         self._origin: Dict[str, Tuple[float, float]] = {}
         self._origin_odo: Dict[str, float] = {}
@@ -490,6 +496,7 @@ class IntentionRecognizer:
         self._entry_latency: Dict[str, float] = {}
         self._base: Dict[str, float] = {}
         self._retired: Set[str] = set()
+        self._entered_by_completion: Set[str] = set()
         # The terminal actions of the task model (T-D L1): the observed agent's
         # completion of one is the episode boundary. Per observed agent, the
         # ones it could complete on the next tick (EnabledTerminal).
@@ -567,6 +574,9 @@ class IntentionRecognizer:
         # sets its base after the others): the tie-break, handback §1.7.
         self._base = self._prior([repr(h) for h in self._hypotheses if repr(h) in self._base])
         self._evidence = dict(self._base)
+        # Observation warrant resets with the origins (T-D G, AD1): the phases
+        # the boundary opens are not entered by a completion in this episode.
+        self._entered_by_completion = set()
         for key in self._origin:
             self._origin[key], self._origin_odo[key], self._origin_still[key] = pos, odo, still
             self._entry_latency[key] = self._action_completion_latency + self._observed_task_completion_latency
@@ -678,7 +688,8 @@ class IntentionRecognizer:
         re-initialises to the prior over H and every origin moves to the
         agent's position (_begin_episode); this tick reports the re-initialised
         belief, flagged episode_boundary. Last, the adequacy finding and the lifecycle state are read
-        from the phase state as it stands (_adequacy).
+        from the phase state as it stands (_adequacy), and beside them, independently, every live
+        hypothesis's observation warrant (_observation_warrant, T-D G).
 
         ω_context is applied to the output only (see _output()). The recognizer
         therefore owns its belief; `prev_belief` is accepted for contract
@@ -731,6 +742,7 @@ class IntentionRecognizer:
                     self._origin_odo.pop(key, None)
                     self._origin_still.pop(key, None)
                     self._entry_latency.pop(key, None)
+                    self._entered_by_completion.discard(key)
                     logging.info("[IR-complete] step=%d %s completed: %s holds",
                                  int(obs.timestamp), key, actions[-1].completion_predicate)
                 continue
@@ -755,6 +767,7 @@ class IntentionRecognizer:
                 self._expected[key], self._origin[key], self._origin_odo[key] = current, pos, odo
                 self._origin_still[key] = still
                 self._entry_latency[key] = 0.0
+                self._entered_by_completion.discard(key)
                 # A returning key's share is set after the loop; its entry is
                 # made here so that the evidence stays in hypothesis order (the
                 # tie-break for most_likely, handback §1.7).
@@ -782,6 +795,9 @@ class IntentionRecognizer:
                 self._entry_latency[key] = self._action_completion_latency if completed else 0.0
                 if completed:
                     advanced.add(key)
+                    self._entered_by_completion.add(key)    # T-D G, AD1: the entry source
+                else:
+                    self._entered_by_completion.discard(key)
             # The open phase's value (E10): 1 while its delay is not positive.
             unnorm[key] = self._base[key] * self._phase_likelihood(key, current, pos, odo, still, world, memo)
 
@@ -832,6 +848,7 @@ class IntentionRecognizer:
             # output convention, not belief mass (T-D R4).
             most_likely, confidence = None, 0.0
         finding, lifecycle, tails, hypothesis_adequacy = self._adequacy(pos, odo, still, world, advanced, boundary, memo)
+        observation_warrant = self._observation_warrant(pos, world)
 
         return BeliefState(
             timestamp=obs.timestamp,
@@ -843,6 +860,7 @@ class IntentionRecognizer:
             lifecycle=lifecycle,
             tails=tails,
             hypothesis_adequacy=hypothesis_adequacy,
+            observation_warrant=observation_warrant,
             episode_boundary=boundary,
         )
 
@@ -928,6 +946,61 @@ class IntentionRecognizer:
         else:
             finding = AdequacyFinding.ADEQUATE
         return finding, RecognizerLifecycle.LIVE, tails, hypothesis_adequacy
+
+    # -------------------------------------------------------------------------
+    # Observation warrant (T-D G, AD1, AD2)
+    # -------------------------------------------------------------------------
+
+    def _observation_warrant(
+        self,
+        pos: Tuple[float, float],
+        world: WorldState,
+    ) -> Dict[str, ObservationWarrant]:
+        """
+        Every live hypothesis's observation warrant, read from the phase state
+        after this tick's update (and boundary): whether its current derived
+        phase holds evidence for it (AD1). A third output (AD2), independent of
+        the belief and of the adequacy: it reads neither.
+
+        Two sources, independent of each other:
+          - the ENTRY: the phase was entered by the completion of the
+            hypothesis's previous expected action in this episode, the
+            completion E8 reads (`_entered_by_completion`). For any phase;
+          - MOVEMENT: the phase's action has a movement target (move_to) whose
+            position is resolved this tick, and the path-cost gain toward it
+            since the phase origin is positive, C(o, g) - C(p, g) > 0 — the
+            path costs the excess-path statistic reads (e = w + C(p, g) -
+            C(o, g), so the gain is w - e), with the injected path cost; no new
+            statistic, no constant. Computed as the difference of the two
+            costs, not as w - e, so that nothing walked (p = o) gives exactly 0.
+        No movement warrant for two different reasons: a stationary phase
+        (pick_up, place, wait_at) has no movement target by definition; an
+        unresolved move_to has a movement target whose position cannot be
+        resolved this tick, so no gain is computable (ruled at the G-build plan
+        step). Either has observation warrant through its entry only. A
+        hypothesis with no derived phase (not decomposable) has none. On a
+        boundary tick every origin is the agent's position and no phase was
+        entered by a completion in the new episode, so nothing is warranted.
+        Empty when EXHAUSTED.
+        """
+        warrant: Dict[str, ObservationWarrant] = {}
+        for key in (repr(h) for h in self._hypotheses if repr(h) in self._evidence):
+            action = self._expected.get(key)
+            if action is None:
+                warrant[key] = ObservationWarrant.NONE              # no derived phase
+            elif key in self._entered_by_completion:
+                warrant[key] = ObservationWarrant.OBSERVATION       # the entry source
+            elif action.schema.movement_target_key is None:
+                warrant[key] = ObservationWarrant.NONE              # a stationary phase: no movement target
+            else:
+                target_pos = movement_target_position(action, world)
+                if target_pos is None:
+                    warrant[key] = ObservationWarrant.NONE          # an unresolved move_to: no gain computable
+                elif self._path_cost(self._origin[key], target_pos) - self._path_cost(pos, target_pos) > 0.0:
+                    warrant[key] = ObservationWarrant.OBSERVATION   # the movement source
+                else:
+                    warrant[key] = ObservationWarrant.NONE
+        return warrant
 
     # -------------------------------------------------------------------------
     # The phase's projected completion delay D (T-D E2, E9, E10)
