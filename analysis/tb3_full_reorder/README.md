@@ -592,3 +592,50 @@ Commands: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`; 
 | env_layout_08_scenario_s06_03_full_reorder_on | 14f93fee856ed59854e821047ccee258 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_single_task_off | d5408bc3f3b37688872513771ac37200 | c9c444622f25d15abfd849fc495db540 | 304 | 316 | 70.62 (265) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_single_task_on | 7bd23cd70a937187b48cb0b6ea0b1848 | c9c444622f25d15abfd849fc495db540 | 268 | 272 | 28.69 (246) | 0 | 3 | 1 |
+
+## G-build: T-D G, admission requires warrant — the logs from here on
+
+Regenerated at G-build (29 September 2026), superseding the 2.5 table above. CAUSE: design_decisions.md, "T-D G:
+admission" (AD1 to AD4): the gate also requires the leader to be warranted (commitment: one of the observed human's
+assigned tasks, prior on; or the recognizer's observation warrant), and refuses an unwarranted leader as
+`none(leader_unwarranted)`; the `[IR]` line ends with `warrant=[<key>=none|observation ...]` over the live
+hypotheses, and `[meta-proj] projection=built` names its warrant source (`warrant=commitment`, `observation` or
+both). Every log's md5 changes (the `[IR]` field). The diff rule checked on every log against the 2.5 logs: the `.rec`
+streams byte-identical in all; prior on, every `[IR*]` line byte-identical once the trailing ` warrant=[...]` is removed,
+and every other line identical once `[meta-proj]`'s ` warrant=...` is removed, except in the prior-on runs listed
+below, whose first difference is a moved admission of a foreseeable task. Prior on, commitment warrant covers every
+assigned task, so only admissions of foreseeable tasks can move. Completion is the world tick (T6),
+`analysis/tb1a_destination/sep_classes.py` on both sets; the `[sep]` minimum of the continuous distance and F1's
+classes (`docs/assumptions.md` 4.6) as in 2.5. Prior on first.
+Prior on: scenario_s05_01 under both strategies as in `analysis/tb1a_destination/`: coffee_break's admission at 142
+gone, refused `none(leader_unwarranted)` at 144 and 150; no completion, `[sep]` or F1 move. Nothing else moved
+beyond the log fields.
+Prior off (appendix): scenario_s06_01 single_task the admission of item_4 at 172 gone, full_reorder of item_1 at 188
+gone; scenario_s06_02 the admissions at 189 gone (item_4 single_task, item_1 full_reorder), refused unwarranted at 191
+and 197; scenario_s06_03 full_reorder the admission of item_1 at 221 gone, completion 236 → 226, `[sep]` 90.80 →
+54.58 cm; scenario_s06_03 single_task item_4 admitted at 222 instead of 221, completion 316 → 314, `[sep]` 70.62 →
+68.41 cm.
+Commands: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb3_full_reorder/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (2.5) | completion after (G-build) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_on | 9396ff1e4afc6b24c44a242a1411f91e | 515647f63e1b047aab15b0dc0ac91d08 | 221 | 221 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_on | f9a3a12c7c0f0a61a6c5589112961e61 | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 3f06634b0f174655763ee57bd94982a7 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_on | 0f52f86aa773cefa1e0719d4f4d3d9b2 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_on | f2b1c2c81d78c7657047699996dd7731 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_on | b07b1e31211c1135136a34528e2b7835 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_on | e3a478cc4ec7d321e65c406e22578c14 | 329590c9c1249859bfe20d107588c50a | 224 | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_on | ccbaf46c678c522e09c78a692999a620 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_on | 2c734fb09410644d22f4a8cf8cf97a94 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_on | 0b63ed6e9e4962e699384c8cfce0b767 | c9c444622f25d15abfd849fc495db540 | 272 | 272 | 28.69 (246) | 0 | 3 | 1 |
+| env_layout_03_scenario_s03_01_full_reorder_off | 31046a0cbfdfdacd0a3100cb55a16072 | 515647f63e1b047aab15b0dc0ac91d08 | 265 | 265 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_off | 7d868fd4aefe10d3926e86619180ccad | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_full_reorder_off | 2a6d00bc355b058d2cdff4ab2921a7e3 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_off | bda40c05ad083b0051e7ce64d455f009 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_off | 8b621e3f1f757056ef8a8a3dc5903142 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_off | 4e89831c9236307b244ee7cd63d34cd5 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_off | a23d89a6e646be2285842adce2670dc9 | 329590c9c1249859bfe20d107588c50a | 224 | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_off | ed808863ff4d9887224de039cb5653fd | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 236 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_off | 35b4df6e43ab34fe83e7e7ab75140d57 | c9c444622f25d15abfd849fc495db540 | 316 | 314 | 68.41 (264) | 0 | 0 | 0 |

@@ -529,3 +529,35 @@ Commands: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/swee
 | env_layout_08_scenario_s06_03_plain_on | 3316cb3f852e8e38a8a11682f7bded1d | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
 | env_layout_08_scenario_s06_03_realized_off | d618371426083d9dbb12544fe0384904 | c9c444622f25d15abfd849fc495db540 | 238 | 236 | 90.80 (220) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_realized_on | 14f93fee856ed59854e821047ccee258 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+
+## G-build: T-D G, admission requires warrant — the logs from here on
+
+Regenerated at G-build (29 September 2026), superseding the 2.5 table above. CAUSE: design_decisions.md, "T-D G:
+admission" (AD1 to AD4): the gate also requires the leader to be warranted (commitment: one of the observed human's
+assigned tasks, prior on; or the recognizer's observation warrant), and refuses an unwarranted leader as
+`none(leader_unwarranted)`; the `[IR]` line ends with `warrant=[<key>=none|observation ...]` over the live
+hypotheses, and `[meta-proj] projection=built` names its warrant source (`warrant=commitment`, `observation` or
+both). Every log's md5 changes (the `[IR]` field). The diff rule checked on every log against the 2.5 logs: the `.rec`
+streams byte-identical in all; prior on, every `[IR*]` line byte-identical once the trailing ` warrant=[...]` is removed,
+and every other line identical once `[meta-proj]`'s ` warrant=...` is removed, except in the prior-on runs listed
+below, whose first difference is a moved admission of a foreseeable task. Prior on, commitment warrant covers every
+assigned task, so only admissions of foreseeable tasks can move. Completion is the world tick (T6),
+`analysis/tb1a_destination/sep_classes.py` on both sets; the `[sep]` minimum of the continuous distance and F1's
+classes (`docs/assumptions.md` 4.6) as in 2.5. Prior on first.
+Prior on: nothing moved beyond the log fields.
+Prior off (appendix): scenario_s06_01 (plain and realized) the admission of item_1 at 188 gone; scenario_s06_03 (plain
+and realized) the admission of item_1 at 221 gone, refused unwarranted at 223; scenario_s06_03 realized completion 236 →
+226, `[sep]` 90.80 → 54.58 cm. `check.py` was not rerun: it reads the registry from before T-L stage 1 (above) and
+fails on it.
+Commands: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (2.5) | completion after (G-build) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_on | fc03cc9953344aae5a3945346de24eb2 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_on | f2b1c2c81d78c7657047699996dd7731 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_on | 1c4dd4ee4a3c8bd9bfa9ac22e533ba5c | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_on | 2c734fb09410644d22f4a8cf8cf97a94 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_plain_off | 7c086199a3ca526c7ad189ea0e96d835 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_off | 8b621e3f1f757056ef8a8a3dc5903142 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_off | c60a7db0c91a86084328a356985228be | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 236 | 226 | 54.58 (223) | 0 | 0 | 0 |

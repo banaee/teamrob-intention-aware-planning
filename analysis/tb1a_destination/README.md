@@ -644,3 +644,52 @@ Commands: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`; 
 | env_layout_07_scenario_s05_01_on | 29861d94faf3dec03cb4165471d65b5f | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
 | env_layout_07_scenario_s05_02_off | 8d2ccf8c010c262e80bf0580b61adad8 | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 218 | 50.00 (57) | 0 | 0 | 0 |
 | env_layout_07_scenario_s05_02_on | fb47d44872ffee0930a1403f311886f2 | dab078d5ca51e5b378054ee6a60ccca7 | 214 | 214 | 50.00 (57) | 0 | 0 | 0 |
+
+## G-build: T-D G, admission requires warrant — the logs from here on
+
+Regenerated at G-build (29 September 2026), superseding the 2.5 table above. CAUSE: design_decisions.md, "T-D G:
+admission" (AD1 to AD4): the gate also requires the leader to be warranted (commitment: one of the observed human's
+assigned tasks, prior on; or the recognizer's observation warrant), and refuses an unwarranted leader as
+`none(leader_unwarranted)`; the `[IR]` line ends with `warrant=[<key>=none|observation ...]` over the live
+hypotheses, and `[meta-proj] projection=built` names its warrant source (`warrant=commitment`, `observation` or
+both). Every log's md5 changes (the `[IR]` field). The diff rule checked on every log against the 2.5 logs: the `.rec`
+streams byte-identical in all; prior on, every `[IR*]` line byte-identical once the trailing ` warrant=[...]` is removed,
+and every other line identical once `[meta-proj]`'s ` warrant=...` is removed, except in the prior-on runs listed
+below, whose first difference is a moved admission of a foreseeable task. Prior on, commitment warrant covers every
+assigned task, so only admissions of foreseeable tasks can move. Completion is the world tick (T6),
+`analysis/tb1a_destination/sep_classes.py` on both sets; the `[sep]` minimum of the continuous distance and F1's
+classes (`docs/assumptions.md` 4.6) as in 2.5. Prior on first.
+Prior on: no completion tick, `[sep]` minimum or F1 class moved. Admissions that disappeared or moved (all
+coffee_break, the lone foreseeable task after a boundary, admitted at b + 1 on a standing tick before G):
+- scenario_s02_01: at 363 (b + 1 after the AC switch's wait_at at 362; a `projection_expired` decision) refused
+  `none(leader_unwarranted)` instead of admitted; the same winner, no hold either way.
+- scenario_s03_06: moved from 122 (b + 1) to 123, admitted on the first step's gain (`warrant=observation`); the same
+  winner and hold.
+- scenario_s05_01 and scenario_s05_02: at 142 (b + 1 after ac_activation's wait_at at 141) no longer admitted
+  (`recognition_changed` does not fire on an unwarranted leader); refused `none(leader_unwarranted)` at the
+  `projection_expired` decisions of 144 and 150, inadequate from 159 (the human walks away from the machine); no hold
+  before or after.
+Unchanged prior on: scenario_s04_01's foreseeable admissions (coffee_break at 158, entered by its walk's completion;
+ac_activation at 218, on the walk's gain).
+Prior off (appendix): scenario_s01_01 the robot's own item_4 admitted at 143 instead of 142 (on the gain), completion
+201 → 199, `[sep]` 75.30 → 72.61 cm; scenario_s03_06 the admission of item_7 at 177 gone. No other prior-off move.
+Commands: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (2.5) | completion after (G-build) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_on | f9928acd529390f06def423fee5b8aba | e75eaa192f7071498290d6255fc81320 | 174 | 174 | 45.74 (156) | 0 | 3 | 0 |
+| env_layout_02_scenario_s02_01_on | a3c9840bc8793d6ee15dcf399eb5a883 | fb8914e13cbab8b97307127aa0cd4327 | 426 | 426 | 30.87 (75) | 2 | 3 | 0 |
+| env_layout_03_scenario_s03_01_on | f9a3a12c7c0f0a61a6c5589112961e61 | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_04_scenario_s01_06_on | d6bd11fc0b73f23c17dc7b700f0c86ae | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_on | 0259a082dbbd5f46723c86de185015d9 | 5018d8aa07e5b9ad7aa277fec933ada9 | 384 | 384 | 38.58 (355) | 0 | 3 | 1 |
+| env_layout_06_scenario_s03_06_on | ac3fa1671423ce4782b9e0803f855dd7 | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_on | 0f52f86aa773cefa1e0719d4f4d3d9b2 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_on | 16c51cd20e1cac4323a11384ec28cace | dab078d5ca51e5b378054ee6a60ccca7 | 214 | 214 | 50.00 (57) | 0 | 0 | 0 |
+| env_layout_01_scenario_s01_01_off | f43bd622a7fccc7423367919a0681428 | e75eaa192f7071498290d6255fc81320 | 201 | 199 | 72.61 (166) | 0 | 0 | 0 |
+| env_layout_02_scenario_s02_01_off | c9e9f1f339f6fe8d8913ee9fa65b5681 | fb8914e13cbab8b97307127aa0cd4327 | 422 | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_off | 7d868fd4aefe10d3926e86619180ccad | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_04_scenario_s01_06_off | 947ab153ebd26fdffd69895731a3033f | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_off | d4471d706f95639a6a207aaba8c36a3f | 5018d8aa07e5b9ad7aa277fec933ada9 | 384 | 384 | 38.58 (355) | 0 | 3 | 1 |
+| env_layout_06_scenario_s03_06_off | 5f5a313476701443abb951663dae49fd | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_off | bda40c05ad083b0051e7ce64d455f009 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_off | a33b38be658def9388af110f597e39ca | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 218 | 50.00 (57) | 0 | 0 | 0 |

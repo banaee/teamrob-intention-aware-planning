@@ -483,3 +483,30 @@ Commands: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep`; `a
 | env_layout_08_scenario_s06_01_on | 1618a7efff2c9193f6204f54015f910d | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_02_off | d7506eae987c2276028a9d5374692659 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_02_on | aa88a8cd08807205b66829d1e1b402d9 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+
+## G-build: T-D G, admission requires warrant — the logs from here on
+
+Regenerated at G-build (29 September 2026), superseding the 2.5 table above. CAUSE: design_decisions.md, "T-D G:
+admission" (AD1 to AD4): the gate also requires the leader to be warranted (commitment: one of the observed human's
+assigned tasks, prior on; or the recognizer's observation warrant), and refuses an unwarranted leader as
+`none(leader_unwarranted)`; the `[IR]` line ends with `warrant=[<key>=none|observation ...]` over the live
+hypotheses, and `[meta-proj] projection=built` names its warrant source (`warrant=commitment`, `observation` or
+both). Every log's md5 changes (the `[IR]` field). The diff rule checked on every log against the 2.5 logs: the `.rec`
+streams byte-identical in all; prior on, every `[IR*]` line byte-identical once the trailing ` warrant=[...]` is removed,
+and every other line identical once `[meta-proj]`'s ` warrant=...` is removed, except in the prior-on runs listed
+below, whose first difference is a moved admission of a foreseeable task. Prior on, commitment warrant covers every
+assigned task, so only admissions of foreseeable tasks can move. Completion is the world tick (T6),
+`analysis/tb1a_destination/sep_classes.py` on both sets; the `[sep]` minimum of the continuous distance and F1's
+classes (`docs/assumptions.md` 4.6) as in 2.5. Prior on first.
+Prior on: nothing moved beyond the log fields (both scenarios' admissions are of assigned deliveries).
+Prior off (appendix): scenario_s06_01 the admission of item_4 at 172 gone, refused `none(leader_unwarranted)` at 174
+and 180; scenario_s06_02 the admission of item_4 at 189 gone, refused unwarranted at 191 and 197. No completion tick,
+`[sep]` minimum or F1 class moved.
+Commands: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (2.5) | completion after (G-build) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_on | b07b1e31211c1135136a34528e2b7835 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_on | ccbaf46c678c522e09c78a692999a620 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_off | 4e89831c9236307b244ee7cd63d34cd5 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_off | ed808863ff4d9887224de039cb5653fd | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
