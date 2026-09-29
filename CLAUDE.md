@@ -201,14 +201,19 @@ Decisions
   Track 3, the meta-planner test-bed (MPB), is ruled (29 Sept 2026; design_decisions.md, "The meta-planner test-bed
   (MPB)", MPB-1 to MPB-6), records only: eight scenarios on env_layout_12, an oracle for the trigger and cause, the
   gate and the projection (per-tick tables pre-run, the chain assembled with the run's `no_current_task` ticks), part 4
-  as declared properties; prior off a diagnostic appendix. MPB is built (29 Sept 2026; step 2, parts (i) to (iv);
+  as declared properties; prior off a diagnostic appendix. MPB step 2 is built (29 Sept 2026; parts (i) to (iv);
   `analysis/mpb/`, REPORT.md; env_layout_12, env_setup_10/11, scenario_s10_01 to _09 and s11_01, _02, `configs/mpb/`):
   - all eleven scenarios verified: zero disagreements on parts 1 to 3 under both strategies, prior on; every declared
     part-4 property holds under single_task;
   - AD3 is not exercisable in the MPB set (the AD3 line);
   - the skip rule is a design question (P4's dated line, TODO-142);
   - an observed human with no work under the prior on has no representation (TODO-143).
-  Next, as Hadi rules: the evaluation, T-F, or track 4.
+  The coverage matrix is recorded (`analysis/mpb/coverage.md`; MPB-2 as amended: the layout-and-setup rule, the three
+  kinds of cell). Part (v) is under way in track 3: the five reachable claimed cells, one authored instance each (the
+  switch against an admitted projection, the hold against an admitted standing segment, the switch while carrying, a
+  record kept through a dip below θ, the cause boundary on a new layout without the coffee machine). The MPB closes
+  when every materially distinct in-scope decision path is verified, unreachable with a recorded derivation, or outside
+  the claimed mechanism with a recorded reason; then next as Hadi rules (T-F, framed in TODO-144, or track 4).
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
