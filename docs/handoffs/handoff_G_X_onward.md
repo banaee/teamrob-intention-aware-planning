@@ -116,11 +116,13 @@ TB.3b layers 1 to 3, TB.4b layer 4 and the alternates, close-out.
 Scenarios and what they hold: _01 two deliveries; _02 coffee between; _03 coffee after the pick-up;
 _04 coffee after the first walk (empty-handed); _05 corner walk mid-carry (TODO-94); _06 the long
 stand (TODO-95, now 3.4); _07 change of mind; _08 misdelivery to `kitting_table_1` (TODO-87);
-_09 a delivery of an unassigned item (outside the support); _10, _11 two west shelves, with and
-without coffee; _12 reversed order; _13 (track 2.5) the coffee break cut into the carry mid-walk
+_09 a delivery of an unassigned item (outside the support); _10 two west shelves (item_1 and item_3);
+_11 the same with coffee between; _12 reversed order; _13 (track 2.5) the coffee break cut into the carry mid-walk
 (T-H's `during` cut, PT28S, cut at 46).
 
-Results: 16 scenarios, zero disagreements at every build (TB, L, P4, 2.5); the oracle detects 7 of 8
+Results: zero disagreements at every oracle comparison: 16 scenarios at TB and at L-build, 17 at track
+2.5 (with s09_13); at P and P4 the test-bed logs were diffed, not compared (only the step-0 `[meta-proj]`
+line differs). The oracle detects 7 of 8
 single-rule alterations; E8's member clause is covered by E6's second amendment whenever the completion
 latency is 1, so E8 is not exercised on its own (a body property, recorded).
 
@@ -155,7 +157,9 @@ every baseline before.
   completes at 227); exhausted disappears on the coffee exit walks (unexplained instead).
 - Consequence lines recorded: re-admission after a switch needs fresh evidence, about 15 ticks after
   a boundary (s09_01) and 14 after the change of mind (s09_07) at HEAD; a foreseeable hypothesis
-  returns one step after its break as a third rival.
+  returns two ticks after its pin (the human's first step after the break) as a third rival. The
+  boundary cause (`cause=boundary`) fired in none of the 52 L-build runs; the leader changed anyway at
+  every boundary that met a recorded decision.
 
 ### 2.3 Cycle 2, P: the fallback projection (closed with P4; entry "T-D P")
 
@@ -174,7 +178,8 @@ every baseline before.
   observation); `WorldState.workspace` and `fixed_object_positions` from the builder (static layout
   facts). Moving: project the straight motion for as long as it has been maintained, cut where the
   ray meets the workspace boundary or enters the first fixed object's arrival radius (landmarks count
-  as fixed objects), no stand inferred after a cut. Standing: project standing for as long as it has
+  as fixed objects: a code fact, `world_state_builder.py` puts every non-portable object in
+  `fixed_object_positions`; recorded by the records step of section 11), no stand inferred after a cut. Standing: project standing for as long as it has
   stood. Beyond the projection the human is unassessed. realize() unchanged; every candidate gets a
   finite hold; the refusal rule, the wait state, the body's wait branch and the `HumanProjection`
   classes are removed. Q6: `projection_expired` is a third trigger (after `recognition_changed`), the
@@ -182,7 +187,8 @@ every baseline before.
   D2's "one field" superseded). Q5 dissolved (no wait state). The doubling of holds against a standing
   human is emergent, never a rule.
 - Results (P4): s05_01 back to 194 with the closest approach 58 cm (7 cm under the first P build);
-  the occupied table (s01_06 from 120): the robot approaches, holds at 63 cm with lengthening holds
+  the occupied table (s01_06: the human's last delivery completes at 122; the first hold on the final
+  stand at 141): the robot approaches, holds at 63 cm with lengthening holds
   48, 96, 192, 384 (800-step run), never completes while the human stands: X's occupied target,
   emerging as "approach and hold at the separation boundary" (recorded as a P4 consequence, not a
   rule). s03_01's 30 cm was the observation offset (the first step after a decision is unassessed,
@@ -209,11 +215,12 @@ every baseline before.
   ground truth and hands the mind a finished `WorldState`; there is no perception module and no
   robot-mind object; the mind's components are attributes of the Mesa `RobotAgent`. Ruled: the
   `WorldState` is understood as the robot's world model; perception facts (displacement, run, standing
-  count) are the robot's, held on `RobotAgent` until a mind object exists (a TODO, see 9.4); the
+  count) are the robot's, held on `RobotAgent` until a mind object exists (TODO-131, see 9.4); the
   mind keeps a bounded record (four numbers), never a history. Track 4 is where the perception layer
   lands (the observable area is its first rule).
 - Union projection (plan against every adequate hypothesis's plan when none is above θ) is a
-  belief-aware planning move, parked under TODO-97, with two variants to distinguish when taken up:
+  belief-aware planning move, parked under TODO-97 (which today records only the covering-set union;
+  the two variants are a chat decision, recorded by the records step of section 11):
   the fit-set variant (all adequate) and the belief-weighted variant; the case that decides between
   them is a hypothesis adequate for one tick with almost no probability.
 
@@ -228,8 +235,9 @@ every baseline before.
   regenerated once ("2.5" README sections, F1 classes per run via
   `analysis/tb1a_destination/sep_classes.py`). All twelve former occupied-target logs complete
   (174 to 384). Unedited scenarios byte-identical.
-- 3.4: a stand inside a task is a pause while within the standing its current step prices (E9, E10);
-  beyond that the step does not fit and, with no other fit, the finding is unexplained; standing
+- 3.4: a stand inside a task is a pause while within the standing its derived phase (the task's
+  current step) prices (E9, E10); beyond that the derived phase does not fit and, with no other fit,
+  the finding is unexplained; standing
   contributes no hypothesis-specific evidence while the hypotheses price it equally; any movement of
   the probabilities comes from the evidence function, not from one hypothesis explaining the stand
   better. No stay hypothesis. TODO-95 closed; its levels moved (level 1 built as P; 2 and 3 to X; the
@@ -340,7 +348,8 @@ one regeneration. Until then 1.1's corner walk stands.
 
 ## 8. Insights to carry (from the reports, for the paper and for design)
 
-- The implementation is faithful to the records: 16 scenarios at 1e-9 across four builds; a
+- The implementation is faithful to the records: zero disagreements at 1e-9 at every oracle
+  comparison (16 scenarios at TB and L-build, 17 at track 2.5); a
   disagreement between what we want and what we see is a design question, not a bug hunt.
 - Belief and adequacy are independent as R3 intended: the stand moves the finding and not the belief
   (s09_06); a confidently wrong belief with an unexplained finding (s09_09, coffee at 0.97 with no walk
@@ -362,19 +371,45 @@ one regeneration. Until then 1.1's corner walk stands.
 9.1 G Q1 and Q2 (section 4), with the candidate rule.
 9.2 X (section 5).
 9.3 P3 (an admitted projection ending at a non-terminal action), parked, recorded in the P entry.
-9.4 The robot-mind object and perception layer in `shared/` (a TODO from P; lands in track 4).
-9.5 TODO-134, the observation offset on a fallback stand.
-9.6 TODO-97 belief-aware planning with the union's two variants, parked.
+9.4 TODO-131, the robot-mind object and perception layer in `shared/`. "Lands in track 4" is this
+    chat's decision, not yet in the TODO's text; recorded by the records step of section 11.
+9.5 TODO-134, the observation offset on a fallback stand; its case (s03_01, 30.12 cm) no longer
+    occurs in the maintained sets after the exit walks (track 2.5 note); the question stays open.
+9.6 TODO-97 belief-aware planning with the union's two variants (fit-set, belief-weighted), parked;
+    the variants recorded by the records step of section 11.
 9.7 TODO-137 fallback-only control; TODO-138 the horizon with a working robot; TODO-139 the default
     prior (change it in its own step, since every hand run and test expectation moves).
-9.8 A retired hypothesis whose terminal fact cannot be read stays retired (a TODO from L-build).
+9.8 TODO-129: a retired hypothesis whose terminal fact cannot be read stays retired (from L-build's
+    BUILT paragraph, recorded in the P records).
 9.9 The "leave the workspace" foreseeable task as a domain addition: proposed and declined for now
-    (option (a), keep unmodelled); revisit with track 4 or the demonstration.
+    (option (a), keep unmodelled); revisit with track 4 or the demonstration. A chat decision, in no
+    record until the records step of section 11.
 9.10 `docs/env_layouts_png/` screenshots are stale (old ids, no `corner_SE` on 02 and 08); cosmetic.
 9.11 E8 not exercisable on its own with completion latency 1; a design note, no action.
-9.12 The IR test-bed README has no P4 md5 section (its local logs differ only in the step-0 line).
+9.12 The IR test-bed README has no P4 md5 section and no track 2.5 md5s for the 16 earlier runs (only
+    s09_13's are recorded); the local logs differ from L-build's only in the step-0 line.
 
-## 10. First message of the new chat (what Hadi asked for)
+## 10. Provenance of what this document says
+
+Three kinds of statement appear here: repo facts (verified by ccode at commit e0028dd), recorded
+decisions (in the entries and TODOs named), and decisions made in the preceding chat that were in no
+record when this document was first written. The third kind is marked "chat decision" and is recorded
+by the records step of section 11, after which the repo holds them too.
+
+## 11. Records step at the handoff (ccode, one commit, before the new chat starts)
+
+- TODO-97: add the union projection's two variants (the fit-set variant over all adequate hypotheses;
+  the belief-weighted variant) and the case that decides between them (a hypothesis adequate for one
+  tick with almost no probability); parked.
+- TODO-131: add that the perception layer and the mind object land in track 4, whose observable-area
+  rule is their first case.
+- The track 4 TODO: add that a "leave the workspace" foreseeable task was proposed and declined for
+  now (the exit walk stays unmodelled; option (a)); revisit with track 4 or the demonstration.
+- The P entry (P4): one line that landmarks count as fixed objects for the fallback's tail
+  (`world_state_builder.py` puts every non-portable object in `fixed_object_positions`).
+- Then verify sections 2 and 9 of this document against the repo once more and report.
+
+## 12. First message of the new chat (what Hadi asked for)
 
 Show, itemised and in plain words: the pipeline zoomed out (section 2's first paragraph), then where
 each track stands, then G's two questions with their cases, then the verification of this handoff
