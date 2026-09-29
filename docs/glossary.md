@@ -157,6 +157,12 @@ the fallback, the robot waits because the human stands at the robot's target. Wh
 route", the human standing on the robot's walk to its target, has no instance in the fixtures and stays one of X's
 categories in the design record, not a term here.)
 → `docs/design_decisions.md`, "T-D P", the deadlock.
+AMENDED (T-D X, X1, ruled by Hadi 29 September 2026): since P4 nothing is refused and there is no wait; the occupied
+target is a human standing where the robot must work, and keeping standing. It gets no special handling: with an
+alternative task in the pool B3 selects on realized cost, and the occupied task's hold is expected to make the
+alternative preferable; with none the robot holds, the holds lengthening at each expiry (an evaluation observation).
+The verification is a scenario in track 3 (TODO-130). The blocked route gets no ruling of its own: X1 and X2.
+→ `docs/design_decisions.md`, "T-D X: response", X1, X2.
 
 **T_h** — the end of the human projection: its last segment's end step. Nothing past T_h is
 assessed or charged. Under a fallback projection T_h is the candidate's own end, so it differs per candidate;
@@ -789,6 +795,9 @@ membership. No change to the mechanism.
 AMENDED (T-D G, AD2, ruled 29 September 2026; to be built in G-build): **warrant** (below) is a third independent
 output beside the belief and the finding (R3 as amended); it is not a kind of adequacy. design_decisions.md, "T-D G:
 admission".
+AMENDED (T-D X, 29 September 2026): "what it does with it is G and X, open" is answered. G: the leader's hypothesis
+adequacy enters admission (AD1). X: an unexplained finding that has outlived a re-decision is ground (1) for
+communication (X5), recorded, with no mechanism. design_decisions.md, "T-D G: admission", AD1; "T-D X: response", X5.
 
 **hypothesis adequacy** — per live hypothesis, a categorical value the recognizer reports beside the **adequacy
 finding** (G1): **adequate** (a member of the test with S_k ≥ α), **inadequate** (a member with S_k < α) or **no
@@ -897,6 +906,9 @@ own derived phase and was **warranted** (commitment or observation, above), and 
 (`[meta-proj] projection=built warrant=<commitment|observation|commitment,observation>`). An unwarranted leader is
 refused (`none(leader_unwarranted)`, after `none(leader_inadequate)`); losing warrant after admission changes nothing
 (AD3). design_decisions.md, "T-D G: admission".
+AMENDED (T-D X, 29 September 2026): "the downstream response is G and X" is answered: admission is G's AD1 (θ,
+adequacy, warrant); X adds nothing to admission, and X5 records when communication is warranted (TODO-96).
+design_decisions.md, "T-D G: admission", AD1; "T-D X: response", X5.
 
 USAGE RULE, in prose:
 - about the implementation: "the `unknown` hypothesis";
