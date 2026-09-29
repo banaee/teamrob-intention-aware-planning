@@ -417,6 +417,20 @@ the finding itself, the lifecycle and the tails are for evaluation and for the r
 carries `lifecycle=`, `finding=` and `leader_adequacy=` (both absent when exhausted) and `tails=[key=S …]` over the
 members, to four decimals; every other hypothesis's adequacy follows from the tails and α.
 
+WARRANT (T-D G, AD1 to AD4, ruled by Hadi, 29 September 2026; to be built in G-build). A third independent output
+beside the belief and the finding (R3 as amended, AD2), not a kind of adequacy: per live hypothesis, OBSERVATION
+WARRANT (none | observation) on `BeliefState`. A hypothesis's current derived phase holds observation warrant when,
+for a phase with a movement target (`move_to`), the path-cost gain toward the target since the phase origin is
+positive, $C(o, g) - C(p, g) = w - e > 0$ (the quantities of the excess-path statistic above; no new statistic, no
+constant); or, for any phase, when the phase was entered by the observed completion of the hypothesis's previous step
+in this episode (the completion E8 reads). A phase without a movement target (`pick_up`, `place`, `wait_at`, where
+$e = 0$ and $w - e$ would be the path walked) has observation warrant through that entry only. It resets with the
+origins, at a boundary and at a phase change. Commitment warrant (the hypothesis is one of the observed human's
+assigned tasks) is the gate's knowledge, never computed or printed here. The meta-planner's gate reads observation
+warrant, adds commitment warrant and refuses an unwarranted leader (`none(leader_unwarranted)`, after
+`none(leader_inadequate)`); it reconstructs no recognizer quantity. The `[IR]` line prints `warrant=none|observation`
+per live hypothesis, its exact form settled at G-build's plan step. design_decisions.md, "T-D G: admission".
+
 ## 2. Parameters
 
 Two constants in `shared/likelihood_functions.py`, each with a physical meaning, read through the module; the

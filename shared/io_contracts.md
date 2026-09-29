@@ -818,7 +818,14 @@ change to how the bar is computed would not change where it is asked. Since G1 (
 also the one home of the guard on admission: the belief clears the gate (`GateOutcome.CLEARS`) when `confidence ≥ θ`
 AND the leader's `hypothesis_adequacy` is ADEQUATE; otherwise it answers, in this order, `BELOW_THETA`,
 `LEADER_NO_OBSERVATION` or `LEADER_INADEQUATE`. The meta-planner receives no alpha and no S_k. See design_decisions.md,
-"θ has one home". The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
+"θ has one home".
+RULED (T-D G, AD1, AD2, 29 September 2026; to be built in G-build): the gate also requires the leader to be WARRANTED:
+commitment warrant (the leader is one of the observed human's assigned tasks, matched by task equality, `same_task`,
+as the recognizer's support restriction matches them; the assigned tasks become a new meta-planner input, prior on
+only) or observation warrant (read from the recognizer's per-hypothesis output on `BeliefState`). A third refusal,
+`LEADER_UNWARRANTED` (`none(leader_unwarranted)`), asked after `LEADER_INADEQUATE`. `_clears_gate` stays the one
+home; it reconstructs no recognizer quantity. Loss of observation warrant fires nothing (AD3). design_decisions.md,
+"T-D G: admission". The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
 and a margin gate (TODO-65) were considered and not taken; design_decisions.md, "The gate stays
 a fixed share".
 
@@ -1091,6 +1098,11 @@ Emits one `[meta-proj] confidence=<c> theta=<θ> projection=<reason>` line per c
 `none(unresolved)`, which collided with the adequacy finding's value; `none(unknown)` is gone with the `unknown`
 hypothesis). When the recognizer is exhausted, `confidence` is 0.0 and admission refuses as `none(below_theta)`:
 the expected, measured behaviour of this cycle, not a design (G).
+RULED (T-D G, AD1, AD4, 29 September 2026; to be built in G-build): the gate's refusals gain `none(leader_unwarranted)`
+(the leader at θ and adequate, but with neither commitment nor observation warrant), checked after
+`none(leader_inadequate)`; `projection=built` names the admission's warrant source (commitment, observation, or both
+when both hold), as does `[meta-b2]` where that line exists (under `b2a` only). design_decisions.md, "T-D G:
+admission".
 No `step` or `trigger` field: both belong to the caller and are recoverable from the
 `[meta-trig]` line of the same tick.
 
