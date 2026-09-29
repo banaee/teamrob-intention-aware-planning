@@ -4920,6 +4920,13 @@ MEASURED AT (recorded at G-records, 29 Sept 2026; design_decisions.md, "T-D G: a
 measured on the P-build baselines (fa26176) and does not occur under P4 and Track 2.5 (verified 29 Sept 2026 at
 a412b39: tick 92 has no decision; the run's minimum `[sep]` is 58.31 cm at tick 25). P3 stays parked, with no instance
 in the maintained sets.
+A CLASS-3 READING, RECORDED UNDER THE PARKED P3 (Hadi, 29 September 2026, the MPB post-(iv) records; no reopening). The
+bound above ("when the projected end is a terminal action, L1's boundary re-decides within the human's completion
+latency") holds for a human on schedule. An admitted plan always ends at the task's terminal action; a human delayed in
+a phase but still adequate (standing under the inadequacy delay, about 17 standing ticks at α = 0.05 and v = 20
+cm/tick) reaches that action after T_h, so the robot runs past T_h with the record standing for up to the inadequacy
+delay, not only the completion latency. Reachable, not claimed, no instance in the MPB set (analysis/mpb/coverage.md,
+row E8; in all 22 prior-on MPB runs every admitted record ended before its T_h).
 
 Consequence recorded. After L an admitted projection cannot go stale beyond the finding's threshold (the leader is
 retracted when its phase turns inadequate); P adds no staleness rule for admitted projections. For G: the staleness
@@ -5307,6 +5314,24 @@ contribution claims. It is the last instrument before the evaluation and the dem
   planning decision, so a disagreement in them could not be attributed; a controlled room makes the property
   derivable beforehand; varying the setup rather than the room keeps the control scenario meaningful.
   Set aside. Reusing env_layout_11; one layout per scenario; authored parameter variants (the test-bed is not a sweep).
+  AMENDED (Hadi, 29 September 2026, the post-(iv) records): THE LAYOUT-AND-SETUP RULE. The existing geometry is reused
+  only when it naturally instantiates the case. One placement change is a setup fix. A second change, or any move of
+  unrelated geometry to make a case come out, means a new setup or a new layout. The criterion is conceptual, not
+  timing: a timing accident is a class-4 re-authoring of the same case (MPB-4). A placement or setup change is
+  acceptable only if it alters no already-verified scenario on that setup; otherwise a new setup. The output floor
+  couples every scenario on a setup: the setup's robot items inadmissible for the human sit at the floor and lower the
+  leader's confidence, which moved scenario_s10_08's crossing from the IR test-bed's 46 to 47. A spatial or structural
+  requirement (a relation between a robot route and a human station; the absence of a hypothesis) may need a new
+  layout. First instance: scenario_s11_02's shelf_2 case (part (iv); analysis/mpb/authoring.md): item_12 on shelf_2
+  put the exit walk within 2.3 cm of its shelf and admitted the delivery at 97, class 4 found before any run; moved to
+  shelf_1, one placement change on env_setup_11, whose two scenarios were re-authored together.
+  Why. A room or setup bent to make one case come out would make the other scenarios' properties depend on it, and a
+  disagreement could no longer be attributed.
+  THE COVERAGE PRINCIPLE EXTENDED (same date): every materially distinct in-scope decision path is one of three kinds of
+  cell: verified (an instance in a verified run), unreachable (no instance, with a derivation from the records that the
+  framework cannot reach it in scope), or out of coverage (no instance, with a recorded reason why it is not part of the
+  mechanism the MPB claims). The matrix is analysis/mpb/coverage.md. A reachable cell the contribution claims gets one
+  authored instance (part (v)).
 
 - MPB-3, the robot's acts and the compare level.
   Ruling. The oracle's world holds the human's facts. The per-tick tables of parts 1 to 3 stay pre-run derivable
@@ -5348,6 +5373,16 @@ contribution claims. It is the last instrument before the evaluation and the dem
   Why. Exact verification where the records determine the answer, property verification where they do not; classes
   3 to 5 keep the instrument from turning an accident into a rule; the alteration test shows that a zero result is a
   detection.
+  AMENDED (Hadi, 29 September 2026, the post-(iv) records): THE THREE READINGS OF A CLASS-2 FINDING. When the framework
+  disagrees with the records, the finding is read as one of three:
+  (a) the implementation departs from the ruling: a defect under the ruling, reported with the entry and the ticks,
+      and corrected to the ruling after Hadi's ruling (class 2 as above: never a local fix);
+  (b) the ruling is followed, but its stated reason predicted otherwise: a redesign, returned to the design chat;
+  (c) the ruling can be read two ways: class 3, a question to the design chat.
+  THE LOOP: ruling, build, MPB evidence, interpretation, a possible redesign, build, re-test. The scenario is never
+  modified to make a finding pass; it changes only under class 4, with its case unchanged.
+  Why. A scenario changed until the framework passes it tests nothing; the instrument's worth is that a disagreement
+  is attributed to the ruling, the build or the scenario before anything changes.
 
 - MPB-5, scope for the parked items.
   Ruling. TODO-132 (a): scenario 7's stand records the re-decision ticks, the holds and the tick the persistence broke,
@@ -5463,3 +5498,20 @@ that the MPB claims to verify has one authored instance; a different location of
 Provenance: scenario_s10_07 to _09 were added for a coverage gap found in review, not because a run failed.
 RECORD LINE (part (iv)): the framework has no representation of an observed human with no work under the prior on, since
 an empty assigned list is the diagnostic mode (shared/io_contracts.md §2.1). TODO-143, recorded only.
+
+NOT CLOSED (Hadi, 29 September 2026, the post-(iv) records): "BUILT" above is step 2, parts (i) to (iv). The coverage
+matrix (analysis/mpb/coverage.md; the extended coverage principle under MPB-2) sorts every materially distinct decision
+path of the eleven runs: 31 verified, 5 unreachable with a derivation, 4 out of coverage with a reason, 1 reachable and
+not claimed (P3), 1 not a distinct path, and 5 reachable and claimed with no instance. Three facts of the whole set: the
+cause boundary fired in no run; every admitted record ended before its T_h; no record was kept through a dip below θ.
+X5's ground (2) is measured in scenario_s11_02 (single_task; every candidate holds at 25, 27, 31, 39 and 55).
+The five claimed cells are authored in part (v), one instance each, in the order ruled: the switch against an admitted
+projection (a new setup on env_layout_12); the hold against an admitted standing segment (a new scenario on
+env_setup_10); the switch while carrying (a new scenario on env_setup_11); a record kept through a dip below θ (a new
+scenario on env_setup_10); the cause boundary (a new layout without the coffee machine: the mechanism requires the
+absence of the `coffee_break` hypothesis, which wins the tie order at every reset). Rulings kept apart: P3 is reachable
+and not claimed; the wall cut is out of coverage until TODO-142 is ruled; "none" (no projection) is track 4's; AD3 stays
+out of coverage, conceptually apart from the boundary cause (both without instance; the boundary is claimed and
+reachable under a changed hypothesis space, AD3 is not exercisable here).
+CLOSURE CRITERION: the MPB closes when every materially distinct in-scope decision path is verified, unreachable with a
+recorded derivation, or outside the claimed mechanism with a recorded reason.

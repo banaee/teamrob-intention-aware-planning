@@ -128,6 +128,7 @@ Framework scope · Hadi, 28 Sept 2026, reframing F1's stance (F1 stays the safet
 "2.5" sections (the `[sep]` minimum and F1's class counts per run).
 The fallback-only control is no run option today (TODO-137); the evaluation scenario is TODO-135 (its first
 instance: scenario_s01_06, the exit walk through the holding robot, 5.23 cm at 147, stands and a recede).
+The evaluation's framing (the conditions, the measures, the scenario dimension; not ruled): TODO-144.
 
 ## 5. Perception
 

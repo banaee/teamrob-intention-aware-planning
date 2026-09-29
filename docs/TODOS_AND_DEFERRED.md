@@ -3738,7 +3738,7 @@ reaches it.
 Files: shared/recognizer.py (`_retired`)
 Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
 
-**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [BUILT (MPB step 2, parts (i) to (iv), 29 Sept 2026): eleven scenarios verified]
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [OPEN: step 2 built (parts (i) to (iv), 29 Sept 2026; eleven scenarios verified); part (v), the five claimed coverage cells, under way]
 REWRITTEN (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"): the earlier track
 note and its X amendment are superseded by the entry; their content is in it.
 The recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
@@ -3773,6 +3773,14 @@ disagreements on parts 1 to 3, both strategies, prior on; every declared part-4 
 - scenario_s10_07 to _09 added for coverage.
 - AD3 recorded as not exercisable in the MPB set.
 - The skip rule is TODO-142; the observed human with no work under the prior on is TODO-143.
+THE COVERAGE MATRIX AND PART (v) (Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-2 as
+amended and NOT CLOSED; analysis/mpb/coverage.md): the eleven runs sorted into 47 decision paths, 31 verified, 5
+unreachable with a derivation, 4 out of coverage with a reason, 1 reachable and not claimed (P3), 1 not a distinct
+path, 5 reachable and claimed with no instance. Part (v) authors those five, one instance each: the switch against an
+admitted projection; the hold against an admitted standing segment; the switch while carrying; a record kept through a
+dip below θ; the cause boundary (a new layout without the coffee machine). The MPB closes when every materially distinct
+in-scope decision path is verified, unreachable with a recorded derivation, or outside the claimed mechanism with a
+recorded reason.
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
@@ -3825,11 +3833,18 @@ G-RECORDS (T-D G, ruled by Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admi
   - no hold ran past the break.
   scenario_s11_01 after its switch: a hold of 23 at 33 against a stand projected to 68, the human standing until 59.
   To be re-taken on the re-authored scenario.
+  SUPERSEDED (29 Sept 2026): these numbers come from scenario_s11_02 as first authored, outside the verified domain;
+  the part (iv) evidence below, on the re-authored and verified scenario, replaces them.
   MPB PART (iv) EVIDENCE (29 Sept 2026; analysis/mpb/REPORT.md), scenario_s11_02 re-authored (verified), single_task:
   - the stand at spot_E from 26; its persistence broke at 57;
   - the decisions on it at 27, 31, 39 and 55 (a stand of k = 3, 7, 15, 31) sent holds of 4, 8, 16 and 32;
   - the last runs to 87, 30 ticks past the stay.
   Under full_reorder the robot was elsewhere at the stand: no hold. The question returns to the design chat.
+  THE CANDIDATE'S MEASURED COST (the MPB post-(iv) records, 29 Sept 2026): under the candidate principle above (a
+  fallback expires when the persistence it was built from breaks) the decision of 55 would have been re-taken when the
+  stand broke at 57; as built it re-decides at the projection's end, 87. The measured cost of its absence in this
+  instance is the last hold's 30 ticks past the stay (holds 4, 8, 16, 32 at 27, 31, 39, 55). A measurement, not a
+  ruling.
 - (b) CLOSED into X's occupied-target item (`docs/handoffs/handoff_G_X_onward.md` §5).
 - (c) CLOSED as answered: L5 B refuses on the boundary tick (no hypothesis is a member there), and the decision at
   b + 1 is AD1's.
@@ -3875,8 +3890,9 @@ walk, not a scenario authored for it.
 T-D X (29 Sept 2026; design_decisions.md, "T-D X: response", X3): the human walking toward the robot gets no planning
 rule; it is an evaluation case, and this scenario is it (realization responds at the next re-decision; the interval
 before it is what the near-encounter measures).
+T-F (29 Sept 2026): this scenario is one row of the evaluation's scenario dimension (TODO-144).
 Files: domains/kitting/ (the scenario), analysis/tb1a_destination/sep_classes.py (the measure)
-Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137
+Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137, TODO-144
 
 **TODO-136: A reactive human that gives the robot space (recorded, Track 2.5, 29 Sept 2026)** [OPEN; future work]
 docs/assumptions.md 4.2: the scripted human is open-loop, it does not react to the robot's motion (the Mesa human has no
@@ -3897,8 +3913,9 @@ T-D X (29 Sept 2026; design_decisions.md, "T-D X: response", X3): the walk towar
 plain cost and this control.
 MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): an evaluation item, not built in
 the meta-planner test-bed.
+T-F (29 Sept 2026): the admission-off condition of the evaluation, a prerequisite of it (TODO-144).
 Files: mesa_sim/run_mesa.py (the option), shared/meta_planner.py (admission)
-Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135
+Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135, TODO-144
 
 **TODO-138: The horizon of runs in which the robot has work (recorded, Track 2.5, 29 Sept 2026)** [RULED for MPB runs (MPB-5, 29 Sept 2026); nothing built]
 docs/assumptions.md 1.3 derives a run's step count from the human's load-time replay plus the idle margin (TB.3b's rule)
@@ -3945,8 +3962,9 @@ X5's ground (2) (every candidate's realized plan holds, at a decision and at the
 cost per head, `[meta-win]` the winner's holds only). Evaluation-time logging, not a design change.
 MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5, MPB-6): an evaluation item, not built
 in the meta-planner test-bed; `full_reorder` is not required to reproduce every part-4 property there.
+T-F (29 Sept 2026): evaluation-time logging for the full_reorder rows of the evaluation (TODO-144).
 Files: shared/meta_planner.py (`_replan_orderings`, its log lines)
-Reference: design_decisions.md, "T-D X: response", X5; TODO-96
+Reference: design_decisions.md, "T-D X: response", X5; TODO-96, TODO-144
 
 **TODO-142: The fallback's skip rule: what principle does it implement, and does P4 need it? (recorded, MPB part (iv), 29 Sept 2026)** [OPEN; a design question]
 P2's rule, kept by P4 (`Projector.project_fallback`, `_reach`): "an object whose arrival radius contains the ray's start
@@ -3967,6 +3985,28 @@ diagnostic mode, with every hypothesis admissible, the robot's own items' delive
 never performs. Recorded only.
 Files: shared/recognizer.py (`_build_admissible`), mesa_sim/sim_model.py (`observed_assigned`)
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the record line); analysis/mpb/REPORT.md
+
+**TODO-144: T-F, the evaluation: framing (not ruled) (recorded, the MPB post-(iv) records, 29 Sept 2026)** [OPEN; a future item, after the MPB closes]
+A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB established; nothing here is ruled.
+- The conditions, as ablations of the decision levels:
+  - admission off: the fallback-only control (the planner realizing against the fallback projection always, admission
+    never; TODO-137, no run option today);
+  - realization off: plain cost (`--cost_strategy plain`, candidates ranked without realization);
+  - prior off: a diagnostic, never the primary set (`docs/assumptions.md` 1.4).
+- The measures: the completion tick (the world tick, CLAUDE.md, "Regression checking"); the held ticks; the
+  near-encounters classified by F1's classes (a robot violation, a stand, a recede; `docs/assumptions.md` 4.6); the
+  separation stop off.
+- The scenario dimension: deviation kinds (a change of mind, a mid-action change, a sudden stand, a misdelivery, an
+  occupied target, the walk toward the robot of TODO-135, ...) and the points in the task where they occur, with several
+  instances per kind. A row is a condition and a kind. Layouts vary independently where geometry is a factor.
+- What makes the numbers attributable: the MPB's verified chains (design_decisions.md, "The meta-planner test-bed
+  (MPB)"; analysis/mpb/coverage.md). A difference between conditions can be traced to a decision path the MPB verified,
+  not inferred from the outcome.
+- Prerequisites: TODO-137 built; TODO-135's scenario authored; the evaluation set authored; MPB-5's horizon applied to
+  the evaluation runs (TODO-138); the track 4 decision (TODO-140), whether the evaluation needs a genuine departure.
+Files: analysis/ (the evaluation), domains/kitting/ (the evaluation set), mesa_sim/run_mesa.py (TODO-137's option)
+Reference: docs/assumptions.md 1.4, 4.6; design_decisions.md, "The meta-planner test-bed (MPB)", F1; TODO-47,
+TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
