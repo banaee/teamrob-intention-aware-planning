@@ -11,6 +11,10 @@ first classified, then handled by its class:
 - an **authoring artefact** (the fixture produces a situation its purpose does not include): correct the fixture;
 - a **prior-off artefact** (it arises only with the assignment prior off): never framework semantics, never a rule.
 
+A boundary case's fixture is parked (kept out of the maintained sets, or moved to a reserved id range: layouts and
+setups numbered 100 and above), never designed around. Ruled by Hadi, 29 Sept 2026 (design_decisions.md, "T-D G:
+admission").
+
 Simplification comes from general semantics, never from excluding difficult cases.
 
 Each item: the statement; then kind · source · what it affects; at most two lines of detail. Kinds: authoring

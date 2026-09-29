@@ -782,6 +782,9 @@ or an episode boundary moves every origin (E7)" was loose. The finding has no me
 current derived phase; it is recomputed every tick; one member with S_k ≥ α makes it adequate; a boundary empties the
 membership. No change to the mechanism.
 → `docs/design_decisions.md`, "T-D R and E", E7 (its superseding note); `docs/recognizer_handback.md` §1.10.
+AMENDED (T-D G, AD2, ruled 29 September 2026; to be built in G-build): **warrant** (below) is a third independent
+output beside the belief and the finding (R3 as amended); it is not a kind of adequacy. design_decisions.md, "T-D G:
+admission".
 
 **hypothesis adequacy** — per live hypothesis, a categorical value the recognizer reports beside the **adequacy
 finding** (G1): **adequate** (a member of the test with S_k ≥ α), **inadequate** (a member with S_k < α) or **no
@@ -790,6 +793,36 @@ whether one hypothesis explains its own derived phase; the finding is its existe
 hypotheses (above). The meta-planner reads it for the leader only, at admission (**admitted**), and never receives α
 or S_k. Membership is the complete rule of E6 (as amended twice, with E8; **adequacy finding**, above).
 → `docs/design_decisions.md`, "T-D R and E", E6, "1.5 rulings", E8, G1.
+
+The four entries below are ruled (T-D G, 29 September 2026) and to be built in G-build.
+
+**warrant** — commitment or observation that justifies admission: the third condition of the gate (AD1), beside θ and
+the leader's **hypothesis adequacy**. Two sources, **commitment warrant** and **observation warrant** (below). A third
+independent dimension beside the **recognizer belief** and the **adequacy finding** (AD2, R3 as amended): not a kind
+of adequacy. Adequacy says a hypothesis is not contradicted in its derived phase; warrant says it has earned
+admission. Warrant is not the support restriction: "the support" keeps its meaning, the hypotheses admissible under
+the assignment prior (the observed human's assigned tasks plus the foreseeable tasks).
+→ `docs/design_decisions.md`, "T-D G: admission", AD1, AD2.
+
+**warranted** / **unwarranted** — a hypothesis has warrant, from either source, or has none. The gate refuses an
+unwarranted leader (`none(leader_unwarranted)`, checked after `none(leader_inadequate)`, AD4). Loss of observation
+warrant fires nothing and clears no admitted projection; retraction stays on inadequacy (AD3, L2 (ii)).
+→ the same entry, AD3, AD4.
+
+**observation warrant** — a hypothesis's current derived phase (§5) holds evidence for it: for a phase with a movement
+target (`move_to`), the path-cost gain toward the target since the phase origin is positive, C(o, g) − C(p, g) =
+w − e > 0 (the quantities of the excess-path statistic); for any phase, the phase was entered by the observed
+completion of the hypothesis's previous step in this episode (the completion E8 reads), the only source for a phase
+without a movement target (`pick_up`, `place`, `wait_at`). Reset with the origins, at a boundary and at a phase change.
+Reported by the recognizer per live hypothesis on `BeliefState`, printed `warrant=none|observation` on `[IR]`.
+→ the same entry, AD1, AD2, AD4.
+
+**commitment warrant** — the hypothesis is one of the observed human's assigned tasks (prior on), matched by task
+equality (`same_task`) as the support restriction matches them. Not reset: it derives from the assigned tasks, which
+the meta-planner receives as an input; the recognizer never prints it. Prior off there is none. An assigned task is a
+known commitment (`docs/assumptions.md` 2.2, 2.6) that warrants projecting it before movement; a deviation is handled
+by retraction.
+→ the same entry, AD1, AD2.
 
 **unresolved** — the value of the **adequacy finding** while no live hypothesis is a member of the test: no live
 hypothesis's current derived phase holds an observation (E6, as amended twice). A phase holds an observation once it
@@ -809,6 +842,9 @@ observation and not every live hypothesis has S_k < α: at least one live hypoth
 level (E4). It says nothing about which hypothesis leads (that is the belief) and is not admission (that is the
 meta-planner's gate, **admitted**).
 → the same entry, E4.
+AMENDED (T-D G, 29 September 2026): adequate is not **warrant** (above): a hypothesis can be adequate (not
+contradicted) with nothing observed for it, and admission also requires warrant (AD1). design_decisions.md, "T-D G:
+admission".
 
 **exhausted** — the recognizer's lifecycle state when no task hypothesis is live (R4): every hypothesis retired. No
 finding is reported in it, and nothing is unexplained in it. It replaces the reading "`unknown` at 0.995" (a finished
