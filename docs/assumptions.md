@@ -43,6 +43,9 @@ human), not a literal. The horizon of runs where the robot has work is open; the
 step counts.
 Authoring convention · TB.3b's rule (`analysis/ir_testbed/run.sh`) · run files, sweep scripts.
 The replay has no term for the robot's work, which in the maintained sets ends after the human's (TODO-138).
+Ruled for MPB runs (Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): the comparison
+horizon is the first observed completion point plus the idle margin, under a derived plain-cost safety cap; the
+maintained sets keep their literal step counts.
 
 **1.4** The framework's experiments use the prior-on configuration (the robot knows the human's assigned tasks,
 `--assignment_prior true`). Prior off is a recognizer diagnostic and ablation configuration, not a human-behaviour

@@ -168,6 +168,11 @@ The verification is a scenario in track 3 (TODO-130). The blocked route gets no 
 assessed or charged. Under a fallback projection T_h is the candidate's own end, so it differs per candidate;
 `UpdateResult.horizon` carries the winner's (T-D P).
 → `shared/io_contracts.md` §1.11, `RealizedPlan.horizon`.
+SUPERSEDED IN PART (T-D P4, 28 September 2026; recorded at MPB-records, 29 September 2026): "Under a fallback projection
+T_h is the candidate's own end, so it differs per candidate" is P1's horizon; under P4 the fallback's end is one per
+decision, its last segment's end from the observed persistence, the same for every candidate, and recorded as the
+expiry `projection_expired` reads (`shared/meta_planner.py`, `update_human_projection()`). design_decisions.md, "T-D P",
+P4, Q6.
 
 ---
 
@@ -940,6 +945,11 @@ on a layout, setup and scenarios written for it, against expectations derived fr
 run. Sessions TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the expectation generator,
 the runs, the report).
 → `docs/design_decisions.md`, "The IR test-bed" and "The cognitive loop does not end with the task pool".
+**MPB** — the meta-planner test-bed (track 3; ruled 29 September 2026, rulings MPB-1 to MPB-6): the
+recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
+scenario per decision, against an oracle that states the expected decision before the run. Not T3 or T3b, the Phase 4C
+realization tasks.
+→ `docs/design_decisions.md`, "The meta-planner test-bed (MPB)".
 
 ---
 
