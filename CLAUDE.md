@@ -198,6 +198,10 @@ Decisions
   residual), the human walking toward the robot is an evaluation case (X3), the fallback is the response after a
   retraction (X4), and the two grounds for communication are recorded, persistent by the robot's re-decision cadence
   (X5; TODO-96, TODO-141). Next is track 3 (TODO-130); track 4 (TODO-140) first if the evaluation needs a departure.
+  Track 3, the meta-planner test-bed (MPB), is ruled (29 Sept 2026; design_decisions.md, "The meta-planner test-bed
+  (MPB)", MPB-1 to MPB-6), records only: eight scenarios on env_layout_12, an oracle for the trigger and cause, the
+  gate and the projection (per-tick tables pre-run, the chain assembled with the run's `no_current_task` ticks), part 4
+  as declared properties; prior off a diagnostic appendix. Next is its step 2 (authoring and build, plan then build).
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
