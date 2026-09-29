@@ -185,7 +185,14 @@ Decisions
   coffee_break cut into a carry) agrees with the IR test-bed's oracle, extended to cuts; TODO-95 closed (3.4), TODO-135
   to TODO-139 recorded. G is ruled (29 Sept 2026; design_decisions.md, "T-D G: admission", AD1 to AD5): admission
   also requires warrant (commitment or observation that justifies admission; not the support restriction), a third
-  output beside belief and adequacy; TODO-119 closed, TODO-132 (a) and TODO-134 parked. Next is G-build.
+  output beside belief and adequacy; TODO-119 closed, TODO-132 (a) and TODO-134 parked. G is built (G-build, 29 Sept
+  2026; design_decisions.md, "T-D G", BUILT): `BeliefState.observation_warrant` (the entry and the movement source; an
+  unresolved `move_to` has the entry source only), the meta-planner's `observed_assigned_tasks` (commitment warrant),
+  `none(leader_unwarranted)` after `none(leader_inadequate)`, `[IR] ... warrant=[...]` and `[meta-proj] projection=built
+  warrant=...`; the IR test-bed's oracle extended (warrant and the gate's outcome per tick, 0 disagreements on the
+  seventeen); the four maintained sets regenerated ("G-build" sections: prior on, only the lone coffee_break's admission
+  at b + 1 moves, no completion). Recorded: the movement source is a half-plane test (the exit walk warrants the lone
+  coffee_break in scenario_s09_01 from 126; a competitor is TODO-140's). Next is X.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6

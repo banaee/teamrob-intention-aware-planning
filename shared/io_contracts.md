@@ -134,6 +134,7 @@ class BeliefState:
     lifecycle: RecognizerLifecycle         # LIVE | EXHAUSTED
     tails: Dict[str, float]                # S_k of each member of the adequacy test this tick
     hypothesis_adequacy: Dict[str, HypothesisAdequacy]   # ADEQUATE | INADEQUATE | NO_OBSERVATION per live hypothesis
+    observation_warrant: Dict[str, ObservationWarrant]   # NONE | OBSERVATION per live hypothesis (T-D G, AD1, AD2)
     episode_boundary: bool                 # the belief was re-initialised at an episode boundary on this tick (T-D L1, L5)
     # predicted_next_actions: Dict[str, List[str]] — DEPRECATED, commented out in the
     # dataclass itself. Multi-step prediction now goes through ProjectedPlan (§1.7) and
@@ -142,8 +143,10 @@ class BeliefState:
 
 Three independent outputs (T-D R2 to R4, 27 September 2026): the belief (`distribution`, `most_likely`,
 `confidence`), the adequacy finding with the members' tail probabilities and every live hypothesis's hypothesis
-adequacy (G1, T-D 1.5 rulings), and the lifecycle state. The meta-planner reads `confidence`, `most_likely` and the
-leader's `hypothesis_adequacy` (its gate, `_clears_gate`, G1); it never reads alpha or `tails`. `finding`, `lifecycle`
+adequacy (G1, T-D 1.5 rulings), and the lifecycle state. Since G-build (R3 as amended by T-D G, AD2) the observation
+warrant per live hypothesis is a further independent output (`observation_warrant`): not a kind of adequacy. The meta-planner reads `confidence`, `most_likely` and the
+leader's `hypothesis_adequacy` (its gate, `_clears_gate`, G1) and, since G-build, the leader's `observation_warrant`
+(the gate's warrant condition, T-D G); it never reads alpha or `tails`. `finding`, `lifecycle`
 and `tails` exist for evaluation and for the rest of G.
 
 **Invariants:**
@@ -152,11 +155,19 @@ and `tails` exist for evaluation and for the rest of G.
   the returned `distribution` sums to 1.0 (within numerical tolerance) with every retired or inadmissible
   hypothesis at exactly `BELIEF_FLOOR` and the live keys carrying the rest
 - EXHAUSTED (H empty): `distribution` holds the pins alone (the output convention, not belief mass; it does
-  not sum to 1), `most_likely` is `None`, `confidence` 0.0, `finding` `None`, `tails` and `hypothesis_adequacy`
+  not sum to 1), `most_likely` is `None`, `confidence` 0.0, `finding` `None`, `tails`, `observation_warrant` and `hypothesis_adequacy`
   empty
 - otherwise `most_likely` is a key of H in `distribution`; `tails` keys are a subset of H; `hypothesis_adequacy`
   keys are exactly H, a key is ADEQUATE / INADEQUATE iff it is in `tails` with S_k ≥ / < alpha, NO_OBSERVATION iff
   it is not; `finding` is ADEQUATE iff some value is ADEQUATE
+- `observation_warrant` keys are exactly H (T-D G, AD2: a third output, independent of the belief and of the
+  adequacy). OBSERVATION iff the hypothesis's current derived phase was entered by the completion of its previous
+  expected action in this episode (the completion E8 reads), or its action has a movement target whose position is
+  resolved and C(o, g) − C(p, g) > 0 since the phase origin (the path costs the excess-path statistic reads). NONE
+  otherwise: no derived phase; a stationary phase not entered by a completion (no movement target by definition); a
+  `move_to` whose target position cannot be resolved (a movement target, no computable gain; the G-build plan-step
+  ruling); no positive gain. Both sources reset with the origins, at a boundary and at a phase change, so every value is
+  NONE on a boundary tick. BUILT IN G-BUILD (29 September 2026; 81a9f86)
 - `episode_boundary` is true exactly on the tick the observed agent completed a terminal action of the task model
   (T-D L1 as amended: its preconditions held for the agent on the previous tick and a grounding of its completion
   condition holds now and did not then); the belief is then the prior over H and no hypothesis is a member. H is the
@@ -745,6 +756,17 @@ ADEQUATE otherwise. `hypothesis_adequacy` per live hypothesis (G1): ADEQUATE (a 
 (a member with S < alpha), NO_OBSERVATION (not a member). Computed from scratch every tick. `lifecycle` EXHAUSTED iff
 H is empty.
 
+The third output (T-D G, AD1, AD2; built in G-build): `observation_warrant` per live hypothesis, from the phase state
+after the update and the adequacy, reading neither (`_observation_warrant`). Two sources, independent: the ENTRY (the
+phase was entered by the completion of the previous expected action in this episode, the completion E8 reads, kept
+per key in `_entered_by_completion`, emptied at a boundary and cleared at every phase change without a completion, a
+first observation or re-entry, and a pin) for any phase; and MOVEMENT (a phase with a movement target whose position
+`movement_target_position` resolves, and C(o, g) − C(p, g) > 0 with the injected path cost, computed as the
+difference of the two costs so that p = o gives exactly 0). No movement warrant for a stationary phase (no movement
+target) nor for an unresolved `move_to` (a movement target, no computable gain): each has the entry source only.
+Commitment warrant is the meta-planner's, never computed or printed here. Logged at the end of the `[IR]` line as
+`warrant=[<key>=none|observation ...]`, every live hypothesis in hypothesis order, empty when exhausted.
+
 Dispatches by schema-declared `microactions` membership and `progress_evaluator` name — never by hardcoded
 microaction strings. See `design_decisions.md`, "IR likelihood dispatch."
 
@@ -796,8 +818,14 @@ MetaPlanner(
     cost_strategy: Literal["realized", "plain"] = "realized",
     human_agent_id: Optional[str] = None,
     rho: float = 0.5,
+    observed_assigned_tasks: Optional[List[TaskInstance]] = None,   # the observed human's assigned tasks (T-D G)
 )
 ```
+
+`observed_assigned_tasks` (T-D G, AD2; built in G-build): the observed human's assigned tasks, the list the recognizer
+receives as its support restriction (prior on); the source of commitment warrant. None or empty (prior off): no
+hypothesis has commitment warrant. `RobotAgent` passes the `observed_assigned_tasks` it already receives (TODO-123's
+docstring corrected with it).
 
 **Correction (September 2026):** `assumed_speed` and `default_action_cost` are `Projector`
 constructor parameters, not `MetaPlanner`'s; `projector` is injected (one instance, held by
@@ -819,13 +847,16 @@ also the one home of the guard on admission: the belief clears the gate (`GateOu
 AND the leader's `hypothesis_adequacy` is ADEQUATE; otherwise it answers, in this order, `BELOW_THETA`,
 `LEADER_NO_OBSERVATION` or `LEADER_INADEQUATE`. The meta-planner receives no alpha and no S_k. See design_decisions.md,
 "θ has one home".
-RULED (T-D G, AD1, AD2, 29 September 2026; to be built in G-build): the gate also requires the leader to be WARRANTED:
+RULED (T-D G, AD1, AD2, 29 September 2026; BUILT in G-build, 81a9f86): the gate also requires the leader to be WARRANTED:
 commitment warrant (the leader is one of the observed human's assigned tasks, matched by task equality, `same_task`,
 as the recognizer's support restriction matches them; the assigned tasks become a new meta-planner input, prior on
 only) or observation warrant (read from the recognizer's per-hypothesis output on `BeliefState`). A third refusal,
 `LEADER_UNWARRANTED` (`none(leader_unwarranted)`), asked after `LEADER_INADEQUATE`. `_clears_gate` stays the one
 home; it reconstructs no recognizer quantity. Loss of observation warrant fires nothing (AD3). design_decisions.md,
-"T-D G: admission". The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
+"T-D G: admission". As built: `_clears_gate` asks θ, then the leader's adequacy (INADEQUATE, then NO_OBSERVATION), then
+`_warrant(belief) -> FrozenSet[WarrantSource]` (COMMITMENT: the leader resolved through `get_hypothesis()` and matched
+by `same_task` to an assigned task; OBSERVATION: `belief.observation_warrant[leader]`), refusing on an empty set;
+`update_human_projection()` reads `_warrant` again for its log only. The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
 and a margin gate (TODO-65) were considered and not taken; design_decisions.md, "The gate stays
 a fixed share".
 
@@ -1098,11 +1129,12 @@ Emits one `[meta-proj] confidence=<c> theta=<θ> projection=<reason>` line per c
 `none(unresolved)`, which collided with the adequacy finding's value; `none(unknown)` is gone with the `unknown`
 hypothesis). When the recognizer is exhausted, `confidence` is 0.0 and admission refuses as `none(below_theta)`:
 the expected, measured behaviour of this cycle, not a design (G).
-RULED (T-D G, AD1, AD4, 29 September 2026; to be built in G-build): the gate's refusals gain `none(leader_unwarranted)`
+RULED (T-D G, AD1, AD4, 29 September 2026; BUILT in G-build, 81a9f86): the gate's refusals gain `none(leader_unwarranted)`
 (the leader at θ and adequate, but with neither commitment nor observation warrant), checked after
 `none(leader_inadequate)`; `projection=built` names the admission's warrant source (commitment, observation, or both
 when both hold), as does `[meta-b2]` where that line exists (under `b2a` only). design_decisions.md, "T-D G:
-admission".
+admission". As built: `projection=built warrant=commitment`, `warrant=observation` or `warrant=commitment,observation`;
+`[meta-b2]` prints the admission's reason, so it carries the same field.
 No `step` or `trigger` field: both belong to the caller and are recoverable from the
 `[meta-trig]` line of the same tick.
 

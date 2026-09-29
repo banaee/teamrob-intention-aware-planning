@@ -417,7 +417,7 @@ the finding itself, the lifecycle and the tails are for evaluation and for the r
 carries `lifecycle=`, `finding=` and `leader_adequacy=` (both absent when exhausted) and `tails=[key=S …]` over the
 members, to four decimals; every other hypothesis's adequacy follows from the tails and α.
 
-WARRANT (T-D G, AD1 to AD4, ruled by Hadi, 29 September 2026; to be built in G-build). A third independent output
+WARRANT (T-D G, AD1 to AD4, ruled by Hadi, 29 September 2026; built in G-build, 81a9f86). A third independent output
 beside the belief and the finding (R3 as amended, AD2), not a kind of adequacy: per live hypothesis, OBSERVATION
 WARRANT (none | observation) on `BeliefState`. A hypothesis's current derived phase holds observation warrant when,
 for a phase with a movement target (`move_to`), the path-cost gain toward the target since the phase origin is
@@ -430,6 +430,23 @@ assigned tasks) is the gate's knowledge, never computed or printed here. The met
 warrant, adds commitment warrant and refuses an unwarranted leader (`none(leader_unwarranted)`, after
 `none(leader_inadequate)`); it reconstructs no recognizer quantity. The `[IR]` line prints `warrant=none|observation`
 per live hypothesis, its exact form settled at G-build's plan step. design_decisions.md, "T-D G: admission".
+AS BUILT (G-build, 29 September 2026). `BeliefState.observation_warrant: Dict[str, ObservationWarrant]` (NONE |
+OBSERVATION), keys exactly H, empty when exhausted, computed after `_adequacy` by `_observation_warrant(pos, world)`,
+which reads neither the belief nor the adequacy. Per live key: NONE with no derived phase; OBSERVATION if the key is in
+`_entered_by_completion` (the ENTRY source: set when the phase change's previous expected action has its completion
+predicate holding, the completion E8 reads; cleared at a phase change without it, at a first observation or re-entry
+and at a pin; emptied by `_begin_episode`, so nothing crosses a boundary and no phase a boundary opens has it); else
+NONE for a stationary phase (no movement target, by definition); else NONE for a `move_to` whose target position
+`movement_target_position` cannot resolve (a movement target that cannot currently be resolved: no gain computable;
+ruled by Hadi at the G-build plan step, occurring on no tick of the 48 maintained logs or the 17 test-bed runs); else
+OBSERVATION iff C(o, g) − C(p, g) > 0 (the MOVEMENT source), with the injected path cost, computed as the difference of
+the two costs (algebraically w − e; p = o gives exactly 0). The `[IR]` line ends with `warrant=[<key>=none|observation
+...]` over every live hypothesis in hypothesis order (`warrant=[]` when exhausted), after `tails=[...]`; the existing
+fields and their order are unchanged. Verified: the IR test-bed's oracle, extended by derivation, agrees on every tick
+of the seventeen scenarios; the belief and the adequacy are unchanged (prior on, every `[IR*]` line of the 48 maintained
+logs byte-identical to 2.5 once the field is removed). A consequence recorded in the entry's BUILT paragraph: the
+movement source is a half-plane test, so a lone foreseeable task is warranted by any walk within 90° of its target's
+bearing (the exit walk in scenario_s09_01 from 126).
 
 ## 2. Parameters
 
@@ -627,13 +644,24 @@ Also stated, lower in consequence:
 
 `update()` returns a `BeliefState` (`shared/io_contracts.md` §1.2; contract §2.1): `timestamp`, `agent_id`,
 `distribution` (every hypothesis key, pinned ones at 10⁻³), `most_likely` (the argmax over H, `None` when
-exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`, `tails` and
-`hypothesis_adequacy`. The meta-planner reads `most_likely`, `confidence` and the leader's `hypothesis_adequacy`
-(io_contracts §2.2), never α or the tails; the finding and the lifecycle are for the rest of G and X (R5):
+exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`, `tails`,
+`hypothesis_adequacy` and, since G-build, `observation_warrant` (§1.10). The meta-planner reads `most_likely`,
+`confidence`, the leader's `hypothesis_adequacy` and the leader's `observation_warrant` (io_contracts §2.2), never α or
+the tails; the finding and the lifecycle are for the rest of G and X (R5):
 - `_clears_gate(belief) -> GateOutcome`, the one place θ is applied and the one home of the guard on admission
   (G1): CLEARS iff `confidence ≥ θ` (θ = `DEFAULT_THETA` = 0.75, unchanged) and the leader's hypothesis adequacy
   is ADEQUATE; otherwise, in this order, BELOW_THETA, LEADER_NO_OBSERVATION, LEADER_INADEQUATE. A guard refusal
-  behaves as below θ. The gate's input changed meaning with R1 (the leader's share over H); the gate ruling
+  behaves as below θ.
+  SINCE G-BUILD (T-D G, AD1, AD4; 81a9f86): CLEARS also requires the leader to be WARRANTED, and a third refusal,
+  LEADER_UNWARRANTED (`none(leader_unwarranted)`), is asked after LEADER_INADEQUATE. Warrant is commitment (the leader is
+  one of the observed human's assigned tasks, `same_task`, the meta-planner's new input `observed_assigned_tasks`, prior
+  on only) or observation (`belief.observation_warrant`), read by `_warrant(belief)`; the gate reconstructs no
+  recognizer quantity. `[meta-proj] projection=built` names the source (`warrant=commitment`, `observation`, or
+  `commitment,observation`). Loss of observation warrant fires nothing (AD3): retention stays by identity and retraction
+  on inadequacy. Measured at the G-build regeneration: prior on, the lone coffee_break at b + 1 on a standing tick is no
+  longer admitted (scenario_s02_01 at 363, scenario_s05_01 / _02 at 142) or is admitted one tick later on its first
+  step's gain (scenario_s03_06, 123 for 122); no prior-on completion moved.
+  The gate's input changed meaning with R1 (the leader's share over H); the gate ruling
   (September 2026) stands and its justification is G's. Measured at the 1.5b and 1.5c regenerations
   (`analysis/td_stage1b/REPORT.md`): every boundary admission of a lone live task moves from the boundary tick to
   the latency tick after it (b + 1; b + 2 at 1.5b); the wrong-table delivery is refused at 76 / 79
@@ -653,7 +681,7 @@ exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`
 - `update_human_projection()` admits a projection only when the gate clears. It resolves the key through
   `recognizer.get_hypothesis()` (the same live instance, held by reference) to project the human's task, and
   records the hypothesis it projected. Its refusal reasons are `none(below_theta)`, `none(leader_no_observation)`,
-  `none(leader_inadequate)` (G1), `none(no_human)` and `none(unprojectable)` (the projector could not resolve the
+  `none(leader_inadequate)` (G1), `none(leader_unwarranted)` (T-D G), `none(no_human)` and `none(unprojectable)` (the projector could not resolve the
   task; `none(unresolved)` before the Stage 1 build). When the recognizer is exhausted it refuses as
   `none(below_theta)`.
 

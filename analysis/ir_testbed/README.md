@@ -347,3 +347,65 @@ a13dfaf332631c16610f71df1f578b98  runs/env_layout_11_scenario_s09_12_on.log
 60d9491efa8d61c7c5679f1a1307719f  runs/env_layout_11_scenario_s09_13_on.log
 739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
 ```
+
+## G-build: observation warrant and the gate (29 September 2026)
+
+The recognizer gained the observation warrant per live hypothesis and the gate its warrant condition (design_decisions.md,
+"T-D G: admission" (DG), AD1 to AD4, and the ruling on an unresolved target at the G-build plan step). The generator was
+extended by derivation from DG before the recomparison; nothing was fitted. Results: `REPORT.md`, "G-build".
+
+| # | rule (new) | source |
+|---|---|---|
+| 22 | Observation warrant per live hypothesis: observation if the phase was entered at a fold where the previous expected action's completion holds (the completion E8 reads), since the hypothesis's last boundary, first observation or re-entry (the entry source, any phase); else, for an action with a movement target whose position resolves (rule 10), observation iff dist(o, g) − dist(p, g) > 0 from the phase origin (the movement source, rule 9's straight-line C); none otherwise: no derived phase; a stationary phase (no movement target); a `move_to` whose target has no position (no gain computable); no positive gain. Both sources reset with the origins, at a boundary and at a phase change | DG AD1; the plan-step ruling |
+| 23 | The gate's outcome per tick: `none(below_theta)` if the confidence is below θ (exhausted: no leader); else the leader's hypothesis adequacy, `none(leader_inadequate)`, then `none(leader_no_observation)`; else `none(leader_unwarranted)` if the leader is neither an assigned task (commitment: rule 1's known keys) nor observation-warranted; else `clears`. θ from the run's `[run]` header (the one value read from the log: `shared.meta_planner` would load the recognizer) | DG AD1, AD4; DD G1 |
+| column | `warrant` per hypothesis, compared exactly against actual.csv (`BeliefState.observation_warrant`) and actual_log.csv (the `[IR]` line's `warrant=[...]`) | DG AD2, AD4 |
+| column | `gate` per tick, compared exactly against actual.csv (the robot's meta-planner's `_clears_gate` on that tick's BeliefState: the idle robot asks admission at tick 0 only, so the log carries no per-tick gate) | DG AD1 |
+
+The log reader: `actual.py` removes the `[IR]` line's trailing `warrant=[...]` before the frozen
+`analysis/l_build/tdlib.py` reads the line (its `tails` pattern would take it in) and parses it itself. `plot.py` adds a
+panel (per hypothesis the ticks it is observation-warranted, and the ticks the gate clears; expected bars, actual
+marks); `summary.py` adds the warrant stretches and the gate's answer per stretch. `run.sh` passes the run log to the
+oracle.
+
+### Runs (git-ignored logs; md5s at G-build)
+
+The `.rec` streams are byte-identical to the tables above. The logs differ from the L-build and 2.5 runs in the `[IR]`
+line's warrant field, and s08_01 to s09_12 also in the step-0 `[meta-proj]` line (T-D P's fallback; those runs were last
+made at L-build, before P).
+
+```
+bb46aab93594b0630947696e8a48aee1  runs/env_layout_10_scenario_s08_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_10_scenario_s08_01_on.rec
+e036d0f408650738e81b2ec4d9a0b6d4  runs/env_layout_10_scenario_s08_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_10_scenario_s08_02_on.rec
+508ac1b4b4a759b6c4147d240fdcf3c7  runs/env_layout_10_scenario_s08_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_10_scenario_s08_03_on.rec
+79488c2619753d96af4b0884977eb68a  runs/env_layout_10_scenario_s08_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_10_scenario_s08_04_on.rec
+f06adb1e02734a19be04e77b61ed5b08  runs/env_layout_11_scenario_s09_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_11_scenario_s09_01_on.rec
+8f836baad3f9410151c5c916f0077856  runs/env_layout_11_scenario_s09_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_11_scenario_s09_02_on.rec
+a303d0ab64534d6abafe12dd01082795  runs/env_layout_11_scenario_s09_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_11_scenario_s09_03_on.rec
+a89938cedb4d00fe2a032109e7c8f013  runs/env_layout_11_scenario_s09_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_11_scenario_s09_04_on.rec
+86edbd8ed36b46aedda1393f823448de  runs/env_layout_11_scenario_s09_05_on.log
+c715db44f68926f3bb6b8fa387525f1a  runs/env_layout_11_scenario_s09_05_on.rec
+2c92080c3c60764a5d2c011855069c52  runs/env_layout_11_scenario_s09_06_on.log
+703b2c62e484b7db940f36166548a88c  runs/env_layout_11_scenario_s09_06_on.rec
+31259b7bb1a3d4795fc7e1b5818f9626  runs/env_layout_11_scenario_s09_07_on.log
+a2ece1d231a6c071c20efdea470c4c9f  runs/env_layout_11_scenario_s09_07_on.rec
+1c949ecc4c40db7364f75ff4f89cb59d  runs/env_layout_11_scenario_s09_08_on.log
+529f6f2019682be19b77f4e1152b1ea5  runs/env_layout_11_scenario_s09_08_on.rec
+0dcd0fc9abed38283ea69892f9adfc77  runs/env_layout_11_scenario_s09_09_on.log
+e252b7b8e703da1492b52df3ae4df3dc  runs/env_layout_11_scenario_s09_09_on.rec
+39f97c770277dbc9d08fc5a5ff6f52a9  runs/env_layout_11_scenario_s09_10_on.log
+c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
+c1598c77bd67c1d327fd60660aa1e027  runs/env_layout_11_scenario_s09_11_on.log
+9a4309d36ae6a47d9f1e36f512b711b2  runs/env_layout_11_scenario_s09_11_on.rec
+0f41391730ebac6920df37438df30e37  runs/env_layout_11_scenario_s09_12_on.log
+606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
+518acab6d75c24aaecddfb13ddd4f324  runs/env_layout_11_scenario_s09_13_on.log
+739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
+```

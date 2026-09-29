@@ -2232,8 +2232,9 @@ The picked cases (actual; the oracle derived the same):
   support): the machine lies about 62° off that walk's bearing, warranted by its gain, as before G it was admissible on
   θ and adequacy alone.
 - scenario_s09_06, the stand: deliver_item(item_1)'s `pick_up` phase (28 to 71) is entered by the walk's completion at
-  28 and holds observation warrant through the stand; the gate clears 28 to 46 and refuses it as inadequate from 47 to
-  71; the carry, entered by the grasp at 72, is warranted and clears again.
+  28 and holds observation warrant through the stand; the gate clears 25 to 46 (the walk's gain from 25, the entry from
+  28; "28 to 46" in cbe3f00, corrected at the records commit) and refuses it as inadequate from 47 to 71; the carry,
+  entered by the grasp at 72, is warranted and clears again.
 
 scenario_s05_01 prior on (a maintained fixture, not a test-bed scenario; run through the instrument into a scratch
 folder, not committed): the recognizer's outputs, the warrant and the gate agree with the oracle on every tick; 109

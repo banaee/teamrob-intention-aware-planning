@@ -5054,6 +5054,46 @@ Staging. G-build follows in its own session. Verification on picked scenarios (s
 scenario_s09_06, scenario_s05_01 prior on, one control scenario); the IR test-bed's oracle extended by derivation from
 this entry for the warrant output; the four maintained sets as md5 regression plus one completion table.
 
+BUILT (G-build, 29 September 2026): 81a9f86 (the build: `ObservationWarrant` and `BeliefState.observation_warrant`;
+the recognizer's `_entered_by_completion` and `_observation_warrant`; the meta-planner's `WarrantSource`,
+`GateOutcome.LEADER_UNWARRANTED`, `observed_assigned_tasks` and `_warrant`, `_clears_gate` still the one home; the `[IR]`
+line's `warrant=[...]` and `[meta-proj] projection=built warrant=...`; TODO-123's docstring), 0555af7 (tests:
+tests/test_g_build.py, 21; three expectations of tests/test_td15_build.py re-derived from AD1, CLEARS to
+LEADER_UNWARRANTED, the fixture being prior off), cbe3f00 (the IR test-bed's oracle extended by derivation: the warrant
+per hypothesis and the gate's outcome per tick), 5afa7f9 (the four maintained sets, a "G-build" section each).
+Rulings at the plan step (Hadi, 29 September 2026):
+- The unresolved target. A `move_to` whose target position cannot be resolved has no observation warrant from
+  movement; it can obtain observation warrant only through the entry-by-completion clause. Why: the movement source
+  requires a computable C(o, g) − C(p, g) > 0, and without g there is no such observation; the completion source is
+  independent. Two readings kept distinct in the code and here: a stationary phase has no movement target by
+  definition; an unresolved `move_to` has a movement target that cannot currently be resolved. Both give no movement
+  warrant, for different reasons. Counted: it occurs on no tick of the 48 maintained logs or the 17 test-bed runs.
+- The half-plane consequence (objection 1 of the plan, an observed consequence of AD1, not a reason to reopen it). A
+  lone foreseeable task is warranted by any walk within 90° of its target's bearing: the gain test is a half-plane test.
+  What AD1 resolves is admission on standing. Measured on the IR test-bed (the gate's answer per tick; the robot is idle
+  there and asks admission at tick 0 only): in scenario_s09_01 the exit walk to corner_SE bears about 39° off the
+  coffee machine's bearing, and the lone `coffee_break` (0.997) is refused `none(leader_unwarranted)` at 125 (b + 1,
+  standing) and clears from 126 to 156 (before G, from 125); likewise scenario_s08_01 (from 126) and scenario_s09_10
+  (from 109). The lone `coffee_break` on the exit walk has no competitor because the exit walk is unmodelled
+  (`docs/assumptions.md` 1.1); a competing hypothesis is TODO-140's matter, not the gate's.
+Verified. The suite 191 passed. The IR test-bed: 0 disagreements in all seventeen scenarios (scenario_s08_01 to _04,
+scenario_s09_01 to _13), the warrant and the gate compared exactly; every expected.csv, actual.csv and actual_log.csv
+equals the committed one once the two new columns are removed (the belief and the adequacy unchanged). The maintained
+sets: the `.rec` streams byte-identical in all 48; prior on, every `[IR*]` line byte-identical to 2.5 once the `[IR]`
+warrant field is removed, and every other line once `[meta-proj]`'s warrant field is removed, except where a
+foreseeable admission moved. Prior on, commitment warrant covers every assigned task; the moves are all the lone
+`coffee_break` after a boundary: no longer admitted at b + 1 on a standing tick (scenario_s02_01 at 363,
+scenario_s05_01 and scenario_s05_02 at 142, both strategies) or admitted one tick later on its first step's gain
+(scenario_s03_06, 123 for 122). No prior-on completion tick, `[sep]` minimum or F1 class moved. The control,
+scenario_s01_01 prior on (two assigned deliveries), changed in the log fields alone. Picked cases:
+scenario_s05_01 prior on, `coffee_break` after the boundary at 141 refused `none(leader_unwarranted)` from 142 (at the
+`projection_expired` decisions of 144 and 150, against the fallback, no hold) and inadequate from 159; completion 194
+as before. scenario_s09_09, 83 to 87: no admission (`none(leader_inadequate)`, 83 to 106). scenario_s09_06, the stand:
+`deliver_item(item_1)`'s `pick_up` is warranted through its entry (the walk's completion at 28) for the whole stand,
+refused as inadequate 47 to 71. Prior off (appendix, no ruling): the admissions of the robot's own items move;
+completion scenario_s01_01 201 → 199, scenario_s06_03 realized 236 → 226 (tb1c, and tb3 full_reorder), single_task
+316 → 314.
+
 Reference: cchat, 29 September 2026 (G); `docs/handoffs/handoff_G_X_onward.md` §3, §4; "T-D R and E" (R1, R3, R5, E5,
 E6, E8, the 1.5 guard G1); "T-D L" (L2 (ii), L4, L5 B); "T-D P" (P4); `docs/assumptions.md` 1.4, 2.2, 2.6, 3.3;
 TODO-119, TODO-123, TODO-130, TODO-132

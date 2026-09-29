@@ -373,6 +373,10 @@ asked in exactly one place. The recognizer emits a belief distribution and gates
 **admitted** (§7); the recognizer's own finding is **unexplained** (§7), never a gate outcome.
 → `shared/meta_planner.py`, `DEFAULT_THETA` and `_clears_gate()`; `docs/design_decisions.md`, "θ has
 one home", "The gate stays a fixed share".
+AMENDED (T-D G, AD1, built in G-build, 29 September 2026): θ is the gate's first condition, not its only one: the gate
+(`_clears_gate()`, still its one home) admits when the leader's share is at least θ, its **hypothesis adequacy** (§7) is
+adequate, and it is **warranted** (§7), asked in that order; clearing θ alone admits nothing. design_decisions.md, "T-D
+G: admission".
 
 **β, u, ρ** — β the tolerance on wasted path in the movement likelihood (0.01 /cm, supplied by the
 body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, not a measure of unmodelled
@@ -794,7 +798,7 @@ hypotheses (above). The meta-planner reads it for the leader only, at admission 
 or S_k. Membership is the complete rule of E6 (as amended twice, with E8; **adequacy finding**, above).
 → `docs/design_decisions.md`, "T-D R and E", E6, "1.5 rulings", E8, G1.
 
-The four entries below are ruled (T-D G, 29 September 2026) and to be built in G-build.
+The four entries below are ruled (T-D G, 29 September 2026) and built in G-build (29 September 2026).
 
 **warrant** — commitment or observation that justifies admission: the third condition of the gate (AD1), beside θ and
 the leader's **hypothesis adequacy**. Two sources, **commitment warrant** and **observation warrant** (below). A third
@@ -888,6 +892,11 @@ its own derived phase: the leader is a member and S_leader ≥ α, read by the m
 per-hypothesis adequacy (**adequacy finding**), never α or S_k. `_clears_gate` stays the one home of the rule, so
 `recognition_changed` fires and refuses on the same condition; a refusal behaves as below θ. The first ruling of G.
 design_decisions.md, "T-D R and E", "1.5 rulings".
+AMENDED (T-D G, AD1, AD4, built in G-build, 29 September 2026): admitted means the leader cleared θ, was adequate in its
+own derived phase and was **warranted** (commitment or observation, above), and its projection was built
+(`[meta-proj] projection=built warrant=<commitment|observation|commitment,observation>`). An unwarranted leader is
+refused (`none(leader_unwarranted)`, after `none(leader_inadequate)`); losing warrant after admission changes nothing
+(AD3). design_decisions.md, "T-D G: admission".
 
 USAGE RULE, in prose:
 - about the implementation: "the `unknown` hypothesis";

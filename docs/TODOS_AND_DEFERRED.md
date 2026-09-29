@@ -3654,7 +3654,7 @@ Files: domains/kitting/ (scenarios), analysis/ir_testbed/
 Reference: design_decisions.md, "The IR test-bed"; TODO-101; `docs/handoff_T-D_cycle2_and_IR_testbed.md` §8, layer 4
 CLOSED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, its TB.4b section): layer 4 built on the enlarged room (env_layout_11, env_setup_09), ahead of P and X: the corner walk (scenario_s09_05, `TASK_ABSENT`), the long stand (_06), the change of mind (_07), the wrong table (_08, `BINDING_ABSENT`), a delivery outside the support (_09, covered, outside the support); the finished assigned tasks are the exit walks of _01 and _10 (TODO-117). Zero disagreements at 1e-9 against the recognizer's public outputs.
 
-**TODO-123: `SimModel._spawn_agents`'s docstring misdescribes the robot's pool under the prior (recorded, TB.2b, 27 Sept 2026)** [OPEN; docstring only]
+**TODO-123: `SimModel._spawn_agents`'s docstring misdescribes the robot's pool under the prior (recorded, TB.2b, 27 Sept 2026)** [CLOSED; G-build, 29 Sept 2026: the docstring corrected in 81a9f86, where the observed human's assigned tasks also became the meta-planner's input (commitment warrant, T-D G AD2)]
 The docstring says the robot "receives its assigned_tasks as its task pool, plus (when the assignment_prior switch is
 on) the observed human's assigned_tasks". The observed human's assigned tasks go to the recognizer only, as its
 support restriction (`RobotAgent.__init__`, `IntentionRecognizer(assigned_tasks=observed_assigned_tasks)`); the
