@@ -2802,7 +2802,12 @@ fix in Phase 4 via TODO-14.
 Resolved: the robot's task pool is `AgentConfig.assigned_tasks` (unordered); ordering is the
 meta_planner's (assignment-prior session, September 2026).
 
-**TODO-80 — Declared human behaviour outside the robot's domain knowledge** [later extension; from F47b]
+**TODO-80 — Declared human behaviour outside the robot's domain knowledge** [later extension; from F47b] [mind side SUPERSEDED (T-D X2)]
+SUPERSEDED IN PART (T-D X, X2, ruled by Hadi 29 Sept 2026; design_decisions.md, "T-D X: response"): the
+blocked-execution event below is not built on the mind side (no fourth trigger; the WAIT / RECONSIDER pair is not
+built): the stop's refusal adds no information the mind needs; P4's `projection_expired` and L2 (ii)'s retraction
+re-decide on where the human is. The separation stop (C) is unchanged. The declared-stay fixture notes below stand as
+history.
 Every human stay a fixture can script today comes from a task the robot's domain describes, so the robot
 recognises it (at arrival at the latest, the move_to fold) and realization prices it (F47b: no valid fixture
 produces a mid-run block). Testing an unforeseen stay — the case D2's blocked-execution event serves —
@@ -3139,6 +3144,9 @@ carries an observed stand. The open levels move, explicitly: level 1 (decision l
 stand); level 2 (execution: the blocked event, WAIT against RECONSIDER) and level 3 (interaction: communication,
 TODO-96) are X's; the sustained stand as a question for the meta-planner is TODO-132 (b). The text below is kept as the
 record.
+LEVELS 2 AND 3 DISPOSED (T-D X, ruled by Hadi 29 Sept 2026; design_decisions.md, "T-D X: response"): level 2 by X2 (the
+blocked event is not built; the re-decision comes from P4 and L2 (ii); the stop stays an execution safeguard); level 3
+by X5 (the two grounds for communication recorded, no act built; TODO-96). Nothing of TODO-95 stays open.
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
 the pass or stays recorded for T-H.
 T-D R AND E (Hadi, 26 to 27 Sept 2026; design_decisions.md, "T-D R and E: the recognizer's output under a removed
@@ -3256,7 +3264,18 @@ baselines regenerated; about the size of the T-D Q2 to Q4 pass itself.
 Related: TODO-59 (deferred part), TODO-85 half (a), TODO-80, TODO-92, TODO-96, T-D Q1, T-D Q5.
 IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_06, prior on): `stand(PT80S)` at shelf_1 30 to 70, inside `deliver_item(item_1)`'s `pick_up` phase (s_exp 2); its S below α at 47 (17 standing ticks beyond s_exp); the finding unexplained 47 to 71 while the belief holds at about 0.92 (the rival is charged for the same ticks); adequate at the grasp, 72.
 
-**TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN, recorded only]
+**TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN; future work, with TODO-136; rewritten to X5's two grounds, 29 Sept 2026]
+REWRITTEN (T-D X, X5, ruled by Hadi 29 Sept 2026; design_decisions.md, "T-D X: response"). Communication is an X-level
+response considered when the robot reaches a persistent situation its recognition-and-planning machinery cannot
+resolve, on two grounds, each an existing observable with no constant: (1) not understanding: the adequacy finding is
+unexplained and has outlived at least one re-decision (a trigger fired, admission refused, the finding still
+unexplained), persistence measured by the robot's own re-decision cadence; (2) understanding without resolution: at a
+decision every candidate's realized plan holds against the projected human, and at the robot's next re-decision the
+same structural condition still holds. No mechanism and no runtime event; both are read from the logs in the
+evaluation analysis (ground (2) under `full_reorder` needs TODO-141). The condition "a blocked event that WAIT and
+RECONSIDER do not resolve" below is retired as an independent condition and folds into ground (2) (X2: no blocked
+event). The act, its channel and its effect are future work with the reactive human (TODO-136). The text below is kept
+as the record.
 SUPERSEDED IN PART (T-D R, 27 September 2026): the condition "sustained `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".
 TERMS (24 Sept 2026, `docs/glossary.md` §7): "unknown behaviour" below means unmodelled behaviour; "sustained
 `unknown`" is the belief's residual mass, which is not the same condition.
@@ -3722,9 +3741,16 @@ Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.m
 **TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [OPEN; a track note]
 Rooms of the s08 and s09 kind with the robot given its own deliveries, layered in the IR test-bed's order (assigned
 only, a foreseeable task between, the deviations), each scenario exposing one decision: an admission, a hold, a
-retraction, a boundary re-admission, a lone-hypothesis projection after the work order, a blocked target. Its oracle is
-the decision rule, derived from the human's trajectory and the belief. It needs the oracle extension that reads a run
-log's world with the robot's acts.
+retraction, a boundary re-admission, a lone-hypothesis projection after the work order, the occupied target (a declared
+persistent stand at the robot's target plus at least one alternative task in the robot's pool; the expected property:
+the switch by cost), the planning side of the mid-action change (scenario_s09_13's chain, docs/assumptions.md 3.1: the
+phase inadequate, the admitted projection retracted, the fallback, the new task admitted at its next fitting phase). Its
+oracle is the decision rule, derived from the human's trajectory and the belief. It needs the oracle extension that
+reads a run log's world with the robot's acts.
+AMENDED (T-D X, 29 Sept 2026; design_decisions.md, "T-D X: response"): "a blocked target" replaced by X1's occupied-target
+scenario, with X1's verification condition (the authored stand long enough for the occupied task's hold, at most the
+observed standing count, to exceed the cost difference, the return walk included when carrying); the planning side of
+the mid-action change added (the handoff's track 3 list, `docs/handoffs/handoff_G_X_onward.md` §6).
 Files: analysis/ir_testbed/ (the oracle, to extend), domains/kitting/ (layouts, setups, scenarios)
 Reference: design_decisions.md, "The IR test-bed"; "T-D P"
 
@@ -3808,6 +3834,9 @@ FIRST INSTANCE (Track 2.5 baselines, `analysis/tb1a_destination/README.md`, "2.5
 `[sep]` 5.23 cm at 147: the human's exit walk from the table to corner_SE passes through the robot holding mid-carry at
 (262, −76) on a fallback hold from 144; F1: stands and a recede, no robot violation. An instance produced by the exit
 walk, not a scenario authored for it.
+T-D X (29 Sept 2026; design_decisions.md, "T-D X: response", X3): the human walking toward the robot gets no planning
+rule; it is an evaluation case, and this scenario is it (realization responds at the next re-decision; the interval
+before it is what the near-encounter measures).
 Files: domains/kitting/ (the scenario), analysis/tb1a_destination/sep_classes.py (the measure)
 Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137
 
@@ -3815,6 +3844,8 @@ Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, 
 docs/assumptions.md 4.2: the scripted human is open-loop, it does not react to the robot's motion (the Mesa human has no
 avoidance; it reads only what the robot does to objects, T-H2 D3, TODO-105). Future work: a human executor that
 reacts to the robot's execution, for example by giving it space. Not scheduled.
+T-D X (29 Sept 2026; design_decisions.md, "T-D X: response", X5): the communication act, its channel and its effect are
+future work with this reactive human; the two grounds on which communication is warranted are recorded in X5 (TODO-96).
 Files: world/human_executor.py, mesa_sim/sim_agents.py (`HumanAgent`)
 Reference: docs/assumptions.md 4.2; design_decisions.md, "T-H" (item 10, Alternative 1)
 
@@ -3824,6 +3855,8 @@ plain`, candidates ranked without realization) and the fallback-only control (th
 fallback projection always, admission never). The second is no run option today (the flags: `--strategy`,
 `--gate_strategy`, `--cost_strategy`, `--separation_stop`, `--assignment_prior`, `--test_level`). To build with 4.6's
 evaluation.
+T-D X (29 Sept 2026; design_decisions.md, "T-D X: response", X3): the walk toward the robot (TODO-135) is compared with
+plain cost and this control.
 Files: mesa_sim/run_mesa.py (the option), shared/meta_planner.py (admission)
 Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135
 
@@ -3858,6 +3891,13 @@ addition was proposed and declined (option (a): the exit walk stays unmodelled b
 demonstration.
 Files: domains/kitting/ (layouts, scripts), mesa_sim/ (the body's observation), shared/ (the mind object, TODO-131)
 Reference: docs/assumptions.md 1.1, 2.3; TODO-131; design_decisions.md, "T-D P" (the workspace boundary in the tail)
+
+**TODO-141: Per-candidate holds under `full_reorder` for X5's ground (2) (recorded, T-D X records, 29 Sept 2026)** [OPEN; evaluation]
+X5's ground (2) (every candidate's realized plan holds, at a decision and at the next re-decision) is read from
+`single_task` logs (`[meta-cand] delta=` per candidate); `full_reorder` logs no per-candidate hold (`[meta-ord]` the
+cost per head, `[meta-win]` the winner's holds only). Evaluation-time logging, not a design change.
+Files: shared/meta_planner.py (`_replan_orderings`, its log lines)
+Reference: design_decisions.md, "T-D X: response", X5; TODO-96
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).
