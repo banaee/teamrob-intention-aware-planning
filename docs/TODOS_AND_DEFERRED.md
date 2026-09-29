@@ -3306,6 +3306,13 @@ comparison table in the T-B3 style.
 
 Nothing in T-D Q1's build is shaped for it. Sub-ruling 4c of Q1 (`realize()` not special-cased, the
 projection passed through `update_human_projection()`) is the only seam it needs.
+THE UNION PROJECTION, TWO VARIANTS (recorded at the G/X handoff, 29 Sept 2026; a decision of the design chat, parked):
+planning against the plans of several hypotheses when none clears θ has two variants to distinguish when this is taken
+up: the fit-set variant (realize against every adequate hypothesis's plan) and the belief-weighted variant (weight the
+hypotheses' plans by their belief). The case that decides between them: a hypothesis adequate for one tick with almost
+no probability. In the
+priority of projections (T-D P, ownership), the union sits between an admitted projection and the physical fallback,
+parked. Reference: docs/handoffs/handoff_G_X_onward.md, 2.4.
 Related: TODO-84, TODO-95, TODO-15, DESIGN-07, D3; design_decisions.md, "Belief-aware planning".
 
 **TODO-98: A foreseeable task is kept out of `assigned_tasks` by convention only (recorded, 24 Sept 2026)** [OPEN, recorded only]
@@ -3724,6 +3731,9 @@ and the cognition components, the Mesa agent as its body. Its robot-internal rec
 read, never a growing history: since P4 (28 Sept 2026) four numbers per observed agent, the previous position, the
 previous unit direction, the run length and the standing count, from which `RobotAgent` writes
 `agent_displacements`, `agent_run_lengths` and `agent_standing_counts`.
+WHERE IT LANDS (recorded at the G/X handoff, 29 Sept 2026; a decision of the design chat): the perception layer and the
+mind object land in track 4 (TODO-140), whose observable-area rule is their first case: the first time the robot's
+world model must differ from the simulator's state.
 Files: mesa_sim/sim_agents.py (`RobotAgent`), shared/ (the new object)
 Reference: design_decisions.md, "T-D P: the fallback projection", mechanics
 
@@ -3810,6 +3820,23 @@ The default of `--assignment_prior` is still off (`configs/experiment.yaml`, `as
 "(default off)"). Not changed in Track 2.5.
 Files: configs/experiment.yaml, CLAUDE.md
 Reference: docs/assumptions.md 1.4
+
+**TODO-140: Track 4, the workspace boundary and human departure (recorded at the G/X handoff, 29 Sept 2026)** [OPEN; after track 3, or before it if the evaluation needs a genuine departure]
+Hadi's framing (docs/handoffs/handoff_G_X_onward.md, section 7): the shared work area gets a boundary and the human can
+pass through a door into an outside area (a corridor or rest area); the script's terminal task becomes `leave()`;
+whether the outside area is observable is a track 4 design question (observable: the human is seen but outside the
+robot's operational area; unobservable: the first genuine "no human observed", docs/assumptions.md 2.3). Principle
+ruled: the robot's observation is restricted to what it can sense from its area; a human outside is an absence of
+observation, never a message; departure and re-entry are emergent (observed, not observed, observed again; a returning
+human has no memory in the mind). Consequences: the first case where the robot's world model must differ from the
+simulator's state, so track 4 builds the perception layer and the mind object (TODO-131); P4's fallback then uses the
+shared work area's boundary; the six corrected scripts and the test-bed scripts switch to `leave()`, with one
+regeneration. Until then 1.1's corner walk stands.
+DECLINED FOR NOW (a decision of the design chat, 29 Sept 2026): a "leave the workspace" foreseeable task as a domain
+addition was proposed and declined (option (a): the exit walk stays unmodelled behaviour); revisit with track 4 or the
+demonstration.
+Files: domains/kitting/ (layouts, scripts), mesa_sim/ (the body's observation), shared/ (the mind object, TODO-131)
+Reference: docs/assumptions.md 1.1, 2.3; TODO-131; design_decisions.md, "T-D P" (the workspace boundary in the tail)
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).

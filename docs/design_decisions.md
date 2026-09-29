@@ -4863,6 +4863,8 @@ Ruling.
   run of k ticks projects k ticks). If the ray meets the workspace boundary or enters the first fixed object's arrival
   radius before those k ticks, the projected motion ends there; no stand is inferred. Beyond the projection the human
   is unassessed.
+  AS BUILT (recorded at the G/X handoff, 29 Sept 2026): landmarks count as fixed objects for the tail:
+  `world_state_builder.py` puts every non-portable object in `fixed_object_positions`, landmarks included.
 - Standing human: standing at the observed position for as long as the human has already stood (a count of k projects
   k ticks). Beyond that, unassessed.
 - No previous observation: no projection (P1's initialisation convention superseded by "unassessed").
