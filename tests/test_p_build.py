@@ -24,7 +24,8 @@ from shared.projection import Projector
 from shared.realization import realize
 from shared.trajectory_algorithms import stationary_segment
 from shared.types import (
-    AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, ProjectedPlan, ProjectedPlanEntry,
+    AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, ObservationWarrant, ProjectedPlan,
+    ProjectedPlanEntry,
     RecognitionChange, RecognizerLifecycle, Segment, TaskInstance, Var, Workspace, task_instance_key,
 )
 from domains.kitting.tasks import deliver_item
@@ -201,10 +202,13 @@ def task(i):
 
 
 def belief(confidence, adequacy=HypothesisAdequacy.ADEQUATE):
+    # Observation-warranted (T-D G): these tests' premise is an admissible leader above theta; the gate's warrant
+    # condition is tested in tests/test_g_build.py.
     key = task_instance_key(task("item_3"))
     return BeliefState(timestamp=0.0, agent_id=H, distribution={key: confidence}, most_likely=key,
                        confidence=confidence, finding=AdequacyFinding.ADEQUATE, lifecycle=RecognizerLifecycle.LIVE,
-                       tails={}, hypothesis_adequacy={key: adequacy}, episode_boundary=False)
+                       tails={}, hypothesis_adequacy={key: adequacy},
+                       observation_warrant={key: ObservationWarrant.OBSERVATION}, episode_boundary=False)
 
 
 class Stub:

@@ -27,7 +27,7 @@ from shared.meta_planner import DEFAULT_THETA
 from shared.recognizer import build_hypothesis_space
 from shared.types import (
     ActionContext, AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, Observation,
-    RecognitionChange, RecognizerLifecycle, SpatialContext, TaskInstance, Var,
+    ObservationWarrant, RecognitionChange, RecognizerLifecycle, SpatialContext, TaskInstance, Var,
 )
 from domains.kitting.tasks import deliver_item
 from mesa_sim.world_state_builder import build_world_state
@@ -215,10 +215,13 @@ I1, I2 = "deliver_item(?item=item_1)", "deliver_item(?item=item_2)"
 
 
 def belief(leader, adequacy, confidence=0.9, boundary=False):
+    # Every hypothesis observation-warranted (T-D G): these tests' premise is an admissible leader; the gate's
+    # warrant condition is tested in tests/test_g_build.py.
     rival = I2 if leader == I1 else I1
     return BeliefState(timestamp=0.0, agent_id=H, distribution={leader: confidence, rival: 1.0 - confidence},
                        most_likely=leader, confidence=confidence, finding=AdequacyFinding.ADEQUATE,
                        lifecycle=RecognizerLifecycle.LIVE, tails={}, hypothesis_adequacy=adequacy,
+                       observation_warrant={k: ObservationWarrant.OBSERVATION for k in adequacy},
                        episode_boundary=boundary)
 
 

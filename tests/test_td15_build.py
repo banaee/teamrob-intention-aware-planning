@@ -316,15 +316,19 @@ def test_the_guard_refuses_a_lone_hypothesis_at_a_boundary(model):
     assert b.hypothesis_adequacy[b.most_likely] is HypothesisAdequacy.NO_OBSERVATION
     assert gate(model)._clears_gate(b) is GateOutcome.LEADER_NO_OBSERVATION
     # the latency tick after it: one priced standing tick, an observation at S = 1 (E6, second
-    # amendment), so the lone hypothesis clears the gate at b + 1 on a belief of 1.0 by
-    # normalisation (TODO-119)
+    # amendment), so the lone hypothesis is adequate at b + 1 on a belief of 1.0 by normalisation
+    # (TODO-119). Re-derived at G-build (T-D G, AD1): its walk was opened by the boundary (no entry by
+    # a completion in this episode) and nothing is walked (no gain), so it holds no observation
+    # warrant; this fixture is prior off (no commitment warrant): refused as unwarranted
     b = rec.update(obs(2, p), placed)
     assert b.hypothesis_adequacy[b.most_likely] is HypothesisAdequacy.ADEQUATE
-    assert gate(model)._clears_gate(b) is GateOutcome.CLEARS
+    assert gate(model)._clears_gate(b) is GateOutcome.LEADER_UNWARRANTED
 
 
 def test_the_guard_refuses_an_inadequate_leader(model):
-    # a lone hypothesis in its walk, the human standing: S < alpha from 17 ticks (v·D = 340 cm)
+    # a lone hypothesis in its walk, the human standing: S < alpha from 17 ticks (v·D = 340 cm).
+    # Re-derived at G-build (T-D G, AD1; AD4's order): adequate from 1 to 16 but unwarranted (its walk
+    # entered at the first observation, nothing walked; prior off), inadequate from 17 (asked first)
     w = build_world_state(model)
     p = w.agent_positions[H]
     rec = recognizer(model, [item("item_3")])
@@ -332,11 +336,14 @@ def test_the_guard_refuses_an_inadequate_leader(model):
         b = rec.update(obs(s, p), w)
         assert b.confidence >= DEFAULT_THETA
         expected = (GateOutcome.LEADER_NO_OBSERVATION if s == 0
-                    else GateOutcome.LEADER_INADEQUATE if s >= 17 else GateOutcome.CLEARS)
+                    else GateOutcome.LEADER_INADEQUATE if s >= 17 else GateOutcome.LEADER_UNWARRANTED)
         assert gate(model)._clears_gate(b) is expected, s
 
 
-def test_the_guard_admits_the_coffee_leader_during_its_priced_stand(model5):
+def test_the_coffee_leader_during_its_priced_stand_is_adequate_but_unwarranted(model5):
+    # Re-derived at G-build (T-D G, AD1, the case it sets aside): first observed at the machine, in its
+    # wait_at phase (no movement target), not entered by a completion; a PersonalTask, never assigned:
+    # adequate (S = 1 within its priced standing) at about 1.0, and unwarranted. Before G it was admitted.
     coffee = coffee_key(model5)
     machine = coffee.bindings["?coffee_machine"]
     w = world_with(build_world_state(model5), add=[pred("at", H, machine)])
@@ -346,7 +353,7 @@ def test_the_guard_admits_the_coffee_leader_during_its_priced_stand(model5):
         b = rec.update(obs(s, p), w)
     assert b.most_likely == repr(coffee) and b.confidence >= DEFAULT_THETA
     assert b.hypothesis_adequacy[repr(coffee)] is HypothesisAdequacy.ADEQUATE
-    assert gate(model5)._clears_gate(b) is GateOutcome.CLEARS
+    assert gate(model5)._clears_gate(b) is GateOutcome.LEADER_UNWARRANTED
 
 
 def test_the_guard_refusal_is_logged_and_clears_the_record(model, caplog):
