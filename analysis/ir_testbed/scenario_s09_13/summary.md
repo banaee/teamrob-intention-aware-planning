@@ -109,6 +109,35 @@ Across the started task coffee_break(coffee_machine_0) (covered; actual): on top
 | 108 | move_to step | deliver_item(item_1) | 0.2901 / 0.7410 | 0.3671 / 1.0000 | 0.3418 / 0.9038 | adequate |
 | 109 | move_to step | deliver_item(item_1) | 0.2437 / 0.5364 | 0.3991 / 1.0000 | 0.3562 / 0.8526 | adequate |
 
+Observation warrant (actual): the stretches of ticks on which each hypothesis holds it.
+
+| hypothesis | warranted ticks |
+|---|---|
+| coffee_break(coffee_machine_0) | 0 to 104, 151 to 211, 214 to 291 |
+| deliver_item(item_1) | 0 to 104, 107 to 148 |
+| deliver_item(item_2) | 0 to 1, 107 to 135, 151 to 211 |
+
+The gate's answer per tick (actual; the leader and the outcome, stretches):
+
+| ticks | leader | gate |
+|---|---|---|
+| 0 to 24 | deliver_item(item_1) | none(below_theta) |
+| 25 to 54 | deliver_item(item_1) | clears |
+| 55 to 60 | deliver_item(item_1) | none(leader_inadequate) |
+| 61 to 63 | deliver_item(item_1) | none(below_theta) |
+| 64 to 66 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 67 to 73 | coffee_break(coffee_machine_0) | none(leader_inadequate) |
+| 74 to 104 | coffee_break(coffee_machine_0) | clears |
+| 105 to 120 | deliver_item(item_1) | none(below_theta) |
+| 121 to 148 | deliver_item(item_1) | clears |
+| 149 to 150 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 151 to 163 | deliver_item(item_2) | none(below_theta) |
+| 164 to 211 | deliver_item(item_2) | clears |
+| 212 to 212 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
+| 213 to 213 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
+| 214 to 244 | coffee_break(coffee_machine_0) | clears |
+| 245 to 291 | coffee_break(coffee_machine_0) | none(leader_inadequate) |
+
 The last entry (go_to(corner_SE)): first step 214, last step 260, acknowledgement 261; the idle human from 262. Live at its first tick: coffee_break(coffee_machine_0).
 
 - coffee_break(coffee_machine_0): belief 0.9970 at 214; S < α from 245 (belief 0.9970; v·D 348.6 cm); the finding unexplained from 245.

@@ -95,6 +95,33 @@ Across the started task go_to(corner_SE) (task_absent; actual): on top of the st
 | 81 | move_to step | deliver_item(item_1) | 0.3917 / 0.0000 | 0.6064 / 0.0000 | 0.0010 / 0.0000 | unexplained |
 | 82 | move_to step | deliver_item(item_1) | 0.3653 / 0.0000 | 0.6327 / 0.0000 | 0.0010 / 0.0000 | unexplained |
 
+Observation warrant (actual): the stretches of ticks on which each hypothesis holds it.
+
+| hypothesis | warranted ticks |
+|---|---|
+| coffee_break(coffee_machine_0) | 0 to 127, 130 to 187, 192 to 269 |
+| deliver_item(item_1) | 0 to 127 |
+| deliver_item(item_2) | 0 to 1, 130 to 189 |
+
+The gate's answer per tick (actual; the leader and the outcome, stretches):
+
+| ticks | leader | gate |
+|---|---|---|
+| 0 to 24 | deliver_item(item_1) | none(below_theta) |
+| 25 to 42 | deliver_item(item_1) | clears |
+| 43 to 54 | deliver_item(item_1) | none(below_theta) |
+| 55 to 66 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 67 to 86 | deliver_item(item_1) | none(below_theta) |
+| 87 to 125 | deliver_item(item_1) | none(leader_inadequate) |
+| 126 to 127 | deliver_item(item_1) | clears |
+| 128 to 129 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 130 to 142 | deliver_item(item_2) | none(below_theta) |
+| 143 to 189 | deliver_item(item_2) | clears |
+| 190 to 190 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
+| 191 to 191 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
+| 192 to 222 | coffee_break(coffee_machine_0) | clears |
+| 223 to 269 | coffee_break(coffee_machine_0) | none(leader_inadequate) |
+
 The last entry (go_to(corner_SE)): first step 192, last step 238, acknowledgement 239; the idle human from 240. Live at its first tick: coffee_break(coffee_machine_0).
 
 - coffee_break(coffee_machine_0): belief 0.9970 at 192; S < α from 223 (belief 0.9970; v·D 343.6 cm); the finding unexplained from 223.

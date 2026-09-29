@@ -2199,3 +2199,44 @@ the same from the records):
 
 Run (git-ignored; md5s): `runs/env_layout_11_scenario_s09_13_on.log` 60d9491efa8d61c7c5679f1a1307719f,
 `runs/env_layout_11_scenario_s09_13_on.rec` 739ce3199f341516687bfc7701b29143.
+
+## G-build: observation warrant and the gate, the seventeen recompared (29 September 2026)
+
+The recognizer gained a third output, the observation warrant per live hypothesis (design_decisions.md, "T-D G:
+admission", AD1, AD2), and the gate its warrant condition (AD1, AD4). The instrument was extended by derivation from
+the entry before the recomparison (README, "G-build"): `warrant` per hypothesis, compared exactly against actual.csv
+and actual_log.csv, and `gate`, the gate's outcome per tick, compared exactly against actual.csv (the idle robot asks
+admission at tick 0 only, so the gate's answer is read from its one home on every tick's BeliefState, not from the
+log). Nothing was fitted.
+
+Result: 0 disagreements in all seventeen scenarios (scenario_s08_01 to _04, scenario_s09_01 to _13), against
+actual.csv and against actual_log.csv, on every column, the belief and the adequacy included (unchanged: every
+expected.csv, actual.csv and actual_log.csv equals the committed one once the two new columns are removed). Nothing to
+classify. The `.rec` streams are byte-identical; the run logs differ from the committed runs in the `[IR]` line's
+`warrant=[...]` field, and s08_01 to s09_12 also in the step-0 `[meta-proj]` line (`projection=fallback
+refused=none(below_theta)` for `projection=none(below_theta)`: T-D P's fallback, P-build's recorded difference; those
+runs were last made at L-build). An unresolved move_to target (the plan-step ruling: no movement warrant) occurs on no
+tick of the seventeen, nor of the 48 maintained logs (counted in process).
+
+The picked cases (actual; the oracle derived the same):
+- scenario_s09_01, the tail after 124: coffee_break is the lone live hypothesis at 0.997. The gate answers
+  `none(leader_no_observation)` at 124 (the boundary), `none(leader_unwarranted)` at 125 (b + 1: the walk the boundary
+  opened, nothing walked, not assigned), clears from 126 to 156 and `none(leader_inadequate)` from 157. A walk toward
+  the machine does occur: the exit walk to corner_SE bears about 39° off the machine's bearing from kitting_table_0, so
+  its first step gains 15.24 cm toward the machine (295 cm by 155). Before G the gate cleared from 125. The same in
+  scenario_s08_01 (clears from 126) and scenario_s09_10 (from 109). The consequence is recorded in the entry's BUILT
+  paragraph: a lone foreseeable task is warranted by any walk within 90° of its target's bearing; what AD1 resolves is
+  admission on standing.
+- scenario_s09_09, 83 to 87: no admission; the gate answers `none(leader_inadequate)` from 83 to 106 (coffee_break
+  the leader). Earlier, 70 to 82, coffee_break clears on the walk toward shelf_3 (the delivery of item_3 outside the
+  support): the machine lies about 62° off that walk's bearing, warranted by its gain, as before G it was admissible on
+  θ and adequacy alone.
+- scenario_s09_06, the stand: deliver_item(item_1)'s `pick_up` phase (28 to 71) is entered by the walk's completion at
+  28 and holds observation warrant through the stand; the gate clears 28 to 46 and refuses it as inadequate from 47 to
+  71; the carry, entered by the grasp at 72, is warranted and clears again.
+
+scenario_s05_01 prior on (a maintained fixture, not a test-bed scenario; run through the instrument into a scratch
+folder, not committed): the recognizer's outputs, the warrant and the gate agree with the oracle on every tick; 109
+disagreements, all in the `obj_at` column (the robot's own items, which the instrument's human-only world does not
+move; outside its scope). After the boundary at 141 the lone coffee_break is refused `none(leader_unwarranted)` from
+142 to 158 (the human walks away from the machine: no gain) and inadequate from 159; before G it was admitted at 142.

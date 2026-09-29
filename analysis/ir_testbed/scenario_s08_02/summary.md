@@ -84,6 +84,32 @@ Finding transitions (actual; `exhausted` is the lifecycle state, no finding):
 | 202 | unresolved | adequate | deliver_item(item_2) |
 | 234 | adequate | unexplained | - |
 
+Observation warrant (actual): the stretches of ticks on which each hypothesis holds it.
+
+| hypothesis | warranted ticks |
+|---|---|
+| coffee_break(coffee_machine_0) | 0 to 60, 63 to 132, 203 to 280 |
+| deliver_item(item_1) | 0 to 60 |
+| deliver_item(item_2) | 0 to 1, 63 to 95, 135 to 200 |
+
+The gate's answer per tick (actual; the leader and the outcome, stretches):
+
+| ticks | leader | gate |
+|---|---|---|
+| 0 to 24 | deliver_item(item_1) | none(below_theta) |
+| 25 to 60 | deliver_item(item_1) | clears |
+| 61 to 74 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 75 to 132 | coffee_break(coffee_machine_0) | clears |
+| 133 to 133 | deliver_item(item_2) | none(leader_no_observation) |
+| 134 to 134 | deliver_item(item_2) | clears |
+| 135 to 135 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 136 to 139 | deliver_item(item_2) | none(below_theta) |
+| 140 to 200 | deliver_item(item_2) | clears |
+| 201 to 201 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
+| 202 to 202 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
+| 203 to 233 | coffee_break(coffee_machine_0) | clears |
+| 234 to 280 | coffee_break(coffee_machine_0) | none(leader_inadequate) |
+
 The last entry (go_to(corner_SE)): first step 203, last step 249, acknowledgement 250; the idle human from 251. Live at its first tick: coffee_break(coffee_machine_0).
 
 - coffee_break(coffee_machine_0): belief 0.9980 at 203; S < α from 234 (belief 0.9980; v·D 346.0 cm); the finding unexplained from 234.

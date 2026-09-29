@@ -226,6 +226,29 @@ def main(d, log):
                        + " | ".join(cells) + f" | {state(t)} |")
         out.append("")
 
+    # warrant and the gate (T-D G; since G-build): per hypothesis the stretches of observation warrant, and the gate's
+    # outcome per stretch with its leader (the idle robot asks admission at tick 0 only: this is the gate's answer)
+    def stretches_of(ticks_values):
+        out_, cur_ = [], None
+        for t_, v_ in ticks_values:
+            if cur_ and cur_[0] == v_ and cur_[2] == t_ - 1:
+                cur_[2] = t_
+            else:
+                cur_ = [v_, t_, t_]
+                out_.append(cur_)
+        return out_
+    out += ["Observation warrant (actual): the stretches of ticks on which each hypothesis holds it.", "",
+            "| hypothesis | warranted ticks |", "|---|---|"]
+    for k in admissible:
+        st = [f"{a} to {b}" for v, a, b in stretches_of([(t, by[t][k]["warrant"]) for t in sorted(by) if k in by[t]])
+              if v == "observation"]
+        out.append(f"| {short(k)} | {', '.join(st) or 'none'} |")
+    out += ["", "The gate's answer per tick (actual; the leader and the outcome, stretches):", "",
+            "| ticks | leader | gate |", "|---|---|---|"]
+    for (ml, g), a, b in stretches_of([(t, (tick0(t)["most_likely"], tick0(t)["gate"])) for t in sorted(by)]):
+        out.append(f"| {a} to {b} | {short(ml)} | {g} |")
+    out.append("")
+
     # the script's last entry (the exit walk by the authoring convention)
     walk = [r for r in traj["rows"] if exit_start <= r["tick"] <= traj["last_ack"]]
     last_step = max(r["tick"] for r in walk if r["micro"] == "step")

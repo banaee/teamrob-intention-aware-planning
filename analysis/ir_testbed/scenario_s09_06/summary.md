@@ -96,6 +96,30 @@ Across the started task stand(PT80S) (task_absent; actual): on top of the stack 
 | 72 | pick_up grasp | deliver_item(item_1) | 0.0796 / 0.0000 | 0.9184 / 1.0000 | 0.0010 / 1.0000 | adequate |
 | 73 | pick_up  | deliver_item(item_1) | 0.0661 / 0.0000 | 0.9319 / 1.0000 | 0.0010 / 1.0000 | adequate |
 
+Observation warrant (actual): the stretches of ticks on which each hypothesis holds it.
+
+| hypothesis | warranted ticks |
+|---|---|
+| coffee_break(coffee_machine_0) | 0 to 102, 105 to 163, 168 to 245 |
+| deliver_item(item_1) | 0 to 102 |
+| deliver_item(item_2) | 0 to 1, 105 to 165 |
+
+The gate's answer per tick (actual; the leader and the outcome, stretches):
+
+| ticks | leader | gate |
+|---|---|---|
+| 0 to 24 | deliver_item(item_1) | none(below_theta) |
+| 25 to 46 | deliver_item(item_1) | clears |
+| 47 to 71 | deliver_item(item_1) | none(leader_inadequate) |
+| 72 to 102 | deliver_item(item_1) | clears |
+| 103 to 104 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 105 to 117 | deliver_item(item_2) | none(below_theta) |
+| 118 to 165 | deliver_item(item_2) | clears |
+| 166 to 166 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
+| 167 to 167 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
+| 168 to 198 | coffee_break(coffee_machine_0) | clears |
+| 199 to 245 | coffee_break(coffee_machine_0) | none(leader_inadequate) |
+
 The last entry (go_to(corner_SE)): first step 168, last step 214, acknowledgement 215; the idle human from 216. Live at its first tick: coffee_break(coffee_machine_0).
 
 - coffee_break(coffee_machine_0): belief 0.9970 at 168; S < α from 199 (belief 0.9970; v·D 343.9 cm); the finding unexplained from 199.

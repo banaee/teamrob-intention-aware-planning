@@ -22,10 +22,12 @@ Rows (tick, live hypothesis) present on one side only: 0
 | pins | 282 | 0 |
 | reentries | 282 | 0 |
 | boundary | 282 | 0 |
+| gate | 282 | 0 |
 | belief | 621 | 0 |
 | S | 621 | 0 |
 | member | 621 | 0 |
 | adequacy | 621 | 0 |
+| warrant | 621 | 0 |
 
 Disagreements: 0
 
@@ -49,6 +51,7 @@ Rows (tick, live hypothesis) present on one side only: 0
 | S | 621 | 0 |
 | member | 621 | 0 |
 | adequacy | 621 | 0 |
+| warrant | 621 | 0 |
 
 Disagreements: 0
 

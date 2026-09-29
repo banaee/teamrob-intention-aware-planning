@@ -2,7 +2,9 @@
 """
 plot.py — one figure per scenario for the IR test-bed (TB.3b): the belief per hypothesis and S per hypothesis over
 ticks (expected as lines, actual as markers every fifth tick), the finding and the lifecycle as a band, and the
-script's action boundaries (trajectory.json) as thin vertical lines, the task starts labelled. θ and α are read from
+script's action boundaries (trajectory.json) as thin vertical lines, the task starts labelled. Since G-build a fourth
+panel: per hypothesis, the ticks it holds observation warrant (expected as a bar, actual as a dot every tick), and the
+ticks the gate clears (the leader admissible: θ, adequate, warranted; T-D G), expected bar, actual dots. θ and α are read from
 the run's [run] header; a hypothesis or task is labelled by its key without the parameter names. No id, coordinate or
 tick is written here (TB.4b).
 
@@ -59,8 +61,8 @@ def main(d, log):
     assert len(keys) <= len(SERIES), f"{len(keys)} hypotheses; the palette validates {len(SERIES)} all-pairs"
     color = dict(zip(keys, SERIES))
     T = max(int(r["tick"]) for r in exp)
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 7.2), sharex=True,
-                                        gridspec_kw=dict(height_ratios=[3, 3, 0.45], hspace=0.08))
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 8.6), sharex=True,
+                                             gridspec_kw=dict(height_ratios=[3, 3, 0.45, 1.3], hspace=0.08))
     for ax, col, ylabel in ((ax1, "belief", "belief"), (ax2, "S", "tail probability S")):
         e, a = series(exp, col), series(act, col)
         for k in keys:
@@ -90,8 +92,26 @@ def main(d, log):
     ax3.set_ylabel("finding", rotation=0, ha="right", va="center", color=INK)
     ax3.legend(handles=[Patch(color=BAND[s], label=s) for s in BAND], loc="upper left", bbox_to_anchor=(1.0, 1.6),
                frameon=False, fontsize=8)
-    ax3.set_xlabel("tick")
-    ax3.set_xlim(-1, T + 1)
+    # warrant per hypothesis and the gate's clearing (T-D G): expected bars, actual dots
+    rows4 = keys + ["gate clears"]
+    for i, k in enumerate(rows4):
+        y = len(rows4) - 1 - i
+        c = INK if k == "gate clears" else color[k]
+        if k == "gate clears":
+            e_on = sorted({int(r["tick"]) for r in exp if r["gate"] == "clears"})
+            a_on = sorted({int(r["tick"]) for r in act if r["gate"] == "clears"})
+        else:
+            e_on = [int(r["tick"]) for r in exp if r["key"] == k and r["warrant"] == "observation"]
+            a_on = [int(r["tick"]) for r in act if r["key"] == k and r["warrant"] == "observation"]
+        ax4.broken_barh([(t - 0.5, 1) for t in e_on], (y - 0.3, 0.6), color=c, alpha=0.35, lw=0)
+        ax4.plot(a_on, [y] * len(a_on), "|", ms=5, color=c)
+    ax4.set_yticks(range(len(rows4)))
+    ax4.set_yticklabels([("warrant " + short(k)) if k != "gate clears" else k for k in reversed(rows4)], fontsize=7.5)
+    ax4.set_ylim(-0.6, len(rows4) - 0.4)
+    for s in ("top", "right"):
+        ax4.spines[s].set_visible(False)
+    ax4.set_xlabel("tick")
+    ax4.set_xlim(-1, T + 1)
     # the script's action boundaries; the task starts labelled
     last_task = None
     for b in traj["actions"]:

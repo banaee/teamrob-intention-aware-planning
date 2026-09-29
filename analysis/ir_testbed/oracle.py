@@ -4,7 +4,7 @@ oracle.py — the IR test-bed's expectation generator (TB.3b; design_decisions.m
 boundary"): the recognizer's outputs per tick, derived from the recognizer records at HEAD and from nothing of the
 recognizer's code.
 
-    oracle.py <trajectory.json> <run file> <expected.csv> <phases.json>
+    oracle.py <trajectory.json> <run file> <expected.csv> <phases.json> <run.log>
 
 Independence. It imports nothing from shared/recognizer.py or shared/likelihood_functions.py, and asserts at the end
 that neither module was loaded in its process. It uses the planner's decomposition (`AdaptivePlanner.decompose`, on
@@ -19,6 +19,10 @@ L-build changed three rules by derivation from DL (README, "L-build"): the bound
 for the domain's two terminal actions, not through the schemas' preconditions as the recognizer reads it), liveness
 and re-entry (DL L4, arithmetic C, computed after the normalisation over the incumbents rather than before it), and a
 new per-tick column, the re-entries.
+G-build added two columns by derivation from DG = design_decisions.md "T-D G: admission" (AD1, AD4) and the ruling at
+the G-build plan step on an unresolved target (README, "G-build"): the observation warrant per hypothesis, and the
+gate's expected outcome per tick (θ from the run log's [run] header, the one value read from the log; commitment from
+the scenario's assigned tasks, by the support's key reading, rule 1).
 """
 import csv
 import json
@@ -64,12 +68,18 @@ def hypothesis_space(task_model, types):
     return dict(sorted(space.items()))
 
 
-def support(space, assigned):
-    """Prior on: the assigned tasks and every foreseeable task (a PersonalTask's hypothesis) (HB §1.1)."""
+def known_keys(assigned):
+    """The assigned tasks' hypothesis keys: each task's schema and enumerated bindings (HB §1.1)."""
     known = set()
     for t in assigned:
         params = [p for p in t.schema.parameters if p.name not in (t.schema.determined_parameters or {})]
         known.add(key_of(t.schema, [(p.name, t.bindings[p].value) for p in params]))
+    return known
+
+
+def support(space, assigned):
+    """Prior on: the assigned tasks and every foreseeable task (a PersonalTask's hypothesis) (HB §1.1)."""
+    known = known_keys(assigned)
     return {k for k, t in space.items() if k in known or isinstance(t.schema, PersonalTask)}
 
 
@@ -105,9 +115,9 @@ def label(a):
 
 
 class Oracle:
-    def __init__(self, traj, alpha):
+    def __init__(self, traj, alpha, theta):
         p = traj["params"]
-        self.v, self.beta, self.alpha = p["speed"], p["beta"], alpha
+        self.v, self.beta, self.alpha, self.theta = p["speed"], p["beta"], alpha, theta
         self.lat_action, self.lat_task = p["action_completion_latency"], p["observed_task_completion_latency"]
         self.default_cost, self.duration_ticks = p["default_action_cost"], p["duration_ticks"]
         self.traj = traj
@@ -117,11 +127,15 @@ class Oracle:
         human = next(a for a in domain_config["scenarios"][traj["scenario"]].agents if a.agent_type == "human")
         self.agent = human.agent_id                    # the observed human: the scenario's one human
         self.admissible = support(self.space, human.assigned_tasks)
+        self.committed = known_keys(human.assigned_tasks)   # DG AD1: commitment warrant (prior on)
         live = sorted(self.admissible)
         # HB §1.2: the uniform prior over the live set at construction
         self.base = {k: 1.0 / len(live) for k in live}
         self.expected, self.origin, self.entry = {}, {}, {}
         self.observed, self.completed = set(), set()
+        # DG AD1: the keys whose current phase was entered by the completion of the previous expected action in this
+        # episode (the completion E8 reads): reset at a boundary and at every phase change, a first observation or a pin
+        self.entered = set()
         self.last_pos, self.odo, self.still = None, 0.0, 0
         self.prev_facts = None                         # the previous tick's world facts, for the boundary (DL L1)
 
@@ -182,6 +196,7 @@ class Oracle:
                     for d in (self.base, self.expected, self.origin, self.entry):
                         d.pop(k, None)
                     self.observed.discard(k)
+                    self.entered.discard(k)
                 continue
             if k in self.completed:
                 if A is None:                              # its fact cannot be read: nothing says it stopped
@@ -191,6 +206,7 @@ class Oracle:
             if k not in self.observed:                   # enters its action from no completion: an empty phase
                 self.observed.add(k)
                 self.expected[k], self.origin[k], self.entry[k] = a, (pos, self.odo, self.still), 0.0
+                self.entered.discard(k)                                          # DG AD1: no completion
                 if k not in reentries:
                     U[k] = self.base[k]
                 continue
@@ -208,6 +224,9 @@ class Oracle:
                 self.entry[k] = self.lat_action if done else 0.0                # E9
                 if done:
                     advanced.add(k)                                              # E8
+                    self.entered.add(k)                                          # DG AD1: the entry source
+                else:
+                    self.entered.discard(k)                                      # DG AD1: reset at a phase change
             U[k] = self.base[k] * self.phase(k, a, pos, world)["L"]
         Z = sum(U.values())                                # one normalisation, over H (HB §1.5)
         if Z > 0:
@@ -234,6 +253,7 @@ class Oracle:
                 self.origin[k] = (pos, self.odo, self.still)
                 self.entry[k] = self.lat_action + self.lat_task                  # E9
             advanced = set()                                                     # E8: no observation on it
+            self.entered = set()                                                 # DG AD1: reset with the origins
         return world, E, pins, reentries, boundary, advanced, folds
 
     def terminal_completed(self, facts):
@@ -252,6 +272,39 @@ class Oracle:
                 if any(g[0] == "obj_at" and g[1] == f[2] and g[2] not in agents for g in now):
                     return True
         return any(f[0] == "waited" and f[1] == h and f not in prev for f in now)
+
+    def warrant(self, k, pos, world):
+        """DG AD1: observation warrant. The entry source, for any phase: the phase was entered by a completion in this
+        episode. The movement source, for a phase with a movement target: the gain toward the target's current position
+        since the phase origin is positive, dist(o, g) - dist(p, g) > 0 (straight-line C, rule 9's path cost). None for a
+        stationary phase (no movement target), for a move_to whose target has no position (no gain computable; the
+        plan-step ruling), and with no derived phase."""
+        a = self.expected.get(k)
+        if a is None:
+            return "none"
+        if k in self.entered:
+            return "observation"
+        if a.schema.movement_target_key is None:
+            return "none"
+        g = target_position(a.bindings.get(a.schema.movement_target_key), world)
+        if g is None:
+            return "none"
+        return "observation" if math.dist(self.origin[k][0], g) - math.dist(pos, g) > 0 else "none"
+
+    def gate(self, ml, conf, per):
+        """DG AD1, AD4 (and G1): the gate's outcome on the leader: below θ; else its hypothesis adequacy, inadequate
+        then no observation; else warrant (commitment: an assigned task; or observation); else it clears. Exhausted:
+        no leader, confidence 0, below θ."""
+        if ml is None or conf < self.theta:
+            return "none(below_theta)"
+        adequacy, warrant = per[ml][3], per[ml][4]
+        if adequacy == "inadequate":
+            return "none(leader_inadequate)"
+        if adequacy != "adequate":
+            return "none(leader_no_observation)"
+        if ml not in self.committed and warrant != "observation":
+            return "none(leader_unwarranted)"
+        return "clears"
 
     def output(self, E):
         """HB §1.7 (reading R2): normalise over H, the floor, the pinned keys at the floor, the live keys scaled to
@@ -282,12 +335,12 @@ class Oracle:
 
 
 COLUMNS = ["tick", "human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence",
-           "finding", "lifecycle", "pins", "reentries", "boundary", "key", "expected_action", "origin_x", "origin_y", "e", "s",
-           "s_exp", "D", "L", "evidence", "belief", "S", "member", "adequacy"]
+           "finding", "lifecycle", "pins", "reentries", "boundary", "gate", "key", "expected_action", "origin_x", "origin_y", "e",
+           "s", "s_exp", "D", "L", "evidence", "belief", "S", "member", "adequacy", "warrant"]
 
 
-def run(traj, alpha):
-    orc = Oracle(traj, alpha)
+def run(traj, alpha, theta):
+    orc = Oracle(traj, alpha, theta)
     rows, phases = [], {k: [] for k in orc.space}
     for r in traj["rows"]:
         world, E, pins, reentries, boundary, advanced, folds = orc.update(r)
@@ -298,7 +351,7 @@ def run(traj, alpha):
         for k in live:
             ph, member, S = orc.adequacy(k, pos, world, boundary, advanced)
             adequacy = "no_observation" if not member else ("adequate" if S >= alpha else "inadequate")
-            per[k] = (ph, member, S, adequacy)
+            per[k] = (ph, member, S, adequacy, orc.warrant(k, pos, world))
             a = orc.expected.get(k)
             if not phases[k] or phases[k][-1][0] != label(a):
                 phases[k].append([label(a), r["tick"], r["tick"]])
@@ -317,22 +370,25 @@ def run(traj, alpha):
                       waited=r["waited"], obj_at=";".join(f"{i}@{l}" for i, l in sorted(r["item_loc"].items())),
                       at=";".join(f[2] for f in r["facts"] if f[0] == "at"), most_likely=ml, confidence=conf,
                       finding=finding, lifecycle=lifecycle, pins=";".join(pins), reentries=";".join(reentries),
-                      boundary=int(boundary))
+                      boundary=int(boundary), gate=orc.gate(ml, conf, per))
         if not live:
             rows.append(dict(common))
         for k in live:
-            ph, member, S, adequacy = per[k]
+            ph, member, S, adequacy, warrant = per[k]
             o = orc.origin[k][0]
             rows.append(dict(common, key=k, expected_action=label(orc.expected.get(k)), origin_x=o[0], origin_y=o[1],
                              e=ph["e"], s=ph["s"], s_exp=ph["s_exp"], D=ph["D"], L=ph["L"], evidence=E[k],
-                             belief=P[k], S=S, member=int(member), adequacy=adequacy))
+                             belief=P[k], S=S, member=int(member), adequacy=adequacy, warrant=warrant))
     return rows, phases, sorted(orc.admissible)
 
 
 if __name__ == "__main__":
     traj = json.load(open(sys.argv[1]))
     alpha = float(yaml.safe_load(open(sys.argv[2]))["test_level"])
-    rows, phases, space = run(traj, alpha)
+    # θ, the meta-planner's, from the run's [run] header (shared.meta_planner would load the recognizer)
+    header = next(l for l in open(sys.argv[5]) if l.startswith("[run] "))
+    theta = float(header.split("theta=")[1].split()[0])
+    rows, phases, space = run(traj, alpha, theta)
     with open(sys.argv[3], "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()

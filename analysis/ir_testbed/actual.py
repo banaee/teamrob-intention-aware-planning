@@ -13,6 +13,11 @@ step's option B, confirmed by Hadi):
                   most_likely, confidence) and the world the robot built that tick (the human's position and facts).
                   Its `[IR*]` lines are asserted byte-identical to the logged run's, so it is the same run.
 
+Since G-build: the observation warrant per hypothesis (`BeliefState.observation_warrant`; in the log, the `[IR]` line's
+`warrant=[...]`, which is removed before tdlib reads the line and parsed here), and in actual.csv the gate's outcome
+per tick, the robot's meta-planner's `_clears_gate` on that tick's BeliefState (the gate's one home; the idle robot of
+the test-bed asks admission at tick 0 only, so its answer is read here, not from the log).
+
 Nothing in the recognizer is read beyond its output. The columns the recognizer does not output are left empty in
 both files and skipped by the comparison: expected_action, origin_x, origin_y, e, s, s_exp, D, L, evidence.
 
@@ -23,6 +28,7 @@ the scenario's first reference layout when it names none; the observed human is 
 """
 import csv
 import logging
+import re
 import sys
 from pathlib import Path
 
@@ -62,12 +68,24 @@ def support(keys, known):
     return [k for k in keys if k in known_keys or isinstance(schemas[k.split("(")[0]], PersonalTask)]
 
 
+WARRANT = re.compile(r"^\[IR\] step=(-?\d+) .* warrant=\[(.*)\]$")
+
+
 def from_log(log_path, alpha):
     # tdlib's [coverage] pattern does not match a line with a `start:` entry (scenario_s08_03 / _04; TODO-125), so it
-    # is handed the log without its [coverage] lines, which nothing here reads
+    # is handed the log without its [coverage] lines, which nothing here reads; and without the [IR] line's warrant
+    # field (G-build), which its tails pattern would swallow: parsed here instead
     import tempfile
+    warrant = {}
     with tempfile.NamedTemporaryFile("w", suffix=".log", delete=False) as f:
-        f.writelines(l for l in open(log_path) if not l.startswith("[coverage]"))
+        for l in open(log_path):
+            if l.startswith("[coverage]"):
+                continue
+            m = WARRANT.match(l.rstrip("\n"))
+            if m:
+                warrant[int(m[1])] = dict(e.rsplit("=", 1) for e in m[2].split("  ") if e)
+                l = l[:l.rindex(" warrant=[")] + "\n"
+            f.write(l)
     log = tdlib.parse(f.name)
     Path(f.name).unlink()
     keys = sorted(next(iter(log["dist"].values())))
@@ -88,7 +106,8 @@ def from_log(log_path, alpha):
         for k in live:
             S = ir["tails"].get(k)
             adequacy = "no_observation" if S is None else ("adequate" if S >= alpha else "inadequate")
-            rows.append(dict(common, key=k, belief=dist[k], S=S, member=int(S is not None), adequacy=adequacy))
+            rows.append(dict(common, key=k, belief=dist[k], S=S, member=int(S is not None), adequacy=adequacy,
+                             warrant=warrant[t][k]))
     return rows
 
 
@@ -141,14 +160,15 @@ def in_process(run_file, steps, alpha):
                       at=";".join(at), most_likely=b.most_likely, confidence=b.confidence,
                       finding=None if b.finding is None else b.finding.value, lifecycle=b.lifecycle.value,
                       pins=";".join(pins), reentries=";".join(reentries),
-                      boundary=int(any(l.startswith("[IR-boundary]") for l in new)))
+                      boundary=int(any(l.startswith("[IR-boundary]") for l in new)),
+                      gate=robot.meta_planner._clears_gate(b).value)
         live = sorted(b.hypothesis_adequacy)
         if not live:
             rows.append(common)
         for k in live:
             S = b.tails.get(k)
             rows.append(dict(common, key=k, belief=b.distribution[k], S=S, member=int(S is not None),
-                             adequacy=b.hypothesis_adequacy[k].value))
+                             adequacy=b.hypothesis_adequacy[k].value, warrant=b.observation_warrant[k].value))
     root.removeHandler(collect)
     return rows, [l for l in collect.lines if l.startswith("[IR")]
 

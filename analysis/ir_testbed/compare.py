@@ -5,7 +5,8 @@ compare.py — expected.csv against actual.csv (full precision, the in-process B
 count compared and the count that disagrees, then every disagreement with its tick. Tick -1 (the observation before
 the clock starts, RobotAgent.observe_initial) has no log line and is not compared (reading R4).
 
-Categorical columns exactly; numeric columns against actual.csv at relative tolerance 1e-9 (absolute 1e-12 near
+Categorical columns exactly (since G-build also `warrant`, the observation warrant per hypothesis, against both files,
+and `gate`, the gate's outcome per tick, against actual.csv only: the log carries no per-tick gate); numeric columns against actual.csv at relative tolerance 1e-9 (absolute 1e-12 near
 zero), against actual_log.csv at half a unit of the printed digit (belief and confidence 5e-4, S 5e-5, position
 5e-3). The columns the recognizer does not output (expected_action, origin_x, origin_y, e, s, s_exp, D, L,
 evidence) are empty in both actual files and skipped.
@@ -20,13 +21,13 @@ import math
 import sys
 
 TICK = ["human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence", "finding",
-        "lifecycle", "pins", "reentries", "boundary"]
-HYP = ["belief", "S", "member", "adequacy"]
+        "lifecycle", "pins", "reentries", "boundary", "gate"]
+HYP = ["belief", "S", "member", "adequacy", "warrant"]
 NUMERIC = {"human_x", "human_y", "confidence", "belief", "S"}
 PRINTED = {"human_x": 5e-3, "human_y": 5e-3, "confidence": 5e-4, "belief": 5e-4, "S": 5e-5}
 LOG_COLUMNS = ["human_x", "human_y", "micro", "most_likely", "confidence", "finding", "lifecycle", "pins", "reentries",
                "boundary",
-               "belief", "S", "member", "adequacy"]
+               "belief", "S", "member", "adequacy", "warrant"]
 SKIPPED = ["expected_action", "origin_x", "origin_y", "e", "s", "s_exp", "D", "L", "evidence"]
 
 

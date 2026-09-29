@@ -24,7 +24,7 @@ for RUN in $RUNS; do
   cp "$(ls -t logs/run_*.log | head -1)" $LOG
   cp "$(ls -t logs/run_*.rec | head -1)" ${LOG%.log}.rec
   PYTHONHASHSEED=0 $PY $D/trajectory.py $RUN $steps $OUT/trajectory.json $LOG 2>&1 | grep -v '^\['
-  PYTHONHASHSEED=0 $PY $D/oracle.py $OUT/trajectory.json $RUN $OUT/expected.csv $OUT/phases.json
+  PYTHONHASHSEED=0 $PY $D/oracle.py $OUT/trajectory.json $RUN $OUT/expected.csv $OUT/phases.json $LOG
   PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $OUT/actual.csv $OUT/actual_log.csv 2>&1 | grep -v -e '^\[' -e '^  step'
   $PY $D/compare.py $sid $OUT/expected.csv $OUT/actual.csv $OUT/actual_log.csv $OUT/diff.md
   $PY $D/plot.py $OUT $LOG
