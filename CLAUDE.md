@@ -193,6 +193,11 @@ Decisions
   seventeen); the four maintained sets regenerated ("G-build" sections: prior on, only the lone coffee_break's admission
   at b + 1 moves, no completion). Recorded: the movement source is a half-plane test (the exit walk warrants the lone
   coffee_break in scenario_s09_01 from 126; a competitor is TODO-140's). Next is X.
+  X is ruled (29 Sept 2026; design_decisions.md, "T-D X: response", X1 to X5), records only, nothing built for it: the
+  occupied target gets no special handling (X1, verified in track 3), no blocked event and no fourth trigger (X2; P3 the
+  residual), the human walking toward the robot is an evaluation case (X3), the fallback is the response after a
+  retraction (X4), and the two grounds for communication are recorded, persistent by the robot's re-decision cadence
+  (X5; TODO-96, TODO-141). Next is track 3 (TODO-130); track 4 (TODO-140) first if the evaluation needs a departure.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
