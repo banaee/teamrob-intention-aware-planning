@@ -1,0 +1,233 @@
+# domains/kitting/scenarios/scenarios_s10.py
+"""
+Kitting scenarios on env_setup_10 — the meta-planner test-bed (MPB; design_decisions.md, "The meta-planner test-bed
+(MPB)"; analysis/mpb/). One module per setup. Every task instance is written in the kitting call form
+(domains/kitting/script.py), a human's script as a Script of task instances with events (T-H).
+The room is env_layout_12 (the 10/11 pattern translated by (0, -200), plus the robot's work areas); the shift
+env_setup_10: the human's item_1 (shelf_1) and item_2 (shelf_2), both designated to kitting_table_0; the robot's
+item_3 to item_6 on the NE shelves (shelf_4, shelf_7, shelf_8, shelf_9), designated to kitting_table_1; the robot's
+item_7 on shelf_5, designated to kitting_table_3 (the crossing). The robot works (its own pool) and observes the human;
+each scenario is authored to expose one decision of the recognition-to-planning chain, stated in its description; the
+oracle states the expected decision before the run (analysis/mpb/). Prior ON in the primary set (configs/mpb/).
+Disjointness (MPB-3): in every scenario the robot's items and shelves are disjoint from the human's.
+Every human script ends with the exit walk to corner_SE. The coffee break's duration is the schema's.
+_01 admission after theta; _02 the hold against an admitted projection; _03 the planning side of the mid-action change;
+_04 boundary re-admission on commitment; _05 the lone foreseeable hypothesis after the assigned tasks; _06 the control.
+"""
+
+from shared.types import AgentConfig, ScenarioConfig, Script
+from domains.kitting.actions import move_to
+from domains.kitting.script import deliver_item, coffee_break, go_to, stand
+
+
+# ===============================================================
+# the meta-planner test-bed, on "env_layout_12" (analysis/mpb/)
+# ===============================================================
+_MPB = (
+    "Meta-planner test-bed (MPB), env_layout_12: the recognition-to-planning chain with a working robot, against an "
+    "oracle that states the expected decision (trigger and cause, gate, projection) before the run (analysis/mpb/). "
+)
+_NE_POOL = [
+    deliver_item("item_3", table="kitting_table_1"),
+    deliver_item("item_4", table="kitting_table_1"),
+    deliver_item("item_5", table="kitting_table_1"),
+    deliver_item("item_6", table="kitting_table_1"),
+]
+_TWO_DELIVERIES = [
+    deliver_item("item_1", table="kitting_table_0"),
+    deliver_item("item_2", table="kitting_table_0"),
+]
+
+
+def _robot(start, pool):
+    return AgentConfig(
+        agent_id="robot_0",
+        agent_type="robot",
+        start_position=start,
+        assigned_tasks=list(pool),
+        observes=["human_0"],
+    )
+
+
+scenario_s10_01 = ScenarioConfig(
+    id="scenario_s10_01",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_01, MPB scenario 1, admission after theta: the human delivers item_1 and item_2 (assigned, never "
+        "in an order), then exits; the first walk discriminates. Authored to expose the admission on the tick the gate "
+        "first clears, through recognition_changed with cause entered (D2), for each delivery; the robot works its NE "
+        "pool, away from the human, started so that none of its task completions coincides with those ticks. Modelled "
+        "behaviour only, besides the exit walk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+scenario_s10_02 = ScenarioConfig(
+    id="scenario_s10_02",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_02, MPB scenario 2, the hold against an admitted projection: the human's script is "
+        "scenario_s10_01's; the robot's one task carries item_7 from shelf_5 to kitting_table_3 along the perpendicular "
+        "bisector of the human's diagonal kitting_table_0 - shelf_1, crossing it at its midpoint (-210, 0), and the robot "
+        "starts where its planned passage of that point coincides with the human's carry back from shelf_1 (authoring "
+        "check: both between ticks 44 and 45). Authored to expose the hold: at the decision that admits "
+        "deliver_item(item_1) (entered), the admitted plan crosses the robot's route and the robot's task carries a "
+        "hold. Declared property: that hold is positive, and no F1 robot violation occurs within the decision's "
+        "assessed window. Modelled behaviour only, besides the exit walk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((390, -573), [deliver_item("item_7", table="kitting_table_3")]),
+    ],
+)
+
+scenario_s10_03 = ScenarioConfig(
+    id="scenario_s10_03",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_03, MPB scenario 3, the planning side of the mid-action change (scenario_s09_13's script on this "
+        "room): coffee_break cut into the carry of item_1 mid-walk (PT28S, 14 of the carry's 28 steps), the break, the "
+        "resumed delivery, deliver item_2, exit. Authored to expose the chain: the admitted delivery retracted when its "
+        "carry phase turns inadequate (recognition_changed, cause retraction), the fallback projection and its expiry, "
+        "and re-admission at the next fitting phase (coffee_break at its advance to wait_at, cause entered). The robot "
+        "works its NE pool from (-250, 560), a start the pre-run timing check chose so that none of its task "
+        "completions falls within 3 ticks of that chain (analysis/mpb/authoring.md). Modelled behaviour only, besides "
+        "the exit walk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").during(
+                    move_to, "PT28S", coffee_break("coffee_machine_0"), occurrence=1),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-250, 560), _NE_POOL),
+    ],
+)
+
+scenario_s10_04 = ScenarioConfig(
+    id="scenario_s10_04",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_04, MPB scenario 4, boundary re-admission on commitment (scenario_s09_02's script on this room): "
+        "deliver item_1, coffee_break, deliver item_2, exit. Authored to expose the coffee break's own boundary b with "
+        "one delivery left: coffee_break is retired while waited holds, so deliver_item(item_2) is the single live "
+        "hypothesis at b + 1. At b the recorded hypothesis (coffee_break) is pinned and most_likely changes, so "
+        "recognition_changed fires with cause replaced (boundary stays a possible cause when the recorded hypothesis "
+        "remains the leader) and admission refuses (no observation on a boundary tick); at b + 1 deliver_item(item_2) is "
+        "admitted on commitment warrant (cause entered). The robot works its NE pool. Modelled behaviour only, besides "
+        "the exit walk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                coffee_break("coffee_machine_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+scenario_s10_05 = ScenarioConfig(
+    id="scenario_s10_05",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_05, MPB scenario 5, the lone foreseeable hypothesis after the assigned tasks: deliver item_1, "
+        "deliver item_2, a ten-tick stand at the table (stand PT10S, unmodelled, declared here), coffee_break, exit. At "
+        "the last delivery's boundary the recorded delivery is pinned and most_likely changes (cause replaced; boundary "
+        "stays a possible cause when the recorded hypothesis remains the leader), and coffee_break is then the lone live "
+        "hypothesis. The stand is authored so that a decision (the fallback's expiry) falls on standing: there "
+        "coffee_break is refused unwarranted (none(leader_unwarranted)); on the first step toward the machine it is "
+        "warranted and admitted through recognition_changed with cause entered. The robot works its NE pool."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                stand("PT10S"),
+                coffee_break("coffee_machine_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+scenario_s10_06 = ScenarioConfig(
+    id="scenario_s10_06",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_06, MPB scenario 8, the control: the human delivers item_2 only (assigned; the east shelf) and "
+        "exits, working away from every robot route (every human path, admitted plan and fallback segment at least "
+        "280 cm from the robot's NE routes, analysis/mpb/authoring.md). Declared properties: no hold at any decision, "
+        "and the robot's completion (and its per-tick positions) identical to the reference run, the same setup and "
+        "robot run without the human (analysis/mpb/reference.py; a reference run, not a scenario). Modelled behaviour "
+        "only, besides the exit walk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=[deliver_item("item_2", table="kitting_table_0")],
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)

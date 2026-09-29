@@ -1,0 +1,52 @@
+{
+  "env_objects": [
+    {
+      "id": "item_8",
+      "type": "item",
+      "subtype": "part_H",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_2",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB (env_layout_12): the occupied target's delivery (scenario_s11_01), to the table the human stands at."
+    },
+    {
+      "id": "item_9",
+      "type": "item",
+      "subtype": "part_I",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_4",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: the occupied target's alternative (scenario_s11_01), to the free table."
+    },
+    {
+      "id": "item_10",
+      "type": "item",
+      "subtype": "part_J",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: a robot item on the route the walker crosses (scenario_s11_02)."
+    },
+    {
+      "id": "item_11",
+      "type": "item",
+      "subtype": "part_K",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: a robot item, NE work area (scenario_s11_02)."
+    }
+  ]
+}
