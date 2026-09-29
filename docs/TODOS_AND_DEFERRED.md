@@ -3587,7 +3587,7 @@ scenario_s01_01 prior off at 159 (completion 201 → 186), scenario_s03_01 full_
 world 227); 23 retractions over the 52 baseline runs (`analysis/l_build/REPORT.md`).
 
 **TODO-119: A lone hypothesis is adequate right after a boundary with the human idle (recorded for P and G, T-D 1.5c, 27 Sept 2026)**
-[P PART CLOSED by T-D P1 and P2 (28 Sept 2026) as far as a refusal goes; G PART OPEN]
+[CLOSED: the P part by T-D P1 and P2 (28 Sept 2026) as far as a refusal goes; the G part by T-D G, AD1 (29 Sept 2026)]
 Prior off, after the human's last task the robot's own remaining item is the lone live hypothesis (belief 1.0 by
 normalisation), and the idle stand leaves its walk adequate for about 16 ticks (S from 0.86 down to α) before it
 turns inadequate; the gate admits it in that window (scenario_s01_01 prior off at 143 in 1.5b, a 31-tick hold). Under
@@ -3614,6 +3614,11 @@ refused, and with none eligible the robot waits. The lone-hypothesis admission a
 admitted projection outranks the fallback.
 G PART: whether that admission should stand; the rest of G's first questions are TODO-132.
 design_decisions.md, "T-D P: the fallback projection".
+G PART CLOSED BY AD1 (T-D G, ruled by Hadi, 29 Sept 2026): admission also requires warrant (commitment or observation
+that justifies admission). A lone foreseeable hypothesis at b + 1 has no commitment warrant and no observation warrant
+(its phase was opened by the boundary, not by the completion of its previous step in this episode) and is refused
+until the human walks toward its target; the last assigned delivery at b + 1 is admitted as now, on commitment warrant.
+To be built in G-build. design_decisions.md, "T-D G: admission".
 
 **TODO-120: Three small flags from the 1.5b acceptance (recorded, T-D 1.5c, 27 Sept 2026)** [OPEN; documentation]
 - `analysis/td_stage1/supp_sweep.sh` was committed without the executable bit (made executable in 1.5c; run it with
@@ -3737,7 +3742,7 @@ world model must differ from the simulator's state.
 Files: mesa_sim/sim_agents.py (`RobotAgent`), shared/ (the new object)
 Reference: design_decisions.md, "T-D P: the fallback projection", mechanics
 
-**TODO-132: G's first questions after P (recorded, T-D P, 28 Sept 2026)** [OPEN; G]
+**TODO-132: G's first questions after P (recorded, T-D P, 28 Sept 2026)** [OPEN in part: (a) parked under G, to track 3; (b), (c), (d), (e) closed]
 (a) The staleness of a fallback: the human stopped, turned or walked past what the fallback projected; what
 observation establishes it (a departure from the projected position by `min_separation` is one candidate, not a
 ruling, because `min_separation` is the body's safety constraint), and whether it is a trigger. RULED IN PART by P4 /
@@ -3753,6 +3758,20 @@ walks, a consequence of P's ruling 3 (the candidate's own horizon); scenario_s05
 ticks from tick 0 in both priors (the ground for P4, which removes the refusal). P3 (open, design_decisions.md, "T-D P"): what the meta-planner projects when an
 admitted projection reaches its horizon, the open part being a projection ending at a non-terminal action
 (scenario_s05_01 prior on, tick 92: T_h 4.00, δ 0, `[sep]` 6.96 cm).
+MEASURED AT (recorded at G-records, 29 Sept 2026): the P3 case was measured on the P-build baselines (fa26176) and does
+not occur under P4 and Track 2.5 (verified 29 Sept 2026 at a412b39: tick 92 has no decision; the run's minimum `[sep]`
+is 58.31 cm at tick 25). P3 stays parked, with no instance in the maintained sets.
+G-RECORDS (T-D G, ruled by Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admission"):
+- (a) PARKED under G, with a candidate principle that is not a ruling: a fallback projection is warranted only while
+  the evidence it was built from holds, so its expiry can occur by reaching its time horizon or by the underlying
+  persistence breaking (the run length or the standing count no longer equal to k + the elapsed ticks, k derivable from
+  the recorded expiry; a state reading in L2 (ii)'s form, one new trigger condition on an existing observable).
+  Evidence: scenario_s05_02 prior on (42 ticks held against a 23-tick stay; completion 214, against 195 before P). To
+  be decided at track 3 (TODO-130), whose oracle can state the expected decision tick before the run. Not implemented.
+- (b) CLOSED into X's occupied-target item (`docs/handoffs/handoff_G_X_onward.md` §5).
+- (c) CLOSED as answered: L5 B refuses on the boundary tick (no hypothesis is a member there), and the decision at
+  b + 1 is AD1's.
+- (e) CLOSED by AD1 (TODO-119's G part).
 Files: shared/meta_planner.py (`evaluate_triggers`, `_clears_gate`, `update_human_projection`)
 Reference: design_decisions.md, "T-D P", consequence recorded; TODO-95, TODO-119
 
@@ -3766,7 +3785,7 @@ gone with the refusal it came from. Not examined further.
 Files: analysis/tb1b_two_tables/sweep/, analysis/tb3_full_reorder/sweep/
 Reference: design_decisions.md, "T-D P", BUILT
 
-**TODO-134: Does L2's observation offset apply to a fallback stand? (recorded, P4-build, 28 Sept 2026)** [OPEN]
+**TODO-134: Does L2's observation offset apply to a fallback stand? (recorded, P4-build, 28 Sept 2026)** [PARKED (T-D G records, 29 Sept 2026)]
 Every human projection starts at the observation offset (L2: the observed position is true at step 1 of the robot's
 projection), so the robot's first tick after a decision is unassessed against the human (T3b). For a fallback stand
 the position at the decision tick is the observation itself: the human stood there and, standing, is there on the
@@ -3775,6 +3794,8 @@ at tick 171 inside that first tick (violating shifts (0.06, 53) from the offset,
 stand should start at step 0 is the question; a design decision, not a fix.
 TRACK 2.5 (29 Sept 2026): with the exit walk on scenario_s03_01 (docs/assumptions.md 1.1) the case no longer occurs in
 the maintained sets (`[sep]` minimum 48.25 cm prior off, 60.15 cm prior on, single_task); the question stands.
+PARKED (G-records, Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admission"): to be ruled only if track 3
+(TODO-130) produces an instance in scope.
 Files: shared/projection.py (`Projector.project_fallback`), shared/realization.py (the assessed window)
 Reference: design_decisions.md, "T-D P", BUILT (P4-build), the observation-offset gap; L2; T3b
 

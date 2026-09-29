@@ -4270,6 +4270,9 @@ R, ruled.
 - R1. The `unknown` hypothesis leaves the hypothesis space. The belief is normalised over live task hypotheses only. u (`UNKNOWN_LIKELIHOOD`), `graded_unknown_likelihood` and the grade f leave the belief; per stretch each live hypothesis pays L. A lone live hypothesis reads 1.0 at zero evidence; two rivals start at 0.5. The ceiling 1/(1 + uⁿ) is gone. Expected and measured in Stage 1, not corrected.
 - R2. The recognizer reports an adequacy finding beside the belief: unresolved, adequate, unexplained (E5 to E7 define it), and beside the finding the per-hypothesis tail probabilities S_k for evaluation.
 - R3. Belief and finding are independent outputs. The recognizer's state is their product plus the lifecycle state; combinations are examples of what the outputs jointly express, not a state machine, and no transitions are defined.
+  AMENDED (T-D G, AD2, ruled by Hadi, 29 September 2026; to be built in G-build): three independent outputs: the
+  belief; adequacy and the finding; warrant (observation warrant per live hypothesis). design_decisions.md, "T-D G:
+  admission".
 - R4. Exhausted is a lifecycle state, reported when no task hypothesis is live; no finding is reported in it; nothing is unexplained in it. It replaces the reading "`unknown` at 0.995".
 - R5. The recognizer decides nothing about action. What the meta-planner does with belief, finding and lifecycle is G and X, open.
 - R6. Unchanged: the excess-path likelihood, β as a body-supplied tolerance, the per-hypothesis origin and fold at the phase advance, "an empty stretch is not an observation" for the belief (I4c), the terminal pin and the boundary rule as built. The verified invariant "belief equals odds against `unknown`" no longer exists. The primary arithmetic invariant after `unknown` is removed: on every tick the returned probabilities sum to 1 over exactly the live hypothesis set H, and retired (pinned) hypotheses stay outside H under the existing support restriction. Stage 1 verifies this invariant and, separately, the adequacy accounting.
@@ -4895,6 +4898,10 @@ scenario_s05_01 prior on, tick 92: an admitted projection with T_h = 4.00 and δ
 the arriving human, `[sep]` 6.96 cm. The bound: when the projected end is a terminal action, L1's boundary re-decides
 within the human's completion latency, so the exposure is those few ticks and the body's stop; the open part is a
 projection ending at a non-terminal action.
+MEASURED AT (recorded at G-records, 29 Sept 2026; design_decisions.md, "T-D G: admission"): the cited case was
+measured on the P-build baselines (fa26176) and does not occur under P4 and Track 2.5 (verified 29 Sept 2026 at
+a412b39: tick 92 has no decision; the run's minimum `[sep]` is 58.31 cm at tick 25). P3 stays parked, with no instance
+in the maintained sets.
 
 Consequence recorded. After L an admitted projection cannot go stale beyond the finding's threshold (the leader is
 retracted when its phase turns inadequate); P adds no staleness rule for admitted projections. For G: the staleness
@@ -4949,3 +4956,104 @@ P is closed with P4; P3 stays open; next is G.
 Reference: cchat, 28 September 2026 (P, P Q2 reopened); T-D Q1 (handoff_T-D_onward.md, item 1, and its SETTLED
 note: P's building block); F1; R1; T3b; T9; T-B Q7; D2; "T-D L" (L2 (ii), L5 B); "T-D R and E" (G1); T-C2c's
 authoring convention; TODO-80, TODO-95, TODO-119
+
+---
+
+**T-D G: admission (ruled by Hadi, 29 September 2026)**
+
+Cycle 2, G: what counts as grounds for admitting a hypothesis. Admission is the meta-planner's gate outcome: the leader
+(the hypothesis with the highest probability) is accepted and the human projection is built for it. Ruled in cchat on
+the IR test-bed's results and the maintained sets after L, P and Track 2.5 (`docs/handoffs/handoff_G_X_onward.md`, §3
+and §4, G Q1 and G Q2). Records only (session G-records); built in G-build. The rulings are labelled AD1 to AD5
+(admission); "G1" in older records keeps its meaning, the 1.5 guard on admission ("T-D R and E", "1.5 rulings").
+
+Problem. The gate admitted a leader whose probability was at least θ and whose hypothesis adequacy (per live
+hypothesis: adequate, inadequate or no observation, E6 and G1) was adequate. Both can hold with nothing observed for
+the hypothesis. The belief is relative (R1): a lone live hypothesis reads 1.0 by normalisation. Adequate means not
+contradicted, which the first tick of a phase and one step in any direction satisfy. Cases: scenario_s09_01 after 124
+(`coffee_break` lone at 0.997, admitted at once, the finding unexplained from 157); the maintained sets after the
+observed human's assigned tasks are done (the returning foreseeable hypothesis admitted at b + 1, retracted later);
+every boundary that meets a recorded decision (TODO-119's G part).
+
+- AD1, admission.
+  Ruling. The gate admits the leader when its probability is at least θ, its hypothesis adequacy is adequate, and it
+  has WARRANT: commitment or observation that justifies admission. AD1 restates the 1.5 guard G1 (the leader adequate
+  in its own derived phase) and extends it by the third condition. Warrant has two sources.
+  - Commitment warrant: the hypothesis is one of the observed human's assigned tasks (prior on), matched by task
+    equality (`same_task`), as the support restriction matches them. "Assigned" only: a live hypothesis is open, its
+    terminal fact not holding (L4), so "open" adds nothing.
+  - Observation warrant: the hypothesis's current derived phase (the action it expects now, from its origin to its
+    phase advance) holds evidence for it. For a phase with a movement target (`move_to`): the path-cost gain toward the
+    phase's target since the phase origin is positive, C(o, g) − C(p, g) = w − e > 0 (o the origin, p the current
+    position, g the target, w the path walked since the origin, e the excess path: the quantities of the excess-path
+    statistic; no new statistic, no constant). For any phase, a phase without a movement target included (`pick_up`,
+    `place`, `wait_at`): the phase was entered by the observed completion of the hypothesis's previous step in this
+    episode (the completion E8 reads). A phase without a movement target has observation warrant through that entry
+    only.
+  Observation warrant resets with the origins, at a boundary and at a phase change; commitment warrant does not reset,
+  it derives from the assigned tasks.
+  Why. The belief is relative (R1), so a lone live hypothesis reads 1.0 with nothing observed, and adequate means not
+  contradicted, which one step in any direction satisfies. The gate conflated plausibility (what is live and how the
+  mass starts, and later context knowledge) with warrant (what has earned admission). Assignment is not plausibility
+  only: an assigned task is a known commitment (`docs/assumptions.md` 2.2, 2.6) that warrants projecting it before
+  movement, and a deviation from it is handled by retraction (`docs/assumptions.md` 3.3; "T-D L", L2 (ii)). The
+  existing machinery was checked and does not give the distinction: membership (E6 as amended) holds after one step
+  in any direction; S measures surprise, not warrant (one step straight away gives S ≈ 0.74 at v = 20 cm/tick,
+  β = 0.01 /cm, still adequate at α = 0.05).
+  Cases. scenario_s09_01 after 124; the maintained sets after the assigned tasks are done; every boundary that meets a
+  recorded decision.
+  Consequences. The lone `coffee_break` after the assigned tasks are done is not admitted until the human walks toward
+  the machine. The last assigned delivery at b + 1 is admitted as now (commitment warrant). An assigned rival is
+  admissible the moment it clears θ. A lone foreseeable task is admitted on its first step toward its target: θ does
+  not protect a lone hypothesis, and a magnitude threshold on the gain would be a constant. Prior off has no commitment
+  warrant, so every hypothesis needs observation warrant there (expected; `docs/assumptions.md` 1.4). The evaluation
+  counts what these produce.
+  Set aside. Admission as before (no warrant). The w − e > 0 test applied to every phase: e is 0 for a phase without a
+  movement target, so w − e would be w, the path walked since the origin, and walking away would warrant the phase;
+  case: `coffee_break` re-entering in its `wait_at` phase while the human walks away from the machine (L4's recorded
+  consequence), lone at about 1.0 and adequate at S = 1 within its priced standing, would be admitted. A magnitude
+  threshold on the gain (a constant).
+
+- AD2, three outputs.
+  Ruling. Warrant is a third independent dimension beside belief and adequacy; R3 is amended from two independent
+  outputs to three (the belief; adequacy and the finding; warrant). Warrant is not a kind of adequacy. The recognizer
+  reports observation warrant per live hypothesis on `BeliefState`; the gate reads it and adds commitment warrant from
+  the observed human's assigned tasks, passed to the meta-planner as a new input (today they go to the recognizer
+  only, as its support restriction; TODO-123). The gate reconstructs no recognizer quantity (no origin, w, e, phase or
+  target).
+  Why. The recognizer reports what the observations support (R5); the gate combines that with knowledge available to
+  the planner; the two sources stay distinguishable.
+
+- AD3, loss of warrant.
+  Ruling. Loss of observation warrant fires nothing and clears no admitted projection. Retraction stays on the
+  recorded hypothesis's inadequacy (L2 (ii)). Admission is re-asked at the existing triggers only, where an
+  unwarranted leader is refused.
+  Why. Warrant answers whether a hypothesis has earned admission, not whether it is still valid; a second retraction
+  criterion would reopen L2's rejection of a turn-back rule and fire on every small reversal.
+  Consequence. After a turn-back the exposure is bounded by L2's inadequacy delay, as today.
+
+- AD4, representation.
+  Ruling. The `[IR]` line prints, per live hypothesis, `warrant=none|observation` (commitment warrant is the gate's
+  knowledge and is never printed by the recognizer); the line's exact form is settled at G-build's plan step. The
+  gate's refusal reasons gain `none(leader_unwarranted)`, checked after `none(leader_inadequate)`. The admission's
+  warrant source (commitment or observation) is named on `[meta-proj] projection=built`, and on `[meta-b2]` where that
+  line exists (under `b2a` only); when both sources hold, both are printed.
+
+- AD5, the short-lived fit (G Q2, closed).
+  Ruling. A short-lived fit needs no persistence rule: a rival's stationary phase satisfied by the human's own
+  stationary ticks within s_exp (the standing the Projector prices for the phase); scenario_s09_09 at 83 to 87 (the
+  grasp flicker); `coffee_break` re-entering in `wait_at` within reach of the machine. It stays a finding-level reading
+  unless θ, adequacy and warrant make it decision-relevant. scenario_s09_09 is recorded as a boundary case
+  (`docs/assumptions.md` 2.2), not a ground for a recognizer rule.
+  Why. A count would be a temporal constant; in both cases nothing reaches admission.
+
+Unchanged: `realize()`; the trigger set; retraction as L2 (ii) rules it; P4's fallback projection; `_clears_gate` as
+the one home of the gate.
+
+Staging. G-build follows in its own session. Verification on picked scenarios (scenario_s09_01's tail, scenario_s09_09,
+scenario_s09_06, scenario_s05_01 prior on, one control scenario); the IR test-bed's oracle extended by derivation from
+this entry for the warrant output; the four maintained sets as md5 regression plus one completion table.
+
+Reference: cchat, 29 September 2026 (G); `docs/handoffs/handoff_G_X_onward.md` §3, §4; "T-D R and E" (R1, R3, R5, E5,
+E6, E8, the 1.5 guard G1); "T-D L" (L2 (ii), L4, L5 B); "T-D P" (P4); `docs/assumptions.md` 1.4, 2.2, 2.6, 3.3;
+TODO-119, TODO-123, TODO-130, TODO-132
