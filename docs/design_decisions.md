@@ -2263,6 +2263,9 @@ Recorded (R2, September 2026); no decision changed. Measurements: `analysis/c_se
 - OPEN, FOR D2: C's "no trigger fires on a stop" is expected to be reversed. The mind does not know the
   body has stopped (liveness); what event a stop is, and whether an episode length matters, is D2's
   question with the trigger set (TODO-68 / 48 / 54).
+  SUPERSEDED IN PART (T-D X, X2, ruled by Hadi 29 September 2026): not reversed. No trigger fires on a stop and no
+  blocked event is built: the stop's refusal adds no information the mind needs; P4's `projection_expired` and L2 (ii)'s
+  retraction re-decide on where the human is. The stop (C) is unchanged. design_decisions.md, "T-D X: response".
 - FREEZING. A robot that stops safely and cannot progress is related to the freezing robot problem
   (P. Trautman and A. Krause, "Unfreezing the robot: navigation in dense, interacting crowds", IROS 2010;
   bibliographic details not verified in this session), though that arises from prediction uncertainty in
@@ -2449,6 +2452,9 @@ trigger cannot change a decision, so it fixes no liveness; with the stop on, eve
 fixtures is the human's terminal stay at the table with one task left (R2, `blocked.md`), where neither
 policy has anything to choose. The design chat's earlier claim that D2 removes that deadlock is withdrawn.
 TODO-77 (the projector's pick_up accounting) stays out of D2: a projector item, not a trigger question.
+SUPERSEDED IN PART (T-D X, X2, ruled by Hadi 29 September 2026): the blocked event is not built and no fourth trigger is
+added. The refusal adds no information the mind needs; P4's `projection_expired` and L2 (ii)'s retraction re-decide on
+where the human is. The separation stop (C) is unchanged. design_decisions.md, "T-D X: response".
 
 MEASURED (PYTHONHASHSEED=0; the sweep and the evaluation fixtures, prior off / on; baselines at the
 pre-D2 HEAD agree byte-for-byte with F1's and F47b's on the decision grep):
@@ -3012,6 +3018,9 @@ next trigger) against RECONSIDER (mark the blocked task not executable now, a ma
 a cost, and select among the others). Under wait the trigger cannot change the decision, so the pair is
 built and evaluated together, with the declared stay as the fixture that makes the comparison possible
 (F47b found that no task-scripted fixture blocks mid-run: a stay the projection carries is priced).
+SUPERSEDED IN PART (T-D X, X2, ruled by Hadi 29 September 2026): the blocked event and the WAIT / RECONSIDER pair are
+not built; no fourth trigger. At the re-decision P4 or L2 (ii) brings, B3 re-prices the blocked task against the
+observed stand. The separation stop (C) is unchanged. design_decisions.md, "T-D X: response".
 
 MEASURE. Blocked time and completion (the world fact, T6), wait against reconsider; and on the other two
 scenarios, whether retraction and re-recognition fire as expected and whether `unknown` leads.
@@ -4838,6 +4847,9 @@ SUPERSEDED IN PART (Track 2.5, ruled by Hadi 28 Sept 2026): "no retroactive scop
 longer holds. docs/assumptions.md 1.1 extends the authoring convention to the regression fixtures whose terminal stand
 is not their purpose; the six scripts end with the exit walk (52295f7), and the twelve occupied-target logs of P4 now
 complete (the maintained READMEs, "2.5"). The occupied target stays X's case, now with no instance in the fixtures.
+RULED BY X (29 Sept 2026; design_decisions.md, "T-D X: response"): the occupied target has no special handling (X1);
+the blocked route (the human standing on the robot's walk to its target) gets no ruling of its own: see X1 (no
+special handling) and X2 (no blocked event).
 
 Consequence of ruling 3 (the candidate's own horizon), recorded: a fallback can refuse every candidate at a decision
 while the human walks, and the robot then waits by polling until the tail frees one. scenario_s05_01 under
@@ -4937,6 +4949,8 @@ scenario_s01_06 and scenario_s06_06 (complete at 265, `[sep]` 26.0 cm, as before
   at the separation boundary is an observed consequence of P4, not an assumption: the robot walks to where realization
   against the observed stand clears it and holds there, about `min_separation` from the human (63.42 cm above), and
   reconsiders at each expiry. What else the robot may do is X's. Under Track 2.5's exit walk these logs complete.
+  RULED BY X (29 Sept 2026; design_decisions.md, "T-D X: response", X1): no special handling; with an alternative task
+  B3 selects on realized cost, with none the robot holds and the lengthening holds are an evaluation observation.
 - The observation-offset gap, recorded (scenario_s03_01 `single_task`, both priors, `[sep]` 30.12 cm at tick 171).
   The decision at 171 (`no_current_task`) rested on a fallback stand (count 52, [1, 53] on the decision clock) and
   chose item_7 with δ = 0; its first step, from 35.5 cm of the standing human, passes 30.12 cm from it (rule (b):
@@ -5097,3 +5111,98 @@ completion scenario_s01_01 201 → 199, scenario_s06_03 realized 236 → 226 (tb
 Reference: cchat, 29 September 2026 (G); `docs/handoffs/handoff_G_X_onward.md` §3, §4; "T-D R and E" (R1, R3, R5, E5,
 E6, E8, the 1.5 guard G1); "T-D L" (L2 (ii), L4, L5 B); "T-D P" (P4); `docs/assumptions.md` 1.4, 2.2, 2.6, 3.3;
 TODO-119, TODO-123, TODO-130, TODO-132
+
+---
+
+**T-D X: response (ruled by Hadi, 29 September 2026)**
+
+X asks what the robot does when its planned behaviour meets the actual interaction situation, or when no task-level
+choice resolves it. X is not a recognition mechanism. The chain: P, what the human's observed behaviour implies for the
+future (the fallback projection, the short-term physical projection from what was observed); G, whether a hypothesis is
+warranted and adequate enough to plan against (admission, AD1); planning, which task the robot selects on realized cost
+(its projected duration plus the hold realization places, B3); X, what happens when that meets the situation. Ruled in
+cchat on the X questions of `docs/handoffs/handoff_G_X_onward.md` §5. Records only (session X-records): X adds no
+mechanism, and nothing is built. The rulings are labelled X1 to X5.
+
+- X1, the occupied target.
+  Ruling. The occupied target (a human standing where the robot must work, and keeping standing) gets no special
+  handling.
+  Why. The response is a test of the existing adaptive-planning semantics, not a rule. With an alternative task in the
+  pool, B3 selects on realized cost and the occupied task's hold is expected to make the alternative preferable, so the
+  robot leaves the occupied target through ordinary reconsideration; with none, it holds, and the lengthening holds
+  (P4's consequence: a longer observed stand projected at each expiry) are an evaluation observation. Whether that
+  behaviour is desirable is an evaluation result, not a claim of correctness.
+  Verification. One authored scenario, a declared persistent stand at the robot's target with at least one alternative
+  task in the robot's pool, placed in the meta-planner test-bed (TODO-130), not a new maintained fixture. The expected
+  property: the switch by cost. A derived verification condition, not a parameter: the occupied task's hold is at most
+  the observed standing count (P4), so the authored stand must be long enough for that hold to exceed the relevant cost
+  difference between the occupied task and the alternative, the return walk included when the robot carries the
+  occupied task's item (`deliver_with_return`).
+  Set aside. A give-up threshold (a constant); a communication act (X5).
+
+- X2, the blocked event.
+  Ruling. No fourth trigger; TODO-80's blocked-execution event (the separation stop's refusal of a step reported to the
+  mind as a trigger, with WAIT against RECONSIDER as its response) is not built.
+  Why. The body's refusal of a step adds no information the mind needs; the planning-relevant fact is where the human
+  is, and P4 supplies it through observation and projection. Under a fallback, `projection_expired` re-decides within
+  the observed persistence. Under an admitted projection that had the human elsewhere, the hypothesis turns inadequate
+  at α's threshold (its tail probability below the test level) and L2 (ii) retracts. At that re-decision B3 re-prices
+  the blocked task against the observed stand and keeps it while its hold is the cheaper choice. This does not
+  reproduce RECONSIDER (which excludes the blocked task) in general; the two agree when the hold makes an alternative
+  cheaper, or when there is none. The delay before the re-decision is an observed consequence of the projection and
+  adequacy mechanism, not a missing trigger. The separation stop stays an execution-level safeguard (WAIT, the robot
+  standing while a step is refused, is its built behaviour), on for demonstrations, off for evaluation
+  (`docs/assumptions.md` 4.6), so a blocked trigger would act only in runs the evaluation does not count.
+  Residual: P3. An admitted projection past its T_h (the end of the human projection) whose hypothesis stays adequate
+  re-decides nothing; P3 is parked without an instance; in demonstrations the stop holds the robot there.
+  Superseded in part: D2's blocked-event paragraph ("What a trigger is an event of"), the blocked event of "Robustness
+  is tested in kitting", "After C"'s expected reversal of "no trigger fires on a stop", and TODO-80's mind side. The
+  stop (C) is unchanged.
+
+- X3, the human walking toward the robot.
+  Ruling. No planning rule; an evaluation case.
+  Why. Before the walk is observable the recognizer has not warranted it and P4 projects little. Once it is observable,
+  realization responds at the next re-decision (the fallback's expiry, or the retraction), not on the tick the walk
+  becomes observable; the interval before it is what the near-encounter (ticks with the robot–human distance below
+  `min_separation`, classified by F1's classes; `docs/assumptions.md` 4.6) measures. The scenario is TODO-135, authored
+  with the evaluation, compared with plain cost and the fallback-only control (TODO-137).
+
+- X4, after a retraction.
+  Ruling. The fallback projection is the response; nothing more.
+  Why. The fallback is the physical reading of what the robot knows. The union projection (planning against the plans
+  of several hypotheses) is a change of planning semantics for ambiguity and stays parked under TODO-97, with its own
+  gate.
+
+- X5, communication.
+  Ruling. Communication is an X-level response, considered when the robot reaches a persistent situation its current
+  recognition-and-planning machinery cannot resolve. Two grounds, recorded and kept distinct, each defined by an existing
+  observable and no constant:
+  (1) Not understanding: the adequacy finding (the recognizer's output on whether any live hypothesis explains the
+  observations) is unexplained and has outlived at least one re-decision (a trigger fired, admission refused, the
+  finding still unexplained); persistence is measured by the robot's own re-decision cadence. The tick-level reading
+  is the evaluation analysis's.
+  (2) Understanding without resolution: at a decision every candidate's realized plan holds against the projected
+  human, and at the robot's next re-decision the same structural condition still holds.
+  No mechanism and no runtime event is built for either. Ground (1) is reconstructible from existing logs (`[IR] …
+  finding=`, `[meta-trig]`, `[meta-proj]`); ground (2) from `single_task` logs (`[meta-cand] delta=` per candidate).
+  `full_reorder` logs no per-candidate hold (`[meta-win]` only the winner's), so ground (2) there needs evaluation-time
+  logging (TODO-141). Both are read as an evaluation analysis.
+  Why ground (2) is persistent. Without persistence the condition describes an ordinary transient obstruction that the
+  hold resolves; communication concerns a situation that has survived the system's normal opportunity to reconsider.
+  The robot's own decision cadence is the measure; no constant.
+  What this contribution claims: the framework reaches and identifies a state in which communication is warranted as a
+  response; it does not implement or select a communication act. The act, its channel and its effect are future work
+  with the reactive human (TODO-96, TODO-136). TODO-96's condition "a blocked event that WAIT and RECONSIDER do not
+  resolve" is retired as an independent condition; it folds into ground (2).
+  Set aside. For ground (2), "a hold cleared only by the projection's end": it ties the condition to one projection
+  mechanism.
+
+Unchanged: the trigger set (`no_current_task`, `recognition_changed`, `projection_expired`); `realize()`; P4's fallback
+projection; G's gate (`_clears_gate`: θ, adequacy, warrant); the separation stop (C).
+
+Reference: cchat, 29 September 2026 (X); `docs/handoffs/handoff_G_X_onward.md` §5; "T-D P" (P4, Q6, the deadlock, the
+occupied target, P3); "T-D G" (AD1); "T-D L" (L2 (ii)); C; "After C"; D2; "Robustness is tested in kitting"; "Cancellation
+is not a meta_planner cost term" (`deliver_with_return`); `docs/assumptions.md` 3.4, 4.2, 4.4 to 4.6; TODO-80, TODO-95,
+TODO-96, TODO-97, TODO-130, TODO-135, TODO-136, TODO-137, TODO-141
+
+Next: track 3 (TODO-130); track 4 (TODO-140) may move first if the evaluation needs a genuine departure.
