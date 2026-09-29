@@ -5206,3 +5206,174 @@ is not a meta_planner cost term" (`deliver_with_return`); `docs/assumptions.md` 
 TODO-96, TODO-97, TODO-130, TODO-135, TODO-136, TODO-137, TODO-141
 
 Next: track 3 (TODO-130); track 4 (TODO-140) may move first if the evaluation needs a genuine departure.
+
+---
+
+**The meta-planner test-bed (MPB) (ruled by Hadi, 29 September 2026)**
+
+Track 3 (TODO-130), after X. Ruled in cchat; records only (session MPB-records); nothing is built in this step. The
+rulings are labelled MPB-1 to MPB-6 (not T3 or T3b, the Phase 4C realization tasks). The corrections and rulings Hadi
+made on the records plan (29 September 2026) are written into the rulings below.
+
+Purpose. To test the recognition-to-planning chain (the recognizer, the gate, the projection, the meta-planner) with a
+working robot, one authored scenario per decision. The oracle (the instrument's own derivation of the expected
+decision from the records) states the expected decision before the run; a disagreement is classified, never fitted. The
+IR test-bed (track 1, TB) tested the recognizer with an idle robot; this instrument tests the decisions the
+contribution claims. It is the last instrument before the evaluation and the demonstration.
+
+- MPB-1, the oracle's expected decision.
+  Ruling. A meta-planner decision has four parts with different epistemic status.
+  (1) The trigger tick and its cause (a trigger: the condition on which the meta-planner re-decides). The causes
+  compared are the four of `recognition_changed` — entered (no decision is recorded and the gate clears), replaced
+  (the belief no longer points at the recorded hypothesis), boundary (the belief was re-initialised at an episode
+  boundary, the observed human's completion of a terminal action; L1, L5 B), retraction (the recorded hypothesis's
+  hypothesis adequacy, whether it explains its own derived phase, turned inadequate; L2 (ii)) — and
+  `projection_expired` (the fallback projection the last decision rested on has reached its end; Q6). What they read
+  of the human is derivable pre-run from the human's script, the layout and the records (the completions, the
+  adequacy, the persistence rule); `no_current_task` depends on the robot's own progress and is read from the run as
+  an observed fact.
+  (2) The gate's outcome at the trigger (belief, hypothesis adequacy, warrant, the assigned tasks, θ), pre-run.
+  (3) The projection the decision rests on (the admitted task's plan from the task model, or the fallback projection,
+  the short-term physical projection from the observed persistence), pre-run.
+  (4) The selection (the winner and its hold), which depends on the robot's realized state.
+  The oracle derives per-tick tables pre-run: the boundary ticks, the ticks at which a hypothesis turns inadequate, the
+  gate's outcome and leader, and the fallback a decision on that tick would rest on, with its end per the observed
+  persistence. The (tick, cause) chain is assembled at the compare step from those tables and the run's observed
+  `no_current_task` ticks, with D3's order on a shared tick (`no_current_task`, then `recognition_changed`, then
+  `projection_expired`: a `no_current_task` tick masks the others); the decision record (the hypothesis the last
+  decision was projected against, and the tick its fallback ends) follows from the chain, since a record is set at
+  every decision, the robot's included. The assembly imports nothing from the planner. Part 4 is checked as
+  properties the scenario declares, derivable from the layout by the author (for the occupied target: the alternative
+  wins at the first expiry whose hold exceeds the layout's cost difference). The oracle states what the decision rule
+  should conclude from the world's facts, never how the planner scores.
+  The independence boundary. The oracle imports nothing from `shared/meta_planner.py` (the triggers, the gate, the
+  cost strategy, selection), `shared/realization.py`, `shared/projection.py` (the projected durations,
+  `Projector.project_fallback`), `shared/recognizer.py` or `shared/likelihood_functions.py`, nor
+  `RobotAgent._perceive` (`mesa_sim/sim_agents.py`). It derives P4's perception facts (the run length and the standing
+  count, the same direction within 1e-9) and the fallback's tail itself. It may use the planner's decomposition as the
+  IR test-bed does (task and hypothesis definitions, not cost, realization or selection logic).
+  Why. An oracle that reconstructs part 4 is a second planner, and a disagreement between two planners says nothing
+  about which is wrong. The chain is assembled at the compare step because the record it reads is set at the robot's
+  decisions too.
+  Set aside. Full per-tick reconstruction; a single expected property per scenario without the per-tick parts.
+
+- MPB-2, the scenarios.
+  Ruling. Eight, each exposing one decision.
+  (1) Admission after θ: two assigned deliveries, the first walk discriminates. The admission comes on the tick the
+  gate clears, through `recognition_changed` with cause entered (D2): the expected tick is the crossing (the tick the
+  leader's share first clears the gate).
+  (2) The hold against an admitted projection (the hold: the ticks the robot stands still before its entry so that the
+  realized plan keeps `min_separation`): the admitted human plan crosses the robot's route.
+  (3) The planning side of the mid-action change (scenario_s09_13's chain): retraction, the fallback, re-admission at
+  the next fitting phase.
+  (4) Boundary re-admission: b refused, b + 1 admitted on commitment (commitment warrant: the hypothesis is one of the
+  observed human's assigned tasks).
+  (5) The lone foreseeable hypothesis after the work order: unwarranted on standing, warranted on the first step
+  toward the machine, admitted through `recognition_changed` with cause entered on the first warranted tick.
+  (6) The occupied target with an alternative task (X1): a declared stand at the robot's table, long enough by the
+  derived condition (the hold, at most the observed standing count, must exceed the cost difference, the return walk
+  included when carrying), a second delivery elsewhere; the switch by cost.
+  (7) The fallback against a walker and against a stander: a straight run across the route, later a stand beside the
+  route that ends before its projection; the expiry cadence. The stand is evidence for TODO-132 (a) (re-decision at
+  the expiry only, holds outlasting the stay), recorded, not a verification of a rule.
+  (8) The control: the human works away from every robot route; no hold at any decision, and completion identical to
+  the same setup run without the human (a reference run, not a scenario).
+  Recorded for scenarios 4 and 5: with the coffee machine in the room, `coffee_break` is live after every delivery
+  boundary (L4), so at b + 1 the prior gives each live hypothesis 1/2 and θ is not cleared; b + 1 admission on
+  commitment requires a single live hypothesis (after the coffee break's own boundary with one delivery left,
+  `coffee_break` retired while `waited` holds) or the second-layout allowance below. Step 2's derivation shows which.
+  Environments. One newly authored controlled layout, env_layout_12, as the default, authored for the physical facts
+  the scenarios need (a crossing, an occupied table with a second free, a run and a stand on a route, clear routes),
+  not for any expected number. Setups vary within it (env_setup_10, env_setup_11, ...): a setup holds the item
+  placement and designations; the positions, the pools and the scripts are the scenario's. A second controlled layout
+  only where the geometry itself must change, reported as such. Ids on the serial rule (T-L, ruling 4 as amended): a
+  scenario's id repeats its setup's serial (scenario_s10_MM on env_setup_10, scenario_s11_MM on env_setup_11).
+  Why. The existing layouts (1 to 9 for development, 10 and 11 for the recognizer) were not authored to isolate a
+  planning decision, so a disagreement in them could not be attributed; a controlled room makes the property
+  derivable beforehand; varying the setup rather than the room keeps the control scenario meaningful.
+  Set aside. Reusing env_layout_11; one layout per scenario; authored parameter variants (the test-bed is not a sweep).
+
+- MPB-3, the robot's acts and the compare level.
+  Ruling. The oracle's world holds the human's facts. The per-tick tables of parts 1 to 3 stay pre-run derivable
+  because every scenario keeps the robot's items and shelves disjoint from the human's, so the robot's acts touch no
+  fact a human hypothesis reads (L4's live set) and the human's trajectory does not depend on the robot
+  (`docs/assumptions.md` 4.2). The disjointness rule is an authoring constraint of this test-bed, checked per scenario
+  (its pools, its setup's item placement) before its runs, not a framework assumption; it gives the independence with
+  the prior on only (MPB-6). The robot enters at the compare step only, from the run's own record: its logged
+  positions, decisions and `no_current_task` ticks.
+  Compare levels. Part 1: the set of (tick, cause) for entered, replaced, boundary, retraction and
+  `projection_expired`, exact, with the `no_current_task` ticks listed. Part 2: the outcome name and the leader at
+  every decision tick, exact. Part 3: the projection's identity (the admitted hypothesis key, or the fallback with its
+  mode, k and end), exact. Part 4: the declared properties as booleans over the logged robot state.
+  Part 4's inputs. The planner's logged decision values (the winner, its hold on `[meta-win]`, `[meta-cand] delta`) are
+  observed inputs to a declared property, never inputs to the oracle's derivation of what should hold. The
+  instrument's own computation is the F1 check (the separation classes) over the executed positions, and the layout's
+  path lengths; never a hold.
+  The in-process read of `BeliefState` and the meta-planner's outputs is the primary source, the log the check.
+  Why (part 4's inputs). A hold the instrument computed would be MPB-1's second planner.
+  Set aside. The oracle simulating the robot; everything read from the log after the run.
+
+- MPB-4, verification and disagreements.
+  Ruling. A scenario is verified when parts 1 to 3 show zero disagreements at exact equality on every tick, prior on,
+  and every declared part-4 property holds (prior off: MPB-6). Outputs as in the IR test-bed: the expectation written
+  before the run, the in-process and the log-derived actuals, the comparison with a classified diff.md, a figure, a
+  summary, a REPORT with numbers and md5s.
+  The oracle's own check: the single-rule alteration test of the IR test-bed (one rule of the derivation altered in a
+  scratch copy; the comparison must detect it). The derivations new to the MPB oracle are the expiry cadence and the
+  projection identity; on the gate with warrant, derived by the IR test-bed since G-build (its rule 23), only the
+  alteration test is new. An undetected alteration is recorded as a property of the test set with its reason, as the
+  IR test-bed did (E8's member clause), unless it is an oracle defect.
+  Disagreement classes: (1) the oracle misread the records: fix the oracle; (2) the framework disagrees with the
+  records: a defect, reported with the entry and the ticks, a ruling before any code, never a local fix; (3) the
+  records do not determine the value: a design gap, a question to the design chat, never a choice made in the
+  instrument or the code; (4) an authoring artefact: the scenario breaks the disjointness rule or the geometry does not
+  give the declared property; it is re-authored or parked under the fixture rule; (5) a boundary case
+  (`docs/assumptions.md` 2.2 to 2.6, 3.3): recorded, not designed for. A class-2 disagreement stops the build at that
+  scenario.
+  Why. Exact verification where the records determine the answer, property verification where they do not; classes
+  3 to 5 keep the instrument from turning an accident into a rule; the alteration test shows that a zero result is a
+  detection.
+
+- MPB-5, scope for the parked items.
+  Ruling. TODO-132 (a): scenario 7's stand records the re-decision ticks, the holds and the tick the persistence broke,
+  as evidence; nothing is built; the question returns to the design chat after the runs. TODO-134: no scenario is
+  authored for it; a decision inside the observation-offset gap against a fallback stand, if one occurs in scenario 6
+  or 7, is classified and recorded. TODO-137 and TODO-141: evaluation items, not built here.
+  TODO-138, ruled for MPB runs. The comparison horizon is the first observed completion point (the human's script has
+  ended and the robot's pool is empty) plus the idle margin the IR test-bed derives from E5 (30 ticks, covering E5's
+  standing threshold at α = 0.01, 25 ticks). A derived plain-cost horizon (the robot's pool chained along its authored
+  order from the robot's start, plus the human's replay length, plus the margin) is a safety cap for the run, not a
+  behavioural timeout: a run that does not complete within it is classified (class 2 or 4), never given a longer cap.
+  No change to the run loop or the body (TODO-33 stays as it is). The maintained sets keep their literal step counts.
+  Why. Derived, no scenario constant.
+
+- MPB-6, sets and strategies.
+  Ruling. Prior on is primary. Prior off is run as a diagnostic appendix only, reported by completion, holds and
+  near-encounters (ticks with the robot–human distance below `min_separation`), with no exact oracle comparison: with
+  the prior off every hypothesis is admissible, including deliveries of the robot's own items, so the robot's acts
+  change human-side hypothesis state and MPB-3's pre-run independence does not hold. Prior off has a different
+  verification status from prior on. The same scripts in both.
+  `single_task` is primary (its decisions, B2 and B3, are the ones scenarios 1 to 8 name; its `[meta-cand]` lines carry
+  the per-candidate hold). `full_reorder` is a second run of the same scripts: identical per-tick tables of parts 1 to
+  3 (the human side does not depend on the strategy; an invariant the comparison shows), not identical chains (the
+  `no_current_task` ticks differ by strategy), and part-4 properties where defined for it; it is not required to
+  reproduce every part-4 property (TODO-141).
+  Why. The same scripts across strategies keep a difference attributable to the strategy, not to the human's
+  trajectory.
+
+Staging. Step 2: authoring and build in one plan-then-build session. The plan shows the layout's geometry, each
+scenario's derivation of its declared property (on its setup) and the oracle's derivations (the expiry cadence, the
+projection identity, the gate with warrant) before any run; the independence boundary is demonstrated in the build
+report, not stated.
+
+Unchanged: nothing in the framework (the trigger set, `_clears_gate`, `realize()`, P4's fallback projection,
+retraction as L2 (ii) rules it, the recognizer, the run loop).
+
+Reference: cchat, 29 September 2026 (MPB); `docs/handoffs/handoff_G_X_onward.md` §6; "T-D X" (X1, X5); "T-D G" (AD1
+to AD4); "T-D P" (P4, Q6, P3, the observation-offset gap); "T-D L" (L1, L2 (ii), L4, L5 B); "T-D R and E" (E5, E6,
+E8); "The IR test-bed" and its close-out; `analysis/ir_testbed/README.md` (rule 23, the run length) and `REPORT.md`
+(the alteration test, the disagreement classes); "Layouts, setups and scenarios: the three artefacts of a run"
+(ruling 4 as amended); D2; D3; F1; `docs/assumptions.md` 1.3, 1.4, 2.2 to 2.6, 3.3, 4.2, 4.6 and the case
+classification; TODO-33, TODO-130, TODO-132, TODO-134, TODO-137, TODO-138, TODO-141
+
+Next: step 2.
