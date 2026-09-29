@@ -3310,9 +3310,9 @@ THE UNION PROJECTION, TWO VARIANTS (recorded at the G/X handoff, 29 Sept 2026; a
 planning against the plans of several hypotheses when none clears θ has two variants to distinguish when this is taken
 up: the fit-set variant (realize against every adequate hypothesis's plan) and the belief-weighted variant (weight the
 hypotheses' plans by their belief). The case that decides between them: a hypothesis adequate for one tick with almost
-no probability. In the
-priority of projections (T-D P, ownership), the union sits between an admitted projection and the physical fallback,
-parked. Reference: docs/handoffs/handoff_G_X_onward.md, 2.4.
+no probability. In the priority of projections the design chat stated (admitted projection, then the union, then the
+physical fallback; in no entry, TODO-119 records only that an admitted projection outranks the fallback), the union
+sits in the middle, parked. Reference: docs/handoffs/handoff_G_X_onward.md, 2.3 and 2.4.
 Related: TODO-84, TODO-95, TODO-15, DESIGN-07, D3; design_decisions.md, "Belief-aware planning".
 
 **TODO-98: A foreseeable task is kept out of `assigned_tasks` by convention only (recorded, 24 Sept 2026)** [OPEN, recorded only]
