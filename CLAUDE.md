@@ -183,7 +183,9 @@ Decisions
   corner_SE), and the four maintained sets are regenerated (the "2.5" sections: every log completes; the `[sep]` minimum
   and F1's classes per run, `analysis/tb1a_destination/sep_classes.py`); scenario_s09_13 (the mid-action change, a
   coffee_break cut into a carry) agrees with the IR test-bed's oracle, extended to cuts; TODO-95 closed (3.4), TODO-135
-  to TODO-139 recorded. Next is G.
+  to TODO-139 recorded. G is ruled (29 Sept 2026; design_decisions.md, "T-D G: admission", AD1 to AD5): admission
+  also requires warrant (commitment or observation that justifies admission; not the support restriction), a third
+  output beside belief and adequacy; TODO-119 closed, TODO-132 (a) and TODO-134 parked. Next is G-build.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
