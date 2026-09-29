@@ -79,6 +79,7 @@ GL = `docs/glossary.md`; IR = `analysis/ir_testbed/README.md`.
 
 | # | rule | source |
 |---|---|---|
+| M0 | The support: the assigned tasks and every PersonalTask hypothesis; an empty assignment switches the restriction off, and the table is then not derivable before the run (the robot's items' deliveries are live): the oracle refuses (exit 3). Added in part (iii), class 1 | `shared/io_contracts.md` (the recognizer's `assigned_tasks`: None or [] switches the restriction off); MPB-3, MPB-6 |
 | M1 | The belief's leader, the boundary, every live hypothesis's hypothesis adequacy and observation warrant, the gate's outcome per tick | IR rules 1 to 23 (its oracle, imported unchanged) |
 | M2 | The warrant sources when the gate clears: commitment if the leader is an assigned task (IR rule 1's keys), observation if its observation warrant holds; in that order | DG AD1, AD4 |
 | M3 | Perception facts from consecutive observed positions (the first the observation before the clock): the displacement; a zero displacement is a standing tick (the count grows, the run is 0); a step continues the run when its unit direction agrees with the previous step's within 1e-9 (the Euclidean distance of the unit vectors; the records name no norm), else starts a run of 1; a step resets the count | DP P4; GL §9 |
@@ -123,7 +124,7 @@ These are booleans over the logged robot state.
 | scenario | property |
 |---|---|
 | scenario_s10_02 | P2a, the decision admitting deliver_item(item_1) (entered) carries a positive hold; P2b, no F1 robot violation within its assessed window |
-| scenario_s10_03 | Hadi's addition (AD3): P3a, no decision between the cut into the carry and the retraction; P3b, the decision record keeps the delivery; P3c, the leader is the delivery, an assigned task (commitment). The delivery's observation warrant over the interval is measured and reported (its "lost from the cut" clause is pending: REPORT.md) |
+| scenario_s10_03 | Hadi's addition (AD3): P3a, no decision between the cut into the carry and the retraction; P3b, the decision record keeps the delivery; P3c, the leader is the delivery, an assigned task (commitment). The delivery's observation warrant over the interval is measured and reported (its "lost from the cut" clause is pending: REPORT.md). Defined for single_task: the pre-run timing check that keeps the robot's own triggers out of the interval is single_task's |
 | scenario_s11_01 | P6.1, the switch to the alternative at a `projection_expired` decision, before the grasp of item_8, the human standing; P6.2 (single_task), at the switch item_8's hold exceeds the layout's cost difference, and at every earlier decision it does not (X1; the stand ends at 1 + k, so the hold is at most k + 1) |
 | scenario_s10_06 | P8a, no hold at any decision; P8b, the completion equals the reference run's; P8c, the robot's per-tick positions equal the reference run's |
 | scenario_s11_02 | none: TODO-132 (a)'s evidence (the decisions on the stand, the holds, the tick the persistence broke) |

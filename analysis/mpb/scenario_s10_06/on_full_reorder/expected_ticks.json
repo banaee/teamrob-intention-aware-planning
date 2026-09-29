@@ -1,0 +1,11375 @@
+[
+{
+"tick": 0,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.80951493365001,
+-14.467110882871452
+],
+"run_length": 1,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+},
+"admitted": null
+},
+{
+"tick": 1,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.80951493365001,
+-14.467110882871424
+],
+"run_length": 2,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 4.0
+},
+"admitted": null
+},
+{
+"tick": 2,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650014,
+-14.467110882871452
+],
+"run_length": 3,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+},
+"admitted": null
+},
+{
+"tick": 3,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871424
+],
+"run_length": 4,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 4,
+"duration": 4.0,
+"end": 8.0
+},
+"admitted": null
+},
+{
+"tick": 4,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650021,
+-14.467110882871452
+],
+"run_length": 5,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 10.0
+},
+"admitted": null
+},
+{
+"tick": 5,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 6,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 6,
+"duration": 6.0,
+"end": 12.0
+},
+"admitted": null
+},
+{
+"tick": 6,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871424
+],
+"run_length": 7,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+},
+"admitted": null
+},
+{
+"tick": 7,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871438
+],
+"run_length": 8,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 8,
+"duration": 8.0,
+"end": 16.0
+},
+"admitted": null
+},
+{
+"tick": 8,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650036,
+-14.467110882871467
+],
+"run_length": 9,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 9,
+"duration": 9.0,
+"end": 18.0
+},
+"admitted": null
+},
+{
+"tick": 9,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871424
+],
+"run_length": 10,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 10,
+"duration": 10.0,
+"end": 20.0
+},
+"admitted": null
+},
+{
+"tick": 10,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 11,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 22.0
+},
+"admitted": null
+},
+{
+"tick": 11,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871424
+],
+"run_length": 12,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 12,
+"duration": 12.0,
+"end": 24.0
+},
+"admitted": null
+},
+{
+"tick": 12,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 13,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 13,
+"duration": 13.0,
+"end": 26.0
+},
+"admitted": null
+},
+{
+"tick": 13,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "none(below_theta)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871424
+],
+"run_length": 14,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 14,
+"duration": 14.0,
+"end": 28.0
+},
+"admitted": null
+},
+{
+"tick": 14,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650036,
+-14.467110882871452
+],
+"run_length": 15,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 13.913812651491071,
+"end": 28.91381265149107
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 15,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933649979,
+-14.467110882871424
+],
+"run_length": 16,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 16,
+"duration": 12.913812651491133,
+"end": 28.913812651491135
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 16,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650036,
+-14.467110882871452
+],
+"run_length": 17,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 17,
+"duration": 11.913812651491085,
+"end": 28.913812651491085
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 17,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650036,
+-14.46711088287148
+],
+"run_length": 18,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 18,
+"duration": 10.913812651491071,
+"end": 28.91381265149107
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 18,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.80951493364995,
+-14.467110882871395
+],
+"run_length": 19,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 19,
+"duration": 9.913812651491142,
+"end": 28.913812651491142
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 19,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650064,
+-14.467110882871452
+],
+"run_length": 20,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 20,
+"duration": 8.913812651491074,
+"end": 28.913812651491074
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 20,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.80951493364995,
+-14.467110882871452
+],
+"run_length": 21,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 21,
+"duration": 7.913812651491105,
+"end": 28.913812651491106
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 21,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650064,
+-14.467110882871452
+],
+"run_length": 22,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 22,
+"duration": 6.913812651491076,
+"end": 28.913812651491078
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 22,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871395
+],
+"run_length": 23,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 23,
+"duration": 5.913812651491113,
+"end": 28.913812651491114
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 23,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 24,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 24,
+"duration": 4.9138126514910985,
+"end": 28.9138126514911
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 24,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 25,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 25,
+"duration": 3.9138126514910985,
+"end": 28.9138126514911
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 25,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 26,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 26,
+"duration": 2.913812651491099,
+"end": 28.9138126514911
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 26,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 27,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 27,
+"duration": 1.9138126514910982,
+"end": 28.9138126514911
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 27,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871395
+],
+"run_length": 28,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 28,
+"duration": 0.9138126514911024,
+"end": 28.913812651491103
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 28,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+13.809514933650007,
+-14.467110882871452
+],
+"run_length": 29,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 29,
+"duration": 7.206919823203694,
+"end": 36.20691982320369
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 29,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 1
+},
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 31.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"item_2"
+]
+]
+},
+{
+"name": "pick_up",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 30,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 2
+},
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 33.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 31,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 3
+},
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 35.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 32,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 1,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 34.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 33,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871424
+],
+"run_length": 2,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 36.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 34,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 3,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 38.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 35,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871424
+],
+"run_length": 4,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 4,
+"duration": 4.0,
+"end": 40.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 36,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 5,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 42.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 37,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871438
+],
+"run_length": 6,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 6,
+"duration": 6.0,
+"end": 44.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 38,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 7,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 46.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 39,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871424
+],
+"run_length": 8,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 8,
+"duration": 8.0,
+"end": 48.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 40,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650064,
+14.467110882871438
+],
+"run_length": 9,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 9,
+"duration": 9.0,
+"end": 50.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 41,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 10,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 10,
+"duration": 10.0,
+"end": 52.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 42,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933649979,
+14.467110882871424
+],
+"run_length": 11,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 54.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 43,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650036,
+14.467110882871452
+],
+"run_length": 12,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 12,
+"duration": 12.0,
+"end": 56.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 44,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 13,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 13,
+"duration": 13.0,
+"end": 58.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 45,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 14,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 14,
+"duration": 13.499999999999972,
+"end": 59.49999999999997
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 46,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650036,
+14.467110882871424
+],
+"run_length": 15,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 12.499999999999995,
+"end": 59.49999999999999
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 47,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933649979,
+14.467110882871424
+],
+"run_length": 16,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 16,
+"duration": 11.500000000000021,
+"end": 59.50000000000002
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 48,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871424
+],
+"run_length": 17,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 17,
+"duration": 10.499999999999998,
+"end": 59.5
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 49,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650036,
+14.467110882871452
+],
+"run_length": 18,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 18,
+"duration": 9.499999999999993,
+"end": 59.49999999999999
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 50,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933649979,
+14.467110882871452
+],
+"run_length": 19,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 19,
+"duration": 8.500000000000005,
+"end": 59.50000000000001
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 51,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650064,
+14.467110882871452
+],
+"run_length": 20,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 20,
+"duration": 7.49999999999998,
+"end": 59.49999999999998
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 52,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.80951493364995,
+14.467110882871452
+],
+"run_length": 21,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 21,
+"duration": 6.5000000000000115,
+"end": 59.500000000000014
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 53,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871395
+],
+"run_length": 22,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 22,
+"duration": 5.500000000000015,
+"end": 59.500000000000014
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 54,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650064,
+14.467110882871452
+],
+"run_length": 23,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 23,
+"duration": 4.499999999999988,
+"end": 59.499999999999986
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 55,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871452
+],
+"run_length": 24,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 24,
+"duration": 3.4999999999999987,
+"end": 59.5
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 56,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.80951493364995,
+14.467110882871395
+],
+"run_length": 25,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 25,
+"duration": 2.500000000000012,
+"end": 59.500000000000014
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 57,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650064,
+14.46711088287151
+],
+"run_length": 26,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 26,
+"duration": 1.4999999999999918,
+"end": 59.49999999999999
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 58,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.467110882871395
+],
+"run_length": 27,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 27,
+"duration": 0.5000000000000014,
+"end": 59.5
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 59,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+-13.809514933650007,
+14.46711088287151
+],
+"run_length": 28,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 28,
+"duration": 28.0,
+"end": 88.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 60,
+"leader": "deliver_item(?item=item_2)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate",
+"deliver_item(?item=item_2)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation",
+"deliver_item(?item=item_2)": "observation"
+},
+"warrant": [
+"commitment",
+"observation"
+],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 1
+},
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 62.0
+},
+"admitted": {
+"key": "deliver_item(?item=item_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+},
+{
+"name": "place",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"item_2"
+],
+[
+"?target",
+"kitting_table_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 61,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": true,
+"gate": "none(leader_no_observation)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "no_observation"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "none"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 2
+},
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 64.0
+},
+"admitted": null
+},
+{
+"tick": 62,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_unwarranted)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "none"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 3
+},
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 66.0
+},
+"admitted": null
+},
+{
+"tick": 63,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924994,
+-17.817815644388617
+],
+"run_length": 1,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 65.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 64,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924994,
+-17.81781564438859
+],
+"run_length": 2,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 67.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 65,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924994,
+-17.817815644388617
+],
+"run_length": 3,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 69.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 66,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924994,
+-17.81781564438859
+],
+"run_length": 4,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 4,
+"duration": 4.0,
+"end": 71.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 67,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925,
+-17.81781564438863
+],
+"run_length": 5,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 73.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 68,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924986,
+-17.817815644388602
+],
+"run_length": 6,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 6,
+"duration": 6.0,
+"end": 75.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 69,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388617
+],
+"run_length": 7,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 77.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 70,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.08435169192498,
+-17.81781564438859
+],
+"run_length": 8,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 8,
+"duration": 8.0,
+"end": 79.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 71,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388617
+],
+"run_length": 9,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 9,
+"duration": 9.0,
+"end": 81.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 72,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924994,
+-17.817815644388617
+],
+"run_length": 10,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 10,
+"duration": 10.0,
+"end": 83.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 73,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.08435169192498,
+-17.81781564438859
+],
+"run_length": 11,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 85.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 74,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388617
+],
+"run_length": 12,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 12,
+"duration": 12.0,
+"end": 87.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 75,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924994,
+-17.817815644388617
+],
+"run_length": 13,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 13,
+"duration": 13.0,
+"end": 89.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 76,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388617
+],
+"run_length": 14,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 14,
+"duration": 14.0,
+"end": 91.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 77,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.08435169192498,
+-17.817815644388645
+],
+"run_length": 15,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 15.0,
+"end": 93.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 78,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.08435169192498,
+-17.81781564438853
+],
+"run_length": 16,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 16,
+"duration": 16.0,
+"end": 95.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 79,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388645
+],
+"run_length": 17,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 17,
+"duration": 17.0,
+"end": 97.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 80,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 18,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 18,
+"duration": 18.0,
+"end": 99.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 81,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.08435169192498,
+-17.817815644388645
+],
+"run_length": 19,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 19,
+"duration": 19.0,
+"end": 101.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 82,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 20,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 20,
+"duration": 20.0,
+"end": 103.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 83,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388645
+],
+"run_length": 21,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 21,
+"duration": 21.0,
+"end": 105.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 84,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.81781564438853
+],
+"run_length": 22,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 22,
+"duration": 22.0,
+"end": 107.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 85,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388645
+],
+"run_length": 23,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 23,
+"duration": 23.0,
+"end": 109.0
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 86,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 24,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 24,
+"duration": 22.5155876675356,
+"end": 109.5155876675356
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 87,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.08435169192498,
+-17.81781564438859
+],
+"run_length": 25,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 25,
+"duration": 21.51558766753563,
+"end": 109.51558766753563
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 88,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388645
+],
+"run_length": 26,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 26,
+"duration": 20.515587667535588,
+"end": 109.51558766753558
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 89,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 27,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 27,
+"duration": 19.515587667535574,
+"end": 109.51558766753557
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 90,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388645
+],
+"run_length": 28,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 28,
+"duration": 18.51558766753561,
+"end": 109.51558766753561
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 91,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.81781564438859
+],
+"run_length": 29,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 29,
+"duration": 17.515587667535616,
+"end": 109.51558766753561
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 92,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388702
+],
+"run_length": 30,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 30,
+"duration": 16.515587667535517,
+"end": 109.51558766753551
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 93,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "clears",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "adequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [
+"observation"
+],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388475
+],
+"run_length": 31,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 31,
+"duration": 15.515587667535703,
+"end": 109.5155876675357
+},
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+}
+},
+{
+"tick": 94,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.81781564438859
+],
+"run_length": 32,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 32,
+"duration": 14.515587667535646,
+"end": 109.51558766753564
+},
+"admitted": null
+},
+{
+"tick": 95,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388702
+],
+"run_length": 33,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 33,
+"duration": 13.515587667535533,
+"end": 109.51558766753553
+},
+"admitted": null
+},
+{
+"tick": 96,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 34,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 34,
+"duration": 12.515587667535602,
+"end": 109.5155876675356
+},
+"admitted": null
+},
+{
+"tick": 97,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 35,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 35,
+"duration": 11.515587667535613,
+"end": 109.51558766753561
+},
+"admitted": null
+},
+{
+"tick": 98,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 36,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 36,
+"duration": 10.515587667535613,
+"end": 109.51558766753561
+},
+"admitted": null
+},
+{
+"tick": 99,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388702
+],
+"run_length": 37,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 37,
+"duration": 9.515587667535554,
+"end": 109.51558766753556
+},
+"admitted": null
+},
+{
+"tick": 100,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.81781564438859
+],
+"run_length": 38,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 38,
+"duration": 8.51558766753562,
+"end": 109.51558766753561
+},
+"admitted": null
+},
+{
+"tick": 101,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 39,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 39,
+"duration": 7.515587667535604,
+"end": 109.5155876675356
+},
+"admitted": null
+},
+{
+"tick": 102,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.81781564438859
+],
+"run_length": 40,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 40,
+"duration": 6.515587667535609,
+"end": 109.51558766753561
+},
+"admitted": null
+},
+{
+"tick": 103,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.81781564438853
+],
+"run_length": 41,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 41,
+"duration": 5.5155876675356375,
+"end": 109.51558766753564
+},
+"admitted": null
+},
+{
+"tick": 104,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925065,
+-17.817815644388702
+],
+"run_length": 42,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 42,
+"duration": 4.515587667535575,
+"end": 109.51558766753557
+},
+"admitted": null
+},
+{
+"tick": 105,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.817815644388702
+],
+"run_length": 43,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 43,
+"duration": 3.515587667535589,
+"end": 109.51558766753558
+},
+"admitted": null
+},
+{
+"tick": 106,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.817815644388475
+],
+"run_length": 44,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 44,
+"duration": 2.515587667535625,
+"end": 109.51558766753563
+},
+"admitted": null
+},
+{
+"tick": 107,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925065,
+-17.817815644388702
+],
+"run_length": 45,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 45,
+"duration": 1.515587667535592,
+"end": 109.5155876675356
+},
+"admitted": null
+},
+{
+"tick": 108,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691924951,
+-17.817815644388475
+],
+"run_length": 46,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 46,
+"duration": 0.5155876675356111,
+"end": 109.51558766753561
+},
+"admitted": null
+},
+{
+"tick": 109,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+9.084351691925008,
+-17.817815644388702
+],
+"run_length": 47,
+"standing_count": 0
+},
+"fallback": {
+"mode": "moving",
+"k": 47,
+"duration": 3.821767785116189,
+"end": 113.8217677851162
+},
+"admitted": null
+},
+{
+"tick": 110,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 1
+},
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 112.0
+},
+"admitted": null
+},
+{
+"tick": 111,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 2
+},
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 114.0
+},
+"admitted": null
+},
+{
+"tick": 112,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 3
+},
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 116.0
+},
+"admitted": null
+},
+{
+"tick": 113,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 4
+},
+"fallback": {
+"mode": "standing",
+"k": 4,
+"duration": 4.0,
+"end": 118.0
+},
+"admitted": null
+},
+{
+"tick": 114,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 5
+},
+"fallback": {
+"mode": "standing",
+"k": 5,
+"duration": 5.0,
+"end": 120.0
+},
+"admitted": null
+},
+{
+"tick": 115,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 6
+},
+"fallback": {
+"mode": "standing",
+"k": 6,
+"duration": 6.0,
+"end": 122.0
+},
+"admitted": null
+},
+{
+"tick": 116,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 7
+},
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 124.0
+},
+"admitted": null
+},
+{
+"tick": 117,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 8
+},
+"fallback": {
+"mode": "standing",
+"k": 8,
+"duration": 8.0,
+"end": 126.0
+},
+"admitted": null
+},
+{
+"tick": 118,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 9
+},
+"fallback": {
+"mode": "standing",
+"k": 9,
+"duration": 9.0,
+"end": 128.0
+},
+"admitted": null
+},
+{
+"tick": 119,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 10
+},
+"fallback": {
+"mode": "standing",
+"k": 10,
+"duration": 10.0,
+"end": 130.0
+},
+"admitted": null
+},
+{
+"tick": 120,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 11
+},
+"fallback": {
+"mode": "standing",
+"k": 11,
+"duration": 11.0,
+"end": 132.0
+},
+"admitted": null
+},
+{
+"tick": 121,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 12
+},
+"fallback": {
+"mode": "standing",
+"k": 12,
+"duration": 12.0,
+"end": 134.0
+},
+"admitted": null
+},
+{
+"tick": 122,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 13
+},
+"fallback": {
+"mode": "standing",
+"k": 13,
+"duration": 13.0,
+"end": 136.0
+},
+"admitted": null
+},
+{
+"tick": 123,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 14
+},
+"fallback": {
+"mode": "standing",
+"k": 14,
+"duration": 14.0,
+"end": 138.0
+},
+"admitted": null
+},
+{
+"tick": 124,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 15
+},
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 140.0
+},
+"admitted": null
+},
+{
+"tick": 125,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 16
+},
+"fallback": {
+"mode": "standing",
+"k": 16,
+"duration": 16.0,
+"end": 142.0
+},
+"admitted": null
+},
+{
+"tick": 126,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 17
+},
+"fallback": {
+"mode": "standing",
+"k": 17,
+"duration": 17.0,
+"end": 144.0
+},
+"admitted": null
+},
+{
+"tick": 127,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 18
+},
+"fallback": {
+"mode": "standing",
+"k": 18,
+"duration": 18.0,
+"end": 146.0
+},
+"admitted": null
+},
+{
+"tick": 128,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 19
+},
+"fallback": {
+"mode": "standing",
+"k": 19,
+"duration": 19.0,
+"end": 148.0
+},
+"admitted": null
+},
+{
+"tick": 129,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 20
+},
+"fallback": {
+"mode": "standing",
+"k": 20,
+"duration": 20.0,
+"end": 150.0
+},
+"admitted": null
+},
+{
+"tick": 130,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 21
+},
+"fallback": {
+"mode": "standing",
+"k": 21,
+"duration": 21.0,
+"end": 152.0
+},
+"admitted": null
+},
+{
+"tick": 131,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 22
+},
+"fallback": {
+"mode": "standing",
+"k": 22,
+"duration": 22.0,
+"end": 154.0
+},
+"admitted": null
+},
+{
+"tick": 132,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 23
+},
+"fallback": {
+"mode": "standing",
+"k": 23,
+"duration": 23.0,
+"end": 156.0
+},
+"admitted": null
+},
+{
+"tick": 133,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 24
+},
+"fallback": {
+"mode": "standing",
+"k": 24,
+"duration": 24.0,
+"end": 158.0
+},
+"admitted": null
+},
+{
+"tick": 134,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 25
+},
+"fallback": {
+"mode": "standing",
+"k": 25,
+"duration": 25.0,
+"end": 160.0
+},
+"admitted": null
+},
+{
+"tick": 135,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 26
+},
+"fallback": {
+"mode": "standing",
+"k": 26,
+"duration": 26.0,
+"end": 162.0
+},
+"admitted": null
+},
+{
+"tick": 136,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 27
+},
+"fallback": {
+"mode": "standing",
+"k": 27,
+"duration": 27.0,
+"end": 164.0
+},
+"admitted": null
+},
+{
+"tick": 137,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 28
+},
+"fallback": {
+"mode": "standing",
+"k": 28,
+"duration": 28.0,
+"end": 166.0
+},
+"admitted": null
+},
+{
+"tick": 138,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 29
+},
+"fallback": {
+"mode": "standing",
+"k": 29,
+"duration": 29.0,
+"end": 168.0
+},
+"admitted": null
+},
+{
+"tick": 139,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 30
+},
+"fallback": {
+"mode": "standing",
+"k": 30,
+"duration": 30.0,
+"end": 170.0
+},
+"admitted": null
+},
+{
+"tick": 140,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 31
+},
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 172.0
+},
+"admitted": null
+},
+{
+"tick": 141,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 32
+},
+"fallback": {
+"mode": "standing",
+"k": 32,
+"duration": 32.0,
+"end": 174.0
+},
+"admitted": null
+},
+{
+"tick": 142,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 33
+},
+"fallback": {
+"mode": "standing",
+"k": 33,
+"duration": 33.0,
+"end": 176.0
+},
+"admitted": null
+},
+{
+"tick": 143,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 34
+},
+"fallback": {
+"mode": "standing",
+"k": 34,
+"duration": 34.0,
+"end": 178.0
+},
+"admitted": null
+},
+{
+"tick": 144,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 35
+},
+"fallback": {
+"mode": "standing",
+"k": 35,
+"duration": 35.0,
+"end": 180.0
+},
+"admitted": null
+},
+{
+"tick": 145,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 36
+},
+"fallback": {
+"mode": "standing",
+"k": 36,
+"duration": 36.0,
+"end": 182.0
+},
+"admitted": null
+},
+{
+"tick": 146,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 37
+},
+"fallback": {
+"mode": "standing",
+"k": 37,
+"duration": 37.0,
+"end": 184.0
+},
+"admitted": null
+},
+{
+"tick": 147,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 38
+},
+"fallback": {
+"mode": "standing",
+"k": 38,
+"duration": 38.0,
+"end": 186.0
+},
+"admitted": null
+},
+{
+"tick": 148,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 39
+},
+"fallback": {
+"mode": "standing",
+"k": 39,
+"duration": 39.0,
+"end": 188.0
+},
+"admitted": null
+},
+{
+"tick": 149,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 40
+},
+"fallback": {
+"mode": "standing",
+"k": 40,
+"duration": 40.0,
+"end": 190.0
+},
+"admitted": null
+},
+{
+"tick": 150,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 41
+},
+"fallback": {
+"mode": "standing",
+"k": 41,
+"duration": 41.0,
+"end": 192.0
+},
+"admitted": null
+},
+{
+"tick": 151,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 42
+},
+"fallback": {
+"mode": "standing",
+"k": 42,
+"duration": 42.0,
+"end": 194.0
+},
+"admitted": null
+},
+{
+"tick": 152,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 43
+},
+"fallback": {
+"mode": "standing",
+"k": 43,
+"duration": 43.0,
+"end": 196.0
+},
+"admitted": null
+},
+{
+"tick": 153,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 44
+},
+"fallback": {
+"mode": "standing",
+"k": 44,
+"duration": 44.0,
+"end": 198.0
+},
+"admitted": null
+},
+{
+"tick": 154,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 45
+},
+"fallback": {
+"mode": "standing",
+"k": 45,
+"duration": 45.0,
+"end": 200.0
+},
+"admitted": null
+},
+{
+"tick": 155,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 46
+},
+"fallback": {
+"mode": "standing",
+"k": 46,
+"duration": 46.0,
+"end": 202.0
+},
+"admitted": null
+},
+{
+"tick": 156,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 47
+},
+"fallback": {
+"mode": "standing",
+"k": 47,
+"duration": 47.0,
+"end": 204.0
+},
+"admitted": null
+},
+{
+"tick": 157,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 48
+},
+"fallback": {
+"mode": "standing",
+"k": 48,
+"duration": 48.0,
+"end": 206.0
+},
+"admitted": null
+},
+{
+"tick": 158,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 49
+},
+"fallback": {
+"mode": "standing",
+"k": 49,
+"duration": 49.0,
+"end": 208.0
+},
+"admitted": null
+},
+{
+"tick": 159,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 50
+},
+"fallback": {
+"mode": "standing",
+"k": 50,
+"duration": 50.0,
+"end": 210.0
+},
+"admitted": null
+},
+{
+"tick": 160,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 51
+},
+"fallback": {
+"mode": "standing",
+"k": 51,
+"duration": 51.0,
+"end": 212.0
+},
+"admitted": null
+},
+{
+"tick": 161,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 52
+},
+"fallback": {
+"mode": "standing",
+"k": 52,
+"duration": 52.0,
+"end": 214.0
+},
+"admitted": null
+},
+{
+"tick": 162,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 53
+},
+"fallback": {
+"mode": "standing",
+"k": 53,
+"duration": 53.0,
+"end": 216.0
+},
+"admitted": null
+},
+{
+"tick": 163,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 54
+},
+"fallback": {
+"mode": "standing",
+"k": 54,
+"duration": 54.0,
+"end": 218.0
+},
+"admitted": null
+},
+{
+"tick": 164,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 55
+},
+"fallback": {
+"mode": "standing",
+"k": 55,
+"duration": 55.0,
+"end": 220.0
+},
+"admitted": null
+},
+{
+"tick": 165,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 56
+},
+"fallback": {
+"mode": "standing",
+"k": 56,
+"duration": 56.0,
+"end": 222.0
+},
+"admitted": null
+},
+{
+"tick": 166,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 57
+},
+"fallback": {
+"mode": "standing",
+"k": 57,
+"duration": 57.0,
+"end": 224.0
+},
+"admitted": null
+},
+{
+"tick": 167,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 58
+},
+"fallback": {
+"mode": "standing",
+"k": 58,
+"duration": 58.0,
+"end": 226.0
+},
+"admitted": null
+},
+{
+"tick": 168,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 59
+},
+"fallback": {
+"mode": "standing",
+"k": 59,
+"duration": 59.0,
+"end": 228.0
+},
+"admitted": null
+},
+{
+"tick": 169,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 60
+},
+"fallback": {
+"mode": "standing",
+"k": 60,
+"duration": 60.0,
+"end": 230.0
+},
+"admitted": null
+},
+{
+"tick": 170,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 61
+},
+"fallback": {
+"mode": "standing",
+"k": 61,
+"duration": 61.0,
+"end": 232.0
+},
+"admitted": null
+},
+{
+"tick": 171,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 62
+},
+"fallback": {
+"mode": "standing",
+"k": 62,
+"duration": 62.0,
+"end": 234.0
+},
+"admitted": null
+},
+{
+"tick": 172,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 63
+},
+"fallback": {
+"mode": "standing",
+"k": 63,
+"duration": 63.0,
+"end": 236.0
+},
+"admitted": null
+},
+{
+"tick": 173,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 64
+},
+"fallback": {
+"mode": "standing",
+"k": 64,
+"duration": 64.0,
+"end": 238.0
+},
+"admitted": null
+},
+{
+"tick": 174,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 65
+},
+"fallback": {
+"mode": "standing",
+"k": 65,
+"duration": 65.0,
+"end": 240.0
+},
+"admitted": null
+},
+{
+"tick": 175,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 66
+},
+"fallback": {
+"mode": "standing",
+"k": 66,
+"duration": 66.0,
+"end": 242.0
+},
+"admitted": null
+},
+{
+"tick": 176,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 67
+},
+"fallback": {
+"mode": "standing",
+"k": 67,
+"duration": 67.0,
+"end": 244.0
+},
+"admitted": null
+},
+{
+"tick": 177,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 68
+},
+"fallback": {
+"mode": "standing",
+"k": 68,
+"duration": 68.0,
+"end": 246.0
+},
+"admitted": null
+},
+{
+"tick": 178,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 69
+},
+"fallback": {
+"mode": "standing",
+"k": 69,
+"duration": 69.0,
+"end": 248.0
+},
+"admitted": null
+},
+{
+"tick": 179,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 70
+},
+"fallback": {
+"mode": "standing",
+"k": 70,
+"duration": 70.0,
+"end": 250.0
+},
+"admitted": null
+},
+{
+"tick": 180,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 71
+},
+"fallback": {
+"mode": "standing",
+"k": 71,
+"duration": 71.0,
+"end": 252.0
+},
+"admitted": null
+},
+{
+"tick": 181,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 72
+},
+"fallback": {
+"mode": "standing",
+"k": 72,
+"duration": 72.0,
+"end": 254.0
+},
+"admitted": null
+},
+{
+"tick": 182,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 73
+},
+"fallback": {
+"mode": "standing",
+"k": 73,
+"duration": 73.0,
+"end": 256.0
+},
+"admitted": null
+},
+{
+"tick": 183,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 74
+},
+"fallback": {
+"mode": "standing",
+"k": 74,
+"duration": 74.0,
+"end": 258.0
+},
+"admitted": null
+},
+{
+"tick": 184,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 75
+},
+"fallback": {
+"mode": "standing",
+"k": 75,
+"duration": 75.0,
+"end": 260.0
+},
+"admitted": null
+},
+{
+"tick": 185,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 76
+},
+"fallback": {
+"mode": "standing",
+"k": 76,
+"duration": 76.0,
+"end": 262.0
+},
+"admitted": null
+},
+{
+"tick": 186,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 77
+},
+"fallback": {
+"mode": "standing",
+"k": 77,
+"duration": 77.0,
+"end": 264.0
+},
+"admitted": null
+},
+{
+"tick": 187,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 78
+},
+"fallback": {
+"mode": "standing",
+"k": 78,
+"duration": 78.0,
+"end": 266.0
+},
+"admitted": null
+},
+{
+"tick": 188,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 79
+},
+"fallback": {
+"mode": "standing",
+"k": 79,
+"duration": 79.0,
+"end": 268.0
+},
+"admitted": null
+},
+{
+"tick": 189,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 80
+},
+"fallback": {
+"mode": "standing",
+"k": 80,
+"duration": 80.0,
+"end": 270.0
+},
+"admitted": null
+},
+{
+"tick": 190,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 81
+},
+"fallback": {
+"mode": "standing",
+"k": 81,
+"duration": 81.0,
+"end": 272.0
+},
+"admitted": null
+},
+{
+"tick": 191,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 82
+},
+"fallback": {
+"mode": "standing",
+"k": 82,
+"duration": 82.0,
+"end": 274.0
+},
+"admitted": null
+},
+{
+"tick": 192,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 83
+},
+"fallback": {
+"mode": "standing",
+"k": 83,
+"duration": 83.0,
+"end": 276.0
+},
+"admitted": null
+},
+{
+"tick": 193,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 84
+},
+"fallback": {
+"mode": "standing",
+"k": 84,
+"duration": 84.0,
+"end": 278.0
+},
+"admitted": null
+},
+{
+"tick": 194,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 85
+},
+"fallback": {
+"mode": "standing",
+"k": 85,
+"duration": 85.0,
+"end": 280.0
+},
+"admitted": null
+},
+{
+"tick": 195,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 86
+},
+"fallback": {
+"mode": "standing",
+"k": 86,
+"duration": 86.0,
+"end": 282.0
+},
+"admitted": null
+},
+{
+"tick": 196,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 87
+},
+"fallback": {
+"mode": "standing",
+"k": 87,
+"duration": 87.0,
+"end": 284.0
+},
+"admitted": null
+},
+{
+"tick": 197,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 88
+},
+"fallback": {
+"mode": "standing",
+"k": 88,
+"duration": 88.0,
+"end": 286.0
+},
+"admitted": null
+},
+{
+"tick": 198,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 89
+},
+"fallback": {
+"mode": "standing",
+"k": 89,
+"duration": 89.0,
+"end": 288.0
+},
+"admitted": null
+},
+{
+"tick": 199,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 90
+},
+"fallback": {
+"mode": "standing",
+"k": 90,
+"duration": 90.0,
+"end": 290.0
+},
+"admitted": null
+},
+{
+"tick": 200,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 91
+},
+"fallback": {
+"mode": "standing",
+"k": 91,
+"duration": 91.0,
+"end": 292.0
+},
+"admitted": null
+},
+{
+"tick": 201,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 92
+},
+"fallback": {
+"mode": "standing",
+"k": 92,
+"duration": 92.0,
+"end": 294.0
+},
+"admitted": null
+},
+{
+"tick": 202,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 93
+},
+"fallback": {
+"mode": "standing",
+"k": 93,
+"duration": 93.0,
+"end": 296.0
+},
+"admitted": null
+},
+{
+"tick": 203,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 94
+},
+"fallback": {
+"mode": "standing",
+"k": 94,
+"duration": 94.0,
+"end": 298.0
+},
+"admitted": null
+},
+{
+"tick": 204,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 95
+},
+"fallback": {
+"mode": "standing",
+"k": 95,
+"duration": 95.0,
+"end": 300.0
+},
+"admitted": null
+},
+{
+"tick": 205,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 96
+},
+"fallback": {
+"mode": "standing",
+"k": 96,
+"duration": 96.0,
+"end": 302.0
+},
+"admitted": null
+},
+{
+"tick": 206,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 97
+},
+"fallback": {
+"mode": "standing",
+"k": 97,
+"duration": 97.0,
+"end": 304.0
+},
+"admitted": null
+},
+{
+"tick": 207,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 98
+},
+"fallback": {
+"mode": "standing",
+"k": 98,
+"duration": 98.0,
+"end": 306.0
+},
+"admitted": null
+},
+{
+"tick": 208,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 99
+},
+"fallback": {
+"mode": "standing",
+"k": 99,
+"duration": 99.0,
+"end": 308.0
+},
+"admitted": null
+},
+{
+"tick": 209,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 100
+},
+"fallback": {
+"mode": "standing",
+"k": 100,
+"duration": 100.0,
+"end": 310.0
+},
+"admitted": null
+},
+{
+"tick": 210,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 101
+},
+"fallback": {
+"mode": "standing",
+"k": 101,
+"duration": 101.0,
+"end": 312.0
+},
+"admitted": null
+},
+{
+"tick": 211,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 102
+},
+"fallback": {
+"mode": "standing",
+"k": 102,
+"duration": 102.0,
+"end": 314.0
+},
+"admitted": null
+},
+{
+"tick": 212,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 103
+},
+"fallback": {
+"mode": "standing",
+"k": 103,
+"duration": 103.0,
+"end": 316.0
+},
+"admitted": null
+},
+{
+"tick": 213,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 104
+},
+"fallback": {
+"mode": "standing",
+"k": 104,
+"duration": 104.0,
+"end": 318.0
+},
+"admitted": null
+},
+{
+"tick": 214,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 105
+},
+"fallback": {
+"mode": "standing",
+"k": 105,
+"duration": 105.0,
+"end": 320.0
+},
+"admitted": null
+},
+{
+"tick": 215,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 106
+},
+"fallback": {
+"mode": "standing",
+"k": 106,
+"duration": 106.0,
+"end": 322.0
+},
+"admitted": null
+},
+{
+"tick": 216,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 107
+},
+"fallback": {
+"mode": "standing",
+"k": 107,
+"duration": 107.0,
+"end": 324.0
+},
+"admitted": null
+},
+{
+"tick": 217,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 108
+},
+"fallback": {
+"mode": "standing",
+"k": 108,
+"duration": 108.0,
+"end": 326.0
+},
+"admitted": null
+},
+{
+"tick": 218,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 109
+},
+"fallback": {
+"mode": "standing",
+"k": 109,
+"duration": 109.0,
+"end": 328.0
+},
+"admitted": null
+},
+{
+"tick": 219,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 110
+},
+"fallback": {
+"mode": "standing",
+"k": 110,
+"duration": 110.0,
+"end": 330.0
+},
+"admitted": null
+},
+{
+"tick": 220,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 111
+},
+"fallback": {
+"mode": "standing",
+"k": 111,
+"duration": 111.0,
+"end": 332.0
+},
+"admitted": null
+},
+{
+"tick": 221,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 112
+},
+"fallback": {
+"mode": "standing",
+"k": 112,
+"duration": 112.0,
+"end": 334.0
+},
+"admitted": null
+},
+{
+"tick": 222,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 113
+},
+"fallback": {
+"mode": "standing",
+"k": 113,
+"duration": 113.0,
+"end": 336.0
+},
+"admitted": null
+},
+{
+"tick": 223,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 114
+},
+"fallback": {
+"mode": "standing",
+"k": 114,
+"duration": 114.0,
+"end": 338.0
+},
+"admitted": null
+},
+{
+"tick": 224,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 115
+},
+"fallback": {
+"mode": "standing",
+"k": 115,
+"duration": 115.0,
+"end": 340.0
+},
+"admitted": null
+},
+{
+"tick": 225,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 116
+},
+"fallback": {
+"mode": "standing",
+"k": 116,
+"duration": 116.0,
+"end": 342.0
+},
+"admitted": null
+},
+{
+"tick": 226,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 117
+},
+"fallback": {
+"mode": "standing",
+"k": 117,
+"duration": 117.0,
+"end": 344.0
+},
+"admitted": null
+},
+{
+"tick": 227,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 118
+},
+"fallback": {
+"mode": "standing",
+"k": 118,
+"duration": 118.0,
+"end": 346.0
+},
+"admitted": null
+},
+{
+"tick": 228,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 119
+},
+"fallback": {
+"mode": "standing",
+"k": 119,
+"duration": 119.0,
+"end": 348.0
+},
+"admitted": null
+},
+{
+"tick": 229,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 120
+},
+"fallback": {
+"mode": "standing",
+"k": 120,
+"duration": 120.0,
+"end": 350.0
+},
+"admitted": null
+},
+{
+"tick": 230,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 121
+},
+"fallback": {
+"mode": "standing",
+"k": 121,
+"duration": 121.0,
+"end": 352.0
+},
+"admitted": null
+},
+{
+"tick": 231,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 122
+},
+"fallback": {
+"mode": "standing",
+"k": 122,
+"duration": 122.0,
+"end": 354.0
+},
+"admitted": null
+},
+{
+"tick": 232,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 123
+},
+"fallback": {
+"mode": "standing",
+"k": 123,
+"duration": 123.0,
+"end": 356.0
+},
+"admitted": null
+},
+{
+"tick": 233,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 124
+},
+"fallback": {
+"mode": "standing",
+"k": 124,
+"duration": 124.0,
+"end": 358.0
+},
+"admitted": null
+},
+{
+"tick": 234,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 125
+},
+"fallback": {
+"mode": "standing",
+"k": 125,
+"duration": 125.0,
+"end": 360.0
+},
+"admitted": null
+},
+{
+"tick": 235,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 126
+},
+"fallback": {
+"mode": "standing",
+"k": 126,
+"duration": 126.0,
+"end": 362.0
+},
+"admitted": null
+},
+{
+"tick": 236,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 127
+},
+"fallback": {
+"mode": "standing",
+"k": 127,
+"duration": 127.0,
+"end": 364.0
+},
+"admitted": null
+},
+{
+"tick": 237,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 128
+},
+"fallback": {
+"mode": "standing",
+"k": 128,
+"duration": 128.0,
+"end": 366.0
+},
+"admitted": null
+},
+{
+"tick": 238,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 129
+},
+"fallback": {
+"mode": "standing",
+"k": 129,
+"duration": 129.0,
+"end": 368.0
+},
+"admitted": null
+},
+{
+"tick": 239,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 130
+},
+"fallback": {
+"mode": "standing",
+"k": 130,
+"duration": 130.0,
+"end": 370.0
+},
+"admitted": null
+},
+{
+"tick": 240,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 131
+},
+"fallback": {
+"mode": "standing",
+"k": 131,
+"duration": 131.0,
+"end": 372.0
+},
+"admitted": null
+},
+{
+"tick": 241,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 132
+},
+"fallback": {
+"mode": "standing",
+"k": 132,
+"duration": 132.0,
+"end": 374.0
+},
+"admitted": null
+},
+{
+"tick": 242,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 133
+},
+"fallback": {
+"mode": "standing",
+"k": 133,
+"duration": 133.0,
+"end": 376.0
+},
+"admitted": null
+},
+{
+"tick": 243,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 134
+},
+"fallback": {
+"mode": "standing",
+"k": 134,
+"duration": 134.0,
+"end": 378.0
+},
+"admitted": null
+},
+{
+"tick": 244,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 135
+},
+"fallback": {
+"mode": "standing",
+"k": 135,
+"duration": 135.0,
+"end": 380.0
+},
+"admitted": null
+},
+{
+"tick": 245,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 136
+},
+"fallback": {
+"mode": "standing",
+"k": 136,
+"duration": 136.0,
+"end": 382.0
+},
+"admitted": null
+},
+{
+"tick": 246,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 137
+},
+"fallback": {
+"mode": "standing",
+"k": 137,
+"duration": 137.0,
+"end": 384.0
+},
+"admitted": null
+},
+{
+"tick": 247,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 138
+},
+"fallback": {
+"mode": "standing",
+"k": 138,
+"duration": 138.0,
+"end": 386.0
+},
+"admitted": null
+},
+{
+"tick": 248,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 139
+},
+"fallback": {
+"mode": "standing",
+"k": 139,
+"duration": 139.0,
+"end": 388.0
+},
+"admitted": null
+},
+{
+"tick": 249,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 140
+},
+"fallback": {
+"mode": "standing",
+"k": 140,
+"duration": 140.0,
+"end": 390.0
+},
+"admitted": null
+},
+{
+"tick": 250,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 141
+},
+"fallback": {
+"mode": "standing",
+"k": 141,
+"duration": 141.0,
+"end": 392.0
+},
+"admitted": null
+},
+{
+"tick": 251,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 142
+},
+"fallback": {
+"mode": "standing",
+"k": 142,
+"duration": 142.0,
+"end": 394.0
+},
+"admitted": null
+},
+{
+"tick": 252,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 143
+},
+"fallback": {
+"mode": "standing",
+"k": 143,
+"duration": 143.0,
+"end": 396.0
+},
+"admitted": null
+},
+{
+"tick": 253,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 144
+},
+"fallback": {
+"mode": "standing",
+"k": 144,
+"duration": 144.0,
+"end": 398.0
+},
+"admitted": null
+},
+{
+"tick": 254,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 145
+},
+"fallback": {
+"mode": "standing",
+"k": 145,
+"duration": 145.0,
+"end": 400.0
+},
+"admitted": null
+},
+{
+"tick": 255,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 146
+},
+"fallback": {
+"mode": "standing",
+"k": 146,
+"duration": 146.0,
+"end": 402.0
+},
+"admitted": null
+},
+{
+"tick": 256,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 147
+},
+"fallback": {
+"mode": "standing",
+"k": 147,
+"duration": 147.0,
+"end": 404.0
+},
+"admitted": null
+},
+{
+"tick": 257,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 148
+},
+"fallback": {
+"mode": "standing",
+"k": 148,
+"duration": 148.0,
+"end": 406.0
+},
+"admitted": null
+},
+{
+"tick": 258,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 149
+},
+"fallback": {
+"mode": "standing",
+"k": 149,
+"duration": 149.0,
+"end": 408.0
+},
+"admitted": null
+},
+{
+"tick": 259,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 150
+},
+"fallback": {
+"mode": "standing",
+"k": 150,
+"duration": 150.0,
+"end": 410.0
+},
+"admitted": null
+},
+{
+"tick": 260,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 151
+},
+"fallback": {
+"mode": "standing",
+"k": 151,
+"duration": 151.0,
+"end": 412.0
+},
+"admitted": null
+},
+{
+"tick": 261,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 152
+},
+"fallback": {
+"mode": "standing",
+"k": 152,
+"duration": 152.0,
+"end": 414.0
+},
+"admitted": null
+},
+{
+"tick": 262,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 153
+},
+"fallback": {
+"mode": "standing",
+"k": 153,
+"duration": 153.0,
+"end": 416.0
+},
+"admitted": null
+},
+{
+"tick": 263,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 154
+},
+"fallback": {
+"mode": "standing",
+"k": 154,
+"duration": 154.0,
+"end": 418.0
+},
+"admitted": null
+},
+{
+"tick": 264,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 155
+},
+"fallback": {
+"mode": "standing",
+"k": 155,
+"duration": 155.0,
+"end": 420.0
+},
+"admitted": null
+},
+{
+"tick": 265,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 156
+},
+"fallback": {
+"mode": "standing",
+"k": 156,
+"duration": 156.0,
+"end": 422.0
+},
+"admitted": null
+},
+{
+"tick": 266,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 157
+},
+"fallback": {
+"mode": "standing",
+"k": 157,
+"duration": 157.0,
+"end": 424.0
+},
+"admitted": null
+},
+{
+"tick": 267,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 158
+},
+"fallback": {
+"mode": "standing",
+"k": 158,
+"duration": 158.0,
+"end": 426.0
+},
+"admitted": null
+},
+{
+"tick": 268,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 159
+},
+"fallback": {
+"mode": "standing",
+"k": 159,
+"duration": 159.0,
+"end": 428.0
+},
+"admitted": null
+},
+{
+"tick": 269,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 160
+},
+"fallback": {
+"mode": "standing",
+"k": 160,
+"duration": 160.0,
+"end": 430.0
+},
+"admitted": null
+},
+{
+"tick": 270,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 161
+},
+"fallback": {
+"mode": "standing",
+"k": 161,
+"duration": 161.0,
+"end": 432.0
+},
+"admitted": null
+},
+{
+"tick": 271,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 162
+},
+"fallback": {
+"mode": "standing",
+"k": 162,
+"duration": 162.0,
+"end": 434.0
+},
+"admitted": null
+},
+{
+"tick": 272,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 163
+},
+"fallback": {
+"mode": "standing",
+"k": 163,
+"duration": 163.0,
+"end": 436.0
+},
+"admitted": null
+},
+{
+"tick": 273,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 164
+},
+"fallback": {
+"mode": "standing",
+"k": 164,
+"duration": 164.0,
+"end": 438.0
+},
+"admitted": null
+},
+{
+"tick": 274,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 165
+},
+"fallback": {
+"mode": "standing",
+"k": 165,
+"duration": 165.0,
+"end": 440.0
+},
+"admitted": null
+},
+{
+"tick": 275,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 166
+},
+"fallback": {
+"mode": "standing",
+"k": 166,
+"duration": 166.0,
+"end": 442.0
+},
+"admitted": null
+},
+{
+"tick": 276,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 167
+},
+"fallback": {
+"mode": "standing",
+"k": 167,
+"duration": 167.0,
+"end": 444.0
+},
+"admitted": null
+},
+{
+"tick": 277,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 168
+},
+"fallback": {
+"mode": "standing",
+"k": 168,
+"duration": 168.0,
+"end": 446.0
+},
+"admitted": null
+},
+{
+"tick": 278,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 169
+},
+"fallback": {
+"mode": "standing",
+"k": 169,
+"duration": 169.0,
+"end": 448.0
+},
+"admitted": null
+},
+{
+"tick": 279,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 170
+},
+"fallback": {
+"mode": "standing",
+"k": 170,
+"duration": 170.0,
+"end": 450.0
+},
+"admitted": null
+},
+{
+"tick": 280,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 171
+},
+"fallback": {
+"mode": "standing",
+"k": 171,
+"duration": 171.0,
+"end": 452.0
+},
+"admitted": null
+},
+{
+"tick": 281,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 172
+},
+"fallback": {
+"mode": "standing",
+"k": 172,
+"duration": 172.0,
+"end": 454.0
+},
+"admitted": null
+},
+{
+"tick": 282,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 173
+},
+"fallback": {
+"mode": "standing",
+"k": 173,
+"duration": 173.0,
+"end": 456.0
+},
+"admitted": null
+},
+{
+"tick": 283,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 174
+},
+"fallback": {
+"mode": "standing",
+"k": 174,
+"duration": 174.0,
+"end": 458.0
+},
+"admitted": null
+},
+{
+"tick": 284,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"boundary": false,
+"gate": "none(leader_inadequate)",
+"adequacy": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "inadequate"
+},
+"observation_warrant": {
+"coffee_break(?coffee_machine=coffee_machine_0)": "observation"
+},
+"warrant": [],
+"perception": {
+"displacement": [
+0.0,
+0.0
+],
+"run_length": 0,
+"standing_count": 175
+},
+"fallback": {
+"mode": "standing",
+"k": 175,
+"duration": 175.0,
+"end": 460.0
+},
+"admitted": null
+}
+]

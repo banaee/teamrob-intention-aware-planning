@@ -57,9 +57,21 @@ def room(traj, run_file) -> Room:
                 traj["params"]["proximity"])
 
 
+class OutsidePreRunDomain(Exception):
+    """The scenario's per-tick table is not derivable before the run (MPB-3)."""
+
+
 def derive(traj, run_file, alpha, theta):
-    rows, _, _ = ir.run(traj, alpha, theta)
     human = next(a for a in domain_config["scenarios"][traj["scenario"]].agents if a.agent_type == "human")
+    # IO §2.1, the recognizer's constructor (assigned_tasks): None or [] switches the support restriction off. With it off every
+    # hypothesis is admissible, the robot's own items' deliveries included, so the robot's acts change human-side
+    # hypothesis state and the table is not derivable before the run (MPB-3, MPB-6). Found in part (iii): the IR
+    # oracle's support rule (its rule 1) assumes a non-empty assignment (class 1, REPORT.md).
+    if not human.assigned_tasks:
+        raise OutsidePreRunDomain(f"{traj['scenario']}: the human has no assigned tasks, so the support restriction is "
+                                  f"off (shared/io_contracts.md: None or [] switches it off); MPB-3's pre-run "
+                                  f"independence does not hold")
+    rows, _, _ = ir.run(traj, alpha, theta)
     agent = human.agent_id
     committed = ir.known_keys(human.assigned_tasks)                                 # DG AD1: commitment, prior on
     task_model = TaskModel(register_kitting_domain(), domain_config["task_model"])
@@ -107,7 +119,11 @@ if __name__ == "__main__":
     alpha = float(yaml.safe_load(open(run_file))["test_level"])
     header = next(l for l in open(sys.argv[3]) if l.startswith("[run] "))
     theta = float(header.split("theta=")[1].split()[0])
-    table = derive(traj, run_file, alpha, theta)
+    try:
+        table = derive(traj, run_file, alpha, theta)
+    except OutsidePreRunDomain as e:
+        print(f"no table: {e}")
+        sys.exit(3)
     dump(table, sys.argv[4])
     loaded = [m for m in FORBIDDEN if m in sys.modules] + [m for m in sys.modules if m.startswith("mesa_sim")]
     assert not loaded, f"the independence boundary is broken: {loaded} loaded"

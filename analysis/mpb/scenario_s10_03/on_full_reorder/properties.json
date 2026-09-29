@@ -1,0 +1,258 @@
+{
+ "scenario": "scenario_s10_03",
+ "strategy": "full_reorder",
+ "prior": true,
+ "completion": 163,
+ "terminal": 164,
+ "horizon": 292,
+ "properties": [
+  {
+   "name": "P3a",
+   "holds": false,
+   "detail": "interval 46 to 54: decisions [48]"
+  },
+  {
+   "name": "P3b",
+   "holds": true,
+   "detail": "record on the interval: ['deliver_item(?item=item_1)']"
+  },
+  {
+   "name": "P3c",
+   "holds": true,
+   "detail": "leaders on the interval: ['deliver_item(?item=item_1)']; item_1 assigned"
+  }
+ ],
+ "measures": {
+  "sep_min_dist": [
+   385.96,
+   4
+  ],
+  "sep_min_continuous": [
+   385.93,
+   5
+  ],
+  "f1": {
+   "viol": 0,
+   "stand": 0,
+   "recede": 0,
+   "?": 0
+  },
+  "near_encounters": 0,
+  "holds": [],
+  "hold_ticks": 0,
+  "ad3_observation_warrant": [
+   [
+    46,
+    "observation"
+   ],
+   [
+    47,
+    "observation"
+   ],
+   [
+    48,
+    "observation"
+   ],
+   [
+    49,
+    "observation"
+   ],
+   [
+    50,
+    "observation"
+   ],
+   [
+    51,
+    "observation"
+   ],
+   [
+    52,
+    "observation"
+   ],
+   [
+    53,
+    "observation"
+   ],
+   [
+    54,
+    "observation"
+   ]
+  ]
+ },
+ "detectors": {
+  "todo134": [],
+  "arrival_tick_rays": []
+ },
+ "decisions": [
+  {
+   "tick": 0,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "fallback moving k=1 end=2.00",
+   "winner": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 2,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "fallback moving k=3 end=6.00",
+   "winner": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 6,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "fallback moving k=7 end=14.00",
+   "winner": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 14,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "fallback moving k=15 end=28.91",
+   "winner": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 25,
+   "trigger": "recognition_changed",
+   "cause": "entered",
+   "gate": "clears",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "admitted deliver_item(?item=item_1)",
+   "winner": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 48,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "clears",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "admitted deliver_item(?item=item_1)",
+   "winner": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 55,
+   "trigger": "recognition_changed",
+   "cause": "retraction",
+   "gate": "none(leader_inadequate)",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "fallback moving k=10 end=66.00",
+   "winner": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 66,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback moving k=21 end=74.71",
+   "winner": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 74,
+   "trigger": "recognition_changed",
+   "cause": "entered",
+   "gate": "clears",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "admitted coffee_break(?coffee_machine=coffee_machine_0)",
+   "winner": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 99,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "clears",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "admitted coffee_break(?coffee_machine=coffee_machine_0)",
+   "winner": "deliver_item(?item=item_3,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 105,
+   "trigger": "recognition_changed",
+   "cause": "replaced",
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "fallback standing k=31 end=137.00",
+   "winner": "deliver_item(?item=item_3,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 121,
+   "trigger": "recognition_changed",
+   "cause": "entered",
+   "gate": "clears",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "admitted deliver_item(?item=item_1)",
+   "winner": "deliver_item(?item=item_3,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 142,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "clears",
+   "leader": "deliver_item(?item=item_1)",
+   "projection": "admitted deliver_item(?item=item_1)",
+   "winner": "deliver_item(?item=item_6,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 149,
+   "trigger": "recognition_changed",
+   "cause": "replaced",
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=3 end=153.00",
+   "winner": "deliver_item(?item=item_6,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 153,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_2)",
+   "projection": "fallback moving k=3 end=157.00",
+   "winner": "deliver_item(?item=item_6,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 157,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_2)",
+   "projection": "fallback moving k=7 end=165.00",
+   "winner": "deliver_item(?item=item_6,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 164,
+   "trigger": "recognition_changed",
+   "cause": "entered",
+   "gate": "clears",
+   "leader": "deliver_item(?item=item_2)",
+   "projection": "admitted deliver_item(?item=item_2)",
+   "winner": null,
+   "hold": 0
+  }
+ ]
+}

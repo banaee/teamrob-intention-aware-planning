@@ -3738,7 +3738,7 @@ reaches it.
 Files: shared/recognizer.py (`_retired`)
 Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
 
-**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [OPEN; ruled (MPB, 29 Sept 2026); step 2 pending]
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [BUILT IN PART (MPB step 2, 29 Sept 2026): scenarios 1 to 5 and the control verified; scenarios 6 and 7 class 4, re-authoring pending Hadi]
 REWRITTEN (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"): the earlier track
 note and its X amendment are superseded by the entry; their content is in it.
 The recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
@@ -3763,6 +3763,10 @@ on primary, prior off a diagnostic appendix with no exact comparison; `single_ta
 run with identical tables, not identical chains.
 Files: analysis/ (the MPB instrument, step 2), domains/kitting/ (env_layout_12, env_setup_10 onward, scenarios_s10.py
 onward), configs/ (the run files)
+MPB STEP 2 (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", BUILT IN PART; analysis/mpb/REPORT.md):
+- Verified: scenarios 1 to 5 and the control, zero disagreements on parts 1 to 3 under both strategies, prior on.
+- Not verified: scenarios 6 and 7 (scenario_s11_01, _02). Their human has no assigned tasks, which switches the support restriction off, so MPB-3's precondition fails (class 4; the oracle corrected, class 1).
+- Open: the re-authoring of scenarios 6 and 7; the AD3 addition (not exercised); the skip rule on an arrival tick (objection 1).
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
@@ -3808,6 +3812,13 @@ G-RECORDS (T-D G, ruled by Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admi
   MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): scenario 7's stand records the
   re-decision ticks, the holds and the tick the persistence broke, as evidence; nothing built; the question returns
   to the design chat after the runs.
+  MPB STEP 2 EVIDENCE (29 Sept 2026; analysis/mpb/REPORT.md), from scenario_s11_02, a run outside the verified domain
+  (class 4: the support restriction off):
+  - the stand at spot_E from 26; its persistence broke at 57;
+  - the decisions on it at 32 (a stand of k = 8, projected to 41) and 41 (k = 17, projected to 59, hold 14);
+  - no hold ran past the break.
+  scenario_s11_01 after its switch: a hold of 23 at 33 against a stand projected to 68, the human standing until 59.
+  To be re-taken on the re-authored scenario.
 - (b) CLOSED into X's occupied-target item (`docs/handoffs/handoff_G_X_onward.md` §5).
 - (c) CLOSED as answered: L5 B refuses on the boundary tick (no hypothesis is a member there), and the decision at
   b + 1 is AD1's.

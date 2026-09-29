@@ -40,9 +40,10 @@ for RUN in $RUNS; do
       $OUT/reference.json --strategy $STRATEGY 2>&1 | grep -v -e '^\[' -e '^  step'
   fi
   if [ "$PRIOR" = on ]; then
-    PYTHONHASHSEED=0 $PY $D/mpb_oracle.py $OUT/trajectory.json $RUN $LOG $OUT/expected_ticks.json
-    $PY $D/chain.py $OUT/expected_ticks.json $OUT/observed.json $OUT/expected_decisions.json
-    $PY $D/compare.py $sid $OUT
+    if PYTHONHASHSEED=0 $PY $D/mpb_oracle.py $OUT/trajectory.json $RUN $LOG $OUT/expected_ticks.json; then
+      $PY $D/chain.py $OUT/expected_ticks.json $OUT/observed.json $OUT/expected_decisions.json
+      $PY $D/compare.py $sid $OUT
+    fi
   fi
   PYTHONHASHSEED=0 $PY $D/properties.py $sid $OUT $LOG $RUN
   $PY $D/plot.py $sid $OUT

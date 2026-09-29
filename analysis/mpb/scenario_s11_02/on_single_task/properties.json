@@ -1,0 +1,239 @@
+{
+ "scenario": "scenario_s11_02",
+ "strategy": "single_task",
+ "prior": true,
+ "completion": 132,
+ "terminal": 134,
+ "horizon": 164,
+ "properties": [],
+ "measures": {
+  "sep_min_dist": [
+   53.42,
+   19
+  ],
+  "sep_min_continuous": [
+   53.42,
+   19
+  ],
+  "f1": {
+   "viol": 0,
+   "stand": 0,
+   "recede": 0,
+   "?": 0
+  },
+  "near_encounters": 0,
+  "holds": [
+   [
+    14,
+    2
+   ],
+   [
+    20,
+    2
+   ],
+   [
+    41,
+    14
+   ]
+  ],
+  "hold_ticks": 18,
+  "todo132a": {
+   "stand_first_tick": 26,
+   "persistence_broke": 57,
+   "decisions": [
+    [
+     32,
+     "recognition_changed",
+     8,
+     41.0,
+     0
+    ],
+    [
+     41,
+     "projection_expired",
+     17,
+     59.0,
+     14
+    ]
+   ],
+   "last_projection_end": 59.0,
+   "holds_past_break": []
+  }
+ },
+ "detectors": {
+  "todo134": [],
+  "arrival_tick_rays": []
+ },
+ "decisions": [
+  {
+   "tick": 0,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback moving k=1 end=2.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 2,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback moving k=3 end=6.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 6,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback moving k=7 end=14.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 14,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback moving k=15 end=20.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 2
+  },
+  {
+   "tick": 20,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback standing k=1 end=22.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 2
+  },
+  {
+   "tick": 22,
+   "trigger": "recognition_changed",
+   "cause": "entered",
+   "gate": "clears",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "admitted deliver_item(?item=item_10)",
+   "winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 32,
+   "trigger": "recognition_changed",
+   "cause": "retraction",
+   "gate": "none(leader_inadequate)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback standing k=8 end=41.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 41,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback standing k=17 end=59.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 14
+  },
+  {
+   "tick": 59,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback moving k=3 end=63.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 63,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_10)",
+   "projection": "fallback moving k=7 end=71.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 71,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "deliver_item(?item=item_11)",
+   "projection": "fallback moving k=15 end=87.00",
+   "winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 81,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback moving k=25 end=97.46",
+   "winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 98,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback moving k=42 end=119.01",
+   "winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 120,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=1 end=122.00",
+   "winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 122,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=3 end=126.00",
+   "winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 126,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=7 end=134.00",
+   "winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+   "hold": 0
+  },
+  {
+   "tick": 134,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=15 end=150.00",
+   "winner": null,
+   "hold": 0
+  }
+ ]
+}

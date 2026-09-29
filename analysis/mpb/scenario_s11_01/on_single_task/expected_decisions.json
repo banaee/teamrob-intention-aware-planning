@@ -1,0 +1,122 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_unwarranted)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_unwarranted)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_unwarranted)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_unwarranted)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 30.0
+}
+},
+{
+"tick": 30,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 62.0
+}
+},
+{
+"tick": 33,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 34,
+"duration": 34.0,
+"end": 68.0
+}
+},
+{
+"tick": 68,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 8,
+"duration": 8.0,
+"end": 77.0
+}
+},
+{
+"tick": 76,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 16,
+"duration": 16.0,
+"end": 93.0
+}
+}
+]

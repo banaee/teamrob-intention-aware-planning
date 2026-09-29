@@ -1,0 +1,9 @@
+# The run logs and .rec streams are git-ignored by the repo's *.log / *.rec rules (md5s in REPORT.md).
+# The prior-off appendix is reported by its measures (properties.*, figure.png); its per-tick files are not kept.
+scenario_*/off_single_task/trajectory.json
+scenario_*/off_single_task/actual_ticks.json
+scenario_*/off_single_task/actual_decisions.json
+scenario_*/off_single_task/actual_log_decisions.json
+scenario_*/off_single_task/robot.json
+# The trajectory is the human's, the same for every strategy (byte-identical, REPORT.md): kept once, on_single_task.
+scenario_*/on_full_reorder/trajectory.json

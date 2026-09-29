@@ -1,0 +1,306 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 2.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 50.58
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 57.41
+}
+]
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 4.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 48.58
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 55.64
+}
+]
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 8.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 44.58
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 52.2
+}
+]
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 2,
+"horizon": 6.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 2,
+"T_r": 36.58
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 46.06
+}
+]
+},
+{
+"tick": 20,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 2,
+"horizon": 2.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 2,
+"T_r": 32.58
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 43.64
+}
+]
+},
+{
+"tick": 22,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 28.80436233741606,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 18,
+"T_r": 32.58
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 43.64
+}
+]
+},
+{
+"tick": 32,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 9.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 33.64
+},
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 32.99
+}
+]
+},
+{
+"tick": 41,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 14,
+"horizon": 18.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 14,
+"T_r": 25.27
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 41.04
+}
+]
+},
+{
+"tick": 59,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 4.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 21.27
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 44.03
+}
+]
+},
+{
+"tick": 63,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 8.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 17.27
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 48.18
+}
+]
+},
+{
+"tick": 71,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 16.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_10,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 9.27
+},
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 56.25
+}
+]
+},
+{
+"tick": 81,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 16.464763090098515,
+"candidates": [
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 50.69
+}
+]
+},
+{
+"tick": 98,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 21.012995970887932,
+"candidates": [
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 33.69
+}
+]
+},
+{
+"tick": 120,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 2.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 13.14
+}
+]
+},
+{
+"tick": 122,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 4.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 11.14
+}
+]
+},
+{
+"tick": 126,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"hold": 0,
+"horizon": 8.0,
+"candidates": [
+{
+"task": "deliver_item(?item=item_11,?kitting_table=kitting_table_1)",
+"delta": 0,
+"T_r": 7.14
+}
+]
+},
+{
+"tick": 134,
+"trigger": "no_current_task",
+"terminal": true,
+"winner": null,
+"hold": 0,
+"horizon": null,
+"candidates": []
+}
+]

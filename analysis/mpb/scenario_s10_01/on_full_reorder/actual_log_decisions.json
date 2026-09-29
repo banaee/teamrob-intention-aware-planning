@@ -1,0 +1,107 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 25,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "deliver_item(?item=item_1)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 35,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 61,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 64,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 67,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 72,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 76,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "deliver_item(?item=item_2)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 116,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 124,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(leader_no_observation)"
+},
+{
+"tick": 126,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "built warrant=observation"
+},
+{
+"tick": 139,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "built warrant=observation"
+}
+]

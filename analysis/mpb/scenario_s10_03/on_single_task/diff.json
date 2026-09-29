@@ -1,0 +1,37 @@
+{
+ "ticks": {
+  "leader": [
+   292,
+   0
+  ],
+  "boundary": [
+   292,
+   0
+  ],
+  "gate": [
+   292,
+   0
+  ],
+  "adequacy": [
+   292,
+   0
+  ],
+  "observation_warrant": [
+   292,
+   0
+  ],
+  "perception": [
+   175,
+   0
+  ]
+ },
+ "decisions": {
+  "part1": [
+   13,
+   13
+  ],
+  "part2": 17,
+  "part3": 17
+ },
+ "disagreements": []
+}
