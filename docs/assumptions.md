@@ -38,14 +38,14 @@ human's load-time replay plus the idle margin (the replay's last acknowledgement
 human), not a literal. The horizon of runs where the robot has work is open; the maintained baseline sets keep their
 step counts.
 Authoring convention · TB.3b's rule (`analysis/ir_testbed/run.sh`) · run files, sweep scripts.
-The replay has no term for the robot's work, which in the maintained sets ends after the human's.
+The replay has no term for the robot's work, which in the maintained sets ends after the human's (TODO-138).
 
 **1.4** The framework's experiments use the prior-on configuration (the robot knows the human's assigned tasks,
 `--assignment_prior true`). Prior off is a recognizer diagnostic and ablation configuration, not a human-behaviour
 scenario; an artefact produced only under prior off is not a framework scope case and never produces a rule.
 Framework scope · CLAUDE.md's prior convention, revised (Hadi, 28 Sept 2026) · where findings are drawn from; the
 maintained sets still run both priors.
-The run option's default is still off (`configs/experiment.yaml`); not changed here.
+The run option's default is still off (`configs/experiment.yaml`); not changed here (TODO-139).
 
 ## 2. The team and the task world
 
@@ -89,7 +89,8 @@ equally; any movement of the probabilities is a consequence of the evidence func
 evidence that one hypothesis explains the stand better than another; the probabilities are not claimed invariant. No
 stay hypothesis is introduced; P4's **fallback projection** (the short-term physical projection from what was observed)
 carries an observed stand.
-General semantics · Hadi, 28 Sept 2026 · the recognizer (no change); TODO-95 closed.
+General semantics · Hadi, 28 Sept 2026 · the recognizer (no change); TODO-95 closed, its open levels to X and
+TODO-132 (b).
 Measured, scenario_s09_06 over its stand (ticks 30 to 69): deliver_item(item_1) 0.8608 to 0.9184, coffee_break 0.1373
 to 0.0796 (the evidence L(v·D) is logistic in D, so an equal added standing moves the ratios until its tail).
 
@@ -98,7 +99,7 @@ to 0.0796 (the evidence L(v·D) is logistic in D, so an equal added standing mov
 **4.2** The scripted human is open-loop: it does not react to the robot's motion.
 Framework scope · T-C1; the Mesa human has no avoidance · the human executor.
 It reads what the robot does to objects (T-H2 D3, TODO-105: a resumed fetch walk goes to where the item now is).
-Future work: a reactive human that gives the robot space.
+Future work: a reactive human that gives the robot space (TODO-136).
 
 **4.4** Execution-time residuals (the robot's motion past the human projection's end T_h, or under a projection built
 on little evidence, P4's recorded error) are not the planner's to remove. Evaluation measures their outcome as
@@ -118,7 +119,8 @@ option for demonstrations, off for evaluation. Scenarios in which the human walk
 evaluation cases for the communication question (X).
 Framework scope · Hadi, 28 Sept 2026, reframing F1's stance (F1 stays the safety record) · the maintained sets'
 "2.5" sections (the `[sep]` minimum and F1's class counts per run).
-The fallback-only control is no run option today.
+The fallback-only control is no run option today (TODO-137); the evaluation scenario is TODO-135 (its first
+instance: scenario_s01_06, the exit walk through the holding robot, 5.23 cm at 147, stands and a recede).
 
 ## 5. Perception
 
@@ -136,10 +138,10 @@ Perception · the world-state builder (one observed human per robot) · the reco
 - **2.1** "The human acts rationally": too strong; nothing depends on it.
 - **3.1** "Switches only at action boundaries": rejected. Mid-action changes stay in scope and are handled by the
   general machinery: the current derived phase's hypothesis adequacy turns inadequate, the admitted projection is
-  retracted, the fallback projection takes over, and the new task is admitted at its next fitting phase. A test-bed
-  scenario demonstrates the recognition side.
-- **3.5** The re-admission delay after a switch: a consequence of T-D L5, recorded there, and an evaluation measure;
-  not an assumption.
+  retracted, the fallback projection takes over, and the new task is admitted at its next fitting phase.
+  scenario_s09_13 demonstrates the recognition side, not the recognition-to-planning chain (the robot is idle).
+- **3.5** The re-admission delay after a switch: a consequence of T-D L5, recorded there (with the test-bed's numbers
+  at HEAD), and an evaluation measure; not an assumption.
 - **4.1** Reframed as 4.6.
 - **4.3** Approach-and-hold at the separation boundary: an observed consequence of P4, recorded in the T-D P entry; what
   else the robot may do is X's.

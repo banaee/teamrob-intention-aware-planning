@@ -175,7 +175,15 @@ Decisions
   observed persistence only (a straight run of k ticks projects k ticks, a stand of k ticks k ticks), the refusal and
   the wait are dropped, and a third trigger, `projection_expired`, re-decides when the fallback a decision rested on
   runs out. P is closed with P4 (P4-build, 28 Sept 2026; the four maintained sets regenerated, six prior-on logs not
-  completing at the occupied target with holds lengthening, X's case); P3 and TODO-134 stay open. Next is G.
+  completing at the occupied target with holds lengthening, X's case); P3 and TODO-134 stay open.
+  Track 2.5 (ruled by Hadi 28 Sept 2026, built 29 Sept 2026): the framework assumptions and authoring conventions are
+  recorded in `docs/assumptions.md` (a case is classified first: intended phenomenon, boundary, authoring artefact,
+  prior-off artefact); the six regression scripts behind the occupied-target logs (scenario_s01_01, s01_06, s02_01,
+  s03_01, s04_01, s06_03) end with the exit walk `go_to("corner_SE")` (1.1; env_layout_02 and env_layout_08 gained
+  corner_SE), and the four maintained sets are regenerated (the "2.5" sections: every log completes; the `[sep]` minimum
+  and F1's classes per run, `analysis/tb1a_destination/sep_classes.py`); scenario_s09_13 (the mid-action change, a
+  coffee_break cut into a carry) agrees with the IR test-bed's oracle, extended to cuts; TODO-95 closed (3.4), TODO-135
+  to TODO-139 recorded. Next is G.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
@@ -217,7 +225,8 @@ Decisions
   and the hypothesis space is that pool plus the foreseeable tasks. Prior OFF (the robot does not know the human's
   assigned tasks) is a later test mode, run once the framework is stable, when both modes are tested and reported.
   Until then a prior-OFF measurement is an appendix, never the primary set, and no ruling is made on prior-OFF numbers
-  alone.
+  alone. Revised in `docs/assumptions.md` 1.4: prior off is a recognizer diagnostic and ablation configuration; an
+  artefact produced only under it never produces a rule. The run option's default is still off (TODO-139).
 - When a task delegates a decision, decide from the design: state the reasoning before implementing, then evaluate. If the evaluation contradicts the reasoning, report it; do not switch the decision to fit the results.
 
 ## Workflow rules
@@ -334,7 +343,9 @@ Old ids (scenario_00 on env_layout0 and so on) are mapped in `docs/rename_table.
 
 Use the step counts of the sweep scripts (`analysis/tb1a_destination/sweep.sh` for the five and the evaluation
 fixtures; before T-L stage 3, the frozen `analysis/f1_robot_responsible/sweep.sh` and `analysis/f47_fixtures/sweep.sh`,
-on the old ids). The current baselines are the T-L stage 3 regeneration of the four maintained sets below, with their
+on the old ids). The current baselines are the Track 2.5 regeneration of the four maintained sets below (their "2.5"
+README sections; before it L-build, P-build and P4-build, each with its own section); what follows is the T-L stage 3
+regeneration's description, whose folders and names still hold, with their
 `.rec` streams, named `<layout id>_<scenario id>_<run options>.log`: `analysis/tb1a_destination/sweep/` (the five plus
 scenario_s03_06 / scenario_s05_01 / scenario_s05_02, both priors, stop off, `single_task`; logs local, md5s in its
 README, the "T-L stage 3" section), `analysis/tb1b_two_tables/sweep/` (scenario_s06_01 / scenario_s06_02),
@@ -433,6 +444,11 @@ across that commit without it.
   literals.
 - Every term has one meaning: `docs/glossary.md`. The entries below are the ones a task prompt
   leans on most; the glossary is the full list and carries the pointers.
+- Framework assumptions and authoring conventions: `docs/assumptions.md` (Track 2.5). Classify a case found in a run
+  before acting on it: an intended phenomenon (design it), a boundary (record it), an authoring artefact (correct the
+  fixture), a prior-off artefact (never framework semantics, never a rule). Baseline human scripts end with the exit
+  walk (1.1); a run's step count follows 1.3 (derived for human-script and test-bed runs; literal in the maintained
+  sets until TODO-138).
 - "Task pool" at the `update()` level; "candidates" exist only inside B3. A candidate is the unit
   the argmin ranges over: an individual task under `single_task`, one ordering of the pool under
   `full_reorder` (DESIGN-16, terminology). An ordering is a permutation of the pool; it is never

@@ -524,7 +524,8 @@ load-time sequential expansion (events and resumptions included), which the exec
 check that a stated table agrees with the station (`check_task_destinations`) applies to the assigned tasks and the
 robot's plans. A free placement or a handover, if ever wanted, is a task of the tree.
 AUTHOR CONVENTION (T-C2c, carried over): a script ends with the human leaving the workspace (`go_to("door")` or a
-corner), unless the scenario is about the terminal stand at a table (TODO-80), said in its description.
+corner), unless the scenario is about the terminal stand at a table (TODO-80), said in its description. Extended to the
+regression fixtures whose terminal stand is not their purpose (Track 2.5): `docs/assumptions.md` 1.1.
 
 **event** — a `Trigger` and a `Decision` attached to a task of the script, or built live by `inject`. Typed, no unions
 and no sentinels. An event fires once per script entry and is then consumed.

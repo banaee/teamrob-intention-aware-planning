@@ -3127,7 +3127,18 @@ AMENDED (Hadi, on the L-records report, 27 Sept 2026): (ii) "leaves adequate" is
 as the state: it is inadequate); no P fallback. (iii) "consistent again" arrives at the next phase change, advance or
 regress. design_decisions.md, "T-D L", L2 as amended.
 
-**TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [OPEN; its recognition level CLOSED by decision, T-D R and E, 27 Sept 2026]
+**TODO-95: Stationary behaviour leaves no evidence; the robot's response to `unknown` and a stationarity channel (design task, raised at T-D Q1, 23 Sept 2026)** [CLOSED (Track 2.5, Hadi, 28 Sept 2026; docs/assumptions.md 3.4); its open levels moved to X and TODO-132 (b)]
+CLOSED (Track 2.5; ruled by Hadi 28 Sept 2026, recorded 29 Sept 2026). The recognition level, closed by decision in T-D R
+and E, closes as not needed (docs/assumptions.md 3.4): a stand inside a task is a pause while it lies within the
+standing its derived phase prices (s_exp, E9, E10); beyond that the phase does not fit and, if no other live hypothesis
+fits, the finding is unexplained. Standing contributes no hypothesis-specific evidence while the live hypotheses price
+the standing equally; a movement of the probabilities is a consequence of the evidence function and the normalisation,
+not evidence that one hypothesis explains the stand better (the probabilities are not claimed invariant: scenario_s09_06,
+deliver_item(item_1) 0.8608 to 0.9184 over its stand). No stay hypothesis is introduced; P4's fallback projection
+carries an observed stand. The open levels move, explicitly: level 1 (decision level) is built as T-D P (P4's observed
+stand); level 2 (execution: the blocked event, WAIT against RECONSIDER) and level 3 (interaction: communication,
+TODO-96) are X's; the sustained stand as a question for the meta-planner is TODO-132 (b). The text below is kept as the
+record.
 Status: open. To be raised at the T-D recognizer pass (Q2 to Q4): rule there whether this joins
 the pass or stays recorded for T-H.
 T-D R AND E (Hadi, 26 to 27 Sept 2026; design_decisions.md, "T-D R and E: the recognizer's output under a removed
@@ -3722,7 +3733,8 @@ observation establishes it (a departure from the projected position by `min_sepa
 ruling, because `min_separation` is the body's safety constraint), and whether it is a trigger. RULED IN PART by P4 /
 Q6 (28 Sept 2026): the fallback's own end is a trigger (`projection_expired`); a departure from it before its end is
 still G's. (b) TODO-95's sustained
-stand. (c) The no-decision on a reset tick (every boundary that meets a record clears the projection, L5 B). (d)
+stand (the one open question TODO-95 left at its closure, Track 2.5, 29 Sept 2026: what the meta-planner does
+with a sustained stand; the recognizer side is docs/assumptions.md 3.4). (c) The no-decision on a reset tick (every boundary that meets a record clears the projection, L5 B). (d)
 Whether the wait's polling by `no_current_task` stands, or a staleness or reconsideration trigger replaces it (P1:
 provisional until G). CLOSED by P4 / Q6: there is no wait; the robot reconsiders when the fallback it planned against
 runs out (`projection_expired`). (e) Whether the lone-hypothesis admission at b + 1 stands (TODO-119's G part).
@@ -3751,8 +3763,53 @@ the position at the decision tick is the observation itself: the human stood the
 robot's first tick too. Measured: scenario_s03_01 `single_task` (both priors) passes 30.12 cm from the standing human
 at tick 171 inside that first tick (violating shifts (0.06, 53) from the offset, (−0.94, 53) from step 0). Whether the
 stand should start at step 0 is the question; a design decision, not a fix.
+TRACK 2.5 (29 Sept 2026): with the exit walk on scenario_s03_01 (docs/assumptions.md 1.1) the case no longer occurs in
+the maintained sets (`[sep]` minimum 48.25 cm prior off, 60.15 cm prior on, single_task); the question stands.
 Files: shared/projection.py (`Projector.project_fallback`), shared/realization.py (the assessed window)
 Reference: design_decisions.md, "T-D P", BUILT (P4-build), the observation-offset gap; L2; T3b
+
+**TODO-135: The near-encounter evaluation scenario: the human walks toward the robot (recorded, Track 2.5, 29 Sept 2026)** [OPEN; authored with X]
+docs/assumptions.md 4.6: near-encounters (ticks with the robot–human distance below `min_separation`) are an evaluation
+measure of the planner, classified per F1 (viol / stand / recede), compared between the IR planner and the no-IR
+planner; scenarios in which the human walks toward the robot stay in scope as evaluation cases for the communication
+question (X). To author: a scenario whose declared intent is that approach, with X.
+FIRST INSTANCE (Track 2.5 baselines, `analysis/tb1a_destination/README.md`, "2.5"): scenario_s01_06, both priors,
+`[sep]` 5.23 cm at 147: the human's exit walk from the table to corner_SE passes through the robot holding mid-carry at
+(262, −76) on a fallback hold from 144; F1: stands and a recede, no robot violation. An instance produced by the exit
+walk, not a scenario authored for it.
+Files: domains/kitting/ (the scenario), analysis/tb1a_destination/sep_classes.py (the measure)
+Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137
+
+**TODO-136: A reactive human that gives the robot space (recorded, Track 2.5, 29 Sept 2026)** [OPEN; future work]
+docs/assumptions.md 4.2: the scripted human is open-loop, it does not react to the robot's motion (the Mesa human has no
+avoidance; it reads only what the robot does to objects, T-H2 D3, TODO-105). Future work: a human executor that
+reacts to the robot's execution, for example by giving it space. Not scheduled.
+Files: world/human_executor.py, mesa_sim/sim_agents.py (`HumanAgent`)
+Reference: docs/assumptions.md 4.2; design_decisions.md, "T-H" (item 10, Alternative 1)
+
+**TODO-137: The fallback-only control for the near-encounter comparison (recorded, Track 2.5, 29 Sept 2026)** [OPEN]
+docs/assumptions.md 4.6 compares the IR planner (realized cost) with the no-IR planner: plain cost (`--cost_strategy
+plain`, candidates ranked without realization) and the fallback-only control (the planner realizing against the
+fallback projection always, admission never). The second is no run option today (the flags: `--strategy`,
+`--gate_strategy`, `--cost_strategy`, `--separation_stop`, `--assignment_prior`, `--test_level`). To build with 4.6's
+evaluation.
+Files: mesa_sim/run_mesa.py (the option), shared/meta_planner.py (admission)
+Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135
+
+**TODO-138: The horizon of runs in which the robot has work (recorded, Track 2.5, 29 Sept 2026)** [OPEN]
+docs/assumptions.md 1.3 derives a run's step count from the human's load-time replay plus the idle margin (TB.3b's rule)
+for human-script and test-bed runs only: the replay has no term for the robot's work, which in the maintained sets ends
+after the human's. The maintained sets keep their literal step counts until this is ruled. Evidence: scenario_s04_01
+completes at 384 of the sweep's 400 steps under Track 2.5 (16 ticks of margin; was the occupied target before).
+Files: analysis/*/sweep.sh, configs/ (run files)
+Reference: docs/assumptions.md 1.3; analysis/ir_testbed/run.sh; TODO-33
+
+**TODO-139: Align the run option's default assignment prior with docs/assumptions.md 1.4 (recorded, Track 2.5, 29 Sept 2026)** [OPEN]
+1.4: the framework's experiments use the prior-on configuration; prior off is a diagnostic and ablation configuration.
+The default of `--assignment_prior` is still off (`configs/experiment.yaml`, `assignment_prior: false`; CLAUDE.md,
+"(default off)"). Not changed in Track 2.5.
+Files: configs/experiment.yaml, CLAUDE.md
+Reference: docs/assumptions.md 1.4
 
 **T-D OPENING AGENDA, from the T-C2c play** (`analysis/tc2c_scripts/play.md`; recorded 23 September 2026)
 1. The robot is blind after every human task completion: TODO-85 (b), its general form (scenario_s05_03, 0.78 cm).

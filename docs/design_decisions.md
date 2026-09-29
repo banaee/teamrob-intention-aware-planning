@@ -3665,6 +3665,10 @@ standing at a table after its script deadlocks the robot with the stop on; that 
 design result, and a stay that ends is waited out (scenario_94). The 22 play scripts and the two C2c fixtures
 (scenario_11, scenario_01) are not edited: they are examples and TODO-80 fixtures. New scenarios follow the
 convention.
+SUPERSEDED IN PART (Track 2.5, ruled by Hadi 28 Sept 2026): "New scenarios follow the convention" is extended to the
+existing regression fixtures where their terminal stand is not part of the fixture's purpose (docs/assumptions.md
+1.1); the six scripts behind the occupied-target logs (scenario_s01_01, s01_06, s02_01, s03_01, s04_01, s06_03) end
+with `go_to("corner_SE")` since 52295f7. The play scripts and the C2c fixtures are unchanged.
 
 T-C2, THE BUILD: C2a the script layer (primitives, `expand`, the vocabulary, landmarks, the provenance check);
 C2b the human executor, action-level (both built). Fixtures s00, s20, s70, s80, s83, prior on; the check is identity up to
@@ -4678,6 +4682,13 @@ only (session L-records); built in L-build.
   plan step): no hypothesis is a member on a boundary tick, so admission refuses there (G1) and every human boundary
   that meets a recorded decision clears the projection; the decision on the boundary tick is unprojected, and a lone
   hypothesis is re-admitted at b + 1 (TODO-119): two decisions per such boundary.
+  CONSEQUENCE RECORDED (Track 2.5, 29 Sept 2026; docs/assumptions.md, 3.5 dropped as an assumption): the re-admission
+  delay after a switch or a boundary follows from L5 (the belief restarts at the prior; the new episode's evidence
+  must carry the leader to θ, adequate) and is an evaluation measure, not an assumption. At HEAD (the IR test-bed,
+  prior on; the leader adequate at its θ tick in each case): scenario_s09_01, the first episode 25 ticks from tick 0,
+  15 after the boundary at 61 (`deliver_item(item_2)` at θ at 76); scenario_s09_07, 14 ticks after the switch at 32
+  (13 after the boundary at 33, θ at 46; TB.4b's 32 ticks, θ at 64, were before L); scenario_s09_13, the resumed
+  delivery 14 ticks after its resumption at 107 (16 after the boundary at 105, θ at 121).
 
 Staging for L-build. The recognizer (L1, L4) and the meta-planner (L2 ii) are built; the IR test-bed's oracle is
 updated by derivation from this entry (not fitted to the runs); the sixteen test-bed scenarios (scenario_s08_01 to _04,
@@ -4820,6 +4831,10 @@ P2 (stationary only) scenario_s02_01 waited too, at a BLOCKED ROUTE (the human s
 shelf_1, the robot's walk there within `min_separation` of it); under P2 as ruled it completes in both priors (425 /
 428), the robot's earlier decisions having moved. The blocked route has no instance in the fixtures; it stays one of
 X's categories beside the occupied target, not a glossary term.
+SUPERSEDED IN PART (Track 2.5, ruled by Hadi 28 Sept 2026): "no retroactive scope change, the scripts are not edited" no
+longer holds. docs/assumptions.md 1.1 extends the authoring convention to the regression fixtures whose terminal stand
+is not their purpose; the six scripts end with the exit walk (52295f7), and the twelve occupied-target logs of P4 now
+complete (the maintained READMEs, "2.5"). The occupied target stays X's case, now with no instance in the fixtures.
 
 Consequence of ruling 3 (the candidate's own horizon), recorded: a fallback can refuse every candidate at a decision
 while the human walks, and the robot then waits by polling until the tail frees one. scenario_s05_01 under
@@ -4909,6 +4924,10 @@ scenario_s01_06 and scenario_s06_06 (complete at 265, `[sep]` 26.0 cm, as before
   and reconsiders at each expiry of a longer stand (scenario_s01_06 prior on, 800 steps: expiries at 165, 213, 309,
   501, holds 48, 96, 192, 384, 63.42 cm from the human, never complete). The READMEs record "does not complete:
   occupied target (X), holds lengthening, from <first hold on the final stand>". The case is X's.
+  CONSEQUENCE RECORDED (Track 2.5, 29 Sept 2026; docs/assumptions.md, 4.3 dropped as an assumption): approach-and-hold
+  at the separation boundary is an observed consequence of P4, not an assumption: the robot walks to where realization
+  against the observed stand clears it and holds there, about `min_separation` from the human (63.42 cm above), and
+  reconsiders at each expiry. What else the robot may do is X's. Under Track 2.5's exit walk these logs complete.
 - The observation-offset gap, recorded (scenario_s03_01 `single_task`, both priors, `[sep]` 30.12 cm at tick 171).
   The decision at 171 (`no_current_task`) rested on a fallback stand (count 52, [1, 53] on the decision clock) and
   chose item_7 with δ = 0; its first step, from 35.5 cm of the standing human, passes 30.12 cm from it (rule (b):
