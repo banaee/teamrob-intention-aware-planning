@@ -460,3 +460,26 @@ Command: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep`.
 | env_layout_08_scenario_s06_01_on | 1618a7efff2c9193f6204f54015f910d | 8cf0930761924a3aab1f1713f3f4bf29 | 267 | 265 |
 | env_layout_08_scenario_s06_02_off | d7506eae987c2276028a9d5374692659 | 329590c9c1249859bfe20d107588c50a | 262 | 267 |
 | env_layout_08_scenario_s06_02_on | aa88a8cd08807205b66829d1e1b402d9 | 329590c9c1249859bfe20d107588c50a | 269 | 267 |
+
+## 2.5: the exit walk on the six regression scripts (Track 2.5) — the logs from here on
+
+Regenerated at Track 2.5 (29 September 2026), superseding the P4-build table above. CAUSE: `docs/assumptions.md` 1.1:
+the human scripts of scenario_s01_01, s01_06, s02_01, s03_01, s04_01 and s06_03 end with the exit walk
+`go_to("corner_SE")` (52295f7), and env_layout_02 and env_layout_08 declare the landmark corner_SE. The other
+scenarios' scripts are unchanged; their logs and `.rec` streams are byte-identical to the P4-build table (env_layout_08's
+new landmark moved nothing). The six scripts' `.rec` streams change from the tick the exit walk begins. Completion is
+the world tick (T6), read by `analysis/tb1a_destination/sep_classes.py`: the tick after the robot's last release made
+while it has a task; the "before" column is the same reader on the P4-build logs. The `[sep]` minimum is
+of the continuous distance; viol / stand / recede are F1's classes (`analysis/f1_robot_responsible/evaluate.py`, its
+rule copied into the reader) of the ticks whose continuous minimum lies below min_separation (50 cm): the
+near-encounters of `docs/assumptions.md` 4.6.
+Nothing changed: the four logs and `.rec` streams are byte-identical to the P4-build table (scenario_s06_01 and
+scenario_s06_02 are not edited; env_layout_08's new landmark moved nothing).
+Commands: `analysis/tb1b_two_tables/sweep.sh analysis/tb1b_two_tables/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (P4) | completion after (2.5) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_off | 1aff98e410789949a7ab283f8b972609 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_on | 1618a7efff2c9193f6204f54015f910d | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_off | d7506eae987c2276028a9d5374692659 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_on | aa88a8cd08807205b66829d1e1b402d9 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |

@@ -605,3 +605,42 @@ Command: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`.
 | env_layout_07_scenario_s05_01_on | 29861d94faf3dec03cb4165471d65b5f | dab078d5ca51e5b378054ee6a60ccca7 | 175 | 194 |
 | env_layout_07_scenario_s05_02_off | 8d2ccf8c010c262e80bf0580b61adad8 | dab078d5ca51e5b378054ee6a60ccca7 | 179 | 218 |
 | env_layout_07_scenario_s05_02_on | fb47d44872ffee0930a1403f311886f2 | dab078d5ca51e5b378054ee6a60ccca7 | 179 | 214 |
+
+## 2.5: the exit walk on the six regression scripts (Track 2.5) — the logs from here on
+
+Regenerated at Track 2.5 (29 September 2026), superseding the P4-build table above. CAUSE: `docs/assumptions.md` 1.1:
+the human scripts of scenario_s01_01, s01_06, s02_01, s03_01, s04_01 and s06_03 end with the exit walk
+`go_to("corner_SE")` (52295f7), and env_layout_02 and env_layout_08 declare the landmark corner_SE. The other
+scenarios' scripts are unchanged; their logs and `.rec` streams are byte-identical to the P4-build table (env_layout_08's
+new landmark moved nothing). The six scripts' `.rec` streams change from the tick the exit walk begins. Completion is
+the world tick (T6), read by `analysis/tb1a_destination/sep_classes.py`: the tick after the robot's last release made
+while it has a task; the "before" column is the same reader on the P4-build logs. The `[sep]` minimum is
+of the continuous distance; viol / stand / recede are F1's classes (`analysis/f1_robot_responsible/evaluate.py`, its
+rule copied into the reader) of the ticks whose continuous minimum lies below min_separation (50 cm): the
+near-encounters of `docs/assumptions.md` 4.6.
+The eight former occupied-target logs complete (off / on): scenario_s01_01 201 / 174, scenario_s03_01 266 / 238,
+scenario_s01_06 174 / 174, scenario_s04_01 384 / 384. scenario_s02_01 is unchanged (422 / 426): its human differs
+from 364 (the exit walk after the AC switch), its robot only after its completion. No other completion moved.
+Recorded: scenario_s01_06, both priors, `[sep]` 5.23 cm at 147: the human's exit walk passes through the robot
+holding mid-carry (a fallback hold from 144); F1: stands and a recede, no violation (the first instance of TODO-135's
+case). scenario_s04_01 completes at 384 of the sweep's 400 steps (TODO-138).
+Commands: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (P4) | completion after (2.5) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_off | 6cefb055745dfbe53daea2bb75e4c79c | e75eaa192f7071498290d6255fc81320 | does not complete: occupied target (X) | 201 | 75.30 (167) | 0 | 0 | 0 |
+| env_layout_01_scenario_s01_01_on | 04d1709a2f1c7f44b34a8ff324043410 | e75eaa192f7071498290d6255fc81320 | does not complete: occupied target (X) | 174 | 45.74 (156) | 0 | 3 | 0 |
+| env_layout_02_scenario_s02_01_off | f3a9fb03bd427fc90e93e0c249ae923a | fb8914e13cbab8b97307127aa0cd4327 | 422 | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_02_scenario_s02_01_on | 3b05a9935c315d195f65a9cdf2d8fbf3 | fb8914e13cbab8b97307127aa0cd4327 | 426 | 426 | 30.87 (75) | 2 | 3 | 0 |
+| env_layout_03_scenario_s03_01_off | dec9a6b025cb410dc17cdcb4ebc47d5b | 515647f63e1b047aab15b0dc0ac91d08 | does not complete: occupied target (X) | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_03_scenario_s03_01_on | 615410beadd91bd3e6bdf38ba0a22c43 | 515647f63e1b047aab15b0dc0ac91d08 | does not complete: occupied target (X) | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_04_scenario_s01_06_off | c6cd6cbd3e58125b02a311a6df686429 | 1a3e9ae88e4e22340a99dc43a3799ef0 | does not complete: occupied target (X) | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_04_scenario_s01_06_on | e2b87b6471d9a8cf0c4ea7e605edf954 | 1a3e9ae88e4e22340a99dc43a3799ef0 | does not complete: occupied target (X) | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_off | b69b7e0e0ba5336d12dfe15a4840f368 | 5018d8aa07e5b9ad7aa277fec933ada9 | does not complete: occupied target (X) | 384 | 38.58 (355) | 0 | 3 | 1 |
+| env_layout_05_scenario_s04_01_on | 79f2351b350140563878b2ff8b224a7b | 5018d8aa07e5b9ad7aa277fec933ada9 | does not complete: occupied target (X) | 384 | 38.58 (355) | 0 | 3 | 1 |
+| env_layout_06_scenario_s03_06_off | 927366706bc5f7f4a1b3515f09376ef0 | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_06_scenario_s03_06_on | 35e1a2d12c84d34dcb3616816abda34f | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_off | 2e09c47f47e86276a1c590e9c2b3beae | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_on | 29861d94faf3dec03cb4165471d65b5f | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_off | 8d2ccf8c010c262e80bf0580b61adad8 | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 218 | 50.00 (57) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_on | fb47d44872ffee0930a1403f311886f2 | dab078d5ca51e5b378054ee6a60ccca7 | 214 | 214 | 50.00 (57) | 0 | 0 | 0 |

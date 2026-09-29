@@ -550,3 +550,45 @@ Command: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`.
 | env_layout_08_scenario_s06_03_full_reorder_on | 9bdf7aed2df3252bf2c26a8f08a9b7e5 | b9f1a0ec26cfa8c022b9951e9ec1b34b | waits: occupied target (X) | 226 |
 | env_layout_08_scenario_s06_03_single_task_off | f7d614cb4b15b5fe477675b6d075a8af | b9f1a0ec26cfa8c022b9951e9ec1b34b | waits: occupied target (X) | 304 |
 | env_layout_08_scenario_s06_03_single_task_on | 6f0af33b82c044874e1811d88ee1329c | b9f1a0ec26cfa8c022b9951e9ec1b34b | waits: occupied target (X) | 268 |
+
+CORRECTION (Track 2.5, 29 September 2026; the table above is left as written): the "340" cells are completions, not the run's end: `env_layout_08_scenario_s06_03_full_reorder_off` completes at 238 (its last release 237; the log declares `all tasks complete` at 238). The reader counted every `action=place micro=release` line, and after its pool empties the robot's per-tick line keeps its last action and micro (`task=None action=place micro=release`), so the last such line was the run's last tick, 339. `analysis/tb1a_destination/sep_classes.py` (Track 2.5) counts only the releases made while the robot has a task. The "340" cells of the earlier tables of this file are most likely the same reader's artefact; their logs are not kept, so this is not verified.
+
+## 2.5: the exit walk on the six regression scripts (Track 2.5) — the logs from here on
+
+Regenerated at Track 2.5 (29 September 2026), superseding the P4-build table above. CAUSE: `docs/assumptions.md` 1.1:
+the human scripts of scenario_s01_01, s01_06, s02_01, s03_01, s04_01 and s06_03 end with the exit walk
+`go_to("corner_SE")` (52295f7), and env_layout_02 and env_layout_08 declare the landmark corner_SE. The other
+scenarios' scripts are unchanged; their logs and `.rec` streams are byte-identical to the P4-build table (env_layout_08's
+new landmark moved nothing). The six scripts' `.rec` streams change from the tick the exit walk begins. Completion is
+the world tick (T6), read by `analysis/tb1a_destination/sep_classes.py`: the tick after the robot's last release made
+while it has a task; the "before" column is the same reader on the P4-build logs (one cell differs from that table, 238 for its "340"; the correction above). The `[sep]` minimum is
+of the continuous distance; viol / stand / recede are F1's classes (`analysis/f1_robot_responsible/evaluate.py`, its
+rule copied into the reader) of the ticks whose continuous minimum lies below min_separation (50 cm): the
+near-encounters of `docs/assumptions.md` 4.6.
+The four former occupied-target logs of scenario_s03_01 complete (off / on): single_task 266 / 238, full_reorder
+265 / 221. scenario_s06_03 (its human differs from 222): full_reorder 236 (was 238) / 226 (unchanged), single_task
+316 (was 304) / 272 (was 268). The other twelve logs are byte-identical.
+Commands: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb3_full_reorder/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (P4) | completion after (2.5) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_off | 9498d8c769254b555b6b54e9bb60a33f | 515647f63e1b047aab15b0dc0ac91d08 | does not complete: occupied target (X) | 265 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_full_reorder_on | db49fd442217874483622573696366fe | 515647f63e1b047aab15b0dc0ac91d08 | does not complete: occupied target (X) | 221 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_off | dec9a6b025cb410dc17cdcb4ebc47d5b | 515647f63e1b047aab15b0dc0ac91d08 | does not complete: occupied target (X) | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_03_scenario_s03_01_single_task_on | 615410beadd91bd3e6bdf38ba0a22c43 | 515647f63e1b047aab15b0dc0ac91d08 | does not complete: occupied target (X) | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_full_reorder_off | a213dd3b9c20b73add34b4fbea91ef6a | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 5d7a8e1c4e1f7341091c9a66d07a25ad | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_off | 2e09c47f47e86276a1c590e9c2b3beae | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_on | 29861d94faf3dec03cb4165471d65b5f | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_off | 01738643503d860be585f4b3c1be17f7 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_on | bfaeba739db5cb7f578f5f0e7ca84750 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_off | 1aff98e410789949a7ab283f8b972609 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_on | 1618a7efff2c9193f6204f54015f910d | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_off | b70852b1ce7cab9a8e9beb7764e760d0 | 329590c9c1249859bfe20d107588c50a | 224 | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_on | 7b7ec37c2c8fc80e9eeda7b97f831d3b | 329590c9c1249859bfe20d107588c50a | 224 | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_off | d7506eae987c2276028a9d5374692659 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_on | aa88a8cd08807205b66829d1e1b402d9 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_off | d618371426083d9dbb12544fe0384904 | c9c444622f25d15abfd849fc495db540 | 238 | 236 | 90.80 (220) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_on | 14f93fee856ed59854e821047ccee258 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_off | d5408bc3f3b37688872513771ac37200 | c9c444622f25d15abfd849fc495db540 | 304 | 316 | 70.62 (265) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_on | 7bd23cd70a937187b48cb0b6ea0b1848 | c9c444622f25d15abfd849fc495db540 | 268 | 272 | 28.69 (246) | 0 | 3 | 1 |

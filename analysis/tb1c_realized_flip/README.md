@@ -500,3 +500,32 @@ Command: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep
 | env_layout_08_scenario_s06_03_plain_on | 47ceaa56bbc8d1a53d2c43ba0e9d39d5 | b9f1a0ec26cfa8c022b9951e9ec1b34b | 224 | 224 |
 | env_layout_08_scenario_s06_03_realized_off | 0dd6d1f4aeab7a8dab96987ee884da8b | b9f1a0ec26cfa8c022b9951e9ec1b34b | 240 | 340 |
 | env_layout_08_scenario_s06_03_realized_on | 9bdf7aed2df3252bf2c26a8f08a9b7e5 | b9f1a0ec26cfa8c022b9951e9ec1b34b | waits: occupied target (X) | 226 |
+
+CORRECTION (Track 2.5, 29 September 2026; the table above is left as written): the "340" cells are completions, not the run's end: `env_layout_08_scenario_s06_03_plain_off` completes at 224 (its last release 223) and `env_layout_08_scenario_s06_03_realized_off` at 238 (its last release 237; the log declares `all tasks complete` at 238). The reader counted every `action=place micro=release` line, and after its pool empties the robot's per-tick line keeps its last action and micro (`task=None action=place micro=release`), so the last such line was the run's last tick, 339. `analysis/tb1a_destination/sep_classes.py` (Track 2.5) counts only the releases made while the robot has a task. The "340" cells of the earlier tables of this file are most likely the same reader's artefact; their logs are not kept, so this is not verified.
+
+## 2.5: the exit walk on the six regression scripts (Track 2.5) — the logs from here on
+
+Regenerated at Track 2.5 (29 September 2026), superseding the P4-build table above. CAUSE: `docs/assumptions.md` 1.1:
+the human scripts of scenario_s01_01, s01_06, s02_01, s03_01, s04_01 and s06_03 end with the exit walk
+`go_to("corner_SE")` (52295f7), and env_layout_02 and env_layout_08 declare the landmark corner_SE. The other
+scenarios' scripts are unchanged; their logs and `.rec` streams are byte-identical to the P4-build table (env_layout_08's
+new landmark moved nothing). The six scripts' `.rec` streams change from the tick the exit walk begins. Completion is
+the world tick (T6), read by `analysis/tb1a_destination/sep_classes.py`: the tick after the robot's last release made
+while it has a task; the "before" column is the same reader on the P4-build logs (two cells differ from that table, 224 and 238 for its "340"; the correction above). The `[sep]` minimum is
+of the continuous distance; viol / stand / recede are F1's classes (`analysis/f1_robot_responsible/evaluate.py`, its
+rule copied into the reader) of the ticks whose continuous minimum lies below min_separation (50 cm): the
+near-encounters of `docs/assumptions.md` 4.6.
+scenario_s06_03's four logs change, its human from 222 (the exit walk): completion plain 224 / 224 (unchanged),
+realized 236 (was 238) / 226 (unchanged), off / on. scenario_s06_01's four are byte-identical.
+Commands: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (P4) | completion after (2.5) | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_off | e24c084e2348d583eeeac0e491f02590 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_plain_on | f64583f1d55c4ba836b23f6a28197779 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_off | 01738643503d860be585f4b3c1be17f7 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_on | bfaeba739db5cb7f578f5f0e7ca84750 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_off | fb5e8a43936bfa7ab53553aeac88b94d | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_plain_on | 3316cb3f852e8e38a8a11682f7bded1d | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_off | d618371426083d9dbb12544fe0384904 | c9c444622f25d15abfd849fc495db540 | 238 | 236 | 90.80 (220) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_realized_on | 14f93fee856ed59854e821047ccee258 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
