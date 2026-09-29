@@ -2117,3 +2117,85 @@ By cause:
     never re-crossing).
   - after the last delivery `coffee_break` is the lone live hypothesis at 0.997 (leader at θ from 201, 191, 202, 195),
     unexplained from the exit walk on.
+
+## Track 2.5: scenario_s09_13, the mid-action change (29 September 2026)
+
+The scenario (`domains/kitting/scenarios/scenarios_s09.py`; `docs/assumptions.md`, 3.1 rejected): on env_layout_11,
+robot idle, prior on, `deliver_item(item_1).during(move_to, "PT28S", coffee_break(coffee_machine_0), occurrence=1)`,
+then deliver item_2, then the exit walk. PT28S is 14 ticks, half the carry's 28 steps (measured on scenario_s09_01's
+replay: steps 32 to 59, acknowledgement 60). Declared intent (its description, label C): the recognition side of the
+general machinery for a mid-action change, not the recognition-to-planning chain (the robot is idle, so no decision is
+taken after tick 0 and no retraction or fallback can occur). Coverage, from the loader: entry 0
+`deliver_item(item_1)` covered, `start:coffee_break(coffee_machine_0)` covered; entry 1 covered; entry 2 `go_to(corner_SE)`
+task_absent (the exit walk); `[scenario-coverage] scenario_coverage=modelled_only tasks=WorkTask,PersonalTask,
+HumanOnlyTask decisions=Start triggers=DuringAction`.
+
+The oracle's extension, by derivation from T-H's executed semantics (design_decisions.md, "T-H", item 6 and the T-H2
+TICKS line; `HumanAgent._step_stack` step 3, `Executor.suspend` / `resume`), in `trajectory.py` only (`oracle.py` derives
+every phase from the world and is unchanged): the walk is cut where the human stands, after the cut's microactions, with
+no acknowledgement tick, the break's first step on the next tick; on resumption the cut walk is completed first,
+re-expanded from the human's position toward the table's current position (item_1 still in hand), then the task is
+re-expanded (`place`, after the re-expansion's `move_to`, already holding, costs its acknowledgement tick at 148). The
+cut is read from the replay's typed record (`Started` with `where` a `Cut`), not inferred. The sixteen earlier
+scenarios rerun through the extended instrument: every committed output byte-identical.
+
+The run: 292 steps (TB.3b's rule: last acknowledgement 261 + 1 + 30). The trajectory equals the run's human lines on
+every tick. The comparison: 0 disagreements against actual.csv (1e-9) and against actual_log.csv, 0 unmatched rows; no
+classification needed.
+
+Script actions (the first tick of each; stack depth 2 while the break is on top):
+
+| tick | task | action | occurrence | stack depth |
+|---|---|---|---|---|
+| 0 | deliver_item(item_1) | move_to | 0 | 1 |
+| 30 | deliver_item(item_1) | pick_up | 0 | 1 |
+| 32 | deliver_item(item_1) | move_to | 1 | 1 |
+| 46 | coffee_break(coffee_machine_0) | move_to | 0 | 2 |
+| 76 | coffee_break(coffee_machine_0) | wait_at | 0 | 2 |
+| 107 | deliver_item(item_1) (resumed) | move_to | 1 | 1 |
+| 148 | deliver_item(item_1) (re-expanded) | move_to | 0 | 1 |
+| 149 | deliver_item(item_1) | place | 0 | 1 |
+| 151 | deliver_item(item_2) | move_to | 0 | 1 |
+| 181 | deliver_item(item_2) | pick_up | 0 | 1 |
+| 183 | deliver_item(item_2) | move_to | 1 | 1 |
+| 212 | deliver_item(item_2) | place | 0 | 1 |
+| 214 | go_to(corner_SE) | move_to | 0 | 1 |
+
+The expected-action table (the oracle's derived phases; ticks inclusive):
+
+| hypothesis | expected action | ticks |
+|---|---|---|
+| coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | -1 to 73 |
+| coffee_break(coffee_machine_0) | wait_at(PT60S, coffee_machine_0) | 74 to 104 |
+| coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | 107 to 291 (re-entry at 107) |
+| deliver_item(item_1) | move_to(item_1) | -1 to 27 |
+| deliver_item(item_1) | pick_up(item_1) | 28 to 29 |
+| deliver_item(item_1) | move_to(kitting_table_0) | 30 to 145 |
+| deliver_item(item_1) | place(item_1, kitting_table_0) | 146 to 148 |
+| deliver_item(item_2) | move_to(item_2) | -1 to 29 |
+| deliver_item(item_2) | place(item_1, shelf_1) | 30 to 31 |
+| deliver_item(item_2) | move_to(shelf_1) | 32 to 148 |
+| deliver_item(item_2) | move_to(item_2) | 149 to 178 |
+| deliver_item(item_2) | pick_up(item_2) | 179 to 180 |
+| deliver_item(item_2) | move_to(kitting_table_0) | 181 to 209 |
+| deliver_item(item_2) | place(item_2, kitting_table_0) | 210 to 211 |
+
+What the recognizer does across the cut (actual; "the recognizer currently behaves this way", and the oracle derived
+the same from the records):
+- deliver_item(item_1) leads at 0.9955 on the cut tick (46); its carry phase `move_to(kitting_table_0)`, open since 30,
+  takes the turn toward the machine as excess: S 0.7759 at 46, below α at 55 (v·D 359.9 cm, belief 0.9604). The
+  finding is unexplained from 55.
+- coffee_break's phase `move_to(coffee_machine_0)` has been inadequate since 34 (its excess accumulated over the
+  delivery's first walks, from its origin at the start); inadequacy attaches to the phase (T-D L2 (i)), so the walk to
+  the machine repairs nothing: coffee_break leads at θ from 67 (0.7904) while inadequate, and the finding stays
+  unexplained until the advance to `wait_at` at 74 (E8), adequate from 74. In the meta-planner's terms (not exercised
+  here): G1 would refuse admission 67 to 73 and admit at 74, "the new task admitted at its next fitting phase".
+- The break's `wait_at` completion at 105 is the boundary and pins coffee_break; both deliveries restart at 0.4990
+  (unresolved on 105, adequate from 106); coffee_break re-enters at 107 at 1/3 (T-D L4), refuted by the walk away (S < α
+  at 116). The resumed delivery of item_1 (carried through the break, re-derived from the held item, L3) reaches θ at
+  121 (0.7794), 14 ticks after its resumption, 16 after the boundary.
+- deliver_item(item_2): θ at 164 (0.7548), 13 ticks after its first step; the exit walk reads unexplained from 245
+  (coffee_break the lone live hypothesis at 0.9970, as in every coffee scenario since L4).
+
+Run (git-ignored; md5s): `runs/env_layout_11_scenario_s09_13_on.log` 60d9491efa8d61c7c5679f1a1307719f,
+`runs/env_layout_11_scenario_s09_13_on.rec` 739ce3199f341516687bfc7701b29143.

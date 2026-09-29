@@ -10,7 +10,8 @@ and only observes; the human starts at the kitting table, is assigned two delive
 item_2, or item_1 and item_3 in _10 and _11) and ends every script with the exit walk to corner_SE. Prior ON in every
 run (configs/ir_testbed/). The coffee break's duration is the schema's.
 _01 to _04: the four TB.3b scripts (scenarios_s08.py) re-authored on this room; _05 to _09: the deviations; _10 to _12:
-the alternates, both deliveries on the same side and the reverse order.
+the alternates, both deliveries on the same side and the reverse order; _13 (Track 2.5): the mid-action change, a
+coffee_break cut into item_1's carry.
 """
 
 from shared.types import AgentConfig, ScenarioConfig, Script
@@ -435,6 +436,46 @@ scenario_s09_12 = ScenarioConfig(
             scheduled_tasks=Script([
                 deliver_item("item_2", table="kitting_table_0"),
                 deliver_item("item_1", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=[
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-400, 400),
+            assigned_tasks=[],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+scenario_s09_13 = ScenarioConfig(
+    id="scenario_s09_13",
+    setup="env_setup_09",
+    reference_layouts=["env_layout_11"],
+    description=_TB + (
+        "scenario_s09_13, the mid-action change (Track 2.5; docs/assumptions.md, 3.1 rejected): coffee_break cut into "
+        "the carry of item_1 mid-walk (T-H's during: 14 of the carry's 28 steps, PT28S), the human stopping where it "
+        "stands and walking to the machine with item_1 in hand; on resumption the cut walk is completed from the "
+        "machine and the delivery re-expanded (place); then deliver item_2, exit. Intent: the recognition side of the "
+        "general machinery (the delivery's derived phase turns inadequate, the break's phase fits, the boundary at the "
+        "break's wait_at), not the recognition-to-planning chain (the robot is idle). Modelled behaviour only, besides "
+        "the exit walk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 420),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").during(
+                    move_to, "PT28S", coffee_break("coffee_machine_0"), occurrence=1),
+                deliver_item("item_2", table="kitting_table_0"),
                 go_to("corner_SE"),
             ]),
             assigned_tasks=[

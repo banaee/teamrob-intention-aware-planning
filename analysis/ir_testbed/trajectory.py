@@ -34,7 +34,17 @@ while carried; waited(human, o). The robot's facts are not produced: no hypothes
 them. Tick -1 is the robot's observation before the clock starts (RobotAgent.observe_initial): the start position
 and the initial world.
 
-The four scripts hold no DuringAction, so no mid-action cut occurs; the expansion raises if the replay has one.
+A mid-action cut (a DuringAction; Track 2.5, scenario_s09_13), by T-H's executed semantics (design_decisions.md,
+"T-H", item 6 and the T-H2 TICKS line; mesa_sim/sim_agents.HumanAgent._step_stack step 3, Executor.suspend / resume):
+  - the cut is read from the replay's record, a Started transition whose `where` is a Cut, on the replay step of the
+    cut action's snapshot; the action runs that many microactions and is then cut where it stands, with no
+    acknowledgement tick: the started task's first action runs on the next tick;
+  - the resumption (the replay's snapshot of the cut action with done > 0) completes the cut action first: a walk is
+    re-expanded from the human's current position toward the target's current position (`steps_toward`, as a fresh
+    walk: Executor.resume leaves a movement action an empty queue), a stand or a wait_at keeps its remaining STANDs
+    (the bound duration's ticks less those done, the last still recording waited_at); a GRASP or RELEASE is never cut
+    (a cut needs ticks done and ticks left);
+  - the task's re-expansion follows from the replay's next snapshots, as any action does.
 Fallback (the task prompt): if the check against the run fails, the generator is to read the run's human lines
 instead; it is built only if the check fails, and the report says so.
 """
@@ -51,6 +61,7 @@ sys.path.insert(0, str(ROOT / "mesa_sim"))
 import yaml
 from shared.types import ActionStep, ConditionSchema, ProcessCompletion, ScenarioConfig, task_instance_key
 from world.human_executor import check_script
+from world.record import Cut, Started
 from domains.kitting.registry import domain_config, register_kitting_domain
 from mesa_sim.sim_model import SimModel
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
@@ -184,20 +195,26 @@ def expand(run_file, steps=None):
     ticks_of = lambda d: _parse_duration_to_steps(d, m)
     walk = lambda a, b: [mu.params["target_pos"] for mu in steps_toward(a, b, step_size)]
     record = check_script(human.scheduled_tasks, m.humans[H].machine.planner, build_world_state(m), H, ticks_of, walk)
+    # the replay's cuts: replay step of the cut action's snapshot -> the microactions it runs before the cut
+    cuts = {t.tick: t.where.done for t in record.transitions if isinstance(t, Started) and isinstance(t.where, Cut)}
     body = Body(m, human.start_position, H)
     rows = [body.row(-1, None, None, None)]
     tick = 0
     boundaries = []
     for snap in record.snapshots:
         a = snap.action
-        if snap.done != 0:
-            raise ValueError(f"{base.id}: a mid-action cut in the replay ({snap}); the expansion has no rule for it")
+        if snap.done != 0 and a.schema.microactions not in ("STEP*", "STAND*"):
+            raise ValueError(f"{base.id}: a resumption of {a.action_name} ({snap}); a GRASP or RELEASE is never cut")
+        cut = cuts.get(snap.tick)
         top = task_instance_key(snap.stack[0])
         boundaries.append(dict(tick=tick, action=a.action_name, occurrence=snap.occurrence, task=top,
                                stack=[task_instance_key(t) for t in snap.stack]))
         spec = a.schema.microactions
         queue = None
+        ran = 0
         while True:
+            if cut is not None and ran == cut - snap.done:           # cut where it stands: no acknowledgement
+                break
             if complete(a, body, queue == []):                       # the acknowledgement tick
                 rows.append(body.row(tick, a.action_name, None, top)); tick += 1
                 break
@@ -211,13 +228,14 @@ def expand(run_file, steps=None):
                 body.release(); micro = "release"
             elif spec == "STAND*" and a.schema.duration_key is not None:
                 if queue is None:
-                    queue = list(range(ticks_of(a.bindings[a.schema.duration_key]), 0, -1))
+                    queue = list(range(ticks_of(a.bindings[a.schema.duration_key]) - snap.done, 0, -1))
                 if queue.pop(0) == 1 and isinstance(a.schema.completion, ConditionSchema):
                     body.waited_at = body.nearest_fixed()
                 micro = "stand"
             else:
                 raise ValueError(f"{base.id}: no body rule for the action {a.action_name} ({spec})")
             rows.append(body.row(tick, a.action_name, micro, top)); tick += 1
+            ran += 1
     last_ack = tick - 1
     if steps is None:
         return last_ack

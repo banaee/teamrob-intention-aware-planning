@@ -323,3 +323,27 @@ bd0bc2848e3cda44cf4deac350566929  runs/env_layout_11_scenario_s09_11_on.log
 a13dfaf332631c16610f71df1f578b98  runs/env_layout_11_scenario_s09_12_on.log
 606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
 ```
+
+## Track 2.5: the mid-action cut; scenario_s09_13 (29 September 2026)
+
+- **The scenario.** `scenario_s09_13` on env_layout_11 (`scenarios_s09.py`; run file
+  `configs/ir_testbed/scenario_s09_13.yaml`): `coffee_break(coffee_machine_0)` cut into item_1's carry mid-walk
+  (`.during(move_to, "PT28S", ..., occurrence=1)`, 14 of the carry's 28 steps), then deliver item_2, exit. The
+  recognition side of a mid-action change (`docs/assumptions.md`, 3.1 rejected); the robot is idle.
+- **What changed in the instrument.** `trajectory.py` only: it expanded no mid-action cut before (it raised). The rule,
+  by derivation from T-H's executed semantics (design_decisions.md, "T-H", item 6 and the T-H2 TICKS line;
+  `HumanAgent._step_stack` step 3, `Executor.suspend` / `resume`): the cut is read from the replay's record (a `Started`
+  whose `where` is a `Cut`, on the replay step of the cut action's snapshot); the action runs that many microactions
+  and stops where the human stands, with no acknowledgement tick; the resumption (the replay's snapshot of the cut
+  action with done > 0) completes the cut action first, a walk as a fresh `steps_toward` from the current position to
+  the target's current position, a stand or wait_at with its remaining STANDs; then the replay's next snapshots, as any
+  action. `trajectory.json`'s form is unchanged.
+- **The check.** The sixteen earlier run files through the extended instrument (`run.sh -o <dir>`): every committed
+  output byte-identical, figures and summaries included. scenario_s09_13: the trajectory equals the run's human lines on
+  every tick; 0 disagreements. Results: `REPORT.md`, "Track 2.5".
+- **Run length**, by the rule: 292 steps (last acknowledgement 261).
+
+```
+60d9491efa8d61c7c5679f1a1307719f  runs/env_layout_11_scenario_s09_13_on.log
+739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
+```
