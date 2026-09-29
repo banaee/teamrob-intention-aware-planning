@@ -3738,21 +3738,32 @@ reaches it.
 Files: shared/recognizer.py (`_retired`)
 Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
 
-**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [OPEN; a track note]
-Rooms of the s08 and s09 kind with the robot given its own deliveries, layered in the IR test-bed's order (assigned
-only, a foreseeable task between, the deviations), each scenario exposing one decision: an admission, a hold, a
-retraction, a boundary re-admission, a lone-hypothesis projection after the work order, the occupied target (a declared
-persistent stand at the robot's target plus at least one alternative task in the robot's pool; the expected property:
-the switch by cost), the planning side of the mid-action change (scenario_s09_13's chain, docs/assumptions.md 3.1: the
-phase inadequate, the admitted projection retracted, the fallback, the new task admitted at its next fitting phase). Its
-oracle is the decision rule, derived from the human's trajectory and the belief. It needs the oracle extension that
-reads a run log's world with the robot's acts.
-AMENDED (T-D X, 29 Sept 2026; design_decisions.md, "T-D X: response"): "a blocked target" replaced by X1's occupied-target
-scenario, with X1's verification condition (the authored stand long enough for the occupied task's hold, at most the
-observed standing count, to exceed the cost difference, the return walk included when carrying); the planning side of
-the mid-action change added (the handoff's track 3 list, `docs/handoffs/handoff_G_X_onward.md` §6).
-Files: analysis/ir_testbed/ (the oracle, to extend), domains/kitting/ (layouts, setups, scenarios)
-Reference: design_decisions.md, "The IR test-bed"; "T-D P"
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [OPEN; ruled (MPB, 29 Sept 2026); step 2 pending]
+REWRITTEN (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"): the earlier track
+note and its X amendment are superseded by the entry; their content is in it.
+The recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
+scenario per decision, against an oracle that states the expected decision before the run; a disagreement is
+classified, never fitted. The eight scenarios (MPB-2), scenario_sNN_MM on env_setup_NN, on env_layout_12 (a second
+controlled layout only where the geometry must change): (1) admission after θ, on the tick the gate clears
+(`recognition_changed`, cause entered); (2) the hold against an admitted projection crossing the robot's route; (3) the
+planning side of the mid-action change (scenario_s09_13's chain: retraction, the fallback, re-admission at the next
+fitting phase); (4) boundary re-admission, b refused, b + 1 admitted on commitment; (5) the lone foreseeable hypothesis
+after the work order, unwarranted on standing, admitted (entered) on the first warranted tick; (6) the occupied target
+with an alternative task (X1's derived condition; the switch by cost); (7) the fallback against a walker and a stander
+(the expiry cadence; evidence for TODO-132 (a)); (8) the control (no hold at any decision, completion identical to the
+setup run without the human).
+The six rulings: MPB-1, a decision's four parts (trigger and cause, gate, projection, selection); per-tick tables of
+parts 1 to 3 pre-run, the (tick, cause) chain assembled at the compare step with the run's `no_current_task` ticks;
+part 4 as declared properties; the oracle imports nothing of the planner, the recognizer, the projection or the robot's
+perception. MPB-2, the scenarios and the environment. MPB-3, the disjointness rule (the robot's items and shelves
+disjoint from the human's, checked per scenario) and the compare levels; the planner's logged values are observed inputs
+to a property only. MPB-4, verification (zero disagreements on parts 1 to 3, prior on; every part-4 property), the
+alteration test, five disagreement classes. MPB-5, the parked items and the comparison horizon (TODO-138). MPB-6, prior
+on primary, prior off a diagnostic appendix with no exact comparison; `single_task` primary, `full_reorder` a second
+run with identical tables, not identical chains.
+Files: analysis/ (the MPB instrument, step 2), domains/kitting/ (env_layout_12, env_setup_10 onward, scenarios_s10.py
+onward), configs/ (the run files)
+Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
 WorldState is the robot's world model, not simulator state (T-D P). Today `RobotAgent` (the Mesa body) holds the
@@ -3794,6 +3805,9 @@ G-RECORDS (T-D G, ruled by Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admi
   the recorded expiry; a state reading in L2 (ii)'s form, one new trigger condition on an existing observable).
   Evidence: scenario_s05_02 prior on (42 ticks held against a 23-tick stay; completion 214, against 195 before P). To
   be decided at track 3 (TODO-130), whose oracle can state the expected decision tick before the run. Not implemented.
+  MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): scenario 7's stand records the
+  re-decision ticks, the holds and the tick the persistence broke, as evidence; nothing built; the question returns
+  to the design chat after the runs.
 - (b) CLOSED into X's occupied-target item (`docs/handoffs/handoff_G_X_onward.md` §5).
 - (c) CLOSED as answered: L5 B refuses on the boundary tick (no hypothesis is a member there), and the decision at
   b + 1 is AD1's.
@@ -3822,6 +3836,8 @@ TRACK 2.5 (29 Sept 2026): with the exit walk on scenario_s03_01 (docs/assumption
 the maintained sets (`[sep]` minimum 48.25 cm prior off, 60.15 cm prior on, single_task); the question stands.
 PARKED (G-records, Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admission"): to be ruled only if track 3
 (TODO-130) produces an instance in scope.
+MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): no scenario authored for it; a
+decision inside the gap against a fallback stand, if one occurs in MPB scenario 6 or 7, is classified and recorded.
 Files: shared/projection.py (`Projector.project_fallback`), shared/realization.py (the assessed window)
 Reference: design_decisions.md, "T-D P", BUILT (P4-build), the observation-offset gap; L2; T3b
 
@@ -3857,14 +3873,23 @@ fallback projection always, admission never). The second is no run option today 
 evaluation.
 T-D X (29 Sept 2026; design_decisions.md, "T-D X: response", X3): the walk toward the robot (TODO-135) is compared with
 plain cost and this control.
+MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): an evaluation item, not built in
+the meta-planner test-bed.
 Files: mesa_sim/run_mesa.py (the option), shared/meta_planner.py (admission)
 Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135
 
-**TODO-138: The horizon of runs in which the robot has work (recorded, Track 2.5, 29 Sept 2026)** [OPEN]
+**TODO-138: The horizon of runs in which the robot has work (recorded, Track 2.5, 29 Sept 2026)** [RULED for MPB runs (MPB-5, 29 Sept 2026); nothing built]
 docs/assumptions.md 1.3 derives a run's step count from the human's load-time replay plus the idle margin (TB.3b's rule)
 for human-script and test-bed runs only: the replay has no term for the robot's work, which in the maintained sets ends
 after the human's. The maintained sets keep their literal step counts until this is ruled. Evidence: scenario_s04_01
 completes at 384 of the sweep's 400 steps under Track 2.5 (16 ticks of margin; was the occupied target before).
+RULED (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5), for MPB runs:
+the comparison horizon is the first observed completion point (the human's script has ended and the robot's pool is
+empty) plus the IR test-bed's idle margin (30 ticks, from E5); the safety cap for the run is the derived plain-cost
+horizon (the robot's pool chained along its authored order from the robot's start, plus the human's replay length,
+plus the margin), not a behavioural timeout: a run that does not complete within it is classified (class 2 or 4),
+never given a longer cap. No change to the run loop or the body (TODO-33 unchanged). The maintained sets keep their
+literal step counts.
 Files: analysis/*/sweep.sh, configs/ (run files)
 Reference: docs/assumptions.md 1.3; analysis/ir_testbed/run.sh; TODO-33
 
@@ -3896,6 +3921,8 @@ Reference: docs/assumptions.md 1.1, 2.3; TODO-131; design_decisions.md, "T-D P" 
 X5's ground (2) (every candidate's realized plan holds, at a decision and at the next re-decision) is read from
 `single_task` logs (`[meta-cand] delta=` per candidate); `full_reorder` logs no per-candidate hold (`[meta-ord]` the
 cost per head, `[meta-win]` the winner's holds only). Evaluation-time logging, not a design change.
+MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5, MPB-6): an evaluation item, not built
+in the meta-planner test-bed; `full_reorder` is not required to reproduce every part-4 property there.
 Files: shared/meta_planner.py (`_replan_orderings`, its log lines)
 Reference: design_decisions.md, "T-D X: response", X5; TODO-96
 
