@@ -39,7 +39,9 @@ scenario_s04_01 = ScenarioConfig(
         "17 deg off this last approach - a prior-off decoy, inadmissible prior-on. Robot: "
         "item_4, item_7, item_5 from a SW start, ~375 ticks of work so the IR keeps observing "
         "until the human's script ends (~330 ticks). Run with --steps 400. Measured baselines: "
-        "analysis/f1_foreseeable_fixture/REPORT.md."
+        "analysis/f1_foreseeable_fixture/REPORT.md. "
+        "The script ends with the exit walk to corner_SE (docs/assumptions.md 1.1; added in Track 2.5: "
+        "the terminal stand is not this fixture's purpose)."
     ),
     agents=[
         AgentConfig(
@@ -52,6 +54,7 @@ scenario_s04_01 = ScenarioConfig(
                 ac_activation("ac_switch_1"),   # script part 3, walk 1: toward shelf_6 (an AC switch since F47b; was the waypoint wander_0)
                 ac_activation("ac_switch_2"),   # script part 3, walk 2: turn away
                 deliver_item("item_6", table="kitting_table_0"),
+                go_to("corner_SE"),
             ]),
             assigned_tasks=[
                 deliver_item("item_3", table="kitting_table_0"),

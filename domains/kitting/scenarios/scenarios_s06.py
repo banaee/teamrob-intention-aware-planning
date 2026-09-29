@@ -10,7 +10,7 @@ A task's class (WorkTask, PersonalTask, HumanOnlyTask) is declared in tasks.py â
 
 from shared.types import AgentConfig, ScenarioConfig, Script, drop
 from domains.kitting.actions import move_to
-from domains.kitting.script import deliver_item
+from domains.kitting.script import deliver_item, go_to
 
 
 # ===============================================================
@@ -118,7 +118,9 @@ scenario_s06_03 = ScenarioConfig(
     description=(
         "scenario_s06_01 with the human working item_3 then item_0 from the north wall: its item_0 carry reaches "
         "kitting_table_0 as the second of the robot's two short tasks does, so under full_reorder the plain-cost "
-        "ordering (item_6, item_1) carries a hold before item_1 and realized cost makes item_1 the head."
+        "ordering (item_6, item_1) carries a hold before item_1 and realized cost makes item_1 the head. "
+        "The script ends with the exit walk to corner_SE (docs/assumptions.md 1.1; added in Track 2.5: "
+        "the terminal stand is not this fixture's purpose)."
     ),
     agents=[
         AgentConfig(
@@ -128,6 +130,7 @@ scenario_s06_03 = ScenarioConfig(
             scheduled_tasks=Script([
                 deliver_item("item_3", table="kitting_table_1"),
                 deliver_item("item_0", table="kitting_table_0"),
+                go_to("corner_SE"),
             ]),
             assigned_tasks=[
                 deliver_item("item_3", table="kitting_table_1"),

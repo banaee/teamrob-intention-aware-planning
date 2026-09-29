@@ -10,7 +10,7 @@ A task's class (WorkTask, PersonalTask, HumanOnlyTask) is declared in tasks.py â
 
 from shared.types import AgentConfig, ScenarioConfig, Script, drop
 from domains.kitting.actions import pick_up
-from domains.kitting.script import deliver_item, coffee_break, ac_activation, stand
+from domains.kitting.script import deliver_item, coffee_break, ac_activation, go_to, stand
 
 
 # ===============================================================
@@ -23,7 +23,9 @@ scenario_s02_01 = ScenarioConfig(
     description=(
         "Human and robot each deliver items to the kitting table. "
         "Human deviates to a coffee break after completing their first delivery. "
-        "Robot must recognize the deviation and replan accordingly."
+        "Robot must recognize the deviation and replan accordingly. "
+        "The script ends with the exit walk to corner_SE (docs/assumptions.md 1.1; added in Track 2.5: "
+        "the terminal stand is not this fixture's purpose)."
     ),
     agents=[
         AgentConfig(
@@ -35,6 +37,7 @@ scenario_s02_01 = ScenarioConfig(
                 coffee_break("coffee_machine_0"),
                 deliver_item("item_5", table="kitting_table_0"),
                 ac_activation("ac_switch_0"),
+                go_to("corner_SE"),
             ]),
             assigned_tasks=[
                 deliver_item("item_2", table="kitting_table_0"),

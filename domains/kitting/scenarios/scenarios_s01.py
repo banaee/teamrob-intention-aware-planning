@@ -25,7 +25,9 @@ scenario_s01_01 = ScenarioConfig(
         "Minimal Phase 4 development scenario. Robot and human start symmetric, "
         "paths intersect near center during first moveto (case 0.1 collision). "
         "Both converge on KT after picking (case 0.2 conflict). "
-        "No foreseeable tasks. Human plan is scripted/fixed."
+        "No foreseeable tasks. Human plan is scripted/fixed. "
+        "The script ends with the exit walk to corner_SE (docs/assumptions.md 1.1; added in Track 2.5: "
+        "the terminal stand is not this fixture's purpose)."
     ),
     agents=[
         AgentConfig(
@@ -35,6 +37,7 @@ scenario_s01_01 = ScenarioConfig(
             scheduled_tasks=Script([
                 deliver_item("item_3", table="kitting_table_0"),
                 deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
             ]),
             assigned_tasks=[
                 deliver_item("item_3", table="kitting_table_0"),
@@ -233,7 +236,9 @@ scenario_s01_06 = ScenarioConfig(
         "0.640 on zone_SW entry at step 23 (ZONE_BOOST), and reaches theta only at the grasp "
         "(step 39) - the path intersection itself is never seen by the meta-planner. Measured with "
         "PYTHONHASHSEED=0, assignment_prior on. No foreseeable tasks. Human plan is "
-        "scripted/fixed. Geometry: env_layout_04.json."
+        "scripted/fixed. Geometry: env_layout_04.json. "
+        "The script ends with the exit walk to corner_SE (docs/assumptions.md 1.1; added in Track 2.5: "
+        "the terminal stand is not this fixture's purpose)."
     ),
     agents=[
         AgentConfig(
@@ -243,6 +248,7 @@ scenario_s01_06 = ScenarioConfig(
             scheduled_tasks=Script([
                 deliver_item("item_3", table="kitting_table_0"),
                 deliver_item("item_7", table="kitting_table_0"),
+                go_to("corner_SE"),
             ]),
             assigned_tasks=[
                 deliver_item("item_3", table="kitting_table_0"),

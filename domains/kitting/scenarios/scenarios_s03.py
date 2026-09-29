@@ -11,7 +11,7 @@ A task's class (WorkTask, PersonalTask, HumanOnlyTask) is declared in tasks.py â
 
 from shared.types import AgentConfig, ScenarioConfig, Script, drop
 from domains.kitting.actions import move_to, pick_up
-from domains.kitting.script import deliver_item, coffee_break, stand, go_to_and_stand
+from domains.kitting.script import deliver_item, coffee_break, go_to, stand, go_to_and_stand
 
 
 # ===============================================================
@@ -38,7 +38,9 @@ scenario_s03_01 = ScenarioConfig(
         "(0.780) when the human enters zone_SW and ZONE_BOOST applies to item_3; the robot is "
         "roughly half-way to shelf_4 (its move_to completes at 21), so a projection is built "
         "mid-approach. (3) t=0 most_likely is a tie-break on layout item order (TODO-42). No "
-        "foreseeable tasks. Human plan is scripted/fixed."
+        "foreseeable tasks. Human plan is scripted/fixed. "
+        "The script ends with the exit walk to corner_SE (docs/assumptions.md 1.1; added in Track 2.5: "
+        "the terminal stand is not this fixture's purpose)."
     ),
     agents=[
         AgentConfig(
@@ -48,6 +50,7 @@ scenario_s03_01 = ScenarioConfig(
             scheduled_tasks=Script([
                 deliver_item("item_3", table="kitting_table_0"),
                 deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
             ]),
             assigned_tasks=[
                 deliver_item("item_3", table="kitting_table_0"),

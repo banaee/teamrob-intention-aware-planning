@@ -182,6 +182,14 @@
       ],
       "slots": 2,
       "zone": "zone_SE"
+    },
+    {
+      "id": "corner_SE",
+      "type": "landmark",
+      "position": [950, -450],
+      "size": [20, 20],
+      "zone": "zone_SE",
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls. Added in Track 2.5 (docs/assumptions.md 1.1) as the exit walk's target; the layout declared no landmark before."
     }
   ]
 }
