@@ -2556,6 +2556,13 @@ Files: shared/meta_planner.py (`evaluate_triggers`), shared/io_contracts.md (§2
 Reference: R1 decision record, September 2026
 
 **TODO-77 — Projection runs ahead of execution by the executor's acknowledgement ticks** ✅ RESOLVED (L2 Sept 2026; the residual closed at T-B Q7, Sept 2026) — the systematic whole-tick lag was removed at L2; the robot-only tick recorded below as open was the body cancelling a completion tick at a reload, and is fixed in the body at T-B Q7; WHAT REMAINS IS STEP QUANTISATION ALONE, uncompensated by decision (L2) — the task-completion tick ✅ ADDED (F1)
+REOPENED AND CORRECTED (the MPB class-2 finding, 30 Sept 2026; design_decisions.md, "Realization as built", the dated
+correction; T-B Q7 superseded in part): the robot's projection and its execution still differed at the head of the plan
+in three executor states: (a) after a walk's acknowledgement the plan re-priced the completed walk (+1 tick), (b) and (c)
+the owed acknowledgement and task completion ticks the body spends first were stated by no plan (−1, −2); T-B Q7's
+"accepted" hold-0 residual was (b)/(c). Corrected: the body reports ExecutorState.owed_completion_ticks and
+action_in_flight, the robot's projection states them (lead_in, resume_from), owed ticks run before a hold. Step
+quantisation per walk stays uncompensated, as before. The human side's counterpart is TODO-146.
 THE TASK-COMPLETION TICK (F1, September 2026): the trailing tick the L2 report left unmodelled — the
 tick `Executor.step()` spends in `_on_task_complete()` after the last action's acknowledgement — is
 now charged once per projected task, for both agents (measured: human release 54 / ack 55 / complete
@@ -4030,3 +4037,21 @@ TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
 4. T-D's blocked fixture uses a stay that ends (TODO-80; the scenario-authoring convention).
 5. At the recognizer pass (T-D Q2 to Q4): raise TODO-95 (stationarity channel) and rule whether it joins the pass or
    stays recorded for T-H.
+
+**TODO-146: The human projection's stationary accounting and rounding: should it resume from the recognized phase? (recorded, the MPB class-2 finding, 30 Sept 2026)** [OPEN; a P-side residual, out of scope of the class-2 correction]
+The robot's projection now starts from what its body reports (ExecutorState.owed_completion_ticks, action_in_flight);
+the human's projection still re-decomposes the admitted hypothesis from the live world (Projector.project_human), which
+the robot cannot correct by a report: it sees no executor cursor of the human. Measured on the MPB's saved segments
+(analysis/mpb/, `human_segments`, prior on):
+- rounding: the projected walk ends at the arrival radius, the body's last discrete step up to a step beyond it; the
+  human's projection runs 0.17 to 0.25 tick ahead at a walk's start (scenario_s12_01 at 26: 3.4 cm on every tick of the
+  carry, the projected carry starting at step 5.914 against the body's first carry step on tick 32);
+- one tick early at a decision falling on the human's own walk-acknowledgement tick (+1; scenario_s10_01, s10_04,
+  s10_05, s10_06 at 29, and one more), the analogue of the robot's state (a): the completed walk re-decomposed and its
+  acknowledgement re-priced;
+- one −0.96 (scenario_s10_03 at 164).
+The question: whether the human projection should resume from the recognized phase (the observed cursor: the phase
+advance E8 reads, the expected action the recognizer derives) instead of re-decomposing from the live world. Not the
+cause of the class-2 violations (the cross-pairing: the planned robot against the actual human keeps F1). Not built.
+Files: shared/projection.py (project_human), shared/meta_planner.py (update_human_projection)
+Reference: design_decisions.md, "The meta-planner test-bed (MPB)", MPB-4's class-2 record; TODO-77; T-D R and E (E8, E9)

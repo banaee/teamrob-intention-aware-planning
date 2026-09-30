@@ -1990,6 +1990,30 @@ Files: shared/realization.py, shared/types.py (`RealizedPlan`), shared/trajector
 (`shift_violation_interval`, `first_approach_step`), shared/io_contracts.md (§1.11, §2.2b, §2.2c),
 analysis/t3_realize/ (deleted in the analysis cleanup, September 2026; carried in the T3 / T3b entry of design_decisions.md; realize() is re-validated by analysis/f1_robot_responsible/validate.py)
 Reference: T3 and T3b sessions, September 2026; R1; T1b (`whole`); L2 (the offset, step quantisation)
+BUILT CORRECTION (30 September 2026; the MPB class-2 finding, reading (a), ruled by Hadi; "The meta-planner test-bed
+(MPB)", MPB-4's class-2 record). THE INVARIANT: the trajectory realize() assesses is the trajectory the robot will
+execute from the decision tick onward. Found broken in three executor states, each by the stationary accounting at the
+head of the robot's plan, never by realize() itself:
+  (a) after a walk's acknowledgement, the next action not begun: the fresh decomposition re-contains the completed walk
+      as a zero-length move_to, and build_segments() prices its acknowledgement; the body continues past it
+      (Executor.continue_plan) and spends nothing: the plan one tick long (scenario_s12_01 full_reorder at 26: the robot
+      one step ahead of its plan, three F1 violations at 45 to 47 inside the window);
+  (b) on a pick_up's acknowledgement tick, and (c) on a finished task's completion tick or the tick after a release: the
+      body spends the owed completion ticks first (T-B Q7), and no plan stated them: the plan one or two ticks short.
+The correction, built at 34c908f: the body reports what it will execute (ExecutorState.owed_completion_ticks and
+action_in_flight, from the executor, which decides nothing); every robot candidate's projection states the owed ticks
+first as a stationary lead-in (Projector.project, lead_in) and the continued task is projected from the action in
+flight (resume_from, the executor's own equality); the executor spends owed ticks before a hold (T-B Q7's "the hold
+carries the owed tick", superseded in part, that entry). realize(), F1, min_separation, the hold's meaning (deliberate
+waiting at the decision position before the entry), the gate, the triggers and every human projection are unchanged.
+Verified: tests/test_executed_is_assessed.py, planned = executed tick for tick in the three states with and without a
+hold, each detecting the defect with the report disabled; the four maintained sets (one hold moved, scenario_s02_01
+prior on at 23, state (a): 4 -> 0; the `.rec` streams and the recognizer's lines unchanged); the MPB's sixteen (parts 1
+to 3 unchanged, the violations gone). Not decided on scenarios: the invariant is the ruling; holds and selections may
+move in either direction, only at decisions in states (a) to (c).
+Files: shared/types.py (ExecutorState), shared/projection.py (project), shared/meta_planner.py (_project_robot),
+mesa_sim/executor.py (step() 1b, 3 before 2b; _reload; owed_completion_ticks, action_in_flight), mesa_sim/sim_agents.py
+(ExecutorState), tests/test_executed_is_assessed.py
 
 **B3 selects on realized cost: the argmin of T_r + δ over the realizable candidates, the winner's hold executed, plain cost when nothing realizes (T10)**
 B3.A as decided at R1 is built (T10, September 2026). `_replan_tasks` projects each candidate alone
@@ -3516,6 +3540,18 @@ docs/TODOS_AND_DEFERRED.md (TODO-77, TODO-88), CLAUDE.md
 Reference: T-B Q7, September 2026; TODO-77 (L2, T4, T-B2a, T-B2b); "Projection time includes what the body
 spends finishing an action" (L2); "Robot-responsible separation" (F1, the completion tick); "The robot can
 wait" (R1); shared/io_contracts.md §6 invariant 12
+SUPERSEDED IN PART (the MPB class-2 finding, ruled by Hadi 30 September 2026; "Realization as built", the dated
+correction). "THE HOLD CARRIES AN OWED TICK, IT DOES NOT FOLLOW IT" is superseded: owed completion ticks are represented
+explicitly in the projected plan (a stationary lead-in) and executed BEFORE the hold, and the hold keeps its meaning as
+deliberate waiting at the decision position before the entry. Reason: the sentence assumed a plan that states no owed
+ticks; with the invariant (the trajectory realize() assesses is the one executed) it is a class-2 reading (b) of that
+sentence, following from the invariant, not a new design. Two consequences in this entry follow from the same ruling:
+"THE RESIDUAL, WITH A HOLD OF 0" (accepted, not compensated) is corrected, the owed ticks now stated to the projection;
+and "WHY THE FIX IS THE BODY'S AND NOT THE PROJECTION'S" stands for what it rejected, a projection predicting the robot's
+own future triggers: the correction predicts nothing, the body reports on the decision tick what it will execute from
+it (ExecutorState.owed_completion_ticks, action_in_flight), so no latency per action enters shared/ and no circularity
+arises. "A reload never cancels a completion tick" stands, extended: a reload also keeps a tick still owed from an
+earlier reload (Executor._reload).
 
 
 **D3: `task_committed` is not a trigger**
@@ -5383,6 +5419,22 @@ contribution claims. It is the last instrument before the evaluation and the dem
   modified to make a finding pass; it changes only under class 4, with its case unchanged.
   Why. A scenario changed until the framework passes it tests nothing; the instrument's worth is that a disagreement
   is attributed to the ruling, the build or the scenario before anything changes.
+  CLASS-2 FINDING, READING (a) (Hadi, 30 September 2026; the first under MPB-4). THE INVARIANT: the trajectory realize()
+  assesses is the trajectory the robot executes from the decision tick onward. THE EVIDENCE: scenario_s12_01,
+  full_reorder, prior on, ticks 45 to 47, the cross-pairing of the decision at 26 (item_7, hold 4) on the re-executed
+  realization: the planned robot against the projected human keeps F1 (54.64 cm minimum); the planned robot against the
+  actual human, no violation; the executed robot against either, the three violations; the executed robot one step
+  (20 cm) ahead of its plan on every tick, by the stationary accounting after the hold. A defect under the existing
+  ruling, not a design question: F1, min_separation, the hold's meaning and the realization semantics unchanged; not
+  acceptable quantisation. THE FAMILY, measured on the saved segments (the lag of the executed robot against its plan at
+  its first move after each admitted decision, 32 prior-on runs): (a) after a walk's acknowledgement, +1 (one decision);
+  (b) on a pick_up's acknowledgement tick, −1 (three); (c) on a task's completion tick, −1, or after a release, −2 (three).
+  Corrected ("Realization as built", the dated correction; T-B Q7, superseded in part); re-verified (analysis/mpb/
+  REPORT.md, "The class-2 correction"). THE P-SIDE RESIDUAL, recorded apart, out of scope of the correction: the human
+  projection is 3.4 cm off the actual human on every tick of that carry (projection rounding: the projected walk ends
+  1.7 cm short of the body's last step, and the projected carry starts 0.086 tick early), and one tick early at a decision
+  falling on the human's own walk-acknowledgement tick (+1, five decisions: scenario_s10_01, _04, _05, _06 at 29, ...);
+  −0.17 to −0.25 tick at walk starts generally. Not the cause of the violations. TODO-146.
 
 - MPB-5, scope for the parked items.
   Ruling. TODO-132 (a): scenario 7's stand records the re-decision ticks, the holds and the tick the persistence broke,
@@ -5550,12 +5602,13 @@ Classified, no class 2: scenario_s12_01 under full_reorder keeps item_7 (the ord
 walks; MPB-6); three F1 robot violations inside that admission's window under full_reorder (hold 4 from 26), the pattern
 of scenario_s10_02 prior off; checked on the re-executed realization (REPORT.md, part (v)): the plan keeps 54.64 cm, the
 executed robot runs one step (one priced stationary tick) ahead of it and the projected human is 3.4 cm off the actual
-one, the robot's lead producing the violations; reading (c) by the check's rule, no class assigned, the reading Hadi's;
-a near-encounter in scenario_s12_02 at 139 as the human
+one, the robot's lead producing the violations; reading (c) by the check's rule, no class assigned;
+Hadi then read it as class 2, reading (a), and it was corrected (MPB-4's class-2 record); a near-encounter in scenario_s12_02 at 139 as the human
 walks toward the robot on moving fallbacks of k = 1 and 3 (P4's recorded error; X3; TODO-135). The alteration test on
 the sixteen: every rule detected except the skip rule (B2), as before. The eleven verified scenarios rerun byte-identical
 (68 of 68 logs and streams); the suite 211 passed; the four maintained sets 96 of 96 byte-identical.
-CLOSED (30 September 2026; PROVISIONAL until Hadi reads the check of scenario_s12_01's three F1 violations above): every
+CLOSED (30 September 2026; PROVISIONAL: the check was read as class 2, reading (a), and corrected the same day (MPB-4's
+class-2 record); the close-out pending): every
 materially distinct in-scope decision path is verified (36), unreachable with a
 recorded derivation (5), or outside the claimed mechanism with a recorded reason (4 out of coverage; P3 reachable and not
 claimed; one not a distinct path). The NOT CLOSED paragraph above is superseded. Next, as Hadi rules: the evaluation
