@@ -34,9 +34,9 @@ scenario_s01_01 = ScenarioConfig(
             agent_id="robot_0",
             agent_type="robot",
             start_position=(0, -370),
-            scheduled_tasks=Script([
+            assigned_tasks=[
                 TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_3"), Var("?delivery_bay"): Const("frozen_delivery_bay_0")}),
-            ]),
+            ],
             observes=["human_0"],
         ),
     ],
@@ -72,7 +72,7 @@ scenario_s01_02 = ScenarioConfig(
             agent_id="robot_0",
             agent_type="robot",
             start_position=(0, -370),
-            scheduled_tasks=Script([
+            assigned_tasks=[
                 # Deliver full pallets: dry to dry_delivery_area
                 TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_0"), Var("?delivery_bay"): Const("dry_delivery_bay_0")}),
                 # TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_1"), Var("?delivery_bay"): Const("dry_delivery_bay_0")}),
@@ -82,7 +82,50 @@ scenario_s01_02 = ScenarioConfig(
                 # Load empty pallets back to truck
                 TaskInstance(schema=load_return, bindings={Var("?pallet"): Const("pallet_6")}), # 6 is innitially empty ib empty_bay_dry
                 TaskInstance(schema=load_return, bindings={Var("?pallet"): Const("pallet_8")}), # 8 is innitially empty in empty_bay_frozen
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+# ===============================================================
+# A viewing fixture (T-G build 1), for only "env_layout_01".
+# ===============================================================
+scenario_s01_03 = ScenarioConfig(
+    id="scenario_s01_03",
+    setup="env_setup_01",
+    reference_layouts=["env_layout_01"],
+    description=(
+        "A viewing fixture, written so that the scene loads and initialises; not a baseline, not an evaluation "
+        "scenario. The robot is assigned the delivery of two full pallets to their bays (pallet_0 dry, pallet_3 "
+        "frozen) and the return of one empty pallet (pallet_6) to the truck. The human (warehouse staff) is "
+        "assigned the scan of each pallet the robot delivers, and its script holds those two scans. It has no "
+        "exit walk because the layout has no landmark yet."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script([
+                TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?pallet"): Const("pallet_0")}),
+                TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?pallet"): Const("pallet_3")}),
             ]),
+            assigned_tasks=[
+                TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?pallet"): Const("pallet_0")}),
+                TaskInstance(schema=confirm_delivered_pallet, bindings={Var("?pallet"): Const("pallet_3")}),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            assigned_tasks=[
+                TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_0"), Var("?delivery_bay"): Const("dry_delivery_bay_0")}),
+                TaskInstance(schema=deliver_pallet, bindings={Var("?pallet"): Const("pallet_3"), Var("?delivery_bay"): Const("frozen_delivery_bay_0")}),
+                TaskInstance(schema=load_return, bindings={Var("?pallet"): Const("pallet_6")}),
+            ],
             observes=["human_0"],
         ),
     ],
