@@ -12,6 +12,10 @@ docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md) are authoritative over thi
 > landmarks only. The "deviation vocabulary" and `script[script_index + 1:]` below are T-C's, replaced by T-H's script
 > and stack. What stays for Phase 7: the viewer and its buttons, the context stream, communication.
 
+> SCHEDULED (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): Phase 7 is T-V,
+> track 2, after T-G and T-F; T-V track 1 is the viewer for pre-loaded scripts, T-E as originally defined. T-E in this
+> handoff means that viewer.
+
 ## 0. The idea in plain words
 
 Today every human behaviour in a run is pre-loaded: a script written before the run (T-C makes

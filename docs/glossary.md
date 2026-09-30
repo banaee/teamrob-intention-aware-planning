@@ -936,8 +936,26 @@ in the repository, which builds and checks; older reports call it Fable.
 → `CLAUDE.md`, "Conventions and terminology".
 
 **T-A … T-H** — the plan names task prompts and reports use (T-H, the human behaviour model, runs before T-D; T-H1 to
-T-H4 its build).
+T-H4 its build). Task letters are never reassigned; the order is the roadmap's, not the alphabet's (30 September 2026).
 → `docs/roadmap.md`, "The plan from T-A".
+**T-D tail** — what T-D keeps open after its close at the MPB close-out (30 September 2026): track 3b (TODO-145),
+track 4 (TODO-140) and the 4D detour strategy; it runs after T-V.
+→ `docs/roadmap.md`, "The plan from T-A", T-D.
+**T-E** — the demonstration's viewer, as the plan from T-A defined it. Superseded by T-V, track 1 (30 September
+2026); T-E in older records means the viewer.
+→ `docs/roadmap.md`, "The plan from T-A", T-E and T-V.
+**T-G** — the second domain in Mesa: dock_loading against `shared/` unchanged, testing whether the recognizer, the
+gate, the projection and the meta-planner stay domain-independent. Before 30 September 2026 it also held 4D and ROS;
+4D is in the T-D tail, ROS is T-S.
+→ `docs/roadmap.md`, "The plan from T-A", T-G.
+**T-V** — viewer, interface and interactive simulator (ruled 30 September 2026), one task with tracks: track 1 the
+viewer for pre-loaded scripts (T-E as originally defined; demonstration only, nothing enters the mind); track 2 Phase 7
+(live events through the human executor's injection path, the export as a script, the replay rule, later the context
+stream).
+→ `docs/roadmap.md`, "The plan from T-A", T-V; `docs/handoffs/phase7_interactive_deviations.md`.
+**T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
+the end of the queue.
+→ `docs/roadmap.md`, "The plan from T-A", T-S.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 **TB** — the IR test-bed track (ruled 27 September 2026), before cycle 2 of T-D: the recognizer tested in isolation,
@@ -948,7 +966,8 @@ the runs, the report).
 **MPB** — the meta-planner test-bed (track 3; ruled 29 September 2026, rulings MPB-1 to MPB-6): the
 recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
 scenario per decision, against an oracle that states the expected decision before the run. Not T3 or T3b, the Phase 4C
-realization tasks.
+realization tasks. CLOSED (the close-out, 30 September 2026): it establishes structural branch reachability, not
+consequential activation under conflict, which is track 3b's (TODO-145).
 → `docs/design_decisions.md`, "The meta-planner test-bed (MPB)".
 
 ---

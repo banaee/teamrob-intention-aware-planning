@@ -365,6 +365,8 @@ Fix the schema (add `parameter_types`) before running dock_loading. `office_brea
 guarded-only method is handled: no applicable method → NEUTRAL, logged once.
 dock_loading's `wait_at` still declares `ProcessCompletion` (kitting's does not since
 I2); migrate it to `waited(?agent, ?entity)` with the rest of TODO-25.
+T-G (Hadi's order, 30 September 2026): its schema fixes are part of T-G, the second domain in Mesa (roadmap, "The plan
+from T-A", T-G).
 Files: domains/dock_loading/tasks.py, domains/dock_loading/scenarios.py, domains/dock_loading/registry.py, domains/dock_loading/actions.py
 Reference: Phase 4C typed-parameter generalization session; I2 IR foundations session
 
@@ -2542,6 +2544,8 @@ assigned item_5 / item_1 / item_7. Since R1 `env_layout1` (since T-L stage 3 `en
 (no obstacles, new scenario_10 pool; now scenario_s02_01) and the old layout is `env_layout99.json`, which is NOT registered in
 `domains/kitting/registry.py`. The ROS path would need `env_layout99` registered (or its own copy) to
 reproduce what the guide describes. Not touched: `ros_sim/` is paused.
+T-S (Hadi's order, 30 September 2026): done in T-S, ROS/PRIEST, when `ros_sim/` resumes (roadmap, "The plan from T-A",
+T-S).
 Files: ros_sim/framework_HRI/guide.txt, domains/kitting/registry.py
 Reference: R1 decision record, September 2026
 
@@ -2865,6 +2869,8 @@ the key the schema declares (`ActionSchema.duration_key`, TODO-32). Two spelling
 a mismatch risk; the decomposer should read `action.schema.duration_key` (falling back to one tick when the
 schema names none). Same numbers today; fix when `action_decomposer.py` is next touched, with the regression
 sweep (behaviour-preserving, byte-identical).
+T-G (Hadi's order, 30 September 2026): done in T-G with TODO-25's schema fixes; `duration_key="?duration"` on
+dock_loading's `wait_at` in the same change (roadmap, "The plan from T-A", T-G).
 Files: mesa_sim/action_decomposer.py (`_expand_stand`), shared/types.py (`ActionSchema.duration_key`)
 Reference: R2 session, September 2026
 
@@ -3961,6 +3967,8 @@ Files: configs/experiment.yaml, CLAUDE.md
 Reference: docs/assumptions.md 1.4
 
 **TODO-140: Track 4, the workspace boundary and human departure (recorded at the G/X handoff, 29 Sept 2026)** [OPEN; after track 3, or before it if the evaluation needs a genuine departure]
+PLACEMENT REVISED (Hadi's order, 30 September 2026): track 4 is in the T-D tail, after T-F and T-V (roadmap, "The plan
+from T-A"); "after track 3, or before it" in the header is history. T-F runs without a genuine departure (TODO-144).
 Hadi's framing (docs/handoffs/handoff_G_X_onward.md, section 7): the shared work area gets a boundary and the human can
 pass through a door into an outside area (a corridor or rest area); the script's terminal task becomes `leave()`;
 whether the outside area is observable is a track 4 design question (observable: the human is seen but outside the
@@ -4008,6 +4016,13 @@ Files: shared/recognizer.py (`_build_admissible`), mesa_sim/sim_model.py (`obser
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the record line); analysis/mpb/REPORT.md
 
 **TODO-144: T-F, the evaluation: framing (not ruled) (recorded, the MPB post-(iv) records, 29 Sept 2026)** [OPEN; a future item, after the MPB closes]
+REVISED (Hadi's order, 30 September 2026; roadmap, "The plan from T-A", T-F): T-F follows T-G; tracks kitting,
+dock_loading and cross-domain; the randomised harness (TODO-47) stays in it.
+- Track 3b (TODO-145) follows T-F, in the T-D tail. The line "Before the evaluation: track 3b" below is history; the
+  dependency is a limitation of T-F's reading, not a prerequisite: an evaluation before 3b measures without knowing
+  that the adaptive branches fire under conflict.
+- The track 4 prerequisite below lapses. Scope of the evaluation set: the human stays in the room and ends with the
+  exit walk to the corner (docs/assumptions.md 1.1, 2.3); no genuine departure.
 A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB established; nothing here is ruled.
 - The conditions, as ablations of the decision levels:
   - admission off: the fallback-only control (the planner realizing against the fallback projection always, admission
@@ -4045,6 +4060,10 @@ TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
    stays recorded for T-H.
 
 **TODO-145: Track 3b: consequential activation under conflict (not ruled) (recorded, the MPB close-out, 30 Sept 2026)** [OPEN; after the MPB, before T-F]
+PLACEMENT REVISED (Hadi's order, 30 September 2026): track 3b is in the T-D tail, after T-F and T-V (roadmap, "The
+plan from T-A"); "before T-F" in the header and the "Placed before T-F" line below are history. The dependency is
+recorded as a limitation of T-F's reading (TODO-144), not as a prerequisite: an evaluation before 3b measures without
+knowing that the adaptive branches fire under conflict.
 Framing recorded at the close of the meta-planner test-bed; nothing here is ruled.
 - Purpose. The MPB established structural branch reachability and execution of the recognition-to-planning chain, not
   consequential activation of those branches under human-robot interaction conflict. Track 3b shows that when a recognized

@@ -108,7 +108,8 @@ Decisions
   removed, the robot's grasp is no trigger), and the policy
   components are ablated (T6, `analysis/t6_ablation/`); the gate stays a fixed share (the gate ruling). The 4C
   queue is done.
-  The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`). T-B is under way: T-B2a
+  The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`; the order revised 30 Sept 2026, below).
+  T-B is under way: T-B2a
   (`Projector.project()` chains the entries of an ordering, through a successor state derived from what the
   action schemas declare), T-B2b and T-B2c (`full_reorder`: an ordering realized against the human
   projection, one minimal-shift search and one hold per entry) and T-B2d (the `--strategy` run option) are
@@ -226,11 +227,19 @@ Decisions
   human-robot interaction conflict. The progression: track 1 recognition, track 2 semantics, track 3 reachability, track
   3b consequence under conflict (TODO-145, not ruled), T-F benefit (TODO-144). The MPB instrument saves the belief and S
   per tick and the projected human and planned robot segments per admitted decision, and draws `figure_ir.png` beside
-  `figure.png`. Next, as Hadi rules: track 3b before the evaluation, or track 4.
+  `figure.png`.
+  The pipeline is revised (Hadi, 30 Sept 2026; `docs/roadmap.md`, "The plan from T-A", its order block; task letters
+  are never reassigned, the order is not the alphabet). Done: T-A, T-B, T-C, T-H, T-L; T-D is closed except its tail.
+  Then, in order: T-G (the second domain in Mesa: dock_loading against `shared/` unchanged); T-F (the evaluation,
+  framed in TODO-144, the randomised harness TODO-47 part of it; the human stays in the room, no genuine departure;
+  before track 3b it measures without knowing that the adaptive branches fire under conflict); T-V (viewer, interface
+  and interactive simulator: track 1 the viewer, which was T-E; track 2 Phase 7); the T-D tail (track 3b TODO-145,
+  track 4 TODO-140, the 4D detour strategy); T-S (ROS/PRIEST, Phase 6) last. Next: T-G's design, in a new design chat
+  from a handoff.
   Not to be
-  started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
-  (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
-  (ROS / PRIEST execution).
+  started unasked: T-G, T-F, T-V, the T-D tail and T-S, i.e. the second domain, Phase 5
+  (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
+  strategy) and Phase 6 (ROS / PRIEST execution).
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. `full_reorder` (B3.B) is built (`_replan_orderings()`, T-B2b / T-B2c): orderings are ranked
   on their realized cost, `realize()` running one minimal-shift search per entry (T-B Q2), and the hold sent
@@ -505,9 +514,11 @@ across that commit without it.
   expires.
 - Plan names (`docs/roadmap.md`, "The plan from T-A"): T-A records (T-A1 the pipeline revision);
   T-B B3.B on two tables (B1 fixtures, B2 build, B3 evaluation); T-C the human action script (C1
-  design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case); T-E
-  demonstration; T-F evaluation (Phase 5); T-G later (second domain in Mesa, 4D, ROS). Task prompts
-  and reports use these names.
+  design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case; closed except its tail: track 3b,
+  track 4, 4D); T-E the demonstration's viewer (superseded by T-V, track 1; T-E in older records means the viewer);
+  T-F evaluation (Phase 5); T-G the second domain in Mesa (dock_loading; 4D and ROS left it on 30 Sept 2026); T-V
+  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-S ROS/PRIEST (Phase 6). Task
+  prompts and reports use these names; the order is the roadmap's, not the alphabet's.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.
 - Segment: one straight-line motion, or one stationary interval (a stationary segment), of one robot or human action in a

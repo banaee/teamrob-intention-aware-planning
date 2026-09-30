@@ -2914,6 +2914,10 @@ Reference: T-A1, September 2026; TODO-28; R1; T6
 
 **The pipeline from T-A: what moved, and why (T-A1)**
 
+REVISED ORDER (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): T-G no longer
+holds 4D or ROS (4D is in the T-D tail, ROS is T-S); T-E is superseded by T-V, track 1. The order stated below is
+history; the four decisions stand.
+
 DECIDED (cchat, September 2026, after reading the state in `analysis/big_picture/STATUS.md`). The plan from
 here is T-A (records) → T-B (B3.B on two tables) → T-C (the human action script) → T-D (robustness in
 kitting) → T-E (demonstration) → T-F (evaluation, Phase 5) → T-G (later: a second domain in Mesa, 4D,
@@ -3601,6 +3605,7 @@ Reference: D3, September 2026; cchat ruling; analysis/ablation_task_committed/ (
 SUPERSEDED IN PART by "T-H: the human behaviour model" (25 September 2026), item 8: events are typed and may cut mid-action (`DuringAction`), not only at the next action boundary; `inject` and the export are built in T-H2; an injection on an empty stack is exported as a plain script entry.
 
 RECORDED, NOT DECIDED (cchat, Hadi, 23 September 2026). A later phase, after T-G (roadmap, Phase 7).
+SCHEDULED (Hadi, 30 September 2026): Phase 7 is T-V, track 2 (`docs/roadmap.md`, "The plan from T-A", T-V).
 
 The human executor's injection path serves both: a deviation from T-C's vocabulary applied to the action script
 at load, and the same deviation arriving as an event during the run (from a viewer), applied at the next action
@@ -5631,3 +5636,5 @@ f7f275edfcc056ca12dd9ce67554675b scenario_s10_11, 9b673e2bf65bd1d41cb1fa7e922151
 580ae9fd3ae2455d251086223a6c5867 scenario_s11_02, 31d5f0f5e16cdd71e301cf77182aa311 scenario_s11_03,
 e1e9a758799a488b3bf022fe8c8b92ae scenario_s12_01, 93053e69c0d69ae637fb82b0c9399eb2 scenario_s12_02.
 Next, as Hadi rules: track 3b (TODO-145) before the evaluation (T-F, TODO-144), or track 4 (TODO-140).
+RULED (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): neither; T-G is next, then
+T-F and T-V, and track 3b and track 4 in the T-D tail after them.

@@ -47,6 +47,7 @@ untouched, only the words it claims it in.
 - Live agent positions, task progress, belief state display
 
 ## Phase 2.1 — Dock Loading Domain ✅ *(deferred since Phase 4C — must keep importing, is not run)*
+- 30 September 2026: T-G in the plan from T-A (the second domain in Mesa).
 - `domains/dock_loading/` modeled on HITS3 Scenario 2 (Olivia Stener / TRATON)
 - Tasks: `DELIVER_PALLET` (assigned), `DRIVER_PHONE_CALL`, `DRIVER_TALKS_TO_DOCKWORKER` (foreseeable)
 - Open non-blocking bugs: BUG-03, BUG-04 (see TODOS_AND_DEFERRED.md). Its action schemas were touched once
@@ -363,6 +364,23 @@ The 4C queue above is the record of what was done; this is the plan from here. E
 later sessions use (T-B2, T-C1, ...). The state before this revision: `analysis/big_picture/STATUS.md`.
 Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
 
+THE ORDER FROM 30 SEPTEMBER 2026 (ruled by Hadi; it supersedes every earlier statement of the order, here and in
+the older records). Task letters are never reassigned; the order lives in this block and in CLAUDE.md's state
+paragraph, not in the alphabet.
+
+- Done: T-A, T-B, T-C, T-H, T-L.
+- (1) T-D close: tracks 1, L, P, 2.5, G, X and 3 are done; the MPB is CLOSED (its close-out, 30 September 2026).
+- (2) T-G, the second domain in Mesa: dock_loading against `shared/` unchanged.
+- (3) T-F, the evaluation (Phase 5), framed in TODO-144.
+- (4) T-V, viewer, interface and interactive simulator: track 1 the viewer (T-E as originally defined), track 2
+  Phase 7.
+- (5) The T-D tail: track 3b (TODO-145); track 4 (TODO-140, TODO-131); the 4D detour strategy (TODO-70, TODO-15).
+- (6) T-S, ROS/PRIEST (Phase 6), at the end of the queue.
+- Unscheduled: the two-table re-examination of the recognizer and B2; belief-aware planning (TODO-97); the parked
+  candidates TODO-132 (a), TODO-134, TODO-142, TODO-143 and P3. The documentation pass for the paper stays before the
+  paper, not before the demonstration.
+- Next: T-G's design, in a new design chat from a handoff.
+
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
 - **T-B — B3.B (`full_reorder`): a candidate is an ordering of the pool.** The head of the argmin
@@ -515,11 +533,17 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   recorded (TODO-95; "T-H" named it before 25 Sept 2026).
   SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` as outcome and `unknown` leading as a measure: the `unknown` hypothesis leaves the hypothesis space (R1); the outcome is the adequacy finding (R2). T-D R and E is ruled; its Stage 1 is next. design_decisions.md, "T-D R and E".
   SETTLED BY T-D R (27 September 2026): "inside `unknown` or outside it": outside; the adequacy finding takes the explanatory role; T-D Q1 itself unchanged, P's building block. design_decisions.md, "T-D R and E".
+  CLOSED EXCEPT ITS TAIL (Hadi's order, 30 September 2026): tracks 1 (the IR test-bed), L, P, 2.5, G, X and 3 (the
+  MPB, CLOSED at its close-out) are done; design_decisions.md, the entries of those names. "NEXT after T-L" above is
+  history. The T-D tail runs after T-V: track 3b, consequential activation under conflict (TODO-145); track 4, the
+  workspace boundary and departure (TODO-140, TODO-131); the 4D detour strategy (TODO-70, TODO-15), the planner's
+  remedy for the freezing robot (Phase 4D below).
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
   set covers switch and hold (scenario_s05_01 / scenario_s05_02), a two-table ordering, a change of mind, unmodelled behaviour; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and
   unmodelled behaviour (and the belief's `unknown` leading), not only switch and hold.
   SUPERSEDED IN PART (T-D R, 27 September 2026): "the belief's `unknown` leading" no longer occurs (R1); what the demonstration shows in its place is not ruled. design_decisions.md, "T-D R and E".
+  SUPERSEDED (30 September 2026) by T-V, track 1; T-E in older records means the viewer.
 - **T-F — Evaluation (Phase 5).** Fixture generation completed (the randomised harness, TODO-47); factors
   `cost_strategy` × `gate_strategy` × `strategy` × `separation_stop` × prior (B2 is a factor here, not a
   design step: TODO-36); metrics on `recognition_changed`, completion from the world fact, blocked time,
@@ -529,7 +553,39 @@ Reasoning: design_decisions.md, "The pipeline from T-A: what moved, and why".
   `[sep]` violations; the gate is kept and justified by this sweep, with TODO-84 (the expected-cost branch,
   over per-hypothesis costs) and TODO-97 (the joint-realization branch) as the two recorded alternatives.
   The θ values for the sweep are chosen at T-F, not now.
-- **T-G — Later, in this order:** a second domain in Mesa; 4D (detour); ROS.
+  REVISED (Hadi's order, 30 September 2026): T-F follows T-G and is framed in TODO-144; the randomised harness
+  (TODO-47) stays in it. Tracks: kitting, dock_loading, cross-domain. The conditions as ablations (admission off,
+  realization off, prior off a diagnostic), the measures, and the deviation dimension, as TODO-144 records them.
+  Prerequisites: TODO-137 (the fallback-only control), TODO-135 (the near-encounter scenario), the evaluation scenario
+  sets, MPB-5's horizon (TODO-138). Scope of the evaluation set: the human stays in the room and ends with the exit
+  walk to the corner (docs/assumptions.md 1.1, 2.3); no genuine departure (track 4 follows T-F). LIMITATION OF ITS
+  READING (recorded): track 3b follows T-F, in the T-D tail, so an evaluation before 3b measures without knowing that
+  the adaptive branches fire under conflict; it cannot test behaviour in which the human projection conflicts with the
+  robot's plan.
+- **T-G — The second domain in Mesa: dock_loading** (revised by Hadi, 30 September 2026; before, "Later, in this
+  order: a second domain in Mesa; 4D (detour); ROS": 4D moved to the T-D tail, ROS to T-S).
+  `domains/dock_loading/` against `shared/` unchanged, executed by the Mesa body. Purpose: test whether the
+  recognizer, the gate, the projection and the meta-planner stay domain-independent on a second task model.
+  - The domain's task model: the assigned tasks, the foreseeable tasks (the phone call, talking to the dock worker),
+    unmodelled behaviour; the driver's work order.
+  - The domain's own elements: the truck as a container, the gate state as a method guard.
+  - TODO-25's schema fixes (TODO-81 with them).
+  - The script vocabulary, one controlled layout, setups and scenarios, following T-L.
+  - The IR test-bed, then the MPB, run on it; findings classified by the case classification of
+    `docs/assumptions.md` and under MPB-4.
+  - A shared ruling reopens on design grounds only; nothing domain-specific enters `shared/`.
+- **T-V — Viewer, interface and interactive simulator** (ruled by Hadi, 30 September 2026), one task with tracks.
+  - Track 1: T-E as originally defined, the viewer for pre-loaded scripts, showing belief, admitted projection,
+    decision, hold, refusal and the script's events; demonstration only, nothing enters the mind.
+  - Track 2: Phase 7 (below): live events through the human executor's injection path (`inject`, T-H2), the export
+    as a script, the replay rule, later the context stream.
+- **T-S — ROS/PRIEST** (ruled by Hadi, 30 September 2026; future work, removed from T-G, at the end of the queue).
+  - TODO-75: the ROS guide and `env_layout99`.
+  - The paused `ros_sim/`, including its stale `BeliefState` construction (flagged at G-build; first recorded here):
+    `ros_sim/framework_HRI/framework_HRI/planner_2.py` passes 5 of `BeliefState`'s 11 fields, without those added
+    since T-D Stage 1, and `most_likely="unknown"`.
+  - Phase 6's execution layer (below).
+  - The ROS-specific separation stop, via PRIEST.
 
 The documentation pass for the paper comes before the paper, not before the demonstration.
 
@@ -540,6 +596,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
 `min_separation` is supplied by the body in physical units (TODO-28; design_decisions.md).
 
 **Phase 4D — Low-level execution adaptation**
+- 30 September 2026: the detour strategy is in the T-D tail, the PRIEST side in T-S (the plan from T-A, its order).
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
 - No structural change to executor interface; hints richer than current skeleton
 - DESIGN-13's realization estimator is PARTLY PULLED FORWARD into 4C by the wait-decision
@@ -596,6 +653,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   reveal location from geometry, then check it) and the rationality measure (TODO-63)
 
 ## Phase 6 — ROS Embodiment 🔲 *(ROS team; `ros_sim/` paused)*
+- 30 September 2026: T-S in the plan from T-A, at the end of the queue.
 - `ros_sim/`: microaction classifier from sensor streams, symbolic WorldState builder, goal executor via ROS action servers
 - Core `shared/` requires no modification for ROS integration
 - Architectural interface already defined in `shared/io_contracts.md`
@@ -628,6 +686,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
     set them from the real microaction classifier's measured rates.
 
 ## Phase 7 (recorded, not scheduled): interactive deviations and a context stream 🔲 *(after T-G; nothing decided)*
+- SCHEDULED (30 September 2026): T-V, track 2, in the plan from T-A (after T-G and T-F).
 - Run-time deviation events into the human executor from a viewer, replayable as pre-loaded scripts: live runs
   demonstrate, pre-loaded scripts evaluate. PULLED FORWARD IN PART by T-H (25 Sept 2026): `executor.inject(Start(task) |
   Drop())` and the export of `Now` as `AfterAction` / `DuringAction` are T-H2's; events may cut mid-action; an

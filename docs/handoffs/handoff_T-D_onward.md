@@ -5,6 +5,10 @@ T-B Q6, T-B3, the `task_committed` debate and its removal (D3), the TODO-90 chec
 T-C2a/b/c (build), the script play across nine layouts, and the recording of Phase 7. Everything in
 it is committed and pushed; nothing is open in ccode.
 
+> SUPERSEDED IN ITS ORDER (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): T-E is
+> superseded by T-V, track 1 (T-E here means the viewer); T-G holds the second domain in Mesa only, 4D is in the T-D
+> tail, ROS is T-S. Section 0's "this chat ends when … T-E is designed and built" and section 5's order are history.
+
 ## What T-D now stands on (added 26 September 2026, after T-H)
 
 T-H (the human behaviour model, T-H1 to T-H4; `docs/handoffs/handoff_T-H.md`, its close-out) ran between this handoff

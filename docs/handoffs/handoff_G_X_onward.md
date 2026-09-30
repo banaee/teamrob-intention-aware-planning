@@ -93,6 +93,8 @@ check is needed (ccode's suggestion, not yet applied).
 Pipeline of tracks: 1 (done) → 2: L (done), P (done with P4) → 2.5 (done) → 2: G, X (next) → 3 → 4 →
 demonstration and evaluation (T-E, T-F). Track 4 may move before track 3 if the evaluation scenarios
 need a genuine departure from the workspace.
+SUPERSEDED IN ITS ORDER (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): after
+track 3 come T-G, T-F, T-V (track 1 the viewer, which was T-E), then track 3b and track 4 in the T-D tail, then T-S.
 
 ### 2.1 Track 1, the IR test-bed (closed)
 
