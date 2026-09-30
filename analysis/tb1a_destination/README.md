@@ -693,3 +693,37 @@ Commands: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`; 
 | env_layout_06_scenario_s03_06_off | 5f5a313476701443abb951663dae49fd | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
 | env_layout_07_scenario_s05_01_off | bda40c05ad083b0051e7ce64d455f009 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
 | env_layout_07_scenario_s05_02_off | a33b38be658def9388af110f597e39ca | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 218 | 50.00 (57) | 0 | 0 | 0 |
+
+## The class-2 correction: the assessed trajectory is the executed one — the logs from here on
+
+Regenerated at the MPB class-2 correction (30 September 2026), superseding the G-build table above. CAUSE:
+design_decisions.md, "Realization as built", the dated correction, and "The meta-planner test-bed (MPB)", MPB-4's
+class-2 record: the body reports its owed completion ticks and the action in flight (`ExecutorState`), every robot
+candidate's projection states the owed ticks first and the continued task is projected from the action in flight, and
+the executor spends owed ticks before a hold. Human projections, `realize()`, F1, the gate and the triggers unchanged.
+The diff rule checked on every log against the G-build logs: the `.rec` streams byte-identical in all; every `[IR*]`
+line byte-identical in all, both priors; in every run but one the robot's lines, `[sep]`, `[hold]` and `[meta]`
+lines are identical and only the cost lines differ (`[meta-cand]`, `[meta-b3]`, `[meta-ord]`, `[meta-win]`: a
+candidate's T_r now states the owed ticks, or drops a completed walk's re-priced acknowledgement). Prior on, one run moved, scenario_s02_01 (`analysis/tb1a_destination/`): the decision at 23, state (a) (the tick after the walk to its shelf was acknowledged at 22, the pick_up not begun), held 4 against the old plan, which re-priced the completed walk and its acknowledgement, and holds 0 against the corrected one (the grasp at 23, the next walk from 25). The run is 4 ticks earlier from there; the same delivery order (item_7, item_6, item_1, item_4), the later decisions at the shifted ticks; completion 426 → 422; F1's classes 2/3/0 → 0/4/3 (the two robot violations gone); the `[sep]` minimum 30.87 cm, at 73 instead of 75. Prior off: no
+behaviour moved (cost lines only). Completion is the world tick (T6), `analysis/tb1a_destination/sep_classes.py` on
+both sets. Prior on first.
+Commands: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (G-build) | completion after | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_on | 950a7f3b894e7d9ccb8cd9593ea4af91 | e75eaa192f7071498290d6255fc81320 | 174 | 174 | 45.74 (156) | 0 | 3 | 0 |
+| env_layout_02_scenario_s02_01_on | 81a25bc34061cde2a9a81f14bb7349a4 | fb8914e13cbab8b97307127aa0cd4327 | 426 | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_on | f3c9b01818187664c285e04cad8a9e6b | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_04_scenario_s01_06_on | d6bd11fc0b73f23c17dc7b700f0c86ae | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_on | c7ba3ff49915724a13dea9e5f93bc904 | 5018d8aa07e5b9ad7aa277fec933ada9 | 384 | 384 | 38.58 (355) | 0 | 3 | 1 |
+| env_layout_06_scenario_s03_06_on | 5f463bc4afade581dcc53ce64110eade | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_on | 3b2dad0e43aea6852ad24412930134a6 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_on | 16c51cd20e1cac4323a11384ec28cace | dab078d5ca51e5b378054ee6a60ccca7 | 214 | 214 | 50.00 (57) | 0 | 0 | 0 |
+| env_layout_01_scenario_s01_01_off | c0522d301331ba62280798b7f783391b | e75eaa192f7071498290d6255fc81320 | 199 | 199 | 72.61 (166) | 0 | 0 | 0 |
+| env_layout_02_scenario_s02_01_off | 2a00e756204426dd50cfe80476719065 | fb8914e13cbab8b97307127aa0cd4327 | 422 | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_off | 187ae6ee9ee1383c79501eaa48c65772 | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_04_scenario_s01_06_off | e58a766a12191d44f5bad214f35575ab | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_off | d4471d706f95639a6a207aaba8c36a3f | 5018d8aa07e5b9ad7aa277fec933ada9 | 384 | 384 | 38.58 (355) | 0 | 3 | 1 |
+| env_layout_06_scenario_s03_06_off | 91c3b333b0a8de1dd5512e72fd85f2e4 | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_off | df6b0cea8c59dba6a195b50ea965f392 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_off | a33b38be658def9388af110f597e39ca | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 218 | 50.00 (57) | 0 | 0 | 0 |

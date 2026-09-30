@@ -561,3 +561,29 @@ Commands: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/swee
 | env_layout_08_scenario_s06_01_realized_off | 8b621e3f1f757056ef8a8a3dc5903142 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_plain_off | c60a7db0c91a86084328a356985228be | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
 | env_layout_08_scenario_s06_03_realized_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 236 | 226 | 54.58 (223) | 0 | 0 | 0 |
+
+## The class-2 correction: the assessed trajectory is the executed one — the logs from here on
+
+Regenerated at the MPB class-2 correction (30 September 2026), superseding the G-build table above. CAUSE:
+design_decisions.md, "Realization as built", the dated correction, and "The meta-planner test-bed (MPB)", MPB-4's
+class-2 record: the body reports its owed completion ticks and the action in flight (`ExecutorState`), every robot
+candidate's projection states the owed ticks first and the continued task is projected from the action in flight, and
+the executor spends owed ticks before a hold. Human projections, `realize()`, F1, the gate and the triggers unchanged.
+The diff rule checked on every log against the G-build logs: the `.rec` streams byte-identical in all; every `[IR*]`
+line byte-identical in all, both priors; in every run but one the robot's lines, `[sep]`, `[hold]` and `[meta]`
+lines are identical and only the cost lines differ (`[meta-cand]`, `[meta-b3]`, `[meta-ord]`, `[meta-win]`: a
+candidate's T_r now states the owed ticks, or drops a completed walk's re-priced acknowledgement). Prior on: no completion tick, `[sep]` minimum, F1 class, hold or selection moved. Prior off: no
+behaviour moved (cost lines only). Completion is the world tick (T6), `analysis/tb1a_destination/sep_classes.py` on
+both sets. Prior on first.
+Commands: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (G-build) | completion after | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_on | 97a07b5d8bdd9f8f5d32c4a9afbd6af2 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_on | cd389598a4f7606be7625dc35b484346 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_on | e3f71d76adced8c1ffc49ef4cef76d0c | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_on | 2c734fb09410644d22f4a8cf8cf97a94 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_plain_off | 4fa0a461ca39ea4c317e370be8e74f7d | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_off | cea4392a46a5da7d5e6b922de8dc4da3 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_off | 9cd05ae81b0cf2407b3b1f122504e4f7 | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |

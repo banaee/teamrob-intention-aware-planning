@@ -639,3 +639,41 @@ Commands: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`; 
 | env_layout_08_scenario_s06_02_single_task_off | ed808863ff4d9887224de039cb5653fd | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_full_reorder_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 236 | 226 | 54.58 (223) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_single_task_off | 35b4df6e43ab34fe83e7e7ab75140d57 | c9c444622f25d15abfd849fc495db540 | 316 | 314 | 68.41 (264) | 0 | 0 | 0 |
+
+## The class-2 correction: the assessed trajectory is the executed one — the logs from here on
+
+Regenerated at the MPB class-2 correction (30 September 2026), superseding the G-build table above. CAUSE:
+design_decisions.md, "Realization as built", the dated correction, and "The meta-planner test-bed (MPB)", MPB-4's
+class-2 record: the body reports its owed completion ticks and the action in flight (`ExecutorState`), every robot
+candidate's projection states the owed ticks first and the continued task is projected from the action in flight, and
+the executor spends owed ticks before a hold. Human projections, `realize()`, F1, the gate and the triggers unchanged.
+The diff rule checked on every log against the G-build logs: the `.rec` streams byte-identical in all; every `[IR*]`
+line byte-identical in all, both priors; in every run but one the robot's lines, `[sep]`, `[hold]` and `[meta]`
+lines are identical and only the cost lines differ (`[meta-cand]`, `[meta-b3]`, `[meta-ord]`, `[meta-win]`: a
+candidate's T_r now states the owed ticks, or drops a completed walk's re-priced acknowledgement). Prior on: no completion tick, `[sep]` minimum, F1 class, hold or selection moved. Prior off: no
+behaviour moved (cost lines only). Completion is the world tick (T6), `analysis/tb1a_destination/sep_classes.py` on
+both sets. Prior on first.
+Commands: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`; `analysis/tb1a_destination/sep_classes.py analysis/tb3_full_reorder/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion before (G-build) | completion after | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_on | 9396ff1e4afc6b24c44a242a1411f91e | 515647f63e1b047aab15b0dc0ac91d08 | 221 | 221 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_on | f3c9b01818187664c285e04cad8a9e6b | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 7adae14aafb582e82acbc58795fb0d01 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_on | 3b2dad0e43aea6852ad24412930134a6 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_on | cd389598a4f7606be7625dc35b484346 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_on | 7d79a662e46875c01c5ce9edac142eaf | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_on | b9aea1ebbbfa77b48477882cf9197585 | 329590c9c1249859bfe20d107588c50a | 224 | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_on | ccbaf46c678c522e09c78a692999a620 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_on | 2c734fb09410644d22f4a8cf8cf97a94 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_on | 0b63ed6e9e4962e699384c8cfce0b767 | c9c444622f25d15abfd849fc495db540 | 272 | 272 | 28.69 (246) | 0 | 3 | 1 |
+| env_layout_03_scenario_s03_01_full_reorder_off | f4cd62597c3826af263e1cf04524aef9 | 515647f63e1b047aab15b0dc0ac91d08 | 265 | 265 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_off | 187ae6ee9ee1383c79501eaa48c65772 | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_full_reorder_off | f1f72fdf229d98fc7d7b91299a72405a | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_off | df6b0cea8c59dba6a195b50ea965f392 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_off | cea4392a46a5da7d5e6b922de8dc4da3 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_off | bf2ab7f80ba3e2f63ac896edca3e3fd7 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_off | ca71b3bd591ec9cac0b74af207aaa52d | 329590c9c1249859bfe20d107588c50a | 224 | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_off | 79eb0433ffac1c650293e2f2fbae48c4 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_off | 35b4df6e43ab34fe83e7e7ab75140d57 | c9c444622f25d15abfd849fc495db540 | 314 | 314 | 68.41 (264) | 0 | 0 | 0 |
