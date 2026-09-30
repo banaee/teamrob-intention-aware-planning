@@ -212,7 +212,9 @@ Decisions
   kinds of cell). Part (v) built its five reachable claimed cells, one authored instance each, all verified (30 Sept
   2026; env_layout_13, env_layout_14, env_setup_12, scenario_s12_01, _02, s11_03, s10_10, _11): the switch against an
   admitted projection, the hold against an admitted standing segment, the switch while carrying, a record kept through
-  a dip below θ, the cause boundary. The MPB is CLOSED: every materially distinct in-scope decision path is verified,
+  a dip below θ, the cause boundary. The MPB is CLOSED, provisionally until Hadi reads the check of scenario_s12_01's
+  three F1 violations under full_reorder (`analysis/mpb/REPORT.md`, part (v): reading (c)): every materially distinct
+  in-scope decision path is verified,
   unreachable with a recorded derivation, or outside the claimed mechanism with a recorded reason. Next, as Hadi rules:
   the evaluation, T-F (framed in TODO-144), or track 4.
   Not to be

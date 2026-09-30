@@ -3738,7 +3738,7 @@ reaches it.
 Files: shared/recognizer.py (`_retired`)
 Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
 
-**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [CLOSED (MPB part (v), 30 Sept 2026): sixteen scenarios verified; every materially distinct in-scope decision path verified, unreachable or out of coverage]
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [CLOSED, provisionally (MPB part (v), 30 Sept 2026): sixteen scenarios verified; every materially distinct in-scope decision path verified, unreachable or out of coverage; provisional until Hadi reads the check of scenario_s12_01's three F1 violations]
 REWRITTEN (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"): the earlier track
 note and its X amendment are superseded by the entry; their content is in it.
 The recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
@@ -3784,8 +3784,10 @@ recorded reason.
 PART (v) BUILT, THE MPB CLOSED (30 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", PART (v) and
 CLOSED; analysis/mpb/REPORT.md, "Part (v)"): scenario_s12_01 (D8), scenario_s12_02 (C2), scenario_s11_03 (D9),
 scenario_s10_10 (E6), scenario_s10_11 (A4), all verified; env_layout_13, env_layout_14 and env_setup_12 authored for
-them. Recorded for Hadi: three F1 robot violations in scenario_s12_01 under full_reorder inside the admission's window
-(class 5 pending his reading).
+them. Recorded for Hadi: three F1 robot violations in scenario_s12_01 under full_reorder inside the admission's window;
+checked on the re-executed realization (analysis/mpb/REPORT.md, part (v)): reading (c), no class assigned, pending his
+reading. The instrument now saves the belief and S per tick, and the projected human and planned robot segments per
+admitted decision, and draws the IR test-bed's figure per run (figure_ir.png; analysis/mpb/README.md).
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]

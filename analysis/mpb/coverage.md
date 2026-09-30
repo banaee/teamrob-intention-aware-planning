@@ -261,6 +261,7 @@ setup: the output floor couples every scenario on a setup).
 
 The MPB closes when every materially distinct in-scope decision path is verified, unreachable with a recorded
 derivation, or outside the claimed mechanism with a recorded reason: here, when A4, C2, D8, D9 and E6 are verified.
-CLOSED (part (v), 30 September 2026): all five are verified (zero disagreements on parts 1 to 3 under both strategies,
+CLOSED (part (v), 30 September 2026; provisional until Hadi reads the check of scenario_s12_01's three F1 violations,
+REPORT.md, part (v)): all five are verified (zero disagreements on parts 1 to 3 under both strategies,
 prior on; every declared part-4 property under single_task). Every row is now verified (36), unreachable with a
 derivation (5), out of coverage with a reason (4), reachable and not claimed (1, P3) or not a distinct path (1).

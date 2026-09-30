@@ -21,6 +21,18 @@ Outputs in <out_dir>: actual_ticks.json, actual_decisions.json (mpblib.Decision,
 (the log's), observed.json (the run's no_current_task ticks, its terminal tick, the comparison horizon; MPB-5),
 selection.json (per decision: the winner, its hold, the horizon; [meta-cand] per candidate), robot.json (per tick the
 robot's position, microaction and held item; the human's position).
+
+Added at the MPB close-out (instrument only; never compared, compare.py reads its named fields):
+- actual_ticks.json, per tick: the belief of every hypothesis of the robot's BeliefState (the distribution, the setup's
+  robot items at the output floor included), the tail probability S of the adequacy test's members (`tails`) and the
+  lifecycle; plot_ir.py draws them.
+- actual_decisions.json, per admitted decision: the admitted human projection's segments (`human_segments`) and the
+  winner's realized plan's segments (`robot_segments`, the hold before the first entry included), each as
+  [start_step, end_step, start_pos, end_pos] on the projection clock, where step s is the end of world tick
+  (decision tick - 1 + s) (established on scenario_s12_01's decision of 26, the check of objection 1 at part (v)). The
+  winner's realized plan is recorded by a pass-through wrapper around shared.meta_planner.realize (it calls the original
+  and returns its result unchanged): of the plans realized on the decision's tick, the least-cost one whose head is the
+  winner.
 """
 import json
 import logging
@@ -91,11 +103,20 @@ def in_process(run_file, steps, strategy, prior):
             return r
         return wrapped
 
+    import shared.meta_planner as meta_planner_module
+    realize_orig = meta_planner_module.realize
+
+    def record_realize(plan, human_plan, min_separation, decision_step):
+        r = realize_orig(plan, human_plan, min_separation, decision_step)
+        tick_state.setdefault("realized", []).append((plan, r))
+        return r
+
+    meta_planner_module.realize = record_realize
     mp.evaluate_triggers = record_triggers(mp.evaluate_triggers)
     mp.update_human_projection = record_projection(mp.update_human_projection)
     mp.update = record_update(mp.update)
 
-    ticks, decisions, selection, agents = [], [], [], []
+    ticks, decisions, selection, agents, segments = [], [], [], [], []
     H = human.unique_id
     for t in range(steps):
         tick_state.clear()
@@ -112,7 +133,8 @@ def in_process(run_file, steps, strategy, prior):
                           gate=mp._clears_gate(b).value,
                           adequacy={k: v.value for k, v in b.hypothesis_adequacy.items()},
                           observation_warrant={k: v.value for k, v in b.observation_warrant.items()},
-                          record=mp._projected_hypothesis, evaluated=world is not None, perception=perception))
+                          record=mp._projected_hypothesis, evaluated=world is not None, perception=perception,
+                          belief=dict(b.distribution), S=dict(b.tails), lifecycle=b.lifecycle.value))
         agents.append(dict(tick=t, robot=[float(robot.pos[0]), float(robot.pos[1])], micro=robot.current_microaction,
                            carrying=robot.carrying, task=None if robot.current_task_instance is None
                            else _key_task(robot.current_task_instance),
@@ -139,6 +161,15 @@ def in_process(run_file, steps, strategy, prior):
         decisions.append(Decision(t, Trigger(d.reason), None if d.cause is None else Cause(d.cause.value), gate,
                                   b.most_likely, warrant, admitted, fb))
         r = tick_state.get("result")
+        seg = {}
+        if admitted is not None and r is not None and r.current_task is not None:
+            head = _key_task(r.current_task)
+            mine = [x for x in tick_state.get("realized", []) if x[0].task_queue and x[0].task_queue[0] == head]
+            if mine:
+                won = min(mine, key=lambda x: x[1].cost)[1]
+                seg = dict(human_segments=_segments(g for e in proj.entries for g in e.segments),
+                           robot_segments=_segments(won.segments))
+        segments.append(seg)
         new = collect.lines[n0:]
         cands = [dict(task=l.split()[1], delta=int(re.search(r" delta=(\d+)", l)[1]),
                       T_r=float(re.search(r" T_r=([\d.]+)", l)[1])) for l in new if l.startswith("[meta-cand]")]
@@ -147,7 +178,13 @@ def in_process(run_file, steps, strategy, prior):
                               hold=None if r is None else r.hold, horizon=None if r is None else r.horizon,
                               candidates=cands))
     root.removeHandler(collect)
-    return collect.lines, ticks, decisions, selection, agents
+    meta_planner_module.realize = realize_orig
+    return collect.lines, ticks, decisions, selection, agents, segments
+
+
+def _segments(segs):
+    return [[g.start_step, g.end_step, [float(g.start_pos[0]), float(g.start_pos[1])],
+             [float(g.end_pos[0]), float(g.end_pos[1])]] for g in segs]
 
 
 def _key_task(task):
@@ -188,7 +225,7 @@ if __name__ == "__main__":
     prior = (sys.argv[sys.argv.index("--assignment_prior") + 1] == "true") if "--assignment_prior" in sys.argv \
         else bool(yaml.safe_load(open(run_file))["assignment_prior"])
     out.mkdir(parents=True, exist_ok=True)
-    lines, ticks, decisions, selection, agents = in_process(run_file, steps, strategy, prior)
+    lines, ticks, decisions, selection, agents, segments = in_process(run_file, steps, strategy, prior)
     logged = [l.rstrip("\n") for l in open(log_path) if not l.startswith(RUN_MESA_LINES)]
     same = lines == logged
     print(f"{run_file}: in-process model lines {'identical to' if same else 'DIFFER from'} the logged run's "
@@ -202,6 +239,8 @@ if __name__ == "__main__":
                    strategy=strategy, prior=prior), open(out / "observed.json", "w"), indent=1)
     json.dump(ticks, open(out / "actual_ticks.json", "w"))
     dump(decisions, out / "actual_decisions.json")
+    written = json.load(open(out / "actual_decisions.json"))
+    json.dump([dict(d, **x) for d, x in zip(written, segments)], open(out / "actual_decisions.json", "w"), indent=0)
     json.dump(from_log(log_path), open(out / "actual_log_decisions.json", "w"), indent=0)
     json.dump(selection, open(out / "selection.json", "w"), indent=0)
     json.dump(agents, open(out / "robot.json", "w"))

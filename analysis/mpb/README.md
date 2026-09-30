@@ -64,8 +64,39 @@ in REPORT.md).
    `properties.md`, `properties.json`.
 9. **`reference.py`** runs the reference: the control's robot alone, the human removed. It is not registered (a
    reference run, not a scenario).
-10. **`plot.py`** draws `figure.png`.
-11. **`alteration.py`** runs the single-rule alteration test (MPB-4) over the committed outputs.
+10. **`plot.py`** draws `figure.png`, the MPB's decisions-and-distance figure.
+11. **`plot_ir.py`** (prior on; added at the close-out) draws `figure_ir.png`: the IR test-bed's figure
+    (`analysis/ir_testbed/plot.py`, imported unchanged), the same panels, on the MPB's oracle table and in-process
+    actual: the belief and the tail probability S per hypothesis of the support (expected lines, actual dots), the
+    finding band, the observation-warrant bands and the gate's clearing, θ and α marked.
+12. **`alteration.py`** runs the single-rule alteration test (MPB-4) over the committed outputs.
+
+## Saved beside the compared columns (the MPB close-out, 30 September 2026)
+
+Instrument additions; none is compared (`compare.py` reads its named fields), and no framework file changed. The sixteen
+were rerun with them, every log and `.rec` stream byte-identical to REPORT.md's md5s.
+- **The belief and S, per tick.** `expected_ticks.json` carries the IR oracle's belief, S and lifecycle per hypothesis of
+  the support. `actual_ticks.json` carries the robot's whole distribution, the tails of the adequacy test's members and
+  the lifecycle. `plot_ir.py` draws them.
+  - **The belief here carries the output floor of the robot's items.** The setup's robot items are hypotheses outside
+    the support, each held at the floor, so the support's shares sum to slightly less than 1 (0.995 with env_setup_10's
+    five items), on both sides. This is the floor that moved scenario_s10_08's crossing from 46 to 47 and
+    scenario_s12_01's admission from 25 to 26.
+  - A retired hypothesis keeps its floor share in the robot's distribution (actual dots at 0) where the oracle's row has
+    no belief (the expected line stops).
+- **The segments, per admitted decision.** `actual_decisions.json` carries, for every decision that admitted a
+  projection:
+  - `human_segments`: the admitted human projection's segments;
+  - `robot_segments`: the winner's realized plan, the hold before the first entry included.
+
+  Each segment is [start_step, end_step, start_pos, end_pos] on the projection clock, **where step s is the end of world
+  tick (decision tick − 1 + s)**: step 0 is the robot's position at the decision, and the human projection starts at the
+  observation offset, step 1. The clock was established, not assumed, on scenario_s12_01's decision of 26 (part (v),
+  objection 1): the recorded positions equal the executed ones at steps 1 and 2 (the human) and through the hold (the
+  robot).
+  - The winner's realized plan is taken by a pass-through wrapper around `shared.meta_planner.realize`: of the plans
+    realized on the decision's tick, the least-cost one headed by the winner.
+  - With these a check of projected against actual, and planned against executed, is read-only.
 
 ## What the oracle derives, with its sources
 

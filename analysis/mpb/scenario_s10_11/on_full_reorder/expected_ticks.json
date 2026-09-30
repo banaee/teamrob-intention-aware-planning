@@ -28,7 +28,16 @@
 "duration": 1.0,
 "end": 2.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.5227737118729319,
+"deliver_item(?item=item_2)": 0.47222628812706813
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.8668431304830551
+},
+"lifecycle": "live"
 },
 {
 "tick": 1,
@@ -59,7 +68,16 @@
 "duration": 2.0,
 "end": 4.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.5511724653806636,
+"deliver_item(?item=item_2)": 0.44382753461933655
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.7432822650679201
+},
+"lifecycle": "live"
 },
 {
 "tick": 2,
@@ -90,7 +108,16 @@
 "duration": 3.0,
 "end": 6.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.5825834403759179,
+"deliver_item(?item=item_2)": 0.412416559624082
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.6302932758103746
+},
+"lifecycle": "live"
 },
 {
 "tick": 3,
@@ -121,7 +148,16 @@
 "duration": 4.0,
 "end": 8.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.6166785600700605,
+"deliver_item(?item=item_2)": 0.37832143992993955
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.5285340651264793
+},
+"lifecycle": "live"
 },
 {
 "tick": 4,
@@ -152,7 +188,16 @@
 "duration": 5.0,
 "end": 10.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.6528887061009673,
+"deliver_item(?item=item_2)": 0.34211129389903283
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.43830370339948804
+},
+"lifecycle": "live"
 },
 {
 "tick": 5,
@@ -183,7 +228,16 @@
 "duration": 6.0,
 "end": 12.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.6904119676433808,
+"deliver_item(?item=item_2)": 0.30458803235661924
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.3595350369974642
+},
+"lifecycle": "live"
 },
 {
 "tick": 6,
@@ -214,7 +268,16 @@
 "duration": 7.0,
 "end": 14.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.7282654773785633,
+"deliver_item(?item=item_2)": 0.2667345226214367
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.291821605343976
+},
+"lifecycle": "live"
 },
 {
 "tick": 7,
@@ -308,7 +371,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.7653790374960661,
+"deliver_item(?item=item_2)": 0.22962096250393388
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.23447329377402487
+},
+"lifecycle": "live"
 },
 {
 "tick": 8,
@@ -402,7 +474,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.8007144267050812,
+"deliver_item(?item=item_2)": 0.19428557329491877
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.18659046883431887
+},
+"lifecycle": "live"
 },
 {
 "tick": 9,
@@ -496,7 +577,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.83338359294669,
+"deliver_item(?item=item_2)": 0.16161640705331004
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.14714458615057005
+},
+"lifecycle": "live"
 },
 {
 "tick": 10,
@@ -590,7 +680,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.8627379166041498,
+"deliver_item(?item=item_2)": 0.13226208339585027
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.11505443204572632
+},
+"lifecycle": "live"
 },
 {
 "tick": 11,
@@ -684,7 +783,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.8884104689094976,
+"deliver_item(?item=item_2)": 0.10658953109050234
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.08925029998768154
+},
+"lifecycle": "live"
 },
 {
 "tick": 12,
@@ -778,7 +886,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9103087483400334,
+"deliver_item(?item=item_2)": 0.08469125165996663
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.06872219785772739
+},
+"lifecycle": "live"
 },
 {
 "tick": 13,
@@ -872,7 +989,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9285692127368504,
+"deliver_item(?item=item_2)": 0.0664307872631495
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.052551539992436065
+},
+"lifecycle": "live"
 },
 {
 "tick": 14,
@@ -966,7 +1092,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9434917904515444,
+"deliver_item(?item=item_2)": 0.05150820954845561
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.03992811345812973
+},
+"lifecycle": "live"
 },
 {
 "tick": 15,
@@ -1060,7 +1195,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.955471855095559,
+"deliver_item(?item=item_2)": 0.03952814490444108
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.03015532407459514
+},
+"lifecycle": "live"
 },
 {
 "tick": 16,
@@ -1154,7 +1298,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9649417530497434,
+"deliver_item(?item=item_2)": 0.030058246950256596
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.02264703504136819
+},
+"lifecycle": "live"
 },
 {
 "tick": 17,
@@ -1248,7 +1401,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9723274987316854,
+"deliver_item(?item=item_2)": 0.022672501268314663
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0169190311112267
+},
+"lifecycle": "live"
 },
 {
 "tick": 18,
@@ -1342,7 +1504,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.97802113032764,
+"deliver_item(?item=item_2)": 0.016978869672359915
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.012577572171308542
+},
+"lifecycle": "live"
 },
 {
 "tick": 19,
@@ -1436,7 +1607,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9823662615144658,
+"deliver_item(?item=item_2)": 0.012633738485534179
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.009306857323758456
+},
+"lifecycle": "live"
 },
 {
 "tick": 20,
@@ -1530,7 +1710,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9856532897816452,
+"deliver_item(?item=item_2)": 0.009346710218354749
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.006856630761082856
+},
+"lifecycle": "live"
 },
 {
 "tick": 21,
@@ -1624,7 +1813,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9881208416282564,
+"deliver_item(?item=item_2)": 0.006879158371743616
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.005030680829113348
+},
+"lifecycle": "live"
 },
 {
 "tick": 22,
@@ -1718,7 +1916,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9899607074921829,
+"deliver_item(?item=item_2)": 0.005039292507817055
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0036766257420680205
+},
+"lifecycle": "live"
 },
 {
 "tick": 23,
@@ -1812,7 +2019,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9913243168773398,
+"deliver_item(?item=item_2)": 0.003675683122660254
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.002677131685426479
+},
+"lifecycle": "live"
 },
 {
 "tick": 24,
@@ -1906,7 +2122,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9923295081282933,
+"deliver_item(?item=item_2)": 0.0026704918717066588
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0019425501876068714
+},
+"lifecycle": "live"
 },
 {
 "tick": 25,
@@ -2000,7 +2225,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9930668820022474,
+"deliver_item(?item=item_2)": 0.0019331179977526529
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0014048690519164843
+},
+"lifecycle": "live"
 },
 {
 "tick": 26,
@@ -2094,7 +2328,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9936053946320658,
+"deliver_item(?item=item_2)": 0.0013946053679342668
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0010128249038040197
+},
+"lifecycle": "live"
 },
 {
 "tick": 27,
@@ -2188,7 +2431,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9939970757122842,
+"deliver_item(?item=item_2)": 0.001002924287715759
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0007280096851586027
+},
+"lifecycle": "live"
 },
 {
 "tick": 28,
@@ -2282,7 +2534,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940052758133059,
+"deliver_item(?item=item_2)": 0.0009947241866941625
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0005218064558460732
+},
+"lifecycle": "live"
 },
 {
 "tick": 29,
@@ -2376,7 +2637,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940054059609296,
+"deliver_item(?item=item_2)": 0.0009945940390704694
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 0.0004272329963662774
+},
+"lifecycle": "live"
 },
 {
 "tick": 30,
@@ -2444,7 +2714,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994005512529522,
+"deliver_item(?item=item_2)": 0.0009944874704780344
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 31,
@@ -2512,7 +2791,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994005512529522,
+"deliver_item(?item=item_2)": 0.0009944874704780344
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 32,
@@ -2580,7 +2868,15 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940054948335665,
+"deliver_item(?item=item_2)": 0.0009945051664336242
+},
+"S": {
+"deliver_item(?item=item_1)": 0.9497412680450258
+},
+"lifecycle": "live"
 },
 {
 "tick": 33,
@@ -2648,7 +2944,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940055728010482,
+"deliver_item(?item=item_2)": 0.0009944271989517338
+},
+"S": {
+"deliver_item(?item=item_1)": 0.8984757229592412,
+"deliver_item(?item=item_2)": 0.7502990404125747
+},
+"lifecycle": "live"
 },
 {
 "tick": 34,
@@ -2716,7 +3021,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994005651439714,
+"deliver_item(?item=item_2)": 0.0009943485602861835
+},
+"S": {
+"deliver_item(?item=item_1)": 0.8463498870874816,
+"deliver_item(?item=item_2)": 0.5474399070525162
+},
+"lifecycle": "live"
 },
 {
 "tick": 35,
@@ -2784,7 +3098,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940057239722759,
+"deliver_item(?item=item_2)": 0.0009942760277241254
+},
+"S": {
+"deliver_item(?item=item_1)": 0.7935442260365609,
+"deliver_item(?item=item_2)": 0.39077355967527483
+},
+"lifecycle": "live"
 },
 {
 "tick": 36,
@@ -2852,7 +3175,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940057863685884,
+"deliver_item(?item=item_2)": 0.000994213631411612
+},
+"S": {
+"deliver_item(?item=item_1)": 0.7402755428298566,
+"deliver_item(?item=item_2)": 0.27420385265087305
+},
+"lifecycle": "live"
 },
 {
 "tick": 37,
@@ -2920,7 +3252,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940058372160905,
+"deliver_item(?item=item_2)": 0.0009941627839096007
+},
+"S": {
+"deliver_item(?item=item_1)": 0.6867983502430584,
+"deliver_item(?item=item_2)": 0.1899169369575519
+},
+"lifecycle": "live"
 },
 {
 "tick": 38,
@@ -2988,7 +3329,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940058770121277,
+"deliver_item(?item=item_2)": 0.0009941229878722441
+},
+"S": {
+"deliver_item(?item=item_1)": 0.6334047690729042,
+"deliver_item(?item=item_2)": 0.1302795485493404
+},
+"lifecycle": "live"
 },
 {
 "tick": 39,
@@ -3056,7 +3406,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059072783194,
+"deliver_item(?item=item_2)": 0.0009940927216806322
+},
+"S": {
+"deliver_item(?item=item_1)": 0.5804224663575005,
+"deliver_item(?item=item_2)": 0.0887522695285272
+},
+"lifecycle": "live"
 },
 {
 "tick": 40,
@@ -3124,7 +3483,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059298585554,
+"deliver_item(?item=item_2)": 0.000994070141444738
+},
+"S": {
+"deliver_item(?item=item_1)": 0.528210166411258,
+"deliver_item(?item=item_2)": 0.060166501521682965
+},
+"lifecycle": "live"
 },
 {
 "tick": 41,
@@ -3192,7 +3560,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059465051166,
+"deliver_item(?item=item_2)": 0.0009940534948835193
+},
+"S": {
+"deliver_item(?item=item_1)": 0.47715036341140665,
+"deliver_item(?item=item_2)": 0.040648525575235156
+},
+"lifecycle": "live"
 },
 {
 "tick": 42,
@@ -3260,7 +3637,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059586986602,
+"deliver_item(?item=item_2)": 0.000994041301339911
+},
+"S": {
+"deliver_item(?item=item_1)": 0.427639057621645,
+"deliver_item(?item=item_2)": 0.0273972436910391
+},
+"lifecycle": "live"
 },
 {
 "tick": 43,
@@ -3328,7 +3714,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059676093249,
+"deliver_item(?item=item_2)": 0.000994032390675239
+},
+"S": {
+"deliver_item(?item=item_1)": 0.38007263594065516,
+"deliver_item(?item=item_2)": 0.018435754505680663
+},
+"lifecycle": "live"
 },
 {
 "tick": 44,
@@ -3396,7 +3791,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059741251297,
+"deliver_item(?item=item_2)": 0.0009940258748703512
+},
+"S": {
+"deliver_item(?item=item_1)": 0.3348324064767902,
+"deliver_item(?item=item_2)": 0.012391624576003447
+},
+"lifecycle": "live"
 },
 {
 "tick": 45,
@@ -3464,7 +3868,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059789034026,
+"deliver_item(?item=item_2)": 0.000994021096597488
+},
+"S": {
+"deliver_item(?item=item_1)": 0.29226773099474046,
+"deliver_item(?item=item_2)": 0.008322635434338569
+},
+"lifecycle": "live"
 },
 {
 "tick": 46,
@@ -3532,7 +3945,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059824234191,
+"deliver_item(?item=item_2)": 0.0009940175765810228
+},
+"S": {
+"deliver_item(?item=item_1)": 0.2526791018622248,
+"deliver_item(?item=item_2)": 0.00558679517714543
+},
+"lifecycle": "live"
 },
 {
 "tick": 47,
@@ -3600,7 +4022,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059850316239,
+"deliver_item(?item=item_2)": 0.0009940149683762883
+},
+"S": {
+"deliver_item(?item=item_1)": 0.21630278466289715,
+"deliver_item(?item=item_2)": 0.00374890853188582
+},
+"lifecycle": "live"
 },
 {
 "tick": 48,
@@ -3668,7 +4099,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059869773732,
+"deliver_item(?item=item_2)": 0.0009940130226268817
+},
+"S": {
+"deliver_item(?item=item_1)": 0.1832987002969058,
+"deliver_item(?item=item_2)": 0.0025149860492091254
+},
+"lifecycle": "live"
 },
 {
 "tick": 49,
@@ -3736,7 +4176,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059884399165,
+"deliver_item(?item=item_2)": 0.0009940115600835884
+},
+"S": {
+"deliver_item(?item=item_1)": 0.15374299229424893,
+"deliver_item(?item=item_2)": 0.0016868949661140455
+},
+"lifecycle": "live"
 },
 {
 "tick": 50,
@@ -3804,7 +4253,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059895482202,
+"deliver_item(?item=item_2)": 0.000994010451780011
+},
+"S": {
+"deliver_item(?item=item_1)": 0.12762622028753706,
+"deliver_item(?item=item_2)": 0.0011313185052443143
+},
+"lifecycle": "live"
 },
 {
 "tick": 51,
@@ -3872,7 +4330,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059903953002,
+"deliver_item(?item=item_2)": 0.0009940096046998886
+},
+"S": {
+"deliver_item(?item=item_1)": 0.10485741731097142,
+"deliver_item(?item=item_2)": 0.0007586504278711317
+},
+"lifecycle": "live"
 },
 {
 "tick": 52,
@@ -3940,7 +4407,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.9940059904408435,
+"deliver_item(?item=item_2)": 0.0009940095591565734
+},
+"S": {
+"deliver_item(?item=item_1)": 0.08640682159469222,
+"deliver_item(?item=item_2)": 0.0006211600363980538
+},
+"lifecycle": "live"
 },
 {
 "tick": 53,
@@ -3971,7 +4447,13 @@
 "duration": 2.0,
 "end": 56.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.4975,
+"deliver_item(?item=item_2)": 0.4975
+},
+"S": {},
+"lifecycle": "live"
 },
 {
 "tick": 54,
@@ -4002,7 +4484,16 @@
 "duration": 3.0,
 "end": 58.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.4975,
+"deliver_item(?item=item_2)": 0.4975
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 55,
@@ -4033,7 +4524,15 @@
 "duration": 1.0,
 "end": 57.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.4975,
+"deliver_item(?item=item_2)": 0.4975
+},
+"S": {
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 56,
@@ -4064,7 +4563,16 @@
 "duration": 2.0,
 "end": 59.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.44566414459834724,
+"deliver_item(?item=item_2)": 0.5493358554016528
+},
+"S": {
+"deliver_item(?item=item_1)": 0.750588752344484,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 57,
@@ -4095,7 +4603,16 @@
 "duration": 3.0,
 "end": 61.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.3851183957489102,
+"deliver_item(?item=item_2)": 0.6098816042510897
+},
+"S": {
+"deliver_item(?item=item_1)": 0.5473668186682459,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 58,
@@ -4126,7 +4643,16 @@
 "duration": 4.0,
 "end": 63.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.32008127729510666,
+"deliver_item(?item=item_2)": 0.6749187227048933
+},
+"S": {
+"deliver_item(?item=item_1)": 0.3904829129411295,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 59,
@@ -4157,7 +4683,16 @@
 "duration": 5.0,
 "end": 65.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.25565093663725336,
+"deliver_item(?item=item_2)": 0.7393490633627466
+},
+"S": {
+"deliver_item(?item=item_1)": 0.2738474892532513,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 60,
@@ -4251,7 +4786,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.1966224706945488,
+"deliver_item(?item=item_2)": 0.7983775293054513
+},
+"S": {
+"deliver_item(?item=item_1)": 0.18957956897968625,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 61,
@@ -4345,7 +4889,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.14626424672129207,
+"deliver_item(?item=item_2)": 0.848735753278708
+},
+"S": {
+"deliver_item(?item=item_1)": 0.12999589730221456,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 62,
@@ -4439,7 +4992,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.10584341470448888,
+"deliver_item(?item=item_2)": 0.8891565852955111
+},
+"S": {
+"deliver_item(?item=item_1)": 0.08852929083914228,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 63,
@@ -4533,7 +5095,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.07495574298848957,
+"deliver_item(?item=item_2)": 0.9200442570115105
+},
+"S": {
+"deliver_item(?item=item_1)": 0.05999846084542043,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 64,
@@ -4627,7 +5198,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.052228071284518215,
+"deliver_item(?item=item_2)": 0.9427719287154818
+},
+"S": {
+"deliver_item(?item=item_1)": 0.04052539817469417,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 65,
@@ -4721,7 +5301,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.035965643261455765,
+"deliver_item(?item=item_2)": 0.9590343567385442
+},
+"S": {
+"deliver_item(?item=item_1)": 0.027308767825562817,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 66,
@@ -4815,7 +5404,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.024560814440059545,
+"deliver_item(?item=item_2)": 0.9704391855599405
+},
+"S": {
+"deliver_item(?item=item_1)": 0.018373058958084897,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 67,
@@ -4909,7 +5507,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.016674995758128294,
+"deliver_item(?item=item_2)": 0.9783250042418717
+},
+"S": {
+"deliver_item(?item=item_1)": 0.012347649777707847,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 68,
@@ -5003,7 +5610,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.011275663865956924,
+"deliver_item(?item=item_2)": 0.9837243361340431
+},
+"S": {
+"deliver_item(?item=item_1)": 0.008292027340305087,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 69,
@@ -5097,7 +5713,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.007603660974542386,
+"deliver_item(?item=item_2)": 0.9873963390254576
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0055656156896759955,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 70,
@@ -5191,7 +5816,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.005117861862546495,
+"deliver_item(?item=item_2)": 0.9898821381374535
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0037343202965203137,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 71,
@@ -5285,7 +5919,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0034403339833136066,
+"deliver_item(?item=item_2)": 0.9915596660166863
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0025049743187815937,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 72,
@@ -5379,7 +6022,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.002310663306226356,
+"deliver_item(?item=item_2)": 0.9926893366937737
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0016800441763102417,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 73,
@@ -5473,7 +6125,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0015510198836380458,
+"deliver_item(?item=item_2)": 0.993448980116362
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0011266419186974144,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 74,
@@ -5567,7 +6228,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.001040697107850752,
+"deliver_item(?item=item_2)": 0.9939593028921492
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0007554643793259445,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 75,
@@ -5661,7 +6331,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009947031808331442,
+"deliver_item(?item=item_2)": 0.9940052968191669
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0005065418531358099,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 76,
@@ -5755,7 +6434,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009944734666085882,
+"deliver_item(?item=item_2)": 0.9940055265333914
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0003396230064232113,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 77,
@@ -5849,7 +6537,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994319423782198,
+"deliver_item(?item=item_2)": 0.9940056805762177
+},
+"S": {
+"deliver_item(?item=item_1)": 0.00022770065449939354,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 78,
@@ -5943,7 +6640,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994216133496978,
+"deliver_item(?item=item_2)": 0.9940057838665032
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0001526582791338498,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 79,
@@ -6037,7 +6743,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009941468783544165,
+"deliver_item(?item=item_2)": 0.9940058531216456
+},
+"S": {
+"deliver_item(?item=item_1)": 0.00010234528299756326,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 80,
@@ -6131,7 +6846,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009941004454229923,
+"deliver_item(?item=item_2)": 0.9940058995545771
+},
+"S": {
+"deliver_item(?item=item_1)": 6.861332469940349e-05,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 81,
@@ -6225,7 +6949,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940693148924422,
+"deliver_item(?item=item_2)": 0.9940059306851077
+},
+"S": {
+"deliver_item(?item=item_1)": 4.5998487818616694e-05,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 82,
@@ -6319,7 +7052,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940484442101868,
+"deliver_item(?item=item_2)": 0.99400595155579
+},
+"S": {
+"deliver_item(?item=item_1)": 3.0837137772891406e-05,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 83,
@@ -6413,7 +7155,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940344522410686,
+"deliver_item(?item=item_2)": 0.9940059655477591
+},
+"S": {
+"deliver_item(?item=item_1)": 2.067286668545835e-05,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 84,
@@ -6507,7 +7258,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940250719831557,
+"deliver_item(?item=item_2)": 0.994005974928017
+},
+"S": {
+"deliver_item(?item=item_1)": 1.3858749227878914e-05,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 85,
@@ -6601,7 +7361,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940187835031438,
+"deliver_item(?item=item_2)": 0.9940059812164969
+},
+"S": {
+"deliver_item(?item=item_1)": 9.290615588463072e-06,
+"deliver_item(?item=item_2)": 0.9999999999999984
+},
+"lifecycle": "live"
 },
 {
 "tick": 86,
@@ -6695,7 +7464,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940145677764952,
+"deliver_item(?item=item_2)": 0.9940059854322236
+},
+"S": {
+"deliver_item(?item=item_1)": 6.228198032656482e-06,
+"deliver_item(?item=item_2)": 0.9999999999999974
+},
+"lifecycle": "live"
 },
 {
 "tick": 87,
@@ -6789,7 +7567,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940117416231814,
+"deliver_item(?item=item_2)": 0.9940059882583768
+},
+"S": {
+"deliver_item(?item=item_1)": 4.175207685394714e-06,
+"deliver_item(?item=item_2)": 0.9999999999999974
+},
+"lifecycle": "live"
 },
 {
 "tick": 88,
@@ -6883,7 +7670,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.00099400984702981,
+"deliver_item(?item=item_2)": 0.9940059901529702
+},
+"S": {
+"deliver_item(?item=item_1)": 2.7989280460657157e-06,
+"deliver_item(?item=item_2)": 0.9999999999999974
+},
+"lifecycle": "live"
 },
 {
 "tick": 89,
@@ -6977,7 +7773,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940085769420764,
+"deliver_item(?item=item_2)": 0.994005991423058
+},
+"S": {
+"deliver_item(?item=item_1)": 1.8763055372659245e-06,
+"deliver_item(?item=item_2)": 0.9999999999999968
+},
+"lifecycle": "live"
 },
 {
 "tick": 90,
@@ -7071,7 +7876,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940077255116767,
+"deliver_item(?item=item_2)": 0.9940059922744884
+},
+"S": {
+"deliver_item(?item=item_1)": 1.2578061930810314e-06,
+"deliver_item(?item=item_2)": 0.9999999999999968
+},
+"lifecycle": "live"
 },
 {
 "tick": 91,
@@ -7165,7 +7979,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940071547398133,
+"deliver_item(?item=item_2)": 0.9940059928452603
+},
+"S": {
+"deliver_item(?item=item_1)": 8.431840509613699e-07,
+"deliver_item(?item=item_2)": 0.9999999999999974
+},
+"lifecycle": "live"
 },
 {
 "tick": 92,
@@ -7259,7 +8082,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940067721141115,
+"deliver_item(?item=item_2)": 0.9940059932278859
+},
+"S": {
+"deliver_item(?item=item_1)": 5.652357847931224e-07,
+"deliver_item(?item=item_2)": 0.9999999999999974
+},
+"lifecycle": "live"
 },
 {
 "tick": 93,
@@ -7353,7 +8185,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940065156160583,
+"deliver_item(?item=item_2)": 0.9940059934843841
+},
+"S": {
+"deliver_item(?item=item_1)": 3.7890962464440097e-07,
+"deliver_item(?item=item_2)": 0.9999999999999968
+},
+"lifecycle": "live"
 },
 {
 "tick": 94,
@@ -7447,7 +8288,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940063436698872,
+"deliver_item(?item=item_2)": 0.9940059936563302
+},
+"S": {
+"deliver_item(?item=item_1)": 2.540039349744359e-07,
+"deliver_item(?item=item_2)": 0.9999999999999968
+},
+"lifecycle": "live"
 },
 {
 "tick": 95,
@@ -7541,7 +8391,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940062284043258,
+"deliver_item(?item=item_2)": 0.9940059937715957
+},
+"S": {
+"deliver_item(?item=item_1)": 1.7027236151653442e-07,
+"deliver_item(?item=item_2)": 0.9999999999999968
+},
+"lifecycle": "live"
 },
 {
 "tick": 96,
@@ -7635,7 +8494,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940061511353121,
+"deliver_item(?item=item_2)": 0.9940059938488647
+},
+"S": {
+"deliver_item(?item=item_1)": 1.141423635154636e-07,
+"deliver_item(?item=item_2)": 0.9999999999999958
+},
+"lifecycle": "live"
 },
 {
 "tick": 97,
@@ -7729,7 +8597,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994006099337669,
+"deliver_item(?item=item_2)": 0.9940059939006625
+},
+"S": {
+"deliver_item(?item=item_1)": 7.651535875907495e-08,
+"deliver_item(?item=item_2)": 0.9999999999999958
+},
+"lifecycle": "live"
 },
 {
 "tick": 98,
@@ -7823,7 +8700,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060646149635,
+"deliver_item(?item=item_2)": 0.994005993935385
+},
+"S": {
+"deliver_item(?item=item_1)": 5.129198385772164e-08,
+"deliver_item(?item=item_2)": 0.9999999999999958
+},
+"lifecycle": "live"
 },
 {
 "tick": 99,
@@ -7917,7 +8803,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060413385476,
+"deliver_item(?item=item_2)": 0.9940059939586615
+},
+"S": {
+"deliver_item(?item=item_1)": 3.4383458373191505e-08,
+"deliver_item(?item=item_2)": 0.9999999999999958
+},
+"lifecycle": "live"
 },
 {
 "tick": 100,
@@ -8011,7 +8906,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060257352017,
+"deliver_item(?item=item_2)": 0.9940059939742649
+},
+"S": {
+"deliver_item(?item=item_1)": 2.30488280975761e-08,
+"deliver_item(?item=item_2)": 0.9999999999999952
+},
+"lifecycle": "live"
 },
 {
 "tick": 101,
@@ -8105,7 +9009,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060152755195,
+"deliver_item(?item=item_2)": 0.9940059939847244
+},
+"S": {
+"deliver_item(?item=item_1)": 1.5450673731096304e-08,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 102,
@@ -8199,7 +9112,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060114200088,
+"deliver_item(?item=item_2)": 0.9940059939885801
+},
+"S": {
+"deliver_item(?item=item_1)": 1.2649941671443186e-08,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 103,
@@ -8267,7 +9189,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060082633832,
+"deliver_item(?item=item_2)": 0.9940059939917366
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 104,
@@ -8335,7 +9266,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060082633832,
+"deliver_item(?item=item_2)": 0.9940059939917366
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 105,
@@ -8403,7 +9343,15 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060082633832,
+"deliver_item(?item=item_2)": 0.9940059939917366
+},
+"S": {
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 106,
@@ -8471,7 +9419,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060054595124,
+"deliver_item(?item=item_2)": 0.9940059939945405
+},
+"S": {
+"deliver_item(?item=item_1)": 0.7409856259699011,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 107,
@@ -8539,7 +9496,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940060028595526,
+"deliver_item(?item=item_2)": 0.9940059939971404
+},
+"S": {
+"deliver_item(?item=item_1)": 0.5363569987054989,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 108,
@@ -8607,7 +9573,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994006000619478,
+"deliver_item(?item=item_2)": 0.9940059939993805
+},
+"S": {
+"deliver_item(?item=item_1)": 0.3806936718134587,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 109,
@@ -8675,7 +9650,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059988072026,
+"deliver_item(?item=item_2)": 0.9940059940011929
+},
+"S": {
+"deliver_item(?item=item_1)": 0.26599695350599784,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 110,
@@ -8743,7 +9727,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059974140288,
+"deliver_item(?item=item_2)": 0.9940059940025862
+},
+"S": {
+"deliver_item(?item=item_1)": 0.1836348937817115,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 111,
@@ -8811,7 +9804,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994005996384464,
+"deliver_item(?item=item_2)": 0.9940059940036157
+},
+"S": {
+"deliver_item(?item=item_1)": 0.12565442560786055,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 112,
@@ -8879,7 +9881,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059956455704,
+"deliver_item(?item=item_2)": 0.9940059940043545
+},
+"S": {
+"deliver_item(?item=item_1)": 0.08543422211629516,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 113,
@@ -8947,7 +9958,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059951263585,
+"deliver_item(?item=item_2)": 0.9940059940048738
+},
+"S": {
+"deliver_item(?item=item_1)": 0.057828080333944876,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 114,
@@ -9015,7 +10035,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059947669013,
+"deliver_item(?item=item_2)": 0.9940059940052333
+},
+"S": {
+"deliver_item(?item=item_1)": 0.03902080221384078,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 115,
@@ -9083,7 +10112,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059945205998,
+"deliver_item(?item=item_2)": 0.9940059940054794
+},
+"S": {
+"deliver_item(?item=item_1)": 0.026274103835360104,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 116,
@@ -9151,7 +10189,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994005994353025,
+"deliver_item(?item=item_2)": 0.9940059940056469
+},
+"S": {
+"deliver_item(?item=item_1)": 0.01766562806506563,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 117,
@@ -9219,7 +10266,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059942395623,
+"deliver_item(?item=item_2)": 0.9940059940057604
+},
+"S": {
+"deliver_item(?item=item_1)": 0.011865956970238832,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 118,
@@ -9287,7 +10343,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059941629885,
+"deliver_item(?item=item_2)": 0.9940059940058371
+},
+"S": {
+"deliver_item(?item=item_1)": 0.007965032054114031,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 119,
@@ -9355,7 +10420,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059941114252,
+"deliver_item(?item=item_2)": 0.9940059940058885
+},
+"S": {
+"deliver_item(?item=item_1)": 0.005344134457064095,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 120,
@@ -9423,7 +10497,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940767548,
+"deliver_item(?item=item_2)": 0.9940059940059234
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0035845601782564674,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 121,
@@ -9491,7 +10574,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940534663,
+"deliver_item(?item=item_2)": 0.9940059940059467
+},
+"S": {
+"deliver_item(?item=item_1)": 0.002403841865319095,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 122,
@@ -9559,7 +10651,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940378339,
+"deliver_item(?item=item_2)": 0.9940059940059621
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0016118191127201128,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 123,
@@ -9627,7 +10728,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940273453,
+"deliver_item(?item=item_2)": 0.9940059940059727
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0010806536374876282,
+"deliver_item(?item=item_2)": 0.9999999999999992
+},
+"lifecycle": "live"
 },
 {
 "tick": 124,
@@ -9695,7 +10805,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.00099400599402031,
+"deliver_item(?item=item_2)": 0.9940059940059797
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0007244853589254162,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 125,
@@ -9763,7 +10882,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994005994015592,
+"deliver_item(?item=item_2)": 0.9940059940059844
+},
+"S": {
+"deliver_item(?item=item_1)": 0.00048568463859959785,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 126,
@@ -9831,7 +10959,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940124284,
+"deliver_item(?item=item_2)": 0.9940059940059877
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0003255867276634684,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 127,
@@ -9899,7 +11036,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940103077,
+"deliver_item(?item=item_2)": 0.9940059940059899
+},
+"S": {
+"deliver_item(?item=item_1)": 0.00021825819868018652,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 128,
@@ -9967,7 +11113,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940088857,
+"deliver_item(?item=item_2)": 0.9940059940059912
+},
+"S": {
+"deliver_item(?item=item_1)": 0.000146308200427453,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 129,
@@ -10035,7 +11190,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940079327,
+"deliver_item(?item=item_2)": 0.9940059940059922
+},
+"S": {
+"deliver_item(?item=item_1)": 9.807601383590416e-05,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 130,
@@ -10103,7 +11267,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940072934,
+"deliver_item(?item=item_2)": 0.9940059940059928
+},
+"S": {
+"deliver_item(?item=item_1)": 6.574370885550576e-05,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 131,
@@ -10171,7 +11344,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994005994006865,
+"deliver_item(?item=item_2)": 0.9940059940059931
+},
+"S": {
+"deliver_item(?item=item_1)": 4.4070063743977426e-05,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 132,
@@ -10239,7 +11421,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.000994005994006578,
+"deliver_item(?item=item_2)": 0.9940059940059934
+},
+"S": {
+"deliver_item(?item=item_1)": 2.9541449564127913e-05,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 133,
@@ -10307,7 +11498,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940063855,
+"deliver_item(?item=item_2)": 0.9940059940059937
+},
+"S": {
+"deliver_item(?item=item_1)": 1.9802451250553706e-05,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 134,
@@ -10375,7 +11575,16 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.0009940059940063146,
+"deliver_item(?item=item_2)": 0.9940059940059937
+},
+"S": {
+"deliver_item(?item=item_1)": 1.6212895994652696e-05,
+"deliver_item(?item=item_2)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 135,
@@ -10404,7 +11613,12 @@
 "duration": 2.0,
 "end": 138.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {},
+"lifecycle": "live"
 },
 {
 "tick": 136,
@@ -10495,7 +11709,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 137,
@@ -10586,7 +11807,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.800577025751456
+},
+"lifecycle": "live"
 },
 {
 "tick": 138,
@@ -10677,7 +11905,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.6292240949981039
+},
+"lifecycle": "live"
 },
 {
 "tick": 139,
@@ -10768,7 +12003,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.485989347556408
+},
+"lifecycle": "live"
 },
 {
 "tick": 140,
@@ -10859,7 +12101,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.3693889029585011
+},
+"lifecycle": "live"
 },
 {
 "tick": 141,
@@ -10950,7 +12199,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.2767695092939149
+},
+"lifecycle": "live"
 },
 {
 "tick": 142,
@@ -11041,7 +12297,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.2047950622180354
+},
+"lifecycle": "live"
 },
 {
 "tick": 143,
@@ -11132,7 +12395,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.14991973829940955
+},
+"lifecycle": "live"
 },
 {
 "tick": 144,
@@ -11223,7 +12493,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.10875352469486908
+},
+"lifecycle": "live"
 },
 {
 "tick": 145,
@@ -11314,7 +12591,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.07828734935638508
+},
+"lifecycle": "live"
 },
 {
 "tick": 146,
@@ -11405,7 +12689,14 @@
 ]
 }
 ]
-}
+},
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.05599207088949942
+},
+"lifecycle": "live"
 },
 {
 "tick": 147,
@@ -11434,7 +12725,14 @@
 "duration": 11.0,
 "end": 159.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.039827228471339154
+},
+"lifecycle": "live"
 },
 {
 "tick": 148,
@@ -11463,7 +12761,14 @@
 "duration": 12.0,
 "end": 161.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.02819705403461363
+},
+"lifecycle": "live"
 },
 {
 "tick": 149,
@@ -11492,7 +12797,14 @@
 "duration": 13.0,
 "end": 163.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0198829736745834
+},
+"lifecycle": "live"
 },
 {
 "tick": 150,
@@ -11521,7 +12833,14 @@
 "duration": 14.0,
 "end": 165.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.013971458221727608
+},
+"lifecycle": "live"
 },
 {
 "tick": 151,
@@ -11550,7 +12869,14 @@
 "duration": 15.0,
 "end": 167.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.009787460237770438
+},
+"lifecycle": "live"
 },
 {
 "tick": 152,
@@ -11579,7 +12905,14 @@
 "duration": 16.0,
 "end": 169.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.006837807599697304
+},
+"lifecycle": "live"
 },
 {
 "tick": 153,
@@ -11608,7 +12941,14 @@
 "duration": 17.0,
 "end": 171.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.004765475799163075
+},
+"lifecycle": "live"
 },
 {
 "tick": 154,
@@ -11637,7 +12977,14 @@
 "duration": 18.0,
 "end": 173.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0033139144079864192
+},
+"lifecycle": "live"
 },
 {
 "tick": 155,
@@ -11666,7 +13013,14 @@
 "duration": 19.0,
 "end": 175.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0022998991378147767
+},
+"lifecycle": "live"
 },
 {
 "tick": 156,
@@ -11695,7 +13049,14 @@
 "duration": 20.0,
 "end": 177.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0015932462103413994
+},
+"lifecycle": "live"
 },
 {
 "tick": 157,
@@ -11724,7 +13085,14 @@
 "duration": 21.0,
 "end": 179.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0011018630790463116
+},
+"lifecycle": "live"
 },
 {
 "tick": 158,
@@ -11753,7 +13121,14 @@
 "duration": 22.0,
 "end": 181.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0007608498560630534
+},
+"lifecycle": "live"
 },
 {
 "tick": 159,
@@ -11782,7 +13157,14 @@
 "duration": 23.0,
 "end": 183.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0005246217671696478
+},
+"lifecycle": "live"
 },
 {
 "tick": 160,
@@ -11811,7 +13193,14 @@
 "duration": 22.77676291749809,
 "end": 183.7767629174981
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0003612548575308788
+},
+"lifecycle": "live"
 },
 {
 "tick": 161,
@@ -11840,7 +13229,14 @@
 "duration": 21.776762917498065,
 "end": 183.77676291749808
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.000248450958404054
+},
+"lifecycle": "live"
 },
 {
 "tick": 162,
@@ -11869,7 +13265,14 @@
 "duration": 20.77676291749811,
 "end": 183.7767629174981
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.00017067228252924937
+},
+"lifecycle": "live"
 },
 {
 "tick": 163,
@@ -11898,7 +13301,14 @@
 "duration": 19.776762917498132,
 "end": 183.77676291749813
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.00011711516905083661
+},
+"lifecycle": "live"
 },
 {
 "tick": 164,
@@ -11927,7 +13337,14 @@
 "duration": 18.776762917498008,
 "end": 183.77676291749802
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.028248481624828e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 165,
@@ -11956,7 +13373,14 @@
 "duration": 17.776762917498036,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.498106673310514e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 166,
@@ -11985,7 +13409,14 @@
 "duration": 16.776762917498058,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.761969108612671e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 167,
@@ -12014,7 +13445,14 @@
 "duration": 15.77676291749813,
 "end": 183.77676291749813
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.5718761588271174e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 168,
@@ -12043,7 +13481,14 @@
 "duration": 14.776762917497939,
 "end": 183.77676291749793
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.7568672634241513e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 169,
@@ -12072,7 +13517,14 @@
 "duration": 13.776762917498107,
 "end": 183.7767629174981
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.1992276838139187e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 170,
@@ -12101,7 +13553,14 @@
 "duration": 12.77676291749804,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.180058945472055e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 171,
@@ -12130,7 +13589,14 @@
 "duration": 11.776762917498022,
 "end": 183.77676291749802
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.575968444005629e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 172,
@@ -12159,7 +13625,14 @@
 "duration": 10.776762917498031,
 "end": 183.77676291749802
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.798473262822996e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 173,
@@ -12188,7 +13661,14 @@
 "duration": 9.776762917498038,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.5860531831181545e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 174,
@@ -12217,7 +13697,14 @@
 "duration": 8.77676291749809,
 "end": 183.7767629174981
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.7596211183219225e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 175,
@@ -12246,7 +13733,14 @@
 "duration": 7.776762917498007,
 "end": 183.77676291749802
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.1966496627147927e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 176,
@@ -12275,7 +13769,14 @@
 "duration": 6.776762917498037,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.133790652965007e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 177,
@@ -12304,7 +13805,14 @@
 "duration": 5.776762917498071,
 "end": 183.77676291749808
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.525966649730331e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 178,
@@ -12333,7 +13841,14 @@
 "duration": 4.776762917498043,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.7525225081660476e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 179,
@@ -12362,7 +13877,14 @@
 "duration": 3.7767629174980355,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.547111428256339e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 180,
@@ -12391,7 +13913,14 @@
 "duration": 2.7767629174980404,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.7281895682685798e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 181,
@@ -12420,7 +13949,14 @@
 "duration": 1.7767629174980415,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.1720934718931752e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 182,
@@ -12449,7 +13985,14 @@
 "duration": 0.776762917498039,
 "end": 183.77676291749805
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 7.946367799147914e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 183,
@@ -12478,7 +14021,14 @@
 "duration": 4.085456939855632,
 "end": 188.08545693985565
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.3854035590026655e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 184,
@@ -12507,7 +14057,14 @@
 "duration": 1.0,
 "end": 186.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.409195531788162e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 185,
@@ -12536,7 +14093,14 @@
 "duration": 2.0,
 "end": 188.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.609944004897143e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 186,
@@ -12565,7 +14129,14 @@
 "duration": 3.0,
 "end": 190.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.9555721753892083e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 187,
@@ -12594,7 +14165,14 @@
 "duration": 4.0,
 "end": 192.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.4198178426521432e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 188,
@@ -12623,7 +14201,14 @@
 "duration": 5.0,
 "end": 194.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.981179289268049e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 189,
@@ -12652,7 +14237,14 @@
 "duration": 6.0,
 "end": 196.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.6220524063126772e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 190,
@@ -12681,7 +14273,14 @@
 "duration": 7.0,
 "end": 198.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.3280241778159125e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 191,
@@ -12710,7 +14309,14 @@
 "duration": 8.0,
 "end": 200.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0872942381558858e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 192,
@@ -12739,7 +14345,14 @@
 "duration": 9.0,
 "end": 202.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.902012455294226e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 193,
@@ -12768,7 +14381,14 @@
 "duration": 10.0,
 "end": 204.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 7.2883513926099874e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 194,
@@ -12797,7 +14417,14 @@
 "duration": 11.0,
 "end": 206.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.967197443402555e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 195,
@@ -12826,7 +14453,14 @@
 "duration": 12.0,
 "end": 208.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.8855281338502085e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 196,
@@ -12855,7 +14489,14 @@
 "duration": 13.0,
 "end": 210.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.999931910003527e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 197,
@@ -12884,7 +14525,14 @@
 "duration": 14.0,
 "end": 212.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2748673959301786e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 198,
@@ -12913,7 +14561,14 @@
 "duration": 15.0,
 "end": 214.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.681234665565922e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 199,
@@ -12942,7 +14597,14 @@
 "duration": 16.0,
 "end": 216.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.1952091955152766e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 200,
@@ -12971,7 +14633,14 @@
 "duration": 17.0,
 "end": 218.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.797285321929699e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 201,
@@ -13000,7 +14669,14 @@
 "duration": 18.0,
 "end": 220.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.4714926824063482e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 202,
@@ -13029,7 +14705,14 @@
 "duration": 19.0,
 "end": 222.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.2047564917297484e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 203,
@@ -13058,7 +14741,14 @@
 "duration": 20.0,
 "end": 224.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 9.863712189069152e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 204,
@@ -13087,7 +14777,14 @@
 "duration": 21.0,
 "end": 226.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.075722890503011e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 205,
@@ -13116,7 +14813,14 @@
 "duration": 22.0,
 "end": 228.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 6.611843471520359e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 206,
@@ -13145,7 +14849,14 @@
 "duration": 23.0,
 "end": 230.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.41331988673555e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 207,
@@ -13174,7 +14885,14 @@
 "duration": 24.0,
 "end": 232.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.4320494838482915e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 208,
@@ -13203,7 +14921,14 @@
 "duration": 25.0,
 "end": 234.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.628655744327979e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 209,
@@ -13232,7 +14957,14 @@
 "duration": 26.0,
 "end": 236.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.9708929770236036e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 210,
@@ -13261,7 +14993,14 @@
 "duration": 27.0,
 "end": 238.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.432361744141621e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 211,
@@ -13290,7 +15029,14 @@
 "duration": 28.0,
 "end": 240.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.991448527077143e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 212,
@@ -13319,7 +15065,14 @@
 "duration": 29.0,
 "end": 242.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.6304608012605608e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 213,
@@ -13348,7 +15101,14 @@
 "duration": 30.0,
 "end": 244.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.334909468622467e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 214,
@@ -13377,7 +15137,14 @@
 "duration": 31.0,
 "end": 246.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0929290373976566e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 215,
@@ -13406,7 +15173,14 @@
 "duration": 32.0,
 "end": 248.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.948163287093748e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 216,
@@ -13435,7 +15209,14 @@
 "duration": 33.0,
 "end": 250.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 7.326140311243588e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 217,
@@ -13464,7 +15245,14 @@
 "duration": 34.0,
 "end": 252.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.998127819883402e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 218,
@@ -13493,7 +15281,14 @@
 "duration": 35.0,
 "end": 254.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.9108528302646874e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 219,
@@ -13522,7 +15317,14 @@
 "duration": 36.0,
 "end": 256.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.0206526391471155e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 220,
@@ -13551,7 +15353,14 @@
 "duration": 37.0,
 "end": 258.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2918410752826544e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 221,
@@ -13580,7 +15389,14 @@
 "duration": 38.0,
 "end": 260.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.6951388204294303e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 222,
@@ -13609,7 +15425,14 @@
 "duration": 39.0,
 "end": 262.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.206584244340917e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 223,
@@ -13638,7 +15461,14 @@
 "duration": 40.0,
 "end": 264.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.8066044110801495e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 224,
@@ -13667,7 +15497,14 @@
 "duration": 41.0,
 "end": 266.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.4791181195988796e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 225,
@@ -13696,7 +15533,14 @@
 "duration": 42.0,
 "end": 268.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.2109913212320709e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 226,
@@ -13725,7 +15569,14 @@
 "duration": 43.0,
 "end": 270.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 9.914925371923481e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 227,
@@ -13754,7 +15605,14 @@
 "duration": 44.0,
 "end": 272.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.117482760644164e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 228,
@@ -13783,7 +15641,14 @@
 "duration": 45.0,
 "end": 274.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 6.646148967449501e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 229,
@@ -13812,7 +15677,14 @@
 "duration": 46.0,
 "end": 276.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.441340259369758e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 230,
@@ -13841,7 +15713,14 @@
 "duration": 47.0,
 "end": 278.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.455005238848528e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 231,
@@ -13870,7 +15749,14 @@
 "duration": 48.0,
 "end": 280.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.647421417239055e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 232,
@@ -13899,7 +15785,14 @@
 "duration": 49.0,
 "end": 282.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.9862341868531757e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 233,
@@ -13928,7 +15821,14 @@
 "duration": 50.0,
 "end": 284.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.4448551077094737e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 234,
@@ -13957,7 +15857,14 @@
 "duration": 51.0,
 "end": 286.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.0018212222325533e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 235,
@@ -13986,7 +15893,14 @@
 "duration": 52.0,
 "end": 288.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.6388729993507811e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 236,
@@ -14015,7 +15929,14 @@
 "duration": 53.0,
 "end": 290.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.341915362447445e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 237,
@@ -14044,7 +15965,14 @@
 "duration": 54.0,
 "end": 292.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0984549481577172e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 238,
@@ -14073,7 +16001,14 @@
 "duration": 55.0,
 "end": 294.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.995221622709484e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 239,
@@ -14102,7 +16037,14 @@
 "duration": 56.0,
 "end": 296.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 7.364677532268617e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 240,
@@ -14131,7 +16073,14 @@
 "duration": 57.0,
 "end": 298.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 6.028848680178416e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 241,
@@ -14160,7 +16109,14 @@
 "duration": 58.0,
 "end": 300.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.936480242377944e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 242,
@@ -14189,7 +16145,14 @@
 "duration": 59.0,
 "end": 302.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.0427242478138596e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 243,
@@ -14218,7 +16181,14 @@
 "duration": 60.0,
 "end": 304.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.3091395784404304e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 244,
@@ -14247,7 +16217,14 @@
 "duration": 61.0,
 "end": 306.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.710098822227166e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 245,
@@ -14276,7 +16253,14 @@
 "duration": 62.0,
 "end": 308.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.2167711406397528e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 246,
@@ -14305,7 +16289,14 @@
 "duration": 63.0,
 "end": 310.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.8163428276629441e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 247,
@@ -14334,7 +16325,14 @@
 "duration": 64.0,
 "end": 312.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.4863898977700455e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 248,
@@ -14363,7 +16361,14 @@
 "duration": 65.0,
 "end": 314.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.2173020714496173e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 249,
@@ -14392,7 +16397,14 @@
 "duration": 66.0,
 "end": 316.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 9.96265642686405e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 250,
@@ -14421,7 +16433,14 @@
 "duration": 67.0,
 "end": 318.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.168737584727809e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 251,
@@ -14450,7 +16469,14 @@
 "duration": 68.0,
 "end": 320.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 6.695161392973022e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 252,
@@ -14479,7 +16505,14 @@
 "duration": 69.0,
 "end": 322.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 5.4778593215234055e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 253,
@@ -14508,7 +16541,14 @@
 "duration": 70.0,
 "end": 324.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.484797105340815e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 254,
@@ -14537,7 +16577,14 @@
 "duration": 71.0,
 "end": 326.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.65190621434896e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 255,
@@ -14566,7 +16613,14 @@
 "duration": 72.0,
 "end": 328.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.0112209135859913e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 256,
@@ -14595,7 +16649,14 @@
 "duration": 73.0,
 "end": 330.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.466638407937466e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 257,
@@ -14624,7 +16685,14 @@
 "duration": 74.0,
 "end": 332.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.0181586974033842e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 258,
@@ -14653,7 +16721,14 @@
 "duration": 75.0,
 "end": 334.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.6337475169455987e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 259,
@@ -14682,7 +16757,14 @@
 "duration": 76.0,
 "end": 336.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.345439131602259e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 260,
@@ -14711,7 +16793,14 @@
 "duration": 77.0,
 "end": 338.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.0891650112970679e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 261,
@@ -14740,7 +16829,14 @@
 "duration": 78.0,
 "end": 340.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 8.969594210681742e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 262,
@@ -14769,7 +16865,14 @@
 "duration": 79.0,
 "end": 342.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 7.367880958774292e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 263,
@@ -14798,7 +16901,14 @@
 "duration": 80.0,
 "end": 344.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 6.086510357248331e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 264,
@@ -14827,7 +16937,14 @@
 "duration": 81.0,
 "end": 346.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.8051397557223685e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 265,
@@ -14856,7 +16973,14 @@
 "duration": 82.0,
 "end": 348.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 4.164454454959387e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 266,
@@ -14885,7 +17009,14 @@
 "duration": 83.0,
 "end": 350.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2034265038149143e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 267,
@@ -14914,7 +17045,14 @@
 "duration": 84.0,
 "end": 352.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.8830838534334232e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 268,
@@ -14943,7 +17081,14 @@
 "duration": 85.0,
 "end": 354.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 2.2423985526704407e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 269,
@@ -14972,7 +17117,14 @@
 "duration": 86.0,
 "end": 356.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.9220559022889496e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 270,
@@ -15001,7 +17153,14 @@
 "duration": 87.0,
 "end": 358.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.6017132519074581e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 271,
@@ -15030,7 +17189,14 @@
 "duration": 88.0,
 "end": 360.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 1.2813706015259665e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 272,
@@ -15059,7 +17225,14 @@
 "duration": 89.0,
 "end": 362.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 9.61027951144475e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 273,
@@ -15088,7 +17261,14 @@
 "duration": 90.0,
 "end": 364.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 9.61027951144475e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 274,
@@ -15117,7 +17297,14 @@
 "duration": 91.0,
 "end": 366.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 6.406853007629834e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 275,
@@ -15146,7 +17333,14 @@
 "duration": 92.0,
 "end": 368.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 6.406853007629834e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 276,
@@ -15175,7 +17369,14 @@
 "duration": 93.0,
 "end": 370.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 277,
@@ -15204,7 +17405,14 @@
 "duration": 94.0,
 "end": 372.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 278,
@@ -15233,7 +17441,14 @@
 "duration": 95.0,
 "end": 374.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 279,
@@ -15262,7 +17477,14 @@
 "duration": 96.0,
 "end": 376.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 280,
@@ -15291,7 +17513,14 @@
 "duration": 97.0,
 "end": 378.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 281,
@@ -15320,7 +17549,14 @@
 "duration": 98.0,
 "end": 380.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 282,
@@ -15349,7 +17585,14 @@
 "duration": 99.0,
 "end": 382.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 283,
@@ -15378,7 +17621,14 @@
 "duration": 100.0,
 "end": 384.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 284,
@@ -15407,7 +17657,14 @@
 "duration": 101.0,
 "end": 386.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 285,
@@ -15436,7 +17693,14 @@
 "duration": 102.0,
 "end": 388.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 286,
@@ -15465,7 +17729,14 @@
 "duration": 103.0,
 "end": 390.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 287,
@@ -15494,7 +17765,14 @@
 "duration": 104.0,
 "end": 392.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 288,
@@ -15523,7 +17801,14 @@
 "duration": 105.0,
 "end": 394.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 289,
@@ -15552,7 +17837,14 @@
 "duration": 106.0,
 "end": 396.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 290,
@@ -15581,7 +17873,14 @@
 "duration": 107.0,
 "end": 398.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 291,
@@ -15610,7 +17909,14 @@
 "duration": 108.0,
 "end": 400.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 292,
@@ -15639,7 +17945,14 @@
 "duration": 109.0,
 "end": 402.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 293,
@@ -15668,7 +17981,14 @@
 "duration": 110.0,
 "end": 404.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 294,
@@ -15697,7 +18017,14 @@
 "duration": 111.0,
 "end": 406.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 295,
@@ -15726,7 +18053,14 @@
 "duration": 112.0,
 "end": 408.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 296,
@@ -15755,7 +18089,14 @@
 "duration": 113.0,
 "end": 410.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 297,
@@ -15784,7 +18125,14 @@
 "duration": 114.0,
 "end": 412.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 298,
@@ -15813,7 +18161,14 @@
 "duration": 115.0,
 "end": 414.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 299,
@@ -15842,7 +18197,14 @@
 "duration": 116.0,
 "end": 416.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 300,
@@ -15871,7 +18233,14 @@
 "duration": 117.0,
 "end": 418.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 301,
@@ -15900,7 +18269,14 @@
 "duration": 118.0,
 "end": 420.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 302,
@@ -15929,7 +18305,14 @@
 "duration": 119.0,
 "end": 422.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 303,
@@ -15958,7 +18341,14 @@
 "duration": 120.0,
 "end": 424.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 304,
@@ -15987,7 +18377,14 @@
 "duration": 121.0,
 "end": 426.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 305,
@@ -16016,7 +18413,14 @@
 "duration": 122.0,
 "end": 428.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 306,
@@ -16045,7 +18449,14 @@
 "duration": 123.0,
 "end": 430.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 307,
@@ -16074,7 +18485,14 @@
 "duration": 124.0,
 "end": 432.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 308,
@@ -16103,7 +18521,14 @@
 "duration": 125.0,
 "end": 434.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 309,
@@ -16132,7 +18557,14 @@
 "duration": 126.0,
 "end": 436.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 310,
@@ -16161,7 +18593,14 @@
 "duration": 127.0,
 "end": 438.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 311,
@@ -16190,7 +18629,14 @@
 "duration": 128.0,
 "end": 440.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 312,
@@ -16219,7 +18665,14 @@
 "duration": 129.0,
 "end": 442.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 313,
@@ -16248,7 +18701,14 @@
 "duration": 130.0,
 "end": 444.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 314,
@@ -16277,7 +18737,14 @@
 "duration": 131.0,
 "end": 446.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 315,
@@ -16306,7 +18773,14 @@
 "duration": 132.0,
 "end": 448.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 316,
@@ -16335,7 +18809,14 @@
 "duration": 133.0,
 "end": 450.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 317,
@@ -16364,7 +18845,14 @@
 "duration": 134.0,
 "end": 452.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 318,
@@ -16393,7 +18881,14 @@
 "duration": 135.0,
 "end": 454.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 319,
@@ -16422,7 +18917,14 @@
 "duration": 136.0,
 "end": 456.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 320,
@@ -16451,7 +18953,14 @@
 "duration": 137.0,
 "end": 458.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 321,
@@ -16480,7 +18989,14 @@
 "duration": 138.0,
 "end": 460.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 322,
@@ -16509,7 +19025,14 @@
 "duration": 139.0,
 "end": 462.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 323,
@@ -16538,7 +19061,14 @@
 "duration": 140.0,
 "end": 464.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 324,
@@ -16567,7 +19097,14 @@
 "duration": 141.0,
 "end": 466.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 325,
@@ -16596,7 +19133,14 @@
 "duration": 142.0,
 "end": 468.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 326,
@@ -16625,7 +19169,14 @@
 "duration": 143.0,
 "end": 470.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 327,
@@ -16654,7 +19205,14 @@
 "duration": 144.0,
 "end": 472.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 328,
@@ -16683,7 +19241,14 @@
 "duration": 145.0,
 "end": 474.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 329,
@@ -16712,7 +19277,14 @@
 "duration": 146.0,
 "end": 476.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 330,
@@ -16741,7 +19313,14 @@
 "duration": 147.0,
 "end": 478.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 331,
@@ -16770,7 +19349,14 @@
 "duration": 148.0,
 "end": 480.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 332,
@@ -16799,7 +19385,14 @@
 "duration": 149.0,
 "end": 482.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 333,
@@ -16828,7 +19421,14 @@
 "duration": 150.0,
 "end": 484.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 334,
@@ -16857,7 +19457,14 @@
 "duration": 151.0,
 "end": 486.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 335,
@@ -16886,7 +19493,14 @@
 "duration": 152.0,
 "end": 488.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 336,
@@ -16915,7 +19529,14 @@
 "duration": 153.0,
 "end": 490.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 337,
@@ -16944,7 +19565,14 @@
 "duration": 154.0,
 "end": 492.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 338,
@@ -16973,7 +19601,14 @@
 "duration": 155.0,
 "end": 494.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 339,
@@ -17002,7 +19637,14 @@
 "duration": 156.0,
 "end": 496.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 340,
@@ -17031,7 +19673,14 @@
 "duration": 157.0,
 "end": 498.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 341,
@@ -17060,7 +19709,14 @@
 "duration": 158.0,
 "end": 500.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 342,
@@ -17089,7 +19745,14 @@
 "duration": 159.0,
 "end": 502.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 343,
@@ -17118,7 +19781,14 @@
 "duration": 160.0,
 "end": 504.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 344,
@@ -17147,7 +19817,14 @@
 "duration": 161.0,
 "end": 506.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 345,
@@ -17176,7 +19853,14 @@
 "duration": 162.0,
 "end": 508.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 346,
@@ -17205,7 +19889,14 @@
 "duration": 163.0,
 "end": 510.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 347,
@@ -17234,7 +19925,14 @@
 "duration": 164.0,
 "end": 512.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 348,
@@ -17263,7 +19961,14 @@
 "duration": 165.0,
 "end": 514.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 349,
@@ -17292,7 +19997,14 @@
 "duration": 166.0,
 "end": 516.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 350,
@@ -17321,7 +20033,14 @@
 "duration": 167.0,
 "end": 518.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 351,
@@ -17350,7 +20069,14 @@
 "duration": 168.0,
 "end": 520.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 352,
@@ -17379,7 +20105,14 @@
 "duration": 169.0,
 "end": 522.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 353,
@@ -17408,7 +20141,14 @@
 "duration": 170.0,
 "end": 524.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 354,
@@ -17437,7 +20177,14 @@
 "duration": 171.0,
 "end": 526.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 355,
@@ -17466,7 +20213,14 @@
 "duration": 172.0,
 "end": 528.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 356,
@@ -17495,7 +20249,14 @@
 "duration": 173.0,
 "end": 530.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 357,
@@ -17524,7 +20285,14 @@
 "duration": 174.0,
 "end": 532.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 358,
@@ -17553,6 +20321,13 @@
 "duration": 175.0,
 "end": 534.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"deliver_item(?item=item_1)": 0.994
+},
+"S": {
+"deliver_item(?item=item_1)": 0.0
+},
+"lifecycle": "live"
 }
 ]

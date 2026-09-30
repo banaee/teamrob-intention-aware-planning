@@ -5548,12 +5548,15 @@ every declared part-4 property under single_task).
   0.1); at the place (53) the reset leaves item_1 the leader: recognition_changed with cause boundary, its first instance.
 Classified, no class 2: scenario_s12_01 under full_reorder keeps item_7 (the ordering's cost includes its tail's return
 walks; MPB-6); three F1 robot violations inside that admission's window under full_reorder (hold 4 from 26), the pattern
-of scenario_s10_02 prior off, class 5 pending Hadi's reading (the likely reading the recorded execution residual, step
-quantisation uncompensated, TODO-77; docs/assumptions.md 4.4); a near-encounter in scenario_s12_02 at 139 as the human
+of scenario_s10_02 prior off; checked on the re-executed realization (REPORT.md, part (v)): the plan keeps 54.64 cm, the
+executed robot runs one step (one priced stationary tick) ahead of it and the projected human is 3.4 cm off the actual
+one, the robot's lead producing the violations; reading (c) by the check's rule, no class assigned, the reading Hadi's;
+a near-encounter in scenario_s12_02 at 139 as the human
 walks toward the robot on moving fallbacks of k = 1 and 3 (P4's recorded error; X3; TODO-135). The alteration test on
 the sixteen: every rule detected except the skip rule (B2), as before. The eleven verified scenarios rerun byte-identical
 (68 of 68 logs and streams); the suite 211 passed; the four maintained sets 96 of 96 byte-identical.
-CLOSED (30 September 2026): every materially distinct in-scope decision path is verified (36), unreachable with a
+CLOSED (30 September 2026; PROVISIONAL until Hadi reads the check of scenario_s12_01's three F1 violations above): every
+materially distinct in-scope decision path is verified (36), unreachable with a
 recorded derivation (5), or outside the claimed mechanism with a recorded reason (4 out of coverage; P3 reachable and not
 claimed; one not a distinct path). The NOT CLOSED paragraph above is superseded. Next, as Hadi rules: the evaluation
 (T-F, framed in TODO-144) or track 4 (TODO-140).

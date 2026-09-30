@@ -5,7 +5,7 @@
 # against the run's human lines (the IR test-bed's trajectory.py), the in-process actual and the log (actual.py); prior
 # on also the oracle's per-tick table (mpb_oracle.py), the chain (chain.py) and the comparison (compare.py); the
 # declared properties and the measures (properties.py); for the control, the reference run (reference.py); the figure
-# and the summary. Outputs in <out_root>/<scenario>/<prior>_<strategy>/; the logs and .rec in <out_root>/runs/
+# and the summary; prior on, the IR test-bed's figure (plot_ir.py, figure_ir.png). Outputs in <out_root>/<scenario>/<prior>_<strategy>/; the logs and .rec in <out_root>/runs/
 # (git-ignored). PYTHONHASHSEED=0. Sequential: each run's log is the newest logs/run_*.log. Run from the repo root.
 set -eo pipefail
 PY=~/python-envs/ir-nomesa-env/bin/python; D=analysis/mpb; IR=analysis/ir_testbed; ROOT=$D
@@ -47,4 +47,5 @@ for RUN in $RUNS; do
   fi
   PYTHONHASHSEED=0 $PY $D/properties.py $sid $OUT $LOG $RUN
   $PY $D/plot.py $sid $OUT
+  if [ "$PRIOR" = on ] && [ -f $OUT/expected_ticks.json ]; then $PY $D/plot_ir.py $OUT $LOG; fi   # the IR test-bed's figure
 done

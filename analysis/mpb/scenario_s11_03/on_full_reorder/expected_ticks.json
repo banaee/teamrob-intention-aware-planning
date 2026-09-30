@@ -28,7 +28,16 @@
 "duration": 1.0,
 "end": 2.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.862931980619754,
+"deliver_item(?item=item_12)": 0.862931980619754
+},
+"lifecycle": "live"
 },
 {
 "tick": 1,
@@ -59,7 +68,16 @@
 "duration": 2.0,
 "end": 4.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.7401245605378115,
+"deliver_item(?item=item_12)": 0.7401245605378115
+},
+"lifecycle": "live"
 },
 {
 "tick": 2,
@@ -90,7 +108,16 @@
 "duration": 3.0,
 "end": 6.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.6311616966146637,
+"deliver_item(?item=item_12)": 0.6311616966146637
+},
+"lifecycle": "live"
 },
 {
 "tick": 3,
@@ -121,7 +148,16 @@
 "duration": 4.0,
 "end": 8.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5353850904334507,
+"deliver_item(?item=item_12)": 0.5353850904334507
+},
+"lifecycle": "live"
 },
 {
 "tick": 4,
@@ -152,7 +188,16 @@
 "duration": 5.0,
 "end": 10.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.4519410830830482,
+"deliver_item(?item=item_12)": 0.4519410830830482
+},
+"lifecycle": "live"
 },
 {
 "tick": 5,
@@ -183,7 +228,16 @@
 "duration": 6.0,
 "end": 12.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.37983630998158824,
+"deliver_item(?item=item_12)": 0.37983630998158824
+},
+"lifecycle": "live"
 },
 {
 "tick": 6,
@@ -214,7 +268,16 @@
 "duration": 7.0,
 "end": 14.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.3179951042149388,
+"deliver_item(?item=item_12)": 0.3179951042149388
+},
+"lifecycle": "live"
 },
 {
 "tick": 7,
@@ -245,7 +308,16 @@
 "duration": 8.0,
 "end": 16.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.26531268689541276,
+"deliver_item(?item=item_12)": 0.26531268689541276
+},
+"lifecycle": "live"
 },
 {
 "tick": 8,
@@ -276,7 +348,16 @@
 "duration": 9.0,
 "end": 18.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.22070004007301033,
+"deliver_item(?item=item_12)": 0.22070004007301033
+},
+"lifecycle": "live"
 },
 {
 "tick": 9,
@@ -307,7 +388,16 @@
 "duration": 10.0,
 "end": 20.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.18311841208159615,
+"deliver_item(?item=item_12)": 0.18311841208159615
+},
+"lifecycle": "live"
 },
 {
 "tick": 10,
@@ -338,7 +428,16 @@
 "duration": 11.0,
 "end": 22.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.1516031843104468,
+"deliver_item(?item=item_12)": 0.1516031843104468
+},
+"lifecycle": "live"
 },
 {
 "tick": 11,
@@ -369,7 +468,16 @@
 "duration": 12.0,
 "end": 24.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.1252780860823826,
+"deliver_item(?item=item_12)": 0.1252780860823826
+},
+"lifecycle": "live"
 },
 {
 "tick": 12,
@@ -400,7 +508,16 @@
 "duration": 13.0,
 "end": 26.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.10336144180777446,
+"deliver_item(?item=item_12)": 0.10336144180777446
+},
+"lifecycle": "live"
 },
 {
 "tick": 13,
@@ -431,7 +548,16 @@
 "duration": 14.0,
 "end": 28.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.08516636573531593,
+"deliver_item(?item=item_12)": 0.08516636573531593
+},
+"lifecycle": "live"
 },
 {
 "tick": 14,
@@ -462,7 +588,16 @@
 "duration": 15.0,
 "end": 30.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.07009673116536609,
+"deliver_item(?item=item_12)": 0.07009673116536609
+},
+"lifecycle": "live"
 },
 {
 "tick": 15,
@@ -493,7 +628,16 @@
 "duration": 16.0,
 "end": 32.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.05764047562042277,
+"deliver_item(?item=item_12)": 0.05764047562042277
+},
+"lifecycle": "live"
 },
 {
 "tick": 16,
@@ -524,7 +668,16 @@
 "duration": 17.0,
 "end": 34.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.047361471481923385,
+"deliver_item(?item=item_12)": 0.047361471481923385
+},
+"lifecycle": "live"
 },
 {
 "tick": 17,
@@ -555,7 +708,16 @@
 "duration": 18.0,
 "end": 36.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.03889086439972443,
+"deliver_item(?item=item_12)": 0.03889086439972443
+},
+"lifecycle": "live"
 },
 {
 "tick": 18,
@@ -586,7 +748,16 @@
 "duration": 19.0,
 "end": 38.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.031918497363008294,
+"deliver_item(?item=item_12)": 0.031918497363008294
+},
+"lifecycle": "live"
 },
 {
 "tick": 19,
@@ -617,7 +788,16 @@
 "duration": 20.0,
 "end": 40.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.02618481099951632,
+"deliver_item(?item=item_12)": 0.02618481099951632
+},
+"lifecycle": "live"
 },
 {
 "tick": 20,
@@ -648,7 +828,16 @@
 "duration": 21.0,
 "end": 42.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.021473440402504654,
+"deliver_item(?item=item_12)": 0.021473440402504654
+},
+"lifecycle": "live"
 },
 {
 "tick": 21,
@@ -679,7 +868,16 @@
 "duration": 22.0,
 "end": 44.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.017604608299551176,
+"deliver_item(?item=item_12)": 0.017604608299551176
+},
+"lifecycle": "live"
 },
 {
 "tick": 22,
@@ -710,7 +908,16 @@
 "duration": 23.0,
 "end": 46.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.01442933382138573,
+"deliver_item(?item=item_12)": 0.01442933382138573
+},
+"lifecycle": "live"
 },
 {
 "tick": 23,
@@ -741,7 +948,16 @@
 "duration": 24.0,
 "end": 48.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.01182442570371091,
+"deliver_item(?item=item_12)": 0.01182442570371091
+},
+"lifecycle": "live"
 },
 {
 "tick": 24,
@@ -772,7 +988,16 @@
 "duration": 25.0,
 "end": 50.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.009688199963091684,
+"deliver_item(?item=item_12)": 0.009688199963091684
+},
+"lifecycle": "live"
 },
 {
 "tick": 25,
@@ -803,7 +1028,16 @@
 "duration": 26.0,
 "end": 52.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.007936848138389992,
+"deliver_item(?item=item_12)": 0.007936848138389992
+},
+"lifecycle": "live"
 },
 {
 "tick": 26,
@@ -834,7 +1068,16 @@
 "duration": 27.0,
 "end": 54.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.006501377954980627,
+"deliver_item(?item=item_12)": 0.006501377954980627
+},
+"lifecycle": "live"
 },
 {
 "tick": 27,
@@ -865,7 +1108,16 @@
 "duration": 28.0,
 "end": 56.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.005325050047761447,
+"deliver_item(?item=item_12)": 0.005325050047761447
+},
+"lifecycle": "live"
 },
 {
 "tick": 28,
@@ -896,7 +1148,16 @@
 "duration": 29.0,
 "end": 58.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.004361239597612585,
+"deliver_item(?item=item_12)": 0.004361239597612585
+},
+"lifecycle": "live"
 },
 {
 "tick": 29,
@@ -927,7 +1188,16 @@
 "duration": 30.0,
 "end": 60.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0035716586710060967,
+"deliver_item(?item=item_12)": 0.0035716586710060967
+},
+"lifecycle": "live"
 },
 {
 "tick": 30,
@@ -958,7 +1228,16 @@
 "duration": 31.0,
 "end": 62.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.002924882594488034,
+"deliver_item(?item=item_12)": 0.002924882594488034
+},
+"lifecycle": "live"
 },
 {
 "tick": 31,
@@ -989,7 +1268,16 @@
 "duration": 32.0,
 "end": 64.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.002395131164934477,
+"deliver_item(?item=item_12)": 0.002395131164934477
+},
+"lifecycle": "live"
 },
 {
 "tick": 32,
@@ -1020,7 +1308,16 @@
 "duration": 33.0,
 "end": 66.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0019612625043959604,
+"deliver_item(?item=item_12)": 0.0019612625043959604
+},
+"lifecycle": "live"
 },
 {
 "tick": 33,
@@ -1051,7 +1348,16 @@
 "duration": 34.0,
 "end": 68.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0016059437182812078,
+"deliver_item(?item=item_12)": 0.0016059437182812078
+},
+"lifecycle": "live"
 },
 {
 "tick": 34,
@@ -1082,7 +1388,16 @@
 "duration": 35.0,
 "end": 70.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0013149681327966902,
+"deliver_item(?item=item_12)": 0.0013149681327966902
+},
+"lifecycle": "live"
 },
 {
 "tick": 35,
@@ -1113,7 +1428,16 @@
 "duration": 36.0,
 "end": 72.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0010766937711911447,
+"deliver_item(?item=item_12)": 0.0010766937711911447
+},
+"lifecycle": "live"
 },
 {
 "tick": 36,
@@ -1144,7 +1468,16 @@
 "duration": 37.0,
 "end": 74.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0008815819199602435,
+"deliver_item(?item=item_12)": 0.0008815819199602435
+},
+"lifecycle": "live"
 },
 {
 "tick": 37,
@@ -1175,7 +1508,16 @@
 "duration": 38.0,
 "end": 76.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0007218181988156263,
+"deliver_item(?item=item_12)": 0.0007218181988156263
+},
+"lifecycle": "live"
 },
 {
 "tick": 38,
@@ -1206,7 +1548,16 @@
 "duration": 39.0,
 "end": 78.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0005910015535148744,
+"deliver_item(?item=item_12)": 0.0005910015535148744
+},
+"lifecycle": "live"
 },
 {
 "tick": 39,
@@ -1237,7 +1588,16 @@
 "duration": 40.0,
 "end": 80.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.00048388911085912655,
+"deliver_item(?item=item_12)": 0.00048388911085912655
+},
+"lifecycle": "live"
 },
 {
 "tick": 40,
@@ -1268,7 +1628,16 @@
 "duration": 41.0,
 "end": 82.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.00039618693877303373,
+"deliver_item(?item=item_12)": 0.00039618693877303373
+},
+"lifecycle": "live"
 },
 {
 "tick": 41,
@@ -1299,7 +1668,16 @@
 "duration": 42.0,
 "end": 84.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.0003243785037545282,
+"deliver_item(?item=item_12)": 0.0003243785037545282
+},
+"lifecycle": "live"
 },
 {
 "tick": 42,
@@ -1330,7 +1708,16 @@
 "duration": 43.0,
 "end": 86.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.00026558406849036087,
+"deliver_item(?item=item_12)": 0.00026558406849036087
+},
+"lifecycle": "live"
 },
 {
 "tick": 43,
@@ -1361,7 +1748,16 @@
 "duration": 44.0,
 "end": 88.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.00021744547223738662,
+"deliver_item(?item=item_12)": 0.00021744547223738662
+},
+"lifecycle": "live"
 },
 {
 "tick": 44,
@@ -1392,7 +1788,16 @@
 "duration": 45.0,
 "end": 90.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.00017803172714870113,
+"deliver_item(?item=item_12)": 0.00017803172714870113
+},
+"lifecycle": "live"
 },
 {
 "tick": 45,
@@ -1423,7 +1828,16 @@
 "duration": 46.0,
 "end": 92.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.00014576168025218314,
+"deliver_item(?item=item_12)": 0.00014576168025218314
+},
+"lifecycle": "live"
 },
 {
 "tick": 46,
@@ -1454,7 +1868,16 @@
 "duration": 47.0,
 "end": 94.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.00011934066303622944,
+"deliver_item(?item=item_12)": 0.00011934066303622944
+},
+"lifecycle": "live"
 },
 {
 "tick": 47,
@@ -1485,7 +1908,16 @@
 "duration": 48.0,
 "end": 96.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 9.77086034580963e-05,
+"deliver_item(?item=item_12)": 9.77086034580963e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 48,
@@ -1516,7 +1948,16 @@
 "duration": 49.0,
 "end": 98.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.999752953522729e-05,
+"deliver_item(?item=item_12)": 7.999752953522729e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 49,
@@ -1547,7 +1988,16 @@
 "duration": 50.0,
 "end": 100.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.549676676199696e-05,
+"deliver_item(?item=item_12)": 6.549676676199696e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 50,
@@ -1578,7 +2028,16 @@
 "duration": 51.0,
 "end": 102.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.362443782128021e-05,
+"deliver_item(?item=item_12)": 5.362443782128021e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 51,
@@ -1609,7 +2068,16 @@
 "duration": 52.0,
 "end": 104.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.390412426591844e-05,
+"deliver_item(?item=item_12)": 4.390412426591844e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 52,
@@ -1640,7 +2108,16 @@
 "duration": 53.0,
 "end": 106.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.59457558677244e-05,
+"deliver_item(?item=item_12)": 3.59457558677244e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 53,
@@ -1671,7 +2148,16 @@
 "duration": 54.0,
 "end": 108.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.942996223057726e-05,
+"deliver_item(?item=item_12)": 2.942996223057726e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 54,
@@ -1702,7 +2188,16 @@
 "duration": 55.0,
 "end": 110.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.4095259689020527e-05,
+"deliver_item(?item=item_12)": 2.4095259689020527e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 55,
@@ -1733,7 +2228,16 @@
 "duration": 56.0,
 "end": 112.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.9727559973149806e-05,
+"deliver_item(?item=item_12)": 1.9727559973149806e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 56,
@@ -1764,7 +2268,16 @@
 "duration": 57.0,
 "end": 114.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.6151580050433407e-05,
+"deliver_item(?item=item_12)": 1.6151580050433407e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 57,
@@ -1795,7 +2308,16 @@
 "duration": 58.0,
 "end": 116.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.3223808716103365e-05,
+"deliver_item(?item=item_12)": 1.3223808716103365e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 58,
@@ -1826,7 +2348,16 @@
 "duration": 59.0,
 "end": 118.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.0826747863243512e-05,
+"deliver_item(?item=item_12)": 1.0826747863243512e-05
+},
+"lifecycle": "live"
 },
 {
 "tick": 59,
@@ -1857,7 +2388,16 @@
 "duration": 60.0,
 "end": 120.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 8.864197460608535e-06,
+"deliver_item(?item=item_12)": 8.864197460608535e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 60,
@@ -1888,7 +2428,16 @@
 "duration": 61.0,
 "end": 122.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.498,
+"deliver_item(?item=item_12)": 0.498
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.257395103904129e-06,
+"deliver_item(?item=item_12)": 7.257395103904129e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 61,
@@ -1919,7 +2468,16 @@
 "duration": 1.0,
 "end": 63.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5050225257994482,
+"deliver_item(?item=item_12)": 0.4909774742005518
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.1220036429813775e-06,
+"deliver_item(?item=item_12)": 6.9239349557261696e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 62,
@@ -1950,7 +2508,16 @@
 "duration": 2.0,
 "end": 65.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5123939371874388,
+"deliver_item(?item=item_12)": 0.4836060628125613
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.984915908774218e-06,
+"deliver_item(?item=item_12)": 6.5924808572248766e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 63,
@@ -1981,7 +2548,16 @@
 "duration": 3.0,
 "end": 67.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5201314726275014,
+"deliver_item(?item=item_12)": 0.4758685273724986
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.846137035867421e-06,
+"deliver_item(?item=item_12)": 6.263532708725438e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 64,
@@ -2012,7 +2588,16 @@
 "duration": 4.0,
 "end": 69.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5282525122968905,
+"deliver_item(?item=item_12)": 0.4677474877031095
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.705675649599407e-06,
+"deliver_item(?item=item_12)": 5.937618904718264e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 65,
@@ -2043,7 +2628,16 @@
 "duration": 5.0,
 "end": 71.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5367743765327497,
+"deliver_item(?item=item_12)": 0.45922562346725027
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.563544229010602e-06,
+"deliver_item(?item=item_12)": 5.615295423791359e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 66,
@@ -2074,7 +2668,16 @@
 "duration": 6.0,
 "end": 73.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5457140729260028,
+"deliver_item(?item=item_12)": 0.45028592707399717
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.419759501505845e-06,
+"deliver_item(?item=item_12)": 5.297144379103479e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 67,
@@ -2105,7 +2708,16 @@
 "duration": 7.0,
 "end": 75.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5550879841397605,
+"deliver_item(?item=item_12)": 0.44091201586023954
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.274342864425771e-06,
+"deliver_item(?item=item_12)": 4.983771946428514e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 68,
@@ -2136,7 +2748,16 @@
 "duration": 8.0,
 "end": 77.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5649114883435906,
+"deliver_item(?item=item_12)": 0.4310885116564095
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.127320844418787e-06,
+"deliver_item(?item=item_12)": 4.675805588723432e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 69,
@@ -2167,7 +2788,16 @@
 "duration": 9.0,
 "end": 79.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5751985044093102,
+"deliver_item(?item=item_12)": 0.42080149559068974
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.978725586284813e-06,
+"deliver_item(?item=item_12)": 4.373890491687344e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 70,
@@ -2198,7 +2828,16 @@
 "duration": 10.0,
 "end": 81.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5859609549062086,
+"deliver_item(?item=item_12)": 0.4100390450937914
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.828595382502762e-06,
+"deliver_item(?item=item_12)": 4.078685133108086e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 71,
@@ -2229,7 +2868,16 @@
 "duration": 11.0,
 "end": 83.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.5972081417053434,
+"deliver_item(?item=item_12)": 0.39879185829465663
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.676975232870529e-06,
+"deliver_item(?item=item_12)": 3.7908559254505695e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 72,
@@ -2260,7 +2908,16 @@
 "duration": 12.0,
 "end": 85.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.6089460319322479,
+"deliver_item(?item=item_12)": 0.3870539680677521
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.5239174473914995e-06,
+"deliver_item(?item=item_12)": 3.5110708727429635e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 73,
@@ -2291,7 +2948,16 @@
 "duration": 13.0,
 "end": 87.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.6211764563950025,
+"deliver_item(?item=item_12)": 0.3748235436049974
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.369482282477072e-06,
+"deliver_item(?item=item_12)": 3.2399922283055223e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 74,
@@ -2322,7 +2988,16 @@
 "duration": 14.0,
 "end": 89.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.633896228750327,
+"deliver_item(?item=item_12)": 0.36210377124967313
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.213738614949945e-06,
+"deliver_item(?item=item_12)": 2.978268155563915e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 75,
@@ -2353,7 +3028,16 @@
 "duration": 15.0,
 "end": 91.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.6470962017840896,
+"deliver_item(?item=item_12)": 0.34890379821591033
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.056764652246551e-06,
+"deliver_item(?item=item_12)": 2.726523450569485e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 76,
@@ -2384,7 +3068,16 @@
 "duration": 16.0,
 "end": 93.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.6607602873698677,
+"deliver_item(?item=item_12)": 0.33523971263013236
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.8986486746541646e-06,
+"deliver_item(?item=item_12)": 2.4853494252124267e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 77,
@@ -2415,7 +3108,16 @@
 "duration": 17.0,
 "end": 95.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.6748644787917397,
+"deliver_item(?item=item_12)": 0.3211355212082603
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.739489807660709e-06,
+"deliver_item(?item=item_12)": 2.255293125074454e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 78,
@@ -2446,7 +3148,16 @@
 "duration": 18.0,
 "end": 97.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.6893759276860958,
+"deliver_item(?item=item_12)": 0.3066240723139043
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.579398819932451e-06,
+"deliver_item(?item=item_12)": 2.0368461116076705e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 79,
@@ -2477,7 +3188,16 @@
 "duration": 19.0,
 "end": 99.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.7042521419080776,
+"deliver_item(?item=item_12)": 0.2917478580919224
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.418498937950041e-06,
+"deliver_item(?item=item_12)": 1.8304331193735359e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 80,
@@ -2508,7 +3228,16 @@
 "duration": 20.0,
 "end": 101.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.7194403836253633,
+"deliver_item(?item=item_12)": 0.2765596163746366
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.2569266702553705e-06,
+"deliver_item(?item=item_12)": 1.6364009644262204e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 81,
@@ -2539,7 +3268,16 @@
 "duration": 21.0,
 "end": 103.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.7348773567435702,
+"deliver_item(?item=item_12)": 0.2611226432564298
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.094832630097271e-06,
+"deliver_item(?item=item_12)": 1.4550081478377222e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 82,
@@ -2570,7 +3308,16 @@
 "duration": 22.0,
 "end": 105.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.750489276715624,
+"deliver_item(?item=item_12)": 0.24551072328437604
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.9323823407792455e-06,
+"deliver_item(?item=item_12)": 1.286415645452813e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 83,
@@ -2601,7 +3348,16 @@
 "duration": 23.0,
 "end": 107.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.7661924109708739,
+"deliver_item(?item=item_12)": 0.2298075890291262
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.769757005449725e-06,
+"deliver_item(?item=item_12)": 1.1306794009098058e-06
+},
+"lifecycle": "live"
 },
 {
 "tick": 84,
@@ -2632,7 +3388,16 @@
 "duration": 24.0,
 "end": 109.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.7818941619304216,
+"deliver_item(?item=item_12)": 0.2141058380695783
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.607154221793883e-06,
+"deliver_item(?item=item_12)": 9.87745035439323e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 85,
@@ -2663,7 +3428,16 @@
 "duration": 25.0,
 "end": 111.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.7974947350626737,
+"deliver_item(?item=item_12)": 0.1985052649373264
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.44478861407751e-06,
+"deliver_item(?item=item_12)": 8.57445238620229e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 86,
@@ -2694,7 +3468,16 @@
 "duration": 26.0,
 "end": 113.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.8128893915712101,
+"deliver_item(?item=item_12)": 0.18311060842878987
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.2828923511492885e-06,
+"deliver_item(?item=item_12)": 7.395002225840178e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 87,
@@ -2725,7 +3508,16 @@
 "duration": 27.0,
 "end": 115.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.8279712313920686,
+"deliver_item(?item=item_12)": 0.16802876860793134
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.121715512921285e-06,
+"deliver_item(?item=item_12)": 6.335214815278354e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 88,
@@ -2756,7 +3548,16 @@
 "duration": 28.0,
 "end": 117.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.8426343923042211,
+"deliver_item(?item=item_12)": 0.15336560769577898
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.9615262675270722e-06,
+"deliver_item(?item=item_12)": 5.390189369427882e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 89,
@@ -2787,7 +3588,16 @@
 "duration": 29.0,
 "end": 119.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.8567774928250482,
+"deliver_item(?item=item_12)": 0.13922250717495177
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.80261080790251e-06,
+"deliver_item(?item=item_12)": 4.554113397795399e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 90,
@@ -2818,7 +3628,16 @@
 "duration": 30.0,
 "end": 121.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.8703070995166372,
+"deliver_item(?item=item_12)": 0.12569290048336274
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.645272993651065e-06,
+"deliver_item(?item=item_12)": 3.8203959799542996e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 91,
@@ -2849,7 +3668,16 @@
 "duration": 31.0,
 "end": 123.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.8831409726610077,
+"deliver_item(?item=item_12)": 0.11285902733899227
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.4898336453368784e-06,
+"deliver_item(?item=item_12)": 3.1818248810217423e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 92,
@@ -2880,7 +3708,16 @@
 "duration": 32.0,
 "end": 125.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.8952108450850916,
+"deliver_item(?item=item_12)": 0.10078915491490838
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.3366294229723265e-06,
+"deliver_item(?item=item_12)": 2.6307404211379934e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 93,
@@ -2911,7 +3748,16 @@
 "duration": 33.0,
 "end": 127.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9064645201574129,
+"deliver_item(?item=item_12)": 0.08953547984258711
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.186011230077049e-06,
+"deliver_item(?item=item_12)": 2.1592177796226636e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 94,
@@ -2942,7 +3788,16 @@
 "duration": 34.0,
 "end": 129.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9168671341512351,
+"deliver_item(?item=item_12)": 0.07913286584876486
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.038342075395459e-06,
+"deliver_item(?item=item_12)": 1.7592488570860197e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 95,
@@ -2973,7 +3828,16 @@
 "duration": 35.0,
 "end": 131.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9264015074160538,
+"deliver_item(?item=item_12)": 0.06959849258394624
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.893994332368307e-06,
+"deliver_item(?item=item_12)": 1.422915113491088e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 96,
@@ -3004,7 +3868,16 @@
 "duration": 35.494862832941955,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9350675963393899,
+"deliver_item(?item=item_12)": 0.06093240366061007
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.7533463486268793e-06,
+"deliver_item(?item=item_12)": 1.1425435689888525e-07
+},
+"lifecycle": "live"
 },
 {
 "tick": 97,
@@ -3035,7 +3908,16 @@
 "duration": 34.494862832941955,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.94288114071431,
+"deliver_item(?item=item_12)": 0.05311885928569003
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.6167783629039252e-06,
+"deliver_item(?item=item_12)": 9.108399066284013e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 98,
@@ -3066,7 +3948,16 @@
 "duration": 33.49486283294174,
 "end": 132.49486283294175
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9498716670848262,
+"deliver_item(?item=item_12)": 0.04612833291517387
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.4846677098201257e-06,
+"deliver_item(?item=item_12)": 7.209943747306827e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 99,
@@ -3097,7 +3988,16 @@
 "duration": 32.49486283294204,
 "end": 132.49486283294203
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9560800499454976,
+"deliver_item(?item=item_12)": 0.03991995005450243
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.3573833330478043e-06,
+"deliver_item(?item=item_12)": 5.667585092039622e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 100,
@@ -3128,7 +4028,16 @@
 "duration": 31.494862832941894,
 "end": 132.4948628329419
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9615558463951527,
+"deliver_item(?item=item_12)": 0.034444153604847316
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.2352796385657137e-06,
+"deliver_item(?item=item_12)": 4.424926982249981e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 101,
@@ -3159,7 +4068,16 @@
 "duration": 30.4948628329419,
 "end": 132.4948628329419
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9663546080296157,
+"deliver_item(?item=item_12)": 0.02964539197038425
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.118689793717984e-06,
+"deliver_item(?item=item_12)": 3.4318649532793294e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 102,
@@ -3190,7 +4108,16 @@
 "duration": 29.494862832941713,
 "end": 132.49486283294172
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9705353423224189,
+"deliver_item(?item=item_12)": 0.02546465767758119
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.0079186014958736e-06,
+"deliver_item(?item=item_12)": 2.6445500926626417e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 103,
@@ -3221,7 +4148,16 @@
 "duration": 28.494862832941934,
 "end": 132.49486283294192
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9741582522764464,
+"deliver_item(?item=item_12)": 0.021841747723553694
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 9.032351557026778e-07,
+"deliver_item(?item=item_12)": 2.0251564082157777e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 104,
@@ -3252,7 +4188,16 @@
 "duration": 27.49486283294194,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.977282835661793,
+"deliver_item(?item=item_12)": 0.018717164338207054
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 8.048655268696361e-07,
+"deliver_item(?item=item_12)": 1.541498083302996e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 105,
@@ -3283,7 +4228,16 @@
 "duration": 26.494862832941944,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9799663803322491,
+"deliver_item(?item=item_12)": 0.016033619667750885
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.129857893356156e-07,
+"deliver_item(?item=item_12)": 1.1665441261573762e-08
+},
+"lifecycle": "live"
 },
 {
 "tick": 106,
@@ -3314,7 +4268,16 @@
 "duration": 25.494862832941685,
 "end": 132.4948628329417
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9822628545113994,
+"deliver_item(?item=item_12)": 0.013737145488600638
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.277157370632442e-07,
+"deliver_item(?item=item_12)": 8.778730188763596e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 107,
@@ -3345,7 +4308,16 @@
 "duration": 24.494862832941976,
 "end": 132.49486283294198
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9842221629016464,
+"deliver_item(?item=item_12)": 0.011777837098353531
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.491136655561295e-07,
+"deliver_item(?item=item_12)": 6.5710468605168394e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 108,
@@ -3376,7 +4348,16 @@
 "duration": 23.494862832942072,
 "end": 132.49486283294206
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9858897214020189,
+"deliver_item(?item=item_12)": 0.010110278597981102
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.771725914756464e-07,
+"deliver_item(?item=item_12)": 4.893394147603667e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 109,
@@ -3407,7 +4388,16 @@
 "duration": 22.494862832941944,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9873062941398303,
+"deliver_item(?item=item_12)": 0.008693705860169782
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.118182588113892e-07,
+"deliver_item(?item=item_12)": 3.6262570144609085e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 110,
@@ -3438,7 +4428,16 @@
 "duration": 21.49486283294176,
 "end": 132.49486283294175
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9885080346518805,
+"deliver_item(?item=item_12)": 0.007491965348119447
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.5290919909219356e-07,
+"deliver_item(?item=item_12)": 2.6747208181251562e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 111,
@@ -3469,7 +4468,16 @@
 "duration": 20.494862832941948,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9895266763435039,
+"deliver_item(?item=item_12)": 0.006473323656496144
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.0023903079633577e-07,
+"deliver_item(?item=item_12)": 1.9641149688911447e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 112,
@@ -3500,7 +4508,16 @@
 "duration": 19.494862832941894,
 "end": 132.4948628329419
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9903898238571602,
+"deliver_item(?item=item_12)": 0.005610176142839761
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.5354102711235495e-07,
+"deliver_item(?item=item_12)": 1.4362120649847868e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 113,
@@ -3531,7 +4548,16 @@
 "duration": 18.49486283294195,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9911213050615233,
+"deliver_item(?item=item_12)": 0.004878694938476751
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.124948492204461e-07,
+"deliver_item(?item=item_12)": 1.0459844233597185e-09
+},
+"lifecycle": "live"
 },
 {
 "tick": 114,
@@ -3562,7 +4588,16 @@
 "duration": 17.49486283294173,
 "end": 132.49486283294172
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9917415517968481,
+"deliver_item(?item=item_12)": 0.004258448203151895
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.767351695993787e-07,
+"deliver_item(?item=item_12)": 7.588846910158518e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 115,
@@ -3593,7 +4628,16 @@
 "duration": 16.494862832941912,
 "end": 132.49486283294192
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.992267985454264,
+"deliver_item(?item=item_12)": 0.003732014545735995
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.4586176731115227e-07,
+"deliver_item(?item=item_12)": 5.485999227226649e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 116,
@@ -3624,7 +4668,16 @@
 "duration": 15.494862832941937,
 "end": 132.49486283294195
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9927153904425716,
+"deliver_item(?item=item_12)": 0.0032846095574283994
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.1945056797858004e-07,
+"deliver_item(?item=item_12)": 3.9522754999378475e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 117,
@@ -3655,7 +4708,16 @@
 "duration": 14.494862832941893,
 "end": 132.4948628329419
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9930962643903409,
+"deliver_item(?item=item_12)": 0.002903735609659067
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 9.706501948353363e-08,
+"deliver_item(?item=item_12)": 2.8381045416142015e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 118,
@@ -3686,7 +4748,16 @@
 "duration": 13.494862832941813,
 "end": 132.4948628329418
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9934211385147887,
+"deliver_item(?item=item_12)": 0.002578861485211265
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.826719505428392e-08,
+"deliver_item(?item=item_12)": 2.0317700564750392e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 119,
@@ -3717,7 +4788,16 @@
 "duration": 12.494862832941898,
 "end": 132.4948628329419
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9936988650503797,
+"deliver_item(?item=item_12)": 0.0023011349496203522
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.262804744474104e-08,
+"deliver_item(?item=item_12)": 1.4502936878522388e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 120,
@@ -3748,7 +4828,16 @@
 "duration": 11.494862832941973,
 "end": 132.49486283294198
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9939368711199874,
+"deliver_item(?item=item_12)": 0.002063128880012677
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.9736342660603536e-08,
+"deliver_item(?item=item_12)": 1.0323842764800143e-10
+},
+"lifecycle": "live"
 },
 {
 "tick": 121,
@@ -3779,7 +4868,16 @@
 "duration": 10.494862832941875,
 "end": 132.49486283294186
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9941413801236703,
+"deliver_item(?item=item_12)": 0.0018586198763296817
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.9205929824677135e-08,
+"deliver_item(?item=item_12)": 7.329824251722788e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 122,
@@ -3810,7 +4908,16 @@
 "duration": 9.4948628329418,
 "end": 132.4948628329418
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9943176027864001,
+"deliver_item(?item=item_12)": 0.001682397213599917
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.0681158819653996e-08,
+"deliver_item(?item=item_12)": 5.191280786398827e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 123,
@@ -3841,7 +4948,16 @@
 "duration": 8.494862832941925,
 "end": 132.49486283294192
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9944699006014064,
+"deliver_item(?item=item_12)": 0.0015300993985936278
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.384040950956703e-08,
+"deliver_item(?item=item_12)": 3.668115552411678e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 124,
@@ -3872,7 +4988,16 @@
 "duration": 7.4948628329418705,
 "end": 132.49486283294186
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9946019246615571,
+"deliver_item(?item=item_12)": 0.0013980753384430426
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.8397833447913858e-08,
+"deliver_item(?item=item_12)": 2.5861262165066043e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 125,
@@ -3903,7 +5028,16 @@
 "duration": 6.494862832941924,
 "end": 132.49486283294192
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9947167328934639,
+"deliver_item(?item=item_12)": 0.0012832671065361166
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.4103515974973276e-08,
+"deliver_item(?item=item_12)": 1.8194821856253237e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 126,
@@ -3934,7 +5068,16 @@
 "duration": 5.494862832941856,
 "end": 132.49486283294186
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9948168885800269,
+"deliver_item(?item=item_12)": 0.0011831114199731007
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.0742332597466402e-08,
+"deliver_item(?item=item_12)": 1.2775585239807708e-11
+},
+"lifecycle": "live"
 },
 {
 "tick": 127,
@@ -3965,7 +5108,16 @@
 "duration": 4.49486283294186,
 "end": 132.49486283294186
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9949045428382269,
+"deliver_item(?item=item_12)": 0.0010954571617731175
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 8.131816149297996e-09,
+"deliver_item(?item=item_12)": 8.953577078134913e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 128,
@@ -3996,7 +5148,16 @@
 "duration": 3.494862832941905,
 "end": 132.49486283294192
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9949815034542255,
+"deliver_item(?item=item_12)": 0.001018496545774468
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.119340340452133e-09,
+"deliver_item(?item=item_12)": 6.263980185546091e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 129,
@@ -4027,7 +5188,16 @@
 "duration": 2.4948628329419145,
 "end": 132.49486283294192
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950040452901382,
+"deliver_item(?item=item_12)": 0.0009959547098619523
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.578906080532964e-09,
+"deliver_item(?item=item_12)": 4.3749195762534e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 130,
@@ -4058,7 +5228,16 @@
 "duration": 1.4948628329418754,
 "end": 132.49486283294186
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950041051813519,
+"deliver_item(?item=item_12)": 0.000995894818648222
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.4077788426362343e-09,
+"deliver_item(?item=item_12)": 3.0506230595797208e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 131,
@@ -4089,7 +5268,16 @@
 "duration": 0.4948628329418796,
 "end": 132.4948628329419
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950041582636571,
+"deliver_item(?item=item_12)": 0.0009958417363430565
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.523164147761491e-09,
+"deliver_item(?item=item_12)": 2.123871772027727e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 132,
@@ -4120,7 +5308,16 @@
 "duration": 3.868676330301837,
 "end": 136.86867633030184
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457405,
+"deliver_item(?item=item_12)": 0.0009957945425950897
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.8590643630054348e-09,
+"deliver_item(?item=item_12)": 1.4767796182579213e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 133,
@@ -4151,7 +5348,16 @@
 "duration": 1.0,
 "end": 135.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574052,
+"deliver_item(?item=item_12)": 0.0009957945425949054
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.5220731851358573e-09,
+"deliver_item(?item=item_12)": 1.2089731625392435e-12
+},
+"lifecycle": "live"
 },
 {
 "tick": 134,
@@ -4182,7 +5388,16 @@
 "duration": 2.0,
 "end": 137.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574052,
+"deliver_item(?item=item_12)": 0.0009957945425947544
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.2461681471373387e-09,
+"deliver_item(?item=item_12)": 9.898587896784701e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 135,
@@ -4213,7 +5428,16 @@
 "duration": 3.0,
 "end": 139.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574054,
+"deliver_item(?item=item_12)": 0.000995794542594631
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.0202759646570627e-09,
+"deliver_item(?item=item_12)": 8.104669054649465e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 136,
@@ -4244,7 +5468,16 @@
 "duration": 4.0,
 "end": 141.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574054,
+"deliver_item(?item=item_12)": 0.0009957945425945298
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 8.353315814033035e-10,
+"deliver_item(?item=item_12)": 6.634296289399169e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 137,
@@ -4275,7 +5508,16 @@
 "duration": 5.0,
 "end": 143.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574055,
+"deliver_item(?item=item_12)": 0.0009957945425944467
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.839113768154065e-10,
+"deliver_item(?item=item_12)": 5.433011350469078e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 138,
@@ -4306,7 +5548,16 @@
 "duration": 6.0,
 "end": 145.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574055,
+"deliver_item(?item=item_12)": 0.0009957945425943793
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.599394118565124e-10,
+"deliver_item(?item=item_12)": 4.4463559872944204e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 139,
@@ -4337,7 +5588,16 @@
 "duration": 7.0,
 "end": 147.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574058,
+"deliver_item(?item=item_12)": 0.0009957945425943238
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.5843948380426116e-10,
+"deliver_item(?item=item_12)": 3.642295934837102e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 140,
@@ -4368,7 +5628,16 @@
 "duration": 8.0,
 "end": 149.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574056,
+"deliver_item(?item=item_12)": 0.000995794542594278
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.753387562075109e-10,
+"deliver_item(?item=item_12)": 2.98239007505138e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 141,
@@ -4399,7 +5668,16 @@
 "duration": 9.0,
 "end": 151.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574058,
+"deliver_item(?item=item_12)": 0.000995794542594241
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.0730118070908253e-10,
+"deliver_item(?item=item_12)": 2.4410109959067607e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 142,
@@ -4430,7 +5708,16 @@
 "duration": 10.0,
 "end": 153.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574058,
+"deliver_item(?item=item_12)": 0.0009957945425942106
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.5159711758768515e-10,
+"deliver_item(?item=item_12)": 1.9989381383803704e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 143,
@@ -4461,7 +5748,16 @@
 "duration": 11.0,
 "end": 155.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574058,
+"deliver_item(?item=item_12)": 0.0009957945425941854
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.0599025480275522e-10,
+"deliver_item(?item=item_12)": 1.6369509434493301e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 144,
@@ -4492,7 +5788,16 @@
 "duration": 12.0,
 "end": 157.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574058,
+"deliver_item(?item=item_12)": 0.0009957945425941653
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.68650474793836e-10,
+"deliver_item(?item=item_12)": 1.3390322785945736e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 145,
@@ -4523,7 +5828,16 @@
 "duration": 13.0,
 "end": 159.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574058,
+"deliver_item(?item=item_12)": 0.0009957945425941484
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.3807921464322896e-10,
+"deliver_item(?item=item_12)": 1.0955718643046604e-13
+},
+"lifecycle": "live"
 },
 {
 "tick": 146,
@@ -4554,7 +5868,16 @@
 "duration": 14.0,
 "end": 161.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594135
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.1304988234315029e-10,
+"deliver_item(?item=item_12)": 8.969594210681491e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 147,
@@ -4585,7 +5908,16 @@
 "duration": 15.0,
 "end": 163.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425941236
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 9.255724265705613e-11,
+"deliver_item(?item=item_12)": 7.367880958774122e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 148,
@@ -4616,7 +5948,16 @@
 "duration": 16.0,
 "end": 165.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425941143
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.577961668695471e-11,
+"deliver_item(?item=item_12)": 6.02244182717192e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 149,
@@ -4647,7 +5988,16 @@
 "duration": 17.0,
 "end": 167.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594107
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.20430034966021e-11,
+"deliver_item(?item=item_12)": 4.933276815874889e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 150,
@@ -4678,7 +6028,16 @@
 "duration": 18.0,
 "end": 169.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425941009
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.079641372744852e-11,
+"deliver_item(?item=item_12)": 4.03631739480674e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 151,
@@ -4709,7 +6068,16 @@
 "duration": 19.0,
 "end": 171.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940959
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.158880492782811e-11,
+"deliver_item(?item=item_12)": 3.299529298929328e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 152,
@@ -4740,7 +6108,16 @@
 "duration": 20.0,
 "end": 173.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940916
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.4049860993947705e-11,
+"deliver_item(?item=item_12)": 2.6908782632045058e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 153,
@@ -4771,7 +6148,16 @@
 "duration": 21.0,
 "end": 175.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940883
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.7877819149179974e-11,
+"deliver_item(?item=item_12)": 2.2103642876322765e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 154,
@@ -4802,7 +6188,16 @@
 "duration": 22.0,
 "end": 177.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940855
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.282441383950074e-11,
+"deliver_item(?item=item_12)": 1.8259531071744916e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 155,
@@ -4833,7 +6228,16 @@
 "duration": 23.0,
 "end": 179.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594083
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.868686816723292e-11,
+"deliver_item(?item=item_12)": 1.4735761917548547e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 156,
@@ -4864,7 +6268,16 @@
 "duration": 24.0,
 "end": 181.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940814
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.529956498213892e-11,
+"deliver_item(?item=item_12)": 1.2173020714496636e-14
+},
+"lifecycle": "live"
 },
 {
 "tick": 157,
@@ -4895,7 +6308,16 @@
 "duration": 25.0,
 "end": 183.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940798
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.2526358657813093e-11,
+"deliver_item(?item=item_12)": 9.930622161826211e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 158,
@@ -4926,7 +6348,16 @@
 "duration": 26.0,
 "end": 185.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940785
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.0255769951927007e-11,
+"deliver_item(?item=item_12)": 8.008566259537271e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 159,
@@ -4957,7 +6388,16 @@
 "duration": 27.0,
 "end": 187.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940777
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 8.396501209124847e-12,
+"deliver_item(?item=item_12)": 6.727195658011312e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 160,
@@ -4988,7 +6428,16 @@
 "duration": 28.0,
 "end": 189.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940768
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.874553277170435e-12,
+"deliver_item(?item=item_12)": 5.44582505648535e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 161,
@@ -5019,7 +6468,16 @@
 "duration": 29.0,
 "end": 191.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940762
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.628420367191831e-12,
+"deliver_item(?item=item_12)": 4.484797105340878e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 162,
@@ -5050,7 +6508,16 @@
 "duration": 30.0,
 "end": 193.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940753
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.6081290257303996e-12,
+"deliver_item(?item=item_12)": 3.523769154196405e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 163,
@@ -5081,7 +6548,16 @@
 "duration": 31.0,
 "end": 195.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940749
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.772995736188276e-12,
+"deliver_item(?item=item_12)": 2.8830838534334232e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 164,
@@ -5112,7 +6588,16 @@
 "duration": 32.0,
 "end": 197.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940746
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.0890641776254177e-12,
+"deliver_item(?item=item_12)": 2.562741203051932e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 165,
@@ -5143,7 +6628,16 @@
 "duration": 33.0,
 "end": 199.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940742
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.529105224759661e-12,
+"deliver_item(?item=item_12)": 1.9220559022889496e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 166,
@@ -5174,7 +6668,16 @@
 "duration": 34.0,
 "end": 201.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594074
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.070694892064477e-12,
+"deliver_item(?item=item_12)": 1.6017132519074581e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 167,
@@ -5205,7 +6708,16 @@
 "duration": 35.0,
 "end": 203.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940738
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.6952533058178583e-12,
+"deliver_item(?item=item_12)": 1.2813706015259665e-15
+},
+"lifecycle": "live"
 },
 {
 "tick": 168,
@@ -5236,7 +6748,16 @@
 "duration": 36.0,
 "end": 205.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940736
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.3880447041023361e-12,
+"deliver_item(?item=item_12)": 9.61027951144475e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 169,
@@ -5267,7 +6788,16 @@
 "duration": 37.0,
 "end": 207.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940736
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.136255380902704e-12,
+"deliver_item(?item=item_12)": 9.61027951144475e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 170,
@@ -5298,7 +6828,16 @@
 "duration": 38.0,
 "end": 209.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940733
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 9.302750567075522e-13,
+"deliver_item(?item=item_12)": 6.406853007629834e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 171,
@@ -5329,7 +6868,16 @@
 "duration": 39.0,
 "end": 211.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940733
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.617748226069862e-13,
+"deliver_item(?item=item_12)": 6.406853007629834e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 172,
@@ -5360,7 +6908,16 @@
 "duration": 40.0,
 "end": 213.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940731
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.237071402926296e-13,
+"deliver_item(?item=item_12)": 6.406853007629834e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 173,
@@ -5391,7 +6948,16 @@
 "duration": 41.0,
 "end": 215.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.0009957945425940731
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.106261847080075e-13,
+"deliver_item(?item=item_12)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 174,
@@ -5422,7 +6988,16 @@
 "duration": 42.0,
 "end": 217.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940731
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.1804715874778616e-13,
+"deliver_item(?item=item_12)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 175,
@@ -5453,7 +7028,16 @@
 "duration": 43.0,
 "end": 219.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940731
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.4212595060739267e-13,
+"deliver_item(?item=item_12)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 176,
@@ -5484,7 +7068,16 @@
 "duration": 44.0,
 "end": 221.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940731
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.8029981908377805e-13,
+"deliver_item(?item=item_12)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 177,
@@ -5515,7 +7108,16 @@
 "duration": 45.0,
 "end": 223.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.0009957945425940731
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.2936533767312985e-13,
+"deliver_item(?item=item_12)": 3.2034265038149176e-16
+},
+"lifecycle": "live"
 },
 {
 "tick": 178,
@@ -5546,7 +7148,16 @@
 "duration": 46.0,
 "end": 225.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.87720793123542e-13,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 179,
@@ -5577,7 +7188,16 @@
 "duration": 47.0,
 "end": 227.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.5376447218310786e-13,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 180,
@@ -5608,7 +7228,16 @@
 "duration": 48.0,
 "end": 229.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.2589466159992076e-13,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 181,
@@ -5639,7 +7268,16 @@
 "duration": 49.0,
 "end": 231.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.0315033342283666e-13,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 182,
@@ -5670,7 +7308,16 @@
 "duration": 50.0,
 "end": 233.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 8.425011705032987e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 183,
@@ -5701,7 +7348,16 @@
 "duration": 51.0,
 "end": 235.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.919401248240056e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 184,
@@ -5732,7 +7388,16 @@
 "duration": 52.0,
 "end": 237.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.6700649117522936e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 185,
@@ -5763,7 +7428,16 @@
 "duration": 53.0,
 "end": 239.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.644968430531556e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 186,
@@ -5794,7 +7468,16 @@
 "duration": 54.0,
 "end": 241.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.7800432745015535e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 187,
@@ -5825,7 +7508,16 @@
 "duration": 55.0,
 "end": 243.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.1073237087004364e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 188,
@@ -5856,7 +7548,16 @@
 "duration": 56.0,
 "end": 245.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.5307069380137627e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 189,
@@ -5887,7 +7588,16 @@
 "duration": 57.0,
 "end": 247.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.9950042054574059,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 2.0822272274796816e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 190,
@@ -5918,7 +7628,16 @@
 "duration": 58.0,
 "end": 249.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.6978160470218965e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 191,
@@ -5949,7 +7668,16 @@
 "duration": 59.0,
 "end": 251.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.409507661678557e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 192,
@@ -5980,7 +7708,16 @@
 "duration": 60.0,
 "end": 253.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 1.1532335413733658e-14,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 193,
@@ -6011,7 +7748,16 @@
 "duration": 61.0,
 "end": 255.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 9.289936861063232e-15,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 194,
@@ -6042,7 +7788,16 @@
 "duration": 62.0,
 "end": 257.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 7.688223609155783e-15,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 195,
@@ -6073,7 +7828,16 @@
 "duration": 63.0,
 "end": 259.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 6.406853007629822e-15,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 196,
@@ -6104,7 +7868,16 @@
 "duration": 64.0,
 "end": 261.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 5.1254824061038595e-15,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 197,
@@ -6135,7 +7908,16 @@
 "duration": 65.0,
 "end": 263.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 4.164454454959387e-15,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 },
 {
 "tick": 198,
@@ -6166,6 +7948,15 @@
 "duration": 66.0,
 "end": 265.0
 },
-"admitted": null
+"admitted": null,
+"belief": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 0.995004205457406,
+"deliver_item(?item=item_12)": 0.000995794542594073
+},
+"S": {
+"coffee_break(?coffee_machine=coffee_machine_0)": 3.523769154196405e-15,
+"deliver_item(?item=item_12)": 0.0
+},
+"lifecycle": "live"
 }
 ]

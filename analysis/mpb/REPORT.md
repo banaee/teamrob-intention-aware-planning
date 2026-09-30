@@ -318,15 +318,38 @@ Single_task, prior on; every tick equals the oracle's.
     (its hold 4 included) against 105.25 for [item_13, item_7], so the head stays item_7.
   - The switch is a single_task property by the authored parameter: the difference is set between the two tasks, not
     between the two orderings.
-- **scenario_s12_01 under full_reorder: three F1 robot violations inside the admission's assessed window**, class 5
-  pending Hadi's reading (not examined further).
+- **scenario_s12_01 under full_reorder: three F1 robot violations inside the admission's assessed window.** Checked
+  (below); the reading is Hadi's, and until he reads it the MPB's CLOSED record is provisional.
   - The decision of 26 keeps item_7 with a hold of 4 (its window 27 to 63). The robot passes the crossing at 45 to 47
     within 50 cm of the human's carry, 38.05 cm at its closest.
   - The same pattern as scenario_s10_02 prior off in part (iii) (the admission at 26, hold 4, three violations). The
     hold of 5 from 25 (scenario_s10_02 prior on) kept the separation.
-  - The likely reading is the recorded execution residual: step quantisation, uncompensated by decision (T_r; TODO-77's
-    residual; docs/assumptions.md 4.4). If it is read as the framework departing from F1's ruling, it is class 2.
   - No declared property covers it: P12.1a is single_task's.
+  - **The check (30 September 2026).** The run was re-executed in-process (the headless log and `.rec` byte-identical
+    to the committed ones; the in-process model lines identical to the log) with a recorder on `realize()` at 26. The
+    projection clock, established on the data: step s is the end of world tick 25 + s. Since the close-out the values
+    are saved in `actual_decisions.json` (`human_segments`, `robot_segments`) and the check is read-only.
+
+    | tick | projected human / actual human (gap) | planned robot / executed robot (gap) | planned separation, end / min over the tick | executed separation, end / min |
+    |---|---|---|---|---|
+    | 45 | (−204.8, 5.5) / (−207.1, 3.0) (3.4) | (−159.7, −48.1) / (−174.1, −34.3) (20.0) | 70.07 / 70.07 | 49.83 / 49.83, viol |
+    | 46 | (−191.0, 20.0) / (−193.3, 17.5) (3.4) | (−174.1, −34.3) / (−188.6, −20.5) (20.0) | 56.82 / 56.82 | 38.25 / 38.25, viol |
+    | 47 | (−177.1, 34.4) / (−179.5, 31.9) (3.4) | (−188.6, −20.5) / (−203.0, −6.7) (20.0) | 56.09 / 54.64 | 45.18 / 38.05, viol |
+
+    - The plan satisfies F1: its minimum over the assessed window is 54.64 cm (tick 46.55).
+    - The executed robot runs one step ahead of its plan. After the hold, the plan prices three stationary ticks before
+      the carry (a zero-length walk segment, then three one-tick segments); the body spends two, the grasp at 30 and
+      its acknowledgement at 31, and steps at 32. The walk's acknowledgement was spent at 25, before the decision. The
+      signature is TODO-77's "projection running long" (its skipped-acknowledgement bullet, fixed in the body at
+      T-B Q7); whether it is that case is not established.
+    - The human's projection is 3.4 cm off the actual human on every tick: the projected walk ends 1.7 cm short of the
+      body's last step, and the projected carry starts at step 5.914 (tick 30.9) against the body's first carry step on
+      tick 32.
+    - Crossed: the planned robot against the actual human gives 69.8, 55.2, 53.2 cm (no violation); the executed robot
+      against the projected human gives 50.2, 40.5, 48.6 cm (the violations). The robot's one-tick lead produces them.
+    - By the rule the check was run under, this is reading (c) (projected differs from actual): the difference
+      reported, no class assigned. scenario_s10_02 prior off is the same decision (a hold of 4 from 26 at the same
+      position, identical executed separations at 45 to 48); it takes the same reading.
 - **scenario_s12_02: a near-encounter after the declared window, class 5.**
   - 33.61 cm at 139, one F1 robot violation, 138 to 140.
   - The human leaves the machine at 135 and walks north-east toward shelf_2, toward the robot carrying west along the

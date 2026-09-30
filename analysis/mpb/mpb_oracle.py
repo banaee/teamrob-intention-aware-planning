@@ -16,6 +16,9 @@ leader's warrant sources when the gate clears; P4's perception facts and the fal
 tick would rest on (mpblib); and, when the gate clears, the admitted projection's identity: the leader's key and the
 planner's decomposition of its task in the tick's world (the domain's structure, as the IR test-bed uses it; not cost,
 realization or selection).
+Beside the table, for the figure only (plot_ir.py; never compared): per tick the belief and the tail probability S of
+every hypothesis of the support and the lifecycle, the IR test-bed's oracle rows as they are (the belief carries the
+output floor of the setup's robot items, held outside the support).
 
 The independence boundary (MPB-1): this process imports nothing from shared/meta_planner.py, shared/realization.py,
 shared/projection.py, shared/recognizer.py, shared/likelihood_functions.py or mesa_sim/ (RobotAgent._perceive), nor
@@ -126,6 +129,17 @@ if __name__ == "__main__":
         print(f"no table: {e}")
         sys.exit(3)
     dump(table, sys.argv[4])
+    # the figure's columns (plot_ir.py): the IR oracle's belief, S and lifecycle per tick, beside the compared table
+    rows, _, _ = ir.run(traj, alpha, theta)
+    extra = {}
+    for r in rows:
+        e = extra.setdefault(r["tick"], dict(belief={}, S={}, lifecycle=r.get("lifecycle")))
+        if r.get("key"):
+            e["belief"][r["key"]] = r["belief"]
+            if r.get("S") not in (None, ""):
+                e["S"][r["key"]] = r["S"]
+    written = json.load(open(sys.argv[4]))
+    json.dump([dict(row, **extra.get(row["tick"], {})) for row in written], open(sys.argv[4], "w"), indent=0)
     loaded = [m for m in FORBIDDEN if m in sys.modules] + [m for m in sys.modules if m.startswith("mesa_sim")]
     assert not loaded, f"the independence boundary is broken: {loaded} loaded"
     print(f"{traj['scenario']}: {len(table)} ticks; independence: none of {', '.join(FORBIDDEN)} or mesa_sim loaded")
