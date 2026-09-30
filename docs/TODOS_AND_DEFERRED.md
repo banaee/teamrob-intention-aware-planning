@@ -1310,6 +1310,8 @@ already seeds robots from `assigned_tasks`, so a dock_loading robot gets an **em
 today**: a dock_loading run has an idle robot right now, with no exception raised. Migrate
 before running dock_loading again: humans get `assigned_tasks` = their non-foreseeable
 `scheduled_tasks`; robots get `assigned_tasks=` in place of `scheduled_tasks=`.
+T-G build 1 (30 Sept 2026): the robots' tasks of scenario_s01_01 and _02 moved to `assigned_tasks`; their humans'
+assigned tasks are left to T-G's design (TODO-104); the new scenario_s01_03 states both agents' assigned tasks.
 Files: domains/dock_loading/scenarios.py
 Reference: assignment-prior session, September 2026
 
@@ -3458,6 +3460,10 @@ Files: domains/dock_loading/scenarios/scenarios_s01.py, domains/dock_loading/tas
 (`layouts/env_layout_01.json`) and setup (`setups/env_setup_01.json`)
 T-H3: the scripts were wrapped as `Script([...])` syntactically, the robots' `scheduled_tasks` too (TODO-39: they
 belong in `assigned_tasks`); the domain imports; both scenarios still fail with the same two errors.
+T-G build 1 (30 Sept 2026): the form-only repairs (the steps of `pick_up`, `place`, `scan_it` bind `?item`;
+`confirm_delivered_pallet` typed; the layout's `office_chair` typed `office_chair`) and the viewing fixture
+scenario_s01_03, which loads; both scenarios now fail at the same place, `infeasible:office_break(...)` in the
+load-time replay (its `door_is_open` guard, which no body emits), their content left to T-G's design.
 
 **TODO-107: The duplicate check on assigned tasks compares task instance keys (recorded, T-H3, 25 Sept 2026)**
 [CLOSED, T-H4: task equality is `same_task` (same schema by identity, equal goal bindings), the duplicate check and
