@@ -3745,7 +3745,7 @@ reaches it.
 Files: shared/recognizer.py (`_retired`)
 Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
 
-**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [CLOSED, provisionally (MPB part (v), 30 Sept 2026): sixteen scenarios verified; every materially distinct in-scope decision path verified, unreachable or out of coverage; provisional until Hadi reads the check of scenario_s12_01's three F1 violations]
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [CLOSED (the MPB close-out, 30 Sept 2026): sixteen scenarios verified; every materially distinct in-scope decision path verified, unreachable with a derivation, or out of coverage with a reason; objection 1 read as class 2 (a) and corrected]
 REWRITTEN (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"): the earlier track
 note and its X amendment are superseded by the entry; their content is in it.
 The recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
@@ -4025,6 +4025,12 @@ A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB
   not inferred from the outcome.
 - Prerequisites: TODO-137 built; TODO-135's scenario authored; the evaluation set authored; MPB-5's horizon applied to
   the evaluation runs (TODO-138); the track 4 decision (TODO-140), whether the evaluation needs a genuine departure.
+- The during form (the MPB close-out, 30 Sept 2026): a mid-action deviation is authored today in the absolute form
+  (`during(action, "PTnS", ...)`, a stated physical time into the action). The relative form (a fraction of the replayed
+  action, resolved at load time against the load-time replay and exported absolute) is the candidate when the evaluation
+  set is authored, so that one deviation kind lands at comparable points across instances; an authoring-method question,
+  first taken up in track 3b (TODO-145), not ruled.
+- Before the evaluation: track 3b (TODO-145), consequential activation under conflict.
 Files: analysis/ (the evaluation), domains/kitting/ (the evaluation set), mesa_sim/run_mesa.py (TODO-137's option)
 Reference: docs/assumptions.md 1.4, 4.6; design_decisions.md, "The meta-planner test-bed (MPB)", F1; TODO-47,
 TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
@@ -4037,6 +4043,37 @@ TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
 4. T-D's blocked fixture uses a stay that ends (TODO-80; the scenario-authoring convention).
 5. At the recognizer pass (T-D Q2 to Q4): raise TODO-95 (stationarity channel) and rule whether it joins the pass or
    stays recorded for T-H.
+
+**TODO-145: Track 3b: consequential activation under conflict (not ruled) (recorded, the MPB close-out, 30 Sept 2026)** [OPEN; after the MPB, before T-F]
+Framing recorded at the close of the meta-planner test-bed; nothing here is ruled.
+- Purpose. The MPB established structural branch reachability and execution of the recognition-to-planning chain, not
+  consequential activation of those branches under human-robot interaction conflict. Track 3b shows that when a recognized
+  deviation produces a projection that changes a planner quantity, the adaptive branch activates.
+- The causal chain, per cell: a human deviation; a recognition change; a changed projection; the projection intersects or
+  constrains the robot's plan; a changed realized consequence; the adaptive decision.
+- The closure criterion: one consequential instance per materially distinct adaptive branch:
+  - B2 continue with a hold;
+  - a B3 switch;
+  - a hold with no alternative;
+  - re-selection after a retraction.
+  The deviation kind is chosen as the mechanism that produces the conflict, not crossed exhaustively with the branches.
+- "Conflict" is defined by the planner's own quantities, not by proximity: a separation constraint, a hold cost, an
+  occupied target, a changed completion, an alternative's cost, a plan that cannot execute.
+- Environments: a minimal isolated room per cell, with a separated twin as the control. The twin has the same deviation
+  and recognition chain with the consequence removed (delta = 0), so the activation is attributable to the conflict.
+  MPB-2's layout-and-setup rule and MPB-4's disagreement classes (with its three readings of class 2 and the loop) carry
+  over.
+- The instrument: the MPB's, reused. Parts 1 to 3 exact; the adaptation as the declared property; F1's classes measured;
+  the separation stop off. The saved segments (projected human, planned robot, per admitted decision) keep the invariant
+  checkable read-only.
+- Authoring method, a question inside 3b: the relative during form (a fraction of the replayed action, resolved at load
+  time, exported absolute; TODO-144's during line).
+- Prerequisites: the MPB closed, and the invariant fixed (the trajectory realize() assesses is the one executed; the
+  class-2 correction, 30 Sept 2026). Both met at this session's close.
+- Placed before T-F. Reason: an environment that gives IR nothing to influence makes IR look irrelevant; the evaluation's
+  numbers are attributable only where the consequence under conflict has been shown to activate.
+Files: domains/kitting/ (the rooms, setups and scenarios), analysis/ (the instrument, reused from analysis/mpb/)
+Reference: design_decisions.md, "The meta-planner test-bed (MPB)" (CLOSED; MPB-2, MPB-4); TODO-130, TODO-144
 
 **TODO-146: The human projection's stationary accounting and rounding: should it resume from the recognized phase? (recorded, the MPB class-2 finding, 30 Sept 2026)** [OPEN; a P-side residual, out of scope of the class-2 correction]
 The robot's projection now starts from what its body reports (ExecutorState.owed_completion_ticks, action_in_flight);

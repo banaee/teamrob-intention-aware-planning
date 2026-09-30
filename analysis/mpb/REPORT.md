@@ -17,6 +17,11 @@ cost realized, separation stop off.
   on; every declared part-4 property holds under single_task. With them every materially distinct in-scope decision
   path of `coverage.md` is verified, unreachable with a recorded derivation, or outside the claimed mechanism with a
   recorded reason: **the MPB is closed.**
+- **Final, at the close-out (30 September 2026):** after the class-2 correction (the section of that name), all sixteen
+  are re-verified. Zero disagreements on parts 1 to 3 in all 32 prior-on runs; every declared part-4 property holds
+  under single_task; the three F1 violations of objection 1 are gone. The md5s below are the final runs. The MPB
+  establishes structural branch reachability and execution of the recognition-to-planning chain, not consequential
+  activation under human-robot interaction conflict: that is track 3b (TODO-145), before T-F.
 
 ## Results
 

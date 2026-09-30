@@ -5535,7 +5535,7 @@ TODO-142). AD3 is not exercisable in the MPB set (the AD3 line in "T-D G"). TODO
 TODO-132 (a) evidence (scenario 7, single_task): the stand's holds double, 4, 8, 16, 32, and the last runs 30 ticks past
 the stay.
 
-The primary set's run logs (prior on, single_task; every run's md5 in analysis/mpb/REPORT.md):
+The primary set's run logs at part (iv) (prior on, single_task; SUPERSEDED by the final list under CLOSED, below):
 9a35a1b15f37d877e865c301494d604c scenario_s10_01, 261221bbaaf4639801652a2b8003b69e scenario_s10_02,
 a9901a7af59ad78a65afc3179434a2e9 scenario_s10_03, 751eedb2c3ad3dbdeccf2b6abbdb3151 scenario_s10_04,
 bacc21befccd638cfcd0f1101f805443 scenario_s10_05, 65a9facce7cdd1621a081aa1f7980890 scenario_s10_06,
@@ -5607,9 +5607,27 @@ Hadi then read it as class 2, reading (a), and it was corrected (MPB-4's class-2
 walks toward the robot on moving fallbacks of k = 1 and 3 (P4's recorded error; X3; TODO-135). The alteration test on
 the sixteen: every rule detected except the skip rule (B2), as before. The eleven verified scenarios rerun byte-identical
 (68 of 68 logs and streams); the suite 211 passed; the four maintained sets 96 of 96 byte-identical.
-CLOSED (30 September 2026; PROVISIONAL: the check was read as class 2, reading (a), and corrected the same day (MPB-4's
-class-2 record); the close-out pending): every
-materially distinct in-scope decision path is verified (36), unreachable with a
-recorded derivation (5), or outside the claimed mechanism with a recorded reason (4 out of coverage; P3 reachable and not
-claimed; one not a distinct path). The NOT CLOSED paragraph above is superseded. Next, as Hadi rules: the evaluation
-(T-F, framed in TODO-144) or track 4 (TODO-140).
+CLOSED (the close-out, Hadi, 30 September 2026; no longer provisional: objection 1 was read as class 2, reading (a),
+and corrected the same day, MPB-4's class-2 record). THE CLOSURE CRITERION: every materially distinct in-scope decision
+path is verified, unreachable with a recorded derivation, or outside the claimed mechanism with a recorded reason. Met:
+36 verified, 5 unreachable with a derivation, 4 out of coverage with a reason, P3 reachable and not claimed, one not a
+distinct path (analysis/mpb/coverage.md). The NOT CLOSED paragraph above is superseded.
+WHAT THE MPB ESTABLISHES. The MPB establishes structural branch reachability and execution of the recognition-to-planning
+chain, not consequential activation of those branches under human-robot interaction conflict. The progression: track 1,
+recognition (the IR test-bed); track 2, semantics (T-D R, E, L, P, G, X); track 3, reachability (this test-bed); track
+3b, consequence under conflict (TODO-145); T-F, benefit (TODO-144).
+FINAL NUMBERS (after the class-2 correction; analysis/mpb/REPORT.md): sixteen scenarios (scenario_s10_01 to _11,
+scenario_s11_01 to _03, scenario_s12_01, _02) on env_layout_12, _13 and _14 with env_setup_10, _11 and _12; zero
+disagreements on parts 1 to 3 in all 32 prior-on runs (both strategies), against the in-process run and the log; every
+declared part-4 property holds under single_task; the alteration test detects every rule except the skip rule (B2,
+TODO-142); the suite 220 passed; the four maintained sets regenerated at the correction (their "class-2 correction"
+sections). The primary set's run logs (prior on, single_task; every run's md5 in analysis/mpb/REPORT.md):
+ad1a4020ff0da1eb5d4dbfcafe60361e scenario_s10_01, ed061081de759217002890ab9ba36c5e scenario_s10_02,
+0ac37ed728ba00ccfa741a444da20206 scenario_s10_03, a46a710d3cf5115481c6563179432a7c scenario_s10_04,
+9f2cf65204ed963e1fcd030cff3d95a5 scenario_s10_05, f15ebb8578b481f7365cc78fc819394d scenario_s10_06,
+f58c4f4a9f50a495b5e5081869f4a83c scenario_s10_07, b10ca58e31510b196d1ca86344049c6d scenario_s10_08,
+eaa8e01774b9e925254c2fcbb96027b6 scenario_s10_09, f3299d52a633692e539ad0f0c9310f53 scenario_s10_10,
+f7f275edfcc056ca12dd9ce67554675b scenario_s10_11, 9b673e2bf65bd1d41cb1fa7e92215173 scenario_s11_01,
+580ae9fd3ae2455d251086223a6c5867 scenario_s11_02, 31d5f0f5e16cdd71e301cf77182aa311 scenario_s11_03,
+e1e9a758799a488b3bf022fe8c8b92ae scenario_s12_01, 93053e69c0d69ae637fb82b0c9399eb2 scenario_s12_02.
+Next, as Hadi rules: track 3b (TODO-145) before the evaluation (T-F, TODO-144), or track 4 (TODO-140).

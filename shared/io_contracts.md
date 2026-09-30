@@ -408,7 +408,23 @@ class ExecutorState:
     agent_id: str
     current_task: Optional[TaskInstance]
     holding: Optional[str]                 # item_id or None
+    action_in_flight: Optional[GroundedAction] = None   # the first action of the plan in hand whose
+                                           # microactions the body will still run (a completed action
+                                           # awaiting its acknowledgement is past it); None when none
+    owed_completion_ticks: int = 0         # the completion ticks the body will spend, standing where it
+                                           # is and executing nothing, before its next action's first
+                                           # microaction and before any hold, whatever the decision
 ```
+
+The last two fields are the body's report of what it will execute from this tick (the MPB class-2 correction, 30
+September 2026; design_decisions.md, "Realization as built", the dated correction). The executor reports; it decides
+nothing. The meta-planner passes them to `Projector.project()` for the robot's candidates only: `lead_in` =
+`owed_completion_ticks` for every candidate (a stationary segment at the robot's position before the entry's first
+action), `resume_from` = `action_in_flight` for an ordering headed by the task being continued (the actions before it
+dropped when the fresh decomposition contains it, by `GroundedAction` equality, the executor's own test in
+`continue_plan`). The invariant they serve: the trajectory `realize()` assesses is the trajectory the robot executes from
+the decision tick onward. The embodiment spends the owed ticks before a decided hold, which then runs at the decision
+position as before.
 
 **`TriggerDecision`** / **`UpdateResult`** — typed returns for `MetaPlanner`'s two public
 methods (§2.2), replacing an earlier dict-shaped draft inherited from `replanning.py`'s

@@ -96,7 +96,9 @@ were rerun with them, every log and `.rec` stream byte-identical to REPORT.md's 
   robot).
   - The winner's realized plan is taken by a pass-through wrapper around `shared.meta_planner.realize`: of the plans
     realized on the decision's tick, the least-cost one headed by the winner.
-  - With these a check of projected against actual, and planned against executed, is read-only.
+  - With these a check of projected against actual, and planned against executed, is read-only. The class-2
+    correction's re-check of scenario_s12_01 at 45 to 47 was read this way (REPORT.md, "The class-2 correction"), and
+    track 3b reuses it (TODO-145).
 
 ## What the oracle derives, with its sources
 

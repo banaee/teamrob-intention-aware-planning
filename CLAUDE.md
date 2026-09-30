@@ -201,7 +201,7 @@ Decisions
   Track 3, the meta-planner test-bed (MPB), is ruled (29 Sept 2026; design_decisions.md, "The meta-planner test-bed
   (MPB)", MPB-1 to MPB-6), records only: eight scenarios on env_layout_12, an oracle for the trigger and cause, the
   gate and the projection (per-tick tables pre-run, the chain assembled with the run's `no_current_task` ticks), part 4
-  as declared properties; prior off a diagnostic appendix. MPB step 2 is built (29 to 30 Sept 2026; parts (i) to (v);
+  as declared properties; prior off a diagnostic appendix. MPB step 2 is built and the MPB closed (29 to 30 Sept 2026; parts (i) to (v);
   `analysis/mpb/`, REPORT.md; env_layout_12, env_setup_10/11, scenario_s10_01 to _09 and s11_01, _02, `configs/mpb/`):
   - all eleven scenarios verified: zero disagreements on parts 1 to 3 under both strategies, prior on; every declared
     part-4 property holds under single_task;
@@ -212,11 +212,21 @@ Decisions
   kinds of cell). Part (v) built its five reachable claimed cells, one authored instance each, all verified (30 Sept
   2026; env_layout_13, env_layout_14, env_setup_12, scenario_s12_01, _02, s11_03, s10_10, _11): the switch against an
   admitted projection, the hold against an admitted standing segment, the switch while carrying, a record kept through
-  a dip below θ, the cause boundary. The MPB is CLOSED, provisionally until Hadi reads the check of scenario_s12_01's
-  three F1 violations under full_reorder (`analysis/mpb/REPORT.md`, part (v): reading (c)): every materially distinct
-  in-scope decision path is verified,
-  unreachable with a recorded derivation, or outside the claimed mechanism with a recorded reason. Next, as Hadi rules:
-  the evaluation, T-F (framed in TODO-144), or track 4.
+  a dip below θ, the cause boundary. A class-2 finding, reading (a), was corrected (30 Sept 2026; MPB-4's class-2
+  record; design_decisions.md, "Realization as built", the dated correction): the invariant is that the trajectory
+  realize() assesses is the trajectory the robot executes from the decision tick onward. The body reports
+  `ExecutorState.owed_completion_ticks` and `action_in_flight`; every robot candidate's projection states the owed ticks
+  first (`Projector.project`, `lead_in`) and the continued task is projected from the action in flight (`resume_from`);
+  owed ticks run before a hold (T-B Q7's "the hold carries the tick" superseded in part). Tests:
+  `tests/test_executed_is_assessed.py`. The four maintained sets were regenerated ("class-2 correction" sections; one hold
+  moved, scenario_s02_01 prior on). The human side's counterpart is TODO-146, recorded only.
+  The MPB is CLOSED (the close-out, 30 Sept 2026): every materially distinct in-scope decision path is verified,
+  unreachable with a recorded derivation, or outside the claimed mechanism with a recorded reason. It establishes
+  structural branch reachability and execution of the recognition-to-planning chain, not consequential activation under
+  human-robot interaction conflict. The progression: track 1 recognition, track 2 semantics, track 3 reachability, track
+  3b consequence under conflict (TODO-145, not ruled), T-F benefit (TODO-144). The MPB instrument saves the belief and S
+  per tick and the projected human and planned robot segments per admitted decision, and draws `figure_ir.png` beside
+  `figure.png`. Next, as Hadi rules: track 3b before the evaluation, or track 4.
   Not to be
   started unasked: the rest of T-D, T-E to T-G, i.e. the demonstration, Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), 4D (detour strategy) and Phase 6
