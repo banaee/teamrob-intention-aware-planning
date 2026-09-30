@@ -319,7 +319,7 @@ Single_task, prior on; every tick equals the oracle's.
   - The switch is a single_task property by the authored parameter: the difference is set between the two tasks, not
     between the two orderings.
 - **scenario_s12_01 under full_reorder: three F1 robot violations inside the admission's assessed window.** Checked
-  (below); the reading is Hadi's, and until he reads it the MPB's CLOSED record is provisional.
+  (below). CLASS 2, READING (a) (Hadi, 30 September 2026), corrected: the section "The class-2 correction".
   - The decision of 26 keeps item_7 with a hold of 4 (its window 27 to 63). The robot passes the crossing at 45 to 47
     within 50 cm of the human's carry, 38.05 cm at its closest.
   - The same pattern as scenario_s10_02 prior off in part (iii) (the admission at 26, hold 4, three violations). The
@@ -387,6 +387,60 @@ Prior off, scenario_s12_01's admission falls at 27, after item_7's grasp at 26, 
 - **The four maintained sweeps:** 96 of 96 logs and `.rec` streams byte-identical to their G-build baselines.
 - No file under `shared/`, `mesa_sim/`, `world/` or the run loop changed.
 
+## The class-2 correction (30 September 2026)
+
+Objection 1 of part (v) (scenario_s12_01, full_reorder: three F1 robot violations inside the admission's window) is
+**class 2, reading (a)** (Hadi, 30 September 2026): the implementation departs from the ruling. The invariant: the
+trajectory realize() assesses is the trajectory the robot executes from the decision tick onward. The evidence was the
+cross-pairing (part (v), "Classified"): the plan kept 54.64 cm, the executed robot ran one step ahead of it.
+
+**The family, measured before the fix on the saved segments** (the lag of the executed robot against its plan at its
+first executed move after each admitted decision, the 32 prior-on runs):
+
+| state at the decision | lag | decisions |
+|---|---|---|
+| (a) after a walk's acknowledgement, the next (stationary) action not begun | +1 (the plan one tick long: it re-priced the completed walk and its acknowledgement) | s12_01 full_reorder 26 |
+| (b) on a pick_up's acknowledgement tick | −1 (an owed acknowledgement no plan stated) | s10_01 full_reorder 126, s10_06 14, s10_11 full_reorder 7 |
+| (c) on a finished task's completion tick; the tick after a release | −1; −2 | s10_10 40; s10_03 121, s10_08 full_reorder 135 |
+
+**The fix** (design_decisions.md, "Realization as built", the dated correction): the body reports its owed completion
+ticks and the action in flight (`ExecutorState`); every robot candidate's projection states the owed ticks first, and
+the continued task is projected from the action in flight; the executor spends owed ticks before a hold. Tests:
+`tests/test_executed_is_assessed.py`.
+
+**Re-verification of the sixteen** (rerun under all three variants):
+- Parts 1 to 3: zero disagreements in all 32 prior-on comparisons. The expected per-tick tables are unchanged. One chain
+  moved with the robot's own `no_current_task` ticks: scenario_s12_01 full_reorder, where the robot now finishes at
+  67, whose decision is `no_current_task` masking the expiry that fired there before.
+- Part 4: every declared property holds under single_task, as before. P12.1b: item_7's hold at the admission is 5
+  (was 4), above the 2.499-tick difference. The known exceptions stand: P3a under full_reorder, P12.1a under
+  full_reorder and prior off.
+- Positions moved in two runs only:
+  - scenario_s12_01 full_reorder: holds 4 → 5 at 26 and 7 → 6 at 76; F1 3/0/1 → 0/0/0; the `[sep]` minimum
+    38.05 → 52.20 cm; completion 135 as before.
+  - scenario_s10_02 prior off (appendix): hold 4 → 5 at 26; F1 3/0/1 → 0/0/0; the `[sep]` minimum 38.05 → 52.20 cm;
+    completion 65 → 66; P2b now holds.
+- In four runs only labels moved: scenario_s10_02 under both strategies, scenario_s11_02 prior off, scenario_s12_01
+  prior off. The owed acknowledgement is now spent before the hold, so two ticks swap their microaction label; every
+  position is the same. In scenario_s12_01 prior off the holds read 5 instead of 6: one owed tick plus 5, the same six
+  standing ticks.
+- The `.rec` streams are byte-identical in all 48; every `[IR*]` line prior on is byte-identical.
+
+**The cross-pairing re-checked** (scenario_s12_01 full_reorder, read from the saved segments; step s = end of world tick
+25 + s):
+
+| tick | projected human / actual human (gap) | planned robot / executed robot (gap) | planned separation | executed separation, end / min |
+|---|---|---|---|---|
+| 45 | (−204.8, 5.5) / (−207.1, 3.0) (3.4) | (−159.7, −48.1) / (−159.7, −48.1) (0.0) | 70.07 | 69.78 / 69.78 |
+| 46 | (−191.0, 20.0) / (−193.3, 17.5) (3.4) | (−174.1, −34.3) / (−174.1, −34.3) (0.0) | 56.82 | 55.23 / 55.23 |
+| 47 | (−177.1, 34.4) / (−179.5, 31.9) (3.4) | (−188.6, −20.5) / (−188.6, −20.5) (0.0) | 56.09 | 53.19 / 52.20 |
+
+The planned and the executed robot are equal from 26 to the end of the first walk. The 3.4 cm is the P-side residual
+(design_decisions.md, the class-2 record; TODO-146), not the cause.
+
+**scenario_s10_02 prior off, re-read.** It was the same decision (a hold of 4 from 26 at the same position). It now
+holds 5, the executed robot keeps 52.20 cm, and there are no violations.
+
 ## The independence boundary, demonstrated
 
 - The oracle's process imports `shared.types`, `shared.knowledge`, `shared.planner`, `domains.kitting.registry` and
@@ -403,100 +457,100 @@ Prior off, scenario_s12_01's admission falls at 27, after item_7's grasp at 26, 
 - The four maintained sweeps: 96 of 96 logs and `.rec` streams byte-identical to their G-build md5s.
 - No file under `shared/`, `mesa_sim/`, `world/` or the run loop changed.
 
-## Runs (git-ignored; md5s)
+## Runs (git-ignored; md5s; regenerated at the class-2 correction, 30 September 2026)
 
 ```
-68a56309456062f61ca91be9fc9b3e59  runs/env_layout_12_scenario_s10_01_off_single_task.log
-2bcc18b57ef8bc2dd27581a67486122d  runs/env_layout_12_scenario_s10_01_on_full_reorder.log
-9a35a1b15f37d877e865c301494d604c  runs/env_layout_12_scenario_s10_01_on_single_task.log
-84243392243cb881655ec701edabb89a  runs/env_layout_12_scenario_s10_02_off_single_task.log
-fbc98aba4a96f85e6dbd501175fb0651  runs/env_layout_12_scenario_s10_02_on_full_reorder.log
-261221bbaaf4639801652a2b8003b69e  runs/env_layout_12_scenario_s10_02_on_single_task.log
-8c685e811d98e7faf11937804ca3d03c  runs/env_layout_12_scenario_s10_03_off_single_task.log
+ff405ae96bb70aa1901043a79b47ac47  runs/env_layout_12_scenario_s10_01_off_single_task.log
+8451bf1f7048ec68b33375c2cc99cb15  runs/env_layout_12_scenario_s10_01_off_single_task.rec
+3c1e7bc66dd09ab3aa8228a0f93cbf0d  runs/env_layout_12_scenario_s10_01_on_full_reorder.log
+8451bf1f7048ec68b33375c2cc99cb15  runs/env_layout_12_scenario_s10_01_on_full_reorder.rec
+ad1a4020ff0da1eb5d4dbfcafe60361e  runs/env_layout_12_scenario_s10_01_on_single_task.log
+8451bf1f7048ec68b33375c2cc99cb15  runs/env_layout_12_scenario_s10_01_on_single_task.rec
+815dee9bd3b3ecfe86a4c7b56139839b  runs/env_layout_12_scenario_s10_02_off_single_task.log
+321732473c562c43b06ae158ca81cdef  runs/env_layout_12_scenario_s10_02_off_single_task.rec
+a0a6bff6d1a3f73149eab2b80859940b  runs/env_layout_12_scenario_s10_02_on_full_reorder.log
+321732473c562c43b06ae158ca81cdef  runs/env_layout_12_scenario_s10_02_on_full_reorder.rec
+ed061081de759217002890ab9ba36c5e  runs/env_layout_12_scenario_s10_02_on_single_task.log
+321732473c562c43b06ae158ca81cdef  runs/env_layout_12_scenario_s10_02_on_single_task.rec
+497ea01b58f671b2fa1d852ea31d877d  runs/env_layout_12_scenario_s10_03_off_single_task.log
+7fa9d641f1a0df5af13e70ec188ad19e  runs/env_layout_12_scenario_s10_03_off_single_task.rec
 a02bdb459fcb2d8b74898ab5ca90145a  runs/env_layout_12_scenario_s10_03_on_full_reorder.log
-a9901a7af59ad78a65afc3179434a2e9  runs/env_layout_12_scenario_s10_03_on_single_task.log
-5a3d61aefb5633013b05344313579b15  runs/env_layout_12_scenario_s10_04_off_single_task.log
-74664de5ab8f8052bf494fb70af71328  runs/env_layout_12_scenario_s10_04_on_full_reorder.log
-751eedb2c3ad3dbdeccf2b6abbdb3151  runs/env_layout_12_scenario_s10_04_on_single_task.log
-477d1112d57bae236a295694383c2260  runs/env_layout_12_scenario_s10_05_off_single_task.log
-fa1c28edcdda9ba7356d243787a3dfbd  runs/env_layout_12_scenario_s10_05_on_full_reorder.log
-bacc21befccd638cfcd0f1101f805443  runs/env_layout_12_scenario_s10_05_on_single_task.log
-fbf5a0c149c8fb5cf5abb3f1b5adc95c  runs/env_layout_12_scenario_s10_06_off_single_task.log
-ac6e817d61791c9fd4b1d690983d26d4  runs/env_layout_12_scenario_s10_06_on_full_reorder.log
-65a9facce7cdd1621a081aa1f7980890  runs/env_layout_12_scenario_s10_06_on_single_task.log
+7fa9d641f1a0df5af13e70ec188ad19e  runs/env_layout_12_scenario_s10_03_on_full_reorder.rec
+0ac37ed728ba00ccfa741a444da20206  runs/env_layout_12_scenario_s10_03_on_single_task.log
+7fa9d641f1a0df5af13e70ec188ad19e  runs/env_layout_12_scenario_s10_03_on_single_task.rec
+2d9aeecce69f7a802ece0c16c2edcfdc  runs/env_layout_12_scenario_s10_04_off_single_task.log
+88dcf2598e25a94807b1e1f981218bff  runs/env_layout_12_scenario_s10_04_off_single_task.rec
+e4a8db77bdad1a6dd1f5aeaabdb39b12  runs/env_layout_12_scenario_s10_04_on_full_reorder.log
+88dcf2598e25a94807b1e1f981218bff  runs/env_layout_12_scenario_s10_04_on_full_reorder.rec
+a46a710d3cf5115481c6563179432a7c  runs/env_layout_12_scenario_s10_04_on_single_task.log
+88dcf2598e25a94807b1e1f981218bff  runs/env_layout_12_scenario_s10_04_on_single_task.rec
+ebea0cee5f87cc13d80e401c0c701817  runs/env_layout_12_scenario_s10_05_off_single_task.log
+c0b3c52826984a71c0637d8dfc8eba55  runs/env_layout_12_scenario_s10_05_off_single_task.rec
+6f3ad07dc6ce2b3a57737b62f0b5c68d  runs/env_layout_12_scenario_s10_05_on_full_reorder.log
+c0b3c52826984a71c0637d8dfc8eba55  runs/env_layout_12_scenario_s10_05_on_full_reorder.rec
+9f2cf65204ed963e1fcd030cff3d95a5  runs/env_layout_12_scenario_s10_05_on_single_task.log
+c0b3c52826984a71c0637d8dfc8eba55  runs/env_layout_12_scenario_s10_05_on_single_task.rec
+ca2af7c25ac931caa1c9bc17819d2dfb  runs/env_layout_12_scenario_s10_06_off_single_task.log
+4bdc76ccc6f1ee3244e89c5458b19ffe  runs/env_layout_12_scenario_s10_06_off_single_task.rec
+2acb8b5d303077c62210044a57aafd62  runs/env_layout_12_scenario_s10_06_on_full_reorder.log
+4bdc76ccc6f1ee3244e89c5458b19ffe  runs/env_layout_12_scenario_s10_06_on_full_reorder.rec
+f15ebb8578b481f7365cc78fc819394d  runs/env_layout_12_scenario_s10_06_on_single_task.log
+4bdc76ccc6f1ee3244e89c5458b19ffe  runs/env_layout_12_scenario_s10_06_on_single_task.rec
 cd1e26dd376f01c48781e6cbeaafc612  runs/env_layout_12_scenario_s10_06_reference_full_reorder.log
 a0df65782d76940a31cd5196a86f42f2  runs/env_layout_12_scenario_s10_06_reference_single_task.log
-a0d489c9b0297049fcce7949bab37539  runs/env_layout_12_scenario_s10_07_off_single_task.log
-0c75ad1e19299a1a72e315d5ac8395c8  runs/env_layout_12_scenario_s10_07_on_full_reorder.log
-86a511f42b9eb6756cdcd6fb6e8d65fe  runs/env_layout_12_scenario_s10_07_on_single_task.log
-9129312726660b5c5098d3122e447558  runs/env_layout_12_scenario_s10_08_off_single_task.log
-af2c63635463036b61ccb2f03e81b675  runs/env_layout_12_scenario_s10_08_on_full_reorder.log
-3edb658f33a62c60ecb8296c14b9c8c4  runs/env_layout_12_scenario_s10_08_on_single_task.log
-4edb550f5d765a309eca536d5f501701  runs/env_layout_12_scenario_s10_09_off_single_task.log
-08923e70b14546325cc4fa3007d14efa  runs/env_layout_12_scenario_s10_09_on_full_reorder.log
-5728f8b4f018b256af74c47aa3de9744  runs/env_layout_12_scenario_s10_09_on_single_task.log
-452622fae327fa490c1c6994a933df8e  runs/env_layout_12_scenario_s11_01_off_single_task.log
-9d29f212dbd1ff55bc104fd3b2a36776  runs/env_layout_12_scenario_s11_01_on_full_reorder.log
-60987425011281575480cc73a7c093ab  runs/env_layout_12_scenario_s11_01_on_single_task.log
-af0d765662155e91d28ce4e5fee043af  runs/env_layout_12_scenario_s11_02_off_single_task.log
-7ac2195a7811d1f4efca3021481b6fa8  runs/env_layout_12_scenario_s11_02_on_full_reorder.log
-580ae9fd3ae2455d251086223a6c5867  runs/env_layout_12_scenario_s11_02_on_single_task.log
-8451bf1f7048ec68b33375c2cc99cb15  runs/env_layout_12_scenario_s10_01_off_single_task.rec
-8451bf1f7048ec68b33375c2cc99cb15  runs/env_layout_12_scenario_s10_01_on_full_reorder.rec
-8451bf1f7048ec68b33375c2cc99cb15  runs/env_layout_12_scenario_s10_01_on_single_task.rec
-321732473c562c43b06ae158ca81cdef  runs/env_layout_12_scenario_s10_02_off_single_task.rec
-321732473c562c43b06ae158ca81cdef  runs/env_layout_12_scenario_s10_02_on_full_reorder.rec
-321732473c562c43b06ae158ca81cdef  runs/env_layout_12_scenario_s10_02_on_single_task.rec
-7fa9d641f1a0df5af13e70ec188ad19e  runs/env_layout_12_scenario_s10_03_off_single_task.rec
-7fa9d641f1a0df5af13e70ec188ad19e  runs/env_layout_12_scenario_s10_03_on_full_reorder.rec
-7fa9d641f1a0df5af13e70ec188ad19e  runs/env_layout_12_scenario_s10_03_on_single_task.rec
-88dcf2598e25a94807b1e1f981218bff  runs/env_layout_12_scenario_s10_04_off_single_task.rec
-88dcf2598e25a94807b1e1f981218bff  runs/env_layout_12_scenario_s10_04_on_full_reorder.rec
-88dcf2598e25a94807b1e1f981218bff  runs/env_layout_12_scenario_s10_04_on_single_task.rec
-c0b3c52826984a71c0637d8dfc8eba55  runs/env_layout_12_scenario_s10_05_off_single_task.rec
-c0b3c52826984a71c0637d8dfc8eba55  runs/env_layout_12_scenario_s10_05_on_full_reorder.rec
-c0b3c52826984a71c0637d8dfc8eba55  runs/env_layout_12_scenario_s10_05_on_single_task.rec
-4bdc76ccc6f1ee3244e89c5458b19ffe  runs/env_layout_12_scenario_s10_06_off_single_task.rec
-4bdc76ccc6f1ee3244e89c5458b19ffe  runs/env_layout_12_scenario_s10_06_on_full_reorder.rec
-4bdc76ccc6f1ee3244e89c5458b19ffe  runs/env_layout_12_scenario_s10_06_on_single_task.rec
+de58991297afb977b519fc4f959126f6  runs/env_layout_12_scenario_s10_07_off_single_task.log
 9f6bde960f345934b2423236f91fa158  runs/env_layout_12_scenario_s10_07_off_single_task.rec
+b215a8ee1c1ce094e202f4cb3f423756  runs/env_layout_12_scenario_s10_07_on_full_reorder.log
 9f6bde960f345934b2423236f91fa158  runs/env_layout_12_scenario_s10_07_on_full_reorder.rec
+f58c4f4a9f50a495b5e5081869f4a83c  runs/env_layout_12_scenario_s10_07_on_single_task.log
 9f6bde960f345934b2423236f91fa158  runs/env_layout_12_scenario_s10_07_on_single_task.rec
+d4a3b4be4561ceb8a8be9873f704c008  runs/env_layout_12_scenario_s10_08_off_single_task.log
 33ee73bcf6ffefa2c81b3607397ac879  runs/env_layout_12_scenario_s10_08_off_single_task.rec
+eb174a09d163194f0b5718290324d6f3  runs/env_layout_12_scenario_s10_08_on_full_reorder.log
 33ee73bcf6ffefa2c81b3607397ac879  runs/env_layout_12_scenario_s10_08_on_full_reorder.rec
+b10ca58e31510b196d1ca86344049c6d  runs/env_layout_12_scenario_s10_08_on_single_task.log
 33ee73bcf6ffefa2c81b3607397ac879  runs/env_layout_12_scenario_s10_08_on_single_task.rec
+218b626cabc466897983913d603bdf18  runs/env_layout_12_scenario_s10_09_off_single_task.log
 ebcb27b9f5dbf9cfcfa67e4b25a2ba3a  runs/env_layout_12_scenario_s10_09_off_single_task.rec
+16a99356fc133a3b9b7590e898877ee4  runs/env_layout_12_scenario_s10_09_on_full_reorder.log
 ebcb27b9f5dbf9cfcfa67e4b25a2ba3a  runs/env_layout_12_scenario_s10_09_on_full_reorder.rec
+eaa8e01774b9e925254c2fcbb96027b6  runs/env_layout_12_scenario_s10_09_on_single_task.log
 ebcb27b9f5dbf9cfcfa67e4b25a2ba3a  runs/env_layout_12_scenario_s10_09_on_single_task.rec
-2b20839311f61f384b627483ddebc626  runs/env_layout_12_scenario_s11_01_off_single_task.rec
-2b20839311f61f384b627483ddebc626  runs/env_layout_12_scenario_s11_01_on_full_reorder.rec
-2b20839311f61f384b627483ddebc626  runs/env_layout_12_scenario_s11_01_on_single_task.rec
-86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_off_single_task.rec
-86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_on_full_reorder.rec
-86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_on_single_task.rec
-ce379bcdb3df12bf3c8fd756ff127923  runs/env_layout_12_scenario_s10_10_off_single_task.log
+fd71f715d2ee6331a4024c1c40a192d4  runs/env_layout_12_scenario_s10_10_off_single_task.log
 4251537079b3d12ed72aa11e6771f5e0  runs/env_layout_12_scenario_s10_10_off_single_task.rec
-31fa7baa5f3577440e8a1f0f7f7e3f70  runs/env_layout_12_scenario_s10_10_on_full_reorder.log
+2894aa687e2128bdcb3340d9ef53d766  runs/env_layout_12_scenario_s10_10_on_full_reorder.log
 4251537079b3d12ed72aa11e6771f5e0  runs/env_layout_12_scenario_s10_10_on_full_reorder.rec
-283af6c38bff7488a464c3f8db05276c  runs/env_layout_12_scenario_s10_10_on_single_task.log
+f3299d52a633692e539ad0f0c9310f53  runs/env_layout_12_scenario_s10_10_on_single_task.log
 4251537079b3d12ed72aa11e6771f5e0  runs/env_layout_12_scenario_s10_10_on_single_task.rec
+d78bb83dee4865e37a0ed6fde6f8a3e2  runs/env_layout_12_scenario_s11_01_off_single_task.log
+2b20839311f61f384b627483ddebc626  runs/env_layout_12_scenario_s11_01_off_single_task.rec
+51b4ab69237ff81e38bcbb87931365f4  runs/env_layout_12_scenario_s11_01_on_full_reorder.log
+2b20839311f61f384b627483ddebc626  runs/env_layout_12_scenario_s11_01_on_full_reorder.rec
+9b673e2bf65bd1d41cb1fa7e92215173  runs/env_layout_12_scenario_s11_01_on_single_task.log
+2b20839311f61f384b627483ddebc626  runs/env_layout_12_scenario_s11_01_on_single_task.rec
+54e265873e49cc50466876788fa419f3  runs/env_layout_12_scenario_s11_02_off_single_task.log
+86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_off_single_task.rec
+7e78211cb8ab6073fc34030b32482be7  runs/env_layout_12_scenario_s11_02_on_full_reorder.log
+86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_on_full_reorder.rec
+580ae9fd3ae2455d251086223a6c5867  runs/env_layout_12_scenario_s11_02_on_single_task.log
+86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_on_single_task.rec
 2a9c8daf7b192827db7d81b335ebd2ea  runs/env_layout_12_scenario_s11_03_off_single_task.log
 bd84a77d4d232d4657b782614615bccb  runs/env_layout_12_scenario_s11_03_off_single_task.rec
 a2001d12159a70510cdea9ca483d5751  runs/env_layout_12_scenario_s11_03_on_full_reorder.log
 bd84a77d4d232d4657b782614615bccb  runs/env_layout_12_scenario_s11_03_on_full_reorder.rec
 31d5f0f5e16cdd71e301cf77182aa311  runs/env_layout_12_scenario_s11_03_on_single_task.log
 bd84a77d4d232d4657b782614615bccb  runs/env_layout_12_scenario_s11_03_on_single_task.rec
-d2e2516beaf54f201c9885fb7aa3cff4  runs/env_layout_13_scenario_s10_11_off_single_task.log
+fde498fd3ab38f150e275a71cd9ef5d6  runs/env_layout_13_scenario_s10_11_off_single_task.log
 955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_off_single_task.rec
-ca933a31e0837767b26292b211761404  runs/env_layout_13_scenario_s10_11_on_full_reorder.log
+d0e3bad1b2ef8c48a3885b5db8216317  runs/env_layout_13_scenario_s10_11_on_full_reorder.log
 955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_on_full_reorder.rec
-fe33adbd5e80d5843936d2d9cc41b0d0  runs/env_layout_13_scenario_s10_11_on_single_task.log
+f7f275edfcc056ca12dd9ce67554675b  runs/env_layout_13_scenario_s10_11_on_single_task.log
 955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_on_single_task.rec
-b68584016cc33ade9e4eb5cef1bda9b3  runs/env_layout_14_scenario_s12_01_off_single_task.log
+f8eb27408542ff7acd555591de45eca5  runs/env_layout_14_scenario_s12_01_off_single_task.log
 fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_off_single_task.rec
-5ef49e642a282dab817eeb0a27ed2ab5  runs/env_layout_14_scenario_s12_01_on_full_reorder.log
+f0e681aa7b0376acf2df37ccef57cae9  runs/env_layout_14_scenario_s12_01_on_full_reorder.log
 fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_on_full_reorder.rec
-c342ce69532c3ecf4453e18a1fa7f6a0  runs/env_layout_14_scenario_s12_01_on_single_task.log
+e1e9a758799a488b3bf022fe8c8b92ae  runs/env_layout_14_scenario_s12_01_on_single_task.log
 fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_on_single_task.rec
 c77779465dcf2d64c4716973ed58b280  runs/env_layout_14_scenario_s12_02_off_single_task.log
 eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_off_single_task.rec

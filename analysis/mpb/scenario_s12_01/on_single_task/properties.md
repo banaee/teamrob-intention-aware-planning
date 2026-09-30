@@ -5,7 +5,7 @@ Completion (world tick) 131; terminal decision 133. [sep] minimum 87.76 (78), co
 ## Declared properties
 
 - **P12.1a**: holds. winners before 26: ['item_7']; at 26: deliver_item(?item=item_13,?kitting_table=kitting_table_5), hold 0; first grasp of item_7: 96
-- **P12.1b**: holds. (tick, the layout's cost difference, item_7's hold): [(0, 1.568, 0), (2, 1.568, 0), (6, 1.568, 0), (14, 1.568, 0), (26, 2.499, 4)]
+- **P12.1b**: holds. (tick, the layout's cost difference, item_7's hold): [(0, 1.568, 0), (2, 1.568, 0), (6, 1.568, 0), (14, 1.568, 0), (26, 2.499, 5)]
 
 ## Detectors
 

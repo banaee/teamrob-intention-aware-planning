@@ -14,7 +14,7 @@
   {
    "name": "P12.1b",
    "holds": true,
-   "detail": "(tick, the layout's cost difference, item_7's hold): [(0, 1.568, 0), (2, 1.568, 0), (6, 1.568, 0), (14, 1.568, 0), (26, 2.499, 4)]"
+   "detail": "(tick, the layout's cost difference, item_7's hold): [(0, 1.568, 0), (2, 1.568, 0), (6, 1.568, 0), (14, 1.568, 0), (26, 2.499, 5)]"
   }
  ],
  "measures": {

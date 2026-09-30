@@ -165,17 +165,17 @@
 {
 "task": "deliver_item(?item=item_3,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 44.19
+"T_r": 45.19
 },
 {
 "task": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 55.28
+"T_r": 56.28
 },
 {
 "task": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 44.18
+"T_r": 45.18
 }
 ]
 },
@@ -190,17 +190,17 @@
 {
 "task": "deliver_item(?item=item_3,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 41.19
+"T_r": 42.19
 },
 {
 "task": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 50.25
+"T_r": 51.25
 },
 {
 "task": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 36.16
+"T_r": 37.16
 }
 ]
 },
@@ -320,7 +320,7 @@
 {
 "task": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 28.66
+"T_r": 27.66
 }
 ]
 },

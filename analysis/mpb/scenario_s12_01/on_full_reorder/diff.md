@@ -1,6 +1,6 @@
 # scenario_s12_01: expected against actual (full_reorder, prior on)
 
-Horizon: ticks 0 to 203 (the first observed completion point + 30, capped at the run's 331 steps; MPB-5). Terminal decision: 137; the human's last acknowledgement: 173. The run's no_current_task ticks: [0, 67, 137].
+Horizon: ticks 0 to 203 (the first observed completion point + 30, capped at the run's 331 steps; MPB-5). Terminal decision: 137; the human's last acknowledgement: 173. The run's no_current_task ticks: [0, 137].
 
 ## Per tick (in-process)
 
@@ -16,7 +16,7 @@ Horizon: ticks 0 to 203 (the first observed completion point + 30, capped at the
 
 ## Decisions
 
-Part 1, decisions other than no_current_task: 10 expected, 10 actual. Parts 2 and 3 compared at 13 decisions present on both sides. The log: 13 decisions checked.
+Part 1, decisions other than no_current_task: 11 expected, 11 actual. Parts 2 and 3 compared at 13 decisions present on both sides. The log: 13 decisions checked.
 
 Disagreements: 0
 

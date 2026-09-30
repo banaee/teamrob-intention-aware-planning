@@ -50,7 +50,7 @@
 },
 {
 "tick": 67,
-"trigger": "no_current_task",
+"trigger": "projection_expired",
 "cause": null,
 "leader": "deliver_item(?item=item_2)",
 "projection": "fallback refused=none(below_theta)"

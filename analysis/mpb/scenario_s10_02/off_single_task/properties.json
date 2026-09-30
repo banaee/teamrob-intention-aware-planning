@@ -2,44 +2,44 @@
  "scenario": "scenario_s10_02",
  "strategy": "single_task",
  "prior": false,
- "completion": 65,
+ "completion": 66,
  "terminal": 67,
  "horizon": 204,
  "properties": [
   {
    "name": "P2a",
    "holds": true,
-   "detail": "tick 26: winner deliver_item(?item=item_7,?kitting_table=kitting_table_3), hold 4"
+   "detail": "tick 26: winner deliver_item(?item=item_7,?kitting_table=kitting_table_3), hold 5"
   },
   {
    "name": "P2b",
-   "holds": false,
-   "detail": "assessed window ticks 27 to 63 (T_h 36.3276253029822); F1 violations [45, 46, 47]"
+   "holds": true,
+   "detail": "assessed window ticks 27 to 63 (T_h 36.3276253029822); F1 violations []"
   }
  ],
  "measures": {
   "sep_min_dist": [
-   38.25,
-   46
+   53.19,
+   47
   ],
   "sep_min_continuous": [
-   38.05,
+   52.2,
    47
   ],
   "f1": {
-   "viol": 3,
+   "viol": 0,
    "stand": 0,
-   "recede": 1,
+   "recede": 0,
    "?": 0
   },
-  "near_encounters": 4,
+  "near_encounters": 0,
   "holds": [
    [
     26,
-    4
+    5
    ]
   ],
-  "hold_ticks": 4
+  "hold_ticks": 5
  },
  "detectors": {
   "todo134": [],
@@ -94,7 +94,7 @@
    "leader": "deliver_item(?item=item_1)",
    "projection": "admitted deliver_item(?item=item_1)",
    "winner": "deliver_item(?item=item_7,?kitting_table=kitting_table_3)",
-   "hold": 4
+   "hold": 5
   },
   {
    "tick": 61,
@@ -118,7 +118,7 @@
   },
   {
    "tick": 67,
-   "trigger": "no_current_task",
+   "trigger": "projection_expired",
    "cause": null,
    "gate": "none(below_theta)",
    "leader": "deliver_item(?item=item_2)",

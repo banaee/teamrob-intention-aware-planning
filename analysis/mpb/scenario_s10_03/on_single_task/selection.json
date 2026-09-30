@@ -135,17 +135,17 @@
 {
 "task": "deliver_item(?item=item_3,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 33.3
+"T_r": 34.3
 },
 {
 "task": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 44.57
+"T_r": 45.57
 },
 {
 "task": "deliver_item(?item=item_5,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 33.85
+"T_r": 34.85
 }
 ]
 },
@@ -300,7 +300,7 @@
 {
 "task": "deliver_item(?item=item_4,?kitting_table=kitting_table_1)",
 "delta": 0,
-"T_r": 50.2
+"T_r": 52.2
 }
 ]
 },

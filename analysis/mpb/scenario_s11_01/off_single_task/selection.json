@@ -90,7 +90,7 @@
 {
 "task": "deliver_item(?item=item_9,?kitting_table=kitting_table_4)",
 "delta": 0,
-"T_r": 4.0
+"T_r": 3.0
 },
 {
 "task": "deliver_item(?item=item_8,?kitting_table=kitting_table_2)",

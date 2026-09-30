@@ -164,7 +164,7 @@
 },
 {
 "tick": 67,
-"trigger": "no_current_task",
+"trigger": "projection_expired",
 "cause": null,
 "gate": "none(below_theta)",
 "leader": "deliver_item(?item=item_2)",

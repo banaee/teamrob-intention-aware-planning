@@ -9,12 +9,12 @@
   {
    "name": "P12.1a",
    "holds": false,
-   "detail": "winners before 27: ['item_7']; at 27: deliver_item(?item=item_7,?kitting_table=kitting_table_3), hold 6; first grasp of item_7: 26"
+   "detail": "winners before 27: ['item_7']; at 27: deliver_item(?item=item_7,?kitting_table=kitting_table_3), hold 5; first grasp of item_7: 26"
   },
   {
    "name": "P12.1b",
    "holds": true,
-   "detail": "(tick, the layout's cost difference, item_7's hold): [(0, 1.568, 0), (2, 1.568, 0), (6, 1.568, 0), (14, 1.568, 0), (27, 2.499, 6)]"
+   "detail": "(tick, the layout's cost difference, item_7's hold): [(0, 1.568, 0), (2, 1.568, 0), (6, 1.568, 0), (14, 1.568, 0), (27, 2.499, 5)]"
   }
  ],
  "measures": {
@@ -36,14 +36,14 @@
   "holds": [
    [
     27,
-    6
+    5
    ],
    [
     96,
-    6
+    5
    ]
   ],
-  "hold_ticks": 12
+  "hold_ticks": 10
  },
  "detectors": {
   "todo134": [],
@@ -98,7 +98,7 @@
    "leader": "deliver_item(?item=item_1)",
    "projection": "admitted deliver_item(?item=item_1)",
    "winner": "deliver_item(?item=item_7,?kitting_table=kitting_table_3)",
-   "hold": 6
+   "hold": 5
   },
   {
    "tick": 61,
@@ -178,7 +178,7 @@
    "leader": "deliver_item(?item=item_2)",
    "projection": "admitted deliver_item(?item=item_2)",
    "winner": "deliver_item(?item=item_13,?kitting_table=kitting_table_5)",
-   "hold": 6
+   "hold": 5
   },
   {
    "tick": 124,
