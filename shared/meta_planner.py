@@ -907,9 +907,7 @@ class MetaPlanner:
                 logging.info(f"{head} verdict=continue hold=0")
                 return continuation(0, None)
             now = 0.0  # the trigger, on the projection clock
-            projection = self._projector.project(
-                [current], world, executor_state.agent_id, belief, start_step=now
-            )
+            projection = self._project_robot([current], world, executor_state, belief, now)
             realized = realize(projection, human_projection, self._min_separation, decision_step=now)
             if realized.horizon is None:
                 # An admitted projection without segments: realize() reads it
@@ -942,6 +940,32 @@ class MetaPlanner:
     # =========================================================================
     # B3 — task-level replanning
     # =========================================================================
+
+    def _project_robot(
+        self,
+        ordering: List[TaskInstance],
+        world: WorldState,
+        executor_state: ExecutorState,
+        belief: BeliefState,
+        now: float,
+    ) -> ProjectedPlan:
+        """
+        A robot candidate's projection, as the robot will execute it from this
+        tick (the MPB class-2 finding, 30 Sept 2026; the invariant: the plan
+        realize() assesses is the trajectory the robot executes from the decision
+        tick onward). The body's report enters here and nowhere else: the
+        completion ticks it owes are stated first for every candidate (lead_in);
+        an ordering headed by the task it is executing (task equality, as the
+        body's continue decision tests it) is projected from the action in flight
+        (resume_from). The human's projection never passes through here.
+        """
+        current = executor_state.current_task
+        continues = current is not None and same_task(ordering[0], current)
+        return self._projector.project(
+            ordering, world, executor_state.agent_id, belief, start_step=now,
+            resume_from=executor_state.action_in_flight if continues else None,
+            lead_in=float(executor_state.owed_completion_ticks),
+        )
 
     def _replan_tasks(
         self,
@@ -1016,7 +1040,7 @@ class MetaPlanner:
             return self._replan_orderings(task_pool, belief, world, executor_state, against)
         rows: List[Tuple[TaskInstance, RealizedPlan]] = []
         for task in task_pool:
-            projection = self._projector.project([task], world, executor_state.agent_id, belief, start_step=now)
+            projection = self._project_robot([task], world, executor_state, belief, now)
             realized = realize(projection, against, self._min_separation, decision_step=now)
             rows.append((task, realized))
             logging.info(
@@ -1106,16 +1130,13 @@ class MetaPlanner:
         orderings), with `ordering=` appended.
         """
         now = 0.0  # the trigger, on the projection clock
-        agent_id = executor_state.agent_id
 
         # head's index in the pool -> (realized ordering, ordering as pool
         # indices); filled in enumeration order, a strict < keeping the first
         # minimum per head
         cheapest: Dict[int, Tuple[RealizedPlan, Tuple[int, ...]]] = {}
         for indices in itertools.permutations(range(len(task_pool))):
-            projection = self._projector.project(
-                [task_pool[i] for i in indices], world, agent_id, belief, start_step=now
-            )
+            projection = self._project_robot([task_pool[i] for i in indices], world, executor_state, belief, now)
             realized = realize(projection, against, self._min_separation, decision_step=now)
             if indices[0] not in cheapest or realized.cost < cheapest[indices[0]][0].cost:
                 cheapest[indices[0]] = (realized, indices)

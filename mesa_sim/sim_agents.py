@@ -476,6 +476,10 @@ class RobotAgent(FactoryAgent):
             agent_id=self.unique_id,
             current_task=self.current_task_instance,
             holding=self.carrying,
+            # the body's report (the executor decides nothing): what it will execute from
+            # this tick, so the projection is the executed trajectory (MPB class-2, 30 Sept 2026)
+            action_in_flight=self.executor.action_in_flight(world),
+            owed_completion_ticks=self.executor.owed_completion_ticks(world),
         )
         belief_for_meta_planner = self.belief or self._make_dummy_belief()
 

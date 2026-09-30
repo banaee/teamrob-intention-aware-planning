@@ -218,12 +218,31 @@ class Projector:
         belief: BeliefState,
         start_step: float = 0.0,
         task_completion_latency: Optional[float] = None,
+        resume_from: Optional[GroundedAction] = None,
+        lead_in: float = 0.0,
     ) -> ProjectedPlan:
         """
         Builds a ProjectedPlan for `ordering`: one entry per task, in the
         ordering's order. `task_completion_latency` is the projected agent's
         body's per-task tick; omitted, this agent's own (project_human() passes
         the observed agent's).
+
+        `resume_from` and `lead_in` apply to the FIRST entry only and come from
+        the body's report (ExecutorState.action_in_flight,
+        ExecutorState.owed_completion_ticks); the meta-planner passes them for
+        the robot's candidates only, never for the human (the MPB class-2
+        finding, 30 Sept 2026: the plan realize() assesses must be the
+        trajectory the robot will execute from this tick). `lead_in`: the
+        completion ticks the body owes and spends first, standing where it is —
+        a stationary segment of that many steps at the agent's position before
+        the entry's first action (every candidate: the body spends them
+        whichever task it runs). `resume_from`: the action in flight of the task
+        the body is continuing; when the fresh decomposition contains it (the
+        executor's own test, GroundedAction equality: continue_plan), the
+        actions before it are dropped, since the body will not run them again —
+        a completed walk re-decomposed as a zero-length move_to is not re-paid
+        its acknowledgement. When the decomposition does not contain it the
+        entry keeps every action (the body then reloads the plan from its start).
 
         The first entry is decomposed via planner.plan() against the WorldState
         the caller passes — the live one — so a partially-executed task is
@@ -270,7 +289,17 @@ class Projector:
                 world=world,
             )
 
-            segments = self.build_segments(abstract_plan, world, agent_id, entry_start)
+            lead: List[Segment] = []
+            if index == 0:
+                if resume_from is not None:
+                    at = next((i for i, a in enumerate(abstract_plan.actions) if a == resume_from), None)
+                    if at:
+                        abstract_plan = replace(abstract_plan, actions=list(abstract_plan.actions[at:]))
+                if lead_in > 0.0:
+                    lead = [stationary_segment(world.agent_positions.get(agent_id), entry_start, lead_in)]
+            segments = lead + self.build_segments(
+                abstract_plan, world, agent_id, lead[-1].end_step if lead else entry_start
+            )
             # What the body spends completing the task (F1): a stationary segment at
             # the position the task ended at, once per task — a task-level cost, not per action,
             # so it is placed here and not in build_segments(). Omitted at 0.0.

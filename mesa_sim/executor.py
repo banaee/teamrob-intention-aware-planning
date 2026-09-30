@@ -26,8 +26,12 @@ WHAT THIS MODULE DOES:
           projection. That covers the re-decomposition past the action in flight
           (the robot's grasp), a switch to another task on the tick an action
           finished, and a decision arriving while the finished task's own
-          completion tick was still outstanding. A hold decided at that trigger
-          carries the tick as its first tick rather than adding one.
+          completion tick was still outstanding. SUPERSEDED IN PART (the MPB
+          class-2 finding, 30 Sept 2026): a hold decided at that trigger no longer
+          carries the tick; the owed ticks are spent first, then the hold. The
+          body reports them (owed_completion_ticks, action_in_flight) and the
+          projection states them (Projector.project, lead_in, resume_from), so
+          the trajectory realize() assesses is the one executed.
         - Executes the hold a decision carries (UpdateResult.hold, T4) via
           hold(): one STAND per tick at the agent's position, starting on the
           decision tick, before the plan continues. Every decision replaces
@@ -203,9 +207,11 @@ class Executor:
 
         FLOW:
             1. Load plan if new or changed
-            2. Get current action
+            1b. Spend a completion tick a reload kept (before any hold)
+            2. Get current action (a finished task: its completion tick)
+            3. Check if current action is complete → advance if so (its
+               acknowledgement, before any hold)
             2b. Run a decided hold's STAND, if one is in progress
-            3. Check if current action is complete → advance if so
             4. Expand microaction queue if empty
             5. Execute one microaction
         """
@@ -229,18 +235,17 @@ class Executor:
         #     first microaction runs once none is left. An acknowledgement leaves
         #     current_action naming the action being acknowledged, a task
         #     completion clears it, as each of those sections does.
-        #     A hold decided at the same trigger CARRIES the tick instead of
-        #     adding one: both are the robot standing where the decision found
-        #     it, so the plan resumes at decision + delta, where realization put
-        #     it. The hold then runs in 2b and this tick is one of its ticks.
+        #     Before any hold (the MPB class-2 finding, 30 Sept 2026; superseding
+        #     T-B Q7's "a hold CARRIES the tick"): the projection states the owed
+        #     ticks first (lead_in) and the hold after them, so the body spends
+        #     them first and the hold runs in 2b after.
         # ------------------------------------------------------------------
         if self._completion_pending:
             kind = self._completion_pending.pop(0)
-            if self._hold_remaining == 0:
-                if kind == "task":
-                    self.current_action = None
-                self.current_microaction = None
-                return
+            if kind == "task":
+                self.current_action = None
+            self.current_microaction = None
+            return
 
         # ------------------------------------------------------------------
         # 2. Get current action
@@ -254,8 +259,17 @@ class Executor:
         self.current_action = action.action_name
 
         # ------------------------------------------------------------------
-        # 2b. A decided hold runs first: stand where the agent is this tick,
-        #     leaving the plan cursor and microaction queue untouched
+        # 3. Check if current action is already complete: its acknowledgement,
+        #    an owed completion tick, spent before a decided hold (the MPB
+        #    class-2 finding, 30 Sept 2026: the projection states it first)
+        # ------------------------------------------------------------------
+        if self._is_action_complete(action, world):
+            self._advance_action()
+            return
+
+        # ------------------------------------------------------------------
+        # 2b. A decided hold: stand where the agent is this tick, leaving the
+        #     plan cursor and microaction queue untouched
         # ------------------------------------------------------------------
         if self._hold_remaining > 0:
             stand = Microaction(name="stand")
@@ -265,13 +279,6 @@ class Executor:
             self._hold_executed += 1
             if self._hold_remaining == 0:
                 self._log_hold_end(interrupted_by=None)
-            return
-
-        # ------------------------------------------------------------------
-        # 3. Check if current action is already complete
-        # ------------------------------------------------------------------
-        if self._is_action_complete(action, world):
-            self._advance_action()
             return
 
         # ------------------------------------------------------------------
@@ -699,7 +706,7 @@ class Executor:
         action finished, or arrived while the finished task's own completion
         tick was still outstanding.
         """
-        owed = self._owed_completion(world)
+        owed = self._completion_pending + self._owed_completion(world)   # a tick still owed is never dropped
         self._load_plan(plan)
         self._completion_pending = owed
 
@@ -724,6 +731,33 @@ class Executor:
                 return ["action", "task"]
             return ["action"]
         return []
+
+    # =========================================================================
+    # The body's report to the mind (ExecutorState; the MPB class-2 finding,
+    # 30 Sept 2026): what it will execute from this tick, whatever the decision.
+    # It reports; it decides nothing.
+    # =========================================================================
+
+    def owed_completion_ticks(self, world: WorldState) -> int:
+        """The completion ticks this loop will spend, standing where it is and
+        executing nothing, before its next action's first microaction and before
+        any hold, whichever way the next decision goes: those a reload kept
+        (section 1b) and those the plan in hand still owes (sections 2 and 3, or
+        _reload() recording them). Read-only."""
+        return len(self._completion_pending) + len(self._owed_completion(world))
+
+    def action_in_flight(self, world: WorldState) -> Optional[GroundedAction]:
+        """The first action of the plan in hand whose microactions the body will
+        still run: the action at the cursor, or the one after it when the action
+        at the cursor is complete (its acknowledgement is owed, counted by
+        owed_completion_ticks). None when the plan has no such action. Read-only."""
+        if self.current_plan is None:
+            return None
+        index = self.action_index
+        actions = self.current_plan.actions
+        if index < len(actions) and self._is_action_complete(actions[index], world):
+            index += 1
+        return actions[index] if index < len(actions) else None
 
     def _load_plan(self, plan: AbstractPlan):
         """Load a new plan, resetting action index and queue. Called through

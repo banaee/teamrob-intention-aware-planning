@@ -216,7 +216,7 @@ class Stub:
     def __init__(self, plans, projector):
         self.plans, self.projector = plans, projector
 
-    def project(self, ordering, world, agent_id, belief, start_step=0.0):
+    def project(self, ordering, world, agent_id, belief, start_step=0.0, resume_from=None, lead_in=0.0):
         return self.plans[task_instance_key(ordering[0])]
 
     def project_human(self, **kwargs):

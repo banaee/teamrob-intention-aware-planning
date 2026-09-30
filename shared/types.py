@@ -1164,6 +1164,19 @@ class ExecutorState:
     holding: Optional[str]   # item_id or None — convenience snapshot; evaluate_triggers() no
                               # longer reads it (task_committed removed, D3); kept for the
                               # analysis scripts that read it
+    # What the body reports of its own execution, so that the plan realize() assesses is the
+    # trajectory the robot will execute from this tick (the MPB class-2 finding, 30 Sept 2026;
+    # design_decisions.md, "Realization as built", the dated correction). The executor reports,
+    # it decides nothing.
+    # action_in_flight: the first action of the plan in hand whose microactions the body will
+    #   still run (a completed action awaiting its acknowledgement is past); None when there is
+    #   none. The continued task is projected from it (Projector.project, resume_from).
+    # owed_completion_ticks: the completion ticks the body will spend, standing where it is and
+    #   executing nothing, before its next action's first microaction and before any hold,
+    #   whatever the decision (an acknowledgement, a task's completion tick; T-B Q7). Every
+    #   candidate's projection states them first (Projector.project, lead_in).
+    action_in_flight: Optional["GroundedAction"] = None
+    owed_completion_ticks: int = 0
 
 
 class RecognitionChange(Enum):
