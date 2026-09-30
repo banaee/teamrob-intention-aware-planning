@@ -349,3 +349,200 @@ terminal decision masks nothing. The robot alone, no hold:
 
 Caps (MPB-5): scenario_s10_07 410, scenario_s10_08 419, scenario_s10_09 383; scenario_s11_01 212 and scenario_s11_02 254
 are unchanged.
+
+# Part (v): the five claimed cells of the coverage matrix (29 to 30 September 2026)
+
+Hadi's rulings of 29 September 2026 on the coverage matrix (`coverage.md`) and on the part (v) plan. Each of the five
+reachable cells the contribution claims gets one authored instance. As above, every number here is an authoring check
+made before any MPB run: the oracle's per-tick table (`mpb_oracle.py` on the replay), chained with the robot-alone
+decisions (`reference.py`, both strategies). The oracle's values in the runs are the expectations.
+
+**MPB-2's layout-and-setup rule, as amended.** A placement or setup change is acceptable only if it alters no
+already-verified scenario on that setup; otherwise a new setup. env_setup_10 and env_setup_11 are not changed: cells
+E6 and D9 add scenarios to them; cell A4 runs env_setup_10 on a new layout; cells D8 and C2 share a new layout and a new
+setup, on which nothing was verified before.
+
+## The two new layouts and the new setup
+
+- **env_layout_13** (cell A4): env_layout_12 with coffee_machine_0 removed, nothing else changed.
+- **env_layout_14** (cells D8 and C2): env_layout_12's human side unchanged, plus:
+  - shelf_11 at (−30.6, −171.7) and kitting_table_5 at (371.4, 307.3) (cell D8);
+  - shelf_10 at (300, −580) and kitting_table_6 at (−460, −550) (cell C2).
+- **env_setup_12** (on env_layout_14): env_setup_10's seven items, plus item_13 (shelf_11 → kitting_table_5) and
+  item_14 (shelf_10 → kitting_table_6). Nine robot items are outside the human's support, so the output floor holds
+  seven keys (env_setup_10: five).
+
+## Cell D8: the switch against an admitted projection (scenario_s12_01)
+
+**Why env_layout_12 cannot express it** (the ruled "new setup on env_layout_12" was not expressible; Hadi ruled the new
+layout on the plan):
+- The switch has to come at the admission, which is where the admitted plan first reaches the robot.
+- The crossing's timing puts the robot at shelf_5 then (arrival about 25, the carry through the midpoint M at about 44,
+  as in scenario_s10_02).
+- From shelf_5 every other robot task of env_layout_12 is at least 11.2 ticks dearer than item_7: the nearest other
+  robot table is kitting_table_1, 861 cm against kitting_table_3's 636, and a walk to any other shelf is at least 628 cm
+  on its own.
+- A perpendicular crossing holds for about 5 ticks (the ±50 cm band at 20 cm/tick). No setup gives a cost difference
+  below the hold.
+
+**The geometry.**
+- shelf_11 is 70 cm beyond shelf_5 on the bearing from the robot's start (390, −573), so the walk to it is about 70 cm
+  longer all along the approach (the shelf_3 / shelf_6 pattern). A shelf north of shelf_5 was tried on paper first: the
+  robot reaches almost shelf_5's centre at the admission, so the difference before it would have been 0.05 ticks.
+- kitting_table_5 is on the 50° bearing from shelf_11, at the distance that makes item_13's delivery 2.5 ticks dearer
+  than item_7's at the robot's position at the admission (the instrument's own `plain_difference`, the layout's path
+  lengths). This is the authored parameter, the midpoint of (0, hold), fixed now and never adjusted after a run.
+  - It is 103 cm from shelf_7 and 123 cm from shelf_8.
+  - Its route passes 228 cm from kitting_table_0, clear of the admitted delivery's plan.
+
+**The admission tick on the complete env_setup_12** (ruling 1: derived with item_14 included).
+- The oracle's table puts the entered decision at 26, not 25: the output floor's seven keys lower the confidence (0.751
+  at 25 with five).
+- The cost relation is unchanged. The robot's tick 25 is its walk's acknowledgement, so its position at the decision of
+  26 is its position at 25, (28.23, −227.86).
+- The cost difference there is 2.499 ticks (kitting_table_5 placed to 0.1 cm); at the decisions of 0, 2, 6 and 14 it is
+  1.568, so item_7 wins those.
+- The hold on item_7 at 26 is previewed from scenario_s10_02's crossing, same absolute timing: about 5, above 2.5.
+- The property is not shown failing.
+
+**The chain as derived** (both strategies; robot-alone decisions 0, 63, 126):
+- 0 `no_current_task`, then expiries at 2, 6 and 14 (moving fallback, k = 1, 3, 7, 15);
+- **26 entered** (deliver_item(item_1), commitment and observation);
+- 61 replaced (coffee_break leads after the boundary, below θ, a standing fallback);
+- 76 entered (item_2);
+- 124 replaced.
+
+**Declared.** P12.1a and P12.1b (`properties.py`).
+
+## Cell C2: the hold against an admitted standing segment (scenario_s12_02)
+
+**Why env_layout_12 cannot express it.**
+- Every robot station of env_layout_12 lies at y ≥ −220; the human's waiting point at the machine, (−166.1, −579.8), lies
+  120 cm from the south wall.
+- A walk between two robot stations therefore never passes it. Only the walk from the start can, and it reaches the
+  point within 148 cm, 7.4 ticks.
+- Admitting coffee_break takes at least about 9 ticks (warrant, and θ against two live deliveries). The relation cannot
+  be timed there, so the new layout adds a robot station pair whose carry passes the waiting point.
+
+**The geometry.**
+- shelf_10 at (300, −580) and kitting_table_6 at (−460, −550).
+- The robot arrives at shelf_10 from the north at (297, −562) and carries west.
+- The robot alone comes within 50 cm of the waiting point on 117 to 121, 25.4 cm at its closest.
+- shelf_10 is 102 cm from the exit walk to corner_SE.
+- The robot's walk from kitting_table_1 to shelf_10 stays east of x = 60: it never crosses the human's paths.
+
+**The timing.**
+- The human's script is scenario_s10_04's. `coffee_break` is entered at 76 (scenario_s10_04's 75, moved by the floor).
+- The human stands at the waiting point from 104 to 134, then leaves.
+- The robot (start (460, 480), pool item_3 then item_14; robot-alone decisions 0, 33, 138 under both strategies) is
+  mid-walk at 76, at (236, −227), far from the human.
+- It would pass the waiting point inside the admitted wait and after the human's arrival, so the admitted plan's walk
+  is not concurrent with the passage: a hold at 76 is caused by the stationary segment.
+
+**The chain as derived:**
+- 26 entered (item_1);
+- 33 `no_current_task`, the gate clearing;
+- 61 replaced;
+- 64, 67, 73 expired;
+- **76 entered** (coffee_break, observation);
+- 133 replaced (coffee_break's pin, no observation, a standing fallback, k = 31);
+- 134 entered (item_2, commitment);
+- 135 replaced.
+
+**The fallback after 133.** The fallback stand after the coffee break's boundary projects the human for about 31 more
+ticks after it has left. The hold it produces is TODO-132 (a)'s (ruling 2): recorded, not the property.
+
+**Declared.** P12.2a to P12.2c.
+
+## Cell D9: the switch while carrying (scenario_s11_03)
+
+**The ruled variant.** "The stand beginning after the grasp" is not writable on env_layout_12: no landmark and no
+modelled task ends at kitting_table_2 except a misdelivery. Hadi ruled the stand from tick 0 with the robot grasping
+before the decisive expiry. The experimental variable is the robot's carrying state at the decision (the return walk
+in the cost difference), not when the stand began.
+
+**The artefacts.** scenario_s11_01's human script unchanged, so its per-tick table is identical; the robot starts at
+(−420, 540), 50 cm south of shelf_3.
+
+**The derivation.**
+- The expiries are the stand's own: 0 (`no_current_task`), then 2, 6, 14, 30 (k = 1, 3, 7, 15, 31).
+- The robot reaches shelf_3 at 2 and grasps at 4, so at 6 it carries item_8.
+- The fallback stand ends at 1 + k, so the hold on item_8 is at most k + 1. Previews: 0 at 0 and 2 (the carry's first
+  violating moment, about 10, lies past the projection's end); about 4 at 6.
+- The return difference (P11.3c's formula: the path lengths p → shelf_3 → shelf_6 → kitting_table_4 against
+  p → kitting_table_2, each walk ending the arrival radius short, plus the 6 priced stationary ticks the switch adds,
+  E9) is 9.1 at 6.
+- **Hand-derived, not decided pre-run:** the switch falls at 14 (hold about 15 against about 14.4, if the hold at 6 is 4
+  and the robot is at (−341, 611)) or at 30 (hold about 32 against about 17), both while carrying. At 14 the margin is
+  under a tick. It depends on the planner's stationary pricing against the property's +6, which rests on E9's numbers.
+  The property is stated against the return difference, not against a tick.
+- The robot's own `no_current_task` cannot fall before the switch: it holds item_8.
+
+**Declared.** P11.3a to P11.3c.
+
+## Cell E6: a record kept through a dip below θ (scenario_s10_10)
+
+**The script.**
+- The planned detour (a drop cut into the walk, a short walk toward the machine, dropped in turn) cannot be expanded by
+  the oracle's trajectory: `analysis/ir_testbed/trajectory.py` reads a mid-action cut from a `Started` transition only,
+  and no committed script uses a drop cut.
+- Rather than extend the instrument, the scenario uses a committed script that produces the dip: scenario_s09_04's (the
+  IR test-bed's coffee before the pick-up), whose table dips on env_layout_11 (34 to 36, 0.715).
+- No detour length is chosen: the script has no parameter.
+
+**The table on this room** (env_setup_10):
+- 25 entered (item_1);
+- at 31 a proximity regress: no observation, which fires nothing (L2 as amended);
+- **34 to 36 item_1 leads with its share below θ, adequate** (the dip);
+- 37 replaced (coffee_break overtakes).
+- The record is kept from 25 through 36, with no inadequacy and no trigger in the dip.
+
+**The robot's start** (the timing search). At (460, 480) the robot's own decisions (29 single_task, 35 full_reorder)
+would ask the gate inside the dip and clear the record. The search:
+- candidates west along y = 480 in 10 cm steps from (460, 480);
+- the first start whose robot-alone decisions under both strategies put no `no_current_task` in [22, 40] (the interval
+  25 to 37, widened by the 3-tick rule).
+- It gave **(−250, 480)**: first completions at 41 (single_task) and 47 (full_reorder).
+
+**Declared.** P10.10.
+
+## Cell A4: the cause boundary (scenario_s10_11, on env_layout_13)
+
+**Why the layout.** At an episode boundary the belief resets to the prior and the leader is the first live hypothesis
+in the recognizer's order, by `repr` (`shared/recognizer.py`). `coffee_break(...)` precedes every `deliver_item(...)`.
+With the machine in the room `coffee_break` is live after every delivery boundary (L4) and wins the reset, so the
+recorded delivery can never remain the leader. Without the machine the live set is the two assigned deliveries, and
+`deliver_item(?item=item_1)` precedes item_2.
+
+**The script.** item_1 delivered to kitting_table_3 (a departure; the robot does not use that table here), then item_2,
+then the exit walk. The robot works the NE pool from (460, 480).
+
+**The table:**
+- **7 entered** (item_1; two live hypotheses clear θ sooner than three);
+- item_1 adequate on every tick of the carry (32 to 52);
+- **53: the place at kitting_table_3 is a boundary; item_1 is not pinned (its terminal fact does not hold), leads the
+  1/2 tie, so the cause is boundary.** The gate refuses `none(below_theta)` (θ is asked first); a standing fallback.
+- 60 entered (item_2);
+- 135 replaced (item_2's boundary);
+- 136 entered (item_1, lone, commitment);
+- 147 retraction on the exit walk.
+
+**The misdelivery's margin.** At 52, the last tick before the place, item_1's v·D is 278.5 cm (S = 0.086), against 334
+cm at α = 0.05: 55.5 cm, about 2.8 ticks of standing. At α = 0.1 the delivery would turn inadequate before the place and
+the case would not form. Recorded; the primary level is 0.05.
+
+**Timing.** The robot's decisions at 29 and 35 fall inside [7, 53], but the gate clears there (item_1 re-admitted), so
+the record stands. Nothing falls within 3 ticks of 7 or 53. The start is kept.
+
+## The checks, per scenario
+
+| scenario | disjointness (human's shelves / robot's shelves) | robot-alone decisions (single_task; full_reorder) | exposed | result | cap |
+|---|---|---|---|---|---|
+| scenario_s12_01 | 1, 2 / 5, 11 | 0, 63; 0, 63 | 26 | kept | 331 |
+| scenario_s12_02 | 1, 2 / 4, 10 | 0, 33; 0, 33 | 76 | kept | 419 |
+| scenario_s11_03 | 1 (item_12, never performed) / 3, 6 | 0, 17; 0, 17 (the robot alone) | 6, 14, 30 | kept; authored for holds, so the robot's timeline departs from the robot-alone one (as scenario_s11_01) | 199 |
+| scenario_s10_10 | 1, 2 / 4, 7, 8, 9 | 0, 41, 78, 122; 0, 47, … | 25, 37 and the interval between | moved to (−250, 480) by the search | 453 |
+| scenario_s10_11 | 1, 2 / 4, 7, 8, 9 | 0, 29, 67, 110; 0, 35, 72, 116 | 7, 53 | kept (29 and 35 re-admit) | 359 |
+
+**Effect on verified scenarios.** None by construction: no verified scenario's layout or setup changed. It is measured
+at the runs: the eleven rerun and compared byte for byte.

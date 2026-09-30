@@ -14,6 +14,8 @@ coffee_break; neither reaches theta while adequate (analysis/mpb/authoring.md, p
 fallback projection. Disjointness (MPB-3): the human's item_12 (shelf_1) against the robot's items 8 to 11 (shelves 3,
 6, 4, 7).
 _01 the occupied target with an alternative task (X1); _02 the fallback against a walker and a stander.
+Added in MPB part (v) for coverage (Hadi, 29 September 2026; analysis/mpb/coverage.md, row D9): _03 the switch while
+carrying.
 """
 
 from shared.types import AgentConfig, ScenarioConfig, Script
@@ -104,6 +106,46 @@ scenario_s11_02 = ScenarioConfig(
             assigned_tasks=[
                 deliver_item("item_10", table="kitting_table_1"),
                 deliver_item("item_11", table="kitting_table_1"),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+scenario_s11_03 = ScenarioConfig(
+    id="scenario_s11_03",
+    setup="env_setup_11",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s11_03, the switch while carrying (MPB part (v), coverage row D9; T-D X, X1 with the return walk): "
+        "scenario_s11_01's human script unchanged (the stand at kitting_table_2 from tick 0, unmodelled, declared here, "
+        "then the exit); the robot's pool is scenario_s11_01's, and the robot starts 50 cm south of shelf_3, so it grasps "
+        "item_8 before the first expiry whose hold can exceed the empty-handed cost difference (3.5 ticks). The "
+        "experimental variable is the robot's carrying state at the decision, which puts the return walk "
+        "(deliver_with_return: item_8 back to shelf_3) into the cost difference, not when the stand began. Authored to "
+        "expose the switch by cost while carrying: at the first projection_expired decision whose hold on item_8 (at most "
+        "k + 1, k the observed standing count) exceeds the cost difference with the return walk, the winner switches to "
+        "item_9 and item_8 goes back to shelf_3 before item_9 is grasped."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-270, 620),
+            scheduled_tasks=Script([
+                stand("PT120S"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_UNPERFORMED),
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-420, 540),
+            assigned_tasks=[
+                deliver_item("item_8", table="kitting_table_2"),
+                deliver_item("item_9", table="kitting_table_4"),
             ],
             observes=["human_0"],
         ),

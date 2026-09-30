@@ -1,0 +1,112 @@
+{
+  "env_objects": [
+    {
+      "id": "item_1",
+      "type": "item",
+      "subtype": "part_A",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB (env_layout_14): the human's west item, designated to the human's table (the 10/11 pattern's item_1)."
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "subtype": "part_B",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: the human's east item, designated to the human's table (the 10/11 pattern's item_2)."
+    },
+    {
+      "id": "item_3",
+      "type": "item",
+      "subtype": "part_C",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: a robot item, NE work area."
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "subtype": "part_D",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: a robot item, NE work area."
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "subtype": "part_E",
+      "initial_container": "shelf_8",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: a robot item, NE work area."
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "subtype": "part_F",
+      "initial_container": "shelf_9",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: a robot item, NE work area."
+    },
+    {
+      "id": "item_7",
+      "type": "item",
+      "subtype": "part_G",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_3",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB: the robot's crossing item (scenario_s10_02): its carry crosses the human's diagonal kitting_table_0 - shelf_1 at its midpoint."
+    },
+    {
+      "id": "item_13",
+      "type": "item",
+      "subtype": "part_M",
+      "initial_container": "shelf_11",
+      "destination": "kitting_table_5",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB part (v), cell D8: the alternative to item_7's crossing delivery, 2.5 ticks dearer at the admission."
+    },
+    {
+      "id": "item_14",
+      "type": "item",
+      "subtype": "part_N",
+      "initial_container": "shelf_10",
+      "destination": "kitting_table_6",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "MPB part (v), cell C2: its carry passes the human's waiting point at the coffee machine."
+    }
+  ]
+}

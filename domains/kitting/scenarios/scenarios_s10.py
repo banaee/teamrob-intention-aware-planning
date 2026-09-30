@@ -15,6 +15,8 @@ _01 admission after theta; _02 the hold against an admitted projection; _03 the 
 _04 boundary re-admission on commitment; _05 the lone foreseeable hypothesis after the assigned tasks; _06 the control.
 Added in MPB part (iv) for coverage (Hadi, 29 September 2026; a coverage gap found in review, not a failed run): _07 the
 sudden stand mid-carry; _08 the change of mind between assigned tasks; _09 the misdelivery.
+Added in MPB part (v) for coverage (Hadi, 29 September 2026; analysis/mpb/coverage.md, rows E6 and A4): _10 a record
+kept through a dip below theta; _11 the cause boundary, on env_layout_13 (env_layout_12 without the coffee machine).
 """
 
 from shared.types import AgentConfig, ScenarioConfig, Script
@@ -319,6 +321,70 @@ scenario_s10_09 = ScenarioConfig(
             start_position=(0, 220),
             scheduled_tasks=Script([
                 deliver_item("item_1", table="kitting_table_2"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+scenario_s10_10 = ScenarioConfig(
+    id="scenario_s10_10",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    description=_MPB + (
+        "scenario_s10_10, a record kept through a dip below theta (MPB part (v), coverage row E6; D2's retention by "
+        "identity): scenario_s09_04's script on this room (the IR test-bed's coffee before the pick-up): coffee_break "
+        "started at the boundary after item_1's first walk, empty-handed at shelf_1, then deliver item_2, exit. Modelled "
+        "behaviour only, besides the exit walk. Authored to expose the retention: after deliver_item(item_1) is admitted "
+        "(entered), the human's walk toward the machine lowers its share below theta while it stays the leader and "
+        "adequate, so no trigger fires and the decision record keeps it through the dip, until coffee_break overtakes "
+        "(replaced). The robot works its NE pool, started so that none of its decisions falls between the admission and "
+        "the end of the dip (analysis/mpb/authoring.md, part (v))."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").at(
+                    move_to, coffee_break("coffee_machine_0"), occurrence=0),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-250, 480), _NE_POOL),
+    ],
+)
+
+scenario_s10_11 = ScenarioConfig(
+    id="scenario_s10_11",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_13"],
+    description=_MPB + (
+        "scenario_s10_11, the cause boundary (MPB part (v), coverage row A4), on env_layout_13, env_layout_12 without the "
+        "coffee machine: with no coffee_break hypothesis the live set is the two assigned deliveries. The human delivers "
+        "item_1 to kitting_table_3 (a departure from its designated kitting_table_0; the robot does not use that table "
+        "here), then item_2, then exits. Authored to expose recognition_changed with cause boundary: the admitted "
+        "deliver_item(item_1) stays adequate up to the place at the wrong table (margin read from the oracle's table "
+        "before any run), the place is a terminal action and ends the episode (T-D L, L1) without item_1's terminal fact, "
+        "so item_1 stays live, and after the reset to the prior it is the first live hypothesis in the recognizer's order "
+        "and remains the leader. The robot works its NE pool, started so that no decision of its own clears the record "
+        "before the place."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_3"),
                 deliver_item("item_2", table="kitting_table_0"),
                 go_to("corner_SE"),
             ]),

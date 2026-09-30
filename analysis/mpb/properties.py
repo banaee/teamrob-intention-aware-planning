@@ -40,6 +40,28 @@ The declared properties (the scenarios' descriptions; analysis/mpb/authoring.md)
 - scenario_s10_09 (part (iv)): X5's ground (1), measured, not a mechanism (design_decisions.md, "T-D X", X5): per
   stretch of ticks on which the adequacy finding is unexplained, the decisions inside it whose admission refused, and the
   first tick on which the finding is still unexplained after such a decision (the finding has outlived a re-decision).
+Part (v) (analysis/mpb/coverage.md, the five claimed cells; authoring.md, part (v)):
+- scenario_s12_01 (row D8): P12.1a, the decisions before the one admitting deliver_item(item_1) (entered) all select
+  item_7; that decision selects item_13 with hold 0, before item_7 is grasped (the switch caused by the admitted
+  projection); P12.1b (single_task), at that decision item_7's hold exceeds the layout's plain-cost difference of item_13
+  over item_7 (2.5 ticks, the authored parameter) and at every earlier decision it does not, the difference positive.
+- scenario_s12_02 (row C2): P12.2a, at the decision admitting coffee_break (entered) the robot's task carries a positive
+  hold; P12.2b, the robot comes within min_separation of the human's waiting point (the wait_at position) only after the
+  human has left it (the tick after the wait's last); P12.2c, no F1 robot violation within that decision's assessed
+  window. The hold after the coffee break's boundary (a fallback stand) is TODO-132 (a)'s, recorded, not a property.
+- scenario_s11_03 (row D9): P11.3a, the winner switches to deliver_item(item_9) at a projection_expired decision while
+  the robot carries item_8 (grasped before it), every earlier decision selecting item_8; P11.3b, item_8 is released at
+  shelf_3 (within the arrival radius) before item_9 is grasped; P11.3c (single_task), at that decision item_8's hold
+  exceeds the return difference and at every earlier decision while carrying it does not. The return difference
+  (X1, deliver_with_return), from the robot's position p: the path lengths, each walk ending the arrival radius short,
+  of p -> shelf_3, -> shelf_6, -> kitting_table_4 against p -> kitting_table_2, at the body's speed, plus the priced
+  stationary ticks the switch adds (T-D R and E, E9: 2 per pick_up and per place, 1 per walk entered from a completion:
+  the return place 2, the walk to shelf_6 1, the grasp 2, the carry 1, the place 2, against the continued place 2: 6).
+- scenario_s10_10 (row E6): P10.10, from the decision admitting deliver_item(item_1) (entered) to the tick before the
+  next decision, the decision record is deliver_item(item_1) on every tick and no decision falls; on at least one of
+  those ticks item_1 leads with its share below theta (the gate none(below_theta)), and on every such tick it is
+  adequate (D2's retention by identity, no inadequacy and no trigger in the dip).
+- scenario_s10_11 (row A4): no property; the cause boundary is part 1, compared exactly.
 """
 import json
 import math
@@ -221,6 +243,106 @@ def evaluate(sid, d, log_path, run_file):
     if sid == "scenario_s10_09":
         out["measures"]["x5_ground1"] = [s_ for s_ in x5_ground1([t for t in ticks if t["tick"] < obs["horizon"]],
                                                                 decisions) if s_["refused_decisions"]]
+    if sid == "scenario_s12_01":
+        adm = next((x for x in decisions if x.cause is not None and x.cause.value == "entered" and x.admitted
+                    and item_of(x.admitted.key) == "item_1"), None)
+        if adm is None:
+            prop("P12.1a", False, "no entered decision admitting deliver_item(item_1)")
+        else:
+            grasp7 = next((a["tick"] for a in agents if a["carrying"] == "item_7"), None)
+            before = [x for x in decisions if x.tick < adm.tick]
+            s_ = sel_by[adm.tick]
+            prop("P12.1a", all(item_of(sel_by[x.tick]["winner"]) == "item_7" for x in before)
+                 and item_of(s_["winner"]) == "item_13" and s_["hold"] == 0 and (grasp7 is None or grasp7 > adm.tick),
+                 f"winners before {adm.tick}: {sorted(set(item_of(sel_by[x.tick]['winner']) for x in before))}; at "
+                 f"{adm.tick}: {s_['winner']}, hold {s_['hold']}; first grasp of item_7: {grasp7}")
+            if obs["strategy"] == "single_task":
+                robot_start = next(a for a in domain_config["scenarios"][sid].agents
+                                   if a.agent_type == "robot").start_position
+                rows = []
+                for x in before + [adm]:
+                    p = position_before(agents, x.tick, robot_start)
+                    dc = plain_difference(p, "item_7", "item_13", traj)
+                    h7 = next(c["delta"] for c in sel_by[x.tick]["candidates"] if item_of(c["task"]) == "item_7")
+                    rows.append((x.tick, round(dc, 3), h7))
+                prop("P12.1b", rows[-1][2] > rows[-1][1] and all(0 < dc and h <= dc for _, dc, h in rows[:-1]),
+                     f"(tick, the layout's cost difference, item_7's hold): {rows}")
+    if sid == "scenario_s12_02":
+        adm = next((x for x in decisions if x.cause is not None and x.cause.value == "entered" and x.admitted
+                    and x.admitted.key.startswith("coffee_break")), None)
+        if adm is None:
+            prop("P12.2a", False, "no entered decision admitting coffee_break")
+        else:
+            s_ = sel_by[adm.tick]
+            prop("P12.2a", s_["hold"] and s_["hold"] > 0, f"tick {adm.tick}: winner {s_['winner']}, hold {s_['hold']}")
+            waits = [r for r in traj["rows"] if r["action"] == "wait_at"]
+            wp, left = (waits[0]["x"], waits[0]["y"]), waits[-1]["tick"] + 1
+            near = [a["tick"] for a in agents if math.dist(tuple(a["robot"]), wp) < sep]
+            prop("P12.2b", bool(near) and near[0] >= left,
+                 f"waiting point ({wp[0]:.1f}, {wp[1]:.1f}), the human there {waits[0]['tick']} to {waits[-1]['tick']}; "
+                 f"the robot within {sep:g} cm of it on ticks {near[:1]} to {near[-1:]}")
+            end = adm.tick + math.ceil(s_["horizon"]) if s_["horizon"] is not None else adm.tick
+            viol = [k for k in range(adm.tick + 1, end + 1)
+                    if k in run["sep"] and run["sep"][k][1] is not None and run["sep"][k][1] < sep
+                    and rule(run, k, sep) == "viol"]
+            prop("P12.2c", not viol, f"assessed window ticks {adm.tick + 1} to {end} (T_h {s_['horizon']}); "
+                                     f"F1 violations {viol}")
+    if sid == "scenario_s11_03":
+        grasp8 = next((a["tick"] for a in agents if a["carrying"] == "item_8"), None)
+        sw = next((x for x in decisions if item_of(sel_by[x.tick]["winner"]) == "item_9"), None)
+        before = [x for x in decisions if sw is None or x.tick < sw.tick]
+        carrying = sw is not None and sw.tick > 0 and agents[sw.tick - 1]["carrying"] == "item_8"
+        prop("P11.3a", sw is not None and sw.trigger is Trigger.PROJECTION_EXPIRED and carrying
+             and grasp8 is not None and grasp8 < sw.tick
+             and all(item_of(sel_by[x.tick]["winner"]) == "item_8" for x in before),
+             "no switch" if sw is None else f"switch at {sw.tick} ({sw.trigger.value}); first grasp of item_8 "
+             f"{grasp8}; carrying item_8 on the tick before: {carrying}")
+        rel8 = next((a for a in agents if sw is not None and a["tick"] >= sw.tick and a["micro"] == "release"
+                     and agents[a["tick"] - 1]["carrying"] == "item_8"), None)
+        grasp9 = next((a["tick"] for a in agents if a["carrying"] == "item_9"), None)
+        shelf3 = traj["fixed"]["shelf_3"]
+        prop("P11.3b", rel8 is not None and grasp9 is not None and rel8["tick"] < grasp9
+             and math.dist(tuple(rel8["robot"]), tuple(shelf3)) <= traj["params"]["proximity"] + 1e-9,
+             "no release of item_8 after the switch" if rel8 is None else
+             f"item_8 released at {rel8['tick']}, {math.dist(tuple(rel8['robot']), tuple(shelf3)):.1f} cm from "
+             f"shelf_3; first grasp of item_9 {grasp9}")
+        if obs["strategy"] == "single_task" and sw is not None:
+            r, v, fixed = traj["params"]["proximity"], traj["params"]["speed"], traj["fixed"]
+            def walks(p, targets):
+                total, at = 0.0, tuple(p)
+                for tgt in targets:
+                    d = math.dist(at, fixed[tgt])
+                    total += max(0.0, d - r)
+                    at = arrival(at, fixed[tgt], r)
+                return total
+            robot_start = next(a for a in domain_config["scenarios"][sid].agents
+                               if a.agent_type == "robot").start_position
+            rows = []
+            for x in before + [sw]:
+                if x.tick == 0 or agents[x.tick - 1]["carrying"] != "item_8":
+                    continue
+                p = position_before(agents, x.tick, robot_start)
+                dr = (walks(p, ["shelf_3", "shelf_6", "kitting_table_4"]) - walks(p, ["kitting_table_2"])) / v + 6
+                h8 = next(c["delta"] for c in sel_by[x.tick]["candidates"] if item_of(c["task"]) == "item_8")
+                rows.append((x.tick, round(dr, 3), h8))
+            prop("P11.3c", bool(rows) and rows[-1][0] == sw.tick and rows[-1][2] > rows[-1][1]
+                 and all(h <= dr for _, dr, h in rows[:-1]),
+                 f"(tick, the return difference, item_8's hold), decisions while carrying: {rows}")
+    if sid == "scenario_s10_10":
+        adm = next((x for x in decisions if x.cause is not None and x.cause.value == "entered" and x.admitted
+                    and item_of(x.admitted.key) == "item_1"), None)
+        if adm is None:
+            prop("P10.10", False, "no entered decision admitting deliver_item(item_1)")
+        else:
+            key = "deliver_item(?item=item_1)"
+            nxt = next((x.tick for x in decisions if x.tick > adm.tick), obs["horizon"])
+            span = [k for k in ticks if adm.tick < k["tick"] < nxt]
+            dip = [k for k in span if k["leader"] == key and k["gate"] == "none(below_theta)"]
+            prop("P10.10", bool(dip) and all(k["record"] == key for k in span)
+                 and all(k["adequacy"].get(key) == "adequate" for k in dip),
+                 f"admitted at {adm.tick}, next decision {nxt}; records {sorted(set(str(k['record']) for k in span))}; "
+                 f"dip ticks {[k['tick'] for k in dip]}, item_1's adequacy there "
+                 f"{sorted(set(k['adequacy'].get(key) for k in dip))}")
     if sid == "scenario_s11_02":
         stand = next(a["tick"] for a in traj["actions"] if a["action"] == "stand")
         rows = traj["rows"]
