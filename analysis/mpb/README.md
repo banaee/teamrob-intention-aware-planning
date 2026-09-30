@@ -13,11 +13,13 @@ from the records; a disagreement is classified under MPB-4's five classes.
 
 ## The artefacts
 
-- The room: `env_layout_12`.
-- The setups: `env_setup_10` and `env_setup_11`.
+- The room: `env_layout_12`; since part (v) also `env_layout_13` (without the coffee machine) and `env_layout_14` (plus
+  two robot station pairs).
+- The setups: `env_setup_10` and `env_setup_11`; since part (v) also `env_setup_12` (on `env_layout_14`).
 - The scenarios: `scenario_s10_01` to `_09` and `scenario_s11_01`, `_02` (eleven). `scenario_s10_07` to `_09` were added
   in part (iv) for coverage; `scenario_s11_01` and `_02` were re-authored in part (iv): the human's assigned delivery,
-  never performed.
+  never performed. Part (v) added five, one per claimed cell of the coverage matrix (`coverage.md`): `scenario_s12_01`,
+  `_02`, `scenario_s11_03`, `scenario_s10_10`, `_11` (sixteen).
 - The run files: `configs/mpb/`.
 
 `authoring.md` gives the geometry, the disjointness check (MPB-3), the pre-run timing check and the control's fact.

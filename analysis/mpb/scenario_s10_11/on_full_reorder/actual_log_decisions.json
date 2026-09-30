@@ -1,0 +1,100 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 7,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "deliver_item(?item=item_1)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 35,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 53,
+"trigger": "recognition_changed",
+"cause": "boundary",
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 56,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 59,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 60,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "deliver_item(?item=item_2)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 72,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 116,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_2)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 135,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "deliver_item(?item=item_1)",
+"projection": "fallback refused=none(leader_no_observation)"
+},
+{
+"tick": 136,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "deliver_item(?item=item_1)",
+"projection": "built warrant=commitment"
+},
+{
+"tick": 139,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "deliver_item(?item=item_1)",
+"projection": "built warrant=commitment"
+}
+]

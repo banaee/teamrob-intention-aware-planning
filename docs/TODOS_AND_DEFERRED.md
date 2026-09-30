@@ -3738,7 +3738,7 @@ reaches it.
 Files: shared/recognizer.py (`_retired`)
 Reference: `analysis/l_build/REPORT.md`, "Flags (not fixed)"; design_decisions.md, "T-D L", L4, and its BUILT paragraph
 
-**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [OPEN: step 2 built (parts (i) to (iv), 29 Sept 2026; eleven scenarios verified); part (v), the five claimed coverage cells, under way]
+**TODO-130: The meta-planner test-bed (track 3), after X (recorded, T-D P records, 28 Sept 2026)** [CLOSED (MPB part (v), 30 Sept 2026): sixteen scenarios verified; every materially distinct in-scope decision path verified, unreachable or out of coverage]
 REWRITTEN (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)"): the earlier track
 note and its X amendment are superseded by the entry; their content is in it.
 The recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
@@ -3781,6 +3781,11 @@ admitted projection; the hold against an admitted standing segment; the switch w
 dip below θ; the cause boundary (a new layout without the coffee machine). The MPB closes when every materially distinct
 in-scope decision path is verified, unreachable with a recorded derivation, or outside the claimed mechanism with a
 recorded reason.
+PART (v) BUILT, THE MPB CLOSED (30 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", PART (v) and
+CLOSED; analysis/mpb/REPORT.md, "Part (v)"): scenario_s12_01 (D8), scenario_s12_02 (C2), scenario_s11_03 (D9),
+scenario_s10_10 (E6), scenario_s10_11 (A4), all verified; env_layout_13, env_layout_14 and env_setup_12 authored for
+them. Recorded for Hadi: three F1 robot violations in scenario_s12_01 under full_reorder inside the admission's window
+(class 5 pending his reading).
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
@@ -3840,6 +3845,9 @@ G-RECORDS (T-D G, ruled by Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admi
   - the decisions on it at 27, 31, 39 and 55 (a stand of k = 3, 7, 15, 31) sent holds of 4, 8, 16 and 32;
   - the last runs to 87, 30 ticks past the stay.
   Under full_reorder the robot was elsewhere at the stand: no hold. The question returns to the design chat.
+  MPB PART (v) EVIDENCE (30 Sept 2026; analysis/mpb/REPORT.md, "Part (v)"), scenario_s12_02, both strategies: at the
+  coffee break's boundary (133) the fallback stand of k = 31 is projected to 165 and sends a hold of 30; the human leaves
+  the machine at 135. Recorded, not the scenario's property (Hadi's ruling 2 on part (v)).
   THE CANDIDATE'S MEASURED COST (the MPB post-(iv) records, 29 Sept 2026): under the candidate principle above (a
   fallback expires when the persistence it was built from breaks) the decision of 55 would have been re-taken when the
   stand broke at 57; as built it re-decides at the projection's end, 87. The measured cost of its absence in this
@@ -3891,6 +3899,10 @@ T-D X (29 Sept 2026; design_decisions.md, "T-D X: response", X3): the human walk
 rule; it is an evaluation case, and this scenario is it (realization responds at the next re-decision; the interval
 before it is what the near-encounter measures).
 T-F (29 Sept 2026): this scenario is one row of the evaluation's scenario dimension (TODO-144).
+SECOND INSTANCE (MPB part (v), 30 Sept 2026; analysis/mpb/REPORT.md, "Part (v)", class 5): scenario_s12_02, 33.61 cm at
+139, one F1 robot violation (138 to 140): the human leaves the coffee machine and walks toward the robot carrying west;
+the decisions rest on moving fallbacks of k = 1 and 3 (P4's recorded error). An instance produced by the scenario, not
+authored for it.
 Files: domains/kitting/ (the scenario), analysis/tb1a_destination/sep_classes.py (the measure)
 Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137, TODO-144
 

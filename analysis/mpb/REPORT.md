@@ -1,4 +1,4 @@
-# The meta-planner test-bed: report (MPB step 2, parts (iii) and (iv), 29 September 2026)
+# The meta-planner test-bed: report (MPB step 2, parts (iii) to (v), 29 to 30 September 2026)
 
 The recognition-to-planning chain with a working robot, one authored scenario per decision, against an oracle that
 states the expected decision before the run. The instrument, its rules and their sources are in `README.md`; the
@@ -12,6 +12,11 @@ cost realized, separation stop off.
 - No class-2 finding.
 - The eleven: MPB scenarios 1 to 8; scenario_s11_01 and _02 re-authored in part (iv); scenario_s10_07 to _09 added in
   part (iv) for coverage.
+- **Part (v): the five claimed cells of the coverage matrix are verified** (scenario_s12_01, _02, scenario_s11_03,
+  scenario_s10_10, _11; the section "Part (v)" below). Zero disagreements on parts 1 to 3 under both strategies, prior
+  on; every declared part-4 property holds under single_task. With them every materially distinct in-scope decision
+  path of `coverage.md` is verified, unreachable with a recorded derivation, or outside the claimed mechanism with a
+  recorded reason: **the MPB is closed.**
 
 ## Results
 
@@ -168,28 +173,29 @@ Ticks are the oracle's, and every one equals the run's (single_task, prior on).
   - Its stated reason ("the human is leaving it") describes neither.
   - No decision fell on such a tick in any run. Alteration B2 is detected by none of the eleven.
 
-## The alteration test (MPB-4), on the eleven
+## The alteration test (MPB-4), on the sixteen (part (v); the eleven in part (iv))
 
 One rule altered at a time, in a scratch copy; disagreements against the unchanged actual files (prior on,
-single_task).
+single_task). Rerun on the sixteen in part (v); the eleven's columns reproduce part (iv)'s exactly.
 
-| alteration | s10_01 | s10_02 | s10_03 | s10_04 | s10_05 | s10_06 | s10_07 | s10_08 | s10_09 | s11_01 | s11_02 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| A1: the fallback's end without the observation offset | 18 | 13 | 18 | 20 | 19 | 20 | 21 | 22 | 23 | 15 | 38 |
-| A2: the run length by exact direction equality | 170 | 74 | 155 | 143 | 157 | 114 | 110 | 180 | 174 | 20 | 76 |
-| A3: a turn resets the run length to 0 | 167 | 73 | 151 | 143 | 159 | 111 | 108 | 174 | 167 | 18 | 111 |
-| A4: landmarks not counted as fixed objects | 2 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 14 |
-| A5: projection_expired before recognition_changed | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 |
-| B1: the admitted plan without the method guards | 1 | 0 | 2 | 0 | 1 | 0 | 2 | 1 | 0 | 0 | 0 |
-| B2: the ray does not skip an object containing its start | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| B3: the moving fallback not cut | 3 | 1 | 2 | 1 | 1 | 1 | 2 | 2 | 8 | 0 | 21 |
-| C1: commitment warrant ignored | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| C2: the movement source loosened | 58 | 58 | 141 | 158 | 126 | 0 | 120 | 100 | 226 | 38 | 180 |
-| C3: warrant asked before adequacy | 3 | 1 | 1 | 1 | 56 | 3 | 1 | 1 | 0 | 0 | 0 |
-| D1: no retraction | 1 | 0 | 3 | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 0 |
-| D2: boundary asked before replaced | 4 | 2 | 4 | 4 | 4 | 2 | 2 | 4 | 2 | 0 | 0 |
+| alteration | s10_01 | s10_02 | s10_03 | s10_04 | s10_05 | s10_06 | s10_07 | s10_08 | s10_09 | s10_10 | s10_11 | s11_01 | s11_02 | s11_03 | s12_01 | s12_02 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A1: the fallback's end without the observation offset | 18 | 13 | 18 | 20 | 19 | 20 | 21 | 22 | 23 | 17 | 15 | 15 | 38 | 14 | 16 | 20 |
+| A2: the run length by exact direction equality | 170 | 74 | 155 | 143 | 157 | 114 | 110 | 180 | 174 | 148 | 159 | 20 | 76 | 59 | 136 | 144 |
+| A3: a turn resets the run length to 0 | 167 | 73 | 151 | 143 | 159 | 111 | 108 | 174 | 167 | 146 | 164 | 18 | 111 | 57 | 135 | 143 |
+| A4: landmarks not counted as fixed objects | 2 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 14 | 2 | 0 | 0 |
+| A5: projection_expired before recognition_changed | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| B1: the admitted plan without the method guards | 1 | 0 | 2 | 0 | 1 | 0 | 2 | 1 | 0 | 2 | 1 | 0 | 0 | 0 | 0 | 1 |
+| B2: the ray does not skip an object containing its start | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| B3: the moving fallback not cut | 3 | 1 | 2 | 1 | 1 | 1 | 2 | 2 | 8 | 1 | 1 | 0 | 21 | 2 | 1 | 1 |
+| C1: commitment warrant ignored | 0 | 0 | 0 | 4 | 0 | 0 | 0 | 0 | 0 | 2 | 16 | 0 | 0 | 0 | 0 | 4 |
+| C2: the movement source loosened | 58 | 58 | 141 | 158 | 126 | 0 | 120 | 100 | 226 | 135 | 202 | 38 | 180 | 38 | 58 | 158 |
+| C3: warrant asked before adequacy | 3 | 1 | 1 | 1 | 56 | 3 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 3 | 1 |
+| D1: no retraction | 1 | 0 | 3 | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 |
+| D2: boundary asked before replaced | 4 | 2 | 4 | 4 | 4 | 2 | 2 | 4 | 2 | 4 | 2 | 0 | 0 | 0 | 4 | 4 |
 
-Every alteration is detected by at least one scenario except B2, a property of the test set (above).
+Every alteration is detected by at least one scenario except B2, a property of the test set (above); the five of part
+(v) do not change that.
 
 ## The reference run (the control)
 
@@ -243,6 +249,120 @@ X5's ground (2), measured (new at this step): in scenario_s11_02, single_task, e
 the expiries of 25, 27, 31, 39 and 55 (two candidates each; `[meta-cand] delta=`), so the ground holds at a decision and
 at the next re-decision from 25 on, until 87 (hold 0). An evidence line, not a mechanism; full_reorder logs no
 per-candidate hold (TODO-141).
+
+## Part (v): the five claimed cells (30 September 2026)
+
+One authored instance for each reachable decision path the coverage matrix found without an instance and the
+contribution claims (`coverage.md`; Hadi's rulings of 29 September 2026). The artefacts and their pre-run derivations
+are in `authoring.md`, part (v).
+
+| scenario | cell | variant | ticks compared | decisions other than no_current_task, expected / actual | per-tick | decision | log | completion | holds (tick, ticks) | F1 viol/stand/recede | [sep] min, continuous (tick) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| scenario_s12_01 | D8 | on, single_task | 204 | 11 / 11 | 0 | 0 | 0 | 131 | none | 0/0/0 | 87.57 (79) |
+| scenario_s12_01 | D8 | on, full_reorder | 204 | 10 / 10 | 0 | 0 | 0 | 135 | (26, 4), (76, 7) | 3/0/1 | 38.05 (47) |
+| scenario_s12_02 | C2 | on, single_task | 281 | 14 / 14 | 0 | 0 | 0 | 161 | (76, 18), (133, 30), (134, 7), (135, 2), (137, 4) | 1/2/1 | 32.26 (140) |
+| scenario_s12_02 | C2 | on, full_reorder | 281 | 14 / 14 | 0 | 0 | 0 | 161 | the same | 1/2/1 | 32.26 (140) |
+| scenario_s11_03 | D9 | on, single_task | 164 | 5 / 5 | 0 | 0 | 0 | 113 | (6, 3), (14, 16), (53, 43) | 0/0/0 | 51.33 (13) |
+| scenario_s11_03 | D9 | on, full_reorder | 164 | 5 / 5 | 0 | 0 | 0 | 113 | the same | 0/0/0 | 51.33 (13) |
+| scenario_s10_10 | E6 | on, single_task | 282 | 13 / 13 | 0 | 0 | 0 | 171 | none | 0/0/0 | 352.81 (1) |
+| scenario_s10_10 | E6 | on, full_reorder | 282 | 13 / 13 | 0 | 0 | 0 | 162 | none | 0/0/0 | 320.43 (4) |
+| scenario_s10_11 | A4 | on, single_task | 215 | 11 / 11 | 0 | 0 | 0 | 161 | none | 0/0/0 | 411.19 (127) |
+| scenario_s10_11 | A4 | on, full_reorder | 215 | 9 / 9 | 0 | 0 | 0 | 137 | none | 0/0/0 | 437.79 (134) |
+
+In every run the trajectory equals the run's human lines on every tick, the in-process model lines equal the logged
+run's, and the oracle's process loaded none of the forbidden modules. The expected per-tick tables are byte-identical
+between the strategies.
+
+### Per cell: expected and actual
+
+Single_task, prior on; every tick equals the oracle's.
+
+- **D8, the switch against an admitted projection (scenario_s12_01).**
+  - Decisions before the admission at 0, 2, 6 and 14: fallbacks, both tasks hold 0, item_7 wins (cost difference
+    1.568).
+  - **26, entered (deliver_item(item_1), commitment and observation): item_7's hold is 4, above the authored difference
+    of 2.499, and the winner switches to item_13 with hold 0.** item_7 is grasped only at 96.
+  - P12.1a and P12.1b hold.
+  - The admission is at 26, not scenario_s10_02's 25: env_setup_12's output floor (seven keys against five), found
+    before the run (`authoring.md`).
+- **C2, the hold against an admitted standing segment (scenario_s12_02).**
+  - **76, entered (coffee_break, observation): item_14's hold is 18.** The robot is mid-walk to shelf_10 and would have
+    passed the waiting point inside the admitted wait (104 to 134).
+  - The robot comes within 50 cm of the waiting point on 142 to 146, after the human left it at 135.
+  - No F1 violation in the window 77 to 135.
+  - P12.2a to P12.2c hold.
+- **D9, the switch while carrying (scenario_s11_03).**
+  - item_8 is grasped at 4.
+  - The expiries while carrying: 6 (hold 3, return difference 9.08) and 14 (hold 16, return difference 16.36), both
+    continue.
+  - **30 (k = 31): hold 32, above 16.36: the switch to item_9 while carrying**, under both strategies.
+  - item_8 is released at shelf_3 at 35 (19.4 cm from it); item_9 is grasped at 41.
+  - P11.3a to P11.3c hold. At 14 the margin was 0.36 ticks, as the pre-run derivation flagged.
+- **E6, a record kept through a dip below θ (scenario_s10_10).**
+  - **25, entered; no decision from 26 to 36; the record stays deliver_item(item_1)** through the proximity regress at
+    31 (no observation) and **the dip at 34 to 36** (item_1 leads below θ, adequate).
+  - **37, replaced** (coffee_break overtakes).
+  - P10.10 holds under both strategies.
+- **A4, the cause boundary (scenario_s10_11, env_layout_13).**
+  - 7, entered (item_1).
+  - **53, recognition_changed with cause boundary**: item_1 placed at kitting_table_3, not pinned, leads the reset's
+    tie; the gate refuses below θ, a standing fallback.
+  - Then 60 entered (item_2), 135 replaced, 136 entered (item_1, commitment), 147 retraction.
+  - The first instance of the cause in any MPB run, under both strategies.
+
+### Classified
+
+- **scenario_s12_01 under full_reorder: P12.1a does not hold.** Not a disagreement: parts 1 to 3 agree exactly, and
+  MPB-6 does not require full_reorder to reproduce every part-4 property (as scenario_s10_03's P3a).
+  - The candidate is the ordering, and its tail's return walks enter the cost. At 26, [item_7, item_13] costs 103.93
+    (its hold 4 included) against 105.25 for [item_13, item_7], so the head stays item_7.
+  - The switch is a single_task property by the authored parameter: the difference is set between the two tasks, not
+    between the two orderings.
+- **scenario_s12_01 under full_reorder: three F1 robot violations inside the admission's assessed window**, class 5
+  pending Hadi's reading (not examined further).
+  - The decision of 26 keeps item_7 with a hold of 4 (its window 27 to 63). The robot passes the crossing at 45 to 47
+    within 50 cm of the human's carry, 38.05 cm at its closest.
+  - The same pattern as scenario_s10_02 prior off in part (iii) (the admission at 26, hold 4, three violations). The
+    hold of 5 from 25 (scenario_s10_02 prior on) kept the separation.
+  - The likely reading is the recorded execution residual: step quantisation, uncompensated by decision (T_r; TODO-77's
+    residual; docs/assumptions.md 4.4). If it is read as the framework departing from F1's ruling, it is class 2.
+  - No declared property covers it: P12.1a is single_task's.
+- **scenario_s12_02: a near-encounter after the declared window, class 5.**
+  - 33.61 cm at 139, one F1 robot violation, 138 to 140.
+  - The human leaves the machine at 135 and walks north-east toward shelf_2, toward the robot carrying west along the
+    route.
+  - The decisions it rests on are 135 (replaced, a moving fallback with k = 1, hold 2) and 137 (expired, k = 3, hold 4).
+    That is P4's recorded known error (little evidence protects little) and X3's case (the human walking toward the
+    robot; TODO-135). Recorded, not designed for.
+- **scenario_s12_02: TODO-132 (a) again** (ruling 2: recorded, not the property). At 133, the coffee break's boundary,
+  the fallback stand of k = 31 is projected to 165 and sends a hold of 30. The human leaves at 135.
+- No class-2 finding.
+
+### Prior off (appendix, no oracle comparison, no ruling)
+
+| scenario | completion | holds (tick, ticks) | near-encounters | F1 viol/stand/recede | [sep] min, continuous (tick) |
+|---|---|---|---|---|---|
+| scenario_s12_01 | 134 | (27, 6), (96, 6) | 0 | 0/0/0 | 52.20 (47) |
+| scenario_s12_02 | 184 | (91, 18), (133, 30) | 4 | 0/4/0 | 33.61 (139) |
+| scenario_s11_03 | 113 | (6, 3), (14, 16), (53, 43) | 0 | 0/0/0 | 51.33 (13) |
+| scenario_s10_10 | 171 | none | 0 | 0/0/0 | 352.81 (1) |
+| scenario_s10_11 | 161 | none | 0 | 0/0/0 | 411.19 (127) |
+
+Prior off, scenario_s12_01's admission falls at 27, after item_7's grasp at 26, so P12.1a does not hold there.
+
+### The whole-set facts, re-measured on the sixteen (32 prior-on runs)
+
+- The cause boundary fires in scenario_s10_11 only (53, both strategies).
+- Every admitted record still ends before its T_h: no P3 exposure.
+- The only record kept while the gate refuses is scenario_s10_10's (31, 34 to 36).
+
+### Regression audit, part (v)
+
+- **The suite:** 211 passed. The discovery test's inventory is 71 scenarios, setups 01 to 12.
+- **The eleven verified scenarios**, rerun under all three variants: every log, `.rec` stream and reference log
+  byte-identical to part (iv)'s md5s (68 of 68), and no committed output changed.
+- **The four maintained sweeps:** 96 of 96 logs and `.rec` streams byte-identical to their G-build baselines.
+- No file under `shared/`, `mesa_sim/`, `world/` or the run loop changed.
 
 ## The independence boundary, demonstrated
 
@@ -331,4 +451,34 @@ ebcb27b9f5dbf9cfcfa67e4b25a2ba3a  runs/env_layout_12_scenario_s10_09_on_single_t
 86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_off_single_task.rec
 86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_on_full_reorder.rec
 86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_on_single_task.rec
+ce379bcdb3df12bf3c8fd756ff127923  runs/env_layout_12_scenario_s10_10_off_single_task.log
+4251537079b3d12ed72aa11e6771f5e0  runs/env_layout_12_scenario_s10_10_off_single_task.rec
+31fa7baa5f3577440e8a1f0f7f7e3f70  runs/env_layout_12_scenario_s10_10_on_full_reorder.log
+4251537079b3d12ed72aa11e6771f5e0  runs/env_layout_12_scenario_s10_10_on_full_reorder.rec
+283af6c38bff7488a464c3f8db05276c  runs/env_layout_12_scenario_s10_10_on_single_task.log
+4251537079b3d12ed72aa11e6771f5e0  runs/env_layout_12_scenario_s10_10_on_single_task.rec
+2a9c8daf7b192827db7d81b335ebd2ea  runs/env_layout_12_scenario_s11_03_off_single_task.log
+bd84a77d4d232d4657b782614615bccb  runs/env_layout_12_scenario_s11_03_off_single_task.rec
+a2001d12159a70510cdea9ca483d5751  runs/env_layout_12_scenario_s11_03_on_full_reorder.log
+bd84a77d4d232d4657b782614615bccb  runs/env_layout_12_scenario_s11_03_on_full_reorder.rec
+31d5f0f5e16cdd71e301cf77182aa311  runs/env_layout_12_scenario_s11_03_on_single_task.log
+bd84a77d4d232d4657b782614615bccb  runs/env_layout_12_scenario_s11_03_on_single_task.rec
+d2e2516beaf54f201c9885fb7aa3cff4  runs/env_layout_13_scenario_s10_11_off_single_task.log
+955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_off_single_task.rec
+ca933a31e0837767b26292b211761404  runs/env_layout_13_scenario_s10_11_on_full_reorder.log
+955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_on_full_reorder.rec
+fe33adbd5e80d5843936d2d9cc41b0d0  runs/env_layout_13_scenario_s10_11_on_single_task.log
+955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_on_single_task.rec
+b68584016cc33ade9e4eb5cef1bda9b3  runs/env_layout_14_scenario_s12_01_off_single_task.log
+fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_off_single_task.rec
+5ef49e642a282dab817eeb0a27ed2ab5  runs/env_layout_14_scenario_s12_01_on_full_reorder.log
+fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_on_full_reorder.rec
+c342ce69532c3ecf4453e18a1fa7f6a0  runs/env_layout_14_scenario_s12_01_on_single_task.log
+fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_on_single_task.rec
+c77779465dcf2d64c4716973ed58b280  runs/env_layout_14_scenario_s12_02_off_single_task.log
+eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_off_single_task.rec
+72b73591793951438b743150f183589f  runs/env_layout_14_scenario_s12_02_on_full_reorder.log
+eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_full_reorder.rec
+93053e69c0d69ae637fb82b0c9399eb2  runs/env_layout_14_scenario_s12_02_on_single_task.log
+eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_single_task.rec
 ```

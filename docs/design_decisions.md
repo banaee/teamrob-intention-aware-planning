@@ -5499,7 +5499,7 @@ Provenance: scenario_s10_07 to _09 were added for a coverage gap found in review
 RECORD LINE (part (iv)): the framework has no representation of an observed human with no work under the prior on, since
 an empty assigned list is the diagnostic mode (shared/io_contracts.md §2.1). TODO-143, recorded only.
 
-NOT CLOSED (Hadi, 29 September 2026, the post-(iv) records): "BUILT" above is step 2, parts (i) to (iv). The coverage
+NOT CLOSED (Hadi, 29 September 2026, the post-(iv) records; SUPERSEDED by CLOSED, part (v), below): "BUILT" above is step 2, parts (i) to (iv). The coverage
 matrix (analysis/mpb/coverage.md; the extended coverage principle under MPB-2) sorts every materially distinct decision
 path of the eleven runs: 31 verified, 5 unreachable with a derivation, 4 out of coverage with a reason, 1 reachable and
 not claimed (P3), 1 not a distinct path, and 5 reachable and claimed with no instance. Three facts of the whole set: the
@@ -5515,3 +5515,45 @@ out of coverage, conceptually apart from the boundary cause (both without instan
 reachable under a changed hypothesis space, AD3 is not exercisable here).
 CLOSURE CRITERION: the MPB closes when every materially distinct in-scope decision path is verified, unreachable with a
 recorded derivation, or outside the claimed mechanism with a recorded reason.
+
+PART (v), BUILT (30 September 2026; analysis/mpb/authoring.md and REPORT.md, "Part (v)"; coverage.md): the five claimed
+cells, one authored instance each, all verified (zero disagreements on parts 1 to 3 under both strategies, prior on;
+every declared part-4 property under single_task).
+- D8, the switch against an admitted projection: scenario_s12_01 on env_layout_14 and env_setup_12. At the admission
+  (entered, 26) item_7's hold through the crossing is 4, above the authored cost difference of 2.5 ticks (the midpoint of
+  (0, hold), fixed before any run), and the winner switches to item_13 with hold 0 before item_7 is grasped. The ruled
+  "new setup on env_layout_12" was not expressible: from shelf_5 every other robot task of that room is at least 11.2
+  ticks dearer, above a crossing's hold; Hadi ruled env_layout_14 (plus a shelf beside shelf_5 and a table), no two items
+  on one shelf. The admission moved from 25 to 26 on env_setup_12 (the output floor, seven keys), found before the run,
+  the cost relation unchanged.
+- C2, the hold against an admitted standing segment: scenario_s12_02 on the same room and setup (shelf_10 and
+  kitting_table_6, whose carry passes the human's waiting point at the coffee machine). At coffee_break's admission (76)
+  item_14's hold is 18, against the admitted wait (104 to 134); the robot comes within min_separation of the waiting
+  point only after the human has left it. env_layout_12 could not express it: every robot station lies at y >= -220, so
+  only a walk from the start passes the waiting point, before any admission of coffee_break is possible. The fallback
+  stand after the coffee break's boundary sends a hold of 30 as the human leaves (TODO-132 (a), recorded, not the
+  property).
+- D9, the switch while carrying: scenario_s11_03 on env_setup_11, the stand from tick 0 and the robot grasping item_8 at
+  4, before the decisive expiry (Hadi: the experimental variable is the carrying state at the decision, the return walk
+  in the cost difference, not when the stand began). At the expiry of 30 (k = 31) item_8's hold, 32, exceeds the return
+  difference, 16.4 (X1's condition with deliver_with_return); the robot switches while carrying, under both strategies,
+  and returns item_8 to shelf_3 before item_9's grasp.
+- E6, a record kept through a dip below theta: scenario_s10_10 on env_setup_10, scenario_s09_04's script (the planned
+  drop-cut detour cannot be expanded by the oracle's trajectory, which reads a cut from a Start only). Admitted at 25; the
+  record kept with no trigger through a proximity regress at 31 and the dip at 34 to 36 (item_1 leading below theta,
+  adequate); replaced at 37.
+- A4, the cause boundary: scenario_s10_11 on env_layout_13 (env_layout_12 without the coffee machine: the mechanism
+  requires the absence of the coffee_break hypothesis, which wins the tie order at every reset) with env_setup_10. item_1
+  misdelivered to kitting_table_3, adequate to the place (margin 55.5 cm at alpha = 0.05; the case would not form at
+  0.1); at the place (53) the reset leaves item_1 the leader: recognition_changed with cause boundary, its first instance.
+Classified, no class 2: scenario_s12_01 under full_reorder keeps item_7 (the ordering's cost includes its tail's return
+walks; MPB-6); three F1 robot violations inside that admission's window under full_reorder (hold 4 from 26), the pattern
+of scenario_s10_02 prior off, class 5 pending Hadi's reading (the likely reading the recorded execution residual, step
+quantisation uncompensated, TODO-77; docs/assumptions.md 4.4); a near-encounter in scenario_s12_02 at 139 as the human
+walks toward the robot on moving fallbacks of k = 1 and 3 (P4's recorded error; X3; TODO-135). The alteration test on
+the sixteen: every rule detected except the skip rule (B2), as before. The eleven verified scenarios rerun byte-identical
+(68 of 68 logs and streams); the suite 211 passed; the four maintained sets 96 of 96 byte-identical.
+CLOSED (30 September 2026): every materially distinct in-scope decision path is verified (36), unreachable with a
+recorded derivation (5), or outside the claimed mechanism with a recorded reason (4 out of coverage; P3 reachable and not
+claimed; one not a distinct path). The NOT CLOSED paragraph above is superseded. Next, as Hadi rules: the evaluation
+(T-F, framed in TODO-144) or track 4 (TODO-140).

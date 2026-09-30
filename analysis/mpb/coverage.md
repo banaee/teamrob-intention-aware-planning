@@ -1,7 +1,9 @@
 # The meta-planner test-bed: the coverage matrix (MPB, post-(iv) records, 29 September 2026)
 
 Which decision paths of the recognition-to-planning chain the eleven verified scenarios instantiate, and, for every
-path they do not, whether the framework can reach it in scope. Derived from the committed outputs of the eleven runs
+path they do not, whether the framework can reach it in scope. UPDATED at part (v) (30 September 2026): the five
+reachable claimed cells are verified by one authored instance each (rows A4, C2, D8, D9, E6); the MPB is closed
+(Closure, below). Derived from the committed outputs of the eleven runs
 (`scenario_*/on_single_task/` and `on_full_reorder/`: `actual_decisions.json`, `selection.json`, `robot.json`,
 `expected_ticks.json`, `observed.json`), prior on. No run was made for it. Nothing is authored in this step.
 
@@ -48,6 +50,10 @@ Measured on all 22 prior-on runs (169 decisions under single_task, 158 under ful
   decision. No robot ran past an admitted projection's end with the record standing.
 - **No record was kept through a dip below θ:** on every tick a record stood, its hypothesis led and the gate cleared.
 
+Re-measured at part (v) on the sixteen (32 prior-on runs, 240 decisions under single_task, 227 under full_reorder): the
+cause boundary fires in scenario_s10_11 only (53, both strategies); every admitted record still ends before its T_h (no
+P3 exposure); the only record kept while the gate refuses is scenario_s10_10's (the regress at 31, the dip at 34 to 36).
+
 ## A. The trigger and its cause
 
 | row | instance | kind |
@@ -55,7 +61,7 @@ Measured on all 22 prior-on runs (169 decisions under single_task, 158 under ful
 | A1 `no_current_task` | s10_01 0 (S, F) | verified |
 | A2 entered | s10_01 25 (S, F) | verified |
 | A3 replaced | s10_01 61 (S, F); at a boundary tick, s10_04 133 (S, F) | verified |
-| A4 boundary (the recorded hypothesis still leads after the reset) | none | **reachable** (derivation A4) |
+| A4 boundary (the recorded hypothesis still leads after the reset) | s10_11 53 (S, F), part (v) | verified (derivation A4) |
 | A5 retraction | s10_03 55 (S, F) | verified |
 | A6 `projection_expired` | s10_01 2 (S, F) | verified |
 | A7 shared tick: `no_current_task` masks an expiry | s10_01 67 (S); s10_09 72 (F); six in all | verified |
@@ -120,7 +126,7 @@ the IR test-bed's seventeen scenarios, nor on any tick of the eleven MPB scenari
 | row | instance | kind |
 |---|---|---|
 | C1 an admitted plan, a hold against the human's walk | s10_02 25, hold 5 (S, F) | verified |
-| C2 an admitted plan, a hold against a standing segment (the human's `wait_at`, `place` or `pick_up` on a robot route) | none | **reachable** |
+| C2 an admitted plan, a hold against a standing segment (the human's `wait_at`, `place` or `pick_up` on a robot route) | s12_02 76, hold 18 against the admitted wait (S, F), part (v) | verified |
 | C3 a moving fallback, not cut | s10_01 2 (S, F) | verified |
 | C4 a moving fallback cut at an object | s10_09 60, kitting_table_2 (S, F); shelf_1 at 14 in several | verified |
 | C5 a moving fallback cut at a landmark | s11_02 14, door_N (S, F); s10_01 157, corner_SE (S) | verified |
@@ -156,8 +162,8 @@ on every tick (`docs/assumptions.md` 5.1, 5.2), and the run's first decision alr
 | D5 walking to a shelf: continue, hold positive, against a fallback | s11_02 14, hold 2 (S) | verified |
 | D6 a re-decision inside a running hold | s11_02 27 (S); where the hold drops to 0, s11_02 22 and 87 (S) | verified |
 | D7 a switch while walking to a shelf, against a fallback | s11_01 14 (S, F) | verified |
-| D8 a switch against an admitted projection (B3's realized-cost choice) | none | **reachable** |
-| D9 a switch while carrying (`deliver_with_return`, X1's return walk) | none | **reachable** |
+| D8 a switch against an admitted projection (B3's realized-cost choice) | s12_01 26 (S), part (v) | verified |
+| D9 a switch while carrying (`deliver_with_return`, X1's return walk) | s11_03 30 (S, F), part (v) | verified |
 
 **D8.** The MPB's one switch (s11_01 at 14) is against a fallback stand. scenario_s10_02, the one decision whose hold
 comes from an admitted plan, has a single candidate. With a second candidate whose realized cost falls below the held
@@ -180,7 +186,7 @@ covered by type.
 | E3 θ and adequacy passed and warrant failed | B4 | verified |
 | E4 a projection change with no change of choice | entered, s10_01 25; retraction, s10_03 55 (S, F) | verified |
 | E5 no decision opportunity: a fallback outliving its evidence | s11_02 55 → 87, the stand broken at 57 (S) | verified |
-| E6 no decision opportunity: a record kept through a dip below θ (D2's retention by identity) | none | **reachable** |
+| E6 no decision opportunity: a record kept through a dip below θ (D2's retention by identity) | s10_10 34 to 36, the record kept from 25 to 36 (S, F), part (v) | verified |
 | E7 no decision opportunity: the loss of observation warrant (AD3) | none | **out of coverage** |
 | E8 no decision opportunity: an admitted projection past its T_h (P3) | none | reachable, not claimed |
 | E9 no decision opportunity: a change after the terminal decision | none | **out of coverage** |
@@ -216,16 +222,23 @@ elsewhere during the stand, and full_reorder logs no per-candidate hold (TODO-14
 
 | kind | rows |
 |---|---|
-| verified | 31 (A1 to A3, A5 to A8; B1 to B7; C1, C3 to C5, C7; D1 to D7; E1 to E5, E11, E12) |
+| verified | 36 (A1 to A8; B1 to B7; C1 to C5, C7; D1 to D9; E1 to E6, E11, E12) |
 | unreachable, with a derivation | 5 (B8 to B11; C8) |
 | out of coverage, with a reason | 4 (C6; E7, E9, E10) |
-| reachable, claimed, no instance | 5 (A4, C2, D8, D9, E6) |
+| reachable, claimed, no instance | 0 (A4, C2, D8, D9, E6 verified in part (v); 5 before it) |
 | reachable, not claimed | 1 (E8, P3) |
 | not a distinct path | 1 (A9) |
 
 E2 and E3 repeat B3 and B4 as negative rows and are counted once, as verified.
 
 ## The reachable cells the contribution claims, and their remedies under MPB-2
+
+VERIFIED IN PART (v) (30 September 2026; REPORT.md, "Part (v)"; authoring.md, part (v)), with the remedies as built:
+D8 on env_layout_14 and env_setup_12 (the ruled "new setup on env_layout_12" was not expressible, derivation in
+authoring.md; Hadi ruled the layout); C2 on the same (a new layout, as the ruling allowed); D9 on env_setup_11 with the
+stand from tick 0 and the robot grasping before the decisive expiry (the variable is the carrying state); E6 on
+env_setup_10 with scenario_s09_04's script (the planned drop-cut detour is not expandable by the oracle's trajectory);
+A4 on env_layout_13 with env_setup_10.
 
 Ruled by Hadi, 29 September 2026, in this order; each gets one authored instance in part (v):
 1. **D8, the switch against an admitted projection:** a new setup on env_layout_12 (item_7's crossing task plus an
@@ -248,3 +261,6 @@ setup: the output floor couples every scenario on a setup).
 
 The MPB closes when every materially distinct in-scope decision path is verified, unreachable with a recorded
 derivation, or outside the claimed mechanism with a recorded reason: here, when A4, C2, D8, D9 and E6 are verified.
+CLOSED (part (v), 30 September 2026): all five are verified (zero disagreements on parts 1 to 3 under both strategies,
+prior on; every declared part-4 property under single_task). Every row is now verified (36), unreachable with a
+derivation (5), out of coverage with a reason (4), reachable and not claimed (1, P3) or not a distinct path (1).
