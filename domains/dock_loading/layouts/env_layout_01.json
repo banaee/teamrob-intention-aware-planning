@@ -149,7 +149,7 @@
     },
     {
       "id": "office_chair",
-      "type": "chair",
+      "type": "office_chair",
       "position": [
         -240,
         300

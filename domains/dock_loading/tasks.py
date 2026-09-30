@@ -31,9 +31,11 @@ _empty_pallet_bay = Var("?empty_pallet_bay")
 _coffee_machine = Var("?coffee_machine")
 _office_chair= Var("?office_chair")
 
-# target and entity are used in move_to and wait_at actions, respectively.
+# target and entity are used in move_to and wait_at actions, respectively;
+# item is the parameter of pick_up, place and scan_it, which a step binds to ?pallet.
 _target = Var("?target")
 _entity = Var("?entity")
+_item = Var("?item")
 
 
 # =============================================================================
@@ -54,10 +56,10 @@ deliver_pallet = WorkTask(
             steps=[
                 ActionStep(move_to, {_target: Const("dock_gate")}),
                 ActionStep(move_to, {_target: _pallet}),
-                ActionStep(pick_up, {_pallet: _pallet}),
+                ActionStep(pick_up, {_item: _pallet}),
                 ActionStep(move_to, {_target: Const("dock_gate")}),
                 ActionStep(move_to, {_target: _delivery_bay}),
-                ActionStep(place, {_pallet: _pallet, _target: _delivery_bay}),
+                ActionStep(place, {_item: _pallet, _target: _delivery_bay}),
             ],
         ),
         # TODO: implement open_gate ActionSchema, then fill this method
@@ -71,10 +73,10 @@ deliver_pallet = WorkTask(
         #         ActionStep(move_to,   {_target: Const("dock_gate")}),
         #         ActionStep(open_gate, {_entity: Const("dock_gate")}),
         #         ActionStep(move_to,   {_target: _pallet}),
-        #         ActionStep(pick_up,   {_pallet: _pallet}),
+        #         ActionStep(pick_up,   {_item: _pallet}),
         #         ActionStep(move_to,   {_target: Const("dock_gate")}),
         #         ActionStep(move_to,   {_target: _delivery_bay}),
-        #         ActionStep(place,     {_pallet: _pallet, _target: _delivery_bay}),
+        #         ActionStep(place,     {_item: _pallet, _target: _delivery_bay}),
         #     ],
         # ),
     ],
@@ -98,10 +100,10 @@ load_return = WorkTask(
             ],
             steps=[
                 ActionStep(move_to, {_target: _pallet}),
-                ActionStep(pick_up, {_pallet: _pallet}),
+                ActionStep(pick_up, {_item: _pallet}),
                 ActionStep(move_to, {_target: Const("dock_gate")}),
                 ActionStep(move_to, {_target: Const("truck_interior")}),
-                ActionStep(place, {_pallet: _pallet, _target: Const("truck_interior")}),
+                ActionStep(place, {_item: _pallet, _target: Const("truck_interior")}),
             ],
         ),
         # TODO: gate_closed method — same pattern as deliver_pallet
@@ -116,6 +118,7 @@ load_return = WorkTask(
 confirm_delivered_pallet = WorkTask(
     name="confirm_delivered_pallet",
     parameters=[_pallet],
+    parameter_types={"?pallet": "pallet"},
     methods=[
         MethodSchema(
             name="confirm_delivered_pallet_default",
@@ -123,7 +126,7 @@ confirm_delivered_pallet = WorkTask(
             guards=[],
             steps=[
                 ActionStep(move_to, {_target: _pallet}),
-                ActionStep(scan_it, {_pallet: _pallet}),
+                ActionStep(scan_it, {_item: _pallet}),
             ],
         ),
     ],
