@@ -284,6 +284,15 @@ Decisions
   and the tests sorted under kitting, the instruments' code shared and their run sets, expectations and reports per
   domain, every path named in a record or a README updated, with the preparation of the instruments; then the IR
   test-bed scenarios on dock_loading, agreed with Hadi before they are authored.
+  The second milestone scenario is BUILT and accepted, and stage 1's milestone is complete (1 Oct 2026;
+  design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): scenario_s03_03,
+  s05_03, s07_03 (0371035), one per room, prior on, `single_task`, 1000 steps: the robot completes its four tasks and
+  every entry of the human's script is closed in all three. Not exercised: the robot arriving at a bay where the human
+  stands, two scans at once in one bay (the human finishes a scan before the next pallet arrives). Its findings are
+  recorded there (five of six standby walks admitted as a break, TODO-155; TODO-135's fourth instance; TODO-145;
+  TODO-154). Next: the design of the IR test-bed set with Hadi (first question: TODO-155); then the sorting of the
+  earlier analyses and tests under kitting, with the preparation of the instruments; then the set's authoring and its
+  runs.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

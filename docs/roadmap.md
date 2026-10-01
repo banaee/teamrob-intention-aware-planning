@@ -400,6 +400,10 @@ SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domai
 SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT): steps 6 to 8 of stage 1 are built and the milestone
 accepted. Next: the second simple scenario per room; then the sorting of the earlier analyses and tests under kitting,
 with the preparation of the instruments; then the IR test-bed scenarios, agreed with Hadi before they are authored.
+SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): the second milestone scenario
+is built and accepted; stage 1's milestone is complete. Next: the design of the IR test-bed set with Hadi (first
+question: TODO-155); then the sorting of the earlier analyses and tests under kitting, with the preparation of the
+instruments; then the set's authoring and its runs.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -665,6 +669,16 @@ with the preparation of the instruments; then the IR test-bed scenarios, agreed 
     code shared, their run sets, expectations and reports per domain (its own commit, no change of behaviour), with the
     preparation of the instruments. Next: the second simple scenario per room; then that step; then the IR test-bed
     scenarios, agreed with Hadi before they are authored.
+    BUILT, THE SECOND MILESTONE SCENARIO (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT):
+    scenario_s03_03, s05_03, s07_03, one per room on the MPB setups (0371035): the robot delivers two pallets to the dry
+    bay and one to the frozen bay and returns one empty pallet; the human scans the three, walks to the standby place
+    between scans and closes at the desk. The acceptance held in all three rooms (the robot's last task completes at
+    world tick 289, 276, 285; every entry of the human's script closed, the closing part included). Exercised: the
+    priority rule, the standby walk, the frozen bay, each scan entering the live set on the tick of its delivery. Not
+    exercised: the robot arriving at a bay where the human stands, two scans at once in one bay (the human finishes a
+    scan before the next pallet arrives). Findings recorded there (TODO-135's fourth instance, TODO-145, TODO-154,
+    TODO-155). Stage 1's milestone is complete. Next: the design of the IR test-bed set with Hadi (first question:
+    TODO-155); then the sorting step with the preparation of the instruments; then the set's authoring and its runs.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
