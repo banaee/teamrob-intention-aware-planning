@@ -67,6 +67,9 @@ returning human is a new observation.
 Framework scope · the AAAI paper · perception; the fallback projection.
 Not in the Mesa body: the human never leaves (the exit walk ends inside the workspace, the human observed). The one
 place the code handles no observed human is T-D P's boundary condition (no fallback); the recognizer has no path for it.
+Ruled, not built (T-G A8, Hadi, 1 Oct 2026; track 4's reduced form, after T-G's stage 2): the layout declares monitored
+areas; outside every one the robot's WorldState holds no human, the recognizer does not update, no human projection
+exists; disappearance and reappearance each cause a new decision, the reappearance a new episode from the prior base.
 
 **2.4** The human executes one task at a time; a switch (a `Start` event) suspends the current task, a `Drop` ends it.
 Framework scope · T-H's stack (one level deep) · the human executor and its record.
@@ -140,6 +143,13 @@ Perception · the AAAI paper; L2 · the recognizer's input; the projection's sta
 
 **5.2** One observed human, for the current contribution.
 Perception · the world-state builder (one observed human per robot) · the recognizer; the fallback projection.
+Several observed humans (a passing colleague, a colleague talking to the observed human) are an FW direction (T-G A10;
+TODO-150).
+
+**5.3** The robot knows the states of objects, including which pallets are scanned, through the site's system: a scan is
+a digital act written to that system at once. Its knowledge of objects does not depend on where the human is (T-G A8).
+Perception · Hadi, 1 Oct 2026 (T-G A6) · the robot's WorldState (object states, T-G A5); dock_loading's scan.
+The simulated robot reads the environment's true states through its body; no observation of the scan is modelled.
 
 ## Rejected or dropped
 

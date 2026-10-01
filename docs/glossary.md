@@ -337,6 +337,11 @@ AMENDED (Hadi, on the L-records report, 27 September 2026): RE-ENTRY takes exact
 returning hypothesis; k returning on one tick take 1/|H| each), the incumbents share the rest in this tick's
 proportions; the origin is the current position, the entry latency that of a first observation (0), the derived action
 the world's. Logged `[IR-reentry]`. A re-entry on a boundary tick is governed by the boundary.
+RULED, NOT BUILT (T-G A4, Hadi, 30 September and 1 October 2026): a second condition of the LIVE SET, liveness by
+**applicability** (§6): "A human-task hypothesis is live only when at least one of its methods is currently applicable in
+the robot's WorldState. When no method is applicable, the hypothesis leaves the live set and can re-enter when the task
+becomes executable again." It re-enters at the prior base, as under L4. It replaces the perfect-fit score of a hypothesis
+the planner cannot decompose (I2). design_decisions.md, "T-G: the second domain's rulings", A4.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -481,6 +486,12 @@ hold (`planner.is_complete()`). Not a fact about who performed it. Measured from
 tick after the robot's last release; the empty-pool `[meta]` line is the DECLARED tick, two later.
 → `shared/planner.py`, `is_complete()`; `CLAUDE.md`, "Regression checking".
 
+**applicable** (of a task; T-G A2, 1 October 2026) — one of the task's methods applies in the world state the agent has:
+its conditions (`MethodSchema.guards`) hold there. The planner's own word: it selects the first applicable method. A task
+with no applicable method cannot be decomposed (`DecompositionError`) and, for the human, cannot be chosen (T-G A3); a
+hypothesis with none leaves the live set (T-G A4, ruled, not built). Hadi's rulings say "executable" in the same sense.
+→ `shared/planner.py`, `_select_method()`; `docs/design_decisions.md`, "T-G: the second domain's rulings", A2 to A4.
+
 **assigned tasks** — a set the robot is told: for the human, which tasks it was assigned (every one a `WorkTask`
 instance, T-H), never in which order; the ordering lives only in the human's script. Replaces "work order" (T-H,
 25 Sept 2026; older records say "work order"). For the robot, `assigned_tasks` is its task pool.
@@ -541,6 +552,16 @@ robot's plans. A free placement or a handover, if ever wanted, is a task of the 
 AUTHOR CONVENTION (T-C2c, carried over): a script ends with the human leaving the workspace (`go_to("door")` or a
 corner), unless the scenario is about the terminal stand at a table (TODO-80), said in its description. Extended to the
 regression fixtures whose terminal stand is not their purpose (Track 2.5): `docs/assumptions.md` 1.1.
+RULED, NOT BUILT (T-G A3, Q1 and Q2, Hadi, 30 September and 1 October 2026; one form for every domain, in `world/`): the
+list is a PRIORITY ORDER, not an execution sequence. Whenever the human becomes free it scans the list from the
+beginning and selects the first assigned task that is currently **applicable** and not yet completed, and waits if none
+is; after a completion it starts again from the top. A task in progress is never interrupted by a change in the
+environment; nothing is added to or moved in the list during a run. The choice among applicable tasks is one isolated
+point of the human's executor (a live user, T-V track 2, or a human planner can supply it). A script independent of the
+robot replays exactly at load, as today; one dependent on the robot is checked as far as the replay can. Kitting is the
+special case (every assigned task applicable from the start: the list's order is the execution order). Authoring
+pattern: a lowest entry "go to the standby place", a plain walk to a landmark. design_decisions.md, "T-G: the second
+domain's rulings", A3.
 
 **event** — a `Trigger` and a `Decision` attached to a task of the script, or built live by `inject`. Typed, no unions
 and no sentinels. An event fires once per script entry and is then consumed.
@@ -941,6 +962,16 @@ T-H4 its build). Task letters are never reassigned; the order is the roadmap's, 
 **T-D tail** — what T-D keeps open after its close at the MPB close-out (30 September 2026): track 3b (TODO-145),
 track 4 (TODO-140) and the 4D detour strategy; it runs after T-V.
 → `docs/roadmap.md`, "The plan from T-A", T-D.
+AMENDED (T-G A1, A8, C1, 1 October 2026): track 4, in its reduced form, is placed after T-G's stage 2; the 4D detour is
+FW. Track 3b stays after T-V.
+**V1** — the first complete version of the framework, the package for TeamRob and the publications (T-G A1, Hadi, 1
+October 2026): T-G; T-F; T-V tracks 1 and 2; track 3b (TODO-145); track 4 in its reduced form (TODO-140). An open TODO
+may carry the tag [V1] beside its status.
+**FW** — future work: not designed, ruled or built within V1 (T-G A1): the 4D detour, T-S, and conceptual, higher-level
+directions only, each a TODO tagged [FW]. An alternative not taken in a design question is recorded in that question's
+ruling, never as FW; FW never hides a known wrong behaviour inside what V1 claims. An untagged TODO is not yet ruled;
+a TODO is tagged when next touched by Hadi's ruling, and keeps its number and identifier for good.
+→ `docs/design_decisions.md`, "T-G: the second domain's rulings", A1.
 **T-E** — the demonstration's viewer, as the plan from T-A defined it. Superseded by T-V, track 1 (30 September
 2026); T-E in older records means the viewer.
 → `docs/roadmap.md`, "The plan from T-A", T-E and T-V.
@@ -948,13 +979,16 @@ track 4 (TODO-140) and the 4D detour strategy; it runs after T-V.
 gate, the projection and the meta-planner stay domain-independent. Before 30 September 2026 it also held 4D and ROS;
 4D is in the T-D tail, ROS is T-S.
 → `docs/roadmap.md`, "The plan from T-A", T-G.
+AMENDED (T-G rulings, 30 September and 1 October 2026): its design is ruled, and some rulings change `shared/` and
+`world/` (A3, A4, A5, A7, A8), each with kitting's acceptance; "`shared/` unchanged" now reads: nothing domain-specific
+enters `shared/`. Stages 1 to 3, track 4 after stage 2. design_decisions.md, "T-G: the second domain's rulings".
 **T-V** — viewer, interface and interactive simulator (ruled 30 September 2026), one task with tracks: track 1 the
 viewer for pre-loaded scripts (T-E as originally defined; demonstration only, nothing enters the mind); track 2 Phase 7
 (live events through the human executor's injection path, the export as a script, the replay rule, later the context
 stream).
 → `docs/roadmap.md`, "The plan from T-A", T-V; `docs/handoffs/phase7_interactive_deviations.md`.
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
-the end of the queue.
+the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
@@ -985,6 +1019,10 @@ with no meaning beyond order of writing; ruling 4 as amended, 26 September 2026)
 shelves, machines, switches, landmarks; dock_loading: bays, the gate, and the truck, a fixed container of the room as a
 shelf is.)
 Until T-L's stage 1 the layout JSON also held the setup's objects and dead agent spawn entries.
+AMENDED (T-G A2, A8, A9, 1 October 2026): the layout declares **areas** (§10), among them its **monitored areas**, and the
+area of each **container**; "zone" is not used. AS BUILT: every layout of both domains still declares a `zones` block and
+a `zone` per fixed object, and the Mesa world-state builder emits `in_zone(agent, zone)` from them; dock_loading's revised
+room drops them (B10). design_decisions.md, "T-G: the second domain's rulings", A2 (its conflict line).
 
 **setup** — the shift: the movable objects that exist, each with its home container and, where the domain determines
 one through `destination_of`, its designated destination, and any other initial state the domain declares per movable
@@ -993,6 +1031,11 @@ designated destination must also have the type the schema declares for it. A dif
 setup. One file per setup, with a serial id (`env_setup_NN`; ruling 4 as amended).
 (Kitting: the items, each on a shelf with its designated table; dock_loading: the pallets, with `subtype`, `is_empty`,
 `is_scanned`.) A new term.
+RULED, NOT BUILT (T-G A5, B3, B4, B7, 1 October 2026): the setup gives each object its initial **states** and its
+designations (`destination_of(object, target)`; for a full pallet also its onward container); the action schemas declare
+which action sets or ends which state; the **environment** holds the true states, and the simulator has no code written
+for one domain. dock_loading's `is_empty` becomes the state fact `is_empty(pallet)`. design_decisions.md, "T-G: the
+second domain's rulings", A5.
 COLLISION, not resolved: DESIGN-16 (`docs/design_decisions.md`) says "travel/setup costs between tasks", the
 scheduling sense (a cost of switching between tasks). That is the English word, not the term.
 
@@ -1035,6 +1078,44 @@ the run log. A run with an override is never a fixture or a baseline. Not an inj
 7's injection path (**inject**, §6). A path is `<artefact>.<id>.<fact>` (`scenario.<agent>.start_position`,
 `layout.<object>.position`, `setup.<object>.initial_container`), read into a typed class at the input boundary.
 → `mesa_sim/overrides.py`; `mesa_sim/sim_model.py`, `SimModel.__init__` (where they are applied).
+
+---
+
+## 10. The architecture and the room
+
+Ruled by Hadi (T-G A2, A8, A9, 1 October 2026), a glossary revision: no code is renamed. Older records say "the bodies"
+or "the embodiment layer" for `mesa_sim/` and `ros_sim/`, and "zone" for an area; read them as below.
+→ `docs/design_decisions.md`, "T-G: the second domain's rulings", A2.
+
+**mind** — an agent's deciding part. For the robot: recognition, planning, task knowledge (`shared/`).
+
+**body** — an agent's sensing and acting part. For the robot: it builds the robot's `WorldState` from what the robot
+senses and carries out the robot's decisions as motions. What depends on the body (speed, arrival radius, execution
+latency, spatial resolution) is passed in to `shared/`, never held there (CLAUDE.md, "Layering").
+NOTE (TODO-131): the Mesa class `RobotAgent` still holds mind parts (the recognizer, the meta-planner, the perception
+memory of T-D P) and body parts together.
+
+**environment** — the room, its objects and their true states. It belongs to no agent; it holds the states and plans
+nothing. "World" is not used for it: `world/` (the world's side, the human's executor and record) and the world
+vocabulary (**WorldState**, the WORLD terms of §7) keep their meanings.
+
+**simulator** — the software that implements the environment and the agents' bodies: Mesa (`mesa_sim/`), ROS
+(`ros_sim/`). It replaces "the bodies" as the name of those two homes.
+
+**container** — a fixed object of the layout that holds movable objects. dock_loading: the truck, a delivery bay, the dry
+store, the freezer, the empties area; kitting: a shelf, the table. Its area is fixed and declared (A9). In dock_loading a
+container is one point, its centre, and may hold several pallets (B9), as kitting's table does (TODO-74). A setup's "home
+container" (`initial_container`) is this sense.
+
+**area** — a part of the room declared in the layout. The environment emits the fact that an agent is in an area. Replaces
+"zone", which is not used.
+
+**monitored area** — an area in which the robot observes the human. Outside every monitored area the robot receives no
+observation of the human; its knowledge of objects is not affected. Fixed per layout, independent of where the robot is;
+kitting monitors its whole room, dock_loading's office is unmonitored. Ruled with track 4's reduced form (A8), not built.
+NEAR TERMS, not merged (TODO-140, `docs/assumptions.md` 1.1, 2.3, §2 **fallback projection**): "the shared workspace",
+"the shared work area", "the robot's operational area", "the outside area" and "the observable area" of TODO-140's
+framing; and the "workspace boundary", the edge of the space a fallback ray meets.
 
 ---
 
