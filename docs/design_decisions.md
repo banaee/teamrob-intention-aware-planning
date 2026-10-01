@@ -6103,6 +6103,19 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   Staging: a milestone in stage 1's build, before the IR test-bed: one simple scenario per room runs from start to end.
   Stage 1's "before the plan" points on the layout and the setup (C1's "before each stage's plan the design chat and
   Hadi agree the layout and the setup") are closed by this entry for stage 1.
+  ANSWERS (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6):
+  - The six setups stay as written, though pairwise identical in content across the rooms. Merging identical setups
+    belongs to the held refactor of scenarios and layouts, not to this stage.
+  - Accepted as built (cec8cc3): the MPB robot's start point (0, -370), on the dock platform; the ids
+    `empty_pallet_bay_0`, `desk`, `standby_place`; the area names `zone_hall`, `zone_office`, `zone_truck_side`.
+  - A pallet's `subtype` stays out of the setups. Reason: destinations are by designation.
+  - The pictures of the old room are kept, renamed with the suffix `_original` (C3's note).
+  NOTES (the same answers; facts, not rulings):
+  - An agent stops 10 to 30 cm before a target point (a walk steps 20 cm toward the centre and completes once
+    `at(agent, object)` holds); the proximity threshold is 30 cm (`PROXIMITY_THRESHOLD`).
+  - The scan and the next delivery to the same bay share one point (the bay's centre, B9), so with a minimum separation
+    of 50 cm that conflict is certain whenever both concern the same bay. This is the expected main interaction of stage
+    1, not a defect.
 
 PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 
@@ -6205,6 +6218,9 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     `office_break`) and `scenarios/scenarios_s01.py` ("scenario ids keep their old form until stage 3"); layout pictures
     inside the domain folder under an old id (`env_layout1.svg`, `env_layout1_present.svg`, `env_layout1_present.png`,
     `env_layout_original.jpg`; kitting keeps its pictures in `docs/env_layouts_png/`).
+    NOTE (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6): these pictures show the removed env_layout_01. They are kept, renamed with the suffix `_original`
+    (`env_layout1_original.svg`, `env_layout1_present_original.svg`, `env_layout1_present_original.png`);
+    `env_layout_original.jpg` keeps its name.
   Content that the rulings of part B replace:
   - `deliver_pallet` has a free `?delivery_bay` and one method (B3, B8, B11); `load_return` ranges over every pallet
     (B4); `confirm_delivered_pallet` has no condition (B2); `office_break` has a door condition no fact satisfies and ends
@@ -6243,6 +6259,13 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     deliveries (TODO-143 stays parked: it concerns an empty assigned list, which is a different state);
   - for the IR test-bed on dock_loading the robot is idle, so its setup places the pallets in their delivery containers
     from the start.
+  - ADDED (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6): the rule for a point on the boundary of two areas, which today is decided by the order of
+    declaration (`SimModel.get_zone_of_position`: inclusive bounds, the first declared zone wins); and, since an agent
+    stops 10 to 30 cm before its target, the area an agent is in after "move to the gate" from each side, in the
+    environment and in the computed state alike (R2);
+  - ADDED (the same): the scanned state of an empty pallet (B14's setups leave it out; the form defaults it to false);
+  - ADDED (the same): the stale references to removed dock_loading scenarios in `mesa_sim/run_mesa.py` (its docstring
+    and commented-out imports name scenario_s01_01 and _02), corrected in stage 1's first build step.
   - ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R2 (C1, stage 1): the agent's area in a computed state after a movement action, one
     definition shared with the environment's state construction; the plan names the shared representation, every
     consumer of a computed state that decomposes a later task, and the form.
