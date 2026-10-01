@@ -3207,6 +3207,11 @@ SIDE); `analysis/tb1a_destination/`
 
 **The successor state is derived from what the action schemas declare: a delete list and a declared relocation (T-B2a)**
 
+NOTE (T-G R2, Hadi, 1 October 2026; "T-G: the second domain's rulings", C1, stage 1): R2 adds a requirement to this
+entry: after a movement action the computed successor state represents the agent's resulting area consistently with the
+area fact the environment would emit at the end of that movement, by one definition shared with the environment's state
+construction. Whether the area is declared by the schemas or derived from the position is for stage 1's plan.
+
 DECIDED (September 2026; built in T-B2a). This settles the part the B3.B entry left as a proposal ((b), (i) to
 (iii): "how that is declared is the open part"). WHO DECIDED WHAT: the delete list was ruled in cchat, on the
 T-B2a report, with the reasoning given below. The relocation keys were ccode's proposal, made in the T-B2a
@@ -5771,6 +5776,18 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
     repeatable task be taken again after its condition has ended.
     ADDED (the same ruling), events on a repeatable entry: a repeatable entry carries no events; the loader refuses one
     that does. Reason: an event fires once per script entry, and a repeatable entry can be taken several times.
+    ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R1, repeatable entries and the load-time replay:
+    - In V1 every repeatable entry stands below every ordinary entry of the priority list. The loader refuses any other
+      placement.
+    - The load-time replay does not execute repeatable entries (Q13b's ADDED block, as superseded below).
+    - The skip rule of a repeatable entry (the task's completion condition holds in the present state of the
+      environment) applies at run time, where the environment maintains the facts.
+    Reason: the replay's computed state keeps at(agent, target) after a later walk, so it cannot apply the skip rule;
+    V1's only repeatable entry is the standby entry, which A3 already places lowest.
+    Not taken: repairing the stale at fact in the replay's computed state for this purpose.
+    NOTES (T-G records 4, not rulings): an entry applicable only from one area has no case under B11 (a task has a
+    method for every starting area). A task whose last action completes on process completion only (a stand) could not
+    be skipped as a repeatable entry; V1 authors no such repeatable entry.
   - Q13a, an entry whose task ends with INFEASIBLE.
     The entry is closed, as with COMPLETED and ABANDONED. SUSPENDED keeps it open. A later applicable state does not
     reopen an ordinary entry.
@@ -5808,6 +5825,13 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
     - Dependent script: the loader reports as not replayed the ordinary entries left open and the closing part.
     - Not taken: a replay of the ordinary entries in their authored order. Reason: under A3 the human takes the first
       applicable open entry, so the authored order is not the sequence a run produces.
+    SUPERSEDED IN PART (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R1: "The replay runs the executor's rule unchanged, repeatable entries
+    included" is withdrawn: the load-time replay does not execute repeatable entries. Its reason (the position after a
+    standby walk changes the walks that follow) had no case: a repeatable entry placed lowest is taken only when no open
+    ordinary entry is applicable, which is where the replay ends. The rest of the block stands: the replay ends when the
+    human is free and no open ordinary entry is applicable; an independent script then continues through the closing
+    part and an entry left open stops the load; for a dependent script the loader reports the ordinary entries left open
+    and the closing part as not replayed.
   - Q14, when the list is finished, and the closing part.
     The script has a priority list (ordinary and repeatable entries) and a closing part.
     The priority list is finished when every ordinary entry is closed. The human then takes the entries of the closing
@@ -6080,6 +6104,16 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     - B10, the room; whether the stores and the freezer are already present in stage 1's layout is not ruled
       (PROPOSALS);
     - the IR test-bed on dock_loading, then the MPB.
+    - ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R2, framework-wide, a requirement on stage 1's plan: the agent's area in a computed
+      state. After a movement action, the computed successor state represents the agent's resulting area consistently
+      with the area fact that the environment would emit at the end of that movement. One definition of "the agent is in
+      an area" serves the environment's state construction and the computed state. Stage 1's plan identifies the shared
+      representation and every consumer of a computed state that decomposes a later task (the load-time replay, the
+      meta-planner's lookahead, any other), and proposes the form. Acceptance on kitting: the maintained sets stay
+      byte-identical. Reason: B11 selects a task's method by the agent's starting area. A computed state that does not
+      carry the area after a walk makes the planner select the wrong method for a later task, with a wrong route and a
+      wrong cost. B11 exposed it; the missing invariant is in the shared computed state, not in dock_loading. B11 is not
+      reopened: R2 makes its ruled semantics representable in computed states;
     A3, A4, A5 and A9 each change code outside the domain, and each carries its acceptance check on kitting: the
     maintained sets stay byte-identical.
   - Stage 2:
@@ -6150,6 +6184,9 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     deliveries (TODO-143 stays parked: it concerns an empty assigned list, which is a different state);
   - for the IR test-bed on dock_loading the robot is idle, so its setup places the pallets in their delivery containers
     from the start.
+  - ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R2 (C1, stage 1): the agent's area in a computed state after a movement action, one
+    definition shared with the environment's state construction; the plan names the shared representation, every
+    consumer of a computed state that decomposes a later task, and the form.
 - C5, to watch in the test-beds: hypotheses that predict the same motion divide the belief, so none passes the admission
   threshold (two unscanned pallets in one container). If the IR test-bed confirms it on dock_loading, it is a finding
   about the mind and returns to the design chat within V1.
