@@ -587,3 +587,11 @@ Commands: `analysis/tb1c_realized_flip/sweep.sh analysis/tb1c_realized_flip/swee
 | env_layout_08_scenario_s06_01_realized_off | cea4392a46a5da7d5e6b922de8dc4da3 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 224 | 412.25 (105) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_plain_off | 9cd05ae81b0cf2407b3b1f122504e4f7 | c9c444622f25d15abfd849fc495db540 | 224 | 224 | 37.48 (221) | 1 | 2 | 0 |
 | env_layout_08_scenario_s06_03_realized_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
+
+## The sort (1 October 2026): paths only, no change of behaviour
+
+This folder moved from `analysis/tb1c_realized_flip/` to `analysis/kitting/tb1c_realized_flip/` when the earlier analyses were sorted by domain
+(`docs/rename_table.md`, "Paths: the sort"). The logs, their `.rec` streams and the md5s of the sections above are
+unchanged: the set was regenerated from the sorted tree and is byte-identical. The commands of the sections above read
+`bash analysis/kitting/tb1c_realized_flip/sweep.sh <dir>`, and `sep_classes.py` (with the parser `logparse.py`) is
+`analysis/instruments/common/sep_classes.py`.

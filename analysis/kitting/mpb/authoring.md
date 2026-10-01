@@ -546,3 +546,7 @@ the record stands. Nothing falls within 3 ticks of 7 or 53. The start is kept.
 
 **Effect on verified scenarios.** None by construction: no verified scenario's layout or setup changed. It is measured
 at the runs: the eleven rerun and compared byte for byte.
+
+Note (the sort, 1 October 2026): this folder moved from `analysis/mpb/` to `analysis/kitting/mpb/`, the run files to
+`configs/kitting/mpb/`, the instrument's shared code to `analysis/instruments/mpb/`; the paths above are resolved by
+`docs/rename_table.md`, "Paths: the sort".

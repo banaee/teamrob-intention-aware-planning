@@ -181,3 +181,14 @@ One rule at a time, in a scratch copy:
 - B1 to B3, the projection's identity: the method guards, the skip, the ray's cut;
 - C1 to C3, the gate with warrant: commitment, the movement source, the order of adequacy and warrant;
 - D1, D2, the chain's retraction and its cause order.
+
+## The sort (1 October 2026): paths only, no change of behaviour
+
+This folder holds kitting's set: the scenarios' outputs, `runs/` (git-ignored), this README, `REPORT.md`,
+`authoring.md`, `coverage.md`, and the instrument's kitting-bound parts, `properties.py` (the declared properties),
+`horizon.py` (MPB-5's cap, on kitting's `deliver_item` chain) and `alteration.py` (`docs/rename_table.md`, "Paths: the
+sort"). The shared code moved to `analysis/instruments/mpb/`; the run files to `configs/kitting/mpb/`; `logparse.py` and
+`sep_classes.py` to `analysis/instruments/common/`. Every command above reads `bash analysis/instruments/mpb/run.sh
+kitting [-o <dir>] [--strategy ...] [--prior ...] [run files]`; `alteration.py` takes the scenario folders under
+`analysis/kitting/mpb/`. The sixteen runs under each strategy were regenerated from the sorted tree: every output
+byte-identical.

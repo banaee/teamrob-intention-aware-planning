@@ -48,7 +48,12 @@ Relevant (read as needed):
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
   human behaviour model"; glossary §6 and §7). Read it in every T-H session. `docs/terminology_revision.md` §8 states
   what T-H changed in the 24 Sept terms.
-- `analysis/<task>/REPORT.md`: only the reports a task names. Rows in older reports may be
+- `analysis/`, sorted by domain (the sort, 1 October 2026; `analysis/README.md`): `analysis/instruments/` holds the
+  test-beds' code both domains run (`run.sh <domain>`), `analysis/kitting/` every earlier analysis with kitting's run
+  sets, expectations and reports, `analysis/dock_loading/` dock_loading's; the run files under `configs/<domain>/`, the
+  tests under `tests/kitting/`, `tests/dock_loading/`, `tests/instruments/` (three two-domain tests at `tests/`). Old
+  paths in dated entries and frozen reports: `docs/rename_table.md`, "Paths: the sort".
+- `analysis/<domain>/<task>/REPORT.md`: only the reports a task names. Rows in older reports may be
   stale (earlier projection, recognizer or layouts); their findings are cited, not re-derived.
 
 Never read, edit, or treat as a source of truth:
@@ -110,7 +115,7 @@ Decisions
   (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
   (D2: `recognition_changed` against the decision record replaces `theta_crossed`; D3: `task_committed`
   removed, the robot's grasp is no trigger), and the policy
-  components are ablated (T6, `analysis/t6_ablation/`); the gate stays a fixed share (the gate ruling). The 4C
+  components are ablated (T6, `analysis/kitting/t6_ablation/`); the gate stays a fixed share (the gate ruling). The 4C
   queue is done.
   The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`; the order revised 30 Sept 2026, below).
   T-B is under way: T-B2a
@@ -140,7 +145,7 @@ Decisions
   the adequacy finding (unresolved | adequate | unexplained, from the projected completion delay D and its tail
   probability S per live hypothesis per derived phase, at the test level α, the run option `--test_level`, default
   0.05), the lifecycle state (live | exhausted) and the members' tail probabilities. Session 1.4 verified it
-  (`analysis/td_stage1/REPORT.md`), and cycle 1.5 is ruled on it (27 Sept 2026; design_decisions.md, "T-D R and E",
+  (`analysis/kitting/td_stage1/REPORT.md`), and cycle 1.5 is ruled on it (27 Sept 2026; design_decisions.md, "T-D R and E",
   "1.5 rulings"), and built in session 1.5b (27 Sept 2026): E8 (on the tick a hypothesis's expected action completes
   it is a member with S = 1), E9 (s_exp is the Projector's priced stationary ticks within the phase: 2 for `pick_up`
   and `place`, 1 for a walk entered from a completion, 0 for the initial walk; the recognizer receives the body's
@@ -149,18 +154,18 @@ Decisions
   recognizer reports every live hypothesis's hypothesis adequacy, adequate | inadequate | no observation; the gate,
   `_clears_gate`, now returns a `GateOutcome` and also requires the leader's to be adequate; refusals
   `none(leader_no_observation)`, `none(leader_inadequate)`). The four maintained baseline sets are regenerated under
-  it; acceptance is `analysis/td_stage1b/REPORT.md`. Session 1.5c closed cycle 1 (27 Sept 2026): E6 amended a second
+  it; acceptance is `analysis/kitting/td_stage1b/REPORT.md`. Session 1.5c closed cycle 1 (27 Sept 2026): E6 amended a second
   time (a stationary tick within the priced standing of any phase with s_exp > 0 is an observation at S = 1; no
   member on a boundary tick), zero false unexplained on modelled ticks; the 1.5b findings are cycle 2 inputs
   (TODO-87, TODO-118, TODO-119). Next: the IR test-bed track, then cycle 2, L, P, the rest of G, and X, each ruled
   on these results. The IR test-bed (TB, ruled 27 Sept 2026; design_decisions.md, "The IR test-bed") tests the
   recognizer in isolation, on a layout, setup and scenarios written for it, against expectations derived from the entry
   before the run, in three sessions: TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the
-  expectation generator, the runs, the report; `analysis/ir_testbed/`). The cognitive loop does not end with the task
+  expectation generator, the runs, the report; `analysis/kitting/ir_testbed/`). The cognitive loop does not end with the task
   pool (ruled 27 Sept 2026; design_decisions.md, the entry of that name; built in TB.2b): observation and
   recognition run on every tick, and an empty pool stops planning and execution only. TB.3b built the IR test-bed
-  (27 Sept 2026; env_layout_10, env_setup_08, scenario_s08_01 to _04, run files in `configs/ir_testbed/`, the
-  instrument and its report in `analysis/ir_testbed/`): the recognizer's public outputs agree with the independent
+  (27 Sept 2026; env_layout_10, env_setup_08, scenario_s08_01 to _04, run files in `configs/kitting/ir_testbed/`, the
+  instrument in `analysis/instruments/ir_testbed/`, its report in `analysis/kitting/ir_testbed/`): the recognizer's public outputs agree with the independent
   oracle on every compared tick of the four runs. TB.4b made the instrument independent of the layout and added the
   enlarged room (env_layout_11, env_setup_09, scenario_s09_01 to _12: the TB.3b scripts, the deviations and the
   same-side alternates; the s08 artefacts and outputs unchanged): zero disagreements at 1e-9 on all twelve.
@@ -170,7 +175,7 @@ Decisions
   L5: the boundary on a terminal action's completion, retraction by the meta-planner, liveness while the terminal fact
   holds); L-build built it (28 Sept 2026: the boundary on the observed agent's completion of a terminal action, the
   live set read from the terminal facts every tick with re-entry at 1/|H|, retraction and the boundary flag in
-  `recognition_changed`; `analysis/l_build/REPORT.md`, the IR test-bed agreeing at 1e-9); next is P.
+  `recognition_changed`; `analysis/kitting/l_build/REPORT.md`, the IR test-bed agreeing at 1e-9); next is P.
   P, the fallback projection, is built and closed (28 Sept 2026; design_decisions.md, "T-D P"): when admission refuses
   and a human is observed, a short-term physical projection from the observed position and the last displacement
   (standing, or a straight continuation to the wall or the first fixed object) over each candidate's span; a
@@ -186,7 +191,7 @@ Decisions
   prior-off artefact); the six regression scripts behind the occupied-target logs (scenario_s01_01, s01_06, s02_01,
   s03_01, s04_01, s06_03) end with the exit walk `go_to("corner_SE")` (1.1; env_layout_02 and env_layout_08 gained
   corner_SE), and the four maintained sets are regenerated (the "2.5" sections: every log completes; the `[sep]` minimum
-  and F1's classes per run, `analysis/tb1a_destination/sep_classes.py`); scenario_s09_13 (the mid-action change, a
+  and F1's classes per run, `analysis/instruments/common/sep_classes.py`); scenario_s09_13 (the mid-action change, a
   coffee_break cut into a carry) agrees with the IR test-bed's oracle, extended to cuts; TODO-95 closed (3.4), TODO-135
   to TODO-139 recorded. G is ruled (29 Sept 2026; design_decisions.md, "T-D G: admission", AD1 to AD5): admission
   also requires warrant (commitment or observation that justifies admission; not the support restriction), a third
@@ -207,13 +212,13 @@ Decisions
   (MPB)", MPB-1 to MPB-6), records only: eight scenarios on env_layout_12, an oracle for the trigger and cause, the
   gate and the projection (per-tick tables pre-run, the chain assembled with the run's `no_current_task` ticks), part 4
   as declared properties; prior off a diagnostic appendix. MPB step 2 is built and the MPB closed (29 to 30 Sept 2026; parts (i) to (v);
-  `analysis/mpb/`, REPORT.md; env_layout_12, env_setup_10/11, scenario_s10_01 to _09 and s11_01, _02, `configs/mpb/`):
+  `analysis/kitting/mpb/`, REPORT.md; env_layout_12, env_setup_10/11, scenario_s10_01 to _09 and s11_01, _02, `configs/kitting/mpb/`):
   - all eleven scenarios verified: zero disagreements on parts 1 to 3 under both strategies, prior on; every declared
     part-4 property holds under single_task;
   - AD3 is not exercisable in the MPB set (the AD3 line);
   - the skip rule is a design question (P4's dated line, TODO-142);
   - an observed human with no work under the prior on has no representation (TODO-143).
-  The coverage matrix is recorded (`analysis/mpb/coverage.md`; MPB-2 as amended: the layout-and-setup rule, the three
+  The coverage matrix is recorded (`analysis/kitting/mpb/coverage.md`; MPB-2 as amended: the layout-and-setup rule, the three
   kinds of cell). Part (v) built its five reachable claimed cells, one authored instance each, all verified (30 Sept
   2026; env_layout_13, env_layout_14, env_setup_12, scenario_s12_01, _02, s11_03, s10_10, _11): the switch against an
   admitted projection, the hold against an admitted standing segment, the switch while carrying, a record kept through
@@ -223,7 +228,7 @@ Decisions
   `ExecutorState.owed_completion_ticks` and `action_in_flight`; every robot candidate's projection states the owed ticks
   first (`Projector.project`, `lead_in`) and the continued task is projected from the action in flight (`resume_from`);
   owed ticks run before a hold (T-B Q7's "the hold carries the tick" superseded in part). Tests:
-  `tests/test_executed_is_assessed.py`. The four maintained sets were regenerated ("class-2 correction" sections; one hold
+  `tests/kitting/test_executed_is_assessed.py`. The four maintained sets were regenerated ("class-2 correction" sections; one hold
   moved, scenario_s02_01 prior on). The human side's counterpart is TODO-146, recorded only.
   The MPB is CLOSED (the close-out, 30 Sept 2026): every materially distinct in-scope decision path is verified,
   unreachable with a recorded derivation, or outside the claimed mechanism with a recorded reason. It establishes
@@ -464,15 +469,15 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 
 Old ids (scenario_00 on env_layout0 and so on) are mapped in `docs/rename_table.md`; the frozen records keep them.
 
-Use the step counts of the sweep scripts (`analysis/tb1a_destination/sweep.sh` for the five and the evaluation
-fixtures; before T-L stage 3, the frozen `analysis/f1_robot_responsible/sweep.sh` and `analysis/f47_fixtures/sweep.sh`,
+Use the step counts of the sweep scripts (`analysis/kitting/tb1a_destination/sweep.sh` for the five and the evaluation
+fixtures; before T-L stage 3, the frozen `analysis/kitting/f1_robot_responsible/sweep.sh` and `analysis/kitting/f47_fixtures/sweep.sh`,
 on the old ids). The current baselines are the Track 2.5 regeneration of the four maintained sets below (their "2.5"
 README sections; before it L-build, P-build and P4-build, each with its own section); what follows is the T-L stage 3
 regeneration's description, whose folders and names still hold, with their
-`.rec` streams, named `<layout id>_<scenario id>_<run options>.log`: `analysis/tb1a_destination/sweep/` (the five plus
+`.rec` streams, named `<layout id>_<scenario id>_<run options>.log`: `analysis/kitting/tb1a_destination/sweep/` (the five plus
 scenario_s03_06 / scenario_s05_01 / scenario_s05_02, both priors, stop off, `single_task`; logs local, md5s in its
-README, the "T-L stage 3" section), `analysis/tb1b_two_tables/sweep/` (scenario_s06_01 / scenario_s06_02),
-`analysis/tb1c_realized_flip/sweep/` and `analysis/tb3_full_reorder/sweep/` (both strategies). They differ from the
+README, the "T-L stage 3" section), `analysis/kitting/tb1b_two_tables/sweep/` (scenario_s06_01 / scenario_s06_02),
+`analysis/kitting/tb1c_realized_flip/sweep/` and `analysis/kitting/tb3_full_reorder/sweep/` (both strategies). They differ from the
 stage-2 logs (99563cc) in the `[run_mesa]` line alone (the ids), the `.rec` streams byte-identical; T-L stages 1 and 2
 had changed the same line alone (the setup id), with no README section. The T-H follow-up set differed from the T-H4
 regeneration (e4fe110) by the `[scenario-coverage]` line at load alone (the scenario's composition and scenario
@@ -486,26 +491,26 @@ which they differ in the removed `task_committed` decisions and the executor's r
 world lines byte-identical. The T-B Q7 set superseded T-B2d's, which the body's completion ticks
 moved (T-B Q7: the robot spends one more tick per delivery, less where a hold carried it); T-B2d's had
 differed from T-B1a follow-up 2's in the `[run]` line alone, which names the strategy, and follow-up 2's had
-superseded the graded-evidence sweep (`analysis/g1_graded_evidence/sweep/`; same world-level behaviour,
+superseded the graded-evidence sweep (`analysis/kitting/g1_graded_evidence/sweep/`; same world-level behaviour,
 hypothesis keys no longer carry the table, and the `[run]` header changed with T-A1's β commit). No
-`full_reorder` baselines before T-B3. The stop-on baselines (C's, `analysis/c_separation_stop/`, and F47's) predate graded evidence and are not
+`full_reorder` baselines before T-B3. The stop-on baselines (C's, `analysis/kitting/c_separation_stop/`, and F47's) predate graded evidence and are not
 regenerated; their logs were dropped in the analysis cleanup, their READMEs stay as frozen records. Record
 baselines before changing code, then diff.
 
 ### Maintained baseline sets
 
-`analysis/tb1a_destination/` (16 logs), `analysis/tb1b_two_tables/` (4), `analysis/tb1c_realized_flip/` (8)
-and `analysis/tb3_full_reorder/` (20) are the regression baselines. They are regenerated on every behaviour
+`analysis/kitting/tb1a_destination/` (16 logs), `analysis/kitting/tb1b_two_tables/` (4), `analysis/kitting/tb1c_realized_flip/` (8)
+and `analysis/kitting/tb3_full_reorder/` (20) are the regression baselines. They are regenerated on every behaviour
 change, with new md5s in a new section of each README (the commands are in those READMEs and their
-`sweep.sh`). Every other `analysis/` folder is a frozen record at the commit its README states: never
+`sweep.sh`). Every other folder under `analysis/kitting/` is a frozen record at the commit its README states: never
 regenerated, and never edited except for a superseding note.
 
 Evaluation fixtures, not part of the regression sweep (run them only when a task names them):
 scenario_s03_06 on env_layout_06 (scenario_s03_01's end-state variant), scenario_s05_01 / scenario_s05_02 on
 env_layout_07 (a foreseen human stay on the robot's route; the beside / across alternative). Script:
-`analysis/tb1a_destination/sweep.sh` (the record: `analysis/f47_fixtures/`, frozen). scenario_s06_01 / scenario_s06_02 on env_layout_08 (two kitting tables, T-B's fixture: the
+`analysis/kitting/tb1a_destination/sweep.sh` (the record: `analysis/kitting/f47_fixtures/`, frozen). scenario_s06_01 / scenario_s06_02 on env_layout_08 (two kitting tables, T-B's fixture: the
 greedy head is not the head of the cheapest ordering; a conflict past the head). Script, baselines and the
-cost argument: `analysis/tb1b_two_tables/`.
+cost argument: `analysis/kitting/tb1b_two_tables/`.
 
 ```bash
 grep "^\[meta\]"        <log>   # meta-planner winner per trigger
@@ -538,7 +543,7 @@ Completion is measured from the world fact (T6): the tick after the robot's last
 `[meta] step=N all tasks complete` is the declared tick: the world tick is N − 2 when `no_current_task` ends the
 pool, and N when a `recognition_changed` of that tick ends it (the robot's own last item changes the belief and
 `update()` drops the completed task; TODO-127). Report the world tick; older reports
-(D2 and before) give declared ticks. `analysis/t6_ablation/metrics.py` reads it from a log. Every completion
+(D2 and before) give declared ticks. `analysis/kitting/t6_ablation/metrics.py` reads it from a log. Every completion
 tick recorded BEFORE T-B Q7 is one tick shorter per robot delivery than the behaviour from here on (less
 where a decided hold carried the tick): the body used to cancel a completion tick when a reload landed on it
 (design_decisions.md, "A reload never cancels a completion tick the body states"). Do not compare a number

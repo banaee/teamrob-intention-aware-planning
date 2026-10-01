@@ -677,3 +677,11 @@ Commands: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`; 
 | env_layout_08_scenario_s06_02_single_task_off | 79eb0433ffac1c650293e2f2fbae48c4 | 329590c9c1249859bfe20d107588c50a | 267 | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_full_reorder_off | d86b3ef60143f3138296252450878822 | c9c444622f25d15abfd849fc495db540 | 226 | 226 | 54.58 (223) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_single_task_off | 35b4df6e43ab34fe83e7e7ab75140d57 | c9c444622f25d15abfd849fc495db540 | 314 | 314 | 68.41 (264) | 0 | 0 | 0 |
+
+## The sort (1 October 2026): paths only, no change of behaviour
+
+This folder moved from `analysis/tb3_full_reorder/` to `analysis/kitting/tb3_full_reorder/` when the earlier analyses were sorted by domain
+(`docs/rename_table.md`, "Paths: the sort"). The logs, their `.rec` streams and the md5s of the sections above are
+unchanged: the set was regenerated from the sorted tree and is byte-identical. The commands of the sections above read
+`bash analysis/kitting/tb3_full_reorder/sweep.sh <dir>`, and `sep_classes.py` (with the parser `logparse.py`) is
+`analysis/instruments/common/sep_classes.py`.

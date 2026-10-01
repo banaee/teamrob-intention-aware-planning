@@ -409,3 +409,20 @@ c1598c77bd67c1d327fd60660aa1e027  runs/env_layout_11_scenario_s09_11_on.log
 518acab6d75c24aaecddfb13ddd4f324  runs/env_layout_11_scenario_s09_13_on.log
 739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
 ```
+
+## The sort (1 October 2026): paths only, no change of behaviour
+
+This folder holds kitting's set: the scenarios' outputs, `runs/` (git-ignored), this README and `REPORT.md`
+(`docs/rename_table.md`, "Paths: the sort"). The instrument's code moved to `analysis/instruments/ir_testbed/` and is
+shared by the domains; the run files moved to `configs/kitting/ir_testbed/`; the log reader is
+`analysis/instruments/common/tdlib.py`, a copy of the frozen `analysis/kitting/l_build/tdlib.py`. Every command above
+reads:
+
+```bash
+analysis/instruments/ir_testbed/run.sh kitting                                       # every configs/kitting/ir_testbed/*.yaml
+analysis/instruments/ir_testbed/run.sh kitting configs/kitting/ir_testbed/scenario_s09_*.yaml
+analysis/instruments/ir_testbed/run.sh kitting -o <dir> configs/kitting/ir_testbed/scenario_s08_0{1,2,3,4}.yaml
+```
+
+The seventeen runs and every output were regenerated from the sorted tree into another folder: byte-identical to the
+committed outputs and to the G-build md5s above.

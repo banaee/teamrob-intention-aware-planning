@@ -727,3 +727,11 @@ Commands: `analysis/tb1a_destination/sweep.sh analysis/tb1a_destination/sweep`; 
 | env_layout_06_scenario_s03_06_off | 91c3b333b0a8de1dd5512e72fd85f2e4 | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 237 | 48.25 (57) | 1 | 0 | 1 |
 | env_layout_07_scenario_s05_01_off | df6b0cea8c59dba6a195b50ea965f392 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 198 | 58.31 (25) | 0 | 0 | 0 |
 | env_layout_07_scenario_s05_02_off | a33b38be658def9388af110f597e39ca | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 218 | 50.00 (57) | 0 | 0 | 0 |
+
+## The sort (1 October 2026): paths only, no change of behaviour
+
+This folder moved from `analysis/tb1a_destination/` to `analysis/kitting/tb1a_destination/` when the earlier analyses were sorted by domain
+(`docs/rename_table.md`, "Paths: the sort"). The logs, their `.rec` streams and the md5s of the sections above are
+unchanged: the set was regenerated from the sorted tree and is byte-identical. The commands of the sections above read
+`bash analysis/kitting/tb1a_destination/sweep.sh <dir>`, and `sep_classes.py` (with the parser `logparse.py`) is
+`analysis/instruments/common/sep_classes.py`.
