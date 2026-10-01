@@ -576,6 +576,11 @@ the author declares that a script depends on the robot (default independent); fo
 open at the replay's end stops the load, as today; for a dependent one the loader reports the entries left open and
 loads, and the run's record states the entries still open at the run's end. The declaration concerns load-time
 validation only. design_decisions.md, "T-G: the second domain's rulings", A3 (RULED).
+ADDED (T-G records 3, Hadi, 1 October 2026), the load-time replay under the priority form: it runs the executor's rule unchanged, repeatable entries
+included, and ends when the human is free and no open ordinary entry is applicable (a repeatable entry neither
+establishes that the replay is complete nor keeps it running). Independent script: every ordinary entry is then closed,
+the replay continues through the closing part, and an entry left open stops the load. Dependent script: the loader
+reports as not replayed the ordinary entries left open and the closing part. Not taken: a replay in authored order.
 
 **open entry** / **closed entry** (T-G Q12, Q13a, Hadi, 1 October 2026; ruled, not built) — of an entry of the human's
 script. An ordinary entry is open until its task leaves the stack with COMPLETED, ABANDONED or INFEASIBLE, and closed
@@ -585,6 +590,10 @@ reads the assigned task: a delivery to another table is an entry that completed,
 incomplete in the environment, which concerns the robot's mind only. A closed entry says nothing about the assigned task.
 An entry that was never selected is open; at the load-time replay's end it is "left open", not infeasible (Q13b). The
 names in the code and the authoring form of the repeatable kind are left to stage 1's plan.
+ADDED (T-G records 3, Hadi, 1 October 2026): the human skips a repeatable entry while its task's completion condition (the task's own) holds in the
+present state of the environment; a past completion does not count. For the standby entry: the human is at the standby
+place. V1 authors no other repeatable entry. A repeatable entry carries no events; the loader refuses one that does.
+"Left open" is the word for an entry the executor never began.
 COLLISION: "entry" here is an entry of the human's script (`ScriptEntry`), not the plan's entry (§2, **entry**).
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q12, Q13a, Q13b.
 
@@ -595,6 +604,8 @@ after the closing part selects nothing more, repeatable entries included. The co
 part contains is each domain's own convention. Kitting needs no closing part (every entry is applicable from the start,
 so its last entry, the exit walk, is its last act); dock_loading's closing part is one entry, the walk to the desk (B13).
 "Finished" is said of the priority list only.
+ADDED (T-G records 3, Hadi, 1 October 2026): a closing entry that is not applicable: the human waits; the closing part keeps its written order, and
+the human does not take the next closing entry before the present one has ended.
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q14; B13.
 
 **event** — a `Trigger` and a `Decision` attached to a task of the script, or built live by `inject`. Typed, no unions
@@ -642,6 +653,9 @@ RULED, NOT BUILT (T-G Q13a, Q13b, Hadi, 1 October 2026): infeasible names only t
 could not continue; an entry never selected in the load-time replay is "left open", not infeasible. Infeasible closes the
 entry, as completed and abandoned do; suspended keeps it open (**open entry**, above). design_decisions.md, "T-G: the
 second domain's rulings", A3.
+CORRECTED (T-G records 3, Hadi, 1 October 2026), wording only: infeasible is the outcome of a task that the executor began and could not expand or
+continue, whether the task is a script entry or was started by an event; "left open" stays the word for an entry the
+executor never began.
 
 **record** — the human executor's record: per tick, the stack (top first), the action and its progress. The ground
 truth, written as its own stream (a file beside the run log, one `[rec]` line per tick) and diffed in the sweep. Its
@@ -694,6 +708,9 @@ COLLISION: "a stand" in §7 and the older records is the ordinary word for a hum
 `HumanOnlyTask` may type a parameter as one (`go_to(?landmark)`, `go_to_and_stand(?landmark, ?duration)`; `Tree`'s
 constructor rejects any other), so no hypothesis binds one and no robot action grounds to one. env_layout_01 declares
 `corner_NE`, `corner_NW`, `corner_SE`, `corner_SW` and `door`.
+NOTE (T-G B13, T-G records 3, 1 October 2026): dock_loading's desk is a landmark in stage 1, the target of its closing
+part: no task of the robot's task model names it, and the robot's mind holds no hypothesis for the walk to it, as for
+kitting's exit walk. Whether the desk becomes a fixed object is stage 3's question.
 → `shared/types.py`, `LANDMARK_TYPE`; `shared/knowledge.py`, `Tree`.
 
 **go_to** — the `HumanOnlyTask` `go_to(?landmark)`: walking to a landmark (`move_to` the landmark). Replaces
@@ -787,6 +804,8 @@ landmark), and that carries no events, is not counted. A rule on type, structure
 name: `go_to("door")` or `go_to("corner_SE")` last is the exit walk; the same walk earlier in the script, or carrying
 an event, is counted, and so are a terminal `stand` (no landmark; TODO-80) and a terminal `go_to_and_stand` (a walk
 and a stand: `TASK_ABSENT`).
+NOTE (T-G records 3, 1 October 2026; not a ruling): where a script has a closing part (T-G A3, Q14), "the script's last
+entry" reads "the last closing entry". Stage 1's plan carries the consequence for the code.
 AS BUILT: `world/composition.py`, `scenario_composition(script, robot) -> (Composition, ScenarioCoverage)`; the
 `[scenario-coverage]` line at load, one per observing robot, after its `[coverage]` lines; the listing
 `mesa_sim/list_scenarios.py`.

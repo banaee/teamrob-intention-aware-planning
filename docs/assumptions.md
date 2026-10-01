@@ -34,6 +34,8 @@ walk to a landmark inside the workspace, the human still observed (2.3).
 READS FOR DOCK_LOADING (T-G B13, Hadi, 1 October 2026): the script ends with the walk to the desk, the one entry of its
 closing part (A3, Q14); no exit from the room is defined for dock_loading now. Kitting is unchanged.
 design_decisions.md, "T-G: the second domain's rulings", A3, B13.
+NOTE (T-G records 3, 1 October 2026; not a ruling): the exit walk is defined as "the script's last entry"; where a
+script has a closing part it reads "the last closing entry". Stage 1's plan carries the consequence for the code.
 
 **1.2** Every baseline script declares its experimental intent (label C, purpose); **unmodelled behaviour** (behaviour
 no hypothesis of the robot's hypothesis space describes, label B) appears only where the description says so.
