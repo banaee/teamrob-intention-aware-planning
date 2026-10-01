@@ -34,7 +34,6 @@
       "type": "kitting_table",
       "position": [0, 420],
       "size": [200, 100],
-      "area": "zone_NW",
       "notes": "Top centre, (0.50 W, 0.08 H). The human starts here."
     },
     {
@@ -43,7 +42,6 @@
       "position": [-420, -20],
       "size": [100, 100],
       "slots": 2,
-      "area": "zone_SW",
       "notes": "The west shelf, (0.08 W, 0.52 H). Symmetric to shelf_2 about the table's x."
     },
     {
@@ -52,7 +50,6 @@
       "position": [420, -20],
       "size": [100, 100],
       "slots": 2,
-      "area": "zone_SE",
       "notes": "The east shelf, (0.92 W, 0.52 H). Symmetric to shelf_1 about the table's x."
     },
     {
@@ -61,7 +58,6 @@
       "position": [-420, 300],
       "size": [100, 100],
       "slots": 2,
-      "area": "zone_NW",
       "notes": "TB.4b: the west wall, 320 cm above shelf_1; from kitting_table_0 its bearing (-164.1 deg) is 30.4 deg from shelf_1's. Placed for observability (the walk to item_1 separates from the walk to item_3 within the walk), not for a belief or finding value."
     },
     {
@@ -69,7 +65,6 @@
       "type": "kitting_table",
       "position": [350, 420],
       "size": [200, 100],
-      "area": "zone_NE",
       "notes": "TB.4b: the north wall, east of kitting_table_0; the misdelivery's table (scenario_s09_08). No item is designated to it."
     },
     {
@@ -77,7 +72,6 @@
       "type": "coffee_machine",
       "position": [-170, -400],
       "size": [50, 50],
-      "area": "zone_SW",
       "notes": "Near the south wall, (0.33 W, 0.90 H), deliberately west of centre so that its bearing from the table differs from corner_SE's."
     },
     {
@@ -85,7 +79,6 @@
       "type": "landmark",
       "position": [450, -450],
       "size": [20, 20],
-      "area": "zone_SE",
       "notes": "Landmark (T-C1): the exit walk's target; a place for the human's script only; no task binds it. 50 cm in from both walls."
     }
   ]

@@ -59,7 +59,6 @@
         200,
         100
       ],
-      "area": "zone_NW",
       "orientation_deg": 0
     },
     {
@@ -74,7 +73,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_NW",
       "orientation_deg": -90
     },
     {
@@ -89,7 +87,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_SW",
       "orientation_deg": -90
     },
     {
@@ -104,7 +101,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_SW",
       "orientation_deg": -90
     },
     {
@@ -119,7 +115,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_NE",
       "orientation_deg": -90
     },
     {
@@ -134,7 +129,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_SE",
       "orientation_deg": -90
     },
     {
@@ -149,7 +143,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_SE",
       "orientation_deg": -90
     },
     {
@@ -164,7 +157,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_SW",
       "orientation_deg": 0
     },
     {
@@ -179,7 +171,6 @@
         100
       ],
       "slots": 4,
-      "area": "zone_SE",
       "orientation_deg": 0
     },
     {
@@ -193,7 +184,6 @@
         100,
         100
       ],
-      "area": "zone_SW",
       "orientation_deg": 0
     },
     {
@@ -207,7 +197,6 @@
         50,
         50
       ],
-      "area": "zone_SW",
       "orientation_deg": 0
     },
     {
@@ -215,7 +204,6 @@
       "type": "landmark",
       "position": [950, -450],
       "size": [20, 20],
-      "area": "zone_SE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls. Added in Track 2.5 (docs/assumptions.md 1.1) as the exit walk's target; the layout declared no landmark before."
     }
   ]

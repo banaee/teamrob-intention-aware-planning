@@ -60,7 +60,6 @@
         200,
         100
       ],
-      "area": "zone_NE",
       "notes": "The human's table: env_layout_10's (0, 420) translated by (0, -200)."
     },
     {
@@ -75,7 +74,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SW",
       "notes": "The human's west shelf (10/11 pattern, translated)."
     },
     {
@@ -90,7 +88,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SE",
       "notes": "The human's east shelf (10/11 pattern, translated)."
     },
     {
@@ -104,7 +101,6 @@
         50,
         50
       ],
-      "area": "zone_SW",
       "notes": "Near the south wall, west of centre (10/11 pattern, translated)."
     },
     {
@@ -118,7 +114,6 @@
         20,
         20
       ],
-      "area": "zone_SE",
       "notes": "The exit walk's target, 50 cm in from the south and east walls (10/11 pattern, translated)."
     },
     {
@@ -132,7 +127,6 @@
         100,
         50
       ],
-      "area": "zone_NE",
       "notes": "The robot's NE table. Every NE route is at least 280 cm from every human path of the control (scenario_s10_06)."
     },
     {
@@ -146,7 +140,6 @@
         60,
         60
       ],
-      "area": "zone_NE",
       "notes": "Robot NE shelf; its carry to kitting_table_1 runs along y = 640, the route scenario_s11_02's walker crosses at x = 300."
     },
     {
@@ -160,7 +153,6 @@
         60,
         60
       ],
-      "area": "zone_NE",
       "notes": "Robot NE shelf."
     },
     {
@@ -174,7 +166,6 @@
         60,
         60
       ],
-      "area": "zone_NE",
       "notes": "Robot NE shelf."
     },
     {
@@ -188,7 +179,6 @@
         60,
         60
       ],
-      "area": "zone_NE",
       "notes": "Robot NE shelf."
     },
     {
@@ -202,7 +192,6 @@
         60,
         60
       ],
-      "area": "zone_SE",
       "notes": "The crossing's shelf (scenario_s10_02): about 318 cm from the midpoint (-210, 0) of the diagonal kitting_table_0 - shelf_1, on its perpendicular bisector."
     },
     {
@@ -216,7 +205,6 @@
         100,
         50
       ],
-      "area": "zone_NW",
       "notes": "The crossing's table (scenario_s10_02): about 318 cm from the diagonal's midpoint on the other side; the carry shelf_5 -> kitting_table_3 crosses the human's diagonal at (-210, 0)."
     },
     {
@@ -230,7 +218,6 @@
         60,
         60
       ],
-      "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the shelf of the delivery to kitting_table_2."
     },
     {
@@ -244,7 +231,6 @@
         60,
         60
       ],
-      "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the alternative's shelf, 70 cm beyond shelf_3 on the same bearing from the robot's start."
     },
     {
@@ -258,7 +244,6 @@
         100,
         50
       ],
-      "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the table the human stands at; 153 cm from shelf_3's arrival point."
     },
     {
@@ -272,7 +257,6 @@
         100,
         50
       ],
-      "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the free table; 153 cm from shelf_6's arrival point; its carry passes no closer than 70.5 cm to kitting_table_2's centre."
     },
     {
@@ -286,7 +270,6 @@
         20,
         20
       ],
-      "area": "zone_NE",
       "notes": "Walker (scenario_s11_02): the end of the straight run north across the robot's route y = 640."
     },
     {
@@ -300,7 +283,6 @@
         20,
         20
       ],
-      "area": "zone_NE",
       "notes": "Stander (scenario_s11_02): 30 cm below the robot's route y = 640, within min_separation of a robot passing it."
     },
     {
@@ -314,7 +296,6 @@
         60,
         60
       ],
-      "area": "zone_SE",
       "notes": "Cell D8: the alternative's shelf, 70 cm beyond shelf_5 on the bearing from scenario_s10_02's robot start (390, -573), so the walk to it is about 70 cm longer than to shelf_5 all along the approach (the pattern of env_layout_12's shelf_3 / shelf_6)."
     },
     {
@@ -328,7 +309,6 @@
         100,
         50
       ],
-      "area": "zone_NE",
       "notes": "Cell D8: the alternative's table, on the 50-degree bearing from shelf_11 (103 cm from shelf_7, 123 from shelf_8; the route 228 cm from kitting_table_0, clear of the admitted delivery's plan); its distance fixed so that item_13's delivery is 2.5 ticks dearer on plain cost than item_7's at the robot's position at the admission (2.499 at 0.1 cm; analysis/mpb/authoring.md, part (v))."
     },
     {
@@ -342,7 +322,6 @@
         60,
         60
       ],
-      "area": "zone_SE",
       "notes": "Cell C2: the shelf of the robot's carry west past the coffee machine, 102 cm from the exit walk to corner_SE."
     },
     {
@@ -356,7 +335,6 @@
         100,
         50
       ],
-      "area": "zone_SW",
       "notes": "Cell C2: the table of that carry; the carry passes within min_separation of the human's waiting point at the coffee machine (-166, -580), 25.4 cm at its closest in the robot-alone run (analysis/mpb/authoring.md, part (v))."
     }
   ]

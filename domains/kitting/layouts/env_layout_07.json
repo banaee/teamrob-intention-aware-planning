@@ -60,7 +60,6 @@
         200,
         100
       ],
-      "area": "zone_NE",
       "notes": "Shared delivery sink. The robot starts 50 cm south of it, on its route to shelf_1."
     },
     {
@@ -75,7 +74,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SW",
       "notes": "The robot's first shelf, 800 cm due south of T (t=0 cost ~80 ticks vs ~92 / ~97 for shelf_2 / shelf_3). Robot arrival point (0, -720)."
     },
     {
@@ -89,7 +87,6 @@
         50,
         50
       ],
-      "area": "zone_SW",
       "notes": "On the T -> shelf_1 route, 200 cm short of the shelf. The human's coffee break happens here; arriving from the east it stands at (30, -550). A coffee_break(coffee_machine_0) hypothesis exists (both priors)."
     },
     {
@@ -104,7 +101,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SW",
       "notes": "The human's assigned shelf, beside the coffee machine (100 cm west, same aisle). Delivered after the break."
     },
     {
@@ -119,7 +115,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SW",
       "notes": "Alternative BESIDE the blocked shelf (scenario_s05_01): 900 cm from T at 45 deg west of shelf_1's bearing."
     },
     {
@@ -134,7 +129,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_NE",
       "notes": "Alternative ACROSS the table (scenario_s05_02): 900 cm from T on the opposite bearing."
     },
     {
@@ -148,7 +142,6 @@
         20,
         20
       ],
-      "area": "zone_SE",
       "notes": "The human's last task: switch on the AC by the east wall and stay there, off every robot route."
     },
     {
@@ -156,7 +149,6 @@
       "type": "landmark",
       "position": [950, 950],
       "size": [20, 20],
-      "area": "zone_NE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -164,7 +156,6 @@
       "type": "landmark",
       "position": [-950, 950],
       "size": [20, 20],
-      "area": "zone_NW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -172,7 +163,6 @@
       "type": "landmark",
       "position": [950, -950],
       "size": [20, 20],
-      "area": "zone_SE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -180,7 +170,6 @@
       "type": "landmark",
       "position": [-950, -950],
       "size": [20, 20],
-      "area": "zone_SW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -188,7 +177,6 @@
       "type": "landmark",
       "position": [0, -980],
       "size": [80, 20],
-      "area": "zone_SE",
       "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
     }
   ]

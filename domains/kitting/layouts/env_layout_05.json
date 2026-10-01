@@ -60,7 +60,6 @@
         200,
         100
       ],
-      "area": "zone_NW",
       "notes": "Shared delivery sink, top centre. Script part 2 starts here."
     },
     {
@@ -75,7 +74,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SW",
       "notes": "Human's first delivery (script part 1). Approach from (100, 550): 1209 cm, bearing -150.3 deg; every other target is >= 50 deg off that heading."
     },
     {
@@ -90,7 +88,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SE",
       "notes": "Human's last delivery (script part 4). Script part 3's first waypoint lies on the coffee_machine_0 -> shelf_6 line, 40% of the way."
     },
     {
@@ -105,7 +102,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SE",
       "notes": "Robot task 1 (cheapest from its SW start)."
     },
     {
@@ -120,7 +116,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_NE",
       "notes": "Robot task 2 (cheapest from the table after item_4)."
     },
     {
@@ -135,7 +130,6 @@
         100
       ],
       "slots": 2,
-      "area": "zone_SE",
       "notes": "Robot task 3, the most expensive from the table, so it is done last and keeps the robot busy until ~375 ticks - the IR is only called while the robot has tasks (I1 7.12). Undelivered during the human's script part 4, where it is 17 deg off the heading (prior-off decoy; inadmissible prior-on)."
     },
     {
@@ -149,7 +143,6 @@
         50,
         50
       ],
-      "area": "zone_SW",
       "notes": "Script part 2 target. From the kitting table: bearing -93.1 deg, 751 cm; nearest task-target bearing from there is shelf_5 at -43.5 deg (49.6 deg off). x = -40 keeps the walk off the x = 0 zone boundary."
     },
     {
@@ -163,7 +156,6 @@
         20,
         20
       ],
-      "area": "zone_NE",
       "notes": "Second foreseeable target; never visited. Type spelled as ac_activation's parameter_types requires."
     },
     {
@@ -177,7 +169,6 @@
         20,
         20
       ],
-      "area": "zone_SE",
       "notes": "Script part 3, walk 1 end (was the waypoint wander_0; retyped as an AC switch in F47b so that scenario_s04_01's scripted ac_activation is well typed - same coordinates). Exactly on the coffee_machine_0 -> shelf_6 line (t = 0.4): the human heads toward shelf_6 for 398 cm, then turns. Since F47b it IS a hypothesis (ac_activation(ac_switch_1))."
     },
     {
@@ -191,7 +182,6 @@
         20,
         20
       ],
-      "area": "zone_SE",
       "notes": "Script part 3, walk 2 end (was the waypoint wander_1; retyped as an AC switch in F47b, same coordinates). From ac_switch_1: bearing -110.3 deg, 362 cm; >= 64 deg off every delivery target (shelf_5 92.6, coffee 64.0, shelf_6 116.1, table 133.1). Since F47b it is a hypothesis (ac_activation(ac_switch_2))."
     },
     {
@@ -199,7 +189,6 @@
       "type": "landmark",
       "position": [950, 550],
       "size": [20, 20],
-      "area": "zone_NE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -207,7 +196,6 @@
       "type": "landmark",
       "position": [-950, 550],
       "size": [20, 20],
-      "area": "zone_NW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -215,7 +203,6 @@
       "type": "landmark",
       "position": [950, -550],
       "size": [20, 20],
-      "area": "zone_SE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -223,7 +210,6 @@
       "type": "landmark",
       "position": [-950, -550],
       "size": [20, 20],
-      "area": "zone_SW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -231,7 +217,6 @@
       "type": "landmark",
       "position": [0, -580],
       "size": [80, 20],
-      "area": "zone_SE",
       "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
     }
   ]

@@ -55,8 +55,7 @@
       "size": [
         200,
         100
-      ],
-      "area": "zone_SW"
+      ]
     },
     {
       "id": "kitting_table_1",
@@ -68,8 +67,7 @@
       "size": [
         200,
         100
-      ],
-      "area": "zone_SE"
+      ]
     },
     {
       "id": "shelf_0",
@@ -82,8 +80,7 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_NW"
+      "slots": 2
     },
     {
       "id": "shelf_1",
@@ -96,8 +93,7 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_SW"
+      "slots": 2
     },
     {
       "id": "shelf_2",
@@ -110,8 +106,7 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_NW"
+      "slots": 2
     },
     {
       "id": "shelf_3",
@@ -124,8 +119,7 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_NE"
+      "slots": 2
     },
     {
       "id": "shelf_4",
@@ -138,8 +132,7 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_SE"
+      "slots": 2
     },
     {
       "id": "shelf_5",
@@ -152,8 +145,7 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_NE"
+      "slots": 2
     },
     {
       "id": "shelf_6",
@@ -166,8 +158,7 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_SW"
+      "slots": 2
     },
     {
       "id": "shelf_7",
@@ -180,15 +171,13 @@
         100,
         100
       ],
-      "slots": 2,
-      "area": "zone_SE"
+      "slots": 2
     },
     {
       "id": "corner_SE",
       "type": "landmark",
       "position": [950, -450],
       "size": [20, 20],
-      "area": "zone_SE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls. Added in Track 2.5 (docs/assumptions.md 1.1) as the exit walk's target; the layout declared no landmark before."
     }
   ]

@@ -49,8 +49,7 @@
       "size": [
         250,
         300
-      ],
-      "area": "zone_truck_side"
+      ]
     },
     {
       "id": "dock_gate",
@@ -62,8 +61,7 @@
       "size": [
         300,
         10
-      ],
-      "area": "zone_truck_side"
+      ]
     },
     {
       "id": "dry_delivery_bay_0",
@@ -75,8 +73,7 @@
       "size": [
         170,
         170
-      ],
-      "area": "zone_hall"
+      ]
     },
     {
       "id": "frozen_delivery_bay_0",
@@ -88,8 +85,7 @@
       "size": [
         170,
         170
-      ],
-      "area": "zone_hall"
+      ]
     },
     {
       "id": "empty_pallet_bay_0",
@@ -102,7 +98,6 @@
         170,
         170
       ],
-      "area": "zone_hall",
       "notes": "The one container for empty pallets of this room."
     },
     {
@@ -115,8 +110,7 @@
       "size": [
         50,
         50
-      ],
-      "area": "zone_hall"
+      ]
     },
     {
       "id": "office_door",
@@ -128,8 +122,7 @@
       "size": [
         100,
         10
-      ],
-      "area": "zone_hall"
+      ]
     },
     {
       "id": "office_chair",
@@ -141,8 +134,7 @@
       "size": [
         50,
         50
-      ],
-      "area": "zone_office"
+      ]
     },
     {
       "id": "desk",
@@ -155,7 +147,6 @@
         20,
         20
       ],
-      "area": "zone_hall",
       "notes": "Landmark: the target of the closing part (B13), at the wall on the gate's side, beside the place of the gate's button; no task of the robot's task model names it."
     },
     {
@@ -169,7 +160,6 @@
         20,
         20
       ],
-      "area": "zone_hall",
       "notes": "Landmark: the standby place (A3's standby entry); the human's start position."
     }
   ]
