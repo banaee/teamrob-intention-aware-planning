@@ -91,7 +91,6 @@ Core algorithms reason over **discrete micro-actions** and **symbolic world pred
 class SpatialContext:
     position: Tuple[float, float]
     orientation: float
-    area: Optional[str] = None
 
 @dataclass
 class ActionContext:
@@ -185,7 +184,6 @@ and `tails` exist for evaluation and for the rest of G.
 @dataclass
 class AgentState:
     agent_id: str
-    current_area: str
     holding: Optional[str] = None          # item_id or None
     current_task: Optional[str] = None     # task_id or None
     metadata: Dict[str, Any] = field(default_factory=dict)
