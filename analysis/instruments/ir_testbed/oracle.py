@@ -4,7 +4,7 @@ oracle.py — the IR test-bed's expectation generator (TB.3b; design_decisions.m
 boundary"): the recognizer's outputs per tick, derived from the recognizer records at HEAD and from nothing of the
 recognizer's code.
 
-    oracle.py <trajectory.json> <run file> <expected.csv> <phases.json> <run.log>
+    oracle.py <trajectory.json> <run file> <expected.csv> <phases.json> <run.log | theta=<value>>
 
 Independence. It imports nothing from shared/recognizer.py or shared/likelihood_functions.py, and asserts at the end
 that neither module was loaded in its process. It uses the planner's decomposition (`AdaptivePlanner.decompose`, on
@@ -23,6 +23,11 @@ G-build added two columns by derivation from DG = design_decisions.md "T-D G: ad
 the G-build plan step on an unresolved target (README, "G-build"): the observation warrant per hypothesis, and the
 gate's expected outcome per tick (θ from the run log's [run] header, the one value read from the log; commitment from
 the scenario's assigned tasks, by the support's key reading, rule 1).
+The sort and dock_loading (1 October 2026; analysis/instruments/ir_testbed/README.md, rules 24 to 27): the domain from
+the run file; the agent's area in the world of a tick (the layout's declared areas and the one definition,
+shared.types.area_fact; T-G A9, R2); liveness by applicability (T-G A4; HB §1.1, its A4 amendment); and the boundary
+also read through each terminal action's preconditions and completion condition (DL L1 as amended, its as-built
+reading), which covers a terminal action other than place and wait_at (dock_loading's scan_it).
 """
 import csv
 import json
@@ -33,12 +38,25 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
+import importlib
+import itertools
 import yaml
-from shared.types import (AgentState, Const, PersonalTask, Predicate, TaskInstance, Var, WorldState,
-                          task_instance_key)
+from shared.types import (ActionStep, AgentState, Area, Const, PersonalTask, Predicate, TaskInstance, Var, WorldState,
+                          area_fact, task_instance_key)
 from shared.knowledge import TaskModel
 from shared.planner import AdaptivePlanner, DecompositionError
-from domains.kitting.registry import domain_config, register_kitting_domain
+
+
+def domain_of(run_file):
+    """The run file's domain's registry: domains/<domain>/registry.py, the place every domain keeps it."""
+    return importlib.import_module(f"domains.{yaml.safe_load(open(run_file))['domain']}.registry").domain_config
+
+
+def areas_of(domain_config, layout):
+    """The layout's declared areas, in declaration order, as the environment reads them (SimModel; T-G A9)."""
+    env_layout = json.load(open(ROOT / domain_config["layouts"][layout]))
+    return tuple(Area(id=a["id"], x_min=a["bounds"]["x_min"], x_max=a["bounds"]["x_max"],
+                      y_min=a["bounds"]["y_min"], y_max=a["bounds"]["y_max"]) for a in env_layout.get("areas", []))
 
 # HB §2: the recognizer's constants; HB §1.7 / §2: BELIEF_FLOOR (output only).
 HIT, FALSE_ALARM, FLOOR = 1.0, 1e-3, 1e-3
@@ -84,8 +102,11 @@ def support(space, assigned):
 
 
 # ---- the world of a tick, from the trajectory --------------------------------------------------------------------
-def world_of(row, traj, agent):
+def world_of(row, traj, agent, areas):
     preds = {Predicate(f[0], tuple(Const(a) for a in f[1:])) for f in row["facts"]}
+    fact = area_fact(agent, (row["x"], row["y"]), areas)             # the agent's area (T-G A9, R2)
+    if fact is not None:
+        preds.add(fact)
     positions = {i: tuple(p) for i, p in traj["fixed"].items()}
     positions.update({i: tuple(p) for i, p in row["item_pos"].items()})
     return WorldState(timestamp=float(row["tick"]),
@@ -93,7 +114,7 @@ def world_of(row, traj, agent):
                       agent_positions={agent: (row["x"], row["y"])},
                       object_locations=dict(row["item_loc"]), predicates=preds,
                       object_home_container=dict(traj["home"]), object_destination=dict(traj["dest"]),
-                      object_positions=positions)
+                      object_positions=positions, areas=areas)
 
 
 def target_position(obj, world):
@@ -115,14 +136,20 @@ def label(a):
 
 
 class Oracle:
-    def __init__(self, traj, alpha, theta):
+    def __init__(self, traj, alpha, theta, domain_config):
         p = traj["params"]
         self.v, self.beta, self.alpha, self.theta = p["speed"], p["beta"], alpha, theta
         self.lat_action, self.lat_task = p["action_completion_latency"], p["observed_task_completion_latency"]
         self.default_cost, self.duration_ticks = p["default_action_cost"], p["duration_ticks"]
         self.traj = traj
-        task_model = TaskModel(register_kitting_domain(), domain_config["task_model"])
+        task_model = TaskModel(domain_config["register_fn"](), domain_config["task_model"])
         self.planner = AdaptivePlanner(knowledge=task_model)
+        self.areas = areas_of(domain_config, traj["layout"])
+        # DL L1: the terminal actions, the last action of some method of a task schema of the robot's task model
+        terminal = {m.steps[-1].action.name: m.steps[-1].action for s in task_model.task_schemas() for m in s.methods
+                    if m.steps and isinstance(m.steps[-1], ActionStep)}
+        self.terminal = [terminal[name] for name in sorted(terminal)]
+        self.objects = sorted(traj["types"])
         self.space = hypothesis_space(task_model, traj["types"])
         human = next(a for a in domain_config["scenarios"][traj["scenario"]].agents if a.agent_type == "human")
         self.agent = human.agent_id                    # the observed human: the scenario's one human
@@ -133,6 +160,7 @@ class Oracle:
         self.base = {k: 1.0 / len(live) for k in live}
         self.expected, self.origin, self.entry = {}, {}, {}
         self.observed, self.completed = set(), set()
+        self.inapplicable = set()                     # T-G A4: the keys not live for want of an applicable method
         # DG AD1: the keys whose current phase was entered by the completion of the previous expected action in this
         # episode (the completion E8 reads): reset at a boundary and at every phase change, a first observation or a pin
         self.entered = set()
@@ -175,7 +203,7 @@ class Oracle:
 
     # ---- one update (HB §1.8) ---------------------------------------------------------------------------------------
     def update(self, row):
-        world = world_of(row, self.traj, self.agent)
+        world = world_of(row, self.traj, self.agent, self.areas)
         holds = lambda p: p is not None and p in world.predicates
         pos = (row["x"], row["y"])
         step = 0.0 if self.last_pos is None else math.dist(pos, self.last_pos)   # 0 on the first observation
@@ -190,7 +218,16 @@ class Oracle:
                 A = self.planner.decompose(self.space[k], self.agent, world)
             except DecompositionError:
                 A = None
+            if A is None and k not in self.completed:     # T-G A4: no applicable method: not live (HB §1.1)
+                if k not in self.inapplicable:
+                    self.inapplicable.add(k)
+                    for d in (self.base, self.expected, self.origin, self.entry):
+                        d.pop(k, None)
+                    self.observed.discard(k)
+                    self.entered.discard(k)
+                continue
             if A is not None and holds(A[-1].completion_predicate):             # the terminal pin (HB §1.6)
+                self.inapplicable.discard(k)               # T-G A4: applicable again, its fact holding: retired
                 if k not in self.completed:                # retired while the fact holds (DL L4)
                     self.completed.add(k); pins.append(k)
                     for d in (self.base, self.expected, self.origin, self.entry):
@@ -202,6 +239,8 @@ class Oracle:
                 if A is None:                              # its fact cannot be read: nothing says it stopped
                     continue
                 self.completed.discard(k); reentries.append(k)                  # live again (DL L4)
+            elif k in self.inapplicable:                   # T-G A4: applicable again: re-enters through L4's path
+                self.inapplicable.discard(k); reentries.append(k)
             a = next((x for x in A if not holds(x.completion_predicate)), None) if A is not None else None
             if k not in self.observed:                   # enters its action from no completion: an empty phase
                 self.observed.add(k)
@@ -271,7 +310,24 @@ class Oracle:
             if f[0] == "holding" and f[1] == h and ("holding", h, f[2]) not in now:
                 if any(g[0] == "obj_at" and g[1] == f[2] and g[2] not in agents for g in now):
                     return True
-        return any(f[0] == "waited" and f[1] == h and f not in prev for f in now)
+        if any(f[0] == "waited" and f[1] == h and f not in prev for f in now):
+            return True
+        return any(self.completes(T, h, prev, now) for T in self.terminal)
+
+    def completes(self, T, h, prev, now):
+        """DL L1 as amended, its as-built reading, for any terminal action T: T's preconditions held for the observed
+        agent on the previous tick and, under that binding, a grounding of its completion condition holds now that did
+        not then (scan_it: at(h, x) then, is_scanned(x) newly now). The variables range over the objects; ?agent is h."""
+        conds = list(T.preconditions) + [T.completion]
+        names = sorted({a.name for c in conds for a in c.args if isinstance(a, Var) and a.name != "?agent"})
+        for values in itertools.product(self.objects, repeat=len(names)):
+            b = dict(zip(names, values), **{"?agent": h})
+            ground = lambda c: (c.name,) + tuple(b[a.name] if isinstance(a, Var) else a.value for a in c.args)
+            if all(ground(c) in prev for c in T.preconditions):
+                g = ground(T.completion)
+                if g in now and g not in prev:
+                    return True
+        return False
 
     def warrant(self, k, pos, world):
         """DG AD1: observation warrant. The entry source, for any phase: the phase was entered by a completion in this
@@ -339,8 +395,8 @@ COLUMNS = ["tick", "human_x", "human_y", "micro", "holding", "waited", "obj_at",
            "s", "s_exp", "D", "L", "evidence", "belief", "S", "member", "adequacy", "warrant"]
 
 
-def run(traj, alpha, theta):
-    orc = Oracle(traj, alpha, theta)
+def run(traj, alpha, theta, domain_config):
+    orc = Oracle(traj, alpha, theta, domain_config)
     rows, phases = [], {k: [] for k in orc.space}
     for r in traj["rows"]:
         world, E, pins, reentries, boundary, advanced, folds = orc.update(r)
@@ -385,10 +441,15 @@ def run(traj, alpha, theta):
 if __name__ == "__main__":
     traj = json.load(open(sys.argv[1]))
     alpha = float(yaml.safe_load(open(sys.argv[2]))["test_level"])
-    # θ, the meta-planner's, from the run's [run] header (shared.meta_planner would load the recognizer)
-    header = next(l for l in open(sys.argv[5]) if l.startswith("[run] "))
-    theta = float(header.split("theta=")[1].split()[0])
-    rows, phases, space = run(traj, alpha, theta)
+    # θ, the meta-planner's, from the run's [run] header (shared.meta_planner would load the recognizer); before the
+    # run (the expectations committed before any run, since the sort) the value of record, given as theta=<value>,
+    # and the run's own oracle call must then reproduce the committed expected.csv
+    if sys.argv[5].startswith("theta="):
+        theta = float(sys.argv[5].split("=", 1)[1])
+    else:
+        header = next(l for l in open(sys.argv[5]) if l.startswith("[run] "))
+        theta = float(header.split("theta=")[1].split()[0])
+    rows, phases, space = run(traj, alpha, theta, domain_of(sys.argv[2]))
     with open(sys.argv[3], "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()

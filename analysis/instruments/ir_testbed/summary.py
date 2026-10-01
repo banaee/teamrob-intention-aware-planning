@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from domains.kitting.registry import domain_config
+import importlib
 
 
 def rows(path):
@@ -51,7 +51,16 @@ def coverage(log):
     return out
 
 
-SCHEMAS = {s.name: s for s in domain_config["task_model"]}
+def schemas_of(log):
+    """The task model's schemas of the run's domain, named in the log's [run_mesa] start line."""
+    for l in open(log):
+        m = re.match(r"\[run_mesa\] Starting headless run — domain=(\S+)", l)
+        if m:
+            return {s.name: s for s in importlib.import_module(f"domains.{m[1]}.registry").domain_config["task_model"]}
+    raise ValueError(f"{log}: no [run_mesa] start line")
+
+
+SCHEMAS = {}
 
 
 def hypothesis_key(task):
@@ -71,6 +80,7 @@ def short(k):
 
 def main(d, log):
     d = Path(d)
+    SCHEMAS.update(schemas_of(log))
     THETA, ALPHA, BETA, V = header(log)
     vd_of = lambda S: 0.0 if S >= 1.0 else -math.log(2.0 ** S - 1.0) / BETA
     act, exp = rows(d / "actual.csv"), rows(d / "expected.csv")
@@ -265,6 +275,13 @@ def main(d, log):
                    + (f" (belief {float(by[cross][k]['belief']):.4f}; v·D {vd_of(float(by[cross][k]['S'])):.1f} cm)"
                       if cross is not None else "")
                    + f"; the finding unexplained from {une}.")
+        out.append("")
+
+    # a script that depends on the robot: the entries still open at the run's end (the record; T-G A3, Q13b)
+    still = [l.split(" ", 3)[3].strip() for l in open(log) if l.startswith("[human] ") and "StillOpen(" in l]
+    if still:
+        out += ["Entries still open at the run's end (the record; a script that depends on the robot):", ""]
+        out += [f"- {s}" for s in still]
         out.append("")
     print("\n".join(out))
 

@@ -53,12 +53,11 @@ def _write(path, rows):
                         for c in COLUMNS})
 
 
-def support(keys, known):
+def support(keys, known, domain_config):
     """The support under the prior (docs/recognizer_handback.md §1.1): the known (assigned) tasks' hypotheses and every
     PersonalTask hypothesis of the task model; the log prints the known tasks with their determined parameters
     ([IR-prior]), the hypothesis keys without them. A key outside it is pinned at the floor and never live."""
     import re
-    from domains.kitting.registry import domain_config
     from shared.types import PersonalTask
     schemas = {s.name: s for s in domain_config["task_model"]}
     def key(task):
@@ -72,7 +71,13 @@ def support(keys, known):
 WARRANT = re.compile(r"^\[IR\] step=(-?\d+) .* warrant=\[(.*)\]$")
 
 
-def from_log(log_path, alpha):
+def domain_of(run_file):
+    """The run file's domain's registry: domains/<domain>/registry.py, the place every domain keeps it."""
+    import importlib
+    return importlib.import_module(f"domains.{yaml.safe_load(open(run_file))['domain']}.registry").domain_config
+
+
+def from_log(log_path, alpha, domain_config):
     # tdlib's [coverage] pattern does not match a line with a `start:` entry (scenario_s08_03 / _04; TODO-125), so it
     # is handed the log without its [coverage] lines, which nothing here reads; and without the [IR] line's warrant
     # field (G-build), which its tails pattern would swallow: parsed here instead
@@ -90,13 +95,13 @@ def from_log(log_path, alpha):
     log = tdlib.parse(f.name)
     Path(f.name).unlink()
     keys = sorted(next(iter(log["dist"].values())))
-    admissible = support(keys, log["known"])
+    admissible = support(keys, log["known"], domain_config)
     rows = []
     for t in sorted(log["ir"]):
         ir, dist = log["ir"][t], log["dist"][t]
         pins = [k for s, k in log["pins"] if s == t]
         reentries = [k for s, k in log["reentries"] if s == t]
-        live = [k for k in admissible if not tdlib.retired(log, k, t)]
+        live = [k for k in admissible if not tdlib.retired(log, k, t) and not tdlib.inapplicable(log, k, t)]
         act, micro, (x, y), _ = log["human"][t]
         common = dict(tick=t, human_x=x, human_y=y, micro=None if micro == "None" else micro,
                       most_likely=None if ir["ml"] == "none" else ir["ml"], confidence=ir["conf"],
@@ -122,7 +127,7 @@ class Collect(logging.Handler):
 
 
 def in_process(run_file, steps, alpha):
-    from domains.kitting.registry import domain_config, register_kitting_domain
+    domain_config = domain_of(run_file)
     from mesa_sim.sim_model import SimModel
     from mesa_sim.world_state_builder import build_world_state
     cfg = yaml.safe_load(open(run_file))
@@ -134,7 +139,8 @@ def in_process(run_file, steps, alpha):
     root.setLevel(logging.INFO)
     root.addHandler(collect)
     logging.getLogger("rec").propagate = False
-    m = SimModel(scenario=scenario, register_fn=register_kitting_domain,
+    m = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
+                 state_declarations=domain_config["states"],
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
@@ -177,7 +183,7 @@ def in_process(run_file, steps, alpha):
 if __name__ == "__main__":
     run_file, steps, log_path, out_full, out_log = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
     alpha = float(yaml.safe_load(open(run_file))["test_level"])
-    _write(out_log, from_log(log_path, alpha))
+    _write(out_log, from_log(log_path, alpha, domain_of(run_file)))
     rows, ir_lines = in_process(run_file, steps, alpha)
     logged = [l.rstrip("\n") for l in open(log_path) if l.startswith("[IR")]
     same = ir_lines == logged
