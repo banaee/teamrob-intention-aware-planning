@@ -2,7 +2,9 @@
 """
 COPIED (the sort, 1 October 2026) from analysis/kitting/l_build/tdlib.py (frozen, L-build) as the IR test-bed
 instrument's log reader, so that the shared instruments import nothing from a domain's folder; the instruments use
-parse() and retired(). The rest of this docstring and runs() / truth() are the L-build original's, unchanged (their
+parse(), retired() and inapplicable(). Corrected here (the instruments' own log reading, for dock_loading): the pool and
+the winner read by each task's first binding, not by kitting's words (`item`, `ac_switch`, `coffee_machine`; the same
+value on every kitting log); the `[IR-inapplicable]` lines (T-G A4) and inapplicable(). The rest of this docstring and runs() / truth() are the L-build original's, unchanged (their
 paths name the L-build folder layout).
 
 tdlib.py — the parser and the ground truth the 1.4 / 1.5b / TB.2b scripts share, rerun for L-build (design_decisions.md,
@@ -106,6 +108,7 @@ def parse(path):
     """
     ir, dist, complete, boundary, cov = {}, {}, {}, [], {}
     pins, reentries, boundary_action, triggers = [], [], {}, []
+    inapplicable = []
     cause = None
     human, robot = {}, {}
     decisions, holds = [], []
@@ -128,6 +131,9 @@ def parse(path):
         elif l.startswith("[IR-reentry]"):
             m = re.match(r"\[IR-reentry\] step=(\d+) (\S+) live again", l)
             reentries.append((int(m[1]), m[2]))
+        elif l.startswith("[IR-inapplicable]"):
+            m = re.match(r"\[IR-inapplicable\] step=(-?\d+) (\S+) (?:does not enter|leaves) the live set", l)
+            inapplicable.append((int(m[1]), m[2]))
         elif l.startswith("[IR-boundary]"):
             m = re.match(r"\[IR-boundary\] step=(\d+) \S+ completed (a task|\S+?):", l)
             boundary.append(int(m[1]))
@@ -155,7 +161,7 @@ def parse(path):
                 done = int(m[1]); continue
             m = re.match(r"\[meta\] step=(\d+) trigger=(\S+) winner=(\S+\{[^}]*\})(?: queue=(.*))?", l)
             decisions.append(dict(step=int(m[1]), trigger=m[2], cause=cause, winner=short(m[3]),
-                                  queue=tuple(re.findall(r"'(item_\d+|ac_switch_\d+|coffee_machine_\d+)'", m[4] or "")),
+                                  queue=tuple(re.findall(r"\{'\?[^']+': '([^']+)'", m[4] or "")),
                                   proj=proj[1] if proj else None, conf_proj=proj[0] if proj else None,
                                   selection=(b3 or {}).get("selection"), hold=(b3 or {}).get("hold"),
                                   ordering=(b3 or {}).get("ordering")))
@@ -169,7 +175,8 @@ def parse(path):
                 d[int(m[1])] = (m[4], m[5], (float(m[6]), float(m[7])), m[3])
     return dict(ir=ir, dist=dist, complete=complete, boundary=boundary, known=known, prior=prior, coverage=cov,
                 human=human, robot=robot, decisions=decisions, holds=holds, done=done, header=header,
-                pins=pins, reentries=reentries, boundary_action=boundary_action, triggers=triggers)
+                pins=pins, reentries=reentries, boundary_action=boundary_action, triggers=triggers,
+                inapplicable=inapplicable)
 
 
 def retired(log, key, t):
@@ -180,9 +187,17 @@ def retired(log, key, t):
     return pin is not None and (back is None or pin > back)
 
 
+def inapplicable(log, key, t):
+    """Whether `key` is out of the live set on tick t for want of an applicable method (T-G A4): its last
+    [IR-inapplicable] at or before t is later than its last [IR-reentry] at or before t."""
+    out = max((s for s, k in log["inapplicable"] if k == key and s <= t), default=None)
+    back = max((s for s, k in log["reentries"] if k == key and s <= t), default=None)
+    return out is not None and (back is None or out > back)
+
+
 def short(w):
-    """A [meta] winner dict string -> 'item_3' / 'ac_switch_0' / 'coffee_machine_0'."""
-    m = re.search(r"'\?(?:item|ac_switch|coffee_machine)': '([^']+)'", w)
+    """A [meta] winner dict string -> the value of its first binding ('item_3', 'pallet_0', 'coffee_machine_0')."""
+    m = re.search(r"\{'\?[^']+': '([^']+)'", w)
     return m[1] if m else w
 
 
