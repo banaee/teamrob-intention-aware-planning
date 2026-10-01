@@ -404,6 +404,11 @@ SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domai
 is built and accepted; stage 1's milestone is complete. Next: the design of the IR test-bed set with Hadi (first
 question: TODO-155); then the sorting of the earlier analyses and tests under kitting, with the preparation of the
 instruments; then the set's authoring and its runs.
+SUPERSEDED (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block, RULED, T-G records 8): TODO-155 is ruled
+for now (the walk to the standby place stays without a hypothesis; H1 and H2 recorded, neither approved), office_break
+lasts 90 seconds (TODO-157), and the IR test-bed set on dock_loading is agreed (C1 to C14, M1 to M4, in all three
+rooms). Next: the build step that sorts the earlier analyses and tests under kitting and prepares the instruments for
+dock_loading; then the authoring of the set, its expectations and its runs.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -679,6 +684,17 @@ instruments; then the set's authoring and its runs.
     scan before the next pallet arrives). Findings recorded there (TODO-135's fourth instance, TODO-145, TODO-154,
     TODO-155). Stage 1's milestone is complete. Next: the design of the IR test-bed set with Hadi (first question:
     TODO-155); then the sorting step with the preparation of the instruments; then the set's authoring and its runs.
+    RULED, THE IR TEST-BED SET (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block, RULED, T-G records 8):
+    T-G Q16, the walk to the standby place stays without a hypothesis for now, the IR test-bed set observing how the
+    present recognizer explains it (the baseline); two candidates on TODO-155, neither approved (H1, a foreseeable task
+    to step aside; H2, a hypothesis live only while no assigned task of the human is applicable); the walk as the scan's
+    tail not taken. `office_break` lasts 90 seconds, `coffee_break` stays 60 (TODO-157; the value changed in the next
+    build step). The set: 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to M4), each in all three rooms on the
+    room's IR setup; the controlled ones run and read first; expectations derived from the records before the runs;
+    nothing adjusted to a result; for the standby walks (C13, C14, M4) the predictions under H1 and H2 written down
+    beside the present model's expectation, which alone is compared. Next: the build step that sorts the earlier
+    analyses and tests under kitting and prepares the instruments for dock_loading; then the authoring of the set, its
+    expectations and its runs.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
@@ -686,6 +702,11 @@ instruments; then the set's authoring and its runs.
     context fact; start only or interruption of a task in progress (A3, A10); liveness under A4 when a condition turns
     false during execution; the prior under context; the perception assumption for context facts. The pre-loaded
     context stream moves here from T-V track 2.
+    ADDED (Hadi, 1 October 2026; T-G Q16's block, T-G records 8), NOT RULED: one design question, what sets a
+    hypothesis's share at the start of an episode, with four determinants designed as one mechanism (the assignment;
+    context facts; the task that just ended, a transition prior between tasks; an enabling event such as the robot's own
+    delivery, TODO-154); and Hadi's ideas: the duration of a foreseeable task is not one fixed number; temporal context
+    can be a fuzzy set with a degree of membership.
   - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
     run, TODO-16 with the stepwise delivery (A7).
     ADDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): B10's room (the stores), with its own layout, setup and scenarios; A8's rule on

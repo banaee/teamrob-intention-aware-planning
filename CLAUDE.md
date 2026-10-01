@@ -293,6 +293,14 @@ Decisions
   TODO-154). Next: the design of the IR test-bed set with Hadi (first question: TODO-155); then the sorting of the
   earlier analyses and tests under kitting, with the preparation of the instruments; then the set's authoring and its
   runs.
+  The IR test-bed set on dock_loading is AGREED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's
+  rulings", T-G Q16's block, RULED, T-G records 8): T-G Q16, the walk to the standby place stays without a hypothesis
+  for now (the set observes the present recognizer; H1 and H2 on TODO-155, neither approved); `office_break` lasts 90
+  seconds (TODO-157, the value changed in the next build step); 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to
+  M4), each in all three rooms on the IR setups, expectations derived before the runs, the controlled read first; for
+  stage 1.5, the share at an episode's start (TODO-154), not ruled. Next: the build step that sorts the earlier analyses
+  and tests under kitting and prepares the instruments for dock_loading; then the authoring of the set, its expectations
+  and its runs.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
