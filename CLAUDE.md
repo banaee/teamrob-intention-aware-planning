@@ -263,6 +263,14 @@ Decisions
   context stream moved here from T-V track 2); 2 `store_pallet` with B10's room (the stores), the gate opened on request,
   the office door's state, A7 (TODO-16), A8's monitored-area rule reopened; then track 4 (A8); 3 check-in and check-out.
   Before each stage's plan the design chat and Hadi agree its layout and setup. Next: stage 1's plan.
+  Stage 1's plan is APPROVED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN
+  APPROVED): `docs/handoffs/plan_T-G_stage1.md`, which every stage-1 build session reads first. Build order, steps 0 to
+  8: HEAD runs of the extended set; the rename (zone to area); the areas and R2 (one definition of an agent's area, a
+  fixed object's area derived from its position, the replay's walk ends where the body stops, the unread carriers
+  removed); A4; A5; A3; dock_loading's catch-up (area ids `area_hall`, `area_office`, `area_truck_side`); its content (a
+  method for every area the agent can be in: 8 per robot task, the human's for the hall and the office); the milestone
+  (scenario_s03_02, s05_02, s07_02). A robot task with no applicable method stops the run (TODO-152, a ruling before
+  stage 2). Next: stage 1's build, step 0 then step 1.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
@@ -340,6 +348,10 @@ A standing convention for every build or refactor session.
 - No new check function that works by string or key matching, and no patch that goes around the conceptual design;
   identity is object identity or value equality of typed objects.
 - If a rule above blocks progress, stop and report why; that report is the deliverable.
+- Conceptual changes need Hadi's ruling (Hadi, 1 Oct 2026, standing): the recognizer's scoring and admission, the
+  meta-planner's candidate evaluation and cost, the projection's semantics, the planner's method selection and the
+  trigger set are not changed at the conceptual level without Hadi's ruling. A change to `shared/`, `core/` or `world/`
+  is domain-agnostic and named in an approved plan. Otherwise stop and report before changing anything.
 
 ## Cost discipline
 
