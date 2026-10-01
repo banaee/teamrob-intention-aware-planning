@@ -57,6 +57,11 @@ The robot architecture from the HCM paper maps directly to two layers:
 
 These two layers communicate only through canonical symbolic types (`Observation`, `BeliefState`, `WorldState`, `AbstractPlan`). The cognitive layer never imports anything from a simulator.
 
+AMENDED (T-G records 1, terms, 1 October 2026; `docs/glossary.md` §10): the robot's **mind** (`shared/`) and **body** are
+kept; `mesa_sim/` and `ros_sim/` are **simulators**, each implementing the **environment** (the room, its objects and their
+true states, belonging to no agent) and the agents' bodies, not "the robot's body" alone. Since T-H2 `world/` is the
+world's side (the human's executor and its record). "T-G: the second domain's rulings", A2.
+
 ---
 
 ## The Four Key Decisions
@@ -1073,6 +1078,13 @@ hypothesis is visible rather than indistinguishable from an uninformative one. A
 variable or unknown lookup is a schema error and still raises: a domain modelling mistake must
 not look like uncertainty (dock_loading's `confirm_delivered_pallet`, TODO-25, now fails
 loudly at the first tick instead of being NEUTRAL forever).
+SUPERSEDED IN PART (T-G records 1, 1 October 2026). Wording: since I4 the score of a hypothesis the planner cannot
+decompose is the perfect-fit value L = 1 (`PERFECT_FIT_LIKELIHOOD`), as the code, its log line ("scored perfect-fit")
+and `docs/recognizer_handback.md` §1 name it; NEUTRAL was the pre-I4 constant of the same value (1.0), and the records
+read "the perfect-fit value". dock_loading's error is raised at model construction (`RobotAgent.observe_initial()`, in
+`SimModel.__init__`), not on the first tick, and since T-G build 1 not at all (TODO-25). Behaviour: T-G's A4 (liveness
+by applicability) replaces this scoring when built: a hypothesis with no applicable method leaves the live set.
+"T-G: the second domain's rulings", A4.
 
 Consequences measured (`analysis/i2_ir_foundations/REPORT.md`; every difference from the I1/F1
 baselines attributed by stage): no target is unresolved in any of the eight conditions; the
@@ -5638,3 +5650,347 @@ e1e9a758799a488b3bf022fe8c8b92ae scenario_s12_01, 93053e69c0d69ae637fb82b0c9399e
 Next, as Hadi rules: track 3b (TODO-145) before the evaluation (T-F, TODO-144), or track 4 (TODO-140).
 RULED (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): neither; T-G is next, then
 T-F and T-V, and track 3b and track 4 in the T-D tail after them.
+
+---
+
+**T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)**
+
+Ruled in cchat (the T-G design chat) on the questions of `docs/handoffs/handoff_T-G_onward.md` §5, after Hadi's own
+reading of the domain; recorded in T-G records 1 (1 October 2026). Records only: nothing in this entry is built unless it
+says so. Q1 to Q11 are the design chat's question numbers; a letter in parentheses (D1, E2, F2, H2', K1, S2, P2) is the
+option it ruled. The rulings are grouped by SCOPE, and the scope binds:
+- PART A, FRAMEWORK-WIDE: binds every domain. A3 changes `world/`, and A4, A5, A7 and A8 change `shared/` (A5 also the
+  simulator), when built; each states its acceptance on kitting.
+- PART B, DOCK_LOADING ONLY: binds `domains/dock_loading/` and its artefacts. Nothing in it enters `shared/` or `world/`.
+- PART C, STAGING: statements about T-G's stages and the domain's present state, not design rulings.
+- PROPOSALS: what the design chat proposed and Hadi has not ruled.
+Names not yet given (the human's gate task, the robot's honk action, the fact names for the states and the
+designations) are left unnamed; the stage plans propose them.
+
+PART A. FRAMEWORK-WIDE RULINGS (every domain)
+
+- A1, V1 and FW.
+  V1 is the first complete version of the framework, the package for TeamRob and the publications. In V1: T-G; T-F; T-V
+  track 1 and track 2; the T-D tail's track 3b (TODO-145); track 4 in the reduced form of A8. FW (future work: not
+  designed, ruled or built within V1): the 4D detour; T-S; the directions of A10.
+  Tags. Each open TODO may carry a tag beside its status: [V1] or [FW]. A TODO keeps its number and identifier for good:
+  no renumbering, no renaming. An untagged TODO is not yet ruled. There is no full pass now: a TODO gets its tag when it
+  is next touched, by Hadi's ruling; a new item gets its tag when recorded.
+  [FW] is for conceptual, higher-level directions only. An alternative not taken in a design question is recorded inside
+  that question's ruling as "not taken", with its reason, and gets no FW item. FW must not hide a known wrong behaviour
+  inside what V1 claims: such an item is fixed in V1 or stated as a limitation.
+
+- A2, terms (a glossary revision; no code is renamed). Mind, body, environment, simulator, container, area and
+  monitored area are defined in `docs/glossary.md` §10, applicable in §6. "World" is not used for the environment
+  (`world/` and the world vocabulary keep their meanings). "Zone" is not used: an area is declared in the layout. The
+  simulator replaces "the bodies" as the name of `mesa_sim/` and `ros_sim/`; the Mesa class `RobotAgent` still holds mind
+  parts and body parts together (TODO-131).
+  CONFLICT MARKED (T-G records 1, not resolved): the ruling's reason "kitting dropped it" holds for the robot's inference
+  (I4 removed ZONE_BOOST; the recognizer reads no zone), not for the artefacts, the simulator or the records: every
+  kitting layout declares a `zones` block and a `zone` per fixed object, the Mesa world-state builder emits
+  `in_zone(agent, zone)` and `WorldState.object_zones`, the planner keeps the `zone_of` lookup, and CLAUDE.md's invariant
+  and the glossary's **layout** (§9) name zones.
+
+- A3, the human's script (T-G Q1, Q2). One form for every domain. It changes `world/` when built; the robot's mind
+  receives nothing from it.
+  Q1. Assignment is static; availability is dynamic; execution order is dynamic. The human's assigned tasks are a fixed
+  set known at load. A task can start only when it is applicable. The human agent decides this by its own HTN planning,
+  the same planning that decomposes the task, against the true state it perceives (the simulated human perceives
+  perfectly, wherever it is). The environment holds the state and plans nothing. A task that is not applicable cannot be
+  chosen.
+  Q2 (Hadi's wording): "At each point when the human becomes free, it scans its authored priority list from the
+  beginning and selects the first assigned task that is currently executable and not yet completed. If no assigned task
+  is executable, it waits. The list is a priority order, not an execution sequence." ("Executable" reads "applicable",
+  A2.) After completing a task the human starts again from the top. The list's order has an effect only when two or more
+  entries are applicable at the same moment.
+  A change in the environment does not interrupt a task in progress: the human reaches a newly applicable task the next
+  time it is free. Nothing is added to or moved in the list during a run.
+  The choice among applicable tasks is one isolated point of the human's executor, so that a live user (T-V track 2, in
+  V1) or a human planner (TODO-148) can supply the choice. This isolation is a V1 requirement.
+  The authored script stays fixed and pre-loaded; the realised sequence (the executor's record) is dynamic. A script is
+  either independent of the robot (the load-time replay is exact, as today) or dependent on the robot (the replay checks
+  what it can and says so).
+  Kitting is the special case: every assigned task is applicable from the start, so the list's order is the execution
+  order. Acceptance when built: the maintained kitting sets stay byte-identical.
+  Authoring pattern, the standby place: the author may give the list a lowest entry "go to the standby place" (a plain
+  walk to a landmark). The human then steps aside whenever nothing else is applicable. Why: a waiting human otherwise
+  stands where its last task ended, which can be the point where the robot must put down the next object.
+  Not taken: an ordered script with holding only; arrival order, nearest first or random as the choice rule; a generic
+  task whose object is bound at run time (it removes the allocation the prior relies on; DESIGN-02).
+  When built, it supersedes for a script that depends on the robot "the human's script, an ordered list ... which the
+  executor must reproduce exactly" (glossary §6, **human's script**; "T-H: the human behaviour model"). It answers
+  DESIGN-01 (an entry condition is applicability, decided by the human's own planning in `world/`) and LIMIT-02.
+
+- A4, liveness by applicability (T-G Q3). It changes `shared/` when built and reopens I2's scoring of a hypothesis that
+  cannot be decomposed, on design grounds.
+  Hadi's wording: "A human-task hypothesis is live only when at least one of its methods is currently applicable in the
+  robot's WorldState. When no method is applicable, the hypothesis leaves the live set and can re-enter when the task
+  becomes executable again." A hypothesis that re-enters the live set enters at the prior base, the rule T-D L4 uses for
+  re-entry. It is the mind's counterpart of Q1 and names no domain. Acceptance on kitting: byte-identical.
+  Not taken: keeping the neutral score (as built, the perfect-fit value L = 1) for a hypothesis that cannot be decomposed:
+  the belief then favours tasks the human cannot be doing.
+  When built, it supersedes I2's scoring (the I2 entry's superseding note), and the live set of T-D L4 (the support minus
+  the hypotheses whose terminal fact holds) gains this second condition.
+
+- A5, object states and designations (T-G Q10).
+  The domain declares: the setup gives each object its initial states and its designations; the action schemas say which
+  action sets or ends which state (the effects and retractions of T-B2a). The environment holds the true states and
+  changes them when an action completes, as the schema declares. The simulator has no code written for one domain. The
+  robot's body builds the robot's WorldState from them every tick. The robot's mind reads only its WorldState. Physical
+  facts (positions, what an agent holds) stay derived by the simulator as today. Kitting has no such states; acceptance:
+  byte-identical.
+  Not taken: fields and code per domain in the simulator (today's `is_scanned`, `is_empty`, `is_open`); the robot deriving
+  states from observed actions.
+
+- A6, perception of object states. The robot knows the states of objects, including which pallets are scanned, through
+  the site's system: a scan is a digital act written to that system at once. Recorded as an assumption on perception,
+  `docs/assumptions.md` 5.3.
+
+- A7, TODO-16 (cost-aware method selection) [V1], inside T-G stage 2, after the MPB's first run on dock_loading. When two
+  or more methods of a task apply in the same world state, the robot chooses by realized cost; the meta-planner's
+  candidates become pairs of task and method. Its case in dock_loading: a delivery in one cycle (truck to bay) against a
+  stepwise delivery (truck to gate, then gate to bay). It changes `shared/`; Hadi's ruling is the design ground. It needs
+  its own design question before any build (how the candidates are formed; whether the recognizer also considers several
+  applicable methods). Acceptance on kitting: no decision changes.
+
+- A8, track 4 [V1], reduced form (TODO-140; it revises that entry's consequences).
+  Ruling: "The layout declares monitored areas. The robot's WorldState holds the human, and facts about the human, only
+  while the human is inside one. While no human is observed, the recognizer does not update, no human projection exists,
+  and the planner plans as with no human present. The human's disappearance and its reappearance each cause a new
+  decision. The reappearance starts a new episode from the prior base. The human's own execution is unaffected.
+  dock_loading's office is one unmonitored area."
+  Monitored areas are fixed per layout and do not depend on where the robot is. Kitting monitors its whole room. The mind
+  keeps no last observed position; the log and the viewer may show it.
+  Placement: its own increment after stage 2 of T-G (C1). It changes `shared/`.
+  Not taken: keeping the last position marked stale; resuming the old belief on return; sensor-specific observation. A
+  robot that expects the human's return at the office door and plans around it belongs to belief-aware planning
+  (TODO-97).
+  TODO-140's other content (`leave()`, the exit through a door) is not ruled here and stays for track 4's own design.
+  CONFLICTS MARKED (T-G records 1, not resolved): (1) the placement supersedes "track 4 in the T-D tail, after T-V" (the
+  roadmap's order block of 30 September 2026; TODO-140's PLACEMENT REVISED line). T-F's scope line ("the human stays in
+  the room ... no genuine departure", track 4 following T-F: roadmap, T-F; TODO-144) is not revised by these rulings,
+  though track 4 now precedes T-F. (2) "each cause a new decision": the trigger set has three members (glossary §4);
+  whether a new trigger or an existing one makes that decision is for track 4's plan. (3) `docs/assumptions.md` 2.3 ("Not
+  in the Mesa body: the human never leaves") holds until A8 is built.
+
+- A9, areas and the gate (the framework side of T-G Q11).
+  The layout declares areas. The environment emits the fact that an agent is in an area. The area of each container is
+  fixed and declared.
+  A property of `shared/planner.py`, recorded: a task is decomposed against one world state, the present one; the state
+  is not advanced from step to step (`_decompose_schema` passes the same `world` to every sub-task's method selection). A
+  condition inside a later step is therefore judged in the present state.
+  A property of method selection, recorded: the planner takes the first method whose conditions hold (`_select_method`);
+  the meta-planner compares realized costs across candidate tasks, each with that one method. A7 extends this.
+
+- A10, FW directions (conceptual; each a TODO tagged [FW], or a tag on an existing item):
+  - shared work between the human and the robot: TODO-147;
+  - a human that chooses its own tasks (a human planner in place of the author's priority list): TODO-148;
+  - the robot modelling a human who waits for the robot's own action (Q3's alternative M3): TODO-149;
+  - several observed humans (`docs/assumptions.md` 5.2 allows one): TODO-150;
+  - a container divided into positions, the position chosen when an object is put down: the [FW] tag on LIMIT-04, no new
+    item;
+  - communication acts stay under the existing records (T-D X5, TODO-96): the human assigning or changing a delivery
+    location during the run; the robot informing a third party;
+  - under T-V track 2 (roadmap, T-V): an interruption of a busy human caused by a world fact, if wanted, is designed there
+    as the same entry point as the live user's click.
+
+- A11, a note for T-F (TODO-144): a layout authored so that routes cross shows that the robot adapts when an interaction
+  exists; it does not show how often interactions occur. T-F varies the placement and takes no interaction rate from
+  crossing setups alone.
+
+PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or `world/`)
+
+- B1, the domain's reading. The robot replaces the driver: an automated forklift whose assigned tasks are to deliver full
+  pallets from the truck to their containers and to return empty pallets to the truck. The truck stays parked for the
+  whole run and is a container. The observed human is the warehouse staff member who receives the delivery. The human's
+  assigned scans follow from the robot's assigned deliveries and are known at load.
+  It corrects the roadmap's T-G entry and `docs/handoffs/handoff_T-G_onward.md` (§4, §5): "a driver unloading pallets"
+  and "the driver's work order" are wrong under this reading; the foreseeable candidates recorded there (the phone call,
+  talking to the dock worker) belong to the driver's role, which the robot holds, and do not apply to the observed human;
+  "work order" was superseded by "assigned tasks" at T-H.
+- B2, Q1 in dock_loading: `confirm_delivered_pallet` states its condition in the task model: the pallet is in its
+  delivery container. (It answers LIMIT-02, TODO-10 and DESIGN-04 with A3.)
+- B3, Q4 (D1): "In V1, each object's destination is explicitly designated in the setup. The resolved fact is
+  destination_of(object, target), which the mind reads." The form of "An item's destination table is a fact of the
+  station" (T-B1a, amended by T-L). Not taken: a setup rule from an object's property to a target (an authoring
+  convenience, no component reasons with it); a destination decided at run time by the human.
+- B4, Q5 (E2): "A pallet has one type, pallet, and its full/empty condition is represented by the state fact
+  is_empty(pallet). Methods use that fact to determine which tasks are executable. In V1 the state remains constant
+  during a run; actions that change it are future work." Not taken: two object types; one task for both movements.
+- B5, Q6: the gate and the office door each have the state open or closed, declared in the setup. No action closes them
+  in V1.
+  - The gate, opened on request: the robot moves to the closed gate and honks; the honk is an action of the robot that
+    sets the fact "opening requested". The human has the assigned task "open the gate", applicable when the gate is
+    closed and the opening is requested: walk to the gate's button, press it. The button is a fixed object on the wall
+    beside the gate, away from the passage. The robot's deliveries require the open gate; until then the robot has no
+    applicable task and stands. The human is not interrupted and takes the task the next time it is free. Because the
+    task is assigned, the robot knows it through the prior, and it is a live hypothesis after the honk. No information
+    is exchanged. No deadline.
+  - The office door: the agent that passes it opens it; the affected task has one method for the open state and one that
+    opens first.
+  This supersedes TODO-08 for the gate and answers LIMIT-03 (with them TODO-02, BUG-04 and DESIGN-15's point 2). Not
+  taken: neither a state; constant states without an action; the robot opening the gate itself.
+- B6, Q7 (F2): two foreseeable tasks, `coffee_break` and `office_break`. `office_break` ends at its chair with a wait,
+  and the chair stands inside the office. Until track 4 is built the office is observed. (It answers DESIGN-15's point
+  3.) Not taken: a third foreseeable task of the same structure (standing with a colleague); a variant in which the human
+  scans all pallets only after every delivery; recognizing which variant of a task a human follows.
+- B7, Q8 (H2'): `store_pallet(?pallet)`, a work task of the human: it takes a delivered and scanned pallet from its
+  delivery container to its onward container. Condition: the pallet is in its delivery container and is scanned, so the
+  order per pallet is delivered, scanned, stored. Each full pallet has a second designation in the setup, its onward
+  container. The human carries a pallet as the kitting human carries an item; no tool in V1. The human is never assigned
+  `deliver_pallet` or `load_return` in V1. Not taken: the human delivering its own pallets from the truck (kitting's
+  pattern).
+- B8, Q8b (K1): kitting's rule for a held object, unchanged. Hadi's wording: "When an agent starts a new task while
+  carrying an object, the carried object determines the applicable method. Continue with it if it is the new task's
+  object; otherwise return it to its recorded origin before starting the new task." It applies to `deliver_pallet`,
+  `load_return` and `store_pallet`. The origin is where the pallet was picked up: the truck, the empties area, the
+  delivery container.
+- B9, Q9a (S2): a container is one point, the centre of the container, with no constraint, and it may hold several
+  pallets (as kitting's table does). Not taken: authored pallet places; a position chosen when the pallet is put down
+  (FW on LIMIT-04, A10). Pallets drawn on top of each other are a drawing matter for T-V.
+- B10, Q9b, the room. Requirements (Hadi): goods flow forward (truck, delivery container, store) and never travel away
+  from their store and back; the freezer lies near the dock; no bay stands in front of a store entrance; one place for
+  empties that both stores can bring to. Arrangement: the delivery bays in a row on one side wall, the frozen bay nearest
+  the gate; the freezer and the dry store on the opposite wall, the freezer nearest the gate; the empties in the top
+  corner on the bay side; the office at the top centre. The coffee machine, the gate's button, the desk, the standby
+  place and the landmarks are placed when the layout is drawn.
+  Artefact constraint: by the setup's designations, the human's carrying route crosses or approaches a normal robot route
+  in some setups and stays clear in others; the V1 scenarios include both.
+  Catch-up requirements: every fixed object inside the space; the zones leave the layout and areas are declared (A9);
+  landmarks for the exit walk; the revised room is a new layout and a new setup with the next serial ids; the present ones
+  (env_layout_01, env_setup_01) stay for the viewing fixture.
+- B11, Q11 (P2) in dock_loading: passing the gate is a plain step "move to the gate", whose target is the gate's centre
+  point; no special action. Each task has one method per starting area, selected by the condition on the agent's area. A
+  method that crosses the gate keeps the condition that the gate is open. "Return the held pallet to its origin" may be a
+  sub-task used as the first step. Not taken: always going by the gate; a sub-task with conditions for a later passage
+  (A9's property defeats it); routing through openings as a property of movement (it changes the projection and the
+  recognizer in `shared/`). Within V1 this is dock_loading's answer to TODO-09.
+- B12, further rulings on the domain's scope.
+  - Check-in and check-out [V1], stage 3: separate from the gate mechanism and independent of it. A desk with a computer
+    beside the gate's button is the human's place; the robot's place is a point just inside the gate, more than the
+    minimum separation away. Check-in: the two agents exchange the list of deliveries at the start. Check-out: the human
+    signs at the end to confirm that everything is delivered. Design open until stage 3, including what "exchanging the
+    list" means when the robot holds the designations from the start.
+  - A rule "the robot must not enter the delivery area with a pallet while a human is in it": not taken. A fixed
+    prohibition contradicts the framework's claim; the requirement is that the robot is aware of the human and adapts,
+    which the realization against the human projection with `min_separation` serves.
+  - A deadline on the robot's waiting: the default is that the robot waits without limit. Optional in stage 3; not
+    planned.
+  - A pallet that blocks another in the truck: an optional sub-task in stage 3, if time in V1 allows.
+  - Not taken: an action of unknown length inside a plan; a fixed order among the robot's tasks as its own mechanism
+    (conditions cover it; deliveries and returns may be intertwined); the robot moving to wherever the human is (the
+    target would be an agent, arrival contradicts `min_separation`, the prediction becomes circular); a check-in that is
+    a meeting with no content.
+
+PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
+
+- C1, the stages of T-G (all in V1). Before each stage's plan the design chat and Hadi agree the layout and the setup for
+  that stage.
+  - Stage 1, the basic domain: the robot delivers and returns (B11); the human scans, takes the two breaks, steps aside to
+    the standby place; the gate is declared open; the office door has no state yet. The IR test-bed, then the MPB.
+  - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
+    run, TODO-16 with the stepwise delivery (A7).
+  - After stage 2: track 4 (A8).
+  - Stage 3: check-in and check-out (B12), with the two optional items.
+  WHERE EACH RULING IS FIRST BUILT (Hadi, 1 October 2026, T-G records 1, continued). Content only; the order inside a
+  stage is for that stage's plan.
+  - Stage 1, the basic domain:
+    - the catch-up of dock_loading's forms to kitting's (C3);
+    - A3, the human's script form (`world/`), with the standby entry;
+    - A4, liveness by applicability (`shared/`);
+    - A5, generic object states and designations, used here for the scanned state, `is_empty` and the destination;
+    - A6, the perception assumption;
+    - A9, the declared areas and the fact that an agent is in an area;
+    - B1 to B4, B8, B9, B11;
+    - B6, with `office_break` in a reduced form: the office door has no state yet, and the human passes it as a plain
+      point on the way; the office is observed;
+    - B10, the room; whether the stores and the freezer are already present in stage 1's layout is not ruled
+      (PROPOSALS);
+    - the IR test-bed on dock_loading, then the MPB.
+    A3, A4, A5 and A9 each change code outside the domain, and each carries its acceptance check on kitting: the
+    maintained sets stay byte-identical.
+  - Stage 2:
+    - B7, `store_pallet`, with the second designation (the onward container);
+    - B5, the gate opened on request, and the office door's state;
+    - A7, TODO-16, after the MPB's first run on dock_loading.
+  - After stage 2: A8, track 4.
+  - Stage 3: B12, check-in and check-out, with its two optional items.
+  Rulings with no stage, because nothing is built for them: A1 (V1, FW and the tags: a records rule), A2 (terms; no code
+  is renamed), A10 (FW directions, outside V1), A11 (a note for T-F), and B12's items "not taken". A6 is an assumption,
+  recorded in `docs/assumptions.md` 5.3; stage 1 is where the robot first reads object states through it.
+- C2, build 1 (30 September 2026; 56e674e, 6e29c15, 62ebc4e): the form-only repairs (the steps of `pick_up`, `place` and
+  `scan_it` bind `?item`; `confirm_delivered_pallet` typed; the layout's `office_chair` typed `office_chair`; the robots'
+  tasks in `assigned_tasks`) and scenario_s01_03, a viewing fixture that loads and initialises. scenario_s01_01 and
+  scenario_s01_02 still fail at load by intent (`infeasible:office_break(...)` in the load-time replay: the door
+  condition). Re-measured at 62ebc4e (1 October 2026): as stated.
+- C3, the state of `domains/dock_loading/` after build 1 (the survey of 30 September; each line verified against the code
+  at 62ebc4e, 1 October 2026). Stage 1's plan starts from this list.
+  Still not in kitting's current form:
+  - no `HumanOnlyTask` (`go_to`, `stand`, `go_to_and_stand`) and no `stand` action; no `script.py` with the call forms;
+    the scenarios use raw `TaskInstance`s;
+  - `pick_up` and `place` lack the successor-state declarations of T-B2a (`moved_object_key`, `moved_to_key`); `place`
+    still has the effect `not_holding` instead of a retraction of `holding`;
+  - `wait_at` completes on `ProcessCompletion`, not on the fact `waited`;
+  - no landmarks; no exit walk; no purpose statement in the scenarios;
+  - the layout has a `zones` block and a `zone` field per object (kitting's layouts too: A2);
+  - stale docstrings in `tasks.py` (`?dest`, two gate methods per task, "Human assigned" / "Human foreseeable", no
+    `office_break`) and `scenarios/scenarios_s01.py` ("scenario ids keep their old form until stage 3"); layout pictures
+    inside the domain folder under an old id (`env_layout1.svg`, `env_layout1_present.svg`, `env_layout1_present.png`,
+    `env_layout_original.jpg`; kitting keeps its pictures in `docs/env_layouts_png/`).
+  Content that the rulings of part B replace:
+  - `deliver_pallet` has a free `?delivery_bay` and one method (B3, B8, B11); `load_return` ranges over every pallet
+    (B4); `confirm_delivered_pallet` has no condition (B2); `office_break` has a door condition no fact satisfies and ends
+    with a walk to the gate (B5, B6); the human has no assigned tasks in scenario_s01_01 and scenario_s01_02 (B1);
+  - the truck extends 40 cm outside the space (to y = −740; the space's y runs from −700); the office chair stands in the
+    hall (its declared zone is `zone_hall_center`), 30 cm from the coffee machine (B10).
+  In the simulator, written for this domain (A5 replaces them):
+  - `mesa_sim/world_state_builder.py` emits `gate_is_open` for every object of type `gate` whose `is_open` is not False,
+    and `is_open` is never loaded (always None); nothing emits a door fact;
+  - the fields `is_empty`, `is_scanned`, `is_open` on `SimObject`, the `scanned` fact, and the touch handler reading the
+    literal `"?item"` (`mesa_sim/action_decomposer.py`; the grasp handler, kitting's too, reads the same literal);
+  - `mesa_sim/list_scenarios.py` lists kitting only; `SimModel.get_movable_objects` filters the type `"item"` and nothing
+    reads it.
+  In the viewer (for T-V, or the stage that first needs it): the colour table's keys (`delivery_area`, `empty_bay`) do
+  not match the layout's types (`delivery_bay`, `empty_pallet_bay`; `office_chair` absent); the axis range clips what
+  lies outside the space; the label offset is keyed on the type `"shelf"`.
+  `domains/README.md` is stale throughout: rewritten with stage 1's build (REFACTOR-03).
+- C4, points for the stage plans (not rulings; each returns to the design chat only if it produces a finding):
+  - the load-time check for a script that depends on the robot, and the meaning of the outcome "infeasible" under A3;
+  - how "completed" is judged for an entry of the human's list (the standby entry must be takable again after the human
+    has left the place);
+  - where the exit walk stands relative to the priority list (a plain walk is always applicable);
+  - how an event or a foreseeable task is placed relative to tasks whose order is not fixed;
+  - how a pallet's origin is recorded (B8);
+  - how the meta-planner behaves when the pool holds tasks and none is applicable (TODO-30);
+  - the forms in the setup and the registry for object states and the two designations (A5);
+  - the smallest set of methods under B11 with B8;
+  - how the existing machinery behaves when the live set holds foreseeable tasks only, at the start of a run and between
+    deliveries (TODO-143 stays parked: it concerns an empty assigned list, which is a different state);
+  - for the IR test-bed on dock_loading the robot is idle, so its setup places the pallets in their delivery containers
+    from the start.
+- C5, to watch in the test-beds: hypotheses that predict the same motion divide the belief, so none passes the admission
+  threshold (two unscanned pallets in one container). If the IR test-bed confirms it on dock_loading, it is a finding
+  about the mind and returns to the design chat within V1.
+- C6, open at their stage: the design of check-in and check-out; the design of TODO-16; how the MPB's oracle derives an
+  expected decision when the human's sequence depends on the robot's decisions.
+
+PROPOSALS (by the design chat, NOT RULED)
+- An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
+  and names no fixed object.
+- Two generic load checks in `shared/` that let malformed input through (TODO-151, recorded as a proposal, untagged).
+- TODO-131 (the robot-mind object): A8's reduced form does not need it, so its landing in track 4 is no longer implied;
+  its placement is open (TODO-131's note).
+- Stage 1 may already use the room of B10, with the stores and the freezer present and unused.
+- `pytest` over the whole repo stops on collection errors in `ros_sim/framework_HRI/test/` that predate build 1. Measured
+  at 62ebc4e: three files (`test_copyright.py`, `test_flake8.py`, `test_pep257.py`; the `ament_*` modules are missing);
+  the proposal named the first.
+
+Reference: cchat, 30 September and 1 October 2026 (T-G); `docs/handoffs/handoff_T-G_onward.md`; ccode's dock_loading
+survey (30 September 2026, not committed); "T-H: the human behaviour model"; "Layouts, setups and scenarios"; "An item's
+destination table is a fact of the station"; "The successor state is derived from what the action schemas declare"; I2
+("Targets, methods and completions are the planner's"); "T-D L" (L4); "T-D X" (X5); `docs/glossary.md` §6, §8, §9, §10;
+`docs/assumptions.md` 2.3, 5.1 to 5.3; TODO-02, TODO-08, TODO-09, TODO-10, TODO-16, TODO-25, TODO-30, TODO-39, TODO-81,
+TODO-96, TODO-97, TODO-104, TODO-131, TODO-140, TODO-143 to TODO-151; LIMIT-02 to LIMIT-05; DESIGN-01, DESIGN-02,
+DESIGN-04, DESIGN-15; REFACTOR-03
+
+Next: the layout and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
