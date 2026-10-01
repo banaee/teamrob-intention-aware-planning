@@ -70,7 +70,7 @@ def obs(t, pos):
 
 
 def live_set(rec):
-    return {repr(h) for h in rec._hypotheses} - rec._inadmissible - rec._retired
+    return {repr(h) for h in rec._hypotheses} - rec._inadmissible - rec._retired - rec._inapplicable
 
 
 def check_r6(rec, belief):
@@ -358,7 +358,9 @@ def test_the_finding_clears_at_a_boundary_then_exhausted(model):
 def test_an_undecomposable_hypothesis_is_a_non_member():
     # The human holds an object with no home container: deliver_with_return's derived
     # container has no value, so every deliver_item hypothesis is undecomposable
-    # (DecompositionError, a fact about this world) and has no derived phase.
+    # (DecompositionError, a fact about this world). SUPERSEDED (T-G A4, 1 Oct 2026):
+    # such a hypothesis is not applicable, so not live (tests/test_tg_liveness.py);
+    # never entering H, it is no member either.
     m = model_for("env_layout_05", registered("env_layout_05", "scenario_s04_01"))
     w = world_with(build_world_state(m), add=[pred("holding", H, "stray_box")])
     x0, y0 = w.agent_positions[H]
@@ -369,10 +371,10 @@ def test_an_undecomposable_hypothesis_is_a_non_member():
     rec = recognizer(m, [ghost, coffee])
     for t in range(5):
         b = rec.update(obs(t, (x0 - 10.0 * t, y0)), w)
-    assert rec._expected[repr(ghost)] is None and rec._expected[repr(coffee)] is not None
+    assert repr(ghost) not in rec._expected and rec._expected[repr(coffee)] is not None
     assert repr(ghost) not in b.tails and repr(coffee) in b.tails
-    # alone, it never makes the finding anything but unresolved
+    # alone, the live set is empty: exhausted, no finding
     rec = recognizer(m, [ghost])
     for t in range(30):
         b = rec.update(obs(t, (x0 - 10.0 * t, y0)), w)
-        assert b.finding is AdequacyFinding.UNRESOLVED and b.tails == {}
+        assert b.lifecycle is RecognizerLifecycle.EXHAUSTED and b.finding is None and b.tails == {}

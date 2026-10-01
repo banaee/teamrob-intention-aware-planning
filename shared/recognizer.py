@@ -53,8 +53,14 @@ ALGORITHM:
           path is; a stationary tick within the priced standing is not a
           charge (I4c narrowed), nor is a phase with nothing walked and no
           standing (D <= 0: the value 1, the belief carries forward).
-        - a hypothesis the planner cannot decompose here has no phase: the
-          perfect-fit value, nothing to charge.
+    A hypothesis is live only while its task is applicable (T-G A4): the
+    planner decomposes it for the observed agent in the present world
+    (AdaptivePlanner.is_applicable, read through decompose). One that is not
+    applicable leaves H as a retired one does — skipped, its phase state
+    dropped, pinned at BELIEF_FLOOR on output — and returns through the
+    re-entry path below when it decomposes again (retired instead, if its
+    terminal fact holds by then). Not applicable on the first tick, it never
+    enters H; a retired hypothesis that becomes inapplicable stays retired.
     There is no reference hypothesis (T-D R1, 27 September 2026): each live
     hypothesis pays its own likelihood per phase — its closed phases and
     events in its base, the open phase's value multiplied on top for this
@@ -450,17 +456,14 @@ class IntentionRecognizer:
         # holds one — decomposition is stateless and world-driven.
         self._planner = AdaptivePlanner(knowledge=task_model)
         # Per-tick memo of the grounded action list per hypothesis key (None =
-        # not decomposable this tick). Cleared at the top of update().
+        # not applicable this tick). Cleared at the top of update().
         self._tick_actions: Dict[str, Optional[List[GroundedAction]]] = {}
-        # Keys already reported as undecomposable, so the log says it once per
-        # episode rather than once per tick.
-        self._undecomposable: Set[str] = set()
 
         # Per-hypothesis phase state (see update()). Nothing here is an index
         # into an action list, and nothing is shared across hypotheses.
         #   _expected[key]  the GroundedAction the hypothesis expected on the
-        #                   previous tick (None = not decomposable then); a key
-        #                   absent from the dict has not been observed yet
+        #                   previous tick; a key absent from the dict has not
+        #                   been observed yet (or is not live)
         #   _origin[key]    the agent's position when that action became the
         #                   expected one — where its excess path is measured from
         #   _origin_odo[key] the agent's odometer reading at that moment, so
@@ -484,18 +487,23 @@ class IntentionRecognizer:
         #   _retired        keys whose terminal completion condition holds on
         #                   this tick (T-D L4): skipped and pinned while it holds,
         #                   live again (a first observation) when it stops
+        #   _inapplicable   keys whose task is not applicable on this tick
+        #                   (T-G A4): skipped and pinned while so, live again
+        #                   (a first observation) when it decomposes, retired
+        #                   instead if its terminal fact holds by then
         #   _entered_by_completion keys whose current phase was entered by the
         #                   completion of their previous expected action in
         #                   this episode (the completion E8 reads): the entry
         #                   source of observation warrant (T-D G, AD1); emptied
         #                   at a boundary, with the origins
-        self._expected: Dict[str, Optional[GroundedAction]] = {}
+        self._expected: Dict[str, GroundedAction] = {}
         self._origin: Dict[str, Tuple[float, float]] = {}
         self._origin_odo: Dict[str, float] = {}
         self._origin_still: Dict[str, int] = {}
         self._entry_latency: Dict[str, float] = {}
         self._base: Dict[str, float] = {}
         self._retired: Set[str] = set()
+        self._inapplicable: Set[str] = set()
         self._entered_by_completion: Set[str] = set()
         # The terminal actions of the task model (T-D L1): the observed agent's
         # completion of one is the episode boundary. Per observed agent, the
@@ -647,6 +655,19 @@ class IntentionRecognizer:
         out.update({k: BELIEF_FLOOR for k in sorted(pinned)})   # sets have no stable order
         return out
 
+    def _leave(self, key: str) -> None:
+        """
+        Drop `key`'s phase state: it leaves H, retired (T-D L4) or not
+        applicable (T-G A4). It returns, if it does, as a first observation.
+        """
+        self._base.pop(key, None)
+        self._expected.pop(key, None)
+        self._origin.pop(key, None)
+        self._origin_odo.pop(key, None)
+        self._origin_still.pop(key, None)
+        self._entry_latency.pop(key, None)
+        self._entered_by_completion.discard(key)
+
     def update(
         self,
         obs: Observation,
@@ -657,7 +678,12 @@ class IntentionRecognizer:
         Bayesian update: P(τ|obs_1..t) ∝ P(obs_t|τ) · ω_context(τ) · P(τ|obs_1..t-1),
         with P(obs_t|τ) the likelihood of the action τ expects now.
 
-        Per live hypothesis, in this order:
+        Per hypothesis, in this order:
+          0. decompose it for the observed agent against the current world; not
+             applicable (T-G A4): it leaves H (skipped here, pinned in _output)
+             while so, unless retired, and stays retired then; applicable
+             again: retired if its terminal fact holds (2), else it re-enters
+             as a first observation, at 1/|H| (L4's returning path);
           1. derive the expected action against the current world (planner's
              guard-selected method, walked from the start to the first action
              whose completion condition does not hold);
@@ -732,31 +758,39 @@ class IntentionRecognizer:
             if key in self._inadmissible:
                 continue
             actions = self._grounded_actions(hyp, obs.agent_id, world)
-            if actions is not None and self._terminal_complete(actions, world):
+            if actions is None:
+                # Not applicable here (T-G A4): not live while so. A retired
+                # hypothesis stays retired: its terminal fact cannot be read,
+                # so nothing says it stopped holding.
+                if key not in self._retired and key not in self._inapplicable:
+                    self._inapplicable.add(key)
+                    self._leave(key)
+                    logging.info("[IR-inapplicable] step=%d %s %s the live set: no applicable method",
+                                 int(obs.timestamp), key,
+                                 "does not enter" if len(self._history) == 1 else "leaves")
+                continue
+            if self._terminal_complete(actions, world):
                 # The terminal pin: retired while its terminal fact holds (L4).
+                self._inapplicable.discard(key)
                 if key not in self._retired:
                     self._retired.add(key)
-                    self._base.pop(key, None)
-                    self._expected.pop(key, None)
-                    self._origin.pop(key, None)
-                    self._origin_odo.pop(key, None)
-                    self._origin_still.pop(key, None)
-                    self._entry_latency.pop(key, None)
-                    self._entered_by_completion.discard(key)
+                    self._leave(key)
                     logging.info("[IR-complete] step=%d %s completed: %s holds",
                                  int(obs.timestamp), key, actions[-1].completion_predicate)
                 continue
             if key in self._retired:
-                if actions is None:
-                    # Not decomposable here: its terminal fact cannot be read,
-                    # so nothing says it stopped holding; it stays retired.
-                    continue
                 # Its terminal fact no longer holds: live again (L4), entering
                 # as a first observation; its share is set after the loop.
                 self._retired.discard(key)
                 returning.append(key)
                 logging.info("[IR-reentry] step=%d %s live again: %s no longer holds",
                              int(obs.timestamp), key, actions[-1].completion_predicate)
+            elif key in self._inapplicable:
+                # Applicable again (T-G A4): live again through the same path.
+                self._inapplicable.discard(key)
+                returning.append(key)
+                logging.info("[IR-reentry] step=%d %s live again: applicable",
+                             int(obs.timestamp), key)
             current = self._expected_action(actions, world)
 
             if key not in self._expected:
@@ -775,7 +809,7 @@ class IntentionRecognizer:
                 continue
 
             previous = self._expected[key]
-            if previous is not None and self._in_vocabulary(previous, mu):
+            if self._in_vocabulary(previous, mu):
                 self._base[key] *= self._completion_likelihood(previous, world, memo)
             if not self._same_action(previous, current):
                 # The closing phase was one observation: its final value
@@ -790,7 +824,7 @@ class IntentionRecognizer:
                 # and the completing hypothesis is a member of the adequacy
                 # test with S = 1 on this tick (E8). A regress, or a method
                 # flip that completed nothing, prices none.
-                completed = (previous is not None and previous.completion_predicate is not None
+                completed = (previous.completion_predicate is not None
                              and previous.completion_predicate in world.predicates)
                 self._entry_latency[key] = self._action_completion_latency if completed else 0.0
                 if completed:
@@ -887,9 +921,9 @@ class IntentionRecognizer:
         phase (E7).
 
         H empty: EXHAUSTED, no finding, no tails, no hypothesis adequacy (R4).
-        Otherwise, per live hypothesis in hypothesis order: a MEMBER iff it has
-        a derived phase this tick (an expected action) and that phase holds an
-        observation (E6 as amended twice, the complete membership rule) —
+        Otherwise, per live hypothesis in hypothesis order (each has a derived
+        phase: a live hypothesis is applicable, T-G A4): a MEMBER iff that
+        phase holds an observation (E6 as amended twice, the complete membership rule) —
         walked path since its origin, standing beyond the priced standing
         s_exp, or a stationary tick with s <= s_exp in a stationary phase or in
         any phase with s_exp > 0 (then D <= 0 and S = 1: the latency tick E9
@@ -911,9 +945,9 @@ class IntentionRecognizer:
             return None, RecognizerLifecycle.EXHAUSTED, {}, {}
         tails: Dict[str, float] = {}
         for key in live:
-            action = self._expected.get(key)
-            if action is None or boundary:
-                continue                    # no derived phase, or a boundary tick: no observation
+            action = self._expected[key]
+            if boundary:
+                continue                    # a boundary tick: no observation
             if key in advanced:
                 tails[key] = 1.0            # the completion is an observation consistent with it (E8)
                 continue
@@ -977,18 +1011,15 @@ class IntentionRecognizer:
         (pick_up, place, wait_at) has no movement target by definition; an
         unresolved move_to has a movement target whose position cannot be
         resolved this tick, so no gain is computable (ruled at the G-build plan
-        step). Either has observation warrant through its entry only. A
-        hypothesis with no derived phase (not decomposable) has none. On a
+        step). Either has observation warrant through its entry only. On a
         boundary tick every origin is the agent's position and no phase was
         entered by a completion in the new episode, so nothing is warranted.
         Empty when EXHAUSTED.
         """
         warrant: Dict[str, ObservationWarrant] = {}
         for key in (repr(h) for h in self._hypotheses if repr(h) in self._evidence):
-            action = self._expected.get(key)
-            if action is None:
-                warrant[key] = ObservationWarrant.NONE              # no derived phase
-            elif key in self._entered_by_completion:
+            action = self._expected[key]
+            if key in self._entered_by_completion:
                 warrant[key] = ObservationWarrant.OBSERVATION       # the entry source
             elif action.schema.movement_target_key is None:
                 warrant[key] = ObservationWarrant.NONE              # a stationary phase: no movement target
@@ -1009,7 +1040,7 @@ class IntentionRecognizer:
     def _phase_likelihood(
         self,
         key: str,
-        action: Optional[GroundedAction],
+        action: GroundedAction,
         pos: Tuple[float, float],
         odo: float,
         still: int,
@@ -1022,11 +1053,8 @@ class IntentionRecognizer:
         delay_likelihood). For a walk with no standing beyond its priced
         standing v·D is the excess and this is the excess-path likelihood;
         standing beyond it is charged as excess path is; standing within it
-        is no charge (I4c narrowed). No expected action (not decomposable
-        here): the perfect-fit value, nothing to charge.
+        is no charge (I4c narrowed).
         """
-        if action is None:
-            return likelihood_functions.PERFECT_FIT_LIKELIHOOD
         return likelihood_functions.delay_likelihood(
             self._delay_length(key, action, pos, odo, still, world, memo), self._beta)
 
@@ -1131,18 +1159,18 @@ class IntentionRecognizer:
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
         The belief reported this tick: evidence × ω_context, with the
-        inadmissible and the retired hypotheses pinned at BELIEF_FLOOR and the
-        floor applied. State factors only — nothing here is fed back.
+        inadmissible, the retired and the inapplicable hypotheses pinned at
+        BELIEF_FLOOR and the floor applied. State factors only — nothing here is fed back.
         """
         unnorm: Dict[str, float] = {}
         for key, p in self._evidence.items():
             unnorm[key] = p * self._context_weight(obs, world, self._by_key[key])
-        return self._finalize(unnorm, self._inadmissible | self._retired)
+        return self._finalize(unnorm, self._inadmissible | self._retired | self._inapplicable)
 
     def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:
         """Normalize, floor, and pin an unnormalized posterior over the live
         keys — the output step. `pinned` defaults to the inadmissible set;
-        _output() adds the retired hypotheses."""
+        _output() adds the retired and the inapplicable hypotheses."""
         total = sum(unnorm.values()) or 1.0
         distribution = {k: v / total for k, v in unnorm.items()}
 
@@ -1174,26 +1202,24 @@ class IntentionRecognizer:
 
     @staticmethod
     def _expected_action(
-        actions: Optional[List[GroundedAction]],
+        actions: List[GroundedAction],
         world: WorldState,
-    ) -> Optional[GroundedAction]:
+    ) -> GroundedAction:
         """
         The action the observed agent would be on if it held this intention:
         scan the planner's grounded list from the start and return the first
         whose completion condition does not hold in the world. Derived from the
         world every tick, never stored as an index — the method may have been
         re-selected since the last tick, and the same position in a different
-        method is a different action. None when the hypothesis is not
-        decomposable here or every completion already holds (the caller has
-        then retired it on the terminal condition).
+        method is a different action. Called on a live hypothesis only: it is
+        applicable (T-G A4) and its terminal completion does not hold (else it
+        is retired, L4), so the scan stops at the terminal action at the latest.
         An action with no completion predicate (ProcessCompletion) never reads
         as complete, so the scan stops at it.
         """
-        for action in actions or []:
-            predicate = action.completion_predicate
-            if predicate is None or predicate not in world.predicates:
-                return action
-        return None
+        return next(action for action in actions
+                    if action.completion_predicate is None
+                    or action.completion_predicate not in world.predicates)
 
     @staticmethod
     def _terminal_complete(actions: List[GroundedAction], world: WorldState) -> bool:
@@ -1310,15 +1336,12 @@ class IntentionRecognizer:
         deliver_already_held and deliver_with_return), its derived vars, and
         every step binding. Re-selected every tick — the world is the cursor.
 
-        None when the planner cannot decompose hyp here (DecompositionError:
-        no applicable method, a derived var without a value). That is a fact
-        about this hypothesis in this world, not an error in the recognizer,
-        and the hypothesis is scored at the perfect-fit value (nothing to
-        charge); it has no derived phase, so it is never a member of the
-        adequacy test while it stays so; it is
-        logged once, until the hypothesis decomposes again, so that a
-        hypothesis that can never be scored is visible in the log rather than
-        indistinguishable from one that is merely uninformative.
+        None when hyp is not applicable here (DecompositionError: no applicable
+        method, a derived var without a value) — the planner's definition
+        (AdaptivePlanner.is_applicable), read through decompose so that each
+        hypothesis is decomposed once per tick. That is a fact about this
+        hypothesis in this world, not an error in the recognizer: the
+        hypothesis is not live while it holds (T-G A4, update()).
         Schema errors (unbound variable, unknown lookup) propagate: a domain
         modelling mistake must not look like uncertainty.
         Memoised per tick (cleared at the top of update()).
@@ -1328,13 +1351,8 @@ class IntentionRecognizer:
             return self._tick_actions[key]
         try:
             actions = self._planner.decompose(hyp.task_instance(), agent_id, world)
-            self._undecomposable.discard(key)
-        except DecompositionError as e:
+        except DecompositionError:
             actions = None
-            if key not in self._undecomposable:
-                self._undecomposable.add(key)
-                logging.warning("[recognizer] %s not decomposable for %s, scored perfect-fit: %s",
-                                key, agent_id, e)
         self._tick_actions[key] = actions
         return actions
 

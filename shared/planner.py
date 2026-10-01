@@ -59,8 +59,9 @@ class DecompositionError(ValueError):
     derived-var lookup has no value here. A fact about the world, not about the
     schema — the same task may decompose a tick later. Callers that plan for
     themselves let it propagate (an unexecutable plan is an error); callers that
-    only ask whether a task is possible for someone else (the recognizer, per
-    hypothesis) catch it and score the hypothesis neutrally. Schema errors —
+    only ask whether a task is possible (is_applicable; the recognizer, per
+    hypothesis, through decompose) catch it: the task is not applicable here.
+    Schema errors —
     an unknown task or step, an unbound variable, an unknown lookup function —
     stay plain ValueError: they are modelling mistakes and must surface loudly.
     """
@@ -121,6 +122,26 @@ class AdaptivePlanner:
         bindings: Dict[str, str] = {"?agent": agent_id}
         bindings.update({var.name: const.value for var, const in task.bindings.items()})
         return self._decompose_schema(task.schema, bindings, world, method)
+
+    def is_applicable(
+        self,
+        task: TaskInstance,
+        agent_id: str,
+        world: WorldState,
+    ) -> bool:
+        """
+        Whether `task` is applicable for `agent_id` in `world`: at least one of
+        its methods' conditions hold, i.e. decomposition raises no
+        DecompositionError (T-G A4). The one definition of applicability: the
+        recognizer's liveness reads it through decompose (it needs the actions
+        too, once per hypothesis and tick), the human's script form reads it
+        here. Schema errors propagate as from decompose().
+        """
+        try:
+            self.decompose(task, agent_id, world)
+        except DecompositionError:
+            return False
+        return True
 
     def is_complete(
         self,
