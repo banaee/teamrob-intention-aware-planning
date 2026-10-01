@@ -5,7 +5,8 @@ env_layout_03; design_decisions.md, "T-G: the second domain's rulings", B14).
 One module per setup.
 """
 
-from shared.types import AgentConfig, ScenarioConfig, Script
+from shared.types import AgentConfig, RepeatableEntry, ScenarioConfig, Script, ScriptDependence
+from domains.dock_loading.script import confirm_delivered_pallet, deliver_pallet, go_to, load_return
 
 
 # A viewing fixture: the scene loads and initialises; not a baseline, not an
@@ -32,6 +33,47 @@ scenario_s05_01 = ScenarioConfig(
             agent_type="robot",
             start_position=(0, -370),
             observes=["human_0"],
+        ),
+    ],
+)
+
+
+# The milestone (T-G stage 1, step 8; plan_T-G_stage1.md, answer 8): one simple
+# scenario per room runs from start to end. Not a baseline; it measures nothing.
+scenario_s05_02 = ScenarioConfig(
+    id="scenario_s05_02",
+    setup="env_setup_05",
+    reference_layouts=["env_layout_03"],
+    description=(
+        "The milestone of T-G stage 1 (plan_T-G_stage1.md, answer 8): the first evidence that the room, the five "
+        "mechanisms (the rename, A9 with R2, A4, A5, A3) and the domain's tasks work together; it measures nothing. "
+        "The robot delivers pallet_0 to its bay and returns the empty pallet_4 to the truck; the human scans "
+        "pallet_0 once it stands in its bay and closes at the desk. The script is declared dependent on the robot "
+        "(the scan waits for the delivery). The standby entry is written; the human starts at the standby place, "
+        "where go_to(standby_place) is complete, so until the scan is applicable the machine waits there (the skip "
+        "rule), and after the scan the priority list is finished: the standby walk is not taken in this scenario. "
+        "Contains behaviour with no hypothesis in the robot's task model: the stay at the standby place and the "
+        "walk to the desk (unmodelled behaviour)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [confirm_delivered_pallet("pallet_0"), RepeatableEntry(go_to("standby_place"))],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[confirm_delivered_pallet("pallet_0")],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[deliver_pallet("pallet_0"), load_return("pallet_4")],
         ),
     ],
 )
