@@ -6214,6 +6214,10 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     A3, A4, A5 and A9 each change code outside the domain, and each carries its acceptance check on kitting: the
     maintained sets stay byte-identical.
     BUILT (1 October 2026): the rename, A9 with R2, A4, A5 and A3 (stage 1, steps 1 to 5). "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
+    BUILT (1 October 2026): dock_loading's catch-up, its content and the milestone (stage 1, steps 6 to 8; the
+    milestone's acceptance held in all three rooms). ADDED (Hadi, 1 October 2026): before the IR test-bed, a second
+    simple scenario per room, then the sorting of the earlier analyses and tests under kitting with the preparation of
+    the instruments. "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT.
   - Stage 2:
     - B7, `store_pallet`, with the second designation (the onward container);
     - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): B10's room (the freezer and the dry store on the opposite wall), with its own layout, setup and
@@ -6369,10 +6373,14 @@ STAGE 1, STEPS 0 TO 5 BUILT (1 October 2026; built and accepted, each against th
 - Step 0: the HEAD runs of the extended set (the four maintained sets, the ten kitting drop scenarios, the IR and MPB
   test-bed sets), kept outside git as the reference set of every later step; no commit.
 - Step 1, the rename "zone" to "area": 8d064ca; the stale references to removed dock_loading files: c21f001.
+  ADDED (records, 1 October 2026): acceptance, 655 reference files byte-identical, 220 tests.
 - Step 2, the declared areas and the agent's area in a computed state (A9, R2): b513b82; the layout's per-object area
   field dropped: 9bca721; `shared/io_contracts.md`: a76054f.
+  ADDED (records, 1 October 2026): acceptance, 844 reference files byte-identical, 225 tests.
 - Step 3, liveness by applicability (A4) and `AdaptivePlanner.is_applicable`: bd4bddc.
+  ADDED (records, 1 October 2026): acceptance, 847 reference files byte-identical, 232 tests.
 - Step 4, object states and designations (A5): b74485b; `shared/io_contracts.md`, `domains/README.md`: 50f2fb8.
+  ADDED (records, 1 October 2026): acceptance, 847 reference files byte-identical, 241 tests.
 - Step 5, the human's script form (A3): 048a36e; `shared/io_contracts.md`: 576f2b2.
 Next: step 6 (dock_loading's catch-up, with the area ids), step 7 (the domain's content), then the milestone (step 8).
 NOTES (records, 1 October 2026; facts of the build, not rulings):
@@ -6392,6 +6400,71 @@ NOTES (records, 1 October 2026; facts of the build, not rulings):
 - Four frozen analysis scripts no longer run since the rename (step 1): `analysis/i4_evidence_model/check_i4.py`,
   `analysis/g1_graded_evidence/unit_checks.py`, `analysis/i4c_episode/check_i4c.py`,
   `analysis/i4d_fold_unknown/check_i4d.py`; they need the old field names. Frozen records: not edited.
+
+STAGE 1, STEPS 6 TO 8 BUILT (1 October 2026; built and accepted, each against the plan's acceptance and stop
+conditions; the milestone accepted by Hadi).
+- Step 6, dock_loading's catch-up (the forms brought up to kitting's; the area ids `area_hall`, `area_office`,
+  `area_truck_side`; `domains/dock_loading/script.py`; `domains/README.md` rewritten): 670cb78; `list_scenarios.py`
+  lists every domain, `SimModel.get_movable_objects` removed (no reader): 610fed9.
+- Step 7, the domain's content (the plan's section 4: 16 robot methods, 11 human methods, the declared states, the task
+  model): 1492789; its tests, `tests/test_tg_dock_tasks.py`: 512a452.
+- Step 8, the milestone: the two allowed one-line corrections (the stale note on `ProcessCompletion` in
+  `shared/types.py`; the viewer's colour keys for the three area ids): 52b2aae; the three scenarios, scenario_s03_02
+  (env_layout_02, env_setup_03), scenario_s05_02 (env_layout_03, env_setup_05), scenario_s07_02 (env_layout_04,
+  env_setup_07), as the plan's answer 8 states them: 8b9d267. Prior on, 800 steps, headless. The acceptance held in all
+  three rooms: the run ends with no error; the robot completes both tasks; every entry of the human's script is closed,
+  the closing part included (`[rec] end step=800 open=-`). The maintained sets byte-identical, 301 tests.
+  Completion ticks (the world tick; the declared tick in brackets), env_layout_02 / env_layout_03 / env_layout_04:
+  `deliver_pallet(pallet_0)` 64 / 64 / 57; `load_return(pallet_4)` 125 (127) / 125 (127) / 151 (153); the scan,
+  `is_scanned` holds / the record closes the entry, 92, 94 / 92, 94 / 74, 76; `go_to(desk)` completes 140 / 140 / 112.
+FINDINGS OF THE MILESTONE (Hadi and the design chat, 1 October 2026, on ccode's report; each with its classification):
+- The walk to the standby place and the meeting at a shared bay (the plan's section 5, last point) were not exercised:
+  the human starts at the standby place, where `go_to(standby_place)` is complete, so the machine waits there (the skip
+  rule), and the robot's second task was a return. A gap of the scenario. A second simple scenario per room follows.
+  The three descriptions state that the standby walk is not taken.
+- env_layout_02 and env_layout_03 produced identical motion: the scenario uses neither of the two objects that differ
+  between them (the frozen bay, the coffee machine). The recognition differs (the coffee machine), the motion does not.
+- In env_layout_04 the human passes the standing robot at 22.5 cm (ticks 66 to 69). The robot had left the bay toward
+  the empties, decided to hold at tick 63 before the scan was admitted (admitted at 69), and stood about 95 cm from the
+  bay's point, on the human's straight line to the bay. Classified: the parked case of the human walking toward the
+  robot (X3, TODO-135); a standing robot does not violate by definition (F1); the simulated human does not react to the
+  robot. Note: in this domain the case is structural, because a scan becomes applicable at the moment of delivery, so
+  the human walks to a bay when the robot leaves it. Whether to reopen the parked case is decided after the MPB, with
+  counts from all rooms.
+- A measure for the evaluation: the number of ticks in which the human passes a standing robot closer than the minimum
+  separation, reported separately from violations by a moving robot. Reason: the hold turns a closeness that would
+  count against a moving robot into one the present measure does not count. Nothing is added to the code for it now
+  (TODO-144, TODO-135).
+- In env_layout_02 the walk to the desk is admitted as coffee_break (tick 112). The recorded effect of an unmodelled
+  walk read as the nearest modelled task ("T-D G", the movement source's half-plane test; TODO-140); no consequence in
+  this run.
+- Candidate finding about the mind, NOT RULED: the robot's own delivery makes the scan applicable, and the robot does
+  not anticipate the human's walk to that bay; the scan hypothesis enters at an equal share and is admitted 8 to 12
+  ticks after the human starts (TODO-154).
+- Parked question, now with evidence, NOT RULED: whether the robot's mind holds hypotheses for the walks to the standby
+  place and to the desk (TODO-155; it carries the approval's parked note on the human stepping aside).
+- On a fixture with no assigned tasks for the human, every task of the robot's task model becomes a hypothesis: the
+  parked case TODO-143. With the restriction off, two hypotheses about empty pallets become possible: artefacts of
+  running without the prior (`docs/assumptions.md` 1.4).
+NOTES FROM THE INDEPENDENT REVIEW of dock_loading's task file against kitting's (records, 1 October 2026). The file
+follows kitting's building blocks and rules; no special case for dock_loading exists in shared code.
+- The robot's methods use a pallet's emptiness as a proxy for the side of the gate on which its origin lies. True for
+  every pallet the robot handles in stage 1. False in stage 2, when a full pallet has an origin in the hall (TODO-156).
+- The method for "holding another full pallet" (return_full) has no condition of its own; it is correct through its
+  position after the method for an empty one (return_empty) and through equal gate conditions.
+- `stand` has one method with no area condition: over-broad, and the stated exception to "the absence of a method is
+  the check" (the plan's section 4).
+- `office_break` waits 60 seconds, copied from `coffee_break`; no record gives the value; Hadi's word is pending
+  (TODO-157).
+- One dictionary is shared by eight methods: a maintainability risk with no behavioural effect.
+- A design question for stage 2, to rule before `store_pallet`: a route is selected from the areas of the agent and of
+  the object, not from the kind of task and the pallet's state (TODO-156).
+A STEP ADDED (Hadi, 1 October 2026), before the IR test-bed and the MPB run on dock_loading: the earlier analyses in
+`analysis/` and the tests are sorted under kitting, so that nothing of kitting is mixed with dock_loading's. The
+instruments' code is shared; their run sets, expectations and reports are per domain. Its own commit, no change of
+behaviour; the maintained sets and the reference set byte-identical; every path named in a record or a README updated.
+Next: the second simple scenario per room; then the step added above, with the preparation of the instruments (the
+plan's section 7, "After the milestone"); then the IR test-bed scenarios, agreed with Hadi before they are authored.
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
@@ -6425,3 +6498,7 @@ SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 7): stage 1's plan is 
 `docs/handoffs/plan_T-G_stage1.md`). Next: stage 1's build, step 0 then step 1 (the rename).
 SUPERSEDED (records, 1 October 2026): steps 0 to 5 of stage 1 are built and accepted (STAGE 1, STEPS 0 TO 5 BUILT
 above). Next: the domain steps, step 6 (the catch-up) and step 7 (the content), then the milestone (step 8).
+SUPERSEDED (records, 1 October 2026): steps 6 to 8 of stage 1 are built and the milestone accepted (STAGE 1, STEPS 6
+TO 8 BUILT above). Next: the second simple scenario per room; then the sorting of the earlier analyses and tests under
+kitting, with the preparation of the instruments; then the IR test-bed scenarios, agreed with Hadi before they are
+authored.

@@ -4014,6 +4014,13 @@ SECOND INSTANCE (MPB part (v), 30 Sept 2026; analysis/mpb/REPORT.md, "Part (v)",
 139, one F1 robot violation (138 to 140): the human leaves the coffee machine and walks toward the robot carrying west;
 the decisions rest on moving fallbacks of k = 1 and 3 (P4's recorded error). An instance produced by the scenario, not
 authored for it.
+THIRD INSTANCE (T-G stage 1, the milestone, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT): scenario_s07_02 on
+env_layout_04 (dock_loading), 22.53 cm at 68, ticks 66 to 69 below `min_separation`; F1 over the continuous minimum: 3
+stands, 2 recedes, no robot violation. The robot, leaving the bay toward the empties, decided a hold at 63 on a fallback
+(the scan admitted at 69) and stood about 95 cm from the bay's point, on the human's straight line to the bay; the
+simulated human does not react to the robot. In dock_loading the case is structural: a scan becomes applicable at the
+moment of delivery, so the human walks to a bay when the robot leaves it. Whether to reopen this parked case is decided
+after the MPB on dock_loading, with counts from all rooms. An instance produced by the scenario, not authored for it.
 Files: domains/kitting/ (the scenario), analysis/tb1a_destination/sep_classes.py (the measure)
 Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137, TODO-144
 
@@ -4132,6 +4139,10 @@ human's assigned tasks, and an empty list switches the support restriction off (
 diagnostic mode, with every hypothesis admissible, the robot's own items' deliveries included. Found in the MPB (part
 (iii), scenarios 6 and 7 as first authored, class 4); the scenarios were re-authored with an assigned task the human
 never performs. Recorded only.
+NOTE (T-G stage 1, the milestone's findings, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT): on a dock_loading fixture
+with no assigned tasks for the human (the viewing fixtures), every task of the robot's task model becomes a hypothesis:
+this parked case. With the restriction off, two hypotheses about empty pallets become possible: artefacts of running
+without the prior (docs/assumptions.md 1.4), never a rule.
 Files: shared/recognizer.py (`_build_admissible`), mesa_sim/sim_model.py (`observed_assigned`)
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the record line); analysis/mpb/REPORT.md
 
@@ -4161,6 +4172,10 @@ A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB
 - The measures: the completion tick (the world tick, CLAUDE.md, "Regression checking"); the held ticks; the
   near-encounters classified by F1's classes (a robot violation, a stand, a recede; `docs/assumptions.md` 4.6); the
   separation stop off.
+  ADDED (T-G stage 1, the milestone's findings, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT): the number of ticks in
+  which the human passes a standing robot closer than `min_separation`, reported separately from violations by a
+  moving robot. Reason: the hold turns a closeness that would count against a moving robot into one the present
+  measure does not count. Nothing added to the code for it at the milestone.
 - The scenario dimension: deviation kinds (a change of mind, a mid-action change, a sudden stand, a misdelivery, an
   occupied target, the walk toward the robot of TODO-135, ...) and the points in the task where they occur, with several
   instances per kind. A row is a condition and a kind. Layouts vary independently where geometry is a factor.
@@ -4314,6 +4329,8 @@ at 576f2b2 over the tracked files outside `ros_sim/`, `scripts/`, `analysis/` an
   id; the viewer is T-V's), domains/kitting/actions.py 11 (the commented-out `goto_zone`), shared/types.py 7 (examples
   `Const('zone_SE')`, `goto_zone`, `movement_target_type` "zone", `GOTO_ZONE`), shared/projection.py 2 (the zone movement
   target removed from the live domain), tests/test_tg_areas.py 3 (kitting's area ids).
+  NOTE (T-G stage 1, step 8, 52b2aae, 1 Oct 2026): the viewer's six old dock_loading colour keys (`zone_hall_dry` ...
+  `zone_office`) are replaced by the three area ids; kitting's four keys (`zone_NW` ...) stay, as its area ids do.
 - Scenario descriptions quoting old values: domains/kitting/scenarios/scenarios_s01.py 1, scenarios_s03.py 2 (ZONE_BOOST,
   `zone_SW`).
 - Not wording: kitting's area ids (`zone_NW`, `zone_SE`, ...) in its layouts stay (the plan's answer 3); dock_loading's
@@ -4323,3 +4340,40 @@ at 576f2b2 over the tracked files outside `ros_sim/`, `scripts/`, `analysis/` an
 Files: as listed
 Reference: design_decisions.md, "T-G: the second domain's rulings", A2 (the rename), STAGE 1 PLAN APPROVED;
 docs/handoffs/plan_T-G_stage1.md, section 1
+
+**TODO-154: The robot does not anticipate the scan its own delivery makes applicable (recorded, T-G stage 1 milestone, 1 Oct 2026)** [CANDIDATE FINDING about the mind; NOT RULED]
+The robot's own delivery makes the human's scan of that pallet applicable (the guard `obj_at(?pallet, ?delivery_bay)`),
+and the robot does not anticipate the human's walk to that bay: the scan hypothesis enters the live set at the tick of
+delivery (A4, `[IR-reentry] ... live again: applicable`) at an equal share, and is admitted 8 to 12 ticks after the
+human starts (the milestone: 64 to 72 on env_layout_02, 64 to 76 on env_layout_03, 57 to 69 on env_layout_04). Until
+then the robot plans against the fallback; on env_layout_04 this interval holds the near-encounter of TODO-135's third
+instance. Recorded only; nothing is changed for it.
+Files: shared/recognizer.py, shared/meta_planner.py (no change)
+Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
+
+**TODO-155: Hypotheses for the walks to the standby place and to the desk (recorded, T-G stage 1 milestone, 1 Oct 2026)** [PARKED; NOT RULED; now with evidence]
+Whether the robot's mind holds hypotheses for the human's walk to the standby place (the repeatable entry) and to the
+desk (the closing part). Neither is in the robot's task model (the plan's section 5: a scenario with a standby entry is
+classed as containing unmodelled behaviour). The approval parked the related question of the human stepping aside
+(STAGE 1 PLAN APPROVED, notes). Evidence from the milestone: during the stay at the standby place the live set holds
+the two breaks only, the finding turns unexplained after 15 ticks and the robot plans against the fallback; during the
+walk to the desk the walk is read as the nearest modelled task, and on env_layout_02 admitted as coffee_break at 112
+(the half-plane test, TODO-140); no consequence in those runs. Not ruled.
+Files: domains/dock_loading/tasks.py (the task model), shared/recognizer.py
+Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; docs/handoffs/plan_T-G_stage1.md, section 5; TODO-140, TODO-154
+
+**TODO-156: Route selection in dock_loading's robot methods: a design question for stage 2 (recorded, the review of the task file, 1 Oct 2026)** [OPEN; to rule before `store_pallet`]
+The independent review of dock_loading's task file against kitting's (the file follows kitting's building blocks and
+rules; no special case for dock_loading exists in shared code) found that the robot's methods use a pallet's emptiness
+as a proxy for the side of the gate on which its origin lies (return_empty against return_full). True for every pallet
+the robot handles in stage 1; false in stage 2, when a full pallet has an origin in the hall (`store_pallet`). The
+question: a route is selected from the areas of the agent and of the object, not from the kind of task and the pallet's
+state. To rule before `store_pallet` is built.
+Files: domains/dock_loading/tasks.py
+Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B7, B11 (AMENDED); docs/handoffs/plan_T-G_stage1.md,
+section 4
+
+**TODO-157: The duration of office_break (recorded, the review of the task file, 1 Oct 2026)** [OPEN; Hadi's word pending]
+`office_break` waits 60 seconds, a value copied from `coffee_break`; no record gives it. Hadi's word is pending.
+Files: domains/dock_loading/tasks.py (`office_break`)
+Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B6
