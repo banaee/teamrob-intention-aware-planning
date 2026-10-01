@@ -21,7 +21,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a"]          # categorical slots 1 to 3 (all-pairs valid), fixed order by key
+# categorical slots 1 to 4, fixed order by key; the four pass every check over all pairs (the dataviz validator, light;
+# violet as slot 4, since the sort). More than four hypotheses: the figure is faceted, four per figure (figure.png,
+# figure_2.png, ...), every hypothesis keeping its slot within its figure; a fifth slot fails the normal-vision floor.
+SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#4a3aa7"]
 BAND = {"unresolved": "#cfcdc6", "adequate": "#eeede9", "unexplained": "#e34948", "exhausted": "#8a8880"}
 INK, MUTED = "#0b0b0b", "#8a8880"
 
@@ -57,8 +60,15 @@ def main(d, log):
     THETA, alpha = header(log)
     exp, act = read(d / "expected.csv"), read(d / "actual.csv")
     traj = json.load(open(d / "trajectory.json"))
-    keys = sorted({r["key"] for r in exp if r["key"]})
-    assert len(keys) <= len(SERIES), f"{len(keys)} hypotheses; the palette validates {len(SERIES)} all-pairs"
+    every = sorted({r["key"] for r in exp if r["key"]})
+    groups = [every[i:i + len(SERIES)] for i in range(0, len(every), len(SERIES))] or [[]]
+    for n, keys in enumerate(groups):
+        name = "figure.png" if n == 0 else f"figure_{n + 1}.png"
+        part = "" if len(groups) == 1 else f" (hypotheses {n * len(SERIES) + 1} to {n * len(SERIES) + len(keys)} of {len(every)})"
+        figure(d, exp, act, traj, THETA, alpha, keys, name, part)
+
+
+def figure(d, exp, act, traj, THETA, alpha, keys, name, part):
     color = dict(zip(keys, SERIES))
     T = max(int(r["tick"]) for r in exp)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 8.6), sharex=True,
@@ -120,8 +130,9 @@ def main(d, log):
         if b["task"] != last_task:
             ax1.text(b["tick"] + 1, 1.05, short(b["task"]), fontsize=7.5, color=INK, va="bottom", rotation=0)
             last_task = b["task"]
-    fig.suptitle(f"{traj['scenario']} on {traj['layout']}, prior on", x=0.06, ha="left", fontsize=11, color=INK)
-    fig.savefig(d / "figure.png", dpi=130, bbox_inches="tight")
+    fig.suptitle(f"{traj['scenario']} on {traj['layout']}, prior on{part}", x=0.06, ha="left", fontsize=11, color=INK)
+    fig.savefig(d / name, dpi=130, bbox_inches="tight")
+    plt.close(fig)
 
 
 if __name__ == "__main__":
