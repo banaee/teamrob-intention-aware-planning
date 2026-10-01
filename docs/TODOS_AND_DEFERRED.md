@@ -41,6 +41,11 @@ Items marked **[BLOCKING]** must be resolved before the simulation runs correctl
 >   item is TODO-95; T-H now names the human behaviour model.
 > - `Stay`, `MoveTo`, `interrupt` / `deviate` / `abandon`, provenance, `check_work_order`: T-C1's vocabulary, deleted
 >   in T-H3 (`stand(n)`, `go_to`, events with `at` / `drop`, plain instances).
+>
+> **Tags [V1] / [FW] (T-G A1, ruled by Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A1).** An open item may carry
+> a tag beside its status: [V1] (inside the first complete version) or [FW] (future work: conceptual directions only).
+> An untagged item is not yet ruled. No full pass: an item is tagged when next touched by Hadi's ruling, a new item
+> when recorded. Numbers and identifiers are kept for good: no renumbering, no renaming.
 
 ---
 
@@ -62,6 +67,8 @@ the planner seeds the next task. Benign but indicates a one-step planning delay.
 Files: `mesa_sim/sim_agents.py`, `shared/planner.py`
 
 **BUG-04 — Robot skips `dock_gate` waypoint**
+T-G (T-G records 1, 1 Oct 2026): the gate becomes a state declared in the setup and opened on request (B5), passed by a plain step to the
+gate's centre (B11); design_decisions.md, "T-G: the second domain's rulings", B5, B11. The guard's predicate is emitted today (TODO-02's note).
 `deliver_pallet` method includes `move_to(dock_gate)` as intermediate step, but robot
 goes directly truck → delivery area. Likely: `gate_is_open(dock_gate)` predicate not
 emitted by `world_state_builder`, so method guard fails and fallback has no gate step.
@@ -95,7 +102,10 @@ Proper fix: `ActionSchema` declares `microaction_param_extractors` dict,
 Files: `mesa_sim/action_decomposer.py`, `shared/types.py`
 Reference: TODO #16
 
-**TODO-02 — `world_state_builder`: emit `gate_is_open(dock_gate)` unconditionally**
+**TODO-02 — `world_state_builder`: emit `gate_is_open(dock_gate)` unconditionally** ⛔ SUPERSEDED (T-G A5, B5)
+SUPERSEDED (T-G records 1, 1 Oct 2026): built as an emission for every object of type `gate` whose `is_open` is not False (never loaded,
+so always); the gate is a state declared in the setup, held by the environment, with no simulator code for one domain
+(A5, B5). design_decisions.md, "T-G: the second domain's rulings", A5, B5.
 Phase 2.1 shortcut: gate is always open. Emit the predicate unconditionally so
 method guards in `deliver_pallet` and `load_return` evaluate correctly.
 Files: `mesa_sim/world_state_builder.py`
@@ -176,7 +186,11 @@ state. The same form problem, also read by nothing: `move_to` does not end the p
 Files: `shared/planner.py`, `shared/types.py` (ConditionSchema), `shared/meta_planner.py`
 Reference: Phase 4B; Phase 4C meta_planner build session, September 2026
 
-**TODO-08 — `dock_gate` open/close: implement `open_gate` ActionSchema**
+**TODO-08 — `dock_gate` open/close: implement `open_gate` ActionSchema** ⛔ SUPERSEDED for the gate (T-G B5)
+SUPERSEDED (T-G records 1, 1 Oct 2026): the gate is open or closed, declared in the setup; the robot moves to the closed gate and honks
+(an action that sets "opening requested"); the human's assigned task "open the gate" presses the button; no action
+closes it in V1; the robot never opens it itself (B5). The commented `gate_closed` methods are not the form: a method per
+starting area, the gate's condition on a method that crosses it (B11). Stage 2 (C1). design_decisions.md, "T-G: the second domain's rulings", B5, B11.
 `deliver_pallet` and `load_return` have a commented-out `gate_closed` method.
 Implement `open_gate` action schemas and wire the second method when gate state
 is modeled dynamically.
@@ -184,6 +198,9 @@ Files: `domains/dock_loading/ActionSchemas.py`, `domains/dock_loading/tasks.py`
 Reference: TODO in tasks.py comments
 
 **TODO-09 — Path planning: replace straight-line STEP* with obstacle-aware planning**
+T-G (T-G records 1, 1 Oct 2026): within V1, dock_loading's answer is B11: passing the gate is a plain step "move to the gate", one method
+per starting area; routing through openings as a property of movement was not taken (it changes the projection and
+the recognizer in `shared/`). This item itself is not tagged. design_decisions.md, "T-G: the second domain's rulings", B11.
 Currently `action_decomposer.steps_toward()` uses straight-line interpolation.
 Agents walk through walls and obstacles. Replace with A* or RRT in Phase 4.
 See DESIGN-13 for the broader plan: this becomes Mesa's use of the common
@@ -192,6 +209,9 @@ Files: `mesa_sim/action_decomposer.py`
 Reference: Phase 4D
 
 **TODO-10 — `scan_pallet` precondition: `obj_at(?item, delivery_area)` guard**
+ANSWERED, NOT BUILT (T-G records 1, 1 Oct 2026): `confirm_delivered_pallet` (was `scan_pallet`) states its condition in the task model, the
+pallet in its delivery container (B2); the human takes it only when it is applicable (A3), by its own planning in
+`world/`, not in the `shared/` cognitive loop. design_decisions.md, "T-G: the second domain's rulings", A3, B2.
 `scan_pallet` should only execute when the pallet has been delivered to the area.
 Requires task eligibility condition evaluation (see DESIGN-01 below).
 Files: `domains/dock_loading/tasks.py`, `shared/` cognitive loop
@@ -239,7 +259,14 @@ robot problem (design_decisions.md, "After C", the freezing point).
 Files: `shared/meta_planner.py` (Phase 4 new)
 Reference: Phase 4 design session; R2
 
-**TODO-16 — Cost-aware method selection in `_select_method`**
+**TODO-16 — Cost-aware method selection in `_select_method`** [V1] [RULED (T-G A7, 1 Oct 2026); its design question open]
+RULED (T-G A7, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A7): inside T-G stage 2, after the MPB's first run on dock_loading.
+When two or more methods of a task apply in the same world state, the robot chooses by realized cost; the
+meta-planner's candidates become pairs of task and method. Its case in dock_loading: a delivery in one cycle (truck to
+bay) against a stepwise delivery (truck to gate, then gate to bay). It changes `shared/`; Hadi's ruling is the design
+ground. Its own design question comes before any build: how the candidates are formed; whether the recognizer also
+considers several applicable methods. Acceptance on kitting: no decision changes. The fix as filed below (a cost
+estimator passed into `_select_method`) is not the ruled form: the choice is the meta-planner's, on realized cost.
 Currently picks first applicable method (greedy). If multiple methods have
 satisfied guards, the cheaper one may be missed.
 Fix: pass cost estimator from meta_planner into _select_method, score all
@@ -347,7 +374,14 @@ cross-cutting mechanism — needs its own design, not an inline fix.
 Files: mesa_sim/world_state_builder.py (_add_proximity_predicates)
 Reference: Phase 4 design session, July 2026
 
-**TODO-25 — dock_loading typed-parameter integration: not reviewed** [deferred]
+**TODO-25 — dock_loading typed-parameter integration: not reviewed** [deferred] [V1]
+CORRECTED (T-G records 1, 1 Oct 2026): the error below is raised at model construction (`RobotAgent.observe_initial()`, in
+`SimModel.__init__`), not "on the first tick", once TODO-104's errors are past. T-G build 1 (30 Sept 2026, 56e674e)
+typed `confirm_delivered_pallet` (`?pallet: pallet`) and keyed the steps of `pick_up`, `place`, `scan_it` on `?item`:
+the error is gone and scenario_s01_03 loads. Left: `wait_at` still completes on `ProcessCompletion` (the `waited`
+migration), and scenario_s01_02 binds `?delivery_bay` on `confirm_delivered_pallet`, which the schema does not declare
+(the replay stops at `office_break` before it is read). "NEUTRAL" below is the perfect-fit value L = 1 since I4 (the I2
+entry's note); T-G A4 replaces that scoring when built. Stage 1 (C3). design_decisions.md, "T-G: the second domain's rulings", C2, C3.
 `dock_loading/tasks.py`/`scenarios.py` were manually updated in parallel with
 the kitting typed-parameter work (?pallet/?delivery_bay, office_break rename,
 parameter_types added to deliver_pallet/load_return/coffee_break) but not
@@ -386,6 +420,10 @@ Reference: Phase 4C meta_planner build session, July 2026
 ## 🏗️ Design TODOs
 
 **DESIGN-01 — Task eligibility conditions and scenario task scheduling mechanism** [Phase 2.3]
+ANSWERED, NOT BUILT (T-G A3, T-G records 1, 1 Oct 2026): a task can start only when it is applicable (one of its methods applies), decided by
+the human agent's own HTN planning against the true state it perceives; the script is a priority list scanned from the
+top whenever the human is free; if nothing is applicable the human waits. In `world/` (the human's executor), not a
+`TaskSchema.entry_conditions` field read in `shared/`. design_decisions.md, "T-G: the second domain's rulings", A3.
 Human tasks in `scenarios.py` are a flat queue executed sequentially regardless of
 world state. The proper mechanism: `TaskSchema.entry_conditions: List[ConditionSchema]`
 checked against `WorldState` before task dequeue. If unsatisfied, agent idles.
@@ -395,6 +433,8 @@ Files: `shared/types.py`, `shared/` cognitive loop, `mesa_sim/sim_agents.py`
 Reference: TODO #17
 
 **DESIGN-02 — Existential parameter binding in planner**
+NOT TAKEN (T-G A3, T-G records 1, 1 Oct 2026): a generic task whose object is bound at run time removes the allocation the assignment prior
+relies on. design_decisions.md, "T-G: the second domain's rulings", A3.
 `scan_pallet` with unbound `?item` — planner should search `model.items` for first
 pallet satisfying `obj_at(?item, delivery_area) ∧ ¬scanned(?item)` and bind at
 planning time. Eliminates need to pre-assign pallet IDs in `scenarios.py`.
@@ -409,6 +449,8 @@ Consider whether to generalize or keep domain-specific.
 Files: `domains/dock_loading/tasks.py`
 
 **DESIGN-04 — Parallel task coordination between agents**
+ANSWERED, NOT BUILT (T-G records 1, 1 Oct 2026): (a) is taken: applicability (A3) with the scan's condition (B2). Shared work between the
+two agents is an FW direction (TODO-147). design_decisions.md, "T-G: the second domain's rulings", A3, B2, A10.
 Robot and human run in parallel with no coordination mechanism. Human can attempt
 to scan a pallet before robot has delivered it. Proper fix requires either:
 (a) task eligibility conditions (DESIGN-01), or
@@ -713,6 +755,9 @@ Files: shared/recognizer.py, object registry (wherever it lands)
 Reference: Phase 4 design session, July 2026
 
 **DESIGN-15 — `office_break`: unresolved design questions (parked)** [was: go_to_office]
+ANSWERED (T-G records 1, 1 Oct 2026): 1. T-G build 1 typed the layout's object `office_chair` (56e674e). 2. The office door is open or closed,
+declared in the setup; the agent that passes it opens it, one method for the open state and one that opens first (B5).
+3. `office_break` ends at its chair with a wait, the chair inside the office (B6). design_decisions.md, "T-G: the second domain's rulings", B5, B6.
 Task renamed from `go_to_office` to `office_break` (dock_loading). Three open
 questions before this task is reliable:
 1. `parameter_types={"?office_chair": "office_chair"}` doesn't match the
@@ -1302,7 +1347,7 @@ current inconsistency (linear kernel circle-mean 2.05 vs NEUTRAL = 1.0, which ha
 with a controlled IR-only test, ideally against recorded human walks when ROS resumes; do
 not tune it toward a fixture.
 
-**TODO-39 — Migrate `domains/dock_loading/scenarios.py` to `assigned_tasks`**
+**TODO-39 — Migrate `domains/dock_loading/scenarios.py` to `assigned_tasks`** [V1]
 `AgentConfig.assigned_tasks` was added and all three kitting scenarios migrated; dock_loading
 still declares only `scheduled_tasks` for both agent types. It imports and loads fine — empty
 `assigned_tasks` skips `__post_init__` validation by design — but `SimModel._spawn_agents()`
@@ -1312,6 +1357,9 @@ before running dock_loading again: humans get `assigned_tasks` = their non-fores
 `scheduled_tasks`; robots get `assigned_tasks=` in place of `scheduled_tasks=`.
 T-G build 1 (30 Sept 2026): the robots' tasks of scenario_s01_01 and _02 moved to `assigned_tasks`; their humans'
 assigned tasks are left to T-G's design (TODO-104); the new scenario_s01_03 states both agents' assigned tasks.
+THE HUMAN'S SIDE (T-G records 1, 1 Oct 2026): scenario_s01_01 and _02 declare no assigned tasks for the human, so with the prior on no
+scan hypothesis is admissible. Ruled (B1): the human's assigned scans follow from the robot's assigned deliveries and
+are known at load. The two scenarios are replaced in stage 1 (B10, C3). design_decisions.md, "T-G: the second domain's rulings", B1.
 Files: domains/dock_loading/scenarios.py
 Reference: assignment-prior session, September 2026
 
@@ -2776,7 +2824,10 @@ Both `_make_domain_model()` and `run_headless()` call `parse_args()` independent
 Refactor to parse once at module level and pass config around.
 Files: `mesa_sim/run_mesa.py`
 
-**REFACTOR-03 — `domains/README.md`: update domain folder name references**
+**REFACTOR-03 — `domains/README.md`: update domain folder name references** [V1]
+WIDENED (T-G records 1, 1 Oct 2026): the README is stale throughout (`is_assigned` / `is_foreseeable`, `StepCall`, `DomainModel`,
+`intentions`, `dock_delivery_loading/`, "pallet scanning has no microaction", which `scan_it` / TOUCH contradicts, the
+driver reading of B1). Rewritten with T-G stage 1's build, not before. design_decisions.md, "T-G: the second domain's rulings", C3.
 README still references `dock_delivery_loading` in the folder listing.
 Update to `dock_loading`.
 Files: `domains/README.md`
@@ -2793,18 +2844,27 @@ Agents move in straight lines ignoring walls between hall/dock/truck.
 Accepted: same as kitting. Fix deferred to Phase 4 path planning (TODO-09, DESIGN-13).
 
 **LIMIT-02 — Parallel task independence: human scans before robot delivers**
+ANSWERED, NOT BUILT (T-G records 1, 1 Oct 2026): `scan_pallet` is the old name of `confirm_delivered_pallet` (BUG-02). Answered by A3
+(applicability; the human waits) and B2 (the scan's condition: the pallet in its delivery container). design_decisions.md, "T-G: the second domain's rulings", A3, B2.
 Human `scan_pallet` executes without waiting for robot `deliver_pallet` to complete.
 Mitigated by `office_break` delay in scenario. Proper fix: DESIGN-01.
 
 **LIMIT-03 — Gate always open**
+ANSWERED, NOT BUILT (T-G records 1, 1 Oct 2026): the gate's state is declared in the setup and opened on request (B5, stage 2); stage 1
+declares it open (C1). design_decisions.md, "T-G: the second domain's rulings", B5.
 `gate_is_open(dock_gate)` emitted unconditionally. Gate state not modeled dynamically.
 Fix: TODO-08 (`open_gate` action schema + `gate_closed` method).
 
-**LIMIT-04 — All pallets start at same position (truck center)**
+**LIMIT-04 — All pallets start at same position (truck center)** [FW]
+[FW] (T-G A10, B9, T-G records 1, 1 Oct 2026): in V1 a container is one point, its centre, with no constraint, and may hold several pallets
+(B9); authored pallet places are not taken. A container divided into positions, the position chosen when an object is
+put down, is FW, with no new item. Pallets drawn on top of each other are a drawing matter for T-V. design_decisions.md, "T-G: the second domain's rulings", A10, B9.
 Pallets 0–5 all share `truck_interior` center position. No individual slot positions.
 Deferred: individual pallet slot positions within truck area.
 
 **LIMIT-05 — Empty pallet bays not wired to `LOAD_RETURN` task execution yet**
+NOTE (T-G records 1, 1 Oct 2026): it conditions on BUG-01 and BUG-02, both resolved. Its content is replaced by B4 (a pallet's full/empty
+condition as the state fact `is_empty(pallet)`, read by the methods) and B11 (one method per starting area). design_decisions.md, "T-G: the second domain's rulings", B4.
 `load_return` tasks defined and in scenario but may not complete correctly
 until BUG-01 and BUG-02 are resolved and full scenario runs end-to-end.
 
@@ -2860,7 +2920,10 @@ Files: domains/kitting/scenarios.py, mesa_sim/sim_agents.py (HumanAgent), shared
 Reference: F47b session, September 2026; design_decisions.md, "Scheduled bindings are typed"
 T-H (25 Sept 2026; design_decisions.md, "T-H: the human behaviour model"): the declared behaviour this item asks for is a `HumanOnlyTask` instance in the human's script, `stand(?duration)` for a stay of a stated length wherever the human is (its stand action emits no world fact), `go_to(?landmark)` for a walk; it is in the tree and never in a robot's task model, so it adds no hypothesis (coverage `TASK_ABSENT`). The scenario-side vocabulary and the superset domain of the text above become one tree and a task model. The terminal stand at a table stays undeclared by the authoring convention.
 
-**TODO-81 — The Mesa decomposer reads the literal `"?duration"`; the schema names the binding (`duration_key`)** [housekeeping; from R2]
+**TODO-81 — The Mesa decomposer reads the literal `"?duration"`; the schema names the binding (`duration_key`)** [housekeeping; from R2] ✅ CLOSED (T-H1, e571eed)
+CLOSED (T-G records 1, 1 Oct 2026): both halves were done in T-H1 (e571eed, 25 Sept 2026): `action_decomposer._expand_stand` reads
+`action.schema.duration_key`, and dock_loading's `wait_at` declares `duration_key="?duration"`. The T-G line below and
+the roadmap's "TODO-81 with them" are history.
 NOT DONE at the 4C housekeeping, because the fix as filed is not behaviour-preserving: `dock_loading`'s
 `wait_at` is `STAND*` with a `?duration` binding (`PT60S`, `domains/dock_loading/tasks.py`) but declares
 no `duration_key`, so reading `action.schema.duration_key` would shrink its waits to one tick. Kitting is
@@ -3280,6 +3343,8 @@ Related: TODO-59 (deferred part), TODO-85 half (a), TODO-80, TODO-92, TODO-96, T
 IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_06, prior on): `stand(PT80S)` at shelf_1 30 to 70, inside `deliver_item(item_1)`'s `pick_up` phase (s_exp 2); its S below α at 47 (17 standing ticks beyond s_exp); the finding unexplained 47 to 71 while the belief holds at about 0.92 (the rival is charged for the same ticks); adequate at the grasp, 72.
 
 **TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN; future work, with TODO-136; rewritten to X5's two grounds, 29 Sept 2026]
+T-G A10 (T-G records 1, 1 Oct 2026): two communication acts stay under this item and X5, with no FW item of their own: the human assigning
+or changing a delivery location during the run; the robot informing a third party. design_decisions.md, "T-G: the second domain's rulings", A10.
 REWRITTEN (T-D X, X5, ruled by Hadi 29 Sept 2026; design_decisions.md, "T-D X: response"). Communication is an X-level
 response considered when the robot reaches a persistent situation its recognition-and-planning machinery cannot
 resolve, on two grounds, each an existing observable with no constant: (1) not understanding: the adequacy finding is
@@ -3447,7 +3512,7 @@ robot's projection has the same limitation (TODO-07's remainder). Options, not d
 the movement schemas (needs a wildcard on the entity), or a body-supplied fact filter for the replay.
 Reference: world/human_executor.py, `advance()`; mesa_sim/world_state_builder.py.
 
-**TODO-104: dock_loading's two scenarios do not load (recorded, T-H1, 25 Sept 2026)** [OPEN; domain deferred]
+**TODO-104: dock_loading's two scenarios do not load (recorded, T-H1, 25 Sept 2026)** [OPEN; domain deferred] [V1]
 Both fail at load at ea4446c (before T-H1) and identically after it; the domain imports, and its tree and task model
 build. Error text (current at T-L stage 3, 26 Sept 2026, under the serial ids; scenario_10 and scenario_11 before it,
 `docs/rename_table.md`):
@@ -3464,6 +3529,10 @@ T-G build 1 (30 Sept 2026): the form-only repairs (the steps of `pick_up`, `plac
 `confirm_delivered_pallet` typed; the layout's `office_chair` typed `office_chair`) and the viewing fixture
 scenario_s01_03, which loads; both scenarios now fail at the same place, `infeasible:office_break(...)` in the
 load-time replay (its `door_is_open` guard, which no body emits), their content left to T-G's design.
+TWO CAUSES (T-G records 1, 1 Oct 2026; the survey of 30 Sept 2026): scenario_s01_01 fails on two causes, the door condition
+(`door_is_open(office_door)`, which no body emits) and the empty binding (`office_break` bound with `{}`): with the guard
+removed, the replay stops at `unbound variable '?office_chair'`. Ruled (B5, B6): the door's state is declared in the
+setup; both scenarios are replaced in stage 1, the present layout and setup kept for scenario_s01_03 (B10). design_decisions.md, "T-G: the second domain's rulings", C2.
 
 **TODO-107: The duplicate check on assigned tasks compares task instance keys (recorded, T-H3, 25 Sept 2026)**
 [CLOSED, T-H4: task equality is `same_task` (same schema by identity, equal goal bindings), the duplicate check and
@@ -3810,6 +3879,9 @@ admitted decision, and draws the IR test-bed's figure per run (figure_ir.png; an
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
+PROPOSED, NOT RULED (the T-G design chat; T-G records 1, 1 Oct 2026): track 4's reduced form (T-G A8) does not need the mind object, so its
+landing in track 4 below is no longer implied; its placement is open. The Mesa class `RobotAgent` still holds mind parts
+and body parts together (glossary §10, **body**). design_decisions.md, "T-G: the second domain's rulings", A2, A8, PROPOSALS.
 WorldState is the robot's world model, not simulator state (T-D P). Today `RobotAgent` (the Mesa body) holds the
 recognizer, the meta-planner and, since P, the human's previous observed position, from which it writes
 `WorldState.agent_displacements` each tick. The form to build: a robot-mind object in `shared/` owning the world model
@@ -3972,7 +4044,26 @@ The default of `--assignment_prior` is still off (`configs/experiment.yaml`, `as
 Files: configs/experiment.yaml, CLAUDE.md
 Reference: docs/assumptions.md 1.4
 
-**TODO-140: Track 4, the workspace boundary and human departure (recorded at the G/X handoff, 29 Sept 2026)** [OPEN; after track 3, or before it if the evaluation needs a genuine departure]
+**TODO-140: Track 4, the workspace boundary and human departure (recorded at the G/X handoff, 29 Sept 2026)** [OPEN; after track 3, or before it if the evaluation needs a genuine departure] [V1, reduced form]
+RULED, REDUCED FORM (T-G A8, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A8), [V1]: "The layout declares monitored areas. The robot's
+WorldState holds the human, and facts about the human, only while the human is inside one. While no human is observed,
+the recognizer does not update, no human projection exists, and the planner plans as with no human present. The
+human's disappearance and its reappearance each cause a new decision. The reappearance starts a new episode from the
+prior base. The human's own execution is unaffected. dock_loading's office is one unmonitored area." Monitored areas
+are fixed per layout, independent of where the robot is; kitting monitors its whole room. The mind keeps no last
+observed position (the log and the viewer may show it). Not taken: the last position kept and marked stale; resuming
+the old belief on return; sensor-specific observation; a robot that expects the return at the office door belongs to
+TODO-97.
+PLACEMENT (A8, C1): its own increment after T-G's stage 2; it changes `shared/`. It supersedes the placement in the T-D
+tail (the PLACEMENT REVISED line below). CONFLICT MARKED: T-F's scope ("no genuine departure", track 4 after T-F;
+TODO-144) is not revised by the ruling.
+CONSEQUENCES REVISED: the first case where the robot's WorldState differs from the environment's state stands (the
+human outside every monitored area); "track 4 builds the perception layer and the mind object (TODO-131)" no longer
+follows (a proposal, not ruled: TODO-131's note); how the new decision on disappearance and reappearance is triggered
+(the trigger set has three members) is track 4's plan. NOT RULED HERE, kept for track 4's own design: `leave()`, the
+exit through a door, P4's use of the boundary, the scripts' switch and its regeneration.
+NEAR TERMS (glossary §10, **monitored area**, not merged): "the shared work area", "the robot's operational area", "the
+outside area" and "observable" below; "the shared workspace" in docs/assumptions.md 1.1, 2.3.
 PLACEMENT REVISED (Hadi's order, 30 September 2026): track 4 is in the T-D tail, after T-F and T-V (roadmap, "The plan
 from T-A"); "after track 3, or before it" in the header is history. T-F runs without a genuine departure (TODO-144).
 Hadi's framing (docs/handoffs/handoff_G_X_onward.md, section 7): the shared work area gets a boundary and the human can
@@ -4021,7 +4112,11 @@ never performs. Recorded only.
 Files: shared/recognizer.py (`_build_admissible`), mesa_sim/sim_model.py (`observed_assigned`)
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the record line); analysis/mpb/REPORT.md
 
-**TODO-144: T-F, the evaluation: framing (not ruled) (recorded, the MPB post-(iv) records, 29 Sept 2026)** [OPEN; a future item, after the MPB closes]
+**TODO-144: T-F, the evaluation: framing (not ruled) (recorded, the MPB post-(iv) records, 29 Sept 2026)** [OPEN; a future item, after the MPB closes] [V1]
+T-G A11 (T-G records 1, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A11): a layout authored so that routes cross shows that the robot adapts when an interaction
+exists; it does not show how often interactions occur. T-F varies the placement and takes no interaction rate from
+crossing setups alone. Track 4 now precedes T-F (TODO-140, A8); the scope line below (no genuine departure) is not
+revised by that ruling.
 REVISED (Hadi's order, 30 September 2026; roadmap, "The plan from T-A", T-F): T-F follows T-G; tracks kitting,
 dock_loading and cross-domain; the randomised harness (TODO-47) stays in it.
 - Track 3b (TODO-145) follows T-F, in the T-D tail. The line "Before the evaluation: track 3b" below is history; the
@@ -4065,7 +4160,8 @@ TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
 5. At the recognizer pass (T-D Q2 to Q4): raise TODO-95 (stationarity channel) and rule whether it joins the pass or
    stays recorded for T-H.
 
-**TODO-145: Track 3b: consequential activation under conflict (not ruled) (recorded, the MPB close-out, 30 Sept 2026)** [OPEN; after the MPB, before T-F]
+**TODO-145: Track 3b: consequential activation under conflict (not ruled) (recorded, the MPB close-out, 30 Sept 2026)** [OPEN; after the MPB, before T-F] [V1]
+[V1] (T-G A1, T-G records 1, 1 Oct 2026): in V1. design_decisions.md, "T-G: the second domain's rulings", A1.
 PLACEMENT REVISED (Hadi's order, 30 September 2026): track 3b is in the T-D tail, after T-F and T-V (roadmap, "The
 plan from T-A"); "before T-F" in the header and the "Placed before T-F" line below are history. The dependency is
 recorded as a limitation of T-F's reading (TODO-144), not as a prerequisite: an evaluation before 3b measures without
@@ -4117,3 +4213,41 @@ advance E8 reads, the expected action the recognizer derives) instead of re-deco
 cause of the class-2 violations (the cross-pairing: the planned robot against the actual human keeps F1). Not built.
 Files: shared/projection.py (project_human), shared/meta_planner.py (update_human_projection)
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", MPB-4's class-2 record; TODO-77; T-D R and E (E8, E9)
+
+**TODO-147: Shared work between the human and the robot (recorded, T-G records 1, 1 Oct 2026)** [FW]
+A conceptual direction (T-G A10). The Q1 template (A3: assignment static, availability and order dynamic) makes a task
+assigned to both agents expressible; each agent's applicable set shrinks when the other takes or delivers the object.
+To design first: both agents choose the same object in the same interval; one picks it up; the other's task stops being
+applicable during its execution: what that agent does; what the robot believes in that interval; whether the robot
+avoids a task the human is recognized to pursue. Smallest instance: the human opening the gate unasked, or supporting
+single steps of a delivery.
+Files: world/ (the human's executor), shared/ (the recognizer, the meta-planner), domains/ (a task assigned to both)
+Reference: design_decisions.md, "T-G: the second domain's rulings", A3, A10; docs/assumptions.md 2.2; TODO-15,
+TODO-105; DESIGN-04
+
+**TODO-148: A human that chooses its own tasks (recorded, T-G records 1, 1 Oct 2026)** [FW]
+A conceptual direction (T-G A10): a human planner in place of the author's priority list. It supplies the choice at the
+one isolated point of the human's executor that A3 requires in V1 (the point a live user supplies in T-V track 2).
+Files: world/ (the human's executor)
+Reference: design_decisions.md, "T-G: the second domain's rulings", A3, A10; roadmap, T-V track 2
+
+**TODO-149: The robot modelling a human who waits for the robot's own action (recorded, T-G records 1, 1 Oct 2026)** [FW]
+A conceptual direction (T-G A10): Q3's alternative M3. Under A4 a human-task hypothesis with no applicable method leaves
+the live set; a model of the human waiting for what the robot will do next is not in V1.
+Files: shared/recognizer.py
+Reference: design_decisions.md, "T-G: the second domain's rulings", A4, A10
+
+**TODO-150: Several observed humans (recorded, T-G records 1, 1 Oct 2026)** [FW]
+A conceptual direction (T-G A10): a passing colleague, a colleague talking to the observed human. docs/assumptions.md 5.2
+allows one observed human for the current contribution.
+Files: mesa_sim/world_state_builder.py (one observed human per robot), shared/ (the recognizer, the projection)
+Reference: design_decisions.md, "T-G: the second domain's rulings", A10; docs/assumptions.md 5.2
+
+**TODO-151: Two generic load checks in shared/ let malformed input through (recorded, T-G records 1, 1 Oct 2026)** [PROPOSED by the design chat, not ruled]
+Found by ccode's dock_loading survey (30 Sept 2026); generic, not domain-specific. (1) `check_task_bindings` accepts a
+binding of a variable the schema does not declare and does not require every parameter to be bound, so
+scenario_s01_02's `?delivery_bay` on `confirm_delivered_pallet` surfaced late, with a misleading message. (2) The `Tree`
+constructor does not check that a step's binding keys are the parameters of the action it calls, so dock_loading's
+`{?pallet: ...}` steps (before build 1) surfaced at decomposition. A proposal; untagged until Hadi rules it.
+Files: shared/types.py (`check_task_bindings`), shared/knowledge.py (`Tree`)
+Reference: design_decisions.md, "T-G: the second domain's rulings", PROPOSALS; TODO-25, TODO-104
