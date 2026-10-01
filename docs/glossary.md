@@ -76,6 +76,11 @@ previous one as entry k's action schemas declare they leave it (`ActionSchema.re
 `moved_object_key` / `moved_to_key`), with the agent where entry k's last segment ends. Built and dropped
 inside one `Projector.project()` call; the live `WorldState` is never written.
 The same derivation advances the human script's symbolic state at load (the load-time replay, `check_script`, §6).
+RULED, NOT BUILT (T-G R2, Hadi, 1 October 2026; framework-wide, a requirement on T-G stage 1's plan): after a movement
+action the successor state represents the agent's resulting **area** (§10) consistently with the area fact the
+environment would emit at the end of that movement, by one definition shared with the environment's state construction.
+Whether the area is declared by the schemas or derived from the position is for stage 1's plan. design_decisions.md,
+"T-G: the second domain's rulings", C1.
 → `shared/projection.py`, `successor_state()`; `docs/design_decisions.md`, "The successor state is
 derived from what the action schemas declare: a delete list and a declared relocation".
 
@@ -581,6 +586,9 @@ included, and ends when the human is free and no open ordinary entry is applicab
 establishes that the replay is complete nor keeps it running). Independent script: every ordinary entry is then closed,
 the replay continues through the closing part, and an entry left open stops the load. Dependent script: the loader
 reports as not replayed the ordinary entries left open and the closing part. Not taken: a replay in authored order.
+SUPERSEDED IN PART (T-G R1, T-G records 4, Hadi, 1 October 2026): "it runs the executor's rule unchanged, repeatable entries included" is withdrawn: the
+replay does not execute repeatable entries (a repeatable entry placed lowest is taken only where the replay ends). The
+rest stands.
 
 **open entry** / **closed entry** (T-G Q12, Q13a, Hadi, 1 October 2026; ruled, not built) — of an entry of the human's
 script. An ordinary entry is open until its task leaves the stack with COMPLETED, ABANDONED or INFEASIBLE, and closed
@@ -594,6 +602,9 @@ ADDED (T-G records 3, Hadi, 1 October 2026): the human skips a repeatable entry 
 present state of the environment; a past completion does not count. For the standby entry: the human is at the standby
 place. V1 authors no other repeatable entry. A repeatable entry carries no events; the loader refuses one that does.
 "Left open" is the word for an entry the executor never began.
+ADDED (T-G R1, T-G records 4, Hadi, 1 October 2026): in V1 every repeatable entry stands below every ordinary entry of the priority list; the loader refuses any
+other placement. The skip rule applies at run time, where the environment maintains the facts; the load-time replay does
+not execute repeatable entries.
 COLLISION: "entry" here is an entry of the human's script (`ScriptEntry`), not the plan's entry (§2, **entry**).
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q12, Q13a, Q13b.
 

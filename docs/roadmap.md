@@ -623,6 +623,12 @@ order is stage 1, stage 1.5 (context knowledge, new), stage 2, track 4, stage 3.
     compared with their present behaviour (expected: no difference; a difference returns to the design chat). The form
     built for A5 admits a fact that no action changes and that is not the state of a movable object (none authored in
     stage 1).
+    R1 and R2 (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3 and C1): every
+    repeatable entry stands below every ordinary entry (the loader refuses another placement), and the load-time replay
+    does not execute repeatable entries (R1); framework-wide, after a movement action the computed successor state
+    represents the agent's resulting area consistently with the area fact the environment would emit, one definition for
+    both; the plan names the shared representation and every consumer of a computed state that decomposes a later task,
+    and proposes the form; acceptance on kitting byte-identical (R2).
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
