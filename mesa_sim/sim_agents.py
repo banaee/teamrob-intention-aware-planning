@@ -39,8 +39,8 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
-from shared.types import (AbstractPlan, AdequacyFinding, BeliefState, Decision, ExecutorState, GroundedAction, Script, Start,
-                          RecognizerLifecycle, TaskInstance, same_task, task_instance_key)
+from shared.types import (AbstractPlan, AdequacyFinding, BeliefState, Decision, ExecutorState, GroundedAction, Script,
+                          ScriptDependence, Start, RecognizerLifecycle, TaskInstance, same_task, task_instance_key)
 from world.record import Record, Snapshot
 from world.human_executor import StackMachine, RunAction, ResumeAction
 
@@ -130,6 +130,7 @@ class HumanAgent(FactoryAgent):
         # apply on the next tick (inject).
         self.machine: Optional[StackMachine] = None
         self.record: Optional[Record] = None
+        self.scheduled_dependence: Optional[ScriptDependence] = None
         self._in_hand: Optional[GroundedAction] = None
         self._suspended: Optional[Suspended] = None
         self._injections: List[Decision] = []
@@ -140,6 +141,7 @@ class HumanAgent(FactoryAgent):
         """The script, checked at load (world/human_executor.check_script),
         before step 0. The planner is on the world's tree."""
         self.record = Record()
+        self.scheduled_dependence = script.dependence
         self.machine = StackMachine(script, planner, self.unique_id,
                                     lambda duration: _parse_duration_to_steps(duration, self.model), self.record)
 
@@ -151,6 +153,20 @@ class HumanAgent(FactoryAgent):
 
     def step(self):
         self._step_stack()
+
+    def end_run(self, tick: int) -> None:
+        """
+        The run's end (T-G A3, Q13b), called once after the headless loop with
+        the run's end tick: for a script that depends on the robot, one
+        StillOpen per entry still open (ordinary, open or on the stack; closing,
+        not closed) into the record, its `[human]` line in the run log and a
+        `[rec] end` line in the stream. An independent script writes nothing.
+        """
+        if self.scheduled_dependence is not ScriptDependence.ON_ROBOT:
+            return
+        for transition in self.machine.state_open(tick):
+            logging.info(f"[human] step={tick} {self.unique_id} {transition!r}")
+        _REC.info(self.record.end_line(tick))
 
     def _idle(self):
         self.current_action = None
@@ -219,7 +235,7 @@ class HumanAgent(FactoryAgent):
                 self._in_hand = nxt.cut.action
                 plan = executor.current_plan
             else:
-                self._idle()
+                self._idle()        # Wait or Idle: the body stands
         before = executor.progress()
         if self._in_hand is not None:
             executor.step(plan=plan, world=world)

@@ -392,6 +392,11 @@ def run_headless():
                                  f"min={_min_separation_over_tick(r0, r1, h0, h1):.2f}")
                     prev_pos[(rid, hid)] = (r1, h1)
 
+    # The run's end (T-G A3): a human whose script depends on the robot states
+    # the entries still open; an independent script writes nothing.
+    for human in model.humans.values():
+        human.end_run(int(model.schedule.steps))
+
     logging.info("[run_mesa] Headless run complete.")
     
     return model

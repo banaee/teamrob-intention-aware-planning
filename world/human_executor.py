@@ -9,8 +9,8 @@ transition rule: which entry begins, which event fires on which anchor, what a
 Start and a Drop do, how a suspended task resumes (the cut action first, then a
 re-expansion in the resulting state), and which outcome a task gets. It expands
 tasks with the planner on the tree and resolves anchors by schema identity. It
-does not run actions: it hands the driver a Next (RunAction, ResumeAction, Idle)
-and the driver reports back (action_done, cut, inject). Two drivers exist:
+does not run actions: it hands the driver a Next (RunAction, ResumeAction, Wait,
+Idle) and the driver reports back (action_done, cut, inject). Two drivers exist:
     - the body, at run time (mesa_sim/sim_agents.HumanAgent): one tick at a
       time, the shared Executor executing the microactions;
     - the symbolic replay, at load (check_script below): each action completes
@@ -28,6 +28,17 @@ the action has ticks left; `at` fires when the action's completion has been
 acknowledged. The machine never reads a clock: the driver hands it the tick for
 the record.
 
+THE PRIORITY FORM (T-G A3, Q12 to Q15). A free human (the stack empty) takes the
+first applicable open ordinary entry of the priority list (the choice among the
+applicable open entries is made at one point, `choose`); with none applicable,
+the first applicable repeatable entry whose task is not complete in the present
+world; else it waits. An ordinary entry is closed when its task leaves the stack
+COMPLETED, ABANDONED or INFEASIBLE (SUSPENDED keeps it open), and is never taken
+again; a repeatable entry is never closed. Once every ordinary entry is closed
+the list is finished: the closing part is taken in written order, the human
+waiting while the next closing entry is not applicable; after it, nothing more
+(Idle). Applicability is the planner's (AdaptivePlanner.is_applicable).
+
 THE RECORD. Every transition is written to the Record (shared/record.py) as it
 happens; the driver writes the per-tick Snapshot. Nothing here reaches the
 robot's mind.
@@ -39,13 +50,13 @@ from typing import Callable, List, Optional, Sequence, Tuple
 from shared.planner import AdaptivePlanner, DecompositionError
 from shared.projection import successor_state
 from world.record import (
-    Beginning, Boundary, Cut, Entered, Left, Outcome, Record, Refused, RefusalReason, Resumed, Snapshot, Started,
-    Unfired, UnfiredReason, Where,
+    Beginning, Boundary, ClosingRef, Cut, Entered, EntryRef, Left, OrdinaryRef, Outcome, Record, Refused,
+    RefusalReason, RepeatableRef, Resumed, Snapshot, Started, StillOpen, Unfired, UnfiredReason, Where,
 )
 from shared.target_resolution import movement_target_position
 from shared.types import (
-    AfterAction, Decision, Drop, DuringAction, Event, GroundedAction, Now, Script, Start, TaskInstance, Trigger,
-    WorldState, task_instance_key,
+    AfterAction, Decision, Drop, DuringAction, Event, GroundedAction, Now, Script, ScriptDependence, ScriptEntry,
+    Start, TaskInstance, Trigger, WorldState, task_instance_key,
 )
 
 
@@ -121,10 +132,12 @@ class Frame:
     in hand. `cut`: it was suspended inside that action; `finishing`: the cut
     action is being completed on resumption, before the re-expansion. `events`
     are the unfired authored events (a decision's task has none); `pending`
-    the ones whose anchor resolved against `actions`.
+    the ones whose anchor resolved against `actions`. `entry`: the script
+    entry it runs, None for a Start's task.
     """
     task: TaskInstance
     events: List[Event]
+    entry: Optional[EntryRef] = None
     actions: Optional[List[GroundedAction]] = None
     index: int = 0
     pending: Optional[List[Pending]] = None
@@ -157,8 +170,15 @@ class ResumeAction(Next):
 
 
 @dataclass(frozen=True)
+class Wait(Next):
+    """The stack is empty and no entry can be taken now: the human waits
+    (the driver stands, as for Idle) and is asked again."""
+
+
+@dataclass(frozen=True)
 class Idle(Next):
-    """The stack is empty and the script has no entry left."""
+    """The stack is empty and every ordinary and closing entry is closed: the
+    human selects nothing more, repeatable entries included."""
 
 
 class StackMachine:
@@ -166,7 +186,10 @@ class StackMachine:
     def __init__(self, script: Script, planner: AdaptivePlanner, agent_id: str,
                  ticks_of: Callable[[str], int], record: Record):
         self.entries = list(script.entries)
-        self.next_entry = 0
+        self.repeatable = list(script.repeatable)
+        self.closing = list(script.closing)
+        self.closed: List[bool] = [False] * len(self.entries)   # per ordinary entry
+        self.closing_done = 0                                   # closing entries closed, in written order
         self.planner = planner
         self.agent_id = agent_id
         self.ticks_of = ticks_of
@@ -193,6 +216,43 @@ class StackMachine:
             return top.actions[top.index], occurrence_of(top.actions, top.index)
         return None
 
+    def finished(self) -> bool:
+        """Whether the priority list is finished: every ordinary entry closed."""
+        return all(self.closed)
+
+    def all_closed(self) -> bool:
+        """Whether every ordinary and every closing entry is closed: with an
+        empty stack, the human selects nothing more."""
+        return self.finished() and self.closing_done == len(self.closing)
+
+    def open_entries(self) -> List[EntryRef]:
+        """The ordinary entries not closed, in written order, then the closing
+        entries not closed. Repeatable entries are never closed and never listed."""
+        return ([OrdinaryRef(i) for i, closed in enumerate(self.closed) if not closed]
+                + [ClosingRef(j) for j in range(self.closing_done, len(self.closing))])
+
+    def entry_task(self, ref: EntryRef) -> TaskInstance:
+        """The task of the entry `ref` names."""
+        if isinstance(ref, RepeatableRef):
+            return self.repeatable[ref.index].task
+        return self._script_entry(ref).task
+
+    def state_open(self, tick: int) -> List[StillOpen]:
+        """Writes one StillOpen per open entry into the record (T-G A3, Q13b:
+        the statement for a script that depends on the robot), and returns them."""
+        still = [StillOpen(tick, self.entry_task(ref), ref) for ref in self.open_entries()]
+        for t in still:
+            self.record.add(t)
+        return still
+
+    def choose(self, candidates: Sequence[OrdinaryRef]) -> OrdinaryRef:
+        """
+        The one choice among the applicable open ordinary entries, given in
+        written order (never empty): the first. The isolated point a later
+        source of choice (a live user, a human planner) replaces (T-G A3, Q2).
+        """
+        return candidates[0]
+
     def cut_due(self, done: int) -> bool:
         """Whether a DuringAction on the action in hand fires at `done` executed ticks."""
         return bool(self._during_at(done))
@@ -211,16 +271,19 @@ class StackMachine:
     # ------------------------------------------------------------------
 
     def next(self, world: WorldState, tick: int) -> Next:
-        """What to run, with nothing in hand: begins entries, expands,
-        resumes, completes, until an action is to run or nothing is left."""
+        """What to run, with nothing in hand: selects and begins entries,
+        expands, resumes, completes, until an action is to run, no entry can be
+        taken now (Wait) or nothing is left (Idle)."""
         while True:
             if not self.stack:
-                if self.next_entry >= len(self.entries):
+                if self.all_closed():
                     return Idle()
-                entry = self.entries[self.next_entry]
-                self.next_entry += 1
-                self.stack.append(Frame(entry.task, list(entry.events)))
-                self.record.add(Entered(tick, entry.task))
+                ref = self._select(world)
+                if ref is None:
+                    return Wait()
+                task = self.entry_task(ref)
+                self.stack.append(Frame(task, self._entry_events(ref), entry=ref))
+                self.record.add(Entered(tick, task))
                 continue
             top = self.stack[-1]
             if top.finishing is not None:
@@ -304,6 +367,43 @@ class StackMachine:
     # internals
     # ------------------------------------------------------------------
 
+    def _select(self, world: WorldState) -> Optional[EntryRef]:
+        """The entry a free human takes in `world`, or None (it waits). The
+        priority list not finished: the applicable open ordinary entries go to
+        choose(); none: the first applicable repeatable entry whose task's
+        completion condition does not hold in `world` (the skip rule). Finished:
+        the next closing entry, if applicable."""
+        if not self.finished():
+            candidates = [OrdinaryRef(i) for i, entry in enumerate(self.entries)
+                          if not self.closed[i] and self.planner.is_applicable(entry.task, self.agent_id, world)]
+            if candidates:
+                chosen = self.choose(candidates)
+                if chosen not in candidates:
+                    raise ValueError(f"choose() returned {chosen!r}, not one of {candidates!r}")
+                return chosen
+            for i, entry in enumerate(self.repeatable):
+                if (self.planner.is_applicable(entry.task, self.agent_id, world)
+                        and not self.planner.is_complete(entry.task, self.agent_id, world)):
+                    return RepeatableRef(i)
+            return None
+        entry = self.closing[self.closing_done]
+        if self.planner.is_applicable(entry.task, self.agent_id, world):
+            return ClosingRef(self.closing_done)
+        return None
+
+    def _entry_events(self, ref: EntryRef) -> List[Event]:
+        """The entry's authored events; a repeatable entry carries none."""
+        if isinstance(ref, RepeatableRef):
+            return []
+        return list(self._script_entry(ref).events)
+
+    def _script_entry(self, ref: EntryRef) -> ScriptEntry:
+        if isinstance(ref, OrdinaryRef):
+            return self.entries[ref.index]
+        if isinstance(ref, ClosingRef):
+            return self.closing[ref.index]
+        raise TypeError(f"{ref!r} names no ordinary or closing entry")
+
     def _during_at(self, done: int) -> List[Pending]:
         if not self.stack:
             return []
@@ -350,10 +450,15 @@ class StackMachine:
         return True
 
     def _pop(self, frame: Frame, outcome: Outcome, tick: int) -> None:
-        """`frame` leaves the stack with `outcome`; its unfired events are
-        recorded; the frame below, if any, is resumed."""
+        """`frame` leaves the stack with `outcome`; its entry, if ordinary or
+        closing, is closed; its unfired events are recorded; the frame below,
+        if any, is resumed."""
         assert self.stack[-1] is frame
         self.stack.pop()
+        if isinstance(frame.entry, OrdinaryRef):
+            self.closed[frame.entry.index] = True
+        elif isinstance(frame.entry, ClosingRef):
+            self.closing_done += 1
         self.record.add(Left(tick, frame.task, outcome))
         for event in frame.events:
             self.record.add(Unfired(tick, frame.task, event, UnfiredReason.NEVER_REACHED))
@@ -445,15 +550,25 @@ def check_script(script: Script, planner: AdaptivePlanner, world: WorldState, ag
     included. An event that cannot fire (an anchor absent, ambiguous or out of
     range, a during outside its action, an anchor never reached, a Drop with
     nothing to drop, a Start refused) and a task infeasible in the symbolic
-    state are a ScriptError. Returns the record of
-    the replay, one snapshot per instruction.
+    state are a ScriptError.
+
+    Under the priority form (T-G A3, Q13b and R1) the machine is built without
+    the repeatable entries, and the replay ends when the human is free and no
+    open ordinary entry is applicable (Wait), or after the closing part (Idle).
+    An entry then left open, never begun, is not infeasible: for an
+    independent script it is a ScriptError naming it; for a script that
+    depends on the robot one StillOpen per ordinary entry left open and per
+    closing entry not taken is written into the replay's record, and the
+    script loads. Returns the record of the replay, one snapshot per
+    instruction.
     """
     record = Record()
-    machine = StackMachine(script, planner, agent_id, ticks_of, record)
+    replayed = Script(script.entries, closing=script.closing, dependence=script.dependence)
+    machine = StackMachine(replayed, planner, agent_id, ticks_of, record)
     step = 0
     while True:
         nxt = machine.next(world, step)
-        if isinstance(nxt, Idle):
+        if isinstance(nxt, (Idle, Wait)):
             break
         if isinstance(nxt, RunAction):
             action, occurrence, done = nxt.action, nxt.occurrence, 0
@@ -488,4 +603,10 @@ def check_script(script: Script, planner: AdaptivePlanner, world: WorldState, ag
                 if isinstance(t, (Unfired, Refused)) or (isinstance(t, Left) and t.outcome is Outcome.INFEASIBLE)]
     if problems:
         raise ScriptError("the script cannot run as written: " + "; ".join(repr(t) for t in problems))
+    left_open = machine.open_entries()
+    if left_open:
+        if script.dependence is ScriptDependence.INDEPENDENT:
+            raise ScriptError("the script cannot run as written: left open: "
+                              + "; ".join(f"{ref!r} {task_instance_key(machine.entry_task(ref))}" for ref in left_open))
+        machine.state_open(step)
     return record

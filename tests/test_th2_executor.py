@@ -81,7 +81,7 @@ def run(m, max_steps=400):
     h = m.humans[H]
     for _ in range(max_steps):
         m.step()
-        if not h.machine.stack and h.machine.next_entry >= len(h.machine.entries):
+        if not h.machine.stack and h.machine.all_closed():
             return h
     pytest.fail("the script did not finish")
 
@@ -413,11 +413,14 @@ def test_ill_typed_tasks_in_a_script_are_load_errors():
         load("env_layout_01", "scenario_s01_01", Script([st("soon")]))
 
 
-def test_infeasible_at_load_is_an_error():
+def test_an_entry_never_applicable_at_load_is_left_open():
+    # T-G A3 (Q13b): an entry the executor never began is left open, not
+    # infeasible; for an independent script an error. INFEASIBLE at load (a
+    # task begun that cannot continue): tests/test_tg_script.py.
     tree, carry = _carry_tree()
     m = load("env_layout_01", "scenario_s01_01", Script([deliver("item_3")]))
     task = TaskInstance(schema=carry, bindings={Var("?item"): Const("item_3"), Var("?target"): Const("kitting_table_0")})
-    with pytest.raises(ValueError, match="infeasible"):
+    with pytest.raises(ValueError, match="left open: entry=0 carry_to"):
         check_script(Script([task]), AdaptivePlanner(knowledge=tree), build_world_state(m), H,
                      lambda d: TICKS[d], lambda a, b: [b])
 

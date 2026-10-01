@@ -55,7 +55,7 @@ def run_script(m, max_steps=600):
     h = m.humans[H]
     for _ in range(max_steps):
         m.step()
-        if not h.machine.stack and h.machine.next_entry >= len(h.machine.entries):
+        if not h.machine.stack and h.machine.all_closed():
             return h.record
     pytest.fail("the script did not finish")
 

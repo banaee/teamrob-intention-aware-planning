@@ -153,6 +153,58 @@ class Left(Transition):
 
 
 @dataclass(frozen=True)
+class EntryRef:
+    """Which entry of the script a frame runs (T-G A3): its part and its index
+    there. Not constructed directly: an OrdinaryRef, a RepeatableRef or a
+    ClosingRef. A Start's task runs on no entry."""
+    index: int
+
+    def __post_init__(self):
+        if type(self) is EntryRef:
+            raise TypeError("EntryRef is not constructed directly: write OrdinaryRef, RepeatableRef or ClosingRef")
+
+
+@dataclass(frozen=True)
+class OrdinaryRef(EntryRef):
+    """An ordinary entry of the priority list (Script.entries[index]): taken at
+    most once, closed when its task leaves the stack."""
+
+    def __repr__(self):
+        return f"entry={self.index}"
+
+
+@dataclass(frozen=True)
+class RepeatableRef(EntryRef):
+    """A repeatable entry (Script.repeatable[index]): never closed."""
+
+    def __repr__(self):
+        return f"repeatable={self.index}"
+
+
+@dataclass(frozen=True)
+class ClosingRef(EntryRef):
+    """An entry of the closing part (Script.closing[index]): taken in written
+    order once the priority list is finished, closed as an ordinary entry."""
+
+    def __repr__(self):
+        return f"closing={self.index}"
+
+
+@dataclass(frozen=True)
+class StillOpen(Transition):
+    """An entry still open where the script stops being followed (T-G A3,
+    Q13b): at the end of the load-time replay of a script that depends on the
+    robot (an ordinary entry left open, a closing entry not taken), and at the
+    end of its run (an ordinary or closing entry not closed). Never written for
+    an independent script."""
+    task: TaskInstance
+    entry: EntryRef
+
+    def __repr__(self):
+        return f"open:{task_instance_key(self.task)}"
+
+
+@dataclass(frozen=True)
 class Refused(Transition):
     decision: Decision
     reason: RefusalReason
@@ -194,3 +246,11 @@ class Record:
         progress = f"{snap.done}/{snap.total}" if snap else "0/0"
         events = ",".join(repr(t) for t in self.transitions_at(tick)) or "-"
         return f"[rec] step={tick} stack={stack} action={action} progress={progress} events={events}"
+
+    def end_line(self, tick: int) -> str:
+        """The `[rec] end` line of a run of a script that depends on the robot
+        (T-G A3): the entries still open at the run's end, `tick`, from its
+        StillOpen transitions; `-` when none is."""
+        still = [t for t in self.transitions_at(tick) if isinstance(t, StillOpen)]
+        keys = ";".join(task_instance_key(t.task) for t in still) or "-"
+        return f"[rec] end step={tick} open={keys}"

@@ -19,7 +19,8 @@ PURPOSE:
 
     THE EXIT WALK: the authoring convention's terminal walk out of the
     workspace (design_decisions.md, "SCENARIO-AUTHORING CONVENTION") is not
-    counted in the scenario coverage. It is the script's last entry when its
+    counted in the scenario coverage. It is the script's last entry (the last
+    closing entry where the script has a closing part, T-G A3) when its
     task is a HumanOnlyTask whose only goal binding is a landmark and that
     decomposes to exactly one movement action to that landmark (every method:
     one action step, whose action declares a movement target bound to the
@@ -82,7 +83,7 @@ def scenario_composition(script: Script, robot: ObservingRobot) -> Tuple[Composi
     coverage reads the coverage results of the same tasks, less the exit walk.
     """
     tasks = script.tasks()
-    events = [ev for entry in script.entries for ev in entry.events]
+    events = [ev for entry in script.entries + script.closing for ev in entry.events]
     composition = Composition(
         task_classes=frozenset(_task_class(t.schema) for t in tasks),
         decisions=frozenset(type(ev.decision) for ev in events),
@@ -99,12 +100,14 @@ def _task_class(schema: TaskSchema) -> Type[TaskSchema]:
 
 
 def _exit_walk(script: Script) -> Optional[TaskInstance]:
-    """The last entry's task when it is the convention's exit walk: a
-    HumanOnlyTask whose only goal binding is a landmark and that decomposes to
-    exactly one movement action to that landmark, carrying no events."""
-    if not script.entries:
+    """The last entry's task (the last closing entry's where the script has a
+    closing part) when it is the convention's exit walk: a HumanOnlyTask whose
+    only goal binding is a landmark and that decomposes to exactly one movement
+    action to that landmark, carrying no events."""
+    last_part = script.closing or script.entries
+    if not last_part:
         return None
-    last: ScriptEntry = script.entries[-1]
+    last: ScriptEntry = last_part[-1]
     if last.events or not isinstance(last.task.schema, HumanOnlyTask):
         return None
     goal = goal_bindings(last.task)

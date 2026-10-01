@@ -882,33 +882,101 @@ class ScriptEntry:
         return f"{task_instance_key(self.task)}{list(self.events) if self.events else ''}"
 
 
+@dataclass(frozen=True)
+class RepeatableEntry:
+    """
+    A repeatable entry of the priority list (T-G A3, Q12): the human may take
+    it any number of times, and skips it while its task's completion condition
+    holds in the present state of the environment. It carries no events (an
+    event fires once per entry): the form has no events field and no `at` /
+    `during`. The standby entry is V1's one repeatable entry.
+    """
+    task: TaskInstance
+
+    def __post_init__(self):
+        if not isinstance(self.task, TaskInstance):
+            raise TypeError(f"a repeatable entry holds a TaskInstance and carries no events; got {self.task!r}")
+
+    def __repr__(self):
+        return f"repeatable:{task_instance_key(self.task)}"
+
+
+class ScriptDependence(Enum):
+    """
+    The author's declaration whether a script depends on the robot (T-G A3,
+    Q13b). It concerns the load-time validation and the run-end statement only,
+    never the human's run-time selection, and it does not state that the script
+    is valid or will complete.
+    """
+    INDEPENDENT = "independent"    # the replay is exact: an entry left open stops the load
+    ON_ROBOT = "on_robot"          # the loader reports the entries left open and loads
+
+
 class Script:
     """
-    The human's script (T-H): its entries in order. A plain TaskInstance is an
-    entry with no events. The only form of AgentConfig.scheduled_tasks (the C1
-    list form was deleted in T-H3).
+    The human's script (T-H; the priority form, T-G A3): a priority list and a
+    closing part. A plain TaskInstance is an entry with no events. The only
+    form of AgentConfig.scheduled_tasks (the C1 list form was deleted in T-H3).
+
+    The priority list `entries` holds ordinary entries (TaskInstance or
+    ScriptEntry) and RepeatableEntry; every repeatable entry stands below every
+    ordinary one. Stored split: `entries` the ordinary entries (each a
+    ScriptEntry, in written order), `repeatable` the repeatable ones, `closing`
+    the closing part (ordinary in form, taken in written order once every
+    ordinary entry of the list is closed; never a repeatable entry).
+    `dependence`: ScriptDependence, INDEPENDENT by default.
     """
 
-    def __init__(self, entries: Sequence["Union[TaskInstance, ScriptEntry]"]):
+    def __init__(self, entries: Sequence["Union[TaskInstance, ScriptEntry, RepeatableEntry]"],
+                 closing: Sequence["Union[TaskInstance, ScriptEntry]"] = (),
+                 dependence: ScriptDependence = ScriptDependence.INDEPENDENT):
         self.entries: List[ScriptEntry] = []
+        self.repeatable: List[RepeatableEntry] = []
         for e in entries:
-            if isinstance(e, TaskInstance):
-                self.entries.append(ScriptEntry(e, ()))
-            elif isinstance(e, ScriptEntry):
-                self.entries.append(e)
-            else:
-                raise TypeError(f"script entry {e!r}: not a TaskInstance or a ScriptEntry")
+            if isinstance(e, RepeatableEntry):
+                self.repeatable.append(e)
+                continue
+            if self.repeatable:
+                raise ValueError(f"script entry {e!r}: an ordinary entry below the repeatable entry "
+                                 f"{self.repeatable[0]!r}; every repeatable entry stands below every ordinary entry")
+            self.entries.append(_script_entry(e))
+        self.closing: List[ScriptEntry] = []
+        for e in closing:
+            if isinstance(e, RepeatableEntry):
+                raise ValueError(f"closing entry {e!r}: the closing part holds no repeatable entry")
+            self.closing.append(_script_entry(e))
+        if not isinstance(dependence, ScriptDependence):
+            raise TypeError(f"a script's dependence is a ScriptDependence, not {dependence!r}")
+        self.dependence = dependence
 
     def tasks(self) -> List[TaskInstance]:
-        """Every task the script names: each entry's, and each Start's."""
+        """Every task the script names: each entry's, and each Start's; then
+        each repeatable entry's, then each closing entry's and its Starts'."""
         out: List[TaskInstance] = []
         for entry in self.entries:
+            out.append(entry.task)
+            out.extend(ev.decision.task for ev in entry.events if isinstance(ev.decision, Start))
+        out.extend(r.task for r in self.repeatable)
+        for entry in self.closing:
             out.append(entry.task)
             out.extend(ev.decision.task for ev in entry.events if isinstance(ev.decision, Start))
         return out
 
     def __repr__(self):
-        return f"Script({self.entries})"
+        parts = [repr(self.entries + self.repeatable)]
+        if self.closing:
+            parts.append(f"closing={self.closing}")
+        if self.dependence is not ScriptDependence.INDEPENDENT:
+            parts.append(f"dependence={self.dependence.value}")
+        return f"Script({', '.join(parts)})"
+
+
+def _script_entry(e: "Union[TaskInstance, ScriptEntry]") -> ScriptEntry:
+    if isinstance(e, TaskInstance):
+        return ScriptEntry(e, ())
+    if isinstance(e, ScriptEntry):
+        return e
+    raise TypeError(f"script entry {e!r}: not a TaskInstance or a ScriptEntry")
 
 
 @dataclass

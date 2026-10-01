@@ -40,6 +40,7 @@ from shared.types import (
     check_task_destinations, destination_derivations, task_instance_key,
 )
 from world.human_executor import check_script
+from world.record import ClosingRef, OrdinaryRef, RepeatableRef, StillOpen
 from world.composition import scenario_composition
 from world.queries import ObservingRobot, coverage
 # from domains.kitting.registry import register_kitting_domain
@@ -596,6 +597,8 @@ class SimModel(model.Model):
         load-time replay (world/human_executor.check_script): every anchor
         against the sequential expansion, events and resumptions included, by
         the same stack machine the agent runs; then handed to the HumanAgent.
+        A script that depends on the robot loads with the entries the replay
+        left open, printed as one `[replay] ... not replayed:` line (T-G A3).
         Expanded with the world's tree. Then one `[coverage]` line per script
         entry for each robot observing the human, and its [scenario-coverage]
         line (_log_coverage).
@@ -611,16 +614,21 @@ class SimModel(model.Model):
             if agent_cfg.agent_type != "human":
                 continue
             try:
-                check_script(agent_cfg.scheduled_tasks, planner, world, agent_cfg.agent_id, ticks_of, walk)
+                replay = check_script(agent_cfg.scheduled_tasks, planner, world, agent_cfg.agent_id, ticks_of, walk)
             except ValueError as e:
                 raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
+            not_replayed = [t for t in replay.transitions if isinstance(t, StillOpen)]
+            if not_replayed:
+                logger.info(f"[replay] {agent_cfg.agent_id} not replayed: "
+                            + " ".join(f"{t.entry!r} {task_instance_key(t.task)}" for t in not_replayed))
             self.humans[agent_cfg.agent_id].load_stack(agent_cfg.scheduled_tasks, planner)
             self._log_coverage(scenario, agent_cfg)
 
     def _log_coverage(self, scenario: ScenarioConfig, human_cfg) -> None:
         """
         Which script entries the observing robots' models cover (T-H4): one
-        line per entry per robot observing the human, the entry's task and each
+        line per entry per robot observing the human (`entry=i`, then
+        `repeatable=i` and `closing=j`, T-G A3), the entry's task and each
         of its events' started tasks (an interruption is judged on its own),
         each with its coverage (world/queries.coverage), in the run log beside
         the [IR] lines it is read against. Information for the reader: no run
@@ -632,11 +640,15 @@ class SimModel(model.Model):
                      if a.agent_type == "robot" and human_cfg.agent_id in a.observes]
         for robot_id in observers:
             robot = self.observing[robot_id]
-            for i, entry in enumerate(human_cfg.scheduled_tasks.entries):
-                judged = [f"{task_instance_key(entry.task)}={coverage(entry.task, robot)!r}"]
+            script = human_cfg.scheduled_tasks
+            lines = ([(OrdinaryRef(i), e.task, e.events) for i, e in enumerate(script.entries)]
+                     + [(RepeatableRef(i), r.task, ()) for i, r in enumerate(script.repeatable)]
+                     + [(ClosingRef(j), e.task, e.events) for j, e in enumerate(script.closing)])
+            for ref, task, events in lines:
+                judged = [f"{task_instance_key(task)}={coverage(task, robot)!r}"]
                 judged += [f"start:{task_instance_key(ev.decision.task)}={coverage(ev.decision.task, robot)!r}"
-                           for ev in entry.events if isinstance(ev.decision, Start)]
-                logger.info(f"[coverage] {human_cfg.agent_id} {robot_id} entry={i} " + " ".join(judged))
+                           for ev in events if isinstance(ev.decision, Start)]
+                logger.info(f"[coverage] {human_cfg.agent_id} {robot_id} {ref!r} " + " ".join(judged))
             composition, scenario_coverage = scenario_composition(human_cfg.scheduled_tasks, robot)
             logger.info(f"[scenario-coverage] {human_cfg.agent_id} {robot_id} "
                         f"scenario_coverage={scenario_coverage.value} {composition!r}")
