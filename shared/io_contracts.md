@@ -606,12 +606,19 @@ trajectory. Design: `docs/design_decisions.md`, "T-H: the human behaviour model"
 primitives, `Stay`, `expand` / `resolve_script`, provenance, the deviation vocabulary and `check_work_order`, was
 deleted in T-H3.)
 
-**The written form.** A `Script` (`shared/types.py`): an ordered list of fully bound `TaskInstance`s of the tree, each
+**The written form.** A `Script` (`shared/types.py`): a priority list of fully bound `TaskInstance`s of the tree, each
 an entry with its events. An event is `Event(Trigger, Decision)`: `Trigger` is `AfterAction(action, occurrence)`,
 `DuringAction(action, time, occurrence)` or `Now` (live only); `Decision` is `Start(task)` or `Drop`. Authored as
 `task.at(action, task | drop, occurrence=)` and `task.during(action, time, task | drop, occurrence=)`; `action` is an
 `ActionSchema` object of the task's decomposition, `occurrence` the 0-based occurrence when the method repeats it.
-`AgentConfig` refuses any other type (`TypeError`); the default is an empty `Script`. Kitting's call forms
+`AgentConfig` refuses any other type (`TypeError`); the default is an empty `Script`.
+The priority form (T-G A3, Q12 to Q15; stage 1, step 5): `Script(entries, closing=(), dependence=ScriptDependence.INDEPENDENT)`.
+`entries` holds the ordinary entries and `RepeatableEntry(task)` (no events, no `at` / `during`), every repeatable entry
+below every ordinary one; `closing` the closing part (no repeatable entry); both placements are refused at construction.
+Stored split: `Script.entries` (the ordinary entries, `ScriptEntry`), `Script.repeatable`, `Script.closing`;
+`Script.tasks()` lists the repeatable and closing tasks after the entries'. `ScriptDependence` (`INDEPENDENT`, `ON_ROBOT`)
+is the author's declaration whether the script depends on the robot; it concerns the load-time check and the run-end
+statement only. Kitting's call forms
 (`domains/kitting/script.py`): `deliver_item(item, table=None)`, `coffee_break(machine)`, `ac_activation(switch)`,
 `go_to(landmark)`, `stand(duration)`, `go_to_and_stand(landmark, duration)`; a determined parameter is bound only when
 stated.
@@ -619,9 +626,15 @@ stated.
 **At load** (`SimModel`): every task the script names (`Script.tasks()`: each entry's and each `Start`'s) is type-checked
 against the run's layout and setup (`check_task_bindings`; a duration through the body's parser); the destination check
 (`check_task_destinations`) applies to the assigned tasks, never to the script. Then the load-time replay
-(`world/human_executor.check_script`) drives the stack machine symbolically through the whole script, the state
+(`world/human_executor.check_script`) drives the stack machine symbolically through the script, the state
 advancing by `shared.projection.successor_state()`: every anchor is checked against the sequential expansion, events
-and resumptions included; an unfired or refused event, or an infeasible task, is a load error naming the scenario.
+and resumptions included; an unfired or refused event, or a task begun that ends INFEASIBLE, is a load error naming the
+scenario. The replay runs without the repeatable entries and ends when the human is free and no open ordinary entry is
+applicable, or after the closing part. An entry then left open (never begun): for an independent script a load error
+naming it; for a script that depends on the robot one `StillOpen` per ordinary entry left open and per closing entry
+not taken in the replay's record, the line `[replay] <human> not replayed: entry=i <task> ... closing=j <task>`, and the
+script loads. `[coverage]` prints `entry=i`, `repeatable=i` and `closing=j`; the exit walk is read on the last closing
+entry where the script has a closing part.
 Nothing ties the assigned tasks to the script at load (the record's `unperformed` query, T-H4, `world/queries.py`).
 
 **Landmarks.** A layout may declare objects of type `landmark` (`shared.types.LANDMARK_TYPE`); only a `HumanOnlyTask`
@@ -630,7 +643,14 @@ may type a parameter as one (`Tree`'s constructor), so no hypothesis binds one a
 **The human executor.** `HumanAgent` is the body-side driver of the stack machine (`world/human_executor.StackMachine`):
 one action at a time handed to the shared `Executor` as a one-action plan, its target resolved at that moment; the
 next action starts on the tick after the acknowledgement of the last, so no per-task completion tick is spent; an
-empty stack stands. The record (`world/record.py`) is streamed as one `[rec]` line per tick to
+empty stack stands. A free human takes the first applicable open ordinary entry (`AdaptivePlanner.is_applicable`; the
+choice among the applicable ones is `StackMachine.choose`, the first by default); with none, the first applicable
+repeatable entry whose task's completion condition does not hold in the present world; else it waits (`Wait`). An
+ordinary or closing entry is closed when its task leaves the stack COMPLETED, ABANDONED or INFEASIBLE; SUSPENDED keeps
+it open. Once every ordinary entry is closed the closing part is taken in written order (waiting on an entry not
+applicable), and after it nothing more (`Idle`). At the run's end (headless) a script that depends on the robot states
+the entries still open: one `StillOpen` per entry in the record, a `[human] ... open:<task>` line and a
+`[rec] end step=n open=<task keys>` line; an independent script writes nothing. The record (`world/record.py`) is streamed as one `[rec]` line per tick to
 `logs/run_<timestamp>.rec`, and its transitions as `[human]` lines in the run log. `current_task` stays `None` for
 the human. The robot's mind learns the human's task completions from the world.
 
