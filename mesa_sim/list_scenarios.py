@@ -1,7 +1,7 @@
 """
 mesa_sim/list_scenarios.py
 
-Lists every registered kitting scenario with its composition and its scenario
+Lists every registered scenario of every domain with its composition and its scenario
 coverage (world/composition.scenario_composition), one line per human and
 observing robot, on each of its declared reference layouts (the declared
 pairs, T-L) with its declared setup and the domain's declared task model.
@@ -20,25 +20,41 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))   # makes mesa_fork importable directly
 
 from mesa_sim.sim_model import SimModel
-from domains.kitting.registry import domain_config
+from domains.kitting.registry import domain_config as kitting_config
+from domains.dock_loading.registry import domain_config as dock_config
 from world.composition import scenario_composition
+
+# Every domain, as run_mesa.py's DOMAIN_REGISTRY names them (not imported from
+# there: importing run_mesa opens a run's log files).
+DOMAINS = {
+    "kitting":      kitting_config,
+    "dock_loading": dock_config,
+}
 
 
 def main():
+    for domain_name, domain_config in DOMAINS.items():
+        list_domain(domain_name, domain_config)
+
+
+def list_domain(domain_name, domain_config):
+    """One line per scenario, layout and observing pair, prefixed by the
+    domain: scenario ids are unique within a domain only."""
     for scenario_id, scenario in domain_config["scenarios"].items():
         for layout_id in scenario.reference_layouts:
             model = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
                              task_model_schemas=domain_config["task_model"],
+                             state_declarations=domain_config["states"],
                              layout_path=domain_config["layouts"][layout_id],
                              setup_path=domain_config["setups"][scenario.setup])
             pairs = [(h, r) for r in scenario.agents if r.agent_type == "robot"
                      for h in scenario.agents if h.agent_type == "human" and h.agent_id in r.observes]
             if not pairs:
-                print(f"{scenario_id} {layout_id} no robot observes a human")
+                print(f"{domain_name} {scenario_id} {layout_id} no robot observes a human")
             for human_cfg, robot_cfg in pairs:
                 composition, scenario_coverage = scenario_composition(human_cfg.scheduled_tasks,
                                                                       model.observing[robot_cfg.agent_id])
-                print(f"{scenario_id} {layout_id} {human_cfg.agent_id} {robot_cfg.agent_id} "
+                print(f"{domain_name} {scenario_id} {layout_id} {human_cfg.agent_id} {robot_cfg.agent_id} "
                       f"scenario_coverage={scenario_coverage.value} {composition!r}")
 
 

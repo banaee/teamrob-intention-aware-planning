@@ -663,10 +663,6 @@ class SimModel(model.Model):
     def get_objects_by_type(self, type: str) -> List[str]:
         return self._objects_by_type.get(type, [])
 
-    def get_movable_objects(self) -> Dict[str, SimObject]:
-        """Return all items — used by world_state_builder."""
-        return {oid: o for oid, o in self.objects.items() if o.type == "item"}
-
     def get_item_location(self, item_id: str) -> Optional[Tuple[float, float]]:
         item = self.objects.get(item_id)
         if item is None:
