@@ -354,7 +354,7 @@ A standing convention for every build or refactor session.
 - If a rule above blocks progress, stop and report why; that report is the deliverable.
 - Conceptual changes need Hadi's ruling (Hadi, 1 Oct 2026, standing): the recognizer's scoring and admission, the
   meta-planner's candidate evaluation and cost, the projection's semantics, the planner's method selection and the
-  trigger set are not changed at the conceptual level without Hadi's ruling. A change to `shared/`, `core/` or `world/`
+  trigger set are not changed at the conceptual level without Hadi's ruling. A change to `shared/` or `world/`
   is domain-agnostic and named in an approved plan. Otherwise stop and report before changing anything.
 
 ## Cost discipline
