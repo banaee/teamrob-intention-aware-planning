@@ -6,6 +6,16 @@ domain, then puts T-G's design questions one at a time. The repo is authoritativ
 the repo disagree, the repo wins. Statements marked "(verify)" were read from the repo during the previous
 chat but must be re-verified by ccode before the new chat relies on them.
 
+SUPERSEDED IN PART (T-G records 1, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings"). The T-G
+design is ruled. Under B1 the robot replaces the driver (an automated forklift) and the observed human is the warehouse
+staff member who receives the delivery, so "a driver unloading pallets" (§4) and "the driver's work order" (§5.1, §5.2)
+are wrong; the foreseeable candidates of §5.1 (the phone call, talking to the dock worker) belong to the driver's role,
+which the robot holds, and do not apply to the observed human; "work order" was superseded by "assigned tasks" at T-H.
+§3's "`shared/` unchanged" reads: nothing domain-specific enters `shared/` (A3, A4, A5, A7, A8 change `shared/` or
+`world/` framework-wide). §4: TODO-25's error was raised at model construction (`observe_initial`), not on the first
+tick, and T-G build 1 removed it; TODO-81 was done in T-H1 (e571eed); LIMIT-02 and LIMIT-03 are answered by A3, B2 and
+B5; CLAUDE.md no longer marks dock_loading as deferred.
+
 ## 1. Working style (binds every reply in the new chat)
 
 - The design chat settles WHAT and WHY; Claude Code (ccode) owns HOW and runs everything. Design before

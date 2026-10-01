@@ -36,6 +36,8 @@ Relevant (read as needed):
   one module per setup (`scenarios_sNN.py`); the registry discovers all three (`domains/discovery.py`) — no hand
   list; `env_layout6.json` and `env_layout99.json` stay at the domain root, unsplit and unregistered;
   `mesa_sim/sim_agents.py` `HumanAgent`: the human's body-side driver of the stack machine (T-H2)
+- `domains/dock_loading/`: the second domain, T-G's (open; its rulings in design_decisions.md, "T-G: the second
+  domain's rulings", part B dock_loading only; its state after build 1 in part C, C3)
 - `configs/experiment.yaml`, `configs/costs.yaml`, `mesa_sim/mesa_configs.yaml`
 - `docs/glossary.md`: the terms and their one meaning each. Read it every session, before the
   design record. Use its terms in the code, in the documents and in reports.
@@ -57,7 +59,6 @@ Skip in the current phase; read only if the task explicitly requires it:
 - `mesa_sim/mesa_fork/`: vendored Mesa 3.0; treat as an installed library. Look inside only if
   a traceback points there.
 - `ros_sim/`: paused.
-- `domains/dock_loading/`: deferred.
 - `scripts/`: not part of the run path.
 - `logs/`: except logs you produced in the current task.
 
@@ -69,8 +70,11 @@ Layering: four homes
 - `world/` is the world's side (T-H2): simulator-agnostic, use-case-agnostic code about what the human is and
   does (the human's executor and stack machine, the executor's record). It imports `shared/` only: no body, no use case. The robot's mind never reads it.
 - `domains/` holds the use cases (kitting, dock_loading): schemas, layouts, setups, scenarios.
-- `mesa_sim/` and `ros_sim/` are the bodies. A body may import from `shared/`, `world/` and `domains/`;
-  it drives the human's executor and executes the robot's decisions.
+- `mesa_sim/` and `ros_sim/` are the simulators (T-G A2; glossary §10): each implements the environment (the room, its
+  objects and their true states, belonging to no agent) and the agents' bodies. A simulator may import from `shared/`,
+  `world/` and `domains/`; it drives the human's executor and executes the robot's decisions. (Older records say "the
+  bodies" or "the embodiment layer" for it; the robot's body is the part that builds its WorldState and carries out its
+  decisions; the Mesa class `RobotAgent` still holds mind parts and body parts together, TODO-131.)
 - `shared/` holds no simulator constant and no unit-scale default. Whatever depends on the body
   (speed, arrival radius, execution latency, spatial resolution) is supplied by the embodiment
   layer and passed in.
@@ -236,10 +240,25 @@ Decisions
   and interactive simulator: track 1 the viewer, which was T-E; track 2 Phase 7); the T-D tail (track 3b TODO-145,
   track 4 TODO-140, the 4D detour strategy); T-S (ROS/PRIEST, Phase 6) last. Next: T-G's design, in a new design chat
   from a handoff.
+  V1 and FW (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A1): V1, the first complete
+  version, holds T-G, T-F, T-V tracks 1 and 2, track 3b (TODO-145) and track 4 in a reduced form (monitored areas,
+  A8, TODO-140), placed after T-G's stage 2; FW (not designed, ruled or built within V1) holds the 4D detour, T-S and
+  the conceptual directions TODO-147 to TODO-150. Open TODOs carry [V1] or [FW] beside their status when next touched by
+  Hadi's ruling; untagged means not yet ruled.
+  T-G is OPEN: its design is ruled (30 Sept and 1 Oct 2026; the entry above, by scope: part A framework-wide, some of
+  it changing `shared/` or `world/` when built, each with kitting byte-identical or no decision changed as acceptance;
+  part B dock_loading only; part C the stages), and build 1 is in (30 Sept 2026; 56e674e, 6e29c15, 62ebc4e: form-only
+  repairs, the viewing fixture scenario_s01_03; scenario_s01_01 and _02 still fail at load by intent). Stages (what
+  each first builds: the entry's C1): 1 the basic domain, with the forms' catch-up (C3) and the framework-wide A3 (the
+  script's priority form, `world/`), A4 (liveness by applicability, `shared/`), A5 (object states and designations) and
+  A9 (areas), each accepted on kitting byte-identical; then the IR test-bed and the MPB on dock_loading; 2
+  `store_pallet`, the gate opened on request, the office door's state, A7 (TODO-16); then track 4 (A8); 3 check-in and
+  check-out. Before each stage's plan the design chat and Hadi agree its layout and setup. Next:
+  stage 1's layout and setup, then its plan.
   Not to be
-  started unasked: T-G, T-F, T-V, the T-D tail and T-S, i.e. the second domain, Phase 5
+  started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
-  strategy) and Phase 6 (ROS / PRIEST execution).
+  strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. `full_reorder` (B3.B) is built (`_replan_orderings()`, T-B2b / T-B2c): orderings are ranked
   on their realized cost, `realize()` running one minimal-shift search per entry (T-B Q2), and the hold sent
@@ -255,6 +274,8 @@ Decisions
   SUPERSEDED FOR T-L'S STAGES ONLY (26 Sept 2026): kitting and dock_loading migrate together, so T-L's stages may
   touch `domains/dock_loading/`; it must still import and run (design_decisions.md, "Layouts, setups and scenarios",
   ruling 8).
+  SUPERSEDED (T-G, 1 Oct 2026): dock_loading is no longer deferred; it is T-G's domain, touched by T-G tasks only, and
+  it must still import.
 - `domains/kitting/env_layout99.json` is the old `env_layout1` with obstacles, kept for later and
   not registered; it stays unsplit (T-L stage 1).
 - The code is the source of truth. Docs are maintained but can lag. Do not change code to match

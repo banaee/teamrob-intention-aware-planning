@@ -381,6 +381,14 @@ paragraph, not in the alphabet.
   paper, not before the demonstration.
 - Next: T-G's design, in a new design chat from a handoff.
 
+V1 AND FW (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
+the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
+T-F; T-V track 1 and track 2; the T-D tail's track 3b (TODO-145). FW (future work, not designed, ruled or built within
+V1): the 4D detour; T-S; the conceptual directions TODO-147 to TODO-150. The order block above is superseded in part:
+track 4 leaves the T-D tail for its place inside T-G (after stage 2); the 4D detour and T-S leave the queue for FW. T-G
+is open: its design is ruled (30 September and 1 October 2026) and build 1 is in (30 September 2026). Next: the layout
+and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
+
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
 - **T-B — B3.B (`full_reorder`): a candidate is an ordering of the pool.** The head of the argmin
@@ -538,6 +546,8 @@ paragraph, not in the alphabet.
   history. The T-D tail runs after T-V: track 3b, consequential activation under conflict (TODO-145); track 4, the
   workspace boundary and departure (TODO-140, TODO-131); the 4D detour strategy (TODO-70, TODO-15), the planner's
   remedy for the freezing robot (Phase 4D below).
+  SUPERSEDED IN PART (T-G A1, A8, 1 October 2026): track 4, in its reduced form (monitored areas), is placed after T-G's
+  stage 2 (TODO-140); the 4D detour is FW. Track 3b stays after T-V, in V1.
 - **T-E — Demonstration.** The viewer shows belief, admitted projection, decision, hold, refusal; the run
   set covers switch and hold (scenario_s05_01 / scenario_s05_02), a two-table ordering, a change of mind, unmodelled behaviour; plain against
   realized, stop on, prior off. After T-B, T-C and T-D, so that it shows ordering, change of mind and
@@ -562,6 +572,10 @@ paragraph, not in the alphabet.
   READING (recorded): track 3b follows T-F, in the T-D tail, so an evaluation before 3b measures without knowing that
   the adaptive branches fire under conflict; it cannot test behaviour in which the human projection conflicts with the
   robot's plan.
+  T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A8, A11): track 4's reduced form now comes before T-F (after T-G's stage 2); the scope
+  line above (no genuine departure) is not revised by that ruling. A layout authored so that routes cross shows that
+  the robot adapts when an interaction exists, not how often interactions occur: T-F varies the placement and takes no
+  interaction rate from crossing setups alone (TODO-144).
 - **T-G — The second domain in Mesa: dock_loading** (revised by Hadi, 30 September 2026; before, "Later, in this
   order: a second domain in Mesa; 4D (detour); ROS": 4D moved to the T-D tail, ROS to T-S).
   `domains/dock_loading/` against `shared/` unchanged, executed by the Mesa body. Purpose: test whether the
@@ -574,12 +588,46 @@ paragraph, not in the alphabet.
   - The IR test-bed, then the MPB, run on it; findings classified by the case classification of
     `docs/assumptions.md` and under MPB-4.
   - A shared ruling reopens on design grounds only; nothing domain-specific enters `shared/`.
+  SUPERSEDED IN PART (T-G records 1, 1 October 2026): "the driver's work order" and the foreseeable candidates (the phone
+  call, talking to the dock worker) are wrong under B1: the robot replaces the driver (an automated forklift), the
+  observed human is the warehouse staff member who receives the delivery, and those candidates belong to the driver's
+  role, which the robot holds; "work order" was superseded by "assigned tasks" at T-H. "The gate state as a method guard"
+  reads: the gate open or closed, a state declared in the setup, opened on request (B5). "TODO-81 with them": TODO-81 was
+  done in T-H1 (e571eed). "`shared/` unchanged": the rulings change `shared/` and `world/` where they are framework-wide
+  (A3, A4, A5, A7, A8), each with its acceptance on kitting; nothing domain-specific enters `shared/`.
+  RULED (Hadi, 30 September and 1 October 2026; design_decisions.md, "T-G: the second domain's rulings"; the parts keep their scope: A framework-wide, B
+  dock_loading only, C staging). BUILD 1 (30 September 2026; 56e674e, 6e29c15, 62ebc4e): the form-only repairs and the
+  viewing fixture scenario_s01_03; scenario_s01_01 and _02 still fail at load by intent (C2). The stages, all in V1;
+  before each stage's plan the design chat and Hadi agree its layout and setup:
+  - Stage 1, the basic domain: the robot delivers and returns (B11); the human scans, takes the two breaks, steps aside
+    to the standby place; the gate is declared open; the office door has no state yet. The IR test-bed, then the MPB.
+    Its catch-up list is C3 (the domain's state after build 1).
+    BUILDS: the catch-up of dock_loading's forms to kitting's (C3); A3, the human's script form (`world/`), with the
+    standby entry; A4, liveness by applicability (`shared/`); A5, generic object states and designations (used for the
+    scanned state, `is_empty` and the destination); A6, the perception assumption; A9, the declared areas and the fact
+    that an agent is in an area; B1 to B4, B8, B9, B11; B6 with `office_break` reduced (the office door has no state, the
+    human passes it as a plain point; the office observed); B10, the room (whether the stores and the freezer are
+    already in stage 1's layout is not ruled); the IR test-bed on dock_loading, then the MPB. A3, A4, A5 and A9 change
+    code outside the domain; each is accepted on kitting by the maintained sets staying byte-identical.
+  - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
+    run, TODO-16 with the stepwise delivery (A7).
+    BUILDS: B7 with the second designation; B5, the gate opened on request and the office door's state; A7, TODO-16,
+    after the MPB's first run on dock_loading.
+  - After stage 2: track 4 in its reduced form (A8, TODO-140).
+  - Stage 3: check-in and check-out (B12), with the two optional items (a deadline on the robot's waiting; a pallet
+    that blocks another in the truck).
+  The order inside a stage is for that stage's plan; the mapping states content only (C1). No stage: A1, A2, A10, A11 and
+  B12's items "not taken" (nothing is built for them).
 - **T-V — Viewer, interface and interactive simulator** (ruled by Hadi, 30 September 2026), one task with tracks.
   - Track 1: T-E as originally defined, the viewer for pre-loaded scripts, showing belief, admitted projection,
     decision, hold, refusal and the script's events; demonstration only, nothing enters the mind.
   - Track 2: Phase 7 (below): live events through the human executor's injection path (`inject`, T-H2), the export
     as a script, the replay rule, later the context stream.
+    T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
+    its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
+    fact, if wanted, is designed here as the same entry point as the live user's click.
 - **T-S — ROS/PRIEST** (ruled by Hadi, 30 September 2026; future work, removed from T-G, at the end of the queue).
+  FW (T-G A1, 1 October 2026): not designed, ruled or built within V1.
   - TODO-75: the ROS guide and `env_layout99`.
   - The paused `ros_sim/`, including its stale `BeliefState` construction (flagged at G-build; first recorded here):
     `ros_sim/framework_HRI/framework_HRI/planner_2.py` passes 5 of `BeliefState`'s 11 fields, without those added
@@ -597,6 +645,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
 
 **Phase 4D — Low-level execution adaptation**
 - 30 September 2026: the detour strategy is in the T-D tail, the PRIEST side in T-S (the plan from T-A, its order).
+- 1 October 2026: both are FW (T-G A1).
 - Executor continues to handle within-action adaptation (detour, pause) guided by execution hints in AbstractPlan
 - No structural change to executor interface; hints richer than current skeleton
 - DESIGN-13's realization estimator is PARTLY PULLED FORWARD into 4C by the wait-decision
