@@ -5764,6 +5764,13 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
     vocabulary, and it still needs C's condition.
     Terms (glossary §6): open entry, closed entry. The names in the code and the authoring form of the repeatable kind
     are left to stage 1's plan.
+    ADDED (Hadi, 1 October 2026, on the T-G records 2 flags; recorded in T-G records 3), the skip rule of a repeatable entry: the human skips a repeatable entry while its task's
+    completion condition holds in the present state of the environment. The task defines that condition. A past
+    completion does not count. For the standby entry: the human is at the standby place. V1 authors no other repeatable
+    entry. Reason: one general rule, not a rule for the standby entry alone; a rule on the present state lets a
+    repeatable task be taken again after its condition has ended.
+    ADDED (the same ruling), events on a repeatable entry: a repeatable entry carries no events; the loader refuses one
+    that does. Reason: an event fires once per script entry, and a repeatable entry can be taken several times.
   - Q13a, an entry whose task ends with INFEASIBLE.
     The entry is closed, as with COMPLETED and ABANDONED. SUSPENDED keeps it open. A later applicable state does not
     reopen an ordinary entry.
@@ -5775,6 +5782,9 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   - Q13b, what the load-time check claims.
     INFEASIBLE names only the outcome of a task that was selected and could not continue. An entry that was never
     selected in the load-time replay is "left open", not infeasible.
+    CORRECTED (Hadi, 1 October 2026, on the T-G records 2 flags; recorded in T-G records 3), wording only, no change of behaviour: INFEASIBLE is the outcome of a task that the
+    executor began and could not expand or continue, whether the task is a script entry or was started by an event.
+    "Left open" stays the word for an entry the executor never began.
     The author declares that a script depends on the robot. The default is independent.
     - Independent: an entry left open at the replay's end stops the load, as today.
     - Dependent: the loader reports the entries left open and loads. The run's record states the entries still open at
@@ -5788,6 +5798,16 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
     robot's tasks (an entry applicable only in an intermediate state, such as "open the gate" between the request and
     the opening, would be reported wrongly).
     The declaration's form is left to stage 1's plan.
+    ADDED (Hadi, 1 October 2026, on the T-G records 2 flags; recorded in T-G records 3), the load-time replay under the priority form:
+    - The replay runs the executor's rule unchanged, repeatable entries included. Reason: A3 requires the replay of an
+      independent script to be exact, and the human's position after a standby walk changes the walks that follow.
+    - The replay ends when the human is free and no open ordinary entry is applicable. A repeatable entry is not used to
+      establish that the replay is complete and does not keep it running.
+    - Independent script: every ordinary entry is then closed, the replay continues through the closing part, and an
+      entry left open stops the load.
+    - Dependent script: the loader reports as not replayed the ordinary entries left open and the closing part.
+    - Not taken: a replay of the ordinary entries in their authored order. Reason: under A3 the human takes the first
+      applicable open entry, so the authored order is not the sequence a run produces.
   - Q14, when the list is finished, and the closing part.
     The script has a priority list (ordinary and repeatable entries) and a closing part.
     The priority list is finished when every ordinary entry is closed. The human then takes the entries of the closing
@@ -5799,6 +5819,12 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
     take it before the work; and a repeatable entry would move the human again after the end.
     Not taken: the closing walk as an ordinary entry; no closing act for a script that depends on the robot.
     Terms (glossary §6): closing part, closing entry, finished (said of the priority list).
+    ADDED (Hadi, 1 October 2026, on the T-G records 2 flags; recorded in T-G records 3), a closing entry that is not applicable: the human waits. The closing part keeps its
+    written order; the human does not take the next closing entry before the present one has ended. Reason: the same
+    rule as in the priority list when nothing is applicable.
+    NOTE (T-G records 3, not a ruling): the exit-walk exemption (glossary §7, **scenario coverage**; `docs/assumptions.md`
+    1.1) is defined on "the script's last entry". Where a script has a closing part it reads "the last closing entry".
+    Stage 1's plan carries the consequence for the code (`world/composition.py`).
   - Q15, placing a foreseeable task or an event when the order of the work tasks is not fixed.
     An event stays attached to its entry and needs no new rule.
     A foreseeable task written as an entry is an ordinary entry under the plain priority rule: the human takes it once,
@@ -6003,6 +6029,9 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   `docs/assumptions.md` 1.1 (a script ends with the human leaving the workspace) reads for dock_loading: the script ends
   with the walk to the desk. B10's "landmarks for the exit walk" reads: the desk landmark. Kitting is unchanged. T-F's
   scope line on the exit walk (TODO-144) is a kitting statement; dock_loading's ending is for T-F's own design.
+  NOTE (T-G records 3, 1 October 2026; not a ruling): the desk is a landmark in stage 1, so no task of the robot's task
+  model names it and the robot's mind holds no hypothesis for the walk to the desk, as for kitting's exit walk. Whether
+  the desk becomes a fixed object is stage 3's question.
 
 PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 
