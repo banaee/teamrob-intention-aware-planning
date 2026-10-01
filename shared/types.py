@@ -20,7 +20,7 @@ class SpatialContext:
     """Spatial information about an observed action."""
     position: Tuple[float, float]
     orientation: float
-    zone: Optional[str] = None
+    area: Optional[str] = None
 
 
 @dataclass
@@ -173,7 +173,7 @@ class AgentState:
     Consumed by: shared/planner.py, shared/meta_planner.py
     """
     agent_id: str
-    current_zone: str
+    current_area: str
     holding: Optional[str] = None  # item_id or None
     current_task: Optional[str] = None  # task_id or None
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -185,7 +185,7 @@ class AgentState:
 
 @dataclass(frozen=True)
 class Var:
-    """A formal planning variable. e.g. Var('?item'), Var('?zone')."""
+    """A formal planning variable. e.g. Var('?item'), Var('?area')."""
     name: str  # must start with '?'
 
     def __str__(self):
@@ -210,7 +210,7 @@ class Predicate:
     """
     A logical predicate with typed arguments.
     args are Term objects — either Var (schema-level) or Const (grounded).
-    e.g. Predicate('at', (Var('?agent'), Var('?zone')))         # schema
+    e.g. Predicate('at', (Var('?agent'), Var('?area')))         # schema
          Predicate('at', (Const('robot_0'), Const('zone_SE')))  # grounded
     """
     name: str
@@ -250,9 +250,9 @@ class WorldState:
     agent_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {agent_id: (x, y)}
     object_locations: Dict[str, str] = field(default_factory=dict)  # {item_id: location_id} 
     predicates: Set[Predicate] = field(default_factory=set)  # e.g., "path_clear", "human_at_table"
-    object_zones: Dict[str, str] = field(default_factory=dict)  # {item_id: zone_id}
+    object_areas: Dict[str, str] = field(default_factory=dict)  # {item_id: area_id}
     object_home_container: Dict[str, str] = field(default_factory=dict)     # {item_id: container_id} — static per scenario, set once at load, 
-                                                                            # never updated as item moves (unlike object_locations/object_zones)
+                                                                            # never updated as item moves (unlike object_locations/object_areas)
     object_destination: Dict[str, str] = field(default_factory=dict)        # {item_id: destination_id} — static per scenario, set once at load
                                                                             # from the layout's "destination" (kitting: the item's designated table);
                                                                             # read through the planner's derived-var lookup "destination_of"
@@ -366,14 +366,14 @@ class MethodSchema:
     guards hold in the current WorldState.
     guards=[] means unconditionally applicable.
     derived_vars: optional mapping of Var names to lookup functions for dynamic grounding.
-    e.g. {"?item_zone": ("zone_of", "?item")} means ?item_zone is derived from the zone of ?item at grounding time.
+    e.g. {"?item_area": ("area_of", "?item")} means ?item_area is derived from the area of ?item at grounding time.
     """
     name: str
     parameters: List[Var]
     guards: List[ConditionSchema]       # empty = unconditional
     steps: List[Step]                   # ordered decomposition
     derived_vars: Dict[str, tuple] = field(default_factory=dict)
-    # {var_name: (lookup_fn, source_var_name)} e.g. {"?item_zone": ("zone_of", "?item")}
+    # {var_name: (lookup_fn, source_var_name)} e.g. {"?item_area": ("area_of", "?item")}
 
 @dataclass
 class TaskSchema:
@@ -500,7 +500,7 @@ class GroundedAction:
     in WorldState.predicates directly, no string parsing.
     """
     action_name: str
-    bindings: Dict[str, str]            # {var_name: concrete_value} e.g. {'?zone': 'zone_SE'}
+    bindings: Dict[str, str]            # {var_name: concrete_value} e.g. {'?area': 'zone_SE'}
     completion_predicate: Optional[Predicate]     # fully grounded, ready for set membership check (or None if completion is ProcessCompletion)
     schema: ActionSchema            # back-reference for decomposer
 

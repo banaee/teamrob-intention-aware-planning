@@ -6,7 +6,7 @@
     "units": "cm",
     "notes": "Mid-run blocking fixture (scenario_60 / _61, F47; for D2's evaluation). The robot's route from the kitting table T (0, 50) to its first shelf, shelf_1 (0, -750), runs straight south along x = 0. The human walks in from the east along the aisle y = -550 and stops at wander_0 (0, -550), ON that route, for the coffee_break schema's PT60S (30 ticks) - the occupation is scheduled, unmodelled (no coffee machine on the layout, so no hypothesis explains a stop there) and finite; then the human walks east to wander_1 and stays. Two alternative shelves at the SAME distance from T (900 cm, so the alternative's own cost is identical in both variants and shelf_1 at 800 cm is picked first in both): shelf_2 beside the blocked shelf (45 deg west of its bearing) and shelf_3 across the table (opposite bearing). Only the robot's pool differs between the two scenarios. shelf_5 / item_5 is the human's ASSIGNED delivery, never executed: it lies on the human's approach line beyond wander_0 and is delivered last (after the rest), so prior-on the recognizer projects the assigned delivery and the stop is a deviation inside the window; prior-off shelf_2 (2 deg off the heading), shelf_5 (0 deg) and shelf_1 (21 deg) split the belief below theta and nothing is projected. No obstacles, no coffee machine, no ac switch."
   },
-  "zones": [
+  "areas": [
     {
       "id": "zone_NW",
       "bounds": {
@@ -79,7 +79,7 @@
         200,
         100
       ],
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "notes": "Shared delivery sink. The robot starts 50 cm south of it, on its route to shelf_1."
     },
     {
@@ -94,7 +94,7 @@
         100
       ],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "The blocked goal. 800 cm due south of T; the robot's cheapest task from its start (t=0 cost ~80 ticks vs ~92 / ~97 for shelf_2 / shelf_3). Robot arrival point (0, -720)."
     },
     {
@@ -108,7 +108,7 @@
         10,
         10
       ],
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "The occupied place: on the T -> shelf_1 route, 200 cm short of the shelf. The human stops 30 cm east of it at (30, -550); the robot's next step south is refused from y = -500 (step end within 50 cm and closing). No task enumerates 'waypoint'."
     },
     {
@@ -123,7 +123,7 @@
         100
       ],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Alternative BESIDE the blocked shelf (scenario_60): 900 cm from T at 45 deg west of shelf_1's bearing. From the block point (0, -500) the switch-and-return detour is ~262 cm (~13 ticks) beyond what the task costs from the table."
     },
     {
@@ -138,7 +138,7 @@
         100
       ],
       "slots": 2,
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "notes": "Alternative ACROSS the table (scenario_61): 900 cm from T on the opposite bearing. From the block point the detour is ~1070 cm (~53 ticks): the robot must pass the table twice more."
     },
     {
@@ -153,7 +153,7 @@
         100
       ],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "The human's assigned shelf, on its approach line beyond wander_0; visited last in scenario_60/61 (the human stops for its break, rests, and delivers item_5 only after the robot is done in the current runs). Prior-on this is the projected task the stop deviates from."
     },
     {
@@ -167,7 +167,7 @@
         10,
         10
       ],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "The human's rest spot after the break: east along the same aisle, off every robot route."
     },
     {

@@ -91,7 +91,7 @@ Core algorithms reason over **discrete micro-actions** and **symbolic world pred
 class SpatialContext:
     position: Tuple[float, float]
     orientation: float
-    zone: Optional[str] = None
+    area: Optional[str] = None
 
 @dataclass
 class ActionContext:
@@ -185,7 +185,7 @@ and `tails` exist for evaluation and for the rest of G.
 @dataclass
 class AgentState:
     agent_id: str
-    current_zone: str
+    current_area: str
     holding: Optional[str] = None          # item_id or None
     current_task: Optional[str] = None     # task_id or None
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -198,7 +198,7 @@ class WorldState:
     object_locations: Dict[str, str] = {}                        # {object_id: location_id}, symbolic;
                                                                  # a carried object maps to its holder's agent id
     predicates: Set[Predicate] = set()
-    object_zones: Dict[str, str] = {}                            # {item_id: zone_id}
+    object_areas: Dict[str, str] = {}                            # {item_id: area_id}
     object_home_container: Dict[str, str] = {}                   # {item_id: original container_id}; static per
                                                                  # scenario, for the deliver_with_return guard
     object_destination: Dict[str, str] = {}                      # {item_id: destination_id}; static per run,
@@ -243,12 +243,12 @@ re-implement it. Two consumers:
 `planner.py` and `executor.py` stay symbolic.
 
 **Predicate naming convention (unchanged):**
-- `in_zone(agent_id, zone_id)` — coarse zone-level context
+- `in_area(agent_id, area_id)` — coarse area-level context
 - `at(agent_id, object_id)` — fine-grained object proximity, used by executor completion checking
 - `holding(agent_id, item_id)` — agent is carrying item
 - `obj_at(item_id, location_id)` — item rests at location
 
-`in_zone` and `at` are intentionally distinct predicates. Conflating them caused a semantic
+`in_area` and `at` are intentionally distinct predicates. Conflating them caused a semantic
 mismatch where `move_to` completion was never satisfied.
 
 **Design rule:** core planners only use symbolic predicates; geometry stays in simulators, subject to the
@@ -264,7 +264,7 @@ scoped exception above (the recognizer's excess-path scoring and the Projector's
 @dataclass
 class GroundedAction:
     action_name: str
-    bindings: Dict[str, str]               # {var_name: concrete_value}, e.g. {'?zone': 'zone_SE'}
+    bindings: Dict[str, str]               # {var_name: concrete_value}, e.g. {'?area': 'zone_SE'}
     completion_predicate: Optional[Predicate]  # None if completion is ProcessCompletion (§1.9)
     schema: ActionSchema                   # back-reference for decomposer
 ```
@@ -1347,7 +1347,7 @@ guards hold, a derived var without a value — so callers can treat "unscorable 
 a schema error, which still raises plainly.
 
 **Lookups** (`_resolve_lookups`), shared by a task's `determined_parameters` (resolved before method
-selection) and a method's `derived_vars` (after it): `zone_of` → `world.object_zones`, `home_container_of` →
+selection) and a method's `derived_vars` (after it): `area_of` → `world.object_areas`, `home_container_of` →
 `world.object_home_container`, `destination_of` → `world.object_destination` (T-B1a). Precedence: only
 `destination_of` yields to a binding the task instance already carries (a scripted deviation keeps its
 table); the others always derive. A `destination_of` lookup with no value raises `ValueError`, not
@@ -1430,7 +1430,7 @@ domains/kitting/
     scenarios/         # ScenarioConfig objects — typed Python, no YAML; a package, one module per
                        # setup (scenarios_sNN.py: every scenario whose setup is env_setup_NN and no other)
     script.py          # the call forms of the human's script: deliver_item(...), go_to(...), stand(...), ... §1.12
-    layouts/           # the layouts — the room: space, zones, fixed objects with positions (one file per layout)
+    layouts/           # the layouts — the room: space, areas, fixed objects with positions (one file per layout)
     setups/            # the setups — the shift: the movable objects, each with its home container,
                        # its designated destination and its other per-object state (one file per setup,
                        # env_setup_NN.json; the file stem is the id)
@@ -1482,7 +1482,7 @@ a declared relocation".
 
 - Maintains perfect synchronous ground truth
 - Builds `Observation` each step from human agent state (`detected_microaction` known exactly)
-- Builds `WorldState` each step from Mesa world — emits `in_zone` and `at` predicates
+- Builds `WorldState` each step from Mesa world — emits `in_area` and `at` predicates
 - Calls cognitive loop each step: `obs_builder → recognizer → meta_planner
   (evaluate_triggers/update, §2.2) → planner → executor`
 - Builds one `ExecutorState` per step and passes the same instance to both
@@ -1506,7 +1506,7 @@ a declared relocation".
   produced under: `gate_strategy`, `cost_strategy`, `separation_stop`, θ, ρ, `min_separation` and its
   ratio × rate (TODO-78); a run option (`--gate_strategy`, `--cost_strategy`, `--separation_stop`,
   `configs/experiment.yaml`) is a run fact, never a scenario fact
-- Loads the run's layout (space, zones, fixed objects) and setup (movable objects) and validates the
+- Loads the run's layout (space, areas, fixed objects) and setup (movable objects) and validates the
   triple before anything is built (T-L, stage 1): a layout entry has a position and no home container, a
   setup entry has one; every home container the setup names is an object of the layout; every agent's
   `start_position` lies inside the space's bounds (the body's own `out_of_bounds`, half-open; objects are
@@ -1577,7 +1577,7 @@ Simulators MUST ensure:
 1. `Observation.detected_microaction` is never empty
 2. `BeliefState.distribution` sums to 1.0 (±1e-6), except when `lifecycle` is EXHAUSTED (the pins alone, §1.2)
 3. `BeliefState.most_likely` is a key in `distribution`, or `None` when `lifecycle` is EXHAUSTED
-4. `WorldState.predicates` contains at minimum `in_zone` predicates for all active agents
+4. `WorldState.predicates` contains at minimum `in_area` predicates for all active agents
 5. `AbstractPlan.actions` is a non-empty list of fully grounded `GroundedAction` objects
 6. No `Var` objects remain in any `GroundedAction.bindings` or `completion_predicate`
 7. Every hypothesis key in `BeliefState.distribution` names a task schema of the robot's `TaskModel`

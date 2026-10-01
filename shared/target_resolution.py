@@ -4,7 +4,7 @@ shared/target_resolution.py
 PURPOSE:
     One answer to "where is the thing this action targets?", shared by every
     reader of positions in the cognitive layer — the projector (segments) and
-    the recognizer (chord target, zone) — so that neither carries its own
+    the recognizer (chord target, area) — so that neither carries its own
     weaker copy of the lookup (I1 audit §4).
 
     Resolution has two halves, both in shared/:

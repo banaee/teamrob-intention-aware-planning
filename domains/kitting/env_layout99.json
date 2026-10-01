@@ -5,7 +5,7 @@
     "name": "Kitting Domain Layout 99 (layout 1 with obstacles, unregistered)",
     "units": "cm"
   },
-  "zones": [
+  "areas": [
     {
       "id": "zone_SE",
       "bounds": {
@@ -80,7 +80,7 @@
         200,
         100
       ],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "orientation_deg": 0
     },
     {
@@ -95,7 +95,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "orientation_deg": -90
     },
     {
@@ -110,7 +110,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "orientation_deg": -90
     },
     {
@@ -125,7 +125,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "orientation_deg": -90
     },
     {
@@ -140,7 +140,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "orientation_deg": -90
     },
     {
@@ -155,7 +155,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "orientation_deg": -90
     },
     {
@@ -170,7 +170,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "orientation_deg": -90
     },
     {
@@ -185,7 +185,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "orientation_deg": 0
     },
     {
@@ -200,7 +200,7 @@
         100
       ],
       "slots": 4,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "orientation_deg": 0
     },
         {
@@ -310,7 +310,7 @@
         100,
         100
       ],
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "orientation_deg": 0
     },
     {
@@ -324,7 +324,7 @@
         50,
         50
       ],
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "orientation_deg": 0
     },
     {

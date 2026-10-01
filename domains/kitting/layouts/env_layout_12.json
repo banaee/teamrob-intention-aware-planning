@@ -6,49 +6,49 @@
     "units": "cm",
     "notes": "The meta-planner test-bed's room (MPB; design_decisions.md, \"The meta-planner test-bed (MPB)\", MPB-2; analysis/mpb/README.md). The human's side is the 10/11 pattern (env_layout_10 / _11) translated by (0, -200): kitting_table_0, shelf_1, shelf_2, coffee_machine_0 and corner_SE keep their relative arrangement and their distances to the south and east walls, and 400 cm is added to the north for the robot's work. The recognizer reads distances only, so a TB script run here has TB's trajectory, translated. Robot side: an NE work area (kitting_table_1 with shelf_4, shelf_7, shelf_8, shelf_9), the crossing (shelf_5 and kitting_table_3 on the perpendicular bisector of the diagonal kitting_table_0 - shelf_1, crossing it at its midpoint (-210, 0)), the NW pair for the occupied target (shelf_3 -> kitting_table_2, shelf_6 -> kitting_table_4, carries of equal length, the second walk 70 cm longer on the same bearing), and two landmarks for the walker and the stand (door_N, spot_E). Authored for the physical facts MPB-2 needs, not for any expected number; the geometric derivations are in analysis/mpb/authoring.md. No door on the walls, no AC switch, no obstacle."
   },
-  "zones": [
+  "areas": [
     { "id": "zone_NW", "bounds": { "x_min": -500, "x_max": 0, "y_min": 0, "y_max": 700 }, "label": "northwest" },
     { "id": "zone_NE", "bounds": { "x_min": 0, "x_max": 500, "y_min": 0, "y_max": 700 }, "label": "northeast" },
     { "id": "zone_SW", "bounds": { "x_min": -500, "x_max": 0, "y_min": -700, "y_max": 0 }, "label": "southwest" },
     { "id": "zone_SE", "bounds": { "x_min": 0, "x_max": 500, "y_min": -700, "y_max": 0 }, "label": "southeast" }
   ],
   "env_objects": [
-    { "id": "kitting_table_0", "type": "kitting_table", "position": [0, 220], "size": [200, 100], "zone": "zone_NE",
+    { "id": "kitting_table_0", "type": "kitting_table", "position": [0, 220], "size": [200, 100], "area": "zone_NE",
       "notes": "The human's table: env_layout_10's (0, 420) translated by (0, -200)." },
-    { "id": "shelf_1", "type": "shelf", "position": [-420, -220], "size": [100, 100], "slots": 2, "zone": "zone_SW",
+    { "id": "shelf_1", "type": "shelf", "position": [-420, -220], "size": [100, 100], "slots": 2, "area": "zone_SW",
       "notes": "The human's west shelf (10/11 pattern, translated)." },
-    { "id": "shelf_2", "type": "shelf", "position": [420, -220], "size": [100, 100], "slots": 2, "zone": "zone_SE",
+    { "id": "shelf_2", "type": "shelf", "position": [420, -220], "size": [100, 100], "slots": 2, "area": "zone_SE",
       "notes": "The human's east shelf (10/11 pattern, translated)." },
-    { "id": "coffee_machine_0", "type": "coffee_machine", "position": [-170, -600], "size": [50, 50], "zone": "zone_SW",
+    { "id": "coffee_machine_0", "type": "coffee_machine", "position": [-170, -600], "size": [50, 50], "area": "zone_SW",
       "notes": "Near the south wall, west of centre (10/11 pattern, translated)." },
-    { "id": "corner_SE", "type": "landmark", "position": [450, -650], "size": [20, 20], "zone": "zone_SE",
+    { "id": "corner_SE", "type": "landmark", "position": [450, -650], "size": [20, 20], "area": "zone_SE",
       "notes": "The exit walk's target, 50 cm in from the south and east walls (10/11 pattern, translated)." },
 
-    { "id": "kitting_table_1", "type": "kitting_table", "position": [60, 640], "size": [100, 50], "zone": "zone_NE",
+    { "id": "kitting_table_1", "type": "kitting_table", "position": [60, 640], "size": [100, 50], "area": "zone_NE",
       "notes": "The robot's NE table. Every NE route is at least 280 cm from every human path of the control (scenario_s10_06)." },
-    { "id": "shelf_4", "type": "shelf", "position": [460, 640], "size": [60, 60], "zone": "zone_NE",
+    { "id": "shelf_4", "type": "shelf", "position": [460, 640], "size": [60, 60], "area": "zone_NE",
       "notes": "Robot NE shelf; its carry to kitting_table_1 runs along y = 640, the route scenario_s11_02's walker crosses at x = 300." },
-    { "id": "shelf_7", "type": "shelf", "position": [460, 360], "size": [60, 60], "zone": "zone_NE", "notes": "Robot NE shelf." },
-    { "id": "shelf_8", "type": "shelf", "position": [260, 360], "size": [60, 60], "zone": "zone_NE", "notes": "Robot NE shelf." },
-    { "id": "shelf_9", "type": "shelf", "position": [260, 640], "size": [60, 60], "zone": "zone_NE", "notes": "Robot NE shelf." },
+    { "id": "shelf_7", "type": "shelf", "position": [460, 360], "size": [60, 60], "area": "zone_NE", "notes": "Robot NE shelf." },
+    { "id": "shelf_8", "type": "shelf", "position": [260, 360], "size": [60, 60], "area": "zone_NE", "notes": "Robot NE shelf." },
+    { "id": "shelf_9", "type": "shelf", "position": [260, 640], "size": [60, 60], "area": "zone_NE", "notes": "Robot NE shelf." },
 
-    { "id": "shelf_5", "type": "shelf", "position": [20, -220], "size": [60, 60], "zone": "zone_SE",
+    { "id": "shelf_5", "type": "shelf", "position": [20, -220], "size": [60, 60], "area": "zone_SE",
       "notes": "The crossing's shelf (scenario_s10_02): about 318 cm from the midpoint (-210, 0) of the diagonal kitting_table_0 - shelf_1, on its perpendicular bisector." },
-    { "id": "kitting_table_3", "type": "kitting_table", "position": [-440, 220], "size": [100, 50], "zone": "zone_NW",
+    { "id": "kitting_table_3", "type": "kitting_table", "position": [-440, 220], "size": [100, 50], "area": "zone_NW",
       "notes": "The crossing's table (scenario_s10_02): about 318 cm from the diagonal's midpoint on the other side; the carry shelf_5 -> kitting_table_3 crosses the human's diagonal at (-210, 0)." },
 
-    { "id": "shelf_3", "type": "shelf", "position": [-420, 620], "size": [60, 60], "zone": "zone_NW",
+    { "id": "shelf_3", "type": "shelf", "position": [-420, 620], "size": [60, 60], "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the shelf of the delivery to kitting_table_2." },
-    { "id": "shelf_6", "type": "shelf", "position": [-420, 690], "size": [60, 60], "zone": "zone_NW",
+    { "id": "shelf_6", "type": "shelf", "position": [-420, 690], "size": [60, 60], "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the alternative's shelf, 70 cm beyond shelf_3 on the same bearing from the robot's start." },
-    { "id": "kitting_table_2", "type": "kitting_table", "position": [-270, 620], "size": [100, 50], "zone": "zone_NW",
+    { "id": "kitting_table_2", "type": "kitting_table", "position": [-270, 620], "size": [100, 50], "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the table the human stands at; 153 cm from shelf_3's arrival point." },
-    { "id": "kitting_table_4", "type": "kitting_table", "position": [-270, 690], "size": [100, 50], "zone": "zone_NW",
+    { "id": "kitting_table_4", "type": "kitting_table", "position": [-270, 690], "size": [100, 50], "area": "zone_NW",
       "notes": "Occupied target (scenario_s11_01): the free table; 153 cm from shelf_6's arrival point; its carry passes no closer than 70.5 cm to kitting_table_2's centre." },
 
-    { "id": "door_N", "type": "landmark", "position": [300, 690], "size": [20, 20], "zone": "zone_NE",
+    { "id": "door_N", "type": "landmark", "position": [300, 690], "size": [20, 20], "area": "zone_NE",
       "notes": "Walker (scenario_s11_02): the end of the straight run north across the robot's route y = 640." },
-    { "id": "spot_E", "type": "landmark", "position": [380, 610], "size": [20, 20], "zone": "zone_NE",
+    { "id": "spot_E", "type": "landmark", "position": [380, 610], "size": [20, 20], "area": "zone_NE",
       "notes": "Stander (scenario_s11_02): 30 cm below the robot's route y = 640, within min_separation of a robot passing it." }
   ]
 }

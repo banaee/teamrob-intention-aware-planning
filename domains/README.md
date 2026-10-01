@@ -46,11 +46,11 @@ an authoring convention the code does not check.
 
 A run is a triple (layout, setup, scenario) plus the run options.
 
-**Layout — the room** (`layouts/env_layout<N>.json`): the space, its zones, and the fixed objects
+**Layout — the room** (`layouts/env_layout<N>.json`): the space, its areas, and the fixed objects
 with their positions (tables, shelves, machines, switches, landmarks; a fixed container
 such as a truck belongs here too). No movable object and no agent. Coordinates use a
-center-origin system `(0,0)` that matches the simulator grid directly. Zones use the
-convention `zone_<descriptor>`. Top-level keys: `"space"`, `"zones"`, `"env_objects"`.
+center-origin system `(0,0)` that matches the simulator grid directly. Areas use the
+convention `zone_<descriptor>`. Top-level keys: `"space"`, `"areas"`, `"env_objects"`.
 Every fixed object has a `"position"` and never an `"initial_container"`.
 
 **Setup — the shift** (`setups/env_setup_NN.json`; the final serial ids since T-L stage 2,
@@ -87,9 +87,9 @@ The framework uses a three-level hierarchy:
 
 **Two important predicate families — do not conflate them:**
 - `at(agent, object)` — fine-grained object proximity, used by the executor to check action completion.
-- `in_zone(agent, zone)` — coarse zone-level context, used only by IR for context weighting.
+- `in_area(agent, area)` — coarse area-level context, used only by IR for context weighting.
 
-Using `at` with a zone argument (instead of an object) is a silent bug: the executor will never see the completion predicate satisfied and the agent gets stuck.
+Using `at` with an area argument (instead of an object) is a silent bug: the executor will never see the completion predicate satisfied and the agent gets stuck.
 
 ---
 

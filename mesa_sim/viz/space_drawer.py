@@ -9,7 +9,7 @@ WHAT THIS MODULE DOES:
     - Draws static env objects from model.env_objects (shelves, tables,
       coffee machines, ac switches, obstacles) using positions and sizes
       from env_layout_02.json
-    - Draws zone boundaries from model.zone_map
+    - Draws area boundaries from model.area_map
     - Draws dynamic elements: agents (human, robot) and items
     - Draws planned paths if available on agents
 
@@ -55,14 +55,14 @@ OBJ_COLORS = {
     "door":           ("dimgray",     0.3),
 }
 
-# ZONE_COLORS = {
+# AREA_COLORS = {
 #     "zone_NW": "rgba(200,230,200,0.15)",
 #     "zone_NE": "rgba(200,200,230,0.15)",
 #     "zone_SW": "rgba(230,220,200,0.15)",
 #     "zone_SE": "rgba(230,200,200,0.15)",
 # }
 
-ZONE_COLORS = {
+AREA_COLORS = {
     # kitting
     "zone_NW": "rgba(200,230,200,0.15)",
     "zone_NE": "rgba(200,200,230,0.15)",
@@ -81,7 +81,7 @@ ZONE_COLORS = {
 
 def space_drawer(model, agent_portrayal):
     fig = go.Figure()
-    _draw_zones(model, fig)
+    _draw_areas(model, fig)
     _draw_env_objects(model, fig)
     _draw_delivery_items(model, fig)
     _draw_agents(model, fig)
@@ -91,9 +91,9 @@ def space_drawer(model, agent_portrayal):
     return fig
 
 
-def _draw_zones(model, fig):
-    for zone_id, bounds in model.zone_map.items():
-        color = ZONE_COLORS.get(zone_id, "rgba(200,200,200,0.1)")
+def _draw_areas(model, fig):
+    for area_id, bounds in model.area_map.items():
+        color = AREA_COLORS.get(area_id, "rgba(200,200,200,0.1)")
         fig.add_shape(
             type="rect",
             x0=bounds["x_min"], y0=bounds["y_min"],
@@ -105,7 +105,7 @@ def _draw_zones(model, fig):
         cx = (bounds["x_min"] + bounds["x_max"]) / 2
         cy = (bounds["y_min"] + bounds["y_max"]) / 2
         fig.add_annotation(
-            x=cx, y=cy, text=zone_id,
+            x=cx, y=cy, text=area_id,
             font=dict(color="gray", size=10),
             showarrow=False, opacity=0.5,
         )

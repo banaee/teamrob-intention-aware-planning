@@ -7,7 +7,7 @@ PURPOSE:
     and the cognitive layer's symbolic reasoning.
 
 WHAT THIS MODULE DOES:
-    - Reads agent positions from Mesa space → derives current zones
+    - Reads agent positions from Mesa space → derives current areas
     - Reads env_objects () from model → derives object locations
     - Derives symbolic predicates from the above
     - Returns a fresh WorldState each time it is called
@@ -25,8 +25,8 @@ OUTPUTS:
     - shared.types.WorldState  consumed by shared/replanning.py and shared/planner.py
 
 PREDICATES GENERATED:
-    Spatial (zone-level — used by IR context reasoning):
-        Predicate("in_zone", (Const(agent_id), Const(zone_id)))
+    Spatial (area-level — used by IR context reasoning):
+        Predicate("in_area", (Const(agent_id), Const(area_id)))
 
     Spatial (object-level — used by executor completion checking):
         Predicate("at", (Const(agent_id), Const(obj_id)))
@@ -44,8 +44,8 @@ PREDICATES GENERATED:
           body runs the timer, so the body says when the wait is over.
 
 PREDICATE NAMING RATIONALE:
-    "in_zone" and "at" are intentionally distinct:
-    - in_zone(agent, zone) — coarse spatial context for IR
+    "in_area" and "at" are intentionally distinct:
+    - in_area(agent, area) — coarse spatial context for IR
     - at(agent, object)    — fine-grained proximity for execution completion
     Conflating them under a single "at" predicate caused a semantic mismatch
     where move_to completion was never satisfied. Kept separate.
@@ -83,7 +83,7 @@ def build_world_state(model: SimModel) -> WorldState:
             - agent_states       for all humans and robots
             - agent_positions    for all humans and robots, for IR direction-based likelihood
             - object_locations   for all items
-            - object_zones       for all items
+            - object_areas       for all items
             - object_positions   for all env objects and items, for IR direction-based likelihood
             - predicates         derived symbolic facts
     """
@@ -92,7 +92,7 @@ def build_world_state(model: SimModel) -> WorldState:
     agent_states: Dict[str, AgentState] = {}
     agent_positions: Dict[str, Tuple[float, float]] = {}
     object_locations: Dict[str, str] = {}
-    object_zones: Dict[str, str] = {}
+    object_areas: Dict[str, str] = {}
     object_home_container: Dict[str, str] = {}
     object_destination: Dict[str, str] = {}
     object_positions: Dict[str, Tuple[float, float]] = {}
@@ -103,10 +103,10 @@ def build_world_state(model: SimModel) -> WorldState:
     # Agent states — humans
     # ------------------------------------------------------------------
     for agent_id, human in model.humans.items():
-        zone = model.get_zone_of_position(human.pos[0], human.pos[1])
+        area = model.get_area_of_position(human.pos[0], human.pos[1])
         agent_states[agent_id] = AgentState(
             agent_id=agent_id,
-            current_zone=zone or "unknown",
+            current_area=area or "unknown",
             holding=human.carrying,
             current_task=human.current_task,
         )
@@ -114,9 +114,9 @@ def build_world_state(model: SimModel) -> WorldState:
         # Record agent position 
         agent_positions[agent_id] = (human.pos[0], human.pos[1])
 
-        # Zone-level predicate — for IR context reasoning
-        if zone:
-            predicates.add(Predicate("in_zone", (Const(agent_id), Const(zone))))
+        # Area-level predicate — for IR context reasoning
+        if area:
+            predicates.add(Predicate("in_area", (Const(agent_id), Const(area))))
 
         # Manipulation predicate
         if human.carrying:
@@ -133,10 +133,10 @@ def build_world_state(model: SimModel) -> WorldState:
     # Agent states — robots
     # ------------------------------------------------------------------
     for agent_id, robot in model.robots.items():
-        zone = model.get_zone_of_position(robot.pos[0], robot.pos[1])
+        area = model.get_area_of_position(robot.pos[0], robot.pos[1])
         agent_states[agent_id] = AgentState(
             agent_id=agent_id,
-            current_zone=zone or "unknown",
+            current_area=area or "unknown",
             holding=robot.carrying,
             current_task=robot.current_task,
         )
@@ -144,9 +144,9 @@ def build_world_state(model: SimModel) -> WorldState:
         # Record agent position
         agent_positions[agent_id] = (robot.pos[0], robot.pos[1])
 
-        # Zone-level predicate — for IR context reasoning
-        if zone:
-            predicates.add(Predicate("in_zone", (Const(agent_id), Const(zone))))
+        # Area-level predicate — for IR context reasoning
+        if area:
+            predicates.add(Predicate("in_area", (Const(agent_id), Const(area))))
 
         # Manipulation predicate
         if robot.carrying:
@@ -169,30 +169,30 @@ def build_world_state(model: SimModel) -> WorldState:
             if obj.held_by:
                 location = obj.held_by
                 carrier = model.humans.get(obj.held_by) or model.robots.get(obj.held_by)
-                zone = model.get_zone_of_position(
+                area = model.get_area_of_position(
                     carrier.pos[0], carrier.pos[1]
                 ) if carrier else "unknown"
             else:
                 location = obj.at_location
-                zone = model.get_zone_of_position(obj.position[0], obj.position[1])
+                area = model.get_area_of_position(obj.position[0], obj.position[1])
 
             if obj.is_scanned:
                 predicates.add(Predicate("scanned", (Const(obj_id),)))
 
             object_locations[obj_id] = location
             predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
-            object_zones[obj_id] = zone
+            object_areas[obj_id] = area
             object_home_container[obj_id] = obj.home_container   # obj.home_container itself never mutates after load, 
                                                                  # but the WorldState dict is still refreshed here each call, 
-                                                                 # like object_zones/object_locations above
+                                                                 # like object_areas/object_locations above
             if obj.destination is not None:
                 object_destination[obj_id] = obj.destination   # static like home_container
             object_positions[obj_id] = tuple(obj.position)
         else:
-            # Fixed object — direct position/zone, no held_by/at_location semantics.
+            # Fixed object — direct position/area, no held_by/at_location semantics.
             object_positions[obj_id] = tuple(obj.position)
             fixed_object_positions[obj_id] = tuple(obj.position)   # static, for the fallback projection (T-D P)
-            object_zones[obj_id] = model.get_zone_of_position(obj.position[0], obj.position[1]) or "unknown"
+            object_areas[obj_id] = model.get_area_of_position(obj.position[0], obj.position[1]) or "unknown"
 
     # ------------------------------------------------------------------
     # Phase 2.1: dock gate always open — TODO: derive from gate state
@@ -206,7 +206,7 @@ def build_world_state(model: SimModel) -> WorldState:
     # TODO Phase 4: derive additional predicates
     # Examples:
     #   path_clear — check if any obstacle is between robot and its target
-    #   in_zone_occupied — another agent is already in this zone
+    #   in_area_occupied — another agent is already in this area
     #   item_delivered — obj_at(item_id, kitting_table)
     # ------------------------------------------------------------------
 
@@ -215,7 +215,7 @@ def build_world_state(model: SimModel) -> WorldState:
         agent_states=agent_states,
         agent_positions=agent_positions,
         object_locations=object_locations,
-        object_zones=object_zones,
+        object_areas=object_areas,
         object_home_container=object_home_container,
         object_destination=object_destination,
         object_positions=object_positions,

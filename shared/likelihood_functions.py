@@ -3,7 +3,7 @@ shared/likelihood_functions.py
 
 PURPOSE:
     Pure, domain-agnostic likelihood functions for Bayesian intention recognition.
-    No knowledge of tasks, items, zones, or simulators — only distances and
+    No knowledge of tasks, items, areas, or simulators — only distances and
     predicate membership tests over plain symbolic inputs.
 
     recognizer.py resolves WHAT to check (which predicate, which target position,

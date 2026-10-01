@@ -647,7 +647,7 @@ def successor_state(
     end of the entry's last segment (None: left where it is).
 
     What it does NOT carry, because no schema declares it: anything the
-    body's world-state builder derives and no action states (zones, a fact
+    body's world-state builder derives and no action states (areas, a fact
     a later action of another kind ends), and the observed agent's own
     projected effects — the limitation a single task has too. The part of
     TODO-07 projection needs; the planner's forward chaining and

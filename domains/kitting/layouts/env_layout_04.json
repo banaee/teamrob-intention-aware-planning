@@ -6,7 +6,7 @@
     "units": "cm",
     "notes": "Intersecting-paths fixture (from the edited layout0 geometry, September 2026). Mirror-symmetric about x=0: shelf_3 (-200,-300) for the human and shelf_4 (200,-300) for the robot, so two agents starting at (450,350) and (-450,350) walk mirror-image approaches that intersect at the centre line mid-path. Scenario: scenario_s01_06. No obstacles."
   },
-  "zones": [
+  "areas": [
     {
       "id": "zone_NW",
       "bounds": { "x_min": -500, "x_max": 0, "y_min": 0, "y_max": 400 },
@@ -34,7 +34,7 @@
       "type": "kitting_table",
       "position": [0, 350],
       "size": [200, 100],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Top-center. Both agents converge here after picking — KT conflict zone for Scenario 0.2."
     },
     {
@@ -43,7 +43,7 @@
       "position": [-200, -300],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Human first target. Symmetric to shelf_4 across vertical axis."
     },
     {
@@ -52,7 +52,7 @@
       "position": [200, -300],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Robot first target. Symmetric to shelf_3."
     },
     {
@@ -61,7 +61,7 @@
       "position": [400, -100],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Robot second task item."
     },
     {
@@ -70,7 +70,7 @@
       "position": [-400, 200],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Robot third task item."
     },
     {
@@ -79,7 +79,7 @@
       "position": [400, -300],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Human second task item. Symmetric to shelf_6."
     },
     {
@@ -87,7 +87,7 @@
       "type": "landmark",
       "position": [450, 350],
       "size": [20, 20],
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -95,7 +95,7 @@
       "type": "landmark",
       "position": [-450, 350],
       "size": [20, 20],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -103,7 +103,7 @@
       "type": "landmark",
       "position": [450, -350],
       "size": [20, 20],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -111,7 +111,7 @@
       "type": "landmark",
       "position": [-450, -350],
       "size": [20, 20],
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -119,7 +119,7 @@
       "type": "landmark",
       "position": [0, -380],
       "size": [80, 20],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
     }
   ]

@@ -6,7 +6,7 @@
     "units": "cm",
     "notes": "Phase 4C B2/B3 fixture layout. Built for sustained interference: the robot's cheapest task (shelf_4) and the human's first task (shelf_3) have near-equal approach + carry totals, so both carry walks converge into the kitting table with a small arrival gap. Measured behaviour and limits: see scenario_s03_01 description. No obstacles, no foreseeable tasks."
   },
-  "zones": [
+  "areas": [
     { "id": "zone_NW", "bounds": { "x_min": -600, "x_max": 0, "y_min": 0, "y_max": 450 }, "label": "northwest_work" },
     { "id": "zone_NE", "bounds": { "x_min": 0, "x_max": 600, "y_min": 0, "y_max": 450 }, "label": "northeast_work" },
     { "id": "zone_SW", "bounds": { "x_min": -600, "x_max": 0, "y_min": -450, "y_max": 0 }, "label": "southwest_storage" },
@@ -18,7 +18,7 @@
       "type": "kitting_table",
       "position": [0, 400],
       "size": [200, 100],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Shared delivery sink. A candidate whose carry walk reaches the table while the human's projection is still running converges here, and its min_dist is set by the projected arrival-time gap (both placements coincide at this point when the gap is under a tick). Candidates arriving after the human's projection ends show no sink conflict. Current figures: analysis/t1_conflict_measurement/REPORT.md, TODO-28/TODO-30."
     },
     {
@@ -27,7 +27,7 @@
       "position": [-300, -100],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Robot's cheapest task (approach 447 + carry 583 cm ≈ 54 ticks at 20 cm/tick, incl. pick and place). Its conflict comes from the matched arrival time at the kitting table, not from the 150 cm adjacency to shelf_3; the adjacency makes item_4 an early IR decoy."
     },
     {
@@ -36,7 +36,7 @@
       "position": [-180, -190],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Human's first target. Human approach 449 vs robot 447 — time-aligned. With assignment_prior off, theta crosses at the human's grasp here (step 22)."
     },
     {
@@ -45,7 +45,7 @@
       "position": [-500, -250],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Robot's clean alternative (approach 550 + carry 820 cm ≈ 71 ticks). Seen from the human's path it lies nearly behind shelf_3 (9–20° off heading), so it is the IR decoy that keeps confidence below theta until the grasp (TODO-38)."
     },
     {
@@ -54,7 +54,7 @@
       "position": [450, -350],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Robot's third task (approach 1151 + carry 875 cm ≈ 103 ticks). Far enough east that it never competes — present to keep the pool at three, matching scenario_s01_01."
     },
     {
@@ -63,7 +63,7 @@
       "position": [400, -100],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Human's second target. At -36.9 deg from the human's start it is angularly far from shelf_3/4/6, so it does not muddy the early ambiguity."
     },
     {
@@ -71,7 +71,7 @@
       "type": "landmark",
       "position": [550, 400],
       "size": [20, 20],
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -79,7 +79,7 @@
       "type": "landmark",
       "position": [-550, 400],
       "size": [20, 20],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -87,7 +87,7 @@
       "type": "landmark",
       "position": [550, -400],
       "size": [20, 20],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -95,7 +95,7 @@
       "type": "landmark",
       "position": [-550, -400],
       "size": [20, 20],
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -103,7 +103,7 @@
       "type": "landmark",
       "position": [0, -430],
       "size": [80, 20],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
     }
   ]

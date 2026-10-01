@@ -397,8 +397,8 @@ class AdaptivePlanner:
                     f"AdaptivePlanner: derived var '{var_name}' depends on "
                     f"'{source_var}' which is not bound. {where}"
                 )
-            if lookup_fn == "zone_of":
-                derived_val = world.object_zones.get(source_val)
+            if lookup_fn == "area_of":
+                derived_val = world.object_areas.get(source_val)
             elif lookup_fn == "home_container_of":
                 derived_val = world.object_home_container.get(source_val)
             elif lookup_fn == DESTINATION_LOOKUP:

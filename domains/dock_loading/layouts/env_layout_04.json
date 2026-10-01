@@ -6,7 +6,7 @@
     "units": "cm",
     "note": "origin (0,0) at the centre of the hall, y up. T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14). The space is centred on the origin, x [-600, 600], y [-740, 740]: it holds every fixed object, the truck included (y from -740 to -440) and the office (y up to 415)."
   },
-  "zones": [
+  "areas": [
     {
       "id": "zone_hall",
       "bounds": {
@@ -35,7 +35,7 @@
         "y_min": -740,
         "y_max": -300
       },
-      "label": "truck_side: the dock platform (y -440 to -300) and the truck (x -125 to 125, y -740 to -440), outside the gate; written as one rectangle, the form holds one rectangle per zone"
+      "label": "truck_side: the dock platform (y -440 to -300) and the truck (x -125 to 125, y -740 to -440), outside the gate; written as one rectangle, the form holds one rectangle per area"
     }
   ],
   "env_objects": [
@@ -50,7 +50,7 @@
         250,
         300
       ],
-      "zone": "zone_truck_side"
+      "area": "zone_truck_side"
     },
     {
       "id": "dock_gate",
@@ -63,7 +63,7 @@
         300,
         10
       ],
-      "zone": "zone_truck_side"
+      "area": "zone_truck_side"
     },
     {
       "id": "dry_delivery_bay_0",
@@ -76,7 +76,7 @@
         170,
         170
       ],
-      "zone": "zone_hall"
+      "area": "zone_hall"
     },
     {
       "id": "frozen_delivery_bay_0",
@@ -89,7 +89,7 @@
         170,
         170
       ],
-      "zone": "zone_hall"
+      "area": "zone_hall"
     },
     {
       "id": "empty_pallet_bay_0",
@@ -102,7 +102,7 @@
         170,
         170
       ],
-      "zone": "zone_hall",
+      "area": "zone_hall",
       "notes": "The one container for empty pallets of this room."
     },
     {
@@ -116,7 +116,7 @@
         50,
         50
       ],
-      "zone": "zone_hall"
+      "area": "zone_hall"
     },
     {
       "id": "office_door",
@@ -129,7 +129,7 @@
         100,
         10
       ],
-      "zone": "zone_hall"
+      "area": "zone_hall"
     },
     {
       "id": "office_chair",
@@ -142,7 +142,7 @@
         50,
         50
       ],
-      "zone": "zone_office"
+      "area": "zone_office"
     },
     {
       "id": "desk",
@@ -155,7 +155,7 @@
         20,
         20
       ],
-      "zone": "zone_hall",
+      "area": "zone_hall",
       "notes": "Landmark: the target of the closing part (B13), at the wall on the gate's side, beside the place of the gate's button; no task of the robot's task model names it."
     },
     {
@@ -169,7 +169,7 @@
         20,
         20
       ],
-      "zone": "zone_hall",
+      "area": "zone_hall",
       "notes": "Landmark: the standby place (A3's standby entry); the human's start position."
     }
   ]

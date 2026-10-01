@@ -44,7 +44,7 @@ Each domain defines:
 - **Action schemas** — HTN primitive tasks (directly executable)
 - **Task schemas** — HTN non-primitive tasks (decompose via methods)
 - **Scenarios** — typed agent assignments and task instances; each declares its setup and its reference layouts
-- **Layouts and setups** — JSON files: the room (space, zones, fixed objects) and the shift (movable objects, home containers, designated destinations); a run is the triple (layout, setup, scenario)
+- **Layouts and setups** — JSON files: the room (space, areas, fixed objects) and the shift (movable objects, home containers, designated destinations); a run is the triple (layout, setup, scenario)
 
 Currently implemented: `domains/kitting/` (industrial kitting), `domains/dock_loading/`
 (truck unloading, modeled on HITS3 Scenario 2)
@@ -75,7 +75,7 @@ confidence threshold crossing, or the robot committing to a task by picking some
 - **HTN-aligned representation**: tasks decompose to tasks or primitive actions; primitive actions are the leaves executed by the embodiment layer
 - **Bidirectional tree**: same decomposition structure used top-down for planning and bottom-up for intention recognition
 - **No string parsing**: all knowledge represented as typed Python dataclasses (`Var`, `Const`, `Predicate`, `TaskSchema`, `ActionSchema`)
-- **Predicate semantics**: `at(agent, object)` for executor completion checking; `in_zone(agent, zone)` for IR context reasoning — kept strictly separate
+- **Predicate semantics**: `at(agent, object)` for executor completion checking; `in_area(agent, area)` for IR context reasoning — kept strictly separate
 - **Intention recognition drives task selection**: the robot observes human microactions, updates a Bayesian belief over task hypotheses, and re-selects its next task when that belief or the world changes
 - **Receding-horizon selection**: the robot picks the single best *next* task at each cognitive event rather than committing to an ordering of everything remaining — decisions are re-made as the picture of the human improves
 - **Plans are re-decomposed, never resumed**: there is no plan cursor; the world state is the record of progress, and HTN method guards encode what remains to be done from the current state

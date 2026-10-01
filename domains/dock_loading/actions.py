@@ -8,8 +8,8 @@ PREDICATE NAMING NOTE:
     Completion predicates use "at(agent, object)" — object-level proximity.
     This matches world_state_builder.py which emits Predicate("at", ...) only
     when agent is within PROXIMITY_THRESHOLD of a named env object or item.
-    Zone-level spatial context uses "in_zone(agent, zone)" — a separate predicate.
-    Do NOT use "at" for zone-level completion.
+    Area-level spatial context uses "in_area(agent, area)" — a separate predicate.
+    Do NOT use "at" for area-level completion.
 
 ACTIONS:
     move_to       — navigate to a target object or location

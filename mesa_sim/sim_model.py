@@ -8,7 +8,7 @@ PURPOSE:
     simulation step loop.
 
 WHAT THIS MODULE DOES:
-    - Reads the layout JSON (space, zones, fixed objects) and the setup JSON
+    - Reads the layout JSON (space, areas, fixed objects) and the setup JSON
       (movable objects with their home containers and destinations)
     - Receives a ScenarioConfig (Python object) — no YAML scenario parsing
     - Creates Mesa ContinuousSpace with center-origin (0,0)
@@ -61,7 +61,7 @@ class SimObject:
     type: str                          # enumeration category — "item", "shelf", "gate", etc.
     position: Tuple[float, float]
     size: Tuple[float, float]
-    zone: Optional[str] = None
+    area: Optional[str] = None
     subtype: Optional[str] = None      # domain-specific classification:
                                         # kitting: "part_A", "part_D", ...
                                         # dock loading: "frozen", "dry"
@@ -159,10 +159,10 @@ class SimModel(model.Model):
         self.schedule = time.BaseScheduler(self)
 
         # ------------------------------------------------------------------
-        # Zone map
+        # Area map
         # ------------------------------------------------------------------
-        self.zone_map: Dict[str, dict] = {
-            z["id"]: z["bounds"] for z in env_layout.get("zones", [])
+        self.area_map: Dict[str, dict] = {
+            z["id"]: z["bounds"] for z in env_layout.get("areas", [])
         }
 
         # ------------------------------------------------------------------
@@ -237,7 +237,7 @@ class SimModel(model.Model):
         Unified loader for all env_objects entries. Two passes, as before the
         split (T-L, stage 1): the layout's fixed objects first (shelves, gates,
         tables, machines...), then the setup's movable objects (items,
-        pallets), whose position/zone are derived from their home container.
+        pallets), whose position/area are derived from their home container.
         A layout entry has a "position" and no "initial_container"; a setup
         entry has an "initial_container"; every home container named by the
         setup is an object of the layout — each an error naming the artefact
@@ -266,7 +266,7 @@ class SimModel(model.Model):
                 type=obj["type"],
                 position=tuple(obj["position"]),
                 size=tuple(obj["size"]),
-                zone=obj.get("zone"),
+                area=obj.get("area"),
                 subtype=obj.get("subtype"),
                 is_empty=obj.get("is_empty", False),
                 is_scanned=obj.get("is_scanned", False),
@@ -288,7 +288,7 @@ class SimModel(model.Model):
                 type=obj["type"],
                 position=container.position,
                 size=tuple(obj["size"]),
-                zone=container.zone,
+                area=container.area,
                 subtype=obj.get("subtype"),
                 held_by=None,
                 at_location=container_id,
@@ -517,15 +517,15 @@ class SimModel(model.Model):
         """Return all items — used by world_state_builder."""
         return {oid: o for oid, o in self.objects.items() if o.type == "item"}
 
-    def get_zone_of_position(self, x: float, y: float) -> Optional[str]:
-        for zone_id, bounds in self.zone_map.items():
+    def get_area_of_position(self, x: float, y: float) -> Optional[str]:
+        for area_id, bounds in self.area_map.items():
             if (bounds["x_min"] <= x <= bounds["x_max"] and
                     bounds["y_min"] <= y <= bounds["y_max"]):
-                return zone_id
+                return area_id
         return None
 
-    def get_objects_in_zone(self, zone_id: str) -> List[SimObject]:
-        return [obj for obj in self.objects.values() if obj.zone == zone_id]
+    def get_objects_in_area(self, area_id: str) -> List[SimObject]:
+        return [obj for obj in self.objects.values() if obj.area == area_id]
 
     def get_item_location(self, item_id: str) -> Optional[Tuple[float, float]]:
         item = self.objects.get(item_id)

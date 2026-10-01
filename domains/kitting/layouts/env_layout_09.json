@@ -6,7 +6,7 @@
     "units": "cm",
     "notes": "Two kitting tables against opposite walls (kitting_table_0 on the north wall, kitting_table_1 on the south wall): the realistic-placement variant of env_layout_08, where both tables stand in open floor. Storage along the side walls. T-B1b follow-up; scenario_s07_01 opens it, and it is not a measured fixture."
   },
-  "zones": [
+  "areas": [
     {
       "id": "zone_NW",
       "bounds": { "x_min": -1000, "x_max": 0, "y_min": 0, "y_max": 500 },
@@ -34,7 +34,7 @@
       "type": "kitting_table",
       "position": [-500, 450],
       "size": [200, 100],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Against the north wall, centred in the northwest zone."
     },
     {
@@ -42,7 +42,7 @@
       "type": "kitting_table",
       "position": [500, -450],
       "size": [200, 100],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Against the south wall, on the opposite side: the arrangement of the two that separates the tables most (67.3 ticks apart)."
     },
     {
@@ -51,7 +51,7 @@
       "position": [-950, -350],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "West wall, south end. Robot item, delivered across the room to kitting_table_1."
     },
     {
@@ -60,7 +60,7 @@
       "position": [-950, 400],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "West wall, north end. Human's first item; no other shelf lies near its bearing from the human's start."
     },
     {
@@ -69,7 +69,7 @@
       "position": [700, 450],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "notes": "North wall, east end. Human's second item."
     },
     {
@@ -78,7 +78,7 @@
       "position": [950, -100],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "East wall. Robot item, short haul to kitting_table_1."
     },
     {
@@ -87,7 +87,7 @@
       "position": [950, -350],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "East wall, south end. Robot item, the shortest single task from the robot's start."
     },
     {
@@ -96,7 +96,7 @@
       "position": [-600, -450],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "South wall, west end. The robot's only kitting_table_0 item: its delivery ends at the far table."
     },
     {
@@ -104,7 +104,7 @@
       "type": "landmark",
       "position": [950, 450],
       "size": [20, 20],
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -112,7 +112,7 @@
       "type": "landmark",
       "position": [-950, 450],
       "size": [20, 20],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -120,7 +120,7 @@
       "type": "landmark",
       "position": [950, -450],
       "size": [20, 20],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -128,7 +128,7 @@
       "type": "landmark",
       "position": [-950, -450],
       "size": [20, 20],
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
     },
     {
@@ -136,7 +136,7 @@
       "type": "landmark",
       "position": [0, -480],
       "size": [80, 20],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
     }
   ]

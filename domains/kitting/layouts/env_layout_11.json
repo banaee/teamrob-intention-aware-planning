@@ -6,7 +6,7 @@
     "units": "cm",
     "notes": "The IR test-bed's enlarged room (TB.4b): env_layout_10 (the TB.3b room, unchanged) plus kitting_table_1 at (350, 420) on the north wall, bearing 0 deg from kitting_table_0 (46.3 deg from its nearest target, shelf_2), and shelf_3 at (-420, 300) on the west wall 320 cm above shelf_1, bearing -164.1 deg (30.4 deg from shelf_1, 62.3 deg from coffee_machine_0). shelf_3's position was chosen for observability (TB.4b addendum): the criterion, stated before any run, is that on the walk to item_1 the rival delivery of item_3 is refuted (S < alpha) after the first quarter of the walk and before the arrival; at (-420, -220), 10.4 deg, it was not (the refutation fell after the grasp); (-420, 300) is the first position up the west wall that meets it. The human of the TB.3b scripts never comes within 221 cm of shelf_3 or 253 cm of kitting_table_1. The TB.3b room's description follows. The IR test-bed room (TB; design_decisions.md, \"The IR test-bed\"). Square, 1000 x 1000 (env_layout_01's width), the proportions from Hadi's sketch (W, H the room's width and height, y from the top): kitting_table_0 at (0.50 W, 0.08 H), shelf_1 (west) and shelf_2 (east) at (0.08 W, 0.52 H) and (0.92 W, 0.52 H), symmetric about the table's x, coffee_machine_0 at (0.33 W, 0.90 H), west of centre, corner_SE 50 cm in from both walls, the one landmark; no door, no AC switch, no obstacles. Not designed to produce a recognizer result. Stated consequences: from the table the two shelves are at equal path cost (608.3 cm); the coffee machine's bearing from the table (-101.7 deg) differs from corner_SE's (-62.7 deg); no ac_activation hypothesis exists in this room."
   },
-  "zones": [
+  "areas": [
     {
       "id": "zone_NW",
       "bounds": { "x_min": -500, "x_max": 0, "y_min": 0, "y_max": 500 },
@@ -34,7 +34,7 @@
       "type": "kitting_table",
       "position": [0, 420],
       "size": [200, 100],
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "Top centre, (0.50 W, 0.08 H). The human starts here."
     },
     {
@@ -43,7 +43,7 @@
       "position": [-420, -20],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "The west shelf, (0.08 W, 0.52 H). Symmetric to shelf_2 about the table's x."
     },
     {
@@ -52,7 +52,7 @@
       "position": [420, -20],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "The east shelf, (0.92 W, 0.52 H). Symmetric to shelf_1 about the table's x."
     },
     {
@@ -61,7 +61,7 @@
       "position": [-420, 300],
       "size": [100, 100],
       "slots": 2,
-      "zone": "zone_NW",
+      "area": "zone_NW",
       "notes": "TB.4b: the west wall, 320 cm above shelf_1; from kitting_table_0 its bearing (-164.1 deg) is 30.4 deg from shelf_1's. Placed for observability (the walk to item_1 separates from the walk to item_3 within the walk), not for a belief or finding value."
     },
     {
@@ -69,7 +69,7 @@
       "type": "kitting_table",
       "position": [350, 420],
       "size": [200, 100],
-      "zone": "zone_NE",
+      "area": "zone_NE",
       "notes": "TB.4b: the north wall, east of kitting_table_0; the misdelivery's table (scenario_s09_08). No item is designated to it."
     },
     {
@@ -77,7 +77,7 @@
       "type": "coffee_machine",
       "position": [-170, -400],
       "size": [50, 50],
-      "zone": "zone_SW",
+      "area": "zone_SW",
       "notes": "Near the south wall, (0.33 W, 0.90 H), deliberately west of centre so that its bearing from the table differs from corner_SE's."
     },
     {
@@ -85,7 +85,7 @@
       "type": "landmark",
       "position": [450, -450],
       "size": [20, 20],
-      "zone": "zone_SE",
+      "area": "zone_SE",
       "notes": "Landmark (T-C1): the exit walk's target; a place for the human's script only; no task binds it. 50 cm in from both walls."
     }
   ]

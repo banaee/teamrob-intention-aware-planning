@@ -9,7 +9,7 @@ A run is one layout, one setup and one scenario, plus the run options.
 
 | layer | what it holds | file |
 |---|---|---|
-| layout (the room) | space, zones, the fixed objects with positions: tables, shelves, machines, switches, landmarks | `domains/<domain>/layouts/env_layout_KK.json` |
+| layout (the room) | space, areas, the fixed objects with positions: tables, shelves, machines, switches, landmarks | `domains/<domain>/layouts/env_layout_KK.json` |
 | setup (the shift) | the movable objects that exist, each with its home container and its designated destination | `domains/<domain>/setups/env_setup_NN.json` |
 | scenario (the episode) | per agent: start position, assigned tasks, `observes`, the human's script; the purpose; `setup`; `reference_layouts` | `domains/<domain>/scenarios/scenarios_sNN.py` |
 | run options | gate, cost strategy, strategy, prior, separation stop, steps | `configs/experiment.yaml` or the command line |
@@ -29,7 +29,7 @@ Rules that follow:
 
 | you want to change | layer | do this |
 |---|---|---|
-| move a shelf, table or machine; add a landmark or zone | layout | edit the layout file, or copy it to a new `env_layout_KK.json` |
+| move a shelf, table or machine; add a landmark or area | layout | edit the layout file, or copy it to a new `env_layout_KK.json` |
 | which items exist; the shelf an item starts on; the table an item goes to | setup | edit the setup file, or copy it to a new `env_setup_NN.json` |
 | an agent's start position | scenario | edit the literal, or add a new one |
 | the robot's or the human's assigned tasks | scenario | a new literal (the old one may be a fixture) |
