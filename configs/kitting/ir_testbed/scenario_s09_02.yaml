@@ -1,0 +1,18 @@
+# configs/kitting/ir_testbed/scenario_s09_02.yaml — the IR test-bed's run file for scenario_s09_02 on the enlarged room (TB.4b;
+# design_decisions.md, "The IR test-bed"; analysis/kitting/ir_testbed/README.md). Run from the repo root:
+#   PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run configs/kitting/ir_testbed/scenario_s09_02.yaml
+# steps: the replay expanded per tick ends with the exit walk's acknowledgement at tick 250; plus 30 ticks of the idle
+# human (E5's standing threshold at the lowest reported level, alpha = 0.01, is 25 ticks), 281 in all. run.sh
+# computes the same rule from the replay and runs with it.
+
+domain: kitting
+layout: env_layout_11
+setup: env_setup_09
+scenario: scenario_s09_02
+steps: 281
+assignment_prior: true
+strategy: "single_task"
+gate_strategy: "none"
+cost_strategy: "realized"
+separation_stop: false
+test_level: 0.05
