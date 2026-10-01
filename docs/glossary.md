@@ -88,6 +88,9 @@ One function, `area_fact(agent, position, areas)` over the layout's declared are
 first declared area holding the point), serves the environment's state construction and every computed state: the
 projection's chain, the replay's advance and the replay's cut. The load-time replay ends a walk where the body stops,
 not at the target's centre.
+BUILT (T-G stage 1, step 2, 1 October 2026; b513b82, 9bca721): as approved, with one name changed: the shared function
+for a position's area is `area_at(position, areas)`; the planner's lookup for an object's area keeps the name `area_of`.
+design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 **B1 / B2 / B3** — the blocks of `MetaPlanner.update()`: B1 the human projection, B2 the mid-task
 commitment gate (`b2a` built, `b2b` a stub), B3 selection on realized cost.
@@ -352,6 +355,12 @@ RULED, NOT BUILT (T-G A4, Hadi, 30 September and 1 October 2026): a second condi
 the robot's WorldState. When no method is applicable, the hypothesis leaves the live set and can re-enter when the task
 becomes executable again." It re-enters at the prior base, as under L4. It replaces the perfect-fit score of a hypothesis
 the planner cannot decompose (I2). design_decisions.md, "T-G: the second domain's rulings", A4.
+BUILT (T-G stage 1, step 3, 1 October 2026; bd4bddc): a hypothesis with no applicable method (decomposition raises
+`DecompositionError`) leaves H and is pinned at the floor, logged `[IR-inapplicable] step=N <key> leaves the live set: no
+applicable method`, or `... does not enter the live set: ...` on the first tick (the wording confirmed as built); when it
+is applicable again it is retired if its terminal fact holds (L4), else it re-enters at 1/|H|, logged `[IR-reentry]
+step=N <key> live again: applicable`; a retired hypothesis that becomes inapplicable stays retired. The perfect-fit score
+of an undecomposable hypothesis is removed. design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -505,6 +514,9 @@ APPROVED, NOT BUILT (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.
 `AdaptivePlanner.is_applicable` (decomposition raises no `DecompositionError`), the one definition read by the human's
 executor (A3) and the recognizer (A4). B11 AMENDED: a task has a method for every area its agent can be in, not for every
 area; an agent in another area has no applicable method, and that absence is the check.
+BUILT (T-G stage 1, steps 3 and 5, 1 October 2026; bd4bddc, 048a36e): `AdaptivePlanner.is_applicable`, read by the
+recognizer through `decompose` (A4) and by the human's executor (A3). "(T-G A4, ruled, not built)" above reads: built.
+B11 as amended is dock_loading's content (step 7, not built). design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 **assigned tasks** — a set the robot is told: for the human, which tasks it was assigned (every one a `WorkTask`
 instance, T-H), never in which order; the ordering lives only in the human's script. Replaces "work order" (T-H,
@@ -603,6 +615,13 @@ dependence=...)`; the repeatable entry `RepeatableEntry(task)` (a type with no e
 `INDEPENDENT` (default) and `ON_ROBOT`; the human's isolated choice point `StackMachine.choose`; the executor's `Wait`
 when no entry is applicable; the transition `StillOpen` (`open:<task>`), written at the replay's end for a dependent
 script's entries left open and at the run's end for a dependent script's open entries.
+BUILT (T-G stage 1, step 5, 1 October 2026; 048a36e, 576f2b2): the RULED blocks above under the approved names. Also:
+the typed entry references `OrdinaryRef`, `RepeatableRef`, `ClosingRef` (`world/record.py`), carried by `StillOpen`; the
+loader's line `[replay] <human> not replayed: entry=i <task> ... closing=j <task>`; `[coverage]` with `entry=i`,
+`repeatable=i` and `closing=j`; at the run's end (headless) a dependent script writes one `StillOpen` per open entry, a
+`[human] ... open:<task>` line and always its `[rec] end step=n open=<task keys>` line (`open=-` when none is open). A
+closing entry begun and not finished at the run's end counts as open. Kitting's outputs are byte-identical.
+design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 **open entry** / **closed entry** (T-G Q12, Q13a, Hadi, 1 October 2026; ruled, not built) — of an entry of the human's
 script. An ordinary entry is open until its task leaves the stack with COMPLETED, ABANDONED or INFEASIBLE, and closed
@@ -623,6 +642,8 @@ COLLISION: "entry" here is an entry of the human's script (`ScriptEntry`), not t
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q12, Q13a, Q13b.
 APPROVED NAMES (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): `RepeatableEntry` for the repeatable kind; an
 ordinary entry keeps the type `ScriptEntry`.
+BUILT (T-G stage 1, step 5, 1 October 2026; 048a36e): "ruled, not built" in the heading reads: built. Both placement
+refusals are raised by `Script`'s constructor.
 
 **closing part** / **closing entry** / **finished** (T-G Q14, Hadi, 1 October 2026; ruled, not built) — the closing part
 is the part of the human's script after its priority list; a closing entry is one of its entries. The priority list is
@@ -635,6 +656,8 @@ ADDED (T-G records 3, Hadi, 1 October 2026): a closing entry that is not applica
 the human does not take the next closing entry before the present one has ended.
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q14; B13.
 APPROVED NAME (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): `Script.closing`.
+BUILT (T-G stage 1, step 5, 1 October 2026; 048a36e): "ruled, not built" in the heading reads: built. After the closing
+part the executor returns `Idle`; a closing entry not applicable, `Wait`.
 
 **event** — a `Trigger` and a `Decision` attached to a task of the script, or built live by `inject`. Typed, no unions
 and no sentinels. An event fires once per script entry and is then consumed.
@@ -684,6 +707,8 @@ second domain's rulings", A3.
 CORRECTED (T-G records 3, Hadi, 1 October 2026), wording only: infeasible is the outcome of a task that the executor began and could not expand or
 continue, whether the task is a script entry or was started by an event; "left open" stays the word for an entry the
 executor never began.
+BUILT (T-G stage 1, step 5, 1 October 2026; 048a36e): an entry never begun is reported left open (an independent
+script: a load error naming it; a dependent one: `StillOpen`); INFEASIBLE at load stays an error for both kinds.
 
 **record** — the human executor's record: per tick, the stack (top first), the action and its progress. The ground
 truth, written as its own stream (a file beside the run log, one `[rec]` line per tick) and diffed in the sweep. Its
@@ -1118,6 +1143,8 @@ emitted by the Mesa world-state builder, `WorldState.object_zones`, the planner'
 "T-G: the second domain's rulings", A2.
 AMENDED, NOT BUILT (T-G stage 1's plan, answer 2, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): the per-object area field is
 dropped; a fixed object's area is derived from its position.
+BUILT (T-G stage 1, 1 October 2026): the layouts' block is `areas` (step 1, 8d064ca); the per-object area field is
+dropped (step 2, 9bca721).
 
 **setup** — the shift: the movable objects that exist, each with its home container and, where the domain determines
 one through `destination_of`, its designated destination, and any other initial state the domain declares per movable
@@ -1131,6 +1158,11 @@ designations (`destination_of(object, target)`; for a full pallet also its onwar
 which action sets or ends which state; the **environment** holds the true states, and the simulator has no code written
 for one domain. dock_loading's `is_empty` becomes the state fact `is_empty(pallet)`. design_decisions.md, "T-G: the
 second domain's rulings", A5.
+BUILT (T-G stage 1, step 4, 1 October 2026; b74485b, 50f2fb8): the domain registry's `"states"`
+(`StateDeclaration(name, object_type)`; `object_type` None, a fact about no object, admitted) and the setup's one
+`"states"` block (`state`, `object`); a declared state not listed does not hold; kitting declares none; the six
+dock_loading setups converted. A setup entry that still carries the old per-object state fields is ignored for those
+fields, not refused (an authoring risk, parked under TODO-151). design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 COLLISION, not resolved: DESIGN-16 (`docs/design_decisions.md`) says "travel/setup costs between tasks", the
 scheduling sense (a cost of switching between tasks). That is the English word, not the term.
 
@@ -1203,6 +1235,7 @@ container is one point, its centre, and may hold several pallets (B9), as kittin
 container" (`initial_container`) is this sense.
 AMENDED (T-G stage 1's plan, answer 2, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): "Its area is fixed and declared" reads: fixed
 and derived from its position (A9 AMENDED).
+BUILT (T-G stage 1, step 2, 1 October 2026; 9bca721).
 
 **area** — a part of the room declared in the layout. The environment emits the fact that an agent is in an area. Its
 code name is "zone" (`zones`, `in_zone`, `object_zones`, `zone_of`) until it is renamed to "area" as the first step of T-G
@@ -1213,6 +1246,10 @@ APPROVED, NOT BUILT (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.
 `area_of`, `AREA_FACT = "in_area"`, `area_fact`. The `in_area` fact is the one carrier of an agent's area; the carriers
 nothing reads (`AgentState`'s, the observation's, `SimObject`'s) are removed. A point on the edge of two areas belongs to
 the first declared. dock_loading's area ids are `area_hall`, `area_office`, `area_truck_side`; kitting's stay.
+BUILT (T-G stage 1, steps 1 and 2, 1 October 2026; 8d064ca, c21f001, b513b82, 9bca721): the rename and the shared
+form as approved, with one name changed: the shared function for a position's area is `area_at`; the planner's lookup
+for an object's area keeps `area_of`. "Its code name is 'zone' ... until it is renamed" above is past: the code name is
+"area". dock_loading's area ids are step 6's, not yet built. design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 **monitored area** — an area in which the robot observes the human. Outside every monitored area the robot receives no
 observation of the human; its knowledge of objects is not affected. Fixed per layout, independent of where the robot is;

@@ -395,6 +395,8 @@ order is stage 1, stage 1.5 (context knowledge, new), stage 2, track 4, stage 3.
 SUPERSEDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): stage 1's rooms and setups are agreed. Next: stage 1's plan.
 SUPERSEDED (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED): stage 1's
 plan is approved, `docs/handoffs/plan_T-G_stage1.md`. Next: stage 1's build, step 0, then step 1 (the rename).
+SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT): steps 0 to 5 of stage 1 are built and accepted. Next: the domain steps
+6 and 7, then the milestone.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -646,6 +648,10 @@ plan is approved, `docs/handoffs/plan_T-G_stage1.md`. Next: stage 1's build, ste
     task, the human's for the hall and the office); the milestone, one scenario per room. Then the IR test-bed and the
     MPB, whose instruments obtain the human's run-time sequence from the executor's own selection rule. A robot task with
     no applicable method stops the run: a ruling before stage 2 (TODO-152).
+    BUILT, STEPS 0 TO 5 (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT): step 0 the reference runs (outside git); step 1 the rename
+    (8d064ca, c21f001); step 2 the areas and R2 (b513b82, 9bca721); step 3 A4 (bd4bddc); step 4 A5 (b74485b); step 5
+    A3 (048a36e); each accepted on kitting byte-identical, A3 also on the drop scenarios and both test-bed sets. Next:
+    step 6 (dock_loading's catch-up) and step 7 (its content), then the milestone (step 8).
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,

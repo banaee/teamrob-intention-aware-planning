@@ -271,6 +271,10 @@ Decisions
   method for every area the agent can be in: 8 per robot task, the human's for the hall and the office); the milestone
   (scenario_s03_02, s05_02, s07_02). A robot task with no applicable method stops the run (TODO-152, a ruling before
   stage 2). Next: stage 1's build, step 0 then step 1.
+  Steps 0 to 5 are BUILT and accepted (1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1,
+  STEPS 0 TO 5 BUILT): the rename (8d064ca, c21f001); the areas and R2 (b513b82, 9bca721; the shared function is
+  `area_at`, the planner's lookup keeps `area_of`); A4 (bd4bddc); A5 (b74485b); A3 (048a36e). Next: the domain steps 6
+  (dock_loading's catch-up) and 7 (its content), then the milestone (step 8).
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

@@ -1085,6 +1085,8 @@ read "the perfect-fit value". dock_loading's error is raised at model constructi
 `SimModel.__init__`), not on the first tick, and since T-G build 1 not at all (TODO-25). Behaviour: T-G's A4 (liveness
 by applicability) replaces this scoring when built: a hypothesis with no applicable method leaves the live set.
 "T-G: the second domain's rulings", A4.
+BUILT (T-G stage 1, step 3, 1 October 2026; bd4bddc): A4 replaces this scoring; the perfect-fit score of an
+undecomposable hypothesis and its log line are removed. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 Consequences measured (`analysis/i2_ir_foundations/REPORT.md`; every difference from the I1/F1
 baselines attributed by stage): no target is unresolved in any of the eight conditions; the
@@ -3211,6 +3213,8 @@ NOTE (T-G R2, Hadi, 1 October 2026; "T-G: the second domain's rulings", C1, stag
 entry: after a movement action the computed successor state represents the agent's resulting area consistently with the
 area fact the environment would emit at the end of that movement, by one definition shared with the environment's state
 construction. Whether the area is declared by the schemas or derived from the position is for stage 1's plan.
+BUILT (T-G stage 1, step 2, 1 October 2026; b513b82): derived from the position. `successor_state` replaces the
+agent's area fact by `area_fact` at the end position, as do the replay's advance and its cut world. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 DECIDED (September 2026; built in T-B2a). This settles the part the B3.B entry left as a proposal ((b), (i) to
 (iii): "how that is declared is the open part"). WHO DECIDED WHAT: the delete list was ruled in cchat, on the
@@ -5704,6 +5708,8 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   for the terms it introduces (mind, body, environment, simulator, container, monitored area, applicable). The one rename
   in V1 is "zone" to "area", ruled afterwards (above) and built as the first step of stage 1 (C1). The two statements
   concern different things.
+  BUILT (T-G stage 1, step 1, 1 October 2026; 8d064ca, c21f001): the rename, no change of behaviour. The remaining
+  "zone" wording in records and comments is listed in TODO-153 for the sweep of old terms at stage 1's close. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 - A3, the human's script (T-G Q1, Q2). One form for every domain. It changes `world/` when built; the robot's mind
   receives nothing from it.
@@ -5867,6 +5873,9 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   When built, it supersedes for a script that depends on the robot "the human's script, an ordered list ... which the
   executor must reproduce exactly" (glossary §6, **human's script**; "T-H: the human behaviour model"). It answers
   DESIGN-01 (an entry condition is applicability, decided by the human's own planning in `world/`) and LIMIT-02.
+  BUILT (T-G stage 1, step 5, 1 October 2026; 048a36e, 576f2b2): Q12 to Q15 with R1 as the plan's 3a names them. The
+  acceptance added above: the maintained kitting sets, the ten drop scenarios and both test-bed sets (IR 17, MPB 16 run
+  files, both strategies) byte-identical with the step-0 reference, 844 files; no difference, so no finding. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 - A4, liveness by applicability (T-G Q3). It changes `shared/` when built and reopens I2's scoring of a hypothesis that
   cannot be decomposed, on design grounds.
@@ -5878,6 +5887,8 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   the belief then favours tasks the human cannot be doing.
   When built, it supersedes I2's scoring (the I2 entry's superseding note), and the live set of T-D L4 (the support minus
   the hypotheses whose terminal fact holds) gains this second condition.
+  BUILT (T-G stage 1, step 3, 1 October 2026; bd4bddc): with `AdaptivePlanner.is_applicable` as the one definition,
+  read through `decompose`; it re-enters at 1/|H| through L4's returning path. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 - A5, object states and designations (T-G Q10).
   The domain declares: the setup gives each object its initial states and its designations; the action schemas say which
@@ -5890,6 +5901,10 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   states from observed actions.
   A REQUIREMENT ON ITS FORM (Hadi, 1 October 2026; T-G records 2; C1, stage 1.5): the form built for A5 admits a fact that
   no action changes and that is not the state of a movable object. Stage 1 authors no such fact.
+  BUILT (T-G stage 1, step 4, 1 October 2026; b74485b, 50f2fb8): `StateDeclaration` in the registry, the setup's
+  `"states"` block, the environment holding the true state facts and applying an action's declared effects and
+  retractions on declared states; the destination check generalised. The requirement on its form holds (`object_type`
+  None). "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 
 - A6, perception of object states. The robot knows the states of objects, including which pallets are scanned, through
   the site's system: a scan is a digital act written to that system at once. Recorded as an assumption on perception,
@@ -5939,6 +5954,9 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   NOTE (the same approval, answers 3 and 7): dock_loading's area ids are `area_hall`, `area_office`, `area_truck_side`
   (kitting's ids stay); the domain's task model names `dock_gate`, `office_door` and the area ids, as this domain's
   convention.
+  BUILT (T-G stage 1, steps 1 and 2, 1 October 2026; 8d064ca, b513b82, 9bca721): the areas declared under `areas`,
+  `Area`, `WorldState.areas`, `area_at`, `AREA_FACT`, `area_fact`; the per-object area field dropped; with R2. The area ids
+  of dock_loading are step 6's. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
   dock_loading's areas (part of the ruled form of Q11; recorded in T-G records 1, third follow-up, 1 October 2026): three,
   divided by the gate and by the office door: the truck side (the truck and the dock platform, on the outer side of the
   gate), the hall, and the office. The content is ruled; the names are not fixed and are settled with stage 1's layout.
@@ -6195,6 +6213,7 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
       reopened: R2 makes its ruled semantics representable in computed states;
     A3, A4, A5 and A9 each change code outside the domain, and each carries its acceptance check on kitting: the
     maintained sets stay byte-identical.
+    BUILT (1 October 2026): the rename, A9 with R2, A4, A5 and A3 (stage 1, steps 1 to 5). "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
   - Stage 2:
     - B7, `store_pallet`, with the second designation (the onward container);
     - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): B10's room (the freezer and the dry store on the opposite wall), with its own layout, setup and
@@ -6295,6 +6314,8 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     stops 10 to 30 cm before its target, the area an agent is in after "move to the gate" from each side, in the
     environment and in the computed state alike (R2);
     SETTLED (the same approval): the rule stays the order of declaration, stated in one shared function (`area_of`).
+    NOTE (T-G stage 1, step 2 as built, 1 October 2026): that shared function is `area_at`; `area_of` is the planner's
+    lookup for an object's area.
     An agent stops 10 to 30 cm short of the gate on its side of approach and stays in the area it came from; the
     projection's arrival point and the replay's walk end (where the body stops, answer 5) give the same area; only the
     centres of the gate and the office door lie on an edge;
@@ -6344,6 +6365,34 @@ Notes (not rulings):
   definition. (Under R1 the load-time replay no longer gives that sequence for a script with a standby entry.)
 - Finding: a robot task with no applicable method stops the run (C4, TODO-152).
 
+STAGE 1, STEPS 0 TO 5 BUILT (1 October 2026; built and accepted, each against the plan's acceptance and stop conditions).
+- Step 0: the HEAD runs of the extended set (the four maintained sets, the ten kitting drop scenarios, the IR and MPB
+  test-bed sets), kept outside git as the reference set of every later step; no commit.
+- Step 1, the rename "zone" to "area": 8d064ca; the stale references to removed dock_loading files: c21f001.
+- Step 2, the declared areas and the agent's area in a computed state (A9, R2): b513b82; the layout's per-object area
+  field dropped: 9bca721; `shared/io_contracts.md`: a76054f.
+- Step 3, liveness by applicability (A4) and `AdaptivePlanner.is_applicable`: bd4bddc.
+- Step 4, object states and designations (A5): b74485b; `shared/io_contracts.md`, `domains/README.md`: 50f2fb8.
+- Step 5, the human's script form (A3): 048a36e; `shared/io_contracts.md`: 576f2b2.
+Next: step 6 (dock_loading's catch-up, with the area ids), step 7 (the domain's content), then the milestone (step 8).
+NOTES (records, 1 October 2026; facts of the build, not rulings):
+- The shared function for a position's area is `area_at(position, areas)` (the plan's 3d named it `area_of`); the
+  planner's lookup for an object's area keeps the name `area_of`.
+- A setup entry that still carries the old per-object state fields (`is_empty`, `is_scanned`) is ignored for those
+  fields, not refused. An authoring risk, parked under TODO-151; step 4 was not widened.
+- A dock_loading grasp raises an explicit error (the action declares no `moved_object_key`) until step 6 gives `pick_up`
+  its final form. Intended; no fixture grasps.
+- Step 2 made the walks of kitting's load-time replay 1 to 3 ticks shorter (the replay's walk ends where the body stops,
+  answer 5); no maintained output contains them.
+- Step 3 removed two dead branches, in the adequacy test and in the warrant, with no change of output.
+- A closing entry begun and not finished at the run's end counts as open. A dependent script always writes its end line
+  (`[rec] end step=n open=-` when no entry is open).
+- The log wording for a hypothesis that never enters the live set, `[IR-inapplicable] step=N <key> does not enter the
+  live set: no applicable method`, is confirmed as built.
+- Four frozen analysis scripts no longer run since the rename (step 1): `analysis/i4_evidence_model/check_i4.py`,
+  `analysis/g1_graded_evidence/unit_checks.py`, `analysis/i4c_episode/check_i4c.py`,
+  `analysis/i4d_fold_unknown/check_i4d.py`; they need the old field names. Frozen records: not edited.
+
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
   and names no fixed object.
@@ -6374,3 +6423,5 @@ layout and setup, agreed in the design chat, then stage 1's plan.
 SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): stage 1's rooms and setups are agreed (B14). Next: stage 1's plan.
 SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 7): stage 1's plan is approved (STAGE 1 PLAN APPROVED above;
 `docs/handoffs/plan_T-G_stage1.md`). Next: stage 1's build, step 0 then step 1 (the rename).
+SUPERSEDED (records, 1 October 2026): steps 0 to 5 of stage 1 are built and accepted (STAGE 1, STEPS 0 TO 5 BUILT
+above). Next: the domain steps, step 6 (the catch-up) and step 7 (the content), then the milestone (step 8).
