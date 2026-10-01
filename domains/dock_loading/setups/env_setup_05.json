@@ -1,0 +1,75 @@
+{
+  "notes": "T-G stage 1, kind 2 (the MPB), written for env_layout_03 (B14): four full pallets in the truck, two designated to each delivery bay; two empty pallets in the empties container, each designated to the truck.",
+  "env_objects": [
+    {
+      "id": "pallet_0",
+      "type": "pallet",
+      "initial_container": "truck_interior",
+      "destination": "dry_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_1",
+      "type": "pallet",
+      "initial_container": "truck_interior",
+      "destination": "dry_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_2",
+      "type": "pallet",
+      "initial_container": "truck_interior",
+      "destination": "frozen_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_3",
+      "type": "pallet",
+      "initial_container": "truck_interior",
+      "destination": "frozen_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_4",
+      "type": "pallet",
+      "initial_container": "empty_pallet_bay_0",
+      "destination": "truck_interior",
+      "is_empty": true,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_5",
+      "type": "pallet",
+      "initial_container": "empty_pallet_bay_0",
+      "destination": "truck_interior",
+      "is_empty": true,
+      "size": [
+        80,
+        120
+      ]
+    }
+  ]
+}

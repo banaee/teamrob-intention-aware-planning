@@ -1,0 +1,66 @@
+{
+  "notes": "T-G stage 1, kind 1 (the IR test-bed), written for env_layout_02 (design_decisions.md, \"T-G: the second domain's rulings\", B14): two full unscanned pallets in each delivery bay, each designated to the bay it stands in; one full pallet in the truck, designated to the dry delivery bay; no empty pallets.",
+  "env_objects": [
+    {
+      "id": "pallet_0",
+      "type": "pallet",
+      "initial_container": "dry_delivery_bay_0",
+      "destination": "dry_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_1",
+      "type": "pallet",
+      "initial_container": "dry_delivery_bay_0",
+      "destination": "dry_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_2",
+      "type": "pallet",
+      "initial_container": "frozen_delivery_bay_0",
+      "destination": "frozen_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_3",
+      "type": "pallet",
+      "initial_container": "frozen_delivery_bay_0",
+      "destination": "frozen_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_4",
+      "type": "pallet",
+      "initial_container": "truck_interior",
+      "destination": "dry_delivery_bay_0",
+      "is_empty": false,
+      "is_scanned": false,
+      "size": [
+        80,
+        120
+      ],
+      "notes": "In the truck: its scan never becomes applicable while the robot is idle."
+    }
+  ]
+}

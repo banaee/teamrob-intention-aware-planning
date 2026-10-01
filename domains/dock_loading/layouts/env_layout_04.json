@@ -1,0 +1,176 @@
+{
+  "space": {
+    "width": 1200,
+    "height": 1480,
+    "name": "Dock Loading Domain Layout 04 (T-G stage 1)",
+    "units": "cm",
+    "note": "origin (0,0) at the centre of the hall, y up. T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14). The space is centred on the origin, x [-600, 600], y [-740, 740]: it holds every fixed object, the truck included (y from -740 to -440) and the office (y up to 415)."
+  },
+  "zones": [
+    {
+      "id": "zone_hall",
+      "bounds": {
+        "x_min": -600,
+        "x_max": 600,
+        "y_min": -300,
+        "y_max": 300
+      },
+      "label": "hall"
+    },
+    {
+      "id": "zone_office",
+      "bounds": {
+        "x_min": -170,
+        "x_max": 170,
+        "y_min": 300,
+        "y_max": 415
+      },
+      "label": "office"
+    },
+    {
+      "id": "zone_truck_side",
+      "bounds": {
+        "x_min": -600,
+        "x_max": 600,
+        "y_min": -740,
+        "y_max": -300
+      },
+      "label": "truck_side: the dock platform (y -440 to -300) and the truck (x -125 to 125, y -740 to -440), outside the gate; written as one rectangle, the form holds one rectangle per zone"
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "truck_interior",
+      "type": "truck",
+      "position": [
+        0,
+        -590
+      ],
+      "size": [
+        250,
+        300
+      ],
+      "zone": "zone_truck_side"
+    },
+    {
+      "id": "dock_gate",
+      "type": "gate",
+      "position": [
+        0,
+        -300
+      ],
+      "size": [
+        300,
+        10
+      ],
+      "zone": "zone_truck_side"
+    },
+    {
+      "id": "dry_delivery_bay_0",
+      "type": "delivery_bay",
+      "position": [
+        -255,
+        215
+      ],
+      "size": [
+        170,
+        170
+      ],
+      "zone": "zone_hall"
+    },
+    {
+      "id": "frozen_delivery_bay_0",
+      "type": "delivery_bay",
+      "position": [
+        -515,
+        -35
+      ],
+      "size": [
+        170,
+        170
+      ],
+      "zone": "zone_hall"
+    },
+    {
+      "id": "empty_pallet_bay_0",
+      "type": "empty_pallet_bay",
+      "position": [
+        515,
+        -35
+      ],
+      "size": [
+        170,
+        170
+      ],
+      "zone": "zone_hall",
+      "notes": "The one container for empty pallets of this room."
+    },
+    {
+      "id": "coffee_machine_0",
+      "type": "coffee_machine",
+      "position": [
+        -400,
+        -230
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "zone": "zone_hall"
+    },
+    {
+      "id": "office_door",
+      "type": "door",
+      "position": [
+        0,
+        300
+      ],
+      "size": [
+        100,
+        10
+      ],
+      "zone": "zone_hall"
+    },
+    {
+      "id": "office_chair",
+      "type": "office_chair",
+      "position": [
+        130,
+        365
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "zone": "zone_office"
+    },
+    {
+      "id": "desk",
+      "type": "landmark",
+      "position": [
+        300,
+        -260
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "zone": "zone_hall",
+      "notes": "Landmark: the target of the closing part (B13), at the wall on the gate's side, beside the place of the gate's button; no task of the robot's task model names it."
+    },
+    {
+      "id": "standby_place",
+      "type": "landmark",
+      "position": [
+        0,
+        0
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "zone": "zone_hall",
+      "notes": "Landmark: the standby place (A3's standby entry); the human's start position."
+    }
+  ]
+}
