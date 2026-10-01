@@ -4283,10 +4283,14 @@ binding of a variable the schema does not declare and does not require every par
 scenario_s01_02's `?delivery_bay` on `confirm_delivered_pallet` surfaced late, with a misleading message. (2) The `Tree`
 constructor does not check that a step's binding keys are the parameters of the action it calls, so dock_loading's
 `{?pallet: ...}` steps (before build 1) surfaced at decomposition. A proposal; untagged until Hadi rules it.
+PARKED HERE (records, 1 Oct 2026; T-G stage 1, step 4): a setup entry that still carries the old per-object state
+fields (`is_empty`, `is_scanned`) is ignored for those fields, not refused: an authoring risk of the same kind (malformed
+input let through). Step 4 was not widened. design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO
+5 BUILT, notes.
 Files: shared/types.py (`check_task_bindings`), shared/knowledge.py (`Tree`)
 Reference: design_decisions.md, "T-G: the second domain's rulings", PROPOSALS; TODO-25, TODO-104
 
-**TODO-152: A robot task with no applicable method stops the run (recorded, T-G records 7, 1 Oct 2026)** [OPEN; a ruling before T-G stage 2]
+**TODO-152: A robot task with no applicable method stops the run (recorded, T-G records 7, 1 Oct 2026)** [OPEN; a ruling before T-G stage 2] [V1]
 Found by T-G stage 1's plan (approved by Hadi, 1 Oct 2026). `MetaPlanner.update()` judges every task of the pool through
 `_is_complete` (`AdaptivePlanner.is_complete`, which decomposes it), and projects candidates through the planner; a task
 with no applicable method raises `DecompositionError`, which nothing catches, and the run stops. Stage 1 cannot reach it:
@@ -4296,3 +4300,26 @@ case was first cited under TODO-30, which concerns realizability (corrected).
 Files: shared/meta_planner.py (`update`, `_is_complete`, `_replan_tasks`, `_replan_orderings`), shared/projection.py
 Reference: design_decisions.md, "T-G: the second domain's rulings", B5, B11 (AMENDED), C4, STAGE 1 PLAN APPROVED;
 docs/handoffs/plan_T-G_stage1.md, section 5
+TAGGED [V1] (records, 1 Oct 2026): it must be ruled before stage 2.
+
+**TODO-153: The remaining "zone" wording, for the sweep of old terms at stage 1's close (recorded, records after T-G stage 1 step 5, 1 Oct 2026)** [OPEN; not swept now]
+The rename (T-G stage 1, step 1, 8d064ca) changed the code names; "zone" remains in wording. Listed once here, measured
+at 576f2b2 over the tracked files outside `ros_sim/`, `scripts/`, `analysis/` and the personal files. Occurrences
+(case-insensitive) per file:
+- Records: docs/design_decisions.md 59, docs/TODOS_AND_DEFERRED.md 33, docs/handoffs/plan_T-G_stage1.md 9,
+  docs/roadmap.md 8, docs/glossary.md 6, shared/io_contracts.md 6, docs/recognizer_handback.md 4, CLAUDE.md 4,
+  docs/handoffs/handoff_T-G_stage1_onward.md 2, domains/README.md 1 (the area-id convention `zone_<descriptor>`). Much
+  of it is history (I2's zone context, ZONE_BOOST, the rename's own records), which stays as written.
+- Comments and docstrings: mesa_sim/viz/space_drawer.py 14 (the colour keys `zone_NW` ... `zone_office`, keyed by area
+  id; the viewer is T-V's), domains/kitting/actions.py 11 (the commented-out `goto_zone`), shared/types.py 7 (examples
+  `Const('zone_SE')`, `goto_zone`, `movement_target_type` "zone", `GOTO_ZONE`), shared/projection.py 2 (the zone movement
+  target removed from the live domain), tests/test_tg_areas.py 3 (kitting's area ids).
+- Scenario descriptions quoting old values: domains/kitting/scenarios/scenarios_s01.py 1, scenarios_s03.py 2 (ZONE_BOOST,
+  `zone_SW`).
+- Not wording: kitting's area ids (`zone_NW`, `zone_SE`, ...) in its layouts stay (the plan's answer 3); dock_loading's
+  change in step 6. `ros_sim/` keeps the old field names (TODO-111's note). Four frozen analysis scripts need the old
+  field names and no longer run (design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT,
+  notes); frozen records are not edited.
+Files: as listed
+Reference: design_decisions.md, "T-G: the second domain's rulings", A2 (the rename), STAGE 1 PLAN APPROVED;
+docs/handoffs/plan_T-G_stage1.md, section 1
