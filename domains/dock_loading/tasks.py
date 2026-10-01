@@ -325,7 +325,7 @@ office_break = PersonalTask(
             steps=[
                 _go(OFFICE_DOOR),
                 _go(_office_chair),
-                ActionStep(wait_at, {_entity: _office_chair, _duration: Const("PT60S")}),
+                ActionStep(wait_at, {_entity: _office_chair, _duration: Const("PT90S")}),
             ],
         ),
         MethodSchema(
@@ -334,7 +334,7 @@ office_break = PersonalTask(
             guards=[_in(OFFICE)],
             steps=[
                 _go(_office_chair),
-                ActionStep(wait_at, {_entity: _office_chair, _duration: Const("PT60S")}),
+                ActionStep(wait_at, {_entity: _office_chair, _duration: Const("PT90S")}),
             ],
         ),
     ],
