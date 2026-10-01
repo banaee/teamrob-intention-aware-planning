@@ -15,7 +15,7 @@ USAGE:
     python mesa_sim/run_mesa.py --domain dock_loading
 
     # Headless with full overrides:
-    python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_s01_02 --steps 400
+    python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_s03_01 --steps 400
 
     # Another run file, and one override of a fact of the run's artefacts (T-L stage 4):
     python mesa_sim/run_mesa.py --run my_run.yaml --override layout.shelf_2.position=-300,-300
@@ -59,10 +59,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from mesa_sim.sim_model import SimModel
 from mesa_sim.overrides import run_overrides
-# from domains.kitting.registry import register_kitting_domain
-# from domains.kitting.scenarios import scenario_s02_02 as kitting_scenario_s02_02
-# from domains.dock_loading.registry import register_dock_loading_domain
-# from domains.dock_loading.scenarios import scenario_s01_01 as dock_scenario_s01_01, scenario_s01_02 as dock_scenario_s01_02
 
 from domains.kitting.registry import domain_config as kitting_config
 from domains.dock_loading.registry import domain_config as dock_config

@@ -81,6 +81,11 @@ them through the scenario table (`s20` = scenario_20 = scenario_s03_01).
 | scenario_10 | scenario_s01_01 |
 | scenario_11 | scenario_s01_02 |
 
+Note (1 October 2026, T-G stage 1, step 1): the dock_loading rows above name artefacts since removed. env_layout_01, env_setup_01
+and build 1's scenarios (scenario_s01_01, scenario_s01_02) were replaced by stage 1's rooms (B14): env_layout_02 to
+env_layout_04, env_setup_02 to env_setup_07 and the viewing fixtures scenario_s02_01 to scenario_s07_01. The rows stay as the
+record of the T-L rename.
+
 ## The maintained baseline logs
 
 Named `<layout id>_<scenario id>_<run options>.log` (ruling 6) from stage 3 on; the old condition tags map as:

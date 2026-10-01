@@ -6,7 +6,7 @@ Each domain is self-contained: tasks, actions, scenarios, environment layout, an
 ```
 domains/
     kitting/          ← reference implementation (fully filled)
-    dock_delivery_loading/      ← skeleton ready to be filled
+    dock_loading/     ← the second domain (T-G; in build)
     <your_domain>/    ← copy the skeleton, fill it in
 ```
 
