@@ -4366,10 +4366,14 @@ to 188; env_layout_03 58 to 65 and 159 to 173; env_layout_04 57 to 76 and 148 to
 where the coffee machine lies in the same direction from the standby place: env_layout_04, admitted 19 ticks after it
 enters; env_layout_02, leading 19 ticks after it enters (308) and clearing theta at 315. The last scan of each run is
 never admitted: an empty pool gives no further decision (noted, no action).
+NOTE (Hadi, 1 Oct 2026; T-G records 8; design_decisions.md, "T-G: the second domain's rulings", C1, STAGE 1.5): an
+enabling event, such as the robot's own delivery, is one of four determinants recorded for stage 1.5's design question,
+NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, which exists; context facts; the
+task that just ended, a transition prior between tasks; an enabling event). They are designed as one mechanism.
 Files: shared/recognizer.py, shared/meta_planner.py (no change)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
 
-**TODO-155: Hypotheses for the walks to the standby place and to the desk (recorded, T-G stage 1 milestone, 1 Oct 2026)** [PARKED; NOT RULED; now with evidence]
+**TODO-155: Hypotheses for the walks to the standby place and to the desk (recorded, T-G stage 1 milestone, 1 Oct 2026)** [PARKED; NOT RULED; now with evidence] [RULED FOR NOW, 1 Oct 2026 (T-G Q16): no hypothesis; H1 and H2 recorded, neither approved]
 Whether the robot's mind holds hypotheses for the human's walk to the standby place (the repeatable entry) and to the
 desk (the closing part). Neither is in the robot's task model (the plan's section 5: a scenario with a standby entry is
 classed as containing unmodelled behaviour). The approval parked the related question of the human stepping aside
@@ -4382,6 +4386,26 @@ six walks to the standby place are admitted as coffee_break or office_break on t
 (env_layout_02 at 114 and 231; env_layout_03 at 109 and 206; env_layout_04 at 94; the sixth never clears theta); the
 finding turns unexplained once the human stands. In this domain the walk follows almost every scan, so the case is
 frequent. It becomes the first design question before the IR test-bed set on dock_loading. NOT RULED.
+RULED FOR NOW (Hadi, 1 Oct 2026; T-G Q16; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block,
+RULED, T-G records 8): the walk to the standby place stays without a hypothesis for now. The IR test-bed set observes how
+the present recognizer explains it; that is the baseline. Two candidates are recorded here, neither approved for
+building:
+- H1: a foreseeable task "the human steps aside to the standby place", always possible, with the standby place as a
+  fixed object.
+- H2: a hypothesis that is live only while no assigned task of the human is applicable.
+The difference: the human steps aside only when no other pallet is applicable, so H1 states an unconditional behaviour
+that the human does not perform, and competes with the scans when a pallet waits; H2 matches the condition and changes
+the rule for the live set (A4).
+Not taken: the walk as the tail of the scan task. Reasons: the human would step aside after every scan, also when a
+pallet waits; the condition "no other pallet waits" cannot be stated in a method; the scan's terminal fact would hold in
+the middle of the task.
+In the IR test-bed set the standby walks (C13, C14, M4) are diagnostic observations: beside the expectation under the
+present model, the predictions under H1 and under H2 are written down before the run; only the present model's
+expectation is compared with the run.
+NOTE (T-G records 8, not a ruling): Q16 concerns the walk to the standby place; the walk to the desk, this item's second
+walk, is not ruled by it (B13's note: the desk is a landmark in stage 1, so no hypothesis, as for kitting's exit walk).
+Related, for stage 1.5, NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, context
+facts, the task that just ended, an enabling event; one mechanism); design_decisions.md, C1, STAGE 1.5.
 Files: domains/dock_loading/tasks.py (the task model), shared/recognizer.py
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; docs/handoffs/plan_T-G_stage1.md, section 5; TODO-140, TODO-154
 
@@ -4396,7 +4420,11 @@ Files: domains/dock_loading/tasks.py
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B7, B11 (AMENDED); docs/handoffs/plan_T-G_stage1.md,
 section 4
 
-**TODO-157: The duration of office_break (recorded, the review of the task file, 1 Oct 2026)** [OPEN; Hadi's word pending]
+**TODO-157: The duration of office_break (recorded, the review of the task file, 1 Oct 2026)** [OPEN; Hadi's word pending] [CLOSED AS RULED, 1 Oct 2026: 90 seconds; the value is changed in the next build step]
 `office_break` waits 60 seconds, a value copied from `coffee_break`; no record gives it. Hadi's word is pending.
+CLOSED AS RULED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block, RULED,
+T-G records 8; B6's note): `office_break` lasts 90 seconds; `coffee_break` stays 60. Reason: a long absence lets pallets
+accumulate in a bay, which gives two scans possible at once and the robot arriving at an occupied bay; it differs
+clearly from the coffee break. The change of the value is made in the next build step.
 Files: domains/dock_loading/tasks.py (`office_break`)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B6

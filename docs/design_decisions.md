@@ -6020,6 +6020,10 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   and the chair stands inside the office. Until track 4 is built the office is observed. (It answers DESIGN-15's point
   3.) Not taken: a third foreseeable task of the same structure (standing with a colleague); a variant in which the human
   scans all pallets only after every delivery; recognizing which variant of a task a human follows.
+  ADDED (Hadi, 1 October 2026; T-G records 8): `office_break` lasts 90 seconds; `coffee_break` stays 60 (TODO-157,
+  closed as ruled; the value is changed in the next build step). Reason: a long absence lets pallets accumulate in a bay,
+  which gives two scans possible at once and the robot arriving at an occupied bay; it differs clearly from the coffee
+  break. "T-G: the second domain's rulings", T-G Q16's block (RULED, T-G records 8).
 - B7, Q8 (H2'): `store_pallet(?pallet)`, a work task of the human: it takes a delivered and scanned pallet from its
   delivery container to its onward container. Condition: the pallet is in its delivery container and is scanned, so the
   order per pallet is delivered, scanned, stored. Each full pallet has a second designation in the setup, its onward
@@ -6178,6 +6182,12 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   - the prior under context;
   - the perception assumption for context facts.
   The pre-loaded context stream moves from T-V track 2 to stage 1.5. T-V track 2 keeps the live events.
+  ADDED (Hadi, 1 October 2026; T-G records 8; T-G Q16's block below, RULED), NOT RULED: one design question for stage
+  1.5, what sets a hypothesis's share at the start of an episode. Four determinants are recorded for it: the assignment
+  (exists); context facts; the task that just ended (a transition prior between tasks, Hadi's idea); an enabling event,
+  such as the robot's own delivery (TODO-154). They are designed as one mechanism. Also Hadi's ideas for stage 1.5, NOT
+  RULED: the duration of a foreseeable task is not one fixed number; temporal context can be a fuzzy set with a degree
+  of membership.
   A requirement on stage 1's plan (the same ruling): the form built for A5 admits a fact that no action changes and that
   is not the state of a movable object. Reason: context knowledge then needs no second mechanism. Stage 1 authors no such
   fact.
@@ -6527,6 +6537,72 @@ classification):
 Next: the design of the IR test-bed set with Hadi (first question: TODO-155); then the sorting of the earlier analyses
 and tests under kitting, with the preparation of the instruments (the step added above); then the set's authoring and
 its runs.
+RULED (Hadi, 1 October 2026; recorded in T-G records 8, 1 October 2026): T-G Q16, the duration of office_break, and the
+IR test-bed set on dock_loading. Records only; nothing in this block is built.
+- Q16, the walk to the standby place in the robot's mind (TODO-155).
+  The walk stays without a hypothesis for now. The IR test-bed set observes how the present recognizer explains it; that
+  is the baseline.
+  Two candidates are recorded on TODO-155, neither approved for building:
+  - H1: a foreseeable task "the human steps aside to the standby place", always possible, with the standby place as a
+    fixed object.
+  - H2: a hypothesis that is live only while no assigned task of the human is applicable.
+  The difference: the human steps aside only when no other pallet is applicable. H1 states an unconditional behaviour
+  that the human does not perform, and competes with the scans when a pallet waits; H2 matches the condition and changes
+  the rule for the live set (A4).
+  Not taken: the walk as the tail of the scan task. Reasons: the human would step aside after every scan, also when a
+  pallet waits; the condition "no other pallet waits" cannot be stated in a method; the scan's terminal fact would hold
+  in the middle of the task.
+  For stage 1.5, one design question, NOT RULED: what sets a hypothesis's share at the start of an episode. Four
+  determinants are recorded for it: the assignment (exists); context facts; the task that just ended (a transition prior
+  between tasks, Hadi's idea); an enabling event, such as the robot's own delivery (TODO-154). They are designed as one
+  mechanism. Recorded under C1, STAGE 1.5.
+  Also for stage 1.5, Hadi's ideas, NOT RULED: the duration of a foreseeable task is not one fixed number; temporal
+  context can be a fuzzy set with a degree of membership. Recorded under C1, STAGE 1.5.
+- The duration of office_break (TODO-157, closed as ruled): `office_break` lasts 90 seconds; `coffee_break` stays 60.
+  Reason: a long absence lets pallets accumulate in a bay, which gives two scans possible at once and the robot arriving
+  at an occupied bay; it differs clearly from the coffee break. The change of the value is made in the next build step.
+  B6's note.
+- The IR test-bed set for dock_loading, agreed: 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to M4), each in all
+  three rooms (env_layout_02, env_layout_03, env_layout_04), on the room's IR setup (kind 1 of B14: env_setup_02,
+  env_setup_04, env_setup_06; pallet_0 and pallet_1 in the dry bay, pallet_2 and pallet_3 in the frozen bay, pallet_4 in
+  the truck), the robot idle on the gate's centre, the human starting at the standby place, the closing part the walk to
+  the desk (B13). "scan n" is `confirm_delivered_pallet` of pallet_n; where no assignment is named, the assigned tasks
+  are the script's scans. The script of each, with its purpose:
+  - C1: scan 0, scan 2 (assigned work, two bays).
+  - C2: scan 2, scan 0 (order).
+  - C3: scan 0, scan 1 (two scans with the same motion).
+  - C4: scan 0, 2, 1, 3 (lifecycle over many episodes).
+  - C5: scan 0, coffee_break, scan 2 (a foreseeable task between scans).
+  - C6: scan 0, office_break, scan 2 (the office and its door).
+  - C7: scan 0 with coffee_break started on arrival at the pallet; scan 2 (a foreseeable task inside a scan).
+  - C8: scan 0 with coffee_break cut into the walk to the pallet; scan 2 (an interruption inside a walk).
+  - C9: scan 0 dropped during its walk; scan 2 (a dropped scan).
+  - C10: scan 0 dropped; scan 2; scan 0 as a second entry (an authored retry; Q12).
+  - C11: scan 0; a stand in the hall; scan 2 (the long stand).
+  - C12: assigned the scans of 0 and 2; script: scan 1, scan 2 (a scan outside the assigned set).
+  - C13: assigned the scans of 0 and 4; script: scan 0, scan 4, the standby entry; dependent (the standby walk from the
+    dry bay; a hypothesis never live).
+  - C14: assigned the scans of 2 and 4; script: scan 2, scan 4, the standby entry; dependent (the standby walk from the
+    frozen bay).
+  - M1: scan 0 with coffee_break on arrival; office_break; scan 2.
+  - M2: scan 0 dropped; coffee_break; scan 2; scan 0.
+  - M3: scan 0; a stand; scan 1 with coffee_break cut into the walk.
+  - M4: assigned 0, 2, 4; script: scan 1; office_break; scan 2; scan 4; the standby entry; dependent.
+  Rules of the set:
+  - The controlled scenarios run and are read first; a mixed scenario is read only against what the controlled ones have
+    shown.
+  - Expectations are derived from the records before the runs (as in "The IR test-bed").
+  - Nothing is adjusted to a result; findings are classified (`docs/assumptions.md`).
+  - The standby walks (C13, C14, M4) are diagnostic observations. Beside the expectation under the present model, the
+    predictions under H1 and under H2 (Q16) are written down before the run. Only the present model's expectation is
+    compared with the run.
+  NOTE (T-G records 8, not a ruling; a consequence of Q14 and B14 to be confirmed by Hadi): in C13, C14 and M4 the scan
+  of pallet_4 never becomes applicable (the robot is idle, pallet_4 stays in the truck), so its entry stays open, the
+  priority list is never finished and the closing part, the walk to the desk, is not taken; the record states the
+  entries still open at the run's end (Q13b).
+Next: the build step that sorts the earlier analyses and tests under kitting and prepares the instruments for dock_loading
+(the step added above, with the plan's section 7, "After the milestone"); then the authoring of the set, its
+expectations and its runs.
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
@@ -6568,3 +6644,7 @@ SUPERSEDED (records, 1 October 2026): the second milestone scenario is built and
 complete (STAGE 1, THE SECOND MILESTONE SCENARIO BUILT above). Next: the design of the IR test-bed set with Hadi (first
 question: TODO-155); then the sorting of the earlier analyses and tests under kitting, with the preparation of the
 instruments; then the set's authoring and its runs.
+SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 8): TODO-155 is ruled for now (T-G Q16: the walk stays without
+a hypothesis) and the IR test-bed set on dock_loading is agreed (T-G Q16's block above, RULED). Next: the build step that
+sorts the earlier analyses and tests under kitting and prepares the instruments for dock_loading; then the authoring of
+the set, its expectations and its runs.
