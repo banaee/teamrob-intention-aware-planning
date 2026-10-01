@@ -392,6 +392,7 @@ stage 1, agreed in the design chat, then stage 1's plan.
 SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (T-G Q12 to Q15; design_decisions.md, "T-G:
 the second domain's rulings", A3, B13). Next: the layout and the setup of T-G's stage 1, then stage 1's plan. T-G's
 order is stage 1, stage 1.5 (context knowledge, new), stage 2, track 4, stage 3.
+SUPERSEDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): stage 1's rooms and setups are agreed. Next: stage 1's plan.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -629,6 +630,13 @@ order is stage 1, stage 1.5 (context knowledge, new), stage 2, track 4, stage 3.
     represents the agent's resulting area consistently with the area fact the environment would emit, one definition for
     both; the plan names the shared representation and every consumer of a computed state that decomposes a later task,
     and proposes the form; acceptance on kitting byte-identical (R2).
+    ROOMS AND SETUPS (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): three rooms, env_layout_02, env_layout_03 and env_layout_04 (the
+    hall, the office, the gate, the truck, the desk and the standby landmarks identical; the bays, the empties container
+    and the coffee machine placed per room), and six setups, two kinds per room (kind 1 for the IR test-bed: pallets in
+    their delivery bays and one in the truck; kind 2 for the MPB: pallets in the truck, two empties); the empty pallets
+    designated to the truck. env_layout_01, env_setup_01 and scenario_s01_01 to _03 are removed. Full observation in
+    stage 1. A milestone before the IR test-bed: one simple scenario per room runs from start to end. B10's room moves to
+    stage 2.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
@@ -638,6 +646,9 @@ order is stage 1, stage 1.5 (context knowledge, new), stage 2, track 4, stage 3.
     context stream moves here from T-V track 2.
   - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
     run, TODO-16 with the stepwise delivery (A7).
+    ADDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): B10's room (the stores), with its own layout, setup and scenarios; A8's rule on
+    monitored areas reopened (the robot observes its own area only, or its own and every area behind an open passage;
+    the trigger at disappearance and reappearance with it).
     BUILDS: B7 with the second designation; B5, the gate opened on request and the office door's state; A7, TODO-16,
     after the MPB's first run on dock_loading.
   - After stage 2: track 4 in its reduced form (A8, TODO-140).

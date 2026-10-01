@@ -1186,6 +1186,9 @@ stage 1, in its own commit, with no change of behaviour (Hadi, 1 October 2026). 
 **monitored area** — an area in which the robot observes the human. Outside every monitored area the robot receives no
 observation of the human; its knowledge of objects is not affected. Fixed per layout, independent of where the robot is;
 kitting monitors its whole room, dock_loading's office is unmonitored. Ruled with track 4's reduced form (A8), not built.
+REOPENED AT STAGE 2 (T-G, Hadi and the design chat, 1 October 2026): "fixed per layout, independent of where the robot
+is" is reopened at T-G's stage 2 (alternatives: the robot observes its own area only; its own area and every area behind
+an open passage); stage 1 keeps full observation. design_decisions.md, "T-G: the second domain's rulings", A8, B14.
 NEAR TERMS, not merged (TODO-140, `docs/assumptions.md` 1.1, 2.3, §2 **fallback projection**): "the shared workspace",
 "the shared work area", "the robot's operational area", "the outside area" and "the observable area" of TODO-140's
 framing; and the "workspace boundary", the edge of the space a fallback ray meets.

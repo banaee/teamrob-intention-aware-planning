@@ -4058,6 +4058,9 @@ Reference: docs/assumptions.md 1.4
 **TODO-140: Track 4, the workspace boundary and human departure (recorded at the G/X handoff, 29 Sept 2026)** [OPEN; after track 3, or before it if the evaluation needs a genuine departure] [V1, reduced form]
 NOTE (T-G B13, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", B13): no exit from the room is
 defined for dock_loading now; its script ends with the walk to the desk, the closing part (A3, Q14).
+NOTE (T-G B14, Hadi and the design chat, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A8): the
+rule "monitored areas are fixed per layout and do not depend on where the robot is" is reopened at T-G's stage 2, with
+the trigger at the human's disappearance and reappearance; stage 1 keeps full observation.
 RULED, REDUCED FORM (T-G A8, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A8), [V1]: "The layout declares monitored areas. The robot's
 WorldState holds the human, and facts about the human, only while the human is inside one. While no human is observed,
 the recognizer does not update, no human projection exists, and the planner plans as with no human present. The

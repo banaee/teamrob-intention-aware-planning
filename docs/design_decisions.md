@@ -5923,6 +5923,10 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   CONFLICT MARKED (T-G records 1, not resolved): "each cause a new decision": the trigger set has three members (glossary
   §4); whether a new trigger or an existing one makes that decision is for track 4's plan.
   Note: `docs/assumptions.md` 2.3 ("Not in the Mesa body: the human never leaves") holds until A8 is built.
+  REOPENED AT STAGE 2 (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): the rule "monitored areas are fixed per layout and do not depend on where the robot is"
+  is reopened at stage 2 (B14). Alternatives noted for then: the robot observes its own area only; its own area and every
+  area behind an open passage. The trigger at the human's disappearance and reappearance is ruled with it. Whether that
+  build is inside stage 2 or its own increment is decided then. Stage 1 keeps full observation.
 
 - A9, areas and the gate (the framework side of T-G Q11).
   The layout declares areas. The environment emits the fact that an agent is in an area. The area of each container is
@@ -6017,6 +6021,12 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   (env_layout_01, env_setup_01) stay for the viewing fixture.
   READS (B13, T-G records 2, 1 October 2026): "landmarks for the exit walk" reads: the desk landmark, which enters stage
   1's layout.
+  MOVED TO STAGE 2 (Hadi and the design chat, 1 October 2026; recorded in T-G records 5); B14: the arrangement above (the freezer and the dry store on the opposite wall) is stage
+  2's room, with its own layout, setup and scenarios; it is unchanged and can be revised when stage 2's layout is agreed.
+  Reason: that arrangement serves `store_pallet`, which stage 1 does not have. Stage 1 uses the three rooms of B14.
+  "The present ones (env_layout_01, env_setup_01) stay for the viewing fixture" is superseded: they are removed with
+  their three scenarios, and the viewing fixtures of B14 replace build 1's. The other catch-up requirements hold for
+  B14's rooms (every fixed object inside the space; the areas declared; the desk landmark).
 - B11, Q11 (P2) in dock_loading: passing the gate is a plain step "move to the gate", whose target is the gate's centre
   point; no special action. The domain has three areas, divided by the gate and by the office door: the truck side (the
   truck and the dock platform, outside the gate), the hall, and the office (A9; names settled with stage 1's layout; the
@@ -6056,6 +6066,43 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   NOTE (T-G records 3, 1 October 2026; not a ruling): the desk is a landmark in stage 1, so no task of the robot's task
   model names it and the robot's mind holds no hypothesis for the walk to the desk, as for kitting's exit walk. Whether
   the desk becomes a fixed object is stage 3's question.
+- B14, stage 1's rooms and setups (Hadi and the design chat, 1 October 2026; recorded in T-G records 5).
+  Rooms. Stage 1 uses three rooms, env_layout_02, env_layout_03 and env_layout_04, derived from the present room. The old
+  env_layout_01, env_setup_01 and the three scenarios on it are removed; the viewing fixture of build 1 is replaced by the
+  fixtures written with these rooms. The room of B10 (the freezer and the dry store on the opposite wall) moves to stage 2
+  (B10's note). More rooms and setups may be added in stage 1 later.
+  Identical in the three rooms (centres in cm; origin and axes as before): the hall, x from -600 to 600, y from -300 to
+  300; the office, x from -170 to 170, y from 300 to 415; the office door (0, 300); the chair (130, 365), inside the
+  office; the gate (0, -300), width 300; the truck (0, -590), 250 by 300; the dock platform as before; the desk, a
+  landmark, (300, -260); the standby place, a landmark, (0, 0); the delivery bays and the empties container 170 by 170;
+  the coffee machine 50 by 50. The declared space contains every fixed object, the truck included.
+  Differing:
+  - env_layout_02: dry delivery bay (-515, 215); frozen delivery bay (515, 215); empties (-515, -35); coffee machine
+    (505, 30).
+  - env_layout_03: dry delivery bay (-515, 215); frozen delivery bay (515, 0); empties (-515, -35); coffee machine
+    (-400, -230).
+  - env_layout_04: dry delivery bay (-255, 215); frozen delivery bay (-515, -35); empties (515, -35); coffee machine
+    (-400, -230).
+  One container for empty pallets per room. The three areas (truck side, hall, office) are declared in each layout,
+  written under the name the code has today (zones); stage 1's rename step converts them.
+  Agents. The human starts at the standby place. IR test-bed: the robot stands idle on the gate's centre point (0, -300)
+  for the whole run. MPB: the robot starts on the truck side. Stage 1 keeps full observation: the robot observes every
+  area, the office included, wherever it stands. A8's rule on monitored areas is reopened at stage 2 (A8's note).
+  Setups, two kinds per room (six files):
+  - Kind 1, for the IR test-bed: two full unscanned pallets in the dry delivery bay and two in the frozen delivery bay,
+    each designated to the bay it stands in; one full pallet in the truck, designated to the dry delivery bay; no empty
+    pallets. Reason: one setup serves three cases by the scans a scenario assigns (one scan per bay; two scans in one
+    bay, the same-motion case; the scan of the pallet in the truck, which never becomes applicable, so the human goes to
+    the standby place).
+  - Kind 2, for the MPB: four full pallets in the truck, two designated to each delivery bay; two empty pallets in the
+    empties container. Reason: the robot's pool always holds a delivery to the other bay and a return.
+  - RULED: the setup designates the truck as the destination of each empty pallet (the PROPOSAL of that name). Reason:
+    one rule covers every pallet.
+  - A third kind, all four full pallets designated to one bay, is added after the first MPB run if its results call for
+    it.
+  Staging: a milestone in stage 1's build, before the IR test-bed: one simple scenario per room runs from start to end.
+  Stage 1's "before the plan" points on the layout and the setup (C1's "before each stage's plan the design chat and
+  Hadi agree the layout and the setup") are closed by this entry for stage 1.
 
 PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 
@@ -6103,7 +6150,10 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
       point on the way; the office is observed;
     - B10, the room; whether the stores and the freezer are already present in stage 1's layout is not ruled
       (PROPOSALS);
+      SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): stage 1 builds B14's three rooms and six setups; B10's room is stage 2's; the proposal is
+      closed as not taken;
     - the IR test-bed on dock_loading, then the MPB.
+    - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): before the IR test-bed, a milestone: one simple scenario per room of B14 runs from start to end;
     - ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R2, framework-wide, a requirement on stage 1's plan: the agent's area in a computed
       state. After a movement action, the computed successor state represents the agent's resulting area consistently
       with the area fact that the environment would emit at the end of that movement. One definition of "the agent is in
@@ -6118,6 +6168,10 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     maintained sets stay byte-identical.
   - Stage 2:
     - B7, `store_pallet`, with the second designation (the onward container);
+    - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): B10's room (the freezer and the dry store on the opposite wall), with its own layout, setup and
+      scenarios;
+    - ADDED (the same): A8's rule on monitored areas reopened (A8's note); its build inside stage 2 or its own
+      increment, decided then;
     - B5, the gate opened on request, and the office door's state;
     - A7, TODO-16, after the MPB's first run on dock_loading.
   - After stage 2: A8, track 4.
@@ -6132,8 +6186,13 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   tasks in `assigned_tasks`) and scenario_s01_03, a viewing fixture that loads and initialises. scenario_s01_01 and
   scenario_s01_02 still fail at load by intent (`infeasible:office_break(...)` in the load-time replay: the door
   condition). Re-measured at 62ebc4e (1 October 2026): as stated.
+  SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5); B14: env_layout_01, env_setup_01 and scenario_s01_01 to _03 are removed; B14's viewing fixtures
+  replace scenario_s01_03.
 - C3, the state of `domains/dock_loading/` after build 1 (the survey of 30 September; each line verified against the code
   at 62ebc4e, 1 October 2026). Stage 1's plan starts from this list.
+  NOTE (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): the lines on env_layout_01, env_setup_01 and their scenarios (the truck outside the space, the office
+  chair in the hall, no landmarks, no assigned tasks for the human) describe artefacts B14 removes; B14's rooms have every
+  fixed object inside the space, the chair inside the office and the two landmarks. The rest of the list stands.
   Still not in kitting's current form:
   - no `HumanOnlyTask` (`go_to`, `stand`, `go_to_and_stand`) and no `stand` action; no `script.py` with the call forms;
     the scenarios use raw `TaskInstance`s;
@@ -6196,10 +6255,13 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
   and names no fixed object.
+  RULED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5), B14: the setup designates the truck as the destination of each empty pallet (one rule covers every
+  pallet). How `load_return` reads it is for stage 1's plan.
 - Two generic load checks in `shared/` that let malformed input through (TODO-151, recorded as a proposal, untagged).
 - TODO-131 (the robot-mind object): A8's reduced form does not need it, so its landing in track 4 is no longer implied;
   its placement is open (TODO-131's note).
 - Stage 1 may already use the room of B10, with the stores and the freezer present and unused.
+  CLOSED, NOT TAKEN (Hadi and the design chat, 1 October 2026; recorded in T-G records 5), B14: B10's room moves to stage 2; stage 1 uses three rooms without stores.
 - `pytest` over the whole repo stops on collection errors in `ros_sim/framework_HRI/test/` that predate build 1. Measured
   at 62ebc4e: three files (`test_copyright.py`, `test_flake8.py`, `test_pep257.py`; the `ament_*` modules are missing);
   the proposal named the first.
@@ -6217,3 +6279,4 @@ SUPERSEDED (T-G records 1, third follow-up, 1 October 2026): the order is the li
 (A3, PARKED), then stage 1's layout and setup, then stage 1's plan.
 SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (A3, Q12 to Q15; B13). Next: stage 1's
 layout and setup, agreed in the design chat, then stage 1's plan.
+SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): stage 1's rooms and setups are agreed (B14). Next: stage 1's plan.
