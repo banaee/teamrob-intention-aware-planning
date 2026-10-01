@@ -51,4 +51,5 @@ for RUN in $RUNS; do
   PYTHONHASHSEED=0 $PY $DOM/properties.py $sid $OUT $LOG $RUN
   $PY $D/plot.py $sid $OUT
   if [ "$PRIOR" = on ] && [ -f $OUT/expected_ticks.json ]; then $PY $D/plot_ir.py $OUT $LOG; fi   # the IR test-bed's figure
+  $PY analysis/instruments/common/separation.py $LOG > $OUT/separation.md          # since the sort
 done

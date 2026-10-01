@@ -39,7 +39,6 @@ import yaml
 import oracle as ir                                    # the IR test-bed's oracle (analysis/ir_testbed/oracle.py)
 from shared.knowledge import TaskModel
 from shared.planner import AdaptivePlanner, DecompositionError
-from domains.kitting.registry import domain_config, register_kitting_domain
 from mpblib import Action, Admitted, Gate, Room, TickRow, dump, fallback, perception
 
 FORBIDDEN = ("shared.meta_planner", "shared.realization", "shared.projection", "shared.recognizer",
@@ -54,6 +53,7 @@ def room(traj, run_file) -> Room:
     """DP P2 / P4: the workspace rectangle (the layout's space, centred) and every non-portable object of the layout,
     landmarks included; the arrival radius the body's (the trajectory's parameters)."""
     cfg = yaml.safe_load(open(run_file))
+    domain_config = ir.domain_of(run_file)                       # the run file's domain (since the sort)
     sc = domain_config["scenarios"][cfg["scenario"]]
     layout = json.load(open(ROOT / domain_config["layouts"][cfg.get("layout") or sc.reference_layouts[0]]))
     w, h = layout["space"]["width"], layout["space"]["height"]
@@ -66,6 +66,7 @@ class OutsidePreRunDomain(Exception):
 
 
 def derive(traj, run_file, alpha, theta):
+    domain_config = ir.domain_of(run_file)                       # the run file's domain (since the sort)
     human = next(a for a in domain_config["scenarios"][traj["scenario"]].agents if a.agent_type == "human")
     # IO §2.1, the recognizer's constructor (assigned_tasks): None or [] switches the support restriction off. With it off every
     # hypothesis is admissible, the robot's own items' deliveries included, so the robot's acts change human-side
@@ -75,10 +76,11 @@ def derive(traj, run_file, alpha, theta):
         raise OutsidePreRunDomain(f"{traj['scenario']}: the human has no assigned tasks, so the support restriction is "
                                   f"off (shared/io_contracts.md: None or [] switches it off); MPB-3's pre-run "
                                   f"independence does not hold")
-    rows, _, _ = ir.run(traj, alpha, theta)
+    rows, _, _ = ir.run(traj, alpha, theta, domain_config)
     agent = human.agent_id
     committed = ir.known_keys(human.assigned_tasks)                                 # DG AD1: commitment, prior on
-    task_model = TaskModel(register_kitting_domain(), domain_config["task_model"])
+    task_model = TaskModel(domain_config["register_fn"](), domain_config["task_model"])
+    areas = ir.areas_of(domain_config, traj["layout"])
     planner = AdaptivePlanner(knowledge=task_model)
     space = ir.hypothesis_space(task_model, traj["types"])
     rm = room(traj, run_file)
@@ -103,7 +105,7 @@ def derive(traj, run_file, alpha, theta):
         if gate is Gate.CLEARS:
             warrant = tuple(s for s, holds in (("commitment", leader in committed),
                                                ("observation", ow.get(leader) == "observation")) if holds)   # DG AD4
-            world = ir.world_of(traj_row[t], traj, agent)
+            world = ir.world_of(traj_row[t], traj, agent, areas)
             try:
                 actions = planner.decompose(space[leader], agent, world)
             except DecompositionError:
@@ -130,7 +132,7 @@ if __name__ == "__main__":
         sys.exit(3)
     dump(table, sys.argv[4])
     # the figure's columns (plot_ir.py): the IR oracle's belief, S and lifecycle per tick, beside the compared table
-    rows, _, _ = ir.run(traj, alpha, theta)
+    rows, _, _ = ir.run(traj, alpha, theta, ir.domain_of(run_file))
     extra = {}
     for r in rows:
         e = extra.setdefault(r["tick"], dict(belief={}, S={}, lifecycle=r.get("lifecycle")))

@@ -31,7 +31,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "mesa_sim")]
 import numpy as np
 import yaml
 from shared.types import ScenarioConfig
-from domains.kitting.registry import domain_config, register_kitting_domain
+import importlib
 from mesa_sim.sim_model import SimModel
 
 
@@ -53,6 +53,7 @@ def reference_scenario(scenario: ScenarioConfig) -> ScenarioConfig:
 
 def run(run_file, steps, strategy):
     cfg = yaml.safe_load(open(run_file))
+    domain_config = importlib.import_module(f"domains.{cfg['domain']}.registry").domain_config   # since the sort
     scenario = domain_config["scenarios"][cfg["scenario"]]
     layout = cfg.get("layout") or scenario.reference_layouts[0]
     collect = Collect()
@@ -60,7 +61,8 @@ def run(run_file, steps, strategy):
     root.setLevel(logging.INFO)
     root.addHandler(collect)
     logging.getLogger("rec").propagate = False
-    m = SimModel(scenario=reference_scenario(scenario), register_fn=register_kitting_domain,
+    m = SimModel(scenario=reference_scenario(scenario), register_fn=domain_config["register_fn"],
+                 state_declarations=domain_config["states"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
                  assignment_prior=bool(cfg["assignment_prior"]), strategy=strategy,
