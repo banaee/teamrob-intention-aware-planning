@@ -565,6 +565,37 @@ domain's rulings", A3.
 PARKED (Hadi, 1 October 2026): the lifecycle of an entry of the list ("completed", "ended", "abandoned", "available
 again" are distinct; Q2's "not yet completed" is not sufficient), the next design chat's first question; A3 is not built
 before it is ruled. The same entry, A3's PARKED block.
+RULED, NOT BUILT (T-G Q12 to Q15, Hadi, 1 October 2026; framework-wide, extending A3): the PARKED question is answered.
+The script has a priority list of ordinary and repeatable entries and a **closing part** (below). The free human
+selects the first **open entry** (below) that is applicable, which supersedes "not yet completed" and "the first
+assigned task": a foreseeable task written as an entry is an ordinary entry, taken once, the first time the human is
+free and no entry above it is applicable (Q15); an event stays attached to its entry. An ordinary entry is taken at most
+once in a run; a repeatable entry (the standby entry) any number of times, skipped while the human is at the standby
+place; a retry of a dropped task exists only as a second authored entry of that task (Q12). The load-time check (Q13b):
+the author declares that a script depends on the robot (default independent); for an independent script an entry left
+open at the replay's end stops the load, as today; for a dependent one the loader reports the entries left open and
+loads, and the run's record states the entries still open at the run's end. The declaration concerns load-time
+validation only. design_decisions.md, "T-G: the second domain's rulings", A3 (RULED).
+
+**open entry** / **closed entry** (T-G Q12, Q13a, Hadi, 1 October 2026; ruled, not built) — of an entry of the human's
+script. An ordinary entry is open until its task leaves the stack with COMPLETED, ABANDONED or INFEASIBLE, and closed
+from then on; SUSPENDED keeps it open, and a later applicable state does not reopen it. A repeatable entry (the standby
+entry) is not closed by being taken. "Completed" is a statement about the entry in the executor's **record**; it never
+reads the assigned task: a delivery to another table is an entry that completed, while the assigned task stays
+incomplete in the environment, which concerns the robot's mind only. A closed entry says nothing about the assigned task.
+An entry that was never selected is open; at the load-time replay's end it is "left open", not infeasible (Q13b). The
+names in the code and the authoring form of the repeatable kind are left to stage 1's plan.
+COLLISION: "entry" here is an entry of the human's script (`ScriptEntry`), not the plan's entry (§2, **entry**).
+→ `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q12, Q13a, Q13b.
+
+**closing part** / **closing entry** / **finished** (T-G Q14, Hadi, 1 October 2026; ruled, not built) — the closing part
+is the part of the human's script after its priority list; a closing entry is one of its entries. The priority list is
+**finished** when every ordinary entry is closed; the human then takes the closing entries in their written order, and
+after the closing part selects nothing more, repeatable entries included. The construct is framework-wide; what a closing
+part contains is each domain's own convention. Kitting needs no closing part (every entry is applicable from the start,
+so its last entry, the exit walk, is its last act); dock_loading's closing part is one entry, the walk to the desk (B13).
+"Finished" is said of the priority list only.
+→ `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q14; B13.
 
 **event** — a `Trigger` and a `Decision` attached to a task of the script, or built live by `inject`. Typed, no unions
 and no sentinels. An event fires once per script entry and is then consumed.
@@ -607,6 +638,10 @@ the resulting state (sequential expansion through the **successor state**, §1).
 **outcome** — of a task on the stack, computed from what the stack did and the world, never authored: completed,
 suspended, abandoned, infeasible. Completion is a world fact whoever caused it (**task completion**); a resumption with
 nothing left to do is completed; a task with no applicable method is infeasible, recorded, and the executor moves on.
+RULED, NOT BUILT (T-G Q13a, Q13b, Hadi, 1 October 2026): infeasible names only the outcome of a task that was selected and
+could not continue; an entry never selected in the load-time replay is "left open", not infeasible. Infeasible closes the
+entry, as completed and abandoned do; suspended keeps it open (**open entry**, above). design_decisions.md, "T-G: the
+second domain's rulings", A3.
 
 **record** — the human executor's record: per tick, the stack (top first), the action and its progress. The ground
 truth, written as its own stream (a file beside the run log, one `[rec]` line per tick) and diffed in the sweep. Its
@@ -989,6 +1024,8 @@ enters `shared/`. Stages 1 to 3, track 4 after stage 2. design_decisions.md, "T-
 viewer for pre-loaded scripts (T-E as originally defined; demonstration only, nothing enters the mind); track 2 Phase 7
 (live events through the human executor's injection path, the export as a script, the replay rule, later the context
 stream).
+SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-G's stage 1.5 (context
+knowledge); track 2 keeps the live events. design_decisions.md, "T-G: the second domain's rulings", C1.
 → `docs/roadmap.md`, "The plan from T-A", T-V; `docs/handoffs/phase7_interactive_deviations.md`.
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
 the end of the queue. FW (T-G A1, 1 October 2026).
