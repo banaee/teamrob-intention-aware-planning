@@ -275,6 +275,15 @@ Decisions
   STEPS 0 TO 5 BUILT): the rename (8d064ca, c21f001); the areas and R2 (b513b82, 9bca721; the shared function is
   `area_at`, the planner's lookup keeps `area_of`); A4 (bd4bddc); A5 (b74485b); A3 (048a36e). Next: the domain steps 6
   (dock_loading's catch-up) and 7 (its content), then the milestone (step 8).
+  Steps 6 to 8 are BUILT and the milestone accepted (1 Oct 2026; design_decisions.md, "T-G: the second domain's
+  rulings", STAGE 1, STEPS 6 TO 8 BUILT): the catch-up (670cb78, 610fed9); the content (1492789, 512a452); the milestone
+  (52b2aae, 8b9d267), scenario_s03_02, s05_02, s07_02, one per room, prior on, 800 steps: the robot completes both
+  tasks and every entry of the human's script is closed in all three. Its findings are recorded there (a gap of the
+  scenario: no standby walk, no meeting at a shared bay; TODO-135's third instance; TODO-154 to TODO-157). Next: a
+  second simple scenario per room; then a step of its own (no change of behaviour): the earlier analyses in `analysis/`
+  and the tests sorted under kitting, the instruments' code shared and their run sets, expectations and reports per
+  domain, every path named in a record or a README updated, with the preparation of the instruments; then the IR
+  test-bed scenarios on dock_loading, agreed with Hadi before they are authored.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

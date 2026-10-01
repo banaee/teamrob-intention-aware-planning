@@ -397,6 +397,9 @@ SUPERSEDED (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's
 plan is approved, `docs/handoffs/plan_T-G_stage1.md`. Next: stage 1's build, step 0, then step 1 (the rename).
 SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT): steps 0 to 5 of stage 1 are built and accepted. Next: the domain steps
 6 and 7, then the milestone.
+SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT): steps 6 to 8 of stage 1 are built and the milestone
+accepted. Next: the second simple scenario per room; then the sorting of the earlier analyses and tests under kitting,
+with the preparation of the instruments; then the IR test-bed scenarios, agreed with Hadi before they are authored.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -652,6 +655,16 @@ SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domai
     (8d064ca, c21f001); step 2 the areas and R2 (b513b82, 9bca721); step 3 A4 (bd4bddc); step 4 A5 (b74485b); step 5
     A3 (048a36e); each accepted on kitting byte-identical, A3 also on the drop scenarios and both test-bed sets. Next:
     step 6 (dock_loading's catch-up) and step 7 (its content), then the milestone (step 8).
+    BUILT, STEPS 6 TO 8 (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT): step 6 the catch-up
+    (670cb78, 610fed9); step 7 the content (1492789, 512a452); step 8 the milestone (52b2aae, 8b9d267): scenario_s03_02,
+    s05_02, s07_02, one per room; the acceptance held in all three (the robot completes both tasks at world ticks 64 and
+    125, 64 and 125, 57 and 151; every entry of the human's script closed, the closing part included). The findings are
+    recorded there (TODO-135's third instance, TODO-154 to TODO-157). ADDED (Hadi, 1 October 2026): a second simple
+    scenario per room (the milestone did not exercise the standby walk or a meeting at a shared bay); then a step before
+    the IR test-bed and the MPB on dock_loading: the earlier analyses and the tests sorted under kitting, the instruments'
+    code shared, their run sets, expectations and reports per domain (its own commit, no change of behaviour), with the
+    preparation of the instruments. Next: the second simple scenario per room; then that step; then the IR test-bed
+    scenarios, agreed with Hadi before they are authored.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
