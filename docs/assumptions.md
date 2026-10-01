@@ -36,11 +36,18 @@ closing part (A3, Q14); no exit from the room is defined for dock_loading now. K
 design_decisions.md, "T-G: the second domain's rulings", A3, B13.
 NOTE (T-G records 3, 1 October 2026; not a ruling): the exit walk is defined as "the script's last entry"; where a
 script has a closing part it reads "the last closing entry". Stage 1's plan carries the consequence for the code.
+NOTE (T-G stage 1's plan, approved by Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings",
+STAGE 1 PLAN APPROVED): in the IR test-bed setup (B14, kind 1) the case with the assigned scan of the pallet in the truck
+is declared dependent on the robot; its priority list never finishes, so that run has no walk to the desk.
 
 **1.2** Every baseline script declares its experimental intent (label C, purpose); **unmodelled behaviour** (behaviour
 no hypothesis of the robot's hypothesis space describes, label B) appears only where the description says so.
 Authoring convention · the terms ruling of 24 Sept 2026 (labels A, B, C), TODO-80 · scenario descriptions; the
 label-C check (the exit walk is exempt, glossary §7).
+NOTE (T-G stage 1's plan, approved by Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings",
+STAGE 1 PLAN APPROVED): the walk to the standby place has no hypothesis in the robot's task model, so a dock_loading
+scenario with a standby entry contains unmodelled behaviour, and its purpose says so. Parked for after the milestone, not
+ruled: whether the robot's mind holds a hypothesis for the human stepping aside.
 
 **1.3** For human-script and test-bed runs (the robot has no work of its own), a run's step count is derived from the
 human's load-time replay plus the idle margin (the replay's last acknowledgement tick + 1 + 30 ticks of the idle

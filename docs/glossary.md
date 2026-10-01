@@ -83,6 +83,11 @@ Whether the area is declared by the schemas or derived from the position is for 
 "T-G: the second domain's rulings", C1.
 → `shared/projection.py`, `successor_state()`; `docs/design_decisions.md`, "The successor state is
 derived from what the action schemas declare: a delete list and a declared relocation".
+APPROVED, NOT BUILT (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`, 3d): the area is derived from the position.
+One function, `area_fact(agent, position, areas)` over the layout's declared areas (`WorldState.areas`, `area_of`: the
+first declared area holding the point), serves the environment's state construction and every computed state: the
+projection's chain, the replay's advance and the replay's cut. The load-time replay ends a walk where the body stops,
+not at the target's centre.
 
 **B1 / B2 / B3** — the blocks of `MetaPlanner.update()`: B1 the human projection, B2 the mid-task
 commitment gate (`b2a` built, `b2b` a stub), B3 selection on realized cost.
@@ -496,6 +501,10 @@ its conditions (`MethodSchema.guards`) hold there. The planner's own word: it se
 with no applicable method cannot be decomposed (`DecompositionError`) and, for the human, cannot be chosen (T-G A3); a
 hypothesis with none leaves the live set (T-G A4, ruled, not built). Hadi's rulings say "executable" in the same sense.
 → `shared/planner.py`, `_select_method()`; `docs/design_decisions.md`, "T-G: the second domain's rulings", A2 to A4.
+APPROVED, NOT BUILT (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): the code name is
+`AdaptivePlanner.is_applicable` (decomposition raises no `DecompositionError`), the one definition read by the human's
+executor (A3) and the recognizer (A4). B11 AMENDED: a task has a method for every area its agent can be in, not for every
+area; an agent in another area has no applicable method, and that absence is the check.
 
 **assigned tasks** — a set the robot is told: for the human, which tasks it was assigned (every one a `WorkTask`
 instance, T-H), never in which order; the ordering lives only in the human's script. Replaces "work order" (T-H,
@@ -589,6 +598,11 @@ reports as not replayed the ordinary entries left open and the closing part. Not
 SUPERSEDED IN PART (T-G R1, T-G records 4, Hadi, 1 October 2026): "it runs the executor's rule unchanged, repeatable entries included" is withdrawn: the
 replay does not execute repeatable entries (a repeatable entry placed lowest is taken only where the replay ends). The
 rest stands.
+APPROVED NAMES, NOT BUILT (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`, 3a): `Script(entries, closing=...,
+dependence=...)`; the repeatable entry `RepeatableEntry(task)` (a type with no events); `ScriptDependence` with
+`INDEPENDENT` (default) and `ON_ROBOT`; the human's isolated choice point `StackMachine.choose`; the executor's `Wait`
+when no entry is applicable; the transition `StillOpen` (`open:<task>`), written at the replay's end for a dependent
+script's entries left open and at the run's end for a dependent script's open entries.
 
 **open entry** / **closed entry** (T-G Q12, Q13a, Hadi, 1 October 2026; ruled, not built) — of an entry of the human's
 script. An ordinary entry is open until its task leaves the stack with COMPLETED, ABANDONED or INFEASIBLE, and closed
@@ -607,6 +621,8 @@ other placement. The skip rule applies at run time, where the environment mainta
 not execute repeatable entries.
 COLLISION: "entry" here is an entry of the human's script (`ScriptEntry`), not the plan's entry (§2, **entry**).
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q12, Q13a, Q13b.
+APPROVED NAMES (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): `RepeatableEntry` for the repeatable kind; an
+ordinary entry keeps the type `ScriptEntry`.
 
 **closing part** / **closing entry** / **finished** (T-G Q14, Hadi, 1 October 2026; ruled, not built) — the closing part
 is the part of the human's script after its priority list; a closing entry is one of its entries. The priority list is
@@ -618,6 +634,7 @@ so its last entry, the exit walk, is its last act); dock_loading's closing part 
 ADDED (T-G records 3, Hadi, 1 October 2026): a closing entry that is not applicable: the human waits; the closing part keeps its written order, and
 the human does not take the next closing entry before the present one has ended.
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A3, Q14; B13.
+APPROVED NAME (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): `Script.closing`.
 
 **event** — a `Trigger` and a `Decision` attached to a task of the script, or built live by `inject`. Typed, no unions
 and no sentinels. An event fires once per script entry and is then consumed.
@@ -820,6 +837,11 @@ entry" reads "the last closing entry". Stage 1's plan carries the consequence fo
 AS BUILT: `world/composition.py`, `scenario_composition(script, robot) -> (Composition, ScenarioCoverage)`; the
 `[scenario-coverage]` line at load, one per observing robot, after its `[coverage]` lines; the listing
 `mesa_sim/list_scenarios.py`.
+NOTE (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): in code the exemption reads the last closing entry where the
+script has a closing part (`world/composition.py`, when built). The walk to the standby place (the repeatable standby
+entry) has no hypothesis in the robot's task model and is counted: a scenario with a standby entry is classed as
+containing unmodelled behaviour, and its purpose says so. PARKED for after the milestone, not ruled: whether the robot's
+mind holds a hypothesis for the human stepping aside.
 
 "Scripted" is not a behaviour class: every behaviour in the simulator is scripted. Use "scripted" only to
 contrast simulation with a real deployment.
@@ -1094,6 +1116,8 @@ area of each **container**. CODE NAME (Hadi, 1 October 2026): until the rename t
 mechanism is named "zone" in the code: the layouts' `zones` block and each fixed object's `zone`, `in_zone(agent, zone)`
 emitted by the Mesa world-state builder, `WorldState.object_zones`, the planner's `zone_of` lookup. design_decisions.md,
 "T-G: the second domain's rulings", A2.
+AMENDED, NOT BUILT (T-G stage 1's plan, answer 2, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): the per-object area field is
+dropped; a fixed object's area is derived from its position.
 
 **setup** — the shift: the movable objects that exist, each with its home container and, where the domain determines
 one through `destination_of`, its designated destination, and any other initial state the domain declares per movable
@@ -1177,11 +1201,18 @@ vocabulary (**WorldState**, the WORLD terms of §7) keep their meanings.
 store, the freezer, the empties area; kitting: a shelf, the table. Its area is fixed and declared (A9). In dock_loading a
 container is one point, its centre, and may hold several pallets (B9), as kitting's table does (TODO-74). A setup's "home
 container" (`initial_container`) is this sense.
+AMENDED (T-G stage 1's plan, answer 2, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): "Its area is fixed and declared" reads: fixed
+and derived from its position (A9 AMENDED).
 
 **area** — a part of the room declared in the layout. The environment emits the fact that an agent is in an area. Its
 code name is "zone" (`zones`, `in_zone`, `object_zones`, `zone_of`) until it is renamed to "area" as the first step of T-G
 stage 1, in its own commit, with no change of behaviour (Hadi, 1 October 2026). Only the recognizer stopped reading zones
 (I4); the mechanism is otherwise built. In prose write "area".
+APPROVED, NOT BUILT (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): the code names after the rename are
+`in_area`, `object_areas`, the lookup `area_of`, the layout's `areas` block; the shared form is `Area`, `WorldState.areas`,
+`area_of`, `AREA_FACT = "in_area"`, `area_fact`. The `in_area` fact is the one carrier of an agent's area; the carriers
+nothing reads (`AgentState`'s, the observation's, `SimObject`'s) are removed. A point on the edge of two areas belongs to
+the first declared. dock_loading's area ids are `area_hall`, `area_office`, `area_truck_side`; kitting's stay.
 
 **monitored area** — an area in which the robot observes the human. Outside every monitored area the robot receives no
 observation of the human; its knowledge of objects is not affected. Fixed per layout, independent of where the robot is;
