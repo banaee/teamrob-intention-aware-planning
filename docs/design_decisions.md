@@ -5931,6 +5931,14 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
 - A9, areas and the gate (the framework side of T-G Q11).
   The layout declares areas. The environment emits the fact that an agent is in an area. The area of each container is
   fixed and declared.
+  AMENDED (Hadi, 1 October 2026, T-G stage 1's plan approved, answer 2; recorded in T-G records 7): a fixed object's area,
+  a container's included, is fixed and DERIVED from its position by the one definition of an area (C1, R2; the plan's
+  3d), not declared: the layout's per-object area field is dropped. Reason: two sources for one fact disagreed
+  (`dock_gate`, declared on the truck side, derives to the hall by declaration order). The layout still declares the
+  areas themselves.
+  NOTE (the same approval, answers 3 and 7): dock_loading's area ids are `area_hall`, `area_office`, `area_truck_side`
+  (kitting's ids stay); the domain's task model names `dock_gate`, `office_door` and the area ids, as this domain's
+  convention.
   dock_loading's areas (part of the ruled form of Q11; recorded in T-G records 1, third follow-up, 1 October 2026): three,
   divided by the gate and by the office door: the truck side (the truck and the dock platform, on the outer side of the
   gate), the hall, and the office. The content is ruled; the names are not fixed and are settled with stage 1's layout.
@@ -6035,6 +6043,14 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   sub-task used as the first step. Not taken: always going by the gate; a sub-task with conditions for a later passage
   (A9's property defeats it); routing through openings as a property of movement (it changes the projection and the
   recognizer in `shared/`). Within V1 this is dock_loading's answer to TODO-09.
+  AMENDED (Hadi, 1 October 2026, T-G stage 1's plan approved, answer 6; recorded in T-G records 7): "Each task has one
+  method per starting area" reads: a task has a method for every area its agent can be in, not for every area. The
+  robot can be on the truck side and in the hall; the human in the hall and in the office. With B8's four held-object
+  cases (held, another empty pallet held, another full pallet held, nothing held) a robot task has 8 methods. An agent
+  in another area is a defect: no method covers it, the absence of a method is the check, and no mechanism is added
+  (for the robot the run stops, TODO-152). B11's optional sub-task for the return is not used: a sub-task schema must be
+  in the robot's task model, and the hypothesis space is built from every schema there, so it would become a hypothesis
+  about the human. The methods: `docs/handoffs/plan_T-G_stage1.md`, section 4.
 - B12, further rulings on the domain's scope.
   - Check-in and check-out [V1], stage 3: separate from the gate mechanism and independent of it. A desk with a computer
     beside the gate's button is the human's place; the robot's place is a point just inside the gate, more than the
@@ -6252,18 +6268,39 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   - how an event or a foreseeable task is placed relative to tasks whose order is not fixed;
     RULED (Hadi, 1 October 2026): A3, Q15;
   - how a pallet's origin is recorded (B8);
+    SETTLED (T-G stage 1's plan, approved by Hadi, 1 October 2026; recorded in T-G records 7): in stage 1 a pallet's
+    origin is the setup's initial container (`home_container_of`), which is where every stage-1 pick-up happens; stage 2
+    (`store_pallet` picks up from a delivery bay) needs the origin recorded at the pick-up;
   - how the meta-planner behaves when the pool holds tasks and none is applicable (TODO-30);
+    CORRECTED (T-G records 7, 1 October 2026): the citation of TODO-30 is wrong; TODO-30 is closed and concerns
+    realizability (F1), not applicability. FINDING (T-G stage 1's plan, approved by Hadi, 1 October 2026): a robot task
+    with no applicable method raises `DecompositionError` out of `MetaPlanner.update()` (through `_is_complete`), which
+    nothing catches, and the run stops. Stage 1 cannot reach it (a method for every area the robot can be in, the gate
+    open). Stage 2 (the robot at a closed gate, B5) needs a ruling first. TODO-152;
   - the forms in the setup and the registry for object states and the two designations (A5);
   - the smallest set of methods under B11 with B8;
+    SETTLED (the same approval): B11 as amended (answer 6): 8 methods per robot task, the human's methods for the hall
+    and the office;
   - how the existing machinery behaves when the live set holds foreseeable tasks only, at the start of a run and between
     deliveries (TODO-143 stays parked: it concerns an empty assigned list, which is a different state);
+    SETTLED (the same approval): the existing machinery, nothing new. With the prior on the live set is {coffee_break,
+    office_break}; the human waits or walks to the standby place; both hypotheses become inadequate, the finding is
+    unexplained, admission refuses and the robot realizes against the fallback projection, as for kitting's exit walk.
+    An empty live set is not reached with the prior on while the human is in an area; otherwise exhausted, below theta,
+    the fallback;
   - for the IR test-bed on dock_loading the robot is idle, so its setup places the pallets in their delivery containers
     from the start.
   - ADDED (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6): the rule for a point on the boundary of two areas, which today is decided by the order of
     declaration (`SimModel.get_zone_of_position`: inclusive bounds, the first declared zone wins); and, since an agent
     stops 10 to 30 cm before its target, the area an agent is in after "move to the gate" from each side, in the
     environment and in the computed state alike (R2);
+    SETTLED (the same approval): the rule stays the order of declaration, stated in one shared function (`area_of`).
+    An agent stops 10 to 30 cm short of the gate on its side of approach and stays in the area it came from; the
+    projection's arrival point and the replay's walk end (where the body stops, answer 5) give the same area; only the
+    centres of the gate and the office door lie on an edge;
   - ADDED (the same): the scanned state of an empty pallet (B14's setups leave it out; the form defaults it to false);
+    SETTLED (the same approval): it does not hold (the form's default: a declared state not listed does not hold);
+    nothing reads it with the prior on;
   - ADDED (the same): the stale references to removed dock_loading scenarios in `mesa_sim/run_mesa.py` (its docstring
     and commented-out imports name scenario_s01_01 and _02), corrected in stage 1's first build step.
   - ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R2 (C1, stage 1): the agent's area in a computed state after a movement action, one
@@ -6274,6 +6311,38 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   about the mind and returns to the design chat within V1.
 - C6, open at their stage: the design of check-in and check-out; the design of TODO-16; how the MPB's oracle derives an
   expected decision when the human's sequence depends on the robot's decisions.
+
+STAGE 1 PLAN APPROVED (Hadi, 1 October 2026; recorded in T-G records 7). The approved plan, with the answers merged in,
+is `docs/handoffs/plan_T-G_stage1.md`; every build session of stage 1 reads it. The answers to the plan's nine questions:
+1. `deliver_pallet` has no condition on the pallet being full. Reason: the designation and the load check (an assigned
+   task's determined parameter, resolved from the station, must have its declared type) exclude an empty pallet, and the
+   planner needs no negated condition. It answers B4 for `deliver_pallet`; `load_return`'s methods read `is_empty`.
+2. A fixed object's area is derived from its position; the declared per-object field is dropped (A9 AMENDED).
+3. dock_loading's area ids are `area_hall`, `area_office`, `area_truck_side`; kitting's ids stay.
+4. The carriers of the area that nothing reads are removed (`AgentState`'s area, the observation's area,
+   `SimObject`'s area and its query); the `in_area` fact stays.
+5. The load-time replay ends a walk where the body stops. Reason: the replay and the run must select the same method at
+   the gate and at the office door.
+6. Not as recommended: a task has a method for every area the agent can be in, not for every area (B11 AMENDED).
+7. The task model names `dock_gate`, `office_door` and the area ids, as this domain's convention.
+8. The milestone scenarios as proposed, one per room (scenario_s03_02, s05_02, s07_02).
+9. The build may edit `shared/io_contracts.md`, `README.md`, `domains/README.md` and the note in `docs/rename_table.md`;
+   the glossary and this file stay with records steps.
+Also approved: the names in the plan's section 6 as proposed; the build order, steps 0 to 8, with their acceptance and
+stop conditions.
+Notes (not rulings):
+- A pallet's origin is the setup's initial container in stage 1; stage 2 needs it recorded at the pick-up (C4).
+- The rename leaves `ros_sim/` passing the old field names (`current_zone`, `object_zones`); `ros_sim/` is not touched
+  (TODO-111's note).
+- The walk to the standby place has no hypothesis in the robot's task model, so a scenario with a standby entry is
+  classed as containing unmodelled behaviour, and its purpose says so (`docs/assumptions.md` 1.2). PARKED for after the
+  milestone, not ruled: whether the robot's mind holds a hypothesis for the human stepping aside.
+- In the IR test-bed setup (B14, kind 1) the case with the assigned scan of the pallet in the truck is declared
+  dependent on the robot; its priority list never finishes, so that run has no walk to the desk (B13, assumptions 1.1).
+- REQUIREMENT on the later preparation of the IR test-bed and the MPB on dock_loading: the instruments obtain the human's
+  run-time sequence from the executor's own selection rule; they do not implement that rule a second time. Reason: one
+  definition. (Under R1 the load-time replay no longer gives that sequence for a script with a standby entry.)
+- Finding: a robot task with no applicable method stops the run (C4, TODO-152).
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
@@ -6303,3 +6372,5 @@ SUPERSEDED (T-G records 1, third follow-up, 1 October 2026): the order is the li
 SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (A3, Q12 to Q15; B13). Next: stage 1's
 layout and setup, agreed in the design chat, then stage 1's plan.
 SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): stage 1's rooms and setups are agreed (B14). Next: stage 1's plan.
+SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 7): stage 1's plan is approved (STAGE 1 PLAN APPROVED above;
+`docs/handoffs/plan_T-G_stage1.md`). Next: stage 1's build, step 0 then step 1 (the rename).
