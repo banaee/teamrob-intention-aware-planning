@@ -249,7 +249,9 @@ Decisions
   T-G is OPEN: its design is ruled (30 Sept and 1 Oct 2026; the entry above, by scope: part A framework-wide, some of
   it changing `shared/` or `world/` when built, each with kitting byte-identical or no decision changed as acceptance;
   part B dock_loading only; part C the stages), and build 1 is in (30 Sept 2026; 56e674e, 6e29c15, 62ebc4e: form-only
-  repairs, the viewing fixture scenario_s01_03; scenario_s01_01 and _02 still fail at load by intent). Stages (what
+  repairs). Stage 1's rooms and setups are agreed and written (B14, 1 Oct 2026): env_layout_02 to _04, six setups (two
+  kinds per room: the IR test-bed's, the MPB's), one viewing fixture per pair; env_layout_01, env_setup_01 and build 1's
+  scenarios removed; full observation in stage 1. Stages (what
   each first builds: the entry's C1): 1 the basic domain, opened by the rename of the zone mechanism to "area" (its own
   commit, no change of behaviour), with the forms' catch-up (C3) and the framework-wide A3 (the script's priority form,
   `world/`, with the lifecycle of a list entry ruled as T-G Q12 to Q15, 1 Oct 2026: open and closed entries, the
@@ -257,10 +259,10 @@ Decisions
   kitting drop scenarios and the test-bed misdeliveries), A4 (liveness by applicability, `shared/`), A5 (object states
   and designations; its form admits a fact no action changes) and A9 (areas), each accepted on kitting byte-identical;
   dock_loading's closing part is the walk to the desk, a landmark in stage 1's layout (B13); then the IR test-bed and the
-  MPB on dock_loading; 1.5 context knowledge (framework-wide, from its own handoff; nothing ruled yet; the pre-loaded
-  context stream moved here from T-V track 2); 2 `store_pallet`, the gate opened on request, the office door's state,
-  A7 (TODO-16); then track 4 (A8); 3 check-in and check-out. Before each stage's plan the design chat and Hadi agree its
-  layout and setup. Next: stage 1's layout and setup, then stage 1's plan.
+  MPB on dock_loading, after a milestone (one simple scenario per room runs from start to end); 1.5 context knowledge (framework-wide, from its own handoff; nothing ruled yet; the pre-loaded
+  context stream moved here from T-V track 2); 2 `store_pallet` with B10's room (the stores), the gate opened on request,
+  the office door's state, A7 (TODO-16), A8's monitored-area rule reopened; then track 4 (A8); 3 check-in and check-out.
+  Before each stage's plan the design chat and Hadi agree its layout and setup. Next: stage 1's plan.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
