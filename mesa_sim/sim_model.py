@@ -9,7 +9,10 @@ PURPOSE:
 
 WHAT THIS MODULE DOES:
     - Reads the layout JSON (space, areas, fixed objects) and the setup JSON
-      (movable objects with their home containers and destinations)
+      (movable objects with their home containers and destinations, and the
+      object states that hold at the start)
+    - Holds the true state facts the domain declares (T-G A5) and changes them
+      when an action that declares one has run (apply_state_changes)
     - Receives a ScenarioConfig (Python object) — no YAML scenario parsing
     - Creates Mesa ContinuousSpace with center-origin (0,0)
     - Instantiates env objects as plain dataclasses (not Mesa agents)
@@ -27,12 +30,15 @@ COORDINATE SYSTEM:
 
 import json
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
-from shared.knowledge import Tree, TaskModel
+from shared.knowledge import StateDeclaration, Tree, TaskModel
 from shared.planner import AdaptivePlanner
 from shared.recognizer import build_hypothesis_space
-from shared.types import Area, ScenarioConfig, Start, TaskSchema, check_task_bindings, check_task_destinations, task_instance_key
+from shared.types import (
+    Area, Const, GroundedAction, Predicate, ScenarioConfig, Start, TaskInstance, TaskSchema, check_task_bindings,
+    check_task_destinations, destination_derivations, task_instance_key,
+)
 from world.human_executor import check_script
 from world.composition import scenario_composition
 from world.queries import ObservingRobot, coverage
@@ -67,9 +73,6 @@ class SimObject:
 
     held_by: Optional[str] = None
     at_location: Optional[str] = None
-    is_empty: bool = False             # dock loading: pallet empty/full state
-    is_scanned: bool = False
-    is_open: Optional[bool] = None     # gates — kept as attribute, not tracked/implemented this phase
     is_portable: bool = False   # set once at load time — True if loaded via
                                  # "initial_container" (items/pallets); never
                                  # mutated afterward. Distinct from at_location/
@@ -103,7 +106,8 @@ class SimModel(model.Model):
                  cost_strategy: str = "realized",
                  separation_stop: bool = False,
                  test_level: float = 0.05,
-                 overrides: Sequence[Override] = ()):
+                 overrides: Sequence[Override] = (),
+                 state_declarations: Sequence[StateDeclaration] = ()):
         super().__init__()
 
         # Evaluation switch: give each robot the observed human's assigned_tasks
@@ -184,6 +188,20 @@ class SimModel(model.Model):
 
         self._init_objects(env_layout.get("env_objects", []), env_setup.get("env_objects", []),
                            layout_path, setup_path)
+
+        # ------------------------------------------------------------------
+        # The object states (T-G A5): the domain declares them, the setup
+        # states which hold at the start, the environment holds the true facts
+        # (state_facts), emitted to every WorldState by the builder
+        # ------------------------------------------------------------------
+        self.state_declarations: Dict[str, StateDeclaration] = {}
+        for declaration in state_declarations:
+            if declaration.name in self.state_declarations:
+                raise ValueError(f"the domain declares the state '{declaration.name}' twice")
+            self.state_declarations[declaration.name] = declaration
+        self._check_declared_effects()
+        self.state_facts: Set[Predicate] = set()
+        self._init_states(env_setup.get("states", []), setup_path)
 
 
         # ------------------------------------------------------------------
@@ -269,8 +287,6 @@ class SimModel(model.Model):
                 position=tuple(obj["position"]),
                 size=tuple(obj["size"]),
                 subtype=obj.get("subtype"),
-                is_empty=obj.get("is_empty", False),
-                is_scanned=obj.get("is_scanned", False),
                 is_portable=False,  # direct-position objects are not portable
             )
 
@@ -292,8 +308,6 @@ class SimModel(model.Model):
                 subtype=obj.get("subtype"),
                 held_by=None,
                 at_location=container_id,
-                is_empty=obj.get("is_empty", False),
-                is_scanned=obj.get("is_scanned", False),
                 is_portable=True,  # items/pallets are portable, even if not currently held
                 home_container=container_id,   # set once at load time, never mutated afterward
                 destination=obj.get("destination"),   # likewise
@@ -301,17 +315,18 @@ class SimModel(model.Model):
             # print(f"Loaded portable object {obj['id']} with home_container {container_id}")
 
         # Every object of a type the domain resolves through "destination_of"
-        # declares its destination, naming an object of the layout of the
-        # type the schema declares for it (T-B1a). An error, not a default.
+        # declares its destination, naming an object of the layout of a type
+        # the domain declares for it (T-B1a; T-G A5: one of the declared
+        # destination types). An error, not a default.
         types_with_destination = self.tree.get_types_with_destination()
         for obj_id, obj in self.objects.items():
             if obj.type not in types_with_destination:
                 continue
-            task_name, dest_type = types_with_destination[obj.type]
+            dest_types = types_with_destination[obj.type]
             if obj.destination is None:
                 raise ValueError(
                     f"setup '{setup_path}': {obj.type} '{obj_id}' declares no "
-                    f"\"destination\" (required by task '{task_name}')"
+                    f"\"destination\" (the domain determines one for type '{obj.type}')"
                 )
             dest = self.objects.get(obj.destination) if obj.destination in layout_ids else None
             if dest is None:
@@ -319,16 +334,106 @@ class SimModel(model.Model):
                     f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
                     f"'{obj.destination}', which is not an object of layout '{layout_path}'"
                 )
-            if dest_type is not None and dest.type != dest_type:
+            if dest.type not in dest_types:
                 raise ValueError(
                     f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
-                    f"'{obj.destination}' of type '{dest.type}', but task '{task_name}' "
-                    f"requires type '{dest_type}'"
+                    f"'{obj.destination}' of type '{dest.type}', but the domain declares for "
+                    f"type '{obj.type}' the destination types {sorted(dest_types)}"
                 )
 
         # Build type → instance-ids registry, feeds IR's hypothesis space
         for obj_id, obj in self.objects.items():
             self._objects_by_type.setdefault(obj.type, []).append(obj_id)
+
+    # =========================================================================
+    # The object states (T-G A5)
+    # =========================================================================
+
+    def _init_states(self, entries: list, setup_path: str):
+        """
+        The setup's "states" block: one entry per fact that holds at the start,
+        {"state": <declared name>, "object": <object id>}, the object omitted
+        for a fact about no object. A declared state not listed does not hold.
+        Each entry is validated (_state_fact); an entry with another key, or
+        listed twice, is an error naming the setup.
+        """
+        for entry in entries:
+            unknown = set(entry) - {"state", "object"}
+            if "state" not in entry or unknown:
+                raise ValueError(
+                    f"setup '{setup_path}': states entry {entry} is not of the form "
+                    f"{{\"state\": <name>, \"object\": <object id>}} (\"object\" omitted for a fact about no object)"
+                )
+            try:
+                fact = self._state_fact(entry["state"], entry.get("object"))
+            except ValueError as e:
+                raise ValueError(f"setup '{setup_path}': {e}") from e
+            if fact in self.state_facts:
+                raise ValueError(f"setup '{setup_path}': the state {fact} is listed twice")
+            self.state_facts.add(fact)
+
+    def _state_fact(self, name: str, obj_id: Optional[str]) -> Predicate:
+        """
+        The state fact `name` about `obj_id` (None: about no object), validated
+        against the declarations: the name is declared; a state about an
+        object of a type names an existing object of that type; a state about
+        no object names none.
+        """
+        declaration = self.state_declarations.get(name)
+        if declaration is None:
+            raise ValueError(f"'{name}' is not a state the domain declares ({sorted(self.state_declarations)})")
+        if declaration.object_type is None:
+            if obj_id is not None:
+                raise ValueError(f"the state '{name}' is a fact about no object, but names '{obj_id}'")
+            return Predicate(name, ())
+        if obj_id is None:
+            raise ValueError(f"the state '{name}' is about an object of type '{declaration.object_type}', but names none")
+        obj = self.objects.get(obj_id)
+        if obj is None:
+            raise ValueError(f"the state '{name}' names '{obj_id}', which is not an object of this run")
+        if obj.type != declaration.object_type:
+            raise ValueError(
+                f"the state '{name}' names '{obj_id}' of type '{obj.type}', but is declared for type "
+                f"'{declaration.object_type}'"
+            )
+        return Predicate(name, (Const(obj_id),))
+
+    def _check_declared_effects(self):
+        """
+        Every effect and retraction of the tree's action schemas whose name is a
+        declared state has the declared form: one argument for a state about an
+        object, none for a fact about no object.
+        """
+        for action in self.tree.get_all_actions():
+            for condition in list(action.effects) + list(action.retracts):
+                declaration = self.state_declarations.get(condition.name)
+                if declaration is None:
+                    continue
+                arity = 0 if declaration.object_type is None else 1
+                if len(condition.args) != arity:
+                    raise ValueError(
+                        f"action '{action.name}': '{condition.name}' is a declared state with {arity} "
+                        f"argument(s), but the action states it with {len(condition.args)}"
+                    )
+
+    def apply_state_changes(self, action: GroundedAction):
+        """
+        The environment's change when `action`'s last microaction has run (the
+        executor calls it): its retractions, then its effects, whose names are
+        declared states, grounded with the action's own bindings — the order
+        successor_state() reads them in. Physical facts (at, holding, obj_at,
+        waited) are not states: the builder derives them.
+        """
+        for condition in action.schema.retracts:
+            if condition.name in self.state_declarations:
+                fact = condition.to_predicate(action.bindings)
+                self._state_fact(fact.name, fact.args[0].value if fact.args else None)
+                self.state_facts.discard(fact)
+        for condition in action.schema.effects:
+            if condition.name in self.state_declarations:
+                fact = condition.to_predicate(action.bindings)
+                self._state_fact(fact.name, fact.args[0].value if fact.args else None)
+                self.state_facts.add(fact)
 
 
 
@@ -378,6 +483,16 @@ class SimModel(model.Model):
                     check_task_bindings(task, object_type_by_id, check_duration)
             except ValueError as e:
                 raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
+
+        # Every assigned task's determined parameter, resolved from the station,
+        # has the type its schema declares (T-G A5): an assigned delivery of an
+        # object whose designation is of another kind is refused.
+        for agent_cfg in scenario.agents:
+            for task in agent_cfg.assigned_tasks or []:
+                try:
+                    self._check_designated_types(task)
+                except ValueError as e:
+                    raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
 
         for agent_cfg in scenario.agents:
             start_pos = agent_cfg.start_position
@@ -448,6 +563,28 @@ class SimModel(model.Model):
                     check_task_destinations(task, destination_by_id)
                 except ValueError as e:
                     raise ValueError(f"scenario '{scenario.id}', agent '{agent_cfg.agent_id}': {e}") from e
+
+    def _check_designated_types(self, task: TaskInstance) -> None:
+        """
+        Each parameter `task` determines through "destination_of" (T-B1a): the
+        destination the setup designates for its bound source object has the
+        type the schema declares for that parameter. Raises ValueError naming
+        the task, the source object, the designation and both types.
+        """
+        bound = {var.name: const.value for var, const in task.bindings.items()}
+        for var_name, source_var in destination_derivations(task.schema):
+            if source_var not in bound or source_var not in task.schema.parameter_types:
+                continue
+            source = bound[source_var]
+            designated = self.objects[source].destination
+            expected = task.schema.parameter_types[var_name]
+            actual = self.objects[designated].type
+            if actual != expected:
+                raise ValueError(
+                    f"{task_instance_key(task)}: {var_name} resolves to '{designated}', the destination the setup "
+                    f"designates for {source_var}='{source}', of type '{actual}', but the schema requires type "
+                    f"'{expected}'"
+                )
 
     def _destination_by_id(self) -> Dict[str, str]:
         """The station: each object with a designated destination, and that destination."""

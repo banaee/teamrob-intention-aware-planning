@@ -76,9 +76,9 @@ scan_it = ActionSchema(
         ConditionSchema("at", (_agent, _item)),
     ],
     effects=[
-        ConditionSchema("scanned", (_item,)),
+        ConditionSchema("is_scanned", (_item,)),
     ],
-    completion=ConditionSchema("scanned", (_item,)),
+    completion=ConditionSchema("is_scanned", (_item,)),
     microactions=["TOUCH"],
 )
 

@@ -6,8 +6,6 @@
       "type": "pallet",
       "initial_container": "dry_delivery_bay_0",
       "destination": "dry_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -18,8 +16,6 @@
       "type": "pallet",
       "initial_container": "dry_delivery_bay_0",
       "destination": "dry_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -30,8 +26,6 @@
       "type": "pallet",
       "initial_container": "frozen_delivery_bay_0",
       "destination": "frozen_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -42,8 +36,6 @@
       "type": "pallet",
       "initial_container": "frozen_delivery_bay_0",
       "destination": "frozen_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -54,13 +46,17 @@
       "type": "pallet",
       "initial_container": "truck_interior",
       "destination": "dry_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
       ],
       "notes": "In the truck: its scan never becomes applicable while the robot is idle."
+    }
+  ],
+  "states": [
+    {
+      "state": "is_open",
+      "object": "dock_gate"
     }
   ]
 }

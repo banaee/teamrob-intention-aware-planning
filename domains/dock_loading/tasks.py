@@ -16,7 +16,7 @@ TASKS:
 
 METHODS NOTE:
     deliver_pallet and load_return each have two methods guarded by gate state:
-        - "gate_open"   — gate_is_open in WorldState  (Phase 2.1: only this path runs)
+        - "gate_open"   — is_open(dock_gate) in WorldState, a declared state (T-G A5)  (Phase 2.1: only this path runs)
         - "gate_closed" — gate_is_closed in WorldState (TODO: implement open_gate action)
     For Phase 2.1 the gate is always open, so the gate_closed method is a stub with
     an empty steps list and will never be selected. It exists to document the structure.
@@ -51,7 +51,7 @@ deliver_pallet = WorkTask(
             name="deliver_pallet_gate_open",
             parameters=[_pallet, _delivery_bay],
             guards=[
-                ConditionSchema("gate_is_open", (Const("dock_gate"),)),
+                ConditionSchema("is_open", (Const("dock_gate"),)),
             ],
             steps=[
                 ActionStep(move_to, {_target: Const("dock_gate")}),
@@ -96,7 +96,7 @@ load_return = WorkTask(
             name="load_return_gate_open",
             parameters=[_pallet],
             guards=[
-                ConditionSchema("gate_is_open", (Const("dock_gate"),)),
+                ConditionSchema("is_open", (Const("dock_gate"),)),
             ],
             steps=[
                 ActionStep(move_to, {_target: _pallet}),

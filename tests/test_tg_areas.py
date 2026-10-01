@@ -114,7 +114,8 @@ def _dock_model():
     return SimModel(scenario=base, register_fn=register_dock_loading_domain,
                     task_model_schemas=dock_config["task_model"],
                     layout_path=dock_config["layouts"]["env_layout_02"],
-                    setup_path=dock_config["setups"][base.setup])
+                    setup_path=dock_config["setups"][base.setup],
+                    state_declarations=dock_config["states"])
 
 
 def test_the_gate_approached_from_each_side():

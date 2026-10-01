@@ -75,7 +75,10 @@ I/O:
     OUT: world mutations       agent.pos, item.held_by, item.at_location,
                                agent.waited_at (the fixed object a completed wait
                                ended at; world_state_builder emits waited(agent, obj)
-                               from it, as holding(agent, item) comes from carrying)
+                               from it, as holding(agent, item) comes from carrying);
+                               the object states the action declares, applied by
+                               the environment when its last microaction has run
+                               (SimModel.apply_state_changes, T-G A5)
 
 COMPLETION CHECKING:
     Each GroundedAction carries a fully instantiated completion_predicate
@@ -314,6 +317,10 @@ class Executor:
             self.microaction_queue.pop(0)
             if not self.microaction_queue:
                 self._queue_was_exhausted = True
+                # The action's last microaction has run: the environment applies
+                # the states it declares (T-G A5), seen from the next tick's
+                # WorldState, where its completion is acknowledged.
+                self.agent.model.apply_state_changes(action)
         else:
             self.microaction_queue = []
             self.current_microaction = None
@@ -497,14 +504,11 @@ class Executor:
         return True
 
     def _execute_touch(self, microaction: Microaction) -> bool:
-        """Scan an item. Sets item.is_scanned = True."""
-        item_id = microaction.params.get("item_id")
-        if not item_id:
-            return False
-        item = self.agent.model.objects.get(item_id)
-        if item is None:
-            return False
-        item.is_scanned = True
+        """
+        Touch for one tick (the scan's screen), changing nothing itself: what
+        the action changes is the state its schema declares, applied by the
+        environment when this, its last microaction, has run (step(), T-G A5).
+        """
         self.agent.waited_at = None
         return True
 

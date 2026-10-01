@@ -44,6 +44,11 @@ PREDICATES GENERATED:
           next step/grasp/release/touch. wait_at's completion condition; the
           body runs the timer, so the body says when the wait is over.
 
+    Object states (T-G A5):
+        Predicate(<declared state>, (Const(obj_id),)), or with no argument for a
+        fact about no object — every fact the environment holds
+        (SimModel.state_facts), emitted as held; the builder derives none.
+
 PREDICATE NAMING RATIONALE:
     "in_area" and "at" are intentionally distinct:
     - in_area(agent, area) — coarse spatial context for IR
@@ -173,9 +178,6 @@ def build_world_state(model: SimModel) -> WorldState:
                 location = obj.at_location
                 area_id = _area_id(obj.position, model)
 
-            if obj.is_scanned:
-                predicates.add(Predicate("scanned", (Const(obj_id),)))
-
             object_locations[obj_id] = location
             predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
             object_areas[obj_id] = area_id
@@ -192,13 +194,10 @@ def build_world_state(model: SimModel) -> WorldState:
             object_areas[obj_id] = _area_id(obj.position, model) or "unknown"
 
     # ------------------------------------------------------------------
-    # Phase 2.1: dock gate always open — TODO: derive from gate state
+    # The object states the environment holds (T-G A5; A6, assumptions 5.3)
     # ------------------------------------------------------------------
-    # predicates.add(Predicate("gate_is_open", (Const("dock_gate"),)))
-    for obj_id, obj in model.objects.items():
-            if obj.type == "gate" and obj.is_open is not False:
-                predicates.add(Predicate("gate_is_open", (Const(obj_id),)))
-        
+    predicates |= model.state_facts
+
     # ------------------------------------------------------------------
     # TODO Phase 4: derive additional predicates
     # Examples:

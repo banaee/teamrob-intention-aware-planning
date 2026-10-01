@@ -95,9 +95,12 @@ def expand(
     EXPANSION RULES:
         action.schema.microactions == "STEP*"   → full STEP sequence to movement target
         action.schema.microactions == "STAND*"  → N STAND microactions (duration from bindings)
-        action.schema.microactions == ["GRASP"] → single GRASP with item_id from bindings
+        action.schema.microactions == ["GRASP"] → single GRASP of the object the
+                                                  schema's moved_object_key binds
         action.schema.microactions == ["RELEASE"] → single RELEASE
-        action.schema.microactions == ["TOUCH"] → single TOUCH with item_id from bindings
+        action.schema.microactions == ["TOUCH"] → single TOUCH (one tick; the
+                                                  states the action declares are
+                                                  the environment's, T-G A5)
         unknown                            → empty list with warning
     """
     spec = action.schema.microactions
@@ -170,25 +173,19 @@ def _expand_fixed(
 ) -> List[Microaction]:
     """
     Expand a fixed microaction list e.g. ["GRASP"] or ["RELEASE"] or ["TOUCH"] into the corresponding microaction(s).
-    Reads item_id from bindings for GRASP.
+    GRASP reads the object it grasps from the binding the schema's
+    moved_object_key names (T-G A5: no variable name here).
     RELEASE needs no params — executor detects target by proximity.
-    TOUCH ???
+    TOUCH and any other fixed microaction need none.
     """
     result = []
     for mu in spec:
         mu_lower = mu.lower()
         if mu_lower == "grasp":
-            item_id = action.bindings.get("?item", "")
-            result.append(Microaction(name="grasp", params={"item_id": item_id}))
-        elif mu_lower == "release":
-            result.append(Microaction(name="release", params={}))
-        
-        elif mu_lower == "touch":
-            item_id = action.bindings.get("?item", "")
-            result.append(Microaction(name="touch", params={"item_id": item_id}))
-        
-        # Add more fixed microactions here as needed, e.g. based on the domain's microaction vocabulary
-        
+            key = action.schema.moved_object_key
+            if key is None:
+                raise ValueError(f"action '{action.action_name}' expands a GRASP but declares no moved_object_key")
+            result.append(Microaction(name="grasp", params={"item_id": action.bindings[key]}))
         else:
             result.append(Microaction(name=mu_lower, params={}))
     return result

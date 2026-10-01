@@ -8,7 +8,7 @@ Called once at startup by sim_model.py.
 
 from pathlib import Path
 
-from shared.knowledge import Tree
+from shared.knowledge import StateDeclaration, Tree
 from domains.discovery import discover_files, discover_scenarios
 from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it
 from domains.dock_loading.tasks import deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break
@@ -28,6 +28,10 @@ domain_config = {
     "register_fn": register_dock_loading_domain,
     # The task model every robot is given (T-H).
     "task_model":  [deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break],
+    # The object states the domain declares (T-G A5); the setup's "states"
+    # block states which hold at the start, the environment holds them.
+    "states":      [StateDeclaration("is_empty", "pallet"), StateDeclaration("is_scanned", "pallet"),
+                    StateDeclaration("is_open", "gate")],
     # The three artefacts of a run (T-L, stage 2): layouts and setups are
     # registered by the files in their folders, the scenarios by discovery
     # over the scenarios package (domains/discovery.py) — no hand-written

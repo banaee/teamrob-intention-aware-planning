@@ -6,8 +6,6 @@
       "type": "pallet",
       "initial_container": "truck_interior",
       "destination": "dry_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -18,8 +16,6 @@
       "type": "pallet",
       "initial_container": "truck_interior",
       "destination": "dry_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -30,8 +26,6 @@
       "type": "pallet",
       "initial_container": "truck_interior",
       "destination": "frozen_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -42,8 +36,6 @@
       "type": "pallet",
       "initial_container": "truck_interior",
       "destination": "frozen_delivery_bay_0",
-      "is_empty": false,
-      "is_scanned": false,
       "size": [
         80,
         120
@@ -54,7 +46,6 @@
       "type": "pallet",
       "initial_container": "empty_pallet_bay_0",
       "destination": "truck_interior",
-      "is_empty": true,
       "size": [
         80,
         120
@@ -65,11 +56,24 @@
       "type": "pallet",
       "initial_container": "empty_pallet_bay_0",
       "destination": "truck_interior",
-      "is_empty": true,
       "size": [
         80,
         120
       ]
+    }
+  ],
+  "states": [
+    {
+      "state": "is_empty",
+      "object": "pallet_4"
+    },
+    {
+      "state": "is_empty",
+      "object": "pallet_5"
+    },
+    {
+      "state": "is_open",
+      "object": "dock_gate"
     }
   ]
 }

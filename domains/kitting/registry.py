@@ -29,6 +29,8 @@ domain_config = {
     # The task model every robot is given (T-H): every WorkTask and the
     # PersonalTasks it foresees; no HumanOnlyTask.
     "task_model":  [deliver_item, coffee_break, ac_activation],
+    # The object states the domain declares (T-G A5): kitting declares none.
+    "states":      [],
     # The three artefacts of a run (T-L, stage 2): layouts and setups are
     # registered by the files in their folders, the scenarios by discovery
     # over the scenarios package (domains/discovery.py) — no hand-written

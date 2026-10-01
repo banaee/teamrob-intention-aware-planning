@@ -12,6 +12,8 @@ PURPOSE:
     - TaskModel:    one robot's task model, the subset of the tree the robot is
                     given, by whole schemas. The robot's recognizer, projector,
                     planner and meta-planner use it only.
+    - StateDeclaration: one object state the domain declares (T-G A5), in the
+                    registry's "states" list; the environment holds its facts.
     - ContextKnowledge: background context facts (shift info, environment
                     state) used by IR for ω_context weighting.
 
@@ -39,12 +41,29 @@ USED BY:
     - mesa_sim/sim_agents.py → TaskModel, ContextKnowledge.default()
 """
 
-from typing import Dict, List, Optional, Sequence, Tuple
+from dataclasses import dataclass
+from typing import Dict, FrozenSet, List, Optional, Sequence
 
 from shared.types import (
     ActionSchema, ActionStep, HumanOnlyTask, LANDMARK_TYPE, TaskSchema, TaskStep, WorkTask,
     destination_derivations,
 )
+
+
+@dataclass(frozen=True)
+class StateDeclaration:
+    """
+    One state the domain declares (T-G A5): a fact named `name`, about one
+    object of type `object_type` (is_empty(pallet)), or, with `object_type`
+    None, a fact about no object (the form admits it for context knowledge,
+    stage 1.5). Listed in the domain registry's "states"; the setup's "states"
+    block states which hold at the start (one not listed does not hold); the
+    environment holds the true facts and changes them when an action that
+    declares one as an effect or a retraction has run. Never a physical fact
+    (at, holding, obj_at, waited): those stay the simulator's derivation.
+    """
+    name: str
+    object_type: Optional[str]
 
 
 class ProceduralKnowledge:
@@ -179,21 +198,30 @@ class Tree(ProceduralKnowledge):
                         f"only a HumanOnlyTask may type a parameter as a landmark"
                     )
 
-    def get_types_with_destination(self) -> Dict[str, Tuple[str, Optional[str]]]:
+    def get_types_with_destination(self) -> Dict[str, FrozenSet[str]]:
         """
-        {object type: (task name, destination type)} for every object type
-        some task determines a parameter from through the "destination_of"
-        lookup — the types whose objects the layout must give a destination,
-        and the type that destination must have (the determined parameter's
-        parameter_types entry; None if the schema types it not). T-B1a.
+        {object type: the destination types declared for it} for every object
+        type some task determines a parameter from through the "destination_of"
+        lookup — the types whose objects the setup must give a destination, and
+        the types that destination may have: the determined parameters'
+        parameter_types entries, over every such task (T-B1a; generalised in
+        T-G A5: dock_loading's pallet goes to a delivery bay or to the truck).
+        A determined parameter the schema types not is an error: its
+        destination could not be checked.
         """
-        types: Dict[str, Tuple[str, Optional[str]]] = {}
+        types: Dict[str, set] = {}
         for task in self._tasks.values():
             for var_name, source_var in destination_derivations(task):
                 source_type = task.parameter_types.get(source_var)
-                if source_type is not None:
-                    types.setdefault(source_type, (task.name, task.parameter_types.get(var_name)))
-        return types
+                if source_type is None:
+                    continue
+                dest_type = task.parameter_types.get(var_name)
+                if dest_type is None:
+                    raise ValueError(
+                        f"task '{task.name}': determined parameter {var_name} has no type in parameter_types"
+                    )
+                types.setdefault(source_type, set()).add(dest_type)
+        return {source_type: frozenset(dests) for source_type, dests in types.items()}
 
 
 class TaskModel(ProceduralKnowledge):
