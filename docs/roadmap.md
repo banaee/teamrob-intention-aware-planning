@@ -389,6 +389,9 @@ track 4 leaves the T-D tail for its place inside T-G (after stage 2); the 4D det
 is open: its design is ruled (30 September and 1 October 2026) and build 1 is in (30 September 2026). Next, in order
 (1 October 2026): the lifecycle question of the human's list (parked under A3), then the layout and the setup of T-G's
 stage 1, agreed in the design chat, then stage 1's plan.
+SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (T-G Q12 to Q15; design_decisions.md, "T-G:
+the second domain's rulings", A3, B13). Next: the layout and the setup of T-G's stage 1, then stage 1's plan. T-G's
+order is stage 1, stage 1.5 (context knowledge, new), stage 2, track 4, stage 3.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -608,12 +611,25 @@ stage 1, agreed in the design chat, then stage 1's plan.
     BUILDS: first, in its own commit with no change of behaviour, the zone mechanism renamed to "area" in the code (the
     plan reports the extent first: every occurrence, and whether the maintained sets' logs print it); the catch-up of
     dock_loading's forms to kitting's (C3); A3, the human's script form (`world/`), with the standby entry, once the
-    lifecycle of a list entry is ruled (PARKED, the next design chat's first question); A4, liveness by applicability (`shared/`); A5, generic object states and designations (used for the
+    lifecycle of a list entry is ruled (PARKED, the next design chat's first question; RULED 1 October 2026, T-G Q12 to
+    Q15: open and closed entries, the repeatable standby entry, the dependence declaration for the load-time check, the
+    closing part; dock_loading's closing part is the walk to the desk, a landmark that enters stage 1's layout, B13); A4, liveness by applicability (`shared/`); A5, generic object states and designations (used for the
     scanned state, `is_empty` and the destination); A6, the perception assumption; A9, the declared areas and the fact
     that an agent is in an area; B1 to B4, B8, B9, B11; B6 with `office_break` reduced (the office door has no state, the
     human passes it as a plain point; the office observed); B10, the room (whether the stores and the freezer are
     already in stage 1's layout is not ruled); the IR test-bed on dock_loading, then the MPB. A3, A4, A5 and A9 change
-    code outside the domain; each is accepted on kitting by the maintained sets staying byte-identical.
+    code outside the domain; each is accepted on kitting by the maintained sets staying byte-identical. A3 also by
+    the kitting scenarios with a drop event and the test-bed sets with misdeliveries, run under the new form and
+    compared with their present behaviour (expected: no difference; a difference returns to the design chat). The form
+    built for A5 admits a fact that no action changes and that is not the state of a movable object (none authored in
+    stage 1).
+  - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
+    knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
+    at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
+    applied by the environment; both domains' foreseeable tasks conditioned on such facts. Open questions: the form of a
+    context fact; start only or interruption of a task in progress (A3, A10); liveness under A4 when a condition turns
+    false during execution; the prior under context; the perception assumption for context facts. The pre-loaded
+    context stream moves here from T-V track 2.
   - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
     run, TODO-16 with the stepwise delivery (A7).
     BUILDS: B7 with the second designation; B5, the gate opened on request and the office door's state; A7, TODO-16,
@@ -628,6 +644,8 @@ stage 1, agreed in the design chat, then stage 1's plan.
     decision, hold, refusal and the script's events; demonstration only, nothing enters the mind.
   - Track 2: Phase 7 (below): live events through the human executor's injection path (`inject`, T-H2), the export
     as a script, the replay rule, later the context stream.
+    SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-G's stage 1.5; track 2
+    keeps the live events.
     T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
     its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
     fact, if wanted, is designed here as the same entry point as the live user's click.
@@ -747,6 +765,8 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   injection on an empty stack is exported as a plain script entry; viewer walks go to landmarks only. The viewer's
   buttons stay here.
 - A context-knowledge stream into the world state, read by the recognizer: its own task.
+  MOVED (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream is T-G's stage 1.5 (context knowledge), above;
+  the live events stay with T-V track 2.
 - Communication as a robot action under a live `unknown` or block: its own task.
   SUPERSEDED IN PART (T-D R, 27 September 2026): "a live `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".
 - Handoff: `docs/handoffs/phase7_interactive_deviations.md`.

@@ -420,6 +420,9 @@ Reference: Phase 4C meta_planner build session, July 2026
 ## 🏗️ Design TODOs
 
 **DESIGN-01 — Task eligibility conditions and scenario task scheduling mechanism** [Phase 2.3]
+NOTE (T-G Q12 to Q15, Hadi, 1 Oct 2026): the lifecycle of an entry of the human's list is ruled (open and closed
+entries, the repeatable standby entry, the closing part, the dependence declaration for the load-time check).
+design_decisions.md, "T-G: the second domain's rulings", A3 (RULED).
 ANSWERED, NOT BUILT (T-G A3, T-G records 1, 1 Oct 2026): a task can start only when it is applicable (one of its methods applies), decided by
 the human agent's own HTN planning against the true state it perceives; the script is a priority list scanned from the
 top whenever the human is free; if nothing is applicable the human waits. In `world/` (the human's executor), not a
@@ -2285,6 +2288,11 @@ Files: shared/recognizer.py (`_output`, `BeliefState.confidence`), shared/meta_p
 Reference: I1 audit; I5 hand-back; θ single-source session, September 2026
 
 **TODO-66 — The context / knowledge-representation pass: `_context_weight` branches on literal task names** [DEFERRED deliberately]
+NOTE (T-G C1, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", C1): T-G's stage 1.5, context
+knowledge (framework-wide, after stage 1 and before stage 2, from its own handoff), opens the question this item defers:
+a context timeline in the scenario changing a fact at an authored point of a run, applied by the environment, and both
+domains' foreseeable tasks conditioned on such facts; the form of a context fact is its first open question. It is the
+pre-loaded context stream, moved from T-V track 2 (Phase 7). Whether stage 1.5 closes this item is for its design.
 `_context_weight` still tests `hyp.task_name == "ac_activation"` and `"coffee_break"` and carries its own
 constants (TEMPERATURE_BOOST 3.0, FATIGUE_BOOST 2.5, HIGH_TEMP_THRESHOLD 26.0, LONG_SHIFT_THRESHOLD 500) —
 the one place in shared/ that names a domain task. Applied to the output only, never fed back, so it does
@@ -2844,6 +2852,9 @@ Agents move in straight lines ignoring walls between hall/dock/truck.
 Accepted: same as kitting. Fix deferred to Phase 4 path planning (TODO-09, DESIGN-13).
 
 **LIMIT-02 — Parallel task independence: human scans before robot delivers**
+NOTE (T-G Q13b, Hadi, 1 Oct 2026): a script whose scans wait for the robot's deliveries is one the author declares
+dependent on the robot: the loader reports the entries left open by the load-time replay and loads. design_decisions.md,
+"T-G: the second domain's rulings", A3 (RULED).
 ANSWERED, NOT BUILT (T-G records 1, 1 Oct 2026): `scan_pallet` is the old name of `confirm_delivered_pallet` (BUG-02). Answered by A3
 (applicability; the human waits) and B2 (the scan's condition: the pallet in its delivery container). design_decisions.md, "T-G: the second domain's rulings", A3, B2.
 Human `scan_pallet` executes without waiting for robot `deliver_pallet` to complete.
@@ -4045,6 +4056,8 @@ Files: configs/experiment.yaml, CLAUDE.md
 Reference: docs/assumptions.md 1.4
 
 **TODO-140: Track 4, the workspace boundary and human departure (recorded at the G/X handoff, 29 Sept 2026)** [OPEN; after track 3, or before it if the evaluation needs a genuine departure] [V1, reduced form]
+NOTE (T-G B13, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", B13): no exit from the room is
+defined for dock_loading now; its script ends with the walk to the desk, the closing part (A3, Q14).
 RULED, REDUCED FORM (T-G A8, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A8), [V1]: "The layout declares monitored areas. The robot's
 WorldState holds the human, and facts about the human, only while the human is inside one. While no human is observed,
 the recognizer does not update, no human projection exists, and the planner plans as with no human present. The
@@ -4113,6 +4126,8 @@ Files: shared/recognizer.py (`_build_admissible`), mesa_sim/sim_model.py (`obser
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the record line); analysis/mpb/REPORT.md
 
 **TODO-144: T-F, the evaluation: framing (not ruled) (recorded, the MPB post-(iv) records, 29 Sept 2026)** [OPEN; a future item, after the MPB closes] [V1]
+NOTE (T-G B13, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", B13): the scope line on the exit
+walk is a kitting statement; dock_loading's ending (the walk to the desk, its closing part) is for T-F's own design.
 T-G A11 (T-G records 1, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A11): a layout authored so that routes cross shows that the robot adapts when an interaction
 exists; it does not show how often interactions occur. T-F varies the placement and takes no interaction rate from
 crossing setups alone.
@@ -4218,6 +4233,9 @@ Files: shared/projection.py (project_human), shared/meta_planner.py (update_huma
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", MPB-4's class-2 record; TODO-77; T-D R and E (E8, E9)
 
 **TODO-147: Shared work between the human and the robot (recorded, T-G records 1, 1 Oct 2026)** [FW]
+NOTE (T-G Q13a, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A3): an entry whose task ends
+INFEASIBLE is closed and not reopened by a later applicable state; no V1 ruling produces the case. This item reopens
+that question if it produces a case (the other agent's task stopping being applicable during its execution).
 A conceptual direction (T-G A10). The Q1 template (A3: assignment static, availability and order dynamic) makes a task
 assigned to both agents expressible; each agent's applicable set shrinks when the other takes or delivers the object.
 To design first: both agents choose the same object in the same interval; one picks it up; the other's task stops being
@@ -4229,6 +4247,9 @@ Reference: design_decisions.md, "T-G: the second domain's rulings", A3, A10; doc
 TODO-105; DESIGN-04
 
 **TODO-148: A human that chooses its own tasks (recorded, T-G records 1, 1 Oct 2026)** [FW]
+NOTE (T-G Q12, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A3): a retry of a dropped task
+by rule (a choice rule of the human that no author wrote) is not taken for V1 and is named as this item's direction; in
+V1 a retry exists only as a second authored entry of that task.
 A conceptual direction (T-G A10): a human planner in place of the author's priority list. It supplies the choice at the
 one isolated point of the human's executor that A3 requires in V1 (the point a live user supplies in T-V track 2).
 Files: world/ (the human's executor)
