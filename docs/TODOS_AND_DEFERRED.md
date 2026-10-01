@@ -961,6 +961,9 @@ Files: domains/kitting/tasks.py, mesa_sim/sim_model.py, domains/kitting/scenario
 Reference: Phase 4C scenario_s01_01 validation, September 2026
 
 **TODO-30 — Interference exclusion branch never exercised** — MEANING CHANGED (wait-decision revision, Sept 2026): "infeasible" = no realization within the human's horizon — ✅ RESOLVED by decision (R1, Sept 2026): all-unrealizable → plain projected cost, logged `all_unrealizable` — ✅ BUILT (T10): the `RuntimeError` is gone; one event measured — ✅ CLOSED (F1): realization is total, the branch no longer exists — ✅ CLOSED (F1: nothing is unrealizable)
+NOTE (T-G records 7, 1 Oct 2026): design_decisions.md, "T-G: the second domain's rulings", C4 cited this item for "how
+the meta-planner behaves when the pool holds tasks and none is applicable"; the citation is corrected. This item concerns
+realizability and stays closed; applicability is TODO-152.
 CLOSED (F1, September 2026): under robot-responsible separation (design_decisions.md,
 "Robot-responsible separation") a clearing hold always exists, `realize()` always returns a cost, and
 there is no unrealizable candidate — neither the exclusion branch nor the all-unrealizable fallback
@@ -3595,6 +3598,10 @@ Stage 2 adds: `planner_2.py`'s `from domains.kitting.scenarios import scenario_1
 now a package whose names live in its modules); it joins the readers above for the resume.
 Stage 3 adds: the import names change again (kitting scenario_10 is `scenario_s02_01`, in
 `domains/kitting/scenarios/scenarios_s02.py`; the layout files are `layouts/env_layout_KK.json`; `docs/rename_table.md`).
+T-G stage 1 adds (T-G records 7, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN
+APPROVED): the rename of "zone" to "area" in the code leaves ros_sim passing the old field names
+(`world_state_builder_continuous.py`: `current_zone=`, `object_zones=`, `in_zone`; `planner_2.py`: `current_zone=`), and
+the carriers nothing reads (`AgentState`'s area among them) are removed; ros_sim is not touched.
 Files: ros_sim/framework_HRI/framework_HRI/{planner_2,planner_3,world_con,run_continuous}.py
 Reference: design_decisions.md, "Layouts, setups and scenarios: the three artefacts of a run", ruling 8; TODO-108
 
@@ -4278,3 +4285,14 @@ constructor does not check that a step's binding keys are the parameters of the 
 `{?pallet: ...}` steps (before build 1) surfaced at decomposition. A proposal; untagged until Hadi rules it.
 Files: shared/types.py (`check_task_bindings`), shared/knowledge.py (`Tree`)
 Reference: design_decisions.md, "T-G: the second domain's rulings", PROPOSALS; TODO-25, TODO-104
+
+**TODO-152: A robot task with no applicable method stops the run (recorded, T-G records 7, 1 Oct 2026)** [OPEN; a ruling before T-G stage 2]
+Found by T-G stage 1's plan (approved by Hadi, 1 Oct 2026). `MetaPlanner.update()` judges every task of the pool through
+`_is_complete` (`AdaptivePlanner.is_complete`, which decomposes it), and projects candidates through the planner; a task
+with no applicable method raises `DecompositionError`, which nothing catches, and the run stops. Stage 1 cannot reach it:
+every robot task has a method for every area the robot can be in, and the gate is open (B11 as amended). Stage 2 reaches
+it: the robot at a closed gate has no applicable task and stands (B5). A ruling is needed before stage 2's build. The
+case was first cited under TODO-30, which concerns realizability (corrected).
+Files: shared/meta_planner.py (`update`, `_is_complete`, `_replan_tasks`, `_replan_orderings`), shared/projection.py
+Reference: design_decisions.md, "T-G: the second domain's rulings", B5, B11 (AMENDED), C4, STAGE 1 PLAN APPROVED;
+docs/handoffs/plan_T-G_stage1.md, section 5
