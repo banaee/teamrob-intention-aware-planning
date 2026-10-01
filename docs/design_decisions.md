@@ -5666,6 +5666,8 @@ option it ruled. The rulings are grouped by SCOPE, and the scope binds:
 - PROPOSALS: what the design chat proposed and Hadi has not ruled.
 Names not yet given (the human's gate task, the robot's honk action, the fact names for the states and the
 designations) are left unnamed; the stage plans propose them.
+ADDED (T-G records 2, 1 October 2026): Q12 to Q15, ruled by Hadi on 1 October 2026, answer A3's PARKED block (the
+lifecycle of an entry of the human's list); recorded in A3 (RULED), B13, C1 (stage 1.5) and C4.
 
 PART A. FRAMEWORK-WIDE RULINGS (every domain)
 
@@ -5741,6 +5743,77 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
     byte-identical acceptance does not exercise the lifecycle rule. Whatever rule is ruled needs its own check on the
     kitting scenarios that contain a drop event and on the test-bed sets with misdeliveries, in addition to the
     byte-identical acceptance.
+  ANSWERED (Hadi, 1 October 2026): by Q12 to Q15, the RULED block below. This PARKED block stays as the question's
+  record. The candidate's first half (an entry skipped when its terminal fact holds) is Q12's (B), not taken.
+  RULED (Hadi, 1 October 2026; T-G Q12 to Q15; recorded in T-G records 2, 1 October 2026): the lifecycle of an entry of
+  the human's list. Framework-wide: the rulings extend A3 and bind every domain. A3 may be built in stage 1.
+  - Q12, when an entry is no longer selectable.
+    The human takes an ordinary entry at most once in a run. The entry is closed after its task leaves the stack with
+    COMPLETED or ABANDONED.
+    Repeatability is an explicit property of an entry's form. The standby entry is repeatable: the human may take it any
+    number of times, and skips it while the human is at the standby place.
+    "Completed" is a statement about the entry in the executor's record. It never reads the assigned task. A delivery to
+    another table is an entry that completed; the assigned task stays incomplete in the environment, which concerns the
+    robot's mind only.
+    A retry of a dropped task exists only if the author writes a second entry of that task.
+    Reason: every realised task traces to exactly one authored entry; a dropped task does not restart unasked; kitting
+    keeps its present behaviour.
+    Not taken: (B) judging by the environment's facts: an entry whose terminal fact does not persist, such as
+    `coffee_break` with `waited(agent, object)`, would become selectable again after every later task. (C) a retry by
+    rule: a choice rule of the human that no author wrote (TODO-148's direction). (D) a retry flag on each drop: more
+    vocabulary, and it still needs C's condition.
+    Terms (glossary §6): open entry, closed entry. The names in the code and the authoring form of the repeatable kind
+    are left to stage 1's plan.
+  - Q13a, an entry whose task ends with INFEASIBLE.
+    The entry is closed, as with COMPLETED and ABANDONED. SUSPENDED keeps it open. A later applicable state does not
+    reopen an ordinary entry.
+    A closed entry says nothing about the assigned task: after INFEASIBLE or ABANDONED the assigned task is still
+    incomplete in the environment, and the robot's mind can still hold its hypothesis.
+    Reason: one rule for all three ends; no retry semantics; no V1 ruling produces the case, so no mechanism is added
+    for it.
+    Not taken: reopening the entry; waiting in place. TODO-147 (shared work) reopens the question if it produces a case.
+  - Q13b, what the load-time check claims.
+    INFEASIBLE names only the outcome of a task that was selected and could not continue. An entry that was never
+    selected in the load-time replay is "left open", not infeasible.
+    The author declares that a script depends on the robot. The default is independent.
+    - Independent: an entry left open at the replay's end stops the load, as today.
+    - Dependent: the loader reports the entries left open and loads. The run's record states the entries still open at
+      the run's end.
+    The declaration concerns load-time validation only. It does not change the human's run-time selection. It does not
+    state that the script is valid or will complete.
+    Reason: the replay runs the human alone and cannot tell an entry that waits for the robot from an entry that can
+    never be applicable; the exact check is kept wherever the replay is exact (kitting; dock_loading scenarios with an
+    idle robot).
+    Not taken: the loader inferring the kind (kitting would lose its check); a check against the state after all the
+    robot's tasks (an entry applicable only in an intermediate state, such as "open the gate" between the request and
+    the opening, would be reported wrongly).
+    The declaration's form is left to stage 1's plan.
+  - Q14, when the list is finished, and the closing part.
+    The script has a priority list (ordinary and repeatable entries) and a closing part.
+    The priority list is finished when every ordinary entry is closed. The human then takes the entries of the closing
+    part in their written order. After the closing part the human selects nothing more, repeatable entries included.
+    The construct is framework-wide. What a closing part contains is each domain's own convention; no framework-wide
+    rule prescribes it. Kitting needs no closing part: every entry is applicable from the start, so its last entry is
+    its last act, as today. (dock_loading's closing part: B13.)
+    Reason: a plain walk has no condition and is applicable from the first tick, so as an ordinary entry the human would
+    take it before the work; and a repeatable entry would move the human again after the end.
+    Not taken: the closing walk as an ordinary entry; no closing act for a script that depends on the robot.
+    Terms (glossary §6): closing part, closing entry, finished (said of the priority list).
+  - Q15, placing a foreseeable task or an event when the order of the work tasks is not fixed.
+    An event stays attached to its entry and needs no new rule.
+    A foreseeable task written as an entry is an ordinary entry under the plain priority rule: the human takes it once,
+    the first time it is free and no entry above it is applicable.
+    Reason: the two authoring means have one meaning each ("after or during this task" by an event; "once, when nothing
+    above is applicable" by an entry) and add no construct.
+    Not taken: an order condition between entries (the extension if a scenario needs it); a tick in the script.
+  ACCEPTANCE, added to A3 (the same ruling): the maintained kitting sets stay byte-identical (as ruled). In addition,
+  because no maintained scenario contains a dropped task: the kitting scenarios with a drop event and the test-bed sets
+  with misdeliveries are run under the new form and compared with their present behaviour. The expectation is no
+  difference. A difference is a finding and returns to the design chat.
+  SUPERSEDED IN PART (T-G records 2, 1 October 2026), in Q2 above: "not yet completed" reads "open" (Q12, Q13a); "the
+  first assigned task" reads "the first open entry" (Q15: a foreseeable task written as an entry is an ordinary entry;
+  the standby entry is not an assigned task either). "A script is either independent of the robot ... or dependent on
+  the robot (the replay checks what it can and says so)" is made exact by Q13b: the author declares it.
   When built, it supersedes for a script that depends on the robot "the human's script, an ordered list ... which the
   executor must reproduce exactly" (glossary §6, **human's script**; "T-H: the human behaviour model"). It answers
   DESIGN-01 (an entry condition is applicability, decided by the human's own planning in `world/`) and LIMIT-02.
@@ -5765,6 +5838,8 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   byte-identical.
   Not taken: fields and code per domain in the simulator (today's `is_scanned`, `is_empty`, `is_open`); the robot deriving
   states from observed actions.
+  A REQUIREMENT ON ITS FORM (Hadi, 1 October 2026; T-G records 2; C1, stage 1.5): the form built for A5 admits a fact that
+  no action changes and that is not the state of a movable object. Stage 1 authors no such fact.
 
 - A6, perception of object states. The robot knows the states of objects, including which pallets are scanned, through
   the site's system: a scan is a digital act written to that system at once. Recorded as an assumption on perception,
@@ -5890,6 +5965,8 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   Catch-up requirements: every fixed object inside the space; the zones leave the layout and areas are declared (A9);
   landmarks for the exit walk; the revised room is a new layout and a new setup with the next serial ids; the present ones
   (env_layout_01, env_setup_01) stay for the viewing fixture.
+  READS (B13, T-G records 2, 1 October 2026): "landmarks for the exit walk" reads: the desk landmark, which enters stage
+  1's layout.
 - B11, Q11 (P2) in dock_loading: passing the gate is a plain step "move to the gate", whose target is the gate's centre
   point; no special action. The domain has three areas, divided by the gate and by the office door: the truck side (the
   truck and the dock platform, outside the gate), the hall, and the office (A9; names settled with stage 1's layout; the
@@ -5904,6 +5981,8 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
     minimum separation away. Check-in: the two agents exchange the list of deliveries at the start. Check-out: the human
     signs at the end to confirm that everything is delivered. Design open until stage 3, including what "exchanging the
     list" means when the robot holds the designations from the start.
+    AMENDED (B13, T-G records 2, 1 October 2026): the desk enters stage 1's layout, as the target of the closing part;
+    check-in and check-out stay in stage 3 and will use this desk.
   - A rule "the robot must not enter the delivery area with a pallet while a human is in it": not taken. A fixed
     prohibition contradicts the framework's claim; the requirement is that the robot is aware of the human and adapts,
     which the realization against the human projection with `min_separation` serves.
@@ -5914,6 +5993,16 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
     (conditions cover it; deliveries and returns may be intertwined); the robot moving to wherever the human is (the
     target would be an agent, arrival contradicts `min_separation`, the prediction becomes circular); a check-in that is
     a meeting with no content.
+- B13, the closing part in dock_loading (the domain side of T-G Q14; Hadi, 1 October 2026; recorded in T-G records 2).
+  Stage 1's closing part is one entry: go to the desk. The desk is a landmark inside the hall, at the wall on the gate's
+  side, beside the place of the gate's button. It enters stage 1's layout.
+  The desk lies more than the minimum separation from the robot's routes through the gate. Reason: the robot still passes
+  the gate after the human's list is finished, and the human then stands at the desk.
+  No exit from the room is defined for dock_loading now. Check-in and check-out stay in stage 3 and will use this desk
+  (B12).
+  `docs/assumptions.md` 1.1 (a script ends with the human leaving the workspace) reads for dock_loading: the script ends
+  with the walk to the desk. B10's "landmarks for the exit walk" reads: the desk landmark. Kitting is unchanged. T-F's
+  scope line on the exit walk (TODO-144) is a kitting statement; dock_loading's ending is for T-F's own design.
 
 PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 
@@ -5925,6 +6014,22 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     run, TODO-16 with the stepwise delivery (A7).
   - After stage 2: track 4 (A8).
   - Stage 3: check-in and check-out (B12), with the two optional items.
+  STAGE 1.5 (Hadi, 1 October 2026; T-G records 2): context knowledge, framework-wide, after stage 1's close and before
+  stage 2. The order is stage 1, stage 1.5, stage 2, track 4, stage 3. Stage 1.5 starts from its own handoff.
+  Its content (its design opens at its stage; nothing is ruled yet): a context timeline in the scenario that changes a
+  fact at an authored point of a run, applied by the environment; both domains' foreseeable tasks conditioned on such
+  facts. Open questions recorded for it:
+  - the form of a context fact;
+  - whether the human only starts a task on it or a task in progress is interrupted (A3's "never interrupted" and A10's
+    line on an interruption caused by a fact);
+  - liveness under A4 when a condition turns false while the human still executes the task ("applicable to start"
+    against "valid to continue");
+  - the prior under context;
+  - the perception assumption for context facts.
+  The pre-loaded context stream moves from T-V track 2 to stage 1.5. T-V track 2 keeps the live events.
+  A requirement on stage 1's plan (the same ruling): the form built for A5 admits a fact that no action changes and that
+  is not the state of a movable object. Reason: context knowledge then needs no second mechanism. Stage 1 authors no such
+  fact.
   WHERE EACH RULING IS FIRST BUILT (Hadi, 1 October 2026, T-G records 1, continued). Content only; the order inside a
   stage is for that stage's plan.
   - Stage 1, the basic domain:
@@ -5933,6 +6038,8 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
       renamed" concerns the terms it introduces;
     - the catch-up of dock_loading's forms to kitting's (C3);
     - A3, the human's script form (`world/`), with the standby entry, once the entry lifecycle is ruled (A3, PARKED);
+      RULED (1 October 2026): the lifecycle is A3's Q12 to Q15, with the closing part; dock_loading's closing part, the
+      walk to the desk, and the desk landmark (B13);
     - A4, liveness by applicability (`shared/`);
     - A5, generic object states and designations, used here for the scanned state, `is_empty` and the destination;
     - A6, the perception assumption;
@@ -5952,6 +6059,8 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     - A7, TODO-16, after the MPB's first run on dock_loading.
   - After stage 2: A8, track 4.
   - Stage 3: B12, check-in and check-out, with its two optional items.
+  ADDED (T-G records 2, 1 October 2026): stage 1.5, between stage 1 and stage 2 (before track 4): context knowledge
+  (STAGE 1.5 above); nothing in it is ruled yet.
   Rulings with no stage, because nothing is built for them: A1 (V1, FW and the tags: a records rule), A2 (terms; no code
   is renamed), A10 (FW directions, outside V1), A11 (a note for T-F), and B12's items "not taken". A6 is an assumption,
   recorded in `docs/assumptions.md` 5.3; stage 1 is where the robot first reads object states through it.
@@ -5993,13 +6102,17 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   `domains/README.md` is stale throughout: rewritten with stage 1's build (REFACTOR-03).
 - C4, points for the stage plans (not rulings; each returns to the design chat only if it produces a finding):
   - the load-time check for a script that depends on the robot, and the meaning of the outcome "infeasible" under A3;
+    RULED (Hadi, 1 October 2026): A3, Q13b (and Q13a for an entry that ends INFEASIBLE);
   - how "completed" is judged for an entry of the human's list (the standby entry must be takable again after the human
     has left the place). PARKED (Hadi, 1 October 2026) as the first design question of the next design chat, the
     lifecycle of an entry: A3's PARKED block; A3 is not built before it is ruled. The byte-identical acceptance does not
     exercise the rule (no maintained kitting set has a dropped task): the ruled rule is also checked on the kitting
     scenarios with a drop event and on the test-bed sets with misdeliveries;
+    RULED (Hadi, 1 October 2026): A3, Q12; the added check is A3's ACCEPTANCE;
   - where the exit walk stands relative to the priority list (a plain walk is always applicable);
+    RULED (Hadi, 1 October 2026): A3, Q14 (the closing part); dock_loading's, B13;
   - how an event or a foreseeable task is placed relative to tasks whose order is not fixed;
+    RULED (Hadi, 1 October 2026): A3, Q15;
   - how a pallet's origin is recorded (B8);
   - how the meta-planner behaves when the pool holds tasks and none is applicable (TODO-30);
   - the forms in the setup and the registry for object states and the two designations (A5);
@@ -6036,3 +6149,5 @@ DESIGN-04, DESIGN-15; REFACTOR-03
 Next: the layout and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
 SUPERSEDED (T-G records 1, third follow-up, 1 October 2026): the order is the lifecycle question of the human's list
 (A3, PARKED), then stage 1's layout and setup, then stage 1's plan.
+SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (A3, Q12 to Q15; B13). Next: stage 1's
+layout and setup, agreed in the design chat, then stage 1's plan.
