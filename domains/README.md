@@ -58,9 +58,13 @@ which merged the content-identical env_setup3 into env_setup_01 and env_setup5 i
 env_setup_03): the movable objects that exist, in one
 `"env_objects"` list. Each entry has an `"initial_container"` (its home container, an
 object of the layout), a `"destination"` where the domain determines one through
-`destination_of` (kitting: the item's designated table), and any other per-object state
-the domain declares (dock_loading: `subtype`, `is_empty`, `is_scanned`). A different
-designation set is a different setup.
+`destination_of` (kitting: the item's designated table), and its `subtype` where the domain
+uses one. A `"states"` block lists the object states that
+hold at the start, `{"state": <name>, "object": <id>}` (the object omitted for a fact about
+no object), each a state the domain registry declares (`"states"`, `StateDeclaration`; T-G
+A5); a declared state not listed does not hold (dock_loading: `is_empty` on the empty
+pallets, `is_open` on the gate; kitting declares none). A different designation set is a
+different setup.
 
 **Scenario — the episode** (`scenarios/scenarios_sNN.py`, its setup's module): per agent its `start_position`,
 `assigned_tasks`, `observes` and, for a human, the script; the purpose as `description`;

@@ -1399,8 +1399,14 @@ Provides read-only access to:
   and `completed_groundings(action, bindings, world)` ground them for the observed agent (§2.3)
 - `get_microactions() -> List[str]`
 - `get_cost(key) -> Optional[float]` — per-action costs; empty in Mesa
-- `Tree.get_types_with_destination() -> Dict[str, Tuple[str, Optional[str]]]` — {object type: (task, destination
-  type)} for the types some task determines a parameter from through `destination_of`; the embodiment's load check (T-B1a)
+- `Tree.get_types_with_destination() -> Dict[str, FrozenSet[str]]` — {object type: the destination types declared for
+  it} for the types some task determines a parameter from through `destination_of`, over every such task (T-B1a;
+  generalised in T-G A5); a determined parameter with no type is an error; the embodiment's load check
+- `StateDeclaration(name, object_type)` — one object state the domain declares (T-G A5), listed in the domain registry's
+  `"states"`; `object_type` None is a fact about no object. The setup's `"states"` block states which hold at the start
+  (one not listed does not hold); the environment (`SimModel.state_facts`) validates and holds them, changes them when
+  an action declaring one as an effect or a retraction has run its last microaction (`SimModel.apply_state_changes`),
+  and the builder emits them to every WorldState as predicates. Kitting declares none
 
 **Deliberately absent:** no `get_objects_by_type()` method. `known_objects_by_type` is
 workspace/layout data, not domain knowledge — it's passed as a parameter into
@@ -1516,8 +1522,10 @@ a declared relocation".
   TODO-80)
 - Checks the setup's destinations at load (T-B1a; stored in the setup since T-L's stage 1): every object of
   a type some task determines a parameter
-  from through `destination_of` declares `"destination"`, naming an object of the layout of the type the
-  schema declares (`Tree.get_types_with_destination`); and, where each robot's task model is built, the robot's
+  from through `destination_of` declares `"destination"`, naming an object of the layout of one of the types the
+  domain declares for it (`Tree.get_types_with_destination`); every agent's assigned task's determined parameter,
+  resolved from the setup's designation, has the type its schema declares (T-G A5: an assigned delivery of an empty
+  pallet is refused); and, where each robot's task model is built, the robot's
   own `assigned_tasks` and those of the agent it observes bind the destination the setup designates (`shared.types.check_task_destinations`), an error naming the task,
   the item and both tables. The human's `scheduled_tasks` is not checked against the setup's destinations:
   the script may send an item elsewhere. Every task the script names (`Script.tasks()`) is checked for binding
