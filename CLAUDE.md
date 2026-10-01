@@ -235,7 +235,8 @@ Decisions
   The pipeline is revised (Hadi, 30 Sept 2026; `docs/roadmap.md`, "The plan from T-A", its order block; task letters
   are never reassigned, the order is not the alphabet). Done: T-A, T-B, T-C, T-H, T-L; T-D is closed except its tail.
   Then, in order: T-G (the second domain in Mesa: dock_loading against `shared/` unchanged); T-F (the evaluation,
-  framed in TODO-144, the randomised harness TODO-47 part of it; the human stays in the room, no genuine departure;
+  framed in TODO-144, the randomised harness TODO-47 part of it; kitting's part without a departure, dock_loading's may
+  use the unmonitored office (Hadi, 1 Oct 2026);
   before track 3b it measures without knowing that the adaptive branches fire under conflict); T-V (viewer, interface
   and interactive simulator: track 1 the viewer, which was T-E; track 2 Phase 7); the T-D tail (track 3b TODO-145,
   track 4 TODO-140, the 4D detour strategy); T-S (ROS/PRIEST, Phase 6) last. Next: T-G's design, in a new design chat
@@ -249,8 +250,9 @@ Decisions
   it changing `shared/` or `world/` when built, each with kitting byte-identical or no decision changed as acceptance;
   part B dock_loading only; part C the stages), and build 1 is in (30 Sept 2026; 56e674e, 6e29c15, 62ebc4e: form-only
   repairs, the viewing fixture scenario_s01_03; scenario_s01_01 and _02 still fail at load by intent). Stages (what
-  each first builds: the entry's C1): 1 the basic domain, with the forms' catch-up (C3) and the framework-wide A3 (the
-  script's priority form, `world/`), A4 (liveness by applicability, `shared/`), A5 (object states and designations) and
+  each first builds: the entry's C1): 1 the basic domain, opened by the rename of the zone mechanism to "area" (its own
+  commit, no change of behaviour), with the forms' catch-up (C3) and the framework-wide A3 (the script's priority form,
+  `world/`; not built before the lifecycle of a list entry is ruled, PARKED as the next design chat's first question), A4 (liveness by applicability, `shared/`), A5 (object states and designations) and
   A9 (areas), each accepted on kitting byte-identical; then the IR test-bed and the MPB on dock_loading; 2
   `store_pallet`, the gate opened on request, the office door's state, A7 (TODO-16); then track 4 (A8); 3 check-in and
   check-out. Before each stage's plan the design chat and Hadi agree its layout and setup. Next:

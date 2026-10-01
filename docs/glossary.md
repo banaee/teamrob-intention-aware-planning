@@ -562,6 +562,9 @@ robot replays exactly at load, as today; one dependent on the robot is checked a
 special case (every assigned task applicable from the start: the list's order is the execution order). Authoring
 pattern: a lowest entry "go to the standby place", a plain walk to a landmark. design_decisions.md, "T-G: the second
 domain's rulings", A3.
+PARKED (Hadi, 1 October 2026): the lifecycle of an entry of the list ("completed", "ended", "abandoned", "available
+again" are distinct; Q2's "not yet completed" is not sufficient), the next design chat's first question; A3 is not built
+before it is ruled. The same entry, A3's PARKED block.
 
 **event** — a `Trigger` and a `Decision` attached to a task of the script, or built live by `inject`. Typed, no unions
 and no sentinels. An event fires once per script entry and is then consumed.
@@ -1020,9 +1023,10 @@ shelves, machines, switches, landmarks; dock_loading: bays, the gate, and the tr
 shelf is.)
 Until T-L's stage 1 the layout JSON also held the setup's objects and dead agent spawn entries.
 AMENDED (T-G A2, A8, A9, 1 October 2026): the layout declares **areas** (§10), among them its **monitored areas**, and the
-area of each **container**; "zone" is not used. AS BUILT: every layout of both domains still declares a `zones` block and
-a `zone` per fixed object, and the Mesa world-state builder emits `in_zone(agent, zone)` from them; dock_loading's revised
-room drops them (B10). design_decisions.md, "T-G: the second domain's rulings", A2 (its conflict line).
+area of each **container**. CODE NAME (Hadi, 1 October 2026): until the rename that opens T-G's stage 1, the area
+mechanism is named "zone" in the code: the layouts' `zones` block and each fixed object's `zone`, `in_zone(agent, zone)`
+emitted by the Mesa world-state builder, `WorldState.object_zones`, the planner's `zone_of` lookup. design_decisions.md,
+"T-G: the second domain's rulings", A2.
 
 **setup** — the shift: the movable objects that exist, each with its home container and, where the domain determines
 one through `destination_of`, its designated destination, and any other initial state the domain declares per movable
@@ -1107,8 +1111,10 @@ store, the freezer, the empties area; kitting: a shelf, the table. Its area is f
 container is one point, its centre, and may hold several pallets (B9), as kitting's table does (TODO-74). A setup's "home
 container" (`initial_container`) is this sense.
 
-**area** — a part of the room declared in the layout. The environment emits the fact that an agent is in an area. Replaces
-"zone", which is not used.
+**area** — a part of the room declared in the layout. The environment emits the fact that an agent is in an area. Its
+code name is "zone" (`zones`, `in_zone`, `object_zones`, `zone_of`) until it is renamed to "area" as the first step of T-G
+stage 1, in its own commit, with no change of behaviour (Hadi, 1 October 2026). Only the recognizer stopped reading zones
+(I4); the mechanism is otherwise built. In prose write "area".
 
 **monitored area** — an area in which the robot observes the human. Outside every monitored area the robot receives no
 observation of the human; its knowledge of objects is not affected. Fixed per layout, independent of where the robot is;

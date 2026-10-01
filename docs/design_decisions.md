@@ -5682,14 +5682,17 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
 
 - A2, terms (a glossary revision; no code is renamed). Mind, body, environment, simulator, container, area and
   monitored area are defined in `docs/glossary.md` §10, applicable in §6. "World" is not used for the environment
-  (`world/` and the world vocabulary keep their meanings). "Zone" is not used: an area is declared in the layout. The
+  (`world/` and the world vocabulary keep their meanings). "Area" is the term; "zone" is the old code name (below). The
   simulator replaces "the bodies" as the name of `mesa_sim/` and `ros_sim/`; the Mesa class `RobotAgent` still holds mind
   parts and body parts together (TODO-131).
-  CONFLICT MARKED (T-G records 1, not resolved): the ruling's reason "kitting dropped it" holds for the robot's inference
-  (I4 removed ZONE_BOOST; the recognizer reads no zone), not for the artefacts, the simulator or the records: every
-  kitting layout declares a `zones` block and a `zone` per fixed object, the Mesa world-state builder emits
-  `in_zone(agent, zone)` and `WorldState.object_zones`, the planner keeps the `zone_of` lookup, and CLAUDE.md's invariant
-  and the glossary's **layout** (§9) name zones.
+  RULED (Hadi, 1 October 2026), area and zone. "Area" is the term (glossary; A9). The existing zone mechanism
+  (`in_zone`, `WorldState.object_zones`, the planner's `zone_of` lookup, the layouts' `zones` block and each fixed
+  object's `zone`) is the area mechanism under its old code name. It is renamed to "area" in the code as the first step
+  of T-G stage 1, in its own commit, with no change of behaviour. Stage 1's plan first reports the extent: every place
+  the name occurs, and whether the maintained sets' logs print it (if they do, they change in that token only and are
+  regenerated once). Until that commit the glossary states that the code name is "zone".
+  CORRECTED (the same ruling): kitting did not drop zones. Only the recognizer stopped reading them (I4 removed
+  ZONE_BOOST); every kitting layout still declares them and the Mesa world-state builder emits `in_zone(agent, zone)`.
 
 - A3, the human's script (T-G Q1, Q2). One form for every domain. It changes `world/` when built; the robot's mind
   receives nothing from it.
@@ -5717,6 +5720,19 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   stands where its last task ended, which can be the point where the robot must put down the next object.
   Not taken: an ordered script with holding only; arrival order, nearest first or random as the choice rule; a generic
   task whose object is bound at run time (it removes the allocation the prior relies on; DESIGN-02).
+  PARKED (Hadi, 1 October 2026): the lifecycle of an entry of the human's list, the first design question of the next
+  design chat. A3 is not built before it is ruled.
+  - Q2's "not yet completed" is not sufficient. Evidence (T-G records 1): a dropped or misdelivered task is not
+    completed, so Q2 as worded would select it again. No maintained kitting scenario has a `Drop` or a misdelivery; ten
+    other kitting scenarios have a `.at(..., drop)` (scenario_s01_03, s01_07, s02_03, s03_04, s03_07, s04_02, s04_03,
+    s05_03, s06_05, s07_02), and the test-bed sets have misdeliveries.
+  - "Completed", "ended", "abandoned" and "available again" are distinct. For an abandoned entry three readings are
+    open: (a) finished for good for that entry; (b) unavailable for now and retryable; (c) a state of its own that
+    depends on the authored event.
+  - Two cases any rule must satisfy: the standby entry is takable again after the human has left the place; a dropped
+    work task does not restart at once.
+  - A candidate, not ruled: an entry is skipped when its terminal fact holds or when the human has ended it by an
+    authored event.
   When built, it supersedes for a script that depends on the robot "the human's script, an ordered list ... which the
   executor must reproduce exactly" (glossary §6, **human's script**; "T-H: the human behaviour model"). It answers
   DESIGN-01 (an entry condition is applicability, decided by the human's own planning in `world/`) and LIMIT-02.
@@ -5766,12 +5782,14 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   robot that expects the human's return at the office door and plans around it belongs to belief-aware planning
   (TODO-97).
   TODO-140's other content (`leave()`, the exit through a door) is not ruled here and stays for track 4's own design.
-  CONFLICTS MARKED (T-G records 1, not resolved): (1) the placement supersedes "track 4 in the T-D tail, after T-V" (the
-  roadmap's order block of 30 September 2026; TODO-140's PLACEMENT REVISED line). T-F's scope line ("the human stays in
-  the room ... no genuine departure", track 4 following T-F: roadmap, T-F; TODO-144) is not revised by these rulings,
-  though track 4 now precedes T-F. (2) "each cause a new decision": the trigger set has three members (glossary §4);
-  whether a new trigger or an existing one makes that decision is for track 4's plan. (3) `docs/assumptions.md` 2.3 ("Not
-  in the Mesa body: the human never leaves") holds until A8 is built.
+  The placement supersedes "track 4 in the T-D tail, after T-V" (the roadmap's order block of 30 September 2026;
+  TODO-140's PLACEMENT REVISED line).
+  RULED (Hadi, 1 October 2026), track 4 and T-F: track 4 is built after T-G's stage 2, so before T-F. T-F may use the
+  unmonitored office on dock_loading; kitting's part of T-F stays without a departure. T-F's scope line is revised
+  accordingly (roadmap, T-F; TODO-144); the details belong to T-F's own design.
+  CONFLICT MARKED (T-G records 1, not resolved): "each cause a new decision": the trigger set has three members (glossary
+  §4); whether a new trigger or an existing one makes that decision is for track 4's plan.
+  Note: `docs/assumptions.md` 2.3 ("Not in the Mesa body: the human never leaves") holds until A8 is built.
 
 - A9, areas and the gate (the framework side of T-G Q11).
   The layout declares areas. The environment emits the fact that an agent is in an area. The area of each container is
@@ -5895,8 +5913,10 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   WHERE EACH RULING IS FIRST BUILT (Hadi, 1 October 2026, T-G records 1, continued). Content only; the order inside a
   stage is for that stage's plan.
   - Stage 1, the basic domain:
+    - first, in its own commit with no change of behaviour: the zone mechanism renamed to "area" in the code (A2's
+      ruling of 1 October 2026; the plan reports the extent first);
     - the catch-up of dock_loading's forms to kitting's (C3);
-    - A3, the human's script form (`world/`), with the standby entry;
+    - A3, the human's script form (`world/`), with the standby entry, once the entry lifecycle is ruled (A3, PARKED);
     - A4, liveness by applicability (`shared/`);
     - A5, generic object states and designations, used here for the scanned state, `is_empty` and the destination;
     - A6, the perception assumption;
@@ -5957,7 +5977,8 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 - C4, points for the stage plans (not rulings; each returns to the design chat only if it produces a finding):
   - the load-time check for a script that depends on the robot, and the meaning of the outcome "infeasible" under A3;
   - how "completed" is judged for an entry of the human's list (the standby entry must be takable again after the human
-    has left the place);
+    has left the place). PARKED (Hadi, 1 October 2026) as the first design question of the next design chat, the
+    lifecycle of an entry: A3's PARKED block; A3 is not built before it is ruled;
   - where the exit walk stands relative to the priority list (a plain walk is always applicable);
   - how an event or a foreseeable task is placed relative to tasks whose order is not fixed;
   - how a pallet's origin is recorded (B8);

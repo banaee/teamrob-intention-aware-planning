@@ -572,8 +572,10 @@ and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
   READING (recorded): track 3b follows T-F, in the T-D tail, so an evaluation before 3b measures without knowing that
   the adaptive branches fire under conflict; it cannot test behaviour in which the human projection conflicts with the
   robot's plan.
-  T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A8, A11): track 4's reduced form now comes before T-F (after T-G's stage 2); the scope
-  line above (no genuine departure) is not revised by that ruling. A layout authored so that routes cross shows that
+  T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A8, A11): track 4's reduced form now comes before T-F (after T-G's stage 2).
+  SCOPE REVISED (Hadi, 1 October 2026): T-F may use the unmonitored office on dock_loading; kitting's part of T-F stays
+  without a departure; "no genuine departure (track 4 follows T-F)" above is superseded for dock_loading, and the
+  details belong to T-F's own design. A layout authored so that routes cross shows that
   the robot adapts when an interaction exists, not how often interactions occur: T-F varies the placement and takes no
   interaction rate from crossing setups alone (TODO-144).
 - **T-G — The second domain in Mesa: dock_loading** (revised by Hadi, 30 September 2026; before, "Later, in this
@@ -602,8 +604,10 @@ and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
   - Stage 1, the basic domain: the robot delivers and returns (B11); the human scans, takes the two breaks, steps aside
     to the standby place; the gate is declared open; the office door has no state yet. The IR test-bed, then the MPB.
     Its catch-up list is C3 (the domain's state after build 1).
-    BUILDS: the catch-up of dock_loading's forms to kitting's (C3); A3, the human's script form (`world/`), with the
-    standby entry; A4, liveness by applicability (`shared/`); A5, generic object states and designations (used for the
+    BUILDS: first, in its own commit with no change of behaviour, the zone mechanism renamed to "area" in the code (the
+    plan reports the extent first: every occurrence, and whether the maintained sets' logs print it); the catch-up of
+    dock_loading's forms to kitting's (C3); A3, the human's script form (`world/`), with the standby entry, once the
+    lifecycle of a list entry is ruled (PARKED, the next design chat's first question); A4, liveness by applicability (`shared/`); A5, generic object states and designations (used for the
     scanned state, `is_empty` and the destination); A6, the perception assumption; A9, the declared areas and the fact
     that an agent is in an area; B1 to B4, B8, B9, B11; B6 with `office_break` reduced (the office door has no state, the
     human passes it as a plain point; the office observed); B10, the room (whether the stores and the freezer are

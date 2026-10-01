@@ -4055,8 +4055,8 @@ observed position (the log and the viewer may show it). Not taken: the last posi
 the old belief on return; sensor-specific observation; a robot that expects the return at the office door belongs to
 TODO-97.
 PLACEMENT (A8, C1): its own increment after T-G's stage 2; it changes `shared/`. It supersedes the placement in the T-D
-tail (the PLACEMENT REVISED line below). CONFLICT MARKED: T-F's scope ("no genuine departure", track 4 after T-F;
-TODO-144) is not revised by the ruling.
+tail (the PLACEMENT REVISED line below). RULED (Hadi, 1 Oct 2026): track 4 is built before T-F; T-F may use the
+unmonitored office on dock_loading, kitting's part of T-F stays without a departure (TODO-144).
 CONSEQUENCES REVISED: the first case where the robot's WorldState differs from the environment's state stands (the
 human outside every monitored area); "track 4 builds the perception layer and the mind object (TODO-131)" no longer
 follows (a proposal, not ruled: TODO-131's note); how the new decision on disappearance and reappearance is triggered
@@ -4115,8 +4115,11 @@ Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the re
 **TODO-144: T-F, the evaluation: framing (not ruled) (recorded, the MPB post-(iv) records, 29 Sept 2026)** [OPEN; a future item, after the MPB closes] [V1]
 T-G A11 (T-G records 1, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A11): a layout authored so that routes cross shows that the robot adapts when an interaction
 exists; it does not show how often interactions occur. T-F varies the placement and takes no interaction rate from
-crossing setups alone. Track 4 now precedes T-F (TODO-140, A8); the scope line below (no genuine departure) is not
-revised by that ruling.
+crossing setups alone.
+SCOPE REVISED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A8): track 4 is built after T-G's stage 2, so before T-F. T-F
+may use the unmonitored office on dock_loading (a genuine departure); kitting's part of T-F stays without a departure,
+the human staying in the room and ending with the exit walk. The details belong to T-F's own design. The scope lines
+below ("no genuine departure") are superseded for dock_loading.
 REVISED (Hadi's order, 30 September 2026; roadmap, "The plan from T-A", T-F): T-F follows T-G; tracks kitting,
 dock_loading and cross-domain; the randomised harness (TODO-47) stays in it.
 - Track 3b (TODO-145) follows T-F, in the T-D tail. The line "Before the evaluation: track 3b" below is history; the
