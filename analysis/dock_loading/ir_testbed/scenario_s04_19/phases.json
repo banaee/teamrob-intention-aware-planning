@@ -1,0 +1,117 @@
+{
+ "space": [
+  "coffee_break(?coffee_machine=coffee_machine_0)",
+  "confirm_delivered_pallet(?pallet=pallet_0)",
+  "confirm_delivered_pallet(?pallet=pallet_2)",
+  "confirm_delivered_pallet(?pallet=pallet_4)",
+  "office_break(?office_chair=office_chair)"
+ ],
+ "phases": {
+  "coffee_break(?coffee_machine=coffee_machine_0)": [
+   [
+    "move_to(?target=coffee_machine_0)",
+    -1,
+    56
+   ],
+   [
+    "move_to(?target=office_door)",
+    57,
+    114
+   ],
+   [
+    "move_to(?target=coffee_machine_0)",
+    115,
+    202
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_0)": [
+   [
+    "move_to(?target=pallet_0)",
+    -1,
+    25
+   ],
+   [
+    "scan_it(?item=pallet_0)",
+    26,
+    29
+   ],
+   [
+    "move_to(?target=pallet_0)",
+    30,
+    56
+   ],
+   [
+    "move_to(?target=office_door)",
+    57,
+    114
+   ],
+   [
+    "move_to(?target=pallet_0)",
+    115,
+    202
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_1)": [],
+  "confirm_delivered_pallet(?pallet=pallet_2)": [
+   [
+    "move_to(?target=pallet_2)",
+    -1,
+    56
+   ],
+   [
+    "move_to(?target=office_door)",
+    57,
+    114
+   ],
+   [
+    "move_to(?target=pallet_2)",
+    115,
+    143
+   ],
+   [
+    "scan_it(?item=pallet_2)",
+    144,
+    145
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_3)": [],
+  "confirm_delivered_pallet(?pallet=pallet_4)": [],
+  "deliver_pallet(?pallet=pallet_0)": [],
+  "deliver_pallet(?pallet=pallet_1)": [],
+  "deliver_pallet(?pallet=pallet_2)": [],
+  "deliver_pallet(?pallet=pallet_3)": [],
+  "deliver_pallet(?pallet=pallet_4)": [],
+  "load_return(?pallet=pallet_0)": [],
+  "load_return(?pallet=pallet_1)": [],
+  "load_return(?pallet=pallet_2)": [],
+  "load_return(?pallet=pallet_3)": [],
+  "load_return(?pallet=pallet_4)": [],
+  "office_break(?office_chair=office_chair)": [
+   [
+    "move_to(?target=office_door)",
+    -1,
+    52
+   ],
+   [
+    "move_to(?target=office_chair)",
+    53,
+    61
+   ],
+   [
+    "wait_at(?duration=PT90S,?entity=office_chair)",
+    62,
+    107
+   ],
+   [
+    "move_to(?target=office_chair)",
+    110,
+    117
+   ],
+   [
+    "move_to(?target=office_door)",
+    118,
+    202
+   ]
+  ]
+ }
+}

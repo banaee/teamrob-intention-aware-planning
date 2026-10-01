@@ -1,0 +1,141 @@
+{
+ "space": [
+  "coffee_break(?coffee_machine=coffee_machine_0)",
+  "confirm_delivered_pallet(?pallet=pallet_0)",
+  "confirm_delivered_pallet(?pallet=pallet_2)",
+  "office_break(?office_chair=office_chair)"
+ ],
+ "phases": {
+  "coffee_break(?coffee_machine=coffee_machine_0)": [
+   [
+    "move_to(?target=coffee_machine_0)",
+    -1,
+    76
+   ],
+   [
+    "wait_at(?duration=PT60S,?entity=coffee_machine_0)",
+    77,
+    107
+   ],
+   [
+    "move_to(?target=coffee_machine_0)",
+    110,
+    189
+   ],
+   [
+    "move_to(?target=office_door)",
+    190,
+    245
+   ],
+   [
+    "move_to(?target=coffee_machine_0)",
+    246,
+    247
+   ],
+   [
+    "move_to(?target=office_door)",
+    248,
+    248
+   ],
+   [
+    "move_to(?target=coffee_machine_0)",
+    249,
+    330
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_0)": [
+   [
+    "move_to(?target=pallet_0)",
+    -1,
+    25
+   ],
+   [
+    "scan_it(?item=pallet_0)",
+    26,
+    27
+   ],
+   [
+    "move_to(?target=pallet_0)",
+    28,
+    158
+   ],
+   [
+    "scan_it(?item=pallet_0)",
+    159,
+    160
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_1)": [],
+  "confirm_delivered_pallet(?pallet=pallet_2)": [
+   [
+    "move_to(?target=pallet_2)",
+    -1,
+    189
+   ],
+   [
+    "move_to(?target=office_door)",
+    190,
+    245
+   ],
+   [
+    "move_to(?target=pallet_2)",
+    246,
+    247
+   ],
+   [
+    "move_to(?target=office_door)",
+    248,
+    248
+   ],
+   [
+    "move_to(?target=pallet_2)",
+    249,
+    270
+   ],
+   [
+    "scan_it(?item=pallet_2)",
+    271,
+    272
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_3)": [],
+  "confirm_delivered_pallet(?pallet=pallet_4)": [],
+  "deliver_pallet(?pallet=pallet_0)": [],
+  "deliver_pallet(?pallet=pallet_1)": [],
+  "deliver_pallet(?pallet=pallet_2)": [],
+  "deliver_pallet(?pallet=pallet_3)": [],
+  "deliver_pallet(?pallet=pallet_4)": [],
+  "load_return(?pallet=pallet_0)": [],
+  "load_return(?pallet=pallet_1)": [],
+  "load_return(?pallet=pallet_2)": [],
+  "load_return(?pallet=pallet_3)": [],
+  "load_return(?pallet=pallet_4)": [],
+  "office_break(?office_chair=office_chair)": [
+   [
+    "move_to(?target=office_door)",
+    -1,
+    185
+   ],
+   [
+    "move_to(?target=office_chair)",
+    186,
+    193
+   ],
+   [
+    "wait_at(?duration=PT90S,?entity=office_chair)",
+    194,
+    239
+   ],
+   [
+    "move_to(?target=office_chair)",
+    242,
+    248
+   ],
+   [
+    "move_to(?target=office_door)",
+    249,
+    330
+   ]
+  ]
+ }
+}

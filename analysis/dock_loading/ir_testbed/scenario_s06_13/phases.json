@@ -1,0 +1,66 @@
+{
+ "space": [
+  "coffee_break(?coffee_machine=coffee_machine_0)",
+  "confirm_delivered_pallet(?pallet=pallet_0)",
+  "confirm_delivered_pallet(?pallet=pallet_2)",
+  "office_break(?office_chair=office_chair)"
+ ],
+ "phases": {
+  "coffee_break(?coffee_machine=coffee_machine_0)": [
+   [
+    "move_to(?target=coffee_machine_0)",
+    -1,
+    110
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_0)": [
+   [
+    "move_to(?target=pallet_0)",
+    -1,
+    14
+   ],
+   [
+    "scan_it(?item=pallet_0)",
+    15,
+    19
+   ],
+   [
+    "move_to(?target=pallet_0)",
+    20,
+    110
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_1)": [],
+  "confirm_delivered_pallet(?pallet=pallet_2)": [
+   [
+    "move_to(?target=pallet_2)",
+    -1,
+    34
+   ],
+   [
+    "scan_it(?item=pallet_2)",
+    35,
+    36
+   ]
+  ],
+  "confirm_delivered_pallet(?pallet=pallet_3)": [],
+  "confirm_delivered_pallet(?pallet=pallet_4)": [],
+  "deliver_pallet(?pallet=pallet_0)": [],
+  "deliver_pallet(?pallet=pallet_1)": [],
+  "deliver_pallet(?pallet=pallet_2)": [],
+  "deliver_pallet(?pallet=pallet_3)": [],
+  "deliver_pallet(?pallet=pallet_4)": [],
+  "load_return(?pallet=pallet_0)": [],
+  "load_return(?pallet=pallet_1)": [],
+  "load_return(?pallet=pallet_2)": [],
+  "load_return(?pallet=pallet_3)": [],
+  "load_return(?pallet=pallet_4)": [],
+  "office_break(?office_chair=office_chair)": [
+   [
+    "move_to(?target=office_door)",
+    -1,
+    110
+   ]
+  ]
+ }
+}
