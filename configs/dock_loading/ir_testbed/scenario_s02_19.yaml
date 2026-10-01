@@ -1,0 +1,18 @@
+# configs/dock_loading/ir_testbed/scenario_s02_19.yaml — the IR test-bed's run file for scenario_s02_19 on dock_loading (T-G Q16's set;
+# design_decisions.md, "T-G: the second domain's rulings"; analysis/dock_loading/ir_testbed/README.md). Run from the
+# repo root:
+#   PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run configs/dock_loading/ir_testbed/scenario_s02_19.yaml
+# steps: the last acknowledgement tick of the human's sequence (the executor's rule) + 1 + 30 ticks of the idle human
+# (E5's standing threshold at alpha = 0.01 is 25 ticks); analysis/instruments/ir_testbed/run.sh recomputes it.
+
+domain: dock_loading
+layout: env_layout_02
+setup: env_setup_02
+scenario: scenario_s02_19
+steps: 202
+assignment_prior: true
+strategy: "single_task"
+gate_strategy: "none"
+cost_strategy: "realized"
+separation_stop: false
+test_level: 0.05
