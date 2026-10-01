@@ -10,14 +10,16 @@ from pathlib import Path
 
 from shared.knowledge import StateDeclaration, Tree
 from domains.discovery import discover_files, discover_scenarios
-from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it
-from domains.dock_loading.tasks import deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break
+from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it, stand
+from domains.dock_loading.tasks import (deliver_pallet, load_return, confirm_delivered_pallet, coffee_break,
+                                        office_break, go_to, stand_task, go_to_and_stand)
 import domains.dock_loading.scenarios as _scenarios
 
 def register_dock_loading_domain() -> Tree:
     return Tree(
-        tasks=[deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break],
-        actions=[move_to, pick_up, place, wait_at, scan_it],
+        tasks=[deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break,
+               go_to, stand_task, go_to_and_stand],
+        actions=[move_to, pick_up, place, wait_at, stand, scan_it],
         microactions=["STEP", "GRASP", "RELEASE", "STAND", "TOUCH"],
     )
 
@@ -26,7 +28,8 @@ _HERE = Path(__file__).parent
 
 domain_config = {
     "register_fn": register_dock_loading_domain,
-    # The task model every robot is given (T-H).
+    # The task model every robot is given (T-H): every WorkTask and the
+    # PersonalTasks it foresees; no HumanOnlyTask.
     "task_model":  [deliver_pallet, load_return, confirm_delivered_pallet, coffee_break, office_break],
     # The object states the domain declares (T-G A5); the setup's "states"
     # block states which hold at the start, the environment holds them.

@@ -1,214 +1,146 @@
-# Adding a New Domain
+# Domains
 
-This folder contains one sub-package per case study domain.
-Each domain is self-contained: tasks, actions, scenarios, environment layout, and a registry that wires them together.
+This folder holds the use cases, one sub-package per domain: the tree of task schemas, the robot's task model, the
+layouts, the setups and the scenarios. A domain imports `shared/` (the types) and nothing of the simulators.
 
-```
+```text
 domains/
-    kitting/          ← reference implementation (fully filled)
-    dock_loading/     ← the second domain (T-G; in build)
-    <your_domain>/    ← copy the skeleton, fill it in
+    discovery.py      ← registers layouts, setups and scenarios by discovery (T-L stage 2)
+    kitting/          ← the reference domain: every form is first written here
+    dock_loading/     ← the second domain (T-G): pallets between a truck and the delivery bays
 ```
 
-The `kitting/` domain is the authoritative reference. When in doubt, look there first.
+`kitting/` is the reference for every form. A new domain copies its forms; where the two differ, kitting's is the
+present one.
 
 ---
 
-## 1. Folder structure
+## 1. A domain's folder
 
-Each domain package contains the same files:
-
-```
-domains/<your_domain>/
+```text
+domains/<domain>/
     __init__.py
-    tasks.py            # TaskSchema definitions  — HTN compound tasks
-    actions.py          # ActionSchema defs     — HTN primitive actions (leaves)
-    registry.py         # builds the Tree, declares the task model; discovers
-                        # layouts, setups and scenarios (domain_config)
-    scenarios/          # a package (T-L stage 2): one module per setup,
-                        # scenarios_sNN.py — every scenario whose setup is
-                        # env_setup_NN and no other
-    script.py           # the call forms the scenarios are written in (kitting)
-    layouts/            # the layout files — the room (one file per layout)
-    setups/             # the setup files — the shift (one file per setup,
-                        # env_setup_NN.json; the file stem is the id)
+    actions.py          # ActionSchema definitions: the HTN primitive actions (leaves)
+    tasks.py            # the task schemas (WorkTask, PersonalTask, HumanOnlyTask) and their methods
+    script.py           # the call forms the scenarios are written in: one function per task schema
+    registry.py         # builds the Tree; declares the task model and the object states (domain_config)
+    layouts/            # the layout files, the room: env_layout_KK.json, the file stem is the id
+    setups/             # the setup files, the shift: env_setup_NN.json
+    scenarios/          # a package: scenarios_sNN.py holds every scenario whose setup is env_setup_NN
 ```
 
-Registration is by discovery (`domains/discovery.py`, T-L stage 2): layouts and setups by
-the files in their folders, scenarios by a module scan of the scenarios package at import
-of `domains.<domain>.registry`. No hand-written list; a duplicate scenario id is an error
-at import. The serial in a module's name repeats its scenarios' validated `setup` field —
-an authoring convention the code does not check.
+Registration is by discovery (`domains/discovery.py`): layouts and setups by the files in their folders, scenarios by a
+module scan of the scenarios package at import of `domains.<domain>.registry`. No hand-written list; a duplicate
+scenario id is an error at import. The simulator's `DOMAIN_REGISTRY` (`mesa_sim/run_mesa.py`) maps the domain's name to
+its `domain_config`; `mesa_sim/list_scenarios.py` lists every registered scenario of every domain.
+
+`registry.py` exports `domain_config`:
+
+| key | what |
+|---|---|
+| `register_fn` | returns the domain's `Tree`: every task schema, every action schema, the microaction names |
+| `task_model` | the task model every robot is given: every `WorkTask` and the `PersonalTask`s it foresees; no `HumanOnlyTask` |
+| `states` | the object states the domain declares, `StateDeclaration(name, object_type)` (T-G A5); `object_type` None is a fact about no object |
+| `layouts`, `setups`, `scenarios` | discovered (above) |
 
 ---
 
-## 2. The three artefacts of a run (T-L; docs/glossary.md §9)
+## 2. The three artefacts of a run (T-L; `docs/glossary.md` §9)
 
 A run is a triple (layout, setup, scenario) plus the run options.
 
-**Layout — the room** (`layouts/env_layout<N>.json`): the space, its areas, and the fixed objects
-with their positions (tables, shelves, machines, switches, landmarks; a fixed container
-such as a truck belongs here too). No movable object and no agent. Coordinates use a
-center-origin system `(0,0)` that matches the simulator grid directly. Areas use the
-convention `zone_<descriptor>`. Top-level keys: `"space"`, `"areas"`, `"env_objects"`.
-Every fixed object has a `"position"` and never an `"initial_container"`.
+**Layout, the room** (`layouts/env_layout_KK.json`). Top-level keys `"space"`, `"areas"`, `"env_objects"`. The space
+is centred on the origin, in cm, and holds every fixed object. `"areas"` declares the areas, each one rectangle
+(`id`, `bounds`); a point on the boundary of two areas belongs to the first declared (`shared.types.area_at`).
+`"env_objects"` lists the fixed objects with their `id`, `type`, `position` and `size`: tables, shelves, machines,
+bays, a truck, a gate, landmarks. A fixed object's area is derived from its position, never declared. No movable
+object and no agent. A landmark (type `landmark`) is a point only a `HumanOnlyTask` may name.
 
-**Setup — the shift** (`setups/env_setup_NN.json`; the final serial ids since T-L stage 2,
-which merged the content-identical env_setup3 into env_setup_01 and env_setup5 into
-env_setup_03): the movable objects that exist, in one
-`"env_objects"` list. Each entry has an `"initial_container"` (its home container, an
-object of the layout), a `"destination"` where the domain determines one through
-`destination_of` (kitting: the item's designated table), and its `subtype` where the domain
-uses one. A `"states"` block lists the object states that
-hold at the start, `{"state": <name>, "object": <id>}` (the object omitted for a fact about
-no object), each a state the domain registry declares (`"states"`, `StateDeclaration`; T-G
-A5); a declared state not listed does not hold (dock_loading: `is_empty` on the empty
-pallets, `is_open` on the gate; kitting declares none). A different designation set is a
-different setup.
+**Setup, the shift** (`setups/env_setup_NN.json`). The movable objects in one `"env_objects"` list, each with its
+`"initial_container"` (an object of the layout; its origin, read by `home_container_of`) and a `"destination"` where
+the domain designates one (read by `destination_of`). A `"states"` block lists the declared object states that hold at
+the start, `{"state": <name>, "object": <id>}` (the object omitted for a fact about no object); a declared state not
+listed does not hold. A different designation set is a different setup.
 
-**Scenario — the episode** (`scenarios/scenarios_sNN.py`, its setup's module): per agent its `start_position`,
-`assigned_tasks`, `observes` and, for a human, the script; the purpose as `description`;
-the one `setup` it binds; and its `reference_layouts` (one or more layout ids). A run that
-names no layout takes the scenario's first reference layout; `--layout` selects another
-registered layout.
+**Scenario, the episode** (`scenarios/scenarios_sNN.py`). A `ScenarioConfig` literal: its `id` (the Python variable
+equals it), the one `setup` it binds, its `reference_layouts`, the purpose as `description`, and per agent its
+`start_position`, `assigned_tasks`, `observes` and, for a human, the script. A run that names no layout takes the
+first reference layout.
 
-The loader validates the triple at load: every home container of the setup is an object of
-the layout; every designated destination is an object of the layout with the type the
-schema declares; every task binding names an object of the layout or setup with the
-schema's type; every assigned task agrees with the setup's designations; every
-`start_position` lies inside the space's bounds. A failure names the artefact and the
-mismatch.
+The loader validates the triple at load: every home container is an object of the layout; every destination is an
+object whose type the schemas declare for that object's type; every task binding names an object with the schema's
+type; every assigned task's determined parameter resolves to an object of its declared type; every state of the
+`"states"` block is declared, names an existing object of the declared type; every start position lies inside the
+space. A failure names the artefact and the mismatch.
+
+Ids are serial, nothing encoded beyond order of writing: `env_layout_KK`, `env_setup_NN`, `scenario_sNN_MM` (NN the
+setup's serial, MM a counter per setup). Scenario ids are unique within a domain. `docs/rename_table.md` maps old ids.
 
 ---
 
-## 3. Concepts: tasks, actions, microactions
+## 3. Tasks, actions, microactions
 
-The framework uses a three-level hierarchy:
+- **Task schemas** (`tasks.py`) are decomposed by HTN methods into actions. Each is one of three classes
+  (`shared/types.py`):
+  - `WorkTask`: may be assigned, to the human or to the robot. Always in the robot's task model.
+  - `PersonalTask`: never assigned. In the task model it is a foreseeable task the robot recognises.
+  - `HumanOnlyTask`: a `PersonalTask` never given to a robot (`go_to`, `stand`, `go_to_and_stand`); no hypothesis
+    describes it. The only class whose parameter may be typed `landmark`.
+- **Methods** (`MethodSchema`): guards and steps. The planner takes the first method whose guards hold in the present
+  `WorldState`; an empty guard list always holds. A task with no method whose guards hold is not applicable
+  (`AdaptivePlanner.is_applicable`, the one definition: the human's script form and the recognizer's liveness read
+  it). A guard may bind one free variable existentially (`holding(?agent, ?other)`); `not_equal` is built in.
+  `derived_vars` resolve a variable after selection (`home_container_of`); a task's `determined_parameters` resolve
+  a parameter from another before selection (`destination_of`: the object's designation; a binding written in the
+  task instance is kept).
+- **Action schemas** (`actions.py`): preconditions, effects, retractions, and a `completion` the executor reads in the
+  `WorldState`. `moved_object_key` / `moved_to_key` declare what an action moves, for the successor state (T-B2a) and
+  for the body's grasp. An effect or retraction whose name is a declared state is applied by the environment when the
+  action's last microaction has run (`scan_it` sets `is_scanned`).
+- **Microactions** (STEP, GRASP, RELEASE, STAND, TOUCH) are the simulator's.
 
-- **Tasks** (`tasks.py`) — high-level goals, decomposed into ordered sequences of actions via HTN methods. These are what the IR reasons about.
-- **Actions** (`actions.py`) — primitive executable steps. Each has preconditions (checked at planning time), effects (declared world changes), and a `completion` predicate the executor monitors at runtime against the `WorldState`.
-- **Microactions** — atomic simulator steps (STEP, GRASP, RELEASE, STAND). Produced by the embodiment layer, not defined here.
-
-**Two important predicate families — do not conflate them:**
-- `at(agent, object)` — fine-grained object proximity, used by the executor to check action completion.
-- `in_area(agent, area)` — coarse area-level context, used only by IR for context weighting.
-
-Using `at` with an area argument (instead of an object) is a silent bug: the executor will never see the completion predicate satisfied and the agent gets stuck.
-
----
-
-## 4. Defining tasks
-
-A `TaskSchema` has a name, parameters, and one or more decomposition methods. Each method is an ordered list of action calls with parameter bindings. The planner selects the first method whose guards hold in the current `WorldState`; an empty guard list is unconditionally applicable and serves as the fallback.
-
-Tasks come in two categories, set by flags on the schema:
-
-- `is_assigned=True` — part of the shared team task. The robot both plans with it and uses it to recognize the human doing it.
-- `is_foreseeable=True` — a predictable human behavior not part of the team task. The robot never executes it, but must recognize it to avoid misinterpreting the human's actions.
-
-A task can carry multiple methods to support **conditional decomposition** — for example, `DELIVER_PALLET` could have a method for delivering to the dock entrance (default) and a second method for carrying the pallet inside the building (if a condition such as `receiver_requested_inside` holds in the `WorldState`). The planner picks the first applicable method. This is fully supported by the current types via `MethodSchema.guards`; see `shared/types.py`.
-
----
-
-## 5. Example: pallet shop domain (from HITS3 Scenario 2)
-
-The HITS3 study (Olivia Stener, TRATON observations, Dec 2025) describes a normal dock delivery scenario: a driver and support vehicle unload pallets from a truck onto a platform connected to a warehouse. The receiver assigns delivery spots; the driver delivers one pallet at a time.
-
-Three tasks from this scenario translate directly into our format:
-
-### Assigned task: `DELIVER_PALLET(?pallet, ?dest)`
-
-The core team task. The driver (or robot) moves to the pallet, picks it up, moves to the assigned delivery spot, and places it. Decomposes to `move_to(?pallet)` → `pick_up(?pallet)` → `move_to(?dest)` → `place(?pallet, ?dest)`. Structurally identical to `DELIVER_ITEM` in kitting.
-
-### Foreseeable task: `DRIVER_PHONE_CALL()`
-
-Listed explicitly in HITS3 as "DriverAgent receives phone call from logistics planner." The driver stops and stands in place for the duration. Decomposes to `move_to(neutral_spot)` → `wait_at(neutral_spot)`. Same shape as `COFFEE_BREAK` in kitting. The robot distinguishes this from an assigned task because the destination does not match any known delivery spot.
-
-### Foreseeable task: `DRIVER_TALKS_TO_DOCKWORKER()`
-
-Listed in HITS3 as "DriverAgent stands at DockWorkerAgent and talks." Decomposes to `move_to(?dockworker)` → `wait_at(?dockworker)`. Foreseeable, no manipulation, recognizable by destination mismatch with the delivery area.
-
-**What was not translated and why:** the receiver dynamically assigning a new delivery location requires runtime parameter mutation, outside the current `ScenarioConfig` model. Communication acts (intercom calls, pallet scanning) have no observable microaction equivalent. Interleaved loading/unloading requires unordered or parallel steps, which the current sequential `MethodSchema` does not support. These are known limitations documented in the paper.
+Two predicate families, never conflated:
+- `at(agent, object)`: object proximity, the completion of a walk.
+- `in_area(agent, area)`: the area an agent is in (`shared.types.area_fact`), emitted for every agent; a method guard
+  may read it. Never `at(agent, area)`.
 
 ---
 
-## 6. registry.py — wiring
+## 4. The human's script (T-H; T-G A3)
 
-The registry assembles all tasks and actions into a `DomainModel` and declares the `intentions` set — the tasks the IR will reason over, typically all tasks. See `domains/kitting/registry.py` for the pattern.
-
----
-
-## 7. scenarios/ — concrete agent assignments
-
-A `ScenarioConfig` assigns concrete task instances to each agent, with all parameters bound to specific values; it declares its `setup` and its `reference_layouts` (section 2). The human's script is a `Script` of task instances with events (T-H). Each scenario is one hand-written literal in its setup's module (`scenarios/scenarios_sNN.py`), registered by discovery at import — no list to maintain. See `domains/kitting/scenarios/` for the pattern.
-
-### Scenario ids
-
-Serial ids, nothing encoded beyond order of writing (T-L, ruling 4 as amended; built in stages 2 and 3): layouts `env_layout_KK`, setups `env_setup_NN`, scenarios `scenario_sNN_MM`, NN the serial of the scenario's `setup` and MM a counter per setup (`scenario_s01_06` is the sixth scenario of `scenarios_s01.py`, on `env_setup_01`). The Python variable equals the id. The setup serial in a scenario id repeats the `setup` field by convention; the code checks nothing about it, and an author who moves a scenario to another setup renames it. No layout serial is in a scenario id: a scenario has one or more reference layouts. `docs/rename_table.md` maps the old ids (`scenario_30` on `env_layout3`, and so on).
+`Script(entries, closing=(), dependence=ScriptDependence.INDEPENDENT)`, written with the call forms of `script.py`:
+- `entries`, the priority list: ordinary entries (a task instance, with events through `.at` / `.during`) and, below
+  every ordinary entry, `RepeatableEntry(task)` (no events). When free, the human takes the first applicable open
+  ordinary entry; with none applicable, the first applicable repeatable entry whose task is not complete in the present
+  state; else it waits. An ordinary entry is closed once its task has left the stack completed, abandoned or
+  infeasible.
+- `closing`: taken in written order once every ordinary entry is closed; then the human selects nothing more.
+- `dependence`: `ON_ROBOT` when entries wait for the robot's work; the load-time replay then reports the entries it
+  could not replay instead of refusing the load.
 
 ---
 
-## 8. Checklist before marking a domain ready
+## 5. The two domains
 
-- [ ] All objects and locations referenced in tasks/actions appear in `env_layout.json`
-- [ ] Every action call in a task method resolves to an `ActionSchema` in `actions.py`
-- [ ] Every action schema used in a task is registered in `registry.py`
-- [ ] All task schemas appear in `registry.py` `intentions` set
-- [ ] `is_assigned` / `is_foreseeable` flags match domain semantics
-- [ ] `completion` predicate in each action matches what `world_state_builder.py` actually emits
-- [ ] `register_<domain>_domain()` is imported and called in `sim_model.py`
+**kitting.** The robot and the human deliver items from shelves to a kitting table (`deliver_item`, a `WorkTask` whose
+table is the item's designation); foreseeable tasks `coffee_break`, `ac_activation`; every method has no area guard.
+Declares no object state. A script needs no closing part: its last entry is the exit walk (`docs/assumptions.md` 1.1).
 
+**dock_loading** (T-G; `docs/handoffs/plan_T-G_stage1.md`). The robot, an automated forklift, delivers full pallets
+from the truck to their delivery bays (`deliver_pallet`) and returns empty pallets to the truck (`load_return`); the
+human, the staff member receiving the delivery, scans each delivered pallet (`confirm_delivered_pallet`); foreseeable
+tasks `coffee_break`, `office_break`. Three areas: `area_truck_side`, `area_hall` and `area_office`, divided by the
+gate (`dock_gate`) and the office door (`office_door`). Declared states: `is_empty(pallet)`, `is_scanned(pallet)`,
+`is_open(gate)`. A pallet's destination is its designation: a delivery bay for a full pallet, the truck for an empty
+one. Landmarks: `standby_place` (the repeatable standby entry) and `desk` (the closing part).
 
+---
 
-## subtask nesting: an example
+## 6. Checklist for a domain
 
-```
-DELIVER_PALLET(?pallet, ?dest)          RETRIEVE_EMPTY_PALLET()
-        |                                        |
-  ACQUIRE_PALLET(?pallet)              ACQUIRE_PALLET(empty_stack)
-  move_to → pick_up                    move_to → pick_up
-
-DELIVER_PALLET → [ACQUIRE_PALLET, move_to(?dest), place]
-                        |
-                 [move_to, pick_up]     ← still just actions, no extra nesting
-
-RETRIEVE_EMPTY_PALLET → [ACQUIRE_PALLET, move_to(?dest), place]
-                        |
-                 [move_to, pick_up]     ← same ACQUIRE_PALLET action schema, just different parameter bindings, good for IR reasoning... 
-
-```
-
-```
-deliver_pallet = TaskSchema(
-    name="deliver_pallet",
-    parameters=[_pallet, _dest],
-    methods=[
-        MethodSchema(
-            name="deliver_inside",
-            parameters=[_pallet, _dest],
-            guards=[
-                ConditionSchema("requested_inside_delivery", (_agent,)),
-            ],
-            steps=[
-                StepCall("move_to", {Var("?target"): _pallet}),
-                StepCall("pick_up", {Var("?pallet"): _pallet}),
-                StepCall("move_to", {Var("?target"): Const("building_interior")}),
-                StepCall("place",   {Var("?pallet"): _pallet, Var("?target"): Const("building_interior")}),
-            ],
-        ),
-        MethodSchema(
-            name="deliver_entrance",   # fallback — guards=[] means always applicable
-            parameters=[_pallet, _dest],
-            guards=[],
-            steps=[
-                StepCall("move_to", {Var("?target"): _pallet}),
-                StepCall("pick_up", {Var("?pallet"): _pallet}),
-                StepCall("move_to", {Var("?target"): _dest}),
-                StepCall("place",   {Var("?pallet"): _pallet, Var("?target"): _dest}),
-            ],
-        ),
-    ],
-    is_assigned=True,
-    is_foreseeable=False,
-)
-```
+- [ ] Every object a method names (`Const`) exists in every layout the domain's scenarios reference.
+- [ ] Every action schema a method calls is registered in `register_fn`'s `Tree`.
+- [ ] The task model holds every `WorkTask`, the foreseeable `PersonalTask`s, and no `HumanOnlyTask`.
+- [ ] Every completion predicate is a fact the environment emits or a declared state an action sets.
+- [ ] Every object state a method reads is declared in `states`.
+- [ ] Every registered scenario loads: `PYTHONHASHSEED=0 python mesa_sim/list_scenarios.py`.

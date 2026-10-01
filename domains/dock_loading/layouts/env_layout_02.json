@@ -8,7 +8,7 @@
   },
   "areas": [
     {
-      "id": "zone_hall",
+      "id": "area_hall",
       "bounds": {
         "x_min": -600,
         "x_max": 600,
@@ -18,7 +18,7 @@
       "label": "hall"
     },
     {
-      "id": "zone_office",
+      "id": "area_office",
       "bounds": {
         "x_min": -170,
         "x_max": 170,
@@ -28,7 +28,7 @@
       "label": "office"
     },
     {
-      "id": "zone_truck_side",
+      "id": "area_truck_side",
       "bounds": {
         "x_min": -600,
         "x_max": 600,
