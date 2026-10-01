@@ -1,4 +1,4 @@
-# tests/test_tl4_overrides.py
+# tests/kitting/test_tl4_overrides.py
 """
 T-L stage 4 (the run file and overrides): each of the three overrides applied
 and printed; the refused kinds refused with the path named; an out-of-bounds

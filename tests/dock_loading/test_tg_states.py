@@ -1,4 +1,4 @@
-# tests/test_tg_states.py
+# tests/dock_loading/test_tg_states.py
 """
 T-G stage 1, step 4 (A5): object states and designations. The domain declares
 its states, the setup states which hold at the start, the environment validates
@@ -9,7 +9,7 @@ tick, where its completion is acknowledged; a fact about no object loads and is
 emitted; the gate's state is emitted and read by a method's guard; the
 designation check refuses and accepts, on the setup's destinations and on an
 assigned task's determined parameter.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_tg_states.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/dock_loading/test_tg_states.py
 """
 
 import json
@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.knowledge import StateDeclaration, Tree
 from shared.planner import AdaptivePlanner

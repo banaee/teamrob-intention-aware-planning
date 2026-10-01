@@ -1,4 +1,4 @@
-# tests/test_tg_dock_tasks.py
+# tests/dock_loading/test_tg_dock_tasks.py
 """
 T-G stage 1, step 7: dock_loading's tasks (docs/handoffs/plan_T-G_stage1.md,
 section 4). Every robot method is selected from each of its areas and
@@ -7,7 +7,7 @@ only once the pallet stands in its bay; load_return is not applicable to a full
 pallet; the routes cross the gate exactly when the areas differ; the human's
 tasks from the hall and the office; an agent outside its areas has no
 applicable method.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_tg_dock_tasks.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/dock_loading/test_tg_dock_tasks.py
 """
 
 import sys
@@ -16,8 +16,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.planner import AdaptivePlanner, DecompositionError
 from shared.types import AREA_FACT, AgentConfig, Const, Predicate, ScenarioConfig, Script, area_at, area_fact

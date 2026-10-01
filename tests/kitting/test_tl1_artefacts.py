@@ -1,4 +1,4 @@
-# tests/test_tl1_artefacts.py
+# tests/kitting/test_tl1_artefacts.py
 """
 T-L stage 1 (the split): the loader's two added checks and the resolver's
 triple. A missing home container and an out-of-bounds start are refused; a run

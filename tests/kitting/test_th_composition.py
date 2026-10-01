@@ -1,4 +1,4 @@
-# tests/test_th_composition.py
+# tests/kitting/test_th_composition.py
 """
 A scenario's composition and its scenario coverage (world/composition.py; T-H
 follow-up), computed at load from the script and an observing robot: the
@@ -6,7 +6,7 @@ scenario coverage of scenario_s02_02, scenario_s01_03, scenario_s06_06,
 scenario_s01_05, scenario_s01_04; scenario_s02_02 against a task model without
 coffee_break; the exit-walk exemption; the four sets of scenario_s02_02; the
 [scenario-coverage] line.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_th_composition.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_th_composition.py
 """
 
 import logging
@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.knowledge import TaskModel
 from shared.recognizer import build_hypothesis_space

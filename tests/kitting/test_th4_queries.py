@@ -1,4 +1,4 @@
-# tests/test_th4_queries.py
+# tests/kitting/test_th4_queries.py
 """
 T-H4: the record's queries (world/queries.py) on the migrated scenarios, and
 task equality (same_task). scenario_s01_03 abandon, scenario_s02_02
@@ -6,7 +6,7 @@ interruption and resumption, scenario_s06_06 / scenario_s07_03 binding level,
 scenario_s05_01 the empty stack, scenario_s01_05 human-only tasks; a task model
 without coffee_break; the [coverage] line the same with the prior on and off.
 The queries run on the in-memory Record of an in-process run.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_th4_queries.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_th4_queries.py
 """
 
 import logging
@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.knowledge import TaskModel
 from shared.recognizer import build_hypothesis_space

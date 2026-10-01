@@ -17,9 +17,9 @@ import math
 import pytest
 
 # first: puts the repo root and mesa_sim/ on the path, as the other test modules do
-from tests.test_td1_adequacy import H, SPEED, TABLE, item, obs, pred, recognizer, world_with
-from tests.test_td15_build import ARRIVAL, GRASP, coffee_key, delivery, start_of
-from tests.test_th1_tree import model_for, registered
+from tests.kitting.test_td1_adequacy import H, SPEED, TABLE, item, obs, pred, recognizer, world_with
+from tests.kitting.test_td15_build import ARRIVAL, GRASP, coffee_key, delivery, start_of
+from tests.kitting.test_th1_tree import model_for, registered
 from domains.kitting.registry import domain_config
 from domains.kitting.tasks import deliver_item
 from shared.meta_planner import DEFAULT_THETA, GateOutcome, MetaPlanner

@@ -1,4 +1,4 @@
-# tests/test_td1_adequacy.py
+# tests/kitting/test_td1_adequacy.py
 """
 T-D R and E, Stage 1: the recognizer without the `unknown` hypothesis (R1, R6) and
 its adequacy finding (E1 to E7), with the membership ruling of 27 September 2026 (a
@@ -7,7 +7,7 @@ Every expected value is derived from the entry (design_decisions.md, "T-D R and 
 none from a run. The world is env_layout_01's initial world, changed by hand: the
 phase is derived from the world's predicates, the movement from the observed
 positions, so a fixed world holds each hypothesis in one derived phase.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_td1_adequacy.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_td1_adequacy.py
 """
 
 import dataclasses
@@ -17,8 +17,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared import likelihood_functions
 from shared.knowledge import ContextKnowledge
@@ -30,7 +30,7 @@ from shared.types import (
 from domains.kitting.tasks import deliver_item
 from mesa_sim.action_decomposer import _parse_duration_to_steps
 from mesa_sim.world_state_builder import build_world_state
-from tests.test_th1_tree import model_for, registered
+from tests.kitting.test_th1_tree import model_for, registered
 
 H = "human_0"
 TABLE = "kitting_table_0"

@@ -1,4 +1,4 @@
-# tests/test_tg_liveness.py
+# tests/kitting/test_tg_liveness.py
 """
 T-G A4, liveness by applicability (docs/handoffs/plan_T-G_stage1.md, 3b): a hypothesis is live only while its task is
 applicable, i.e. the planner decomposes it for the observed agent in the present world (AdaptivePlanner.is_applicable).
@@ -9,7 +9,7 @@ ruling, none from a run. As in test_td1_adequacy.py the world is env_layout_01's
 human holds item_2 and item_2 has no home container, so deliver_item(item_3) and deliver_item(item_4) select
 deliver_with_return, whose derived container has no value (DecompositionError), while deliver_item(item_2) selects
 deliver_already_held.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_tg_liveness.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_tg_liveness.py
 """
 
 import dataclasses
@@ -20,11 +20,11 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
-from tests.test_td1_adequacy import H, TABLE, check_r6, item, obs, pred, recognizer, world_with
-from tests.test_th1_tree import model_for, registered
+from tests.kitting.test_td1_adequacy import H, TABLE, check_r6, item, obs, pred, recognizer, world_with
+from tests.kitting.test_th1_tree import model_for, registered
 from shared.planner import AdaptivePlanner
 from shared.recognizer import BELIEF_FLOOR
 from shared.types import RecognizerLifecycle

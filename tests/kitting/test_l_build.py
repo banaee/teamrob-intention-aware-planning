@@ -1,4 +1,4 @@
-# tests/test_l_build.py
+# tests/kitting/test_l_build.py
 """
 T-D L, the belief lifecycle (design_decisions.md, "T-D L: the belief lifecycle", as amended on the L-records report):
 L1 the episode boundary is the observed agent's completion of a terminal action, read from the world's completion
@@ -8,7 +8,7 @@ adequacy inadequate; L4 retirement while the terminal fact holds, re-entry at ex
 proportions kept; L5 B the boundary flag fires recognition_changed for a recorded decision. Every expected value is
 derived from the entry, none from a run. As in test_td1_adequacy.py the world is a layout's initial world changed by
 hand (the enlarged room, env_layout_11: two kitting tables, a coffee machine).
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_l_build.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_l_build.py
 """
 
 import logging
@@ -18,11 +18,11 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
-from tests.test_td1_adequacy import H, check_r6, item, obs, pred, recognizer, world_with
-from tests.test_th1_tree import model_for, registered
+from tests.kitting.test_td1_adequacy import H, check_r6, item, obs, pred, recognizer, world_with
+from tests.kitting.test_th1_tree import model_for, registered
 from shared.meta_planner import DEFAULT_THETA
 from shared.recognizer import build_hypothesis_space
 from shared.types import (

@@ -1,10 +1,10 @@
-# tests/test_th1_tree.py
+# tests/kitting/test_th1_tree.py
 """
 T-H1: the tree, the task model and the two knowledge objects. The schema classes,
 the knowledge objects' construction checks, the typed steps (with a TaskStep's
 recursion), the support restriction on HypothesisKey values, and the human-only
 tasks go_to and stand run through the C1 script layer.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_th1_tree.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_th1_tree.py
 """
 
 import sys
@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.knowledge import Tree, TaskModel, ProceduralKnowledge, ContextKnowledge
 from shared.planner import AdaptivePlanner

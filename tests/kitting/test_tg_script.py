@@ -1,4 +1,4 @@
-# tests/test_tg_script.py
+# tests/kitting/test_tg_script.py
 """
 T-G stage 1, step 5: the human's script form (A3, Q12 to Q15, R1). The
 placement refusals; the priority list (an entry skipped and taken later, an
@@ -8,7 +8,7 @@ its retaking; Wait; the closing part (in order, waiting on an entry not
 applicable, Idle after it); the load-time replay for both kinds of script, with
 repeatable entries not replayed; the run-end statement; the exit walk on the
 last closing entry; the choice point.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_tg_script.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_tg_script.py
 """
 
 import logging
@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.knowledge import Tree
 from shared.planner import AdaptivePlanner
@@ -34,7 +34,7 @@ from domains.kitting.actions import move_to, pick_up, place
 from domains.kitting.registry import domain_config, register_kitting_domain
 from domains.kitting.script import deliver_item, stand
 from mesa_sim.world_state_builder import build_world_state
-from tests.test_th2_executor import H, TICKS, _carry_tree, goto, key, kinds, model_for, run, st
+from tests.kitting.test_th2_executor import H, TICKS, _carry_tree, goto, key, kinds, model_for, run, st
 
 LAYOUT, SID = "env_layout_01", "scenario_s01_01"
 
@@ -326,7 +326,7 @@ def test_the_run_end_statement_for_a_dependent_script_only(caplog):
 # ---------------------------------------------------------------------------
 
 def test_the_exit_walk_is_the_last_closing_entry():
-    from tests.test_th_composition import R, model_for as composition_model
+    from tests.kitting.test_th_composition import R, model_for as composition_model
     robot = composition_model(LAYOUT, "scenario_s01_05").observing[R]
     assert scenario_composition(Script([deliver_item("item_3")], closing=[goto("door")]), robot)[1] \
         is ScenarioCoverage.MODELLED_ONLY

@@ -1,4 +1,4 @@
-# tests/test_td15_build.py
+# tests/kitting/test_td15_build.py
 """
 T-D R and E, cycle 1.5b: E8 (the advance tick), E9 (s_exp by the Projector's attribution),
 E10 (standing in the belief, L(v·D)) and G1 (the guard on admission). Every expected value is
@@ -6,7 +6,7 @@ derived from the entry (design_decisions.md, "T-D R and E", "1.5 rulings") or, f
 Projector's own segments; none from a run. As in test_td1_adequacy.py the world is a layout's
 initial world changed by hand: the phase is derived from the predicates, the movement from the
 observed positions.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_td15_build.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_td15_build.py
 """
 
 import dataclasses
@@ -16,10 +16,10 @@ import math
 import pytest
 
 # first: puts the repo root and mesa_sim/ on the path, as the other test modules do
-from tests.test_td1_adequacy import (
+from tests.kitting.test_td1_adequacy import (
     BETA, H, SPEED, TABLE, check_r6, item, obs, pred, recognizer, world_with,
 )
-from tests.test_th1_tree import model_for, registered
+from tests.kitting.test_th1_tree import model_for, registered
 from shared import likelihood_functions
 from shared.meta_planner import DEFAULT_THETA, GateOutcome
 from shared.planner import AdaptivePlanner

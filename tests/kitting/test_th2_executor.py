@@ -1,4 +1,4 @@
-# tests/test_th2_executor.py
+# tests/kitting/test_th2_executor.py
 """
 T-H2: the human's executor. The script form and its sugar, the stack machine
 through the body (every event kind, a cut inside a walk and inside a stand and a
@@ -6,7 +6,7 @@ wait_at, a Drop, a refused second Start, inject), an infeasible resumption on
 the machine alone, the load-time replay (anchors, occurrences, a during outside
 its action, a Drop after the last action), the replay against the run, and the
 guard that the robot's inputs carry nothing of the stack.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_th2_executor.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_th2_executor.py
 """
 
 import sys
@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "mesa_sim"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.knowledge import Tree
 from shared.planner import AdaptivePlanner
@@ -498,7 +498,7 @@ def test_world_state_and_observation_expose_nothing_of_the_stack():
 
 def test_world_imports_shared_only():
     import re
-    root = Path(__file__).parent.parent
+    root = Path(__file__).parent.parent.parent
     for module in (root / "world").glob("*.py"):
         for line in module.read_text().splitlines():
             m = re.match(r"\s*(?:from|import)\s+([\w.]+)", line)

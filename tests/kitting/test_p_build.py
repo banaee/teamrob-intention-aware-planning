@@ -1,4 +1,4 @@
-# tests/test_p_build.py
+# tests/kitting/test_p_build.py
 """
 T-D P, the fallback projection, as ruled with P4 and Q6 (design_decisions.md, "T-D P: the fallback projection"):
 where admission refuses and a human is observed, the robot projects what it observed for as long as it observed it —
@@ -7,7 +7,7 @@ arrival radius, with no stand after it), a stand of k ticks held k ticks, nothin
 realize() prices it as any projection, and projection_expired re-decides when the fallback a decision rested on
 reaches its end. Every expected value is derived from the entry and from realize() on synthetic plans (v = 20 cm/tick,
 min_separation = 50 cm, the observation offset 1 tick), none from a run.
-Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_p_build.py
+Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/kitting/test_p_build.py
 """
 
 import logging
@@ -17,8 +17,8 @@ from dataclasses import replace
 import pytest
 
 # first: puts the repo root and mesa_sim/ on the path, as the other test modules do
-from tests.test_td1_adequacy import H
-from tests.test_th1_tree import model_for, registered
+from tests.kitting.test_td1_adequacy import H
+from tests.kitting.test_th1_tree import model_for, registered
 from shared.meta_planner import DEFAULT_THETA, MetaPlanner
 from shared.projection import Projector
 from shared.realization import realize

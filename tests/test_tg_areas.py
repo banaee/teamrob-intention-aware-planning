@@ -32,7 +32,7 @@ from domains.dock_loading.registry import domain_config as dock_config, register
 from mesa_sim.action_decomposer import _get_step_size, _parse_duration_to_steps, walk_positions
 from mesa_sim.sim_model import SimModel
 from mesa_sim.world_state_builder import PROXIMITY_THRESHOLD, build_world_state
-from tests.test_th2_executor import H, goto, model_for, st
+from tests.kitting.test_th2_executor import H, goto, model_for, st
 
 
 def area_facts(world, agent):
