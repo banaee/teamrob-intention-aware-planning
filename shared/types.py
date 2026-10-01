@@ -352,7 +352,7 @@ class ProcessCompletion:
     Nothing outside the executor can observe such a completion, so a recognizer
     cannot see the action end. kitting's wait_at no longer uses it: the body
     emits waited(agent, entity) when its timer runs out (see
-    domains/kitting/actions.py). Still used by dock_loading's wait_at (deferred).
+    domains/kitting/actions.py). Used by both domains' stand action.
     """
     pass
 

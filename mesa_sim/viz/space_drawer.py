@@ -69,12 +69,9 @@ AREA_COLORS = {
     "zone_SW": "rgba(230,220,200,0.15)",
     "zone_SE": "rgba(230,200,200,0.15)",
     # dock_loading
-    "zone_hall_dry":    "rgba(250,220,180,0.15)",
-    "zone_hall_frozen": "rgba(180,220,250,0.15)",
-    "zone_hall_center": "rgba(220,220,220,0.15)",
-    "zone_dock":        "rgba(200,200,180,0.15)",
-    "zone_truck":       "rgba(210,190,170,0.15)",
-    "zone_office":      "rgba(220,230,220,0.15)",
+    "area_hall":        "rgba(220,220,220,0.15)",
+    "area_office":      "rgba(220,230,220,0.15)",
+    "area_truck_side":  "rgba(210,190,170,0.15)",
 }
 
 
