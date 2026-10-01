@@ -386,8 +386,9 @@ the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track
 T-F; T-V track 1 and track 2; the T-D tail's track 3b (TODO-145). FW (future work, not designed, ruled or built within
 V1): the 4D detour; T-S; the conceptual directions TODO-147 to TODO-150. The order block above is superseded in part:
 track 4 leaves the T-D tail for its place inside T-G (after stage 2); the 4D detour and T-S leave the queue for FW. T-G
-is open: its design is ruled (30 September and 1 October 2026) and build 1 is in (30 September 2026). Next: the layout
-and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
+is open: its design is ruled (30 September and 1 October 2026) and build 1 is in (30 September 2026). Next, in order
+(1 October 2026): the lifecycle question of the human's list (parked under A3), then the layout and the setup of T-G's
+stage 1, agreed in the design chat, then stage 1's plan.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.

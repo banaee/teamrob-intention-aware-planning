@@ -142,3 +142,10 @@ terms ("body" for the simulator, "embodiment layer") can go with stage 1's recor
 - Domain: domains/dock_loading/ (build 1's state), domains/kitting/ (the reference for every form).
 - Instruments: analysis/ir_testbed/, analysis/mpb/.
 - Handoffs: docs/handoffs/ (this file belongs there).
+
+CORRECTED (T-G records 1, third follow-up, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings"):
+- Section 7 omits A9 from the mechanisms outside the domain. The repo's four stand: A3, A4, A5 and A9, each with its
+  acceptance on kitting. A9's mechanism exists under the code name "zone" and is renamed (the first step), not built.
+- Section 9 omits the note on the pytest collection errors: `pytest` over the whole repo stops on three collection
+  errors in `ros_sim/framework_HRI/test/` (`test_copyright.py`, `test_flake8.py`, `test_pep257.py`; the `ament_*`
+  modules are missing), which predate build 1.

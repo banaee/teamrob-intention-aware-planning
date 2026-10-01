@@ -255,8 +255,8 @@ Decisions
   `world/`; not built before the lifecycle of a list entry is ruled, PARKED as the next design chat's first question), A4 (liveness by applicability, `shared/`), A5 (object states and designations) and
   A9 (areas), each accepted on kitting byte-identical; then the IR test-bed and the MPB on dock_loading; 2
   `store_pallet`, the gate opened on request, the office door's state, A7 (TODO-16); then track 4 (A8); 3 check-in and
-  check-out. Before each stage's plan the design chat and Hadi agree its layout and setup. Next:
-  stage 1's layout and setup, then its plan.
+  check-out. Before each stage's plan the design chat and Hadi agree its layout and setup. Next, in order: the lifecycle
+  question of the human's list (parked under A3), then stage 1's layout and setup, then stage 1's plan.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

@@ -5680,7 +5680,7 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   that question's ruling as "not taken", with its reason, and gets no FW item. FW must not hide a known wrong behaviour
   inside what V1 claims: such an item is fixed in V1 or stated as a limitation.
 
-- A2, terms (a glossary revision; no code is renamed). Mind, body, environment, simulator, container, area and
+- A2, terms (a glossary revision; no code is renamed for them). Mind, body, environment, simulator, container, area and
   monitored area are defined in `docs/glossary.md` §10, applicable in §6. "World" is not used for the environment
   (`world/` and the world vocabulary keep their meanings). "Area" is the term; "zone" is the old code name (below). The
   simulator replaces "the bodies" as the name of `mesa_sim/` and `ros_sim/`; the Mesa class `RobotAgent` still holds mind
@@ -5693,6 +5693,10 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   regenerated once). Until that commit the glossary states that the code name is "zone".
   CORRECTED (the same ruling): kitting did not drop zones. Only the recognizer stopped reading them (I4 removed
   ZONE_BOOST); every kitting layout still declares them and the Mesa world-state builder emits `in_zone(agent, zone)`.
+  SCOPE OF "NO CODE IS RENAMED" (T-G records 1, third follow-up, 1 October 2026; no ruling changed): A2 renames no code
+  for the terms it introduces (mind, body, environment, simulator, container, monitored area, applicable). The one rename
+  in V1 is "zone" to "area", ruled afterwards (above) and built as the first step of stage 1 (C1). The two statements
+  concern different things.
 
 - A3, the human's script (T-G Q1, Q2). One form for every domain. It changes `world/` when built; the robot's mind
   receives nothing from it.
@@ -5733,6 +5737,10 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
     work task does not restart at once.
   - A candidate, not ruled: an entry is skipped when its terminal fact holds or when the human has ended it by an
     authored event.
+  - Acceptance (T-G records 1, third follow-up): the maintained kitting sets contain no dropped task, so A3's
+    byte-identical acceptance does not exercise the lifecycle rule. Whatever rule is ruled needs its own check on the
+    kitting scenarios that contain a drop event and on the test-bed sets with misdeliveries, in addition to the
+    byte-identical acceptance.
   When built, it supersedes for a script that depends on the robot "the human's script, an ordered list ... which the
   executor must reproduce exactly" (glossary §6, **human's script**; "T-H: the human behaviour model"). It answers
   DESIGN-01 (an entry condition is applicability, decided by the human's own planning in `world/`) and LIMIT-02.
@@ -5794,6 +5802,11 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
 - A9, areas and the gate (the framework side of T-G Q11).
   The layout declares areas. The environment emits the fact that an agent is in an area. The area of each container is
   fixed and declared.
+  dock_loading's areas (part of the ruled form of Q11; recorded in T-G records 1, third follow-up, 1 October 2026): three,
+  divided by the gate and by the office door: the truck side (the truck and the dock platform, on the outer side of the
+  gate), the hall, and the office. The content is ruled; the names are not fixed and are settled with stage 1's layout.
+  They replace the six zones of env_layout_01 (`zone_hall_dry`, `zone_hall_frozen`, `zone_hall_center`, `zone_dock`,
+  `zone_truck`, `zone_office`). B11's methods per starting area range over them.
   A property of `shared/planner.py`, recorded: a task is decomposed against one world state, the present one; the state
   is not advanced from step to step (`_decompose_schema` passes the same `world` to every sub-task's method selection). A
   condition inside a later step is therefore judged in the present state.
@@ -5878,7 +5891,9 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   landmarks for the exit walk; the revised room is a new layout and a new setup with the next serial ids; the present ones
   (env_layout_01, env_setup_01) stay for the viewing fixture.
 - B11, Q11 (P2) in dock_loading: passing the gate is a plain step "move to the gate", whose target is the gate's centre
-  point; no special action. Each task has one method per starting area, selected by the condition on the agent's area. A
+  point; no special action. The domain has three areas, divided by the gate and by the office door: the truck side (the
+  truck and the dock platform, outside the gate), the hall, and the office (A9; names settled with stage 1's layout; the
+  six zones of env_layout_01 are replaced). Each task has one method per starting area, selected by the condition on the agent's area. A
   method that crosses the gate keeps the condition that the gate is open. "Return the held pallet to its origin" may be a
   sub-task used as the first step. Not taken: always going by the gate; a sub-task with conditions for a later passage
   (A9's property defeats it); routing through openings as a property of movement (it changes the projection and the
@@ -5914,13 +5929,15 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   stage is for that stage's plan.
   - Stage 1, the basic domain:
     - first, in its own commit with no change of behaviour: the zone mechanism renamed to "area" in the code (A2's
-      ruling of 1 October 2026; the plan reports the extent first);
+      ruling of 1 October 2026; the plan reports the extent first). This is the one rename in V1; A2's "no code is
+      renamed" concerns the terms it introduces;
     - the catch-up of dock_loading's forms to kitting's (C3);
     - A3, the human's script form (`world/`), with the standby entry, once the entry lifecycle is ruled (A3, PARKED);
     - A4, liveness by applicability (`shared/`);
     - A5, generic object states and designations, used here for the scanned state, `is_empty` and the destination;
     - A6, the perception assumption;
-    - A9, the declared areas and the fact that an agent is in an area;
+    - A9, the declared areas and the fact that an agent is in an area (the mechanism exists under the code name "zone":
+      renamed by the first step, not built anew; dock_loading's three areas declared in stage 1's layout);
     - B1 to B4, B8, B9, B11;
     - B6, with `office_break` in a reduced form: the office door has no state yet, and the human passes it as a plain
       point on the way; the office is observed;
@@ -5978,7 +5995,9 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   - the load-time check for a script that depends on the robot, and the meaning of the outcome "infeasible" under A3;
   - how "completed" is judged for an entry of the human's list (the standby entry must be takable again after the human
     has left the place). PARKED (Hadi, 1 October 2026) as the first design question of the next design chat, the
-    lifecycle of an entry: A3's PARKED block; A3 is not built before it is ruled;
+    lifecycle of an entry: A3's PARKED block; A3 is not built before it is ruled. The byte-identical acceptance does not
+    exercise the rule (no maintained kitting set has a dropped task): the ruled rule is also checked on the kitting
+    scenarios with a drop event and on the test-bed sets with misdeliveries;
   - where the exit walk stands relative to the priority list (a plain walk is always applicable);
   - how an event or a foreseeable task is placed relative to tasks whose order is not fixed;
   - how a pallet's origin is recorded (B8);
@@ -6015,3 +6034,5 @@ TODO-96, TODO-97, TODO-104, TODO-131, TODO-140, TODO-143 to TODO-151; LIMIT-02 t
 DESIGN-04, DESIGN-15; REFACTOR-03
 
 Next: the layout and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
+SUPERSEDED (T-G records 1, third follow-up, 1 October 2026): the order is the lifecycle question of the human's list
+(A3, PARKED), then stage 1's layout and setup, then stage 1's plan.
