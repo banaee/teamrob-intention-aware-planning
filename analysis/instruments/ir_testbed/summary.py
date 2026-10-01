@@ -278,7 +278,7 @@ def main(d, log):
         out.append("")
 
     # a script that depends on the robot: the entries still open at the run's end (the record; T-G A3, Q13b)
-    still = [l.split(" ", 3)[3].strip() for l in open(log) if l.startswith("[human] ") and "StillOpen(" in l]
+    still = [l.split(" open:", 1)[1].strip() for l in open(log) if l.startswith("[human] ") and " open:" in l]
     if still:
         out += ["Entries still open at the run's end (the record; a script that depends on the robot):", ""]
         out += [f"- {s}" for s in still]
