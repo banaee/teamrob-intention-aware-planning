@@ -82,6 +82,10 @@ dropped work task does not restart at once. A candidate, not ruled: an entry is 
 terminal fact holds or when the human has ended it by an authored event.
 The human's script form is not built before this is ruled.
 
+RULED (Hadi, 1 October 2026; note added in T-G records 2): the question is ruled as T-G Q12 to Q15
+(design_decisions.md, "T-G: the second domain's rulings", A3, RULED; dock_loading's closing part, B13).
+This section stays as the question's record.
+
 ## 6. Before stage 1's plan: the layout and the setup (to agree with Hadi)
 
 - The room's arrangement is ruled (design entry, B10). Not ruled: whether stage 1's layout already
