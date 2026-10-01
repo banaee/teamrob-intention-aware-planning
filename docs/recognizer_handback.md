@@ -8,6 +8,8 @@ and G1 (the guard on admission, the meta-planner's side, §5). UPDATED at 1.5c (
 amendment (a stationary tick within the priced standing of any phase with s_exp > 0 is an observation) and the
 boundary tick (no member on it), §1.10. Figures in §3 are from the 1.5c regeneration, with earlier values where they
 moved; acceptance in `analysis/td_stage1b/REPORT.md` (sections 1.5b and 1.5c).
+UPDATED at T-G stage 1, step 3 (1 October 2026; bd4bddc): liveness by applicability (T-G A4), §1.1; the perfect-fit
+score of an undecomposable hypothesis is removed (the superseding notes in §1.4, §1.10 and §4).
 
 What `shared/recognizer.py` and `shared/likelihood_functions.py` do at HEAD (September 2026), for two readers:
 later sessions of this project, and colleagues who last saw the recognizer before July 2026 (start with §9,
@@ -55,6 +57,14 @@ AMENDED (Hadi, on the L-records report, 27 September 2026): re-entry takes exact
 returning on one tick take 1/|H| each), the incumbents share the rest in this tick's proportions; origin the current
 position, entry latency 0 (a first observation), the derived action the world's; a re-entry on a boundary tick is
 governed by the boundary. Logged `[IR-reentry]`. BUILT IN L-BUILD (28 September 2026; 2c54c4a, 493c095, 5129d90, 3d65ca6).
+AMENDED (T-G A4, built in T-G stage 1, step 3, 1 October 2026; bd4bddc): a second condition of H, liveness by
+applicability. A hypothesis whose task has no applicable method in this world (`decompose` raises `DecompositionError`;
+the one definition is `AdaptivePlanner.is_applicable`) is not live: it leaves H, is pinned at `BELIEF_FLOOR` on output and
+is never a member, logged `[IR-inapplicable] step=N <key> leaves the live set: no applicable method` (on the first tick
+`does not enter the live set`). When it is applicable again: retired if its terminal fact holds (L4), else it re-enters
+at 1/|H| through L4's returning path, logged `[IR-reentry] step=N <key> live again: applicable`. A retired hypothesis
+that becomes inapplicable stays retired. No kitting hypothesis is ever undecomposable: the maintained outputs are
+unchanged.
 
 ### 1.2 Prior
 
@@ -128,6 +138,8 @@ signal never reaches this channel: the completion pin (§1.6) retires the hypoth
 NO DERIVED PHASE. A hypothesis the planner cannot decompose in this world (`DecompositionError`, logged once) has
 no phase and scores the perfect-fit value L = 1: nothing to charge. It is therefore not refuted; it is treated as
 fitting (and it is never a member of the adequacy test).
+SUPERSEDED (T-G A4, built in T-G stage 1, step 3, 1 October 2026; bd4bddc): a hypothesis the planner cannot decompose
+is not applicable and is not live: it leaves H and is pinned at the floor (§1.1); no perfect-fit score is given.
 
 AN EMPTY PHASE. A phase with nothing walked and no standing beyond its $s_{\mathrm{exp}}$ (the tick a hypothesis
 enters an action, the ticks after a boundary before the agent moves) has $vD \le 0$ and pays L = 1: no charge,
@@ -400,6 +412,8 @@ the finding unexplained: scenario_s02_01 on 248, scenario_s04_01 on 269, scenari
 on modelled ticks: 0 at every α, both priors (`analysis/td_stage1b/REPORT.md`, 1.5c). An observation whose D is not
 surprising is still one. A non-member contributes no $S_k$ (absent from `tails`); a hypothesis with no expected action
 (undecomposable) is never a member.
+SUPERSEDED IN PART (T-G A4, built in T-G stage 1, step 3; bd4bddc): an undecomposable hypothesis is not live at all
+(§1.1).
 
 FINDING. UNRESOLVED iff there is no member; UNEXPLAINED iff every member has $S_k < \alpha$
 (intersection-union); ADEQUATE otherwise. HYPOTHESIS ADEQUACY (G1), per live hypothesis: ADEQUATE (a member with
@@ -635,6 +649,7 @@ it (1.5c): no false unexplained remains on modelled ticks (§1.10).
 Also stated, lower in consequence:
 - An undecomposable hypothesis scores the perfect fit in the belief and is never a member of the adequacy
   test; no case occurs in the maintained baselines (§1.10).
+  SUPERSEDED (T-G A4, built in T-G stage 1, step 3, 1 October 2026; bd4bddc): it leaves the live set (§1.1).
 - The boundary infers authorship from the phase. A domain where another agent satisfies a terminal condition
   while the observed agent stands in its terminal phase would attribute wrongly.
 - Evidence accumulated under one method is reused when the guard re-selects another. Dormant in kitting (every

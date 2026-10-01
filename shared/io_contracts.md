@@ -172,6 +172,11 @@ and `tails` exist for evaluation and for the rest of G.
   condition holds now and did not then); the belief is then the prior over H and no hypothesis is a member. H is the
   support minus the hypotheses whose terminal fact holds on this tick (L4); a hypothesis whose fact stops holding
   re-enters at exactly 1/|H| (`[IR-reentry]`). BUILT IN L-BUILD (28 September 2026; 2c54c4a, 493c095, 5129d90, 3d65ca6)
+  AMENDED (T-G A4, built in T-G stage 1, step 3, 1 October 2026; bd4bddc): H also excludes the hypotheses with no
+  applicable method in this world (`AdaptivePlanner.is_applicable`, read through `decompose`), pinned at `BELIEF_FLOOR`
+  and logged `[IR-inapplicable] step=N <key> leaves the live set: no applicable method` (`does not enter` on the first
+  tick); applicable again, one re-enters at 1/|H| (`[IR-reentry] ... live again: applicable`) unless its terminal fact
+  holds; a retired hypothesis that becomes inapplicable stays retired.
 
 ---
 
@@ -767,6 +772,8 @@ Per live hypothesis, every tick:
    evidence, never into it). For a walk with no standing beyond s_exp, v·D = e: the excess-path likelihood.
    Standing beyond s_exp is charged v per tick; standing within it is not a charge. A hypothesis with no
    derived phase (undecomposable) scores the perfect-fit value.
+   SUPERSEDED (T-G A4, built in T-G stage 1, step 3, 1 October 2026; bd4bddc): an undecomposable hypothesis is not
+   applicable and not live (§1.2, the live set); it is pinned at `BELIEF_FLOOR` and given no score.
 
 The evidence is normalised over the live set H (T-D R1): no residual hypothesis, no reference likelihood. The
 episode is local: when a retirement is the observed agent's own (its expected action on the previous tick was
