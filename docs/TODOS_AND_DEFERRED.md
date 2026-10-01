@@ -4021,6 +4021,12 @@ stands, 2 recedes, no robot violation. The robot, leaving the bay toward the emp
 simulated human does not react to the robot. In dock_loading the case is structural: a scan becomes applicable at the
 moment of delivery, so the human walks to a bay when the robot leaves it. Whether to reopen this parked case is decided
 after the MPB on dock_loading, with counts from all rooms. An instance produced by the scenario, not authored for it.
+FOURTH INSTANCE (T-G stage 1, the second milestone scenario, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT):
+scenario_s03_03, s05_03, s07_03 (dock_loading), at the end of every run: the robot's last task is a delivery, and with
+an empty pool it stays at the bay; the human walks up to it for the last scan: 8.69 cm at 320 (env_layout_02), 13.41 cm
+at 301 (env_layout_03), 8.11 cm at 299 (env_layout_04); 9 / 8 / 8 ticks below `min_separation` with a standing robot, 0
+with a moving robot. An instance produced by the scenario, not authored for it. PROPOSAL for stage 1, NOT RULED: an
+authoring convention that the robot's last assigned task is a return.
 Files: domains/kitting/ (the scenario), analysis/tb1a_destination/sep_classes.py (the measure)
 Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137, TODO-144
 
@@ -4236,6 +4242,12 @@ Framing recorded at the close of the meta-planner test-bed; nothing here is rule
   class-2 correction, 30 Sept 2026). Both met at this session's close.
 - Placed before T-F. Reason: an environment that gives IR nothing to influence makes IR look irrelevant; the evaluation's
   numbers are attributable only where the consequence under conflict has been shown to activate.
+NOTED (T-G stage 1, the second milestone scenario, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): scenario_s05_03 on
+env_layout_03 (dock_loading), tick 64: a B3 switch decided on the fallback projection while the gate refuses (below
+theta). At 60 the three candidates lay within 0.6 and `load_return` won; at 64 the fallback (the human walking straight
+toward the robot) charged `load_return` a shift of 4 and `deliver_pallet(pallet_0)` won, 94.68 against 97.46. The
+conflict enters the cost and decides the choice; consistent with the design. An instance produced by a scenario, not a
+3b cell; nothing is ruled.
 Files: domains/kitting/ (the rooms, setups and scenarios), analysis/ (the instrument, reused from analysis/mpb/)
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)" (CLOSED; MPB-2, MPB-4); TODO-130, TODO-144
 
@@ -4348,6 +4360,12 @@ delivery (A4, `[IR-reentry] ... live again: applicable`) at an equal share, and 
 human starts (the milestone: 64 to 72 on env_layout_02, 64 to 76 on env_layout_03, 57 to 69 on env_layout_04). Until
 then the robot plans against the fallback; on env_layout_04 this interval holds the near-encounter of TODO-135's third
 instance. Recorded only; nothing is changed for it.
+EVIDENCE (T-G stage 1, the second milestone scenario, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): each scan hypothesis
+enters the live set on the tick of its delivery in all three rooms; entry to admission, env_layout_02 64 to 72 and 182
+to 188; env_layout_03 58 to 65 and 159 to 173; env_layout_04 57 to 76 and 148 to 160. The scan at the frozen bay is late
+where the coffee machine lies in the same direction from the standby place: env_layout_04, admitted 19 ticks after it
+enters; env_layout_02, leading 19 ticks after it enters (308) and clearing theta at 315. The last scan of each run is
+never admitted: an empty pool gives no further decision (noted, no action).
 Files: shared/recognizer.py, shared/meta_planner.py (no change)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
 
@@ -4359,6 +4377,11 @@ classed as containing unmodelled behaviour). The approval parked the related que
 the two breaks only, the finding turns unexplained after 15 ticks and the robot plans against the fallback; during the
 walk to the desk the walk is read as the nearest modelled task, and on env_layout_02 admitted as coffee_break at 112
 (the half-plane test, TODO-140); no consequence in those runs. Not ruled.
+EVIDENCE AND PLACEMENT (T-G stage 1, the second milestone scenario, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): five of the
+six walks to the standby place are admitted as coffee_break or office_break on the observation warrant, wrongly
+(env_layout_02 at 114 and 231; env_layout_03 at 109 and 206; env_layout_04 at 94; the sixth never clears theta); the
+finding turns unexplained once the human stands. In this domain the walk follows almost every scan, so the case is
+frequent. It becomes the first design question before the IR test-bed set on dock_loading. NOT RULED.
 Files: domains/dock_loading/tasks.py (the task model), shared/recognizer.py
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; docs/handoffs/plan_T-G_stage1.md, section 5; TODO-140, TODO-154
 

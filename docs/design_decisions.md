@@ -6150,6 +6150,10 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   - The scan and the next delivery to the same bay share one point (the bay's centre, B9), so with a minimum separation
     of 50 cm that conflict is certain whenever both concern the same bay. This is the expected main interaction of stage
     1, not a defect.
+    CORRECTED (records, 1 October 2026; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): the conflict requires, in
+    addition, that the human is still at the bay when the robot arrives. In stage 1's rooms a round trip to the truck
+    takes about 96 ticks and a scan from the standby place 16 to 30, so the human finishes before the next pallet
+    arrives, and the second milestone scenario did not reach it.
 
 PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 
@@ -6465,6 +6469,64 @@ instruments' code is shared; their run sets, expectations and reports are per do
 behaviour; the maintained sets and the reference set byte-identical; every path named in a record or a README updated.
 Next: the second simple scenario per room; then the step added above, with the preparation of the instruments (the
 plan's section 7, "After the milestone"); then the IR test-bed scenarios, agreed with Hadi before they are authored.
+STAGE 1, THE SECOND MILESTONE SCENARIO BUILT (1 October 2026; built and accepted, records 1 October 2026).
+- Built: scenario_s03_03 (env_layout_02, env_setup_03), scenario_s05_03 (env_layout_03, env_setup_05), scenario_s07_03
+  (env_layout_04, env_setup_07), one per room on the MPB setups, identical in content: the robot is assigned
+  `deliver_pallet` of pallet_0 and pallet_1 (the dry bay) and of pallet_2 (the frozen bay) and `load_return(pallet_4)`;
+  the human is assigned the three scans, with the script [the three scans, the dry bay's first,
+  `RepeatableEntry(go_to("standby_place"))`], closing [`go_to("desk")`], `ScriptDependence.ON_ROBOT`. Each description
+  states the purpose and the unmodelled behaviour (the walk to and the stay at the standby place, the walk to the desk).
+  0371035. Prior on, `single_task`, 1000 steps, headless. The acceptance held in all three rooms: the run ends with no
+  error; the robot completes its four tasks; every entry of the human's script is closed, the closing part included
+  (`[rec] end step=1000 open=-`). The maintained sets byte-identical, 301 tests.
+  Completion ticks (the world tick; the declared tick of the last task in brackets), env_layout_02 / env_layout_03 /
+  env_layout_04: `deliver_pallet(pallet_0)` 64 / 159 / 148; `deliver_pallet(pallet_1)` 182 / 276 (278) / 285 (287);
+  `deliver_pallet(pallet_2)` 289 (291) / 58 / 57; `load_return(pallet_4)` 125 / 220 / 236; the scans, `is_scanned`
+  holds / the record closes the entry: pallet_0 92, 94 / 188, 190 / 164, 166; pallet_1 209, 211 / 303, 305 / 301, 303;
+  pallet_2 318, 320 / 84, 86 / 83, 85; `go_to(desk)` completes 346 / 351 / 339.
+- Exercised:
+  - The priority rule: the first applicable open entry is taken. In env_layout_03 and env_layout_04 the robot delivered
+    pallet_2 first, and the human scanned it first, against the written order.
+  - The walk to the standby place between scans: two per room (env_layout_02 94 to 121 and 211 to 238; env_layout_03 86
+    to 111 and 190 to 217; env_layout_04 85 to 110 and 166 to 182).
+  - The frozen bay, which makes the three rooms differ in motion and in recognition.
+  - Each scan hypothesis enters the live set on the tick of its delivery (A4, `[IR-reentry] ... live again:
+    applicable`).
+- Not exercised: the robot arriving at a bay where the human stands, and two scans possible at once in one bay. Reason:
+  a round trip to the truck takes about 96 ticks and a scan from the standby place 16 to 30, so the human finishes
+  before the next pallet arrives; at every delivery the human was at the standby place, and the live intervals of the
+  scans never overlap. The note on B14 ("that conflict is certain whenever both concern the same bay") is corrected
+  there: it requires that the human is still at the bay when the robot arrives. Consequence recorded for the MPB's
+  design on dock_loading, NOT RULED: a setup in which some pallets already stand in a bay while the robot delivers
+  others.
+FINDINGS OF THE SECOND MILESTONE SCENARIO (Hadi and the design chat, 1 October 2026, on ccode's report; each with its
+classification):
+- Five of the six walks to the standby place are admitted as coffee_break or office_break on the observation warrant,
+  wrongly (env_layout_02 at 114 and 231, coffee_break; env_layout_03 at 109, coffee_break, and 206, office_break;
+  env_layout_04 at 94, office_break; the sixth, env_layout_04 166 to 182, never clears theta). The finding turns
+  unexplained once the human stands, and the gate refuses with `none(leader_inadequate)`. No consequence on a decision
+  in these runs. The parked question TODO-155: the walk follows almost every scan in this domain, so the case is
+  frequent. It becomes the first design question before the IR test-bed set. NOT RULED.
+- At the end of every run the human walks up to the standing robot: 8.69 cm (env_layout_02, at 320), 13.41 cm
+  (env_layout_03, at 301), 8.11 cm (env_layout_04, at 299); 9 / 8 / 8 ticks below the minimum separation with a
+  standing robot, 0 with a moving robot in all three. The robot's last task is a delivery, and a robot with an empty
+  pool stays where it is, at the bay the last scan walks to. The parked case of the human walking toward the robot
+  (X3, TODO-135). PROPOSAL for stage 1, NOT RULED: an authoring convention that the robot's last assigned task is a
+  return.
+- In env_layout_03 at tick 64 the robot changes its task on the fallback projection while the gate refuses (below
+  theta): at 60 the three candidates lay within 0.6 and `load_return` won; at 64 the fallback, the human walking
+  straight toward the robot, charged `load_return` a shift of 4 and `deliver_pallet(pallet_0)` won, 94.68 against
+  97.46. The conflict enters the cost and decides the choice. Consistent with the design; noted for track 3b
+  (TODO-145).
+- The scan at the frozen bay is late because the coffee machine lies in the same direction from the standby place:
+  in env_layout_04 it enters at 57 and is admitted at 76, 19 ticks after; in env_layout_02 it enters at 289, leads from
+  308 (19 ticks after) and clears theta at 315 (it is the last scan, see the next point). TODO-154, with the room's
+  geometry.
+- The last scan is never admitted (env_layout_02 pallet_2, env_layout_03 and env_layout_04 pallet_1), because an empty
+  pool gives no further decision. Noted, no action.
+Next: the design of the IR test-bed set with Hadi (first question: TODO-155); then the sorting of the earlier analyses
+and tests under kitting, with the preparation of the instruments (the step added above); then the set's authoring and
+its runs.
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
@@ -6502,3 +6564,7 @@ SUPERSEDED (records, 1 October 2026): steps 6 to 8 of stage 1 are built and the 
 TO 8 BUILT above). Next: the second simple scenario per room; then the sorting of the earlier analyses and tests under
 kitting, with the preparation of the instruments; then the IR test-bed scenarios, agreed with Hadi before they are
 authored.
+SUPERSEDED (records, 1 October 2026): the second milestone scenario is built and accepted, and stage 1's milestone is
+complete (STAGE 1, THE SECOND MILESTONE SCENARIO BUILT above). Next: the design of the IR test-bed set with Hadi (first
+question: TODO-155); then the sorting of the earlier analyses and tests under kitting, with the preparation of the
+instruments; then the set's authoring and its runs.
