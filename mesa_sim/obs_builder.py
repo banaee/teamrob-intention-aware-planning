@@ -8,7 +8,6 @@ PURPOSE:
 
 WHAT THIS MODULE DOES:
     - Reads human agent's current physical state from Mesa (position, microaction, carrying)
-    - Derives area from position via model.get_area_of_position()
     - Constructs and returns a canonical Observation object
 
 WHAT THIS MODULE DOES NOT DO:
@@ -23,7 +22,7 @@ CALLED BY:
 
 INPUTS:
     - human_agent   HumanAgent — the observed human (read-only)
-    - model         SimModel — for area lookup
+    - model         SimModel (read-only; the area left the observation, A9)
     - timestamp     float — current simulation step as float
 
 OUTPUTS:
@@ -61,7 +60,7 @@ def build_observation(
 
     INPUT:
         human_agent  — the HumanAgent being observed (read-only)
-        model        — SimModel for area lookup (read-only)
+        model        — SimModel (read-only)
         timestamp    — current step as float
 
     OUTPUT:
@@ -75,15 +74,13 @@ def build_observation(
     """
 
     # ------------------------------------------------------------------
-    # Position and area
+    # Position
     # ------------------------------------------------------------------
     pos = human_agent.pos  # (x, y) center-origin
-    area = model.get_area_of_position(pos[0], pos[1])
 
     spatial_context = SpatialContext(
         position=pos,
         orientation=0.0,  # Mesa agents have no orientation tracking yet
-        area=area,
     )
 
     # ------------------------------------------------------------------

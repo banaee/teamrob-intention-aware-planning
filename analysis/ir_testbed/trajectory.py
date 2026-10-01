@@ -13,14 +13,14 @@ Independent of the layout (TB.4b): the room, the shift and the script are read f
 the observed human is the scenario's one human, and no id, coordinate or tick is written here.
 
 The replay is loaded as tests/test_th2_executor.py loads it: the registered scenario with the human alone (no robot
-is constructed, so no recognizer runs), check_script with the body's conversions (`steps_toward` at the body's step
-size, `_parse_duration_to_steps`). The replay gives the sequence of actions the human performs; the body's timing
+is constructed, so no recognizer runs), check_script with the body's conversions (`walk_positions` at the body's step
+size, the walk up to where the body stops; `_parse_duration_to_steps`). The replay gives the sequence of actions the human performs; the body's timing
 of each, read from mesa_sim/executor.Executor.step and mesa_sim/sim_agents.HumanAgent._step_stack:
   - every action: the executor checks the action's completion at the start of the tick, against the world built
     before the human acts (section 3); if it holds, the tick is the action's ACKNOWLEDGEMENT (no microaction,
     micro=None; ACTION_COMPLETION_LATENCY = 1), and the next action starts on the next tick (the human spends no
     per-task completion tick, HUMAN_TASK_COMPLETION_LATENCY = 0); otherwise one microaction runs;
-  - STEP* (a walk): the `steps_toward` positions from where the action starts to the target's position; the walk
+  - STEP* (a walk): the `walk_positions` from where the action starts toward the target's position; the walk
     ends when the agent is within PROXIMITY_THRESHOLD of the target (`at` holds), short of the target point;
   - GRASP: the item is held, at the holder's position; RELEASE: the item is at the nearest fixed object, at its
     position; STAND* with a duration: that many STANDs; for an action whose completion is a world fact (wait_at) the
@@ -40,7 +40,7 @@ A mid-action cut (a DuringAction; Track 2.5, scenario_s09_13), by T-H's executed
     cut action's snapshot; the action runs that many microactions and is then cut where it stands, with no
     acknowledgement tick: the started task's first action runs on the next tick;
   - the resumption (the replay's snapshot of the cut action with done > 0) completes the cut action first: a walk is
-    re-expanded from the human's current position toward the target's current position (`steps_toward`, as a fresh
+    re-expanded from the human's current position toward the target's current position (`walk_positions`, as a fresh
     walk: Executor.resume leaves a movement action an empty queue), a stand or a wait_at keeps its remaining STANDs
     (the bound duration's ticks less those done, the last still recording waited_at); a GRASP or RELEASE is never cut
     (a cut needs ticks done and ticks left);
@@ -65,7 +65,7 @@ from world.record import Cut, Started
 from domains.kitting.registry import domain_config, register_kitting_domain
 from mesa_sim.sim_model import SimModel
 from mesa_sim.world_state_builder import build_world_state, PROXIMITY_THRESHOLD
-from mesa_sim.action_decomposer import steps_toward, _get_step_size, _parse_duration_to_steps
+from mesa_sim.action_decomposer import walk_positions, _get_step_size, _parse_duration_to_steps
 from mesa_sim.executor import ACTION_COMPLETION_LATENCY
 from mesa_sim.sim_agents import HUMAN_TASK_COMPLETION_LATENCY
 
@@ -193,7 +193,7 @@ def expand(run_file, steps=None):
     H = human.agent_id
     step_size = _get_step_size(m)
     ticks_of = lambda d: _parse_duration_to_steps(d, m)
-    walk = lambda a, b: [mu.params["target_pos"] for mu in steps_toward(a, b, step_size)]
+    walk = lambda a, b: walk_positions(a, b, step_size)
     record = check_script(human.scheduled_tasks, m.humans[H].machine.planner, build_world_state(m), H, ticks_of, walk)
     # the replay's cuts: replay step of the cut action's snapshot -> the microactions it runs before the cut
     cuts = {t.tick: t.where.done for t in record.transitions if isinstance(t, Started) and isinstance(t.where, Cut)}

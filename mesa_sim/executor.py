@@ -491,7 +491,6 @@ class Executor:
         item.held_by = None
         item.at_location = target_id
         item.position = target_obj.position
-        item.area = target_obj.area
         self.agent.carrying = None
         self.agent.waited_at = None
 

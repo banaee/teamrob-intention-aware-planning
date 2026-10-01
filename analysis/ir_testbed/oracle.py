@@ -89,7 +89,7 @@ def world_of(row, traj, agent):
     positions = {i: tuple(p) for i, p in traj["fixed"].items()}
     positions.update({i: tuple(p) for i, p in row["item_pos"].items()})
     return WorldState(timestamp=float(row["tick"]),
-                      agent_states={agent: AgentState(agent_id=agent, current_area="unknown", holding=row["holding"])},
+                      agent_states={agent: AgentState(agent_id=agent, holding=row["holding"])},
                       agent_positions={agent: (row["x"], row["y"])},
                       object_locations=dict(row["item_loc"]), predicates=preds,
                       object_home_container=dict(traj["home"]), object_destination=dict(traj["dest"]),

@@ -435,10 +435,10 @@ def test_infeasible_at_load_is_an_error():
 def test_replay_equals_run(script):
     m = model_for("env_layout_02", "scenario_s02_01", script, robot=False)
     h = m.humans[H]
-    from mesa_sim.action_decomposer import _parse_duration_to_steps, _get_step_size, steps_toward
+    from mesa_sim.action_decomposer import _parse_duration_to_steps, _get_step_size, walk_positions
     replay = check_script(script, h.machine.planner, build_world_state(m), H,
                           lambda d: _parse_duration_to_steps(d, m),
-                          lambda a, b: [mu.params["target_pos"] for mu in steps_toward(a, b, _get_step_size(m))])
+                          lambda a, b: walk_positions(a, b, _get_step_size(m)))
     run(m)
     assert kinds(replay) == kinds(h.record)
     assert action_sequence(replay) == action_sequence(h.record)
@@ -483,7 +483,9 @@ def test_world_state_and_observation_expose_nothing_of_the_stack():
                                                     "object_destination", "object_positions", "metadata",
                                                     # T-D P: the room, and the robot's own perception of motion
                                                     "fixed_object_positions", "workspace", "agent_displacements",
-                                                    "agent_run_lengths", "agent_standing_counts"}
+                                                    "agent_run_lengths", "agent_standing_counts",
+                                                    # A9: the declared areas
+                                                    "areas"}
     assert world.agent_states[H].metadata == {} and world.metadata == {}
 
 

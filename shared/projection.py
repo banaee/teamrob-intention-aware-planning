@@ -59,6 +59,9 @@ from shared.types import (
     ProjectedPlanEntry,
     Segment,
     Workspace,
+    AREA_FACT,
+    Const,
+    area_fact,
     task_instance_key,
 )
 from shared.knowledge import TaskModel
@@ -644,11 +647,16 @@ def successor_state(
         now at, and object_positions follows, read at the END of the plan
         (an object an agent still holds is where the agent ends).
     The agent's own position is geometry, not a schema fact: `end_pos`, the
-    end of the entry's last segment (None: left where it is).
+    end of the entry's last segment (None: left where it is). The agent's
+    area follows it: its in_area fact is replaced by area_fact() at `end_pos`,
+    the definition the body's world-state builder emits (A9, R2), so a later
+    task's method is selected by the area the agent ends in. With no actions
+    the call only moves the agent (the replay's cut world).
 
-    What it does NOT carry, because no schema declares it: anything the
-    body's world-state builder derives and no action states (areas, a fact
-    a later action of another kind ends), and the observed agent's own
+    What it does NOT carry, because no schema declares it: anything else the
+    body's world-state builder derives and no action states (a fact a later
+    action of another kind ends; the area of a moved object, object_areas),
+    and the observed agent's own
     projected effects — the limitation a single task has too. The part of
     TODO-07 projection needs; the planner's forward chaining and
     precondition checking are not this.
@@ -677,6 +685,13 @@ def successor_state(
         position = agent_positions.get(place_id, object_positions.get(place_id))
         if position is not None:
             object_positions[obj_id] = position
+
+    if end_pos is not None:
+        agent = Const(agent_id)
+        predicates = {p for p in predicates if not (p.name == AREA_FACT and p.args[0] == agent)}
+        fact = area_fact(agent_id, end_pos, world.areas)
+        if fact is not None:
+            predicates.add(fact)
 
     return replace(
         world,

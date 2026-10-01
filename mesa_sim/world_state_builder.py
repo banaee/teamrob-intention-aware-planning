@@ -7,7 +7,7 @@ PURPOSE:
     and the cognitive layer's symbolic reasoning.
 
 WHAT THIS MODULE DOES:
-    - Reads agent positions from Mesa space → derives current areas
+    - Reads agent positions from Mesa space → derives the agents' areas (area_fact)
     - Reads env_objects () from model → derives object locations
     - Derives symbolic predicates from the above
     - Returns a fresh WorldState each time it is called
@@ -25,8 +25,9 @@ OUTPUTS:
     - shared.types.WorldState  consumed by shared/replanning.py and shared/planner.py
 
 PREDICATES GENERATED:
-    Spatial (area-level — used by IR context reasoning):
+    Spatial (area-level — read by method guards):
         Predicate("in_area", (Const(agent_id), Const(area_id)))
+        — shared.types.area_fact, the one definition every computed state reads too
 
     Spatial (object-level — used by executor completion checking):
         Predicate("at", (Const(agent_id), Const(obj_id)))
@@ -60,7 +61,7 @@ import logging
 from typing import TYPE_CHECKING, Dict, Set, Tuple
 import math
 
-from shared.types import AgentState, WorldState, Workspace, Predicate, Const
+from shared.types import AgentState, WorldState, Workspace, Predicate, Const, area_at, area_fact
 
 if TYPE_CHECKING:
     from mesa_sim.sim_model import SimModel
@@ -103,10 +104,8 @@ def build_world_state(model: SimModel) -> WorldState:
     # Agent states — humans
     # ------------------------------------------------------------------
     for agent_id, human in model.humans.items():
-        area = model.get_area_of_position(human.pos[0], human.pos[1])
         agent_states[agent_id] = AgentState(
             agent_id=agent_id,
-            current_area=area or "unknown",
             holding=human.carrying,
             current_task=human.current_task,
         )
@@ -114,9 +113,10 @@ def build_world_state(model: SimModel) -> WorldState:
         # Record agent position 
         agent_positions[agent_id] = (human.pos[0], human.pos[1])
 
-        # Area-level predicate — for IR context reasoning
-        if area:
-            predicates.add(Predicate("in_area", (Const(agent_id), Const(area))))
+        # Area-level predicate — the one definition (A9, R2)
+        fact = area_fact(agent_id, agent_positions[agent_id], model.areas)
+        if fact is not None:
+            predicates.add(fact)
 
         # Manipulation predicate
         if human.carrying:
@@ -133,10 +133,8 @@ def build_world_state(model: SimModel) -> WorldState:
     # Agent states — robots
     # ------------------------------------------------------------------
     for agent_id, robot in model.robots.items():
-        area = model.get_area_of_position(robot.pos[0], robot.pos[1])
         agent_states[agent_id] = AgentState(
             agent_id=agent_id,
-            current_area=area or "unknown",
             holding=robot.carrying,
             current_task=robot.current_task,
         )
@@ -144,9 +142,10 @@ def build_world_state(model: SimModel) -> WorldState:
         # Record agent position
         agent_positions[agent_id] = (robot.pos[0], robot.pos[1])
 
-        # Area-level predicate — for IR context reasoning
-        if area:
-            predicates.add(Predicate("in_area", (Const(agent_id), Const(area))))
+        # Area-level predicate — the one definition (A9, R2)
+        fact = area_fact(agent_id, agent_positions[agent_id], model.areas)
+        if fact is not None:
+            predicates.add(fact)
 
         # Manipulation predicate
         if robot.carrying:
@@ -169,19 +168,17 @@ def build_world_state(model: SimModel) -> WorldState:
             if obj.held_by:
                 location = obj.held_by
                 carrier = model.humans.get(obj.held_by) or model.robots.get(obj.held_by)
-                area = model.get_area_of_position(
-                    carrier.pos[0], carrier.pos[1]
-                ) if carrier else "unknown"
+                area_id = _area_id(carrier.pos, model) if carrier else "unknown"
             else:
                 location = obj.at_location
-                area = model.get_area_of_position(obj.position[0], obj.position[1])
+                area_id = _area_id(obj.position, model)
 
             if obj.is_scanned:
                 predicates.add(Predicate("scanned", (Const(obj_id),)))
 
             object_locations[obj_id] = location
             predicates.add(Predicate("obj_at", (Const(obj_id), Const(location))))
-            object_areas[obj_id] = area
+            object_areas[obj_id] = area_id
             object_home_container[obj_id] = obj.home_container   # obj.home_container itself never mutates after load, 
                                                                  # but the WorldState dict is still refreshed here each call, 
                                                                  # like object_areas/object_locations above
@@ -192,7 +189,7 @@ def build_world_state(model: SimModel) -> WorldState:
             # Fixed object — direct position/area, no held_by/at_location semantics.
             object_positions[obj_id] = tuple(obj.position)
             fixed_object_positions[obj_id] = tuple(obj.position)   # static, for the fallback projection (T-D P)
-            object_areas[obj_id] = model.get_area_of_position(obj.position[0], obj.position[1]) or "unknown"
+            object_areas[obj_id] = _area_id(obj.position, model) or "unknown"
 
     # ------------------------------------------------------------------
     # Phase 2.1: dock gate always open — TODO: derive from gate state
@@ -223,6 +220,7 @@ def build_world_state(model: SimModel) -> WorldState:
         # The room's rectangle, static (T-D P): the body's space, built from the layout's width and height.
         workspace=Workspace(x_min=model.space.x_min, x_max=model.space.x_max,
                             y_min=model.space.y_min, y_max=model.space.y_max),
+        areas=model.areas,   # the declared areas (A9), static
         predicates=predicates,
     )
 
@@ -230,6 +228,21 @@ def build_world_state(model: SimModel) -> WorldState:
 # =============================================================================
 # Proximity helpers
 # =============================================================================
+
+def _area_id(position, model: "SimModel"):
+    """The id of the declared area holding `position` (area_at), or None."""
+    area = area_at(position, model.areas)
+    return area.id if area is not None else None
+
+
+def within_proximity(agent_pos: Tuple[float, float], obj_pos: Tuple[float, float]) -> bool:
+    """True when an agent at `agent_pos` is "at" an object at `obj_pos`: within
+    PROXIMITY_THRESHOLD. The one test, read by `at` and by the walk's stop
+    (action_decomposer.walk_positions)."""
+    ax, ay = agent_pos
+    ox, oy = obj_pos
+    return math.sqrt((ax - ox) ** 2 + (ay - oy) ** 2) <= PROXIMITY_THRESHOLD
+
 
 def _add_proximity_predicates(
     agent_id: str,
@@ -242,14 +255,10 @@ def _add_proximity_predicates(
     Skips obstacles (not task-relevant targets) and currently-held objects
     (they travel with the agent, not proximity-checkable at a fixed point).
     """
-    ax, ay = agent_pos
-
     for obj_id, obj in model.objects.items():
         if obj.type == "obstacle" or obj.held_by:
             continue
-        ox, oy = obj.position
-        dist = math.sqrt((ax - ox) ** 2 + (ay - oy) ** 2)
-        if dist <= PROXIMITY_THRESHOLD:
+        if within_proximity(agent_pos, obj.position):
             predicates.add(Predicate("at", (Const(agent_id), Const(obj_id))))
             
     # TODO: flagged rather than fixed — obj.type == "obstacle". Same shape of hardcoding as "?item" was, technically. 

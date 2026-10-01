@@ -33,7 +33,7 @@ happens; the driver writes the per-tick Snapshot. Nothing here reaches the
 robot's mind.
 """
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from shared.planner import AdaptivePlanner, DecompositionError
@@ -393,13 +393,20 @@ class StackMachine:
 # the load-time check: the symbolic replay
 # =============================================================================
 
-def advance(world: WorldState, actions: Sequence[GroundedAction], agent_id: str) -> WorldState:
+def advance(world: WorldState, actions: Sequence[GroundedAction], agent_id: str,
+            walk: Callable[[Tuple[float, float], Tuple[float, float]], List[Tuple[float, float]]]) -> WorldState:
     """The symbolic state `actions` leave `world` in for `agent_id`: the
-    successor state, the agent at the target of its last walk. A new value."""
+    successor state, the agent where the body's walk stops (the last position
+    of `walk`; where it stands when the walk has no step), not at the target's
+    centre, so that the area it ends in is the run's (A9, R2). A new value."""
+    pos = world.agent_positions[agent_id]
     end_pos = None
     for action in actions:
         if action.schema.movement_target_key is not None:
-            end_pos = movement_target_position(action, world) or end_pos
+            target = movement_target_position(action, world)
+            if target is not None:
+                positions = walk(pos, target)
+                pos = end_pos = positions[-1] if positions else pos
     return successor_state(world, actions, agent_id, end_pos)
 
 
@@ -470,11 +477,11 @@ def check_script(script: Script, planner: AdaptivePlanner, world: WorldState, ag
             cut_world = world
             if action.schema.movement_target_key is not None:
                 positions = walk(pos, movement_target_position(action, world))
-                cut_world = replace(world, agent_positions={**world.agent_positions, agent_id: positions[n - done - 1]})
+                cut_world = successor_state(world, [], agent_id, positions[n - done - 1])   # moved, with its area
             machine.cut(cut_world, step, n)
             world = cut_world
         else:
-            world = advance(world, [action], agent_id)
+            world = advance(world, [action], agent_id, walk)
             machine.action_done(world, step)
         step += 1
     problems = [t for t in record.transitions

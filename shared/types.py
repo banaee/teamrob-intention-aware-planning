@@ -20,7 +20,6 @@ class SpatialContext:
     """Spatial information about an observed action."""
     position: Tuple[float, float]
     orientation: float
-    area: Optional[str] = None
 
 
 @dataclass
@@ -173,7 +172,6 @@ class AgentState:
     Consumed by: shared/planner.py, shared/meta_planner.py
     """
     agent_id: str
-    current_area: str
     holding: Optional[str] = None  # item_id or None
     current_task: Optional[str] = None  # task_id or None
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -235,7 +233,43 @@ class Workspace:
     y_min: float
     y_max: float
 
-    
+
+@dataclass(frozen=True)
+class Area:
+    """A declared area of the layout (A9): a closed rectangle, a static fact of
+    the room. Filled into WorldState.areas by the builder, in declaration order."""
+    id: str
+    x_min: float
+    x_max: float
+    y_min: float
+    y_max: float
+
+
+# The fact "the agent is in an area": in_area(agent, area). Method guards read it as a predicate.
+AREA_FACT = "in_area"
+
+
+def area_at(position: Tuple[float, float], areas: Sequence[Area]) -> Optional[Area]:
+    """The area a position lies in: the first declared area whose closed rectangle
+    holds the point (the boundary rule: a point on an edge shared by two areas is in
+    the one declared first). None when no declared area holds it."""
+    x, y = position
+    for area in areas:
+        if area.x_min <= x <= area.x_max and area.y_min <= y <= area.y_max:
+            return area
+    return None
+
+
+def area_fact(agent_id: str, position: Tuple[float, float], areas: Sequence[Area]) -> Optional[Predicate]:
+    """The one definition of "the agent is in an area" (A9, R2): in_area(agent, area)
+    at `position`, or None outside every declared area. Called by the body's
+    world-state builder for every agent and by every computed state."""
+    area = area_at(position, areas)
+    if area is None:
+        return None
+    return Predicate(AREA_FACT, (Const(agent_id), Const(area.id)))
+
+
 @dataclass
 class WorldState:
     """
@@ -250,7 +284,7 @@ class WorldState:
     agent_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {agent_id: (x, y)}
     object_locations: Dict[str, str] = field(default_factory=dict)  # {item_id: location_id} 
     predicates: Set[Predicate] = field(default_factory=set)  # e.g., "path_clear", "human_at_table"
-    object_areas: Dict[str, str] = field(default_factory=dict)  # {item_id: area_id}
+    object_areas: Dict[str, str] = field(default_factory=dict)  # {obj_id: area_id}, derived by area_at (read only by the planner's "area_of" lookup)
     object_home_container: Dict[str, str] = field(default_factory=dict)     # {item_id: container_id} — static per scenario, set once at load, 
                                                                             # never updated as item moves (unlike object_locations/object_areas)
     object_destination: Dict[str, str] = field(default_factory=dict)        # {item_id: destination_id} — static per scenario, set once at load
@@ -260,6 +294,7 @@ class WorldState:
     fixed_object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — the fixed objects only (T-D P):
                                                                                         # static facts of the layout, filled by the builder
     workspace: Optional[Workspace] = None       # the room's rectangle (T-D P), static, filled by the builder
+    areas: Tuple[Area, ...] = ()                # the declared areas (A9), static, in declaration order, filled by the builder
     agent_displacements: Dict[str, Tuple[float, float]] = field(default_factory=dict)   # {agent_id: (dx, dy)} — the agent's last observed
                                                                                         # one-tick displacement (T-D P): a perception fact of
                                                                                         # the robot's world model (WorldState read as the robot's

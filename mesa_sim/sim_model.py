@@ -32,7 +32,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from shared.knowledge import Tree, TaskModel
 from shared.planner import AdaptivePlanner
 from shared.recognizer import build_hypothesis_space
-from shared.types import ScenarioConfig, Start, TaskSchema, check_task_bindings, check_task_destinations, task_instance_key
+from shared.types import Area, ScenarioConfig, Start, TaskSchema, check_task_bindings, check_task_destinations, task_instance_key
 from world.human_executor import check_script
 from world.composition import scenario_composition
 from world.queries import ObservingRobot, coverage
@@ -43,7 +43,7 @@ from world.queries import ObservingRobot, coverage
 from mesa_sim.mesa_fork import model, space, time, datacollection
 from mesa_sim.sim_agents import HumanAgent, RobotAgent
 from mesa_sim.world_state_builder import build_world_state
-from mesa_sim.action_decomposer import _parse_duration_to_steps, _get_step_size, steps_toward
+from mesa_sim.action_decomposer import _parse_duration_to_steps, _get_step_size, walk_positions
 from mesa_sim.overrides import Override, apply_overrides
 
 import logging 
@@ -61,7 +61,6 @@ class SimObject:
     type: str                          # enumeration category — "item", "shelf", "gate", etc.
     position: Tuple[float, float]
     size: Tuple[float, float]
-    area: Optional[str] = None
     subtype: Optional[str] = None      # domain-specific classification:
                                         # kitting: "part_A", "part_D", ...
                                         # dock loading: "frozen", "dry"
@@ -159,11 +158,14 @@ class SimModel(model.Model):
         self.schedule = time.BaseScheduler(self)
 
         # ------------------------------------------------------------------
-        # Area map
+        # The declared areas (A9), in declaration order: the boundary rule
+        # reads the order (shared/types.area_at)
         # ------------------------------------------------------------------
-        self.area_map: Dict[str, dict] = {
-            z["id"]: z["bounds"] for z in env_layout.get("areas", [])
-        }
+        self.areas: Tuple[Area, ...] = tuple(
+            Area(id=a["id"], x_min=a["bounds"]["x_min"], x_max=a["bounds"]["x_max"],
+                 y_min=a["bounds"]["y_min"], y_max=a["bounds"]["y_max"])
+            for a in env_layout.get("areas", [])
+        )
 
         # ------------------------------------------------------------------
         # The two knowledge objects (T-H): the world's tree, loaded once, which
@@ -237,7 +239,7 @@ class SimModel(model.Model):
         Unified loader for all env_objects entries. Two passes, as before the
         split (T-L, stage 1): the layout's fixed objects first (shelves, gates,
         tables, machines...), then the setup's movable objects (items,
-        pallets), whose position/area are derived from their home container.
+        pallets), whose position is derived from their home container.
         A layout entry has a "position" and no "initial_container"; a setup
         entry has an "initial_container"; every home container named by the
         setup is an object of the layout — each an error naming the artefact
@@ -266,7 +268,6 @@ class SimModel(model.Model):
                 type=obj["type"],
                 position=tuple(obj["position"]),
                 size=tuple(obj["size"]),
-                area=obj.get("area"),
                 subtype=obj.get("subtype"),
                 is_empty=obj.get("is_empty", False),
                 is_scanned=obj.get("is_scanned", False),
@@ -288,7 +289,6 @@ class SimModel(model.Model):
                 type=obj["type"],
                 position=container.position,
                 size=tuple(obj["size"]),
-                area=container.area,
                 subtype=obj.get("subtype"),
                 held_by=None,
                 at_location=container_id,
@@ -466,9 +466,10 @@ class SimModel(model.Model):
         world = build_world_state(self)
         planner = AdaptivePlanner(knowledge=self.tree)
         # The body's conversions for the replay: a duration to ticks, a walk to
-        # its step positions (the same functions the executor runs).
+        # its step positions up to where the body stops (the same functions the
+        # executor runs).
         ticks_of = lambda duration: _parse_duration_to_steps(duration, self)
-        walk = lambda start, target: [m.params["target_pos"] for m in steps_toward(start, target, _get_step_size(self))]
+        walk = lambda start, target: walk_positions(start, target, _get_step_size(self))
         for agent_cfg in scenario.agents:
             if agent_cfg.agent_type != "human":
                 continue
@@ -516,16 +517,6 @@ class SimModel(model.Model):
     def get_movable_objects(self) -> Dict[str, SimObject]:
         """Return all items — used by world_state_builder."""
         return {oid: o for oid, o in self.objects.items() if o.type == "item"}
-
-    def get_area_of_position(self, x: float, y: float) -> Optional[str]:
-        for area_id, bounds in self.area_map.items():
-            if (bounds["x_min"] <= x <= bounds["x_max"] and
-                    bounds["y_min"] <= y <= bounds["y_max"]):
-                return area_id
-        return None
-
-    def get_objects_in_area(self, area_id: str) -> List[SimObject]:
-        return [obj for obj in self.objects.values() if obj.area == area_id]
 
     def get_item_location(self, item_id: str) -> Optional[Tuple[float, float]]:
         item = self.objects.get(item_id)

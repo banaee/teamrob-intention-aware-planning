@@ -49,6 +49,7 @@ import yaml
 from pathlib import Path
 
 from shared.types import ConditionSchema, GroundedAction
+from mesa_sim.world_state_builder import within_proximity
 
 
 # =============================================================================
@@ -259,6 +260,29 @@ def steps_toward(
         steps.append(Microaction(name="step", params={"target_pos": (ix, iy)}))
 
     return steps
+
+
+def walk_positions(
+    start: Tuple[float, float],
+    target: Tuple[float, float],
+    step_size: float,
+) -> List[Tuple[float, float]]:
+    """
+    The positions the body's walk from `start` toward `target` passes through,
+    up to where the body stops: the first step within the `at` radius of the
+    target (within_proximity), since the executor's completion check sees `at`
+    at the next tick's start and the walk ends there. Empty when `start` is
+    already within it (the walk is complete before its first step). The body's
+    `walk` for the load-time replay (world/human_executor.check_script).
+    """
+    if within_proximity(start, target):
+        return []
+    positions = []
+    for microaction in steps_toward(start, target, step_size):
+        positions.append(microaction.params["target_pos"])
+        if within_proximity(positions[-1], target):
+            break
+    return positions
 
 
 # =============================================================================
