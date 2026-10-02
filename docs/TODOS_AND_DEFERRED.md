@@ -4035,6 +4035,11 @@ an empty pool it stays at the bay; the human walks up to it for the last scan: 8
 at 301 (env_layout_03), 8.11 cm at 299 (env_layout_04); 9 / 8 / 8 ticks below `min_separation` with a standing robot, 0
 with a moving robot. An instance produced by the scenario, not authored for it. PROPOSAL for stage 1, NOT RULED: an
 authoring convention that the robot's last assigned task is a return.
+PROPOSAL CLOSED, NOT TAKEN (Hadi, 2 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", THE MPB ON
+DOCK_LOADING, MPB-DL4): the robot's pool is unordered and the meta-planner selects by cost, so an author cannot fix the
+last task without constraining the selection. In its place the MPB on dock_loading reports, per room, the ticks below
+`min_separation` with a standing robot, beside the violations with a moving robot. These counts serve Hadi's later
+ruling on whether to reopen this item. Nothing is ruled on this item itself.
 Files: domains/kitting/ (the scenario), analysis/tb1a_destination/sep_classes.py (the measure)
 Reference: docs/assumptions.md 4.2, 4.5, 4.6; design_decisions.md, F1; TODO-96, TODO-137, TODO-144
 
@@ -4464,5 +4469,7 @@ BUILT (edbe34f, 1 October 2026). CORRECTED (records, 2 October 2026; T-G records
 so the wait is 45 ticks and the human's absence about 110 ticks (C6 on env_layout_02: the dry bay left at 30, the frozen
 bay reached at 141), a little more than one round trip of the robot (about 96 ticks); the value is reviewed with the
 MPB's design.
+REVIEWED (Hadi, 2 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", THE MPB ON DOCK_LOADING, MPB-DL5):
+the value stays 90 seconds for the MPB. Reason: no value is changed for a test set.
 Files: domains/dock_loading/tasks.py (`office_break`)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B6
