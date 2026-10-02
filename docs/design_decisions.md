@@ -5,8 +5,8 @@ This is a living reference of *why* things are designed the way they are.
 
 > **The records split (Hadi, 2 October 2026).** This file holds the conceptual design. The record of planning and
 > building (domain rulings, staging, plans, build blocks with commits, acceptance, test-bed sets and their method,
-> expectations, dispositions, results) moved verbatim to `docs/records/<task>.md`, one file per task. An index line
-> `→ RECORD [<id>]` stands where each block was and names the file; there the block is headed by this file's entry
+> expectations, dispositions, results) moved verbatim to `docs/design_records.md`, under one heading per task. An index
+> line `→ RECORD [<id>]` stands where each block was and names the file; there the block is headed by this file's entry
 > title and the same id. Where a new ruling goes: CLAUDE.md, "Where a ruling is recorded".
 
 > **Terms:** `docs/glossary.md` gives each term one meaning. The entries below are the HISTORICAL
@@ -978,7 +978,7 @@ phase-2 branch mirrors `_get_expected_position()`: target zone = the kitting tab
 under which there is still no boost during the carry until the human reaches the table.
 0.797 stands either way.
 
-→ RECORD [phase4/1] (moved verbatim, 2 October 2026): docs/records/phase4.md, under this entry's title: the crossings after the change (the table of the six runs).
+→ RECORD [phase4/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: the crossings after the change (the table of the six runs).
 
 KNOWN DEPENDENCY, recorded so it is not mistaken later: with one chord per leg, the kernel
 alone decides whether any mid-approach reveal exists. Under the current linear kernel one
@@ -1917,7 +1917,7 @@ it. Two effects, both left alone — the walk finishes ceil(dur) − dur ticks l
 starts up to one step off the projected start, so it can be a whole step longer. No safety margin is
 added anywhere to absorb any of this.
 
-→ RECORD [phase4/2] (moved verbatim, 2 October 2026): docs/records/phase4.md, under this entry's title: MEASURED (L2) and its CONSEQUENCE.
+→ RECORD [phase4/2] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: MEASURED (L2) and its CONSEQUENCE.
 Files: shared/projection.py (`Projector.__init__`, `build_segments`, `project_human`),
 mesa_sim/executor.py (`ACTION_COMPLETION_LATENCY`), mesa_sim/sim_agents.py (`OBSERVATION_OFFSET`,
 Projector construction), analysis/l2_execution_lag/ (deleted in the analysis cleanup, September 2026; carried in the L2 entry of design_decisions.md and TODO-77)
@@ -2032,7 +2032,7 @@ argmin of T_r alone, no human consideration, no hold, no filter) exists for comp
 ablation; both use the same T_r, so their difference is realization's effect and nothing else. The run
 header (`[run]`, TODO-78) names `gate_strategy`, `cost_strategy`, θ, ρ and `min_separation`.
 
-→ RECORD [phase4/3] (moved verbatim, 2 October 2026): docs/records/phase4.md, under this entry's title: MEASURED (T10) and the finding behind F1.
+→ RECORD [phase4/3] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: MEASURED (T10) and the finding behind F1.
 Files: shared/meta_planner.py (`_replan_tasks`, constructor, properties), shared/types.py
 (`UpdateResult.hold` doc), mesa_sim/sim_agents.py (`[run]`, MetaPlanner construction),
 mesa_sim/sim_model.py, mesa_sim/run_mesa.py (`--cost_strategy`, `[sep] min=`),
@@ -2428,7 +2428,7 @@ SUPERSEDED IN PART (T-D X, X2, ruled by Hadi 29 September 2026): the blocked eve
 added. The refusal adds no information the mind needs; P4's `projection_expired` and L2 (ii)'s retraction re-decide on
 where the human is. The separation stop (C) is unchanged. design_decisions.md, "T-D X: response".
 
-→ RECORD [phase4/4] (moved verbatim, 2 October 2026): docs/records/phase4.md, under this entry's title: MEASURED (the D2 sweep, PRIOR-ON and PRIOR-OFF) and the baselines.
+→ RECORD [phase4/4] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: MEASURED (the D2 sweep, PRIOR-ON and PRIOR-OFF) and the baselines.
 Files: shared/meta_planner.py (`evaluate_triggers`, `update_human_projection`, `_projected_hypothesis`),
 shared/io_contracts.md (§2.2), CLAUDE.md, docs/roadmap.md, docs/TODOS_AND_DEFERRED.md (48, 54, 68, 80),
 docs/recognizer_handback.md (§5 pointer), analysis/d2_recognition_trigger/
@@ -2698,7 +2698,7 @@ implement piecemeal". Read against the code as it stands:
     segments, in order; not assumed to be one task" ("The robot can wait", INPUT), and the closed-form
     shift intervals are per segment pair. What it does today with such a plan is ONE δ at the decision
     position; whether that is what B3.B wants is the open point below.
-→ RECORD [T-B/1] (moved verbatim, 2 October 2026): docs/records/T-B.md, under this entry's title: "Do not implement piecemeal" replaced by an order (PROPOSAL), OPEN POINT 1 and 2, THE ONE-TABLE EXPECTATION, MEASURED, THE EVALUATION, the two-table consequence to measure, THE FIXTURE SIDE, ONE DESIGN QUESTION BEFORE THE LAYOUT IS WRITTEN.
+→ RECORD [T-B/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: "Do not implement piecemeal" replaced by an order (PROPOSAL), OPEN POINT 1 and 2, THE ONE-TABLE EXPECTATION, MEASURED, THE EVALUATION, the two-table consequence to measure, THE FIXTURE SIDE, ONE DESIGN QUESTION BEFORE THE LAYOUT IS WRITTEN.
 RESOLVED (T-B1a, September 2026): a fact of the station, declared in the layout; one hypothesis per item.
 See "An item's destination table is a fact of the station". The items × tables consequence above no
 longer applies.
@@ -2750,7 +2750,7 @@ Reference: T-A1, September 2026; TODO-28; R1; T6
 
 **The pipeline from T-A: what moved, and why (T-A1)**
 
-→ RECORD [T-A/1] (moved verbatim, 2 October 2026): docs/records/T-A.md, under this entry's title: the whole entry (the order of work from T-A).
+→ RECORD [T-A/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: the whole entry (the order of work from T-A).
 
 **β is a physical tolerance on wasted path, fixed, decided on IR grounds (T-A1)**
 
@@ -3197,7 +3197,7 @@ the CURRENT TASK: `b2a` is unchanged (it realizes the current task alone; contin
 the winning ordering is not stored, and the internal queue stays in pool order ("B3.B on plain cost: the
 internal queue stays in pool order").
 
-→ RECORD [T-B/2] (moved verbatim, 2 October 2026): docs/records/T-B.md, under this entry's title: AS BUILT, CHECKED (DOMINANCE, THE HEAD'S HOLD, BEHAVIOUR, IDENTITY), A FINDING FOR T-B3, NOT PART OF THIS DECISION.
+→ RECORD [T-B/2] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: AS BUILT, CHECKED (DOMINANCE, THE HEAD'S HOLD, BEHAVIOUR, IDENTITY), A FINDING FOR T-B3, NOT PART OF THIS DECISION.
 
 Files: shared/realization.py, shared/types.py (`RealizedPlan`), shared/meta_planner.py (`_replan_orderings`),
 shared/io_contracts.md (§1.11, §2.2, §2.2c), docs/glossary.md, docs/roadmap.md, CLAUDE.md,
@@ -3272,7 +3272,7 @@ GONE WITH THE TRIGGER (D3, September 2026): the case the fixtures showed, the re
 longer occurs; the residual measured at those decisions is gone with them. The body's rule stands for any other
 re-decision that reloads on an owed tick.
 
-→ RECORD [T-B/3] (moved verbatim, 2 October 2026): docs/records/T-B.md, under this entry's title: WHAT REMAINS UNCOMPENSATED, MEASURED, THE ACCEPTANCE CRITERION THAT WAS WRONG, CORRECTED.
+→ RECORD [T-B/3] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: WHAT REMAINS UNCOMPENSATED, MEASURED, THE ACCEPTANCE CRITERION THAT WAS WRONG, CORRECTED.
 
 Files: mesa_sim/executor.py (`_reload`, `_owed_completion`, `step()` 1b, `continue_plan`, `hold`,
 `_on_task_complete`), mesa_sim/sim_agents.py (`continue_plan` call), analysis/tb1a_destination/README.md,
@@ -3413,7 +3413,7 @@ marker reaches the recognizer or the meta-planner. The framework statement (Hadi
 robot reads and plans around the human; what the human produces is not the object. An abandoned delivery is in
 scope for what it does to the robot (retraction, `unknown`, re-planning), not for the human's output.
 
-→ RECORD [T-C/1] (moved verbatim, 2 October 2026): docs/records/T-C.md, under this entry's title: RECORDED FOR T-D; AS BUILT (T-C2b), sequential expansion and THE ACTION-LEVEL HUMAN EXECUTOR; AS BUILT (T-C2c), the SCENARIO-AUTHORING CONVENTION; SUPERSEDED IN PART (Track 2.5); T-C2, THE BUILD.
+→ RECORD [T-C/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: RECORDED FOR T-D; AS BUILT (T-C2b), sequential expansion and THE ACTION-LEVEL HUMAN EXECUTOR; AS BUILT (T-C2c), the SCENARIO-AUTHORING CONVENTION; SUPERSEDED IN PART (Track 2.5); T-C2, THE BUILD.
 Reference: T-C1, 23 September 2026; "The human's scenario is an action script" (T-A1); "A run-time deviation is
 the same operation as a load-time edit" (Phase 7); TODO-86, TODO-87, TODO-85, TODO-88, TODO-15, TODO-92
 
@@ -3596,7 +3596,7 @@ replaces the representation.
    instance is, and its interruption is judged on its own. `TASK_ABSENT` arises from human-only tasks and from
    `PersonalTask`s omitted per experiment. The queries replace labels A and B, `Provenance`, `Deviation`, string anchors
    and the key-counting `check_work_order` (`unperformed` replaces it).
-→ RECORD [T-H/1] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: item 7, the stream's format (ccode's choice).
+→ RECORD [T-H/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: item 7, the stream's format (ccode's choice).
    `world_state_builder` exposes nothing of the human's stack; a test guards it (T-H2).
    SIMULATION ONLY: the record, coverage and the oracle IR exist in simulation only. A real human needs annotation of
    the same form.
@@ -3613,12 +3613,12 @@ replaces the representation.
    the existing `duration_key` mechanism, not `parameter_types`. The projector takes a stand's duration from the
    instance's binding.
 
-→ RECORD [T-H/2] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: 10. NOT PART OF T-H (its first part).
+→ RECORD [T-H/2] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: 10. NOT PART OF T-H (its first part).
       SETTLED BY T-D R (27 September 2026): "inside `unknown` or outside it": outside; the adequacy finding takes the explanatory role; T-D Q1 itself unchanged, P's building block. design_decisions.md, "T-D R and E".
     - Oracle-IR evaluation: its own pipeline task after T-H (TODO-101). Three conditions on the same scenario: no IR;
       IR; oracle IR, where the meta-planner receives `truth_at(tick)` instead of the belief. `truth_at` enters the
       robot's mind only through that condition's explicit adapter.
-→ RECORD [T-H/3] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: item 10, Alternative 1 and nested interruptions; 11. ACCEPTANCE ACROSS T-H; THE BUILD; RECORDED AT WRITING (its first items).
+→ RECORD [T-H/3] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: item 10, Alternative 1 and nested interruptions; 11. ACCEPTANCE ACROSS T-H; THE BUILD; RECORDED AT WRITING (its first items).
 - (T-H1, as built) The knowledge objects live in one module, `shared/knowledge.py` (was `shared/domain_knowledge.py`):
   `ProceduralKnowledge` (was `DomainKnowledgeBase`; with `DomainModel` and its `intentions` it replaces: tasks,
   methods, actions, microactions, costs, how things are done), whose two forms are `Tree` and `TaskModel`, and
@@ -3627,7 +3627,7 @@ replaces the representation.
   landmark rule is checked in `Tree`'s constructor, the `HumanOnlyTask` rejection and the every-`WorkTask`
   requirement in `TaskModel`'s: the robot's inference reads no human-only-ness, construction-time validation of the
   knowledge objects may.
-→ RECORD [T-H/4] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H1, as built) where the destination check runs.
+→ RECORD [T-H/4] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: (T-H1, as built) where the destination check runs.
 - (T-H1, as built) The planner's entry points (`plan`, `decompose`, `is_complete`) take a `TaskInstance` and check
   its schema against their knowledge by identity (`ProceduralKnowledge.holds`); no task is looked up by name. A
   `HypothesisKey` holds its schema object (its `task_name` is the schema's name), so the recognizer and the projector
@@ -3686,7 +3686,7 @@ replaces the representation.
   `Unfired`, `Refused` and `INFEASIBLE` of the replay is a `ScriptError`; at run time they are recorded (the robot's
   effects). Several events per entry fire in authored order, each replayed against the state the previous one
   leaves. The exporter and the viewer's buttons are Phase 7's; `inject` is `HumanAgent.inject(decision)`.
-→ RECORD [T-H/5] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H3, as built) THE MIGRATION.
+→ RECORD [T-H/5] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: (T-H3, as built) THE MIGRATION.
   RULINGS ON THE PLAN (Hadi, 25 Sept 2026): (Q1) an interruption made of a walk to a landmark and a stay (scenarios
   03, 22, 52, 93) is one decision: the `HumanOnlyTask` `go_to_and_stand(?landmark, ?duration)` (proposed as `pause_at`,
   renamed at the report's confirmation for the literal name) = [`move_to(?landmark)`,
@@ -3698,7 +3698,7 @@ replaces the representation.
   the end of the run": the empty stack is the state a stand with no duration would have stood for, so no such stand
   exists. The duplicate check on `assigned_tasks` stays on task instance keys (TODO-107, settled with T-H4's task
   equality). `ProceduralKnowledge.get_action_schema(name)` removed with its last reader.
-→ RECORD [T-H/6] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H3) CHECKED; (T-H4) the open point on `assigned`.
+→ RECORD [T-H/6] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: (T-H3) CHECKED; (T-H4) the open point on `assigned`.
 - (T-H4, as built) THE QUERIES. `world/queries.py`, pure functions on the in-memory `Record`, importing `shared/` only:
   `truth_at(record, tick)` (the tick's `Snapshot`), `switches(record)` (every applied `Start`, authored or injected, on
   a task or on the empty stack; a `Drop` is not a switch but `Left(ABANDONED)`), `resumptions(record)`,
@@ -3729,10 +3729,10 @@ replaces the representation.
   `BindingAbsent` with its stated binding (ruling on the plan, Q1: the prompt's two-step rule gave s85's wrong-table
   delivery `COVERED`, since the table is determined and never enumerated); else `Covered`. A determined parameter
   with a lookup other than `destination_of` is an error, never silently `COVERED`.
-→ RECORD [T-H/7] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H4) THE COVERAGE LINE.
+→ RECORD [T-H/7] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: (T-H4) THE COVERAGE LINE.
   THE ORACLE SEAM (TODO-101, recorded, not built): the adapter takes `truth_at(record, tick).stack[0]` and
   `coverage(top, robot)`; a `Covered` carries the `HypothesisKey` to put the belief's mass on.
-→ RECORD [T-H/8] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H4) CHECKED.
+→ RECORD [T-H/8] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: (T-H4) CHECKED.
 - (T-H follow-up, as built) SCENARIO COMPOSITION AND SCENARIO COVERAGE (Hadi, cchat, 26 September 2026). Batch runs
   and the viewer will select scenarios by what they contain; a tag declared on the scenario would be a second copy of
   the script and could drift, so both are computed at load and never stored: `ScenarioConfig` keeps its fields (id,
@@ -3756,7 +3756,7 @@ replaces the representation.
   every registered kitting scenario in the same form, on its registered layout and the declared task model.
   Selection by composition or scenario coverage is not built (TODO-110). Of the registered scenarios, s42 is the one
   whose scenario coverage the exemption decides (`MODELLED_ONLY`; its script ends with `go_to(corner_SE)`).
-→ RECORD [T-H/9] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H follow-up) CHECKED.
+→ RECORD [T-H/9] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: (T-H follow-up) CHECKED.
 Reference: Hadi's ruling and the rulings on the review, 25 September 2026; docs/handoffs/handoff_T-H.md; "The human
 action script (T-C1, decided)"; "Terms for human behaviour, model coverage and the robot's inference (ruled)"; "A
 run-time deviation is the same operation as a load-time edit" (Phase 7); TODO-80, TODO-85, TODO-86, TODO-87, TODO-92,
@@ -3802,7 +3802,7 @@ THE RULINGS.
      space's bounds (ruling a: objects are not obstacles for a start, since a walk ends at an object's position, T9;
      shapes and footprints are outside T-L). A failure names the mismatch. The load-time replay follows as today.
      Validity is not selection: nothing ever enumerates the product of artefacts; runs are chosen explicitly.
-→ RECORD [T-L/1] (moved verbatim, 2 October 2026): docs/records/T-L.md, under this entry's title: THE STATED TABLE (ruling b).
+→ RECORD [T-L/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: THE STATED TABLE (ruling b).
    - Domain independence: no domain string enters `shared/` or the loader; which types need a designation is read from
      the schemas (`Tree.get_types_with_destination`), as T-B1a ruled.
 
@@ -3819,7 +3819,7 @@ THE RULINGS.
    scenario's first reference layout. A run on a layout outside the scenario's `reference_layouts` is valid and is not
    a baseline; to make it one, the author adds the layout's id to `reference_layouts`.
 
-→ RECORD [T-L/2] (moved verbatim, 2 October 2026): docs/records/T-L.md, under this entry's title: 4. NAMING, with FORM AMENDED; 5. REGISTRATION BY DISCOVERY; 6. BASELINES ARE KEYED BY THE RUN (THE TRIPLE LINE).
+→ RECORD [T-L/2] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: 4. NAMING, with FORM AMENDED; 5. REGISTRATION BY DISCOVERY; 6. BASELINES ARE KEYED BY THE RUN (THE TRIPLE LINE).
 
 7. SELECTION AND OVERRIDES.
    - Selection by composition and coverage is TODO-110, after this refactor, over the declared pairs.
@@ -3837,14 +3837,14 @@ THE RULINGS.
      `--override <path>=<value>` covers a single tweak. The viewer reads and edits the same file. Overrides apply at
      load only; a change during a run is Phase 7's injection path, not an override.
 
-→ RECORD [T-L/3] (moved verbatim, 2 October 2026): docs/records/T-L.md, under this entry's title: 8. SEQUENCING (stages 1 to 4, BUILT); ACCEPTANCE.
+→ RECORD [T-L/3] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: 8. SEQUENCING (stages 1 to 4, BUILT); ACCEPTANCE.
 
 SUPERSEDES IN PART: "An item's destination table is a fact of the station" (T-B1a): the storage of the destination
 moves from the layout to the setup; the form stands (note in place). CLAUDE.md's and
 `docs/handoffs/handoff_T-D_onward.md`'s rules on fixture registration and scenario numbering, and, for T-L's stages
 only, CLAUDE.md's rule that `domains/dock_loading/` is not modified (notes in place).
 
-→ RECORD [T-L/4] (moved verbatim, 2 October 2026): docs/records/T-L.md, under this entry's title: MEASURED AT RECORD TIME, CLOSED BY RULING a.
+→ RECORD [T-L/4] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: MEASURED AT RECORD TIME, CLOSED BY RULING a.
 Files (stage 1 onward): shared/types.py (`ScenarioConfig`), mesa_sim/sim_model.py (the loader and validator),
 mesa_sim/run_mesa.py (`resolve_model_params`), mesa_sim/list_scenarios.py, domains/kitting/ and domains/dock_loading/
 (`env_layout*.json`, `scenarios.py`, `registry.py`), configs/experiment.yaml, tests/
@@ -3916,7 +3916,7 @@ E, ruled.
   158): a rival on the same bearing is refuted only as its unpriced standing is charged, L ≤ 1/3 at
   v·(s − s_exp) ≥ ln 5 / β = 160.9 cm. The price of the gradient E10 chose over a cliff; a design property, not a defect.
 - Limitations recorded, not built: (a) sub-threshold waste is not summed across phases; an episode-level test by convolution of the phase density is the form to add if a ground-truth case demands it; (b) a regress at the proximity threshold (30 cm) is a phase change and resets that hypothesis's test; (c) the aggregate false-unexplained count per run grows with the number of phases of the true hypothesis; reopening condition: data establishing a null whose spread depends on phase duration reopens the reference distribution and the per-phase unit of α together.
-→ RECORD [T-D/1] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Dependencies to verify in the build; Staging; For the Stage 1 build.
+→ RECORD [T-D/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Dependencies to verify in the build; Staging; For the Stage 1 build.
 
 Reference: TODO-95 (its recognition level closed by this entry), TODO-59 (deferred part), TODO-85 (a), TODO-63, TODO-101,
 TODO-97, TODO-87; handoff_T-D_onward.md item 6; `docs/glossary.md` §5 and §7; I4c; T-A1; "Terms for human behaviour,
@@ -3932,7 +3932,7 @@ session 1.4), its "Findings for cycle 1.5". The four rulings, verbatim:
 - E9, s_exp from the Projector's attribution (from 1.4 finding 2). s_exp for a phase equals the Projector's priced stationary ticks that fall within that phase's span, derived from the Projector's own execution sequence (walk latency, action, action latency; for wait_at, walk latency, the bound duration, action latency). In kitting this gives 2 for pick_up and place; a walk phase entered from a completion receives the preceding completion's latency tick; the initial walk, with no preceding completion, receives 0. No new duration constant; the body's and the Projector's timing remain authoritative. Consequence: the recognizer and the Projector charge the same physical ticks to the same phase; the apparent "resolved" tick after a boundary disappears, and the finding stays unresolved until the walk has produced evidence. I3's phase rule is unchanged: this is an attribution correction inside the existing phase structure.
 - E10, standing as belief evidence (from 1.4 finding 4; revises E3 and narrows I4c). The belief and adequacy use the same phase-level statistic D through two functions: the belief's evidence per phase is L(v·D), adequacy's is S(v·D). For a walking phase without standing D = e/v and L(v·D) = L(e), so ordinary walking evidence is unchanged. In a stationary phase, standing within the Projector-priced duration gives D <= 0, hence L = 1, no belief penalty (D < 0 is clipped to L = 1, the moving-target case being outside the model); standing beyond the priced duration contributes v·(s − s_exp) and penalises the hypothesis in the belief as excess path does. D replaces the previous value within a phase and folds at the advance, as the excess does: one observation per phase. E3's "time enters adequacy only" is superseded; I4c narrows to "a stationary tick within a phase's priced standing is not a charge". Measured: the coffee walk ties with item_5 at 0.498 and the 30-tick stand moved only the finding, so coffee_break was never revealed and s05_02's 31-tick hold was lost. Rejected: charging rivals through the completion channel's false-alarm rate on an arrival (a cliff where the design has a gradient).
 - G1, the guard on admission (from 1.4 finding 3; the first ruling of G, ahead of the cycle order because it is one condition). Admission requires the leader to be adequate in its own phase: the leader is a member and S_leader >= alpha. The recognizer reports per-hypothesis adequacy as a categorical value beside the finding (adequate, inadequate, no observation); the meta-planner still receives no alpha and no S_k. Aggregate adequacy is existential over the live hypotheses, while admission concerns the one hypothesis the planner proposes to act on; these are different questions, and the aggregate finding would admit a stale leader whose own phase is inadequate whenever a weaker hypothesis is adequate. _clears_gate stays the one home of the rule, so recognition_changed fires and refuses on the same condition. When the guard refuses, the behaviour is today's below-theta behaviour; the observation-based projection is P. TODO-97 unchanged. Measured: a lone hypothesis admitted at the boundary on no evidence; the wrong-table delivery admitted at 76 and 79 while unexplained; prior off, the robot's own remaining item admitted with holds of 33 to 89 ticks.
-→ RECORD [T-D/2] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: CYCLE 2 INPUT (1.5c).
+→ RECORD [T-D/2] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: CYCLE 2 INPUT (1.5c).
 
 Three rulings made at the Stage 1 plan step (cycle 1, session 1.3; Hadi, 27 September 2026), recorded until now in
 `docs/recognizer_handback.md` (§1.5, §1.7, §1.10) and not in this entry:
@@ -3959,7 +3959,7 @@ Three readings from the E6 amendment's build (cycle 1, session 1.3b), recorded a
   SUPERSEDED (1.5c, 27 September 2026): no hypothesis is a member on a boundary tick, a stationary phase the boundary
   opens included (E8's boundary clause applied generally; E6, second amendment, above).
 
-→ RECORD [T-D/3] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Staging, cycle 1.5.
+→ RECORD [T-D/3] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Staging, cycle 1.5.
 Reference: `analysis/td_stage1/REPORT.md` (findings 1 to 5); `docs/recognizer_handback.md` §1.5, §1.7, §1.10; I3; I4c;
 TODO-97, TODO-113; TODO-87 (1.4 finding 5, L)
 
@@ -3987,7 +3987,7 @@ Alternatives set aside. An observe-only run mode: a switch around the design, it
 is a real case. Keeping triggers alive after the terminal return: `no_current_task` would fire on every tick, against
 D3's definition of a trigger as a change in what the last decision rested on.
 
-→ RECORD [T-D/4] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Consequences recorded (TB.2b).
+→ RECORD [T-D/4] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Consequences recorded (TB.2b).
 
 Files: mesa_sim/sim_agents.py (`RobotAgent.step`, `finished`). Built in TB.2b.
 Reference: cchat, 27 September 2026 (TB); D3; "The IR test-bed" (below), whose runs need it; TODO-33, TODO-121;
@@ -3997,7 +3997,7 @@ Reference: cchat, 27 September 2026 (TB); D3; "The IR test-bed" (below), whose r
 
 **The IR test-bed (TB, ruled by Hadi, 27 September 2026)**
 
-→ RECORD [T-D/5] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: the whole entry: Purpose, Rules, the layout, the setup, the scenarios, the expectations, the comparison, Sessions, CORRECTED IN PLACE, Files, Reference, TRACK COMPLETE.
+→ RECORD [T-D/5] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: the whole entry: Purpose, Rules, the layout, the setup, the scenarios, the expectations, the comparison, Sessions, CORRECTED IN PLACE, Files, Reference, TRACK COMPLETE.
 
 **T-D L: the belief lifecycle (ruled by Hadi, 27 September 2026)**
 
@@ -4140,7 +4140,7 @@ only (session L-records); built in L-build.
   (13 after the boundary at 33, θ at 46; TB.4b's 32 ticks, θ at 64, were before L); scenario_s09_13, the resumed
   delivery 14 ticks after its resumption at 107 (16 after the boundary at 105, θ at 121).
 
-→ RECORD [T-D/6] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Staging for L-build; BUILT (L-build).
+→ RECORD [T-D/6] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Staging for L-build; BUILT (L-build).
 Files (L-build): shared/recognizer.py (`update`, `_task_boundary`, `_completed`, `_begin_episode`, `_adequacy`),
 shared/meta_planner.py (`evaluate_triggers`), analysis/ir_testbed/ (the oracle), the four maintained baseline sets.
 Reference: cchat, 27 September 2026 (L); "T-D R and E" (R4, R6, E1, E7, E8, E9, E10, G1); "The IR test-bed" (its
@@ -4243,20 +4243,20 @@ Mechanics ruled.
   `Projector.arrival_radius`, the body's radius a projected walk already stops at (T9).
 - SUPERSEDED BY P4 (28 September 2026), with rule 5 that produced it: the wait, the body's wait branch and the
   executor's owed-ticks handling for it are removed as unreachable; the terminal test is again "no current task".
-→ RECORD [T-D/7] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: As first ruled: the wait.
+→ RECORD [T-D/7] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: As first ruled: the wait.
 - `UpdateResult.horizon` carries the winner's assessed horizon (its `RealizedPlan.horizon`) to the body, which passes
   it to `set_assessed_window` and derives nothing.
 - SUPERSEDED IN PART BY P4: the `HumanProjection` types are removed (their reason was the per-candidate span and the
   refusal); the human projection is again `Optional[ProjectedPlan]`.
-→ RECORD [T-D/8] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Confirmed at the P plan step.
+→ RECORD [T-D/8] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Confirmed at the P plan step.
 Unchanged: `realize()`, `_clears_gate()`, G1, the trigger set, the recognizer, the IR test-bed's oracle.
 
-→ RECORD [T-D/9] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: The deadlock (measured), with its SUPERSEDED IN PART (Track 2.5).
+→ RECORD [T-D/9] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: The deadlock (measured), with its SUPERSEDED IN PART (Track 2.5).
 RULED BY X (29 Sept 2026; design_decisions.md, "T-D X: response"): the occupied target has no special handling (X1);
 the blocked route (the human standing on the robot's walk to its target) gets no ruling of its own: see X1 (no
 special handling) and X2 (no blocked event).
 
-→ RECORD [T-D/10] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Consequence of ruling 3, recorded.
+→ RECORD [T-D/10] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Consequence of ruling 3, recorded.
 
 P4, PERSISTENCE (P reopened on design grounds, ruled by Hadi, 28 September 2026; supersedes P2's tail rule, P1's
 stand-for-the-candidate horizon, and rule 5).
@@ -4318,7 +4318,7 @@ scenario_s05_01 prior on, tick 92: an admitted projection with T_h = 4.00 and δ
 the arriving human, `[sep]` 6.96 cm. The bound: when the projected end is a terminal action, L1's boundary re-decides
 within the human's completion latency, so the exposure is those few ticks and the body's stop; the open part is a
 projection ending at a non-terminal action.
-→ RECORD [T-D/11] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: MEASURED AT (G-records).
+→ RECORD [T-D/11] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: MEASURED AT (G-records).
 A CLASS-3 READING, RECORDED UNDER THE PARKED P3 (Hadi, 29 September 2026, the MPB post-(iv) records; no reopening). The
 bound above ("when the projected end is a terminal action, L1's boundary re-decides within the human's completion
 latency") holds for a human on schedule. An admitted plan always ends at the task's terminal action; a human delayed in
@@ -4333,14 +4333,14 @@ of a fallback (the human stopped, turned or walked past; a departure from the pr
 is one candidate, not a ruling, because `min_separation` is the body's safety constraint); TODO-95's sustained
 stand; the no-decision on a reset tick; whether the wait's polling stands.
 
-→ RECORD [T-D/12] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: BUILT (P-build); SUPERSEDED: P reopened by P4; BUILT (P4-build) and the occupied target under P4.
+→ RECORD [T-D/12] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: BUILT (P-build); SUPERSEDED: P reopened by P4; BUILT (P4-build) and the occupied target under P4.
   CONSEQUENCE RECORDED (Track 2.5, 29 Sept 2026; docs/assumptions.md, 4.3 dropped as an assumption): approach-and-hold
   at the separation boundary is an observed consequence of P4, not an assumption: the robot walks to where realization
   against the observed stand clears it and holds there, about `min_separation` from the human (63.42 cm above), and
   reconsiders at each expiry. What else the robot may do is X's. Under Track 2.5's exit walk these logs complete.
   RULED BY X (29 Sept 2026; design_decisions.md, "T-D X: response", X1): no special handling; with an alternative task
   B3 selects on realized cost, with none the robot holds and the lengthening holds are an evaluation observation.
-→ RECORD [T-D/13] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: the observation-offset gap; P4's separation cost; P closed with P4.
+→ RECORD [T-D/13] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: the observation-offset gap; P4's separation cost; P closed with P4.
 
 Reference: cchat, 28 September 2026 (P, P Q2 reopened); T-D Q1 (handoff_T-D_onward.md, item 1, and its SETTLED
 note: P's building block); F1; R1; T3b; T9; T-B Q7; D2; "T-D L" (L2 (ii), L5 B); "T-D R and E" (G1); T-C2c's
@@ -4448,7 +4448,7 @@ every boundary that meets a recorded decision (TODO-119's G part).
 Unchanged: `realize()`; the trigger set; retraction as L2 (ii) rules it; P4's fallback projection; `_clears_gate` as
 the one home of the gate.
 
-→ RECORD [T-D/14] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Staging; BUILT (G-build).
+→ RECORD [T-D/14] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Staging; BUILT (G-build).
 Rulings at the plan step (Hadi, 29 September 2026):
 - The unresolved target. A `move_to` whose target position cannot be resolved has no observation warrant from
   movement; it can obtain observation warrant only through the entry-by-completion clause. Why: the movement source
@@ -4464,7 +4464,7 @@ Rulings at the plan step (Hadi, 29 September 2026):
   standing) and clears from 126 to 156 (before G, from 125); likewise scenario_s08_01 (from 126) and scenario_s09_10
   (from 109). The lone `coffee_break` on the exit walk has no competitor because the exit walk is unmodelled
   (`docs/assumptions.md` 1.1); a competing hypothesis is TODO-140's matter, not the gate's.
-→ RECORD [T-D/15] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Verified (G-build).
+→ RECORD [T-D/15] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Verified (G-build).
 
 Reference: cchat, 29 September 2026 (G); `docs/handoffs/handoff_G_X_onward.md` §3, §4; "T-D R and E" (R1, R3, R5, E5,
 E6, E8, the 1.5 guard G1); "T-D L" (L2 (ii), L4, L5 B); "T-D P" (P4); `docs/assumptions.md` 1.4, 2.2, 2.6, 3.3;
@@ -4490,7 +4490,7 @@ mechanism, and nothing is built. The rulings are labelled X1 to X5.
   robot leaves the occupied target through ordinary reconsideration; with none, it holds, and the lengthening holds
   (P4's consequence: a longer observed stand projected at each expiry) are an evaluation observation. Whether that
   behaviour is desirable is an evaluation result, not a claim of correctness.
-→ RECORD [T-D/16] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: X1, Verification.
+→ RECORD [T-D/16] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: X1, Verification.
   Set aside. A give-up threshold (a constant); a communication act (X5).
 
 - X2, the blocked event.
@@ -4558,13 +4558,13 @@ occupied target, P3); "T-D G" (AD1); "T-D L" (L2 (ii)); C; "After C"; D2; "Robus
 is not a meta_planner cost term" (`deliver_with_return`); `docs/assumptions.md` 3.4, 4.2, 4.4 to 4.6; TODO-80, TODO-95,
 TODO-96, TODO-97, TODO-130, TODO-135, TODO-136, TODO-137, TODO-141
 
-→ RECORD [T-D/17] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: Next: track 3.
+→ RECORD [T-D/17] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Next: track 3.
 
 ---
 
 **The meta-planner test-bed (MPB) (ruled by Hadi, 29 September 2026)**
 
-→ RECORD [T-D/18] (moved verbatim, 2 October 2026): docs/records/T-D.md, under this entry's title: the whole entry: Purpose, MPB-1 to MPB-6 with their AMENDED blocks, THE COVERAGE PRINCIPLE EXTENDED, the CLASS-2 FINDING and THE P-SIDE RESIDUAL, Staging, Unchanged, Reference, BUILT (MPB step 2), COVERAGE PRINCIPLE, the RECORD LINE (TODO-143), NOT CLOSED, PART (v), BUILT, CLOSED, WHAT THE MPB ESTABLISHES, FINAL NUMBERS, AUDIT TRAIL.
+→ RECORD [T-D/18] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: the whole entry: Purpose, MPB-1 to MPB-6 with their AMENDED blocks, THE COVERAGE PRINCIPLE EXTENDED, the CLASS-2 FINDING and THE P-SIDE RESIDUAL, Staging, Unchanged, Reference, BUILT (MPB step 2), COVERAGE PRINCIPLE, the RECORD LINE (TODO-143), NOT CLOSED, PART (v), BUILT, CLOSED, WHAT THE MPB ESTABLISHES, FINAL NUMBERS, AUDIT TRAIL.
 
 **T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)**
 
@@ -4584,7 +4584,7 @@ lifecycle of an entry of the human's list); recorded in A3 (RULED), B13, C1 (sta
 
 PART A. FRAMEWORK-WIDE RULINGS (every domain)
 
-→ RECORD [T-G/1] (moved verbatim, 2 October 2026): docs/records/T-G.md, under this entry's title: A1, V1 and FW.
+→ RECORD [T-G/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: A1, V1 and FW.
 
 - A2, terms (a glossary revision; no code is renamed for them). Mind, body, environment, simulator, container, area and
   monitored area are defined in `docs/glossary.md` §10, applicable in §6. "World" is not used for the environment
@@ -4866,13 +4866,13 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   A property of method selection, recorded: the planner takes the first method whose conditions hold (`_select_method`);
   the meta-planner compares realized costs across candidate tasks, each with that one method. A7 extends this.
 
-→ RECORD [T-G/2] (moved verbatim, 2 October 2026): docs/records/T-G.md, under this entry's title: A10, FW directions; A11, a note for T-F.
+→ RECORD [T-G/2] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: A10, FW directions; A11, a note for T-F.
 
-→ RECORD [T-G/3] (moved verbatim, 2 October 2026): docs/records/T-G.md, under this entry's title: PART B. DOCK_LOADING RULINGS: B1 to B11, and B12 to its AMENDED line on check-in and check-out.
+→ RECORD [T-G/3] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: PART B. DOCK_LOADING RULINGS: B1 to B11, and B12 to its AMENDED line on check-in and check-out.
   - A rule "the robot must not enter the delivery area with a pallet while a human is in it": not taken. A fixed
     prohibition contradicts the framework's claim; the requirement is that the robot is aware of the human and adapts,
     which the realization against the human projection with `min_separation` serves.
-→ RECORD [T-G/4] (moved verbatim, 2 October 2026): docs/records/T-G.md, under this entry's title: B12 from "A deadline on the robot's waiting", B13, B14; PART C. STAGING AND THE DOMAIN'S PRESENT STATE: C1 to stage 1's milestone ADDED line.
+→ RECORD [T-G/4] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: B12 from "A deadline on the robot's waiting", B13, B14; PART C. STAGING AND THE DOMAIN'S PRESENT STATE: C1 to stage 1's milestone ADDED line.
     - ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R2, framework-wide, a requirement on stage 1's plan: the agent's area in a computed
       state. After a movement action, the computed successor state represents the agent's resulting area consistently
       with the area fact that the environment would emit at the end of that movement. One definition of "the agent is in
@@ -4883,6 +4883,6 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
       carry the area after a walk makes the planner select the wrong method for a later task, with a wrong route and a
       wrong cost. B11 exposed it; the missing invariant is in the shared computed state, not in dock_loading. B11 is not
       reopened: R2 makes its ruled semantics representable in computed states;
-→ RECORD [T-G/5] (moved verbatim, 2 October 2026): docs/records/T-G.md, under this entry's title: C1 from "A3, A4, A5 and A9 each change code outside the domain" (stage 1's BUILT lines, stage 2, stage 3, the rulings with no stage), C2 to C6.
+→ RECORD [T-G/5] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: C1 from "A3, A4, A5 and A9 each change code outside the domain" (stage 1's BUILT lines, stage 2, stage 3, the rulings with no stage), C2 to C6.
 
-→ RECORD [T-G_stage1/1] (moved verbatim, 2 October 2026): docs/records/T-G_stage1.md, under this entry's title: STAGE 1 PLAN APPROVED; STAGE 1, STEPS 0 TO 5 BUILT; STAGE 1, STEPS 6 TO 8 BUILT; FINDINGS OF THE MILESTONE; NOTES FROM THE INDEPENDENT REVIEW; A STEP ADDED; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT; FINDINGS OF THE SECOND MILESTONE SCENARIO; RULED: T-G Q16 (T-G Q16's block) and the IR test-bed set; STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; RULED: THE MPB ON DOCK_LOADING (MPB-DL1 to MPB-DL6); DISPOSITIONS; THE SET; RULED ON THE SET; THE BUILD'S PLAN, CONFIRMED; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN; T-G STAGE 1 CLOSED; PROPOSALS; Reference; the Next lines.
+→ RECORD [T-G_stage1/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: STAGE 1 PLAN APPROVED; STAGE 1, STEPS 0 TO 5 BUILT; STAGE 1, STEPS 6 TO 8 BUILT; FINDINGS OF THE MILESTONE; NOTES FROM THE INDEPENDENT REVIEW; A STEP ADDED; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT; FINDINGS OF THE SECOND MILESTONE SCENARIO; RULED: T-G Q16 (T-G Q16's block) and the IR test-bed set; STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; RULED: THE MPB ON DOCK_LOADING (MPB-DL1 to MPB-DL6); DISPOSITIONS; THE SET; RULED ON THE SET; THE BUILD'S PLAN, CONFIRMED; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN; T-G STAGE 1 CLOSED; PROPOSALS; Reference; the Next lines.

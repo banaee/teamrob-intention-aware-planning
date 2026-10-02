@@ -1,0 +1,2412 @@
+# Design records: the record of planning and building
+
+Moved verbatim from `docs/design_decisions.md` on 2 October 2026 (Hadi's rulings of that day: the records split;
+one record file beside design_decisions.md, one heading per task). Each block is headed by the title of the entry it
+comes from and its id; in design_decisions.md an index line with the same id stands where the block was.
+
+## Phase 4 (4A to 4C: the I-series, the T-series, F1, C, D2, D3)
+
+**One leg is one observation — replace, do not multiply** — RECORD [phase4/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Crossings after the change (PYTHONHASHSEED=0; runs 20260910_1552xx — superseded as regression
+baselines by runs 20260911_0826xx after T2 rescaled projection time to execution ticks; the
+`theta_crossed` steps below are unchanged in those runs, the built/selected columns are not —
+see TODO-28 and TODO-30). `theta_crossed` = crossing events; "built" = admitted projections:
+
+| run      | first ≥ θ            | theta_crossed | built projections  | note |
+|----------|----------------------|---------------|--------------------|------|
+| s20 off  | 22 (0.797), grasp    | 22, 89        | 22, 24, 89, 96     | late-reveal condition |
+| s20 on   | **11 (0.780)**       | 11, 82        | 11, 23, 82, 95     | PRE-GRASP: human crosses x=0 into zone_SW at 11 (13.99 → −2.92) and ZONE_BOOST doubles item_3 (0.641 → 0.780); robot at (−393, 85), its move_to to shelf_4 completes at 21 — roughly half the approach; projection built, item_4 min_dist 14.98 at cost 812. This is the fixture condition B2 needs. It is a zone-state reveal on top of one honest chord (0.641), not an accumulation. |
+| s00 off  | 41 (0.797), grasp    | 41, 111       | 41, 63, 111, 131   | |
+| s00 on   | 41 (0.797), grasp    | 41, 81        | 41, 63, 81, 95, 131| leg-2 first chord 0.856 (carry-leg chord had already favoured shelf_2, 49° off, L 3.4) |
+| s10 off  | 257 (0.769), grasp of item_4 | 257   | 257, 262           | grasp of item_2 at 31 gives 0.662: item_2 : coffee : unknown = 4 : 1 : 1 — coffee has no item binding and survives the pin |
+| s10 on   | **107 (0.853) on item_6 — wrong** | 107, 257 | 107, 142, 200, 257, 262 | coffee-leg criterion FAILED, known consequence of TODO-46: `coffee_break` gets no chord evidence, so the walk to the coffee machine is credited to shelf_6 (27° off) and doubled on zone_SW entry |
+
+Every belief change in all six runs is attributable to a leg start, a discrete event, a
+quadrant crossing, or a world change (a robot-carried item's expected position moving with
+the robot — switch-off only, since those hypotheses are inadmissible switch-on). No
+per-step accumulation remains; within-leg values are flat to the third decimal.
+
+**Projection time includes what the body spends finishing an action, and the human's projection starts when it was observed (L2)** — RECORD [phase4/2], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+MEASURED (L2, `analysis/l2_execution_lag/REPORT.md` (deleted in the analysis cleanup, September 2026; carried in the L2 entry of design_decisions.md and TODO-77), TODO-77's own terms). The systematic whole-tick lag
+is gone: medians move from −1.46/−3.32 to −0.46/−0.32 for the robot (2- and 4-action plans) and from
+−2.21/−5.32 to −0.21/−1.32 for the human. What remains is exactly the two things above: a discrete-step
+forward model of the executor, using no execution data, predicts the actual release tick EXACTLY for all
+68 human and robot 2-action rows, and exactly one tick early for all 35 robot 4-action rows. That last
++1 is not quantisation and is not compensated either: the robot re-plans at its own `task_committed`
+trigger, which fires on the tick that would have acknowledged the `pick_up`; the fresh
+`deliver_already_held` plan does not contain that `pick_up`, so `continue_plan()` loads from the start
+and the carry begins on that very tick. One of the four charged latencies is never spent. Modelling it
+would mean the projection predicting the robot's own future triggers, which are decided FROM the
+projection — recorded in TODO-77, not fixed.
+
+CONSEQUENCE, and a correction to the expectation this task was set with. "B3 is plain-cost argmin, so
+any change comes from durations" is not what the code does: B3 is an argmin over candidates that
+`_detect_interference()` has not excluded, and that filter is still live. Across the ten sweep
+conditions the latency changed every cost (by one tick per action) and reordered NO candidate set at any
+of the 93 triggers compared. The single decision change in the sweep comes from the offset instead:
+with the two agents finally in phase, scenario_30's mirror crossing is projected as the near-coincidence
+it is (`min_dist` 15.37 → 0.49 cm, the continuous-time minimum of two agents passing through each other
+— `[sep]`'s 11.0 cm was the closest integer-tick sample), and the superseded `min_safe_distance = 1.0`
+excludes the candidate. Ablation confirms it: latency alone changes no decision, offset alone produces
+the whole change. That threshold is already superseded (R1; removed in T10), so the exclusion is a
+vestigial mechanism firing on a newly-accurate number, not a new policy.
+
+**B3 selects on realized cost: the argmin of T_r + δ over the realizable candidates, the winner's hold executed, plain cost when nothing realizes (T10)** — RECORD [phase4/3], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+MEASURED (T10; `analysis/t10_b3_realized/comparison.md` (deleted in the analysis cleanup, September 2026; carried in the T10 entry of design_decisions.md, TODO-36 and TODO-79); s00/s10/s20/s30 × prior off/on, run to
+completion, PYTHONHASHSEED=0; `plain`+`none`, `realized`+`none`, `realized`+`b2a` with ρ = 0.5):
+- PLAIN against L2: identical in every condition but s30_on, where at step 21 the superseded
+  `min_safe_distance` exclusion no longer fires and item_4 stays selected (the L2 report predicted
+  this). Plain is therefore the old B3 minus the vestigial filter, on the fractional T_r.
+- REALIZED against PLAIN — realization's effect. s00 (both priors): identical; every δ is 0. s10, s20,
+  s30: the same TASK ORDER except s20_on (below), reached later: the holds B2 executed under T4's
+  `b2a` are now B3's, at the same triggers with the same δ (s10 29/33/35 → 6, 2, 0; s20_off 20/24/30
+  → 7, 3, 1; s20_on 6/30 → 7, 1; s30_off 28/46 → 6, 1), plus s30_on 40/77 → 7, 1, which T4 did not
+  have because its old B3 had switched to item_2 at 21. 12 holds, 43 ticks held, 2 interrupted
+  (s10_off 29→33 and s20_off 20→24, the remainder re-decided as at T4). Completion slips by the held
+  ticks: s10 +6, s20_off +8, s30 +7/+8. ONE all-unrealizable event, s30_on 21 (the mirror crossing,
+  both candidates `hold_position_violated`): the fallback keeps item_4 on plain cost, which is what
+  plain does too; its residual conflict is the 0.00 cm pass-through at tick 23, inside that window.
+- REALIZED, `none` against `b2a`: IDENTICAL decision sequences, greps and holds in all eight
+  conditions. B2 continued exactly where B3 keeps the current task, and both escalations reach a B3
+  that decides as it would have without the gate. On these fixtures at ρ = 0.5 `b2a` is a computation
+  saving (one realization per trigger instead of one per candidate) and nothing else (TODO-36).
+- s40 (regression sweep only, `realized`+`none`): byte-identical to L2 on every grep — no δ > 0.
+- ACTUAL SEPARATION (TODO-79, `dist` and the continuous `min`): every moment below 50 cm is past T_h,
+  under no projection, after the robot finished, or inside the s30_on fallback's window, EXCEPT s10
+  tick 75 at 49.15 cm (both priors, both realized configurations) — TODO-77's step-quantisation
+  residual, inside the step-35 decision's window by 0.29 tick. The continuous minimum lowers the
+  crossing minima (s30 tick 23: 11.03 → 0.00; s20_off crossing: 11.64 at tick 51 → 9.02 over tick 52) and extends episodes by
+  one tick; it moves nothing from outside to inside.
+
+FINDING (RESOLVED by F1, "Robot-responsible separation", which redefined the violation; the mechanism
+below is corrected there: it was the robot's stationary placement, not its walk, that the joint-state
+rule counted), recorded at T10: s20_on, step 57 (`theta_crossed`, the human's next
+task admitted). The robot is carrying item_4, 3.95 projected ticks from placing it. The human has just
+placed at the table and is walking away, and at the trigger stands 37.5 cm from the robot — already
+inside `min_separation`. item_4's plan converges on the departing human at δ = 0 and its hold position
+is violated at step 1, so it is UNREALIZABLE; item_6's plan (return item_4 to its shelf first, then
+fetch item_6 — six actions) walks away from the human and realizes at δ = 0, cost 84.65. B3 selects
+item_6. Under plain the robot had delivered item_4 at 54 (no holds earlier); under realized the
+step-6 and step-30 holds placed the robot's arrival exactly where the human departs. Consequence:
+completion 292 vs 228 ticks (+64), item_4 delivered third instead of first, and the human passed the
+robot anyway (56–57: 35.1 cm, past T_h). RESOLVED (F1, next entry but one: the flag and the
+hold-position check are gone; item_4 wins at 57 with δ = 2). Mechanism as it was: realizability is a HARD GATE inside B3 whenever
+some candidate realizes — the argmin ranges over realizable candidates only, so an unrealizable
+candidate cannot win however short its plan — and `hold_position_violated` fires here not on a
+projected conflict but on the PRESENT state (the human already within `min_separation` of where the
+robot stands), which no hold can change and which afflicts every candidate whose first step converges.
+This is the over-reaction the wait revision set out to remove, returning through the realizability
+flag: switching cost 64 ticks to avoid a 4-tick completion whose "conflict" was the human leaving.
+The design as decided says this is what B3 does (the all-unrealizable fallback covers only the case
+where NOTHING realizes), so it was built as decided and is reported here. Where it belongs: T6 (the
+ablation will show it as the largest realized-vs-plain difference) and D2 / the R1 follow-up — whether
+an unrealizable current task a few ticks from completion should compete on plain cost, whether a
+present-state violation is a realization question at all, or whether this is `min_separation`'s value
+(TODO-28) at the table. Nothing here was tuned.
+
+**What a trigger is an event of: `recognition_changed` against the decision record replaces `theta_crossed`; the blocked event designed, not built (D2)** — RECORD [phase4/4], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+MEASURED (PYTHONHASHSEED=0; the sweep and the evaluation fixtures, prior off / on; baselines at the
+pre-D2 HEAD agree byte-for-byte with F1's and F47b's on the decision grep):
+- Fires of the replaced trigger, old `theta_crossed` → new `recognition_changed`: s00 5→4 / 2→4, s10 6→7 /
+  4→7, s20 7→4 / 2→4, s30 2→4 / 2→4, s40 5→10 / 5→10, s50 8→6 / 3→6, s70 5→6 / 3→6, s71 5→7 / 3→6. The new
+  count is two per human task everywhere (a recognition, then its end) except s71_off, where item_5 enters
+  twice (61 and 72): the robot's own `task_committed` at 69 fell inside item_5's dip (0.572), its admission
+  refused, the record was cleared, and item_5's next clearing of the gate is a new recognition. A property
+  of the rule, stated here: the record is what the LAST decision projected, whichever trigger made it, so
+  the guarantee is "no fire while a projection stands", not one fire per hypothesis. Every fire that retracts — admission `none(below_theta)` or
+  `none(unknown)` — decided a CONTINUE in all 16 conditions.
+- PRIOR-ON: decisions identical modulo the reason string and the added retraction continues in s00, s10,
+  s20, s30, s40, s50, s70 (completion 168 / 420 / 239 / 162 / 378 / 237 / 187, unchanged; `[sep]`
+  byte-identical). s71_on: the retraction at the human's boundary, step 54, replaces the last tick of the
+  32-tick hold placed against the coffee stay that ended on that tick (executed 31, interrupted); the
+  robot leaves one tick earlier, completion 204 → 203. Expected under T4's rule that a later decision
+  replaces the hold in progress.
+- PRIOR-OFF: the repeated crossings no longer decide (s00 113 / 115, s10 33 / 35, s20 and s50 24 / 30 /
+  91 / 95, s70 and s71 65); s20 and s50's first hold runs its 8 ticks in one piece instead of 4 + 4
+  (interrupted and re-realized at 24). Robot motion identical in s00, s10, s20, s30, s40, s50, s70
+  (`[sep]` byte-identical). Completion DECLARED two ticks later in s00, s20, s50 (166 → 168, 235 → 237,
+  235 → 237): the old `theta_crossed` on `unknown` at the robot's own last delivery (TODO-54) declared the
+  empty pool on that tick; nothing enters on `unknown` now, so `no_current_task` declares it when the
+  executor's bookkeeping learns of the completion, two ticks later. The run's behaviour is the same;
+  two trailing `[IR]` lines are the only other difference. s71_off: the boundary retraction at 54
+  interrupts the hold's last tick as prior-on, the switch to item_3 comes at 108 instead of 111,
+  completion 204 → 201.
+These are the meta-planner-side regression baselines from here on: `analysis/d2_recognition_trigger/`
+(`sweep/` for s00–s40, `fixtures/` for s50 / s70 / s71; logs local, README committed).
+
+## T-A, the pipeline revision
+
+**The pipeline from T-A: what moved, and why (T-A1)** — RECORD [T-A/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+REVISED ORDER (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): T-G no longer
+holds 4D or ROS (4D is in the T-D tail, ROS is T-S); T-E is superseded by T-V, track 1. The order stated below is
+history; the four decisions stand.
+
+DECIDED (cchat, September 2026, after reading the state in `analysis/big_picture/STATUS.md`). The plan from
+here is T-A (records) → T-B (B3.B on two tables) → T-C (the human action script) → T-D (robustness in
+kitting) → T-E (demonstration) → T-F (evaluation, Phase 5) → T-G (later: a second domain in Mesa, 4D,
+ROS); `docs/roadmap.md` holds it. Four decisions shape that order.
+1. B2 (`gate_strategy`) IS AN EVALUATION FACTOR, NOT A DESIGN STEP. STATUS.md named "does the commitment
+   gate survive?" as the first question for generated fixtures. It is not a question to answer before
+   other work: `none` and `b2a` are both built, nothing downstream depends on which one wins, and B3.B
+   leaves `b2a` unchanged (it commits to a task). So it is one factor of T-F's factorial, and no step
+   re-reads B2 first. TODO-36 closes on this.
+2. THE RANDOMISED HARNESS (TODO-47) MOVES TO T-F. It was "the next step" because three questions (B2, the
+   gate's reopening condition, the scale of `min_separation` and β) were said to be answerable only there.
+   Of these, B2 is a factor (1), the gate's reopening condition (TODO-47 (g)) is a T-F condition, and the
+   scale question is gone: `min_separation` is a distance the body supplies ("`min_separation` is supplied
+   by the body", above) and β is a physical tolerance ("β is a physical tolerance", below). What was
+   genuinely blocking is the ordering fixture, so TODO-47 (f) stays in T-B as hand-built two-table layouts,
+   with programmatic registration built there as the first part of fixture generation.
+3. THE DEMONSTRATION COMES AFTER T-B, T-C AND T-D. Built now it could show switch and hold (s70 / s71) only.
+   After them it shows what the framework claims: a two-table ordering, a change of mind, `unknown` as an
+   outcome, as well as switch and hold, plain against realized cost, the stop on, prior off.
+   SUPERSEDED IN PART (T-D R1, 27 September 2026): the `unknown` route no longer exists; its replacement is G. Not closed: the downstream response is G and X. design_decisions.md, "T-D R and E".
+4. THE DOCUMENTATION PASS FOR THE PAPER COMES BEFORE THE PAPER, NOT BEFORE THE DEMONSTRATION. The demo is
+   an instrument for seeing behaviour, and it needs the viewer, not polished documents; the paper needs
+   the record consolidated once the evaluation's content is known.
+Reference: T-A1, September 2026; `analysis/big_picture/STATUS.md`; TODO-36; TODO-47
+
+---
+
+## T-B, B3.B on two tables
+
+**B3.B (`full_reorder`) is lookahead for the choice of the next task, built next: geometry couples tasks in two-table kitting (DESIGN-16 revised)** — RECORD [T-B/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+"Do not implement piecemeal" is replaced by an order (PROPOSAL): the successor state and `project()` for
+orderings first, checked alone (a length-1 ordering byte-identical; a later entry equal to the same task
+projected alone from a world in which the earlier task has really been done); then B3.B on plain cost;
+then on realized cost, once the hold placement is decided. This is also the order of the evaluation.
+
+OPEN POINT 1: WHERE A HOLD THAT CLEARS A CONFLICT IN A LATER TASK IS PLACED. Two options:
+  (A) one δ at the decision position, the whole sequence shifted, as T4 / `realize()` does today;
+  (B) a hold at the boundary before the task it clears: δ_1 at the decision position for task 1 (today's
+      realization of task 1, unchanged), δ_2 where task 1 ended (at the table) before task 2 starts, and
+      so on. Each is still "a hold where the robot is", on a segment boundary: not a detour (4D) and not
+      partway along a segment (TODO-70).
+PROPOSAL (not decided): (B), for these reasons.
+  - Point 4. Only the head's hold is executed before the next re-decision. Under (A) a conflict in task 2
+    makes the robot stand NOW, before task 1, on the strength of a lookahead that is re-priced at the
+    next boundary: the executed hold would commit to the order, which point 4 says the order is not.
+    Under (B) `UpdateResult.hold` = δ_1 is exactly the hold `single_task` would execute for the same
+    head, so B3.A and B3.B differ in WHICH task is chosen and in nothing else, which is also what makes
+    the evaluation readable.
+  - Cost. The per-boundary minimal shifts are optimal among boundary placements and never cost more than
+    (A): with Δ_k the cumulative shift of task k, taking Δ_k = the smallest whole tick ≥ Δ_{k−1} outside
+    task k's violating intervals gives, by induction, Δ_k ≤ any feasible non-decreasing sequence's, and
+    (A)'s single δ is one such sequence. Task k's violating intervals do not depend on the earlier shifts
+    (positions are unchanged; the human's projection is fixed), so this is `realize()`'s one-pass walk,
+    once per entry. The cost of an ordering is Σ T_r + Δ_n.
+  - A concrete case in the current baselines (an illustration, not a specification): s00_on, the
+    `recognition_changed` decision with three candidates: item_7 costs 12.58 with δ = 0, T_h = 59.48,
+    and item_6 alone has δ = 8. In (item_7, item_6) a conflict can only lie in item_6; (A) would stand
+    the robot before item_7 for it, (B) at the table after item_7, if it is still there from the new
+    start.
+  AGAINST (B), to be weighed in cchat: the boundary is at a table, where the human converges. A standing
+  robot never violates (F1), but it may be in the human's way there more than at the decision position;
+  that is the team-level cost of TODO-15, not priced by either option. And (B) changes `RealizedPlan`
+  (one `delta` / `hold_position` today) to per-entry holds, where (A) needs no type change.
+
+OPEN POINT 2: WHAT B2 COMMITS TO UNDER B3.B, a task or an order. PROPOSAL (not decided): a task. B2 is a
+mid-task commitment gate on the CURRENT task (`b2a`: realize it alone, continue iff δ ≤ ρ × (T_h − now));
+under point 4 the order past the head was never committed to, so there is nothing of it to keep, and
+`b2a` runs unchanged. Committing to an order would need the order stored as decision state, against the
+one-field decision record (D2) and the unordered queue. Consequence to state in the build: `UpdateResult.queue`
+is then the winning order's tail, informational only; `_queue` order carries no commitment, as today.
+
+THE ONE-TABLE EXPECTATION, MEASURED. Point 1's "B3.A and B3.B cannot differ on any current fixture" is an
+expectation, not an identity. Two mechanisms can separate them on one table:
+  - the arrival point (T9): a delivery ends `arrival_radius` (30 cm in Mesa, 1.5 ticks) short of the
+    table on the side it approached from, so the next walk's length depends on the previous task by up
+    to that scale per boundary;
+  - point 3 itself: where T_h reaches past the head, orderings with the same head differ in the
+    conflicts of their later tasks. Measured on the graded-evidence baselines
+    (`analysis/g1_graded_evidence/sweep/`, the five fixtures, both priors): of the B3 decisions with an
+    admitted projection and more than one candidate, T_h exceeds the winner's cost in s00_on (1 of 3:
+    12.58 against 59.48), s10_off (2 of 3: 45.81 / 48.29, 37.27 / 67.05) and s10_on (3 of 4: 50.81 /
+    53.02, 80.09 / 110.05, 58.27 / 88.05), and in none of s20, s30, s40.
+The candidate gaps at those decisions are tens of ticks, so identical choices are still expected; but a
+difference there is to be traced to one of the two mechanisms, not presumed a bug. The byte-identity
+check is the default run: with `strategy` left at `single_task`, the greps must not move.
+
+THE EVALUATION (B3.A against B3.B, to be run when the build and the fixtures exist):
+  1. plain cost first (`cost_strategy` plain: geometry only, no human consideration) on the two-table
+     fixtures: does the head differ, and the completion tick (world fact, T6);
+  2. then realized cost on the same fixtures, under the hold placement decided from open point 1;
+  3. the current one-table fixtures under B3.B, expected identical in choice (above), as the check that
+     the lookahead adds nothing where geometry does not couple tasks.
+Needed for it and not present today: `strategy` has no run option (`gate_strategy` and `cost_strategy`
+do); the build adds one. The fixtures set no parameter and select no value (as T6).
+A consequence of two tables to MEASURE on those fixtures, outside B3.B: the recognizer's hypothesis space
+is the product over typed parameters, so `deliver_item` has items × tables hypotheses, and the two table
+hypotheses of one item share the fetch walk. With the assignment prior off, the belief is expected to
+split between them until the carry walk discriminates, which would move the admission of the human
+projection later than in one-table layouts. Expected from the code, not measured.
+
+THE FIXTURE SIDE (T-A1, September 2026; T-B1). A kitting layout with a second table on the opposite side
+of the room and each item assigned to one table. Example: items 4 and 6 go to the north table, item 7 to
+the south table. From the north table item 7 is the far task, so the orderings (4, 6, 7) and (4, 7, 6)
+differ in walking cost with no human present: that difference is what single-task selection cannot see,
+and it is the first thing the evaluation looks for (plain cost). Hand-built, registered programmatically
+(TODO-47 (a), built here as the first part of fixture generation).
+ONE DESIGN QUESTION BEFORE THE LAYOUT IS WRITTEN, OPEN: what kind of fact is an item's destination table?
+  - A DOMAIN fact: the domain model says where each item goes. One `deliver_item` hypothesis per item; the
+    recognizer knows the table from the domain, and the belief is as in one-table kitting.
+  - A WORK-ORDER fact: the table is a binding of the task instance, as `?kitting_table` is today. The
+    hypothesis space is items × tables; the assignment prior (when on) restricts it to the assigned
+    pairs. Expected recognizer effect with the prior off: the two table hypotheses of one item share the
+    fetch walk, so the belief splits between them until the carry walk discriminates, and the human
+    projection is admitted later than in one-table layouts. Expected from the code, not measured.
+The two readings put the same layout to different uses (the first tests ordering with the recognizer as
+it behaves now; the second also tests the recognizer on a split it has not met). The choice is cchat's.
+
+**One hold per entry: an ordering is realized by one minimal-shift search per entry, and B2 commits to the current task (T-B Q2, T-B Q3; T-B2c)** — RECORD [T-B/2], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+AS BUILT. `shared/realization.py`: `realize()` runs the searches and `_realized_segments()` places each
+entry at its cumulative shift, with the stationary stretch of each hold where it is taken.
+`shared/types.py`: `RealizedPlan.holds`, `.cumulative_shifts`, `.delta` (property). `shared/meta_planner.py`:
+`_replan_orderings()` realizes every ordering against the human projection (`cost_strategy realized`) or none
+(`plain`) and ranks on `RealizedPlan.cost`. Orderings with a common prefix share no work (accepted at
+review, ccode's reasoning): sharing the prefix's
+projection would need a successor state that outlives a `project()` call, which T-B2a rules out; measured, one
+B3 call with a pool of four costs about 32 ms with an admitted projection (8 ms without; `single_task` about
+1 ms), and triggers are events. Log, `full_reorder` only: `[meta-ord]` as in T-B2b; `[meta-win]` for the
+winning ordering (`holds` per entry, `shift` the cumulative shift of the last entry, `T_r`, `cost`, `share`);
+`[meta-b3]` with `selection` as under `single_task` and `ordering=`.
+
+CHECKED (`analysis/tb2c_per_entry_holds/`, scenario_81, both priors; the B3 calls of the `full_reorder` run and
+of the `single_task` run, every ordering of the pool at every call: 402 orderings, 260 against an admitted
+projection).
+- DOMINANCE: 0 rows where the per-entry cost differs from the common-shift cost (computed in the script only),
+  so none where it is higher. A null result, as R1 measured that more places for a hold seldom change the
+  total. It is not vacuous: 12 orderings carry a hold, 8 of them before a LATER entry (item_1 after item_6,
+  holds [0, 2, 0, 0] and [0, 3, 0, 0]); in those 8 the cost equals the common shift's and the hold is taken
+  elsewhere (at the table after entry 1, not at the decision position). All 12 are on the `single_task` run's
+  course; under `full_reorder` no ordering priced on scenario_81 carries any hold.
+- THE HEAD'S HOLD: the hold before the first entry equals the head realized alone in all 402.
+- VALIDITY, by F1's independent method (sampling at 0.001 tick inside [trigger, T_h], rules (a) and (b)): the
+  14 winning orderings with an admitted projection and the 8 orderings with a later hold have no violating
+  sample; each later hold is minimal (its entry at shift − 1 violates).
+- A synthetic two-entry case (literal segments; a check of the code, not a finding): per entry [0, 14], cost
+  34; one common shift 24, cost 44; both clear under sampling; entry 2 at shift − 1 violates.
+- BEHAVIOUR: scenario_80 and scenario_81, both priors: `single_task` heads 6, 1, 7, 4 (completion 261 and 265
+  from the world fact; one 4-tick hold in scenario_81), `full_reorder` heads 7, 4, 6, 1, completion 220, no
+  hold. scenario_00, both priors: identical to `single_task`. The executed behaviour under `full_reorder` is
+  the same as at T-B2b on these fixtures; the full comparison is T-B3.
+- IDENTITY: the 20 baselines byte-identical under the default strategy; `b2a` runs (scenario_20 with executed
+  holds, scenario_81; both priors) byte-identical between the commit before and the change.
+
+A FINDING FOR T-B3. On every current fixture no winning ordering under `full_reorder` carries a hold, so
+T-B2c changes nothing executed. scenario_81 does not exercise realized cost under `full_reorder`: its conflict
+belongs to `single_task`'s course (6, 1, 7, 4), and the course `full_reorder` chooses (7, 4, 6, 1) never meets
+the human, so its saving mixes two causes, the order of the tasks and not meeting the human. A fixture for
+T-B3b must put a conflict into the orderings `full_reorder` would choose; Hadi designs it (TODO-47,
+f-designations).
+
+NOT PART OF THIS DECISION. Entries after the first are projected about one tick late per preceding entry with a
+`pick_up` (TODO-77). It is an error in the input to `realize()`, present under `single_task` too, and is not
+compensated here; cchat decides it. No `full_reorder` baselines are recorded until Hadi confirms T-B2c.
+
+**A reload never cancels a completion tick the body states: the Mesa executor spends the acknowledgement after the robot's pick_up (T-B Q7)** — RECORD [T-B/3], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+WHAT REMAINS UNCOMPENSATED. STEP QUANTISATION only (L2's decision, unchanged): a walk of projected duration
+`dur` executes as ceil(dur) steps and the walker stops on the first step inside the arrival radius, so it
+finishes late and the next walk may start up to one step off its projected start. Measured per delivery on
+scenario_80, executed minus projected, before → after: fetch part −0.89 → +0.11, −0.36 → +0.64, −0.60 → +0.40,
++0.41 → +1.41; carry part unchanged (+0.62, +0.67, +0.92, +0.48); total −0.27 → +0.73, +0.31 → +1.31,
++0.32 → +1.32, +0.89 → +1.89. The executed fetch gains EXACTLY one tick in all four deliveries. Before the
+fix three of the four ran SHORTER than projected — the skipped acknowledgement masking quantisation; after
+it every residual is positive, which ceil-per-walk alone produces. TODO-77's residual is closed with that.
+
+MEASURED, the 20 baselines (both priors; `analysis/tb1a_destination/`, `analysis/tb1b_two_tables/`).
+Completion from the world fact moves by one tick per robot delivery, less where a hold carried the tick:
+s00 166 → 169, s10 418 → 422, s20 235 → 237, s30 160 → 161, s40 376 → 379, s50 235 → 237, s70 185 → 186,
+s71 201 → 203, s80 261 → 265, s81 265 → 268. The three carried ticks: s20 / s50 and s30, where the post-grasp
+decision already held for δ = 1; s70, where the hold at step 61 / 60 re-realized 2 → 1, and s81, where the
+hold at step 39 → 40 re-realized 4 → 3 — the robot reaches those decisions one tick later, so one fewer tick
+of shift clears the same human, minimal in both. THE DECISION SEQUENCES ARE OTHERWISE UNCHANGED, with two
+exceptions, both traced to a trigger that used to land on a cancelled completion tick: s10 (both priors) and
+s00_on, where the run now spends it; and one decision that was never separately raised before, s81_off's
+`task_committed` at 132, because the grasp and a belief change no longer share a tick. Changed decisions are
+explained, never adjusted. The human's lines are byte-identical in all 20 runs, and 17 of the 20 were
+byte-identical between the grasp-only fix and the general rule — including the three whose post-grasp hold
+carries the acknowledgement, so moving that absorption from `hold()` into `step()` preserves behaviour.
+
+THE ACCEPTANCE CRITERION THAT WAS WRONG, CORRECTED. The task expected every `[IR]` line to be byte-identical,
+on the ground that the robot does not touch the human and the recognizer observes the human only. The second
+half does not follow: the recognizer reads the `WorldState`, and the robot writes into it (a) a carried
+item's position, which IS the carrier's, so while the robot carries item X the hypothesis `deliver_item(X)`
+is scored against a target that moves with the ROBOT, and (b) task completion as a WORLD FACT, so the pin
+retiring that hypothesis falls on the tick the robot's release makes `obj_at` hold. Measured: with the prior
+ON every `[IR]` line is identical (the support is the human's assigned pool and holds none of the robot's
+items); with it OFF 1 to 29 steps per run differ, by at most 0.165 in confidence where `most_likely` is
+unchanged and by up to 0.497 at the pin ticks. The human's own lines are byte-identical in all 20, so nothing
+reaches the OBSERVATION. The criterion as corrected is met. The recognizer question this exposes — with the
+prior off, a live hypothesis about the human whose item the robot is carrying away — is
+`docs/TODOS_AND_DEFERRED.md`, TODO-88, for cchat; nothing was changed for it.
+
+## T-C, the human action script
+
+**The human action script (T-C1, decided)** — RECORD [T-C/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+RECORDED FOR T-D, not designed here: an observed history of the human's tasks in the robot's mind (completed,
+dropped, `unknown` episodes), for evaluation (TODO-92). The robot taking over an abandoned task is TODO-15.
+Not decided in T-C1 and left where they are: TODO-85 (a stationary human; half (b), the robot's action under
+`unknown`, with T-D) and TODO-88 (its own item).
+
+AS BUILT (T-C2b): SEQUENTIAL EXPANSION. `resolve_script()` resolves the script's elements in order, each
+against the initial world advanced by every element before it: the primitives grounded and handed to
+`shared.projection.successor_state()`, the successor state of T-B2a, made a module function so that the
+projection of an ordering and the script share one derivation (no second successor state); the agent stands at
+the target of its last walk; a `Stay` changes nothing. A deviation's injected content is resolved against the
+state its task's expansion leaves at the anchor (after the kept part, for `abandon`); anchors are resolved
+against the task's own expansion as before. Check: `abandon(deliver(item_3), after="pick_up",
+then=[deliver(item_5)])` expands the second delivery with `deliver_with_return` (item_3 to its shelf first);
+with `before="pick_up"` it expands with `deliver_default`.
+AS BUILT (T-C2b): THE ACTION-LEVEL HUMAN EXECUTOR. `HumanAgent` holds the resolved list (`load_script()`, by the
+loader); each `ScriptAction` is grounded when reached (`ground()`) and handed to the shared `Executor` as a
+one-action plan; the executor is handed no plan before the next one, so it owes no per-task completion tick; the
+next primitive's first microaction runs on the tick after the last one's acknowledgement. `Stay(n)` stands n
+ticks, `Stay()` to the end, an empty list stands. `current_task` stays `None`. The C2a compatibility path is
+removed. The shared `Executor` is unchanged: its `_on_task_complete()` is no longer reached by the human. The
+human's body reports 0 for the per-task tick to the projector (`observed_task_completion_latency`,
+`HUMAN_TASK_COMPLETION_LATENCY` in `mesa_sim/sim_agents.py`); the robot's candidates keep its own. CONSEQUENCE,
+measured: the human projection ends one tick earlier, so a decision may move before any human task completes
+(s20 `single_task`: the hold at step 11 is 7 ticks, was 8); with the human's latency set back to 1 the run is
+identical up to the first dropped tick. RULING (Hadi, T-C2b): the decision working, not a defect — the human's
+projection without the per-task tick ends one tick earlier and the human arrives one tick earlier, so the hold
+that clears it is one tick shorter. Holds moved in the fixtures (prior on): s20 `single_task` 8 -> 7, s70 (both
+strategies) 1 -> none, s83 `full_reorder` a new hold of 2 at step 190. Nothing in `shared/` reads another
+agent's `current_task` (checked by grep: `WorldState.agent_states` is read nowhere in `shared/`), so the
+human's `current_task = None` reaches no decision. Fixture results: every human line identical up to the dropped per-task
+tick in all ten runs (s00, s20, s70, s80, s83; `single_task`, `full_reorder`; prior on).
+
+AS BUILT (T-C2c): SCENARIO-AUTHORING CONVENTION (Hadi, cchat, 23 September 2026). A human's script ends with the
+human leaving the workspace (`MoveTo("door")` or a corner, then the empty list's stand), unless the scenario is
+about the terminal stand at a table (TODO-80's blocked case, stated in the scenario's description). Reason: a human
+standing at a table after its script deadlocks the robot with the stop on; that is the scenario's artefact, not a
+design result, and a stay that ends is waited out (scenario_94). The 22 play scripts and the two C2c fixtures
+(scenario_11, scenario_01) are not edited: they are examples and TODO-80 fixtures. New scenarios follow the
+convention.
+SUPERSEDED IN PART (Track 2.5, ruled by Hadi 28 Sept 2026): "New scenarios follow the convention" is extended to the
+existing regression fixtures where their terminal stand is not part of the fixture's purpose (docs/assumptions.md
+1.1); the six scripts behind the occupied-target logs (scenario_s01_01, s01_06, s02_01, s03_01, s04_01, s06_03) end
+with `go_to("corner_SE")` since 52295f7. The play scripts and the C2c fixtures are unchanged.
+
+T-C2, THE BUILD: C2a the script layer (primitives, `expand`, the vocabulary, landmarks, the provenance check);
+C2b the human executor, action-level (both built). Fixtures s00, s20, s70, s80, s83, prior on; the check is identity up to
+the dropped per-task completion tick; the baselines are regenerated once. Then two literal scenarios, an
+interrupt and a stay, one run each, observed and not judged. From here debugging runs use prior on only; off /
+on returns for the paper.
+
+## T-H, the human behaviour model
+
+**T-H: the human behaviour model** — RECORD [T-H/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+   Format (ccode's choice): one line per tick in a file of its own beside the run log,
+   `[rec] step=<n> stack=<top>;<suspended> action=<action>#<occurrence> progress=<done>/<total>`, tasks by their task
+   instance key, `stack=-` when empty; the sweep diffs it as it diffs the greps.
+
+**T-H: the human behaviour model** — RECORD [T-H/2], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+10. NOT PART OF T-H.
+    - IR is not redesigned. T-D resumes on this structure; T-D Q1 stays "what the robot infers and does when no
+      hypothesis explains the evidence, inside `unknown` or outside it", now with ground-truth cases: a switch to a
+      modelled task, a switch to a modelled task outside the support, a switch to an unmodelled task, a binding-level
+      deviation, no task on the stack, an episode's first ticks.
+
+**T-H: the human behaviour model** — RECORD [T-H/3], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+    - Alternative 1 (a human mind that generates events; a stack-aware IR): recorded as the next architecture
+      direction, not scheduled (roadmap).
+    - Nested interruptions beyond one level: the stack allows them; the restriction is lifted only when a scenario
+      needs it (TODO-100).
+
+11. ACCEPTANCE ACROSS T-H: after each build, the 40 maintained baseline logs are rerun; robot-side lines (`[IR]`,
+    `[IR-dist]`, `[meta-*]`, decisions) must be byte-identical; human-side differences are listed and each explained. At
+    the end of T-H3 the new logs replace the stored baselines.
+
+THE BUILD, one session each, each under CLAUDE.md's BUILD DISCIPLINE (a plan step confirmed by Hadi, then the build):
+- T-H1 the tree, the task model and the two knowledge objects (items 2, 3, 9), and the destination check's move; the
+  migration of `domains/dock_loading/` and `ros_sim/` to the tree begins here (finished in T-H3). Its planning step
+  shows methods referencing `ActionSchema` objects and the support restriction comparing `HypothesisKey` values.
+- T-H2 the executor: `Event`, `Decision` (`Start`, `Drop`), `Trigger` (`AfterAction`, `DuringAction`, `Now`), `at`,
+  `during`, `inject`, the stack, the mid-action cut and the resumption rule, the record and its stream, the test that
+  `world_state_builder` exposes nothing of the stack (items 5 to 8). Its planning step shows how the cut and the resume
+  sit in the shared `Executor` without touching the robot's paths.
+- T-H3 the migration of the scenarios; deletion of the C1 vocabulary, `Deviation`, `Provenance`, `expand` /
+  `resolve_script` as a separate form, the key-based checks, `Stay`, `MoveTo` / `PickUp` / `Place`; `dock_loading`
+  and `ros_sim` migrated.
+- T-H4 the record's queries, `unperformed` and coverage (item 7); supersedes TODO-92.
+
+RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leaves to the build:
+- (T-H1) In the code at 19e7b8b `check_task_destinations` already runs on `assigned_tasks` only, for both agents, and
+  not on the human's `scheduled_tasks` (`mesa_sim/sim_model.py`, the T-B1a block). The move is to where the task model
+  and the robot's plans are checked.
+- (T-H1) `is_foreseeable` is read in the robot's mind at one place (`IntentionRecognizer._build_admissible_keys`);
+  `DomainKnowledge.get_assigned_intentions()` and `get_foreseeable_intentions()` read the two booleans and have no
+  caller. The per-domain `DomainModel.intentions` set is the nearest existing thing to the task model; today one
+  `DomainKnowledge` serves the robot and the human's script resolver alike.
+
+**T-H: the human behaviour model** — RECORD [T-H/4], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+- (T-H1, as built) The destination check runs where each robot's task model is built, on the robot's own assigned
+  tasks and those of the agent it observes; a human no robot observes is no longer checked (no scenario has one).
+
+**T-H: the human behaviour model** — RECORD [T-H/5], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+- (T-H3, as built) THE MIGRATION. Every registered scenario's human script is a `Script` (the list form is refused
+  by `AgentConfig`); `domains/kitting/scenarios.py` is written wholly in the kitting call form (`deliver_item("item_3",
+  table="kitting_table_0")`, `coffee_break(...)`, `ac_activation(...)`, `go_to(...)`, `stand(...)`, `go_to_and_stand(...)`),
+  explicit typed functions in `domains/kitting/script.py`, each building a `TaskInstance` of its schema with the
+  `Var`s read from the schema's parameters. They are kitting's (its schemas, its word `table=`): `world/` holds no use
+  case; the generic sugar (`Script`, `.at`, `.during`, `drop`) stays in `shared/types.py`. `table=` is written wherever
+  the old instance bound it (every kitting instance), so every task instance key, and every robot-side line, is
+  unchanged. The translation, per old edit: `interrupt(t, after=x, with_=[Y])` → `t.at(x, Y)`; `abandon(t, after=x,
+  then=[...])` → `t.at(x, drop)` then plain entries; `abandon(t, before=pick_up)` → `t.at(move_to, drop,
+  occurrence=0)` (the action before the anchor; `deliver_default` has two walks); `deviate(t, destination=k)` → the
+  instance with `table=k`; `MoveTo(landmark)` → `go_to(landmark)`; `Stay(n)` → `stand("PT<2n>S")` (n standing ticks at
+  the body's 2 s per step).
+
+**T-H: the human behaviour model** — RECORD [T-H/6], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  CHECKED: the 40 maintained logs and tb3's 8 unstored `single_task` runs are byte-identical to the T-C2b baselines
+  outside the `[human]` lines, the human's step lines included; the C1 `[human] primitive k:` lines are replaced by the
+  record's transitions (`entered:`, `completed:`); the `.rec` streams are the first non-empty baselines.
+- (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
+  table="kitting_table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance
+  or its enumerated bindings is part of the query's type, settled in T-H4.
+
+**T-H: the human behaviour model** — RECORD [T-H/7], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  THE COVERAGE LINE: `[coverage] <human> <robot> entry=<i> <task>=<value> start:<task>=<value>`, one per script entry
+  for each robot observing the human, printed by `SimModel._log_coverage` in the run log after the `[run]` headers
+  (read against the `[IR]` lines; the `.rec` unchanged). Information only; the same with the prior on and off. Every
+  entry of the maintained fixtures is `covered`.
+
+**T-H: the human behaviour model** — RECORD [T-H/8], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  CHECKED: the 40 maintained logs and tb3's 8 unstored `single_task` runs are byte-identical to the T-H3 baselines
+  outside the new `[coverage]` lines, and every `.rec` is byte-identical.
+
+**T-H: the human behaviour model** — RECORD [T-H/9], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  CHECKED: the 40 maintained logs are byte-identical to the T-H4 baselines outside the new `[scenario-coverage]`
+  lines, and every `.rec` is byte-identical.
+
+## T-L, layouts, setups and scenarios
+
+**Layouts, setups and scenarios: the three artefacts of a run (T-L, 26 September 2026)** — RECORD [T-L/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+   - THE STATED TABLE (ruling b): the stated table stays explicit in a scenario's assigned tasks and script, validated
+     against the setup's designations as today. A readability choice: the HTN model does not require it ("T-H: the
+     human behaviour model", item 5; the T-B1a precedence rule). Consequence: a scenario fits a setup whose
+     designations agree with its stated tables, and that is what the check says.
+
+**Layouts, setups and scenarios: the three artefacts of a run (T-L, 26 September 2026)** — RECORD [T-L/2], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+4. NAMING: descriptive ids, nothing encoded. One id per artefact, snake_case, unique within the domain and artefact
+   kind; the Python variable of a `ScenarioConfig` equals its id; the `name` field is dropped; `description` holds the
+   purpose. The same rule for layout and setup ids.
+   FORM AMENDED (Hadi, 26 September 2026; the principle stands — the variable equals the id, `name` dropped,
+   `description` holds the purpose, nothing about the script's content in an id): serial ids.
+   - Layout ids `env_layout_KK`; setup ids `env_setup_NN`; scenario ids `scenario_sNN_MM`, NN the scenario's setup
+     serial and MM a counter per setup. KK, NN, MM are independent serials with no meaning beyond order of writing.
+     Example: `env_layout_07`, `env_setup_04`, `scenario_s04_01` (today's env_layout7, env_setup7, scenario_70);
+     scenario_71 becomes `scenario_s04_02`.
+     NOTE (Hadi, 26 September 2026, the stage-3 task): the example's serials were illustrative. The built numbering is
+     the rule's: stage 2 numbered env_setup7 as `env_setup_05`, so scenario_70 is `scenario_s05_01` and scenario_71
+     `scenario_s05_02`; env_layout7 is `env_layout_07`. `docs/rename_table.md` holds every id.
+   - The setup serial in a scenario id repeats the validated `setup` field. The code does not check that they agree
+     (a check that reads an id out of an id string is string matching, which BUILD DISCIPLINE forbids); the agreement
+     is an authoring convention stated in CLAUDE.md, and an author who moves a scenario to another setup renames it.
+   - A layout's serial is never in a scenario id (a scenario has one or more reference layouts).
+   - Stage 3 merges the identical setups (env_setup0 = env_setup3, env_setup2 = env_setup5) before numbering, so
+     numbering is done once. SUPERSEDED (Hadi, 26 Sept 2026, the stage-2 task): the merge and the setup ids
+     `env_setup_NN` are stage 2's, because the module division (one module per setup, `scenarios_sNN.py`) keys on
+     the setup serial and a stage-3 rename would touch every module twice; scenario and layout ids stay old until
+     stage 3.
+   - Baseline file names: `<layout id>_<scenario id>_<run options>.log`, as ruling 6 states.
+
+5. REGISTRATION BY DISCOVERY: a `ScenarioConfig` is registered at import of the domain package (a decorator or a module
+   scan; ccode chooses in stage 2), with no side effect beyond adding to a dict; a duplicate id is an error. Layouts
+   and setups are registered by their files. BUILT (stage 2): a module scan (`domains/discovery.py`) — a decorator
+   can be forgotten on a new scenario, which recreates the omission this ruling closes; registration runs at import
+   of `domains.<domain>.registry`, the one entry every reader uses (importing the bare domain package registers
+   nothing). Scenarios stay hand-written literals; T-B1b's ruling (TODO-47 (a))
+   reversed a generator that produced fixtures, not a mechanism that lists them. That distinction is recorded under
+   TODO-47 (a).
+
+6. BASELINES ARE KEYED BY THE RUN. File names carry the layout id and the scenario id plus the run options already
+   present (prior, strategy); the setup is omitted from names because ruling 3 gives a scenario exactly one setup.
+   THE TRIPLE LINE: the `[run_mesa]` start line, where the layout and scenario ids are printed today, prints all three
+   ids; stage 1 adds the setup to it. The four maintained sets are regenerated under the new names in stage 3, `.rec`
+   streams byte-identical, a new md5 section in each README. Frozen records are not touched; one file
+   `docs/rename_table.md` maps every old layout and scenario id to its new id, and says in one line that the frozen
+   analysis scripts stay frozen at their commit; each frozen README gets one superseding line pointing to it.
+
+**Layouts, setups and scenarios: the three artefacts of a run (T-L, 26 September 2026)** — RECORD [T-L/3], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+8. SEQUENCING: T-L precedes T-D. kitting and dock_loading migrate together (this task and its stages may touch
+   `domains/dock_loading/`; it must still import). dock_loading's two scenarios fail at load before T-L (TODO-104);
+   TODO-104 stands and T-L must not worsen it. ros_sim stays parked: TODO-111, with TODO-108, records that its layout
+   readers move to the same sources when it resumes. The stages after this record task, each its own ccode task, each
+   ending in the acceptance check below:
+   - stage 1: types (`ScenarioConfig` gains `setup` and `reference_layouts`, loses `name`), loader, resolver,
+     validator; every registered layout split into a layout file and a setup file with the object ids unchanged and the
+     dead spawn entries deleted (`env_layout99.json` stays an unregistered file); scenarios unchanged in content and
+     id; the tests' helpers move with the registry shape; the setup id added to the `[run_mesa]` line; the docs pass
+     on the lines the survey listed (roadmap, T-L, stage 1).
+   - stage 2: the scenarios package (one module per theme) and registration by discovery; `list_scenarios` and the
+     tests' helpers on the declared pairs. AMENDED (Hadi, 26 Sept 2026, the stage-2 task): one module per SETUP,
+     `scenarios_sNN.py`, and the setups finished here — the merge and the final ids `env_setup_NN` — because the
+     module division keys on the setup serial.
+   - stage 3: the rename to the serial ids (ruling 4 as amended), the identical setups merged before numbering
+     [DONE IN STAGE 2, with the setup ids],
+     `docs/rename_table.md`, the four maintained sets regenerated under the new names, sweep scripts and READMEs.
+     BUILT (26 September 2026): the layouts and scenarios of both domains under their serial ids, `docs/rename_table.md`,
+     the four maintained sets regenerated as `<layout id>_<scenario id>_<run options>.log` (tb1a gained its own
+     `sweep.sh`; tb3 keeps all 20 runs), differing from the stage-2 logs in the `[run_mesa]` line alone, every `.rec`
+     byte-identical; one superseding line in each frozen analysis README pointing to the rename table.
+   - stage 4: the run file and the override mechanism, with the viewer reading it.
+     BUILT (26 September 2026): `--run <path>` (replacing `--experiment`, no alias) and `--override
+     <path>=<value>` (repeatable) in `mesa_sim/run_mesa.py`; a path is `<artefact>.<id>.<fact>`, the same in the run
+     file's flat `overrides:` block (path: value) and on the command line, read once at the input boundary into one of
+     three typed classes (`mesa_sim/overrides.py`: `StartPositionOverride` for `scenario.<agent>.start_position`,
+     `FixedPositionOverride` for `layout.<object>.position`, `HomeContainerOverride` for
+     `setup.<object>.initial_container`, the file keys), every other path refused with the path named; the value typed
+     by the fact (two numbers, an id); a command-line override replaces the file's for the same path. `SimModel`
+     applies them to the artefacts as read, before `_init_objects` and `_spawn_agents` (the registered scenario is
+     copied, never changed); an unknown agent or object, or a layout position for a setup's object, is an error naming
+     the path; bounds, container existence, destinations and the replay are the existing checks. Each override is
+     printed after the start line as `[run_mesa] override <path>=<value>`, sorted by path, in the `--override` form.
+     The viewer's `Page` reads the run file it is started from on every reload and shows the triple and the overrides
+     (`mesa_sim/viz/run_file_panel.py`); its form, limited to the three kinds, builds the run first, writes the file's
+     block only if it loads (a path the command line gives is refused: its value, not the file's, is run) (round-trip through `ruamel.yaml`, comments kept, a new dependency) and reloads. A run with
+     no overrides is byte-identical to stage 3, and the four maintained sweeps are unchanged. NOT COVERED, as built: a
+     fixed object moved out of the space or onto another object is not checked (ruling 7: the checks of any run); a
+     moved fixed object keeps its declared `zone`, which nothing in the run reads; a duplicate path in the yaml block
+     is PyYAML's last-one-wins; the viewer prints no `[run_mesa]` line (as before), so an override applied in the
+     viewer is not in its log; a viewer started on `configs/experiment.yaml` writes its overrides there, where every
+     run that takes the default file (the sweeps included) picks them up.
+
+ACCEPTANCE, at every stage: the four maintained sweeps (tb1a, tb1b, tb1c, tb3) are run from scratch and diffed against
+the previous stage's logs, with no difference outside the lines the stage names (the triple line, the ids); AND pytest
+is green. Nothing is aligned to older analyses.
+
+**Layouts, setups and scenarios: the three artefacts of a run (T-L, 26 September 2026)** — RECORD [T-L/4], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+MEASURED AT RECORD TIME, CLOSED BY RULING a (read-only, the registered scenarios against their registered layouts'
+fixed objects, a footprint being the object's `size` centred on its `position`): an object check would have refused
+scenario_40, scenario_41 and scenario_42 (robot_0 at (-950, -550), the centre of the landmark `corner_SW`), and left
+undecided the starts on the edge of `kitting_table_0` (scenario_40 to 42's human_0, scenario_70 to 73's robot_0).
+Every registered start lies inside its space's bounds.
+
+## T-D, robustness in kitting (R and E, the cognitive loop, the IR test-bed, L, P, G, X, the MPB)
+
+**T-D R and E: the recognizer's output under a removed `unknown` hypothesis (ruled by Hadi, 26 to 27 September 2026)** — RECORD [T-D/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+- Dependencies to verify in the build, not design questions: the schema durations of `pick_up` and `place`; the body's speed and its duration-to-ticks conversion supplied to the adequacy computation (the Projector already receives both); β remains body-supplied as established in T-A1.
+
+Staging (ruled).
+- Stage 1: this record; then build the recognizer side and regenerate the baselines. The gate is left exactly as it is; its input changes meaning (the leader's share over H), so admissions are expected to shift; the shift is measured, not corrected. Verify: the arithmetic invariant of R6; recognizer outputs per ground-truth case against oracle IR (TODO-101); admissions before and after on the maintained baseline sets (`analysis/tb1a_destination/`, `analysis/tb1b_two_tables/`, `analysis/tb1c_realized_flip/`, `analysis/tb3_full_reorder/`: 48 logs, 36 distinct by md5); false-unexplained per phase and per run, missed findings, detection delay, at every α.
+- Cycle 1.5 (ruled 27 September 2026, on Stage 1's verification): 1.5b builds E8, E9, E10 and G1 together; acceptance is 1.4's scripts rerun on the regenerated baselines ("1.5 rulings", below).
+- Then L (boundary at a misdelivery, retraction, resumption), P (projection from observation; the moving human; the staleness trigger), G (consumption of belief, finding and lifecycle; TODO-97 on its own gate), X (WAIT against RECONSIDER; the occupied target; communication on a persistent finding). Each ruled on Stage 1's results, recorded before its build. The relation to Alternative 1 stays open. T-D Q1 (option 1) is unchanged and is P's building block.
+
+For the Stage 1 build: the docstring of `UNKNOWN_LIKELIHOOD` ("the threshold separating unexplained from a real hypothesis") is false under R; the registry's reserved "duration" evaluator is not what E builds, since time enters adequacy and not the belief's likelihood. The log reason `none(unresolved)` is renamed in the Stage 1 build, since it collides with the finding's value unresolved; the string is chosen there.
+
+**T-D R and E: the recognizer's output under a removed `unknown` hypothesis (ruled by Hadi, 26 to 27 September 2026)** — RECORD [T-D/2], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  CYCLE 2 INPUT (1.5c; with 1.5b finding 3, TODO-119): under the second E6 amendment a lone hypothesis is admitted at
+  b + 1, on a belief of 1.0 by normalisation and one priced standing tick (its latency tick is an observation with
+  S = 1). The boundary admissions of 1.5b (at b + 2) move one tick earlier; they are expected and listed in
+  `analysis/td_stage1b/REPORT.md`, section 1.5c.
+
+**T-D R and E: the recognizer's output under a removed `unknown` hypothesis (ruled by Hadi, 26 to 27 September 2026)** — RECORD [T-D/3], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Staging, cycle 1.5: session 1.5r records these rulings (records only). Cycle 1.5b builds E8, E9, E10 and G1 together;
+acceptance is 1.4's scripts (`analysis/td_stage1/`) rerun on the regenerated baselines.
+
+**The cognitive loop does not end with the task pool (TB, ruled by Hadi, 27 September 2026)** — RECORD [T-D/4], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Consequences recorded.
+- After the terminal return the body calls neither `evaluate_triggers` nor the executor. The existing baselines stay
+  byte-identical once every `[IR*]` line is removed, and their `[IR*]` lines stay byte-identical up to and including
+  the declared completion tick; the new lines begin the tick after it and include `[IR-complete]` and `[IR-boundary]`
+  as well as `[IR]` and `[IR-dist]`. (Refined in TB.2b records, Hadi on the TB.1r report, 27 September 2026.)
+- Within a tick, the robot's `[IR]` and `[IR-dist]` lines now precede its `[meta-trig]` line, on every tick (observation,
+  recognition and their logging come before the guard, the guard before the trigger evaluation); before TB.2b the
+  `[meta-trig]` line came first. Every log's md5 changes with it, a run whose robot never finishes included; the
+  comparison above is unaffected. (TB.2b plan, confirmed by Hadi.)
+- The 1.4 and 1.5b measurements (`analysis/td_stage1/`, `analysis/td_stage1b/`) were taken over the truncated
+  interval. They are rerun over the newly exposed interval in TB.2b, with every change reported and no previous
+  statistic preserved for comparability (TODO-121).
+- With an empty pool, tick 0 still produces one `no_current_task`, one `[meta-proj]` line and one "all tasks complete"
+  line.
+- TODO-33 (the run loop does not stop when all agents are finished) is untouched: the run's length is the run file's
+  steps.
+
+**The IR test-bed (TB, ruled by Hadi, 27 September 2026)** — RECORD [T-D/5], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Purpose. Test the recognizer in isolation on scenarios written for it, with expectations derived from the entry "T-D
+R and E" before the run, so that a result can say "the recognizer disagrees with the design" rather than "the run looks
+odd". The 48 maintained fixtures cannot: the robot acts in them, the layouts vary, and the cases Design B was ruled for
+(the corner walk, a switch outside the support) are absent (TODO-101's note). Hadi's requirement: the simplest cases
+first, to see whether the new design produces what we expect.
+
+Rules.
+- The layout is not designed to produce a desired IR result. Its geometric consequences are stated and feed the
+  independently derived expectations; an unexpected recognizer behaviour on a resulting trajectory is evidence to
+  investigate, never a reason to adjust the layout.
+- A test-bed finding enters a cycle as a design question with its ticks, as 1.4's findings did; it never changes the
+  mechanism on its own.
+- Any result that contradicts E5's reference distribution or E10's unit is a cycle 1 reopening, put to Hadi as such.
+
+The layout (the room). Deliberately simple, square, the proportions from Hadi's sketch, to be kept (a distance is
+adjusted only if a derivation needs it; never rearranged):
+- one kitting_table KT at the top centre;
+- two shelves, west and east, at the same height, symmetric about KT's vertical axis;
+- the coffee machine near the south wall, offset west of centre;
+- one landmark, corner_SE, the exit walk's target; no other corner and no door (landmarks are optional under the layout
+  rule);
+- no AC switch, so no `ac_activation` hypothesis exists in this room.
+Stated consequences:
+- from KT the two delivery hypotheses have equal path cost, so the first walk separates them by excess alone;
+- the coffee machine's bearing from KT differs from corner_SE's, so a walk to the machine and the exit walk are
+  distinguishable;
+- with the prior on, the hypothesis space is the two deliveries plus `coffee_break`. `coffee_break` is retired for the
+  run once `waited` holds (the completion pin, `docs/recognizer_handback.md` §1.6), so in the three coffee scenarios no
+  hypothesis is live after the second delivery: the lifecycle reads exhausted and the exit walk has no finding. Only
+  in the two-deliveries scenario (`scenario_s08_01`) is `coffee_break` the lone live hypothesis after both deliveries,
+  at 1.0 by normalisation, and the exit walk is charged against its walk to the machine (TODO-117's case by
+  construction).
+  SUPERSEDED (T-D L4, ruled 27 September 2026, built in L-build): `coffee_break` is retired while `waited` holds, not
+  for the run; it is live again the tick `waited` clears, so after the work order it is the lone live hypothesis in
+  every scenario and the exit walk reads unexplained. design_decisions.md, "T-D L: the belief lifecycle", L4.
+
+The setup (the shift). item_1 on the west shelf, item_2 on the east shelf, both designated to KT.
+
+The scenarios. Prior ON in every run. The robot at the top left with an empty task pool (`assigned_tasks` empty),
+observing the human. The human starts at KT, assigned `deliver_item(item_1)` and `deliver_item(item_2)`, never in an
+order. Every script ends with the exit walk to corner_SE (the authoring convention), which is itself an unmodelled walk
+and part of every expectation.
+1. `scenario_s08_01` (two deliveries): deliver item_1, deliver item_2, exit.
+2. `scenario_s08_02` (coffee between): deliver item_1, `coffee_break`, deliver item_2, exit.
+3a. `scenario_s08_03` (coffee after the pick-up): `coffee_break` started after the `pick_up` of item_1 (the item in
+   hand during the break; resumption re-expands the carry), then deliver item_2, exit.
+3b. `scenario_s08_04` (coffee before the pick-up): `coffee_break` started after the first `move_to` of item_1's
+   delivery, before its `pick_up` (empty-handed at the shelf; resumption re-expands the walk back to the shelf, then
+   the pick-up), then deliver item_2, exit.
+3a and 3b are separate scenarios because they test different suspended task states, not parameter variations of one
+scenario. Both are L's subject; their expectations are generated mechanically from the current entry, and the test-bed
+does not resolve L. The deviations (the corner walk, a switch outside the support, the wrong table, the long stand,
+the finished assigned tasks) are authored later with P and X (TODO-122).
+Ids: serial, as every existing artefact: the layout `env_layout_10`, the setup `env_setup_08`, and the scenario ids
+above (`scenario_s08_01` to `scenario_s08_04`, in the order listed); each scenario's purpose is stated in its
+`description` field. The
+coffee break's duration is the schema's; no scenario constant. One run file per scenario: steps enough to include the
+exit walk, `separation_stop` off, `test_level` 0.05, `assignment_prior` on.
+
+The expectations. Per scenario one CSV:
+- per tick, per live hypothesis: the expected action (derived phase), the origin, e, s, s_exp, D, L, the normalised
+  belief value, S, member, hypothesis adequacy;
+- per tick: the human's position, the world facts the phase rule reads, the finding, the lifecycle state, the pin and
+  boundary ticks.
+Two files per scenario, expected and actual, and a diff. The source of the human's trajectory and world facts is the
+load-time replay (`check_script`), expanded per tick with the body's walker (`steps_toward`, the step size, the
+proximity threshold, the action and task latencies). TB.3b asserts per-tick equality of that trajectory with the run's
+human lines; if the assertion fails, the generator reads the run's human lines instead and the report says so.
+Independence boundary. The generator implements the belief from all recognizer records at HEAD, not from one entry:
+this file's "T-D R and E" (e as the straight-line excess from the origin, s, s_exp by E9's attribution, D, L clipped
+at 1, S, membership as amended twice with the boundary-tick rule, the finding) and `docs/recognizer_handback.md`
+§§1.2 to 1.7 (the uniform prior, the proximity regress, the fold and prefix accumulation, the normalisation over H,
+the completion signal, the pin, the boundary and the retirement, `BELIEF_FLOOR`, target resolution for a carried
+item). The TB.3b report lists each rule the generator implements with its source. It imports nothing from
+`shared/recognizer.py` or `shared/likelihood_functions.py`. It may use the planner's decomposition and the domain's method guards to obtain each hypothesis's expected action sequence, which is
+the domain's structure, not the recognizer's. The expected-action table per hypothesis per scenario is written out in
+the report, so the oracle is inspectable.
+
+The comparison.
+- Categorical values (expected action, member, hypothesis adequacy, finding, lifecycle, most_likely, pin and boundary
+  ticks) exactly; numeric values at relative tolerance 1e-9.
+- Every disagreement is listed with its tick and classified as one of: the generator misread the entry; the recognizer
+  disagrees with the entry; the entry does not determine the expected value for that case. "The entry is silent" is
+  used only when the entry genuinely does not determine the value, never for a case the generator finds unspecified or
+  inconvenient.
+- No same-session adjustment of the generator or the recognizer to make the comparison pass; the standing rule
+  applies (the entry's mechanism stands over runs, baselines and tests; a disagreement is reported, not fitted).
+- The report distinguishes "the recognizer currently behaves this way" from "this behaviour is correct by the current
+  design".
+
+Sessions (the TB track; the IR test-bed first, cycle 2 (L) second): TB.1r records these rulings and the cognitive-loop
+ruling (records only); TB.2b builds the cognitive-loop correction ("The cognitive loop does not end with the task
+pool", above), which the test-bed's runs need; TB.3b builds the artefacts and the expectation generator, runs the
+scenarios and writes the report.
+
+CORRECTED IN PLACE (TB.2b records; Hadi on the TB.1r report, 27 September 2026): the landmarks (corner_SE only, no
+door; TB.1r had them required), the ids (serial; TB.1r had descriptive ids), the generator's source (all recognizer
+records at HEAD; TB.1r had the one entry), the trajectory (the replay expanded per tick with the body's walker, and the
+fallback to the run's human lines), and the third stated consequence (`coffee_break` is retired once `waited` holds, so
+TODO-117's case arises in the two-deliveries scenario only; TB.1r had it in every scenario).
+
+Files: domains/kitting/ (the layout, setup and scenarios, hand-written literals registered by discovery), the run files
+where T-L keeps them, analysis/ir_testbed/ (the generator, the log reader reusing `analysis/td_stage1b/tdlib.py`,
+expected.csv, actual.csv and diff.md per scenario, REPORT.md). Built in TB.2b and TB.3b.
+Reference: cchat, 27 September 2026 (TB); "T-D R and E" (R1 to R6, E1 to E10, G1, the membership rule as amended
+twice); "Layouts, setups and scenarios: the three artefacts of a run"; "T-H: the human behaviour model";
+`docs/handoff_T-D_cycle2_and_IR_testbed.md` §8 (the layered plan); TODO-101, TODO-117, TODO-122;
+`docs/recognizer_handback.md` §1.10
+
+TRACK COMPLETE (TB close-out, 27 September 2026): TB.2b, TB.3b and TB.4b are built; sixteen scenarios (scenario_s08_01
+to _04 on env_layout_10, scenario_s09_01 to _12 on env_layout_11), zero disagreements at 1e-9 between the recognizer's
+public outputs and the independent oracle; the instrument is independent of the layout, and its record is
+`analysis/ir_testbed/README.md` (the results in `REPORT.md`). Two facts for cycle 2, stated without ruling: (1) E8's
+member clause is covered by E6's second amendment whenever the action completion latency is 1 (every phase an advance
+opens then has s_exp ≥ 1, so its entry tick is already a member; removing the clause changed no output in TB.3b); (2) at
+the current β (0.01 /cm) and v (20 cm/tick), two targets 10.4° apart as seen from the start are not separated by a
+28-tick walk (the rival's S 0.765 at the arrival), while 30.4° separates them three ticks before the arrival (S < α at
+tick 25 of 28; scenario_s09_10, shallow runs of TB.4b).
+
+---
+
+**T-D L: the belief lifecycle (ruled by Hadi, 27 September 2026)** — RECORD [T-D/6], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Staging for L-build. The recognizer (L1, L4) and the meta-planner (L2 ii) are built; the IR test-bed's oracle is
+updated by derivation from this entry (not fitted to the runs); the sixteen test-bed scenarios (scenario_s08_01 to _04,
+scenario_s09_01 to _12) are recompared; the four maintained baseline sets are regenerated; the 1.5c and TB.2b measures
+are rerun; every moved number is reported.
+
+BUILT (L-build, 28 September 2026): c4beb1d (records), 2c54c4a (L1, L4, the flag: `ProceduralKnowledge.
+terminal_actions`, `AdaptivePlanner.enabled_groundings` / `completed_groundings`, `_observed_terminal_completion`,
+`_retired`), 493c095 (L2 (ii), L5 B: `RecognitionChange`, `TriggerDecision.cause`), 5129d90 and 3d65ca6 (the re-entry
+kept in hypothesis order, the tie-break; found by the IR test-bed), 013cd35 (tests). Verified: `analysis/l_build/
+REPORT.md` and `analysis/ir_testbed/REPORT.md`, "L-build" (the sixteen agree with the derived generator at 1e-9). Two
+readings stated there: a retired hypothesis the planner cannot decompose stays retired (its fact cannot be read); L5 B
+fired in no baseline run (at every boundary that met a record, most_likely changed). Measured wording: `coffee_break`
+re-enters on the tick `waited` clears, the human's first step after the break, two ticks after its pin (133 → 135 in
+scenario_s09_02); "one tick after its break" above reads so.
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/7], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  As first ruled: the wait, a mechanical consequence of P1: a planner outcome, not a terminal state. `update()` returns no current task
+  with the whole pool as the queue; the terminal return is no current task AND an empty queue, and the body tests both.
+  The body executes the wait by running no plan that tick. Completion ticks the body already owes (T-B Q7) are kept:
+  the wait carries them as a hold carries them (the robot standing where the decision found it), and what a wait does
+  not spend passes to the next plan loaded.
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/8], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+- Confirmed at the P plan step: the types (`HumanProjection`: `AdmittedProjection`, `FallbackProjection`);
+  `ProjectedPlanEntry.abstract_plan` Optional, None only for the fallback's entry; "a human observed" = a
+  `human_agent_id` and a position for it in the world; unprojectable → the fallback, the record empty; the logs
+  (`[meta-proj] … projection=fallback refused=<reason>`, `[meta-b2]` the admission's reason, `[meta-b3]`'s T_h the
+  winner's).
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/9], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+The deadlock (ruled (b); measured on the P-build baselines, under P2 as ruled). 16 of the 48 maintained logs end in a
+wait that never ends, all an OCCUPIED TARGET: five scripts end with the human standing at the robot's delivery table
+while the robot's last task delivers there (scenario_s01_01, s03_01, s01_06, s04_01, s06_03). T-C2c's authoring
+convention covers new scenarios only, and these predate it: no retroactive scope change, the scripts are not edited.
+The READMEs record "waits: occupied target (X)" in place of a completion tick; the case carries into X. Under the first
+P2 (stationary only) scenario_s02_01 waited too, at a BLOCKED ROUTE (the human standing at ac_switch_0, 145 cm from
+shelf_1, the robot's walk there within `min_separation` of it); under P2 as ruled it completes in both priors (425 /
+428), the robot's earlier decisions having moved. The blocked route has no instance in the fixtures; it stays one of
+X's categories beside the occupied target, not a glossary term.
+SUPERSEDED IN PART (Track 2.5, ruled by Hadi 28 Sept 2026): "no retroactive scope change, the scripts are not edited" no
+longer holds. docs/assumptions.md 1.1 extends the authoring convention to the regression fixtures whose terminal stand
+is not their purpose; the six scripts end with the exit walk (52295f7), and the twelve occupied-target logs of P4 now
+complete (the maintained READMEs, "2.5"). The occupied target stays X's case, now with no instance in the fixtures.
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/10], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Consequence of ruling 3 (the candidate's own horizon), recorded: a fallback can refuse every candidate at a decision
+while the human walks, and the robot then waits by polling until the tail frees one. scenario_s05_01 under
+`full_reorder` waits 23 ticks from tick 0 in both priors (every ordering refused under the human's moving tail). It is
+evidence for G's staleness question (TODO-132), not a defect of P.
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/11], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+MEASURED AT (recorded at G-records, 29 Sept 2026; design_decisions.md, "T-D G: admission"): the cited case was
+measured on the P-build baselines (fa26176) and does not occur under P4 and Track 2.5 (verified 29 Sept 2026 at
+a412b39: tick 92 has no decision; the run's minimum `[sep]` is 58.31 cm at tick 25). P3 stays parked, with no instance
+in the maintained sets.
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/12], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+BUILT (P-build, 28 September 2026): b19b5e2 and 4470708 (records), e93cbd9 (the build), 5e853a0 (tests;
+tests/test_p_build.py, and four tests re-derived by P), 15cb99f (TB.2b's mid-run pool test moved to scenario_s03_06),
+fa26176 (the four maintained sets, a "P-build" section each). Verified on the P-build baselines: `.rec` streams
+byte-identical in all 48; the recognizer's lines byte-identical prior on; the first difference of every changed run at
+tick 0, a decision under the fallback; the IR test-bed's sixteen logs differ in the step-0 `[meta-proj]` line alone
+(no oracle rerun: the recognizer is untouched and the robot is idle there). Measured, not examined: scenario_s06_01
+`single_task` prior off does not finish in 340 steps, with no wait (TODO-133). P is closed; next is G.
+SUPERSEDED: P was reopened by P4 and closed with it (BUILT (P4-build), below).
+
+BUILT (P4-build, 28 September 2026): 57600e2 (records: P4, Q6, the superseding notes), 179a503 (the build: the
+perception facts on `RobotAgent`, `Projector.project_fallback()` from the evidence, the record's second value and
+`projection_expired`; the refusal, the wait, the body's wait branch, the executor's wait handling and the
+`HumanProjection` types removed), f0ead6e (tests; tests/test_p_build.py re-derived, the three "refusal returns None"
+tests back to None, the WorldState field set), d7c98b5 (the four maintained sets, a "P4-build" section each;
+TODO-133 closed). Verified: `.rec` streams byte-identical in all 48; the recognizer's lines prior on byte-identical to
+L-build's; the IR test-bed's sixteen logs differ in the step-0 `[meta-proj]` line alone; the suite 170 passed.
+Accepted on scenario_s05_01 (the 23-tick wait gone under both strategies; complete at 194 as before P),
+scenario_s01_06 and scenario_s06_06 (complete at 265, `[sep]` 26.0 cm, as before P).
+- The occupied target, under P4: six prior-on logs do not complete (and the same six prior off): scenario_s01_01,
+  scenario_s03_01 (`single_task` and `full_reorder`, in `analysis/tb1a_destination/` and `analysis/tb3_full_reorder/`),
+  scenario_s01_06 and scenario_s04_01. The human's script ends standing at the robot's delivery table; the robot holds
+  and reconsiders at each expiry of a longer stand (scenario_s01_06 prior on, 800 steps: expiries at 165, 213, 309,
+  501, holds 48, 96, 192, 384, 63.42 cm from the human, never complete). The READMEs record "does not complete:
+  occupied target (X), holds lengthening, from <first hold on the final stand>". The case is X's.
+
+**T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/13], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+- The observation-offset gap, recorded (scenario_s03_01 `single_task`, both priors, `[sep]` 30.12 cm at tick 171).
+  The decision at 171 (`no_current_task`) rested on a fallback stand (count 52, [1, 53] on the decision clock) and
+  chose item_7 with δ = 0; its first step, from 35.5 cm of the standing human, passes 30.12 cm from it (rule (b):
+  moving within `min_separation`, the distance falling) entirely inside the robot's first tick, [0, 1), before the
+  human projection begins at the observation offset (L2); its violating shifts are (0.06, 53), so δ = 0 is clear, where
+  a stand known from step 0 gives (−0.94, 53). Not P4's recorded error, not P3, not a defect: the gap predates P (T3b,
+  L2: the robot's first tick after a decision is unassessed against the human), made visible by a decision taken
+  within reach of a standing human. TODO-134: whether L2's offset applies to a fallback stand, whose position at the
+  decision tick is the observation itself.
+- P4's separation cost, recorded (scenario_s05_02 prior on, completion 195 before P, 214 under P4). The human reaches
+  its stay beside the robot's route at tick 24; before P, unprojected, the robot walked on and passed about 30 cm from
+  the standing human (ticks 26 to 27); under P4 the first standing tick is evidence, the robot holds before the human
+  and waits out the stay (42 ticks held against 23). The 19 ticks buy the separation: `[sep]` minimum 28.16 cm before
+  P, 50.99 cm under P4.
+P is closed with P4; P3 stays open; next is G.
+
+**T-D G: admission (ruled by Hadi, 29 September 2026)** — RECORD [T-D/14], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Staging. G-build follows in its own session. Verification on picked scenarios (scenario_s09_01's tail, scenario_s09_09,
+scenario_s09_06, scenario_s05_01 prior on, one control scenario); the IR test-bed's oracle extended by derivation from
+this entry for the warrant output; the four maintained sets as md5 regression plus one completion table.
+
+BUILT (G-build, 29 September 2026): 81a9f86 (the build: `ObservationWarrant` and `BeliefState.observation_warrant`;
+the recognizer's `_entered_by_completion` and `_observation_warrant`; the meta-planner's `WarrantSource`,
+`GateOutcome.LEADER_UNWARRANTED`, `observed_assigned_tasks` and `_warrant`, `_clears_gate` still the one home; the `[IR]`
+line's `warrant=[...]` and `[meta-proj] projection=built warrant=...`; TODO-123's docstring), 0555af7 (tests:
+tests/test_g_build.py, 21; three expectations of tests/test_td15_build.py re-derived from AD1, CLEARS to
+LEADER_UNWARRANTED, the fixture being prior off), cbe3f00 (the IR test-bed's oracle extended by derivation: the warrant
+per hypothesis and the gate's outcome per tick), 5afa7f9 (the four maintained sets, a "G-build" section each).
+
+**T-D G: admission (ruled by Hadi, 29 September 2026)** — RECORD [T-D/15], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Verified. The suite 191 passed. The IR test-bed: 0 disagreements in all seventeen scenarios (scenario_s08_01 to _04,
+scenario_s09_01 to _13), the warrant and the gate compared exactly; every expected.csv, actual.csv and actual_log.csv
+equals the committed one once the two new columns are removed (the belief and the adequacy unchanged). The maintained
+sets: the `.rec` streams byte-identical in all 48; prior on, every `[IR*]` line byte-identical to 2.5 once the `[IR]`
+warrant field is removed, and every other line once `[meta-proj]`'s warrant field is removed, except where a
+foreseeable admission moved. Prior on, commitment warrant covers every assigned task; the moves are all the lone
+`coffee_break` after a boundary: no longer admitted at b + 1 on a standing tick (scenario_s02_01 at 363,
+scenario_s05_01 and scenario_s05_02 at 142, both strategies) or admitted one tick later on its first step's gain
+(scenario_s03_06, 123 for 122). No prior-on completion tick, `[sep]` minimum or F1 class moved. The control,
+scenario_s01_01 prior on (two assigned deliveries), changed in the log fields alone. Picked cases:
+scenario_s05_01 prior on, `coffee_break` after the boundary at 141 refused `none(leader_unwarranted)` from 142 (at the
+`projection_expired` decisions of 144 and 150, against the fallback, no hold) and inadequate from 159; completion 194
+as before. scenario_s09_09, 83 to 87: no admission (`none(leader_inadequate)`, 83 to 106). scenario_s09_06, the stand:
+`deliver_item(item_1)`'s `pick_up` is warranted through its entry (the walk's completion at 28) for the whole stand,
+refused as inadequate 47 to 71. Prior off (appendix, no ruling): the admissions of the robot's own items move;
+completion scenario_s01_01 201 → 199, scenario_s06_03 realized 236 → 226 (tb1c, and tb3 full_reorder), single_task
+316 → 314.
+
+**T-D X: response (ruled by Hadi, 29 September 2026)** — RECORD [T-D/16], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  Verification. One authored scenario, a declared persistent stand at the robot's target with at least one alternative
+  task in the robot's pool, placed in the meta-planner test-bed (TODO-130), not a new maintained fixture. The expected
+  property: the switch by cost. A derived verification condition, not a parameter: the occupied task's hold is at most
+  the observed standing count (P4), so the authored stand must be long enough for that hold to exceed the relevant cost
+  difference between the occupied task and the alternative, the return walk included when the robot carries the
+  occupied task's item (`deliver_with_return`).
+
+**T-D X: response (ruled by Hadi, 29 September 2026)** — RECORD [T-D/17], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Next: track 3 (TODO-130); track 4 (TODO-140) may move first if the evaluation needs a genuine departure.
+
+**The meta-planner test-bed (MPB) (ruled by Hadi, 29 September 2026)** — RECORD [T-D/18], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+Track 3 (TODO-130), after X. Ruled in cchat; records only (session MPB-records); nothing is built in this step. The
+rulings are labelled MPB-1 to MPB-6 (not T3 or T3b, the Phase 4C realization tasks). The corrections and rulings Hadi
+made on the records plan (29 September 2026) are written into the rulings below.
+
+Purpose. To test the recognition-to-planning chain (the recognizer, the gate, the projection, the meta-planner) with a
+working robot, one authored scenario per decision. The oracle (the instrument's own derivation of the expected
+decision from the records) states the expected decision before the run; a disagreement is classified, never fitted. The
+IR test-bed (track 1, TB) tested the recognizer with an idle robot; this instrument tests the decisions the
+contribution claims. It is the last instrument before the evaluation and the demonstration.
+
+- MPB-1, the oracle's expected decision.
+  Ruling. A meta-planner decision has four parts with different epistemic status.
+  (1) The trigger tick and its cause (a trigger: the condition on which the meta-planner re-decides). The causes
+  compared are the four of `recognition_changed` — entered (no decision is recorded and the gate clears), replaced
+  (the belief no longer points at the recorded hypothesis), boundary (the belief was re-initialised at an episode
+  boundary, the observed human's completion of a terminal action; L1, L5 B), retraction (the recorded hypothesis's
+  hypothesis adequacy, whether it explains its own derived phase, turned inadequate; L2 (ii)) — and
+  `projection_expired` (the fallback projection the last decision rested on has reached its end; Q6). What they read
+  of the human is derivable pre-run from the human's script, the layout and the records (the completions, the
+  adequacy, the persistence rule); `no_current_task` depends on the robot's own progress and is read from the run as
+  an observed fact.
+  (2) The gate's outcome at the trigger (belief, hypothesis adequacy, warrant, the assigned tasks, θ), pre-run.
+  (3) The projection the decision rests on (the admitted task's plan from the task model, or the fallback projection,
+  the short-term physical projection from the observed persistence), pre-run.
+  (4) The selection (the winner and its hold), which depends on the robot's realized state.
+  The oracle derives per-tick tables pre-run: the boundary ticks, the ticks at which a hypothesis turns inadequate, the
+  gate's outcome and leader, and the fallback a decision on that tick would rest on, with its end per the observed
+  persistence. The (tick, cause) chain is assembled at the compare step from those tables and the run's observed
+  `no_current_task` ticks, with D3's order on a shared tick (`no_current_task`, then `recognition_changed`, then
+  `projection_expired`: a `no_current_task` tick masks the others); the decision record (the hypothesis the last
+  decision was projected against, and the tick its fallback ends) follows from the chain, since a record is set at
+  every decision, the robot's included. The assembly imports nothing from the planner. Part 4 is checked as
+  properties the scenario declares, derivable from the layout by the author (for the occupied target: the alternative
+  wins at the first expiry whose hold exceeds the layout's cost difference). The oracle states what the decision rule
+  should conclude from the world's facts, never how the planner scores.
+  The independence boundary. The oracle imports nothing from `shared/meta_planner.py` (the triggers, the gate, the
+  cost strategy, selection), `shared/realization.py`, `shared/projection.py` (the projected durations,
+  `Projector.project_fallback`), `shared/recognizer.py` or `shared/likelihood_functions.py`, nor
+  `RobotAgent._perceive` (`mesa_sim/sim_agents.py`). It derives P4's perception facts (the run length and the standing
+  count, the same direction within 1e-9) and the fallback's tail itself. It may use the planner's decomposition as the
+  IR test-bed does (task and hypothesis definitions, not cost, realization or selection logic).
+  Why. An oracle that reconstructs part 4 is a second planner, and a disagreement between two planners says nothing
+  about which is wrong. The chain is assembled at the compare step because the record it reads is set at the robot's
+  decisions too.
+  Set aside. Full per-tick reconstruction; a single expected property per scenario without the per-tick parts.
+
+- MPB-2, the scenarios.
+  Ruling. Eight, each exposing one decision.
+  (1) Admission after θ: two assigned deliveries, the first walk discriminates. The admission comes on the tick the
+  gate clears, through `recognition_changed` with cause entered (D2): the expected tick is the crossing (the tick the
+  leader's share first clears the gate).
+  (2) The hold against an admitted projection (the hold: the ticks the robot stands still before its entry so that the
+  realized plan keeps `min_separation`): the admitted human plan crosses the robot's route.
+  (3) The planning side of the mid-action change (scenario_s09_13's chain): retraction, the fallback, re-admission at
+  the next fitting phase.
+  (4) Boundary re-admission: b refused, b + 1 admitted on commitment (commitment warrant: the hypothesis is one of the
+  observed human's assigned tasks).
+  (5) The lone foreseeable hypothesis after the work order: unwarranted on standing, warranted on the first step
+  toward the machine, admitted through `recognition_changed` with cause entered on the first warranted tick.
+  (6) The occupied target with an alternative task (X1): a declared stand at the robot's table, long enough by the
+  derived condition (the hold, at most the observed standing count, must exceed the cost difference, the return walk
+  included when carrying), a second delivery elsewhere; the switch by cost.
+  (7) The fallback against a walker and against a stander: a straight run across the route, later a stand beside the
+  route that ends before its projection; the expiry cadence. The stand is evidence for TODO-132 (a) (re-decision at
+  the expiry only, holds outlasting the stay), recorded, not a verification of a rule.
+  (8) The control: the human works away from every robot route; no hold at any decision, and completion identical to
+  the same setup run without the human (a reference run, not a scenario).
+  Recorded for scenarios 4 and 5: with the coffee machine in the room, `coffee_break` is live after every delivery
+  boundary (L4), so at b + 1 the prior gives each live hypothesis 1/2 and θ is not cleared; b + 1 admission on
+  commitment requires a single live hypothesis (after the coffee break's own boundary with one delivery left,
+  `coffee_break` retired while `waited` holds) or the second-layout allowance below. Step 2's derivation shows which.
+  Environments. One newly authored controlled layout, env_layout_12, as the default, authored for the physical facts
+  the scenarios need (a crossing, an occupied table with a second free, a run and a stand on a route, clear routes),
+  not for any expected number. Setups vary within it (env_setup_10, env_setup_11, ...): a setup holds the item
+  placement and designations; the positions, the pools and the scripts are the scenario's. A second controlled layout
+  only where the geometry itself must change, reported as such. Ids on the serial rule (T-L, ruling 4 as amended): a
+  scenario's id repeats its setup's serial (scenario_s10_MM on env_setup_10, scenario_s11_MM on env_setup_11).
+  Why. The existing layouts (1 to 9 for development, 10 and 11 for the recognizer) were not authored to isolate a
+  planning decision, so a disagreement in them could not be attributed; a controlled room makes the property
+  derivable beforehand; varying the setup rather than the room keeps the control scenario meaningful.
+  Set aside. Reusing env_layout_11; one layout per scenario; authored parameter variants (the test-bed is not a sweep).
+  AMENDED (Hadi, 29 September 2026, the post-(iv) records): THE LAYOUT-AND-SETUP RULE. The existing geometry is reused
+  only when it naturally instantiates the case. One placement change is a setup fix. A second change, or any move of
+  unrelated geometry to make a case come out, means a new setup or a new layout. The criterion is conceptual, not
+  timing: a timing accident is a class-4 re-authoring of the same case (MPB-4). A placement or setup change is
+  acceptable only if it alters no already-verified scenario on that setup; otherwise a new setup. The output floor
+  couples every scenario on a setup: the setup's robot items inadmissible for the human sit at the floor and lower the
+  leader's confidence, which moved scenario_s10_08's crossing from the IR test-bed's 46 to 47. A spatial or structural
+  requirement (a relation between a robot route and a human station; the absence of a hypothesis) may need a new
+  layout. First instance: scenario_s11_02's shelf_2 case (part (iv); analysis/mpb/authoring.md): item_12 on shelf_2
+  put the exit walk within 2.3 cm of its shelf and admitted the delivery at 97, class 4 found before any run; moved to
+  shelf_1, one placement change on env_setup_11, whose two scenarios were re-authored together.
+  Why. A room or setup bent to make one case come out would make the other scenarios' properties depend on it, and a
+  disagreement could no longer be attributed.
+  THE COVERAGE PRINCIPLE EXTENDED (same date): every materially distinct in-scope decision path is one of three kinds of
+  cell: verified (an instance in a verified run), unreachable (no instance, with a derivation from the records that the
+  framework cannot reach it in scope), or out of coverage (no instance, with a recorded reason why it is not part of the
+  mechanism the MPB claims). The matrix is analysis/mpb/coverage.md. A reachable cell the contribution claims gets one
+  authored instance (part (v)).
+
+- MPB-3, the robot's acts and the compare level.
+  Ruling. The oracle's world holds the human's facts. The per-tick tables of parts 1 to 3 stay pre-run derivable
+  because every scenario keeps the robot's items and shelves disjoint from the human's, so the robot's acts touch no
+  fact a human hypothesis reads (L4's live set) and the human's trajectory does not depend on the robot
+  (`docs/assumptions.md` 4.2). The disjointness rule is an authoring constraint of this test-bed, checked per scenario
+  (its pools, its setup's item placement) before its runs, not a framework assumption; it gives the independence with
+  the prior on only (MPB-6). The robot enters at the compare step only, from the run's own record: its logged
+  positions, decisions and `no_current_task` ticks.
+  Compare levels. Part 1: the set of (tick, cause) for entered, replaced, boundary, retraction and
+  `projection_expired`, exact, with the `no_current_task` ticks listed. Part 2: the outcome name and the leader at
+  every decision tick, exact. Part 3: the projection's identity (the admitted hypothesis key, or the fallback with its
+  mode, k and end), exact. Part 4: the declared properties as booleans over the logged robot state.
+  Part 4's inputs. The planner's logged decision values (the winner, its hold on `[meta-win]`, `[meta-cand] delta`) are
+  observed inputs to a declared property, never inputs to the oracle's derivation of what should hold. The
+  instrument's own computation is the F1 check (the separation classes) over the executed positions, and the layout's
+  path lengths; never a hold.
+  The in-process read of `BeliefState` and the meta-planner's outputs is the primary source, the log the check.
+  Why (part 4's inputs). A hold the instrument computed would be MPB-1's second planner.
+  Set aside. The oracle simulating the robot; everything read from the log after the run.
+
+- MPB-4, verification and disagreements.
+  Ruling. A scenario is verified when parts 1 to 3 show zero disagreements at exact equality on every tick, prior on,
+  and every declared part-4 property holds (prior off: MPB-6). Outputs as in the IR test-bed: the expectation written
+  before the run, the in-process and the log-derived actuals, the comparison with a classified diff.md, a figure, a
+  summary, a REPORT with numbers and md5s.
+  The oracle's own check: the single-rule alteration test of the IR test-bed (one rule of the derivation altered in a
+  scratch copy; the comparison must detect it). The derivations new to the MPB oracle are the expiry cadence and the
+  projection identity; on the gate with warrant, derived by the IR test-bed since G-build (its rule 23), only the
+  alteration test is new. An undetected alteration is recorded as a property of the test set with its reason, as the
+  IR test-bed did (E8's member clause), unless it is an oracle defect.
+  Disagreement classes: (1) the oracle misread the records: fix the oracle; (2) the framework disagrees with the
+  records: a defect, reported with the entry and the ticks, a ruling before any code, never a local fix; (3) the
+  records do not determine the value: a design gap, a question to the design chat, never a choice made in the
+  instrument or the code; (4) an authoring artefact: the scenario breaks the disjointness rule or the geometry does not
+  give the declared property; it is re-authored or parked under the fixture rule; (5) a boundary case
+  (`docs/assumptions.md` 2.2 to 2.6, 3.3): recorded, not designed for. A class-2 disagreement stops the build at that
+  scenario.
+  Why. Exact verification where the records determine the answer, property verification where they do not; classes
+  3 to 5 keep the instrument from turning an accident into a rule; the alteration test shows that a zero result is a
+  detection.
+  AMENDED (Hadi, 29 September 2026, the post-(iv) records): THE THREE READINGS OF A CLASS-2 FINDING. When the framework
+  disagrees with the records, the finding is read as one of three:
+  (a) the implementation departs from the ruling: a defect under the ruling, reported with the entry and the ticks,
+      and corrected to the ruling after Hadi's ruling (class 2 as above: never a local fix);
+  (b) the ruling is followed, but its stated reason predicted otherwise: a redesign, returned to the design chat;
+  (c) the ruling can be read two ways: class 3, a question to the design chat.
+  THE LOOP: ruling, build, MPB evidence, interpretation, a possible redesign, build, re-test. The scenario is never
+  modified to make a finding pass; it changes only under class 4, with its case unchanged.
+  Why. A scenario changed until the framework passes it tests nothing; the instrument's worth is that a disagreement
+  is attributed to the ruling, the build or the scenario before anything changes.
+  CLASS-2 FINDING, READING (a) (Hadi, 30 September 2026; the first under MPB-4). THE INVARIANT: the trajectory realize()
+  assesses is the trajectory the robot executes from the decision tick onward. THE EVIDENCE: scenario_s12_01,
+  full_reorder, prior on, ticks 45 to 47, the cross-pairing of the decision at 26 (item_7, hold 4) on the re-executed
+  realization: the planned robot against the projected human keeps F1 (54.64 cm minimum); the planned robot against the
+  actual human, no violation; the executed robot against either, the three violations; the executed robot one step
+  (20 cm) ahead of its plan on every tick, by the stationary accounting after the hold. A defect under the existing
+  ruling, not a design question: F1, min_separation, the hold's meaning and the realization semantics unchanged; not
+  acceptable quantisation. THE FAMILY, measured on the saved segments (the lag of the executed robot against its plan at
+  its first move after each admitted decision, 32 prior-on runs): (a) after a walk's acknowledgement, +1 (one decision);
+  (b) on a pick_up's acknowledgement tick, −1 (three); (c) on a task's completion tick, −1, or after a release, −2 (three).
+  Corrected ("Realization as built", the dated correction; T-B Q7, superseded in part); re-verified (analysis/mpb/
+  REPORT.md, "The class-2 correction"). THE P-SIDE RESIDUAL, recorded apart, out of scope of the correction: the human
+  projection is 3.4 cm off the actual human on every tick of that carry (projection rounding: the projected walk ends
+  1.7 cm short of the body's last step, and the projected carry starts 0.086 tick early), and one tick early at a decision
+  falling on the human's own walk-acknowledgement tick (+1, five decisions: scenario_s10_01, _04, _05, _06 at 29, ...);
+  −0.17 to −0.25 tick at walk starts generally. Not the cause of the violations. TODO-146.
+
+- MPB-5, scope for the parked items.
+  Ruling. TODO-132 (a): scenario 7's stand records the re-decision ticks, the holds and the tick the persistence broke,
+  as evidence; nothing is built; the question returns to the design chat after the runs. TODO-134: no scenario is
+  authored for it; a decision inside the observation-offset gap against a fallback stand, if one occurs in scenario 6
+  or 7, is classified and recorded. TODO-137 and TODO-141: evaluation items, not built here.
+  TODO-138, ruled for MPB runs. The comparison horizon is the first observed completion point (the human's script has
+  ended and the robot's pool is empty) plus the idle margin the IR test-bed derives from E5 (30 ticks, covering E5's
+  standing threshold at α = 0.01, 25 ticks). A derived plain-cost horizon (the robot's pool chained along its authored
+  order from the robot's start, plus the human's replay length, plus the margin) is a safety cap for the run, not a
+  behavioural timeout: a run that does not complete within it is classified (class 2 or 4), never given a longer cap.
+  No change to the run loop or the body (TODO-33 stays as it is). The maintained sets keep their literal step counts.
+  Why. Derived, no scenario constant.
+
+- MPB-6, sets and strategies.
+  Ruling. Prior on is primary. Prior off is run as a diagnostic appendix only, reported by completion, holds and
+  near-encounters (ticks with the robot–human distance below `min_separation`), with no exact oracle comparison: with
+  the prior off every hypothesis is admissible, including deliveries of the robot's own items, so the robot's acts
+  change human-side hypothesis state and MPB-3's pre-run independence does not hold. Prior off has a different
+  verification status from prior on. The same scripts in both.
+  `single_task` is primary (its decisions, B2 and B3, are the ones scenarios 1 to 8 name; its `[meta-cand]` lines carry
+  the per-candidate hold). `full_reorder` is a second run of the same scripts: identical per-tick tables of parts 1 to
+  3 (the human side does not depend on the strategy; an invariant the comparison shows), not identical chains (the
+  `no_current_task` ticks differ by strategy), and part-4 properties where defined for it; it is not required to
+  reproduce every part-4 property (TODO-141).
+  Why. The same scripts across strategies keep a difference attributable to the strategy, not to the human's
+  trajectory.
+
+Staging. Step 2: authoring and build in one plan-then-build session. The plan shows the layout's geometry, each
+scenario's derivation of its declared property (on its setup) and the oracle's derivations (the expiry cadence, the
+projection identity, the gate with warrant) before any run; the independence boundary is demonstrated in the build
+report, not stated.
+
+Unchanged: nothing in the framework (the trigger set, `_clears_gate`, `realize()`, P4's fallback projection,
+retraction as L2 (ii) rules it, the recognizer, the run loop).
+
+Reference: cchat, 29 September 2026 (MPB); `docs/handoffs/handoff_G_X_onward.md` §6; "T-D X" (X1, X5); "T-D G" (AD1
+to AD4); "T-D P" (P4, Q6, P3, the observation-offset gap); "T-D L" (L1, L2 (ii), L4, L5 B); "T-D R and E" (E5, E6,
+E8); "The IR test-bed" and its close-out; `analysis/ir_testbed/README.md` (rule 23, the run length) and `REPORT.md`
+(the alteration test, the disagreement classes); "Layouts, setups and scenarios: the three artefacts of a run"
+(ruling 4 as amended); D2; D3; F1; `docs/assumptions.md` 1.3, 1.4, 2.2 to 2.6, 3.3, 4.2, 4.6 and the case
+classification; TODO-33, TODO-130, TODO-132, TODO-134, TODO-137, TODO-138, TODO-141
+
+Next: step 2.
+
+BUILT (MPB step 2, 29 September 2026; parts (i) to (iv)): e9f33ce (part (i), authoring), 787cee1 (part (ii), the
+instrument and its tests), b5c7387 (part (iii), the runs, the classification, the records, then "built in part"),
+8149f1d (part (iv), authoring: scenarios 6 and 7 re-authored, three scenarios added), and the part (iv) runs-and-records
+commit.
+
+The artefacts:
+- env_layout_12: the 10/11 pattern translated by (0, -200), plus the robot's work areas.
+- env_setup_10, env_setup_11.
+- Eleven scenarios:
+  - scenario_s10_01 to _05: MPB scenarios 1 to 5;
+  - scenario_s10_06: the control (8);
+  - scenario_s11_01, _02: 6 and 7, re-authored;
+  - scenario_s10_07: the sudden stand mid-carry; scenario_s10_08: the change of mind; scenario_s10_09: the misdelivery.
+- configs/mpb/, whose steps are MPB-5's safety cap.
+- analysis/mpb/: authoring.md, README.md, REPORT.md, the md5s of every run.
+
+The control's fact: a robot-only scenario is representable and loads and runs with no code change. The reference is
+built in-process and not registered; completion 161 (single_task), 137 (full_reorder).
+
+Verified, prior on, both strategies: all eleven, with zero disagreements on parts 1 to 3 at exact equality (every
+tick's leader, boundary, adequacy finding, gate, hypothesis adequacy, observation warrant and perception facts; every
+decision's trigger and cause, gate, leader, warrant and projection), against the in-process run and the log. Every
+declared part-4 property holds under single_task. The expected per-tick tables are byte-identical across strategies.
+- Scenario 1: entered at 25 and 76.
+- Scenario 2: the hold 5 at the admission at 25; no F1 violation in its window.
+- Scenario 3: retraction 55, expiry 66, entered 74.
+- Scenario 4: replaced and refused at the coffee break's boundary 133; entered on commitment at 134.
+- Scenario 5: `none(leader_unwarranted)` at the expiry of 127, on standing; entered at 132.
+- Scenario 6: the switch by cost at the expiry of 14. item_8's hold, 7, exceeds the layout's cost difference, 3.5; the
+  fallback stand ends at 1 + k, so the hold is at most k + 1.
+- Scenario 7: the walk's and the stand's expiry cadence.
+- The control: no hold; completion and every position equal to the reference.
+- scenario_s10_07: retraction at 62, 17 standing ticks into the stand; the standing fallback's doubling at the expiry
+  of 90 (k = 22 → 45); the resumed walk as a moving fallback at 110 and 115; re-admission only at the carry's advance to
+  `place`, 120; replaced at the boundary, 123; item_2 entered at b + 15, 138 (coffee_break live after the boundary: 1/2
+  each).
+- scenario_s10_08: replaced at 33 (the return's place, a boundary; coffee_break leads on the prior's tie order, so the
+  human's change from delivery 1 to delivery 2 passes through the coffee hypothesis in the recognizer's chain);
+  entered at 47 (commitment and observation; the IR test-bed's 46 moved by this setup's output floor); no retraction.
+- scenario_s10_09: retraction at 60; no re-admission of the misdelivered item; X5's ground (1) measured, the finding
+  unexplained from 60 to 72 and outliving a refused re-decision from 61.
+
+Classified:
+- Part (iii): scenarios 6 and 7 as first authored (a human with no assigned tasks), class 1 (the oracle's support rule
+  lacked io_contracts §2.1's empty-list clause; rule M0) and class 4 (MPB-3's precondition); re-authored in part (iv).
+- Part (iv), before any run: item_12 on shelf_2, class 4 (scenario 7's exit walk within 2.3 cm of it, admitted at 97);
+  moved to shelf_1.
+- scenario_s10_03's P3 under full_reorder: not a disagreement; P3 is declared for single_task.
+
+The alteration test detects every altered rule in some scenario except the skip rule (B2), class 3 (P4's dated line;
+TODO-142). AD3 is not exercisable in the MPB set (the AD3 line in "T-D G"). TODO-134: no instance.
+
+TODO-132 (a) evidence (scenario 7, single_task): the stand's holds double, 4, 8, 16, 32, and the last runs 30 ticks past
+the stay.
+
+The primary set's run logs at part (iv) (prior on, single_task; SUPERSEDED by the final list under CLOSED, below):
+9a35a1b15f37d877e865c301494d604c scenario_s10_01, 261221bbaaf4639801652a2b8003b69e scenario_s10_02,
+a9901a7af59ad78a65afc3179434a2e9 scenario_s10_03, 751eedb2c3ad3dbdeccf2b6abbdb3151 scenario_s10_04,
+bacc21befccd638cfcd0f1101f805443 scenario_s10_05, 65a9facce7cdd1621a081aa1f7980890 scenario_s10_06,
+86a511f42b9eb6756cdcd6fb6e8d65fe scenario_s10_07, 3edb658f33a62c60ecb8296c14b9c8c4 scenario_s10_08,
+5728f8b4f018b256af74c47aa3de9744 scenario_s10_09, 60987425011281575480cc73a7c093ab scenario_s11_01,
+580ae9fd3ae2455d251086223a6c5867 scenario_s11_02.
+
+The suite: 211 passed. The 48 maintained logs and their .rec streams are byte-identical to G-build's.
+
+COVERAGE PRINCIPLE (Hadi, 29 September 2026): each materially distinct mapping from a deviation kind to a decision chain
+that the MPB claims to verify has one authored instance; a different location of the same chain is covered by type.
+Provenance: scenario_s10_07 to _09 were added for a coverage gap found in review, not because a run failed.
+RECORD LINE (part (iv)): the framework has no representation of an observed human with no work under the prior on, since
+an empty assigned list is the diagnostic mode (shared/io_contracts.md §2.1). TODO-143, recorded only.
+
+NOT CLOSED (Hadi, 29 September 2026, the post-(iv) records; SUPERSEDED by CLOSED, part (v), below): "BUILT" above is step 2, parts (i) to (iv). The coverage
+matrix (analysis/mpb/coverage.md; the extended coverage principle under MPB-2) sorts every materially distinct decision
+path of the eleven runs: 31 verified, 5 unreachable with a derivation, 4 out of coverage with a reason, 1 reachable and
+not claimed (P3), 1 not a distinct path, and 5 reachable and claimed with no instance. Three facts of the whole set: the
+cause boundary fired in no run; every admitted record ended before its T_h; no record was kept through a dip below θ.
+X5's ground (2) is measured in scenario_s11_02 (single_task; every candidate holds at 25, 27, 31, 39 and 55).
+The five claimed cells are authored in part (v), one instance each, in the order ruled: the switch against an admitted
+projection (a new setup on env_layout_12); the hold against an admitted standing segment (a new scenario on
+env_setup_10); the switch while carrying (a new scenario on env_setup_11); a record kept through a dip below θ (a new
+scenario on env_setup_10); the cause boundary (a new layout without the coffee machine: the mechanism requires the
+absence of the `coffee_break` hypothesis, which wins the tie order at every reset). Rulings kept apart: P3 is reachable
+and not claimed; the wall cut is out of coverage until TODO-142 is ruled; "none" (no projection) is track 4's; AD3 stays
+out of coverage, conceptually apart from the boundary cause (both without instance; the boundary is claimed and
+reachable under a changed hypothesis space, AD3 is not exercisable here).
+CLOSURE CRITERION: the MPB closes when every materially distinct in-scope decision path is verified, unreachable with a
+recorded derivation, or outside the claimed mechanism with a recorded reason.
+
+PART (v), BUILT (30 September 2026; analysis/mpb/authoring.md and REPORT.md, "Part (v)"; coverage.md): the five claimed
+cells, one authored instance each, all verified (zero disagreements on parts 1 to 3 under both strategies, prior on;
+every declared part-4 property under single_task).
+- D8, the switch against an admitted projection: scenario_s12_01 on env_layout_14 and env_setup_12. At the admission
+  (entered, 26) item_7's hold through the crossing is 4, above the authored cost difference of 2.5 ticks (the midpoint of
+  (0, hold), fixed before any run), and the winner switches to item_13 with hold 0 before item_7 is grasped. The ruled
+  "new setup on env_layout_12" was not expressible: from shelf_5 every other robot task of that room is at least 11.2
+  ticks dearer, above a crossing's hold; Hadi ruled env_layout_14 (plus a shelf beside shelf_5 and a table), no two items
+  on one shelf. The admission moved from 25 to 26 on env_setup_12 (the output floor, seven keys), found before the run,
+  the cost relation unchanged.
+- C2, the hold against an admitted standing segment: scenario_s12_02 on the same room and setup (shelf_10 and
+  kitting_table_6, whose carry passes the human's waiting point at the coffee machine). At coffee_break's admission (76)
+  item_14's hold is 18, against the admitted wait (104 to 134); the robot comes within min_separation of the waiting
+  point only after the human has left it. env_layout_12 could not express it: every robot station lies at y >= -220, so
+  only a walk from the start passes the waiting point, before any admission of coffee_break is possible. The fallback
+  stand after the coffee break's boundary sends a hold of 30 as the human leaves (TODO-132 (a), recorded, not the
+  property).
+- D9, the switch while carrying: scenario_s11_03 on env_setup_11, the stand from tick 0 and the robot grasping item_8 at
+  4, before the decisive expiry (Hadi: the experimental variable is the carrying state at the decision, the return walk
+  in the cost difference, not when the stand began). At the expiry of 30 (k = 31) item_8's hold, 32, exceeds the return
+  difference, 16.4 (X1's condition with deliver_with_return); the robot switches while carrying, under both strategies,
+  and returns item_8 to shelf_3 before item_9's grasp.
+- E6, a record kept through a dip below theta: scenario_s10_10 on env_setup_10, scenario_s09_04's script (the planned
+  drop-cut detour cannot be expanded by the oracle's trajectory, which reads a cut from a Start only). Admitted at 25; the
+  record kept with no trigger through a proximity regress at 31 and the dip at 34 to 36 (item_1 leading below theta,
+  adequate); replaced at 37.
+- A4, the cause boundary: scenario_s10_11 on env_layout_13 (env_layout_12 without the coffee machine: the mechanism
+  requires the absence of the coffee_break hypothesis, which wins the tie order at every reset) with env_setup_10. item_1
+  misdelivered to kitting_table_3, adequate to the place (margin 55.5 cm at alpha = 0.05; the case would not form at
+  0.1); at the place (53) the reset leaves item_1 the leader: recognition_changed with cause boundary, its first instance.
+Classified, no class 2: scenario_s12_01 under full_reorder keeps item_7 (the ordering's cost includes its tail's return
+walks; MPB-6); three F1 robot violations inside that admission's window under full_reorder (hold 4 from 26), the pattern
+of scenario_s10_02 prior off; checked on the re-executed realization (REPORT.md, part (v)): the plan keeps 54.64 cm, the
+executed robot runs one step (one priced stationary tick) ahead of it and the projected human is 3.4 cm off the actual
+one, the robot's lead producing the violations; reading (c) by the check's rule, no class assigned;
+Hadi then read it as class 2, reading (a), and it was corrected (MPB-4's class-2 record); a near-encounter in scenario_s12_02 at 139 as the human
+walks toward the robot on moving fallbacks of k = 1 and 3 (P4's recorded error; X3; TODO-135). The alteration test on
+the sixteen: every rule detected except the skip rule (B2), as before. The eleven verified scenarios rerun byte-identical
+(68 of 68 logs and streams); the suite 211 passed; the four maintained sets 96 of 96 byte-identical.
+CLOSED (the close-out, Hadi, 30 September 2026; no longer provisional: objection 1 was read as class 2, reading (a),
+and corrected the same day, MPB-4's class-2 record). THE CLOSURE CRITERION: every materially distinct in-scope decision
+path is verified, unreachable with a recorded derivation, or outside the claimed mechanism with a recorded reason. Met:
+36 verified, 5 unreachable with a derivation, 4 out of coverage with a reason, P3 reachable and not claimed, one not a
+distinct path (analysis/mpb/coverage.md). The NOT CLOSED paragraph above is superseded.
+WHAT THE MPB ESTABLISHES. The MPB establishes structural branch reachability and execution of the recognition-to-planning
+chain, not consequential activation of those branches under human-robot interaction conflict. The progression: track 1,
+recognition (the IR test-bed); track 2, semantics (T-D R, E, L, P, G, X); track 3, reachability (this test-bed); track
+3b, consequence under conflict (TODO-145); T-F, benefit (TODO-144).
+FINAL NUMBERS (after the class-2 correction; analysis/mpb/REPORT.md): sixteen scenarios (scenario_s10_01 to _11,
+scenario_s11_01 to _03, scenario_s12_01, _02) on env_layout_12, _13 and _14 with env_setup_10, _11 and _12; zero
+disagreements on parts 1 to 3 in all 32 prior-on runs (both strategies), against the in-process run and the log; every
+declared part-4 property holds under single_task; the alteration test detects every rule except the skip rule (B2,
+TODO-142); the suite 220 passed; the four maintained sets regenerated at the correction (their "class-2 correction"
+sections). The primary set's run logs (prior on, single_task; every run's md5 in analysis/mpb/REPORT.md):
+ad1a4020ff0da1eb5d4dbfcafe60361e scenario_s10_01, ed061081de759217002890ab9ba36c5e scenario_s10_02,
+0ac37ed728ba00ccfa741a444da20206 scenario_s10_03, a46a710d3cf5115481c6563179432a7c scenario_s10_04,
+9f2cf65204ed963e1fcd030cff3d95a5 scenario_s10_05, f15ebb8578b481f7365cc78fc819394d scenario_s10_06,
+f58c4f4a9f50a495b5e5081869f4a83c scenario_s10_07, b10ca58e31510b196d1ca86344049c6d scenario_s10_08,
+eaa8e01774b9e925254c2fcbb96027b6 scenario_s10_09, f3299d52a633692e539ad0f0c9310f53 scenario_s10_10,
+f7f275edfcc056ca12dd9ce67554675b scenario_s10_11, 9b673e2bf65bd1d41cb1fa7e92215173 scenario_s11_01,
+580ae9fd3ae2455d251086223a6c5867 scenario_s11_02, 31d5f0f5e16cdd71e301cf77182aa311 scenario_s11_03,
+e1e9a758799a488b3bf022fe8c8b92ae scenario_s12_01, 93053e69c0d69ae637fb82b0c9399eb2 scenario_s12_02.
+Next, as Hadi rules: track 3b (TODO-145) before the evaluation (T-F, TODO-144), or track 4 (TODO-140).
+RULED (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): neither; T-G is next, then
+T-F and T-V, and track 3b and track 4 in the T-D tail after them.
+AUDIT TRAIL (Hadi, 2 October 2026; recorded in T-G records 15): the alteration test was broken at HEAD since the IR
+oracle began to read the layout's areas (T-G A9): its scratch copy looked for the layout under the scratch directory. It
+was corrected in the shared instrument code (analysis/instruments/mpb/alteration.py, c6469db). The table of
+analysis/kitting/mpb/REPORT.md reproduces exactly. An instrument correction, no change of behaviour.
+
+---
+
+## T-G, the second domain: rulings outside the shared core (A1, A10, A11; part B; part C)
+
+**T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)** — RECORD [T-G/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+- A1, V1 and FW.
+  V1 is the first complete version of the framework, the package for TeamRob and the publications. In V1: T-G; T-F; T-V
+  track 1 and track 2; the T-D tail's track 3b (TODO-145); track 4 in the reduced form of A8. FW (future work: not
+  designed, ruled or built within V1): the 4D detour; T-S; the directions of A10.
+  Tags. Each open TODO may carry a tag beside its status: [V1] or [FW]. A TODO keeps its number and identifier for good:
+  no renumbering, no renaming. An untagged TODO is not yet ruled. There is no full pass now: a TODO gets its tag when it
+  is next touched, by Hadi's ruling; a new item gets its tag when recorded.
+  [FW] is for conceptual, higher-level directions only. An alternative not taken in a design question is recorded inside
+  that question's ruling as "not taken", with its reason, and gets no FW item. FW must not hide a known wrong behaviour
+  inside what V1 claims: such an item is fixed in V1 or stated as a limitation.
+
+**T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)** — RECORD [T-G/2], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+- A10, FW directions (conceptual; each a TODO tagged [FW], or a tag on an existing item):
+  - shared work between the human and the robot: TODO-147;
+  - a human that chooses its own tasks (a human planner in place of the author's priority list): TODO-148;
+  - the robot modelling a human who waits for the robot's own action (Q3's alternative M3): TODO-149;
+  - several observed humans (`docs/assumptions.md` 5.2 allows one): TODO-150;
+  - a container divided into positions, the position chosen when an object is put down: the [FW] tag on LIMIT-04, no new
+    item;
+  - communication acts stay under the existing records (T-D X5, TODO-96): the human assigning or changing a delivery
+    location during the run; the robot informing a third party;
+  - under T-V track 2 (roadmap, T-V): an interruption of a busy human caused by a world fact, if wanted, is designed there
+    as the same entry point as the live user's click.
+
+- A11, a note for T-F (TODO-144): a layout authored so that routes cross shows that the robot adapts when an interaction
+  exists; it does not show how often interactions occur. T-F varies the placement and takes no interaction rate from
+  crossing setups alone.
+
+**T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)** — RECORD [T-G/3], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or `world/`)
+
+- B1, the domain's reading. The robot replaces the driver: an automated forklift whose assigned tasks are to deliver full
+  pallets from the truck to their containers and to return empty pallets to the truck. The truck stays parked for the
+  whole run and is a container. The observed human is the warehouse staff member who receives the delivery. The human's
+  assigned scans follow from the robot's assigned deliveries and are known at load.
+  It corrects the roadmap's T-G entry and `docs/handoffs/handoff_T-G_onward.md` (§4, §5): "a driver unloading pallets"
+  and "the driver's work order" are wrong under this reading; the foreseeable candidates recorded there (the phone call,
+  talking to the dock worker) belong to the driver's role, which the robot holds, and do not apply to the observed human;
+  "work order" was superseded by "assigned tasks" at T-H.
+- B2, Q1 in dock_loading: `confirm_delivered_pallet` states its condition in the task model: the pallet is in its
+  delivery container. (It answers LIMIT-02, TODO-10 and DESIGN-04 with A3.)
+- B3, Q4 (D1): "In V1, each object's destination is explicitly designated in the setup. The resolved fact is
+  destination_of(object, target), which the mind reads." The form of "An item's destination table is a fact of the
+  station" (T-B1a, amended by T-L). Not taken: a setup rule from an object's property to a target (an authoring
+  convenience, no component reasons with it); a destination decided at run time by the human.
+- B4, Q5 (E2): "A pallet has one type, pallet, and its full/empty condition is represented by the state fact
+  is_empty(pallet). Methods use that fact to determine which tasks are executable. In V1 the state remains constant
+  during a run; actions that change it are future work." Not taken: two object types; one task for both movements.
+- B5, Q6: the gate and the office door each have the state open or closed, declared in the setup. No action closes them
+  in V1.
+  - The gate, opened on request: the robot moves to the closed gate and honks; the honk is an action of the robot that
+    sets the fact "opening requested". The human has the assigned task "open the gate", applicable when the gate is
+    closed and the opening is requested: walk to the gate's button, press it. The button is a fixed object on the wall
+    beside the gate, away from the passage. The robot's deliveries require the open gate; until then the robot has no
+    applicable task and stands. The human is not interrupted and takes the task the next time it is free. Because the
+    task is assigned, the robot knows it through the prior, and it is a live hypothesis after the honk. No information
+    is exchanged. No deadline.
+  - The office door: the agent that passes it opens it; the affected task has one method for the open state and one that
+    opens first.
+  This supersedes TODO-08 for the gate and answers LIMIT-03 (with them TODO-02, BUG-04 and DESIGN-15's point 2). Not
+  taken: neither a state; constant states without an action; the robot opening the gate itself.
+- B6, Q7 (F2): two foreseeable tasks, `coffee_break` and `office_break`. `office_break` ends at its chair with a wait,
+  and the chair stands inside the office. Until track 4 is built the office is observed. (It answers DESIGN-15's point
+  3.) Not taken: a third foreseeable task of the same structure (standing with a colleague); a variant in which the human
+  scans all pallets only after every delivery; recognizing which variant of a task a human follows.
+  ADDED (Hadi, 1 October 2026; T-G records 8): `office_break` lasts 90 seconds; `coffee_break` stays 60 (TODO-157,
+  closed as ruled; the value is changed in the next build step). Reason: a long absence lets pallets accumulate in a bay,
+  which gives two scans possible at once and the robot arriving at an occupied bay; it differs clearly from the coffee
+  break. "T-G: the second domain's rulings", T-G Q16's block (RULED, T-G records 8).
+  CORRECTED (records, 2 October 2026; T-G records 9): one tick is 2 seconds (PT60S is 30 ticks), so office_break's wait is
+  45 ticks, and the human's absence is about 110 ticks (in the IR test-bed's C6 on env_layout_02, from leaving the dry
+  bay at 30 to the arrival at the frozen bay at 141), a little more than one round trip of the robot (about 96 ticks,
+  B14's note). Whether the absence is long enough for pallets to accumulate in a bay is reviewed with the MPB's design.
+  REVIEWED (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL5): office_break stays at 90 seconds
+  for the MPB. Reason: no value is changed for a test set.
+- B7, Q8 (H2'): `store_pallet(?pallet)`, a work task of the human: it takes a delivered and scanned pallet from its
+  delivery container to its onward container. Condition: the pallet is in its delivery container and is scanned, so the
+  order per pallet is delivered, scanned, stored. Each full pallet has a second designation in the setup, its onward
+  container. The human carries a pallet as the kitting human carries an item; no tool in V1. The human is never assigned
+  `deliver_pallet` or `load_return` in V1. Not taken: the human delivering its own pallets from the truck (kitting's
+  pattern).
+- B8, Q8b (K1): kitting's rule for a held object, unchanged. Hadi's wording: "When an agent starts a new task while
+  carrying an object, the carried object determines the applicable method. Continue with it if it is the new task's
+  object; otherwise return it to its recorded origin before starting the new task." It applies to `deliver_pallet`,
+  `load_return` and `store_pallet`. The origin is where the pallet was picked up: the truck, the empties area, the
+  delivery container.
+- B9, Q9a (S2): a container is one point, the centre of the container, with no constraint, and it may hold several
+  pallets (as kitting's table does). Not taken: authored pallet places; a position chosen when the pallet is put down
+  (FW on LIMIT-04, A10). Pallets drawn on top of each other are a drawing matter for T-V.
+  NOTE (records, 2 October 2026; T-G records 9; the IR test-bed on dock_loading), a property of "one point per
+  container", not a ruling: two pallets in one container stand on one point, so the second scan has no walk (its
+  move_to is acknowledged at once: C3, three stretches of 3 ticks that never reach the threshold), and no walk between
+  the two exists that an event could cut (the set's M3 as written was not buildable; Hadi approved scan 2 in its
+  place). LIMIT-04's FW direction (a position chosen when a pallet is put down) is the alternative.
+- B10, Q9b, the room. Requirements (Hadi): goods flow forward (truck, delivery container, store) and never travel away
+  from their store and back; the freezer lies near the dock; no bay stands in front of a store entrance; one place for
+  empties that both stores can bring to. Arrangement: the delivery bays in a row on one side wall, the frozen bay nearest
+  the gate; the freezer and the dry store on the opposite wall, the freezer nearest the gate; the empties in the top
+  corner on the bay side; the office at the top centre. The coffee machine, the gate's button, the desk, the standby
+  place and the landmarks are placed when the layout is drawn.
+  Artefact constraint: by the setup's designations, the human's carrying route crosses or approaches a normal robot route
+  in some setups and stays clear in others; the V1 scenarios include both.
+  Catch-up requirements: every fixed object inside the space; the zones leave the layout and areas are declared (A9);
+  landmarks for the exit walk; the revised room is a new layout and a new setup with the next serial ids; the present ones
+  (env_layout_01, env_setup_01) stay for the viewing fixture.
+  READS (B13, T-G records 2, 1 October 2026): "landmarks for the exit walk" reads: the desk landmark, which enters stage
+  1's layout.
+  MOVED TO STAGE 2 (Hadi and the design chat, 1 October 2026; recorded in T-G records 5); B14: the arrangement above (the freezer and the dry store on the opposite wall) is stage
+  2's room, with its own layout, setup and scenarios; it is unchanged and can be revised when stage 2's layout is agreed.
+  Reason: that arrangement serves `store_pallet`, which stage 1 does not have. Stage 1 uses the three rooms of B14.
+  "The present ones (env_layout_01, env_setup_01) stay for the viewing fixture" is superseded: they are removed with
+  their three scenarios, and the viewing fixtures of B14 replace build 1's. The other catch-up requirements hold for
+  B14's rooms (every fixed object inside the space; the areas declared; the desk landmark).
+- B11, Q11 (P2) in dock_loading: passing the gate is a plain step "move to the gate", whose target is the gate's centre
+  point; no special action. The domain has three areas, divided by the gate and by the office door: the truck side (the
+  truck and the dock platform, outside the gate), the hall, and the office (A9; names settled with stage 1's layout; the
+  six zones of env_layout_01 are replaced). Each task has one method per starting area, selected by the condition on the agent's area. A
+  method that crosses the gate keeps the condition that the gate is open. "Return the held pallet to its origin" may be a
+  sub-task used as the first step. Not taken: always going by the gate; a sub-task with conditions for a later passage
+  (A9's property defeats it); routing through openings as a property of movement (it changes the projection and the
+  recognizer in `shared/`). Within V1 this is dock_loading's answer to TODO-09.
+  AMENDED (Hadi, 1 October 2026, T-G stage 1's plan approved, answer 6; recorded in T-G records 7): "Each task has one
+  method per starting area" reads: a task has a method for every area its agent can be in, not for every area. The
+  robot can be on the truck side and in the hall; the human in the hall and in the office. With B8's four held-object
+  cases (held, another empty pallet held, another full pallet held, nothing held) a robot task has 8 methods. An agent
+  in another area is a defect: no method covers it, the absence of a method is the check, and no mechanism is added
+  (for the robot the run stops, TODO-152). B11's optional sub-task for the return is not used: a sub-task schema must be
+  in the robot's task model, and the hypothesis space is built from every schema there, so it would become a hypothesis
+  about the human. The methods: `docs/handoffs/plan_T-G_stage1.md`, section 4.
+- B12, further rulings on the domain's scope.
+  - Check-in and check-out [V1], stage 3: separate from the gate mechanism and independent of it. A desk with a computer
+    beside the gate's button is the human's place; the robot's place is a point just inside the gate, more than the
+    minimum separation away. Check-in: the two agents exchange the list of deliveries at the start. Check-out: the human
+    signs at the end to confirm that everything is delivered. Design open until stage 3, including what "exchanging the
+    list" means when the robot holds the designations from the start.
+    AMENDED (B13, T-G records 2, 1 October 2026): the desk enters stage 1's layout, as the target of the closing part;
+    check-in and check-out stay in stage 3 and will use this desk.
+
+**T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)** — RECORD [T-G/4], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+  - A deadline on the robot's waiting: the default is that the robot waits without limit. Optional in stage 3; not
+    planned.
+  - A pallet that blocks another in the truck: an optional sub-task in stage 3, if time in V1 allows.
+  - Not taken: an action of unknown length inside a plan; a fixed order among the robot's tasks as its own mechanism
+    (conditions cover it; deliveries and returns may be intertwined); the robot moving to wherever the human is (the
+    target would be an agent, arrival contradicts `min_separation`, the prediction becomes circular); a check-in that is
+    a meeting with no content.
+- B13, the closing part in dock_loading (the domain side of T-G Q14; Hadi, 1 October 2026; recorded in T-G records 2).
+  Stage 1's closing part is one entry: go to the desk. The desk is a landmark inside the hall, at the wall on the gate's
+  side, beside the place of the gate's button. It enters stage 1's layout.
+  The desk lies more than the minimum separation from the robot's routes through the gate. Reason: the robot still passes
+  the gate after the human's list is finished, and the human then stands at the desk.
+  No exit from the room is defined for dock_loading now. Check-in and check-out stay in stage 3 and will use this desk
+  (B12).
+  `docs/assumptions.md` 1.1 (a script ends with the human leaving the workspace) reads for dock_loading: the script ends
+  with the walk to the desk. B10's "landmarks for the exit walk" reads: the desk landmark. Kitting is unchanged. T-F's
+  scope line on the exit walk (TODO-144) is a kitting statement; dock_loading's ending is for T-F's own design.
+  NOTE (T-G records 3, 1 October 2026; not a ruling): the desk is a landmark in stage 1, so no task of the robot's task
+  model names it and the robot's mind holds no hypothesis for the walk to the desk, as for kitting's exit walk. Whether
+  the desk becomes a fixed object is stage 3's question.
+- B14, stage 1's rooms and setups (Hadi and the design chat, 1 October 2026; recorded in T-G records 5).
+  Rooms. Stage 1 uses three rooms, env_layout_02, env_layout_03 and env_layout_04, derived from the present room. The old
+  env_layout_01, env_setup_01 and the three scenarios on it are removed; the viewing fixture of build 1 is replaced by the
+  fixtures written with these rooms. The room of B10 (the freezer and the dry store on the opposite wall) moves to stage 2
+  (B10's note). More rooms and setups may be added in stage 1 later.
+  Identical in the three rooms (centres in cm; origin and axes as before): the hall, x from -600 to 600, y from -300 to
+  300; the office, x from -170 to 170, y from 300 to 415; the office door (0, 300); the chair (130, 365), inside the
+  office; the gate (0, -300), width 300; the truck (0, -590), 250 by 300; the dock platform as before; the desk, a
+  landmark, (300, -260); the standby place, a landmark, (0, 0); the delivery bays and the empties container 170 by 170;
+  the coffee machine 50 by 50. The declared space contains every fixed object, the truck included.
+  Differing:
+  - env_layout_02: dry delivery bay (-515, 215); frozen delivery bay (515, 215); empties (-515, -35); coffee machine
+    (505, 30).
+  - env_layout_03: dry delivery bay (-515, 215); frozen delivery bay (515, 0); empties (-515, -35); coffee machine
+    (-400, -230).
+  - env_layout_04: dry delivery bay (-255, 215); frozen delivery bay (-515, -35); empties (515, -35); coffee machine
+    (-400, -230).
+  One container for empty pallets per room. The three areas (truck side, hall, office) are declared in each layout,
+  written under the name the code has today (zones); stage 1's rename step converts them.
+  Agents. The human starts at the standby place. IR test-bed: the robot stands idle on the gate's centre point (0, -300)
+  for the whole run. MPB: the robot starts on the truck side. Stage 1 keeps full observation: the robot observes every
+  area, the office included, wherever it stands. A8's rule on monitored areas is reopened at stage 2 (A8's note).
+  Setups, two kinds per room (six files):
+  - Kind 1, for the IR test-bed: two full unscanned pallets in the dry delivery bay and two in the frozen delivery bay,
+    each designated to the bay it stands in; one full pallet in the truck, designated to the dry delivery bay; no empty
+    pallets. Reason: one setup serves three cases by the scans a scenario assigns (one scan per bay; two scans in one
+    bay, the same-motion case; the scan of the pallet in the truck, which never becomes applicable, so the human goes to
+    the standby place).
+  - Kind 2, for the MPB: four full pallets in the truck, two designated to each delivery bay; two empty pallets in the
+    empties container. Reason: the robot's pool always holds a delivery to the other bay and a return.
+  - RULED: the setup designates the truck as the destination of each empty pallet (the PROPOSAL of that name). Reason:
+    one rule covers every pallet.
+  - A third kind, all four full pallets designated to one bay, is added after the first MPB run if its results call for
+    it.
+    KEPT (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL2): the condition stands. A new kind for
+    the MPB's controlled scenarios is ruled there (one full pallet already in each delivery bay); the names of the kinds
+    are not ruled.
+    READS (Hadi, 2 October 2026; T-G records 11; THE MPB ON DOCK_LOADING, DISPOSITIONS, D7): "a third kind" reads "kind 4"
+    ("one bay"). Kind 3, "pallets in the bays", is MPB-DL2's (two full pallets in each delivery bay, as amended).
+  Staging: a milestone in stage 1's build, before the IR test-bed: one simple scenario per room runs from start to end.
+  Stage 1's "before the plan" points on the layout and the setup (C1's "before each stage's plan the design chat and
+  Hadi agree the layout and the setup") are closed by this entry for stage 1.
+  ANSWERS (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6):
+  - The six setups stay as written, though pairwise identical in content across the rooms. Merging identical setups
+    belongs to the held refactor of scenarios and layouts, not to this stage.
+  - Accepted as built (cec8cc3): the MPB robot's start point (0, -370), on the dock platform; the ids
+    `empty_pallet_bay_0`, `desk`, `standby_place`; the area names `zone_hall`, `zone_office`, `zone_truck_side`.
+  - A pallet's `subtype` stays out of the setups. Reason: destinations are by designation.
+  - The pictures of the old room are kept, renamed with the suffix `_original` (C3's note).
+  NOTES (the same answers; facts, not rulings):
+  - An agent stops 10 to 30 cm before a target point (a walk steps 20 cm toward the centre and completes once
+    `at(agent, object)` holds); the proximity threshold is 30 cm (`PROXIMITY_THRESHOLD`).
+  - The scan and the next delivery to the same bay share one point (the bay's centre, B9), so with a minimum separation
+    of 50 cm that conflict is certain whenever both concern the same bay. This is the expected main interaction of stage
+    1, not a defect.
+    CORRECTED (records, 1 October 2026; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): the conflict requires, in
+    addition, that the human is still at the bay when the robot arrives. In stage 1's rooms a round trip to the truck
+    takes about 96 ticks and a scan from the standby place 16 to 30, so the human finishes before the next pallet
+    arrives, and the second milestone scenario did not reach it.
+
+PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
+
+- C1, the stages of T-G (all in V1). Before each stage's plan the design chat and Hadi agree the layout and the setup for
+  that stage.
+  - Stage 1, the basic domain: the robot delivers and returns (B11); the human scans, takes the two breaks, steps aside to
+    the standby place; the gate is declared open; the office door has no state yet. The IR test-bed, then the MPB.
+  - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
+    run, TODO-16 with the stepwise delivery (A7).
+  - After stage 2: track 4 (A8).
+  - Stage 3: check-in and check-out (B12), with the two optional items.
+  STAGE 1.5 (Hadi, 1 October 2026; T-G records 2): context knowledge, framework-wide, after stage 1's close and before
+  stage 2. The order is stage 1, stage 1.5, stage 2, track 4, stage 3. Stage 1.5 starts from its own handoff.
+  Its content (its design opens at its stage; nothing is ruled yet): a context timeline in the scenario that changes a
+  fact at an authored point of a run, applied by the environment; both domains' foreseeable tasks conditioned on such
+  facts. Open questions recorded for it:
+  - the form of a context fact;
+  - whether the human only starts a task on it or a task in progress is interrupted (A3's "never interrupted" and A10's
+    line on an interruption caused by a fact);
+  - liveness under A4 when a condition turns false while the human still executes the task ("applicable to start"
+    against "valid to continue");
+  - the prior under context;
+  - the perception assumption for context facts.
+  The pre-loaded context stream moves from T-V track 2 to stage 1.5. T-V track 2 keeps the live events.
+  ADDED (Hadi, 1 October 2026; T-G records 8; T-G Q16's block below, RULED), NOT RULED: one design question for stage
+  1.5, what sets a hypothesis's share at the start of an episode. Four determinants are recorded for it: the assignment
+  (exists); context facts; the task that just ended (a transition prior between tasks, Hadi's idea); an enabling event,
+  such as the robot's own delivery (TODO-154). They are designed as one mechanism. Also Hadi's ideas for stage 1.5, NOT
+  RULED: the duration of a foreseeable task is not one fixed number; temporal context can be a fuzzy set with a degree
+  of membership.
+  A requirement on stage 1's plan (the same ruling): the form built for A5 admits a fact that no action changes and that
+  is not the state of a movable object. Reason: context knowledge then needs no second mechanism. Stage 1 authors no such
+  fact.
+  WHERE EACH RULING IS FIRST BUILT (Hadi, 1 October 2026, T-G records 1, continued). Content only; the order inside a
+  stage is for that stage's plan.
+  - Stage 1, the basic domain:
+    - first, in its own commit with no change of behaviour: the zone mechanism renamed to "area" in the code (A2's
+      ruling of 1 October 2026; the plan reports the extent first). This is the one rename in V1; A2's "no code is
+      renamed" concerns the terms it introduces;
+    - the catch-up of dock_loading's forms to kitting's (C3);
+    - A3, the human's script form (`world/`), with the standby entry, once the entry lifecycle is ruled (A3, PARKED);
+      RULED (1 October 2026): the lifecycle is A3's Q12 to Q15, with the closing part; dock_loading's closing part, the
+      walk to the desk, and the desk landmark (B13);
+    - A4, liveness by applicability (`shared/`);
+    - A5, generic object states and designations, used here for the scanned state, `is_empty` and the destination;
+    - A6, the perception assumption;
+    - A9, the declared areas and the fact that an agent is in an area (the mechanism exists under the code name "zone":
+      renamed by the first step, not built anew; dock_loading's three areas declared in stage 1's layout);
+    - B1 to B4, B8, B9, B11;
+    - B6, with `office_break` in a reduced form: the office door has no state yet, and the human passes it as a plain
+      point on the way; the office is observed;
+    - B10, the room; whether the stores and the freezer are already present in stage 1's layout is not ruled
+      (PROPOSALS);
+      SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): stage 1 builds B14's three rooms and six setups; B10's room is stage 2's; the proposal is
+      closed as not taken;
+    - the IR test-bed on dock_loading, then the MPB.
+    - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): before the IR test-bed, a milestone: one simple scenario per room of B14 runs from start to end;
+
+**T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)** — RECORD [T-G/5], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+    A3, A4, A5 and A9 each change code outside the domain, and each carries its acceptance check on kitting: the
+    maintained sets stay byte-identical.
+    BUILT (1 October 2026): the rename, A9 with R2, A4, A5 and A3 (stage 1, steps 1 to 5). "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
+    BUILT (1 October 2026): dock_loading's catch-up, its content and the milestone (stage 1, steps 6 to 8; the
+    milestone's acceptance held in all three rooms). ADDED (Hadi, 1 October 2026): before the IR test-bed, a second
+    simple scenario per room, then the sorting of the earlier analyses and tests under kitting with the preparation of
+    the instruments. "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT.
+  - Stage 2:
+    - B7, `store_pallet`, with the second designation (the onward container);
+    - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): B10's room (the freezer and the dry store on the opposite wall), with its own layout, setup and
+      scenarios;
+    - ADDED (the same): A8's rule on monitored areas reopened (A8's note); its build inside stage 2 or its own
+      increment, decided then;
+    - B5, the gate opened on request, and the office door's state;
+    - A7, TODO-16, after the MPB's first run on dock_loading.
+  - After stage 2: A8, track 4.
+  - Stage 3: B12, check-in and check-out, with its two optional items.
+  ADDED (T-G records 2, 1 October 2026): stage 1.5, between stage 1 and stage 2 (before track 4): context knowledge
+  (STAGE 1.5 above); nothing in it is ruled yet.
+  Rulings with no stage, because nothing is built for them: A1 (V1, FW and the tags: a records rule), A2 (terms; no code
+  is renamed), A10 (FW directions, outside V1), A11 (a note for T-F), and B12's items "not taken". A6 is an assumption,
+  recorded in `docs/assumptions.md` 5.3; stage 1 is where the robot first reads object states through it.
+- C2, build 1 (30 September 2026; 56e674e, 6e29c15, 62ebc4e): the form-only repairs (the steps of `pick_up`, `place` and
+  `scan_it` bind `?item`; `confirm_delivered_pallet` typed; the layout's `office_chair` typed `office_chair`; the robots'
+  tasks in `assigned_tasks`) and scenario_s01_03, a viewing fixture that loads and initialises. scenario_s01_01 and
+  scenario_s01_02 still fail at load by intent (`infeasible:office_break(...)` in the load-time replay: the door
+  condition). Re-measured at 62ebc4e (1 October 2026): as stated.
+  SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5); B14: env_layout_01, env_setup_01 and scenario_s01_01 to _03 are removed; B14's viewing fixtures
+  replace scenario_s01_03.
+- C3, the state of `domains/dock_loading/` after build 1 (the survey of 30 September; each line verified against the code
+  at 62ebc4e, 1 October 2026). Stage 1's plan starts from this list.
+  NOTE (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): the lines on env_layout_01, env_setup_01 and their scenarios (the truck outside the space, the office
+  chair in the hall, no landmarks, no assigned tasks for the human) describe artefacts B14 removes; B14's rooms have every
+  fixed object inside the space, the chair inside the office and the two landmarks. The rest of the list stands.
+  Still not in kitting's current form:
+  - no `HumanOnlyTask` (`go_to`, `stand`, `go_to_and_stand`) and no `stand` action; no `script.py` with the call forms;
+    the scenarios use raw `TaskInstance`s;
+  - `pick_up` and `place` lack the successor-state declarations of T-B2a (`moved_object_key`, `moved_to_key`); `place`
+    still has the effect `not_holding` instead of a retraction of `holding`;
+  - `wait_at` completes on `ProcessCompletion`, not on the fact `waited`;
+  - no landmarks; no exit walk; no purpose statement in the scenarios;
+  - the layout has a `zones` block and a `zone` field per object (kitting's layouts too: A2);
+  - stale docstrings in `tasks.py` (`?dest`, two gate methods per task, "Human assigned" / "Human foreseeable", no
+    `office_break`) and `scenarios/scenarios_s01.py` ("scenario ids keep their old form until stage 3"); layout pictures
+    inside the domain folder under an old id (`env_layout1.svg`, `env_layout1_present.svg`, `env_layout1_present.png`,
+    `env_layout_original.jpg`; kitting keeps its pictures in `docs/env_layouts_png/`).
+    NOTE (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6): these pictures show the removed env_layout_01. They are kept, renamed with the suffix `_original`
+    (`env_layout1_original.svg`, `env_layout1_present_original.svg`, `env_layout1_present_original.png`);
+    `env_layout_original.jpg` keeps its name.
+  Content that the rulings of part B replace:
+  - `deliver_pallet` has a free `?delivery_bay` and one method (B3, B8, B11); `load_return` ranges over every pallet
+    (B4); `confirm_delivered_pallet` has no condition (B2); `office_break` has a door condition no fact satisfies and ends
+    with a walk to the gate (B5, B6); the human has no assigned tasks in scenario_s01_01 and scenario_s01_02 (B1);
+  - the truck extends 40 cm outside the space (to y = −740; the space's y runs from −700); the office chair stands in the
+    hall (its declared zone is `zone_hall_center`), 30 cm from the coffee machine (B10).
+  In the simulator, written for this domain (A5 replaces them):
+  - `mesa_sim/world_state_builder.py` emits `gate_is_open` for every object of type `gate` whose `is_open` is not False,
+    and `is_open` is never loaded (always None); nothing emits a door fact;
+  - the fields `is_empty`, `is_scanned`, `is_open` on `SimObject`, the `scanned` fact, and the touch handler reading the
+    literal `"?item"` (`mesa_sim/action_decomposer.py`; the grasp handler, kitting's too, reads the same literal);
+  - `mesa_sim/list_scenarios.py` lists kitting only; `SimModel.get_movable_objects` filters the type `"item"` and nothing
+    reads it.
+  In the viewer (for T-V, or the stage that first needs it): the colour table's keys (`delivery_area`, `empty_bay`) do
+  not match the layout's types (`delivery_bay`, `empty_pallet_bay`; `office_chair` absent); the axis range clips what
+  lies outside the space; the label offset is keyed on the type `"shelf"`.
+  `domains/README.md` is stale throughout: rewritten with stage 1's build (REFACTOR-03).
+- C4, points for the stage plans (not rulings; each returns to the design chat only if it produces a finding):
+  - the load-time check for a script that depends on the robot, and the meaning of the outcome "infeasible" under A3;
+    RULED (Hadi, 1 October 2026): A3, Q13b (and Q13a for an entry that ends INFEASIBLE);
+  - how "completed" is judged for an entry of the human's list (the standby entry must be takable again after the human
+    has left the place). PARKED (Hadi, 1 October 2026) as the first design question of the next design chat, the
+    lifecycle of an entry: A3's PARKED block; A3 is not built before it is ruled. The byte-identical acceptance does not
+    exercise the rule (no maintained kitting set has a dropped task): the ruled rule is also checked on the kitting
+    scenarios with a drop event and on the test-bed sets with misdeliveries;
+    RULED (Hadi, 1 October 2026): A3, Q12; the added check is A3's ACCEPTANCE;
+  - where the exit walk stands relative to the priority list (a plain walk is always applicable);
+    RULED (Hadi, 1 October 2026): A3, Q14 (the closing part); dock_loading's, B13;
+  - how an event or a foreseeable task is placed relative to tasks whose order is not fixed;
+    RULED (Hadi, 1 October 2026): A3, Q15;
+  - how a pallet's origin is recorded (B8);
+    SETTLED (T-G stage 1's plan, approved by Hadi, 1 October 2026; recorded in T-G records 7): in stage 1 a pallet's
+    origin is the setup's initial container (`home_container_of`), which is where every stage-1 pick-up happens; stage 2
+    (`store_pallet` picks up from a delivery bay) needs the origin recorded at the pick-up;
+  - how the meta-planner behaves when the pool holds tasks and none is applicable (TODO-30);
+    CORRECTED (T-G records 7, 1 October 2026): the citation of TODO-30 is wrong; TODO-30 is closed and concerns
+    realizability (F1), not applicability. FINDING (T-G stage 1's plan, approved by Hadi, 1 October 2026): a robot task
+    with no applicable method raises `DecompositionError` out of `MetaPlanner.update()` (through `_is_complete`), which
+    nothing catches, and the run stops. Stage 1 cannot reach it (a method for every area the robot can be in, the gate
+    open). Stage 2 (the robot at a closed gate, B5) needs a ruling first. TODO-152;
+  - the forms in the setup and the registry for object states and the two designations (A5);
+  - the smallest set of methods under B11 with B8;
+    SETTLED (the same approval): B11 as amended (answer 6): 8 methods per robot task, the human's methods for the hall
+    and the office;
+  - how the existing machinery behaves when the live set holds foreseeable tasks only, at the start of a run and between
+    deliveries (TODO-143 stays parked: it concerns an empty assigned list, which is a different state);
+    SETTLED (the same approval): the existing machinery, nothing new. With the prior on the live set is {coffee_break,
+    office_break}; the human waits or walks to the standby place; both hypotheses become inadequate, the finding is
+    unexplained, admission refuses and the robot realizes against the fallback projection, as for kitting's exit walk.
+    An empty live set is not reached with the prior on while the human is in an area; otherwise exhausted, below theta,
+    the fallback;
+  - for the IR test-bed on dock_loading the robot is idle, so its setup places the pallets in their delivery containers
+    from the start.
+  - ADDED (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6): the rule for a point on the boundary of two areas, which today is decided by the order of
+    declaration (`SimModel.get_zone_of_position`: inclusive bounds, the first declared zone wins); and, since an agent
+    stops 10 to 30 cm before its target, the area an agent is in after "move to the gate" from each side, in the
+    environment and in the computed state alike (R2);
+    SETTLED (the same approval): the rule stays the order of declaration, stated in one shared function (`area_of`).
+    NOTE (T-G stage 1, step 2 as built, 1 October 2026): that shared function is `area_at`; `area_of` is the planner's
+    lookup for an object's area.
+    An agent stops 10 to 30 cm short of the gate on its side of approach and stays in the area it came from; the
+    projection's arrival point and the replay's walk end (where the body stops, answer 5) give the same area; only the
+    centres of the gate and the office door lie on an edge;
+  - ADDED (the same): the scanned state of an empty pallet (B14's setups leave it out; the form defaults it to false);
+    SETTLED (the same approval): it does not hold (the form's default: a declared state not listed does not hold);
+    nothing reads it with the prior on;
+  - ADDED (the same): the stale references to removed dock_loading scenarios in `mesa_sim/run_mesa.py` (its docstring
+    and commented-out imports name scenario_s01_01 and _02), corrected in stage 1's first build step.
+  - ADDED (Hadi, 1 October 2026, on the T-G records 3 flags; recorded in T-G records 4), R2 (C1, stage 1): the agent's area in a computed state after a movement action, one
+    definition shared with the environment's state construction; the plan names the shared representation, every
+    consumer of a computed state that decomposes a later task, and the form.
+- C5, to watch in the test-beds: hypotheses that predict the same motion divide the belief, so none passes the admission
+  threshold (two unscanned pallets in one container). If the IR test-bed confirms it on dock_loading, it is a finding
+  about the mind and returns to the design chat within V1.
+  CONFIRMED (the IR test-bed on dock_loading, 1 to 2 October 2026; records 2 October 2026, T-G records 9): in C3 and on
+  C4's first two walks, in all three rooms, two scans of one bay share the belief and neither reaches the threshold (9
+  stretches; none admitted). A finding about the mind, NOT RULED; it returns to the design chat. Linked to the recorded
+  direction on acting on a set of hypotheses with the same projection: belief-aware planning, the covering set S_ε and
+  one realization against its projections jointly (TODO-97). "T-G", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT.
+- C6, open at their stage: the design of check-in and check-out; the design of TODO-16; how the MPB's oracle derives an
+  expected decision when the human's sequence depends on the robot's decisions.
+  ANSWERED FOR STAGE 1 (Hadi, 2 October 2026; T-G records 10): the third clause, by THE MPB ON DOCK_LOADING, MPB-DL3.
+  The first two clauses stay open at their stages.
+
+**Stale passages, input for a later consolidation (records, 2 October 2026; Hadi's ruling of that day)**
+Found in the records split's plan step and listed as reported there; not corrected now (the corrected ones are the two
+area passages of design_decisions.md, CLAUDE.md's invariant and the docstring in `shared/types.py`, commit fbc8a55).
+Line numbers are those of `docs/design_decisions.md` at 248a946, before the split; each passage is in design_decisions.md
+or, where the split moved it, in the record file its index line names.
+- 103–109 and 116–120: scenarios are YAML, `scenarios.yaml` → scenarios are Python literals
+  (`domains/*/scenarios/scenarios_sNN.py`).
+- 132–160: one unified `env_objects` list → split between the layout file and the setup file (T-L).
+- 195–213: the progress evaluator "directional" → `excess_path` (`shared/likelihood_functions.py:184`).
+- 361–371: `_project()` raises for orderings → `Projector.project` chains orderings (`shared/projection.py:216`).
+- 1943: `realize()` not yet consumed → the meta-planner consumes it.
+- 2035, 2181: min_separation as 2.5 × motion → a body-supplied distance (`shared/meta_planner.py:254`).
+- 2038: no projection means δ = 0 → a fallback projection since T-D P (`shared/meta_planner.py:354–359`).
+- 2383: `task_instance_key` equality → `same_task` (`mesa_sim/sim_agents.py:539–545`).
+- 2619: `_clears_gate` tests confidence ≥ θ → it returns a `GateOutcome`, which also needs adequacy and warrant
+  (`shared/meta_planner.py:202, 712`).
+- 2964: a `BETA` constant → beta is a required constructor argument (`shared/recognizer.py:360`).
+- 3146: `DomainKnowledgeBase` → `Tree` (`shared/knowledge.py:201`).
+- 3150, 3272: `zone_of`, `in_zone`, `object_zones` → `area_of`, `in_area`, `object_areas`.
+- 3227: `Projector._successor_state` → `successor_state` (`shared/projection.py:623`).
+- 3869–3871 (T-H): the support includes `∪ {unknown}` → no `unknown` hypothesis.
+- 3881, 3903 (T-H): the script is an ordered list → A3's priority form (`world/human_executor.py:31–40`).
+- 3926: a coverage enum → the classes in `world/queries.py:143–169`.
+- 4173: "zones" → areas.
+- 4344–4346: R3 "to be built" → built (`shared/meta_planner.py:793`).
+- 4723–4729 and 4749 (L4, L5): a live set from terminal facts only → A4's inapplicability as well
+  (`shared/recognizer.py:490, 760–768`).
+- 4856: "P adds no trigger" → `projection_expired` (`shared/meta_planner.py:466`).
+- 4845, 4868: the decision record stays empty under a fallback → its expiry field is set
+  (`shared/meta_planner.py:578–596`).
+- 4875–4877: a stationary tail at the current position → `project_fallback` returns None (`shared/projection.py:415–418`).
+- 4871: one stored field → also a run length and a standing count (`mesa_sim/sim_agents.py:404, 624–639`).
+- Code docstrings: `mesa_sim/world_state_builder.py:54` repeats "in_area … context for IR"; `shared/types.py:479–490`
+  (`goto_zone`, `?zone`); `shared/types.py:1142` (`FallbackProjection`); `world/human_executor.py:42` (`shared/record.py`).
+CLAUDE.md's "Current phase and status" section and `docs/TODOS_AND_DEFERRED.md` show the same mix of conceptual design
+and record; they are not treated in this step.
+
+## T-G stage 1: the plan, the build, the test-beds, the close
+
+**T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)** — RECORD [T-G_stage1/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+STAGE 1 PLAN APPROVED (Hadi, 1 October 2026; recorded in T-G records 7). The approved plan, with the answers merged in,
+is `docs/handoffs/plan_T-G_stage1.md`; every build session of stage 1 reads it. The answers to the plan's nine questions:
+1. `deliver_pallet` has no condition on the pallet being full. Reason: the designation and the load check (an assigned
+   task's determined parameter, resolved from the station, must have its declared type) exclude an empty pallet, and the
+   planner needs no negated condition. It answers B4 for `deliver_pallet`; `load_return`'s methods read `is_empty`.
+2. A fixed object's area is derived from its position; the declared per-object field is dropped (A9 AMENDED).
+3. dock_loading's area ids are `area_hall`, `area_office`, `area_truck_side`; kitting's ids stay.
+4. The carriers of the area that nothing reads are removed (`AgentState`'s area, the observation's area,
+   `SimObject`'s area and its query); the `in_area` fact stays.
+5. The load-time replay ends a walk where the body stops. Reason: the replay and the run must select the same method at
+   the gate and at the office door.
+6. Not as recommended: a task has a method for every area the agent can be in, not for every area (B11 AMENDED).
+7. The task model names `dock_gate`, `office_door` and the area ids, as this domain's convention.
+8. The milestone scenarios as proposed, one per room (scenario_s03_02, s05_02, s07_02).
+9. The build may edit `shared/io_contracts.md`, `README.md`, `domains/README.md` and the note in `docs/rename_table.md`;
+   the glossary and this file stay with records steps.
+Also approved: the names in the plan's section 6 as proposed; the build order, steps 0 to 8, with their acceptance and
+stop conditions.
+Notes (not rulings):
+- A pallet's origin is the setup's initial container in stage 1; stage 2 needs it recorded at the pick-up (C4).
+- The rename leaves `ros_sim/` passing the old field names (`current_zone`, `object_zones`); `ros_sim/` is not touched
+  (TODO-111's note).
+- The walk to the standby place has no hypothesis in the robot's task model, so a scenario with a standby entry is
+  classed as containing unmodelled behaviour, and its purpose says so (`docs/assumptions.md` 1.2). PARKED for after the
+  milestone, not ruled: whether the robot's mind holds a hypothesis for the human stepping aside.
+- In the IR test-bed setup (B14, kind 1) the case with the assigned scan of the pallet in the truck is declared
+  dependent on the robot; its priority list never finishes, so that run has no walk to the desk (B13, assumptions 1.1).
+- REQUIREMENT on the later preparation of the IR test-bed and the MPB on dock_loading: the instruments obtain the human's
+  run-time sequence from the executor's own selection rule; they do not implement that rule a second time. Reason: one
+  definition. (Under R1 the load-time replay no longer gives that sequence for a script with a standby entry.)
+- Finding: a robot task with no applicable method stops the run (C4, TODO-152).
+
+STAGE 1, STEPS 0 TO 5 BUILT (1 October 2026; built and accepted, each against the plan's acceptance and stop conditions).
+- Step 0: the HEAD runs of the extended set (the four maintained sets, the ten kitting drop scenarios, the IR and MPB
+  test-bed sets), kept outside git as the reference set of every later step; no commit.
+- Step 1, the rename "zone" to "area": 8d064ca; the stale references to removed dock_loading files: c21f001.
+  ADDED (records, 1 October 2026): acceptance, 655 reference files byte-identical, 220 tests.
+- Step 2, the declared areas and the agent's area in a computed state (A9, R2): b513b82; the layout's per-object area
+  field dropped: 9bca721; `shared/io_contracts.md`: a76054f.
+  ADDED (records, 1 October 2026): acceptance, 844 reference files byte-identical, 225 tests.
+- Step 3, liveness by applicability (A4) and `AdaptivePlanner.is_applicable`: bd4bddc.
+  ADDED (records, 1 October 2026): acceptance, 847 reference files byte-identical, 232 tests.
+- Step 4, object states and designations (A5): b74485b; `shared/io_contracts.md`, `domains/README.md`: 50f2fb8.
+  ADDED (records, 1 October 2026): acceptance, 847 reference files byte-identical, 241 tests.
+- Step 5, the human's script form (A3): 048a36e; `shared/io_contracts.md`: 576f2b2.
+Next: step 6 (dock_loading's catch-up, with the area ids), step 7 (the domain's content), then the milestone (step 8).
+NOTES (records, 1 October 2026; facts of the build, not rulings):
+- The shared function for a position's area is `area_at(position, areas)` (the plan's 3d named it `area_of`); the
+  planner's lookup for an object's area keeps the name `area_of`.
+- A setup entry that still carries the old per-object state fields (`is_empty`, `is_scanned`) is ignored for those
+  fields, not refused. An authoring risk, parked under TODO-151; step 4 was not widened.
+- A dock_loading grasp raises an explicit error (the action declares no `moved_object_key`) until step 6 gives `pick_up`
+  its final form. Intended; no fixture grasps.
+- Step 2 made the walks of kitting's load-time replay 1 to 3 ticks shorter (the replay's walk ends where the body stops,
+  answer 5); no maintained output contains them.
+- Step 3 removed two dead branches, in the adequacy test and in the warrant, with no change of output.
+- A closing entry begun and not finished at the run's end counts as open. A dependent script always writes its end line
+  (`[rec] end step=n open=-` when no entry is open).
+- The log wording for a hypothesis that never enters the live set, `[IR-inapplicable] step=N <key> does not enter the
+  live set: no applicable method`, is confirmed as built.
+- Four frozen analysis scripts no longer run since the rename (step 1): `analysis/i4_evidence_model/check_i4.py`,
+  `analysis/g1_graded_evidence/unit_checks.py`, `analysis/i4c_episode/check_i4c.py`,
+  `analysis/i4d_fold_unknown/check_i4d.py`; they need the old field names. Frozen records: not edited.
+
+STAGE 1, STEPS 6 TO 8 BUILT (1 October 2026; built and accepted, each against the plan's acceptance and stop
+conditions; the milestone accepted by Hadi).
+- Step 6, dock_loading's catch-up (the forms brought up to kitting's; the area ids `area_hall`, `area_office`,
+  `area_truck_side`; `domains/dock_loading/script.py`; `domains/README.md` rewritten): 670cb78; `list_scenarios.py`
+  lists every domain, `SimModel.get_movable_objects` removed (no reader): 610fed9.
+- Step 7, the domain's content (the plan's section 4: 16 robot methods, 11 human methods, the declared states, the task
+  model): 1492789; its tests, `tests/test_tg_dock_tasks.py`: 512a452.
+- Step 8, the milestone: the two allowed one-line corrections (the stale note on `ProcessCompletion` in
+  `shared/types.py`; the viewer's colour keys for the three area ids): 52b2aae; the three scenarios, scenario_s03_02
+  (env_layout_02, env_setup_03), scenario_s05_02 (env_layout_03, env_setup_05), scenario_s07_02 (env_layout_04,
+  env_setup_07), as the plan's answer 8 states them: 8b9d267. Prior on, 800 steps, headless. The acceptance held in all
+  three rooms: the run ends with no error; the robot completes both tasks; every entry of the human's script is closed,
+  the closing part included (`[rec] end step=800 open=-`). The maintained sets byte-identical, 301 tests.
+  Completion ticks (the world tick; the declared tick in brackets), env_layout_02 / env_layout_03 / env_layout_04:
+  `deliver_pallet(pallet_0)` 64 / 64 / 57; `load_return(pallet_4)` 125 (127) / 125 (127) / 151 (153); the scan,
+  `is_scanned` holds / the record closes the entry, 92, 94 / 92, 94 / 74, 76; `go_to(desk)` completes 140 / 140 / 112.
+FINDINGS OF THE MILESTONE (Hadi and the design chat, 1 October 2026, on ccode's report; each with its classification):
+- The walk to the standby place and the meeting at a shared bay (the plan's section 5, last point) were not exercised:
+  the human starts at the standby place, where `go_to(standby_place)` is complete, so the machine waits there (the skip
+  rule), and the robot's second task was a return. A gap of the scenario. A second simple scenario per room follows.
+  The three descriptions state that the standby walk is not taken.
+- env_layout_02 and env_layout_03 produced identical motion: the scenario uses neither of the two objects that differ
+  between them (the frozen bay, the coffee machine). The recognition differs (the coffee machine), the motion does not.
+- In env_layout_04 the human passes the standing robot at 22.5 cm (ticks 66 to 69). The robot had left the bay toward
+  the empties, decided to hold at tick 63 before the scan was admitted (admitted at 69), and stood about 95 cm from the
+  bay's point, on the human's straight line to the bay. Classified: the parked case of the human walking toward the
+  robot (X3, TODO-135); a standing robot does not violate by definition (F1); the simulated human does not react to the
+  robot. Note: in this domain the case is structural, because a scan becomes applicable at the moment of delivery, so
+  the human walks to a bay when the robot leaves it. Whether to reopen the parked case is decided after the MPB, with
+  counts from all rooms.
+- A measure for the evaluation: the number of ticks in which the human passes a standing robot closer than the minimum
+  separation, reported separately from violations by a moving robot. Reason: the hold turns a closeness that would
+  count against a moving robot into one the present measure does not count. Nothing is added to the code for it now
+  (TODO-144, TODO-135).
+- In env_layout_02 the walk to the desk is admitted as coffee_break (tick 112). The recorded effect of an unmodelled
+  walk read as the nearest modelled task ("T-D G", the movement source's half-plane test; TODO-140); no consequence in
+  this run.
+- Candidate finding about the mind, NOT RULED: the robot's own delivery makes the scan applicable, and the robot does
+  not anticipate the human's walk to that bay; the scan hypothesis enters at an equal share and is admitted 8 to 12
+  ticks after the human starts (TODO-154).
+- Parked question, now with evidence, NOT RULED: whether the robot's mind holds hypotheses for the walks to the standby
+  place and to the desk (TODO-155; it carries the approval's parked note on the human stepping aside).
+- On a fixture with no assigned tasks for the human, every task of the robot's task model becomes a hypothesis: the
+  parked case TODO-143. With the restriction off, two hypotheses about empty pallets become possible: artefacts of
+  running without the prior (`docs/assumptions.md` 1.4).
+NOTES FROM THE INDEPENDENT REVIEW of dock_loading's task file against kitting's (records, 1 October 2026). The file
+follows kitting's building blocks and rules; no special case for dock_loading exists in shared code.
+- The robot's methods use a pallet's emptiness as a proxy for the side of the gate on which its origin lies. True for
+  every pallet the robot handles in stage 1. False in stage 2, when a full pallet has an origin in the hall (TODO-156).
+- The method for "holding another full pallet" (return_full) has no condition of its own; it is correct through its
+  position after the method for an empty one (return_empty) and through equal gate conditions.
+- `stand` has one method with no area condition: over-broad, and the stated exception to "the absence of a method is
+  the check" (the plan's section 4).
+- `office_break` waits 60 seconds, copied from `coffee_break`; no record gives the value; Hadi's word is pending
+  (TODO-157).
+- One dictionary is shared by eight methods: a maintainability risk with no behavioural effect.
+- A design question for stage 2, to rule before `store_pallet`: a route is selected from the areas of the agent and of
+  the object, not from the kind of task and the pallet's state (TODO-156).
+A STEP ADDED (Hadi, 1 October 2026), before the IR test-bed and the MPB run on dock_loading: the earlier analyses in
+`analysis/` and the tests are sorted under kitting, so that nothing of kitting is mixed with dock_loading's. The
+instruments' code is shared; their run sets, expectations and reports are per domain. Its own commit, no change of
+behaviour; the maintained sets and the reference set byte-identical; every path named in a record or a README updated.
+Next: the second simple scenario per room; then the step added above, with the preparation of the instruments (the
+plan's section 7, "After the milestone"); then the IR test-bed scenarios, agreed with Hadi before they are authored.
+STAGE 1, THE SECOND MILESTONE SCENARIO BUILT (1 October 2026; built and accepted, records 1 October 2026).
+- Built: scenario_s03_03 (env_layout_02, env_setup_03), scenario_s05_03 (env_layout_03, env_setup_05), scenario_s07_03
+  (env_layout_04, env_setup_07), one per room on the MPB setups, identical in content: the robot is assigned
+  `deliver_pallet` of pallet_0 and pallet_1 (the dry bay) and of pallet_2 (the frozen bay) and `load_return(pallet_4)`;
+  the human is assigned the three scans, with the script [the three scans, the dry bay's first,
+  `RepeatableEntry(go_to("standby_place"))`], closing [`go_to("desk")`], `ScriptDependence.ON_ROBOT`. Each description
+  states the purpose and the unmodelled behaviour (the walk to and the stay at the standby place, the walk to the desk).
+  0371035. Prior on, `single_task`, 1000 steps, headless. The acceptance held in all three rooms: the run ends with no
+  error; the robot completes its four tasks; every entry of the human's script is closed, the closing part included
+  (`[rec] end step=1000 open=-`). The maintained sets byte-identical, 301 tests.
+  Completion ticks (the world tick; the declared tick of the last task in brackets), env_layout_02 / env_layout_03 /
+  env_layout_04: `deliver_pallet(pallet_0)` 64 / 159 / 148; `deliver_pallet(pallet_1)` 182 / 276 (278) / 285 (287);
+  `deliver_pallet(pallet_2)` 289 (291) / 58 / 57; `load_return(pallet_4)` 125 / 220 / 236; the scans, `is_scanned`
+  holds / the record closes the entry: pallet_0 92, 94 / 188, 190 / 164, 166; pallet_1 209, 211 / 303, 305 / 301, 303;
+  pallet_2 318, 320 / 84, 86 / 83, 85; `go_to(desk)` completes 346 / 351 / 339.
+- Exercised:
+  - The priority rule: the first applicable open entry is taken. In env_layout_03 and env_layout_04 the robot delivered
+    pallet_2 first, and the human scanned it first, against the written order.
+  - The walk to the standby place between scans: two per room (env_layout_02 94 to 121 and 211 to 238; env_layout_03 86
+    to 111 and 190 to 217; env_layout_04 85 to 110 and 166 to 182).
+  - The frozen bay, which makes the three rooms differ in motion and in recognition.
+  - Each scan hypothesis enters the live set on the tick of its delivery (A4, `[IR-reentry] ... live again:
+    applicable`).
+- Not exercised: the robot arriving at a bay where the human stands, and two scans possible at once in one bay. Reason:
+  a round trip to the truck takes about 96 ticks and a scan from the standby place 16 to 30, so the human finishes
+  before the next pallet arrives; at every delivery the human was at the standby place, and the live intervals of the
+  scans never overlap. The note on B14 ("that conflict is certain whenever both concern the same bay") is corrected
+  there: it requires that the human is still at the bay when the robot arrives. Consequence recorded for the MPB's
+  design on dock_loading, NOT RULED: a setup in which some pallets already stand in a bay while the robot delivers
+  others.
+FINDINGS OF THE SECOND MILESTONE SCENARIO (Hadi and the design chat, 1 October 2026, on ccode's report; each with its
+classification):
+- Five of the six walks to the standby place are admitted as coffee_break or office_break on the observation warrant,
+  wrongly (env_layout_02 at 114 and 231, coffee_break; env_layout_03 at 109, coffee_break, and 206, office_break;
+  env_layout_04 at 94, office_break; the sixth, env_layout_04 166 to 182, never clears theta). The finding turns
+  unexplained once the human stands, and the gate refuses with `none(leader_inadequate)`. No consequence on a decision
+  in these runs. The parked question TODO-155: the walk follows almost every scan in this domain, so the case is
+  frequent. It becomes the first design question before the IR test-bed set. NOT RULED.
+- At the end of every run the human walks up to the standing robot: 8.69 cm (env_layout_02, at 320), 13.41 cm
+  (env_layout_03, at 301), 8.11 cm (env_layout_04, at 299); 9 / 8 / 8 ticks below the minimum separation with a
+  standing robot, 0 with a moving robot in all three. The robot's last task is a delivery, and a robot with an empty
+  pool stays where it is, at the bay the last scan walks to. The parked case of the human walking toward the robot
+  (X3, TODO-135). PROPOSAL for stage 1, NOT RULED: an authoring convention that the robot's last assigned task is a
+  return.
+  CLOSED, NOT TAKEN (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL4): the robot's pool is
+  unordered and the meta-planner selects by cost. In its place the MPB reports the separation counts per room.
+- In env_layout_03 at tick 64 the robot changes its task on the fallback projection while the gate refuses (below
+  theta): at 60 the three candidates lay within 0.6 and `load_return` won; at 64 the fallback, the human walking
+  straight toward the robot, charged `load_return` a shift of 4 and `deliver_pallet(pallet_0)` won, 94.68 against
+  97.46. The conflict enters the cost and decides the choice. Consistent with the design; noted for track 3b
+  (TODO-145).
+- The scan at the frozen bay is late because the coffee machine lies in the same direction from the standby place:
+  in env_layout_04 it enters at 57 and is admitted at 76, 19 ticks after; in env_layout_02 it enters at 289, leads from
+  308 (19 ticks after) and clears theta at 315 (it is the last scan, see the next point). TODO-154, with the room's
+  geometry.
+- The last scan is never admitted (env_layout_02 pallet_2, env_layout_03 and env_layout_04 pallet_1), because an empty
+  pool gives no further decision. Noted, no action.
+Next: the design of the IR test-bed set with Hadi (first question: TODO-155); then the sorting of the earlier analyses
+and tests under kitting, with the preparation of the instruments (the step added above); then the set's authoring and
+its runs.
+RULED (Hadi, 1 October 2026; recorded in T-G records 8, 1 October 2026): T-G Q16, the duration of office_break, and the
+IR test-bed set on dock_loading. Records only; nothing in this block is built.
+- Q16, the walk to the standby place in the robot's mind (TODO-155).
+  The walk stays without a hypothesis for now. The IR test-bed set observes how the present recognizer explains it; that
+  is the baseline.
+  Two candidates are recorded on TODO-155, neither approved for building:
+  - H1: a foreseeable task "the human steps aside to the standby place", always possible, with the standby place as a
+    fixed object.
+  - H2: a hypothesis that is live only while no assigned task of the human is applicable.
+    CORRECTED (Hadi, at the approval of the IR test-bed's build, 1 October 2026; recorded 2 October 2026, T-G records
+    9): worded "a hypothesis that is live only while no assigned task of the human is live". Reason: a scanned pallet's
+    scan stays applicable (its guards do not read is_scanned), so read as "applicable" H2 would never be live after a
+    scan.
+  The difference: the human steps aside only when no other pallet is applicable. H1 states an unconditional behaviour
+  that the human does not perform, and competes with the scans when a pallet waits; H2 matches the condition and changes
+  the rule for the live set (A4).
+  Not taken: the walk as the tail of the scan task. Reasons: the human would step aside after every scan, also when a
+  pallet waits; the condition "no other pallet waits" cannot be stated in a method; the scan's terminal fact would hold
+  in the middle of the task.
+  NOTE (records, 2 October 2026; T-G records 9), on H1: the always-possible standby task, as a walk only, would make
+  move_to a terminal action of the task model (the last action of one of its methods), so under L1 every arrival at any
+  target would be an episode boundary. A wait at its end would avoid that.
+  For stage 1.5, one design question, NOT RULED: what sets a hypothesis's share at the start of an episode. Four
+  determinants are recorded for it: the assignment (exists); context facts; the task that just ended (a transition prior
+  between tasks, Hadi's idea); an enabling event, such as the robot's own delivery (TODO-154). They are designed as one
+  mechanism. Recorded under C1, STAGE 1.5.
+  Also for stage 1.5, Hadi's ideas, NOT RULED: the duration of a foreseeable task is not one fixed number; temporal
+  context can be a fuzzy set with a degree of membership. Recorded under C1, STAGE 1.5.
+- The duration of office_break (TODO-157, closed as ruled): `office_break` lasts 90 seconds; `coffee_break` stays 60.
+  Reason: a long absence lets pallets accumulate in a bay, which gives two scans possible at once and the robot arriving
+  at an occupied bay; it differs clearly from the coffee break. The change of the value is made in the next build step.
+  B6's note.
+- The IR test-bed set for dock_loading, agreed: 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to M4), each in all
+  three rooms (env_layout_02, env_layout_03, env_layout_04), on the room's IR setup (kind 1 of B14: env_setup_02,
+  env_setup_04, env_setup_06; pallet_0 and pallet_1 in the dry bay, pallet_2 and pallet_3 in the frozen bay, pallet_4 in
+  the truck), the robot idle on the gate's centre, the human starting at the standby place, the closing part the walk to
+  the desk (B13). "scan n" is `confirm_delivered_pallet` of pallet_n; where no assignment is named, the assigned tasks
+  are the script's scans. The script of each, with its purpose:
+  - C1: scan 0, scan 2 (assigned work, two bays).
+  - C2: scan 2, scan 0 (order).
+  - C3: scan 0, scan 1 (two scans with the same motion).
+  - C4: scan 0, 2, 1, 3 (lifecycle over many episodes).
+  - C5: scan 0, coffee_break, scan 2 (a foreseeable task between scans).
+  - C6: scan 0, office_break, scan 2 (the office and its door).
+  - C7: scan 0 with coffee_break started on arrival at the pallet; scan 2 (a foreseeable task inside a scan).
+  - C8: scan 0 with coffee_break cut into the walk to the pallet; scan 2 (an interruption inside a walk).
+  - C9: scan 0 dropped during its walk; scan 2 (a dropped scan).
+  - C10: scan 0 dropped; scan 2; scan 0 as a second entry (an authored retry; Q12).
+  - C11: scan 0; a stand in the hall; scan 2 (the long stand).
+  - C12: assigned the scans of 0 and 2; script: scan 1, scan 2 (a scan outside the assigned set).
+  - C13: assigned the scans of 0 and 4; script: scan 0, scan 4, the standby entry; dependent (the standby walk from the
+    dry bay; a hypothesis never live).
+  - C14: assigned the scans of 2 and 4; script: scan 2, scan 4, the standby entry; dependent (the standby walk from the
+    frozen bay).
+  - M1: scan 0 with coffee_break on arrival; office_break; scan 2.
+  - M2: scan 0 dropped; coffee_break; scan 2; scan 0.
+  - M3: scan 0; a stand; scan 1 with coffee_break cut into the walk.
+  - M4: assigned 0, 2, 4; script: scan 1; office_break; scan 2; scan 4; the standby entry; dependent.
+  Rules of the set:
+  - The controlled scenarios run and are read first; a mixed scenario is read only against what the controlled ones have
+    shown.
+  - Expectations are derived from the records before the runs (as in "The IR test-bed").
+  - Nothing is adjusted to a result; findings are classified (`docs/assumptions.md`).
+  - The standby walks (C13, C14, M4) are diagnostic observations. Beside the expectation under the present model, the
+    predictions under H1 and under H2 (Q16) are written down before the run. Only the present model's expectation is
+    compared with the run.
+  NOTE (T-G records 8, not a ruling; a consequence of Q14 and B14 to be confirmed by Hadi): in C13, C14 and M4 the scan
+  of pallet_4 never becomes applicable (the robot is idle, pallet_4 stays in the truck), so its entry stays open, the
+  priority list is never finished and the closing part, the walk to the desk, is not taken; the record states the
+  entries still open at the run's end (Q13b).
+Next: the build step that sorts the earlier analyses and tests under kitting and prepares the instruments for dock_loading
+(the step added above, with the plan's section 7, "After the milestone"); then the authoring of the set, its
+expectations and its runs.
+
+STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED (1 to 2 October 2026; accepted by Hadi, 2 October
+2026; records 2 October 2026, T-G records 9). The results are recorded here because the design chat cannot read
+analysis/; the report is analysis/dock_loading/ir_testbed/REPORT.md.
+BUILT, with the commits and the acceptance of each part:
+- The sort of kitting's analyses and tests (746fae6, 9a35af1, ae77689): analysis/kitting/ (every earlier analysis,
+  the four maintained sets, kitting's IR test-bed and MPB sets), analysis/instruments/ (the shared code;
+  run.sh <domain>), analysis/dock_loading/; the run files under configs/kitting/; the tests under tests/kitting/,
+  tests/dock_loading/, tests/instruments/ (three two-domain tests stay at tests/). The path table:
+  docs/rename_table.md, "Paths: the sort"; dated entries, frozen reports, descriptions and comments keep the old paths.
+  Acceptance: the reference set regenerated from the sorted tree, 847 files, 844 byte-identical and the three stdout
+  files differing in the run-file path token only; the four maintained sets byte-identical; 301 tests, the same ids;
+  the moves pure renames apart from 14 path-edited scripts and 33 run-file headers; 83 scenarios load.
+- The instruments prepared for dock_loading (65273e8, cbeefe4, e573e9e; then 3ea4b60, 736eb01, e4fc88c):
+  - the human's run-time sequence from the executor's own selection rule: the trajectory drives a StackMachine on the
+    whole script (repeatable entries and the closing part included) as the body drives it, against the world the
+    environment's builder makes; the load-time replay is no longer the source (R1 skips the standby entry);
+  - the oracle brought to liveness by applicability (A4), the agent's area (A9, R2) and the boundary through each
+    terminal action's preconditions and completion (L1's as-built reading; adds scan_it), the domain from the run file;
+  - the log reader: the pool read without kitting's words, the [IR-inapplicable] lines;
+  - the separation counts per run (separation.md): a moving robot violating or receding, and a standing robot with
+    the human passing (moved on the tick) or standing beside it (did not);
+  - the figure: a fourth colour and a facet beyond four hypotheses; the summary's open entries; baseline.py (reporting).
+  Acceptance: kitting's 17 IR and 16 MPB trajectories and 17 expectation tables byte-identical before any run; the 17
+  IR runs and the 16 MPB scenarios under each strategy byte-identical in every output apart from the new separation
+  files (17 and 32); 301 tests.
+- office_break at 90 seconds (edbe34f). Acceptance: the four maintained sets byte-identical (96 files); the milestone
+  reruns identical except scenario_s05_03 at tick 206 and scenario_s07_03 at tick 94, the decision admitting
+  office_break (T_h 15 ticks longer, one candidate's share; winner, cost and hold unchanged, the .rec identical).
+- The 54 scenarios (51e5e1c): scenario_s02_02 to _19 (env_layout_02, env_setup_02), s04_02 to _19 (env_layout_03,
+  env_setup_04), s06_02 to _19 (env_layout_04, env_setup_06), in domains/dock_loading/scenarios/scenarios_s02.py,
+  _s04.py, _s06.py; _02 to _15 the controlled rows C1 to C14, _16 to _19 the mixed M1 to M4; run files in
+  configs/dock_loading/ir_testbed/. Authoring values approved by Hadi: a cut or a drop during a walk at PT28S; the
+  stand at the bay just scanned, stand(PT80S); M3 with scan 2 in place of scan 1; C13, C14, M4 dependent on the robot.
+  Acceptance: 137 scenarios load; the three dependent scripts report the entries not replayed.
+- The expectations committed before the runs (54edb71): per scenario the trajectory, expected.csv and phases.json (θ =
+  0.75, the value of record) and predictions.md (C13, C14, M4: the present model beside H1 and H2); every run's own
+  oracle call reproduced them byte for byte.
+RESULT: 42 controlled runs (4d9011d) and 12 mixed runs (b20a67f), zero disagreements, zero unmatched rows; every
+trajectory equal to the run's human lines on every tick; separation counts 0 (the closest approach 115.85 cm). What it
+establishes: the recognizer behaves on dock_loading as the records specify (rules 1 to 27 of the instrument). It does
+not establish the quality of the recognition.
+THE BASELINE (all 54 runs; one tick is 2 seconds): of 153 true stretches, 147 lie in the support (6 outside: the scan
+of pallet_1 in C12 and M4). 98 of the 147 reach the threshold within the stretch (38, 40 and 20 of 49 on env_layout_02,
+_03, _04); the median delay is 20 ticks (range 6 to 50; 28, 16 and 17 by room). 49 never reach it, all scans: 34
+stretches of 26 ticks or fewer, 9 same-motion pairs, 3 second scans with no walk, 3 scans leaving the office in
+env_layout_02. Every coffee_break and office_break stretch reaches it. Ticks from each true stretch's start to the
+threshold, per row and room ("never": not within the stretch; "out": outside the support):
+| row | env_layout_02 | env_layout_03 | env_layout_04 |
+|---|---|---|---|
+| C1 | scan 0 10, scan 2 50 | scan 0 14, scan 2 24 | scan 0 never, scan 2 never |
+| C2 | scan 2 25, scan 0 28 | scan 2 8, scan 0 34 | scan 2 21, scan 0 never |
+| C3 | scan 0 never, scan 1 never | scan 0 never, scan 1 never | scan 0 never, scan 1 never |
+| C4 | scan 0 never, scan 2 never, scan 1 28, scan 3 50 | scan 0 never, scan 2 never, scan 1 34, scan 3 24 | scan 0 never, scan 2 never, scan 1 never, scan 3 never |
+| C5 | scan 0 10, coffee 49, scan 2 never | scan 0 14, coffee 13, scan 2 19 | scan 0 never, coffee 17, scan 2 10 |
+| C6 | scan 0 10, office 33, scan 2 never | scan 0 14, office 30, scan 2 14 | scan 0 never, office 6, scan 2 37 |
+| C7 | scan 0 10, coffee 50, scan 0 27, scan 2 50 | scan 0 14, coffee 17, scan 0 15, scan 2 24 | scan 0 never, coffee 21, scan 0 never, scan 2 never |
+| C8 | scan 0 10, coffee 37, scan 0 26, scan 2 49 | scan 0 never, coffee 11, scan 0 15, scan 2 24 | scan 0 never, coffee 20, scan 0 never, scan 2 never |
+| C9 | scan 0 10, scan 2 31 | scan 0 never, scan 2 21 | scan 0 never, scan 2 10 |
+| C10 | scan 0 10, scan 2 31, scan 0 28 | scan 0 never, scan 2 21, scan 0 34 | scan 0 never, scan 2 10, scan 0 never |
+| C11 | scan 0 10, scan 2 46 | scan 0 14, scan 2 21 | scan 0 never, scan 2 17 |
+| C12 | scan 1 out, scan 2 50 | scan 1 out, scan 2 24 | scan 1 out, scan 2 never |
+| C13 | scan 0 9 | scan 0 14 | scan 0 14 |
+| C14 | scan 2 25 | scan 2 8 | scan 2 21 |
+| M1 | scan 0 10, coffee 50, scan 0 27, office 34, scan 2 never | scan 0 14, coffee 17, scan 0 15, office 30, scan 2 13 | scan 0 never, coffee 21, scan 0 never, office 6, scan 2 36 |
+| M2 | scan 0 10, coffee 37, scan 2 never, scan 0 28 | scan 0 never, coffee 11, scan 2 19, scan 0 33 | scan 0 never, coffee 20, scan 2 never, scan 0 never |
+| M3 | scan 0 10, scan 2 never, coffee 33, scan 2 never | scan 0 14, scan 2 never, coffee 13, scan 2 19 | scan 0 never, scan 2 never, coffee 7, scan 2 11 |
+| M4 | scan 1 out, office 33, scan 2 never | scan 1 out, office 30, scan 2 15 | scan 1 out, office 8, scan 2 37 |
+FINDINGS (classified as findings about the mind; none ruled):
+- Hypotheses that predict the same motion divide the belief and are not admitted: the watched item C5, confirmed (C5's
+  note). Linked to the recorded direction on acting on a set of hypotheses with the same projection (TODO-97).
+- A short walk gives too little evidence under equal shares at the start of an episode (34 of the 49 stretches that
+  never reach the threshold last 26 ticks or fewer; on env_layout_04, 16 steps from the standby place to the dry bay,
+  scan 0's first walk never reaches it with three or more rivals live). It joins stage 1.5's question on what sets a
+  hypothesis's share at the start of an episode, as its measured baseline (C1, STAGE 1.5; TODO-154).
+- The walk to the standby place: admitted as a break in five of six controlled runs (C13 and C14: coffee_break or
+  office_break by the room's bearings, cleared 8 to 23 ticks into the walk; never above θ in scenario_s06_14); in M4
+  admitted on env_layout_02 as the scan of pallet_0 (from 167), an assigned task the human never performs and that stays
+  live with its commitment warrant. The finding turns unexplained once the human stands. On TODO-155, with the written
+  predictions: C13 and C14 separate the conditional candidate (H2) from the present model, M4 does not (H2 is never live
+  there, scan 0 being live).
+- Two pallets in one container stand on one point: the second scan has no walk and a walk between them cannot be cut;
+  a property of "one point per container" (B9's note).
+CORRECTIONS of earlier notes: one tick is 2 seconds (B6's note: office_break's wait 45 ticks, the absence about 110
+ticks, reviewed with the MPB's design); H2 worded "no assigned task is live" (Q16's block); the always-possible standby
+task as a walk only would make every arrival an episode boundary (Q16's block).
+The IR test-bed of stage 1 is CLOSED. Next: the design of the MPB set with Hadi. Open for it: a setup with pallets
+already in a bay while the robot delivers others; the robot's last task as a return (the PROPOSAL of the second
+milestone's findings); how expected decisions are derived when the human's sequence depends on the robot's decisions
+(C6).
+
+RULED (Hadi, 2 October 2026; recorded in T-G records 10, 2 October 2026): THE MPB ON DOCK_LOADING, its design, ruled as
+one package (MPB-DL1 to MPB-DL6; the labels are this block's, distinct from kitting's MPB-1 to MPB-6). Records only;
+nothing in this block is built. The MPB of stage 1 is a test and an analysis; it changes nothing in the framework. The
+scenario set itself is not yet agreed and is not recorded here. "As kitting's MPB rules" refers to "The meta-planner
+test-bed (MPB)".
+- MPB-DL1, the claim.
+  The MPB on dock_loading has two parts.
+  Part 1: a few of kitting's decision paths re-instantiated on dock_loading.
+  Part 2: one scenario for each case that dock_loading adds:
+  (i) a hypothesis that enters the live set during the run through the robot's own act (a scan becomes live when the
+      robot puts the pallet down; liveness by applicability, A4);
+  (ii) decisions on the fallback projection as the frequent case;
+  (iii) two hypotheses with the same motion waiting in one bay, so that the gate refuses during the walk;
+  (iv) an admission that is correct by the records and wrong about the human (the walk to the standby place admitted as
+       a break). The expectation states that admission before the run. The run agreeing with it is not a disagreement;
+       the wrong reading is a finding about the mind (TODO-155, Q16);
+  (v) the human in another area (the office), with methods selected by area (B11);
+  (vi) the robot and the human at the same bay while the robot has an alternative task;
+  (vii) a human's script that depends on the robot (Q13b).
+  The set does not claim full coverage of the decision paths on dock_loading. Kitting's coverage matrix
+  (analysis/kitting/mpb/coverage.md) is not repeated.
+  Reason: T-G tests that the chain stays domain-independent. The chain's code is shared, and its paths are verified on
+  kitting. A second full matrix would test the same paths again.
+  AMENDED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D4): cases (i) and (vii) are mixed scenarios with
+  declared properties. Reason: the entry tick of the scan is the robot's delivery tick, which is not derivable before
+  the run.
+- MPB-DL2, a new setup kind per room, for the MPB's controlled scenarios.
+  The setup: one full unscanned pallet already in each delivery bay, designated to the bay it stands in; one full pallet
+  in the truck designated to each delivery bay; two empty pallets in the empties container, designated to the truck.
+  The human scans only the pallets that stand in the bays at the start.
+  A meeting at a bay is authored by a stand or a break at the bay. Its timing is computed from path lengths before any
+  run.
+  Reason: in setup kind 2 (B14) a scan becomes applicable only at the robot's delivery, so the human's script depends on
+  the robot. A round trip to the truck (about 96 ticks) is longer than a scan (16 to 30 ticks), so the robot never
+  arrives at a bay where the human stands (the second milestone scenario). Pallets already in the bays give a script
+  that is independent of the robot.
+  The kind recorded earlier as conditional (B14: all full pallets designated to one bay, added only if the first MPB run
+  calls for it) keeps its condition.
+  The names of the new kind and of the conditional kind are not ruled. The records step proposed names in its report
+  (T-G records 10); nothing that exists is renamed.
+  AMENDED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D2), a correction before any run: the new kind has two
+  full unscanned pallets in each delivery bay at the start, not one, each designated to the bay it stands in. Reason:
+  the same-motion case (MPB-DL1 (iii)) needs two scans in one bay; with one pallet per bay it cannot be a controlled
+  scenario. A scenario that assigns one scan per bay is unaffected: the other pallet's scan is outside the support.
+  CORRECTED (the same ruling; DISPOSITIONS, D3): "a break at the bay" is withdrawn; no break ends at a bay. The meeting
+  at a bay has two forms. Form 1: the human walks to the bay on an admitted scan while a delivery of the robot goes to
+  that bay. Form 2: the human stands at the bay after a scan (a `stand`, unmodelled behaviour), and the robot decides on
+  the fallback projection.
+  NAMED (the same ruling; DISPOSITIONS, D7): the new kind is kind 3, "pallets in the bays"; the conditional kind is kind
+  4, "one bay". Two setups of kind 3, for env_layout_03 and env_layout_04 (D6).
+- MPB-DL3, expected decisions. It answers, for stage 1, the third clause of C6: how the MPB's oracle derives an expected
+  decision when the human's sequence depends on the robot's decisions.
+  - Controlled scenarios: scripts independent of the robot only. Full expectations (trigger and cause, gate,
+    projection) are committed before the run, as kitting's MPB rules (MPB-1, MPB-3).
+  - Mixed scenarios: a script that depends on the robot is allowed. Properties are declared before the run and checked
+    on the run. This is the weaker check. Those runs do not validate the recognizer's decisions, and no record may claim
+    that they do.
+  - Not taken: a check per decision derived from the logged state at the decision tick. Reason: it conditions on the run
+    and needs new instrument code.
+  AMENDED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D1 and D5): the controlled scenarios are also bound by
+  the disjointness rule (MPB-DL7). A mixed scenario is either dependent on the robot, on kind 2, with declared
+  properties, or independent of the robot, on kind 3, with full expectations committed before the run. Each scenario
+  states its kind.
+- MPB-DL4, the robot's last task.
+  The proposal "an authoring convention that the robot's last assigned task is a return" (FINDINGS OF THE SECOND
+  MILESTONE SCENARIO; TODO-135's fourth instance) is CLOSED, NOT TAKEN.
+  Reason: the robot's pool is unordered and the meta-planner selects by cost, so an author cannot fix the last task
+  without constraining the selection.
+  In its place the MPB reports, per room, the ticks below the minimum separation with a standing robot, beside the
+  violations with a moving robot. These counts serve Hadi's later ruling on whether to reopen TODO-135. Nothing is ruled
+  on TODO-135 itself.
+- MPB-DL5, office_break stays at 90 seconds for the MPB (B6's note).
+  Reason: no value is changed for a test set.
+- MPB-DL6, strategies and rooms.
+  `single_task` is primary and `full_reorder` is the second run, as kitting's MPB rules (MPB-6).
+  The set runs in two rooms, env_layout_03 and env_layout_04.
+  env_layout_02 is excluded as a reduction of scope, not because it is irrelevant. Its condition of late admission (the
+  coffee machine lies in the direction of the walk from the dry bay to the frozen bay; median delay 28 ticks in the IR
+  test-bed) remains untested by the MPB.
+  Reason for the two rooms: env_layout_03 has frequent admissions and env_layout_04 rare ones (in the IR test-bed's
+  baseline, 40 and 20 of 49 stretches reach the threshold), so they give decisions on an admitted projection and on the
+  fallback projection.
+  Planned size: about 8 controlled and 4 mixed scenarios, 48 runs (two rooms, two strategies). The set is agreed with
+  Hadi before it is authored.
+  CORRECTED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D8): env_layout_04 also has the frozen bay and the
+  coffee machine in one direction from the standby place. The late-admission condition is untested by the MPB only for
+  the walk from the dry bay to the frozen bay in env_layout_02.
+  SUPERSEDED (the same date; THE SET below): the planned size reads 9 controlled and 4 mixed scenarios, 52 runs.
+- MPB-DL7, the disjointness rule (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D1). An authoring constraint of
+  the controlled scenarios, checked per scenario before its runs: no pallet is named both by the robot's pool and by an
+  assigned scan of the human.
+  Reason: under it, with the prior on, no act of the robot changes the live set, the belief or the adequacy of a
+  hypothesis in the support (the records step's answer, T-G records 10: a scan reads `in_area` of the human and
+  `obj_at` of its own pallet; the robot moves only the pallets of its pool; inadmissible hypotheses are skipped before
+  the applicability check and stay pinned; the terminal facts, the boundary, the excess path, the standing and the
+  warrant are the human's own). It is the dock_loading form of kitting's rule (MPB-3).
+  It holds for controlled scenarios only. It is not generalised to mixed scenarios, where a delivery changes
+  applicability.
+DISPOSITIONS ON THE FLAGS OF T-G RECORDS 10 (Hadi, 2 October 2026; recorded in T-G records 11). D1 to D10 are Hadi's
+numbers; each is recorded where it applies:
+- D1, the disjointness rule: MPB-DL7.
+- D2, kind 3 with two pallets in each delivery bay: MPB-DL2, AMENDED.
+- D3, "a break at the bay" withdrawn, the two forms of the meeting at a bay: MPB-DL2, CORRECTED.
+- D4, cases (i) and (vii) mixed: MPB-DL1, AMENDED.
+- D5, a dependent mixed scenario on kind 2, an independent one on kind 3 with full expectations, each scenario stating
+  its kind: MPB-DL3, AMENDED.
+- D6, two setups of kind 3, for env_layout_03 and env_layout_04: MPB-DL2, NAMED.
+- D7, the names, kind 3 "pallets in the bays" and kind 4 "one bay": MPB-DL2, NAMED; B14's "a third kind", READS.
+- D8, the late-admission condition: MPB-DL6, CORRECTED.
+- D9, kind 3 is a test condition. No record describes the runs on kind 3 as the domain's work cycle: the pallets the
+  robot delivers there are never scanned (B1's reading is the work cycle; M1 below is the set's instance of it).
+- D10, the glossary: controlled scenario, mixed scenario, setup kind, disjointness rule, declared property, each
+  defined from its use in the records (`docs/glossary.md` §9).
+THE SET (agreed by Hadi, 2 October 2026; recorded in T-G records 11). Records only; nothing is authored or run. 9
+controlled scenarios (K1 to K9) and 4 mixed (M1 to M4; this set's, distinct from the IR test-bed's M1 to M4 above),
+each in env_layout_03 and env_layout_04, prior on, `single_task` primary and `full_reorder` second: 52 runs.
+Common to all: the human starts at the standby place and closes at the desk (B13); the robot starts on the truck side.
+On kind 3, pallet_0 and pallet_1 stand in the dry bay and pallet_2 and pallet_3 in the frozen bay. "scan n" is
+`confirm_delivered_pallet` of pallet_n. The robot's tasks on kind 3 are deliver-dry and deliver-frozen (the two truck
+pallets), return-1 and return-2 (the two empty pallets). Where no assignment is named, the human's assigned tasks are
+the script's scans. Every duration and cut point is derived from path lengths before any run, in the build's plan, and
+approved by Hadi; the plan shows per room that the geometry gives the declared case.
+Controlled (kind 3, a script independent of the robot, the disjointness rule, full expectations before the run):
+- K1, the control. Human: scan 2. Robot: deliver-dry, return-1. Tests: no hold at any decision; completion equal to a
+  comparison run with the same setup, pool and start and no human.
+- K2, admission and the admitted projection (meeting form 1). Human: scan 0, scan 2. Robot: deliver-dry,
+  deliver-frozen, return-1. Tests: the decision at the tick the gate clears, against the human's projected walk to the
+  bay the robot delivers to.
+- K3, the stand at a bay with an alternative task (meeting form 2). Human: scan 0, then a long `stand` at the dry bay.
+  Robot: deliver-dry, deliver-frozen, return-1. Tests: decisions on the fallback projection of a standing human, the
+  `projection_expired` cadence, the switch by cost.
+- K4, the stand at a bay with no alternative. As K3; the robot's pool is deliver-dry only. Tests: the robot holds; the
+  holds lengthen at each expiry.
+- K5, the same motion. Human: scan 0, scan 1. Robot: deliver-dry, deliver-frozen, return-1. Tests: the gate refuses
+  during the walk; the robot decides on the fallback projection of a walking human; scan 1 is admitted alone after
+  scan 0.
+- K6, a foreseeable task between scans. Human: scan 0, coffee_break, scan 2. Robot: all four tasks. Tests: admission
+  on observation warrant during the break walk; the boundary and the re-admission after it.
+- K7, the office. Human: scan 0, office_break, scan 2. Robot: all four tasks. Tests: the admitted projection through
+  the office door; the robot's decisions while the human is in another area.
+- K8, the change during an action. Human: scan 0 with coffee_break cut into its walk; scan 2. Robot: deliver-dry,
+  deliver-frozen, return-1. Tests: retraction, the fallback projection after it, re-admission.
+- K9, the admission that is wrong about the human. Human: assigned scan 0 only; script: scan 0, `go_to(standby_place)`
+  as an ordinary entry, a `stand` there, the desk. Robot: deliver-frozen, return-1. Tests: the walk to the standby
+  place admitted as a break (expected so, by the records), the robot's decision against it, the retraction when the
+  human stands. The run agreeing with the expectation is not a disagreement; the wrong reading is a finding about the
+  mind (MPB-DL1 (iv)). The script has no entry that waits for the robot. The repeatable standby entry is exercised in
+  M1, M2 and M4.
+Mixed (read only against the controlled ones):
+- M1, the domain's work cycle. Kind 2, dependent. Human: the scans of the four delivered pallets, the standby entry.
+  Robot: four deliveries, two returns. Declared properties: every robot task completes; every script entry closes; no
+  violation with a moving robot; each scan enters the live set on its delivery tick.
+- M2, pallets accumulate. Kind 2, dependent. As M1, with office_break after the first scan. Declared properties: as
+  M1, plus two scans applicable at once in one bay, and the robot's decision at an occupied bay.
+- M3, combined deviations. Kind 3, independent, full expectations. Human: scan 0 with coffee_break on arrival; scan 1;
+  scan 2; a `stand` at the frozen bay. Robot: all four tasks. Combines K5, K6 and K3.
+- M4, a dropped scan in the work cycle. Kind 2, dependent. Human: the first scan dropped during its walk;
+  coffee_break; the other scans; the dropped scan as a second entry; the standby entry. Robot: as M1. Declared
+  properties: as M1.
+Rules of the set:
+- The controlled scenarios run and are read first.
+- Nothing is adjusted to a result.
+- Findings are classified: kitting's five disagreement classes and the three readings of class 2 carry over (MPB-4).
+- The mixed runs with declared properties do not validate the recognizer's decisions (MPB-DL3).
+- Every run reports the separation counts: violations with a moving robot, and ticks below the minimum separation with
+  a standing robot (MPB-DL4).
+Not in the set: env_layout_02 (MPB-DL6); a dropped scan as a controlled scenario.
+RULED ON THE SET (Hadi, 2 October 2026; recorded in T-G records 12): the flags of T-G records 11. Records only; nothing
+is authored or run.
+- The case per room, a principle of the set. A scenario runs in both rooms. Where the records predict that its case
+  does not form in a room, the expectation for that room says so before the run. The case counts as tested only where
+  it forms. Nothing is changed to make it form.
+  Reason: a case engineered into existence tests the engineering, not the chain.
+- K2: unchanged. On env_layout_03 it shows the decision at admission. On env_layout_04, where the records predict no
+  admission, it shows a decision on the fallback projection.
+- K5, AMENDED: the clause "scan 1 is admitted alone after scan 0" is withdrawn. K5 tests the refusing gate and the
+  fallback projection.
+  Reason: the second scan has no walk and never reaches the threshold in the IR test-bed.
+- K8, AMENDED: the cut comes after the tick at which the oracle expects scan 0's admission, derived before the run. The
+  retraction forms on env_layout_03 only.
+- K9, AMENDED: the human's scan is scan 2 (pallet_2, the frozen bay); the robot's pool is deliver-dry and return-1.
+  Reason: the IR test-bed admitted the walk from the frozen bay to the standby place as a break in every room.
+- K1, AMENDED: the control requires that the human works away from every robot route. The build's plan selects, per
+  room, the scan and the robot's pool that satisfy this and shows the derivation. If no pairing exists on
+  env_layout_04, K1 runs on env_layout_03 only, and the record says so.
+- K4: the lengthening holds are evidence for TODO-132 (a), not a verified rule.
+- M2, AMENDED: office_break is an event on one named scan entry. "Two scans applicable at once in one bay" and "the
+  robot's decision at an occupied bay" are not declared properties, because they depend on the order the robot chooses
+  by cost. The report states whether each occurred.
+- M4, AMENDED: one named scan is dropped during its walk; a second named scan has coffee_break on arrival; the dropped
+  scan is a second entry; the standby entry closes the list.
+THE BUILD'S PLAN, CONFIRMED (Hadi, 2 October 2026; recorded in T-G records 13): ccode's plan for the MPB set (its
+sections a to i: the setups env_setup_08 and env_setup_09 of kind 3; the scenarios scenario_s08_01 to _10 and
+scenario_s09_01 to _10 (K1 to K9, M3), scenario_s05_04 to _06 and scenario_s07_04 to _06 (M1, M2, M4); the authored
+durations; the instrument's generalisation; the order of the build) with the dispositions below on its open points.
+- DL-P1, K8's cut, by a rule: the cut falls on the last step of the walk to the pallet, in both rooms. The cause is
+  whatever the oracle derives on kind 3; it is not inferred from the IR test-bed's rows on kind 1.
+  Reason: it is the latest change that is still a change during the walk, so scan 0 has received all the walking
+  evidence it can receive.
+  Procedure, before any controlled run: K8's per-tick table is reported for both rooms, from scan 0's expected
+  admission (or the walk's start if none) to 10 ticks after the cut: the leader, scan 0's share, scan 0's hypothesis
+  adequacy, the gate's outcome and the expected cause of each decision. On env_layout_03, if the oracle expects the
+  retraction, the build proceeds; if it expects "replaced" or no admission, the build stops before the controlled runs
+  and reports; no other cut is tried; Hadi rules. On env_layout_04 there is no stop: K8 runs, and if the case does not
+  form the expectation and the record say so for that room.
+- DL-P2, K3's switch by cost is neither an expectation nor a declared property. K3's exact parts are the fallback
+  decisions on the standing human and the expiry cadence. The report states whether the switch occurred and, if it
+  did, checks the occupied-target condition (X1). The stand is not lengthened to force it.
+  Reason: the selection depends on the robot's realized state; the records do not determine it.
+- DL-P3, K1 on env_layout_04 runs with its one-task pool (the human's scan 0, the robot's deliver-frozen).
+  Reason: a control needs no hold and an equal completion, not a selection between tasks.
+- DL-P4, K9 on env_layout_04: if a `no_current_task` tick masks the retraction (D3's order on a shared tick), the case
+  counts as not formed there. Nothing changes.
+- DL-P5, the closing walk to the desk admitted as a break is expected by the oracle and is not a disagreement. Each
+  instance is recorded as a finding about the mind, with TODO-155.
+- DL-P6, admissions near the threshold: the oracle's computed table decides every tick. No hand-derived tick of the
+  plan is binding.
+- DL-P7, the step cap for a script that depends on the robot (an extension of MPB-5 for this set): the robot's plain
+  chain, plus the human's replay on the state after that chain, plus 30 ticks. It bounds the run's length and is not
+  an expectation. A run that reaches the cap is reported as such; the cap is not raised after a run.
+- DL-P8, a condition on the instrument: dock_loading's horizon code may call the planner's decomposition for the cap
+  only. The report shows that no module of the oracle (the per-tick tables, the chain assembly, the compare) imports it
+  or anything of the planner, the recognizer, the projection or the robot's perception.
+  READ (Hadi, 2 October 2026; recorded in T-G records 15): the condition reads as kitting's MPB-1 reads. The oracle may
+  use the task model's decomposition. No module of the oracle imports the cap code (horizon.py). No stricter reading.
+- DL-P9, the alteration E3 (every support key live whatever its applicability, T-G A4 switched off in the oracle): if
+  undetected on the controlled set, it is recorded as a property of the set with its reason.
+
+SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN (Hadi, 2 October 2026; recorded in T-G records 14). Hadi reduced the scope
+of stage 1's MPB: it establishes that the recognizer and the recognition-to-planning chain run on dock_loading and
+produce runs, logs and figures; the behavioural analysis belongs to stage 2. The stop for review between the controlled
+and the mixed runs was withdrawn; a class-2 disagreement no longer stops the build (reported with its evidence); the
+alteration test on dock_loading is not run in stage 1. Reason: stage 1's purpose is that the chain runs on the second
+domain; the deeper analysis needs stage 2's room and tasks.
+- What ran: the 26 scenarios of the set (K1 to K9 and M3 on kind 3, scenario_s08_01 to _10 and scenario_s09_01 to _10;
+  M1, M2, M4 on kind 2, scenario_s05_04 to _06 and scenario_s07_04 to _06), in env_layout_03 and env_layout_04, prior
+  on, single_task and full_reorder: 52 runs, every one completed within its cap; and K1's 4 comparison runs. The
+  expectations and K8's table were committed before any run (8fb9981).
+- Where: analysis/dock_loading/mpb/ (README.md, authoring.md, predictions.md, REPORT.md with every run's line and the
+  md5s; per run the comparison, the properties, the figures and the separation counts; the logs and records in runs/,
+  git-ignored); the run files in configs/dock_loading/mpb/; the instrument's shared code in analysis/instruments/mpb/.
+- The comparison: the 40 runs with full expectations (K1 to K9, M3) agree with the oracle on parts 1 to 3 at exact
+  equality, 0 disagreements; no class-2 disagreement. K1's properties hold against the comparison runs. The mixed
+  runs M1, M2, M4 (declared properties only, MPB-DL3): (i), (ii) and (iv) hold in every run; (iii), no violation with a
+  moving robot, does not hold in env_layout_04 under single_task (one violation at 387 in each; M2 also 224 to 226).
+- Formed or not: K8's retraction formed on env_layout_03 (entered 14, retraction 34) and not on env_layout_04 (no
+  admission of scan 0); K9's retraction formed on env_layout_03 (67) and on env_layout_04 under full_reorder (59);
+  under single_task it was masked by the robot's no_current_task at 59 (DL-P4, not formed there); K2's admission of the
+  scans did not form on env_layout_04; K3's switch by cost occurred on env_layout_04 (single_task at 104, full_reorder
+  at 110), not on env_layout_03 (DL-P2: reported, not expected); K4's holds lengthened (13, 48, 96; 10, 48, 96); M2's
+  two scans live at once in one bay did not occur; its decision at an occupied bay occurred in every M2 run.
+- The walk to the desk (and K9's walk to the standby place) admitted as a break, a finding about the mind with TODO-155
+  (DL-P5): coffee_break on env_layout_03 in K1, K2, K6, K7, K8, K9; office_break on env_layout_04 in K2, K6, K7, K8, K9.
+- Not tested or not run: the alteration test on dock_loading (built, for stage 2); env_layout_02 (MPB-DL6); the cases
+  listed above as not formed.
+- Observations for stage 2, unanalysed: (1) M1, M2, M4 on env_layout_04, single_task: a hold of 6 decided at 382 on a
+  moving fallback, scan 1 entered at 387 with hold 0, and a moving-robot violation at 387; (2) moving-robot violations
+  in K8 full_reorder on env_layout_03 (2) and K9 single_task on env_layout_04 (2); (3) standing-robot ticks below
+  min_separation (MPB-DL4, TODO-135's measure) in K3, K4, M3 and the mixed full_reorder runs, up to 15 with the human
+  passing and 4 beside; (4) the switch while carrying in K3 on env_layout_04 returns the full pallet to the truck first
+  (B8); (5) K9 on env_layout_04: the masking depends on the strategy; (6) the desk walk read as a break in most
+  controlled runs; (7) M1 and M4 of one room end on the same terminal tick under each strategy.
+- The instrument (no change of framework code): measures.py and the alteration engine shared; run.sh --expect and the
+  control list per domain; a script that depends on the robot gets no oracle comparison and its human read from the
+  run; dock_loading's horizon.py (DL-P7, DL-P8), properties.py, alteration.py, disjoint.py. Found on the way: HEAD's
+  kitting alteration test failed since the IR oracle reads the layout's areas (its scratch copy's root); corrected in
+  the shared engine, kitting's table reproduced exactly.
+- The regression audit: byte-identical. Kitting's MPB (the sixteen, both strategies and prior off, after
+  the generalisation; every committed output and md5; the alteration table), the reference set of stage 1 (the four
+  maintained sweeps, the ten drop scenarios, kitting's IR test-bed and MPB; the stdout files differ in the run-file
+  paths only, as since the sort), dock_loading's IR test-bed (54 runs, every output and md5); the suite 301 passed;
+  every registered scenario of both domains loads (163).
+T-G STAGE 1 CLOSED (Hadi, 2 October 2026; recorded in T-G records 15).
+- Its purpose was an initial check that the recognizer and the recognition-to-planning chain run on dock_loading.
+- Result: the 52 MPB runs completed; zero disagreements wherever full expectations exist; the regression audit
+  byte-identical.
+- This does not state that the scenarios are free of violations. The declared property "no violation with a moving
+  robot" failed in three mixed runs (env_layout_04, `single_task`, tick 387), and controlled runs contain recorded
+  separation violations. These are findings carried to stage 2, unanalysed. They do not reopen stage 1.
+- Deferred to one housekeeping step, not done now: the sweep of old terms (TODO-153), the sizes of the files under
+  docs/, and what of analysis/ stays in git.
+- TODO-153, TODO-154, TODO-155 and TODO-156 are tagged [V1].
+
+PROPOSALS (by the design chat, NOT RULED)
+- An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
+  and names no fixed object.
+  RULED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5), B14: the setup designates the truck as the destination of each empty pallet (one rule covers every
+  pallet). How `load_return` reads it is for stage 1's plan.
+- Two generic load checks in `shared/` that let malformed input through (TODO-151, recorded as a proposal, untagged).
+- TODO-131 (the robot-mind object): A8's reduced form does not need it, so its landing in track 4 is no longer implied;
+  its placement is open (TODO-131's note).
+- Stage 1 may already use the room of B10, with the stores and the freezer present and unused.
+  CLOSED, NOT TAKEN (Hadi and the design chat, 1 October 2026; recorded in T-G records 5), B14: B10's room moves to stage 2; stage 1 uses three rooms without stores.
+- `pytest` over the whole repo stops on collection errors in `ros_sim/framework_HRI/test/` that predate build 1. Measured
+  at 62ebc4e: three files (`test_copyright.py`, `test_flake8.py`, `test_pep257.py`; the `ament_*` modules are missing);
+  the proposal named the first.
+
+Reference: cchat, 30 September and 1 October 2026 (T-G); `docs/handoffs/handoff_T-G_onward.md`; ccode's dock_loading
+survey (30 September 2026, not committed); "T-H: the human behaviour model"; "Layouts, setups and scenarios"; "An item's
+destination table is a fact of the station"; "The successor state is derived from what the action schemas declare"; I2
+("Targets, methods and completions are the planner's"); "T-D L" (L4); "T-D X" (X5); `docs/glossary.md` §6, §8, §9, §10;
+`docs/assumptions.md` 2.3, 5.1 to 5.3; TODO-02, TODO-08, TODO-09, TODO-10, TODO-16, TODO-25, TODO-30, TODO-39, TODO-81,
+TODO-96, TODO-97, TODO-104, TODO-131, TODO-140, TODO-143 to TODO-151; LIMIT-02 to LIMIT-05; DESIGN-01, DESIGN-02,
+DESIGN-04, DESIGN-15; REFACTOR-03
+
+Next: the layout and the setup of T-G's stage 1, agreed in the design chat; then stage 1's plan.
+SUPERSEDED (T-G records 1, third follow-up, 1 October 2026): the order is the lifecycle question of the human's list
+(A3, PARKED), then stage 1's layout and setup, then stage 1's plan.
+SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (A3, Q12 to Q15; B13). Next: stage 1's
+layout and setup, agreed in the design chat, then stage 1's plan.
+SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): stage 1's rooms and setups are agreed (B14). Next: stage 1's plan.
+SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 7): stage 1's plan is approved (STAGE 1 PLAN APPROVED above;
+`docs/handoffs/plan_T-G_stage1.md`). Next: stage 1's build, step 0 then step 1 (the rename).
+SUPERSEDED (records, 1 October 2026): steps 0 to 5 of stage 1 are built and accepted (STAGE 1, STEPS 0 TO 5 BUILT
+above). Next: the domain steps, step 6 (the catch-up) and step 7 (the content), then the milestone (step 8).
+SUPERSEDED (records, 1 October 2026): steps 6 to 8 of stage 1 are built and the milestone accepted (STAGE 1, STEPS 6
+TO 8 BUILT above). Next: the second simple scenario per room; then the sorting of the earlier analyses and tests under
+kitting, with the preparation of the instruments; then the IR test-bed scenarios, agreed with Hadi before they are
+authored.
+SUPERSEDED (records, 1 October 2026): the second milestone scenario is built and accepted, and stage 1's milestone is
+complete (STAGE 1, THE SECOND MILESTONE SCENARIO BUILT above). Next: the design of the IR test-bed set with Hadi (first
+question: TODO-155); then the sorting of the earlier analyses and tests under kitting, with the preparation of the
+instruments; then the set's authoring and its runs.
+SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 8): TODO-155 is ruled for now (T-G Q16: the walk stays without
+a hypothesis) and the IR test-bed set on dock_loading is agreed (T-G Q16's block above, RULED). Next: the build step that
+sorts the earlier analyses and tests under kitting and prepares the instruments for dock_loading; then the authoring of
+the set, its expectations and its runs.
+SUPERSEDED (records, 2 October 2026; T-G records 9): the sort, the instruments' preparation, office_break at 90 seconds,
+the 54 scenarios, their expectations and the 54 runs are built and accepted, and the IR test-bed of stage 1 is closed
+(STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED above). Next: the design of the MPB set with Hadi.
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 10): the design of the MPB on dock_loading is ruled (THE MPB ON
+DOCK_LOADING above, MPB-DL1 to MPB-DL6). Its three open points are answered: the setup with pallets already in the bays
+(MPB-DL2); the robot's last task as a return, not taken (MPB-DL4); expected decisions when the human's sequence depends
+on the robot (MPB-DL3). Next: the MPB set's scenarios, agreed with Hadi before they are authored.
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 11): the dispositions on the flags are recorded and the MPB
+set on dock_loading is agreed (THE MPB ON DOCK_LOADING above: MPB-DL7, DISPOSITIONS, THE SET; 13 scenarios, 52 runs).
+Next: the build's plan (the two setups of kind 3, the scenarios, every duration and cut point derived from path lengths,
+the per-room derivation that the geometry gives each declared case), approved by Hadi before the build.
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 14): the build's plan was confirmed (DL-P1 to DL-P9), the
+scope of stage 1's MPB reduced, and the MPB on dock_loading built and run (THE MPB ON DOCK_LOADING above, SCOPE REDUCED AND
+THE MPB ON DOCK_LOADING RUN; 52 runs; the 40 with full expectations agree with the oracle). Next, as Hadi rules: the
+close of stage 1 (handoff_T-G_stage1_MPB_onward.md, section 6).
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 15): T-G stage 1 is closed (T-G STAGE 1 CLOSED above). Next:
+to be named by Hadi.
