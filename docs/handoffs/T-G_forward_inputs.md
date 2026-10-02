@@ -2,6 +2,7 @@
 
 Written 2 October 2026 by the design chat that closed T-G stage 1. Place: docs/handoffs/.
 Corrected 2 October 2026 by the next design chat, after its verification against the repo's records.
+Updated 3 October 2026 at the close of the design chat of stage 1.5 (section 5 rewritten; sections 2, 9 and 11 amended).
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G. It collects, per
 stage, what is already ruled, what is open, what is parked, and the ideas Hadi stated. It replaces the reading of
@@ -74,10 +75,8 @@ Scope of stage 1's tests, as Hadi set it [ruled]: they are an initial check that
 behavioural analysis belongs to stage 2. Hadi wants stage 2's questions, rulings and discussion taken in full
 depth, one at a time.
 
-The next stage is not yet named by Hadi [open]. The records say stage 1.5 comes before stage 2. Hadi has spoken
-of stage 2 as the next work. The design chat's recommendation was stage 1.5 first, because stage 2's tests would
-otherwise be read twice, once with the present weak admissions and once after stage 1.5. The new chat asks Hadi
-before anything else.
+Stage 1.5 was taken next. Its design is ruled and recorded (2 and 3 October 2026). Its build has not
+started. Section 5 holds its state.
 
 ---
 
@@ -169,70 +168,151 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 
 ---
 
-## 5. Stage 1.5: context knowledge (framework-wide; nothing ruled)
+## 5. Stage 1.5: context knowledge (framework-wide: kitting and dock_loading)
 
-NOTE (2 October 2026): the stage's design is ruled by Hadi (design_decisions.md, "T-G stage 1.5: context knowledge in
-the recognizer's belief", R1 to R8; design_records.md, "T-G stage 1.5", R9, the cut, the open items). Hadi's earlier
-idea of a context fact that triggers or interrupts a task of the human is superseded by R1 for this stage: context
-knowledge acts in the robot's mind only, in the recognizer's belief.
+State on 3 October 2026: the design is ruled and recorded. Nothing is built. Three content points are
+open and come before the build (5.4).
+Records: docs/design_decisions.md, the entry "T-G stage 1.5: context knowledge in the recognizer's
+belief" (rulings R1 to R8, assumptions A1 to A7, amendments AM1 to AM9, corrections C1 to C4);
+docs/design_records.md, the heading "T-G stage 1.5" (the cut, T-K, the open items, the build's list).
+Where this section and those records disagree, the records win.
 
-Content, as recorded: the scenario holds a timeline of context facts. A context fact changes at an authored
-point of a run, and the environment applies it. Foreseeable tasks of both domains can be conditioned on such
-facts. The mechanism for object states built in stage 1 already admits a fact that no action changes, so
-context facts need no second mechanism. [ruled: the requirement on the form; everything else open]
+### 5.1 The design in plain words [ruled]
 
-The central design question [open]: what sets a hypothesis's share at the start of an episode. Four determinants
-are recorded, to be designed as one mechanism:
-1. the assignment (exists today: assigned tasks are in the support);
-2. context facts;
-3. the task that just ended;
-4. an enabling event, such as the robot's own delivery.
-Stage 1's figures in section 4 are its measured baseline.
+- Context knowledge acts in the robot's mind only, in the recognizer's belief. It does not drive the
+  human. It starts no task and interrupts no task of the human. A script may be authored to agree with
+  it for a test; that is test authoring.
+- Conditions of tasks stay in the task model. They decide which hypotheses are live. They are not
+  context knowledge.
+- The belief. At each run of the recognizer, the belief is the prior multiplied by the evidence, then
+  normalised over the live hypotheses. The prior is evaluated on the context facts that hold at the
+  present tick. The evidence is what the observed movement of the present episode says, with no context
+  in it. The prior enters once and is never folded into the evidence. Adequacy and warrant do not read
+  the prior. The rules on re-entry and on the episode boundary describe the evidence (it restarts equal;
+  a returning hypothesis takes 1/|H| of it).
+- The prior. It is the normalisation of the strengths of what is live. The human's work as a whole
+  contributes 1 while a work-task hypothesis is live. Work as a whole is the live hypotheses of work
+  tasks in the support; with assignment knowledge on, these are the live assigned tasks. Its share is
+  divided equally among those hypotheses. Each live foreseeable task contributes its declared strength,
+  divided equally among that task's live hypotheses.
+- A strength is the declared relative weight of a foreseeable task against the human's work as a whole.
+  A foreseeable task declares a low strength (its occurrence condition is not satisfied) and a high
+  strength (it is satisfied). A foreseeable task with no occurrence condition declares one strength.
+  Every strength is greater than zero and carries its source. It is a modelling assumption until a site
+  measures it. Proposed meaning, not claimed: a ratio of counted task starts.
+- An occurrence condition is the condition over context facts attached to a foreseeable task. In stage
+  1.5 it is one context fact or a conjunction of context facts.
+- A context fact is a declared fact derived from context values (the clock time, the temperature). In
+  stage 1.5 it is crisp: it holds or it does not hold.
+- Two independent run options, both on by default: assignment_knowledge (today's assignment_prior) and
+  context_knowledge (new). With context_knowledge off the prior is equal over the live hypotheses. Each
+  "off" is an ablation or a diagnostic.
+- Gate policy, no change to the gate: an assigned task may be admitted before any distinguishing
+  movement, on its commitment warrant. The prior is the robot's expectation, not evidence that the human
+  has started. Adequacy tests the hypothesis afterwards and can cause the retraction. A foreseeable task
+  still needs observation warrant.
+- A task keeps one declared duration. Context does not change the content of a projection. The only
+  path from context to the projection is: prior, belief, gate, projection of the admitted task.
+- The earlier decision "Assigned-task pool is a support restriction, not a prior" is revised in part:
+  the assignment still restricts the support and sets no weight; declared strengths replace unit weight
+  between work as a whole and the foreseeable tasks.
+- Superseded by these rulings: Hadi's earlier sketch in which a context fact triggers a foreseeable task
+  of the human or interrupts a task in progress.
 
-What exists in the code today [recorded, TODO-66, deferred]: the recognizer holds a context weight in the shared
-core (`_context_weight`). It names two tasks literally (`ac_activation`, `coffee_break`). It carries four
-constants (a temperature boost of 3.0, a fatigue boost of 2.5, the thresholds 26.0 and 500). It acts on the
-recognizer's output only and is never fed back. No scenario sets the temperature or a long shift. It is the one
-place in the shared core that names a domain task. Whether stage 1.5 closes this item is for the stage's design.
+### 5.2 What the build of stage 1.5 contains [ruled]
 
-Also recorded: the pre-loaded context stream moved to stage 1.5 from the interactive simulator's track (T-V track
-2), which keeps the live events.
+- The prior as in 5.1, with crisp context facts.
+- A timeline of context facts in the scenario: a fact changes at an authored tick. The environment
+  applies it; the robot's world state carries it; the recognizer reads it there.
+- The declarations of context knowledge per domain: the context facts, and per foreseeable task its
+  occurrence condition and its strengths.
+- The two run options, their names and their defaults.
+- The removal of the two domain task names and the four constants from the recognizer (TODO-66). The
+  present hardcoded weight multiplies coffee_break by 2.5 from step 500 in every run (found on 3 October
+  2026; see the caveat in section 4).
 
-Other open questions recorded for the stage [open]:
-- the form of a context fact;
-- whether a context fact only lets the human start a task, or also interrupts a task in progress (the present
-  rule is: never interrupted). The record on future-work directions places the design of "an interruption of a
-  busy human caused by a world fact, if wanted" in T-V track 2, as the same entry point as a live user's click;
-- what happens to a hypothesis when its condition turns false while the human still executes the task
-  ("applicable to start" against "valid to continue");
-- how the prior uses context;
-- how the robot perceives a context fact.
+### 5.3 What is not in stage 1.5
 
-Hadi's ideas for the stage [idea]:
-- A coffee break is taken in a time window (his example: 9:30 to 10:00), and the hypothesis has a higher
-  probability inside the window. An air-conditioning task is triggered when the temperature in the context
-  stream passes a threshold. He sees both as dynamic and as possibly interrupting a task in progress.
-- "Applicable" can track context: a condition on a context fact makes the human take the task, and keeps the
-  hypothesis live only while the condition holds.
-- A transition prior between tasks, like a chain of tasks: after one task ends, some next tasks are more
-  probable. His example: after putting the pan on the stove, adding oil most probably follows, without being
-  part of the same task.
-- The duration of a foreseeable task is not one fixed number. An office visit can last 20 to 30 seconds (to fetch
-  something) or 90 to 120 seconds (office work).
-- Temporal context as a fuzzy set with a degree of membership.
-- In kitting, a human who leaves the room for a while can be a foreseeable task with a typical duration known
-  from context. (chat only)
+- T-K, a new task at the end of the V1 queue [ruled]: degrees. A context fact satisfied to a degree
+  between 0 and 1; a membership function that gives the degree from a context value; minimum for "and",
+  maximum for "or", 1 minus the degree for "not"; the strength linear in the degree between low and
+  high. The design is ruled; the representation of a context value and of a degree is open.
+- T-G stage 2 [open]: whether succession between tasks affects the division inside work as a whole, to
+  be argued with store_pallet present.
+- Not taken, and not future work [ruled]: a preference for a task that has just become applicable.
+- Under TODO-155 [open, parked, V1, no stage]: the walk to the standby place and the walk to the desk
+  have no hypothesis. Recorded there as not taken for this stage: a share for "none of the modelled
+  tasks"; it would reopen the decision that the belief has no residual hypothesis. With no work-task
+  hypothesis live, the prior is conditional on one of the modelled foreseeable tasks.
+- Future work [ruled]: see section 9.
+- Still open and outside this stage: whether a hypothesis stays live when its method's condition turns
+  false while the human is doing the task.
 
-The walk to the standby place and the walk to the desk (TODO-155) [open]. The item is parked and tagged V1. No
-stage is assigned to it. Its placement in stage 1.5 was a proposal of the previous design chat, not a ruling.
-Ruled for now: these walks stay without a hypothesis. Two candidates are recorded, neither approved:
-- a foreseeable task "step aside" that is always possible. Hadi's objection: the human steps aside only when no
-  pallet waits; an always-possible task competes with the scans when a pallet waits. Also, as a walk alone it
-  would make every arrival at any target count as the end of an episode. A wait at the end of the task avoids
-  that.
-- a hypothesis that is live only while no assigned task of the human is live. It matches the condition, and it
-  changes the rule for which hypotheses are live.
-Not taken: the walk as the last step of the scan task.
+### 5.4 Open before the build: three content points [open]
+
+Each is put to Hadi one at a time. None is decided.
+
+1. The values for kitting and dock_loading: which context facts exist; the occurrence condition of each
+   foreseeable task; its low and high strength; the source of each value.
+   Hadi's examples from the design chat [chat only, not values]:
+   - Coffee break: the human takes it at the fixed break time, or after long work without a break.
+     "Tired" is not a fact, because the robot cannot observe it; "long work without a break" is,
+     because it rests on values. The "or" needs T-K, or the two are authored as one fact.
+   - Break time with soft edges: 9:15 to 9:30 partly, 9:30 to 10:00 fully, 10:00 to 10:15 partly. The
+     soft edges need T-K; in stage 1.5 the fact is crisp.
+   - A/C: the temperature rises near 25 degrees, the room is warmer than it should be, and turning on
+     the A/C is likely. Turning on the A/C changes the temperature: an action may change a context
+     value, never a context fact directly.
+   - The numbers used in the design chat's examples (coffee break 0.05 and 3, office break 0.05, A/C
+     0.01 and 0.5) were illustrations only.
+2. The perception assumption: how the robot obtains a context fact. The existing assumption for object
+   states (the robot knows them through the site's system) is the likely model. Nothing is written.
+3. The tests of the stage: a script that agrees with an occurrence condition; a human who acts against
+   it; a duration mismatch (the human's actual duration differs from the robot's declared one).
+
+Also open, Hadi's choice: whether A1 (given the task, the movement does not depend on the context), A5
+(the declared and the actual duration match) and possibly A4 go into docs/assumptions.md. ccode thinks
+A1 and A5 belong there.
+
+### 5.5 What the build must respect [recorded, with one chat-only item]
+
+- The stage is framework-wide. The acceptance includes kitting.
+- With both options on, every existing run with assignment knowledge on changes, also with no context
+  fact declared: each foreseeable task has its low strength in place of an equal share [chat only: the
+  design chat's statement of this consequence].
+- Every existing baseline set and test either states context_knowledge off to stay identical, or is
+  regenerated with the reason stated, with the regression audit CLAUDE.md requires. Runs of 500 steps or
+  more change even with context_knowledge off, because the hardcoded weight leaves.
+- The renames (assignment_prior to assignment_knowledge; the context weight; prior base) and the default
+  changes belong to the build. docs/assumptions.md 1.4 is updated there.
+- The recognizer is a core algorithm. The change is domain-independent and ruled. The build touches
+  nothing else of the core at the conceptual level without asking.
+- ccode works in two steps: a plan with no code, confirmed in the design chat, then the build.
+
+### 5.6 The steps from here
+
+1. The three content points, one at a time.
+2. The records of their rulings.
+3. ccode's plan for the build, reviewed in the design chat.
+4. The build, its verification, and the review.
+5. The re-measurement of stage 1's baseline with context knowledge on (section 4's figures were measured
+   with the equal prior).
+6. The close of stage 1.5, with this file updated. Then stage 2 (section 6).
+
+### 5.7 Background from the design chat [chat only]
+
+- The reason for the form of the prior: the literature puts context in the prior (Pynadath and Wellman
+  1995; Kelley et al. 2012; CoBaIR, Lubitz et al. 2023). The hierarchy follows the idea of a nested
+  choice model; the form is a hierarchical prior with declared relative strengths and inherits none of
+  that model's further assumptions. These references may serve the paper.
+- Discussed and not held: kinds of knowledge by force (a strict constraint, a norm, a habit) and by
+  scope (general, sector or organisation, domain or site). The principle that was held and ruled: only
+  a condition of the task model removes a hypothesis; context only changes how probable a live
+  hypothesis is.
+- A consequence of the ruled prior, stated as a consequence and not as its reason: with one assigned
+  task live and the foreseeable tasks at low strength, the assigned task starts near the threshold or
+  above it. This bears on the finding that the robot does not anticipate the scan its own delivery
+  enables (TODO-154).
 
 ---
 
@@ -345,12 +425,15 @@ mechanism; an action of unknown length inside a plan; a rule that keeps the robo
 - A detour as the robot's response; execution in ROS.
 - Communication acts stay under their existing records (TODO-96): the human assigning or changing a delivery
   location during the run; the robot informing a third party.
+- Duration uncertainty and a projection that depends on context; unobservable states of the human as context; scopes of
+  knowledge and norms; validation of the strengths on site data.
 
 Not future work [ruled]: a type-to-destination rule in place of explicit designations is recorded as not taken.
 By the rule on V1 and future work, an alternative not taken in a design question is never a future-work item.
 
 Also planned inside V1, after T-G: the evaluation; the viewer; an interactive simulator in which deviations are
-injected at run time; one further test track on adaptation under conflict.
+injected at run time; one further test track on adaptation under conflict. T-K, the degrees of context facts (section
+5.3), at the end of the V1 queue.
 
 ---
 
@@ -393,3 +476,7 @@ injected at run time; one further test track on adaptation under conflict.
   and why fixed, how left open; plain copiable text; one prompt at a time; commits on main, never a push.
 - Hadi reads recommendations quickly. A package ruled with one "ok" must state its consequential items
   separately and plainly.
+- A stage whose subject is conceptual is first discussed as research: the concept, its terms and its
+  alternatives, with no build steps, until Hadi rules. Hadi may bring reflections from another chat; the
+  design chat takes from them what improves the decision and does not defend against them.
+- Logic and knowledge-representation terms are used exactly: a fact holds, a condition is satisfied.
