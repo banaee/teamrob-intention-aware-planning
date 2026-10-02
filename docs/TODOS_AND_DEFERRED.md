@@ -2873,6 +2873,9 @@ Fix: TODO-08 (`open_gate` action schema + `gate_closed` method).
 [FW] (T-G A10, B9, T-G records 1, 1 Oct 2026): in V1 a container is one point, its centre, with no constraint, and may hold several pallets
 (B9); authored pallet places are not taken. A container divided into positions, the position chosen when an object is
 put down, is FW, with no new item. Pallets drawn on top of each other are a drawing matter for T-V. design_decisions.md, "T-G: the second domain's rulings", A10, B9.
+NOTE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; B9's note): a property of "one point per container": two pallets
+in one container stand on one point, so the second scan has no walk (C3: three stretches of 3 ticks, never at the
+threshold) and no walk between them exists that an event could cut (M3 as first written was not buildable).
 Pallets 0–5 all share `truck_interior` center position. No individual slot positions.
 Deferred: individual pallet slot positions within truck area.
 
@@ -3383,6 +3386,11 @@ not part of T-D Q1.
 **TODO-97: Belief-aware planning: a joint realization against the hypotheses that cover the belief (recorded, 24 Sept 2026)** [OPEN, recorded only; later, after the T-D Q2 to Q4 recognizer pass]
 SUPERSEDED IN PART (T-D R1, 27 September 2026): `unknown` is not a member of S_ε; the finding's role in belief-aware planning is G; TODO-97's gate is unchanged. design_decisions.md, "T-D R and E".
 Status: open, recorded only. Not on the T-D agenda, not in the handoff order.
+LINKED (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED): the IR test-bed on dock_loading confirmed T-G's watched item
+C5, a finding about the mind, NOT RULED: hypotheses that predict the same motion divide the belief and none is admitted
+(two unscanned pallets in one bay: in C3 and on C4's first two walks, all three rooms, 9 stretches never reach the
+threshold). The direction recorded here, acting on a set of hypotheses with the same projection (the covering set S_ε,
+one joint realization), is the one this finding returns to the design chat with.
 
 Claim it would support: robustness to intention AMBIGUITY, two or more live hypotheses sharing the
 mass and none clearing θ. Not robustness to intention uncertainty in general: a confident wrong
@@ -4370,6 +4378,13 @@ NOTE (Hadi, 1 Oct 2026; T-G records 8; design_decisions.md, "T-G: the second dom
 enabling event, such as the robot's own delivery, is one of four determinants recorded for stage 1.5's design question,
 NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, which exists; context facts; the
 task that just ended, a transition prior between tasks; an enabling event). They are designed as one mechanism.
+BASELINE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED), a finding about the mind, NOT RULED: a short walk gives too
+little evidence under equal shares at the start of an episode. Over the 54 runs of the IR test-bed on dock_loading, 98
+of the 147 true stretches in the support reach the threshold (38, 40, 20 of 49 by room), median 20 ticks (range 6 to
+50; one tick is 2 seconds); of the 49 that never do, all scans, 34 last 26 ticks or fewer (on env_layout_04, 16 steps
+from the standby place to the dry bay, scan 0's first walk never reaches it with three or more rivals live). It joins
+stage 1.5's question on what sets a hypothesis's share at the start of an episode as its measured baseline (the per-row
+table: the T-G block named above).
 Files: shared/recognizer.py, shared/meta_planner.py (no change)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
 
@@ -4402,6 +4417,25 @@ the middle of the task.
 In the IR test-bed set the standby walks (C13, C14, M4) are diagnostic observations: beside the expectation under the
 present model, the predictions under H1 and under H2 are written down before the run; only the present model's
 expectation is compared with the run.
+CORRECTED (Hadi, 1 October 2026, at the approval of the IR test-bed's build; recorded 2 October 2026, T-G records 9): H2
+is worded "a hypothesis live only while no assigned task of the human is live" (a scanned pallet's scan stays
+applicable, its guards not reading is_scanned). NOTE (the same records): H1, an always-possible standby task, as a walk
+only would make move_to a terminal action and every arrival an episode boundary (L1); a wait at its end avoids that.
+EVIDENCE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; analysis/dock_loading/ir_testbed/predictions.md, written
+before the runs), a finding about the mind, NOT RULED: the actual readings equal the present model's expectation in all
+nine runs.
+- C13 (from the dry bay) and C14 (from the frozen bay): the walk is admitted as a break in five of six runs, by the
+  room's bearings: coffee_break on env_layout_02 in C13 (gate clears 50 to 70) and env_layout_03 in C14 (51 to 66);
+  office_break on env_layout_03 in C13 (46 to 56), env_layout_02 in C14 (38 to 56) and env_layout_04 in C14 (37 to 58);
+  never above θ in C13 on env_layout_04. The finding turns unexplained once the human stands; the scan of pallet_4
+  never enters the live set (A4).
+- M4: on env_layout_02 the walk is admitted as the scan of pallet_0 (gate clears 167 to 182), an assigned task the
+  human never performs and that stays live with its commitment warrant; on env_layout_03 read as it, never above θ; on
+  env_layout_04 as office_break (143 to 156).
+- The predictions written before the runs: H1 leads the walk at zero excess, clears it and is pinned on arrival, in
+  every row; H2 (no assigned task live) is live from the scan's pin in C13 and C14 and reads the walk as H1, and is
+  never live in M4 (scan 0 live to the end), so its prediction there equals the present model's. C13 and C14 separate
+  the conditional candidate from the present model; M4 does not.
 NOTE (T-G records 8, not a ruling): Q16 concerns the walk to the standby place; the walk to the desk, this item's second
 walk, is not ruled by it (B13's note: the desk is a landmark in stage 1, so no hypothesis, as for kitting's exit walk).
 Related, for stage 1.5, NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, context
@@ -4426,5 +4460,9 @@ CLOSED AS RULED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain'
 T-G records 8; B6's note): `office_break` lasts 90 seconds; `coffee_break` stays 60. Reason: a long absence lets pallets
 accumulate in a bay, which gives two scans possible at once and the robot arriving at an occupied bay; it differs
 clearly from the coffee break. The change of the value is made in the next build step.
+BUILT (edbe34f, 1 October 2026). CORRECTED (records, 2 October 2026; T-G records 9; B6's note): one tick is 2 seconds,
+so the wait is 45 ticks and the human's absence about 110 ticks (C6 on env_layout_02: the dry bay left at 30, the frozen
+bay reached at 141), a little more than one round trip of the robot (about 96 ticks); the value is reviewed with the
+MPB's design.
 Files: domains/dock_loading/tasks.py (`office_break`)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B6
