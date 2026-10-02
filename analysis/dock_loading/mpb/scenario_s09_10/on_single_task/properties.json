@@ -1,0 +1,320 @@
+{
+ "scenario": "scenario_s09_10",
+ "strategy": "single_task",
+ "prior": true,
+ "completion": 327,
+ "terminal": 329,
+ "horizon": 359,
+ "properties": [],
+ "measures": {
+  "sep_min_dist": [
+   79.01,
+   264
+  ],
+  "sep_min_continuous": [
+   78.96,
+   265
+  ],
+  "f1": {
+   "viol": 0,
+   "stand": 0,
+   "recede": 0,
+   "?": 0
+  },
+  "near_encounters": 0,
+  "holds": [],
+  "hold_ticks": 0
+ },
+ "detectors": {
+  "todo134": [],
+  "arrival_tick_rays": []
+ },
+ "decisions": [
+  {
+   "tick": 0,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=1 end=2.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 2,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=3 end=6.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 6,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=7 end=14.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 14,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=15 end=15.18",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 16,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback standing k=1 end=18.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 18,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=2 end=21.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 21,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=5 end=27.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 27,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+   "projection": "fallback moving k=11 end=38.66",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 38,
+   "trigger": "recognition_changed",
+   "cause": "entered",
+   "gate": "clears",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "admitted coffee_break(?coffee_machine=coffee_machine_0)",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 59,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "clears",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "admitted coffee_break(?coffee_machine=coffee_machine_0)",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 69,
+   "trigger": "recognition_changed",
+   "cause": "replaced",
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback standing k=31 end=101.00",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 101,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+   "projection": "fallback moving k=4 end=106.00",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 106,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+   "projection": "fallback moving k=9 end=113.45",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 114,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+   "projection": "fallback standing k=1 end=116.00",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 116,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=3 end=120.00",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 120,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=7 end=128.00",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 128,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=15 end=144.00",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 144,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=31 end=176.00",
+   "winner": "deliver_pallet(?pallet=pallet_4)",
+   "hold": 0
+  },
+  {
+   "tick": 150,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=37 end=188.00",
+   "winner": "load_return(?pallet=pallet_6)",
+   "hold": 0
+  },
+  {
+   "tick": 188,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=75 end=264.00",
+   "winner": "load_return(?pallet=pallet_6)",
+   "hold": 0
+  },
+  {
+   "tick": 238,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback moving k=25 end=254.27",
+   "winner": "load_return(?pallet=pallet_7)",
+   "hold": 0
+  },
+  {
+   "tick": 255,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback standing k=1 end=257.00",
+   "winner": "load_return(?pallet=pallet_7)",
+   "hold": 0
+  },
+  {
+   "tick": 257,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback standing k=3 end=261.00",
+   "winner": "load_return(?pallet=pallet_7)",
+   "hold": 0
+  },
+  {
+   "tick": 261,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback standing k=7 end=269.00",
+   "winner": "load_return(?pallet=pallet_7)",
+   "hold": 0
+  },
+  {
+   "tick": 269,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback standing k=15 end=285.00",
+   "winner": "load_return(?pallet=pallet_7)",
+   "hold": 0
+  },
+  {
+   "tick": 285,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback standing k=31 end=317.00",
+   "winner": "load_return(?pallet=pallet_7)",
+   "hold": 0
+  },
+  {
+   "tick": 317,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback standing k=63 end=381.00",
+   "winner": "load_return(?pallet=pallet_7)",
+   "hold": 0
+  },
+  {
+   "tick": 329,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback standing k=75 end=405.00",
+   "winner": null,
+   "hold": 0
+  }
+ ],
+ "extra_measures": [
+  "stand",
+  "k3_switch",
+  "k9",
+  "m2"
+ ]
+}

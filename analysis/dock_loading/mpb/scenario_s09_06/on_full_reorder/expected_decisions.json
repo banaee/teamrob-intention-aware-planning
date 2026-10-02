@@ -1,0 +1,495 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 0.17708008015791726,
+"end": 15.177080080157918
+}
+},
+{
+"tick": 16,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 18.0
+}
+},
+{
+"tick": 18,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 22.0
+}
+},
+{
+"tick": 22,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 4,
+"duration": 4.0,
+"end": 27.0
+}
+},
+{
+"tick": 27,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 9,
+"duration": 9.0,
+"end": 37.0
+}
+},
+{
+"tick": 36,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 71,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 103.0
+}
+},
+{
+"tick": 81,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 9,
+"duration": 0.1157322598817792,
+"end": 82.11573225988178
+}
+},
+{
+"tick": 83,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_2"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_2"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 84,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 87.0
+}
+},
+{
+"tick": 87,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 90.0
+}
+},
+{
+"tick": 90,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 96.0
+}
+},
+{
+"tick": 96,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 108.0
+}
+},
+{
+"tick": 100,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "office_break(?office_chair=office_chair)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"office_door"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"office_chair"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT90S"
+],
+[
+"?entity",
+"office_chair"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 109,
+"trigger": "recognition_changed",
+"cause": "retraction",
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 24,
+"duration": 16.299367985963592,
+"end": 126.29936798596358
+}
+},
+{
+"tick": 127,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 129.0
+}
+},
+{
+"tick": 129,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 133.0
+}
+},
+{
+"tick": 133,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 141.0
+}
+},
+{
+"tick": 141,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 157.0
+}
+},
+{
+"tick": 157,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 189.0
+}
+},
+{
+"tick": 189,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 63,
+"duration": 63.0,
+"end": 253.0
+}
+},
+{
+"tick": 221,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 95,
+"duration": 95.0,
+"end": 317.0
+}
+},
+{
+"tick": 270,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 144,
+"duration": 144.0,
+"end": 415.0
+}
+}
+]

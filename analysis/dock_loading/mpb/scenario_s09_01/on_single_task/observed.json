@@ -1,0 +1,12 @@
+{
+ "no_current_task": [
+  0,
+  59
+ ],
+ "terminal": 59,
+ "last_ack": 54,
+ "steps": 144,
+ "horizon": 89,
+ "strategy": "single_task",
+ "prior": true
+}

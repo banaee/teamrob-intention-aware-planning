@@ -1,0 +1,137 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 2.0,
+"candidates": []
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 4.0,
+"candidates": []
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 8.0,
+"candidates": []
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 10.309397513308937,
+"candidates": []
+},
+{
+"tick": 21,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 6.309397513308985,
+"candidates": []
+},
+{
+"tick": 26,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": []
+},
+{
+"tick": 29,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": []
+},
+{
+"tick": 32,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 6.0,
+"candidates": []
+},
+{
+"tick": 37,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 76.6096379023631,
+"candidates": []
+},
+{
+"tick": 59,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 9.0,
+"candidates": []
+},
+{
+"tick": 68,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 18.0,
+"candidates": []
+},
+{
+"tick": 81,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 31.0,
+"candidates": []
+},
+{
+"tick": 112,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 10.0,
+"candidates": []
+},
+{
+"tick": 122,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 20.0,
+"candidates": []
+},
+{
+"tick": 130,
+"trigger": "no_current_task",
+"terminal": true,
+"winner": null,
+"hold": 0,
+"horizon": null,
+"candidates": []
+}
+]

@@ -1,0 +1,417 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_0"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_0"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 28,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 31.0
+}
+},
+{
+"tick": 31,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 34.0
+}
+},
+{
+"tick": 34,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 40.0
+}
+},
+{
+"tick": 40,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 52.0
+}
+},
+{
+"tick": 52,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 23,
+"duration": 23.0,
+"end": 76.0
+}
+},
+{
+"tick": 54,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_2"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_2"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 60,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_2"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_2"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 82,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 85.0
+}
+},
+{
+"tick": 85,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 88.0
+}
+},
+{
+"tick": 88,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 94.0
+}
+},
+{
+"tick": 93,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 111,
+"trigger": "recognition_changed",
+"cause": "retraction",
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 12,
+"duration": 12.0,
+"end": 124.0
+}
+},
+{
+"tick": 124,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 25,
+"duration": 25.0,
+"end": 150.0
+}
+},
+{
+"tick": 150,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 51,
+"duration": 51.0,
+"end": 202.0
+}
+},
+{
+"tick": 159,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 60,
+"duration": 60.0,
+"end": 220.0
+}
+},
+{
+"tick": 215,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 116,
+"duration": 116.0,
+"end": 332.0
+}
+}
+]

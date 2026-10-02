@@ -1,0 +1,531 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 2.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 64.99
+},
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 58.08
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 78.88
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 78.88
+}
+]
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 4.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 56.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 62.99
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 80.88
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 80.88
+}
+]
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 8.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 52.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 58.99
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 84.88
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 84.88
+}
+]
+},
+{
+"tick": 14,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 15.403852780574947,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 45.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 58.99
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 91.88
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 91.88
+}
+]
+},
+{
+"tick": 28,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 31.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 71.2
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 104.09
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 104.09
+}
+]
+},
+{
+"tick": 31,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 28.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 75.87
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 108.76
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 108.76
+}
+]
+},
+{
+"tick": 34,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 6.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 25.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 78.95
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 111.84
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 111.84
+}
+]
+},
+{
+"tick": 40,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 10.946705562750568,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 19.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 85.0
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 117.89
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 117.89
+}
+]
+},
+{
+"tick": 43,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 39.94670556275057,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_5)",
+"delta": 0,
+"T_r": 16.08
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 88.01
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 120.9
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 120.9
+}
+]
+},
+{
+"tick": 60,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 33.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 98.03
+},
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 97.46
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 97.46
+}
+]
+},
+{
+"tick": 81,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 32.0,
+"candidates": [
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 76.46
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 84.16
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 76.46
+}
+]
+},
+{
+"tick": 103,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 28.658554986889307,
+"candidates": [
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 54.46
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 91.21
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 54.46
+}
+]
+},
+{
+"tick": 130,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": [
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 28.33
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 115.59
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 67.1
+}
+]
+},
+{
+"tick": 133,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": [
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 25.33
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 118.59
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 70.1
+}
+]
+},
+{
+"tick": 136,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 6.0,
+"candidates": [
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 22.33
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 121.59
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 73.1
+}
+]
+},
+{
+"tick": 141,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 70.23473455158884,
+"candidates": [
+{
+"task": "load_return(?pallet=pallet_6)",
+"delta": 0,
+"T_r": 17.53
+},
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 125.59
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 77.1
+}
+]
+},
+{
+"tick": 159,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 14.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 55.96
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 88.84
+}
+]
+},
+{
+"tick": 173,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 28.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 41.96
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 101.91
+}
+]
+},
+{
+"tick": 201,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 56.0,
+"candidates": [
+{
+"task": "deliver_pallet(?pallet=pallet_4)",
+"delta": 0,
+"T_r": 13.97
+},
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 129.91
+}
+]
+},
+{
+"tick": 215,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_7)",
+"hold": 0,
+"horizon": 70.0,
+"candidates": [
+{
+"task": "load_return(?pallet=pallet_7)",
+"delta": 0,
+"T_r": 59.84
+}
+]
+},
+{
+"tick": 276,
+"trigger": "no_current_task",
+"terminal": true,
+"winner": null,
+"hold": 0,
+"horizon": null,
+"candidates": []
+}
+]

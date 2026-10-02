@@ -1,0 +1,14 @@
+{
+ "no_current_task": [
+  0,
+  66,
+  127,
+  177
+ ],
+ "terminal": 177,
+ "last_ack": 100,
+ "steps": 393,
+ "horizon": 207,
+ "strategy": "full_reorder",
+ "prior": true
+}

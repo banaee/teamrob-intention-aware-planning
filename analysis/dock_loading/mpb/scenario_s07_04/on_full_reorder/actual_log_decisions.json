@@ -1,0 +1,303 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 30,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 59,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 63,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 69,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 74,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 77,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 80,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 86,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 91,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 93,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 97,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 105,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 121,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 153,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 202,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 206,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_1)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 211,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "confirm_delivered_pallet(?pallet=pallet_1)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 216,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 219,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 222,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 228,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 233,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 235,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 239,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 247,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 263,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 295,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 344,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 348,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 356,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 361,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 367,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 370,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 373,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 378,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "built warrant=observation"
+},
+{
+"tick": 400,
+"trigger": "recognition_changed",
+"cause": "retraction",
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 409,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 427,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 435,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+}
+]

@@ -1,0 +1,186 @@
+{
+ "scenario": "scenario_s09_01",
+ "strategy": "single_task",
+ "prior": true,
+ "completion": 57,
+ "terminal": 59,
+ "horizon": 89,
+ "properties": [
+  {
+   "name": "P1a",
+   "holds": true,
+   "detail": "holds []"
+  },
+  {
+   "name": "P1b",
+   "holds": true,
+   "detail": "completion 57, the reference's 57"
+  },
+  {
+   "name": "P1c",
+   "holds": true,
+   "detail": "ticks where the robot's positions differ: []"
+  }
+ ],
+ "measures": {
+  "sep_min_dist": [
+   284.41,
+   34
+  ],
+  "sep_min_continuous": [
+   284.19,
+   35
+  ],
+  "f1": {
+   "viol": 0,
+   "stand": 0,
+   "recede": 0,
+   "?": 0
+  },
+  "near_encounters": 0,
+  "holds": [],
+  "hold_ticks": 0
+ },
+ "detectors": {
+  "todo134": [],
+  "arrival_tick_rays": []
+ },
+ "decisions": [
+  {
+   "tick": 0,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=1 end=2.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 2,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=3 end=6.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 6,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "fallback moving k=7 end=14.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 14,
+   "trigger": "recognition_changed",
+   "cause": "entered",
+   "gate": "clears",
+   "leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+   "projection": "admitted confirm_delivered_pallet(?pallet=pallet_0)",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 17,
+   "trigger": "recognition_changed",
+   "cause": "replaced",
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=2 end=20.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 20,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback moving k=2 end=23.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 23,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "office_break(?office_chair=office_chair)",
+   "projection": "fallback moving k=5 end=29.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 29,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback moving k=11 end=33.50",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 34,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(below_theta)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback moving k=16 end=51.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 51,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback moving k=33 end=53.35",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 54,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=1 end=56.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 56,
+   "trigger": "projection_expired",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=3 end=60.00",
+   "winner": "deliver_pallet(?pallet=pallet_5)",
+   "hold": 0
+  },
+  {
+   "tick": 59,
+   "trigger": "no_current_task",
+   "cause": null,
+   "gate": "none(leader_inadequate)",
+   "leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+   "projection": "fallback standing k=6 end=66.00",
+   "winner": null,
+   "hold": 0
+  }
+ ],
+ "extra_measures": [
+  "stand",
+  "k3_switch",
+  "k9",
+  "m2"
+ ]
+}

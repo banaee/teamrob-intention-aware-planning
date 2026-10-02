@@ -1,0 +1,2212 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 30.0
+}
+},
+{
+"tick": 30,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 62.0
+}
+},
+{
+"tick": 59,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 63.0
+}
+},
+{
+"tick": 63,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 71.0
+}
+},
+{
+"tick": 71,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 9.309397513308937,
+"end": 81.30939751330894
+}
+},
+{
+"tick": 76,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_2"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_2"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+5.3093975133089835,
+[
+-399.07944362857205,
+-27.121903935922372
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+],
+[
+5.3093975133089835,
+6.3093975133089835,
+[
+-485.0690417278571,
+-32.96585720480582
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+],
+[
+6.3093975133089835,
+7.3093975133089835,
+[
+-485.0690417278571,
+-32.96585720480582
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+],
+[
+7.3093975133089835,
+8.309397513308983,
+[
+-485.0690417278571,
+-32.96585720480582
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+9.784395075312414,
+[
+-200.78955148813355,
+-196.95348186625523
+],
+[
+-26.69033875738012,
+-286.3023426449523
+]
+],
+[
+9.784395075312414,
+10.784395075312414,
+[
+-26.69033875738012,
+-286.3023426449523
+],
+[
+-26.69033875738012,
+-286.3023426449523
+]
+],
+[
+10.784395075312414,
+24.5278068707347,
+[
+-26.69033875738012,
+-286.3023426449523
+],
+[
+-2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+24.5278068707347,
+25.5278068707347,
+[
+-2.6264138680615545,
+-560.1151886371413
+],
+[
+-2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+25.5278068707347,
+26.5278068707347,
+[
+-2.6264138680615545,
+-560.1151886371413
+],
+[
+-2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+26.5278068707347,
+27.5278068707347,
+[
+-2.6264138680615545,
+-560.1151886371413
+],
+[
+-2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+27.5278068707347,
+39.03422926599216,
+[
+-2.6264138680615545,
+-560.1151886371413
+],
+[
+-0.30289811312977477,
+-329.9984708399122
+]
+],
+[
+39.03422926599216,
+40.03422926599216,
+[
+-0.30289811312977477,
+-329.9984708399122
+],
+[
+-0.30289811312977477,
+-329.9984708399122
+]
+],
+[
+40.03422926599216,
+68.19637705103251,
+[
+-0.30289811312977477,
+-329.9984708399122
+],
+[
+-488.97202460100766,
+-49.91792534602081
+]
+],
+[
+68.19637705103251,
+69.19637705103251,
+[
+-488.97202460100766,
+-49.91792534602081
+],
+[
+-488.97202460100766,
+-49.91792534602081
+]
+],
+[
+69.19637705103251,
+70.19637705103251,
+[
+-488.97202460100766,
+-49.91792534602081
+],
+[
+-488.97202460100766,
+-49.91792534602081
+]
+],
+[
+70.19637705103251,
+71.19637705103251,
+[
+-488.97202460100766,
+-49.91792534602081
+],
+[
+-488.97202460100766,
+-49.91792534602081
+]
+],
+[
+71.19637705103251,
+72.19637705103251,
+[
+-488.97202460100766,
+-49.91792534602081
+],
+[
+-488.97202460100766,
+-49.91792534602081
+]
+]
+]
+},
+{
+"tick": 83,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 86.0
+}
+},
+{
+"tick": 86,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 89.0
+}
+},
+{
+"tick": 89,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 95.0
+}
+},
+{
+"tick": 94,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "office_break(?office_chair=office_chair)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"office_door"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"office_chair"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT90S"
+],
+[
+"?entity",
+"office_chair"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+21.42058717114833,
+[
+-299.309582721429,
+-20.341427951941778
+],
+[
+-20.481402736924224,
+278.0794128288517
+]
+],
+[
+21.42058717114833,
+22.42058717114833,
+[
+-20.481402736924224,
+278.0794128288517
+],
+[
+-20.481402736924224,
+278.0794128288517
+]
+],
+[
+22.42058717114833,
+29.609637902363104,
+[
+-20.481402736924224,
+278.0794128288517
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+],
+[
+29.609637902363104,
+30.609637902363104,
+[
+104.02223659547798,
+349.99480728218805
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+],
+[
+30.609637902363104,
+75.6096379023631,
+[
+104.02223659547798,
+349.99480728218805
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+],
+[
+75.6096379023631,
+76.6096379023631,
+[
+104.02223659547798,
+349.99480728218805
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+6.629654134776368,
+[
+-12.28017421307443,
+-427.8713231358156
+],
+[
+-2.2658111912553522,
+-560.0856873780195
+]
+],
+[
+6.629654134776368,
+7.629654134776368,
+[
+-2.2658111912553522,
+-560.0856873780195
+],
+[
+-2.2658111912553522,
+-560.0856873780195
+]
+],
+[
+7.629654134776368,
+8.629654134776368,
+[
+-2.2658111912553522,
+-560.0856873780195
+],
+[
+-2.2658111912553522,
+-560.0856873780195
+]
+],
+[
+8.629654134776368,
+9.629654134776368,
+[
+-2.2658111912553522,
+-560.0856873780195
+],
+[
+-2.2658111912553522,
+-560.0856873780195
+]
+],
+[
+9.629654134776368,
+21.13443197594414,
+[
+-2.2658111912553522,
+-560.0856873780195
+],
+[
+-0.2613437021679901,
+-329.99886163622443
+]
+],
+[
+21.13443197594414,
+22.13443197594414,
+[
+-0.2613437021679901,
+-329.99886163622443
+],
+[
+-0.2613437021679901,
+-329.99886163622443
+]
+],
+[
+22.13443197594414,
+50.29839212348537,
+[
+-0.2613437021679901,
+-329.99886163622443
+],
+[
+-488.9715135603448,
+-49.917033674986726
+]
+],
+[
+50.29839212348537,
+51.29839212348537,
+[
+-488.9715135603448,
+-49.917033674986726
+],
+[
+-488.9715135603448,
+-49.917033674986726
+]
+],
+[
+51.29839212348537,
+52.29839212348537,
+[
+-488.9715135603448,
+-49.917033674986726
+],
+[
+-488.9715135603448,
+-49.917033674986726
+]
+],
+[
+52.29839212348537,
+53.29839212348537,
+[
+-488.9715135603448,
+-49.917033674986726
+],
+[
+-488.9715135603448,
+-49.917033674986726
+]
+],
+[
+53.29839212348537,
+54.29839212348537,
+[
+-488.9715135603448,
+-49.917033674986726
+],
+[
+-488.9715135603448,
+-49.917033674986726
+]
+]
+]
+},
+{
+"tick": 116,
+"trigger": "recognition_changed",
+"cause": "retraction",
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 8,
+"duration": 8.0,
+"end": 125.0
+}
+},
+{
+"tick": 125,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 17,
+"duration": 17.0,
+"end": 143.0
+}
+},
+{
+"tick": 143,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 35,
+"duration": 35.0,
+"end": 179.0
+}
+},
+{
+"tick": 150,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 154.0
+}
+},
+{
+"tick": 154,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_3)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 162.0
+}
+},
+{
+"tick": 155,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_3)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_3)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_3"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_3"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+16.30939751330898,
+[
+-179.5857496328575,
+-12.204856771165074
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+],
+[
+16.30939751330898,
+17.30939751330898,
+[
+-485.0690417278571,
+-32.96585720480582
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+],
+[
+17.30939751330898,
+18.30939751330898,
+[
+-485.0690417278571,
+-32.96585720480582
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+],
+[
+18.30939751330898,
+19.30939751330898,
+[
+-485.0690417278571,
+-32.96585720480582
+],
+[
+-485.0690417278571,
+-32.96585720480582
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+21.854363645321936,
+[
+-415.5168185817455,
+-86.65451964740656
+],
+[
+-26.687741842945286,
+-286.2972836516146
+]
+],
+[
+21.854363645321936,
+22.854363645321936,
+[
+-26.687741842945286,
+-286.2972836516146
+],
+[
+-26.687741842945286,
+-286.2972836516146
+]
+],
+[
+22.854363645321936,
+36.598016052312815,
+[
+-26.687741842945286,
+-286.2972836516146
+],
+[
+-2.6261168711810186,
+-560.1151625371846
+]
+],
+[
+36.598016052312815,
+37.598016052312815,
+[
+-2.6261168711810186,
+-560.1151625371846
+],
+[
+-2.6261168711810186,
+-560.1151625371846
+]
+],
+[
+37.598016052312815,
+38.598016052312815,
+[
+-2.6261168711810186,
+-560.1151625371846
+],
+[
+-2.6261168711810186,
+-560.1151625371846
+]
+],
+[
+38.598016052312815,
+39.598016052312815,
+[
+-2.6261168711810186,
+-560.1151625371846
+],
+[
+-2.6261168711810186,
+-560.1151625371846
+]
+],
+[
+39.598016052312815,
+51.104436992714426,
+[
+-2.6261168711810186,
+-560.1151625371846
+],
+[
+-0.3028638950578122,
+-329.9984711853966
+]
+],
+[
+51.104436992714426,
+52.104436992714426,
+[
+-0.3028638950578122,
+-329.9984711853966
+],
+[
+-0.3028638950578122,
+-329.9984711853966
+]
+],
+[
+52.104436992714426,
+80.68324866864667,
+[
+-0.3028638950578122,
+-329.9984711853966
+],
+[
+-242.2985107166614,
+187.82147594174342
+]
+],
+[
+80.68324866864667,
+81.68324866864667,
+[
+-242.2985107166614,
+187.82147594174342
+],
+[
+-242.2985107166614,
+187.82147594174342
+]
+],
+[
+81.68324866864667,
+82.68324866864667,
+[
+-242.2985107166614,
+187.82147594174342
+],
+[
+-242.2985107166614,
+187.82147594174342
+]
+],
+[
+82.68324866864667,
+83.68324866864667,
+[
+-242.2985107166614,
+187.82147594174342
+],
+[
+-242.2985107166614,
+187.82147594174342
+]
+],
+[
+83.68324866864667,
+84.68324866864667,
+[
+-242.2985107166614,
+187.82147594174342
+],
+[
+-242.2985107166614,
+187.82147594174342
+]
+]
+]
+},
+{
+"tick": 173,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 176.0
+}
+},
+{
+"tick": 176,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 179.0
+}
+},
+{
+"tick": 179,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 185.0
+}
+},
+{
+"tick": 184,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "office_break(?office_chair=office_chair)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"office_door"
+]
+]
+},
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"office_chair"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT90S"
+],
+[
+"?entity",
+"office_chair"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+21.420587171148334,
+[
+-299.30958272142914,
+-20.341427951941785
+],
+[
+-20.481402736924224,
+278.0794128288517
+]
+],
+[
+21.420587171148334,
+22.420587171148334,
+[
+-20.481402736924224,
+278.0794128288517
+],
+[
+-20.481402736924224,
+278.0794128288517
+]
+],
+[
+22.420587171148334,
+29.609637902363104,
+[
+-20.481402736924224,
+278.0794128288517
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+],
+[
+29.609637902363104,
+30.609637902363104,
+[
+104.02223659547798,
+349.99480728218805
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+],
+[
+30.609637902363104,
+75.6096379023631,
+[
+104.02223659547798,
+349.99480728218805
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+],
+[
+75.6096379023631,
+76.6096379023631,
+[
+104.02223659547798,
+349.99480728218805
+],
+[
+104.02223659547798,
+349.99480728218805
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+7.666546949982859,
+[
+-14.563806827219647,
+-407.24845082682486
+],
+[
+-2.3831995144987843,
+-560.0948104825585
+]
+],
+[
+7.666546949982859,
+8.666546949982859,
+[
+-2.3831995144987843,
+-560.0948104825585
+],
+[
+-2.3831995144987843,
+-560.0948104825585
+]
+],
+[
+8.666546949982859,
+9.666546949982859,
+[
+-2.3831995144987843,
+-560.0948104825585
+],
+[
+-2.3831995144987843,
+-560.0948104825585
+]
+],
+[
+9.666546949982859,
+10.666546949982859,
+[
+-2.3831995144987843,
+-560.0948104825585
+],
+[
+-2.3831995144987843,
+-560.0948104825585
+]
+],
+[
+10.666546949982859,
+22.171833382803545,
+[
+-2.3831995144987843,
+-560.0948104825585
+],
+[
+-0.2748727827113955,
+-329.99874072279243
+]
+],
+[
+22.171833382803545,
+23.171833382803545,
+[
+-0.2748727827113955,
+-329.99874072279243
+],
+[
+-0.2748727827113955,
+-329.99874072279243
+]
+],
+[
+23.171833382803545,
+51.751249842622606,
+[
+-0.2748727827113955,
+-329.99874072279243
+],
+[
+-242.2973702353456,
+187.8220089583113
+]
+],
+[
+51.751249842622606,
+52.751249842622606,
+[
+-242.2973702353456,
+187.8220089583113
+],
+[
+-242.2973702353456,
+187.8220089583113
+]
+],
+[
+52.751249842622606,
+53.751249842622606,
+[
+-242.2973702353456,
+187.8220089583113
+],
+[
+-242.2973702353456,
+187.8220089583113
+]
+],
+[
+53.751249842622606,
+54.751249842622606,
+[
+-242.2973702353456,
+187.8220089583113
+],
+[
+-242.2973702353456,
+187.8220089583113
+]
+],
+[
+54.751249842622606,
+55.751249842622606,
+[
+-242.2973702353456,
+187.8220089583113
+],
+[
+-242.2973702353456,
+187.8220089583113
+]
+]
+]
+},
+{
+"tick": 206,
+"trigger": "recognition_changed",
+"cause": "retraction",
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 8,
+"duration": 8.0,
+"end": 215.0
+}
+},
+{
+"tick": 215,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 17,
+"duration": 17.0,
+"end": 233.0
+}
+},
+{
+"tick": 233,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 35,
+"duration": 35.0,
+"end": 269.0
+}
+},
+{
+"tick": 241,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 245.0
+}
+},
+{
+"tick": 245,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 253.0
+}
+},
+{
+"tick": 251,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_0"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_0"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+2.4731489633457753,
+[
+-211.2499006582263,
+174.72873591650549
+],
+[
+-232.92739286806182,
+194.68251948692674
+]
+],
+[
+2.4731489633457753,
+3.4731489633457753,
+[
+-232.92739286806182,
+194.68251948692674
+],
+[
+-232.92739286806182,
+194.68251948692674
+]
+],
+[
+3.4731489633457753,
+4.473148963345775,
+[
+-232.92739286806182,
+194.68251948692674
+],
+[
+-232.92739286806182,
+194.68251948692674
+]
+],
+[
+4.473148963345775,
+5.473148963345775,
+[
+-232.92739286806182,
+194.68251948692674
+],
+[
+-232.92739286806182,
+194.68251948692674
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+28.344998092791496,
+[
+-55.79481338180415,
+139.5933718098218
+],
+[
+486.3120363616473,
+-26.2249933171218
+]
+],
+[
+28.344998092791496,
+29.344998092791496,
+[
+486.3120363616473,
+-26.2249933171218
+],
+[
+486.3120363616473,
+-26.2249933171218
+]
+],
+[
+29.344998092791496,
+30.344998092791496,
+[
+486.3120363616473,
+-26.2249933171218
+],
+[
+486.3120363616473,
+-26.2249933171218
+]
+],
+[
+30.344998092791496,
+31.344998092791496,
+[
+486.3120363616473,
+-26.2249933171218
+],
+[
+486.3120363616473,
+-26.2249933171218
+]
+],
+[
+31.344998092791496,
+57.74894723061168,
+[
+486.3120363616473,
+-26.2249933171218
+],
+[
+26.14210809156657,
+-285.2829967544731
+]
+],
+[
+57.74894723061168,
+58.74894723061168,
+[
+26.14210809156657,
+-285.2829967544731
+],
+[
+26.14210809156657,
+-285.2829967544731
+]
+],
+[
+58.74894723061168,
+72.5407638233522,
+[
+26.14210809156657,
+-285.2829967544731
+],
+[
+2.564323335918477,
+-560.1097968252328
+]
+],
+[
+72.5407638233522,
+73.5407638233522,
+[
+2.564323335918477,
+-560.1097968252328
+],
+[
+2.564323335918477,
+-560.1097968252328
+]
+],
+[
+73.5407638233522,
+74.5407638233522,
+[
+2.564323335918477,
+-560.1097968252328
+],
+[
+2.564323335918477,
+-560.1097968252328
+]
+],
+[
+74.5407638233522,
+75.5407638233522,
+[
+2.564323335918477,
+-560.1097968252328
+],
+[
+2.564323335918477,
+-560.1097968252328
+]
+],
+[
+75.5407638233522,
+76.5407638233522,
+[
+2.564323335918477,
+-560.1097968252328
+],
+[
+2.564323335918477,
+-560.1097968252328
+]
+]
+]
+},
+{
+"tick": 255,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 258.0
+}
+},
+{
+"tick": 258,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 261.0
+}
+},
+{
+"tick": 261,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 267.0
+}
+},
+{
+"tick": 267,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 3.2049096637763643,
+"end": 271.2049096637764
+}
+},
+{
+"tick": 272,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 274.0
+}
+},
+{
+"tick": 274,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 278.0
+}
+},
+{
+"tick": 278,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 286.0
+}
+},
+{
+"tick": 286,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 302.0
+}
+},
+{
+"tick": 302,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 334.0
+}
+},
+{
+"tick": 329,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 58,
+"duration": 58.0,
+"end": 388.0
+}
+},
+{
+"tick": 378,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_1)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 382.0
+}
+},
+{
+"tick": 382,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_1)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 390.0
+}
+},
+{
+"tick": 387,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_1)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_1)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_1"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_1"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+3.472173091091192,
+[
+-194.26979337116836,
+163.78373667422625
+],
+[
+-232.0666313239077,
+195.65935365179257
+]
+],
+[
+3.472173091091192,
+4.472173091091192,
+[
+-232.0666313239077,
+195.65935365179257
+],
+[
+-232.0666313239077,
+195.65935365179257
+]
+],
+[
+4.472173091091192,
+5.472173091091192,
+[
+-232.0666313239077,
+195.65935365179257
+],
+[
+-232.0666313239077,
+195.65935365179257
+]
+],
+[
+5.472173091091192,
+6.472173091091192,
+[
+-232.0666313239077,
+195.65935365179257
+],
+[
+-232.0666313239077,
+195.65935365179257
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+34.35587448966745,
+[
+-170.68466340466793,
+174.98580080362862
+],
+[
+486.3149655462066,
+-26.215422697438044
+]
+],
+[
+34.35587448966745,
+35.35587448966745,
+[
+486.3149655462066,
+-26.215422697438044
+],
+[
+486.3149655462066,
+-26.215422697438044
+]
+],
+[
+35.35587448966745,
+36.35587448966745,
+[
+486.3149655462066,
+-26.215422697438044
+],
+[
+486.3149655462066,
+-26.215422697438044
+]
+],
+[
+36.35587448966745,
+37.35587448966745,
+[
+486.3149655462066,
+-26.215422697438044
+],
+[
+486.3149655462066,
+-26.215422697438044
+]
+],
+[
+37.35587448966745,
+63.760186006122694,
+[
+486.3149655462066,
+-26.215422697438044
+],
+[
+26.141926056449677,
+-285.2826734065212
+]
+],
+[
+63.760186006122694,
+64.7601860061227,
+[
+26.141926056449677,
+-285.2826734065212
+],
+[
+26.141926056449677,
+-285.2826734065212
+]
+],
+[
+64.7601860061227,
+78.55201792909858,
+[
+26.141926056449677,
+-285.2826734065212
+],
+[
+2.5643029090424,
+-560.1097950727889
+]
+],
+[
+78.55201792909858,
+79.55201792909858,
+[
+2.5643029090424,
+-560.1097950727889
+],
+[
+2.5643029090424,
+-560.1097950727889
+]
+],
+[
+79.55201792909858,
+80.55201792909858,
+[
+2.5643029090424,
+-560.1097950727889
+],
+[
+2.5643029090424,
+-560.1097950727889
+]
+],
+[
+80.55201792909858,
+81.55201792909858,
+[
+2.5643029090424,
+-560.1097950727889
+],
+[
+2.5643029090424,
+-560.1097950727889
+]
+],
+[
+81.55201792909858,
+82.55201792909858,
+[
+2.5643029090424,
+-560.1097950727889
+],
+[
+2.5643029090424,
+-560.1097950727889
+]
+]
+]
+},
+{
+"tick": 392,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 395.0
+}
+},
+{
+"tick": 395,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 398.0
+}
+},
+{
+"tick": 398,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 404.0
+}
+},
+{
+"tick": 404,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 3.2092023837830137,
+"end": 408.209202383783
+}
+},
+{
+"tick": 409,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 16,
+"duration": 16.0,
+"end": 426.0
+}
+},
+{
+"tick": 426,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 33,
+"duration": 1.0535291923547128,
+"end": 428.0535291923547
+}
+},
+{
+"tick": 429,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 431.0
+}
+},
+{
+"tick": 431,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 435.0
+}
+},
+{
+"tick": 435,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 443.0
+}
+},
+{
+"tick": 443,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 459.0
+}
+},
+{
+"tick": 459,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 491.0
+}
+},
+{
+"tick": 471,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 43,
+"duration": 43.0,
+"end": 515.0
+}
+}
+]

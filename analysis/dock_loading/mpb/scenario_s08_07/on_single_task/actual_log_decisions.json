@@ -1,0 +1,177 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 14,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 28,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 31,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 34,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 40,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 52,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 54,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 56,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 59,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 60,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "office_break(?office_chair=office_chair)",
+"projection": "built warrant=observation"
+},
+{
+"tick": 108,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 124,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"projection": "built warrant=commitment,observation"
+},
+{
+"tick": 146,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 149,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 152,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(below_theta)"
+},
+{
+"tick": 157,
+"trigger": "recognition_changed",
+"cause": "entered",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "built warrant=observation"
+},
+{
+"tick": 175,
+"trigger": "recognition_changed",
+"cause": "retraction",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 188,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 214,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 218,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 274,
+"trigger": "projection_expired",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(leader_inadequate)"
+},
+{
+"tick": 279,
+"trigger": "no_current_task",
+"cause": null,
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"projection": "fallback refused=none(leader_inadequate)"
+}
+]

@@ -1,0 +1,240 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_0"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_0"
+]
+]
+}
+]
+},
+"fallback": null
+},
+{
+"tick": 17,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 20.0
+}
+},
+{
+"tick": 20,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 5,
+"duration": 5.0,
+"end": 26.0
+}
+},
+{
+"tick": 26,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 11,
+"duration": 11.0,
+"end": 38.0
+}
+},
+{
+"tick": 38,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 23,
+"duration": 23.0,
+"end": 62.0
+}
+},
+{
+"tick": 62,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 47,
+"duration": 47.0,
+"end": 110.0
+}
+},
+{
+"tick": 110,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 95,
+"duration": 95.0,
+"end": 206.0
+}
+},
+{
+"tick": 201,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 51,
+"duration": 51.0,
+"end": 253.0
+}
+},
+{
+"tick": 253,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 103,
+"duration": 103.0,
+"end": 357.0
+}
+},
+{
+"tick": 300,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 150,
+"duration": 150.0,
+"end": 451.0
+}
+},
+{
+"tick": 349,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 199,
+"duration": 199.0,
+"end": 549.0
+}
+}
+]

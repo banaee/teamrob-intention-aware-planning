@@ -1,0 +1,209 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 2.0,
+"candidates": []
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 4.0,
+"candidates": []
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 8.0,
+"candidates": []
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 12.403852780574988,
+"candidates": []
+},
+{
+"tick": 27,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 2.0,
+"candidates": []
+},
+{
+"tick": 29,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": []
+},
+{
+"tick": 32,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 6.0,
+"candidates": []
+},
+{
+"tick": 38,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 10.946705562750568,
+"candidates": []
+},
+{
+"tick": 48,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_6)",
+"hold": 0,
+"horizon": 33.0,
+"candidates": []
+},
+{
+"tick": 79,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 32.0,
+"candidates": []
+},
+{
+"tick": 111,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 5.0,
+"candidates": []
+},
+{
+"tick": 116,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 10.0,
+"candidates": []
+},
+{
+"tick": 126,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 20.0,
+"candidates": []
+},
+{
+"tick": 133,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_4)",
+"hold": 0,
+"horizon": 28.874258100956542,
+"candidates": []
+},
+{
+"tick": 137,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_7)",
+"hold": 0,
+"horizon": 24.874258100956542,
+"candidates": []
+},
+{
+"tick": 160,
+"trigger": "recognition_changed",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_7)",
+"hold": 0,
+"horizon": 3.0,
+"candidates": []
+},
+{
+"tick": 163,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_7)",
+"hold": 0,
+"horizon": 6.0,
+"candidates": []
+},
+{
+"tick": 169,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_7)",
+"hold": 0,
+"horizon": 12.0,
+"candidates": []
+},
+{
+"tick": 181,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "load_return(?pallet=pallet_7)",
+"hold": 0,
+"horizon": 24.0,
+"candidates": []
+},
+{
+"tick": 198,
+"trigger": "no_current_task",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 41.0,
+"candidates": []
+},
+{
+"tick": 239,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 80,
+"horizon": 82.0,
+"candidates": []
+},
+{
+"tick": 321,
+"trigger": "projection_expired",
+"terminal": false,
+"winner": "deliver_pallet(?pallet=pallet_5)",
+"hold": 0,
+"horizon": 49.0,
+"candidates": []
+},
+{
+"tick": 328,
+"trigger": "no_current_task",
+"terminal": true,
+"winner": null,
+"hold": 0,
+"horizon": null,
+"candidates": []
+}
+]

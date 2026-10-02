@@ -1,0 +1,1159 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_0"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_0"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+12.403852780574947,
+[
+-276.8434904221434,
+115.57543774905017
+],
+[
+-487.3156509577857,
+203.442456225095
+]
+],
+[
+12.403852780574947,
+13.403852780574947,
+[
+-487.3156509577857,
+203.442456225095
+],
+[
+-487.3156509577857,
+203.442456225095
+]
+],
+[
+13.403852780574947,
+14.403852780574947,
+[
+-487.3156509577857,
+203.442456225095
+],
+[
+-487.3156509577857,
+203.442456225095
+]
+],
+[
+14.403852780574947,
+15.403852780574947,
+[
+-487.3156509577857,
+203.442456225095
+],
+[
+-487.3156509577857,
+203.442456225095
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+11.0,
+[
+0.0,
+-550.0
+],
+[
+0.0,
+-330.0
+]
+],
+[
+11.0,
+12.0,
+[
+0.0,
+-330.0
+],
+[
+0.0,
+-330.0
+]
+],
+[
+12.0,
+41.08287919735485,
+[
+0.0,
+-330.0
+],
+[
+489.7407693364981,
+-16.185526444574066
+]
+],
+[
+41.08287919735485,
+42.08287919735485,
+[
+489.7407693364981,
+-16.185526444574066
+],
+[
+489.7407693364981,
+-16.185526444574066
+]
+],
+[
+42.08287919735485,
+43.08287919735485,
+[
+489.7407693364981,
+-16.185526444574066
+],
+[
+489.7407693364981,
+-16.185526444574066
+]
+],
+[
+43.08287919735485,
+44.08287919735485,
+[
+489.7407693364981,
+-16.185526444574066
+],
+[
+489.7407693364981,
+-16.185526444574066
+]
+],
+[
+44.08287919735485,
+45.08287919735485,
+[
+489.7407693364981,
+-16.185526444574066
+],
+[
+489.7407693364981,
+-16.185526444574066
+]
+]
+]
+},
+{
+"tick": 28,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 31.0
+}
+},
+{
+"tick": 31,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 34.0
+}
+},
+{
+"tick": 34,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 40.0
+}
+},
+{
+"tick": 40,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 52.0
+}
+},
+{
+"tick": 52,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 23,
+"duration": 0.8366595682533595,
+"end": 53.83665956825336
+}
+},
+{
+"tick": 54,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 56.0
+}
+},
+{
+"tick": 56,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 59.0
+}
+},
+{
+"tick": 59,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 2.0594371183780047,
+"end": 62.05943711837801
+}
+},
+{
+"tick": 60,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "office_break(?office_chair=office_chair)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"office_chair"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT90S"
+],
+[
+"?entity",
+"office_chair"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+2.059437118378002,
+[
+83.26649234527133,
+344.11300386705034
+],
+[
+102.6110631987248,
+352.75883416925683
+]
+],
+[
+2.059437118378002,
+3.059437118378002,
+[
+102.6110631987248,
+352.75883416925683
+],
+[
+102.6110631987248,
+352.75883416925683
+]
+],
+[
+3.059437118378002,
+48.059437118378,
+[
+102.6110631987248,
+352.75883416925683
+],
+[
+102.6110631987248,
+352.75883416925683
+]
+],
+[
+48.059437118378,
+49.059437118378,
+[
+102.6110631987248,
+352.75883416925683
+],
+[
+102.6110631987248,
+352.75883416925683
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+49.52942630537221,
+[
+505.18461327003797,
+-6.289471108519365
+],
+[
+-485.0118729388115,
+-34.156059621765976
+]
+],
+[
+49.52942630537221,
+50.52942630537221,
+[
+-485.0118729388115,
+-34.156059621765976
+],
+[
+-485.0118729388115,
+-34.156059621765976
+]
+],
+[
+50.52942630537221,
+51.52942630537221,
+[
+-485.0118729388115,
+-34.156059621765976
+],
+[
+-485.0118729388115,
+-34.156059621765976
+]
+],
+[
+51.52942630537221,
+52.52942630537221,
+[
+-485.0118729388115,
+-34.156059621765976
+],
+[
+-485.0118729388115,
+-34.156059621765976
+]
+],
+[
+52.52942630537221,
+78.68397012403969,
+[
+-485.0118729388115,
+-34.156059621765976
+],
+[
+-26.307351666279374,
+-285.58045602986317
+]
+],
+[
+78.68397012403969,
+79.68397012403969,
+[
+-26.307351666279374,
+-285.58045602986317
+],
+[
+-26.307351666279374,
+-285.58045602986317
+]
+],
+[
+79.68397012403969,
+93.46167737207591,
+[
+-26.307351666279374,
+-285.58045602986317
+],
+[
+-2.582915542153181,
+-560.1113977024334
+]
+],
+[
+93.46167737207591,
+94.46167737207591,
+[
+-2.582915542153181,
+-560.1113977024334
+],
+[
+-2.582915542153181,
+-560.1113977024334
+]
+],
+[
+94.46167737207591,
+95.46167737207591,
+[
+-2.582915542153181,
+-560.1113977024334
+],
+[
+-2.582915542153181,
+-560.1113977024334
+]
+],
+[
+95.46167737207591,
+96.46167737207591,
+[
+-2.582915542153181,
+-560.1113977024334
+],
+[
+-2.582915542153181,
+-560.1113977024334
+]
+],
+[
+96.46167737207591,
+97.46167737207591,
+[
+-2.582915542153181,
+-560.1113977024334
+],
+[
+-2.582915542153181,
+-560.1113977024334
+]
+]
+]
+},
+{
+"tick": 108,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 46,
+"duration": 46.0,
+"end": 155.0
+}
+},
+{
+"tick": 124,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [
+"commitment",
+"observation"
+],
+"admitted": {
+"key": "confirm_delivered_pallet(?pallet=pallet_2)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"pallet_2"
+]
+]
+},
+{
+"name": "scan_it",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?item",
+"pallet_2"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+20.920515527748513,
+[
+149.24741321639206,
+223.07048090436655
+],
+[
+489.3876901811859,
+15.620806181022857
+]
+],
+[
+20.920515527748513,
+21.920515527748513,
+[
+489.3876901811859,
+15.620806181022857
+],
+[
+489.3876901811859,
+15.620806181022857
+]
+],
+[
+21.920515527748513,
+22.920515527748513,
+[
+489.3876901811859,
+15.620806181022857
+],
+[
+489.3876901811859,
+15.620806181022857
+]
+],
+[
+22.920515527748513,
+23.920515527748513,
+[
+489.3876901811859,
+15.620806181022857
+],
+[
+489.3876901811859,
+15.620806181022857
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+15.561676051911084,
+[
+-300.6102490251537,
+-138.5261814993602
+],
+[
+-26.42855087423976,
+-285.80381393867634
+]
+],
+[
+15.561676051911084,
+16.561676051911085,
+[
+-26.42855087423976,
+-285.80381393867634
+],
+[
+-26.42855087423976,
+-285.80381393867634
+]
+],
+[
+16.561676051911085,
+30.32878022359077,
+[
+-26.42855087423976,
+-285.80381393867634
+],
+[
+-2.596617267136793,
+-560.1125849433577
+]
+],
+[
+30.32878022359077,
+31.32878022359077,
+[
+-2.596617267136793,
+-560.1125849433577
+],
+[
+-2.596617267136793,
+-560.1125849433577
+]
+],
+[
+31.32878022359077,
+32.32878022359077,
+[
+-2.596617267136793,
+-560.1125849433577
+],
+[
+-2.596617267136793,
+-560.1125849433577
+]
+],
+[
+32.32878022359077,
+33.32878022359077,
+[
+-2.596617267136793,
+-560.1125849433577
+],
+[
+-2.596617267136793,
+-560.1125849433577
+]
+],
+[
+33.32878022359077,
+34.32878022359077,
+[
+-2.596617267136793,
+-560.1125849433577
+],
+[
+-2.596617267136793,
+-560.1125849433577
+]
+]
+]
+},
+{
+"tick": 146,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 2,
+"duration": 2.0,
+"end": 149.0
+}
+},
+{
+"tick": 149,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 152.0
+}
+},
+{
+"tick": 152,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 158.0
+}
+},
+{
+"tick": 157,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+38.542976118831675,
+[
+376.6994557654767,
+-149.50435353463905
+],
+[
+-370.1598264409389,
+-226.90742146985554
+]
+],
+[
+38.542976118831675,
+39.542976118831675,
+[
+-370.1598264409389,
+-226.90742146985554
+],
+[
+-370.1598264409389,
+-226.90742146985554
+]
+],
+[
+39.542976118831675,
+69.54297611883167,
+[
+-370.1598264409389,
+-226.90742146985554
+],
+[
+-370.1598264409389,
+-226.90742146985554
+]
+],
+[
+69.54297611883167,
+70.54297611883167,
+[
+-370.1598264409389,
+-226.90742146985554
+],
+[
+-370.1598264409389,
+-226.90742146985554
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+3.0,
+[
+-1.2836536026119845,
+-569.4096263822034
+],
+[
+-1.2836536026119845,
+-569.4096263822034
+]
+],
+[
+3.0,
+5.0,
+[
+-1.2836536026119845,
+-569.4096263822034
+],
+[
+-1.2836536026119845,
+-569.4096263822034
+]
+],
+[
+5.0,
+5.0,
+[
+-1.2836536026119845,
+-569.4096263822034
+],
+[
+-1.2836536026119845,
+-569.4096263822034
+]
+],
+[
+5.0,
+6.0,
+[
+-1.2836536026119845,
+-569.4096263822034
+],
+[
+-1.2836536026119845,
+-569.4096263822034
+]
+],
+[
+6.0,
+7.0,
+[
+-1.2836536026119845,
+-569.4096263822034
+],
+[
+-1.2836536026119845,
+-569.4096263822034
+]
+],
+[
+7.0,
+8.0,
+[
+-1.2836536026119845,
+-569.4096263822034
+],
+[
+-1.2836536026119845,
+-569.4096263822034
+]
+],
+[
+8.0,
+19.97063422355922,
+[
+-1.2836536026119845,
+-569.4096263822034
+],
+[
+-0.1429391053132778,
+-329.99965947160354
+]
+],
+[
+19.97063422355922,
+20.97063422355922,
+[
+-0.1429391053132778,
+-329.99965947160354
+],
+[
+-0.1429391053132778,
+-329.99965947160354
+]
+],
+[
+20.97063422355922,
+56.957379280221545,
+[
+-0.1429391053132778,
+-329.99965947160354
+],
+[
+-494.3984356290551,
+193.1923053609554
+]
+],
+[
+56.957379280221545,
+57.957379280221545,
+[
+-494.3984356290551,
+193.1923053609554
+],
+[
+-494.3984356290551,
+193.1923053609554
+]
+],
+[
+57.957379280221545,
+58.957379280221545,
+[
+-494.3984356290551,
+193.1923053609554
+],
+[
+-494.3984356290551,
+193.1923053609554
+]
+],
+[
+58.957379280221545,
+59.957379280221545,
+[
+-494.3984356290551,
+193.1923053609554
+],
+[
+-494.3984356290551,
+193.1923053609554
+]
+],
+[
+59.957379280221545,
+60.957379280221545,
+[
+-494.3984356290551,
+193.1923053609554
+],
+[
+-494.3984356290551,
+193.1923053609554
+]
+]
+]
+},
+{
+"tick": 175,
+"trigger": "recognition_changed",
+"cause": "retraction",
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 12,
+"duration": 12.0,
+"end": 188.0
+}
+},
+{
+"tick": 188,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 25,
+"duration": 25.0,
+"end": 214.0
+}
+},
+{
+"tick": 214,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 51,
+"duration": 51.0,
+"end": 266.0
+}
+},
+{
+"tick": 218,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 55,
+"duration": 55.0,
+"end": 274.0
+}
+},
+{
+"tick": 274,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 111,
+"duration": 111.0,
+"end": 386.0
+}
+},
+{
+"tick": 279,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 116,
+"duration": 116.0,
+"end": 396.0
+}
+}
+]

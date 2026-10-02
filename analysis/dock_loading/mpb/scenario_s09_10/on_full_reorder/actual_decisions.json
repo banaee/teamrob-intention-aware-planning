@@ -1,0 +1,1015 @@
+[
+{
+"tick": 0,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 2.0
+}
+},
+{
+"tick": 2,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 6.0
+}
+},
+{
+"tick": 6,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 14.0
+}
+},
+{
+"tick": 14,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 0.17708008015791732,
+"end": 15.177080080157918
+}
+},
+{
+"tick": 16,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 18.0
+}
+},
+{
+"tick": 18,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 2,
+"duration": 2.0,
+"end": 21.0
+}
+},
+{
+"tick": 21,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 27.0
+}
+},
+{
+"tick": 27,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 10.655291022937089,
+"end": 38.65529102293709
+}
+},
+{
+"tick": 38,
+"trigger": "recognition_changed",
+"cause": "entered",
+"gate": "clears",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [
+"observation"
+],
+"admitted": {
+"key": "coffee_break(?coffee_machine=coffee_machine_0)",
+"actions": [
+{
+"name": "move_to",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?target",
+"coffee_machine_0"
+]
+]
+},
+{
+"name": "wait_at",
+"bindings": [
+[
+"?agent",
+"human_0"
+],
+[
+"?duration",
+"PT60S"
+],
+[
+"?entity",
+"coffee_machine_0"
+]
+]
+}
+]
+},
+"fallback": null,
+"human_segments": [
+[
+1.0,
+1.0,
+[
+-392.2489524934524,
+-208.23304794825722
+],
+[
+-392.2489524934524,
+-208.23304794825722
+]
+],
+[
+1.0,
+2.0,
+[
+-392.2489524934524,
+-208.23304794825722
+],
+[
+-392.2489524934524,
+-208.23304794825722
+]
+],
+[
+2.0,
+32.0,
+[
+-392.2489524934524,
+-208.23304794825722
+],
+[
+-392.2489524934524,
+-208.23304794825722
+]
+],
+[
+32.0,
+33.0,
+[
+-392.2489524934524,
+-208.23304794825722
+],
+[
+-392.2489524934524,
+-208.23304794825722
+]
+]
+],
+"robot_segments": [
+[
+0.0,
+23.784395075312414,
+[
+449.8993798903481,
+-69.10867988581002
+],
+[
+26.69033875738012,
+-286.30234264495226
+]
+],
+[
+23.784395075312414,
+24.784395075312414,
+[
+26.69033875738012,
+-286.30234264495226
+],
+[
+26.69033875738012,
+-286.30234264495226
+]
+],
+[
+24.784395075312414,
+38.5278068707347,
+[
+26.69033875738012,
+-286.30234264495226
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+38.5278068707347,
+39.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+39.5278068707347,
+40.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+40.5278068707347,
+41.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+41.5278068707347,
+42.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+42.5278068707347,
+42.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+42.5278068707347,
+43.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+43.5278068707347,
+44.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+44.5278068707347,
+45.5278068707347,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+2.6264138680615545,
+-560.1151886371413
+]
+],
+[
+45.5278068707347,
+57.03422926599216,
+[
+2.6264138680615545,
+-560.1151886371413
+],
+[
+0.30289811312977477,
+-329.9984708399122
+]
+],
+[
+57.03422926599216,
+58.03422926599216,
+[
+0.30289811312977477,
+-329.9984708399122
+],
+[
+0.30289811312977477,
+-329.9984708399122
+]
+],
+[
+58.03422926599216,
+86.62587690295305,
+[
+0.30289811312977477,
+-329.9984708399122
+],
+[
+-242.2737328381009,
+187.8330692914351
+]
+],
+[
+86.62587690295305,
+87.62587690295305,
+[
+-242.2737328381009,
+187.8330692914351
+],
+[
+-242.2737328381009,
+187.8330692914351
+]
+],
+[
+87.62587690295305,
+88.62587690295305,
+[
+-242.2737328381009,
+187.8330692914351
+],
+[
+-242.2737328381009,
+187.8330692914351
+]
+],
+[
+88.62587690295305,
+89.62587690295305,
+[
+-242.2737328381009,
+187.8330692914351
+],
+[
+-242.2737328381009,
+187.8330692914351
+]
+],
+[
+89.62587690295305,
+90.62587690295305,
+[
+-242.2737328381009,
+187.8330692914351
+],
+[
+-242.2737328381009,
+187.8330692914351
+]
+],
+[
+90.62587690295305,
+128.5947913552278,
+[
+-242.2737328381009,
+187.8330692914351
+],
+[
+486.220120567778,
+-26.531320063506627
+]
+],
+[
+128.5947913552278,
+129.5947913552278,
+[
+486.220120567778,
+-26.531320063506627
+],
+[
+486.220120567778,
+-26.531320063506627
+]
+],
+[
+129.5947913552278,
+130.5947913552278,
+[
+486.220120567778,
+-26.531320063506627
+],
+[
+486.220120567778,
+-26.531320063506627
+]
+],
+[
+130.5947913552278,
+131.5947913552278,
+[
+486.220120567778,
+-26.531320063506627
+],
+[
+486.220120567778,
+-26.531320063506627
+]
+],
+[
+131.5947913552278,
+157.98722422469766,
+[
+486.220120567778,
+-26.531320063506627
+],
+[
+26.147958633252358,
+-285.2933940246662
+]
+],
+[
+157.98722422469766,
+158.98722422469766,
+[
+26.147958633252358,
+-285.2933940246662
+],
+[
+26.147958633252358,
+-285.2933940246662
+]
+],
+[
+158.98722422469766,
+172.7785478647307,
+[
+26.147958633252358,
+-285.2933940246662
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+172.7785478647307,
+173.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+173.7785478647307,
+174.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+174.7785478647307,
+175.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+175.7785478647307,
+176.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+176.7785478647307,
+176.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+176.7785478647307,
+177.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+177.7785478647307,
+178.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+178.7785478647307,
+179.7785478647307,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+2.5649799110388685,
+-560.109853161017
+]
+],
+[
+179.7785478647307,
+191.28467284811737,
+[
+2.5649799110388685,
+-560.109853161017
+],
+[
+0.2958198442251523,
+-329.99854147487446
+]
+],
+[
+191.28467284811737,
+192.28467284811737,
+[
+0.2958198442251523,
+-329.99854147487446
+],
+[
+0.2958198442251523,
+-329.99854147487446
+]
+],
+[
+192.28467284811737,
+220.47279848031397,
+[
+0.2958198442251523,
+-329.99854147487446
+],
+[
+-488.96454935073155,
+-49.90487535974404
+]
+],
+[
+220.47279848031397,
+221.47279848031397,
+[
+-488.96454935073155,
+-49.90487535974404
+],
+[
+-488.96454935073155,
+-49.90487535974404
+]
+],
+[
+221.47279848031397,
+222.47279848031397,
+[
+-488.96454935073155,
+-49.90487535974404
+],
+[
+-488.96454935073155,
+-49.90487535974404
+]
+],
+[
+222.47279848031397,
+223.47279848031397,
+[
+-488.96454935073155,
+-49.90487535974404
+],
+[
+-488.96454935073155,
+-49.90487535974404
+]
+],
+[
+223.47279848031397,
+224.47279848031397,
+[
+-488.96454935073155,
+-49.90487535974404
+],
+[
+-488.96454935073155,
+-49.90487535974404
+]
+]
+]
+},
+{
+"tick": 69,
+"trigger": "recognition_changed",
+"cause": "replaced",
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 101.0
+}
+},
+{
+"tick": 81,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 9.746543992051997,
+"end": 91.746543992052
+}
+},
+{
+"tick": 92,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 94.0
+}
+},
+{
+"tick": 94,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 98.0
+}
+},
+{
+"tick": 98,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 1,
+"duration": 1.0,
+"end": 100.0
+}
+},
+{
+"tick": 100,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 3,
+"duration": 3.0,
+"end": 104.0
+}
+},
+{
+"tick": 104,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 7,
+"duration": 7.0,
+"end": 112.0
+}
+},
+{
+"tick": 112,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 15,
+"duration": 0.44586618016908997,
+"end": 113.44586618016909
+}
+},
+{
+"tick": 114,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "confirm_delivered_pallet(?pallet=pallet_2)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 116.0
+}
+},
+{
+"tick": 116,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 120.0
+}
+},
+{
+"tick": 120,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 128.0
+}
+},
+{
+"tick": 128,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 15,
+"duration": 15.0,
+"end": 144.0
+}
+},
+{
+"tick": 144,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 31,
+"duration": 31.0,
+"end": 176.0
+}
+},
+{
+"tick": 176,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "coffee_break(?coffee_machine=coffee_machine_0)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 63,
+"duration": 63.0,
+"end": 240.0
+}
+},
+{
+"tick": 218,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 5,
+"duration": 5.0,
+"end": 224.0
+}
+},
+{
+"tick": 224,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(below_theta)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 11,
+"duration": 11.0,
+"end": 236.0
+}
+},
+{
+"tick": 236,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "moving",
+"k": 23,
+"duration": 17.271284468974326,
+"end": 254.27128446897433
+}
+},
+{
+"tick": 255,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 1,
+"duration": 1.0,
+"end": 257.0
+}
+},
+{
+"tick": 257,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 3,
+"duration": 3.0,
+"end": 261.0
+}
+},
+{
+"tick": 261,
+"trigger": "projection_expired",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 7,
+"duration": 7.0,
+"end": 269.0
+}
+},
+{
+"tick": 267,
+"trigger": "no_current_task",
+"cause": null,
+"gate": "none(leader_inadequate)",
+"leader": "office_break(?office_chair=office_chair)",
+"warrant": [],
+"admitted": null,
+"fallback": {
+"mode": "standing",
+"k": 13,
+"duration": 13.0,
+"end": 281.0
+}
+}
+]
