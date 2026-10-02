@@ -6028,6 +6028,8 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   45 ticks, and the human's absence is about 110 ticks (in the IR test-bed's C6 on env_layout_02, from leaving the dry
   bay at 30 to the arrival at the frozen bay at 141), a little more than one round trip of the robot (about 96 ticks,
   B14's note). Whether the absence is long enough for pallets to accumulate in a bay is reviewed with the MPB's design.
+  REVIEWED (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL5): office_break stays at 90 seconds
+  for the MPB. Reason: no value is changed for a test set.
 - B7, Q8 (H2'): `store_pallet(?pallet)`, a work task of the human: it takes a delivered and scanned pallet from its
   delivery container to its onward container. Condition: the pallet is in its delivery container and is scanned, so the
   order per pallet is delivered, scanned, stored. Each full pallet has a second designation in the setup, its onward
@@ -6147,6 +6149,9 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
     one rule covers every pallet.
   - A third kind, all four full pallets designated to one bay, is added after the first MPB run if its results call for
     it.
+    KEPT (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL2): the condition stands. A new kind for
+    the MPB's controlled scenarios is ruled there (one full pallet already in each delivery bay); the names of the kinds
+    are not ruled.
   Staging: a milestone in stage 1's build, before the IR test-bed: one simple scenario per room runs from start to end.
   Stage 1's "before the plan" points on the layout and the setup (C1's "before each stage's plan the design chat and
   Hadi agree the layout and the setup") are closed by this entry for stage 1.
@@ -6364,6 +6369,8 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   one realization against its projections jointly (TODO-97). "T-G", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT.
 - C6, open at their stage: the design of check-in and check-out; the design of TODO-16; how the MPB's oracle derives an
   expected decision when the human's sequence depends on the robot's decisions.
+  ANSWERED FOR STAGE 1 (Hadi, 2 October 2026; T-G records 10): the third clause, by THE MPB ON DOCK_LOADING, MPB-DL3.
+  The first two clauses stay open at their stages.
 
 STAGE 1 PLAN APPROVED (Hadi, 1 October 2026; recorded in T-G records 7). The approved plan, with the answers merged in,
 is `docs/handoffs/plan_T-G_stage1.md`; every build session of stage 1 reads it. The answers to the plan's nine questions:
@@ -6537,6 +6544,8 @@ classification):
   pool stays where it is, at the bay the last scan walks to. The parked case of the human walking toward the robot
   (X3, TODO-135). PROPOSAL for stage 1, NOT RULED: an authoring convention that the robot's last assigned task is a
   return.
+  CLOSED, NOT TAKEN (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL4): the robot's pool is
+  unordered and the meta-planner selects by cost. In its place the MPB reports the separation counts per room.
 - In env_layout_03 at tick 64 the robot changes its task on the fallback projection while the gate refuses (below
   theta): at 60 the three candidates lay within 0.6 and `load_return` won; at 64 the fallback, the human walking
   straight toward the robot, charged `load_return` a shift of 4 and `deliver_pallet(pallet_0)` won, 94.68 against
@@ -6715,6 +6724,74 @@ already in a bay while the robot delivers others; the robot's last task as a ret
 milestone's findings); how expected decisions are derived when the human's sequence depends on the robot's decisions
 (C6).
 
+RULED (Hadi, 2 October 2026; recorded in T-G records 10, 2 October 2026): THE MPB ON DOCK_LOADING, its design, ruled as
+one package (MPB-DL1 to MPB-DL6; the labels are this block's, distinct from kitting's MPB-1 to MPB-6). Records only;
+nothing in this block is built. The MPB of stage 1 is a test and an analysis; it changes nothing in the framework. The
+scenario set itself is not yet agreed and is not recorded here. "As kitting's MPB rules" refers to "The meta-planner
+test-bed (MPB)".
+- MPB-DL1, the claim.
+  The MPB on dock_loading has two parts.
+  Part 1: a few of kitting's decision paths re-instantiated on dock_loading.
+  Part 2: one scenario for each case that dock_loading adds:
+  (i) a hypothesis that enters the live set during the run through the robot's own act (a scan becomes live when the
+      robot puts the pallet down; liveness by applicability, A4);
+  (ii) decisions on the fallback projection as the frequent case;
+  (iii) two hypotheses with the same motion waiting in one bay, so that the gate refuses during the walk;
+  (iv) an admission that is correct by the records and wrong about the human (the walk to the standby place admitted as
+       a break). The expectation states that admission before the run. The run agreeing with it is not a disagreement;
+       the wrong reading is a finding about the mind (TODO-155, Q16);
+  (v) the human in another area (the office), with methods selected by area (B11);
+  (vi) the robot and the human at the same bay while the robot has an alternative task;
+  (vii) a human's script that depends on the robot (Q13b).
+  The set does not claim full coverage of the decision paths on dock_loading. Kitting's coverage matrix
+  (analysis/kitting/mpb/coverage.md) is not repeated.
+  Reason: T-G tests that the chain stays domain-independent. The chain's code is shared, and its paths are verified on
+  kitting. A second full matrix would test the same paths again.
+- MPB-DL2, a new setup kind per room, for the MPB's controlled scenarios.
+  The setup: one full unscanned pallet already in each delivery bay, designated to the bay it stands in; one full pallet
+  in the truck designated to each delivery bay; two empty pallets in the empties container, designated to the truck.
+  The human scans only the pallets that stand in the bays at the start.
+  A meeting at a bay is authored by a stand or a break at the bay. Its timing is computed from path lengths before any
+  run.
+  Reason: in setup kind 2 (B14) a scan becomes applicable only at the robot's delivery, so the human's script depends on
+  the robot. A round trip to the truck (about 96 ticks) is longer than a scan (16 to 30 ticks), so the robot never
+  arrives at a bay where the human stands (the second milestone scenario). Pallets already in the bays give a script
+  that is independent of the robot.
+  The kind recorded earlier as conditional (B14: all full pallets designated to one bay, added only if the first MPB run
+  calls for it) keeps its condition.
+  The names of the new kind and of the conditional kind are not ruled. The records step proposed names in its report
+  (T-G records 10); nothing that exists is renamed.
+- MPB-DL3, expected decisions. It answers, for stage 1, the third clause of C6: how the MPB's oracle derives an expected
+  decision when the human's sequence depends on the robot's decisions.
+  - Controlled scenarios: scripts independent of the robot only. Full expectations (trigger and cause, gate,
+    projection) are committed before the run, as kitting's MPB rules (MPB-1, MPB-3).
+  - Mixed scenarios: a script that depends on the robot is allowed. Properties are declared before the run and checked
+    on the run. This is the weaker check. Those runs do not validate the recognizer's decisions, and no record may claim
+    that they do.
+  - Not taken: a check per decision derived from the logged state at the decision tick. Reason: it conditions on the run
+    and needs new instrument code.
+- MPB-DL4, the robot's last task.
+  The proposal "an authoring convention that the robot's last assigned task is a return" (FINDINGS OF THE SECOND
+  MILESTONE SCENARIO; TODO-135's fourth instance) is CLOSED, NOT TAKEN.
+  Reason: the robot's pool is unordered and the meta-planner selects by cost, so an author cannot fix the last task
+  without constraining the selection.
+  In its place the MPB reports, per room, the ticks below the minimum separation with a standing robot, beside the
+  violations with a moving robot. These counts serve Hadi's later ruling on whether to reopen TODO-135. Nothing is ruled
+  on TODO-135 itself.
+- MPB-DL5, office_break stays at 90 seconds for the MPB (B6's note).
+  Reason: no value is changed for a test set.
+- MPB-DL6, strategies and rooms.
+  `single_task` is primary and `full_reorder` is the second run, as kitting's MPB rules (MPB-6).
+  The set runs in two rooms, env_layout_03 and env_layout_04.
+  env_layout_02 is excluded as a reduction of scope, not because it is irrelevant. Its condition of late admission (the
+  coffee machine lies in the direction of the walk from the dry bay to the frozen bay; median delay 28 ticks in the IR
+  test-bed) remains untested by the MPB.
+  Reason for the two rooms: env_layout_03 has frequent admissions and env_layout_04 rare ones (in the IR test-bed's
+  baseline, 40 and 20 of 49 stretches reach the threshold), so they give decisions on an admitted projection and on the
+  fallback projection.
+  Planned size: about 8 controlled and 4 mixed scenarios, 48 runs (two rooms, two strategies). The set is agreed with
+  Hadi before it is authored.
+
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
   and names no fixed object.
@@ -6762,3 +6839,7 @@ the set, its expectations and its runs.
 SUPERSEDED (records, 2 October 2026; T-G records 9): the sort, the instruments' preparation, office_break at 90 seconds,
 the 54 scenarios, their expectations and the 54 runs are built and accepted, and the IR test-bed of stage 1 is closed
 (STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED above). Next: the design of the MPB set with Hadi.
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 10): the design of the MPB on dock_loading is ruled (THE MPB ON
+DOCK_LOADING above, MPB-DL1 to MPB-DL6). Its three open points are answered: the setup with pallets already in the bays
+(MPB-DL2); the robot's last task as a return, not taken (MPB-DL4); expected decisions when the human's sequence depends
+on the robot (MPB-DL3). Next: the MPB set's scenarios, agreed with Hadi before they are authored.
