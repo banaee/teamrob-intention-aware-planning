@@ -63,7 +63,7 @@ Stage 1 is closed (2 October 2026). What it delivered:
   the rename of "zone" to "area"; the agent's area carried in computed states; a hypothesis is live only while one
   of its methods is applicable; object states and designations declared by the domain; the human's script as a
   priority list.
-- dock_loading's tasks, three rooms without stores, and four kinds of setup.
+- dock_loading's tasks, three rooms without stores, and three kinds of setup (a fourth, "one bay", is named as conditional and not built).
 - An intention-recognition test set (the IR test-bed): 54 runs with an idle robot, zero disagreements with the
   expectations written before the runs.
 - A recognition-to-planning test set (the MPB, the meta-planner test-bed): 52 runs with a working robot in two
