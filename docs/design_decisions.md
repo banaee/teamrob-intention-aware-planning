@@ -4992,6 +4992,13 @@ reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
   knowledge. With context knowledge off reproducing today's prior, the stage adds behaviour only where the option is
   on, and the option serves the evaluation as a condition.
   Consequences, recorded, not acted on: in the record ("T-G stage 1.5", AM3).
+  CORRECTED (C1, Hadi, 3 October 2026; the review's measured finding): "With context knowledge off, the prior is equal
+  over the live hypotheses, which is today's behaviour" holds except where the present hardcoded context weight acts.
+  Measured: the weight (`_context_weight`, TODO-66) multiplies coffee_break by 2.5 from step 500 in every run, because
+  the shift starts at step 0 and the step count serves as the clock. So "context knowledge off" differs from today's
+  behaviour in runs of 500 steps or more. AM3's consequence clause (regenerate with the reason stated, at the build)
+  covers these runs. The caveat on T-G stage 1's results: design_records.md, the heading "T-G stage 1", SCOPE REDUCED
+  AND THE MPB ON DOCK_LOADING RUN, its CAVEAT.
   AMENDED (AM4, Hadi, 3 October 2026): every declared strength is greater than zero. With context knowledge on, every
   foreseeable task in the task model declares a strength. A declaration that violates either is rejected when the
   knowledge is loaded. No small constant is added by the framework.
@@ -5003,6 +5010,9 @@ reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
 
 - R4, division inside assigned work: equal among the live assigned tasks, for this stage.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
+  CORRECTED (C3, Hadi, 3 October 2026; following AM3), the wording: "The share of work as a whole is divided equally
+  among its live hypotheses (the live hypotheses of work tasks in the support). With assignment knowledge on, these are
+  the live assigned tasks." The reason is unchanged.
   Open, for T-G stage 2: whether succession between tasks affects the division (to be argued with `store_pallet`
   present).
   Not taken, and not future work: a preference for a task that has just become applicable (no defensible meaning or
@@ -5053,6 +5063,8 @@ ASSUMPTIONS, recorded with the rulings (not added to `docs/assumptions.md`):
 - A2. The prior uses the present facts. The exact model would use the facts at the moment the human chose the task.
   The robot does not know that moment; the approximation avoids a model of when the human chooses or switches.
 - A3. Equal division inside assigned work expresses absence of knowledge.
+  CORRECTED (C3, Hadi, 3 October 2026; following AM3), the wording: "Equal division inside work as a whole expresses
+  absence of knowledge."
 - A4. The strengths are declared values with a proposed empirical meaning; their stability across sites is not claimed.
 - A5. The robot's declared duration and the human's actual duration match (already on record: "The human's wait
   duration in the projection is the schema's, converted by the body (TODO-32, R2)", its ASSUMPTION line).
@@ -5070,5 +5082,8 @@ Reason: `assignment_prior` is a wrong name; the option says only whether the rob
 assigned, and that knowledge restricts the support and sets no prior (TODO-44). The two names form a pair for the two
 kinds of knowledge of AM3. Nothing is renamed in code, configuration or commands now: the rename belongs to the build,
 with the regression audit. Older records keep the old name.
+CORRECTED (C4, Hadi, 3 October 2026), the reason's wording: "that knowledge restricts the support and sets no prior"
+reads "that knowledge restricts the support and sets no weight". Under AM3 the option decides which hypotheses work as a
+whole contains, so it shapes the prior through the support.
 
 → RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K's open items).

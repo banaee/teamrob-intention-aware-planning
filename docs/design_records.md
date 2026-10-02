@@ -1799,6 +1799,8 @@ conditions; the milestone accepted by Hadi).
   env_setup_07), as the plan's answer 8 states them: 8b9d267. Prior on, 800 steps, headless. The acceptance held in all
   three rooms: the run ends with no error; the robot completes both tasks; every entry of the human's script is closed,
   the closing part included (`[rec] end step=800 open=-`). The maintained sets byte-identical, 301 tests.
+  CAVEAT (Hadi, 3 October 2026): these runs pass step 500 and are potentially confounded by the undeclared context
+  weight; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN, its CAVEAT, below.
   Completion ticks (the world tick; the declared tick in brackets), env_layout_02 / env_layout_03 / env_layout_04:
   `deliver_pallet(pallet_0)` 64 / 64 / 57; `load_return(pallet_4)` 125 (127) / 125 (127) / 151 (153); the scan,
   `is_scanned` holds / the record closes the entry, 92, 94 / 92, 94 / 74, 76; `go_to(desk)` completes 140 / 140 / 112.
@@ -1860,6 +1862,8 @@ STAGE 1, THE SECOND MILESTONE SCENARIO BUILT (1 October 2026; built and accepted
   0371035. Prior on, `single_task`, 1000 steps, headless. The acceptance held in all three rooms: the run ends with no
   error; the robot completes its four tasks; every entry of the human's script is closed, the closing part included
   (`[rec] end step=1000 open=-`). The maintained sets byte-identical, 301 tests.
+  CAVEAT (Hadi, 3 October 2026): these runs pass step 500 and are potentially confounded by the undeclared context
+  weight; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN, its CAVEAT, below.
   Completion ticks (the world tick; the declared tick of the last task in brackets), env_layout_02 / env_layout_03 /
   env_layout_04: `deliver_pallet(pallet_0)` 64 / 159 / 148; `deliver_pallet(pallet_1)` 182 / 276 (278) / 285 (287);
   `deliver_pallet(pallet_2)` 289 (291) / 58 / 57; `load_return(pallet_4)` 125 / 220 / 236; the scans, `is_scanned`
@@ -2346,6 +2350,21 @@ domain; the deeper analysis needs stage 2's room and tasks.
   maintained sweeps, the ten drop scenarios, kitting's IR test-bed and MPB; the stdout files differ in the run-file
   paths only, as since the sort), dock_loading's IR test-bed (54 runs, every output and md5); the suite 301 passed;
   every registered scenario of both domains loads (163).
+CAVEAT (Hadi, 3 October 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", AM3's C1; TODO-66). The results of the run files that last 500 steps or more,
+and of the milestone runs, are potentially confounded by an undeclared weight: the present hardcoded context weight
+(`_context_weight`) multiplies coffee_break by 2.5 from step 500 in every run, because the shift starts at step 0 and
+the step count serves as the clock. They are not declared invalid. Identified by duration:
+- the MPB on dock_loading: 11 run files in configs/dock_loading/mpb/, each run under both strategies (22 runs; every
+  one reaches step 500): on env_layout_03, scenario_s08_06 (K6, 531 steps), scenario_s08_07 (K7, 548), scenario_s08_10
+  (M3, 658), scenario_s05_04 (M1, 686), scenario_s05_05 (M2, 803), scenario_s05_06 (M4, 858); on env_layout_04,
+  scenario_s09_07 (K7, 538), scenario_s09_10 (M3, 626), scenario_s07_04 (M1, 639), scenario_s07_06 (M4, 716),
+  scenario_s07_05 (M2, 760);
+- the milestone runs (headless, prior on): scenario_s03_02, scenario_s05_02, scenario_s07_02 (800 steps) and
+  scenario_s03_03, scenario_s05_03, scenario_s07_03 (1000 steps), on env_layout_02, env_layout_03, env_layout_04.
+One effect is demonstrated, as one case: in scenario_s03_03 (env_layout_02) the hypothesis with the highest belief
+changes from office_break (0.602) to coffee_break (0.601) at step 500 with no new observation.
+Not affected: kitting's maintained sets (they end by step 449) and every run of the IR test-bed (kitting's and
+dock_loading's run files end by step 331), so the recognition figures of the IR test-bed stand.
 T-G STAGE 1 CLOSED (Hadi, 2 October 2026; recorded in T-G records 15).
 - Its purpose was an initial check that the recognizer and the recognition-to-planning chain run on dock_loading.
 - Result: the 52 MPB runs completed; zero disagreements wherever full expectations exist; the regression audit
@@ -2450,6 +2469,12 @@ AM3's CONSEQUENCES, recorded, not acted on:
   regenerated with the reason stated, with the regression audit CLAUDE.md requires;
 - the rename of `assignment_prior` to `assignment_knowledge` in code, configuration and commands belongs to the build,
   with the regression audit (AM9); older records keep the old name.
+- CORRECTED (C1, Hadi, 3 October 2026): "context knowledge off" differs from today's behaviour in runs of 500 steps or
+  more (the hardcoded context weight's long-shift rule, reached by step count); the second consequence above covers
+  them. The runs concerned: the heading "T-G stage 1", SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN,
+  its CAVEAT.
+TO UPDATE AT THE BUILD (Hadi, 3 October 2026; NOT NOW): `docs/assumptions.md` 1.4 (the option's default, still off,
+and the maintained sets running both settings) stays as it is until the build changes the default.
 
 THE CUT AND THE QUEUE.
 - T-G stage 1.5 builds: R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts, and the
