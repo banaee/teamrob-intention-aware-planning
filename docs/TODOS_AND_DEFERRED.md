@@ -1475,6 +1475,9 @@ option `context_knowledge`; each is on or off and states what the robot knows. R
 the robot is told which tasks the human was assigned, and that knowledge restricts the support and sets no prior. The
 rename (code, configuration, commands; the `[IR-prior]` tag and the `[run]` header's field with them) belongs to stage
 1.5's build, with the regression audit; older records keep the old name.
+CORRECTED (C4, Hadi, 3 Oct 2026): "restricts the support and sets no prior" reads "restricts the support and sets no
+weight". Under AM3 the option decides which hypotheses work as a whole contains, so it shapes the prior through the
+support.
 `configs/experiment.yaml: assignment_prior` and `--assignment_prior` now switch a support
 *restriction*, not a prior — nothing is weighted (design_decisions.md, "Assigned-task pool is
 a support restriction, not a prior"). The name is a leftover from the first build. Also
@@ -2315,6 +2318,11 @@ not touch the evidence state or the accounting. Deferred because fixing it prope
 and knowledge-representation questions (what a context fact is, which schema field declares a task's
 sensitivity to it, where the constants live — a `ContextSchema`, not a branch). Not a bug in any measured
 condition (no scenario sets the temperature or a long shift).
+CORRECTED (C2, Hadi, 3 Oct 2026; measured in the review of the stage 1.5 records): "no scenario sets ... a long shift"
+is wrong. The long-shift rule is reached by step count in any run of 500 steps or more: the shift starts at step 0
+(`ContextKnowledge.default()`) and the step count serves as the clock, so coffee_break is multiplied by 2.5 from step
+500 in every run. The runs it potentially confounds: design_records.md, "T-G stage 1", SCOPE REDUCED AND THE MPB ON
+DOCK_LOADING RUN, its CAVEAT. Stage 1.5's build still closes this item (the RULED line above).
 Files: shared/recognizer.py (`_context_weight`, the four constants), shared/knowledge.py (`ContextKnowledge`;
 was shared/domain_knowledge.py)
 Reference: I1 audit (architecture invariant "no domain-specific strings in shared/"); I5 hand-back
