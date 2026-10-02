@@ -414,3 +414,40 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   expected decision when the human's sequence depends on the robot's decisions.
   ANSWERED FOR STAGE 1 (Hadi, 2 October 2026; T-G records 10): the third clause, by THE MPB ON DOCK_LOADING, MPB-DL3.
   The first two clauses stay open at their stages.
+
+**Stale passages, input for a later consolidation (records, 2 October 2026; Hadi's ruling of that day)**
+Found in the records split's plan step and listed as reported there; not corrected now (the corrected ones are the two
+area passages of design_decisions.md, CLAUDE.md's invariant and the docstring in `shared/types.py`, commit fbc8a55).
+Line numbers are those of `docs/design_decisions.md` at 248a946, before the split; each passage is in design_decisions.md
+or, where the split moved it, in the record file its index line names.
+- 103–109 and 116–120: scenarios are YAML, `scenarios.yaml` → scenarios are Python literals
+  (`domains/*/scenarios/scenarios_sNN.py`).
+- 132–160: one unified `env_objects` list → split between the layout file and the setup file (T-L).
+- 195–213: the progress evaluator "directional" → `excess_path` (`shared/likelihood_functions.py:184`).
+- 361–371: `_project()` raises for orderings → `Projector.project` chains orderings (`shared/projection.py:216`).
+- 1943: `realize()` not yet consumed → the meta-planner consumes it.
+- 2035, 2181: min_separation as 2.5 × motion → a body-supplied distance (`shared/meta_planner.py:254`).
+- 2038: no projection means δ = 0 → a fallback projection since T-D P (`shared/meta_planner.py:354–359`).
+- 2383: `task_instance_key` equality → `same_task` (`mesa_sim/sim_agents.py:539–545`).
+- 2619: `_clears_gate` tests confidence ≥ θ → it returns a `GateOutcome`, which also needs adequacy and warrant
+  (`shared/meta_planner.py:202, 712`).
+- 2964: a `BETA` constant → beta is a required constructor argument (`shared/recognizer.py:360`).
+- 3146: `DomainKnowledgeBase` → `Tree` (`shared/knowledge.py:201`).
+- 3150, 3272: `zone_of`, `in_zone`, `object_zones` → `area_of`, `in_area`, `object_areas`.
+- 3227: `Projector._successor_state` → `successor_state` (`shared/projection.py:623`).
+- 3869–3871 (T-H): the support includes `∪ {unknown}` → no `unknown` hypothesis.
+- 3881, 3903 (T-H): the script is an ordered list → A3's priority form (`world/human_executor.py:31–40`).
+- 3926: a coverage enum → the classes in `world/queries.py:143–169`.
+- 4173: "zones" → areas.
+- 4344–4346: R3 "to be built" → built (`shared/meta_planner.py:793`).
+- 4723–4729 and 4749 (L4, L5): a live set from terminal facts only → A4's inapplicability as well
+  (`shared/recognizer.py:490, 760–768`).
+- 4856: "P adds no trigger" → `projection_expired` (`shared/meta_planner.py:466`).
+- 4845, 4868: the decision record stays empty under a fallback → its expiry field is set
+  (`shared/meta_planner.py:578–596`).
+- 4875–4877: a stationary tail at the current position → `project_fallback` returns None (`shared/projection.py:415–418`).
+- 4871: one stored field → also a run length and a standing count (`mesa_sim/sim_agents.py:404, 624–639`).
+- Code docstrings: `mesa_sim/world_state_builder.py:54` repeats "in_area … context for IR"; `shared/types.py:479–490`
+  (`goto_zone`, `?zone`); `shared/types.py:1142` (`FallbackProjection`); `world/human_executor.py:42` (`shared/record.py`).
+CLAUDE.md's "Current phase and status" section and `docs/TODOS_AND_DEFERRED.md` show the same mix of conceptual design
+and record; they are not treated in this step.
