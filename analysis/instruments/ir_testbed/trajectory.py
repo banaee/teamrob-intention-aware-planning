@@ -86,9 +86,11 @@ def domain_of(run_file):
     return importlib.import_module(f"domains.{yaml.safe_load(open(run_file))['domain']}.registry").domain_config
 
 
-def load(run_file):
+def load(run_file, overrides=()):
     """The run file's scenario with the human alone, on the run file's layout (the scenario's first reference layout
-    when it names none); the model (not stepped), the human's config, the scenario and the layout id."""
+    when it names none); the model (not stepped), the human's config, the scenario and the layout id. `overrides`
+    (mesa_sim/overrides.py), applied by the loader as in a run; none by default (dock_loading's MPB step cap, DL-P7,
+    replays a script that depends on the robot on the state after the robot's chain)."""
     cfg = yaml.safe_load(open(run_file))
     domain_config = domain_of(run_file)
     base = domain_config["scenarios"][cfg["scenario"]]
@@ -100,7 +102,7 @@ def load(run_file):
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][base.setup],
-                 state_declarations=domain_config["states"])
+                 state_declarations=domain_config["states"], overrides=overrides)
     return m, human, base, layout
 
 
@@ -231,8 +233,8 @@ def complete(action, body, exhausted):
     raise ValueError(f"no body rule for the completion {pred}")
 
 
-def expand(run_file, steps=None):
-    m, human, base, layout = load(run_file)
+def expand(run_file, steps=None, overrides=()):
+    m, human, base, layout = load(run_file, overrides)
     domain_config = domain_of(run_file)
     H = human.agent_id
     step_size = _get_step_size(m)

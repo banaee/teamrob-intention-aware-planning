@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run.sh <domain> [-o out_root] [--strategy single_task|full_reorder] [--prior on|off] [run files] — the meta-planner
+# run.sh <domain> [--expect] [-o out_root] [--strategy single_task|full_reorder] [--prior on|off] [run files] — the meta-planner
 # test-bed (MPB; design_decisions.md, "The meta-planner test-bed (MPB)"; analysis/kitting/mpb/README.md). The code is
 # shared by the domains since the sort (1 October 2026); horizon.py and properties.py are the domain's, in
 # analysis/<domain>/mpb/ (with CONTROLS, the control scenarios whose reference run is made, and alteration.py). Per run file (default: every configs/<domain>/mpb/*.yaml): the safety cap (horizon.py, MPB-5) as the run's steps, the run, the trajectory and its check
@@ -12,12 +12,13 @@ set -eo pipefail
 DOMAIN=$1; shift
 PY=~/python-envs/ir-nomesa-env/bin/python; D=analysis/instruments/mpb; IR=analysis/instruments/ir_testbed
 DOM=analysis/$DOMAIN/mpb; ROOT=$DOM
-STRATEGY=single_task; PRIOR=on; RUNS=""
+STRATEGY=single_task; PRIOR=on; RUNS=""; EXPECT=""
 while [ $# -gt 0 ]; do
   case $1 in
     -o) ROOT=$2; shift 2;;
     --strategy) STRATEGY=$2; shift 2;;
     --prior) PRIOR=$2; shift 2;;
+    --expect) EXPECT=1; shift;;
     *) RUNS="$RUNS $1"; shift;;
   esac
 done
@@ -31,6 +32,13 @@ for RUN in $RUNS; do
   last=$(PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN --length 2>/dev/null | tail -1)
   own=$(awk '/^steps:/ {print $2}' $RUN)
   [ "$own" = "$steps" ] || echo "$sid: notice: the run file's steps ($own) differ from the cap ($steps); run with $steps"
+  if [ -n "$EXPECT" ]; then
+    # the expectations before any run: the trajectory and the oracle's per-tick table, theta the value of record (the
+    # [run] header's theta=0.75, DEFAULT_THETA); the run's own oracle call must reproduce them byte for byte
+    PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json 2>&1 | grep -v '^\['
+    PYTHONHASHSEED=0 $PY $D/mpb_oracle.py $OUT/trajectory.json $RUN theta=0.75 $OUT/expected_ticks.json
+    continue
+  fi
   PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --run $RUN --steps $steps --strategy $STRATEGY --assignment_prior $FLAG \
     < /dev/null > /dev/null 2>&1
   cp "$(ls -t logs/run_*.log | head -1)" $LOG

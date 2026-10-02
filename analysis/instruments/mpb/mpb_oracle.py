@@ -4,7 +4,7 @@ mpb_oracle.py — the meta-planner test-bed's per-tick table of parts 1 to 3 (MP
 test-bed (MPB)"), derived before the run from the human's side alone: the trajectory (analysis/ir_testbed/
 trajectory.py, the load-time replay expanded per tick with the body's timing, its own process) and the records.
 
-    mpb_oracle.py <trajectory.json> <run file> <run.log> <expected_ticks.json>
+    mpb_oracle.py <trajectory.json> <run file> <run.log | theta=<value>> <expected_ticks.json>
 
 Prior on only: the IR test-bed's oracle derives the support under the prior (its rule 1), and MPB-6 compares no
 prior-off run against the oracle.
@@ -123,8 +123,11 @@ if __name__ == "__main__":
     traj = json.load(open(sys.argv[1]))
     run_file = sys.argv[2]
     alpha = float(yaml.safe_load(open(run_file))["test_level"])
-    header = next(l for l in open(sys.argv[3]) if l.startswith("[run] "))
-    theta = float(header.split("theta=")[1].split()[0])
+    if sys.argv[3].startswith("theta="):        # the expectations before any run: theta the value of record
+        theta = float(sys.argv[3].split("=", 1)[1])
+    else:
+        header = next(l for l in open(sys.argv[3]) if l.startswith("[run] "))
+        theta = float(header.split("theta=")[1].split()[0])
     try:
         table = derive(traj, run_file, alpha, theta)
     except OutsidePreRunDomain as e:
