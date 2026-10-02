@@ -5051,6 +5051,9 @@ reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
   among assigned tasks). The entry is marked SUPERSEDED IN PART, with a pointer here; nothing in it is deleted.
   CORRECTED (Hadi, 3 October 2026): the sentence "every admissible hypothesis carries unit weight" stands in TODO-40's
   resolution, not in the entry's text; the entry's mark says so.
+  CORRECTED (Hadi, 3 October 2026; following AM3): under AM3, "assigned work" in R8 reads "the human's work as a
+  whole"; declared strengths replace unit weight between work as a whole and the foreseeable tasks. Reason: AM3
+  redefined the group; R8 was left with the old term. No new decision.
   AMENDED (AM6, Hadi, 3 October 2026): marked SUPERSEDED IN PART, with a pointer to R7 and R8: the passage of the
   support-restriction entry that gives the crossing on prior mass as the reason against the weight, and the passage of
   "θ gates projection admission as well as triggering" that states the belief's confidence is evidence confidence.
