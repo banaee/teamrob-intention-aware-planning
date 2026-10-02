@@ -1470,6 +1470,11 @@ FLAGGED AGAIN (T-G stage 1.5, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 
 recognizer's belief", NAMES FLAGGED): with the context weight (ω_context) and the prior base, for renaming at stage
 1.5's build, not now. R3 gives the robot a prior made of declared strengths, so the switch's name now collides with a
 term of its own (glossary §5, **prior**).
+RULED (AM9, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", NAMES FLAGGED, AM9): the name is `assignment_knowledge`, beside the new
+option `context_knowledge`; each is on or off and states what the robot knows. Reason: the option says only whether
+the robot is told which tasks the human was assigned, and that knowledge restricts the support and sets no prior. The
+rename (code, configuration, commands; the `[IR-prior]` tag and the `[run]` header's field with them) belongs to stage
+1.5's build, with the regression audit; older records keep the old name.
 `configs/experiment.yaml: assignment_prior` and `--assignment_prior` now switch a support
 *restriction*, not a prior — nothing is weighted (design_decisions.md, "Assigned-task pool is
 a support restriction, not a prior"). The name is a leftover from the first build. Also
@@ -4092,6 +4097,9 @@ Reference: docs/assumptions.md 1.3; analysis/ir_testbed/run.sh; TODO-33
 1.4: the framework's experiments use the prior-on configuration; prior off is a diagnostic and ablation configuration.
 The default of `--assignment_prior` is still off (`configs/experiment.yaml`, `assignment_prior: false`; CLAUDE.md,
 "(default off)"). Not changed in Track 2.5.
+RULED (T-G stage 1.5, AM3 and AM9, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM3; design_records.md, "T-G stage 1.5"): the
+option is on by default, named `assignment_knowledge`, beside a new option `context_knowledge`, also on by default. The
+default change and the rename belong to stage 1.5's build, with the regression audit; this item closes there.
 Files: configs/experiment.yaml, CLAUDE.md
 Reference: docs/assumptions.md 1.4
 
@@ -4549,7 +4557,10 @@ stated situation; a ratio of counts, not a probability. Validating it, and the s
 Files: domains/ (the declared strengths and their sources)
 Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3, A4
 
-**TODO-162: The robot without knowledge of the assignment (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
+**TODO-162: The robot without knowledge of the assignment (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW] ⛔ SUPERSEDED by AM3 (3 Oct 2026)
+SUPERSEDED (AM3, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM3; design_records.md, "T-G stage 1.5", R9's mark): no
+future-work direction any more. Assignment knowledge is a run option, on by default; with it off, "work as a whole" is
+every work task of the task model, and R3's formula covers the case. The off setting is an ablation or a diagnostic.
 A conceptual direction (T-G stage 1.5, R9): the support restriction (the switch named `assignment_prior`) is on by
 default for every further analysis and test in V1; the robot that does not know the human's assigned tasks is future
 work. Recorded only: the run option's default is still off (TODO-139), and prior off stays a recognizer diagnostic and
