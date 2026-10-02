@@ -46,3 +46,7 @@ first binding. `summary.py` lists the entries still open at the run's end for a 
 question 5): the ticks whose continuous [sep] minimum lies below min_separation, by F1's execution class
 (`sep_classes.rule`): a moving robot violating, a moving robot receding, a standing robot with the human passing (it
 moved on the tick) or standing beside it (it did not).
+
+**The baseline table** (`baseline.py <set dir>`, reporting only, 2 October 2026): from a set's existing outputs, per true
+stretch (summary.py's definition) its length, the live hypotheses at its first tick and the ticks to the first tick
+with the true hypothesis's belief at or above θ, or "never"; one table per room and the counts.
