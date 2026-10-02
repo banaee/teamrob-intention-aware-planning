@@ -4342,7 +4342,10 @@ Reference: design_decisions.md, "T-G: the second domain's rulings", B5, B11 (AME
 docs/handoffs/plan_T-G_stage1.md, section 5
 TAGGED [V1] (records, 1 Oct 2026): it must be ruled before stage 2.
 
-**TODO-153: The remaining "zone" wording, for the sweep of old terms at stage 1's close (recorded, records after T-G stage 1 step 5, 1 Oct 2026)** [OPEN; not swept now]
+**TODO-153: The remaining "zone" wording, for the sweep of old terms at stage 1's close (recorded, records after T-G stage 1 step 5, 1 Oct 2026)** [OPEN; not swept now] [V1]
+TAGGED [V1] (Hadi, 2 October 2026; T-G records 15; design_decisions.md, "T-G: the second domain's rulings", T-G STAGE 1
+CLOSED). The sweep is deferred to one housekeeping step with the sizes of the files under docs/ and what of
+analysis/ stays in git; not done at stage 1's close.
 The rename (T-G stage 1, step 1, 8d064ca) changed the code names; "zone" remains in wording. Listed once here, measured
 at 576f2b2 over the tracked files outside `ros_sim/`, `scripts/`, `analysis/` and the personal files. Occurrences
 (case-insensitive) per file:
@@ -4366,7 +4369,9 @@ Files: as listed
 Reference: design_decisions.md, "T-G: the second domain's rulings", A2 (the rename), STAGE 1 PLAN APPROVED;
 docs/handoffs/plan_T-G_stage1.md, section 1
 
-**TODO-154: The robot does not anticipate the scan its own delivery makes applicable (recorded, T-G stage 1 milestone, 1 Oct 2026)** [CANDIDATE FINDING about the mind; NOT RULED]
+**TODO-154: The robot does not anticipate the scan its own delivery makes applicable (recorded, T-G stage 1 milestone, 1 Oct 2026)** [CANDIDATE FINDING about the mind; NOT RULED] [V1]
+TAGGED [V1] (Hadi, 2 October 2026; T-G records 15; design_decisions.md, "T-G: the second domain's rulings", T-G STAGE 1
+CLOSED).
 The robot's own delivery makes the human's scan of that pallet applicable (the guard `obj_at(?pallet, ?delivery_bay)`),
 and the robot does not anticipate the human's walk to that bay: the scan hypothesis enters the live set at the tick of
 delivery (A4, `[IR-reentry] ... live again: applicable`) at an equal share, and is admitted 8 to 12 ticks after the
@@ -4393,7 +4398,9 @@ table: the T-G block named above).
 Files: shared/recognizer.py, shared/meta_planner.py (no change)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
 
-**TODO-155: Hypotheses for the walks to the standby place and to the desk (recorded, T-G stage 1 milestone, 1 Oct 2026)** [PARKED; NOT RULED; now with evidence] [RULED FOR NOW, 1 Oct 2026 (T-G Q16): no hypothesis; H1 and H2 recorded, neither approved]
+**TODO-155: Hypotheses for the walks to the standby place and to the desk (recorded, T-G stage 1 milestone, 1 Oct 2026)** [PARKED; NOT RULED; now with evidence] [RULED FOR NOW, 1 Oct 2026 (T-G Q16): no hypothesis; H1 and H2 recorded, neither approved] [V1]
+TAGGED [V1] (Hadi, 2 October 2026; T-G records 15; design_decisions.md, "T-G: the second domain's rulings", T-G STAGE 1
+CLOSED).
 Whether the robot's mind holds hypotheses for the human's walk to the standby place (the repeatable entry) and to the
 desk (the closing part). Neither is in the robot's task model (the plan's section 5: a scenario with a standby entry is
 classed as containing unmodelled behaviour). The approval parked the related question of the human stepping aside
@@ -4448,7 +4455,9 @@ facts, the task that just ended, an enabling event; one mechanism); design_decis
 Files: domains/dock_loading/tasks.py (the task model), shared/recognizer.py
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; docs/handoffs/plan_T-G_stage1.md, section 5; TODO-140, TODO-154
 
-**TODO-156: Route selection in dock_loading's robot methods: a design question for stage 2 (recorded, the review of the task file, 1 Oct 2026)** [OPEN; to rule before `store_pallet`]
+**TODO-156: Route selection in dock_loading's robot methods: a design question for stage 2 (recorded, the review of the task file, 1 Oct 2026)** [OPEN; to rule before `store_pallet`] [V1]
+TAGGED [V1] (Hadi, 2 October 2026; T-G records 15; design_decisions.md, "T-G: the second domain's rulings", T-G STAGE 1
+CLOSED).
 The independent review of dock_loading's task file against kitting's (the file follows kitting's building blocks and
 rules; no special case for dock_loading exists in shared code) found that the robot's methods use a pallet's emptiness
 as a proxy for the side of the gate on which its origin lies (return_empty against return_full). True for every pallet

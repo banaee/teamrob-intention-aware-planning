@@ -740,6 +740,13 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     52 runs, all completed; the 40 with full expectations agree with the oracle; the mixed runs' declared properties
     hold except M(iii) in env_layout_04 under single_task; the alteration test on dock_loading built, not run.
     analysis/dock_loading/mpb/. Next, as Hadi rules: the close of stage 1.
+    CLOSED, T-G STAGE 1 (Hadi, 2 October 2026; design_decisions.md, the same block, T-G STAGE 1 CLOSED; T-G records 15):
+    its purpose was an initial check that the recognizer and the recognition-to-planning chain run on dock_loading. The
+    52 MPB runs completed; zero disagreements wherever full expectations exist; the regression audit byte-identical. It
+    does not state that the scenarios are free of violations: M(iii) failed in three mixed runs and controlled runs
+    contain recorded separation violations; findings carried to stage 2, unanalysed. TODO-153 to TODO-156 tagged [V1].
+    Deferred to one housekeeping step: the sweep of old terms (TODO-153), the sizes of the files under docs/, what of
+    analysis/ stays in git. Next: to be named by Hadi.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,

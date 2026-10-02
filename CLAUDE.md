@@ -340,6 +340,10 @@ Decisions
   disagreements); M(iii) fails in env_layout_04 under single_task (one moving-robot violation); the alteration test on
   dock_loading built, not run. Observations for stage 2 listed unanalysed in the record. Next, as Hadi rules: the close
   of stage 1.
+  T-G stage 1 is CLOSED (Hadi, 2 Oct 2026; the same block, T-G STAGE 1 CLOSED): an initial check that the recognizer and
+  the chain run on dock_loading; the findings (M(iii)'s failure at 387, the recorded separation violations) go to stage
+  2 unanalysed; TODO-153 to TODO-156 tagged [V1]; a housekeeping step deferred (the sweep of old terms, the sizes under
+  docs/, what of analysis/ stays in git). Next: to be named by Hadi.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

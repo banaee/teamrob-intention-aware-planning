@@ -5659,6 +5659,10 @@ e1e9a758799a488b3bf022fe8c8b92ae scenario_s12_01, 93053e69c0d69ae637fb82b0c9399e
 Next, as Hadi rules: track 3b (TODO-145) before the evaluation (T-F, TODO-144), or track 4 (TODO-140).
 RULED (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): neither; T-G is next, then
 T-F and T-V, and track 3b and track 4 in the T-D tail after them.
+AUDIT TRAIL (Hadi, 2 October 2026; recorded in T-G records 15): the alteration test was broken at HEAD since the IR
+oracle began to read the layout's areas (T-G A9): its scratch copy looked for the layout under the scratch directory. It
+was corrected in the shared instrument code (analysis/instruments/mpb/alteration.py, c6469db). The table of
+analysis/kitting/mpb/REPORT.md reproduces exactly. An instrument correction, no change of behaviour.
 
 ---
 
@@ -6949,6 +6953,8 @@ durations; the instrument's generalisation; the order of the build) with the dis
 - DL-P8, a condition on the instrument: dock_loading's horizon code may call the planner's decomposition for the cap
   only. The report shows that no module of the oracle (the per-tick tables, the chain assembly, the compare) imports it
   or anything of the planner, the recognizer, the projection or the robot's perception.
+  READ (Hadi, 2 October 2026; recorded in T-G records 15): the condition reads as kitting's MPB-1 reads. The oracle may
+  use the task model's decomposition. No module of the oracle imports the cap code (horizon.py). No stricter reading.
 - DL-P9, the alteration E3 (every support key live whatever its applicability, T-G A4 switched off in the oracle): if
   undetected on the controlled set, it is recorded as a property of the set with its reason.
 
@@ -6996,6 +7002,16 @@ domain; the deeper analysis needs stage 2's room and tasks.
   maintained sweeps, the ten drop scenarios, kitting's IR test-bed and MPB; the stdout files differ in the run-file
   paths only, as since the sort), dock_loading's IR test-bed (54 runs, every output and md5); the suite 301 passed;
   every registered scenario of both domains loads (163).
+T-G STAGE 1 CLOSED (Hadi, 2 October 2026; recorded in T-G records 15).
+- Its purpose was an initial check that the recognizer and the recognition-to-planning chain run on dock_loading.
+- Result: the 52 MPB runs completed; zero disagreements wherever full expectations exist; the regression audit
+  byte-identical.
+- This does not state that the scenarios are free of violations. The declared property "no violation with a moving
+  robot" failed in three mixed runs (env_layout_04, `single_task`, tick 387), and controlled runs contain recorded
+  separation violations. These are findings carried to stage 2, unanalysed. They do not reopen stage 1.
+- Deferred to one housekeeping step, not done now: the sweep of old terms (TODO-153), the sizes of the files under
+  docs/, and what of analysis/ stays in git.
+- TODO-153, TODO-154, TODO-155 and TODO-156 are tagged [V1].
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
@@ -7056,3 +7072,5 @@ SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 14): the build's plan 
 scope of stage 1's MPB reduced, and the MPB on dock_loading built and run (THE MPB ON DOCK_LOADING above, SCOPE REDUCED AND
 THE MPB ON DOCK_LOADING RUN; 52 runs; the 40 with full expectations agree with the oracle). Next, as Hadi rules: the
 close of stage 1 (handoff_T-G_stage1_MPB_onward.md, section 6).
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 15): T-G stage 1 is closed (T-G STAGE 1 CLOSED above). Next:
+to be named by Hadi.
