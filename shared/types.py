@@ -210,6 +210,7 @@ class Predicate:
     args are Term objects — either Var (schema-level) or Const (grounded).
     e.g. Predicate('at', (Var('?agent'), Var('?area')))         # schema
          Predicate('at', (Const('robot_0'), Const('zone_SE')))  # grounded
+    CORRECTED (2 October 2026): the examples break the invariant; an area is Predicate('in_area', (Const('robot_0'), Const('zone_SE'))), and 'at' takes an object.
     """
     name: str
     args: Tuple[Term, ...]

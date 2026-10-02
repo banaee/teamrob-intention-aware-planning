@@ -93,6 +93,9 @@ World and facts
   holds, via `planner.is_complete()`), not about who performed it or about bookkeeping.
 - `at(agent, object)` (executor completion) and `in_area(agent, area)` (recognizer context) are
   distinct predicates. Never use `at(agent, area)`.
+  CORRECTED (2 October 2026): "(recognizer context)" is false since I3 (a7a4f8c): the recognizer reads no area.
+  `in_area(agent, area)` is read by method guards through the planner's method selection; `at(agent, object)` is also
+  `move_to`'s completion condition, which the recognizer's phase model reads.
 
 Decisions
 - Decisions are made once, inside `shared/`. Embodiment layers execute them and may refine them

@@ -1282,6 +1282,9 @@ BUILT (T-G stage 1, step 2, 1 October 2026; 9bca721).
 code name is "zone" (`zones`, `in_zone`, `object_zones`, `zone_of`) until it is renamed to "area" as the first step of T-G
 stage 1, in its own commit, with no change of behaviour (Hadi, 1 October 2026). Only the recognizer stopped reading zones
 (I4); the mechanism is otherwise built. In prose write "area".
+CORRECTED (records, 2 October 2026; from the git history): the recognizer stopped reading zones in I3, not I4: a7a4f8c
+(13 September 2026) removed ZONE_BOOST and every zone read from `shared/recognizer.py`. design_decisions.md, "T-G: the
+second domain's rulings", A2.
 APPROVED, NOT BUILT (T-G stage 1's plan, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED; `docs/handoffs/plan_T-G_stage1.md`): the code names after the rename are
 `in_area`, `object_areas`, the lookup `area_of`, the layout's `areas` block; the shared form is `Area`, `WorldState.areas`,
 `area_of`, `AREA_FACT = "in_area"`, `area_fact`. The `in_area` fact is the one carrier of an agent's area; the carriers

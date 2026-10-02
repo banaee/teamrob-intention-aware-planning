@@ -128,6 +128,15 @@ context weighting (ω_context). `at(agent, object)` — proximity-based object
 presence, used by the executor to check action completion. These are separate
 concerns and must not be conflated. `GOTO_ZONE` was removed from the HTN
 decomposition tree entirely; zone-level reasoning lives only in the recognizer.
+CORRECTED (records, 2 October 2026; the content, not only the wording): the recognizer reads no area itself. ω_context
+and ZONE_BOOST were removed in I3 (a7a4f8c, 13 September 2026; "A task's likelihood is the likelihood of the action it
+expects now (I3, the phase model)", REMOVED), and since I2 an area reaches the recognizer only through the planner's
+method selection. The predicate is `in_area(agent, area)` since T-G stage 1, step 1 (8d064ca), from the one definition
+`area_fact` (`shared/types.py`): the Mesa world-state builder emits it for every agent, and a computed successor state
+replaces it after a walk (`shared/projection.py`, R2). Method guards read it (dock_loading's methods per area, B11; no
+kitting method reads it). `at(agent, object)` is the executor's completion fact and `move_to`'s completion condition,
+which the phase model reads. The two families stay distinct; "zone-level reasoning lives only in the recognizer" no
+longer holds.
 
 **env_layout.json: single unified `env_objects` list, `SimObject.is_portable` distinguishes fixed vs. carryable**
 Superseded decision (was: items in a separate top-level `"items"` section from
@@ -191,6 +200,14 @@ position, since I2), and by its two callers — recognizer.py (chord target, zon
 and projection.py (segments, and through it meta_planner.py) — never by
 planner.py or executor.py, which remain fully symbolic. (Updated in I2; the
 earlier wording predated the projector, I1 audit 10.8.)
+CORRECTED (records, 2 October 2026; the content): "object_zones are populated and read by the recognizer" and
+"recognizer.py (chord target, zone)" no longer hold. The field is `WorldState.object_areas`, read only by the planner's
+`area_of` lookup (`shared/planner.py`); the recognizer reads the target position of a hypothesis's expected action
+through `shared/target_resolution.py`, for the excess-path evidence (I4), and no area (ZONE_BOOST and the zone read
+left in I3, a7a4f8c). `direction_consistency_likelihood` is gone (I4 rewrote `shared/likelihood_functions.py`).
+Positions are read today by `shared/target_resolution.py` and its callers (`shared/recognizer.py`,
+`shared/projection.py`, the human's executor in `world/human_executor.py`), and `WorldState.fixed_object_positions` by
+the fallback projection (T-D P); `shared/planner.py` reads no position.
 
 **IR likelihood dispatch: schema-driven, not microaction-string-driven**
 ActionSchema declares two IR-relevant fields: `completion` (a ConditionSchema
@@ -5708,6 +5725,9 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   regenerated once). Until that commit the glossary states that the code name is "zone".
   CORRECTED (the same ruling): kitting did not drop zones. Only the recognizer stopped reading them (I4 removed
   ZONE_BOOST); every kitting layout still declares them and the Mesa world-state builder emits `in_zone(agent, zone)`.
+  CORRECTED (records, 2 October 2026; from the git history): the recognizer stopped reading zones in I3, not I4.
+  a7a4f8c (13 September 2026, "IR phase model (I3): ... held-item rule and ZONE_BOOST removed") removed ZONE_BOOST and
+  every zone read from `shared/recognizer.py`; I4 (e3881a9) found none to remove.
   SCOPE OF "NO CODE IS RENAMED" (T-G records 1, third follow-up, 1 October 2026; no ruling changed): A2 renames no code
   for the terms it introduces (mind, body, environment, simulator, container, monitored area, applicable). The one rename
   in V1 is "zone" to "area", ruled afterwards (above) and built as the first step of stage 1 (C1). The two statements
