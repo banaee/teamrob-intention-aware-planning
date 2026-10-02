@@ -461,6 +461,46 @@ S_k: the rule is unchanged, restated. At v = 20 cm/tick and
 live target), 497 cm at α = 0.01.
 → the same entry, E4, E5.
 
+The seven entries below are ruled (T-G stage 1.5, Hadi, 2 October 2026) and not built. Stage 1.5 builds crisp context
+facts; the degrees (a context fact satisfied to a degree, the membership function) are T-K's (§8). Context knowledge acts
+in the robot's mind only, in the recognizer's belief: it does not drive the human, and the conditions of tasks (the
+methods' guards, **applicable**, §6) are not context knowledge (R1).
+→ `docs/design_decisions.md`, "T-G stage 1.5: context knowledge in the recognizer's belief".
+
+**context knowledge** — the umbrella: what the robot knows about the situation, before any movement, that bears on how
+strongly it considers each live hypothesis. It enters the **prior** only (R1, R2); adequacy and warrant do not read it.
+The code's `ContextKnowledge` (`shared/knowledge.py`) and the context weight are its present, domain-naming form
+(TODO-66), replaced at stage 1.5's build.
+
+**context value** — a measured or scheduled quantity of the situation (a time of day, a temperature). An action may
+change a context value.
+
+**context fact** — a declared fact derived from context values, satisfied to a degree in [0, 1]; a crisp fact has only
+0 and 1 (R5). In this stage no task's action sets or removes a context fact directly. Stage 1.5 builds crisp facts only,
+on a timeline in the scenario.
+
+**membership function** — gives the degree to which a context fact is satisfied from a context value. Declared knowledge,
+with its source (R5). T-K's.
+
+**occurrence condition** — the condition over context facts attached to a **foreseeable task** (§6): its high strength
+applies when it is satisfied, its low strength when it is not (R3). Over several facts: the minimum for "and", the
+maximum for "or", 1 minus the degree for "not" (R5, the selected operators). Not a method's condition: it decides no
+liveness.
+
+**strength** — the declared relative weight of a foreseeable task against assigned work as a whole, which contributes 1
+(R3). A foreseeable task declares a low and a high strength, or one strength if it has no occurrence condition; under
+degrees, strength = low + degree × (high − low) (R5). Each carries its source; a modelling assumption until a site
+measures it. Proposed operational meaning, to be validated, not claimed: a ratio of counted task starts (TODO-161).
+
+**prior** — the distribution over the live hypotheses before the evidence of the episode is applied, computed at each
+run of the recognizer from the present context facts, the strengths of the live foreseeable tasks and the division of
+assigned work (equal among the live assigned tasks, R4). The belief is normalise(prior × evidence) over the live
+hypotheses (R2); the prior is never folded into the evidence. Not the support restriction, which the assignment still
+makes (R8).
+NAMES FLAGGED for renaming at stage 1.5's build, not renamed now: the context weight (ω_context, `_context_weight`),
+the prior base (the re-entry and boundary records, §5 **hypothesis**), `assignment_prior` (the switch of the support
+restriction; TODO-44).
+
 ---
 
 ## 6. Tasks, schemas and the world
@@ -1107,6 +1147,10 @@ knowledge); track 2 keeps the live events. design_decisions.md, "T-G: the second
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
 the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.
+**T-K** — the build of degrees of context facts (T-G stage 1.5's R5: membership functions, the operators, the linear
+rule for a strength), ruled 2 October 2026; at the end of the V1 queue, after track 3b. Not started.
+→ `docs/design_decisions.md`, "T-G stage 1.5: context knowledge in the recognizer's belief", R5;
+`docs/design_records.md`, "T-G stage 1.5"; `docs/roadmap.md`, "The plan from T-A", T-K.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 **TB** — the IR test-bed track (ruled 27 September 2026), before cycle 2 of T-D: the recognizer tested in isolation,
