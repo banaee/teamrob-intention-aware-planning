@@ -100,6 +100,12 @@ class Part4:
         self.sel_by = {s["tick"]: s for s in self.sel}
         self.rm = room_of(run_file, self.traj)
         self.human_rows = {r["tick"]: r for r in self.traj["rows"]}
+        human = next(a for a in self.domain_config["scenarios"][sid].agents if a.agent_type == "human")
+        if human.scheduled_tasks.dependence.value == "on_robot":
+            # a script that depends on the robot: the replay with an idle robot does not describe the run; the
+            # human's positions are the run's own (robot.json's per-tick human position)
+            self.human_rows = {a["tick"]: dict(tick=a["tick"], x=a["human"][0], y=a["human"][1]) for a in self.agents}
+            self.human_rows[-1] = dict(tick=-1, x=human.start_position[0], y=human.start_position[1])
         obs, sel, run, sep = self.obs, self.sel, self.run, self.sep
         out = dict(scenario=sid, strategy=obs["strategy"], prior=obs["prior"], completion=completion(self.agents),
                    terminal=obs["terminal"], horizon=obs["horizon"], properties=[], measures={}, detectors={})

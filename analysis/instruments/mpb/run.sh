@@ -30,9 +30,16 @@ for RUN in $RUNS; do
   VAR=${PRIOR}_${STRATEGY}; OUT=$ROOT/$sid/$VAR; LOG=$ROOT/runs/${layout}_${sid}_${VAR}.log; mkdir -p $OUT
   steps=$(PYTHONHASHSEED=0 $PY $DOM/horizon.py $RUN 2>/dev/null | tail -1)
   last=$(PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN --length 2>/dev/null | tail -1)
+  # a script declared dependent on the robot (T-G A3, Q13b): no expectations before the run (MPB-DL3: declared
+  # properties only); the replay with an idle robot does not describe its run, so neither the trajectory check, the
+  # oracle nor the compare is made, and the human's last acknowledgement is the run's own (its human lines)
+  dep=$(PYTHONHASHSEED=0 $PY -c "import sys; sys.path[:0] = ['$IR', '.']; import yaml, trajectory as t; \
+c = yaml.safe_load(open('$RUN')); sc = t.domain_of('$RUN')['scenarios'][c['scenario']]; \
+print(next(a for a in sc.agents if a.agent_type == 'human').scheduled_tasks.dependence.value)" 2>/dev/null)
   own=$(awk '/^steps:/ {print $2}' $RUN)
   [ "$own" = "$steps" ] || echo "$sid: notice: the run file's steps ($own) differ from the cap ($steps); run with $steps"
   if [ -n "$EXPECT" ]; then
+    [ "$dep" = on_robot ] && { echo "$sid: depends on the robot: no expectations before the run (MPB-DL3)"; continue; }
     # the expectations before any run: the trajectory and the oracle's per-tick table, theta the value of record (the
     # [run] header's theta=0.75, DEFAULT_THETA); the run's own oracle call must reproduce them byte for byte
     PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json 2>&1 | grep -v '^\['
@@ -43,14 +50,20 @@ for RUN in $RUNS; do
     < /dev/null > /dev/null 2>&1
   cp "$(ls -t logs/run_*.log | head -1)" $LOG
   cp "$(ls -t logs/run_*.rec | head -1)" ${LOG%.log}.rec
-  PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json $LOG 2>&1 | grep -v '^\['
+  if [ "$dep" = on_robot ]; then
+    PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json 2>&1 | grep -v '^\['
+    hid=$(awk '/^\s*step: [0-9]+: \[human/ {print $3; exit}' $LOG)
+    last=$(awk -v h="$hid" '/^\s*step: [0-9]+: / && $3 == h && $5 != "action=None" {t = $2} END {sub(":", "", t); print t}' $LOG)
+  else
+    PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json $LOG 2>&1 | grep -v '^\['
+  fi
   PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $last $OUT --strategy $STRATEGY --assignment_prior $FLAG \
     2>&1 | grep -v -e '^\[' -e '^  step'
   if PYTHONHASHSEED=0 $PY -c "import sys; sys.path[:0] = ['$DOM', '.']; import properties; sys.exit(0 if '$sid' in properties.CONTROLS else 1)" 2>/dev/null; then   # the domain's control scenarios
     PYTHONHASHSEED=0 $PY $D/reference.py $RUN $steps $ROOT/runs/${layout}_${sid}_reference_${STRATEGY}.log \
       $OUT/reference.json --strategy $STRATEGY 2>&1 | grep -v -e '^\[' -e '^  step'
   fi
-  if [ "$PRIOR" = on ]; then
+  if [ "$PRIOR" = on ] && [ "$dep" != on_robot ]; then
     if PYTHONHASHSEED=0 $PY $D/mpb_oracle.py $OUT/trajectory.json $RUN $LOG $OUT/expected_ticks.json; then
       $PY $D/chain.py $OUT/expected_ticks.json $OUT/observed.json $OUT/expected_decisions.json
       $PY $D/compare.py $sid $OUT
