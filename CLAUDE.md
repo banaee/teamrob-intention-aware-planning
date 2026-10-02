@@ -368,18 +368,23 @@ Decisions
   pictures), deferred until Hadi names one.
   The entry point for the next T-G design chat is `docs/handoffs/T-G_forward_inputs.md` (what is ruled, open and parked
   per stage after stage 1). Next: the stage to be named by Hadi.
-  T-G stage 1.5 (context knowledge) is RULED, its build NOT STARTED (Hadi, 2 October 2026; design_decisions.md, "T-G
-  stage 1.5: context knowledge in the recognizer's belief", R1 to R8 and A1 to A7; design_records.md, "T-G stage 1.5",
-  R9, the cut, the open items): context knowledge acts in the recognizer's belief only, never on the human; belief =
+  T-G stage 1.5 (context knowledge) is RULED AND AMENDED, its build NOT STARTED (Hadi, 2 and 3 October 2026;
+  design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R1 to R8, A1 to A7, AM1 to AM9;
+  design_records.md, "T-G stage 1.5", the cut, the open items). The stage is framework-wide: it concerns kitting and
+  dock_loading alike. Context knowledge acts in the recognizer's belief only, never on the human; belief =
   normalise(prior × evidence), the prior computed at each run from the present context facts as the normalisation of
   the strengths of what is live (assigned work as a whole 1, each live foreseeable task its declared low or high
-  strength by its occurrence condition), equal division inside assigned work; one declared duration; the gate
-  unchanged; the earlier entry "Assigned-task pool is a support restriction, not a prior" superseded in part (R8); the
-  support restriction on by default for every further analysis and test in V1 (R9; the run option's default not
-  changed now). Stage 1.5 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
-  the removal of the domain task names and constants from the recognizer (TODO-66). Open, before the build: the values
-  for the two domains (Hadi states them), the perception assumption, the stage's tests. T-K (the build of R5, degrees)
-  is added at the end of the V1 queue, after track 3b. Future work: TODO-158 to TODO-162 [FW]. Next: stage 1.5's open
+  strength by its occurrence condition, divided among the task's live hypotheses), equal division inside work as a
+  whole; the re-entry and boundary rules are shares of the evidence, not of the belief (AM1); every strength > 0
+  (AM4); one declared duration; the gate unchanged; the earlier entry "Assigned-task pool is a support restriction,
+  not a prior" superseded in part (R8, AM6). Two independent run options, both on by default at the build:
+  `assignment_knowledge` (today's `assignment_prior`, not renamed before the build) and `context_knowledge` (new);
+  context knowledge off gives today's equal prior (AM3, AM9; replaces R9). Stage 1.5 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
+  the removal of the domain task names and constants from the recognizer (TODO-66); an occurrence condition is a
+  conjunction (AM7). Open, before the build, unchanged: the values for kitting and dock_loading (Hadi states them), the
+  perception assumption, the stage's tests. T-K (the build of R5, degrees; open: the representation of a context value
+  and of a degree, AM8) is added at the end of the V1 queue, after track 3b. Future work: TODO-158 to TODO-161 [FW]
+  (TODO-162 superseded by AM3). Next: stage 1.5's open
   items, then its build's plan.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K and T-S, i.e. Phase 5

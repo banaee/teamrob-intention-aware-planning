@@ -781,6 +781,15 @@ order block above). Next: stage 1.5's three open items, then its build's plan.
     the removal of the domain task names and constants from the recognizer (TODO-66). The build is not started. Open:
     the values for the two domains (Hadi states them), the perception assumption, the stage's tests. Future work:
     TODO-158 to TODO-162.
+    AMENDED (Hadi, 3 October 2026; the same entry, AM1 to AM9): the re-entry and boundary rules are shares of the
+    evidence (AM1); a strength per task, divided among its live hypotheses (AM2); two run options, both on by default at
+    the build, `assignment_knowledge` (today's `assignment_prior`) and `context_knowledge`, context knowledge off giving
+    today's equal prior, "work as a whole" covering both settings of the assignment option (AM3, AM9; replaces R9;
+    TODO-162 superseded); every strength > 0 (AM4); R7 "before any distinguishing movement" (AM5); the passages on
+    crossing θ on prior mass superseded in part (AM6); an occurrence condition is a conjunction in stage 1.5 (AM7); T-K
+    open on the representation of a context value and of a degree (AM8). The design is ruled and amended; the build is
+    not started; the open items are unchanged (the values for kitting and dock_loading, the perception assumption, the
+    tests). The stage is framework-wide: it concerns kitting and dock_loading alike.
   - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
     run, TODO-16 with the stepwise delivery (A7).
     ADDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): B10's room (the stores), with its own layout, setup and scenarios; A8's rule on
