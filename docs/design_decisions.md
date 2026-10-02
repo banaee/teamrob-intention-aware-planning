@@ -75,7 +75,7 @@ This keeps planning symbolic while giving simulators flexibility in execution.
 **2. WorldState is symbolic**
 Simulators build a canonical symbolic snapshot before calling core.
 Geometry, positions, and sensor data stay inside the simulator.
-The cognitive layer reasons only over predicates (zone, holding, task_progress, etc.).
+The cognitive layer reasons only over predicates (area, holding, task_progress, etc.).
 
 **3. Simulators decide WHEN to call core — core decides WHAT to do**
 Mesa calls the cognitive chain every step.
@@ -140,7 +140,7 @@ registered with the scheduler, not passive objects, a genuinely different
 loading path.
 `SimModel._init_objects()` loads the unified list in two passes: objects with
 a direct `"position"` first, then objects with `"initial_container"` (items,
-pallets), whose position/zone are derived from their container — two-pass
+pallets), whose position/area are derived from their container — two-pass
 avoids depending on JSON array order.
 `SimObject.is_portable: bool` is set once at load time (True only for the
 `initial_container`-loaded branch) and never mutated afterward. This is
@@ -563,10 +563,10 @@ Files: shared/meta_planner.py (`_strategy` flag, `update()`), shared/projection.
 Reference: Phase 4C meta_planner build session, September 2026
 
 **Interference is geometric, not zone-based**
-Zone co-occupancy was rejected as the proximity criterion for interference detection.
-Zones are arbitrary in size and shape; two agents in one large zone may be far apart, and
-two agents in adjacent zones may be adjacent in space. This extends the existing rejection
-of zone-based *pre-filtering* (NOTE on DESIGN-09/DESIGN-11) to the detection mechanism
+Area co-occupancy was rejected as the proximity criterion for interference detection.
+Areas are arbitrary in size and shape; two agents in one large area may be far apart, and
+two agents in adjacent areas may be adjacent in space. This extends the existing rejection
+of area-based *pre-filtering* (NOTE on DESIGN-09/DESIGN-11) to the detection mechanism
 itself, for the same underlying reason.
 
 Interference detection instead computes actual Euclidean distance between the robot's and
@@ -1584,7 +1584,7 @@ COSTS, not how many are chosen); trajectory algorithms MEASURE ONLY and hold no 
 asks them a different question; `min_separation` is passed IN); the queue invariant (`_queue` excludes
 the executing task; candidates = `[current_task] + queue`); cancellation is an HTN method choice,
 never a cost term (realization adds HOLDS, never methods); plans are re-decomposed from scratch and
-realization produces no persistent state; interference is geometric, not zone-based; projection is a
+realization produces no persistent state; interference is geometric, not area-based; projection is a
 service separate from selection — realization belongs on the projection / trajectory side, NOT in
 `MetaPlanner`, which supplies `min_separation` and consumes the result; task exhaustion is returned,
 not raised.

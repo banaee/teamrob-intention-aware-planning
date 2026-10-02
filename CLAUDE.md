@@ -91,8 +91,8 @@ World and facts
 - `WorldState` is ephemeral: rebuilt every tick, never stored or mutated.
 - One fact, one owner. Task completion is a fact about the world (the task's terminal condition
   holds, via `planner.is_complete()`), not about who performed it or about bookkeeping.
-- `at(agent, object)` (executor completion) and `in_zone(agent, zone)` (recognizer context) are
-  distinct predicates. Never use `at(agent, zone)`.
+- `at(agent, object)` (executor completion) and `in_area(agent, area)` (recognizer context) are
+  distinct predicates. Never use `at(agent, area)`.
 
 Decisions
 - Decisions are made once, inside `shared/`. Embodiment layers execute them and may refine them

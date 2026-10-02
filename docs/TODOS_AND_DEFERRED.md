@@ -4342,13 +4342,14 @@ Reference: design_decisions.md, "T-G: the second domain's rulings", B5, B11 (AME
 docs/handoffs/plan_T-G_stage1.md, section 5
 TAGGED [V1] (records, 1 Oct 2026): it must be ruled before stage 2.
 
-**TODO-153: The remaining "zone" wording, for the sweep of old terms at stage 1's close (recorded, records after T-G stage 1 step 5, 1 Oct 2026)** [OPEN; not swept now] [V1]
+**TODO-153: The remaining "zone" wording, for the sweep of old terms at stage 1's close (recorded, records after T-G stage 1 step 5, 1 Oct 2026)** [V1] [CLOSED, 2 Oct 2026: swept; what remains below]
 TAGGED [V1] (Hadi, 2 October 2026; T-G records 15; design_decisions.md, "T-G: the second domain's rulings", T-G STAGE 1
 CLOSED). The sweep is deferred to one housekeeping step with the sizes of the files under docs/ and what of
 analysis/ stays in git; not done at stage 1's close.
 The rename (T-G stage 1, step 1, 8d064ca) changed the code names; "zone" remains in wording. Listed once here, measured
 at 576f2b2 over the tracked files outside `ros_sim/`, `scripts/`, `analysis/` and the personal files. Occurrences
 (case-insensitive) per file:
+CORRECTED (2 October 2026, the housekeeping step): the numbers below count lines that contain "zone", not occurrences.
 - Records: docs/design_decisions.md 59, docs/TODOS_AND_DEFERRED.md 33, docs/handoffs/plan_T-G_stage1.md 9,
   docs/roadmap.md 8, docs/glossary.md 6, shared/io_contracts.md 6, docs/recognizer_handback.md 4, CLAUDE.md 4,
   docs/handoffs/handoff_T-G_stage1_onward.md 2, domains/README.md 1 (the area-id convention `zone_<descriptor>`). Much
@@ -4367,6 +4368,20 @@ at 576f2b2 over the tracked files outside `ros_sim/`, `scripts/`, `analysis/` an
   notes); frozen records are not edited.
 Files: as listed
 Reference: design_decisions.md, "T-G: the second domain's rulings", A2 (the rename), STAGE 1 PLAN APPROVED;
+CLOSED (Hadi, 2 October 2026; the housekeeping step after T-G stage 1's close): the sweep is done in the files listed
+above. "zone" became "area" where the word names the concept as it is today: CLAUDE.md's predicate invariant
+(`in_area(agent, area)`, `at(agent, area)`), design_decisions.md's "WorldState is symbolic", the two-pass loading note and
+the body of "Interference is geometric, not zone-based" with its summary line, roadmap.md's interference line,
+glossary.md's layout entry, shared/io_contracts.md's two interference notes. Left as written: area ids and code names
+(kitting's `zone_NW` ... in its layouts, the viewer's keys, the examples in shared/types.py and the tests), removed code
+names quoted in history (`ZONE_BOOST`, `spatial_zones`, `goto_zone`, `GOTO_ZONE`, `object_zones`, `_get_target_zone`),
+the movement-target literal "zone" and projection.py's runtime message, the records of the rename itself, dated
+entries, the scenario descriptions (printed at load), the vendored mesa_fork ("timezone"), ros_sim/ and analysis/.
+What remains, not wording: the entry title "Interference is geometric, not zone-based" and its quotations are kept as
+the entry's name; three undated passages of design_decisions.md ("Two distinct predicate families in WorldState", the
+`object_zones` line of "WorldState carries object positions" and its "recognizer.py (chord target, zone)") state that
+the recognizer reads zones, which is no longer true since I4; a word swap would make them read as current, so they are
+left for a records correction by Hadi.
 docs/handoffs/plan_T-G_stage1.md, section 1
 
 **TODO-154: The robot does not anticipate the scan its own delivery makes applicable (recorded, T-G stage 1 milestone, 1 Oct 2026)** [CANDIDATE FINDING about the mind; NOT RULED] [V1]

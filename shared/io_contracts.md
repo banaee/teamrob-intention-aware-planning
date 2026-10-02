@@ -368,8 +368,8 @@ class ProjectedPlan:
 previous entry ended. Nothing reads it; the entry's segments carry the exact step (recorded at T-B2a, not
 fixed).
 
-`spatial_zones` was removed — zone membership was rejected as a proximity criterion
-(zones are arbitrary in size; co-location in one zone doesn't imply closeness). Replaced
+`spatial_zones` was removed — area membership was rejected as a proximity criterion
+(areas are arbitrary in size; co-location in one area doesn't imply closeness). Replaced
 by `segments`, which carry actual geometry for distance-based interference detection.
 See `shared/trajectory_algorithms.py`.
 
@@ -509,7 +509,7 @@ hold that avoids it — and the observe / value split survives inside realizatio
 (`shift_violation_interval` observes; holding values). `realize()` takes the projected segments of
 whatever ordering it is given — it does not assume a single task.
 
-Interference stays geometric, never zone co-occupancy (zones are arbitrary in size, so co-location
+Interference stays geometric, never area co-occupancy (areas are arbitrary in size, so co-location
 implies nothing about closeness). See
 design_decisions.md, "Interference is geometric, not zone-based."
 

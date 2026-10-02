@@ -1133,7 +1133,7 @@ one layout JSON per room and shift, and a registry that bound each scenario to o
 dock_loading appear as examples only.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 
-**layout** — the room: the space, its zones, and the fixed objects with their positions, a fixed container
+**layout** — the room: the space, its areas, and the fixed objects with their positions, a fixed container
 included. No movable object and no agent. Static. One file per layout, with a serial id (`env_layout_KK`, KK a serial
 with no meaning beyond order of writing; ruling 4 as amended, 26 September 2026). (Kitting: tables,
 shelves, machines, switches, landmarks; dock_loading: bays, the gate, and the truck, a fixed container of the room as a
