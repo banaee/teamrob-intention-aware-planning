@@ -1,5 +1,9 @@
 # The IR test-bed on dock_loading (T-G stage 1)
 
+The data and figures of this set (.json, .csv, .png) are not in git (Hadi, 2 October 2026). They are regenerated
+by the set's run script (`analysis/instruments/ir_testbed/run.sh dock_loading`). A byte comparison uses the local copy or the outside copy,
+`/home/hadi/teamrob_analysis_2026-10-02/` (the whole of analysis/ as it was at 38d66ea).
+
 The recognizer in isolation on dock_loading, against expectations derived from the records before the runs
 (design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block: the set and its rules; "The IR test-bed").
 The instrument is the shared one, `analysis/instruments/ir_testbed/` (its README: rules 24 to 27 and the human's

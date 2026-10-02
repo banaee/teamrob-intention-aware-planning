@@ -1,5 +1,9 @@
 # The IR test-bed (TB.3b)
 
+The data and figures of this set (.json, .csv, .png) are not in git (Hadi, 2 October 2026). They are regenerated
+by the set's run script (`analysis/instruments/ir_testbed/run.sh kitting`). A byte comparison uses the local copy or the outside copy,
+`/home/hadi/teamrob_analysis_2026-10-02/` (the whole of analysis/ as it was at 38d66ea).
+
 The recognizer tested in isolation, on a layout, a setup and scenarios written for it, against expectations derived
 from the recognizer records before the run (design_decisions.md, "The IR test-bed"; glossary §8, TB). This file is
 the instrument: what it runs, what it derives, from which record, and how it compares. The results are in

@@ -1,5 +1,9 @@
 # The MPB on dock_loading (T-G stage 1)
 
+The data and figures of this set (.json, .csv, .png) are not in git (Hadi, 2 October 2026). They are regenerated
+by the set's run script (`analysis/instruments/mpb/run.sh dock_loading`). A byte comparison uses the local copy or the outside copy,
+`/home/hadi/teamrob_analysis_2026-10-02/` (the whole of analysis/ as it was at 38d66ea).
+
 The recognition-to-planning chain with a working robot in the second domain, with nothing domain-specific in `shared/`
 (design_decisions.md, "T-G: the second domain's rulings", THE MPB ON DOCK_LOADING: MPB-DL1 to MPB-DL7, DISPOSITIONS,
 THE SET, RULED ON THE SET, THE BUILD'S PLAN CONFIRMED with DL-P1 to DL-P9). A test and an analysis: it changes nothing

@@ -1,5 +1,9 @@
 # The meta-planner test-bed (MPB)
 
+The data and figures of this set (.json, .csv, .png) are not in git (Hadi, 2 October 2026). They are regenerated
+by the set's run script (`analysis/instruments/mpb/run.sh kitting`). A byte comparison uses the local copy or the outside copy,
+`/home/hadi/teamrob_analysis_2026-10-02/` (the whole of analysis/ as it was at 38d66ea).
+
 This folder is the instrument: what it runs, what it derives and from which records, and how it compares. It was built
 in MPB step 2 (29 September 2026) under design_decisions.md, "The meta-planner test-bed (MPB)", MPB-1 to MPB-6.
 - The recognition-to-planning chain (the recognizer, the gate, the projection, the meta-planner) is tested with a
