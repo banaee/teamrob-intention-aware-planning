@@ -1,5 +1,11 @@
 # The MPB on dock_loading (T-G stage 1): report
 
+SUPERSEDING NOTE (Hadi, 3 Oct 2026): the results of the run files of 500 steps or more are potentially confounded by an
+undeclared weight (the hardcoded context weight multiplies coffee_break by 2.5 from step 500); they are not declared
+invalid; the recorded violations of the minimum separation at ticks 387 and 224 to 226 fall before step 500. Pointer:
+design_records.md, "T-G stage 1", SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN, its CAVEAT. The report's own text is
+unchanged.
+
 The set, its rulings and the build: README.md, authoring.md; design_decisions.md, "T-G: the second domain's rulings",
 THE MPB ON DOCK_LOADING. The expectations (trajectory.json, expected_ticks.json, 20 scenarios, both strategies) and K8's
 table (predictions.md) were committed before any run (8fb9981). Run 2 October 2026.
