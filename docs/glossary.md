@@ -1209,6 +1209,44 @@ the run log. A run with an override is never a fixture or a baseline. Not an inj
 `layout.<object>.position`, `setup.<object>.initial_container`), read into a typed class at the input boundary.
 → `mesa_sim/overrides.py`; `mesa_sim/sim_model.py`, `SimModel.__init__` (where they are applied).
 
+ADDED (T-G records 11, Hadi, 2 October 2026; MPB-DL disposition D10): five terms of the test-beds, each defined from
+its use in the records. They name how scenarios are written and checked; none is a code name.
+
+**setup kind** — a placement pattern of the movable objects and their designations, written once per room as separate
+**setup** files with their own serial ids. A records name; the code knows only setup ids. dock_loading (T-G B14;
+MPB-DL2): kind 1, the IR test-bed's (two full unscanned pallets in each delivery bay, one full pallet in the truck);
+kind 2, the MPB's (four full pallets in the truck, two designated to each delivery bay, two empty pallets); kind 3,
+"pallets in the bays" (two full unscanned pallets in each delivery bay, one full pallet in the truck for each bay, two
+empty pallets); kind 4, "one bay" (all full pallets designated to one bay; conditional, added only if the first MPB run
+calls for it).
+→ `docs/design_decisions.md`, "T-G: the second domain's rulings", B14 and THE MPB ON DOCK_LOADING.
+
+**controlled scenario** — a test-bed scenario that tests one case. Its expectations are derived from the records and
+committed before the run, and the run is compared with them exactly. The controlled scenarios of a set run and are read
+first. In the MPB on dock_loading a controlled scenario has a script independent of the robot and keeps the
+**disjointness rule** (MPB-DL3, MPB-DL7).
+
+**mixed scenario** — a test-bed scenario that combines several cases, read only against what the controlled scenarios
+of its set have shown. In the IR test-bed on dock_loading every mixed scenario has full expectations. In the MPB on
+dock_loading a mixed scenario is either independent of the robot, with full expectations committed before the run, or
+dependent on the robot, checked by **declared properties** only; a run checked by declared properties does not validate
+the recognizer's decisions (MPB-DL3 as amended).
+
+**declared property** — a statement about a run, true or false, written with the scenario before the run and evaluated
+on the run's logged state. Used where the oracle does not derive the expected value from the records: kitting's MPB part
+4, the selection, which depends on the robot's realized state (MPB-1, MPB-3), and the mixed scenarios of the MPB on
+dock_loading that depend on the robot (MPB-DL3). The planner's logged values are its observed inputs, never inputs to
+the oracle's derivation. A weaker check than an expectation.
+
+**disjointness rule** — an authoring constraint of a test-bed's controlled scenarios, checked per scenario before its
+runs, under which the robot's acts touch no fact that a human hypothesis in the support reads, so that the per-tick
+tables are derivable before the run. It gives that independence with the prior on only; it is not a framework
+assumption. Kitting's MPB: the robot's items and shelves are disjoint from the human's (MPB-3). The MPB on dock_loading:
+no pallet is named both by the robot's pool and by an assigned scan of the human (MPB-DL7); not generalised to mixed
+scenarios, where a delivery changes applicability.
+→ `docs/design_decisions.md`, "The meta-planner test-bed (MPB)", MPB-3; "T-G: the second domain's rulings", THE MPB ON
+DOCK_LOADING.
+
 ---
 
 ## 10. The architecture and the room
