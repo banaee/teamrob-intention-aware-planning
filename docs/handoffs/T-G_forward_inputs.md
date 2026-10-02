@@ -1,6 +1,7 @@
 # T-G: forward inputs for the stages after stage 1
 
 Written 2 October 2026 by the design chat that closed T-G stage 1. Place: docs/handoffs/.
+Corrected 2 October 2026 by the next design chat, after its verification against the repo's records.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G. It collects, per
 stage, what is already ruled, what is open, what is parked, and the ideas Hadi stated. It replaces the reading of
@@ -29,9 +30,11 @@ stays domain-independent.
 The chain of the robot's mind, in four parts:
 1. The recognizer keeps a belief over hypotheses. A hypothesis is a task the human may be doing: one of the
    human's assigned tasks, or a foreseeable task (a break).
-2. The admission gate decides whether the hypothesis with the highest probability is good enough to plan against.
-   It requires a belief of at least 0.75, that the hypothesis is not contradicted by what was observed, and that
-   it is warranted (it is an assigned task, or the observed movement supports it).
+2. The gate decides whether the meta-planner plans against the hypothesis with the highest probability. The gate
+   requires three things. The belief is at least the threshold θ = 0.75. The hypothesis is adequate (what was
+   observed in its current phase does not contradict it). The hypothesis is warranted (it is an assigned task, or
+   the observed movement supports it). A hypothesis that passes is admitted. A retraction is the meta-planner's
+   act of withdrawing an admitted projection when the admitted hypothesis becomes inadequate.
 3. The projection states where the human is expected to be. If a hypothesis is admitted, the projection is that
    task's plan. If none is admitted, the robot uses the fallback projection: the human's observed motion continued
    for as long as it has been observed.
@@ -63,8 +66,9 @@ Stage 1 is closed (2 October 2026). What it delivered:
 - dock_loading's tasks, three rooms without stores, and four kinds of setup.
 - An intention-recognition test set (the IR test-bed): 54 runs with an idle robot, zero disagreements with the
   expectations written before the runs.
-- A recognition-to-planning test set (the MPB): 52 runs with a working robot in two rooms, all completed, zero
-  disagreements where full expectations existed.
+- A recognition-to-planning test set (the MPB, the meta-planner test-bed): 52 runs with a working robot in two
+  rooms, all completed, zero disagreements where full expectations existed (40 runs). This result does not state
+  that the runs are free of violations of the minimum separation (section 4).
 
 Scope of stage 1's tests, as Hadi set it [ruled]: they are an initial check that dock_loading works. The deeper
 behavioural analysis belongs to stage 2. Hadi wants stage 2's questions, rulings and discussion taken in full
@@ -93,29 +97,41 @@ before anything else.
   dock_loading it is "go to the desk". [ruled]
 - A foreseeable task written as an entry is an ordinary entry. A deviation (a break cut into a walk, a dropped
   task) is an event attached to its entry. [ruled]
-- The simulated human does not react to the robot. A human that gives the robot space is future work. [ruled]
+- The simulated human does not react to the robot (docs/assumptions.md, the human's trajectory). A human that
+  gives the robot space is future work. [ruled]
 
 ---
 
 ## 4. What stage 1 found (inputs for the next stages; none is ruled)
 
-Recognition on dock_loading:
-- Of 147 stretches in which the human did a modelled task, 98 reached the admission threshold, after a median of
-  20 ticks (one tick is 2 seconds). 49 never reached it. All 49 are scans. By room: 38, 40 and 20 of 49.
-- Cause 1, a short walk. At the start of an episode every live hypothesis has an equal share. A walk of 26 ticks
-  or fewer gives too little evidence to lift one above 0.75 when three or more hypotheses are live.
-- Cause 2, the same motion. Two unscanned pallets in one bay give two hypotheses that predict the same walk. They
-  divide the belief, and neither is admitted. Hadi's recorded direction for this: planning against a set of
-  hypotheses with the same projection instead of one dominant hypothesis (belief-aware planning). He wants this
-  kept as a possible contribution of a paper.
-- Cause 3, no walk. Two pallets in one bay stand on one point, so the second scan has no walk at all.
-- The robot does not anticipate the scan that its own delivery makes possible. The scan hypothesis becomes live
-  on the tick of the delivery and starts with an equal share.
-- The walk to the standby place and the walk to the desk have no hypothesis. The robot reads them as the nearest
-  modelled task. In most runs the walk is admitted as a coffee break or an office break, and the admission is
-  withdrawn when the human stands. This is correct by the present rules and wrong about the human.
+Recognition on dock_loading (the IR test-bed, 54 runs):
+- A true stretch is a run of consecutive ticks in which the human does one modelled task. The runs hold 153 true
+  stretches. 147 lie in the support (the hypotheses allowed under the assignment prior: the human's assigned tasks
+  and the foreseeable tasks). 6 lie outside the support (the scan of pallet_1 in two scenarios).
+- Of the 147, 98 reached θ within the stretch, after a median of 20 ticks (range 6 to 50; one tick is 2 seconds).
+  Each room has 49 of the 147. Reached θ: 38, 40 and 20 (env_layout_02, _03, _04; medians 28, 16 and 17 ticks).
+- 49 never reached θ: 11, 9 and 29 by room. All 49 are scans. Every break stretch reached θ.
+- The 49 fall in four classes:
+  - Class 1, a short walk: 34 stretches of 26 ticks or fewer. At the start of an episode every live hypothesis has
+    an equal share. A short walk gives too little evidence to lift one share above 0.75 when three or more
+    hypotheses are live.
+  - Class 2, the same motion: 9 stretches. Two unscanned pallets in one bay give two hypotheses that predict the
+    same walk. They divide the belief, and neither is admitted. Hadi's recorded direction for this: planning
+    against a set of hypotheses with the same projection instead of one dominant hypothesis (belief-aware
+    planning, TODO-97). He wants this kept as a possible contribution of a paper.
+  - Class 3, no walk: 3 stretches. Two pallets in one bay stand on one point, so the second scan has no walk.
+  - Class 4: 3 scans that start as the human leaves the office in env_layout_02 (33 to 35 ticks). The short-walk
+    cause does not explain them. No cause is recorded.
+- The robot does not anticipate the scan that its own delivery makes possible (TODO-154). The scan hypothesis
+  becomes live on the tick of the delivery and starts with an equal share.
+- The walk to the standby place and the walk to the desk have no hypothesis (TODO-155). The robot reads them as
+  the nearest modelled task. In most runs the walk is admitted as a coffee break or an office break. When the
+  human then stands, the admitted hypothesis becomes inadequate and the retraction follows. This is correct by
+  the present rules and wrong about the human.
+- A fact of the task model: a scanned pallet's scan stays applicable, because the scan's conditions do not read
+  the scanned state. This bears on "live only while applicable" and on store_pallet's condition.
 
-Planning on dock_loading:
+Planning on dock_loading (the MPB, 52 runs):
 - Many decisions rest on the fallback projection, because admissions are late or absent.
 - A round trip of the robot to the truck takes about 96 ticks. A scan from the standby place takes 16 to 30. So
   in the domain's normal work cycle the robot never arrives at a bay while the human is there.
@@ -123,18 +139,29 @@ Planning on dock_loading:
   leaving. The human passes the standing robot closer than the minimum separation. A standing robot does not
   count as violating by the present measure. Stage 1 counted these ticks separately (up to 15 with the human
   passing, 4 with the human standing beside). Whether to reopen the parked case "the human walks toward the
-  robot" is Hadi's decision, to take with these counts. [open]
-- One case to look at first in stage 2: in three runs of the work cycle (the room with opposed paths, the
-  strategy that selects one task at a time), the moving robot violates the minimum separation at one tick. The
-  robot had decided a hold of 6 ticks; then a scan was admitted, the hold became 0, and the violation fell on
-  that same tick. Kept unanalysed.
-- Other observations, unanalysed: the robot's switch of task while carrying returns the pallet to the truck
-  first; whether a withdrawal of an admission is visible depends on the strategy; the robot with nothing left to
-  do stays standing at the bay of its last delivery.
+  robot" (TODO-135) is Hadi's decision, to take with these counts. [open]
+- Violations of the minimum separation by a moving robot, all unanalysed:
+  - The case to look at first in stage 2: the mixed runs M1, M2 and M4 in env_layout_04 (the room with opposed
+    paths) under single_task (the strategy that selects one task at a time). Each has a violation at tick 387.
+    The robot had decided a hold of 6 ticks at tick 382, against the fallback projection of a moving human. At
+    tick 387 a scan was admitted, the new decision gave a hold of 0, and the violation fell on that tick. The
+    declared property "no violation with a moving robot" failed in these three runs.
+  - M2 in the same room and strategy also has violations at ticks 224 to 226.
+  - Two controlled runs have two violations each: K8 in env_layout_03 under full_reorder (the strategy that
+    orders the whole pool), and K9 in env_layout_04 under single_task.
+- Other observations, unanalysed:
+  - The robot's switch of task while carrying returns the pallet to the truck first.
+  - In K9 on env_layout_04 the robot's own completion masks the retraction under single_task and not under
+    full_reorder.
+  - K4's holds lengthen at each expiry (13, 48, 96 ticks in env_layout_03; 10, 48, 96 in env_layout_04). The
+    record cites this as evidence for the parked TODO-132 (a).
+  - The mixed runs M1 and M4 of one room end on the same tick under each strategy.
+  - The robot with nothing left to do stays standing at the bay of its last delivery (recorded in the findings
+    of the second milestone scenario).
 
-Not tested in stage 1: the third room (it has the latest admissions); the test that alters one rule of the
-oracle to show that a zero result is a detection (built for dock_loading, not run); a setup in which all pallets
-go to one bay (recorded as conditional, never needed).
+Not tested in stage 1: env_layout_02 in the MPB (the room with the latest admissions, median 28 ticks); the test
+that alters one rule of the oracle to show that a zero result is a detection (built for dock_loading, not run); a
+setup in which all pallets go to one bay (recorded as conditional, never needed).
 
 ---
 
@@ -153,10 +180,20 @@ are recorded, to be designed as one mechanism:
 4. an enabling event, such as the robot's own delivery.
 Stage 1's figures in section 4 are its measured baseline.
 
+What exists in the code today [recorded, TODO-66, deferred]: the recognizer holds a context weight in the shared
+core (`_context_weight`). It names two tasks literally (`ac_activation`, `coffee_break`). It carries four
+constants (a temperature boost of 3.0, a fatigue boost of 2.5, the thresholds 26.0 and 500). It acts on the
+recognizer's output only and is never fed back. No scenario sets the temperature or a long shift. It is the one
+place in the shared core that names a domain task. Whether stage 1.5 closes this item is for the stage's design.
+
+Also recorded: the pre-loaded context stream moved to stage 1.5 from the interactive simulator's track (T-V track
+2), which keeps the live events.
+
 Other open questions recorded for the stage [open]:
 - the form of a context fact;
 - whether a context fact only lets the human start a task, or also interrupts a task in progress (the present
-  rule is: never interrupted);
+  rule is: never interrupted). The record on future-work directions places the design of "an interruption of a
+  busy human caused by a world fact, if wanted" in T-V track 2, as the same entry point as a live user's click;
 - what happens to a hypothesis when its condition turns false while the human still executes the task
   ("applicable to start" against "valid to continue");
 - how the prior uses context;
@@ -177,12 +214,15 @@ Hadi's ideas for the stage [idea]:
 - In kitting, a human who leaves the room for a while can be a foreseeable task with a typical duration known
   from context. (chat only)
 
-The walk to the standby place, parked for this stage [open]. Two candidates are recorded, neither approved:
+The walk to the standby place and the walk to the desk (TODO-155) [open]. The item is parked and tagged V1. No
+stage is assigned to it. Its placement in stage 1.5 was a proposal of the previous design chat, not a ruling.
+Ruled for now: these walks stay without a hypothesis. Two candidates are recorded, neither approved:
 - a foreseeable task "step aside" that is always possible. Hadi's objection: the human steps aside only when no
   pallet waits; an always-possible task competes with the scans when a pallet waits. Also, as a walk alone it
-  would make every arrival at any target count as the end of an episode.
-- a hypothesis that is live only when no assigned task is live. It matches the condition, and it changes the
-  rule for which hypotheses are live.
+  would make every arrival at any target count as the end of an episode. A wait at the end of the task avoids
+  that.
+- a hypothesis that is live only while no assigned task of the human is live. It matches the condition, and it
+  changes the rule for which hypotheses are live.
 Not taken: the walk as the last step of the scan task.
 
 ---
@@ -200,7 +240,8 @@ Content, as recorded [ruled unless marked]:
 - The room with the stores: delivery bays in a row on one side wall, the frozen bay nearest the gate; the freezer
   and the dry store on the opposite wall, the freezer nearest the gate; the empties in the top corner on the bay
   side; the office at the top centre. Requirements: goods flow forward and never travel away from their store and
-  back; no bay stands in front of a store entrance; one place for empties that both stores can bring to.
+  back; the freezer lies near the dock; no bay stands in front of a store entrance; one place for empties that
+  both stores can bring to. The arrangement can be revised when stage 2's layout is agreed.
   Constraint on the setups: the human's carrying route crosses or approaches a normal robot route in some setups
   and stays clear in others, and the scenarios include both.
 - Stage 2 has its own layout, setups and several scenarios. It is not a rerun of stage 1's scenarios.
@@ -227,8 +268,10 @@ To rule before the build [open]:
   own area only, or its own area and every area behind an open passage. With it comes the decision on the human's
   disappearance and reappearance. Whether this is built inside stage 2 or as its own step after it is not
   decided.
-- Choosing between two applicable methods by cost (the planner takes the first applicable method today). Ruled
-  to be designed and built inside stage 2, after its first planning tests. Its case here: a delivery in one go
+- Choosing between two applicable methods by cost (TODO-16; the planner takes the first applicable method
+  today). Ruled to be designed and built inside stage 2, "after the MPB's first run on dock_loading". That run
+  took place in stage 1, so the recorded condition is already met. Where the work stands inside stage 2 is for
+  Hadi to say when stage 2 opens. [open] Its case here: a delivery in one go
   (truck to bay) against a delivery in two steps (truck to gate, gate to bay). It changes the shared core and
   needs its own design question: how the candidates are formed, and whether the recognizer also considers
   several applicable methods.
@@ -246,21 +289,22 @@ Hadi's ideas and wishes for the stage [idea]:
 
 ---
 
-## 7. After stage 2: the unobserved human ("track 4")
+## 7. After stage 2: the human outside the monitored areas ("track 4")
 
-As recorded [ruled, with the observation rule reopened, see section 6]: the robot's state of the world holds the
-human only while the human is observed. While no human is observed, the recognizer does not update, no
-projection exists, and the planner plans as with no human. The disappearance and the reappearance each cause a
-new decision. The reappearance starts a new episode from the prior. The mind keeps no last observed position.
-dock_loading's office is the unobserved area. It is built before the evaluation, and the evaluation may use the
-office.
+As recorded [ruled, with the observation rule reopened, see section 6]: the layout declares monitored areas (the
+areas in which the robot observes the human). The robot's state of the world holds the human only while the human
+is inside a monitored area. While no human is observed, the recognizer does not update, no projection exists, and
+the planner plans as with no human. The disappearance and the reappearance each cause a new decision. The
+reappearance starts a new episode from the prior base (the belief with which an episode starts). The mind keeps
+no last observed position. dock_loading's office is the one unmonitored area. This step is built before the
+evaluation, and the evaluation may use the office.
 
 Open [open]: which trigger makes the decision at disappearance and reappearance (the trigger set has three
 members today); the human leaving through a door.
 
 Hadi's idea [idea]: the human vanishes into the office; the robot knows that the human is there and will appear
 at the office door at some moment, without knowing when. A robot that expects the return and plans around it
-belongs to belief-aware planning, outside this step.
+belongs to belief-aware planning (TODO-97), outside this step.
 
 ---
 
@@ -289,8 +333,12 @@ mechanism; an action of unknown length inside a plan; a rule that keeps the robo
 - Several observed humans. Hadi's sketch: a second human with its own script that the robot has no model of,
   handled by the fallback projection.
 - A position chosen when a pallet is put down (places inside a bay).
-- A type-to-destination rule in place of explicit designations.
 - A detour as the robot's response; execution in ROS.
+- Communication acts stay under their existing records (TODO-96): the human assigning or changing a delivery
+  location during the run; the robot informing a third party.
+
+Not future work [ruled]: a type-to-destination rule in place of explicit designations is recorded as not taken.
+By the rule on V1 and future work, an alternative not taken in a design question is never a future-work item.
 
 Also planned inside V1, after T-G: the evaluation; the viewer; an interactive simulator in which deviations are
 injected at run time; one further test track on adaptation under conflict.
@@ -306,7 +354,11 @@ injected at run time; one further test track on adaptation under conflict.
   record file as input. [open]
 - Under analysis/, git tracks reports and code only. Data and figures stay on Hadi's disk, with a full copy
   outside the repo. [ruled]
-- Two large old files under docs/ wait for a destination. [open]
+- The housekeeping step after stage 1's close is done (2 October 2026): the sweep of old terms ("zone" to
+  "area" in wording), the split of the records, and the rule for analysis/. The reports under analysis/ are
+  readable in the design chat's project knowledge.
+- Two large old items under docs/ wait for a destination that Hadi names: the old ROS planner reference text and
+  the folder of old layout pictures. Deferred. [open]
 
 ---
 
