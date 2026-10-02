@@ -733,6 +733,13 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     independent, with full expectations), in env_layout_03 and env_layout_04, both strategies: 52 runs. Kind 3 is a test
     condition, not the domain's work cycle. Next: the build's plan (the setups, the scenarios, every duration and cut
     point derived from path lengths, the per-room derivation of each declared case), approved by Hadi.
+    BUILT AND RUN, THE MPB ON DOCK_LOADING, ITS SCOPE REDUCED FOR STAGE 1 (Hadi, 2 October 2026; design_decisions.md, the
+    same block, THE BUILD'S PLAN CONFIRMED and SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN; T-G records 13 and 14):
+    stage 1 establishes that the recognizer and the recognition-to-planning chain run on dock_loading and produce runs,
+    logs and figures; the behavioural analysis belongs to stage 2. The 26 scenarios in two rooms under both strategies,
+    52 runs, all completed; the 40 with full expectations agree with the oracle; the mixed runs' declared properties
+    hold except M(iii) in env_layout_04 under single_task; the alteration test on dock_loading built, not run.
+    analysis/dock_loading/mpb/. Next, as Hadi rules: the close of stage 1.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,

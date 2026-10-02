@@ -6952,6 +6952,51 @@ durations; the instrument's generalisation; the order of the build) with the dis
 - DL-P9, the alteration E3 (every support key live whatever its applicability, T-G A4 switched off in the oracle): if
   undetected on the controlled set, it is recorded as a property of the set with its reason.
 
+SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN (Hadi, 2 October 2026; recorded in T-G records 14). Hadi reduced the scope
+of stage 1's MPB: it establishes that the recognizer and the recognition-to-planning chain run on dock_loading and
+produce runs, logs and figures; the behavioural analysis belongs to stage 2. The stop for review between the controlled
+and the mixed runs was withdrawn; a class-2 disagreement no longer stops the build (reported with its evidence); the
+alteration test on dock_loading is not run in stage 1. Reason: stage 1's purpose is that the chain runs on the second
+domain; the deeper analysis needs stage 2's room and tasks.
+- What ran: the 26 scenarios of the set (K1 to K9 and M3 on kind 3, scenario_s08_01 to _10 and scenario_s09_01 to _10;
+  M1, M2, M4 on kind 2, scenario_s05_04 to _06 and scenario_s07_04 to _06), in env_layout_03 and env_layout_04, prior
+  on, single_task and full_reorder: 52 runs, every one completed within its cap; and K1's 4 comparison runs. The
+  expectations and K8's table were committed before any run (8fb9981).
+- Where: analysis/dock_loading/mpb/ (README.md, authoring.md, predictions.md, REPORT.md with every run's line and the
+  md5s; per run the comparison, the properties, the figures and the separation counts; the logs and records in runs/,
+  git-ignored); the run files in configs/dock_loading/mpb/; the instrument's shared code in analysis/instruments/mpb/.
+- The comparison: the 40 runs with full expectations (K1 to K9, M3) agree with the oracle on parts 1 to 3 at exact
+  equality, 0 disagreements; no class-2 disagreement. K1's properties hold against the comparison runs. The mixed
+  runs M1, M2, M4 (declared properties only, MPB-DL3): (i), (ii) and (iv) hold in every run; (iii), no violation with a
+  moving robot, does not hold in env_layout_04 under single_task (one violation at 387 in each; M2 also 224 to 226).
+- Formed or not: K8's retraction formed on env_layout_03 (entered 14, retraction 34) and not on env_layout_04 (no
+  admission of scan 0); K9's retraction formed on env_layout_03 (67) and on env_layout_04 under full_reorder (59);
+  under single_task it was masked by the robot's no_current_task at 59 (DL-P4, not formed there); K2's admission of the
+  scans did not form on env_layout_04; K3's switch by cost occurred on env_layout_04 (single_task at 104, full_reorder
+  at 110), not on env_layout_03 (DL-P2: reported, not expected); K4's holds lengthened (13, 48, 96; 10, 48, 96); M2's
+  two scans live at once in one bay did not occur; its decision at an occupied bay occurred in every M2 run.
+- The walk to the desk (and K9's walk to the standby place) admitted as a break, a finding about the mind with TODO-155
+  (DL-P5): coffee_break on env_layout_03 in K1, K2, K6, K7, K8, K9; office_break on env_layout_04 in K2, K6, K7, K8, K9.
+- Not tested or not run: the alteration test on dock_loading (built, for stage 2); env_layout_02 (MPB-DL6); the cases
+  listed above as not formed.
+- Observations for stage 2, unanalysed: (1) M1, M2, M4 on env_layout_04, single_task: a hold of 6 decided at 382 on a
+  moving fallback, scan 1 entered at 387 with hold 0, and a moving-robot violation at 387; (2) moving-robot violations
+  in K8 full_reorder on env_layout_03 (2) and K9 single_task on env_layout_04 (2); (3) standing-robot ticks below
+  min_separation (MPB-DL4, TODO-135's measure) in K3, K4, M3 and the mixed full_reorder runs, up to 15 with the human
+  passing and 4 beside; (4) the switch while carrying in K3 on env_layout_04 returns the full pallet to the truck first
+  (B8); (5) K9 on env_layout_04: the masking depends on the strategy; (6) the desk walk read as a break in most
+  controlled runs; (7) M1 and M4 of one room end on the same terminal tick under each strategy.
+- The instrument (no change of framework code): measures.py and the alteration engine shared; run.sh --expect and the
+  control list per domain; a script that depends on the robot gets no oracle comparison and its human read from the
+  run; dock_loading's horizon.py (DL-P7, DL-P8), properties.py, alteration.py, disjoint.py. Found on the way: HEAD's
+  kitting alteration test failed since the IR oracle reads the layout's areas (its scratch copy's root); corrected in
+  the shared engine, kitting's table reproduced exactly.
+- The regression audit: byte-identical. Kitting's MPB (the sixteen, both strategies and prior off, after
+  the generalisation; every committed output and md5; the alteration table), the reference set of stage 1 (the four
+  maintained sweeps, the ten drop scenarios, kitting's IR test-bed and MPB; the stdout files differ in the run-file
+  paths only, as since the sort), dock_loading's IR test-bed (54 runs, every output and md5); the suite 301 passed;
+  every registered scenario of both domains loads (163).
+
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
   and names no fixed object.
@@ -7007,3 +7052,7 @@ SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 11): the dispositions 
 set on dock_loading is agreed (THE MPB ON DOCK_LOADING above: MPB-DL7, DISPOSITIONS, THE SET; 13 scenarios, 52 runs).
 Next: the build's plan (the two setups of kind 3, the scenarios, every duration and cut point derived from path lengths,
 the per-room derivation that the geometry gives each declared case), approved by Hadi before the build.
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 14): the build's plan was confirmed (DL-P1 to DL-P9), the
+scope of stage 1's MPB reduced, and the MPB on dock_loading built and run (THE MPB ON DOCK_LOADING above, SCOPE REDUCED AND
+THE MPB ON DOCK_LOADING RUN; 52 runs; the 40 with full expectations agree with the oracle). Next, as Hadi rules: the
+close of stage 1 (handoff_T-G_stage1_MPB_onward.md, section 6).

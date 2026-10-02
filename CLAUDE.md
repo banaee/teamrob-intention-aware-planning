@@ -331,6 +331,15 @@ Decisions
   "pallets in the bays" (two full pallets in each bay), one setup each for env_layout_03 and env_layout_04; 9 controlled
   (K1 to K9, kind 3) and 4 mixed (M1, M2, M4 on kind 2 with declared properties; M3 on kind 3 with full expectations),
   both strategies, 52 runs; kind 3 is a test condition, not the work cycle. Next: the build's plan, approved by Hadi.
+  The MPB on dock_loading is BUILT AND RUN, its scope reduced for stage 1 (Hadi, 2 Oct 2026; the same block, THE BUILD'S
+  PLAN CONFIRMED, DL-P1 to DL-P9, and SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN): stage 1 establishes that the chain
+  runs on dock_loading and produces runs, logs and figures; the behavioural analysis is stage 2's. env_setup_08 and _09
+  (kind 3), scenario_s08_01 to _10, s09_01 to _10, s05_04 to _06, s07_04 to _06, run files in configs/dock_loading/mpb/,
+  outputs and REPORT.md in analysis/dock_loading/mpb/; the MPB instrument's shared part 4 (measures.py) and alteration
+  engine in analysis/instruments/mpb/. 52 runs, all completed; the 40 with full expectations agree with the oracle (0
+  disagreements); M(iii) fails in env_layout_04 under single_task (one moving-robot violation); the alteration test on
+  dock_loading built, not run. Observations for stage 2 listed unanalysed in the record. Next, as Hadi rules: the close
+  of stage 1.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
