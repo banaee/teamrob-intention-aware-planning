@@ -6917,6 +6917,40 @@ is authored or run.
   by cost. The report states whether each occurred.
 - M4, AMENDED: one named scan is dropped during its walk; a second named scan has coffee_break on arrival; the dropped
   scan is a second entry; the standby entry closes the list.
+THE BUILD'S PLAN, CONFIRMED (Hadi, 2 October 2026; recorded in T-G records 13): ccode's plan for the MPB set (its
+sections a to i: the setups env_setup_08 and env_setup_09 of kind 3; the scenarios scenario_s08_01 to _10 and
+scenario_s09_01 to _10 (K1 to K9, M3), scenario_s05_04 to _06 and scenario_s07_04 to _06 (M1, M2, M4); the authored
+durations; the instrument's generalisation; the order of the build) with the dispositions below on its open points.
+- DL-P1, K8's cut, by a rule: the cut falls on the last step of the walk to the pallet, in both rooms. The cause is
+  whatever the oracle derives on kind 3; it is not inferred from the IR test-bed's rows on kind 1.
+  Reason: it is the latest change that is still a change during the walk, so scan 0 has received all the walking
+  evidence it can receive.
+  Procedure, before any controlled run: K8's per-tick table is reported for both rooms, from scan 0's expected
+  admission (or the walk's start if none) to 10 ticks after the cut: the leader, scan 0's share, scan 0's hypothesis
+  adequacy, the gate's outcome and the expected cause of each decision. On env_layout_03, if the oracle expects the
+  retraction, the build proceeds; if it expects "replaced" or no admission, the build stops before the controlled runs
+  and reports; no other cut is tried; Hadi rules. On env_layout_04 there is no stop: K8 runs, and if the case does not
+  form the expectation and the record say so for that room.
+- DL-P2, K3's switch by cost is neither an expectation nor a declared property. K3's exact parts are the fallback
+  decisions on the standing human and the expiry cadence. The report states whether the switch occurred and, if it
+  did, checks the occupied-target condition (X1). The stand is not lengthened to force it.
+  Reason: the selection depends on the robot's realized state; the records do not determine it.
+- DL-P3, K1 on env_layout_04 runs with its one-task pool (the human's scan 0, the robot's deliver-frozen).
+  Reason: a control needs no hold and an equal completion, not a selection between tasks.
+- DL-P4, K9 on env_layout_04: if a `no_current_task` tick masks the retraction (D3's order on a shared tick), the case
+  counts as not formed there. Nothing changes.
+- DL-P5, the closing walk to the desk admitted as a break is expected by the oracle and is not a disagreement. Each
+  instance is recorded as a finding about the mind, with TODO-155.
+- DL-P6, admissions near the threshold: the oracle's computed table decides every tick. No hand-derived tick of the
+  plan is binding.
+- DL-P7, the step cap for a script that depends on the robot (an extension of MPB-5 for this set): the robot's plain
+  chain, plus the human's replay on the state after that chain, plus 30 ticks. It bounds the run's length and is not
+  an expectation. A run that reaches the cap is reported as such; the cap is not raised after a run.
+- DL-P8, a condition on the instrument: dock_loading's horizon code may call the planner's decomposition for the cap
+  only. The report shows that no module of the oracle (the per-tick tables, the chain assembly, the compare) imports it
+  or anything of the planner, the recognizer, the projection or the robot's perception.
+- DL-P9, the alteration E3 (every support key live whatever its applicability, T-G A4 switched off in the oracle): if
+  undetected on the controlled set, it is recorded as a property of the set with its reason.
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
