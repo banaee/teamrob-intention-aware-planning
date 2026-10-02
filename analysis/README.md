@@ -13,3 +13,7 @@ before the IR test-bed; old paths: `docs/rename_table.md`, "Paths: the sort").
   (`tb1a_destination`, `tb1b_two_tables`, `tb1c_realized_flip`, `tb3_full_reorder`), and kitting's IR test-bed
   and MPB sets (`ir_testbed/`, `mpb/`).
 - `dock_loading/`: dock_loading's sets (the IR test-bed from T-G stage 1).
+
+Data and figures (Hadi, 2 October 2026): analysis/ tracks reports and code only (.md, .py, .sh). The frozen sets' data
+is not in git from this commit on; it is restored in any clone with `git checkout 7d00f43 -- analysis/kitting/<set>`. A
+full copy of analysis/ as of 2 October 2026 is at /home/hadi/teamrob_analysis_2026-10-02/.
