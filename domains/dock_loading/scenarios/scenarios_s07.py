@@ -1,7 +1,7 @@
 # domains/dock_loading/scenarios/scenarios_s07.py
 """
 Dock_loading scenarios on env_setup_07 (T-G stage 1, kind 2, written for
-env_layout_04; design_decisions.md, "T-G: the second domain's rulings", B14).
+env_layout_04; design_records.md, "T-G: the second domain's rulings", B14).
 One module per setup.
 """
 
@@ -81,7 +81,7 @@ scenario_s07_02 = ScenarioConfig(
 )
 
 
-# The second milestone scenario (T-G stage 1; design_decisions.md, "T-G: the
+# The second milestone scenario (T-G stage 1; design_records.md, "T-G: the
 # second domain's rulings", FINDINGS OF THE MILESTONE: a second simple scenario
 # per room). Not a baseline; it measures nothing.
 scenario_s07_03 = ScenarioConfig(
@@ -138,7 +138,7 @@ scenario_s07_03 = ScenarioConfig(
 )
 
 
-# The MPB on dock_loading (design_decisions.md, "T-G: the second domain's rulings", THE MPB ON DOCK_LOADING, THE
+# The MPB on dock_loading (design_records.md, "T-G: the second domain's rulings", THE MPB ON DOCK_LOADING, THE
 # SET): its mixed scenarios on kind 2, M1 as _04, M2 as _05, M4 as _06. Declared properties in
 # analysis/dock_loading/mpb/properties.py.
 scenario_s07_04 = ScenarioConfig(

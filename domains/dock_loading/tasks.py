@@ -16,7 +16,7 @@ TASKS:
     HumanOnlyTasks:
         go_to(?landmark), stand(?duration), go_to_and_stand(?landmark, ?duration)
 
-METHODS (T-G stage 1; docs/handoffs/plan_T-G_stage1.md, section 4; design_decisions.md, "T-G: the second domain's
+METHODS (T-G stage 1; docs/handoffs/plan_T-G_stage1.md, section 4; design_records.md, "T-G: the second domain's
 rulings", B8 and B11 as amended):
     A task has a method for every area its agent can be in, selected by in_area(?agent, <area>): the robot on the truck
     side and in the hall, the human in the hall and in the office. No method is written for another area: an agent

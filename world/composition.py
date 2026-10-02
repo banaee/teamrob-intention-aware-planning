@@ -18,7 +18,7 @@ PURPOSE:
     configuration, not of the script alone.
 
     THE EXIT WALK: the authoring convention's terminal walk out of the
-    workspace (design_decisions.md, "SCENARIO-AUTHORING CONVENTION") is not
+    workspace (design_records.md, "SCENARIO-AUTHORING CONVENTION") is not
     counted in the scenario coverage. It is the script's last entry (the last
     closing entry where the script has a closing part, T-G A3) when its
     task is a HumanOnlyTask whose only goal binding is a landmark and that

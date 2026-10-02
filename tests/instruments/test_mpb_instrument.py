@@ -1,5 +1,5 @@
 """
-The meta-planner test-bed's instrument (analysis/instruments/mpb/ and analysis/kitting/mpb/; design_decisions.md, "The meta-planner test-bed (MPB)"): its own
+The meta-planner test-bed's instrument (analysis/instruments/mpb/ and analysis/kitting/mpb/; design_records.md, "The meta-planner test-bed (MPB)"): its own
 derivations (P4's perception facts, the fallback's ray, its end and expiry), the chain assembly and the compare, on
 synthetic inputs derived from the records (T-D P, P4 and Q6; shared/io_contracts.md §2.2; D2, D3, T-D L); none from a
 run. And the oracle's independence boundary (MPB-1).

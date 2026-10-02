@@ -39,7 +39,7 @@ the list is finished: the closing part is taken in written order, the human
 waiting while the next closing entry is not applicable; after it, nothing more
 (Idle). Applicability is the planner's (AdaptivePlanner.is_applicable).
 
-THE RECORD. Every transition is written to the Record (shared/record.py) as it
+THE RECORD. Every transition is written to the Record (world/record.py) as it
 happens; the driver writes the per-tick Snapshot. Nothing here reaches the
 robot's mind.
 """

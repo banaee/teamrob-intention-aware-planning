@@ -1,7 +1,7 @@
 # domains/dock_loading/scenarios/scenarios_s03.py
 """
 Dock_loading scenarios on env_setup_03 (T-G stage 1, kind 2, written for
-env_layout_02; design_decisions.md, "T-G: the second domain's rulings", B14).
+env_layout_02; design_records.md, "T-G: the second domain's rulings", B14).
 One module per setup.
 """
 
@@ -79,7 +79,7 @@ scenario_s03_02 = ScenarioConfig(
 )
 
 
-# The second milestone scenario (T-G stage 1; design_decisions.md, "T-G: the
+# The second milestone scenario (T-G stage 1; design_records.md, "T-G: the
 # second domain's rulings", FINDINGS OF THE MILESTONE: a second simple scenario
 # per room). Not a baseline; it measures nothing.
 scenario_s03_03 = ScenarioConfig(

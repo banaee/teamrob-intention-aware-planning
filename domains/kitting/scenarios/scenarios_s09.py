@@ -1,6 +1,6 @@
 # domains/kitting/scenarios/scenarios_s09.py
 """
-Kitting scenarios on env_setup_09 — the IR test-bed on its enlarged room (TB.4b; design_decisions.md, "The IR
+Kitting scenarios on env_setup_09 — the IR test-bed on its enlarged room (TB.4b; design_records.md, "The IR
 test-bed"; TODO-122). One module per setup. Every task instance is written in the kitting call form
 (domains/kitting/script.py), a human's script as a Script of task instances with events (T-H): an event's anchor is
 an action schema of the task's decomposition.

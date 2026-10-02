@@ -1,6 +1,6 @@
 # domains/kitting/scenarios/scenarios_s11.py
 """
-Kitting scenarios on env_setup_11 — the meta-planner test-bed (MPB; design_decisions.md, "The meta-planner test-bed
+Kitting scenarios on env_setup_11 — the meta-planner test-bed (MPB; design_records.md, "The meta-planner test-bed
 (MPB)"; analysis/mpb/), the fallback projection's scenarios. One module per setup; the kitting call form
 (domains/kitting/script.py).
 The room is env_layout_12; the shift env_setup_11: the robot's item_8 (shelf_3 -> kitting_table_2) and item_9

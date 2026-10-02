@@ -1,6 +1,6 @@
 # domains/kitting/scenarios/scenarios_s08.py
 """
-Kitting scenarios on env_setup_08 — the IR test-bed (TB; design_decisions.md, "The IR test-bed").
+Kitting scenarios on env_setup_08 — the IR test-bed (TB; design_records.md, "The IR test-bed").
 One module per setup. Every task instance is written in the kitting call form (domains/kitting/script.py),
 a human's script as a Script of task instances with events (T-H): an event's anchor is an action schema of
 the task's decomposition.

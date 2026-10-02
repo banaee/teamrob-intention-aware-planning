@@ -51,7 +51,7 @@ PREDICATES GENERATED:
 
 PREDICATE NAMING RATIONALE:
     "in_area" and "at" are intentionally distinct:
-    - in_area(agent, area) — coarse spatial context for IR
+    - in_area(agent, area) — the agent's area, read by method guards (not by IR since I3)
     - at(agent, object)    — fine-grained proximity for execution completion
     Conflating them under a single "at" predicate caused a semantic mismatch
     where move_to completion was never satisfied. Kept separate.

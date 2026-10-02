@@ -1,7 +1,7 @@
 # domains/dock_loading/scenarios/scenarios_s08.py
 """
 Dock_loading scenarios on env_setup_08 (T-G stage 1, kind 3 "pallets in the bays", written for env_layout_03;
-design_decisions.md, "T-G: the second domain's rulings", THE MPB ON DOCK_LOADING: THE SET, its rulings and the build
+design_records.md, "T-G: the second domain's rulings", THE MPB ON DOCK_LOADING: THE SET, its rulings and the build
 plan's dispositions DL-P1 to DL-P9). One module per setup. The MPB on dock_loading: K1 to K9 as _01 to _09 (controlled),
 M3 as _10 (mixed, independent of the robot, full expectations). Every authored duration and cut point is derived from
 path lengths in analysis/dock_loading/mpb/authoring.md.

@@ -1,6 +1,6 @@
 """
 The trajectory realize() assesses is the trajectory the robot executes from the decision tick onward (the MPB class-2
-finding, 30 September 2026; design_decisions.md, "Realization as built", the dated correction; MPB-4, its class-2
+finding, 30 September 2026; design_decisions.md, "Realization as built", the dated correction; design_records.md, MPB-4, its class-2
 record). One test per state in which the body's execution and the projection diverged before the fix, with and without
 a hold:
 

@@ -1,7 +1,7 @@
 # domains/dock_loading/scenarios/scenarios_s04.py
 """
 Dock_loading scenarios on env_setup_04 (T-G stage 1, kind 1, written for
-env_layout_03; design_decisions.md, "T-G: the second domain's rulings", B14).
+env_layout_03; design_records.md, "T-G: the second domain's rulings", B14).
 One module per setup.
 """
 
@@ -39,7 +39,7 @@ scenario_s04_01 = ScenarioConfig(
 )
 
 
-# The IR test-bed on dock_loading (design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block: the
+# The IR test-bed on dock_loading (design_records.md, "T-G: the second domain's rulings", T-G Q16's block: the
 # set, 14 controlled scenarios C1 to C14 as _02 to _15 and 4 mixed M1 to M4 as _16 to _19, each in the three rooms).
 # The robot is idle; expectations are derived from the records before the runs (analysis/dock_loading/ir_testbed/).
 scenario_s04_02 = ScenarioConfig(

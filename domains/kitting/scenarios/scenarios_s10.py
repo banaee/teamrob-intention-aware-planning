@@ -1,6 +1,6 @@
 # domains/kitting/scenarios/scenarios_s10.py
 """
-Kitting scenarios on env_setup_10 — the meta-planner test-bed (MPB; design_decisions.md, "The meta-planner test-bed
+Kitting scenarios on env_setup_10 — the meta-planner test-bed (MPB; design_records.md, "The meta-planner test-bed
 (MPB)"; analysis/mpb/). One module per setup. Every task instance is written in the kitting call form
 (domains/kitting/script.py), a human's script as a Script of task instances with events (T-H).
 The room is env_layout_12 (the 10/11 pattern translated by (0, -200), plus the robot's work areas); the shift

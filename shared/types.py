@@ -477,7 +477,7 @@ class ActionSchema:
                    None means this action has no meaningful in-progress signal —
                    only its completion predicate carries evidence.
     """
-    name: str                           # e.g. 'goto_zone'
+    name: str                           # e.g. 'move_to'
     parameters: List[Var]
     preconditions: List[ConditionSchema]
     effects: List[ConditionSchema]
@@ -485,10 +485,10 @@ class ActionSchema:
     microactions: Union[str, List[str]] # 'STEP*' / 'STAND*' or ['GRASP'] etc.
     movement_target_key: Optional[str] = None
     # Binding key whose value is the movement target position.
-    # e.g. "?zone" for goto_zone, "?target" for move_to.
+    # e.g. "?target" for move_to.
     # None for non-movement actions (pick_up, place, wait_at).
     movement_target_type: Optional[str] = None
-    # "zone" or "object" — tells decomposer how to resolve the movement target.
+    # "object", the only kind handled (area targets left with GOTO_ZONE) — tells decomposer how to resolve the movement target.
     # None for non-movement actions.
     progress_evaluator: Optional[str] = None
     # Name of the IR excess measure to apply while this action is ongoing (not
@@ -1140,7 +1140,7 @@ class ProjectedPlanEntry:
     An ordering of n tasks projects to ONE ProjectedPlan with n entries, in
     the ordering's order.
     abstract_plan is None only for the one entry of a fallback projection
-    (T-D P1; shared/projection.py, FallbackProjection): the observed human
+    (T-D P, P4; shared/projection.py, Projector.project_fallback): the observed human
     standing, which is no task and has no plan.
     """
     abstract_plan: Optional["AbstractPlan"]

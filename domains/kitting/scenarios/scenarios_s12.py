@@ -1,6 +1,6 @@
 # domains/kitting/scenarios/scenarios_s12.py
 """
-Kitting scenarios on env_setup_12 — the meta-planner test-bed (MPB; design_decisions.md, "The meta-planner test-bed
+Kitting scenarios on env_setup_12 — the meta-planner test-bed (MPB; design_records.md, "The meta-planner test-bed
 (MPB)"; analysis/mpb/), part (v): two of the five reachable decision paths the coverage matrix found without an instance
 (analysis/mpb/coverage.md, rows D8 and C2; Hadi's rulings of 29 September 2026). One module per setup; the kitting call
 form (domains/kitting/script.py).
