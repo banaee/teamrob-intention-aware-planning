@@ -3945,9 +3945,7 @@ replaces the representation.
    instance is, and its interruption is judged on its own. `TASK_ABSENT` arises from human-only tasks and from
    `PersonalTask`s omitted per experiment. The queries replace labels A and B, `Provenance`, `Deviation`, string anchors
    and the key-counting `check_work_order` (`unperformed` replaces it).
-   Format (ccode's choice): one line per tick in a file of its own beside the run log,
-   `[rec] step=<n> stack=<top>;<suspended> action=<action>#<occurrence> progress=<done>/<total>`, tasks by their task
-   instance key, `stack=-` when empty; the sweep diffs it as it diffs the greps.
+→ RECORD [T-H/1] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: item 7, the stream's format (ccode's choice).
    `world_state_builder` exposes nothing of the human's stack; a test guards it (T-H2).
    SIMULATION ONLY: the record, coverage and the oracle IR exist in simulation only. A real human needs annotation of
    the same form.
@@ -3964,45 +3962,12 @@ replaces the representation.
    the existing `duration_key` mechanism, not `parameter_types`. The projector takes a stand's duration from the
    instance's binding.
 
-10. NOT PART OF T-H.
-    - IR is not redesigned. T-D resumes on this structure; T-D Q1 stays "what the robot infers and does when no
-      hypothesis explains the evidence, inside `unknown` or outside it", now with ground-truth cases: a switch to a
-      modelled task, a switch to a modelled task outside the support, a switch to an unmodelled task, a binding-level
-      deviation, no task on the stack, an episode's first ticks.
+→ RECORD [T-H/2] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: 10. NOT PART OF T-H (its first part).
       SETTLED BY T-D R (27 September 2026): "inside `unknown` or outside it": outside; the adequacy finding takes the explanatory role; T-D Q1 itself unchanged, P's building block. design_decisions.md, "T-D R and E".
     - Oracle-IR evaluation: its own pipeline task after T-H (TODO-101). Three conditions on the same scenario: no IR;
       IR; oracle IR, where the meta-planner receives `truth_at(tick)` instead of the belief. `truth_at` enters the
       robot's mind only through that condition's explicit adapter.
-    - Alternative 1 (a human mind that generates events; a stack-aware IR): recorded as the next architecture
-      direction, not scheduled (roadmap).
-    - Nested interruptions beyond one level: the stack allows them; the restriction is lifted only when a scenario
-      needs it (TODO-100).
-
-11. ACCEPTANCE ACROSS T-H: after each build, the 40 maintained baseline logs are rerun; robot-side lines (`[IR]`,
-    `[IR-dist]`, `[meta-*]`, decisions) must be byte-identical; human-side differences are listed and each explained. At
-    the end of T-H3 the new logs replace the stored baselines.
-
-THE BUILD, one session each, each under CLAUDE.md's BUILD DISCIPLINE (a plan step confirmed by Hadi, then the build):
-- T-H1 the tree, the task model and the two knowledge objects (items 2, 3, 9), and the destination check's move; the
-  migration of `domains/dock_loading/` and `ros_sim/` to the tree begins here (finished in T-H3). Its planning step
-  shows methods referencing `ActionSchema` objects and the support restriction comparing `HypothesisKey` values.
-- T-H2 the executor: `Event`, `Decision` (`Start`, `Drop`), `Trigger` (`AfterAction`, `DuringAction`, `Now`), `at`,
-  `during`, `inject`, the stack, the mid-action cut and the resumption rule, the record and its stream, the test that
-  `world_state_builder` exposes nothing of the stack (items 5 to 8). Its planning step shows how the cut and the resume
-  sit in the shared `Executor` without touching the robot's paths.
-- T-H3 the migration of the scenarios; deletion of the C1 vocabulary, `Deviation`, `Provenance`, `expand` /
-  `resolve_script` as a separate form, the key-based checks, `Stay`, `MoveTo` / `PickUp` / `Place`; `dock_loading`
-  and `ros_sim` migrated.
-- T-H4 the record's queries, `unperformed` and coverage (item 7); supersedes TODO-92.
-
-RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leaves to the build:
-- (T-H1) In the code at 19e7b8b `check_task_destinations` already runs on `assigned_tasks` only, for both agents, and
-  not on the human's `scheduled_tasks` (`mesa_sim/sim_model.py`, the T-B1a block). The move is to where the task model
-  and the robot's plans are checked.
-- (T-H1) `is_foreseeable` is read in the robot's mind at one place (`IntentionRecognizer._build_admissible_keys`);
-  `DomainKnowledge.get_assigned_intentions()` and `get_foreseeable_intentions()` read the two booleans and have no
-  caller. The per-domain `DomainModel.intentions` set is the nearest existing thing to the task model; today one
-  `DomainKnowledge` serves the robot and the human's script resolver alike.
+→ RECORD [T-H/3] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: item 10, Alternative 1 and nested interruptions; 11. ACCEPTANCE ACROSS T-H; THE BUILD; RECORDED AT WRITING (its first items).
 - (T-H1, as built) The knowledge objects live in one module, `shared/knowledge.py` (was `shared/domain_knowledge.py`):
   `ProceduralKnowledge` (was `DomainKnowledgeBase`; with `DomainModel` and its `intentions` it replaces: tasks,
   methods, actions, microactions, costs, how things are done), whose two forms are `Tree` and `TaskModel`, and
@@ -4011,8 +3976,7 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   landmark rule is checked in `Tree`'s constructor, the `HumanOnlyTask` rejection and the every-`WorkTask`
   requirement in `TaskModel`'s: the robot's inference reads no human-only-ness, construction-time validation of the
   knowledge objects may.
-- (T-H1, as built) The destination check runs where each robot's task model is built, on the robot's own assigned
-  tasks and those of the agent it observes; a human no robot observes is no longer checked (no scenario has one).
+→ RECORD [T-H/4] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H1, as built) where the destination check runs.
 - (T-H1, as built) The planner's entry points (`plan`, `decompose`, `is_complete`) take a `TaskInstance` and check
   its schema against their knowledge by identity (`ProceduralKnowledge.holds`); no task is looked up by name. A
   `HypothesisKey` holds its schema object (its `task_name` is the schema's name), so the recognizer and the projector
@@ -4071,18 +4035,7 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   `Unfired`, `Refused` and `INFEASIBLE` of the replay is a `ScriptError`; at run time they are recorded (the robot's
   effects). Several events per entry fire in authored order, each replayed against the state the previous one
   leaves. The exporter and the viewer's buttons are Phase 7's; `inject` is `HumanAgent.inject(decision)`.
-- (T-H3, as built) THE MIGRATION. Every registered scenario's human script is a `Script` (the list form is refused
-  by `AgentConfig`); `domains/kitting/scenarios.py` is written wholly in the kitting call form (`deliver_item("item_3",
-  table="kitting_table_0")`, `coffee_break(...)`, `ac_activation(...)`, `go_to(...)`, `stand(...)`, `go_to_and_stand(...)`),
-  explicit typed functions in `domains/kitting/script.py`, each building a `TaskInstance` of its schema with the
-  `Var`s read from the schema's parameters. They are kitting's (its schemas, its word `table=`): `world/` holds no use
-  case; the generic sugar (`Script`, `.at`, `.during`, `drop`) stays in `shared/types.py`. `table=` is written wherever
-  the old instance bound it (every kitting instance), so every task instance key, and every robot-side line, is
-  unchanged. The translation, per old edit: `interrupt(t, after=x, with_=[Y])` → `t.at(x, Y)`; `abandon(t, after=x,
-  then=[...])` → `t.at(x, drop)` then plain entries; `abandon(t, before=pick_up)` → `t.at(move_to, drop,
-  occurrence=0)` (the action before the anchor; `deliver_default` has two walks); `deviate(t, destination=k)` → the
-  instance with `table=k`; `MoveTo(landmark)` → `go_to(landmark)`; `Stay(n)` → `stand("PT<2n>S")` (n standing ticks at
-  the body's 2 s per step).
+→ RECORD [T-H/5] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H3, as built) THE MIGRATION.
   RULINGS ON THE PLAN (Hadi, 25 Sept 2026): (Q1) an interruption made of a walk to a landmark and a stay (scenarios
   03, 22, 52, 93) is one decision: the `HumanOnlyTask` `go_to_and_stand(?landmark, ?duration)` (proposed as `pause_at`,
   renamed at the report's confirmation for the literal name) = [`move_to(?landmark)`,
@@ -4094,12 +4047,7 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   the end of the run": the empty stack is the state a stand with no duration would have stood for, so no such stand
   exists. The duplicate check on `assigned_tasks` stays on task instance keys (TODO-107, settled with T-H4's task
   equality). `ProceduralKnowledge.get_action_schema(name)` removed with its last reader.
-  CHECKED: the 40 maintained logs and tb3's 8 unstored `single_task` runs are byte-identical to the T-C2b baselines
-  outside the `[human]` lines, the human's step lines included; the C1 `[human] primitive k:` lines are replaced by the
-  record's transitions (`entered:`, `completed:`); the `.rec` streams are the first non-empty baselines.
-- (T-H4) `assigned(task)` for a binding-level deviation of an assigned task (`deliver_item("item_1",
-  table="kitting_table_2")` against the assigned `deliver_item(item_1)`): whether the query compares the whole instance
-  or its enumerated bindings is part of the query's type, settled in T-H4.
+→ RECORD [T-H/6] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H3) CHECKED; (T-H4) the open point on `assigned`.
 - (T-H4, as built) THE QUERIES. `world/queries.py`, pure functions on the in-memory `Record`, importing `shared/` only:
   `truth_at(record, tick)` (the tick's `Snapshot`), `switches(record)` (every applied `Start`, authored or injected, on
   a task or on the empty stack; a `Drop` is not a switch but `Left(ABANDONED)`), `resumptions(record)`,
@@ -4130,14 +4078,10 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   `BindingAbsent` with its stated binding (ruling on the plan, Q1: the prompt's two-step rule gave s85's wrong-table
   delivery `COVERED`, since the table is determined and never enumerated); else `Covered`. A determined parameter
   with a lookup other than `destination_of` is an error, never silently `COVERED`.
-  THE COVERAGE LINE: `[coverage] <human> <robot> entry=<i> <task>=<value> start:<task>=<value>`, one per script entry
-  for each robot observing the human, printed by `SimModel._log_coverage` in the run log after the `[run]` headers
-  (read against the `[IR]` lines; the `.rec` unchanged). Information only; the same with the prior on and off. Every
-  entry of the maintained fixtures is `covered`.
+→ RECORD [T-H/7] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H4) THE COVERAGE LINE.
   THE ORACLE SEAM (TODO-101, recorded, not built): the adapter takes `truth_at(record, tick).stack[0]` and
   `coverage(top, robot)`; a `Covered` carries the `HypothesisKey` to put the belief's mass on.
-  CHECKED: the 40 maintained logs and tb3's 8 unstored `single_task` runs are byte-identical to the T-H3 baselines
-  outside the new `[coverage]` lines, and every `.rec` is byte-identical.
+→ RECORD [T-H/8] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H4) CHECKED.
 - (T-H follow-up, as built) SCENARIO COMPOSITION AND SCENARIO COVERAGE (Hadi, cchat, 26 September 2026). Batch runs
   and the viewer will select scenarios by what they contain; a tag declared on the scenario would be a second copy of
   the script and could drift, so both are computed at load and never stored: `ScenarioConfig` keeps its fields (id,
@@ -4161,8 +4105,7 @@ RECORDED AT WRITING (ccode, 25 September 2026), facts and points the ruling leav
   every registered kitting scenario in the same form, on its registered layout and the declared task model.
   Selection by composition or scenario coverage is not built (TODO-110). Of the registered scenarios, s42 is the one
   whose scenario coverage the exemption decides (`MODELLED_ONLY`; its script ends with `go_to(corner_SE)`).
-  CHECKED: the 40 maintained logs are byte-identical to the T-H4 baselines outside the new `[scenario-coverage]`
-  lines, and every `.rec` is byte-identical.
+→ RECORD [T-H/9] (moved verbatim, 2 October 2026): docs/records/T-H.md, under this entry's title: (T-H follow-up) CHECKED.
 Reference: Hadi's ruling and the rulings on the review, 25 September 2026; docs/handoffs/handoff_T-H.md; "The human
 action script (T-C1, decided)"; "Terms for human behaviour, model coverage and the robot's inference (ruled)"; "A
 run-time deviation is the same operation as a load-time edit" (Phase 7); TODO-80, TODO-85, TODO-86, TODO-87, TODO-92,
