@@ -6152,6 +6152,8 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
     KEPT (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL2): the condition stands. A new kind for
     the MPB's controlled scenarios is ruled there (one full pallet already in each delivery bay); the names of the kinds
     are not ruled.
+    READS (Hadi, 2 October 2026; T-G records 11; THE MPB ON DOCK_LOADING, DISPOSITIONS, D7): "a third kind" reads "kind 4"
+    ("one bay"). Kind 3, "pallets in the bays", is MPB-DL2's (two full pallets in each delivery bay, as amended).
   Staging: a milestone in stage 1's build, before the IR test-bed: one simple scenario per room runs from start to end.
   Stage 1's "before the plan" points on the layout and the setup (C1's "before each stage's plan the design chat and
   Hadi agree the layout and the setup") are closed by this entry for stage 1.
@@ -6747,6 +6749,9 @@ test-bed (MPB)".
   (analysis/kitting/mpb/coverage.md) is not repeated.
   Reason: T-G tests that the chain stays domain-independent. The chain's code is shared, and its paths are verified on
   kitting. A second full matrix would test the same paths again.
+  AMENDED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D4): cases (i) and (vii) are mixed scenarios with
+  declared properties. Reason: the entry tick of the scan is the robot's delivery tick, which is not derivable before
+  the run.
 - MPB-DL2, a new setup kind per room, for the MPB's controlled scenarios.
   The setup: one full unscanned pallet already in each delivery bay, designated to the bay it stands in; one full pallet
   in the truck designated to each delivery bay; two empty pallets in the empties container, designated to the truck.
@@ -6761,6 +6766,16 @@ test-bed (MPB)".
   calls for it) keeps its condition.
   The names of the new kind and of the conditional kind are not ruled. The records step proposed names in its report
   (T-G records 10); nothing that exists is renamed.
+  AMENDED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D2), a correction before any run: the new kind has two
+  full unscanned pallets in each delivery bay at the start, not one, each designated to the bay it stands in. Reason:
+  the same-motion case (MPB-DL1 (iii)) needs two scans in one bay; with one pallet per bay it cannot be a controlled
+  scenario. A scenario that assigns one scan per bay is unaffected: the other pallet's scan is outside the support.
+  CORRECTED (the same ruling; DISPOSITIONS, D3): "a break at the bay" is withdrawn; no break ends at a bay. The meeting
+  at a bay has two forms. Form 1: the human walks to the bay on an admitted scan while a delivery of the robot goes to
+  that bay. Form 2: the human stands at the bay after a scan (a `stand`, unmodelled behaviour), and the robot decides on
+  the fallback projection.
+  NAMED (the same ruling; DISPOSITIONS, D7): the new kind is kind 3, "pallets in the bays"; the conditional kind is kind
+  4, "one bay". Two setups of kind 3, for env_layout_03 and env_layout_04 (D6).
 - MPB-DL3, expected decisions. It answers, for stage 1, the third clause of C6: how the MPB's oracle derives an expected
   decision when the human's sequence depends on the robot's decisions.
   - Controlled scenarios: scripts independent of the robot only. Full expectations (trigger and cause, gate,
@@ -6770,6 +6785,10 @@ test-bed (MPB)".
     that they do.
   - Not taken: a check per decision derived from the logged state at the decision tick. Reason: it conditions on the run
     and needs new instrument code.
+  AMENDED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D1 and D5): the controlled scenarios are also bound by
+  the disjointness rule (MPB-DL7). A mixed scenario is either dependent on the robot, on kind 2, with declared
+  properties, or independent of the robot, on kind 3, with full expectations committed before the run. Each scenario
+  states its kind.
 - MPB-DL4, the robot's last task.
   The proposal "an authoring convention that the robot's last assigned task is a return" (FINDINGS OF THE SECOND
   MILESTONE SCENARIO; TODO-135's fourth instance) is CLOSED, NOT TAKEN.
@@ -6791,6 +6810,89 @@ test-bed (MPB)".
   fallback projection.
   Planned size: about 8 controlled and 4 mixed scenarios, 48 runs (two rooms, two strategies). The set is agreed with
   Hadi before it is authored.
+  CORRECTED (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D8): env_layout_04 also has the frozen bay and the
+  coffee machine in one direction from the standby place. The late-admission condition is untested by the MPB only for
+  the walk from the dry bay to the frozen bay in env_layout_02.
+  SUPERSEDED (the same date; THE SET below): the planned size reads 9 controlled and 4 mixed scenarios, 52 runs.
+- MPB-DL7, the disjointness rule (Hadi, 2 October 2026; T-G records 11; DISPOSITIONS, D1). An authoring constraint of
+  the controlled scenarios, checked per scenario before its runs: no pallet is named both by the robot's pool and by an
+  assigned scan of the human.
+  Reason: under it, with the prior on, no act of the robot changes the live set, the belief or the adequacy of a
+  hypothesis in the support (the records step's answer, T-G records 10: a scan reads `in_area` of the human and
+  `obj_at` of its own pallet; the robot moves only the pallets of its pool; inadmissible hypotheses are skipped before
+  the applicability check and stay pinned; the terminal facts, the boundary, the excess path, the standing and the
+  warrant are the human's own). It is the dock_loading form of kitting's rule (MPB-3).
+  It holds for controlled scenarios only. It is not generalised to mixed scenarios, where a delivery changes
+  applicability.
+DISPOSITIONS ON THE FLAGS OF T-G RECORDS 10 (Hadi, 2 October 2026; recorded in T-G records 11). D1 to D10 are Hadi's
+numbers; each is recorded where it applies:
+- D1, the disjointness rule: MPB-DL7.
+- D2, kind 3 with two pallets in each delivery bay: MPB-DL2, AMENDED.
+- D3, "a break at the bay" withdrawn, the two forms of the meeting at a bay: MPB-DL2, CORRECTED.
+- D4, cases (i) and (vii) mixed: MPB-DL1, AMENDED.
+- D5, a dependent mixed scenario on kind 2, an independent one on kind 3 with full expectations, each scenario stating
+  its kind: MPB-DL3, AMENDED.
+- D6, two setups of kind 3, for env_layout_03 and env_layout_04: MPB-DL2, NAMED.
+- D7, the names, kind 3 "pallets in the bays" and kind 4 "one bay": MPB-DL2, NAMED; B14's "a third kind", READS.
+- D8, the late-admission condition: MPB-DL6, CORRECTED.
+- D9, kind 3 is a test condition. No record describes the runs on kind 3 as the domain's work cycle: the pallets the
+  robot delivers there are never scanned (B1's reading is the work cycle; M1 below is the set's instance of it).
+- D10, the glossary: controlled scenario, mixed scenario, setup kind, disjointness rule, declared property, each
+  defined from its use in the records (`docs/glossary.md` §9).
+THE SET (agreed by Hadi, 2 October 2026; recorded in T-G records 11). Records only; nothing is authored or run. 9
+controlled scenarios (K1 to K9) and 4 mixed (M1 to M4; this set's, distinct from the IR test-bed's M1 to M4 above),
+each in env_layout_03 and env_layout_04, prior on, `single_task` primary and `full_reorder` second: 52 runs.
+Common to all: the human starts at the standby place and closes at the desk (B13); the robot starts on the truck side.
+On kind 3, pallet_0 and pallet_1 stand in the dry bay and pallet_2 and pallet_3 in the frozen bay. "scan n" is
+`confirm_delivered_pallet` of pallet_n. The robot's tasks on kind 3 are deliver-dry and deliver-frozen (the two truck
+pallets), return-1 and return-2 (the two empty pallets). Where no assignment is named, the human's assigned tasks are
+the script's scans. Every duration and cut point is derived from path lengths before any run, in the build's plan, and
+approved by Hadi; the plan shows per room that the geometry gives the declared case.
+Controlled (kind 3, a script independent of the robot, the disjointness rule, full expectations before the run):
+- K1, the control. Human: scan 2. Robot: deliver-dry, return-1. Tests: no hold at any decision; completion equal to a
+  comparison run with the same setup, pool and start and no human.
+- K2, admission and the admitted projection (meeting form 1). Human: scan 0, scan 2. Robot: deliver-dry,
+  deliver-frozen, return-1. Tests: the decision at the tick the gate clears, against the human's projected walk to the
+  bay the robot delivers to.
+- K3, the stand at a bay with an alternative task (meeting form 2). Human: scan 0, then a long `stand` at the dry bay.
+  Robot: deliver-dry, deliver-frozen, return-1. Tests: decisions on the fallback projection of a standing human, the
+  `projection_expired` cadence, the switch by cost.
+- K4, the stand at a bay with no alternative. As K3; the robot's pool is deliver-dry only. Tests: the robot holds; the
+  holds lengthen at each expiry.
+- K5, the same motion. Human: scan 0, scan 1. Robot: deliver-dry, deliver-frozen, return-1. Tests: the gate refuses
+  during the walk; the robot decides on the fallback projection of a walking human; scan 1 is admitted alone after
+  scan 0.
+- K6, a foreseeable task between scans. Human: scan 0, coffee_break, scan 2. Robot: all four tasks. Tests: admission
+  on observation warrant during the break walk; the boundary and the re-admission after it.
+- K7, the office. Human: scan 0, office_break, scan 2. Robot: all four tasks. Tests: the admitted projection through
+  the office door; the robot's decisions while the human is in another area.
+- K8, the change during an action. Human: scan 0 with coffee_break cut into its walk; scan 2. Robot: deliver-dry,
+  deliver-frozen, return-1. Tests: retraction, the fallback projection after it, re-admission.
+- K9, the admission that is wrong about the human. Human: assigned scan 0 only; script: scan 0, `go_to(standby_place)`
+  as an ordinary entry, a `stand` there, the desk. Robot: deliver-frozen, return-1. Tests: the walk to the standby
+  place admitted as a break (expected so, by the records), the robot's decision against it, the retraction when the
+  human stands. The run agreeing with the expectation is not a disagreement; the wrong reading is a finding about the
+  mind (MPB-DL1 (iv)). The script has no entry that waits for the robot. The repeatable standby entry is exercised in
+  M1, M2 and M4.
+Mixed (read only against the controlled ones):
+- M1, the domain's work cycle. Kind 2, dependent. Human: the scans of the four delivered pallets, the standby entry.
+  Robot: four deliveries, two returns. Declared properties: every robot task completes; every script entry closes; no
+  violation with a moving robot; each scan enters the live set on its delivery tick.
+- M2, pallets accumulate. Kind 2, dependent. As M1, with office_break after the first scan. Declared properties: as
+  M1, plus two scans applicable at once in one bay, and the robot's decision at an occupied bay.
+- M3, combined deviations. Kind 3, independent, full expectations. Human: scan 0 with coffee_break on arrival; scan 1;
+  scan 2; a `stand` at the frozen bay. Robot: all four tasks. Combines K5, K6 and K3.
+- M4, a dropped scan in the work cycle. Kind 2, dependent. Human: the first scan dropped during its walk;
+  coffee_break; the other scans; the dropped scan as a second entry; the standby entry. Robot: as M1. Declared
+  properties: as M1.
+Rules of the set:
+- The controlled scenarios run and are read first.
+- Nothing is adjusted to a result.
+- Findings are classified: kitting's five disagreement classes and the three readings of class 2 carry over (MPB-4).
+- The mixed runs with declared properties do not validate the recognizer's decisions (MPB-DL3).
+- Every run reports the separation counts: violations with a moving robot, and ticks below the minimum separation with
+  a standing robot (MPB-DL4).
+Not in the set: env_layout_02 (MPB-DL6); a dropped scan as a controlled scenario.
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
@@ -6843,3 +6945,7 @@ SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 10): the design of the
 DOCK_LOADING above, MPB-DL1 to MPB-DL6). Its three open points are answered: the setup with pallets already in the bays
 (MPB-DL2); the robot's last task as a return, not taken (MPB-DL4); expected decisions when the human's sequence depends
 on the robot (MPB-DL3). Next: the MPB set's scenarios, agreed with Hadi before they are authored.
+SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 11): the dispositions on the flags are recorded and the MPB
+set on dock_loading is agreed (THE MPB ON DOCK_LOADING above: MPB-DL7, DISPOSITIONS, THE SET; 13 scenarios, 52 runs).
+Next: the build's plan (the two setups of kind 3, the scenarios, every duration and cut point derived from path lengths,
+the per-room derivation that the geometry gives each declared case), approved by Hadi before the build.
