@@ -1466,6 +1466,10 @@ analysis/t5_continue/ (deleted in the analysis cleanup, September 2026; carried 
 Reference: fixture-design session, September 2026; T5 session, September 2026
 
 **TODO-44 — `assignment_prior` config key and CLI flag are misnamed**
+FLAGGED AGAIN (T-G stage 1.5, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the
+recognizer's belief", NAMES FLAGGED): with the context weight (ω_context) and the prior base, for renaming at stage
+1.5's build, not now. R3 gives the robot a prior made of declared strengths, so the switch's name now collides with a
+term of its own (glossary §5, **prior**).
 `configs/experiment.yaml: assignment_prior` and `--assignment_prior` now switch a support
 *restriction*, not a prior — nothing is weighted (design_decisions.md, "Assigned-task pool is
 a support restriction, not a prior"). The name is a leftover from the first build. Also
@@ -2291,6 +2295,9 @@ Files: shared/recognizer.py (`_output`, `BeliefState.confidence`), shared/meta_p
 Reference: I1 audit; I5 hand-back; θ single-source session, September 2026
 
 **TODO-66 — The context / knowledge-representation pass: `_context_weight` branches on literal task names** [DEFERRED deliberately]
+RULED (T-G stage 1.5, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's
+belief"; design_records.md, "T-G stage 1.5", THE CUT): stage 1.5's build removes the domain task names and constants
+from the recognizer and closes this item; the context weight is replaced by the prior of R2 and R3. Not built.
 NOTE (T-G C1, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", C1): T-G's stage 1.5, context
 knowledge (framework-wide, after stage 1 and before stage 2, from its own handoff), opens the question this item defers:
 a context timeline in the scenario changing a fact at an authored point of a run, applied by the environment, and both
@@ -4410,6 +4417,11 @@ of the 147 true stretches in the support reach the threshold (38, 40, 20 of 49 b
 from the standby place to the dry bay, scan 0's first walk never reaches it with three or more rivals live). It joins
 stage 1.5's question on what sets a hypothesis's share at the start of an episode as its measured baseline (the per-row
 table: the T-G block named above).
+RULED (T-G stage 1.5, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's
+belief", R2 to R4), on the four determinants: the assignment and context facts set the prior (R3); the share is
+divided equally inside assigned work (R4); the task that just ended (succession) is open for T-G stage 2 (R4); a
+preference for a task that has just become applicable, the enabling event of this item, is not taken and is not future
+work (R4: no defensible meaning or magnitude). Not built.
 Files: shared/recognizer.py, shared/meta_planner.py (no change)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
 
@@ -4467,6 +4479,10 @@ NOTE (T-G records 8, not a ruling): Q16 concerns the walk to the standby place; 
 walk, is not ruled by it (B13's note: the desk is a landmark in stage 1, so no hypothesis, as for kitting's exit walk).
 Related, for stage 1.5, NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, context
 facts, the task that just ended, an enabling event; one mechanism); design_decisions.md, C1, STAGE 1.5.
+NOT TAKEN FOR STAGE 1.5 (T-G stage 1.5, R3, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in
+the recognizer's belief"), recorded here: a share of the prior for "none of the modelled tasks". When no assigned task
+is live the prior is normalised over the live foreseeable tasks alone and is conditional on one of them. Such a share
+would reopen T-D R1 (no residual hypothesis).
 Files: domains/dock_loading/tasks.py (the task model), shared/recognizer.py
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; docs/handoffs/plan_T-G_stage1.md, section 5; TODO-140, TODO-154
 
@@ -4497,3 +4513,48 @@ REVIEWED (Hadi, 2 Oct 2026; design_decisions.md, "T-G: the second domain's rulin
 the value stays 90 seconds for the MPB. Reason: no value is changed for a test set.
 Files: domains/dock_loading/tasks.py (`office_break`)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B6
+
+**TODO-158: Duration uncertainty and a projection that depends on context (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
+A conceptual direction (T-G stage 1.5, R6). In V1 a task keeps one declared duration, and context changes how strongly
+the robot considers a task, not the content of a projection; the only path from context to the projection is prior,
+belief, gate, projection of the admitted task. An uncertain or context-dependent duration (Hadi's example: an office
+visit of 20 to 30 seconds to fetch something, or 90 to 120 seconds of office work) changes what a projection is and how
+realization reads it: planning under an uncertain projection, separate from the prior. A5 of the rulings (the robot's
+declared duration and the human's actual duration match) holds until then.
+Files: shared/projection.py, shared/meta_planner.py (realization)
+Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R6, A5; "The human's
+wait duration in the projection is the schema's, converted by the body (TODO-32, R2)"
+
+**TODO-159: Unobservable states of the human as context (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
+A conceptual direction. In stage 1.5 a context fact is derived from context values, measured or scheduled quantities of
+the situation (glossary §5); a state of the human the robot cannot observe (fatigue, for one; the present
+`ContextKnowledge.shift_duration` calls itself a proxy for it) is not one. Whether and how such a state enters the
+robot's knowledge is not designed in V1.
+Files: shared/knowledge.py (`ContextKnowledge`), shared/recognizer.py
+Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief"; TODO-66
+
+**TODO-160: Scopes of knowledge (general, sector, domain) and norms (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
+A conceptual direction. In stage 1.5 the context facts, occurrence conditions and strengths are declared per domain,
+each strength with its source. Knowledge that holds at a wider scope (general, a sector, a domain) and norms of a site
+are not designed in V1.
+Files: shared/knowledge.py, domains/
+Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3, A4
+
+**TODO-161: Validation of the strengths on site data (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
+A conceptual direction (T-G stage 1.5, R3, A4). A declared strength is a modelling assumption until a site measures
+it. Its proposed operational meaning, to be validated and not claimed: a ratio of counted task starts (starts of the
+foreseeable task over starts of any assigned task), counted over task starts at which both were applicable, in the
+stated situation; a ratio of counts, not a probability. Validating it, and the stability of the strengths across sites
+(A4: not claimed), needs site data.
+Files: domains/ (the declared strengths and their sources)
+Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3, A4
+
+**TODO-162: The robot without knowledge of the assignment (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
+A conceptual direction (T-G stage 1.5, R9): the support restriction (the switch named `assignment_prior`) is on by
+default for every further analysis and test in V1; the robot that does not know the human's assigned tasks is future
+work. Recorded only: the run option's default is still off (TODO-139), and prior off stays a recognizer diagnostic and
+ablation configuration (`docs/assumptions.md` 1.4). R3's prior is stated for a robot that knows the assignment
+(assigned work as a whole contributes 1).
+Files: configs/experiment.yaml, shared/recognizer.py
+Reference: design_records.md, "T-G stage 1.5", R9; design_decisions.md, "T-G stage 1.5: context knowledge in the
+recognizer's belief", R3; TODO-44, TODO-139
