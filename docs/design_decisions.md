@@ -3,6 +3,12 @@
 Key architectural agreements for the Intention-Aware Adaptive Planning Framework.
 This is a living reference of *why* things are designed the way they are.
 
+> **The records split (Hadi, 2 October 2026).** This file holds the conceptual design. The record of planning and
+> building (domain rulings, staging, plans, build blocks with commits, acceptance, test-bed sets and their method,
+> expectations, dispositions, results) moved verbatim to `docs/records/<task>.md`, one file per task. An index line
+> `→ RECORD [<id>]` stands where each block was and names the file; there the block is headed by this file's entry
+> title and the same id. Where a new ruling goes: CLAUDE.md, "Where a ruling is recorded".
+
 > **Terms:** `docs/glossary.md` gives each term one meaning. The entries below are the HISTORICAL
 > RECORD and are left exactly as they were written, so some of them use a term differently from the
 > glossary (the conflicts are listed in the glossary task's report). Read an entry in the terms of

@@ -45,6 +45,10 @@ Relevant (read as needed):
   coverage, the adequacy finding and "unexplained"); the glossary stays authoritative.
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
+- The record of planning and building, one file per task (the records split, 2 October 2026):
+  `docs/records/<task>.md` (`T-G_stage1`, `T-G`, `T-D`, `T-L`, `T-H`, `T-C`, `T-B`, `T-A`, `phase4`). A session reads
+  its own task's file. In `design_decisions.md` an index line `→ RECORD [<id>]` stands where a moved block was; the
+  record file heads the block with the entry's title and the same id, so a citation by title and label resolves.
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
   human behaviour model"; glossary §6 and §7). Read it in every T-H session. `docs/terminology_revision.md` §8 states
   what T-H changed in the 24 Sept terms.
@@ -55,6 +59,16 @@ Relevant (read as needed):
   paths in dated entries and frozen reports: `docs/rename_table.md`, "Paths: the sort".
 - `analysis/<domain>/<task>/REPORT.md`: only the reports a task names. Rows in older reports may be
   stale (earlier projection, recognizer or layouts); their findings are cited, not re-derived.
+
+Where a ruling is recorded (Hadi, 2 October 2026). `docs/design_decisions.md` holds conceptual design: what the
+framework's mind, the world's side or their contract does or must do, in any domain and at any stage, superseded
+statements of that kind included, with the measurement that is its stated premise. Everything else goes to
+`docs/records/<task>.md` of the task that made it (a closed stage of an open task: `<task>_stage<n>.md`): the method
+of verifying the design, authoring conventions, domain rulings, staging, plans, build blocks with commits, acceptance,
+test-bed sets, expectations, dispositions, results. A ruling made in a domain or test-bed discussion goes by its
+content. A mixed ruling is cut at the block: its conceptual part under its entry in `design_decisions.md`, its record
+part in the task's file under the same entry title. A dated amendment goes where the text it amends is; a short BUILT
+line goes with the ruling it reports. Unclear: ask Hadi.
 
 Never read, edit, or treat as a source of truth:
 - Any file or directory named `my_*`, `old_*`, `archive_*` (personal notes and backups).
