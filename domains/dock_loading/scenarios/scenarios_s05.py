@@ -5,8 +5,10 @@ env_layout_03; design_decisions.md, "T-G: the second domain's rulings", B14).
 One module per setup.
 """
 
-from shared.types import AgentConfig, RepeatableEntry, ScenarioConfig, Script, ScriptDependence
-from domains.dock_loading.script import confirm_delivered_pallet, deliver_pallet, go_to, load_return
+from shared.types import AgentConfig, RepeatableEntry, ScenarioConfig, Script, ScriptDependence, drop
+from domains.dock_loading.actions import move_to, scan_it
+from domains.dock_loading.script import (coffee_break, confirm_delivered_pallet, deliver_pallet, go_to, load_return,
+                                         office_break)
 
 
 # A viewing fixture: the scene loads and initialises; not a baseline, not an
@@ -130,6 +132,181 @@ scenario_s05_03 = ScenarioConfig(
                 deliver_pallet("pallet_1"),
                 deliver_pallet("pallet_2"),
                 load_return("pallet_4"),
+            ],
+        ),
+    ],
+)
+
+
+# The MPB on dock_loading (design_decisions.md, "T-G: the second domain's rulings", THE MPB ON DOCK_LOADING, THE
+# SET): its mixed scenarios on kind 2, M1 as _04, M2 as _05, M4 as _06. Declared properties in
+# analysis/dock_loading/mpb/properties.py.
+scenario_s05_04 = ScenarioConfig(
+    id="scenario_s05_04",
+    setup="env_setup_05",
+    reference_layouts=["env_layout_03"],
+    description=(
+        "MPB on dock_loading, M1, the domain's work cycle: the human scans the four delivered pallets as they "
+        "become applicable. Declared properties: every robot task completes; every ordinary entry of the script "
+        "closes and the closing part completes; no violation with a moving robot; each scan enters the live set "
+        "on the tick its pallet's delivery is observable. Mixed (THE SET; MPB-DL3 as amended): kind 2, the script "
+        "declared dependent on the robot (each scan waits for its delivery), declared properties only, read only "
+        "against the controlled scenarios; these runs do not validate the recognizer's decisions. The robot "
+        "delivers the four full pallets and returns the two empty ones; the human starts at the standby place, "
+        "takes the standby entry whenever no scan is applicable, and closes at the desk; prior on. Contains "
+        "behaviour with no hypothesis: the walks to and stays at the standby place, the walk to the desk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    confirm_delivered_pallet("pallet_3"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s05_05 = ScenarioConfig(
+    id="scenario_s05_05",
+    setup="env_setup_05",
+    reference_layouts=["env_layout_03"],
+    description=(
+        "MPB on dock_loading, M2, pallets accumulate: as M1, with an office_break after the scan of pallet_2 (an "
+        "event on that named entry, M2 as amended). Declared properties: as M1. Reported, not declared: whether "
+        "two scans were applicable at once in one bay, and whether the robot decided while the human stood at the "
+        "bay of its delivery. Mixed (THE SET; MPB-DL3 as amended): kind 2, the script declared dependent on the "
+        "robot (each scan waits for its delivery), declared properties only, read only against the controlled "
+        "scenarios; these runs do not validate the recognizer's decisions. The robot delivers the four full "
+        "pallets and returns the two empty ones; the human starts at the standby place, takes the standby entry "
+        "whenever no scan is applicable, and closes at the desk; prior on. Contains behaviour with no hypothesis: "
+        "the walks to and stays at the standby place, the walk to the desk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2").at(scan_it, office_break("office_chair"), occurrence=0),
+                    confirm_delivered_pallet("pallet_3"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s05_06 = ScenarioConfig(
+    id="scenario_s05_06",
+    setup="env_setup_05",
+    reference_layouts=["env_layout_03"],
+    description=(
+        "MPB on dock_loading, M4, a dropped scan in the work cycle (M4 as amended): the scan of pallet_2 is "
+        "dropped during its walk (PT28S, the IR test-bed's approved value); the scan of pallet_3 has a "
+        "coffee_break on arrival; the dropped scan is a second entry. Declared properties: as M1. Mixed (THE SET; "
+        "MPB-DL3 as amended): kind 2, the script declared dependent on the robot (each scan waits for its "
+        "delivery), declared properties only, read only against the controlled scenarios; these runs do not "
+        "validate the recognizer's decisions. The robot delivers the four full pallets and returns the two empty "
+        "ones; the human starts at the standby place, takes the standby entry whenever no scan is applicable, and "
+        "closes at the desk; prior on. Contains behaviour with no hypothesis: the walks to and stays at the "
+        "standby place, the walk to the desk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_2").during(move_to, "PT28S", drop, occurrence=0),
+                    confirm_delivered_pallet("pallet_3").at(move_to, coffee_break("coffee_machine_0"), occurrence=0),
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
             ],
         ),
     ],
