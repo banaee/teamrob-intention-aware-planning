@@ -773,6 +773,12 @@ Reference: Phase 4C meta_planner build session, September 2026
 
 **Assigned-task pool is a support restriction, not a prior**
 SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` in the admissible set, "the escape hatch for behaviour outside the model": the `unknown` hypothesis leaves the hypothesis space (R1); the support restriction stands (R6). design_decisions.md, "T-D R and E".
+SUPERSEDED IN PART (T-G stage 1.5, R8, Hadi, 2 October 2026; not built): kept, the assignment restricts the support and
+is not a weight. Revised, "every admissible hypothesis carries unit weight" (the sentence as TODO-40's resolution states
+this entry's outcome): declared strengths replace unit weight between assigned work and the foreseeable tasks (R3).
+The entry's surviving concern: a number must not decide between hypotheses that the robot has no knowledge to tell
+apart (R4 satisfies it among assigned tasks). design_decisions.md, "T-G stage 1.5: context knowledge in the
+recognizer's belief", R3, R4, R8.
 What the robot knows when it knows the human's `assigned_tasks` is *"the human's task lies
 in this set"* — a restriction on the support of the belief. The first build encoded it as a
 magnitude: hypotheses in the pool weighed `ASSIGNED_TASK_PRIOR` = 10.0, all others 1.0. A
@@ -4886,3 +4892,101 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
 → RECORD [T-G/5] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: C1 from "A3, A4, A5 and A9 each change code outside the domain" (stage 1's BUILT lines, stage 2, stage 3, the rulings with no stage), C2 to C6.
 
 → RECORD [T-G_stage1/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: STAGE 1 PLAN APPROVED; STAGE 1, STEPS 0 TO 5 BUILT; STAGE 1, STEPS 6 TO 8 BUILT; FINDINGS OF THE MILESTONE; NOTES FROM THE INDEPENDENT REVIEW; A STEP ADDED; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT; FINDINGS OF THE SECOND MILESTONE SCENARIO; RULED: T-G Q16 (T-G Q16's block) and the IR test-bed set; STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; RULED: THE MPB ON DOCK_LOADING (MPB-DL1 to MPB-DL6); DISPOSITIONS; THE SET; RULED ON THE SET; THE BUILD'S PLAN, CONFIRMED; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN; T-G STAGE 1 CLOSED; PROPOSALS; Reference; the Next lines.
+
+**T-G stage 1.5: context knowledge in the recognizer's belief (ruled by Hadi, 2 October 2026)**
+
+Ruled in cchat (the T-G design chat), 2 October 2026; recorded the same day, before any build. Records only: nothing in
+this entry is built. Each ruling carries its reason. The conceptual part is here; the cut (what stage 1.5 builds), the
+queue (T-K), R9 and the open items of the stage are in `docs/design_records.md`, under this title (index line below).
+Terms: `docs/glossary.md` §5 (context knowledge, context value, context fact, membership function, occurrence
+condition, strength, prior) and §8 (T-K).
+
+- R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
+  and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
+  hypotheses are live and are not context knowledge.
+  Reason: the robot's knowledge about the human is not a law of the human. A script may be authored to agree with it
+  for a test; that is test authoring. Applicability already has its owner (the methods' conditions, liveness by
+  applicability).
+
+- R2, the belief. At each run of the recognizer, belief = normalise(prior × evidence) over the live hypotheses. The
+  prior is evaluated on the context facts that hold at the present tick. The evidence is the likelihood accumulated in
+  the present episode and contains no context. The prior enters once and is never folded into the evidence. Adequacy
+  and warrant do not read the prior.
+  Reason: context is knowledge the robot has before the movement, so it belongs in the prior. Folding it into the
+  evidence counts one fact again at every tick (the reason the code already gives for applying the context weight to
+  the output only).
+  This is a calculation at each run, not a sequential update with a fixed prior.
+  Not taken: a prior fixed at the start of the episode (it uses outdated facts when the human switches tasks inside an
+  episode). Rejected earlier and still rejected: a weight multiplied in at every tick.
+
+- R3, the prior. It is the normalisation of the strengths of what is live.
+  - Assigned work as a whole contributes 1 while at least one assigned task is live, and 0 otherwise. It is a level
+    that partitions, not a hypothesis.
+  - Each live foreseeable task contributes its declared strength, relative to assigned work as a whole.
+  - Each share is a contribution divided by the sum of the contributions.
+  - The share of assigned work is divided among the live assigned tasks (R4).
+  - A foreseeable task declares a low strength and a high strength. The low strength applies when its occurrence
+    condition is not satisfied, the high strength when it is satisfied. A foreseeable task with no occurrence condition
+    declares one strength.
+  - Each declared strength carries its source. It is a modelling assumption until a site measures it.
+  Reason: the prior probability of a foreseeable task should not depend on the number of live assigned tasks. Equal
+  shares for all hypotheses assert equal strengths, which was never argued.
+  Proposed operational meaning, to be validated, not claimed: a strength is a ratio of counted task starts (starts of
+  the foreseeable task over starts of any assigned task), counted over task starts at which both were applicable, in
+  the stated situation. It is a ratio of counts, not a probability.
+  When no assigned task is live, the same normalisation runs over the live foreseeable tasks alone. This prior is
+  conditional on one of the modelled foreseeable tasks; it has no option "none of the modelled tasks".
+  Not taken for this stage: a share for "none of the modelled tasks"; recorded under TODO-155, with the note that it
+  would reopen T-D R1 (no residual hypothesis).
+
+- R4, division inside assigned work: equal among the live assigned tasks, for this stage.
+  Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
+  Open, for T-G stage 2: whether succession between tasks affects the division (to be argued with `store_pallet`
+  present).
+  Not taken, and not future work: a preference for a task that has just become applicable (no defensible meaning or
+  magnitude).
+
+- R5, degrees (ruled as design; built later, in T-K).
+  - A context fact is satisfied to a degree in [0, 1]. A crisp fact has only 0 and 1.
+  - A membership function gives the degree from a context value. It is declared knowledge with its source.
+  - A condition over several facts takes the minimum for "and", the maximum for "or", and 1 minus the degree for "not".
+    These are the selected operators, one choice among several in fuzzy logic. Overlapping reasons do not accumulate.
+  - strength = low + degree × (high − low).
+  - The linear rule and the operators are stated modelling choices, not consequences of Bayes' rule.
+  Stage 1.5 builds crisp context facts only. A crisp fact is the special case, so the later task changes nothing in R2
+  to R4. Recorded cost: with crisp facts the prior changes at one tick, where the approximation of A2 (below) has its
+  largest error.
+
+- R6, duration and projection. A task keeps one declared duration. Context changes how strongly the robot considers a
+  task; it does not change the content of a projection. The only path from context to the projection is: prior,
+  belief, gate, projection of the admitted task.
+  Reason: an uncertain or context-dependent duration changes what a projection is and how realization reads it. That
+  is a topic of planning under an uncertain projection, separate from the prior.
+
+- R7, gate policy, stated; no change to the gate. An assigned task may be admitted before any movement, on its
+  commitment warrant, when its belief reaches the threshold on the prior. The prior is the robot's relative
+  expectation; it is not evidence that the human has started the task. Adequacy tests the hypothesis afterwards and can
+  cause the retraction. A foreseeable task still needs observation warrant.
+
+- R8, the entry "Assigned-task pool is a support restriction, not a prior" is revised in one sentence. Kept: the
+  assignment restricts the support and is not a weight. Revised: "every admissible hypothesis carries unit weight";
+  declared strengths replace unit weight between assigned work and the foreseeable tasks. The entry's surviving
+  concern: a number must not decide between hypotheses that the robot has no knowledge to tell apart (R4 satisfies it
+  among assigned tasks). The entry is marked SUPERSEDED IN PART, with a pointer here; nothing in it is deleted.
+
+ASSUMPTIONS, recorded with the rulings (not added to `docs/assumptions.md`):
+- A1. Given the task, the human's movement does not depend on the context.
+- A2. The prior uses the present facts. The exact model would use the facts at the moment the human chose the task.
+  The robot does not know that moment; the approximation avoids a model of when the human chooses or switches.
+- A3. Equal division inside assigned work expresses absence of knowledge.
+- A4. The strengths are declared values with a proposed empirical meaning; their stability across sites is not claimed.
+- A5. The robot's declared duration and the human's actual duration match (already on record: "The human's wait
+  duration in the projection is the schema's, converted by the body (TODO-32, R2)", its ASSUMPTION line).
+- A6. A foreseeable task competes with assigned work as a whole, independently of the number of live assigned tasks.
+- A7. The ratio between the strengths of two foreseeable tasks holds also when no assigned task is live. This is an
+  extrapolation.
+
+NAMES FLAGGED for renaming at the build, not renamed now: the context weight (ω_context, `_context_weight`), the prior
+base, `assignment_prior` (TODO-44 already notes the last).
+
+→ RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered.

@@ -1512,6 +1512,14 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   such as the robot's own delivery (TODO-154). They are designed as one mechanism. Also Hadi's ideas for stage 1.5, NOT
   RULED: the duration of a foreseeable task is not one fixed number; temporal context can be a fuzzy set with a degree
   of membership.
+  RULED (Hadi, 2 October 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief";
+  the record in "T-G stage 1.5" below): the open questions above are answered there, except as stated. The form of a
+  context fact: R5 (a degree in [0, 1]; stage 1.5 crisp only). Start or interruption: neither; context drives no task
+  of the human (R1). The prior under context, and the share at the start of an episode: R2 to R4 (the assignment and
+  context facts; the task that just ended is open for stage 2, R4; an enabling event's preference not taken, R4). The
+  duration: one declared duration (R6; its uncertainty is FW). The perception assumption: open (open item 2). Liveness
+  when a condition turns false during execution ("applicable to start" against "valid to continue"): not answered by
+  the rulings; R1 keeps the conditions of tasks in the task model and A4 as built stands.
   A requirement on stage 1's plan (the same ruling): the form built for A5 admits a fact that no action changes and that
   is not the state of a movable object. Reason: context knowledge then needs no second mechanism. Stage 1 authors no such
   fact.
@@ -2417,3 +2425,39 @@ THE MPB ON DOCK_LOADING RUN; 52 runs; the 40 with full expectations agree with t
 close of stage 1 (handoff_T-G_stage1_MPB_onward.md, section 6).
 SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 15): T-G stage 1 is closed (T-G STAGE 1 CLOSED above). Next:
 to be named by Hadi.
+SUPERSEDED (Hadi, 2 October 2026; T-G stage 1.5 below): the stage named is 1.5, and its design is ruled. Next: its
+three open items, then its build's plan.
+
+## T-G stage 1.5: context knowledge
+
+**T-G stage 1.5: context knowledge in the recognizer's belief (ruled by Hadi, 2 October 2026)** — RECORD [T-G_stage1.5/1], written 2 October 2026; the conceptual part (R1 to R8, the assumptions A1 to A7) is in docs/design_decisions.md under this title.
+Ruled in cchat, 2 October 2026; recorded before any build. Nothing is built.
+
+R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
+in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
+(`configs/experiment.yaml`, false; TODO-139) is not changed now.
+
+THE CUT AND THE QUEUE.
+- T-G stage 1.5 builds: R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts, and the
+  removal of the domain task names and constants from the recognizer (TODO-66; stage 1.5's build closes it).
+- T-K, a new task, holds the build of R5 (degrees: membership functions, the operators, the linear rule for a
+  strength). Its place: the end of the V1 queue, after track 3b (roadmap, "The plan from T-A", the order block;
+  CLAUDE.md's state). The letter was verified unused in the repository before it was taken (2 October 2026).
+- Future work, each a TODO tagged [FW]: duration uncertainty and a projection that depends on context (TODO-158);
+  unobservable states of the human as context (TODO-159); scopes of knowledge (general, sector, domain) and norms
+  (TODO-160); validation of the strengths on site data (TODO-161); the robot without knowledge of the assignment
+  (TODO-162).
+
+OPEN ITEMS OF STAGE 1.5 (recorded as open; nothing decided):
+1. The values for the two domains: the context facts, each foreseeable task's occurrence condition, its strengths and
+   their source. Hadi states them.
+2. The perception assumption: how the robot obtains a context value.
+3. The tests of the stage: a script that agrees with an occurrence condition, a human who acts against it, a duration
+   mismatch.
+
+Also recorded: the open questions of C1, STAGE 1.5 (the T-G heading above) are answered by the rulings, except the
+liveness of a hypothesis whose condition turns false while the human executes its task, which is not answered (C1,
+STAGE 1.5, its RULED line). Hadi's earlier idea of a context fact that triggers or interrupts a task of the human is
+superseded by R1 for this stage (`docs/handoffs/T-G_forward_inputs.md`, section 5, its dated note).
+
+Next: the three open items, then stage 1.5's build plan (BUILD DISCIPLINE, step 1).
