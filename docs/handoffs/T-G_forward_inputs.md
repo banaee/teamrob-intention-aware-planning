@@ -173,8 +173,9 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 State on 3 October 2026: the design is ruled and recorded. Nothing is built. Three content points are
 open and come before the build (5.4).
 Records: docs/design_decisions.md, the entry "T-G stage 1.5: context knowledge in the recognizer's
-belief" (rulings R1 to R8, assumptions A1 to A7, amendments AM1 to AM9, corrections C1 to C4);
-docs/design_records.md, the heading "T-G stage 1.5" (the cut, T-K, the open items, the build's list).
+belief" (rulings R1 to R8, assumptions A1 to A7, amendments AM1 to AM9, corrections C1, C3 and C4). Correction
+C2, the caveat on the long runs, stands in docs/design_records.md under "T-G stage 1", in TODO-66 and in the MPB
+report. docs/design_records.md, the heading "T-G stage 1.5" (the cut, T-K, the open items, the build's list).
 Where this section and those records disagree, the records win.
 
 ### 5.1 The design in plain words [ruled]
@@ -186,8 +187,8 @@ Where this section and those records disagree, the records win.
   context knowledge.
 - The belief. At each run of the recognizer, the belief is the prior multiplied by the evidence, then
   normalised over the live hypotheses. The prior is evaluated on the context facts that hold at the
-  present tick. The evidence is what the observed movement of the present episode says, with no context
-  in it. The prior enters once and is never folded into the evidence. Adequacy and warrant do not read
+  present tick. The evidence is the likelihood accumulated in the present episode (movement, standing and
+  completion events), with no context in it. The prior enters once and is never folded into the evidence. Adequacy and warrant do not read
   the prior. The rules on re-entry and on the episode boundary describe the evidence (it restarts equal;
   a returning hypothesis takes 1/|H| of it).
 - The prior. It is the normalisation of the strengths of what is live. The human's work as a whole
@@ -204,8 +205,8 @@ Where this section and those records disagree, the records win.
   1.5 it is one context fact or a conjunction of context facts.
 - A context fact is a declared fact derived from context values (the clock time, the temperature). In
   stage 1.5 it is crisp: it holds or it does not hold.
-- Two independent run options, both on by default: assignment_knowledge (today's assignment_prior) and
-  context_knowledge (new). With context_knowledge off the prior is equal over the live hypotheses. Each
+- Two independent run options, both on by default from the build (today assignment_prior defaults to off):
+  assignment_knowledge (today's assignment_prior) and context_knowledge (new). With context_knowledge off the prior is equal over the live hypotheses. Each
   "off" is an ablation or a diagnostic.
 - Gate policy, no change to the gate: an assigned task may be admitted before any distinguishing
   movement, on its commitment warrant. The prior is the robot's expectation, not evidence that the human
@@ -216,16 +217,18 @@ Where this section and those records disagree, the records win.
 - The earlier decision "Assigned-task pool is a support restriction, not a prior" is revised in part:
   the assignment still restricts the support and sets no weight; declared strengths replace unit weight
   between work as a whole and the foreseeable tasks.
-- Superseded by these rulings: Hadi's earlier sketch in which a context fact triggers a foreseeable task
+- Superseded for this stage by these rulings: Hadi's earlier sketch in which a context fact triggers a foreseeable task
   of the human or interrupts a task in progress.
 
 ### 5.2 What the build of stage 1.5 contains [ruled]
 
 - The prior as in 5.1, with crisp context facts.
-- A timeline of context facts in the scenario: a fact changes at an authored tick. The environment
-  applies it; the robot's world state carries it; the recognizer reads it there.
+- A timeline of context facts in the scenario: a fact changes at an authored tick [ruled]. How the
+  fact reaches the recognizer is not ruled; it depends on open item 2. The design chat's sketch
+  [chat only]: the environment applies it, the robot's world state carries it, the recognizer reads
+  it there.
 - The declarations of context knowledge per domain: the context facts, and per foreseeable task its
-  occurrence condition and its strengths.
+  occurrence condition and its strengths. [implied by the rulings on the strengths; the values are open item 1]
 - The two run options, their names and their defaults.
 - The removal of the two domain task names and the four constants from the recognizer (TODO-66). The
   present hardcoded weight multiplies coffee_break by 2.5 from step 500 in every run (found on 3 October
@@ -261,25 +264,28 @@ Each is put to Hadi one at a time. None is decided.
    - Break time with soft edges: 9:15 to 9:30 partly, 9:30 to 10:00 fully, 10:00 to 10:15 partly. The
      soft edges need T-K; in stage 1.5 the fact is crisp.
    - A/C: the temperature rises near 25 degrees, the room is warmer than it should be, and turning on
-     the A/C is likely. Turning on the A/C changes the temperature: an action may change a context
-     value, never a context fact directly.
+     the A/C is likely. Turning on the A/C changes the temperature: in this stage an action may
+     change a context value and never sets or removes a context fact directly.
    - The numbers used in the design chat's examples (coffee break 0.05 and 3, office break 0.05, A/C
      0.01 and 0.5) were illustrations only.
-2. The perception assumption: how the robot obtains a context fact. The existing assumption for object
+2. The perception assumption: how the robot obtains a context value. The existing assumption for object
    states (the robot knows them through the site's system) is the likely model. Nothing is written.
 3. The tests of the stage: a script that agrees with an occurrence condition; a human who acts against
    it; a duration mismatch (the human's actual duration differs from the robot's declared one).
 
-Also open, Hadi's choice: whether A1 (given the task, the movement does not depend on the context), A5
-(the declared and the actual duration match) and possibly A4 go into docs/assumptions.md. ccode thinks
-A1 and A5 belong there.
+Also open, Hadi's choice [chat only; the records say only that A1 to A7 are not added to
+docs/assumptions.md]: whether A1 (given the task, the movement does not depend on the context), A5
+(the declared and the actual duration match) and possibly A4 go into that file. ccode's view, stated
+in a report and not recorded: A1 and A5 belong there.
 
-### 5.5 What the build must respect [recorded, with one chat-only item]
+### 5.5 What the build must respect [recorded, with two chat-only items]
 
-- The stage is framework-wide. The acceptance includes kitting.
+- The stage is framework-wide: it concerns kitting and dock_loading alike [recorded]. The build's
+  acceptance includes kitting [chat only].
 - With both options on, every existing run with assignment knowledge on changes, also with no context
-  fact declared: each foreseeable task has its low strength in place of an equal share [chat only: the
-  design chat's statement of this consequence].
+  fact declared: each foreseeable task has its declared strength (its low strength, or its one strength
+  when it has no occurrence condition) in place of an equal share [chat only: the design chat's statement
+  of this consequence].
 - Every existing baseline set and test either states context_knowledge off to stay identical, or is
   regenerated with the reason stated, with the regression audit CLAUDE.md requires. Runs of 500 steps or
   more change even with context_knowledge off, because the hardcoded weight leaves.
@@ -384,8 +390,8 @@ As recorded [ruled, with the observation rule reopened, see section 6]: the layo
 areas in which the robot observes the human). The robot's state of the world holds the human only while the human
 is inside a monitored area. While no human is observed, the recognizer does not update, no projection exists, and
 the planner plans as with no human. The disappearance and the reappearance each cause a new decision. The
-reappearance starts a new episode from the prior base (the belief with which an episode starts). The mind keeps
-no last observed position. dock_loading's office is the one unmonitored area. This step is built before the
+reappearance starts a new episode from the prior base (the value with which the evidence restarts; the belief is
+the prior multiplied by the evidence). The mind keeps no last observed position. dock_loading's office is the one unmonitored area. This step is built before the
 evaluation, and the evaluation may use the office.
 
 Open [open]: which trigger makes the decision at disappearance and reappearance (the trigger set has three
