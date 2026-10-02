@@ -380,6 +380,9 @@ paragraph, not in the alphabet.
   candidates TODO-132 (a), TODO-134, TODO-142, TODO-143 and P3. The documentation pass for the paper stays before the
   paper, not before the demonstration.
 - Next: T-G's design, in a new design chat from a handoff.
+- ADDED (Hadi, 2 October 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R5;
+  design_records.md, "T-G stage 1.5"): T-K, the build of degrees of context facts (stage 1.5's R5), at the end of the V1
+  queue, after track 3b.
 
 V1 AND FW (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
@@ -409,6 +412,9 @@ for now (the walk to the standby place stays without a hypothesis; H1 and H2 rec
 lasts 90 seconds (TODO-157), and the IR test-bed set on dock_loading is agreed (C1 to C14, M1 to M4, in all three
 rooms). Next: the build step that sorts the earlier analyses and tests under kitting and prepares the instruments for
 dock_loading; then the authoring of the set, its expectations and its runs.
+SUPERSEDED (Hadi, 2 October 2026): the states after T-G Q16 are in the T-G entry below (stage 1's test-beds and close, the
+housekeeping step); T-G stage 1.5's design is ruled, its build not started; T-K is added at the end of the V1 queue (the
+order block above). Next: stage 1.5's three open items, then its build's plan.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -765,6 +771,16 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     context facts; the task that just ended, a transition prior between tasks; an enabling event such as the robot's own
     delivery, TODO-154); and Hadi's ideas: the duration of a foreseeable task is not one fixed number; temporal context
     can be a fuzzy set with a degree of membership.
+    RULED (Hadi, 2 October 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R1 to
+    R8; design_records.md, "T-G stage 1.5", R9, the cut, the open items): context knowledge acts in the recognizer's
+    belief only, never on the human (R1); belief = normalise(prior × evidence), the prior computed at each run from the
+    present context facts (R2); the prior normalises the strengths of what is live, assigned work as a whole
+    contributing 1 and each live foreseeable task its declared low or high strength by its occurrence condition (R3);
+    equal division inside assigned work (R4); degrees (R5) built later, in T-K; one declared duration (R6); the gate
+    unchanged (R7). Stage 1.5 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
+    the removal of the domain task names and constants from the recognizer (TODO-66). The build is not started. Open:
+    the values for the two domains (Hadi states them), the perception assumption, the stage's tests. Future work:
+    TODO-158 to TODO-162.
   - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
     run, TODO-16 with the stepwise delivery (A7).
     ADDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): B10's room (the stores), with its own layout, setup and scenarios; A8's rule on
@@ -787,6 +803,11 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
     its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
     fact, if wanted, is designed here as the same entry point as the live user's click.
+- **T-K — Degrees of context facts** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-G stage 1.5: context
+  knowledge in the recognizer's belief", R5; design_records.md, "T-G stage 1.5"). The build of R5: a context fact
+  satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
+  1 minus the degree), strength = low + degree × (high − low). At the end of the V1 queue, after track 3b. Stage 1.5's
+  crisp facts are its special case, so nothing in R2 to R4 changes with it. Not started.
 - **T-S — ROS/PRIEST** (ruled by Hadi, 30 September 2026; future work, removed from T-G, at the end of the queue).
   FW (T-G A1, 1 October 2026): not designed, ruled or built within V1.
   - TODO-75: the ROS guide and `env_layout99`.

@@ -167,6 +167,11 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 
 ## 5. Stage 1.5: context knowledge (framework-wide; nothing ruled)
 
+NOTE (2 October 2026): the stage's design is ruled by Hadi (design_decisions.md, "T-G stage 1.5: context knowledge in
+the recognizer's belief", R1 to R8; design_records.md, "T-G stage 1.5", R9, the cut, the open items). Hadi's earlier
+idea of a context fact that triggers or interrupts a task of the human is superseded by R1 for this stage: context
+knowledge acts in the robot's mind only, in the recognizer's belief.
+
 Content, as recorded: the scenario holds a timeline of context facts. A context fact changes at an authored
 point of a run, and the environment applies it. Foreseeable tasks of both domains can be conditioned on such
 facts. The mechanism for object states built in stage 1 already admits a fact that no action changes, so

@@ -46,7 +46,7 @@ Relevant (read as needed):
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - The record of planning and building (the records split, 2 October 2026): `docs/design_records.md`, one heading per
-  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1). A session reads its own task's heading. In
+  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-G stage 1.5). A session reads its own task's heading. In
   `design_decisions.md` an index line `→ RECORD [<id>]` stands where a moved block was; `design_records.md` heads the
   block with the entry's title and the same id, so a citation by title and label resolves.
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
@@ -368,8 +368,21 @@ Decisions
   pictures), deferred until Hadi names one.
   The entry point for the next T-G design chat is `docs/handoffs/T-G_forward_inputs.md` (what is ruled, open and parked
   per stage after stage 1). Next: the stage to be named by Hadi.
+  T-G stage 1.5 (context knowledge) is RULED, its build NOT STARTED (Hadi, 2 October 2026; design_decisions.md, "T-G
+  stage 1.5: context knowledge in the recognizer's belief", R1 to R8 and A1 to A7; design_records.md, "T-G stage 1.5",
+  R9, the cut, the open items): context knowledge acts in the recognizer's belief only, never on the human; belief =
+  normalise(prior × evidence), the prior computed at each run from the present context facts as the normalisation of
+  the strengths of what is live (assigned work as a whole 1, each live foreseeable task its declared low or high
+  strength by its occurrence condition), equal division inside assigned work; one declared duration; the gate
+  unchanged; the earlier entry "Assigned-task pool is a support restriction, not a prior" superseded in part (R8); the
+  support restriction on by default for every further analysis and test in V1 (R9; the run option's default not
+  changed now). Stage 1.5 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
+  the removal of the domain task names and constants from the recognizer (TODO-66). Open, before the build: the values
+  for the two domains (Hadi states them), the perception assumption, the stage's tests. T-K (the build of R5, degrees)
+  is added at the end of the V1 queue, after track 3b. Future work: TODO-158 to TODO-162 [FW]. Next: stage 1.5's open
+  items, then its build's plan.
   Not to be
-  started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
+  started unasked: T-F, T-V, the T-D tail, T-K and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
@@ -655,7 +668,8 @@ across that commit without it.
   design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case; closed except its tail: track 3b,
   track 4, 4D); T-E the demonstration's viewer (superseded by T-V, track 1; T-E in older records means the viewer);
   T-F evaluation (Phase 5); T-G the second domain in Mesa (dock_loading; 4D and ROS left it on 30 Sept 2026); T-V
-  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-S ROS/PRIEST (Phase 6). Task
+  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-K degrees of context facts (T-G
+  stage 1.5's R5, after track 3b); T-S ROS/PRIEST (Phase 6). Task
   prompts and reports use these names; the order is the roadmap's, not the alphabet's.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.
