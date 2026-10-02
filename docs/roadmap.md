@@ -747,6 +747,12 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     contain recorded separation violations; findings carried to stage 2, unanalysed. TODO-153 to TODO-156 tagged [V1].
     Deferred to one housekeeping step: the sweep of old terms (TODO-153), the sizes of the files under docs/, what of
     analysis/ stays in git. Next: to be named by Hadi.
+    DONE (2 October 2026), the housekeeping step after stage 1's close: the sweep of old terms ("zone" to "area" in
+    wording; TODO-153 closed); the split of the records (docs/design_decisions.md holds the conceptual design of the
+    shared core, docs/design_records.md everything else, one heading per task); the rule for analysis/ (git tracks
+    reports and code only; data and figures stay on Hadi's disk). Open: the rewriting of each conceptual entry into one
+    current rule; the destination of two old items under docs/ (the old ROS planner reference text, the folder of old
+    layout pictures), deferred until Hadi names one. The next T-G design chat reads docs/handoffs/T-G_forward_inputs.md.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,

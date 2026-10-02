@@ -359,8 +359,15 @@ Decisions
   of stage 1.
   T-G stage 1 is CLOSED (Hadi, 2 Oct 2026; the same block, T-G STAGE 1 CLOSED): an initial check that the recognizer and
   the chain run on dock_loading; the findings (M(iii)'s failure at 387, the recorded separation violations) go to stage
-  2 unanalysed; TODO-153 to TODO-156 tagged [V1]; a housekeeping step deferred (the sweep of old terms, the sizes under
-  docs/, what of analysis/ stays in git). Next: to be named by Hadi.
+  2 unanalysed; TODO-153 to TODO-156 tagged [V1].
+  The housekeeping step after stage 1's close is DONE (2 Oct 2026): the sweep of old terms ("zone" to "area" in
+  wording; TODO-153 closed); the split of the records (`docs/design_decisions.md` the conceptual design of the shared
+  core, `docs/design_records.md` everything else, one heading per task); the rule for analysis/ (git tracks reports
+  and code only; data and figures stay on Hadi's disk). Open: the rewriting of each conceptual entry into one current
+  rule; the destination of two old items under docs/ (the old ROS planner reference text, the folder of old layout
+  pictures), deferred until Hadi names one.
+  The entry point for the next T-G design chat is `docs/handoffs/T-G_forward_inputs.md` (what is ruled, open and parked
+  per stage after stage 1). Next: the stage to be named by Hadi.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

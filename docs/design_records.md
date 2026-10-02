@@ -2347,6 +2347,13 @@ T-G STAGE 1 CLOSED (Hadi, 2 October 2026; recorded in T-G records 15).
   separation violations. These are findings carried to stage 2, unanalysed. They do not reopen stage 1.
 - Deferred to one housekeeping step, not done now: the sweep of old terms (TODO-153), the sizes of the files under
   docs/, and what of analysis/ stays in git.
+  DONE (2 October 2026), the housekeeping step: the sweep of old terms ("zone" to "area" in wording; TODO-153 closed,
+  1551d1c); the split of the records (docs/design_decisions.md holds the conceptual design of the shared core,
+  docs/design_records.md everything else, one heading per task); the rule for analysis/ (git tracks reports and code
+  only; data and figures stay on Hadi's disk; 7d00f43, 248a946). Open: the rewriting of each conceptual entry into one
+  current rule (input: "Stale passages, input for a later consolidation" in this file); the destination of two old
+  items under docs/ (the old ROS planner reference text, the folder of old layout pictures), deferred until Hadi names
+  one.
 - TODO-153, TODO-154, TODO-155 and TODO-156 are tagged [V1].
 
 PROPOSALS (by the design chat, NOT RULED)
