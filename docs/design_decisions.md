@@ -6024,6 +6024,10 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   closed as ruled; the value is changed in the next build step). Reason: a long absence lets pallets accumulate in a bay,
   which gives two scans possible at once and the robot arriving at an occupied bay; it differs clearly from the coffee
   break. "T-G: the second domain's rulings", T-G Q16's block (RULED, T-G records 8).
+  CORRECTED (records, 2 October 2026; T-G records 9): one tick is 2 seconds (PT60S is 30 ticks), so office_break's wait is
+  45 ticks, and the human's absence is about 110 ticks (in the IR test-bed's C6 on env_layout_02, from leaving the dry
+  bay at 30 to the arrival at the frozen bay at 141), a little more than one round trip of the robot (about 96 ticks,
+  B14's note). Whether the absence is long enough for pallets to accumulate in a bay is reviewed with the MPB's design.
 - B7, Q8 (H2'): `store_pallet(?pallet)`, a work task of the human: it takes a delivered and scanned pallet from its
   delivery container to its onward container. Condition: the pallet is in its delivery container and is scanned, so the
   order per pallet is delivered, scanned, stored. Each full pallet has a second designation in the setup, its onward
@@ -6038,6 +6042,11 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
 - B9, Q9a (S2): a container is one point, the centre of the container, with no constraint, and it may hold several
   pallets (as kitting's table does). Not taken: authored pallet places; a position chosen when the pallet is put down
   (FW on LIMIT-04, A10). Pallets drawn on top of each other are a drawing matter for T-V.
+  NOTE (records, 2 October 2026; T-G records 9; the IR test-bed on dock_loading), a property of "one point per
+  container", not a ruling: two pallets in one container stand on one point, so the second scan has no walk (its
+  move_to is acknowledged at once: C3, three stretches of 3 ticks that never reach the threshold), and no walk between
+  the two exists that an event could cut (the set's M3 as written was not buildable; Hadi approved scan 2 in its
+  place). LIMIT-04's FW direction (a position chosen when a pallet is put down) is the alternative.
 - B10, Q9b, the room. Requirements (Hadi): goods flow forward (truck, delivery container, store) and never travel away
   from their store and back; the freezer lies near the dock; no bay stands in front of a store entrance; one place for
   empties that both stores can bring to. Arrangement: the delivery bays in a row on one side wall, the frozen bay nearest
@@ -6348,6 +6357,11 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 - C5, to watch in the test-beds: hypotheses that predict the same motion divide the belief, so none passes the admission
   threshold (two unscanned pallets in one container). If the IR test-bed confirms it on dock_loading, it is a finding
   about the mind and returns to the design chat within V1.
+  CONFIRMED (the IR test-bed on dock_loading, 1 to 2 October 2026; records 2 October 2026, T-G records 9): in C3 and on
+  C4's first two walks, in all three rooms, two scans of one bay share the belief and neither reaches the threshold (9
+  stretches; none admitted). A finding about the mind, NOT RULED; it returns to the design chat. Linked to the recorded
+  direction on acting on a set of hypotheses with the same projection: belief-aware planning, the covering set S_ε and
+  one realization against its projections jointly (TODO-97). "T-G", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT.
 - C6, open at their stage: the design of check-in and check-out; the design of TODO-16; how the MPB's oracle derives an
   expected decision when the human's sequence depends on the robot's decisions.
 
@@ -6546,12 +6560,19 @@ IR test-bed set on dock_loading. Records only; nothing in this block is built.
   - H1: a foreseeable task "the human steps aside to the standby place", always possible, with the standby place as a
     fixed object.
   - H2: a hypothesis that is live only while no assigned task of the human is applicable.
+    CORRECTED (Hadi, at the approval of the IR test-bed's build, 1 October 2026; recorded 2 October 2026, T-G records
+    9): worded "a hypothesis that is live only while no assigned task of the human is live". Reason: a scanned pallet's
+    scan stays applicable (its guards do not read is_scanned), so read as "applicable" H2 would never be live after a
+    scan.
   The difference: the human steps aside only when no other pallet is applicable. H1 states an unconditional behaviour
   that the human does not perform, and competes with the scans when a pallet waits; H2 matches the condition and changes
   the rule for the live set (A4).
   Not taken: the walk as the tail of the scan task. Reasons: the human would step aside after every scan, also when a
   pallet waits; the condition "no other pallet waits" cannot be stated in a method; the scan's terminal fact would hold
   in the middle of the task.
+  NOTE (records, 2 October 2026; T-G records 9), on H1: the always-possible standby task, as a walk only, would make
+  move_to a terminal action of the task model (the last action of one of its methods), so under L1 every arrival at any
+  target would be an episode boundary. A wait at its end would avoid that.
   For stage 1.5, one design question, NOT RULED: what sets a hypothesis's share at the start of an episode. Four
   determinants are recorded for it: the assignment (exists); context facts; the task that just ended (a transition prior
   between tasks, Hadi's idea); an enabling event, such as the robot's own delivery (TODO-154). They are designed as one
@@ -6604,6 +6625,96 @@ Next: the build step that sorts the earlier analyses and tests under kitting and
 (the step added above, with the plan's section 7, "After the milestone"); then the authoring of the set, its
 expectations and its runs.
 
+STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED (1 to 2 October 2026; accepted by Hadi, 2 October
+2026; records 2 October 2026, T-G records 9). The results are recorded here because the design chat cannot read
+analysis/; the report is analysis/dock_loading/ir_testbed/REPORT.md.
+BUILT, with the commits and the acceptance of each part:
+- The sort of kitting's analyses and tests (746fae6, 9a35af1, ae77689): analysis/kitting/ (every earlier analysis,
+  the four maintained sets, kitting's IR test-bed and MPB sets), analysis/instruments/ (the shared code;
+  run.sh <domain>), analysis/dock_loading/; the run files under configs/kitting/; the tests under tests/kitting/,
+  tests/dock_loading/, tests/instruments/ (three two-domain tests stay at tests/). The path table:
+  docs/rename_table.md, "Paths: the sort"; dated entries, frozen reports, descriptions and comments keep the old paths.
+  Acceptance: the reference set regenerated from the sorted tree, 847 files, 844 byte-identical and the three stdout
+  files differing in the run-file path token only; the four maintained sets byte-identical; 301 tests, the same ids;
+  the moves pure renames apart from 14 path-edited scripts and 33 run-file headers; 83 scenarios load.
+- The instruments prepared for dock_loading (65273e8, cbeefe4, e573e9e; then 3ea4b60, 736eb01, e4fc88c):
+  - the human's run-time sequence from the executor's own selection rule: the trajectory drives a StackMachine on the
+    whole script (repeatable entries and the closing part included) as the body drives it, against the world the
+    environment's builder makes; the load-time replay is no longer the source (R1 skips the standby entry);
+  - the oracle brought to liveness by applicability (A4), the agent's area (A9, R2) and the boundary through each
+    terminal action's preconditions and completion (L1's as-built reading; adds scan_it), the domain from the run file;
+  - the log reader: the pool read without kitting's words, the [IR-inapplicable] lines;
+  - the separation counts per run (separation.md): a moving robot violating or receding, and a standing robot with
+    the human passing (moved on the tick) or standing beside it (did not);
+  - the figure: a fourth colour and a facet beyond four hypotheses; the summary's open entries; baseline.py (reporting).
+  Acceptance: kitting's 17 IR and 16 MPB trajectories and 17 expectation tables byte-identical before any run; the 17
+  IR runs and the 16 MPB scenarios under each strategy byte-identical in every output apart from the new separation
+  files (17 and 32); 301 tests.
+- office_break at 90 seconds (edbe34f). Acceptance: the four maintained sets byte-identical (96 files); the milestone
+  reruns identical except scenario_s05_03 at tick 206 and scenario_s07_03 at tick 94, the decision admitting
+  office_break (T_h 15 ticks longer, one candidate's share; winner, cost and hold unchanged, the .rec identical).
+- The 54 scenarios (51e5e1c): scenario_s02_02 to _19 (env_layout_02, env_setup_02), s04_02 to _19 (env_layout_03,
+  env_setup_04), s06_02 to _19 (env_layout_04, env_setup_06), in domains/dock_loading/scenarios/scenarios_s02.py,
+  _s04.py, _s06.py; _02 to _15 the controlled rows C1 to C14, _16 to _19 the mixed M1 to M4; run files in
+  configs/dock_loading/ir_testbed/. Authoring values approved by Hadi: a cut or a drop during a walk at PT28S; the
+  stand at the bay just scanned, stand(PT80S); M3 with scan 2 in place of scan 1; C13, C14, M4 dependent on the robot.
+  Acceptance: 137 scenarios load; the three dependent scripts report the entries not replayed.
+- The expectations committed before the runs (54edb71): per scenario the trajectory, expected.csv and phases.json (θ =
+  0.75, the value of record) and predictions.md (C13, C14, M4: the present model beside H1 and H2); every run's own
+  oracle call reproduced them byte for byte.
+RESULT: 42 controlled runs (4d9011d) and 12 mixed runs (b20a67f), zero disagreements, zero unmatched rows; every
+trajectory equal to the run's human lines on every tick; separation counts 0 (the closest approach 115.85 cm). What it
+establishes: the recognizer behaves on dock_loading as the records specify (rules 1 to 27 of the instrument). It does
+not establish the quality of the recognition.
+THE BASELINE (all 54 runs; one tick is 2 seconds): of 153 true stretches, 147 lie in the support (6 outside: the scan
+of pallet_1 in C12 and M4). 98 of the 147 reach the threshold within the stretch (38, 40 and 20 of 49 on env_layout_02,
+_03, _04); the median delay is 20 ticks (range 6 to 50; 28, 16 and 17 by room). 49 never reach it, all scans: 34
+stretches of 26 ticks or fewer, 9 same-motion pairs, 3 second scans with no walk, 3 scans leaving the office in
+env_layout_02. Every coffee_break and office_break stretch reaches it. Ticks from each true stretch's start to the
+threshold, per row and room ("never": not within the stretch; "out": outside the support):
+| row | env_layout_02 | env_layout_03 | env_layout_04 |
+|---|---|---|---|
+| C1 | scan 0 10, scan 2 50 | scan 0 14, scan 2 24 | scan 0 never, scan 2 never |
+| C2 | scan 2 25, scan 0 28 | scan 2 8, scan 0 34 | scan 2 21, scan 0 never |
+| C3 | scan 0 never, scan 1 never | scan 0 never, scan 1 never | scan 0 never, scan 1 never |
+| C4 | scan 0 never, scan 2 never, scan 1 28, scan 3 50 | scan 0 never, scan 2 never, scan 1 34, scan 3 24 | scan 0 never, scan 2 never, scan 1 never, scan 3 never |
+| C5 | scan 0 10, coffee 49, scan 2 never | scan 0 14, coffee 13, scan 2 19 | scan 0 never, coffee 17, scan 2 10 |
+| C6 | scan 0 10, office 33, scan 2 never | scan 0 14, office 30, scan 2 14 | scan 0 never, office 6, scan 2 37 |
+| C7 | scan 0 10, coffee 50, scan 0 27, scan 2 50 | scan 0 14, coffee 17, scan 0 15, scan 2 24 | scan 0 never, coffee 21, scan 0 never, scan 2 never |
+| C8 | scan 0 10, coffee 37, scan 0 26, scan 2 49 | scan 0 never, coffee 11, scan 0 15, scan 2 24 | scan 0 never, coffee 20, scan 0 never, scan 2 never |
+| C9 | scan 0 10, scan 2 31 | scan 0 never, scan 2 21 | scan 0 never, scan 2 10 |
+| C10 | scan 0 10, scan 2 31, scan 0 28 | scan 0 never, scan 2 21, scan 0 34 | scan 0 never, scan 2 10, scan 0 never |
+| C11 | scan 0 10, scan 2 46 | scan 0 14, scan 2 21 | scan 0 never, scan 2 17 |
+| C12 | scan 1 out, scan 2 50 | scan 1 out, scan 2 24 | scan 1 out, scan 2 never |
+| C13 | scan 0 9 | scan 0 14 | scan 0 14 |
+| C14 | scan 2 25 | scan 2 8 | scan 2 21 |
+| M1 | scan 0 10, coffee 50, scan 0 27, office 34, scan 2 never | scan 0 14, coffee 17, scan 0 15, office 30, scan 2 13 | scan 0 never, coffee 21, scan 0 never, office 6, scan 2 36 |
+| M2 | scan 0 10, coffee 37, scan 2 never, scan 0 28 | scan 0 never, coffee 11, scan 2 19, scan 0 33 | scan 0 never, coffee 20, scan 2 never, scan 0 never |
+| M3 | scan 0 10, scan 2 never, coffee 33, scan 2 never | scan 0 14, scan 2 never, coffee 13, scan 2 19 | scan 0 never, scan 2 never, coffee 7, scan 2 11 |
+| M4 | scan 1 out, office 33, scan 2 never | scan 1 out, office 30, scan 2 15 | scan 1 out, office 8, scan 2 37 |
+FINDINGS (classified as findings about the mind; none ruled):
+- Hypotheses that predict the same motion divide the belief and are not admitted: the watched item C5, confirmed (C5's
+  note). Linked to the recorded direction on acting on a set of hypotheses with the same projection (TODO-97).
+- A short walk gives too little evidence under equal shares at the start of an episode (34 of the 49 stretches that
+  never reach the threshold last 26 ticks or fewer; on env_layout_04, 16 steps from the standby place to the dry bay,
+  scan 0's first walk never reaches it with three or more rivals live). It joins stage 1.5's question on what sets a
+  hypothesis's share at the start of an episode, as its measured baseline (C1, STAGE 1.5; TODO-154).
+- The walk to the standby place: admitted as a break in five of six controlled runs (C13 and C14: coffee_break or
+  office_break by the room's bearings, cleared 8 to 23 ticks into the walk; never above θ in scenario_s06_14); in M4
+  admitted on env_layout_02 as the scan of pallet_0 (from 167), an assigned task the human never performs and that stays
+  live with its commitment warrant. The finding turns unexplained once the human stands. On TODO-155, with the written
+  predictions: C13 and C14 separate the conditional candidate (H2) from the present model, M4 does not (H2 is never live
+  there, scan 0 being live).
+- Two pallets in one container stand on one point: the second scan has no walk and a walk between them cannot be cut;
+  a property of "one point per container" (B9's note).
+CORRECTIONS of earlier notes: one tick is 2 seconds (B6's note: office_break's wait 45 ticks, the absence about 110
+ticks, reviewed with the MPB's design); H2 worded "no assigned task is live" (Q16's block); the always-possible standby
+task as a walk only would make every arrival an episode boundary (Q16's block).
+The IR test-bed of stage 1 is CLOSED. Next: the design of the MPB set with Hadi. Open for it: a setup with pallets
+already in a bay while the robot delivers others; the robot's last task as a return (the PROPOSAL of the second
+milestone's findings); how expected decisions are derived when the human's sequence depends on the robot's decisions
+(C6).
+
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
   and names no fixed object.
@@ -6648,3 +6759,6 @@ SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 8): TODO-155 is ruled 
 a hypothesis) and the IR test-bed set on dock_loading is agreed (T-G Q16's block above, RULED). Next: the build step that
 sorts the earlier analyses and tests under kitting and prepares the instruments for dock_loading; then the authoring of
 the set, its expectations and its runs.
+SUPERSEDED (records, 2 October 2026; T-G records 9): the sort, the instruments' preparation, office_break at 90 seconds,
+the 54 scenarios, their expectations and the 54 runs are built and accepted, and the IR test-bed of stage 1 is closed
+(STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED above). Next: the design of the MPB set with Hadi.
