@@ -8,7 +8,9 @@ sep_classes.py, F1's execution rule) and the layout's path lengths; never a hold
 
     properties.py <scenario> <dir> <run.log> <run file>
 
-Writes properties.json and properties.md in <dir>.
+Writes properties.json and properties.md in <dir>. The part every domain shares (the run's outputs read once, the
+measures, the detectors, the markdown) is analysis/instruments/mpb/measures.py since dock_loading's MPB (2 October
+2026); this file keeps kitting's declared properties.
 
 For every run:
 - completion (the world tick after the robot's last release on a task), holds, near-encounters and F1's classes;
@@ -73,39 +75,17 @@ ROOT = HERE.parents[2]
 sys.path[:0] = [str(HERE), str(ROOT), str(ROOT / "analysis" / "instruments" / "common"),
                  str(ROOT / "analysis" / "instruments" / "mpb")]
 
-import yaml
-import logparse
 from domains.kitting.registry import domain_config
-from sep_classes import rule, summary
-from mpblib import Mode, Room, Trigger, load_decisions, skipped_objects
+from measures import Part4, arrival, main, position_before, x5_ground1
+from mpblib import Trigger
+from sep_classes import rule
 
-
-def room_of(run_file, traj):
-    cfg = yaml.safe_load(open(run_file))
-    sc = domain_config["scenarios"][cfg["scenario"]]
-    layout = json.load(open(ROOT / domain_config["layouts"][cfg.get("layout") or sc.reference_layouts[0]]))
-    w, h = layout["space"]["width"], layout["space"]["height"]
-    return Room(-w / 2, w / 2, -h / 2, h / 2, {o["id"]: tuple(o["position"]) for o in layout["env_objects"]},
-                traj["params"]["proximity"])
+# The control scenarios: run.sh runs the reference (reference.py) for each (MPB-2, scenario 8).
+CONTROLS = ("scenario_s10_06",)
 
 
 def item_of(key):
     return None if key is None else key.split("?item=")[1].split(",")[0].split(")")[0]
-
-
-def completion(agents):
-    releases = [a["tick"] for a in agents if a["micro"] == "release" and a["task"] is not None]
-    return releases[-1] + 1 if releases else None
-
-
-def position_before(agents, t, start):
-    """The robot's position at a decision on tick t: where it stood before its tick-t move."""
-    return tuple(start) if t == 0 else tuple(agents[t - 1]["robot"])
-
-
-def arrival(frm, to, radius):
-    d = math.dist(frm, to)
-    return tuple(frm) if d <= radius else (to[0] - (to[0] - frm[0]) * radius / d, to[1] - (to[1] - frm[1]) * radius / d)
 
 
 def plain_difference(p, a, b, traj):
@@ -120,64 +100,10 @@ def plain_difference(p, a, b, traj):
     return (path(b) - path(a)) / v
 
 
-def x5_ground1(ticks, decisions):
-    """X5's ground (1), reconstructed: the stretches of consecutive ticks with the finding unexplained; in each, the
-    decisions (a trigger fired) whose admission refused; and the first tick of the stretch after such a decision, where the
-    finding has outlived a re-decision. A measurement over the run's own outputs."""
-    out, stretch = [], []
-    for t in sorted(ticks, key=lambda x: x["tick"]) + [None]:
-        if t is not None and t["finding"] == "unexplained" and (not stretch or t["tick"] == stretch[-1] + 1):
-            stretch.append(t["tick"])
-            continue
-        if stretch:
-            refused = [x.tick for x in decisions if stretch[0] <= x.tick <= stretch[-1] and x.admitted is None]
-            outlived = next((k for k in stretch if refused and k > refused[0]), None)
-            out.append(dict(first=stretch[0], last=stretch[-1], refused_decisions=refused, ground1_from=outlived))
-        stretch = [t["tick"]] if t is not None and t["finding"] == "unexplained" else []
-    return out
-
-
 def evaluate(sid, d, log_path, run_file):
-    obs = json.load(open(d / "observed.json"))
-    sel = json.load(open(d / "selection.json"))
-    agents = json.load(open(d / "robot.json"))
-    ticks = json.load(open(d / "actual_ticks.json"))
-    traj = json.load(open(d / "trajectory.json"))
-    decisions = load_decisions(d / "actual_decisions.json")
-    run = logparse.parse(log_path)
-    sep = float(run["hdr"].get("min_separation", 50.0))
-    sel_by = {s["tick"]: s for s in sel}
-    rm = room_of(run_file, traj)
-    human_rows = {r["tick"]: r for r in traj["rows"]}
-    out = dict(scenario=sid, strategy=obs["strategy"], prior=obs["prior"], completion=completion(agents),
-               terminal=obs["terminal"], horizon=obs["horizon"], properties=[], measures={}, detectors={})
-    s = summary(log_path)
-    out["measures"] = dict(sep_min_dist=s["dist"], sep_min_continuous=s["cont"], f1=s["counts"],
-                           near_encounters=sum(1 for _, (_, m) in run["sep"].items() if m is not None and m < sep),
-                           holds=[(x["tick"], x["hold"]) for x in sel if x["hold"]],
-                           hold_ticks=sum(x["hold"] or 0 for x in sel))
-    out["decisions"] = [dict(tick=x.tick, trigger=x.trigger.value, cause=x.cause and x.cause.value, gate=x.gate.value,
-                             leader=x.leader, projection=("admitted " + x.admitted.key) if x.admitted else
-                             (f"fallback {x.fallback.mode.value} k={x.fallback.k} end={x.fallback.end:.2f}"
-                              if x.fallback else "none"),
-                             winner=sel_by[x.tick]["winner"], hold=sel_by[x.tick]["hold"]) for x in decisions]
-    # the detectors
-    todo134, rays = [], []
-    for x in decisions:
-        if x.fallback is not None and x.fallback.mode is Mode.STANDING and rule(run, x.tick, sep) == "viol":
-            todo134.append(x.tick)
-        if x.fallback is not None and x.fallback.mode is Mode.MOVING:
-            pos, prev = human_rows[x.tick], human_rows[x.tick - 1]
-            now = skipped_objects((pos["x"], pos["y"]), rm)
-            before = skipped_objects((prev["x"], prev["y"]), rm)
-            entered = [o for o in now if o not in before]
-            if entered:
-                rays.append(dict(tick=x.tick, objects=entered, k=x.fallback.k, duration=x.fallback.duration,
-                                 end=x.fallback.end))
-    out["detectors"] = dict(todo134=todo134, arrival_tick_rays=rays)
-
-    def prop(name, holds, detail):
-        out["properties"].append(dict(name=name, holds=bool(holds), detail=detail))
+    p4 = Part4(sid, d, log_path, run_file)
+    obs, sel, agents, ticks, traj, decisions = p4.obs, p4.sel, p4.agents, p4.ticks, p4.traj, p4.decisions
+    run, sep, sel_by, human_rows, out, prop = p4.run, p4.sep, p4.sel_by, p4.human_rows, p4.out, p4.prop
 
     if sid == "scenario_s10_02":
         adm = next((x for x in decisions if x.trigger is Trigger.RECOGNITION_CHANGED and x.cause is not None
@@ -360,32 +286,5 @@ def evaluate(sid, d, log_path, run_file):
     return out
 
 
-def markdown(r):
-    m = r["measures"]
-    lines = [f"# {r['scenario']}: part 4 and the measures ({r['strategy']}, prior {'on' if r['prior'] else 'off'})", "",
-             f"Completion (world tick) {r['completion']}; terminal decision {r['terminal']}. [sep] minimum "
-             f"{m['sep_min_dist'][0]:.2f} ({m['sep_min_dist'][1]}), continuous {m['sep_min_continuous'][0]:.2f} "
-             f"({m['sep_min_continuous'][1]}); near-encounters {m['near_encounters']} ticks; F1 classes {m['f1']}; "
-             f"holds {m['holds']} ({m['hold_ticks']} ticks).", "", "## Declared properties", ""]
-    lines += [f"- **{p['name']}**: {'holds' if p['holds'] else 'DOES NOT HOLD'}. {p['detail']}"
-              for p in r["properties"]] or ["None declared."]
-    lines += ["", "## Detectors", "", f"- TODO-134 (a decision on a fallback stand whose first robot tick violates): "
-              f"{r['detectors']['todo134'] or 'none'}", f"- The arrival-tick ray: "
-              f"{r['detectors']['arrival_tick_rays'] or 'none'}"]
-    for k in ("retention_observation_warrant", "todo132a", "x5_ground1"):
-        if k in m:
-            lines += ["", f"## {k}", "", f"{m[k]}"]
-    lines += ["", "## Decisions", "", "| tick | trigger | cause | gate | leader | projection | winner | hold |",
-              "|---|---|---|---|---|---|---|---|"]
-    lines += [f"| {x['tick']} | {x['trigger']} | {x['cause'] or ''} | {x['gate']} | {x['leader']} | {x['projection']} | "
-              f"{x['winner']} | {x['hold']} |" for x in r["decisions"]]
-    return "\n".join(lines) + "\n"
-
-
 if __name__ == "__main__":
-    sid, d, log_path, run_file = sys.argv[1], Path(sys.argv[2]), sys.argv[3], sys.argv[4]
-    r = evaluate(sid, d, log_path, run_file)
-    json.dump(r, open(d / "properties.json", "w"), indent=1)
-    (d / "properties.md").write_text(markdown(r))
-    held = [f"{p['name']}={'yes' if p['holds'] else 'NO'}" for p in r["properties"]]
-    print(f"{sid} ({r['strategy']}): properties {held or 'none'}; detectors {r['detectors']}")
+    main(evaluate)

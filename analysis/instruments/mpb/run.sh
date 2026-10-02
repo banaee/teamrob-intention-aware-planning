@@ -2,7 +2,7 @@
 # run.sh <domain> [-o out_root] [--strategy single_task|full_reorder] [--prior on|off] [run files] — the meta-planner
 # test-bed (MPB; design_decisions.md, "The meta-planner test-bed (MPB)"; analysis/kitting/mpb/README.md). The code is
 # shared by the domains since the sort (1 October 2026); horizon.py and properties.py are the domain's, in
-# analysis/<domain>/mpb/. Per run file (default: every configs/<domain>/mpb/*.yaml): the safety cap (horizon.py, MPB-5) as the run's steps, the run, the trajectory and its check
+# analysis/<domain>/mpb/ (with CONTROLS, the control scenarios whose reference run is made, and alteration.py). Per run file (default: every configs/<domain>/mpb/*.yaml): the safety cap (horizon.py, MPB-5) as the run's steps, the run, the trajectory and its check
 # against the run's human lines (the IR test-bed's trajectory.py), the in-process actual and the log (actual.py); prior
 # on also the oracle's per-tick table (mpb_oracle.py), the chain (chain.py) and the comparison (compare.py); the
 # declared properties and the measures (properties.py); for the control, the reference run (reference.py); the figure
@@ -38,7 +38,7 @@ for RUN in $RUNS; do
   PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json $LOG 2>&1 | grep -v '^\['
   PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $last $OUT --strategy $STRATEGY --assignment_prior $FLAG \
     2>&1 | grep -v -e '^\[' -e '^  step'
-  if [ "$sid" = scenario_s10_06 ]; then
+  if PYTHONHASHSEED=0 $PY -c "import sys; sys.path[:0] = ['$DOM', '.']; import properties; sys.exit(0 if '$sid' in properties.CONTROLS else 1)" 2>/dev/null; then   # the domain's control scenarios
     PYTHONHASHSEED=0 $PY $D/reference.py $RUN $steps $ROOT/runs/${layout}_${sid}_reference_${STRATEGY}.log \
       $OUT/reference.json --strategy $STRATEGY 2>&1 | grep -v -e '^\[' -e '^  step'
   fi
