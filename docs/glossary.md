@@ -361,6 +361,8 @@ applicable method`, or `... does not enter the live set: ...` on the first tick 
 is applicable again it is retired if its terminal fact holds (L4), else it re-enters at 1/|H|, logged `[IR-reentry]
 step=N <key> live again: applicable`; a retired hypothesis that becomes inapplicable stays retired. The perfect-fit score
 of an undecomposable hypothesis is removed. design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
+AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): the re-entry share (1/|H|, "the prior base") is a share of
+the evidence, not of the belief; the belief is the **prior** (below) × the evidence, normalised. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -402,6 +404,9 @@ placed at a container; `waited(agent, e)` starts holding). No microaction is rea
 terminal `place` is a boundary wherever it sits in a decomposition (a return inside `deliver_with_return`). The
 boundary tick is flagged on the belief (`BeliefState.episode_boundary`), and `recognition_changed` fires on it for any
 recorded decision (L5 B). `[IR-boundary]` names the completed action.
+AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): "every base becomes the uniform prior" describes the
+evidence: at a boundary the evidence restarts equal over the live hypotheses, and the belief is the **prior** (below) ×
+the evidence, normalised. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
 
 **θ (theta)** — the confidence gate. It belongs to the meta-planner, not the recognizer, and is
 asked in exactly one place. The recognizer emits a belief distribution and gates nothing. The gate's outcome is
@@ -461,7 +466,7 @@ S_k: the rule is unchanged, restated. At v = 20 cm/tick and
 live target), 497 cm at α = 0.01.
 → the same entry, E4, E5.
 
-The seven entries below are ruled (T-G stage 1.5, Hadi, 2 October 2026) and not built. Stage 1.5 builds crisp context
+The entries below are ruled (T-G stage 1.5, Hadi, 2 October 2026; amended 3 October 2026, AM1 to AM9) and not built. Stage 1.5 builds crisp context
 facts; the degrees (a context fact satisfied to a degree, the membership function) are T-K's (§8). Context knowledge acts
 in the robot's mind only, in the recognizer's belief: it does not drive the human, and the conditions of tasks (the
 methods' guards, **applicable**, §6) are not context knowledge (R1).
@@ -486,11 +491,19 @@ with its source (R5). T-K's.
 applies when it is satisfied, its low strength when it is not (R3). Over several facts: the minimum for "and", the
 maximum for "or", 1 minus the degree for "not" (R5, the selected operators). Not a method's condition: it decides no
 liveness.
+AMENDED (AM7, 3 October 2026): in stage 1.5 an occurrence condition is one context fact or a conjunction of context
+facts; "or" and "not" arrive with T-K, with R5's operators.
 
 **strength** — the declared relative weight of a foreseeable task against assigned work as a whole, which contributes 1
 (R3). A foreseeable task declares a low and a high strength, or one strength if it has no occurrence condition; under
 degrees, strength = low + degree × (high − low) (R5). Each carries its source; a modelling assumption until a site
 measures it. Proposed operational meaning, to be validated, not claimed: a ratio of counted task starts (TODO-161).
+AMENDED (AM2, AM3, AM4, 3 October 2026): declared per task and divided equally among the task's live hypotheses (AM2).
+It is relative to the human's **work as a whole**, the live hypotheses of work tasks in the support: the assigned tasks
+with **assignment knowledge** on, every work task of the task model with it off (AM3); the proposed measured meaning
+is stated for the case with assignment knowledge. Every declared strength is greater than zero, and with **context
+knowledge** on every foreseeable task in the task model declares one; a declaration that violates either is rejected
+when the knowledge is loaded (AM4).
 
 **prior** — the distribution over the live hypotheses before the evidence of the episode is applied, computed at each
 run of the recognizer from the present context facts, the strengths of the live foreseeable tasks and the division of
@@ -500,6 +513,20 @@ makes (R8).
 NAMES FLAGGED for renaming at stage 1.5's build, not renamed now: the context weight (ω_context, `_context_weight`),
 the prior base (the re-entry and boundary records, §5 **hypothesis**), `assignment_prior` (the switch of the support
 restriction; TODO-44).
+AMENDED (AM1, AM3, 3 October 2026): the prior multiplies the evidence, which restarts equal at a boundary and gives a
+returning hypothesis 1/|H| of itself (AM1). "Assigned work" reads the human's **work as a whole** (AM3, under
+**strength**). With **context knowledge** off the prior is equal over the live hypotheses, today's behaviour with
+**assignment knowledge** on and off.
+
+**assignment knowledge** / **context knowledge** (the run options; AM3, AM9, Hadi, 3 October 2026; not built) — two
+independent run options, each on or off, stating what the robot knows; both on by default, the framework as designed;
+each "off" an ablation or a diagnostic. Code names: `assignment_knowledge` and `context_knowledge`.
+- `assignment_knowledge`: whether the robot is told which tasks the human was assigned; that knowledge restricts the
+  support and sets no weight. OLD NAME: `assignment_prior` (`--assignment_prior`, `configs/experiment.yaml`,
+  `SimModel.assignment_prior`, `[IR-prior]`), which stays in code, configuration and commands until stage 1.5's build
+  renames it, and in older records ("prior on", "prior off" mean assignment knowledge on, off).
+- `context_knowledge`: whether the robot holds **context knowledge** (above) for the **prior**. New at the build.
+→ design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM3, AM9; TODO-44.
 
 ---
 
