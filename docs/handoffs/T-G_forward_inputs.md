@@ -158,6 +158,10 @@ Planning on dock_loading (the MPB, 52 runs):
   - The mixed runs M1 and M4 of one room end on the same tick under each strategy.
   - The robot with nothing left to do stays standing at the bay of its last delivery (recorded in the findings
     of the second milestone scenario).
+- CAVEAT (3 October 2026): the MPB run files of 500 steps or more and the milestone runs are potentially confounded
+  by an undeclared weight (the hardcoded context weight multiplies coffee_break by 2.5 from step 500); the IR
+  test-bed's figures are not affected. design_records.md, "T-G stage 1", SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN,
+  its CAVEAT.
 
 Not tested in stage 1: env_layout_02 in the MPB (the room with the latest admissions, median 28 ticks); the test
 that alters one rule of the oracle to show that a zero result is a detection (built for dock_loading, not run); a
