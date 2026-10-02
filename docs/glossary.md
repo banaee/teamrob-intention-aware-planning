@@ -522,7 +522,7 @@ returning hypothesis 1/|H| of itself (AM1). "Assigned work" reads the human's **
 independent run options, each on or off, stating what the robot knows; both on by default, the framework as designed;
 each "off" an ablation or a diagnostic. Code names: `assignment_knowledge` and `context_knowledge`.
 - `assignment_knowledge`: whether the robot is told which tasks the human was assigned; that knowledge restricts the
-  support and sets no weight. OLD NAME: `assignment_prior` (`--assignment_prior`, `configs/experiment.yaml`,
+  support and sets no prior (AM9's reason). OLD NAME: `assignment_prior` (`--assignment_prior`, `configs/experiment.yaml`,
   `SimModel.assignment_prior`, `[IR-prior]`), which stays in code, configuration and commands until stage 1.5's build
   renames it, and in older records ("prior on", "prior off" mean assignment knowledge on, off).
 - `context_knowledge`: whether the robot holds **context knowledge** (above) for the **prior**. New at the build.
