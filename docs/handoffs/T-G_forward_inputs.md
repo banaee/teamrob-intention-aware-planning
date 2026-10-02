@@ -2,7 +2,7 @@
 
 Written 2 October 2026 by the design chat that closed T-G stage 1. Place: docs/handoffs/.
 Corrected 2 October 2026 by the next design chat, after its verification against the repo's records.
-Updated 3 October 2026 at the close of the design chat of stage 1.5 (section 5 rewritten; sections 2, 9 and 11 amended).
+Updated 3 October 2026 at the close of the design chat of stage 1.5 (section 5 rewritten; sections 2, 7, 9 and 11 amended).
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G. It collects, per
 stage, what is already ruled, what is open, what is parked, and the ideas Hadi stated. It replaces the reading of
