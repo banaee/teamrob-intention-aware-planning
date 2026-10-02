@@ -2432,10 +2432,24 @@ three open items, then its build's plan.
 
 **T-G stage 1.5: context knowledge in the recognizer's belief (ruled by Hadi, 2 October 2026)** — RECORD [T-G_stage1.5/1], written 2 October 2026; the conceptual part (R1 to R8, the assumptions A1 to A7) is in docs/design_decisions.md under this title.
 Ruled in cchat, 2 October 2026; recorded before any build. Nothing is built.
+AMENDED (Hadi, 3 October 2026, on the review of the records): AM1 to AM9 in design_decisions.md under this title; here
+R9 superseded by AM3, AM3's consequences and AM8.
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
 (`configs/experiment.yaml`, false; TODO-139) is not changed now.
+SUPERSEDED (AM3, Hadi, 3 October 2026; design_decisions.md, this title, R3's AM3): R9 is replaced by two independent run
+options, both on by default, assignment knowledge (the support restriction, today's switch `assignment_prior`) and
+context knowledge; their names are `assignment_knowledge` and `context_knowledge` (AM9). Each "off" setting is an
+ablation or a diagnostic; the default configuration is the framework as designed. The robot without knowledge of the
+assignment is no future-work direction any more: R3's formula covers the case (TODO-162, superseded).
+AM3's CONSEQUENCES, recorded, not acted on:
+- the default change of both options belongs to the build (today `assignment_prior` defaults to false, TODO-139;
+  `context_knowledge` does not exist);
+- at the build, every existing baseline set and test either states "context knowledge off" to stay identical, or is
+  regenerated with the reason stated, with the regression audit CLAUDE.md requires;
+- the rename of `assignment_prior` to `assignment_knowledge` in code, configuration and commands belongs to the build,
+  with the regression audit (AM9); older records keep the old name.
 
 THE CUT AND THE QUEUE.
 - T-G stage 1.5 builds: R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts, and the
@@ -2443,10 +2457,16 @@ THE CUT AND THE QUEUE.
 - T-K, a new task, holds the build of R5 (degrees: membership functions, the operators, the linear rule for a
   strength). Its place: the end of the V1 queue, after track 3b (roadmap, "The plan from T-A", the order block;
   CLAUDE.md's state). The letter was verified unused in the repository before it was taken (2 October 2026).
+  T-K's operators include "or" and "not" in an occurrence condition; stage 1.5's occurrence condition is a conjunction
+  (AM7).
+  T-K's OPEN ITEMS (AM8, Hadi, 3 October 2026): the representation of a context value and of a degree. The fact form of
+  T-G A5 holds crisp facts only.
 - Future work, each a TODO tagged [FW]: duration uncertainty and a projection that depends on context (TODO-158);
   unobservable states of the human as context (TODO-159); scopes of knowledge (general, sector, domain) and norms
   (TODO-160); validation of the strengths on site data (TODO-161); the robot without knowledge of the assignment
   (TODO-162).
+  SUPERSEDED IN PART (AM3, Hadi, 3 October 2026): the last item; TODO-162 is marked superseded (R3's formula covers the
+  case with assignment knowledge off).
 
 OPEN ITEMS OF STAGE 1.5 (recorded as open; nothing decided):
 1. The values for the two domains: the context facts, each foreseeable task's occurrence condition, its strengths and
@@ -2461,3 +2481,6 @@ STAGE 1.5, its RULED line). Hadi's earlier idea of a context fact that triggers 
 superseded by R1 for this stage (`docs/handoffs/T-G_forward_inputs.md`, section 5, its dated note).
 
 Next: the three open items, then stage 1.5's build plan (BUILD DISCIPLINE, step 1).
+AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the
+values for kitting and dock_loading, the perception assumption, the tests). The stage is framework-wide: it concerns
+kitting and dock_loading alike. Next: unchanged.

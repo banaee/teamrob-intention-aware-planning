@@ -779,6 +779,12 @@ this entry's outcome): declared strengths replace unit weight between assigned w
 The entry's surviving concern: a number must not decide between hypotheses that the robot has no knowledge to tell
 apart (R4 satisfies it among assigned tasks). design_decisions.md, "T-G stage 1.5: context knowledge in the
 recognizer's belief", R3, R4, R8.
+SUPERSEDED IN PART (T-G stage 1.5, AM6, Hadi, 3 October 2026): the passage that gives the crossing on prior mass as the
+reason against the weight ("A soft number standing in for a hard fact, and the number, not the evidence, decided when
+θ was crossed" to "the crossing is a property of the constant"). The crossing on prior mass is accepted for an assigned
+task as a gate policy, on the commitment warrant, with adequacy as the later test; it is not a claim that the prior is
+evidence. The concern that survives is R8's: a number must not decide between hypotheses the robot has no knowledge to
+tell apart. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R7, R8, AM6.
 What the robot knows when it knows the human's `assigned_tasks` is *"the human's task lies
 in this set"* — a restriction on the support of the belief. The first build encoded it as a
 magnitude: hypotheses in the pool weighed `ASSIGNED_TASK_PRIOR` = 10.0, all others 1.0. A
@@ -823,6 +829,11 @@ Files: shared/recognizer.py (`_build_admissible_keys`, `_pin_inadmissible`, `upd
 Reference: evidence-gated projection admission session, September 2026
 
 **θ gates projection admission as well as triggering**
+SUPERSEDED IN PART (T-G stage 1.5, AM6, Hadi, 3 October 2026): "Once the pool is a restriction, `belief.confidence`
+*is* evidence confidence" (the paragraph "The gate is only meaningful because of the restriction above"). Under R2 and R3 the belief carries the prior; the crossing on prior
+mass is accepted for an assigned task as a gate policy, on the commitment warrant, with adequacy as the later test, and
+it is not a claim that the prior is evidence. The concern that survives is R8's: a number must not decide between
+hypotheses the robot has no knowledge to tell apart. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R7, R8, AM6.
 `MetaPlanner.update_human_projection()` now returns `None` without calling the projector
 when `belief.confidence < θ`. Extends DESIGN-07: θ already decided *whether* candidate
 evaluation runs (`theta_crossed`); it now also decides whether the human's most-likely
@@ -4045,6 +4056,10 @@ only (session L-records); built in L-build.
   Consequence D: a terminal `place` is a boundary wherever it sits in a decomposition: scenario_s09_07's return at 33
   (item_1 back on shelf_1, the first `place` of `deliver_with_return`) ends an episode inside `deliver_item(item_2)`'s
   execution. The phase evidence discarded there is accepted: the release ended what the human was doing.
+  AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): "starts the next episode at the prior" and the
+  boundary's reset (`docs/recognizer_handback.md` §1.6) describe the evidence, not the belief: at a boundary the
+  evidence restarts equal over the live hypotheses, and the belief is prior × evidence, normalised (R2). The content of
+  the rule does not change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
 
 - L2, retraction, three parts.
   Problem. An admitted projection outlives its leader's adequacy (TODO-118): G1 is asked at admission only and D2
@@ -4125,6 +4140,9 @@ only (session L-records); built in L-build.
   question, TODO-119). Re-entering while the human is still within reach of the machine, `coffee_break` re-enters in
   its `wait_at` phase with its priced standing, a member at S = 1 for a tick or two as the human walks away, before the
   regress and the excess (G's, recorded at the L-build plan step).
+  AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): the re-entry rule above (exactly 1/|H|, the incumbents
+  sharing the rest in proportion; "the prior base") describes the evidence, not the belief; the belief is prior ×
+  evidence, normalised (R2). The content of the rule does not change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
 
 - L5, persistence: no change.
   The world persists, the recognizer does not: a boundary resets bases, origins, standing clocks and the completion
@@ -4793,6 +4811,9 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   the hypotheses whose terminal fact holds) gains this second condition.
   BUILT (T-G stage 1, step 3, 1 October 2026; bd4bddc): with `AdaptivePlanner.is_applicable` as the one definition,
   read through `decompose`; it re-enters at 1/|H| through L4's returning path. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
+  AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): the re-entry ("at the prior base", "at 1/|H|") is a
+  share of the evidence, not of the belief; the belief is prior × evidence, normalised (R2). The content of the rule
+  does not change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
 
 - A5, object states and designations (T-G Q10).
   The domain declares: the setup gives each object its initial states and its designations; the action schemas say which
@@ -4900,6 +4921,8 @@ this entry is built. Each ruling carries its reason. The conceptual part is here
 queue (T-K), R9 and the open items of the stage are in `docs/design_records.md`, under this title (index line below).
 Terms: `docs/glossary.md` §5 (context knowledge, context value, context fact, membership function, occurrence
 condition, strength, prior) and §8 (T-K).
+AMENDED (Hadi, 3 October 2026, on the review of the records; AM1 to AM9, each under the ruling it amends, with its
+reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -4918,6 +4941,15 @@ condition, strength, prior) and §8 (T-K).
   This is a calculation at each run, not a sequential update with a fixed prior.
   Not taken: a prior fixed at the start of the episode (it uses outdated facts when the human switches tasks inside an
   episode). Rejected earlier and still rejected: a weight multiplied in at every tick.
+  AMENDED (AM1, Hadi, 3 October 2026): the settled rules on re-entry and on the episode boundary describe the evidence,
+  not the belief: at an episode boundary the evidence restarts equal over the live hypotheses; a hypothesis that returns
+  to the live set takes exactly 1/|H| of the evidence, and the incumbents share the rest in proportion. The belief is
+  then prior × evidence, normalised (R2). Marked with a pointer here: T-D L4 as amended ("T-D L: the belief
+  lifecycle"), T-G A4's re-entry rule ("T-G: the second domain's rulings", A4), the boundary rule (L1;
+  `docs/recognizer_handback.md` §1.6, with §1.1 and §1.2). Their content does not change; only what the share is a
+  share of.
+  Reason: R2 already assumes that the evidence starts equal. If these rules fixed the belief, the prior would be
+  switched off on exactly the ticks where no movement has been observed yet.
 
 - R3, the prior. It is the normalisation of the strengths of what is live.
   - Assigned work as a whole contributes 1 while at least one assigned task is live, and 0 otherwise. It is a level
@@ -4938,6 +4970,36 @@ condition, strength, prior) and §8 (T-K).
   conditional on one of the modelled foreseeable tasks; it has no option "none of the modelled tasks".
   Not taken for this stage: a share for "none of the modelled tasks"; recorded under TODO-155, with the note that it
   would reopen T-D R1 (no residual hypothesis).
+  AMENDED (AM2, Hadi, 3 October 2026): a foreseeable task declares its strength per task. The strength is divided
+  equally among the task's live hypotheses. No restriction on layouts.
+  Reason: the strength says how often the human takes the task; which bound object the human goes to is a further
+  choice the robot has no knowledge about. If each hypothesis took the full strength, the task's total would grow with
+  the number of objects, which R3's own reason rejects. Same principle as R4.
+  AMENDED (AM3, Hadi, 3 October 2026; it replaces R9, in the record): two independent run options, both on by default:
+  assignment knowledge (the support restriction; the present switch `assignment_prior`) and context knowledge (new;
+  its name is `context_knowledge`, AM9). "Work as a whole" in R3 is the live hypotheses of work tasks in the support.
+  With assignment knowledge on, these are the assigned tasks, as R3 states; with it off, every work task of the task
+  model. One formula covers the four combinations. With context knowledge off, the prior is equal over the live
+  hypotheses, which is today's behaviour in both settings of the assignment switch. Each "off" setting is an ablation
+  or a diagnostic; the default configuration is the framework as designed.
+  R3's wording, adjusted: "Assigned work as a whole contributes 1 while at least one assigned task is live" reads "the
+  human's work as a whole (the live hypotheses of work tasks in the support) contributes 1 while at least one of them
+  is live"; "relative to assigned work as a whole" reads "relative to the human's work as a whole". A strength is
+  defined against the human's work as a whole; its proposed measured meaning (the ratio of counted task starts) is
+  stated for the case with assignment knowledge.
+  Reason: the two are different kinds of knowledge (which tasks the human was assigned; when the human tends to take a
+  foreseeable task), so one switch must not turn both off. The default is on because the robot is assumed to hold this
+  knowledge. With context knowledge off reproducing today's prior, the stage adds behaviour only where the option is
+  on, and the option serves the evaluation as a condition.
+  Consequences, recorded, not acted on: in the record ("T-G stage 1.5", AM3).
+  AMENDED (AM4, Hadi, 3 October 2026): every declared strength is greater than zero. With context knowledge on, every
+  foreseeable task in the task model declares a strength. A declaration that violates either is rejected when the
+  knowledge is loaded. No small constant is added by the framework.
+  Reason: a strength of zero would remove a hypothesis, and context must never remove one (R1); a missing strength
+  would leave the prior undefined.
+  AMENDED (AM7, Hadi, 3 October 2026): in stage 1.5 an occurrence condition is one context fact or a conjunction of
+  context facts. "Or" and "not" arrive with T-K, together with the operators of R5.
+  Reason: the present condition form expresses conjunction only; stage 1.5 builds crisp facts and adds no operator.
 
 - R4, division inside assigned work: equal among the live assigned tasks, for this stage.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -4954,7 +5016,7 @@ condition, strength, prior) and §8 (T-K).
   - strength = low + degree × (high − low).
   - The linear rule and the operators are stated modelling choices, not consequences of Bayes' rule.
   Stage 1.5 builds crisp context facts only. A crisp fact is the special case, so the later task changes nothing in R2
-  to R4. Recorded cost: with crisp facts the prior changes at one tick, where the approximation of A2 (below) has its
+  to R4. (AM7, under R3: in stage 1.5 an occurrence condition is a conjunction; "or" and "not" are T-K's.) Recorded cost: with crisp facts the prior changes at one tick, where the approximation of A2 (below) has its
   largest error.
 
 - R6, duration and projection. A task keeps one declared duration. Context changes how strongly the robot considers a
@@ -4967,12 +5029,24 @@ condition, strength, prior) and §8 (T-K).
   commitment warrant, when its belief reaches the threshold on the prior. The prior is the robot's relative
   expectation; it is not evidence that the human has started the task. Adequacy tests the hypothesis afterwards and can
   cause the retraction. A foreseeable task still needs observation warrant.
+  AMENDED (AM5, Hadi, 3 October 2026): "before any movement" reads "before any distinguishing movement". The gate's
+  refusal of a hypothesis with no observation (`none(leader_no_observation)`, G1) stands unchanged.
+  Reason: the review's finding (on the first tick of a run the leader has no observation); R7 states a policy and
+  changes no rule of the gate.
 
 - R8, the entry "Assigned-task pool is a support restriction, not a prior" is revised in one sentence. Kept: the
   assignment restricts the support and is not a weight. Revised: "every admissible hypothesis carries unit weight";
   declared strengths replace unit weight between assigned work and the foreseeable tasks. The entry's surviving
   concern: a number must not decide between hypotheses that the robot has no knowledge to tell apart (R4 satisfies it
   among assigned tasks). The entry is marked SUPERSEDED IN PART, with a pointer here; nothing in it is deleted.
+  CORRECTED (Hadi, 3 October 2026): the sentence "every admissible hypothesis carries unit weight" stands in TODO-40's
+  resolution, not in the entry's text; the entry's mark says so.
+  AMENDED (AM6, Hadi, 3 October 2026): marked SUPERSEDED IN PART, with a pointer to R7 and R8: the passage of the
+  support-restriction entry that gives the crossing on prior mass as the reason against the weight, and the passage of
+  "θ gates projection admission as well as triggering" that states the belief's confidence is evidence confidence.
+  Reason: the crossing on prior mass is accepted for an assigned task as a gate policy, on the commitment warrant, with
+  adequacy as the later test; it is not a claim that the prior is evidence. The concern that survives is R8's: a number
+  must not decide between hypotheses the robot has no knowledge to tell apart.
 
 ASSUMPTIONS, recorded with the rulings (not added to `docs/assumptions.md`):
 - A1. Given the task, the human's movement does not depend on the context.
@@ -4983,10 +5057,18 @@ ASSUMPTIONS, recorded with the rulings (not added to `docs/assumptions.md`):
 - A5. The robot's declared duration and the human's actual duration match (already on record: "The human's wait
   duration in the projection is the schema's, converted by the body (TODO-32, R2)", its ASSUMPTION line).
 - A6. A foreseeable task competes with assigned work as a whole, independently of the number of live assigned tasks.
+  AMENDED (AM3, Hadi, 3 October 2026), the wording: "A foreseeable task competes with the human's work as a whole (the
+  live hypotheses of work tasks in the support), independently of the number of them that are live."
 - A7. The ratio between the strengths of two foreseeable tasks holds also when no assigned task is live. This is an
   extrapolation.
 
 NAMES FLAGGED for renaming at the build, not renamed now: the context weight (ω_context, `_context_weight`), the prior
 base, `assignment_prior` (TODO-44 already notes the last).
+AMENDED (AM9, Hadi, 3 October 2026), the names of the two run options of AM3: `assignment_knowledge` (today's
+`assignment_prior`) and `context_knowledge` (the new option). Each is on or off and states what the robot knows.
+Reason: `assignment_prior` is a wrong name; the option says only whether the robot is told which tasks the human was
+assigned, and that knowledge restricts the support and sets no prior (TODO-44). The two names form a pair for the two
+kinds of knowledge of AM3. Nothing is renamed in code, configuration or commands now: the rename belongs to the build,
+with the regression audit. Older records keep the old name.
 
-→ RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered.
+→ RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K's open items).

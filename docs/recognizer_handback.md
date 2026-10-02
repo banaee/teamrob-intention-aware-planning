@@ -65,6 +65,9 @@ is never a member, logged `[IR-inapplicable] step=N <key> leaves the live set: n
 at 1/|H| through L4's returning path, logged `[IR-reentry] step=N <key> live again: applicable`. A retired hypothesis
 that becomes inapplicable stays retired. No kitting hypothesis is ever undecomposable: the maintained outputs are
 unchanged.
+AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): the re-entry share (1/|H|, the incumbents sharing the rest)
+is a share of the evidence, not of the belief; the belief is prior × evidence, normalised. The rule's content does not
+change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
 
 ### 1.2 Prior
 
@@ -73,6 +76,11 @@ recomputed over what is still live. Nothing else is stored to restart from. A lo
 reads 1.0 on no evidence, and two rivals start at 0.5 (R1: expected, measured in Stage 1, not corrected). The
 robot observes the human once before the clock starts (`RobotAgent.observe_initial`), so step 0 is already a
 scored step.
+RULED, NOT BUILT (T-G stage 1.5, Hadi, 2 and 3 October 2026): the uniform start above becomes the EVIDENCE's (AM1); the
+belief is normalise(prior × evidence), the prior computed at each run from the present context facts, the strengths of
+the live foreseeable tasks (each divided among its live hypotheses) and the equal division of work as a whole (R2 to
+R4, AM2, AM3). With context knowledge off the prior is equal over the live hypotheses, as here.
+design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief".
 
 ### 1.3 Phase: the expected action
 
@@ -209,6 +217,9 @@ then (`place`: `holding(agent, x)` then `obj_at(x, c)`; `wait_at`: `at(agent, e)
 microaction is read. A terminal `place` inside a decomposition (the return of `deliver_with_return`, scenario_s09_07 at
 33) is a boundary. The boundary tick is flagged on the belief (`episode_boundary`, L5 B). BUILT IN L-BUILD (28 September 2026; 2c54c4a, 493c095, 5129d90, 3d65ca6);
 `[IR-boundary]` names the action (`completed place(item_1,shelf_1):`).
+AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): "every live base becomes the uniform prior" and "this tick
+already reports the prior" describe the evidence: at a boundary the evidence restarts equal over the live hypotheses,
+and the belief is prior × evidence, normalised (R2). The rule's content does not change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
 
 ### 1.7 Output
 
