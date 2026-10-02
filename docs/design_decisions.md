@@ -6893,6 +6893,30 @@ Rules of the set:
 - Every run reports the separation counts: violations with a moving robot, and ticks below the minimum separation with
   a standing robot (MPB-DL4).
 Not in the set: env_layout_02 (MPB-DL6); a dropped scan as a controlled scenario.
+RULED ON THE SET (Hadi, 2 October 2026; recorded in T-G records 12): the flags of T-G records 11. Records only; nothing
+is authored or run.
+- The case per room, a principle of the set. A scenario runs in both rooms. Where the records predict that its case
+  does not form in a room, the expectation for that room says so before the run. The case counts as tested only where
+  it forms. Nothing is changed to make it form.
+  Reason: a case engineered into existence tests the engineering, not the chain.
+- K2: unchanged. On env_layout_03 it shows the decision at admission. On env_layout_04, where the records predict no
+  admission, it shows a decision on the fallback projection.
+- K5, AMENDED: the clause "scan 1 is admitted alone after scan 0" is withdrawn. K5 tests the refusing gate and the
+  fallback projection.
+  Reason: the second scan has no walk and never reaches the threshold in the IR test-bed.
+- K8, AMENDED: the cut comes after the tick at which the oracle expects scan 0's admission, derived before the run. The
+  retraction forms on env_layout_03 only.
+- K9, AMENDED: the human's scan is scan 2 (pallet_2, the frozen bay); the robot's pool is deliver-dry and return-1.
+  Reason: the IR test-bed admitted the walk from the frozen bay to the standby place as a break in every room.
+- K1, AMENDED: the control requires that the human works away from every robot route. The build's plan selects, per
+  room, the scan and the robot's pool that satisfy this and shows the derivation. If no pairing exists on
+  env_layout_04, K1 runs on env_layout_03 only, and the record says so.
+- K4: the lengthening holds are evidence for TODO-132 (a), not a verified rule.
+- M2, AMENDED: office_break is an event on one named scan entry. "Two scans applicable at once in one bay" and "the
+  robot's decision at an occupied bay" are not declared properties, because they depend on the order the robot chooses
+  by cost. The report states whether each occurred.
+- M4, AMENDED: one named scan is dropped during its walk; a second named scan has coffee_break on arrival; the dropped
+  scan is a second entry; the standby entry closes the list.
 
 PROPOSALS (by the design chat, NOT RULED)
 - An empty pallet's destination (the truck) as a designation in the setup, so that `load_return` reads `destination_of`
