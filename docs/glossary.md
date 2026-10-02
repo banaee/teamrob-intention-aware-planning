@@ -525,6 +525,8 @@ each "off" an ablation or a diagnostic. Code names: `assignment_knowledge` and `
   support and sets no prior (AM9's reason). OLD NAME: `assignment_prior` (`--assignment_prior`, `configs/experiment.yaml`,
   `SimModel.assignment_prior`, `[IR-prior]`), which stays in code, configuration and commands until stage 1.5's build
   renames it, and in older records ("prior on", "prior off" mean assignment knowledge on, off).
+  CORRECTED (C4, Hadi, 3 October 2026): "sets no prior" reads "sets no weight". Under AM3 the option decides which
+  hypotheses work as a whole contains, so it shapes the prior through the support.
 - `context_knowledge`: whether the robot holds **context knowledge** (above) for the **prior**. New at the build.
 → design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM3, AM9; TODO-44.
 
