@@ -306,6 +306,17 @@ Decisions
   stage 1.5, the share at an episode's start (TODO-154), not ruled. Next: the build step that sorts the earlier analyses
   and tests under kitting and prepares the instruments for dock_loading; then the authoring of the set, its expectations
   and its runs.
+  The IR test-bed on dock_loading is BUILT, RUN AND ACCEPTED, and the IR test-bed of stage 1 is CLOSED (1 to 2 Oct 2026;
+  design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED): the sort (the tree in "Where to look"), the instruments prepared (the human's sequence from the executor's own
+  selection rule; A4 in the oracle; the separation counts), office_break at 90 seconds (45 ticks: one tick is 2
+  seconds), 54 scenarios (scenario_s02_02 to _19, s04_02 to _19, s06_02 to _19; C1 to C14 as _02 to _15, M1 to M4 as
+  _16 to _19), expectations committed before the runs; 42 controlled and 12 mixed runs, zero disagreements (the
+  recognizer behaves as the records specify, not a measure of recognition quality). The baseline: 98 of 147 true
+  stretches reach the threshold, median 20 ticks; 49 never, all scans. Findings, none ruled: the same-motion split (T-G
+  C5 confirmed, TODO-97), a short walk under equal shares (stage 1.5, TODO-154), the standby walk (TODO-155), one point
+  per container (B9's note). Next: the design of the MPB set with Hadi (open: pallets already in a bay while the robot
+  delivers others; the robot's last task as a return; expected decisions when the human's sequence depends on the
+  robot's, C6).
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

@@ -695,6 +695,21 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     beside the present model's expectation, which alone is compared. Next: the build step that sorts the earlier
     analyses and tests under kitting and prepares the instruments for dock_loading; then the authoring of the set, its
     expectations and its runs.
+    BUILT, RUN AND ACCEPTED, THE IR TEST-BED ON DOCK_LOADING (1 to 2 October 2026; accepted by Hadi 2 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED;
+    T-G records 9): the sort of kitting's analyses and tests (analysis/kitting/, analysis/instruments/,
+    analysis/dock_loading/; the path table in docs/rename_table.md); the instruments prepared (the human's run-time
+    sequence from the executor's own selection rule, the oracle with liveness by applicability, the separation counts
+    with the passing and the standing human told apart); office_break at 90 seconds; the 54 scenarios (scenario_s02_02
+    to _19, s04_02 to _19, s06_02 to _19); the expectations committed before the runs. 42 controlled and 12 mixed runs,
+    zero disagreements: the recognizer behaves on dock_loading as the records specify; this does not establish the
+    quality of the recognition. The baseline: 98 of 147 true stretches in the support reach the threshold (38, 40, 20 of
+    49 by room), median 20 ticks (range 6 to 50; one tick is 2 seconds); 49 never, all scans (34 of 26 ticks or fewer, 9
+    same-motion pairs, 3 second scans with no walk, 3 scans leaving the office on env_layout_02); every break reaches it.
+    Findings, none ruled: the same-motion split (C5 confirmed; TODO-97); a short walk under equal shares (stage 1.5's
+    question, TODO-154); the standby walk read as a break or, in M4, as an assigned scan never performed (TODO-155);
+    one point per container (B9's note, LIMIT-04). The IR test-bed of stage 1 is CLOSED. Next: the design of the MPB set
+    with Hadi; open for it: a setup with pallets already in a bay while the robot delivers others; the robot's last task
+    as a return; how expected decisions are derived when the human's sequence depends on the robot's decisions (C6).
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
