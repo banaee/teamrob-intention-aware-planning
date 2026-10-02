@@ -723,6 +723,16 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     stays 90 seconds. `single_task` primary, `full_reorder` second; two rooms, env_layout_03 and env_layout_04
     (env_layout_02 excluded as a reduction of scope, its late admission untested); about 8 controlled and 4 mixed
     scenarios, 48 runs. Next: the MPB set's scenarios, agreed with Hadi before they are authored.
+    AGREED, THE MPB SET ON DOCK_LOADING (Hadi, 2 October 2026; design_decisions.md, "T-G: the second domain's rulings",
+    THE MPB ON DOCK_LOADING, MPB-DL7, DISPOSITIONS and THE SET; T-G records 11): the disjointness rule for the controlled
+    scenarios (no pallet named both by the robot's pool and by an assigned scan of the human); kind 3, "pallets in the
+    bays", with two full pallets in each delivery bay, one setup each for env_layout_03 and env_layout_04; kind 4, "one
+    bay", the conditional kind; the meeting at a bay in two forms (an admitted scan walk toward the robot's delivery
+    bay; a `stand` at the bay, decided on the fallback projection); cases (i) and (vii) mixed. The set: 9 controlled
+    scenarios (K1 to K9, kind 3) and 4 mixed (M1, M2, M4 on kind 2, dependent, with declared properties; M3 on kind 3,
+    independent, with full expectations), in env_layout_03 and env_layout_04, both strategies: 52 runs. Kind 3 is a test
+    condition, not the domain's work cycle. Next: the build's plan (the setups, the scenarios, every duration and cut
+    point derived from path lengths, the per-room derivation of each declared case), approved by Hadi.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,

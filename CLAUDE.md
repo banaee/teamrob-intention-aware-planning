@@ -326,6 +326,11 @@ Decisions
   counts with a standing robot reported instead (TODO-135); office_break stays 90 seconds; `single_task` primary;
   env_layout_03 and env_layout_04 only; about 8 controlled and 4 mixed scenarios, 48 runs. Next: the MPB set's
   scenarios, agreed with Hadi before they are authored.
+  The MPB set on dock_loading is AGREED (Hadi, 2 Oct 2026; the same block, MPB-DL7, DISPOSITIONS, THE SET): the
+  disjointness rule for controlled scenarios (no pallet named both by the robot's pool and by an assigned scan); kind 3,
+  "pallets in the bays" (two full pallets in each bay), one setup each for env_layout_03 and env_layout_04; 9 controlled
+  (K1 to K9, kind 3) and 4 mixed (M1, M2, M4 on kind 2 with declared properties; M3 on kind 3 with full expectations),
+  both strategies, 52 runs; kind 3 is a test condition, not the work cycle. Next: the build's plan, approved by Hadi.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
