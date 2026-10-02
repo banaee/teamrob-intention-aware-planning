@@ -1119,7 +1119,10 @@ recognition-to-planning chain (recognizer, gate, projection, meta-planner) teste
 scenario per decision, against an oracle that states the expected decision before the run. Not T3 or T3b, the Phase 4C
 realization tasks. CLOSED (the close-out, 30 September 2026): it establishes structural branch reachability, not
 consequential activation under conflict, which is track 3b's (TODO-145).
-→ `docs/design_decisions.md`, "The meta-planner test-bed (MPB)".
+ADDED (T-G records 10, 2 October 2026): the MPB on dock_loading is a second set of the same instrument, T-G stage 1's,
+ruled 2 October 2026 (MPB-DL1 to MPB-DL6); kitting's MPB stays closed.
+→ `docs/design_decisions.md`, "The meta-planner test-bed (MPB)"; "T-G: the second domain's rulings", THE MPB ON
+DOCK_LOADING.
 
 ---
 

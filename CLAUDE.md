@@ -317,6 +317,15 @@ Decisions
   per container (B9's note). Next: the design of the MPB set with Hadi (open: pallets already in a bay while the robot
   delivers others; the robot's last task as a return; expected decisions when the human's sequence depends on the
   robot's, C6).
+  The MPB on dock_loading is RULED (Hadi, 2 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", THE MPB
+  ON DOCK_LOADING, MPB-DL1 to MPB-DL6): a test and an analysis, no framework change; part 1 a few of kitting's decision
+  paths, part 2 one scenario per case dock_loading adds (seven), no full coverage claimed; a new setup kind for the
+  controlled scenarios (one full pallet already in each delivery bay; the human scans only those); controlled scenarios
+  with full expectations before the run, mixed ones (a dependent script allowed) with declared properties only, never
+  claimed to validate the recognizer's decisions; the last-task-as-a-return proposal not taken, the per-room separation
+  counts with a standing robot reported instead (TODO-135); office_break stays 90 seconds; `single_task` primary;
+  env_layout_03 and env_layout_04 only; about 8 controlled and 4 mixed scenarios, 48 runs. Next: the MPB set's
+  scenarios, agreed with Hadi before they are authored.
   Not to be
   started unasked: T-F, T-V, the T-D tail and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

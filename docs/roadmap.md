@@ -710,6 +710,19 @@ dock_loading; then the authoring of the set, its expectations and its runs.
     one point per container (B9's note, LIMIT-04). The IR test-bed of stage 1 is CLOSED. Next: the design of the MPB set
     with Hadi; open for it: a setup with pallets already in a bay while the robot delivers others; the robot's last task
     as a return; how expected decisions are derived when the human's sequence depends on the robot's decisions (C6).
+    RULED, THE MPB ON DOCK_LOADING (Hadi, 2 October 2026; design_decisions.md, "T-G: the second domain's rulings", THE MPB
+    ON DOCK_LOADING, MPB-DL1 to MPB-DL6; T-G records 10): a test and an analysis; nothing in the framework changes. Part
+    1, a few of kitting's decision paths re-instantiated on dock_loading; part 2, one scenario for each of seven cases
+    dock_loading adds; no full coverage claimed, kitting's coverage matrix not repeated. A new setup kind for the
+    controlled scenarios: one full unscanned pallet already in each delivery bay, one full pallet in the truck for each
+    bay, two empty pallets; the human scans only the pallets in the bays at the start. Controlled scenarios: scripts
+    independent of the robot, full expectations committed before the run; mixed scenarios: a dependent script allowed,
+    properties declared before the run, and no claim that they validate the recognizer's decisions (C6's third clause,
+    for stage 1). The last-task-as-a-return proposal closed, not taken; in its place the per-room counts of ticks below
+    the minimum separation with a standing robot, beside the violations with a moving robot (TODO-135). office_break
+    stays 90 seconds. `single_task` primary, `full_reorder` second; two rooms, env_layout_03 and env_layout_04
+    (env_layout_02 excluded as a reduction of scope, its late admission untested); about 8 controlled and 4 mixed
+    scenarios, 48 runs. Next: the MPB set's scenarios, agreed with Hadi before they are authored.
   - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
