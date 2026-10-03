@@ -31,7 +31,7 @@ import webbrowser
 import zlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from xml.sax.saxutils import escape, quoteattr
 
 LAYOUT_KEYS = ("space", "areas", "env_objects")
@@ -90,8 +90,8 @@ def layout_svg(layout: dict, grid: bool = False) -> str:
     the layout point (x, y) is drawn at SVG (x, -y), so y points up.
 
     Each entry of env_objects is one <g class="obj"> element carrying the object's id
-    (data-id), its type (data-type) and its position (data-x, data-y), translated to its
-    centre; its rectangle and label are drawn about (0, 0) inside it. With `grid`, grid lines
+    (data-id), its type (data-type), its subtype where it has one (data-subtype, and shown
+    after the id) and its position (data-x, data-y), translated to its centre; its rectangle and label are drawn about (0, 0) inside it. With `grid`, grid lines
     are drawn over the areas and under the objects (the edit page's; "render" draws none).
     """
     space = layout["space"]
@@ -169,14 +169,18 @@ def layout_svg(layout: dict, grid: bool = False) -> str:
         x, y = float(o["position"][0]), float(o["position"][1])
         w, h = float(o["size"][0]), float(o["size"][1])
         oid = str(o["id"])
-        a(f'<g class="obj" data-id={quoteattr(oid)} data-type={quoteattr(str(o["type"]))} '
+        subtype = o.get("subtype")
+        subtype_attr = f' data-subtype={quoteattr(str(subtype))}' if subtype is not None else ""
+        subtype_text = (f'<tspan font-style="italic" fill="#444444"> \u00b7 {escape(str(subtype))}</tspan>'
+                        if subtype is not None else "")
+        a(f'<g class="obj" data-id={quoteattr(oid)} data-type={quoteattr(str(o["type"]))}{subtype_attr} '
           f'data-w="{_num(w)}" data-h="{_num(h)}" '
           f'data-x="{_num(x)}" data-y="{_num(y)}" transform="translate({_num(x)} {_num(-y)})">'
           f'<rect x="{_num(-w / 2)}" y="{_num(-h / 2)}" width="{_num(w)}" height="{_num(h)}" '
           f'fill="{colours[o["type"]]}" fill-opacity="0.55" stroke="#222222" '
           f'stroke-width="{_num(font / 10)}"/>'
           f'<text x="0" y="{_num(font * 0.35)}" font-size="{_num(font * 0.9)}" text-anchor="middle" '
-          f'fill="#000000">{escape(oid)}</text></g>')
+          f'fill="#000000">{escape(oid)}{subtype_text}</text></g>')
 
     # Legend of the types.
     ly = H / 2 + font * 3.2
@@ -234,8 +238,9 @@ def cmd_render(paths: List[str]) -> None:
 # edit
 # =============================================================================
 
-# Object library entries: one per distinct (type, size) of the layout files in the source's folder.
-LibraryEntry = Tuple[str, Tuple[float, float]]
+# Object library entries: one per distinct (type, size, subtype) of the layout files in the source's
+# folder; the subtype is None for an object without the field.
+LibraryEntry = Tuple[str, Tuple[float, float], Optional[str]]
 
 PAGE = r"""<!doctype html>
 <html><head><meta charset="utf-8"><title>Layout editor: __SOURCE__</title>
@@ -290,7 +295,7 @@ PAGE = r"""<!doctype html>
 "use strict";
 const GRID = __GRID__;
 const EXISTING = new Set(__EXISTING__);
-const LIBRARY = __LIBRARY__;       // [{type, size: [w, h]}], one per distinct (type, size) in the folder
+const LIBRARY = __LIBRARY__;       // [{type, size: [w, h], subtype}], one per distinct (type, size, subtype) in the folder
 const SOURCE_IDS = __SOURCE_IDS__; // every id of the source layout, deleted ones included
 const stage = document.getElementById("stage");
 const status = document.getElementById("status");
@@ -303,6 +308,7 @@ const objs = [];
 for (const g of stage.querySelectorAll("g.obj")) {
   const x = parseFloat(g.dataset.x), y = parseFloat(g.dataset.y);
   objs.push({ id: g.dataset.id, type: g.dataset.type, size: [parseFloat(g.dataset.w), parseFloat(g.dataset.h)],
+              subtype: g.dataset.subtype === undefined ? null : g.dataset.subtype,
               x: x, y: y, x0: x, y0: y, added: false });
 }
 const deleted = new Set();
@@ -346,7 +352,7 @@ function select(id) { selected = id; highlight(); hideWarn(); }
 
 // The drawing comes from the server: after an add or a delete the page asks for the drawing of its state.
 async function refresh() {
-  const body = { objects: objs.map(o => ({ id: o.id, type: o.type, size: o.size, position: [o.x, o.y] })) };
+  const body = { objects: objs.map(o => ({ id: o.id, type: o.type, size: o.size, subtype: o.subtype, position: [o.x, o.y] })) };
   const resp = await fetch("/svg", { method: "POST", headers: { "Content-Type": "application/json" },
                                       body: JSON.stringify(body) });
   if (!resp.ok) { status.innerHTML = '<span class="bad">drawing failed: ' + (await resp.text()) + "</span>"; return; }
@@ -396,17 +402,15 @@ function endDrag() {
 stage.addEventListener("pointerup", endDrag);
 stage.addEventListener("pointercancel", endDrag);
 
-// Object library: a click adds one object of the entry's type and size.
-// Id: <type>_<N>, N one more than the highest N of that form among the source's ids and the page's objects.
+// Object library: a click adds one object of the entry's type, size and subtype.
+// Id: the first of <type>_0, <type>_1, ... that equals no id of the source layout and no id used on the page
+// (an id deleted during this edit included). Ids are compared whole, for equality only.
+const usedIds = new Set(SOURCE_IDS);
 function nextId(type) {
-  const prefix = type + "_";
-  let n = -1;
-  for (const id of SOURCE_IDS.concat(objs.map(o => o.id))) {
-    if (!id.startsWith(prefix)) continue;
-    const rest = id.slice(prefix.length);
-    if (/^[0-9]+$/.test(rest)) n = Math.max(n, parseInt(rest, 10));
+  for (let n = 0; ; n++) {
+    const candidate = type + "_" + n;
+    if (!usedIds.has(candidate)) return candidate;
   }
-  return prefix + (n + 1);
 }
 // Position: the origin (inside every space, on the grid); if an object's centre is there, 50 cm further along x, then y.
 function freeSpot() {
@@ -420,7 +424,9 @@ function freeSpot() {
 }
 async function addObject(entry) {
   const [x, y] = freeSpot();
-  const o = { id: nextId(entry.type), type: entry.type, size: entry.size.slice(), x: x, y: y, x0: x, y0: y, added: true };
+  const o = { id: nextId(entry.type), type: entry.type, size: entry.size.slice(), subtype: entry.subtype,
+              x: x, y: y, x0: x, y0: y, added: true };
+  usedIds.add(o.id);
   objs.push(o);
   await refresh();
   select(o.id);
@@ -434,7 +440,8 @@ for (const entry of LIBRARY) {
     lastType = entry.type;
   }
   const b = document.createElement("button");
-  b.className = "entry"; b.textContent = entry.size[0] + " × " + entry.size[1];
+  b.className = "entry";
+  b.textContent = entry.size[0] + " × " + entry.size[1] + (entry.subtype === null ? "" : " · " + entry.subtype);
   b.addEventListener("click", () => addObject(entry));
   library.appendChild(b);
 }
@@ -492,7 +499,8 @@ saveBtn.addEventListener("click", async () => {
   const name = nameBox.value.trim();
   const positions = {};
   for (const o of objs) if (!o.added && (o.x !== o.x0 || o.y !== o.y0)) positions[o.id] = [o.x, o.y];
-  const added = objs.filter(o => o.added).map(o => ({ id: o.id, type: o.type, size: o.size, position: [o.x, o.y] }));
+  const added = objs.filter(o => o.added).map(o => ({ id: o.id, type: o.type, size: o.size, subtype: o.subtype,
+                                                      position: [o.x, o.y] }));
   const resp = await fetch("/save", { method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name: name, positions: positions, added: added, deleted: Array.from(deleted) }) });
   const res = await resp.json();
@@ -533,7 +541,7 @@ def name_problem(name: str, folder: Path) -> str:
 
 def object_library(folder: Path) -> List[LibraryEntry]:
     """
-    One entry per distinct (type, size) among the env_objects of every layout file in
+    One entry per distinct (type, size, subtype) among the env_objects of every layout file in
     `folder` (its *.json that are layouts, sorted); a file that is not a layout is
     skipped with a note.
     """
@@ -542,10 +550,12 @@ def object_library(folder: Path) -> List[LibraryEntry]:
         try:
             layout = load_layout(path)
             for o in layout["env_objects"]:
-                entries.add((str(o["type"]), (float(o["size"][0]), float(o["size"][1]))))
+                subtype = o.get("subtype")
+                entries.add((str(o["type"]), (float(o["size"][0]), float(o["size"][1])),
+                             None if subtype is None else str(subtype)))
         except (ValueError, OSError, KeyError, IndexError, TypeError, json.JSONDecodeError) as e:
             print(f"layout_tool: object library skips {path.name}: {e}", file=sys.stderr)
-    return sorted(entries)
+    return sorted(entries, key=lambda e: (e[0], e[1], e[2] is not None, e[2] or ""))
 
 
 def _point(oid: str, pos, W: float, H: float) -> list:
@@ -564,11 +574,13 @@ def edited_layout(source: dict, name: str, library: List[LibraryEntry],
     """
     The source layout with: the positions of the named objects replaced, the objects
     `added` appended (fields id, type, position, size, in that order), the objects
-    `deleted` removed, and space.name set to `name`. Everything else is unchanged: every
+    `deleted` removed, and space.name set to `name`. An added object has the fields id,
+    type, position, size, and subtype where its library entry has one. Everything else is unchanged: every
     other field of every kept object (slots included), the areas, the rest of the space.
     Refuses: an unknown id; a moved object that is deleted; an added id that is the id of
     a source object (a deleted id is never reused) or repeated; an added (type, size)
-    that is not an entry of the object library; a centre outside the space.
+    that is not an entry of the object library (an object without a subtype matches an
+    entry without one); a centre outside the space.
     """
     space = source["space"]
     W, H = float(space["width"]), float(space["height"])
@@ -600,10 +612,17 @@ def edited_layout(source: dict, name: str, library: List[LibraryEntry],
             size = (float(a["size"][0]), float(a["size"][1]))
         except (TypeError, ValueError, IndexError):
             raise ValueError(f"'{oid}': a size is two numbers")
-        if (str(a["type"]), size) not in allowed:
-            raise ValueError(f"'{oid}': type {a['type']} with size {list(size)} is not in the object library")
-        new_objects.append({"id": oid, "type": str(a["type"]), "position": _point(oid, a["position"], W, H),
-                            "size": [_clean(size[0]), _clean(size[1])]})
+        subtype = a.get("subtype")
+        if subtype is not None and not isinstance(subtype, str):
+            raise ValueError(f"'{oid}': a subtype is a string")
+        if (str(a["type"]), size, subtype) not in allowed:
+            what = f"type {a['type']}, size {list(size)}" + ("" if subtype is None else f", subtype {subtype}")
+            raise ValueError(f"'{oid}': {what} is not in the object library")
+        new_object = {"id": oid, "type": str(a["type"]), "position": _point(oid, a["position"], W, H),
+                      "size": [_clean(size[0]), _clean(size[1])]}
+        if subtype is not None:
+            new_object["subtype"] = subtype
+        new_objects.append(new_object)
     new = copy.deepcopy(source)
     new["space"]["name"] = name
     kept = []
@@ -622,7 +641,8 @@ def drawing_layout(source: dict, objects: List[dict]) -> dict:
     """The layout to draw for the page's state: the source's space and areas, the page's objects."""
     return {"space": source["space"], "areas": source["areas"],
             "env_objects": [{"id": str(o["id"]), "type": str(o["type"]), "position": o["position"],
-                             "size": o["size"]} for o in objects]}
+                             "size": o["size"], **({"subtype": o["subtype"]} if o.get("subtype") is not None else {})}
+                            for o in objects]}
 
 
 def cmd_edit(source_path: Path) -> None:
@@ -641,8 +661,8 @@ def cmd_edit(source_path: Path) -> None:
                     .replace("__GRID__", str(GRID_CM))
                     .replace("__UNITS__", escape(units))
                     .replace("__EXISTING__", embed(existing))
-                    .replace("__LIBRARY__", embed([{"type": t, "size": [_clean(w), _clean(h)]}
-                                                    for t, (w, h) in library]))
+                    .replace("__LIBRARY__", embed([{"type": t, "size": [_clean(w), _clean(h)], "subtype": st}
+                                                    for t, (w, h), st in library]))
                     .replace("__SOURCE_IDS__", embed([str(o["id"]) for o in source["env_objects"]])))
         return html.encode("utf-8")
 
