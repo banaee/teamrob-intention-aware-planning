@@ -4631,7 +4631,9 @@ The layout field `orientation_deg` is read by no code: the loader (`mesa_sim/sim
 object's `position` and `size` only, and every rectangle is axis-aligned. The field exists only in kitting
 env_layout_02 and in env_layout99 (unregistered). scripts/layout_tool.py does not draw it. Open question: remove the
 field or implement it.
-Files: domains/kitting/layouts/env_layout_02.json, domains/kitting/env_layout99.json, mesa_sim/sim_model.py
+Also (3 Oct 2026): `orientation_deg` occurs on an item in kitting env_setup_02 (item_0, -90), a movable object. The
+loader reads no such field for a movable object either.
+Files: domains/kitting/layouts/env_layout_02.json, domains/kitting/env_layout99.json, domains/kitting/setups/env_setup_02.json, mesa_sim/sim_model.py
 Reference: domains/README.md, section 2
 
 **TODO-167: dock_loading, part of the space in no area (recorded, layout tool, 3 Oct 2026)** open
@@ -4674,3 +4676,17 @@ Files: mesa_sim/viz/space_drawer.py, domains/dock_loading/layouts/
 Kitting items carry `subtype` in the setups, and no code reads it (`SimObject.subtype` is loaded and unused).
 Files: domains/kitting/setups/, mesa_sim/sim_model.py
 Reference: design_decisions.md, "`subtype` is a stated fact of an object"
+
+**TODO-173: Slots in containers (recorded, layout tool, 3 Oct 2026; T-G, covers both domains)**
+A possible change from one position per container to named slots inside a container (kitting `shelf` and
+`kitting_table`, dock_loading containers). A movable object would have a designated slot, and the world would state
+which slot is empty or full. The existing `slots` field on kitting shelves is kept for this. The terms need glossary
+entries before design work starts. Not designed.
+Files: domains/kitting/layouts/ (the `slots` field of shelves), domains/dock_loading/layouts/, domains/*/setups/
+Reference: docs/glossary.md, §10 **container**; design_decisions.md, "T-G: the second domain's rulings", B9
+
+**TODO-174: "door" names two things (recorded, layout tool, 3 Oct 2026)** open
+"door" is a type in dock_loading (`office_door`, size [100, 10]) and the id of a landmark in kitting (size [80, 20]).
+One word names two things. Open question: whether one of them is renamed.
+Files: domains/dock_loading/layouts/, domains/kitting/layouts/env_layout_01.json, env_layout_03.json to _07, env_layout_09.json
+Reference: docs/glossary.md, §6 **landmark**; design_decisions.md, "An object id is an opaque name"

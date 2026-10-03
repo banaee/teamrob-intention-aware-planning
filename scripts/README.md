@@ -6,9 +6,9 @@ Utility scripts. They are not on the run path.
 
 ## The layout tool (`layout_tool.py`)
 
-The tool draws a layout as a PNG, without a simulator. It also derives a new layout from an existing one: you drag the
-fixed objects in a browser and save the result under a new id. One function draws the layout as SVG; both commands use
-it.
+The tool draws a layout as a PNG, without a simulator. It also derives a new layout from an existing one: you move,
+add and delete fixed objects in a browser and save the result under a new id. One function draws the layout as SVG;
+both commands use it.
 
 A layout is one JSON file with the top-level keys `"space"`, `"areas"` and `"env_objects"` (`domains/README.md`,
 section 2; `docs/glossary.md` §9). The file stem is the layout's id.
@@ -43,18 +43,35 @@ A type keeps its colour from one layout to the next.
 python scripts/layout_tool.py edit domains/kitting/layouts/env_layout_02.json
 ```
 
-- The program starts a local server on 127.0.0.1 and opens the browser on a page with the same drawing.
-- Dragging a fixed object moves its centre. The centre snaps to a 10 cm grid. Objects you do not drag keep their exact
-  positions.
-- A drag that puts the centre outside the space is refused. The object stays at its last position inside, and the page
-  says why.
-- "Save as" takes the new layout's id: the file stem, without `.json`. The page refuses the name, before saving, when:
+- The program starts a local server on 127.0.0.1 and opens the browser on a page with the same drawing, with grid
+  lines over the space: very light gray every 50 cm, slightly darker every 100 cm. The grid is in "edit" only; the PNG
+  from "render" has none.
+- **Move.** Dragging a fixed object moves its centre. The centre snaps to a 5 cm grid. While you drag, the page shows
+  the object's id and position as numbers. Objects you do not drag keep their exact positions.
+- **Refusal.** A drag that puts the centre outside the space is refused. The object stays at its last position inside,
+  and the page says why.
+- **Add.** The page has a list, the object library. The tool builds it from every layout file in the folder of the
+  source layout: one entry per distinct (type, size). A click on an entry adds one object of that type and size. Then
+  you drag it.
+  - The new object has the fields `id`, `type`, `position`, `size`, and no other.
+  - Its id is `<type>_<N>`, N one more than the highest N of that form among the ids of the source layout and of the
+    page (0 if there is none). A deleted id is not used again, so a setup that names it does not attach to a new
+    object. Where a type has no such id yet (for example `landmark`), the first id is `landmark_0`.
+  - It first appears at the origin (0, 0): inside every space, on the grid. If another object's centre is there, it
+    appears 50 cm further along x, then along y.
+- **Delete.** Click an object to select it, then "Delete selected" (or the Delete key). The page warns first. The
+  loader refuses a setup that names a fixed object the layout lacks as a home container or as a destination, and
+  refuses a scenario whose task names it. A setup that does not name the object still loads.
+- **Save as** takes the new layout's id: the file stem, without `.json`. The page refuses the name, before saving,
+  when:
   - it is empty;
   - it holds `/` or `\`;
   - it ends in `.json` (the id would then end in `.json`);
   - it starts with `.`;
   - `<id>.json` or `<id>.png` exists already in the source layout's folder.
 - "Save as" writes `<id>.json` and `<id>.png` into the source layout's folder. The PNG is the one "render" writes.
+  `space.name` of the new layout is its id. The server checks: ids are unique; every added object is an entry of the
+  object library; every centre is inside the space; a deleted object is absent.
 - The program never overwrites a file and never modifies the source layout.
 - Ctrl+C in the terminal stops the program.
 
@@ -69,11 +86,15 @@ It reads the geometry as the loader does (`mesa_sim/sim_model.py`):
 
 ### Limits
 
-- "edit" changes only the positions of the entries of `"env_objects"`. It does not rotate, resize, add or delete an
-  object, and it does not change the areas. Every id, type and size stays, so the setups of the source layout stay
-  usable with the new layout.
-- A saved layout copies `space.name` and every object's `notes` from its source. Edit them by hand if they describe
-  the old positions.
+- "edit" moves, adds and deletes the entries of `"env_objects"`. It does not rotate or resize an object, it has no
+  field for a size, it adds no new type (only types and sizes the folder already has), and it does not change the
+  areas.
+- It does not draw `slots` and gives no way to edit it. An existing object keeps its `slots` field, and every other
+  field, unchanged in the saved layout.
+- A saved layout copies the `notes` of the objects from its source, and the other fields of `space`. Edit them by
+  hand if they describe the old layout.
+- A moved or kept object keeps its id, type and size, so the setups of the source layout stay usable with the new
+  layout unless an object they name was deleted.
 
 ### Dependency
 
