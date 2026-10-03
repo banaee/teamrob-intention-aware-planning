@@ -26,7 +26,8 @@ about: what the human produces. An abandoned delivery is in scope for what it do
   - One ccode session, one concern. A follow-up goes to the session it belongs to.
   - Once a plan with numbered steps is agreed, replies keep those step numbers.
   - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.
-    Detail goes into the repository's files.
+    Detail goes into the files the task already produces (a room's notes, a set's README, a report the task asked
+    for); this rule creates no new report file (workflow rule 6).
 
 ## Where to look, and what to skip
 
