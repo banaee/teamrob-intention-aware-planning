@@ -4615,3 +4615,13 @@ division of the strength among the task's live hypotheses (AM2) reconsidered.
 Files: the domains' layouts, the domains' context knowledge, shared/recognizer.py (the prior)
 Reference: design_records.md, "T-K", CONTENT POINTS 1 AND 2, AM18, AM19, NOT RULED; design_decisions.md,
 "T-K: context knowledge in the recognizer's belief", R3's AM2
+
+**TODO-165: Object rectangles crossing the outline of the space (recorded, layout tool, 3 Oct 2026)** open
+In env_layout_12, env_layout_13 and env_layout_14 (kitting) the rectangles (position ± size/2) of shelf_6 and
+kitting_table_4 (all three layouts) and kitting_table_6 (env_layout_14) cross the outline of the space, while their
+centres are inside. domains/README.md, section 2, says the space holds every fixed object; the loader reads an object's
+position as a point and its size for drawing only, so no check refuses it. Found when drawing the layouts with
+scripts/layout_tool.py; the layouts are not changed (Hadi, 3 Oct 2026). The tool's edit page refuses a dragged object
+whose centre leaves the space, not one whose rectangle does (Hadi, 3 Oct 2026).
+Files: domains/kitting/layouts/env_layout_12.json, env_layout_13.json, env_layout_14.json
+Reference: domains/README.md, section 2; mesa_sim/sim_model.py (`_init_objects`)
