@@ -163,6 +163,34 @@ a digital act written to that system at once. Its knowledge of objects does not 
 Perception · Hadi, 1 Oct 2026 (T-G A6) · the robot's WorldState (object states, T-G A5); dock_loading's scan.
 The simulated robot reads the environment's true states through its body; no observation of the scan is modelled.
 
+**5.4** The robot knows which facts of the scenario's timeline of context facts hold, exactly and at once; no sensing
+is modelled. The justification is the site's system (clock, schedule, temperature sensor), as for object states (5.3).
+The facts reach the robot's mind through the world state: the environment applies the timeline, the world state
+carries the facts, the recognizer reads them there. A **recency fact** (glossary §5) rests on the mind's own memory of
+an observed completion: the world state holds no history, and the mind does not read the simulator's record of the
+human. A completion the robot does not observe produces no recency fact (a limit once the human can be outside the
+monitored areas, 2.3); a task cut before its completion produces none.
+Perception · Hadi, 3 Oct 2026 (T-G stage 1.5, AM25, AM27; placed here by AM28) · the robot's WorldState; the
+recognizer's prior. Ruled, not built.
+
+## 6. Context knowledge
+
+Ruled by Hadi, 3 October 2026 (T-G stage 1.5, AM28; design_decisions.md, "T-G stage 1.5: context knowledge in the
+recognizer's belief"). Not built.
+
+**6.1** Given the task, the human's movement does not depend on the context.
+Framework scope · T-G stage 1.5, its assumption A1 (placed here by AM28) · the recognizer's evidence, which contains no
+context (R2).
+
+**6.2** The robot's declared duration of a task and the human's actual duration match. This is a baseline: a violation
+is a deviation that the existing chain handles.
+Framework scope · T-G stage 1.5, its assumption A5 (placed here by AM28); "The human's wait duration in the projection
+is the schema's, converted by the body (TODO-32, R2)" · the projection; the stage's tests (a duration mismatch).
+
+**6.3** The durations declared in the domains (the waits of the foreseeable tasks, the recency durations) are at a
+compressed demonstration scale and are not calibrated.
+Simulator convention · Hadi, 3 Oct 2026 (T-G stage 1.5, AM23) · the domains' task schemas and context knowledge.
+
 ## Rejected or dropped
 
 - **2.1** "The human acts rationally": too strong; nothing depends on it.

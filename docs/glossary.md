@@ -466,7 +466,7 @@ S_k: the rule is unchanged, restated. At v = 20 cm/tick and
 live target), 497 cm at α = 0.01.
 → the same entry, E4, E5.
 
-The entries below are ruled (T-G stage 1.5, Hadi, 2 October 2026; amended 3 October 2026, AM1 to AM9) and not built. Stage 1.5 builds crisp context
+The entries below are ruled (T-G stage 1.5, Hadi, 2 October 2026; amended 3 October 2026, AM1 to AM9, and AM10 to AM29 on the values and the perception assumption) and not built. Stage 1.5 builds crisp context
 facts; the degrees (a context fact satisfied to a degree, the membership function) are T-K's (§8). Context knowledge acts
 in the robot's mind only, in the recognizer's belief: it does not drive the human, and the conditions of tasks (the
 methods' guards, **applicable**, §6) are not context knowledge (R1).
@@ -476,6 +476,8 @@ methods' guards, **applicable**, §6) are not context knowledge (R1).
 strongly it considers each live hypothesis. It enters the **prior** only (R1, R2); adequacy and warrant do not read it.
 The code's `ContextKnowledge` (`shared/knowledge.py`) and the context weight are its present, domain-naming form
 (TODO-66), replaced at stage 1.5's build.
+AMENDED (AM26, 3 October 2026): the declared context knowledge (the facts that exist, the occurrence conditions, the
+strengths, the recency durations) reaches the mind directly from the knowledge component, as the task model does.
 
 **context value** — a measured or scheduled quantity of the situation (a time of day, a temperature). An action may
 change a context value.
@@ -483,6 +485,11 @@ change a context value.
 **context fact** — a declared fact derived from context values, satisfied to a degree in [0, 1]; a crisp fact has only
 0 and 1 (R5). In this stage no task's action sets or removes a context fact directly. Stage 1.5 builds crisp facts only,
 on a timeline in the scenario.
+AMENDED (AM10, AM14, AM20, AM21, AM25, 3 October 2026): every fact of stage 1.5 is crisp (AM10). A fact on the
+timeline is a state: an entry of the timeline is the change, and the fact holds on every tick until the next change;
+the change is no trigger of the meta-planner (AM21). No action sets or removes a context fact (AM20). The robot knows
+which timeline facts hold exactly and at once, through the world state (AM25). A **recency fact** (below) is a context
+fact of stage 1.5 that is not on the timeline (AM14).
 
 **membership function** — gives the degree to which a context fact is satisfied from a context value. Declared knowledge,
 with its source (R5). T-K's.
@@ -493,6 +500,18 @@ maximum for "or", 1 minus the degree for "not" (R5, the selected operators). Not
 liveness.
 AMENDED (AM7, 3 October 2026): in stage 1.5 an occurrence condition is one context fact or a conjunction of context
 facts; "or" and "not" arrive with T-K, with R5's operators.
+AMENDED (AM11, AM15, 3 October 2026; supersedes AM7's line in part): a condition over context facts and object states,
+using "and" and "not". It reads three sources: a context fact on the scenario's timeline, an object state (T-G A5),
+a **recency fact**. "Or" stays in T-K. With it not satisfied, the task has its low strength and stays live (AM12).
+
+**recency fact** (AM14, AM15, 3 October 2026; not built) — a context fact derived from the time since the robot
+observed completion of a named task; it holds for a declared duration after that observation. Declared per task. It
+rests on the mind's own memory of an observed completion; a completion the robot does not observe, or a task cut
+before its completion, produces none (AM27).
+
+**recency duration** (AM15, AM16, 3 October 2026; not built) — the declared duration for which the recency fact holds,
+with its source. Counted from the observed completion. The values: design_records.md, "T-G stage 1.5", CONTENT POINTS
+1 AND 2, AM16.
 
 **strength** — the declared relative weight of a foreseeable task against assigned work as a whole, which contributes 1
 (R3). A foreseeable task declares a low and a high strength, or one strength if it has no occurrence condition; under
@@ -1178,6 +1197,7 @@ the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.
 **T-K** — the build of degrees of context facts (T-G stage 1.5's R5: membership functions, the operators, the linear
 rule for a strength), ruled 2 October 2026; at the end of the V1 queue, after track 3b. Not started.
+AMENDED (AM11, 3 October 2026): "not" in an occurrence condition is stage 1.5's; T-K keeps "or" and the degrees.
 → `docs/design_decisions.md`, "T-G stage 1.5: context knowledge in the recognizer's belief", R5;
 `docs/design_records.md`, "T-G stage 1.5"; `docs/roadmap.md`, "The plan from T-A", T-K.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
