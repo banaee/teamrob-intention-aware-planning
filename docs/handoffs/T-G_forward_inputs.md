@@ -7,6 +7,8 @@ Updated 3 October 2026 after the design chat on T-K part 1's content points 1 an
 5.1, 5.2 and 5.5 corrected; section 2's last paragraph amended).
 Updated 3 October 2026 after Hadi's rulings on ccode's report (AM30 to AM33: section 5 in line; section 9 gains
 TODO-163 and TODO-164).
+Updated 3 October 2026 after Hadi's rulings on content point 3, the tests (KT1 to KT7, AM34: section 5 brought to that
+state; 5.4 item 3 and 5.6 rewritten).
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -185,6 +187,10 @@ POINTS 1 AND 2; docs/design_records.md, "T-K", CONTENT POINTS 1 AND 2; docs/glos
 recency duration, occurrence condition as amended); docs/assumptions.md 5.4, 6.1 to 6.3; TODO-163, TODO-164 [FW].
 UPDATED (3 October 2026, Hadi's rulings on ccode's report): AM30 to AM33 (5.1 and 5.2 below) and three notes for the
 build's plan (5.2).
+UPDATED (3 October 2026, Hadi's rulings on content point 3): the tests are ruled (KT1 to KT7; 5.4, item 3); the setup,
+not the scenario, holds the timeline of context facts (AM34). All three content points are ruled. Nothing is built.
+Records: docs/design_records.md, "T-K", CONTENT POINT 3, THE TESTS; docs/design_decisions.md, the entry, AM11's AM34.
+Next: the round without context knowledge (5.6).
 Records: docs/design_decisions.md, the entry "T-K: context knowledge in the recognizer's
 belief" (rulings R1 to R8, assumptions A1 to A7, amendments AM1 to AM9, corrections C1, C3 and C4). Correction
 C2, the caveat on the long runs, stands in docs/design_records.md under "T-G stage 1", in TODO-66 and in the MPB
@@ -222,6 +228,8 @@ Where this section and those records disagree, the records win.
   SUPERSEDED IN PART (AM11, 3 October 2026): it reads facts from three sources (a context fact authored as a window
   on the scenario's timeline, an object state, a recency fact) and uses "and" and "not". "Or" stays in T-K part 2. With it
   not satisfied, the foreseeable task has its low strength and stays live (AM12).
+  AMENDED (AM34, 3 October 2026): the timeline of context facts is the setup's, not the scenario's. Reason: it is the
+  world's course and does not depend on what the human does; one timeline is shared by several scenarios.
 - A context fact is a declared fact derived from context values (the clock time, the temperature). In
   T-K part 1 it is crisp: it holds or it does not hold.
   ADDED (AM10, AM14, AM20, AM21, 3 October 2026): every fact of T-K part 1 is crisp (AM10). A timeline fact is a
@@ -268,6 +276,7 @@ Where this section and those records disagree, the records win.
   fact reaches the recognizer is not ruled; it depends on open item 2. The design chat's sketch
   [chat only]: the environment applies it, the robot's world state carries it, the recognizer reads
   it there.
+  AMENDED (AM34, 3 October 2026) [ruled]: the timeline is the setup's, not the scenario's.
 - The declarations of context knowledge per domain: the context facts, and per foreseeable task its
   occurrence condition and its strengths. [implied by the rulings on the strengths; the values are open item 1]
 - The two run options, their names and their defaults.
@@ -320,6 +329,7 @@ CORRECTED AND ADDED (3 October 2026, after the design chat on content points 1 a
 
 Each is put to Hadi one at a time. None is decided.
 UPDATED (3 October 2026): items 1 and 2 are RULED (AM10 to AM29); item 3 stays open.
+UPDATED (3 October 2026): item 3 is RULED (KT1 to KT7, AM34). All three are ruled.
 
 1. RULED (3 October 2026; AM10 to AM24; 5.1, the values; design_records.md, "T-K", CONTENT POINTS 1 AND
    2). The text below is the question as it stood.
@@ -352,6 +362,36 @@ UPDATED (3 October 2026): items 1 and 2 are RULED (AM10 to AM29); item 3 stays o
    Hadi's direction (3 October 2026) [open, not ruled]: the tests start on kitting, then cover dock_loading's stage 1
    scenarios, with what dock_loading's layouts and scenarios need for context knowledge. The re-measurement of stage
    1's baseline is that dock_loading part.
+   RULED (3 October 2026; KT1 to KT7; design_records.md, "T-K", CONTENT POINT 3, THE TESTS) [ruled]. The text above
+   is the question as it stood.
+   - Order (KT1): kitting first, then dock_loading's stage 1 scenarios; in each domain the IRB with an idle robot
+     first, then the MPB with a working robot. Reason: T-K changes the belief, so recognition is examined first; the
+     two MPB cases then show whether a changed admission changes the robot's decision.
+   - Rooms on kitting (KT2): env_layout_15, _16 and _17, Hadi's design (the kitting table at the middle of the north
+     wall, the exit place corner_NE); env_layout_12 to _14 are unfit for a controlled test (the MPB's many tables).
+     15: no A/C switch, the basic room. 17: 15 plus an A/C switch between two deliveries. 16: a dense cluster with the
+     coffee machine and the A/C switch inside it. In 15 and 16 the human does all items and the robot is idle; 17
+     serves the MPB or a mix. env_layout_10, _11 and _02 stay unchanged as a comparison. A further layout by Hadi,
+     with more shelves and items, is to come for the second coffee break and the recency fact; that case waits for it.
+   - The basic set (KT3): the only variation is where a foreseeable task is placed, between tasks (after the first
+     delivery, after the second, and so on) or inside a task, between its actions; no other kind of deviation, so as
+     not to mix causes. The duration mismatch waits for a later set (it needs a deviation event; AM29). Two setups per
+     layout, five or more scenarios each, every scenario run with context knowledge on and off. Two cases also run in
+     the MPB: a coffee break inside the break time; deliveries through the whole break time. The measure: the tick at
+     which the true task reaches the threshold and is admitted, and whether a retraction follows. Expectations stated
+     before the runs.
+   - The setup holds the timeline (KT4, AM34): the two setups of a layout differ in their timeline, which is also how
+     the effect of a different window on the same activity is tested.
+   - A round without context knowledge first (KT5), before the mechanism is built: the setups and the human's
+     scripts in rooms 15, 16 and 17, run in the IRB with the present equal prior. It gives the "off" side of every
+     case and shows how well movement alone separates the tasks in these rooms.
+   - Findings (KT6), none changes a value: coffee_break's strength 3 gives, with one delivery live and no other
+     foreseeable task, a prior of exactly 0.75, the threshold (the value stays: moving it would choose a value from
+     the threshold); the recency duration of 90 ticks comes from the compressed wait while walking is not compressed,
+     and the walk from the coffee machine to the table and back takes about 84 to 94 ticks in these rooms (it joins
+     T-F's open item on the time scale, TODO-144); in room 15 the prior has no effect once no delivery is live; in
+     room 17 the robot must not hold item_1 or item_4, or the A/C switch no longer stands between two of the human's
+     hypotheses, and two deliveries that finish together at the shared table stop closer than min_separation.
 
 Also open, Hadi's choice [chat only; the records say only that A1 to A7 are not added to
 docs/assumptions.md]: whether A1 (given the task, the movement does not depend on the context), A5
@@ -403,6 +443,18 @@ UPDATED (3 October 2026): steps 1 and 2 are done for content points 1 and 2. Fro
 6. The re-measurement of stage 1's baseline with context knowledge on. Open at this step: whether the 22 potentially
    confounded MPB runs (section 4's caveat) are rerun then or in stage 2.
 7. The close of T-K part 1, with this file updated. Then T-G resumes at its stage 2 (section 6).
+
+UPDATED (3 October 2026, KT7): content point 3 is ruled and recorded. From here:
+
+1. The round without context knowledge (KT5): the setups (each with its timeline, AM34) and the human's scripts in
+   env_layout_15, _16 and _17, run in the IRB with the present equal prior.
+2. A new design chat takes the build of T-K part 1: ccode's list of the layouts with more than one A/C switch and what
+   rests on them, Hadi's decision on it, the layout change and the regeneration of the baselines that remain (AM19);
+   ccode's plan for the build, reviewed in the design chat; the build, its verification (AM24) and the review; the
+   runs with context knowledge on (the basic set, KT3, and the two MPB cases); dock_loading (the re-measurement of
+   stage 1's baseline; open there: whether the 22 potentially confounded MPB runs are rerun then or in stage 2); the
+   close of T-K part 1, with this file updated.
+3. A later design chat returns to T-G's stage 2 (section 6).
 
 ### 5.7 Background from the design chat [chat only]
 

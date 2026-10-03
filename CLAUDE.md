@@ -401,15 +401,28 @@ Decisions
   is open. Future work: TODO-163, TODO-164 [FW]. Nothing built. Next: content point 3, then ccode's list of the layouts
   with more than one A/C switch and what rests on them (AM19; Hadi decides on it; the layout change and the
   regeneration before the build), then the build's plan.
+  T-K part 1's content point 3 (the tests) is RULED (Hadi, 3 October 2026; design_records.md, "T-K", CONTENT POINT 3,
+  THE TESTS, KT1 to KT7; design_decisions.md, the same entry, AM11's AM34): kitting first, then dock_loading's stage 1
+  scenarios, in each the IRB with an idle robot before the MPB with a working robot (KT1); on kitting Hadi's rooms
+  env_layout_15 (no A/C switch), _16 (coffee machine and A/C switch in a dense cluster), _17 (15 plus an A/C switch
+  between two deliveries; MPB or mix), env_layout_10, _11, _02 unchanged as a comparison (KT2); the basic set varies
+  only where a foreseeable task is placed (between tasks, or inside a task between its actions), two setups per layout,
+  five or more scenarios each, context knowledge on and off, two MPB cases, the measure the tick at which the true task
+  reaches the threshold and is admitted and whether a retraction follows, expectations before the runs, the duration
+  mismatch a later set (KT3); the setup, not the scenario, holds the timeline of context facts (KT4, AM34); a round
+  without context knowledge first (KT5); findings, none changing a value (KT6). Nothing built. Next: the round without
+  context knowledge (rooms 15, 16, 17 in the IRB with the present equal prior); then a new design chat takes the build
+  of T-K part 1 (the list of the layouts with more than one A/C switch, AM19; the build's plan; the build; the runs with
+  context knowledge on; dock_loading; the close); a later chat returns to T-G's stage 2.
   T-G stage 1.5 was renamed T-K part 1 on 3 October 2026; git commit messages use the old name.
   T-K (design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS) is context knowledge as a whole, a task of the
   pipeline (framework-wide), not a stage of T-G. Part 1 (V1, ongoing):
-  crisp context knowledge, R1 to R8, AM1 to AM33, the state above. Part 2 (V1, at the end of the V1 queue after track
+  crisp context knowledge, R1 to R8, AM1 to AM34, KT1 to KT7, the state above. Part 2 (V1, at the end of the V1 queue after track
   3b): degrees (R5: membership functions, soft edges of a window, the gradual return after a task, "or", with "long
   work without a break" its open item; succession, R4, after T-G stage 2). Later, future work: the stream of context
   values with the world's dynamics, TODO-163, TODO-164, TODO-158 to TODO-161. A letter is never given to a different
   task; a task may be paused, resumed and revisited. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes
-  at its stage 2 when T-K part 1 is closed. Next: T-K part 1's content point 3, as above.
+  at its stage 2 when T-K part 1 is closed. Next: the round without context knowledge, as above.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

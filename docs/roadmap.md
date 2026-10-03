@@ -843,6 +843,22 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     completion (AM25 to AM27). Future work: TODO-163, TODO-164 [FW]. Content point 3 (the tests) is open. The build is
     not started. Next: content point 3, then ccode's list of the layouts with more than one A/C switch (AM19), then the
     build's plan.
+    RULED (Hadi, 3 October 2026; design_records.md, "T-K", CONTENT POINT 3, THE TESTS, KT1 to KT7; design_decisions.md,
+    the same entry, AM11's AM34): content point 3, the tests. Kitting first, then dock_loading's stage 1 scenarios; in
+    each domain the IRB with an idle robot, then the MPB with a working robot (KT1). On kitting Hadi's rooms
+    env_layout_15 (no A/C switch), _16 (the coffee machine and the A/C switch in a dense cluster) and _17 (15 plus an
+    A/C switch between two deliveries; the MPB or a mix); env_layout_10, _11 and _02 unchanged as a comparison; a
+    further layout for the second coffee break and the recency fact is to come (KT2). The basic set varies only where
+    a foreseeable task is placed, between tasks or inside a task between its actions; two setups per layout, five or
+    more scenarios each, each run with context knowledge on and off; two MPB cases (a coffee break inside the break
+    time, deliveries through the whole break time); the measure is the tick at which the true task reaches the
+    threshold and is admitted, and whether a retraction follows; expectations before the runs; the duration mismatch
+    waits for a later set (KT3). The setup, not the scenario, holds the timeline of context facts (KT4, AM34). A round
+    without context knowledge comes first, before the build: rooms 15, 16 and 17 in the IRB with the present equal
+    prior (KT5). Findings, none changing a value: KT6. The build is not started. Next: the round without context
+    knowledge; then a new design chat takes the build of T-K part 1 (the list of the layouts with more than one A/C
+    switch, the build's plan, the build, the runs with context knowledge on, dock_loading, the close); a later chat
+    returns to T-G's stage 2.
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing
