@@ -1,4 +1,4 @@
-# Handoff: Phase 7, interactive deviations and a context stream
+# Handoff: Phase 7, interactive deviations
 
 Recorded 23 September 2026 (cchat, Hadi). An idea for a later phase, after the planned pipeline
 T-A to T-G. Nothing here is decided; it is recorded so that the phase opens with its own chat
@@ -10,7 +10,7 @@ docs/design_decisions.md, docs/TODOS_AND_DEFERRED.md) are authoritative over thi
 > mid-action (`DuringAction`), not only at the next action boundary; export rewrites `Now` as `AfterAction` or
 > `DuringAction` from the record, and an injection on an empty stack as a plain script entry. Viewer walks go to
 > landmarks only. The "deviation vocabulary" and `script[script_index + 1:]` below are T-C's, replaced by T-H's script
-> and stack. What stays for Phase 7: the viewer and its buttons, the context stream, communication.
+> and stack. What stays for Phase 7: the viewer and its buttons, communication. The context stream is T-K's (section 3, point 4).
 
 > SCHEDULED (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): Phase 7 is T-V,
 > track 2, after T-G and T-F; T-V track 1 is the viewer for pre-loaded scripts, T-E as originally defined. T-E in this
@@ -25,9 +25,10 @@ simulation in the viewer clicks a button ("coffee break now", "stay here", "chan
 "walk to the corner") and the human executor injects that deviation at the next action boundary.
 The robot's mind is unchanged: it sees a trajectory, as always.
 
-A second, related idea: a stream of context knowledge (room temperature, coffee-break time
-slots, shift changes) fed into the world state during the run, so that the recognizer can
-condition its belief on situation, not only on walked path.
+A related idea, which is T-K's and not Phase 7's: context knowledge (room temperature, coffee-break
+time slots, shift changes) in the world state during the run, so that the recognizer can condition
+its belief on situation, not only on walked path. T-K part 1 carries crisp context facts on the
+scenario's timeline; the stream of context values with the world's dynamics is T-K's future work.
 
 ## 1. Why
 
@@ -35,7 +36,7 @@ condition its belief on situation, not only on walked path.
   the robot reacting to a departure it could not have known was coming.
 - It makes `unknown`, retraction, re-recognition, wait against reconsider, and the blocked case
   demonstrable live, on the demo day and as a capability claim in the paper.
-- The context stream opens a second scientific claim: recognition conditioned on situation.
+- Context knowledge (T-K, not Phase 7) opens a second scientific claim: recognition conditioned on situation.
 
 ## 2. What is fixed already (from T-C's design, C1)
 
@@ -62,10 +63,11 @@ condition its belief on situation, not only on walked path.
    socket and the same queue.
 3. The viewer: which buttons, what it shows (belief, admitted projection, decision, hold,
    refusal, the event marks). Builds on T-E's viewer.
-4. The context stream (its own task): what a context item is, how the world state carries it
-   in real time, how the robot's mind reads it, and which recognizer channel uses it (a prior
-   term or a likelihood term conditioned on context; today's evidence is walked path only).
-   Scientific item, not a simulator one.
+4. The context stream is not Phase 7's: context knowledge is T-K (crisp context facts in T-K part 1,
+   degrees in T-K part 2, the stream of context values with the world's dynamics T-K's future
+   work). The questions once recorded here (what a context item is, how the world state carries
+   it, how the robot's mind reads it, which recognizer channel uses it) are T-K's: design_decisions.md,
+   "T-K: context knowledge in the recognizer's belief".
 5. Communication as an action (its own task): when the robot, facing a live `unknown` or a
    block, raises communication instead of adapting its plan; how that enters B3's candidates.
    SUPERSEDED IN PART (T-D R, 27 September 2026): "a live `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".
@@ -100,8 +102,7 @@ Run-time checks from the code after T-C2b (read-only, no build; T-C2c, 23 Septem
 ## 5. Cost, rough
 
 Moderate for the live-deviation demo: the queue, a few buttons on T-E's viewer, the export to a
-script. Larger for the context stream: a recognizer extension with its own reasoning and a
-world-state extension, plus fixtures that make context matter.
+script. The context stream is T-K's (section 3, point 4), not part of this cost.
 
 ## 6. What to read first when the phase opens
 

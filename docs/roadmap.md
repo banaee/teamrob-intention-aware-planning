@@ -368,6 +368,10 @@ THE ORDER FROM 30 SEPTEMBER 2026 (ruled by Hadi; it supersedes every earlier sta
 the older records). Task letters are never reassigned; the order lives in this block and in CLAUDE.md's state
 paragraph, not in the alphabet.
 
+- THE PRESENT ORDER (Hadi, 3 October 2026; this block with V1 AND FW and the T-K bullet below): done T-A, T-B, T-C,
+  T-H, T-L; T-D closed except its tail; T-G's stage 1 closed and T-G paused. Now: T-K part 1. Then: T-G's stage 2,
+  track 4 (reduced form) and T-G's stage 3; T-F; T-V; track 3b; T-K part 2 at the end of the V1 queue. FW: the 4D
+  detour, T-S, T-K's later directions. The numbered list below is the order of 30 September 2026.
 - Done: T-A, T-B, T-C, T-H, T-L.
 - (1) T-D close: tracks 1, L, P, 2.5, G, X and 3 are done; the MPB is CLOSED (its close-out, 30 September 2026).
 - (2) T-G, the second domain in Mesa: dock_loading against `shared/` unchanged.
@@ -389,10 +393,12 @@ paragraph, not in the alphabet.
   later part. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes at its stage 2 when T-K part 1 is
   closed.
 
-V1 AND FW (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
+V1 AND FW (Hadi, 1 October 2026, amended by Hadi 3 October 2026 for T-K; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
-T-F; T-V track 1 and track 2; the T-D tail's track 3b (TODO-145). FW (future work, not designed, ruled or built within
-V1): the 4D detour; T-S; the conceptual directions TODO-147 to TODO-150. The order block above is superseded in part:
+T-K part 1 and T-K part 2 (the amendment); T-F; T-V track 1 and track 2; the T-D tail's track 3b (TODO-145). FW (future
+work, not designed, ruled or built within V1): the 4D detour; T-S; T-K's later directions (the stream of context
+values with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164; the amendment); the conceptual directions
+TODO-147 to TODO-150. The order block above is superseded in part:
 track 4 leaves the T-D tail for its place inside T-G (after stage 2); the 4D detour and T-S leave the queue for FW. T-G
 is open: its design is ruled (30 September and 1 October 2026) and build 1 is in (30 September 2026). Next, in order
 (1 October 2026): the lifecycle question of the human's list (parked under A3), then the layout and the setup of T-G's

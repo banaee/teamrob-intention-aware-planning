@@ -254,19 +254,21 @@ Decisions
   3b consequence under conflict (TODO-145, not ruled), T-F benefit (TODO-144). The MPB instrument saves the belief and S
   per tick and the projected human and planned robot segments per admitted decision, and draws `figure_ir.png` beside
   `figure.png`.
-  The pipeline is revised (Hadi, 30 Sept 2026; `docs/roadmap.md`, "The plan from T-A", its order block; task letters
-  are never reassigned, the order is not the alphabet). Done: T-A, T-B, T-C, T-H, T-L; T-D is closed except its tail.
-  Then, in order: T-G (the second domain in Mesa: dock_loading against `shared/` unchanged); T-F (the evaluation,
-  framed in TODO-144, the randomised harness TODO-47 part of it; kitting's part without a departure, dock_loading's may
-  use the unmonitored office (Hadi, 1 Oct 2026);
-  before track 3b it measures without knowing that the adaptive branches fire under conflict); T-V (viewer, interface
-  and interactive simulator: track 1 the viewer, which was T-E; track 2 Phase 7); the T-D tail (track 3b TODO-145,
-  track 4 TODO-140, the 4D detour strategy); T-S (ROS/PRIEST, Phase 6) last. Next: T-G's design, in a new design chat
-  from a handoff.
-  V1 and FW (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", A1): V1, the first complete
-  version, holds T-G, T-F, T-V tracks 1 and 2, track 3b (TODO-145) and track 4 in a reduced form (monitored areas,
-  A8, TODO-140), placed after T-G's stage 2; FW (not designed, ruled or built within V1) holds the 4D detour, T-S and
-  the conceptual directions TODO-147 to TODO-150. Open TODOs carry [V1] or [FW] beside their status when next touched by
+  The order of the tasks (Hadi; `docs/roadmap.md`, "The plan from T-A", its order block; task letters are never
+  reassigned, the order is not the alphabet). Done: T-A, T-B, T-C, T-H, T-L; T-D is closed except its tail; T-G's
+  stage 1 is closed and T-G is paused. Now: T-K part 1 (crisp context knowledge). Then, in order: T-G's stage 2, track 4
+  (its reduced form, TODO-140) and T-G's stage 3; T-F (the evaluation, framed in TODO-144, the randomised harness
+  TODO-47 part of it; kitting's part without a departure, dock_loading's may use the unmonitored office (Hadi, 1 Oct
+  2026); before track 3b it measures without knowing that the adaptive branches fire under conflict); T-V (viewer,
+  interface and interactive simulator: track 1 the viewer, which was T-E; track 2 Phase 7); track 3b (TODO-145); T-K
+  part 2 (degrees) at the end of the V1 queue. FW: the 4D detour strategy, T-S (ROS/PRIEST, Phase 6) and T-K's later
+  directions.
+  V1 and FW (Hadi, 1 Oct 2026, amended by Hadi 3 Oct 2026; design_decisions.md, "T-G: the second domain's rulings",
+  A1): V1, the first complete version, holds T-G, T-K part 1 and T-K part 2 (the amendment), T-F, T-V tracks 1 and 2,
+  track 3b (TODO-145) and track 4 in a reduced form (monitored areas, A8, TODO-140), placed after T-G's stage 2; FW (not
+  designed, ruled or built within V1) holds the 4D detour, T-S, T-K's later directions (the stream of context values
+  with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164; the amendment) and the conceptual directions
+  TODO-147 to TODO-150. Open TODOs carry [V1] or [FW] beside their status when next touched by
   Hadi's ruling; untagged means not yet ruled.
   T-G is OPEN: its design is ruled (30 Sept and 1 Oct 2026; the entry above, by scope: part A framework-wide, some of
   it changing `shared/` or `world/` when built, each with kitting byte-identical or no decision changed as acceptance;

@@ -544,7 +544,7 @@ mechanism; an action of unknown length inside a plan; a rule that keeps the robo
 Not future work [ruled]: a type-to-destination rule in place of explicit designations is recorded as not taken.
 By the rule on V1 and future work, an alternative not taken in a design question is never a future-work item.
 
-Also planned inside V1, after T-G: the evaluation; the viewer; an interactive simulator in which deviations are
+Also planned inside V1: T-K part 1 now (section 5), before T-G's stage 2; after T-G: the evaluation; the viewer; an interactive simulator in which deviations are
 injected at run time; one further test track on adaptation under conflict. T-K part 2, the degrees of context facts (section
 5.3), at the end of the V1 queue.
 

@@ -203,7 +203,7 @@ What changed in this chat (details in sections 3 and 4):
   `analysis/tc2c_scripts/play.py <n>`, five-line observations in `analysis/tc2c_scripts/play.md`.
 - Authoring convention: a script ends with the human leaving the workspace (`MoveTo("door")` or a
   corner) unless the scenario is about the terminal stand (TODO-80).
-- Phase 7 (interactive deviations and a context stream) is recorded, not scheduled:
+- Phase 7 (interactive deviations; the context stream is T-K's) is recorded, not scheduled:
   `docs/handoffs/phase7_interactive_deviations.md`, roadmap section, one design_decisions entry.
 
 ## 3. What this chat did, in order (all committed and pushed)
@@ -370,7 +370,7 @@ Next, in order, for the new chat (T-L inserted before T-D, ruled 26 Sept 2026; d
    roadmap's numbering).
 5. **Two-table re-examination of the recognizer and B2**: its own task after T-B, unscheduled
    (roadmap line, four points).
-6. **Phase 7**: interactive deviations and a context stream; own chat, own revised handoff; not this
+6. **Phase 7**: interactive deviations (the context stream is T-K's); own chat, own revised handoff; not this
    chat's work beyond its agenda line.
 
 The documentation pass for the paper comes before the paper, not before the demonstration.

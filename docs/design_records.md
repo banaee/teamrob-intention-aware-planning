@@ -1268,6 +1268,11 @@ analysis/kitting/mpb/REPORT.md reproduces exactly. An instrument correction, no 
   V1 is the first complete version of the framework, the package for TeamRob and the publications. In V1: T-G; T-F; T-V
   track 1 and track 2; the T-D tail's track 3b (TODO-145); track 4 in the reduced form of A8. FW (future work: not
   designed, ruled or built within V1): the 4D detour; T-S; the directions of A10.
+  AMENDED (Hadi, 3 October 2026): T-K is in V1, T-K part 1 (crisp context knowledge) and T-K part 2 (degrees); T-K's
+  later directions (the stream of context values with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164)
+  are FW.
+  Reason: whatever was agreed for V1 about knowledge stays in V1. This ruling was made before T-K existed as a task, so
+  its restatements were incomplete.
   Tags. Each open TODO may carry a tag beside its status: [V1] or [FW]. A TODO keeps its number and identifier for good:
   no renumbering, no renaming. An untagged TODO is not yet ruled. There is no full pass now: a TODO gets its tag when it
   is next touched, by Hadi's ruling; a new item gets its tag when recorded.

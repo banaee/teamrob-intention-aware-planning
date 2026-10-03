@@ -1177,10 +1177,12 @@ track 4 (TODO-140) and the 4D detour strategy; it runs after T-V.
 AMENDED (T-G A1, A8, C1, 1 October 2026): track 4, in its reduced form, is placed after T-G's stage 2; the 4D detour is
 FW. Track 3b stays after T-V.
 **V1** — the first complete version of the framework, the package for TeamRob and the publications (T-G A1, Hadi, 1
-October 2026): T-G; T-F; T-V tracks 1 and 2; track 3b (TODO-145); track 4 in its reduced form (TODO-140). An open TODO
+October 2026; amended by Hadi, 3 October 2026, for T-K): T-G; T-K part 1 and T-K part 2; T-F; T-V tracks 1 and 2;
+track 3b (TODO-145); track 4 in its reduced form (TODO-140). An open TODO
 may carry the tag [V1] beside its status.
-**FW** — future work: not designed, ruled or built within V1 (T-G A1): the 4D detour, T-S, and conceptual, higher-level
-directions only, each a TODO tagged [FW]. An alternative not taken in a design question is recorded in that question's
+**FW** — future work: not designed, ruled or built within V1 (T-G A1; amended by Hadi, 3 October 2026, for T-K): the 4D
+detour, T-S, T-K's later directions (the stream of context values with the world's dynamics, TODO-158 to TODO-161,
+TODO-163, TODO-164), and conceptual, higher-level directions only, each a TODO tagged [FW]. An alternative not taken in a design question is recorded in that question's
 ruling, never as FW; FW never hides a known wrong behaviour inside what V1 claims. An untagged TODO is not yet ruled;
 a TODO is tagged when next touched by Hadi's ruling, and keeps its number and identifier for good.
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A1.
