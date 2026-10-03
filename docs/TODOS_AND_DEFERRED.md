@@ -4641,3 +4641,13 @@ tool's drawings, not analysed. Open questions: what `shared.types.area_at` retur
 agent can reach that region.
 Files: domains/dock_loading/layouts/env_layout_02.json, env_layout_03.json, env_layout_04.json; shared/types.py (`area_at`)
 Reference: domains/README.md, section 2; design_decisions.md, "T-G: the second domain's rulings", A9
+
+**TODO-168: Layout and picture files outside layouts/ (recorded, layout tool, 3 Oct 2026)** open
+Layout files and pictures exist outside the domains' `layouts/` folders: domains/kitting/env_layout6.json and
+domains/kitting/env_layout99.json (neither registered; CLAUDE.md keeps env_layout99 "for later"), and the picture files
+at the top level of domains/dock_loading/ (env_layout1_original.svg, env_layout1_present_original.png,
+env_layout1_present_original.svg, env_layout_original.jpg). Open question: keep, move or delete. The files are not
+changed.
+Files: domains/kitting/env_layout6.json, domains/kitting/env_layout99.json, domains/dock_loading/env_layout1_original.svg,
+env_layout1_present_original.png, env_layout1_present_original.svg, env_layout_original.jpg
+Reference: CLAUDE.md, "Where to look, and what to skip"; domains/discovery.py (`discover_files`)
