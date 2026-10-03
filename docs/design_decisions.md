@@ -3809,6 +3809,9 @@ THE RULINGS.
      one through `destination_of`, its designated destination; any other initial state a domain declares per movable
      object (dock_loading's `subtype`, `is_empty`, `is_scanned`) goes with it. Binds container and destination ids of a
      layout.
+     AMENDED (T-K part 1, AM34, Hadi, 3 October 2026; not built): the setup also holds the timeline of context facts,
+     the world's course, shared by the scenarios that bind the setup. "T-K: context knowledge in the recognizer's
+     belief", AM11's AM34.
    - Scenario, the episode: per agent, `start_position`, `assigned_tasks`, `observes`, and the human's script; the
      purpose as description text; the setup it binds; its reference layouts.
    - A run is the triple (layout, setup, scenario) plus the run facts, as the existing records define them: gate, cost
@@ -4946,6 +4949,9 @@ the amendment it concerns): AM30 where the memory of observed completions lives 
 measured from the robot's own observation (under AM14); AM32 the wording of "no action changes a context fact" (under
 AM20); AM33 what an observed completion is (under AM27). Notes for the build's plan: the record, OPEN ITEMS OF T-K PART
 1. Not built.
+AMENDED (Hadi, 3 October 2026, content point 3, the tests): AM34, the setup holds the timeline of context facts (under
+AM11). The rest of content point 3 (the order of the tests, the rooms, the basic set, the round without context
+knowledge, the findings) is in the record ("T-K", CONTENT POINT 3, THE TESTS). Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -5108,6 +5114,13 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
   time.
   Not taken: a stream of context values in place of the timeline of facts (recorded as T-K's future work, in the record,
   THE CUT AND THE QUEUE).
+  AMENDED (AM34, Hadi, 3 October 2026; content point 3): the setup holds the timeline of context facts, not the
+  scenario. "The scenario's timeline of context facts" reads "the setup's timeline of context facts", here and wherever
+  the records say it.
+  Reason: the timeline is the world's course and does not depend on what the human does; the scenario holds the
+  agents' behaviour. One timeline is then shared by several scenarios. The two setups of a layout differ in their
+  timeline, and this is also how the effect of a different window on the same activity is tested.
+  Pointer: "Layouts, setups and scenarios: the three artefacts of a run", ruling 1, the setup.
 
 - AM12, context removes no hypothesis (under R3, with AM4). Context still removes no hypothesis. With its occurrence
   condition not satisfied, a foreseeable task has its low strength and stays live. The condition's change selects the
@@ -5208,7 +5221,8 @@ whole contains, so it shapes the prior through the support.
 → RECORD [T-K/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what T-K part 1 builds; T-K part 2; the future work); OPEN ITEMS OF T-K PART 1; the open questions of C1, T-K PART 1, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K part 2's open items). Amended 3 October 2026
 (content points 1 and 2): CONTENT POINTS 1 AND 2 (AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28, AM29;
 the ideas not ruled, each to its place); the open items' state. Amended 3 October 2026 (AM30 to AM33): the notes
-for the build's plan, with the open items.
+for the build's plan, with the open items. Amended 3 October 2026 (content point 3): CONTENT POINT 3, THE TESTS (KT1 to
+KT7; KT4 is AM34's record part).
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one

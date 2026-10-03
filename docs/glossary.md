@@ -495,6 +495,8 @@ which timeline facts hold exactly and at once, through the world state (AM25). A
 fact of T-K part 1 that is not on the timeline (AM14).
 AMENDED (AM32, 3 October 2026), the wording of AM20: no action's declared effect sets or removes a context fact in the
 world. A recency fact changes through the robot's observation of a completion, in the mind.
+AMENDED (AM34, 3 October 2026): the timeline of context facts is the **setup**'s (§9), not the scenario's: it is the
+world's course, shared by the scenarios that bind the setup.
 
 **membership function** — gives the degree to which a context fact is satisfied from a context value. Declared knowledge,
 with its source (R5). T-K part 2's.
@@ -508,6 +510,7 @@ facts; "or" and "not" arrive with T-K part 2, with R5's operators.
 AMENDED (AM11, AM15, 3 October 2026; supersedes AM7's line in part): a condition over context facts and object states,
 using "and" and "not". It reads three sources: a context fact on the scenario's timeline, an object state (T-G A5),
 a **recency fact**. "Or" stays in T-K part 2. With it not satisfied, the task has its low strength and stays live (AM12).
+AMENDED (AM34, 3 October 2026): "the scenario's timeline" reads "the setup's timeline".
 
 **recency fact** (AM14, AM15, 3 October 2026; not built) — a context fact derived from the time since the robot
 observed completion of a named task; it holds for a declared duration after that observation. Declared per task. It
@@ -1213,8 +1216,8 @@ Part 1 and part 2 are in V1; later, future work: the stream of context values wi
 TODO-161, TODO-163, TODO-164. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1 is closed.
 → `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K";
 `docs/roadmap.md`, "The plan from T-A", T-K.
-**T-K part 1** — crisp context knowledge (V1, ongoing): R1 to R4, R6, R7, crisp context facts, the scenario's timeline
-of context facts, recency facts, the removal of the domain task names and constants from the recognizer (TODO-66).
+**T-K part 1** — crisp context knowledge (V1, ongoing): R1 to R4, R6, R7, crisp context facts, the setup's timeline
+of context facts (AM34; "the scenario's" before 3 October 2026), recency facts, the removal of the domain task names and constants from the recognizer (TODO-66).
 → `docs/roadmap.md`, "The plan from T-A", T-K, part 1; `docs/handoffs/T-G_forward_inputs.md`, section 5.
 **T-K part 2** — the build of degrees of context facts (R5: membership functions, the operators, the linear rule for a
 strength; soft edges of a window and the gradual return after a task; "or", with "long work without a break" its open
@@ -1279,6 +1282,9 @@ designations (`destination_of(object, target)`; for a full pallet also its onwar
 which action sets or ends which state; the **environment** holds the true states, and the simulator has no code written
 for one domain. dock_loading's `is_empty` becomes the state fact `is_empty(pallet)`. design_decisions.md, "T-G: the
 second domain's rulings", A5.
+RULED, NOT BUILT (T-K part 1, AM34, 3 October 2026): the setup also holds the timeline of context facts (§5, context
+fact), the world's course, shared by the scenarios that bind it; the two setups of a layout may differ in it alone.
+design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM11's AM34.
 BUILT (T-G stage 1, step 4, 1 October 2026; b74485b, 50f2fb8): the domain registry's `"states"`
 (`StateDeclaration(name, object_type)`; `object_type` None, a fact about no object, admitted) and the setup's one
 `"states"` block (`state`, `object`); a declared state not listed does not hold; kitting declares none; the six

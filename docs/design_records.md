@@ -2461,6 +2461,9 @@ R9 superseded by AM3, AM3's consequences and AM8.
 AMENDED (Hadi, 3 October 2026, the design chat on content points 1 and 2): AM10 to AM29. Their conceptual part is in
 design_decisions.md under this title; here the record part (CONTENT POINTS 1 AND 2, below), the cut and T-K part 2's open
 items as amended, and the open items' state.
+AMENDED (Hadi, 3 October 2026, content point 3, the tests): CONTENT POINT 3, THE TESTS (below), KT1 to KT7. Its
+conceptual part, AM34 (the setup holds the timeline of context facts), is in design_decisions.md under this title,
+under AM11.
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -2487,6 +2490,8 @@ and the maintained sets running both settings) stays as it is until the build ch
 THE CUT AND THE QUEUE.
 - T-K part 1 builds: R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts, and the
   removal of the domain task names and constants from the recognizer (TODO-66; T-K part 1's build closes it).
+  AMENDED (AM34, Hadi, 3 October 2026; content point 3): "the scenario's timeline of context facts" reads "the setup's
+  timeline of context facts" (CONTENT POINT 3, THE TESTS, KT4, below).
   AMENDED (Hadi, 3 October 2026; AM10 to AM29): the build also contains "not" in an occurrence condition and its three
   sources (AM11: timeline facts, object states, recency facts); the recency facts and their memory of observed
   completions (AM14, AM27); the A/C switch's object state ac_on, and ac_activation with room_warm in both domains
@@ -2542,6 +2547,9 @@ OPEN ITEMS OF T-K PART 1 (recorded as open; nothing decided):
    HADI'S DIRECTION (3 October 2026; NOT RULED): the tests start on kitting, then cover dock_loading's stage 1
    scenarios, with what dock_loading's layouts and scenarios need for context knowledge. The re-measurement of stage
    1's baseline is that dock_loading part.
+   RULED (Hadi, 3 October 2026): CONTENT POINT 3, THE TESTS, below (KT1 to KT7). Of the three cases above, the script
+   that agrees with an occurrence condition and the human who acts against it are tested through where a foreseeable
+   task is placed against the setup's timeline (KT3, KT4); the duration mismatch waits for a later set (KT3).
 
 NOTES FOR THE BUILD'S PLAN (Hadi, 3 October 2026; confirmed on ccode's report of the records of content points 1 and 2;
 not rulings of design):
@@ -2638,6 +2646,66 @@ NOT RULED, the chat's ideas and open items, each to its place:
 - Open in T-K part 1: content point 3, the tests (OPEN ITEMS, item 3). Open at the re-measurement step: whether the 22
   potentially confounded MPB runs (the heading "T-G stage 1", SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN, its CAVEAT)
   are rerun then or in stage 2.
+  RULED IN PART (Hadi, 3 October 2026): content point 3 (CONTENT POINT 3, THE TESTS, below). The question of the 22 MPB
+  runs stays open.
+
+CONTENT POINT 3, THE TESTS, RULED (Hadi, 3 October 2026; T-K part 1's open item 3). Records only: nothing is built,
+and no layout, setup, scenario, test or analysis is changed. Hadi's points 1 to 7 are KT1 to KT7, in order. KT4 is
+conceptual: AM34 in design_decisions.md under this title (under AM11); its record part is here.
+
+- KT1, the order of the tests. First kitting, then dock_loading's stage 1 scenarios. In each domain first the IRB with
+  an idle robot, then the MPB with a working robot.
+  Reason: T-K changes the belief, so the recognition is examined first; the two MPB cases (KT3) then show whether a
+  changed admission changes the robot's decision.
+
+- KT2, the rooms on kitting. Layouts env_layout_12 to _14 are unfit for a controlled test: they carry the MPB's many
+  tables. Hadi designed env_layout_15, _16 and _17 (6354a90, 1efe382, 014538a): the kitting table at the middle of the
+  north wall, the exit place corner_NE.
+  - env_layout_15 has no A/C switch; it is the first, basic room.
+  - env_layout_17 is env_layout_15 plus an A/C switch between two deliveries.
+  - env_layout_16 has a dense cluster with the coffee machine and the A/C switch inside it.
+  - In env_layout_15 and _16 the human does all items and the robot is idle. env_layout_17 serves the MPB or a mix.
+  - env_layout_10, _11 and _02 stay unchanged, as a comparison.
+  - A further layout by Hadi, with more shelves and items, is to come for the second coffee break and the recency
+    fact; that case waits for it.
+
+- KT3, the basic set. The only variation is where a foreseeable task is placed: between tasks (after the first
+  delivery, after the second, and so on) and inside a task, between its actions. No other kind of deviation.
+  Reason: this set tests the implementation of context knowledge, and other deviations would mix causes. So the
+  duration mismatch (a coffee break cut short or prolonged, which needs a deviation event; AM29 above) waits for a
+  later set.
+  - Size: two setups per layout, five or more scenarios each; every scenario run with context knowledge on and off.
+  - Two cases also run in the MPB: a coffee break inside the break time, and deliveries through the whole break time.
+  - The measure: the tick at which the true task reaches the threshold and is admitted, and whether a retraction
+    follows.
+  - Expectations are stated before the runs.
+
+- KT4, the setup holds the timeline of context facts (AM34; amends "the scenario's timeline" of THE CUT AND THE QUEUE
+  above and of AM11).
+  Reason: the timeline is the world's course and does not depend on what the human does; the scenario holds the
+  agents' behaviour; one timeline is then shared by several scenarios. The two setups of a layout differ in their
+  timeline, and this is also how the effect of a different window on the same activity is tested.
+
+- KT5, a round without context knowledge comes first, before the mechanism is built: the setups and the human's
+  scripts in env_layout_15, _16 and _17, run in the IRB with the present equal prior.
+  Reason: it gives the "off" side of every case and shows how well the movement alone separates the tasks in these
+  rooms.
+
+- KT6, findings recorded; none changes a value.
+  - The strength 3 of coffee_break gives, with one delivery live and no other foreseeable task, a prior of exactly
+    0.75 (3 / (1 + 3)), the threshold. The value stays, because moving it would choose a value from the threshold
+    (AM17's stated consequence).
+  - The recency duration of 90 ticks (AM16) was derived from the wait, which is compressed, while walking is not. In
+    these rooms the walk from the coffee machine to the table and back takes about 84 to 94 ticks. It joins T-F's open
+    item on the time scale (TODO-144, its open item of 3 October 2026).
+  - In env_layout_15 the prior has no effect once no delivery is live.
+  - In env_layout_17 the robot must not hold item_1 or item_4, or the A/C switch no longer stands between two of the
+    human's hypotheses; and two deliveries that finish together at the shared table stop closer than min_separation.
+
+- KT7, the state. Open item 3 (the tests) is ruled (OPEN ITEMS above). Next: the round without context knowledge
+  (KT5). Then a new design chat takes the build of T-K part 1: the list of the layouts with more than one A/C switch
+  (AM19), the build's plan, the build, the runs with context knowledge on, dock_loading, the close. A later chat
+  returns to T-G's stage 2.
 
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the
@@ -2650,6 +2718,10 @@ AMENDED (Hadi, 3 October 2026, on ccode's report of these records): AM30 to AM33
 memory of observed completions outside the recognizer, AM30; a context value measured from the robot's own
 observation, AM31; the wording of "no action changes a context fact", AM32; an observed completion is the task's
 terminal fact, AM33) and the NOTES FOR THE BUILD'S PLAN above. Next: unchanged.
+SUPERSEDED (Hadi, 3 October 2026; CONTENT POINT 3, THE TESTS above, KT7): content point 3 is ruled. Next: the round
+without context knowledge (KT5); then a new design chat takes the build of T-K part 1 (the list of the layouts with
+more than one A/C switch, AM19; the build's plan, BUILD DISCIPLINE step 1; the build; the runs with context knowledge
+on; dock_loading; the close); a later chat returns to T-G's stage 2.
 
 THE TASK RENAMED: T-K AND ITS PARTS (Hadi, 3 October 2026). Records only: a reorganisation of task names; no change of
 behaviour. The old name and the new are mapped in one line each in CLAUDE.md and docs/design_decisions.md (this
@@ -2683,3 +2755,4 @@ entry's head); git commit messages use the old name.
    world state still holds the terminal fact of a task that the human completed outside the monitored areas. If it
    does, the robot gets a recency fact for a completion it did not observe, against AM27 and AM33.
 6. Hadi's direction for T-K part 1's tests (content point 3, OPEN ITEMS item 3; still open, not ruled): recorded there.
+   RULED (Hadi, 3 October 2026): CONTENT POINT 3, THE TESTS above (KT1 to KT7).

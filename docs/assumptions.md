@@ -175,6 +175,7 @@ recognizer's prior. Ruled, not built.
 AMENDED (AM30, AM33, Hadi, 3 Oct 2026): the memory is its own component of the robot's mind, outside the recognizer,
 and records the tick of an observed completion; an observed completion is the task's terminal fact in the robot's
 WorldState (for example waited(agent, machine)), not the episode boundary.
+AMENDED (AM34, Hadi, 3 Oct 2026): the timeline of context facts is the setup's, not the scenario's.
 
 ## 6. Context knowledge
 

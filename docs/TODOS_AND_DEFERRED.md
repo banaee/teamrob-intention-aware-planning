@@ -4245,6 +4245,9 @@ A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB
   finding: motion is not compressed, so every scheduled duration must stay longer than a task; 8 hours in 800 ticks
   does not satisfy this. Two clocks: the motion clock (2 seconds per tick) and a compressed schedule clock. Not
   decided. Related: `docs/assumptions.md` 6.3 (the declared durations are at a compressed demonstration scale).
+  ADDED (Hadi, 3 October 2026; design_records.md, "T-K", CONTENT POINT 3, THE TESTS, KT6; no value changed): the
+  recency duration of 90 ticks (coffee_break, T-K AM16) was derived from the wait, which is compressed, while walking
+  is not; in env_layout_15 to _17 the walk from the coffee machine to the table and back takes about 84 to 94 ticks.
 - Before the evaluation: track 3b (TODO-145), consequential activation under conflict.
 Files: analysis/ (the evaluation), domains/kitting/ (the evaluation set), mesa_sim/run_mesa.py (TODO-137's option)
 Reference: docs/assumptions.md 1.4, 4.6; design_decisions.md, "The meta-planner test-bed (MPB)", F1; TODO-47,
