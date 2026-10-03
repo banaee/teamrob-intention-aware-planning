@@ -2531,6 +2531,9 @@ OPEN ITEMS OF T-K PART 1 (recorded as open; nothing decided):
 3. The tests of the stage: a script that agrees with an occurrence condition, a human who acts against it, a duration
    mismatch.
    OPEN (3 October 2026). ccode's check of the authorable waits is recorded with it (AM29, below).
+   HADI'S DIRECTION (3 October 2026; NOT RULED): the tests start on kitting, then cover dock_loading's stage 1
+   scenarios, with what dock_loading's layouts and scenarios need for context knowledge. The re-measurement of stage
+   1's baseline is that dock_loading part.
 
 NOTES FOR THE BUILD'S PLAN (Hadi, 3 October 2026; confirmed on ccode's report of the records of content points 1 and 2;
 not rulings of design):
@@ -2638,3 +2641,40 @@ AMENDED (Hadi, 3 October 2026, on ccode's report of these records): AM30 to AM33
 memory of observed completions outside the recognizer, AM30; a context value measured from the robot's own
 observation, AM31; the wording of "no action changes a context fact", AM32; an observed completion is the task's
 terminal fact, AM33) and the NOTES FOR THE BUILD'S PLAN above. Next: unchanged.
+
+THE TASK RENAMED: T-K AND ITS PARTS (Hadi, 3 October 2026). Records only: a reorganisation of task names; no change of
+behaviour. The old name and the new are mapped in one line each in CLAUDE.md and docs/design_decisions.md (this
+entry's head); git commit messages use the old name.
+1. T-K names context knowledge as a whole (K for knowledge). What was T-G's stage between stage 1 and stage 2 is T-K
+   part 1.
+   Reason: the stage is framework-wide. It concerns kitting and dock_loading alike, so it is a task of the pipeline,
+   not a stage of the dock_loading task.
+   The rule on task letters, clarified: a letter is never given to a different task; a task may be paused, resumed and
+   revisited, and may hold a V1 part and a later part. T-G is paused after its stage 1. T-K part 1 runs now. T-G
+   resumes at its stage 2 when T-K part 1 is closed.
+2. The parts of T-K:
+   - Part 1, V1, ongoing: crisp context knowledge (formerly a stage of T-G; R1 to R8, AM1 to AM33).
+   - Part 2, V1, at the end of the V1 queue after track 3b: degrees, as ruled (R5): membership functions, soft edges of
+     a window, the gradual return after a task, "or", with "long work without a break" as its open item. This is the
+     task the records called "T-K" until 3 October 2026.
+   - Later, future work: the stream of context values with the world's dynamics; A/C deactivation (TODO-163); several
+     A/C switches in one layout (TODO-164); TODO-158 to TODO-161.
+   Reason for the stream as future work: it needs a model of the world's physics, and nothing that V1 claims depends
+   on it. This moves the stream out of T-K part 2's OPEN ITEMS (THE CUT AND THE QUEUE above, ADDED), where it was
+   recorded as an idea, not ruled.
+3. Everything related to context knowledge moves to T-K. Moved now: the open question of the prior, whether succession
+   between tasks affects the division inside work as a whole (R4; recorded for T-G stage 2). It is an item of T-K
+   part 2: after T-G stage 2, to be argued with store_pallet present.
+   Not moved: framework-wide work inside T-G (the choice between two applicable methods by cost, the robot with no
+   applicable task, the observation rule, track 4). Hadi's principle: building a new domain includes revisiting its
+   effect on the other domains, assessed framework-wide inside the domain's task.
+4. The rename, everywhere in the repository's documents, older handoff files and frozen analysis reports included.
+   Exception recorded: CLAUDE.md's rule that a frozen record is edited only by a superseding note does not apply to
+   this rename. Every earlier "T-K" (the degrees) became "T-K part 2"; then the stage's old name, with or without "T-G",
+   became "T-K part 1"; the entry's title became "T-K: context knowledge in the recognizer's belief", in the title and
+   in every pointer; this heading and the record identifier ([T-K/1]) followed. No file name held the old name. docs/handoffs/T-G_forward_inputs.md
+   keeps its name; its section 5 is T-K part 1's. Git commit messages are not changed.
+5. Track 4's open points gain one line (docs/handoffs/T-G_forward_inputs.md, section 7; TODO-140): whether the robot's
+   world state still holds the terminal fact of a task that the human completed outside the monitored areas. If it
+   does, the robot gets a recency fact for a completion it did not observe, against AM27 and AM33.
+6. Hadi's direction for T-K part 1's tests (content point 3, OPEN ITEMS item 3; still open, not ruled): recorded there.

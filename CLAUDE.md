@@ -399,6 +399,15 @@ Decisions
   is open. Future work: TODO-163, TODO-164 [FW]. Nothing built. Next: content point 3, then ccode's list of the layouts
   with more than one A/C switch and what rests on them (AM19; Hadi decides on it; the layout change and the
   regeneration before the build), then the build's plan.
+  T-G stage 1.5 was renamed T-K part 1 on 3 October 2026; git commit messages use the old name.
+  T-K is REORGANISED (Hadi, 3 October 2026; design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS): T-K names
+  context knowledge as a whole, a task of the pipeline (framework-wide), not a stage of T-G. Part 1 (V1, ongoing):
+  crisp context knowledge, R1 to R8, AM1 to AM33, the state above. Part 2 (V1, at the end of the V1 queue after track
+  3b): degrees (R5: membership functions, soft edges of a window, the gradual return after a task, "or", with "long
+  work without a break" its open item; succession, R4, after T-G stage 2). Later, future work: the stream of context
+  values with the world's dynamics, TODO-163, TODO-164, TODO-158 to TODO-161. A letter is never given to a different
+  task; a task may be paused, resumed and revisited. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes
+  at its stage 2 when T-K part 1 is closed. Next: unchanged.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

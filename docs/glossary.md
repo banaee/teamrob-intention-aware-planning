@@ -1204,6 +1204,12 @@ knowledge); track 2 keeps the live events. design_decisions.md, "T-G: the second
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
 the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.
+**T-K** — context knowledge as a whole (K for knowledge; Hadi, 3 October 2026): a task of the pipeline, not a stage of
+T-G, because context knowledge is framework-wide. Part 1, V1, ongoing: crisp context knowledge (R1 to R8, AM1 to AM33;
+formerly a stage of T-G). Part 2, V1, at the end of the V1 queue after track 3b: degrees (below). Later, future work:
+the stream of context values with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164. T-G is paused after
+its stage 1 and resumes at its stage 2 when T-K part 1 is closed.
+→ `docs/design_records.md`, "T-K", THE TASK RENAMED: T-K AND ITS PARTS; `docs/roadmap.md`, "The plan from T-A", T-K.
 **T-K part 2** — the build of degrees of context facts (T-K part 1's R5: membership functions, the operators, the linear
 rule for a strength), ruled 2 October 2026; at the end of the V1 queue, after track 3b. Not started.
 AMENDED (AM11, 3 October 2026): "not" in an occurrence condition is T-K part 1's; T-K part 2 keeps "or" and the degrees.

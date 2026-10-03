@@ -4155,6 +4155,9 @@ regeneration. Until then 1.1's corner walk stands.
 DECLINED FOR NOW (a decision of the design chat, 29 Sept 2026): a "leave the workspace" foreseeable task as a domain
 addition was proposed and declined (option (a): the exit walk stays unmodelled behaviour); revisit with track 4 or the
 demonstration.
+OPEN POINT (Hadi, 3 Oct 2026; design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS, point 5): whether the
+robot's world state still holds the terminal fact of a task that the human completed outside the monitored areas. If it
+does, the robot gets a recency fact for a completion it did not observe, against AM27 and AM33.
 Files: domains/kitting/ (layouts, scripts), mesa_sim/ (the body's observation), shared/ (the mind object, TODO-131)
 Reference: docs/assumptions.md 1.1, 2.3; TODO-131; design_decisions.md, "T-D P" (the workspace boundary in the tail)
 
@@ -4448,6 +4451,8 @@ belief", R2 to R4), on the four determinants: the assignment and context facts s
 divided equally inside assigned work (R4); the task that just ended (succession) is open for T-G stage 2 (R4); a
 preference for a task that has just become applicable, the enabling event of this item, is not taken and is not future
 work (R4: no defensible meaning or magnitude). Not built.
+MOVED (Hadi, 3 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R4's MOVED line):
+succession is an item of T-K part 2, after T-G stage 2, to be argued with store_pallet present.
 Files: shared/recognizer.py, shared/meta_planner.py (no change)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
 

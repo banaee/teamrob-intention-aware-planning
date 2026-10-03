@@ -4924,6 +4924,8 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
 
 **T-K: context knowledge in the recognizer's belief (ruled by Hadi, 2 October 2026)**
 
+T-G stage 1.5 was renamed T-K part 1 on 3 October 2026; git commit messages use the old name.
+
 Ruled in cchat (the T-G design chat), 2 October 2026; recorded the same day, before any build. Records only: nothing in
 this entry is built. Each ruling carries its reason. The conceptual part is here; the cut (what T-K part 1 builds), the
 queue (T-K part 2), R9 and the open items of the stage are in `docs/design_records.md`, under this title (index line below).
@@ -5039,6 +5041,9 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   the live assigned tasks." The reason is unchanged.
   Open, for T-G stage 2: whether succession between tasks affects the division (to be argued with `store_pallet`
   present).
+  MOVED (Hadi, 3 October 2026): this open question is an item of T-K part 2, after T-G stage 2, to be argued with
+  `store_pallet` present. Reason: everything related to context knowledge moves to T-K (design_records.md, "T-K", THE
+  TASK RENAMED: T-K AND ITS PARTS, point 3).
   Not taken, and not future work: a preference for a task that has just become applicable (no defensible meaning or
   magnitude).
 

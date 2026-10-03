@@ -306,6 +306,7 @@ CORRECTED AND ADDED (3 October 2026, after the design chat on content points 1 a
   high. The design is ruled; the representation of a context value and of a degree is open.
 - T-G stage 2 [open]: whether succession between tasks affects the division inside work as a whole, to
   be argued with store_pallet present.
+  MOVED (3 October 2026) [ruled]: an item of T-K part 2, after T-G stage 2, to be argued with store_pallet present.
 - Not taken, and not future work [ruled]: a preference for a task that has just become applicable.
 - Under TODO-155 [open, parked, V1, no stage]: the walk to the standby place and the walk to the desk
   have no hypothesis. Recorded there as not taken for this stage: a share for "none of the modelled
@@ -348,6 +349,9 @@ UPDATED (3 October 2026): items 1 and 2 are RULED (AM10 to AM29); item 3 stays o
    seconds, since 45 cannot be written at 2 seconds per tick; the entry closes as abandoned); a longer wait is
    authorable (during wait_at, a Start of stand). Neither is authorable when the coffee break is itself the task of
    another entry's event (the stack is one level deep, TODO-100): that case is recorded as absent.
+   Hadi's direction (3 October 2026) [open, not ruled]: the tests start on kitting, then cover dock_loading's stage 1
+   scenarios, with what dock_loading's layouts and scenarios need for context knowledge. The re-measurement of stage
+   1's baseline is that dock_loading part.
 
 Also open, Hadi's choice [chat only; the records say only that A1 to A7 are not added to
 docs/assumptions.md]: whether A1 (given the task, the movement does not depend on the context), A5
@@ -491,6 +495,9 @@ evaluation, and the evaluation may use the office.
 
 Open [open]: which trigger makes the decision at disappearance and reappearance (the trigger set has three
 members today); the human leaving through a door.
+Open [open] (3 October 2026): whether the robot's world state still holds the terminal fact of a task that the human
+completed outside the monitored areas. If it does, the robot gets a recency fact for a completion it did not observe,
+against AM27 and AM33.
 
 Hadi's idea [idea]: the human vanishes into the office; the robot knows that the human is there and will appear
 at the office door at some moment, without knowing when. A robot that expects the return and plans around it
@@ -530,6 +537,8 @@ mechanism; an action of unknown length inside a plan; a rule that keeps the robo
   knowledge and norms; validation of the strengths on site data.
 - A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164). Added 3 October 2026 (T-K part 1's
   content points 1 and 2).
+- The stream of context values with the world's dynamics [ruled, 3 October 2026]: T-K's later part, future work. It
+  needs a model of the world's physics, and nothing that V1 claims depends on it.
 
 Not future work [ruled]: a type-to-destination rule in place of explicit designations is recorded as not taken.
 By the rule on V1 and future work, an alternative not taken in a design question is never a future-work item.

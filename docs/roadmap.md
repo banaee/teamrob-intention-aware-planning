@@ -383,6 +383,13 @@ paragraph, not in the alphabet.
 - ADDED (Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R5;
   design_records.md, "T-K"): T-K part 2, the build of degrees of context facts (T-K part 1's R5), at the end of the V1
   queue, after track 3b.
+- REORGANISED (Hadi, 3 October 2026; design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS): T-K names context
+  knowledge as a whole (K for knowledge); it is a task of the pipeline, not a stage of T-G, because the stage is
+  framework-wide. T-K part 1 (V1, ongoing): crisp context knowledge, formerly a stage of T-G (R1 to R8, AM1 to AM33).
+  T-K part 2 (V1, at the end of the V1 queue, after track 3b): degrees (R5). Later, future work: the stream of context
+  values with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164. A letter is never given to a different
+  task; a task may be paused, resumed and revisited, and may hold a V1 part and a later part. T-G is paused after its
+  stage 1; T-K part 1 runs now; T-G resumes at its stage 2 when T-K part 1 is closed.
 
 V1 AND FW (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
@@ -826,6 +833,9 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
     its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
     fact, if wanted, is designed here as the same entry point as the live user's click.
+- **T-K — Context knowledge** (Hadi, 3 October 2026; the order block above, REORGANISED): part 1, crisp context
+  knowledge (V1, ongoing; its state in the T-G entry above, its bullet "T-K part 1", and in
+  `docs/handoffs/T-G_forward_inputs.md`, section 5); part 2, degrees (V1, below); later, future work.
 - **T-K part 2 — Degrees of context facts** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-K: context
   knowledge in the recognizer's belief", R5; design_records.md, "T-K"). The build of R5: a context fact
   satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
@@ -839,6 +849,10 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
   strength after a task (a membership function over the time since the last observed completion); "or" in an
   occurrence condition, with "long work without a break" (open with it: what counts as a break, when the count starts,
   its limit and source, the unobserved human).
+  MOVED (Hadi, 3 October 2026): the stream of context values is not part 2's; it is future work, T-K's later part (it
+  needs a model of the world's physics, and nothing that V1 claims depends on it). ADDED to part 2: whether succession
+  between tasks affects the division inside work as a whole (R4), after T-G stage 2, to be argued with `store_pallet`
+  present.
 - **T-S — ROS/PRIEST** (ruled by Hadi, 30 September 2026; future work, removed from T-G, at the end of the queue).
   FW (T-G A1, 1 October 2026): not designed, ruled or built within V1.
   - TODO-75: the ROS guide and `env_layout99`.
