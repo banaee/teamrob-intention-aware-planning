@@ -3,6 +3,8 @@
 Written 2 October 2026 by the design chat that closed T-G stage 1. Place: docs/handoffs/.
 Corrected 2 October 2026 by the next design chat, after its verification against the repo's records.
 Updated 3 October 2026 at the close of the design chat of stage 1.5 (section 5 rewritten; sections 2, 7, 9 and 11 amended).
+Updated 3 October 2026 after the design chat on stage 1.5's content points 1 and 2 (section 5 brought to that state;
+5.1, 5.2 and 5.5 corrected; section 2's last paragraph amended).
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G. It collects, per
 stage, what is already ruled, what is open, what is parked, and the ideas Hadi stated. It replaces the reading of
@@ -76,7 +78,8 @@ behavioural analysis belongs to stage 2. Hadi wants stage 2's questions, rulings
 depth, one at a time.
 
 Stage 1.5 was taken next. Its design is ruled and recorded (2 and 3 October 2026). Its build has not
-started. Section 5 holds its state.
+started. Section 5 holds its state. Its content points 1 (the values) and 2 (the perception assumption) are ruled
+(3 October 2026); content point 3 (the tests) is open.
 
 ---
 
@@ -172,6 +175,11 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 
 State on 3 October 2026: the design is ruled and recorded. Nothing is built. Three content points are
 open and come before the build (5.4).
+UPDATED (3 October 2026, after the design chat on content points 1 and 2): content points 1 (the values) and 2 (the
+perception assumption) are ruled and recorded, AM10 to AM29 (the chat's A1 to A15 are AM10 to AM24, its B1 to B5 are
+AM25 to AM29). Content point 3 (the tests) is open. Nothing is built. Records: the entry below, its block CONTENT
+POINTS 1 AND 2; docs/design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND 2; docs/glossary.md §5 (recency fact,
+recency duration, occurrence condition as amended); docs/assumptions.md 5.4, 6.1 to 6.3; TODO-163, TODO-164 [FW].
 Records: docs/design_decisions.md, the entry "T-G stage 1.5: context knowledge in the recognizer's
 belief" (rulings R1 to R8, assumptions A1 to A7, amendments AM1 to AM9, corrections C1, C3 and C4). Correction
 C2, the caveat on the long runs, stands in docs/design_records.md under "T-G stage 1", in TODO-66 and in the MPB
@@ -191,6 +199,9 @@ Where this section and those records disagree, the records win.
   completion events), with no context in it. The prior enters once and is never folded into the evidence. Adequacy and warrant do not read
   the prior. The rules on re-entry and on the episode boundary describe the evidence (it restarts equal;
   a returning hypothesis takes 1/|H| of it).
+  CORRECTED (3 October 2026): the parenthesis "(movement, standing and completion events)" is confirmed in the code
+  (`shared/recognizer.py`: the walking and standing evidence per phase and the completion events of an episode) and is
+  not in the ruling's text (R2 says "the likelihood accumulated in the present episode").
 - The prior. It is the normalisation of the strengths of what is live. The human's work as a whole
   contributes 1 while a work-task hypothesis is live. Work as a whole is the live hypotheses of work
   tasks in the support; with assignment knowledge on, these are the live assigned tasks. Its share is
@@ -203,8 +214,25 @@ Where this section and those records disagree, the records win.
   measures it. Proposed meaning, not claimed: a ratio of counted task starts.
 - An occurrence condition is the condition over context facts attached to a foreseeable task. In stage
   1.5 it is one context fact or a conjunction of context facts.
+  SUPERSEDED IN PART (AM11, 3 October 2026): it reads facts from three sources (a context fact authored as a window
+  on the scenario's timeline, an object state, a recency fact) and uses "and" and "not". "Or" stays in T-K. With it
+  not satisfied, the foreseeable task has its low strength and stays live (AM12).
 - A context fact is a declared fact derived from context values (the clock time, the temperature). In
   stage 1.5 it is crisp: it holds or it does not hold.
+  ADDED (AM10, AM14, AM20, AM21, 3 October 2026): every fact of stage 1.5 is crisp (AM10). A timeline fact is a
+  state: an entry of the timeline is the change, the fact holds until the next change, and the change is no trigger
+  of the meta-planner (AM21). No action sets or removes a context fact (AM20). A recency fact is a context fact
+  derived from the time since the robot observed completion of a named task; it holds for the task's recency
+  duration after that observation; it is declared per task (AM14).
+- The values [ruled, 3 October 2026; AM13 to AM18]: coffee_break (both domains): break_time and not recent, strengths
+  low 0.02, high 3, recency duration 3 minutes (90 ticks). ac_activation (both domains): room_warm and not ac_on,
+  strengths low 0.005, high 0.2, no recency fact. office_break (dock_loading): not recent, strengths low 0.005, high
+  0.02, recency duration 4.5 minutes (135 ticks). Each strength's source: "Modelling assumption, Hadi, 3 October 2026.
+  A relative strength. Its order of magnitude is motivated by the proposed meaning of a strength (a ratio of counted
+  task starts), which is not validated." An A/C switch is an object with the state ac_on, which ac_activation sets;
+  at most one per layout in V1; none in dock_loading's three existing rooms.
+- The long-shift rule leaves at the build with no replacement in stage 1.5: the robot's expectation of coffee_break
+  does not rise with the duration of work, a stated limitation until T-K [ruled, AM22].
 - Two independent run options, both on by default from the build (today assignment_prior defaults to off):
   assignment_knowledge (today's assignment_prior) and context_knowledge (new). With context_knowledge off the prior is equal over the live hypotheses. Each
   "off" is an ablation or a diagnostic.
@@ -233,6 +261,23 @@ Where this section and those records disagree, the records win.
 - The removal of the two domain task names and the four constants from the recognizer (TODO-66). The
   present hardcoded weight multiplies coffee_break by 2.5 from step 500 in every run (found on 3 October
   2026; see the caveat in section 4).
+CORRECTED AND ADDED (3 October 2026, after the design chat on content points 1 and 2) [ruled]:
+- The path of a timeline fact is ruled (AM25): the environment applies the timeline, the robot's world state carries
+  the facts, the recognizer reads them there. The robot knows which timeline facts hold, exactly and at once; no
+  sensing is modelled. The "[chat only]" sketch above is now the ruling.
+- The declared context knowledge (the facts that exist, the occurrence conditions, the strengths, the recency
+  durations) reaches the mind directly from the knowledge component, as the task model does (AM26). The build also
+  replaces the class `ContextKnowledge` in `shared/knowledge.py`, as the glossary says (§5, context knowledge).
+- The declarations' values are ruled (5.1, the values; AM13 to AM18).
+- "Not" in an occurrence condition and its three sources: timeline facts, object states, recency facts (AM11).
+- The recency facts: per task, each from the mind's own memory of an observed completion; completion counts, not
+  admission; a completion the robot does not observe, or a task cut before its completion, produces none (AM14, AM27).
+- The A/C switch's object state ac_on, set by ac_activation; ac_activation and room_warm in the task model and the
+  context knowledge of both domains (AM18).
+- Before the build, in its own step: the layouts with more than one A/C switch are changed to the V1 rule (at most
+  one per layout). ccode first lists every such layout and every scenario, test and analysis that rests on it; Hadi
+  decides on that list. Order: the list, the layout change, the regeneration of the baselines that remain, then the
+  build (AM19).
 
 ### 5.3 What is not in stage 1.5
 
@@ -254,8 +299,11 @@ Where this section and those records disagree, the records win.
 ### 5.4 Open before the build: three content points [open]
 
 Each is put to Hadi one at a time. None is decided.
+UPDATED (3 October 2026): items 1 and 2 are RULED (AM10 to AM29); item 3 stays open.
 
-1. The values for kitting and dock_loading: which context facts exist; the occurrence condition of each
+1. RULED (3 October 2026; AM10 to AM24; 5.1, the values; design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND
+   2). The text below is the question as it stood.
+   The values for kitting and dock_loading: which context facts exist; the occurrence condition of each
    foreseeable task; its low and high strength; the source of each value.
    Hadi's examples from the design chat [chat only, not values]:
    - Coffee break: the human takes it at the fixed break time, or after long work without a break.
@@ -268,15 +316,28 @@ Each is put to Hadi one at a time. None is decided.
      change a context value and never sets or removes a context fact directly.
    - The numbers used in the design chat's examples (coffee break 0.05 and 3, office break 0.05, A/C
      0.01 and 0.5) were illustrations only.
-2. The perception assumption: how the robot obtains a context value. The existing assumption for object
+   SUPERSEDED (3 October 2026): the examples above are history. The ruled values are in 5.1. "Or" and "long work
+   without a break" are T-K's open items (not ruled); the soft edges are T-K's (AM10); in stage 1.5 no action sets or
+   removes a context fact (AM20), and the A/C's activation acts through the object state ac_on (AM18).
+2. RULED (3 October 2026; AM25 to AM27; 5.2, the path of a fact; docs/assumptions.md 5.4). The text below is the
+   question as it stood.
+   The perception assumption: how the robot obtains a context value. The existing assumption for object
    states (the robot knows them through the site's system) is the likely model. Nothing is written.
-3. The tests of the stage: a script that agrees with an occurrence condition; a human who acts against
+3. OPEN. The tests of the stage: a script that agrees with an occurrence condition; a human who acts against
    it; a duration mismatch (the human's actual duration differs from the robot's declared one).
+   Recorded with it (AM29, ccode's check, 3 October 2026): a shorter wait is authorable (during wait_at, drop; 46
+   seconds, since 45 cannot be written at 2 seconds per tick; the entry closes as abandoned); a longer wait is
+   authorable (during wait_at, a Start of stand). Neither is authorable when the coffee break is itself the task of
+   another entry's event (the stack is one level deep, TODO-100): that case is recorded as absent.
 
 Also open, Hadi's choice [chat only; the records say only that A1 to A7 are not added to
 docs/assumptions.md]: whether A1 (given the task, the movement does not depend on the context), A5
 (the declared and the actual duration match) and possibly A4 go into that file. ccode's view, stated
 in a report and not recorded: A1 and A5 belong there.
+RULED (AM28, 3 October 2026): A1 and A5 are in docs/assumptions.md (6.1 and 6.2; A5 as a baseline whose violation is
+a deviation that the existing chain handles); A4 stays in the design record only (it is about strength values at real
+sites, not about the per-domain declaration). Also added: 5.4, the perception entry (AM25, AM27), and 6.3, the
+declared durations at a compressed demonstration scale, not calibrated (AM23).
 
 ### 5.5 What the build must respect [recorded, with two chat-only items]
 
@@ -286,6 +347,9 @@ in a report and not recorded: A1 and A5 belong there.
   fact declared: each foreseeable task has its declared strength (its low strength, or its one strength
   when it has no occurrence condition) in place of an equal share [chat only: the design chat's statement
   of this consequence].
+  CORRECTED (3 October 2026; AM24, ruled): with context_knowledge on, runs with assignment_knowledge off change too.
+- The build's acceptance [ruled, AM24]: "identical except for the lines the build names", with the regression audit.
+  Reason: the rename of the run option changes the run header in every log.
 - Every existing baseline set and test either states context_knowledge off to stay identical, or is
   regenerated with the reason stated, with the regression audit CLAUDE.md requires. Runs of 500 steps or
   more change even with context_knowledge off, because the hardcoded weight leaves.
@@ -304,6 +368,18 @@ in a report and not recorded: A1 and A5 belong there.
 5. The re-measurement of stage 1's baseline with context knowledge on (section 4's figures were measured
    with the equal prior).
 6. The close of stage 1.5, with this file updated. Then stage 2 (section 6).
+
+UPDATED (3 October 2026): steps 1 and 2 are done for content points 1 and 2. From here:
+
+1. Content point 3 (the tests), then the records of its ruling.
+2. ccode's list of the layouts with more than one A/C switch and of every scenario, test and analysis that rests on
+   them (AM19); Hadi decides on the list.
+3. The layout change, then the regeneration of the baselines that remain (AM19).
+4. ccode's plan for the build, reviewed in the design chat.
+5. The build, its verification (AM24) and the review.
+6. The re-measurement of stage 1's baseline with context knowledge on. Open at this step: whether the 22 potentially
+   confounded MPB runs (section 4's caveat) are rerun then or in stage 2.
+7. The close of stage 1.5, with this file updated. Then stage 2 (section 6).
 
 ### 5.7 Background from the design chat [chat only]
 
