@@ -4625,3 +4625,19 @@ scripts/layout_tool.py; the layouts are not changed (Hadi, 3 Oct 2026). The tool
 whose centre leaves the space, not one whose rectangle does (Hadi, 3 Oct 2026).
 Files: domains/kitting/layouts/env_layout_12.json, env_layout_13.json, env_layout_14.json
 Reference: domains/README.md, section 2; mesa_sim/sim_model.py (`_init_objects`)
+
+**TODO-166: orientation_deg, a field no code reads (recorded, layout tool, 3 Oct 2026)** open
+The layout field `orientation_deg` is read by no code: the loader (`mesa_sim/sim_model.py`, `_init_objects`) keeps an
+object's `position` and `size` only, and every rectangle is axis-aligned. The field exists only in kitting
+env_layout_02 and in env_layout99 (unregistered). scripts/layout_tool.py does not draw it. Open question: remove the
+field or implement it.
+Files: domains/kitting/layouts/env_layout_02.json, domains/kitting/env_layout99.json, mesa_sim/sim_model.py
+Reference: domains/README.md, section 2
+
+**TODO-167: dock_loading, part of the space in no area (recorded, layout tool, 3 Oct 2026)** open
+In dock_loading env_layout_02, env_layout_03 and env_layout_04 part of the space belongs to no area: above y = 300 and
+outside the office (area_office: x in [-170, 170], y in [300, 415]; the space reaches y = 740). Seen in the layout
+tool's drawings, not analysed. Open questions: what `shared.types.area_at` returns for a position there, and whether an
+agent can reach that region.
+Files: domains/dock_loading/layouts/env_layout_02.json, env_layout_03.json, env_layout_04.json; shared/types.py (`area_at`)
+Reference: domains/README.md, section 2; design_decisions.md, "T-G: the second domain's rulings", A9
