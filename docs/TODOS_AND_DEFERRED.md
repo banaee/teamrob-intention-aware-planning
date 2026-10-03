@@ -4693,8 +4693,9 @@ Reference: docs/glossary.md, §6 **landmark**; design_decisions.md, "An object i
 
 **TODO-175: Named logs in logs/ cited as evidence, logs/ git-ignored (recorded, 3 Oct 2026)** open
 Named logs in logs/ are evidence for statements in the records, and logs/ is git-ignored: 3 in TODOS_AND_DEFERRED.md,
-6 in analysis/kitting/t1_conflict_measurement/REPORT.md, 2 in analysis/kitting/f1_foreseeable_fixture/REPORT.md. 3 of
-the 11 cannot be reproduced. Open question: copy each cited log into the folder of the record that cites it, so that
+6 in analysis/kitting/t1_conflict_measurement/REPORT.md, 2 in analysis/kitting/f1_foreseeable_fixture/REPORT.md. 2 of
+the 11 cannot be reproduced (the first two named in TODOS_AND_DEFERRED.md). 3 lack only their commit
+(run_20260910_144817 and the two f1 logs). 6 are reproducible at commit 372d925 (the t1 logs). Open question: copy each cited log into the folder of the record that cites it, so that
 git tracks the evidence.
 Files: docs/TODOS_AND_DEFERRED.md (lines citing run_20260904_131808, run_20260910_083630, run_20260910_144817),
 analysis/kitting/t1_conflict_measurement/REPORT.md, analysis/kitting/f1_foreseeable_fixture/REPORT.md
