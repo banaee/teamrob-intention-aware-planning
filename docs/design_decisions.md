@@ -5004,6 +5004,10 @@ knowledge, the findings) is in the record ("T-K", CONTENT POINT 3, THE TESTS). N
   Reason: the strength says how often the human takes the task; which bound object the human goes to is a further
   choice the robot has no knowledge about. If each hypothesis took the full strength, the task's total would grow with
   the number of objects, which R3's own reason rejects. Same principle as R4.
+  CLARIFIED (the design chat with Hadi, 3 October 2026; no new decision): an occurrence condition is evaluated per
+  foreseeable task, not per hypothesis. There is one selection of the low or the high strength per task, which is then
+  divided among the task's live hypotheses. This is why V1 has at most one A/C switch per layout (AM18, in the record),
+  and why a condition that differs per hypothesis is future work (TODO-164).
   AMENDED (AM3, Hadi, 3 October 2026; it replaces R9, in the record): two independent run options, both on by default:
   assignment knowledge (the support restriction; the present switch `assignment_prior`) and context knowledge (new;
   its name is `context_knowledge`, AM9). "Work as a whole" in R3 is the live hypotheses of work tasks in the support.

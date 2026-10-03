@@ -2558,6 +2558,9 @@ not rulings of design):
 - ac_on (AM18) needs a declared state and a declared effect of the action; dock_loading needs the object type and the
   task ac_activation.
 - Recency durations (AM16) are declared in physical time and converted by the body.
+- ADDED (the design chat, 3 October 2026): the instruments are part of the build's plan. The IRB's expectations must
+  be computed with the new prior (the oracle assumes the equal prior and ω = 1 today); its report must read the three
+  conditions A, B and C (KT11); the A/C's measure is its belief at its arrival (KT10). The plan states what this costs.
 
 Also recorded: the open questions of C1, T-K PART 1 (the T-G heading above) are answered by the rulings, except the
 liveness of a hypothesis whose condition turns false while the human executes its task, which is not answered (C1,
@@ -2608,6 +2611,9 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   dock_loading's three existing rooms get no A/C switch; stage 2's layouts may have one.
   Reason for no switch in the existing rooms: the re-measurement of stage 1's baseline then shows the effect of context
   knowledge alone.
+  ADDED (the design chat, 3 October 2026): the reason for the V1 rule. An occurrence condition is evaluated per
+  foreseeable task, not per hypothesis (design_decisions.md, this title, R3's AM2, its CLARIFIED line), so the state of
+  one switch cannot select the strength of one hypothesis of ac_activation; a condition per hypothesis is TODO-164.
   Not taken: the state of the A/C as a condition of the task (context only lowers the strength).
 
 - AM19, the layouts with more than one A/C switch (the chat's A10). They are changed to the V1 rule (AM18), in their own
@@ -2616,6 +2622,12 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   existing layouts, setups and their analyses are not an evaluation reference and need not be kept.
   Order, for the regression check: the list, the layout change, the regeneration of the baselines that remain, then
   the build.
+  KNOWN INPUT (the design chat, 3 October 2026; ccode, the same day): env_layout_05 holds three A/C switches
+  (ac_switch_0 at (400, 550), ac_switch_1 at (356, -210), ac_switch_2 at (230, -550)). Its scenarios are
+  scenario_s04_01 to _03 (env_setup_04); scenario_s04_01, a fixture of the regression sweep (analysis/kitting/
+  tb1a_destination/, both priors), scripts two activations, at ac_switch_1 and then ac_switch_2. Tests that name
+  env_layout_05 or the s04 scenarios: tests/kitting/test_th1_tree.py, test_td15_build.py, test_td1_adequacy.py,
+  test_g_build.py. The full list, over every layout of both domains, is the step's own work.
 
 - AM23, the scale of the durations (the chat's A14). A simulator convention: the durations declared in the domains (the
   waits of the foreseeable tasks, the recency durations) are at a compressed demonstration scale and are not
@@ -2691,6 +2703,10 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
   Reason: the timeline is the world's course and does not depend on what the human does; the scenario holds the
   agents' behaviour; one timeline is then shared by several scenarios. The two setups of a layout differ in their
   timeline, and this is also how the effect of a different window on the same activity is tested.
+  ADDED (Hadi, 3 October 2026, in the design chat): the same activity under a window whose edge falls before the human
+  leaves for the foreseeable task, during the walk to it, or after the arrival. The middle case is the recorded cost
+  of crisp facts (design_decisions.md, this title, R5: the prior changes at one tick, where the approximation of A2 has
+  its largest error): the prior changes inside the episode at one tick. It is part of authoring the windows.
 
 - KT5, a round without context knowledge comes first, before the mechanism is built: the setups and the human's
   scripts in env_layout_15, _16 and _17, run in the IRB with the present equal prior.
@@ -2756,6 +2772,9 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   ADDED (Hadi, 3 October 2026, on ccode's report): the reasons for the other two. ccode may adjust the three rooms
   because they are test instruments and not an evaluation reference (Hadi's statement on the layouts, AM19). The
   caution for env_layout_17 reads by role because objects in these rooms may move or be renumbered.
+  ADDED (the design chat, 3 October 2026): env_layout_16 lost its two south-east shelves only because its runs had to
+  end before step 500. The build removes that limit (AM22, TODO-66). Hadi accepted the room as it is; whether the
+  shelves return is not ruled.
 
 - KT10, findings of the round; none changes a value.
   - The A/C activation is almost never recognised by movement, since its wait is one tick (it reaches the threshold
@@ -2794,6 +2813,10 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   the break and recognises the work later.
   Also recorded: work as a whole contributes 1 however many deliveries are live, so in env_layout_15 the coffee
   break's prior inside the break time is 0.75 in every scenario.
+  ADDED (the design chat, 3 October 2026), for the expectations with context knowledge on: the gate refuses only
+  below the threshold (`MetaPlanner._clears_gate`, confidence < θ). Where the prior alone is exactly 0.75, as for the
+  coffee break inside the break time in env_layout_15, the outcome at the first observed movement depends on
+  floating-point rounding. The runs are deterministic, so the result is stable, and it is arbitrary.
   Reason: the run with context knowledge off is not a neutral baseline, since the equal prior gives a foreseeable task
   the share of one delivery; A to C alone would mix the effect of the strengths with that of the fact.
 

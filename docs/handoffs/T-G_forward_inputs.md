@@ -12,6 +12,9 @@ state; 5.4 item 3 and 5.6 rewritten).
 Updated 3 October 2026 at the close of the design chat on T-K part 1's tests, after the first round and Hadi's
 decisions on its report (KT8 to KT12): section 5 rewritten as the handoff for the next design chat, which takes the
 rest of T-K part 1; sections 1, 2 and 9 brought in line.
+Completed 3 October 2026 from the design chat's scan of its conversation: section 5 (the occurrence condition per
+task, the instruments in the build's plan, env_layout_05, the gate at exactly θ, the window edges, env_layout_16's
+shelves) and section 11 (Hadi's rules of 3 October 2026); durations shown in ticks.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -55,8 +58,8 @@ dock_loading. A truck stands parked at a dock gate. The robot is an automated fo
 Its assigned tasks: deliver full pallets from the truck to their delivery bay (dry or frozen), and return empty
 pallets to the truck. The observed human is the warehouse staff member who receives the delivery. The human's
 assigned task in stage 1: go to each delivered pallet and scan it. The human can scan a pallet only after the
-robot has delivered it. The human's foreseeable tasks: a coffee break (60 seconds) and an office break (90
-seconds, at a chair inside the office). T-K part 1's build adds ac_activation and room_warm to dock_loading's task
+robot has delivered it. The human's foreseeable tasks: a coffee break (a wait of 30 ticks) and an office
+break (45 ticks, at a chair inside the office). T-K part 1's build adds ac_activation and room_warm to dock_loading's task
 model and context knowledge; its three rooms get no A/C switch (AM18). When no task is applicable, the human goes to a standby place in the
 middle of the hall. At the end the human goes to a desk beside the gate.
 
@@ -199,7 +202,8 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM34 (the amendments, each under the ruling it amends), the
   corrections C1, C3 and C4. AM1 to AM9 come from the review of the records; AM10 to AM29 from content points 1 and 2
   (the block CONTENT POINTS 1 AND 2, after R8; that chat's A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29);
-  AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11).
+  AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11); a CLARIFIED line under
+  R3's AM2 (the occurrence condition evaluated per task).
 - docs/design_records.md, the heading "T-K": the record part. R9, superseded by AM3, and AM3's consequences; THE CUT
   AND THE QUEUE (what part 1 builds, part 2, the future work); OPEN ITEMS OF T-K PART 1 (all three ruled); NOTES FOR
   THE BUILD'S PLAN; CONTENT POINTS 1 AND 2 (the values: AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28,
@@ -242,6 +246,10 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - An occurrence condition (AM11, AM12). It reads facts from three sources: a timeline fact (a window on the setup's
   timeline of context facts), an object state (T-G A5), a recency fact. It uses "and" and "not"; "or" is T-K part 2's.
   Not satisfied, the foreseeable task has its low strength and stays live: context removes no hypothesis.
+- An occurrence condition is evaluated per foreseeable task, not per hypothesis (R3's AM2, its CLARIFIED line): one
+  selection of the low or the high strength per task, which is then divided among the task's live hypotheses. This is
+  why V1 has at most one A/C switch per layout, and why a condition that differs per hypothesis is future work
+  (TODO-164).
 - Facts (AM10, AM14, AM20, AM21, AM30 to AM34).
   - Every fact of T-K part 1 is crisp: it holds or it does not hold.
   - A timeline fact is a state. An entry of the timeline is the change; the fact holds until the next change. The
@@ -266,9 +274,9 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 
   | foreseeable task | occurrence condition | strength low / high | recency duration |
   |---|---|---|---|
-  | coffee_break (kitting, dock_loading) | break_time and not recent | 0.02 / 3 | 3 minutes (90 ticks) |
+  | coffee_break (kitting, dock_loading) | break_time and not recent | 0.02 / 3 | 90 ticks |
   | ac_activation (kitting, dock_loading) | room_warm and not ac_on | 0.005 / 0.2 | none (ac_on covers it) |
-  | office_break (dock_loading) | not recent | 0.005 (recent) / 0.02 (not recent) | 4.5 minutes (135 ticks) |
+  | office_break (dock_loading) | not recent | 0.005 (recent) / 0.02 (not recent) | 135 ticks |
 
   break_time and room_warm are timeline facts; ac_on is the A/C switch's object state; "recent" is the task's own
   recency fact. A recency duration is 3 times the task's declared wait, counted from the observed completion. Each
@@ -313,6 +321,9 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   code, configuration and commands. Also flagged for renaming at the build: the context weight (ω_context,
   _context_weight) and the prior base. docs/assumptions.md 1.4 is updated at the build.
 - The removal of the domain task names and constants from the recognizer, the long-shift rule with them (TODO-66).
+- The instruments (NOTES FOR THE BUILD'S PLAN, the design chat's addition): the IRB's expectations must be computed
+  with the new prior (its oracle assumes the equal prior and no context weight today); its report must read the three
+  conditions A, B and C (5.4); the A/C's measure is its belief at its arrival. The plan states what this costs.
 - Before the build, in its own step (AM19): the layouts with more than one A/C switch (5.7, step 1).
 
 ### 5.4 The tests [ruled]
@@ -328,7 +339,8 @@ Recorded: design_records.md, "T-K", CONTENT POINT 3, THE TESTS (KT1 to KT7) and 
 - The basic set (KT3). The only variation is where a foreseeable task is placed: between tasks (after the first
   delivery, after the second, and so on) and inside a task, between its actions. No other kind of deviation, since
   this set tests the implementation of context knowledge and other deviations would mix causes. Size: two setups per
-  layout, five or more scenarios each. Expectations are stated before the runs.
+  layout, five or more scenarios each, every scenario run with context knowledge on and off. Expectations are stated
+  before the runs.
 - The setup holds the timeline (KT4, AM34). The two setups of a layout differ in their timeline; this is also how the
   effect of a different window on the same activity is tested.
 - The three conditions (KT11, ruled by Hadi). The run with context knowledge off is not a neutral baseline: the equal
@@ -363,8 +375,9 @@ obstacles. Each file's notes give bearings and distances from the table.
 - env_layout_17: env_layout_15 plus the A/C switch on the south wall, straight south of the table, between the two
   shelves shelf_1 and shelf_4.
 - env_layout_16, the dense room: one cluster in the south-west with three shelves (shelf_0, shelf_1, shelf_2), the
-  coffee machine and the A/C switch. Its two south-east shelves were removed before the runs so that its runs end
-  before step 500 (KT9).
+  coffee machine and the A/C switch. Its two south-east shelves were removed before the runs only because its runs
+  had to end before step 500 (KT9). The build removes that limit. Hadi accepted the room as it is; whether the shelves
+  return is not ruled [open; 5.10].
 
 Setups, one per room for now, with no timeline (no form exists yet): env_setup_13 (env_layout_15: item_1 to item_4,
 item_i on shelf_i), env_setup_14 (env_layout_16: item_0 to item_2), env_setup_15 (env_layout_17: item_1 to item_4).
@@ -409,6 +422,10 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    analysis that rests on it; Hadi decides on the list; the layouts are changed to the V1 rule; the baselines that
    remain are regenerated. Affected analyses and tests are deleted or regenerated (Hadi: the existing layouts, setups
    and their analyses are not an evaluation reference).
+   Known input (AM19's KNOWN INPUT): env_layout_05 holds three A/C switches (ac_switch_0, _1, _2). Its scenarios are
+   scenario_s04_01 to _03 (env_setup_04); scenario_s04_01, a fixture of the regression sweep, scripts two
+   activations, at ac_switch_1 and then ac_switch_2; four tests in tests/kitting/ name the layout or its scenarios.
+   The full list, over every layout of both domains, is this step's work.
 2. The build's plan (BUILD DISCIPLINE, step 1): ccode's plan, with no code, reviewed in the design chat.
 3. The build, its verification (AM24) and the review. The existing sets either state context_knowledge off and stay
    identical, or are regenerated with the reason stated; round 1 with context_knowledge off is expected identical
@@ -426,8 +443,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 - The second coffee break and the recency fact: they wait for a further layout by Hadi, with more shelves and items
   (KT2). [ruled]
 - The duration mismatch (a coffee break cut short or prolonged): a later set, since it needs a deviation event (KT3).
-  Authorable (AM29): a shorter wait (during wait_at, drop; 46 seconds, since 45 cannot be written at 2 seconds per
-  tick; the entry closes as abandoned); a longer wait (during wait_at, a Start of stand). Neither when the coffee
+  Authorable (AM29): a shorter wait (during wait_at, drop; at 23 ticks, written as 46 seconds, since a half tick
+  cannot be written; the entry closes as abandoned); a longer wait (during wait_at, a Start of stand). Neither when the coffee
   break is itself the task of another entry's event (the stack is one level deep, TODO-100): recorded as absent.
   [ruled]
 - T-K part 2 [ruled as design, not built]: degrees (R5): a context fact satisfied to a degree in [0, 1], a membership
@@ -465,6 +482,10 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
   prior does not change. (KT10)
 - Two A/C cases in env_layout_17 (s15_10, s15_11) peak just under θ with the equal prior (0.746, 0.745): a later
   crossing there must not be read as the effect of the A/C's strength. (KT10)
+- The gate refuses only below the threshold. Where the prior alone is exactly 0.75, as for the coffee break inside the
+  break time in env_layout_15, the outcome at the first observed movement depends on floating-point rounding. The runs
+  are deterministic, so the result is stable, and it is arbitrary. This bears on the expectations written before the
+  runs with context knowledge on. (KT11, its ADDED line)
 
 ### 5.10 Open points the next chat must put to Hadi [open]
 
@@ -477,7 +498,10 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    (KT3) are still needed where one window already splits the scenarios into B and C (KT11). The design chat's view,
    not a ruling: the same script under two timelines is the cleanest comparison of B against C.
 3. The windows of break_time and room_warm per setup (which scenarios fall in B, which in C), authored from the
-   round's foreseeable-task ticks, before the runs.
+   round's foreseeable-task ticks, before the runs. Hadi's addition (KT4, its ADDED line): the same activity under a
+   window whose edge falls before the human leaves for the foreseeable task, during the walk to it, or after the
+   arrival. The middle case is the recorded cost of crisp facts (R5): the prior changes inside the episode at one
+   tick.
 4. The two MPB cases: their scenarios on env_layout_17 (the robot's pool not holding the items of the two shelves
    beside the A/C switch), and the separation when two deliveries finish together at the shared table.
 5. dock_loading's part: what its layouts and scenarios need for context knowledge (the timelines in its setups; no
@@ -487,6 +511,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    the share at an episode's start, not ruled; the records do not say whether T-K part 1 answers it.
 7. The decision on ccode's AM19 list (step 1), and the items the build's plan proposes: the form of "not", the
    declaration of ac_on, dock_loading's object type and task, the setup's timeline form.
+8. Whether env_layout_16's two south-east shelves return once the build removes the step-500 limit (KT9, its ADDED
+   line; Hadi accepted the room as it is).
 
 ### 5.11 What the build must respect [recorded]
 
@@ -693,3 +719,12 @@ injected at run time; one further test track on adaptation under conflict. T-K p
   alternatives, with no build steps, until Hadi rules. Hadi may bring reflections from another chat; the
   design chat takes from them what improves the decision and does not defend against them.
 - Logic and knowledge-representation terms are used exactly: a fact holds, a condition is satisfied.
+- Rules Hadi set on 3 October 2026 (also in CLAUDE.md, "How sessions work"):
+  - Durations are shown in ticks, not in seconds or minutes.
+  - A prompt for ccode states what is decided, its purpose and why it was ruled, and leaves to ccode which files and
+    names are affected and how it checks its work. No micro-level instructions. ccode stays the worker: the decisions
+    are fixed, and it is not asked for alternatives or opinions on them; it flags what the code contradicts.
+  - One ccode session, one concern. A follow-up goes to the session it belongs to.
+  - Once a plan with numbered steps is agreed, replies keep those step numbers.
+  - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.
+    Detail goes into the repository's files.

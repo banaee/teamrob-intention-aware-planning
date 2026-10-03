@@ -18,6 +18,15 @@ about: what the human produces. An abandoned delivery is in scope for what it do
   implement, where things go, and how to structure outputs are yours.
 - If a decided design turns out to be structurally or experimentally deadlocked when you apply
   it, stop and report. Do not work around it.
+- Rules Hadi set on 3 October 2026 (also `docs/handoffs/T-G_forward_inputs.md`, section 11):
+  - Durations are shown in ticks, not in seconds or minutes.
+  - A prompt for ccode states what is decided, its purpose and why it was ruled; which files and names are affected
+    and how ccode checks its work are ccode's. No micro-level instructions. ccode stays the worker: the decisions are
+    fixed, and it is not asked for alternatives or opinions on them; it flags what the code contradicts.
+  - One ccode session, one concern. A follow-up goes to the session it belongs to.
+  - Once a plan with numbered steps is agreed, replies keep those step numbers.
+  - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.
+    Detail goes into the repository's files.
 
 ## Where to look, and what to skip
 
