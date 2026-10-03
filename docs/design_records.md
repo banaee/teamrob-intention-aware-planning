@@ -2668,6 +2668,10 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
   - env_layout_10, _11 and _02 stay unchanged, as a comparison.
   - A further layout by Hadi, with more shelves and items, is to come for the second coffee break and the recency
     fact; that case waits for it.
+  AMENDED (Hadi, 3 October 2026; ROUND 1, KT9, below): the rooms as they are. The kitting table stands at the middle of
+  the north wall in all three (014538a). env_layout_16 lost its two south-east shelves, shelf_3 and shelf_4, outside
+  the cluster (4cd7bca), so that its runs end before step 500; the cluster is unchanged. ccode may adjust these rooms
+  where it makes a better basic test, decided before the runs and never after seeing a result.
 
 - KT3, the basic set. The only variation is where a foreseeable task is placed: between tasks (after the first
   delivery, after the second, and so on) and inside a task, between its actions. No other kind of deviation.
@@ -2678,6 +2682,8 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
   - Two cases also run in the MPB: a coffee break inside the break time, and deliveries through the whole break time.
   - The measure: the tick at which the true task reaches the threshold and is admitted, and whether a retraction
     follows.
+    AMENDED (Hadi, 3 October 2026; ROUND 1, KT10, below): for ac_activation the measure is its belief at its arrival,
+    not its admission.
   - Expectations are stated before the runs.
 
 - KT4, the setup holds the timeline of context facts (AM34; amends "the scenario's timeline" of THE CUT AND THE QUEUE
@@ -2690,22 +2696,98 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
   scripts in env_layout_15, _16 and _17, run in the IRB with the present equal prior.
   Reason: it gives the "off" side of every case and shows how well the movement alone separates the tasks in these
   rooms.
+  BUILT AND RUN (3 October 2026; 4cd7bca, 4c71b44): ROUND 1, KT8, below.
 
 - KT6, findings recorded; none changes a value.
   - The strength 3 of coffee_break gives, with one delivery live and no other foreseeable task, a prior of exactly
     0.75 (3 / (1 + 3)), the threshold. The value stays, because moving it would choose a value from the threshold
     (AM17's stated consequence).
+    AMENDED (Hadi, 3 October 2026; ROUND 1, KT11, below): work as a whole contributes 1 however many deliveries are
+    live, so in env_layout_15 the coffee break's prior inside the break time is 0.75 in every scenario.
   - The recency duration of 90 ticks (AM16) was derived from the wait, which is compressed, while walking is not. In
     these rooms the walk from the coffee machine to the table and back takes about 84 to 94 ticks. It joins T-F's open
     item on the time scale (TODO-144, its open item of 3 October 2026).
   - In env_layout_15 the prior has no effect once no delivery is live.
   - In env_layout_17 the robot must not hold item_1 or item_4, or the A/C switch no longer stands between two of the
     human's hypotheses; and two deliveries that finish together at the shared table stop closer than min_separation.
+    CORRECTED (Hadi, 3 October 2026; ROUND 1, KT9, below), by role: the robot must not hold the items of the two
+    shelves beside the A/C switch (in env_setup_15, item_1 on shelf_1 and item_4 on shelf_4).
 
 - KT7, the state. Open item 3 (the tests) is ruled (OPEN ITEMS above). Next: the round without context knowledge
   (KT5). Then a new design chat takes the build of T-K part 1: the list of the layouts with more than one A/C switch
   (AM19), the build's plan, the build, the runs with context knowledge on, dock_loading, the close. A later chat
   returns to T-G's stage 2.
+
+ROUND 1, THE ROUND WITHOUT CONTEXT KNOWLEDGE: BUILT, RUN AND ACCEPTED; HADI'S DECISIONS ON ITS REPORT (3 October
+2026). Records only in this block; the round's artefacts and outputs are named in KT8. Hadi's points 1 to 4 are KT8 to
+KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechanism is built.
+
+- KT8, the round is done (KT5). 31 scenarios in env_layout_15, _16 and _17 (scenario_s13_01 to _07, s14_01 to _11,
+  s15_01 to _13, on env_setup_13, _14 and _15; one setup per room; run files in configs/kitting/irb/tk1/), the robot
+  idle, the human doing every delivery, the only variation where one foreseeable task is placed (KT3). The
+  expectations were committed before any run (4cd7bca); the runs and the report followed (4c71b44):
+  analysis/kitting/irb/tk1/README.md (the set, the foreseeable tasks' ticks for authoring the timelines, the
+  expectations and their md5s) and REPORT.md (the comparison, the measure per scenario, the rooms).
+  - Every run agrees with its expectations: 0 disagreements at 1e-9 in all 31; at print precision one, s14_02 tick 181
+    (S = 0.049970 printed as 0.0500), the IRB's known print-precision flag.
+  - No run is touched by the undeclared weight (TODO-66): every run ends before step 500 (the last observed tick is
+    480).
+  - No retraction follows any admission.
+  What the rooms show, in plain words:
+  - env_layout_15, the basic room: the movement recognises every task, but late: a delivery reaches the threshold at
+    about 70 to 85 percent of its walk to the shelf, the coffee break from the table at 32 to 34 ticks of a 43-tick
+    walk. (The only stretches that never reach it are the short first parts of a delivery cut by the coffee break.)
+  - env_layout_17, the A/C switch between two shelves: the A/C hypothesis delays the two deliveries beside it (item_1
+    reaches the threshold at 47 ticks against 37 in env_layout_15, item_4 at 45 against 31); the other two are nearly
+    unchanged.
+  - env_layout_16, the dense room: the movement recognises nothing in the cluster before the arrival. A delivery
+    reaches the threshold only on the carry back, the coffee break only during its wait, the A/C activation never.
+  Reason: KT5 asked for the "off" side of every case and for how well the movement alone separates the tasks.
+
+- KT9, the rooms as they are (by Hadi's decision or with his acceptance). The kitting table stands at the middle of
+  the north wall in all three. env_layout_16 lost its two south-east shelves (shelf_3 and shelf_4, outside the
+  cluster), removed before the runs so that its runs end before step 500; the cluster is unchanged. ccode has Hadi's
+  permission to adjust these rooms where it makes a better basic test, decided before the runs and never after seeing
+  a result. The caution for env_layout_17 (KT6) reads by role: the robot must not hold the items of the two shelves
+  beside the A/C switch.
+  Reason: the shelves of env_layout_16 were removed so that its runs end before step 500, where the undeclared weight
+  acts (TODO-66). The permission is bounded by its condition: a change is decided before the runs, never after a
+  result.
+
+- KT10, findings of the round; none changes a value.
+  - The A/C activation is almost never recognised by movement, since its wait is one tick (it reaches the threshold
+    only in s15_12 and s15_13, with an item in hand; never in env_layout_16). The wait stays; it is a domain value. For
+    the A/C the measure is its belief at its arrival, not its admission (amends KT3's measure).
+  - A coffee break begun inside a delivery after the carry (before the place) leads but stays inadequate until the
+    human reaches the machine, because its evidence counts from the start of the delivery (s13_07, s15_07: the
+    threshold at 153, admitted at 163; the same for the A/C in s15_13). This is the episode's existing behaviour, and
+    the prior does not change it.
+  - Two A/C cases in env_layout_17 peak just under the threshold with the equal prior (s15_10 at 0.746, s15_11 at
+    0.745), so a later crossing there must not be read as the effect of the A/C's strength.
+
+- KT11, the method of the comparison (ruled by Hadi). The run with context knowledge off is not a neutral baseline: the
+  equal prior gives a foreseeable task the share of one delivery. So the tests read three conditions:
+  - A: context knowledge off;
+  - B: context knowledge on, with the context fact not holding (the low strengths);
+  - C: context knowledge on, with the context fact holding.
+  A to B shows the effect of the declared strengths; B to C shows the effect of the context fact. One window in a
+  setup puts some scenarios in B and others in C, since the foreseeable task falls at a different tick in each.
+  The directions expected before the runs:
+  - deliveries earlier in B and C than in A;
+  - a coffee break outside the break time later in B than in A;
+  - a coffee break inside the break time earlier in C;
+  - the A/C lower than A in both B and C, and higher in C than in B.
+  Also recorded: work as a whole contributes 1 however many deliveries are live, so in env_layout_15 the coffee
+  break's prior inside the break time is 0.75 in every scenario.
+  Reason: the run with context knowledge off is not a neutral baseline, since the equal prior gives a foreseeable task
+  the share of one delivery; A to C alone would mix the effect of the strengths with that of the fact.
+
+- KT12, the state. The round without context knowledge is done; it is condition A. Next: a new design chat takes the
+  rest of T-K part 1: the list of the layouts with more than one A/C switch and their change (AM19); the build's plan;
+  the build; the timelines in the setups and the runs in conditions B and C; the two MPB cases (KT3); dock_loading's
+  part, with the re-measurement of T-G stage 1's baseline; the close. Waiting: the further layout for the second
+  coffee break and the recency fact (KT2); the duration mismatch (KT3). The entry point:
+  docs/handoffs/T-G_forward_inputs.md, section 5. A later chat returns to T-G's stage 2.
 
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the
@@ -2722,6 +2804,7 @@ SUPERSEDED (Hadi, 3 October 2026; CONTENT POINT 3, THE TESTS above, KT7): conten
 without context knowledge (KT5); then a new design chat takes the build of T-K part 1 (the list of the layouts with
 more than one A/C switch, AM19; the build's plan, BUILD DISCIPLINE step 1; the build; the runs with context knowledge
 on; dock_loading; the close); a later chat returns to T-G's stage 2.
+SUPERSEDED (Hadi, 3 October 2026; ROUND 1 above, KT12): the round without context knowledge is done. Next: KT12.
 
 THE TASK RENAMED: T-K AND ITS PARTS (Hadi, 3 October 2026). Records only: a reorganisation of task names; no change of
 behaviour. The old name and the new are mapped in one line each in CLAUDE.md and docs/design_decisions.md (this
