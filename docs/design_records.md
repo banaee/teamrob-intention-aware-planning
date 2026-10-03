@@ -2753,6 +2753,9 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   Reason: the shelves of env_layout_16 were removed so that its runs end before step 500, where the undeclared weight
   acts (TODO-66). The permission is bounded by its condition: a change is decided before the runs, never after a
   result.
+  ADDED (Hadi, 3 October 2026, on ccode's report): the reasons for the other two. ccode may adjust the three rooms
+  because they are test instruments and not an evaluation reference (Hadi's statement on the layouts, AM19). The
+  caution for env_layout_17 reads by role because objects in these rooms may move or be renumbered.
 
 - KT10, findings of the round; none changes a value.
   - The A/C activation is almost never recognised by movement, since its wait is one tick (it reaches the threshold
@@ -2777,6 +2780,18 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   - a coffee break outside the break time later in B than in A;
   - a coffee break inside the break time earlier in C;
   - the A/C lower than A in both B and C, and higher in C than in B.
+  CORRECTED (Hadi, 3 October 2026, on ccode's report of these records): the first direction, "deliveries earlier in B
+  and C than in A", was the design chat's own sentence and contradicts the prior's arithmetic. When break_time holds,
+  coffee_break's high strength 3 takes most of the prior, and each live delivery's prior falls below its share in A
+  (in env_layout_15, with n deliveries live, from 1/(n + 1) to 1/(4n): 0.25 against 0.5 for one, 0.0625 against 0.2
+  for four). The directions, as corrected:
+  - deliveries are earlier in B than in A;
+  - in C, deliveries are later than in A when the fact that holds is break_time, and earlier when it is room_warm;
+  - a coffee break outside the break time is later in B than in A; inside the break time it is earlier in C;
+  - the A/C is lower than A in both B and C, and higher in C than in B; with several deliveries live the difference
+    between A and C is small (in env_layout_17 with four deliveries live, 0.164 in C against 0.167 in A).
+  The "later in C" case is the cost of context knowledge when the human works through a break time: the robot expects
+  the break and recognises the work later.
   Also recorded: work as a whole contributes 1 however many deliveries are live, so in env_layout_15 the coffee
   break's prior inside the break time is 0.75 in every scenario.
   Reason: the run with context knowledge off is not a neutral baseline, since the equal prior gives a foreseeable task

@@ -324,7 +324,7 @@ Recorded: design_records.md, "T-K", CONTENT POINT 3, THE TESTS (KT1 to KT7) and 
 - Rooms on kitting (KT2, KT9). env_layout_15, _16 and _17, Hadi's design, as they are in 5.5. env_layout_12 to _14
   are unfit for a controlled test (they carry the MPB's many tables). env_layout_10, _11 and _02 stay unchanged, as a
   comparison. ccode may adjust the three rooms where it makes a better basic test, decided before the runs and never
-  after seeing a result.
+  after seeing a result, because they are test instruments and not an evaluation reference.
 - The basic set (KT3). The only variation is where a foreseeable task is placed: between tasks (after the first
   delivery, after the second, and so on) and inside a task, between its actions. No other kind of deviation, since
   this set tests the implementation of context knowledge and other deviations would mix causes. Size: two setups per
@@ -338,9 +338,16 @@ Recorded: design_records.md, "T-K", CONTENT POINT 3, THE TESTS (KT1 to KT7) and 
   - C: context knowledge on, the context fact holding.
   A to B shows the effect of the declared strengths; B to C the effect of the context fact. One window in a setup
   puts some scenarios in B and others in C, since the foreseeable task falls at a different tick in each.
-  Directions expected before the runs: deliveries earlier in B and C than in A; a coffee break outside the break time
-  later in B than in A; a coffee break inside the break time earlier in C; the A/C lower than A in both B and C, and
-  higher in C than in B. (See 5.10, point 1.)
+  Directions expected before the runs, as corrected (KT11's CORRECTED line, Hadi, 3 October 2026; the first wording,
+  "deliveries earlier in B and C than in A", contradicted the prior's arithmetic):
+  - deliveries are earlier in B than in A;
+  - in C, deliveries are later than in A when the fact that holds is break_time, since the coffee break's strength
+    takes most of the prior (in env_layout_15, each of n live deliveries falls from 1/(n + 1) to 1/(4n)), and earlier
+    when it is room_warm;
+  - a coffee break outside the break time is later in B than in A; inside the break time it is earlier in C;
+  - the A/C is lower than A in both B and C, and higher in C than in B; with several deliveries live the difference
+    between A and C is small.
+  The "later in C" case is the cost of context knowledge when the human works through a break time.
 - The measure (KT3, KT10). Per true stretch: the tick at which the true task reaches the threshold and is admitted,
   and whether a retraction follows. For the A/C the measure is its belief at its arrival, not its admission.
 - The two MPB cases (KT3): a coffee break inside the break time; deliveries through the whole break time.
@@ -449,7 +456,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 - In env_layout_15 the prior has no effect once no delivery is live (only one foreseeable task is live there). (KT6)
 - In env_layout_17 the robot must not hold the items of the two shelves beside the A/C switch, or the switch no longer
   stands between two of the human's hypotheses; and two deliveries that finish together at the shared table stop
-  closer than min_separation. (KT6, KT9)
+  closer than min_separation. The caution reads by role because objects in these rooms may move or be renumbered.
+  (KT6, KT9)
 - The A/C activation is almost never recognised by movement, since its wait is one tick. The wait stays; it is a
   domain value. Hence the A/C's measure is its belief at arrival. (KT10)
 - A coffee break begun inside a delivery after the carry leads but stays inadequate until the human reaches the
@@ -460,28 +468,24 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 
 ### 5.10 Open points the next chat must put to Hadi [open]
 
-1. The direction "deliveries earlier in C" (KT11). Found by ccode when recording it, not ruled: when the fact that
-   holds is break_time, coffee_break's high strength 3 lowers each live delivery's prior below A's (with n live
-   deliveries in env_layout_15, from 1/(n + 1) to 1/(4n): 0.25 against 0.5 for one, 0.0625 against 0.2 for four), so
-   deliveries come later in that C, not earlier. When the fact is room_warm, deliveries are earlier in C, as stated.
-   To be confirmed or corrected before the expectations are written.
-2. In env_layout_17 the A/C is live at its low strength, so the coffee break's prior inside the break time is
+1. In env_layout_17 the A/C is live at its low strength, so the coffee break's prior inside the break time is
    3 / 4.005 = 0.749, just below θ, not 0.75 (ccode's arithmetic; KT11's 0.75 is stated for env_layout_15). And in B,
    a lone live delivery has a prior of about 0.98, so the last delivery of a scenario stands above θ from its first
    tick; its admission then waits for observation (R7, AM5, G1). Both bear on the expectations.
-3. The second setup per room: a scenario names one setup, so how the same scenarios run on a room's second setup
+2. The second setup per room: a scenario names one setup, so how the same scenarios run on a room's second setup
    (copies of the scenarios per setup, or another form) is for the build's plan; and whether two setups per layout
-   (KT3) are still needed where one window already splits the scenarios into B and C (KT11).
-4. The windows of break_time and room_warm per setup (which scenarios fall in B, which in C), authored from the
+   (KT3) are still needed where one window already splits the scenarios into B and C (KT11). The design chat's view,
+   not a ruling: the same script under two timelines is the cleanest comparison of B against C.
+3. The windows of break_time and room_warm per setup (which scenarios fall in B, which in C), authored from the
    round's foreseeable-task ticks, before the runs.
-5. The two MPB cases: their scenarios on env_layout_17 (the robot's pool not holding the items of the two shelves
+4. The two MPB cases: their scenarios on env_layout_17 (the robot's pool not holding the items of the two shelves
    beside the A/C switch), and the separation when two deliveries finish together at the shared table.
-6. dock_loading's part: what its layouts and scenarios need for context knowledge (the timelines in its setups; no
+5. dock_loading's part: what its layouts and scenarios need for context knowledge (the timelines in its setups; no
    A/C switch in its three rooms); which of stage 1's sets are re-measured; whether the 22 potentially confounded MPB
    runs (section 4's caveat) are rerun then or in stage 2.
-7. TODO-154 (the robot does not anticipate the scan its own delivery makes applicable): recorded for T-K part 1 as
+6. TODO-154 (the robot does not anticipate the scan its own delivery makes applicable): recorded for T-K part 1 as
    the share at an episode's start, not ruled; the records do not say whether T-K part 1 answers it.
-8. The decision on ccode's AM19 list (step 1), and the items the build's plan proposes: the form of "not", the
+7. The decision on ccode's AM19 list (step 1), and the items the build's plan proposes: the form of "not", the
    declaration of ac_on, dock_loading's object type and task, the setup's timeline form.
 
 ### 5.11 What the build must respect [recorded]
