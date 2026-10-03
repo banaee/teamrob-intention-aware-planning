@@ -132,6 +132,19 @@ python scripts/layout_tool.py render domains/kitting/layouts/env_layout_02.json
 python scripts/layout_tool.py render domains/kitting/layouts domains/dock_loading/layouts
 ```
 
+To derive a new layout from one, drag its fixed objects in the browser:
+
+```bash
+python scripts/layout_tool.py edit domains/kitting/layouts/env_layout_02.json   # Ctrl+C stops
+```
+
+The page shows the same drawing; dragging an object moves its centre on a 10 cm grid, and a centre outside the space is
+refused. Only positions change: no object is rotated, resized, added or removed, the areas stay, so every setup of the
+source layout fits the new one. "Save as" takes the new layout's id (the file stem, without `.json`) and writes
+`<id>.json` and `<id>.png` into the source layout's folder; it never overwrites a file and never modifies the source.
+The new file keeps the source's `space` (its `name` included) and every object's `notes` as they are: edit them by hand
+if they describe the old positions.
+
 The drawing: the space's outline with its name and units, each area's rectangle and id, each fixed object's rectangle
 and id coloured by its type, a legend of the types. It reads the geometry as the loader does: the space centred on the
 origin with y up, `position` the object's centre, `size` its extent along x and y; `orientation_deg` is not read by
@@ -187,7 +200,7 @@ teamrob-intention-aware-planning/
 ├── ros_sim/                     # ROS embodiment (planned)
 ├── configs/                     # Cross-domain config (costs.yaml)
 ├── docs/                        # Design documentation
-└── scripts/                     # Utility scripts (layout_tool.py: layout drawings)
+└── scripts/                     # Utility scripts (layout_tool.py: layout drawings and editor)
 ```
 
 ---
