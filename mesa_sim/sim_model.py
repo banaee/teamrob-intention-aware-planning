@@ -342,6 +342,24 @@ class SimModel(model.Model):
                     f"type '{obj.type}' the destination types {sorted(dest_types)}"
                 )
 
+        # A movable object's subtype is checked against its destination's and
+        # its home container's, where the fixed object carries one (design
+        # decisions, "subtype is a stated fact of an object"). An object
+        # without a subtype is not checked. The robot does not read subtype.
+        for obj_id, obj in self.objects.items():
+            if not obj.is_portable or obj.subtype is None:
+                continue
+            for role, container_id in (("home container", obj.home_container),
+                                       ("destination", obj.destination)):
+                container = self.objects.get(container_id) if container_id is not None else None
+                if container is None or container.subtype is None:
+                    continue
+                if container.subtype != obj.subtype:
+                    raise ValueError(
+                        f"setup '{setup_path}': {obj.type} '{obj_id}' of subtype '{obj.subtype}' has {role} "
+                        f"'{container_id}' of subtype '{container.subtype}'; the two subtypes must be equal"
+                    )
+
         # Build type → instance-ids registry, feeds IR's hypothesis space
         for obj_id, obj in self.objects.items():
             self._objects_by_type.setdefault(obj.type, []).append(obj_id)
