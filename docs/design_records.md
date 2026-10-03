@@ -2489,6 +2489,9 @@ THE CUT AND THE QUEUE.
   component (AM26), which replaces the class `ContextKnowledge` in `shared/knowledge.py` (glossary §5, context
   knowledge); the removal of the long-shift rule with nothing in its place (AM22). Before the build, in its own step:
   the layouts with more than one A/C switch (AM19).
+  AMENDED (Hadi, 3 October 2026; AM30, AM33): the memory of observed completions is its own component of the robot's
+  mind, outside the recognizer, and records the tick of an observed completion; an observed completion is the task's
+  terminal fact in the robot's world state (design_decisions.md, this title, AM27's AM30 and AM33).
 - T-K, a new task, holds the build of R5 (degrees: membership functions, the operators, the linear rule for a
   strength). Its place: the end of the V1 queue, after track 3b (roadmap, "The plan from T-A", the order block;
   CLAUDE.md's state). The letter was verified unused in the repository before it was taken (2 October 2026).
@@ -2528,6 +2531,14 @@ OPEN ITEMS OF STAGE 1.5 (recorded as open; nothing decided):
 3. The tests of the stage: a script that agrees with an occurrence condition, a human who acts against it, a duration
    mismatch.
    OPEN (3 October 2026). ccode's check of the authorable waits is recorded with it (AM29, below).
+
+NOTES FOR THE BUILD'S PLAN (Hadi, 3 October 2026; confirmed on ccode's report of the records of content points 1 and 2;
+not rulings of design):
+- "not" in an occurrence condition (AM11) needs a condition form of its own; ccode proposes it in the build's plan.
+  (The code's `ConditionSchema` has no negation flag, by its own comment.)
+- ac_on (AM18) needs a declared state and a declared effect of the action; dock_loading needs the object type and the
+  task ac_activation.
+- Recency durations (AM16) are declared in physical time and converted by the body.
 
 Also recorded: the open questions of C1, STAGE 1.5 (the T-G heading above) are answered by the rulings, except the
 liveness of a hypothesis whose condition turns false while the human executes its task, which is not answered (C1,
@@ -2623,3 +2634,7 @@ kitting and dock_loading alike. Next: unchanged.
 SUPERSEDED (Hadi, 3 October 2026; CONTENT POINTS 1 AND 2 above): content points 1 and 2 are ruled (AM10 to AM29).
 Next: content point 3 (the tests), then ccode's list of the layouts with more than one A/C switch (AM19), then the
 build's plan (BUILD DISCIPLINE, step 1).
+AMENDED (Hadi, 3 October 2026, on ccode's report of these records): AM30 to AM33 (design_decisions.md, this title: the
+memory of observed completions outside the recognizer, AM30; a context value measured from the robot's own
+observation, AM31; the wording of "no action changes a context fact", AM32; an observed completion is the task's
+terminal fact, AM33) and the NOTES FOR THE BUILD'S PLAN above. Next: unchanged.

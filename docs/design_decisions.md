@@ -1367,6 +1367,10 @@ explicitly outside the task-hypothesis model. If it is ever wanted it needs its 
 not to be smuggled into task belief. Nobody re-adds it. Consequence recorded: the completion channel's
 events, permanent within an episode, are discarded with the rest of the base at a boundary — the I4b gate
 statement's "unresettable by construction" now reads "within an episode".
+POINTER (T-G stage 1.5, AM30, Hadi, 3 October 2026; not built): the memory of observed completions, which recency
+facts rest on, is cross-episode information with its own representation: a component of the robot's mind outside the
+recognizer. The recognizer reads the recency facts as an input and stores nothing across episodes. This ruling's text
+is unchanged. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", AM27, AM30.
 
 Decision 3 — the pin and the boundary do not share a criterion, and the difference is now visible. The
 terminal pin (I3) fires on the world's completion condition whoever satisfied it: `obj_at(item_7, table)`
@@ -4148,6 +4152,10 @@ only (session L-records); built in L-build.
   The world persists, the recognizer does not: a boundary resets bases, origins, standing clocks and the completion
   events; the live set is a function of the world's terminal facts on every tick; derived phases re-derive from the
   world on the first tick of the new episode. The meta-planner needs nothing beyond D2 at a boundary.
+  POINTER (T-G stage 1.5, AM30, Hadi, 3 October 2026; not built): the memory of observed completions is a component
+  of the robot's mind outside the recognizer; the recognizer reads the recency facts as an input on each run and
+  stores nothing across episodes. L5's text is unchanged. design_decisions.md, "T-G stage 1.5: context knowledge in
+  the recognizer's belief", AM27, AM30.
   AMENDED (Hadi, on the L-records report, 27 Sept 2026; supersedes "The meta-planner needs nothing beyond D2 at a
   boundary"). Consequence B: a belief re-initialisation at an episode boundary fires `recognition_changed` for any
   recorded decision, whether or not most_likely changes; the BeliefState carries the boundary as a flag
@@ -4931,6 +4939,11 @@ that declare a recency fact (AM14's record part), the recency durations (AM16), 
 (AM18), the layouts with more than one A/C switch (AM19), the assumption on the scale of the durations (AM23), the
 build's acceptance (AM24), the placement of the assumptions in `docs/assumptions.md` (AM28) and ccode's check of the
 authorable waits (AM29). Content point 3 (the tests) is not ruled. Not built.
+AMENDED (Hadi, 3 October 2026, on ccode's report of the records of content points 1 and 2; AM30 to AM33, each under
+the amendment it concerns): AM30 where the memory of observed completions lives (under AM27); AM31 a context value
+measured from the robot's own observation (under AM14); AM32 the wording of "no action changes a context fact" (under
+AM20); AM33 what an observed completion is (under AM27). Notes for the build's plan: the record, OPEN ITEMS OF STAGE
+1.5. Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -5104,11 +5117,19 @@ the values and the rest are in the record ("T-G stage 1.5", CONTENT POINTS 1 AND
   record part).
   Reason: no one argued that one kind of break replaces the other.
   Not taken: a shared recency fact per domain; a recency fact for coffee_break only.
+  AMENDED (AM31, Hadi, 3 October 2026): the robot may measure a context value from its own observation, for example
+  the time since an observed completion. One sentence to this effect is added to the glossary's entry "context value".
+  Reason: a recency fact is then a context fact by the existing definition ("a declared fact derived from context
+  values"), and the definition of "context fact" itself does not change.
 
 - AM20, no action changes a context fact (under R1). The recorded line stays: no action sets or removes a context fact.
   After an activation of the A/C, room_warm may still hold; the task then has its low strength through the object
   state ac_on (AM18, in the record). The scenario's author is not required to end the window at the activation.
   Not taken: an action that sets or removes a context fact.
+  AMENDED (AM32, Hadi, 3 October 2026), the wording: no action's declared effect sets or removes a context fact in the
+  world. A recency fact changes through the robot's observation of a completion, in the mind.
+  Reason: the rule concerns the world's timeline facts; the recency fact is derived in the mind and was never an
+  effect of the action.
 
 - AM21, a clarification, no new decision (under R2). A context fact is a state. An entry of the timeline is the
   change; the fact then holds on every tick until the next change. The change is no trigger of the meta-planner; the
@@ -5134,6 +5155,18 @@ the values and the rest are in the record ("T-G stage 1.5", CONTENT POINTS 1 AND
   human can be outside the monitored areas). A task cut before its completion produces no recency fact; Hadi's reading:
   the human may not have finished and may return to it.
   In `docs/assumptions.md` as 5.4 (AM28).
+  AMENDED (AM30, Hadi, 3 October 2026), where the memory lives: the memory of observed completions is its own
+  component of the robot's mind, outside the recognizer. It records the tick of an observed completion. The recognizer
+  reads the recency facts as an input on each run and stores nothing across episodes.
+  Reason: both older rulings then stand unchanged. Cross-episode information has its own representation (the 4C
+  ruling on episodes, "The recognizer estimates the intention of the current behavioural episode", Decision 2, NO
+  PERSISTENCE LAYER), and the recognizer does not persist (T-D L5, "T-D L: the belief lifecycle"). A pointer stands at
+  each; their text is unchanged.
+  AMENDED (AM33, Hadi, 3 October 2026), what an observed completion is: the task's terminal fact in the robot's world
+  state, for example waited(agent, machine). Not the episode boundary.
+  Reason: an episode boundary also follows the completions of other tasks; the terminal fact belongs to the one task.
+  A task cut before its completion has no terminal fact, which agrees with the ruled limit that it produces no recency
+  fact.
 
 ASSUMPTIONS, recorded with the rulings (not added to `docs/assumptions.md`):
 AMENDED (AM28, Hadi, 3 October 2026): A1 and A5 are added to `docs/assumptions.md` (6.1 and 6.2), A5 stated as a
@@ -5172,4 +5205,5 @@ whole contains, so it shapes the prior through the support.
 
 → RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K's open items). Amended 3 October 2026
 (content points 1 and 2): CONTENT POINTS 1 AND 2 (AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28, AM29;
-the ideas not ruled, each to its place); the open items' state.
+the ideas not ruled, each to its place); the open items' state. Amended 3 October 2026 (AM30 to AM33): the notes
+for the build's plan, with the open items.
