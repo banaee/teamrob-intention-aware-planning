@@ -4556,6 +4556,9 @@ A conceptual direction. In stage 1.5 a context fact is derived from context valu
 the situation (glossary §5); a state of the human the robot cannot observe (fatigue, for one; the present
 `ContextKnowledge.shift_duration` calls itself a proxy for it) is not one. Whether and how such a state enters the
 robot's knowledge is not designed in V1.
+NOTE (AM31, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief",
+AM14's AM31): a recency fact is a context fact derived from a value the robot measures from its own observation (the
+time since an observed completion); it is not an unobservable state of the human.
 Files: shared/knowledge.py (`ContextKnowledge`), shared/recognizer.py
 Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief"; TODO-66
 

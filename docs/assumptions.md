@@ -172,6 +172,9 @@ human. A completion the robot does not observe produces no recency fact (a limit
 monitored areas, 2.3); a task cut before its completion produces none.
 Perception · Hadi, 3 Oct 2026 (T-G stage 1.5, AM25, AM27; placed here by AM28) · the robot's WorldState; the
 recognizer's prior. Ruled, not built.
+AMENDED (AM30, AM33, Hadi, 3 Oct 2026): the memory is its own component of the robot's mind, outside the recognizer,
+and records the tick of an observed completion; an observed completion is the task's terminal fact in the robot's
+WorldState (for example waited(agent, machine)), not the episode boundary.
 
 ## 6. Context knowledge
 

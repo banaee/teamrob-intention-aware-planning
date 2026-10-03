@@ -481,6 +481,9 @@ strengths, the recency durations) reaches the mind directly from the knowledge c
 
 **context value** — a measured or scheduled quantity of the situation (a time of day, a temperature). An action may
 change a context value.
+AMENDED (AM31, Hadi, 3 October 2026): the robot may measure a context value from its own observation, for example the
+time since an observed completion. A **recency fact** (below) is then a context fact by the definition of **context
+fact**, which does not change.
 
 **context fact** — a declared fact derived from context values, satisfied to a degree in [0, 1]; a crisp fact has only
 0 and 1 (R5). In this stage no task's action sets or removes a context fact directly. Stage 1.5 builds crisp facts only,
@@ -490,6 +493,8 @@ timeline is a state: an entry of the timeline is the change, and the fact holds 
 the change is no trigger of the meta-planner (AM21). No action sets or removes a context fact (AM20). The robot knows
 which timeline facts hold exactly and at once, through the world state (AM25). A **recency fact** (below) is a context
 fact of stage 1.5 that is not on the timeline (AM14).
+AMENDED (AM32, 3 October 2026), the wording of AM20: no action's declared effect sets or removes a context fact in the
+world. A recency fact changes through the robot's observation of a completion, in the mind.
 
 **membership function** — gives the degree to which a context fact is satisfied from a context value. Declared knowledge,
 with its source (R5). T-K's.
@@ -508,6 +513,10 @@ a **recency fact**. "Or" stays in T-K. With it not satisfied, the task has its l
 observed completion of a named task; it holds for a declared duration after that observation. Declared per task. It
 rests on the mind's own memory of an observed completion; a completion the robot does not observe, or a task cut
 before its completion, produces none (AM27).
+AMENDED (AM30, AM33, 3 October 2026): the memory of observed completions is its own component of the robot's mind,
+outside the recognizer; it records the tick of an observed completion, and the recognizer reads the recency facts as an
+input on each run and stores nothing across episodes (AM30). An observed completion is the task's terminal fact in the
+robot's world state, for example waited(agent, machine), not the episode boundary (AM33).
 
 **recency duration** (AM15, AM16, 3 October 2026; not built) — the declared duration for which the recency fact holds,
 with its source. Counted from the observed completion. The values: design_records.md, "T-G stage 1.5", CONTENT POINTS
