@@ -1285,6 +1285,14 @@ fields, not refused (an authoring risk, parked under TODO-151). design_decisions
 COLLISION, not resolved: DESIGN-16 (`docs/design_decisions.md`) says "travel/setup costs between tasks", the
 scheduling sense (a cost of switching between tasks). That is the English word, not the term.
 
+**subtype** — a stated fact of an object, a field of its layout entry (a fixed object) or its setup entry (a movable
+object). It classifies the object within its type (kitting: an item's part; dock_loading: a pallet's and a delivery
+bay's `dry` or `frozen`). The loader checks a movable object's subtype against its destination's and its home
+container's where both carry one; the robot does not read it. It is not part of the id, which is an opaque name. No
+code reads the subtype of kitting items (TODO-172). The subtype is not the type. The field destination stays the
+statement of where an object belongs. design_decisions.md, "`subtype` is a stated fact of an object" (Hadi, 3 October
+2026).
+
 **scenario** — the episode: per agent its `start_position`, `assigned_tasks`, `observes` and, for a human, the
 human's script; the purpose, as description text (label C, §7); the one setup it binds (`setup`, required); and its
 reference layouts. A hand-written `ScenarioConfig` literal, registered by discovery at import of the domain package.
