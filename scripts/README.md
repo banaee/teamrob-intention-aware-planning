@@ -50,7 +50,7 @@ python scripts/layout_tool.py edit domains/kitting/layouts/env_layout_02.json
   the object's id and position as numbers. Objects you do not drag keep their exact positions.
 - **Refusal.** A drag that puts the centre outside the space is refused. The object stays at its last position inside,
   and the page says why.
-- **Add.** The page has a list, the object library. The tool builds it from every layout file in the folder of the
+- **Add.** The page has a list in a side panel, the object library, with each type's colour from the legend. The tool builds it from every layout file in the folder of the
   source layout: one entry per distinct (type, size, subtype). An object without a `subtype` field forms an entry
   without a subtype (dock_loading: a `delivery_bay` with `dry` and one with `frozen` are two entries). A click on an
   entry adds one object of that type, size and subtype. Then you drag it.

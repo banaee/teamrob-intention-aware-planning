@@ -84,7 +84,7 @@ def _num(v: float) -> str:
 # Drawing
 # =============================================================================
 
-def layout_svg(layout: dict, grid: bool = False) -> str:
+def layout_svg(layout: dict, grid: bool = False, colours: Optional[Dict[str, str]] = None) -> str:
     """
     The drawing of a parsed layout as SVG text. SVG user units are the layout's units;
     the layout point (x, y) is drawn at SVG (x, -y), so y points up.
@@ -93,17 +93,21 @@ def layout_svg(layout: dict, grid: bool = False) -> str:
     (data-id), its type (data-type), its subtype where it has one (data-subtype, and shown
     after the id) and its position (data-x, data-y), translated to its centre; its rectangle and label are drawn about (0, 0) inside it. With `grid`, grid lines
     are drawn over the areas and under the objects (the edit page's; "render" draws none).
+    `colours` (type -> colour) replaces the colours chosen from the layout's own types; the
+    legend lists the types of the layout's objects.
     """
     space = layout["space"]
     W, H = float(space["width"]), float(space["height"])
     units = space.get("units", "")
     name = space.get("name", "")
     objects = layout["env_objects"]
-    colours = type_colours([o["type"] for o in objects])
+    present = sorted({o["type"] for o in objects})
+    colours = colours or type_colours(present)
+    legend = {t: colours[t] for t in present}
 
     font = max(W, H) / 75.0
     margin = font * 4
-    legend_rows = math.ceil(len(colours) / 4) if colours else 0
+    legend_rows = math.ceil(len(legend) / 4) if legend else 0
     legend_h = legend_rows * font * 1.8 + font
     x0, y0 = -W / 2 - margin, -H / 2 - margin - font * 1.5
     vw, vh = W + 2 * margin, H + 2 * margin + font * 1.5 + legend_h
@@ -185,7 +189,7 @@ def layout_svg(layout: dict, grid: bool = False) -> str:
     # Legend of the types.
     ly = H / 2 + font * 3.2
     col_w = W / 4
-    for i, (t, c) in enumerate(colours.items()):
+    for i, (t, c) in enumerate(legend.items()):
         lx = -W / 2 + (i % 4) * col_w
         ry = ly + (i // 4) * font * 1.8
         a(f'<rect x="{_num(lx)}" y="{_num(ry - font)}" width="{_num(font * 1.2)}" height="{_num(font * 1.2)}" '
@@ -252,11 +256,29 @@ PAGE = r"""<!doctype html>
   .bad { color: #b00020; }
   .ok { color: #1b6e20; }
   #main { display: flex; gap: 12px; align-items: flex-start; }
-  #stage { flex: 1 1 auto; min-width: 0; }
-  #side { flex: 0 0 15em; background: #fff; border: 1px solid #ccc; padding: 8px; }
-  #side h3 { margin: 8px 0 4px; font-size: 1em; }
-  #side .type { margin-top: 6px; font-size: 0.85em; color: #555; }
-  #side button.entry { display: block; width: 100%; text-align: left; margin: 2px 0; }
+  #stage { flex: 0 1 auto; min-width: 0; }
+  #side { flex: 0 0 17em; background: #fff; border: 1px solid #d0d4da; border-radius: 8px; padding: 14px 14px 16px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  #side h3 { margin: 0 0 8px; font-size: 0.78em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+             color: #6b7280; }
+  #side section + section { margin-top: 18px; padding-top: 14px; border-top: 1px solid #e5e7eb; }
+  #side .type { display: flex; align-items: center; gap: 8px; margin: 12px 0 4px; font-size: 0.9em; font-weight: 600;
+                color: #1f2937; }
+  #side .type:first-child { margin-top: 0; }
+  #side .swatch { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 3px; border: 1px solid #222; opacity: 0.8; }
+  #side button { font: inherit; font-size: 0.9em; cursor: pointer; border: 1px solid #d0d4da; border-radius: 6px;
+                 background: #f9fafb; color: #1f2937; padding: 6px 10px; }
+  #side button:hover:not(:disabled) { background: #eef2ff; border-color: #6366f1; }
+  #side button:disabled { color: #9ca3af; cursor: default; }
+  #side button.entry { display: flex; justify-content: space-between; align-items: center; width: 100%;
+                       margin: 0 0 4px; text-align: left; }
+  #side .badge { font-size: 0.85em; color: #374151; background: #e5e7eb; border-radius: 10px; padding: 0 8px; }
+  #side .hint { margin: 0 0 8px; font-size: 0.8em; color: #6b7280; }
+  #selname { margin-bottom: 8px; font-weight: 600; color: #1f2937; }
+  #selname.none { font-weight: 400; color: #9ca3af; }
+  #delete:not(:disabled) { color: #b00020; border-color: #e5b4bc; }
+  #moved div { margin: 2px 0; font-size: 0.82em; color: #374151; }
+  #moved .label { font-weight: 700; color: #6b7280; margin-top: 8px; }
   #warn { display: none; margin: 6px 0; padding: 6px; background: #fff3cd; border: 1px solid #e0b000; }
   html { overflow-y: scroll; }
   svg { display: block; width: auto; height: 80vh; max-width: 100%; background: #fff; border: 1px solid #ccc; }
@@ -282,12 +304,20 @@ PAGE = r"""<!doctype html>
 <div id="main">
   <div id="stage">__SVG__</div>
   <div id="side">
-    <h3>Object library</h3>
-    <div id="library"></div>
-    <h3>Selected</h3>
-    <div id="selname">none</div>
-    <button id="delete" disabled>Delete selected</button>
-    <div id="moved" style="margin-top:10px; font-size:0.85em"></div>
+    <section>
+      <h3>Object library</h3>
+      <p class="hint">Click an entry to add an object, then drag it.</p>
+      <div id="library"></div>
+    </section>
+    <section>
+      <h3>Selected</h3>
+      <div id="selname" class="none">none</div>
+      <button id="delete" disabled>Delete selected</button>
+    </section>
+    <section>
+      <h3>Changes</h3>
+      <div id="moved"></div>
+    </section>
   </div>
 </div>
 <div id="tip"></div>
@@ -335,17 +365,28 @@ function showTip(evt, text, bad) {
   tip.style.left = (evt.clientX + 14) + "px"; tip.style.top = (evt.clientY + 14) + "px";
 }
 function summary() {
-  const moved = objs.filter(o => !o.added && (o.x !== o.x0 || o.y !== o.y0));
-  const added = objs.filter(o => o.added);
-  const parts = [];
-  if (moved.length) parts.push("Moved: " + moved.map(o => o.id + " (" + o.x + ", " + o.y + ")").join(", "));
-  if (added.length) parts.push("Added: " + added.map(o => o.id + " (" + o.x + ", " + o.y + ")").join(", "));
-  if (deleted.size) parts.push("Deleted: " + Array.from(deleted).sort().join(", "));
-  document.getElementById("moved").textContent = parts.join(" | ");
+  const box = document.getElementById("moved");
+  box.textContent = "";
+  const groups = [
+    ["Moved", objs.filter(o => !o.added && (o.x !== o.x0 || o.y !== o.y0)).map(o => o.id + " (" + o.x + ", " + o.y + ")")],
+    ["Added", objs.filter(o => o.added).map(o => o.id + " (" + o.x + ", " + o.y + ")")],
+    ["Deleted", Array.from(deleted).sort()],
+  ];
+  let any = false;
+  for (const [label, items] of groups) {
+    if (!items.length) continue;
+    any = true;
+    const h = document.createElement("div"); h.className = "label"; h.textContent = label + " (" + items.length + ")";
+    box.appendChild(h);
+    for (const t of items) { const d = document.createElement("div"); d.textContent = t; box.appendChild(d); }
+  }
+  if (!any) { const d = document.createElement("div"); d.style.color = "#9ca3af"; d.textContent = "none yet"; box.appendChild(d); }
 }
 function highlight() {
   for (const g of getSvg().querySelectorAll("g.obj")) g.classList.toggle("selected", g.dataset.id === selected);
-  document.getElementById("selname").textContent = selected === null ? "none" : selected;
+  const sel = document.getElementById("selname");
+  sel.textContent = selected === null ? "none" : selected;
+  sel.className = selected === null ? "none" : "";
   document.getElementById("delete").disabled = selected === null;
 }
 function select(id) { selected = id; highlight(); hideWarn(); }
@@ -436,12 +477,20 @@ const library = document.getElementById("library");
 let lastType = null;
 for (const entry of LIBRARY) {
   if (entry.type !== lastType) {
-    const h = document.createElement("div"); h.className = "type"; h.textContent = entry.type; library.appendChild(h);
+    const h = document.createElement("div"); h.className = "type";
+    const sw = document.createElement("span"); sw.className = "swatch"; sw.style.background = entry.colour;
+    h.appendChild(sw); h.appendChild(document.createTextNode(entry.type));
+    library.appendChild(h);
     lastType = entry.type;
   }
   const b = document.createElement("button");
   b.className = "entry";
-  b.textContent = entry.size[0] + " × " + entry.size[1] + (entry.subtype === null ? "" : " · " + entry.subtype);
+  const size = document.createElement("span"); size.textContent = entry.size[0] + " \u00d7 " + entry.size[1];
+  b.appendChild(size);
+  if (entry.subtype !== null) {
+    const badge = document.createElement("span"); badge.className = "badge"; badge.textContent = entry.subtype;
+    b.appendChild(badge);
+  }
   b.addEventListener("click", () => addObject(entry));
   library.appendChild(b);
 }
@@ -650,18 +699,21 @@ def cmd_edit(source_path: Path) -> None:
     folder = source_path.resolve().parent
     units = str(source["space"].get("units", ""))
     library = object_library(folder)
+    # One colour per type for the whole page, library types included, so a library swatch, the drawing and
+    # the legend agree.
+    colours = type_colours([str(o["type"]) for o in source["env_objects"]] + [t for t, _, _ in library])
 
     def embed(value) -> str:
         return json.dumps(value).replace("</", "<\\/")
 
     def page() -> bytes:
         existing = sorted(p.name for p in folder.iterdir())
-        html = (PAGE.replace("__SVG__", layout_svg(source, grid=True))
+        html = (PAGE.replace("__SVG__", layout_svg(source, grid=True, colours=colours))
                     .replace("__SOURCE__", escape(source_path.name))
                     .replace("__GRID__", str(GRID_CM))
                     .replace("__UNITS__", escape(units))
                     .replace("__EXISTING__", embed(existing))
-                    .replace("__LIBRARY__", embed([{"type": t, "size": [_clean(w), _clean(h)], "subtype": st}
+                    .replace("__LIBRARY__", embed([{"type": t, "size": [_clean(w), _clean(h)], "subtype": st, "colour": colours[t]}
                                                     for t, (w, h), st in library]))
                     .replace("__SOURCE_IDS__", embed([str(o["id"]) for o in source["env_objects"]])))
         return html.encode("utf-8")
@@ -689,7 +741,7 @@ def cmd_edit(source_path: Path) -> None:
         def do_POST(self) -> None:
             if self.path == "/svg":
                 try:
-                    svg = layout_svg(drawing_layout(source, self._body()["objects"]), grid=True)
+                    svg = layout_svg(drawing_layout(source, self._body()["objects"]), grid=True, colours=colours)
                 except (KeyError, TypeError, ValueError, IndexError) as e:
                     self._send(400, f"bad state: {e}".encode("utf-8"), "text/plain")
                     return
