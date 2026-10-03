@@ -473,6 +473,8 @@ Decisions
 6. Report in the chat reply, concisely: commits; what changed and where; the numbers the task
    asked for; contradictions with the task or the docs; flags. Do not create a REPORT.md, an
    analysis directory, checksums or regeneration scripts unless the task asks for them.
+7. Do not delete or overwrite a file that this session did not create. A script that removes files must target only
+   its own output folder. Ask before any other deletion.
 
 ## BUILD DISCIPLINE
 
