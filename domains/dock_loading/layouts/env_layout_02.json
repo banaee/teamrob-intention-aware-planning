@@ -66,6 +66,7 @@
     {
       "id": "dry_delivery_bay_0",
       "type": "delivery_bay",
+      "subtype": "dry",
       "position": [
         -515,
         215
@@ -78,6 +79,7 @@
     {
       "id": "frozen_delivery_bay_0",
       "type": "delivery_bay",
+      "subtype": "frozen",
       "position": [
         515,
         215

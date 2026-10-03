@@ -4,6 +4,7 @@
     {
       "id": "pallet_0",
       "type": "pallet",
+      "subtype": "dry",
       "initial_container": "truck_interior",
       "destination": "dry_delivery_bay_0",
       "size": [
@@ -14,6 +15,7 @@
     {
       "id": "pallet_1",
       "type": "pallet",
+      "subtype": "dry",
       "initial_container": "truck_interior",
       "destination": "dry_delivery_bay_0",
       "size": [
@@ -24,6 +26,7 @@
     {
       "id": "pallet_2",
       "type": "pallet",
+      "subtype": "frozen",
       "initial_container": "truck_interior",
       "destination": "frozen_delivery_bay_0",
       "size": [
@@ -34,6 +37,7 @@
     {
       "id": "pallet_3",
       "type": "pallet",
+      "subtype": "frozen",
       "initial_container": "truck_interior",
       "destination": "frozen_delivery_bay_0",
       "size": [
