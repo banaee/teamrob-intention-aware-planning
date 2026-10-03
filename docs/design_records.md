@@ -2453,6 +2453,9 @@ three open items, then its build's plan.
 Ruled in cchat, 2 October 2026; recorded before any build. Nothing is built.
 AMENDED (Hadi, 3 October 2026, on the review of the records): AM1 to AM9 in design_decisions.md under this title; here
 R9 superseded by AM3, AM3's consequences and AM8.
+AMENDED (Hadi, 3 October 2026, the design chat on content points 1 and 2): AM10 to AM29. Their conceptual part is in
+design_decisions.md under this title; here the record part (CONTENT POINTS 1 AND 2, below), the cut and T-K's open
+items as amended, and the open items' state.
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -2479,33 +2482,144 @@ and the maintained sets running both settings) stays as it is until the build ch
 THE CUT AND THE QUEUE.
 - T-G stage 1.5 builds: R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts, and the
   removal of the domain task names and constants from the recognizer (TODO-66; stage 1.5's build closes it).
+  AMENDED (Hadi, 3 October 2026; AM10 to AM29): the build also contains "not" in an occurrence condition and its three
+  sources (AM11: timeline facts, object states, recency facts); the recency facts and their memory of observed
+  completions (AM14, AM27); the A/C switch's object state ac_on, and ac_activation with room_warm in both domains
+  (AM18); the timeline's facts carried by the world state (AM25); the declared context knowledge from the knowledge
+  component (AM26), which replaces the class `ContextKnowledge` in `shared/knowledge.py` (glossary §5, context
+  knowledge); the removal of the long-shift rule with nothing in its place (AM22). Before the build, in its own step:
+  the layouts with more than one A/C switch (AM19).
 - T-K, a new task, holds the build of R5 (degrees: membership functions, the operators, the linear rule for a
   strength). Its place: the end of the V1 queue, after track 3b (roadmap, "The plan from T-A", the order block;
   CLAUDE.md's state). The letter was verified unused in the repository before it was taken (2 October 2026).
   T-K's operators include "or" and "not" in an occurrence condition; stage 1.5's occurrence condition is a conjunction
   (AM7).
+  SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): "not" is in stage 1.5; T-K's operators keep "or" (and the degrees).
   T-K's OPEN ITEMS (AM8, Hadi, 3 October 2026): the representation of a context value and of a degree. The fact form of
   T-G A5 holds crisp facts only.
+  ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED):
+  - The stream of context values as the world's evolving state at each tick. The environment updates a value through
+    its dynamics (the A/C lowers the temperature); the robot derives graded facts from the values. A sketch from the
+    chat, not ruled: a crisp condition as an interval on one value. Stage 1.5 did not take the stream in place of the
+    timeline of facts (AM11's "Not taken").
+  - Soft edges of a window; a gradual return of the strength after a task (a membership function over the time since
+    the last observed completion). Stage 1.5's facts are crisp (AM10).
+  - "Or" in an occurrence condition, with "long work without a break". Open with it: what counts as a break, when the
+    count starts, its limit and its source, the unobserved human. Stage 1.5 has no replacement for the long-shift rule
+    (AM22).
 - Future work, each a TODO tagged [FW]: duration uncertainty and a projection that depends on context (TODO-158);
   unobservable states of the human as context (TODO-159); scopes of knowledge (general, sector, domain) and norms
   (TODO-160); validation of the strengths on site data (TODO-161); the robot without knowledge of the assignment
   (TODO-162).
   SUPERSEDED IN PART (AM3, Hadi, 3 October 2026): the last item; TODO-162 is marked superseded (R3's formula covers the
   case with assignment knowledge off).
+  ADDED (Hadi, 3 October 2026; the design chat on content points 1 and 2): A/C deactivation (TODO-163); several A/C
+  switches in one layout (TODO-164).
 
 OPEN ITEMS OF STAGE 1.5 (recorded as open; nothing decided):
 1. The values for the two domains: the context facts, each foreseeable task's occurrence condition, its strengths and
    their source. Hadi states them.
+   RULED (Hadi, 3 October 2026): AM10 to AM24 (design_decisions.md, this title, CONTENT POINTS 1 AND 2; the values in
+   CONTENT POINTS 1 AND 2 below).
 2. The perception assumption: how the robot obtains a context value.
+   RULED (Hadi, 3 October 2026): AM25 to AM28 (the timeline's facts known exactly and at once, through the world state;
+   the declared knowledge from the knowledge component; a recency fact from the mind's memory of an observed
+   completion; the placement in `docs/assumptions.md`). Same places.
 3. The tests of the stage: a script that agrees with an occurrence condition, a human who acts against it, a duration
    mismatch.
+   OPEN (3 October 2026). ccode's check of the authorable waits is recorded with it (AM29, below).
 
 Also recorded: the open questions of C1, STAGE 1.5 (the T-G heading above) are answered by the rulings, except the
 liveness of a hypothesis whose condition turns false while the human executes its task, which is not answered (C1,
 STAGE 1.5, its RULED line). Hadi's earlier idea of a context fact that triggers or interrupts a task of the human is
 superseded by R1 for this stage (`docs/handoffs/T-G_forward_inputs.md`, section 5, its dated note).
 
+CONTENT POINTS 1 AND 2, RULED (Hadi, 3 October 2026; the design chat on stage 1.5's open items 1 and 2). Records only:
+nothing is built, and no layout, scenario, test or analysis is changed. The conceptual part (AM10 every fact crisp;
+AM11 the occurrence condition's three sources with "and" and "not"; AM12 context removes no hypothesis; AM14 recency
+facts per task; AM20 no action changes a context fact; AM21 a fact is a state and its change no trigger; AM22 the
+long-shift rule leaves with no replacement; AM25 to AM27 perception) is in design_decisions.md under this title,
+CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29.
+
+- AM13, the occurrence conditions (the chat's A4). "recent" is the task's own recency fact (AM14):
+  - coffee_break (kitting, dock_loading): break_time and not recent.
+  - ac_activation (kitting, dock_loading): room_warm and not ac_on.
+  - office_break (dock_loading): not recent. It has no timeline fact.
+  break_time and room_warm are timeline facts (AM11); ac_on is the A/C switch's object state (AM18).
+
+- AM14, record part (the chat's A5): coffee_break and office_break each declare a recency fact, with its own recency
+  duration. ac_activation declares none (ac_on covers it).
+
+- AM15, the glossary (the chat's A6): new entries recency fact and recency duration; occurrence condition amended (a
+  condition over context facts and object states, using "and" and "not"). The wordings are in `docs/glossary.md` §5.
+
+- AM16, the recency durations (the chat's A7). The recency duration is 3 times the task's declared wait: 3 minutes (90
+  ticks) for coffee_break, 4.5 minutes (135 ticks) for office_break. It is counted from the observed completion.
+  Reason: the motivation is the real ratio (a break of about 10 minutes; a second one within 30 minutes is rare),
+  applied at the scale the task durations already use.
+
+- AM17, the strengths (the chat's A8), the same in both domains:
+  - coffee_break: low 0.02, high 3.
+  - ac_activation: low 0.005, high 0.2.
+  - office_break: low 0.005 (recent), high 0.02 (not recent).
+  The source of each, in these words: "Modelling assumption, Hadi, 3 October 2026. A relative strength. Its order of
+  magnitude is motivated by the proposed meaning of a strength (a ratio of counted task starts), which is not
+  validated."
+  MOTIVATION ONLY, not in the declarations: the frequency readings of the design chat, for example "about 4
+  unscheduled coffees per shift".
+  Stated consequence, not a criterion: the values decide whether an assigned task is at or above the threshold before
+  any distinguishing movement. No value was chosen from the threshold or from a scenario.
+
+- AM18, the A/C switch (the chat's A9). An A/C switch is an object in the layout with a state, on or off (ac_on).
+  ac_activation sets it to on. A setup may state its initial state. The state is read by the occurrence condition, not
+  by a condition of the task.
+  V1 rule: at most one A/C switch per layout, in every domain. A layout may have none.
+  ac_activation and the context fact room_warm are in the task model and the context knowledge of both domains.
+  dock_loading's three existing rooms get no A/C switch; stage 2's layouts may have one.
+  Reason for no switch in the existing rooms: the re-measurement of stage 1's baseline then shows the effect of context
+  knowledge alone.
+  Not taken: the state of the A/C as a condition of the task (context only lowers the strength).
+
+- AM19, the layouts with more than one A/C switch (the chat's A10). They are changed to the V1 rule (AM18), in their own
+  step before the build of stage 1.5. First ccode lists every such layout and every scenario, test and analysis that
+  rests on it; Hadi decides on that list. Affected analyses and tests are deleted or regenerated. Hadi's statement: the
+  existing layouts, setups and their analyses are not an evaluation reference and need not be kept.
+  Order, for the regression check: the list, the layout change, the regeneration of the baselines that remain, then
+  the build.
+
+- AM23, the scale of the durations (the chat's A14). A simulator convention: the durations declared in the domains (the
+  waits of the foreseeable tasks, the recency durations) are at a compressed demonstration scale and are not
+  calibrated. In `docs/assumptions.md` as 6.3.
+
+- AM24, the build's acceptance (the chat's A15; Hadi's clarification): "identical except for the lines the build
+  names", with the regression audit. Reason: the rename of the run option changes the run header in every log. Also:
+  with context_knowledge on, runs with assignment_knowledge off change too.
+
+- AM28, the assumptions placed in `docs/assumptions.md` (the chat's B4): the perception entry (AM25, AM27) as 5.4; the
+  stage's assumption A1 (given the task, the movement does not depend on the context) as 6.1; its A5 (the declared and
+  the actual duration match) as 6.2, stated as a baseline whose violation is a deviation that the existing chain
+  handles. A4 (no claim that a strength measured at one real site holds at another) stays in the design record only.
+  A4 is about strength values at real sites; it does not concern the per-domain declaration.
+
+- AM29, ccode's check, 3 October 2026, recorded with open item 3 (the tests; the chat's B5). A shorter wait is
+  authorable (during wait_at, drop; 46 seconds, since 45 cannot be written at 2 seconds per tick; the entry closes as
+  abandoned). A longer wait is authorable (during wait_at, a Start of stand). Neither is authorable when the coffee
+  break is itself the task of another entry's event (the stack is one level deep, TODO-100): that case is recorded as
+  absent.
+
+NOT RULED, the chat's ideas and open items, each to its place:
+- T-K: the stream of context values, soft edges and a gradual return, "or" with "long work without a break" (THE CUT
+  AND THE QUEUE above, T-K's OPEN ITEMS, ADDED; the roadmap's T-K entry).
+- T-F: the time-scale convention for the evaluation (TODO-144, its open item of 3 October 2026).
+- Future work [FW], by Hadi's ruling: A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164).
+- Open in stage 1.5: content point 3, the tests (OPEN ITEMS, item 3). Open at the re-measurement step: whether the 22
+  potentially confounded MPB runs (the heading "T-G stage 1", SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN, its CAVEAT)
+  are rerun then or in stage 2.
+
 Next: the three open items, then stage 1.5's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the
 values for kitting and dock_loading, the perception assumption, the tests). The stage is framework-wide: it concerns
 kitting and dock_loading alike. Next: unchanged.
+SUPERSEDED (Hadi, 3 October 2026; CONTENT POINTS 1 AND 2 above): content points 1 and 2 are ruled (AM10 to AM29).
+Next: content point 3 (the tests), then ccode's list of the layouts with more than one A/C switch (AM19), then the
+build's plan (BUILD DISCIPLINE, step 1).

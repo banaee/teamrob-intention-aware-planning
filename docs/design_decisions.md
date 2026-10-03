@@ -4923,6 +4923,14 @@ Terms: `docs/glossary.md` §5 (context knowledge, context value, context fact, m
 condition, strength, prior) and §8 (T-K).
 AMENDED (Hadi, 3 October 2026, on the review of the records; AM1 to AM9, each under the ruling it amends, with its
 reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
+AMENDED (Hadi, 3 October 2026, the design chat on stage 1.5's content points 1 and 2, the values and the perception
+assumption; AM10 to AM29). The chat's labels map in order: its A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to
+AM29. They are not the assumptions A1 to A7 below. The conceptual part is in the block CONTENT POINTS 1 AND 2 below,
+after R8. In the record ("T-G stage 1.5"): the occurrence conditions of the three foreseeable tasks (AM13), the tasks
+that declare a recency fact (AM14's record part), the recency durations (AM16), the strengths (AM17), the A/C switch
+(AM18), the layouts with more than one A/C switch (AM19), the assumption on the scale of the durations (AM23), the
+build's acceptance (AM24), the placement of the assumptions in `docs/assumptions.md` (AM28) and ccode's check of the
+authorable waits (AM29). Content point 3 (the tests) is not ruled. Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -5007,6 +5015,9 @@ reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
   AMENDED (AM7, Hadi, 3 October 2026): in stage 1.5 an occurrence condition is one context fact or a conjunction of
   context facts. "Or" and "not" arrive with T-K, together with the operators of R5.
   Reason: the present condition form expresses conjunction only; stage 1.5 builds crisp facts and adds no operator.
+  SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): "not" is in stage 1.5. An occurrence condition reads context facts,
+  object states and recency facts, and uses "and" and "not". "Or" stays in T-K. The block CONTENT POINTS 1 AND 2 below,
+  AM11.
 
 - R4, division inside assigned work: equal among the live assigned tasks, for this stage.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -5028,6 +5039,8 @@ reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
   Stage 1.5 builds crisp context facts only. A crisp fact is the special case, so the later task changes nothing in R2
   to R4. (AM7, under R3: in stage 1.5 an occurrence condition is a conjunction; "or" and "not" are T-K's.) Recorded cost: with crisp facts the prior changes at one tick, where the approximation of A2 (below) has its
   largest error.
+  SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): the parenthesis on AM7. In stage 1.5 an occurrence condition uses
+  "and" and "not"; "or" stays T-K's. AM10 (below) confirms that every fact of stage 1.5 is crisp.
 
 - R6, duration and projection. A task keeps one declared duration. Context changes how strongly the robot considers a
   task; it does not change the content of a projection. The only path from context to the projection is: prior,
@@ -5061,16 +5074,84 @@ reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
   adequacy as the later test; it is not a claim that the prior is evidence. The concern that survives is R8's: a number
   must not decide between hypotheses the robot has no knowledge to tell apart.
 
+CONTENT POINTS 1 AND 2, RULED (Hadi, 3 October 2026; the design chat on stage 1.5's open items 1 and 2, the values and
+the perception assumption). Records only; not built. The conceptual part of each ruling is here, each with its reason;
+the values and the rest are in the record ("T-G stage 1.5", CONTENT POINTS 1 AND 2). Terms: `docs/glossary.md` §5
+(recency fact, recency duration, occurrence condition as amended).
+
+- AM10, every fact is crisp (under R5). Every fact in stage 1.5 is crisp: it holds or it does not hold.
+  Reason: degrees, soft edges of a window and a gradual return after a task belong together and stay in T-K.
+
+- AM11, the occurrence condition (amends AM7, under R3). An occurrence condition reads facts from three sources and
+  uses "and" and "not". "Or" stays in T-K. The three sources:
+  - a context fact authored as a window on the scenario's timeline of context facts: it holds from one authored tick
+    to another;
+  - an object state (T-G A5);
+  - a recency fact (AM14).
+  Reason: a foreseeable task just done, or made pointless by an object's state, is improbable to be done again soon.
+  Hadi's reason: it is strange in reality that a human does the coffee break or the A/C activation twice in a short
+  time.
+  Not taken: a stream of context values in place of the timeline of facts (recorded for T-K, in the record, T-K's open
+  items).
+
+- AM12, context removes no hypothesis (under R3, with AM4). Context still removes no hypothesis. With its occurrence
+  condition not satisfied, a foreseeable task has its low strength and stays live. The condition's change selects the
+  strength; the prior stays a probability distribution.
+
+- AM14, recency facts are per task (under R3). A recency fact is declared per task, with its own recency duration. A
+  recency fact is a context fact derived from the time since the robot observed completion of a named task; it holds
+  for a declared duration after that observation (the recency duration). Which tasks declare one: the record (AM14's
+  record part).
+  Reason: no one argued that one kind of break replaces the other.
+  Not taken: a shared recency fact per domain; a recency fact for coffee_break only.
+
+- AM20, no action changes a context fact (under R1). The recorded line stays: no action sets or removes a context fact.
+  After an activation of the A/C, room_warm may still hold; the task then has its low strength through the object
+  state ac_on (AM18, in the record). The scenario's author is not required to end the window at the activation.
+  Not taken: an action that sets or removes a context fact.
+
+- AM21, a clarification, no new decision (under R2). A context fact is a state. An entry of the timeline is the
+  change; the fact then holds on every tick until the next change. The change is no trigger of the meta-planner; the
+  trigger set is unchanged. It acts only through the belief.
+
+- AM22, the long-shift rule (under R2; TODO-66). The hardcoded long-shift rule (the step count since the shift's start)
+  leaves at the build (TODO-66). Nothing replaces it in stage 1.5: the robot's expectation of coffee_break does not rise
+  with the duration of work. A stated limitation until T-K.
+
+- AM25, perception of the timeline's facts (content point 2). The robot knows which timeline facts hold, exactly and
+  at once. No sensing is modelled. The justification is the site's system (clock, schedule, temperature sensor), as for
+  object states (`docs/assumptions.md` 5.3). The facts reach the robot's mind through the world state: the environment
+  applies the timeline, the world state carries the facts, the recognizer reads them there.
+  In `docs/assumptions.md` as 5.4 (AM28).
+
+- AM26, the declared context knowledge (content point 2). The declared context knowledge (the facts that exist, the
+  occurrence conditions, the strengths, the recency durations) reaches the mind directly from the knowledge component,
+  as the task model does.
+
+- AM27, the source of a recency fact (content point 2). A recency fact rests on the mind's own memory of an observed
+  completion. The world state holds no history, and the mind does not read the simulator's record of the human.
+  Completion counts, not admission. A completion the robot does not observe produces no recency fact (a limit once the
+  human can be outside the monitored areas). A task cut before its completion produces no recency fact; Hadi's reading:
+  the human may not have finished and may return to it.
+  In `docs/assumptions.md` as 5.4 (AM28).
+
 ASSUMPTIONS, recorded with the rulings (not added to `docs/assumptions.md`):
+AMENDED (AM28, Hadi, 3 October 2026): A1 and A5 are added to `docs/assumptions.md` (6.1 and 6.2), A5 stated as a
+baseline whose violation is a deviation that the existing chain handles. A4 stays here only. The marks below.
 - A1. Given the task, the human's movement does not depend on the context.
+  ADDED to `docs/assumptions.md` as 6.1 (AM28, Hadi, 3 October 2026).
 - A2. The prior uses the present facts. The exact model would use the facts at the moment the human chose the task.
   The robot does not know that moment; the approximation avoids a model of when the human chooses or switches.
 - A3. Equal division inside assigned work expresses absence of knowledge.
   CORRECTED (C3, Hadi, 3 October 2026; following AM3), the wording: "Equal division inside work as a whole expresses
   absence of knowledge."
 - A4. The strengths are declared values with a proposed empirical meaning; their stability across sites is not claimed.
+  STAYS HERE ONLY (AM28, Hadi, 3 October 2026): A4 is about strength values at real sites; it does not concern the
+  per-domain declaration.
 - A5. The robot's declared duration and the human's actual duration match (already on record: "The human's wait
   duration in the projection is the schema's, converted by the body (TODO-32, R2)", its ASSUMPTION line).
+  ADDED to `docs/assumptions.md` as 6.2 (AM28, Hadi, 3 October 2026), stated as a baseline whose violation is a
+  deviation that the existing chain handles.
 - A6. A foreseeable task competes with assigned work as a whole, independently of the number of live assigned tasks.
   AMENDED (AM3, Hadi, 3 October 2026), the wording: "A foreseeable task competes with the human's work as a whole (the
   live hypotheses of work tasks in the support), independently of the number of them that are live."
@@ -5089,4 +5170,6 @@ CORRECTED (C4, Hadi, 3 October 2026), the reason's wording: "that knowledge rest
 reads "that knowledge restricts the support and sets no weight". Under AM3 the option decides which hypotheses work as a
 whole contains, so it shapes the prior through the support.
 
-→ RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K's open items).
+→ RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K's open items). Amended 3 October 2026
+(content points 1 and 2): CONTENT POINTS 1 AND 2 (AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28, AM29;
+the ideas not ruled, each to its place); the open items' state.
