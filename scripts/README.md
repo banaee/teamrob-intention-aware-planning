@@ -51,12 +51,15 @@ python scripts/layout_tool.py edit domains/kitting/layouts/env_layout_02.json
 - **Refusal.** A drag that puts the centre outside the space is refused. The object stays at its last position inside,
   and the page says why.
 - **Add.** The page has a list, the object library. The tool builds it from every layout file in the folder of the
-  source layout: one entry per distinct (type, size). A click on an entry adds one object of that type and size. Then
-  you drag it.
-  - The new object has the fields `id`, `type`, `position`, `size`, and no other.
-  - Its id is `<type>_<N>`, N one more than the highest N of that form among the ids of the source layout and of the
-    page (0 if there is none). A deleted id is not used again, so a setup that names it does not attach to a new
-    object. Where a type has no such id yet (for example `landmark`), the first id is `landmark_0`.
+  source layout: one entry per distinct (type, size, subtype). An object without a `subtype` field forms an entry
+  without a subtype (dock_loading: a `delivery_bay` with `dry` and one with `frozen` are two entries). A click on an
+  entry adds one object of that type, size and subtype. Then you drag it.
+  - The new object has the fields `id`, `type`, `position`, `size`, and `subtype` if its entry has one. It has no
+    other field.
+  - Its id is the first of `<type>_0`, `<type>_1`, `<type>_2`, ... that equals no id of the source layout and no id
+    used on the page, an id deleted during this edit included. The tool compares whole ids for equality only. It
+    reads no meaning and no number from the text of an id. A deleted id is not used again, so a setup that names it
+    does not attach to a new object.
   - It first appears at the origin (0, 0): inside every space, on the grid. If another object's centre is there, it
     appears 50 cm further along x, then along y.
 - **Delete.** Click an object to select it, then "Delete selected" (or the Delete key). The page warns first. The
@@ -71,7 +74,7 @@ python scripts/layout_tool.py edit domains/kitting/layouts/env_layout_02.json
   - `<id>.json` or `<id>.png` exists already in the source layout's folder.
 - "Save as" writes `<id>.json` and `<id>.png` into the source layout's folder. The PNG is the one "render" writes.
   `space.name` of the new layout is its id. The server checks: ids are unique; every added object is an entry of the
-  object library; every centre is inside the space; a deleted object is absent.
+  object library, subtype included; every centre is inside the space; a deleted object is absent.
 - The program never overwrites a file and never modifies the source layout.
 - Ctrl+C in the terminal stops the program.
 
@@ -82,6 +85,7 @@ It reads the geometry as the loader does (`mesa_sim/sim_model.py`):
 - The y axis points up.
 - `position` is the object's centre.
 - `size` is the object's extent along x, then along y.
+- `subtype`, where an object has it, is shown after the id in the drawing, in "render" and in "edit".
 - `orientation_deg` is read by no code. The tool does not draw it: every rectangle is axis-aligned (TODO-166).
 
 ### Limits
@@ -90,7 +94,7 @@ It reads the geometry as the loader does (`mesa_sim/sim_model.py`):
   field for a size, it adds no new type (only types and sizes the folder already has), and it does not change the
   areas.
 - It does not draw `slots` and gives no way to edit it. An existing object keeps its `slots` field, and every other
-  field, unchanged in the saved layout.
+  field, unchanged in the saved layout. The same holds for `subtype`: the page gives no way to edit it.
 - A saved layout copies the `notes` of the objects from its source, and the other fields of `space`. Edit them by
   hand if they describe the old layout.
 - A moved or kept object keeps its id, type and size, so the setups of the source layout stay usable with the new

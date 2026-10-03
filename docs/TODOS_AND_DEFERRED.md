@@ -4701,9 +4701,13 @@ Files: docs/TODOS_AND_DEFERRED.md (lines citing run_20260904_131808, run_2026091
 analysis/kitting/t1_conflict_measurement/REPORT.md, analysis/kitting/f1_foreseeable_fixture/REPORT.md
 Reference: CLAUDE.md, Workflow rules, 7
 
-**TODO-176: layout_tool.py reads the number in existing ids to generate a new id (recorded, 3 Oct 2026)** open
+**TODO-176: layout_tool.py reads the number in existing ids to generate a new id (recorded, 3 Oct 2026)** [CLOSED, 3 Oct 2026: fixed]
 scripts/layout_tool.py generates a new id by reading the number in existing ids of the form <type>_<N>. This violates
 the rule on object ids. Fix: form candidates <type>_0, <type>_1, ... and take the first that equals no existing id, by
 whole-id equality only. The layout tool's session owns the fix.
+CLOSED (3 Oct 2026): the generator forms <type>_0, <type>_1, ... and takes the first that equals no id of the source
+layout and no id used on the page, an id deleted during the edit included; whole-id equality only. The prefix test, the
+slice and the pattern on an id are removed from the tool's page. The only string tests left in the tool are on the name
+the user types for the new layout (its file stem: a separator, a `.json` ending, a leading `.`), not on an object id.
 Files: scripts/layout_tool.py (the id of an added object), scripts/README.md
 Reference: design_decisions.md, "An object id is an opaque name"
