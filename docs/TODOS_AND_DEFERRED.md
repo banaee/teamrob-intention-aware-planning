@@ -4661,7 +4661,7 @@ the destination"; subtype adds information only with two or more bays per subtyp
 Files: domains/dock_loading/layouts/, domains/dock_loading/setups/
 Reference: design_decisions.md, "`subtype` is a stated fact of an object"
 
-**TODO-170: tdlib.py derives a fact about an object from the text of its id (recorded, 3 Oct 2026)** open
+**TODO-170: tdlib.py reads meaning from the text of an id (recorded, 3 Oct 2026)** open
 `analysis/instruments/common/tdlib.py:237` applies a pattern on kitting_table ids (`,?kitting_table=kitting_table_\d+`).
 It violates the opaque-name rule.
 Files: analysis/instruments/common/tdlib.py
@@ -4699,3 +4699,10 @@ git tracks the evidence.
 Files: docs/TODOS_AND_DEFERRED.md (lines citing run_20260904_131808, run_20260910_083630, run_20260910_144817),
 analysis/kitting/t1_conflict_measurement/REPORT.md, analysis/kitting/f1_foreseeable_fixture/REPORT.md
 Reference: CLAUDE.md, Workflow rules, 7
+
+**TODO-176: layout_tool.py reads the number in existing ids to generate a new id (recorded, 3 Oct 2026)** open
+scripts/layout_tool.py generates a new id by reading the number in existing ids of the form <type>_<N>. This violates
+the rule on object ids. Fix: form candidates <type>_0, <type>_1, ... and take the first that equals no existing id, by
+whole-id equality only. The layout tool's session owns the fix.
+Files: scripts/layout_tool.py (the id of an added object), scripts/README.md
+Reference: design_decisions.md, "An object id is an opaque name"
