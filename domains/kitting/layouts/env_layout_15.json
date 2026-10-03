@@ -4,7 +4,7 @@
     "height": 1000,
     "name": "env_layout_15",
     "units": "cm",
-    "notes": "The IRB room (design_decisions.md, \"The intention-recognition test-bed (IRB)\"). Square, 1000 x 1000 (env_layout_01's width), the proportions from Hadi's sketch (W, H the room's width and height, y from the top): kitting_table_0 at (0.50 W, 0.08 H), shelf_1 (west) and shelf_2 (east) at (0.08 W, 0.52 H) and (0.92 W, 0.52 H), symmetric about the table's x, coffee_machine_0 at (0.33 W, 0.90 H), west of centre, corner_SE 50 cm in from both walls, the one landmark; no door, no AC switch, no obstacles. Not designed to produce a recognizer result. Stated consequences: from the table the two shelves are at equal path cost (608.3 cm); the coffee machine's bearing from the table (-101.7 deg) differs from corner_SE's (-62.7 deg); no ac_activation hypothesis exists in this room."
+    "notes": "T-K part 1's basic room (Hadi's design, 3 October 2026): the tests of context knowledge on kitting, in the IRB (idle robot) and the MPB (working robot). Square, 1000 x 1000. Bearings are seen from kitting_table_0's centre (degrees, x east, y north), distances between centres. kitting_table_0 in the north-west corner at (-400, 450), against both walls; five targets fan out from it to the south and east: shelf_3 (-450, -5), -96.3 deg, 458 cm; shelf_1 (-155, -450), -74.8 deg, 933 cm; shelf_4 (150, -450), -58.6 deg, 1055 cm; coffee_machine_0 (475, -275), -39.6 deg, 1136 cm; shelf_2 (445, 150), -19.5 deg, 897 cm. corner_NE (450, 450) the one landmark, the exit walk's target; no door, no A/C switch, no obstacles. Not designed to produce a recognizer result. Stated consequences: neighbouring targets are 16.2 to 21.5 deg apart; the walks from the table are long (897 to 1136 cm) except the walk to shelf_3 (458 cm); the fixed objects' centres are at least 300 cm apart; the coffee machine's neighbours by bearing are shelf_4 (19.0 deg) and shelf_2 (20.1 deg); corner_NE's bearing (0.0 deg) is 19.5 deg from shelf_2's; no ac_activation hypothesis exists in this room, so once no delivery is live coffee_break is the one live hypothesis, whatever its strength."
   },
   "areas": [
     {
@@ -60,7 +60,7 @@
         200,
         100
       ],
-      "notes": "Top centre, (0.50 W, 0.08 H). The human starts here."
+      "notes": "The north-west corner, against both walls; the one kitting table, shared."
     },
     {
       "id": "shelf_1",
@@ -74,7 +74,7 @@
         100
       ],
       "slots": 2,
-      "notes": "The west shelf, (0.08 W, 0.52 H). Symmetric to shelf_2 about the table's x."
+      "notes": "The south wall, west of centre; -74.8 deg from the table, 933 cm."
     },
     {
       "id": "shelf_2",
@@ -88,7 +88,7 @@
         100
       ],
       "slots": 2,
-      "notes": "The east shelf, (0.92 W, 0.52 H). Symmetric to shelf_1 about the table's x."
+      "notes": "The east wall, north of centre; -19.5 deg from the table, 897 cm."
     },
     {
       "id": "coffee_machine_0",
@@ -101,7 +101,7 @@
         50,
         50
       ],
-      "notes": "Near the south wall, (0.33 W, 0.90 H), deliberately west of centre so that its bearing from the table differs from corner_SE's."
+      "notes": "The east wall, south of centre; -39.6 deg from the table, 1136 cm, between shelf_4 and shelf_2 by bearing."
     },
     {
       "id": "shelf_3",
@@ -113,7 +113,8 @@
       "size": [
         100,
         100
-      ]
+      ],
+      "notes": "The west wall, at mid-height; -96.3 deg from the table, 458 cm: the one short walk."
     },
     {
       "id": "shelf_4",
@@ -125,7 +126,21 @@
       "size": [
         100,
         100
-      ]
+      ],
+      "notes": "The south wall, east of centre; -58.6 deg from the table, 1055 cm."
+    },
+    {
+      "id": "corner_NE",
+      "type": "landmark",
+      "position": [
+        450,
+        450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): the exit walk's target; a place for the human's script only; no task binds it. 50 cm in from both walls. The north-east corner, not the south-east one: from kitting_table_0 corner_NE's bearing (0.0 deg) is 19.5 deg from shelf_2's and 39.6 deg from the coffee machine's, while (450, -450) would be 7.0 deg from the coffee machine's. From the coffee machine the walk here passes through shelf_2's footprint."
     }
   ]
 }

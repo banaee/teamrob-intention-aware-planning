@@ -4,7 +4,7 @@
     "height": 1000,
     "name": "env_layout_16",
     "units": "cm",
-    "notes": "The IRB room (design_decisions.md, \"The intention-recognition test-bed (IRB)\"). Square, 1000 x 1000 (env_layout_01's width), the proportions from Hadi's sketch (W, H the room's width and height, y from the top): kitting_table_0 at (0.50 W, 0.08 H), shelf_1 (west) and shelf_2 (east) at (0.08 W, 0.52 H) and (0.92 W, 0.52 H), symmetric about the table's x, coffee_machine_0 at (0.33 W, 0.90 H), west of centre, corner_SE 50 cm in from both walls, the one landmark; no door, no AC switch, no obstacles. Not designed to produce a recognizer result. Stated consequences: from the table the two shelves are at equal path cost (608.3 cm); the coffee machine's bearing from the table (-101.7 deg) differs from corner_SE's (-62.7 deg); no ac_activation hypothesis exists in this room."
+    "notes": "T-K part 1's dense room (Hadi's design, 3 October 2026): the tests of context knowledge on kitting, in the IRB (idle robot) and the MPB (working robot). Square, 1000 x 1000. Bearings are seen from kitting_table_0's centre (degrees, x east, y north), distances between centres. kitting_table_0 at (0, 350), centred, 100 cm from the north wall. Seven targets along the south and west walls: a cluster of five in the south-west, shelf_0 (-450, -280), -125.5 deg, 774 cm; shelf_1 (-420, -450), -117.7 deg, 904 cm; coffee_machine_0 (-300, -470), -110.1 deg, 873 cm; ac_switch_0 (-200, -485), -103.5 deg, 859 cm; shelf_2 (-95, -450), -96.8 deg, 806 cm; and two in the south-east, shelf_4 (150, -450), -79.4 deg, 814 cm; shelf_3 (350, -450), -66.4 deg, 873 cm. corner_NE (450, 450) the one landmark, the exit walk's target; one A/C switch (the V1 rule, T-K AM18); no door, no obstacles. Not designed to produce a recognizer result. Stated consequences: inside the cluster neighbours are 6.6 to 7.8 deg apart and their distances from the table lie within 130 cm of each other (774 to 904 cm); the coffee machine and the A/C switch both lie inside the cluster, the coffee machine 101 cm from the A/C switch and 122 cm from shelf_1, the A/C switch 111 cm from shelf_2 (centres); the walk from the table to the A/C switch passes 34 cm from shelf_2's footprint, the walk to shelf_1 38 cm from shelf_0's; shelf_2 to shelf_4 is 17.4 deg, shelf_4 to shelf_3 13.0 deg; corner_NE's bearing (12.5 deg) is 78.9 deg from the nearest target's (shelf_3)."
   },
   "areas": [
     {
@@ -60,7 +60,7 @@
         200,
         100
       ],
-      "notes": "Top centre, (0.50 W, 0.08 H). The human starts here."
+      "notes": "Centred, 100 cm from the north wall; the one kitting table, shared."
     },
     {
       "id": "shelf_1",
@@ -74,7 +74,7 @@
         100
       ],
       "slots": 2,
-      "notes": "The west shelf, (0.08 W, 0.52 H). Symmetric to shelf_2 about the table's x."
+      "notes": "The south wall, the cluster's south-west end; -117.7 deg from the table, 904 cm; 122 cm from the coffee machine."
     },
     {
       "id": "shelf_2",
@@ -88,7 +88,7 @@
         100
       ],
       "slots": 2,
-      "notes": "The east shelf, (0.92 W, 0.52 H). Symmetric to shelf_1 about the table's x."
+      "notes": "The south wall, the cluster's east end; -96.8 deg from the table, 806 cm; 111 cm from the A/C switch."
     },
     {
       "id": "coffee_machine_0",
@@ -101,7 +101,7 @@
         50,
         50
       ],
-      "notes": "Near the south wall, (0.33 W, 0.90 H), deliberately west of centre so that its bearing from the table differs from corner_SE's."
+      "notes": "The south wall, inside the cluster; -110.1 deg from the table, 873 cm; 101 cm from the A/C switch."
     },
     {
       "id": "shelf_3",
@@ -113,7 +113,8 @@
       "size": [
         100,
         100
-      ]
+      ],
+      "notes": "The south wall, east; -66.4 deg from the table, 873 cm."
     },
     {
       "id": "shelf_4",
@@ -125,7 +126,8 @@
       "size": [
         100,
         100
-      ]
+      ],
+      "notes": "The south wall, east of centre; -79.4 deg from the table, 814 cm."
     },
     {
       "id": "ac_switch_0",
@@ -137,7 +139,8 @@
       "size": [
         20,
         20
-      ]
+      ],
+      "notes": "The south wall, inside the cluster; -103.5 deg from the table, 859 cm; the room's one A/C switch."
     },
     {
       "id": "shelf_0",
@@ -149,7 +152,21 @@
       "size": [
         100,
         100
-      ]
+      ],
+      "notes": "The west wall, in the south-west cluster; -125.5 deg from the table, 774 cm."
+    },
+    {
+      "id": "corner_NE",
+      "type": "landmark",
+      "position": [
+        450,
+        450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): the exit walk's target; a place for the human's script only; no task binds it. 50 cm in from both walls. The north-east corner, not the south-east one: from kitting_table_0 corner_NE's bearing (12.5 deg) is 78.9 deg from the nearest target's (shelf_3), while (450, -450) would be 5.7 deg from shelf_3's, its walk passing 19 cm from shelf_3's footprint."
     }
   ]
 }
