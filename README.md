@@ -120,6 +120,24 @@ Logs are written to `logs/run_<timestamp>.log` as well as stdout.
 solara run mesa_sim/run_mesa.py
 ```
 
+### Layout drawings
+
+`scripts/layout_tool.py` draws layout files (a JSON file with `"space"`, `"areas"`, `"env_objects"`;
+`domains/README.md`, section 2). It reads only the JSON and imports nothing of the repository, so it also works on a
+layout file outside it.
+
+```bash
+# one PNG per layout, written beside it as <stem>.png; a path is a layout file or a folder of layout files
+python scripts/layout_tool.py render domains/kitting/layouts/env_layout_02.json
+python scripts/layout_tool.py render domains/kitting/layouts domains/dock_loading/layouts
+```
+
+The drawing: the space's outline with its name and units, each area's rectangle and id, each fixed object's rectangle
+and id coloured by its type, a legend of the types. It reads the geometry as the loader does: the space centred on the
+origin with y up, `position` the object's centre, `size` its extent along x and y; `orientation_deg` is not read by
+the loader and is not drawn. The PNGs are not layouts (discovery registers `*.json` only). Needs `cairosvg`
+(`requirements.txt`).
+
 ---
 
 ## Running the ROS Simulation
@@ -169,7 +187,7 @@ teamrob-intention-aware-planning/
 ├── ros_sim/                     # ROS embodiment (planned)
 ├── configs/                     # Cross-domain config (costs.yaml)
 ├── docs/                        # Design documentation
-└── scripts/                     # Utility scripts
+└── scripts/                     # Utility scripts (layout_tool.py: layout drawings)
 ```
 
 ---

@@ -16,6 +16,9 @@ reacton==1.9.1        # imported directly by mesa_sim/mesa_fork/visualization/so
 plotly==5.23.0
 matplotlib==3.9.0
 
+# Layout drawings (scripts/layout_tool.py render only; needs the system library libcairo2)
+cairosvg==2.9.1
+
 # Development (tests/)
 pytest==9.0.3
 
