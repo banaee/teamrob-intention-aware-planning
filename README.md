@@ -122,34 +122,7 @@ solara run mesa_sim/run_mesa.py
 
 ### Layout drawings
 
-`scripts/layout_tool.py` draws layout files (a JSON file with `"space"`, `"areas"`, `"env_objects"`;
-`domains/README.md`, section 2). It reads only the JSON and imports nothing of the repository, so it also works on a
-layout file outside it.
-
-```bash
-# one PNG per layout, written beside it as <stem>.png; a path is a layout file or a folder of layout files
-python scripts/layout_tool.py render domains/kitting/layouts/env_layout_02.json
-python scripts/layout_tool.py render domains/kitting/layouts domains/dock_loading/layouts
-```
-
-To derive a new layout from one, drag its fixed objects in the browser:
-
-```bash
-python scripts/layout_tool.py edit domains/kitting/layouts/env_layout_02.json   # Ctrl+C stops
-```
-
-The page shows the same drawing; dragging an object moves its centre on a 10 cm grid, and a centre outside the space is
-refused. Only positions change: no object is rotated, resized, added or removed, the areas stay, so every setup of the
-source layout fits the new one. "Save as" takes the new layout's id (the file stem, without `.json`) and writes
-`<id>.json` and `<id>.png` into the source layout's folder; it never overwrites a file and never modifies the source.
-The new file keeps the source's `space` (its `name` included) and every object's `notes` as they are: edit them by hand
-if they describe the old positions.
-
-The drawing: the space's outline with its name and units, each area's rectangle and id, each fixed object's rectangle
-and id coloured by its type, a legend of the types. It reads the geometry as the loader does: the space centred on the
-origin with y up, `position` the object's centre, `size` its extent along x and y; `orientation_deg` is not read by
-the loader and is not drawn. The PNGs are not layouts (discovery registers `*.json` only). Needs `cairosvg`
-(`requirements.txt`).
+`scripts/layout_tool.py` draws a layout as a PNG and derives a new layout by dragging its fixed objects: `scripts/README.md`.
 
 ---
 
