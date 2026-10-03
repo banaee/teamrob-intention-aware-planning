@@ -73,7 +73,7 @@ rulings". This handoff points to them and does not restate them in full.
 - dock_loading: stage 1's closing part is "go to the desk"; three rooms from the present room; two setup kinds per
   room; the truck designated as the destination of an empty pallet; a task has a method for every area the agent
   can be in (the robot: truck side and hall; the human: hall and office); office_break lasts 90 seconds.
-- Staging: stage 1, then stage 1.5 (context knowledge), stage 2, stage 3. The room with the freezer and the dry
+- Staging: stage 1, then T-K part 1 (context knowledge), stage 2, stage 3. The room with the freezer and the dry
   store moved to stage 2 with its own setup and scenarios. Stage 1 keeps full observation; the rule that monitored
   areas are fixed per layout (A8) is reopened at stage 2.
 - The walk to the standby place stays without a hypothesis for now (Q16). Two candidates are recorded on TODO-155,
@@ -124,11 +124,11 @@ that conflicts with nothing; a break walk crosses a robot route in some rooms an
 - Records: the MPB's results and classified findings; the tags of TODO-153 to TODO-156 (Hadi rules); the sweep of
   old terms ("zone" in records and comments, "body" for the simulator); the sizes of the files under docs/, since
   docs/ takes about a third of the project knowledge's capacity.
-- The handoff for stage 1.5.
+- The handoff for T-K part 1.
 
 ## 7. Inputs recorded for later stages (do not open before their stage)
 
-- Stage 1.5, context knowledge. One design question for it: what sets a hypothesis's share at the start of an
+- T-K part 1, context knowledge. One design question for it: what sets a hypothesis's share at the start of an
   episode. Four determinants, to design as one mechanism: the assignment (exists), context facts, the task that
   just ended (Hadi's transition prior), an enabling event such as the robot's own delivery. Also Hadi's ideas: a
   foreseeable task's duration is not one fixed number; temporal context as a fuzzy set. Its other questions: the

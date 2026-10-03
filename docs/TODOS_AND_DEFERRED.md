@@ -1466,15 +1466,15 @@ analysis/t5_continue/ (deleted in the analysis cleanup, September 2026; carried 
 Reference: fixture-design session, September 2026; T5 session, September 2026
 
 **TODO-44 — `assignment_prior` config key and CLI flag are misnamed**
-FLAGGED AGAIN (T-G stage 1.5, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the
-recognizer's belief", NAMES FLAGGED): with the context weight (ω_context) and the prior base, for renaming at stage
-1.5's build, not now. R3 gives the robot a prior made of declared strengths, so the switch's name now collides with a
+FLAGGED AGAIN (T-K part 1, Hadi, 2 Oct 2026; design_decisions.md, "T-K: context knowledge in the
+recognizer's belief", NAMES FLAGGED): with the context weight (ω_context) and the prior base, for renaming at T-K part
+1's build, not now. R3 gives the robot a prior made of declared strengths, so the switch's name now collides with a
 term of its own (glossary §5, **prior**).
-RULED (AM9, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", NAMES FLAGGED, AM9): the name is `assignment_knowledge`, beside the new
+RULED (AM9, Hadi, 3 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", NAMES FLAGGED, AM9): the name is `assignment_knowledge`, beside the new
 option `context_knowledge`; each is on or off and states what the robot knows. Reason: the option says only whether
 the robot is told which tasks the human was assigned, and that knowledge restricts the support and sets no prior. The
-rename (code, configuration, commands; the `[IR-prior]` tag and the `[run]` header's field with them) belongs to stage
-1.5's build, with the regression audit; older records keep the old name.
+rename (code, configuration, commands; the `[IR-prior]` tag and the `[run]` header's field with them) belongs to T-K part
+1's build, with the regression audit; older records keep the old name.
 CORRECTED (C4, Hadi, 3 Oct 2026): "restricts the support and sets no prior" reads "restricts the support and sets no
 weight". Under AM3 the option decides which hypotheses work as a whole contains, so it shapes the prior through the
 support.
@@ -2303,14 +2303,14 @@ Files: shared/recognizer.py (`_output`, `BeliefState.confidence`), shared/meta_p
 Reference: I1 audit; I5 hand-back; θ single-source session, September 2026
 
 **TODO-66 — The context / knowledge-representation pass: `_context_weight` branches on literal task names** [DEFERRED deliberately]
-RULED (T-G stage 1.5, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's
-belief"; design_records.md, "T-G stage 1.5", THE CUT): stage 1.5's build removes the domain task names and constants
+RULED (T-K part 1, Hadi, 2 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's
+belief"; design_records.md, "T-K", THE CUT): T-K part 1's build removes the domain task names and constants
 from the recognizer and closes this item; the context weight is replaced by the prior of R2 and R3. Not built.
-NOTE (T-G C1, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", C1): T-G's stage 1.5, context
+NOTE (T-G C1, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", C1): T-K part 1, context
 knowledge (framework-wide, after stage 1 and before stage 2, from its own handoff), opens the question this item defers:
 a context timeline in the scenario changing a fact at an authored point of a run, applied by the environment, and both
 domains' foreseeable tasks conditioned on such facts; the form of a context fact is its first open question. It is the
-pre-loaded context stream, moved from T-V track 2 (Phase 7). Whether stage 1.5 closes this item is for its design.
+pre-loaded context stream, moved from T-V track 2 (Phase 7). Whether T-K part 1 closes this item is for its design.
 `_context_weight` still tests `hyp.task_name == "ac_activation"` and `"coffee_break"` and carries its own
 constants (TEMPERATURE_BOOST 3.0, FATIGUE_BOOST 2.5, HIGH_TEMP_THRESHOLD 26.0, LONG_SHIFT_THRESHOLD 500) —
 the one place in shared/ that names a domain task. Applied to the output only, never fed back, so it does
@@ -2318,15 +2318,15 @@ not touch the evidence state or the accounting. Deferred because fixing it prope
 and knowledge-representation questions (what a context fact is, which schema field declares a task's
 sensitivity to it, where the constants live — a `ContextSchema`, not a branch). Not a bug in any measured
 condition (no scenario sets the temperature or a long shift).
-CORRECTED (C2, Hadi, 3 Oct 2026; measured in the review of the stage 1.5 records): "no scenario sets ... a long shift"
+CORRECTED (C2, Hadi, 3 Oct 2026; measured in the review of the T-K part 1 records): "no scenario sets ... a long shift"
 is wrong. The long-shift rule is reached by step count in any run of 500 steps or more: the shift starts at step 0
 (`ContextKnowledge.default()`) and the step count serves as the clock, so coffee_break is multiplied by 2.5 from step
 500 in every run. The runs it potentially confounds: design_records.md, "T-G stage 1", SCOPE REDUCED AND THE MPB ON
-DOCK_LOADING RUN, its CAVEAT. Stage 1.5's build still closes this item (the RULED line above).
-RULED (AM22, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief",
+DOCK_LOADING RUN, its CAVEAT. T-K part 1's build still closes this item (the RULED line above).
+RULED (AM22, Hadi, 3 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief",
 CONTENT POINTS 1 AND 2): the hardcoded long-shift rule (the step count since the shift's start) leaves at the build,
-and nothing replaces it in stage 1.5: the robot's expectation of coffee_break does not rise with the duration of work.
-A stated limitation until T-K ("or" with "long work without a break" is among T-K's open items, NOT RULED).
+and nothing replaces it in T-K part 1: the robot's expectation of coffee_break does not rise with the duration of work.
+A stated limitation until T-K part 2 ("or" with "long work without a break" is among T-K part 2's open items, NOT RULED).
 Files: shared/recognizer.py (`_context_weight`, the four constants), shared/knowledge.py (`ContextKnowledge`;
 was shared/domain_knowledge.py)
 Reference: I1 audit (architecture invariant "no domain-specific strings in shared/"); I5 hand-back
@@ -4109,9 +4109,9 @@ Reference: docs/assumptions.md 1.3; analysis/ir_testbed/run.sh; TODO-33
 1.4: the framework's experiments use the prior-on configuration; prior off is a diagnostic and ablation configuration.
 The default of `--assignment_prior` is still off (`configs/experiment.yaml`, `assignment_prior: false`; CLAUDE.md,
 "(default off)"). Not changed in Track 2.5.
-RULED (T-G stage 1.5, AM3 and AM9, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM3; design_records.md, "T-G stage 1.5"): the
+RULED (T-K part 1, AM3 and AM9, Hadi, 3 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3's AM3; design_records.md, "T-K"): the
 option is on by default, named `assignment_knowledge`, beside a new option `context_knowledge`, also on by default. The
-default change and the rename belong to stage 1.5's build, with the regression audit; this item closes there.
+default change and the rename belong to T-K part 1's build, with the regression audit; this item closes there.
 Files: configs/experiment.yaml, CLAUDE.md
 Reference: docs/assumptions.md 1.4
 
@@ -4235,7 +4235,7 @@ A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB
   action, resolved at load time against the load-time replay and exported absolute) is the candidate when the evaluation
   set is authored, so that one deviation kind lands at comparable points across instances; an authoring-method question,
   first taken up in track 3b (TODO-145), not ruled.
-- OPEN ITEM (the design chat of T-G stage 1.5, 3 Oct 2026; NOT RULED; design_records.md, "T-G stage 1.5", CONTENT
+- OPEN ITEM (the design chat of T-K part 1, 3 Oct 2026; NOT RULED; design_records.md, "T-K", CONTENT
   POINTS 1 AND 2, NOT RULED): the time-scale convention for the evaluation. Hadi's idea: a work day (8:00 to 16:00)
   scaled to a fixed number of steps, one factor used wherever a scale is needed; walking stays physical. The chat's
   finding: motion is not compressed, so every scheduled duration must stay longer than a task; 8 hours in 800 ticks
@@ -4432,8 +4432,8 @@ to 188; env_layout_03 58 to 65 and 159 to 173; env_layout_04 57 to 76 and 148 to
 where the coffee machine lies in the same direction from the standby place: env_layout_04, admitted 19 ticks after it
 enters; env_layout_02, leading 19 ticks after it enters (308) and clearing theta at 315. The last scan of each run is
 never admitted: an empty pool gives no further decision (noted, no action).
-NOTE (Hadi, 1 Oct 2026; T-G records 8; design_decisions.md, "T-G: the second domain's rulings", C1, STAGE 1.5): an
-enabling event, such as the robot's own delivery, is one of four determinants recorded for stage 1.5's design question,
+NOTE (Hadi, 1 Oct 2026; T-G records 8; design_decisions.md, "T-G: the second domain's rulings", C1, T-K PART 1): an
+enabling event, such as the robot's own delivery, is one of four determinants recorded for T-K part 1's design question,
 NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, which exists; context facts; the
 task that just ended, a transition prior between tasks; an enabling event). They are designed as one mechanism.
 BASELINE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED), a finding about the mind, NOT RULED: a short walk gives too
@@ -4441,9 +4441,9 @@ little evidence under equal shares at the start of an episode. Over the 54 runs 
 of the 147 true stretches in the support reach the threshold (38, 40, 20 of 49 by room), median 20 ticks (range 6 to
 50; one tick is 2 seconds); of the 49 that never do, all scans, 34 last 26 ticks or fewer (on env_layout_04, 16 steps
 from the standby place to the dry bay, scan 0's first walk never reaches it with three or more rivals live). It joins
-stage 1.5's question on what sets a hypothesis's share at the start of an episode as its measured baseline (the per-row
+T-K part 1's question on what sets a hypothesis's share at the start of an episode as its measured baseline (the per-row
 table: the T-G block named above).
-RULED (T-G stage 1.5, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's
+RULED (T-K part 1, Hadi, 2 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's
 belief", R2 to R4), on the four determinants: the assignment and context facts set the prior (R3); the share is
 divided equally inside assigned work (R4); the task that just ended (succession) is open for T-G stage 2 (R4); a
 preference for a task that has just become applicable, the enabling event of this item, is not taken and is not future
@@ -4503,9 +4503,9 @@ nine runs.
   the conditional candidate from the present model; M4 does not.
 NOTE (T-G records 8, not a ruling): Q16 concerns the walk to the standby place; the walk to the desk, this item's second
 walk, is not ruled by it (B13's note: the desk is a landmark in stage 1, so no hypothesis, as for kitting's exit walk).
-Related, for stage 1.5, NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, context
-facts, the task that just ended, an enabling event; one mechanism); design_decisions.md, C1, STAGE 1.5.
-NOT TAKEN FOR STAGE 1.5 (T-G stage 1.5, R3, Hadi, 2 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in
+Related, for T-K part 1, NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, context
+facts, the task that just ended, an enabling event; one mechanism); design_decisions.md, C1, T-K PART 1.
+NOT TAKEN FOR T-K PART 1 (T-K part 1, R3, Hadi, 2 Oct 2026; design_decisions.md, "T-K: context knowledge in
 the recognizer's belief"), recorded here: a share of the prior for "none of the modelled tasks". When no assigned task
 is live the prior is normalised over the live foreseeable tasks alone and is conditional on one of them. Such a share
 would reopen T-D R1 (no residual hypothesis).
@@ -4540,70 +4540,70 @@ the value stays 90 seconds for the MPB. Reason: no value is changed for a test s
 Files: domains/dock_loading/tasks.py (`office_break`)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT, the review's notes; design_decisions.md, B6
 
-**TODO-158: Duration uncertainty and a projection that depends on context (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
-A conceptual direction (T-G stage 1.5, R6). In V1 a task keeps one declared duration, and context changes how strongly
+**TODO-158: Duration uncertainty and a projection that depends on context (recorded, T-K part 1 rulings, 2 Oct 2026)** [FW]
+A conceptual direction (T-K part 1, R6). In V1 a task keeps one declared duration, and context changes how strongly
 the robot considers a task, not the content of a projection; the only path from context to the projection is prior,
 belief, gate, projection of the admitted task. An uncertain or context-dependent duration (Hadi's example: an office
 visit of 20 to 30 seconds to fetch something, or 90 to 120 seconds of office work) changes what a projection is and how
 realization reads it: planning under an uncertain projection, separate from the prior. A5 of the rulings (the robot's
 declared duration and the human's actual duration match) holds until then.
 Files: shared/projection.py, shared/meta_planner.py (realization)
-Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R6, A5; "The human's
+Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", R6, A5; "The human's
 wait duration in the projection is the schema's, converted by the body (TODO-32, R2)"
 
-**TODO-159: Unobservable states of the human as context (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
-A conceptual direction. In stage 1.5 a context fact is derived from context values, measured or scheduled quantities of
+**TODO-159: Unobservable states of the human as context (recorded, T-K part 1 rulings, 2 Oct 2026)** [FW]
+A conceptual direction. In T-K part 1 a context fact is derived from context values, measured or scheduled quantities of
 the situation (glossary §5); a state of the human the robot cannot observe (fatigue, for one; the present
 `ContextKnowledge.shift_duration` calls itself a proxy for it) is not one. Whether and how such a state enters the
 robot's knowledge is not designed in V1.
-NOTE (AM31, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief",
+NOTE (AM31, Hadi, 3 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief",
 AM14's AM31): a recency fact is a context fact derived from a value the robot measures from its own observation (the
 time since an observed completion); it is not an unobservable state of the human.
 Files: shared/knowledge.py (`ContextKnowledge`), shared/recognizer.py
-Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief"; TODO-66
+Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief"; TODO-66
 
-**TODO-160: Scopes of knowledge (general, sector, domain) and norms (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
-A conceptual direction. In stage 1.5 the context facts, occurrence conditions and strengths are declared per domain,
+**TODO-160: Scopes of knowledge (general, sector, domain) and norms (recorded, T-K part 1 rulings, 2 Oct 2026)** [FW]
+A conceptual direction. In T-K part 1 the context facts, occurrence conditions and strengths are declared per domain,
 each strength with its source. Knowledge that holds at a wider scope (general, a sector, a domain) and norms of a site
 are not designed in V1.
 Files: shared/knowledge.py, domains/
-Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3, A4
+Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3, A4
 
-**TODO-161: Validation of the strengths on site data (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW]
-A conceptual direction (T-G stage 1.5, R3, A4). A declared strength is a modelling assumption until a site measures
+**TODO-161: Validation of the strengths on site data (recorded, T-K part 1 rulings, 2 Oct 2026)** [FW]
+A conceptual direction (T-K part 1, R3, A4). A declared strength is a modelling assumption until a site measures
 it. Its proposed operational meaning, to be validated and not claimed: a ratio of counted task starts (starts of the
 foreseeable task over starts of any assigned task), counted over task starts at which both were applicable, in the
 stated situation; a ratio of counts, not a probability. Validating it, and the stability of the strengths across sites
 (A4: not claimed), needs site data.
 Files: domains/ (the declared strengths and their sources)
-Reference: design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3, A4
+Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3, A4
 
-**TODO-162: The robot without knowledge of the assignment (recorded, T-G stage 1.5 rulings, 2 Oct 2026)** [FW] ⛔ SUPERSEDED by AM3 (3 Oct 2026)
-SUPERSEDED (AM3, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM3; design_records.md, "T-G stage 1.5", R9's mark): no
+**TODO-162: The robot without knowledge of the assignment (recorded, T-K part 1 rulings, 2 Oct 2026)** [FW] ⛔ SUPERSEDED by AM3 (3 Oct 2026)
+SUPERSEDED (AM3, Hadi, 3 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3's AM3; design_records.md, "T-K", R9's mark): no
 future-work direction any more. Assignment knowledge is a run option, on by default; with it off, "work as a whole" is
 every work task of the task model, and R3's formula covers the case. The off setting is an ablation or a diagnostic.
-A conceptual direction (T-G stage 1.5, R9): the support restriction (the switch named `assignment_prior`) is on by
+A conceptual direction (T-K part 1, R9): the support restriction (the switch named `assignment_prior`) is on by
 default for every further analysis and test in V1; the robot that does not know the human's assigned tasks is future
 work. Recorded only: the run option's default is still off (TODO-139), and prior off stays a recognizer diagnostic and
 ablation configuration (`docs/assumptions.md` 1.4). R3's prior is stated for a robot that knows the assignment
 (assigned work as a whole contributes 1).
 Files: configs/experiment.yaml, shared/recognizer.py
-Reference: design_records.md, "T-G stage 1.5", R9; design_decisions.md, "T-G stage 1.5: context knowledge in the
+Reference: design_records.md, "T-K", R9; design_decisions.md, "T-K: context knowledge in the
 recognizer's belief", R3; TODO-44, TODO-139
 
-**TODO-163: A/C deactivation (recorded, T-G stage 1.5, content points 1 and 2, 3 Oct 2026)** [FW]
-A conceptual direction, by Hadi's ruling (3 Oct 2026). In stage 1.5 ac_activation sets the A/C switch's object state
+**TODO-163: A/C deactivation (recorded, T-K part 1, content points 1 and 2, 3 Oct 2026)** [FW]
+A conceptual direction, by Hadi's ruling (3 Oct 2026). In T-K part 1 ac_activation sets the A/C switch's object state
 ac_on, and its occurrence condition is room_warm and not ac_on (AM13, AM18). Notes from the design chat: a context fact
 room_cold; two tasks, not one task with two methods (that needs "or"); the state of the switch would then move into the
 tasks' conditions, and object states would leave the occurrence condition.
-Files: domains/kitting/tasks.py (ac_activation; dock_loading gains it at stage 1.5's build, AM18), the domains' context knowledge
-Reference: design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND 2, AM13, AM18, NOT RULED; design_decisions.md,
-"T-G stage 1.5: context knowledge in the recognizer's belief", AM11
+Files: domains/kitting/tasks.py (ac_activation; dock_loading gains it at T-K part 1's build, AM18), the domains' context knowledge
+Reference: design_records.md, "T-K", CONTENT POINTS 1 AND 2, AM13, AM18, NOT RULED; design_decisions.md,
+"T-K: context knowledge in the recognizer's belief", AM11
 
-**TODO-164: Several A/C switches in one layout (recorded, T-G stage 1.5, content points 1 and 2, 3 Oct 2026)** [FW]
+**TODO-164: Several A/C switches in one layout (recorded, T-K part 1, content points 1 and 2, 3 Oct 2026)** [FW]
 A conceptual direction, by Hadi's ruling (3 Oct 2026). The V1 rule is at most one A/C switch per layout, in every
 domain (AM18). Several switches need an occurrence condition that differs per hypothesis of one task, with the
 division of the strength among the task's live hypotheses (AM2) reconsidered.
 Files: the domains' layouts, the domains' context knowledge, shared/recognizer.py (the prior)
-Reference: design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND 2, AM18, AM19, NOT RULED; design_decisions.md,
-"T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM2
+Reference: design_records.md, "T-K", CONTENT POINTS 1 AND 2, AM18, AM19, NOT RULED; design_decisions.md,
+"T-K: context knowledge in the recognizer's belief", R3's AM2

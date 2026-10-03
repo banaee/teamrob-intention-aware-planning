@@ -170,7 +170,7 @@ carries the facts, the recognizer reads them there. A **recency fact** (glossary
 an observed completion: the world state holds no history, and the mind does not read the simulator's record of the
 human. A completion the robot does not observe produces no recency fact (a limit once the human can be outside the
 monitored areas, 2.3); a task cut before its completion produces none.
-Perception · Hadi, 3 Oct 2026 (T-G stage 1.5, AM25, AM27; placed here by AM28) · the robot's WorldState; the
+Perception · Hadi, 3 Oct 2026 (T-K part 1, AM25, AM27; placed here by AM28) · the robot's WorldState; the
 recognizer's prior. Ruled, not built.
 AMENDED (AM30, AM33, Hadi, 3 Oct 2026): the memory is its own component of the robot's mind, outside the recognizer,
 and records the tick of an observed completion; an observed completion is the task's terminal fact in the robot's
@@ -178,21 +178,21 @@ WorldState (for example waited(agent, machine)), not the episode boundary.
 
 ## 6. Context knowledge
 
-Ruled by Hadi, 3 October 2026 (T-G stage 1.5, AM28; design_decisions.md, "T-G stage 1.5: context knowledge in the
+Ruled by Hadi, 3 October 2026 (T-K part 1, AM28; design_decisions.md, "T-K: context knowledge in the
 recognizer's belief"). Not built.
 
 **6.1** Given the task, the human's movement does not depend on the context.
-Framework scope · T-G stage 1.5, its assumption A1 (placed here by AM28) · the recognizer's evidence, which contains no
+Framework scope · T-K part 1, its assumption A1 (placed here by AM28) · the recognizer's evidence, which contains no
 context (R2).
 
 **6.2** The robot's declared duration of a task and the human's actual duration match. This is a baseline: a violation
 is a deviation that the existing chain handles.
-Framework scope · T-G stage 1.5, its assumption A5 (placed here by AM28); "The human's wait duration in the projection
+Framework scope · T-K part 1, its assumption A5 (placed here by AM28); "The human's wait duration in the projection
 is the schema's, converted by the body (TODO-32, R2)" · the projection; the stage's tests (a duration mismatch).
 
 **6.3** The durations declared in the domains (the waits of the foreseeable tasks, the recency durations) are at a
 compressed demonstration scale and are not calibrated.
-Simulator convention · Hadi, 3 Oct 2026 (T-G stage 1.5, AM23) · the domains' task schemas and context knowledge.
+Simulator convention · Hadi, 3 Oct 2026 (T-K part 1, AM23) · the domains' task schemas and context knowledge.
 
 ## Rejected or dropped
 

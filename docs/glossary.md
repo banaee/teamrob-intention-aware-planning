@@ -361,8 +361,8 @@ applicable method`, or `... does not enter the live set: ...` on the first tick 
 is applicable again it is retired if its terminal fact holds (L4), else it re-enters at 1/|H|, logged `[IR-reentry]
 step=N <key> live again: applicable`; a retired hypothesis that becomes inapplicable stays retired. The perfect-fit score
 of an undecomposable hypothesis is removed. design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
-AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): the re-entry share (1/|H|, "the prior base") is a share of
-the evidence, not of the belief; the belief is the **prior** (below) × the evidence, normalised. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
+AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): the re-entry share (1/|H|, "the prior base") is a share of
+the evidence, not of the belief; the belief is the **prior** (below) × the evidence, normalised. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -404,9 +404,9 @@ placed at a container; `waited(agent, e)` starts holding). No microaction is rea
 terminal `place` is a boundary wherever it sits in a decomposition (a return inside `deliver_with_return`). The
 boundary tick is flagged on the belief (`BeliefState.episode_boundary`), and `recognition_changed` fires on it for any
 recorded decision (L5 B). `[IR-boundary]` names the completed action.
-AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): "every base becomes the uniform prior" describes the
+AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): "every base becomes the uniform prior" describes the
 evidence: at a boundary the evidence restarts equal over the live hypotheses, and the belief is the **prior** (below) ×
-the evidence, normalised. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
+the evidence, normalised. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
 
 **θ (theta)** — the confidence gate. It belongs to the meta-planner, not the recognizer, and is
 asked in exactly one place. The recognizer emits a belief distribution and gates nothing. The gate's outcome is
@@ -466,16 +466,16 @@ S_k: the rule is unchanged, restated. At v = 20 cm/tick and
 live target), 497 cm at α = 0.01.
 → the same entry, E4, E5.
 
-The entries below are ruled (T-G stage 1.5, Hadi, 2 October 2026; amended 3 October 2026, AM1 to AM9, and AM10 to AM29 on the values and the perception assumption) and not built. Stage 1.5 builds crisp context
-facts; the degrees (a context fact satisfied to a degree, the membership function) are T-K's (§8). Context knowledge acts
+The entries below are ruled (T-K part 1, Hadi, 2 October 2026; amended 3 October 2026, AM1 to AM9, and AM10 to AM29 on the values and the perception assumption) and not built. T-K part 1 builds crisp context
+facts; the degrees (a context fact satisfied to a degree, the membership function) are T-K part 2's (§8). Context knowledge acts
 in the robot's mind only, in the recognizer's belief: it does not drive the human, and the conditions of tasks (the
 methods' guards, **applicable**, §6) are not context knowledge (R1).
-→ `docs/design_decisions.md`, "T-G stage 1.5: context knowledge in the recognizer's belief".
+→ `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief".
 
 **context knowledge** — the umbrella: what the robot knows about the situation, before any movement, that bears on how
 strongly it considers each live hypothesis. It enters the **prior** only (R1, R2); adequacy and warrant do not read it.
 The code's `ContextKnowledge` (`shared/knowledge.py`) and the context weight are its present, domain-naming form
-(TODO-66), replaced at stage 1.5's build.
+(TODO-66), replaced at T-K part 1's build.
 AMENDED (AM26, 3 October 2026): the declared context knowledge (the facts that exist, the occurrence conditions, the
 strengths, the recency durations) reaches the mind directly from the knowledge component, as the task model does.
 
@@ -486,28 +486,28 @@ time since an observed completion. A **recency fact** (below) is then a context 
 fact**, which does not change.
 
 **context fact** — a declared fact derived from context values, satisfied to a degree in [0, 1]; a crisp fact has only
-0 and 1 (R5). In this stage no task's action sets or removes a context fact directly. Stage 1.5 builds crisp facts only,
+0 and 1 (R5). In this stage no task's action sets or removes a context fact directly. T-K part 1 builds crisp facts only,
 on a timeline in the scenario.
-AMENDED (AM10, AM14, AM20, AM21, AM25, 3 October 2026): every fact of stage 1.5 is crisp (AM10). A fact on the
+AMENDED (AM10, AM14, AM20, AM21, AM25, 3 October 2026): every fact of T-K part 1 is crisp (AM10). A fact on the
 timeline is a state: an entry of the timeline is the change, and the fact holds on every tick until the next change;
 the change is no trigger of the meta-planner (AM21). No action sets or removes a context fact (AM20). The robot knows
 which timeline facts hold exactly and at once, through the world state (AM25). A **recency fact** (below) is a context
-fact of stage 1.5 that is not on the timeline (AM14).
+fact of T-K part 1 that is not on the timeline (AM14).
 AMENDED (AM32, 3 October 2026), the wording of AM20: no action's declared effect sets or removes a context fact in the
 world. A recency fact changes through the robot's observation of a completion, in the mind.
 
 **membership function** — gives the degree to which a context fact is satisfied from a context value. Declared knowledge,
-with its source (R5). T-K's.
+with its source (R5). T-K part 2's.
 
 **occurrence condition** — the condition over context facts attached to a **foreseeable task** (§6): its high strength
 applies when it is satisfied, its low strength when it is not (R3). Over several facts: the minimum for "and", the
 maximum for "or", 1 minus the degree for "not" (R5, the selected operators). Not a method's condition: it decides no
 liveness.
-AMENDED (AM7, 3 October 2026): in stage 1.5 an occurrence condition is one context fact or a conjunction of context
-facts; "or" and "not" arrive with T-K, with R5's operators.
+AMENDED (AM7, 3 October 2026): in T-K part 1 an occurrence condition is one context fact or a conjunction of context
+facts; "or" and "not" arrive with T-K part 2, with R5's operators.
 AMENDED (AM11, AM15, 3 October 2026; supersedes AM7's line in part): a condition over context facts and object states,
 using "and" and "not". It reads three sources: a context fact on the scenario's timeline, an object state (T-G A5),
-a **recency fact**. "Or" stays in T-K. With it not satisfied, the task has its low strength and stays live (AM12).
+a **recency fact**. "Or" stays in T-K part 2. With it not satisfied, the task has its low strength and stays live (AM12).
 
 **recency fact** (AM14, AM15, 3 October 2026; not built) — a context fact derived from the time since the robot
 observed completion of a named task; it holds for a declared duration after that observation. Declared per task. It
@@ -519,7 +519,7 @@ input on each run and stores nothing across episodes (AM30). An observed complet
 robot's world state, for example waited(agent, machine), not the episode boundary (AM33).
 
 **recency duration** (AM15, AM16, 3 October 2026; not built) — the declared duration for which the recency fact holds,
-with its source. Counted from the observed completion. The values: design_records.md, "T-G stage 1.5", CONTENT POINTS
+with its source. Counted from the observed completion. The values: design_records.md, "T-K", CONTENT POINTS
 1 AND 2, AM16.
 
 **strength** — the declared relative weight of a foreseeable task against assigned work as a whole, which contributes 1
@@ -538,7 +538,7 @@ run of the recognizer from the present context facts, the strengths of the live 
 assigned work (equal among the live assigned tasks, R4). The belief is normalise(prior × evidence) over the live
 hypotheses (R2); the prior is never folded into the evidence. Not the support restriction, which the assignment still
 makes (R8).
-NAMES FLAGGED for renaming at stage 1.5's build, not renamed now: the context weight (ω_context, `_context_weight`),
+NAMES FLAGGED for renaming at T-K part 1's build, not renamed now: the context weight (ω_context, `_context_weight`),
 the prior base (the re-entry and boundary records, §5 **hypothesis**), `assignment_prior` (the switch of the support
 restriction; TODO-44).
 AMENDED (AM1, AM3, 3 October 2026): the prior multiplies the evidence, which restarts equal at a boundary and gives a
@@ -551,12 +551,12 @@ independent run options, each on or off, stating what the robot knows; both on b
 each "off" an ablation or a diagnostic. Code names: `assignment_knowledge` and `context_knowledge`.
 - `assignment_knowledge`: whether the robot is told which tasks the human was assigned; that knowledge restricts the
   support and sets no prior (AM9's reason). OLD NAME: `assignment_prior` (`--assignment_prior`, `configs/experiment.yaml`,
-  `SimModel.assignment_prior`, `[IR-prior]`), which stays in code, configuration and commands until stage 1.5's build
+  `SimModel.assignment_prior`, `[IR-prior]`), which stays in code, configuration and commands until T-K part 1's build
   renames it, and in older records ("prior on", "prior off" mean assignment knowledge on, off).
   CORRECTED (C4, Hadi, 3 October 2026): "sets no prior" reads "sets no weight". Under AM3 the option decides which
   hypotheses work as a whole contains, so it shapes the prior through the support.
 - `context_knowledge`: whether the robot holds **context knowledge** (above) for the **prior**. New at the build.
-→ design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM3, AM9; TODO-44.
+→ design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3's AM3, AM9; TODO-44.
 
 ---
 
@@ -1198,17 +1198,17 @@ enters `shared/`. Stages 1 to 3, track 4 after stage 2. design_decisions.md, "T-
 viewer for pre-loaded scripts (T-E as originally defined; demonstration only, nothing enters the mind); track 2 Phase 7
 (live events through the human executor's injection path, the export as a script, the replay rule, later the context
 stream).
-SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-G's stage 1.5 (context
+SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-K part 1 (context
 knowledge); track 2 keeps the live events. design_decisions.md, "T-G: the second domain's rulings", C1.
 → `docs/roadmap.md`, "The plan from T-A", T-V; `docs/handoffs/phase7_interactive_deviations.md`.
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
 the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.
-**T-K** — the build of degrees of context facts (T-G stage 1.5's R5: membership functions, the operators, the linear
+**T-K part 2** — the build of degrees of context facts (T-K part 1's R5: membership functions, the operators, the linear
 rule for a strength), ruled 2 October 2026; at the end of the V1 queue, after track 3b. Not started.
-AMENDED (AM11, 3 October 2026): "not" in an occurrence condition is stage 1.5's; T-K keeps "or" and the degrees.
-→ `docs/design_decisions.md`, "T-G stage 1.5: context knowledge in the recognizer's belief", R5;
-`docs/design_records.md`, "T-G stage 1.5"; `docs/roadmap.md`, "The plan from T-A", T-K.
+AMENDED (AM11, 3 October 2026): "not" in an occurrence condition is T-K part 1's; T-K part 2 keeps "or" and the degrees.
+→ `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief", R5;
+`docs/design_records.md`, "T-K"; `docs/roadmap.md`, "The plan from T-A", T-K part 2.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 **TB** — the IR test-bed track (ruled 27 September 2026), before cycle 2 of T-D: the recognizer tested in isolation,

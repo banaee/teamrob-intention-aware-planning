@@ -380,8 +380,8 @@ paragraph, not in the alphabet.
   candidates TODO-132 (a), TODO-134, TODO-142, TODO-143 and P3. The documentation pass for the paper stays before the
   paper, not before the demonstration.
 - Next: T-G's design, in a new design chat from a handoff.
-- ADDED (Hadi, 2 October 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R5;
-  design_records.md, "T-G stage 1.5"): T-K, the build of degrees of context facts (stage 1.5's R5), at the end of the V1
+- ADDED (Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R5;
+  design_records.md, "T-K"): T-K part 2, the build of degrees of context facts (T-K part 1's R5), at the end of the V1
   queue, after track 3b.
 
 V1 AND FW (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
@@ -394,7 +394,7 @@ is open: its design is ruled (30 September and 1 October 2026) and build 1 is in
 stage 1, agreed in the design chat, then stage 1's plan.
 SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (T-G Q12 to Q15; design_decisions.md, "T-G:
 the second domain's rulings", A3, B13). Next: the layout and the setup of T-G's stage 1, then stage 1's plan. T-G's
-order is stage 1, stage 1.5 (context knowledge, new), stage 2, track 4, stage 3.
+order is stage 1, T-K part 1 (context knowledge, new), stage 2, track 4, stage 3.
 SUPERSEDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): stage 1's rooms and setups are agreed. Next: stage 1's plan.
 SUPERSEDED (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED): stage 1's
 plan is approved, `docs/handoffs/plan_T-G_stage1.md`. Next: stage 1's build, step 0, then step 1 (the rename).
@@ -413,9 +413,9 @@ lasts 90 seconds (TODO-157), and the IR test-bed set on dock_loading is agreed (
 rooms). Next: the build step that sorts the earlier analyses and tests under kitting and prepares the instruments for
 dock_loading; then the authoring of the set, its expectations and its runs.
 SUPERSEDED (Hadi, 2 October 2026): the states after T-G Q16 are in the T-G entry below (stage 1's test-beds and close, the
-housekeeping step); T-G stage 1.5's design is ruled, its build not started; T-K is added at the end of the V1 queue (the
-order block above). Next: stage 1.5's three open items, then its build's plan.
-SUPERSEDED (Hadi, 3 October 2026; the T-G entry below, stage 1.5's RULED line of 3 October 2026): stage 1.5's content
+housekeeping step); T-K part 1's design is ruled, its build not started; T-K part 2 is added at the end of the V1 queue (the
+order block above). Next: T-K part 1's three open items, then its build's plan.
+SUPERSEDED (Hadi, 3 October 2026; the T-G entry below, T-K part 1's RULED line of 3 October 2026): T-K part 1's content
 points 1 and 2 are ruled (AM10 to AM29); content point 3 (the tests) is open. Next: content point 3, then ccode's list
 of the layouts with more than one A/C switch (AM19), then the build's plan.
 
@@ -714,7 +714,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     quality of the recognition. The baseline: 98 of 147 true stretches in the support reach the threshold (38, 40, 20 of
     49 by room), median 20 ticks (range 6 to 50; one tick is 2 seconds); 49 never, all scans (34 of 26 ticks or fewer, 9
     same-motion pairs, 3 second scans with no walk, 3 scans leaving the office on env_layout_02); every break reaches it.
-    Findings, none ruled: the same-motion split (C5 confirmed; TODO-97); a short walk under equal shares (stage 1.5's
+    Findings, none ruled: the same-motion split (C5 confirmed; TODO-97); a short walk under equal shares (T-K part 1's
     question, TODO-154); the standby walk read as a break or, in M4, as an assigned scan never performed (TODO-155);
     one point per container (B9's note, LIMIT-04). The IR test-bed of stage 1 is CLOSED. Next: the design of the MPB set
     with Hadi; open for it: a setup with pallets already in a bay while the robot delivers others; the robot's last task
@@ -762,7 +762,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     reports and code only; data and figures stay on Hadi's disk). Open: the rewriting of each conceptual entry into one
     current rule; the destination of two old items under docs/ (the old ROS planner reference text, the folder of old
     layout pictures), deferred until Hadi names one. The next T-G design chat reads docs/handoffs/T-G_forward_inputs.md.
-  - Stage 1.5 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
+  - T-K part 1 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
     knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
     at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
     applied by the environment; both domains' foreseeable tasks conditioned on such facts. Open questions: the form of a
@@ -774,13 +774,13 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     context facts; the task that just ended, a transition prior between tasks; an enabling event such as the robot's own
     delivery, TODO-154); and Hadi's ideas: the duration of a foreseeable task is not one fixed number; temporal context
     can be a fuzzy set with a degree of membership.
-    RULED (Hadi, 2 October 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R1 to
-    R8; design_records.md, "T-G stage 1.5", R9, the cut, the open items): context knowledge acts in the recognizer's
+    RULED (Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R1 to
+    R8; design_records.md, "T-K", R9, the cut, the open items): context knowledge acts in the recognizer's
     belief only, never on the human (R1); belief = normalise(prior × evidence), the prior computed at each run from the
     present context facts (R2); the prior normalises the strengths of what is live, assigned work as a whole
     contributing 1 and each live foreseeable task its declared low or high strength by its occurrence condition (R3);
-    equal division inside assigned work (R4); degrees (R5) built later, in T-K; one declared duration (R6); the gate
-    unchanged (R7). Stage 1.5 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
+    equal division inside assigned work (R4); degrees (R5) built later, in T-K part 2; one declared duration (R6); the gate
+    unchanged (R7). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
     the removal of the domain task names and constants from the recognizer (TODO-66). The build is not started. Open:
     the values for the two domains (Hadi states them), the perception assumption, the stage's tests. Future work:
     TODO-158 to TODO-162.
@@ -789,14 +789,13 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     the build, `assignment_knowledge` (today's `assignment_prior`) and `context_knowledge`, context knowledge off giving
     today's equal prior, "work as a whole" covering both settings of the assignment option (AM3, AM9; replaces R9;
     TODO-162 superseded); every strength > 0 (AM4); R7 "before any distinguishing movement" (AM5); the passages on
-    crossing θ on prior mass superseded in part (AM6); an occurrence condition is a conjunction in stage 1.5 (AM7); T-K
+    crossing θ on prior mass superseded in part (AM6); an occurrence condition is a conjunction in T-K part 1 (AM7); T-K part 2
     open on the representation of a context value and of a degree (AM8). The design is ruled and amended; the build is
     not started; the open items are unchanged (the values for kitting and dock_loading, the perception assumption, the
     tests). The stage is framework-wide: it concerns kitting and dock_loading alike.
-    RULED (Hadi, 3 October 2026; the same entry, CONTENT POINTS 1 AND 2, AM10 to AM29; design_records.md, "T-G stage
-    1.5", CONTENT POINTS 1 AND 2): content points 1 (the values) and 2 (the perception assumption). Every fact is crisp
+    RULED (Hadi, 3 October 2026; the same entry, CONTENT POINTS 1 AND 2, AM10 to AM29; design_records.md, "T-K", CONTENT POINTS 1 AND 2): content points 1 (the values) and 2 (the perception assumption). Every fact is crisp
     (AM10); an occurrence condition reads timeline facts, object states and recency facts, with "and" and "not", "or"
-    staying in T-K (AM11); context removes no hypothesis (AM12); the occurrence conditions, the recency durations and the
+    staying in T-K part 2 (AM11); context removes no hypothesis (AM12); the occurrence conditions, the recency durations and the
     strengths of coffee_break, ac_activation and office_break (AM13, AM14, AM16, AM17); the A/C switch with its object
     state ac_on, at most one per layout in V1, none in dock_loading's three existing rooms (AM18); the layouts with more
     than one A/C switch changed in their own step before the build (AM19); the long-shift rule leaves with no
@@ -822,19 +821,19 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     decision, hold, refusal and the script's events; demonstration only, nothing enters the mind.
   - Track 2: Phase 7 (below): live events through the human executor's injection path (`inject`, T-H2), the export
     as a script, the replay rule, later the context stream.
-    SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-G's stage 1.5; track 2
+    SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-K part 1; track 2
     keeps the live events.
     T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
     its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
     fact, if wanted, is designed here as the same entry point as the live user's click.
-- **T-K — Degrees of context facts** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-G stage 1.5: context
-  knowledge in the recognizer's belief", R5; design_records.md, "T-G stage 1.5"). The build of R5: a context fact
+- **T-K part 2 — Degrees of context facts** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-K: context
+  knowledge in the recognizer's belief", R5; design_records.md, "T-K"). The build of R5: a context fact
   satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
-  1 minus the degree), strength = low + degree × (high − low). At the end of the V1 queue, after track 3b. Stage 1.5's
+  1 minus the degree), strength = low + degree × (high − low). At the end of the V1 queue, after track 3b. T-K part 1's
   crisp facts are its special case, so nothing in R2 to R4 changes with it. Not started.
-  AMENDED (AM11, Hadi, 3 October 2026): "not" in an occurrence condition is stage 1.5's; T-K keeps "or" and the degrees.
-  ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED; design_records.md, "T-G stage 1.5",
-  T-K's OPEN ITEMS): the stream of context values as the world's evolving state at each tick, the environment updating
+  AMENDED (AM11, Hadi, 3 October 2026): "not" in an occurrence condition is T-K part 1's; T-K part 2 keeps "or" and the degrees.
+  ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED; design_records.md, "T-K",
+  T-K part 2's OPEN ITEMS): the stream of context values as the world's evolving state at each tick, the environment updating
   a value through its dynamics (the A/C lowers the temperature) and the robot deriving graded facts from the values (a
   sketch, not ruled: a crisp condition as an interval on one value); soft edges of a window and a gradual return of the
   strength after a task (a membership function over the time since the last observed completion); "or" in an
@@ -956,7 +955,7 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   injection on an empty stack is exported as a plain script entry; viewer walks go to landmarks only. The viewer's
   buttons stay here.
 - A context-knowledge stream into the world state, read by the recognizer: its own task.
-  MOVED (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream is T-G's stage 1.5 (context knowledge), above;
+  MOVED (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream is T-K part 1 (context knowledge), above;
   the live events stay with T-V track 2.
 - Communication as a robot action under a live `unknown` or block: its own task.
   SUPERSEDED IN PART (T-D R, 27 September 2026): "a live `unknown`": the `unknown` hypothesis leaves the hypothesis space (R1); X names communication on a persistent finding. design_decisions.md, "T-D R and E".

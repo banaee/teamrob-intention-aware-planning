@@ -773,18 +773,18 @@ Reference: Phase 4C meta_planner build session, September 2026
 
 **Assigned-task pool is a support restriction, not a prior**
 SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` in the admissible set, "the escape hatch for behaviour outside the model": the `unknown` hypothesis leaves the hypothesis space (R1); the support restriction stands (R6). design_decisions.md, "T-D R and E".
-SUPERSEDED IN PART (T-G stage 1.5, R8, Hadi, 2 October 2026; not built): kept, the assignment restricts the support and
+SUPERSEDED IN PART (T-K part 1, R8, Hadi, 2 October 2026; not built): kept, the assignment restricts the support and
 is not a weight. Revised, "every admissible hypothesis carries unit weight" (the sentence as TODO-40's resolution states
 this entry's outcome): declared strengths replace unit weight between assigned work and the foreseeable tasks (R3).
 The entry's surviving concern: a number must not decide between hypotheses that the robot has no knowledge to tell
-apart (R4 satisfies it among assigned tasks). design_decisions.md, "T-G stage 1.5: context knowledge in the
+apart (R4 satisfies it among assigned tasks). design_decisions.md, "T-K: context knowledge in the
 recognizer's belief", R3, R4, R8.
-SUPERSEDED IN PART (T-G stage 1.5, AM6, Hadi, 3 October 2026): the passage that gives the crossing on prior mass as the
+SUPERSEDED IN PART (T-K part 1, AM6, Hadi, 3 October 2026): the passage that gives the crossing on prior mass as the
 reason against the weight ("A soft number standing in for a hard fact, and the number, not the evidence, decided when
 θ was crossed" to "the crossing is a property of the constant"). The crossing on prior mass is accepted for an assigned
 task as a gate policy, on the commitment warrant, with adequacy as the later test; it is not a claim that the prior is
 evidence. The concern that survives is R8's: a number must not decide between hypotheses the robot has no knowledge to
-tell apart. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R7, R8, AM6.
+tell apart. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7, R8, AM6.
 What the robot knows when it knows the human's `assigned_tasks` is *"the human's task lies
 in this set"* — a restriction on the support of the belief. The first build encoded it as a
 magnitude: hypotheses in the pool weighed `ASSIGNED_TASK_PRIOR` = 10.0, all others 1.0. A
@@ -829,11 +829,11 @@ Files: shared/recognizer.py (`_build_admissible_keys`, `_pin_inadmissible`, `upd
 Reference: evidence-gated projection admission session, September 2026
 
 **θ gates projection admission as well as triggering**
-SUPERSEDED IN PART (T-G stage 1.5, AM6, Hadi, 3 October 2026): "Once the pool is a restriction, `belief.confidence`
+SUPERSEDED IN PART (T-K part 1, AM6, Hadi, 3 October 2026): "Once the pool is a restriction, `belief.confidence`
 *is* evidence confidence" (the paragraph "The gate is only meaningful because of the restriction above"). Under R2 and R3 the belief carries the prior; the crossing on prior
 mass is accepted for an assigned task as a gate policy, on the commitment warrant, with adequacy as the later test, and
 it is not a claim that the prior is evidence. The concern that survives is R8's: a number must not decide between
-hypotheses the robot has no knowledge to tell apart. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R7, R8, AM6.
+hypotheses the robot has no knowledge to tell apart. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7, R8, AM6.
 `MetaPlanner.update_human_projection()` now returns `None` without calling the projector
 when `belief.confidence < θ`. Extends DESIGN-07: θ already decided *whether* candidate
 evaluation runs (`theta_crossed`); it now also decides whether the human's most-likely
@@ -1367,10 +1367,10 @@ explicitly outside the task-hypothesis model. If it is ever wanted it needs its 
 not to be smuggled into task belief. Nobody re-adds it. Consequence recorded: the completion channel's
 events, permanent within an episode, are discarded with the rest of the base at a boundary — the I4b gate
 statement's "unresettable by construction" now reads "within an episode".
-POINTER (T-G stage 1.5, AM30, Hadi, 3 October 2026; not built): the memory of observed completions, which recency
+POINTER (T-K part 1, AM30, Hadi, 3 October 2026; not built): the memory of observed completions, which recency
 facts rest on, is cross-episode information with its own representation: a component of the robot's mind outside the
 recognizer. The recognizer reads the recency facts as an input and stores nothing across episodes. This ruling's text
-is unchanged. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", AM27, AM30.
+is unchanged. design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM27, AM30.
 
 Decision 3 — the pin and the boundary do not share a criterion, and the difference is now visible. The
 terminal pin (I3) fires on the world's completion condition whoever satisfied it: `obj_at(item_7, table)`
@@ -4060,10 +4060,10 @@ only (session L-records); built in L-build.
   Consequence D: a terminal `place` is a boundary wherever it sits in a decomposition: scenario_s09_07's return at 33
   (item_1 back on shelf_1, the first `place` of `deliver_with_return`) ends an episode inside `deliver_item(item_2)`'s
   execution. The phase evidence discarded there is accepted: the release ended what the human was doing.
-  AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): "starts the next episode at the prior" and the
+  AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): "starts the next episode at the prior" and the
   boundary's reset (`docs/recognizer_handback.md` §1.6) describe the evidence, not the belief: at a boundary the
   evidence restarts equal over the live hypotheses, and the belief is prior × evidence, normalised (R2). The content of
-  the rule does not change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
+  the rule does not change. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
 
 - L2, retraction, three parts.
   Problem. An admitted projection outlives its leader's adequacy (TODO-118): G1 is asked at admission only and D2
@@ -4144,17 +4144,17 @@ only (session L-records); built in L-build.
   question, TODO-119). Re-entering while the human is still within reach of the machine, `coffee_break` re-enters in
   its `wait_at` phase with its priced standing, a member at S = 1 for a tick or two as the human walks away, before the
   regress and the excess (G's, recorded at the L-build plan step).
-  AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): the re-entry rule above (exactly 1/|H|, the incumbents
+  AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): the re-entry rule above (exactly 1/|H|, the incumbents
   sharing the rest in proportion; "the prior base") describes the evidence, not the belief; the belief is prior ×
-  evidence, normalised (R2). The content of the rule does not change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
+  evidence, normalised (R2). The content of the rule does not change. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
 
 - L5, persistence: no change.
   The world persists, the recognizer does not: a boundary resets bases, origins, standing clocks and the completion
   events; the live set is a function of the world's terminal facts on every tick; derived phases re-derive from the
   world on the first tick of the new episode. The meta-planner needs nothing beyond D2 at a boundary.
-  POINTER (T-G stage 1.5, AM30, Hadi, 3 October 2026; not built): the memory of observed completions is a component
+  POINTER (T-K part 1, AM30, Hadi, 3 October 2026; not built): the memory of observed completions is a component
   of the robot's mind outside the recognizer; the recognizer reads the recency facts as an input on each run and
-  stores nothing across episodes. L5's text is unchanged. design_decisions.md, "T-G stage 1.5: context knowledge in
+  stores nothing across episodes. L5's text is unchanged. design_decisions.md, "T-K: context knowledge in
   the recognizer's belief", AM27, AM30.
   AMENDED (Hadi, on the L-records report, 27 Sept 2026; supersedes "The meta-planner needs nothing beyond D2 at a
   boundary"). Consequence B: a belief re-initialisation at an episode boundary fires `recognition_changed` for any
@@ -4612,7 +4612,7 @@ option it ruled. The rulings are grouped by SCOPE, and the scope binds:
 Names not yet given (the human's gate task, the robot's honk action, the fact names for the states and the
 designations) are left unnamed; the stage plans propose them.
 ADDED (T-G records 2, 1 October 2026): Q12 to Q15, ruled by Hadi on 1 October 2026, answer A3's PARKED block (the
-lifecycle of an entry of the human's list); recorded in A3 (RULED), B13, C1 (stage 1.5) and C4.
+lifecycle of an entry of the human's list); recorded in A3 (RULED), B13, C1 (T-K part 1) and C4.
 
 PART A. FRAMEWORK-WIDE RULINGS (every domain)
 
@@ -4819,9 +4819,9 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   the hypotheses whose terminal fact holds) gains this second condition.
   BUILT (T-G stage 1, step 3, 1 October 2026; bd4bddc): with `AdaptivePlanner.is_applicable` as the one definition,
   read through `decompose`; it re-enters at 1/|H| through L4's returning path. "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
-  AMENDED (T-G stage 1.5, AM1, Hadi, 3 October 2026; not built): the re-entry ("at the prior base", "at 1/|H|") is a
+  AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): the re-entry ("at the prior base", "at 1/|H|") is a
   share of the evidence, not of the belief; the belief is prior × evidence, normalised (R2). The content of the rule
-  does not change. design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R2, AM1.
+  does not change. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
 
 - A5, object states and designations (T-G Q10).
   The domain declares: the setup gives each object its initial states and its designations; the action schemas say which
@@ -4832,7 +4832,7 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
   byte-identical.
   Not taken: fields and code per domain in the simulator (today's `is_scanned`, `is_empty`, `is_open`); the robot deriving
   states from observed actions.
-  A REQUIREMENT ON ITS FORM (Hadi, 1 October 2026; T-G records 2; C1, stage 1.5): the form built for A5 admits a fact that
+  A REQUIREMENT ON ITS FORM (Hadi, 1 October 2026; T-G records 2; C1, T-K part 1): the form built for A5 admits a fact that
   no action changes and that is not the state of a movable object. Stage 1 authors no such fact.
   BUILT (T-G stage 1, step 4, 1 October 2026; b74485b, 50f2fb8): `StateDeclaration` in the registry, the setup's
   `"states"` block, the environment holding the true state facts and applying an action's declared effects and
@@ -4922,19 +4922,19 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
 
 → RECORD [T-G_stage1/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: STAGE 1 PLAN APPROVED; STAGE 1, STEPS 0 TO 5 BUILT; STAGE 1, STEPS 6 TO 8 BUILT; FINDINGS OF THE MILESTONE; NOTES FROM THE INDEPENDENT REVIEW; A STEP ADDED; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT; FINDINGS OF THE SECOND MILESTONE SCENARIO; RULED: T-G Q16 (T-G Q16's block) and the IR test-bed set; STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; RULED: THE MPB ON DOCK_LOADING (MPB-DL1 to MPB-DL6); DISPOSITIONS; THE SET; RULED ON THE SET; THE BUILD'S PLAN, CONFIRMED; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN; T-G STAGE 1 CLOSED; PROPOSALS; Reference; the Next lines.
 
-**T-G stage 1.5: context knowledge in the recognizer's belief (ruled by Hadi, 2 October 2026)**
+**T-K: context knowledge in the recognizer's belief (ruled by Hadi, 2 October 2026)**
 
 Ruled in cchat (the T-G design chat), 2 October 2026; recorded the same day, before any build. Records only: nothing in
-this entry is built. Each ruling carries its reason. The conceptual part is here; the cut (what stage 1.5 builds), the
-queue (T-K), R9 and the open items of the stage are in `docs/design_records.md`, under this title (index line below).
+this entry is built. Each ruling carries its reason. The conceptual part is here; the cut (what T-K part 1 builds), the
+queue (T-K part 2), R9 and the open items of the stage are in `docs/design_records.md`, under this title (index line below).
 Terms: `docs/glossary.md` §5 (context knowledge, context value, context fact, membership function, occurrence
-condition, strength, prior) and §8 (T-K).
+condition, strength, prior) and §8 (T-K part 2).
 AMENDED (Hadi, 3 October 2026, on the review of the records; AM1 to AM9, each under the ruling it amends, with its
-reason; AM3 replaces R9, AM8 is T-K's, both in the record). Not built.
-AMENDED (Hadi, 3 October 2026, the design chat on stage 1.5's content points 1 and 2, the values and the perception
+reason; AM3 replaces R9, AM8 is T-K part 2's, both in the record). Not built.
+AMENDED (Hadi, 3 October 2026, the design chat on T-K part 1's content points 1 and 2, the values and the perception
 assumption; AM10 to AM29). The chat's labels map in order: its A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to
 AM29. They are not the assumptions A1 to A7 below. The conceptual part is in the block CONTENT POINTS 1 AND 2 below,
-after R8. In the record ("T-G stage 1.5"): the occurrence conditions of the three foreseeable tasks (AM13), the tasks
+after R8. In the record ("T-K"): the occurrence conditions of the three foreseeable tasks (AM13), the tasks
 that declare a recency fact (AM14's record part), the recency durations (AM16), the strengths (AM17), the A/C switch
 (AM18), the layouts with more than one A/C switch (AM19), the assumption on the scale of the durations (AM23), the
 build's acceptance (AM24), the placement of the assumptions in `docs/assumptions.md` (AM28) and ccode's check of the
@@ -4942,8 +4942,8 @@ authorable waits (AM29). Content point 3 (the tests) is not ruled. Not built.
 AMENDED (Hadi, 3 October 2026, on ccode's report of the records of content points 1 and 2; AM30 to AM33, each under
 the amendment it concerns): AM30 where the memory of observed completions lives (under AM27); AM31 a context value
 measured from the robot's own observation (under AM14); AM32 the wording of "no action changes a context fact" (under
-AM20); AM33 what an observed completion is (under AM27). Notes for the build's plan: the record, OPEN ITEMS OF STAGE
-1.5. Not built.
+AM20); AM33 what an observed completion is (under AM27). Notes for the build's plan: the record, OPEN ITEMS OF T-K PART
+1. Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -5012,7 +5012,7 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   foreseeable task), so one switch must not turn both off. The default is on because the robot is assumed to hold this
   knowledge. With context knowledge off reproducing today's prior, the stage adds behaviour only where the option is
   on, and the option serves the evaluation as a condition.
-  Consequences, recorded, not acted on: in the record ("T-G stage 1.5", AM3).
+  Consequences, recorded, not acted on: in the record ("T-K", AM3).
   CORRECTED (C1, Hadi, 3 October 2026; the review's measured finding): "With context knowledge off, the prior is equal
   over the live hypotheses, which is today's behaviour" holds except where the present hardcoded context weight acts.
   Measured: the weight (`_context_weight`, TODO-66) multiplies coffee_break by 2.5 from step 500 in every run, because
@@ -5025,11 +5025,11 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   knowledge is loaded. No small constant is added by the framework.
   Reason: a strength of zero would remove a hypothesis, and context must never remove one (R1); a missing strength
   would leave the prior undefined.
-  AMENDED (AM7, Hadi, 3 October 2026): in stage 1.5 an occurrence condition is one context fact or a conjunction of
-  context facts. "Or" and "not" arrive with T-K, together with the operators of R5.
-  Reason: the present condition form expresses conjunction only; stage 1.5 builds crisp facts and adds no operator.
-  SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): "not" is in stage 1.5. An occurrence condition reads context facts,
-  object states and recency facts, and uses "and" and "not". "Or" stays in T-K. The block CONTENT POINTS 1 AND 2 below,
+  AMENDED (AM7, Hadi, 3 October 2026): in T-K part 1 an occurrence condition is one context fact or a conjunction of
+  context facts. "Or" and "not" arrive with T-K part 2, together with the operators of R5.
+  Reason: the present condition form expresses conjunction only; T-K part 1 builds crisp facts and adds no operator.
+  SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): "not" is in T-K part 1. An occurrence condition reads context facts,
+  object states and recency facts, and uses "and" and "not". "Or" stays in T-K part 2. The block CONTENT POINTS 1 AND 2 below,
   AM11.
 
 - R4, division inside assigned work: equal among the live assigned tasks, for this stage.
@@ -5042,18 +5042,18 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   Not taken, and not future work: a preference for a task that has just become applicable (no defensible meaning or
   magnitude).
 
-- R5, degrees (ruled as design; built later, in T-K).
+- R5, degrees (ruled as design; built later, in T-K part 2).
   - A context fact is satisfied to a degree in [0, 1]. A crisp fact has only 0 and 1.
   - A membership function gives the degree from a context value. It is declared knowledge with its source.
   - A condition over several facts takes the minimum for "and", the maximum for "or", and 1 minus the degree for "not".
     These are the selected operators, one choice among several in fuzzy logic. Overlapping reasons do not accumulate.
   - strength = low + degree × (high − low).
   - The linear rule and the operators are stated modelling choices, not consequences of Bayes' rule.
-  Stage 1.5 builds crisp context facts only. A crisp fact is the special case, so the later task changes nothing in R2
-  to R4. (AM7, under R3: in stage 1.5 an occurrence condition is a conjunction; "or" and "not" are T-K's.) Recorded cost: with crisp facts the prior changes at one tick, where the approximation of A2 (below) has its
+  T-K part 1 builds crisp context facts only. A crisp fact is the special case, so the later task changes nothing in R2
+  to R4. (AM7, under R3: in T-K part 1 an occurrence condition is a conjunction; "or" and "not" are T-K part 2's.) Recorded cost: with crisp facts the prior changes at one tick, where the approximation of A2 (below) has its
   largest error.
-  SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): the parenthesis on AM7. In stage 1.5 an occurrence condition uses
-  "and" and "not"; "or" stays T-K's. AM10 (below) confirms that every fact of stage 1.5 is crisp.
+  SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): the parenthesis on AM7. In T-K part 1 an occurrence condition uses
+  "and" and "not"; "or" stays T-K part 2's. AM10 (below) confirms that every fact of T-K part 1 is crisp.
 
 - R6, duration and projection. A task keeps one declared duration. Context changes how strongly the robot considers a
   task; it does not change the content of a projection. The only path from context to the projection is: prior,
@@ -5087,16 +5087,16 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   adequacy as the later test; it is not a claim that the prior is evidence. The concern that survives is R8's: a number
   must not decide between hypotheses the robot has no knowledge to tell apart.
 
-CONTENT POINTS 1 AND 2, RULED (Hadi, 3 October 2026; the design chat on stage 1.5's open items 1 and 2, the values and
+CONTENT POINTS 1 AND 2, RULED (Hadi, 3 October 2026; the design chat on T-K part 1's open items 1 and 2, the values and
 the perception assumption). Records only; not built. The conceptual part of each ruling is here, each with its reason;
-the values and the rest are in the record ("T-G stage 1.5", CONTENT POINTS 1 AND 2). Terms: `docs/glossary.md` §5
+the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms: `docs/glossary.md` §5
 (recency fact, recency duration, occurrence condition as amended).
 
-- AM10, every fact is crisp (under R5). Every fact in stage 1.5 is crisp: it holds or it does not hold.
-  Reason: degrees, soft edges of a window and a gradual return after a task belong together and stay in T-K.
+- AM10, every fact is crisp (under R5). Every fact in T-K part 1 is crisp: it holds or it does not hold.
+  Reason: degrees, soft edges of a window and a gradual return after a task belong together and stay in T-K part 2.
 
 - AM11, the occurrence condition (amends AM7, under R3). An occurrence condition reads facts from three sources and
-  uses "and" and "not". "Or" stays in T-K. The three sources:
+  uses "and" and "not". "Or" stays in T-K part 2. The three sources:
   - a context fact authored as a window on the scenario's timeline of context facts: it holds from one authored tick
     to another;
   - an object state (T-G A5);
@@ -5104,7 +5104,7 @@ the values and the rest are in the record ("T-G stage 1.5", CONTENT POINTS 1 AND
   Reason: a foreseeable task just done, or made pointless by an object's state, is improbable to be done again soon.
   Hadi's reason: it is strange in reality that a human does the coffee break or the A/C activation twice in a short
   time.
-  Not taken: a stream of context values in place of the timeline of facts (recorded for T-K, in the record, T-K's open
+  Not taken: a stream of context values in place of the timeline of facts (recorded for T-K part 2, in the record, T-K part 2's open
   items).
 
 - AM12, context removes no hypothesis (under R3, with AM4). Context still removes no hypothesis. With its occurrence
@@ -5136,8 +5136,8 @@ the values and the rest are in the record ("T-G stage 1.5", CONTENT POINTS 1 AND
   trigger set is unchanged. It acts only through the belief.
 
 - AM22, the long-shift rule (under R2; TODO-66). The hardcoded long-shift rule (the step count since the shift's start)
-  leaves at the build (TODO-66). Nothing replaces it in stage 1.5: the robot's expectation of coffee_break does not rise
-  with the duration of work. A stated limitation until T-K.
+  leaves at the build (TODO-66). Nothing replaces it in T-K part 1: the robot's expectation of coffee_break does not rise
+  with the duration of work. A stated limitation until T-K part 2.
 
 - AM25, perception of the timeline's facts (content point 2). The robot knows which timeline facts hold, exactly and
   at once. No sensing is modelled. The justification is the site's system (clock, schedule, temperature sensor), as for
@@ -5203,7 +5203,7 @@ CORRECTED (C4, Hadi, 3 October 2026), the reason's wording: "that knowledge rest
 reads "that knowledge restricts the support and sets no weight". Under AM3 the option decides which hypotheses work as a
 whole contains, so it shapes the prior through the support.
 
-→ RECORD [T-G_stage1.5/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what stage 1.5 builds; T-K; the future work); OPEN ITEMS OF STAGE 1.5; the open questions of C1, STAGE 1.5, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K's open items). Amended 3 October 2026
+→ RECORD [T-K/1] (written 2 October 2026): docs/design_records.md, under this entry's title: R9; THE CUT AND THE QUEUE (what T-K part 1 builds; T-K part 2; the future work); OPEN ITEMS OF T-K PART 1; the open questions of C1, T-K PART 1, answered. Amended 3 October 2026: R9 superseded by AM3, AM3's consequences, AM8 (T-K part 2's open items). Amended 3 October 2026
 (content points 1 and 2): CONTENT POINTS 1 AND 2 (AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28, AM29;
 the ideas not ruled, each to its place); the open items' state. Amended 3 October 2026 (AM30 to AM33): the notes
 for the build's plan, with the open items.

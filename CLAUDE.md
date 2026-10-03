@@ -46,7 +46,7 @@ Relevant (read as needed):
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - The record of planning and building (the records split, 2 October 2026): `docs/design_records.md`, one heading per
-  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-G stage 1.5). A session reads its own task's heading. In
+  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-K). A session reads its own task's heading. In
   `design_decisions.md` an index line `→ RECORD [<id>]` stands where a moved block was; `design_records.md` heads the
   block with the entry's title and the same id, so a citation by title and label resolves.
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
@@ -320,7 +320,7 @@ Decisions
   for now (the set observes the present recognizer; H1 and H2 on TODO-155, neither approved); `office_break` lasts 90
   seconds (TODO-157, the value changed in the next build step); 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to
   M4), each in all three rooms on the IR setups, expectations derived before the runs, the controlled read first; for
-  stage 1.5, the share at an episode's start (TODO-154), not ruled. Next: the build step that sorts the earlier analyses
+  T-K part 1, the share at an episode's start (TODO-154), not ruled. Next: the build step that sorts the earlier analyses
   and tests under kitting and prepares the instruments for dock_loading; then the authoring of the set, its expectations
   and its runs.
   The IR test-bed on dock_loading is BUILT, RUN AND ACCEPTED, and the IR test-bed of stage 1 is CLOSED (1 to 2 Oct 2026;
@@ -330,7 +330,7 @@ Decisions
   _16 to _19), expectations committed before the runs; 42 controlled and 12 mixed runs, zero disagreements (the
   recognizer behaves as the records specify, not a measure of recognition quality). The baseline: 98 of 147 true
   stretches reach the threshold, median 20 ticks; 49 never, all scans. Findings, none ruled: the same-motion split (T-G
-  C5 confirmed, TODO-97), a short walk under equal shares (stage 1.5, TODO-154), the standby walk (TODO-155), one point
+  C5 confirmed, TODO-97), a short walk under equal shares (T-K part 1, TODO-154), the standby walk (TODO-155), one point
   per container (B9's note). Next: the design of the MPB set with Hadi (open: pallets already in a bay while the robot
   delivers others; the robot's last task as a return; expected decisions when the human's sequence depends on the
   robot's, C6).
@@ -368,9 +368,9 @@ Decisions
   pictures), deferred until Hadi names one.
   The entry point for the next T-G design chat is `docs/handoffs/T-G_forward_inputs.md` (what is ruled, open and parked
   per stage after stage 1). Next: the stage to be named by Hadi.
-  T-G stage 1.5 (context knowledge) is RULED AND AMENDED, its build NOT STARTED (Hadi, 2 and 3 October 2026;
-  design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief", R1 to R8, A1 to A7, AM1 to AM9;
-  design_records.md, "T-G stage 1.5", the cut, the open items). The stage is framework-wide: it concerns kitting and
+  T-K part 1 (context knowledge) is RULED AND AMENDED, its build NOT STARTED (Hadi, 2 and 3 October 2026;
+  design_decisions.md, "T-K: context knowledge in the recognizer's belief", R1 to R8, A1 to A7, AM1 to AM9;
+  design_records.md, "T-K", the cut, the open items). The stage is framework-wide: it concerns kitting and
   dock_loading alike. Context knowledge acts in the recognizer's belief only, never on the human; belief =
   normalise(prior × evidence), the prior computed at each run from the present context facts as the normalisation of
   the strengths of what is live (assigned work as a whole 1, each live foreseeable task its declared low or high
@@ -379,17 +379,17 @@ Decisions
   (AM4); one declared duration; the gate unchanged; the earlier entry "Assigned-task pool is a support restriction,
   not a prior" superseded in part (R8, AM6). Two independent run options, both on by default at the build:
   `assignment_knowledge` (today's `assignment_prior`, not renamed before the build) and `context_knowledge` (new);
-  context knowledge off gives today's equal prior (AM3, AM9; replaces R9). Stage 1.5 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
+  context knowledge off gives today's equal prior (AM3, AM9; replaces R9). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
   the removal of the domain task names and constants from the recognizer (TODO-66); an occurrence condition is a
   conjunction (AM7). Open, before the build, unchanged: the values for kitting and dock_loading (Hadi states them), the
-  perception assumption, the stage's tests. T-K (the build of R5, degrees; open: the representation of a context value
+  perception assumption, the stage's tests. T-K part 2 (the build of R5, degrees; open: the representation of a context value
   and of a degree, AM8) is added at the end of the V1 queue, after track 3b. Future work: TODO-158 to TODO-161 [FW]
-  (TODO-162 superseded by AM3). Next: stage 1.5's open
+  (TODO-162 superseded by AM3). Next: T-K part 1's open
   items, then its build's plan.
-  Stage 1.5's content points 1 (the values) and 2 (the perception assumption) are RULED (Hadi, 3 October 2026;
-  design_decisions.md, the same entry, CONTENT POINTS 1 AND 2, AM10 to AM29; design_records.md, "T-G stage 1.5", CONTENT
+  T-K part 1's content points 1 (the values) and 2 (the perception assumption) are RULED (Hadi, 3 October 2026;
+  design_decisions.md, the same entry, CONTENT POINTS 1 AND 2, AM10 to AM29; design_records.md, "T-K", CONTENT
   POINTS 1 AND 2): every fact crisp (AM10); an occurrence condition reads timeline facts, object states and recency
-  facts, with "and" and "not", "or" staying in T-K (AM11, amends AM7); coffee_break: break_time and not recent;
+  facts, with "and" and "not", "or" staying in T-K part 2 (AM11, amends AM7); coffee_break: break_time and not recent;
   ac_activation: room_warm and not ac_on; office_break: not recent (AM13); a recency fact per task, 3 times the task's
   wait, from the observed completion (AM14, AM16); the strengths (AM17); the A/C switch, an object with the state ac_on,
   at most one per layout in V1, ac_activation and room_warm in both domains, none in dock_loading's existing rooms
@@ -400,7 +400,7 @@ Decisions
   with more than one A/C switch and what rests on them (AM19; Hadi decides on it; the layout change and the
   regeneration before the build), then the build's plan.
   Not to be
-  started unasked: T-F, T-V, the T-D tail, T-K and T-S, i.e. Phase 5
+  started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
@@ -686,8 +686,8 @@ across that commit without it.
   design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case; closed except its tail: track 3b,
   track 4, 4D); T-E the demonstration's viewer (superseded by T-V, track 1; T-E in older records means the viewer);
   T-F evaluation (Phase 5); T-G the second domain in Mesa (dock_loading; 4D and ROS left it on 30 Sept 2026); T-V
-  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-K degrees of context facts (T-G
-  stage 1.5's R5, after track 3b); T-S ROS/PRIEST (Phase 6). Task
+  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-K part 2 degrees of context facts (T-K
+  part 1's R5, after track 3b); T-S ROS/PRIEST (Phase 6). Task
   prompts and reports use these names; the order is the roadmap's, not the alphabet's.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.

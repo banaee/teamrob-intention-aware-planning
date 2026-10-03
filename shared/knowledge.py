@@ -56,7 +56,7 @@ class StateDeclaration:
     One state the domain declares (T-G A5): a fact named `name`, about one
     object of type `object_type` (is_empty(pallet)), or, with `object_type`
     None, a fact about no object (the form admits it for context knowledge,
-    stage 1.5). Listed in the domain registry's "states"; the setup's "states"
+    T-K part 1). Listed in the domain registry's "states"; the setup's "states"
     block states which hold at the start (one not listed does not hold); the
     environment holds the true facts and changes them when an action that
     declares one as an effect or a retraction has run. Never a physical fact

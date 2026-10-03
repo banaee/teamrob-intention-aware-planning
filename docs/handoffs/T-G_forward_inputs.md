@@ -2,8 +2,8 @@
 
 Written 2 October 2026 by the design chat that closed T-G stage 1. Place: docs/handoffs/.
 Corrected 2 October 2026 by the next design chat, after its verification against the repo's records.
-Updated 3 October 2026 at the close of the design chat of stage 1.5 (section 5 rewritten; sections 2, 7, 9 and 11 amended).
-Updated 3 October 2026 after the design chat on stage 1.5's content points 1 and 2 (section 5 brought to that state;
+Updated 3 October 2026 at the close of the design chat of T-K part 1 (section 5 rewritten; sections 2, 7, 9 and 11 amended).
+Updated 3 October 2026 after the design chat on T-K part 1's content points 1 and 2 (section 5 brought to that state;
 5.1, 5.2 and 5.5 corrected; section 2's last paragraph amended).
 Updated 3 October 2026 after Hadi's rulings on ccode's report (AM30 to AM33: section 5 in line; section 9 gains
 TODO-163 and TODO-164).
@@ -60,7 +60,7 @@ The office door separates the hall from the office.
 
 ## 2. Where T-G stands
 
-The staging, as recorded: stage 1, stage 1.5, stage 2, then "track 4", then stage 3. All are inside V1, the first
+The staging, as recorded: stage 1, T-K part 1, stage 2, then "track 4", then stage 3. All are inside V1, the first
 complete version of the framework.
 
 Stage 1 is closed (2 October 2026). What it delivered:
@@ -79,7 +79,7 @@ Scope of stage 1's tests, as Hadi set it [ruled]: they are an initial check that
 behavioural analysis belongs to stage 2. Hadi wants stage 2's questions, rulings and discussion taken in full
 depth, one at a time.
 
-Stage 1.5 was taken next. Its design is ruled and recorded (2 and 3 October 2026). Its build has not
+T-K part 1 was taken next. Its design is ruled and recorded (2 and 3 October 2026). Its build has not
 started. Section 5 holds its state. Its content points 1 (the values) and 2 (the perception assumption) are ruled
 (3 October 2026); content point 3 (the tests) is open.
 
@@ -173,21 +173,21 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 
 ---
 
-## 5. Stage 1.5: context knowledge (framework-wide: kitting and dock_loading)
+## 5. T-K part 1: context knowledge (framework-wide: kitting and dock_loading)
 
 State on 3 October 2026: the design is ruled and recorded. Nothing is built. Three content points are
 open and come before the build (5.4).
 UPDATED (3 October 2026, after the design chat on content points 1 and 2): content points 1 (the values) and 2 (the
 perception assumption) are ruled and recorded, AM10 to AM29 (the chat's A1 to A15 are AM10 to AM24, its B1 to B5 are
 AM25 to AM29). Content point 3 (the tests) is open. Nothing is built. Records: the entry below, its block CONTENT
-POINTS 1 AND 2; docs/design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND 2; docs/glossary.md §5 (recency fact,
+POINTS 1 AND 2; docs/design_records.md, "T-K", CONTENT POINTS 1 AND 2; docs/glossary.md §5 (recency fact,
 recency duration, occurrence condition as amended); docs/assumptions.md 5.4, 6.1 to 6.3; TODO-163, TODO-164 [FW].
 UPDATED (3 October 2026, Hadi's rulings on ccode's report): AM30 to AM33 (5.1 and 5.2 below) and three notes for the
 build's plan (5.2).
-Records: docs/design_decisions.md, the entry "T-G stage 1.5: context knowledge in the recognizer's
+Records: docs/design_decisions.md, the entry "T-K: context knowledge in the recognizer's
 belief" (rulings R1 to R8, assumptions A1 to A7, amendments AM1 to AM9, corrections C1, C3 and C4). Correction
 C2, the caveat on the long runs, stands in docs/design_records.md under "T-G stage 1", in TODO-66 and in the MPB
-report. docs/design_records.md, the heading "T-G stage 1.5" (the cut, T-K, the open items, the build's list).
+report. docs/design_records.md, the heading "T-K" (the cut, T-K part 2, the open items, the build's list).
 Where this section and those records disagree, the records win.
 
 ### 5.1 The design in plain words [ruled]
@@ -216,14 +216,14 @@ Where this section and those records disagree, the records win.
   strength (it is satisfied). A foreseeable task with no occurrence condition declares one strength.
   Every strength is greater than zero and carries its source. It is a modelling assumption until a site
   measures it. Proposed meaning, not claimed: a ratio of counted task starts.
-- An occurrence condition is the condition over context facts attached to a foreseeable task. In stage
-  1.5 it is one context fact or a conjunction of context facts.
+- An occurrence condition is the condition over context facts attached to a foreseeable task. In T-K part
+  1 it is one context fact or a conjunction of context facts.
   SUPERSEDED IN PART (AM11, 3 October 2026): it reads facts from three sources (a context fact authored as a window
-  on the scenario's timeline, an object state, a recency fact) and uses "and" and "not". "Or" stays in T-K. With it
+  on the scenario's timeline, an object state, a recency fact) and uses "and" and "not". "Or" stays in T-K part 2. With it
   not satisfied, the foreseeable task has its low strength and stays live (AM12).
 - A context fact is a declared fact derived from context values (the clock time, the temperature). In
-  stage 1.5 it is crisp: it holds or it does not hold.
-  ADDED (AM10, AM14, AM20, AM21, 3 October 2026): every fact of stage 1.5 is crisp (AM10). A timeline fact is a
+  T-K part 1 it is crisp: it holds or it does not hold.
+  ADDED (AM10, AM14, AM20, AM21, 3 October 2026): every fact of T-K part 1 is crisp (AM10). A timeline fact is a
   state: an entry of the timeline is the change, the fact holds until the next change, and the change is no trigger
   of the meta-planner (AM21). No action sets or removes a context fact (AM20). A recency fact is a context fact
   derived from the time since the robot observed completion of a named task; it holds for the task's recency
@@ -243,8 +243,8 @@ Where this section and those records disagree, the records win.
   A relative strength. Its order of magnitude is motivated by the proposed meaning of a strength (a ratio of counted
   task starts), which is not validated." An A/C switch is an object with the state ac_on, which ac_activation sets;
   at most one per layout in V1; none in dock_loading's three existing rooms.
-- The long-shift rule leaves at the build with no replacement in stage 1.5: the robot's expectation of coffee_break
-  does not rise with the duration of work, a stated limitation until T-K [ruled, AM22].
+- The long-shift rule leaves at the build with no replacement in T-K part 1: the robot's expectation of coffee_break
+  does not rise with the duration of work, a stated limitation until T-K part 2 [ruled, AM22].
 - Two independent run options, both on by default from the build (today assignment_prior defaults to off):
   assignment_knowledge (today's assignment_prior) and context_knowledge (new). With context_knowledge off the prior is equal over the live hypotheses. Each
   "off" is an ablation or a diagnostic.
@@ -260,7 +260,7 @@ Where this section and those records disagree, the records win.
 - Superseded for this stage by these rulings: Hadi's earlier sketch in which a context fact triggers a foreseeable task
   of the human or interrupts a task in progress.
 
-### 5.2 What the build of stage 1.5 contains [ruled]
+### 5.2 What the build of T-K part 1 contains [ruled]
 
 - The prior as in 5.1, with crisp context facts.
 - A timeline of context facts in the scenario: a fact changes at an authored tick [ruled]. How the
@@ -293,14 +293,14 @@ CORRECTED AND ADDED (3 October 2026, after the design chat on content points 1 a
   one per layout). ccode first lists every such layout and every scenario, test and analysis that rests on it; Hadi
   decides on that list. Order: the list, the layout change, the regeneration of the baselines that remain, then the
   build (AM19).
-- Notes for the build's plan [confirmed by Hadi, 3 October 2026; design_records.md, "T-G stage 1.5", NOTES FOR THE
+- Notes for the build's plan [confirmed by Hadi, 3 October 2026; design_records.md, "T-K", NOTES FOR THE
   BUILD'S PLAN]: "not" needs a condition form of its own, which ccode proposes in the plan; ac_on needs a declared
   state and a declared effect of the action, and dock_loading needs the object type and the task ac_activation; the
   recency durations are declared in physical time and converted by the body.
 
-### 5.3 What is not in stage 1.5
+### 5.3 What is not in T-K part 1
 
-- T-K, a new task at the end of the V1 queue [ruled]: degrees. A context fact satisfied to a degree
+- T-K part 2, a new task at the end of the V1 queue [ruled]: degrees. A context fact satisfied to a degree
   between 0 and 1; a membership function that gives the degree from a context value; minimum for "and",
   maximum for "or", 1 minus the degree for "not"; the strength linear in the degree between low and
   high. The design is ruled; the representation of a context value and of a degree is open.
@@ -320,23 +320,23 @@ CORRECTED AND ADDED (3 October 2026, after the design chat on content points 1 a
 Each is put to Hadi one at a time. None is decided.
 UPDATED (3 October 2026): items 1 and 2 are RULED (AM10 to AM29); item 3 stays open.
 
-1. RULED (3 October 2026; AM10 to AM24; 5.1, the values; design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND
+1. RULED (3 October 2026; AM10 to AM24; 5.1, the values; design_records.md, "T-K", CONTENT POINTS 1 AND
    2). The text below is the question as it stood.
    The values for kitting and dock_loading: which context facts exist; the occurrence condition of each
    foreseeable task; its low and high strength; the source of each value.
    Hadi's examples from the design chat [chat only, not values]:
    - Coffee break: the human takes it at the fixed break time, or after long work without a break.
      "Tired" is not a fact, because the robot cannot observe it; "long work without a break" is,
-     because it rests on values. The "or" needs T-K, or the two are authored as one fact.
+     because it rests on values. The "or" needs T-K part 2, or the two are authored as one fact.
    - Break time with soft edges: 9:15 to 9:30 partly, 9:30 to 10:00 fully, 10:00 to 10:15 partly. The
-     soft edges need T-K; in stage 1.5 the fact is crisp.
+     soft edges need T-K part 2; in T-K part 1 the fact is crisp.
    - A/C: the temperature rises near 25 degrees, the room is warmer than it should be, and turning on
      the A/C is likely. Turning on the A/C changes the temperature: in this stage an action may
      change a context value and never sets or removes a context fact directly.
    - The numbers used in the design chat's examples (coffee break 0.05 and 3, office break 0.05, A/C
      0.01 and 0.5) were illustrations only.
    SUPERSEDED (3 October 2026): the examples above are history. The ruled values are in 5.1. "Or" and "long work
-   without a break" are T-K's open items (not ruled); the soft edges are T-K's (AM10); in stage 1.5 no action sets or
+   without a break" are T-K part 2's open items (not ruled); the soft edges are T-K part 2's (AM10); in T-K part 1 no action sets or
    removes a context fact (AM20), and the A/C's activation acts through the object state ac_on (AM18).
 2. RULED (3 October 2026; AM25 to AM27; 5.2, the path of a fact; docs/assumptions.md 5.4). The text below is the
    question as it stood.
@@ -386,7 +386,7 @@ declared durations at a compressed demonstration scale, not calibrated (AM23).
 4. The build, its verification, and the review.
 5. The re-measurement of stage 1's baseline with context knowledge on (section 4's figures were measured
    with the equal prior).
-6. The close of stage 1.5, with this file updated. Then stage 2 (section 6).
+6. The close of T-K part 1, with this file updated. Then stage 2 (section 6).
 
 UPDATED (3 October 2026): steps 1 and 2 are done for content points 1 and 2. From here:
 
@@ -398,7 +398,7 @@ UPDATED (3 October 2026): steps 1 and 2 are done for content points 1 and 2. Fro
 5. The build, its verification (AM24) and the review.
 6. The re-measurement of stage 1's baseline with context knowledge on. Open at this step: whether the 22 potentially
    confounded MPB runs (section 4's caveat) are rerun then or in stage 2.
-7. The close of stage 1.5, with this file updated. Then stage 2 (section 6).
+7. The close of T-K part 1, with this file updated. Then stage 2 (section 6).
 
 ### 5.7 Background from the design chat [chat only]
 
@@ -528,14 +528,14 @@ mechanism; an action of unknown length inside a plan; a rule that keeps the robo
   location during the run; the robot informing a third party.
 - Duration uncertainty and a projection that depends on context; unobservable states of the human as context; scopes of
   knowledge and norms; validation of the strengths on site data.
-- A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164). Added 3 October 2026 (stage 1.5's
+- A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164). Added 3 October 2026 (T-K part 1's
   content points 1 and 2).
 
 Not future work [ruled]: a type-to-destination rule in place of explicit designations is recorded as not taken.
 By the rule on V1 and future work, an alternative not taken in a design question is never a future-work item.
 
 Also planned inside V1, after T-G: the evaluation; the viewer; an interactive simulator in which deviations are
-injected at run time; one further test track on adaptation under conflict. T-K, the degrees of context facts (section
+injected at run time; one further test track on adaptation under conflict. T-K part 2, the degrees of context facts (section
 5.3), at the end of the V1 queue.
 
 ---
