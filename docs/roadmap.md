@@ -415,6 +415,9 @@ dock_loading; then the authoring of the set, its expectations and its runs.
 SUPERSEDED (Hadi, 2 October 2026): the states after T-G Q16 are in the T-G entry below (stage 1's test-beds and close, the
 housekeeping step); T-G stage 1.5's design is ruled, its build not started; T-K is added at the end of the V1 queue (the
 order block above). Next: stage 1.5's three open items, then its build's plan.
+SUPERSEDED (Hadi, 3 October 2026; the T-G entry below, stage 1.5's RULED line of 3 October 2026): stage 1.5's content
+points 1 and 2 are ruled (AM10 to AM29); content point 3 (the tests) is open. Next: content point 3, then ccode's list
+of the layouts with more than one A/C switch (AM19), then the build's plan.
 
 - **T-A — Records.** T-A1: this revision (the decisions below; `min_separation` supplied by the body in
   physical units, the only code change, byte-identical). Then the handoff to the next design chat.
@@ -790,6 +793,18 @@ order block above). Next: stage 1.5's three open items, then its build's plan.
     open on the representation of a context value and of a degree (AM8). The design is ruled and amended; the build is
     not started; the open items are unchanged (the values for kitting and dock_loading, the perception assumption, the
     tests). The stage is framework-wide: it concerns kitting and dock_loading alike.
+    RULED (Hadi, 3 October 2026; the same entry, CONTENT POINTS 1 AND 2, AM10 to AM29; design_records.md, "T-G stage
+    1.5", CONTENT POINTS 1 AND 2): content points 1 (the values) and 2 (the perception assumption). Every fact is crisp
+    (AM10); an occurrence condition reads timeline facts, object states and recency facts, with "and" and "not", "or"
+    staying in T-K (AM11); context removes no hypothesis (AM12); the occurrence conditions, the recency durations and the
+    strengths of coffee_break, ac_activation and office_break (AM13, AM14, AM16, AM17); the A/C switch with its object
+    state ac_on, at most one per layout in V1, none in dock_loading's three existing rooms (AM18); the layouts with more
+    than one A/C switch changed in their own step before the build (AM19); the long-shift rule leaves with no
+    replacement (AM22); the build's acceptance (AM24); the timeline's facts known exactly and at once through the world
+    state, the declared knowledge from the knowledge component, a recency fact from the mind's memory of an observed
+    completion (AM25 to AM27). Future work: TODO-163, TODO-164 [FW]. Content point 3 (the tests) is open. The build is
+    not started. Next: content point 3, then ccode's list of the layouts with more than one A/C switch (AM19), then the
+    build's plan.
   - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
     run, TODO-16 with the stepwise delivery (A7).
     ADDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): B10's room (the stores), with its own layout, setup and scenarios; A8's rule on
@@ -817,6 +832,14 @@ order block above). Next: stage 1.5's three open items, then its build's plan.
   satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
   1 minus the degree), strength = low + degree × (high − low). At the end of the V1 queue, after track 3b. Stage 1.5's
   crisp facts are its special case, so nothing in R2 to R4 changes with it. Not started.
+  AMENDED (AM11, Hadi, 3 October 2026): "not" in an occurrence condition is stage 1.5's; T-K keeps "or" and the degrees.
+  ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED; design_records.md, "T-G stage 1.5",
+  T-K's OPEN ITEMS): the stream of context values as the world's evolving state at each tick, the environment updating
+  a value through its dynamics (the A/C lowers the temperature) and the robot deriving graded facts from the values (a
+  sketch, not ruled: a crisp condition as an interval on one value); soft edges of a window and a gradual return of the
+  strength after a task (a membership function over the time since the last observed completion); "or" in an
+  occurrence condition, with "long work without a break" (open with it: what counts as a break, when the count starts,
+  its limit and source, the unobserved human).
 - **T-S — ROS/PRIEST** (ruled by Hadi, 30 September 2026; future work, removed from T-G, at the end of the queue).
   FW (T-G A1, 1 October 2026): not designed, ruled or built within V1.
   - TODO-75: the ROS guide and `env_layout99`.

@@ -2323,6 +2323,10 @@ is wrong. The long-shift rule is reached by step count in any run of 500 steps o
 (`ContextKnowledge.default()`) and the step count serves as the clock, so coffee_break is multiplied by 2.5 from step
 500 in every run. The runs it potentially confounds: design_records.md, "T-G stage 1", SCOPE REDUCED AND THE MPB ON
 DOCK_LOADING RUN, its CAVEAT. Stage 1.5's build still closes this item (the RULED line above).
+RULED (AM22, Hadi, 3 Oct 2026; design_decisions.md, "T-G stage 1.5: context knowledge in the recognizer's belief",
+CONTENT POINTS 1 AND 2): the hardcoded long-shift rule (the step count since the shift's start) leaves at the build,
+and nothing replaces it in stage 1.5: the robot's expectation of coffee_break does not rise with the duration of work.
+A stated limitation until T-K ("or" with "long work without a break" is among T-K's open items, NOT RULED).
 Files: shared/recognizer.py (`_context_weight`, the four constants), shared/knowledge.py (`ContextKnowledge`;
 was shared/domain_knowledge.py)
 Reference: I1 audit (architecture invariant "no domain-specific strings in shared/"); I5 hand-back
@@ -4231,6 +4235,12 @@ A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB
   action, resolved at load time against the load-time replay and exported absolute) is the candidate when the evaluation
   set is authored, so that one deviation kind lands at comparable points across instances; an authoring-method question,
   first taken up in track 3b (TODO-145), not ruled.
+- OPEN ITEM (the design chat of T-G stage 1.5, 3 Oct 2026; NOT RULED; design_records.md, "T-G stage 1.5", CONTENT
+  POINTS 1 AND 2, NOT RULED): the time-scale convention for the evaluation. Hadi's idea: a work day (8:00 to 16:00)
+  scaled to a fixed number of steps, one factor used wherever a scale is needed; walking stays physical. The chat's
+  finding: motion is not compressed, so every scheduled duration must stay longer than a task; 8 hours in 800 ticks
+  does not satisfy this. Two clocks: the motion clock (2 seconds per tick) and a compressed schedule clock. Not
+  decided. Related: `docs/assumptions.md` 6.3 (the declared durations are at a compressed demonstration scale).
 - Before the evaluation: track 3b (TODO-145), consequential activation under conflict.
 Files: analysis/ (the evaluation), domains/kitting/ (the evaluation set), mesa_sim/run_mesa.py (TODO-137's option)
 Reference: docs/assumptions.md 1.4, 4.6; design_decisions.md, "The meta-planner test-bed (MPB)", F1; TODO-47,
@@ -4577,3 +4587,20 @@ ablation configuration (`docs/assumptions.md` 1.4). R3's prior is stated for a r
 Files: configs/experiment.yaml, shared/recognizer.py
 Reference: design_records.md, "T-G stage 1.5", R9; design_decisions.md, "T-G stage 1.5: context knowledge in the
 recognizer's belief", R3; TODO-44, TODO-139
+
+**TODO-163: A/C deactivation (recorded, T-G stage 1.5, content points 1 and 2, 3 Oct 2026)** [FW]
+A conceptual direction, by Hadi's ruling (3 Oct 2026). In stage 1.5 ac_activation sets the A/C switch's object state
+ac_on, and its occurrence condition is room_warm and not ac_on (AM13, AM18). Notes from the design chat: a context fact
+room_cold; two tasks, not one task with two methods (that needs "or"); the state of the switch would then move into the
+tasks' conditions, and object states would leave the occurrence condition.
+Files: domains/kitting/tasks.py (ac_activation; dock_loading gains it at stage 1.5's build, AM18), the domains' context knowledge
+Reference: design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND 2, AM13, AM18, NOT RULED; design_decisions.md,
+"T-G stage 1.5: context knowledge in the recognizer's belief", AM11
+
+**TODO-164: Several A/C switches in one layout (recorded, T-G stage 1.5, content points 1 and 2, 3 Oct 2026)** [FW]
+A conceptual direction, by Hadi's ruling (3 Oct 2026). The V1 rule is at most one A/C switch per layout, in every
+domain (AM18). Several switches need an occurrence condition that differs per hypothesis of one task, with the
+division of the strength among the task's live hypotheses (AM2) reconsidered.
+Files: the domains' layouts, the domains' context knowledge, shared/recognizer.py (the prior)
+Reference: design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND 2, AM18, AM19, NOT RULED; design_decisions.md,
+"T-G stage 1.5: context knowledge in the recognizer's belief", R3's AM2

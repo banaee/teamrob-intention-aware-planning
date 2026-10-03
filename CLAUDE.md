@@ -386,6 +386,19 @@ Decisions
   and of a degree, AM8) is added at the end of the V1 queue, after track 3b. Future work: TODO-158 to TODO-161 [FW]
   (TODO-162 superseded by AM3). Next: stage 1.5's open
   items, then its build's plan.
+  Stage 1.5's content points 1 (the values) and 2 (the perception assumption) are RULED (Hadi, 3 October 2026;
+  design_decisions.md, the same entry, CONTENT POINTS 1 AND 2, AM10 to AM29; design_records.md, "T-G stage 1.5", CONTENT
+  POINTS 1 AND 2): every fact crisp (AM10); an occurrence condition reads timeline facts, object states and recency
+  facts, with "and" and "not", "or" staying in T-K (AM11, amends AM7); coffee_break: break_time and not recent;
+  ac_activation: room_warm and not ac_on; office_break: not recent (AM13); a recency fact per task, 3 times the task's
+  wait, from the observed completion (AM14, AM16); the strengths (AM17); the A/C switch, an object with the state ac_on,
+  at most one per layout in V1, ac_activation and room_warm in both domains, none in dock_loading's existing rooms
+  (AM18); the long-shift rule leaves with no replacement (AM22); acceptance "identical except for the lines the build
+  names" (AM24); the timeline's facts known exactly and at once through the world state, a recency fact from the mind's
+  memory of an observed completion (AM25 to AM27; `docs/assumptions.md` 5.4, 6.1 to 6.3). Content point 3 (the tests)
+  is open. Future work: TODO-163, TODO-164 [FW]. Nothing built. Next: content point 3, then ccode's list of the layouts
+  with more than one A/C switch and what rests on them (AM19; Hadi decides on it; the layout change and the
+  regeneration before the build), then the build's plan.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
