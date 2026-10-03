@@ -5,6 +5,8 @@ Corrected 2 October 2026 by the next design chat, after its verification against
 Updated 3 October 2026 at the close of the design chat of stage 1.5 (section 5 rewritten; sections 2, 7, 9 and 11 amended).
 Updated 3 October 2026 after the design chat on stage 1.5's content points 1 and 2 (section 5 brought to that state;
 5.1, 5.2 and 5.5 corrected; section 2's last paragraph amended).
+Updated 3 October 2026 after Hadi's rulings on ccode's report (AM30 to AM33: section 5 in line; section 9 gains
+TODO-163 and TODO-164).
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G. It collects, per
 stage, what is already ruled, what is open, what is parked, and the ideas Hadi stated. It replaces the reading of
@@ -180,6 +182,8 @@ perception assumption) are ruled and recorded, AM10 to AM29 (the chat's A1 to A1
 AM25 to AM29). Content point 3 (the tests) is open. Nothing is built. Records: the entry below, its block CONTENT
 POINTS 1 AND 2; docs/design_records.md, "T-G stage 1.5", CONTENT POINTS 1 AND 2; docs/glossary.md §5 (recency fact,
 recency duration, occurrence condition as amended); docs/assumptions.md 5.4, 6.1 to 6.3; TODO-163, TODO-164 [FW].
+UPDATED (3 October 2026, Hadi's rulings on ccode's report): AM30 to AM33 (5.1 and 5.2 below) and three notes for the
+build's plan (5.2).
 Records: docs/design_decisions.md, the entry "T-G stage 1.5: context knowledge in the recognizer's
 belief" (rulings R1 to R8, assumptions A1 to A7, amendments AM1 to AM9, corrections C1, C3 and C4). Correction
 C2, the caveat on the long runs, stands in docs/design_records.md under "T-G stage 1", in TODO-66 and in the MPB
@@ -224,6 +228,14 @@ Where this section and those records disagree, the records win.
   of the meta-planner (AM21). No action sets or removes a context fact (AM20). A recency fact is a context fact
   derived from the time since the robot observed completion of a named task; it holds for the task's recency
   duration after that observation; it is declared per task (AM14).
+  AMENDED (AM30 to AM33, 3 October 2026): the robot may measure a context value from its own observation, for example
+  the time since an observed completion, so a recency fact is a context fact by the existing definition (AM31). The
+  rule on actions reads: no action's declared effect sets or removes a context fact in the world; a recency fact
+  changes through the robot's observation of a completion, in the mind (AM32). An observed completion is the task's
+  terminal fact in the robot's world state, for example waited(agent, machine), not the episode boundary (AM33). The
+  memory of observed completions is its own component of the robot's mind, outside the recognizer; it records the
+  tick of an observed completion; the recognizer reads the recency facts as an input on each run and stores nothing
+  across episodes (AM30).
 - The values [ruled, 3 October 2026; AM13 to AM18]: coffee_break (both domains): break_time and not recent, strengths
   low 0.02, high 3, recency duration 3 minutes (90 ticks). ac_activation (both domains): room_warm and not ac_on,
   strengths low 0.005, high 0.2, no recency fact. office_break (dock_loading): not recent, strengths low 0.005, high
@@ -272,12 +284,19 @@ CORRECTED AND ADDED (3 October 2026, after the design chat on content points 1 a
 - "Not" in an occurrence condition and its three sources: timeline facts, object states, recency facts (AM11).
 - The recency facts: per task, each from the mind's own memory of an observed completion; completion counts, not
   admission; a completion the robot does not observe, or a task cut before its completion, produces none (AM14, AM27).
+  AMENDED (AM30, AM33, 3 October 2026): the memory is its own component of the robot's mind, outside the recognizer,
+  recording the tick of an observed completion; an observed completion is the task's terminal fact in the robot's
+  world state.
 - The A/C switch's object state ac_on, set by ac_activation; ac_activation and room_warm in the task model and the
   context knowledge of both domains (AM18).
 - Before the build, in its own step: the layouts with more than one A/C switch are changed to the V1 rule (at most
   one per layout). ccode first lists every such layout and every scenario, test and analysis that rests on it; Hadi
   decides on that list. Order: the list, the layout change, the regeneration of the baselines that remain, then the
   build (AM19).
+- Notes for the build's plan [confirmed by Hadi, 3 October 2026; design_records.md, "T-G stage 1.5", NOTES FOR THE
+  BUILD'S PLAN]: "not" needs a condition form of its own, which ccode proposes in the plan; ac_on needs a declared
+  state and a declared effect of the action, and dock_loading needs the object type and the task ac_activation; the
+  recency durations are declared in physical time and converted by the body.
 
 ### 5.3 What is not in stage 1.5
 
@@ -509,6 +528,8 @@ mechanism; an action of unknown length inside a plan; a rule that keeps the robo
   location during the run; the robot informing a third party.
 - Duration uncertainty and a projection that depends on context; unobservable states of the human as context; scopes of
   knowledge and norms; validation of the strengths on site data.
+- A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164). Added 3 October 2026 (stage 1.5's
+  content points 1 and 2).
 
 Not future work [ruled]: a type-to-destination rule in place of explicit designations is recorded as not taken.
 By the rule on V1 and future work, an alternative not taken in a design question is never a future-work item.
