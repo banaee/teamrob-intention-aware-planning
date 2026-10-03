@@ -4651,3 +4651,26 @@ changed.
 Files: domains/kitting/env_layout6.json, domains/kitting/env_layout99.json, domains/dock_loading/env_layout1_original.svg,
 env_layout1_present_original.png, env_layout1_present_original.svg, env_layout_original.jpg
 Reference: CLAUDE.md, "Where to look, and what to skip"; domains/discovery.py (`discover_files`)
+
+**TODO-169: Deviation in dock_loading: a pallet delivered to a bay of the wrong subtype (recorded, 3 Oct 2026)** open
+The human delivers a pallet to a delivery bay of the wrong subtype, and the robot recognises it. The subtype of pallets
+and bays can feed this. Not designed yet. With one bay per subtype the deviation equals "placed in a bay that is not
+the destination"; subtype adds information only with two or more bays per subtype.
+Files: domains/dock_loading/layouts/, domains/dock_loading/setups/
+Reference: design_decisions.md, "`subtype` is a stated fact of an object"
+
+**TODO-170: tdlib.py reads meaning from the text of an id (recorded, 3 Oct 2026)** open
+`analysis/instruments/common/tdlib.py:237` applies a pattern on kitting_table ids (`,?kitting_table=kitting_table_\d+`).
+It violates the opaque-name rule.
+Files: analysis/instruments/common/tdlib.py
+Reference: design_decisions.md, "An object id is an opaque name"
+
+**TODO-171: space_drawer OBJ_COLORS keys do not match dock_loading's types (recorded, 3 Oct 2026)** open
+`mesa_sim/viz/space_drawer.py` `OBJ_COLORS` has the keys `delivery_area` and `empty_bay`; the layouts use
+`delivery_bay` and `empty_pallet_bay`.
+Files: mesa_sim/viz/space_drawer.py, domains/dock_loading/layouts/
+
+**TODO-172: Kitting items carry subtype in the setups, no code reads it (recorded, 3 Oct 2026)** open
+Kitting items carry `subtype` in the setups, and no code reads it (`SimObject.subtype` is loaded and unused).
+Files: domains/kitting/setups/, mesa_sim/sim_model.py
+Reference: design_decisions.md, "`subtype` is a stated fact of an object"

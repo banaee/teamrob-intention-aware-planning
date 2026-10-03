@@ -5209,3 +5209,16 @@ whole contains, so it shapes the prior through the support.
 (content points 1 and 2): CONTENT POINTS 1 AND 2 (AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28, AM29;
 the ideas not ruled, each to its place); the open items' state. Amended 3 October 2026 (AM30 to AM33): the notes
 for the build's plan, with the open items.
+
+**An object id is an opaque name** (Hadi, 3 October 2026)
+No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one
+object, and is compared by whole-id equality. What an object is or has is stated in a field (`type`, `subtype`,
+`destination`, `initial_container`), never in the spelling of its id.
+
+**`subtype` is a stated fact of an object** (Hadi, 3 October 2026)
+In dock_loading a pallet and a delivery bay carry `subtype` `dry` or `frozen`. The loader checks the setup against it:
+if a movable object carries a subtype, and its destination or its home container is a fixed object that carries a
+subtype, the two must be equal, or loading the setup fails; an object without a subtype is not checked. A scenario
+stays free: the human can place a pallet in a bay of another subtype, and that is a deviation in the world, not an
+error of the setup. The robot does not read `subtype`. The setup's `destination` field stays the statement of where a
+pallet belongs. A fixed object reads its subtype from the layout entry, a movable object from the setup entry.
