@@ -1,0 +1,37 @@
+{
+  "env_objects": [
+    {
+      "id": "item_0",
+      "type": "item",
+      "initial_container": "shelf_0",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, round 1 (env_layout_16): on shelf_0, designated to the one kitting table."
+    },
+    {
+      "id": "item_1",
+      "type": "item",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, round 1 (env_layout_16): on shelf_1, designated to the one kitting table."
+    },
+    {
+      "id": "item_2",
+      "type": "item",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, round 1 (env_layout_16): on shelf_2, designated to the one kitting table."
+    }
+  ]
+}

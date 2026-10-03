@@ -4,7 +4,7 @@
     "height": 1000,
     "name": "env_layout_16",
     "units": "cm",
-    "notes": "T-K part 1's dense room (Hadi's design, 3 October 2026): the tests of context knowledge on kitting, in the IRB (idle robot) and the MPB (working robot). Square, 1000 x 1000. Bearings are seen from kitting_table_0's centre (degrees, x east, y north), distances between centres. kitting_table_0 in the middle of the north wall at (0, 450), against it; seven targets along the south and west walls: a cluster of five in the south-west, shelf_0 (-450, -280), -121.7 deg, 858 cm; shelf_1 (-420, -450), -115.0 deg, 993 cm; coffee_machine_0 (-300, -470), -108.1 deg, 968 cm; ac_switch_0 (-200, -485), -102.1 deg, 956 cm; shelf_2 (-95, -450), -96.0 deg, 905 cm; and two in the south-east, shelf_4 (150, -450), -80.5 deg, 912 cm; shelf_3 (350, -450), -68.7 deg, 966 cm. corner_NE (450, 450) the one landmark, the exit walk's target; one A/C switch (the V1 rule, T-K AM18); no door, no obstacles. Not designed to produce a recognizer result. Stated consequences: inside the cluster neighbours are 6.0 to 7.0 deg apart and their distances from the table lie within 136 cm of each other (858 to 993 cm); the coffee machine and the A/C switch both lie inside the cluster, the coffee machine 101 cm from the A/C switch and 122 cm from shelf_1, the A/C switch 111 cm from shelf_2 (centres); the walk from the table to the A/C switch passes 36 cm from shelf_2's footprint, the walk to shelf_1 33 cm from shelf_0's; shelf_2 to shelf_4 is 15.5 deg, shelf_4 to shelf_3 11.8 deg; corner_NE's bearing (0.0 deg, along the north wall) is 68.7 deg from the nearest target's (shelf_3)."
+    "notes": "T-K part 1's dense room (Hadi's design, 3 October 2026; shelf_3 and shelf_4, the two south-east shelves outside the cluster, removed by ccode before the round-1 runs of 3 October 2026, so that the human's whole work fits below step 500, where TODO-66's context weight acts: analysis/kitting/irb/tk1/README.md): the tests of context knowledge on kitting, in the IRB (idle robot) and the MPB (working robot). Square, 1000 x 1000. Bearings are seen from kitting_table_0's centre (degrees, x east, y north), distances between centres. kitting_table_0 in the middle of the north wall at (0, 450), against it. Five targets in one cluster in the south-west: shelf_0 (-450, -280), -121.7 deg, 858 cm; shelf_1 (-420, -450), -115.0 deg, 993 cm; coffee_machine_0 (-300, -470), -108.1 deg, 968 cm; ac_switch_0 (-200, -485), -102.1 deg, 956 cm; shelf_2 (-95, -450), -96.0 deg, 905 cm. corner_NE (450, 450) the one landmark, the exit walk's target; one A/C switch (the V1 rule, T-K AM18); no door, no obstacles. Not designed to produce a recognizer result. Stated consequences: neighbouring targets are 6.0 to 7.0 deg apart, the whole cluster spans 25.7 deg, and their distances from the table lie within 136 cm of each other (858 to 993 cm); the coffee machine and the A/C switch both lie inside the cluster, the coffee machine 101 cm from the A/C switch and 122 cm from shelf_1, the A/C switch 111 cm from shelf_2 (centres); the walk from the table to the A/C switch passes 36 cm from shelf_2's footprint, the walk to shelf_1 33 cm from shelf_0's; a walk along the south wall from shelf_2 westward passes the A/C switch and the coffee machine before shelf_1; corner_NE's bearing (0.0 deg, along the north wall) is 96.0 deg from the nearest target's (shelf_2)."
   },
   "areas": [
     {
@@ -104,32 +104,6 @@
       "notes": "The south wall, inside the cluster; -108.1 deg from the table, 968 cm; 101 cm from the A/C switch."
     },
     {
-      "id": "shelf_3",
-      "type": "shelf",
-      "position": [
-        350,
-        -450
-      ],
-      "size": [
-        100,
-        100
-      ],
-      "notes": "The south wall, east; -68.7 deg from the table, 966 cm."
-    },
-    {
-      "id": "shelf_4",
-      "type": "shelf",
-      "position": [
-        150,
-        -450
-      ],
-      "size": [
-        100,
-        100
-      ],
-      "notes": "The south wall, east of centre; -80.5 deg from the table, 912 cm."
-    },
-    {
       "id": "ac_switch_0",
       "type": "ac_switch",
       "position": [
@@ -166,7 +140,7 @@
         20,
         20
       ],
-      "notes": "Landmark (T-C1): the exit walk's target; a place for the human's script only; no task binds it. 50 cm in from both walls. From kitting_table_0 its bearing (0.0 deg, along the north wall) is 68.7 deg from the nearest target's (shelf_3); (450, -450) would be 5.3 deg from shelf_3's. From the A/C switch the walk here passes through shelf_2's footprint."
+      "notes": "Landmark (T-C1): the exit walk's target; a place for the human's script only; no task binds it. 50 cm in from both walls. From kitting_table_0 its bearing (0.0 deg, along the north wall) is 96.0 deg from the nearest target's (shelf_2). From the A/C switch the walk here passes through shelf_2's footprint."
     }
   ]
 }
