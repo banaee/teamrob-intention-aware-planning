@@ -39,7 +39,7 @@ B5; CLAUDE.md no longer marks dock_loading as deferred.
 
 ## 2. State of the repo at handoff
 
-- T-D is closed except its tail. Tracks 1 (the IR test-bed), L, P, 2.5, G, X and 3 (the MPB) are done.
+- T-D is closed except its tail. Tracks 1 (the IRB), L, P, 2.5, G, X and 3 (the MPB) are done.
 - The MPB is CLOSED (design_decisions.md, "The meta-planner test-bed (MPB)"): sixteen scenarios on
   env_layout_12, 13 and 14, zero disagreements on parts 1 to 3 under both strategies prior on; the
   coverage matrix in analysis/mpb/coverage.md (36 verified paths, 5 unreachable with derivation, 4 out
@@ -68,7 +68,7 @@ unchanged, on a second task model and room. Rules recorded with it:
   reopened on design grounds only;
 - the artefacts follow T-L's rules (layouts, setups, scenarios by discovery; serial ids; the setup
   holds item placement and designations; positions, pools and scripts are the scenario's);
-- the instruments are reused in order: the IR test-bed (the oracle imports nothing from the recognizer
+- the instruments are reused in order: the IRB (the oracle imports nothing from the recognizer
   or the likelihood functions; the trajectory replay from the script), then the MPB (parts 1 to 3
   exact; part 4 as declared properties; MPB-2's layout-and-setup rule; the placement rule that a setup
   change may not alter a verified scenario on that setup).
@@ -87,7 +87,7 @@ unchanged, on a second task model and room. Rules recorded with it:
 - LIMIT-02 and LIMIT-03 (verify their text): the gate is always open; the human's scan does not wait
   for the delivery.
 - Nothing after Phase 2.1 was exercised on it: no T-H script vocabulary (script.py exists for kitting
-  only), no IR test-bed, no assumptions check, no P4 landmarks, no MPB. Every ruling since T-D was
+  only), no IRB, no assumptions check, no P4 landmarks, no MPB. Every ruling since T-D was
   verified on kitting only.
 - CLAUDE.md still marks domains/dock_loading/ as deferred until T-G's first build.
 
@@ -105,8 +105,8 @@ unchanged, on a second task model and room. Rules recorded with it:
 4. TODO-25's schema fixes, before any run.
 5. The human action script vocabulary for the domain (T-C's and T-H's forms; the during form is
    absolute, TODO-144 notes the relative form as an authoring question).
-6. The room: one controlled layout for the IR test-bed, then setups and scenarios by discovery; whether
-   the IR test-bed's oracle needs anything beyond its current derivations (verify: it uses the
+6. The room: one controlled layout for the IRB, then setups and scenarios by discovery; whether
+   the IRB's oracle needs anything beyond its current derivations (verify: it uses the
    planner's decomposition and the task model, nothing domain-specific).
 7. The MPB on the domain: the same instrument; the coverage matrix's rows are the framework's, not the
    domain's; which rows the domain can reach is derived, not assumed.
@@ -126,7 +126,7 @@ Hadi's ruling.
 - Records: docs/roadmap.md ("The plan from T-A"), CLAUDE.md (the state paragraph; ccode's standing
   conventions), design_decisions.md (the entries named above; "T-D X", "T-D G", "T-D P", "T-D L",
   "T-D R and E", the MPB), docs/assumptions.md, docs/glossary.md, docs/TODOS_AND_DEFERRED.md.
-- Instruments: analysis/ir_testbed/ (README, REPORT, the scripts), analysis/mpb/ (README, REPORT,
+- Instruments: analysis/irb/ (README, REPORT, the scripts), analysis/mpb/ (README, REPORT,
   coverage.md, authoring.md, the scripts).
 - Domain: domains/dock_loading/ (skeleton), domains/kitting/ (the reference for every artefact form).
 - Handoffs: docs/handoffs/ (T-D onward; G and X onward; Phase 7).

@@ -37,7 +37,7 @@ design_decisions.md, "T-G: the second domain's rulings", A3, B13.
 NOTE (T-G records 3, 1 October 2026; not a ruling): the exit walk is defined as "the script's last entry"; where a
 script has a closing part it reads "the last closing entry". Stage 1's plan carries the consequence for the code.
 NOTE (T-G stage 1's plan, approved by Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings",
-STAGE 1 PLAN APPROVED): in the IR test-bed setup (B14, kind 1) the case with the assigned scan of the pallet in the truck
+STAGE 1 PLAN APPROVED): in the IRB setup (B14, kind 1) the case with the assigned scan of the pallet in the truck
 is declared dependent on the robot; its priority list never finishes, so that run has no walk to the desk.
 
 **1.2** Every baseline script declares its experimental intent (label C, purpose); **unmodelled behaviour** (behaviour
@@ -53,7 +53,7 @@ ruled: whether the robot's mind holds a hypothesis for the human stepping aside.
 human's load-time replay plus the idle margin (the replay's last acknowledgement tick + 1 + 30 ticks of the idle
 human), not a literal. The horizon of runs where the robot has work is open; the maintained baseline sets keep their
 step counts.
-Authoring convention · TB.3b's rule (`analysis/ir_testbed/run.sh`) · run files, sweep scripts.
+Authoring convention · IRB.3b's rule (`analysis/irb/run.sh`) · run files, sweep scripts.
 The replay has no term for the robot's work, which in the maintained sets ends after the human's (TODO-138).
 Ruled for MPB runs (Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): the comparison
 horizon is the first observed completion point plus the idle margin, under a derived plain-cost safety cap; the

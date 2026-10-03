@@ -1,6 +1,6 @@
 # Handoff: T-G stage 1, the MPB on dock_loading and the close of stage 1
 
-Written 2 October 2026 by the design chat that planned and built T-G stage 1 up to the close of its IR test-bed
+Written 2 October 2026 by the design chat that planned and built T-G stage 1 up to the close of its IRB
 (1 and 2 October 2026). Informative only. It decides nothing. The repo is authoritative; where this text and the
 repo disagree, the repo wins. The rulings are in docs/design_decisions.md, entry "T-G: the second domain's
 rulings". This handoff points to them and does not restate them in full.
@@ -52,7 +52,7 @@ rulings". This handoff points to them and does not restate them in full.
   (670cb78, 610fed9, 1492789, 512a452); the milestone scenarios (52b2aae, 8b9d267, 0371035).
 - Records of the build and the milestones (772e422, 63fd2f9, bea5930, 1968e0d, bd65b49, 60c9193, 8ee9e87, e5e4c6a,
   and the records of the second milestone scenario).
-- The IR test-bed on dock_loading: the sorting under kitting, the instruments, office_break at 90 seconds, the 54
+- The IRB on dock_loading: the sorting under kitting, the instruments, office_break at 90 seconds, the 54
   scenarios, the expectations, the runs, the report (746fae6, 9a35af1, ae77689, 65273e8, cbeefe4, e573e9e, edbe34f,
   51e5e1c, 54edb71, 3ea4b60, 736eb01, 4d9011d, e4fc88c, b20a67f); its records (cc516f9, e1c4a54, 16ad4b7).
 - Verify that Hadi has pushed the last commits.
@@ -82,7 +82,7 @@ rulings". This handoff points to them and does not restate them in full.
 ## 4. Results so far
 
 - The five mechanisms are built with kitting unchanged. dock_loading runs from start to end in all three rooms.
-- The IR test-bed: 42 controlled and 12 mixed runs, zero disagreements with the expectations committed beforehand.
+- The IRB: 42 controlled and 12 mixed runs, zero disagreements with the expectations committed beforehand.
   This establishes that the recognizer behaves on dock_loading as the records specify. It does not establish the
   quality of the recognition.
 - The baseline: 98 of 147 stretches reach the admission threshold (38, 40 and 20 of 49 by room); the median delay is
@@ -149,8 +149,8 @@ that lands on one of these is classified and recorded; the item reopens only by 
 ## 9. Where things are
 
 - Records: docs/design_decisions.md (the T-G entry, with the blocks on the approved plan, the milestone, Q16 and
-  the IR test-bed), docs/glossary.md, docs/assumptions.md, docs/TODOS_AND_DEFERRED.md, docs/roadmap.md, CLAUDE.md.
+  the IRB), docs/glossary.md, docs/assumptions.md, docs/TODOS_AND_DEFERRED.md, docs/roadmap.md, CLAUDE.md.
 - The plan of stage 1: docs/handoffs/plan_T-G_stage1.md.
 - Domain: domains/dock_loading/ (layouts, setups, scenarios, tasks, actions, script call forms).
-- Instruments and results (not readable by the design chat): analysis/instruments/, analysis/dock_loading/ir_testbed/.
+- Instruments and results (not readable by the design chat): analysis/instruments/, analysis/dock_loading/irb/.
 - Handoffs: docs/handoffs/ (this file belongs there).

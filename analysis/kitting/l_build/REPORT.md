@@ -1,8 +1,8 @@
-# L-build: T-D L, the belief lifecycle — the 1.5c and TB.2b measures rerun
+# L-build: T-D L, the belief lifecycle — the 1.5c and IRB.2b measures rerun
 
 28 September 2026, at the L-build commits: c4beb1d (records), 2c54c4a (recognizer: L1, L4, the flag), 493c095
 (meta-planner: L2 (ii), L5 B), 013cd35 (tests), 5129d90 and 3d65ca6 (two tie-break defects in the re-entry, found by the
-IR test-bed and fixed, each with a test), 2a4ab60 (the four maintained baseline sets), 695f5a8 (the IR test-bed). The
+IRB and fixed, each with a test), 2a4ab60 (the four maintained baseline sets), 695f5a8 (the IRB). The
 mechanism is design_decisions.md, "T-D L: the belief lifecycle", as amended on the L-records report (confirmed at the
 L-build plan step: L1 read through the terminal action's preconditions on the previous tick; L2 (ii) as the state "the
 recorded hypothesis is inadequate"; the boundary governs a re-entry on its tick; the `[IR-boundary]` line names the
@@ -11,24 +11,24 @@ reported with its ticks and its cause (L1, L2, L4, L5 B). No previous statistic 
 
 ## Material and conventions
 
-- PRE: the TB.2b baselines, md5-checked against the READMEs' "TB.2b" sections (48 logs and 48 `.rec` of 48) and
+- PRE: the IRB.2b baselines, md5-checked against the READMEs' "IRB.2b" sections (48 logs and 48 `.rec` of 48) and
   copied to `pre/<set>/` before any code changed; `pre/supp/`: the four supplementary wrong-table runs
-  (`analysis/td_stage1b/supp_sweep.sh`) at ec155f3, before the build, byte-identical to TB.2b's `post/supp/`.
+  (`analysis/td_stage1b/supp_sweep.sh`) at ec155f3, before the build, byte-identical to IRB.2b's `post/supp/`.
 - POST: the four maintained sets regenerated at L-build (`analysis/<set>/sweep/`, md5s in the READMEs' "L-build"
   sections) and `post/supp/`. All logs git-ignored. The 52 `.rec` streams are byte-identical PRE and POST: the human's
   script, and with the separation stop off nothing the robot does reaches it.
-- SCRIPTS: `analysis/tb2b_exposed_interval/`'s scripts copied here. `tdlib.py` extended for the L lines (a key pinned
+- SCRIPTS: `analysis/irb2b_exposed_interval/`'s scripts copied here. `tdlib.py` extended for the L lines (a key pinned
   more than once and re-entering, `retired(log, key, t)` the interval; `[IR-reentry]`; the action an `[IR-boundary]`
   names; `[meta-trig]`'s `cause=`); A reads retirement as an interval and A4 as L4 (a retired key is not most likely,
-  not a member and at the floor WHILE retired; a key's pins and re-entries alternate); X drops TB.2b's EXPOSED /
+  not a member and at the floor WHILE retired; a key's pins and re-entries alternate); X drops IRB.2b's EXPOSED /
   TRUNCATED classes (L's changes are not confined to an interval) and adds `reent`; D shows the POST trigger's cause
-  (not compared: PRE has none) and covers the supplementary runs; `x_summary.py` (TB.2b's exposed-interval table) is
+  (not compared: PRE has none) and covers the supplementary runs; `x_summary.py` (IRB.2b's exposed-interval table) is
   not carried. NEW: `baseline_diff.py` (per log and grep family, the first differing step, with the two format changes
   undone), `l_events.py` (per run: boundaries with and without a pin, re-entries, pins, retractions, boundary fires,
-  the causes), `tb_compare.py` (the IR test-bed against TB).
+  the causes), `irb_compare.py` (the IRB against IRB).
 - A, B, C, F, H were run on both sides (`<script>.txt`, `TD_SIDE=pre` for `<script>_pre.txt`); D, E, X and
   `baseline_diff` compare PRE with POST themselves. G (the priced standing) and the clip (`clip_sweep.sh`, 17 prior-off
-  conditions) drive the simulator: run at HEAD, both byte-identical to TB.2b's outputs.
+  conditions) drive the simulator: run at HEAD, both byte-identical to IRB.2b's outputs.
 - Truth lag-corrected (the record at t + 2), α ∈ {0.01, 0.05, 0.1}, prior ON primary, prior OFF an appendix, the four
   supplementary runs (the wrong table: TODO-87's case, where L1 acts) beside them. Run from this directory with
   `~/python-envs/ir-nomesa-env/bin/python <script>.py > <script>.txt`; G and `clip_sweep.sh` from the repo root with
@@ -72,7 +72,7 @@ unexplained tick is on the idle human after the work order (below, L4).
 - The supplementary runs (both priors): a boundary WITHOUT a pin at the misdelivery, scenario_s06_06 at 103
   (`place(item_0,kitting_table_1)`) and scenario_s07_03 at 94 (`place(item_2,kitting_table_1)`); PRE had none. Their
   second boundaries (158 and 189, the pins) unchanged.
-- The IR test-bed (`analysis/ir_testbed/REPORT.md`, "L-build"): without a pin at scenario_s09_07 33 (the return of a
+- The IRB (`analysis/irb/REPORT.md`, "L-build"): without a pin at scenario_s09_07 33 (the return of a
   change of mind), s09_08 75 (the misdelivery), s09_09 107 (item_3, outside the support).
 
 ## Re-entries (L4)
@@ -195,13 +195,13 @@ none admitted, the finding unexplained from 343 / 344 as before; the wrong-table
 ## Runs and tests that disagree with the mechanism
 
 None at HEAD.
-- The IR test-bed found two build defects of L-build, both in the recognizer and both against the records (handback
+- The IRB found two build defects of L-build, both in the recognizer and both against the records (handback
   §1.7, the tie-break "the first live key in sorted order"): the re-entering key's evidence and base were set after the
   loop, so a 1/2 tie at the re-entry (135 in s08_02, s09_02, s09_11) and at the next boundary (127 in s08_03, s09_03;
   139 in s08_04, s09_04) went to the incumbent. Fixed in 5129d90 and 3d65ca6, each with a test that fails on the code
   before it; the sixteen then agree at 1e-9 and at print precision. The maintained baselines above are the regeneration
   after both fixes.
-- Tests: the full suite passes (149). td1, td15 and tb2b needed no re-derivation: every hand-built release in them is a
+- Tests: the full suite passes (149). td1, td15 and irb2b needed no re-derivation: every hand-built release in them is a
   boundary under both criteria and every delivery by another agent a pin without one; td1's helper followed the rename
   `_completed` → `_retired` (mechanical). The 14 new tests (`tests/test_l_build.py`) pass; the tie-break test fails on
   the code before each fix. The other new tests were not run against the pre-L code: every one constructs a

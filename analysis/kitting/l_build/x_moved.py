@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-X. Every moved number, tick by tick (L-build; TB.2b's script, its EXPOSED / TRUNCATED classes dropped: the L-build
+X. Every moved number, tick by tick (L-build; IRB.2b's script, its EXPOSED / TRUNCATED classes dropped: the L-build
 changes are not confined to an interval). Per run (all 48 and the four supplementary runs, not grouped), the tick sets
-of the statistics 1.5c and TB.2b reported, computed by the same code on PRE (the TB.2b logs) and POST (L-build), and
+of the statistics 1.5c and IRB.2b reported, computed by the same code on PRE (the IRB.2b logs) and POST (L-build), and
 their difference: the ticks present on one side only. The cause of each moved set is read beside l_events.txt (the
 run's L events: boundaries without a pin, L1; re-entries, L4; retractions and boundary fires, L2 (ii) and L5 B).
 

@@ -15,8 +15,8 @@ from an empty hand, the chain's state throughout):
   the shelf; its acknowledgement; the grasp; its acknowledgement; the carry from that arrival point to the item's
   designated table, ceil((d - arrival) / step) steps; its acknowledgement; the release; its acknowledgement; the
   robot's task-completion tick. The next task starts where the carry ended.
-The human's replay length is the replay's last acknowledgement tick + 1 (analysis/ir_testbed/trajectory.py, the same
-expansion the oracle reads). MARGIN is the IR test-bed's idle margin (E5's standing threshold at alpha = 0.01 is 25
+The human's replay length is the replay's last acknowledgement tick + 1 (analysis/irb/trajectory.py, the same
+expansion the oracle reads). MARGIN is the IRB's idle margin (E5's standing threshold at alpha = 0.01 is 25
 ticks; 30 covers it).
 """
 import json
@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path[:0] = [str(ROOT), str(ROOT / "mesa_sim"), str(ROOT / "analysis" / "instruments" / "ir_testbed")]
+sys.path[:0] = [str(ROOT), str(ROOT / "mesa_sim"), str(ROOT / "analysis" / "instruments" / "irb")]
 
 import yaml
 from domains.kitting.registry import domain_config

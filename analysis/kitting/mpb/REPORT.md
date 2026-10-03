@@ -158,7 +158,7 @@ Ticks are the oracle's, and every one equals the run's (single_task, prior on).
   - Parts 1 to 3 agree exactly.
 - **Deviations from the rulings' text, which are the oracle's values and stand:**
   - scenario_s10_07's item_2 at b + 15 (138), not b + 1;
-  - scenario_s10_08's item_2 at 47, not the IR test-bed's 46: the output floor of this setup's five inadmissible robot
+  - scenario_s10_08's item_2 at 47, not the IRB's 46: the output floor of this setup's five inadmissible robot
     items;
   - scenario_s10_09's retraction at 60.
 - **Prior off (appendix, no ruling).** scenario_s10_02: P2b does not hold (3 F1 violations; the admission moves to 26,
@@ -449,7 +449,7 @@ holds 5, the executed robot keeps 52.20 cm, and there are no violations.
 ## The independence boundary, demonstrated
 
 - The oracle's process imports `shared.types`, `shared.knowledge`, `shared.planner`, `domains.kitting.registry` and
-  the IR test-bed's `oracle.py`.
+  the IRB's `oracle.py`.
 - In every run it asserted at exit that none of these was loaded: `shared.meta_planner`, `shared.realization`,
   `shared.projection`, `shared.recognizer`, `shared.likelihood_functions`, `world.human_executor`, `mesa_sim.*`. A test
   checks the same in a clean interpreter.

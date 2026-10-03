@@ -413,14 +413,14 @@ SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domai
 6 and 7, then the milestone.
 SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT): steps 6 to 8 of stage 1 are built and the milestone
 accepted. Next: the second simple scenario per room; then the sorting of the earlier analyses and tests under kitting,
-with the preparation of the instruments; then the IR test-bed scenarios, agreed with Hadi before they are authored.
+with the preparation of the instruments; then the IRB scenarios, agreed with Hadi before they are authored.
 SUPERSEDED (records, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): the second milestone scenario
-is built and accepted; stage 1's milestone is complete. Next: the design of the IR test-bed set with Hadi (first
+is built and accepted; stage 1's milestone is complete. Next: the design of the IRB set with Hadi (first
 question: TODO-155); then the sorting of the earlier analyses and tests under kitting, with the preparation of the
 instruments; then the set's authoring and its runs.
 SUPERSEDED (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block, RULED, T-G records 8): TODO-155 is ruled
 for now (the walk to the standby place stays without a hypothesis; H1 and H2 recorded, neither approved), office_break
-lasts 90 seconds (TODO-157), and the IR test-bed set on dock_loading is agreed (C1 to C14, M1 to M4, in all three
+lasts 90 seconds (TODO-157), and the IRB set on dock_loading is agreed (C1 to C14, M1 to M4, in all three
 rooms). Next: the build step that sorts the earlier analyses and tests under kitting and prepares the instruments for
 dock_loading; then the authoring of the set, its expectations and its runs.
 SUPERSEDED (Hadi, 2 October 2026): the states after T-G Q16 are in the T-G entry below (stage 1's test-beds and close, the
@@ -582,7 +582,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
   recorded (TODO-95; "T-H" named it before 25 Sept 2026).
   SUPERSEDED IN PART (T-D R, 27 September 2026): `unknown` as outcome and `unknown` leading as a measure: the `unknown` hypothesis leaves the hypothesis space (R1); the outcome is the adequacy finding (R2). T-D R and E is ruled; its Stage 1 is next. design_decisions.md, "T-D R and E".
   SETTLED BY T-D R (27 September 2026): "inside `unknown` or outside it": outside; the adequacy finding takes the explanatory role; T-D Q1 itself unchanged, P's building block. design_decisions.md, "T-D R and E".
-  CLOSED EXCEPT ITS TAIL (Hadi's order, 30 September 2026): tracks 1 (the IR test-bed), L, P, 2.5, G, X and 3 (the
+  CLOSED EXCEPT ITS TAIL (Hadi's order, 30 September 2026): tracks 1 (the IRB), L, P, 2.5, G, X and 3 (the
   MPB, CLOSED at its close-out) are done; design_decisions.md, the entries of those names. "NEXT after T-L" above is
   history. The T-D tail runs after T-V: track 3b, consequential activation under conflict (TODO-145); track 4, the
   workspace boundary and departure (TODO-140, TODO-131); the 4D detour strategy (TODO-70, TODO-15), the planner's
@@ -628,7 +628,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
   - The domain's own elements: the truck as a container, the gate state as a method guard.
   - TODO-25's schema fixes (TODO-81 with them).
   - The script vocabulary, one controlled layout, setups and scenarios, following T-L.
-  - The IR test-bed, then the MPB, run on it; findings classified by the case classification of
+  - The IRB, then the MPB, run on it; findings classified by the case classification of
     `docs/assumptions.md` and under MPB-4.
   - A shared ruling reopens on design grounds only; nothing domain-specific enters `shared/`.
   SUPERSEDED IN PART (T-G records 1, 1 October 2026): "the driver's work order" and the foreseeable candidates (the phone
@@ -643,7 +643,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
   viewing fixture scenario_s01_03; scenario_s01_01 and _02 still fail at load by intent (C2). The stages, all in V1;
   before each stage's plan the design chat and Hadi agree its layout and setup:
   - Stage 1, the basic domain: the robot delivers and returns (B11); the human scans, takes the two breaks, steps aside
-    to the standby place; the gate is declared open; the office door has no state yet. The IR test-bed, then the MPB.
+    to the standby place; the gate is declared open; the office door has no state yet. The IRB, then the MPB.
     Its catch-up list is C3 (the domain's state after build 1).
     BUILDS: first, in its own commit with no change of behaviour, the zone mechanism renamed to "area" in the code (the
     plan reports the extent first: every occurrence, and whether the maintained sets' logs print it); the catch-up of
@@ -654,7 +654,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     scanned state, `is_empty` and the destination); A6, the perception assumption; A9, the declared areas and the fact
     that an agent is in an area; B1 to B4, B8, B9, B11; B6 with `office_break` reduced (the office door has no state, the
     human passes it as a plain point; the office observed); B10, the room (whether the stores and the freezer are
-    already in stage 1's layout is not ruled); the IR test-bed on dock_loading, then the MPB. A3, A4, A5 and A9 change
+    already in stage 1's layout is not ruled); the IRB on dock_loading, then the MPB. A3, A4, A5 and A9 change
     code outside the domain; each is accepted on kitting by the maintained sets staying byte-identical. A3 also by
     the kitting scenarios with a drop event and the test-bed sets with misdeliveries, run under the new form and
     compared with their present behaviour (expected: no difference; a difference returns to the design chat). The form
@@ -668,16 +668,16 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     and proposes the form; acceptance on kitting byte-identical (R2).
     ROOMS AND SETUPS (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): three rooms, env_layout_02, env_layout_03 and env_layout_04 (the
     hall, the office, the gate, the truck, the desk and the standby landmarks identical; the bays, the empties container
-    and the coffee machine placed per room), and six setups, two kinds per room (kind 1 for the IR test-bed: pallets in
+    and the coffee machine placed per room), and six setups, two kinds per room (kind 1 for the IRB: pallets in
     their delivery bays and one in the truck; kind 2 for the MPB: pallets in the truck, two empties); the empty pallets
     designated to the truck. env_layout_01, env_setup_01 and scenario_s01_01 to _03 are removed. Full observation in
-    stage 1. A milestone before the IR test-bed: one simple scenario per room runs from start to end. B10's room moves to
+    stage 1. A milestone before the IRB: one simple scenario per room runs from start to end. B10's room moves to
     stage 2.
     PLAN APPROVED (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED;
     the plan, `docs/handoffs/plan_T-G_stage1.md`): the build order, steps 0 to 8: the rename; the areas and R2 (one
     definition of an agent's area; a fixed object's area derived from its position; the replay's walk ends where the body
     stops); A4; A5; A3; dock_loading's catch-up; its content (a method for every area the agent can be in: 8 per robot
-    task, the human's for the hall and the office); the milestone, one scenario per room. Then the IR test-bed and the
+    task, the human's for the hall and the office); the milestone, one scenario per room. Then the IRB and the
     MPB, whose instruments obtain the human's run-time sequence from the executor's own selection rule. A robot task with
     no applicable method stops the run: a ruling before stage 2 (TODO-152).
     BUILT, STEPS 0 TO 5 (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT): step 0 the reference runs (outside git); step 1 the rename
@@ -690,9 +690,9 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     125, 64 and 125, 57 and 151; every entry of the human's script closed, the closing part included). The findings are
     recorded there (TODO-135's third instance, TODO-154 to TODO-157). ADDED (Hadi, 1 October 2026): a second simple
     scenario per room (the milestone did not exercise the standby walk or a meeting at a shared bay); then a step before
-    the IR test-bed and the MPB on dock_loading: the earlier analyses and the tests sorted under kitting, the instruments'
+    the IRB and the MPB on dock_loading: the earlier analyses and the tests sorted under kitting, the instruments'
     code shared, their run sets, expectations and reports per domain (its own commit, no change of behaviour), with the
-    preparation of the instruments. Next: the second simple scenario per room; then that step; then the IR test-bed
+    preparation of the instruments. Next: the second simple scenario per room; then that step; then the IRB
     scenarios, agreed with Hadi before they are authored.
     BUILT, THE SECOND MILESTONE SCENARIO (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT):
     scenario_s03_03, s05_03, s07_03, one per room on the MPB setups (0371035): the robot delivers two pallets to the dry
@@ -702,10 +702,10 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     priority rule, the standby walk, the frozen bay, each scan entering the live set on the tick of its delivery. Not
     exercised: the robot arriving at a bay where the human stands, two scans at once in one bay (the human finishes a
     scan before the next pallet arrives). Findings recorded there (TODO-135's fourth instance, TODO-145, TODO-154,
-    TODO-155). Stage 1's milestone is complete. Next: the design of the IR test-bed set with Hadi (first question:
+    TODO-155). Stage 1's milestone is complete. Next: the design of the IRB set with Hadi (first question:
     TODO-155); then the sorting step with the preparation of the instruments; then the set's authoring and its runs.
-    RULED, THE IR TEST-BED SET (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block, RULED, T-G records 8):
-    T-G Q16, the walk to the standby place stays without a hypothesis for now, the IR test-bed set observing how the
+    RULED, THE IRB SET (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block, RULED, T-G records 8):
+    T-G Q16, the walk to the standby place stays without a hypothesis for now, the IRB set observing how the
     present recognizer explains it (the baseline); two candidates on TODO-155, neither approved (H1, a foreseeable task
     to step aside; H2, a hypothesis live only while no assigned task of the human is applicable); the walk as the scan's
     tail not taken. `office_break` lasts 90 seconds, `coffee_break` stays 60 (TODO-157; the value changed in the next
@@ -715,7 +715,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     beside the present model's expectation, which alone is compared. Next: the build step that sorts the earlier
     analyses and tests under kitting and prepares the instruments for dock_loading; then the authoring of the set, its
     expectations and its runs.
-    BUILT, RUN AND ACCEPTED, THE IR TEST-BED ON DOCK_LOADING (1 to 2 October 2026; accepted by Hadi 2 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED;
+    BUILT, RUN AND ACCEPTED, THE IRB ON DOCK_LOADING (1 to 2 October 2026; accepted by Hadi 2 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED;
     T-G records 9): the sort of kitting's analyses and tests (analysis/kitting/, analysis/instruments/,
     analysis/dock_loading/; the path table in docs/rename_table.md); the instruments prepared (the human's run-time
     sequence from the executor's own selection rule, the oracle with liveness by applicability, the separation counts
@@ -727,7 +727,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     same-motion pairs, 3 second scans with no walk, 3 scans leaving the office on env_layout_02); every break reaches it.
     Findings, none ruled: the same-motion split (C5 confirmed; TODO-97); a short walk under equal shares (T-K part 1's
     question, TODO-154); the standby walk read as a break or, in M4, as an assigned scan never performed (TODO-155);
-    one point per container (B9's note, LIMIT-04). The IR test-bed of stage 1 is CLOSED. Next: the design of the MPB set
+    one point per container (B9's note, LIMIT-04). The IRB of stage 1 is CLOSED. Next: the design of the MPB set
     with Hadi; open for it: a setup with pallets already in a bay while the robot delivers others; the robot's last task
     as a return; how expected decisions are derived when the human's sequence depends on the robot's decisions (C6).
     RULED, THE MPB ON DOCK_LOADING (Hadi, 2 October 2026; design_decisions.md, "T-G: the second domain's rulings", THE MPB

@@ -584,7 +584,7 @@ scenario_40, scenario_41 and scenario_42 (robot_0 at (-950, -550), the centre of
 undecided the starts on the edge of `kitting_table_0` (scenario_40 to 42's human_0, scenario_70 to 73's robot_0).
 Every registered start lies inside its space's bounds.
 
-## T-D, robustness in kitting (R and E, the cognitive loop, the IR test-bed, L, P, G, X, the MPB)
+## T-D, robustness in kitting (R and E, the cognitive loop, the IRB, L, P, G, X, the MPB)
 
 **T-D R and E: the recognizer's output under a removed `unknown` hypothesis (ruled by Hadi, 26 to 27 September 2026)** — RECORD [T-D/1], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
 - Dependencies to verify in the build, not design questions: the schema durations of `pick_up` and `place`; the body's speed and its duration-to-ticks conversion supplied to the adequacy computation (the Projector already receives both); β remains body-supplied as established in T-A1.
@@ -606,25 +606,25 @@ For the Stage 1 build: the docstring of `UNKNOWN_LIKELIHOOD` ("the threshold sep
 Staging, cycle 1.5: session 1.5r records these rulings (records only). Cycle 1.5b builds E8, E9, E10 and G1 together;
 acceptance is 1.4's scripts (`analysis/td_stage1/`) rerun on the regenerated baselines.
 
-**The cognitive loop does not end with the task pool (TB, ruled by Hadi, 27 September 2026)** — RECORD [T-D/4], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+**The cognitive loop does not end with the task pool (IRB, ruled by Hadi, 27 September 2026)** — RECORD [T-D/4], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
 Consequences recorded.
 - After the terminal return the body calls neither `evaluate_triggers` nor the executor. The existing baselines stay
   byte-identical once every `[IR*]` line is removed, and their `[IR*]` lines stay byte-identical up to and including
   the declared completion tick; the new lines begin the tick after it and include `[IR-complete]` and `[IR-boundary]`
-  as well as `[IR]` and `[IR-dist]`. (Refined in TB.2b records, Hadi on the TB.1r report, 27 September 2026.)
+  as well as `[IR]` and `[IR-dist]`. (Refined in IRB.2b records, Hadi on the IRB.1r report, 27 September 2026.)
 - Within a tick, the robot's `[IR]` and `[IR-dist]` lines now precede its `[meta-trig]` line, on every tick (observation,
-  recognition and their logging come before the guard, the guard before the trigger evaluation); before TB.2b the
+  recognition and their logging come before the guard, the guard before the trigger evaluation); before IRB.2b the
   `[meta-trig]` line came first. Every log's md5 changes with it, a run whose robot never finishes included; the
-  comparison above is unaffected. (TB.2b plan, confirmed by Hadi.)
+  comparison above is unaffected. (IRB.2b plan, confirmed by Hadi.)
 - The 1.4 and 1.5b measurements (`analysis/td_stage1/`, `analysis/td_stage1b/`) were taken over the truncated
-  interval. They are rerun over the newly exposed interval in TB.2b, with every change reported and no previous
+  interval. They are rerun over the newly exposed interval in IRB.2b, with every change reported and no previous
   statistic preserved for comparability (TODO-121).
 - With an empty pool, tick 0 still produces one `no_current_task`, one `[meta-proj]` line and one "all tasks complete"
   line.
 - TODO-33 (the run loop does not stop when all agents are finished) is untouched: the run's length is the run file's
   steps.
 
-**The IR test-bed (TB, ruled by Hadi, 27 September 2026)** — RECORD [T-D/5], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
+**The intention-recognition test-bed (IRB, ruled by Hadi, 27 September 2026)** — RECORD [T-D/5], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
 Purpose. Test the recognizer in isolation on scenarios written for it, with expectations derived from the entry "T-D
 R and E" before the run, so that a result can say "the recognizer disagrees with the design" rather than "the run looks
 odd". The 48 maintained fixtures cannot: the robot acts in them, the layouts vary, and the cases Design B was ruled for
@@ -691,14 +691,14 @@ The expectations. Per scenario one CSV:
   boundary ticks.
 Two files per scenario, expected and actual, and a diff. The source of the human's trajectory and world facts is the
 load-time replay (`check_script`), expanded per tick with the body's walker (`steps_toward`, the step size, the
-proximity threshold, the action and task latencies). TB.3b asserts per-tick equality of that trajectory with the run's
+proximity threshold, the action and task latencies). IRB.3b asserts per-tick equality of that trajectory with the run's
 human lines; if the assertion fails, the generator reads the run's human lines instead and the report says so.
 Independence boundary. The generator implements the belief from all recognizer records at HEAD, not from one entry:
 this file's "T-D R and E" (e as the straight-line excess from the origin, s, s_exp by E9's attribution, D, L clipped
 at 1, S, membership as amended twice with the boundary-tick rule, the finding) and `docs/recognizer_handback.md`
 §§1.2 to 1.7 (the uniform prior, the proximity regress, the fold and prefix accumulation, the normalisation over H,
 the completion signal, the pin, the boundary and the retirement, `BELIEF_FLOOR`, target resolution for a carried
-item). The TB.3b report lists each rule the generator implements with its source. It imports nothing from
+item). The IRB.3b report lists each rule the generator implements with its source. It imports nothing from
 `shared/recognizer.py` or `shared/likelihood_functions.py`. It may use the planner's decomposition and the domain's method guards to obtain each hypothesis's expected action sequence, which is
 the domain's structure, not the recognizer's. The expected-action table per hypothesis per scenario is written out in
 the report, so the oracle is inspectable.
@@ -715,48 +715,48 @@ The comparison.
 - The report distinguishes "the recognizer currently behaves this way" from "this behaviour is correct by the current
   design".
 
-Sessions (the TB track; the IR test-bed first, cycle 2 (L) second): TB.1r records these rulings and the cognitive-loop
-ruling (records only); TB.2b builds the cognitive-loop correction ("The cognitive loop does not end with the task
-pool", above), which the test-bed's runs need; TB.3b builds the artefacts and the expectation generator, runs the
+Sessions (the IRB track; the IRB first, cycle 2 (L) second): IRB.1r records these rulings and the cognitive-loop
+ruling (records only); IRB.2b builds the cognitive-loop correction ("The cognitive loop does not end with the task
+pool", above), which the test-bed's runs need; IRB.3b builds the artefacts and the expectation generator, runs the
 scenarios and writes the report.
 
-CORRECTED IN PLACE (TB.2b records; Hadi on the TB.1r report, 27 September 2026): the landmarks (corner_SE only, no
-door; TB.1r had them required), the ids (serial; TB.1r had descriptive ids), the generator's source (all recognizer
-records at HEAD; TB.1r had the one entry), the trajectory (the replay expanded per tick with the body's walker, and the
+CORRECTED IN PLACE (IRB.2b records; Hadi on the IRB.1r report, 27 September 2026): the landmarks (corner_SE only, no
+door; IRB.1r had them required), the ids (serial; IRB.1r had descriptive ids), the generator's source (all recognizer
+records at HEAD; IRB.1r had the one entry), the trajectory (the replay expanded per tick with the body's walker, and the
 fallback to the run's human lines), and the third stated consequence (`coffee_break` is retired once `waited` holds, so
-TODO-117's case arises in the two-deliveries scenario only; TB.1r had it in every scenario).
+TODO-117's case arises in the two-deliveries scenario only; IRB.1r had it in every scenario).
 
 Files: domains/kitting/ (the layout, setup and scenarios, hand-written literals registered by discovery), the run files
-where T-L keeps them, analysis/ir_testbed/ (the generator, the log reader reusing `analysis/td_stage1b/tdlib.py`,
-expected.csv, actual.csv and diff.md per scenario, REPORT.md). Built in TB.2b and TB.3b.
-Reference: cchat, 27 September 2026 (TB); "T-D R and E" (R1 to R6, E1 to E10, G1, the membership rule as amended
+where T-L keeps them, analysis/irb/ (the generator, the log reader reusing `analysis/td_stage1b/tdlib.py`,
+expected.csv, actual.csv and diff.md per scenario, REPORT.md). Built in IRB.2b and IRB.3b.
+Reference: cchat, 27 September 2026 (IRB); "T-D R and E" (R1 to R6, E1 to E10, G1, the membership rule as amended
 twice); "Layouts, setups and scenarios: the three artefacts of a run"; "T-H: the human behaviour model";
-`docs/handoff_T-D_cycle2_and_IR_testbed.md` §8 (the layered plan); TODO-101, TODO-117, TODO-122;
+`docs/handoff_T-D_cycle2_and_IRB.md` §8 (the layered plan); TODO-101, TODO-117, TODO-122;
 `docs/recognizer_handback.md` §1.10
 
-TRACK COMPLETE (TB close-out, 27 September 2026): TB.2b, TB.3b and TB.4b are built; sixteen scenarios (scenario_s08_01
+TRACK COMPLETE (IRB close-out, 27 September 2026): IRB.2b, IRB.3b and IRB.4b are built; sixteen scenarios (scenario_s08_01
 to _04 on env_layout_10, scenario_s09_01 to _12 on env_layout_11), zero disagreements at 1e-9 between the recognizer's
 public outputs and the independent oracle; the instrument is independent of the layout, and its record is
-`analysis/ir_testbed/README.md` (the results in `REPORT.md`). Two facts for cycle 2, stated without ruling: (1) E8's
+`analysis/irb/README.md` (the results in `REPORT.md`). Two facts for cycle 2, stated without ruling: (1) E8's
 member clause is covered by E6's second amendment whenever the action completion latency is 1 (every phase an advance
-opens then has s_exp ≥ 1, so its entry tick is already a member; removing the clause changed no output in TB.3b); (2) at
+opens then has s_exp ≥ 1, so its entry tick is already a member; removing the clause changed no output in IRB.3b); (2) at
 the current β (0.01 /cm) and v (20 cm/tick), two targets 10.4° apart as seen from the start are not separated by a
 28-tick walk (the rival's S 0.765 at the arrival), while 30.4° separates them three ticks before the arrival (S < α at
-tick 25 of 28; scenario_s09_10, shallow runs of TB.4b).
+tick 25 of 28; scenario_s09_10, shallow runs of IRB.4b).
 
 ---
 
 **T-D L: the belief lifecycle (ruled by Hadi, 27 September 2026)** — RECORD [T-D/6], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
-Staging for L-build. The recognizer (L1, L4) and the meta-planner (L2 ii) are built; the IR test-bed's oracle is
+Staging for L-build. The recognizer (L1, L4) and the meta-planner (L2 ii) are built; the IRB's oracle is
 updated by derivation from this entry (not fitted to the runs); the sixteen test-bed scenarios (scenario_s08_01 to _04,
-scenario_s09_01 to _12) are recompared; the four maintained baseline sets are regenerated; the 1.5c and TB.2b measures
+scenario_s09_01 to _12) are recompared; the four maintained baseline sets are regenerated; the 1.5c and IRB.2b measures
 are rerun; every moved number is reported.
 
 BUILT (L-build, 28 September 2026): c4beb1d (records), 2c54c4a (L1, L4, the flag: `ProceduralKnowledge.
 terminal_actions`, `AdaptivePlanner.enabled_groundings` / `completed_groundings`, `_observed_terminal_completion`,
 `_retired`), 493c095 (L2 (ii), L5 B: `RecognitionChange`, `TriggerDecision.cause`), 5129d90 and 3d65ca6 (the re-entry
-kept in hypothesis order, the tie-break; found by the IR test-bed), 013cd35 (tests). Verified: `analysis/l_build/
-REPORT.md` and `analysis/ir_testbed/REPORT.md`, "L-build" (the sixteen agree with the derived generator at 1e-9). Two
+kept in hypothesis order, the tie-break; found by the IRB), 013cd35 (tests). Verified: `analysis/l_build/
+REPORT.md` and `analysis/irb/REPORT.md`, "L-build" (the sixteen agree with the derived generator at 1e-9). Two
 readings stated there: a retired hypothesis the planner cannot decompose stays retired (its fact cannot be read); L5 B
 fired in no baseline run (at every boundary that met a record, most_likely changed). Measured wording: `coffee_break`
 re-enters on the tick `waited` clears, the human's first step after the break, two ticks after its pin (133 → 135 in
@@ -805,10 +805,10 @@ in the maintained sets.
 
 **T-D P: the fallback projection (ruled by Hadi, 28 September 2026)** — RECORD [T-D/12], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
 BUILT (P-build, 28 September 2026): b19b5e2 and 4470708 (records), e93cbd9 (the build), 5e853a0 (tests;
-tests/test_p_build.py, and four tests re-derived by P), 15cb99f (TB.2b's mid-run pool test moved to scenario_s03_06),
+tests/test_p_build.py, and four tests re-derived by P), 15cb99f (IRB.2b's mid-run pool test moved to scenario_s03_06),
 fa26176 (the four maintained sets, a "P-build" section each). Verified on the P-build baselines: `.rec` streams
 byte-identical in all 48; the recognizer's lines byte-identical prior on; the first difference of every changed run at
-tick 0, a decision under the fallback; the IR test-bed's sixteen logs differ in the step-0 `[meta-proj]` line alone
+tick 0, a decision under the fallback; the IRB's sixteen logs differ in the step-0 `[meta-proj]` line alone
 (no oracle rerun: the recognizer is untouched and the robot is idle there). Measured, not examined: scenario_s06_01
 `single_task` prior off does not finish in 340 steps, with no wait (TODO-133). P is closed; next is G.
 SUPERSEDED: P was reopened by P4 and closed with it (BUILT (P4-build), below).
@@ -819,7 +819,7 @@ perception facts on `RobotAgent`, `Projector.project_fallback()` from the eviden
 `HumanProjection` types removed), f0ead6e (tests; tests/test_p_build.py re-derived, the three "refusal returns None"
 tests back to None, the WorldState field set), d7c98b5 (the four maintained sets, a "P4-build" section each;
 TODO-133 closed). Verified: `.rec` streams byte-identical in all 48; the recognizer's lines prior on byte-identical to
-L-build's; the IR test-bed's sixteen logs differ in the step-0 `[meta-proj]` line alone; the suite 170 passed.
+L-build's; the IRB's sixteen logs differ in the step-0 `[meta-proj]` line alone; the suite 170 passed.
 Accepted on scenario_s05_01 (the 23-tick wait gone under both strategies; complete at 194 as before P),
 scenario_s01_06 and scenario_s06_06 (complete at 265, `[sep]` 26.0 cm, as before P).
 - The occupied target, under P4: six prior-on logs do not complete (and the same six prior off): scenario_s01_01,
@@ -848,7 +848,7 @@ P is closed with P4; P3 stays open; next is G.
 
 **T-D G: admission (ruled by Hadi, 29 September 2026)** — RECORD [T-D/14], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
 Staging. G-build follows in its own session. Verification on picked scenarios (scenario_s09_01's tail, scenario_s09_09,
-scenario_s09_06, scenario_s05_01 prior on, one control scenario); the IR test-bed's oracle extended by derivation from
+scenario_s09_06, scenario_s05_01 prior on, one control scenario); the IRB's oracle extended by derivation from
 this entry for the warrant output; the four maintained sets as md5 regression plus one completion table.
 
 BUILT (G-build, 29 September 2026): 81a9f86 (the build: `ObservationWarrant` and `BeliefState.observation_warrant`;
@@ -856,11 +856,11 @@ the recognizer's `_entered_by_completion` and `_observation_warrant`; the meta-p
 `GateOutcome.LEADER_UNWARRANTED`, `observed_assigned_tasks` and `_warrant`, `_clears_gate` still the one home; the `[IR]`
 line's `warrant=[...]` and `[meta-proj] projection=built warrant=...`; TODO-123's docstring), 0555af7 (tests:
 tests/test_g_build.py, 21; three expectations of tests/test_td15_build.py re-derived from AD1, CLEARS to
-LEADER_UNWARRANTED, the fixture being prior off), cbe3f00 (the IR test-bed's oracle extended by derivation: the warrant
+LEADER_UNWARRANTED, the fixture being prior off), cbe3f00 (the IRB's oracle extended by derivation: the warrant
 per hypothesis and the gate's outcome per tick), 5afa7f9 (the four maintained sets, a "G-build" section each).
 
 **T-D G: admission (ruled by Hadi, 29 September 2026)** — RECORD [T-D/15], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
-Verified. The suite 191 passed. The IR test-bed: 0 disagreements in all seventeen scenarios (scenario_s08_01 to _04,
+Verified. The suite 191 passed. The IRB: 0 disagreements in all seventeen scenarios (scenario_s08_01 to _04,
 scenario_s09_01 to _13), the warrant and the gate compared exactly; every expected.csv, actual.csv and actual_log.csv
 equals the committed one once the two new columns are removed (the belief and the adequacy unchanged). The maintained
 sets: the `.rec` streams byte-identical in all 48; prior on, every `[IR*]` line byte-identical to 2.5 once the `[IR]`
@@ -897,7 +897,7 @@ made on the records plan (29 September 2026) are written into the rulings below.
 Purpose. To test the recognition-to-planning chain (the recognizer, the gate, the projection, the meta-planner) with a
 working robot, one authored scenario per decision. The oracle (the instrument's own derivation of the expected
 decision from the records) states the expected decision before the run; a disagreement is classified, never fitted. The
-IR test-bed (track 1, TB) tested the recognizer with an idle robot; this instrument tests the decisions the
+IRB (track 1) tested the recognizer with an idle robot; this instrument tests the decisions the
 contribution claims. It is the last instrument before the evaluation and the demonstration.
 
 - MPB-1, the oracle's expected decision.
@@ -930,7 +930,7 @@ contribution claims. It is the last instrument before the evaluation and the dem
   `Projector.project_fallback`), `shared/recognizer.py` or `shared/likelihood_functions.py`, nor
   `RobotAgent._perceive` (`mesa_sim/sim_agents.py`). It derives P4's perception facts (the run length and the standing
   count, the same direction within 1e-9) and the fallback's tail itself. It may use the planner's decomposition as the
-  IR test-bed does (task and hypothesis definitions, not cost, realization or selection logic).
+  IRB does (task and hypothesis definitions, not cost, realization or selection logic).
   Why. An oracle that reconstructs part 4 is a second planner, and a disagreement between two planners says nothing
   about which is wrong. The chain is assembled at the compare step because the record it reads is set at the robot's
   decisions too.
@@ -977,7 +977,7 @@ contribution claims. It is the last instrument before the evaluation and the dem
   timing: a timing accident is a class-4 re-authoring of the same case (MPB-4). A placement or setup change is
   acceptable only if it alters no already-verified scenario on that setup; otherwise a new setup. The output floor
   couples every scenario on a setup: the setup's robot items inadmissible for the human sit at the floor and lower the
-  leader's confidence, which moved scenario_s10_08's crossing from the IR test-bed's 46 to 47. A spatial or structural
+  leader's confidence, which moved scenario_s10_08's crossing from the IRB's 46 to 47. A spatial or structural
   requirement (a relation between a robot route and a human station; the absence of a hypothesis) may need a new
   layout. First instance: scenario_s11_02's shelf_2 case (part (iv); analysis/mpb/authoring.md): item_12 on shelf_2
   put the exit walk within 2.3 cm of its shelf and admitted the delivery at 97, class 4 found before any run; moved to
@@ -1012,14 +1012,14 @@ contribution claims. It is the last instrument before the evaluation and the dem
 
 - MPB-4, verification and disagreements.
   Ruling. A scenario is verified when parts 1 to 3 show zero disagreements at exact equality on every tick, prior on,
-  and every declared part-4 property holds (prior off: MPB-6). Outputs as in the IR test-bed: the expectation written
+  and every declared part-4 property holds (prior off: MPB-6). Outputs as in the IRB: the expectation written
   before the run, the in-process and the log-derived actuals, the comparison with a classified diff.md, a figure, a
   summary, a REPORT with numbers and md5s.
-  The oracle's own check: the single-rule alteration test of the IR test-bed (one rule of the derivation altered in a
+  The oracle's own check: the single-rule alteration test of the IRB (one rule of the derivation altered in a
   scratch copy; the comparison must detect it). The derivations new to the MPB oracle are the expiry cadence and the
-  projection identity; on the gate with warrant, derived by the IR test-bed since G-build (its rule 23), only the
+  projection identity; on the gate with warrant, derived by the IRB since G-build (its rule 23), only the
   alteration test is new. An undetected alteration is recorded as a property of the test set with its reason, as the
-  IR test-bed did (E8's member clause), unless it is an oracle defect.
+  IRB did (E8's member clause), unless it is an oracle defect.
   Disagreement classes: (1) the oracle misread the records: fix the oracle; (2) the framework disagrees with the
   records: a defect, reported with the entry and the ticks, a ruling before any code, never a local fix; (3) the
   records do not determine the value: a design gap, a question to the design chat, never a choice made in the
@@ -1063,7 +1063,7 @@ contribution claims. It is the last instrument before the evaluation and the dem
   authored for it; a decision inside the observation-offset gap against a fallback stand, if one occurs in scenario 6
   or 7, is classified and recorded. TODO-137 and TODO-141: evaluation items, not built here.
   TODO-138, ruled for MPB runs. The comparison horizon is the first observed completion point (the human's script has
-  ended and the robot's pool is empty) plus the idle margin the IR test-bed derives from E5 (30 ticks, covering E5's
+  ended and the robot's pool is empty) plus the idle margin the IRB derives from E5 (30 ticks, covering E5's
   standing threshold at α = 0.01, 25 ticks). A derived plain-cost horizon (the robot's pool chained along its authored
   order from the robot's start, plus the human's replay length, plus the margin) is a safety cap for the run, not a
   behavioural timeout: a run that does not complete within it is classified (class 2 or 4), never given a longer cap.
@@ -1094,7 +1094,7 @@ retraction as L2 (ii) rules it, the recognizer, the run loop).
 
 Reference: cchat, 29 September 2026 (MPB); `docs/handoffs/handoff_G_X_onward.md` §6; "T-D X" (X1, X5); "T-D G" (AD1
 to AD4); "T-D P" (P4, Q6, P3, the observation-offset gap); "T-D L" (L1, L2 (ii), L4, L5 B); "T-D R and E" (E5, E6,
-E8); "The IR test-bed" and its close-out; `analysis/ir_testbed/README.md` (rule 23, the run length) and `REPORT.md`
+E8); "The intention-recognition test-bed (IRB)" and its close-out; `analysis/irb/README.md` (rule 23, the run length) and `REPORT.md`
 (the alteration test, the disagreement classes); "Layouts, setups and scenarios: the three artefacts of a run"
 (ruling 4 as amended); D2; D3; F1; `docs/assumptions.md` 1.3, 1.4, 2.2 to 2.6, 3.3, 4.2, 4.6 and the case
 classification; TODO-33, TODO-130, TODO-132, TODO-134, TODO-137, TODO-138, TODO-141
@@ -1139,7 +1139,7 @@ declared part-4 property holds under single_task. The expected per-tick tables a
   each).
 - scenario_s10_08: replaced at 33 (the return's place, a boundary; coffee_break leads on the prior's tie order, so the
   human's change from delivery 1 to delivery 2 passes through the coffee hypothesis in the recognizer's chain);
-  entered at 47 (commitment and observation; the IR test-bed's 46 moved by this setup's output floor); no retraction.
+  entered at 47 (commitment and observation; the IRB's 46 moved by this setup's output floor); no retraction.
 - scenario_s10_09: retraction at 60; no re-admission of the misdelivered item; X5's ground (1) measured, the finding
   unexplained from 60 to 72 and outliving a refused re-decision from 61.
 
@@ -1235,7 +1235,7 @@ path is verified, unreachable with a recorded derivation, or outside the claimed
 distinct path (analysis/mpb/coverage.md). The NOT CLOSED paragraph above is superseded.
 WHAT THE MPB ESTABLISHES. The MPB establishes structural branch reachability and execution of the recognition-to-planning
 chain, not consequential activation of those branches under human-robot interaction conflict. The progression: track 1,
-recognition (the IR test-bed); track 2, semantics (T-D R, E, L, P, G, X); track 3, reachability (this test-bed); track
+recognition (the IRB); track 2, semantics (T-D R, E, L, P, G, X); track 3, reachability (this test-bed); track
 3b, consequence under conflict (TODO-145); T-F, benefit (TODO-144).
 FINAL NUMBERS (after the class-2 correction; analysis/mpb/REPORT.md): sixteen scenarios (scenario_s10_01 to _11,
 scenario_s11_01 to _03, scenario_s12_01, _02) on env_layout_12, _13 and _14 with env_setup_10, _11 and _12; zero
@@ -1339,7 +1339,7 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
   which gives two scans possible at once and the robot arriving at an occupied bay; it differs clearly from the coffee
   break. "T-G: the second domain's rulings", T-G Q16's block (RULED, T-G records 8).
   CORRECTED (records, 2 October 2026; T-G records 9): one tick is 2 seconds (PT60S is 30 ticks), so office_break's wait is
-  45 ticks, and the human's absence is about 110 ticks (in the IR test-bed's C6 on env_layout_02, from leaving the dry
+  45 ticks, and the human's absence is about 110 ticks (in the IRB's C6 on env_layout_02, from leaving the dry
   bay at 30 to the arrival at the frozen bay at 141), a little more than one round trip of the robot (about 96 ticks,
   B14's note). Whether the absence is long enough for pallets to accumulate in a bay is reviewed with the MPB's design.
   REVIEWED (Hadi, 2 October 2026; T-G records 10; THE MPB ON DOCK_LOADING, MPB-DL5): office_break stays at 90 seconds
@@ -1358,7 +1358,7 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
 - B9, Q9a (S2): a container is one point, the centre of the container, with no constraint, and it may hold several
   pallets (as kitting's table does). Not taken: authored pallet places; a position chosen when the pallet is put down
   (FW on LIMIT-04, A10). Pallets drawn on top of each other are a drawing matter for T-V.
-  NOTE (records, 2 October 2026; T-G records 9; the IR test-bed on dock_loading), a property of "one point per
+  NOTE (records, 2 October 2026; T-G records 9; the IRB on dock_loading), a property of "one point per
   container", not a ruling: two pallets in one container stand on one point, so the second scan has no walk (its
   move_to is acknowledged at once: C3, three stretches of 3 ticks that never reach the threshold), and no walk between
   the two exists that an event could cut (the set's M3 as written was not buildable; Hadi approved scan 2 in its
@@ -1447,11 +1447,11 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
     (-400, -230).
   One container for empty pallets per room. The three areas (truck side, hall, office) are declared in each layout,
   written under the name the code has today (zones); stage 1's rename step converts them.
-  Agents. The human starts at the standby place. IR test-bed: the robot stands idle on the gate's centre point (0, -300)
+  Agents. The human starts at the standby place. IRB: the robot stands idle on the gate's centre point (0, -300)
   for the whole run. MPB: the robot starts on the truck side. Stage 1 keeps full observation: the robot observes every
   area, the office included, wherever it stands. A8's rule on monitored areas is reopened at stage 2 (A8's note).
   Setups, two kinds per room (six files):
-  - Kind 1, for the IR test-bed: two full unscanned pallets in the dry delivery bay and two in the frozen delivery bay,
+  - Kind 1, for the IRB: two full unscanned pallets in the dry delivery bay and two in the frozen delivery bay,
     each designated to the bay it stands in; one full pallet in the truck, designated to the dry delivery bay; no empty
     pallets. Reason: one setup serves three cases by the scans a scenario assigns (one scan per bay; two scans in one
     bay, the same-motion case; the scan of the pallet in the truck, which never becomes applicable, so the human goes to
@@ -1467,7 +1467,7 @@ PART B. DOCK_LOADING RULINGS (the domain only; nothing here enters `shared/` or 
     are not ruled.
     READS (Hadi, 2 October 2026; T-G records 11; THE MPB ON DOCK_LOADING, DISPOSITIONS, D7): "a third kind" reads "kind 4"
     ("one bay"). Kind 3, "pallets in the bays", is MPB-DL2's (two full pallets in each delivery bay, as amended).
-  Staging: a milestone in stage 1's build, before the IR test-bed: one simple scenario per room runs from start to end.
+  Staging: a milestone in stage 1's build, before the IRB: one simple scenario per room runs from start to end.
   Stage 1's "before the plan" points on the layout and the setup (C1's "before each stage's plan the design chat and
   Hadi agree the layout and the setup") are closed by this entry for stage 1.
   ANSWERS (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6):
@@ -1493,7 +1493,7 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
 - C1, the stages of T-G (all in V1). Before each stage's plan the design chat and Hadi agree the layout and the setup for
   that stage.
   - Stage 1, the basic domain: the robot delivers and returns (B11); the human scans, takes the two breaks, steps aside to
-    the standby place; the gate is declared open; the office door has no state yet. The IR test-bed, then the MPB.
+    the standby place; the gate is declared open; the office door has no state yet. The IRB, then the MPB.
   - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
     run, TODO-16 with the stepwise delivery (A7).
   - After stage 2: track 4 (A8).
@@ -1551,15 +1551,15 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
       (PROPOSALS);
       SUPERSEDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): stage 1 builds B14's three rooms and six setups; B10's room is stage 2's; the proposal is
       closed as not taken;
-    - the IR test-bed on dock_loading, then the MPB.
-    - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): before the IR test-bed, a milestone: one simple scenario per room of B14 runs from start to end;
+    - the IRB on dock_loading, then the MPB.
+    - ADDED (Hadi and the design chat, 1 October 2026; recorded in T-G records 5): before the IRB, a milestone: one simple scenario per room of B14 runs from start to end;
 
 **T-G: the second domain's rulings (ruled by Hadi, 30 September and 1 October 2026)** — RECORD [T-G/5], moved verbatim from docs/design_decisions.md (2 October 2026); the conceptual part stays there under this title.
     A3, A4, A5 and A9 each change code outside the domain, and each carries its acceptance check on kitting: the
     maintained sets stay byte-identical.
     BUILT (1 October 2026): the rename, A9 with R2, A4, A5 and A3 (stage 1, steps 1 to 5). "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
     BUILT (1 October 2026): dock_loading's catch-up, its content and the milestone (stage 1, steps 6 to 8; the
-    milestone's acceptance held in all three rooms). ADDED (Hadi, 1 October 2026): before the IR test-bed, a second
+    milestone's acceptance held in all three rooms). ADDED (Hadi, 1 October 2026): before the IRB, a second
     simple scenario per room, then the sorting of the earlier analyses and tests under kitting with the preparation of
     the instruments. "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT.
   - Stage 2:
@@ -1655,7 +1655,7 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     unexplained, admission refuses and the robot realizes against the fallback projection, as for kitting's exit walk.
     An empty live set is not reached with the prior on while the human is in an area; otherwise exhausted, below theta,
     the fallback;
-  - for the IR test-bed on dock_loading the robot is idle, so its setup places the pallets in their delivery containers
+  - for the IRB on dock_loading the robot is idle, so its setup places the pallets in their delivery containers
     from the start.
   - ADDED (Hadi, 1 October 2026, on the B14 build's flags; recorded in T-G records 6): the rule for a point on the boundary of two areas, which today is decided by the order of
     declaration (`SimModel.get_zone_of_position`: inclusive bounds, the first declared zone wins); and, since an agent
@@ -1676,13 +1676,13 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     definition shared with the environment's state construction; the plan names the shared representation, every
     consumer of a computed state that decomposes a later task, and the form.
 - C5, to watch in the test-beds: hypotheses that predict the same motion divide the belief, so none passes the admission
-  threshold (two unscanned pallets in one container). If the IR test-bed confirms it on dock_loading, it is a finding
+  threshold (two unscanned pallets in one container). If the IRB confirms it on dock_loading, it is a finding
   about the mind and returns to the design chat within V1.
-  CONFIRMED (the IR test-bed on dock_loading, 1 to 2 October 2026; records 2 October 2026, T-G records 9): in C3 and on
+  CONFIRMED (the IRB on dock_loading, 1 to 2 October 2026; records 2 October 2026, T-G records 9): in C3 and on
   C4's first two walks, in all three rooms, two scans of one bay share the belief and neither reaches the threshold (9
   stretches; none admitted). A finding about the mind, NOT RULED; it returns to the design chat. Linked to the recorded
   direction on acting on a set of hypotheses with the same projection: belief-aware planning, the covering set S_ε and
-  one realization against its projections jointly (TODO-97). "T-G", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT.
+  one realization against its projections jointly (TODO-97). "T-G", STAGE 1, THE IRB ON DOCK_LOADING BUILT.
 - C6, open at their stage: the design of check-in and check-out; the design of TODO-16; how the MPB's oracle derives an
   expected decision when the human's sequence depends on the robot's decisions.
   ANSWERED FOR STAGE 1 (Hadi, 2 October 2026; T-G records 10): the third clause, by THE MPB ON DOCK_LOADING, MPB-DL3.
@@ -1753,9 +1753,9 @@ Notes (not rulings):
 - The walk to the standby place has no hypothesis in the robot's task model, so a scenario with a standby entry is
   classed as containing unmodelled behaviour, and its purpose says so (`docs/assumptions.md` 1.2). PARKED for after the
   milestone, not ruled: whether the robot's mind holds a hypothesis for the human stepping aside.
-- In the IR test-bed setup (B14, kind 1) the case with the assigned scan of the pallet in the truck is declared
+- In the IRB setup (B14, kind 1) the case with the assigned scan of the pallet in the truck is declared
   dependent on the robot; its priority list never finishes, so that run has no walk to the desk (B13, assumptions 1.1).
-- REQUIREMENT on the later preparation of the IR test-bed and the MPB on dock_loading: the instruments obtain the human's
+- REQUIREMENT on the later preparation of the IRB and the MPB on dock_loading: the instruments obtain the human's
   run-time sequence from the executor's own selection rule; they do not implement that rule a second time. Reason: one
   definition. (Under R1 the load-time replay no longer gives that sequence for a script with a standby entry.)
 - Finding: a robot task with no applicable method stops the run (C4, TODO-152).
@@ -1852,12 +1852,12 @@ follows kitting's building blocks and rules; no special case for dock_loading ex
 - One dictionary is shared by eight methods: a maintainability risk with no behavioural effect.
 - A design question for stage 2, to rule before `store_pallet`: a route is selected from the areas of the agent and of
   the object, not from the kind of task and the pallet's state (TODO-156).
-A STEP ADDED (Hadi, 1 October 2026), before the IR test-bed and the MPB run on dock_loading: the earlier analyses in
+A STEP ADDED (Hadi, 1 October 2026), before the IRB and the MPB run on dock_loading: the earlier analyses in
 `analysis/` and the tests are sorted under kitting, so that nothing of kitting is mixed with dock_loading's. The
 instruments' code is shared; their run sets, expectations and reports are per domain. Its own commit, no change of
 behaviour; the maintained sets and the reference set byte-identical; every path named in a record or a README updated.
 Next: the second simple scenario per room; then the step added above, with the preparation of the instruments (the
-plan's section 7, "After the milestone"); then the IR test-bed scenarios, agreed with Hadi before they are authored.
+plan's section 7, "After the milestone"); then the IRB scenarios, agreed with Hadi before they are authored.
 STAGE 1, THE SECOND MILESTONE SCENARIO BUILT (1 October 2026; built and accepted, records 1 October 2026).
 - Built: scenario_s03_03 (env_layout_02, env_setup_03), scenario_s05_03 (env_layout_03, env_setup_05), scenario_s07_03
   (env_layout_04, env_setup_07), one per room on the MPB setups, identical in content: the robot is assigned
@@ -1897,7 +1897,7 @@ classification):
   env_layout_04 at 94, office_break; the sixth, env_layout_04 166 to 182, never clears theta). The finding turns
   unexplained once the human stands, and the gate refuses with `none(leader_inadequate)`. No consequence on a decision
   in these runs. The parked question TODO-155: the walk follows almost every scan in this domain, so the case is
-  frequent. It becomes the first design question before the IR test-bed set. NOT RULED.
+  frequent. It becomes the first design question before the IRB set. NOT RULED.
 - At the end of every run the human walks up to the standing robot: 8.69 cm (env_layout_02, at 320), 13.41 cm
   (env_layout_03, at 301), 8.11 cm (env_layout_04, at 299); 9 / 8 / 8 ticks below the minimum separation with a
   standing robot, 0 with a moving robot in all three. The robot's last task is a delivery, and a robot with an empty
@@ -1917,19 +1917,19 @@ classification):
   geometry.
 - The last scan is never admitted (env_layout_02 pallet_2, env_layout_03 and env_layout_04 pallet_1), because an empty
   pool gives no further decision. Noted, no action.
-Next: the design of the IR test-bed set with Hadi (first question: TODO-155); then the sorting of the earlier analyses
+Next: the design of the IRB set with Hadi (first question: TODO-155); then the sorting of the earlier analyses
 and tests under kitting, with the preparation of the instruments (the step added above); then the set's authoring and
 its runs.
 RULED (Hadi, 1 October 2026; recorded in T-G records 8, 1 October 2026): T-G Q16, the duration of office_break, and the
-IR test-bed set on dock_loading. Records only; nothing in this block is built.
+IRB set on dock_loading. Records only; nothing in this block is built.
 - Q16, the walk to the standby place in the robot's mind (TODO-155).
-  The walk stays without a hypothesis for now. The IR test-bed set observes how the present recognizer explains it; that
+  The walk stays without a hypothesis for now. The IRB set observes how the present recognizer explains it; that
   is the baseline.
   Two candidates are recorded on TODO-155, neither approved for building:
   - H1: a foreseeable task "the human steps aside to the standby place", always possible, with the standby place as a
     fixed object.
   - H2: a hypothesis that is live only while no assigned task of the human is applicable.
-    CORRECTED (Hadi, at the approval of the IR test-bed's build, 1 October 2026; recorded 2 October 2026, T-G records
+    CORRECTED (Hadi, at the approval of the IRB's build, 1 October 2026; recorded 2 October 2026, T-G records
     9): worded "a hypothesis that is live only while no assigned task of the human is live". Reason: a scanned pallet's
     scan stays applicable (its guards do not read is_scanned), so read as "applicable" H2 would never be live after a
     scan.
@@ -1952,7 +1952,7 @@ IR test-bed set on dock_loading. Records only; nothing in this block is built.
   Reason: a long absence lets pallets accumulate in a bay, which gives two scans possible at once and the robot arriving
   at an occupied bay; it differs clearly from the coffee break. The change of the value is made in the next build step.
   B6's note.
-- The IR test-bed set for dock_loading, agreed: 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to M4), each in all
+- The IRB set for dock_loading, agreed: 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to M4), each in all
   three rooms (env_layout_02, env_layout_03, env_layout_04), on the room's IR setup (kind 1 of B14: env_setup_02,
   env_setup_04, env_setup_06; pallet_0 and pallet_1 in the dry bay, pallet_2 and pallet_3 in the frozen bay, pallet_4 in
   the truck), the robot idle on the gate's centre, the human starting at the standby place, the closing part the walk to
@@ -1981,7 +1981,7 @@ IR test-bed set on dock_loading. Records only; nothing in this block is built.
   Rules of the set:
   - The controlled scenarios run and are read first; a mixed scenario is read only against what the controlled ones have
     shown.
-  - Expectations are derived from the records before the runs (as in "The IR test-bed").
+  - Expectations are derived from the records before the runs (as in "The intention-recognition test-bed (IRB)").
   - Nothing is adjusted to a result; findings are classified (`docs/assumptions.md`).
   - The standby walks (C13, C14, M4) are diagnostic observations. Beside the expectation under the present model, the
     predictions under H1 and under H2 (Q16) are written down before the run. Only the present model's expectation is
@@ -1994,12 +1994,12 @@ Next: the build step that sorts the earlier analyses and tests under kitting and
 (the step added above, with the plan's section 7, "After the milestone"); then the authoring of the set, its
 expectations and its runs.
 
-STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED (1 to 2 October 2026; accepted by Hadi, 2 October
+STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED (1 to 2 October 2026; accepted by Hadi, 2 October
 2026; records 2 October 2026, T-G records 9). The results are recorded here because the design chat cannot read
-analysis/; the report is analysis/dock_loading/ir_testbed/REPORT.md.
+analysis/; the report is analysis/dock_loading/irb/REPORT.md.
 BUILT, with the commits and the acceptance of each part:
 - The sort of kitting's analyses and tests (746fae6, 9a35af1, ae77689): analysis/kitting/ (every earlier analysis,
-  the four maintained sets, kitting's IR test-bed and MPB sets), analysis/instruments/ (the shared code;
+  the four maintained sets, kitting's IRB and MPB sets), analysis/instruments/ (the shared code;
   run.sh <domain>), analysis/dock_loading/; the run files under configs/kitting/; the tests under tests/kitting/,
   tests/dock_loading/, tests/instruments/ (three two-domain tests stay at tests/). The path table:
   docs/rename_table.md, "Paths: the sort"; dated entries, frozen reports, descriptions and comments keep the old paths.
@@ -2025,7 +2025,7 @@ BUILT, with the commits and the acceptance of each part:
 - The 54 scenarios (51e5e1c): scenario_s02_02 to _19 (env_layout_02, env_setup_02), s04_02 to _19 (env_layout_03,
   env_setup_04), s06_02 to _19 (env_layout_04, env_setup_06), in domains/dock_loading/scenarios/scenarios_s02.py,
   _s04.py, _s06.py; _02 to _15 the controlled rows C1 to C14, _16 to _19 the mixed M1 to M4; run files in
-  configs/dock_loading/ir_testbed/. Authoring values approved by Hadi: a cut or a drop during a walk at PT28S; the
+  configs/dock_loading/irb/. Authoring values approved by Hadi: a cut or a drop during a walk at PT28S; the
   stand at the bay just scanned, stand(PT80S); M3 with scan 2 in place of scan 1; C13, C14, M4 dependent on the robot.
   Acceptance: 137 scenarios load; the three dependent scripts report the entries not replayed.
 - The expectations committed before the runs (54edb71): per scenario the trajectory, expected.csv and phases.json (θ =
@@ -2079,7 +2079,7 @@ FINDINGS (classified as findings about the mind; none ruled):
 CORRECTIONS of earlier notes: one tick is 2 seconds (B6's note: office_break's wait 45 ticks, the absence about 110
 ticks, reviewed with the MPB's design); H2 worded "no assigned task is live" (Q16's block); the always-possible standby
 task as a walk only would make every arrival an episode boundary (Q16's block).
-The IR test-bed of stage 1 is CLOSED. Next: the design of the MPB set with Hadi. Open for it: a setup with pallets
+The IRB of stage 1 is CLOSED. Next: the design of the MPB set with Hadi. Open for it: a setup with pallets
 already in a bay while the robot delivers others; the robot's last task as a return (the PROPOSAL of the second
 milestone's findings); how expected decisions are derived when the human's sequence depends on the robot's decisions
 (C6).
@@ -2161,9 +2161,8 @@ test-bed (MPB)".
   `single_task` is primary and `full_reorder` is the second run, as kitting's MPB rules (MPB-6).
   The set runs in two rooms, env_layout_03 and env_layout_04.
   env_layout_02 is excluded as a reduction of scope, not because it is irrelevant. Its condition of late admission (the
-  coffee machine lies in the direction of the walk from the dry bay to the frozen bay; median delay 28 ticks in the IR
-  test-bed) remains untested by the MPB.
-  Reason for the two rooms: env_layout_03 has frequent admissions and env_layout_04 rare ones (in the IR test-bed's
+  coffee machine lies in the direction of the walk from the dry bay to the frozen bay; median delay 28 ticks in the IRB) remains untested by the MPB.
+  Reason for the two rooms: env_layout_03 has frequent admissions and env_layout_04 rare ones (in the IRB's
   baseline, 40 and 20 of 49 stretches reach the threshold), so they give decisions on an admitted projection and on the
   fallback projection.
   Planned size: about 8 controlled and 4 mixed scenarios, 48 runs (two rooms, two strategies). The set is agreed with
@@ -2198,7 +2197,7 @@ numbers; each is recorded where it applies:
 - D10, the glossary: controlled scenario, mixed scenario, setup kind, disjointness rule, declared property, each
   defined from its use in the records (`docs/glossary.md` §9).
 THE SET (agreed by Hadi, 2 October 2026; recorded in T-G records 11). Records only; nothing is authored or run. 9
-controlled scenarios (K1 to K9) and 4 mixed (M1 to M4; this set's, distinct from the IR test-bed's M1 to M4 above),
+controlled scenarios (K1 to K9) and 4 mixed (M1 to M4; this set's, distinct from the IRB's M1 to M4 above),
 each in env_layout_03 and env_layout_04, prior on, `single_task` primary and `full_reorder` second: 52 runs.
 Common to all: the human starts at the standby place and closes at the desk (B13); the robot starts on the truck side.
 On kind 3, pallet_0 and pallet_1 stand in the dry bay and pallet_2 and pallet_3 in the frozen bay. "scan n" is
@@ -2261,11 +2260,11 @@ is authored or run.
   admission, it shows a decision on the fallback projection.
 - K5, AMENDED: the clause "scan 1 is admitted alone after scan 0" is withdrawn. K5 tests the refusing gate and the
   fallback projection.
-  Reason: the second scan has no walk and never reaches the threshold in the IR test-bed.
+  Reason: the second scan has no walk and never reaches the threshold in the IRB.
 - K8, AMENDED: the cut comes after the tick at which the oracle expects scan 0's admission, derived before the run. The
   retraction forms on env_layout_03 only.
 - K9, AMENDED: the human's scan is scan 2 (pallet_2, the frozen bay); the robot's pool is deliver-dry and return-1.
-  Reason: the IR test-bed admitted the walk from the frozen bay to the standby place as a break in every room.
+  Reason: the IRB admitted the walk from the frozen bay to the standby place as a break in every room.
 - K1, AMENDED: the control requires that the human works away from every robot route. The build's plan selects, per
   room, the scan and the robot's pool that satisfy this and shows the derivation. If no pairing exists on
   env_layout_04, K1 runs on env_layout_03 only, and the record says so.
@@ -2280,7 +2279,7 @@ sections a to i: the setups env_setup_08 and env_setup_09 of kind 3; the scenari
 scenario_s09_01 to _10 (K1 to K9, M3), scenario_s05_04 to _06 and scenario_s07_04 to _06 (M1, M2, M4); the authored
 durations; the instrument's generalisation; the order of the build) with the dispositions below on its open points.
 - DL-P1, K8's cut, by a rule: the cut falls on the last step of the walk to the pallet, in both rooms. The cause is
-  whatever the oracle derives on kind 3; it is not inferred from the IR test-bed's rows on kind 1.
+  whatever the oracle derives on kind 3; it is not inferred from the IRB's rows on kind 1.
   Reason: it is the latest change that is still a change during the walk, so scan 0 has received all the walking
   evidence it can receive.
   Procedure, before any controlled run: K8's per-tick table is reported for both rooms, from scan 0's expected
@@ -2353,8 +2352,8 @@ domain; the deeper analysis needs stage 2's room and tasks.
   the shared engine, kitting's table reproduced exactly.
 - The regression audit: byte-identical. Kitting's MPB (the sixteen, both strategies and prior off, after
   the generalisation; every committed output and md5; the alteration table), the reference set of stage 1 (the four
-  maintained sweeps, the ten drop scenarios, kitting's IR test-bed and MPB; the stdout files differ in the run-file
-  paths only, as since the sort), dock_loading's IR test-bed (54 runs, every output and md5); the suite 301 passed;
+  maintained sweeps, the ten drop scenarios, kitting's IRB and MPB; the stdout files differ in the run-file
+  paths only, as since the sort), dock_loading's IRB (54 runs, every output and md5); the suite 301 passed;
   every registered scenario of both domains loads (163).
 CAVEAT (Hadi, 3 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM3's C1; TODO-66). The results of the run files that last 500 steps or more,
 and of the milestone runs, are potentially confounded by an undeclared weight: the present hardcoded context weight
@@ -2369,8 +2368,8 @@ the step count serves as the clock. They are not declared invalid. Identified by
   scenario_s03_03, scenario_s05_03, scenario_s07_03 (1000 steps), on env_layout_02, env_layout_03, env_layout_04.
 One effect is demonstrated, as one case: in scenario_s03_03 (env_layout_02) the hypothesis with the highest belief
 changes from office_break (0.602) to coffee_break (0.601) at step 500 with no new observation.
-Not affected: kitting's maintained sets (they end by step 449) and every run of the IR test-bed (kitting's and
-dock_loading's run files end by step 331), so the recognition figures of the IR test-bed stand.
+Not affected: kitting's maintained sets (they end by step 449) and every run of the IRB (kitting's and
+dock_loading's run files end by step 331), so the recognition figures of the IRB stand.
 T-G STAGE 1 CLOSED (Hadi, 2 October 2026; recorded in T-G records 15).
 - Its purpose was an initial check that the recognizer and the recognition-to-planning chain run on dock_loading.
 - Result: the 52 MPB runs completed; zero disagreements wherever full expectations exist; the regression audit
@@ -2423,19 +2422,19 @@ SUPERSEDED (records, 1 October 2026): steps 0 to 5 of stage 1 are built and acce
 above). Next: the domain steps, step 6 (the catch-up) and step 7 (the content), then the milestone (step 8).
 SUPERSEDED (records, 1 October 2026): steps 6 to 8 of stage 1 are built and the milestone accepted (STAGE 1, STEPS 6
 TO 8 BUILT above). Next: the second simple scenario per room; then the sorting of the earlier analyses and tests under
-kitting, with the preparation of the instruments; then the IR test-bed scenarios, agreed with Hadi before they are
+kitting, with the preparation of the instruments; then the IRB scenarios, agreed with Hadi before they are
 authored.
 SUPERSEDED (records, 1 October 2026): the second milestone scenario is built and accepted, and stage 1's milestone is
-complete (STAGE 1, THE SECOND MILESTONE SCENARIO BUILT above). Next: the design of the IR test-bed set with Hadi (first
+complete (STAGE 1, THE SECOND MILESTONE SCENARIO BUILT above). Next: the design of the IRB set with Hadi (first
 question: TODO-155); then the sorting of the earlier analyses and tests under kitting, with the preparation of the
 instruments; then the set's authoring and its runs.
 SUPERSEDED (Hadi, 1 October 2026; recorded in T-G records 8): TODO-155 is ruled for now (T-G Q16: the walk stays without
-a hypothesis) and the IR test-bed set on dock_loading is agreed (T-G Q16's block above, RULED). Next: the build step that
+a hypothesis) and the IRB set on dock_loading is agreed (T-G Q16's block above, RULED). Next: the build step that
 sorts the earlier analyses and tests under kitting and prepares the instruments for dock_loading; then the authoring of
 the set, its expectations and its runs.
 SUPERSEDED (records, 2 October 2026; T-G records 9): the sort, the instruments' preparation, office_break at 90 seconds,
-the 54 scenarios, their expectations and the 54 runs are built and accepted, and the IR test-bed of stage 1 is closed
-(STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED above). Next: the design of the MPB set with Hadi.
+the 54 scenarios, their expectations and the 54 runs are built and accepted, and the IRB of stage 1 is closed
+(STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED above). Next: the design of the MPB set with Hadi.
 SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 10): the design of the MPB on dock_loading is ruled (THE MPB ON
 DOCK_LOADING above, MPB-DL1 to MPB-DL6). Its three open points are answered: the setup with pallets already in the bays
 (MPB-DL2); the robot's last task as a return, not taken (MPB-DL4); expected decisions when the human's sequence depends

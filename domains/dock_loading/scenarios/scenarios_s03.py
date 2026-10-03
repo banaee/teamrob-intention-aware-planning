@@ -10,14 +10,14 @@ from domains.dock_loading.script import confirm_delivered_pallet, deliver_pallet
 
 
 # A viewing fixture: the scene loads and initialises; not a baseline, not an
-# IR test-bed or MPB case.
+# IRB or MPB case.
 scenario_s03_01 = ScenarioConfig(
     id="scenario_s03_01",
     setup="env_setup_03",
     reference_layouts=["env_layout_02"],
     description=(
         "A viewing fixture (T-G stage 1, B14), written so that the scene loads and initialises; not a baseline, "
-        "not an IR test-bed or MPB case. Setup kind 2, the MPB's: the robot on the truck side; the human at the standby place. The human has "
+        "not an IRB or MPB case. Setup kind 2, the MPB's: the robot on the truck side; the human at the standby place. The human has "
         "no script and no assigned task, the robot no assigned task."
     ),
     agents=[

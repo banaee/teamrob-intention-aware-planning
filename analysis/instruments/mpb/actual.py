@@ -10,7 +10,7 @@ capture the public outputs of evaluate_triggers (the TriggerDecision, and the wo
 perception facts the fallback reads), update_human_projection (the ProjectedPlan it returns) and update (the
 UpdateResult); each calls the original and returns its result unchanged. After every tick: the robot's BeliefState
 (leader, boundary flag, hypothesis adequacy, observation warrant), the gate's outcome from its one home (_clears_gate,
-as the IR test-bed's actual.py reads it), the decision record (_projected_hypothesis), and both agents' positions. The
+as the IRB's actual.py reads it), the decision record (_projected_hypothesis), and both agents' positions. The
 model's log lines are asserted identical to the logged run's (the lines run_mesa.py itself adds removed: the per-agent
 step lines, [sep], [run_mesa]): the recorders changed nothing, and the in-process run is the logged run.
 
@@ -46,7 +46,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "mesa_sim"), str(Path(__file__).resolve().
 import yaml
 from mpblib import Action, Admitted, Cause, Decision, Fallback, Gate, Mode, Trigger, dump
 
-MARGIN = 30          # MPB-5: the IR test-bed's idle margin
+MARGIN = 30          # MPB-5: the IRB's idle margin
 RUN_MESA_LINES = ("  step:", "[sep]", "[run_mesa]")
 
 

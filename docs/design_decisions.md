@@ -3927,7 +3927,7 @@ E, ruled.
   stationary phase, or in any phase with s_exp > 0 (then D ≤ 0, S_k = 1); or the completion of its expected action on
   this tick (E8, S_k = 1) — and the tick is not a boundary tick.
 - E7. The finding has no memory beyond each live hypothesis's current phase; it clears when every live hypothesis advances its phase or an episode boundary moves every origin. Retraction and resumption are L.
-  SUPERSEDED IN PART (wording; TB.1r, Hadi, 27 September 2026): "it clears when every live hypothesis advances its
+  SUPERSEDED IN PART (wording; IRB.1r, Hadi, 27 September 2026): "it clears when every live hypothesis advances its
   phase or an episode boundary moves every origin" was loose. The mechanism, as recorded in
   `docs/recognizer_handback.md` §1.10, is per-tick recomputation: the finding has no memory beyond each live
   hypothesis's current phase; it is recomputed every tick; one member with S_k ≥ α makes it adequate; a boundary
@@ -3986,7 +3986,7 @@ TODO-97, TODO-113; TODO-87 (1.4 finding 5, L)
 
 ---
 
-**The cognitive loop does not end with the task pool (TB, ruled by Hadi, 27 September 2026)**
+**The cognitive loop does not end with the task pool (IRB, ruled by Hadi, 27 September 2026)**
 
 Problem, as found in the repo. With an empty task pool, `no_current_task` fires at tick 0, `update()` returns its
 terminal result (correct, unchanged), and `RobotAgent` sets `finished = True`; `RobotAgent.step()` then returns at its
@@ -4008,23 +4008,23 @@ Alternatives set aside. An observe-only run mode: a switch around the design, it
 is a real case. Keeping triggers alive after the terminal return: `no_current_task` would fire on every tick, against
 D3's definition of a trigger as a change in what the last decision rested on.
 
-→ RECORD [T-D/4] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Consequences recorded (TB.2b).
+→ RECORD [T-D/4] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Consequences recorded (IRB.2b).
 
-Files: mesa_sim/sim_agents.py (`RobotAgent.step`, `finished`). Built in TB.2b.
-Reference: cchat, 27 September 2026 (TB); D3; "The IR test-bed" (below), whose runs need it; TODO-33, TODO-121;
-`docs/handoff_T-D_cycle2_and_IR_testbed.md` §8 (the idle-robot run mode, the question this rules)
+Files: mesa_sim/sim_agents.py (`RobotAgent.step`, `finished`). Built in IRB.2b.
+Reference: cchat, 27 September 2026 (IRB); D3; "The intention-recognition test-bed (IRB)" (below), whose runs need it; TODO-33, TODO-121;
+`docs/handoff_T-D_cycle2_and_IRB.md` §8 (the idle-robot run mode, the question this rules)
 
 ---
 
-**The IR test-bed (TB, ruled by Hadi, 27 September 2026)**
+**The intention-recognition test-bed (IRB, ruled by Hadi, 27 September 2026)**
 
 → RECORD [T-D/5] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: the whole entry: Purpose, Rules, the layout, the setup, the scenarios, the expectations, the comparison, Sessions, CORRECTED IN PLACE, Files, Reference, TRACK COMPLETE.
 
 **T-D L: the belief lifecycle (ruled by Hadi, 27 September 2026)**
 
 Cycle 2, L: when an episode ends, when an admitted projection is withdrawn, what a suspended task keeps, when a
-hypothesis is live, and what persists. Ruled in cchat on the IR test-bed's results (`analysis/ir_testbed/REPORT.md`,
-TB.4b; prior on, α = 0.05, θ = 0.75). The design does not change to fit the test-bed; the cases are evidence. Records
+hypothesis is live, and what persists. Ruled in cchat on the IRB's results (`analysis/irb/REPORT.md`,
+IRB.4b; prior on, α = 0.05, θ = 0.75). The design does not change to fit the test-bed; the cases are evidence. Records
 only (session L-records); built in L-build.
 
 - L1, the boundary criterion.
@@ -4116,7 +4116,7 @@ only (session L-records); built in L-build.
 - L4, liveness.
   Problem. A pin retires a hypothesis for the rest of the run (`_completed`), although its terminal fact can stop
   holding (`waited(agent, machine)` is cleared on the agent's next step); so a foreseeable task is recognisable once per
-  run (TB close-out), and whether a foreseeable hypothesis stays live after the work order (TODO-117) depends on whether
+  run (IRB close-out), and whether a foreseeable hypothesis stays live after the work order (TODO-117) depends on whether
   it was ever performed.
   Cases. scenario_s09_01 and scenario_s09_10 (coffee never taken): `coffee_break` lone live after the last delivery,
   unexplained from 157 and from 141 on the exit walk, to the end of the run. scenario_s09_02 to _04 (coffee taken):
@@ -4166,18 +4166,18 @@ only (session L-records); built in L-build.
   hypothesis is re-admitted at b + 1 (TODO-119): two decisions per such boundary.
   CONSEQUENCE RECORDED (Track 2.5, 29 Sept 2026; docs/assumptions.md, 3.5 dropped as an assumption): the re-admission
   delay after a switch or a boundary follows from L5 (the belief restarts at the prior; the new episode's evidence
-  must carry the leader to θ, adequate) and is an evaluation measure, not an assumption. At HEAD (the IR test-bed,
+  must carry the leader to θ, adequate) and is an evaluation measure, not an assumption. At HEAD (the IRB,
   prior on; the leader adequate at its θ tick in each case): scenario_s09_01, the first episode 25 ticks from tick 0,
   15 after the boundary at 61 (`deliver_item(item_2)` at θ at 76); scenario_s09_07, 14 ticks after the switch at 32
-  (13 after the boundary at 33, θ at 46; TB.4b's 32 ticks, θ at 64, were before L); scenario_s09_13, the resumed
+  (13 after the boundary at 33, θ at 46; IRB.4b's 32 ticks, θ at 64, were before L); scenario_s09_13, the resumed
   delivery 14 ticks after its resumption at 107 (16 after the boundary at 105, θ at 121).
 
 → RECORD [T-D/6] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Staging for L-build; BUILT (L-build).
 Files (L-build): shared/recognizer.py (`update`, `_task_boundary`, `_completed`, `_begin_episode`, `_adequacy`),
-shared/meta_planner.py (`evaluate_triggers`), analysis/ir_testbed/ (the oracle), the four maintained baseline sets.
-Reference: cchat, 27 September 2026 (L); "T-D R and E" (R4, R6, E1, E7, E8, E9, E10, G1); "The IR test-bed" (its
+shared/meta_planner.py (`evaluate_triggers`), analysis/irb/ (the oracle), the four maintained baseline sets.
+Reference: cchat, 27 September 2026 (L); "T-D R and E" (R4, R6, E1, E7, E8, E9, E10, G1); "The intention-recognition test-bed (IRB)" (its
 close-out); I4c (Decisions 1 to 4); D2; T7; DESIGN-07; `docs/recognizer_handback.md` §1.1, §1.6, §1.8, §5;
-`analysis/ir_testbed/REPORT.md` (scenario_s09_01, _03, _04, _05, _07, _08, _09, _10); TODO-87, TODO-93, TODO-94,
+`analysis/irb/REPORT.md` (scenario_s09_01, _03, _04, _05, _07, _08, _09, _10); TODO-87, TODO-93, TODO-94,
 TODO-117, TODO-118, TODO-119
 
 ---
@@ -4281,7 +4281,7 @@ Mechanics ruled.
 - SUPERSEDED IN PART BY P4: the `HumanProjection` types are removed (their reason was the per-candidate span and the
   refusal); the human projection is again `Optional[ProjectedPlan]`.
 → RECORD [T-D/8] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: Confirmed at the P plan step.
-Unchanged: `realize()`, `_clears_gate()`, G1, the trigger set, the recognizer, the IR test-bed's oracle.
+Unchanged: `realize()`, `_clears_gate()`, G1, the trigger set, the recognizer, the IRB's oracle.
 
 → RECORD [T-D/9] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: The deadlock (measured), with its SUPERSEDED IN PART (Track 2.5).
 RULED BY X (29 Sept 2026; design_decisions.md, "T-D X: response"): the occupied target has no special handling (X1);
@@ -4384,7 +4384,7 @@ authoring convention; TODO-80, TODO-95, TODO-119
 
 Cycle 2, G: what counts as grounds for admitting a hypothesis. Admission is the meta-planner's gate outcome: the leader
 (the hypothesis with the highest probability) is accepted and the human projection is built for it. Ruled in cchat on
-the IR test-bed's results and the maintained sets after L, P and Track 2.5 (`docs/handoffs/handoff_G_X_onward.md`, §3
+the IRB's results and the maintained sets after L, P and Track 2.5 (`docs/handoffs/handoff_G_X_onward.md`, §3
 and §4, G Q1 and G Q2). Records only (session G-records); built in G-build. The rulings are labelled AD1 to AD5
 (admission); "G1" in older records keeps its meaning, the 1.5 guard on admission ("T-D R and E", "1.5 rulings").
 
@@ -4490,7 +4490,7 @@ Rulings at the plan step (Hadi, 29 September 2026):
   warrant, for different reasons. Counted: it occurs on no tick of the 48 maintained logs or the 17 test-bed runs.
 - The half-plane consequence (objection 1 of the plan, an observed consequence of AD1, not a reason to reopen it). A
   lone foreseeable task is warranted by any walk within 90° of its target's bearing: the gain test is a half-plane test.
-  What AD1 resolves is admission on standing. Measured on the IR test-bed (the gate's answer per tick; the robot is idle
+  What AD1 resolves is admission on standing. Measured on the IRB (the gate's answer per tick; the robot is idle
   there and asks admission at tick 0 only): in scenario_s09_01 the exit walk to corner_SE bears about 39° off the
   coffee machine's bearing, and the lone `coffee_break` (0.997) is refused `none(leader_unwarranted)` at 125 (b + 1,
   standing) and clears from 126 to 156 (before G, from 125); likewise scenario_s08_01 (from 126) and scenario_s09_10
@@ -4920,7 +4920,7 @@ PART A. FRAMEWORK-WIDE RULINGS (every domain)
       reopened: R2 makes its ruled semantics representable in computed states;
 → RECORD [T-G/5] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: C1 from "A3, A4, A5 and A9 each change code outside the domain" (stage 1's BUILT lines, stage 2, stage 3, the rulings with no stage), C2 to C6.
 
-→ RECORD [T-G_stage1/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: STAGE 1 PLAN APPROVED; STAGE 1, STEPS 0 TO 5 BUILT; STAGE 1, STEPS 6 TO 8 BUILT; FINDINGS OF THE MILESTONE; NOTES FROM THE INDEPENDENT REVIEW; A STEP ADDED; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT; FINDINGS OF THE SECOND MILESTONE SCENARIO; RULED: T-G Q16 (T-G Q16's block) and the IR test-bed set; STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; RULED: THE MPB ON DOCK_LOADING (MPB-DL1 to MPB-DL6); DISPOSITIONS; THE SET; RULED ON THE SET; THE BUILD'S PLAN, CONFIRMED; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN; T-G STAGE 1 CLOSED; PROPOSALS; Reference; the Next lines.
+→ RECORD [T-G_stage1/1] (moved verbatim, 2 October 2026): docs/design_records.md, under this entry's title: STAGE 1 PLAN APPROVED; STAGE 1, STEPS 0 TO 5 BUILT; STAGE 1, STEPS 6 TO 8 BUILT; FINDINGS OF THE MILESTONE; NOTES FROM THE INDEPENDENT REVIEW; A STEP ADDED; STAGE 1, THE SECOND MILESTONE SCENARIO BUILT; FINDINGS OF THE SECOND MILESTONE SCENARIO; RULED: T-G Q16 (T-G Q16's block) and the IRB set; STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED; RULED: THE MPB ON DOCK_LOADING (MPB-DL1 to MPB-DL6); DISPOSITIONS; THE SET; RULED ON THE SET; THE BUILD'S PLAN, CONFIRMED; SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN; T-G STAGE 1 CLOSED; PROPOSALS; Reference; the Next lines.
 
 **T-K: context knowledge in the recognizer's belief (ruled by Hadi, 2 October 2026)**
 

@@ -71,7 +71,7 @@ Stage 1 is closed (2 October 2026). What it delivered:
   of its methods is applicable; object states and designations declared by the domain; the human's script as a
   priority list.
 - dock_loading's tasks, three rooms without stores, and three kinds of setup (a fourth, "one bay", is named as conditional and not built).
-- An intention-recognition test set (the IR test-bed): 54 runs with an idle robot, zero disagreements with the
+- An intention-recognition test set (the IRB): 54 runs with an idle robot, zero disagreements with the
   expectations written before the runs.
 - A recognition-to-planning test set (the MPB, the meta-planner test-bed): 52 runs with a working robot in two
   rooms, all completed, zero disagreements where full expectations existed (40 runs). This result does not state
@@ -110,7 +110,7 @@ started. Section 5 holds its state. Its content points 1 (the values) and 2 (the
 
 ## 4. What stage 1 found (inputs for the next stages; none is ruled)
 
-Recognition on dock_loading (the IR test-bed, 54 runs):
+Recognition on dock_loading (the IRB, 54 runs):
 - A true stretch is a run of consecutive ticks in which the human does one modelled task. The runs hold 153 true
   stretches. 147 lie in the support (the hypotheses allowed under the assignment prior: the human's assigned tasks
   and the foreseeable tasks). 6 lie outside the support (the scan of pallet_1 in two scenarios).
@@ -165,8 +165,7 @@ Planning on dock_loading (the MPB, 52 runs):
   - The robot with nothing left to do stays standing at the bay of its last delivery (recorded in the findings
     of the second milestone scenario).
 - CAVEAT (3 October 2026): the MPB run files of 500 steps or more and the milestone runs are potentially confounded
-  by an undeclared weight (the hardcoded context weight multiplies coffee_break by 2.5 from step 500); the IR
-  test-bed's figures are not affected. design_records.md, "T-G stage 1", SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN,
+  by an undeclared weight (the hardcoded context weight multiplies coffee_break by 2.5 from step 500); the IRB's figures are not affected. design_records.md, "T-G stage 1", SCOPE REDUCED AND THE MPB ON DOCK_LOADING RUN,
   its CAVEAT.
 
 Not tested in stage 1: env_layout_02 in the MPB (the room with the latest admissions, median 28 ticks); the test

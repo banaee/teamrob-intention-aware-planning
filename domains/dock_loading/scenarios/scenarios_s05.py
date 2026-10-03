@@ -12,14 +12,14 @@ from domains.dock_loading.script import (coffee_break, confirm_delivered_pallet,
 
 
 # A viewing fixture: the scene loads and initialises; not a baseline, not an
-# IR test-bed or MPB case.
+# IRB or MPB case.
 scenario_s05_01 = ScenarioConfig(
     id="scenario_s05_01",
     setup="env_setup_05",
     reference_layouts=["env_layout_03"],
     description=(
         "A viewing fixture (T-G stage 1, B14), written so that the scene loads and initialises; not a baseline, "
-        "not an IR test-bed or MPB case. Setup kind 2, the MPB's: the robot on the truck side; the human at the standby place. The human has "
+        "not an IRB or MPB case. Setup kind 2, the MPB's: the robot on the truck side; the human at the standby place. The human has "
         "no script and no assigned task, the robot no assigned task."
     ),
     agents=[
@@ -261,7 +261,7 @@ scenario_s05_06 = ScenarioConfig(
     reference_layouts=["env_layout_03"],
     description=(
         "MPB on dock_loading, M4, a dropped scan in the work cycle (M4 as amended): the scan of pallet_2 is "
-        "dropped during its walk (PT28S, the IR test-bed's approved value); the scan of pallet_3 has a "
+        "dropped during its walk (PT28S, the IRB's approved value); the scan of pallet_3 has a "
         "coffee_break on arrival; the dropped scan is a second entry. Declared properties: as M1. Mixed (THE SET; "
         "MPB-DL3 as amended): kind 2, the script declared dependent on the robot (each scan waits for its "
         "delivery), declared properties only, read only against the controlled scenarios; these runs do not "

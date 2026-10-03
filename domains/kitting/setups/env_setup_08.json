@@ -7,7 +7,7 @@
       "initial_container": "shelf_1",
       "destination": "kitting_table_0",
       "size": [25, 25],
-      "notes": "The IR test-bed (TB): on the west shelf, designated to the kitting table."
+      "notes": "The IRB: on the west shelf, designated to the kitting table."
     },
     {
       "id": "item_2",
@@ -16,7 +16,7 @@
       "initial_container": "shelf_2",
       "destination": "kitting_table_0",
       "size": [25, 25],
-      "notes": "The IR test-bed (TB): on the east shelf, designated to the kitting table."
+      "notes": "The IRB: on the east shelf, designated to the kitting table."
     }
   ]
 }

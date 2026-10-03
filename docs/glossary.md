@@ -25,7 +25,7 @@ never an entry, never a plan.
 minus every task whose terminal condition already holds in the `WorldState`, whoever made it hold.
 The pool is not a candidate set; nothing competes at that level.
 An empty pool prevents planning and execution only; the robot's observation and recognition go on every tick (ruled
-27 September 2026, built in TB.2b; `docs/design_decisions.md`, "The cognitive loop does not end with the task pool").
+27 September 2026, built in IRB.2b; `docs/design_decisions.md`, "The cognitive loop does not end with the task pool").
 → `shared/meta_planner.py`, `update()` block 0 and "TASK POOL vs. CANDIDATES";
 `shared/io_contracts.md` §2.2.
 
@@ -1025,7 +1025,7 @@ whether one hypothesis explains its own phase, and the meta-planner reads it for
 RELATION TO HYPOTHESIS ADEQUACY (ruled by Hadi, 27 September 2026): the aggregate adequacy finding is **adequate** when
 at least one live hypothesis has hypothesis adequacy adequate; otherwise it is **unresolved** (no live hypothesis is a
 member) or **unexplained** (every member is inadequate), by the aggregate rule (E4, E6).
-SUPERSEDED IN PART (wording; TB.1r, Hadi, 27 September 2026): "it clears when every live hypothesis advances its phase
+SUPERSEDED IN PART (wording; IRB.1r, Hadi, 27 September 2026): "it clears when every live hypothesis advances its phase
 or an episode boundary moves every origin (E7)" was loose. The finding has no memory beyond each live hypothesis's
 current derived phase; it is recomputed every tick; one member with S_k ≥ α makes it adequate; a boundary empties the
 membership. No change to the mechanism.
@@ -1225,11 +1225,13 @@ AMENDED (AM11, 3 October 2026): "not" in an occurrence condition is T-K part 1's
 `docs/design_records.md`, "T-K"; `docs/roadmap.md`, "The plan from T-A", T-K, part 2.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
-**TB** — the IR test-bed track (ruled 27 September 2026), before cycle 2 of T-D: the recognizer tested in isolation,
-on a layout, setup and scenarios written for it, against expectations derived from the entry "T-D R and E" before the
-run. Sessions TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the expectation generator,
-the runs, the report).
-→ `docs/design_decisions.md`, "The IR test-bed" and "The cognitive loop does not end with the task pool".
+**IRB** — the intention-recognition test-bed (track 1; ruled 27 September 2026), before cycle 2 of T-D: the recognizer
+tested in isolation, with an idle robot, on a layout, setup and scenarios written for it, against expectations derived
+from the entry "T-D R and E" before the run. Sessions IRB.1r (records), IRB.2b (the cognitive-loop correction), IRB.3b
+(the artefacts, the expectation generator, the runs, the report), IRB.4b (the enlarged room). Its code is
+`analysis/instruments/irb/`, its sets `analysis/<domain>/irb/`, its run files `configs/<domain>/irb/`.
+IRB was called the IR test-bed until 3 October 2026 (its track TB, its sessions TB.1r to TB.4b, its folders ir_testbed).
+→ `docs/design_decisions.md`, "The intention-recognition test-bed (IRB)" and "The cognitive loop does not end with the task pool".
 **MPB** — the meta-planner test-bed (track 3; ruled 29 September 2026, rulings MPB-1 to MPB-6): the
 recognition-to-planning chain (recognizer, gate, projection, meta-planner) tested with a working robot, one authored
 scenario per decision, against an oracle that states the expected decision before the run. Not T3 or T3b, the Phase 4C
@@ -1338,7 +1340,7 @@ its use in the records. They name how scenarios are written and checked; none is
 
 **setup kind** — a placement pattern of the movable objects and their designations, written once per room as separate
 **setup** files with their own serial ids. A records name; the code knows only setup ids. dock_loading (T-G B14;
-MPB-DL2): kind 1, the IR test-bed's (two full unscanned pallets in each delivery bay, one full pallet in the truck);
+MPB-DL2): kind 1, the IRB's (two full unscanned pallets in each delivery bay, one full pallet in the truck);
 kind 2, the MPB's (four full pallets in the truck, two designated to each delivery bay, two empty pallets); kind 3,
 "pallets in the bays" (two full unscanned pallets in each delivery bay, one full pallet in the truck for each bay, two
 empty pallets); kind 4, "one bay" (all full pallets designated to one bay; conditional, added only if the first MPB run
@@ -1351,7 +1353,7 @@ first. In the MPB on dock_loading a controlled scenario has a script independent
 **disjointness rule** (MPB-DL3, MPB-DL7).
 
 **mixed scenario** — a test-bed scenario that combines several cases, read only against what the controlled scenarios
-of its set have shown. In the IR test-bed on dock_loading every mixed scenario has full expectations. In the MPB on
+of its set have shown. In the IRB on dock_loading every mixed scenario has full expectations. In the MPB on
 dock_loading a mixed scenario is either independent of the robot, with full expectations committed before the run, or
 dependent on the robot, checked by **declared properties** only; a run checked by declared properties does not validate
 the recognizer's decisions (MPB-DL3 as amended).

@@ -3,14 +3,14 @@
 # test-bed (MPB; design_decisions.md, "The meta-planner test-bed (MPB)"; analysis/kitting/mpb/README.md). The code is
 # shared by the domains since the sort (1 October 2026); horizon.py and properties.py are the domain's, in
 # analysis/<domain>/mpb/ (with CONTROLS, the control scenarios whose reference run is made, and alteration.py). Per run file (default: every configs/<domain>/mpb/*.yaml): the safety cap (horizon.py, MPB-5) as the run's steps, the run, the trajectory and its check
-# against the run's human lines (the IR test-bed's trajectory.py), the in-process actual and the log (actual.py); prior
+# against the run's human lines (the IRB's trajectory.py), the in-process actual and the log (actual.py); prior
 # on also the oracle's per-tick table (mpb_oracle.py), the chain (chain.py) and the comparison (compare.py); the
 # declared properties and the measures (properties.py); for the control, the reference run (reference.py); the figure
-# and the summary; prior on, the IR test-bed's figure (plot_ir.py, figure_ir.png). Outputs in <out_root>/<scenario>/<prior>_<strategy>/; the logs and .rec in <out_root>/runs/
+# and the summary; prior on, the IRB's figure (plot_ir.py, figure_ir.png). Outputs in <out_root>/<scenario>/<prior>_<strategy>/; the logs and .rec in <out_root>/runs/
 # (git-ignored). PYTHONHASHSEED=0. Sequential: each run's log is the newest logs/run_*.log. Run from the repo root.
 set -eo pipefail
 DOMAIN=$1; shift
-PY=~/python-envs/ir-nomesa-env/bin/python; D=analysis/instruments/mpb; IR=analysis/instruments/ir_testbed
+PY=~/python-envs/ir-nomesa-env/bin/python; D=analysis/instruments/mpb; IR=analysis/instruments/irb
 DOM=analysis/$DOMAIN/mpb; ROOT=$DOM
 STRATEGY=single_task; PRIOR=on; RUNS=""; EXPECT=""
 while [ $# -gt 0 ]; do
@@ -71,6 +71,6 @@ print(next(a for a in sc.agents if a.agent_type == 'human').scheduled_tasks.depe
   fi
   PYTHONHASHSEED=0 $PY $DOM/properties.py $sid $OUT $LOG $RUN
   $PY $D/plot.py $sid $OUT
-  if [ "$PRIOR" = on ] && [ -f $OUT/expected_ticks.json ]; then $PY $D/plot_ir.py $OUT $LOG; fi   # the IR test-bed's figure
+  if [ "$PRIOR" = on ] && [ -f $OUT/expected_ticks.json ]; then $PY $D/plot_ir.py $OUT $LOG; fi   # the IRB's figure
   $PY analysis/instruments/common/separation.py $LOG > $OUT/separation.md          # since the sort
 done

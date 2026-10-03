@@ -119,7 +119,7 @@ share to θ in one tick. A share jumps only by renormalisation when the live set
 terminal action is a boundary tick, on which no hypothesis is a member (E8), so the gate refuses (no observation); a
 pin without a boundary needs another agent to make a human hypothesis's terminal fact, which MPB-3's disjointness and
 the prior exclude. Checked on the committed tables: no leader change onto a clearing gate on any of the 4285 ticks of
-the IR test-bed's seventeen scenarios, nor on any tick of the eleven MPB scenarios.
+the IRB's seventeen scenarios, nor on any tick of the eleven MPB scenarios.
 
 ## C. The projection the decision rests on
 

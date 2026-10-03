@@ -1090,7 +1090,7 @@ reachable, but nothing outside `sim_agents.py` reads either flag — confirmed b
 (scenario_s01_01: everything done by step 147).
 Harmless, but wasteful and makes log tails uninformative. Fix belongs in the run loop
 (`run_mesa.py` / `SimModel.step()`), not in the agents.
-NOTE (TB.1r, 27 Sept 2026): the cognitive-loop ruling (design_decisions.md, "The cognitive loop does not end with the task pool") does not touch this item.
+NOTE (IRB.1r, 27 Sept 2026): the cognitive-loop ruling (design_decisions.md, "The cognitive loop does not end with the task pool") does not touch this item.
 Files: mesa_sim/run_mesa.py, mesa_sim/sim_model.py
 Reference: Phase 4C scenario_s01_01 validation, September 2026
 
@@ -2897,7 +2897,7 @@ Fix: TODO-08 (`open_gate` action schema + `gate_closed` method).
 [FW] (T-G A10, B9, T-G records 1, 1 Oct 2026): in V1 a container is one point, its centre, with no constraint, and may hold several pallets
 (B9); authored pallet places are not taken. A container divided into positions, the position chosen when an object is
 put down, is FW, with no new item. Pallets drawn on top of each other are a drawing matter for T-V. design_decisions.md, "T-G: the second domain's rulings", A10, B9.
-NOTE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; B9's note): a property of "one point per container": two pallets
+NOTE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED; B9's note): a property of "one point per container": two pallets
 in one container stand on one point, so the second scan has no walk (C3: three stretches of 3 ticks, never at the
 threshold) and no walk between them exists that an event could cut (M3 as first written was not buildable).
 Pallets 0–5 all share `truck_interior` center position. No individual slot positions.
@@ -3099,7 +3099,7 @@ T-D 1.5b (27 Sept 2026; `analysis/td_stage1b/REPORT.md`, finding 5): G1 refuses 
 `none(leader_inadequate)`), but after the release the misdelivered item's hypothesis is admitted again at 0.995
 (scenario_s06_06 at 103, scenario_s07_03 at 94, both priors): with no boundary at a misdelivery, its new derived phase
 (pick the item up where it now lies) is a member at S = 1. Cycle 2 input (L).
-IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_08, prior on): item_1 released on kitting_table_1 at 75, no pin and no boundary; `deliver_item(item_1)` keeps leading into the next delivery (0.997 at 86, 0.897 at 120) while the true `deliver_item(item_2)` never reaches θ (at most 0.483, at 130); it is never pinned in the run.
+IRB (IRB.4b, 27 Sept 2026; `analysis/irb/REPORT.md`, scenario_s09_08, prior on): item_1 released on kitting_table_1 at 75, no pin and no boundary; `deliver_item(item_1)` keeps leading into the next delivery (0.997 at 86, 0.897 at 120) while the true `deliver_item(item_2)` never reaches θ (at most 0.483, at 130); it is never pinned in the run.
 RULED (T-D L1, Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): the episode boundary fires when
 the observed agent completes an action that is terminal in the task model (`place`, `wait_at`), read from the completion
 channel, whatever its binding; the pin stays the world's terminal fact. The misdelivery is a boundary (scenario_s09_08 at
@@ -3239,8 +3239,8 @@ to item_3 had refuted it), where in scenario_s02_02 it rose to 0.345. The recogn
 should decay, be reset by another event, or stand, is a recognizer question for T-D. Recorded, nothing changed.
 Files: shared/recognizer.py
 Reference: T-C2c play, 23 September 2026; docs/recognizer_handback.md §1.4, §1.6
-IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_05, prior on): the corner walk mid-delivery, 32 to 79; `deliver_item(item_1)`'s one derived phase `move_to(kitting_table_0)` runs 30 to 125, its S below α from 48; the finding is unexplained 48 to 125, through the resumed carry (80 to 125), where the delivery reaches θ at 87 while inadequate; adequate again at 126 (its advance to `place`).
-IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_07, prior on): the change of mind: after item_1's grasp (30) `deliver_item(item_2)` is started (32) and returns item_1 to its shelf (33); `deliver_item(item_2)`, whose S the first walk had put below α at 14, rises from 0.000 at 35 to θ at 64, 32 ticks after the switch, adequate throughout; `deliver_item(item_1)` falls below α at 44 and, resumed at 110 after the boundary at 108, reaches θ again at 135. The finding stays adequate until the exit walk (204).
+IRB (IRB.4b, 27 Sept 2026; `analysis/irb/REPORT.md`, scenario_s09_05, prior on): the corner walk mid-delivery, 32 to 79; `deliver_item(item_1)`'s one derived phase `move_to(kitting_table_0)` runs 30 to 125, its S below α from 48; the finding is unexplained 48 to 125, through the resumed carry (80 to 125), where the delivery reaches θ at 87 while inadequate; adequate again at 126 (its advance to `place`).
+IRB (IRB.4b, 27 Sept 2026; `analysis/irb/REPORT.md`, scenario_s09_07, prior on): the change of mind: after item_1's grasp (30) `deliver_item(item_2)` is started (32) and returns item_1 to its shelf (33); `deliver_item(item_2)`, whose S the first walk had put below α at 14, rises from 0.000 at 35 to θ at 64, 32 ticks after the switch, adequate throughout; `deliver_item(item_1)` falls below α at 44 and, resumed at 110 after the boundary at 108, reaches θ again at 135. The finding stays adequate until the exit walk (204).
 RULED (T-D L2, Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): (i) recognizer, no change: the
 evidence of a misleading walk stands; inadequacy attaches to the phase and is not retracted when behaviour becomes
 consistent again (scenario_s09_05: inadequate 48 to 125, adequate at the advance, 126); no reopening on the finding, no
@@ -3381,7 +3381,7 @@ Size, estimated at recording: comparable to I4c plus I4d; one to two design roun
 two build-and-verify rounds (i4d-style invariant check with a reversion variant), all
 baselines regenerated; about the size of the T-D Q2 to Q4 pass itself.
 Related: TODO-59 (deferred part), TODO-85 half (a), TODO-80, TODO-92, TODO-96, T-D Q1, T-D Q5.
-IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, scenario_s09_06, prior on): `stand(PT80S)` at shelf_1 30 to 70, inside `deliver_item(item_1)`'s `pick_up` phase (s_exp 2); its S below α at 47 (17 standing ticks beyond s_exp); the finding unexplained 47 to 71 while the belief holds at about 0.92 (the rival is charged for the same ticks); adequate at the grasp, 72.
+IRB (IRB.4b, 27 Sept 2026; `analysis/irb/REPORT.md`, scenario_s09_06, prior on): `stand(PT80S)` at shelf_1 30 to 70, inside `deliver_item(item_1)`'s `pick_up` phase (s_exp 2); its S below α at 47 (17 standing ticks beyond s_exp); the finding unexplained 47 to 71 while the belief holds at about 0.92 (the rival is charged for the same ticks); adequate at the grasp, 72.
 
 **TODO-96: Communication as a response under sustained `unknown` or a block (recorded, T-D Q1 discussion, 23 Sept 2026)** [OPEN; future work, with TODO-136; rewritten to X5's two grounds, 29 Sept 2026]
 T-G A10 (T-G records 1, 1 Oct 2026): two communication acts stay under this item and X5, with no FW item of their own: the human assigning
@@ -3410,7 +3410,7 @@ not part of T-D Q1.
 **TODO-97: Belief-aware planning: a joint realization against the hypotheses that cover the belief (recorded, 24 Sept 2026)** [OPEN, recorded only; later, after the T-D Q2 to Q4 recognizer pass]
 SUPERSEDED IN PART (T-D R1, 27 September 2026): `unknown` is not a member of S_ε; the finding's role in belief-aware planning is G; TODO-97's gate is unchanged. design_decisions.md, "T-D R and E".
 Status: open, recorded only. Not on the T-D agenda, not in the handoff order.
-LINKED (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED): the IR test-bed on dock_loading confirmed T-G's watched item
+LINKED (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED): the IRB on dock_loading confirmed T-G's watched item
 C5, a finding about the mind, NOT RULED: hypotheses that predict the same motion divide the belief and none is admitted
 (two unscanned pallets in one bay: in C3 and on C4's first two walks, all three rooms, 9 stretches never reach the
 threshold). The direction recorded here, acting on a set of hypotheses with the same projection (the covering set S_ε,
@@ -3512,14 +3512,14 @@ The interface it needs (recorded, not designed):
   before and after on the maintained baselines; false-unexplained per phase and per run, missed findings and detection
   delay, at every test level α (0.01, 0.05, 0.1). The ground truth is the record's (`truth_at`, `coverage`); the oracle
   interface above serves it.
-- THE IR TEST-BED (TB, ruled 27 Sept 2026; design_decisions.md, "The IR test-bed"): the recognizer tested in
+- THE IRB (ruled 27 Sept 2026; design_decisions.md, "The intention-recognition test-bed (IRB)"): the recognizer tested in
   isolation against expectations derived from the entry "T-D R and E" before the run, not through this oracle
   adapter, which stays unbuilt. The cases the 48 fixtures lack (the corner walk, a switch outside the support) are its
   layer 4, TODO-122.
 - 1.4 (27 Sept 2026, `analysis/td_stage1/REPORT.md`) measured against the record directly (`truth_at`, `coverage`);
   oracle IR is still unbuilt.
 - The 48 logs of the maintained baseline sets contain no `TASK_ABSENT` case and no case outside the hypothesis
-  space's support (every entry `COVERED`, no `go_to`, no exit walk; 1.4 §H case 1). The IR test bed, a separate
+  space's support (every entry `COVERED`, no `go_to`, no exit walk; 1.4 §H case 1). The IRB, a separate
   track, will.
 Reference: design_decisions.md, "T-H: the human behaviour model", item 10; roadmap, "The plan from T-A"
 
@@ -3698,18 +3698,17 @@ complete, a foreseeable hypothesis still live keeps the recognizer from reading 
 `ac_switch_0` alone live at 0.992 from 327, admitted at 327, the finding adequate to 343 and unexplained from 344
 (α = 0.05; `analysis/td_stage1/REPORT.md` §H case 2), while the human is idle. Whether a foreseeable hypothesis stays
 live after the work order is complete is for L.
-THE IR TEST-BED (TB, ruled 27 Sept 2026; corrected in TB.2b records): its room has no AC switch, so with the prior on
+THE IRB (ruled 27 Sept 2026; corrected in IRB.2b records): its room has no AC switch, so with the prior on
 the hypothesis space is the two deliveries plus `coffee_break`. The test-bed constructs this case in its two-deliveries
 scenario only (`scenario_s08_01`): in the three coffee scenarios `coffee_break` is retired once `waited` holds, no
-hypothesis is live after the second delivery, and the lifecycle reads exhausted (design_decisions.md, "The IR
-test-bed"). Its expectations are generated from the current records; it does not resolve L.
-A FACT FOR L (TB.2b records, 27 Sept 2026): under the current completion pin a foreseeable task is recognisable once
+hypothesis is live after the second delivery, and the lifecycle reads exhausted (design_decisions.md, "The intention-recognition test-bed (IRB)"). Its expectations are generated from the current records; it does not resolve L.
+A FACT FOR L (IRB.2b records, 27 Sept 2026): under the current completion pin a foreseeable task is recognisable once
 per run. The pin retires a hypothesis for the rest of the run once its terminal completion predicate holds
 (`docs/recognizer_handback.md` §1.6), although `waited(agent, machine)` itself is cleared when the agent's next
 action starts; so a second coffee break in the same run has no live hypothesis.
 Files: shared/recognizer.py (the live set H)
 Reference: design_decisions.md, "T-D R and E", R4; `analysis/td_stage1/REPORT.md` §H
-IR TEST-BED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`): scenario_s09_01 (as scenario_s08_01) and scenario_s09_10, prior on: `coffee_break` lone live at 0.997 after the last delivery (from 124 and from 107), its S below α on the exit walk (157 and 141), the finding unexplained from there to the end of the run, the idle human included.
+IRB (IRB.4b, 27 Sept 2026; `analysis/irb/REPORT.md`): scenario_s09_01 (as scenario_s08_01) and scenario_s09_10, prior on: `coffee_break` lone live at 0.997 after the last delivery (from 124 and from 107), its S below α on the exit walk (157 and 141), the finding unexplained from there to the end of the run, the idle human included.
 RULED (T-D L4, Hadi, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle"): yes. Retirement lasts exactly as
 long as the hypothesis's terminal fact holds, read from the world on every tick (T7's criterion); a hypothesis whose
 fact stops holding re-enters the live set with the prior base and the current position as origin. `coffee_break` is
@@ -3786,13 +3785,13 @@ To be built in G-build. design_decisions.md, "T-D G: admission".
   initial walk's 0, not the post-boundary 1).
 Reference: `analysis/td_stage1b/REPORT.md`, flags
 
-**TODO-121: The 1.4 and 1.5b measurements cover the truncated interval (recorded, TB.1r, 27 Sept 2026)** [CLOSED; TB.2b, 27 Sept 2026]
+**TODO-121: The 1.4 and 1.5b measurements cover the truncated interval (recorded, IRB.1r, 27 Sept 2026)** [CLOSED; IRB.2b, 27 Sept 2026]
 In every run the robot stopped observing at its terminal return (`RobotAgent.finished`): the `[IR]` and `[IR-dist]`
 lines end at the robot's completion, and the recognizer's output over the human's remaining behaviour is in no
 baseline. The measurements of 1.4 (`analysis/td_stage1/`) and of 1.5b and 1.5c (`analysis/td_stage1b/`) were taken
 over that truncated interval. Once the cognitive-loop correction is built, they are rerun over the newly exposed
-interval in TB.2b, with every change reported and no previous statistic preserved for comparability.
-CLOSED (TB.2b, 27 Sept 2026; `analysis/tb2b_exposed_interval/REPORT.md`): the scripts are rerun over the exposed
+interval in IRB.2b, with every change reported and no previous statistic preserved for comparability.
+CLOSED (IRB.2b, 27 Sept 2026; `analysis/irb2b_exposed_interval/REPORT.md`): the scripts are rerun over the exposed
 interval (the tick after the robot's declared completion to the run's end). In every baseline run that interval is the
 idle human after its script: no modelled tick, boundary, pin or decision lies in it, so false unexplained (0 at every
 α), non-member, adequate-below-θ, boundaries and admissions are unchanged; what moved is the output over the idle
@@ -3802,53 +3801,53 @@ moved tick lies in the exposed interval.
 Files: analysis/td_stage1/, analysis/td_stage1b/ (the scripts rerun on the regenerated baselines)
 Reference: design_decisions.md, "The cognitive loop does not end with the task pool"
 
-**TODO-122: The IR test-bed's deviation scenarios, layer 4 (recorded, TB.1r, 27 Sept 2026)** [CLOSED; TB.4b, 27 Sept 2026]
+**TODO-122: The IRB's deviation scenarios, layer 4 (recorded, IRB.1r, 27 Sept 2026)** [CLOSED; IRB.4b, 27 Sept 2026]
 The test-bed's first scenarios hold modelled behaviour and the exit walk only. The deviations are authored later, with
 P and X: the corner walk (`TASK_ABSENT`, the case Design B was ruled for), a switch outside the support, the wrong
 table (`BINDING_ABSENT`), the long stand, the finished assigned tasks. Same rules as the test-bed's first scenarios:
 the layout is not adjusted to a desired result, and the expectations are derived from the entry before the run.
-Files: domains/kitting/ (scenarios), analysis/ir_testbed/
-Reference: design_decisions.md, "The IR test-bed"; TODO-101; `docs/handoff_T-D_cycle2_and_IR_testbed.md` §8, layer 4
-CLOSED (TB.4b, 27 Sept 2026; `analysis/ir_testbed/REPORT.md`, its TB.4b section): layer 4 built on the enlarged room (env_layout_11, env_setup_09), ahead of P and X: the corner walk (scenario_s09_05, `TASK_ABSENT`), the long stand (_06), the change of mind (_07), the wrong table (_08, `BINDING_ABSENT`), a delivery outside the support (_09, covered, outside the support); the finished assigned tasks are the exit walks of _01 and _10 (TODO-117). Zero disagreements at 1e-9 against the recognizer's public outputs.
+Files: domains/kitting/ (scenarios), analysis/irb/
+Reference: design_decisions.md, "The intention-recognition test-bed (IRB)"; TODO-101; `docs/handoff_T-D_cycle2_and_IRB.md` §8, layer 4
+CLOSED (IRB.4b, 27 Sept 2026; `analysis/irb/REPORT.md`, its IRB.4b section): layer 4 built on the enlarged room (env_layout_11, env_setup_09), ahead of P and X: the corner walk (scenario_s09_05, `TASK_ABSENT`), the long stand (_06), the change of mind (_07), the wrong table (_08, `BINDING_ABSENT`), a delivery outside the support (_09, covered, outside the support); the finished assigned tasks are the exit walks of _01 and _10 (TODO-117). Zero disagreements at 1e-9 against the recognizer's public outputs.
 
-**TODO-123: `SimModel._spawn_agents`'s docstring misdescribes the robot's pool under the prior (recorded, TB.2b, 27 Sept 2026)** [CLOSED; G-build, 29 Sept 2026: the docstring corrected in 81a9f86, where the observed human's assigned tasks also became the meta-planner's input (commitment warrant, T-D G AD2)]
+**TODO-123: `SimModel._spawn_agents`'s docstring misdescribes the robot's pool under the prior (recorded, IRB.2b, 27 Sept 2026)** [CLOSED; G-build, 29 Sept 2026: the docstring corrected in 81a9f86, where the observed human's assigned tasks also became the meta-planner's input (commitment warrant, T-D G AD2)]
 The docstring says the robot "receives its assigned_tasks as its task pool, plus (when the assignment_prior switch is
 on) the observed human's assigned_tasks". The observed human's assigned tasks go to the recognizer only, as its
 support restriction (`RobotAgent.__init__`, `IntentionRecognizer(assigned_tasks=observed_assigned_tasks)`); the
 robot's pool is its own `assigned_tasks` (`meta_planner.seed_tasks(assigned_tasks)`), with the prior on or off. The code
 is right, the text is stale.
 Files: mesa_sim/sim_model.py (`_spawn_agents`)
-Reference: TB.2b plan step, 27 Sept 2026
+Reference: IRB.2b plan step, 27 Sept 2026
 
-**TODO-124: The run log prints S to four decimals (recorded, TB close-out, 27 Sept 2026)** [OPEN; recorded only]
+**TODO-124: The run log prints S to four decimals (recorded, IRB close-out, 27 Sept 2026)** [OPEN; recorded only]
 The `[IR]` line prints the members' tail probabilities to four decimals, so a hypothesis adequacy read from the log is
 undetermined within 5·10⁻⁵ of α: scenario_s09_07 at tick 35, `coffee_break`'s S = 0.0499824 printed `0.0500` and read
 from the log as adequate, where the recognizer's own output is inadequate. The in-process `BeliefState` is
-authoritative; the IR test-bed compares against it at 1e-9 and against the log at print precision only.
-Files: mesa_sim/sim_agents.py (the `[IR]` line's `tails=` format); analysis/ir_testbed/actual.py (the log reader)
-Reference: `analysis/ir_testbed/REPORT.md`, TB.4b, "Disagreements, classified"
+authoritative; the IRB compares against it at 1e-9 and against the log at print precision only.
+Files: mesa_sim/sim_agents.py (the `[IR]` line's `tails=` format); analysis/irb/actual.py (the log reader)
+Reference: `analysis/irb/REPORT.md`, IRB.4b, "Disagreements, classified"
 
-**TODO-125: tdlib.py cannot parse a `[coverage]` line with a `start:` entry (recorded, TB close-out, 27 Sept 2026)** [OPEN; recorded only]
+**TODO-125: tdlib.py cannot parse a `[coverage]` line with a `start:` entry (recorded, IRB close-out, 27 Sept 2026)** [OPEN; recorded only]
 `analysis/td_stage1b/tdlib.py`'s `[coverage]` pattern does not match a line that carries a `start:` entry (any script
-with a `Start` event), and `parse` then raises. tdlib is a frozen record and is not edited; the IR test-bed's log reader
+with a `Start` event), and `parse` then raises. tdlib is a frozen record and is not edited; the IRB's log reader
 hands it a copy of the log without its `[coverage]` lines, which nothing there reads.
-Files: analysis/td_stage1b/tdlib.py (frozen); analysis/ir_testbed/actual.py (`from_log`)
-Reference: `analysis/ir_testbed/REPORT.md`, TB.3b flags
+Files: analysis/td_stage1b/tdlib.py (frozen); analysis/irb/actual.py (`from_log`)
+Reference: `analysis/irb/REPORT.md`, IRB.3b flags
 
-**TODO-126: The registry inventory literal in the discovery test (recorded, TB close-out, 27 Sept 2026)** [OPEN; recorded only]
+**TODO-126: The registry inventory literal in the discovery test (recorded, IRB close-out, 27 Sept 2026)** [OPEN; recorded only]
 `tests/test_tl2_discovery.py::test_the_registry_is_the_union_of_the_modules` pins the registry's inventory as literals
-(the scenario count and the set of setup ids), so it must be edited with every new scenario or setup: 38 to 42 in TB.3b,
-42 to 54 and setups 01 to 09 in TB.4b.
+(the scenario count and the set of setup ids), so it must be edited with every new scenario or setup: 38 to 42 in IRB.3b,
+42 to 54 and setups 01 to 09 in IRB.4b.
 Files: tests/test_tl2_discovery.py
-Reference: `analysis/ir_testbed/REPORT.md`, TB.3b and TB.4b, "Runs and tests that disagree with the mechanism"
+Reference: `analysis/irb/REPORT.md`, IRB.3b and IRB.4b, "Runs and tests that disagree with the mechanism"
 
 **TODO-127: `d_decisions.txt`'s world completion tick equals the declared one prior off, declared − 2 prior on (recorded, L-records, 27 Sept 2026)** [RESOLVED as wording (T-D P records, 28 Sept 2026): CLAUDE.md's sentence fixed]
-Flagged in TB.2b (`analysis/tb2b_exposed_interval/REPORT.md`, flags) and not examined: for the prior-off runs
+Flagged in IRB.2b (`analysis/irb2b_exposed_interval/REPORT.md`, flags) and not examined: for the prior-off runs
 `d_decisions.txt` prints a world completion tick (`tdlib.robot_completion`, T6) equal to the declared one (scenario_s06_02
 off: world 267, declared 267), where the prior-on runs read world = declared − 2 (scenario_s01_01 on: 169 / 171), the
-relation CLAUDE.md states for every run. Identical before and after TB.2b, so not TB.2b's. Either `tdlib.robot_completion`
+relation CLAUDE.md states for every run. Identical before and after IRB.2b, so not IRB.2b's. Either `tdlib.robot_completion`
 reads another line prior off, or the declared tick differs by prior; to be checked before a completion tick from
-`analysis/td_stage1b/tdlib.py` is compared across priors (the 1.5c and TB.2b measures rerun in L-build).
+`analysis/td_stage1b/tdlib.py` is compared across priors (the 1.5c and IRB.2b measures rerun in L-build).
 CHECKED (L-build, 28 Sept 2026; `analysis/l_build/REPORT.md`, "Completion ticks"): not a reader defect. The declared
 tick equals the world tick when the pool empties on a `recognition_changed` of that tick (the robot's own item pinned
 changes most_likely and `update()` drops the completed task, T7), and is world + 2 when `no_current_task` ends the pool;
@@ -3859,7 +3858,7 @@ RESOLVED AS WORDING (T-D P records, 28 Sept 2026): CLAUDE.md, "Regression checki
 is the world tick + 2 only when `no_current_task` ends the pool, and equals it when a `recognition_changed` of that tick
 ends it.
 Files: analysis/td_stage1b/tdlib.py (frozen), analysis/td_stage1b/d_decisions.py
-Reference: `analysis/tb2b_exposed_interval/REPORT.md`, "Flags (not fixed)"; CLAUDE.md, "Regression checking" (completion)
+Reference: `analysis/irb2b_exposed_interval/REPORT.md`, "Flags (not fixed)"; CLAUDE.md, "Regression checking" (completion)
 
 **TODO-128: A moved item does not re-enter the robot's pool (recorded, L-build records, 27 Sept 2026)** [OPEN; recorded only]
 The recognizer's live set uses T7's completion test on every tick, not its permanence (T-D L4): a delivery whose item
@@ -3925,8 +3924,8 @@ scenario_s10_10 (E6), scenario_s10_11 (A4), all verified; env_layout_13, env_lay
 them. Recorded for Hadi: three F1 robot violations in scenario_s12_01 under full_reorder inside the admission's window;
 checked on the re-executed realization (analysis/mpb/REPORT.md, part (v)): reading (c), no class assigned, pending his
 reading. The instrument now saves the belief and S per tick, and the projected human and planned robot segments per
-admitted decision, and draws the IR test-bed's figure per run (figure_ir.png; analysis/mpb/README.md).
-Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The IR test-bed"; "T-D X" (X1)
+admitted decision, and draws the IRB's figure per run (figure_ir.png; analysis/mpb/README.md).
+Reference: design_decisions.md, "The meta-planner test-bed (MPB)"; "The intention-recognition test-bed (IRB)"; "T-D X" (X1)
 
 **TODO-131: A robot-mind object in shared/ that owns the world model and the cognition components (recorded, T-D P, 28 Sept 2026)** [OPEN; recorded only]
 PROPOSED, NOT RULED (the T-G design chat; T-G records 1, 1 Oct 2026): track 4's reduced form (T-G A8) does not need the mind object, so its
@@ -4091,19 +4090,19 @@ Files: mesa_sim/run_mesa.py (the option), shared/meta_planner.py (admission)
 Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135, TODO-144
 
 **TODO-138: The horizon of runs in which the robot has work (recorded, Track 2.5, 29 Sept 2026)** [RULED for MPB runs (MPB-5, 29 Sept 2026); nothing built]
-docs/assumptions.md 1.3 derives a run's step count from the human's load-time replay plus the idle margin (TB.3b's rule)
+docs/assumptions.md 1.3 derives a run's step count from the human's load-time replay plus the idle margin (IRB.3b's rule)
 for human-script and test-bed runs only: the replay has no term for the robot's work, which in the maintained sets ends
 after the human's. The maintained sets keep their literal step counts until this is ruled. Evidence: scenario_s04_01
 completes at 384 of the sweep's 400 steps under Track 2.5 (16 ticks of margin; was the occupied target before).
 RULED (MPB, ruled by Hadi, 29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5), for MPB runs:
 the comparison horizon is the first observed completion point (the human's script has ended and the robot's pool is
-empty) plus the IR test-bed's idle margin (30 ticks, from E5); the safety cap for the run is the derived plain-cost
+empty) plus the IRB's idle margin (30 ticks, from E5); the safety cap for the run is the derived plain-cost
 horizon (the robot's pool chained along its authored order from the robot's start, plus the human's replay length,
 plus the margin), not a behavioural timeout: a run that does not complete within it is classified (class 2 or 4),
 never given a longer cap. No change to the run loop or the body (TODO-33 unchanged). The maintained sets keep their
 literal step counts.
 Files: analysis/*/sweep.sh, configs/ (run files)
-Reference: docs/assumptions.md 1.3; analysis/ir_testbed/run.sh; TODO-33
+Reference: docs/assumptions.md 1.3; analysis/irb/run.sh; TODO-33
 
 **TODO-139: Align the run option's default assignment prior with docs/assumptions.md 1.4 (recorded, Track 2.5, 29 Sept 2026)** [OPEN]
 1.4: the framework's experiments use the prior-on configuration; prior off is a diagnostic and ablation configuration.
@@ -4441,8 +4440,8 @@ NOTE (Hadi, 1 Oct 2026; T-G records 8; design_decisions.md, "T-G: the second dom
 enabling event, such as the robot's own delivery, is one of four determinants recorded for T-K part 1's design question,
 NOT RULED: what sets a hypothesis's share at the start of an episode (the assignment, which exists; context facts; the
 task that just ended, a transition prior between tasks; an enabling event). They are designed as one mechanism.
-BASELINE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED), a finding about the mind, NOT RULED: a short walk gives too
-little evidence under equal shares at the start of an episode. Over the 54 runs of the IR test-bed on dock_loading, 98
+BASELINE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED), a finding about the mind, NOT RULED: a short walk gives too
+little evidence under equal shares at the start of an episode. Over the 54 runs of the IRB on dock_loading, 98
 of the 147 true stretches in the support reach the threshold (38, 40, 20 of 49 by room), median 20 ticks (range 6 to
 50; one tick is 2 seconds); of the 49 that never do, all scans, 34 last 26 ticks or fewer (on env_layout_04, 16 steps
 from the standby place to the dry bay, scan 0's first walk never reaches it with three or more rivals live). It joins
@@ -4471,9 +4470,9 @@ EVIDENCE AND PLACEMENT (T-G stage 1, the second milestone scenario, 1 Oct 2026; 
 six walks to the standby place are admitted as coffee_break or office_break on the observation warrant, wrongly
 (env_layout_02 at 114 and 231; env_layout_03 at 109 and 206; env_layout_04 at 94; the sixth never clears theta); the
 finding turns unexplained once the human stands. In this domain the walk follows almost every scan, so the case is
-frequent. It becomes the first design question before the IR test-bed set on dock_loading. NOT RULED.
+frequent. It becomes the first design question before the IRB set on dock_loading. NOT RULED.
 RULED FOR NOW (Hadi, 1 Oct 2026; T-G Q16; design_decisions.md, "T-G: the second domain's rulings", T-G Q16's block,
-RULED, T-G records 8): the walk to the standby place stays without a hypothesis for now. The IR test-bed set observes how
+RULED, T-G records 8): the walk to the standby place stays without a hypothesis for now. The IRB set observes how
 the present recognizer explains it; that is the baseline. Two candidates are recorded here, neither approved for
 building:
 - H1: a foreseeable task "the human steps aside to the standby place", always possible, with the standby place as a
@@ -4485,14 +4484,14 @@ the rule for the live set (A4).
 Not taken: the walk as the tail of the scan task. Reasons: the human would step aside after every scan, also when a
 pallet waits; the condition "no other pallet waits" cannot be stated in a method; the scan's terminal fact would hold in
 the middle of the task.
-In the IR test-bed set the standby walks (C13, C14, M4) are diagnostic observations: beside the expectation under the
+In the IRB set the standby walks (C13, C14, M4) are diagnostic observations: beside the expectation under the
 present model, the predictions under H1 and under H2 are written down before the run; only the present model's
 expectation is compared with the run.
-CORRECTED (Hadi, 1 October 2026, at the approval of the IR test-bed's build; recorded 2 October 2026, T-G records 9): H2
+CORRECTED (Hadi, 1 October 2026, at the approval of the IRB's build; recorded 2 October 2026, T-G records 9): H2
 is worded "a hypothesis live only while no assigned task of the human is live" (a scanned pallet's scan stays
 applicable, its guards not reading is_scanned). NOTE (the same records): H1, an always-possible standby task, as a walk
 only would make move_to a terminal action and every arrival an episode boundary (L1); a wait at its end avoids that.
-EVIDENCE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED; analysis/dock_loading/ir_testbed/predictions.md, written
+EVIDENCE (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED; analysis/dock_loading/irb/predictions.md, written
 before the runs), a finding about the mind, NOT RULED: the actual readings equal the present model's expectation in all
 nine runs.
 - C13 (from the dry bay) and C14 (from the frozen bay): the walk is admitted as a break in five of six runs, by the

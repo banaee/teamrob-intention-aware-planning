@@ -24,7 +24,7 @@ to `"areas"` and the per-object `"zone"` to `"area"` (every layout file, the unr
 `env_layout99.json` included); `SimModel.zone_map` to `area_map`, `get_zone_of_position` to `get_area_of_position`,
 `get_objects_in_zone` to `get_objects_in_area`, `SimObject.zone` to `area`; the viewer's `_draw_zones` / `ZONE_COLORS`
 to `_draw_areas` / `AREA_COLORS`; docstrings and comments in `shared/` and both domains' `actions.py`;
-`tests/test_th2_executor.py` (the WorldState field set); `analysis/ir_testbed/oracle.py:92` (the keyword).
+`tests/test_th2_executor.py` (the WorldState field set); `analysis/irb/oracle.py:92` (the keyword).
 Docs the build may edit (answer 9): `shared/io_contracts.md`, `README.md`, `domains/README.md` and the note in
 `docs/rename_table.md`. The glossary and `design_decisions.md` stay with records steps; so does
 `docs/artefacts_user_guide.md` (two mentions of zones), which answer 9 does not list.
@@ -32,7 +32,7 @@ Not renamed: area ids (kitting's stay; dock_loading's change in step 6, answer 3
 field names, TODO-111's note), `scripts/`, frozen reports, history in the records, scenario descriptions quoting old
 values.
 No maintained log prints the name: 0 occurrences of "zone" in the 48 maintained logs and their `.rec` streams and in the
-IR test-bed and MPB runs.
+IRB and MPB runs.
 Second commit of the step: the stale references to removed dock_loading files (`mesa_sim/run_mesa.py` docstring example
 and the commented imports at :64-65; `domains/README.md`'s folder listing; a dated note on the dock_loading rows of
 `docs/rename_table.md`).
@@ -92,7 +92,7 @@ Coverage: `[coverage] ... repeatable=i` and `closing=j` beside `entry=i`. `world
 `closing[-1]` when the closing part is non-empty, else on `entries[-1]` (kitting).
 Files: `shared/types.py`, `shared/planner.py`, `world/human_executor.py`, `world/record.py`, `world/composition.py`,
 `mesa_sim/sim_agents.py`, `mesa_sim/sim_model.py`, `mesa_sim/run_mesa.py`. Readers: `world/queries.py`,
-`mesa_sim/list_scenarios.py`, `analysis/ir_testbed/trajectory.py` and the MPB oracle (through the replay's record).
+`mesa_sim/list_scenarios.py`, `analysis/irb/trajectory.py` and the MPB oracle (through the replay's record).
 Acceptance: the maintained sets byte-identical; the ten kitting scenarios with a drop event (scenario_s01_03, s01_07,
 s02_03, s03_04, s03_07, s04_02, s04_03, s05_03, s06_05, s07_02) and both test-bed sets (IR, 17 run files; MPB, 16) run
 at HEAD (step 0) and after the change: the `.rec` streams and every grep of CLAUDE.md's list byte-identical. A difference
@@ -114,7 +114,7 @@ again: applicable`. A hypothesis not applicable on the first tick never enters H
 inapplicable stays retired (TODO-129's path). The perfect-fit scoring of an undecomposable hypothesis and its warning are
 removed. One definition: the planner's (`is_applicable`), read through `decompose` so that each hypothesis is decomposed
 once per tick.
-Acceptance: the maintained sets and the IR test-bed logs byte-identical (no kitting hypothesis is ever undecomposable: 0
+Acceptance: the maintained sets and the IRB logs byte-identical (no kitting hypothesis is ever undecomposable: 0
 "not decomposable" lines in the 48 maintained logs and the 33 test-bed logs).
 Tests (`tests/test_tg_liveness.py`): leaving H; the pin; re-entry at 1/|H|; not entering on the first tick; exhausted;
 retired and inapplicable.
@@ -168,7 +168,7 @@ timing; an object-less fact loads and is emitted; the gate's state emitted; the 
   (0, -300): the hall, by declaration order). No B14 target lies within 30 cm of an edge except the two passages.
 Files: `shared/types.py`, `shared/projection.py`, `world/human_executor.py`, `mesa_sim/world_state_builder.py`,
 `mesa_sim/sim_model.py`, `mesa_sim/obs_builder.py`, `mesa_sim/executor.py`, `mesa_sim/viz/space_drawer.py`, the layouts,
-`analysis/ir_testbed/oracle.py`.
+`analysis/irb/oracle.py`.
 Acceptance: the maintained sets byte-identical (kitting's schemas read no area fact; the tb3 orderings exercise
 `successor_state`); every registered scenario loads; the test-bed sets byte-identical; the kitting replay's transitions
 unchanged (walk totals may move by the stop distance: counted and reported).
@@ -268,7 +268,7 @@ The rename's names (section 1); `Area`, `WorldState.areas`, `area_of`, `AREA_FAC
 | 0 | none | HEAD runs of the extended set (the ten drop scenarios, the IR and MPB test-bed sets), kept in the scratchpad | - |
 | 1 | the rename; the stale references | maintained sets byte-identical, no regeneration | any difference |
 | 2 | areas and R2 (with the carriers removed) | maintained sets and test-bed sets byte-identical; every scenario loads | a difference or a load failure |
-| 3 | A4 (with `is_applicable`) | maintained sets and IR test-bed byte-identical | a difference |
+| 3 | A4 (with `is_applicable`) | maintained sets and IRB byte-identical | a difference |
 | 4 | A5 (the dock_loading setups converted) | kitting byte-identical; the dock_loading fixtures run | a difference |
 | 5 | A3 | maintained sets, drop scenarios and test-beds byte-identical | a difference, which returns as a finding |
 | 6 | the dock_loading catch-up (with the area ids) | kitting untouched; the fixtures run | a fixture fails |
@@ -286,8 +286,7 @@ with the script `[confirm_delivered_pallet("pallet_0"), RepeatableEntry(go_to("s
 `[go_to("desk")]`, `ScriptDependence.ON_ROBOT`; prior on; 800 steps literal, the completion tick reported. Each purpose
 states the standby walk as unmodelled behaviour.
 
-After the milestone (preparation only, no measuring scenario; their scenarios are agreed with Hadi first): the IR
-test-bed and MPB instruments take the domain from the run file; the body's facts gain `area_fact` and the declared
+After the milestone (preparation only, no measuring scenario; their scenarios are agreed with Hadi first): the IRB and MPB instruments take the domain from the run file; the body's facts gain `area_fact` and the declared
 states; the oracle models A4; the instruments obtain the human's run-time sequence from the executor's own selection
 rule (the stack machine), never implementing it a second time (one definition); the MPB's question C6 stays open.
 
@@ -300,7 +299,7 @@ finding about the mind; nothing is adjusted.
 
 ## Notes recorded with the approval
 
-- The IR test-bed setup's case with the assigned scan of the pallet in the truck: the script is declared dependent, the
+- The IRB setup's case with the assigned scan of the pallet in the truck: the script is declared dependent, the
   priority list never finishes, so that run has no walk to the desk.
 - Parked for after the milestone, not ruled: whether the robot's mind holds a hypothesis for the human stepping aside.
 - The rename leaves `ros_sim/` passing the old field names; `ros_sim/` is not touched (TODO-111's note).

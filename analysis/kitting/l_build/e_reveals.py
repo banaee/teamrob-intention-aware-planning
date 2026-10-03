@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-E. Completion and reveal evidence, PRE (L-build: the TB.2b logs) against POST (L-build). The "unknown" column of the
+E. Completion and reveal evidence, PRE (L-build: the IRB.2b logs) against POST (L-build). The "unknown" column of the
 tick tables is 1.4's; the PRE logs have no `unknown` key and it reads 0.000.
 
 REVEAL: the first tick of a human task's span at which its hypothesis is most_likely with confidence >= θ (0.75), the

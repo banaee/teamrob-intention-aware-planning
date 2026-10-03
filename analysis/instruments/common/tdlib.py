@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-COPIED (the sort, 1 October 2026) from analysis/kitting/l_build/tdlib.py (frozen, L-build) as the IR test-bed
+COPIED (the sort, 1 October 2026) from analysis/kitting/l_build/tdlib.py (frozen, L-build) as the IRB
 instrument's log reader, so that the shared instruments import nothing from a domain's folder; the instruments use
 parse(), retired() and inapplicable(). Corrected here (the instruments' own log reading, for dock_loading): the pool and
 the winner read by each task's first binding, not by kitting's words (`item`, `ac_switch`, `coffee_machine`; the same
 value on every kitting log); the `[IR-inapplicable]` lines (T-G A4) and inapplicable(). The rest of this docstring and runs() / truth() are the L-build original's, unchanged (their
 paths name the L-build folder layout).
 
-tdlib.py — the parser and the ground truth the 1.4 / 1.5b / TB.2b scripts share, rerun for L-build (design_decisions.md,
-"T-D L: the belief lifecycle"). Copied from analysis/tb2b_exposed_interval/ (1.4's logic, adapted in 1.5b to the
-`leader_adequacy=` field and in TB.2b to the TD_SIDE switch); changed here for L-build: this docstring, the paths, and
+tdlib.py — the parser and the ground truth the 1.4 / 1.5b / IRB.2b scripts share, rerun for L-build (design_decisions.md,
+"T-D L: the belief lifecycle"). Copied from analysis/irb2b_exposed_interval/ (1.4's logic, adapted in 1.5b to the
+`leader_adequacy=` field and in IRB.2b to the TD_SIDE switch); changed here for L-build: this docstring, the paths, and
 the parse of the L lines: a key may be pinned more than once and re-enter (`[IR-reentry]`), so `pins` and `reentries`
 list every (step, key) and `retired(log, key, t)` reads the interval; `complete` keeps the FIRST pin per key (as
 before, setdefault); `boundary_action` the action an `[IR-boundary]` names (step -> label, None on the PRE logs);
 `[meta-trig]`'s `cause=` (None on the PRE logs and for no_current_task); each decision carries its trigger's cause.
 
 Reads run logs and `.rec` streams only (no simulator import): the POST logs are the four maintained sets regenerated
-at L-build (`analysis/<set>/sweep/`), the PRE logs the TB.2b baselines (md5-identical to the READMEs' "TB.2b" sections,
+at L-build (`analysis/<set>/sweep/`), the PRE logs the IRB.2b baselines (md5-identical to the READMEs' "IRB.2b" sections,
 48 of 48), copied to `analysis/l_build/pre/<set>/` before the build. Supplementary: `pre/supp/` (HEAD before the build,
-identical to TB.2b's `post/supp/`) and `post/supp/`. All git-ignored.
+identical to IRB.2b's `post/supp/`) and `post/supp/`. All git-ignored.
 TD_SIDE=pre runs a script on the PRE logs in place of the POST ones (r["post"] and r["rec"] then name the PRE files),
 so that each statistic is computed by the same code on both sides and the two outputs diffed.
 
@@ -31,7 +31,7 @@ import math, re
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-# PRE: `pre/` (the TB.2b logs, copied before the L-build). POST is always the maintained sets and `post/supp/`.
+# PRE: `pre/` (the IRB.2b logs, copied before the L-build). POST is always the maintained sets and `post/supp/`.
 import os
 PRE = os.environ.get("TD_PRE", "pre")
 SIDE = os.environ.get("TD_SIDE", "post")   # "pre": the scripts read the PRE logs as their primary side

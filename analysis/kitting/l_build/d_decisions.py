@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-D. Decisions against the pre-build baseline (L-build: the TB.2b logs), prior on primary, prior off after, then the four
+D. Decisions against the pre-build baseline (L-build: the IRB.2b logs), prior on primary, prior off after, then the four
 supplementary runs. The POST trigger carries its cause (`cause=` since L-build: entered, replaced, boundary,
 retraction); the cause is shown, not compared (PRE has none).
 

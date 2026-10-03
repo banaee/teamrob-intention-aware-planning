@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 alteration.py — the meta-planner test-bed's single-rule alteration test (the engine and the rules every domain shares;
-a domain's own rules and its call are analysis/<domain>/mpb/alteration.py, since dock_loading's MPB, 2 October 2026) (MPB-4; the IR test-bed's method, its REPORT.md,
+a domain's own rules and its call are analysis/<domain>/mpb/alteration.py, since dock_loading's MPB, 2 October 2026) (MPB-4; the IRB's method, its REPORT.md,
 "The instrument can fail"): one rule of the derivation altered at a time in a scratch copy of the instrument's sources
-(analysis/instruments/mpb and analysis/instruments/ir_testbed, never committed), the per-tick table and the chain re-derived from each
+(analysis/instruments/mpb and analysis/instruments/irb, never committed), the per-tick table and the chain re-derived from each
 scenario's committed trajectory and observed run facts, and compared against the unchanged actual files. The count of
 disagreements per scenario shows whether the comparison detects the alteration. An undetected alteration is recorded
 as a property of the test set with its reason, unless it is an oracle defect.
@@ -50,12 +50,12 @@ SHARED = [
     ("B3", "the moving fallback not cut at the wall or the first object", "mpb/mpblib.py",
      ["duration = min(float(p.run_length), reach(position, u, room) / length)"],
      ["duration = float(p.run_length)"]),
-    ("C1", "commitment warrant ignored", "ir_testbed/oracle.py",
+    ("C1", "commitment warrant ignored", "irb/oracle.py",
      ['if ml not in self.committed and warrant != "observation":'], ['if warrant != "observation":']),
-    ("C2", "the movement source loosened to any walked path since the origin", "ir_testbed/oracle.py",
+    ("C2", "the movement source loosened to any walked path since the origin", "irb/oracle.py",
      ['return "observation" if math.dist(self.origin[k][0], g) - math.dist(pos, g) > 0 else "none"'],
      ['return "observation" if self.odo - self.origin[k][1] > 0 else "none"']),
-    ("C3", "warrant asked before the leader's adequacy", "ir_testbed/oracle.py",
+    ("C3", "warrant asked before the leader's adequacy", "irb/oracle.py",
      ['        if adequacy == "inadequate":\n            return "none(leader_inadequate)"\n'
       '        if adequacy != "adequate":\n            return "none(leader_no_observation)"\n'
       '        if ml not in self.committed and warrant != "observation":\n'
@@ -79,7 +79,7 @@ def prepare(scratch: Path, label: str, target: str, old, new) -> Path:
     if base.exists():
         shutil.rmtree(base)
     (base / "analysis" / "instruments").mkdir(parents=True)
-    for sub in ("mpb", "ir_testbed"):
+    for sub in ("mpb", "irb"):
         shutil.copytree(ROOT / "analysis" / "instruments" / sub, base / "analysis" / "instruments" / sub,
                         ignore=shutil.ignore_patterns("scenario_*", "runs", "__pycache__", "*.png"))
     path = base / "analysis" / "instruments" / target
@@ -102,10 +102,10 @@ def rederive(base: Path, scen: Path, work: Path, domain: str):
     oracle = base / "analysis" / "instruments" / "mpb" / "mpb_oracle.py"
     # the scratch oracle's ROOT is the repo's (its sys.path), but the IR oracle it imports must be the scratch copy
     src = oracle.read_text().replace('ROOT = Path(__file__).resolve().parents[3]', f'ROOT = Path("{ROOT}")') \
-        .replace('str(ROOT / "analysis" / "instruments" / "ir_testbed")',
-                 f'"{base / "analysis" / "instruments" / "ir_testbed"}"')
+        .replace('str(ROOT / "analysis" / "instruments" / "irb")',
+                 f'"{base / "analysis" / "instruments" / "irb"}"')
     oracle.write_text(src)
-    ir = base / "analysis" / "instruments" / "ir_testbed" / "oracle.py"
+    ir = base / "analysis" / "instruments" / "irb" / "oracle.py"
     ir.write_text(ir.read_text().replace('ROOT = Path(__file__).resolve().parents[3]', f'ROOT = Path("{ROOT}")'))
     subprocess.run([PY, str(oracle), str(scen / "trajectory.json"), str(run_file), str(log),
                     str(work / "expected_ticks.json")], check=True, env=env, cwd=ROOT, capture_output=True)

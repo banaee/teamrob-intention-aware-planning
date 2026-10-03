@@ -47,7 +47,7 @@ in REPORT.md).
    - It is not a behavioural timeout. A run that does not complete within it is classified 2 or 4, never given a
      longer cap.
 2. **The run** (`mesa_sim/run_mesa.py`, the run file and the options).
-3. **`analysis/ir_testbed/trajectory.py`** (imported, unchanged) expands the load-time replay per tick with the body's
+3. **`analysis/irb/trajectory.py`** (imported, unchanged) expands the load-time replay per tick with the body's
    timing. Its own check compares it with the run's human lines on every tick.
 4. **`actual.py`** re-executes the run in-process (the primary source) and reads the run log (the check).
    - Pass-through recorders on the robot's MetaPlanner instance capture `evaluate_triggers` (the TriggerDecision and
@@ -69,8 +69,8 @@ in REPORT.md).
 9. **`reference.py`** runs the reference: the control's robot alone, the human removed. It is not registered (a
    reference run, not a scenario).
 10. **`plot.py`** draws `figure.png`, the MPB's decisions-and-distance figure.
-11. **`plot_ir.py`** (prior on; added at the close-out) draws `figure_ir.png`: the IR test-bed's figure
-    (`analysis/ir_testbed/plot.py`, imported unchanged), the same panels, on the MPB's oracle table and in-process
+11. **`plot_ir.py`** (prior on; added at the close-out) draws `figure_ir.png`: the IRB's figure
+    (`analysis/irb/plot.py`, imported unchanged), the same panels, on the MPB's oracle table and in-process
     actual: the belief and the tail probability S per hypothesis of the support (expected lines, actual dots), the
     finding band, the observation-warrant bands and the gate's clearing, θ and α marked.
 12. **`alteration.py`** runs the single-rule alteration test (MPB-4) over the committed outputs.
@@ -108,15 +108,15 @@ were rerun with them, every log and `.rec` stream byte-identical to REPORT.md's 
 
 The oracle is `mpb_oracle.py`, with `mpblib.py`.
 - It imports `shared.types`, `shared.knowledge.TaskModel`, `shared.planner` (AdaptivePlanner, DecompositionError),
-  `domains.kitting.registry`, and the IR test-bed's `oracle.py` (which imports the same).
+  `domains.kitting.registry`, and the IRB's `oracle.py` (which imports the same).
 - At exit it asserts that none of these is loaded: `shared.meta_planner`, `shared.realization`, `shared.projection`,
   `shared.recognizer`, `shared.likelihood_functions`, `world.human_executor` (which imports `shared.projection`), any
   `mesa_sim` module (`RobotAgent._perceive`).
-- The trajectory is expanded in its own process, as in the IR test-bed.
+- The trajectory is expanded in its own process, as in the IRB.
 - θ is read from the run's `[run]` header, the one value read from a log.
 
 Sources: DP = "T-D P" (P2 as kept by P4, P4, Q6); DG = "T-D G" (AD1, AD4); IO = `shared/io_contracts.md` §2.2;
-GL = `docs/glossary.md`; IR = `analysis/ir_testbed/README.md`.
+GL = `docs/glossary.md`; IR = `analysis/irb/README.md`.
 
 | # | rule | source |
 |---|---|---|
@@ -127,7 +127,7 @@ GL = `docs/glossary.md`; IR = `analysis/ir_testbed/README.md`.
 | M4 | The ray: the nearer of the workspace rectangle and the entry into the arrival radius (the body's, 30 cm) of the first fixed object along it (every object of the layout, landmarks included); an object whose radius contains the start is skipped | DP P2 (kept by P4), P4 AS BUILT |
 | M5 | The fallback on a tick: standing, k = the standing count, duration k; moving, k = the run length, duration min(k, reach / step length); none without a previous observation | DP P4 |
 | M6 | Its end: the tick + the observation offset (1) + the duration; `projection_expired` fires on the first tick at or after it | DP Q6; IO |
-| M7 | The admitted projection's identity: the leader's key and the planner's decomposition of its task in the tick's world (the full decomposition, as `Projector.project` builds it) | MPB-1 (the planner's decomposition, as the IR test-bed uses it) |
+| M7 | The admitted projection's identity: the leader's key and the planner's decomposition of its task in the tick's world (the full decomposition, as `Projector.project` builds it) | MPB-1 (the planner's decomposition, as the IRB uses it) |
 | C1 | The decision record: the hypothesis on admission (cleared on a refusal) and the fallback's end (set when admission returns one, cleared otherwise), set at every decision, the robot's included | D2; DP Q6; MPB-1 |
 | C2 | On a tick: `no_current_task`, then `recognition_changed`, then `projection_expired`; a `no_current_task` tick masks the others | D3 as superseded by Q6; IO |
 | C3 | `recognition_changed` with a record: replaced, then boundary, then retraction (the recorded hypothesis inadequate); without one: entered (the gate clears) | IO (L-build); T-D L, L2 (ii), L5 B; D2 |

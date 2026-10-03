@@ -4,7 +4,7 @@ The artefacts of the meta-planner test-bed (design_decisions.md, "The meta-plann
 geometric and timing checks they were authored against, before any MPB run. 29 September 2026.
 
 **Status of every number here: an authoring check.** The distances and ticks below were derived by hand from the layout
-and, where stated, by the pre-run checks (the robot alone, the IR test-bed's expansion and oracle on each script). They
+and, where stated, by the pre-run checks (the robot alone, the IRB's expansion and oracle on each script). They
 show that each scenario can expose its decision. They are previews, not expectations: the expectations are the MPB
 oracle's (analysis/mpb/README.md, the derivations of parts 1 to 3), and a preview never becomes an oracle rule.
 
@@ -14,7 +14,7 @@ W 1000 × H 1400 cm, centred origin, x ∈ [−500, 500], y ∈ [−700, 700].
 
 The human's side is the 10/11 pattern (env_layout_10 / _11) translated by (0, −200). Every object keeps its relative
 arrangement and its distance to the south and east walls, and the room gains 400 cm to the north for the robot. The
-recognizer reads distances only, so a TB script run here has the IR test-bed's trajectory, translated. The belief
+recognizer reads distances only, so a IRB script run here has the IRB's trajectory, translated. The belief
 differs only through the output floor: the setup's inadmissible robot items count among the keys held at the floor.
 The pre-run check below found the recognition ticks unchanged.
 
@@ -120,8 +120,8 @@ what it is authored to expose.
 
 ### Previews per scenario
 
-Recognition ticks come from the IR test-bed's expansion and oracle on each script (θ = 0.75, α = 0.05), before any MPB
-run. They are identical to the IR test-bed's committed gate tables for the same scripts (scenario_s09_01, _02, _13).
+Recognition ticks come from the IRB's expansion and oracle on each script (θ = 0.75, α = 0.05), before any MPB
+run. They are identical to the IRB's committed gate tables for the same scripts (scenario_s09_01, _02, _13).
 No robot decision is assumed in them. The expiry ticks are hand-derived from P4's persistence rule.
 
 - **scenario_s10_01.**
@@ -313,7 +313,7 @@ scenario_s09_07's script:
 - 135 entered (item_1 again);
 - then the exit.
 
-The IR test-bed's 46 was on env_layout_11. Here env_setup_10's five inadmissible robot items at the output floor lower
+The IRB's 46 was on env_layout_11. Here env_setup_10's five inadmissible robot items at the output floor lower
 the confidence enough to move the crossing to 47: the oracle's value, and it stands. No retraction. AD3 has no
 property here: it is not exercisable in the MPB set (design_decisions.md, "T-D G", AD3).
 
@@ -484,10 +484,10 @@ in the cost difference), not when the stand began.
 
 **The script.**
 - The planned detour (a drop cut into the walk, a short walk toward the machine, dropped in turn) cannot be expanded by
-  the oracle's trajectory: `analysis/ir_testbed/trajectory.py` reads a mid-action cut from a `Started` transition only,
+  the oracle's trajectory: `analysis/irb/trajectory.py` reads a mid-action cut from a `Started` transition only,
   and no committed script uses a drop cut.
 - Rather than extend the instrument, the scenario uses a committed script that produces the dip: scenario_s09_04's (the
-  IR test-bed's coffee before the pick-up), whose table dips on env_layout_11 (34 to 36, 0.715).
+  IRB's coffee before the pick-up), whose table dips on env_layout_11 (34 to 36, 0.715).
 - No detour length is chosen: the script has no parameter.
 
 **The table on this room** (env_setup_10):

@@ -399,9 +399,9 @@ REPORT.md, section 1.5c).
 | env_layout_08_scenario_s06_03_single_task_off | 0fe101800bf026ff5f7c19fc0c9cbb91 | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 | env_layout_08_scenario_s06_03_single_task_on | 3080642740a0e1c84180c4d2c9a93f7a | b9f1a0ec26cfa8c022b9951e9ec1b34b |
 
-## TB.2b: the cognitive loop does not end with the task pool — the logs from here on
+## IRB.2b: the cognitive loop does not end with the task pool — the logs from here on
 
-Regenerated at TB.2b (27 September 2026), superseding the 1.5c table above. CAUSE: the robot observes and recognizes
+Regenerated at IRB.2b (27 September 2026), superseding the 1.5c table above. CAUSE: the robot observes and recognizes
 on every tick; after its terminal return it evaluates no trigger, decides nothing and does not step the executor
 (design_decisions.md, "The cognitive loop does not end with the task pool"). Each log gains `[IR]` and `[IR-dist]`
 lines from the tick after the declared completion tick to the run's last tick (all but
@@ -409,7 +409,7 @@ env_layout_03_scenario_s03_01_full_reorder_off, whose robot does not complete: T
 `[IR]` and `[IR-dist]` lines now precede its `[meta-trig]` line, so every md5 changed. Criterion, met in all 20: the
 log with every `[IR*]` line removed is byte-identical to the 1.5c log, the `[IR*]` lines are byte-identical up to and
 including the declared tick, and the `.rec` streams are byte-identical to the table above. Command: `analysis/tb3_full_reorder/sweep.sh analysis/tb3_full_reorder/sweep`.
-Check and measurements: `analysis/tb2b_exposed_interval/` (`baseline_diff.txt`, REPORT.md).
+Check and measurements: `analysis/irb2b_exposed_interval/` (`baseline_diff.txt`, REPORT.md).
 
 | log | md5 (.log) | md5 (.rec) |
 |---|---|---|
@@ -436,7 +436,7 @@ Check and measurements: `analysis/tb2b_exposed_interval/` (`baseline_diff.txt`, 
 
 ## L-build: T-D L, the belief lifecycle — the logs from here on
 
-Regenerated at L-build (28 September 2026), superseding the TB.2b table above. CAUSE: design_decisions.md, "T-D L: the
+Regenerated at L-build (28 September 2026), superseding the IRB.2b table above. CAUSE: design_decisions.md, "T-D L: the
 belief lifecycle", as amended on the L-records report: the episode boundary is the observed agent's completion of a
 terminal action (L1); a hypothesis is retired while its terminal fact holds and re-enters at 1/|H| (L4, `[IR-reentry]`,
 new); `recognition_changed` also fires on the belief's episode boundary (L5 B) and on the recorded hypothesis's

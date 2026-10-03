@@ -1,5 +1,5 @@
 {
-  "notes": "T-G stage 1, kind 1 (the IR test-bed), written for env_layout_03 (design_decisions.md, \"T-G: the second domain's rulings\", B14): two full unscanned pallets in each delivery bay, each designated to the bay it stands in; one full pallet in the truck, designated to the dry delivery bay; no empty pallets.",
+  "notes": "T-G stage 1, kind 1 (the IRB), written for env_layout_03 (design_decisions.md, \"T-G: the second domain's rulings\", B14): two full unscanned pallets in each delivery bay, each designated to the bay it stands in; one full pallet in the truck, designated to the dry delivery bay; no empty pallets.",
   "env_objects": [
     {
       "id": "pallet_0",

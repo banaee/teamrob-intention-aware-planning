@@ -62,7 +62,7 @@ check-out; the items not taken.
 
 - Stage 1, the basic domain: the robot delivers and returns; the human scans, takes the two breaks and
   steps aside to the standby place; the gate is declared open; the office door has no state. The
-  framework-wide mechanisms are first built here. The IR test-bed, then the MPB.
+  framework-wide mechanisms are first built here. The IRB, then the MPB.
 - Stage 2: store_pallet; the gate opened on request; the office door's state; after the MPB's first
   run, TODO-16 with the stepwise delivery.
 - After stage 2: track 4. It now comes before T-F, and T-F may use the unmonitored office on
@@ -93,7 +93,7 @@ This section stays as the question's record.
 - To place when the layout is drawn: the coffee machine, the standby place, the landmarks for the exit
   walk. The gate's button and the desk belong to stages 2 and 3.
 - The areas of the room (truck side, hall, office) are declared in the layout.
-- For the IR test-bed the robot is idle, so that setup places the pallets in their delivery containers
+- For the IRB the robot is idle, so that setup places the pallets in their delivery containers
   from the start.
 
 ## 7. What stage 1's plan must contain or settle (design entry, C3 and C4)
@@ -144,7 +144,7 @@ terms ("body" for the simulator, "embodiment layer") can go with stage 1's recor
   8, 9, 10), docs/assumptions.md (5.3; the note on 2.3), docs/TODOS_AND_DEFERRED.md, docs/roadmap.md
   ("The plan from T-A", the T-G stages), CLAUDE.md (the state paragraph).
 - Domain: domains/dock_loading/ (build 1's state), domains/kitting/ (the reference for every form).
-- Instruments: analysis/ir_testbed/, analysis/mpb/.
+- Instruments: analysis/irb/, analysis/mpb/.
 - Handoffs: docs/handoffs/ (this file belongs there).
 
 CORRECTED (T-G records 1, third follow-up, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings"):

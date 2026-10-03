@@ -1,42 +1,41 @@
 #!/usr/bin/env python3
 """
 mpb_oracle.py — the meta-planner test-bed's per-tick table of parts 1 to 3 (MPB-1; design_decisions.md, "The meta-planner
-test-bed (MPB)"), derived before the run from the human's side alone: the trajectory (analysis/ir_testbed/
+test-bed (MPB)"), derived before the run from the human's side alone: the trajectory (analysis/irb/
 trajectory.py, the load-time replay expanded per tick with the body's timing, its own process) and the records.
 
     mpb_oracle.py <trajectory.json> <run file> <run.log | theta=<value>> <expected_ticks.json>
 
-Prior on only: the IR test-bed's oracle derives the support under the prior (its rule 1), and MPB-6 compares no
+Prior on only: the IRB's oracle derives the support under the prior (its rule 1), and MPB-6 compares no
 prior-off run against the oracle.
 
 Per tick: the leader, the boundary, the adequacy finding, every live hypothesis's hypothesis adequacy and the gate's
-outcome (the IR
-test-bed's oracle, analysis/ir_testbed/oracle.py, its rules 1 to 23 with their sources, imported unchanged); the
+outcome (the IRB's oracle, analysis/irb/oracle.py, its rules 1 to 23 with their sources, imported unchanged); the
 leader's warrant sources when the gate clears; P4's perception facts and the fallback projection a decision on the
 tick would rest on (mpblib); and, when the gate clears, the admitted projection's identity: the leader's key and the
-planner's decomposition of its task in the tick's world (the domain's structure, as the IR test-bed uses it; not cost,
+planner's decomposition of its task in the tick's world (the domain's structure, as the IRB uses it; not cost,
 realization or selection).
 Beside the table, for the figure only (plot_ir.py; never compared): per tick the belief and the tail probability S of
-every hypothesis of the support and the lifecycle, the IR test-bed's oracle rows as they are (the belief carries the
+every hypothesis of the support and the lifecycle, the IRB's oracle rows as they are (the belief carries the
 output floor of the setup's robot items, held outside the support).
 
 The independence boundary (MPB-1): this process imports nothing from shared/meta_planner.py, shared/realization.py,
 shared/projection.py, shared/recognizer.py, shared/likelihood_functions.py or mesa_sim/ (RobotAgent._perceive), nor
 world/human_executor.py (which imports shared/projection.py), and asserts at exit that none was loaded. θ is read from
-the run's [run] header, the one value read from the log (as the IR test-bed's oracle reads it).
+the run's [run] header, the one value read from the log (as the IRB's oracle reads it).
 
 Sources: MPB = design_decisions.md "The meta-planner test-bed (MPB)"; DG = "T-D G: admission" (AD1, AD4); DP = "T-D P"
-(P4, Q6); IO = shared/io_contracts.md §2.2; IR = analysis/ir_testbed/README.md (its rules 1 to 23).
+(P4, Q6); IO = shared/io_contracts.md §2.2; IR = analysis/irb/README.md (its rules 1 to 23).
 """
 import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path[:0] = [str(ROOT), str(ROOT / "analysis" / "instruments" / "ir_testbed"), str(Path(__file__).resolve().parent)]
+sys.path[:0] = [str(ROOT), str(ROOT / "analysis" / "instruments" / "irb"), str(Path(__file__).resolve().parent)]
 
 import yaml
-import oracle as ir                                    # the IR test-bed's oracle (analysis/ir_testbed/oracle.py)
+import oracle as ir                                    # the IRB's oracle (analysis/irb/oracle.py)
 from shared.knowledge import TaskModel
 from shared.planner import AdaptivePlanner, DecompositionError
 from mpblib import Action, Admitted, Gate, Room, TickRow, dump, fallback, perception

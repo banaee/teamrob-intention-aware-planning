@@ -337,7 +337,7 @@ scenario_s10_10 = ScenarioConfig(
     reference_layouts=["env_layout_12"],
     description=_MPB + (
         "scenario_s10_10, a record kept through a dip below theta (MPB part (v), coverage row E6; D2's retention by "
-        "identity): scenario_s09_04's script on this room (the IR test-bed's coffee before the pick-up): coffee_break "
+        "identity): scenario_s09_04's script on this room (the IRB's coffee before the pick-up): coffee_break "
         "started at the boundary after item_1's first walk, empty-handed at shelf_1, then deliver item_2, exit. Modelled "
         "behaviour only, besides the exit walk. Authored to expose the retention: after deliver_item(item_1) is admitted "
         "(entered), the human's walk toward the machine lowers its share below theta while it stays the leader and "

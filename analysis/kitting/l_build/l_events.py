@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-L. The lifecycle's events per run, POST (L-build) against PRE (TB.2b), prior on first, then prior off, then the four
+L. The lifecycle's events per run, POST (L-build) against PRE (IRB.2b), prior on first, then prior off, then the four
 supplementary runs:
   boundaries   every [IR-boundary] tick, with the action it names and whether a pin ([IR-complete]) falls on the same
                tick ("pin" / "NO PIN": T-D L1's new boundaries); PRE's boundary ticks beside them;

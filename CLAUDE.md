@@ -174,25 +174,25 @@ Decisions
   it; acceptance is `analysis/kitting/td_stage1b/REPORT.md`. Session 1.5c closed cycle 1 (27 Sept 2026): E6 amended a second
   time (a stationary tick within the priced standing of any phase with s_exp > 0 is an observation at S = 1; no
   member on a boundary tick), zero false unexplained on modelled ticks; the 1.5b findings are cycle 2 inputs
-  (TODO-87, TODO-118, TODO-119). Next: the IR test-bed track, then cycle 2, L, P, the rest of G, and X, each ruled
-  on these results. The IR test-bed (TB, ruled 27 Sept 2026; design_decisions.md, "The IR test-bed") tests the
+  (TODO-87, TODO-118, TODO-119). Next: the IRB track, then cycle 2, L, P, the rest of G, and X, each ruled
+  on these results. The IRB (ruled 27 Sept 2026; design_decisions.md, "The intention-recognition test-bed (IRB)") tests the
   recognizer in isolation, on a layout, setup and scenarios written for it, against expectations derived from the entry
-  before the run, in three sessions: TB.1r (records), TB.2b (the cognitive-loop correction), TB.3b (the artefacts, the
-  expectation generator, the runs, the report; `analysis/kitting/ir_testbed/`). The cognitive loop does not end with the task
-  pool (ruled 27 Sept 2026; design_decisions.md, the entry of that name; built in TB.2b): observation and
-  recognition run on every tick, and an empty pool stops planning and execution only. TB.3b built the IR test-bed
-  (27 Sept 2026; env_layout_10, env_setup_08, scenario_s08_01 to _04, run files in `configs/kitting/ir_testbed/`, the
-  instrument in `analysis/instruments/ir_testbed/`, its report in `analysis/kitting/ir_testbed/`): the recognizer's public outputs agree with the independent
-  oracle on every compared tick of the four runs. TB.4b made the instrument independent of the layout and added the
-  enlarged room (env_layout_11, env_setup_09, scenario_s09_01 to _12: the TB.3b scripts, the deviations and the
+  before the run, in three sessions: IRB.1r (records), IRB.2b (the cognitive-loop correction), IRB.3b (the artefacts, the
+  expectation generator, the runs, the report; `analysis/kitting/irb/`). The cognitive loop does not end with the task
+  pool (ruled 27 Sept 2026; design_decisions.md, the entry of that name; built in IRB.2b): observation and
+  recognition run on every tick, and an empty pool stops planning and execution only. IRB.3b built the IRB
+  (27 Sept 2026; env_layout_10, env_setup_08, scenario_s08_01 to _04, run files in `configs/kitting/irb/`, the
+  instrument in `analysis/instruments/irb/`, its report in `analysis/kitting/irb/`): the recognizer's public outputs agree with the independent
+  oracle on every compared tick of the four runs. IRB.4b made the instrument independent of the layout and added the
+  enlarged room (env_layout_11, env_setup_09, scenario_s09_01 to _12: the IRB.3b scripts, the deviations and the
   same-side alternates; the s08 artefacts and outputs unchanged): zero disagreements at 1e-9 on all twelve.
-  The IR test-bed track is closed (TB close-out, 27 Sept 2026; design_decisions.md, "The IR test-bed", its foot); next
+  The IRB track is closed (IRB close-out, 27 Sept 2026; design_decisions.md, "The intention-recognition test-bed (IRB)", its foot); next
   is cycle 2, L.
   L, the belief lifecycle, is ruled (L-records, 27 Sept 2026; design_decisions.md, "T-D L: the belief lifecycle", L1 to
   L5: the boundary on a terminal action's completion, retraction by the meta-planner, liveness while the terminal fact
   holds); L-build built it (28 Sept 2026: the boundary on the observed agent's completion of a terminal action, the
   live set read from the terminal facts every tick with re-entry at 1/|H|, retraction and the boundary flag in
-  `recognition_changed`; `analysis/kitting/l_build/REPORT.md`, the IR test-bed agreeing at 1e-9); next is P.
+  `recognition_changed`; `analysis/kitting/l_build/REPORT.md`, the IRB agreeing at 1e-9); next is P.
   P, the fallback projection, is built and closed (28 Sept 2026; design_decisions.md, "T-D P"): when admission refuses
   and a human is observed, a short-term physical projection from the observed position and the last displacement
   (standing, or a straight continuation to the wall or the first fixed object) over each candidate's span; a
@@ -209,14 +209,14 @@ Decisions
   s03_01, s04_01, s06_03) end with the exit walk `go_to("corner_SE")` (1.1; env_layout_02 and env_layout_08 gained
   corner_SE), and the four maintained sets are regenerated (the "2.5" sections: every log completes; the `[sep]` minimum
   and F1's classes per run, `analysis/instruments/common/sep_classes.py`); scenario_s09_13 (the mid-action change, a
-  coffee_break cut into a carry) agrees with the IR test-bed's oracle, extended to cuts; TODO-95 closed (3.4), TODO-135
+  coffee_break cut into a carry) agrees with the IRB's oracle, extended to cuts; TODO-95 closed (3.4), TODO-135
   to TODO-139 recorded. G is ruled (29 Sept 2026; design_decisions.md, "T-D G: admission", AD1 to AD5): admission
   also requires warrant (commitment or observation that justifies admission; not the support restriction), a third
   output beside belief and adequacy; TODO-119 closed, TODO-132 (a) and TODO-134 parked. G is built (G-build, 29 Sept
   2026; design_decisions.md, "T-D G", BUILT): `BeliefState.observation_warrant` (the entry and the movement source; an
   unresolved `move_to` has the entry source only), the meta-planner's `observed_assigned_tasks` (commitment warrant),
   `none(leader_unwarranted)` after `none(leader_inadequate)`, `[IR] ... warrant=[...]` and `[meta-proj] projection=built
-  warrant=...`; the IR test-bed's oracle extended (warrant and the gate's outcome per tick, 0 disagreements on the
+  warrant=...`; the IRB's oracle extended (warrant and the gate's outcome per tick, 0 disagreements on the
   seventeen); the four maintained sets regenerated ("G-build" sections: prior on, only the lone coffee_break's admission
   at b + 1 moves, no completion). Recorded: the movement source is a half-plane test (the exit walk warrants the lone
   coffee_break in scenario_s09_01 from 126; a competitor is TODO-140's). Next is X.
@@ -274,7 +274,7 @@ Decisions
   it changing `shared/` or `world/` when built, each with kitting byte-identical or no decision changed as acceptance;
   part B dock_loading only; part C the stages), and build 1 is in (30 Sept 2026; 56e674e, 6e29c15, 62ebc4e: form-only
   repairs). Stage 1's rooms and setups are agreed and written (B14, 1 Oct 2026): env_layout_02 to _04, six setups (two
-  kinds per room: the IR test-bed's, the MPB's), one viewing fixture per pair; env_layout_01, env_setup_01 and build 1's
+  kinds per room: the IRB's, the MPB's), one viewing fixture per pair; env_layout_01, env_setup_01 and build 1's
   scenarios removed; full observation in stage 1. Stages (what
   each first builds: the entry's C1): 1 the basic domain, opened by the rename of the zone mechanism to "area" (its own
   commit, no change of behaviour), with the forms' catch-up (C3) and the framework-wide A3 (the script's priority form,
@@ -282,7 +282,7 @@ Decisions
   repeatable standby entry, the dependence declaration for the load-time check, the closing part; also checked on the
   kitting drop scenarios and the test-bed misdeliveries), A4 (liveness by applicability, `shared/`), A5 (object states
   and designations; its form admits a fact no action changes) and A9 (areas), each accepted on kitting byte-identical;
-  dock_loading's closing part is the walk to the desk, a landmark in stage 1's layout (B13); then the IR test-bed and the
+  dock_loading's closing part is the walk to the desk, a landmark in stage 1's layout (B13); then the IRB and the
   MPB on dock_loading, after a milestone (one simple scenario per room runs from start to end); then T-G pauses for
   context knowledge, T-K part 1 (framework-wide, from its own handoff; the pre-loaded context stream moved there from
   T-V track 2); 2 `store_pallet` with B10's room (the stores), the gate opened on request,
@@ -307,18 +307,17 @@ Decisions
   scenario: no standby walk, no meeting at a shared bay; TODO-135's third instance; TODO-154 to TODO-157). Next: a
   second simple scenario per room; then a step of its own (no change of behaviour): the earlier analyses in `analysis/`
   and the tests sorted under kitting, the instruments' code shared and their run sets, expectations and reports per
-  domain, every path named in a record or a README updated, with the preparation of the instruments; then the IR
-  test-bed scenarios on dock_loading, agreed with Hadi before they are authored.
+  domain, every path named in a record or a README updated, with the preparation of the instruments; then the IRB scenarios on dock_loading, agreed with Hadi before they are authored.
   The second milestone scenario is BUILT and accepted, and stage 1's milestone is complete (1 Oct 2026;
   design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE SECOND MILESTONE SCENARIO BUILT): scenario_s03_03,
   s05_03, s07_03 (0371035), one per room, prior on, `single_task`, 1000 steps: the robot completes its four tasks and
   every entry of the human's script is closed in all three. Not exercised: the robot arriving at a bay where the human
   stands, two scans at once in one bay (the human finishes a scan before the next pallet arrives). Its findings are
   recorded there (five of six standby walks admitted as a break, TODO-155; TODO-135's fourth instance; TODO-145;
-  TODO-154). Next: the design of the IR test-bed set with Hadi (first question: TODO-155); then the sorting of the
+  TODO-154). Next: the design of the IRB set with Hadi (first question: TODO-155); then the sorting of the
   earlier analyses and tests under kitting, with the preparation of the instruments; then the set's authoring and its
   runs.
-  The IR test-bed set on dock_loading is AGREED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's
+  The IRB set on dock_loading is AGREED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's
   rulings", T-G Q16's block, RULED, T-G records 8): T-G Q16, the walk to the standby place stays without a hypothesis
   for now (the set observes the present recognizer; H1 and H2 on TODO-155, neither approved); `office_break` lasts 90
   seconds (TODO-157, the value changed in the next build step); 14 controlled scenarios (C1 to C14) and 4 mixed (M1 to
@@ -326,8 +325,8 @@ Decisions
   T-K part 1, the share at an episode's start (TODO-154), not ruled. Next: the build step that sorts the earlier analyses
   and tests under kitting and prepares the instruments for dock_loading; then the authoring of the set, its expectations
   and its runs.
-  The IR test-bed on dock_loading is BUILT, RUN AND ACCEPTED, and the IR test-bed of stage 1 is CLOSED (1 to 2 Oct 2026;
-  design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IR TEST-BED ON DOCK_LOADING BUILT, RUN AND ACCEPTED): the sort (the tree in "Where to look"), the instruments prepared (the human's sequence from the executor's own
+  The IRB on dock_loading is BUILT, RUN AND ACCEPTED, and the IRB of stage 1 is CLOSED (1 to 2 Oct 2026;
+  design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED): the sort (the tree in "Where to look"), the instruments prepared (the human's sequence from the executor's own
   selection rule; A4 in the oracle; the separation counts), office_break at 90 seconds (45 ticks: one tick is 2
   seconds), 54 scenarios (scenario_s02_02 to _19, s04_02 to _19, s06_02 to _19; C1 to C14 as _02 to _15, M1 to M4 as
   _16 to _19), expectations committed before the runs; 42 controlled and 12 mixed runs, zero disagreements (the

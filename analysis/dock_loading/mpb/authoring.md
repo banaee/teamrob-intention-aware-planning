@@ -10,7 +10,7 @@ table, committed before the runs, decides every tick.
 
 env_layout_03 and env_layout_04 (B14). Positions in cm; one tick is 2 seconds; the body walks in whole steps of 20 cm
 toward the target until within the arrival radius (30 cm), then one acknowledgement tick; a scan is a touch and its
-acknowledgement; a wait or a stand of n ticks is n ticks and its acknowledgement. This rule reproduces the IR test-bed's
+acknowledgement; a wait or a stand of n ticks is n ticks and its acknowledgement. This rule reproduces the IRB's
 last acknowledgement ticks of C1, C5, C6, C11 and C14 in both rooms exactly.
 
 | object | env_layout_03 | env_layout_04 |
@@ -68,12 +68,12 @@ The human starts at the standby place (0, 0) and closes with `go_to("desk")`; th
   110 (04): 91 ticks from the stand's first tick in both rooms. 96 adds 5 against an off-by-one in this hand count
   (the oracle's table is exact). K3 and M3 use the same human stand (K3 is "as K4" for the human; M3 combines K3).
 - **The stand of K9: 30 ticks, PT60S**: MPB-5's idle margin, which covers E5's standing threshold (25 ticks at
-  alpha = 0.01); the IR test-bed's C14 shows the leader inadequate 15 (03) and 7 (04) ticks after the arrival.
+  alpha = 0.01); the IRB's C14 shows the leader inadequate 15 (03) and 7 (04) ticks after the arrival.
 - **K8's cut, DL-P1**: on the last step of the walk to pallet_0. The walk from the standby place is 27 steps in
   env_layout_03 (558 cm) and 16 in env_layout_04 (334 cm); the cut fires after 26, respectively 15, executed ticks:
   PT52S and PT30S. The human then walks to the coffee machine, waits, resumes the scan (the walk to pallet_0), scans
   pallet_2 and closes.
-- **M4's drop: PT28S** (14 ticks), the IR test-bed's approved value; shorter than every walk to a bay from the standby
+- **M4's drop: PT28S** (14 ticks), the IRB's approved value; shorter than every walk to a bay from the standby
   place.
 - coffee_break and office_break last 60 and 90 seconds (the schema's; MPB-DL5).
 

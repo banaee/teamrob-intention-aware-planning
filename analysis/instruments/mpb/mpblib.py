@@ -77,7 +77,7 @@ class Fallback:
 
 @dataclass(frozen=True)
 class Action:
-    """A grounded action by its name and bindings (the IR test-bed's `sig`)."""
+    """A grounded action by its name and bindings (the IRB's `sig`)."""
     name: str
     bindings: Tuple[Tuple[str, str], ...]
 

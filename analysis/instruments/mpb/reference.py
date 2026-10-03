@@ -3,7 +3,7 @@
 reference.py — the meta-planner test-bed's reference run (MPB-2, scenario 8; design_decisions.md, "The meta-planner
 test-bed (MPB)"): the same setup, the same robot and pool as a scenario, without the human. A reference run, not a
 scenario: it is not registered; the ScenarioConfig is built here from the scenario's own literal with the human agent
-removed and the robot's `observes` emptied (no agent to observe), as analysis/ir_testbed/trajectory.py builds a
+removed and the robot's `observes` emptied (no agent to observe), as analysis/irb/trajectory.py builds a
 human-only one. It runs through the same SimModel, in-process, with the run file's options.
 
     reference.py <run file> <steps> <out.log> <out.json> [--strategy single_task|full_reorder]

@@ -15,11 +15,11 @@ walk, ceil((d - arrival) / step) steps from the chain's position toward the targ
 short of it, and its acknowledgement; a pick_up or a place, its microaction and its acknowledgement; per task, the
 robot's task-completion tick. The chain's state follows: the robot's position and area, the pallet it holds, each
 pallet's container. Never the projector, the realization or the selection.
-The human's replay length: the replay's last acknowledgement tick + 1 (analysis/instruments/ir_testbed/trajectory.py,
+The human's replay length: the replay's last acknowledgement tick + 1 (analysis/instruments/irb/trajectory.py,
 the executor's own selection rule). For a script declared dependent on the robot (DL-P7) the replay runs on the state
 after the robot's chain (each pallet of the pool in the container the chain leaves it in, as the run's overrides of
 `setup.<pallet>.initial_container` read it); with the robot idle that script's scans never become applicable.
-MARGIN is the IR test-bed's idle margin (E5's standing threshold at alpha = 0.01 is 25 ticks; 30 covers it).
+MARGIN is the IRB's idle margin (E5's standing threshold at alpha = 0.01 is 25 ticks; 30 covers it).
 """
 import json
 import math
@@ -27,7 +27,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path[:0] = [str(ROOT), str(ROOT / "mesa_sim"), str(ROOT / "analysis" / "instruments" / "ir_testbed")]
+sys.path[:0] = [str(ROOT), str(ROOT / "mesa_sim"), str(ROOT / "analysis" / "instruments" / "irb")]
 
 import yaml
 from mesa_sim.world_state_builder import PROXIMITY_THRESHOLD

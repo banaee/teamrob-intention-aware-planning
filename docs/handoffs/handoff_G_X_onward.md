@@ -1,6 +1,6 @@
 # TeamRob handoff: from the test-bed / L / P / track 2.5 chat to the G-and-X chat
 
-Written 29 September 2026 by cchat (the design chat) at the end of the chat that ran the IR test-bed
+Written 29 September 2026 by cchat (the design chat) at the end of the chat that ran the IRB
 (track 1), cycle 2's L and P (with P4), the framework assumptions round and track 2.5. Everything named
 here is committed on `main`; Hadi pushes before the new chat starts. Nothing is open in ccode.
 
@@ -9,15 +9,15 @@ here is committed on `main`; Hadi pushes before the new chat starts. Nothing is 
 - The repo is authoritative over this document. Before opening any question, the new chat verifies
   section 2 (state) and section 9 (open items) from the repo and reports every disagreement to Hadi.
   Files: `CLAUDE.md`, `docs/glossary.md`, `docs/design_decisions.md` (entries "T-D R and E", "The
-  cognitive loop does not end with the task pool", "The IR test-bed", "T-D L: the belief lifecycle",
+  cognitive loop does not end with the task pool", "The intention-recognition test-bed (IRB)", "T-D L: the belief lifecycle",
   "T-D P" with P4), `docs/assumptions.md`, `docs/TODOS_AND_DEFERRED.md` (TODO-119, 131 to 139, 95
   closed, 97, 96, 134), `docs/recognizer_handback.md`, `shared/io_contracts.md`,
-  `analysis/ir_testbed/README.md` and `REPORT.md`, `analysis/l_build/REPORT.md`, the four maintained
+  `analysis/irb/README.md` and `REPORT.md`, `analysis/l_build/REPORT.md`, the four maintained
   READMEs (`analysis/tb1a_destination`, `tb1b_two_tables`, `tb1c_realized_flip`, `tb3_full_reorder`).
 - Terms come from `docs/glossary.md`. Beside every repo term, write its plain meaning once (section 1).
 - This document carries what the repo does not: the reasoning state, candidate rules marked as
   candidates, parked items with their status, the process rules learned in this chat, and the pipeline.
-- The previous handoff (`docs/handoffs/handoff_T-D_cycle2_and_IR_testbed.md`) is superseded by this one
+- The previous handoff (`docs/handoffs/handoff_T-D_cycle2_and_IRB.md`) is superseded by this one
   where they differ.
 
 ## 1. Working style, enforced in every reply (learned or confirmed in this chat)
@@ -96,7 +96,7 @@ need a genuine departure from the workspace.
 SUPERSEDED IN ITS ORDER (Hadi, 30 September 2026; `docs/roadmap.md`, "The plan from T-A", its order block): after
 track 3 come T-G, T-F, T-V (track 1 the viewer, which was T-E), then track 3b and track 4 in the T-D tail, then T-S.
 
-### 2.1 Track 1, the IR test-bed (closed)
+### 2.1 Track 1, the IRB (closed)
 
 Purpose: test the recognizer alone, robot idle, on scenarios written for it, with expectations derived
 from the records before the run by an oracle that imports nothing from `shared/recognizer.py` or
@@ -109,11 +109,11 @@ Artefacts (serial ids, per T-L ruling 4): `env_layout_10` (1000 × 1000, one tab
 shelves symmetric, coffee machine bottom offset west, `corner_SE` only), `env_setup_08`,
 `scenario_s08_01` to `_04`; `env_layout_11` (the same plus `kitting_table_1` and `shelf_3` at
 (-420, 300), 30.4° from shelf_1 after a shallow run showed 10.4° does not separate), `env_setup_09`,
-`scenario_s09_01` to `_13`. Run files in `configs/ir_testbed/`. The instrument is layout-independent:
+`scenario_s09_01` to `_13`. Run files in `configs/irb/`. The instrument is layout-independent:
 `trajectory.py` (the human's per-tick path from the load-time replay expanded with the body's walker),
 `oracle.py`, `actual.py`, `compare.py`, `plot.py`, `run.sh` (the run length from the replay plus a
-30-tick idle margin derived from E5). Sessions: TB.1r records, TB.2b the cognitive-loop correction,
-TB.3b layers 1 to 3, TB.4b layer 4 and the alternates, close-out.
+30-tick idle margin derived from E5). Sessions: IRB.1r records, IRB.2b the cognitive-loop correction,
+IRB.3b layers 1 to 3, IRB.4b layer 4 and the alternates, close-out.
 
 Scenarios and what they hold: _01 two deliveries; _02 coffee between; _03 coffee after the pick-up;
 _04 coffee after the first walk (empty-handed); _05 corner walk mid-carry (TODO-94); _06 the long
@@ -122,13 +122,13 @@ _09 a delivery of an unassigned item (outside the support); _10 two west shelves
 _11 the same with coffee between; _12 reversed order; _13 (track 2.5) the coffee break cut into the carry mid-walk
 (T-H's `during` cut, PT28S, cut at 46).
 
-Results: zero disagreements at every oracle comparison: 16 scenarios at TB and at L-build, 17 at track
+Results: zero disagreements at every oracle comparison: 16 scenarios at IRB and at L-build, 17 at track
 2.5 (with s09_13); at P and P4 the test-bed logs were diffed, not compared (only the step-0 `[meta-proj]`
 line differs). The oracle detects 7 of 8
 single-rule alterations; E8's member clause is covered by E6's second amendment whenever the completion
 latency is 1, so E8 is not exercised on its own (a body property, recorded).
 
-Cognitive-loop correction (TB.2b, ruled (c)): observation and recognition run on every tick
+Cognitive-loop correction (IRB.2b, ruled (c)): observation and recognition run on every tick
 unconditionally; `finished` (the robot's task pool is empty) guards only triggers, decision and
 execution; no_current_task does not refire on a permanently empty pool. Consequence: `[IR]` lines
 before `[meta-trig]` on every tick; the idle interval after the robot's completion was invisible in
@@ -351,7 +351,7 @@ one regeneration. Until then 1.1's corner walk stands.
 ## 8. Insights to carry (from the reports, for the paper and for design)
 
 - The implementation is faithful to the records: zero disagreements at 1e-9 at every oracle
-  comparison (16 scenarios at TB and L-build, 17 at track 2.5); a
+  comparison (16 scenarios at IRB and L-build, 17 at track 2.5); a
   disagreement between what we want and what we see is a design question, not a bug hunt.
 - Belief and adequacy are independent as R3 intended: the stand moves the finding and not the belief
   (s09_06); a confidently wrong belief with an unexplained finding (s09_09, coffee at 0.97 with no walk
@@ -388,7 +388,7 @@ one regeneration. Until then 1.1's corner walk stands.
     record until the records step of section 11.
 9.10 `docs/env_layouts_png/` screenshots are stale (old ids, no `corner_SE` on 02 and 08); cosmetic.
 9.11 E8 not exercisable on its own with completion latency 1; a design note, no action.
-9.12 The IR test-bed README has no P4 md5 section and no track 2.5 md5s for the 16 earlier runs (only
+9.12 The IRB README has no P4 md5 section and no track 2.5 md5s for the 16 earlier runs (only
     s09_13's are recorded); the local logs differ from L-build's only in the step-0 line.
 
 ## 10. Provenance of what this document says

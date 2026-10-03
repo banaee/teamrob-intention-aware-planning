@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-plot_ir.py — the IR test-bed's figure for an MPB run (added at the MPB close-out): the same panels as
-analysis/ir_testbed/plot.py (the belief per hypothesis, the tail probability S per hypothesis, the finding band, the
+plot_ir.py — the IRB's figure for an MPB run (added at the MPB close-out): the same panels as
+analysis/irb/plot.py (the belief per hypothesis, the tail probability S per hypothesis, the finding band, the
 observation-warrant bands and the gate's clearing; expected as lines, actual as dots; θ and α marked), drawn by that
 script, imported unchanged, on the MPB's oracle table (expected_ticks.json) and in-process actual (actual_ticks.json).
 Saved as figure_ir.png beside figure.png, which stays the MPB's decisions-and-distance figure (plot.py).
@@ -20,8 +20,8 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[0] / "ir_testbed"))
-import plot as ir_plot                                  # analysis/ir_testbed/plot.py, unchanged
+sys.path.insert(0, str(HERE.parents[0] / "irb"))
+import plot as ir_plot                                  # analysis/irb/plot.py, unchanged
 
 COLUMNS = ["tick", "key", "belief", "S", "finding", "lifecycle", "gate", "warrant"]
 
