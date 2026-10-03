@@ -281,8 +281,9 @@ Decisions
   kitting drop scenarios and the test-bed misdeliveries), A4 (liveness by applicability, `shared/`), A5 (object states
   and designations; its form admits a fact no action changes) and A9 (areas), each accepted on kitting byte-identical;
   dock_loading's closing part is the walk to the desk, a landmark in stage 1's layout (B13); then the IR test-bed and the
-  MPB on dock_loading, after a milestone (one simple scenario per room runs from start to end); 1.5 context knowledge (framework-wide, from its own handoff; nothing ruled yet; the pre-loaded
-  context stream moved here from T-V track 2); 2 `store_pallet` with B10's room (the stores), the gate opened on request,
+  MPB on dock_loading, after a milestone (one simple scenario per room runs from start to end); then T-G pauses for
+  context knowledge, T-K part 1 (framework-wide, from its own handoff; the pre-loaded context stream moved there from
+  T-V track 2); 2 `store_pallet` with B10's room (the stores), the gate opened on request,
   the office door's state, A7 (TODO-16), A8's monitored-area rule reopened; then track 4 (A8); 3 check-in and check-out.
   Before each stage's plan the design chat and Hadi agree its layout and setup. Next: stage 1's plan.
   Stage 1's plan is APPROVED (Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN
@@ -370,7 +371,7 @@ Decisions
   per stage after stage 1). Next: the stage to be named by Hadi.
   T-K part 1 (context knowledge) is RULED AND AMENDED, its build NOT STARTED (Hadi, 2 and 3 October 2026;
   design_decisions.md, "T-K: context knowledge in the recognizer's belief", R1 to R8, A1 to A7, AM1 to AM9;
-  design_records.md, "T-K", the cut, the open items). The stage is framework-wide: it concerns kitting and
+  design_records.md, "T-K", the cut, the open items). T-K is framework-wide: it concerns kitting and
   dock_loading alike. Context knowledge acts in the recognizer's belief only, never on the human; belief =
   normalise(prior × evidence), the prior computed at each run from the present context facts as the normalisation of
   the strengths of what is live (assigned work as a whole 1, each live foreseeable task its declared low or high
@@ -382,8 +383,8 @@ Decisions
   context knowledge off gives today's equal prior (AM3, AM9; replaces R9). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
   the removal of the domain task names and constants from the recognizer (TODO-66); an occurrence condition is a
   conjunction (AM7). Open, before the build, unchanged: the values for kitting and dock_loading (Hadi states them), the
-  perception assumption, the stage's tests. T-K part 2 (the build of R5, degrees; open: the representation of a context value
-  and of a degree, AM8) is added at the end of the V1 queue, after track 3b. Future work: TODO-158 to TODO-161 [FW]
+  perception assumption, the tests. T-K part 2 (the build of R5, degrees; open: the representation of a context value
+  and of a degree, AM8) is at the end of the V1 queue, after track 3b. Future work: TODO-158 to TODO-161 [FW]
   (TODO-162 superseded by AM3). Next: T-K part 1's open
   items, then its build's plan.
   T-K part 1's content points 1 (the values) and 2 (the perception assumption) are RULED (Hadi, 3 October 2026;
@@ -400,14 +401,14 @@ Decisions
   with more than one A/C switch and what rests on them (AM19; Hadi decides on it; the layout change and the
   regeneration before the build), then the build's plan.
   T-G stage 1.5 was renamed T-K part 1 on 3 October 2026; git commit messages use the old name.
-  T-K is REORGANISED (Hadi, 3 October 2026; design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS): T-K names
-  context knowledge as a whole, a task of the pipeline (framework-wide), not a stage of T-G. Part 1 (V1, ongoing):
+  T-K (design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS) is context knowledge as a whole, a task of the
+  pipeline (framework-wide), not a stage of T-G. Part 1 (V1, ongoing):
   crisp context knowledge, R1 to R8, AM1 to AM33, the state above. Part 2 (V1, at the end of the V1 queue after track
   3b): degrees (R5: membership functions, soft edges of a window, the gradual return after a task, "or", with "long
   work without a break" its open item; succession, R4, after T-G stage 2). Later, future work: the stream of context
   values with the world's dynamics, TODO-163, TODO-164, TODO-158 to TODO-161. A letter is never given to a different
   task; a task may be paused, resumed and revisited. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes
-  at its stage 2 when T-K part 1 is closed. Next: unchanged.
+  at its stage 2 when T-K part 1 is closed. Next: T-K part 1's content point 3, as above.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
@@ -695,8 +696,9 @@ across that commit without it.
   design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case; closed except its tail: track 3b,
   track 4, 4D); T-E the demonstration's viewer (superseded by T-V, track 1; T-E in older records means the viewer);
   T-F evaluation (Phase 5); T-G the second domain in Mesa (dock_loading; 4D and ROS left it on 30 Sept 2026); T-V
-  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-K part 2 degrees of context facts (T-K
-  part 1's R5, after track 3b); T-S ROS/PRIEST (Phase 6). Task
+  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-K context knowledge (part 1 crisp
+  context knowledge, between T-G's stage 1 and stage 2; part 2 degrees of context facts, R5, after track 3b); T-S
+  ROS/PRIEST (Phase 6). Task
   prompts and reports use these names; the order is the roadmap's, not the alphabet's.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.

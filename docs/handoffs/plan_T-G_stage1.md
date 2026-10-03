@@ -10,7 +10,7 @@ Scope: the basic dock_loading domain. The robot delivers full pallets and return
 pallets, takes `coffee_break` and `office_break` (reduced: the office door has no state; the office is observed), goes
 to the standby place when no entry is applicable, and ends at the desk. The gate is open for the whole run. The robot
 observes every area. Four mechanisms outside the domain (A3, A4, A5, A9 with R2), each accepted on kitting.
-Out of scope: T-K part 1 (context knowledge), stage 2 (`store_pallet`, the gate on request, the door's state, B10's room,
+Out of scope: context knowledge (T-K part 1, not a stage of T-G), stage 2 (`store_pallet`, the gate on request, the door's state, B10's room,
 the observation rule), stage 3 (check-in and check-out).
 
 State at approval: HEAD eca9ae8; no code outside `domains/dock_loading/` changed in T-G; env_layout_02 to _04,

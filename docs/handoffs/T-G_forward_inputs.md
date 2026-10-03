@@ -1,4 +1,4 @@
-# T-G: forward inputs for the stages after stage 1
+# T-G and T-K: forward inputs (T-G after its stage 1; T-K)
 
 Written 2 October 2026 by the design chat that closed T-G stage 1. Place: docs/handoffs/.
 Corrected 2 October 2026 by the next design chat, after its verification against the repo's records.
@@ -8,8 +8,9 @@ Updated 3 October 2026 after the design chat on T-K part 1's content points 1 an
 Updated 3 October 2026 after Hadi's rulings on ccode's report (AM30 to AM33: section 5 in line; section 9 gains
 TODO-163 and TODO-164).
 
-Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G. It collects, per
-stage, what is already ruled, what is open, what is parked, and the ideas Hadi stated. It replaces the reading of
+Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
+collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
+stated. It replaces the reading of
 the chain of earlier T-G handoffs. Those stay in the repo as history.
 
 Status of this file. Informative. It decides nothing. Where it and the repo's records disagree, the records win.
@@ -19,8 +20,8 @@ Each item carries one of three marks:
 - [idea]: something Hadi said in a design chat. Some ideas are also in the records; those marked "chat only" are
   not, and no ruling rests on them.
 
-Maintenance. The chat that closes a stage updates this file: it removes what the stage settled and adds what the
-stage produced for later stages.
+Maintenance. The chat that closes a stage of T-G or a part of T-K updates this file: it removes what it settled and
+adds what it produced for what follows.
 
 ---
 
@@ -60,8 +61,9 @@ The office door separates the hall from the office.
 
 ## 2. Where T-G stands
 
-The staging, as recorded: stage 1, T-K part 1, stage 2, then "track 4", then stage 3. All are inside V1, the first
-complete version of the framework.
+T-G's staging, as recorded: stage 1, stage 2, then "track 4", then stage 3. All are inside V1, the first complete
+version of the framework. T-G is paused after its stage 1 while T-K part 1, context knowledge, runs (section 5); T-G
+resumes at its stage 2 when T-K part 1 is closed.
 
 Stage 1 is closed (2 October 2026). What it delivered:
 - Five framework-wide mechanisms, each built with kitting's outputs unchanged byte for byte:
@@ -79,7 +81,7 @@ Scope of stage 1's tests, as Hadi set it [ruled]: they are an initial check that
 behavioural analysis belongs to stage 2. Hadi wants stage 2's questions, rulings and discussion taken in full
 depth, one at a time.
 
-T-K part 1 was taken next. Its design is ruled and recorded (2 and 3 October 2026). Its build has not
+T-K part 1 runs now. Its design is ruled and recorded (2 and 3 October 2026). Its build has not
 started. Section 5 holds its state. Its content points 1 (the values) and 2 (the perception assumption) are ruled
 (3 October 2026); content point 3 (the tests) is open.
 
@@ -257,7 +259,7 @@ Where this section and those records disagree, the records win.
 - The earlier decision "Assigned-task pool is a support restriction, not a prior" is revised in part:
   the assignment still restricts the support and sets no weight; declared strengths replace unit weight
   between work as a whole and the foreseeable tasks.
-- Superseded for this stage by these rulings: Hadi's earlier sketch in which a context fact triggers a foreseeable task
+- Superseded for T-K part 1 by these rulings: Hadi's earlier sketch in which a context fact triggers a foreseeable task
   of the human or interrupts a task in progress.
 
 ### 5.2 What the build of T-K part 1 contains [ruled]
@@ -300,20 +302,19 @@ CORRECTED AND ADDED (3 October 2026, after the design chat on content points 1 a
 
 ### 5.3 What is not in T-K part 1
 
-- T-K part 2, a new task at the end of the V1 queue [ruled]: degrees. A context fact satisfied to a degree
+- T-K part 2, at the end of the V1 queue [ruled]: degrees. A context fact satisfied to a degree
   between 0 and 1; a membership function that gives the degree from a context value; minimum for "and",
   maximum for "or", 1 minus the degree for "not"; the strength linear in the degree between low and
   high. The design is ruled; the representation of a context value and of a degree is open.
-- T-G stage 2 [open]: whether succession between tasks affects the division inside work as a whole, to
-  be argued with store_pallet present.
-  MOVED (3 October 2026) [ruled]: an item of T-K part 2, after T-G stage 2, to be argued with store_pallet present.
+- T-K part 2, after T-G stage 2 [open]: whether succession between tasks affects the division inside work as a
+  whole, to be argued with store_pallet present.
 - Not taken, and not future work [ruled]: a preference for a task that has just become applicable.
 - Under TODO-155 [open, parked, V1, no stage]: the walk to the standby place and the walk to the desk
-  have no hypothesis. Recorded there as not taken for this stage: a share for "none of the modelled
+  have no hypothesis. Recorded there as not taken in T-K part 1: a share for "none of the modelled
   tasks"; it would reopen the decision that the belief has no residual hypothesis. With no work-task
   hypothesis live, the prior is conditional on one of the modelled foreseeable tasks.
 - Future work [ruled]: see section 9.
-- Still open and outside this stage: whether a hypothesis stays live when its method's condition turns
+- Still open and outside T-K part 1: whether a hypothesis stays live when its method's condition turns
   false while the human is doing the task.
 
 ### 5.4 Open before the build: three content points [open]
@@ -332,7 +333,7 @@ UPDATED (3 October 2026): items 1 and 2 are RULED (AM10 to AM29); item 3 stays o
    - Break time with soft edges: 9:15 to 9:30 partly, 9:30 to 10:00 fully, 10:00 to 10:15 partly. The
      soft edges need T-K part 2; in T-K part 1 the fact is crisp.
    - A/C: the temperature rises near 25 degrees, the room is warmer than it should be, and turning on
-     the A/C is likely. Turning on the A/C changes the temperature: in this stage an action may
+     the A/C is likely. Turning on the A/C changes the temperature: in T-K part 1 an action may
      change a context value and never sets or removes a context fact directly.
    - The numbers used in the design chat's examples (coffee break 0.05 and 3, office break 0.05, A/C
      0.01 and 0.5) were illustrations only.
@@ -343,7 +344,7 @@ UPDATED (3 October 2026): items 1 and 2 are RULED (AM10 to AM29); item 3 stays o
    question as it stood.
    The perception assumption: how the robot obtains a context value. The existing assumption for object
    states (the robot knows them through the site's system) is the likely model. Nothing is written.
-3. OPEN. The tests of the stage: a script that agrees with an occurrence condition; a human who acts against
+3. OPEN. The tests of T-K part 1: a script that agrees with an occurrence condition; a human who acts against
    it; a duration mismatch (the human's actual duration differs from the robot's declared one).
    Recorded with it (AM29, ccode's check, 3 October 2026): a shorter wait is authorable (during wait_at, drop; 46
    seconds, since 45 cannot be written at 2 seconds per tick; the entry closes as abandoned); a longer wait is
@@ -364,7 +365,7 @@ declared durations at a compressed demonstration scale, not calibrated (AM23).
 
 ### 5.5 What the build must respect [recorded, with two chat-only items]
 
-- The stage is framework-wide: it concerns kitting and dock_loading alike [recorded]. The build's
+- T-K is framework-wide: it concerns kitting and dock_loading alike [recorded]. The build's
   acceptance includes kitting [chat only].
 - With both options on, every existing run with assignment knowledge on changes, also with no context
   fact declared: each foreseeable task has its declared strength (its low strength, or its one strength
@@ -390,7 +391,7 @@ declared durations at a compressed demonstration scale, not calibrated (AM23).
 4. The build, its verification, and the review.
 5. The re-measurement of stage 1's baseline with context knowledge on (section 4's figures were measured
    with the equal prior).
-6. The close of T-K part 1, with this file updated. Then stage 2 (section 6).
+6. The close of T-K part 1, with this file updated. Then T-G resumes at its stage 2 (section 6).
 
 UPDATED (3 October 2026): steps 1 and 2 are done for content points 1 and 2. From here:
 
@@ -402,7 +403,7 @@ UPDATED (3 October 2026): steps 1 and 2 are done for content points 1 and 2. Fro
 5. The build, its verification (AM24) and the review.
 6. The re-measurement of stage 1's baseline with context knowledge on. Open at this step: whether the 22 potentially
    confounded MPB runs (section 4's caveat) are rerun then or in stage 2.
-7. The close of T-K part 1, with this file updated. Then stage 2 (section 6).
+7. The close of T-K part 1, with this file updated. Then T-G resumes at its stage 2 (section 6).
 
 ### 5.7 Background from the design chat [chat only]
 
@@ -537,7 +538,7 @@ mechanism; an action of unknown length inside a plan; a rule that keeps the robo
   knowledge and norms; validation of the strengths on site data.
 - A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164). Added 3 October 2026 (T-K part 1's
   content points 1 and 2).
-- The stream of context values with the world's dynamics [ruled, 3 October 2026]: T-K's later part, future work. It
+- The stream of context values with the world's dynamics [ruled]: T-K's later part, future work. It
   needs a model of the world's physics, and nothing that V1 claims depends on it.
 
 Not future work [ruled]: a type-to-destination rule in place of explicit designations is recorded as not taken.

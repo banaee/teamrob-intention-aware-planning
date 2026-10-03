@@ -1493,9 +1493,10 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     run, TODO-16 with the stepwise delivery (A7).
   - After stage 2: track 4 (A8).
   - Stage 3: check-in and check-out (B12), with the two optional items.
-  T-K PART 1 (Hadi, 1 October 2026; T-G records 2): context knowledge, framework-wide, after stage 1's close and before
-  stage 2. The order is stage 1, T-K part 1, stage 2, track 4, stage 3. T-K part 1 starts from its own handoff.
-  Its content (its design opens at its stage; nothing is ruled yet): a context timeline in the scenario that changes a
+  T-K PART 1 (Hadi, 1 October 2026; T-G records 2): context knowledge is framework-wide, so it is not a stage of T-G but
+  T-K; T-K part 1 runs after T-G's stage 1 and before its stage 2. T-G's order is stage 1, stage 2, track 4, stage 3;
+  T-G is paused between stage 1 and stage 2 while T-K part 1 runs. T-K part 1 starts from its own handoff.
+  Its content (its design opens in T-K part 1; nothing is ruled yet): a context timeline in the scenario that changes a
   fact at an authored point of a run, applied by the environment; both domains' foreseeable tasks conditioned on such
   facts. Open questions recorded for it:
   - the form of a context fact;
@@ -1516,7 +1517,7 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
   the record in "T-K" below): the open questions above are answered there, except as stated. The form of a
   context fact: R5 (a degree in [0, 1]; T-K part 1 crisp only). Start or interruption: neither; context drives no task
   of the human (R1). The prior under context, and the share at the start of an episode: R2 to R4 (the assignment and
-  context facts; the task that just ended is open for stage 2, R4; an enabling event's preference not taken, R4). The
+  context facts; the task that just ended is open, an item of T-K part 2 after T-G's stage 2, R4; an enabling event's preference not taken, R4). The
   duration: one declared duration (R6; its uncertainty is FW). The perception assumption: open (open item 2). Liveness
   when a condition turns false during execution ("applicable to start" against "valid to continue"): not answered by
   the rulings; R1 keeps the conditions of tasks in the task model and A4 as built stands.
@@ -1566,8 +1567,8 @@ PART C. STAGING AND THE DOMAIN'S PRESENT STATE (statements, not design rulings)
     - A7, TODO-16, after the MPB's first run on dock_loading.
   - After stage 2: A8, track 4.
   - Stage 3: B12, check-in and check-out, with its two optional items.
-  ADDED (T-G records 2, 1 October 2026): T-K part 1, between stage 1 and stage 2 (before track 4): context knowledge
-  (T-K PART 1 above); nothing in it is ruled yet.
+  ADDED (T-G records 2, 1 October 2026): T-G pauses between stage 1 and stage 2 (before track 4) while T-K part 1,
+  context knowledge, runs (T-K PART 1 above); nothing in it is ruled yet.
   Rulings with no stage, because nothing is built for them: A1 (V1, FW and the tags: a records rule), A2 (terms; no code
   is renamed), A10 (FW directions, outside V1), A11 (a note for T-F), and B12's items "not taken". A6 is an assumption,
   recorded in `docs/assumptions.md` 5.3; stage 1 is where the robot first reads object states through it.
@@ -2444,8 +2445,8 @@ THE MPB ON DOCK_LOADING RUN; 52 runs; the 40 with full expectations agree with t
 close of stage 1 (handoff_T-G_stage1_MPB_onward.md, section 6).
 SUPERSEDED (Hadi, 2 October 2026; recorded in T-G records 15): T-G stage 1 is closed (T-G STAGE 1 CLOSED above). Next:
 to be named by Hadi.
-SUPERSEDED (Hadi, 2 October 2026; T-K part 1 below): the stage named is 1.5, and its design is ruled. Next: its
-three open items, then its build's plan.
+SUPERSEDED (Hadi, 2 October 2026; the heading "T-K" below): the task named is T-K, part 1 next, and its design is
+ruled. Next: its three open items, then its build's plan.
 
 ## T-K: context knowledge
 
@@ -2492,24 +2493,22 @@ THE CUT AND THE QUEUE.
   AMENDED (Hadi, 3 October 2026; AM30, AM33): the memory of observed completions is its own component of the robot's
   mind, outside the recognizer, and records the tick of an observed completion; an observed completion is the task's
   terminal fact in the robot's world state (design_decisions.md, this title, AM27's AM30 and AM33).
-- T-K part 2, a new task, holds the build of R5 (degrees: membership functions, the operators, the linear rule for a
+- T-K part 2 holds the build of R5 (degrees: membership functions, the operators, the linear rule for a
   strength). Its place: the end of the V1 queue, after track 3b (roadmap, "The plan from T-A", the order block;
-  CLAUDE.md's state). The letter was verified unused in the repository before it was taken (2 October 2026).
+  CLAUDE.md's state). The letter T-K was verified unused in the repository before it was taken (2 October 2026).
   T-K part 2's operators include "or" and "not" in an occurrence condition; T-K part 1's occurrence condition is a conjunction
   (AM7).
   SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): "not" is in T-K part 1; T-K part 2's operators keep "or" (and the degrees).
   T-K part 2's OPEN ITEMS (AM8, Hadi, 3 October 2026): the representation of a context value and of a degree. The fact form of
   T-G A5 holds crisp facts only.
   ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED):
-  - The stream of context values as the world's evolving state at each tick. The environment updates a value through
-    its dynamics (the A/C lowers the temperature); the robot derives graded facts from the values. A sketch from the
-    chat, not ruled: a crisp condition as an interval on one value. T-K part 1 did not take the stream in place of the
-    timeline of facts (AM11's "Not taken").
   - Soft edges of a window; a gradual return of the strength after a task (a membership function over the time since
     the last observed completion). T-K part 1's facts are crisp (AM10).
   - "Or" in an occurrence condition, with "long work without a break". Open with it: what counts as a break, when the
     count starts, its limit and its source, the unobserved human. T-K part 1 has no replacement for the long-shift rule
     (AM22).
+  Open, also part 2's: whether succession between tasks affects the division inside work as a whole (R4), after T-G
+  stage 2, to be argued with `store_pallet` present.
 - Future work, each a TODO tagged [FW]: duration uncertainty and a projection that depends on context (TODO-158);
   unobservable states of the human as context (TODO-159); scopes of knowledge (general, sector, domain) and norms
   (TODO-160); validation of the strengths on site data (TODO-161); the robot without knowledge of the assignment
@@ -2518,6 +2517,11 @@ THE CUT AND THE QUEUE.
   case with assignment knowledge off).
   ADDED (Hadi, 3 October 2026; the design chat on content points 1 and 2): A/C deactivation (TODO-163); several A/C
   switches in one layout (TODO-164).
+  Also future work: the stream of context values as the world's evolving state at each tick. The environment updates a
+  value through its dynamics (the A/C lowers the temperature); the robot derives graded facts from the values. A sketch
+  from the chat, not ruled: a crisp condition as an interval on one value. It needs a model of the world's physics, and
+  nothing that V1 claims depends on it. T-K part 1 did not take the stream in place of the timeline of facts (AM11's
+  "Not taken").
 
 OPEN ITEMS OF T-K PART 1 (recorded as open; nothing decided):
 1. The values for the two domains: the context facts, each foreseeable task's occurrence condition, its strengths and
@@ -2528,7 +2532,7 @@ OPEN ITEMS OF T-K PART 1 (recorded as open; nothing decided):
    RULED (Hadi, 3 October 2026): AM25 to AM28 (the timeline's facts known exactly and at once, through the world state;
    the declared knowledge from the knowledge component; a recency fact from the mind's memory of an observed
    completion; the placement in `docs/assumptions.md`). Same places.
-3. The tests of the stage: a script that agrees with an occurrence condition, a human who acts against it, a duration
+3. The tests of T-K part 1: a script that agrees with an occurrence condition, a human who acts against it, a duration
    mismatch.
    OPEN (3 October 2026). ccode's check of the authorable waits is recorded with it (AM29, below).
    HADI'S DIRECTION (3 October 2026; NOT RULED): the tests start on kitting, then cover dock_loading's stage 1
@@ -2546,7 +2550,7 @@ not rulings of design):
 Also recorded: the open questions of C1, T-K PART 1 (the T-G heading above) are answered by the rulings, except the
 liveness of a hypothesis whose condition turns false while the human executes its task, which is not answered (C1,
 T-K PART 1, its RULED line). Hadi's earlier idea of a context fact that triggers or interrupts a task of the human is
-superseded by R1 for this stage (`docs/handoffs/T-G_forward_inputs.md`, section 5, its dated note).
+superseded by R1 for T-K part 1 (`docs/handoffs/T-G_forward_inputs.md`, section 5, its dated note).
 
 CONTENT POINTS 1 AND 2, RULED (Hadi, 3 October 2026; the design chat on T-K part 1's open items 1 and 2). Records only:
 nothing is built, and no layout, scenario, test or analysis is changed. The conceptual part (AM10 every fact crisp;
@@ -2610,7 +2614,7 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   with context_knowledge on, runs with assignment_knowledge off change too.
 
 - AM28, the assumptions placed in `docs/assumptions.md` (the chat's B4): the perception entry (AM25, AM27) as 5.4; the
-  stage's assumption A1 (given the task, the movement does not depend on the context) as 6.1; its A5 (the declared and
+  entry's assumption A1 (given the task, the movement does not depend on the context) as 6.1; its A5 (the declared and
   the actual duration match) as 6.2, stated as a baseline whose violation is a deviation that the existing chain
   handles. A4 (no claim that a strength measured at one real site holds at another) stays in the design record only.
   A4 is about strength values at real sites; it does not concern the per-domain declaration.
@@ -2622,8 +2626,9 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   absent.
 
 NOT RULED, the chat's ideas and open items, each to its place:
-- T-K part 2: the stream of context values, soft edges and a gradual return, "or" with "long work without a break" (THE CUT
-  AND THE QUEUE above, T-K part 2's OPEN ITEMS, ADDED; the roadmap's T-K part 2 entry).
+- T-K part 2: soft edges and a gradual return, "or" with "long work without a break" (THE CUT AND THE QUEUE above, T-K
+  part 2's OPEN ITEMS, ADDED; the roadmap's T-K entry, part 2). T-K's future work: the stream of context values (THE CUT
+  AND THE QUEUE above, the future work).
 - T-F: the time-scale convention for the evaluation (TODO-144, its open item of 3 October 2026).
 - Future work [FW], by Hadi's ruling: A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164).
 - Open in T-K part 1: content point 3, the tests (OPEN ITEMS, item 3). Open at the re-measurement step: whether the 22
@@ -2632,7 +2637,7 @@ NOT RULED, the chat's ideas and open items, each to its place:
 
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the
-values for kitting and dock_loading, the perception assumption, the tests). The stage is framework-wide: it concerns
+values for kitting and dock_loading, the perception assumption, the tests). T-K is framework-wide: it concerns
 kitting and dock_loading alike. Next: unchanged.
 SUPERSEDED (Hadi, 3 October 2026; CONTENT POINTS 1 AND 2 above): content points 1 and 2 are ruled (AM10 to AM29).
 Next: content point 3 (the tests), then ccode's list of the layouts with more than one A/C switch (AM19), then the
@@ -2645,35 +2650,31 @@ terminal fact, AM33) and the NOTES FOR THE BUILD'S PLAN above. Next: unchanged.
 THE TASK RENAMED: T-K AND ITS PARTS (Hadi, 3 October 2026). Records only: a reorganisation of task names; no change of
 behaviour. The old name and the new are mapped in one line each in CLAUDE.md and docs/design_decisions.md (this
 entry's head); git commit messages use the old name.
-1. T-K names context knowledge as a whole (K for knowledge). What was T-G's stage between stage 1 and stage 2 is T-K
-   part 1.
-   Reason: the stage is framework-wide. It concerns kitting and dock_loading alike, so it is a task of the pipeline,
+1. T-K names context knowledge as a whole (K for knowledge). T-K part 1 is the crisp context knowledge.
+   Reason: context knowledge is framework-wide. It concerns kitting and dock_loading alike, so it is a task of the pipeline,
    not a stage of the dock_loading task.
    The rule on task letters, clarified: a letter is never given to a different task; a task may be paused, resumed and
    revisited, and may hold a V1 part and a later part. T-G is paused after its stage 1. T-K part 1 runs now. T-G
    resumes at its stage 2 when T-K part 1 is closed.
 2. The parts of T-K:
-   - Part 1, V1, ongoing: crisp context knowledge (formerly a stage of T-G; R1 to R8, AM1 to AM33).
+   - Part 1, V1, ongoing: crisp context knowledge (R1 to R8, AM1 to AM33).
    - Part 2, V1, at the end of the V1 queue after track 3b: degrees, as ruled (R5): membership functions, soft edges of
-     a window, the gradual return after a task, "or", with "long work without a break" as its open item. This is the
-     task the records called "T-K" until 3 October 2026.
+     a window, the gradual return after a task, "or", with "long work without a break" as its open item.
    - Later, future work: the stream of context values with the world's dynamics; A/C deactivation (TODO-163); several
      A/C switches in one layout (TODO-164); TODO-158 to TODO-161.
    Reason for the stream as future work: it needs a model of the world's physics, and nothing that V1 claims depends
-   on it. This moves the stream out of T-K part 2's OPEN ITEMS (THE CUT AND THE QUEUE above, ADDED), where it was
-   recorded as an idea, not ruled.
-3. Everything related to context knowledge moves to T-K. Moved now: the open question of the prior, whether succession
-   between tasks affects the division inside work as a whole (R4; recorded for T-G stage 2). It is an item of T-K
-   part 2: after T-G stage 2, to be argued with store_pallet present.
+   on it.
+3. Everything related to context knowledge is T-K's. The open question of the prior, whether succession between tasks
+   affects the division inside work as a whole (R4), is an item of T-K part 2: after T-G stage 2, to be argued with
+   store_pallet present.
    Not moved: framework-wide work inside T-G (the choice between two applicable methods by cost, the robot with no
    applicable task, the observation rule, track 4). Hadi's principle: building a new domain includes revisiting its
    effect on the other domains, assessed framework-wide inside the domain's task.
 4. The rename, everywhere in the repository's documents, older handoff files and frozen analysis reports included.
    Exception recorded: CLAUDE.md's rule that a frozen record is edited only by a superseding note does not apply to
-   this rename. Every earlier "T-K" (the degrees) became "T-K part 2"; then the stage's old name, with or without "T-G",
-   became "T-K part 1"; the entry's title became "T-K: context knowledge in the recognizer's belief", in the title and
-   in every pointer; this heading and the record identifier ([T-K/1]) followed. No file name held the old name. docs/handoffs/T-G_forward_inputs.md
-   keeps its name; its section 5 is T-K part 1's. Git commit messages are not changed.
+   this rename. The entry's title is "T-K: context knowledge in the recognizer's belief"; this heading and the record
+   identifier ([T-K/1]) follow it. docs/handoffs/T-G_forward_inputs.md keeps its name; its section 5 is T-K part 1's.
+   Git commit messages are not changed.
 5. Track 4's open points gain one line (docs/handoffs/T-G_forward_inputs.md, section 7; TODO-140): whether the robot's
    world state still holds the terminal fact of a task that the human completed outside the monitored areas. If it
    does, the robot gets a recency fact for a completion it did not observe, against AM27 and AM33.

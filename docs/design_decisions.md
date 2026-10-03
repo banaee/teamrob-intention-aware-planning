@@ -4928,7 +4928,7 @@ T-G stage 1.5 was renamed T-K part 1 on 3 October 2026; git commit messages use 
 
 Ruled in cchat (the T-G design chat), 2 October 2026; recorded the same day, before any build. Records only: nothing in
 this entry is built. Each ruling carries its reason. The conceptual part is here; the cut (what T-K part 1 builds), the
-queue (T-K part 2), R9 and the open items of the stage are in `docs/design_records.md`, under this title (index line below).
+queue (T-K part 2), R9 and the open items of T-K part 1 are in `docs/design_records.md`, under this title (index line below).
 Terms: `docs/glossary.md` §5 (context knowledge, context value, context fact, membership function, occurrence
 condition, strength, prior) and §8 (T-K part 2).
 AMENDED (Hadi, 3 October 2026, on the review of the records; AM1 to AM9, each under the ruling it amends, with its
@@ -4991,7 +4991,7 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   the stated situation. It is a ratio of counts, not a probability.
   When no assigned task is live, the same normalisation runs over the live foreseeable tasks alone. This prior is
   conditional on one of the modelled foreseeable tasks; it has no option "none of the modelled tasks".
-  Not taken for this stage: a share for "none of the modelled tasks"; recorded under TODO-155, with the note that it
+  Not taken in T-K part 1: a share for "none of the modelled tasks"; recorded under TODO-155, with the note that it
   would reopen T-D R1 (no residual hypothesis).
   AMENDED (AM2, Hadi, 3 October 2026): a foreseeable task declares its strength per task. The strength is divided
   equally among the task's live hypotheses. No restriction on layouts.
@@ -5012,7 +5012,7 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   stated for the case with assignment knowledge.
   Reason: the two are different kinds of knowledge (which tasks the human was assigned; when the human tends to take a
   foreseeable task), so one switch must not turn both off. The default is on because the robot is assumed to hold this
-  knowledge. With context knowledge off reproducing today's prior, the stage adds behaviour only where the option is
+  knowledge. With context knowledge off reproducing today's prior, T-K part 1 adds behaviour only where the option is
   on, and the option serves the evaluation as a condition.
   Consequences, recorded, not acted on: in the record ("T-K", AM3).
   CORRECTED (C1, Hadi, 3 October 2026; the review's measured finding): "With context knowledge off, the prior is equal
@@ -5034,16 +5034,13 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
   object states and recency facts, and uses "and" and "not". "Or" stays in T-K part 2. The block CONTENT POINTS 1 AND 2 below,
   AM11.
 
-- R4, division inside assigned work: equal among the live assigned tasks, for this stage.
+- R4, division inside assigned work: equal among the live assigned tasks, in T-K part 1.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
   CORRECTED (C3, Hadi, 3 October 2026; following AM3), the wording: "The share of work as a whole is divided equally
   among its live hypotheses (the live hypotheses of work tasks in the support). With assignment knowledge on, these are
   the live assigned tasks." The reason is unchanged.
-  Open, for T-G stage 2: whether succession between tasks affects the division (to be argued with `store_pallet`
-  present).
-  MOVED (Hadi, 3 October 2026): this open question is an item of T-K part 2, after T-G stage 2, to be argued with
-  `store_pallet` present. Reason: everything related to context knowledge moves to T-K (design_records.md, "T-K", THE
-  TASK RENAMED: T-K AND ITS PARTS, point 3).
+  Open, for T-K part 2, after T-G stage 2: whether succession between tasks affects the division (to be argued with
+  `store_pallet` present).
   Not taken, and not future work: a preference for a task that has just become applicable (no defensible meaning or
   magnitude).
 
@@ -5054,7 +5051,7 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
     These are the selected operators, one choice among several in fuzzy logic. Overlapping reasons do not accumulate.
   - strength = low + degree × (high − low).
   - The linear rule and the operators are stated modelling choices, not consequences of Bayes' rule.
-  T-K part 1 builds crisp context facts only. A crisp fact is the special case, so the later task changes nothing in R2
+  T-K part 1 builds crisp context facts only. A crisp fact is the special case, so T-K part 2 changes nothing in R2
   to R4. (AM7, under R3: in T-K part 1 an occurrence condition is a conjunction; "or" and "not" are T-K part 2's.) Recorded cost: with crisp facts the prior changes at one tick, where the approximation of A2 (below) has its
   largest error.
   SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): the parenthesis on AM7. In T-K part 1 an occurrence condition uses
@@ -5109,8 +5106,8 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
   Reason: a foreseeable task just done, or made pointless by an object's state, is improbable to be done again soon.
   Hadi's reason: it is strange in reality that a human does the coffee break or the A/C activation twice in a short
   time.
-  Not taken: a stream of context values in place of the timeline of facts (recorded for T-K part 2, in the record, T-K part 2's open
-  items).
+  Not taken: a stream of context values in place of the timeline of facts (recorded as T-K's future work, in the record,
+  THE CUT AND THE QUEUE).
 
 - AM12, context removes no hypothesis (under R3, with AM4). Context still removes no hypothesis. With its occurrence
   condition not satisfied, a foreseeable task has its low strength and stays live. The condition's change selects the

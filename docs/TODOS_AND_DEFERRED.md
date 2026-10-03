@@ -2307,7 +2307,7 @@ RULED (T-K part 1, Hadi, 2 Oct 2026; design_decisions.md, "T-K: context knowledg
 belief"; design_records.md, "T-K", THE CUT): T-K part 1's build removes the domain task names and constants
 from the recognizer and closes this item; the context weight is replaced by the prior of R2 and R3. Not built.
 NOTE (T-G C1, Hadi, 1 Oct 2026; design_decisions.md, "T-G: the second domain's rulings", C1): T-K part 1, context
-knowledge (framework-wide, after stage 1 and before stage 2, from its own handoff), opens the question this item defers:
+knowledge (framework-wide, after T-G's stage 1 and before its stage 2, from its own handoff), opens the question this item defers:
 a context timeline in the scenario changing a fact at an authored point of a run, applied by the environment, and both
 domains' foreseeable tasks conditioned on such facts; the form of a context fact is its first open question. It is the
 pre-loaded context stream, moved from T-V track 2 (Phase 7). Whether T-K part 1 closes this item is for its design.
@@ -4192,6 +4192,8 @@ NOTE (T-G stage 1, the milestone's findings, 1 Oct 2026; design_decisions.md, "T
 with no assigned tasks for the human (the viewing fixtures), every task of the robot's task model becomes a hypothesis:
 this parked case. With the restriction off, two hypotheses about empty pallets become possible: artefacts of running
 without the prior (docs/assumptions.md 1.4), never a rule.
+T-K: T-K part 1 rules the prior when no work task is live: it runs over the live foreseeable tasks alone
+(design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3).
 Files: shared/recognizer.py (`_build_admissible`), mesa_sim/sim_model.py (`observed_assigned`)
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", BUILT (the record line); analysis/mpb/REPORT.md
 
@@ -4448,11 +4450,10 @@ T-K part 1's question on what sets a hypothesis's share at the start of an episo
 table: the T-G block named above).
 RULED (T-K part 1, Hadi, 2 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's
 belief", R2 to R4), on the four determinants: the assignment and context facts set the prior (R3); the share is
-divided equally inside assigned work (R4); the task that just ended (succession) is open for T-G stage 2 (R4); a
-preference for a task that has just become applicable, the enabling event of this item, is not taken and is not future
-work (R4: no defensible meaning or magnitude). Not built.
-MOVED (Hadi, 3 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R4's MOVED line):
-succession is an item of T-K part 2, after T-G stage 2, to be argued with store_pallet present.
+divided equally inside assigned work (R4); the task that just ended (succession) is open, an item of T-K part 2 after
+T-G stage 2 (R4); a preference for a task that has just become applicable, the enabling event of this item, is not
+taken and is not future work (R4: no defensible meaning or magnitude). Not built.
+T-K: its prior part is ruled in T-K (the RULED line above), and its baseline is re-measured in T-K part 1.
 Files: shared/recognizer.py, shared/meta_planner.py (no change)
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; TODO-135, TODO-155
 
@@ -4514,6 +4515,8 @@ NOT TAKEN FOR T-K PART 1 (T-K part 1, R3, Hadi, 2 Oct 2026; design_decisions.md,
 the recognizer's belief"), recorded here: a share of the prior for "none of the modelled tasks". When no assigned task
 is live the prior is normalised over the live foreseeable tasks alone and is conditional on one of them. Such a share
 would reopen T-D R1 (no residual hypothesis).
+T-K: the prior part of this item is ruled in T-K (the line above, R3); the hypotheses for the two walks (H1, H2) stay
+with this item.
 Files: domains/dock_loading/tasks.py (the task model), shared/recognizer.py
 Reference: design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 6 TO 8 BUILT; docs/handoffs/plan_T-G_stage1.md, section 5; TODO-140, TODO-154
 

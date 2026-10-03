@@ -380,16 +380,14 @@ paragraph, not in the alphabet.
   candidates TODO-132 (a), TODO-134, TODO-142, TODO-143 and P3. The documentation pass for the paper stays before the
   paper, not before the demonstration.
 - Next: T-G's design, in a new design chat from a handoff.
-- ADDED (Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief", R5;
-  design_records.md, "T-K"): T-K part 2, the build of degrees of context facts (T-K part 1's R5), at the end of the V1
-  queue, after track 3b.
-- REORGANISED (Hadi, 3 October 2026; design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS): T-K names context
-  knowledge as a whole (K for knowledge); it is a task of the pipeline, not a stage of T-G, because the stage is
-  framework-wide. T-K part 1 (V1, ongoing): crisp context knowledge, formerly a stage of T-G (R1 to R8, AM1 to AM33).
-  T-K part 2 (V1, at the end of the V1 queue, after track 3b): degrees (R5). Later, future work: the stream of context
-  values with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164. A letter is never given to a different
-  task; a task may be paused, resumed and revisited, and may hold a V1 part and a later part. T-G is paused after its
-  stage 1; T-K part 1 runs now; T-G resumes at its stage 2 when T-K part 1 is closed.
+- ADDED (Hadi, 2 and 3 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's belief";
+  design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS): T-K, context knowledge as a whole (K for knowledge), a
+  task of the pipeline, not a stage of T-G, because it is framework-wide. T-K part 1 (V1, ongoing): crisp context
+  knowledge (R1 to R8, AM1 to AM33). T-K part 2 (V1, at the end of the V1 queue, after track 3b): degrees (R5). Later,
+  future work: the stream of context values with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164. A
+  letter is never given to a different task; a task may be paused, resumed and revisited, and may hold a V1 part and a
+  later part. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes at its stage 2 when T-K part 1 is
+  closed.
 
 V1 AND FW (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
@@ -401,7 +399,7 @@ is open: its design is ruled (30 September and 1 October 2026) and build 1 is in
 stage 1, agreed in the design chat, then stage 1's plan.
 SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (T-G Q12 to Q15; design_decisions.md, "T-G:
 the second domain's rulings", A3, B13). Next: the layout and the setup of T-G's stage 1, then stage 1's plan. T-G's
-order is stage 1, T-K part 1 (context knowledge, new), stage 2, track 4, stage 3.
+order is stage 1, stage 2, track 4, stage 3; context knowledge (T-K part 1) runs between T-G's stage 1 and stage 2.
 SUPERSEDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): stage 1's rooms and setups are agreed. Next: stage 1's plan.
 SUPERSEDED (Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", STAGE 1 PLAN APPROVED): stage 1's
 plan is approved, `docs/handoffs/plan_T-G_stage1.md`. Next: stage 1's build, step 0, then step 1 (the rename).
@@ -420,9 +418,9 @@ lasts 90 seconds (TODO-157), and the IR test-bed set on dock_loading is agreed (
 rooms). Next: the build step that sorts the earlier analyses and tests under kitting and prepares the instruments for
 dock_loading; then the authoring of the set, its expectations and its runs.
 SUPERSEDED (Hadi, 2 October 2026): the states after T-G Q16 are in the T-G entry below (stage 1's test-beds and close, the
-housekeeping step); T-K part 1's design is ruled, its build not started; T-K part 2 is added at the end of the V1 queue (the
-order block above). Next: T-K part 1's three open items, then its build's plan.
-SUPERSEDED (Hadi, 3 October 2026; the T-G entry below, T-K part 1's RULED line of 3 October 2026): T-K part 1's content
+housekeeping step); T-K is added (the order block above): its part 1's design is ruled, its build not started; its part 2
+is at the end of the V1 queue. Next: T-K part 1's three open items, then its build's plan.
+SUPERSEDED (Hadi, 3 October 2026; the T-K entry below, part 1's RULED line of 3 October 2026): T-K part 1's content
 points 1 and 2 are ruled (AM10 to AM29); content point 3 (the tests) is open. Next: content point 3, then ccode's list
 of the layouts with more than one A/C switch (AM19), then the build's plan.
 
@@ -769,9 +767,37 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     reports and code only; data and figures stay on Hadi's disk). Open: the rewriting of each conceptual entry into one
     current rule; the destination of two old items under docs/ (the old ROS planner reference text, the folder of old
     layout pictures), deferred until Hadi names one. The next T-G design chat reads docs/handoffs/T-G_forward_inputs.md.
-  - T-K part 1 (new, Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", C1): context
-    knowledge, framework-wide, after stage 1's close and before stage 2, from its own handoff. Content (its design opens
-    at its stage; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
+  - Paused after stage 1: context knowledge is T-K (below), framework-wide. T-K part 1 runs now; T-G resumes at its
+    stage 2 when T-K part 1 is closed.
+  - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
+    run, TODO-16 with the stepwise delivery (A7).
+    ADDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): B10's room (the stores), with its own layout, setup and scenarios; A8's rule on
+    monitored areas reopened (the robot observes its own area only, or its own and every area behind an open passage;
+    the trigger at disappearance and reappearance with it).
+    BUILDS: B7 with the second designation; B5, the gate opened on request and the office door's state; A7, TODO-16,
+    after the MPB's first run on dock_loading.
+  - After stage 2: track 4 in its reduced form (A8, TODO-140).
+  - Stage 3: check-in and check-out (B12), with the two optional items (a deadline on the robot's waiting; a pallet
+    that blocks another in the truck).
+  The order inside a stage is for that stage's plan; the mapping states content only (C1). No stage: A1, A2, A10, A11 and
+  B12's items "not taken" (nothing is built for them).
+- **T-V — Viewer, interface and interactive simulator** (ruled by Hadi, 30 September 2026), one task with tracks.
+  - Track 1: T-E as originally defined, the viewer for pre-loaded scripts, showing belief, admitted projection,
+    decision, hold, refusal and the script's events; demonstration only, nothing enters the mind.
+  - Track 2: Phase 7 (below): live events through the human executor's injection path (`inject`, T-H2), the export
+    as a script, the replay rule. The context stream is not track 2's: the pre-loaded context facts are T-K part 1's
+    timeline, and the stream of context values with the world's dynamics is T-K's future work.
+    SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-K part 1; track 2
+    keeps the live events.
+    T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
+    its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
+    fact, if wanted, is designed here as the same entry point as the live user's click.
+- **T-K — Context knowledge** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the
+  recognizer's belief"; design_records.md, "T-K"; `docs/handoffs/T-G_forward_inputs.md`, section 5). Context knowledge
+  as a whole, framework-wide: it concerns kitting and dock_loading alike. Three parts.
+  - Part 1, crisp context knowledge (V1, ongoing; Hadi, 1 October 2026; design_decisions.md, "T-G: the second domain's
+    rulings", C1): framework-wide, after T-G's stage 1 and before T-G's stage 2, from its own handoff. Content (its design
+    opens in part 1; nothing ruled): a context timeline in the scenario that changes a fact at an authored point of a run,
     applied by the environment; both domains' foreseeable tasks conditioned on such facts. Open questions: the form of a
     context fact; start only or interruption of a task in progress (A3, A10); liveness under A4 when a condition turns
     false during execution; the prior under context; the perception assumption for context facts. The pre-loaded
@@ -789,7 +815,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     equal division inside assigned work (R4); degrees (R5) built later, in T-K part 2; one declared duration (R6); the gate
     unchanged (R7). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
     the removal of the domain task names and constants from the recognizer (TODO-66). The build is not started. Open:
-    the values for the two domains (Hadi states them), the perception assumption, the stage's tests. Future work:
+    the values for the two domains (Hadi states them), the perception assumption, the tests. Future work:
     TODO-158 to TODO-162.
     AMENDED (Hadi, 3 October 2026; the same entry, AM1 to AM9): the re-entry and boundary rules are shares of the
     evidence (AM1); a strength per task, divided among its live hypotheses (AM2); two run options, both on by default at
@@ -799,7 +825,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     crossing θ on prior mass superseded in part (AM6); an occurrence condition is a conjunction in T-K part 1 (AM7); T-K part 2
     open on the representation of a context value and of a degree (AM8). The design is ruled and amended; the build is
     not started; the open items are unchanged (the values for kitting and dock_loading, the perception assumption, the
-    tests). The stage is framework-wide: it concerns kitting and dock_loading alike.
+    tests). T-K is framework-wide: it concerns kitting and dock_loading alike.
     RULED (Hadi, 3 October 2026; the same entry, CONTENT POINTS 1 AND 2, AM10 to AM29; design_records.md, "T-K", CONTENT POINTS 1 AND 2): content points 1 (the values) and 2 (the perception assumption). Every fact is crisp
     (AM10); an occurrence condition reads timeline facts, object states and recency facts, with "and" and "not", "or"
     staying in T-K part 2 (AM11); context removes no hypothesis (AM12); the occurrence conditions, the recency durations and the
@@ -811,48 +837,23 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     completion (AM25 to AM27). Future work: TODO-163, TODO-164 [FW]. Content point 3 (the tests) is open. The build is
     not started. Next: content point 3, then ccode's list of the layouts with more than one A/C switch (AM19), then the
     build's plan.
-  - Stage 2: `store_pallet` (B7); the gate opened on request (B5); the office door's state (B5); after the MPB's first
-    run, TODO-16 with the stepwise delivery (A7).
-    ADDED (Hadi and the design chat, 1 October 2026; design_decisions.md, "T-G: the second domain's rulings", B14): B10's room (the stores), with its own layout, setup and scenarios; A8's rule on
-    monitored areas reopened (the robot observes its own area only, or its own and every area behind an open passage;
-    the trigger at disappearance and reappearance with it).
-    BUILDS: B7 with the second designation; B5, the gate opened on request and the office door's state; A7, TODO-16,
-    after the MPB's first run on dock_loading.
-  - After stage 2: track 4 in its reduced form (A8, TODO-140).
-  - Stage 3: check-in and check-out (B12), with the two optional items (a deadline on the robot's waiting; a pallet
-    that blocks another in the truck).
-  The order inside a stage is for that stage's plan; the mapping states content only (C1). No stage: A1, A2, A10, A11 and
-  B12's items "not taken" (nothing is built for them).
-- **T-V — Viewer, interface and interactive simulator** (ruled by Hadi, 30 September 2026), one task with tracks.
-  - Track 1: T-E as originally defined, the viewer for pre-loaded scripts, showing belief, admitted projection,
-    decision, hold, refusal and the script's events; demonstration only, nothing enters the mind.
-  - Track 2: Phase 7 (below): live events through the human executor's injection path (`inject`, T-H2), the export
-    as a script, the replay rule, later the context stream.
-    SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-K part 1; track 2
-    keeps the live events.
-    T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
-    its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
-    fact, if wanted, is designed here as the same entry point as the live user's click.
-- **T-K — Context knowledge** (Hadi, 3 October 2026; the order block above, REORGANISED): part 1, crisp context
-  knowledge (V1, ongoing; its state in the T-G entry above, its bullet "T-K part 1", and in
-  `docs/handoffs/T-G_forward_inputs.md`, section 5); part 2, degrees (V1, below); later, future work.
-- **T-K part 2 — Degrees of context facts** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-K: context
-  knowledge in the recognizer's belief", R5; design_records.md, "T-K"). The build of R5: a context fact
-  satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
-  1 minus the degree), strength = low + degree × (high − low). At the end of the V1 queue, after track 3b. T-K part 1's
-  crisp facts are its special case, so nothing in R2 to R4 changes with it. Not started.
-  AMENDED (AM11, Hadi, 3 October 2026): "not" in an occurrence condition is T-K part 1's; T-K part 2 keeps "or" and the degrees.
-  ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED; design_records.md, "T-K",
-  T-K part 2's OPEN ITEMS): the stream of context values as the world's evolving state at each tick, the environment updating
-  a value through its dynamics (the A/C lowers the temperature) and the robot deriving graded facts from the values (a
-  sketch, not ruled: a crisp condition as an interval on one value); soft edges of a window and a gradual return of the
-  strength after a task (a membership function over the time since the last observed completion); "or" in an
-  occurrence condition, with "long work without a break" (open with it: what counts as a break, when the count starts,
-  its limit and source, the unobserved human).
-  MOVED (Hadi, 3 October 2026): the stream of context values is not part 2's; it is future work, T-K's later part (it
-  needs a model of the world's physics, and nothing that V1 claims depends on it). ADDED to part 2: whether succession
-  between tasks affects the division inside work as a whole (R4), after T-G stage 2, to be argued with `store_pallet`
-  present.
+  - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
+    satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
+    1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing
+    in R2 to R4 changes with it. Not started.
+    AMENDED (AM11, Hadi, 3 October 2026): "not" in an occurrence condition is part 1's; part 2 keeps "or" and the
+    degrees.
+    ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED; design_records.md, "T-K",
+    T-K part 2's OPEN ITEMS): soft edges of a window and a gradual return of the strength after a task (a membership
+    function over the time since the last observed completion); "or" in an occurrence condition, with "long work without
+    a break" (open with it: what counts as a break, when the count starts, its limit and source, the unobserved human).
+    Open: whether succession between tasks affects the division inside work as a whole (R4), after T-G stage 2, to be
+    argued with `store_pallet` present.
+  - Later, future work: the stream of context values with the world's dynamics, the environment updating a value
+    through its dynamics (the A/C lowers the temperature) and the robot deriving graded facts from the values (a sketch,
+    not ruled: a crisp condition as an interval on one value); it needs a model of the world's physics, and nothing that
+    V1 claims depends on it. A/C deactivation (TODO-163); several A/C switches in one layout (TODO-164); TODO-158 to
+    TODO-161.
 - **T-S — ROS/PRIEST** (ruled by Hadi, 30 September 2026; future work, removed from T-G, at the end of the queue).
   FW (T-G A1, 1 October 2026): not designed, ruled or built within V1.
   - TODO-75: the ROS guide and `env_layout99`.
@@ -961,14 +962,16 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
   - The completion channel's detection rates (hit 1.0, false alarm 10⁻³) describe Mesa's perfect reporting;
     set them from the real microaction classifier's measured rates.
 
-## Phase 7 (recorded, not scheduled): interactive deviations and a context stream 🔲 *(after T-G; nothing decided)*
+## Phase 7 (recorded, not scheduled): interactive deviations 🔲 *(after T-G; nothing decided)*
 - SCHEDULED (30 September 2026): T-V, track 2, in the plan from T-A (after T-G and T-F).
 - Run-time deviation events into the human executor from a viewer, replayable as pre-loaded scripts: live runs
   demonstrate, pre-loaded scripts evaluate. PULLED FORWARD IN PART by T-H (25 Sept 2026): `executor.inject(Start(task) |
   Drop())` and the export of `Now` as `AfterAction` / `DuringAction` are T-H2's; events may cut mid-action; an
   injection on an empty stack is exported as a plain script entry; viewer walks go to landmarks only. The viewer's
   buttons stay here.
-- A context-knowledge stream into the world state, read by the recognizer: its own task.
+- A context-knowledge stream into the world state, read by the recognizer: not Phase 7's; it is T-K's (above). The
+  pre-loaded context facts are T-K part 1's timeline; the stream of context values with the world's dynamics is T-K's
+  future work.
   MOVED (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream is T-K part 1 (context knowledge), above;
   the live events stay with T-V track 2.
 - Communication as a robot action under a live `unknown` or block: its own task.

@@ -466,7 +466,7 @@ S_k: the rule is unchanged, restated. At v = 20 cm/tick and
 live target), 497 cm at α = 0.01.
 → the same entry, E4, E5.
 
-The entries below are ruled (T-K part 1, Hadi, 2 October 2026; amended 3 October 2026, AM1 to AM9, and AM10 to AM29 on the values and the perception assumption) and not built. T-K part 1 builds crisp context
+The entries below are ruled (T-K, Hadi, 2 October 2026; amended 3 October 2026, AM1 to AM9, and AM10 to AM29 on the values and the perception assumption) and not built. T-K part 1 builds crisp context
 facts; the degrees (a context fact satisfied to a degree, the membership function) are T-K part 2's (§8). Context knowledge acts
 in the robot's mind only, in the recognizer's belief: it does not drive the human, and the conditions of tasks (the
 methods' guards, **applicable**, §6) are not context knowledge (R1).
@@ -486,7 +486,7 @@ time since an observed completion. A **recency fact** (below) is then a context 
 fact**, which does not change.
 
 **context fact** — a declared fact derived from context values, satisfied to a degree in [0, 1]; a crisp fact has only
-0 and 1 (R5). In this stage no task's action sets or removes a context fact directly. T-K part 1 builds crisp facts only,
+0 and 1 (R5). In T-K part 1 no task's action sets or removes a context fact directly. T-K part 1 builds crisp facts only,
 on a timeline in the scenario.
 AMENDED (AM10, AM14, AM20, AM21, AM25, 3 October 2026): every fact of T-K part 1 is crisp (AM10). A fact on the
 timeline is a state: an entry of the timeline is the change, and the fact holds on every tick until the next change;
@@ -1196,25 +1196,31 @@ AMENDED (T-G rulings, 30 September and 1 October 2026): its design is ruled, and
 enters `shared/`. Stages 1 to 3, track 4 after stage 2. design_decisions.md, "T-G: the second domain's rulings".
 **T-V** — viewer, interface and interactive simulator (ruled 30 September 2026), one task with tracks: track 1 the
 viewer for pre-loaded scripts (T-E as originally defined; demonstration only, nothing enters the mind); track 2 Phase 7
-(live events through the human executor's injection path, the export as a script, the replay rule, later the context
-stream).
+(live events through the human executor's injection path, the export as a script, the replay rule). The context
+stream is not T-V's: the pre-loaded context facts are T-K part 1's timeline, and the stream of context values with the
+world's dynamics is T-K's future work.
 SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-K part 1 (context
 knowledge); track 2 keeps the live events. design_decisions.md, "T-G: the second domain's rulings", C1.
 → `docs/roadmap.md`, "The plan from T-A", T-V; `docs/handoffs/phase7_interactive_deviations.md`.
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
 the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.
-**T-K** — context knowledge as a whole (K for knowledge; Hadi, 3 October 2026): a task of the pipeline, not a stage of
-T-G, because context knowledge is framework-wide. Part 1, V1, ongoing: crisp context knowledge (R1 to R8, AM1 to AM33;
-formerly a stage of T-G). Part 2, V1, at the end of the V1 queue after track 3b: degrees (below). Later, future work:
-the stream of context values with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164. T-G is paused after
-its stage 1 and resumes at its stage 2 when T-K part 1 is closed.
-→ `docs/design_records.md`, "T-K", THE TASK RENAMED: T-K AND ITS PARTS; `docs/roadmap.md`, "The plan from T-A", T-K.
-**T-K part 2** — the build of degrees of context facts (T-K part 1's R5: membership functions, the operators, the linear
-rule for a strength), ruled 2 October 2026; at the end of the V1 queue, after track 3b. Not started.
+**T-K** — context knowledge as a whole (K for knowledge), ruled 2 October 2026: a task of the pipeline, not a stage of
+T-G, because context knowledge is framework-wide (kitting and dock_loading alike). Its rulings: R1 to R8, AM1 to AM33.
+Part 1 and part 2 are in V1; later, future work: the stream of context values with the world's dynamics, TODO-158 to
+TODO-161, TODO-163, TODO-164. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1 is closed.
+→ `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K";
+`docs/roadmap.md`, "The plan from T-A", T-K.
+**T-K part 1** — crisp context knowledge (V1, ongoing): R1 to R4, R6, R7, crisp context facts, the scenario's timeline
+of context facts, recency facts, the removal of the domain task names and constants from the recognizer (TODO-66).
+→ `docs/roadmap.md`, "The plan from T-A", T-K, part 1; `docs/handoffs/T-G_forward_inputs.md`, section 5.
+**T-K part 2** — the build of degrees of context facts (R5: membership functions, the operators, the linear rule for a
+strength; soft edges of a window and the gradual return after a task; "or", with "long work without a break" its open
+item; whether succession between tasks affects the division inside work as a whole, R4, after T-G stage 2); at the end
+of the V1 queue, after track 3b. Not started.
 AMENDED (AM11, 3 October 2026): "not" in an occurrence condition is T-K part 1's; T-K part 2 keeps "or" and the degrees.
 → `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief", R5;
-`docs/design_records.md`, "T-K"; `docs/roadmap.md`, "The plan from T-A", T-K part 2.
+`docs/design_records.md`, "T-K"; `docs/roadmap.md`, "The plan from T-A", T-K, part 2.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
 → `docs/design_decisions.md`, "Layouts, setups and scenarios: the three artefacts of a run".
 **TB** — the IR test-bed track (ruled 27 September 2026), before cycle 2 of T-D: the recognizer tested in isolation,
