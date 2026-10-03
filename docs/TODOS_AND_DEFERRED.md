@@ -4661,7 +4661,7 @@ the destination"; subtype adds information only with two or more bays per subtyp
 Files: domains/dock_loading/layouts/, domains/dock_loading/setups/
 Reference: design_decisions.md, "`subtype` is a stated fact of an object"
 
-**TODO-170: tdlib.py reads meaning from the text of an id (recorded, 3 Oct 2026)** open
+**TODO-170: tdlib.py derives a fact about an object from the text of its id (recorded, 3 Oct 2026)** open
 `analysis/instruments/common/tdlib.py:237` applies a pattern on kitting_table ids (`,?kitting_table=kitting_table_\d+`).
 It violates the opaque-name rule.
 Files: analysis/instruments/common/tdlib.py
@@ -4690,3 +4690,12 @@ Reference: docs/glossary.md, §10 **container**; design_decisions.md, "T-G: the 
 One word names two things. Open question: whether one of them is renamed.
 Files: domains/dock_loading/layouts/, domains/kitting/layouts/env_layout_01.json, env_layout_03.json to _07, env_layout_09.json
 Reference: docs/glossary.md, §6 **landmark**; design_decisions.md, "An object id is an opaque name"
+
+**TODO-175: Named logs in logs/ cited as evidence, logs/ git-ignored (recorded, 3 Oct 2026)** open
+Named logs in logs/ are evidence for statements in the records, and logs/ is git-ignored: 3 in TODOS_AND_DEFERRED.md,
+6 in analysis/kitting/t1_conflict_measurement/REPORT.md, 2 in analysis/kitting/f1_foreseeable_fixture/REPORT.md. 3 of
+the 11 cannot be reproduced. Open question: copy each cited log into the folder of the record that cites it, so that
+git tracks the evidence.
+Files: docs/TODOS_AND_DEFERRED.md (lines citing run_20260904_131808, run_20260910_083630, run_20260910_144817),
+analysis/kitting/t1_conflict_measurement/REPORT.md, analysis/kitting/f1_foreseeable_fixture/REPORT.md
+Reference: CLAUDE.md, Workflow rules, 7

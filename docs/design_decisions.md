@@ -5211,9 +5211,11 @@ the ideas not ruled, each to its place); the open items' state. Amended 3 Octobe
 for the build's plan, with the open items.
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
-No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one
-object, and is compared by whole-id equality. What an object is or has is stated in a field (`type`, `subtype`,
-`destination`, `initial_container`), never in the spelling of its id.
+An object id is an opaque name. No code derives a fact about an object from the text of its id. Code may read existing
+ids to generate a new unique id.
+CLARIFIED (Hadi, 3 October 2026, the same day): the wording replaces "No code reads meaning from the text of an id".
+Reason: generating the next free id of the form `<type>_<N>` (`scripts/layout_tool.py`) derives no fact about an object
+and is permitted.
 
 **`subtype` is a stated fact of an object** (Hadi, 3 October 2026)
 In dock_loading a pallet and a delivery bay carry `subtype` `dry` or `frozen`. The loader checks the setup against it:
