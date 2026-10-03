@@ -1,6 +1,6 @@
 # scripts/layout_tool.py
 """
-Draw layout files, and derive a new layout from one by dragging its fixed objects.
+Draw layout files, and derive a new layout from one by moving, adding and deleting its fixed objects.
 
     python scripts/layout_tool.py render <path> [<path> ...]
     python scripts/layout_tool.py edit <layout file>
@@ -18,8 +18,8 @@ Geometry, read the way the loader reads it (mesa_sim/sim_model.py):
 - an area is its "bounds" rectangle.
 
 layout_svg() is the only drawing code. "render" rasterises its SVG to <stem>.png beside
-the layout file (cairosvg); "edit" serves the same SVG in a page whose JavaScript only
-moves the existing object elements.
+the layout file (cairosvg); "edit" serves the same SVG, with a grid, in a page whose
+JavaScript moves objects and asks the server for the drawing after an add or a delete.
 """
 
 import argparse
@@ -31,17 +31,18 @@ import webbrowser
 import zlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from xml.sax.saxutils import escape, quoteattr
 
 LAYOUT_KEYS = ("space", "areas", "env_objects")
 PNG_WIDTH_PX = 1600   # the larger side of the drawing in the PNG and on the page
-GRID_CM = 10          # the edit page's snap step, in the layout's units
+GRID_CM = 5           # the edit page's snap step, in the layout's units
+GRID_LINE_CM = 50     # the edit page's grid lines: every 50 cm, the multiples of 100 darker
 
 # One colour per type. A type's colour is chosen by a stable hash of its name, so a type
 # keeps its colour from one layout to the next; two types of one layout that hash to the
 # same colour are separated by taking the next free colour, in sorted type order.
-PALETTE = (
+TYPE_COLOURS = (
     "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b",
     "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#393b79", "#e7ba52",
 )
@@ -65,10 +66,10 @@ def type_colours(types: List[str]) -> Dict[str, str]:
     colours: Dict[str, str] = {}
     taken = set()
     for t in sorted(set(types)):
-        i = zlib.crc32(t.encode("utf-8")) % len(PALETTE)
-        for k in range(len(PALETTE)):
-            c = PALETTE[(i + k) % len(PALETTE)]
-            if c not in taken or len(taken) >= len(PALETTE):
+        i = zlib.crc32(t.encode("utf-8")) % len(TYPE_COLOURS)
+        for k in range(len(TYPE_COLOURS)):
+            c = TYPE_COLOURS[(i + k) % len(TYPE_COLOURS)]
+            if c not in taken or len(taken) >= len(TYPE_COLOURS):
                 break
         colours[t] = c
         taken.add(c)
@@ -83,14 +84,15 @@ def _num(v: float) -> str:
 # Drawing
 # =============================================================================
 
-def layout_svg(layout: dict) -> str:
+def layout_svg(layout: dict, grid: bool = False) -> str:
     """
     The drawing of a parsed layout as SVG text. SVG user units are the layout's units;
     the layout point (x, y) is drawn at SVG (x, -y), so y points up.
 
     Each entry of env_objects is one <g class="obj"> element carrying the object's id
     (data-id), its type (data-type) and its position (data-x, data-y), translated to its
-    centre; its rectangle and label are drawn about (0, 0) inside it.
+    centre; its rectangle and label are drawn about (0, 0) inside it. With `grid`, grid lines
+    are drawn over the areas and under the objects (the edit page's; "render" draws none).
     """
     space = layout["space"]
     W, H = float(space["width"]), float(space["height"])
@@ -134,6 +136,26 @@ def layout_svg(layout: dict) -> str:
           f'<text x="{_num(ax0 + font / 2)}" y="{_num(-ay1 + font * 1.3)}" font-size="{_num(font)}" '
           f'font-style="italic" fill="#666688">{escape(str(area["id"]))}</text></g>')
 
+    # The edit page's grid: lines at the multiples of 50 from the origin, the multiples of 100 darker.
+    if grid:
+        step = GRID_LINE_CM
+        lines: List[Tuple[int, str, float]] = []
+        for k in range(math.ceil(-W / 2 / step), math.floor(W / 2 / step) + 1):
+            lines.append((k * step, "v", W))
+        for k in range(math.ceil(-H / 2 / step), math.floor(H / 2 / step) + 1):
+            lines.append((k * step, "h", H))
+        for dark in (False, True):
+            for v, kind, _ in lines:
+                if (v % (2 * step) == 0) != dark:
+                    continue
+                colour = "#c4c4c4" if dark else "#e6e6e6"
+                if kind == "v":
+                    a(f'<line class="grid" x1="{v}" y1="{_num(-H / 2)}" x2="{v}" y2="{_num(H / 2)}" '
+                      f'stroke="{colour}" stroke-width="{_num(font / 25)}"/>')
+                else:
+                    a(f'<line class="grid" x1="{_num(-W / 2)}" y1="{-v}" x2="{_num(W / 2)}" y2="{-v}" '
+                      f'stroke="{colour}" stroke-width="{_num(font / 25)}"/>')
+
     # The outline of the space, with the coordinates of two corners.
     a(f'<rect x="{_num(-W / 2)}" y="{_num(-H / 2)}" width="{_num(W)}" height="{_num(H)}" '
       f'fill="none" stroke="#000000" stroke-width="{_num(font / 4)}"/>')
@@ -148,6 +170,7 @@ def layout_svg(layout: dict) -> str:
         w, h = float(o["size"][0]), float(o["size"][1])
         oid = str(o["id"])
         a(f'<g class="obj" data-id={quoteattr(oid)} data-type={quoteattr(str(o["type"]))} '
+          f'data-w="{_num(w)}" data-h="{_num(h)}" '
           f'data-x="{_num(x)}" data-y="{_num(y)}" transform="translate({_num(x)} {_num(-y)})">'
           f'<rect x="{_num(-w / 2)}" y="{_num(-h / 2)}" width="{_num(w)}" height="{_num(h)}" '
           f'fill="{colours[o["type"]]}" fill-opacity="0.55" stroke="#222222" '
@@ -211,7 +234,10 @@ def cmd_render(paths: List[str]) -> None:
 # edit
 # =============================================================================
 
-PAGE = """<!doctype html>
+# Object library entries: one per distinct (type, size) of the layout files in the source's folder.
+LibraryEntry = Tuple[str, Tuple[float, float]]
+
+PAGE = r"""<!doctype html>
 <html><head><meta charset="utf-8"><title>Layout editor: __SOURCE__</title>
 <style>
   body { font-family: sans-serif; margin: 12px; background: #fafafa; }
@@ -220,9 +246,21 @@ PAGE = """<!doctype html>
   #check, #status { margin-left: 1em; }
   .bad { color: #b00020; }
   .ok { color: #1b6e20; }
-  svg { max-width: 100%; height: auto; max-height: 82vh; background: #fff; border: 1px solid #ccc; }
+  #main { display: flex; gap: 12px; align-items: flex-start; }
+  #stage { flex: 1 1 auto; min-width: 0; }
+  #side { flex: 0 0 15em; background: #fff; border: 1px solid #ccc; padding: 8px; }
+  #side h3 { margin: 8px 0 4px; font-size: 1em; }
+  #side .type { margin-top: 6px; font-size: 0.85em; color: #555; }
+  #side button.entry { display: block; width: 100%; text-align: left; margin: 2px 0; }
+  #warn { display: none; margin: 6px 0; padding: 6px; background: #fff3cd; border: 1px solid #e0b000; }
+  html { overflow-y: scroll; }
+  svg { display: block; width: auto; height: 80vh; max-width: 100%; background: #fff; border: 1px solid #ccc; }
   g.obj { cursor: move; }
   g.obj.refused rect { stroke: #b00020; stroke-width: 6; }
+  g.obj.selected rect { stroke: #0050ff; stroke-width: 5; }
+  #tip { position: fixed; display: none; pointer-events: none; background: #222; color: #fff;
+         padding: 2px 6px; font-size: 13px; border-radius: 3px; white-space: nowrap; }
+  #tip.bad { background: #b00020; color: #fff; }
 </style></head>
 <body>
 <div id="bar">
@@ -231,80 +269,213 @@ PAGE = """<!doctype html>
   <button id="save" disabled>Save as</button>
   <span id="check"></span>
 </div>
-<div id="status">Drag an object to move it; positions snap to __GRID__ __UNITS__. The source is never modified.</div>
-__SVG__
-<div id="moved"></div>
+<div id="status">Drag an object to move it; centres snap to __GRID__ __UNITS__. Click an object to select it. The source is never modified.</div>
+<div id="warn">
+  <span id="warntext"></span>
+  <button id="warnyes">Delete</button> <button id="warnno">Cancel</button>
+</div>
+<div id="main">
+  <div id="stage">__SVG__</div>
+  <div id="side">
+    <h3>Object library</h3>
+    <div id="library"></div>
+    <h3>Selected</h3>
+    <div id="selname">none</div>
+    <button id="delete" disabled>Delete selected</button>
+    <div id="moved" style="margin-top:10px; font-size:0.85em"></div>
+  </div>
+</div>
+<div id="tip"></div>
 <script>
 "use strict";
 const GRID = __GRID__;
 const EXISTING = new Set(__EXISTING__);
-const svg = document.getElementById("layout");
-const W = parseFloat(svg.dataset.width), H = parseFloat(svg.dataset.height);
+const LIBRARY = __LIBRARY__;       // [{type, size: [w, h]}], one per distinct (type, size) in the folder
+const SOURCE_IDS = __SOURCE_IDS__; // every id of the source layout, deleted ones included
+const stage = document.getElementById("stage");
 const status = document.getElementById("status");
-const movedBox = document.getElementById("moved");
-const moved = {};   // id -> [x, y], layout coordinates, objects whose position changed
+const tip = document.getElementById("tip");
+const getSvg = () => stage.querySelector("svg");
+const W = parseFloat(getSvg().dataset.width), H = parseFloat(getSvg().dataset.height);
+
+// The page's state: every object now in the layout. The server draws; this script moves.
+const objs = [];
+for (const g of stage.querySelectorAll("g.obj")) {
+  const x = parseFloat(g.dataset.x), y = parseFloat(g.dataset.y);
+  objs.push({ id: g.dataset.id, type: g.dataset.type, size: [parseFloat(g.dataset.w), parseFloat(g.dataset.h)],
+              x: x, y: y, x0: x, y0: y, added: false });
+}
+const deleted = new Set();
+let selected = null;
 
 function inside(x, y) { return x >= -W / 2 && x <= W / 2 && y >= -H / 2 && y <= H / 2; }
+function objGroup(id) {
+  for (const g of getSvg().querySelectorAll("g.obj")) if (g.dataset.id === id) return g;
+  return null;
+}
 function place(g, x, y) {
   g.dataset.x = x; g.dataset.y = y;
   g.setAttribute("transform", "translate(" + x + " " + (-y) + ")");
 }
 function svgPoint(evt) {
+  const svg = getSvg();
   const p = svg.createSVGPoint(); p.x = evt.clientX; p.y = evt.clientY;
   const q = p.matrixTransform(svg.getScreenCTM().inverse());
   return [q.x, -q.y];   // layout coordinates, y up
 }
-function showMoved() {
-  const ids = Object.keys(moved).sort();
-  movedBox.textContent = ids.length ? "Moved: " + ids.map(i => i + " (" + moved[i] + ")").join(", ") : "";
+function showTip(evt, text, bad) {
+  tip.textContent = text; tip.className = bad ? "bad" : "";
+  tip.style.display = "block";
+  tip.style.left = (evt.clientX + 14) + "px"; tip.style.top = (evt.clientY + 14) + "px";
+}
+function summary() {
+  const moved = objs.filter(o => !o.added && (o.x !== o.x0 || o.y !== o.y0));
+  const added = objs.filter(o => o.added);
+  const parts = [];
+  if (moved.length) parts.push("Moved: " + moved.map(o => o.id + " (" + o.x + ", " + o.y + ")").join(", "));
+  if (added.length) parts.push("Added: " + added.map(o => o.id + " (" + o.x + ", " + o.y + ")").join(", "));
+  if (deleted.size) parts.push("Deleted: " + Array.from(deleted).sort().join(", "));
+  document.getElementById("moved").textContent = parts.join(" | ");
+}
+function highlight() {
+  for (const g of getSvg().querySelectorAll("g.obj")) g.classList.toggle("selected", g.dataset.id === selected);
+  document.getElementById("selname").textContent = selected === null ? "none" : selected;
+  document.getElementById("delete").disabled = selected === null;
+}
+function select(id) { selected = id; highlight(); hideWarn(); }
+
+// The drawing comes from the server: after an add or a delete the page asks for the drawing of its state.
+async function refresh() {
+  const body = { objects: objs.map(o => ({ id: o.id, type: o.type, size: o.size, position: [o.x, o.y] })) };
+  const resp = await fetch("/svg", { method: "POST", headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify(body) });
+  if (!resp.ok) { status.innerHTML = '<span class="bad">drawing failed: ' + (await resp.text()) + "</span>"; return; }
+  stage.innerHTML = await resp.text();
+  highlight();
+  summary();
 }
 
-for (const g of svg.querySelectorAll("g.obj")) {
-  const x0 = parseFloat(g.dataset.x), y0 = parseFloat(g.dataset.y);
-  let drag = null;
-  g.addEventListener("pointerdown", evt => {
-    const [px, py] = svgPoint(evt);
-    drag = { dx: parseFloat(g.dataset.x) - px, dy: parseFloat(g.dataset.y) - py };
-    g.setPointerCapture(evt.pointerId);
-    evt.preventDefault();
-  });
-  g.addEventListener("pointermove", evt => {
-    if (!drag) return;
-    const [px, py] = svgPoint(evt);
-    const x = Math.round((px + drag.dx) / GRID) * GRID;
-    const y = Math.round((py + drag.dy) / GRID) * GRID;
-    if (!inside(x, y)) {
-      g.classList.add("refused");
-      status.innerHTML = '<span class="bad">' + g.dataset.id + ": (" + x + ", " + y +
-        ") is outside the space; kept at (" + g.dataset.x + ", " + g.dataset.y + ")</span>";
-      return;
-    }
-    g.classList.remove("refused");
-    place(g, x, y);
-    status.textContent = g.dataset.id + ": (" + x + ", " + y + ")";
-  });
-  const end = () => {
-    if (!drag) return;
-    drag = null;
-    g.classList.remove("refused");
-    const x = parseFloat(g.dataset.x), y = parseFloat(g.dataset.y);
-    if (x === x0 && y === y0) delete moved[g.dataset.id]; else moved[g.dataset.id] = [x, y];
-    showMoved();
-  };
-  g.addEventListener("pointerup", end);
-  g.addEventListener("pointercancel", end);
+// Dragging (event delegation: the svg is replaced by refresh()).
+let drag = null;
+stage.addEventListener("pointerdown", evt => {
+  const g = evt.target.closest("g.obj");
+  if (!g) { select(null); return; }
+  const o = objs.find(o => o.id === g.dataset.id);
+  select(o.id);
+  const [px, py] = svgPoint(evt);
+  drag = { o: o, g: g, dx: o.x - px, dy: o.y - py };
+  stage.setPointerCapture(evt.pointerId);
+  evt.preventDefault();
+  showTip(evt, o.id + " (" + o.x + ", " + o.y + ")", false);
+});
+stage.addEventListener("pointermove", evt => {
+  if (!drag) return;
+  const [px, py] = svgPoint(evt);
+  const x = Math.round((px + drag.dx) / GRID) * GRID;
+  const y = Math.round((py + drag.dy) / GRID) * GRID;
+  if (!inside(x, y)) {
+    drag.g.classList.add("refused");
+    showTip(evt, drag.o.id + " (" + x + ", " + y + ") outside the space; stays (" + drag.o.x + ", " + drag.o.y + ")", true);
+    status.innerHTML = '<span class="bad">' + drag.o.id + ": (" + x + ", " + y + ") is outside the space; kept at (" +
+      drag.o.x + ", " + drag.o.y + ")</span>";
+    return;
+  }
+  drag.g.classList.remove("refused");
+  drag.o.x = x; drag.o.y = y;
+  place(drag.g, x, y);
+  showTip(evt, drag.o.id + " (" + x + ", " + y + ")", false);
+  status.textContent = drag.o.id + ": (" + x + ", " + y + ")";
+});
+function endDrag() {
+  if (!drag) return;
+  drag.g.classList.remove("refused");
+  drag = null;
+  tip.style.display = "none";
+  summary();
+}
+stage.addEventListener("pointerup", endDrag);
+stage.addEventListener("pointercancel", endDrag);
+
+// Object library: a click adds one object of the entry's type and size.
+// Id: <type>_<N>, N one more than the highest N of that form among the source's ids and the page's objects.
+function nextId(type) {
+  const prefix = type + "_";
+  let n = -1;
+  for (const id of SOURCE_IDS.concat(objs.map(o => o.id))) {
+    if (!id.startsWith(prefix)) continue;
+    const rest = id.slice(prefix.length);
+    if (/^[0-9]+$/.test(rest)) n = Math.max(n, parseInt(rest, 10));
+  }
+  return prefix + (n + 1);
+}
+// Position: the origin (inside every space, on the grid); if an object's centre is there, 50 cm further along x, then y.
+function freeSpot() {
+  let x = 0, y = 0;
+  while (objs.some(o => o.x === x && o.y === y)) {
+    x += 50;
+    if (x > W / 2) { x = 0; y += 50; }
+    if (y > H / 2) return [0, 0];
+  }
+  return [x, y];
+}
+async function addObject(entry) {
+  const [x, y] = freeSpot();
+  const o = { id: nextId(entry.type), type: entry.type, size: entry.size.slice(), x: x, y: y, x0: x, y0: y, added: true };
+  objs.push(o);
+  await refresh();
+  select(o.id);
+  status.textContent = "added " + o.id + " at (" + x + ", " + y + "); drag it";
+}
+const library = document.getElementById("library");
+let lastType = null;
+for (const entry of LIBRARY) {
+  if (entry.type !== lastType) {
+    const h = document.createElement("div"); h.className = "type"; h.textContent = entry.type; library.appendChild(h);
+    lastType = entry.type;
+  }
+  const b = document.createElement("button");
+  b.className = "entry"; b.textContent = entry.size[0] + " × " + entry.size[1];
+  b.addEventListener("click", () => addObject(entry));
+  library.appendChild(b);
 }
 
+// Delete: warn first. A layout without the object is refused at load by a setup (or scenario) that names it.
+const warn = document.getElementById("warn");
+function hideWarn() { warn.style.display = "none"; }
+function askDelete() {
+  if (selected === null) return;
+  document.getElementById("warntext").textContent =
+    "Delete " + selected + "? A setup or scenario that names this id (a home container, a destination, a task " +
+    "parameter) is refused at load with the new layout. A setup that does not name it still loads.";
+  warn.style.display = "block";
+}
+document.getElementById("delete").addEventListener("click", askDelete);
+document.getElementById("warnno").addEventListener("click", hideWarn);
+document.getElementById("warnyes").addEventListener("click", async () => {
+  const i = objs.findIndex(o => o.id === selected);
+  if (i < 0) return;
+  const o = objs[i];
+  objs.splice(i, 1);
+  if (!o.added) deleted.add(o.id);
+  selected = null;
+  hideWarn();
+  await refresh();
+  status.textContent = "deleted " + o.id;
+});
+document.addEventListener("keydown", evt => {
+  if (evt.key === "Delete" && document.activeElement.tagName !== "INPUT") askDelete();
+});
+
+// Save as.
 const nameBox = document.getElementById("name");
 const saveBtn = document.getElementById("save");
 const check = document.getElementById("check");
-// The name is the new layout's id, its file stem: the file is <name>.json in the source's
-// folder. domains/discovery.py registers every *.json directly in a layouts folder, keyed by
-// its stem.
+// The name is the new layout's id, its file stem: the file is <name>.json in the source's folder.
+// domains/discovery.py registers every *.json directly in a layouts folder, keyed by its stem.
 function nameProblem(n) {
   if (n === "") return "type a name";
-  if (/[\\/\\\\]/.test(n)) return "no folder separators: the file goes into the source layout's folder";
-  if (/\\.json$/i.test(n)) return "type the id without .json (the file would be " + n + ".json, its id " + n + ")";
+  if (/[\/\\]/.test(n)) return "no folder separators: the file goes into the source layout's folder";
+  if (/\.json$/i.test(n)) return "type the id without .json (the file would be " + n + ".json, its id " + n + ")";
   if (n.startsWith(".")) return "a name may not start with '.'";
   if (EXISTING.has(n + ".json") || EXISTING.has(n + ".png")) return n + ".json or " + n + ".png exists already";
   return null;
@@ -319,8 +490,11 @@ nameBox.addEventListener("input", recheck);
 recheck();
 saveBtn.addEventListener("click", async () => {
   const name = nameBox.value.trim();
+  const positions = {};
+  for (const o of objs) if (!o.added && (o.x !== o.x0 || o.y !== o.y0)) positions[o.id] = [o.x, o.y];
+  const added = objs.filter(o => o.added).map(o => ({ id: o.id, type: o.type, size: o.size, position: [o.x, o.y] }));
   const resp = await fetch("/save", { method: "POST", headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({ name: name, positions: moved }) });
+    body: JSON.stringify({ name: name, positions: positions, added: added, deleted: Array.from(deleted) }) });
   const res = await resp.json();
   if (resp.ok) {
     EXISTING.add(name + ".json"); EXISTING.add(name + ".png");
@@ -330,9 +504,15 @@ saveBtn.addEventListener("click", async () => {
   }
   recheck();
 });
+summary();
 </script>
 </body></html>
 """
+
+
+def _clean(v: float):
+    """A number as the layout files write it: an integer when it is one."""
+    return int(v) if float(v).is_integer() else v
 
 
 def name_problem(name: str, folder: Path) -> str:
@@ -351,41 +531,119 @@ def name_problem(name: str, folder: Path) -> str:
     return ""
 
 
-def moved_layout(source: dict, positions: Dict[str, list]) -> dict:
+def object_library(folder: Path) -> List[LibraryEntry]:
     """
-    The source layout with the positions of the named env_objects replaced; everything
-    else (ids, types, sizes, areas, the space) unchanged. Refuses an unknown id or a centre
-    outside the space.
+    One entry per distinct (type, size) among the env_objects of every layout file in
+    `folder` (its *.json that are layouts, sorted); a file that is not a layout is
+    skipped with a note.
+    """
+    entries = set()
+    for path in sorted(folder.glob("*.json")):
+        try:
+            layout = load_layout(path)
+            for o in layout["env_objects"]:
+                entries.add((str(o["type"]), (float(o["size"][0]), float(o["size"][1]))))
+        except (ValueError, OSError, KeyError, IndexError, TypeError, json.JSONDecodeError) as e:
+            print(f"layout_tool: object library skips {path.name}: {e}", file=sys.stderr)
+    return sorted(entries)
+
+
+def _point(oid: str, pos, W: float, H: float) -> list:
+    """A position as two finite numbers with the centre inside the space; else an error."""
+    if (not isinstance(pos, list) or len(pos) != 2
+            or not all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in pos)):
+        raise ValueError(f"'{oid}': a position is two numbers")
+    x, y = pos
+    if not (-W / 2 <= x <= W / 2 and -H / 2 <= y <= H / 2):
+        raise ValueError(f"'{oid}': ({x:g}, {y:g}) is outside the space")
+    return [_clean(x), _clean(y)]
+
+
+def edited_layout(source: dict, name: str, library: List[LibraryEntry],
+                  positions: Dict[str, list], added: List[dict], deleted: List[str]) -> dict:
+    """
+    The source layout with: the positions of the named objects replaced, the objects
+    `added` appended (fields id, type, position, size, in that order), the objects
+    `deleted` removed, and space.name set to `name`. Everything else is unchanged: every
+    other field of every kept object (slots included), the areas, the rest of the space.
+    Refuses: an unknown id; a moved object that is deleted; an added id that is the id of
+    a source object (a deleted id is never reused) or repeated; an added (type, size)
+    that is not an entry of the object library; a centre outside the space.
     """
     space = source["space"]
     W, H = float(space["width"]), float(space["height"])
-    new = copy.deepcopy(source)
-    by_id = {str(o["id"]): o for o in new["env_objects"]}
+    source_ids = [str(o["id"]) for o in source["env_objects"]]
+    deleted_set = set(deleted)
+    for oid in deleted_set:
+        if oid not in source_ids:
+            raise ValueError(f"cannot delete '{oid}': no such object in the source layout")
+    moves = {}
     for oid, pos in positions.items():
-        if oid not in by_id:
+        if oid not in source_ids:
             raise ValueError(f"no object '{oid}' in the source layout")
-        if (not isinstance(pos, list) or len(pos) != 2
-                or not all(isinstance(v, (int, float)) and math.isfinite(v) for v in pos)):
-            raise ValueError(f"'{oid}': a position is two numbers")
-        x, y = pos
-        if not (-W / 2 <= x <= W / 2 and -H / 2 <= y <= H / 2):
-            raise ValueError(f"'{oid}': ({x:g}, {y:g}) is outside the space")
-        by_id[oid]["position"] = [int(v) if float(v).is_integer() else v for v in pos]
+        if oid in deleted_set:
+            raise ValueError(f"'{oid}' is moved and deleted")
+        moves[oid] = _point(oid, pos, W, H)
+    allowed = set(library)
+    new_objects = []
+    seen = set()
+    for a in added:
+        if not isinstance(a, dict) or not {"id", "type", "size", "position"} <= set(a):
+            raise ValueError("an added object has the fields id, type, size, position")
+        oid = str(a["id"])
+        if not oid:
+            raise ValueError("an added object has an empty id")
+        if oid in source_ids or oid in seen:
+            raise ValueError(f"added id '{oid}' is not unique")
+        seen.add(oid)
+        try:
+            size = (float(a["size"][0]), float(a["size"][1]))
+        except (TypeError, ValueError, IndexError):
+            raise ValueError(f"'{oid}': a size is two numbers")
+        if (str(a["type"]), size) not in allowed:
+            raise ValueError(f"'{oid}': type {a['type']} with size {list(size)} is not in the object library")
+        new_objects.append({"id": oid, "type": str(a["type"]), "position": _point(oid, a["position"], W, H),
+                            "size": [_clean(size[0]), _clean(size[1])]})
+    new = copy.deepcopy(source)
+    new["space"]["name"] = name
+    kept = []
+    for o in new["env_objects"]:
+        oid = str(o["id"])
+        if oid in deleted_set:
+            continue
+        if oid in moves:
+            o["position"] = moves[oid]
+        kept.append(o)
+    new["env_objects"] = kept + new_objects
     return new
+
+
+def drawing_layout(source: dict, objects: List[dict]) -> dict:
+    """The layout to draw for the page's state: the source's space and areas, the page's objects."""
+    return {"space": source["space"], "areas": source["areas"],
+            "env_objects": [{"id": str(o["id"]), "type": str(o["type"]), "position": o["position"],
+                             "size": o["size"]} for o in objects]}
 
 
 def cmd_edit(source_path: Path) -> None:
     source = load_layout(source_path)
     folder = source_path.resolve().parent
     units = str(source["space"].get("units", ""))
+    library = object_library(folder)
+
+    def embed(value) -> str:
+        return json.dumps(value).replace("</", "<\\/")
 
     def page() -> bytes:
         existing = sorted(p.name for p in folder.iterdir())
-        html = (PAGE.replace("__SVG__", layout_svg(source))
+        html = (PAGE.replace("__SVG__", layout_svg(source, grid=True))
                     .replace("__SOURCE__", escape(source_path.name))
                     .replace("__GRID__", str(GRID_CM))
                     .replace("__UNITS__", escape(units))
-                    .replace("__EXISTING__", json.dumps(existing)))
+                    .replace("__EXISTING__", embed(existing))
+                    .replace("__LIBRARY__", embed([{"type": t, "size": [_clean(w), _clean(h)]}
+                                                    for t, (w, h) in library]))
+                    .replace("__SOURCE_IDS__", embed([str(o["id"]) for o in source["env_objects"]])))
         return html.encode("utf-8")
 
     class Handler(BaseHTTPRequestHandler):
@@ -399,6 +657,9 @@ def cmd_edit(source_path: Path) -> None:
         def _json(self, code: int, obj: dict) -> None:
             self._send(code, json.dumps(obj).encode("utf-8"), "application/json")
 
+        def _body(self) -> dict:
+            return json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
+
         def do_GET(self) -> None:
             if self.path == "/":
                 self._send(200, page(), "text/html; charset=utf-8")
@@ -406,21 +667,30 @@ def cmd_edit(source_path: Path) -> None:
                 self._send(404, b"not found", "text/plain")
 
         def do_POST(self) -> None:
+            if self.path == "/svg":
+                try:
+                    svg = layout_svg(drawing_layout(source, self._body()["objects"]), grid=True)
+                except (KeyError, TypeError, ValueError, IndexError) as e:
+                    self._send(400, f"bad state: {e}".encode("utf-8"), "text/plain")
+                    return
+                self._send(200, svg.encode("utf-8"), "image/svg+xml")
+                return
             if self.path != "/save":
                 self._send(404, b"not found", "text/plain")
                 return
             try:
-                req = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
+                req = self._body()
                 name = str(req.get("name", "")).strip()
                 problem = name_problem(name, folder)
                 if problem:
                     raise ValueError(problem)
-                new = moved_layout(source, req.get("positions", {}))
+                new = edited_layout(source, name, library, req.get("positions", {}),
+                                    req.get("added", []), req.get("deleted", []))
                 json_out, png_out = folder / f"{name}.json", folder / f"{name}.png"
                 with open(json_out, "x", encoding="utf-8") as f:   # "x": never overwrite
                     f.write(json.dumps(new, indent=2, ensure_ascii=False) + "\n")
                 write_png(new, png_out)
-            except ValueError as e:
+            except (ValueError, AttributeError) as e:
                 self._json(400, {"error": str(e)})
                 return
             except FileExistsError as e:
