@@ -819,7 +819,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     present context facts (R2); the prior normalises the strengths of what is live, assigned work as a whole
     contributing 1 and each live foreseeable task its declared low or high strength by its occurrence condition (R3);
     equal division inside assigned work (R4); degrees (R5) built later, in T-K part 2; one declared duration (R6); the gate
-    unchanged (R7). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
+    unchanged (R7). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the setup's timeline of context facts (AM34) and
     the removal of the domain task names and constants from the recognizer (TODO-66). The build is not started. Open:
     the values for the two domains (Hadi states them), the perception assumption, the tests. Future work:
     TODO-158 to TODO-162.
@@ -859,6 +859,16 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     knowledge; then a new design chat takes the build of T-K part 1 (the list of the layouts with more than one A/C
     switch, the build's plan, the build, the runs with context knowledge on, dock_loading, the close); a later chat
     returns to T-G's stage 2.
+    BUILT AND RUN (3 October 2026; 4cd7bca, 4c71b44; design_records.md, "T-K", ROUND 1, KT8 to KT12;
+    `analysis/kitting/irb/tk1/`): the round without context knowledge, 31 scenarios in env_layout_15 to _17, robot
+    idle, all in agreement with the expectations committed before them, every run below step 500. The rooms show: in
+    15 the movement recognises every task late; in 17 the A/C hypothesis delays the two deliveries beside it; in 16 the
+    movement recognises nothing in the cluster before the arrival (KT8). env_layout_16 lost its two south-east shelves
+    before the runs (KT9). Findings, none changing a value (KT10); the method of the comparison, conditions A, B and C,
+    with the directions expected (KT11). The mechanism is not built. Next: a new design chat takes the rest of T-K part
+    1 (`docs/handoffs/T-G_forward_inputs.md`, section 5): the layouts with more than one A/C switch and their change,
+    the build's plan, the build, the setups' timelines and the runs in B and C, the two MPB cases, dock_loading's part,
+    the close.
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing

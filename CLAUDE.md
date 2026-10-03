@@ -381,7 +381,7 @@ Decisions
   (AM4); one declared duration; the gate unchanged; the earlier entry "Assigned-task pool is a support restriction,
   not a prior" superseded in part (R8, AM6). Two independent run options, both on by default at the build:
   `assignment_knowledge` (today's `assignment_prior`, not renamed before the build) and `context_knowledge` (new);
-  context knowledge off gives today's equal prior (AM3, AM9; replaces R9). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the scenario's timeline of context facts and
+  context knowledge off gives today's equal prior (AM3, AM9; replaces R9). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the setup's timeline of context facts (AM34) and
   the removal of the domain task names and constants from the recognizer (TODO-66); an occurrence condition is a
   conjunction (AM7). Open, before the build, unchanged: the values for kitting and dock_loading (Hadi states them), the
   perception assumption, the tests. T-K part 2 (the build of R5, degrees; open: the representation of a context value
@@ -414,15 +414,24 @@ Decisions
   context knowledge (rooms 15, 16, 17 in the IRB with the present equal prior); then a new design chat takes the build
   of T-K part 1 (the list of the layouts with more than one A/C switch, AM19; the build's plan; the build; the runs with
   context knowledge on; dock_loading; the close); a later chat returns to T-G's stage 2.
+  The round without context knowledge (round 1) is BUILT, RUN AND ACCEPTED (3 October 2026; 4cd7bca, 4c71b44;
+  design_records.md, "T-K", ROUND 1, KT8 to KT12; `analysis/kitting/irb/tk1/`, README.md and REPORT.md): 31 scenarios
+  (scenario_s13_01 to _07, s14_01 to _11, s15_01 to _13 on env_setup_13 to _15), robot idle, expectations committed
+  before the runs, 0 disagreements at 1e-9, every run below step 500 (TODO-66's weight never acts); env_layout_16 lost
+  its two south-east shelves before the runs, the cluster unchanged (KT9). The comparison reads three conditions: A
+  context knowledge off (round 1), B on with the fact not holding, C on with it holding (KT11); for the A/C the measure
+  is its belief at arrival (KT10). Next: a new design chat takes the rest of T-K part 1 from
+  `docs/handoffs/T-G_forward_inputs.md`, section 5: the layouts with more than one A/C switch (AM19), the build's plan,
+  the build, the setups' timelines and the runs in B and C, the two MPB cases, dock_loading's part, the close.
   T-G stage 1.5 was renamed T-K part 1 on 3 October 2026; git commit messages use the old name.
   T-K (design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS) is context knowledge as a whole, a task of the
   pipeline (framework-wide), not a stage of T-G. Part 1 (V1, ongoing):
-  crisp context knowledge, R1 to R8, AM1 to AM34, KT1 to KT7, the state above. Part 2 (V1, at the end of the V1 queue after track
+  crisp context knowledge, R1 to R8, AM1 to AM34, KT1 to KT12, the state above. Part 2 (V1, at the end of the V1 queue after track
   3b): degrees (R5: membership functions, soft edges of a window, the gradual return after a task, "or", with "long
   work without a break" its open item; succession, R4, after T-G stage 2). Later, future work: the stream of context
   values with the world's dynamics, TODO-163, TODO-164, TODO-158 to TODO-161. A letter is never given to a different
   task; a task may be paused, resumed and revisited. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes
-  at its stage 2 when T-K part 1 is closed. Next: the round without context knowledge, as above.
+  at its stage 2 when T-K part 1 is closed. Next: the rest of T-K part 1 in a new design chat, as above.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
