@@ -521,11 +521,13 @@ UNDETERMINED = "undetermined"
 def rank(E, k):
     """AM68, AM73, AM75, AM76 (rule 34): outranked iff another live key's evidence is strictly greater; not_outranked
     iff none is (a tie included); undetermined (D3) where no other key is greater beyond the agreement level and some
-    other key lies within it, either side."""
+    other key lies within it, either side, without being equal. D3 AMENDED (Hadi, 5 October 2026): an other key whose
+    evidence here is exactly equal is a tie, not outranked (the re-entry rule's 1/|H| makes such ties by
+    construction), so the comparison checks that a tie passes."""
     others = [v for j, v in E.items() if j != k]
     if any(v > E[k] and not math.isclose(v, E[k], **AGREEMENT) for v in others):
         return "outranked"
-    if any(math.isclose(v, E[k], **AGREEMENT) for v in others):
+    if any(v != E[k] and math.isclose(v, E[k], **AGREEMENT) for v in others):
         return UNDETERMINED
     return "not_outranked"
 

@@ -79,9 +79,10 @@ SHARED = [
 RANK = [
     ("C4", "the outranked condition not asked", "irb/oracle.py",
      ['        if rank == "outranked":\n            return "none(leader_outranked)"\n'], ['']),
-    ("C5", "a tie refused (a key within the agreement level of another counted outranked)", "irb/oracle.py",
-     ['    if any(math.isclose(v, E[k], **AGREEMENT) for v in others):\n        return UNDETERMINED\n'],
-     ['    if any(math.isclose(v, E[k], **AGREEMENT) for v in others):\n        return "outranked"\n']),
+    ("C5", "a tie refused (a key whose evidence equals another's counted outranked; D3 amended)", "irb/oracle.py",
+     ['    if any(v != E[k] and math.isclose(v, E[k], **AGREEMENT) for v in others):\n        return UNDETERMINED\n'],
+     ['    if any(v != E[k] and math.isclose(v, E[k], **AGREEMENT) for v in others):\n        return UNDETERMINED\n'
+      '    if any(v == E[k] for v in others):\n        return "outranked"\n']),
     ("C6", "the rank read from the belief instead of the evidence", "irb/oracle.py",
      ['orc.warrant(k, pos, world), rank(E, k))'], ['orc.warrant(k, pos, world), rank(B, k))']),
 ]

@@ -191,7 +191,8 @@ def test_the_irb_oracles_rank_is_exact_beyond_its_agreement_level_and_undetermin
     sys.path.insert(0, str(ROOT / "analysis" / "instruments" / "irb"))
     from oracle import rank, UNDETERMINED
     assert rank({"a": 0.6, "b": 0.4}, "b") == "outranked" and rank({"a": 0.6, "b": 0.4}, "a") == "not_outranked"
-    assert rank({"a": 0.5, "b": 0.5}, "a") == UNDETERMINED                      # an exact tie: not decided here (D3)
+    assert rank({"a": 0.5, "b": 0.5}, "a") == "not_outranked"                   # an exact tie passes (D3 amended)
+    assert rank({"a": 0.5, "b": 0.5, "c": 0.0}, "c") == "outranked"
     assert rank({"a": 0.5 + 1e-12, "b": 0.5 - 1e-12}, "b") == UNDETERMINED      # within 1e-9: not decided here
     assert rank({"a": 0.5, "b": 0.3, "c": 0.2}, "c") == "outranked"
 
