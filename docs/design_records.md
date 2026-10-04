@@ -3372,3 +3372,23 @@ QUESTION S, RULED (Hadi, 4 October 2026; AM65, its conceptual part in design_dec
   evidence.
 - A table of step 4's cases under compressed values is a sensitivity analysis for the close of T-K part 1, not a
   candidate design. Not built; it belongs to the close.
+
+THE READING FOR QUESTION G (ccode, 4 October 2026; `analysis/kitting/irb/tk2/REPORT.md`, "The reading for question G",
+and Appendix C; `analysis/kitting/irb/tk2/g_reading.py`). A reading of step 4's outputs, nothing run, nothing ruled.
+Question G: admission and retraction under context knowledge; T-D G admits an assigned task on commitment warrant and
+relies on retraction for a deviation.
+- For every admission of a hypothesis not the true task with context knowledge on (32 rows, the exit walk apart): the
+  belief, prior, hypothesis adequacy and warrant source at the admission; observation warrant and adequacy over the
+  admitted ticks; from the off run of the same script, the first tick on which a rival is strictly above the admitted
+  hypothesis and on which the true task is strictly first, with the two leading values' difference and ratio (ties
+  reported, never given a first tick); the gate's ending and what the trigger rule would read against a record.
+- Counts: 43 of 256 admissions of the true task rest on commitment warrant with no observation warrant on the
+  admission tick, all 43 lone deliveries admitted on the previous task's pin tick (off: 0 of 148); in the 32 rows, 14,
+  4 of them lone deliveries.
+- What it shows: adequacy and warrant held on every admitted tick (the per-tick gate requires both; neither reads
+  context knowledge); the evidence alone turns against an interrupted delivery 3 to 9 ticks after the human left, by
+  small margins (×1.009 to ×1.25), and the trigger rule fires 3 to 8 ticks after that; a carried delivery is retracted
+  on inadequacy 8 ticks after the break begins, before the evidence alone turns; the lone delivery admitted early
+  lasts 43 to 60 ticks, the evidence alone near a tie (×1.0006 to ×1.009), with observation warrant held because the
+  walk to the machine or the switch gains path toward its shelf; the trigger rule ends an admission later than the
+  per-tick gate in 18 of 32 rows. Next: question G in the design chat.

@@ -169,6 +169,116 @@ Appendix B, last table; per run off against on.
   scenario states one).
 - `directions.py` reads this set only (its folder); `offon.py` is general.
 
+## The reading for question G: admission and retraction under context knowledge (`g_reading.py`)
+
+Hadi, 4 October 2026: for every admission of a hypothesis that is not the true task, context knowledge on, which of the
+gate's three conditions held, and when the evidence alone turned against it. Read from `actual.csv` of this set and of
+its off side (round 1, `off/`); nothing was run. One row per row of the P8 table (on), the one-tick rows on a
+completion left out; the exit walk in Appendix C. How the columns are read:
+- Admitted ticks: the gate per tick, as the P8 table reads it (the idle robot asks admission at tick 0 only). Column 1
+  is read on the first tick of that run of ticks; "right until t": the run began while the hypothesis was the true task.
+- Warrant: commitment (one of the human's assigned tasks, the log's `[IR-assignment]` line) and observation (the
+  `warrant` column). Observation warrant held means that the human gained path toward the phase's target, or that the
+  phase was entered by an observed completion. It does not mean that the movement told this target from another one.
+- 3a and 3b: from the off run of the same script, where the prior is equal and the ranking is the evidence's alone,
+  searched from the first tick on which the admitted hypothesis is not the true task; "+n" from that tick; "held
+  before": the condition held on the tick before as well. Δ and × are the two leading values' absolute difference and
+  ratio. Values equal within 1e-9 are a tie, reported with its length and given no first tick.
+- 4: the gate's outcome on the tick after the last admitted tick (the P8 table's ending); and what the meta-planner's
+  trigger rule (`evaluate_triggers`) would read against a record of the hypothesis: the leader changes, an episode
+  boundary, the recorded hypothesis inadequate. The gate is not asked for retention, and a refusal for no observation
+  fires nothing. "Record from": the record's first tick. This is a reading of the recognizer's outputs; no
+  meta-planner decided on these ticks.
+
+| scenario | admitted | wrong ticks | true task | 1. at the admission: belief, prior, adequacy, warrant | 2. over the admitted ticks | 3a. off: another strictly above it (top two) | 3b. off: the true task strictly greatest (top two) | 4. gate's end | 4. the trigger rule's end |
+|---|---|---|---|---|---|---|---|---|---|
+| s13_03 | item_4 | 150 to 161 | coffee_break | 150: b 0.759, prior 0.490, adequate, commitment,observation | 12 ticks: obs. warrant 12, adequate 12 | 150 (+0, held before): coffee_break 0.6042 / item_4 0.3186 (Δ 0.2856, ×1.8963) | 150 (+0, held before): coffee_break 0.6042 / item_4 0.3186 (Δ 0.2856, ×1.8963) | 162 none(below_theta) (item_4) | record from 150; fires 167 inadequate |
+| s13_05 | item_2 | 94 | coffee_break | 87 (right until 93): b 0.760, prior 0.327, adequate, commitment,observation | 8 ticks: obs. warrant 8, adequate 8; of the 1 wrong: obs. warrant 1 | 98 (+4): coffee_break 0.4616 / item_2 0.4573 (Δ 0.0043, ×1.0093) | 98 (+4): coffee_break 0.4616 / item_2 0.4573 (Δ 0.0043, ×1.0093) | 95 none(leader_no_observation) | record from 87; fires 104 leader item_4 |
+| s13_05 | item_2 | 96 to 99 | coffee_break | 96: b 0.871, prior 0.327, adequate, commitment | 4 ticks: obs. warrant 0, adequate 4 | 98 (+2): coffee_break 0.4616 / item_2 0.4573 (Δ 0.0043, ×1.0093) | 98 (+2): coffee_break 0.4616 / item_2 0.4573 (Δ 0.0043, ×1.0093) | 100 none(below_theta) (item_2) | record from 87; fires 104 leader item_4 |
+| s13_06 | item_2 | 96 to 103 | coffee_break | 87 (right until 95): b 0.760, prior 0.327, adequate, commitment,observation | 17 ticks: obs. warrant 17, adequate 17; of the 8 wrong: obs. warrant 8 | 100 (+4): coffee_break 0.4990 / item_2 0.4443 (Δ 0.0547, ×1.1231) | 100 (+4): coffee_break 0.4990 / item_2 0.4443 (Δ 0.0547, ×1.1231) | 104 none(below_theta) (item_2) | record from 87; fires 105 inadequate |
+| s13_07 | item_2 | 123 to 130 | coffee_break | 123: b 1.000, prior 0.327, adequate, commitment | 8 ticks: obs. warrant 0, adequate 8 | 150 (+27): coffee_break 0.5703 / item_2 0.4217 (Δ 0.1486, ×1.3525) | 150 (+27): coffee_break 0.5703 / item_2 0.4217 (Δ 0.1486, ×1.3525) | 131 none(leader_inadequate) | record from 87; fires 131 inadequate |
+| s13_11 | coffee_break | 81 to 91 | item_2 | 81: b 0.754, prior 0.667, adequate, observation | 11 ticks: obs. warrant 11, adequate 11 | 81 (+0, held before): item_2 0.4134 / coffee_break 0.3376 (Δ 0.0759, ×1.2248) | 81 (+0, held before): item_2 0.4134 / coffee_break 0.3376 (Δ 0.0759, ×1.2248) | 92 none(below_theta) (coffee_break) | record from 81; fires 98 leader item_2 |
+| s13_12 | coffee_break | 81 to 91 | item_2 | 81: b 0.754, prior 0.667, adequate, observation | 11 ticks: obs. warrant 11, adequate 11 | 81 (+0, held before): item_2 0.4134 / coffee_break 0.3376 (Δ 0.0759, ×1.2248) | 81 (+0, held before): item_2 0.4134 / coffee_break 0.3376 (Δ 0.0759, ×1.2248) | 92 none(below_theta) (coffee_break) | record from 81; fires 98 leader item_2 |
+| s13_12 | item_4 | 150 to 161 | coffee_break | 150: b 0.759, prior 0.490, adequate, commitment,observation | 12 ticks: obs. warrant 12, adequate 12 | 150 (+0, held before): coffee_break 0.6042 / item_4 0.3186 (Δ 0.2856, ×1.8963) | 150 (+0, held before): coffee_break 0.6042 / item_4 0.3186 (Δ 0.2856, ×1.8963) | 162 none(below_theta) (item_4) | record from 150; fires 167 inadequate |
+| s13_13 | item_4 | 216 to 258 | item_1 (complete: pinned), coffee_break | 216: b 0.980, prior 0.980, adequate, commitment | 43 ticks: obs. warrant 42, adequate 43 | tie 216 (1 tick); 217 (+1): coffee_break 0.5023 / item_4 0.4977 (Δ 0.0046, ×1.0092) | 217 (+1): coffee_break 0.5023 / item_4 0.4977 (Δ 0.0046, ×1.0092) | 259 none(leader_inadequate) | record from 216; fires 259 inadequate |
+| s13_14 | coffee_break | 81 to 91 | item_2 | 81: b 0.754, prior 0.667, adequate, observation | 11 ticks: obs. warrant 11, adequate 11 | 81 (+0, held before): item_2 0.4134 / coffee_break 0.3376 (Δ 0.0759, ×1.2248) | 81 (+0, held before): item_2 0.4134 / coffee_break 0.3376 (Δ 0.0759, ×1.2248) | 92 none(below_theta) (coffee_break) | record from 81; fires 98 leader item_2 |
+| s13_15 | item_4 | 262 to 269 | coffee_break | 262: b 0.999, prior 0.980, adequate, commitment | 8 ticks: obs. warrant 0, adequate 8 | 272 (+10): coffee_break 0.5890 / item_4 0.4110 (Δ 0.1779, ×1.4329) | 272 (+10): coffee_break 0.5890 / item_4 0.4110 (Δ 0.1779, ×1.4329) | 270 none(leader_inadequate) | record from 216; fires 270 inadequate |
+| s14_04 | item_2 | 133 | coffee_break | 129 (right until 132): b 0.753, prior 0.481, adequate, commitment,observation | 5 ticks: obs. warrant 5, adequate 5; of the 1 wrong: obs. warrant 1 | 137 (+4): ac_activation 0.3684 / item_2 0.2946 (Δ 0.0737, ×1.2503) | 140 (+7): coffee_break 0.3567 / ac_activation 0.3195 (Δ 0.0372, ×1.1164) | 134 none(leader_no_observation) | record from 129; fires 141 leader item_1 |
+| s14_04 | item_2 | 135 to 136 | coffee_break | 135: b 0.793, prior 0.481, adequate, commitment | 2 ticks: obs. warrant 0, adequate 2 | 137 (+2): ac_activation 0.3684 / item_2 0.2946 (Δ 0.0737, ×1.2503) | 140 (+5): coffee_break 0.3567 / ac_activation 0.3195 (Δ 0.0372, ×1.1164) | 137 none(below_theta) (item_2) | record from 129; fires 141 leader item_1 |
+| s14_05 | item_2 | 135 to 146 | coffee_break | 129 (right until 134): b 0.753, prior 0.481, adequate, commitment,observation | 18 ticks: obs. warrant 18, adequate 18; of the 12 wrong: obs. warrant 12 | 139 (+4): ac_activation 0.3756 / item_2 0.3383 (Δ 0.0374, ×1.1105) | 142 (+7): coffee_break 0.3717 / ac_activation 0.3306 (Δ 0.0411, ×1.1243) | 147 none(leader_inadequate) | record from 129; fires 147 inadequate |
+| s14_06 | item_2 | 180 to 187 | coffee_break | 180: b 1.000, prior 0.166, adequate, commitment | 8 ticks: obs. warrant 0, adequate 8 | 225 (+45): coffee_break 0.4807 / item_2 0.3288 (Δ 0.1519, ×1.4619) | 225 (+45): coffee_break 0.4807 / item_2 0.3288 (Δ 0.1519, ×1.4619) | 188 none(leader_inadequate) | record from 129; fires 188 inadequate |
+| s14_09 | item_2 | 133 | ac_activation | 129 (right until 132): b 0.753, prior 0.481, adequate, commitment,observation | 5 ticks: obs. warrant 5, adequate 5; of the 1 wrong: obs. warrant 1 | 136 (+3): ac_activation 0.3681 / item_2 0.3479 (Δ 0.0202, ×1.0580) | 136 (+3): ac_activation 0.3681 / item_2 0.3479 (Δ 0.0202, ×1.0580) | 134 none(leader_no_observation) | record from 129; fires 139 leader item_1 |
+| s14_09 | item_2 | 135 to 136 | ac_activation | 135: b 0.800, prior 0.481, adequate, commitment | 2 ticks: obs. warrant 0, adequate 2 | 136 (+1): ac_activation 0.3681 / item_2 0.3479 (Δ 0.0202, ×1.0580) | 136 (+1): ac_activation 0.3681 / item_2 0.3479 (Δ 0.0202, ×1.0580) | 137 none(below_theta) (item_2) | record from 129; fires 139 leader item_1 |
+| s14_10 | item_2 | 135 to 140 | ac_activation | 129 (right until 134): b 0.753, prior 0.481, adequate, commitment,observation | 12 ticks: obs. warrant 12, adequate 12; of the 6 wrong: obs. warrant 6 | 138 (+3): ac_activation 0.3951 / item_2 0.3328 (Δ 0.0624, ×1.1874) | 138 (+3): ac_activation 0.3951 / item_2 0.3328 (Δ 0.0624, ×1.1874) | 141 none(below_theta) (item_1) | record from 129; fires 141 leader item_1 |
+| s14_11 | item_2 | 180 to 187 | ac_activation | 180: b 1.000, prior 0.329, adequate, commitment | 8 ticks: obs. warrant 0, adequate 8 | 225 (+45): ac_activation 0.4351 / item_2 0.3597 (Δ 0.0754, ×1.2095) | 225 (+45): ac_activation 0.4351 / item_2 0.3597 (Δ 0.0754, ×1.2095) | 188 none(leader_inadequate) | record from 129; fires 188 inadequate |
+| s14_19 | item_1 | 180 to 239 | item_2 (complete: pinned), coffee_break | 180: b 0.962, prior 0.962, adequate, commitment | 60 ticks: obs. warrant 59, adequate 60 | tie 180 (1 tick); 181 (+1): coffee_break 0.3335 / ac_activation 0.3333 (Δ 0.00019, ×1.0006; admitted 0.3332) | 181 (+1): coffee_break 0.3335 / ac_activation 0.3333 (Δ 0.00019, ×1.0006) | 240 none(below_theta) (item_1) | record from 180; fires 240 inadequate |
+| s14_21 | coffee_break | 221 to 227 | ac_activation | 221: b 0.755, prior 0.662, adequate, observation | 7 ticks: obs. warrant 7, adequate 7 | 221 (+0, held before): ac_activation 0.4201 / coffee_break 0.3568 (Δ 0.0632, ×1.1772) | 221 (+0, held before): ac_activation 0.4201 / coffee_break 0.3568 (Δ 0.0632, ×1.1772) | 228 none(below_theta) (coffee_break) | record from 221; fires 228 boundary |
+| s15_03 | item_4 | 151 to 161 | coffee_break | 151: b 0.757, prior 0.481, adequate, commitment,observation | 11 ticks: obs. warrant 11, adequate 11 | 151 (+0, held before): coffee_break 0.5356 / item_4 0.2659 (Δ 0.2696, ×2.0139) | 151 (+0, held before): coffee_break 0.5356 / item_4 0.2659 (Δ 0.2696, ×2.0139) | 162 none(below_theta) (item_4) | record from 151; fires 167 inadequate |
+| s15_05 | item_2 | 94 | coffee_break | 87 (right until 93): b 0.756, prior 0.321, adequate, commitment,observation | 8 ticks: obs. warrant 8, adequate 8; of the 1 wrong: obs. warrant 1 | 98 (+4): coffee_break 0.4489 / item_2 0.4447 (Δ 0.0041, ×1.0093) | 98 (+4): coffee_break 0.4489 / item_2 0.4447 (Δ 0.0041, ×1.0093) | 95 none(leader_no_observation) | record from 87; fires 104 leader item_4 |
+| s15_05 | item_2 | 96 to 99 | coffee_break | 96: b 0.870, prior 0.321, adequate, commitment | 4 ticks: obs. warrant 0, adequate 4 | 98 (+2): coffee_break 0.4489 / item_2 0.4447 (Δ 0.0041, ×1.0093) | 98 (+2): coffee_break 0.4489 / item_2 0.4447 (Δ 0.0041, ×1.0093) | 100 none(below_theta) (item_2) | record from 87; fires 104 leader item_4 |
+| s15_06 | item_2 | 96 to 103 | coffee_break | 87 (right until 95): b 0.756, prior 0.321, adequate, commitment,observation | 17 ticks: obs. warrant 17, adequate 17; of the 8 wrong: obs. warrant 8 | 100 (+4): coffee_break 0.4852 / item_2 0.4320 (Δ 0.0532, ×1.1231) | 100 (+4): coffee_break 0.4852 / item_2 0.4320 (Δ 0.0532, ×1.1231) | 104 none(below_theta) (item_2) | record from 87; fires 105 inadequate |
+| s15_07 | item_2 | 123 to 130 | coffee_break | 123: b 1.000, prior 0.321, adequate, commitment | 8 ticks: obs. warrant 0, adequate 8 | 150 (+27): coffee_break 0.5359 / item_2 0.3962 (Δ 0.1397, ×1.3525) | 150 (+27): coffee_break 0.5359 / item_2 0.3962 (Δ 0.1397, ×1.3525) | 131 none(leader_inadequate) | record from 87; fires 131 inadequate |
+| s15_11 | item_2 | 94 | ac_activation | 87 (right until 93): b 0.756, prior 0.321, adequate, commitment,observation | 8 ticks: obs. warrant 8, adequate 8; of the 1 wrong: obs. warrant 1 | 99 (+5): coffee_break 0.4262 / item_2 0.4104 (Δ 0.0158, ×1.0384) | 126 (+32): ac_activation 0.4601 / item_4 0.4056 (Δ 0.0545, ×1.1344) | 95 none(leader_no_observation) | record from 87; fires 103 leader item_4 |
+| s15_11 | item_2 | 96 to 98 | ac_activation | 96: b 0.863, prior 0.321, adequate, commitment | 3 ticks: obs. warrant 0, adequate 3 | 99 (+3): coffee_break 0.4262 / item_2 0.4104 (Δ 0.0158, ×1.0384) | 126 (+30): ac_activation 0.4601 / item_4 0.4056 (Δ 0.0545, ×1.1344) | 99 none(below_theta) (item_2) | record from 87; fires 103 leader item_4 |
+| s15_11 | item_4 | 111 to 118 | ac_activation | 111: b 0.763, prior 0.321, adequate, commitment,observation | 8 ticks: obs. warrant 8, adequate 8 | 111 (+0, held before): coffee_break 0.3704 / item_4 0.3688 (Δ 0.0016, ×1.0043) | 126 (+15): ac_activation 0.4601 / item_4 0.4056 (Δ 0.0545, ×1.1344) | 119 none(leader_inadequate) | record from 111; fires 119 inadequate |
+| s15_12 | item_2 | 96 to 108 | ac_activation | 87 (right until 95): b 0.756, prior 0.321, adequate, commitment,observation | 22 ticks: obs. warrant 22, adequate 22; of the 13 wrong: obs. warrant 13 | 105 (+9): coffee_break 0.4758 / item_2 0.4396 (Δ 0.0362, ×1.0823) | 117 (+21): ac_activation 0.5034 / coffee_break 0.4023 (Δ 0.1011, ×1.2514) | 109 none(leader_inadequate) | record from 87; fires 109 inadequate |
+| s15_13 | item_2 | 123 to 130 | ac_activation | 123: b 1.000, prior 0.321, adequate, commitment | 8 ticks: obs. warrant 0, adequate 8 | 150 (+27): ac_activation 0.4946 / item_2 0.4390 (Δ 0.0556, ×1.1267) | 150 (+27): ac_activation 0.4946 / item_2 0.4390 (Δ 0.0556, ×1.1267) | 131 none(leader_inadequate) | record from 87; fires 131 inadequate |
+| s15_19 | item_4 | 216 to 261 | item_1 (complete: pinned), ac_activation | 216: b 0.962, prior 0.962, adequate, commitment | 46 ticks: obs. warrant 45, adequate 46 | tie 216 (1 tick); 217 (+1): ac_activation 0.3355 / item_4 0.3350 (Δ 0.00049, ×1.0015) | 217 (+1): ac_activation 0.3355 / item_4 0.3350 (Δ 0.00049, ×1.0015) | 262 none(leader_no_observation) | record from 216; fires 262 boundary |
+
+Counts, over the admissions of the true task (on; the admission tick is the first tick of the gate's run that reaches
+the stretch): 43 of 256 rest on commitment warrant with no observation warrant on the admission tick. All 43 are lone
+deliveries (of the 58 lone-delivery admissions), and all 43 begin on the previous task's pin tick, before the stretch's
+first tick. Off: 0 of 148. Over the 32 rows of the table: 14 rest on commitment alone on their first tick, 4 of them
+lone deliveries (s13_13, s13_15, s14_19, s15_19).
+
+What the reading shows, by kind of row:
+1. A raised foreseeable task admitted while the human walks to its neighbour (s13_11, s13_12, s13_14: the coffee break
+   during item_2; s14_21: the coffee break during the A/C): observation warrant alone, prior 0.66 to 0.67. The
+   evidence alone ranked the true task first on the admission tick and before it (×1.22, ×1.18). The gate drops below
+   θ at 92 and 228; the trigger rule fires at 98 (the leader changes) and at 228 (the A/C's completion boundary).
+2. A delivery admitted while the human walks to the coffee machine, no fact holding (s13_03, s13_12 item_4, s15_03):
+   commitment and observation, prior 0.48 to 0.49. The evidence alone ranked the coffee break first on the admission
+   tick and before it, ×1.90 to ×2.01, the widest margins in the table. The gate drops below θ at 162; the trigger
+   rule fires at 167 on inadequacy: 16 to 17 ticks admitted. Observation warrant held on every admitted tick, because
+   the walk to the machine also gains path toward shelf_4.
+3. A delivery admitted while it was the true task, then left on foot for a foreseeable task begun inside it (s13_05,
+   s13_06, s14_04, s14_05, s14_09, s14_10, s15_05, s15_06, s15_11 item_2, s15_12; on only): the evidence alone puts a
+   rival strictly above it 3 to 9 ticks after the human left, by Δ 0.004 to 0.074 (×1.009 to ×1.25). The trigger rule
+   fires 6 to 13 ticks after the human left, 3 to 8 ticks after that first tick: on inadequacy in 4, on a change of
+   leader in 6, each time to another delivery, never to the foreseeable task. In five of them the per-tick gate is
+   split by a tick with no observation and clears again on commitment alone; the record is not split.
+4. A carried delivery when the break begins inside it (s13_07, s14_06, s14_11, s15_07, s15_13, unchanged off and on;
+   s13_15, the lone item_4): commitment alone, no observation warrant on any admitted tick, inadequate after 8 ticks.
+   The evidence alone turns 27 to 45 ticks after the human left (s13_15: 10). The retraction comes before the
+   evidence alone turns.
+5. A lone delivery admitted on the previous task's pin tick, then a foreseeable task (s13_13, s14_19, s15_19):
+   commitment alone, belief and prior 0.96 to 0.98. Off: a tie on the admission tick (the evidence restarted at the
+   boundary), then a rival strictly above from the next tick by Δ 0.0002 to 0.005 (×1.0006 to ×1.009), not a
+   decisive difference. Admitted 43, 60 and 46 ticks, with observation warrant on every tick after the first: the
+   walk to the machine or to the switch gains path toward the delivery's shelf. It ends on inadequacy (259, 240), and
+   beside the switch only on the A/C's completion boundary (262).
+6. s15_11 item_4 (111 to 118, during the A/C): commitment and observation; off a near tie on the admission tick
+   (the coffee break ×1.004 above it), the true task first only at 126; inadequate at 119.
+
+The exit walk (Appendix C): in env_layout_15 the coffee break is the only live hypothesis (prior and belief 1), so the
+evidence ranks nothing; in env_layout_17 the evidence alone keeps it first to the run's end. Every one ends on
+inadequacy after 1 to 23 ticks; the prior moves where it starts, not where it ends.
+
+What the data suggests, without resolving the question:
+- Hypothesis adequacy and warrant held on every admitted tick: the gate per tick requires both, so this is no finding.
+  Neither reads context knowledge (R1), so both are the same off and on; where off did not admit, the threshold is the
+  condition that differs, and the prior is what moved the belief across it.
+- In kinds 1 and 2 (7 rows) the evidence alone ranked another hypothesis first when the gate admitted: the prior
+  outweighed the movement evidence within one walk (question S's finding). In kinds 3 and 5 the evidence alone turns
+  early but by small margins, and the admission lasts until inadequacy or a change of leader.
+- Commitment warrant with no observation warrant admits only lone deliveries on the true task (43, all on the
+  previous task's pin tick). It is the only warrant on the first tick in kinds 4 and 5 and in the split rows of kind
+  3, and the only warrant on every tick in kind 4.
+- Observation warrant held in kinds 2 and 5 while the human walked to a target beside the admitted one: as defined it
+  does not separate neighbouring targets, so it did not shorten these admissions.
+- The trigger rule ends an admission later than the per-tick gate in 18 of the 32 rows (1 to 9 ticks), every one a
+  fall below θ or a tick with no observation, which leave the record in place.
+
 ## Appendix A: off against on, every true stretch (`offon.py analysis/kitting/irb/tk2 actual.csv 0.75 analysis/kitting/irb/tk2/off analysis/kitting/irb/tk1`)
 
 From `actual.csv`, θ = 0.75; off: the same script's run in the off folder named. Ticks inclusive; delay from the stretch's first tick in brackets. "after admission": ticks from the admission to the pin on which the gate no longer clears for the true hypothesis (the retraction reading).
@@ -1134,3 +1244,43 @@ Delay: admitted tick minus the stretch's first tick; `never` sorts last. A rival
   - as stated: deliver_item(item_4) from 264 (1 live): s15_20 with 19, s15_19 without 0, off 15
   - no on side without the raising fact in the set for: s13_01 deliver_item(item_4) from 217 (1 live); s13_14 deliver_item(item_4) from 217 (1 live); s14_01 deliver_item(item_1) from 181 (1 live); s14_20 deliver_item(item_1) from 181 (1 live); s15_01 deliver_item(item_4) from 217 (1 live); s15_18 deliver_item(item_4) from 217 (1 live)
 - 5, stretches with a level changing to or from raised inside the span (read in the section on edges): 25: s13_09 coffee_break(coffee_machine_0), s13_02 deliver_item(item_1), s13_02 deliver_item(item_4), s13_12 coffee_break(coffee_machine_0), s13_03 deliver_item(item_4), s13_05 deliver_item(item_1), s13_05 deliver_item(item_4), s13_06 deliver_item(item_4), s14_13 coffee_break(coffee_machine_0), s14_14 coffee_break(coffee_machine_0), s14_02 deliver_item(item_1), s14_04 deliver_item(item_1), s14_05 deliver_item(item_1), s15_02 deliver_item(item_1), s15_02 deliver_item(item_4), s15_03 deliver_item(item_4), s15_17 deliver_item(item_1), s15_05 deliver_item(item_1), s15_05 deliver_item(item_4), s15_06 deliver_item(item_1), s15_06 deliver_item(item_4), s15_07 deliver_item(item_1), s15_10 deliver_item(item_1), s15_20 deliver_item(item_1), s15_13 ac_activation(ac_switch_0)
+
+## Appendix C: the reading for question G, the exit walk (`g_reading.py`)
+
+The columns as in the section above; the true task is unmodelled, so 3b has no value.
+
+| scenario | admitted | wrong ticks | true task | 1. at the admission: belief, prior, adequacy, warrant | 2. over the admitted ticks | 3a. off: another strictly above it (top two) | 3b. off: the true task strictly greatest (top two) | 4. gate's end | 4. the trigger rule's end |
+|---|---|---|---|---|---|---|---|---|---|
+| s13_01 | coffee_break | 309 to 330 | unmodelled | 309: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 331 none(leader_inadequate) | record from 309; fires 331 inadequate |
+| s13_02 | coffee_break | 378 to 399 | unmodelled | 378: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 400 none(leader_inadequate) | record from 378; fires 400 inadequate |
+| s13_03 | coffee_break | 372 to 393 | unmodelled | 372: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 394 none(leader_inadequate) | record from 372; fires 394 inadequate |
+| s13_04 | coffee_break | 357 to 378 | unmodelled | 357: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 379 none(leader_inadequate) | record from 357; fires 379 inadequate |
+| s13_05 | coffee_break | 384 to 405 | unmodelled | 384: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 406 none(leader_inadequate) | record from 384; fires 406 inadequate |
+| s13_06 | coffee_break | 379 to 400 | unmodelled | 379: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 401 none(leader_inadequate) | record from 379; fires 401 inadequate |
+| s13_07 | coffee_break | 429 to 451 | unmodelled | 429: b 1.000, prior 1.000, adequate, observation | 23 ticks: obs. warrant 23, adequate 23 | none: no other live hypothesis | - (unmodelled) | 452 none(leader_inadequate) | record from 429; fires 452 inadequate |
+| s13_08 | coffee_break | 378 to 399 | unmodelled | 378: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 400 none(leader_inadequate) | record from 378; fires 400 inadequate |
+| s13_09 | coffee_break | 378 to 399 | unmodelled | 378: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 400 none(leader_inadequate) | record from 378; fires 400 inadequate |
+| s13_10 | coffee_break | 378 to 399 | unmodelled | 378: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 400 none(leader_inadequate) | record from 378; fires 400 inadequate |
+| s13_11 | coffee_break | 372 to 393 | unmodelled | 372: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 394 none(leader_inadequate) | record from 372; fires 394 inadequate |
+| s13_12 | coffee_break | 372 to 393 | unmodelled | 372: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 394 none(leader_inadequate) | record from 372; fires 394 inadequate |
+| s13_13 | coffee_break | 357 to 378 | unmodelled | 357: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 379 none(leader_inadequate) | record from 357; fires 379 inadequate |
+| s13_14 | coffee_break | 309 to 330 | unmodelled | 309: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 331 none(leader_inadequate) | record from 309; fires 331 inadequate |
+| s13_15 | coffee_break | 376 to 397 | unmodelled | 376: b 1.000, prior 1.000, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none: no other live hypothesis | - (unmodelled) | 398 none(leader_inadequate) | record from 376; fires 398 inadequate |
+| s15_01 | coffee_break | 319 to 330 | unmodelled | 319: b 0.752, prior 0.500, adequate, observation | 12 ticks: obs. warrant 12, adequate 12 | none to the run's end | - (unmodelled) | 331 none(leader_inadequate) | record from 319; fires 331 inadequate |
+| s15_02 | coffee_break | 388 to 399 | unmodelled | 388: b 0.752, prior 0.500, adequate, observation | 12 ticks: obs. warrant 12, adequate 12 | none to the run's end | - (unmodelled) | 400 none(leader_inadequate) | record from 388; fires 400 inadequate |
+| s15_03 | coffee_break | 382 to 393 | unmodelled | 382: b 0.753, prior 0.500, adequate, observation | 12 ticks: obs. warrant 12, adequate 12 | none to the run's end | - (unmodelled) | 394 none(leader_inadequate) | record from 382; fires 394 inadequate |
+| s15_04 | coffee_break | 378 | unmodelled | 378: b 0.909, prior 0.500, adequate, observation | 1 ticks: obs. warrant 1, adequate 1 | none to the run's end | - (unmodelled) | 379 none(leader_inadequate) | record from 378; fires 379 inadequate |
+| s15_05 | coffee_break | 394 to 405 | unmodelled | 394: b 0.752, prior 0.500, adequate, observation | 12 ticks: obs. warrant 12, adequate 12 | none to the run's end | - (unmodelled) | 406 none(leader_inadequate) | record from 394; fires 406 inadequate |
+| s15_06 | coffee_break | 389 to 400 | unmodelled | 389: b 0.752, prior 0.500, adequate, observation | 12 ticks: obs. warrant 12, adequate 12 | none to the run's end | - (unmodelled) | 401 none(leader_inadequate) | record from 389; fires 401 inadequate |
+| s15_07 | coffee_break | 440 to 451 | unmodelled | 440: b 0.770, prior 0.500, adequate, observation | 12 ticks: obs. warrant 12, adequate 12 | none to the run's end | - (unmodelled) | 452 none(leader_inadequate) | record from 440; fires 452 inadequate |
+| s15_08 | coffee_break | 369 to 390 | unmodelled | 369: b 0.810, prior 0.800, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none to the run's end | - (unmodelled) | 391 none(leader_inadequate) | record from 369; fires 391 inadequate |
+| s15_09 | coffee_break | 324 to 346 | unmodelled | 324: b 0.809, prior 0.800, adequate, observation | 23 ticks: obs. warrant 23, adequate 23 | none to the run's end | - (unmodelled) | 347 none(leader_inadequate) | record from 324; fires 347 inadequate |
+| s15_10 | coffee_break | 322 to 344 | unmodelled | 322: b 0.809, prior 0.800, adequate, observation | 23 ticks: obs. warrant 23, adequate 23 | none to the run's end | - (unmodelled) | 345 none(leader_inadequate) | record from 322; fires 345 inadequate |
+| s15_11 | coffee_break | 389 to 410 | unmodelled | 389: b 0.810, prior 0.800, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none to the run's end | - (unmodelled) | 411 none(leader_inadequate) | record from 389; fires 411 inadequate |
+| s15_12 | coffee_break | 373 to 394 | unmodelled | 373: b 0.810, prior 0.800, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none to the run's end | - (unmodelled) | 395 none(leader_inadequate) | record from 373; fires 395 inadequate |
+| s15_13 | coffee_break | 401 to 422 | unmodelled | 401: b 0.810, prior 0.800, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none to the run's end | - (unmodelled) | 423 none(leader_inadequate) | record from 401; fires 423 inadequate |
+| s15_14 | coffee_break | 369 to 390 | unmodelled | 369: b 0.810, prior 0.800, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none to the run's end | - (unmodelled) | 391 none(leader_inadequate) | record from 369; fires 391 inadequate |
+| s15_15 | coffee_break | 369 to 390 | unmodelled | 369: b 0.810, prior 0.800, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none to the run's end | - (unmodelled) | 391 none(leader_inadequate) | record from 369; fires 391 inadequate |
+| s15_16 | coffee_break | 369 to 390 | unmodelled | 369: b 0.810, prior 0.800, adequate, observation | 22 ticks: obs. warrant 22, adequate 22 | none to the run's end | - (unmodelled) | 391 none(leader_inadequate) | record from 369; fires 391 inadequate |
+| s15_19 | coffee_break | 322 to 344 | unmodelled | 322: b 0.809, prior 0.800, adequate, observation | 23 ticks: obs. warrant 23, adequate 23 | none to the run's end | - (unmodelled) | 345 none(leader_inadequate) | record from 322; fires 345 inadequate |
+| s15_20 | coffee_break | 322 to 344 | unmodelled | 322: b 0.809, prior 0.800, adequate, observation | 23 ticks: obs. warrant 23, adequate 23 | none to the run's end | - (unmodelled) | 345 none(leader_inadequate) | record from 322; fires 345 inadequate |

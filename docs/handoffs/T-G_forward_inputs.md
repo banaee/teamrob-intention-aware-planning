@@ -547,6 +547,11 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    the A/C switch). Hadi wants a recommendation on one case for the early admission and its retraction, since it is
    the consequence of the new prior that reaches planning most directly. [open] (Whether this case is a third
    planning case or takes the place of one of KT3's two stays open for this step; Hadi, 4 October 2026.)
+   - Question S is ruled (AM65, 4 October 2026): the four strengths stay as ruled; a table of step 4's cases under
+     compressed values is a sensitivity analysis for the close, not a candidate design. [ruled]
+   - Question G, admission and retraction under context knowledge: ccode's reading of step 4's outputs is in
+     analysis/kitting/irb/tk2/REPORT.md, "The reading for question G" (design_records.md, "T-K", THE READING FOR
+     QUESTION G). [open]
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]
