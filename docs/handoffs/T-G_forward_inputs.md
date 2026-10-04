@@ -29,6 +29,8 @@ Updated 4 October 2026 after step 5b and the design discussion that followed it 
 section 5's state rewritten (the build, steps 4, 5 and 5b, the reading for question G, the comparison, what remains
 with no order decided); 5.5, 5.6, 5.7 and 5.10 in line; 5.13 added (the discussion); section 2's T-K paragraph;
 section 11 gains the working rules Hadi set in that chat.
+Updated 4 October 2026 after Hadi's rulings that closed the design discussion after step 5b (AM67 to AM72): section 5's
+state, 5.1, 5.2, 5.4, 5.6, 5.7, 5.10 and 5.13 in line; section 2's T-K paragraph.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -106,8 +108,9 @@ depth, one at a time.
 
 T-K part 1 runs now. Its design is ruled and recorded (2 to 4 October 2026), the build's plan included and approved
 (docs/handoffs/plan_T-K_part1.md). The mechanism is built, and kitting's tests with context knowledge on are run
-(steps 4, 5 and 5b). A design discussion that followed them (4 October 2026) is open and not ruled. dock_loading's part
-and the close remain. Section 5 holds its state.
+(steps 4, 5 and 5b). The design discussion that followed them is closed: Hadi ruled on the gate and the strengths
+(4 October 2026, AM67 to AM72; not built). The build of the two rulings on the gate, dock_loading's part and the close
+remain, in no decided order. Section 5 holds its state.
 
 ---
 
@@ -211,11 +214,15 @@ chat that has read nothing else. [ruled unless marked]
   from 150, and a scenario that is to meet another window states its own timeline. 59 runs, 0 disagreements with the
   oracle. The deliveries are admitted earlier; the coffee break earlier inside break_time and later outside it.
 - Question S is ruled (AM65, 2daef04): the four strengths stay as ruled, not tuned to the movement evidence. Under
-  discussion again since 4 October 2026 (5.13); no change until Hadi rules.
+  discussion again since 4 October 2026 (5.13); no change until Hadi rules. RESOLVED (AM70, 4 October 2026): all
+  strengths stay as ruled; a larger ordinary strength was not taken.
 - The reading for question G (002e1ce; analysis/kitting/irb/tk2/REPORT.md, "The reading for question G"): the evidence
   alone turns against an interrupted delivery 3 to 9 ticks after the human left, the trigger rule 3 to 8 ticks later;
   a lone delivery admitted early lasts 43 to 60 ticks. Question G is ruled (AM66, 1fad437): the gate and the
-  retraction stay as ruled. Under discussion again since 4 October 2026 (5.13); no change until Hadi rules.
+  retraction stay as ruled. Under discussion again since 4 October 2026 (5.13); no change until Hadi rules. REOPENED
+  AND RULED (AM67 to AM69, 4 October 2026): observation warrant is required at admission for every hypothesis; the gate
+  refuses a leader that the evidence alone ranks below another live hypothesis; the end of an admission is unchanged.
+  AM66 is superseded in part.
 - Step 5, the planning cases, is done (1fad437, 450dad5, cfbf778, 17cadf0; analysis/kitting/mpb/tk/REPORT.md). Five
   cases on env_layout_18, 9 runs, 0 disagreements with the oracle. A gain as an earlier decision when the human acts
   as the context makes probable (cases 1 and 3); a cost when the human acts against it (case 5: a pass at 28.3 cm with
@@ -239,12 +246,15 @@ chat that has read nothing else. [ruled unless marked]
   below min_separation).
 - Two what-if readings, X and Y (6f11c13; analysis/kitting/mpb/tk5b/WHATIF.md): filters on the recorded gate answers,
   not runs. X is the discussion's 2.B, Y its 2.A (5.13).
-- The design discussion that followed step 5b: 5.13. [open, not ruled]
+- The design discussion that followed step 5b: 5.13. CLOSED AND RULED (Hadi, 4 October 2026; AM67 to AM72; 5.13's
+  head). [ruled; AM67 and AM68 not built]
 
 What remains of T-K part 1. A list; no order is decided. [open]
-- The open design question of 5.13: the gate and the prior after an admission (Hadi rules).
-- The table of 5.13, from existing outputs, if Hadi wants it.
-- If Hadi rules a change: its build, and new measurements.
+- The open design question of 5.13: the gate and the prior after an admission (Hadi rules). RULED (AM67 to AM72).
+- The table of 5.13, from existing outputs, if Hadi wants it. RULED (AM70): the table at other values is the
+  sensitivity analysis for the close.
+- The build of AM67 and AM68, starting with a plan step in its own session (BUILD DISCIPLINE), and new measurements.
+- The question on the planning set's coverage matrix (5.13, question 3). [open]
 - dock_loading's part (5.7, step 6).
 - The close (5.7, step 7), with this file updated.
 The design chat suggested settling the design question before dock_loading's part. Hadi has not confirmed it.
@@ -261,7 +271,7 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM66 (the amendments, each under the ruling it amends, the
   record parts in design_records.md; AM40 to AM64 are of 4 October 2026: the timeline, the plan, the cross-check; AM65
   question S under R3 and AM66 question G under R7, each with a NOTE of 4 October 2026 that it is under discussion
-  again), the
+  again, resolved by AM67 to AM72: under R7 Hadi's principle, AM67 to AM69, AM71, AM72; under R3 AM70), the
   corrections C1, C3 and C4. AM1 to AM9 come from the review of the records; AM10 to AM29 from content points 1 and 2
   (the block CONTENT POINTS 1 AND 2, after R8; that chat's A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29);
   AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11); a CLARIFIED line under
@@ -285,7 +295,8 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - docs/design_records.md, "T-K", after the build: STEP 4, KITTING, THE IDLE ROBOT; QUESTION S, RULED; THE READING FOR
   QUESTION G; QUESTION G, RULED; THE PLANNING CASES, RULED (KT15); STEP 5 (its stages and its result); STEP 5B; CONTEXT
   KNOWLEDGE ON AGAINST OFF, AN OVERVIEW; THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT; TWO WHAT-IF READINGS, X
-  AND Y; THE DESIGN DISCUSSION AFTER STEP 5B (not ruled).
+  AND Y; THE DESIGN DISCUSSION AFTER STEP 5B (closed); THE GATE AFTER STEP 5B, RULED (AM67 to AM72: the measured
+  basis, what becomes stale, the proposed term "outranked", ccode's facts for the build's plan, what stays open).
 - docs/assumptions.md 5.4 (the timeline's facts known exactly and at once; the source of a recency fact), 6.1 (given
   the task, the movement does not depend on the context), 6.2 (the declared and the actual duration match, a baseline
   whose violation is a deviation), 6.3 (the declared durations are at a compressed demonstration scale), 6.4 (an
@@ -396,6 +407,12 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   AMENDED (AM42, Hadi, 4 October 2026): the gate compares θ with the belief over the live hypotheses, with context
   knowledge on or off; the floor and the scaling by the pinned hypotheses stay in the reported distribution only (their
   removal there is TODO-178); the log prints the value the gate read. [ruled]
+  RULED (AM67, AM68, Hadi, 4 October 2026; not built): observation warrant is required at admission for every
+  hypothesis; commitment warrant alone no longer admits, so an assigned task is no longer admitted before movement. The
+  gate refuses a leader that the evidence alone (E_t, without the prior) ranks below another live hypothesis: rank only,
+  a tie passes, no constant, no margin, at admission only. The end of an admission is unchanged (AM69). Hadi's
+  principle: an admission of X while the human does Y is not, for that reason, an error of the recognizer; the
+  framework shows what recognition contributes to adaptive planning, and the core changes minimally. [ruled]
 - One declared duration (R6). Context does not change the content of a projection. The only path from context to the
   projection is: prior, belief, gate, projection of the admitted task.
 - The earlier entry "Assigned-task pool is a support restriction, not a prior" is superseded in part (R8, AM6): the
@@ -473,7 +490,9 @@ Recorded: design_records.md, "T-K", CONTENT POINT 3, THE TESTS (KT1 to KT7) and 
   superseded (KT11's SUPERSEDED line; AM36 to AM38). The design chat restates them before the runs in B and C. Ruled
   by Hadi for that restatement: with context knowledge on and no raising fact holding, a lone live assigned task is
   admitted on its commitment warrant from its prior, and a retraction follows if the human then takes a foreseeable
-  task. [ruled]
+  task. [ruled] SUPERSEDED (AM67, 4 October 2026): commitment warrant alone no longer admits; the lone assigned task
+  needs observation warrant, and the gate refuses it while the evidence alone ranks another live hypothesis above it
+  (AM68).
 - The measure (KT3, KT10). Per true stretch: the tick at which the true task reaches the threshold and is admitted,
   and whether a retraction follows. For the A/C the measure is its belief at its arrival, not its admission.
 - The two MPB cases (KT3): a coffee break inside the break time; deliveries through the whole break time.
@@ -547,7 +566,8 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
   DONE for kitting (4 October 2026).
 - The planning cases (step 5). DONE (4 October 2026), with step 5b.
 - dock_loading's part (step 6). Not built.
-- Any change the discussion of 5.13 may lead to: nothing ruled, nothing built.
+- Any change the discussion of 5.13 may lead to: nothing ruled, nothing built. RULED (4 October 2026): AM67 and AM68
+  change the gate; not built; their build starts with a plan step in its own session.
 
 ### 5.7 The steps from here
 
@@ -579,6 +599,7 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
      labelled by the state the script meets (KT14), with the revised strengths (5.2).
    - To add to them, as Hadi ruled (KT11's RULED line): with no raising fact holding, a lone live assigned task is
      admitted early on its commitment warrant, and a retraction follows if the human then takes a foreseeable task.
+     SUPERSEDED (AM67, 4 October 2026): no admission on commitment warrant alone (5.4).
      Its admission still waits for its first observation (the gate refuses a leader with no observation).
    - With no assigned task live, the foreseeable tasks share the whole prior (the method document, section 12). Hadi's
      caution: this state is no argument for or against any strength value.
@@ -623,6 +644,8 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    After step 5b: the comparison, the limitation (docs/assumptions.md 6.4), the what-if readings and the design
    discussion (section 5's opening, 5.13). Steps 6 and 7 keep their numbers; their order against the open design
    question of 5.13 is not decided. [open]
+   The design question is RULED (AM67 to AM72, 4 October 2026). Open: the order of what remains (the build of AM67 and
+   AM68, dock_loading's part, the close) and the question on the planning set's coverage matrix. [open]
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]
@@ -696,7 +719,8 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
 ### 5.10 Open points the next chat must put to Hadi [open]
 
 ANSWERED on 4 October 2026 (steps 4 and 5): points 1, 2 and 3 below. Open: points 4, 5 and 6, and the questions of
-5.13.
+5.13. Of 5.13's questions, 1 (the direction for the gate and the prior) and 2 (the table) are answered by AM67 to AM72
+(4 October 2026); 3 (the planning set's coverage matrix) and 4 (the order of the remaining work) stay open.
 1. The expected directions for the runs with context knowledge on, restated before those runs (5.7, step 4).
 2. The windows of break_time and room_warm: the setups' defaults and the scenarios that state their own, authored from
    the foreseeable tasks' ticks ccode supplies. Hadi's addition (KT4, its ADDED line): the same activity under a window
@@ -752,7 +776,40 @@ the live hypotheses).
   human or interrupts a task in progress.
 
 
-### 5.13 The design discussion of 4 October 2026 after step 5b [open, not ruled]
+### 5.13 The design discussion of 4 October 2026 after step 5b [closed: ruled 4 October 2026, AM67 to AM72]
+
+RULED (Hadi, 4 October 2026, in the design chat; design_decisions.md, "T-K", under R7 and R3; design_records.md, "T-K",
+THE GATE AFTER STEP 5B, RULED). Ruling n is AM(66 + n). [ruled; AM67 and AM68 not built]
+Hadi's principle: if the robot admits task X and the human does Y, the recognizer was not wrong for that reason. Either
+the human did something unexpected given the modelled knowledge and the evidence, or the recognizer is limited. The
+framework is about what recognition contributes to adaptive planning; it is not changed to make every run flawless.
+Changes to the core stay minimal.
+1. AM67 (the discussion's 2.A). Observation warrant is required at admission, for every hypothesis. Commitment warrant
+   alone no longer admits. A lost observation warrant still ends nothing. Reason: the prior states which task is
+   probable; nothing states when the human starts; a projection built before the first movement assumes a start tick
+   the robot has not observed. Measured cost (what-if Y): the 59 lone assigned tasks admitted 1 tick later. It reverses
+   the part of T-D G that admits an assigned task before movement, the same part of R7 (with AM5), and KT11's RULED
+   line.
+2. AM68 (2.B, as a condition of admission). The gate refuses a leader (the hypothesis with the highest belief) that the
+   evidence alone ranks below another live hypothesis. Rank only; a tie passes; no constant, no margin; a condition of
+   admission only. Reason: context knowledge may make an admission earlier; it may not admit a task against the rank of
+   the observed evidence; a margin would be a new constant. Not taken: the same condition as a ground for ending an
+   admission (it changes T-D L). The term is open: ccode proposes "outranked" and the refusal reason
+   none(leader_outranked). [open]
+3. AM69. The rule on when an admission ends (T-D L) is unchanged: an admission that was correct when made stays until
+   the retraction. A stated limitation.
+4. AM70. All strengths stay as ruled: raised 2 (coffee_break) and 0.5 (ac_activation), ordinary 0.02, suppressed
+   0.005; 1.A not taken. Reason: a strength is the designer's statement about a site, not chosen from test results;
+   with 1 and 2 the wrong admissions no longer depend on the value. The table at other values stays a sensitivity
+   analysis for the close.
+5. AM71. Not taken: 3.A, 3.B, 4.A. 3.B and 4.A are possible future work (TODO-97, TODO-96).
+6. AM72. The cases that remain are limitations, not defects: the first ticks of a walk with equal evidence; the
+   evidence itself ranking another task first after the human interrupts a task; the human doing the less probable task
+   after a correct admission (docs/assumptions.md 6.4).
+Open: the order of the remaining work; question 3 below (the planning set's coverage matrix); the build of AM67 and
+AM68, which starts with a plan step in its own session. ccode's facts for that plan: design_records.md, "T-K", THE GATE
+AFTER STEP 5B, RULED.
+What follows is the discussion as recorded before the ruling.
 
 The design chat discussed the results of steps 4, 5 and 5b with Hadi. Nothing was ruled. Hadi continues the
 discussion in the next design chat and rules there. No point below carries a ruling number. Each point is attributed:

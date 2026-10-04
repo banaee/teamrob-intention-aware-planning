@@ -531,10 +531,13 @@ Decisions
   runs, 0 disagreements with the oracle; findings for TODO-146 and TODO-132 (a)). Step 5b, the existing kitting sets
   with context knowledge on, is DONE (4 October 2026; analysis/kitting/mpb/tk5b/REPORT.md: 33 runs, 0 disagreements;
   12 of the planning set's 16 authored cases reached, E6, D9 and A8 without an instance with it on). A design
-  discussion followed (4 October 2026; design_records.md, "T-K", THE DESIGN DISCUSSION AFTER STEP 5B): NOT RULED;
-  rulings S and G stand, each noted as under discussion again. Next: open. What remains (the design question, a table
-  from existing outputs if Hadi wants it, dock_loading's part (step 6), the close) has no decided order
-  (`docs/handoffs/T-G_forward_inputs.md`, section 5).
+  discussion followed and is closed: Hadi ruled (4 October 2026; design_decisions.md, "T-K", AM67 to AM72 under R7 and
+  R3; design_records.md, "T-K", THE GATE AFTER STEP 5B, RULED): observation warrant is required at admission for every
+  hypothesis (commitment warrant alone no longer admits); the gate refuses a leader that the evidence alone ranks below
+  another live hypothesis (rank only, a tie passes; the term "outranked" proposed, not ruled); the end of an admission
+  and all strengths unchanged. Nothing built. Next: open. What remains (the build of AM67 and AM68, a plan step first
+  in its own session; dock_loading's part (step 6); the close; the question on the planning set's coverage matrix) has
+  no decided order (`docs/handoffs/T-G_forward_inputs.md`, section 5).
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
