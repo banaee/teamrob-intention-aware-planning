@@ -14,6 +14,7 @@ setup: env_setup_05
 scenario: scenario_s05_05
 steps: 803
 assignment_knowledge: true
+context_knowledge: false
 strategy: "single_task"
 gate_strategy: "none"
 cost_strategy: "realized"

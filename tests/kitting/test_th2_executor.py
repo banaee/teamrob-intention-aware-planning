@@ -73,7 +73,7 @@ def model_for(layout, sid, script, robot=True):
     return SimModel(scenario=scenario, register_fn=register_kitting_domain,
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][layout],
-                    setup_path=domain_config["setups"][base.setup])
+                    setup_path=domain_config["setups"][base.setup], assignment_knowledge=False, context_knowledge=False)
 
 
 def run(m, max_steps=400):
@@ -378,7 +378,7 @@ def test_anchor_absent_from_the_re_expansion_is_a_load_error():
         return SimModel(scenario=scenario, register_fn=lambda: tree,
                         task_model_schemas=domain_config["task_model"],
                         layout_path=domain_config["layouts"]["env_layout_02"],
-                        setup_path=domain_config["setups"][base.setup])
+                        setup_path=domain_config["setups"][base.setup], assignment_knowledge=False, context_knowledge=False)
 
     with pytest.raises(ValueError, match="anchor_absent"):
         model(Script([deliver("item_2").at(move_to, took, occurrence=0).at(pick_up, st("PT2S"))]))

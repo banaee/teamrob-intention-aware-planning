@@ -115,7 +115,7 @@ def _dock_model():
                     task_model_schemas=dock_config["task_model"],
                     layout_path=dock_config["layouts"]["env_layout_02"],
                     setup_path=dock_config["setups"][base.setup],
-                    state_declarations=dock_config["states"])
+                    state_declarations=dock_config["states"], assignment_knowledge=False, context_knowledge=False)
 
 
 def test_the_gate_approached_from_each_side():

@@ -102,7 +102,7 @@ def load(run_file, overrides=()):
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][base.setup],
-                 state_declarations=domain_config["states"], overrides=overrides)
+                 state_declarations=domain_config["states"], overrides=overrides, assignment_knowledge=False, context_knowledge=False)
     return m, human, base, layout
 
 

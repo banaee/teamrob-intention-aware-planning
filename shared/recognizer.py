@@ -6,7 +6,7 @@ PURPOSE:
     Maintains and updates P(τ | observations) over all known intentions T.
 
 ALGORITHM:
-    P(τ | obs_1..t) ∝ P(obs_t | τ) · ω_context(τ, context, world) · P(τ | obs_1..t-1)
+    P(τ | obs_1..t) ∝ P(obs_t | τ) · P(τ | obs_1..t-1)
 
     P(obs_t | τ) = P(obs_t | a_φ(τ)) — a task's likelihood IS the likelihood of
     the action it expects now (the phase model, I3). The phase is DERIVED every
@@ -118,10 +118,13 @@ ALGORITHM:
     execution ends without it stays live. The boundary tick is flagged on
     the belief (episode_boundary).
 
-    Output belief = evidence × ω_context, with inadmissible and retired
-    hypotheses pinned at BELIEF_FLOOR and the floor applied. ω_context is a fact
-    about the current state, not an event: applied to the output only, never
-    fed back. The distribution is over TASKS; the phase is internal. The R6
+    Output belief = the evidence × the prior's weights, with inadmissible and
+    retired hypotheses pinned at BELIEF_FLOOR and the floor applied. The prior's
+    weights are a function of the current state, not an event: applied to the
+    output only, never fed back. With context knowledge off every weight is
+    exactly 1.0 (the equal prior, T-K part 1, P1); the hardcoded context weight
+    ω_context and its constants are gone (TODO-66, AM22). The distribution is
+    over TASKS; the phase is internal. The R6
     invariant holds at two levels: the normalised evidence sums to 1 over
     exactly H (before the floor); the returned distribution sums to 1 with the
     pinned keys at exactly BELIEF_FLOOR and the live keys carrying the rest.
@@ -171,11 +174,6 @@ ALGORITHM:
     in. The recognizer decides nothing about action with the finding (R5);
     the meta-planner reads the leader's hypothesis adequacy at its gate.
 
-    Context weight ω_context(τ, context, world):
-        - TEMPERATURE_BOOST if room_temperature is high and τ is ac_activation
-        - FATIGUE_BOOST if shift is long and τ is coffee_break
-        - 1.0 otherwise
-
     Prior:
         - Uniform over the live hypotheses at t=0 and at every episode
           boundary (the admissible prior, over the current support)
@@ -207,7 +205,6 @@ INPUTS:
     - Observation:      detected_microaction, spatial_context.position
     - WorldState:       predicates (completion conditions), object_locations,
                         object_positions, agent_positions (target resolution)
-    - ContextKnowledge: shift_start_step, room_temperature
     - prev_belief:      previous BeliefState (None → initial prior)
     - assigned_tasks:   observed agent's assigned tasks (None/empty → restriction is off)
 
@@ -230,7 +227,7 @@ from shared.types import (
     TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, same_task,
     AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy, ObservationWarrant,
 )
-from shared.knowledge import TaskModel, ContextKnowledge
+from shared.knowledge import TaskModel
 from shared.planner import AdaptivePlanner, DecompositionError
 from shared.target_resolution import movement_target_position
 from shared import likelihood_functions
@@ -245,13 +242,6 @@ from shared import likelihood_functions
 #  body's speed and duration conversion, the priced standing and the test
 #  level alpha are the embodiment's, passed to the constructor)
 # =============================================================================
-
-# ω_context boost multipliers
-TEMPERATURE_BOOST  = 3.0
-FATIGUE_BOOST      = 2.5
-
-HIGH_TEMP_THRESHOLD    = 26.0
-LONG_SHIFT_THRESHOLD   = 500
 
 # theta is NOT here. The confidence gate is the meta-planner's decision, not a
 # likelihood parameter (recognizer_handback.md §2) — this module produces the
@@ -359,7 +349,6 @@ class IntentionRecognizer:
     def __init__(
         self,
         task_model: TaskModel,
-        context: ContextKnowledge,
         hypotheses: List[HypothesisKey],
         beta: float,
         speed: float,
@@ -373,7 +362,6 @@ class IntentionRecognizer:
     ):
         """
         task_model:     the robot's task model (T-H): its HTN knowledge
-        context:        background context facts for ω_context weighting
         hypotheses:     list of (task_name, bindings) pairs for this scenario.
                         Built from the domain schemas and the workspace objects
                         at construction time in sim_agents.py.
@@ -424,7 +412,6 @@ class IntentionRecognizer:
         comes from prev_belief.distribution or this fallback.
         """
         self.task_model = task_model
-        self.context = context
         self._path_cost = path_cost or likelihood_functions.straight_line_cost
         self._beta = beta
         self._speed = speed
@@ -679,7 +666,7 @@ class IntentionRecognizer:
         prev_belief: Optional[BeliefState] = None,
     ) -> BeliefState:
         """
-        Bayesian update: P(τ|obs_1..t) ∝ P(obs_t|τ) · ω_context(τ) · P(τ|obs_1..t-1),
+        Bayesian update: P(τ|obs_1..t) ∝ P(obs_t|τ) · P(τ|obs_1..t-1),
         with P(obs_t|τ) the likelihood of the action τ expects now.
 
         Per hypothesis, in this order:
@@ -721,7 +708,7 @@ class IntentionRecognizer:
         from the phase state as it stands (_adequacy), and beside them, independently, every live
         hypothesis's observation warrant (_observation_warrant, T-D G).
 
-        ω_context is applied to the output only (see _output()). The recognizer
+        The prior's weights are applied to the output only (see _output()). The recognizer
         therefore owns its belief; `prev_belief` is accepted for contract
         compatibility and not consulted (its distribution already contains the
         output-only factors, so feeding it back would count them twice).
@@ -1176,14 +1163,14 @@ class IntentionRecognizer:
 
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
-        The distribution reported this tick: evidence × ω_context, with the
-        inadmissible, the retired and the inapplicable hypotheses pinned at
-        BELIEF_FLOOR and the floor applied. State factors only — nothing here is fed back.
-        Not the value the gate reads since AM42 (_belief).
+        The distribution reported this tick: the evidence × the prior's weights,
+        with the inadmissible, the retired and the inapplicable hypotheses
+        pinned at BELIEF_FLOOR and the floor applied. State factors only —
+        nothing here is fed back. Not the value the gate reads since AM42
+        (_belief). Until the prior is built (T-K part 1, stage 5) every weight
+        is 1.0, the equal prior: the evidence itself.
         """
-        unnorm: Dict[str, float] = {}
-        for key, p in self._evidence.items():
-            unnorm[key] = p * self._context_weight(obs, world, self._by_key[key])
+        unnorm: Dict[str, float] = dict(self._evidence)
         return self._finalize(unnorm, self._inadmissible | self._retired | self._inapplicable)
 
     def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:
@@ -1374,33 +1361,3 @@ class IntentionRecognizer:
             actions = None
         self._tick_actions[key] = actions
         return actions
-
-    # -------------------------------------------------------------------------
-    # Context weight ω_context
-    # -------------------------------------------------------------------------
-
-    def _context_weight(
-        self,
-        obs: Observation,
-        world: WorldState,
-        hyp: HypothesisKey,
-    ) -> float:
-        """
-        Combines multiple context signals multiplicatively.
-        Each signal contributes an independent boost factor.
-        """
-        weight = 1.0
-
-        # Temperature boost — high temp makes ac_activation more likely
-        if hyp.task_name == "ac_activation":
-            if (self.context.room_temperature is not None
-                    and self.context.room_temperature >= HIGH_TEMP_THRESHOLD):
-                weight *= TEMPERATURE_BOOST
-
-        # Fatigue boost — long shift makes coffee_break more likely
-        if hyp.task_name == "coffee_break":
-            current_step = int(obs.timestamp)
-            if self.context.shift_duration(current_step) >= LONG_SHIFT_THRESHOLD:
-                weight *= FATIGUE_BOOST
-
-        return weight

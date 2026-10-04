@@ -10,6 +10,7 @@ setup: env_setup_08
 scenario: scenario_s08_04
 steps: 282
 assignment_knowledge: true
+context_knowledge: false
 strategy: "single_task"
 gate_strategy: "none"
 cost_strategy: "realized"

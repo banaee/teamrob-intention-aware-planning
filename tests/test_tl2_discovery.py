@@ -73,4 +73,4 @@ def test_the_merged_setups_load(scenario_id, layout_id):
     SimModel(scenario=scenario, register_fn=register_kitting_domain,
              task_model_schemas=domain_config["task_model"],
              layout_path=domain_config["layouts"][layout_id],
-             setup_path=domain_config["setups"][scenario.setup])
+             setup_path=domain_config["setups"][scenario.setup], assignment_knowledge=False, context_knowledge=False)

@@ -33,7 +33,7 @@ import math
 from dataclasses import replace
 from typing import TYPE_CHECKING, List, Optional, Dict, Tuple
 
-from shared.knowledge import TaskModel, ContextKnowledge
+from shared.knowledge import TaskModel
 from shared.projection import Projector
 from shared.recognizer import IntentionRecognizer, HypothesisKey
 
@@ -288,8 +288,6 @@ class RobotAgent(FactoryAgent):
         # and the workspace objects (SimModel._spawn_agents), which judges the
         # record's coverage against the same space (T-H4).
 
-        context = ContextKnowledge.default()
-
         # The body's physical parameters for the mind, each with where it came
         # from, for the run header below (T-A1): beta in the body's length units
         # for the recognizer, min_separation for the MetaPlanner.
@@ -309,7 +307,6 @@ class RobotAgent(FactoryAgent):
         self.recognizer = IntentionRecognizer(
             task_model=task_model,
             hypotheses=hypotheses,
-            context=context,
             beta=beta,
             speed=speed,
             duration_to_steps=duration_to_steps,
@@ -381,6 +378,7 @@ class RobotAgent(FactoryAgent):
             f"cost_strategy={self.meta_planner.cost_strategy} "
             f"separation_stop={'on' if self.model.separation_stop else 'off'} "
             f"assignment_knowledge={'on' if self.model.assignment_knowledge else 'off'} "
+            f"context_knowledge={'on' if self.model.context_knowledge else 'off'} "
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
             f"min_separation={self.meta_planner.min_separation:.2f} "
             f"min_separation_source={self._min_separation_source} "

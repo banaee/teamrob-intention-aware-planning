@@ -44,7 +44,7 @@ def dock_model(setup="env_setup_03", robot_tasks=None, script=Script([])):
                               reference_layouts=[LAYOUT])
     return SimModel(scenario=scenario, register_fn=register_dock_loading_domain,
                     task_model_schemas=dock["task_model"], state_declarations=dock["states"],
-                    layout_path=dock["layouts"][LAYOUT], setup_path=dock["setups"][setup])
+                    layout_path=dock["layouts"][LAYOUT], setup_path=dock["setups"][setup], assignment_knowledge=False, context_knowledge=False)
 
 
 def placed(world, agent, area, held=None):

@@ -46,7 +46,7 @@ def list_domain(domain_name, domain_config):
                              task_model_schemas=domain_config["task_model"],
                              state_declarations=domain_config["states"],
                              layout_path=domain_config["layouts"][layout_id],
-                             setup_path=domain_config["setups"][scenario.setup])
+                             setup_path=domain_config["setups"][scenario.setup], assignment_knowledge=False, context_knowledge=False)
             pairs = [(h, r) for r in scenario.agents if r.agent_type == "robot"
                      for h in scenario.agents if h.agent_type == "human" and h.agent_id in r.observes]
             if not pairs:

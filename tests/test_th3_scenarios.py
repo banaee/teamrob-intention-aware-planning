@@ -36,7 +36,7 @@ def model_for(layout, scenario):
     return SimModel(scenario=cfg, register_fn=register_kitting_domain,
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][layout],
-                    setup_path=domain_config["setups"][cfg.setup])
+                    setup_path=domain_config["setups"][cfg.setup], assignment_knowledge=False, context_knowledge=False)
 
 
 def test_every_registered_scenario_loads():
@@ -112,7 +112,7 @@ def test_loader_errors_name_the_scenario():
         SimModel(scenario=scenario, register_fn=register_kitting_domain,
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"]["env_layout_01"],
-                 setup_path=domain_config["setups"][base.setup])
+                 setup_path=domain_config["setups"][base.setup], assignment_knowledge=False, context_knowledge=False)
 
 
 def test_landmark_parameter_rejected():

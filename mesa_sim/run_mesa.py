@@ -28,7 +28,7 @@ USAGE:
 
 WHAT THIS MODULE DOES:
     - Loads configs/experiment.yaml as default run configuration
-    - Accepts CLI args to override individual fields (domain, scenario, steps, etc.);
+    - Accepts CLI args to override individual fields (domain, scenario, steps, the two knowledge switches, etc.);
       an unknown flag or yaml key, or a value of the wrong kind, stops the run
     - Reads the run file's overrides block and --override (mesa_sim/overrides.py),
       prints each on the start line's block, and hands them to the loader
@@ -112,7 +112,7 @@ EXPERIMENT_CONFIG_PATH = "configs/experiment.yaml"
 STRATEGIES = ("single_task", "full_reorder")
 GATE_STRATEGIES = ("none", "b2a", "b2b")
 COST_STRATEGIES = ("realized", "plain")
-BOOL_OPTIONS = ("assignment_knowledge", "separation_stop")
+BOOL_OPTIONS = ("assignment_knowledge", "context_knowledge", "separation_stop")
 
 def load_experiment(run_path: str, flags: dict, cli_overrides=()) -> dict:
     """
@@ -198,6 +198,7 @@ def parse_user_args():
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_s02_02)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
     parser.add_argument("--assignment_knowledge", type=_bool_arg, default=None, help="Assignment knowledge override: true/false (the robot knows the observed human's assigned tasks)")
+    parser.add_argument("--context_knowledge", type=_bool_arg, default=None, help="Context knowledge override: true/false (the recognizer's prior from the declared context knowledge, T-K part 1; off: the equal prior)")
     parser.add_argument("--strategy", type=str, default=None, choices=STRATEGIES, help="MetaPlanner B3 strategy override")
     parser.add_argument("--gate_strategy", type=str, default=None, choices=GATE_STRATEGIES, help="MetaPlanner B2 gate strategy override")
     parser.add_argument("--cost_strategy", type=str, default=None, choices=COST_STRATEGIES, help="MetaPlanner B3 cost strategy override")
@@ -299,6 +300,7 @@ def resolve_model_params(user_config: dict) -> dict:
         "layout_path":      domain["layouts"][layout_id],
         "setup_path":       domain["setups"][setup_id],
         "assignment_knowledge": bool(user_config.get("assignment_knowledge", False)),
+        "context_knowledge":  bool(user_config.get("context_knowledge", False)),
         "strategy":         user_config.get("strategy", "single_task"),
         "gate_strategy":    user_config.get("gate_strategy", "none"),
         "cost_strategy":    user_config.get("cost_strategy", "realized"),

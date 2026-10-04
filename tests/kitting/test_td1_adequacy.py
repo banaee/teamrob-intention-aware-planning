@@ -21,7 +21,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared import likelihood_functions
-from shared.knowledge import ContextKnowledge
 from shared.recognizer import BELIEF_FLOOR, HypothesisKey, IntentionRecognizer, build_hypothesis_space
 from shared.types import (
     ActionContext, AdequacyFinding, Const, Observation, Predicate, RecognizerLifecycle, SpatialContext,
@@ -49,7 +48,7 @@ def item(i):
 def recognizer(m, hypotheses, alpha=0.05, assigned_tasks=None):
     robot = next(iter(m.robots.values()))
     return IntentionRecognizer(
-        task_model=robot.recognizer.task_model, context=ContextKnowledge.default(), hypotheses=hypotheses,
+        task_model=robot.recognizer.task_model, hypotheses=hypotheses,
         beta=BETA, speed=SPEED, duration_to_steps=lambda d: _parse_duration_to_steps(d, m),
         default_action_cost=1.0, action_completion_latency=1.0, observed_task_completion_latency=0.0,
         alpha=alpha, assigned_tasks=assigned_tasks)

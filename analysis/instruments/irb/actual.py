@@ -149,7 +149,8 @@ def in_process(run_file, steps, alpha):
                  setup_path=domain_config["setups"][scenario.setup],
                  assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=cfg["strategy"],
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
-                 separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]))
+                 separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]),
+                 context_knowledge=bool(cfg["context_knowledge"]))
     robot = next(iter(m.robots.values()))
     human = m.humans[H]
     rows = []

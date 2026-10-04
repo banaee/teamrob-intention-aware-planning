@@ -101,7 +101,9 @@ class SimModel(model.Model):
                  layout_path: str,
                  setup_path: str,
                  seed=None,
-                 assignment_knowledge: bool = False,
+                 *,
+                 assignment_knowledge: bool,
+                 context_knowledge: bool,
                  strategy: str = "single_task",
                  gate_strategy: str = "none",
                  cost_strategy: str = "realized",
@@ -111,9 +113,18 @@ class SimModel(model.Model):
                  state_declarations: Sequence[StateDeclaration] = ()):
         super().__init__()
 
-        # Evaluation switch: give each robot the observed human's assigned_tasks
-        # as a persistent IR prior. Off = the robot knows no assigned tasks of it.
+        # The two knowledge switches (T-K part 1, AM3, AM9, AM51): both stated by
+        # every caller, no default here (the defaults live in the run file and
+        # the loader's fallback). assignment_knowledge: each robot knows the
+        # observed human's assigned tasks (the recognizer's support restriction
+        # and the gate's commitment warrant). context_knowledge: the
+        # recognizer's prior comes from the domain's declared context knowledge;
+        # off, the prior is equal over the live hypotheses.
         self.assignment_knowledge = assignment_knowledge
+        self.context_knowledge = context_knowledge
+        if context_knowledge:
+            raise ValueError("context_knowledge=true: the prior from context knowledge is not built yet "
+                             "(T-K part 1, build stage 5)")
         # MetaPlanner B3 strategy for every robot ("single_task" | "full_reorder");
         # a run option, not a scenario fact (T-B2d).
         self.strategy = strategy

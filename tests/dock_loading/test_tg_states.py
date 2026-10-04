@@ -66,7 +66,7 @@ def dock_model(setup="env_setup_03", setup_path=None, script=Script([]), robot_t
     return SimModel(scenario=scenario, register_fn=register_fn or register_dock_loading_domain,
                     task_model_schemas=task_model or dock["task_model"],
                     layout_path=dock["layouts"][LAYOUT], setup_path=setup_path or dock["setups"][setup],
-                    state_declarations=dock["states"] if states is None else states)
+                    state_declarations=dock["states"] if states is None else states, assignment_knowledge=False, context_knowledge=False)
 
 
 # ---------------------------------------------------------------------------

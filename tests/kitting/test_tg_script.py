@@ -83,7 +83,7 @@ def carry_model(script, tree):
                               setup=base.setup, reference_layouts=base.reference_layouts)
     from mesa_sim.sim_model import SimModel
     return SimModel(scenario=scenario, register_fn=lambda: tree, task_model_schemas=domain_config["task_model"],
-                    layout_path=domain_config["layouts"][LAYOUT], setup_path=domain_config["setups"][base.setup])
+                    layout_path=domain_config["layouts"][LAYOUT], setup_path=domain_config["setups"][base.setup], assignment_knowledge=False, context_knowledge=False)
 
 
 # ---------------------------------------------------------------------------

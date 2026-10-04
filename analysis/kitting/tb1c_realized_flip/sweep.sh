@@ -14,7 +14,7 @@ for sc in scenario_s06_03 scenario_s06_01; do
       tag=${LAY}_${sc}_${cost}_$([ $p = true ] && echo on || echo off)
       PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --domain kitting --layout $LAY --scenario "$sc" --steps 340 \
         --strategy full_reorder --cost_strategy $cost --gate_strategy none --separation_stop false \
-        --assignment_knowledge $p "$@" > /dev/null 2>&1 || echo "$tag: exit $?"
+        --assignment_knowledge $p --context_knowledge false "$@" > /dev/null 2>&1 || echo "$tag: exit $?"
       cp "$(ls -t logs/run_*.log | head -1)" "$OUT/$tag.log"
       cp "$(ls -t logs/run_*.rec | head -1)" "$OUT/$tag.rec"    # the human executor's record stream (T-H2)
     done

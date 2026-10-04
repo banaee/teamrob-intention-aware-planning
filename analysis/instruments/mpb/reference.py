@@ -67,7 +67,8 @@ def run(run_file, steps, strategy):
                  setup_path=domain_config["setups"][scenario.setup],
                  assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=strategy,
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
-                 separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]))
+                 separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]),
+                 context_knowledge=bool(cfg["context_knowledge"]))
     robot = next(iter(m.robots.values()))
     ticks = []
     for t in range(steps):

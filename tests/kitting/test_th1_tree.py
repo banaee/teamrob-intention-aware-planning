@@ -15,7 +15,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
-from shared.knowledge import Tree, TaskModel, ProceduralKnowledge, ContextKnowledge
+from shared.knowledge import Tree, TaskModel, ProceduralKnowledge
 from shared.planner import AdaptivePlanner
 from shared.recognizer import HypothesisKey, IntentionRecognizer, build_hypothesis_space
 from shared.types import (
@@ -36,7 +36,7 @@ def model_for(layout, scenario_cfg):
     return SimModel(scenario=scenario_cfg, register_fn=register_kitting_domain,
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][layout],
-                    setup_path=domain_config["setups"][scenario_cfg.setup])
+                    setup_path=domain_config["setups"][scenario_cfg.setup], assignment_knowledge=False, context_knowledge=False)
 
 
 def registered(layout, sid):
@@ -139,8 +139,7 @@ def test_support_restriction_on_hypothesis_keys():
     m = model_for("env_layout_05", registered("env_layout_05", "scenario_s04_01"))
     robot = next(iter(m.robots.values()))
     human = next(a for a in registered("env_layout_05", "scenario_s04_01").agents if a.agent_type == "human")
-    rec = IntentionRecognizer(task_model=robot.recognizer.task_model, context=ContextKnowledge.default(),
-                              hypotheses=build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type),
+    rec = IntentionRecognizer(task_model=robot.recognizer.task_model, hypotheses=build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type),
                               beta=0.01, speed=20.0, duration_to_steps=float, default_action_cost=1.0,
                               action_completion_latency=1.0, observed_task_completion_latency=0.0, alpha=0.05,
                               assigned_tasks=human.assigned_tasks)
@@ -149,8 +148,7 @@ def test_support_restriction_on_hypothesis_keys():
     assert rec._admissible == assigned | personal
     # a model that omits ac_activation: its hypotheses do not exist, so none is admissible
     small = TaskModel(m.tree, [deliver_item, coffee_break])
-    rec2 = IntentionRecognizer(task_model=small, context=ContextKnowledge.default(),
-                               hypotheses=build_hypothesis_space(small, m._objects_by_type),
+    rec2 = IntentionRecognizer(task_model=small, hypotheses=build_hypothesis_space(small, m._objects_by_type),
                                beta=0.01, speed=20.0, duration_to_steps=float, default_action_cost=1.0,
                               action_completion_latency=1.0, observed_task_completion_latency=0.0, alpha=0.05,
                                assigned_tasks=human.assigned_tasks)

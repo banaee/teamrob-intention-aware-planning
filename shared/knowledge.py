@@ -14,8 +14,6 @@ PURPOSE:
                     planner and meta-planner use it only.
     - StateDeclaration: one object state the domain declares (T-G A5), in the
                     registry's "states" list; the environment holds its facts.
-    - ContextKnowledge: background context facts (shift info, environment
-                    state) used by IR for ω_context weighting.
 
 WHAT THIS MODULE DOES:
     - Holds typed schema objects and answers queries with them, not strings
@@ -38,7 +36,7 @@ USED BY:
                                script, a TaskModel for the robot)
     - world/human_executor.py → Tree (through the planner)
     - mesa_sim/sim_model.py  → builds the Tree and one TaskModel per robot
-    - mesa_sim/sim_agents.py → TaskModel, ContextKnowledge.default()
+    - mesa_sim/sim_agents.py → TaskModel
 """
 
 from dataclasses import dataclass
@@ -248,30 +246,3 @@ class TaskModel(ProceduralKnowledge):
         if missing:
             raise ValueError(f"task model: every WorkTask of the tree is in it; missing: {missing}")
         super().__init__(schemas, tree.get_all_actions(), tree.get_microactions(), tree._costs)
-
-
-# ========================================================================
-# Context knowledge — e.g. shift duration, room temperature, etc. that may affect human
-# behavior and should be considered by the intention recognizer and planner.
-# ========================================================================
-
-class ContextKnowledge:
-    def __init__(
-        self,
-        shift_start_step: int = 0,
-        room_temperature: float = 21.0,   # default comfortable temperature
-        metadata: dict = None,
-    ):
-        self.shift_start_step = shift_start_step
-        self.room_temperature = room_temperature
-        self.metadata = metadata or {}
-
-    @classmethod
-    def default(cls) -> "ContextKnowledge":
-        """Default context — used when no external context source is available."""
-        return cls()
-
-    def shift_duration(self, current_step: int) -> int:
-        """Steps elapsed since shift start — proxy for fatigue."""
-        return current_step - self.shift_start_step
-    

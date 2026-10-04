@@ -29,7 +29,7 @@ def run_mesa(monkeypatch):
 def model(scenario, layout_path, setup_path):
     return SimModel(scenario=scenario, register_fn=register_kitting_domain,
                     task_model_schemas=domain_config["task_model"],
-                    layout_path=layout_path, setup_path=setup_path)
+                    layout_path=layout_path, setup_path=setup_path, assignment_knowledge=False, context_knowledge=False)
 
 
 def test_a_missing_home_container_is_refused(tmp_path):

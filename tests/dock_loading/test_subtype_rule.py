@@ -51,7 +51,7 @@ def load(setup="env_setup_02", setup_path=None, layout_path=None):
                     task_model_schemas=dock["task_model"],
                     layout_path=layout_path or dock["layouts"][LAYOUT],
                     setup_path=setup_path or dock["setups"][setup],
-                    state_declarations=dock["states"])
+                    state_declarations=dock["states"], assignment_knowledge=False, context_knowledge=False)
 
 
 def test_matching_subtypes_load():
