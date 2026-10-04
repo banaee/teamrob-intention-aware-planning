@@ -3726,7 +3726,7 @@ nothing built.
   strengths stay as ruled. AM71: 3.A, 3.B and 4.A not taken; 3.B and 4.A possible future work. AM72: the cases that
   remain are limitations, not defects (docs/assumptions.md 6.4).
 - The discussion's labels: 2.A is AM67; 2.B is AM68, as a condition of admission only; 1.A is not taken (AM70); 3.A,
-  3.B and 4.A are not taken (AM71; TODO-181 for 3.B, TODO-96 for 4.A).
+  3.B and 4.A are not taken (AM71; TODO-97 for 3.B, TODO-96 for 4.A).
 - The measured basis (analysis/kitting/mpb/tk5b/WHATIF.md; filters on recorded answers, not runs; the robot idle,
   except the two planning rows). Y, the reading of AM67: the 59 lone assigned tasks admitted on the previous task's
   completion tick come 1 tick later, still earlier than with context knowledge off; scenario_s11_03's admission (0 to

@@ -3411,8 +3411,19 @@ communication channel exists in the framework. Level 3 of the response structure
 Its condition (sustained `unknown`, or a blocked event WAIT and RECONSIDER do not resolve)
 must be defensible without a constant taken from a scenario. To be argued at T-D Q5 or after;
 not part of T-D Q1.
+LINKED (T-K part 1, AM71, Hadi, 4 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's
+belief", R7's AM71): communication or slowing down on a weak admission (the discussion's 4.A after step 5b) is not taken
+in the framework and is possible future work, under this item. Its cases: an admission that can be wrong while the
+robot plans on the admitted task alone (scenario_s16_05, 28.3 cm; scenario_s11_03, 11.3 cm). No condition for "weak"
+is ruled.
 
 **TODO-97: Belief-aware planning: a joint realization against the hypotheses that cover the belief (recorded, 24 Sept 2026)** [OPEN, recorded only; later, after the T-D Q2 to Q4 recognizer pass]
+LINKED (T-K part 1, AM71, Hadi, 4 October 2026; design_decisions.md, "T-K: context knowledge in the recognizer's
+belief", R7's AM71): the discussion's 3.B after step 5b, the robot's plan checked against the admitted task's projection
+and the fallback projection together, is not taken in the framework and is possible future work. Hadi's position in
+the discussion: it changes the meta-planner and mixes high-level planning with a lower level; it may be part of future
+work on planning that uses the belief, which is this item's direction. design_records.md, "T-K", THE DESIGN DISCUSSION
+AFTER STEP 5B and THE GATE AFTER STEP 5B, RULED.
 SUPERSEDED IN PART (T-D R1, 27 September 2026): `unknown` is not a member of S_ε; the finding's role in belief-aware planning is G; TODO-97's gate is unchanged. design_decisions.md, "T-D R and E".
 Status: open, recorded only. Not on the T-D agenda, not in the handoff order.
 LINKED (records, 2 October 2026; T-G records 9; design_decisions.md, "T-G: the second domain's rulings", STAGE 1, THE IRB ON DOCK_LOADING BUILT, RUN AND ACCEPTED): the IRB on dock_loading confirmed T-G's watched item

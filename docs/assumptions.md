@@ -260,7 +260,7 @@ gate; how they are read in an evaluation.
   RULED (Hadi, 4 October 2026; design_decisions.md, "T-K", R7's AM69, AM71): the robot keeps planning on the admitted
   task alone; an admission that was correct when made stays until the retraction (the end of an admission, T-D L, is
   unchanged). Not taken: projecting an admission without observation warrant as the human staying, checking the plan
-  against two projections together, communication on a weak admission (the last two possible future work, TODO-181,
+  against two projections together, communication on a weak admission (the last two possible future work, TODO-97,
   TODO-96).
 - The cases that remain are limitations, not defects (Hadi, 4 October 2026; AM72): the first ticks of a walk with equal
   evidence; the evidence itself ranking another task first after the human interrupts a task (the 141 ticks above, in

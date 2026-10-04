@@ -5308,7 +5308,7 @@ starts with a plan step in its own session.
   RULED (AM71, Hadi, 4 October 2026), not taken: an admitted task without observation warrant projected as the human
   staying at the observed position until the human moves (the discussion's 3.A); the robot's plan checked against the
   admitted task's projection and the fallback projection together (3.B); communication or slowing down on a weak
-  admission (4.A; T-D X). 3.B and 4.A are possible future work (TODO-181; TODO-96). Hadi's position on 3.B in the
+  admission (4.A; T-D X). 3.B and 4.A are possible future work (TODO-97; TODO-96). Hadi's position on 3.B in the
   discussion: it changes the meta-planner and mixes high-level planning with a lower level; the framework shows what
   recognition contributes to adaptive planning (the record, "T-K", THE DESIGN DISCUSSION AFTER STEP 5B).
 
