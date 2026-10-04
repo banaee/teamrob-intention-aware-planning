@@ -514,3 +514,51 @@ columns and their rows in `diff.md`; `params.recency_ticks`; in an A/C scenario'
 it on (`run.sh kitting -o <scratch> --context on configs/kitting/irb/tk1/*.yaml`), 0 disagreements at 1e-9 in all 31
 (s14_02 tick 181's print-precision flag as before), its results not read (AM49). The on runs are not a set: their
 outputs stayed outside the repository.
+
+## T-K part 1, build stage 7: the final rerun (4 October 2026)
+
+The seventeen rerun at 766f7d3, context knowledge off. After setting aside the lines named since the gate stage, every log and `.rec` equals the gate stage's (0 differ):
+the `[run]` header's `context_knowledge=off` (stage 3, bbb7227); the line `[run_mesa] timeline source=none windows=[]`
+(stage 4a, f70f72f); `switch_on` for `wait_at` where an A/C activation runs (stage 4b, 2393935). The instrument
+outputs equal the gate stage's after the three new columns `prior`, `levels`, `recent` (empty with context knowledge
+off) and their rows in `diff.md`, `params.recency_ticks` and the A/C's name and effect `ac_on(switch)` in the
+trajectory (stage 6, 766f7d3). 0 disagreements at 1e-9 in all seventeen. Runs
+(git-ignored; md5s at the rerun):
+
+```
+7ba27c662a25882ac20578c3ad761e09  runs/env_layout_10_scenario_s08_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_10_scenario_s08_01_on.rec
+7e217679a24dd0732a8630a58fc95af4  runs/env_layout_10_scenario_s08_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_10_scenario_s08_02_on.rec
+b8746aacbe510bf4333fe9590a887fc1  runs/env_layout_10_scenario_s08_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_10_scenario_s08_03_on.rec
+ac64a007badfe2c1e7661a2a22c440c3  runs/env_layout_10_scenario_s08_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_10_scenario_s08_04_on.rec
+a6076b86fe4a03bb87836f4c34f9bfd8  runs/env_layout_11_scenario_s09_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_11_scenario_s09_01_on.rec
+ae1bb1fae768389f78c9a21918c5432f  runs/env_layout_11_scenario_s09_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_11_scenario_s09_02_on.rec
+6f55c01a4430da011cad59f51a206fdc  runs/env_layout_11_scenario_s09_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_11_scenario_s09_03_on.rec
+577cc08c1828ead84091e96303ad928b  runs/env_layout_11_scenario_s09_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_11_scenario_s09_04_on.rec
+acbe77daf12a4ac64c85825e57e94558  runs/env_layout_11_scenario_s09_05_on.log
+c715db44f68926f3bb6b8fa387525f1a  runs/env_layout_11_scenario_s09_05_on.rec
+3904ad1eb7c6481e15b60662d66aafe6  runs/env_layout_11_scenario_s09_06_on.log
+703b2c62e484b7db940f36166548a88c  runs/env_layout_11_scenario_s09_06_on.rec
+e1b4d1128aed37b78b28c3e470b3b98d  runs/env_layout_11_scenario_s09_07_on.log
+a2ece1d231a6c071c20efdea470c4c9f  runs/env_layout_11_scenario_s09_07_on.rec
+409f269fe62162ac43abda70f2ff9abe  runs/env_layout_11_scenario_s09_08_on.log
+529f6f2019682be19b77f4e1152b1ea5  runs/env_layout_11_scenario_s09_08_on.rec
+225ea884b2be95cbc03679dee0830edf  runs/env_layout_11_scenario_s09_09_on.log
+e252b7b8e703da1492b52df3ae4df3dc  runs/env_layout_11_scenario_s09_09_on.rec
+c50cb2c236cf8c86d6cddc6b8610b74c  runs/env_layout_11_scenario_s09_10_on.log
+c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
+2dd2232402d9cda6d710b70e6a613924  runs/env_layout_11_scenario_s09_11_on.log
+9a4309d36ae6a47d9f1e36f512b711b2  runs/env_layout_11_scenario_s09_11_on.rec
+7882287bd9d1409c5a6ded95d1074bcf  runs/env_layout_11_scenario_s09_12_on.log
+606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
+61174ec35dd3c7f112290829139d41f4  runs/env_layout_11_scenario_s09_13_on.log
+739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
+```
+

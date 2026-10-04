@@ -483,3 +483,84 @@ fec0265c1dacced411d30f8570e7ca93  runs/env_layout_17_scenario_s15_12_on.rec
 cadc9e9071af1496aa78d6a16244768a  runs/env_layout_17_scenario_s15_13_on.log
 8d1ee36ec9e90ba1c00a1cc56f82d1af  runs/env_layout_17_scenario_s15_13_on.rec
 ```
+
+## The build of context knowledge, final (T-K part 1, build stage 7, 4 October 2026)
+
+Rerun at 766f7d3 (the build's stage 6; design_records.md, "T-K", THE BUILD, STAGES 3 TO 7), context knowledge off (the
+run files state it). After setting aside the lines named since the gate stage, every log and `.rec` equals the gate stage's (0 differ):
+the `[run]` header's `context_knowledge=off` (stage 3, bbb7227); the line `[run_mesa] timeline source=none windows=[]`
+(stage 4a, f70f72f); `switch_on` for `wait_at` where an A/C activation runs (stage 4b, 2393935). The instrument
+outputs equal the gate stage's after the three new columns `prior`, `levels`, `recent` (empty with context knowledge
+off) and their rows in `diff.md`, `params.recency_ticks` and the A/C's name and effect `ac_on(switch)` in the
+trajectory (stage 6, 766f7d3). 0 disagreements at 1e-9 in all 31 (s14_02 tick 181's print-precision flag as before).
+The foreseeable tasks' ticks in the table above stand: every trajectory equals the gate stage's in those columns, and
+with context knowledge on (stage 6's check, outside the repository) the recency fact of each coffee_break first holds
+on the table's completion tick and holds for 90 ticks, in all 17 coffee_break scripts. The case labels of KT14 and the
+A/C's belief at arrival (KT10) are read by `admission.py`'s last two columns; with context knowledge off both read "-".
+Runs (git-ignored; md5s at the rerun):
+
+```
+732bede783fa82d7e2f6728c5ced40ba  runs/env_layout_15_scenario_s13_01_on.log
+e478e3955464c5da8e4483fb6a58801a  runs/env_layout_15_scenario_s13_01_on.rec
+6f5dcb3528877987896564cb4e51fdb6  runs/env_layout_15_scenario_s13_02_on.log
+6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_15_scenario_s13_02_on.rec
+9c6881accc2f20a4239c6b1fc82b8d7d  runs/env_layout_15_scenario_s13_03_on.log
+6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_15_scenario_s13_03_on.rec
+2128a4e8c57f71c544f3a58542771f5e  runs/env_layout_15_scenario_s13_04_on.log
+08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_15_scenario_s13_04_on.rec
+5f83ac763d16a4a2cf853774a9845021  runs/env_layout_15_scenario_s13_05_on.log
+726dd2b9a82635f2139aed1d8b5970c3  runs/env_layout_15_scenario_s13_05_on.rec
+169f96659bfa5a3d40e9e4b7dac543ed  runs/env_layout_15_scenario_s13_06_on.log
+c537966a26ce76c9537c0e9e4ba8df11  runs/env_layout_15_scenario_s13_06_on.rec
+fb7533c059e171c2551b8fe5e6c52c05  runs/env_layout_15_scenario_s13_07_on.log
+f759306928400bdc9427ba0569c11433  runs/env_layout_15_scenario_s13_07_on.rec
+3bc2ff70f0dbaa22ae14e43c3920adac  runs/env_layout_16_scenario_s14_01_on.log
+962e436075b7c3f9f555445c944b8bff  runs/env_layout_16_scenario_s14_01_on.rec
+ecfd6e17bd1cd15abe58e45dffe9c801  runs/env_layout_16_scenario_s14_02_on.log
+c2d2afc42bf1c9e6a69f104ccd364765  runs/env_layout_16_scenario_s14_02_on.rec
+1fa881d3cedfa5076a3b0c2e70ceac40  runs/env_layout_16_scenario_s14_03_on.log
+1d8302b47da19e51d38441c3e6beb23b  runs/env_layout_16_scenario_s14_03_on.rec
+eb5d07d4263b4cae78c4bf75d3445cbf  runs/env_layout_16_scenario_s14_04_on.log
+99a4a214e4681eb7483925ca5e9d78b1  runs/env_layout_16_scenario_s14_04_on.rec
+365f899fb4ded54962a80bac9352958e  runs/env_layout_16_scenario_s14_05_on.log
+c6a4c9bfd459f09856302fc32ce8c301  runs/env_layout_16_scenario_s14_05_on.rec
+85dcb6df1c74c26bf88202eff37f5eea  runs/env_layout_16_scenario_s14_06_on.log
+40ce5a270689411dd5ad07819564fbe1  runs/env_layout_16_scenario_s14_06_on.rec
+837569b473a90b21b503943aedbeac2b  runs/env_layout_16_scenario_s14_07_on.log
+ac459e141d935406a26e730d5aacf887  runs/env_layout_16_scenario_s14_07_on.rec
+08bf3e33218e1dee7d00bed8d9ab449c  runs/env_layout_16_scenario_s14_08_on.log
+4fc04cbdedc31350db303be82bd79e22  runs/env_layout_16_scenario_s14_08_on.rec
+72e5e46c31555558f65f2ab893106e80  runs/env_layout_16_scenario_s14_09_on.log
+0ed61d1b9861e0190690aa25d9284d51  runs/env_layout_16_scenario_s14_09_on.rec
+4262b06073828653c1b64d331ccd97fd  runs/env_layout_16_scenario_s14_10_on.log
+6ce37100f6281b2b4458faef05e0c77c  runs/env_layout_16_scenario_s14_10_on.rec
+30ea0f615d43856f427d274244aa62b3  runs/env_layout_16_scenario_s14_11_on.log
+349ccc75b98e2268d47524c50015acf9  runs/env_layout_16_scenario_s14_11_on.rec
+1624f8ba245a54a05e4f059951c9b666  runs/env_layout_17_scenario_s15_01_on.log
+e478e3955464c5da8e4483fb6a58801a  runs/env_layout_17_scenario_s15_01_on.rec
+eb068c58350a9c065ae2007445c0fcc5  runs/env_layout_17_scenario_s15_02_on.log
+6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_17_scenario_s15_02_on.rec
+c0036e9eee550c156653852240899e08  runs/env_layout_17_scenario_s15_03_on.log
+6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_17_scenario_s15_03_on.rec
+9738ebe3e124ca1f5b496c76527d9fcf  runs/env_layout_17_scenario_s15_04_on.log
+08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_17_scenario_s15_04_on.rec
+503aeb7d4bc4f867bc42a3fcbfb213c3  runs/env_layout_17_scenario_s15_05_on.log
+726dd2b9a82635f2139aed1d8b5970c3  runs/env_layout_17_scenario_s15_05_on.rec
+9f5ecad67bdd079c30b9b0915e159719  runs/env_layout_17_scenario_s15_06_on.log
+c537966a26ce76c9537c0e9e4ba8df11  runs/env_layout_17_scenario_s15_06_on.rec
+0f52f01946520f2bd9314750808cea55  runs/env_layout_17_scenario_s15_07_on.log
+f759306928400bdc9427ba0569c11433  runs/env_layout_17_scenario_s15_07_on.rec
+b4ea5b786862011cf3b276726694aea1  runs/env_layout_17_scenario_s15_08_on.log
+ffdd1b085c77ac1b2b700883047d44b7  runs/env_layout_17_scenario_s15_08_on.rec
+2b5c5ec4aa9b798855abaee825ba00f1  runs/env_layout_17_scenario_s15_09_on.log
+10badc90f3949849526a162004929f47  runs/env_layout_17_scenario_s15_09_on.rec
+27666f9e16cd4854592d730c872be8c9  runs/env_layout_17_scenario_s15_10_on.log
+15542ad2f74ae4201ca81b0365d5ad64  runs/env_layout_17_scenario_s15_10_on.rec
+96afd6abb6c574fc09945f11e4f5e61a  runs/env_layout_17_scenario_s15_11_on.log
+4241f5198f6729e2e13c1b358b3bac80  runs/env_layout_17_scenario_s15_11_on.rec
+119f678e5a4e5993f80474e49d980672  runs/env_layout_17_scenario_s15_12_on.log
+3839d3ec27e8f1e28ac7a66fedf87b81  runs/env_layout_17_scenario_s15_12_on.rec
+0accb763b98b89720af4ce2507459341  runs/env_layout_17_scenario_s15_13_on.log
+36343581ab71fd1cc3b2a5f428df326c  runs/env_layout_17_scenario_s15_13_on.rec
+```
+

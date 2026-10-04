@@ -479,9 +479,25 @@ What the rooms show:
 
 Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 
+THE MECHANISM IS BUILT (step 3, 4 October 2026; design_records.md, "T-K", THE BUILD, STAGES 1 AND 2 and THE BUILD,
+STAGES 3 TO 7; the state file `docs/handoffs/build_T-K_part1_state.md`): everything in 5.3, by the approved plan, in
+eight stages, each checked against the previous one's outputs. Where it lives: the run options `assignment_knowledge`
+and `context_knowledge` (both on by default; `configs/experiment.yaml`, `mesa_sim/run_mesa.py`); the gate on the
+belief over the live hypotheses (`BeliefState.belief`, `confidence`); `Timeline`, `Window` and the resolution at load
+(`shared/types.py`, `mesa_sim/sim_model.py`; the header line `[run_mesa] timeline`); break_time, room_warm, ac_on and
+switch_on in both domains' `facts.py` and `actions.py`; dock_loading's ac_activation (one method, from the hall); the
+declared context knowledge in each registry's `"context_knowledge"` (`shared/knowledge.py`, `ContextKnowledge`); the
+memory of observed completions (`shared/completion_memory.py`); the prior in the recognizer (`context_prior`,
+`_prior_weights`; the `[IR-context]` line); the IRB's oracle computing the prior on its own (rules 29 to 33 in
+`analysis/kitting/irb/README.md`) and the readers labelling each case by the state the script meets (KT14) and
+giving the A/C's belief at arrival (KT10). Checks: with context knowledge off every maintained log and every
+instrument output is the gate stage's (B2) except the named lines; round 1 with it on agrees with the oracle in all
+31 runs. No setup or scenario states a timeline yet, so no run of the build exercises a raised strength; the unit
+tests against the method document cover it (AM49). dock_loading's IRB and MPB sets stay stale (AM57; step 6).
+
 ### 5.6 What is not built
 
-- The mechanism: everything in 5.3, built by the approved plan (step 3).
+- The mechanism: everything in 5.3, built by the approved plan (step 3). BUILT (4 October 2026; 5.5).
 - The timelines of the setups and of the scenarios that state their own; the runs with context knowledge on (step 4).
 - The planning cases (step 5).
 - dock_loading's part (step 6).
@@ -501,6 +517,10 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    Hadi confirmed on 4 October 2026); a stop means its cause is examined, not
    that the ruling on the gate is rejected. The run without assignment knowledge is a diagnostic and never stops the
    build. [ruled]
+   DONE (4 October 2026; design_records.md, "T-K", THE BUILD; 5.5). No stop condition was met. The foreseeable tasks'
+   start and completion ticks of round 1's README stand, confirmed from the build's rerun with context knowledge on
+   (31 of 31 trajectories; the recency fact of each coffee_break first holds on the README's completion tick and lasts
+   90 ticks, in all 17 coffee_break scripts).
 4. The timelines and the runs with context knowledge on. [ruled unless marked]
    - One setup per room with its default timeline; a scenario may state its own, which replaces the setup's whole
      (AM40, KT13).

@@ -898,6 +898,17 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     AM55 to AM58 (round 1 and kitting's IRB and MPB sets rerun with the new gate in the build; dock_loading's sets stale
     until its step; TODO-179, TODO-180); on its consequences, AM59 to AM63. The plan is approved. Nothing built. Next:
     a new design chat takes the build, stage by stage (`docs/handoffs/T-G_forward_inputs.md`, section 5).
+    STEP 3 DONE, THE BUILD (4 October 2026; design_records.md, "T-K", THE BUILD, STAGES 1 AND 2 and THE BUILD, STAGES
+    3 TO 7; the state file `docs/handoffs/build_T-K_part1_state.md`): the eight stages of the plan built and checked:
+    the rename (b85494d), the gate on the belief over the live hypotheses with its regenerated baseline B2 (91774ce,
+    3b05a8a, 733e593), the run option `context_knowledge` and the removal of the context weight (bbb7227, 67b899e),
+    the timeline of context facts and the facts break_time, room_warm, ac_on with switch_on (f70f72f, 2393935), the
+    mind (e589731: the declared context knowledge, the memory of observed completions, the prior in the recognizer),
+    the instruments (the IRB's oracle computes the prior on its own) and the records. Both run options on by default
+    (TODO-139 closed); TODO-66 closed. With context knowledge off every maintained log and instrument output is
+    B2's except the named lines; round 1 with it on agrees with the oracle (0 disagreements). No timeline is authored
+    yet. Next: step 4 of `docs/handoffs/T-G_forward_inputs.md`, section 5.7 (the timelines and the runs with context
+    knowledge on, in the design chat).
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing

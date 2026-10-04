@@ -561,3 +561,25 @@ Commands: `bash analysis/kitting/tb1b_two_tables/sweep.sh analysis/kitting/tb1b_
 | env_layout_08_scenario_s06_02_on | ec8923a19370d7ca758e95e4f4deb779 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_01_off | e1466fd0bc8105b2ca1f71e41a3d27cf | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_02_off | 394a83251116d5272f7445f0e6f737b9 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+
+## The build of context knowledge, final (T-K part 1, build stage 7, 4 October 2026) — the logs from here on
+
+Regenerated at 766f7d3 (the build's stage 6; design_records.md, "T-K", THE BUILD, STAGES 3 TO 7), the run files and
+the sweep stating `context_knowledge: false` (stage 3). Named lines since B2 (the gate stage's section above), and nothing else (each log compared with B2 after setting
+them aside; 0 differ):
+- stage 3 (bbb7227): the `[run]` header gains `context_knowledge=off`;
+- stage 4a (f70f72f): a new line after the `[run_mesa]` start line, `[run_mesa] timeline source=none windows=[]` (no
+  setup or scenario states a timeline);
+- stage 4b (2393935): where an A/C activation runs, the action reads `switch_on` for `wait_at` in `[rec]`,
+  `[human]`, the human's step lines and the executor's `_load_plan` line (AM43);
+- stages 5 and 6 (e589731, 766f7d3): nothing (context knowledge off: every prior weight exactly 1, P1; no `[IR-context]` line).
+The `.rec` streams differ from the table above only where an A/C activation runs (`switch_on`). Completion ticks,
+the `[sep]` minima and F1's classes are the same as the table above in every log.
+Commands: `bash analysis/kitting/tb1b_two_tables/sweep.sh analysis/kitting/tb1b_two_tables/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_on | 1cf6af1499d3826a5854b2f0bbd785da | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_on | b3a85c2d0410924c19c7064c726deb31 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_off | 581a076ae2cd1fab484bb404d26ad985 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_off | 676defd1b29c6481e6d458f55a8bc0e9 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |

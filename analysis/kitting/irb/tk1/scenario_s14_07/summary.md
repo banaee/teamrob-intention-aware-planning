@@ -9,7 +9,7 @@ Script actions (replay expanded per tick; the first tick of each action; the tas
 | 45 | deliver_item(item_0,kitting_table_0) | covered | move_to | 1 | 1 |
 | 87 | deliver_item(item_0,kitting_table_0) | covered | place | 0 | 1 |
 | 89 | ac_activation(ac_switch_0) | covered | move_to | 0 | 1 |
-| 136 | ac_activation(ac_switch_0) | covered | wait_at | 0 | 1 |
+| 136 | ac_activation(ac_switch_0) | covered | switch_on | 0 | 1 |
 | 138 | deliver_item(item_2,kitting_table_0) | covered | move_to | 0 | 1 |
 | 143 | deliver_item(item_2,kitting_table_0) | covered | pick_up | 0 | 1 |
 | 145 | deliver_item(item_2,kitting_table_0) | covered | move_to | 1 | 1 |
@@ -27,7 +27,7 @@ Expected action per hypothesis (the oracle's derived phases; ticks inclusive, -1
 | hypothesis | expected action | ticks |
 |---|---|---|
 | ac_activation(ac_switch_0) | move_to(ac_switch_0) | -1 to 133 |
-| ac_activation(ac_switch_0) | wait_at(PT2S,ac_switch_0) | 134 to 135 |
+| ac_activation(ac_switch_0) | switch_on(PT2S,ac_switch_0) | 134 to 135 |
 | ac_activation(ac_switch_0) | move_to(ac_switch_0) | 138 to 347 |
 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | -1 to 347 |
 | deliver_item(item_0) | move_to(item_0) | -1 to 40 |

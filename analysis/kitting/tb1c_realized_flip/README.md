@@ -622,3 +622,29 @@ Commands: `bash analysis/kitting/tb1c_realized_flip/sweep.sh analysis/kitting/tb
 | env_layout_08_scenario_s06_01_realized_off | 0e8d3c8127d5d66ac6d9a8c539978f5a | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_plain_off | 5c4e92f8625efe964cfb3c397705bd82 | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
 | env_layout_08_scenario_s06_03_realized_off | 558404c21eff46da13f0004c7e485eb5 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+
+## The build of context knowledge, final (T-K part 1, build stage 7, 4 October 2026) — the logs from here on
+
+Regenerated at 766f7d3 (the build's stage 6; design_records.md, "T-K", THE BUILD, STAGES 3 TO 7), the run files and
+the sweep stating `context_knowledge: false` (stage 3). Named lines since B2 (the gate stage's section above), and nothing else (each log compared with B2 after setting
+them aside; 0 differ):
+- stage 3 (bbb7227): the `[run]` header gains `context_knowledge=off`;
+- stage 4a (f70f72f): a new line after the `[run_mesa]` start line, `[run_mesa] timeline source=none windows=[]` (no
+  setup or scenario states a timeline);
+- stage 4b (2393935): where an A/C activation runs, the action reads `switch_on` for `wait_at` in `[rec]`,
+  `[human]`, the human's step lines and the executor's `_load_plan` line (AM43);
+- stages 5 and 6 (e589731, 766f7d3): nothing (context knowledge off: every prior weight exactly 1, P1; no `[IR-context]` line).
+The `.rec` streams differ from the table above only where an A/C activation runs (`switch_on`). Completion ticks,
+the `[sep]` minima and F1's classes are the same as the table above in every log.
+Commands: `bash analysis/kitting/tb1c_realized_flip/sweep.sh analysis/kitting/tb1c_realized_flip/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_on | 72fbac5c11abd99bfb2af90e2e700c14 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_on | 23830f099291c4d57795228e2acad745 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_on | d36bd84d780d0dcf30d35189ed8350e5 | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_on | a42cac39359bd429ebcd08c388adf7d9 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_plain_off | 9ee231cee9d9e5e45bd97ba7d090d217 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_off | ff4785fa7a93d86d81b5f0e81ad50990 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_off | c5a9c52003d5ab93a13d74639e6016ff | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_off | 30facb4519327e2457ee1666a46ce647 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |

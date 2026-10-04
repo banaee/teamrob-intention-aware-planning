@@ -23,6 +23,9 @@ Rows (tick, live hypothesis) present on one side only: 0
 | reentries | 336 | 0 |
 | boundary | 336 | 0 |
 | gate | 336 | 0 |
+| levels | 336 | 0 |
+| recent | 336 | 0 |
+| prior | 1219 | 0 |
 | belief | 1219 | 0 |
 | belief_h | 1219 | 0 |
 | S | 1219 | 0 |
@@ -48,6 +51,9 @@ Rows (tick, live hypothesis) present on one side only: 0
 | pins | 336 | 0 |
 | reentries | 336 | 0 |
 | boundary | 336 | 0 |
+| levels | 336 | 0 |
+| recent | 336 | 0 |
+| prior | 1219 | 0 |
 | belief | 1219 | 0 |
 | S | 1219 | 0 |
 | member | 1219 | 0 |

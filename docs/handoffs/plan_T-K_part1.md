@@ -4,7 +4,9 @@ Written by ccode on 4 October 2026 (T-K part 1, step 2; BUILD DISCIPLINE, step 1
 Amended the same day to Hadi's rulings on it: the decisions D1 to D10 and two additions of the review are AM42 to AM53
 (`docs/design_decisions.md` and `docs/design_records.md`, "T-K", THE BUILD'S PLAN, RULED); the proposals P1 to P5 are
 accepted. Amended again the same day to Hadi's rulings on section 11 (AM54 to AM58; THE CROSS-CHECK, RULED) and on its
-consequences (AM59 to AM63; THE CROSS-CHECK'S CONSEQUENCES, RULED). The plan is approved; the build has not started. Nothing in it is built. Every build session of T-K part 1 reads this file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
+consequences (AM59 to AM63; THE CROSS-CHECK'S CONSEQUENCES, RULED). The plan is approved; the build has not started. Nothing in it is built. BUILT (step 3, 4 October 2026; design_records.md, "T-K", THE BUILD, STAGES 1 AND 2 and THE BUILD, STAGES 3 TO 7; the
+session's state file `docs/handoffs/build_T-K_part1_state.md`): every stage of section 8 is built and checked; this
+file is the plan as approved and is not rewritten to the build. Every build session of T-K part 1 reads this file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
 (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K").
 The rulings fix what and why; this file fixes how, the names and the build order. Section 7 lists the decisions as
 ruled; section 11 is ccode's cross-check of the rulings, with the points Hadi has not ruled on.

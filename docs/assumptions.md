@@ -65,6 +65,10 @@ scenario; an artefact produced only under prior off is not a framework scope cas
 Framework scope · CLAUDE.md's prior convention, revised (Hadi, 28 Sept 2026) · where findings are drawn from; the
 maintained sets still run both priors.
 The run option's default is still off (`configs/experiment.yaml`); not changed here (TODO-139).
+BUILT (T-K part 1's build, 4 October 2026; AM3, AM9; design_records.md, "T-K", THE BUILD): the option is
+`assignment_knowledge` (`--assignment_knowledge`; `assignment_prior` was its old name) and is on by default, beside the
+new option `context_knowledge`, also on by default; each "off" is an ablation or a diagnostic (glossary §5, the run
+options). "Prior on" and "prior off" in the older records mean assignment knowledge on and off. TODO-139 closed.
 
 ## 2. The team and the task world
 
@@ -172,6 +176,9 @@ human. A completion the robot does not observe produces no recency fact (a limit
 monitored areas, 2.3); a task cut before its completion produces none.
 Perception · Hadi, 3 Oct 2026 (T-K part 1, AM25, AM27; placed here by AM28) · the robot's WorldState; the
 recognizer's prior. Ruled, not built.
+BUILT (T-K part 1's build, 4 October 2026; design_records.md, "T-K", THE BUILD): the timeline in force is resolved at
+load (the scenario's, else the setup's, else none) and read as a function of the tick by the world-state builder; the
+memory of observed completions is `shared/completion_memory.py`, read by the robot's body before the recognizer runs.
 AMENDED (AM30, AM33, Hadi, 3 Oct 2026): the memory is its own component of the robot's mind, outside the recognizer,
 and records the tick of an observed completion; an observed completion is the task's terminal fact in the robot's
 WorldState (for example waited(agent, machine)), not the episode boundary.
@@ -181,6 +188,8 @@ AMENDED (AM34, Hadi, 3 Oct 2026): the timeline of context facts is the setup's, 
 
 Ruled by Hadi, 3 October 2026 (T-K part 1, AM28; design_decisions.md, "T-K: context knowledge in the
 recognizer's belief"). Not built.
+BUILT (T-K part 1's build, 4 October 2026; design_records.md, "T-K", THE BUILD): the mechanism these assumptions
+stand under is built; the assumptions themselves are unchanged.
 
 **6.1** Given the task, the human's movement does not depend on the context.
 Framework scope · T-K part 1, its assumption A1 (placed here by AM28) · the recognizer's evidence, which contains no

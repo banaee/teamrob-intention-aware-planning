@@ -363,6 +363,7 @@ step=N <key> live again: applicable`; a retired hypothesis that becomes inapplic
 of an undecomposable hypothesis is removed. design_decisions.md, "T-G: the second domain's rulings", STAGE 1, STEPS 0 TO 5 BUILT.
 AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): the re-entry share (1/|H|, "the prior base") is a share of
 the evidence, not of the belief; the belief is the **prior** (below) × the evidence, normalised. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
+BUILT (T-K part 1's build, 4 October 2026; design_records.md, "T-K", THE BUILD): as stated; the log line's wording is unchanged.
 
 **stretch** — the recognizer's unit of movement evidence: one continuous run toward one target,
 measured from its origin, per hypothesis. ONE observation however many ticks it spans. It is not a
@@ -407,6 +408,7 @@ recorded decision (L5 B). `[IR-boundary]` names the completed action.
 AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): "every base becomes the uniform prior" describes the
 evidence: at a boundary the evidence restarts equal over the live hypotheses, and the belief is the **prior** (below) ×
 the evidence, normalised. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
+BUILT (T-K part 1's build, 4 October 2026; design_records.md, "T-K", THE BUILD): as stated.
 
 **θ (theta)** — the confidence gate. It belongs to the meta-planner, not the recognizer, and is
 asked in exactly one place. The recognizer emits a belief distribution and gates nothing. The gate's outcome is
@@ -422,6 +424,9 @@ over the live hypotheses (the **prior** × the evidence, normalised over H), wit
 floor and the scaling by the pinned hypotheses stay in the reported distribution only (their removal there, TODO-178).
 The log prints the value the gate read. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's
 AM42.
+BUILT (T-K part 1's build, stage 2, 4 October 2026; 91774ce; design_records.md, "T-K", THE BUILD): `BeliefState.belief`
+is the belief over H and `confidence` its leader's value; `_clears_gate` is unchanged and reads it; `[IR]` and
+`[meta-proj]` print it; `[IR-dist]` keeps the reported distribution.
 
 **β, u, ρ** — β the tolerance on wasted path in the movement likelihood (0.01 /cm, supplied by the
 body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, not a measure of unmodelled
@@ -479,6 +484,8 @@ AMENDED (AM35 to AM39, Hadi, 3 October 2026; recorded 4 October 2026): three lev
 **suppressing condition** and a **raising condition** (below), replace the low strength, the high strength and the
 **occurrence condition** (retired); "work as a whole" reads **the assigned tasks as a whole** (below). The statement of
 the prior, with formulas and worked examples: `docs/context_knowledge_method.md`; the records win where the two disagree.
+BUILT (T-K part 1's build, 4 October 2026; design_records.md, "T-K", THE BUILD): "not built" in the entries below, up to **assignment knowledge** / **context knowledge**, reads: built, with the
+crisp facts of T-K part 1 (the degrees stay T-K part 2's). Each entry's BUILT line names where it lives.
 → `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief".
 
 **context knowledge** — the umbrella: what the robot knows about the situation, before any movement, that bears on how
@@ -489,6 +496,10 @@ AMENDED (AM26, 3 October 2026): the declared context knowledge (the facts that e
 strengths, the recency durations) reaches the mind directly from the knowledge component, as the task model does.
 AMENDED (AM36, 3 October 2026): "the occurrence conditions, the strengths" reads "the suppressing and the raising
 conditions, the strengths (the suppressed and the ordinary strength per domain, the raised strength per task)".
+BUILT (T-K part 1's build, 4 October 2026): `ContextKnowledge` (`shared/knowledge.py`) is now the declared context
+knowledge of a domain, built once in its registry (`"context_knowledge"`), with `ForeseeableKnowledge` per
+foreseeable task and the typed facts `TimelineFact`, `ObjectState`, `RecencyFact`; the context weight and its
+constants are gone (TODO-66 closed). The recognizer's constructor takes it, or None for context knowledge off.
 
 **context value** — a measured or scheduled quantity of the situation (a time of day, a temperature). An action may
 change a context value.
@@ -526,10 +537,18 @@ optional; two windows of one fact do not overlap (AM46). A timeline fact is stat
 "states" block refuses it, and a fact that holds from the start is a window from tick 0 (AM50). No precondition and no
 guard of any schema names a timeline fact (AM52), no completion condition (AM54), nor any effect or retraction
 (AM20): no condition of a schema reads one, and the loader refuses each.
+BUILT (T-K part 1's build, stage 4a, 4 October 2026; f70f72f): `Timeline` and `Window` (`shared/types.py`; the mind
+never reads them); the setup's optional `"timeline"` list of `{"fact", "from", "until"}`, the scenario's
+`timeline=` of `window(fact, start, end)` (the domain's `script.py`); the resolution at load in `SimModel` (the
+scenario's, else the setup's, else none; `TimelineSource`); the world-state builder adds the facts in force at the tick;
+the header line `[run_mesa] timeline source=<scenario|setup|none> windows=[...]`; the load checks of AM20, AM46, AM50,
+AM52 and AM54. No setup or scenario states a timeline yet (the authoring is step 4).
 
 **timeline fact** (Hadi, 3 October 2026; not built) — a **context fact** on the **timeline of context facts**. It holds
 from one authored change to the next. One of the three sources of a **suppressing condition** and a **raising
 condition** (AM11), for example break_time, room_warm.
+BUILT (T-K part 1's build, stage 4b, 4 October 2026; 2393935): a `StateDeclaration` about no object in the registry's
+`"timeline_facts"` list (the A5 form, P3): break_time and room_warm in both domains (`facts.py`).
 
 **membership function** — gives the degree to which a context fact is satisfied from a context value. Declared knowledge,
 with its source (R5). T-K part 2's.
@@ -553,6 +572,8 @@ task** (§6). When it is satisfied, the task has the **suppressed strength**. It
 condition**. It decides no liveness. Optional. One fact or a conjunction of facts from three sources: a **timeline
 fact**, an object state (T-G A5), a **recency fact**; "not" and "or" are T-K part 2's. Evaluated per task, not per
 hypothesis. Declared: coffee_break and office_break, each its own recency fact; ac_activation, ac_on (AM37).
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): `ForeseeableKnowledge.suppressing`, a `Condition` of
+typed facts, declared in the domain's registry; read in `ContextKnowledge.level`.
 
 **raising condition** (AM36, Hadi, 3 October 2026; not built) — a condition over facts attached to a **foreseeable task**
 (§6). When it is satisfied and the **suppressing condition** is not, the task has its **raised strength**. It decides
@@ -560,6 +581,8 @@ no liveness. Optional; the same form and sources as the suppressing condition. D
 ac_activation, room_warm; office_break, none (AM37).
 AMENDED (AM44, Hadi, 4 October 2026), for both conditions: a fact that is an object state holds if the state holds
 for any object of its declared type in the world state (with at most one A/C switch per layout, that switch's state).
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): `ForeseeableKnowledge.raising` with `raised`;
+`ObjectState.holds` reads any object of the state's type (AM44).
 
 **suppressed strength** / **ordinary strength** / **raised strength** (AM36, Hadi, 3 October 2026; not built) — the three
 levels of a foreseeable task's **strength**. The suppressed strength applies when the suppressing condition is
@@ -567,6 +590,9 @@ satisfied; otherwise the raised strength when the raising condition is satisfied
 suppressed and the ordinary strength are declared once per domain and hold for every foreseeable task of the domain;
 the raised strength is declared per task, with its raising condition. The values (AM37, AM38): suppressed 0.005,
 ordinary 0.02; raised, coffee_break 2, ac_activation 0.5. They replace the low and the high strength.
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): `Strength(value, source)`, value > 0 (AM4);
+`StrengthLevel` SUPPRESSED | ORDINARY | RAISED (`shared/types.py`), reported per foreseeable task in
+`BeliefState.levels` and the `[IR-context]` line.
 
 **recency fact** (AM14, AM15, 3 October 2026; not built) — a context fact derived from the time since the robot
 observed completion of a named task; it holds for a declared duration after that observation. Declared per task. It
@@ -576,6 +602,8 @@ AMENDED (AM30, AM33, 3 October 2026): the memory of observed completions is its 
 outside the recognizer; it records the tick of an observed completion, and the recognizer reads the recency facts as an
 input on each run and stores nothing across episodes (AM30). An observed completion is the task's terminal fact in the
 robot's world state, for example waited(agent, machine), not the episode boundary (AM33).
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): `RecencyFact(task)`; it holds when the task is among the
+recency facts the body passes to `update(recent=...)`, from `ObservedCompletions.recent(tick)`.
 
 **observed completion** (AM33, Hadi, 3 October 2026; not built) — a task's terminal fact in the robot's world state,
 observed by the robot, for example waited(agent, machine). Not the episode boundary. Completion counts, not admission;
@@ -583,14 +611,22 @@ a completion the robot does not observe, or a task cut before its completion, is
 AMENDED (AM47, Hadi, 4 October 2026): recorded at the tick on which the terminal fact holds after a tick on which it
 did not; one already holding at the robot's first observation is not recorded. The **recency duration** counts from
 that tick, the tick included.
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): `ObservedCompletions.observe(agent, world)`
+(`shared/completion_memory.py`), the terminal fact read through the planner's decomposition of each hypothesis of a
+task that declares a recency duration (the pin's query); a fact whose previous tick could not be read (the hypothesis
+not applicable then) records nothing either.
 
 **memory of observed completions** (AM30, Hadi, 3 October 2026; not built) — the component of the robot's mind, outside
 the recognizer, that records the tick of each **observed completion**. The **recency facts** are derived from it; the
 recognizer reads them as an input on each run and stores nothing across episodes.
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): `shared/completion_memory.py`, `ObservedCompletions`,
+built by the robot's body (`RobotAgent`) with context knowledge on, read before the recognizer runs on every tick.
 
 **recency duration** (AM15, AM16, 3 October 2026; not built) — the declared duration for which the recency fact holds,
 with its source. Counted from the observed completion. The values: design_records.md, "T-K", CONTENT POINTS
 1 AND 2, AM16.
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): `RecencyDuration(duration, source)`, an ISO-8601 duration
+in the form a wait's binding uses (PT180S, PT270S), converted to ticks by the body (90, 135).
 
 **the assigned tasks as a whole** (AM35, Hadi, 3 October 2026; not built) — the group of the live hypotheses of the
 assigned tasks, which contributes 1 to the **prior** while at least one of them is live, however many are live; its
@@ -598,6 +634,9 @@ share is divided equally among them (R4). It is a level that partitions, not a h
 knowledge** off (an ablation), every work task of the task model takes the place of the assigned tasks. The assigned
 tasks and the foreseeable tasks together are the modelled behaviour (§7). It replaces "work as a whole", "assigned work
 as a whole" and "the human's work as a whole" of the older records; wording only.
+BUILT (T-K part 1's build, stage 5, 4 October 2026; e589731): the recognizer groups the live hypotheses by their
+schema's class (`WorkTask` the assigned tasks as a whole, `PersonalTask` its task), `_prior_weights` and the pure
+function `context_prior`.
 
 **strength** — the declared relative weight of a foreseeable task against assigned work as a whole, which contributes 1
 (R3). A foreseeable task declares a low and a high strength, or one strength if it has no occurrence condition; under
@@ -626,6 +665,9 @@ makes (R8).
 NAMES FLAGGED for renaming at T-K part 1's build, not renamed now: the context weight (ω_context, `_context_weight`),
 the prior base (the re-entry and boundary records, §5 **hypothesis**), `assignment_prior` (the switch of the support
 restriction; TODO-44).
+RENAMED AND REMOVED (T-K part 1's build, 4 October 2026): the context weight is removed (stage 3, bbb7227); the prior
+base is `_equal_evidence` / `_initial_evidence` (stage 5); `assignment_prior` is `assignment_knowledge` (stage 1,
+b85494d), its log line `[IR-assignment] knowledge=on|off known=[...]`.
 AMENDED (AM1, AM3, 3 October 2026): the prior multiplies the evidence, which restarts equal at a boundary and gives a
 returning hypothesis 1/|H| of itself (AM1). "Assigned work" reads the human's **work as a whole** (AM3, under
 **strength**). With **context knowledge** off the prior is equal over the live hypotheses, today's behaviour with
@@ -647,6 +689,11 @@ each "off" an ablation or a diagnostic. Code names: `assignment_knowledge` and `
 AMENDED (AM35, 3 October 2026): "which hypotheses work as a whole contains" reads "which hypotheses take the place of
 the assigned tasks in **the assigned tasks as a whole**": with assignment knowledge off, every work task of the task
 model.
+BUILT (T-K part 1's build, stages 1, 3 and 5, 4 October 2026; b85494d, bbb7227, e589731): `--assignment_knowledge`
+and `--context_knowledge`, the keys of the run file, both `true` by default in `configs/experiment.yaml` and in the
+loader's fallback (TODO-139 closed); `SimModel` takes both with no default (AM51). The `[run]` header prints
+`assignment_knowledge=on|off context_knowledge=on|off`; `[IR-assignment]` replaces `[IR-prior]`; with context
+knowledge on one `[IR-context] step=N facts=[...] recent=[...] levels=[...] prior=[...]` line per tick.
 → design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3's AM3, AM9; TODO-44.
 
 ---
@@ -946,6 +993,9 @@ RULED, NOT BUILT (T-K part 1, AM43, Hadi, 4 October 2026): a third action, `swit
 `wait_at`'s form (located, a stated duration, completing `waited(agent, entity)`) with the declared effect that the
 switch is on (`ac_on(entity)`); only `ac_activation` uses it, in both domains, so `wait_at` stays the expected action of
 `coffee_break` and `office_break` only. design_records.md, "T-K", THE BUILD'S PLAN, RULED, AM43.
+BUILT (T-K part 1's build, stage 4b, 4 October 2026; 2393935): `switch_on` in both domains' `actions.py`, with the
+effects waited(agent, entity) and ac_on(entity); ac_activation's method calls it; `[rec]` and `[human]` name it where an
+A/C activation runs. The `[IR-boundary]` label of its completion still reads `wait_at(...)` (TODO-179).
 COLLISION: "a stand" in §7 and the older records is the ordinary word for a human standing still (in the record, a
 `stand` task, a `wait_at` inside a task, or an empty stack); the hold's STAND ticks are a microaction.
 
@@ -1389,6 +1439,8 @@ design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM11's
 AMENDED (T-K part 1, AM40, Hadi, 4 October 2026; not built): the setup's timeline is the default; a scenario may state
 its own, which replaces it whole; "the two setups of a layout may differ in it alone" is dropped (the second setup per
 room, design_records.md, "T-K", KT13).
+BUILT (T-K part 1's build, stage 4a, 4 October 2026; f70f72f): the setup's optional `"timeline"` list (**timeline of
+context facts**, §5); absent, the setup has no timeline. The `"states"` block refuses a timeline fact (AM50).
 BUILT (T-G stage 1, step 4, 1 October 2026; b74485b, 50f2fb8): the domain registry's `"states"`
 (`StateDeclaration(name, object_type)`; `object_type` None, a fact about no object, admitted) and the setup's one
 `"states"` block (`state`, `object`); a declared state not listed does not hold; kitting declares none; the six
@@ -1417,6 +1469,8 @@ scenario fits a setup whose designations agree with its stated tables.
 RULED, NOT BUILT (T-K part 1, AM40, Hadi, 4 October 2026): a scenario may state its own **timeline of context facts**
 (§5), which replaces the setup's whole; not stated, the setup's applies; stated empty, no timeline fact holds.
 design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM11's AM40.
+BUILT (T-K part 1's build, stage 4a, 4 October 2026; f70f72f): `ScenarioConfig.timeline`, None or a `Timeline` of
+`window(fact, start, end)` calls (the domain's `script.py`).
 → `shared/types.py`, `ScenarioConfig`.
 
 **reference layout** — a layout a scenario declares it runs on (`reference_layouts`, one or more). A binding the

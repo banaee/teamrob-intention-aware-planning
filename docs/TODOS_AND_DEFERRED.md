@@ -2302,7 +2302,12 @@ NOT an argument for any of the three: that a gate fires earlier — see the M1 n
 Files: shared/recognizer.py (`_output`, `BeliefState.confidence`), shared/meta_planner.py (`_clears_gate`)
 Reference: I1 audit; I5 hand-back; θ single-source session, September 2026
 
-**TODO-66 — The context / knowledge-representation pass: `_context_weight` branches on literal task names** [DEFERRED deliberately]
+**TODO-66 — The context / knowledge-representation pass: `_context_weight` branches on literal task names** [CLOSED, T-K part 1's build, 4 Oct 2026]
+CLOSED (T-K part 1's build, stage 3, bbb7227, and stage 5, e589731; design_records.md, "T-K", THE BUILD): `_context_weight`
+and its four constants are removed; the recognizer, the knowledge component and the memory of observed completions
+name no task, fact, object or domain (a test asserts it, `tests/test_tk_prior.py`); the domain's declared context
+knowledge lives in its registry (`"context_knowledge"`), and the prior of R2 and R3 takes the weight's place. The
+long-shift rule leaves with no replacement (AM22; a stated limitation until T-K part 2).
 RULED (T-K part 1, Hadi, 2 Oct 2026; design_decisions.md, "T-K: context knowledge in the recognizer's
 belief"; design_records.md, "T-K", THE CUT): T-K part 1's build removes the domain task names and constants
 from the recognizer and closes this item; the context weight is replaced by the prior of R2 and R3. Not built.
@@ -4104,7 +4109,10 @@ literal step counts.
 Files: analysis/*/sweep.sh, configs/ (run files)
 Reference: docs/assumptions.md 1.3; analysis/irb/run.sh; TODO-33
 
-**TODO-139: Align the run option's default assignment prior with docs/assumptions.md 1.4 (recorded, Track 2.5, 29 Sept 2026)** [OPEN]
+**TODO-139: Align the run option's default assignment prior with docs/assumptions.md 1.4 (recorded, Track 2.5, 29 Sept 2026)** [CLOSED, T-K part 1's build, 4 Oct 2026]
+CLOSED (T-K part 1's build, stages 1 and 5, b85494d and e589731): the option is `assignment_knowledge`, on by default in
+`configs/experiment.yaml` and in the loader's fallback, beside `context_knowledge`, also on by default; CLAUDE.md and
+docs/assumptions.md 1.4 updated. The maintained sweeps still run both settings of the assignment option.
 1.4: the framework's experiments use the prior-on configuration; prior off is a diagnostic and ablation configuration.
 The default of `--assignment_prior` is still off (`configs/experiment.yaml`, `assignment_prior: false`; CLAUDE.md,
 "(default off)"). Not changed in Track 2.5.

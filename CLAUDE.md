@@ -136,8 +136,10 @@ Decisions
 - Decisions are made once, inside `shared/`. Embodiment layers execute them and may refine them
   (for example a hold), but never implement a parallel heuristic or re-decide which task runs.
 - The robot knows nothing of the human's script. It never reads the human's `scheduled_tasks`
-  or their order. The optional `--assignment_prior` switch (default off) gives it only the
-  human's assigned-task pool, as an evaluation condition.
+  or their order. The run option `--assignment_knowledge` (on by default since T-K part 1's build; `--assignment_prior`,
+  default off, before it) gives it only the human's assigned-task pool; off is an ablation. A second option,
+  `--context_knowledge` (on by default), gives the recognizer's prior the domain's declared context knowledge; off is
+  the equal prior (T-K part 1, AM3, AM9).
 - The recognizer emits a belief distribution and gates nothing. The confidence gate θ belongs
   to the meta-planner (`DEFAULT_THETA` in `shared/meta_planner.py`), and is asked in one place
   (`MetaPlanner._clears_gate`). Do not weld comparisons against θ into other call sites.
@@ -495,6 +497,26 @@ Decisions
   AM63): one external copy of the three kitting sets' untracked data before they are replaced; the gate's stage
   committed only after its checks pass; its stop conditions; the run without assignment knowledge never stops the
   build. The plan is approved; a new design chat takes the build from `docs/handoffs/T-G_forward_inputs.md`, section 5. Nothing built. Next: the build (BUILD DISCIPLINE, step 2), stage by stage as the plan states.
+  Step 3 of T-K part 1, the build, is DONE (4 October 2026; design_records.md, "T-K", THE BUILD, STAGES 1 AND 2 and THE
+  BUILD, STAGES 3 TO 7; the session's state file `docs/handoffs/build_T-K_part1_state.md`; the roadmap's STEP 3 DONE
+  line). The eight stages of the plan are built, each checked against the previous stage's outputs: 0 the baselines
+  B0; 1 the rename `assignment_prior` → `assignment_knowledge` (b85494d); 2 the gate on the belief over the live
+  hypotheses (AM42; 91774ce, 3b05a8a, 733e593), round 1 and kitting's IRB and MPB sets rerun under it and their outputs
+  replaced (B2, the baseline of every later stage), no stop condition met; 3 the run option `context_knowledge` and the
+  removal of the context weight and its constants (TODO-66 closed; bbb7227, 67b899e); 4 the timeline of context facts
+  (`Timeline`, `Window`, the setup's `"timeline"` list and the scenario's `window(...)` form, the resolution at load, the
+  `[run_mesa] timeline` line, the load checks; f70f72f) and the facts break_time, room_warm, ac_on with the action
+  switch_on and dock_loading's ac_activation (2393935); 5 the mind (e589731: `ContextKnowledge` as the domain's declared
+  context knowledge in its registry, `shared/completion_memory.py` the memory of observed completions, the prior in the
+  recognizer with `BeliefState.belief`, `prior`, `levels` and the `[IR-context]` line; both run options on by default,
+  TODO-139 closed); 6 the instruments (the IRB's oracle computes the prior on its own from the declared values and the
+  method document, rules 29 to 33; the columns prior, levels, recent; the readers label each case by the state the
+  script meets, KT14, and give the A/C's belief at arrival, KT10); 7 these records. With context knowledge off every
+  maintained log and every instrument output is B2's except the named lines (the `[run]` field, the timeline line,
+  switch_on's name and its effect ac_on in `[rec]`, `[human]` and the trajectory, the new columns); round 1 with it on
+  agrees with the oracle in all 31 runs (AM49; results not read). No setup or scenario states a timeline yet. Next: step
+  4 of `docs/handoffs/T-G_forward_inputs.md`, section 5.7, in the design chat (the timelines of the setups and the runs
+  with context knowledge on, the expectations stated first); then the two MPB cases, dock_loading's part, the close.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
@@ -540,6 +562,9 @@ Decisions
   Until then a prior-OFF measurement is an appendix, never the primary set, and no ruling is made on prior-OFF numbers
   alone. Revised in `docs/assumptions.md` 1.4: prior off is a recognizer diagnostic and ablation configuration; an
   artefact produced only under it never produces a rule. The run option's default is still off (TODO-139).
+  SINCE T-K PART 1'S BUILD (4 October 2026): the option is `assignment_knowledge`, on by default, beside
+  `context_knowledge`, on by default (TODO-139 closed). The maintained sweeps run both settings of the assignment
+  option with context knowledge off; the runs with it on are step 4 of T-K part 1 (the timelines are not authored).
 - When a task delegates a decision, decide from the design: state the reasoning before implementing, then evaluate. If the evaluation contradicts the reasoning, report it; do not switch the decision to fit the results.
 
 ## Workflow rules
@@ -613,8 +638,10 @@ round-trip, so the file's comments are kept.
 # headless; --layout is optional (T-L stage 1): a run that names none takes the scenario's first reference layout.
 # The [run_mesa] start line names the triple; setup ids are env_setup_NN since stage 2 (the setup is the scenario's, never a flag).
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout_04 --scenario scenario_s01_06 --steps 200
-# evaluation switch (default off): robot knows the observed human's assigned-task pool
-PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout_04 --scenario scenario_s01_06 --steps 200 --assignment_prior true
+# the two knowledge options (both on by default since T-K part 1's build): assignment knowledge (the robot knows the
+# observed human's assigned-task pool; `--assignment_prior` before the build) and context knowledge (the prior from the
+# domain's declared context knowledge; off: the equal prior)
+PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layout_04 --scenario scenario_s01_06 --steps 200 --assignment_knowledge true --context_knowledge false
 # another run file, and one override of a fact of the run's artefacts (T-L stage 4; repeatable)
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run my_run.yaml --override layout.shelf_2.position=-300,-300
 # visualization
@@ -622,15 +649,17 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout_03 --sce
 ```
 
 Logs go to `logs/run_<timestamp>.log`. Defaults come from the run file, `configs/experiment.yaml` or the yaml
-`--run` names; CLI flags override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_prior`
-(true/false), `--strategy` (single_task | full_reorder), `--gate_strategy` (none | b2a | b2b),
+`--run` names; CLI flags override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_knowledge`
+(true/false; `--assignment_prior` before T-K part 1's build, no alias), `--context_knowledge` (true/false), `--strategy` (single_task | full_reorder), `--gate_strategy` (none | b2a | b2b),
 `--cost_strategy` (realized | plain),
 `--separation_stop` (true/false), `--test_level` (the recognizer's adequacy test level α, strictly between 0 and 1), `--run` (another run file; it replaced `--experiment` in T-L stage 4, no alias) and
 `--override <path>=<value>` (repeatable). Parsing is strict: an unknown
 or misspelled flag, an unknown yaml key, or a bad value stops the run. Each robot's `[run]` header
-names the policy and evaluation switches the run took (strategy, gate, cost, stop, assignment prior, θ, ρ,
-min_separation and β, each with its source: the body supplies both, `mesa_sim/mesa_configs.yaml`, 50 cm
-and 0.01 /cm; since T-D Stage 1 also the test level α and the body's speed, 20 cm/tick).
+names the policy and evaluation switches the run took (strategy, gate, cost, stop, assignment knowledge, context
+knowledge, θ, ρ, min_separation and β, each with its source: the body supplies both, `mesa_sim/mesa_configs.yaml`, 50 cm
+and 0.01 /cm; since T-D Stage 1 also the test level α and the body's speed, 20 cm/tick). After the `[run_mesa]` start
+line every log prints `[run_mesa] timeline source=<scenario|setup|none> windows=[...]`, the timeline of context facts in
+force (T-K part 1, AM40).
 
 Overrides (T-L stage 4; design_decisions.md, "Layouts, setups and scenarios", ruling 7; glossary §9): a closed list of
 three, one path each, the same in the run file's `overrides:` block (a mapping path: value) and in `--override`:
@@ -716,6 +745,9 @@ grep "^\[IR\] step="    <log>   # most_likely, confidence, lifecycle, finding, t
 grep "^\[IR-dist\]"     <log>   # full belief distribution per tick
 grep "^\[IR-complete\]" <log>   # task completion pins (a pin lasts while the terminal fact holds, T-D L4)
 grep "^\[IR-reentry\]"  <log>   # a retired hypothesis live again, its terminal fact no longer holding (L4)
+grep "^\[IR-assignment\]" <log>  # at load: assignment knowledge on|off and the known assigned tasks (`[IR-prior] switch=` before T-K part 1)
+grep "^\[IR-context\]"   <log>   # context knowledge on: per tick the facts, the recency facts, the foreseeable tasks' levels and the prior (T-K part 1)
+grep "^\[run_mesa\] timeline" <log>   # the timeline of context facts in force and its source (T-K part 1, AM40)
 grep "^\[sep\]"         <log>   # actual robot-human distance per tick
 grep "^\[hold\]"        <log>   # decided holds: start, end, planned, executed, interrupted
 grep "^\[stop\]"        <log>   # separation-stop refusals (stop on), with the assessed-window label

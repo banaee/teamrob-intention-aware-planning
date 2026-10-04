@@ -6,8 +6,10 @@ stage by stage, so that a compaction or a new session loses nothing. The records
 
 ## Status
 
-BUILD STAGE 5 committed (e589731). The session ended here (Hadi, 4 October 2026); stage 6 is next: its edits are
-in the working tree, uncommitted (below), its check not yet run. HEAD e589731 plus this file's commit.
+BUILD STAGE 7 committed: the build of T-K part 1 (step 3) is complete. Stage 6 (766f7d3) and stage 7 (the records
+commit that carries this file) were built in the second session (4 October 2026, one model, no pause before stage 7,
+as Hadi ruled). Nothing of the build is left to do; the next step is step 4 of `docs/handoffs/T-G_forward_inputs.md`,
+section 5.7 (the timelines and the runs with context knowledge on), in the design chat.
 
 | stage | commits | check |
 |---|---|---|
@@ -17,8 +19,8 @@ in the working tree, uncommitted (below), its check not yet run. HEAD e589731 pl
 | 3 | bbb7227 (the option, ω removed), 67b899e (the sweeps' mode) | passed: identical to B2 except the `[run]` field; milestones from step 500 the recognizer's lines only |
 | 4 | f70f72f (4a, the timeline), 2393935 (4b, the facts, switch_on, dock_loading's ac_activation) | passed: the timeline line and switch_on's name only; every scenario loads; 329 tests |
 | 5 | e589731 (the mind) | passed: off identical to stage 4 (85 logs, .rec, round 1's 248 instrument files, the `[run]` header); on: all 85 runs complete; 352 tests |
-| 6 | not started (its edits are in the working tree, uncommitted: the instruments, see below) | to run: `run_stage6.sh` on a snapshot; compare with B2 (`compare_outputs.py`) |
-| 7 | not started | — |
+| 6 | 766f7d3 (the instruments) | passed: round 1, the IRB and the MPB (both strategies, prior-off diagnostic) with context off, every instrument output identical to B2 after the named additions; round 1 on, 0 disagreements in all 31 (results not read); 352 tests |
+| 7 | the records commit (HEAD) | the final regeneration at 766f7d3: the four sets, kitting's IRB, round 1 and the MPB in the repository, md5s in the READMEs |
 
 ## The rules Hadi added in this session (beside the build prompt)
 
@@ -35,6 +37,9 @@ in the working tree, uncommitted (below), its check not yet run. HEAD e589731 pl
 - Two planned pauses for a model switch: after stage 4's commit, before stage 5's first edit ("stage 5 next", with the
   gate's stage report printed again); after stage 6's commit, before stage 7. Hadi answers "continue".
 - This file: the session's state, kept current; the session ends after stage 5's commit (Hadi, 4 October 2026).
+- The second session (Hadi, the build prompt of stages 6 and 7): one model, so no pause before stage 7; the oracle's
+  independence stated in the report; a disagreement in round 1 with context knowledge on that is not a plain defect
+  stops the session (none occurred).
 
 ## Where the outputs lie on disk
 
@@ -43,13 +48,22 @@ in the working tree, uncommitted (below), its check not yet run. HEAD e589731 pl
   (round 1) and `analysis/kitting/mpb/`. Stages 3 to 5 regenerate nothing there: their checks compare against B2
   with the named lines set aside (the `[run]` field, the timeline line, switch_on's name).
 - The old data (before the gate's stage): `/home/hadi/teamrob_analysis_2026-10-04/` (AM59; its README.txt).
-- The session's scratch outputs (session-specific; lost with it): `/tmp/claude-1000/-home-hadi-Nextcloud---Research---TeamRob-Framework-teamrob-intention-aware-planning/a9b7dcc0-3fd2-4649-a7e9-11f4fdf149f0/scratchpad/`: `b0/` (B0), `s1/`, `s3/`, `s4/`, `s5/`
+- After stage 7 the repository's analysis folders hold the final regeneration at 766f7d3 (the four sets' `sweep/`,
+  `irb/`, `irb/tk1/`, `mpb/`); B2's md5s stay in the READMEs' stage 2 sections, the final ones in their stage 7 sections.
+- The second session's scratch (lost with it): `.../a763ea38-811e-46c5-b748-82fb87a4397a/scratchpad/`: `s6_tree/`,
+  `s6/` (stage 6's first pass: irb, tk1, tk1_on, pytest), `s6b_tree/`, `s6b/` (the MPB passes after the repair),
+  `final/` (stage 7's regeneration outputs: the sweeps' and instruments' console output, sep_classes tables),
+  `compare_outputs.py` (extended for the stage 6 additions), `run_stage6.sh`, `run_mpb6.sh`, `run_final.sh`, `fticks.py`.
+- The first session's scratch outputs (session-specific; lost with it): `/tmp/claude-1000/-home-hadi-Nextcloud---Research---TeamRob-Framework-teamrob-intention-aware-planning/a9b7dcc0-3fd2-4649-a7e9-11f4fdf149f0/scratchpad/`: `b0/` (B0), `s1/`, `s3/`, `s4/`, `s5/`
   (each stage's scope: the four sets, `tk1/`, `dl_milestone/`), `s2_tree/analysis/kitting/` (B2 as produced),
   `s5/on_*` (the on runs). The scripts: `run_scope.sh <tree> <out>` (the scope), `run_on.sh`, `run_stage6.sh`,
   `compare_scope.sh`, `compare_gate.sh`, `compare_s4.sh`, `compare_outputs.py`, `gate_moves.py`,
   `mpb_moves.py`, `snapshot_tree.sh`. A new session regenerates any of them from the commits.
 
 ## What the next session reads first
+
+THE BUILD IS COMPLETE (stage 7 committed). The two sections below describe the state between stages 5 and 6 and are
+kept as the record of how the build was carried over; nothing in them is left to do.
 
 `docs/handoffs/plan_T-K_part1.md` (stages 6 and 7, sections 8 and 9), this file, CLAUDE.md, `docs/glossary.md`, the
 T-K entries of the records; then `git status` (stage 6's 14 modified files below, plus nothing untracked). The build
@@ -96,7 +110,15 @@ since B2); `docs/handoffs/T-G_forward_inputs.md` section 5 (5.5, 5.6, 5.7 step 3
   recognizer's constructor requires `context` (every caller states it; three tests updated). Observed in the smoke
   run with context on, not read (AM49): a lone live delivery is admitted at its stretch's first tick (KT11's ruled
   expectation); the coffee break at the ordinary strength reaches θ later than under the equal prior.
-- Stage 6 (so far): `run.sh --context on|off` (how); the oracle's prior is in a class of its own, ContextPrior,
-  with rules 29 to 33; the A/C's belief at arrival is read at the first tick of its switch_on in the trajectory.
+- Stage 6: `run.sh --context on|off` (how); the oracle's prior is in a class of its own, ContextPrior, with rules 29
+  to 33, and its lookup of a task's entry is its own (`entries()` read once); the A/C's belief at arrival is read at
+  the first tick of its switch_on in the trajectory. Found by the check and repaired (small, obvious): the MPB's
+  `actual.py` compared the in-process lines unfiltered against the filtered log, so the model's own `[run_mesa]
+  timeline` line (stage 4a) failed its identity assertion in every MPB run; a stray indentation in
+  `mesa_sim/list_scenarios.py`. The comparer's named additions grew by two the plan did not list: the A/C's effect
+  `ac_on(switch)` among the trajectory's facts from the completion on (stage 4b's ruling, AM43) and
+  `params.recency_ticks`. Suggest: nothing; both are consequences of ruled items.
+- Stage 7: the final regeneration ran in the repository's working tree at 766f7d3 while this session edited documents
+  only (no code, no config, no artefact); the runs read none of them. Suggest: nothing.
 - Parallel work used as Hadi allowed: each stage's check ran on a snapshot while the next stage was edited; each
   commit was staged from the snapshot's files.

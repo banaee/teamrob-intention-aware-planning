@@ -4989,6 +4989,12 @@ condition of any task or action reads a timeline fact, the completion condition 
 AM52). In the record ("T-K", THE CROSS-CHECK, RULED): AM55 the dock_loading runs of the build (X6), AM56 the label of
 the episode boundary for a switch_on (X3), AM57 the test-bed sets rerun with the new gate and the stale sets (X1, both
 parts), AM58 the viewer's confidence (X2). Not built.
+BUILT (T-K part 1, step 3, 4 October 2026; design_records.md, "T-K", THE BUILD, STAGES 1 AND 2 and THE BUILD, STAGES 3
+TO 7): R1 to R4, R6, R7 as amended (AM1 to AM4, AM9, AM26, AM27, AM30, AM33 to AM38, AM40, AM42 to AM47, AM50 to AM54)
+are built in eight stages (b85494d; 91774ce, 3b05a8a, 733e593; bbb7227, 67b899e; f70f72f, 2393935; e589731; the
+instruments; the records). "Not built" in the lines above reads: built, except R5 (T-K part 2) and the items the
+records leave open. The timelines of the setups and the runs with context knowledge on are step 4; no run of the build
+exercises a raised strength.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which

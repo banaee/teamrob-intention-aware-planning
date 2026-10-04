@@ -127,8 +127,11 @@ class BeliefState:
     timestamp: float
     agent_id: str                          # agent whose intention is being tracked
     distribution: Dict[str, float]         # {intention_name: probability}
-    most_likely: Optional[str]             # argmax over the live set H; None when exhausted
-    confidence: float                      # the share of most_likely; 0.0 when exhausted
+    most_likely: Optional[str]             # argmax over the live set H (of `belief`); None when exhausted
+    confidence: float                      # the leader's belief over H, belief[most_likely] (T-K part 1, AM42); 0.0 when exhausted
+    belief: Dict[str, float]               # the belief over H: evidence × prior, normalised over H, before the floor and the pins (AM42); keys exactly H
+    prior: Dict[str, float]                # the prior over H (T-K part 1, R3), normalised; empty with context knowledge off and when exhausted
+    levels: Dict[str, StrengthLevel]       # per foreseeable task with a live hypothesis, its level SUPPRESSED | ORDINARY | RAISED (AM36); empty with context knowledge off
     finding: Optional[AdequacyFinding]     # UNRESOLVED | ADEQUATE | UNEXPLAINED; None exactly when exhausted
     lifecycle: RecognizerLifecycle         # LIVE | EXHAUSTED
     tails: Dict[str, float]                # S_k of each member of the adequacy test this tick
@@ -141,7 +144,8 @@ class BeliefState:
 ```
 
 Three independent outputs (T-D R2 to R4, 27 September 2026): the belief (`distribution`, `most_likely`,
-`confidence`), the adequacy finding with the members' tail probabilities and every live hypothesis's hypothesis
+`confidence`; since T-K part 1's build also `belief`, `prior` and `levels`: `distribution` is the reported distribution
+with the floor and the pins, `belief` the belief over H the gate reads, AM42; design_records.md, "T-K", THE BUILD), the adequacy finding with the members' tail probabilities and every live hypothesis's hypothesis
 adequacy (G1, T-D 1.5 rulings), and the lifecycle state. Since G-build (R3 as amended by T-D G, AD2) the observation
 warrant per live hypothesis is a further independent output (`observation_warrant`): not a kind of adequacy. The meta-planner reads `confidence`, `most_likely` and the
 leader's `hypothesis_adequacy` (its gate, `_clears_gate`, G1) and, since G-build, the leader's `observation_warrant`
@@ -673,7 +677,7 @@ entries in `design_decisions.md`). This section is the interface.
 ```python
 IntentionRecognizer(
     task_model: TaskModel,                            # the robot's task model (T-H), §2.4
-    context: ContextKnowledge,                        # background facts for ω_context weighting (output only)
+    context: Optional[ContextKnowledge],              # the domain's declared context knowledge for the prior (T-K part 1, R3, AM26); None: context knowledge off, the equal prior
     hypotheses: List[HypothesisKey],                  # precomputed hypothesis space for this scenario
     beta: float,                                      # detour tolerance, body's length units; no default (T-A1)
     speed: float,                                     # v, the body's motion per tick (the Projector's assumed_speed)
@@ -702,6 +706,8 @@ by the embodiment (`shared.types.check_task_destinations`, §4.1), which rejects
 the recognizer is built. An assigned task matching no hypothesis is logged as a warning, naming its
 `task_instance_key()`, and ignored.
 `None` or `[]` switches the restriction off (`--assignment_prior false`, the default).
+SINCE T-K PART 1'S BUILD (AM3, AM9; 4 October 2026): the option is `--assignment_knowledge`, on by default; off is an
+ablation. The hypotheses of the work tasks it leaves live are "the assigned tasks as a whole" of the prior (glossary §5).
 
 `beta` is the phase likelihood's detour tolerance, per unit of the body's length (Mesa: 0.01 /cm, from
 `mesa_configs.yaml`, named with its source in the `[run]` header). It carries a unit, so the body supplies it
@@ -743,6 +749,11 @@ update(
     obs: Observation,
     world: WorldState,
     prev_belief: BeliefState | None = None,
+    recent: Sequence[PersonalTask] | None = None,     # T-K part 1 (AM30, P5): the recency facts of this tick, the
+                                                      # tasks whose observed completion lies within their recency
+                                                      # duration (from the mind's memory of observed completions,
+                                                      # `shared/completion_memory.py`); required with context
+                                                      # knowledge on (an error if missing), ignored when off
 ) -> BeliefState
 ```
 
@@ -780,6 +791,15 @@ episode is local: when a retirement is the observed agent's own (its expected ac
 the terminal one), the belief re-initialises to the uniform prior over the live set and every origin moves to
 the agent's position. Output = evidence × ω_context (`_context_weight`, output only), normalised, floored at
 `BELIEF_FLOOR`, with completed and inadmissible hypotheses pinned.
+SINCE T-K PART 1'S BUILD (4 October 2026; R2 to R4, AM1, AM36, AM42; `docs/context_knowledge_method.md`): the
+context weight and its constants are gone (TODO-66). The belief over H is evidence × the prior's weights, normalised
+over H (`BeliefState.belief`; `confidence` its leader's value, the value the gate reads); the prior's weights are
+computed on every tick from the declared context knowledge and the facts of the tick (the timeline facts and the
+object states in `world.predicates`, the recency facts in `recent`): the live work hypotheses share 1 equally, each
+foreseeable task's live hypotheses share its strength (the suppressed, the raised or the ordinary strength, by its
+suppressing and raising conditions, read in `ContextKnowledge.level`); with context knowledge off every weight is
+exactly 1.0. The reported `distribution` applies the floor and the pins to that belief. "The uniform prior" of the
+boundary and the re-entry above is the evidence's equal restart (AM1).
 
 **Adequacy** (T-D E1 to E9), after the belief, over the same D. Per live hypothesis, per derived phase (origin to
 phase advance), D = e/v + (s − s_exp) in ticks: e the excess path from the origin (`likelihood_functions.EXCESS_MEASURES`;
@@ -1443,6 +1463,14 @@ workspace/layout data, not domain knowledge — it's passed as a parameter into
 **Companion class, not in previous contract:** `ContextKnowledge` — background context facts
 (shift info, environment state) used by IR for ω_context weighting. Required constructor
 argument for `IntentionRecognizer` (§2.1).
+SINCE T-K PART 1'S BUILD (4 October 2026; AM26, AM36 to AM38): `ContextKnowledge` (`shared/knowledge.py`) is the
+domain's declared context knowledge, built once in the domain's registry (`"context_knowledge"`): the suppressed and
+the ordinary strength, and per foreseeable task its `ForeseeableKnowledge` (the suppressing and the raising condition,
+each a conjunction of typed facts, `TimelineFact` | `ObjectState` | `RecencyFact`; the raised strength; the recency
+duration). Validated at construction and against the robot's task model when the robot is built with context
+knowledge on (AM4). The constructor argument is `Optional`: None is context knowledge off. Beside it, the memory of
+observed completions (`shared/completion_memory.py`, `ObservedCompletions`) is a component of the mind outside the
+recognizer (AM30), built by the body, which passes its recency facts to `update()`.
 
 **No simulator imports allowed.**
 

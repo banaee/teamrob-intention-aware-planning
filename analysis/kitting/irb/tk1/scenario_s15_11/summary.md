@@ -10,7 +10,7 @@ Script actions (replay expanded per tick; the first tick of each action; the tas
 | 65 | deliver_item(item_3,kitting_table_0) | covered | place | 0 | 1 |
 | 67 | deliver_item(item_2,kitting_table_0) | covered | move_to | 0 | 1 |
 | 94 | ac_activation(ac_switch_0) | covered | move_to | 0 | 2 |
-| 133 | ac_activation(ac_switch_0) | covered | wait_at | 0 | 2 |
+| 133 | ac_activation(ac_switch_0) | covered | switch_on | 0 | 2 |
 | 135 | deliver_item(item_2,kitting_table_0) | covered | move_to | 0 | 1 |
 | 173 | deliver_item(item_2,kitting_table_0) | covered | pick_up | 0 | 1 |
 | 175 | deliver_item(item_2,kitting_table_0) | covered | move_to | 1 | 1 |
@@ -32,7 +32,7 @@ Expected action per hypothesis (the oracle's derived phases; ticks inclusive, -1
 | hypothesis | expected action | ticks |
 |---|---|---|
 | ac_activation(ac_switch_0) | move_to(ac_switch_0) | -1 to 130 |
-| ac_activation(ac_switch_0) | wait_at(PT2S,ac_switch_0) | 131 to 132 |
+| ac_activation(ac_switch_0) | switch_on(PT2S,ac_switch_0) | 131 to 132 |
 | ac_activation(ac_switch_0) | move_to(ac_switch_0) | 135 to 440 |
 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | -1 to 440 |
 | deliver_item(item_1) | move_to(item_1) | -1 to 31 |
@@ -163,8 +163,8 @@ Across the started task ac_activation(ac_switch_0) (covered; actual): on top of 
 | 95 | move_to step | ac_activation(ac_switch_0) | 0.0240 / 0.0277 | 0.2795 / 0.3605 | 0.0095 / 0.0109 | 0.6319 / - | retired | 0.0541 / 0.0631 | adequate |
 | 96 | move_to step | ac_activation(ac_switch_0) | 0.0277 / 0.0277 | 0.3080 / 0.3426 | 0.0110 / 0.0109 | 0.5901 / 0.7491 | retired | 0.0622 / 0.0630 | adequate |
 | 132 | move_to  | ac_activation(ac_switch_0) | 0.7454 / 1.0000 | 0.0025 / 0.0001 | 0.1125 / 0.0041 | 0.0010 / 0.0000 | retired | 0.1377 / 0.0051 | adequate |
-| 133 | wait_at stand | ac_activation(ac_switch_0) | retired | 0.2495 / - | 0.2495 / - | 0.2495 / - | retired | 0.2495 / - | unresolved |
-| 134 | wait_at  | ac_activation(ac_switch_0) | retired | 0.2495 / 1.0000 | 0.2495 / 1.0000 | 0.2495 / 1.0000 | retired | 0.2495 / 1.0000 | adequate |
+| 133 | switch_on stand | ac_activation(ac_switch_0) | retired | 0.2495 / - | 0.2495 / - | 0.2495 / - | retired | 0.2495 / - | unresolved |
+| 134 | switch_on  | ac_activation(ac_switch_0) | retired | 0.2495 / 1.0000 | 0.2495 / 1.0000 | 0.2495 / 1.0000 | retired | 0.2495 / 1.0000 | adequate |
 | 135 | move_to step | deliver_item(item_2) | 0.1998 / - | 0.2070 / 0.9774 | 0.1788 / 0.7985 | 0.2103 / 1.0000 | retired | 0.2030 / 0.9505 | adequate |
 | 136 | move_to step | deliver_item(item_2) | 0.1751 / 0.7401 | 0.2221 / 0.9534 | 0.1606 / 0.6209 | 0.2297 / 1.0000 | retired | 0.2115 / 0.8901 | adequate |
 | 137 | move_to step | deliver_item(item_2) | 0.1486 / 0.5354 | 0.2394 / 0.9280 | 0.1406 / 0.4710 | 0.2523 / 1.0000 | retired | 0.2182 / 0.8169 | adequate |

@@ -28,7 +28,7 @@ Expected action per hypothesis (the oracle's derived phases; ticks inclusive, -1
 | hypothesis | expected action | ticks |
 |---|---|---|
 | ac_activation(ac_switch_0) | move_to(ac_switch_0) | -1 to 177 |
-| ac_activation(ac_switch_0) | wait_at(PT2S,ac_switch_0) | 178 to 179 |
+| ac_activation(ac_switch_0) | switch_on(PT2S,ac_switch_0) | 178 to 179 |
 | ac_activation(ac_switch_0) | move_to(ac_switch_0) | 180 to 386 |
 | coffee_break(coffee_machine_0) | move_to(coffee_machine_0) | -1 to 141 |
 | coffee_break(coffee_machine_0) | wait_at(PT60S,coffee_machine_0) | 142 to 172 |

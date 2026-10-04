@@ -724,3 +724,41 @@ Commands: `bash analysis/kitting/tb3_full_reorder/sweep.sh analysis/kitting/tb3_
 | env_layout_08_scenario_s06_02_single_task_off | 394a83251116d5272f7445f0e6f737b9 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_full_reorder_off | 558404c21eff46da13f0004c7e485eb5 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_single_task_off | c00a5a724d76c8ef607f8c03ea436a56 | c9c444622f25d15abfd849fc495db540 | 314 | 68.41 (264) | 0 | 0 | 0 |
+
+## The build of context knowledge, final (T-K part 1, build stage 7, 4 October 2026) — the logs from here on
+
+Regenerated at 766f7d3 (the build's stage 6; design_records.md, "T-K", THE BUILD, STAGES 3 TO 7), the run files and
+the sweep stating `context_knowledge: false` (stage 3). Named lines since B2 (the gate stage's section above), and nothing else (each log compared with B2 after setting
+them aside; 0 differ):
+- stage 3 (bbb7227): the `[run]` header gains `context_knowledge=off`;
+- stage 4a (f70f72f): a new line after the `[run_mesa]` start line, `[run_mesa] timeline source=none windows=[]` (no
+  setup or scenario states a timeline);
+- stage 4b (2393935): where an A/C activation runs, the action reads `switch_on` for `wait_at` in `[rec]`,
+  `[human]`, the human's step lines and the executor's `_load_plan` line (AM43);
+- stages 5 and 6 (e589731, 766f7d3): nothing (context knowledge off: every prior weight exactly 1, P1; no `[IR-context]` line).
+The `.rec` streams differ from the table above only where an A/C activation runs (`switch_on`). Completion ticks,
+the `[sep]` minima and F1's classes are the same as the table above in every log.
+Commands: `bash analysis/kitting/tb3_full_reorder/sweep.sh analysis/kitting/tb3_full_reorder/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb3_full_reorder/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_on | 12a779c93676f8a565155aa3343f4a36 | 515647f63e1b047aab15b0dc0ac91d08 | 221 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_on | bdc7a664bd97632ea627d9bc75b8861d | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 6dd8010d49e5bceb4f0802bd09ea2935 | a3927888957766c7da70eea660062fd5 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_on | ba1b15179dfc1ad36639a8a4a2dd46e0 | a3927888957766c7da70eea660062fd5 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_on | 23830f099291c4d57795228e2acad745 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_on | 1cf6af1499d3826a5854b2f0bbd785da | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_on | fc80003051546349edf6e2f496525d9c | 329590c9c1249859bfe20d107588c50a | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_on | b3a85c2d0410924c19c7064c726deb31 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_on | a42cac39359bd429ebcd08c388adf7d9 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_on | 211e648284557180b979c674e891fdd4 | c9c444622f25d15abfd849fc495db540 | 272 | 28.69 (246) | 0 | 3 | 1 |
+| env_layout_03_scenario_s03_01_full_reorder_off | 396ddb46021ec4076ebb328cf9579394 | 515647f63e1b047aab15b0dc0ac91d08 | 265 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_off | ce4b01981202dadaffd5fec5b8c0b61f | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_full_reorder_off | 1165926ffef0799882a0db0257cf0daf | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_off | e00487f9706f711a493d2ab6b1b42486 | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_off | ff4785fa7a93d86d81b5f0e81ad50990 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_off | 581a076ae2cd1fab484bb404d26ad985 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_off | fef9b5a5c5dd5b93bb3ff9a015456f0f | 329590c9c1249859bfe20d107588c50a | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_off | 676defd1b29c6481e6d458f55a8bc0e9 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_off | 30facb4519327e2457ee1666a46ce647 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_off | d02ce3dc6f2852a0c42640e5487bdbaa | c9c444622f25d15abfd849fc495db540 | 314 | 68.41 (264) | 0 | 0 | 0 |

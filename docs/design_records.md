@@ -3266,3 +3266,72 @@ THE BUILD, STAGES 1 AND 2 (T-K part 1, step 3; ccode, 4 October 2026, by the app
   - The old untracked data: /home/hadi/teamrob_analysis_2026-10-04/ (AM59). dock_loading's IRB and MPB sets marked
     stale in their READMEs (AM57).
 
+
+THE BUILD, STAGES 3 TO 7 (T-K part 1, step 3; ccode, 4 October 2026, by the approved plan, section 8; the session's
+state file `docs/handoffs/build_T-K_part1_state.md`). Records only what was built and what moved. Every stage's check
+ran on a snapshot of that stage's files while the next was edited (Hadi's rule of parallel work), and each stage was
+committed from its own files after its check passed. Each check compared with B2 (stage 2's regenerated outputs) with
+the lines the earlier stages named set aside, so every stage's outputs are "B2 except the named lines".
+- Stage 3, bbb7227 and 67b899e (the sweeps' executable bit): the run option `context_knowledge` (the CLI flag, the run
+  file key, `SimModel`'s keyword with no default beside `assignment_knowledge`, AM51; every run file and sweep states
+  `context_knowledge: false`, the tests both); the context weight `_context_weight`, its four constants and the old
+  `ContextKnowledge` removed, nothing in their place (AM22, TODO-66); `_output` multiplies by unit weights (P1).
+  Against B2: the four sets and round 1 identical except the `[run]` field; dock_loading's six milestone runs identical
+  up to step 499 and differing from step 500 in the recognizer's lines only (the long-shift rule gone).
+- Stage 4, f70f72f (4a) and 2393935 (4b). 4a: `Timeline`, `Window` and `TimelineSource` (`shared/types.py`; the mind
+  never reads them), `ScenarioConfig.timeline`; the registry list `"timeline_facts"` (the A5 form, P3); the setup's
+  optional `"timeline"` list and the scenario's `window(fact, start, end)` form; the resolution at load in `SimModel`
+  (the scenario's, else the setup's, else none; AM40) and the header line `[run_mesa] timeline source=... windows=[...]`;
+  the world-state builder adds the facts in force at the tick (P2); the load checks (AM20, AM46, AM50, AM52, AM54: no
+  effect, retraction, precondition, guard or completion condition of any schema names a timeline fact, the `"states"`
+  block refuses one, windows in ticks, half-open, no overlap). 4b: break_time and room_warm (timeline facts), ac_on (a
+  state of `ac_switch`), the action `switch_on` with the effects waited and ac_on, called by ac_activation's method, in
+  both domains (AM18, AM43); dock_loading's ac_activation with one method from the hall and its object type (AM45).
+  Against stage 3: the timeline line (`source=none windows=[]` everywhere: no setup or scenario states one) and
+  `switch_on` in `[rec]`, `[human]`, the human's step lines and the executor's `_load_plan` line where an A/C
+  activation runs; every registered scenario of both domains loads; 329 tests.
+- Stage 5, e589731 (the mind): `ContextKnowledge` rebuilt as the domain's declared context knowledge (`Strength`,
+  `RecencyDuration`, the typed facts `TimelineFact` | `ObjectState` | `RecencyFact`, `Condition`,
+  `ForeseeableKnowledge`; `level` and `strength`; validated at construction and against the robot's task model, AM4),
+  declared once per registry under `"context_knowledge"` with the values of AM37 and AM38 and a source per value;
+  `shared/completion_memory.py`, `ObservedCompletions` (AM30, AM33, AM47), built by the body with context knowledge on
+  and read before the recognizer; the recognizer's constructor takes `context` (None: off), `update()` takes
+  `recent` (P5), `_prior_weights` groups the live hypotheses by their schema's class and the pure function
+  `context_prior` divides (R3, R4, AM35, AM36); `BeliefState.prior` and `levels`; the `[IR-context]` line per tick;
+  `_prior` and `_initial_prior` renamed `_equal_evidence`, `_initial_evidence` (AM1); both run options on by default
+  (AM3, TODO-139). Against stage 4, context knowledge off: identical (85 logs and `.rec`, round 1's 248 instrument
+  files, the `[run]` header's field aside); with it on, all 85 runs of the scope complete (not read). 352 tests, among
+  them section 10's eight rows, sections 11 to 13 of the method document, the memory on a recorded run (the recency
+  fact holds on exactly 90 ticks), every registered scenario of both domains loading with context knowledge on, and the
+  three shared modules naming no task, fact, object or domain in their code strings.
+- Stage 6, 766f7d3 (the instruments): the IRB's oracle computes the prior on its own (rules 29 to 33 in
+  `analysis/kitting/irb/README.md`: the facts, its own memory of observed completions from the rows, the level, the
+  weights, the belief), from the domain's declared values (`ContextKnowledge.entries()`, `suppressed`, `ordinary`) and
+  the method document; it calls no function of the recognizer or of the knowledge component for the level, the groups
+  or the division, and asserts as before that neither recognizer module was loaded; the trajectory carries the timeline
+  facts in force per tick and `params.recency_ticks`; the columns `prior`, `levels`, `recent` in expected and actual,
+  compared; `run.sh --context on|off`; `admission.py` labels each true stretch by the state the script meets (KT14) and
+  gives the A/C's belief over H at its arrival (KT10); `summary.py` prints the levels and the recency facts as
+  stretches; `tdlib.py` reads `[IR-context]` and the timeline line; the MPB instrument follows (the oracle's context
+  from the run file; `declared_context` at every instrument `SimModel` call). Check: round 1 (31), kitting's IRB (17)
+  and MPB (16, both strategies and the prior-off diagnostic) with context knowledge off, every instrument output
+  identical to B2 after the named additions (the three columns and their rows in `diff.md`, `recency_ticks`, switch_on's
+  name and its effect ac_on in the trajectory's facts); round 1 with it on, 0 disagreements at 1e-9 in all 31 (the known
+  print-precision flag at s14_02 tick 181 as before), results not read (AM49); 352 tests. Two defects found by the
+  check and repaired (small, obvious): the MPB's `actual.py` compared the in-process lines unfiltered against the
+  filtered log, so the model's own `[run_mesa] timeline` line failed its identity assertion in every MPB run (the
+  same prefixes are now set aside on both sides); a stray indentation in `mesa_sim/list_scenarios.py`.
+- Stage 7 (this commit): this block; the docs (`docs/assumptions.md` 1.4, 5.4 and 6; `shared/io_contracts.md`
+  `BeliefState`, the constructor, `update()`, the companion class; `docs/recognizer_handback.md` §1.2, §1.6, §1.7 and
+  §2; the glossary's BUILT lines in §5 and at θ, switch_on, setup and scenario; CLAUDE.md's options, greps and state;
+  the roadmap; TODO-66 and TODO-139 closed; `docs/handoffs/T-G_forward_inputs.md` 5.5 to 5.7); the final regeneration
+  of the four maintained sets, kitting's IRB, round 1 and the MPB in the repository at the stage 6 commit, with new
+  README sections (md5s; every named line since B2) in the four sets and round 1.
+- What the build did not exercise: no setup or scenario states a timeline and no run with context knowledge on is read,
+  so no run of the build exercises a raised strength or the gate under the new prior; the unit tests against the
+  method document cover the arithmetic until the windows are authored (AM49, D8). dock_loading's IRB and MPB sets stay
+  stale (AM57).
+- For the authoring of the windows (step 4): the foreseeable tasks' start and completion ticks in round 1's README
+  stand, confirmed from stage 6's rerun with context knowledge on (31 of 31 trajectories equal in those columns); the
+  recency fact of each coffee_break first holds on the README's completion tick and holds for 90 ticks in all 17
+  coffee_break scripts.

@@ -68,6 +68,8 @@ unchanged.
 AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): the re-entry share (1/|H|, the incumbents sharing the rest)
 is a share of the evidence, not of the belief; the belief is prior × evidence, normalised. The rule's content does not
 change. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
+BUILT (T-K part 1's build, 4 October 2026): `_equal_evidence`, `_initial_evidence` (renamed from `_prior`,
+`_initial_prior`).
 
 ### 1.2 Prior
 
@@ -81,6 +83,14 @@ belief is normalise(prior × evidence), the prior computed at each run from the 
 the live foreseeable tasks (each divided among its live hypotheses) and the equal division of work as a whole (R2 to
 R4, AM2, AM3). With context knowledge off the prior is equal over the live hypotheses, as here.
 design_decisions.md, "T-K: context knowledge in the recognizer's belief".
+BUILT (T-K part 1's build, 4 October 2026; design_records.md, "T-K", THE BUILD; the statement of the prior and worked
+examples in `docs/context_knowledge_method.md`): the prior's weights are computed on every tick (`_prior_weights`,
+the pure function `context_prior`): the live work hypotheses share 1 equally; each foreseeable task's live hypotheses
+share its strength, selected per task by the declared context knowledge (`ContextKnowledge.level`: the suppressing
+condition first, then the raising, else ordinary) from the tick's facts (the timeline facts and the object states in the
+world state, the recency facts from the mind's memory of observed completions, passed to `update(recent=...)`). With
+context knowledge off every weight is exactly 1.0 (P1), so the belief is the normalised evidence bit for bit.
+`BeliefState.prior` and `.levels` report them; `[IR-context]` prints them per tick.
 
 ### 1.3 Phase: the expected action
 
@@ -220,6 +230,7 @@ microaction is read. A terminal `place` inside a decomposition (the return of `d
 AMENDED (T-K part 1, AM1, Hadi, 3 October 2026; not built): "every live base becomes the uniform prior" and "this tick
 already reports the prior" describe the evidence: at a boundary the evidence restarts equal over the live hypotheses,
 and the belief is prior × evidence, normalised (R2). The rule's content does not change. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R2, AM1.
+BUILT (T-K part 1's build, 4 October 2026): as stated; the log line's wording is unchanged.
 
 ### 1.7 Output
 
@@ -236,7 +247,12 @@ pinned\ keys\ (inadmissible \cup completed) = \mathrm{BELIEF\_FLOOR};\quad live\
 $$
 
 `most_likely` is the argmax over H, and `confidence` is its value. Ties go to the first live key in sorted
-order. A lone live hypothesis reads 1.0 in the evidence and $1 - \mathrm{BELIEF\_FLOOR}\cdot|pinned|$ in the
+order.
+BUILT (T-K part 1's build, 4 October 2026; AM42, R2; design_records.md, "T-K", THE BUILD): ω is gone (TODO-66); in its
+place the prior's weights w (§1.2's BUILT line): B(k) = normalise(E(k) · w(k)) over H is the belief
+(`BeliefState.belief`), `most_likely` its argmax and `confidence` its value there, before the floor and the pins; P
+applies the floor and the pin scaling to B and is the reported `distribution` only (their removal there, TODO-178). A
+lone live hypothesis therefore reads `confidence` 1.0, while `[IR-dist]` still prints 1 − BELIEF_FLOOR·|pinned|. A lone live hypothesis reads 1.0 in the evidence and $1 - \mathrm{BELIEF\_FLOOR}\cdot|pinned|$ in the
 output (0.996 with four pins). The recognizer owns its evidence: `prev_belief` is accepted by `update()` and not
 consulted, because the reported distribution carries output-only factors.
 
@@ -509,6 +525,12 @@ LOAD-BEARING, NOT PARAMETERS:
   temperature ≥ 26.0, FATIGUE_BOOST 2.5 on `coffee_break` after a shift of ≥ 500 steps, on literal task names
   (TODO-66). Inert in every run: Mesa builds `ContextKnowledge.default()` (21.0 °C, shift from step 0) and no
   run reaches 500 steps.
+  REMOVED (T-K part 1's build, 4 October 2026; AM22, TODO-66 closed): the context weights and their four constants
+  are gone, and the recognizer names no task. In their place the declared context knowledge of the domain
+  (`ContextKnowledge`, built in the domain's registry: the strengths 0.005 suppressed, 0.02 ordinary, and per
+  foreseeable task its raised strength and conditions, AM37, AM38) and the recency durations (90 ticks for
+  coffee_break, 135 for office_break, declared in physical time and converted by the body, AM16). Nothing replaces the
+  long-shift rule (AM22). The run option `context_knowledge` (on by default) switches the prior; off, every weight is 1.
 
 ## 3. The guarantee statement (β = 0.01 /cm, θ = 0.75, T-D cycle 1.5b)
 

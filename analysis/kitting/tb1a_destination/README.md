@@ -788,3 +788,37 @@ Commands: `bash analysis/kitting/tb1a_destination/sweep.sh analysis/kitting/tb1a
 | env_layout_06_scenario_s03_06_off | 0077a977077dec87cf0c2fd6df46e36c | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
 | env_layout_07_scenario_s05_01_off | 8fb8e02355ebc63dc3f827d3c204aca2 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 58.31 (25) | 0 | 0 | 0 |
 | env_layout_07_scenario_s05_02_off | d518d7bdab535848613304a71cc77a4d | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 50.00 (57) | 0 | 0 | 0 |
+
+## The build of context knowledge, final (T-K part 1, build stage 7, 4 October 2026) — the logs from here on
+
+Regenerated at 766f7d3 (the build's stage 6; design_records.md, "T-K", THE BUILD, STAGES 3 TO 7), the run files and
+the sweep stating `context_knowledge: false` (stage 3). Named lines since B2 (the gate stage's section above), and nothing else (each log compared with B2 after setting
+them aside; 0 differ):
+- stage 3 (bbb7227): the `[run]` header gains `context_knowledge=off`;
+- stage 4a (f70f72f): a new line after the `[run_mesa]` start line, `[run_mesa] timeline source=none windows=[]` (no
+  setup or scenario states a timeline);
+- stage 4b (2393935): where an A/C activation runs, the action reads `switch_on` for `wait_at` in `[rec]`,
+  `[human]`, the human's step lines and the executor's `_load_plan` line (AM43);
+- stages 5 and 6 (e589731, 766f7d3): nothing (context knowledge off: every prior weight exactly 1, P1; no `[IR-context]` line).
+The `.rec` streams differ from the table above only where an A/C activation runs (`switch_on`). Completion ticks,
+the `[sep]` minima and F1's classes are the same as the table above in every log.
+Commands: `bash analysis/kitting/tb1a_destination/sweep.sh analysis/kitting/tb1a_destination/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_on | cf41fcf43e2c7397e85a86fec10b3aa4 | e75eaa192f7071498290d6255fc81320 | 174 | 45.74 (156) | 0 | 3 | 0 |
+| env_layout_02_scenario_s02_01_on | cbab9f0448e7046ef329084ee23c592f | e7b6f87c8caf8abd75112060de0d297e | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_on | bdc7a664bd97632ea627d9bc75b8861d | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_04_scenario_s01_06_on | fc259d96abdb3288fabb734aabb15e4f | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_on | 6461e25d53d93830c75857d8deaee92a | 5b5d7e333ea858a7d09a4d0a0fca2891 | 379 | 59.89 (338) | 0 | 0 | 0 |
+| env_layout_06_scenario_s03_06_on | 0931635057843f23b1a7009e42f54aa4 | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_on | ba1b15179dfc1ad36639a8a4a2dd46e0 | a3927888957766c7da70eea660062fd5 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_on | 18cf0b65afa7576a113fb968f3e471ba | a3927888957766c7da70eea660062fd5 | 214 | 50.00 (57) | 0 | 0 | 0 |
+| env_layout_01_scenario_s01_01_off | 76312f0e67549e0d9d8e60b7ceca75f2 | e75eaa192f7071498290d6255fc81320 | 199 | 72.61 (166) | 0 | 0 | 0 |
+| env_layout_02_scenario_s02_01_off | edc04f23c979654d52b7fa188cf29018 | e7b6f87c8caf8abd75112060de0d297e | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_off | ce4b01981202dadaffd5fec5b8c0b61f | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_04_scenario_s01_06_off | 53d4fc6a68a755787e8bcccf3430a148 | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_off | 7f417eef64aea4bcada6bbe919ab001e | 5b5d7e333ea858a7d09a4d0a0fca2891 | 392 | 64.96 (341) | 0 | 0 | 0 |
+| env_layout_06_scenario_s03_06_off | 1e640f5f953e49a7185e393e06bcfc68 | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_off | e00487f9706f711a493d2ab6b1b42486 | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_off | e0ced6fa3c51058ad99ba5dcae7d2634 | a3927888957766c7da70eea660062fd5 | 218 | 50.00 (57) | 0 | 0 | 0 |
