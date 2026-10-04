@@ -123,8 +123,12 @@ class BeliefState:
                   the retired and inadmissible hypotheses pinned at the floor
                   (the output convention, not belief mass). When EXHAUSTED it
                   holds the pins only and does not sum to 1.
-    most_likely   the argmax over H; None when EXHAUSTED.
-    confidence    the share of most_likely; 0.0 when EXHAUSTED.
+    belief        the belief over the live hypothesis set H (T-K part 1, AM42): the
+                  evidence × the prior, normalised over H, before the floor and
+                  the pin scaling; its keys are exactly H. Empty when EXHAUSTED.
+    most_likely   the argmax over H (of `belief`); None when EXHAUSTED.
+    confidence    the leader's belief over H, `belief[most_likely]` (AM42: the
+                  value the gate compares with theta); 0.0 when EXHAUSTED.
     finding       the adequacy finding; None exactly when EXHAUSTED.
     lifecycle     LIVE or EXHAUSTED.
     tails         the tail probability S_k of each member of the adequacy test
@@ -151,13 +155,14 @@ class BeliefState:
     agent_id: str
     distribution: Dict[str, float]  # {intention_id: probability}
     most_likely: Optional[str]  # intention_id with highest probability; None when exhausted
-    confidence: float  # the share of most_likely
+    confidence: float  # the leader's belief over H (AM42)
     finding: Optional[AdequacyFinding]
     lifecycle: RecognizerLifecycle
     tails: Dict[str, float]  # {intention_id: S_k}, members of the adequacy test only
     hypothesis_adequacy: Dict[str, HypothesisAdequacy]  # {intention_id: value}, every live hypothesis
     observation_warrant: Dict[str, ObservationWarrant]  # {intention_id: value}, every live hypothesis
     episode_boundary: bool  # the belief was re-initialised at an episode boundary on this tick
+    belief: Dict[str, float] = field(default_factory=dict)  # {intention_id: P} over exactly H (AM42); empty when exhausted
     # predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}  
                             # OUTDATED: current design uses ProjectedPlan for multi-step prediction; 
                             # this field is retained for backward compatibility but should not be used in new code.

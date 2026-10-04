@@ -90,7 +90,10 @@ def test_an_inapplicable_hypothesis_leaves_the_live_set_and_is_pinned(model, wor
         assert k not in b.tails and k not in b.hypothesis_adequacy and k not in b.observation_warrant
     # the pin, as for a retired hypothesis
     assert b.distribution[k3] == BELIEF_FLOOR and b.distribution[k4] == BELIEF_FLOOR
-    assert b.most_likely == k2 and math.isclose(b.confidence, 1.0 - 2 * BELIEF_FLOOR)
+    # the confidence is the belief over H (T-K part 1, AM42): 1.0 for the lone live hypothesis; the pins scale the
+    # reported distribution only
+    assert b.most_likely == k2 and b.confidence == 1.0
+    assert math.isclose(b.distribution[k2], 1.0 - 2 * BELIEF_FLOOR)
     check_r6(rec, b)
     # logged once per leaving, at the tick it leaves
     assert lines(caplog, "[IR-inapplicable]") == [

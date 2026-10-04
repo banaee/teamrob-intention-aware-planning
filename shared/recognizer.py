@@ -125,9 +125,12 @@ ALGORITHM:
     invariant holds at two levels: the normalised evidence sums to 1 over
     exactly H (before the floor); the returned distribution sums to 1 with the
     pinned keys at exactly BELIEF_FLOOR and the live keys carrying the rest.
-    When no hypothesis is live (lifecycle EXHAUSTED) the belief over H has no
-    members: the distribution holds the pins alone (the output convention, not
-    belief mass), most_likely is None and confidence 0.0.
+    Beside the reported distribution, BeliefState.belief is the belief over H
+    itself (before the floor and the pin scaling), and the leader's confidence
+    is its value there (T-K part 1, AM42): the value the gate compares with
+    theta. When no hypothesis is live (lifecycle EXHAUSTED) the belief over H
+    has no members: the distribution holds the pins alone (the output
+    convention, not belief mass), most_likely is None and confidence 0.0.
 
     Adequacy (T-D E1 to E9, G1): the recognizer's second output, independent
     of the belief, over the same statistic. Per live hypothesis, per DERIVED
@@ -209,7 +212,8 @@ INPUTS:
     - assigned_tasks:   observed agent's assigned tasks (None/empty → restriction is off)
 
 OUTPUTS:
-    - BeliefState: distribution, most_likely, confidence (the belief over H);
+    - BeliefState: distribution (the reported distribution), belief (the
+      belief over H), most_likely, confidence (the leader's belief over H);
       finding, lifecycle, tails, hypothesis_adequacy (the adequacy finding,
       the lifecycle state, the members' tail probabilities, every live
       hypothesis's hypothesis adequacy); observation_warrant (every live
@@ -870,13 +874,15 @@ class IntentionRecognizer:
                          "prior over %d hypotheses, origins reset",
                          int(obs.timestamp), agent, self._action_label(completed_terminal), len(self._origin))
 
+        belief = self._belief()
         distribution = self._output(obs, world)
-        if self._evidence:
-            # The argmax over H, in the distribution's order (the live keys
-            # first, in hypothesis order: the tie-break as before).
-            most_likely = max((k for k in distribution if k in self._evidence),
-                              key=lambda k: distribution[k])
-            confidence = distribution[most_likely]
+        if belief:
+            # The argmax over H, in hypothesis order (the tie-break as before:
+            # the live keys come first in the distribution, in the same order).
+            # The leader's value is its belief over H, before the floor and the
+            # pin scaling (T-K part 1, AM42): the value the gate reads.
+            most_likely = max(belief, key=belief.get)
+            confidence = belief[most_likely]
         else:
             # Exhausted: the belief over H has no members; the pins are the
             # output convention, not belief mass (T-D R4).
@@ -896,6 +902,7 @@ class IntentionRecognizer:
             hypothesis_adequacy=hypothesis_adequacy,
             observation_warrant=observation_warrant,
             episode_boundary=boundary,
+            belief=belief,
         )
 
     # -------------------------------------------------------------------------
@@ -1156,11 +1163,23 @@ class IntentionRecognizer:
                 walked, origin, pos, target_pos, self._path_cost)
         return memo[memo_key]
 
+    def _belief(self) -> Dict[str, float]:
+        """
+        The belief over the live hypothesis set H (T-K part 1, AM42): the
+        evidence normalised over H, in hypothesis order; its keys are exactly H.
+        The value the leader's `confidence` reports and the gate compares with
+        theta. The floor and the pin scaling belong to the reported
+        distribution only (_output, _finalize): the number of hypotheses that
+        are not live says nothing about the observed agent's intention.
+        """
+        return dict(self._evidence)
+
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
-        The belief reported this tick: evidence × ω_context, with the
+        The distribution reported this tick: evidence × ω_context, with the
         inadmissible, the retired and the inapplicable hypotheses pinned at
         BELIEF_FLOOR and the floor applied. State factors only — nothing here is fed back.
+        Not the value the gate reads since AM42 (_belief).
         """
         unnorm: Dict[str, float] = {}
         for key, p in self._evidence.items():

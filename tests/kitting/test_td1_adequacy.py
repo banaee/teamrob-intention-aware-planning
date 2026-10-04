@@ -339,11 +339,13 @@ def test_the_finding_clears_at_a_boundary_then_exhausted(model):
     placed = world_with(placing, add=[pred("obj_at", "item_3", TABLE)], remove=[pred("holding", H, "item_3")])
     b = rec.update(obs(19, p), placed)
     assert b.finding is AdequacyFinding.UNRESOLVED and b.tails == {}
-    # a lone live hypothesis: 1.0 in the evidence over H; in the output, the rest of the
-    # mass beside the one pinned (retired) key (the two-level reading of R6)
+    # a lone live hypothesis: 1.0 in the evidence over H, and 1.0 as its confidence (the belief over H, T-K part 1,
+    # AM42); in the reported distribution, the rest of the mass beside the one pinned (retired) key (the two-level
+    # reading of R6)
     assert b.most_likely == repr(item("item_2"))
     assert rec._evidence == {repr(item("item_2")): 1.0}
-    assert math.isclose(b.confidence, 1.0 - BELIEF_FLOOR)
+    assert b.confidence == 1.0
+    assert math.isclose(b.distribution[b.most_likely], 1.0 - BELIEF_FLOOR)
     check_r6(rec, b)
     # item_2 delivered too: no hypothesis is live
     done = world_with(placed, add=[pred("obj_at", "item_2", TABLE)], remove=[pred("obj_at", "item_2", "shelf_2")])
