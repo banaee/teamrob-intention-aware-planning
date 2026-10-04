@@ -14,15 +14,18 @@ about: what the human produces. An abandoned delivery is in scope for what it do
   and what to do. You implement, check, commit, and report. Hadi reviews and pushes.
 - One task per session as a rule. A fresh session starts from what is committed, not from an
   earlier session's reading of it.
-- What a task states as decided is settled: do not explore alternatives to it. How to
-  implement, where things go, and how to structure outputs are yours.
+- What a task states as decided is settled until Hadi rules otherwise. How to implement, where things go,
+  and how to structure outputs are yours. (Hadi, 4 October 2026, replacing "do not explore alternatives to it" and the
+  rule of 3 October below:) ccode decides how the approved design is built. On what is built and why, ccode may propose alternatives and raise objections, with reasons. ccode does not resolve a design question. Hadi rules what is built and why. Reason: Hadi decides the design, and ccode
+  knows the code best, so its proposals and its doubts are wanted. The working rules of the design chat:
+  `docs/handoffs/T-G_forward_inputs.md`, its last section.
 - If a decided design turns out to be structurally or experimentally deadlocked when you apply
   it, stop and report. Do not work around it.
 - Rules Hadi set on 3 October 2026 (also `docs/handoffs/T-G_forward_inputs.md`, section 11):
   - Durations are shown in ticks, not in seconds or minutes.
   - A prompt for ccode states what is decided, its purpose and why it was ruled; which files and names are affected
-    and how ccode checks its work are ccode's. No micro-level instructions. ccode stays the worker: the decisions are
-    fixed, and it is not asked for alternatives or opinions on them; it flags what the code contradicts.
+    and how ccode checks its work are ccode's. No micro-level instructions. (The sentence on ccode as the worker who is
+    not asked for alternatives is replaced by Hadi's wording of 4 October 2026 above.)
   - One ccode session, one concern. A follow-up goes to the session it belongs to.
   - Once a plan with numbered steps is agreed, replies keep those step numbers.
   - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.

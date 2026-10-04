@@ -3030,7 +3030,7 @@ recorded as stated in the plan's section 11.
 
 THE CROSS-CHECK'S CONSEQUENCES, RULED (Hadi, 4 October 2026, on the plan's section 11, X11 to X14, and on ccode's
 judgement of X3; recorded the same day). Records and the plan only; nothing is built. X11 is AM59, X12 AM60, X13 AM61,
-X14 AM62, X3's acceptance AM63.
+X14 AM62, X3's acceptance AM63; AM64, on ccode's flag on AM61, below.
 
 - AM59, the old data (X11). Before the gate's stage replaces the outputs of the three kitting sets (round 1, the IRB,
   the MPB), their untracked data (per-tick data and figures) are copied outside the repository: one external copy;
@@ -3048,6 +3048,11 @@ X14 AM62, X3's acceptance AM63.
 
 - AM63, the label of the episode boundary for a switch_on (X3). Accepted as ccode reported it (AM56): the label stays
   deferred (TODO-179); the tick of the episode boundary is not changed.
+
+- AM64, the stop conditions of the gate's stage, confirmed (Hadi, 4 October 2026, on ccode's flag). AM61 adds
+  specificity to AM57 and does not replace it. Three conditions stop the build in the planning set: a declared
+  property no longer holds; the run disagrees with the independent computation; a scenario no longer reaches its
+  authored coverage case.
 
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the

@@ -5381,7 +5381,7 @@ AM38 under AM17, THE STRENGTHS REVISED (what becomes stale, the open item on the
 threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and KT14, after KT12. Amended 4 October 2026
 (AM42 to AM53): THE BUILD'S PLAN, RULED (AM43, AM45, AM48, AM49, AM51, AM53; P1 to P5 accepted). Amended 4 October
 2026 (AM54 to AM58): THE CROSS-CHECK, RULED (AM55 to AM58). Amended 4 October 2026
-(AM59 to AM63): THE CROSS-CHECK'S CONSEQUENCES, RULED.
+(AM59 to AM64): THE CROSS-CHECK'S CONSEQUENCES, RULED.
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one

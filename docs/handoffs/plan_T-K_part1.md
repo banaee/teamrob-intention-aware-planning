@@ -393,7 +393,7 @@ since", which the final README sections state.
    variants as its README states, the prior-off appendix included as a diagnostic): the IRB sets and the MPB's parts 1
    to 3 agree with the oracle (0 disagreements at 1e-9), every declared property of the MPB's part 4 holds, and every
    scenario of the coverage matrix still reaches its authored case. A disagreement, a declared property that no
-   longer holds, or a scenario that no longer reaches its case stops the build (AM57, AM61): its cause is examined and
+   longer holds, or a scenario that no longer reaches its case stops the build (AM57, AM61, confirmed as three by AM64): its cause is examined and
    reported; no ruling and no scenario is changed for it. The run without assignment knowledge is a diagnostic: its
    changes are listed and never stop (AM62). 2c, its own commit: B2 recorded, a new README section in
    each maintained set (md5s, the lines that moved and why); in round 1's, the IRB's and the MPB's README a section

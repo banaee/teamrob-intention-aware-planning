@@ -222,8 +222,8 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 ### 5.1 Where it is recorded
 
 - docs/design_decisions.md, the entry "T-K: context knowledge in the recognizer's belief": the conceptual part. R1 to
-  R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM63 (the amendments, each under the ruling it amends, the
-  record parts in design_records.md; AM40 to AM63 are of 4 October 2026: the timeline, the plan, the cross-check), the
+  R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM64 (the amendments, each under the ruling it amends, the
+  record parts in design_records.md; AM40 to AM64 are of 4 October 2026: the timeline, the plan, the cross-check), the
   corrections C1, C3 and C4. AM1 to AM9 come from the review of the records; AM10 to AM29 from content points 1 and 2
   (the block CONTENT POINTS 1 AND 2, after R8; that chat's A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29);
   AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11); a CLARIFIED line under
@@ -497,7 +497,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 3. The build (BUILD DISCIPLINE, step 2), stage by stage as the plan states, each stage checked before the next. The
    first act of the next design chat is its prompt (the state above). The gate's stage is committed only after its
    checks pass; it stops on a disagreement with the oracle, on a declared property of the planning set that no longer
-   holds, or on a scenario that no longer reaches its authored coverage case; a stop means its cause is examined, not
+   holds, or on a scenario that no longer reaches its authored coverage case (three conditions, AM57 with AM61, as
+   Hadi confirmed on 4 October 2026); a stop means its cause is examined, not
    that the ruling on the gate is rejected. The run without assignment knowledge is a diagnostic and never stops the
    build. [ruled]
 4. The timelines and the runs with context knowledge on. [ruled unless marked]
@@ -506,7 +507,7 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    - The windows are authored only after ccode supplies the start and completion ticks of the foreseeable tasks in the
      existing scripts. A case that no existing script covers needs a new script. (ccode, a fact: round 1's README
      already lists these ticks for its 31 scripts; the robot is idle there, so the gate's change does not move the
-     human's ticks; ccode confirms them after the build's rerun.)
+     human's ticks; ccode confirms them after the build's rerun, as Hadi accepted on 4 October 2026.)
    - The design chat restates the expected directions before the runs: context knowledge off against on, each case
      labelled by the state the script meets (KT14), with the revised strengths (5.2).
    - To add to them, as Hadi ruled (KT11's RULED line): with no raising fact holding, a lone live assigned task is
@@ -522,8 +523,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 5. The planning cases, with a working robot. KT3 rules two: a coffee break inside the break time, and deliveries
    through the whole break time (env_layout_17 serves; the robot must not hold the items of the two shelves beside
    the A/C switch). Hadi wants a recommendation on one case for the early admission and its retraction, since it is
-   the consequence of the new prior that reaches planning most directly. [open] (ccode, a flag: whether this case is
-   a third planning case or takes the place of one of KT3's two is not stated.)
+   the consequence of the new prior that reaches planning most directly. [open] (Whether this case is a third
+   planning case or takes the place of one of KT3's two stays open for this step; Hadi, 4 October 2026.)
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]
@@ -825,8 +826,9 @@ injected at run time; one further test track on adaptation under conflict. T-K p
 - Rules Hadi set on 3 October 2026 (also in CLAUDE.md, "How sessions work"):
   - Durations are shown in ticks, not in seconds or minutes.
   - A prompt for ccode states what is decided, its purpose and why it was ruled, and leaves to ccode which files and
-    names are affected and how it checks its work. No micro-level instructions. ccode stays the worker: the decisions
-    are fixed, and it is not asked for alternatives or opinions on them; it flags what the code contradicts.
+    names are affected and how it checks its work. No micro-level instructions. SUPERSEDED IN PART (Hadi, 4 October
+    2026; ccode's part, above): "ccode stays the worker: the decisions are fixed, and it is not asked for alternatives
+    or opinions on them; it flags what the code contradicts" is replaced by ccode's part.
   - One ccode session, one concern. A follow-up goes to the session it belongs to.
   - Once a plan with numbered steps is agreed, replies keep those step numbers.
   - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.
@@ -840,10 +842,11 @@ injected at run time; one further test track on adaptation under conflict. T-K p
   - One ccode prompt per reply. The next prompt comes after the report of the previous one is reviewed and closed.
   - A ccode prompt states what is ruled and why as the fixed part, and invites ccode to check consequences, to
     cross-check, and to propose better ways. It lists no files and no sections.
-    FLAGGED by ccode (4 October 2026), not resolved: the rule of 3 October 2026 below (also CLAUDE.md, "How sessions
-    work") says that ccode "is not asked for alternatives or opinions on" the decisions. This rule asks ccode to propose
-    better ways. One reading that reconciles them: a proposal that changes a ruled decision is put to Hadi as a
-    proposal, with its alternatives, and the ruled part stays fixed until Hadi rules. Hadi rules which wording stands.
+  - ccode's part (Hadi, 4 October 2026; one wording replaces the rule of 3 October 2026 that ccode "is not asked for
+    alternatives or opinions" and the invitation above to "propose better ways"): ccode decides how the approved design
+    is built. On what is built and why, ccode may propose alternatives and raise objections, with reasons. ccode does
+    not resolve a design question. Hadi rules what is built and why. Reason: Hadi decides the design, and ccode knows
+    the code best, so its proposals and its doubts are wanted. (Also in CLAUDE.md, "How sessions work".)
   - The design chat states a fact about the repo only with the material in front of it, and says so when it has none.
   - The design is revised on arguments, never on a run's result. A surprising result is a finding to examine.
 - Rule Hadi set on 4 October 2026 (also in CLAUDE.md, "Where to look"): a ruling that changes the method of context
