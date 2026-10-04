@@ -464,6 +464,11 @@ Decisions
   part 2), the form for "not". Open for the build's plan: which value the gate compares with θ. The statement of the
   prior: `docs/context_knowledge_method.md` (the rule in "Where to look"). Nothing built. Next: unchanged (KT12's steps,
   from `docs/handoffs/T-G_forward_inputs.md`, section 5).
+  Step 1 of T-K part 1 is DONE (Hadi's ruling of 4 October 2026 on AM19; design_records.md, "T-K", STEP 1; 32029d3,
+  098b1a8, 35c9db8): env_layout_05 keeps one A/C switch, ac_switch_1, and scenario_s04_01 one ac_activation; every
+  layout of both domains holds at most one A/C switch; tb1a's two s04_01 logs regenerated, every other maintained
+  baseline byte-identical; 14 early frozen analyses deleted (analysis/README.md). Next: the plan for the build of
+  context knowledge (BUILD DISCIPLINE, step 1), after one design question that the design chat puts to Hadi first.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

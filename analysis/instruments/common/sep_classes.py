@@ -9,7 +9,8 @@ analysis/tb1a_destination/sep_classes.py and the parser analysis/logparse.py); n
   release on a tick the robot has a task counts: after the pool empties the robot's per-tick line keeps its last
   action and micro (`task=None action=place micro=release`), which is no release.
 - The [sep] minimum: of the tick-sampled `dist` and of the continuous `min` (TODO-79).
-- F1's classes (analysis/f1_robot_responsible/evaluate.py, `rule`, copied here because that script runs at import),
+- F1's classes (F1's `rule`, copied here from its evaluate.py, which ran at import; that folder was deleted on
+  4 October 2026 and is last held by 32029d3, analysis/kitting/f1_robot_responsible/),
   over the ticks whose continuous minimum lies below min_separation (read from the [run] header): "viol" when the
   robot moved during the tick and the continuous minimum lies below both min_separation and the tick's starting
   distance; "stand" when the robot did not move; "recede" when it moved with the distance increasing throughout.

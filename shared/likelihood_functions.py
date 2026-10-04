@@ -56,7 +56,8 @@ THE EVIDENCE MODEL (I4):
     mesa_configs.yaml), as it supplies min_separation to the MetaPlanner
     (T-A1; TODO-58). One fixed value per embodiment, decided on IR grounds, not
     per layout. The fractional form (excess as a fraction of C(origin, g)) was
-    measured against it in the I4 sweep — see analysis/i4_evidence_model/REPORT.md.
+    measured against it in the I4 sweep (its report was deleted with its folder on 4 October 2026;
+    last held by 32029d3, analysis/kitting/i4_evidence_model/REPORT.md).
 
     PERFECT_FIT_LIKELIHOOD — the value at zero excess, 1.0: the multiplicative
     identity, so that a phase with no wasted path folds NOTHING into the

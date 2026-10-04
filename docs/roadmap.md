@@ -880,6 +880,11 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     (AM37, AM38). The reading of a strength stated per value, still proposed (AM39). The expected directions with
     context knowledge on are restated by the design chat before those runs. Open for the build's plan: which value the
     gate compares with θ. The statement of the prior: `docs/context_knowledge_method.md`. Nothing built. Next: unchanged.
+    STEP 1 DONE (Hadi's ruling of 4 October 2026 on AM19; design_records.md, "T-K", STEP 1; 32029d3, 098b1a8, 35c9db8):
+    env_layout_05 keeps one A/C switch, ac_switch_1, and scenario_s04_01 one ac_activation; every layout of both domains
+    holds at most one A/C switch; the maintained baselines regenerated for s04_01 alone; 14 early frozen analyses
+    deleted. Next: the plan for the build of context knowledge, after one design question that the design chat puts to
+    Hadi first.
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing

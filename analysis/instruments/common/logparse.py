@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-logparse.py — the run-log parser the analysis scripts share: C's evaluate.py and blocked.py
-(analysis/c_separation_stop/), F1's evaluate.py (analysis/f1_robot_responsible/) and T6's metrics.py
-(analysis/t6_ablation/). They held copies of one parser; this is the one.
+logparse.py — the run-log parser the analysis scripts share (sep_classes.py, separation.py, the MPB's measures.py).
+It began as the one parser behind the copies in C's, F1's and T6's scripts (evaluate.py, blocked.py, metrics.py; their
+folders were deleted on 4 October 2026 and are last held by 32029d3).
 
-parse(path) reads a headless run log in one pass and returns every field any of those scripts uses;
+parse(path) reads a headless run log in one pass and returns every field any of its readers uses;
 each script takes what it needs. The measures more than one script computes the same way on a parsed
 run (episodes, the decision in effect, the sequential-motion check of the F1 rule) are here too; the
 script-specific ones (window labels, outcomes, the stand-within split) stay in the scripts.
