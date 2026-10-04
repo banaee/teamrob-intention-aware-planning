@@ -961,3 +961,70 @@ e478e3955464c5da8e4483fb6a58801a  runs/env_layout_17_scenario_s15_18_on.rec
 d845aa4ac311b344cdaed07c5c3ea626  off/runs/env_layout_15_scenario_s13_15_on.rec
 018c8fdb1002afd33140d34a41cf6976  off/runs/env_layout_17_scenario_s15_21_on.rec
 ```
+
+## Step 5d: the expectations after the gate change (5 October 2026, committed before the runs)
+
+The oracle after the gate's build (8357b74: the rank column, D3; observation warrant at admission, AM67;
+none(leader_outranked) last, AM68 and D1) recomputes every table; the trajectories are byte-identical to stage 1's
+(the human's script is open-loop). Commands as above, with --expect. The runs follow in the next commit; the reading:
+analysis/kitting/mpb/tk5b/COMPARISON_5d.md.
+
+    b38f1255fee1d911866cc68242436c49  off/scenario_s13_15/expected.csv
+    0510a802c36d152ba1da9b534cd7e172  off/scenario_s15_21/expected.csv
+    ec675353cf8d6c058cfd3e443c385f72  scenario_s13_01/expected.csv
+    bed98ee107ef5b26f7d4e303b876488c  scenario_s13_02/expected.csv
+    3574539b0b250ce1fb93f8dd8c52e455  scenario_s13_03/expected.csv
+    1ec6dfc32eb2de72d1e6920d9be96e7b  scenario_s13_04/expected.csv
+    7b7d4e8265a4b17e6e07c3531e685db2  scenario_s13_05/expected.csv
+    6e380a5416b96a393faacda1d8c96126  scenario_s13_06/expected.csv
+    900a1e59e75e1b6cae3453962288dde0  scenario_s13_07/expected.csv
+    83709aa5013b26073f63a8692eac2d7e  scenario_s13_08/expected.csv
+    c75ff9cb68604032a66d96bc5f93a3ba  scenario_s13_09/expected.csv
+    6bc77e038b64206a19ed1cdc3eada044  scenario_s13_10/expected.csv
+    bfa30198ce148930d7455c8f332857a0  scenario_s13_11/expected.csv
+    ffee99ce2125674ae5d140848ebefdf4  scenario_s13_12/expected.csv
+    35eda0cdfacf251bd09d1a0b5a548890  scenario_s13_13/expected.csv
+    277f41096d228399c378e3417bc0e544  scenario_s13_14/expected.csv
+    6c7993edeedcb980effe6d3c4cb2bc18  scenario_s13_15/expected.csv
+    551fb8c4a1d31b4936f052f09d752bce  scenario_s14_01/expected.csv
+    4d944d1d67f38c716458e00d6c64e345  scenario_s14_02/expected.csv
+    61b54072f121b109707d2d5de39a0849  scenario_s14_03/expected.csv
+    90ac72af11d432007b15d3ec5e1c20d4  scenario_s14_04/expected.csv
+    299f6c45c518291c428b4ed667a08c79  scenario_s14_05/expected.csv
+    107fffe1f43bcf40e0c287b43d4d904a  scenario_s14_06/expected.csv
+    d24d25bd08da872d417d62af8147c1d0  scenario_s14_07/expected.csv
+    d9fb2b6318627f6dcaded59f3ed7981c  scenario_s14_08/expected.csv
+    aeb59f248d4b226998bf8537b3e83c9f  scenario_s14_09/expected.csv
+    48ae05f83292b75d1e10de23cab56cfe  scenario_s14_10/expected.csv
+    c5b615c778d94fcf1a43e49823b95503  scenario_s14_11/expected.csv
+    961dc01b11ad32a0f153992e330988a0  scenario_s14_12/expected.csv
+    eed7ce31bca85cef4387535cc199bc5f  scenario_s14_13/expected.csv
+    664837eadd23665622ef479a69881f04  scenario_s14_14/expected.csv
+    87783651ee07d200d792ad9dcd39ab6a  scenario_s14_15/expected.csv
+    0c6d1da8012f50872f1c459843eb5f0b  scenario_s14_16/expected.csv
+    0b5afbb340728fbb732663e1943f5ec0  scenario_s14_17/expected.csv
+    ab80389fbb08963b51885a388f06d495  scenario_s14_18/expected.csv
+    be30a70b602fd41ab0c97eadc8da7ea3  scenario_s14_19/expected.csv
+    3ae8a46789e7f4477ac25de5f826c84f  scenario_s14_20/expected.csv
+    1f41e0eb969edf7e1324f3c22cc7d63a  scenario_s14_21/expected.csv
+    e5468f80ae42179af51b829cb2fadef2  scenario_s15_01/expected.csv
+    b2760a333aea432c7fd55168d030c6c9  scenario_s15_02/expected.csv
+    e0a89aa41f122b70950b81092cacb667  scenario_s15_03/expected.csv
+    0f9de6f9df80967d52344d912ecdd583  scenario_s15_04/expected.csv
+    7e7aad0b03cf827c13ecfb120d6bdfa3  scenario_s15_05/expected.csv
+    7b4bcad5862310e81ae3d25b02d3b5c5  scenario_s15_06/expected.csv
+    3d930c07df815a43562c397862e51bb7  scenario_s15_07/expected.csv
+    d2bd699584c1875c72670ad4f3d0b85c  scenario_s15_08/expected.csv
+    8b4549220f328144006d725881ffe7fa  scenario_s15_09/expected.csv
+    14d5f584fc6af9880a4655b3d2abdf79  scenario_s15_10/expected.csv
+    666d0f1f34a0011c1486a44a6f468155  scenario_s15_11/expected.csv
+    ff37cd5c07447f0284fd2096d27bbd41  scenario_s15_12/expected.csv
+    9a3c9f9fafe72b859526716a32b1e3fd  scenario_s15_13/expected.csv
+    4a21d6a987dd81e2fd183d438fe6eec7  scenario_s15_14/expected.csv
+    7eada06fe56192b43c6058b43caa9792  scenario_s15_15/expected.csv
+    fe9b3e7c78b488e7ec026e94c6e41150  scenario_s15_16/expected.csv
+    f034b9f365f2daffb071bb378d389cde  scenario_s15_17/expected.csv
+    5c90a98673e95c2b5e80b65fef6e1373  scenario_s15_18/expected.csv
+    bbed690df7fb3135285679e63ba6e7df  scenario_s15_19/expected.csv
+    625fb17d60727f616a4c165c84ac4995  scenario_s15_20/expected.csv
+    d7e95905606fce287acb7dade9de5d54  scenario_s15_21/expected.csv

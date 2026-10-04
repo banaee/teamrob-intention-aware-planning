@@ -175,3 +175,27 @@ md5s of the expectations (`expected_ticks.json` and the `trajectory.json` it is 
     955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_on_single_task.rec
     fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_on_single_task.rec
     eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_single_task.rec
+
+## Step 5d: the expectations after the gate change (5 October 2026, committed before the runs)
+
+The oracle after the gate's build (8357b74: the rank column, D3; observation warrant at admission, AM67;
+none(leader_outranked) last, AM68 and D1) recomputes every table; the trajectories are byte-identical to stage 1's
+(the human's script is open-loop). Commands as above, with --expect. The runs follow in the next commit; the reading:
+analysis/kitting/mpb/tk5b/COMPARISON_5d.md.
+
+    5b127dc0f5302f61b3c692a09877f9e5  scenario_s10_01/on_single_task/expected_ticks.json
+    7e7be5b6ff6d7a44d77f43ecc7188b5f  scenario_s10_02/on_single_task/expected_ticks.json
+    50baface73319785852ee0970bda5009  scenario_s10_03/on_single_task/expected_ticks.json
+    bfea022095138c1610f091ce8ad0e2d5  scenario_s10_04/on_single_task/expected_ticks.json
+    659b17abb4f18336802911dda3a62b1d  scenario_s10_05/on_single_task/expected_ticks.json
+    9e231e67d2baf73719ba383c6ff90549  scenario_s10_06/on_single_task/expected_ticks.json
+    55b52f47b775320f180c3c756b798094  scenario_s10_07/on_single_task/expected_ticks.json
+    c99091edf47816057915a323f221579a  scenario_s10_08/on_single_task/expected_ticks.json
+    400313fd769aad4f225d0c633b41ed90  scenario_s10_09/on_single_task/expected_ticks.json
+    da95b19f6274b7715992ae5da6859418  scenario_s10_10/on_single_task/expected_ticks.json
+    75573736760d725700582947ebc0a9d6  scenario_s10_11/on_single_task/expected_ticks.json
+    4fbe1f2fae229f88f96a7139b6662db6  scenario_s11_01/on_single_task/expected_ticks.json
+    3af6a2c30ea651ee82aeb5af38300a8d  scenario_s11_02/on_single_task/expected_ticks.json
+    6504633b3da03ae3fcdc2188511eca80  scenario_s11_03/on_single_task/expected_ticks.json
+    ec5e17408f819d7012f3f6c8bb9f38d3  scenario_s12_01/on_single_task/expected_ticks.json
+    eef81536cb4f37cbd2e08c2dd63becd6  scenario_s12_02/on_single_task/expected_ticks.json

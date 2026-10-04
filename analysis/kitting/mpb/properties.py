@@ -87,6 +87,17 @@ the continuous [sep] minimum under min_separation; a violation is F1's (a moving
   in the walk's window.
 - scenario_s16_06, on (the A/C raised): PK5rw, no admitted projection before 47, a positive hold at 14 on a fallback,
   and no violation in the walk's window.
+SUPERSEDED (step 5d, 5 October 2026; the plan of the gate's build, D5 (a); docs/handoffs/plan_T-K_gate.md, section 4):
+PK4a, PK4b, PK4c, PK4e, PK1b, PK5a and PK5b above, whose premise, the early admission against the context at 0, the
+gate's rulings (AM67, AM68) remove. Re-declared before step 5d's runs, from the updated oracle's tables (what the
+rulings determine: the gate's answers and the admission ticks); the separation in the stand's and the walk's windows
+is a measure of step 5d's report, not a property (PK4c and PK5b have no successor):
+- scenario_s16_03, on (case 4): PK4a.r, the decision at 0 refuses with none(leader_outranked) and rests on a fallback,
+  and no admitted projection before 55; PK4b.r, no decision with cause retraction before 55; PK4e.r,
+  deliver_item(item_4) admitted at 74 and no decision after 72 rests on a fallback stand.
+- scenario_s16_04, on (case 1): PK1b.r, as PK4e.r.
+- scenario_s16_05, on (case 5): PK5a.r, the decision at 0 refuses with none(leader_outranked) and rests on a fallback,
+  and the first admission is deliver_item(item_4) at 48 (entered).
 """
 import json
 import math
@@ -100,7 +111,7 @@ sys.path[:0] = [str(HERE), str(ROOT), str(ROOT / "analysis" / "instruments" / "c
 
 from domains.kitting.registry import domain_config
 from measures import Part4, arrival, main, position_before, x5_ground1
-from mpblib import Trigger
+from mpblib import Gate, Trigger
 from sep_classes import rule
 
 # The control scenarios: run.sh runs the reference (reference.py) for each (MPB-2, scenario 8).
@@ -171,23 +182,27 @@ def _tk5(p4, sid):
         p4.prop("PK1off.stale", y is not None and y.admitted is None and y.fallback is not None
                 and y.fallback.mode.value == "standing" and hold(72) > 0 and z is not None and z.tick == 97,
                 f"{desc(y)}; first item_4 admission: {desc(z)}")
+    def refused_outranked(t):
+        # step 5d's re-declaration (D5): the decision at t refuses with none(leader_outranked), on a fallback
+        x = at(t)
+        return x is not None and x.gate is Gate.LEADER_OUTRANKED and x.admitted is None and x.fallback is not None
     if sid == "scenario_s16_03" and ctx:
-        early = [x for x in decisions if x.tick <= 42]
-        p4.prop("PK4a", [x.tick for x in early] == [0] and adm(early[0]) == "deliver_item(item_4)" and hold(0) == 0,
-                "; ".join(desc(x) for x in early))
-        x = at(43)
-        p4.prop("PK4b", x is not None and x.cause is not None and x.cause.value == "retraction" and x.admitted is None
-                and x.fallback is not None and x.fallback.mode.value == "standing" and hold(43) > 0, desc(x))
+        first = next((x for x in decisions if x.admitted), None)
+        p4.prop("PK4a.r", refused_outranked(0) and first is not None and first.tick >= 55,
+                f"{desc(at(0))} gate {at(0) and at(0).gate.value}; first admission: {desc(first)}")
+        r = [x.tick for x in decisions if x.tick < 55 and x.cause is not None and x.cause.value == "retraction"]
+        p4.prop("PK4b.r", not r, f"retraction decisions before 55: {r}")
         x = next((x for x in decisions if x.tick > 43 and x.admitted), None)
         p4.prop("PK4d", x is not None and x.tick == 55 and adm(x) == "coffee_break", f"next admission: {desc(x)}")
     if sid in ("scenario_s16_03", "scenario_s16_04") and ctx:
         z = next((x for x in decisions if x.tick > 72 and adm(x) == "deliver_item(item_4)"), None)
         stale = [x.tick for x in decisions if x.tick > 72 and x.admitted is None and x.fallback is not None
                  and x.fallback.mode.value == "standing"]
-        p4.prop("PK4e" if sid.endswith("3") else "PK1b", z is not None and z.tick == 73 and not stale,
+        p4.prop("PK4e.r" if sid.endswith("3") else "PK1b.r", z is not None and z.tick == 74 and not stale,
                 f"item_4 after the break: {desc(z)}; decisions on a fallback stand after 72: {stale}")
+    if sid == "scenario_s16_04" and ctx:
         v = p4.violations(38, 75)
-        p4.prop("PK4c" if sid.endswith("3") else "PK1c", not v, f"violations in 38 to 75: {v}")
+        p4.prop("PK1c", not v, f"violations in 38 to 75: {v}")
     if sid == "scenario_s16_04":
         x = at(22)
         p4.prop("PK1a", fb_ticks(22) == [0, 2, 6, 14] and x is not None and adm(x) == "coffee_break"
@@ -198,11 +213,10 @@ def _tk5(p4, sid):
         p4.prop("PK5off", x is not None and x.admitted is None and hold(14) > 0 and not v,
                 f"{desc(x)}; violations in 15 to 35: {v}")
     if sid == "scenario_s16_05" and ctx:
-        early = [x for x in decisions if x.tick <= 45]
-        p4.prop("PK5a", [x.tick for x in early] == [0] and adm(early[0]) == "deliver_item(item_4)" and hold(0) == 0,
-                "; ".join(desc(x) for x in early))
-        v = p4.violations(15, 35)
-        p4.prop("PK5b", bool(v), f"violations in 15 to 35: {v}; below {below(15, 35)}")
+        first = next((x for x in decisions if x.admitted), None)
+        p4.prop("PK5a.r", refused_outranked(0) and first is not None and first.tick == 48
+                and adm(first) == "deliver_item(item_4)" and first.cause is not None and first.cause.value == "entered",
+                f"{desc(at(0))} gate {at(0) and at(0).gate.value}; first admission: {desc(first)}")
     if sid == "scenario_s16_06":
         x, v = at(14), p4.violations(15, 35)
         first = next((x for x in decisions if x.admitted), None)

@@ -120,3 +120,26 @@ md5s of the expectations (committed before any run with context knowledge on; `e
     0322dfb2e9c441f47866ca3c374923c0  runs/env_layout_18_scenario_s16_06_reference_single_task.log
 
 Results: `REPORT.md`. 0 disagreements with the oracle in all nine; the expectations' md5s unchanged by the runs.
+
+## Step 5d: the expectations after the gate change (5 October 2026, committed before the runs)
+
+The oracle after the gate's build (8357b74: the rank column, D3; observation warrant at admission, AM67;
+none(leader_outranked) last, AM68 and D1) recomputes every table; the trajectories are byte-identical to stage 1's
+(the human's script is open-loop). Commands as above, with --expect. The runs follow in the next commit; the reading:
+analysis/kitting/mpb/tk5b/COMPARISON_5d.md. Step 5's properties moved by the rulings are re-declared in
+analysis/kitting/mpb/properties.py (D5 (a); the old ones kept in its docstring, marked superseded): PK4a.r, PK4b.r,
+PK4e.r (scenario_s16_03), PK1b.r (s16_04), PK5a.r (s16_05); PK4c and PK5b have no successor, the separation in their
+windows a measure. The expected chain (tk5.py expect) agrees with the plan's section 4: s16_03 on refused
+none(leader_outranked) at 0, coffee_break entered at 55, item_4 at 74; s16_04 coffee_break at 22, item_4 at 74;
+s16_05 refused none(leader_outranked) at 0, item_4 first admitted at 48; s16_06 item_4 at 48; s16_01 and s16_02
+unchanged (item_4 at 0 and 38). Off: s16_03 coffee_break 36, item_4 97; s16_05 item_4 63.
+
+    6d01fc6c5897726ada80d8f1e92ad066  off/scenario_s16_01/on_single_task/expected_ticks.json
+    a85612a49071befde40dbad7e36d5263  off/scenario_s16_03/on_single_task/expected_ticks.json
+    d78b9273888bd91c8089ef962904ac44  off/scenario_s16_05/on_single_task/expected_ticks.json
+    e45523c3f845dfb1c0f0b6d8f7f0a7b7  scenario_s16_01/on_single_task/expected_ticks.json
+    7518ff025ae3dfbe2d87c96f49c333d5  scenario_s16_02/on_single_task/expected_ticks.json
+    97b038557fa12240c294a05372a0021b  scenario_s16_03/on_single_task/expected_ticks.json
+    a5e0b6da5725137936ba0f7050714cac  scenario_s16_04/on_single_task/expected_ticks.json
+    c21d7ea06c28baf9182db64d53677823  scenario_s16_05/on_single_task/expected_ticks.json
+    237cbdf8442eac7dc2efe2259f802e47  scenario_s16_06/on_single_task/expected_ticks.json

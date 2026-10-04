@@ -303,3 +303,28 @@ md5s of the expectations (`expected.csv`, `phases.json`, and the `trajectory.jso
     9a4309d36ae6a47d9f1e36f512b711b2  runs/env_layout_11_scenario_s09_11_on.rec
     606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
     739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
+
+## Step 5d: the expectations after the gate change (5 October 2026, committed before the runs)
+
+The oracle after the gate's build (8357b74: the rank column, D3; observation warrant at admission, AM67;
+none(leader_outranked) last, AM68 and D1) recomputes every table; the trajectories are byte-identical to stage 1's
+(the human's script is open-loop). Commands as above, with --expect. The runs follow in the next commit; the reading:
+analysis/kitting/mpb/tk5b/COMPARISON_5d.md.
+
+    c19d18dcfeb119c25b2db3a72177ab0f  scenario_s08_01/expected.csv
+    bbc049cef29d1c93f2682b13a581ff59  scenario_s08_02/expected.csv
+    f5c1234c7998443a2c65dc784f7b0492  scenario_s08_03/expected.csv
+    1a0ca018c7af0d6af58d02ed6ee4e24f  scenario_s08_04/expected.csv
+    a0bc3a74418b17970021d4d441422562  scenario_s09_01/expected.csv
+    3dda9eb771790659415ffd583093947c  scenario_s09_02/expected.csv
+    82cf1d81bca7f162c86fbde192263a73  scenario_s09_03/expected.csv
+    f5a742798bb4fe7e87be1188c098d1e7  scenario_s09_04/expected.csv
+    7607c3d14deeebd26a0e51ab3a1e433f  scenario_s09_05/expected.csv
+    da4d2972b2aff94a15af8ba0a1c379fd  scenario_s09_06/expected.csv
+    56fb4eb7368da1376739cf5b38f97510  scenario_s09_07/expected.csv
+    059c5bdb5be616296d76d5c53545c37d  scenario_s09_08/expected.csv
+    d0f8a83ff0cf070089ac5cdd1937bf7d  scenario_s09_09/expected.csv
+    73f6d129e4bbe3ed9873e9d10573e5d0  scenario_s09_10/expected.csv
+    54e1d35c579952bb4e9a44dec00a3ac6  scenario_s09_11/expected.csv
+    faecab1a642a1393bb086fbada495709  scenario_s09_12/expected.csv
+    09e69dd416f8003fb13ff914e8ec40e6  scenario_s09_13/expected.csv
