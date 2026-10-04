@@ -1,11 +1,12 @@
 # T-K part 1: the plan of the build of context knowledge
 
-Written by ccode on 4 October 2026 (T-K part 1, step 2; BUILD DISCIPLINE, step 1: plan only, no code). For review by
-Hadi in the design chat. Nothing in it is built or approved. Once approved, every build session of T-K part 1 reads this
-file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
+Written by ccode on 4 October 2026 (T-K part 1, step 2; BUILD DISCIPLINE, step 1: plan only, no code; 41efa76).
+Amended the same day to Hadi's rulings on it: the decisions D1 to D10 and two additions of the review are AM42 to AM53
+(`docs/design_decisions.md` and `docs/design_records.md`, "T-K", THE BUILD'S PLAN, RULED); the proposals P1 to P5 are
+accepted. Nothing in it is built. Every build session of T-K part 1 reads this file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
 (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K").
-The rulings fix what and why; this file proposes how, the names and the build order. Where it proposes something the
-records do not rule, it says so and names the decision (section 7, D1 to D10).
+The rulings fix what and why; this file fixes how, the names and the build order. Section 7 lists the decisions as
+ruled; section 11 is ccode's cross-check of the rulings, with the points Hadi has not ruled on.
 
 State at writing: HEAD 2602c7a (the records of AM40, AM41, KT13, KT14). Every layout of both domains holds at most one
 A/C switch (step 1). Durations are in ticks (one tick is 2 seconds in both domains).
@@ -63,8 +64,8 @@ Contradictions found, not resolved:
   (`shared/recognizer.py:246-250`). The build removes both as ruled (TODO-66); the plan does not keep them in any form.
 - The A5 form of the setup's `"states"` block admits a fact about no object (`SimModel._init_states`: "object" omitted).
   If the timeline facts take that form (section 3.2), a setup could state a timeline fact as holding from the start
-  through `"states"`, a second way beside the timeline. Not a contradiction of the point above (it still states only
-  when a fact holds), but two ways to state one thing: D9 proposes refusing it.
+  through `"states"`, a second way beside the timeline. RULED (AM50): the `"states"` block refuses a timeline fact; a
+  fact that holds from the start is a window from tick 0.
 - No record contradicts either point. AM18 ("a setup may state its initial state") is the second kind of statement.
 
 ## 3. The structure
@@ -79,7 +80,7 @@ glossary's term is "context knowledge" and the old class goes whole):
   - `TimelineFact(state: StateDeclaration)`: a fact about no object (`object_type` None); holds iff its predicate
     `Predicate(name, ())` is in the world state's predicates;
   - `ObjectState(state: StateDeclaration)`: a state about an object type; holds iff the state holds for an object of
-    that type in the world state (D3);
+    that type in the world state (AM44);
   - `RecencyFact(task: PersonalTask)`: holds iff the task is among the recency facts the recognizer is given.
 - `Condition(facts: Tuple[ConditionFact, ...])`: a conjunction, at least one fact.
 - `ForeseeableKnowledge(task: PersonalTask, suppressing: Optional[Condition], raising: Optional[Condition],
@@ -99,7 +100,7 @@ predicate's name against its declaration's, which is how every condition already
 for its observed agent, with the task model and the hypotheses of the foreseeable tasks that declare a recency
 duration. `observe(agent, world)` decomposes each of them for the observed agent with the planner (`decompose`, the
 query the recognizer's pin uses) and records, per task, the tick at which its terminal action's completion predicate
-first holds after a tick on which it did not (AM33; D6). `recent(tick, durations) -> FrozenSet[PersonalTask]`: the
+first holds after a tick on which it did not (AM33, AM47). `recent(tick, durations) -> FrozenSet[PersonalTask]`: the
 tasks with a completion at t_obs and 0 ≤ tick − t_obs < d, d in ticks. It stores nothing else.
 
 `shared/recognizer.py`:
@@ -116,7 +117,11 @@ tasks with a completion at t_obs and 0 ≤ tick − t_obs < d, d in ticks. It st
 - A module-level pure function `context_prior(groups, strengths)` (section 4), so the tests check it without a
   recognizer.
 
-`shared/types.py`: `BeliefState` gains `prior: Dict[str, float]` (the prior over the live hypotheses, normalised;
+`shared/types.py`: `BeliefState.confidence` becomes the leader's belief over the live hypotheses (the evidence × the
+prior, normalised over H, before the floor and the pin scaling): the value the gate reads (AM42); `_clears_gate` keeps
+reading `belief.confidence` and does not change. `distribution` stays the reported distribution (floor, pins).
+`BeliefState` gains `belief: Dict[str, float]` (the belief over H, the keys of H only; what a margin gate, TODO-65,
+would read), `prior: Dict[str, float]` (the prior over the live hypotheses, normalised;
 empty when context knowledge is off) and `levels` (per foreseeable task with a live hypothesis, its level: a small enum
 `StrengthLevel` SUPPRESSED | ORDINARY | RAISED); both with empty defaults, so existing constructions stay valid.
 `Timeline` and `Window` (3.2) live here beside `ScenarioConfig`, which holds one; the mind never reads them.
@@ -124,8 +129,15 @@ empty when context knowledge is off) and `levels` (per foreseeable task with a l
 ### 3.2 The world and the artefacts
 
 - Timeline facts take the A5 form, as the requirement on stage 1's plan intended ("context knowledge then needs no
-  second mechanism", records "T-G", C1, T-K PART 1): each is a `StateDeclaration(name, None)` in the domain's
-  `"states"`. Checked at load: no action's effect or retraction names a timeline fact (AM20, AM32).
+  second mechanism", records "T-G", C1, T-K PART 1): each is a `StateDeclaration(name, None)`, listed in a registry
+  list of its own, `"timeline_facts"`, beside `"states"`. The loader needs to know which declared facts are timeline
+  facts to refuse them where AM20, AM50 and AM52 forbid them; the A5 form alone (a state about no object) does not say
+  (section 11, X5). The environment emits them as it emits states.
+- Checked at load (`SimModel`, beside `_check_declared_effects`, over the world's tree, which holds every schema of
+  the robot's task model too): no effect or retraction of an action schema (AM20, AM32), no precondition of an action
+  schema and no guard of a method (AM52) names a timeline fact, by the condition's name against the declaration's, as
+  `_check_declared_effects` reads it; a failure names the schema and the fact. The setup's `"states"` block refuses a
+  timeline fact (AM50). Proposed, not ruled: the completion condition too (section 11, X4).
 - `Window(fact: StateDeclaration, start: int, end: Optional[int])` in ticks, half-open [start, end), `end` None to the
   run's end; `Timeline(windows: Tuple[Window, ...])` with `facts_at(tick) -> FrozenSet[Predicate]`. Checked at load:
   the fact is a declared state about no object, start ≥ 0, start < end, no two windows of one fact overlap.
@@ -141,31 +153,39 @@ empty when context knowledge is off) and `levels` (per foreseeable task with a l
   predicates, t = `schedule.steps` (the world state's own timestamp). No per-tick mutation of `state_facts`.
 - One new line after the `[run_mesa]` start line, in every log: `[run_mesa] timeline source=<scenario|setup|none>
   windows=[<fact> <start>..<end> ...]`.
-- ac_on: a `StateDeclaration("ac_on", "ac_switch")` in both domains' `"states"`, set by ac_activation's last action
-  (D2). The setup may state it in `"states"` (AM18).
+- ac_on: a `StateDeclaration("ac_on", "ac_switch")` in both domains' `"states"`, set by the action switch_on
+  (AM43). The setup may state it in `"states"` (AM18).
 
 ### 3.3 The domains
 
-- Kitting `registry.py`: `"states"` gains break_time, room_warm (timeline facts) and ac_on; a new key
+- Both domains' `actions.py`: `switch_on(?entity, ?duration)`, wait_at's form (precondition at(agent, entity),
+  STAND*, `duration_key`, completion waited(agent, entity)) with the effects waited(agent, entity) and ac_on(entity)
+  (AM43). ac_activation's method calls it in place of `wait_at`; nothing else does.
+- Kitting `registry.py`: `"timeline_facts"` holds break_time and room_warm, `"states"` gains ac_on; a new key
   `"context_knowledge"`: suppressed 0.005, ordinary 0.02 (source: AM17's sentence); coffee_break: suppressing its
   recency fact, raising break_time, raised 2 (AM38's source), recency PT180S (90 ticks); ac_activation: suppressing
   ac_on, raising room_warm, raised 0.5 (AM38's source), no recency.
-- dock_loading: the same states; ac_activation added to the tree and the task model (methods: D4) with the action of
-  D2; the object type `ac_switch`; `"context_knowledge"`: coffee_break as kitting, ac_activation as kitting,
+- dock_loading: the same facts and states; ac_activation added to the tree and the task model with one method, from
+  the hall (move_to the switch, switch_on; AM45), and switch_on in its actions; the object type `ac_switch`; `"context_knowledge"`: coffee_break as kitting, ac_activation as kitting,
   office_break: suppressing its recency fact, no raising, recency PT270S (135 ticks). No layout gains a switch.
-- No layout, setup or scenario changes in the build except: none. (The timelines are authored in step 4.)
+- No layout, setup or scenario changes in the build. (The timelines are authored in step 4.)
 
 ### 3.4 The body and the run options (`mesa_sim/`)
 
 - `assignment_prior` renamed `assignment_knowledge` everywhere (section 6); `context_knowledge` added: the CLI flag, the
   run file key, `BOOL_OPTIONS`, `resolve_model_params`, `SimModel`. Both default on in `configs/experiment.yaml` and in
-  the loader's fallback (AM3; TODO-139). `SimModel` takes both without a default (D10).
+  the loader's fallback (AM3; TODO-139). `SimModel` takes both without a default; a caller that states neither fails
+  (AM51).
 - `RobotAgent`: builds `ObservedCompletions` when context knowledge is on; per tick (and in `observe_initial`):
   world → `memory.observe` → `recent` → `recognizer.update(..., recent=recent)`. The recency durations are converted by
   the body's `_parse_duration_to_steps`, as wait durations are.
 - One new line per tick when context knowledge is on, after `[IR-dist]`: `[IR-context] step=N facts=[...]
   recent=[...] levels=[<task>=<level> ...] prior=[<key>=<p> ...]` (prior to 4 decimals). Nothing when off.
 - `[run]` header: `assignment_knowledge=on|off context_knowledge=on|off` in place of `assignment_prior=on|off`.
+- The value the gate read is printed where it is today (AM42's requirement): `[IR] confidence=` and `[meta-proj]
+  confidence=` print `belief.confidence`, now the belief over H. `[IR-dist]` keeps printing the reported distribution,
+  so its leader's value can differ from `confidence` by the floor and the pin scaling; the log readers take θ crossings
+  from `confidence` (section 9).
 
 ## 4. The prior, the belief, and the check against the method
 
@@ -217,7 +237,9 @@ after the floor and the pin scaling, not the belief over H.
   lowers every other live value slightly. The reported belief then differs from the method's P_t.
 - Bearing on the regression: moving the gate to the belief over H changes gate outcomes near θ with context knowledge
   off too (requirement 1 would then name gate lines); KT10's two A/C cases peaking at 0.746 and 0.745 are of this
-  size. Not measured here. D1.
+  size. Not measured here.
+- RULED (AM42): the belief over the live hypotheses, with context knowledge on or off; the floor and the pin scaling
+  stay in the reported distribution only (their removal there, TODO-178).
 
 **(b) The edges of a window and of a recency duration.** The world state the robot reads at tick t is built during
 the model's step t (`build_world_state`, timestamp `schedule.steps`, `mesa_sim/world_state_builder.py:97`); the
@@ -252,32 +274,39 @@ it; AM21's "no trigger" holds (the change acts only through the belief).
 1. "ac_activation sets ac_on" (AM18) and "a declared effect of ac_activation" (5.3 of the forward inputs): effects are
    declared on action schemas (T-G A5), and ac_activation's terminal action is `wait_at` (`domains/kitting/tasks.py:110`),
    shared with coffee_break. An effect ac_on(?entity) on `wait_at` would ground to the coffee machine, which the
-   environment refuses (`SimModel._state_fact`, a type mismatch raises). It needs a decision: D2.
+   environment refuses (`SimModel._state_fact`, a type mismatch raises). RULED (AM43): a new action switch_on.
 2. An object-state condition is evaluated per task (AM2's CLARIFIED line, AM36), but ac_on is a state of one object.
    The records do not say how the per-task condition grounds it. With at most one switch per layout (AM18) every
-   reading gives the same value; the form must still pick one: D3.
+   reading gives the same value; the form must still pick one. RULED (AM44): any object of the state's type.
 3. dock_loading's ac_activation needs methods; dock_loading's human tasks have one method per area the human can be in
-   (T-G B content, the hall and the office). The records do not say where a switch would stand. D4.
+   (T-G B content, the hall and the office). The records do not say where a switch would stand. RULED (AM45): one
+   method, from the hall; the switch stands only in the delivery hall.
 4. Nothing else found. The floor's interaction with the prior is a fact of (a), not a block.
 
 ## 6. Renames, and every log line the build changes
 
-With context knowledge off, the lines that differ from today, all named:
+With context knowledge off, the lines that differ from today, all named. The gate's change (AM42) is not among them:
+it changes behaviour, has its own stage and its own regenerated baseline (stage 2, AM53), and every later stage is
+compared with that baseline.
 
 | line | change | where | cause |
 |---|---|---|---|
 | `[run]` | `assignment_prior=on` → `assignment_knowledge=on context_knowledge=off` | every log, once per robot | rename (AM9), new option (AM3) |
 | `[IR-prior] switch=on known=[...]` | → `[IR-assignment] knowledge=on known=[...]` | every log with an observing robot | rename (AM9; glossary names `[IR-prior]` as the old name) |
 | `[run_mesa] timeline ...` | new, after the start line | every log | AM40 |
-| `[rec]`, `[human]` | the action name of the A/C activation (if D2 takes a new action) | runs whose script holds ac_activation (maintained: scenario_s02_01, scenario_s04_01) | D2 |
+| `[rec]`, `[human]` | `wait_at` → `switch_on` in an A/C activation | runs whose script holds ac_activation (maintained: scenario_s02_01, scenario_s04_01; round 1: the s14 and s15 scenarios with an A/C activation) | AM43 |
 | everything from step 500 | the long-shift rule's ×2.5 on coffee_break gone | runs of 500 steps or more with a coffee_break hypothesis live: none of the four maintained sets (450 the longest), none of kitting's IRB, MPB or round 1 run files (481 the longest); dock_loading's 11 MPB run files of 531 to 858 steps (22 runs, the recorded caveat) and the milestone runs (800, 1000 steps) | AM22, TODO-66 (C1's correction) |
 
 Unchanged with context knowledge off: `[IR]`, `[IR-dist]` (bit-identical by P1), `[IR-boundary]` (its words "belief
 re-initialised to the prior" stay true: at a boundary the evidence is equal, so the belief is the prior), every
 `[meta*]`, `[hold]`, `[sep]`, `[coverage]` and `[scenario-coverage]` (dock_loading's task model gains ac_activation but
-no script names it; checked in the diff). If D2 takes a new action, the `[IR-boundary]` label stays `wait_at(...)` for
-an A/C completion (terminal actions in declaration order: `_observed_terminal_completion` returns the first), to be
-confirmed by the diff.
+no script names it; checked in the diff). The `[IR-boundary]` label of an A/C completion stays `wait_at(...)` (section
+11, X3), to be confirmed by the diff.
+
+The gate's stage (stage 2) changes, with context knowledge off: the value of `confidence` in `[IR]` and `[meta-proj]`
+wherever a hypothesis is pinned or a live value is floored; where that moves the leader across θ, the gate's outcome
+(`[meta-proj]` reason, `[meta-trig]`, `[meta]`, `[hold]`, the robot's motion and the `.rec`). Each such difference is
+listed one line each in the stage's report (condition, first differing step, grep), not analysed.
 
 Renamed in code, configuration and commands (assigned by the records):
 - `assignment_prior` → `assignment_knowledge` (AM9): the CLI flag, `configs/experiment.yaml` and every run file under
@@ -295,93 +324,88 @@ Renamed in code, configuration and commands (assigned by the records):
   (`BeliefState`), `docs/recognizer_handback.md` §1.7 and §2 (ω gone, the prior), the glossary's BUILT lines, CLAUDE.md
   (its commands name `--assignment_prior`; its state), the roadmap, TODO-66 closed, TODO-139.
 
-## 7. Proposals and decisions for Hadi
+## 7. Proposals and decisions, as ruled (Hadi, 4 October 2026)
 
-Proposals that change no design (taken unless Hadi objects):
-- P1 the off prior as exact unit weights (section 4).
-- P2 the timeline as a pure function of the tick read by the world-state builder, not a mutation of the environment's
-  facts each tick: one object resolved once at load, which AM41's override can replace in the same place; the IRB's
-  mirror model gets it with no code of its own. AM25's "the environment applies the timeline" holds: the builder is
-  the environment's.
-- P3 timeline facts in the A5 form (`StateDeclaration` about no object), as the stage-1 requirement intended.
+Accepted proposals, no design change:
+- P1 the prior with context knowledge off as exact unit weights (section 4).
+- P2 the timeline as a function of the tick read by the world-state builder (3.2); one object resolved at load, which
+  TODO-177's override replaces in the same place.
+- P3 timeline facts in the A5 form (3.2), in a registry list of their own (section 11, X5).
 - P4 the level per task and the facts read in the knowledge component (`ContextKnowledge.strength`); the recognizer
-  only groups and divides. It keeps every fact, name and value out of the recognizer (requirement 2) and makes the
-  three levels testable alone.
-- P5 `recent` passed to `update()` explicitly, not through the world state. Alternative: a field of the robot's world
-  model, as P4 (T-D) does with the perceived motion; not taken, because AM27 says the world state holds no history.
+  only groups and divides.
+- P5 the recency facts passed to `update()` explicitly.
 
-Decisions:
-- D1 (open item, a design question). Which value the gate compares with θ: (i) the output, as today, after the floor
-  and the pin scaling; (ii) the belief over H, P_t of the method. My reading of what each means (section 5 a): (ii) is
-  the quantity R2 defines; (i) adds the count of non-live keys and the floor, which say nothing about the human. If
-  (ii), the floor and the pin stay for the reported distribution only, and the change is its own stage with its own
-  regeneration, since it moves gate outcomes near θ with context knowledge off. Alternative (iii): (ii) only when
-  context knowledge is on; not recommended, as the gate would then read two quantities by a run option.
-- D2. How ac_activation sets ac_on: (i) recommended, a new action schema in both domains for the A/C's activation (for
-  example `switch_on(?entity)`), the same form as `wait_at` (STAND*, a duration, completion waited(agent, entity)) with
-  the effect ac_on(?entity); the body executes it by its fields as it does `wait_at`, so nothing in the simulator
-  changes; the action's name changes in `[rec]` and `[human]` (section 6). (ii) an effect on `wait_at` applied only when
-  the object has the state's type: a hidden rule in the environment, and the projector's successor state would carry
-  ac_on(coffee machine). (iii) the robot inferring ac_on from waited(agent, switch): the robot deriving a state from an
-  observed action, "not taken" in T-G A5.
-- D3. An object-state condition per task holds iff the state holds for some object of its declared type in the world
-  state. With at most one switch per layout it is that switch's state. Alternative: grounding through the task's own
-  parameter (per hypothesis, TODO-164's direction); not taken in V1.
-- D4. dock_loading's ac_activation: two methods mirroring coffee_break's (from the hall: walk to the switch, activate;
-  from the office: walk to the office door, then to the switch, activate), so a switch stands in the hall. Unexercised
-  in V1 (no switch in its rooms); it must exist for the tree and the task model (AM18).
-- D5. The windows: in ticks (AM11's "from one authored tick to another"), half-open (5 b), `until` optional (to the
-  run's end), overlapping windows of one fact refused.
-- D6. The memory records a completion when the terminal fact holds on a tick after one on which it did not; a fact
-  already holding at the first observation is not recorded (not observed completing). It records only the tasks that
-  declare a recency duration (nothing else reads it).
-- D7. The build's regression scope beyond the four maintained sets (section 8): round 1's 31 runs with context
-  knowledge off, and dock_loading's three milestone runs; the 22 dock_loading MPB runs stay with step 6 (the recorded
-  open question).
-- D8. The instruments' check under context knowledge on (section 9): round 1's 31 scenarios run on, compared with the
-  oracle for agreement only, no reading of the results (their timelines are empty, so every case meets the ordinary or
-  the suppressed state). The reading belongs to step 4.
-- D9. The setup's `"states"` block refuses a timeline fact: a timeline fact is stated by a timeline only.
-- D10. `SimModel` takes `assignment_knowledge` and `context_knowledge` with no default; every caller states both. The
-  defaults (on, on) live in the run file and the loader's fallback, the one place a run's defaults are set. Today 15 of
-  the 18 `SimModel` constructions in `tests/` rely on its default (off); with a code default flipped to on they would change silently.
+The decisions (the plan's D1 to D10 and the review's two additions are AM42 to AM53):
+
+| plan | ruling | what the build does | stated consequence |
+|---|---|---|---|
+| D1 | AM42 | the gate compares θ with the belief over H, context knowledge on or off; `confidence` is that value; the floor and the pins stay in `distribution` only | gate outcomes near θ move with context knowledge off too; the floor's and the pins' removal from the report is TODO-178 |
+| D2 | AM43 | the action switch_on (wait_at's form, effect ac_on), used by ac_activation only, both domains | the action's name changes in `[rec]` and `[human]` |
+| D3 | AM44 | an object-state condition holds if the state holds for any object of its type | with one switch per layout, the switch's state |
+| D4 | AM45 | dock_loading's ac_activation: one method, from the hall | when a dock_loading room gets a switch, the office method is added in the same step; without it the task is not live while the human is in the office |
+| D5 | AM46 | windows in ticks, half-open, the end optional, no overlap of one fact's windows | every expectation near a window's edge depends on the half-open reading by one tick |
+| D6 | AM47 | the memory records the tick the terminal fact first holds after a tick it did not; not at the first observation; only tasks with a recency duration | an unobserved completion is not remembered and does not suppress; the duration counts from the completion tick, included |
+| D7 | AM48 | the build's regression scope: the four maintained sets, round 1 (31, off), dock_loading's six milestone runs | dock_loading's IRB and MPB sets are not rerun in the build; a regression only they show is found at dock_loading's step |
+| D8 | AM49 | round 1 run with context knowledge on, against the oracle, agreement only | no run of the build exercises a raised strength; the unit tests against the method cover it until the authored windows |
+| D9 | AM50 | the setup's `"states"` block refuses a timeline fact | a fact that holds from the start is a window from tick 0 |
+| D10 | AM51 | `SimModel` takes both run options with no default | a caller that does not state both fails with an error |
+| review 1 | AM52 | the loader refuses a timeline fact in any precondition or guard (3.2) | context never drives the human |
+| review 2 | AM53 | the gate's change in its own commit, with its own regenerated baseline (stage 2) | each later stage compares with it (section 8) |
 
 ## 8. Stages, commits and verification
 
-Each stage is one or two commits; the next starts only when its check passes. Baselines are recorded before any code
-(stage 0) and every later stage diffs against them. "Named lines" means section 6's table.
+Each stage is one or more commits; the next starts only when its check passes. The regression scope is AM48's: the four
+maintained sets (`sweep.sh` of tb1a, tb1b, tb1c, tb3: 48 logs and their `.rec`), round 1's 31 runs with context
+knowledge off (`analysis/instruments/irb/run.sh kitting`, `configs/kitting/irb/tk1/`), and dock_loading's six milestone
+runs (scenario_s03_02, s05_02, s07_02 at 800 steps; s03_03, s05_03, s07_03 at 1000), plus `pytest`. "Named lines" are
+section 6's table. Outputs of the checks stay local (logs are git-ignored); md5s go into the reports.
 
-0. Baselines at HEAD, no code. The four maintained sets (`sweep.sh` of tb1a, tb1b, tb1c, tb3: 48 logs and their
-   `.rec`), round 1's 31 runs (`analysis/instruments/irb/run.sh kitting` on `configs/kitting/irb/tk1/`), dock_loading's
-   milestone runs (scenario_s03_02, s05_02, s07_02, 800 steps; s03_03, s05_03, s07_03, 1000 steps), `pytest` (307).
-   Outputs in a local folder outside git; md5s noted in the stage report. No commit.
-1. The rename `assignment_prior` → `assignment_knowledge` (one commit: code, every run file, sweeps, instruments, tests).
-   Check: every baseline differs in the `[run]` field and the `[IR-assignment]` line only (a diff after replacing
-   those two lines is empty), `.rec` byte-identical, pytest passes.
-2. The option `context_knowledge` and the removal of ω (TODO-66), off only (one commit): the flag, `SimModel` without
-   defaults (D10), the run files and sweeps state `context_knowledge: false`, tests state both; `ContextKnowledge`'s old
-   class and the recognizer's constants removed; `_output` multiplies by unit weights. Check: the four sets and round
-   1 identical except the `[run]` field; dock_loading's milestone runs identical up to step 499 and the first differing
-   step at 500 or later (one line each, not analysed); pytest passes.
-3. The world's side (two commits). 3a: `Timeline`, `Window`, the setup's and the scenario's forms, the resolution at
-   load, the builder, the `[run_mesa] timeline` line, the load checks (D5, D9, AM20), with tests of the resolution's
-   four cases (scenario stated, stated empty, not stated with a setup timeline, setup with none). 3b: the domains'
-   states (break_time, room_warm, ac_on), the A/C's action (D2) in both domains, dock_loading's ac_activation (D4) and
-   object type. Check: every baseline identical except the named lines (the timeline line; the action name in
-   scenario_s02_01's and scenario_s04_01's `[rec]` and `[human]`); every registered scenario of both domains loads;
+| stage | compared with | expected difference |
+|---|---|---|
+| 0 | (records B0) | none |
+| 1 | B0 | the rename's lines |
+| 2 | stage 1's outputs | the gate's change, listed; then B2 is recorded |
+| 3 | B2 | the `[run]` field; dock_loading's milestones from step 500 |
+| 4 | stage 3's outputs | the timeline line; switch_on in `[rec]`, `[human]` |
+| 5 | stage 4's outputs, off | none |
+| 6 | stage 5's outputs, off | none (instrument outputs byte-identical); on: 0 disagreements |
+
+Since stages 3 to 6 differ from B2 only by named lines, each check is also "B2 except the named lines of the stages
+since", which the final README sections state.
+
+0. Baselines B0 at HEAD, no code: the regression scope above, and its wall time noted. No commit.
+1. The rename `assignment_prior` → `assignment_knowledge` (one commit: code, every run file, sweeps, instruments,
+   tests; `SimModel` states it at every caller). Check against B0: the `[run]` field and the `[IR-assignment]` line
+   only (a diff after replacing them is empty), `.rec` byte-identical, pytest passes.
+2. The gate (AM42, AM53). 2a, its own commit: the recognizer's `confidence` is the leader's belief over H, before the
+   floor and the pins; `BeliefState.belief`; `_clears_gate` unchanged (it reads `confidence`); a unit test that a
+   belief with pinned keys clears θ on its value over H. 2b: the instruments follow (the IRB oracle's `confidence` and
+   gate columns from the belief over H; `tdlib`, `summary.py`, `baseline.py` take θ crossings from `confidence`).
+   Check against stage 1: every difference is in the lines section 6 names for this stage, each listed; round 1 with
+   the changed instrument agrees with the oracle (0 disagreements at 1e-9). 2c, its own commit: B2 recorded, a new
+   README section in each maintained set (md5s, the lines that moved and why) and in round 1's README (section 11, X1).
+3. The run option `context_knowledge` and the removal of ω (TODO-66), off only (one commit): the flag, the run files
+   and sweeps state `context_knowledge: false`, tests state both (AM51); the old `ContextKnowledge` and the
+   recognizer's constants removed; `_output` multiplies by unit weights (P1). Check against B2: the four sets and round
+   1 identical except the `[run]` field; the dock_loading milestones identical up to step 499, the first differing step
+   at 500 or later (one line each); pytest passes.
+4. The world's side (two commits). 4a: `Timeline`, `Window`, the setup's and the scenario's forms, the resolution at
+   load, the builder, the `[run_mesa] timeline` line, `"timeline_facts"`, the load checks (AM20, AM46, AM50, AM52),
+   with tests: the resolution's four cases (scenario stated, stated empty, not stated with a setup timeline, setup with
+   none); each refusal (a timeline fact in a precondition, a guard, an effect, the `"states"` block; overlapping
+   windows). 4b: break_time, room_warm, ac_on; switch_on (AM43) in both domains; dock_loading's ac_activation (AM45)
+   and its object type. Check against stage 3: the named lines only; every registered scenario of both domains loads;
    pytest passes.
-4. The mind (one or two commits): `ContextKnowledge` and the domains' declarations, `ObservedCompletions`, the prior in
+5. The mind (one or two commits): `ContextKnowledge` and the domains' declarations, `ObservedCompletions`, the prior in
    the recognizer, `BeliefState.prior` and `levels`, `[IR-context]`, the run options' defaults on. Tests: section 4's
-   table tests; the memory on a recorded run (a coffee_break in round 1: the recency fact holds for exactly 90 ticks
-   from the tick waited(human, coffee_machine_0) first holds); the robot loads with context knowledge on in every
-   registered scenario of both domains. Check: with context knowledge off, every baseline identical to stage 3's;
-   with it on, the four sets and round 1 run to completion (a smoke run, not read). If D1 takes (ii), it is stage 4b,
-   its own commit, with the four sets regenerated and the gate lines that move listed one line each.
-5. The instruments (one commit, section 9). Check: kitting's IRB (17), round 1 (31) and MPB (16 × 2 strategies)
-   outputs with context knowledge off byte-identical to the outputs before the change; under D8, round 1 on agrees
-   with the oracle (0 disagreements at 1e-9).
-6. Records and docs (one commit): the BUILT block under "T-K" with commits and acceptance, the docs of section 6, the
-   regenerated md5s in each maintained set's README (a new section naming the lines that changed and why).
+   table tests; the memory on a recorded run (in a round 1 scenario with a coffee_break, the recency fact holds on
+   exactly 90 ticks, from the tick waited(human, coffee_machine_0) first holds, AM47); a robot with context knowledge
+   on loads in every registered scenario of both domains. Check against stage 4, context knowledge off: identical;
+   with it on, the four sets and round 1 run to completion (not read).
+6. The instruments (one commit, section 9). Check: round 1 with context knowledge off, every instrument output
+   byte-identical to stage 5's; with it on, 0 disagreements with the oracle (AM49), results not read.
+7. Records and docs (one commit): the BUILT block under "T-K" with commits and acceptance, the docs of section 6, the
+   maintained sets' and round 1's README sections stating the final md5s and every named line since B2.
 
 ## 9. The instruments and their cost
 
@@ -391,7 +415,7 @@ What changes, and roughly how much:
 - `irb/oracle.py`: its own prior from the method document, independent of `shared/recognizer.py` (it reads the
   domain's declared values from the registry, as it reads the task model, and computes the levels, the groups and the
   division itself); its own memory of observed completions from the rows (the terminal fact newly holding for the
-  observed human, D6); `output()` multiplies by the prior before the floor and the pin, as the recognizer does; new
+  observed human, AM47); `output()` multiplies by the prior before the floor and the pin, as the recognizer does; new
   columns `prior` per key and `levels`. About 80 to 120 lines, with new rules in the IRB README (28 onward, each with
   its source).
 - `irb/compare.py`: the new columns compared. About 10 lines.
@@ -401,15 +425,18 @@ What changes, and roughly how much:
 - `common/tdlib.py`: the `[IR-assignment]`, `[IR-context]` and `[run_mesa] timeline` lines. About 20 lines.
 - The MPB instrument: its oracle imports the IRB's unchanged, so the gate's expected outcome follows the new belief;
   only the rename in `mpb/actual.py`, `mpb/reference.py`, `mpb/run.sh`. Part 4's measures are unchanged.
-Cost: one build session for the code and the README rules; the verification reruns of stage 5 (kitting's 17 + 31 IRB
-runs, the MPB's 32), each through the run, the trajectory, the oracle and the comparison, as the sort's preparation
-did; their wall time is measured at stage 0 and stated in the stage report. dock_loading's 54 IRB and 52 MPB runs are
-not rerun in the build (step 6 re-measures them).
+- The gate's part (AM42) comes first, in stage 2b: the oracle's `confidence` from the belief over H (its `output()`
+  keeps the floor and the pins for the reported distribution), the gate column from it, the log readers' θ crossings
+  from `confidence`. About 15 lines.
+Cost: one build session for the code and the README rules; the verification reruns are round 1's 31 runs, in stage 2b
+and twice in stage 6 (off and on), each through the run, the trajectory, the oracle and the comparison, as the sort's
+preparation did; their wall time is measured at stage 0. Within AM48's scope, kitting's other IRB (17) and MPB (16 × 2)
+sets and dock_loading's 54 IRB and 52 MPB runs are not rerun in the build (section 11, X1).
 
 ## 10. Cases the design does not cover
 
-Each is either a decision of section 7 or recorded here for Hadi:
-- D2, D3, D4, D6 above.
+Each is ruled in section 7, or recorded here for Hadi:
+- AM43 to AM45 and AM47 settle the cases the first version listed.
 - A timeline fact whose window opens while the robot's decision rests on a projection: the prior changes, possibly the
   leader, and `recognition_changed` may fire (5 d). Ruled behaviour (AM21), stated so the runs are not surprised.
 - A foreseeable task with no live hypothesis contributes nothing to Z (method section 6); a task whose only hypothesis
@@ -418,3 +445,55 @@ Each is either a decision of section 7 or recorded here for Hadi:
 - TODO-154 (the share at an episode's start) stays as recorded: the build answers nothing beyond R4.
 - dock_loading's coffee_break from the office (the method document's open flag on section 12): unchanged by the build;
   observed in step 6.
+
+## 11. Cross-check of the rulings (ccode, 4 October 2026)
+
+The ten rulings and the two additions, checked against each other, against the earlier rulings of the T-K entry and
+against the code. None of them conflicts with another. The points below are consequences nobody stated, or places
+where a ruling looks incomplete from the code's side. Hadi rules on each; the plan does not resolve them.
+
+- X1. AM42 with AM48: round 1 and the test-bed sets go stale. Round 1 (KT8) is the "off" side of KT14's comparison,
+  and its expectations, outputs and report were made with the old gate. After AM42 they no longer describe HEAD. The
+  same holds for kitting's other IRB (s08, s09) and MPB sets and for dock_loading's stage-1 IRB and MPB outputs, which
+  AM48 does not rerun. The plan reruns round 1 in stage 2 and records it as a new section of its README, with a
+  superseding note in its REPORT.md that points to it. Round 1 is a frozen folder under CLAUDE.md, so this needs
+  Hadi's ruling; the alternative is a new folder for the regenerated off side. The other kitting test-bed sets stay
+  stale until a task reruns them.
+- X2. AM42 and the log. `[IR] confidence` (the value the gate read) and the leader's value in `[IR-dist]` (the reported
+  distribution) will differ wherever pins or the floor act. A reader that takes a θ crossing from `[IR-dist]` reads the
+  wrong value. The instruments are changed in stage 2b. Any other reader of the logs (a report, the viewer) is also
+  affected; the viewer is not checked in this build.
+- X3. AM43 and the episode boundary (T-D L1 as built). At an A/C completion, waited(human, switch) newly holds. Both
+  `wait_at` (still a terminal action, through coffee_break) and `switch_on` have an enabled grounding at the switch.
+  `_observed_terminal_completion` returns the first in declaration order, so the `[IR-boundary]` line names
+  `wait_at(ac_switch_…)` for a switch_on completion. The boundary itself is correct (one boundary at the right tick);
+  only the label is misleading. Not fixed by the plan, since it changes no decision; flagged.
+- X4. AM52 looks incomplete. A schema names a fact in four places: a precondition, a method's guard, an effect or
+  retraction (AM20), and the completion condition. AM52 names the first two. A completion condition that named a
+  timeline fact would let the timeline end the human's action: the body's executor and the recognizer's phase model
+  both read completion conditions. Proposal: the loader also refuses a timeline fact in a completion condition.
+  Alternative: leave it to authoring.
+- X5. AM50 and AM52 with P3. To refuse a timeline fact in the `"states"` block and in schemas, the loader must know
+  which declared facts are timeline facts. The A5 form (a state about no object) does not say this, since A5 admits a
+  state about no object that an action sets. The plan therefore lists timeline facts in a registry list of their own,
+  `"timeline_facts"`, with the same class. This refines P3 and is not a design change; flagged because P3 said
+  `"states"`.
+- X6. AM48's consequence and the plan's scope. The consequence says "dock_loading's recognition and planning runs are
+  not rerun in the build". The scope Hadi accepted runs dock_loading's six milestone runs, which are recognition and
+  planning runs, though not test-bed sets. The plan reads the consequence as dock_loading's IRB and MPB sets and keeps
+  the milestone runs, as the only check of dock_loading's new task, action and declarations. Also: the first version
+  named three milestone runs in D7 and six in stage 0; the amended plan runs the six (scenario_s03_02, s05_02, s07_02,
+  s03_03, s05_03, s07_03). To confirm.
+- X7. AM45 and the human's script. With no office method, the load-time replay refuses a dock_loading script that
+  starts ac_activation while the human is in the office, because the task is not applicable there. Consistent with
+  AM45's consequence; stated so that an author is not surprised. Unexercised in V1, since no dock_loading room has a
+  switch.
+- X8. AM46 and the recency durations. Windows are written in ticks (AM11, AM46). Recency durations are declared in
+  physical time and converted by the body (NOTES FOR THE BUILD'S PLAN). A change of the tick length would move every
+  window in physical time but no recency duration. Harmless in V1, where the tick length is 2 seconds in both domains.
+- X9. AM47 and L4. On the completion tick the foreseeable task's hypothesis is retired and takes no share. On the next
+  tick it re-enters with 1/|H| of the evidence, under the suppressed prior. If the human stays standing at the machine,
+  waited holds and the hypothesis stays retired until the human moves. Consistent with the rulings; stated for the
+  expectations.
+- X10. AM44 and AM18. AM18's "not taken: ac_on as a condition of the task" is a decision, not a load check. Nothing
+  refuses ac_on in a guard, as AM52 refuses a timeline fact. No schema does this today. Flagged only.

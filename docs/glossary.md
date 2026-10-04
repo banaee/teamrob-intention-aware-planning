@@ -417,6 +417,11 @@ AMENDED (T-D G, AD1, built in G-build, 29 September 2026): θ is the gate's firs
 (`_clears_gate()`, still its one home) admits when the leader's share is at least θ, its **hypothesis adequacy** (§7) is
 adequate, and it is **warranted** (§7), asked in that order; clearing θ alone admits nothing. design_decisions.md, "T-D
 G: admission".
+RULED, NOT BUILT (T-K part 1, AM42, Hadi, 4 October 2026): the leader's share the gate compares with θ is its belief
+over the live hypotheses (the **prior** × the evidence, normalised over H), with context knowledge on or off; the
+floor and the scaling by the pinned hypotheses stay in the reported distribution only (their removal there, TODO-178).
+The log prints the value the gate read. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's
+AM42.
 
 **β, u, ρ** — β the tolerance on wasted path in the movement likelihood (0.01 /cm, supplied by the
 body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, not a measure of unmodelled
@@ -516,6 +521,10 @@ states one (stated empty: no timeline fact holds), else the setup's (a setup wit
 timeline fact follows the same rules. The run's header prints the timeline in force and its source. No action of an
 agent sets or removes a timeline fact, wherever the windows are written (AM20, AM32). Later work (AM41): an override
 from the run file and the viewer, taking precedence over both; a change during a run is the interactive phase's.
+AMENDED (AM46, AM50, AM52, Hadi, 4 October 2026; not built): a window is written in ticks, half-open [a, b), the end
+optional; two windows of one fact do not overlap (AM46). A timeline fact is stated by a timeline only; the setup's
+"states" block refuses it, and a fact that holds from the start is a window from tick 0 (AM50). No precondition and no
+guard of any schema names a timeline fact (AM52), nor any effect or retraction (AM20).
 
 **timeline fact** (Hadi, 3 October 2026; not built) — a **context fact** on the **timeline of context facts**. It holds
 from one authored change to the next. One of the three sources of a **suppressing condition** and a **raising
@@ -548,6 +557,8 @@ hypothesis. Declared: coffee_break and office_break, each its own recency fact; 
 (§6). When it is satisfied and the **suppressing condition** is not, the task has its **raised strength**. It decides
 no liveness. Optional; the same form and sources as the suppressing condition. Declared: coffee_break, break_time;
 ac_activation, room_warm; office_break, none (AM37).
+AMENDED (AM44, Hadi, 4 October 2026), for both conditions: a fact that is an object state holds if the state holds
+for any object of its declared type in the world state (with at most one A/C switch per layout, that switch's state).
 
 **suppressed strength** / **ordinary strength** / **raised strength** (AM36, Hadi, 3 October 2026; not built) — the three
 levels of a foreseeable task's **strength**. The suppressed strength applies when the suppressing condition is
@@ -568,6 +579,9 @@ robot's world state, for example waited(agent, machine), not the episode boundar
 **observed completion** (AM33, Hadi, 3 October 2026; not built) — a task's terminal fact in the robot's world state,
 observed by the robot, for example waited(agent, machine). Not the episode boundary. Completion counts, not admission;
 a completion the robot does not observe, or a task cut before its completion, is none (AM27).
+AMENDED (AM47, Hadi, 4 October 2026): recorded at the tick on which the terminal fact holds after a tick on which it
+did not; one already holding at the robot's first observation is not recorded. The **recency duration** counts from
+that tick, the tick included.
 
 **memory of observed completions** (AM30, Hadi, 3 October 2026; not built) — the component of the robot's mind, outside
 the recognizer, that records the tick of each **observed completion**. The **recency facts** are derived from it; the
@@ -927,6 +941,10 @@ entity, process completion only, it emits no world fact; the `HumanOnlyTask` `st
 action. Durations in the physical form `wait_at` uses (ISO-8601, converted by the body), the parameter's type declared
 through `duration_key`, not `parameter_types`; the projector takes a stand's duration from the instance's binding.
 Where the action and the task could both be read, write "the stand action" or "the stand task".
+RULED, NOT BUILT (T-K part 1, AM43, Hadi, 4 October 2026): a third action, `switch_on(?entity, ?duration)`, of
+`wait_at`'s form (located, a stated duration, completing `waited(agent, entity)`) with the declared effect that the
+switch is on (`ac_on(entity)`); only `ac_activation` uses it, in both domains, so `wait_at` stays the expected action of
+`coffee_break` and `office_break` only. design_records.md, "T-K", THE BUILD'S PLAN, RULED, AM43.
 COLLISION: "a stand" in §7 and the older records is the ordinary word for a human standing still (in the record, a
 `stand` task, a `wait_at` inside a task, or an empty stack); the hold's STAND ticks are a microaction.
 

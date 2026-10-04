@@ -2471,6 +2471,9 @@ values and their sources (under AM17), and the block THE STRENGTHS REVISED (belo
 AMENDED (Hadi, 4 October 2026, the design chat; AM40, AM41): where the timeline of context facts is stated. Their
 conceptual part is in design_decisions.md under this title, under AM11's AM34; here KT13 and KT14, in the block THE
 TIMELINE IN THE SCENARIO (after KT12).
+AMENDED (Hadi, 4 October 2026, on ccode's plan of the build; AM42 to AM53): the plan's decisions. The conceptual part
+(AM42, AM44, AM46, AM47, AM50, AM52) is in design_decisions.md under this title; here the block THE BUILD'S PLAN, RULED
+(after THE TIMELINE IN THE SCENARIO).
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -2583,6 +2586,7 @@ not rulings of design):
   belief over the live hypotheses or the output after its scaling by the pinned hypotheses. It is a design question,
   argued from what each value means. The plan reports the facts of the code. It is not settled by whether a given
   value passes.
+  RULED (AM42, Hadi, 4 October 2026): the belief over the live hypotheses (design_decisions.md, this title, under R7).
 - ADDED (Hadi, 4 October 2026): the statement of the prior that the plan reads is `docs/context_knowledge_method.md`
   (THE STRENGTHS REVISED, below, F).
 
@@ -2669,6 +2673,9 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   foreseeable task, not per hypothesis (design_decisions.md, this title, R3's AM2, its CLARIFIED line), so the state of
   one switch cannot select the strength of one hypothesis of ac_activation; a condition per hypothesis is TODO-164.
   Not taken: the state of the A/C as a condition of the task (context only lowers the strength).
+  AMENDED (AM43, AM45, Hadi, 4 October 2026; THE BUILD'S PLAN, RULED, below): ac_activation sets ac_on through its
+  own action switch_on; in dock_loading the switch stands only in the delivery hall, and ac_activation has one method,
+  from the hall.
   SUPERSEDED IN PART (AM36, AM37, Hadi, 3 October 2026), the wording: "the occurrence condition" reads "the suppressing
   condition of ac_activation"; "an occurrence condition is evaluated per foreseeable task" reads "the suppressing and
   the raising condition are evaluated per foreseeable task".
@@ -2929,6 +2936,54 @@ continues the numbering of the tests:
   Reason: with a scenario's own timeline, the state a case meets is a property of the case, stated with it; the
   comparison is between the two settings of the run option on the same case.
 
+THE BUILD'S PLAN, RULED (Hadi, 4 October 2026, on ccode's plan, `docs/handoffs/plan_T-K_part1.md`, 41efa76; recorded
+the same day). Records and the plan only; nothing is built. The plan's decisions D1 to D10 and two additions of the
+review are AM42 to AM53, in this order: D1 AM42, D2 AM43, D3 AM44, D4 AM45, D5 AM46, D6 AM47, D7 AM48, D8 AM49, D9 AM50,
+D10 AM51, the review's addition 1 AM52, its addition 2 AM53. Conceptual (design_decisions.md, this title): AM42 under
+R7, AM44 under R3, AM46 and AM50 under AM11's AM40, AM47 under AM27, AM52 under R1. The plan is amended to these
+rulings.
+
+- ccode's proposals P1 to P5 are accepted (the plan, section 7): the prior with context knowledge off as exact unit
+  weights; the timeline as a function of the tick read by the world-state builder; timeline facts in the A5 form; the
+  level per task read in the knowledge component; the recency facts passed to the recognizer on each run.
+
+- AM43, the A/C's action (D2). A new action schema switch_on, of the same form as wait_at (standing for a stated
+  duration, completion waited(agent, entity)), with the declared effect that the switch is on (ac_on). Only
+  ac_activation uses it, in both domains.
+  Reason: a state of the world changes through a declared effect of an action (T-G A5); an effect on wait_at would also
+  apply at the coffee machine.
+  Not taken: a rule inside the environment (an effect applied only to objects of the state's type); the robot inferring
+  the state from an observed wait at the switch ("not taken" in T-G A5).
+
+- AM45, dock_loading's ac_activation (D4). One method, from the hall. In dock_loading an A/C switch stands only in the
+  delivery hall. A choice of scope for V1, not forced by the design.
+  Consequence: when a dock_loading room gets a switch, the method from the office is added in the same step; without it
+  the task is not a live hypothesis while the human is in the office.
+
+- AM48, the build's regression scope (D7): the four maintained sets, round 1's 31 runs with context knowledge off, and
+  dock_loading's milestone runs, as the plan states (its D7 named three, its stage 0 six: scenario_s03_02, s05_02,
+  s07_02, s03_03, s05_03, s07_03; the amended plan runs the six, its section 11, X6). The 22
+  dock_loading MPB runs stay with dock_loading's step (the recorded open question).
+  Consequence: dock_loading's recognition and planning runs (its IRB and MPB sets) are not rerun in the build; a
+  regression that affects only them is found at dock_loading's step.
+
+- AM49, the instruments' check with context knowledge on (D8): round 1's 31 scenarios run with context knowledge on and
+  compared with the oracle for agreement only; their results are not read (the reading belongs to the step with the
+  authored windows).
+  Consequence: no run of the build exercises a raised strength; the unit tests against the method document cover it
+  until the step with the authored windows.
+
+- AM51, the run options at every caller (D10): `SimModel` takes `assignment_knowledge` and `context_knowledge` with no
+  default; every caller states both. The defaults (both on) live in the run file and the loader's fallback.
+  Consequence: a caller that does not state both options fails with an error.
+
+- AM53, the gate's change in the build (the review's addition 2): AM42 has its own commit and its own regenerated
+  baseline. The plan places it and states which baseline each later stage's check compares against.
+
+- Recorded beside them: CLAUDE.md and the roadmap brought in line with AM40; TODO-177 (the override of the timeline,
+  AM41) and TODO-178 (the removal of the floor and the scaling from the reported distribution, AM42's later work)
+  opened.
+
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the
 values for kitting and dock_loading, the perception assumption, the tests). T-K is framework-wide: it concerns
@@ -3018,6 +3073,7 @@ C. What becomes stale, marked superseded with a pointer here; the expected direc
 - The notes for the build's plan: no form for "not" is needed (NOTES FOR THE BUILD'S PLAN, above).
 - OPEN, for the build's plan: which value the gate compares with the threshold, the belief over the live hypotheses or
   the output after its scaling by the pinned hypotheses (NOTES FOR THE BUILD'S PLAN, above).
+  RULED (AM42, Hadi, 4 October 2026): the belief over the live hypotheses.
 - The same marks in `docs/handoffs/T-G_forward_inputs.md`, section 5.
 
 D. Records from the layout tool's chat (3 October 2026).

@@ -20,6 +20,8 @@ AM39): section 5 in line (5.1 to 5.4 and 5.7 to 5.11); the method document named
 entries on object ids and on subtype named (5.11).
 Updated 4 October 2026 after Hadi's ruling on where the timeline of context facts is stated (AM40, AM41, KT13, KT14):
 section 5 in line (5.1 to 5.4, 5.6 to 5.8, 5.10).
+Updated 4 October 2026 after Hadi's rulings on the build's plan (AM42 to AM53; docs/handoffs/plan_T-K_part1.md): 5.2,
+5.3, 5.7 and 5.10 in line.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -330,6 +332,9 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   commitment warrant, when its belief reaches θ on the prior. The prior is the robot's expectation, not evidence that
   the human has started; adequacy tests the hypothesis afterwards and can cause the retraction. A foreseeable task
   still needs observation warrant. The refusal of a leader with no observation (none(leader_no_observation)) stands.
+  AMENDED (AM42, Hadi, 4 October 2026): the gate compares θ with the belief over the live hypotheses, with context
+  knowledge on or off; the floor and the scaling by the pinned hypotheses stay in the reported distribution only (their
+  removal there is TODO-178); the log prints the value the gate read. [ruled]
 - One declared duration (R6). Context does not change the content of a projection. The only path from context to the
   projection is: prior, belief, gate, projection of the admitted task.
 - The earlier entry "Assigned-task pool is a support restriction, not a prior" is superseded in part (R8, AM6): the
@@ -352,6 +357,14 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - The memory of observed completions, its own component of the mind (AM30).
 - ac_on: a declared state and a declared effect of ac_activation. dock_loading needs the object type, the task
   ac_activation and the fact room_warm.
+  RULED (AM43, AM45, Hadi, 4 October 2026): the effect is declared on a new action switch_on (wait_at's form), used by
+  ac_activation only, in both domains; dock_loading's ac_activation has one method, from the hall, where its A/C
+  switch would stand (the office method is added when a room gets a switch).
+- Ruled on the plan (AM44, AM46, AM47, AM50, AM52; Hadi, 4 October 2026): an object-state condition holds for any
+  object of its type; windows in ticks, half-open; the memory records a completion at the tick the terminal fact first
+  holds, and an unobserved completion is not remembered; a timeline fact is stated by a timeline only (from the start:
+  a window from tick 0); no precondition or guard of any schema names a timeline fact. The plan:
+  docs/handoffs/plan_T-K_part1.md. [ruled]
 - The two run options, their names and their defaults; the rename of assignment_prior to assignment_knowledge in
   code, configuration and commands. Also flagged for renaming at the build: the context weight (ω_context,
   _context_weight) and the prior base. docs/assumptions.md 1.4 is updated at the build.
@@ -471,6 +484,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 2. The build's plan (BUILD DISCIPLINE, step 1): ccode's plan, with no code, reviewed in the design chat. It reads
    docs/context_knowledge_method.md as the statement of the prior. Open for it (5.10, item 9): which value the gate
    compares with θ.
+   DONE (4 October 2026): docs/handoffs/plan_T-K_part1.md, its decisions ruled (AM42 to AM53; ccode's P1 to P5
+   accepted). The gate's change has its own commit and its own regenerated baseline (AM53).
 3. The build, its verification (AM24) and the review. The existing sets either state context_knowledge off and stay
    identical, or are regenerated with the reason stated; round 1 with context_knowledge off is expected identical
    except the lines the build names.
@@ -562,12 +577,14 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    the share at an episode's start, not ruled; the records do not say whether T-K part 1 answers it.
 7. The decision on ccode's AM19 list (step 1; decided 4 October 2026, 5.7), and the items the build's plan proposes: the declaration of ac_on,
    dock_loading's object type and task, the setup's timeline form. (No form for "not" is needed, AM36.)
+   RULED (4 October 2026): the plan's items, AM40 to AM53.
 8. Whether env_layout_16's two south-east shelves return once the build removes the step-500 limit (KT9, its ADDED
    line; Hadi accepted the room as it is).
 9. For the build's plan (recorded open, Hadi, 3 October 2026; design_records.md, "T-K", NOTES FOR THE BUILD'S PLAN):
    which value the gate compares with θ, the belief over the live hypotheses or the output after its scaling by the
    pinned hypotheses. A design question, argued from what each value means. The plan reports the facts of the code; it
    is not settled by whether a given value passes.
+   RULED (AM42, Hadi, 4 October 2026): the belief over the live hypotheses.
 10. ccode's flags on docs/context_knowledge_method.md (design_records.md, "T-K", THE STRENGTHS REVISED, F): the first
    three resolved by Hadi on 4 October 2026. Open: section 12's three cases do not hold for dock_loading's coffee_break
    from the office, whose walk to the machine is warranted on its entry from the walk to the office door.

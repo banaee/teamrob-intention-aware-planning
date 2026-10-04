@@ -397,7 +397,7 @@ Decisions
   (AM4); one declared duration; the gate unchanged; the earlier entry "Assigned-task pool is a support restriction,
   not a prior" superseded in part (R8, AM6). Two independent run options, both on by default at the build:
   `assignment_knowledge` (today's `assignment_prior`, not renamed before the build) and `context_knowledge` (new);
-  context knowledge off gives today's equal prior (AM3, AM9; replaces R9). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the setup's timeline of context facts (AM34) and
+  context knowledge off gives today's equal prior (AM3, AM9; replaces R9). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the setup's timeline of context facts (AM34; since AM40 the default, which a scenario's own timeline replaces whole) and
   the removal of the domain task names and constants from the recognizer (TODO-66); an occurrence condition is a
   conjunction (AM7). Open, before the build, unchanged: the values for kitting and dock_loading (Hadi states them), the
   perception assumption, the tests. T-K part 2 (the build of R5, degrees; open: the representation of a context value
@@ -423,10 +423,12 @@ Decisions
   env_layout_15 (no A/C switch), _16 (coffee machine and A/C switch in a dense cluster), _17 (15 plus an A/C switch
   between two deliveries; MPB or mix), env_layout_10, _11, _02 as they are, as a comparison (KT2; env_layout_02 after
   Hadi's correction of its object sizes, 4191202, which only the viewer reads); the basic set varies
-  only where a foreseeable task is placed (between tasks, or inside a task between its actions), two setups per layout,
+  only where a foreseeable task is placed (between tasks, or inside a task between its actions), two setups per layout
+  (dropped by KT13, 4 October 2026),
   five or more scenarios each, context knowledge on and off, two MPB cases, the measure the tick at which the true task
   reaches the threshold and is admitted and whether a retraction follows, expectations before the runs, the duration
-  mismatch a later set (KT3); the setup, not the scenario, holds the timeline of context facts (KT4, AM34); a round
+  mismatch a later set (KT3); the setup, not the scenario, holds the timeline of context facts (KT4, AM34; amended by AM40, 4 October 2026: the setup
+  states the default timeline, a scenario may state its own, which replaces it whole); a round
   without context knowledge first (KT5); findings, none changing a value (KT6). Nothing built. Next: the round without
   context knowledge (rooms 15, 16, 17 in the IRB with the present equal prior); then a new design chat takes the build
   of T-K part 1 (the list of the layouts with more than one A/C switch, AM19; the build's plan; the build; the runs with
@@ -461,7 +463,8 @@ Decisions
   durations unchanged, 90 and 135 ticks (AM37, AM38). The reading per value, s / (1 + s) of task starts, still proposed
   (AM39). Stale and marked: the coffee break's prior equal to θ (now 2/3), the expected directions with context
   knowledge on (the design chat restates them before those runs), R5's linear rule (restated for two conditions, T-K
-  part 2), the form for "not". Open for the build's plan: which value the gate compares with θ. The statement of the
+  part 2), the form for "not". Open for the build's plan: which value the gate compares with θ (ruled by AM42, 4 October
+  2026: the belief over the live hypotheses). The statement of the
   prior: `docs/context_knowledge_method.md` (the rule in "Where to look"). Nothing built. Next: unchanged (KT12's steps,
   from `docs/handoffs/T-G_forward_inputs.md`, section 5).
   Step 1 of T-K part 1 is DONE (Hadi's ruling of 4 October 2026 on AM19; design_records.md, "T-K", STEP 1; 32029d3,
@@ -469,6 +472,19 @@ Decisions
   layout of both domains holds at most one A/C switch; tb1a's two s04_01 logs regenerated, every other maintained
   baseline byte-identical; 14 early frozen analyses deleted (analysis/README.md). Next: the plan for the build of
   context knowledge (BUILD DISCIPLINE, step 1), after one design question that the design chat puts to Hadi first.
+  Step 2 of T-K part 1, the build's plan, is WRITTEN AND RULED (4 October 2026; `docs/handoffs/plan_T-K_part1.md`;
+  design_decisions.md, the same entry, AM40 to AM53; design_records.md, "T-K", THE TIMELINE IN THE SCENARIO and THE
+  BUILD'S PLAN, RULED). Where the timeline is stated (AM40): the setup states the default; a scenario may state its own,
+  which replaces it whole; the run's header prints the timeline in force and its source; the second setup per room is
+  dropped (KT13); the tests read context knowledge off against on, each case labelled by the state the script meets
+  (KT14); the override of the timeline is later work (AM41, TODO-177). The plan's decisions: the gate compares θ with
+  the belief over the live hypotheses, the floor and the pin scaling staying in the reported distribution only (AM42;
+  its removal there TODO-178), in its own commit with its own regenerated baseline (AM53); the A/C's action switch_on
+  with the effect ac_on (AM43); an object-state condition holds for any object of its type (AM44); dock_loading's
+  ac_activation from the hall only (AM45); windows in ticks, half-open (AM46); the memory's recording rule (AM47); the
+  regression scope (AM48); the instruments' check on round 1 (AM49); a timeline fact stated by a timeline only (AM50);
+  `SimModel` takes both run options explicitly (AM51); no precondition or guard names a timeline fact (AM52); ccode's
+  P1 to P5 accepted. Nothing built. Next: the build (BUILD DISCIPLINE, step 2), stage by stage as the plan states.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

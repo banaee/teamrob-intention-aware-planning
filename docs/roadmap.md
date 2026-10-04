@@ -819,7 +819,7 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     present context facts (R2); the prior normalises the strengths of what is live, assigned work as a whole
     contributing 1 and each live foreseeable task its declared low or high strength by its occurrence condition (R3);
     equal division inside assigned work (R4); degrees (R5) built later, in T-K part 2; one declared duration (R6); the gate
-    unchanged (R7). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the setup's timeline of context facts (AM34) and
+    unchanged (R7). T-K part 1 builds R1 to R4, R6, R7, crisp context facts, the setup's timeline of context facts (AM34; since AM40 the default, which a scenario's own timeline replaces whole) and
     the removal of the domain task names and constants from the recognizer (TODO-66). The build is not started. Open:
     the values for the two domains (Hadi states them), the perception assumption, the tests. Future work:
     TODO-158 to TODO-162.
@@ -854,7 +854,9 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     more scenarios each, each run with context knowledge on and off; two MPB cases (a coffee break inside the break
     time, deliveries through the whole break time); the measure is the tick at which the true task reaches the
     threshold and is admitted, and whether a retraction follows; expectations before the runs; the duration mismatch
-    waits for a later set (KT3). The setup, not the scenario, holds the timeline of context facts (KT4, AM34). A round
+    waits for a later set (KT3). The setup, not the scenario, holds the timeline of context facts (KT4, AM34; amended by
+    AM40, 4 October 2026: the setup states the default, a scenario may state its own; the second setup per layout
+    dropped, KT13). A round
     without context knowledge comes first, before the build: rooms 15, 16 and 17 in the IRB with the present equal
     prior (KT5). Findings, none changing a value: KT6. The build is not started. Next: the round without context
     knowledge; then a new design chat takes the build of T-K part 1 (the list of the layouts with more than one A/C
@@ -868,7 +870,8 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     before the runs (KT9). Findings, none changing a value (KT10); the method of the comparison, conditions A, B and C,
     with the directions expected (KT11). The mechanism is not built. Next: a new design chat takes the rest of T-K part
     1 (`docs/handoffs/T-G_forward_inputs.md`, section 5): the layouts with more than one A/C switch and their change,
-    the build's plan, the build, the setups' timelines and the runs in B and C, the two MPB cases, dock_loading's part,
+    the build's plan, the build, the setups' timelines and the runs in B and C (since KT14: off against on, each case
+    labelled by the state the script meets), the two MPB cases, dock_loading's part,
     the close.
     AMENDED (Hadi, 3 October 2026, the design chat on the rest of T-K part 1; recorded 4 October 2026; design_decisions.md,
     the same entry, R3's AM35, AM36, AM39; design_records.md, "T-K", AM37, AM38, THE STRENGTHS REVISED): the form and the
@@ -879,12 +882,19 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     room_warm, office_break none; suppressed by the recency fact (coffee_break, office_break) or ac_on (ac_activation)
     (AM37, AM38). The reading of a strength stated per value, still proposed (AM39). The expected directions with
     context knowledge on are restated by the design chat before those runs. Open for the build's plan: which value the
-    gate compares with θ. The statement of the prior: `docs/context_knowledge_method.md`. Nothing built. Next: unchanged.
+    gate compares with θ (ruled by AM42, 4 October 2026: the belief over the live hypotheses). The statement of the prior: `docs/context_knowledge_method.md`. Nothing built. Next: unchanged.
     STEP 1 DONE (Hadi's ruling of 4 October 2026 on AM19; design_records.md, "T-K", STEP 1; 32029d3, 098b1a8, 35c9db8):
     env_layout_05 keeps one A/C switch, ac_switch_1, and scenario_s04_01 one ac_activation; every layout of both domains
     holds at most one A/C switch; the maintained baselines regenerated for s04_01 alone; 14 early frozen analyses
     deleted. Next: the plan for the build of context knowledge, after one design question that the design chat puts to
     Hadi first.
+    STEP 2 DONE (4 October 2026; `docs/handoffs/plan_T-K_part1.md`; design_decisions.md, the same entry, AM40 to AM53;
+    design_records.md, "T-K", THE TIMELINE IN THE SCENARIO, THE BUILD'S PLAN, RULED): the setup states the default
+    timeline and a scenario may state its own, which replaces it whole (AM40; its override later work, AM41, TODO-177);
+    the second setup per room dropped (KT13); the tests read off against on, each case labelled by the state the script
+    meets (KT14); the plan written and its decisions ruled (AM42 to AM53: the gate on the belief over the live
+    hypotheses, in its own commit and baseline; switch_on; the conditions, the windows, the memory, the regression
+    scope, the run options; no task condition reads a timeline fact). Nothing built. Next: the build, stage by stage.
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing

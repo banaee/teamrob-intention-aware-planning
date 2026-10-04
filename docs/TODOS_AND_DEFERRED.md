@@ -4723,3 +4723,24 @@ slice and the pattern on an id are removed from the tool's page. The only string
 the user types for the new layout (its file stem: a separator, a `.json` ending, a leading `.`), not on an object id.
 Files: scripts/layout_tool.py (the id of an added object), scripts/README.md
 Reference: design_decisions.md, "An object id is an opaque name"
+
+**TODO-177: An override of the timeline of context facts (recorded, T-K part 1, AM41, 4 Oct 2026)** open
+Later work, by Hadi's ruling (4 Oct 2026): an override of the timeline from the run file and from the viewer, which
+takes precedence over the setup's and the scenario's timeline. Not built in T-K part 1. The build resolves the timeline
+in force at load in one place (the scenario's, else the setup's, else none), so the override is a further branch there,
+with no change to the recognizer. A change of a fact during a run is not this item: it belongs to the interactive phase
+(T-V track 2).
+Files: mesa_sim/sim_model.py (the timeline's resolution at load), mesa_sim/overrides.py, mesa_sim/viz/run_file_panel.py
+Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM11's AM41;
+docs/handoffs/plan_T-K_part1.md, 3.2
+
+**TODO-178: The floor and the scaling by the pinned hypotheses in the reported distribution (recorded, T-K part 1, AM42, 4 Oct 2026)** open
+Later work, by Hadi's ruling (4 Oct 2026). Since AM42 the gate compares the threshold with the belief over the live
+hypotheses; the floor (BELIEF_FLOOR) and the scaling of the live mass by the pinned hypotheses stay in the reported
+distribution only (`[IR-dist]`, `BeliefState.distribution`). The item: remove them from the reported distribution as
+well. The output is not fed back (the recognizer's `prev_belief` is not consulted), so the floor's stated reason (no
+recovery from exact zero under a multiplicative update) no longer acts on the inference.
+Files: shared/recognizer.py (`_output`, `_finalize`, `_pin`), docs/recognizer_handback.md §1.7, the instruments'
+oracle (analysis/instruments/irb/oracle.py, `output`) and log readers
+Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM42;
+docs/handoffs/plan_T-K_part1.md, section 5 (a)

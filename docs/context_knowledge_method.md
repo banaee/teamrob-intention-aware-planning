@@ -2,7 +2,7 @@
 
 Status: the design records hold the rulings and their reasons and are authoritative (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K"). This document states the result of the rulings. If the two disagree, the records win and this document is corrected. A ruling that changes the method of context knowledge updates this document in the same records step.
 
-It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39), with where the timeline is stated as ruled on 4 October 2026 (AM40). Section 13 is a derivation from the method, not a ruling. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
+It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39), with where the timeline is stated and the gate's value as ruled on 4 October 2026 (AM40, AM42, AM44, AM46, AM47). Section 13 is a derivation from the method, not a ruling. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
 
 ## 1. The idea
 
@@ -35,12 +35,12 @@ $C_t$ is the set of crisp facts that hold at tick $t$. A fact holds or does not 
 
 1. A timeline fact: a context fact on the timeline of context facts in force, with an authored window, for example "break time" or "room warm". The setup states the default timeline; a scenario may state its own, which replaces the setup's whole. Not stated in the scenario, the setup's applies; stated empty, or a setup with none, no timeline fact holds. Every timeline fact follows the same rules (AM40).
    $c \in C_t \iff a_c \le t < b_c$
-2. An object state, read from the world state, for example "the A/C is on".
+2. An object state, read from the world state, for example "the A/C is on". It holds if the state holds for any object of its declared type (AM44); with at most one A/C switch per layout, that is the switch's state.
 3. A recency fact of task $f$: the robot's memory of observed completions holds an observed completion of $f$ within the recency duration.
    $\mathit{recent}_f \in C_t \iff 0 \le t - t_f^{\mathrm{obs}} < d_f$
    Here $t_f^{\mathrm{obs}}$ is the tick of the last observed completion of $f$, and $d_f$ is the declared recency duration.
 
-The half-open window edges are a reading that the build's plan must confirm.
+The half-open edges are confirmed (AM46): a window is written in ticks, and the fact holds in every world state of tick $t$ with $a_c \le t < b_c$. The observed completion is recorded at the tick on which the task's terminal fact holds after a tick on which it did not, and the recency duration counts from that tick, the tick included (AM47). A completion the robot did not observe is not remembered.
 
 ## 4. The strength of a foreseeable task: three levels
 
@@ -139,7 +139,7 @@ The belief sums to 1 over the live hypotheses. There is no share for "none of th
 
 The meta-planner admits the leading hypothesis $h^*$ when three conditions hold:
 
-1. $P_t(h^*) \ge \theta$, with $\theta = 0.75$.
+1. $P_t(h^*) \ge \theta$, with $\theta = 0.75$. $P_t$ is the belief over the live hypotheses of section 7, with context knowledge on or off; the floor and the scaling by the pinned hypotheses stay in the reported distribution only (AM42).
 2. It is adequate: the observed movement does not contradict it. A hypothesis turns inadequate after about 334 cm of excess path, or after 17 ticks of standing.
 3. It is warranted.
    - An assigned task has commitment warrant, from the assignment. It can be admitted before any distinguishing movement.
@@ -291,7 +291,7 @@ Consequences to measure, not reasons to adjust the design:
 
 Open questions:
 
-- Which value the gate compares with the threshold: the belief over the live hypotheses, or the output after its scaling by the pinned hypotheses. It is to be argued from what each value means.
+- Ruled (AM42, 4 October 2026): the gate compares the threshold with the belief over the live hypotheses (section 8).
 - Unmodelled behaviour has no hypothesis and no share of the belief (section 12).
 - The later extension from crisp facts to degrees was stated for the pair of low and high strength. It must be restated for two conditions.
 - The reading of a strength as a ratio of task starts is proposed and not validated. No strength is measured at a real site.

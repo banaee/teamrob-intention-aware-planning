@@ -2542,6 +2542,10 @@ Reference: graded-evidence session, September 2026; cchat decision; I4d; TODO-61
 
 **The gate stays a fixed share: `_clears_gate` on the normalised belief, θ = 0.75 (the gate ruling)**
 SUPERSEDED IN PART (T-D R1, 27 September 2026): reason superseded by R1; the gate stands; its justification is re-derived from Stage 1's admission measurement (G). Not reopened. design_decisions.md, "T-D R and E".
+AMENDED (T-K part 1, AM42, Hadi, 4 October 2026; not built): "the normalised share" is the leader's belief over the
+live hypotheses, before the floor and the scaling by the pinned hypotheses, which stay in the reported distribution
+only. θ, its home and the order of the gate's questions are unchanged. "T-K: context knowledge in the recognizer's
+belief", R7's AM42.
 
 DECIDED (cchat, September 2026, on the graded-evidence θ data, `analysis/g1_graded_evidence/crossings.md`):
 the admission gate is unchanged. `MetaPlanner._clears_gate(belief)` tests `confidence ≥ θ` on the normalised
@@ -4971,6 +4975,15 @@ AMENDED (Hadi, 4 October 2026, the design chat; AM40 and AM41, under AM11's AM34
 timeline of context facts, and a scenario may state its own, which replaces it whole (AM40); an override of the
 timeline from the run file and the viewer is later work (AM41). In the record ("T-K"): KT13 (the second setup per
 room dropped) and KT14 (the conditions of the tests restated). Not built.
+AMENDED (Hadi, 4 October 2026, on ccode's plan of the build, `docs/handoffs/plan_T-K_part1.md`; AM42 to AM53, the
+plan's decisions D1 to D10 and two additions of the review). Here, each under the ruling it amends: AM42 the gate reads
+the belief over the live hypotheses (D1, under R7); AM44 an object-state condition (D3, under R3); AM46 the edges of a
+window and of a recency duration (D5) and AM50 a fact that holds from the start (D9), both under AM11's AM40; AM47
+what the memory records (D6, under AM27); AM52 no task condition reads a timeline fact (the review's addition 1, under
+R1). In the record ("T-K", THE BUILD'S PLAN, RULED): AM43 the A/C's action switch_on (D2), AM45 dock_loading's
+ac_activation (D4), AM48 the regression scope (D7), AM49 the instruments' check (D8), AM51 the run options stated by
+every caller (D10), AM53 the gate's own commit and baseline (the review's addition 2); ccode's proposals P1 to P5
+accepted. Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -4978,6 +4991,10 @@ room dropped) and KT14 (the conditions of the tests restated). Not built.
   Reason: the robot's knowledge about the human is not a law of the human. A script may be authored to agree with it
   for a test; that is test authoring. Applicability already has its owner (the methods' conditions, liveness by
   applicability).
+  AMENDED (AM52, Hadi, 4 October 2026; the review of the build's plan): no task condition reads a timeline fact. No
+  precondition of an action schema and no guard of a method names one; the loader refuses a domain whose schemas do
+  (with AM20's refusal of an effect or a retraction that names one).
+  Reason: context acts in the robot's belief only and never drives the human.
 
 - R2, the belief. At each run of the recognizer, belief = normalise(prior × evidence) over the live hypotheses. The
   prior is evaluated on the context facts that hold at the present tick. The evidence is the likelihood accumulated in
@@ -5104,6 +5121,10 @@ room dropped) and KT14 (the conditions of the tests restated). Not built.
   validated. Stated per value: at a task start, with only this foreseeable task and the assigned tasks live, the
   probability that the start is the foreseeable task is s / (1 + s). 0.005: 1 of 201 task starts. 0.02: 1 of 51. 0.5:
   1 of 3. 2: 2 of 3.
+  AMENDED (AM44, Hadi, 4 October 2026; the plan's D3): a condition fact that is an object state holds if the state
+  holds for any object of its declared type in the world state. With at most one A/C switch per layout (AM18) it is
+  that switch's state. The evaluation stays per task (AM2's CLARIFIED line, AM36).
+  Not taken: grounding the state through the task's own parameter (per hypothesis; TODO-164's direction).
 
 - R4, division inside assigned work: equal among the live assigned tasks, in T-K part 1.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -5146,6 +5167,18 @@ room dropped) and KT14 (the conditions of the tests restated). Not built.
   refusal of a hypothesis with no observation (`none(leader_no_observation)`, G1) stands unchanged.
   Reason: the review's finding (on the first tick of a run the leader has no observation); R7 states a policy and
   changes no rule of the gate.
+  AMENDED (AM42, Hadi, 4 October 2026; the plan's D1, the open item recorded in THE STRENGTHS REVISED): the gate
+  compares the threshold with the belief over the live hypotheses (the method's P_t, R2), with context knowledge on or
+  off. The floor and the scaling by the pinned hypotheses stay in the reported distribution only. The log prints the
+  value the gate read.
+  Reason: the threshold is defined on the robot's confidence among the tasks the human can be doing now; the count of
+  hypotheses that are not live, and the floor, say nothing about the human, and a number must not decide where the
+  robot has no knowledge (R8's surviving concern).
+  Not taken: the output after the floor and the scaling, as before; the belief over the live hypotheses only when
+  context knowledge is on (the gate would read two quantities by a run option).
+  Later work, recorded: the removal of the floor and the scaling from the reported distribution as well (TODO-178).
+  Consequence: gate outcomes near the threshold change with context knowledge off too; the build gives the change its
+  own commit and its own regenerated baseline (AM53, in the record).
 
 - R8, the entry "Assigned-task pool is a support restriction, not a prior" is revised in one sentence. Kept: the
   assignment restricts the support and is not a weight. Revised: "every admissible hypothesis carries unit weight";
@@ -5211,6 +5244,13 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
   AMENDED (AM41, Hadi, 4 October 2026, the design chat), later work, recorded and not built now: an override of the
   timeline from the run file and from the viewer, which takes precedence over the setup and the scenario. A change of
   a fact during a run belongs to the interactive phase (T-V track 2).
+  AMENDED (AM46, Hadi, 4 October 2026; the plan's D5): a window is written in ticks of the run, half-open: a fact with
+  the window [a, b) holds in every world state of tick t with a <= t < b; the end may be omitted (to the run's end);
+  two windows of one fact may not overlap. A recency fact is read the same way, [t_obs, t_obs + d) (AM47). This
+  confirms the reading of `docs/context_knowledge_method.md`, section 3.
+  Consequence: every expectation near a window's edge depends on the half-open reading by one tick.
+  AMENDED (AM50, Hadi, 4 October 2026; the plan's D9): a timeline fact is stated by a timeline only; the setup's
+  "states" block refuses it. A fact that holds from the start is a window from tick 0.
   SUPERSEDED IN PART (AM36, Hadi, 3 October 2026; R3): the three sources stand, and are read by a suppressing condition
   and a raising condition; "uses 'and' and 'not'" reads "is one fact or a conjunction of facts". The reason stands as
   the reason of a suppressing condition.
@@ -5282,6 +5322,11 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
   Reason: an episode boundary also follows the completions of other tasks; the terminal fact belongs to the one task.
   A task cut before its completion has no terminal fact, which agrees with the ruled limit that it produces no recency
   fact.
+  AMENDED (AM47, Hadi, 4 October 2026; the plan's D6): the memory records an observed completion at the tick on which
+  the task's terminal fact holds in the robot's world state after a tick on which it did not; a terminal fact already
+  holding at the robot's first observation is not recorded. It records the tasks that declare a recency duration.
+  Consequence: a completion the robot did not observe is not remembered and does not suppress the task; the recency
+  duration counts from the completion tick, that tick included.
 
 ASSUMPTIONS, recorded with the rulings (not added to `docs/assumptions.md`):
 AMENDED (AM28, Hadi, 3 October 2026): A1 and A5 are added to `docs/assumptions.md` (6.1 and 6.2), A5 stated as a
@@ -5324,7 +5369,8 @@ the ideas not ruled, each to its place); the open items' state. Amended 3 Octobe
 for the build's plan, with the open items. Amended 3 October 2026 (content point 3): CONTENT POINT 3, THE TESTS (KT1 to
 KT7; KT4 is AM34's record part). Amended 3 October 2026, recorded 4 October 2026 (AM35 to AM39): AM37 under AM13,
 AM38 under AM17, THE STRENGTHS REVISED (what becomes stale, the open item on the value the gate compares with the
-threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and KT14, after KT12.
+threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and KT14, after KT12. Amended 4 October 2026
+(AM42 to AM53): THE BUILD'S PLAN, RULED (AM43, AM45, AM48, AM49, AM51, AM53; P1 to P5 accepted).
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one
