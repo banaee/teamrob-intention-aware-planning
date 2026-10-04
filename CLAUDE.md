@@ -80,6 +80,12 @@ the block: its conceptual part under its entry in `design_decisions.md`, its rec
 the task's heading and the same entry title. A dated amendment goes where the text it amends is; a short BUILT
 line goes with the ruling it reports. Unclear: ask Hadi.
 
+The method of context knowledge (Hadi, 4 October 2026). `docs/context_knowledge_method.md` states the method of context
+knowledge (T-K): the concept, the formulas of the prior and worked examples, the statement of the prior that a build
+reads. The design records hold the rulings and win where the two disagree. A ruling that changes the method of context
+knowledge updates this document in the same records step. ccode does not change the method itself: it flags a
+contradiction with its evidence, and Hadi rules.
+
 Never read, edit, or treat as a source of truth:
 - Any file or directory named `my_*`, `old_*`, `archive_*` (personal notes and backups).
 - `__pycache__/`, `.venv/`, `.pytest_cache/`.

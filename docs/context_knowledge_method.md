@@ -1,6 +1,8 @@
 # Context knowledge in the robot's belief: the method
 
-Status: the method as discussed and ruled by Hadi on 3 October 2026, with the question of 4 October 2026 on the equal prior. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. The repo's records are authoritative once the records step has run.
+Status: the design records hold the rulings and their reasons and are authoritative (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K"). This document states the result of the rulings. If the two disagree, the records win and this document is corrected. A ruling that changes the method of context knowledge updates this document in the same records step.
+
+It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39), with the question of 4 October 2026 on the equal prior. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
 
 ## 1. The idea
 
@@ -25,18 +27,18 @@ Notation at tick $t$:
 - $A_t$: the live hypotheses of the assigned tasks. Together they are "the assigned tasks as a whole".
 - $H_t^f$: the live hypotheses of foreseeable task $f$, one per object the task can use (one per coffee machine, for example).
 
-Exception: with knowledge of the assignment switched off (an ablation), every work task of the task model takes the place of the assigned tasks.
+Exception: with assignment knowledge off (an ablation), every work task of the task model takes the place of the assigned tasks.
 
 ## 3. The facts
 
 $C_t$ is the set of crisp facts that hold at tick $t$. A fact holds or does not hold. There are three sources.
 
-1. A timeline fact: a fact of the situation with an authored window, for example "break time" or "room warm".
+1. A timeline fact: a context fact on the setup's timeline of context facts, with an authored window, for example "break time" or "room warm".
    $c \in C_t \iff a_c \le t < b_c$
 2. An object state, read from the world state, for example "the A/C is on".
-3. A recency fact of task $f$: the robot observed the human complete $f$ recently.
+3. A recency fact of task $f$: the robot's memory of observed completions holds an observed completion of $f$ within the recency duration.
    $\mathit{recent}_f \in C_t \iff 0 \le t - t_f^{\mathrm{obs}} < d_f$
-   Here $t_f^{\mathrm{obs}}$ is the tick of the last completion of $f$ that the robot observed, and $d_f$ is the declared recency duration.
+   Here $t_f^{\mathrm{obs}}$ is the tick of the last observed completion of $f$, and $d_f$ is the declared recency duration.
 
 The half-open window edges are a reading that the build's plan must confirm.
 
@@ -55,7 +57,7 @@ s^{\mathrm{ord}} & \text{otherwise}
 \end{cases}
 $$
 
-The suppressing condition is tested first. The suppressed strength and the ordinary strength are the same for every foreseeable task. The raised strength is declared per task.
+The suppressing condition is tested first. The suppressed strength and the ordinary strength are declared once per domain and hold for every foreseeable task of the domain. The raised strength is declared per task, with the raising condition.
 
 | task | suppressing condition | raising condition | raised strength | recency duration |
 |---|---|---|---|---|
@@ -140,8 +142,8 @@ The meta-planner admits the leading hypothesis $h^*$ when three conditions hold:
 1. $P_t(h^*) \ge \theta$, with $\theta = 0.75$.
 2. It is adequate: the observed movement does not contradict it. A hypothesis turns inadequate after about 334 cm of excess path, or after 17 ticks of standing.
 3. It is warranted.
-   - An assigned task is warranted by the assignment. It can be admitted before any distinguishing movement.
-   - A foreseeable task needs supporting movement: the human's path cost to the task's target has decreased since the start of the present phase. One step that brings the human closer satisfies it.
+   - An assigned task has commitment warrant, from the assignment. It can be admitted before any distinguishing movement.
+   - A foreseeable task needs observation warrant from movement: the human's path cost to the task's target has decreased since the start of the present phase. One step that brings the human closer satisfies it.
 
 ## 9. The procedure in four steps
 
