@@ -6,7 +6,8 @@ stage by stage, so that a compaction or a new session loses nothing. The records
 
 ## Status
 
-BUILD STAGE 5 in progress (its checks running, its commit pending). HEAD 2393935 (stage 4b).
+BUILD STAGE 5 committed (e589731). The session ended here (Hadi, 4 October 2026); stage 6 is next: its edits are
+in the working tree, uncommitted (below), its check not yet run. HEAD e589731 plus this file's commit.
 
 | stage | commits | check |
 |---|---|---|
@@ -15,8 +16,8 @@ BUILD STAGE 5 in progress (its checks running, its commit pending). HEAD 2393935
 | 2 | 91774ce (2a, the gate), 3b05a8a (2b, the instruments), 733e593 (2c, B2 and the records) | passed: 0 disagreements (round 1, IRB, MPB); every declared property as before; every coverage cell reached |
 | 3 | bbb7227 (the option, ω removed), 67b899e (the sweeps' mode) | passed: identical to B2 except the `[run]` field; milestones from step 500 the recognizer's lines only |
 | 4 | f70f72f (4a, the timeline), 2393935 (4b, the facts, switch_on, dock_loading's ac_activation) | passed: the timeline line and switch_on's name only; every scenario loads; 329 tests |
-| 5 | pending | the off scope against stage 4; the on runs to completion |
-| 6 | not started (its edits are in the working tree, uncommitted: the instruments, see below) | — |
+| 5 | e589731 (the mind) | passed: off identical to stage 4 (85 logs, .rec, round 1's 248 instrument files, the `[run]` header); on: all 85 runs complete; 352 tests |
+| 6 | not started (its edits are in the working tree, uncommitted: the instruments, see below) | to run: `run_stage6.sh` on a snapshot; compare with B2 (`compare_outputs.py`) |
 | 7 | not started | — |
 
 ## The rules Hadi added in this session (beside the build prompt)
@@ -47,6 +48,14 @@ BUILD STAGE 5 in progress (its checks running, its commit pending). HEAD 2393935
   `s5/on_*` (the on runs). The scripts: `run_scope.sh <tree> <out>` (the scope), `run_on.sh`, `run_stage6.sh`,
   `compare_scope.sh`, `compare_gate.sh`, `compare_s4.sh`, `compare_outputs.py`, `gate_moves.py`,
   `mpb_moves.py`, `snapshot_tree.sh`. A new session regenerates any of them from the commits.
+
+## What the next session reads first
+
+`docs/handoffs/plan_T-K_part1.md` (stages 6 and 7, sections 8 and 9), this file, CLAUDE.md, `docs/glossary.md`, the
+T-K entries of the records; then `git status` (stage 6's 14 modified files below, plus nothing untracked). The build
+prompt and Hadi's rules of this session (above) hold. Stage 6's check needs no scratch file from this session: its
+baseline is the repository's analysis folders (B2) and the named differences; `run_stage6.sh` and
+`compare_outputs.py` are reproduced from their description here if the scratchpad is gone.
 
 ## Stage 6, as it stands in the working tree (uncommitted)
 
