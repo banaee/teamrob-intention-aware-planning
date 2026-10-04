@@ -48,7 +48,8 @@ def reference_scenario(scenario: ScenarioConfig) -> ScenarioConfig:
     """The scenario's robot alone: the human agent removed, the robot's `observes` emptied."""
     robots = [dataclasses.replace(a, observes=[]) for a in scenario.agents if a.agent_type == "robot"]
     return ScenarioConfig(id=scenario.id, description=f"reference run of {scenario.id}: its robot alone",
-                          agents=robots, setup=scenario.setup, reference_layouts=scenario.reference_layouts)
+                          agents=robots, setup=scenario.setup, reference_layouts=scenario.reference_layouts,
+                          timeline=scenario.timeline)    # the scenario's own timeline, if it states one (AM40)
 
 
 def run(run_file, steps, strategy):

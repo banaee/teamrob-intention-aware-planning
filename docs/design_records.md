@@ -3560,3 +3560,11 @@ knowledge off; the on sides' admissions are the IRB oracle's previews (no run wi
     admits nothing on the walk and holds as off.
 - Not taken (the flags of the final report): the needless hold for a walk that never comes (case 4's other form, from
   the first proposal); case 5 at the human's turn east at the switch; E2 as a separate case.
+STEP 5, STAGE 2: AUTHORED (ccode, 4 October 2026). env_layout_18, env_setup_16, scenario_s16_01 to _06, the run files
+in configs/kitting/mpb/tk/ (on) and configs/kitting/mpb/tk/off/ (off); the expectations committed before any run with
+context knowledge on (the oracle's tables, md5s and the expected chains in analysis/kitting/mpb/tk/README.md; the
+declared properties PK1 to PK5 in analysis/kitting/mpb/properties.py). The instrument: reference.py carries a
+scenario's own timeline (the flag of step 4, a plain defect); the six scenarios have their reference run (CONTROLS);
+tk5.py reads the set. Audit: the existing control scenario_s10_06 rerun through the instrument is byte-identical
+(properties, diff, separation, reference, decisions, expectations; the log but for its header lines); the tests pass
+with the registry's counts updated (134 scenarios, setups 01 to 16).

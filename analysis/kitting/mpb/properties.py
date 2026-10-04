@@ -64,6 +64,29 @@ Part (v) (analysis/mpb/coverage.md, the five claimed cells; authoring.md, part (
   those ticks item_1 leads with its share below theta (the gate none(below_theta)), and on every such tick it is
   adequate (D2's retention by identity, no inadequacy and no trigger in the dip).
 - scenario_s10_11 (row A4): no property; the cause boundary is part 1, compared exactly.
+T-K part 1, step 5, the planning cases (analysis/kitting/mpb/tk/README.md; declared before any run with context knowledge
+on). The side is read from the run file (context knowledge off or on) and the scenario's timeline. The windows: the
+turn at shelf_4 40 to 60; the stand at the coffee machine 38 to 75; the walk to the A/C switch 15 to 35. "Below 50" is
+the continuous [sep] minimum under min_separation; a violation is F1's (a moving robot).
+- scenario_s16_01, off: PK3off, no admitted projection before 47 and the first admission is deliver_item(item_4) at 47
+  (entered); PK3off.sep, the separation falls below min_separation in the turn's window. On (case 3): PK3a, the decision
+  at 0 rests on the admitted deliver_item(item_4) and carries a positive hold; PK3b, no projection_expired decision
+  before 47; PK3c, no violation and no tick below min_separation in the turn's window.
+- scenario_s16_02, on (case 2): PK2a, the decisions before 38 rest on fallbacks, at off's ticks (0, 2, 6, 14, 30); at 38
+  recognition_changed (entered) admits deliver_item(item_4) with a positive hold; PK2b, as PK3c.
+- scenario_s16_03, off: PK1off, coffee_break admitted at 36 (entered) with a positive hold; PK1off.stale, the decision
+  at 72 rests on a fallback stand and carries a positive hold, and deliver_item(item_4) is admitted at 97. On (case 4):
+  PK4a, the one decision in 0 to 42 is tick 0's, on the admitted deliver_item(item_4), hold 0; PK4b, at 43
+  recognition_changed with cause retraction, on a fallback stand, with a positive hold; PK4c, no violation in the
+  stand's window; PK4d, coffee_break admitted at 55 (entered); PK4e, deliver_item(item_4) admitted at 73 and no decision
+  after 72 rests on a fallback stand (the boundary's decision at 72 rests on the observed stand; 73 replaces it).
+- scenario_s16_04, on (case 1): PK1a, the decisions before 22 at off's ticks (0, 2, 6, 14), on fallbacks; coffee_break
+  admitted at 22 (entered) with a positive hold; PK1b, as PK4e; PK1c, as PK4c.
+- scenario_s16_05, off: PK5off, a positive hold at 14 on a fallback and no violation in the walk's window. On (case
+  5): PK5a, the one decision in 0 to 45 is tick 0's, on the admitted deliver_item(item_4), hold 0; PK5b, a violation
+  in the walk's window.
+- scenario_s16_06, on (the A/C raised): PK5rw, no admitted projection before 47, a positive hold at 14 on a fallback,
+  and no violation in the walk's window.
 """
 import json
 import math
@@ -81,7 +104,10 @@ from mpblib import Trigger
 from sep_classes import rule
 
 # The control scenarios: run.sh runs the reference (reference.py) for each (MPB-2, scenario 8).
-CONTROLS = ("scenario_s10_06",)
+# Since T-K part 1, step 5, also its six scenarios: their reference (the robot alone) is part of what the chain is read
+# against (analysis/kitting/mpb/tk/README.md).
+CONTROLS = ("scenario_s10_06", "scenario_s16_01", "scenario_s16_02", "scenario_s16_03", "scenario_s16_04",
+            "scenario_s16_05", "scenario_s16_06")
 
 
 def item_of(key):
@@ -98,6 +124,90 @@ def plain_difference(p, a, b, traj):
         shelf, table = fixed[traj["home"][item]], fixed[traj["dest"][item]]
         return math.dist(p, shelf) + math.dist(arrival(p, shelf, r), table)
     return (path(b) - path(a)) / v
+
+
+def _tk5(p4, sid):
+    """T-K part 1, step 5's declared properties (the docstring's list)."""
+    import yaml
+    ctx = bool(yaml.safe_load(open(p4.run_file))["context_knowledge"])
+    decisions, sel_by, run, sep = p4.decisions, p4.sel_by, p4.run, p4.sep
+    def adm(x):
+        return None if x.admitted is None else x.admitted.key.split("(")[0] + ("" if "item" not in x.admitted.key else
+                                                                              "(" + item_of(x.admitted.key) + ")")
+    def at(t):
+        return next((x for x in decisions if x.tick == t), None)
+    def hold(t):
+        return (sel_by.get(t) or {}).get("hold") or 0
+    def first_adm(name):
+        return next((x for x in decisions if adm(x) == name), None)
+    def below(a, b):
+        return [k for k in range(a, b + 1) if k in run["sep"] and run["sep"][k][1] is not None and run["sep"][k][1] < sep]
+    def desc(x):
+        return "none" if x is None else (f"tick {x.tick} {x.trigger.value}/{x.cause and x.cause.value} "
+                                         f"{'admitted ' + adm(x) if x.admitted else 'fallback'} hold {hold(x.tick)}")
+    fb_ticks = lambda t: [x.tick for x in decisions if x.tick < t and x.admitted is None]
+    if sid == "scenario_s16_01" and not ctx:
+        x = next((x for x in decisions if x.admitted), None)
+        p4.prop("PK3off", x is not None and x.tick == 47 and adm(x) == "deliver_item(item_4)"
+                and x.cause is not None and x.cause.value == "entered", f"first admission: {desc(x)}")
+        b = below(40, 60)
+        p4.prop("PK3off.sep", bool(b), f"ticks below min_separation in 40 to 60: {b}")
+    if sid == "scenario_s16_01" and ctx:
+        x = at(0)
+        p4.prop("PK3a", x is not None and adm(x) == "deliver_item(item_4)" and hold(0) > 0, desc(x))
+        e = [x.tick for x in decisions if x.trigger is Trigger.PROJECTION_EXPIRED and x.tick < 47]
+        p4.prop("PK3b", not e, f"projection_expired decisions before 47: {e}")
+    if sid in ("scenario_s16_01", "scenario_s16_02") and ctx:
+        v, b = p4.violations(40, 60), below(40, 60)
+        p4.prop("PK3c" if sid.endswith("1") else "PK2b", not v and not b, f"violations {v}; below {b} (40 to 60)")
+    if sid == "scenario_s16_02":
+        x = at(38)
+        p4.prop("PK2a", fb_ticks(38) == [0, 2, 6, 14, 30] and x is not None and x.cause is not None
+                and x.cause.value == "entered" and adm(x) == "deliver_item(item_4)" and hold(38) > 0,
+                f"fallback decisions before 38: {fb_ticks(38)}; {desc(x)}")
+    if sid == "scenario_s16_03" and not ctx:
+        x, y, z = at(36), at(72), first_adm("deliver_item(item_4)")
+        p4.prop("PK1off", x is not None and adm(x) == "coffee_break" and hold(36) > 0, desc(x))
+        p4.prop("PK1off.stale", y is not None and y.admitted is None and y.fallback is not None
+                and y.fallback.mode.value == "standing" and hold(72) > 0 and z is not None and z.tick == 97,
+                f"{desc(y)}; first item_4 admission: {desc(z)}")
+    if sid == "scenario_s16_03" and ctx:
+        early = [x for x in decisions if x.tick <= 42]
+        p4.prop("PK4a", [x.tick for x in early] == [0] and adm(early[0]) == "deliver_item(item_4)" and hold(0) == 0,
+                "; ".join(desc(x) for x in early))
+        x = at(43)
+        p4.prop("PK4b", x is not None and x.cause is not None and x.cause.value == "retraction" and x.admitted is None
+                and x.fallback is not None and x.fallback.mode.value == "standing" and hold(43) > 0, desc(x))
+        x = next((x for x in decisions if x.tick > 43 and x.admitted), None)
+        p4.prop("PK4d", x is not None and x.tick == 55 and adm(x) == "coffee_break", f"next admission: {desc(x)}")
+    if sid in ("scenario_s16_03", "scenario_s16_04") and ctx:
+        z = next((x for x in decisions if x.tick > 72 and adm(x) == "deliver_item(item_4)"), None)
+        stale = [x.tick for x in decisions if x.tick > 72 and x.admitted is None and x.fallback is not None
+                 and x.fallback.mode.value == "standing"]
+        p4.prop("PK4e" if sid.endswith("3") else "PK1b", z is not None and z.tick == 73 and not stale,
+                f"item_4 after the break: {desc(z)}; decisions on a fallback stand after 72: {stale}")
+        v = p4.violations(38, 75)
+        p4.prop("PK4c" if sid.endswith("3") else "PK1c", not v, f"violations in 38 to 75: {v}")
+    if sid == "scenario_s16_04":
+        x = at(22)
+        p4.prop("PK1a", fb_ticks(22) == [0, 2, 6, 14] and x is not None and adm(x) == "coffee_break"
+                and x.cause is not None and x.cause.value == "entered" and hold(22) > 0,
+                f"fallback decisions before 22: {fb_ticks(22)}; {desc(x)}")
+    if sid == "scenario_s16_05" and not ctx:
+        x, v = at(14), p4.violations(15, 35)
+        p4.prop("PK5off", x is not None and x.admitted is None and hold(14) > 0 and not v,
+                f"{desc(x)}; violations in 15 to 35: {v}")
+    if sid == "scenario_s16_05" and ctx:
+        early = [x for x in decisions if x.tick <= 45]
+        p4.prop("PK5a", [x.tick for x in early] == [0] and adm(early[0]) == "deliver_item(item_4)" and hold(0) == 0,
+                "; ".join(desc(x) for x in early))
+        v = p4.violations(15, 35)
+        p4.prop("PK5b", bool(v), f"violations in 15 to 35: {v}; below {below(15, 35)}")
+    if sid == "scenario_s16_06":
+        x, v = at(14), p4.violations(15, 35)
+        first = next((x for x in decisions if x.admitted), None)
+        p4.prop("PK5rw", (first is None or first.tick >= 47) and x is not None and x.admitted is None
+                and hold(14) > 0 and not v, f"first admission: {desc(first)}; {desc(x)}; violations in 15 to 35: {v}")
 
 
 def evaluate(sid, d, log_path, run_file):
@@ -283,6 +393,8 @@ def evaluate(sid, d, log_path, run_file):
             last_projection_end=None if not on or on[-1].fallback is None else on[-1].fallback.end,
             holds_past_break=[(x.tick, sel_by[x.tick]["hold"]) for x in decisions
                               if sel_by[x.tick]["hold"] and x.tick + sel_by[x.tick]["hold"] > brk and x.tick < brk])
+    if sid.startswith("scenario_s16_"):
+        _tk5(p4, sid)
     return out
 
 

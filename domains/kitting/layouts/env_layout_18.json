@@ -1,0 +1,198 @@
+{
+  "space": {
+    "width": 1000,
+    "height": 1000,
+    "name": "env_layout_18",
+    "units": "cm",
+    "notes": "T-K part 1, step 5's room (Hadi's ruling of 4 October 2026, option (b): a copy of env_layout_17 with additions for the robot only; the human's side unchanged; it serves KT3's 'on env_layout_17'). Every object of env_layout_17 at its place, plus three objects the robot alone uses: kitting_table_1 (440, -450), the robot's table in the south-east corner; shelf_5 (-470, -400) on the west wall, whose carry to kitting_table_1 runs along the south wall and passes 4 cm from the point where the human stands at shelf_4 (148, -438) and turns north; shelf_6 (480, -60) on the east wall between coffee_machine_0 and shelf_2, whose carry to kitting_table_1 passes the point where the human stands at the coffee machine (460, -253). With its own table no robot delivery ends at kitting_table_0, and the robot's routes cross the human's walks away from it. None of the three lies on a walk of the human from kitting_table_0 or on its straight continuation (the fallback projection's cut is env_layout_17's): kitting_table_1 is 158 cm from the walk from the coffee machine to shelf_4 and beyond shelf_4's arrival disc on the walk east from the A/C switch; shelf_6 is 146 cm east of the walk to the coffee machine. No assigned task of the human names them, so the human's hypotheses are env_layout_17's. Sizes are the viewer's only. Step 5's set: analysis/kitting/mpb/tk/README.md."
+  },
+  "areas": [
+    {
+      "id": "zone_NW",
+      "bounds": {
+        "x_min": -500,
+        "x_max": 0,
+        "y_min": 0,
+        "y_max": 500
+      },
+      "label": "northwest_work"
+    },
+    {
+      "id": "zone_NE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 500,
+        "y_min": 0,
+        "y_max": 500
+      },
+      "label": "northeast_work"
+    },
+    {
+      "id": "zone_SW",
+      "bounds": {
+        "x_min": -500,
+        "x_max": 0,
+        "y_min": -500,
+        "y_max": 0
+      },
+      "label": "southwest_storage"
+    },
+    {
+      "id": "zone_SE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 500,
+        "y_min": -500,
+        "y_max": 0
+      },
+      "label": "southeast_storage"
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table_0",
+      "type": "kitting_table",
+      "position": [
+        0,
+        450
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "notes": "The middle of the north wall, against it; the one kitting table, shared."
+    },
+    {
+      "id": "shelf_1",
+      "type": "shelf",
+      "position": [
+        -155,
+        -450
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "The south wall, west of centre; -99.8 deg from the table, 913 cm."
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [
+        445,
+        150
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "The east wall, north of centre; -34.0 deg from the table, 537 cm."
+    },
+    {
+      "id": "coffee_machine_0",
+      "type": "coffee_machine",
+      "position": [
+        475,
+        -275
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "notes": "The east wall, south of centre; -56.8 deg from the table, 867 cm, between shelf_2 and shelf_4 by bearing."
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [
+        -450,
+        -5
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "notes": "The west wall, at mid-height; -134.7 deg from the table, 640 cm."
+    },
+    {
+      "id": "shelf_4",
+      "type": "shelf",
+      "position": [
+        150,
+        -450
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "notes": "The south wall, east of centre; -80.5 deg from the table, 912 cm."
+    },
+    {
+      "id": "ac_switch_0",
+      "type": "ac_switch",
+      "position": [
+        0,
+        -480
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "The south wall, between shelf_1 and shelf_4; -90.0 deg from the table, 930 cm, 9.8 and 9.5 deg from their bearings; the room's one A/C switch."
+    },
+    {
+      "id": "corner_NE",
+      "type": "landmark",
+      "position": [
+        450,
+        450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): the exit walk's target; a place for the human's script only; no task binds it. 50 cm in from both walls. From kitting_table_0 its bearing (0.0 deg, along the north wall) is 34.0 deg from the nearest target's (shelf_2); (450, -450) would be 6.6 deg from the coffee machine's. From the coffee machine the walk here passes through shelf_2's footprint, from shelf_4 27 cm from it."
+    },
+    {
+      "id": "kitting_table_1",
+      "type": "kitting_table",
+      "position": [
+        440,
+        -450
+      ],
+      "size": [
+        100,
+        60
+      ],
+      "notes": "The robot's table, the south-east corner; used by no task of the human."
+    },
+    {
+      "id": "shelf_5",
+      "type": "shelf",
+      "position": [
+        -470,
+        -400
+      ],
+      "size": [
+        60,
+        60
+      ],
+      "notes": "A robot shelf on the west wall, south; its carry to kitting_table_1 passes the human's turn point at shelf_4."
+    },
+    {
+      "id": "shelf_6",
+      "type": "shelf",
+      "position": [
+        480,
+        -60
+      ],
+      "size": [
+        40,
+        60
+      ],
+      "notes": "A robot shelf on the east wall between coffee_machine_0 and shelf_2; its carry to kitting_table_1 passes the human's point at the coffee machine."
+    }
+  ]
+}
