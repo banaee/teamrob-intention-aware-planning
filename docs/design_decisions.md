@@ -4108,6 +4108,9 @@ only (session L-records); built in L-build.
   against no human plan" no longer hold. A retraction refuses admission like any refusal; with a human observed the
   decision realizes against the fallback projection (P1). The retraction itself is unchanged. design_decisions.md,
   "T-D P: the fallback projection".
+  UNCHANGED (AM69, Hadi, 4 October 2026; "T-K: context knowledge in the recognizer's belief", R7, AM69): T-K part 1's
+  rulings on the gate (AM67, AM68) change admission only. An admission that was correct when made stays until the
+  retraction; a stated limitation (`docs/assumptions.md` 6.4).
 
 - L3, resumption: no change under L1.
   Problem. The completion of a foreseeable task inside a suspended delivery ends the episode while the delivery is
@@ -4447,6 +4450,15 @@ every boundary that meets a recorded decision (TODO-119's G part).
   CONSEQUENCE RECORDED (MPB part (iii), 29 September 2026; analysis/mpb/REPORT.md): observation warrant obtained through
   entry by completion persists for the whole phase; loss by the gain is possible only in a phase not entered by
   completion.
+  SUPERSEDED IN PART (AM67, AM68, Hadi, 4 October 2026; "T-K: context knowledge in the recognizer's belief", R7, AM67
+  and AM68; not built): observation warrant is required at admission for every hypothesis; commitment warrant alone no
+  longer admits and decides no admission. Superseded with it: commitment warrant as a ground of admission; the reason
+  "an assigned task is a known commitment ... that warrants projecting it before movement"; the consequences "The last
+  assigned delivery at b + 1 is admitted as now (commitment warrant)" and "An assigned rival is admissible the moment it
+  clears θ" (it needs observation warrant too); "Prior off has no commitment warrant, so every hypothesis needs
+  observation warrant there" now holds in both settings. Unchanged: observation warrant, its two sources and its reset;
+  AD3. AM68 adds a condition of admission: the gate refuses a leader that the evidence alone ranks below another live
+  hypothesis (rank only, a tie passes).
 
 - AD2, three outputs.
   Ruling. Warrant is a third independent dimension beside belief and adequacy; R3 is amended from two independent
@@ -4457,6 +4469,10 @@ every boundary that meets a recorded decision (TODO-119's G part).
   target).
   Why. The recognizer reports what the observations support (R5); the gate combines that with knowledge available to
   the planner; the two sources stay distinguishable.
+  NOTE (AM67, AM68, 4 October 2026; not built): after AM67, commitment warrant and the assigned tasks passed to the
+  meta-planner for it decide no admission; whether they stay, for the log of AD4, is the build plan's question. AM68
+  needs a recognizer output that the gate reads for the leader, since the gate reconstructs no recognizer quantity;
+  which output is the build plan's (design_records.md, "T-K", THE GATE AFTER STEP 5B, RULED, ccode's facts).
 
 - AD3, loss of warrant.
   Ruling. Loss of observation warrant fires nothing and clears no admitted projection. Retraction stays on the
@@ -4471,6 +4487,8 @@ every boundary that meets a recorded decision (TODO-119's G part).
   by 334 cm. This occurs only for a lone hypothesis admitted at once (a foreseeable task on its first step; a delivery
   on commitment at b + 1), followed by a turn back. Hypotheses admitted through θ among rivals are practically excluded
   from it. No AD3 property is declared in the MPB; the instance belongs to the evaluation's authored deviations.
+  AMENDED (AM67, 4 October 2026; not built): no hypothesis is admitted on commitment, so "a delivery on commitment at
+  b + 1" reads "a lone delivery admitted on its first step toward its target".
 
 - AD4, representation.
   Ruling. The `[IR]` line prints, per live hypothesis, `warrant=none|observation` (commitment warrant is the gate's
@@ -4995,6 +5013,14 @@ are built in eight stages (b85494d; 91774ce, 3b05a8a, 733e593; bbb7227, 67b899e;
 instruments; the records). "Not built" in the lines above reads: built, except R5 (T-K part 2) and the items the
 records leave open. The timelines of the setups and the runs with context knowledge on are step 4; no run of the build
 exercises a raised strength.
+AMENDED (Hadi, 4 October 2026, the design chat after step 5b; AM67 to AM72, recorded the same day): the design
+discussion after step 5b is closed. Under R7: Hadi's principle for the decision, AM67 (observation warrant is required
+at admission, for every hypothesis), AM68 (the gate refuses a leader that the evidence alone ranks below another live
+hypothesis), AM69 (the end of an admission unchanged, a stated limitation), AM71 (the changes not taken) and AM72 (the
+cases that remain are limitations). Under R3: AM70 (the strengths stay). The notes that AM65 and AM66 were under
+discussion again are resolved. In the record ("T-K", THE GATE AFTER STEP 5B, RULED): the measured basis, what becomes
+stale, the proposed term, ccode's facts for the build's plan, what stays open. AM67 and AM68 are not built; their build
+starts with a plan step in its own session.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -5151,6 +5177,14 @@ exercises a raised strength.
   of steps 4 and 5b corrected (×12 to ×14 at the end of a long walk; docs/assumptions.md 6.4), and Hadi asked why a
   larger ordinary strength is not reopened. The discussion is recorded, not ruled: the record, "T-K", THE DESIGN
   DISCUSSION AFTER STEP 5B.
+  RESOLVED (Hadi, 4 October 2026; the design chat after step 5b): the note above is resolved by AM70 below; AM65
+  stands.
+  RULED (AM70, Hadi, 4 October 2026; the design chat after step 5b), the strengths: all strengths stay as ruled: the
+  raised strength 2 (coffee_break) and 0.5 (ac_activation), the ordinary strength 0.02, the suppressed strength 0.005.
+  A larger ordinary strength (0.1 and 0.2 were named, the discussion's 1.A) was discussed and not taken.
+  Reason: a strength is the designer's statement about a site; it is not chosen from test results. With AM67 and AM68
+  (under R7) the admissions of a hypothesis that is not the true task no longer depend on the value. The table of the
+  cases at other values stays a sensitivity analysis for the close of T-K part 1 (AM65).
 
 - R4, division inside assigned work: equal among the live assigned tasks, in T-K part 1.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -5222,6 +5256,65 @@ exercises a raised strength.
   the first ticks of a walk; after them the evidence ranks the true task first, by about ×3 to ×14 at the end of the
   walk, and the prior overrules it (docs/assumptions.md 6.4). The discussion is recorded, not ruled: the record,
   "T-K", THE DESIGN DISCUSSION AFTER STEP 5B.
+  RESOLVED (Hadi, 4 October 2026; the design chat after step 5b): the note above is resolved by AM67 to AM69, AM71 and
+  AM72 below. AM66 is SUPERSEDED IN PART: by AM67, where it keeps the admission of an assigned task on commitment
+  warrant; by AM68, its sentence "No rule lets the evidence alone veto the prior" and the first of its reasons (such a
+  rule would cancel the prior where the movement is ambiguous). AM66 stands for the end of an admission (AM69): a
+  recorded admission ends on a change of leader, a boundary or its inadequacy; the gate is not asked for retention; no
+  retraction comes below the threshold.
+
+  THE PRINCIPLE (Hadi, 4 October 2026), recorded with AM67 to AM72. If the robot admits task X and the human does Y,
+  the recognizer was not wrong for that reason. Either the human did something unexpected given the modelled knowledge
+  and the evidence, or the recognizer is limited. The framework is about what recognition contributes to adaptive
+  planning. It is not changed to make every run flawless. Changes to the core stay minimal.
+
+  RULED (AM67, Hadi, 4 October 2026; the discussion's 2.A), observation warrant at admission: observation warrant is
+  required at admission, for every hypothesis, assigned or foreseeable. Commitment warrant alone no longer admits. A lost
+  observation warrant still ends nothing ("T-D G: admission", AD3, unchanged).
+  Reason: the prior states which task is probable. Nothing states when the human starts. A projection built before the
+  first movement assumes a start tick the robot has not observed. Measured cost, in the what-if reading Y (the record,
+  "T-K", TWO WHAT-IF READINGS, X AND Y): the 59 lone assigned tasks admitted on the previous task's completion tick are
+  admitted 1 tick later.
+  Consequence: commitment warrant no longer decides an admission. This reverses the part of T-D G that admits an
+  assigned task before movement ("T-D G: admission", AD1, its marks), the same part of this entry's ruling on the gate
+  (R7's first sentence and AM5 above; AM6's gate policy under R8), and the ruled test line on the early admission of a
+  lone assigned task (the record, "T-K", KT11's RULED line).
+  SUPERSEDED IN PART by it: R7's "An assigned task may be admitted before any movement, on its commitment warrant, when
+  its belief reaches the threshold on the prior", with AM5's reading of it ("before any distinguishing movement"). R7's
+  "A foreseeable task still needs observation warrant" now holds for every hypothesis. The rest of R7 stands: the prior
+  is the robot's relative expectation, not evidence that the human has started the task; adequacy tests the hypothesis
+  afterwards and can cause the retraction. Not built.
+
+  RULED (AM68, Hadi, 4 October 2026; the discussion's 2.B, as a condition of admission), the rank of the evidence: the
+  gate refuses a leader (the hypothesis with the highest belief) that the evidence alone ranks below another live
+  hypothesis. Rank only: a tie passes. No constant, no margin. It is a condition of admission only. The evidence alone
+  is E_t of R2, the movement likelihood accumulated in the present episode over the live hypotheses, without the prior
+  (`docs/context_knowledge_method.md`, section 7). PROPOSED, NOT RULED (ccode, 4 October 2026; Hadi rules): the term
+  "outranked" for a leader so ranked, and the refusal reason `none(leader_outranked)` (`docs/glossary.md` §7).
+  Reason: context knowledge may make an admission earlier. It may not admit a task against the rank of the observed
+  evidence. A margin would be a new constant, which the gate has avoided before (no threshold on the path gain, "T-D
+  G: admission", AD1, its Set aside).
+  Not taken: the same condition as a ground for ending an admission. Reason: it changes the rule on when an admission
+  ends (T-D L), and Hadi keeps the change minimal.
+  Consequences: with context knowledge off the prior is equal, the belief's leader is the evidence's leader, and the
+  condition refuses nothing. On the first walking tick after a boundary the evidence's rank can rest on a difference of
+  about 0.0003 (scenario_s14_19 at 181: 0.333484 against 0.333225), the case the first reason of AM66 named; the
+  ruling takes the rank as it is. Not built.
+
+  RULED (AM69, Hadi, 4 October 2026), the end of an admission: the rule on when an admission ends ("T-D L: the belief
+  lifecycle"; D2) is unchanged. An admission that was correct when made stays until the retraction, as today. This is a
+  stated limitation (`docs/assumptions.md` 6.4).
+
+  RULED (AM71, Hadi, 4 October 2026), not taken: an admitted task without observation warrant projected as the human
+  staying at the observed position until the human moves (the discussion's 3.A); the robot's plan checked against the
+  admitted task's projection and the fallback projection together (3.B); communication or slowing down on a weak
+  admission (4.A; T-D X). 3.B and 4.A are possible future work (TODO-181; TODO-96). Hadi's position on 3.B in the
+  discussion: it changes the meta-planner and mixes high-level planning with a lower level; the framework shows what
+  recognition contributes to adaptive planning (the record, "T-K", THE DESIGN DISCUSSION AFTER STEP 5B).
+
+  RULED (AM72, Hadi, 4 October 2026): the cases that remain are limitations, not defects: the first ticks of a walk with
+  equal evidence; the evidence itself ranking another task first after the human interrupts a task; the human doing
+  the less probable task after a correct admission. Recorded in `docs/assumptions.md` 6.4.
 
 - R8, the entry "Assigned-task pool is a support restriction, not a prior" is revised in one sentence. Kept: the
   assignment restricts the support and is not a weight. Revised: "every admissible hypothesis carries unit weight";
@@ -5239,6 +5332,11 @@ exercises a raised strength.
   Reason: the crossing on prior mass is accepted for an assigned task as a gate policy, on the commitment warrant, with
   adequacy as the later test; it is not a claim that the prior is evidence. The concern that survives is R8's: a number
   must not decide between hypotheses the robot has no knowledge to tell apart.
+  SUPERSEDED IN PART (AM67, AM68, Hadi, 4 October 2026; under R7): the gate policy named in AM6's reason, "the crossing
+  on prior mass is accepted for an assigned task as a gate policy, on the commitment warrant", no longer holds as
+  stated. Commitment warrant admits nothing (AM67); a crossing of the threshold on the belief admits only a leader that
+  the evidence alone does not rank below another live hypothesis (AM68). The marks AM6 placed stand: the belief the gate
+  reads is still the prior × the evidence, and the prior is not evidence.
 
 CONTENT POINTS 1 AND 2, RULED (Hadi, 3 October 2026; the design chat on T-K part 1's open items 1 and 2, the values and
 the perception assumption). Records only; not built. The conceptual part of each ruling is here, each with its reason;
@@ -5418,7 +5516,7 @@ threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and K
 (AM59 to AM64): THE CROSS-CHECK'S CONSEQUENCES, RULED. Amended 4 October 2026 (AM65): QUESTION S, RULED; THE READING
 FOR QUESTION G. Amended 4 October 2026 (AM66): QUESTION G, RULED; THE PLANNING CASES, RULED (KT15); STEP 5B, PLANNED;
 STEP 5, STAGE 1: THE PROPOSAL; THE ROOM, RULED; THE STEP'S MODE AND SIZE; STEP 5, STAGE 1,
-REVISED: THE SET.
+REVISED: THE SET. Amended 4 October 2026 (AM67 to AM72): THE GATE AFTER STEP 5B, RULED.
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one
