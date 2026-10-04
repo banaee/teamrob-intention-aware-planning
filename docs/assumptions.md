@@ -204,6 +204,39 @@ is the schema's, converted by the body (TODO-32, R2)" · the projection; the sta
 compressed demonstration scale and are not calibrated.
 Simulator convention · Hadi, 3 Oct 2026 (T-K part 1, AM23) · the domains' task schemas and context knowledge.
 
+**6.4** When the movement cannot separate two targets (the coffee machine beside a shelf; the A/C switch beside
+shelf_4) and the declared context makes one of them probable, the robot admits that one, and the human may then do the
+less probable thing. This is a limit of recognising from context and movement, not a defect of the recognizer or of
+the gate. A careful human observer with the same knowledge could make the same guess. No rule inside recognition
+removes it, because the information that would separate the two tasks does not exist at that time. It is the stated
+meaning of the threshold: at θ = 0.75 the robot accepts that an admitted hypothesis can be other than what the human
+does.
+Boundary (framework scope) · Hadi, 4 Oct 2026 (T-K part 1, after step 5b; design_records.md, "T-K", THE LIMITATION OF
+ADMISSION FROM CONTEXT AND MOVEMENT) · the recognizer's belief and the gate; how they are read in an evaluation.
+- "An admission of a hypothesis that is not the true task" names the outcome. It does not say the reasoning was wrong.
+- Two kinds, as the reading for question G separates them by the evidence alone (the run with context knowledge off,
+  the equal prior). (i) The movement does not separate the targets, and the prior decides. (ii) The evidence ranks the
+  true task first, and the prior overrules it. This item is about kind (i). Kind (ii) depends on the declared
+  strengths; the sensitivity table planned for the close of T-K part 1 shows it (AM65).
+- Measured instances. The evidence ratio is the true task's belief over the admitted one's in the off run.
+  - The coffee break admitted under break_time during the walk to the neighbouring shelf (step 4: scenario_s13_11,
+    _12, _14). Admitted at 81 with belief 0.754 (prior 0.667), held 11 ticks; evidence ratio ×1.22 at the admission,
+    ×1.71 at its end.
+  - The last delivery admitted through the whole A/C activation (step 4, P4: scenario_s15_19). Admitted at 216 on
+    commitment (prior 0.962), held 46 ticks. The evidence ties on its first tick, is ×1.0015 on the next, stays
+    within 1 percent for 5 ticks, then rises to ×3.05 at the end.
+  - The pass at 28.3 cm in step 5's case 5 (scenario_s16_05). The delivery is admitted 0 to 45 while the human walks to
+    the A/C switch, with F1 violations at 22 to 25. The evidence ratio is ×1.003 at 0, ×1.02 at 10, and ×1.065 to
+    ×1.087 at 22 to 25.
+  - Measured by ccode (analysis/kitting/mpb/tk5b/COMPARISON.md, A2, a 1-percent reporting threshold, not a design
+    value): the first instance ranks the true task first from its first tick, ×1.22. The second and third are within
+    1 percent only on their first ticks. Whether they count as kind (i) depends on how small a ratio "does not
+    separate" means; Hadi rules.
+- Not settled here: how the robot acts on an admitted hypothesis that can be wrong. Today it plans on the admitted task
+  alone and does not use the fallback projection while the admission stands. That is an open design question about
+  the meta-planner, not part of this limitation. Communication with the human is the other place where such a case can
+  be resolved (T-D X, X5).
+
 ## Rejected or dropped
 
 - **2.1** "The human acts rationally": too strong; nothing depends on it.
