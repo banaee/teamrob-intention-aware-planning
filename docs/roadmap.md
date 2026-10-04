@@ -894,7 +894,9 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     the second setup per room dropped (KT13); the tests read off against on, each case labelled by the state the script
     meets (KT14); the plan written and its decisions ruled (AM42 to AM53: the gate on the belief over the live
     hypotheses, in its own commit and baseline; switch_on; the conditions, the windows, the memory, the regression
-    scope, the run options; no task condition reads a timeline fact). Nothing built. Next: the build, stage by stage.
+    scope, the run options; no condition of a task or action reads a timeline fact, AM52, AM54); on ccode's cross-check,
+    AM55 to AM58 (round 1 and kitting's IRB and MPB sets rerun with the new gate in the build; dock_loading's sets stale
+    until its step; TODO-179, TODO-180). Nothing built. Next: the build, stage by stage.
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing

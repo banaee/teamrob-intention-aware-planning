@@ -4744,3 +4744,27 @@ Files: shared/recognizer.py (`_output`, `_finalize`, `_pin`), docs/recognizer_ha
 oracle (analysis/instruments/irb/oracle.py, `output`) and log readers
 Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM42;
 docs/handoffs/plan_T-K_part1.md, section 5 (a)
+
+**TODO-179: The episode-boundary line names wait_at for a completed switch_on (recorded, T-K part 1, AM56, 4 Oct 2026)** open
+A log names what happened (Hadi, 4 Oct 2026); deferred because the correction is not small. When T-K part 1's build
+adds switch_on (AM43), an A/C activation's completion makes waited(human, switch) newly hold, and both terminal actions
+wait_at and switch_on have an enabled grounding at the switch (the same precondition at(agent, entity), the same
+completion waited(agent, entity); wait_at's ?entity has no type in its schema). `_observed_terminal_completion` returns
+the first in declaration order, so `[IR-boundary]` reads `completed wait_at(ac_switch_…)`. The boundary's tick is right.
+A correct label needs the terminal actions' parameter types derived from the methods that call them and the objects'
+types in the robot's world state, a change to the boundary's as-built reading (T-D L1), which needs a ruling.
+switch_on's effect ac_on newly holding distinguishes the two only when the A/C was off. Reordering the terminal actions
+moves the wrong label to the coffee break. Readers of the label: `analysis/instruments/common/tdlib.py`
+(`boundary_action`).
+Files: shared/recognizer.py (`_observed_terminal_completion`, `_action_label`), shared/knowledge.py
+(`terminal_actions`), shared/types.py (WorldState), analysis/instruments/common/tdlib.py
+Reference: design_records.md, "T-K", THE CROSS-CHECK, RULED, AM56; docs/handoffs/plan_T-K_part1.md, section 11, X3
+
+**TODO-180: The viewer's confidence (recorded, T-K part 1, AM58, 4 Oct 2026)** open
+Since AM42 the gate reads the leader's belief over the live hypotheses (`BeliefState.confidence`), and the reported
+distribution keeps the floor and the pin scaling, so the leader's value in `distribution` can differ from
+`confidence`. The viewer is not checked for which value it shows as the confidence. ccode's check (4 Oct 2026): no file
+under mesa_sim/viz/ reads `confidence` or `distribution` today, so the viewer shows no recognizer value now; the item
+applies when it does (T-V track 1).
+Files: mesa_sim/viz/
+Reference: design_records.md, "T-K", THE CROSS-CHECK, RULED, AM58; docs/handoffs/plan_T-K_part1.md, section 11, X2

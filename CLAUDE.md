@@ -483,8 +483,10 @@ Decisions
   with the effect ac_on (AM43); an object-state condition holds for any object of its type (AM44); dock_loading's
   ac_activation from the hall only (AM45); windows in ticks, half-open (AM46); the memory's recording rule (AM47); the
   regression scope (AM48); the instruments' check on round 1 (AM49); a timeline fact stated by a timeline only (AM50);
-  `SimModel` takes both run options explicitly (AM51); no precondition or guard names a timeline fact (AM52); ccode's
-  P1 to P5 accepted. Nothing built. Next: the build (BUILD DISCIPLINE, step 2), stage by stage as the plan states.
+  `SimModel` takes both run options explicitly (AM51); no condition of a schema names a timeline fact (AM52, AM54);
+  ccode's P1 to P5 accepted. On the cross-check (AM55 to AM58): the gate's stage reruns round 1 and kitting's IRB and
+  MPB sets, outputs replaced, and stops on a failed declared property; dock_loading's IRB and MPB sets stale until its
+  step; TODO-179 (the boundary label for switch_on), TODO-180 (the viewer's confidence). Nothing built. Next: the build (BUILD DISCIPLINE, step 2), stage by stage as the plan states.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

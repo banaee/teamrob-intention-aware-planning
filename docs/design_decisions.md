@@ -4984,6 +4984,11 @@ R1). In the record ("T-K", THE BUILD'S PLAN, RULED): AM43 the A/C's action switc
 ac_activation (D4), AM48 the regression scope (D7), AM49 the instruments' check (D8), AM51 the run options stated by
 every caller (D10), AM53 the gate's own commit and baseline (the review's addition 2); ccode's proposals P1 to P5
 accepted. Not built.
+AMENDED (Hadi, 4 October 2026, on ccode's cross-check of those rulings, the plan's section 11; AM54 to AM58): AM54 no
+condition of any task or action reads a timeline fact, the completion condition included (X4, under R1, completing
+AM52). In the record ("T-K", THE CROSS-CHECK, RULED): AM55 the dock_loading runs of the build (X6), AM56 the label of
+the episode boundary for a switch_on (X3), AM57 the test-bed sets rerun with the new gate and the stale sets (X1, both
+parts), AM58 the viewer's confidence (X2). Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -4995,6 +5000,10 @@ accepted. Not built.
   precondition of an action schema and no guard of a method names one; the loader refuses a domain whose schemas do
   (with AM20's refusal of an effect or a retraction that names one).
   Reason: context acts in the robot's belief only and never drives the human.
+  AMENDED (AM54, Hadi, 4 October 2026; ccode's cross-check, X4): no condition of any task or action reads a timeline
+  fact: no precondition, no guard and no completion condition. The loader refuses each. It completes AM52, which named
+  preconditions and guards; with AM20 (effects and retractions) no condition of a schema names a timeline fact.
+  Reason: as AM52's; a completion condition that named a timeline fact would let the timeline end the human's action.
 
 - R2, the belief. At each run of the recognizer, belief = normalise(prior × evidence) over the live hypotheses. The
   prior is evaluated on the context facts that hold at the present tick. The evidence is the likelihood accumulated in
@@ -5370,7 +5379,8 @@ for the build's plan, with the open items. Amended 3 October 2026 (content point
 KT7; KT4 is AM34's record part). Amended 3 October 2026, recorded 4 October 2026 (AM35 to AM39): AM37 under AM13,
 AM38 under AM17, THE STRENGTHS REVISED (what becomes stale, the open item on the value the gate compares with the
 threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and KT14, after KT12. Amended 4 October 2026
-(AM42 to AM53): THE BUILD'S PLAN, RULED (AM43, AM45, AM48, AM49, AM51, AM53; P1 to P5 accepted).
+(AM42 to AM53): THE BUILD'S PLAN, RULED (AM43, AM45, AM48, AM49, AM51, AM53; P1 to P5 accepted). Amended 4 October
+2026 (AM54 to AM58): THE CROSS-CHECK, RULED (AM55 to AM58).
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one

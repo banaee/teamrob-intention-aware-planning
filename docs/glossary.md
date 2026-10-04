@@ -524,7 +524,8 @@ from the run file and the viewer, taking precedence over both; a change during a
 AMENDED (AM46, AM50, AM52, Hadi, 4 October 2026; not built): a window is written in ticks, half-open [a, b), the end
 optional; two windows of one fact do not overlap (AM46). A timeline fact is stated by a timeline only; the setup's
 "states" block refuses it, and a fact that holds from the start is a window from tick 0 (AM50). No precondition and no
-guard of any schema names a timeline fact (AM52), nor any effect or retraction (AM20).
+guard of any schema names a timeline fact (AM52), no completion condition (AM54), nor any effect or retraction
+(AM20): no condition of a schema reads one, and the loader refuses each.
 
 **timeline fact** (Hadi, 3 October 2026; not built) — a **context fact** on the **timeline of context facts**. It holds
 from one authored change to the next. One of the three sources of a **suppressing condition** and a **raising

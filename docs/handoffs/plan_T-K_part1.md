@@ -3,7 +3,7 @@
 Written by ccode on 4 October 2026 (T-K part 1, step 2; BUILD DISCIPLINE, step 1: plan only, no code; 41efa76).
 Amended the same day to Hadi's rulings on it: the decisions D1 to D10 and two additions of the review are AM42 to AM53
 (`docs/design_decisions.md` and `docs/design_records.md`, "T-K", THE BUILD'S PLAN, RULED); the proposals P1 to P5 are
-accepted. Nothing in it is built. Every build session of T-K part 1 reads this file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
+accepted. Amended again the same day to Hadi's rulings on section 11 (AM54 to AM58; THE CROSS-CHECK, RULED). Nothing in it is built. Every build session of T-K part 1 reads this file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
 (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K").
 The rulings fix what and why; this file fixes how, the names and the build order. Section 7 lists the decisions as
 ruled; section 11 is ccode's cross-check of the rulings, with the points Hadi has not ruled on.
@@ -137,7 +137,8 @@ empty when context knowledge is off) and `levels` (per foreseeable task with a l
   the robot's task model too): no effect or retraction of an action schema (AM20, AM32), no precondition of an action
   schema and no guard of a method (AM52) names a timeline fact, by the condition's name against the declaration's, as
   `_check_declared_effects` reads it; a failure names the schema and the fact. The setup's `"states"` block refuses a
-  timeline fact (AM50). Proposed, not ruled: the completion condition too (section 11, X4).
+  timeline fact (AM50). The completion condition of an action schema is refused too (AM54): no condition of any
+  schema names a timeline fact.
 - `Window(fact: StateDeclaration, start: int, end: Optional[int])` in ticks, half-open [start, end), `end` None to the
   run's end; `Timeline(windows: Tuple[Window, ...])` with `facts_at(tick) -> FrozenSet[Predicate]`. Checked at load:
   the fact is a declared state about no object, start ≥ 0, start < end, no two windows of one fact overlap.
@@ -300,8 +301,8 @@ compared with that baseline.
 Unchanged with context knowledge off: `[IR]`, `[IR-dist]` (bit-identical by P1), `[IR-boundary]` (its words "belief
 re-initialised to the prior" stay true: at a boundary the evidence is equal, so the belief is the prior), every
 `[meta*]`, `[hold]`, `[sep]`, `[coverage]` and `[scenario-coverage]` (dock_loading's task model gains ac_activation but
-no script names it; checked in the diff). The `[IR-boundary]` label of an A/C completion stays `wait_at(...)` (section
-11, X3), to be confirmed by the diff.
+no script names it; checked in the diff). The `[IR-boundary]` label of an A/C completion stays `wait_at(...)`: its
+correction is not small and is deferred (AM56, TODO-179; section 11, X3).
 
 The gate's stage (stage 2) changes, with context knowledge off: the value of `confidence` in `[IR]` and `[meta-proj]`
 wherever a hypothesis is pinned or a live value is floored; where that moves the leader across θ, the gate's outcome
@@ -345,12 +346,15 @@ The decisions (the plan's D1 to D10 and the review's two additions are AM42 to A
 | D4 | AM45 | dock_loading's ac_activation: one method, from the hall | when a dock_loading room gets a switch, the office method is added in the same step; without it the task is not live while the human is in the office |
 | D5 | AM46 | windows in ticks, half-open, the end optional, no overlap of one fact's windows | every expectation near a window's edge depends on the half-open reading by one tick |
 | D6 | AM47 | the memory records the tick the terminal fact first holds after a tick it did not; not at the first observation; only tasks with a recency duration | an unobserved completion is not remembered and does not suppress; the duration counts from the completion tick, included |
-| D7 | AM48 | the build's regression scope: the four maintained sets, round 1 (31, off), dock_loading's six milestone runs | dock_loading's IRB and MPB sets are not rerun in the build; a regression only they show is found at dock_loading's step |
+| D7 | AM48, AM55 | the build's regression scope: the four maintained sets, round 1 (31, off), dock_loading's six milestone runs | dock_loading's IRB and MPB sets are not rerun in the build; a regression only they show is found at dock_loading's step |
 | D8 | AM49 | round 1 run with context knowledge on, against the oracle, agreement only | no run of the build exercises a raised strength; the unit tests against the method cover it until the authored windows |
 | D9 | AM50 | the setup's `"states"` block refuses a timeline fact | a fact that holds from the start is a window from tick 0 |
 | D10 | AM51 | `SimModel` takes both run options with no default | a caller that does not state both fails with an error |
-| review 1 | AM52 | the loader refuses a timeline fact in any precondition or guard (3.2) | context never drives the human |
+| review 1, X4 | AM52, AM54 | the loader refuses a timeline fact in any precondition, guard or completion condition (3.2) | context never drives the human |
 | review 2 | AM53 | the gate's change in its own commit, with its own regenerated baseline (stage 2) | each later stage compares with it (section 8) |
+| X3 | AM56 | the boundary label for a switch_on: not small, deferred (TODO-179) | `[IR-boundary]` names `wait_at(...)` at an A/C completion until then |
+| X1 | AM57 | stage 2 reruns round 1 and kitting's IRB and MPB sets with the new gate, outputs replaced; it checks the MPB's declared properties | a declared property that no longer holds stops the build (a finding); dock_loading's IRB and MPB sets stale until its step |
+| X2 | AM58 | nothing in the build (TODO-180) | the viewer is not checked for the confidence it shows |
 
 ## 8. Stages, commits and verification
 
@@ -364,11 +368,11 @@ section 6's table. Outputs of the checks stay local (logs are git-ignored); md5s
 |---|---|---|
 | 0 | (records B0) | none |
 | 1 | B0 | the rename's lines |
-| 2 | stage 1's outputs | the gate's change, listed; then B2 is recorded |
+| 2 | stage 1's outputs; the test-bed sets against their oracle | the gate's change, listed; every MPB declared property holds, else stop; then B2 and the sets' new outputs are recorded |
 | 3 | B2 | the `[run]` field; dock_loading's milestones from step 500 |
 | 4 | stage 3's outputs | the timeline line; switch_on in `[rec]`, `[human]` |
 | 5 | stage 4's outputs, off | none |
-| 6 | stage 5's outputs, off | none (instrument outputs byte-identical); on: 0 disagreements |
+| 6 | stage 2's test-bed outputs (off; round 1 and kitting's IRB and MPB) | none (instrument outputs byte-identical); round 1 on: 0 disagreements |
 
 Since stages 3 to 6 differ from B2 only by named lines, each check is also "B2 except the named lines of the stages
 since", which the final README sections state.
@@ -381,9 +385,18 @@ since", which the final README sections state.
    floor and the pins; `BeliefState.belief`; `_clears_gate` unchanged (it reads `confidence`); a unit test that a
    belief with pinned keys clears θ on its value over H. 2b: the instruments follow (the IRB oracle's `confidence` and
    gate columns from the belief over H; `tdlib`, `summary.py`, `baseline.py` take θ crossings from `confidence`).
-   Check against stage 1: every difference is in the lines section 6 names for this stage, each listed; round 1 with
-   the changed instrument agrees with the oracle (0 disagreements at 1e-9). 2c, its own commit: B2 recorded, a new
-   README section in each maintained set (md5s, the lines that moved and why) and in round 1's README (section 11, X1).
+   Check against stage 1: every difference is in the lines section 6 names for this stage, each listed. Then the
+   test-bed sets, rerun with the new gate (AM57), each through its own pipeline (`analysis/instruments/irb/run.sh
+   kitting` for round 1 and for the IRB's scenario_s08 and s09; `analysis/instruments/mpb/run.sh` for the MPB set, its
+   variants as its README states, the prior-off appendix included as a diagnostic): the IRB sets and the MPB's parts 1
+   to 3 agree with the oracle (0 disagreements at 1e-9), and every declared property of the MPB's part 4 holds. A
+   declared property that no longer holds is a finding: the build stops there and reports it with its cause; no ruling
+   and no scenario is changed for it (section 11, X12, X13). 2c, its own commit: B2 recorded, a new README section in
+   each maintained set (md5s, the lines that moved and why); in round 1's, the IRB's and the MPB's README a section
+   that states what changed and names the last commit that holds the old results (section 11, X11); their reports'
+   moved numbers and the moved findings in the design records (KT8, KT10; the IRB's and the MPB's T-D records) marked
+   with a dated line, not rewritten; a stale note in dock_loading's IRB and MPB READMEs (until dock_loading's step).
+   The commits of stage 2 are made only after its checks pass.
 3. The run option `context_knowledge` and the removal of ω (TODO-66), off only (one commit): the flag, the run files
    and sweeps state `context_knowledge: false`, tests state both (AM51); the old `ContextKnowledge` and the
    recognizer's constants removed; `_output` multiplies by unit weights (P1). Check against B2: the four sets and round
@@ -392,8 +405,8 @@ since", which the final README sections state.
 4. The world's side (two commits). 4a: `Timeline`, `Window`, the setup's and the scenario's forms, the resolution at
    load, the builder, the `[run_mesa] timeline` line, `"timeline_facts"`, the load checks (AM20, AM46, AM50, AM52),
    with tests: the resolution's four cases (scenario stated, stated empty, not stated with a setup timeline, setup with
-   none); each refusal (a timeline fact in a precondition, a guard, an effect, the `"states"` block; overlapping
-   windows). 4b: break_time, room_warm, ac_on; switch_on (AM43) in both domains; dock_loading's ac_activation (AM45)
+   none); each refusal (a timeline fact in a precondition, a guard, a completion condition, an effect, the `"states"`
+   block; overlapping windows). 4b: break_time, room_warm, ac_on; switch_on (AM43) in both domains; dock_loading's ac_activation (AM45)
    and its object type. Check against stage 3: the named lines only; every registered scenario of both domains loads;
    pytest passes.
 5. The mind (one or two commits): `ContextKnowledge` and the domains' declarations, `ObservedCompletions`, the prior in
@@ -402,8 +415,10 @@ since", which the final README sections state.
    exactly 90 ticks, from the tick waited(human, coffee_machine_0) first holds, AM47); a robot with context knowledge
    on loads in every registered scenario of both domains. Check against stage 4, context knowledge off: identical;
    with it on, the four sets and round 1 run to completion (not read).
-6. The instruments (one commit, section 9). Check: round 1 with context knowledge off, every instrument output
-   byte-identical to stage 5's; with it on, 0 disagreements with the oracle (AM49), results not read.
+6. The instruments (one commit, section 9). Check: round 1 and kitting's IRB and MPB sets with context knowledge off,
+   every instrument output byte-identical to stage 2's (no named line of stages 3 to 5 reaches an instrument output
+   except the A/C action's name in the IRB's record columns, if any: listed); round 1 with it on, 0 disagreements with
+   the oracle (AM49), results not read.
 7. Records and docs (one commit): the BUILT block under "T-K" with commits and acceptance, the docs of section 6, the
    maintained sets' and round 1's README sections stating the final md5s and every named line since B2.
 
@@ -428,10 +443,11 @@ What changes, and roughly how much:
 - The gate's part (AM42) comes first, in stage 2b: the oracle's `confidence` from the belief over H (its `output()`
   keeps the floor and the pins for the reported distribution), the gate column from it, the log readers' θ crossings
   from `confidence`. About 15 lines.
-Cost: one build session for the code and the README rules; the verification reruns are round 1's 31 runs, in stage 2b
-and twice in stage 6 (off and on), each through the run, the trajectory, the oracle and the comparison, as the sort's
-preparation did; their wall time is measured at stage 0. Within AM48's scope, kitting's other IRB (17) and MPB (16 × 2)
-sets and dock_loading's 54 IRB and 52 MPB runs are not rerun in the build (section 11, X1).
+Cost: one build session for the code and the README rules. The verification reruns: in stage 2, round 1's 31 runs,
+the IRB's 17 and the MPB set (its variants as its README states); in stage 6, the same with context knowledge off, and
+round 1 once more with it on. Each goes through the run, the trajectory, the oracle and the comparison, as the sort's
+preparation did; the wall time of one pass is measured at stage 0 and stated in the stage report. dock_loading's 54 IRB
+and 52 MPB runs are not rerun in the build (AM55); they are stale from stage 2 until dock_loading's step (AM57).
 
 ## 10. Cases the design does not cover
 
@@ -452,23 +468,27 @@ The ten rulings and the two additions, checked against each other, against the e
 against the code. None of them conflicts with another. The points below are consequences nobody stated, or places
 where a ruling looks incomplete from the code's side. Hadi rules on each; the plan does not resolve them.
 
-- X1. AM42 with AM48: round 1 and the test-bed sets go stale. Round 1 (KT8) is the "off" side of KT14's comparison,
+- X1. RULED (AM57): round 1 and kitting's IRB and MPB sets are rerun in stage 2 with the new gate, their outputs
+  replaced; dock_loading's sets stay stale until its step. The point as raised: AM42 with AM48: round 1 and the
+  test-bed sets go stale. Round 1 (KT8) is the "off" side of KT14's comparison,
   and its expectations, outputs and report were made with the old gate. After AM42 they no longer describe HEAD. The
   same holds for kitting's other IRB (s08, s09) and MPB sets and for dock_loading's stage-1 IRB and MPB outputs, which
   AM48 does not rerun. The plan reruns round 1 in stage 2 and records it as a new section of its README, with a
   superseding note in its REPORT.md that points to it. Round 1 is a frozen folder under CLAUDE.md, so this needs
   Hadi's ruling; the alternative is a new folder for the regenerated off side. The other kitting test-bed sets stay
   stale until a task reruns them.
-- X2. AM42 and the log. `[IR] confidence` (the value the gate read) and the leader's value in `[IR-dist]` (the reported
+- X2. RULED (AM58): the viewer's confidence is TODO-180. The point as raised: AM42 and the log. `[IR] confidence` (the value the gate read) and the leader's value in `[IR-dist]` (the reported
   distribution) will differ wherever pins or the floor act. A reader that takes a θ crossing from `[IR-dist]` reads the
   wrong value. The instruments are changed in stage 2b. Any other reader of the logs (a report, the viewer) is also
   affected; the viewer is not checked in this build.
-- X3. AM43 and the episode boundary (T-D L1 as built). At an A/C completion, waited(human, switch) newly holds. Both
+- X3. RULED (AM56): corrected if small; it is not small (no object types in the world state; the fix changes the
+  boundary's as-built reading), so it is deferred, TODO-179. The point as raised: AM43 and the episode boundary (T-D
+  L1 as built). At an A/C completion, waited(human, switch) newly holds. Both
   `wait_at` (still a terminal action, through coffee_break) and `switch_on` have an enabled grounding at the switch.
   `_observed_terminal_completion` returns the first in declaration order, so the `[IR-boundary]` line names
   `wait_at(ac_switch_…)` for a switch_on completion. The boundary itself is correct (one boundary at the right tick);
   only the label is misleading. Not fixed by the plan, since it changes no decision; flagged.
-- X4. AM52 looks incomplete. A schema names a fact in four places: a precondition, a method's guard, an effect or
+- X4. RULED (AM54): the completion condition is refused too. The point as raised: AM52 looks incomplete. A schema names a fact in four places: a precondition, a method's guard, an effect or
   retraction (AM20), and the completion condition. AM52 names the first two. A completion condition that named a
   timeline fact would let the timeline end the human's action: the body's executor and the recognizer's phase model
   both read completion conditions. Proposal: the loader also refuses a timeline fact in a completion condition.
@@ -478,7 +498,8 @@ where a ruling looks incomplete from the code's side. Hadi rules on each; the pl
   state about no object that an action sets. The plan therefore lists timeline facts in a registry list of their own,
   `"timeline_facts"`, with the same class. This refines P3 and is not a design change; flagged because P3 said
   `"states"`.
-- X6. AM48's consequence and the plan's scope. The consequence says "dock_loading's recognition and planning runs are
+- X6. RULED (AM55): the reading confirmed; the six milestone runs. The point as raised: AM48's consequence and the
+  plan's scope. The consequence says "dock_loading's recognition and planning runs are
   not rerun in the build". The scope Hadi accepted runs dock_loading's six milestone runs, which are recognition and
   planning runs, though not test-bed sets. The plan reads the consequence as dock_loading's IRB and MPB sets and keeps
   the milestone runs, as the only check of dock_loading's new task, action and declarations. Also: the first version
@@ -497,3 +518,24 @@ where a ruling looks incomplete from the code's side. Hadi rules on each; the pl
   expectations.
 - X10. AM44 and AM18. AM18's "not taken: ac_on as a condition of the task" is a decision, not a load check. Nothing
   refuses ac_on in a guard, as AM52 refuses a timeline fact. No schema does this today. Flagged only.
+
+Consequences of the rulings on section 11 (ccode, 4 October 2026), not ruled:
+
+- X11. "The last commit that holds the old results" (AM57) holds only what git tracks. Under the rule for analysis/
+  (2 October 2026) the per-tick data (csv, json) and the figures are untracked. For kitting's IRB and MPB sets they
+  are restorable from 7d00f43 (`analysis/README.md`). For round 1 the summaries, diffs and reports are in 4c71b44, but
+  its per-tick data and figures are in no commit; replacing them on disk loses them. Proposal: before stage 2 replaces
+  them, copy the three sets' untracked files outside the repository (as the copy of 2 October 2026,
+  /home/hadi/teamrob_analysis_2026-10-02/) and name the copy in each README. This is not a second folder in the
+  repository. Hadi decides.
+- X12. The stop rule and the commits. Stage 2's reruns come after its code change. Its commits are made only after the
+  checks pass, so a stop leaves the gate's change uncommitted in the working tree, HEAD at stage 1, and the finding
+  reported.
+- X13. What counts as declared in the MPB. Part 4's properties are declared. Parts 1 to 3 are full per-tick
+  expectations from the oracle, which follows the new gate in stage 2b; a disagreement there is a fault of the code or
+  of the instrument, and stops the build as well. The coverage matrix (`analysis/kitting/mpb/coverage.md`) claims
+  cells, each verified by one authored instance. Under the new gate an instance can stop reaching its cell (for
+  example, an admission one tick later that no longer meets the authored conflict). The plan treats a claimed cell
+  that its instance no longer reaches as a declared property that no longer holds: stop and report. To confirm.
+- X14. The prior-off appendix of the MPB (MPB-6) is rerun as its pipeline runs it. It is a diagnostic: a change there is
+  listed, never a stop (CLAUDE.md, Methodology, the prior; `docs/assumptions.md` 1.4).

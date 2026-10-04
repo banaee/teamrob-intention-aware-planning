@@ -2474,6 +2474,8 @@ TIMELINE IN THE SCENARIO (after KT12).
 AMENDED (Hadi, 4 October 2026, on ccode's plan of the build; AM42 to AM53): the plan's decisions. The conceptual part
 (AM42, AM44, AM46, AM47, AM50, AM52) is in design_decisions.md under this title; here the block THE BUILD'S PLAN, RULED
 (after THE TIMELINE IN THE SCENARIO).
+AMENDED (Hadi, 4 October 2026, on ccode's cross-check of the plan's rulings; AM54 to AM58): AM54 is in
+design_decisions.md under this title, under R1; here the block THE CROSS-CHECK, RULED (after THE BUILD'S PLAN, RULED).
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -2966,6 +2968,8 @@ rulings.
   dock_loading MPB runs stay with dock_loading's step (the recorded open question).
   Consequence: dock_loading's recognition and planning runs (its IRB and MPB sets) are not rerun in the build; a
   regression that affects only them is found at dock_loading's step.
+  CONFIRMED (AM55, Hadi, 4 October 2026; THE CROSS-CHECK, RULED, below): the six milestone runs are run; the IRB and the
+  MPB sets are not.
 
 - AM49, the instruments' check with context knowledge on (D8): round 1's 31 scenarios run with context knowledge on and
   compared with the oracle for agreement only; their results are not read (the reading belongs to the step with the
@@ -2983,6 +2987,46 @@ rulings.
 - Recorded beside them: CLAUDE.md and the roadmap brought in line with AM40; TODO-177 (the override of the timeline,
   AM41) and TODO-178 (the removal of the floor and the scaling from the reported distribution, AM42's later work)
   opened.
+
+THE CROSS-CHECK, RULED (Hadi, 4 October 2026, on ccode's cross-check of the plan's rulings, the plan's section 11, X1
+to X10; recorded the same day). Records and the plan only; nothing is built. Ruled: X4 (AM54, design_decisions.md,
+this title, under R1), X6 (AM55), X3 (AM56), X1 (AM57), X2 (AM58). X5, X7, X8, X9 and X10 need no ruling and stay
+recorded as stated in the plan's section 11.
+
+- AM55, dock_loading's runs in the build (X6). ccode's reading of AM48 is confirmed: the build does not rerun
+  dock_loading's recognition set (its IRB) and its planning set (its MPB); it runs dock_loading's six milestone runs
+  (scenario_s03_02, s05_02, s07_02, s03_03, s05_03, s07_03).
+
+- AM56, the label of the episode-boundary line for a completed switch_on (X3). A log names what happened: corrected
+  in the build if the change is small, otherwise recorded as deferred work with the reason.
+  ccode's judgement (4 October 2026): not small; deferred, TODO-179. Reason: the boundary's observable reads facts only
+  (T-D L1 as built). wait_at and switch_on have the same precondition, at(agent, entity), and the same completion,
+  waited(agent, entity), and wait_at's ?entity has no type in its schema (the types come from the task that calls it),
+  so at the switch both are enabled and both complete on the same fact; the world state carries no object types.
+  switch_on's effect ac_on distinguishes the two only when the A/C was off. A correct label needs the terminal actions'
+  parameter types derived from the methods that call them and the objects' types in the robot's world state: a change
+  to the boundary's as-built reading, which is the recognizer's and needs a ruling. Reordering the terminal actions
+  only moves the wrong label to the coffee break (switch_on(coffee machine)). The boundary's tick is right; only its
+  label is wrong.
+
+- AM57, the test-bed sets and the new gate (X1).
+  - Round 1 is rerun in the build with the new gate (AM42) and its outputs are replaced. Its README states what changed
+    and names the last commit that holds the old results. Findings in the design records that move are marked, not
+    rewritten.
+    Reason: the comparison needs an "off" side made with the same gate as the "on" side, and one current baseline is
+    kept, not two. Not taken: a second folder beside the old one; a rerun only at the later step.
+  - The gate's stage also reruns kitting's planning set (the MPB) and checks its declared properties, and reruns
+    kitting's recognition set (the IRB, scenario_s08 and s09). Their outputs are replaced in the same way. If a declared
+    property no longer holds, that is a finding: the build stops and reports it with its cause, and does not continue;
+    it is no reason to change a ruling or a scenario.
+    Reason: the planning set is the test-bed of the meta-planner, and the gate's change is a change of the
+    meta-planner's behaviour; it is checked where expectations are declared.
+  - dock_loading's recognition set and planning set (T-G stage 1's IRB and MPB outputs, `analysis/dock_loading/irb/`,
+    `analysis/dock_loading/mpb/`) are stale from the gate's stage of the build until dock_loading's step of T-K part 1,
+    which measures them again.
+
+- AM58, the viewer's confidence (X2): deferred work, TODO-180. The viewer is not checked for which value it shows as
+  the confidence.
 
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the

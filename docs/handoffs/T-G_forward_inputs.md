@@ -363,8 +363,12 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - Ruled on the plan (AM44, AM46, AM47, AM50, AM52; Hadi, 4 October 2026): an object-state condition holds for any
   object of its type; windows in ticks, half-open; the memory records a completion at the tick the terminal fact first
   holds, and an unobserved completion is not remembered; a timeline fact is stated by a timeline only (from the start:
-  a window from tick 0); no precondition or guard of any schema names a timeline fact. The plan:
-  docs/handoffs/plan_T-K_part1.md. [ruled]
+  a window from tick 0); no condition of any schema (precondition, guard, completion condition, effect) names a
+  timeline fact (AM52, AM54). The plan: docs/handoffs/plan_T-K_part1.md. [ruled]
+- Ruled on ccode's cross-check (AM55 to AM58; Hadi, 4 October 2026): the build reruns round 1 and kitting's IRB and MPB
+  sets with the new gate in the gate's stage, replacing their outputs, and stops if a declared property of the MPB no
+  longer holds; dock_loading's IRB and MPB sets are stale from that stage until dock_loading's step; the
+  episode-boundary label for a switch_on is deferred (TODO-179); the viewer's confidence is TODO-180. [ruled]
 - The two run options, their names and their defaults; the rename of assignment_prior to assignment_knowledge in
   code, configuration and commands. Also flagged for renaming at the build: the context weight (ω_context,
   _context_weight) and the prior base. docs/assumptions.md 1.4 is updated at the build.
@@ -439,7 +443,8 @@ returning to the table and ending with the exit walk. _01 is the control; the ot
 ac_activation after a delivery or inside the second delivery (after the walk to the shelf, after the grasp, after the
 carry). The placement table is in the round's README.
 
-Round 1, the round without context knowledge, is condition A (KT8; 4cd7bca, 4c71b44). 31 runs, prior on (assignment
+Round 1, the round without context knowledge, is condition A (KT8; 4cd7bca, 4c71b44). Rerun in the build with the new
+gate and its outputs replaced (AM42, AM57); the numbers below are the old gate's, marked where they move. 31 runs, prior on (assignment
 knowledge), test level 0.05, θ = 0.75. Every run agrees with the expectations committed before it (0 disagreements at
 1e-9; one at print precision, s14_02 tick 181, the IRB's known flag). Every run ends before step 500, so TODO-66's
 weight never acts. No retraction follows any admission. Where the numbers are:
