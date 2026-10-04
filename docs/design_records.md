@@ -3607,3 +3607,11 @@ any run (398d890); runs 613803b. First, step 5's two accepted suggestions record
   c fail; the trigger rule and the gate agree more often (the record outlives the gate in 2 rows against 7).
   Suggested: scenario_s11_03's 11.3 cm as a measurement under the KT11 consequence or TODO-132 (a). Next: dock_loading's
   part (step 6).
+CONTEXT KNOWLEDGE ON AGAINST OFF, AN OVERVIEW (ccode, 4 October 2026, at Hadi's request; analysis/kitting/mpb/tk5b/
+COMPARISON.md and comparison.py; existing outputs of steps 4, 5 and 5b only, no run, no ruling): the true task admitted
+earlier in 206 of 325 true stretches (3005 ticks) and later in 42 (365 ticks; the coffee break with no raising fact 24
+of 28); admissions of a hypothesis that is not the true task during modelled tasks 17 off, 47 on (gate ticks 114, 504),
+by the evidence alone 0 near-ties, 17 the true task first with the prior overruling, 26 the evidence itself ranking the
+admitted one first, 4 with no true hypothesis; planning completion better in 7 of 22 runs, worse in 2 (134 ticks gained,
+3 lost); cases below min_separation 2 off, 5 on (2 wrong admissions, 2 TODO-146 at a turn, 1 other). The scenarios are
+authored: the counts compare the settings and are no rate of occurrence.
