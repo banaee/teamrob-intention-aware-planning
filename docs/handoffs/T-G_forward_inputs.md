@@ -205,6 +205,38 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 
 ## 5. T-K part 1: context knowledge (framework-wide: kitting and dock_loading)
 
+The steps of T-K part 1 (Hadi, 5 October 2026: one tree, kept here and brought up to date at each step's close; the
+step numbers are those of 5.7, steps 5c and 5d named by Hadi on 5 October 2026; details in 5.7 and the records):
+
+```text
+T-K part 1: context knowledge
+├─ step 1  layouts with more than one A/C switch ................ done
+├─ step 2  the plan of the build (AM42 to AM63, P1 to P5) ....... done
+├─ step 3  the build of context knowledge (stages 0 to 7) ....... done
+├─ step 4  kitting, idle robot, context knowledge on (59 runs) .. done
+│          └─ questions S and G ruled (AM65, AM66)
+├─ step 5  kitting, the planning cases (5 cases, 9 runs) ........ done
+├─ step 5b the existing kitting sets, context knowledge on (33) . done
+│          └─ the comparison on against off; the limitation (assumptions 6.4); the two what-if readings
+├─ step 5c the gate after step 5b ............................... done
+│   ├─ the design discussion (5.13) ............................ ruled (AM67 to AM72)
+│   │    ├─ observation warrant required at admission
+│   │    ├─ the gate refuses an outranked leader (admission only)
+│   │    └─ strengths and the end of an admission: unchanged
+│   ├─ the records ............................................. done
+│   ├─ the plan of the build (plan_T-K_gate.md, D1 to D7) ...... approved
+│   └─ the build (stages 0 to 5) ............................... done
+├─ step 5d the measurements after the gate change ............... stopped (5.7)
+│   ├─ step 4's recognition runs again
+│   ├─ step 5's planning cases again (D5's re-declared properties; C4 to C6, D6; B12's instance, D4)
+│   ├─ step 5b's recognition runs and planning runs again
+│   └─ the comparison: off, on before the gate change, on after it
+├─ step 6  dock_loading's part .................................. open
+└─ step 7  the close of T-K part 1 .............................. open
+
+then: T-G stage 2 (the full dock_loading domain)
+```
+
 State at the close of 4 October 2026, after step 5b and the design discussion that followed it; written for a design
 chat that has read nothing else. [ruled unless marked]
 - The build (step 3 of 5.7) is done: b85494d to c62e7ea, eight stages by the approved plan, each checked against the
@@ -653,6 +685,19 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    question of 5.13 is not decided. [open]
    The design question is RULED (AM67 to AM72, 4 October 2026). Open: the order of what remains (the build of AM67 and
    AM68, dock_loading's part, the close) and the question on the planning set's coverage matrix. [open]
+5c. The gate after step 5b (named by Hadi, 5 October 2026): the design discussion (5.13, ruled AM67 to AM72), the
+   records, the plan of the build (docs/handoffs/plan_T-K_gate.md, D1 to D7; D4 closed the coverage-matrix question)
+   and the build, stages 0 to 5 (2c939a5 to b18a208; design_records.md, "T-K", THE GATE RULINGS, BUILT). [done]
+5d. The measurements after the gate change (named by Hadi, 5 October 2026; the plan's section 8): step 4's recognition
+   runs, step 5's planning cases and step 5b's recognition and planning runs again with context knowledge on, against
+   the updated oracles; step 5's moved properties re-declared before the runs (D5); C4 to C6 on step 5's six (D6);
+   B12's instance (D4); the comparison off / on before the gate change / on after it. [ruled]
+   STOPPED (5 October 2026) on the blocking condition of the step: the oracle cannot determine the gate's answer on
+   the tick a coffee_break re-enters with one delivery live (the evidence exactly 1/2 each by the re-entry rule; the
+   recognizer passes the tie, AM75; the oracle marks it undetermined, D3). In scenario_s10_04 and s12_02 of step 5b's
+   planning runs it falls on a decision (135), so the MPB chain stops and those two runs are not compared. The
+   expectations and the re-declared properties are committed (f02b04c); the runs are made, their outputs not committed.
+   Waiting for Hadi's ruling. [open]
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]
