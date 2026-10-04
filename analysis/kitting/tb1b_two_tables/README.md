@@ -540,3 +540,24 @@ This folder moved from `analysis/tb1b_two_tables/` to `analysis/kitting/tb1b_two
 unchanged: the set was regenerated from the sorted tree and is byte-identical. The commands of the sections above read
 `bash analysis/kitting/tb1b_two_tables/sweep.sh <dir>`, and `sep_classes.py` (with the parser `logparse.py`) is
 `analysis/instruments/common/sep_classes.py`.
+
+## The gate on the belief over the live hypotheses (T-K part 1, build stage 2, 4 October 2026) — the logs from here on
+
+Regenerated at T-K part 1's gate stage (AM42; design_decisions.md, "T-K: context knowledge in the recognizer's belief",
+R7's AM42; design_records.md, "T-K", THE BUILD, STAGE 2). Two changes since the table above, both named:
+- stage 1 (b85494d), the rename of the run option (AM9): in every log the `[run]` header's `assignment_prior=` reads
+  `assignment_knowledge=` and the `[IR-prior] switch=` line reads `[IR-assignment] knowledge=`; nothing else;
+- stage 2 (91774ce, the gate): `confidence` is the leader's belief over the live hypotheses, before the floor and the
+  pin scaling, and the gate compares θ with it. So `[IR]`, `[IR-dist]` and `[meta-proj]` print a higher confidence
+  wherever a key is pinned or a live value floored (every log). `[IR-dist]`'s dist is the reported distribution, unchanged.
+  No decision moved: the logs differ from the table above in those printed values only.
+The `.rec` streams are byte-identical to the table above in every log. Completion is the world tick (T6).
+The run files state `context_knowledge` from build stage 3 on; these logs were made before it. Prior on first.
+Commands: `bash analysis/kitting/tb1b_two_tables/sweep.sh analysis/kitting/tb1b_two_tables/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_on | b471aef943e9ce5c3c4ce0db6abc61e6 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_on | ec8923a19370d7ca758e95e4f4deb779 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_off | e1466fd0bc8105b2ca1f71e41a3d27cf | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_off | 394a83251116d5272f7445f0e6f737b9 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |

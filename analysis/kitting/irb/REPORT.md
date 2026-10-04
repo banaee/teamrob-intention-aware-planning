@@ -2241,3 +2241,11 @@ folder, not committed): the recognizer's outputs, the warrant and the gate agree
 disagreements, all in the `obj_at` column (the robot's own items, which the instrument's human-only world does not
 move; outside its scope). After the boundary at 141 the lone coffee_break is refused `none(leader_unwarranted)` from
 142 to 158 (the human walks away from the machine: no gain) and inadequate from 159; before G it was admitted at 142.
+
+## T-K part 1, build stage 2: the seventeen rerun with the gate on the belief over the live hypotheses (4 October 2026)
+
+The gate compares θ with the leader's belief over the live hypotheses (AM42). Rerun (README, the section of this
+date): 0 disagreements in all seventeen. The figures quoted above with a confidence are the old gate's; where a value
+moves, it moves up by the floor and the pin scaling (at most a few thousandths). The gate's answer moves on four ticks
+(s08_03 44, s09_03 44, s09_09 122, s09_12 87), each from none(below_theta) to clears; the idle robot asks admission at
+tick 0 only, so no decision depends on them.

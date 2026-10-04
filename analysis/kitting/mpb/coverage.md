@@ -126,7 +126,7 @@ the IRB's seventeen scenarios, nor on any tick of the eleven MPB scenarios.
 | row | instance | kind |
 |---|---|---|
 | C1 an admitted plan, a hold against the human's walk | s10_02 25, hold 5 (S, F) | verified |
-| C2 an admitted plan, a hold against a standing segment (the human's `wait_at`, `place` or `pick_up` on a robot route) | s12_02 76, hold 18 against the admitted wait (S, F), part (v) | verified |
+| C2 an admitted plan, a hold against a standing segment (the human's `wait_at`, `place` or `pick_up` on a robot route) | s12_02 76, hold 18 against the admitted wait (S, F), part (v); 75 since T-K part 1's gate stage (4 October 2026, AM42) | verified |
 | C3 a moving fallback, not cut | s10_01 2 (S, F) | verified |
 | C4 a moving fallback cut at an object | s10_09 60, kitting_table_2 (S, F); shelf_1 at 14 in several | verified |
 | C5 a moving fallback cut at a landmark | s11_02 14, door_N (S, F); s10_01 157, corner_SE (S) | verified |
@@ -162,7 +162,7 @@ on every tick (`docs/assumptions.md` 5.1, 5.2), and the run's first decision alr
 | D5 walking to a shelf: continue, hold positive, against a fallback | s11_02 14, hold 2 (S) | verified |
 | D6 a re-decision inside a running hold | s11_02 27 (S); where the hold drops to 0, s11_02 22 and 87 (S) | verified |
 | D7 a switch while walking to a shelf, against a fallback | s11_01 14 (S, F) | verified |
-| D8 a switch against an admitted projection (B3's realized-cost choice) | s12_01 26 (S), part (v) | verified |
+| D8 a switch against an admitted projection (B3's realized-cost choice) | s12_01 26 (S), part (v); 25 since T-K part 1's gate stage (4 October 2026, AM42) | verified |
 | D9 a switch while carrying (`deliver_with_return`, X1's return walk) | s11_03 30 (S, F), part (v) | verified |
 
 **D8.** The MPB's one switch (s11_01 at 14) is against a fallback stand. scenario_s10_02, the one decision whose hold

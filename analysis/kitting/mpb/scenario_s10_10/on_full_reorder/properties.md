@@ -30,5 +30,5 @@ Completion (world tick) 162; terminal decision 164. [sep] minimum 320.53 (4), co
 | 142 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=2 end=145.00 | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
 | 145 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=5 end=151.00 | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
 | 151 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=11 end=163.00 | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
-| 155 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
+| 154 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
 | 164 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | None | 0 |

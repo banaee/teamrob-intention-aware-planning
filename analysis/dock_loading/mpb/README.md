@@ -50,3 +50,9 @@ table (`trajectory.json`, `expected_ticks.json`) from the scenario's run file, w
 (0.75; the run's own oracle call reads it from the run's [run] header and must reproduce the committed table byte for
 byte). The chain is assembled only at the compare step, from the table and the run's observed `no_current_task` ticks
 (MPB-1, C1 to C6).
+
+## STALE since T-K part 1's gate stage (4 October 2026)
+
+The gate compares θ with the leader's belief over the live hypotheses since T-K part 1's build stage 2 (AM42,
+91774ce); the expectations, outputs and reports here were made with the reported distribution's value. They are stale
+until dock_loading's step of T-K part 1 measures them again (AM55, AM57); the build does not rerun this set.

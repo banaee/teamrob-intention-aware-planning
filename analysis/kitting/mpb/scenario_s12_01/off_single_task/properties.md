@@ -1,6 +1,6 @@
 # scenario_s12_01: part 4 and the measures (single_task, prior off)
 
-Completion (world tick) 134; terminal decision 136. [sep] minimum 53.19 (47), continuous 52.20 (47); near-encounters 0 ticks; F1 classes {'viol': 0, 'stand': 0, 'recede': 0, '?': 0}; holds [(27, 5), (96, 5)] (10 ticks).
+Completion (world tick) 134; terminal decision 136. [sep] minimum 53.19 (47), continuous 52.20 (47); near-encounters 0 ticks; F1 classes {'viol': 0, 'stand': 0, 'recede': 0, '?': 0}; holds [(27, 5), (95, 5)] (10 ticks).
 
 ## Declared properties
 
@@ -28,7 +28,7 @@ Completion (world tick) 134; terminal decision 136. [sep] minimum 53.19 (47), co
 | 85 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=23 end=91.88 | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 0 |
 | 92 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback standing k=1 end=94.00 | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 0 |
 | 94 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback standing k=3 end=98.00 | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 0 |
-| 96 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 5 |
+| 95 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 5 |
 | 124 | recognition_changed | replaced | none(below_theta) | coffee_break(?coffee_machine=coffee_machine_0) | fallback standing k=2 end=127.00 | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 0 |
 | 127 | projection_expired |  | none(below_theta) | deliver_item(?item=item_14) | fallback moving k=2 end=130.00 | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 0 |
 | 130 | projection_expired |  | none(below_theta) | deliver_item(?item=item_14) | fallback moving k=5 end=136.00 | deliver_item(?item=item_13,?kitting_table=kitting_table_5) | 0 |

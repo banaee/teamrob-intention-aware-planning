@@ -405,3 +405,81 @@ f759306928400bdc9427ba0569c11433  runs/env_layout_17_scenario_s15_07_on.rec
 fec0265c1dacced411d30f8570e7ca93  runs/env_layout_17_scenario_s15_12_on.rec
 8d1ee36ec9e90ba1c00a1cc56f82d1af  runs/env_layout_17_scenario_s15_13_on.rec
 ```
+
+## Rerun with the gate on the belief over the live hypotheses (T-K part 1, build stage 2, 4 October 2026)
+
+The round's outputs were replaced by a rerun at the build's gate stage (AM42, AM57): the leader's confidence is its
+belief over the live hypotheses (before the floor and the pin scaling) and the gate compares θ with it. The instrument
+follows (rule 28 in `analysis/kitting/irb/README.md`; the column `belief_h`, which admission.py, summary.py,
+baseline.py and the figure's belief panel read). Old data and figures: Kept in one external copy, outside the repository (AM59): `/home/hadi/teamrob_analysis_2026-10-04/` (its README.txt).
+The last commit holding the old results' reports: 3b05a8a (the build's stage 2b; the reports there are
+93f9083's).
+What changed (`REPORT.md`, the dated section at its end): 0 disagreements at 1e-9 in all 31 (the print-precision flag
+at s14_02 tick 181 as before); every trajectory.json byte-identical to the old, so the foreseeable tasks' ticks in the
+table above stand (rechecked from the rerun's trajectories, 31 of 31); four admissions one tick earlier, no
+retraction. The expectations table above is the old gate's. Runs (git-ignored; md5s at the rerun):
+
+```
+bc056974a53ebc997a99ad60dc513315  runs/env_layout_15_scenario_s13_01_on.log
+e478e3955464c5da8e4483fb6a58801a  runs/env_layout_15_scenario_s13_01_on.rec
+9856d21afed8d15b1fc6f0bf2270887b  runs/env_layout_15_scenario_s13_02_on.log
+6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_15_scenario_s13_02_on.rec
+e7cd8fbf9a06a36d6f9057636d8d5193  runs/env_layout_15_scenario_s13_03_on.log
+6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_15_scenario_s13_03_on.rec
+309c847d95f04a430352154fd5ec7c9e  runs/env_layout_15_scenario_s13_04_on.log
+08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_15_scenario_s13_04_on.rec
+4ad6a6e89793ce307bebbaa44e0e0dc4  runs/env_layout_15_scenario_s13_05_on.log
+726dd2b9a82635f2139aed1d8b5970c3  runs/env_layout_15_scenario_s13_05_on.rec
+f2e25a3f31a372541eeec2c5b382a10a  runs/env_layout_15_scenario_s13_06_on.log
+c537966a26ce76c9537c0e9e4ba8df11  runs/env_layout_15_scenario_s13_06_on.rec
+9a5d3153747c3273ab09c4e81a7eb9f5  runs/env_layout_15_scenario_s13_07_on.log
+f759306928400bdc9427ba0569c11433  runs/env_layout_15_scenario_s13_07_on.rec
+ce4452db751be42d91ea61d11be10bc7  runs/env_layout_16_scenario_s14_01_on.log
+962e436075b7c3f9f555445c944b8bff  runs/env_layout_16_scenario_s14_01_on.rec
+52f5f9191418cd9ab2b3afccc9ec27e8  runs/env_layout_16_scenario_s14_02_on.log
+c2d2afc42bf1c9e6a69f104ccd364765  runs/env_layout_16_scenario_s14_02_on.rec
+d52f0c79157458a5ec2fe3809b9dd113  runs/env_layout_16_scenario_s14_03_on.log
+1d8302b47da19e51d38441c3e6beb23b  runs/env_layout_16_scenario_s14_03_on.rec
+c91b7f2bdf7ba7a37ad0055afe5385df  runs/env_layout_16_scenario_s14_04_on.log
+99a4a214e4681eb7483925ca5e9d78b1  runs/env_layout_16_scenario_s14_04_on.rec
+c4f4d9309dd609948971cb3c1aa7a59f  runs/env_layout_16_scenario_s14_05_on.log
+c6a4c9bfd459f09856302fc32ce8c301  runs/env_layout_16_scenario_s14_05_on.rec
+424196424a174d5ee8176beb71dbccf4  runs/env_layout_16_scenario_s14_06_on.log
+40ce5a270689411dd5ad07819564fbe1  runs/env_layout_16_scenario_s14_06_on.rec
+ccf94c5dc4b9f1f216718914cd75e8e8  runs/env_layout_16_scenario_s14_07_on.log
+2f69371feb2b5b5cf3ee76885c1ed716  runs/env_layout_16_scenario_s14_07_on.rec
+5065e37f04e588fcda6b26e614ce26a1  runs/env_layout_16_scenario_s14_08_on.log
+c39934f8d0837488f0464918a6505303  runs/env_layout_16_scenario_s14_08_on.rec
+e1ea007cd6df80b77dab086c2d90c80b  runs/env_layout_16_scenario_s14_09_on.log
+689aa51e9a70e509060635d6969a7537  runs/env_layout_16_scenario_s14_09_on.rec
+8ee6ad11ce1aeb3e00a79a14d85eabfd  runs/env_layout_16_scenario_s14_10_on.log
+a3f6df03391265687e8d92b7fc428667  runs/env_layout_16_scenario_s14_10_on.rec
+3edb2dd868b9320d159ccbf266a88cb5  runs/env_layout_16_scenario_s14_11_on.log
+16f181f8f25400342a324af7f0328a96  runs/env_layout_16_scenario_s14_11_on.rec
+9f80deede6d1a39cd9ee60e49861c970  runs/env_layout_17_scenario_s15_01_on.log
+e478e3955464c5da8e4483fb6a58801a  runs/env_layout_17_scenario_s15_01_on.rec
+fd933621ce28b08da74de03d67c21d20  runs/env_layout_17_scenario_s15_02_on.log
+6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_17_scenario_s15_02_on.rec
+553b230ab852193125a59c7c9bcb0ffc  runs/env_layout_17_scenario_s15_03_on.log
+6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_17_scenario_s15_03_on.rec
+ca10e6d43ba3f70752fca3c1e40eeafa  runs/env_layout_17_scenario_s15_04_on.log
+08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_17_scenario_s15_04_on.rec
+da41e04de938363fdf4524a070d31553  runs/env_layout_17_scenario_s15_05_on.log
+726dd2b9a82635f2139aed1d8b5970c3  runs/env_layout_17_scenario_s15_05_on.rec
+c32d16ea4b357e8742ff80607c7a249a  runs/env_layout_17_scenario_s15_06_on.log
+c537966a26ce76c9537c0e9e4ba8df11  runs/env_layout_17_scenario_s15_06_on.rec
+3bda4dc6ff5a3c85a4b15fca6e58c443  runs/env_layout_17_scenario_s15_07_on.log
+f759306928400bdc9427ba0569c11433  runs/env_layout_17_scenario_s15_07_on.rec
+0f94eeea5d386df2fb3c81ea5b26c84c  runs/env_layout_17_scenario_s15_08_on.log
+4f2735a7801ce4fa525ffb0cbe628ec5  runs/env_layout_17_scenario_s15_08_on.rec
+68c6d5aa00a6e0fc655dcd8f430c9f08  runs/env_layout_17_scenario_s15_09_on.log
+95ea7df2c9dafe3a4ea6bb8b0949abf4  runs/env_layout_17_scenario_s15_09_on.rec
+bc5be26c0f56339063a528f998afd9a1  runs/env_layout_17_scenario_s15_10_on.log
+8b6fa843b38013dafd259f9d8207c1a8  runs/env_layout_17_scenario_s15_10_on.rec
+ec2152791e89d6959d96b22133bde615  runs/env_layout_17_scenario_s15_11_on.log
+4c1aeb529fbd5fce16391c863e29394a  runs/env_layout_17_scenario_s15_11_on.rec
+d5caa92afd96dab61811dc18ab18bf7e  runs/env_layout_17_scenario_s15_12_on.log
+fec0265c1dacced411d30f8570e7ca93  runs/env_layout_17_scenario_s15_12_on.rec
+cadc9e9071af1496aa78d6a16244768a  runs/env_layout_17_scenario_s15_13_on.log
+8d1ee36ec9e90ba1c00a1cc56f82d1af  runs/env_layout_17_scenario_s15_13_on.rec
+```

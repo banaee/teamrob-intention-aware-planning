@@ -88,15 +88,15 @@ Events (actual):
 
 Never pinned: coffee_break(coffee_machine_0). At the last entry (go_to(corner_NE), ticks 322 to 343): lifecycle and finding adequate; on the idle ticks after it: adequate, unexplained.
 
-True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ, its belief and hypothesis adequacy there, and whether it leads.
+True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ (the belief over H, the value the gate reads; AM42), its belief and hypothesis adequacy there, and whether it leads.
 
 | true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |
 |---|---|---|---|---|---|
-| deliver_item(item_3) | 0 to 66 | 28 | 0.7512 | yes | adequate |
-| deliver_item(item_2) | 67 to 123 | 97 | 0.7812 | yes | adequate |
-| deliver_item(item_1) | 124 to 216 | 171 | 0.7619 | yes | adequate |
+| deliver_item(item_3) | 0 to 66 | 28 | 0.7518 | yes | adequate |
+| deliver_item(item_2) | 67 to 123 | 97 | 0.7820 | yes | adequate |
+| deliver_item(item_1) | 124 to 216 | 171 | 0.7635 | yes | adequate |
 | ac_activation(ac_switch_0) | 217 to 263 | not reached | - | - | - |
-| deliver_item(item_4) | 264 to 321 | 280 | 0.7826 | yes | adequate |
+| deliver_item(item_4) | 264 to 321 | 279 | 0.7521 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 
@@ -165,8 +165,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 171 to 214 | deliver_item(item_1) | clears |
 | 215 to 261 | ac_activation(ac_switch_0) | none(below_theta) |
 | 262 to 263 | coffee_break(coffee_machine_0) | none(below_theta) |
-| 264 to 279 | deliver_item(item_4) | none(below_theta) |
-| 280 to 319 | deliver_item(item_4) | clears |
+| 264 to 278 | deliver_item(item_4) | none(below_theta) |
+| 279 to 319 | deliver_item(item_4) | clears |
 | 320 to 321 | ac_activation(ac_switch_0) | none(below_theta) |
 | 322 to 332 | coffee_break(coffee_machine_0) | none(below_theta) |
 | 333 to 344 | coffee_break(coffee_machine_0) | clears |

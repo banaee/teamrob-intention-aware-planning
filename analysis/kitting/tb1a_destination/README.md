@@ -753,3 +753,38 @@ Commands: `bash analysis/kitting/tb1a_destination/sweep.sh <dir>`; `analysis/ins
 |---|---|---|---|---|---|---|---|---|
 | env_layout_05_scenario_s04_01_on | bdadb875c6e414c689d9e3b1dd6ab80c | 1dc08a288e67886ecaf9bc3614540161 | 384 | 379 | 59.89 (338) | 0 | 0 | 0 |
 | env_layout_05_scenario_s04_01_off | 8dd9fc6bd8fce247e01e49fe26fee1c7 | 1dc08a288e67886ecaf9bc3614540161 | 384 | 392 | 64.96 (341) | 0 | 0 | 0 |
+
+## The gate on the belief over the live hypotheses (T-K part 1, build stage 2, 4 October 2026) — the logs from here on
+
+Regenerated at T-K part 1's gate stage (AM42; design_decisions.md, "T-K: context knowledge in the recognizer's belief",
+R7's AM42; design_records.md, "T-K", THE BUILD, STAGE 2). Two changes since the table above, both named:
+- stage 1 (b85494d), the rename of the run option (AM9): in every log the `[run]` header's `assignment_prior=` reads
+  `assignment_knowledge=` and the `[IR-prior] switch=` line reads `[IR-assignment] knowledge=`; nothing else;
+- stage 2 (91774ce, the gate): `confidence` is the leader's belief over the live hypotheses, before the floor and the
+  pin scaling, and the gate compares θ with it. So `[IR]`, `[IR-dist]` and `[meta-proj]` print a higher confidence
+  wherever a key is pinned or a live value floored (every log). `[IR-dist]`'s dist is the reported distribution, unchanged.
+  Where the leader's value crosses θ one tick earlier, a `recognition_changed` (cause entered) admission moves
+  one tick earlier, with the same winner and hold 0 (a continue): env_layout_02_scenario_s02_01_on at 161 (was 162).
+  No robot motion, `[hold]`, `[sep]`, completion tick or F1 class moved in any log.
+The `.rec` streams are byte-identical to the table above in every log. Completion is the world tick (T6).
+The run files state `context_knowledge` from build stage 3 on; these logs were made before it. Prior on first.
+Commands: `bash analysis/kitting/tb1a_destination/sweep.sh analysis/kitting/tb1a_destination/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_on | 3ecf2186a4faa4337babaf3d6ddc4b13 | e75eaa192f7071498290d6255fc81320 | 174 | 45.74 (156) | 0 | 3 | 0 |
+| env_layout_02_scenario_s02_01_on | 0fab75119f3dab9cd2da52f8f5bd89dd | fb8914e13cbab8b97307127aa0cd4327 | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_on | 48dd6fda8aa93c5271f24fb2a0e84ca1 | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_04_scenario_s01_06_on | 1c866a365c022cd5f75447c8700f985f | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_on | ca689745a596675465e4ee46cdbdd308 | 1dc08a288e67886ecaf9bc3614540161 | 379 | 59.89 (338) | 0 | 0 | 0 |
+| env_layout_06_scenario_s03_06_on | 72b9ed5ae782a5e92524e898b54f933e | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_on | 5e124082b52c44f74d57405dc3f21993 | dab078d5ca51e5b378054ee6a60ccca7 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_on | 48cf8835d4086fa889ab5b3daba3c591 | dab078d5ca51e5b378054ee6a60ccca7 | 214 | 50.00 (57) | 0 | 0 | 0 |
+| env_layout_01_scenario_s01_01_off | 896cc908137a32f27522a06db6ef0e06 | e75eaa192f7071498290d6255fc81320 | 199 | 72.61 (166) | 0 | 0 | 0 |
+| env_layout_02_scenario_s02_01_off | 5e9bb62d5124120634fde07b327399f4 | fb8914e13cbab8b97307127aa0cd4327 | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_off | e44b820331bb8c586c781590feb6bdf5 | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_04_scenario_s01_06_off | 86b5417bb8ec1ef6d9c55564598961cf | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_off | 6580ca1e7442a47bca3489cf294eeca7 | 1dc08a288e67886ecaf9bc3614540161 | 392 | 64.96 (341) | 0 | 0 | 0 |
+| env_layout_06_scenario_s03_06_off | 0077a977077dec87cf0c2fd6df46e36c | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_off | 8fb8e02355ebc63dc3f827d3c204aca2 | dab078d5ca51e5b378054ee6a60ccca7 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_off | d518d7bdab535848613304a71cc77a4d | dab078d5ca51e5b378054ee6a60ccca7 | 218 | 50.00 (57) | 0 | 0 | 0 |

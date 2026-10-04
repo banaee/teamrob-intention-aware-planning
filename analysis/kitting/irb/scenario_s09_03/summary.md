@@ -52,14 +52,14 @@ Events (actual):
 
 Never pinned: none. At the last entry (go_to(corner_SE), ticks 193 to 240): lifecycle and finding adequate, unexplained; on the idle ticks after it: unexplained.
 
-True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ, its belief and hypothesis adequacy there, and whether it leads.
+True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ (the belief over H, the value the gate reads; AM42), its belief and hypothesis adequacy there, and whether it leads.
 
 | true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |
 |---|---|---|---|---|---|
-| deliver_item(item_1) | 0 to 31 | 25 | 0.7544 | yes | adequate |
-| coffee_break(coffee_machine_0) | 32 to 85 | 45 | 0.8036 | yes | adequate |
-| deliver_item(item_1) | 86 to 128 | 100 | 0.7735 | yes | adequate |
-| deliver_item(item_2) | 129 to 192 | 142 | 0.7594 | yes | adequate |
+| deliver_item(item_1) | 0 to 31 | 25 | 0.7552 | yes | adequate |
+| coffee_break(coffee_machine_0) | 32 to 85 | 44 | 0.7506 | yes | adequate |
+| deliver_item(item_1) | 86 to 128 | 100 | 0.7742 | yes | adequate |
+| deliver_item(item_2) | 129 to 192 | 142 | 0.7609 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 
@@ -117,8 +117,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 0 to 24 | deliver_item(item_1) | none(below_theta) |
 | 25 to 36 | deliver_item(item_1) | clears |
 | 37 to 40 | deliver_item(item_1) | none(below_theta) |
-| 41 to 44 | coffee_break(coffee_machine_0) | none(below_theta) |
-| 45 to 83 | coffee_break(coffee_machine_0) | clears |
+| 41 to 43 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 44 to 83 | coffee_break(coffee_machine_0) | clears |
 | 84 to 99 | deliver_item(item_1) | none(below_theta) |
 | 100 to 126 | deliver_item(item_1) | clears |
 | 127 to 128 | coffee_break(coffee_machine_0) | none(below_theta) |

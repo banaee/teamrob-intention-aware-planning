@@ -185,3 +185,9 @@ c561f544bbed0ffacc530d807014ae6d  runs/env_layout_03_scenario_s04_19_on.rec
 8b624615562c23afc3076ee8f5f52625  runs/env_layout_04_scenario_s06_18_on.rec
 d7035dd3b18639cfe78e00d688091982  runs/env_layout_04_scenario_s06_19_on.rec
 ```
+
+## STALE since T-K part 1's gate stage (4 October 2026)
+
+The gate compares θ with the leader's belief over the live hypotheses since T-K part 1's build stage 2 (AM42,
+91774ce); the expectations, outputs and reports here were made with the reported distribution's value. They are stale
+until dock_loading's step of T-K part 1 measures them again (AM55, AM57); the build does not rerun this set.

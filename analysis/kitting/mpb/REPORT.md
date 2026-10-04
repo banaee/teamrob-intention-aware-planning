@@ -564,3 +564,18 @@ eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_full_reo
 93053e69c0d69ae637fb82b0c9399eb2  runs/env_layout_14_scenario_s12_02_on_single_task.log
 eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_single_task.rec
 ```
+
+## T-K part 1, build stage 2: the gate on the belief over the live hypotheses (4 October 2026)
+
+The gate compares θ with the leader's belief over the live hypotheses (AM42; README, the section of this date). The
+stage's three stop conditions (AM57, AM61, AM64), checked:
+- parts 1 to 3 against the oracle: 0 per-tick, 0 decision and 0 log disagreements in all 32 prior-on runs;
+- part 4: every declared property's value is the same as before the change, in all three variants (each holds under
+  single_task; P3a under full_reorder and P12.1a under full_reorder and prior off read NO, as before);
+- the coverage matrix: every claimed cell is still reached. Two instances fall one tick earlier: C2, scenario_s12_02's
+  admission of coffee_break with hold 18 at 75 (was 76); D8, scenario_s12_01's switch to deliver_item(item_13) at 25
+  (was 26). A4 (s10_11 53), D9 (s11_03 30) and E6 (s10_10, the dip at 34 to 36) are unchanged.
+What moved, prior on: one recognition_changed (cause entered) admission one tick earlier in s10_08 (46), s10_09 (101),
+s10_10 (154), s12_01 (25) and s12_02 (75), both strategies, the same winner and hold; the robot's motion moves only in
+s12_02 (one tick earlier from 75; P12.2a to c hold). Prior off (the diagnostic appendix, AM62): s12_01's admission at
+95 (was 96), the same winner and hold; no other run moved.

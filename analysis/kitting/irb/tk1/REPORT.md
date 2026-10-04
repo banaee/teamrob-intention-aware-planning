@@ -245,3 +245,18 @@ _09, _10) ends without it.
   15 and 17, the second in 16), so the prior has work as a whole to weigh against.
 - The run lengths stay below 500; the round with context knowledge removes TODO-66's weight (AM22), after which the
   bound no longer matters.
+
+## The gate on the belief over the live hypotheses: the rerun (T-K part 1, build stage 2, 4 October 2026)
+
+The tables above are the old gate's (the reported distribution's leader value). Rerun with the gate of AM42 (the belief
+over the live hypotheses, before the floor and the pin scaling), the 31 runs:
+- 0 disagreements at 1e-9 against the in-process BeliefState in all 31; at print precision the one known flag (s14_02
+  tick 181). The trajectories are byte-identical: the robot is idle, and the gate changes no human tick.
+- The measure moves in four rows, each an admission one tick earlier, no retraction:
+  s15_02 deliver_item(item_4) 331 (45), was 332 (46); s15_05 deliver_item(item_4) 337 (45), was 338 (46);
+  s15_10 deliver_item(item_4) 279 (15), was 280 (16); s15_12 deliver_item(item_1) 231 (46), was 232 (47).
+- The per-room table is unchanged (counts and medians).
+- The two A/C peaks of observation 2 read 0.7487 (s15_10) and 0.7468 (s15_11) over the live hypotheses, still below θ.
+- Beyond the measure, the gate's per-tick answer moves on 15 ticks in env_layout_17 (s15_01 to _13), each a leader at
+  0.747 to 0.750 that now clears (or, s15_07 tick 146, turns inadequate instead of below θ): ten on the coffee break's
+  hypothesis during the exit walk, after the last delivery. env_layout_15 and _16 move on no tick.

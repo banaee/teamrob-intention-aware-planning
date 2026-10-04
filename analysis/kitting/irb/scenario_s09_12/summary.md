@@ -45,12 +45,12 @@ Events (actual):
 
 Never pinned: coffee_break(coffee_machine_0). At the last entry (go_to(corner_SE), ticks 126 to 174): lifecycle and finding adequate, unexplained; on the idle ticks after it: unexplained.
 
-True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ, its belief and hypothesis adequacy there, and whether it leads.
+True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ (the belief over H, the value the gate reads; AM42), its belief and hypothesis adequacy there, and whether it leads.
 
 | true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |
 |---|---|---|---|---|---|
-| deliver_item(item_2) | 0 to 62 | 15 | 0.7663 | yes | adequate |
-| deliver_item(item_1) | 63 to 125 | 88 | 0.7674 | yes | adequate |
+| deliver_item(item_2) | 0 to 62 | 15 | 0.7671 | yes | adequate |
+| deliver_item(item_1) | 63 to 125 | 87 | 0.7500 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 
@@ -88,8 +88,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 0 to 14 | deliver_item(item_2) | none(below_theta) |
 | 15 to 60 | deliver_item(item_2) | clears |
 | 61 to 62 | coffee_break(coffee_machine_0) | none(below_theta) |
-| 63 to 87 | deliver_item(item_1) | none(below_theta) |
-| 88 to 123 | deliver_item(item_1) | clears |
+| 63 to 86 | deliver_item(item_1) | none(below_theta) |
+| 87 to 123 | deliver_item(item_1) | clears |
 | 124 to 124 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
 | 125 to 125 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
 | 126 to 156 | coffee_break(coffee_machine_0) | clears |

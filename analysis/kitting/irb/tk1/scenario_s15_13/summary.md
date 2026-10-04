@@ -95,16 +95,16 @@ Events (actual):
 
 Never pinned: coffee_break(coffee_machine_0). At the last entry (go_to(corner_NE), ticks 401 to 422): lifecycle and finding adequate; on the idle ticks after it: unexplained.
 
-True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ, its belief and hypothesis adequacy there, and whether it leads.
+True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ (the belief over H, the value the gate reads; AM42), its belief and hypothesis adequacy there, and whether it leads.
 
 | true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |
 |---|---|---|---|---|---|
-| deliver_item(item_3) | 0 to 66 | 28 | 0.7512 | yes | adequate |
-| deliver_item(item_2) | 67 to 121 | 97 | 0.7812 | yes | adequate |
-| ac_activation(ac_switch_0) | 122 to 169 | 154 | 0.7984 | yes | inadequate |
-| deliver_item(item_2) | 170 to 216 | 197 | 0.7699 | yes | adequate |
-| deliver_item(item_1) | 217 to 308 | 263 | 0.7606 | yes | adequate |
-| deliver_item(item_4) | 309 to 400 | 354 | 0.7525 | yes | adequate |
+| deliver_item(item_3) | 0 to 66 | 28 | 0.7518 | yes | adequate |
+| deliver_item(item_2) | 67 to 121 | 97 | 0.7820 | yes | adequate |
+| ac_activation(ac_switch_0) | 122 to 169 | 154 | 0.8006 | yes | inadequate |
+| deliver_item(item_2) | 170 to 216 | 197 | 0.7714 | yes | adequate |
+| deliver_item(item_1) | 217 to 308 | 263 | 0.7621 | yes | adequate |
+| deliver_item(item_4) | 309 to 400 | 354 | 0.7548 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 
@@ -209,8 +209,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 309 to 353 | deliver_item(item_4) | none(below_theta) |
 | 354 to 398 | deliver_item(item_4) | clears |
 | 399 to 400 | ac_activation(ac_switch_0) | none(below_theta) |
-| 401 to 411 | coffee_break(coffee_machine_0) | none(below_theta) |
-| 412 to 422 | coffee_break(coffee_machine_0) | clears |
+| 401 to 410 | coffee_break(coffee_machine_0) | none(below_theta) |
+| 411 to 422 | coffee_break(coffee_machine_0) | clears |
 | 423 to 452 | coffee_break(coffee_machine_0) | none(leader_inadequate) |
 
 The last entry (go_to(corner_NE)): first step 401, last step 421, acknowledgement 422; the idle human from 423. Live at its first tick: ac_activation(ac_switch_0), coffee_break(coffee_machine_0).

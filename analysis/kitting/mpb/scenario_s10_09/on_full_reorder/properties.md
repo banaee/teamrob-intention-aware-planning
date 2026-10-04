@@ -31,6 +31,6 @@ None declared.
 | 78 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=4 end=83.00 | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 83 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=9 end=93.00 | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 93 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=19 end=113.00 | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
-| 102 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
+| 101 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 116 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
 | 139 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | None | 0 |

@@ -595,3 +595,30 @@ This folder moved from `analysis/tb1c_realized_flip/` to `analysis/kitting/tb1c_
 unchanged: the set was regenerated from the sorted tree and is byte-identical. The commands of the sections above read
 `bash analysis/kitting/tb1c_realized_flip/sweep.sh <dir>`, and `sep_classes.py` (with the parser `logparse.py`) is
 `analysis/instruments/common/sep_classes.py`.
+
+## The gate on the belief over the live hypotheses (T-K part 1, build stage 2, 4 October 2026) — the logs from here on
+
+Regenerated at T-K part 1's gate stage (AM42; design_decisions.md, "T-K: context knowledge in the recognizer's belief",
+R7's AM42; design_records.md, "T-K", THE BUILD, STAGE 2). Two changes since the table above, both named:
+- stage 1 (b85494d), the rename of the run option (AM9): in every log the `[run]` header's `assignment_prior=` reads
+  `assignment_knowledge=` and the `[IR-prior] switch=` line reads `[IR-assignment] knowledge=`; nothing else;
+- stage 2 (91774ce, the gate): `confidence` is the leader's belief over the live hypotheses, before the floor and the
+  pin scaling, and the gate compares θ with it. So `[IR]`, `[IR-dist]` and `[meta-proj]` print a higher confidence
+  wherever a key is pinned or a live value floored (every log). `[IR-dist]`'s dist is the reported distribution, unchanged.
+  Where the leader's value crosses θ one tick earlier, a `recognition_changed` (cause entered) admission moves
+  one tick earlier, with the same winner and hold 0 (a continue): env_layout_08_scenario_s06_03_plain_off at 44 (was 45); env_layout_08_scenario_s06_03_realized_off at 44 (was 45).
+  No robot motion, `[hold]`, `[sep]`, completion tick or F1 class moved in any log.
+The `.rec` streams are byte-identical to the table above in every log. Completion is the world tick (T6).
+The run files state `context_knowledge` from build stage 3 on; these logs were made before it. Prior on first.
+Commands: `bash analysis/kitting/tb1c_realized_flip/sweep.sh analysis/kitting/tb1c_realized_flip/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_on | 8a1e5398be36f9628b95e273776510d1 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_on | 98387ebb32cc7dfec3b7b45333aaf55a | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_on | 32ba4c537b732f76fc656c68dc9dcdd3 | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_on | 20f611b268c4e59d85ce40c0edbca5f1 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_plain_off | 8cf38d9477761514b87fcdfa81d9dbff | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_off | 0e8d3c8127d5d66ac6d9a8c539978f5a | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_off | 5c4e92f8625efe964cfb3c397705bd82 | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_off | 558404c21eff46da13f0004c7e485eb5 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |

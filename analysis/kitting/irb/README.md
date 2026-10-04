@@ -430,3 +430,57 @@ analysis/instruments/irb/run.sh kitting -o <dir> configs/kitting/irb/scenario_s0
 
 The seventeen runs and every output were regenerated from the sorted tree into another folder: byte-identical to the
 committed outputs and to the G-build md5s above.
+
+## T-K part 1, build stage 2: the gate on the belief over the live hypotheses (4 October 2026)
+
+The recognizer's `confidence` is the leader's belief over the live hypotheses (AM42); the generator follows by
+derivation, nothing fitted:
+
+| # | rule (new) | source |
+|---|---|---|
+| 28 | The leader and its confidence: the argmax of the belief over H (the evidence normalised over H, before the floor and the pins of rule 15) and its value there; ties to the first live key in sorted order. Rule 23's θ test reads this value. The `belief` column stays rule 15's reported distribution; the new column `belief_h` is the belief over H per hypothesis, compared against actual.csv (`BeliefState.belief`) at 1e-9 | design_decisions.md, "T-K", R7's AM42 |
+
+The seventeen were rerun and their outputs replaced (AM57). Old data and figures: Kept in one external copy, outside the repository (AM59): `/home/hadi/teamrob_analysis_2026-10-04/` (its README.txt).
+The last commit holding the old results' reports: 3b05a8a (the build's stage 2b; the reports there are
+93f9083's).
+Result: 0 disagreements in all seventeen, every column, `belief_h` included. The gate's per-tick answer moves on four
+ticks, each a leader at 0.749 to 0.750 that now clears: scenario_s08_03 and s09_03 at 44 (coffee_break), s09_09 at 122
+(deliver_item(item_2)), s09_12 at 87 (deliver_item(item_1)). The `.rec` streams are byte-identical. Runs (git-ignored;
+md5s at the rerun):
+
+```
+fb58164ca8cf2d7239ae49e183fd32c9  runs/env_layout_10_scenario_s08_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_10_scenario_s08_01_on.rec
+cd9b66b7a91acee7c2af1d82640a2533  runs/env_layout_10_scenario_s08_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_10_scenario_s08_02_on.rec
+992a4e4d02ecd252585eeb791664ec3b  runs/env_layout_10_scenario_s08_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_10_scenario_s08_03_on.rec
+ec05cac2465ee9f4c06a4c37de31db95  runs/env_layout_10_scenario_s08_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_10_scenario_s08_04_on.rec
+0d4ffad4c19ea70f5d97d9c5372f4fdd  runs/env_layout_11_scenario_s09_01_on.log
+2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_11_scenario_s09_01_on.rec
+6e262427ad7852bd18182cfcf072e511  runs/env_layout_11_scenario_s09_02_on.log
+a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_11_scenario_s09_02_on.rec
+1cd0219fa6b677990e0f9fd2c76dcc09  runs/env_layout_11_scenario_s09_03_on.log
+93551c8fa122df7c3ad6a028f9717845  runs/env_layout_11_scenario_s09_03_on.rec
+eb35ca1490cbe50e590be96d0fd1281b  runs/env_layout_11_scenario_s09_04_on.log
+b2d33459410319657e1f47791c1e180e  runs/env_layout_11_scenario_s09_04_on.rec
+bb9e0b60c696055b341e0a8d7316319c  runs/env_layout_11_scenario_s09_05_on.log
+c715db44f68926f3bb6b8fa387525f1a  runs/env_layout_11_scenario_s09_05_on.rec
+b975ba1263789d78b5deeea47b1d19ee  runs/env_layout_11_scenario_s09_06_on.log
+703b2c62e484b7db940f36166548a88c  runs/env_layout_11_scenario_s09_06_on.rec
+61c1e64a15ea7370256f3330035eda19  runs/env_layout_11_scenario_s09_07_on.log
+a2ece1d231a6c071c20efdea470c4c9f  runs/env_layout_11_scenario_s09_07_on.rec
+2c122d143748842ea4e1582ceb62684e  runs/env_layout_11_scenario_s09_08_on.log
+529f6f2019682be19b77f4e1152b1ea5  runs/env_layout_11_scenario_s09_08_on.rec
+2c775e87238efe96d9d210848bbc2823  runs/env_layout_11_scenario_s09_09_on.log
+e252b7b8e703da1492b52df3ae4df3dc  runs/env_layout_11_scenario_s09_09_on.rec
+f1b7385a5089b4e6949993e632c64963  runs/env_layout_11_scenario_s09_10_on.log
+c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
+52300e27ff0971b0e6a93f630834cf79  runs/env_layout_11_scenario_s09_11_on.log
+9a4309d36ae6a47d9f1e36f512b711b2  runs/env_layout_11_scenario_s09_11_on.rec
+22a4e7d56ecf26cc1b5cc103174d67f1  runs/env_layout_11_scenario_s09_12_on.log
+606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
+fd3f36430463c7e087a40103e8032899  runs/env_layout_11_scenario_s09_13_on.log
+739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
+```

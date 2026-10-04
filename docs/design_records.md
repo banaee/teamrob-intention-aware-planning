@@ -2865,6 +2865,10 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
     the prior does not change it.
   - Two A/C cases in env_layout_17 peak just under the threshold with the equal prior (s15_10 at 0.746, s15_11 at
     0.745), so a later crossing there must not be read as the effect of the A/C's strength.
+    MOVED (4 October 2026, T-K part 1's gate stage, AM42): read over the live hypotheses, the gate's value, the two
+    peaks are 0.7487 and 0.7468, still below the threshold (analysis/kitting/irb/tk1/REPORT.md, its last section).
+    Four of round 1's admissions fall one tick earlier (s15_02, s15_05, s15_10, s15_12), no retraction; KT8's other
+    numbers stand.
 
 - KT11, the method of the comparison (ruled by Hadi). The run with context knowledge off is not a neutral baseline: the
   equal prior gives a foreseeable task the share of one delivery. So the tests read three conditions:
@@ -3237,3 +3241,28 @@ STEP 1, THE LAYOUTS WITH MORE THAN ONE A/C SWITCH (AM19): LISTED, RULED AND BUIL
   of l_build, td_stage1, td_stage1b (two sets) and irb2b_exposed_interval, in no commit; all 20 are in the copy at
   /home/hadi/teamrob_analysis_2026-10-02/ (irb2b's under its earlier name tb2b_exposed_interval). No script in the six
   reads only them; tc2c_scripts and f47_fixtures held none.
+
+THE BUILD, STAGES 1 AND 2 (T-K part 1, step 3; ccode, 4 October 2026, by the approved plan,
+`docs/handoffs/plan_T-K_part1.md`, section 8). Records only what was built and what moved.
+- Stage 0: the baselines B0 at 93f9083 (the four maintained sets, round 1's 31 runs through the IRB pipeline,
+  dock_loading's six milestone runs); local, not committed. One pass of the scope takes about 8 minutes.
+- Stage 1, b85494d: the run option `assignment_prior` renamed `assignment_knowledge` (AM9), in code, every run file,
+  the sweeps, the instruments and the tests; the log line `[IR-prior] switch=` reads `[IR-assignment] knowledge=`.
+  Against B0: identical except those two lines, every `.rec` byte-identical.
+- Stage 2, the gate (AM42, AM53): 91774ce (BeliefState.belief, the belief over the live hypotheses; `confidence` its
+  leader's value; `_clears_gate` unchanged), 3b05a8a (the instruments: the IRB's rule 28 and the column `belief_h`),
+  and the records commit with the regenerated sets (B2).
+  - The three stop conditions (AM57, AM61, AM64) checked, none met: 0 disagreements with the oracle in round 1 (31),
+    kitting's IRB (17) and MPB (16, both strategies); every declared property of the MPB reads as before; every
+    claimed coverage cell is still reached (C2 and D8 one tick earlier, at 75 and 25).
+  - What moved: the printed confidence wherever a key is pinned or floored. Decisions only where the leader sits
+    within the pin scaling of θ (0.747 to 0.750): one admission one tick earlier in four of the 48 maintained logs
+    (no motion, completion or separation moved), in five MPB scenarios (motion only in s12_02), in four rows of round
+    1's measure; no retraction anywhere. The run without assignment knowledge: one MPB admission one tick earlier
+    (s12_01 at 95), a diagnostic (AM62).
+  - dock_loading's milestone runs (not a stop condition): an admission one tick earlier in five of six; in
+    scenario_s07_02 it interrupts the robot's hold at 68 (5 of 6 ticks), the robot moves off at 26 cm from the human,
+    and F1 counts one moving-robot violation where it stood at 22.5 cm before. A finding for dock_loading's step.
+  - The old untracked data: /home/hadi/teamrob_analysis_2026-10-04/ (AM59). dock_loading's IRB and MPB sets marked
+    stale in their READMEs (AM57).
+

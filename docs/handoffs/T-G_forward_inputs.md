@@ -589,6 +589,7 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
   prior does not change. (KT10)
 - Two A/C cases in env_layout_17 (s15_10, s15_11) peak just under θ with the equal prior (0.746, 0.745): a later
   crossing there must not be read as the effect of the A/C's strength. (KT10)
+  MOVED (4 October 2026, the gate's stage, AM42): over the live hypotheses 0.7487 and 0.7468, still below θ.
 - The gate refuses only below the threshold. Where the prior alone is exactly θ, the outcome at the first observed
   movement depends on floating-point rounding; the runs are deterministic, so the result is stable, and it is
   arbitrary. (KT11, its ADDED line; its case, the coffee break inside the break time in env_layout_15 at 0.75, no longer

@@ -24,6 +24,7 @@ Rows (tick, live hypothesis) present on one side only: 0
 | boundary | 252 | 0 |
 | gate | 252 | 0 |
 | belief | 531 | 0 |
+| belief_h | 531 | 0 |
 | S | 531 | 0 |
 | member | 531 | 0 |
 | adequacy | 531 | 0 |

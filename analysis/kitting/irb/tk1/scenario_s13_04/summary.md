@@ -87,15 +87,15 @@ Events (actual):
 
 Never pinned: none. At the last entry (go_to(corner_NE), ticks 357 to 378): lifecycle and finding adequate; on the idle ticks after it: unexplained.
 
-True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ, its belief and hypothesis adequacy there, and whether it leads.
+True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its first tick with belief ≥ θ (the belief over H, the value the gate reads; AM42), its belief and hypothesis adequacy there, and whether it leads.
 
 | true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |
 |---|---|---|---|---|---|
-| deliver_item(item_3) | 0 to 66 | 26 | 0.7591 | yes | adequate |
-| deliver_item(item_2) | 67 to 123 | 97 | 0.7917 | yes | adequate |
-| deliver_item(item_1) | 124 to 216 | 161 | 0.7578 | yes | adequate |
-| coffee_break(coffee_machine_0) | 217 to 289 | 249 | 0.7590 | yes | adequate |
-| deliver_item(item_4) | 290 to 356 | 295 | 0.7903 | yes | adequate |
+| deliver_item(item_3) | 0 to 66 | 26 | 0.7596 | yes | adequate |
+| deliver_item(item_2) | 67 to 123 | 97 | 0.7925 | yes | adequate |
+| deliver_item(item_1) | 124 to 216 | 161 | 0.7593 | yes | adequate |
+| coffee_break(coffee_machine_0) | 217 to 289 | 249 | 0.7613 | yes | adequate |
+| deliver_item(item_4) | 290 to 356 | 295 | 0.7927 | yes | adequate |
 
 Refutations (actual): each tick on which a hypothesis's S falls below α = 0.05 (from ≥ α or from no observation), its belief there and the v·D that took it there (from S); e and v·(s − s_exp) from expected.csv; the truth on that tick.
 

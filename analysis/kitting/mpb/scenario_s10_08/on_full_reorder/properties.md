@@ -23,7 +23,7 @@ None declared.
 | 33 | recognition_changed | replaced | none(below_theta) | coffee_break(?coffee_machine=coffee_machine_0) | fallback standing k=5 end=39.00 | deliver_item(?item=item_5,?kitting_table=kitting_table_1) | 0 |
 | 39 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=5 end=45.00 | deliver_item(?item=item_5,?kitting_table=kitting_table_1) | 0 |
 | 43 | no_current_task |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=9 end=53.00 | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
-| 47 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
+| 46 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 94 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 108 | recognition_changed | replaced | none(below_theta) | coffee_break(?coffee_machine=coffee_machine_0) | fallback standing k=2 end=111.00 | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 111 | projection_expired |  | none(below_theta) | deliver_item(?item=item_1) | fallback moving k=2 end=114.00 | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
