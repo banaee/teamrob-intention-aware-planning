@@ -3335,3 +3335,29 @@ the lines the earlier stages named set aside, so every stage's outputs are "B2 e
   stand, confirmed from stage 6's rerun with context knowledge on (31 of 31 trajectories equal in those columns); the
   recency fact of each coffee_break first holds on the README's completion tick and holds for 90 ticks in all 17
   coffee_break scripts.
+
+STEP 4, KITTING, THE IDLE ROBOT: DONE (T-K part 1; ccode, 4 October 2026, three stages with a pause after each, as
+Hadi ruled; `analysis/kitting/irb/tk2/README.md` and `REPORT.md`).
+- Ruled by Hadi for the step: env_layout_16 as it is; the setups' default timeline break_time 178 to 300 (no room_warm);
+  the eleven A/C scripts with their own timeline room_warm 150 to the end (3A); the windows of 3B to 3F; ccode's
+  proposals P1 to P9 all taken (stage 1), P8 part of the measure; the direction "never on the prior alone" restated:
+  while a delivery is live the coffee break does not reach θ on the prior alone, with none live it does and only the
+  observation rule delays its admission; each direction read on three sides (off, on without the raising fact, on with
+  it) with the deliveries live, each comparison marked within one script or across scripts, verdicts from within.
+- Built: the timelines (setups; 3A in place in the eleven scenarios; 26 new scenarios, scenario_s13_08 to _15,
+  s14_12 to _21, s15_14 to _21); `configs/kitting/irb/tk2/` (57, context knowledge on); the instrument (32ce7ed):
+  `trajectory.py` carries a scenario's own timeline (a plain defect, found by the first expectations), `admission.py`
+  reads the A/C's arrival on the tick before its switch_on and lists every admission of a hypothesis not the true task,
+  `offon.py`; the expectations committed before any run (fffcffb). Audit: round 1 rerun, identical except the timeline
+  line and the trajectories' timeline facts; the four maintained sets byte-identical; three tests updated (none for a
+  change of behaviour).
+- Result: 59 runs, 0 disagreements with the oracle at 1e-9. Directions (REPORT.md): 1, 2, 4 and 5 confirmed within one
+  script on every side the set has; 2's delivery direction contradicted against off in 5 of 22 stretches and 3
+  contradicted against off in one script at 1 live (s15_10), both where off gives the A/C, whose switch stands beside
+  shelf_1 and shelf_4, the share of a delivery; 3 confirmed against on without the fact in every script. Findings, none
+  ruled: the belief at a tick depends only on the facts at that tick (a window's edge before the arrival leaves the
+  belief at arrival unchanged); with the A/C as the foreseeable task beside the lone delivery's shelf (P4), the early
+  admission of the delivery lasts the whole A/C activation; admitted deliveries lose θ where a recency fact ends inside
+  break_time, never where a window opens; the early admission also reaches a delivery with three live before a break
+  begun inside it. Flags: the MPB instrument's `reference.py` drops a scenario's own timeline (no MPB scenario states
+  one). Next: step 5, the planning cases (5.7 of the forward inputs).

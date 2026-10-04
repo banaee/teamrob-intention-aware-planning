@@ -540,6 +540,8 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
      terminal fact stops holding (the human's next step); while the human stands at the machine, it stays retired.
    - The expectations are stated before the runs; every expectation near a window's edge depends on the half-open
      reading by one tick (AM46).
+   DONE for kitting with the idle robot (4 October 2026; design_records.md, "T-K", STEP 4, KITTING, THE IDLE ROBOT;
+   analysis/kitting/irb/tk2/REPORT.md): 59 runs, 0 disagreements with the oracle; the directions read per side.
 5. The planning cases, with a working robot. KT3 rules two: a coffee break inside the break time, and deliveries
    through the whole break time (env_layout_17 serves; the robot must not hold the items of the two shelves beside
    the A/C switch). Hadi wants a recommendation on one case for the early admission and its retraction, since it is

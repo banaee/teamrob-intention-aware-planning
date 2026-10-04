@@ -514,9 +514,11 @@ Decisions
   script meets, KT14, and give the A/C's belief at arrival, KT10); 7 these records. With context knowledge off every
   maintained log and every instrument output is B2's except the named lines (the `[run]` field, the timeline line,
   switch_on's name and its effect ac_on in `[rec]`, `[human]` and the trajectory, the new columns); round 1 with it on
-  agrees with the oracle in all 31 runs (AM49; results not read). No setup or scenario states a timeline yet. Next: step
-  4 of `docs/handoffs/T-G_forward_inputs.md`, section 5.7, in the design chat (the timelines of the setups and the runs
-  with context knowledge on, the expectations stated first); then the two MPB cases, dock_loading's part, the close.
+  agrees with the oracle in all 31 runs (AM49; results not read). Step 4 on kitting with the idle robot is DONE (4 October
+  2026; design_records.md, "T-K", STEP 4; `analysis/kitting/irb/tk2/`): env_setup_13 to _15 state break_time 178 to 300,
+  the A/C scripts room_warm from 150, 26 scenarios state their own; 59 runs agree with the oracle; the directions are
+  read per side in its REPORT.md. Next: step 5 of `docs/handoffs/T-G_forward_inputs.md`, section 5.7 (the planning
+  cases), in the design chat; then dock_loading's part, the close.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
