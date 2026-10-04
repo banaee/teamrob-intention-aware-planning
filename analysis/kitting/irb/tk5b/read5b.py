@@ -8,7 +8,8 @@ The on side: every scenario folder of analysis/kitting/irb/tk5b; its off side: t
 analysis/kitting/irb (the set's reference, context knowledge off). Both read from the same <csv name>: expected.csv
 (the oracle, before any run) or actual.csv (the recognizer, after the runs).
 
-    read5b.py <csv name>      e.g. read5b.py expected.csv     run from the repository root; prints markdown
+    read5b.py <csv name>            e.g. read5b.py expected.csv     run from the repository root; prints markdown
+    read5b.py summary <csv name>    one row per scenario (REPORT.md's table)
 
 Two tables:
 1. per true stretch (admission.py): the first tick at θ and the admission, off and on, each with its delay from the
@@ -111,5 +112,49 @@ def main(name):
                       f"{w['end']} | {kept} | {fires} |")
 
 
+def short(k):
+    return G.short(k)
+
+
+def rows_of(x, name):
+    """The wrong admissions of one side, compact: 'h a-b (gate n / rule n)', the unmodelled ones and the pin-tick rows apart."""
+    run = G.Run(x)
+    _, rows = A.wrong_admissions(x, name)
+    main_, exit_ = [], []
+    for w in rows:
+        if on_pin_tick(w):
+            continue
+        n = w["b"] - w["a"] + 1
+        kept, _ = held(run, w)
+        m = re.search(r"\((\d+)\)", kept.split(";")[1])
+        cell = f"{short(w['h'])} {w['a']}-{w['b']} ({n}/{m[1] if m else 'end'})"
+        (exit_ if w["true"] == "unmodelled" else main_).append(cell)
+    return main_, exit_
+
+
+def summary(name):
+    """One row per scenario: the true task's admission delays off -> on, the wrong admissions off and on (gate ticks /
+    the trigger rule's wrong ticks), those on unmodelled actions (the exit walk, s09_05's corner walk, s09_06's stand)
+    apart."""
+    G.NAME = name
+    S.SCHEMAS.update({s.name: s for s in importlib.import_module("domains.kitting.registry").domain_config["task_model"]})
+    print("| scenario | the true task admitted, delay off → on | wrong admissions off (gate / rule ticks) | on | "
+          "on unmodelled actions off | on |")
+    print("|---|---|---|---|---|---|")
+    for d in sorted(p for p in ON.iterdir() if p.is_dir() and (p / name).exists()):
+        o = OFF / d.name
+        _, _, on = A.stretches(d, name, THETA)
+        _, _, off = A.stretches(o, name, THETA)
+        off = {(r["key"], r["a"]): r for r in off}
+        f = lambda r: "never" if r["adm"] is None else str(r["adm"] - r["a"])
+        adm = ", ".join(f"{short(r['key'])} {f(off[(r['key'], r['a'])])} → {f(r)}" for r in on)
+        (mo, eo), (mn, en) = rows_of(o, name), rows_of(d, name)
+        print(f"| {d.name.removeprefix('scenario_')} | {adm} | {'; '.join(mo) or 'none'} | {'; '.join(mn) or 'none'} | "
+              f"{'; '.join(eo) or 'none'} | {'; '.join(en) or 'none'} |")
+
+
 if __name__ == "__main__":
-    main(sys.argv[1])
+    if sys.argv[1] == "summary":
+        summary(sys.argv[2])
+    else:
+        main(sys.argv[1])

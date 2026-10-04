@@ -566,6 +566,13 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    "T-K", STEP 5B, PLANNED): first the recognition set (17 scenarios on env_layout_10 and _11, the robot idle), then the
    planning set (16 scenarios on env_layout_12 to _14), read against its coverage matrix. The run files with context
    knowledge off stay each set's reference. [ruled, planned]
+   DONE (4 October 2026; analysis/kitting/mpb/tk5b/REPORT.md; design_records.md, "T-K", STEP 5B, KITTING, THE
+   EXISTING SETS WITH CONTEXT KNOWLEDGE ON: DONE): 33 runs, 0 disagreements with the oracle; only the state with no
+   raising fact occurs (no timeline). Recognition: the deliveries admitted earlier, the coffee break later, new wrong
+   admissions of a lone delivery during a coffee break between deliveries (18 to 22 ticks). Planning: 12 of 16 authored
+   cases reached; not reached: s10_08 (the cause boundary in place of replaced), s10_10 (E6), s11_01 (P6.1's trigger),
+   s11_03 (D9; the robot delivers 11.3 cm from a standing human who never performs the assigned delivery admitted at
+   tick 0). [done]
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]

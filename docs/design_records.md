@@ -2478,7 +2478,8 @@ AMENDED (Hadi, 4 October 2026, on ccode's cross-check of the plan's rulings; AM5
 design_decisions.md under this title, under R1; here the block THE CROSS-CHECK, RULED (after THE BUILD'S PLAN, RULED).
 AMENDED (Hadi, 4 October 2026, step 5; AM66, KT15): question G ruled, its conceptual part in design_decisions.md
 under this title, under R7; here QUESTION G, RULED, THE PLANNING CASES, RULED (KT15), STEP 5B, PLANNED and STEP 5,
-STAGE 1: THE PROPOSAL (at the end of this heading).
+STAGE 1: THE PROPOSAL (at the end of this heading); STEP 5B's result: STEP 5B, KITTING, THE EXISTING SETS WITH
+CONTEXT KNOWLEDGE ON: DONE (the heading's last entry).
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -3578,3 +3579,31 @@ to 38, the pass 29.3 cm. Findings, none ruled: at the turn the admitted plan run
 executed human (TODO-146), so a planned 54.8 cm became 41.7; off's stand fallback after the coffee break holds 25 ticks
 while the human walks away (TODO-132 (a)), the largest difference in ticks (113 against 89 and 90), ended on the on
 sides by the lone delivery's admission at 73. Next: step 5b.
+STEP 5B, KITTING, THE EXISTING SETS WITH CONTEXT KNOWLEDGE ON: DONE (ccode, 4 October 2026; three stages with no pause,
+as Hadi ruled; analysis/kitting/mpb/tk5b/REPORT.md, one report for both sets; the READMEs of analysis/kitting/irb/tk5b/
+and analysis/kitting/mpb/tk5b/). No authoring: the recognition set (17 scenarios, env_layout_10 and _11, the robot
+idle) and the planning set (16, env_layout_12 to _14, single_task) run with context knowledge on from copies of their
+run files (configs/kitting/{irb,mpb}/tk5b/); the run files with it off stay the reference, rerun at HEAD first and
+byte-identical. No timeline in these setups: only the state with no raising fact occurs. Expectations committed before
+any run (398d890); runs 613803b. First, step 5's two accepted suggestions recorded in TODO-146 and TODO-132 (a)
+(aa73ce3).
+- The chain: 33 runs, 0 disagreements with the oracle; the control equals its reference; scenario_s10_11 (no
+  foreseeable task in the room) identical to off but for the [run] field and the [IR-context] lines.
+- Recognition: every delivery admitted earlier or at the same tick (the first of two at 8 against 25; a lone one on
+  its stretch's first tick); the coffee break 18 to 30 ticks into its stretch against 10 to 12. New wrong admissions:
+  the lone delivery while the human walks to a coffee break between deliveries (22, 22, 18 ticks); the interrupted
+  delivery kept longer by the gate (11 against 5, 8 against 2, 16 against 11), by the trigger rule about as long as
+  off's; the misdelivered item and the assigned delivery beside an unassigned one admitted as the lone assigned task
+  (17 and 11 ticks).
+- Planning: 12 of 16 authored cases reached; not reached: scenario_s10_08 (the cause boundary at 33 in place of
+  replaced through coffee_break), s10_10 (no dip below θ: E6), s11_01 (the switch at the retraction of 16, not at an
+  expiry: P6.1), s11_03 (no switch while carrying: D9; item_8 released 11.3 cm from the standing human, 2 F1 violation
+  ticks, completion 35 against 113). In the s11 scenarios the assigned delivery the human never performs is admitted
+  at tick 0 on its prior of 0.98 and retracted at 10 or 16; the evidence cannot separate it from coffee_break while the
+  human stands. The lone foreseeable hypothesis (s10_05) and the hold at the coffee machine (s12_02, hold 18 at 93
+  against 75) are reached.
+- Findings, none ruled: with context knowledge on, the coverage matrix's E6, D9 and A8 have no instance in the set and
+  A4 has a second (s10_08; coverage.md's A4 derivation assumes the equal prior's tie order); P6.1, P10.10 and P11.3a to
+  c fail; the trigger rule and the gate agree more often (the record outlives the gate in 2 rows against 7).
+  Suggested: scenario_s11_03's 11.3 cm as a measurement under the KT11 consequence or TODO-132 (a). Next: dock_loading's
+  part (step 6).

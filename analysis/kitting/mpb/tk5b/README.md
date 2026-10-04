@@ -28,6 +28,7 @@ Commands (from the repo root):
     analysis/instruments/mpb/run.sh kitting -o analysis/kitting/mpb/tk5b configs/kitting/mpb/tk5b/*.yaml
     analysis/kitting/mpb/tk5b/read5b.py expect     # the preview (below)
     analysis/kitting/mpb/tk5b/read5b.py report     # the runs, off against on (REPORT.md)
+    analysis/kitting/mpb/tk5b/read5b.py rows       # the coverage rows whose instances move (REPORT.md)
 
 ## The expectations (stage 1, committed before any run with context knowledge on)
 

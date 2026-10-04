@@ -522,8 +522,10 @@ Decisions
   step 4's REPORT.md ("The reading for question G"; design_records.md, "T-K", THE READING FOR QUESTION G). Question G
   is ruled (AM66, 4 October 2026): the gate and the retraction stay as ruled. Step 5, the planning cases (five, KT15),
   is DONE (4 October 2026; env_layout_18, env_setup_16, scenario_s16_01 to _06; analysis/kitting/mpb/tk/REPORT.md: 9
-  runs, 0 disagreements with the oracle; findings for TODO-146 and TODO-132 (a)). Next: step 5b (the existing kitting
-  sets with context knowledge on, planned); then dock_loading's part, the close.
+  runs, 0 disagreements with the oracle; findings for TODO-146 and TODO-132 (a)). Step 5b, the existing kitting sets
+  with context knowledge on, is DONE (4 October 2026; analysis/kitting/mpb/tk5b/REPORT.md: 33 runs, 0 disagreements;
+  12 of the planning set's 16 authored cases reached, E6, D9 and A8 without an instance with it on). Next:
+  dock_loading's part (step 6), the close.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

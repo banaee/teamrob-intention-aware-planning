@@ -2,7 +2,7 @@
 
 The records: design_records.md, "T-K", STEP 5B, PLANNED and the step's entries after it. A basic check, not a coverage
 set: the context rooms (env_layout_15 to _18) excluded the human's other deviations on purpose; this set holds them.
-Results: `REPORT.md` (stage 3).
+Results: `analysis/kitting/mpb/tk5b/REPORT.md` (stage 3; one report for both sets).
 
 **The state the set meets.** The setups (env_setup_08, _09) and the scenarios state no timeline, and the rooms
 (env_layout_10, _11) hold a coffee machine and no A/C switch. With context knowledge on, only the state with no raising
@@ -27,7 +27,8 @@ Commands (from the repo root):
     analysis/instruments/irb/run.sh kitting --expect -o analysis/kitting/irb/tk5b configs/kitting/irb/tk5b/*.yaml
     analysis/instruments/irb/run.sh kitting -o analysis/kitting/irb/tk5b configs/kitting/irb/tk5b/*.yaml
     analysis/kitting/irb/tk5b/read5b.py expected.csv      # the expectations, off against on (below)
-    analysis/kitting/irb/tk5b/read5b.py actual.csv        # the runs, off against on (REPORT.md)
+    analysis/kitting/irb/tk5b/read5b.py actual.csv        # the runs, off against on (REPORT.md, Appendix A)
+    analysis/kitting/irb/tk5b/read5b.py summary actual.csv   # one row per scenario (REPORT.md)
 
 `read5b.py` reuses admission.py's stretches and wrong admissions and g_reading.py's trigger-rule reading (step 4).
 
@@ -266,7 +267,7 @@ md5s of the expectations (`expected.csv`, `phases.json`, and the `trajectory.jso
 
 ## Runs (stage 2; git-ignored; md5s)
 
-17 runs, context knowledge on; every run agrees with its expectations (0 disagreements against actual.csv and actual_log.csv at 1e-9, 0 unmatched rows); the trajectory equals the run's human lines on every tick; the expectations' md5s unchanged by the runs. Results: `REPORT.md`.
+17 runs, context knowledge on; every run agrees with its expectations (0 disagreements against actual.csv and actual_log.csv at 1e-9, 0 unmatched rows); the trajectory equals the run's human lines on every tick; the expectations' md5s unchanged by the runs. Results: `analysis/kitting/mpb/tk5b/REPORT.md`.
 
     a95cc2eae7b0fcf51bcfc7d813e6ed71  runs/env_layout_10_scenario_s08_01_on.log
     1aeededb6b19047ac26259e86b711a39  runs/env_layout_10_scenario_s08_02_on.log
