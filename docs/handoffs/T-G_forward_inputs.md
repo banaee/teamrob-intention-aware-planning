@@ -18,6 +18,8 @@ shelves) and section 11 (Hadi's rules of 3 October 2026); durations shown in tic
 Updated 4 October 2026 after Hadi's rulings of 3 October 2026 on the form and the values of the strengths (AM35 to
 AM39): section 5 in line (5.1 to 5.4 and 5.7 to 5.11); the method document named as the statement of the prior; the
 entries on object ids and on subtype named (5.11).
+Updated 4 October 2026 after Hadi's ruling on where the timeline of context facts is stated (AM40, AM41, KT13, KT14):
+section 5 in line (5.1 to 5.4, 5.6 to 5.8, 5.10).
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -207,7 +209,8 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   (the block CONTENT POINTS 1 AND 2, after R8; that chat's A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29);
   AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11); a CLARIFIED line under
   R3's AM2 (the occurrence condition evaluated per task); AM35, AM36 and AM39 under R3, from the design chat on the
-  rest of T-K part 1 (the name, the three levels, the reading of a strength).
+  rest of T-K part 1 (the name, the three levels, the reading of a strength); AM40 and AM41 under AM11's AM34 (the
+  setup's timeline the default, a scenario's own timeline replacing it whole; the override of the timeline, later work).
 - docs/design_records.md, the heading "T-K": the record part. R9, superseded by AM3, and AM3's consequences; THE CUT
   AND THE QUEUE (what part 1 builds, part 2, the future work); OPEN ITEMS OF T-K PART 1 (all three ruled); NOTES FOR
   THE BUILD'S PLAN; CONTENT POINTS 1 AND 2 (the values: AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28,
@@ -274,6 +277,13 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
     change is no trigger of the meta-planner; it acts only through the belief.
   - The setup holds the timeline of context facts, not the scenario (AM34): the timeline is the world's course and
     does not depend on what the human does, so one timeline is shared by the scenarios that bind the setup.
+    AMENDED (AM40, Hadi, 4 October 2026): the setup states the default timeline (the site's break regulation belongs to
+    the shift; a condition of the day, such as a warm room, is the designer's default). A scenario may state its own
+    timeline, which replaces the setup's whole, with no merge per fact (a test case is a script, a window and an
+    expectation, and the expectation is valid under one timeline only). Not stated in the scenario: the setup's
+    applies; stated empty, or a setup with none: no timeline fact holds. Every timeline fact follows the same rules.
+    The run's header prints the timeline in force and its source. The independence the design requires is causal (no
+    action sets or removes a timeline fact) and holds wherever the windows are written. [ruled]
   - No action's declared effect sets or removes a context fact in the world.
   - A recency fact is a context fact derived from the time since the robot observed the completion of a named task.
     It holds for that task's recency duration after the observation. It is declared per task.
@@ -333,7 +343,9 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - The prior of 5.2, with crisp facts, and the three levels: per foreseeable task a suppressing and a raising
   condition, each one fact or a conjunction of facts over the three sources. No "not" (AM36): no form for "not" is
   needed. The statement of the prior that the plan reads: docs/context_knowledge_method.md.
-- The setup's timeline of context facts (AM34). Today a setup has no form for it; the build adds it.
+- The setup's timeline of context facts (AM34), the default, and a scenario's own timeline, which replaces it whole
+  (AM40); the run's header prints the timeline in force and its source. Today neither has a form for it; the build adds
+  both.
 - The declarations per domain: the context facts, the suppressed and the ordinary strength, and per foreseeable task
   its suppressing condition, its raising condition with its raised strength, the sources and its recency duration. Recency durations are declared in physical time and converted by the
   body. The declared knowledge replaces the class ContextKnowledge in shared/knowledge.py.
@@ -363,11 +375,15 @@ Recorded: design_records.md, "T-K", CONTENT POINT 3, THE TESTS (KT1 to KT7) and 
   after seeing a result, because they are test instruments and not an evaluation reference.
 - The basic set (KT3). The only variation is where a foreseeable task is placed: between tasks (after the first
   delivery, after the second, and so on) and inside a task, between its actions. No other kind of deviation, since
-  this set tests the implementation of context knowledge and other deviations would mix causes. Size: two setups per
-  layout, five or more scenarios each, every scenario run with context knowledge on and off. Expectations are stated
-  before the runs.
-- The setup holds the timeline (KT4, AM34). The two setups of a layout differ in their timeline; this is also how the
-  effect of a different window on the same activity is tested.
+  this set tests the implementation of context knowledge and other deviations would mix causes. Size: five or more
+  scenarios per room, every scenario run with context knowledge on and off. Expectations are stated before the runs.
+  The second setup per room is dropped (KT13, Hadi, 4 October 2026).
+- The timeline (KT4, AM34, as amended by AM40 and KT13). The setup states the default; a scenario that is to meet
+  another window states its own timeline, on the room's one setup. The same activity under a window whose edge falls
+  before the human leaves, during the walk, or after the arrival is authored this way.
+- The conditions (KT14, Hadi, 4 October 2026): context knowledge off against on, each case labelled by the state that
+  the script meets. The design chat restates the expected directions before the runs. [ruled] KT11's text, which
+  the restatement replaces:
 - The three conditions (KT11, ruled by Hadi). The run with context knowledge off is not a neutral baseline: the equal
   prior gives a foreseeable task the share of one delivery. So the tests read:
   - A: context knowledge off (round 1 is A);
@@ -431,7 +447,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 ### 5.6 What is not built
 
 - The mechanism: everything in 5.3.
-- The setups' timelines and the second setup per room; the runs in conditions B and C.
+- The setups' timelines and the scenarios' own timelines; the runs with context knowledge on (KT14). (The second setup
+  per room is dropped, KT13.)
 - The two MPB cases.
 - dock_loading's part: the re-measurement of T-G stage 1's baseline with context knowledge on.
 
@@ -457,9 +474,10 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 3. The build, its verification (AM24) and the review. The existing sets either state context_knowledge off and stay
    identical, or are regenerated with the reason stated; round 1 with context_knowledge off is expected identical
    except the lines the build names.
-4. The timelines in the setups (the second setup per room, differing in its timeline; the windows authored from the
-   foreseeable tasks' ticks in the round's README), the expected directions restated by the design chat (5.4),
-   expectations before the runs, the runs in B and C, read A to B and B to C.
+4. The timelines in the setups and in the scenarios that state their own (AM40; the windows authored from the
+   foreseeable tasks' ticks in the round's README; no second setup, KT13), the expected directions restated by the
+   design chat (5.4), expectations before the runs, the runs with context knowledge on, read against off with each
+   case labelled by the state the script meets (KT14).
 5. The two MPB cases, with a working robot.
 6. dock_loading's part: what its layouts and scenarios need for context knowledge, and the re-measurement of T-G
    stage 1's baseline (section 4's figures were measured with the equal prior).
@@ -485,6 +503,9 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
   store_pallet present. Not taken, and not future work [ruled]: a preference for a task that has just become
   applicable.
 - Future work [FW]: section 9.
+- The override of the timeline from the run file and from the viewer, taking precedence over the setup and the
+  scenario (AM41): later work, recorded, not built in T-K part 1. A change of a fact during a run belongs to the
+  interactive phase (T-V track 2). [ruled]
 - Under TODO-155 [open, parked]: no share for "none of the modelled tasks" (it would reopen the decision that the
   belief has no residual hypothesis).
 - Outside T-K part 1 [open]: whether a hypothesis stays live when its method's condition turns false while the human
@@ -522,7 +543,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    the old values and is superseded (AM36 to AM38). Ruled by Hadi for the restatement: with no raising fact holding, a
    lone live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if the human
    then takes a foreseeable task; its admission still waits for an observation (R7, AM5, G1).
-2. The second setup per room: a scenario names one setup, so how the same scenarios run on a room's second setup
+2. ANSWERED (AM40, KT13, Hadi, 4 October 2026): the second setup per room is dropped; a scenario may state its own
+   timeline. The earlier question: the second setup per room: a scenario names one setup, so how the same scenarios run on a room's second setup
    (copies of the scenarios per setup, or another form) is for the build's plan; and whether two setups per layout
    (KT3) are still needed where one window already splits the scenarios into B and C (KT11). The design chat's view,
    not a ruling: the same script under two timelines is the cleanest comparison of B against C.

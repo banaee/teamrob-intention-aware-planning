@@ -3812,6 +3812,9 @@ THE RULINGS.
      AMENDED (T-K part 1, AM34, Hadi, 3 October 2026; not built): the setup also holds the timeline of context facts,
      the world's course, shared by the scenarios that bind the setup. "T-K: context knowledge in the recognizer's
      belief", AM11's AM34.
+     AMENDED (T-K part 1, AM40, Hadi, 4 October 2026; not built): the setup's timeline is the default; a scenario may
+     state its own timeline, which replaces the setup's whole. "T-K: context knowledge in the recognizer's belief",
+     AM11's AM40.
    - Scenario, the episode: per agent, `start_position`, `assigned_tasks`, `observes`, and the human's script; the
      purpose as description text; the setup it binds; its reference layouts.
    - A run is the triple (layout, setup, scenario) plus the run facts, as the existing records define them: gate, cost
@@ -4964,6 +4967,10 @@ condition, raising condition, suppressed strength, ordinary strength, raised str
 timeline of context facts, timeline fact, observed completion, memory of observed completions); "occurrence condition"
 is retired. The statement of the prior, with its formulas and worked examples: `docs/context_knowledge_method.md`
 (the records win where the two disagree). Not built.
+AMENDED (Hadi, 4 October 2026, the design chat; AM40 and AM41, under AM11's AM34): the setup states the default
+timeline of context facts, and a scenario may state its own, which replaces it whole (AM40); an override of the
+timeline from the run file and the viewer is later work (AM41). In the record ("T-K"): KT13 (the second setup per
+room dropped) and KT14 (the conditions of the tests restated). Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -5183,6 +5190,27 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
   agents' behaviour. One timeline is then shared by several scenarios. The two setups of a layout differ in their
   timeline, and this is also how the effect of a different window on the same activity is tested.
   Pointer: "Layouts, setups and scenarios: the three artefacts of a run", ruling 1, the setup.
+  SUPERSEDED IN PART (AM40, Hadi, 4 October 2026; below): "not the scenario" and the reason's last sentence ("The two
+  setups of a layout differ in their timeline, and this is also how the effect of a different window on the same
+  activity is tested"). The setup states the default timeline; a scenario may state its own. The rest of AM34's reason
+  stands as the reason of the setup's default.
+  AMENDED (AM40, Hadi, 4 October 2026, the design chat), where the timeline of context facts is stated:
+  - The setup states the default timeline. Reason: a setup describes the shift, and the site's break regulation belongs
+    to it; a condition of the day, such as a warm room, is stated there as the designer's default.
+  - A scenario may state its own timeline. It replaces the setup's timeline whole, with no merge per fact. Reason: a
+    test case is a script, a window and an expectation; the scenario holds the script and the expectation, and the
+    expectation is valid under one timeline only. The scenario is the episode, not the agent, so this does not make
+    the course of the world depend on the script. The independence the design requires is causal (no action of an
+    agent sets or removes a timeline fact, AM20, AM32) and holds wherever the windows are written.
+  - Not stated in the scenario: the setup's timeline applies. Stated empty: no timeline fact holds. A setup with no
+    timeline: no timeline fact holds.
+  - Every timeline fact follows the same rules. No fact has a rule of its own.
+  - The run's header prints the timeline in force and its source.
+  It amends the recorded rejection of the scenario's timeline (AM34's "not the scenario") and drops the recorded second
+  setup per room (the record, "T-K", KT13). Not built.
+  AMENDED (AM41, Hadi, 4 October 2026, the design chat), later work, recorded and not built now: an override of the
+  timeline from the run file and from the viewer, which takes precedence over the setup and the scenario. A change of
+  a fact during a run belongs to the interactive phase (T-V track 2).
   SUPERSEDED IN PART (AM36, Hadi, 3 October 2026; R3): the three sources stand, and are read by a suppressing condition
   and a raising condition; "uses 'and' and 'not'" reads "is one fact or a conjunction of facts". The reason stands as
   the reason of a suppressing condition.
@@ -5296,7 +5324,7 @@ the ideas not ruled, each to its place); the open items' state. Amended 3 Octobe
 for the build's plan, with the open items. Amended 3 October 2026 (content point 3): CONTENT POINT 3, THE TESTS (KT1 to
 KT7; KT4 is AM34's record part). Amended 3 October 2026, recorded 4 October 2026 (AM35 to AM39): AM37 under AM13,
 AM38 under AM17, THE STRENGTHS REVISED (what becomes stale, the open item on the value the gate compares with the
-threshold, the method document).
+threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and KT14, after KT12.
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one

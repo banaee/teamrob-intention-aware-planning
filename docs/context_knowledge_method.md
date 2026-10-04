@@ -2,7 +2,7 @@
 
 Status: the design records hold the rulings and their reasons and are authoritative (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K"). This document states the result of the rulings. If the two disagree, the records win and this document is corrected. A ruling that changes the method of context knowledge updates this document in the same records step.
 
-It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39). Section 13 is a derivation from the method, not a ruling. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
+It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39), with where the timeline is stated as ruled on 4 October 2026 (AM40). Section 13 is a derivation from the method, not a ruling. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
 
 ## 1. The idea
 
@@ -33,7 +33,7 @@ Exception: with assignment knowledge off (an ablation), every work task of the t
 
 $C_t$ is the set of crisp facts that hold at tick $t$. A fact holds or does not hold. There are three sources.
 
-1. A timeline fact: a context fact on the setup's timeline of context facts, with an authored window, for example "break time" or "room warm".
+1. A timeline fact: a context fact on the timeline of context facts in force, with an authored window, for example "break time" or "room warm". The setup states the default timeline; a scenario may state its own, which replaces the setup's whole. Not stated in the scenario, the setup's applies; stated empty, or a setup with none, no timeline fact holds. Every timeline fact follows the same rules (AM40).
    $c \in C_t \iff a_c \le t < b_c$
 2. An object state, read from the world state, for example "the A/C is on".
 3. A recency fact of task $f$: the robot's memory of observed completions holds an observed completion of $f$ within the recency duration.

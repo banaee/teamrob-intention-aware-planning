@@ -2468,6 +2468,9 @@ AMENDED (Hadi, 3 October 2026, the design chat on the rest of T-K part 1, the fo
 recorded 4 October 2026): AM35 to AM39. Their conceptual part (AM35 the name, AM36 the three levels, AM39 the reading
 of a strength) is in design_decisions.md under this title, under R3; here AM37 the declarations (under AM13), AM38 the
 values and their sources (under AM17), and the block THE STRENGTHS REVISED (below).
+AMENDED (Hadi, 4 October 2026, the design chat; AM40, AM41): where the timeline of context facts is stated. Their
+conceptual part is in design_decisions.md under this title, under AM11's AM34; here KT13 and KT14, in the block THE
+TIMELINE IN THE SCENARIO (after KT12).
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -2496,6 +2499,8 @@ THE CUT AND THE QUEUE.
   removal of the domain task names and constants from the recognizer (TODO-66; T-K part 1's build closes it).
   AMENDED (AM34, Hadi, 3 October 2026; content point 3): "the scenario's timeline of context facts" reads "the setup's
   timeline of context facts" (CONTENT POINT 3, THE TESTS, KT4, below).
+  AMENDED (AM40, Hadi, 4 October 2026): the setup's timeline is the default; a scenario may state its own, which
+  replaces it whole (design_decisions.md, this title, AM11's AM40; THE TIMELINE IN THE SCENARIO, below).
   AMENDED (Hadi, 3 October 2026; AM10 to AM29): the build also contains "not" in an occurrence condition and its three
   sources (AM11: timeline facts, object states, recency facts); the recency facts and their memory of observed
   completions (AM14, AM27); the A/C switch's object state ac_on, and ac_activation with room_warm in both domains
@@ -2748,6 +2753,8 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
   duration mismatch (a coffee break cut short or prolonged, which needs a deviation event; AM29 above) waits for a
   later set.
   - Size: two setups per layout, five or more scenarios each; every scenario run with context knowledge on and off.
+    SUPERSEDED IN PART (KT13, Hadi, 4 October 2026): "two setups per layout"; one setup per room, and a scenario that
+    states its own timeline where the window is to differ.
   - Two cases also run in the MPB: a coffee break inside the break time, and deliveries through the whole break time.
   - The measure: the tick at which the true task reaches the threshold and is admitted, and whether a retraction
     follows.
@@ -2764,6 +2771,9 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
   leaves for the foreseeable task, during the walk to it, or after the arrival. The middle case is the recorded cost
   of crisp facts (design_decisions.md, this title, R5: the prior changes at one tick, where the approximation of A2 has
   its largest error): the prior changes inside the episode at one tick. It is part of authoring the windows.
+  SUPERSEDED IN PART (AM40, KT13, Hadi, 4 October 2026): the setup holds the default timeline, and a scenario may state
+  its own, which replaces it whole; "the two setups of a layout differ in their timeline" is dropped (KT13). The ADDED
+  line stands: the three edges are authored as scenarios' own timelines.
 
 - KT5, a round without context knowledge comes first, before the mechanism is built: the setups and the human's
   scripts in env_layout_15, _16 and _17, run in the IRB with the present equal prior.
@@ -2887,6 +2897,8 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   RULED (Hadi, 3 October 2026), for that restatement: with context knowledge on and no raising fact holding, a lone
   live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if the human then
   takes a foreseeable task.
+  SUPERSEDED IN PART (KT14, Hadi, 4 October 2026; THE TIMELINE IN THE SCENARIO, below): the three conditions read
+  context knowledge off against on, each case labelled by the state that the script meets.
 
 - KT12, the state. The round without context knowledge is done; it is condition A. Next: a new design chat takes the
   rest of T-K part 1: the list of the layouts with more than one A/C switch and their change (AM19); the build's plan;
@@ -2894,6 +2906,28 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   part, with the re-measurement of T-G stage 1's baseline; the close. Waiting: the further layout for the second
   coffee break and the recency fact (KT2); the duration mismatch (KT3). The entry point:
   docs/handoffs/T-G_forward_inputs.md, section 5. A later chat returns to T-G's stage 2.
+  AMENDED (Hadi, 4 October 2026; KT13, below): "the timelines in the setups" reads "the timelines in the setups and in
+  the scenarios that state their own".
+
+THE TIMELINE IN THE SCENARIO, RULED (Hadi, 4 October 2026, the design chat; recorded the same day, before the build's
+plan). Records only: nothing is built, and no layout, setup, scenario, test or analysis is changed. The conceptual part,
+AM40 (the setup states the default timeline; a scenario may state its own, which replaces it whole) and AM41 (the
+override of the timeline, later work), is in design_decisions.md under this title, under AM11's AM34. The record part
+continues the numbering of the tests:
+
+- KT13, the second setup per room is dropped. KT3's "two setups per layout" and KT4's "the two setups of a layout
+  differ in their timeline" are superseded: the same script under another timeline is a scenario that states its own
+  timeline on the room's one setup. `docs/handoffs/T-G_forward_inputs.md` 5.10 item 2 (how the same scenarios run on a
+  second setup) is answered by it.
+  Reason: AM40. A test case is a script, a window and an expectation, held together in the scenario; a second setup
+  that differs only in its timeline is no longer needed to vary the window.
+
+- KT14, the conditions of the tests restated. KT11's three conditions A, B and C read: context knowledge off against
+  context knowledge on, with each case labelled by the state that the script meets (for example, the foreseeable task
+  begun while its raising condition holds, while its suppressing condition holds, or while neither holds). The
+  design chat restates the expected directions before the runs (KT11's SUPERSEDED line stands).
+  Reason: with a scenario's own timeline, the state a case meets is a property of the case, stated with it; the
+  comparison is between the two settings of the run option on the same case.
 
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the

@@ -503,11 +503,19 @@ AMENDED (AM32, 3 October 2026), the wording of AM20: no action's declared effect
 world. A recency fact changes through the robot's observation of a completion, in the mind.
 AMENDED (AM34, 3 October 2026): the timeline of context facts is the **setup**'s (§9), not the scenario's: it is the
 world's course, shared by the scenarios that bind the setup.
+AMENDED (AM40, Hadi, 4 October 2026): the setup states the default timeline; a **scenario** (§9) may state its own,
+which replaces the setup's whole (**timeline of context facts**, below).
 
 **timeline of context facts** (AM34; Hadi, 3 October 2026; not built) — the **setup**'s (§9)
 authored course of context facts over a run. The environment applies it; the world state carries the facts (AM25).
 It is the world's course and does not depend on what the human does. Its change is no trigger of the meta-planner
 (AM21).
+AMENDED (AM40, AM41, Hadi, 4 October 2026; not built): the setup states the default timeline; a **scenario** (§9) may
+state its own, which replaces the setup's whole, with no merge per fact. The timeline in force: the scenario's if it
+states one (stated empty: no timeline fact holds), else the setup's (a setup with none: no timeline fact holds). Every
+timeline fact follows the same rules. The run's header prints the timeline in force and its source. No action of an
+agent sets or removes a timeline fact, wherever the windows are written (AM20, AM32). Later work (AM41): an override
+from the run file and the viewer, taking precedence over both; a change during a run is the interactive phase's.
 
 **timeline fact** (Hadi, 3 October 2026; not built) — a **context fact** on the **timeline of context facts**. It holds
 from one authored change to the next. One of the three sources of a **suppressing condition** and a **raising
@@ -1283,8 +1291,11 @@ TODO-161, TODO-163, TODO-164. T-G is paused after its stage 1 and resumes at its
 `docs/roadmap.md`, "The plan from T-A", T-K.
 AMENDED (4 October 2026): its rulings are R1 to R8 and AM1 to AM39 (AM34, the setup's timeline; AM35 to AM39, the
 strengths revised, 3 October 2026).
+AMENDED (4 October 2026): and AM40, AM41 (the setup's timeline the default, a scenario's own timeline replacing it;
+its override later work).
 **T-K part 1** — crisp context knowledge (V1, ongoing): R1 to R4, R6, R7, crisp context facts, the setup's timeline
-of context facts (AM34; "the scenario's" before 3 October 2026), recency facts, the removal of the domain task names and constants from the recognizer (TODO-66).
+of context facts (AM34; "the scenario's" before 3 October 2026; since AM40, 4 October 2026, the default, which a
+scenario's own timeline replaces), recency facts, the removal of the domain task names and constants from the recognizer (TODO-66).
 → `docs/roadmap.md`, "The plan from T-A", T-K, part 1; `docs/handoffs/T-G_forward_inputs.md`, section 5.
 **T-K part 2** — the build of degrees of context facts (R5: membership functions, the operators, the linear rule for a
 strength; soft edges of a window and the gradual return after a task; "or", with "long work without a break" its open
@@ -1356,6 +1367,9 @@ second domain's rulings", A5.
 RULED, NOT BUILT (T-K part 1, AM34, 3 October 2026): the setup also holds the timeline of context facts (§5, context
 fact), the world's course, shared by the scenarios that bind it; the two setups of a layout may differ in it alone.
 design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM11's AM34.
+AMENDED (T-K part 1, AM40, Hadi, 4 October 2026; not built): the setup's timeline is the default; a scenario may state
+its own, which replaces it whole; "the two setups of a layout may differ in it alone" is dropped (the second setup per
+room, design_records.md, "T-K", KT13).
 BUILT (T-G stage 1, step 4, 1 October 2026; b74485b, 50f2fb8): the domain registry's `"states"`
 (`StateDeclaration(name, object_type)`; `object_type` None, a fact about no object, admitted) and the setup's one
 `"states"` block (`state`, `object`); a declared state not listed does not hold; kitting declares none; the six
@@ -1381,6 +1395,9 @@ setup renames it — and MM a counter per setup. No layout serial is in it (a sc
 layouts), and nothing about the script's content. Its assigned tasks and script state the
 table explicitly (a readability choice, not required by the model), checked against the setup's designations: a
 scenario fits a setup whose designations agree with its stated tables.
+RULED, NOT BUILT (T-K part 1, AM40, Hadi, 4 October 2026): a scenario may state its own **timeline of context facts**
+(§5), which replaces the setup's whole; not stated, the setup's applies; stated empty, no timeline fact holds.
+design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM11's AM40.
 → `shared/types.py`, `ScenarioConfig`.
 
 **reference layout** — a layout a scenario declares it runs on (`reference_layouts`, one or more). A binding the
