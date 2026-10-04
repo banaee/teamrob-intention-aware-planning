@@ -162,3 +162,676 @@ of case, and switching on a switch that is on is not a task of the shift).
   already retired by its pin and has no belief (it would print nan). It reads the tick before (the arrival above).
 - `admission.py` prints the A/C's belief at arrival only with context knowledge on; the off side (round 1's
   expected.csv) needs it too.
+
+## Stage 2: the set as authored (Hadi, 4 October 2026: P1 to P9 all in; P8 part of the measure)
+
+- **The default timeline.** env_setup_13, _14, _15 state `"timeline": [{"fact": "break_time", "from": 178, "until":
+  300}]`. Every scenario of round 1 without an A/C activation meets it.
+- **3A in place.** The 11 scripts with an A/C activation (scenario_s14_07 to _11, s15_08 to _13) state their own
+  timeline, room_warm from 150 to the run's end. So round 1's scenarios are the on side's scenarios too; their off side
+  is round 1's run.
+- **New scenarios** (same module per setup, after round 1's; the description names the script and the case):
+
+  | scenario | case | script | timeline in force |
+  |---|---|---|---|
+  | s13_08, _09, _10 | 3B | s13_02 | break_time 50, 90, 120 to 200 |
+  | s13_11, _12 | 3D | s13_03 | break_time 40 to 190; 40 to 150 |
+  | s13_13 | 3E | s13_04 | stated empty |
+  | s13_14 | P1 | s13_01 | break_time 0 to end |
+  | s13_15 | P7 | new: s13_01's with the coffee break inside item_4's delivery, after the walk to the shelf | stated empty |
+  | s14_12, _13, _14 | 3B | s14_02 | break_time 70, 110, 150 to 250 |
+  | s14_15, _16, _17 | 3C | s14_07 | room_warm 70 to end; 110 to end; 0 to 110 |
+  | s14_18 | 3D | s14_03 | break_time 60 to 250 |
+  | s14_19 | 3E | s14_03 | stated empty |
+  | s14_20 | P3 | s14_01 | break_time 0 to end |
+  | s14_21 | P5 | s14_08 | the setup's (break_time 178 to 300) |
+  | s15_14, _15, _16 | 3C | s15_08 | room_warm 50 to end; 90 to end; 0 to 90 |
+  | s15_17 | 3F | s15_04 | break_time 178 to 300, room_warm 150 to end |
+  | s15_18 | P2 | s15_01 | room_warm 0 to end |
+  | s15_19 | P4 | s15_10 | stated empty |
+  | s15_20 | P6 | s15_10 | break_time 178 to 300, room_warm 150 to end |
+  | s15_21 | P9 | new: s15_01's four deliveries, then the coffee break, then the exit walk | break_time 307 to end |
+
+  The new scripts' ticks (from their trajectories): s13_15, item_4's walk 217 to 260, the coffee break 261 to 309
+  (wait from 279, complete 308), item_4 resumed from 310; s15_21, item_4 delivered at 307 (its terminal fact), the
+  coffee break 309 to 381 (wait from 351, complete 380).
+- **Run files**: `configs/kitting/irb/tk2/scenario_sNN_MM.yaml`, the 57 scenarios with context knowledge on (round 1's
+  run files stay off). The off runs of the two new scripts use the same files with `run.sh --context off`, into
+  `off/`.
+- **The instrument** (small, ccode's):
+  - `trajectory.py` rebuilt the scenario without its own timeline, so the setup's always applied in the trajectory
+    (the run itself resolves it right). Found by the first expectations (s13_13 showed break_time, s15_09 no room_warm
+    at 150); fixed (`timeline=base.timeline`), every expectation recomputed. The MPB's `reference.py` has the same
+    omission (flag only: no MPB scenario states a timeline, and its reference run has no human).
+  - `admission.py`: the A/C's arrival read on the tick before its switch_on (stage 1's reading), with context
+    knowledge off too; a second table, every admission of a hypothesis that is not the true task (P8).
+  - `offon.py` (new): off against on per case; the off side found by the same human actions on the same layout, in
+    `off/` first, then round 1.
+- **Test**: `tests/test_tk_prior.py`'s recency test on scenario_s15_02 states its timeline empty (it reads the level
+  after the recency, which the new default break_time raises).
+
+### The regression audit (stage 2)
+
+What the new default and 3A change in existing outputs:
+- Round 1 (context knowledge off), rerun under the new artefacts: every log equal except its `[run_mesa] timeline`
+  line; every `.rec`, instrument output and figure byte-identical except the trajectories' timeline facts; 0
+  disagreements in all 31. Its outputs replaced; md5s in `analysis/kitting/irb/tk1/README.md`, its last section.
+- The four maintained sets (tb1a, tb1b, tb1c, tb3: 48 logs and their `.rec`): byte-identical to their baselines.
+- Tests: 352 pass. Three tests were updated, none for a change of behaviour: `test_tk_prior.py` (above);
+  `test_tl2_discovery.py` counts 128 registered scenarios (102 before); `test_th3_scenarios.py` gives `SimModel` the
+  domain's timeline facts, which a setup's timeline needs.
+
+### The expected directions (Hadi's point 5, restated before the runs, with the correction ruled on 4 October 2026)
+
+1. With no raising fact holding: one live delivery is admitted at its first observation, and a retraction follows if
+   the human then takes the break; with several live, the deliveries come no later, the break later, the A/C's belief
+   at its arrival lower.
+2. With break_time: the coffee break reaches the threshold earlier. While a delivery is live it does not reach the
+   threshold on the prior alone (its prior is 2/3, or 2/3.02 with the A/C live). With none live it does (2/2.02 or 1),
+   and only the observation rule (warrant) delays its admission. A delivery inside the window is admitted later.
+3. With room_warm and the A/C off: the A/C's belief at its arrival higher.
+4. After an observed break: suppressed for 90 ticks, inside break_time too.
+5. At a window's edge inside an episode: the belief changes at that tick, and an admitted delivery can lose the
+   threshold there.
+
+The oracle's expectations below are not read against these directions before the runs; stage 3's report does that,
+and an expectation that contradicts a direction is a finding.
+
+### How to run (stage 3)
+
+```
+analysis/instruments/irb/run.sh kitting -o analysis/kitting/irb/tk2 configs/kitting/irb/tk2/*.yaml
+analysis/instruments/irb/run.sh kitting --context off -o analysis/kitting/irb/tk2/off \
+    configs/kitting/irb/tk2/scenario_s13_15.yaml configs/kitting/irb/tk2/scenario_s15_21.yaml
+analysis/instruments/irb/offon.py analysis/kitting/irb/tk2 actual.csv 0.75 analysis/kitting/irb/tk2/off analysis/kitting/irb/tk1
+```
+
+The expectations were written by the same `run.sh` with `--expect` (on: all 57; off: the two new scripts).
+
+### md5s of the expectations (committed before any run with context knowledge on)
+
+```
+cb858c0565744aa070b589dd0944412f  scenario_s13_01/expected.csv
+3b232fe5c0cd7d1dfdf1daf8533de90e  scenario_s13_02/expected.csv
+e3a19902c7a05b5780b548c01ce9d743  scenario_s13_03/expected.csv
+dd4633872ef4e6bf4df2bc7444a26c76  scenario_s13_04/expected.csv
+f60d8f5a41c70ae0f698e2ee70817e75  scenario_s13_05/expected.csv
+7204b177f1f0528ac33f70758083b41e  scenario_s13_06/expected.csv
+c8284e4154c87a1cf7d1645731a0fbed  scenario_s13_07/expected.csv
+5ef98e7f0f3838289dc2f5a638219eb5  scenario_s13_08/expected.csv
+2272a8574e27d1f73052abd187dee222  scenario_s13_09/expected.csv
+ac4bbd4d4abc1f8a09eccddf5c72c814  scenario_s13_10/expected.csv
+5672f902698a2531e91ec0865d2fe3e3  scenario_s13_11/expected.csv
+b807cdb610c7c04baf7debb47e68fe7d  scenario_s13_12/expected.csv
+c8b9fea71379fb73c3d2d18171431191  scenario_s13_13/expected.csv
+873e051be0a78e27b5819a3665fccf9d  scenario_s13_14/expected.csv
+1493f5f16af43ccb5192dff00bf45d46  scenario_s13_15/expected.csv
+f4220c343311550b4dde50c98e1dbca1  scenario_s14_01/expected.csv
+74a3778671c3682b36173ccd1d92582d  scenario_s14_02/expected.csv
+337b8e5d2015d66c554262c43ab10826  scenario_s14_03/expected.csv
+04a98332cea3b2a95e4193eb9a7fb874  scenario_s14_04/expected.csv
+10993c6f290758376bf1668743aa34b5  scenario_s14_05/expected.csv
+a4c71761c1ffcbdd93ad48a0fa003391  scenario_s14_06/expected.csv
+6b8d9142f77fda2e27fa611cebe6b253  scenario_s14_07/expected.csv
+d25a834428ec43403a8f9600155428e5  scenario_s14_08/expected.csv
+74b41aaea902853589e629c92fb38179  scenario_s14_09/expected.csv
+a4bf8cf1fffc3a73e11c98232d7c92cc  scenario_s14_10/expected.csv
+c652aa766a1d0f157f5a9035e089214a  scenario_s14_11/expected.csv
+79ab34b94d0d7f9229f2046e78a76702  scenario_s14_12/expected.csv
+e16e95a779d78bd1a67f2a00044e232d  scenario_s14_13/expected.csv
+faaf840cb257926bb03a0361aca8f86f  scenario_s14_14/expected.csv
+8dd26220afe87fd86a5f12ad25febb94  scenario_s14_15/expected.csv
+4456db13ef76805d9a422dbd95c6d39b  scenario_s14_16/expected.csv
+c4c69ffcd6a1f4ccda63a2f084b74451  scenario_s14_17/expected.csv
+60a93e8eb0029151eef270a398fecd71  scenario_s14_18/expected.csv
+e84229019798b36315260f465c178775  scenario_s14_19/expected.csv
+65d8ee92240e761014603fdc73a6d35a  scenario_s14_20/expected.csv
+67e2d92f00aab789c3d1941813fd69c6  scenario_s14_21/expected.csv
+4b40171056b0eabdf1b28ce45c132875  scenario_s15_01/expected.csv
+1f44f82222020d20fce081f94564b1ca  scenario_s15_02/expected.csv
+c8faf3d733e7d54f097064aa046c9469  scenario_s15_03/expected.csv
+9fa5f08ce3e3606cadb8e5d66bb1a445  scenario_s15_04/expected.csv
+22189f22f6743cec4645a5c056f09e05  scenario_s15_05/expected.csv
+3fa10e8c7b1772d9a3efe11750e60389  scenario_s15_06/expected.csv
+6c34c63f9e7f81d02192dd38e317b084  scenario_s15_07/expected.csv
+53ac3ad8517a8f35ca59506539a4ce06  scenario_s15_08/expected.csv
+aa179fba979de07f56b0950169c2db08  scenario_s15_09/expected.csv
+b8848f5514ea567b8a3560d1402c872f  scenario_s15_10/expected.csv
+47ffa3f2eac2b634e5f1518eea9f6743  scenario_s15_11/expected.csv
+20a3bd3c0522142bb2adb92d86d2a887  scenario_s15_12/expected.csv
+c2ca5936849476ac00354e125222f75d  scenario_s15_13/expected.csv
+46f92b4dec7d4118363276b8e2932a2e  scenario_s15_14/expected.csv
+42f64880398c2e368c1e0956ee64ce58  scenario_s15_15/expected.csv
+c829236b0079d9572779f4e0b7d79e05  scenario_s15_16/expected.csv
+810dcf3d27ad1456d6c086f6ec06e171  scenario_s15_17/expected.csv
+14fe7242f950c3edc5e983821c9bc6b7  scenario_s15_18/expected.csv
+428bf40d72c330ba5d62fc31f6d6e6a1  scenario_s15_19/expected.csv
+ea27837c1949e59aefb73cc5630ec297  scenario_s15_20/expected.csv
+c0b737c206e8dfe82a790589b509968e  scenario_s15_21/expected.csv
+d2727d1fed42826c131931a262190d1a  scenario_s13_01/trajectory.json
+ccc11a493ac3df2a73ed15769380a60b  scenario_s13_02/trajectory.json
+18f19dc20a603a7d6eeb68d36a54c223  scenario_s13_03/trajectory.json
+d6ca6c0958ad6dd905bc64dc5839d33f  scenario_s13_04/trajectory.json
+aef42d17564d75b5cc9eece92b10dd53  scenario_s13_05/trajectory.json
+0df6475630923fe1f6f6333a5b1f1aa0  scenario_s13_06/trajectory.json
+4e2206b04f11d969d8438f105295b795  scenario_s13_07/trajectory.json
+0474745744f4598e94e4d0daccdb5488  scenario_s13_08/trajectory.json
+6659034d66ffa3f4fdd7585035c2ec9f  scenario_s13_09/trajectory.json
+0d551053819ca476e966668dfcfd07f2  scenario_s13_10/trajectory.json
+cffdfc19ce0e5c23851ee1a7302c9516  scenario_s13_11/trajectory.json
+f0ffb22cc1e22b01e8d0acd99ee2532f  scenario_s13_12/trajectory.json
+a7ed198098178d35875bb53bb1e9e1dc  scenario_s13_13/trajectory.json
+29ba71382a2e88d9ca2cfbe1e9117fce  scenario_s13_14/trajectory.json
+544606d27c8f38d3e373c1ee0574fb53  scenario_s13_15/trajectory.json
+dbf2a12e9b2bbbf8b5ba7aa87c2e9557  scenario_s14_01/trajectory.json
+b125c846aca208bc873ff1c8fb5f0593  scenario_s14_02/trajectory.json
+e8e0a4c11e9fdf16bf05d17686082e78  scenario_s14_03/trajectory.json
+56af413ec15cc1d67ad14bf4a3c7342b  scenario_s14_04/trajectory.json
+d47bbf9db020c2eb3858f2ecceffc8d7  scenario_s14_05/trajectory.json
+4293479eb24b4ba84838ee799985b4f3  scenario_s14_06/trajectory.json
+9971b3ba01dcc46725eb86040737ada9  scenario_s14_07/trajectory.json
+54bc7db8019c08f8e43735e2eadb09e7  scenario_s14_08/trajectory.json
+cdad13322ac2e7379d9e6163e42de710  scenario_s14_09/trajectory.json
+f7b00a01594bb347fa16478046534f8d  scenario_s14_10/trajectory.json
+ae9d8ce0d4569c3cdb54a3e9256e8f96  scenario_s14_11/trajectory.json
+586784548a66eefbce8c64357e2eeab7  scenario_s14_12/trajectory.json
+01e17aa6006e4d11eeb629e138e6ac21  scenario_s14_13/trajectory.json
+f6c524e24a611eaf5715a7adae9cf80d  scenario_s14_14/trajectory.json
+22534de601e8a15fee607286d869571f  scenario_s14_15/trajectory.json
+43e28def32888092d67a290394dc1917  scenario_s14_16/trajectory.json
+0e5d85d4e56091b8d2f30ff6f94142ae  scenario_s14_17/trajectory.json
+6dad138989bfba9207ac84b4cd13ca99  scenario_s14_18/trajectory.json
+e10b8051bc4700eb0b46b0f17f6a6321  scenario_s14_19/trajectory.json
+bda024053ad7fb847804f27553e0a1da  scenario_s14_20/trajectory.json
+904a145b12b583bf58e79452ad4c0b83  scenario_s14_21/trajectory.json
+4cd0985df9a0fe85253e8645da37e44d  scenario_s15_01/trajectory.json
+a3aea3a99d9bcf345f4a5bf408df76b9  scenario_s15_02/trajectory.json
+c8f39af65f1d4fd2ef70eba44ceeeacd  scenario_s15_03/trajectory.json
+bbbef9274a121942d82586dc9eca597f  scenario_s15_04/trajectory.json
+fe8ea422743b1446204c096fd7b21563  scenario_s15_05/trajectory.json
+d89f55e11b8a9e9cf420bfaa2028ede8  scenario_s15_06/trajectory.json
+dd72b0dbbc9c9cdaaceec874df28c987  scenario_s15_07/trajectory.json
+a6c7289c0c87a04d5baa5adcfddf09ac  scenario_s15_08/trajectory.json
+177bac682c676e7c58d003fc8bdd33bf  scenario_s15_09/trajectory.json
+7e9aa52d029e6b8e947b2867106fdf9e  scenario_s15_10/trajectory.json
+80ae2023fdf79836b4a32f54f2d5f8d0  scenario_s15_11/trajectory.json
+4ea9ea8cbf0de0aa3b4ab6e25b75acb6  scenario_s15_12/trajectory.json
+11cf6fff5d8f2217b9f9c13eabd6c9c1  scenario_s15_13/trajectory.json
+cb33406707949d1b4dd08c140f90173a  scenario_s15_14/trajectory.json
+b762f70c1000a2dac61e64044dac0ccc  scenario_s15_15/trajectory.json
+bbf31ee8bb3e94f84f9defe24cd7ed58  scenario_s15_16/trajectory.json
+d081b251dec04d191244dc92f35d2332  scenario_s15_17/trajectory.json
+6f4e491f6d1511115db6e363272def8f  scenario_s15_18/trajectory.json
+973bff435e35434ddb053fc8b56df230  scenario_s15_19/trajectory.json
+53e21ddfc629043ec2aff7d8c97d8e0d  scenario_s15_20/trajectory.json
+7cf739e2c8a77dd878de89be857bd94a  scenario_s15_21/trajectory.json
+ae4fcd15e6edaa92260f2ef2432a92f2  off/scenario_s13_15/expected.csv
+9037ca49234f89e998261bc684f2adf4  off/scenario_s15_21/expected.csv
+544606d27c8f38d3e373c1ee0574fb53  off/scenario_s13_15/trajectory.json
+7cf739e2c8a77dd878de89be857bd94a  off/scenario_s15_21/trajectory.json
+```
+
+### The expectations, off against on (`offon.py analysis/kitting/irb/tk2 expected.csv 0.75 analysis/kitting/irb/tk2/off analysis/kitting/irb/tk1`)
+
+The off side read from round 1's `expected.csv` (its oracle; round 1 agreed with it at 1e-9) and from `off/` for the
+two new scripts.
+
+From `expected.csv`, θ = 0.75; off: the same script's run in the off folder named. Ticks inclusive; delay from the stretch's first tick in brackets. "after admission": ticks from the admission to the pin on which the gate no longer clears for the true hypothesis (the retraction reading).
+
+| scenario | timeline in force (on) | off from | true hypothesis | ticks | state at start (on) | first ≥ θ off | on | admitted off | on | after admission off | on | A/C belief at arrival off | on |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| s13_01 | break_time 178 to 300 | tk1/s13_01 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_01 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s13_01 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | coffee_break ordinary | 161 (37) | 161 (37) | 161 (37) | 161 (37) | - | - | - | - |
+| s13_01 | 〃 | 〃 | deliver_item(item_4) | 217 to 308 | coffee_break raised | 248 (31) | 253 (36) | 248 (31) | 253 (36) | - | - | - | - |
+| s13_02 | break_time 178 to 300 | tk1/s13_02 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_02 | 〃 | 〃 | coffee_break(coffee_machine_0) | 67 to 140 | ordinary | 101 (34) | 117 (50) | 101 (34) | 117 (50) | - | - | - | - |
+| s13_02 | 〃 | 〃 | deliver_item(item_2) | 141 to 192 | coffee_break suppressed | 149 (8) | 149 (8) | 149 (8) | 149 (8) | - | - | - | - |
+| s13_02 | 〃 | 〃 | deliver_item(item_1) | 193 to 285 | coffee_break suppressed | 230 (37) | 231 (38) | 230 (37) | 231 (38) | - | - | - | - |
+| s13_02 | 〃 | 〃 | deliver_item(item_4) | 286 to 377 | coffee_break raised | 317 (31) | 300 (14) | 317 (31) | 300 (14) | - | - | - | - |
+| s13_03 | break_time 178 to 300 | tk1/s13_03 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_03 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s13_03 | 〃 | 〃 | coffee_break(coffee_machine_0) | 124 to 197 | ordinary | 158 (34) | 175 (51) | 158 (34) | 175 (51) | - | - | - | - |
+| s13_03 | 〃 | 〃 | deliver_item(item_1) | 198 to 279 | coffee_break suppressed | 219 (21) | 219 (21) | 219 (21) | 219 (21) | - | - | - | - |
+| s13_03 | 〃 | 〃 | deliver_item(item_4) | 280 to 371 | coffee_break suppressed | 311 (31) | 280 (0) | 311 (31) | 280 (0) | - | 286 to 299 none(below_theta) (coffee_break(coffee_machine_0)) | - | - |
+| s13_04 | break_time 178 to 300 | tk1/s13_04 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_04 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s13_04 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | coffee_break ordinary | 161 (37) | 161 (37) | 161 (37) | 161 (37) | - | - | - | - |
+| s13_04 | 〃 | 〃 | coffee_break(coffee_machine_0) | 217 to 289 | raised | 249 (32) | 238 (21) | 249 (32) | 238 (21) | - | - | - | - |
+| s13_04 | 〃 | 〃 | deliver_item(item_4) | 290 to 356 | coffee_break suppressed | 295 (5) | 290 (0) | 295 (5) | 290 (0) | - | - | - | - |
+| s13_05 | break_time 178 to 300 | tk1/s13_05 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_05 | 〃 | 〃 | deliver_item(item_2) | 67 to 93 | coffee_break ordinary | never | 87 (20) | never | 87 (20) | - | - | - | - |
+| s13_05 | 〃 | 〃 | coffee_break(coffee_machine_0) | 94 to 146 | ordinary | 103 (9) | 120 (26) | 103 (9) | 120 (26) | - | - | - | - |
+| s13_05 | 〃 | 〃 | deliver_item(item_2) | 147 to 198 | coffee_break suppressed | 156 (9) | 155 (8) | 156 (9) | 155 (8) | - | - | - | - |
+| s13_05 | 〃 | 〃 | deliver_item(item_1) | 199 to 291 | coffee_break suppressed | 236 (37) | 237 (38) | 236 (37) | 237 (38) | - | - | - | - |
+| s13_05 | 〃 | 〃 | deliver_item(item_4) | 292 to 383 | coffee_break raised | 323 (31) | 300 (8) | 323 (31) | 300 (8) | - | - | - | - |
+| s13_06 | break_time 178 to 300 | tk1/s13_06 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_06 | 〃 | 〃 | deliver_item(item_2) | 67 to 95 | coffee_break ordinary | never | 87 (20) | never | 87 (20) | - | - | - | - |
+| s13_06 | 〃 | 〃 | coffee_break(coffee_machine_0) | 96 to 148 | ordinary | 104 (8) | 112 (16) | 104 (8) | 112 (16) | - | - | - | - |
+| s13_06 | 〃 | 〃 | deliver_item(item_2) | 149 to 193 | coffee_break suppressed | 170 (21) | 170 (21) | 170 (21) | 170 (21) | - | - | - | - |
+| s13_06 | 〃 | 〃 | deliver_item(item_1) | 194 to 286 | coffee_break suppressed | 231 (37) | 231 (37) | 231 (37) | 231 (37) | - | - | - | - |
+| s13_06 | 〃 | 〃 | deliver_item(item_4) | 287 to 378 | coffee_break raised | 318 (31) | 300 (13) | 318 (31) | 300 (13) | - | - | - | - |
+| s13_07 | break_time 178 to 300 | tk1/s13_07 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_07 | 〃 | 〃 | deliver_item(item_2) | 67 to 121 | coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s13_07 | 〃 | 〃 | coffee_break(coffee_machine_0) | 122 to 195 | ordinary | 153 (31) | 160 (38) | 163 (41) | 163 (41) | - | - | - | - |
+| s13_07 | 〃 | 〃 | deliver_item(item_2) | 196 to 240 | coffee_break suppressed | 217 (21) | 217 (21) | 217 (21) | 217 (21) | - | - | - | - |
+| s13_07 | 〃 | 〃 | deliver_item(item_1) | 241 to 334 | coffee_break suppressed | 278 (37) | 278 (37) | 278 (37) | 278 (37) | - | - | - | - |
+| s13_07 | 〃 | 〃 | deliver_item(item_4) | 335 to 428 | coffee_break ordinary | 367 (32) | 335 (0) | 367 (32) | 335 (0) | - | - | - | - |
+| s13_08 | break_time 50 to 200 | tk1/s13_02 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_08 | 〃 | 〃 | coffee_break(coffee_machine_0) | 67 to 140 | raised | 101 (34) | 82 (15) | 101 (34) | 82 (15) | - | - | - | - |
+| s13_08 | 〃 | 〃 | deliver_item(item_2) | 141 to 192 | coffee_break suppressed | 149 (8) | 149 (8) | 149 (8) | 149 (8) | - | - | - | - |
+| s13_08 | 〃 | 〃 | deliver_item(item_1) | 193 to 285 | coffee_break suppressed | 230 (37) | 230 (37) | 230 (37) | 230 (37) | - | - | - | - |
+| s13_08 | 〃 | 〃 | deliver_item(item_4) | 286 to 377 | coffee_break ordinary | 317 (31) | 286 (0) | 317 (31) | 286 (0) | - | - | - | - |
+| s13_09 | break_time 90 to 200 | tk1/s13_02 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_09 | 〃 | 〃 | coffee_break(coffee_machine_0) | 67 to 140 | ordinary | 101 (34) | 90 (23) | 101 (34) | 90 (23) | - | - | - | - |
+| s13_09 | 〃 | 〃 | deliver_item(item_2) | 141 to 192 | coffee_break suppressed | 149 (8) | 149 (8) | 149 (8) | 149 (8) | - | - | - | - |
+| s13_09 | 〃 | 〃 | deliver_item(item_1) | 193 to 285 | coffee_break suppressed | 230 (37) | 230 (37) | 230 (37) | 230 (37) | - | - | - | - |
+| s13_09 | 〃 | 〃 | deliver_item(item_4) | 286 to 377 | coffee_break ordinary | 317 (31) | 286 (0) | 317 (31) | 286 (0) | - | - | - | - |
+| s13_10 | break_time 120 to 200 | tk1/s13_02 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_10 | 〃 | 〃 | coffee_break(coffee_machine_0) | 67 to 140 | ordinary | 101 (34) | 117 (50) | 101 (34) | 117 (50) | - | - | - | - |
+| s13_10 | 〃 | 〃 | deliver_item(item_2) | 141 to 192 | coffee_break suppressed | 149 (8) | 149 (8) | 149 (8) | 149 (8) | - | - | - | - |
+| s13_10 | 〃 | 〃 | deliver_item(item_1) | 193 to 285 | coffee_break suppressed | 230 (37) | 230 (37) | 230 (37) | 230 (37) | - | - | - | - |
+| s13_10 | 〃 | 〃 | deliver_item(item_4) | 286 to 377 | coffee_break ordinary | 317 (31) | 286 (0) | 317 (31) | 286 (0) | - | - | - | - |
+| s13_11 | break_time 40 to 190 | tk1/s13_03 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_11 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break raised | 97 (30) | 102 (35) | 97 (30) | 102 (35) | - | - | - | - |
+| s13_11 | 〃 | 〃 | coffee_break(coffee_machine_0) | 124 to 197 | raised | 158 (34) | 138 (14) | 158 (34) | 138 (14) | - | - | - | - |
+| s13_11 | 〃 | 〃 | deliver_item(item_1) | 198 to 279 | coffee_break suppressed | 219 (21) | 219 (21) | 219 (21) | 219 (21) | - | - | - | - |
+| s13_11 | 〃 | 〃 | deliver_item(item_4) | 280 to 371 | coffee_break suppressed | 311 (31) | 280 (0) | 311 (31) | 280 (0) | - | - | - | - |
+| s13_12 | break_time 40 to 150 | tk1/s13_03 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_12 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break raised | 97 (30) | 102 (35) | 97 (30) | 102 (35) | - | - | - | - |
+| s13_12 | 〃 | 〃 | coffee_break(coffee_machine_0) | 124 to 197 | raised | 158 (34) | 138 (14) | 158 (34) | 138 (14) | - | 150 to 161 clears (deliver_item(item_4)); 162 to 169 none(below_theta) (deliver_item(item_4)); 170 to 174 none(below_theta) (coffee_break(coffee_machine_0)) | - | - |
+| s13_12 | 〃 | 〃 | deliver_item(item_1) | 198 to 279 | coffee_break suppressed | 219 (21) | 219 (21) | 219 (21) | 219 (21) | - | - | - | - |
+| s13_12 | 〃 | 〃 | deliver_item(item_4) | 280 to 371 | coffee_break suppressed | 311 (31) | 280 (0) | 311 (31) | 280 (0) | - | - | - | - |
+| s13_13 | none | tk1/s13_04 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_13 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s13_13 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | coffee_break ordinary | 161 (37) | 161 (37) | 161 (37) | 161 (37) | - | - | - | - |
+| s13_13 | 〃 | 〃 | coffee_break(coffee_machine_0) | 217 to 289 | ordinary | 249 (32) | 271 (54) | 249 (32) | 271 (54) | - | - | - | - |
+| s13_13 | 〃 | 〃 | deliver_item(item_4) | 290 to 356 | coffee_break suppressed | 295 (5) | 290 (0) | 295 (5) | 290 (0) | - | - | - | - |
+| s13_14 | break_time 0 to end | tk1/s13_01 | deliver_item(item_3) | 0 to 66 | coffee_break raised | 26 (26) | 27 (27) | 26 (26) | 27 (27) | - | - | - | - |
+| s13_14 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break raised | 97 (30) | 102 (35) | 97 (30) | 102 (35) | - | - | - | - |
+| s13_14 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | coffee_break raised | 161 (37) | 162 (38) | 161 (37) | 162 (38) | - | - | - | - |
+| s13_14 | 〃 | 〃 | deliver_item(item_4) | 217 to 308 | coffee_break raised | 248 (31) | 253 (36) | 248 (31) | 253 (36) | - | - | - | - |
+| s13_15 | none | off/s13_15 | deliver_item(item_3) | 0 to 66 | coffee_break ordinary | 26 (26) | 26 (26) | 26 (26) | 26 (26) | - | - | - | - |
+| s13_15 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s13_15 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | coffee_break ordinary | 161 (37) | 161 (37) | 161 (37) | 161 (37) | - | - | - | - |
+| s13_15 | 〃 | 〃 | deliver_item(item_4) | 217 to 260 | coffee_break ordinary | 248 (31) | 217 (0) | 248 (31) | 217 (0) | - | - | - | - |
+| s13_15 | 〃 | 〃 | coffee_break(coffee_machine_0) | 261 to 309 | ordinary | 274 (13) | 291 (30) | 277 (16) | 291 (30) | - | - | - | - |
+| s13_15 | 〃 | 〃 | deliver_item(item_4) | 310 to 375 | coffee_break suppressed | 315 (5) | 310 (0) | 315 (5) | 310 (0) | - | - | - | - |
+| s14_01 | break_time 178 to 300 | tk1/s14_01 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_01 | 〃 | 〃 | deliver_item(item_2) | 89 to 180 | ac_activation ordinary coffee_break ordinary | 138 (49) | 129 (40) | 138 (49) | 129 (40) | - | - | - | - |
+| s14_01 | 〃 | 〃 | deliver_item(item_1) | 181 to 282 | ac_activation ordinary coffee_break raised | 232 (51) | 234 (53) | 232 (51) | 234 (53) | - | - | - | - |
+| s14_02 | break_time 178 to 300 | tk1/s14_02 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_02 | 〃 | 〃 | coffee_break(coffee_machine_0) | 89 to 166 | ordinary | 143 (54) | 157 (68) | 143 (54) | 157 (68) | - | - | - | - |
+| s14_02 | 〃 | 〃 | deliver_item(item_2) | 167 to 225 | ac_activation ordinary coffee_break suppressed | 177 (10) | 171 (4) | 177 (10) | 171 (4) | - | - | - | - |
+| s14_02 | 〃 | 〃 | deliver_item(item_1) | 226 to 325 | ac_activation ordinary coffee_break suppressed | 277 (51) | 226 (0) | 277 (51) | 226 (0) | - | 255 to 271 none(below_theta) (coffee_break(coffee_machine_0)); 272 to 277 none(below_theta) (deliver_item(item_1)) | - | - |
+| s14_03 | break_time 178 to 300 | tk1/s14_03 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_03 | 〃 | 〃 | deliver_item(item_2) | 89 to 180 | ac_activation ordinary coffee_break ordinary | 138 (49) | 129 (40) | 138 (49) | 129 (40) | - | - | - | - |
+| s14_03 | 〃 | 〃 | coffee_break(coffee_machine_0) | 181 to 259 | raised | 235 (54) | 226 (45) | 235 (54) | 226 (45) | - | - | - | - |
+| s14_03 | 〃 | 〃 | deliver_item(item_1) | 260 to 318 | ac_activation ordinary coffee_break suppressed | 269 (9) | 260 (0) | 269 (9) | 260 (0) | - | - | - | - |
+| s14_04 | break_time 178 to 300 | tk1/s14_04 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_04 | 〃 | 〃 | deliver_item(item_2) | 89 to 132 | ac_activation ordinary coffee_break ordinary | never | 129 (40) | never | 129 (40) | - | - | - | - |
+| s14_04 | 〃 | 〃 | coffee_break(coffee_machine_0) | 133 to 174 | ordinary | 149 (16) | 162 (29) | 149 (16) | 162 (29) | - | - | - | - |
+| s14_04 | 〃 | 〃 | deliver_item(item_2) | 175 to 233 | ac_activation ordinary coffee_break suppressed | 187 (12) | 179 (4) | 187 (12) | 179 (4) | - | - | - | - |
+| s14_04 | 〃 | 〃 | deliver_item(item_1) | 234 to 333 | ac_activation ordinary coffee_break suppressed | 285 (51) | 234 (0) | 285 (51) | 234 (0) | - | 263 to 279 none(below_theta) (coffee_break(coffee_machine_0)); 280 to 285 none(below_theta) (deliver_item(item_1)) | - | - |
+| s14_05 | break_time 178 to 300 | tk1/s14_05 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_05 | 〃 | 〃 | deliver_item(item_2) | 89 to 134 | ac_activation ordinary coffee_break ordinary | never | 129 (40) | never | 129 (40) | - | - | - | - |
+| s14_05 | 〃 | 〃 | coffee_break(coffee_machine_0) | 135 to 176 | ordinary | 150 (15) | 163 (28) | 150 (15) | 163 (28) | - | - | - | - |
+| s14_05 | 〃 | 〃 | deliver_item(item_2) | 177 to 226 | ac_activation ordinary coffee_break suppressed | 187 (10) | 184 (7) | 187 (10) | 184 (7) | - | - | - | - |
+| s14_05 | 〃 | 〃 | deliver_item(item_1) | 227 to 328 | ac_activation ordinary coffee_break suppressed | 278 (51) | 227 (0) | 278 (51) | 227 (0) | - | 265 to 272 none(below_theta) (coffee_break(coffee_machine_0)); 273 to 279 none(below_theta) (deliver_item(item_1)) | - | - |
+| s14_06 | break_time 178 to 300 | tk1/s14_06 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_06 | 〃 | 〃 | deliver_item(item_2) | 89 to 178 | ac_activation ordinary coffee_break ordinary | 138 (49) | 129 (40) | 138 (49) | 129 (40) | - | - | - | - |
+| s14_06 | 〃 | 〃 | coffee_break(coffee_machine_0) | 179 to 257 | raised | 231 (52) | 224 (45) | 231 (52) | 225 (46) | - | - | - | - |
+| s14_06 | 〃 | 〃 | deliver_item(item_2) | 258 to 307 | ac_activation ordinary coffee_break suppressed | 267 (9) | 265 (7) | 267 (9) | 265 (7) | - | - | - | - |
+| s14_06 | 〃 | 〃 | deliver_item(item_1) | 308 to 409 | ac_activation ordinary coffee_break suppressed | 359 (51) | 308 (0) | 359 (51) | 308 (0) | - | - | - | - |
+| s14_07 | room_warm 150 to end | tk1/s14_07 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_07 | 〃 | 〃 | ac_activation(ac_switch_0) | 89 to 137 | ordinary | never | never | never | never | - | - | 0.4626 at 135 | 0.0599 at 135 |
+| s14_07 | 〃 | 〃 | deliver_item(item_2) | 138 to 192 | ac_activation suppressed coffee_break ordinary | 148 (10) | 142 (4) | 148 (10) | 142 (4) | - | - | - | - |
+| s14_07 | 〃 | 〃 | deliver_item(item_1) | 193 to 294 | ac_activation suppressed coffee_break ordinary | 244 (51) | 193 (0) | 244 (51) | 193 (0) | - | - | - | - |
+| s14_08 | room_warm 150 to end | tk1/s14_08 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_08 | 〃 | 〃 | deliver_item(item_2) | 89 to 180 | ac_activation ordinary coffee_break ordinary | 138 (49) | 129 (40) | 138 (49) | 129 (40) | - | - | - | - |
+| s14_08 | 〃 | 〃 | ac_activation(ac_switch_0) | 181 to 229 | raised | never | never | never | never | - | - | 0.5475 at 227 | 0.6449 at 227 |
+| s14_08 | 〃 | 〃 | deliver_item(item_1) | 230 to 293 | ac_activation suppressed coffee_break ordinary | 242 (12) | 230 (0) | 242 (12) | 230 (0) | - | - | - | - |
+| s14_09 | room_warm 150 to end | tk1/s14_09 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_09 | 〃 | 〃 | deliver_item(item_2) | 89 to 132 | ac_activation ordinary coffee_break ordinary | never | 129 (40) | never | 129 (40) | - | - | - | - |
+| s14_09 | 〃 | 〃 | ac_activation(ac_switch_0) | 133 to 140 | ordinary | never | never | never | never | - | - | 0.4456 at 138 | 0.0467 at 138 |
+| s14_09 | 〃 | 〃 | deliver_item(item_2) | 141 to 194 | ac_activation suppressed coffee_break ordinary | 151 (10) | 149 (8) | 151 (10) | 149 (8) | - | - | - | - |
+| s14_09 | 〃 | 〃 | deliver_item(item_1) | 195 to 296 | ac_activation suppressed coffee_break ordinary | 246 (51) | 195 (0) | 246 (51) | 195 (0) | - | - | - | - |
+| s14_10 | room_warm 150 to end | tk1/s14_10 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_10 | 〃 | 〃 | deliver_item(item_2) | 89 to 134 | ac_activation ordinary coffee_break ordinary | never | 129 (40) | never | 129 (40) | - | - | - | - |
+| s14_10 | 〃 | 〃 | ac_activation(ac_switch_0) | 135 to 142 | ordinary | never | never | never | never | - | - | 0.4814 at 140 | 0.0558 at 140 |
+| s14_10 | 〃 | 〃 | deliver_item(item_2) | 143 to 191 | ac_activation suppressed coffee_break ordinary | 151 (8) | 149 (6) | 151 (8) | 149 (6) | - | - | - | - |
+| s14_10 | 〃 | 〃 | deliver_item(item_1) | 192 to 293 | ac_activation suppressed coffee_break ordinary | 243 (51) | 192 (0) | 243 (51) | 192 (0) | - | - | - | - |
+| s14_11 | room_warm 150 to end | tk1/s14_11 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_11 | 〃 | 〃 | deliver_item(item_2) | 89 to 178 | ac_activation ordinary coffee_break ordinary | 138 (49) | 129 (40) | 138 (49) | 129 (40) | - | - | - | - |
+| s14_11 | 〃 | 〃 | ac_activation(ac_switch_0) | 179 to 227 | raised | never | never | never | never | - | - | 0.4351 at 225 | 0.5192 at 225 |
+| s14_11 | 〃 | 〃 | deliver_item(item_2) | 228 to 276 | ac_activation suppressed coffee_break ordinary | 236 (8) | 234 (6) | 236 (8) | 234 (6) | - | - | - | - |
+| s14_11 | 〃 | 〃 | deliver_item(item_1) | 277 to 378 | ac_activation suppressed coffee_break ordinary | 328 (51) | 277 (0) | 328 (51) | 277 (0) | - | - | - | - |
+| s14_12 | break_time 70 to 250 | tk1/s14_02 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_12 | 〃 | 〃 | coffee_break(coffee_machine_0) | 89 to 166 | raised | 143 (54) | 129 (40) | 143 (54) | 129 (40) | - | - | - | - |
+| s14_12 | 〃 | 〃 | deliver_item(item_2) | 167 to 225 | ac_activation ordinary coffee_break suppressed | 177 (10) | 171 (4) | 177 (10) | 171 (4) | - | - | - | - |
+| s14_12 | 〃 | 〃 | deliver_item(item_1) | 226 to 325 | ac_activation ordinary coffee_break suppressed | 277 (51) | 226 (0) | 277 (51) | 226 (0) | - | - | - | - |
+| s14_13 | break_time 110 to 250 | tk1/s14_02 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_13 | 〃 | 〃 | coffee_break(coffee_machine_0) | 89 to 166 | ordinary | 143 (54) | 129 (40) | 143 (54) | 129 (40) | - | - | - | - |
+| s14_13 | 〃 | 〃 | deliver_item(item_2) | 167 to 225 | ac_activation ordinary coffee_break suppressed | 177 (10) | 171 (4) | 177 (10) | 171 (4) | - | - | - | - |
+| s14_13 | 〃 | 〃 | deliver_item(item_1) | 226 to 325 | ac_activation ordinary coffee_break suppressed | 277 (51) | 226 (0) | 277 (51) | 226 (0) | - | - | - | - |
+| s14_14 | break_time 150 to 250 | tk1/s14_02 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_14 | 〃 | 〃 | coffee_break(coffee_machine_0) | 89 to 166 | ordinary | 143 (54) | 150 (61) | 143 (54) | 150 (61) | - | - | - | - |
+| s14_14 | 〃 | 〃 | deliver_item(item_2) | 167 to 225 | ac_activation ordinary coffee_break suppressed | 177 (10) | 171 (4) | 177 (10) | 171 (4) | - | - | - | - |
+| s14_14 | 〃 | 〃 | deliver_item(item_1) | 226 to 325 | ac_activation ordinary coffee_break suppressed | 277 (51) | 226 (0) | 277 (51) | 226 (0) | - | - | - | - |
+| s14_15 | room_warm 70 to end | tk1/s14_07 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_15 | 〃 | 〃 | ac_activation(ac_switch_0) | 89 to 137 | raised | never | never | never | never | - | - | 0.4626 at 135 | 0.6144 at 135 |
+| s14_15 | 〃 | 〃 | deliver_item(item_2) | 138 to 192 | ac_activation suppressed coffee_break ordinary | 148 (10) | 142 (4) | 148 (10) | 142 (4) | - | - | - | - |
+| s14_15 | 〃 | 〃 | deliver_item(item_1) | 193 to 294 | ac_activation suppressed coffee_break ordinary | 244 (51) | 193 (0) | 244 (51) | 193 (0) | - | - | - | - |
+| s14_16 | room_warm 110 to end | tk1/s14_07 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_16 | 〃 | 〃 | ac_activation(ac_switch_0) | 89 to 137 | ordinary | never | never | never | never | - | - | 0.4626 at 135 | 0.6144 at 135 |
+| s14_16 | 〃 | 〃 | deliver_item(item_2) | 138 to 192 | ac_activation suppressed coffee_break ordinary | 148 (10) | 142 (4) | 148 (10) | 142 (4) | - | - | - | - |
+| s14_16 | 〃 | 〃 | deliver_item(item_1) | 193 to 294 | ac_activation suppressed coffee_break ordinary | 244 (51) | 193 (0) | 244 (51) | 193 (0) | - | - | - | - |
+| s14_17 | room_warm 0 to 110 | tk1/s14_07 | deliver_item(item_0) | 0 to 88 | ac_activation raised coffee_break ordinary | 50 (50) | 49 (49) | 50 (50) | 49 (49) | - | - | - | - |
+| s14_17 | 〃 | 〃 | ac_activation(ac_switch_0) | 89 to 137 | raised | never | never | never | never | - | - | 0.4626 at 135 | 0.0599 at 135 |
+| s14_17 | 〃 | 〃 | deliver_item(item_2) | 138 to 192 | ac_activation suppressed coffee_break ordinary | 148 (10) | 142 (4) | 148 (10) | 142 (4) | - | - | - | - |
+| s14_17 | 〃 | 〃 | deliver_item(item_1) | 193 to 294 | ac_activation suppressed coffee_break ordinary | 244 (51) | 193 (0) | 244 (51) | 193 (0) | - | - | - | - |
+| s14_18 | break_time 60 to 250 | tk1/s14_03 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_18 | 〃 | 〃 | deliver_item(item_2) | 89 to 180 | ac_activation ordinary coffee_break raised | 138 (49) | 139 (50) | 138 (49) | 139 (50) | - | - | - | - |
+| s14_18 | 〃 | 〃 | coffee_break(coffee_machine_0) | 181 to 259 | raised | 235 (54) | 226 (45) | 235 (54) | 226 (45) | - | 250 to 251 none(below_theta) (coffee_break(coffee_machine_0)) | - | - |
+| s14_18 | 〃 | 〃 | deliver_item(item_1) | 260 to 318 | ac_activation ordinary coffee_break suppressed | 269 (9) | 260 (0) | 269 (9) | 260 (0) | - | - | - | - |
+| s14_19 | none | tk1/s14_03 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_19 | 〃 | 〃 | deliver_item(item_2) | 89 to 180 | ac_activation ordinary coffee_break ordinary | 138 (49) | 129 (40) | 138 (49) | 129 (40) | - | - | - | - |
+| s14_19 | 〃 | 〃 | coffee_break(coffee_machine_0) | 181 to 259 | ordinary | 235 (54) | 252 (71) | 235 (54) | 252 (71) | - | - | - | - |
+| s14_19 | 〃 | 〃 | deliver_item(item_1) | 260 to 318 | ac_activation ordinary coffee_break suppressed | 269 (9) | 260 (0) | 269 (9) | 260 (0) | - | - | - | - |
+| s14_20 | break_time 0 to end | tk1/s14_01 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break raised | 50 (50) | 51 (51) | 50 (50) | 51 (51) | - | - | - | - |
+| s14_20 | 〃 | 〃 | deliver_item(item_2) | 89 to 180 | ac_activation ordinary coffee_break raised | 138 (49) | 139 (50) | 138 (49) | 139 (50) | - | - | - | - |
+| s14_20 | 〃 | 〃 | deliver_item(item_1) | 181 to 282 | ac_activation ordinary coffee_break raised | 232 (51) | 234 (53) | 232 (51) | 234 (53) | - | - | - | - |
+| s14_21 | break_time 178 to 300 | tk1/s14_08 | deliver_item(item_0) | 0 to 88 | ac_activation ordinary coffee_break ordinary | 50 (50) | 48 (48) | 50 (50) | 48 (48) | - | - | - | - |
+| s14_21 | 〃 | 〃 | deliver_item(item_2) | 89 to 180 | ac_activation ordinary coffee_break ordinary | 138 (49) | 129 (40) | 138 (49) | 129 (40) | - | - | - | - |
+| s14_21 | 〃 | 〃 | ac_activation(ac_switch_0) | 181 to 229 | ordinary | never | never | never | never | - | - | 0.5475 at 227 | 0.0142 at 227 |
+| s14_21 | 〃 | 〃 | deliver_item(item_1) | 230 to 293 | ac_activation suppressed coffee_break raised | 242 (12) | 245 (15) | 242 (12) | 245 (15) | - | - | - | - |
+| s15_01 | break_time 178 to 300 | tk1/s15_01 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_01 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_01 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation ordinary coffee_break ordinary | 171 (47) | 162 (38) | 171 (47) | 162 (38) | - | - | - | - |
+| s15_01 | 〃 | 〃 | deliver_item(item_4) | 217 to 308 | ac_activation ordinary coffee_break raised | 262 (45) | 254 (37) | 262 (45) | 254 (37) | - | - | - | - |
+| s15_02 | break_time 178 to 300 | tk1/s15_02 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_02 | 〃 | 〃 | coffee_break(coffee_machine_0) | 67 to 140 | ordinary | 103 (36) | 117 (50) | 103 (36) | 117 (50) | - | - | - | - |
+| s15_02 | 〃 | 〃 | deliver_item(item_2) | 141 to 192 | ac_activation ordinary coffee_break suppressed | 150 (9) | 149 (8) | 150 (9) | 149 (8) | - | - | - | - |
+| s15_02 | 〃 | 〃 | deliver_item(item_1) | 193 to 285 | ac_activation ordinary coffee_break suppressed | 240 (47) | 232 (39) | 240 (47) | 232 (39) | - | - | - | - |
+| s15_02 | 〃 | 〃 | deliver_item(item_4) | 286 to 377 | ac_activation ordinary coffee_break raised | 331 (45) | 300 (14) | 331 (45) | 300 (14) | - | - | - | - |
+| s15_03 | break_time 178 to 300 | tk1/s15_03 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_03 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_03 | 〃 | 〃 | coffee_break(coffee_machine_0) | 124 to 197 | ordinary | 160 (36) | 176 (52) | 160 (36) | 176 (52) | - | - | - | - |
+| s15_03 | 〃 | 〃 | deliver_item(item_1) | 198 to 279 | ac_activation ordinary coffee_break suppressed | 227 (29) | 219 (21) | 227 (29) | 219 (21) | - | - | - | - |
+| s15_03 | 〃 | 〃 | deliver_item(item_4) | 280 to 371 | ac_activation ordinary coffee_break suppressed | 325 (45) | 280 (0) | 325 (45) | 280 (0) | - | 286 to 299 none(below_theta) (coffee_break(coffee_machine_0)) | - | - |
+| s15_04 | break_time 178 to 300 | tk1/s15_04 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_04 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_04 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation ordinary coffee_break ordinary | 171 (47) | 162 (38) | 171 (47) | 162 (38) | - | - | - | - |
+| s15_04 | 〃 | 〃 | coffee_break(coffee_machine_0) | 217 to 289 | raised | 252 (35) | 238 (21) | 252 (35) | 238 (21) | - | - | - | - |
+| s15_04 | 〃 | 〃 | deliver_item(item_4) | 290 to 356 | ac_activation ordinary coffee_break suppressed | 313 (23) | 290 (0) | 313 (23) | 290 (0) | - | - | - | - |
+| s15_05 | break_time 178 to 300 | tk1/s15_05 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_05 | 〃 | 〃 | deliver_item(item_2) | 67 to 93 | ac_activation ordinary coffee_break ordinary | never | 87 (20) | never | 87 (20) | - | - | - | - |
+| s15_05 | 〃 | 〃 | coffee_break(coffee_machine_0) | 94 to 146 | ordinary | 104 (10) | 120 (26) | 104 (10) | 120 (26) | - | - | - | - |
+| s15_05 | 〃 | 〃 | deliver_item(item_2) | 147 to 198 | ac_activation ordinary coffee_break suppressed | 157 (10) | 155 (8) | 157 (10) | 155 (8) | - | - | - | - |
+| s15_05 | 〃 | 〃 | deliver_item(item_1) | 199 to 291 | ac_activation ordinary coffee_break suppressed | 246 (47) | 238 (39) | 246 (47) | 238 (39) | - | - | - | - |
+| s15_05 | 〃 | 〃 | deliver_item(item_4) | 292 to 383 | ac_activation ordinary coffee_break raised | 337 (45) | 300 (8) | 337 (45) | 300 (8) | - | - | - | - |
+| s15_06 | break_time 178 to 300 | tk1/s15_06 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_06 | 〃 | 〃 | deliver_item(item_2) | 67 to 95 | ac_activation ordinary coffee_break ordinary | never | 87 (20) | never | 87 (20) | - | - | - | - |
+| s15_06 | 〃 | 〃 | coffee_break(coffee_machine_0) | 96 to 148 | ordinary | 104 (8) | 112 (16) | 104 (8) | 112 (16) | - | - | - | - |
+| s15_06 | 〃 | 〃 | deliver_item(item_2) | 149 to 193 | ac_activation ordinary coffee_break suppressed | 170 (21) | 170 (21) | 170 (21) | 170 (21) | - | - | - | - |
+| s15_06 | 〃 | 〃 | deliver_item(item_1) | 194 to 286 | ac_activation ordinary coffee_break suppressed | 241 (47) | 232 (38) | 241 (47) | 232 (38) | - | - | - | - |
+| s15_06 | 〃 | 〃 | deliver_item(item_4) | 287 to 378 | ac_activation ordinary coffee_break raised | 332 (45) | 300 (13) | 332 (45) | 300 (13) | - | - | - | - |
+| s15_07 | break_time 178 to 300 | tk1/s15_07 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_07 | 〃 | 〃 | deliver_item(item_2) | 67 to 121 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_07 | 〃 | 〃 | coffee_break(coffee_machine_0) | 122 to 195 | ordinary | 153 (31) | 160 (38) | 163 (41) | 163 (41) | - | - | - | - |
+| s15_07 | 〃 | 〃 | deliver_item(item_2) | 196 to 240 | ac_activation ordinary coffee_break suppressed | 217 (21) | 217 (21) | 217 (21) | 217 (21) | - | - | - | - |
+| s15_07 | 〃 | 〃 | deliver_item(item_1) | 241 to 334 | ac_activation ordinary coffee_break suppressed | 288 (47) | 278 (37) | 288 (47) | 278 (37) | - | - | - | - |
+| s15_07 | 〃 | 〃 | deliver_item(item_4) | 335 to 428 | ac_activation ordinary coffee_break ordinary | 381 (46) | 335 (0) | 381 (46) | 335 (0) | - | - | - | - |
+| s15_08 | room_warm 150 to end | tk1/s15_08 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_08 | 〃 | 〃 | ac_activation(ac_switch_0) | 67 to 114 | ordinary | never | never | never | never | - | - | 0.6238 at 112 | 0.0914 at 112 |
+| s15_08 | 〃 | 〃 | deliver_item(item_2) | 115 to 183 | ac_activation suppressed coffee_break ordinary | 135 (20) | 125 (10) | 135 (20) | 125 (10) | - | - | - | - |
+| s15_08 | 〃 | 〃 | deliver_item(item_1) | 184 to 276 | ac_activation suppressed coffee_break ordinary | 231 (47) | 221 (37) | 231 (47) | 221 (37) | - | - | - | - |
+| s15_08 | 〃 | 〃 | deliver_item(item_4) | 277 to 368 | ac_activation suppressed coffee_break ordinary | 322 (45) | 277 (0) | 322 (45) | 277 (0) | - | - | - | - |
+| s15_09 | room_warm 150 to end | tk1/s15_09 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_09 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_09 | 〃 | 〃 | ac_activation(ac_switch_0) | 124 to 171 | ordinary | never | never | never | never | - | - | 0.6130 at 169 | 0.6152 at 169 |
+| s15_09 | 〃 | 〃 | deliver_item(item_1) | 172 to 229 | ac_activation suppressed coffee_break ordinary | 180 (8) | 176 (4) | 180 (8) | 176 (4) | - | - | - | - |
+| s15_09 | 〃 | 〃 | deliver_item(item_4) | 230 to 323 | ac_activation suppressed coffee_break ordinary | 276 (46) | 230 (0) | 276 (46) | 230 (0) | - | - | - | - |
+| s15_10 | room_warm 150 to end | tk1/s15_10 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_10 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_10 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation ordinary coffee_break ordinary | 171 (47) | 171 (47) | 171 (47) | 171 (47) | - | - | - | - |
+| s15_10 | 〃 | 〃 | ac_activation(ac_switch_0) | 217 to 263 | raised | never | never | never | never | - | - | 0.7487 at 261 | 0.6035 at 261 |
+| s15_10 | 〃 | 〃 | deliver_item(item_4) | 264 to 321 | ac_activation suppressed coffee_break ordinary | 279 (15) | 264 (0) | 279 (15) | 264 (0) | - | - | - | - |
+| s15_11 | room_warm 150 to end | tk1/s15_11 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_11 | 〃 | 〃 | deliver_item(item_2) | 67 to 93 | ac_activation ordinary coffee_break ordinary | never | 87 (20) | never | 87 (20) | - | - | - | - |
+| s15_11 | 〃 | 〃 | ac_activation(ac_switch_0) | 94 to 134 | ordinary | never | never | never | never | - | - | 0.7468 at 132 | 0.1516 at 132 |
+| s15_11 | 〃 | 〃 | deliver_item(item_2) | 135 to 203 | ac_activation suppressed coffee_break ordinary | 155 (20) | 145 (10) | 155 (20) | 145 (10) | - | - | - | - |
+| s15_11 | 〃 | 〃 | deliver_item(item_1) | 204 to 296 | ac_activation suppressed coffee_break ordinary | 251 (47) | 241 (37) | 251 (47) | 241 (37) | - | - | - | - |
+| s15_11 | 〃 | 〃 | deliver_item(item_4) | 297 to 388 | ac_activation suppressed coffee_break ordinary | 342 (45) | 297 (0) | 342 (45) | 297 (0) | - | - | - | - |
+| s15_12 | room_warm 150 to end | tk1/s15_12 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_12 | 〃 | 〃 | deliver_item(item_2) | 67 to 95 | ac_activation ordinary coffee_break ordinary | never | 87 (20) | never | 87 (20) | - | - | - | - |
+| s15_12 | 〃 | 〃 | ac_activation(ac_switch_0) | 96 to 136 | ordinary | 121 (25) | 125 (29) | 133 (37) | 133 (37) | - | - | 0.9961 at 134 | 0.9875 at 134 |
+| s15_12 | 〃 | 〃 | deliver_item(item_2) | 137 to 184 | ac_activation suppressed coffee_break ordinary | 164 (27) | 164 (27) | 164 (27) | 164 (27) | - | - | - | - |
+| s15_12 | 〃 | 〃 | deliver_item(item_1) | 185 to 278 | ac_activation suppressed coffee_break ordinary | 231 (46) | 221 (36) | 231 (46) | 221 (36) | - | - | - | - |
+| s15_12 | 〃 | 〃 | deliver_item(item_4) | 279 to 372 | ac_activation suppressed coffee_break ordinary | 325 (46) | 279 (0) | 325 (46) | 279 (0) | - | - | - | - |
+| s15_13 | room_warm 150 to end | tk1/s15_13 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_13 | 〃 | 〃 | deliver_item(item_2) | 67 to 121 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_13 | 〃 | 〃 | ac_activation(ac_switch_0) | 122 to 169 | ordinary | 154 (32) | 152 (30) | 166 (44) | 166 (44) | - | - | 0.9952 at 167 | 0.9990 at 167 |
+| s15_13 | 〃 | 〃 | deliver_item(item_2) | 170 to 216 | ac_activation suppressed coffee_break ordinary | 197 (27) | 197 (27) | 197 (27) | 197 (27) | - | - | - | - |
+| s15_13 | 〃 | 〃 | deliver_item(item_1) | 217 to 308 | ac_activation suppressed coffee_break ordinary | 263 (46) | 253 (36) | 263 (46) | 253 (36) | - | - | - | - |
+| s15_13 | 〃 | 〃 | deliver_item(item_4) | 309 to 400 | ac_activation suppressed coffee_break ordinary | 354 (45) | 309 (0) | 354 (45) | 309 (0) | - | - | - | - |
+| s15_14 | room_warm 50 to end | tk1/s15_08 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_14 | 〃 | 〃 | ac_activation(ac_switch_0) | 67 to 114 | raised | never | never | never | never | - | - | 0.6238 at 112 | 0.7154 at 112 |
+| s15_14 | 〃 | 〃 | deliver_item(item_2) | 115 to 183 | ac_activation suppressed coffee_break ordinary | 135 (20) | 125 (10) | 135 (20) | 125 (10) | - | - | - | - |
+| s15_14 | 〃 | 〃 | deliver_item(item_1) | 184 to 276 | ac_activation suppressed coffee_break ordinary | 231 (47) | 221 (37) | 231 (47) | 221 (37) | - | - | - | - |
+| s15_14 | 〃 | 〃 | deliver_item(item_4) | 277 to 368 | ac_activation suppressed coffee_break ordinary | 322 (45) | 277 (0) | 322 (45) | 277 (0) | - | - | - | - |
+| s15_15 | room_warm 90 to end | tk1/s15_08 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_15 | 〃 | 〃 | ac_activation(ac_switch_0) | 67 to 114 | ordinary | never | never | never | never | - | - | 0.6238 at 112 | 0.7154 at 112 |
+| s15_15 | 〃 | 〃 | deliver_item(item_2) | 115 to 183 | ac_activation suppressed coffee_break ordinary | 135 (20) | 125 (10) | 135 (20) | 125 (10) | - | - | - | - |
+| s15_15 | 〃 | 〃 | deliver_item(item_1) | 184 to 276 | ac_activation suppressed coffee_break ordinary | 231 (47) | 221 (37) | 231 (47) | 221 (37) | - | - | - | - |
+| s15_15 | 〃 | 〃 | deliver_item(item_4) | 277 to 368 | ac_activation suppressed coffee_break ordinary | 322 (45) | 277 (0) | 322 (45) | 277 (0) | - | - | - | - |
+| s15_16 | room_warm 0 to 90 | tk1/s15_08 | deliver_item(item_3) | 0 to 66 | ac_activation raised coffee_break ordinary | 28 (28) | 30 (30) | 28 (28) | 30 (30) | - | - | - | - |
+| s15_16 | 〃 | 〃 | ac_activation(ac_switch_0) | 67 to 114 | raised | never | never | never | never | - | - | 0.6238 at 112 | 0.0914 at 112 |
+| s15_16 | 〃 | 〃 | deliver_item(item_2) | 115 to 183 | ac_activation suppressed coffee_break ordinary | 135 (20) | 125 (10) | 135 (20) | 125 (10) | - | - | - | - |
+| s15_16 | 〃 | 〃 | deliver_item(item_1) | 184 to 276 | ac_activation suppressed coffee_break ordinary | 231 (47) | 221 (37) | 231 (47) | 221 (37) | - | - | - | - |
+| s15_16 | 〃 | 〃 | deliver_item(item_4) | 277 to 368 | ac_activation suppressed coffee_break ordinary | 322 (45) | 277 (0) | 322 (45) | 277 (0) | - | - | - | - |
+| s15_17 | break_time 178 to 300; room_warm 150 to end | tk1/s15_04 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_17 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_17 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation ordinary coffee_break ordinary | 171 (47) | 171 (47) | 171 (47) | 171 (47) | - | - | - | - |
+| s15_17 | 〃 | 〃 | coffee_break(coffee_machine_0) | 217 to 289 | raised | 252 (35) | 243 (26) | 252 (35) | 243 (26) | - | - | - | - |
+| s15_17 | 〃 | 〃 | deliver_item(item_4) | 290 to 356 | ac_activation raised coffee_break suppressed | 313 (23) | 310 (20) | 313 (23) | 310 (20) | - | - | - | - |
+| s15_18 | room_warm 0 to end | tk1/s15_01 | deliver_item(item_3) | 0 to 66 | ac_activation raised coffee_break ordinary | 28 (28) | 30 (30) | 28 (28) | 30 (30) | - | - | - | - |
+| s15_18 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation raised coffee_break ordinary | 97 (30) | 90 (23) | 97 (30) | 90 (23) | - | - | - | - |
+| s15_18 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation raised coffee_break ordinary | 171 (47) | 171 (47) | 171 (47) | 171 (47) | - | - | - | - |
+| s15_18 | 〃 | 〃 | deliver_item(item_4) | 217 to 308 | ac_activation raised coffee_break ordinary | 262 (45) | 256 (39) | 262 (45) | 256 (39) | - | - | - | - |
+| s15_19 | none | tk1/s15_10 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_19 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_19 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation ordinary coffee_break ordinary | 171 (47) | 162 (38) | 171 (47) | 162 (38) | - | - | - | - |
+| s15_19 | 〃 | 〃 | ac_activation(ac_switch_0) | 217 to 263 | ordinary | never | never | never | never | - | - | 0.7487 at 261 | 0.0574 at 261 |
+| s15_19 | 〃 | 〃 | deliver_item(item_4) | 264 to 321 | ac_activation suppressed coffee_break ordinary | 279 (15) | 264 (0) | 279 (15) | 264 (0) | - | - | - | - |
+| s15_20 | break_time 178 to 300; room_warm 150 to end | tk1/s15_10 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_20 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_20 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation ordinary coffee_break ordinary | 171 (47) | 171 (47) | 171 (47) | 171 (47) | - | - | - | - |
+| s15_20 | 〃 | 〃 | ac_activation(ac_switch_0) | 217 to 263 | raised | never | never | never | never | - | - | 0.7487 at 261 | 0.5932 at 261 |
+| s15_20 | 〃 | 〃 | deliver_item(item_4) | 264 to 321 | ac_activation suppressed coffee_break raised | 279 (15) | 283 (19) | 279 (15) | 283 (19) | - | - | - | - |
+| s15_21 | break_time 307 to end | off/s15_21 | deliver_item(item_3) | 0 to 66 | ac_activation ordinary coffee_break ordinary | 28 (28) | 26 (26) | 28 (28) | 26 (26) | - | - | - | - |
+| s15_21 | 〃 | 〃 | deliver_item(item_2) | 67 to 123 | ac_activation ordinary coffee_break ordinary | 97 (30) | 87 (20) | 97 (30) | 87 (20) | - | - | - | - |
+| s15_21 | 〃 | 〃 | deliver_item(item_1) | 124 to 216 | ac_activation ordinary coffee_break ordinary | 171 (47) | 162 (38) | 171 (47) | 162 (38) | - | - | - | - |
+| s15_21 | 〃 | 〃 | deliver_item(item_4) | 217 to 308 | ac_activation ordinary coffee_break ordinary | 262 (45) | 217 (0) | 262 (45) | 217 (0) | - | - | - | - |
+| s15_21 | 〃 | 〃 | coffee_break(coffee_machine_0) | 309 to 381 | raised | 334 (25) | 309 (0) | 334 (25) | 309 (0) | - | - | - | - |
+
+Admissions of a hypothesis that is not the true task (every tick, the unmodelled ones included), off and on.
+
+| scenario | side | hypothesis admitted | ticks | true task on those ticks | how it ends |
+|---|---|---|---|---|---|
+| s13_01 | off | coffee_break(coffee_machine_0) | 309 to 330 | unmodelled | retraction at 331 (none(leader_inadequate)) |
+| s13_01 | on | coffee_break(coffee_machine_0) | 309 to 330 | unmodelled | retraction at 331 (none(leader_inadequate)) |
+| s13_02 | off | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_02 | on | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_03 | off | coffee_break(coffee_machine_0) | 372 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s13_03 | on | deliver_item(item_4) | 150 to 161 | coffee_break(coffee_machine_0) | retraction at 162 (none(below_theta)) |
+| s13_03 | on | deliver_item(item_4) | 279 | deliver_item(item_1) (complete: pinned) | the human starts it at 280 |
+| s13_03 | on | coffee_break(coffee_machine_0) | 372 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s13_04 | off | deliver_item(item_4) | 289 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 290 |
+| s13_04 | off | coffee_break(coffee_machine_0) | 357 to 378 | unmodelled | retraction at 379 (none(leader_inadequate)) |
+| s13_04 | on | deliver_item(item_4) | 289 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 290 |
+| s13_04 | on | coffee_break(coffee_machine_0) | 357 to 378 | unmodelled | retraction at 379 (none(leader_inadequate)) |
+| s13_05 | off | coffee_break(coffee_machine_0) | 384 to 405 | unmodelled | retraction at 406 (none(leader_inadequate)) |
+| s13_05 | on | deliver_item(item_2) | 94 | coffee_break(coffee_machine_0) | retraction at 95 (none(leader_no_observation)) |
+| s13_05 | on | deliver_item(item_2) | 96 to 99 | coffee_break(coffee_machine_0) | retraction at 100 (none(below_theta)) |
+| s13_05 | on | coffee_break(coffee_machine_0) | 384 to 405 | unmodelled | retraction at 406 (none(leader_inadequate)) |
+| s13_06 | off | coffee_break(coffee_machine_0) | 379 to 400 | unmodelled | retraction at 401 (none(leader_inadequate)) |
+| s13_06 | on | deliver_item(item_2) | 96 to 103 | coffee_break(coffee_machine_0) | retraction at 104 (none(below_theta)) |
+| s13_06 | on | coffee_break(coffee_machine_0) | 379 to 400 | unmodelled | retraction at 401 (none(leader_inadequate)) |
+| s13_07 | off | deliver_item(item_2) | 123 to 130 | coffee_break(coffee_machine_0) | retraction at 131 (none(leader_inadequate)) |
+| s13_07 | off | coffee_break(coffee_machine_0) | 429 to 451 | unmodelled | retraction at 452 (none(leader_inadequate)) |
+| s13_07 | on | deliver_item(item_2) | 123 to 130 | coffee_break(coffee_machine_0) | retraction at 131 (none(leader_inadequate)) |
+| s13_07 | on | deliver_item(item_4) | 334 | deliver_item(item_1) (complete: pinned) | the human starts it at 335 |
+| s13_07 | on | coffee_break(coffee_machine_0) | 429 to 451 | unmodelled | retraction at 452 (none(leader_inadequate)) |
+| s13_08 | off | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_08 | on | deliver_item(item_4) | 285 | deliver_item(item_1) (complete: pinned) | the human starts it at 286 |
+| s13_08 | on | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_09 | off | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_09 | on | deliver_item(item_4) | 285 | deliver_item(item_1) (complete: pinned) | the human starts it at 286 |
+| s13_09 | on | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_10 | off | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_10 | on | deliver_item(item_4) | 285 | deliver_item(item_1) (complete: pinned) | the human starts it at 286 |
+| s13_10 | on | coffee_break(coffee_machine_0) | 378 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s13_11 | off | coffee_break(coffee_machine_0) | 372 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s13_11 | on | coffee_break(coffee_machine_0) | 81 to 91 | deliver_item(item_2) | retraction at 92 (none(below_theta)) |
+| s13_11 | on | deliver_item(item_4) | 279 | deliver_item(item_1) (complete: pinned) | the human starts it at 280 |
+| s13_11 | on | coffee_break(coffee_machine_0) | 372 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s13_12 | off | coffee_break(coffee_machine_0) | 372 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s13_12 | on | coffee_break(coffee_machine_0) | 81 to 91 | deliver_item(item_2) | retraction at 92 (none(below_theta)) |
+| s13_12 | on | deliver_item(item_4) | 150 to 161 | coffee_break(coffee_machine_0) | retraction at 162 (none(below_theta)) |
+| s13_12 | on | deliver_item(item_4) | 279 | deliver_item(item_1) (complete: pinned) | the human starts it at 280 |
+| s13_12 | on | coffee_break(coffee_machine_0) | 372 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s13_13 | off | deliver_item(item_4) | 289 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 290 |
+| s13_13 | off | coffee_break(coffee_machine_0) | 357 to 378 | unmodelled | retraction at 379 (none(leader_inadequate)) |
+| s13_13 | on | deliver_item(item_4) | 216 to 258 | deliver_item(item_1) (complete: pinned), coffee_break(coffee_machine_0) | retraction at 259 (none(leader_inadequate)) |
+| s13_13 | on | deliver_item(item_4) | 289 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 290 |
+| s13_13 | on | coffee_break(coffee_machine_0) | 357 to 378 | unmodelled | retraction at 379 (none(leader_inadequate)) |
+| s13_14 | off | coffee_break(coffee_machine_0) | 309 to 330 | unmodelled | retraction at 331 (none(leader_inadequate)) |
+| s13_14 | on | coffee_break(coffee_machine_0) | 81 to 91 | deliver_item(item_2) | retraction at 92 (none(below_theta)) |
+| s13_14 | on | coffee_break(coffee_machine_0) | 309 to 330 | unmodelled | retraction at 331 (none(leader_inadequate)) |
+| s13_15 | off | deliver_item(item_4) | 262 to 268 | coffee_break(coffee_machine_0) | retraction at 269 (none(below_theta)) |
+| s13_15 | off | deliver_item(item_4) | 309 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 310 |
+| s13_15 | off | coffee_break(coffee_machine_0) | 376 to 397 | unmodelled | retraction at 398 (none(leader_inadequate)) |
+| s13_15 | on | deliver_item(item_4) | 216 | deliver_item(item_1) (complete: pinned) | the human starts it at 217 |
+| s13_15 | on | deliver_item(item_4) | 262 to 269 | coffee_break(coffee_machine_0) | retraction at 270 (none(leader_inadequate)) |
+| s13_15 | on | deliver_item(item_4) | 309 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 310 |
+| s13_15 | on | coffee_break(coffee_machine_0) | 376 to 397 | unmodelled | retraction at 398 (none(leader_inadequate)) |
+| s14_01 | off | none | - | - | - |
+| s14_01 | on | none | - | - | - |
+| s14_02 | off | none | - | - | - |
+| s14_02 | on | deliver_item(item_1) | 225 | deliver_item(item_2) (complete: pinned) | the human starts it at 226 |
+| s14_03 | off | none | - | - | - |
+| s14_03 | on | deliver_item(item_1) | 259 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 260 |
+| s14_04 | off | none | - | - | - |
+| s14_04 | on | deliver_item(item_2) | 133 | coffee_break(coffee_machine_0) | retraction at 134 (none(leader_no_observation)) |
+| s14_04 | on | deliver_item(item_2) | 135 to 136 | coffee_break(coffee_machine_0) | retraction at 137 (none(below_theta)) |
+| s14_04 | on | deliver_item(item_1) | 233 | deliver_item(item_2) (complete: pinned) | the human starts it at 234 |
+| s14_05 | off | none | - | - | - |
+| s14_05 | on | deliver_item(item_2) | 135 to 146 | coffee_break(coffee_machine_0) | retraction at 147 (none(leader_inadequate)) |
+| s14_05 | on | deliver_item(item_1) | 226 | deliver_item(item_2) (complete: pinned) | the human starts it at 227 |
+| s14_06 | off | deliver_item(item_2) | 180 to 187 | coffee_break(coffee_machine_0) | retraction at 188 (none(leader_inadequate)) |
+| s14_06 | on | deliver_item(item_2) | 180 to 187 | coffee_break(coffee_machine_0) | retraction at 188 (none(leader_inadequate)) |
+| s14_06 | on | deliver_item(item_1) | 307 | deliver_item(item_2) (complete: pinned) | the human starts it at 308 |
+| s14_07 | off | none | - | - | - |
+| s14_07 | on | deliver_item(item_1) | 192 | deliver_item(item_2) (complete: pinned) | the human starts it at 193 |
+| s14_08 | off | none | - | - | - |
+| s14_08 | on | deliver_item(item_1) | 229 | ac_activation(ac_switch_0) (complete: pinned) | the human starts it at 230 |
+| s14_09 | off | none | - | - | - |
+| s14_09 | on | deliver_item(item_2) | 133 | ac_activation(ac_switch_0) | retraction at 134 (none(leader_no_observation)) |
+| s14_09 | on | deliver_item(item_2) | 135 to 136 | ac_activation(ac_switch_0) | retraction at 137 (none(below_theta)) |
+| s14_09 | on | deliver_item(item_1) | 194 | deliver_item(item_2) (complete: pinned) | the human starts it at 195 |
+| s14_10 | off | none | - | - | - |
+| s14_10 | on | deliver_item(item_2) | 135 to 140 | ac_activation(ac_switch_0) | retraction at 141 (none(below_theta)) |
+| s14_10 | on | deliver_item(item_1) | 191 | deliver_item(item_2) (complete: pinned) | the human starts it at 192 |
+| s14_11 | off | deliver_item(item_2) | 180 to 187 | ac_activation(ac_switch_0) | retraction at 188 (none(leader_inadequate)) |
+| s14_11 | on | deliver_item(item_2) | 180 to 187 | ac_activation(ac_switch_0) | retraction at 188 (none(leader_inadequate)) |
+| s14_11 | on | deliver_item(item_1) | 276 | deliver_item(item_2) (complete: pinned) | the human starts it at 277 |
+| s14_12 | off | none | - | - | - |
+| s14_12 | on | deliver_item(item_1) | 225 | deliver_item(item_2) (complete: pinned) | the human starts it at 226 |
+| s14_13 | off | none | - | - | - |
+| s14_13 | on | deliver_item(item_1) | 225 | deliver_item(item_2) (complete: pinned) | the human starts it at 226 |
+| s14_14 | off | none | - | - | - |
+| s14_14 | on | deliver_item(item_1) | 225 | deliver_item(item_2) (complete: pinned) | the human starts it at 226 |
+| s14_15 | off | none | - | - | - |
+| s14_15 | on | deliver_item(item_1) | 192 | deliver_item(item_2) (complete: pinned) | the human starts it at 193 |
+| s14_16 | off | none | - | - | - |
+| s14_16 | on | deliver_item(item_1) | 192 | deliver_item(item_2) (complete: pinned) | the human starts it at 193 |
+| s14_17 | off | none | - | - | - |
+| s14_17 | on | deliver_item(item_1) | 192 | deliver_item(item_2) (complete: pinned) | the human starts it at 193 |
+| s14_18 | off | none | - | - | - |
+| s14_18 | on | deliver_item(item_1) | 259 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 260 |
+| s14_19 | off | none | - | - | - |
+| s14_19 | on | deliver_item(item_1) | 180 to 239 | deliver_item(item_2) (complete: pinned), coffee_break(coffee_machine_0) | retraction at 240 (none(below_theta)) |
+| s14_19 | on | deliver_item(item_1) | 259 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 260 |
+| s14_20 | off | none | - | - | - |
+| s14_20 | on | none | - | - | - |
+| s14_21 | off | none | - | - | - |
+| s14_21 | on | coffee_break(coffee_machine_0) | 221 to 227 | ac_activation(ac_switch_0) | retraction at 228 (none(below_theta)) |
+| s15_01 | off | coffee_break(coffee_machine_0) | 319 to 330 | unmodelled | retraction at 331 (none(leader_inadequate)) |
+| s15_01 | on | coffee_break(coffee_machine_0) | 319 to 330 | unmodelled | retraction at 331 (none(leader_inadequate)) |
+| s15_02 | off | coffee_break(coffee_machine_0) | 388 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s15_02 | on | coffee_break(coffee_machine_0) | 388 to 399 | unmodelled | retraction at 400 (none(leader_inadequate)) |
+| s15_03 | off | coffee_break(coffee_machine_0) | 382 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s15_03 | on | deliver_item(item_4) | 151 to 161 | coffee_break(coffee_machine_0) | retraction at 162 (none(below_theta)) |
+| s15_03 | on | deliver_item(item_4) | 279 | deliver_item(item_1) (complete: pinned) | the human starts it at 280 |
+| s15_03 | on | coffee_break(coffee_machine_0) | 382 to 393 | unmodelled | retraction at 394 (none(leader_inadequate)) |
+| s15_04 | off | coffee_break(coffee_machine_0) | 367 to 378 | unmodelled | retraction at 379 (none(leader_inadequate)) |
+| s15_04 | on | deliver_item(item_4) | 289 | coffee_break(coffee_machine_0) (complete: pinned) | the human starts it at 290 |
+| s15_04 | on | coffee_break(coffee_machine_0) | 378 | unmodelled | retraction at 379 (none(leader_inadequate)) |
+| s15_05 | off | coffee_break(coffee_machine_0) | 394 to 405 | unmodelled | retraction at 406 (none(leader_inadequate)) |
+| s15_05 | on | deliver_item(item_2) | 94 | coffee_break(coffee_machine_0) | retraction at 95 (none(leader_no_observation)) |
+| s15_05 | on | deliver_item(item_2) | 96 to 99 | coffee_break(coffee_machine_0) | retraction at 100 (none(below_theta)) |
+| s15_05 | on | coffee_break(coffee_machine_0) | 394 to 405 | unmodelled | retraction at 406 (none(leader_inadequate)) |
+| s15_06 | off | coffee_break(coffee_machine_0) | 389 to 400 | unmodelled | retraction at 401 (none(leader_inadequate)) |
+| s15_06 | on | deliver_item(item_2) | 96 to 103 | coffee_break(coffee_machine_0) | retraction at 104 (none(below_theta)) |
+| s15_06 | on | coffee_break(coffee_machine_0) | 389 to 400 | unmodelled | retraction at 401 (none(leader_inadequate)) |
+| s15_07 | off | deliver_item(item_2) | 123 to 130 | coffee_break(coffee_machine_0) | retraction at 131 (none(leader_inadequate)) |
+| s15_07 | off | coffee_break(coffee_machine_0) | 440 to 451 | unmodelled | retraction at 452 (none(leader_inadequate)) |
+| s15_07 | on | deliver_item(item_2) | 123 to 130 | coffee_break(coffee_machine_0) | retraction at 131 (none(leader_inadequate)) |
+| s15_07 | on | deliver_item(item_4) | 334 | deliver_item(item_1) (complete: pinned) | the human starts it at 335 |
+| s15_07 | on | coffee_break(coffee_machine_0) | 440 to 451 | unmodelled | retraction at 452 (none(leader_inadequate)) |
+| s15_08 | off | coffee_break(coffee_machine_0) | 379 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_08 | on | deliver_item(item_4) | 276 | deliver_item(item_1) (complete: pinned) | the human starts it at 277 |
+| s15_08 | on | coffee_break(coffee_machine_0) | 369 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_09 | off | coffee_break(coffee_machine_0) | 335 to 346 | unmodelled | retraction at 347 (none(leader_inadequate)) |
+| s15_09 | on | deliver_item(item_4) | 229 | deliver_item(item_1) (complete: pinned) | the human starts it at 230 |
+| s15_09 | on | coffee_break(coffee_machine_0) | 324 to 346 | unmodelled | retraction at 347 (none(leader_inadequate)) |
+| s15_10 | off | coffee_break(coffee_machine_0) | 333 to 344 | unmodelled | retraction at 345 (none(leader_inadequate)) |
+| s15_10 | on | deliver_item(item_4) | 263 | ac_activation(ac_switch_0) (complete: pinned) | the human starts it at 264 |
+| s15_10 | on | coffee_break(coffee_machine_0) | 322 to 344 | unmodelled | retraction at 345 (none(leader_inadequate)) |
+| s15_11 | off | coffee_break(coffee_machine_0) | 399 to 410 | unmodelled | retraction at 411 (none(leader_inadequate)) |
+| s15_11 | on | deliver_item(item_2) | 94 | ac_activation(ac_switch_0) | retraction at 95 (none(leader_no_observation)) |
+| s15_11 | on | deliver_item(item_2) | 96 to 98 | ac_activation(ac_switch_0) | retraction at 99 (none(below_theta)) |
+| s15_11 | on | deliver_item(item_4) | 111 to 118 | ac_activation(ac_switch_0) | retraction at 119 (none(leader_inadequate)) |
+| s15_11 | on | deliver_item(item_4) | 296 | deliver_item(item_1) (complete: pinned) | the human starts it at 297 |
+| s15_11 | on | coffee_break(coffee_machine_0) | 389 to 410 | unmodelled | retraction at 411 (none(leader_inadequate)) |
+| s15_12 | off | coffee_break(coffee_machine_0) | 383 to 394 | unmodelled | retraction at 395 (none(leader_inadequate)) |
+| s15_12 | on | deliver_item(item_2) | 96 to 108 | ac_activation(ac_switch_0) | retraction at 109 (none(leader_inadequate)) |
+| s15_12 | on | deliver_item(item_4) | 278 | deliver_item(item_1) (complete: pinned) | the human starts it at 279 |
+| s15_12 | on | coffee_break(coffee_machine_0) | 373 to 394 | unmodelled | retraction at 395 (none(leader_inadequate)) |
+| s15_13 | off | deliver_item(item_2) | 123 to 130 | ac_activation(ac_switch_0) | retraction at 131 (none(leader_inadequate)) |
+| s15_13 | off | coffee_break(coffee_machine_0) | 411 to 422 | unmodelled | retraction at 423 (none(leader_inadequate)) |
+| s15_13 | on | deliver_item(item_2) | 123 to 130 | ac_activation(ac_switch_0) | retraction at 131 (none(leader_inadequate)) |
+| s15_13 | on | deliver_item(item_4) | 308 | deliver_item(item_1) (complete: pinned) | the human starts it at 309 |
+| s15_13 | on | coffee_break(coffee_machine_0) | 401 to 422 | unmodelled | retraction at 423 (none(leader_inadequate)) |
+| s15_14 | off | coffee_break(coffee_machine_0) | 379 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_14 | on | deliver_item(item_4) | 276 | deliver_item(item_1) (complete: pinned) | the human starts it at 277 |
+| s15_14 | on | coffee_break(coffee_machine_0) | 369 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_15 | off | coffee_break(coffee_machine_0) | 379 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_15 | on | deliver_item(item_4) | 276 | deliver_item(item_1) (complete: pinned) | the human starts it at 277 |
+| s15_15 | on | coffee_break(coffee_machine_0) | 369 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_16 | off | coffee_break(coffee_machine_0) | 379 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_16 | on | deliver_item(item_4) | 276 | deliver_item(item_1) (complete: pinned) | the human starts it at 277 |
+| s15_16 | on | coffee_break(coffee_machine_0) | 369 to 390 | unmodelled | retraction at 391 (none(leader_inadequate)) |
+| s15_17 | off | coffee_break(coffee_machine_0) | 367 to 378 | unmodelled | retraction at 379 (none(leader_inadequate)) |
+| s15_17 | on | none | - | - | - |
+| s15_18 | off | coffee_break(coffee_machine_0) | 319 to 330 | unmodelled | retraction at 331 (none(leader_inadequate)) |
+| s15_18 | on | none | - | - | - |
+| s15_19 | off | coffee_break(coffee_machine_0) | 333 to 344 | unmodelled | retraction at 345 (none(leader_inadequate)) |
+| s15_19 | on | deliver_item(item_4) | 216 to 261 | deliver_item(item_1) (complete: pinned), ac_activation(ac_switch_0) | retraction at 262 (none(leader_no_observation)) |
+| s15_19 | on | deliver_item(item_4) | 263 | ac_activation(ac_switch_0) (complete: pinned) | the human starts it at 264 |
+| s15_19 | on | coffee_break(coffee_machine_0) | 322 to 344 | unmodelled | retraction at 345 (none(leader_inadequate)) |
+| s15_20 | off | coffee_break(coffee_machine_0) | 333 to 344 | unmodelled | retraction at 345 (none(leader_inadequate)) |
+| s15_20 | on | coffee_break(coffee_machine_0) | 322 to 344 | unmodelled | retraction at 345 (none(leader_inadequate)) |
+| s15_21 | off | none | - | - | - |
+| s15_21 | on | deliver_item(item_4) | 216 | deliver_item(item_1) (complete: pinned) | the human starts it at 217 |

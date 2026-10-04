@@ -36,7 +36,9 @@ def model_for(layout, scenario):
     return SimModel(scenario=cfg, register_fn=register_kitting_domain,
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][layout],
-                    setup_path=domain_config["setups"][cfg.setup], assignment_knowledge=False, context_knowledge=False)
+                    setup_path=domain_config["setups"][cfg.setup],
+                    timeline_declarations=domain_config["timeline_facts"],   # a setup may state a timeline (AM40)
+                    assignment_knowledge=False, context_knowledge=False)
 
 
 def test_every_registered_scenario_loads():

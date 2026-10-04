@@ -44,5 +44,12 @@
       ],
       "notes": "T-K part 1, round 1 (env_layout_15): on shelf_4, designated to the one kitting table."
     }
+  ],
+  "timeline": [
+    {
+      "fact": "break_time",
+      "from": 178,
+      "until": 300
+    }
   ]
 }

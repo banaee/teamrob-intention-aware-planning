@@ -14,6 +14,7 @@ Run from the repo root:  PYTHONHASHSEED=0 python -m pytest tests/test_tk_prior.p
 """
 
 import ast
+import dataclasses
 import math
 import sys
 from pathlib import Path
@@ -26,7 +27,7 @@ sys.path.insert(0, str(ROOT / "mesa_sim"))
 
 from shared.knowledge import Condition, ContextKnowledge, ForeseeableKnowledge, Strength, TaskModel, TimelineFact
 from shared.recognizer import build_hypothesis_space, context_prior, IntentionRecognizer
-from shared.types import Const, Predicate, StrengthLevel
+from shared.types import Const, Predicate, StrengthLevel, Timeline
 from domains.kitting import facts
 from domains.kitting.registry import domain_config as kitting, register_kitting_domain
 from domains.kitting.tasks import ac_activation, coffee_break, deliver_item
@@ -183,7 +184,8 @@ def test_the_belief_is_the_prior_times_the_evidence_normalised():
 
 def test_the_recency_fact_holds_on_exactly_90_ticks_from_the_observed_completion():
     sid = "scenario_s15_02"                     # round 1: the coffee break completes at 139 (its README)
-    cfg = kitting["scenarios"][sid]
+    # its timeline stated empty: the setup's default break_time (step 4) would raise the level from 229
+    cfg = dataclasses.replace(kitting["scenarios"][sid], timeline=Timeline(()))
     m = SimModel(scenario=cfg, register_fn=register_kitting_domain, task_model_schemas=kitting["task_model"],
                  layout_path=kitting["layouts"]["env_layout_17"], setup_path=kitting["setups"][cfg.setup],
                  state_declarations=kitting["states"], timeline_declarations=kitting["timeline_facts"],
