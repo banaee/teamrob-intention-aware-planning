@@ -193,7 +193,7 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 67 to 96 | deliver_item(item_2) | none(below_theta) |
 | 97 to 121 | deliver_item(item_2) | clears |
 | 122 to 122 | deliver_item(item_2) | none(leader_no_observation) |
-| 123 to 130 | deliver_item(item_2) | clears |
+| 123 to 130 | deliver_item(item_2) | none(leader_unwarranted) |
 | 131 to 146 | deliver_item(item_2) | none(leader_inadequate) |
 | 147 to 149 | deliver_item(item_2) | none(below_theta) |
 | 150 to 153 | ac_activation(ac_switch_0) | none(below_theta) |

@@ -191,3 +191,5 @@ d7035dd3b18639cfe78e00d688091982  runs/env_layout_04_scenario_s06_19_on.rec
 The gate compares θ with the leader's belief over the live hypotheses since T-K part 1's build stage 2 (AM42,
 91774ce); the expectations, outputs and reports here were made with the reported distribution's value. They are stale
 until dock_loading's step of T-K part 1 measures them again (AM55, AM57); the build does not rerun this set.
+
+STALE ALSO for the gate rulings (4 October 2026; design_records.md, "T-K", THE GATE RULINGS, BUILT): AM67 (no admission on commitment warrant) and AM68 (the outranked refusal) change the gate; this set is measured again in dock_loading's step (step 6), with the instruments of the build's stage 4.

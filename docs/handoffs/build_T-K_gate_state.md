@@ -8,6 +8,9 @@ knowledge on (the plan's section 8) are not in this session.
 
 ## Status
 
+THE BUILD IS COMPLETE (stage 5 committed). Next, a separate step: the measurements with context knowledge on (the
+plan's section 8).
+
 | stage | commits | check |
 |---|---|---|
 | (rulings) | 3a4f00b | D1 to D7 recorded, the plan approved |
@@ -15,7 +18,8 @@ knowledge on (the plan's section 8) are not in this session.
 | 1 | 2c939a5 | passed: 1298 output files identical to B0 after dropping `[IR-rank]` lines (logs, .rec, every instrument output); 54,816 `[IR-rank]` lines; the leader never outranked on 50,734 ticks (context off, F7); 359 tests |
 | 2 | 02956ba | passed: 1298 output files byte-identical to stage 1 (context knowledge off: AM68 refuses nothing, F7); 365 tests |
 | 3 | 725d673 | passed: 153 logs as predicted (17 maintained and 6 MPB logs first differ on their commitment-only admission's tick; the rest identical with `warrant=commitment,observation` read as `warrant=observation`); every .rec identical; IRB gate column 7 ticks in 5 runs, round 1 41 in 6 (clears to unwarranted, nothing else); every MPB property holds; the old oracles' disagreements are those ticks and the warrant text (stage 4); 363 tests |
-| 4 | (this commit) | passed: every log identical to stage 3; IRB (17) and round 1 (31): 0 disagreements with the oracle (s14_02's known print-precision flag apart), 972 rank cells undetermined and skipped (exact ties), no gate undetermined; MPB (16 x 2 strategies): 0 disagreements on parts 1 to 3, no chain stop, every declared property holds; the prior-off appendix runs; 365 tests |
+| 4 | 8357b74 | passed: every log identical to stage 3; IRB (17) and round 1 (31): 0 disagreements with the oracle (s14_02's known print-precision flag apart), 972 rank cells undetermined and skipped (exact ties), no gate undetermined; MPB (16 x 2 strategies): 0 disagreements on parts 1 to 3, no chain stop, every declared property holds; the prior-off appendix runs; 365 tests |
+| 5 | (this commit) | the records: outputs regenerated in the repository (stage 4's scope); the four sets' README sections (17 logs moved, completion, [sep] and F1's classes unchanged); the IRB, round 1 and MPB README sections; coverage.md (B5, B7, B12); BUILT lines; the handoff, CLAUDE.md |
 
 ## Where the outputs lie
 

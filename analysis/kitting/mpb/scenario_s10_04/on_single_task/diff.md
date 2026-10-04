@@ -16,7 +16,7 @@ Horizon: ticks 0 to 280 (the first observed completion point + 30, capped at the
 
 ## Decisions
 
-Part 1, decisions other than no_current_task: 13 expected, 13 actual. Parts 2 and 3 compared at 18 decisions present on both sides. The log: 18 decisions checked.
+Part 1, decisions other than no_current_task: 10 expected, 10 actual. Parts 2 and 3 compared at 15 decisions present on both sides. The log: 15 decisions checked.
 
 Disagreements: 0
 

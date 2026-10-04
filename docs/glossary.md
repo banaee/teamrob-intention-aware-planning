@@ -431,6 +431,7 @@ RULED, NOT BUILT (T-K part 1, AM67, AM68, Hadi, 4 October 2026): admission requi
 hypothesis (commitment warrant alone no longer admits), and the gate refuses a leader that the evidence alone ranks
 below another live hypothesis (rank only, a tie passes, by exact comparison; the leader is **outranked**, §7). Neither is asked for the end
 of an admission (AM69). design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM67, AM68.
+BUILT (the gate rulings' build, 4 October 2026; design_records.md, "T-K", THE GATE RULINGS, BUILT).
 
 **β, u, ρ** — β the tolerance on wasted path in the movement likelihood (0.01 /cm, supplied by the
 body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, not a measure of unmodelled
@@ -1220,7 +1221,7 @@ completion of the hypothesis's previous step in this episode (the completion E8 
 without a movement target (`pick_up`, `place`, `wait_at`). Reset with the origins, at a boundary and at a phase change.
 Reported by the recognizer per live hypothesis on `BeliefState`, printed `warrant=none|observation` on `[IR]`.
 → the same entry, AD1, AD2, AD4.
-RULED, NOT BUILT (AM67, 4 October 2026): required at admission for every hypothesis, assigned or foreseeable.
+RULED (AM67, 4 October 2026): required at admission for every hypothesis, assigned or foreseeable. BUILT (725d673).
 
 **commitment warrant** — the hypothesis is one of the observed human's assigned tasks (prior on), matched by task
 equality (`same_task`) as the support restriction matches them. Not reset: it derives from the assigned tasks, which
@@ -1239,7 +1240,8 @@ accumulated in the present episode over the live hypotheses, without the **prior
 tolerance (AM75); no constant, no margin. The recognizer reports one category per live hypothesis (outranked or not,
 AM76); the gate reads it for the leader only and refuses an outranked leader (AM68; the refusal reason
 `none(leader_outranked)`), at admission only, never as the end of an admission (AM69). With context knowledge off the
-prior is equal and the belief's leader is never outranked. Neither adequacy nor warrant. Ruled, not built.
+prior is equal and the belief's leader is never outranked. Neither adequacy nor warrant. BUILT (the gate rulings' build, 4 October 2026): `EvidenceRank`,
+`BeliefState.evidence_rank`, the `[IR-rank]` line; `GateOutcome.LEADER_OUTRANKED`.
 → design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM68, AM73, AM75, AM76.
 
 **unresolved** — the value of the **adequacy finding** while no live hypothesis is a member of the test: no live

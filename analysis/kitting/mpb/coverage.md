@@ -98,13 +98,14 @@ Reachable by timing alone; covered by A1 and A2.
 | B2 θ passed, no observation | s10_04 133 (S, F) | verified |
 | B3 θ passed, adequacy failed | s10_09 60 (S, F); at `no_current_task`, s10_09 67 (S), s10_07 116 (F) | verified |
 | B4 θ and adequacy passed, warrant failed | s10_05 127 (S, F) | verified |
-| B5 clears by commitment only | s10_04 134 (S, F) | verified |
+| B5 clears by commitment only | s10_04 134 (S, F) until the gate rulings' build | **unreachable** by ruling (AM67, below) |
 | B6 clears by observation only | s10_01 126 (S, F) | verified |
-| B7 clears by both | s10_01 25 (S, F) | verified |
+| B7 clears by both | s10_01 25 (S, F) | not a distinct path since AM67 (below): the instance clears by observation, B6 |
 | B8 entered with a refusal | none | **unreachable** by construction |
 | B9 `projection_expired` with the gate clearing | none | **unreachable** by construction |
 | B10 retraction with the gate clearing | none | **unreachable** by construction |
 | B11 replaced with the new leader admitted on the same tick | none | **unreachable** in scope (derivation B11) |
+| B12 θ, adequacy and warrant passed, the leader outranked (`none(leader_outranked)`) | with context knowledge off none; with it on, claimed from step 5's scenarios (predicted: scenario_s16_03 and s16_05 at 0) | **unreachable** off by construction; **claimed** on (D4), its instance verified in the measurement step |
 
 **B8 to B10.** C3: entered fires only when no record stands and the gate clears. C2 and C3: with a fallback recorded,
 a clearing gate fires entered, which precedes the expiry on the tick, so the expiry never meets a clearing gate. C3:
@@ -265,3 +266,33 @@ CLOSED (part (v) and the close-out, 30 September 2026; objection 1 read as class
 class-2 correction"; no longer provisional): all five are verified (zero disagreements on parts 1 to 3 under both strategies,
 prior on; every declared part-4 property under single_task). Every row is now verified (36), unreachable with a
 derivation (5), out of coverage with a reason (4), reachable and not claimed (1, P3) or not a distinct path (1).
+
+## The gate rulings (T-K part 1, AM67, AM68; the build, 4 October 2026)
+
+Ruled by Hadi on the build's plan (D4, docs/handoffs/plan_T-K_gate.md; design_records.md, "T-K", THE GATE'S BUILD PLAN,
+RULED): the matrix stays the matrix of the setting with context knowledge off, with one added row for the outranked
+refusal, claimed with context knowledge on from step 5's existing scenarios; no new scenario. It closes the open
+question on the coverage matrix.
+- **B5, unreachable by ruling.** AM67: commitment warrant admits nothing, so no admission clears by commitment alone.
+  Its instance, scenario_s10_04 at 134, is refused `none(leader_unwarranted)` since the build's stage 3 (a tick with
+  no trigger: the entering side needs a clearing gate); the delivery is admitted at 140 (entered, observation).
+- **B7, not a distinct path.** With commitment deciding nothing, "clears by both" decides as "clears by observation"
+  (B6); its instance (s10_01 25) is kept, now printed `warrant=observation`.
+- **B12, the outranked refusal (AM68, asked last, D1).** With context knowledge off the belief is the evidence, so the
+  leader is never outranked: unreachable by construction (the build's stage 2: 1298 outputs byte-identical). With it
+  on, claimed (D4): step 5's scenario_s16_03 and s16_05 are predicted to refuse their tick-0 admission
+  `none(leader_outranked)` at a `no_current_task` decision (plan, section 4); the instance is verified when the
+  measurement step reruns step 5.
+- **E7** stays out of coverage; AD3's derivation reads "a lone delivery admitted on its first step" (no admission on
+  commitment, AM67).
+- **The alteration test.** C1 (commitment warrant ignored) is retired: AM67 made it the rule. C4 to C6 (the outranked
+  condition not asked; a tie refused; the rank read from the belief) cannot be detected on these sixteen by
+  construction, with context knowledge off: a property of this set (D6). They run on step 5's six only.
+- Re-measured on the sixteen at the build (both strategies, prior on): every other row's instance unchanged (the three
+  runs that move, s10_04, s10_11 and s12_02, move from 134 / 136, after every instance they hold except B5's); every
+  declared property holds; 0 disagreements on parts 1 to 3.
+
+Counts since the build: verified 34 (B5 unreachable, B7 not a distinct path); unreachable, with a derivation 6 (B5 by
+ruling added); out of coverage 4; reachable and not claimed 1 (E8); not a distinct path 2 (A9, B7); B12 unreachable
+with context knowledge off and claimed with it on.
+

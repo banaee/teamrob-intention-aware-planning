@@ -162,7 +162,7 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 89 to 137 | deliver_item(item_2) | none(below_theta) |
 | 138 to 178 | deliver_item(item_2) | clears |
 | 179 to 179 | deliver_item(item_2) | none(leader_no_observation) |
-| 180 to 187 | deliver_item(item_2) | clears |
+| 180 to 187 | deliver_item(item_2) | none(leader_unwarranted) |
 | 188 to 219 | deliver_item(item_2) | none(leader_inadequate) |
 | 220 to 224 | deliver_item(item_2) | none(below_theta) |
 | 225 to 230 | coffee_break(coffee_machine_0) | none(below_theta) |

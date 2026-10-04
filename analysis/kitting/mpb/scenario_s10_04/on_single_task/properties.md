@@ -28,8 +28,5 @@ None declared.
 | 75 | recognition_changed | entered | clears | coffee_break(?coffee_machine=coffee_machine_0) | admitted coffee_break(?coffee_machine=coffee_machine_0) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 110 | no_current_task |  | clears | coffee_break(?coffee_machine=coffee_machine_0) | admitted coffee_break(?coffee_machine=coffee_machine_0) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 133 | recognition_changed | replaced | none(leader_no_observation) | deliver_item(?item=item_2) | fallback standing k=31 end=165.00 | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
-| 134 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
-| 135 | recognition_changed | replaced | none(below_theta) | coffee_break(?coffee_machine=coffee_machine_0) | fallback moving k=1 end=137.00 | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
-| 137 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=3 end=141.00 | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 140 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 163 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | None | 0 |

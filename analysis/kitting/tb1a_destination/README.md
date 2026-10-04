@@ -822,3 +822,33 @@ Commands: `bash analysis/kitting/tb1a_destination/sweep.sh analysis/kitting/tb1a
 | env_layout_06_scenario_s03_06_off | 1e640f5f953e49a7185e393e06bcfc68 | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
 | env_layout_07_scenario_s05_01_off | e00487f9706f711a493d2ab6b1b42486 | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
 | env_layout_07_scenario_s05_02_off | e0ced6fa3c51058ad99ba5dcae7d2634 | a3927888957766c7da70eea660062fd5 | 218 | 50.00 (57) | 0 | 0 | 0 |
+
+## The gate rulings (T-K part 1, AM67 and AM68; the build's stage 5, 4 October 2026) — the logs from here on
+
+Regenerated at 8357b74 (the build's stage 4; design_records.md, "T-K", THE GATE RULINGS, BUILT; the plan,
+docs/handoffs/plan_T-K_gate.md). Against the section above (its logs byte-identical at 3a4f00b, the build's B0):
+- named lines: every tick that logs `[IR]` gains an `[IR-rank] step=N rank=[...]` line after it (stage 1, AM76); an
+  admission line `[meta-proj] ... projection=built warrant=commitment,observation` reads `warrant=observation` (stage 3, D2);
+- behaviour (stage 3, AM67): the logs below change from the tick of their admission on commitment warrant alone (`warrant=commitment`), which the gate now refuses `none(leader_unwarranted)`; the delivery is admitted when its observation warrant comes: env_layout_01_scenario_s01_01_on from 79; env_layout_03_scenario_s03_01_on from 55; env_layout_04_scenario_s01_06_on from 75. Every other log is identical after the named lines;
+- AM68 (stage 2) moves nothing: with context knowledge off the leader is never outranked.
+The `.rec` streams are byte-identical to the section above. Completion, the `[sep]` minima and F1's classes: unchanged in every log.
+Commands: `bash analysis/kitting/tb1a_destination/sweep.sh analysis/kitting/tb1a_destination/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1a_destination/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_01_scenario_s01_01_on | a51eae477c16d37f02454042cbefcf4a | e75eaa192f7071498290d6255fc81320 | 174 | 45.74 (156) | 0 | 3 | 0 |
+| env_layout_02_scenario_s02_01_on | c7ba9e7d4ac6b8ba285c4ae4077e4841 | e7b6f87c8caf8abd75112060de0d297e | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_on | 05fb7707e92007f8b524ae625dd96caf | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_04_scenario_s01_06_on | d80763c40f350624f4f49d7a8e063d54 | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_on | 225c30b066550fa9d6fd5ae792596322 | 5b5d7e333ea858a7d09a4d0a0fca2891 | 379 | 59.89 (338) | 0 | 0 | 0 |
+| env_layout_06_scenario_s03_06_on | 16794cc81029677e20fcbf12f0b0402f | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_on | 5f361aaa6aba4d4395586030005f8579 | a3927888957766c7da70eea660062fd5 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_on | 3b46ca7c12efcfd0e8bbbfccdbc774b8 | a3927888957766c7da70eea660062fd5 | 214 | 50.00 (57) | 0 | 0 | 0 |
+| env_layout_01_scenario_s01_01_off | b36636cc0c2e7400fd45387207675f17 | e75eaa192f7071498290d6255fc81320 | 199 | 72.61 (166) | 0 | 0 | 0 |
+| env_layout_02_scenario_s02_01_off | 5ba46de23adc438d1ecde67be4642f28 | e7b6f87c8caf8abd75112060de0d297e | 422 | 30.87 (73) | 0 | 4 | 3 |
+| env_layout_03_scenario_s03_01_off | 0d992fd9eb70d2e22894c04da4c2565f | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_04_scenario_s01_06_off | 37a1cb641c4331eaeaf1d74712dc9b6e | 1a3e9ae88e4e22340a99dc43a3799ef0 | 174 | 5.23 (147) | 0 | 4 | 1 |
+| env_layout_05_scenario_s04_01_off | 6f9337cb19bf601439ade79bd8f4408f | 5b5d7e333ea858a7d09a4d0a0fca2891 | 392 | 64.96 (341) | 0 | 0 | 0 |
+| env_layout_06_scenario_s03_06_off | 5594796d25746df49b17f321be45389f | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_off | 43cc750d841df40cf414bfebfbfc6610 | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_02_off | c19b5b12b7d1c5b2ddbf77cce7fac03e | a3927888957766c7da70eea660062fd5 | 218 | 50.00 (57) | 0 | 0 | 0 |

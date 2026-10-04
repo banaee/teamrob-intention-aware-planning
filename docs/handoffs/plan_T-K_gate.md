@@ -2,7 +2,8 @@
 
 Written by ccode, 4 October 2026 (BUILD DISCIPLINE, step 1: plan only, no code). Status: APPROVED (Hadi, 4 October
 2026), with the rulings on D1 to D7 (section 7, each marked RULED; design_records.md, "T-K", THE GATE'S BUILD PLAN,
-RULED). Every build session reads this file first.
+RULED). Every build session reads this file first. BUILT (4 October 2026; design_records.md, "T-K", THE GATE
+RULINGS, BUILT; the state file docs/handoffs/build_T-K_gate_state.md).
 
 What is built: AM67 (observation warrant is required at admission, for every hypothesis; commitment warrant alone no
 longer admits) and AM68 (the gate refuses an outranked leader, as a condition of admission only), with AM73 (the term

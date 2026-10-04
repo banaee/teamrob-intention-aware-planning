@@ -583,3 +583,21 @@ Commands: `bash analysis/kitting/tb1b_two_tables/sweep.sh analysis/kitting/tb1b_
 | env_layout_08_scenario_s06_02_on | b3a85c2d0410924c19c7064c726deb31 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_01_off | 581a076ae2cd1fab484bb404d26ad985 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_02_off | 676defd1b29c6481e6d458f55a8bc0e9 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+
+## The gate rulings (T-K part 1, AM67 and AM68; the build's stage 5, 4 October 2026) — the logs from here on
+
+Regenerated at 8357b74 (the build's stage 4; design_records.md, "T-K", THE GATE RULINGS, BUILT; the plan,
+docs/handoffs/plan_T-K_gate.md). Against the section above (its logs byte-identical at 3a4f00b, the build's B0):
+- named lines: every tick that logs `[IR]` gains an `[IR-rank] step=N rank=[...]` line after it (stage 1, AM76); an
+  admission line `[meta-proj] ... projection=built warrant=commitment,observation` reads `warrant=observation` (stage 3, D2);
+- behaviour (stage 3, AM67): the logs below change from the tick of their admission on commitment warrant alone (`warrant=commitment`), which the gate now refuses `none(leader_unwarranted)`; the delivery is admitted when its observation warrant comes: env_layout_08_scenario_s06_01_on from 54; env_layout_08_scenario_s06_02_on from 71. Every other log is identical after the named lines;
+- AM68 (stage 2) moves nothing: with context knowledge off the leader is never outranked.
+The `.rec` streams are byte-identical to the section above. Completion, the `[sep]` minima and F1's classes: unchanged in every log.
+Commands: `bash analysis/kitting/tb1b_two_tables/sweep.sh analysis/kitting/tb1b_two_tables/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1b_two_tables/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_on | b2d5cd46c68837e8a212444ae6cfff25 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_on | 75d74b93eb0ce0fb8f85b6cc596c576d | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_off | 6efe6577d486fb8bc38d41ec63efebb6 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_off | 1cd8f13142c67f133f95f0310a3bd271 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |

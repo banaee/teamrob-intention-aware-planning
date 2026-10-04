@@ -137,7 +137,7 @@ The belief sums to 1 over the live hypotheses. There is no share for "none of th
 
 ## 8. The gate
 
-The meta-planner admits the leading hypothesis $h^*$ when four conditions hold (as ruled on 4 October 2026, AM67 and AM68; until their build the code asks the first three, with the older third condition stated at the end of this section):
+The meta-planner admits the leading hypothesis $h^*$ when four conditions hold (as ruled on 4 October 2026, AM67 and AM68; built the same day):
 
 1. $P_t(h^*) \ge \theta$, with $\theta = 0.75$. $P_t$ is the belief over the live hypotheses of section 7, with context knowledge on or off; the floor and the scaling by the pinned hypotheses stay in the reported distribution only (AM42).
 2. It is adequate: the observed movement does not contradict it. A hypothesis turns inadequate after about 334 cm of excess path, or after 17 ticks of standing.
@@ -148,7 +148,7 @@ What context knowledge can do at the gate: make an admission earlier, by bringin
 
 An admission ends as before (AM69; T-D L): on a change of leader, an episode boundary, or the admitted hypothesis turning inadequate. Conditions 3 and 4 are not asked while an admission stands.
 
-As built until AM67 and AM68 are built: the third condition reads "it is warranted": an assigned task has commitment warrant, from the assignment, and can be admitted before any distinguishing movement; a foreseeable task needs observation warrant. The fourth condition is not asked.
+Built (4 October 2026; the gate rulings' build): the four conditions as stated. Before it, the third condition read "it is warranted": an assigned task had commitment warrant and could be admitted before any distinguishing movement; the fourth was not asked.
 
 ## 9. The procedure in four steps
 

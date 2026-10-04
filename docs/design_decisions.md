@@ -4459,6 +4459,7 @@ every boundary that meets a recorded decision (TODO-119's G part).
   observation warrant there" now holds in both settings. Unchanged: observation warrant, its two sources and its reset;
   AD3. AM68 adds a condition of admission: the gate refuses a leader that the evidence alone ranks below another live
   hypothesis (rank only, a tie passes).
+  BUILT (the gate rulings' build, stages 2 and 3, 4 October 2026; 02956ba, 725d673).
 
 - AD2, three outputs.
   Ruling. Warrant is a third independent dimension beside belief and adequacy; R3 is amended from two independent
@@ -5325,6 +5326,8 @@ reason as ccode corrected it, accepted. Not built.
   one category per live hypothesis. The gate reads it for the leader only, as it reads hypothesis adequacy and
   observation warrant. Reason: the gate reconstructs no recognizer quantity and receives no raw value ("T-D G:
   admission", AD2; G1).
+
+  BUILT (the gate rulings' build, 4 October 2026; design_records.md, "T-K", THE GATE RULINGS, BUILT; 2c939a5, 02956ba, 725d673, 8357b74): AM67, AM68, AM73, AM75, AM76 as ruled, with D1 to D7. "Not built" above reads: built.
 
   RULED (AM69, Hadi, 4 October 2026), the end of an admission: the rule on when an admission ends ("T-D L: the belief
   lifecycle"; D2) is unchanged. An admission that was correct when made stays until the retraction, as today. This is a

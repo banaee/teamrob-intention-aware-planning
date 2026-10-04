@@ -648,3 +648,25 @@ Commands: `bash analysis/kitting/tb1c_realized_flip/sweep.sh analysis/kitting/tb
 | env_layout_08_scenario_s06_01_realized_off | ff4785fa7a93d86d81b5f0e81ad50990 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_plain_off | c5a9c52003d5ab93a13d74639e6016ff | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
 | env_layout_08_scenario_s06_03_realized_off | 30facb4519327e2457ee1666a46ce647 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+
+## The gate rulings (T-K part 1, AM67 and AM68; the build's stage 5, 4 October 2026) — the logs from here on
+
+Regenerated at 8357b74 (the build's stage 4; design_records.md, "T-K", THE GATE RULINGS, BUILT; the plan,
+docs/handoffs/plan_T-K_gate.md). Against the section above (its logs byte-identical at 3a4f00b, the build's B0):
+- named lines: every tick that logs `[IR]` gains an `[IR-rank] step=N rank=[...]` line after it (stage 1, AM76); an
+  admission line `[meta-proj] ... projection=built warrant=commitment,observation` reads `warrant=observation` (stage 3, D2);
+- behaviour (stage 3, AM67): the logs below change from the tick of their admission on commitment warrant alone (`warrant=commitment`), which the gate now refuses `none(leader_unwarranted)`; the delivery is admitted when its observation warrant comes: env_layout_08_scenario_s06_01_plain_on from 54; env_layout_08_scenario_s06_01_realized_on from 54; env_layout_08_scenario_s06_03_plain_on from 97; env_layout_08_scenario_s06_03_realized_on from 97. Every other log is identical after the named lines;
+- AM68 (stage 2) moves nothing: with context knowledge off the leader is never outranked.
+The `.rec` streams are byte-identical to the section above. Completion, the `[sep]` minima and F1's classes: unchanged in every log.
+Commands: `bash analysis/kitting/tb1c_realized_flip/sweep.sh analysis/kitting/tb1c_realized_flip/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb1c_realized_flip/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_08_scenario_s06_01_plain_on | 3c17599317cc6d89d8c1137d5d4db615 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_on | bcb731d9683efca43c656fdd0d06aea9 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_on | a0a48082cfc055f521fcb72fca3337dc | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_on | 006016099918c594b71b60a8b0d44e78 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_plain_off | 25e30de6143e5d812d07700d0fe109b0 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_realized_off | faa7ec4685b146b62c9c5ab115576254 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_plain_off | 4201be520d3cdff189077fdce7ccdefb | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
+| env_layout_08_scenario_s06_03_realized_off | e414031865be587bd6f2cb2e1e20e024 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |

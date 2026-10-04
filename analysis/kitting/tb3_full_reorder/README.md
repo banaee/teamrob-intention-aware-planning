@@ -762,3 +762,37 @@ Commands: `bash analysis/kitting/tb3_full_reorder/sweep.sh analysis/kitting/tb3_
 | env_layout_08_scenario_s06_02_single_task_off | 676defd1b29c6481e6d458f55a8bc0e9 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_full_reorder_off | 30facb4519327e2457ee1666a46ce647 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_single_task_off | d02ce3dc6f2852a0c42640e5487bdbaa | c9c444622f25d15abfd849fc495db540 | 314 | 68.41 (264) | 0 | 0 | 0 |
+
+## The gate rulings (T-K part 1, AM67 and AM68; the build's stage 5, 4 October 2026) — the logs from here on
+
+Regenerated at 8357b74 (the build's stage 4; design_records.md, "T-K", THE GATE RULINGS, BUILT; the plan,
+docs/handoffs/plan_T-K_gate.md). Against the section above (its logs byte-identical at 3a4f00b, the build's B0):
+- named lines: every tick that logs `[IR]` gains an `[IR-rank] step=N rank=[...]` line after it (stage 1, AM76); an
+  admission line `[meta-proj] ... projection=built warrant=commitment,observation` reads `warrant=observation` (stage 3, D2);
+- behaviour (stage 3, AM67): the logs below change from the tick of their admission on commitment warrant alone (`warrant=commitment`), which the gate now refuses `none(leader_unwarranted)`; the delivery is admitted when its observation warrant comes: env_layout_03_scenario_s03_01_full_reorder_on from 55; env_layout_03_scenario_s03_01_single_task_on from 55; env_layout_08_scenario_s06_01_full_reorder_on from 54; env_layout_08_scenario_s06_01_single_task_on from 54; env_layout_08_scenario_s06_02_full_reorder_on from 71; env_layout_08_scenario_s06_02_single_task_on from 71; env_layout_08_scenario_s06_03_full_reorder_on from 97; env_layout_08_scenario_s06_03_single_task_on from 97. Every other log is identical after the named lines;
+- AM68 (stage 2) moves nothing: with context knowledge off the leader is never outranked.
+The `.rec` streams are byte-identical to the section above. Completion, the `[sep]` minima and F1's classes: unchanged in every log.
+Commands: `bash analysis/kitting/tb3_full_reorder/sweep.sh analysis/kitting/tb3_full_reorder/sweep`; `analysis/instruments/common/sep_classes.py analysis/kitting/tb3_full_reorder/sweep`.
+
+| log | md5 (.log) | md5 (.rec) | completion | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_on | 67ba500180d3ac7adbf44e437e542b28 | 515647f63e1b047aab15b0dc0ac91d08 | 221 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_on | 05fb7707e92007f8b524ae625dd96caf | 515647f63e1b047aab15b0dc0ac91d08 | 238 | 60.15 (58) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_full_reorder_on | 463cf9fd91a9a1a64b1feb7161ce6845 | a3927888957766c7da70eea660062fd5 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_on | 5f361aaa6aba4d4395586030005f8579 | a3927888957766c7da70eea660062fd5 | 194 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_on | bcb731d9683efca43c656fdd0d06aea9 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_on | b2d5cd46c68837e8a212444ae6cfff25 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_on | d19412810ac51edaf3a34ff2c2e49777 | 329590c9c1249859bfe20d107588c50a | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_on | 75d74b93eb0ce0fb8f85b6cc596c576d | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_on | 006016099918c594b71b60a8b0d44e78 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_on | 038432445e1d94e2ec21a2cbb934ed21 | c9c444622f25d15abfd849fc495db540 | 272 | 28.69 (246) | 0 | 3 | 1 |
+| env_layout_03_scenario_s03_01_full_reorder_off | 3a54629314b0f4fc9c982fa1a3b0f6d3 | 515647f63e1b047aab15b0dc0ac91d08 | 265 | 90.84 (125) | 0 | 0 | 0 |
+| env_layout_03_scenario_s03_01_single_task_off | 0d992fd9eb70d2e22894c04da4c2565f | 515647f63e1b047aab15b0dc0ac91d08 | 266 | 48.25 (57) | 1 | 0 | 1 |
+| env_layout_07_scenario_s05_01_full_reorder_off | c8f4bb39cb94b84fb9a37ad1e2cb7124 | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_07_scenario_s05_01_single_task_off | 43cc750d841df40cf414bfebfbfc6610 | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_full_reorder_off | faa7ec4685b146b62c9c5ab115576254 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_01_single_task_off | 6efe6577d486fb8bc38d41ec63efebb6 | 8cf0930761924a3aab1f1713f3f4bf29 | 265 | 153.74 (166) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_full_reorder_off | 4da22e8660f625c1508b9a79bd015097 | 329590c9c1249859bfe20d107588c50a | 224 | 346.07 (114) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_02_single_task_off | 1cd8f13142c67f133f95f0310a3bd271 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_full_reorder_off | e414031865be587bd6f2cb2e1e20e024 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+| env_layout_08_scenario_s06_03_single_task_off | 4d7114e01d552456a81691535f438b73 | c9c444622f25d15abfd849fc495db540 | 314 | 68.41 (264) | 0 | 0 | 0 |

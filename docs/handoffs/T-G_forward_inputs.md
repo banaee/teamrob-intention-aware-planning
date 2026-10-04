@@ -256,6 +256,10 @@ What remains of T-K part 1. A list; no order is decided. [open]
 - The table of 5.13, from existing outputs, if Hadi wants it. RULED (AM70): the table at other values is the
   sensitivity analysis for the close.
 - The build of AM67 and AM68, starting with a plan step in its own session (BUILD DISCIPLINE), and new measurements.
+  BUILT (4 October 2026; docs/handoffs/plan_T-K_gate.md, approved with D1 to D7; design_records.md, "T-K", THE GATE
+  RULINGS, BUILT; 2c939a5 to 8357b74 and the records commit). Next: the measurements with context knowledge on (the
+  plan's section 8), a separate step: step 5's moved properties re-declared before its runs (D5), C4 to C6 on step 5's
+  six (D6), B12's instance (D4).
 - The question on the planning set's coverage matrix (5.13, question 3). [open]
 - dock_loading's part (5.7, step 6).
 - The close (5.7, step 7), with this file updated.
@@ -814,7 +818,7 @@ Changes to the core stay minimal.
    after a correct admission (docs/assumptions.md 6.4).
 Open: the order of the remaining work; question 3 below (the planning set's coverage matrix); the build of AM67 and
 AM68, which starts with a plan step in its own session. ccode's facts for that plan: design_records.md, "T-K", THE GATE
-AFTER STEP 5B, RULED. The plan: docs/handoffs/plan_T-K_gate.md, APPROVED (Hadi, 4 October 2026, with D1 to D7;
+AFTER STEP 5B, RULED. BUILT (4 October 2026; THE GATE RULINGS, BUILT). The plan: docs/handoffs/plan_T-K_gate.md, APPROVED (Hadi, 4 October 2026, with D1 to D7;
 design_records.md, "T-K", THE GATE'S BUILD PLAN, RULED). D4 closes question 3 (the coverage matrix).
 What follows is the discussion as recorded before the ruling.
 

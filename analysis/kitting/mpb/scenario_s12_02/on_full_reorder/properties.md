@@ -1,6 +1,6 @@
 # scenario_s12_02: part 4 and the measures (full_reorder, prior on)
 
-Completion (world tick) 161; terminal decision 163. [sep] minimum 33.61 (139), continuous 32.26 (140); near-encounters 4 ticks; F1 classes {'viol': 1, 'stand': 2, 'recede': 1, '?': 0}; holds [(75, 18), (133, 30), (134, 7), (135, 2), (137, 4)] (61 ticks).
+Completion (world tick) 161; terminal decision 163. [sep] minimum 33.61 (139), continuous 32.26 (140); near-encounters 4 ticks; F1 classes {'viol': 1, 'stand': 2, 'recede': 1, '?': 0}; holds [(75, 18), (133, 30)] (48 ticks).
 
 ## Declared properties
 
@@ -29,8 +29,5 @@ Completion (world tick) 161; terminal decision 163. [sep] minimum 33.61 (139), c
 | 73 | projection_expired |  | none(below_theta) | coffee_break(?coffee_machine=coffee_machine_0) | fallback moving k=11 end=85.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
 | 75 | recognition_changed | entered | clears | coffee_break(?coffee_machine=coffee_machine_0) | admitted coffee_break(?coffee_machine=coffee_machine_0) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 18 |
 | 133 | recognition_changed | replaced | none(leader_no_observation) | deliver_item(?item=item_2) | fallback standing k=31 end=165.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 30 |
-| 134 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 7 |
-| 135 | recognition_changed | replaced | none(below_theta) | coffee_break(?coffee_machine=coffee_machine_0) | fallback moving k=1 end=137.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 2 |
-| 137 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=3 end=141.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 4 |
 | 140 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
 | 163 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | None | 0 |

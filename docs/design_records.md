@@ -3820,3 +3820,36 @@ is approved with these rulings on its decisions D1 to D7; the plan is amended to
   comparison (design_decisions.md, "T-K", R7's AM75, its consequence line).
 Open after it: the order of the remaining work. Next: the build, stages 0 to 5 of the plan, each committed after its
 check, with a pause at each stage boundary; the measurements with context knowledge on are a separate step after it.
+THE GATE RULINGS, BUILT (ccode, 4 October 2026; by the approved plan, docs/handoffs/plan_T-K_gate.md, with D1 to D7;
+the session's state file docs/handoffs/build_T-K_gate_state.md). Six commits, each after its check, a pause at each
+stage boundary.
+- Rulings on the plan: 3a4f00b. Stage 0, B0 at 3a4f00b (no commit): the scope (the four maintained sets, the IRB's s08
+  and s09, round 1, the MPB under both strategies and prior off, dock_loading's six milestones with context knowledge
+  off, pytest) byte-identical to the repository's outputs; one external copy of the untracked data,
+  /home/hadi/teamrob_analysis_2026-10-04_gate/.
+- Stage 1, 2c939a5 (AM76): `EvidenceRank`, `BeliefState.evidence_rank`, `Recognizer._evidence_rank()` from the
+  normalised evidence by exact comparison (AM75); logged on its own line `[IR-rank]` (the plan amended: a field of
+  `[IR]` would have broken the IRB instrument's parsers before stage 4). Check: 1298 outputs identical to B0 after
+  dropping the `[IR-rank]` lines; the leader never outranked on 50,734 ticks with context knowledge off.
+- Stage 2, 02956ba (AM68, D1): `none(leader_outranked)`, asked last in `_clears_gate`. Check: 1298 outputs
+  byte-identical to stage 1 (context knowledge off: nothing outranked).
+- Stage 3, 725d673 (AM67, D2): observation warrant required for every hypothesis; `WarrantSource`, `_warrant` and
+  `observed_assigned_tasks` removed from the meta-planner; `[meta-proj] projection=built warrant=observation`. Check:
+  the 17 maintained logs and the MPB's s10_04, s10_11, s12_02 (both strategies) first differ on their commitment-only
+  admission's tick, every other log identical after the warrant text; every `.rec` identical; the IRB's gate column 7
+  ticks in 5 runs, round 1's 41 in 6; no maintained completion moved; MPB full_reorder completion s10_04 137 to 139,
+  s10_11 139 to 138.
+- Stage 4, 8357b74 (the instruments): the IRB oracle's `rank` column and gate (no commitment; outranked last;
+  undetermined within its agreement level, D3), rules 23 (amended) and 34 to 36; the MPB's oracle, chain, compare and
+  Gate; the alteration test (C1 retired, C4 to C6 for step 5 only, D6). Check: every log identical to stage 3; 0
+  disagreements in the IRB's 17 and round 1's 31 (s14_02's known flag apart), 972 rank cells undetermined (exact
+  ties), no gate undetermined; 0 on parts 1 to 3 in the MPB's 32 prior-on runs; every declared property holds.
+- Stage 5, the records commit: the regenerated outputs in the repository; the maintained sets' and the test-beds'
+  README sections; coverage.md (B5 unreachable by ruling, B7 not a distinct path, B12 claimed with context knowledge
+  on); the BUILT lines in design_decisions.md, the glossary, the method document, docs/assumptions.md and the handoff.
+- Not in the build, the measurement step's (the plan's section 8): the runs with context knowledge on (steps 4, 5, 5b);
+  step 5's re-declared properties before them (D5); C4 to C6 on step 5's six (their actual files are the pre-build
+  runs until then); B12's instance.
+- ccode's decisions in the build: the `[IR-rank]` line; the MPB instrument's warrant hook at stage 3; the oracle's band
+  marks an exact tie undetermined (D3 as worded), so the exact-tie side of the rule is checked by the unit tests only;
+  the alteration engine finds a run file below configs/<domain>/mpb/; unused imports removed.

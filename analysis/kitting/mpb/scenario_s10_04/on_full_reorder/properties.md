@@ -1,6 +1,6 @@
 # scenario_s10_04: part 4 and the measures (full_reorder, prior on)
 
-Completion (world tick) 137; terminal decision 137. [sep] minimum 340.69 (59), continuous 340.69 (59); near-encounters 0 ticks; F1 classes {'viol': 0, 'stand': 0, 'recede': 0, '?': 0}; holds [] (0 ticks).
+Completion (world tick) 137; terminal decision 139. [sep] minimum 340.69 (59), continuous 340.69 (59); near-encounters 0 ticks; F1 classes {'viol': 0, 'stand': 0, 'recede': 0, '?': 0}; holds [] (0 ticks).
 
 ## Declared properties
 
@@ -28,6 +28,4 @@ None declared.
 | 75 | recognition_changed | entered | clears | coffee_break(?coffee_machine=coffee_machine_0) | admitted coffee_break(?coffee_machine=coffee_machine_0) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 116 | no_current_task |  | clears | coffee_break(?coffee_machine=coffee_machine_0) | admitted coffee_break(?coffee_machine=coffee_machine_0) | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
 | 133 | recognition_changed | replaced | none(leader_no_observation) | deliver_item(?item=item_2) | fallback standing k=31 end=165.00 | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
-| 134 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
-| 135 | recognition_changed | replaced | none(below_theta) | coffee_break(?coffee_machine=coffee_machine_0) | fallback moving k=1 end=137.00 | deliver_item(?item=item_6,?kitting_table=kitting_table_1) | 0 |
-| 137 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=3 end=141.00 | None | 0 |
+| 139 | no_current_task |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=5 end=145.00 | None | 0 |
