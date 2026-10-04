@@ -110,6 +110,25 @@ wait_at = ActionSchema(
     microactions="STAND*",
     duration_key="?duration",
 )
+# switch_on (T-K part 1, AM43): wait_at's form (standing at the entity for a stated duration, completion
+# waited(agent, entity)) with the declared effect that the switch is on, ac_on(entity). A state of the world changes
+# through a declared effect of an action (T-G A5); on wait_at the effect would also apply at the coffee machine. Called
+# by ac_activation only. The boundary's label at its completion names wait_at (TODO-179, AM56, AM63).
+switch_on = ActionSchema(
+    name="switch_on",
+    parameters=[_entity],
+    preconditions=[
+        ConditionSchema("at", (_agent, _entity)),
+    ],
+    effects=[
+        ConditionSchema("waited", (_agent, _entity)),
+        ConditionSchema("ac_on", (_entity,)),
+    ],
+    completion=ConditionSchema("waited", (_agent, _entity)),
+    microactions="STAND*",
+    duration_key="?duration",
+)
+
 # stand (T-H): standing still for a stated time, with no entity. Process
 # completion only: it emits no world fact (the body attaches no `remaining` to
 # its STANDs, so no waited(...) is recorded). The duration is in the physical

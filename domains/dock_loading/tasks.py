@@ -13,6 +13,7 @@ TASKS:
     PersonalTasks (foreseeable):
         coffee_break(?coffee_machine)                — walk to the coffee machine and wait
         office_break(?office_chair)                  — walk through the office door to the chair and wait
+        ac_activation(?ac_switch)                    — walk to the A/C switch and switch it on (T-K part 1, AM45)
     HumanOnlyTasks:
         go_to(?landmark), stand(?duration), go_to_and_stand(?landmark, ?duration)
 
@@ -34,13 +35,14 @@ rulings", B8 and B11 as amended):
 
 from shared.types import (Var, Const, ConditionSchema, ActionStep, MethodSchema,
                           WorkTask, PersonalTask, HumanOnlyTask, LANDMARK_TYPE, AREA_FACT)
-from domains.dock_loading.actions import move_to, pick_up, place, wait_at, scan_it, stand
+from domains.dock_loading.actions import move_to, pick_up, place, wait_at, switch_on, scan_it, stand
 
 _pallet = Var("?pallet")
 _delivery_bay = Var("?delivery_bay")
 _truck = Var("?truck")
 _coffee_machine = Var("?coffee_machine")
 _office_chair = Var("?office_chair")
+_ac_switch = Var("?ac_switch")
 _other = Var("?other")              # another pallet the agent may be holding when the task starts
 _other_home = Var("?other_home")    # that pallet's origin
 _agent = Var("?agent")
@@ -335,6 +337,26 @@ office_break = PersonalTask(
             steps=[
                 _go(_office_chair),
                 ActionStep(wait_at, {_entity: _office_chair, _duration: Const("PT90S")}),
+            ],
+        ),
+    ],
+)
+
+
+# T-K part 1 (AM18, AM45): the A/C switch stands only in the delivery hall, so one method, from the hall; the office
+# method is added in the step that gives a room a switch. No room of stage 1 has one: no hypothesis exists.
+ac_activation = PersonalTask(
+    name="ac_activation",
+    parameters=[_ac_switch],
+    parameter_types={"?ac_switch": "ac_switch"},
+    methods=[
+        MethodSchema(
+            name="ac_activation_hall",
+            parameters=[_ac_switch],
+            guards=[_in(HALL)],
+            steps=[
+                _go(_ac_switch),
+                ActionStep(switch_on, {_entity: _ac_switch, _duration: Const("PT2S")}),
             ],
         ),
     ],

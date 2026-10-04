@@ -19,7 +19,7 @@ from typing import Optional
 from shared.types import Const, StateDeclaration, TaskInstance, Window
 from domains.dock_loading import tasks
 
-__all__ = ["deliver_pallet", "load_return", "confirm_delivered_pallet", "coffee_break", "office_break",
+__all__ = ["deliver_pallet", "load_return", "confirm_delivered_pallet", "coffee_break", "office_break", "ac_activation",
            "go_to", "stand", "go_to_and_stand", "window"]
 
 
@@ -53,6 +53,12 @@ def confirm_delivered_pallet(pallet: str, bay: Optional[str] = None) -> TaskInst
 def coffee_break(machine: str) -> TaskInstance:
     machine_var, = tasks.coffee_break.parameters
     return TaskInstance(schema=tasks.coffee_break, bindings={machine_var: Const(machine)})
+
+
+def ac_activation(switch: str) -> TaskInstance:
+    """Switching the A/C on at `switch` (T-K part 1, AM45: from the hall only)."""
+    switch_var, = tasks.ac_activation.parameters
+    return TaskInstance(schema=tasks.ac_activation, bindings={switch_var: Const(switch)})
 
 
 def office_break(chair: str) -> TaskInstance:

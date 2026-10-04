@@ -9,7 +9,7 @@ objects they call.
 
 from shared.types import (Var, Const, ConditionSchema, ActionStep, MethodSchema,
                           WorkTask, PersonalTask, HumanOnlyTask, LANDMARK_TYPE)
-from domains.kitting.actions import pick_up, move_to, place, wait_at, stand
+from domains.kitting.actions import pick_up, move_to, place, wait_at, switch_on, stand
 
 _item      = Var("?item")
 _kitting_table = Var("?kitting_table")
@@ -107,7 +107,7 @@ ac_activation = PersonalTask(
             guards=[],
             steps=[
                 ActionStep(move_to, {_target: _ac_switch}),
-                ActionStep(wait_at, {_entity: _ac_switch, _duration: Const("PT2S")}),
+                ActionStep(switch_on, {_entity: _ac_switch, _duration: Const("PT2S")}),   # AM43
             ],
         )
     ],

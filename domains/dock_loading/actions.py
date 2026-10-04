@@ -17,6 +17,7 @@ ACTIONS:
     pick_up       — grasp a pallet (agent must be at pallet)
     place         — release a pallet at a target location (agent must be holding it)
     wait_at       — stand at an entity for a stated duration; completes on waited(agent, entity)
+    switch_on     — wait_at's form at the A/C switch, with the declared effect ac_on (T-K part 1, AM43)
     stand         — stand still for a stated duration, at no entity; process completion only
     scan_it       — touch the pallet's screen at close range (agent must be at pallet);
                     sets the declared state is_scanned (T-G A5)
@@ -106,6 +107,25 @@ wait_at = ActionSchema(
     completion=ConditionSchema("waited", (_agent, _entity)),
     microactions="STAND*",
     duration_key="?duration",   # the body reads the stated duration through it (T-H1)
+)
+
+# switch_on (T-K part 1, AM43): wait_at's form (standing at the entity for a stated duration, completion
+# waited(agent, entity)) with the declared effect that the switch is on, ac_on(entity). A state of the world changes
+# through a declared effect of an action (T-G A5); on wait_at the effect would also apply at the coffee machine. Called
+# by ac_activation only. The boundary's label at its completion names wait_at (TODO-179, AM56, AM63).
+switch_on = ActionSchema(
+    name="switch_on",
+    parameters=[_entity],
+    preconditions=[
+        ConditionSchema("at", (_agent, _entity)),
+    ],
+    effects=[
+        ConditionSchema("waited", (_agent, _entity)),
+        ConditionSchema("ac_on", (_entity,)),
+    ],
+    completion=ConditionSchema("waited", (_agent, _entity)),
+    microactions="STAND*",
+    duration_key="?duration",
 )
 
 # stand (T-H): standing still for a stated time, with no entity. Process
