@@ -557,7 +557,8 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    - The planning cases are five (KT15, Hadi, 4 October 2026; design_records.md, "T-K", THE PLANNING CASES, RULED):
      KT3's two, the early admission correct, and the early admission against the context with a coffee break and with
      the A/C. Stage 1's proposal (the set, the disjointness rule on env_layout_17, the predictions): design_records.md,
-     "T-K", STEP 5, STAGE 1: THE PROPOSAL. [ruled; the proposal open]
+     "T-K", STEP 5, STAGE 1: THE PROPOSAL; the room ruled, option (b), env_layout_18 (THE ROOM, RULED); the set:
+     STEP 5, STAGE 1, REVISED: THE SET. [ruled]
 5b. The existing sets of kitting with context knowledge on, no new authoring (Hadi, 4 October 2026; design_records.md,
    "T-K", STEP 5B, PLANNED): first the recognition set (17 scenarios on env_layout_10 and _11, the robot idle), then the
    planning set (16 scenarios on env_layout_12 to _14), read against its coverage matrix. The run files with context

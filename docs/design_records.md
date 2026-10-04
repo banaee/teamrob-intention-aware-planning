@@ -3500,3 +3500,63 @@ context knowledge on); they equal step 4's ticks once shifted to the stretch's s
   cases proposed, both needing (b): E1, a correct early admission at a turn (the robot meets the human's carry back
   from shelf_4 or the human at the shelf); E2, the lone delivery admitted early after an observed break (the recency
   fact: item_4 at 73 on both on sides against 97 off, on the walk from the machine), direction 4 reaching planning.
+
+THE ROOM, RULED (Hadi, 4 October 2026, on stage 1's proposal): option (b). A copy of env_layout_17 under a new id with
+additions for the robot only; the human's side unchanged; the disjointness rule holds. It serves KT3's "on
+env_layout_17". Reason: in the room as it is, a conflict exists only on a straight walk, where the fallback projection
+already holds the robot, so the set could show a cost of context knowledge and never a gain. Conditions: each case's
+conflict placed where the projection of the admitted task differs from the fallback projection (a turn, a stand, the
+walk back); case 4 reaches the retraction (a conflict that the retraction and the decision after it can change).
+THE STEP'S MODE AND SIZE (Hadi, 4 October 2026). ccode decides the room's additions, the scripts, the robot's tasks, the
+windows and the further cases by the conditions given, without approval, and does not wait at the stage boundaries
+(commit, the result in a few lines, the next stage); it stops only on a blocking condition (a disagreement with the
+oracle that is not a plain defect; a ruled case with no conflict; a change to a core algorithm or a ruling). The step
+is a basic check that context knowledge works through the planning chain, not a coverage set. In order: (1) the chain
+works (the held admission, the projection and the decision follow as the oracle and the reference state); (2) a gain
+where the human acts in accord with the context, one instance for the raised state (the coffee break inside
+break_time, the stand at the machine) and one with no fact (the last delivery, at a turn or on the walk back); (3) a
+cost where the human acts against it (cases 4 and 5; in case 4 what the retraction and the decision after it change).
+One script and one robot task per case; E1 and E2 only as the form a ruled case takes; at most about 8 scenarios and
+20 runs; one strategy; no variants of a window's position and no second room; the clearest instance of each point.
+The report leads with the three points.
+
+STEP 5, STAGE 1, REVISED: THE SET (ccode, 4 October 2026, by the rulings above; supersedes the set and the predictions
+of STEP 5, STAGE 1: THE PROPOSAL, whose disjointness reading and fallback finding stand). Authoring runs with context
+knowledge off; the on sides' admissions are the IRB oracle's previews (no run with context knowledge on).
+- The room env_layout_18: env_layout_17 and three robot-only objects. kitting_table_1 at (440, -450), the robot's table
+  in the south-east corner, so no robot delivery ends at the human's table (the table event of the first proposal goes)
+  and the robot's routes cross the human's walks away from kitting_table_0. shelf_5 at (-470, -400), on the west wall:
+  its carry to kitting_table_1 runs along the south wall and passes 4 cm from the point where the human stands at
+  shelf_4 (148, -438) and turns north. shelf_6 at (480, -60), on the east wall between the coffee machine and shelf_2:
+  its carry to kitting_table_1 passes the point where the human stands at the machine (460, -253). None lies on a human
+  walk or on its straight continuation, so the fallback's cut is env_layout_17's.
+- The human keeps a reduced assignment: deliver_item(item_4) alone, from the table at (0, 450), every script ending
+  with the exit walk to corner_NE. Its state is step 4's last delivery (live: item_4, coffee_break, ac_activation; the
+  same walk); step 4's ticks hold shifted to the stretch's start (item_4 at 0 / 38 / 47; coffee_break at 22 / 36;
+  item_4 wrongly 0 to 45 before the A/C, as s15_19). Cost: the scripts are not step 4's verbatim, and a lone
+  delivery starts with no previous task's pin tick, so its early admission comes on the first tick, not the pin tick.
+  Step 4's full scripts would put a 216-tick prefix with a working robot before every case.
+- env_setup_16: item_4 on shelf_4 to kitting_table_0 (the human's); item_5 on shelf_5 and item_6 on shelf_6 to
+  kitting_table_1 (the robot's). No default timeline; a fact from tick 0 to the run's end where a side needs it.
+- Three scripts, six scenarios, nine runs, single_task, one robot task each:
+  - scenario_s16_01 (no timeline; off, on) and _02 (break_time): the delivery. Robot from (-470, -120), item_5. Cases 3
+    and 2: the turn at shelf_4 (the human stands 45 to 47, steps north at 48). Off has no projection past the arrival:
+    its robot is moving 42 cm from the human at 44 and then stands 42 cm from it through the turn (holds at 45 and
+    47; the authoring run). Expected: on without the fact holds at 0 against the admitted plan, its separation stays
+    above 50 cm (case 3, the gain with no fact; E1 is this case's form); on with break_time behaves as off until 38,
+    then holds at 38, 7 ticks before the turn (case 2).
+  - scenario_s16_03 (no timeline; off, on) and _04 (break_time): coffee_break, then the delivery. Robot from (-200, 0),
+    item_6, unheld 36 cm from the machine point at 43 and 12 cm at 45, 144 to 191 cm from the item_4 projection. Off
+    holds at 36 (coffee_break admitted) at shelf_6, and at 72, when the break ends, rests on the observed stand of 30
+    ticks and holds to 97 while the human left at 74. Expected: on with break_time decides the same hold at 22 (case 1,
+    the gain in the raised state: the stand known 14 ticks earlier); on without rests on item_4 until 43, with no
+    hold, and the retraction at 43 is the decision that stops the robot short of the standing human (case 4: the cost,
+    and what the retraction changes); both on sides admit item_4 at 73 after the observed break and need no stale
+    hold (E2's form; an observation of this script, not a further case).
+  - scenario_s16_05 (no timeline; off, on) and _06 (room_warm): ac_activation, then the delivery. Robot from
+    (400, 210), item_5, crossing the walk to the switch westward at about 24 (29 cm unheld), 67 to 84 cm from the
+    item_4 projection. Off holds 5 at 14 on the fallback. Expected: on without the fact makes no hold and passes the
+    human at about 29 cm, the robot moving (case 5: the admission the movement does not correct); on with room_warm
+    admits nothing on the walk and holds as off.
+- Not taken (the flags of the final report): the needless hold for a walk that never comes (case 4's other form, from
+  the first proposal); case 5 at the human's turn east at the switch; E2 as a separate case.

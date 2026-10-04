@@ -5407,7 +5407,8 @@ threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and K
 2026 (AM54 to AM58): THE CROSS-CHECK, RULED (AM55 to AM58). Amended 4 October 2026
 (AM59 to AM64): THE CROSS-CHECK'S CONSEQUENCES, RULED. Amended 4 October 2026 (AM65): QUESTION S, RULED; THE READING
 FOR QUESTION G. Amended 4 October 2026 (AM66): QUESTION G, RULED; THE PLANNING CASES, RULED (KT15); STEP 5B, PLANNED;
-STEP 5, STAGE 1: THE PROPOSAL.
+STEP 5, STAGE 1: THE PROPOSAL; THE ROOM, RULED; THE STEP'S MODE AND SIZE; STEP 5, STAGE 1,
+REVISED: THE SET.
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one
