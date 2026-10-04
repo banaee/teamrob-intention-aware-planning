@@ -20,9 +20,18 @@ Per stretch:
 - other admissions: the ticks of the stretch on which the gate clears with another hypothesis leading.
 Since T-K part 1's build stage 6 (KT10, KT14), two columns: the state the case meets, read on the stretch's first tick
 from the `levels` column (a foreseeable task's own level; for an assigned task the levels of its foreseeable rivals);
-and, for an ac_activation stretch, the A/C hypothesis's belief over H (`belief_h`) at its arrival, the first tick of
-its switch_on in the trajectory (its wait is one tick, so admission is not the informative measure, KT10). Both read
-"-" with context knowledge off (no levels).
+and, for an ac_activation stretch, the A/C hypothesis's belief over H (`belief_h`) at its arrival (its wait is one
+tick, so admission is not the informative measure, KT10). The state reads "-" with context knowledge off (no levels).
+CORRECTED (T-K part 1, step 4, 4 October 2026): the arrival is the tick before the first tick of its switch_on in the
+trajectory, the move's last tick (Hadi's completion minus the wait); on switch_on's first tick the hypothesis is
+already retired by its pin and has no belief. It is read with context knowledge off too.
+ADDED (step 4, Hadi: P8 part of the measure): a second table, every admission of a hypothesis that is not the true
+task, on any tick, the unmodelled ones (the exit walk) included: each run of consecutive ticks on which the gate
+clears with the same hypothesis leading and that hypothesis is not the true one, the true task(s) on those ticks, and
+how the run ends: "retraction at t (outcome)" when on the next tick the gate no longer clears for it and the human is
+not doing it; "the human starts it at t" when the next tick's true task is that hypothesis; "then X" when the gate
+clears for another hypothesis; "to the run's end". A true task pinned on or before the tick, within its stretch (its
+terminal fact holds; the human still on the last action's ticks), is marked "(complete: pinned)".
 
     admission.py <set dir> <csv name> <theta>      e.g. admission.py analysis/kitting/irb/tk1 expected.csv 0.75
 """
@@ -68,11 +77,12 @@ def stretches(d, name, theta):
         tick_row[t] = r
         if r["key"]:
             by.setdefault(t, {})[r["key"]] = float(r["belief_h"])     # the belief over H, the gate's value (AM42)
-    # the arrival of each switch_on: the first tick of the action in the trajectory, per task (KT10)
+    # the arrival of each switch_on: the tick before the first tick of the action in the trajectory, per task (KT10;
+    # on the switch_on's first tick the hypothesis is retired by its pin, step 4's correction)
     arrival = {}
     for b in traj["actions"]:
         if b["action"] == "switch_on":
-            arrival.setdefault(b["task"], b["tick"])
+            arrival.setdefault(b["task"], b["tick"] - 1)
     truth = {r["tick"]: (S.hypothesis_key(r["task"]) if r["task"] else None) for r in traj["rows"] if r["tick"] >= 0}
     out = []
     for k, (a, b) in ((k, ab) for k in set(truth.values()) if k
@@ -97,6 +107,46 @@ def stretches(d, name, theta):
     return traj["scenario"], traj["layout"], sorted(out, key=lambda r: r["a"])
 
 
+def wrong_admissions(d, name):
+    """Every run of ticks on which the gate clears with a hypothesis leading that is not the true task (step 4, P8)."""
+    traj = json.load(open(d / "trajectory.json"))
+    truth = {r["tick"]: (S.hypothesis_key(r["task"]) if r["task"] else None) for r in traj["rows"] if r["tick"] >= 0}
+    rows = {}
+    for r in csv.DictReader(open(d / name)):
+        t = int(r["tick"])
+        if t >= 0:
+            rows.setdefault(t, r)                       # gate and leader are per tick, repeated per hypothesis row
+    wrong = lambda t: (t in rows and rows[t]["gate"] == "clears" and rows[t]["most_likely"] != truth.get(t))
+    out, t, last = [], 0, max(rows)
+    while t <= last:
+        if not wrong(t):
+            t += 1
+            continue
+        h, a = rows[t]["most_likely"], t
+        while t + 1 <= last and wrong(t + 1) and rows[t + 1]["most_likely"] == h:
+            t += 1
+        b, nxt = t, t + 1
+        if nxt > last:
+            end = "to the run's end"
+        elif truth.get(nxt) == h:
+            end = f"the human starts it at {nxt}"
+        elif rows[nxt]["gate"] == "clears":
+            end = f"then {S.short(rows[nxt]['most_likely'])} at {nxt}"
+        else:
+            end = f"retraction at {nxt} ({rows[nxt]['gate']})"
+        true = []
+        for u in range(a, b + 1):
+            k = S.short(truth.get(u)) if truth.get(u) else "unmodelled"
+            if truth.get(u) and any(truth[u] in rows[p]["pins"].split(";") for p in range(u, -1, -1)
+                                    if p in rows and all(truth.get(q) == truth[u] for q in range(p, u + 1))):
+                k += " (complete: pinned)"     # pinned on or before the tick, the human still on its last action
+            if not true or true[-1] != k:
+                true.append(k)
+        out.append(dict(h=h, a=a, b=b, true=", ".join(true), end=end))
+        t += 1
+    return traj["scenario"], out
+
+
 def main(root, name, theta):
     root = Path(root)
     S.SCHEMAS.update({s.name: s for s in importlib.import_module("domains.kitting.registry").domain_config["task_model"]})
@@ -110,6 +160,15 @@ def main(root, name, theta):
             adm = "never" if r["adm"] is None else f"{r['adm']} ({r['adm'] - r['a']})"
             print(f"| {sid.removeprefix('scenario_')} | {S.short(r['key'])} | {r['a']} to {r['b']} | {hit} | {adm} | "
                   f"{fmt_runs(r['after'])} | {fmt_runs(r['other'])} | {r['state'] or '-'} | {r['at_arrival'] or '-'} |")
+    print("\nAdmissions of a hypothesis that is not the true task (every tick, the unmodelled ones included).\n")
+    print("| scenario | hypothesis admitted | ticks | true task on those ticks | how it ends |")
+    print("|---|---|---|---|---|")
+    for d in sorted(p for p in root.iterdir() if p.is_dir() and (p / name).exists()):
+        sid, rows = wrong_admissions(d, name)
+        for r in rows:
+            ticks = f"{r['a']}" if r["a"] == r["b"] else f"{r['a']} to {r['b']}"
+            print(f"| {sid.removeprefix('scenario_')} | {S.short(r['h'])} | {ticks} | "
+                  f"{r['true']} | {r['end']} |")
 
 
 if __name__ == "__main__":

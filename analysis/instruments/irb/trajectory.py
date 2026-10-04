@@ -98,7 +98,8 @@ def load(run_file, overrides=()):
     layout = cfg.get("layout") or base.reference_layouts[0]
     human = next(a for a in base.agents if a.agent_type == "human")
     scenario = ScenarioConfig(id=base.id, description=base.description, agents=[human],
-                              setup=base.setup, reference_layouts=base.reference_layouts)
+                              setup=base.setup, reference_layouts=base.reference_layouts,
+                              timeline=base.timeline)    # the scenario's own timeline, if it states one (AM40)
     m = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
