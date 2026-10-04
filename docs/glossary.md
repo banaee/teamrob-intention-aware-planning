@@ -470,6 +470,10 @@ The entries below are ruled (T-K, Hadi, 2 October 2026; amended 3 October 2026, 
 facts; the degrees (a context fact satisfied to a degree, the membership function) are T-K part 2's (§8). Context knowledge acts
 in the robot's mind only, in the recognizer's belief: it does not drive the human, and the conditions of tasks (the
 methods' guards, **applicable**, §6) are not context knowledge (R1).
+AMENDED (AM35 to AM39, Hadi, 3 October 2026; recorded 4 October 2026): three levels per foreseeable task, selected by a
+**suppressing condition** and a **raising condition** (below), replace the low strength, the high strength and the
+**occurrence condition** (retired); "work as a whole" reads **the assigned tasks as a whole** (below). The statement of
+the prior, with formulas and worked examples: `docs/context_knowledge_method.md`; the records win where the two disagree.
 → `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief".
 
 **context knowledge** — the umbrella: what the robot knows about the situation, before any movement, that bears on how
@@ -478,6 +482,8 @@ The code's `ContextKnowledge` (`shared/knowledge.py`) and the context weight are
 (TODO-66), replaced at T-K part 1's build.
 AMENDED (AM26, 3 October 2026): the declared context knowledge (the facts that exist, the occurrence conditions, the
 strengths, the recency durations) reaches the mind directly from the knowledge component, as the task model does.
+AMENDED (AM36, 3 October 2026): "the occurrence conditions, the strengths" reads "the suppressing and the raising
+conditions, the strengths (the suppressed and the ordinary strength per domain, the raised strength per task)".
 
 **context value** — a measured or scheduled quantity of the situation (a time of day, a temperature). An action may
 change a context value.
@@ -498,10 +504,22 @@ world. A recency fact changes through the robot's observation of a completion, i
 AMENDED (AM34, 3 October 2026): the timeline of context facts is the **setup**'s (§9), not the scenario's: it is the
 world's course, shared by the scenarios that bind the setup.
 
+**timeline of context facts** (AM34; Hadi, 3 October 2026; not built) — the **setup**'s (§9)
+authored course of context facts over a run. The environment applies it; the world state carries the facts (AM25).
+It is the world's course and does not depend on what the human does. Its change is no trigger of the meta-planner
+(AM21).
+
+**timeline fact** (Hadi, 3 October 2026; not built) — a **context fact** on the **timeline of context facts**. It holds
+from one authored change to the next. One of the three sources of a **suppressing condition** and a **raising
+condition** (AM11), for example break_time, room_warm.
+
 **membership function** — gives the degree to which a context fact is satisfied from a context value. Declared knowledge,
 with its source (R5). T-K part 2's.
 
-**occurrence condition** — the condition over context facts attached to a **foreseeable task** (§6): its high strength
+**occurrence condition** — RETIRED (AM36, Hadi, 3 October 2026): the older records' term for the single condition of a
+foreseeable task, replaced by the **suppressing condition** and the **raising condition** (below). Kept for reading the
+older records; not used for T-K part 1 from here on.
+The condition over context facts attached to a **foreseeable task** (§6): its high strength
 applies when it is satisfied, its low strength when it is not (R3). Over several facts: the minimum for "and", the
 maximum for "or", 1 minus the degree for "not" (R5, the selected operators). Not a method's condition: it decides no
 liveness.
@@ -512,6 +530,24 @@ using "and" and "not". It reads three sources: a context fact on the scenario's 
 a **recency fact**. "Or" stays in T-K part 2. With it not satisfied, the task has its low strength and stays live (AM12).
 AMENDED (AM34, 3 October 2026): "the scenario's timeline" reads "the setup's timeline".
 
+**suppressing condition** (AM36, Hadi, 3 October 2026; not built) — a condition over facts attached to a **foreseeable
+task** (§6). When it is satisfied, the task has the **suppressed strength**. It is tested before the **raising
+condition**. It decides no liveness. Optional. One fact or a conjunction of facts from three sources: a **timeline
+fact**, an object state (T-G A5), a **recency fact**; "not" and "or" are T-K part 2's. Evaluated per task, not per
+hypothesis. Declared: coffee_break and office_break, each its own recency fact; ac_activation, ac_on (AM37).
+
+**raising condition** (AM36, Hadi, 3 October 2026; not built) — a condition over facts attached to a **foreseeable task**
+(§6). When it is satisfied and the **suppressing condition** is not, the task has its **raised strength**. It decides
+no liveness. Optional; the same form and sources as the suppressing condition. Declared: coffee_break, break_time;
+ac_activation, room_warm; office_break, none (AM37).
+
+**suppressed strength** / **ordinary strength** / **raised strength** (AM36, Hadi, 3 October 2026; not built) — the three
+levels of a foreseeable task's **strength**. The suppressed strength applies when the suppressing condition is
+satisfied; otherwise the raised strength when the raising condition is satisfied; otherwise the ordinary strength. The
+suppressed and the ordinary strength are declared once per domain and hold for every foreseeable task of the domain;
+the raised strength is declared per task, with its raising condition. The values (AM37, AM38): suppressed 0.005,
+ordinary 0.02; raised, coffee_break 2, ac_activation 0.5. They replace the low and the high strength.
+
 **recency fact** (AM14, AM15, 3 October 2026; not built) — a context fact derived from the time since the robot
 observed completion of a named task; it holds for a declared duration after that observation. Declared per task. It
 rests on the mind's own memory of an observed completion; a completion the robot does not observe, or a task cut
@@ -521,9 +557,24 @@ outside the recognizer; it records the tick of an observed completion, and the r
 input on each run and stores nothing across episodes (AM30). An observed completion is the task's terminal fact in the
 robot's world state, for example waited(agent, machine), not the episode boundary (AM33).
 
+**observed completion** (AM33, Hadi, 3 October 2026; not built) — a task's terminal fact in the robot's world state,
+observed by the robot, for example waited(agent, machine). Not the episode boundary. Completion counts, not admission;
+a completion the robot does not observe, or a task cut before its completion, is none (AM27).
+
+**memory of observed completions** (AM30, Hadi, 3 October 2026; not built) — the component of the robot's mind, outside
+the recognizer, that records the tick of each **observed completion**. The **recency facts** are derived from it; the
+recognizer reads them as an input on each run and stores nothing across episodes.
+
 **recency duration** (AM15, AM16, 3 October 2026; not built) — the declared duration for which the recency fact holds,
 with its source. Counted from the observed completion. The values: design_records.md, "T-K", CONTENT POINTS
 1 AND 2, AM16.
+
+**the assigned tasks as a whole** (AM35, Hadi, 3 October 2026; not built) — the group of the live hypotheses of the
+assigned tasks, which contributes 1 to the **prior** while at least one of them is live, however many are live; its
+share is divided equally among them (R4). It is a level that partitions, not a hypothesis. With **assignment
+knowledge** off (an ablation), every work task of the task model takes the place of the assigned tasks. The assigned
+tasks and the foreseeable tasks together are the modelled behaviour (§7). It replaces "work as a whole", "assigned work
+as a whole" and "the human's work as a whole" of the older records; wording only.
 
 **strength** — the declared relative weight of a foreseeable task against assigned work as a whole, which contributes 1
 (R3). A foreseeable task declares a low and a high strength, or one strength if it has no occurrence condition; under
@@ -535,6 +586,14 @@ with **assignment knowledge** on, every work task of the task model with it off 
 is stated for the case with assignment knowledge. Every declared strength is greater than zero, and with **context
 knowledge** on every foreseeable task in the task model declares one; a declaration that violates either is rejected
 when the knowledge is loaded (AM4).
+AMENDED (AM35, AM36, AM39, 3 October 2026): relative to **the assigned tasks as a whole** (above), which replaces "work
+as a whole". A foreseeable task's strength has three levels, the **suppressed**, the **ordinary** and the **raised
+strength** (above), selected per task by its **suppressing condition** and its **raising condition**; "a low and a high
+strength, or one strength if it has no occurrence condition" is superseded. The linear rule under degrees was stated
+for the pair of a low and a high strength; it is restated for two conditions, an open item of T-K part 2. The reading,
+still proposed and not validated, per value: at a task start, with only this foreseeable task and the assigned tasks
+live, the probability that the start is the foreseeable task is s / (1 + s); 0.005: 1 of 201 task starts, 0.02: 1 of
+51, 0.5: 1 of 3, 2: 2 of 3 (AM39).
 
 **prior** — the distribution over the live hypotheses before the evidence of the episode is applied, computed at each
 run of the recognizer from the present context facts, the strengths of the live foreseeable tasks and the division of
@@ -548,6 +607,9 @@ AMENDED (AM1, AM3, 3 October 2026): the prior multiplies the evidence, which res
 returning hypothesis 1/|H| of itself (AM1). "Assigned work" reads the human's **work as a whole** (AM3, under
 **strength**). With **context knowledge** off the prior is equal over the live hypotheses, today's behaviour with
 **assignment knowledge** on and off.
+AMENDED (AM35, AM36, 3 October 2026): "the division of assigned work" and "the human's **work as a whole**" read **the
+assigned tasks as a whole** (above); the strengths are those the suppressing and the raising conditions select (AM36).
+The prior's formula does not change.
 
 **assignment knowledge** / **context knowledge** (the run options; AM3, AM9, Hadi, 3 October 2026; not built) — two
 independent run options, each on or off, stating what the robot knows; both on by default, the framework as designed;
@@ -559,6 +621,9 @@ each "off" an ablation or a diagnostic. Code names: `assignment_knowledge` and `
   CORRECTED (C4, Hadi, 3 October 2026): "sets no prior" reads "sets no weight". Under AM3 the option decides which
   hypotheses work as a whole contains, so it shapes the prior through the support.
 - `context_knowledge`: whether the robot holds **context knowledge** (above) for the **prior**. New at the build.
+AMENDED (AM35, 3 October 2026): "which hypotheses work as a whole contains" reads "which hypotheses take the place of
+the assigned tasks in **the assigned tasks as a whole**": with assignment knowledge off, every work task of the task
+model.
 → design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3's AM3, AM9; TODO-44.
 
 ---
@@ -1216,6 +1281,8 @@ Part 1 and part 2 are in V1; later, future work: the stream of context values wi
 TODO-161, TODO-163, TODO-164. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1 is closed.
 → `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K";
 `docs/roadmap.md`, "The plan from T-A", T-K.
+AMENDED (4 October 2026): its rulings are R1 to R8 and AM1 to AM39 (AM34, the setup's timeline; AM35 to AM39, the
+strengths revised, 3 October 2026).
 **T-K part 1** — crisp context knowledge (V1, ongoing): R1 to R4, R6, R7, crisp context facts, the setup's timeline
 of context facts (AM34; "the scenario's" before 3 October 2026), recency facts, the removal of the domain task names and constants from the recognizer (TODO-66).
 → `docs/roadmap.md`, "The plan from T-A", T-K, part 1; `docs/handoffs/T-G_forward_inputs.md`, section 5.
@@ -1224,6 +1291,10 @@ strength; soft edges of a window and the gradual return after a task; "or", with
 item; whether succession between tasks affects the division inside work as a whole, R4, after T-G stage 2); at the end
 of the V1 queue, after track 3b. Not started.
 AMENDED (AM11, 3 October 2026): "not" in an occurrence condition is T-K part 1's; T-K part 2 keeps "or" and the degrees.
+SUPERSEDED IN PART (AM36, 3 October 2026): "not" is T-K part 2's again, with "or". The linear rule for a strength was
+stated for the pair of a low and a high strength; it is restated for two conditions (the suppressing and the raising
+condition), an open item of T-K part 2. "Division inside work as a whole" reads "inside the assigned tasks as a whole"
+(AM35).
 → `docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief", R5;
 `docs/design_records.md`, "T-K"; `docs/roadmap.md`, "The plan from T-A", T-K, part 2.
 **T-L** — the refactor of layouts and scenarios into three artefacts (§9), before T-D; stages 1 to 4.
