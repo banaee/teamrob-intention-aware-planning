@@ -206,6 +206,9 @@ Predicted, context knowledge off:
   sets stay stale.
 - Assignment knowledge off (the 24 prior-off maintained logs, the MPB's appendix): no commitment warrant existed, so
   identical except the `rank` field.
+- AMENDED (ccode, stage 3, 4 October 2026): stage 3 also changes, in every log with such an admission, the text of the
+  `[meta-proj] projection=built warrant=commitment,observation` line to `warrant=observation` (a named line of section
+  2.4, left out of this list); the logs are compared with that text normalised.
 
 Context knowledge on: no maintained set runs with it. Its sets (steps 4, 5, 5b) are the measurement of section 8.
 

@@ -717,6 +717,10 @@ the tails; the finding and the lifecycle are for the rest of G and X (R5):
   (`belief.evidence_rank[leader]`, AM76); a fourth refusal, LEADER_OUTRANKED (`none(leader_outranked)`), is asked last,
   after LEADER_UNWARRANTED (D1). A tie passes (AM75); retention is untouched (AM69). With context knowledge off the
   leader is never outranked, so no gate answer moves there.
+  SINCE THE GATE RULINGS' BUILD, STAGE 3 (T-K part 1, AM67, D2): warrant is observation warrant only; commitment warrant,
+  `observed_assigned_tasks`, `_warrant` and `WarrantSource` are removed from the meta-planner, and `[meta-proj]
+  projection=built` prints `warrant=observation`. An assigned leader without observation warrant is refused
+  `none(leader_unwarranted)`.
   The gate's input changed meaning with R1 (the leader's share over H); the gate ruling
   (September 2026) stands and its justification is G's. Measured at the 1.5b and 1.5c regenerations
   (`analysis/td_stage1b/REPORT.md`): every boundary admission of a lone live task moves from the boundary tick to

@@ -118,8 +118,8 @@ class SimModel(model.Model):
         # The two knowledge switches (T-K part 1, AM3, AM9, AM51): both stated by
         # every caller, no default here (the defaults live in the run file and
         # the loader's fallback). assignment_knowledge: each robot knows the
-        # observed human's assigned tasks (the recognizer's support restriction
-        # and the gate's commitment warrant). context_knowledge: the
+        # observed human's assigned tasks (the recognizer's support restriction;
+        # since T-K part 1's AM67 no commitment warrant, D2). context_knowledge: the
         # recognizer's prior comes from the domain's declared context knowledge;
         # off, the prior is equal over the live hypotheses.
         self.assignment_knowledge = assignment_knowledge
@@ -583,7 +583,7 @@ class SimModel(model.Model):
         RobotAgent receives its assigned_tasks as its task pool (with the prior
         on or off); when the assignment_knowledge switch is on, also the observed
         human's assigned_tasks, which go to its recognizer (the support
-        restriction) and its meta-planner (commitment warrant, T-D G), never to
+        restriction; to its meta-planner no more since T-K part 1's AM67, D2), never to
         its pool, and never the script; and its task model, built from the tree (T-H), with
         the hypothesis space built from it here, kept with the station's
         destinations as the robot's ObservingRobot (T-H4).

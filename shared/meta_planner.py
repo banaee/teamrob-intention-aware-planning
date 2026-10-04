@@ -151,7 +151,7 @@ import itertools
 import logging
 from enum import Enum
 from math import factorial
-from typing import Dict, FrozenSet, List, Literal, Optional, Set, Tuple
+from typing import Dict, List, Literal, Optional, Tuple
 
 from shared.types import (
     BeliefState,
@@ -207,8 +207,9 @@ class GateOutcome(Enum):
     refusal's value is the [meta-proj] reason admission logs for it; CLEARS
     is never logged as one (admission then logs what the projection became).
     CLEARS                  the leader's share reaches theta, its
-                            hypothesis adequacy is adequate (G1) and it is
-                            warranted (T-D G, AD1);
+                            hypothesis adequacy is adequate (G1), it has
+                            observation warrant (T-D G, AD1; T-K part 1, AM67)
+                            and it is not outranked (AM68);
     BELOW_THETA             the leader's share is below theta (0.0 when the
                             recognizer is exhausted: no leader);
     LEADER_NO_OBSERVATION   at theta, but the leader's derived phase holds no
@@ -216,8 +217,8 @@ class GateOutcome(Enum):
     LEADER_INADEQUATE       at theta, but the leader is inadequate in its own
                             derived phase (G1);
     LEADER_UNWARRANTED      at theta and adequate, but the leader has no
-                            warrant: neither commitment nor observation
-                            (T-D G, AD1, AD4);
+                            observation warrant (T-D G, AD1, AD4; since T-K
+                            part 1's AM67 commitment warrant admits nothing);
     LEADER_OUTRANKED        at theta, adequate and warranted, but the evidence
                             alone ranks another live hypothesis strictly above
                             the leader (T-K part 1, AM68, AM73: the recognizer's
@@ -230,22 +231,6 @@ class GateOutcome(Enum):
     LEADER_INADEQUATE = "none(leader_inadequate)"
     LEADER_UNWARRANTED = "none(leader_unwarranted)"
     LEADER_OUTRANKED = "none(leader_outranked)"
-
-
-class WarrantSource(Enum):
-    """
-    The source of a hypothesis's warrant (T-D G, AD1): what justifies
-    admitting it, beside theta and its hypothesis adequacy.
-    COMMITMENT   it is one of the observed human's assigned tasks (prior on),
-                 matched by task equality (same_task), as the recognizer's
-                 support restriction matches them: the meta-planner's
-                 knowledge;
-    OBSERVATION  its current derived phase holds observation warrant, the
-                 recognizer's output (BeliefState.observation_warrant).
-    Named on [meta-proj] projection=built, in this order when both hold (AD4).
-    """
-    COMMITMENT = "commitment"
-    OBSERVATION = "observation"
 
 
 class MetaPlanner:
@@ -265,7 +250,6 @@ class MetaPlanner:
         cost_strategy: Literal["realized", "plain"] = "realized",
         human_agent_id: Optional[str] = None,
         rho: float = 0.5,
-        observed_assigned_tasks: Optional[List[TaskInstance]] = None,
     ):
         """
         task_model:             the robot's task model (T-H), passed through to planner.py calls.
@@ -326,13 +310,6 @@ class MetaPlanner:
                                  the human's remaining projected duration at the trigger.
                                  0.5 is a STATED ASSUMPTION to be varied in T6, not a
                                  calibrated value.
-        observed_assigned_tasks: the OBSERVED human's assigned tasks (prior on) — which
-                                 tasks it was assigned, never in which order; the same
-                                 list the recognizer receives as its support
-                                 restriction. The source of commitment warrant at the
-                                 gate (T-D G, AD1, AD2). None or empty: the robot has no
-                                 such knowledge (prior off), and no hypothesis has
-                                 commitment warrant.
         """
         self._task_model = task_model
         self._recognizer = recognizer
@@ -344,7 +321,6 @@ class MetaPlanner:
         self._human_agent_id = human_agent_id
         self._min_separation = min_separation
         self._rho = rho
-        self._observed_assigned_tasks: List[TaskInstance] = list(observed_assigned_tasks or [])
         # For the pool's completion test only (_is_complete()). Decomposition
         # for projection stays inside Projector; this never plans.
         self._planner = AdaptivePlanner(knowledge=task_model)
@@ -559,8 +535,8 @@ class MetaPlanner:
         projection_expired (the record's second value, Q6).
 
         Logs one [meta-proj] line per call; an admission as
-        `built warrant=<its sources>` (commitment, observation, or both, T-D G
-        AD4), a fallback as `fallback refused=<the refusal's reason>`. No step or trigger field: step
+        `built warrant=observation` (its warrant source, T-D G AD4; the only
+        source since T-K part 1's AM67, D2), a fallback as `fallback refused=<the refusal's reason>`. No step or trigger field: step
         counts are a simulator concept, and the TriggerDecision belongs to the
         caller. Both are recoverable by adjacency — this is called only on a
         fired trigger, so the [meta-trig] line of the same tick precedes it.
@@ -587,9 +563,9 @@ class MetaPlanner:
         self._projected_hypothesis = belief.most_likely if refused is None else None
         self._fallback_expiry = None
         if refused is None:
-            # The admission's warrant source (T-D G, AD4): both when both hold.
-            sources = self._warrant(belief)
-            reason = "built warrant=" + ",".join(s.value for s in WarrantSource if s in sources)
+            # The admission's warrant source (T-D G, AD4): observation, the only
+            # one since T-K part 1's AM67 (the field kept, D2).
+            reason = "built warrant=" + ObservationWarrant.OBSERVATION.value
         else:
             if self._human_agent_id is not None:
                 projection = self._projector.project_fallback(world, self._human_agent_id)
@@ -725,8 +701,14 @@ class MetaPlanner:
         the recognizer's adequacy test with its tail at or above the test
         level — read as the leader's categorical hypothesis adequacy
         (belief.hypothesis_adequacy). The meta-planner receives no alpha and
-        no tail probability. And the leader must be WARRANTED (T-D G, AD1):
-        commitment or observation that justifies admission (_warrant()). Asked
+        no tail probability. And the leader must be WARRANTED (T-D G, AD1): it
+        has observation warrant, the recognizer's output
+        (belief.observation_warrant), read for the leader only; since T-K part
+        1's AM67 commitment warrant admits nothing, so the meta-planner holds
+        no assigned tasks for it (D2), and no recognizer quantity (origin,
+        path, phase, target) is reconstructed here. Loss of observation warrant
+        fires nothing (AD3): this is asked at admission and on the entering side
+        of recognition_changed only. Asked
         in this order: theta, then the guard, then warrant, so a belief below
         theta refuses as it did before G1, and an inadequate leader as before
         G (AD4: none(leader_unwarranted) after none(leader_inadequate)). Last,
@@ -775,39 +757,11 @@ class MetaPlanner:
             return GateOutcome.LEADER_INADEQUATE
         if leader is not HypothesisAdequacy.ADEQUATE:
             return GateOutcome.LEADER_NO_OBSERVATION
-        if not self._warrant(belief):
+        if belief.observation_warrant.get(belief.most_likely) is not ObservationWarrant.OBSERVATION:
             return GateOutcome.LEADER_UNWARRANTED
         if belief.evidence_rank.get(belief.most_likely) is EvidenceRank.OUTRANKED:
             return GateOutcome.LEADER_OUTRANKED
         return GateOutcome.CLEARS
-
-    def _warrant(self, belief: BeliefState) -> FrozenSet[WarrantSource]:
-        """
-        The leader's warrant sources (T-D G, AD1, AD2), read by _clears_gate(),
-        whose third condition is that this is not empty, and by admission's
-        log (AD4); it decides nothing itself.
-          - COMMITMENT: the leader is one of the observed human's assigned
-            tasks, by task equality (same_task) between the leader's hypothesis,
-            resolved through the recognizer (get_hypothesis(), the static
-            lookup), and each assigned task — the match the support
-            restriction makes. A live hypothesis is open (its terminal fact does
-            not hold, L4), so "assigned" suffices. Not reset: it derives from
-            the assigned tasks. None prior off.
-          - OBSERVATION: the recognizer's observation warrant for the leader
-            (BeliefState.observation_warrant). No recognizer quantity (origin,
-            path, phase, target) is reconstructed here.
-        Loss of observation warrant fires nothing (AD3): this is asked at
-        admission and on the entering side of recognition_changed only.
-        """
-        sources: Set[WarrantSource] = set()
-        hypothesis = (None if belief.most_likely is None
-                      else self._recognizer.get_hypothesis(belief.most_likely))
-        if hypothesis is not None and any(same_task(hypothesis.task_instance(), task)
-                                          for task in self._observed_assigned_tasks):
-            sources.add(WarrantSource.COMMITMENT)
-        if belief.observation_warrant.get(belief.most_likely) is ObservationWarrant.OBSERVATION:
-            sources.add(WarrantSource.OBSERVATION)
-        return frozenset(sources)
 
     def seed_tasks(self, tasks: List[TaskInstance]) -> None:
         """

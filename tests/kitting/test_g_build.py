@@ -6,11 +6,13 @@ Observation warrant, per live hypothesis (AD1): OBSERVATION when its current der
 completion of its previous expected action in this episode (the completion E8 reads), for any phase; or, for a phase
 with a movement target whose position is resolved, when the path-cost gain toward it since the phase origin is
 positive, C(o, g) - C(p, g) > 0. It resets with the origins, at a boundary and at a phase change. The gate (AD1, AD4):
-theta, then the leader's hypothesis adequacy, then warrant (commitment: the leader is one of the observed human's
-assigned tasks, by same_task; or observation); an unwarranted leader is refused as none(leader_unwarranted). Loss of
+theta, then the leader's hypothesis adequacy, then warrant (observation; commitment, the leader being one of the
+observed human's assigned tasks, admits nothing since T-K part 1's AM67); an unwarranted leader is refused as
+none(leader_unwarranted). Loss of
 warrant fires nothing (AD3).
 """
 import dataclasses
+import inspect
 import logging
 import math
 
@@ -20,7 +22,6 @@ import pytest
 from tests.kitting.test_td1_adequacy import H, SPEED, TABLE, item, obs, pred, recognizer, world_with
 from tests.kitting.test_td15_build import ARRIVAL, GRASP, coffee_key, delivery, start_of
 from tests.kitting.test_th1_tree import model_for, registered
-from domains.kitting.registry import domain_config
 from domains.kitting.tasks import deliver_item
 from shared.meta_planner import DEFAULT_THETA, GateOutcome, MetaPlanner
 from shared.types import (
@@ -259,78 +260,57 @@ def belief(leader, adequacy, warrant, confidence=0.9):
                        episode_boundary=False)
 
 
-def planner(model, assigned):
-    """A meta-planner on the model's robot's parts, given the observed human's assigned tasks (None: prior off)."""
+def planner(model):
+    """A meta-planner on the model's robot's parts. It holds no assigned tasks since T-K part 1's AM67 (D2): commitment
+    warrant admits nothing."""
     robot = next(iter(model.robots.values()))
     return MetaPlanner(task_model=robot.meta_planner._task_model, projector=robot.projector,
-                       recognizer=robot.recognizer, min_separation=50.0, human_agent_id=H,
-                       observed_assigned_tasks=assigned)
-
-
-def human_assigned(sid):
-    """The scenario's human's assigned tasks, as the loader passes them with the prior on: with the determined
-    parameter (the kitting table) the hypothesis keys omit."""
-    return next(a for a in domain_config["scenarios"][sid].agents if a.agent_type == "human").assigned_tasks
+                       recognizer=robot.recognizer, min_separation=50.0, human_agent_id=H)
 
 
 def test_the_gates_three_conditions_in_order(model):
-    # scenario_s01_01's human is assigned item_3 and item_2; item_5 is not assigned
-    mp = planner(model, human_assigned("scenario_s01_01"))
+    # scenario_s01_01's human is assigned item_3 and item_2; item_5 is not assigned. Since AM67 an assigned leader
+    # needs observation warrant like any other.
+    mp = planner(model)
     A, I, N = HypothesisAdequacy.ADEQUATE, HypothesisAdequacy.INADEQUATE, HypothesisAdequacy.NO_OBSERVATION
     below = DEFAULT_THETA - 0.01
     assert mp._clears_gate(belief(I5, A, NONE, confidence=below)) is GateOutcome.BELOW_THETA
     assert mp._clears_gate(belief(I5, N, NONE)) is GateOutcome.LEADER_NO_OBSERVATION
     assert mp._clears_gate(belief(I5, I, OBS)) is GateOutcome.LEADER_INADEQUATE       # inadequacy asked first
-    assert mp._clears_gate(belief(I3, I, NONE)) is GateOutcome.LEADER_INADEQUATE      # commitment does not help
+    assert mp._clears_gate(belief(I3, I, NONE)) is GateOutcome.LEADER_INADEQUATE
     assert mp._clears_gate(belief(I5, A, NONE)) is GateOutcome.LEADER_UNWARRANTED
     assert mp._clears_gate(belief(I5, A, OBS)) is GateOutcome.CLEARS                  # observation warrant
-    assert mp._clears_gate(belief(I3, A, NONE)) is GateOutcome.CLEARS                 # commitment warrant
-    assert mp._clears_gate(belief(I2, A, NONE)) is GateOutcome.CLEARS
+    assert mp._clears_gate(belief(I3, A, NONE)) is GateOutcome.LEADER_UNWARRANTED     # assigned: no warrant (AM67)
+    assert mp._clears_gate(belief(I2, A, NONE)) is GateOutcome.LEADER_UNWARRANTED
+    assert mp._clears_gate(belief(I3, A, OBS)) is GateOutcome.CLEARS
 
 
-def test_commitment_is_matched_by_task_equality(model):
-    # the assigned task names the kitting table (a determined parameter); the hypothesis does not: same_task
-    # matches them, as the support restriction does. A task that differs in its goal binding does not match.
-    assigned = human_assigned("scenario_s01_01")
-    assert any(Var("?kitting_table") in t.bindings for t in assigned)
-    mp = planner(model, assigned)
-    assert mp._warrant(belief(I3, HypothesisAdequacy.ADEQUATE, NONE))
-    other = [TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_5")})]
-    assert not planner(model, other)._warrant(belief(I3, HypothesisAdequacy.ADEQUATE, NONE))
-
-
-def test_prior_off_has_no_commitment_warrant(model):
-    # no assigned tasks known: an assigned delivery needs observation warrant like any hypothesis (expected, 1.4)
-    for assigned in (None, []):
-        mp = planner(model, assigned)
-        assert mp._clears_gate(belief(I3, HypothesisAdequacy.ADEQUATE, NONE)) is GateOutcome.LEADER_UNWARRANTED
-        assert mp._clears_gate(belief(I3, HypothesisAdequacy.ADEQUATE, OBS)) is GateOutcome.CLEARS
+def test_the_meta_planner_holds_no_assigned_tasks():
+    # D2: commitment warrant's parts are removed; the assigned tasks reach the recognizer only (its support)
+    assert "observed_assigned_tasks" not in inspect.signature(MetaPlanner.__init__).parameters
+    assert not hasattr(MetaPlanner, "_warrant")
 
 
 def test_the_refusal_is_logged_and_the_record_stays_empty(model, caplog):
     # the world as built carries no previous observation of the human, so no fallback: the reason alone
-    mp = planner(model, None)
+    mp = planner(model)
     w = build_world_state(model)
     with caplog.at_level(logging.INFO):
-        assert mp.update_human_projection(belief(I5, HypothesisAdequacy.ADEQUATE, NONE), w) is None
+        assert mp.update_human_projection(belief(I3, HypothesisAdequacy.ADEQUATE, NONE), w) is None
     assert "projection=none(leader_unwarranted)" in caplog.text
     assert mp._projected_hypothesis is None
 
 
-@pytest.mark.parametrize("leader, warrant, assigned, printed", [
-    (I3, NONE, True, "warrant=commitment"),
-    (I5, OBS, True, "warrant=observation"),
-    (I3, OBS, True, "warrant=commitment,observation"),
-])
-def test_the_admissions_warrant_source_is_named(model, caplog, leader, warrant, assigned, printed):
-    # the admission's [meta-proj] line names its sources (AD4); both when both hold. The projector is not the
-    # subject: it is stood in for so that the admission is built.
-    mp = planner(model, human_assigned("scenario_s01_01") if assigned else None)
+@pytest.mark.parametrize("leader", [I5, I3])
+def test_the_admissions_warrant_source_is_named(model, caplog, leader):
+    # the admission's [meta-proj] line names its source (AD4), observation, the only one since AM67 (the field kept,
+    # D2). The projector is not the subject: it is stood in for so that the admission is built.
+    mp = planner(model)
     mp._projector = type("Stub", (), {"project_human": lambda self, **kw: object()})()
     with caplog.at_level(logging.INFO):
-        mp.update_human_projection(belief(leader, HypothesisAdequacy.ADEQUATE, warrant), build_world_state(model))
+        mp.update_human_projection(belief(leader, HypothesisAdequacy.ADEQUATE, OBS), build_world_state(model))
     line = next(l for l in caplog.text.splitlines() if "[meta-proj]" in l)
-    assert line.endswith(f"projection=built {printed}")
+    assert line.endswith("projection=built warrant=observation")
     assert mp._projected_hypothesis == leader
 
 
@@ -340,7 +320,7 @@ EXECUTING = ExecutorState(agent_id="robot_0", holding=None,
 
 def test_the_entering_side_waits_for_warrant(model):
     # no record: an adequate leader at theta without warrant does not fire recognition_changed; warranted, it does
-    mp = planner(model, None)
+    mp = planner(model)
     w = build_world_state(model)
     assert not mp.evaluate_triggers(belief(I5, HypothesisAdequacy.ADEQUATE, NONE), w, EXECUTING).fired
     assert mp.evaluate_triggers(belief(I5, HypothesisAdequacy.ADEQUATE, OBS), w, EXECUTING).fired
@@ -348,7 +328,7 @@ def test_the_entering_side_waits_for_warrant(model):
 
 def test_loss_of_warrant_fires_nothing(model):
     # AD3: the recorded hypothesis, still most likely and adequate, loses its observation warrant: no trigger
-    mp = planner(model, None)
+    mp = planner(model)
     mp._projected_hypothesis = I5
     w = build_world_state(model)
     d = mp.evaluate_triggers(belief(I5, HypothesisAdequacy.ADEQUATE, NONE), w, EXECUTING)

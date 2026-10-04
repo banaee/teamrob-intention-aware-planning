@@ -892,7 +892,6 @@ MetaPlanner(
     cost_strategy: Literal["realized", "plain"] = "realized",
     human_agent_id: Optional[str] = None,
     rho: float = 0.5,
-    observed_assigned_tasks: Optional[List[TaskInstance]] = None,   # the observed human's assigned tasks (T-D G)
 )
 ```
 
@@ -900,6 +899,9 @@ MetaPlanner(
 receives as its support restriction (prior on); the source of commitment warrant. None or empty (prior off): no
 hypothesis has commitment warrant. `RobotAgent` passes the `observed_assigned_tasks` it already receives (TODO-123's
 docstring corrected with it).
+REMOVED (T-K part 1, AM67 and the build plan's D2, 4 October 2026; the gate rulings' build, stage 3): commitment
+warrant admits nothing, so the argument, its matching and `WarrantSource` are gone from the meta-planner; the assigned
+tasks reach the recognizer only, as its support restriction (unchanged).
 
 **Correction (September 2026):** `assumed_speed` and `default_action_cost` are `Projector`
 constructor parameters, not `MetaPlanner`'s; `projector` is injected (one instance, held by
@@ -931,6 +933,10 @@ home; it reconstructs no recognizer quantity. Loss of observation warrant fires 
 `_warrant(belief) -> FrozenSet[WarrantSource]` (COMMITMENT: the leader resolved through `get_hypothesis()` and matched
 by `same_task` to an assigned task; OBSERVATION: `belief.observation_warrant[leader]`), refusing on an empty set;
 `update_human_projection()` reads `_warrant` again for its log only.
+SUPERSEDED (T-K part 1, AM67, D2; the gate rulings' build, stage 3): warrant is observation warrant only. `_clears_gate`
+asks θ, the leader's adequacy, then `belief.observation_warrant[leader] is OBSERVATION` (else `LEADER_UNWARRANTED`),
+then the evidence rank (below); `_warrant` and `WarrantSource` are removed. An assigned leader without observation
+warrant is refused like any other.
 RULED (T-K part 1, AM68, AM73, AM76, 4 October 2026; BUILT in the gate rulings' build, stage 2): the gate also refuses
 a leader that is OUTRANKED (`belief.evidence_rank[leader]`, the recognizer's fourth output: the evidence alone ranks
 another live hypothesis strictly above it), `LEADER_OUTRANKED` (`none(leader_outranked)`), asked last, after
@@ -1214,6 +1220,8 @@ RULED (T-D G, AD1, AD4, 29 September 2026; BUILT in G-build, 81a9f86): the gate'
 when both hold), as does `[meta-b2]` where that line exists (under `b2a` only). design_decisions.md, "T-D G:
 admission". As built: `projection=built warrant=commitment`, `warrant=observation` or `warrant=commitment,observation`;
 `[meta-b2]` prints the admission's reason, so it carries the same field.
+SINCE T-K part 1's AM67 (D2; the gate rulings' build, stage 3): `projection=built warrant=observation` only; the field
+is kept (AD4) with its one remaining value.
 RULED (T-K part 1, AM68, AM73; BUILT in the gate rulings' build, stage 2): a further refusal reason,
 `none(leader_outranked)`, after `none(leader_unwarranted)`; on a refusal with a fallback, `fallback
 refused=none(leader_outranked)`.

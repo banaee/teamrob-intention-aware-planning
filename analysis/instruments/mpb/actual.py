@@ -95,7 +95,8 @@ def in_process(run_file, steps, strategy, prior):
     def record_projection(orig):
         def wrapped(belief, world):
             tick_state["gate"] = mp._clears_gate(belief)
-            tick_state["warrant"] = mp._warrant(belief)
+            # the leader's observation warrant, the only warrant source since T-K part 1's AM67 (D2: no _warrant)
+            tick_state["warrant"] = belief.observation_warrant.get(belief.most_likely)
             p = orig(belief=belief, world=world)
             tick_state["projection"] = p
             return p
@@ -152,7 +153,7 @@ def in_process(run_file, steps, strategy, prior):
         proj = tick_state["projection"]
         admitted, fb, warrant = None, None, ()
         if gate is Gate.CLEARS and proj is not None:
-            held = {s.value for s in tick_state["warrant"]}
+            held = set() if tick_state["warrant"] is None else {tick_state["warrant"].value}
             warrant = tuple(v for v in ("commitment", "observation") if v in held)     # AD4: this order when both
             plan = proj.entries[0].abstract_plan
             admitted = Admitted(b.most_likely, tuple(Action(a.action_name, tuple(sorted(a.bindings.items())))

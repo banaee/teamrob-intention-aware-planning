@@ -319,7 +319,7 @@ def test_the_guard_refuses_a_lone_hypothesis_at_a_boundary(model):
     # amendment), so the lone hypothesis is adequate at b + 1 on a belief of 1.0 by normalisation
     # (TODO-119). Re-derived at G-build (T-D G, AD1): its walk was opened by the boundary (no entry by
     # a completion in this episode) and nothing is walked (no gain), so it holds no observation
-    # warrant; this fixture is prior off (no commitment warrant): refused as unwarranted
+    # warrant (commitment warrant admits nothing since T-K part 1's AM67): refused as unwarranted
     b = rec.update(obs(2, p), placed)
     assert b.hypothesis_adequacy[b.most_likely] is HypothesisAdequacy.ADEQUATE
     assert gate(model)._clears_gate(b) is GateOutcome.LEADER_UNWARRANTED

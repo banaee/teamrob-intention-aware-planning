@@ -383,7 +383,6 @@ class RobotAgent(FactoryAgent):
             strategy=self.model.strategy,
             gate_strategy=self.model.gate_strategy,
             cost_strategy=self.model.cost_strategy,
-            observed_assigned_tasks=observed_assigned_tasks,
         )
         # The run header (TODO-78): the policy values and evaluation switches this
         # robot's decisions are taken under, once per run, so a log can be read
@@ -466,8 +465,8 @@ class RobotAgent(FactoryAgent):
             # decimals so a finding can be re-read at any alpha. The other
             # hypotheses' adequacy follows from the tails and alpha. Last,
             # every live hypothesis's observation warrant (T-D G, AD4), in
-            # hypothesis order; empty when exhausted. Commitment warrant is the
-            # gate's knowledge and is not printed here.
+            # hypothesis order; empty when exhausted. (Commitment warrant, the
+            # gate's knowledge before T-K part 1's AM67, admits nothing since.)
             most_likely = self.belief.most_likely or "none"
             finding = "" if self.belief.finding is None else f" finding={self.belief.finding.value}"
             leader = self.belief.hypothesis_adequacy.get(self.belief.most_likely)
