@@ -4,7 +4,7 @@
 # steps: the safety cap of MPB-5 (TODO-138): the robot's pool chained along its authored order from its start on
 # plain cost, plus the human's replay length, plus the idle margin (30 ticks); analysis/instruments/mpb/run.sh recomputes it and
 # runs with it. Not a behavioural timeout: a run that does not complete within it is classified, never given more.
-# The primary set: prior on, single_task; run.sh passes --strategy full_reorder and --assignment_prior false for the
+# The primary set: prior on, single_task; run.sh passes --strategy full_reorder and --assignment_knowledge false for the
 # second run and the diagnostic appendix.
 
 domain: kitting
@@ -12,7 +12,7 @@ layout: env_layout_12
 setup: env_setup_11
 scenario: scenario_s11_02
 steps: 254
-assignment_prior: true
+assignment_knowledge: true
 strategy: "single_task"
 gate_strategy: "none"
 cost_strategy: "realized"

@@ -43,7 +43,7 @@ def model_for(layout, sid, prior=False):
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][layout],
                     setup_path=domain_config["setups"][cfg.setup],
-                    assignment_prior=prior)
+                    assignment_knowledge=prior)
 
 
 def human_cfg(layout, sid):

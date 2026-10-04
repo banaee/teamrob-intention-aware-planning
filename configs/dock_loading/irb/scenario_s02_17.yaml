@@ -10,7 +10,7 @@ layout: env_layout_02
 setup: env_setup_02
 scenario: scenario_s02_17
 steps: 223
-assignment_prior: true
+assignment_knowledge: true
 strategy: "single_task"
 gate_strategy: "none"
 cost_strategy: "realized"

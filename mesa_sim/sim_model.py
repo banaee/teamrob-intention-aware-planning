@@ -101,7 +101,7 @@ class SimModel(model.Model):
                  layout_path: str,
                  setup_path: str,
                  seed=None,
-                 assignment_prior: bool = False,
+                 assignment_knowledge: bool = False,
                  strategy: str = "single_task",
                  gate_strategy: str = "none",
                  cost_strategy: str = "realized",
@@ -113,7 +113,7 @@ class SimModel(model.Model):
 
         # Evaluation switch: give each robot the observed human's assigned_tasks
         # as a persistent IR prior. Off = the robot knows no assigned tasks of it.
-        self.assignment_prior = assignment_prior
+        self.assignment_knowledge = assignment_knowledge
         # MetaPlanner B3 strategy for every robot ("single_task" | "full_reorder");
         # a run option, not a scenario fact (T-B2d).
         self.strategy = strategy
@@ -466,7 +466,7 @@ class SimModel(model.Model):
         HumanAgent receives its scheduled_tasks, a Script, checked at load and
         run by its stack machine (_load_human_scripts()).
         RobotAgent receives its assigned_tasks as its task pool (with the prior
-        on or off); when the assignment_prior switch is on, also the observed
+        on or off); when the assignment_knowledge switch is on, also the observed
         human's assigned_tasks, which go to its recognizer (the support
         restriction) and its meta-planner (commitment warrant, T-D G), never to
         its pool, and never the script; and its task model, built from the tree (T-H), with
@@ -541,7 +541,7 @@ class SimModel(model.Model):
                 observed_cfg = agent_cfgs.get(observed_id) if observed_id else None
                 observed_assigned = (
                     observed_cfg.assigned_tasks
-                    if (self.assignment_prior and observed_cfg is not None)
+                    if (self.assignment_knowledge and observed_cfg is not None)
                     else None
                 )
                 if agent_cfg.scheduled_tasks.entries and not agent_cfg.assigned_tasks:

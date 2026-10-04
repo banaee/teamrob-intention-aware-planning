@@ -46,7 +46,7 @@ print(next(a for a in sc.agents if a.agent_type == 'human').scheduled_tasks.depe
     PYTHONHASHSEED=0 $PY $D/mpb_oracle.py $OUT/trajectory.json $RUN theta=0.75 $OUT/expected_ticks.json
     continue
   fi
-  PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --run $RUN --steps $steps --strategy $STRATEGY --assignment_prior $FLAG \
+  PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --run $RUN --steps $steps --strategy $STRATEGY --assignment_knowledge $FLAG \
     < /dev/null > /dev/null 2>&1
   cp "$(ls -t logs/run_*.log | head -1)" $LOG
   cp "$(ls -t logs/run_*.rec | head -1)" ${LOG%.log}.rec
@@ -57,7 +57,7 @@ print(next(a for a in sc.agents if a.agent_type == 'human').scheduled_tasks.depe
   else
     PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json $LOG 2>&1 | grep -v '^\['
   fi
-  PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $last $OUT --strategy $STRATEGY --assignment_prior $FLAG \
+  PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $last $OUT --strategy $STRATEGY --assignment_knowledge $FLAG \
     2>&1 | grep -v -e '^\[' -e '^  step'
   if PYTHONHASHSEED=0 $PY -c "import sys; sys.path[:0] = ['$DOM', '.']; import properties; sys.exit(0 if '$sid' in properties.CONTROLS else 1)" 2>/dev/null; then   # the domain's control scenarios
     PYTHONHASHSEED=0 $PY $D/reference.py $RUN $steps $ROOT/runs/${layout}_${sid}_reference_${STRATEGY}.log \

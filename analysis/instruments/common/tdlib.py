@@ -98,7 +98,8 @@ def parse(path):
       pins, reentries  every [IR-complete] / [IR-reentry] as (step, key), in log order
       boundary_action  step -> the action an [IR-boundary] names (None on the PRE logs)
       triggers  every [meta-trig]: (step, trigger, cause)
-      known     the [IR-prior] known list (strings, as logged); prior 'on' | 'off'
+      known     the [IR-assignment] known list (strings, as logged; `[IR-prior] switch=` before T-K part 1's
+                rename, AM9); prior 'on' | 'off' (the assignment knowledge)
       coverage  task string -> coverage value ([coverage] lines)
       human, robot  step -> (action, micro, (x, y), task)
       decisions list of dict(step, trigger, proj, conf_proj, winner, queue, b3, holds) — one per [meta] line
@@ -138,8 +139,8 @@ def parse(path):
             m = re.match(r"\[IR-boundary\] step=(\d+) \S+ completed (a task|\S+?):", l)
             boundary.append(int(m[1]))
             boundary_action[int(m[1])] = None if m[2] == "a task" else m[2]
-        elif l.startswith("[IR-prior]"):
-            prior = re.search(r"switch=(\w+)", l)[1]
+        elif l.startswith("[IR-assignment]"):
+            prior = re.search(r"knowledge=(\w+)", l)[1]
             known = re.findall(r"'([^']+)'", l)
         elif l.startswith("[coverage]"):
             m = re.match(r"\[coverage\] \S+ \S+ entry=\d+ (\S+?\))=(\S+)$", l)

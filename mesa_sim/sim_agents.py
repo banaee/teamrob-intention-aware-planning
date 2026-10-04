@@ -320,7 +320,7 @@ class RobotAgent(FactoryAgent):
             assigned_tasks=observed_assigned_tasks,
         )
         logging.info(
-            f"[IR-prior] switch={'on' if self.model.assignment_prior else 'off'} "
+            f"[IR-assignment] knowledge={'on' if self.model.assignment_knowledge else 'off'} "
             f"known={[task_instance_key(t) for t in (observed_assigned_tasks or [])]}"
         )
 
@@ -380,7 +380,7 @@ class RobotAgent(FactoryAgent):
             f"gate_strategy={self.meta_planner.gate_strategy} "
             f"cost_strategy={self.meta_planner.cost_strategy} "
             f"separation_stop={'on' if self.model.separation_stop else 'off'} "
-            f"assignment_prior={'on' if self.model.assignment_prior else 'off'} "
+            f"assignment_knowledge={'on' if self.model.assignment_knowledge else 'off'} "
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
             f"min_separation={self.meta_planner.min_separation:.2f} "
             f"min_separation_source={self._min_separation_source} "

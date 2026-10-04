@@ -56,7 +56,7 @@ def _write(path, rows):
 def support(keys, known, domain_config):
     """The support under the prior (docs/recognizer_handback.md §1.1): the known (assigned) tasks' hypotheses and every
     PersonalTask hypothesis of the task model; the log prints the known tasks with their determined parameters
-    ([IR-prior]), the hypothesis keys without them. A key outside it is pinned at the floor and never live."""
+    ([IR-assignment]; [IR-prior] before T-K part 1), the hypothesis keys without them. A key outside it is pinned at the floor and never live."""
     import re
     from shared.types import PersonalTask
     schemas = {s.name: s for s in domain_config["task_model"]}
@@ -144,7 +144,7 @@ def in_process(run_file, steps, alpha):
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
-                 assignment_prior=bool(cfg["assignment_prior"]), strategy=cfg["strategy"],
+                 assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=cfg["strategy"],
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
                  separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]))
     robot = next(iter(m.robots.values()))

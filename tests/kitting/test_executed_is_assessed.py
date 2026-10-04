@@ -70,7 +70,7 @@ def run_forced(tick, human, steps=170):
     executed positions per tick."""
     m = SimModel(scenario=robot_alone(), register_fn=register_kitting_domain,
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][LAYOUT],
-                 setup_path=domain_config["setups"]["env_setup_12"], assignment_prior=True, strategy="single_task",
+                 setup_path=domain_config["setups"]["env_setup_12"], assignment_knowledge=True, strategy="single_task",
                  gate_strategy="none", cost_strategy="realized", separation_stop=False, test_level=0.05)
     robot = next(iter(m.robots.values()))
     mp = robot.meta_planner

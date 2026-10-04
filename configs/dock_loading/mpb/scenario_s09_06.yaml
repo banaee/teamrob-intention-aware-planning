@@ -13,7 +13,7 @@ layout: env_layout_04
 setup: env_setup_09
 scenario: scenario_s09_06
 steps: 498
-assignment_prior: true
+assignment_knowledge: true
 strategy: "single_task"
 gate_strategy: "none"
 cost_strategy: "realized"

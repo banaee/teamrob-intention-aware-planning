@@ -65,7 +65,7 @@ def run(run_file, steps, strategy):
                  state_declarations=domain_config["states"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
-                 assignment_prior=bool(cfg["assignment_prior"]), strategy=strategy,
+                 assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=strategy,
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
                  separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]))
     robot = next(iter(m.robots.values()))

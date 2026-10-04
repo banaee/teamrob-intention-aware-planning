@@ -19,7 +19,7 @@ while read -r lay sc st; do
       tag=${lay}_${sc}_${s}_$([ $p = true ] && echo on || echo off)
       PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --domain kitting --layout "$lay" --scenario "$sc" --steps "$st" \
         --strategy $s --cost_strategy realized --gate_strategy none --separation_stop false \
-        --assignment_prior $p < /dev/null > /dev/null 2>&1 || echo "$tag: exit $?"
+        --assignment_knowledge $p < /dev/null > /dev/null 2>&1 || echo "$tag: exit $?"
       cp "$(ls -t logs/run_*.log | head -1)" "$OUT/$tag.log"
       cp "$(ls -t logs/run_*.rec | head -1)" "$OUT/$tag.rec"    # the human executor's record stream (T-H2)
     done

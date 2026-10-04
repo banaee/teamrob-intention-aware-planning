@@ -3,7 +3,7 @@
 actual.py — the meta-planner test-bed's actual side (MPB-3): the run re-executed in-process (the primary source) and the
 run log (the check).
 
-    actual.py <run file> <steps> <run.log> <last_ack> <out_dir> [--strategy S] [--assignment_prior true|false]
+    actual.py <run file> <steps> <run.log> <last_ack> <out_dir> [--strategy S] [--assignment_knowledge true|false]
 
 In-process: the same SimModel from the run file and options. Pass-through recorders on the robot's MetaPlanner INSTANCE
 capture the public outputs of evaluate_triggers (the TriggerDecision, and the world the robot built that tick, whose
@@ -74,7 +74,7 @@ def in_process(run_file, steps, strategy, prior):
     m = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
                  state_declarations=domain_config["states"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
-                 setup_path=domain_config["setups"][scenario.setup], assignment_prior=prior, strategy=strategy,
+                 setup_path=domain_config["setups"][scenario.setup], assignment_knowledge=prior, strategy=strategy,
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
                  separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]))
     robot = next(iter(m.robots.values()))
@@ -224,8 +224,8 @@ if __name__ == "__main__":
     run_file, steps, log_path, last_ack, out = (sys.argv[1], int(sys.argv[2]), sys.argv[3], int(sys.argv[4]),
                                                Path(sys.argv[5]))
     strategy = sys.argv[sys.argv.index("--strategy") + 1] if "--strategy" in sys.argv else "single_task"
-    prior = (sys.argv[sys.argv.index("--assignment_prior") + 1] == "true") if "--assignment_prior" in sys.argv \
-        else bool(yaml.safe_load(open(run_file))["assignment_prior"])
+    prior = (sys.argv[sys.argv.index("--assignment_knowledge") + 1] == "true") if "--assignment_knowledge" in sys.argv \
+        else bool(yaml.safe_load(open(run_file))["assignment_knowledge"])
     out.mkdir(parents=True, exist_ok=True)
     lines, ticks, decisions, selection, agents, segments = in_process(run_file, steps, strategy, prior)
     logged = [l.rstrip("\n") for l in open(log_path) if not l.startswith(RUN_MESA_LINES)]

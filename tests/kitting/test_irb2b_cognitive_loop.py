@@ -32,7 +32,7 @@ def model_for(layout, sid, empty_pool=False):
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][layout],
                     setup_path=domain_config["setups"][scenario.setup],
-                    assignment_prior=True)
+                    assignment_knowledge=True)
 
 
 def run_lines(m, steps, caplog):

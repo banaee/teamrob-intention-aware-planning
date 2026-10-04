@@ -112,7 +112,7 @@ EXPERIMENT_CONFIG_PATH = "configs/experiment.yaml"
 STRATEGIES = ("single_task", "full_reorder")
 GATE_STRATEGIES = ("none", "b2a", "b2b")
 COST_STRATEGIES = ("realized", "plain")
-BOOL_OPTIONS = ("assignment_prior", "separation_stop")
+BOOL_OPTIONS = ("assignment_knowledge", "separation_stop")
 
 def load_experiment(run_path: str, flags: dict, cli_overrides=()) -> dict:
     """
@@ -197,7 +197,7 @@ def parse_user_args():
     parser.add_argument("--layout", type=str, default=None, help="Layout selection (default: the scenario's first reference layout)")
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_s02_02)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
-    parser.add_argument("--assignment_prior", type=_bool_arg, default=None, help="Assignment-prior override: true/false")
+    parser.add_argument("--assignment_knowledge", type=_bool_arg, default=None, help="Assignment knowledge override: true/false (the robot knows the observed human's assigned tasks)")
     parser.add_argument("--strategy", type=str, default=None, choices=STRATEGIES, help="MetaPlanner B3 strategy override")
     parser.add_argument("--gate_strategy", type=str, default=None, choices=GATE_STRATEGIES, help="MetaPlanner B2 gate strategy override")
     parser.add_argument("--cost_strategy", type=str, default=None, choices=COST_STRATEGIES, help="MetaPlanner B3 cost strategy override")
@@ -298,7 +298,7 @@ def resolve_model_params(user_config: dict) -> dict:
         "state_declarations": domain["states"],
         "layout_path":      domain["layouts"][layout_id],
         "setup_path":       domain["setups"][setup_id],
-        "assignment_prior": bool(user_config.get("assignment_prior", False)),
+        "assignment_knowledge": bool(user_config.get("assignment_knowledge", False)),
         "strategy":         user_config.get("strategy", "single_task"),
         "gate_strategy":    user_config.get("gate_strategy", "none"),
         "cost_strategy":    user_config.get("cost_strategy", "realized"),

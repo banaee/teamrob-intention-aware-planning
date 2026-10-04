@@ -104,7 +104,7 @@ def sample(realized_segments, human_segments, s, t0, t_h):
 def run(cost, prior):
     layout = domain_config["layouts"][LAYOUT]
     m = SimModel(layout["scenarios"][SCENARIO], domain_config["register_fn"], env_layout_path=layout["path"],
-                 assignment_prior=prior, strategy="full_reorder", cost_strategy=cost, gate_strategy="none")
+                 assignment_knowledge=prior, strategy="full_reorder", cost_strategy=cost, gate_strategy="none")
     robot = m.robots["robot_0"]; mp = robot.meta_planner
     calls = []
     inner = mp._replan_tasks
