@@ -215,6 +215,8 @@ What the gate does in that state, in three cases:
 2. The human walks away from the coffee machine. No decrease, no warrant. The gate refuses.
 3. The human walks somewhere unmodelled, and the walk happens to bring the human closer to the coffee machine. Warrant holds after one step. Adequacy holds until the excess path reaches about 334 cm. The gate admits the coffee break. A retraction follows later.
 
+The three cases hold for a foreseeable task whose first step is the walk to its target, as in kitting. In a method with an earlier step, the observed completion of that step warrants the next phase, so cases 1 and 2 do not hold there; the case is recorded as open (`docs/design_records.md`, "T-K", THE STRENGTHS REVISED, F).
+
 Case 3 exists without context knowledge too. Its cause is that an unmodelled walk has no hypothesis. The strengths are not its cause.
 
 What the prior adds: when the two foreseeable tasks are at different levels, the threshold no longer separates them by movement alone.
