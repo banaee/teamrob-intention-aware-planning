@@ -223,6 +223,10 @@ belief over the admitted hypothesis's belief in that run. Such an admission has 
   coffee break under break_time during the walk to the neighbouring shelf: ×1.22 and ×1.71 (s13_11, _12, _14). This
   part follows from the declared strengths and the gate as ruled (question S, AM65; question G, AM66), not from the
   situation.
+  RULED (Hadi, 4 October 2026; AM68, not built): the gate refuses a leader that the evidence alone ranks below another
+  live hypothesis. Once built, this part leaves the gate's admissions: in the what-if reading X (WHATIF.md) 18 of the
+  310 wrong gate ticks of kind (ii) remain (ticks on which the evidence ties or ranks the admitted hypothesis first; not
+  the first part's 18), 11 with AM67 as well.
 Boundary (framework scope), the first part only · Hadi, 4 Oct 2026, corrected the same day (T-K part 1, after step 5b;
 design_records.md, "T-K", THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT) · the recognizer's belief and the
 gate; how they are read in an evaluation.
@@ -245,11 +249,28 @@ gate; how they are read in an evaluation.
   correct 9 times (retracted after 8 to 60 ticks): 230 of the 504 wrong gate ticks during modelled tasks, and both new
   cases below min_separation in planning (scenario_s16_05, 28.3 cm; scenario_s11_03, 11.3 cm, whose 78 ticks gained
   come from the same wrong admission).
+  RULED (Hadi, 4 October 2026; AM67, not built): this admission waits for observation warrant. In the what-if reading
+  Y the 59 correct cases come 1 tick later and scenario_s11_03's admission is refused; scenario_s16_05's stays (observation
+  warrant held, WHATIF.md) and is refused by AM68.
 - Not settled here: how the robot acts on an admitted hypothesis that can be wrong. Today it plans on the admitted task
   alone and does not use the fallback projection while the admission stands. The design discussion of 4 October 2026
   after step 5b takes this up, with the gate and the prior; nothing in it is ruled (design_records.md, "T-K", THE
   DESIGN DISCUSSION AFTER STEP 5B). Communication with the human is the other place where such a case can be resolved
   (T-D X, X5).
+  RULED (Hadi, 4 October 2026; design_decisions.md, "T-K", R7's AM69, AM71): the robot keeps planning on the admitted
+  task alone; an admission that was correct when made stays until the retraction (the end of an admission, T-D L, is
+  unchanged). Not taken: projecting an admission without observation warrant as the human staying, checking the plan
+  against two projections together, communication on a weak admission (the last two possible future work, TODO-181,
+  TODO-96).
+- The cases that remain are limitations, not defects (Hadi, 4 October 2026; AM72): the first ticks of a walk with equal
+  evidence; the evidence itself ranking another task first after the human interrupts a task (the 141 ticks above, in
+  part); the human doing the less probable task after a correct admission. Kind: boundary (framework scope). Hadi's
+  principle: if the robot admits task X and the human does Y, the recognizer was not wrong for that reason; either the
+  human did something unexpected given the modelled knowledge and the evidence, or the recognizer is limited. The
+  framework shows what recognition contributes to adaptive planning and is not changed to make every run flawless.
+  ccode's note (the record, "T-K", THE GATE AFTER STEP 5B, RULED): the 18 measured ticks of the first part rank the true
+  task first by ×1.0008 to ×1.01, so AM68 refuses them; what remains of the first case is an exact tie with observation
+  warrant, or near-equal evidence that ranks the admitted hypothesis first.
 
 ## Rejected or dropped
 

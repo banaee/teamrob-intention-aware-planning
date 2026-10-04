@@ -427,6 +427,10 @@ AM42.
 BUILT (T-K part 1's build, stage 2, 4 October 2026; 91774ce; design_records.md, "T-K", THE BUILD): `BeliefState.belief`
 is the belief over H and `confidence` its leader's value; `_clears_gate` is unchanged and reads it; `[IR]` and
 `[meta-proj]` print it; `[IR-dist]` keeps the reported distribution.
+RULED, NOT BUILT (T-K part 1, AM67, AM68, Hadi, 4 October 2026): admission requires observation warrant for every
+hypothesis (commitment warrant alone no longer admits), and the gate refuses a leader that the evidence alone ranks
+below another live hypothesis (rank only, a tie passes; proposed term **outranked**, §7). Neither is asked for the end
+of an admission (AM69). design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM67, AM68.
 
 **β, u, ρ** — β the tolerance on wasted path in the movement likelihood (0.01 /cm, supplied by the
 body); u `UNKNOWN_LIKELIHOOD`, the `unknown` hypothesis's reference likelihood, not a measure of unmodelled
@@ -1199,11 +1203,15 @@ of adequacy. Adequacy says a hypothesis is not contradicted in its derived phase
 admission. Warrant is not the support restriction: "the support" keeps its meaning, the hypotheses admissible under
 the assignment prior (the observed human's assigned tasks plus the foreseeable tasks).
 → `docs/design_decisions.md`, "T-D G: admission", AD1, AD2.
+RULED, NOT BUILT (AM67, Hadi, 4 October 2026): the gate's third condition is observation warrant, for every
+hypothesis; commitment warrant decides no admission. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM67.
 
 **warranted** / **unwarranted** — a hypothesis has warrant, from either source, or has none. The gate refuses an
 unwarranted leader (`none(leader_unwarranted)`, checked after `none(leader_inadequate)`, AD4). Loss of observation
 warrant fires nothing and clears no admitted projection; retraction stays on inadequacy (AD3, L2 (ii)).
 → the same entry, AD3, AD4.
+RULED, NOT BUILT (AM67, 4 October 2026): a leader with commitment warrant alone is refused. Loss of observation warrant
+still fires nothing (AD3 unchanged).
 
 **observation warrant** — a hypothesis's current derived phase (§5) holds evidence for it: for a phase with a movement
 target (`move_to`), the path-cost gain toward the target since the phase origin is positive, C(o, g) − C(p, g) =
@@ -1212,6 +1220,7 @@ completion of the hypothesis's previous step in this episode (the completion E8 
 without a movement target (`pick_up`, `place`, `wait_at`). Reset with the origins, at a boundary and at a phase change.
 Reported by the recognizer per live hypothesis on `BeliefState`, printed `warrant=none|observation` on `[IR]`.
 → the same entry, AD1, AD2, AD4.
+RULED, NOT BUILT (AM67, 4 October 2026): required at admission for every hypothesis, assigned or foreseeable.
 
 **commitment warrant** — the hypothesis is one of the observed human's assigned tasks (prior on), matched by task
 equality (`same_task`) as the support restriction matches them. Not reset: it derives from the assigned tasks, which
@@ -1219,6 +1228,18 @@ the meta-planner receives as an input; the recognizer never prints it. Prior off
 known commitment (`docs/assumptions.md` 2.2, 2.6) that warrants projecting it before movement; a deviation is handled
 by retraction.
 → the same entry, AD1, AD2.
+SUPERSEDED IN PART (AM67, Hadi, 4 October 2026; not built): commitment warrant alone no longer admits and decides no
+admission. "Warrants projecting it before movement" no longer holds: the prior states which task is probable; nothing
+states when the human starts. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM67; "T-D G: admission", AD1's mark.
+
+**outranked** — PROPOSED TERM, NOT RULED (ccode, 4 October 2026; Hadi rules). A live hypothesis is outranked when the
+evidence alone ranks another live hypothesis strictly above it. The evidence alone is E_t, the movement likelihood
+accumulated in the present episode over the live hypotheses, without the **prior** (§5; R2;
+`docs/context_knowledge_method.md`, section 7). Rank only: a tie is not outranked; no constant, no margin. The gate
+refuses an outranked leader (AM68; proposed refusal reason `none(leader_outranked)`), at admission only, never as the
+end of an admission (AM69). With context knowledge off the prior is equal and the belief's leader is never outranked.
+Neither adequacy nor warrant. Ruled as a condition, not built.
+→ design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM68.
 
 **unresolved** — the value of the **adequacy finding** while no live hypothesis is a member of the test: no live
 hypothesis's current derived phase holds an observation (E6, as amended twice). A phase holds an observation once it
@@ -1292,6 +1313,10 @@ refused (`none(leader_unwarranted)`, after `none(leader_inadequate)`); losing wa
 AMENDED (T-D X, 29 September 2026): "the downstream response is G and X" is answered: admission is G's AD1 (θ,
 adequacy, warrant); X adds nothing to admission, and X5 records when communication is warranted (TODO-96).
 design_decisions.md, "T-D G: admission", AD1; "T-D X: response", X5.
+RULED, NOT BUILT (T-K part 1, AM67, AM68, Hadi, 4 October 2026): admitted also means that the leader held observation
+warrant (commitment warrant alone no longer suffices) and that the evidence alone ranked no other live hypothesis above
+it (not **outranked**, above, a proposed term). An admission ends as before (AM69; "T-D L"). design_decisions.md,
+"T-K: context knowledge in the recognizer's belief", R7's AM67 to AM69.
 
 USAGE RULE, in prose:
 - about the implementation: "the `unknown` hypothesis";

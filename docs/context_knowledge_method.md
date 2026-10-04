@@ -2,7 +2,7 @@
 
 Status: the design records hold the rulings and their reasons and are authoritative (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K"). This document states the result of the rulings. If the two disagree, the records win and this document is corrected. A ruling that changes the method of context knowledge updates this document in the same records step.
 
-It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39), with where the timeline is stated and the gate's value as ruled on 4 October 2026 (AM40, AM42, AM44, AM46, AM47). Section 13 is a derivation from the method, not a ruling. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
+It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39), with where the timeline is stated and the gate's value as ruled on 4 October 2026 (AM40, AM42, AM44, AM46, AM47), and the gate's conditions and the strengths as ruled on 4 October 2026 after step 5b (AM67 to AM72; AM67 and AM68 not built). Section 13 is a derivation from the method, not a ruling. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
 
 ## 1. The idea
 
@@ -135,15 +135,20 @@ Two properties:
 
 The belief sums to 1 over the live hypotheses. There is no share for "none of the modelled tasks".
 
-## 8. The gate (unchanged by context knowledge)
+## 8. The gate
 
-The meta-planner admits the leading hypothesis $h^*$ when three conditions hold:
+The meta-planner admits the leading hypothesis $h^*$ when four conditions hold (as ruled on 4 October 2026, AM67 and AM68; until their build the code asks the first three, with the older third condition stated at the end of this section):
 
 1. $P_t(h^*) \ge \theta$, with $\theta = 0.75$. $P_t$ is the belief over the live hypotheses of section 7, with context knowledge on or off; the floor and the scaling by the pinned hypotheses stay in the reported distribution only (AM42).
 2. It is adequate: the observed movement does not contradict it. A hypothesis turns inadequate after about 334 cm of excess path, or after 17 ticks of standing.
-3. It is warranted.
-   - An assigned task has commitment warrant, from the assignment. It can be admitted before any distinguishing movement.
-   - A foreseeable task needs observation warrant. It has two sources. The first is the path-cost gain toward the target: the human's path cost to the task's target has decreased since the start of the present phase. One step that brings the human closer satisfies it. The second is the observed completion of the hypothesis's previous step, which entered the present phase. In a phase without a movement target (a wait), the second is the only source.
+3. It has observation warrant, whether it is an assigned task or a foreseeable task (AM67). Observation warrant has two sources. The first is the path-cost gain toward the target: the human's path cost to the task's target has decreased since the start of the present phase. One step that brings the human closer satisfies it. The second is the observed completion of the hypothesis's previous step, which entered the present phase. In a phase without a movement target (a wait), the second is the only source. Commitment warrant, from the assignment, no longer admits: the prior states which task is probable, and nothing states when the human starts.
+4. The evidence alone does not rank another live hypothesis above it (AM68): no $h \in H_t$ has $E_t(h) > E_t(h^*)$, with $E_t$ of section 7. Rank only: a tie passes; no constant, no margin. With context knowledge off the prior is equal, so the belief's leader is the evidence's leader and this condition refuses nothing. A leader that fails it is called outranked (a proposed term, not ruled).
+
+What context knowledge can do at the gate: make an admission earlier, by bringing a leader that the evidence already ranks first, or ties, to the threshold sooner. It cannot admit a task against the rank of the observed evidence, and no task is admitted before an observation warrants it.
+
+An admission ends as before (AM69; T-D L): on a change of leader, an episode boundary, or the admitted hypothesis turning inadequate. Conditions 3 and 4 are not asked while an admission stands.
+
+As built until AM67 and AM68 are built: the third condition reads "it is warranted": an assigned task has commitment warrant, from the assignment, and can be admitted before any distinguishing movement; a foreseeable task needs observation warrant. The fourth condition is not asked.
 
 ## 9. The procedure in four steps
 
@@ -224,6 +229,8 @@ What the prior adds: when the two foreseeable tasks are at different levels, the
 - Equal prior: the coffee break needs an evidence share of 0.75 against the A/C activation.
 - Prior 0.8 against 0.2 (state 7): it needs an evidence share of 0.43.
 - Example: the evidence is 0.55 for the A/C activation and 0.45 for the coffee break. The belief in the coffee break is $0.36 / 0.47 = 0.77$.
+- Under AM68 (section 8) the gate also needs the coffee break's evidence share to be at least 0.5, its rank: with the prior 0.8 against 0.2 the prior lowers what the threshold demands of the evidence from 0.75 to 0.5, and no lower.
+- In this example the gate refuses the admission under AM68: the evidence ranks the A/C activation first. The prior decides the leader of the belief, not the admission.
 
 In state 7 the difference between the two tasks rests on knowledge: the A/C is already on, so its activation is suppressed. When both foreseeable tasks are ordinary, the prior is 0.5 and 0.5, the same as without context knowledge.
 
@@ -287,11 +294,18 @@ Consequences to measure, not reasons to adjust the design:
 
 - A human who works through break time: the robot expects a break and recognises the assigned task later (section 11).
 - One assigned task left, no raising fact: its prior is about 0.98. The gate can admit it early on its assignment. If the human then takes a foreseeable task, a retraction follows.
+  Ruled after step 5b (AM67, AM68, 4 October 2026; not built): it is admitted only with observation warrant, which comes with the human's first step toward it (1 tick later in the 59 measured cases), and not while the evidence alone ranks another live hypothesis above it.
 - A crisp fact that changes in the middle of an episode changes the prior at once, with no new movement.
 - Measured in step 4 on kitting: within one walk the prior outweighs the movement evidence. Ruled (question S, AM65,
   4 October 2026): the four strengths stay as ruled; they state the designer's knowledge and are not tuned to the
   movement evidence. A table of step 4's cases under compressed values is a sensitivity analysis for the close of T-K
   part 1, not a candidate design.
+  Ruled again after step 5b (AM70, 4 October 2026): all strengths stay; a larger ordinary strength was discussed and not
+  taken. A strength is the designer's statement about a site, not chosen from test results; with AM67 and AM68 the
+  admissions of a hypothesis that is not the true task no longer depend on the value.
+- The cases that remain are limitations, not defects (AM72, 4 October 2026): the first ticks of a walk with equal
+  evidence; the evidence itself ranking another task first after the human interrupts a task; the human doing the less
+  probable task after a correct admission. An admission that was correct when made stays until the retraction (AM69).
 
 Open questions:
 
