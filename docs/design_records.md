@@ -3626,3 +3626,11 @@ admitted hypothesis first (the off run admits most of them too). The largest gai
 mechanism, a lone assigned task admitted before the human starts it (59 correct, 9 not; both new planning cases below
 min_separation). Not settled there: how the meta-planner acts on an admitted hypothesis that can be wrong (an open
 design question); communication (T-D X). Numbers: analysis/kitting/mpb/tk5b/COMPARISON.md and WHATIF.md.
+TWO WHAT-IF READINGS, X AND Y (ccode, 4 October 2026, at Hadi's request; analysis/kitting/mpb/tk5b/WHATIF.md and
+whatif.py; filters on the recorded gate answers with context knowledge on of step 4 and step 5b's recognition set, not
+runs; no ruling). X: admissible only where the evidence alone ranks no other live hypothesis strictly above; Y:
+observation warrant required. The true task's 216 earlier admissions: X keeps all; Y delays the 59 lone assigned tasks
+admitted on a completion tick by 1 tick. Wrong admissions of kind (ii) (17 rows, 310 ticks): X leaves 18 ticks, Y 302,
+both 11; of kind (iii) (26, 149): X 122, Y 72, both 55. scenario_s16_05's admission is refused by X (not by Y),
+scenario_s11_03's by Y (not by X), both by X and Y together. Changes of the answer within a true stretch: 673 recorded,
+653 X, 579 Y, 560 both.
