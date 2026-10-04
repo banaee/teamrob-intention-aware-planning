@@ -4,7 +4,7 @@
     "height": 1200,
     "name": "Kitting Domain Layout 4",
     "units": "cm",
-    "notes": "Foreseeable-task fixture (scenario_s04_01). One human run in four script parts: (1) an assigned delivery with a 1209 cm approach (positive control); (2) a walk from the kitting table to the coffee machine, >= 49.6 deg off every task target seen from the table; (3) a walk to two AC switches, ac_switch_1 and ac_switch_2 (waypoints wander_0 / wander_1 until F47b, retyped at the same coordinates so the scripted ac_activation instances are well typed; they are ac_activation hypotheses since) - ac_switch_1 lies on the straight line from the coffee machine to shelf_6 (the human heads toward a shelf it will use later), ac_switch_2 is >= 50 deg off every delivery target seen from ac_switch_1 (the human turns away); (4) the delivery from shelf_6. The coffee machine sits alone south of the table; every shelf is on the east or west edge. Every target is >= 50 deg off the script part 1 heading. No obstacles. The ac_switch object uses the type string ac_activation's parameter_types asks for ('ac_switch'); env_layout_02 spells it 'AC_switch' and gets no hypothesis (I1 follow-up). Track 2.5 (docs/assumptions.md 1.1): the script now ends with a fifth part, the exit walk go_to(corner_SE) after the delivery of item_6."
+    "notes": "Foreseeable-task fixture (scenario_s04_01). One human run in five script parts: (1) an assigned delivery with a 1209 cm approach (positive control); (2) a walk from the kitting table to the coffee machine, >= 49.6 deg off every task target seen from the table; (3) a walk to the A/C switch ac_switch_1 (the waypoint wander_0 until F47b, retyped at the same coordinates so the scripted ac_activation instance is well typed), which lies on the straight line from the coffee machine to shelf_6 (the human heads toward a shelf it will use later); (4) the delivery from shelf_6; (5) the exit walk go_to(corner_SE) (Track 2.5, docs/assumptions.md 1.1). One A/C switch, the V1 rule (T-K part 1, AM18): ac_switch_0 and ac_switch_2 were removed on 4 October 2026 (AM19), and with ac_switch_2 the script's walk to it. The coffee machine sits alone south of the table; every shelf is on the east or west edge. Every target is >= 50 deg off the script part 1 heading. No obstacles. The ac_switch object uses the type string ac_activation's parameter_types asks for ('ac_switch')."
   },
   "areas": [
     {
@@ -88,7 +88,7 @@
         100
       ],
       "slots": 2,
-      "notes": "Human's last delivery (script part 4). Script part 3's first waypoint lies on the coffee_machine_0 -> shelf_6 line, 40% of the way."
+      "notes": "Human's last delivery (script part 4). Script part 3's A/C switch, ac_switch_1, lies on the coffee_machine_0 -> shelf_6 line, 40% of the way."
     },
     {
       "id": "shelf_4",
@@ -146,19 +146,6 @@
       "notes": "Script part 2 target. From the kitting table: bearing -93.1 deg, 751 cm; nearest task-target bearing from there is shelf_5 at -43.5 deg (49.6 deg off). x = -40 keeps the walk off the x = 0 zone boundary."
     },
     {
-      "id": "ac_switch_0",
-      "type": "ac_switch",
-      "position": [
-        400,
-        550
-      ],
-      "size": [
-        20,
-        20
-      ],
-      "notes": "Second foreseeable target; never visited. Type spelled as ac_activation's parameter_types requires."
-    },
-    {
       "id": "ac_switch_1",
       "type": "ac_switch",
       "position": [
@@ -169,20 +156,7 @@
         20,
         20
       ],
-      "notes": "Script part 3, walk 1 end (was the waypoint wander_0; retyped as an AC switch in F47b so that scenario_s04_01's scripted ac_activation is well typed - same coordinates). Exactly on the coffee_machine_0 -> shelf_6 line (t = 0.4): the human heads toward shelf_6 for 398 cm, then turns. Since F47b it IS a hypothesis (ac_activation(ac_switch_1))."
-    },
-    {
-      "id": "ac_switch_2",
-      "type": "ac_switch",
-      "position": [
-        230,
-        -550
-      ],
-      "size": [
-        20,
-        20
-      ],
-      "notes": "Script part 3, walk 2 end (was the waypoint wander_1; retyped as an AC switch in F47b, same coordinates). From ac_switch_1: bearing -110.3 deg, 362 cm; >= 64 deg off every delivery target (shelf_5 92.6, coffee 64.0, shelf_6 116.1, table 133.1). Since F47b it is a hypothesis (ac_activation(ac_switch_2))."
+      "notes": "The layout's one A/C switch. Script part 3's walk end (was the waypoint wander_0; retyped as an AC switch in F47b so that scenario_s04_01's scripted ac_activation is well typed - same coordinates). Exactly on the coffee_machine_0 -> shelf_6 line (t = 0.4): the human heads toward shelf_6 for 398 cm, stops at the switch, then walks on to shelf_6 for item_6 (script part 4). Since F47b it IS a hypothesis (ac_activation(ac_switch_1))."
     },
     {
       "id": "corner_NE",

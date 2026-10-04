@@ -104,9 +104,9 @@ def test_the_grasp_tick_is_a_member_with_s_one(model5):
     # E8 (the scenario_s02_01 247 pattern, env_layout_05): on the grasp the true hypothesis
     # advances into its carry walk with nothing walked; it stays a member with S = 1, and the
     # finding is adequate though the only other member is a refuted foreseeable rival
-    # (ac_activation(ac_switch_0), whose walk the grasp does not change). Without E8 the rival
+    # (ac_activation(ac_switch_1), whose walk the grasp does not change). Without E8 the rival
     # alone decides.
-    rival = foreseeable(model5, "ac_activation(?ac_switch=ac_switch_0)")
+    rival = foreseeable(model5, "ac_activation(?ac_switch=ac_switch_1)")
     rec = recognizer(model5, [item("item_3"), rival])
     steps = delivery(model5)
     for t, (p, w) in enumerate(steps[:GRASP + 1]):
@@ -128,7 +128,7 @@ def test_the_grasps_latency_tick_is_a_member_with_s_one(model5):
     # and the finding adequate though the only other member is a refuted rival. (Under 1.5b it held
     # no observation there and the rival alone made the finding unexplained.) The first carry tick
     # keeps it a member at D = 0 (a straight walk, no standing beyond s_exp).
-    rival = foreseeable(model5, "ac_activation(?ac_switch=ac_switch_0)")
+    rival = foreseeable(model5, "ac_activation(?ac_switch=ac_switch_1)")
     rec = recognizer(model5, [item("item_3"), rival])
     k3 = repr(item("item_3"))
     steps = delivery(model5)

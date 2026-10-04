@@ -735,3 +735,21 @@ This folder moved from `analysis/tb1a_destination/` to `analysis/kitting/tb1a_de
 unchanged: the set was regenerated from the sorted tree and is byte-identical. The commands of the sections above read
 `bash analysis/kitting/tb1a_destination/sweep.sh <dir>`, and `sep_classes.py` (with the parser `logparse.py`) is
 `analysis/instruments/common/sep_classes.py`.
+
+## One A/C switch on env_layout_05 (T-K part 1, step 1, 4 October 2026) — the logs from here on
+
+Regenerated when env_layout_05 was brought to the V1 rule of at most one A/C switch per layout (Hadi's ruling of 4
+October 2026 on AM19; design_records.md, "T-K", STEP 1): the layout keeps ac_switch_1 only (ac_switch_0 and
+ac_switch_2 removed), and scenario_s04_01's script keeps one ac_activation, at ac_switch_1 (the walk to ac_switch_2
+removed). Only this scenario's two logs and their `.rec` streams change. The other 14 logs and their `.rec` streams are
+byte-identical to the class-2 table above (the full sweep rerun and compared with `cmp`; tb1b, tb1c and tb3 rerun
+too, every log and `.rec` byte-identical). What moved, both priors: the `[coverage]` lines at load (one ac_activation
+entry fewer); every `[IR*]` line from tick 0 (two hypotheses fewer, ac_activation(ac_switch_0) and (ac_switch_2));
+the human's record from tick 207, where it walks on from ac_switch_1 to shelf_6 for item_6 instead of to ac_switch_2;
+the human completes its exit walk at 369. Completion is the world tick (T6). Prior on first.
+Commands: `bash analysis/kitting/tb1a_destination/sweep.sh <dir>`; `analysis/instruments/common/sep_classes.py <dir>`.
+
+| log | md5 (.log) | md5 (.rec) | completion before | completion after | [sep] min, continuous (tick) | viol | stand | recede |
+|---|---|---|---|---|---|---|---|---|
+| env_layout_05_scenario_s04_01_on | bdadb875c6e414c689d9e3b1dd6ab80c | 1dc08a288e67886ecaf9bc3614540161 | 384 | 379 | 59.89 (338) | 0 | 0 | 0 |
+| env_layout_05_scenario_s04_01_off | 8dd9fc6bd8fce247e01e49fe26fee1c7 | 1dc08a288e67886ecaf9bc3614540161 | 384 | 392 | 64.96 (341) | 0 | 0 | 0 |

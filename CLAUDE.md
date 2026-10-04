@@ -625,7 +625,7 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 | scenario_s02_01 | env_layout_02 | coffee break and AC activation; needs about 450 steps |
 | scenario_s03_01 | env_layout_03 | table convergence; does not finish in 200 steps |
 | scenario_s01_06 | env_layout_04 | mirror-symmetric intersecting paths |
-| scenario_s04_01 | env_layout_05 | foreseeable task and two AC-switch walks (retyped F47b) |
+| scenario_s04_01 | env_layout_05 | foreseeable task and one AC-switch walk (one switch since T-K part 1, step 1) |
 
 Old ids (scenario_00 on env_layout0 and so on) are mapped in `docs/rename_table.md`; the frozen records keep them.
 
