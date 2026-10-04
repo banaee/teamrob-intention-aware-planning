@@ -263,3 +263,42 @@ md5s of the expectations (`expected.csv`, `phases.json`, and the `trajectory.jso
     1e4bd993764ff9ef2d5b54d9047d1ecc  scenario_s09_11/phases.json
     db58521960ef067271c2c1cd8b9ce0a4  scenario_s09_12/phases.json
     e25796c49eaf761a868bcda094320767  scenario_s09_13/phases.json
+
+## Runs (stage 2; git-ignored; md5s)
+
+17 runs, context knowledge on; every run agrees with its expectations (0 disagreements against actual.csv and actual_log.csv at 1e-9, 0 unmatched rows); the trajectory equals the run's human lines on every tick; the expectations' md5s unchanged by the runs. Results: `REPORT.md`.
+
+    a95cc2eae7b0fcf51bcfc7d813e6ed71  runs/env_layout_10_scenario_s08_01_on.log
+    1aeededb6b19047ac26259e86b711a39  runs/env_layout_10_scenario_s08_02_on.log
+    c59fecb8d6573defe8c4e2f8b1524114  runs/env_layout_10_scenario_s08_03_on.log
+    37aac8c5340ec2328876f8bd644b8b93  runs/env_layout_10_scenario_s08_04_on.log
+    cbd9923b09e994b06cf9cefd9e66764e  runs/env_layout_11_scenario_s09_01_on.log
+    7c17e389ae0f0b5771cd23b93b2d8623  runs/env_layout_11_scenario_s09_02_on.log
+    56099d01ad4ca56a574a5fed7f93f02f  runs/env_layout_11_scenario_s09_03_on.log
+    6c1643446f96ce1e75faa52a0565cd09  runs/env_layout_11_scenario_s09_04_on.log
+    6a3fa3747facfec19c99e3a56c4b7206  runs/env_layout_11_scenario_s09_05_on.log
+    9e2645205162c7383f1a1ecc24f56db2  runs/env_layout_11_scenario_s09_06_on.log
+    29e68dfde182ffe644c5d61f787fe923  runs/env_layout_11_scenario_s09_07_on.log
+    bb17462229c5e24106c5ee2aa89accfd  runs/env_layout_11_scenario_s09_08_on.log
+    5874fb334e9bf715fd71321bfb229deb  runs/env_layout_11_scenario_s09_09_on.log
+    01d6b035490d749619c3b7734f90cf44  runs/env_layout_11_scenario_s09_10_on.log
+    fe926c06ac704f483eaffb5dd3df734a  runs/env_layout_11_scenario_s09_11_on.log
+    0ba34f139de36af3510f8a2c8390236f  runs/env_layout_11_scenario_s09_12_on.log
+    3677ff255e79a558c60cd0678bfeb70b  runs/env_layout_11_scenario_s09_13_on.log
+    2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_10_scenario_s08_01_on.rec
+    a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_10_scenario_s08_02_on.rec
+    93551c8fa122df7c3ad6a028f9717845  runs/env_layout_10_scenario_s08_03_on.rec
+    b2d33459410319657e1f47791c1e180e  runs/env_layout_10_scenario_s08_04_on.rec
+    2b6dafd84a0086185ec971c2bde68d75  runs/env_layout_11_scenario_s09_01_on.rec
+    a9c382958a10484ae1bc2df54e4d3a1c  runs/env_layout_11_scenario_s09_02_on.rec
+    93551c8fa122df7c3ad6a028f9717845  runs/env_layout_11_scenario_s09_03_on.rec
+    b2d33459410319657e1f47791c1e180e  runs/env_layout_11_scenario_s09_04_on.rec
+    c715db44f68926f3bb6b8fa387525f1a  runs/env_layout_11_scenario_s09_05_on.rec
+    703b2c62e484b7db940f36166548a88c  runs/env_layout_11_scenario_s09_06_on.rec
+    a2ece1d231a6c071c20efdea470c4c9f  runs/env_layout_11_scenario_s09_07_on.rec
+    529f6f2019682be19b77f4e1152b1ea5  runs/env_layout_11_scenario_s09_08_on.rec
+    e252b7b8e703da1492b52df3ae4df3dc  runs/env_layout_11_scenario_s09_09_on.rec
+    c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
+    9a4309d36ae6a47d9f1e36f512b711b2  runs/env_layout_11_scenario_s09_11_on.rec
+    606beeb608930d07b519195f915aae90  runs/env_layout_11_scenario_s09_12_on.rec
+    739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec

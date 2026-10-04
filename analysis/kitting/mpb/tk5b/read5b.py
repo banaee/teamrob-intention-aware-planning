@@ -234,6 +234,54 @@ def held(decisions, terminal):
     return out
 
 
+def rows():
+    """The coverage rows whose instances the prior moves, over the sixteen runs per side (coverage.md's definitions):
+    A4 the cause boundary; A7 a no_current_task decision on a tick at or after the recorded fallback's end; A8 a
+    recognition_changed decision on such a tick; B11 replaced with the gate clearing on the same tick; a switch (the
+    winner other than the task the robot held, that task not completed), with the robot's state on the tick before
+    (carrying: D9; otherwise walking: D7 or D8 by the projection), the held task still in the pool (a decision after
+    the robot's own release is a new selection); E6 the record kept through a tick below θ (the
+    oracle's table: the recorded hypothesis leads with the gate refusing below θ, no decision on the tick)."""
+    out = {}
+    for side in ("off", "on"):
+        found = {k: [] for k in ("A4", "A7", "A8", "B11", "switch", "E6")}
+        for sid in SCENARIOS:
+            r, s = Run(sid, side), sid.removeprefix("scenario_")
+            ticks = {t.tick: t for t in load_ticks(folder(sid, side) / "expected_ticks.json")}
+            expiry, record, held_task = None, None, None
+            dec = {d.tick: d for d in r.dec}
+            end = r.props["terminal"] if r.props["terminal"] is not None else max(ticks) + 1
+            for t in range(0, end):                       # C6: nothing is evaluated after the terminal decision
+                d = dec.get(t)
+                if d is None:
+                    row = ticks.get(t)
+                    if record is not None and row is not None and row.leader == record and row.gate.value == "none(below_theta)":
+                        found["E6"].append(f"{s} {t}")
+                    continue
+                if d.cause is not None and d.cause.value == "boundary":
+                    found["A4"].append(f"{s} {t}")
+                if expiry is not None and t >= expiry and d.trigger.value == "no_current_task":
+                    found["A7"].append(f"{s} {t}")
+                if expiry is not None and t >= expiry and d.trigger.value == "recognition_changed":
+                    found["A8"].append(f"{s} {t}")
+                if d.cause is not None and d.cause.value == "replaced" and d.admitted is not None:
+                    found["B11"].append(f"{s} {t}")
+                win = r.sel[t]["winner"]
+                pool = [c["task"] for c in r.sel[t]["candidates"]]
+                if held_task is not None and win is not None and win != held_task and held_task in pool \
+                        and d.trigger.value != "no_current_task":
+                    state = "carrying" if (r.robot.get(t - 1) or {}).get("carrying") else "walking"
+                    found["switch"].append(f"{s} {t} ({state}, {'admitted' if d.admitted else 'fallback'})")
+                held_task = win
+                expiry = d.fallback.end if d.admitted is None and d.fallback is not None else None
+                record = d.leader if d.admitted is not None else None
+        out[side] = found
+    print("| row | off | on |")
+    print("|---|---|---|")
+    for k in ("A4", "A7", "A8", "B11", "switch", "E6"):
+        print(f"| {k} | {'; '.join(out['off'][k]) or 'none'} | {'; '.join(out['on'][k]) or 'none'} |")
+
+
 def report():
     print("### The authored case, off against on\n")
     print("| scenario | the authored case | off | on | on: where |")
@@ -267,4 +315,4 @@ def report():
 
 
 if __name__ == "__main__":
-    {"expect": expect, "report": report}[sys.argv[1]]()
+    {"expect": expect, "report": report, "rows": rows}[sys.argv[1]]()
