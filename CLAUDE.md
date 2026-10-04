@@ -421,7 +421,8 @@ Decisions
   THE TESTS, KT1 to KT7; design_decisions.md, the same entry, AM11's AM34): kitting first, then dock_loading's stage 1
   scenarios, in each the IRB with an idle robot before the MPB with a working robot (KT1); on kitting Hadi's rooms
   env_layout_15 (no A/C switch), _16 (coffee machine and A/C switch in a dense cluster), _17 (15 plus an A/C switch
-  between two deliveries; MPB or mix), env_layout_10, _11, _02 unchanged as a comparison (KT2); the basic set varies
+  between two deliveries; MPB or mix), env_layout_10, _11, _02 as they are, as a comparison (KT2; env_layout_02 after
+  Hadi's correction of its object sizes, 4191202, which only the viewer reads); the basic set varies
   only where a foreseeable task is placed (between tasks, or inside a task between its actions), two setups per layout,
   five or more scenarios each, context knowledge on and off, two MPB cases, the measure the tick at which the true task
   reaches the threshold and is admitted and whether a retraction follows, expectations before the runs, the duration
@@ -442,12 +443,27 @@ Decisions
   T-G stage 1.5 was renamed T-K part 1 on 3 October 2026; git commit messages use the old name.
   T-K (design_records.md, "T-K", THE TASK RENAMED: T-K AND ITS PARTS) is context knowledge as a whole, a task of the
   pipeline (framework-wide), not a stage of T-G. Part 1 (V1, ongoing):
-  crisp context knowledge, R1 to R8, AM1 to AM34, KT1 to KT12, the state above. Part 2 (V1, at the end of the V1 queue after track
+  crisp context knowledge, R1 to R8, AM1 to AM39, KT1 to KT12, the state above. Part 2 (V1, at the end of the V1 queue after track
   3b): degrees (R5: membership functions, soft edges of a window, the gradual return after a task, "or", with "long
   work without a break" its open item; succession, R4, after T-G stage 2). Later, future work: the stream of context
   values with the world's dynamics, TODO-163, TODO-164, TODO-158 to TODO-161. A letter is never given to a different
   task; a task may be paused, resumed and revisited. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes
   at its stage 2 when T-K part 1 is closed. Next: the rest of T-K part 1 in a new design chat, as above.
+  The strengths are REVISED (Hadi, 3 October 2026, the design chat on the rest of T-K part 1; recorded 4 October 2026;
+  design_decisions.md, the same entry, R3's AM35, AM36, AM39; design_records.md, "T-K", AM37 under AM13, AM38 under
+  AM17, THE STRENGTHS REVISED). It supersedes the low and the high strength, the occurrence condition, "not" in T-K part
+  1 and the values of AM13 and AM17 stated above. "Work as a whole" reads "the assigned tasks as a whole" (AM35, wording
+  only). Three levels per foreseeable task (AM36): if its suppressing condition is satisfied, the suppressed strength
+  0.005; otherwise, if its raising condition is satisfied, its raised strength; otherwise the ordinary strength 0.02;
+  each condition optional, one fact or a conjunction of facts from the three sources, no "not" ("not" and "or" are T-K
+  part 2's). coffee_break: suppressed by its recency fact, raised to 2 by break_time; ac_activation: suppressed by
+  ac_on, raised to 0.5 by room_warm; office_break: suppressed by its recency fact, no raising condition; recency
+  durations unchanged, 90 and 135 ticks (AM37, AM38). The reading per value, s / (1 + s) of task starts, still proposed
+  (AM39). Stale and marked: the coffee break's prior equal to θ (now 2/3), the expected directions with context
+  knowledge on (the design chat restates them before those runs), R5's linear rule (restated for two conditions, T-K
+  part 2), the form for "not". Open for the build's plan: which value the gate compares with θ. The statement of the
+  prior: `docs/context_knowledge_method.md` (the rule in "Where to look"). Nothing built. Next: unchanged (KT12's steps,
+  from `docs/handoffs/T-G_forward_inputs.md`, section 5).
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

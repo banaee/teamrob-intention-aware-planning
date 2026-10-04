@@ -847,7 +847,8 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     the same entry, AM11's AM34): content point 3, the tests. Kitting first, then dock_loading's stage 1 scenarios; in
     each domain the IRB with an idle robot, then the MPB with a working robot (KT1). On kitting Hadi's rooms
     env_layout_15 (no A/C switch), _16 (the coffee machine and the A/C switch in a dense cluster) and _17 (15 plus an
-    A/C switch between two deliveries; the MPB or a mix); env_layout_10, _11 and _02 unchanged as a comparison; a
+    A/C switch between two deliveries; the MPB or a mix); env_layout_10, _11 and _02 as they are, as a comparison
+    (env_layout_02 after Hadi's correction of its object sizes, 4191202; KT2's CORRECTED line); a
     further layout for the second coffee break and the recency fact is to come (KT2). The basic set varies only where
     a foreseeable task is placed, between tasks or inside a task between its actions; two setups per layout, five or
     more scenarios each, each run with context knowledge on and off; two MPB cases (a coffee break inside the break
@@ -869,12 +870,25 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     1 (`docs/handoffs/T-G_forward_inputs.md`, section 5): the layouts with more than one A/C switch and their change,
     the build's plan, the build, the setups' timelines and the runs in B and C, the two MPB cases, dock_loading's part,
     the close.
+    AMENDED (Hadi, 3 October 2026, the design chat on the rest of T-K part 1; recorded 4 October 2026; design_decisions.md,
+    the same entry, R3's AM35, AM36, AM39; design_records.md, "T-K", AM37, AM38, THE STRENGTHS REVISED): the form and the
+    values of the strengths revised before the build's plan. "Work as a whole" reads "the assigned tasks as a whole"
+    (AM35, wording only). Three levels per foreseeable task (AM36): a suppressing condition and a raising condition, each
+    optional, one fact or a conjunction of facts, no "not" in T-K part 1; the suppressed strength 0.005 and the ordinary
+    strength 0.02 per domain, the raised strength per task: coffee_break 2 under break_time, ac_activation 0.5 under
+    room_warm, office_break none; suppressed by the recency fact (coffee_break, office_break) or ac_on (ac_activation)
+    (AM37, AM38). The reading of a strength stated per value, still proposed (AM39). The expected directions with
+    context knowledge on are restated by the design chat before those runs. Open for the build's plan: which value the
+    gate compares with θ. The statement of the prior: `docs/context_knowledge_method.md`. Nothing built. Next: unchanged.
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing
     in R2 to R4 changes with it. Not started.
     AMENDED (AM11, Hadi, 3 October 2026): "not" in an occurrence condition is part 1's; part 2 keeps "or" and the
     degrees.
+    SUPERSEDED IN PART (AM36, Hadi, 3 October 2026): "not" is part 2's again, with "or". The linear rule, strength = low
+    + degree × (high − low), was stated for the pair of a low and a high strength; it is restated for two conditions (the
+    suppressing and the raising condition), an open item of part 2.
     ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED; design_records.md, "T-K",
     T-K part 2's OPEN ITEMS): soft edges of a window and a gradual return of the strength after a task (a membership
     function over the time since the last observed completion); "or" in an occurrence condition, with "long work without

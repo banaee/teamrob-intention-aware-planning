@@ -15,6 +15,9 @@ rest of T-K part 1; sections 1, 2 and 9 brought in line.
 Completed 3 October 2026 from the design chat's scan of its conversation: section 5 (the occurrence condition per
 task, the instruments in the build's plan, env_layout_05, the gate at exactly θ, the window edges, env_layout_16's
 shelves) and section 11 (Hadi's rules of 3 October 2026); durations shown in ticks.
+Updated 4 October 2026 after Hadi's rulings of 3 October 2026 on the form and the values of the strengths (AM35 to
+AM39): section 5 in line (5.1 to 5.4 and 5.7 to 5.11); the method document named as the statement of the prior; the
+entries on object ids and on subtype named (5.11).
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -203,14 +206,22 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   corrections C1, C3 and C4. AM1 to AM9 come from the review of the records; AM10 to AM29 from content points 1 and 2
   (the block CONTENT POINTS 1 AND 2, after R8; that chat's A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29);
   AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11); a CLARIFIED line under
-  R3's AM2 (the occurrence condition evaluated per task).
+  R3's AM2 (the occurrence condition evaluated per task); AM35, AM36 and AM39 under R3, from the design chat on the
+  rest of T-K part 1 (the name, the three levels, the reading of a strength).
 - docs/design_records.md, the heading "T-K": the record part. R9, superseded by AM3, and AM3's consequences; THE CUT
   AND THE QUEUE (what part 1 builds, part 2, the future work); OPEN ITEMS OF T-K PART 1 (all three ruled); NOTES FOR
   THE BUILD'S PLAN; CONTENT POINTS 1 AND 2 (the values: AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28,
-  AM29); CONTENT POINT 3, THE TESTS (KT1 to KT7); ROUND 1 (KT8 to KT12); THE TASK RENAMED: T-K AND ITS PARTS.
+  AM29); CONTENT POINT 3, THE TESTS (KT1 to KT7); ROUND 1 (KT8 to KT12); THE TASK RENAMED: T-K AND ITS PARTS; AM37
+  under AM13 (the declarations) and AM38 under AM17 (the values and their sources); THE STRENGTHS REVISED (what became
+  stale, the open item on the value the gate compares with θ, the method document, ccode's flags on it).
   Correction C2, the caveat on the long runs, stands under "T-G stage 1", in TODO-66 and in the MPB report.
-- docs/glossary.md §5 (context knowledge, context value, context fact, membership function, occurrence condition,
-  strength, prior, recency fact, recency duration); §8 (T-K part 1, T-K part 2); §9, setup (AM34).
+- docs/glossary.md §5 (context knowledge, context value, context fact, timeline of context facts, timeline fact,
+  membership function, suppressing condition, raising condition, suppressed / ordinary / raised strength, recency fact,
+  observed completion, memory of observed completions, recency duration, the assigned tasks as a whole, strength,
+  prior; occurrence condition retired); §8 (T-K part 1, T-K part 2); §9, setup (AM34).
+- docs/context_knowledge_method.md: the method of context knowledge at the state of AM35 to AM39, the concept, the
+  formulas of the prior and worked examples. It is the statement of the prior that the build's plan reads. The records
+  win where the two disagree; a ruling that changes the method updates it in the same records step (CLAUDE.md).
 - docs/assumptions.md 5.4 (the timeline's facts known exactly and at once; the source of a recency fact), 6.1 (given
   the task, the movement does not depend on the context), 6.2 (the declared and the actual duration match, a baseline
   whose violation is a deviation), 6.3 (the declared durations are at a compressed demonstration scale).
@@ -232,24 +243,31 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   evidence: at a boundary it restarts equal over the live hypotheses; a hypothesis that returns to the live set takes
   1/|H| of it.
 - The prior (R3, R4, AM2 to AM4, C3). It is the normalisation of the strengths of what is live.
-  - The human's work as a whole (the live hypotheses of work tasks in the support; with assignment knowledge on, the
-    live assigned tasks) contributes 1 while at least one of them is live, however many are live. Its share is
-    divided equally among them.
+  - The assigned tasks as a whole (AM35; "work as a whole" in older records) contribute 1 while at least one of them
+    is live, however many are live. Its share is divided equally among them. With assignment knowledge off (an
+    ablation), every work task of the task model takes the place of the assigned tasks.
   - Each live foreseeable task contributes its declared strength, divided equally among that task's live hypotheses.
   - With no work hypothesis live, the normalisation runs over the live foreseeable tasks alone.
   - Every strength is greater than zero. With context knowledge on, every foreseeable task in the task model declares
     a strength. A declaration that violates either is rejected when the knowledge is loaded.
-- A strength. The declared relative weight of a foreseeable task against the human's work as a whole. A foreseeable
-  task declares a low strength (its occurrence condition not satisfied) and a high strength (satisfied); one strength
-  if it has no occurrence condition. Each carries its source and is a modelling assumption until a site measures it.
-  Proposed meaning, not claimed: a ratio of counted task starts.
-- An occurrence condition (AM11, AM12). It reads facts from three sources: a timeline fact (a window on the setup's
-  timeline of context facts), an object state (T-G A5), a recency fact. It uses "and" and "not"; "or" is T-K part 2's.
-  Not satisfied, the foreseeable task has its low strength and stays live: context removes no hypothesis.
-- An occurrence condition is evaluated per foreseeable task, not per hypothesis (R3's AM2, its CLARIFIED line): one
-  selection of the low or the high strength per task, which is then divided among the task's live hypotheses. This is
-  why V1 has at most one A/C switch per layout, and why a condition that differs per hypothesis is future work
-  (TODO-164).
+- A strength (AM36). The declared relative weight of a foreseeable task against the assigned tasks as a whole. Three
+  levels per foreseeable task, in place of the low strength, the high strength and the occurrence condition. A
+  foreseeable task declares a suppressing condition and a raising condition, each optional. If the suppressing
+  condition is satisfied, the task has the suppressed strength; otherwise, if the raising condition is satisfied, its
+  raised strength; otherwise the ordinary strength. The suppressed and the ordinary strength are declared once per
+  domain, for every foreseeable task; the raised strength per task, with its raising condition. Each carries its
+  source and is a modelling assumption until a site measures it. Reason: a number must not decide between hypotheses
+  that the robot has no knowledge to tell apart; one low and one high value cannot state three situations (suppressed,
+  ordinary, raised).
+- The reading of a strength (AM39), proposed, not validated: at a task start, with only this foreseeable task and the
+  assigned tasks live, the probability that the start is the foreseeable task is s / (1 + s). 0.005: 1 of 201 task
+  starts; 0.02: 1 of 51; 0.5: 1 of 3; 2: 2 of 3.
+- A condition (AM11, AM12, AM36). One fact or a conjunction of facts from three sources: a timeline fact (a window on
+  the setup's timeline of context facts), an object state (T-G A5), a recency fact. T-K part 1 builds no "not"; "not"
+  and "or" are T-K part 2's. At every level the foreseeable task stays live: context removes no hypothesis.
+- The conditions are evaluated per foreseeable task, not per hypothesis (R3's AM2, its CLARIFIED line): one selection
+  of the level per task, which is then divided among the task's live hypotheses. This is why V1 has at most one A/C
+  switch per layout, and why a condition that differs per hypothesis is future work (TODO-164).
 - Facts (AM10, AM14, AM20, AM21, AM30 to AM34).
   - Every fact of T-K part 1 is crisp: it holds or it does not hold.
   - A timeline fact is a state. An entry of the timeline is the change; the fact holds until the next change. The
@@ -268,21 +286,26 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - Perception (AM25, AM26). The robot knows which timeline facts hold, exactly and at once; no sensing is modelled
   (justified by the site's system, as for object states). The environment applies the timeline, the world state
   carries the facts, the recognizer reads them there. The declared context knowledge (the facts that exist, the
-  occurrence conditions, the strengths, the recency durations) reaches the mind directly from the knowledge component,
-  as the task model does.
-- The values (AM13 to AM17), the same in both domains where the task exists:
+  suppressing and the raising conditions, the strengths, the recency durations) reaches the mind directly from the
+  knowledge component, as the task model does.
+- The values (AM16, AM37, AM38), the same in both domains where the task exists. Suppressed strength 0.005, ordinary
+  strength 0.02, for every foreseeable task:
 
-  | foreseeable task | occurrence condition | strength low / high | recency duration |
-  |---|---|---|---|
-  | coffee_break (kitting, dock_loading) | break_time and not recent | 0.02 / 3 | 90 ticks |
-  | ac_activation (kitting, dock_loading) | room_warm and not ac_on | 0.005 / 0.2 | none (ac_on covers it) |
-  | office_break (dock_loading) | not recent | 0.005 (recent) / 0.02 (not recent) | 135 ticks |
+  | foreseeable task | suppressing condition | raising condition | raised strength | recency duration |
+  |---|---|---|---|---|
+  | coffee_break (kitting, dock_loading) | its recency fact | break_time | 2 | 90 ticks |
+  | ac_activation (kitting, dock_loading) | ac_on | room_warm | 0.5 | none (ac_on covers it) |
+  | office_break (dock_loading) | its recency fact | none | none | 135 ticks |
 
-  break_time and room_warm are timeline facts; ac_on is the A/C switch's object state; "recent" is the task's own
-  recency fact. A recency duration is 3 times the task's declared wait, counted from the observed completion. Each
-  strength's source, in these words: "Modelling assumption, Hadi, 3 October 2026. A relative strength. Its order of
-  magnitude is motivated by the proposed meaning of a strength (a ratio of counted task starts), which is not
-  validated." No value was chosen from the threshold or from a scenario.
+  break_time and room_warm are timeline facts; ac_on is the A/C switch's object state. A recency duration is 3 times
+  the task's declared wait, counted from the observed completion. A coffee break just completed has the suppressed
+  strength in every situation, inside break time too; ac_activation in a room not warm, with the A/C off, has the
+  ordinary strength. Sources: 0.005 and 0.02 keep the sentence "Modelling assumption, Hadi, 3 October 2026. A relative
+  strength. Its order of magnitude is motivated by the proposed meaning of a strength (a ratio of counted task
+  starts), which is not validated." The raised strength 2 (in place of 3): break time favours the coffee break, more
+  probable than an assigned task, not as strongly as 3 stated (3 asserted 3 of 4 task starts). The raised strength
+  0.5 (in place of 0.2): a warm room is a matter of comfort with no stated time; the activation follows within about 3
+  task starts (0.2 asserted 6). No value was chosen from the threshold or from a scenario.
 - The A/C switch (AM18). An object in the layout with the state ac_on, which ac_activation sets. A setup may state its
   initial state. At most one per layout in V1, in every domain; a layout may have none. ac_activation and room_warm are
   in the task model and the context knowledge of both domains. dock_loading's three existing rooms get no A/C switch,
@@ -300,19 +323,19 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - One declared duration (R6). Context does not change the content of a projection. The only path from context to the
   projection is: prior, belief, gate, projection of the admitted task.
 - The earlier entry "Assigned-task pool is a support restriction, not a prior" is superseded in part (R8, AM6): the
-  assignment still restricts the support and sets no weight; declared strengths replace unit weight between work as a
-  whole and the foreseeable tasks. The surviving concern: a number must not decide between hypotheses that the robot
+  assignment still restricts the support and sets no weight; declared strengths replace unit weight between the
+  assigned tasks as a whole and the foreseeable tasks. The surviving concern: a number must not decide between hypotheses that the robot
   has no knowledge to tell apart.
 - The assumptions A1 to A7 stand in the entry; A1 and A5 are also docs/assumptions.md 6.1 and 6.2.
 
 ### 5.3 What the build of T-K part 1 contains [ruled]
 
-- The prior of 5.2, with crisp facts, and the occurrence condition with "and" and "not" over its three sources. "Not"
-  needs a condition form of its own (the code's ConditionSchema has no negation); ccode proposes it in the build's
-  plan.
+- The prior of 5.2, with crisp facts, and the three levels: per foreseeable task a suppressing and a raising
+  condition, each one fact or a conjunction of facts over the three sources. No "not" (AM36): no form for "not" is
+  needed. The statement of the prior that the plan reads: docs/context_knowledge_method.md.
 - The setup's timeline of context facts (AM34). Today a setup has no form for it; the build adds it.
-- The declarations per domain: the context facts, and per foreseeable task its occurrence condition, its strengths
-  with their source and its recency duration. Recency durations are declared in physical time and converted by the
+- The declarations per domain: the context facts, the suppressed and the ordinary strength, and per foreseeable task
+  its suppressing condition, its raising condition with its raised strength, the sources and its recency duration. Recency durations are declared in physical time and converted by the
   body. The declared knowledge replaces the class ContextKnowledge in shared/knowledge.py.
 - The memory of observed completions, its own component of the mind (AM30).
 - ac_on: a declared state and a declared effect of ac_activation. dock_loading needs the object type, the task
@@ -333,8 +356,9 @@ Recorded: design_records.md, "T-K", CONTENT POINT 3, THE TESTS (KT1 to KT7) and 
   then the MPB with a working robot. Reason: T-K changes the belief, so the recognition is examined first; the two MPB
   cases then show whether a changed admission changes the robot's decision.
 - Rooms on kitting (KT2, KT9). env_layout_15, _16 and _17, Hadi's design, as they are in 5.5. env_layout_12 to _14
-  are unfit for a controlled test (they carry the MPB's many tables). env_layout_10, _11 and _02 stay unchanged, as a
-  comparison. ccode may adjust the three rooms where it makes a better basic test, decided before the runs and never
+  are unfit for a controlled test (they carry the MPB's many tables). env_layout_10, _11 and _02 stay as they are, as a
+  comparison; env_layout_02 as it is after Hadi's correction of its object sizes (4191202; KT2's CORRECTED line; only
+  the viewer reads a size). ccode may adjust the three rooms where it makes a better basic test, decided before the runs and never
   after seeing a result, because they are test instruments and not an evaluation reference.
 - The basic set (KT3). The only variation is where a foreseeable task is placed: between tasks (after the first
   delivery, after the second, and so on) and inside a task, between its actions. No other kind of deviation, since
@@ -346,20 +370,15 @@ Recorded: design_records.md, "T-K", CONTENT POINT 3, THE TESTS (KT1 to KT7) and 
 - The three conditions (KT11, ruled by Hadi). The run with context knowledge off is not a neutral baseline: the equal
   prior gives a foreseeable task the share of one delivery. So the tests read:
   - A: context knowledge off (round 1 is A);
-  - B: context knowledge on, the context fact not holding (the low strengths);
+  - B: context knowledge on, the context fact not holding (no raising condition satisfied);
   - C: context knowledge on, the context fact holding.
   A to B shows the effect of the declared strengths; B to C the effect of the context fact. One window in a setup
   puts some scenarios in B and others in C, since the foreseeable task falls at a different tick in each.
-  Directions expected before the runs, as corrected (KT11's CORRECTED line, Hadi, 3 October 2026; the first wording,
-  "deliveries earlier in B and C than in A", contradicted the prior's arithmetic):
-  - deliveries are earlier in B than in A;
-  - in C, deliveries are later than in A when the fact that holds is break_time, since the coffee break's strength
-    takes most of the prior (in env_layout_15, each of n live deliveries falls from 1/(n + 1) to 1/(4n)), and earlier
-    when it is room_warm;
-  - a coffee break outside the break time is later in B than in A; inside the break time it is earlier in C;
-  - the A/C is lower than A in both B and C, and higher in C than in B; with several deliveries live the difference
-    between A and C is small.
-  The "later in C" case is the cost of context knowledge when the human works through a break time.
+  The expected directions with context knowledge on, and their arithmetic, were stated for the old values; they are
+  superseded (KT11's SUPERSEDED line; AM36 to AM38). The design chat restates them before the runs in B and C. Ruled
+  by Hadi for that restatement: with context knowledge on and no raising fact holding, a lone live assigned task is
+  admitted on its commitment warrant from its prior, and a retraction follows if the human then takes a foreseeable
+  task. [ruled]
 - The measure (KT3, KT10). Per true stretch: the tick at which the true task reaches the threshold and is admitted,
   and whether a retraction follows. For the A/C the measure is its belief at its arrival, not its admission.
 - The two MPB cases (KT3): a coffee break inside the break time; deliveries through the whole break time.
@@ -426,13 +445,15 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    scenario_s04_01 to _03 (env_setup_04); scenario_s04_01, a fixture of the regression sweep, scripts two
    activations, at ac_switch_1 and then ac_switch_2; four tests in tests/kitting/ name the layout or its scenarios.
    The full list, over every layout of both domains, is this step's work.
-2. The build's plan (BUILD DISCIPLINE, step 1): ccode's plan, with no code, reviewed in the design chat.
+2. The build's plan (BUILD DISCIPLINE, step 1): ccode's plan, with no code, reviewed in the design chat. It reads
+   docs/context_knowledge_method.md as the statement of the prior. Open for it (5.10, item 9): which value the gate
+   compares with θ.
 3. The build, its verification (AM24) and the review. The existing sets either state context_knowledge off and stay
    identical, or are regenerated with the reason stated; round 1 with context_knowledge off is expected identical
    except the lines the build names.
 4. The timelines in the setups (the second setup per room, differing in its timeline; the windows authored from the
-   foreseeable tasks' ticks in the round's README), expectations before the runs, the runs in B and C, read A to B and
-   B to C.
+   foreseeable tasks' ticks in the round's README), the expected directions restated by the design chat (5.4),
+   expectations before the runs, the runs in B and C, read A to B and B to C.
 5. The two MPB cases, with a working robot.
 6. dock_loading's part: what its layouts and scenarios need for context knowledge, and the re-measurement of T-G
    stage 1's baseline (section 4's figures were measured with the equal prior).
@@ -448,11 +469,13 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
   break is itself the task of another entry's event (the stack is one level deep, TODO-100): recorded as absent.
   [ruled]
 - T-K part 2 [ruled as design, not built]: degrees (R5): a context fact satisfied to a degree in [0, 1], a membership
-  function from a context value, minimum for "and", maximum for "or", 1 minus the degree for "not", strength = low +
-  degree × (high − low). Open with it: the representation of a context value and of a degree (AM8). Hadi's ideas
+  function from a context value, minimum for "and", maximum for "or", 1 minus the degree for "not" ("not" is part 2's
+  again, AM36). Open with it: the representation of a context value and of a degree (AM8); the linear rule, strength =
+  low + degree × (high − low), was stated for the pair of a low and a high strength and is restated for two conditions
+  (AM36). Hadi's ideas
   [idea, not ruled]: soft edges of a window; a gradual return of the strength after a task; "or" with "long work
   without a break" (open: what counts as a break, when the count starts, its limit and source, the unobserved human).
-  After T-G stage 2 [open]: whether succession between tasks affects the division inside work as a whole (R4), with
+  After T-G stage 2 [open]: whether succession between tasks affects the division inside the assigned tasks as a whole (R4), with
   store_pallet present. Not taken, and not future work [ruled]: a preference for a task that has just become
   applicable.
 - Future work [FW]: section 9.
@@ -463,10 +486,9 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 
 ### 5.9 Findings to carry into the next runs (none changes a value) [ruled as findings]
 
-- The strength 3 of coffee_break gives, with a delivery live and no other foreseeable task, a prior of exactly 0.75,
-  the threshold. Work as a whole contributes 1 however many deliveries are live, so in env_layout_15 the coffee
-  break's prior inside the break time is 0.75 in every scenario. The value stays: moving it would choose a value from
-  the threshold. (KT6, KT11)
+- SUPERSEDED (AM38; KT6's SUPERSEDED line): the finding that the coffee break's prior in break time equals the
+  threshold. With the raised strength 2, one coffee machine and no A/C switch, the coffee break's prior inside the
+  break time is 2/3 for any number of live deliveries, and each of n live deliveries has 1/(3n).
 - The recency duration of 90 ticks was derived from the wait, which is compressed, while walking is not; in these
   rooms the walk from the coffee machine to the table and back takes about 84 to 94 ticks. It joins T-F's open item on
   the time scale (TODO-144). (KT6)
@@ -482,17 +504,18 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
   prior does not change. (KT10)
 - Two A/C cases in env_layout_17 (s15_10, s15_11) peak just under θ with the equal prior (0.746, 0.745): a later
   crossing there must not be read as the effect of the A/C's strength. (KT10)
-- The gate refuses only below the threshold. Where the prior alone is exactly 0.75, as for the coffee break inside the
-  break time in env_layout_15, the outcome at the first observed movement depends on floating-point rounding. The runs
-  are deterministic, so the result is stable, and it is arbitrary. This bears on the expectations written before the
-  runs with context knowledge on. (KT11, its ADDED line)
+- The gate refuses only below the threshold. Where the prior alone is exactly θ, the outcome at the first observed
+  movement depends on floating-point rounding; the runs are deterministic, so the result is stable, and it is
+  arbitrary. (KT11, its ADDED line; its case, the coffee break inside the break time in env_layout_15 at 0.75, no longer
+  arises with the raised strength 2.)
 
 ### 5.10 Open points the next chat must put to Hadi [open]
 
-1. In env_layout_17 the A/C is live at its low strength, so the coffee break's prior inside the break time is
-   3 / 4.005 = 0.749, just below θ, not 0.75 (ccode's arithmetic; KT11's 0.75 is stated for env_layout_15). And in B,
-   a lone live delivery has a prior of about 0.98, so the last delivery of a scenario stands above θ from its first
-   tick; its admission then waits for observation (R7, AM5, G1). Both bear on the expectations.
+1. The expected directions for the runs with context knowledge on, restated before those runs (5.4). The arithmetic
+   that stood here (the coffee break's prior inside the break time in env_layout_17, 3 / 4.005 = 0.749) was stated for
+   the old values and is superseded (AM36 to AM38). Ruled by Hadi for the restatement: with no raising fact holding, a
+   lone live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if the human
+   then takes a foreseeable task; its admission still waits for an observation (R7, AM5, G1).
 2. The second setup per room: a scenario names one setup, so how the same scenarios run on a room's second setup
    (copies of the scenarios per setup, or another form) is for the build's plan; and whether two setups per layout
    (KT3) are still needed where one window already splits the scenarios into B and C (KT11). The design chat's view,
@@ -509,10 +532,17 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    runs (section 4's caveat) are rerun then or in stage 2.
 6. TODO-154 (the robot does not anticipate the scan its own delivery makes applicable): recorded for T-K part 1 as
    the share at an episode's start, not ruled; the records do not say whether T-K part 1 answers it.
-7. The decision on ccode's AM19 list (step 1), and the items the build's plan proposes: the form of "not", the
-   declaration of ac_on, dock_loading's object type and task, the setup's timeline form.
+7. The decision on ccode's AM19 list (step 1), and the items the build's plan proposes: the declaration of ac_on,
+   dock_loading's object type and task, the setup's timeline form. (No form for "not" is needed, AM36.)
 8. Whether env_layout_16's two south-east shelves return once the build removes the step-500 limit (KT9, its ADDED
    line; Hadi accepted the room as it is).
+9. For the build's plan (recorded open, Hadi, 3 October 2026; design_records.md, "T-K", NOTES FOR THE BUILD'S PLAN):
+   which value the gate compares with θ, the belief over the live hypotheses or the output after its scaling by the
+   pinned hypotheses. A design question, argued from what each value means. The plan reports the facts of the code; it
+   is not settled by whether a given value passes.
+10. ccode's flags on docs/context_knowledge_method.md (design_records.md, "T-K", THE STRENGTHS REVISED, F): a question of
+   4 October 2026 named in its status that no record holds; three statements of its section 14 the records do not hold;
+   its section 8 states a foreseeable task's warrant without the entry-by-completion source of observation warrant.
 
 ### 5.11 What the build must respect [recorded]
 
@@ -528,6 +558,11 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 - The recognizer is a core algorithm. The change is domain-independent and ruled. The build touches nothing else of
   the core at the conceptual level without asking.
 - ccode works in two steps: a plan with no code, confirmed in the design chat, then the build.
+- Two entries of 3 October 2026 in design_decisions.md bear on the build [ruled]: "An object id is an opaque name" (no
+  code reads meaning from the text of an id) and "`subtype` is a stated fact of an object" (dock_loading's bays and
+  pallets carry dry or frozen; the loader checks the setup; the robot does not read it). Their bearing: the build
+  identifies no object by the text of its id; dock_loading's layouts and setups changed after stage 1's baseline was
+  measured (5d19859, subtype added), which the re-measurement (5.7, step 6) starts from.
 
 ### 5.12 Background from the design chat [chat only]
 
@@ -540,7 +575,8 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
   a condition of the task model removes a hypothesis; context only changes how probable a live
   hypothesis is.
 - A consequence of the ruled prior, stated as a consequence and not as its reason: with one assigned
-  task live and the foreseeable tasks at low strength, the assigned task starts near the threshold or
+  task live and no raising condition satisfied (AM36: the foreseeable tasks at the ordinary or the
+  suppressed strength), the assigned task starts near the threshold or
   above it. This bears on the finding that the robot does not anticipate the scan its own delivery
   enables (TODO-154).
 - Superseded for T-K part 1 by R1: Hadi's earlier sketch in which a context fact triggers a foreseeable task of the
@@ -728,3 +764,6 @@ injected at run time; one further test track on adaptation under conflict. T-K p
   - Once a plan with numbered steps is agreed, replies keep those step numbers.
   - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.
     Detail goes into the repository's files.
+- Rule Hadi set on 4 October 2026 (also in CLAUDE.md, "Where to look"): a ruling that changes the method of context
+  knowledge updates docs/context_knowledge_method.md in the same records step. ccode does not change the method itself;
+  it flags a contradiction with its evidence, and Hadi rules. The records win where the two disagree.

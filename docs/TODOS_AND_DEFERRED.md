@@ -4576,6 +4576,8 @@ Reference: design_decisions.md, "T-K: context knowledge in the recognizer's beli
 A conceptual direction. In T-K part 1 the context facts, occurrence conditions and strengths are declared per domain,
 each strength with its source. Knowledge that holds at a wider scope (general, a sector, a domain) and norms of a site
 are not designed in V1.
+NOTE (AM36, Hadi, 3 Oct 2026): "occurrence conditions and strengths" reads "suppressing and raising conditions and the
+three levels of a strength" (the suppressed and the ordinary strength per domain, the raised strength per task).
 Files: shared/knowledge.py, domains/
 Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3, A4
 
@@ -4585,6 +4587,10 @@ it. Its proposed operational meaning, to be validated and not claimed: a ratio o
 foreseeable task over starts of any assigned task), counted over task starts at which both were applicable, in the
 stated situation; a ratio of counts, not a probability. Validating it, and the stability of the strengths across sites
 (A4: not claimed), needs site data.
+NOTE (AM39, Hadi, 3 Oct 2026; design_decisions.md, the same entry, R3's AM39): the reading stated per value, still
+proposed and not validated: at a task start, with only this foreseeable task and the assigned tasks live, the
+probability that the start is the foreseeable task is s / (1 + s); 0.005: 1 of 201 task starts, 0.02: 1 of 51, 0.5:
+1 of 3, 2: 2 of 3.
 Files: domains/ (the declared strengths and their sources)
 Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", R3, A4
 
@@ -4606,6 +4612,9 @@ A conceptual direction, by Hadi's ruling (3 Oct 2026). In T-K part 1 ac_activati
 ac_on, and its occurrence condition is room_warm and not ac_on (AM13, AM18). Notes from the design chat: a context fact
 room_cold; two tasks, not one task with two methods (that needs "or"); the state of the switch would then move into the
 tasks' conditions, and object states would leave the occurrence condition.
+NOTE (AM36, AM37, Hadi, 3 Oct 2026): ac_activation's suppressing condition is ac_on and its raising condition room_warm
+(raised strength 0.5); T-K part 1 has no "not". "Room_warm and not ac_on" and "the occurrence condition" above read in
+that form.
 Files: domains/kitting/tasks.py (ac_activation; dock_loading gains it at T-K part 1's build, AM18), the domains' context knowledge
 Reference: design_records.md, "T-K", CONTENT POINTS 1 AND 2, AM13, AM18, NOT RULED; design_decisions.md,
 "T-K: context knowledge in the recognizer's belief", AM11
@@ -4614,6 +4623,7 @@ Reference: design_records.md, "T-K", CONTENT POINTS 1 AND 2, AM13, AM18, NOT RUL
 A conceptual direction, by Hadi's ruling (3 Oct 2026). The V1 rule is at most one A/C switch per layout, in every
 domain (AM18). Several switches need an occurrence condition that differs per hypothesis of one task, with the
 division of the strength among the task's live hypotheses (AM2) reconsidered.
+NOTE (AM36, Hadi, 3 Oct 2026): "an occurrence condition" reads "a suppressing or a raising condition".
 Files: the domains' layouts, the domains' context knowledge, shared/recognizer.py (the prior)
 Reference: design_records.md, "T-K", CONTENT POINTS 1 AND 2, AM18, AM19, NOT RULED; design_decisions.md,
 "T-K: context knowledge in the recognizer's belief", R3's AM2
