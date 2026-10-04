@@ -559,6 +559,9 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
      the A/C. Stage 1's proposal (the set, the disjointness rule on env_layout_17, the predictions): design_records.md,
      "T-K", STEP 5, STAGE 1: THE PROPOSAL; the room ruled, option (b), env_layout_18 (THE ROOM, RULED); the set:
      STEP 5, STAGE 1, REVISED: THE SET. [ruled]
+     DONE (4 October 2026; analysis/kitting/mpb/tk/REPORT.md; design_records.md, "T-K", STEP 5, KITTING, THE PLANNING
+     CASES: DONE): 9 runs, 0 disagreements; a gain as an earlier decision (cases 1, 3), a cost when the human acts
+     against the context (cases 4, 5); findings for TODO-146 and TODO-132 (a). [done]
 5b. The existing sets of kitting with context knowledge on, no new authoring (Hadi, 4 October 2026; design_records.md,
    "T-K", STEP 5B, PLANNED): first the recognition set (17 scenarios on env_layout_10 and _11, the robot idle), then the
    planning set (16 scenarios on env_layout_12 to _14), read against its coverage matrix. The run files with context

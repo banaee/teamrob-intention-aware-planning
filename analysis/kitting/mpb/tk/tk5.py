@@ -66,9 +66,12 @@ def expect():
         print(f"| {sid} | {SIDE[(sid, side)]} | {case} | {'; '.join(cells)} |")
 
 
-def held(decisions, last):
-    """The admissions as the meta-planner held them: from a decision that admits to the tick before the next decision."""
+def held(decisions, terminal):
+    """The admissions as the meta-planner held them: from a decision that admits to the tick before the next decision;
+    the terminal decision (the robot's pool empty) holds nothing for a plan and is left out."""
     out = []
+    decisions = [d for d in decisions if terminal is None or d.tick < terminal]
+    last = terminal - 1 if terminal is not None else None
     for i, d in enumerate(decisions):
         if d.admitted is None:
             continue
@@ -98,7 +101,7 @@ def report():
         s = summary(str(log))
         cells = [f"{x.tick} {x.trigger.value.replace('recognition_changed', 'rc').replace('projection_expired', 'pe').replace('no_current_task', 'nct')}"
                  f"{'/' + x.cause.value if x.cause else ''}: {proj(x)}, {sel[x.tick]['hold'] or 0}" for x in decisions]
-        print(f"| {sid} | {SIDE[(sid, side)]} | {case} | {'; '.join(cells)} | {', '.join(held(decisions, props['horizon']))} | "
+        print(f"| {sid} | {SIDE[(sid, side)]} | {case} | {'; '.join(cells)} | {', '.join(held(decisions, props['terminal']))} | "
               f"{props['completion']} | {mn[0]:.1f} ({mn[1]}), {viol or 'none'} | {s['cont'][0]:.1f} ({s['cont'][1]}) |")
 
 

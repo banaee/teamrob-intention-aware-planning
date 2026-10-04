@@ -3568,3 +3568,13 @@ scenario's own timeline (the flag of step 4, a plain defect); the six scenarios 
 tk5.py reads the set. Audit: the existing control scenario_s10_06 rerun through the instrument is byte-identical
 (properties, diff, separation, reference, decisions, expectations; the log but for its header lines); the tests pass
 with the registry's counts updated (134 scenarios, setups 01 to 16).
+STEP 5, KITTING, THE PLANNING CASES: DONE (ccode, 4 October 2026; analysis/kitting/mpb/tk/REPORT.md). Nine runs, 0
+disagreements with the oracle; in every run the completion is the robot-alone reference plus the executed holds.
+Gain in accord: case 1, the stand's hold decided at 22 against 36, the same outcome; case 3, the hold decided at 0
+against 45 and 47, 1 tick and 4.7 cm in the minimum, min_separation not kept (41.7 cm). Cost against: case 5, a pass at
+28.3 cm with the robot moving (4 violation ticks), room_warm restoring off's decision; case 4, no decision until the
+retraction at 43, whose decision held the robot at 55.5 cm (off 95.0). Case 2: break_time delays the correct admission
+to 38, the pass 29.3 cm. Findings, none ruled: at the turn the admitted plan runs about one tick and 18 cm ahead of the
+executed human (TODO-146), so a planned 54.8 cm became 41.7; off's stand fallback after the coffee break holds 25 ticks
+while the human walks away (TODO-132 (a)), the largest difference in ticks (113 against 89 and 90), ended on the on
+sides by the lone delivery's admission at 73. Next: step 5b.

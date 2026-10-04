@@ -97,3 +97,26 @@ md5s of the expectations (committed before any run with context knowledge on; `e
     adbb6324dc00ef52a3d2345e38bf57ff  scenario_s16_05/on_single_task/trajectory.json
     fccb70761bc4449243b443d5894559d9  scenario_s16_06/on_single_task/expected_ticks.json
     fdc99b95573c0d142eaf38b4e6f40c3c  scenario_s16_06/on_single_task/trajectory.json
+
+## Runs (stage 3; git-ignored; md5s)
+
+    9c225a6ead52fecde1d48e82a7cca77c  off/runs/env_layout_18_scenario_s16_01_on_single_task.log
+    8f8202925985958770a81871f3c02b0e  off/runs/env_layout_18_scenario_s16_01_reference_single_task.log
+    b04e380a5e094279dcda67f067ce9d6a  off/runs/env_layout_18_scenario_s16_03_on_single_task.log
+    170650d7431ec052246d27b5cca6a621  off/runs/env_layout_18_scenario_s16_03_reference_single_task.log
+    fa5478e6cfad2dd465d8ef4d00f098e8  off/runs/env_layout_18_scenario_s16_05_on_single_task.log
+    f9929f298f171991bf56f9f04d29b30a  off/runs/env_layout_18_scenario_s16_05_reference_single_task.log
+    9cfcd166b8fd4971d50c6a03d88711b9  runs/env_layout_18_scenario_s16_01_on_single_task.log
+    a679767445a6ec38c0c8e9185a2a8b33  runs/env_layout_18_scenario_s16_01_reference_single_task.log
+    c62b3221d103d6b9fe05793def52351d  runs/env_layout_18_scenario_s16_02_on_single_task.log
+    1de66ae2fa87f8c5afb3610f12d074a8  runs/env_layout_18_scenario_s16_02_reference_single_task.log
+    dc6a446c63a665d51087632cf54a95ce  runs/env_layout_18_scenario_s16_03_on_single_task.log
+    77fc6a362c4d5ef9915d26ab3ce5c5bf  runs/env_layout_18_scenario_s16_03_reference_single_task.log
+    3e26647cd2ce453dcc5156151794af2b  runs/env_layout_18_scenario_s16_04_on_single_task.log
+    7135203fb5ad3a45e4dd136bc6c66f93  runs/env_layout_18_scenario_s16_04_reference_single_task.log
+    469142457429c96e528f81837dd7d6e7  runs/env_layout_18_scenario_s16_05_on_single_task.log
+    4a8995b59a6ac2bd26b2ce15abd3c9f2  runs/env_layout_18_scenario_s16_05_reference_single_task.log
+    0e4c459cfb92dc0909be337ab65f613c  runs/env_layout_18_scenario_s16_06_on_single_task.log
+    0322dfb2e9c441f47866ca3c374923c0  runs/env_layout_18_scenario_s16_06_reference_single_task.log
+
+Results: `REPORT.md`. 0 disagreements with the oracle in all nine; the expectations' md5s unchanged by the runs.
