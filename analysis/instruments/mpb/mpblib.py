@@ -37,12 +37,16 @@ class Cause(Enum):
 
 
 class Gate(Enum):
-    """The gate's outcome (design_decisions.md "T-D G", AD1, AD4; G1), by the names the records give it."""
+    """The gate's outcome (design_decisions.md "T-D G", AD1, AD4; G1; "T-K", AM68, AM73), by the names the records give
+    it. UNDETERMINED is the IRB oracle's (D3): the gate turns on an evidence rank its own evidence cannot decide; never
+    an actual outcome."""
     CLEARS = "clears"
     BELOW_THETA = "none(below_theta)"
     LEADER_NO_OBSERVATION = "none(leader_no_observation)"
     LEADER_INADEQUATE = "none(leader_inadequate)"
     LEADER_UNWARRANTED = "none(leader_unwarranted)"
+    LEADER_OUTRANKED = "none(leader_outranked)"
+    UNDETERMINED = "undetermined"
 
 
 class Mode(Enum):

@@ -31,6 +31,11 @@ from typing import List, Optional, Set
 from mpblib import Cause, Decision, Gate, TickRow, Trigger, dump, load_ticks
 
 
+# D3 (the gate rulings' build): the gate is asked on this tick and turns on an evidence rank the IRB oracle cannot
+# decide; the decisions from it are not derivable, and nothing is guessed
+UNDETERMINED_AT = "chain: undetermined gate at tick {} (D3): the decisions from it are not derivable"
+
+
 def assemble(ticks: List[TickRow], nct: Set[int], terminal: Optional[int], horizon: int) -> List[Decision]:
     recorded: Optional[str] = None
     expiry: Optional[float] = None
@@ -50,6 +55,8 @@ def assemble(ticks: List[TickRow], nct: Set[int], terminal: Optional[int], horiz
                     cause = Cause.BOUNDARY
                 elif row.adequacy.get(recorded) == "inadequate":
                     cause = Cause.RETRACTION
+            elif row.gate is Gate.UNDETERMINED:                               # D3: asked, not derivable
+                raise SystemExit(UNDETERMINED_AT.format(t))
             elif row.gate is Gate.CLEARS:
                 cause = Cause.ENTERED
             if cause is not None:
@@ -58,6 +65,8 @@ def assemble(ticks: List[TickRow], nct: Set[int], terminal: Optional[int], horiz
                 trigger = Trigger.PROJECTION_EXPIRED
         if trigger is None:
             continue
+        if row.gate is Gate.UNDETERMINED:                                     # D3: asked, not derivable
+            raise SystemExit(UNDETERMINED_AT.format(t))
         if row.gate is Gate.CLEARS:                                           # C5, C1
             recorded, expiry = row.leader, None
             out.append(Decision(t, trigger, cause, row.gate, row.leader, row.warrant, row.admitted, None))

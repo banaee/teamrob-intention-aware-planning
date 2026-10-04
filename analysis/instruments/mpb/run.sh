@@ -65,8 +65,11 @@ print(next(a for a in sc.agents if a.agent_type == 'human').scheduled_tasks.depe
   fi
   if [ "$PRIOR" = on ] && [ "$dep" != on_robot ]; then
     if PYTHONHASHSEED=0 $PY $D/mpb_oracle.py $OUT/trajectory.json $RUN $LOG $OUT/expected_ticks.json; then
-      $PY $D/chain.py $OUT/expected_ticks.json $OUT/observed.json $OUT/expected_decisions.json
-      $PY $D/compare.py $sid $OUT
+      if $PY $D/chain.py $OUT/expected_ticks.json $OUT/observed.json $OUT/expected_decisions.json; then
+        $PY $D/compare.py $sid $OUT
+      else
+        echo "$sid: no chain and no comparison of decisions (D3: an undetermined gate at a decision)"
+      fi
     fi
   fi
   PYTHONHASHSEED=0 $PY $DOM/properties.py $sid $OUT $LOG $RUN

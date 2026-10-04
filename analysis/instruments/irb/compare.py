@@ -5,6 +5,8 @@ compare.py — expected.csv against actual.csv (full precision, the in-process B
 count compared and the count that disagrees, then every disagreement with its tick. Tick -1 (the observation before
 the clock starts, RobotAgent.observe_initial) has no log line and is not compared (reading R4).
 
+Since the gate rulings' build (stage 4): `rank`, the evidence rank per hypothesis, against both files; a cell the
+generator marks undetermined (D3) is skipped and counted, never compared.
 Categorical columns exactly (since G-build also `warrant`, the observation warrant per hypothesis, against both files,
 and `gate`, the gate's outcome per tick, against actual.csv only: the log carries no per-tick gate; since T-K part 1's
 gate stage `belief_h`, the belief over H per hypothesis, against actual.csv only; since its stage 6 `prior` per
@@ -25,12 +27,16 @@ import sys
 
 TICK = ["human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence", "finding",
         "lifecycle", "pins", "reentries", "boundary", "gate", "levels", "recent"]
-HYP = ["prior", "belief", "belief_h", "S", "member", "adequacy", "warrant"]
+HYP = ["prior", "belief", "belief_h", "S", "member", "adequacy", "warrant", "rank"]
 NUMERIC = {"human_x", "human_y", "confidence", "prior", "belief", "belief_h", "S"}
 PRINTED = {"human_x": 5e-3, "human_y": 5e-3, "confidence": 5e-4, "prior": 5e-5, "belief": 5e-4, "S": 5e-5}
 LOG_COLUMNS = ["human_x", "human_y", "micro", "most_likely", "confidence", "finding", "lifecycle", "pins", "reentries",
                "boundary", "levels", "recent",
-               "prior", "belief", "S", "member", "adequacy", "warrant"]
+               "prior", "belief", "S", "member", "adequacy", "warrant", "rank"]
+# D3 (the gate rulings' build): where the generator marks `rank` or `gate` undetermined (its evidence agrees with the
+# recognizer's to 1e-9, not bit for bit, and the exact rule turns on a closer difference), the cell is skipped and
+# counted, never compared
+UNDETERMINED = "undetermined"
 SKIPPED = ["expected_action", "origin_x", "origin_y", "e", "s", "s_exp", "D", "L", "evidence"]
 
 
@@ -56,7 +62,7 @@ def equal(col, a, b, printed):
 
 def compare(exp, act, columns, printed):
     counts = {c: [0, 0] for c in columns}
-    bad = []
+    bad, skipped = [], {}
     rowset = sorted(set(exp) ^ set(act))
     for k in sorted(set(exp) & set(act)):
         for c in columns:
@@ -64,20 +70,25 @@ def compare(exp, act, columns, printed):
                 continue
             if c in TICK and k[1] != sorted(x for (t, x) in exp if t == k[0])[0]:
                 continue                                   # per-tick columns once per tick
+            if exp[k][c] == UNDETERMINED:
+                skipped[c] = skipped.get(c, 0) + 1
+                continue
             counts[c][0] += 1
             if not equal(c, exp[k][c], act[k][c], printed):
                 counts[c][1] += 1
                 bad.append((k[0], k[1], c, exp[k][c], act[k][c]))
-    return counts, bad, rowset
+    return counts, bad, rowset, skipped
 
 
-def section(title, counts, bad, rowset):
+def section(title, counts, bad, rowset, skipped):
     out = [f"## {title}", "",
            f"Rows (tick, live hypothesis) present on one side only: {len(rowset)}"
            + (f" (first: {rowset[:5]})" if rowset else ""), "",
            "| column | compared | disagree |", "|---|---|---|"]
     out += [f"| {c} | {n} | {d} |" for c, (n, d) in counts.items()]
-    out += ["", f"Disagreements: {len(bad)}", ""]
+    out += ["", "Undetermined (D3; skipped, not compared): "
+            + (", ".join(f"{c} {n}" for c, n in sorted(skipped.items())) if skipped else "none"), ""]
+    out += [f"Disagreements: {len(bad)}", ""]
     if bad:
         out += ["| tick | hypothesis | column | expected | actual |", "|---|---|---|---|---|"]
         out += [f"| {t} | {k or '-'} | {c} | {e} | {a} |" for t, k, c, e, a in bad]
@@ -88,17 +99,17 @@ def section(title, counts, bad, rowset):
 if __name__ == "__main__":
     sid, e_path, a_path, l_path, out = sys.argv[1:6]
     exp, act, log = read(e_path), read(a_path), read(l_path)
-    c1, b1, r1 = compare(exp, act, TICK + HYP, printed=False)
-    c2, b2, r2 = compare(exp, log, LOG_COLUMNS, printed=True)
+    c1, b1, r1, u1 = compare(exp, act, TICK + HYP, printed=False)
+    c2, b2, r2, u2 = compare(exp, log, LOG_COLUMNS, printed=True)
     lines = [f"# {sid}: expected against actual", "",
              "expected.csv (oracle.py) against actual.csv (the in-process BeliefState, full precision; its [IR*] lines "
              "byte-identical to the logged run's) and against actual_log.csv (the run log, print precision). Ticks "
              f"0 to {max(t for t, _ in exp)}. Not compared (the recognizer does not output them): "
              + ", ".join(SKIPPED) + ".", ""]
-    lines += section("Against actual.csv (relative tolerance 1e-9)", c1, b1, r1)
-    lines += section("Against actual_log.csv (print precision)", c2, b2, r2)
+    lines += section("Against actual.csv (relative tolerance 1e-9)", c1, b1, r1, u1)
+    lines += section("Against actual_log.csv (print precision)", c2, b2, r2, u2)
     lines += ["## Classification", "",
               "None to classify." if not (b1 or b2 or r1 or r2) else "(written after investigation)", ""]
     open(out, "w").write("\n".join(lines))
     print(f"{sid}: {len(b1)} disagreements against actual.csv, {len(b2)} against actual_log.csv, "
-          f"{len(r1) + len(r2)} unmatched rows")
+          f"{len(r1) + len(r2)} unmatched rows; undetermined (skipped) rank {u1.get('rank', 0)}, gate {u1.get('gate', 0)}")

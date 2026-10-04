@@ -35,6 +35,12 @@ the run file; the agent's area in the world of a tick (the layout's declared are
 shared.types.area_fact; T-G A9, R2); liveness by applicability (T-G A4; HB §1.1, its A4 amendment); and the boundary
 also read through each terminal action's preconditions and completion condition (DL L1 as amended, its as-built
 reading), which covers a terminal action other than place and wait_at (dock_loading's scan_it).
+The gate rulings' build, stage 4 (4 October 2026; rules 34 to 36 in kitting's README, "The gate rulings' build"):
+the gate without commitment warrant (AM67: observation warrant for every hypothesis), the column `rank` per hypothesis
+from the generator's own evidence (AM68, AM73, AM75, AM76: outranked iff another live hypothesis's evidence is strictly
+greater), `undetermined` where the leader's or a key's evidence lies within the comparison's agreement level of
+another's (D3: the rule is exact, the tolerance is the instrument's; skipped and counted by compare.py), and the gate's
+last refusal `none(leader_outranked)` (D1), `undetermined` when it turns on an undetermined rank.
 """
 import csv
 import json
@@ -246,7 +252,6 @@ class Oracle:
         human = next(a for a in domain_config["scenarios"][traj["scenario"]].agents if a.agent_type == "human")
         self.agent = human.agent_id                    # the observed human: the scenario's one human
         self.admissible = support(self.space, human.assigned_tasks)
-        self.committed = known_keys(human.assigned_tasks)   # DG AD1: commitment warrant (prior on)
         live = sorted(self.admissible)
         # HB §1.2: the uniform prior over the live set at construction
         self.base = {k: 1.0 / len(live) for k in live}
@@ -447,18 +452,23 @@ class Oracle:
         return "observation" if math.dist(self.origin[k][0], g) - math.dist(pos, g) > 0 else "none"
 
     def gate(self, ml, conf, per):
-        """DG AD1, AD4 (and G1): the gate's outcome on the leader: below θ; else its hypothesis adequacy, inadequate
-        then no observation; else warrant (commitment: an assigned task; or observation); else it clears. Exhausted:
-        no leader, confidence 0, below θ."""
+        """DG AD1, AD4 (and G1), AM67, AM68 (rules 23, 35): the gate's outcome on the leader: below θ; else its
+        hypothesis adequacy, inadequate then no observation; else its observation warrant (commitment warrant admits
+        nothing since AM67); else its rank, asked last (D1): outranked refuses, undetermined (D3) leaves the outcome
+        undetermined; else it clears. Exhausted: no leader, confidence 0, below θ."""
         if ml is None or conf < self.theta:
             return "none(below_theta)"
-        adequacy, warrant = per[ml][3], per[ml][4]
+        adequacy, warrant, rank = per[ml][3], per[ml][4], per[ml][5]
         if adequacy == "inadequate":
             return "none(leader_inadequate)"
         if adequacy != "adequate":
             return "none(leader_no_observation)"
-        if ml not in self.committed and warrant != "observation":
+        if warrant != "observation":
             return "none(leader_unwarranted)"
+        if rank == "outranked":
+            return "none(leader_outranked)"
+        if rank == UNDETERMINED:
+            return UNDETERMINED
         return "clears"
 
     def output(self, E, t, facts):
@@ -502,10 +512,28 @@ class Oracle:
         return ph, True, 1.0 if k in advanced else self.tail(ph["vD"])
 
 
+# D3 (rule 34): the generator's evidence agrees with the recognizer's at this level (compare.py's numeric tolerance),
+# not bit for bit; where two keys' evidence lie within it, the exact rule's answer (AM75) is not determined here
+AGREEMENT = dict(rel_tol=1e-9, abs_tol=1e-12)
+UNDETERMINED = "undetermined"
+
+
+def rank(E, k):
+    """AM68, AM73, AM75, AM76 (rule 34): outranked iff another live key's evidence is strictly greater; not_outranked
+    iff none is (a tie included); undetermined (D3) where no other key is greater beyond the agreement level and some
+    other key lies within it, either side."""
+    others = [v for j, v in E.items() if j != k]
+    if any(v > E[k] and not math.isclose(v, E[k], **AGREEMENT) for v in others):
+        return "outranked"
+    if any(math.isclose(v, E[k], **AGREEMENT) for v in others):
+        return UNDETERMINED
+    return "not_outranked"
+
+
 COLUMNS = ["tick", "human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence",
            "finding", "lifecycle", "pins", "reentries", "boundary", "gate", "levels", "recent", "key", "expected_action",
            "origin_x", "origin_y", "e", "s", "s_exp", "D", "L", "evidence", "prior", "belief", "belief_h", "S", "member",
-           "adequacy", "warrant"]
+           "adequacy", "warrant", "rank"]
 
 
 def run(traj, alpha, theta, domain_config, context=False):
@@ -520,7 +548,7 @@ def run(traj, alpha, theta, domain_config, context=False):
         for k in live:
             ph, member, S = orc.adequacy(k, pos, world, boundary, advanced)
             adequacy = "no_observation" if not member else ("adequate" if S >= alpha else "inadequate")
-            per[k] = (ph, member, S, adequacy, orc.warrant(k, pos, world))
+            per[k] = (ph, member, S, adequacy, orc.warrant(k, pos, world), rank(E, k))
             a = orc.expected.get(k)
             if not phases[k] or phases[k][-1][0] != label(a):
                 phases[k].append([label(a), r["tick"], r["tick"]])
@@ -544,12 +572,12 @@ def run(traj, alpha, theta, domain_config, context=False):
         if not live:
             rows.append(dict(common))
         for k in live:
-            ph, member, S, adequacy, warrant = per[k]
+            ph, member, S, adequacy, warrant, rk = per[k]
             o = orc.origin[k][0]
             rows.append(dict(common, key=k, expected_action=label(orc.expected.get(k)), origin_x=o[0], origin_y=o[1],
                              e=ph["e"], s=ph["s"], s_exp=ph["s_exp"], D=ph["D"], L=ph["L"], evidence=E[k],
                              prior=pi.get(k), belief=P[k], belief_h=B[k], S=S, member=int(member), adequacy=adequacy,
-                             warrant=warrant))
+                             warrant=warrant, rank=rk))
     return rows, phases, sorted(orc.admissible)
 
 

@@ -148,7 +148,7 @@ def test_x5_ground1_needs_an_unexplained_finding_outliving_a_refused_re_decision
     ticks = [dict(tick=t, finding=f) for t, f in enumerate(
         ["adequate", "unexplained", "unexplained", "unexplained", "adequate", "unexplained", "unexplained"])]
     refused = lambda t: Decision(t, Trigger.PROJECTION_EXPIRED, None, Gate.LEADER_INADEQUATE, "h", (), None, FB(t, 1))
-    admitted = Decision(5, Trigger.RECOGNITION_CHANGED, Cause.ENTERED, Gate.CLEARS, "h", ("commitment",), A, None)
+    admitted = Decision(5, Trigger.RECOGNITION_CHANGED, Cause.ENTERED, Gate.CLEARS, "h", ("observation",), A, None)
     out = x5_ground1(ticks, [refused(2), admitted])
     assert out == [dict(first=1, last=3, refused_decisions=[2], ground1_from=3),
                    dict(first=5, last=6, refused_decisions=[], ground1_from=None)]
@@ -163,9 +163,10 @@ def test_a_missing_decision_and_a_different_fallback_are_disagreements():
 
 
 def test_the_log_text_a_decision_implies():
-    built = Decision(1, Trigger.RECOGNITION_CHANGED, Cause.ENTERED, Gate.CLEARS, "h", ("commitment", "observation"),
-                     A, None)
-    assert log_text(built) == "built warrant=commitment,observation"
+    built = Decision(1, Trigger.RECOGNITION_CHANGED, Cause.ENTERED, Gate.CLEARS, "h", ("observation",), A, None)
+    assert log_text(built) == "built warrant=observation"          # the only source since AM67 (D2)
+    assert log_text(Decision(3, Trigger.NO_CURRENT_TASK, None, Gate.LEADER_OUTRANKED, "h", (), None, FB(3, 2))) \
+        == "fallback refused=none(leader_outranked)"
     assert log_text(Decision(2, Trigger.RECOGNITION_CHANGED, Cause.REPLACED, Gate.LEADER_NO_OBSERVATION, "h", (), None,
                              FB(2, 2))) == "fallback refused=none(leader_no_observation)"
 
@@ -183,3 +184,22 @@ def test_the_oracle_loads_nothing_of_the_planner_the_recognizer_the_projection_o
                          env=dict(PYTHONHASHSEED="0", PATH="/usr/bin:/bin"))
     assert out.returncode == 0, out.stderr
     assert out.stdout.strip().splitlines()[-1] == "[]"
+
+
+# ---- the gate rulings' build (AM68, AM75, AM76; D3) ---------------------------------------------------------------
+def test_the_irb_oracles_rank_is_exact_beyond_its_agreement_level_and_undetermined_within_it():
+    sys.path.insert(0, str(ROOT / "analysis" / "instruments" / "irb"))
+    from oracle import rank, UNDETERMINED
+    assert rank({"a": 0.6, "b": 0.4}, "b") == "outranked" and rank({"a": 0.6, "b": 0.4}, "a") == "not_outranked"
+    assert rank({"a": 0.5, "b": 0.5}, "a") == UNDETERMINED                      # an exact tie: not decided here (D3)
+    assert rank({"a": 0.5 + 1e-12, "b": 0.5 - 1e-12}, "b") == UNDETERMINED      # within 1e-9: not decided here
+    assert rank({"a": 0.5, "b": 0.3, "c": 0.2}, "c") == "outranked"
+
+
+def test_the_chain_stops_on_an_undetermined_gate_it_asks():
+    # D3: an undetermined gate on a tick the chain asks it is not guessed
+    with pytest.raises(SystemExit):
+        assemble([row(0, gate=Gate.UNDETERMINED)], {0}, None, 100)
+    # not asked (a record stands and nothing fires): no stop
+    rows = [row(0, gate=Gate.CLEARS), row(1, gate=Gate.UNDETERMINED)]
+    assert chain(rows) == [(0, "no_current_task", None)]

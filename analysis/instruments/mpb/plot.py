@@ -15,7 +15,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 GATES = ["clears", "none(below_theta)", "none(leader_no_observation)", "none(leader_inadequate)",
-         "none(leader_unwarranted)"]
+         "none(leader_unwarranted)", "none(leader_outranked)"]
 MARK = {"no_current_task": ("s", "tab:gray"), "recognition_changed": ("o", "tab:blue"),
         "projection_expired": ("^", "tab:orange")}
 

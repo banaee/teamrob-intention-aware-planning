@@ -43,6 +43,9 @@ def compare_ticks(exp, act, horizon):
     act = {a["tick"]: a for a in act}
 
     def check(col, t, e, a):
+        if col == "gate" and e == Gate.UNDETERMINED.value:                   # D3: skipped and counted
+            counts.setdefault("gate undetermined (D3, skipped)", [0, 0])[0] += 1
+            return
         counts[col][0] += 1
         if e != a:
             counts[col][1] += 1

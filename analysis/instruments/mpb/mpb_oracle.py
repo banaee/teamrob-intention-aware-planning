@@ -9,6 +9,9 @@ trajectory.py, the load-time replay expanded per tick with the body's timing, it
 Prior on only: the IRB's oracle derives the support under the prior (its rule 1), and MPB-6 compares no
 prior-off run against the oracle.
 
+Since the gate rulings' build (stage 4): the gate as the IRB's oracle now derives it (no commitment warrant, AM67; the
+outranked refusal last, AM68, D1; undetermined where its own evidence cannot decide the rank, D3), so the admission's
+warrant source is observation alone.
 Per tick: the leader, the boundary, the adequacy finding, every live hypothesis's hypothesis adequacy and the gate's
 outcome (the IRB's oracle, analysis/irb/oracle.py, its rules 1 to 23 with their sources, imported unchanged); the
 leader's warrant sources when the gate clears; P4's perception facts and the fallback projection a decision on the
@@ -78,7 +81,6 @@ def derive(traj, run_file, alpha, theta):
     context = bool(yaml.safe_load(open(run_file))["context_knowledge"])          # T-K part 1 (stage 6)
     rows, _, _ = ir.run(traj, alpha, theta, domain_config, context)
     agent = human.agent_id
-    committed = ir.known_keys(human.assigned_tasks)                                 # DG AD1: commitment, prior on
     task_model = TaskModel(domain_config["register_fn"](), domain_config["task_model"])
     areas = ir.areas_of(domain_config, traj["layout"])
     planner = AdaptivePlanner(knowledge=task_model)
@@ -103,8 +105,7 @@ def derive(traj, run_file, alpha, theta):
         ow = {h["key"]: h["warrant"] for h in hyps if h.get("key")}
         warrant, admitted = (), None
         if gate is Gate.CLEARS:
-            warrant = tuple(s for s, holds in (("commitment", leader in committed),
-                                               ("observation", ow.get(leader) == "observation")) if holds)   # DG AD4
+            warrant = ("observation",)            # DG AD4: the admission's source; observation only since AM67 (D2)
             world = ir.world_of(traj_row[t], traj, agent, areas)
             try:
                 actions = planner.decompose(space[leader], agent, world)

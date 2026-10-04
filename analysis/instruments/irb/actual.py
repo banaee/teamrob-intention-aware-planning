@@ -76,6 +76,7 @@ def support(keys, known, domain_config):
 
 
 WARRANT = re.compile(r"^\[IR\] step=(-?\d+) .* warrant=\[(.*)\]$")
+RANK = re.compile(r"^\[IR-rank\] step=(-?\d+) rank=\[(.*)\]$")       # the gate rulings' build: the evidence rank (AM76)
 
 
 def domain_of(run_file):
@@ -89,10 +90,14 @@ def from_log(log_path, alpha, domain_config):
     # is handed the log without its [coverage] lines, which nothing here reads; and without the [IR] line's warrant
     # field (G-build), which its tails pattern would swallow: parsed here instead
     import tempfile
-    warrant = {}
+    warrant, rank = {}, {}
     with tempfile.NamedTemporaryFile("w", suffix=".log", delete=False) as f:
         for l in open(log_path):
             if l.startswith("[coverage]"):
+                continue
+            m = RANK.match(l.rstrip("\n"))
+            if m:
+                rank[int(m[1])] = dict(e.rsplit("=", 1) for e in m[2].split("  ") if e)
                 continue
             m = WARRANT.match(l.rstrip("\n"))
             if m:
@@ -123,7 +128,8 @@ def from_log(log_path, alpha, domain_config):
             S = ir["tails"].get(k)
             adequacy = "no_observation" if S is None else ("adequate" if S >= alpha else "inadequate")
             rows.append(dict(common, key=k, belief=dist[k], prior=ctx.get("prior", {}).get(k), S=S,
-                             member=int(S is not None), adequacy=adequacy, warrant=warrant[t][k]))
+                             member=int(S is not None), adequacy=adequacy, warrant=warrant[t][k],
+                             rank=rank[t][k]))
     return rows
 
 
@@ -190,7 +196,7 @@ def in_process(run_file, steps, alpha, context=None):
             S = b.tails.get(k)
             rows.append(dict(common, key=k, belief=b.distribution[k], belief_h=b.belief[k], prior=b.prior.get(k), S=S,
                              member=int(S is not None), adequacy=b.hypothesis_adequacy[k].value,
-                             warrant=b.observation_warrant[k].value))
+                             warrant=b.observation_warrant[k].value, rank=b.evidence_rank[k].value))
     root.removeHandler(collect)
     return rows, [l for l in collect.lines if l.startswith("[IR")]
 

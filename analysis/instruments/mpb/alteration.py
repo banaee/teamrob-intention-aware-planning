@@ -11,8 +11,10 @@ as a property of the test set with its reason, unless it is an oracle defect.
     analysis/<domain>/mpb/alteration.py <scratch dir> <scenario dir> [<scenario dir> ...]
                                                             (each: analysis/<domain>/mpb/<scenario>/on_single_task)
 
-The shared alterations: the expiry cadence (A1 to A5), the projection's identity (B2, B3), the gate with warrant (C1 to
-C3); and two of the chain's retention rules (D1, D2). B1 (the method guards) names a domain's schemas and is the
+The shared alterations: the expiry cadence (A1 to A5), the projection's identity (B2, B3), the gate with warrant (C2,
+C3; C1, commitment warrant ignored, retired in the gate rulings' build: AM67 made it the rule); and two of the chain's
+retention rules (D1, D2). RANK (C4 to C6, the gate rulings' build): the evidence rank, run on step 5's planning cases
+only (D6). B1 (the method guards) names a domain's schemas and is the
 domain's. The scratch copies of both oracles read the repository's root (ROOT) for the domain's files: the IR oracle's
 own ROOT is patched as the MPB oracle's is (a defect of the copy since the IR oracle reads the layout's areas, T-G A9;
 found when dock_loading's MPB was built, the table unchanged).
@@ -50,17 +52,15 @@ SHARED = [
     ("B3", "the moving fallback not cut at the wall or the first object", "mpb/mpblib.py",
      ["duration = min(float(p.run_length), reach(position, u, room) / length)"],
      ["duration = float(p.run_length)"]),
-    ("C1", "commitment warrant ignored", "irb/oracle.py",
-     ['if ml not in self.committed and warrant != "observation":'], ['if warrant != "observation":']),
     ("C2", "the movement source loosened to any walked path since the origin", "irb/oracle.py",
      ['return "observation" if math.dist(self.origin[k][0], g) - math.dist(pos, g) > 0 else "none"'],
      ['return "observation" if self.odo - self.origin[k][1] > 0 else "none"']),
     ("C3", "warrant asked before the leader's adequacy", "irb/oracle.py",
      ['        if adequacy == "inadequate":\n            return "none(leader_inadequate)"\n'
       '        if adequacy != "adequate":\n            return "none(leader_no_observation)"\n'
-      '        if ml not in self.committed and warrant != "observation":\n'
+      '        if warrant != "observation":\n'
       '            return "none(leader_unwarranted)"\n'],
-     ['        if ml not in self.committed and warrant != "observation":\n'
+     ['        if warrant != "observation":\n'
       '            return "none(leader_unwarranted)"\n'
       '        if adequacy == "inadequate":\n            return "none(leader_inadequate)"\n'
       '        if adequacy != "adequate":\n            return "none(leader_no_observation)"\n']),
@@ -71,6 +71,19 @@ SHARED = [
       "                elif row.boundary:\n                    cause = Cause.BOUNDARY\n"],
      ["                if row.boundary:\n                    cause = Cause.BOUNDARY\n"
       "                elif row.leader != recorded:\n                    cause = Cause.REPLACED\n"]),
+]
+
+# The rank alterations (the gate rulings' build, D6): run on step 5's six scenarios only (context knowledge on). With
+# context knowledge off the leader is never outranked (the belief is the evidence), so on the planning set's sixteen
+# they cannot be detected by construction, a property of that set, and they are not run there.
+RANK = [
+    ("C4", "the outranked condition not asked", "irb/oracle.py",
+     ['        if rank == "outranked":\n            return "none(leader_outranked)"\n'], ['']),
+    ("C5", "a tie refused (a key within the agreement level of another counted outranked)", "irb/oracle.py",
+     ['    if any(math.isclose(v, E[k], **AGREEMENT) for v in others):\n        return UNDETERMINED\n'],
+     ['    if any(math.isclose(v, E[k], **AGREEMENT) for v in others):\n        return "outranked"\n']),
+    ("C6", "the rank read from the belief instead of the evidence", "irb/oracle.py",
+     ['orc.warrant(k, pos, world), rank(E, k))'], ['orc.warrant(k, pos, world), rank(B, k))']),
 ]
 
 
@@ -96,7 +109,8 @@ def rederive(base: Path, scen: Path, work: Path, domain: str):
     work.mkdir(parents=True, exist_ok=True)
     for f in ("actual_ticks.json", "actual_decisions.json", "actual_log_decisions.json", "observed.json"):
         shutil.copy(scen / f, work / f)
-    run_file = ROOT / "configs" / domain / "mpb" / f"{scen.parent.name}.yaml"
+    # the run file: configs/<domain>/mpb/ or a set's folder below it (step 5's tk/, since the gate rulings' build)
+    run_file = min((ROOT / "configs" / domain / "mpb").rglob(f"{scen.parent.name}.yaml"), key=lambda p: len(p.parts))
     log = next((scen.parents[1] / "runs").glob(f"*_{scen.parent.name}_{scen.name}.log"))
     env = dict(PYTHONHASHSEED="0", PATH="/usr/bin:/bin", PYTHONPATH=str(ROOT))
     oracle = base / "analysis" / "instruments" / "mpb" / "mpb_oracle.py"

@@ -562,3 +562,20 @@ c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
 739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
 ```
 
+
+## The gate rulings' build, stage 4: AM67 and AM68 in the generator (4 October 2026)
+
+The gate rulings (design_decisions.md, "T-K", R7's AM67, AM68, AM73, AM75, AM76; the plan,
+docs/handoffs/plan_T-K_gate.md, approved with D1 to D7). The generator derives both conditions on its own: the rank
+from its own evidence (the `evidence` column, rule 33's E, never read from the recognizer), the gate from it.
+
+| rule | content | source |
+|---|---|---|
+| 23 (amended) | The gate's outcome per tick: `none(leader_unwarranted)` if the leader is not observation-warranted (rule 22); commitment warrant (rule 1's known keys) admits nothing. The rest of rule 23 stands | AM67; D2 |
+| 34 (new) | The rank per live hypothesis, column `rank`: `outranked` iff another live key's evidence is strictly greater beyond the comparison's agreement level (relative 1e-9, absolute 1e-12, compare.py's numeric tolerance); `not_outranked` iff no other key's evidence is greater and none lies within that level; `undetermined` otherwise (some other key within the level, either side, none greater beyond it). The recognizer compares exactly (AM75); the generator's evidence agrees with it to that level, not bit for bit, so where the exact rule turns on a closer difference it is not decided here | AM68, AM73, AM75, AM76; D3 |
+| 35 (new) | The gate's last refusal (D1): after rule 23's warrant, `none(leader_outranked)` if the leader's rank is `outranked`; `undetermined` if it is `undetermined`; else `clears` | AM68, AM73; D1, D3 |
+| 36 (new) | The comparison (compare.py): `rank` against actual.csv (`BeliefState.evidence_rank`) and actual_log.csv (the `[IR-rank]` line), exactly; a `rank` or `gate` cell the generator marks `undetermined` is skipped and counted (diff.md, "Undetermined"), never compared | D3 |
+
+With context knowledge off the belief is the evidence, so the recognizer's leader is never outranked (stage 2's check)
+and the gate's last refusal cannot occur; an exact tie in the evidence (a boundary tick, a symmetric stand) is
+`undetermined` here, and skipped.

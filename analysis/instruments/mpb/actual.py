@@ -154,7 +154,7 @@ def in_process(run_file, steps, strategy, prior):
         admitted, fb, warrant = None, None, ()
         if gate is Gate.CLEARS and proj is not None:
             held = set() if tick_state["warrant"] is None else {tick_state["warrant"].value}
-            warrant = tuple(v for v in ("commitment", "observation") if v in held)     # AD4: this order when both
+            warrant = tuple(v for v in ("observation",) if v in held)     # AD4: the source; observation only since AM67
             plan = proj.entries[0].abstract_plan
             admitted = Admitted(b.most_likely, tuple(Action(a.action_name, tuple(sorted(a.bindings.items())))
                                                      for a in plan.actions))
