@@ -1,5 +1,7 @@
 # analysis/tc2c_scripts/play.md — T-C2c play: six scratch scripts
 
+> Superseding note (4 October 2026, T-K part 1, step 1; design_records.md, "T-K", STEP 1): plays 10 and 16 ran on env_layout4 (env_layout_05) with three A/C switches; it now holds one, ac_switch_1. Their scripts (scenario_41 / _42, now scenario_s04_02 / _03) name no switch and are unchanged. This folder has no case on scenario_s04_01 and held no log of it; nothing was deleted. The three-switch layout is last held by 4345ef9.
+
 > Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "never recognised", "not recognised", "not re-recognised", "recognised … before its release", "a walk the robot recognises" → the task's hypothesis never (or does) lead or clear θ (ROBOT). "hypothesis space exhausted" → no task hypothesis left live ("exhausted" is not a term). "reads as `unknown`" is correct as written: the belief's `unknown` leads.
 
 Play, cheap form: nothing measured, nothing judged, nothing a fixture. The six scripts were run unregistered (built in

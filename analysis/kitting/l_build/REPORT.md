@@ -1,5 +1,7 @@
 # L-build: T-D L, the belief lifecycle — the 1.5c and IRB.2b measures rerun
 
+> Superseding note (4 October 2026, T-K part 1, step 1; design_records.md, "T-K", STEP 1): the case on scenario_s04_01 (scenario_40) is no longer reproducible. env_layout_05 now holds one A/C switch, ac_switch_1 (ac_switch_0 and ac_switch_2 removed), and scenario_s04_01's script one ac_activation (the walk to ac_switch_2 removed); this record describes three switches and two activations. The scenario's logs under `pre/tb1a_destination/` were deleted; they were local and git-ignored, in no commit (a copy as of 2 October 2026 at /home/hadi/teamrob_analysis_2026-10-02/kitting/l_build/); the layout and script they ran on are last held by 4345ef9.
+
 28 September 2026, at the L-build commits: c4beb1d (records), 2c54c4a (recognizer: L1, L4, the flag), 493c095
 (meta-planner: L2 (ii), L5 B), 013cd35 (tests), 5129d90 and 3d65ca6 (two tie-break defects in the re-entry, found by the
 IRB and fixed, each with a test), 2a4ab60 (the four maintained baseline sets), 695f5a8 (the IRB). The

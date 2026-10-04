@@ -147,7 +147,7 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
   ticks; `min_safe_distance` exclusion now reachable) — measurement and units, no decision changed
 - T7/T8 (Sept 2026): completed tasks leave the pool by world fact (`AdaptivePlanner.is_complete`);
   `unknown` is not admitted as a projection. `analysis/t7_t8_meta_bugs/` held the meta-planner-side
-  regression baselines until T9; the current ones are F1's (`analysis/f1_robot_responsible/realized_none/`,
+  regression baselines until T9; the current ones are F1's (`analysis/f1_robot_responsible/realized_none/` (deleted 4 Oct 2026),
   with s10 superseded by TODO-32 and s40 by F47b — `analysis/f47_fixtures/`)
   (Analysis cleanup, September 2026: `analysis/t7_t8_meta_bugs/` is deleted, its numbers carried in
   design_decisions.md and TODO-67; F1's and F47's logs are dropped; the current baselines are the maintained
@@ -165,7 +165,7 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
   Whether B2 survives as a policy block is open (TODO-36). The one parameter before implementation is
   `min_separation`'s value, relative to scale (TODO-28). Full record: design_decisions.md, "The robot
   can wait"; new items TODO-70 (per-segment vs whole-trajectory holds), TODO-71 (the hint on the body side)
-- T1b (Sept 2026, `analysis/t1b_realization/`): what realization would produce, measured on the live
+- T1b (Sept 2026, `analysis/t1b_realization/` (deleted 4 Oct 2026)): what realization would produce, measured on the live
   projections with four throwaway realizers over 13 separations — the design's per-segment loop
   overshoots the minimal hold and reverses argmins; the whole-trajectory shift and the per-segment
   minimal hold agree wherever both realize; every hold in the fixtures is a hold into the unassessed
@@ -180,7 +180,7 @@ Built and running end-to-end. All three tasks complete, correct terminal state, 
 - T9 (Sept 2026): projected walks end where the executor stops — the body supplies its stopping
   distance (`PROXIMITY_THRESHOLD`) to the `Projector` as it supplies its rate; a per-tick actual
   robot–human distance measure (`[sep]`); new baselines over ten conditions (s00, s10, s20, s30, s40 ×
-  prior off/on) that T3, T4 and T10 are built and judged on — `analysis/t9_arrival_radius/`
+  prior off/on) that T3, T4 and T10 are built and judged on — `analysis/t9_arrival_radius/` (deleted 4 Oct 2026)
 
 *Design questions resolved (Q1–Q4 from July 2026, plus September 2026 session):*
 - Q1: `MetaPlanner` owns the task queue internally (not passed externally)
@@ -277,7 +277,7 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    actual-distance measure, new baselines over ten conditions ✅
 2. T3 — `realize()` as a service on the projection side (whole-trajectory minimal shift,
    `shift_violation_interval` closed form, `RealizedPlan`), validated against T1b's `whole` realizer ✅
-   (`analysis/t3_realize/` (deleted in the analysis cleanup, September 2026; carried in the T3 / T3b entry of design_decisions.md; realize() is re-validated by analysis/f1_robot_responsible/validate.py); T3b the whole-tick hold; L2 then removed the acknowledgement lag, TODO-77)
+   (`analysis/t3_realize/` (deleted in the analysis cleanup, September 2026; carried in the T3 / T3b entry of design_decisions.md; realize() is re-validated by analysis/f1_robot_responsible/validate.py (deleted 4 Oct 2026)); T3b the whole-tick hold; L2 then removed the acknowledgement lag, TODO-77)
 3. T4 — `b2a`: B2 realizes the current task alone; continue iff δ ≤ ρ × (T_h − trigger), ρ = 0.5;
    the hold δ on `UpdateResult`, executed by Mesa as STAND at the robot's position ✅
    (`analysis/t4_b2a/` (deleted in the analysis cleanup, September 2026; carried in TODO-36 and TODO-71); TODO-36, TODO-71, TODO-77)
@@ -287,8 +287,8 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    Then, in order (all ✅, September 2026): T5 (a continue costs nothing), L2 (projection time includes
    the body's acknowledgement and observation offset), F1 (robot-responsible separation: rules (a)/(b),
    realization total, hold cap and fallback gone, the task-completion tick projected —
-   `analysis/f1_robot_responsible/`), C (the execution-time separation stop in the Mesa executor, default
-   off, same rule; the s / v tail rejected — `analysis/c_separation_stop/`), R2 (the point-place fact,
+   `analysis/f1_robot_responsible/` (deleted 4 Oct 2026)), C (the execution-time separation stop in the Mesa executor, default
+   off, same rule; the s / v tail rejected — `analysis/c_separation_stop/` (deleted 4 Oct 2026)), R2 (the point-place fact,
    one s for two situations, blocked time and human-borne proximity as outcomes, TODO-32 closed),
    F47 / F47b (typed scheduled bindings at spawn; the evaluation fixtures; a stay the projection carries
    is absorbed by realization — `analysis/f47_fixtures/`)
@@ -300,7 +300,7 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    `ExecutorState`, per blocked episode, past B2, wait now / reconsider recorded) is designed, not
    built: under wait it cannot change a decision, and reconsider has no valid fixture (F47b), so it
    waits for TODO-80 or TODO-47. TODO-77 stays a projector accounting item. Entry in
-   `design_decisions.md`; the re-baselined sweep in `analysis/d2_recognition_trigger/`
+   `design_decisions.md`; the re-baselined sweep in `analysis/d2_recognition_trigger/` (deleted 4 Oct 2026)
 6. T6 ✅ (September 2026) — ablation of the meta-planner's policy components on the eight kitting fixtures:
    gate {none, b2a} × cost {plain, realized} × separation stop {off, on} × prior, and a ρ existence test.
    Gate and cost are not independent axes (b2a realizes the current task under either cost); the clean
@@ -311,17 +311,17 @@ Known properties of the evidence model — characterised, not defects (TODO-61; 
    safety parameter set outside the planner, and no fixture result selects s, ρ or any other value.
    The review found one defect, fixed in the wrap-up: `update()` continued a current task its own pool
    had dropped as complete (B1.5). Completion is measured from the world fact from here on (the declared
-   empty-pool tick minus 2). `analysis/t6_ablation/`; TODO-36
+   empty-pool tick minus 2). `analysis/t6_ablation/` (deleted 4 Oct 2026); TODO-36
 7. Graded evidence ✅ (September 2026) — a stretch's evidence against `unknown` is graded by the share of the
    hypothesis's expected path it covers: L / u^f, f = 1 at an arrival by the completion fact; u, β and θ
    unchanged, the I4d accounting invariant re-checked (7.1e-15). The one-task reveals follow the walk
    (θ at f ≈ 0.48) instead of the human's first step; no wrong task at θ; robot motion changed in six of
-   sixteen conditions. New baselines: `analysis/g1_graded_evidence/sweep/`, replacing D2's. Entry in
+   sixteen conditions. New baselines: `analysis/g1_graded_evidence/sweep/` (deleted 4 Oct 2026), replacing D2's. Entry in
    `design_decisions.md`, "A stretch's evidence against `unknown` is graded by the share of the expected
-   path it covers"; `analysis/g1_graded_evidence/`; TODO-61 (a) closed for walks
+   path it covers"; `analysis/g1_graded_evidence/` (deleted 4 Oct 2026); TODO-61 (a) closed for walks
    SUPERSEDED (T-D R, 27 September 2026): the grade leaves the belief (R1). design_decisions.md, "T-D R and E".
 8. The gate ruling ✅ (September 2026, documentation only) — on the graded-evidence θ data
-   (`analysis/g1_graded_evidence/crossings.md`): the admission gate stays `_clears_gate` on the normalised
+   (`analysis/g1_graded_evidence/crossings.md` (deleted 4 Oct 2026)): the admission gate stays `_clears_gate` on the normalised
    share, θ = 0.75. The live-set dependence was in the likelihood, not the gate; under the grade a walk
    crossing sits at about 3:1 or more over `unknown` whatever the live-set size, higher while a rival is
    unrefuted. Not taken: odds against `unknown`, the ratio of the top two, θ from the live set or the

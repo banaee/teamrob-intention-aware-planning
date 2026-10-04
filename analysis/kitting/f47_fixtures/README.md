@@ -1,5 +1,7 @@
 # analysis/f47_fixtures — evaluation fixtures for D2 (F47, F47b)
 
+> Superseding note (4 October 2026, T-K part 1, step 1; design_records.md, "T-K", STEP 1): the case on scenario_s04_01 (scenario_40) is no longer reproducible. env_layout_05 now holds one A/C switch, ac_switch_1 (ac_switch_0 and ac_switch_2 removed), and scenario_s04_01's script one ac_activation (the walk to ac_switch_2 removed); this record describes three switches and two activations. This folder held no log of it, so nothing was deleted; the layout and script of its case are last held by 4345ef9.
+
 > Superseding note (T-L stage 3, 26 Sept 2026): the layout and scenario ids here are the old ones; `docs/rename_table.md` maps them to the serial ids. The scripts and records stay frozen at their commit.
 
 > Superseding note (24 Sept 2026, the terminology ruling; `docs/glossary.md` §7, `docs/terminology_revision.md`): "recognised (205: ac_switch_1 0.784 / 0.878; …)" → the hypothesis clears θ (ROBOT; the gate's outcome is "admitted").

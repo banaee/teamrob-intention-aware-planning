@@ -1,5 +1,7 @@
 # T-D cycle 1.5b: acceptance of E8, E9, E10 and G1 (cycle 1, session 1.5b)
 
+> Superseding note (4 October 2026, T-K part 1, step 1; design_records.md, "T-K", STEP 1): the case on scenario_s04_01 (scenario_40) is no longer reproducible. env_layout_05 now holds one A/C switch, ac_switch_1 (ac_switch_0 and ac_switch_2 removed), and scenario_s04_01's script one ac_activation (the walk to ac_switch_2 removed); this record describes three switches and two activations. The scenario's logs under `pre/tb1a_destination/` and `pre15b/tb1a_destination/` were deleted; they were local and git-ignored, in no commit (a copy as of 2 October 2026 at /home/hadi/teamrob_analysis_2026-10-02/kitting/td_stage1b/); the layout and script they ran on are last held by 4345ef9.
+
 27 September 2026, at the 1.5b build (fe483d8 recognizer, 1ccabf3 meta-planner, dec0e87 baselines). 1.4's scripts
 (`analysis/td_stage1/`) rerun on the regenerated baselines, adapted to the new log field only; every expectation of
 the task is checked against the mechanism, and where one is not met it is stated as a finding, not adjusted.

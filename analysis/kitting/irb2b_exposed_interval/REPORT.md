@@ -1,5 +1,7 @@
 # IRB.2b: the 1.4 and 1.5b measurements over the exposed interval (closes TODO-121)
 
+> Superseding note (4 October 2026, T-K part 1, step 1; design_records.md, "T-K", STEP 1): the case on scenario_s04_01 (scenario_40) is no longer reproducible. env_layout_05 now holds one A/C switch, ac_switch_1 (ac_switch_0 and ac_switch_2 removed), and scenario_s04_01's script one ac_activation (the walk to ac_switch_2 removed); this record describes three switches and two activations. The scenario's logs under `pre/tb1a_destination/` were deleted; they were local and git-ignored, in no commit (a copy as of 2 October 2026 at /home/hadi/teamrob_analysis_2026-10-02/kitting/tb2b_exposed_interval/); the layout and script they ran on are last held by 4345ef9.
+
 27 September 2026, at the IRB.2b build: 4de9cce (records), d03e31e (`RobotAgent.step`), 50a2aab (tests), f3d64d6
 (baselines). The cognitive-loop correction (design_decisions.md, "The cognitive loop does not end with the task pool"):
 observation, recognition and their `[IR]` / `[IR-dist]` logging run on every tick; the `finished` guard sits after

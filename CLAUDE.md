@@ -148,7 +148,7 @@ Decisions
   (TODO-32), scheduled bindings are type-checked at spawn (F47b), and the trigger set is settled
   (D2: `recognition_changed` against the decision record replaces `theta_crossed`; D3: `task_committed`
   removed, the robot's grasp is no trigger), and the policy
-  components are ablated (T6, `analysis/kitting/t6_ablation/`); the gate stays a fixed share (the gate ruling). The 4C
+  components are ablated (T6, `analysis/kitting/t6_ablation/`, deleted 4 Oct 2026); the gate stays a fixed share (the gate ruling). The 4C
   queue is done.
   The plan from here is T-A to T-G ("The plan from T-A" in `docs/roadmap.md`; the order revised 30 Sept 2026, below).
   T-B is under way: T-B2a
@@ -630,7 +630,7 @@ Regression sweep: five fixtures, each with assignment prior off and on, each run
 Old ids (scenario_00 on env_layout0 and so on) are mapped in `docs/rename_table.md`; the frozen records keep them.
 
 Use the step counts of the sweep scripts (`analysis/kitting/tb1a_destination/sweep.sh` for the five and the evaluation
-fixtures; before T-L stage 3, the frozen `analysis/kitting/f1_robot_responsible/sweep.sh` and `analysis/kitting/f47_fixtures/sweep.sh`,
+fixtures; before T-L stage 3, the frozen `analysis/kitting/f1_robot_responsible/sweep.sh` (deleted 4 Oct 2026) and `analysis/kitting/f47_fixtures/sweep.sh`,
 on the old ids). The current baselines are the Track 2.5 regeneration of the four maintained sets below (their "2.5"
 README sections; before it L-build, P-build and P4-build, each with its own section); what follows is the T-L stage 3
 regeneration's description, whose folders and names still hold, with their
@@ -651,10 +651,11 @@ which they differ in the removed `task_committed` decisions and the executor's r
 world lines byte-identical. The T-B Q7 set superseded T-B2d's, which the body's completion ticks
 moved (T-B Q7: the robot spends one more tick per delivery, less where a hold carried it); T-B2d's had
 differed from T-B1a follow-up 2's in the `[run]` line alone, which names the strategy, and follow-up 2's had
-superseded the graded-evidence sweep (`analysis/kitting/g1_graded_evidence/sweep/`; same world-level behaviour,
+superseded the graded-evidence sweep (`analysis/kitting/g1_graded_evidence/sweep/`, deleted 4 Oct 2026; same world-level behaviour,
 hypothesis keys no longer carry the table, and the `[run]` header changed with T-A1's β commit). No
 `full_reorder` baselines before T-B3. The stop-on baselines (C's, `analysis/kitting/c_separation_stop/`, and F47's) predate graded evidence and are not
-regenerated; their logs were dropped in the analysis cleanup, their READMEs stay as frozen records. Record
+regenerated; their logs were dropped in the analysis cleanup, their READMEs stay as frozen records (C's folder deleted
+4 Oct 2026). Record
 baselines before changing code, then diff.
 
 ### Maintained baseline sets
@@ -703,7 +704,8 @@ Completion is measured from the world fact (T6): the tick after the robot's last
 `[meta] step=N all tasks complete` is the declared tick: the world tick is N − 2 when `no_current_task` ends the
 pool, and N when a `recognition_changed` of that tick ends it (the robot's own last item changes the belief and
 `update()` drops the completed task; TODO-127). Report the world tick; older reports
-(D2 and before) give declared ticks. `analysis/kitting/t6_ablation/metrics.py` reads it from a log. Every completion
+(D2 and before) give declared ticks. `analysis/instruments/common/sep_classes.py` reads it from a log (T6's `metrics.py` was deleted with its folder, 4 Oct
+2026). Every completion
 tick recorded BEFORE T-B Q7 is one tick shorter per robot delivery than the behaviour from here on (less
 where a decided hold carried the tick): the body used to cancel a completion tick when a reload landed on it
 (design_decisions.md, "A reload never cancels a completion tick the body states"). Do not compare a number
