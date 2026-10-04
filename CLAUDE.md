@@ -540,8 +540,12 @@ Decisions
   D4 closed the coverage-matrix question). The build is DONE (4 October 2026; design_records.md, "T-K", THE GATE
   RULINGS, BUILT: `BeliefState.evidence_rank` and the `[IR-rank]` line; `none(leader_outranked)` asked last;
   commitment warrant removed from the meta-planner, `[meta-proj] built warrant=observation`; the instruments; the four
-  maintained sets regenerated, 17 logs moved by AM67). What remains (the measurements with context knowledge on, a
-  separate step; dock_loading's part (step 6); the close) has no decided order beyond that (`docs/handoffs/T-G_forward_inputs.md`, section 5).
+  maintained sets regenerated, 17 logs moved by AM67). Step 5d, the measurements after the gate change (Hadi named the
+  gate's discussion to build step 5c, these measurements step 5d), is DONE (5 October 2026; analysis/kitting/tk5d/REPORT.md;
+  design_records.md, "T-K", STEP 5D): 0 disagreements after D3 amended (Hadi: exact ties in the oracle are ties); every
+  moved case as expected by ruling; the true task's admissions unchanged, the wrong ones and the two cases below
+  min_separation from a wrong admission removed. The steps of T-K part 1 stand as a tree at the top of
+  `docs/handoffs/T-G_forward_inputs.md`, section 5. Next: dock_loading's part (step 6), then the close (step 7).
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

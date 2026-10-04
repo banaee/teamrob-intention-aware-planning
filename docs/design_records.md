@@ -3806,6 +3806,12 @@ is approved with these rulings on its decisions D1 to D7; the plan is amended to
 - D3 (a): the IRB oracle marks the rank undetermined where its own two evidence values lie within its agreement level
   (1e-9); the comparison skips and counts those ticks. Reason: the rule stays exact (AM75); the tolerance is the
   instrument's.
+  AMENDED (Hadi, 5 October 2026, in step 5d): the oracle treats exactly equal evidence as a tie, not outranked;
+  "undetermined" stays for values that are close but not equal. Reason: the oracle stays independent of the run and
+  now checks that a tie passes. Occasion: step 5d stopped on the gate's answer at 135 in scenario_s10_04 and s12_02,
+  which the oracle could not determine (coffee_break's re-entry with one delivery live: the evidence exactly 1/2 each by
+  the re-entry rule). Built in oracle.py's rank() and rule 34 (analysis/kitting/irb/README.md); C5 retargeted to an
+  exact tie counted outranked.
 - D4 (a): the planning set's coverage matrix stays the matrix of the setting with context knowledge off, with one added
   row for the outranked refusal, claimed with context knowledge on, its instance from step 5's existing scenarios. No
   new scenario. This closes the open question on the coverage matrix (THE DESIGN DISCUSSION AFTER STEP 5B, question 3).
@@ -3853,3 +3859,34 @@ stage boundary.
 - ccode's decisions in the build: the `[IR-rank]` line; the MPB instrument's warrant hook at stage 3; the oracle's band
   marks an exact tie undetermined (D3 as worded), so the exact-tie side of the rule is checked by the unit tests only;
   the alteration engine finds a run file below configs/<domain>/mpb/; unused imports removed.
+STEP 5C AND STEP 5D NAMED (Hadi, 5 October 2026): step 5c is the gate after step 5b (the discussion, the records, the
+plan, the build above); step 5d the measurements after the gate change. Steps 6 and 7 keep their numbers. The steps
+of T-K part 1 stand as one tree at the top of docs/handoffs/T-G_forward_inputs.md, section 5, kept current at each
+step's close.
+STEP 5D, THE MEASUREMENTS AFTER THE GATE CHANGE: DONE (ccode, 5 October 2026; analysis/kitting/tk5d/REPORT.md, the
+step's one document). With context knowledge on, no new authoring: step 4's recognition runs (57 and its 2 off runs),
+step 5's planning cases (6 and 3 off), step 5b's recognition (17) and planning runs (16), against the updated oracles.
+- Before the runs (f02b04c): the expectations from the updated oracles; step 5's moved properties re-declared (D5):
+  PK4a.r, PK4b.r, PK4e.r, PK1b.r, PK5a.r, the old ones kept in properties.py's docstring, marked superseded; PK4c and
+  PK5b without successor, the separation a measure.
+- A stop on the step's blocking condition (a gate answer the oracle cannot determine: s10_04 and s12_02 at 135), then
+  D3 AMENDED (above); the oracle and the comparison rerun on every kitting test-bed output (no simulation): every change
+  a cell marked undetermined before (3241 rank cells, 6 gate ticks, the two chains at 135).
+- Results: 0 disagreements with the oracles in all 76 recognition and 25 planning runs, and in the context-off sets
+  rerun under the amendment (IRB s08, s09; round 1; the planning set under both strategies); undetermined left: 2 rank
+  cells (scenario_s09_07 at 35, D7). Every re-declared property holds; PK3c, PK2b (the turn, TODO-146) and P10.10 fail
+  as before. B12 verified (s16_03, s16_05 at 0, D4). C4 and C6 detected on step 5's six, C5 undetected there (no tie at
+  a gate-relevant tick: a property of the set; D6).
+- The comparison (off / on before / on after, the report's section 1): the admissions of the true task unchanged (206
+  earlier, 48 equal, 42 later of 325; 3005 ticks earlier, 365 later); wrong admissions during modelled tasks 17 → 9 off,
+  47 → 19 on (504 → 99 gate ticks); the pin-tick and lone-early admissions removed; planning completion better / equal
+  / worse against off 7 / 13 / 2 → 5 / 16 / 1 (134 → 50 ticks gained); cases below min_separation 5 → 3 on, the two from
+  a wrong admission (s16_05, s11_03) gone, no new case. Every case that moved is as expected by ruling (AM67 or AM68);
+  no defect in the framework. The cost: s11_03's completion 35 → 113 (its gain rested on admitting a delivery never
+  performed), s16_05 +5, s16_04 +1; no admission of the true task later than its first tick.
+- Decided provisionally by ccode, for Hadi's confirmation: the report's place (analysis/kitting/tk5d/, with
+  moved5d.py); the off column of the comparison is the off setting after the gate change (its earlier values in
+  brackets); "wrong hypothesis held by the meta-planner" counted only before the robot's completion; C5 retargeted to
+  the amended tie rule; the class "as expected by ruling" given where every lost tick is refused by AM67 or AM68.
+Next: step 6 (dock_loading's part).
+

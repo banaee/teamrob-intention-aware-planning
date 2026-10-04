@@ -226,11 +226,12 @@ T-K part 1: context knowledge
 │   ├─ the records ............................................. done
 │   ├─ the plan of the build (plan_T-K_gate.md, D1 to D7) ...... approved
 │   └─ the build (stages 0 to 5) ............................... done
-├─ step 5d the measurements after the gate change ............... stopped (5.7)
+├─ step 5d the measurements after the gate change ............... done
 │   ├─ step 4's recognition runs again
 │   ├─ step 5's planning cases again (D5's re-declared properties; C4 to C6, D6; B12's instance, D4)
 │   ├─ step 5b's recognition runs and planning runs again
-│   └─ the comparison: off, on before the gate change, on after it
+│   ├─ the comparison: off, on before the gate change, on after it
+│   └─ D3 amended (exact ties in the oracle) ................... ruled
 ├─ step 6  dock_loading's part .................................. open
 └─ step 7  the close of T-K part 1 .............................. open
 
@@ -281,7 +282,14 @@ chat that has read nothing else. [ruled unless marked]
 - Two what-if readings, X and Y (6f11c13; analysis/kitting/mpb/tk5b/WHATIF.md): filters on the recorded gate answers,
   not runs. X is the discussion's 2.B, Y its 2.A (5.13).
 - The design discussion that followed step 5b: 5.13. CLOSED AND RULED (Hadi, 4 October 2026; AM67 to AM72; 5.13's
-  head). [ruled; AM67 and AM68 not built]
+  head). [ruled; AM67 and AM68 not built] BUILT and MEASURED: steps 5c and 5d (the tree above; 5.7).
+- Step 5d, the measurements after the gate change, is done (5 October 2026; analysis/kitting/tk5d/REPORT.md, one
+  document: the comparison off / on before / on after, the effect of step 5c alone, what context knowledge adds after
+  it, a conclusion). 0 disagreements in all runs after D3's amendment (exact ties in the oracle). Context knowledge on
+  against off, after step 5c: the true task admitted earlier in 206 of 325 stretches (3005 ticks earlier, 365 later;
+  deliveries median 8 ticks earlier, the coffee break inside break_time 14), later for the coffee break outside it
+  (median +13.5); wrong admissions during modelled tasks 19 against 9; planning completion better in 5 of 22 runs (50
+  ticks), worse in 1 (1 tick); cases below min_separation 3 against 2 (the two extra the turn, TODO-146).
 
 What remains of T-K part 1. A list; no order is decided. [open]
 - The open design question of 5.13: the gate and the prior after an admission (Hadi rules). RULED (AM67 to AM72).
@@ -291,8 +299,8 @@ What remains of T-K part 1. A list; no order is decided. [open]
   BUILT (4 October 2026; docs/handoffs/plan_T-K_gate.md, approved with D1 to D7; design_records.md, "T-K", THE GATE
   RULINGS, BUILT; 2c939a5 to 8357b74 and the records commit). Next: the measurements with context knowledge on (the
   plan's section 8), a separate step: step 5's moved properties re-declared before its runs (D5), C4 to C6 on step 5's
-  six (D6), B12's instance (D4).
-- The question on the planning set's coverage matrix (5.13, question 3). [open]
+  six (D6), B12's instance (D4). MEASURED (step 5d, 5 October 2026).
+- The question on the planning set's coverage matrix (5.13, question 3). CLOSED by D4; B12 verified in step 5d.
 - dock_loading's part (5.7, step 6).
 - The close (5.7, step 7), with this file updated.
 The design chat suggested settling the design question before dock_loading's part. Hadi has not confirmed it.
@@ -692,12 +700,13 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    runs, step 5's planning cases and step 5b's recognition and planning runs again with context knowledge on, against
    the updated oracles; step 5's moved properties re-declared before the runs (D5); C4 to C6 on step 5's six (D6);
    B12's instance (D4); the comparison off / on before the gate change / on after it. [ruled]
-   STOPPED (5 October 2026) on the blocking condition of the step: the oracle cannot determine the gate's answer on
-   the tick a coffee_break re-enters with one delivery live (the evidence exactly 1/2 each by the re-entry rule; the
-   recognizer passes the tie, AM75; the oracle marks it undetermined, D3). In scenario_s10_04 and s12_02 of step 5b's
-   planning runs it falls on a decision (135), so the MPB chain stops and those two runs are not compared. The
-   expectations and the re-declared properties are committed (f02b04c); the runs are made, their outputs not committed.
-   Waiting for Hadi's ruling. [open]
+   DONE (5 October 2026; analysis/kitting/tk5d/REPORT.md; design_records.md, "T-K", STEP 5D): a stop on the gate's
+   answer the oracle could not determine (the exact tie of coffee_break's re-entry, s10_04 and s12_02 at 135), then D3
+   amended by Hadi (exact equality in the oracle is a tie). 0 disagreements in all 101 runs. The admissions of the true
+   task are unchanged by step 5c (206 earlier, 48 equal, 42 later of 325 against off); wrong admissions during modelled
+   tasks 47 to 19 with context knowledge on (off 9); planning completion better in 5 of 22 runs against off (50 ticks),
+   worse in 1; the two cases below min_separation from a wrong admission gone, no new case; the cost s11_03's 78 ticks.
+   [done]
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]

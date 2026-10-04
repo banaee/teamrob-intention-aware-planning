@@ -279,6 +279,9 @@ differently.
 Recommendation: (a).
 RULED (a): undetermined within the oracle's agreement level, skipped and counted. Reason: the rule stays exact; the
 tolerance is the instrument's.
+AMENDED (Hadi, 5 October 2026, step 5d): exactly equal evidence in the oracle is a tie, not outranked; "undetermined"
+stays for values close but not equal. Reason: the oracle stays independent of the run and now checks that a tie passes
+(design_records.md, "T-K", D3's AMENDED line).
 
 D4. The coverage matrix (open question 3 of the discussion). With context knowledge off the outranked refusal is
 unreachable by construction, so the off matrix cannot cover it.
