@@ -298,10 +298,11 @@ def resolve_model_params(user_config: dict) -> dict:
         "task_model_schemas": domain["task_model"],
         "state_declarations": domain["states"],
         "timeline_declarations": domain["timeline_facts"],
+        "declared_context":   domain["context_knowledge"],
         "layout_path":      domain["layouts"][layout_id],
         "setup_path":       domain["setups"][setup_id],
-        "assignment_knowledge": bool(user_config.get("assignment_knowledge", False)),
-        "context_knowledge":  bool(user_config.get("context_knowledge", False)),
+        "assignment_knowledge": bool(user_config.get("assignment_knowledge", True)),   # both on by default (AM3, AM9)
+        "context_knowledge":  bool(user_config.get("context_knowledge", True)),
         "strategy":         user_config.get("strategy", "single_task"),
         "gate_strategy":    user_config.get("gate_strategy", "none"),
         "cost_strategy":    user_config.get("cost_strategy", "realized"),

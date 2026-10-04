@@ -18,11 +18,11 @@ domain: kitting
 scenario: scenario_s01_01
 steps: 50
 
-# Assignment knowledge (T-K part 1, AM9; assignment_prior before it): the robot knows the observed human's assigned tasks, so the recognizer's support is restricted to the assigned and foreseeable tasks and an assigned task has commitment warrant (a run option, not a scenario fact)
-assignment_knowledge: false
+# Assignment knowledge (T-K part 1, AM9; assignment_prior before it): the robot knows the observed human's assigned tasks, so the recognizer's support is restricted to the assigned and foreseeable tasks and an assigned task has commitment warrant (a run option, not a scenario fact). On by default since the build (AM3); off is an ablation
+assignment_knowledge: true
 
-# Context knowledge (T-K part 1, AM3): the recognizer's prior comes from the domain's declared context knowledge (the timeline facts, the object states, the recency facts); off: the equal prior over the live hypotheses
-context_knowledge: false
+# Context knowledge (T-K part 1, AM3): the recognizer's prior comes from the domain's declared context knowledge (the timeline facts, the object states, the recency facts); off: the equal prior over the live hypotheses. On by default since the build
+context_knowledge: true
 
 # MetaPlanner B3 strategy: "single_task" (default: the cheapest next task) | "full_reorder" (B3.B: the head of the cheapest ordering of the pool; on plain cost, T-B2b)
 strategy: "single_task"

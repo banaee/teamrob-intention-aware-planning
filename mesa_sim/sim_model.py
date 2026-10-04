@@ -32,7 +32,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
-from shared.knowledge import StateDeclaration, Tree, TaskModel
+from shared.knowledge import ContextKnowledge, StateDeclaration, Tree, TaskModel
 from shared.planner import AdaptivePlanner
 from shared.recognizer import build_hypothesis_space
 from shared.types import (
@@ -111,7 +111,8 @@ class SimModel(model.Model):
                  test_level: float = 0.05,
                  overrides: Sequence[Override] = (),
                  state_declarations: Sequence[StateDeclaration] = (),
-                 timeline_declarations: Sequence[StateDeclaration] = ()):
+                 timeline_declarations: Sequence[StateDeclaration] = (),
+                 declared_context: Optional[ContextKnowledge] = None):
         super().__init__()
 
         # The two knowledge switches (T-K part 1, AM3, AM9, AM51): both stated by
@@ -123,9 +124,12 @@ class SimModel(model.Model):
         # off, the prior is equal over the live hypotheses.
         self.assignment_knowledge = assignment_knowledge
         self.context_knowledge = context_knowledge
-        if context_knowledge:
-            raise ValueError("context_knowledge=true: the prior from context knowledge is not built yet "
-                             "(T-K part 1, build stage 5)")
+        # The domain's declared context knowledge (AM26), handed to every robot's
+        # recognizer when context knowledge is on; required then.
+        self.declared_context = declared_context
+        if context_knowledge and declared_context is None:
+            raise ValueError("context_knowledge=true, but the domain declares no context knowledge "
+                             "(its registry's \"context_knowledge\")")
         # MetaPlanner B3 strategy for every robot ("single_task" | "full_reorder");
         # a run option, not a scenario fact (T-B2d).
         self.strategy = strategy

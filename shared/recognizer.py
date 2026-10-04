@@ -119,12 +119,21 @@ ALGORITHM:
     the belief (episode_boundary).
 
     Output belief = the evidence × the prior's weights, with inadmissible and
-    retired hypotheses pinned at BELIEF_FLOOR and the floor applied. The prior's
-    weights are a function of the current state, not an event: applied to the
-    output only, never fed back. With context knowledge off every weight is
-    exactly 1.0 (the equal prior, T-K part 1, P1); the hardcoded context weight
-    ω_context and its constants are gone (TODO-66, AM22). The distribution is
-    over TASKS; the phase is internal. The R6
+    retired hypotheses pinned at BELIEF_FLOOR and the floor applied. The prior
+    (T-K part 1, R2 to R4; docs/context_knowledge_method.md, section 6) is
+    recomputed on every tick from the context facts that hold: the live
+    hypotheses of the WorkTasks are the assigned tasks as a whole (with
+    assignment knowledge on the assigned ones are live; off, every work task's,
+    AM3, AM35), weight 1 shared equally; each foreseeable task (a PersonalTask)
+    with a live hypothesis has its declared strength (the knowledge component
+    selects the level, suppressed, raised or ordinary, from the world's
+    predicates and the recency facts, AM36; P4), shared equally among its live
+    hypotheses (context_prior). The weights multiply the evidence once, on the
+    output, never fed back (AM1): the belief over H is their product
+    normalised. With context knowledge off every weight is exactly 1.0 (the
+    equal prior, P1); the hardcoded context weight ω_context and its constants
+    are gone (TODO-66, AM22). The distribution is over TASKS; the phase is
+    internal. The R6
     invariant holds at two levels: the normalised evidence sums to 1 over
     exactly H (before the floor); the returned distribution sums to 1 with the
     pinned keys at exactly BELIEF_FLOOR and the live keys carrying the rest.
@@ -174,11 +183,12 @@ ALGORITHM:
     in. The recognizer decides nothing about action with the finding (R5);
     the meta-planner reads the leader's hypothesis adequacy at its gate.
 
-    Prior:
-        - Uniform over the live hypotheses at t=0 and at every episode
-          boundary (the admissible prior, over the current support)
-        - The recognizer's own evidence state at t>0 (prev_belief is not
-          consulted — see update())
+    The evidence's base (AM1): equal over the live hypotheses at t=0 and at
+        every episode boundary (over the current support); a returning
+        hypothesis takes 1/|H| of the evidence (L4). These are shares of the
+        evidence, not of the belief: the belief is the prior × the evidence.
+        The recognizer's own evidence state at t>0 (prev_belief is not
+        consulted — see update()).
 
     Admissibility restriction (optional, off by default):
         When the robot knows which tasks the observed agent is assigned — its
@@ -203,14 +213,19 @@ HYPOTHESIS SPACE:
 
 INPUTS:
     - Observation:      detected_microaction, spatial_context.position
-    - WorldState:       predicates (completion conditions), object_locations,
-                        object_positions, agent_positions (target resolution)
+    - WorldState:       predicates (completion conditions; the context facts the
+                        prior reads), object_locations, object_positions,
+                        agent_positions (target resolution)
+    - recent:           the recency facts of this tick (the tasks whose observed
+                        completion lies within their recency duration), from the
+                        mind's memory of observed completions (AM30)
     - prev_belief:      previous BeliefState (None → initial prior)
     - assigned_tasks:   observed agent's assigned tasks (None/empty → restriction is off)
 
 OUTPUTS:
     - BeliefState: distribution (the reported distribution), belief (the
-      belief over H), most_likely, confidence (the leader's belief over H);
+      belief over H), prior (the prior over H), levels (the foreseeable tasks'
+      levels), most_likely, confidence (the leader's belief over H);
       finding, lifecycle, tails, hypothesis_adequacy (the adequacy finding,
       the lifecycle state, the members' tail probabilities, every live
       hypothesis's hypothesis adequacy); observation_warrant (every live
@@ -220,14 +235,14 @@ OUTPUTS:
 import itertools
 import logging
 from dataclasses import dataclass
-from typing import Callable, Dict, FrozenSet, List, Optional, Set, Tuple
+from typing import Callable, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from shared.types import (
     Observation, BeliefState, WorldState, GroundedAction, ActionSchema, Predicate,
-    TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, same_task,
-    AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy, ObservationWarrant,
+    TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, WorkTask, same_task,
+    AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy, ObservationWarrant, StrengthLevel,
 )
-from shared.knowledge import TaskModel
+from shared.knowledge import ContextKnowledge, TaskModel
 from shared.planner import AdaptivePlanner, DecompositionError
 from shared.target_resolution import movement_target_position
 from shared import likelihood_functions
@@ -344,12 +359,30 @@ class EnabledTerminal:
 # IntentionRecognizer
 # =============================================================================
 
+def context_prior(work: List[str], foreseeable: List[Tuple[List[str], float]]) -> Dict[str, float]:
+    """
+    The prior's weights over the live hypotheses (docs/context_knowledge_method.md, section 6; R3, R4, AM35, AM36):
+    `work`, the live hypotheses of the assigned tasks as a whole, share the weight 1 equally (1/|A| each; nothing when
+    none is live); each foreseeable task's live hypotheses share its strength s_f equally (s_f/|H^f| each). The
+    normaliser Z = 1[A nonempty] + sum of s_f cancels in the belief's normalisation, so the weights are returned
+    unnormalised; pi = w / sum(w). A pure function, so the tests check it without a recognizer.
+    """
+    weights: Dict[str, float] = {}
+    for key in work:
+        weights[key] = 1.0 / len(work)
+    for keys, strength in foreseeable:
+        for key in keys:
+            weights[key] = strength / len(keys)
+    return weights
+
+
 class IntentionRecognizer:
 
     def __init__(
         self,
         task_model: TaskModel,
         hypotheses: List[HypothesisKey],
+        context: Optional[ContextKnowledge],
         beta: float,
         speed: float,
         duration_to_steps: Callable[[str], float],
@@ -362,6 +395,10 @@ class IntentionRecognizer:
     ):
         """
         task_model:     the robot's task model (T-H): its HTN knowledge
+        context:        the domain's declared context knowledge (T-K part 1,
+                        AM26), read by the prior on every update; None: context
+                        knowledge off, the equal prior (every weight 1.0, P1).
+                        Checked against the task model at construction (AM4).
         hypotheses:     list of (task_name, bindings) pairs for this scenario.
                         Built from the domain schemas and the workspace objects
                         at construction time in sim_agents.py.
@@ -404,14 +441,17 @@ class IntentionRecognizer:
                         distance by default (Mesa agents walk through obstacles);
                         a domain with a better model injects it here.
 
-        _initial_prior is the t=0 prior over all hypotheses: uniform
-        when the restriction is off; uniform over the admissible set, with the
+        _initial_evidence is the t=0 evidence over all hypotheses: equal
+        when the restriction is off; equal over the admissible set, with the
         inadmissible pinned, when it is on.
         Keyed by repr(hyp) strings — same key space as BeliefState.distribution,
         so `prior` has one consistent type throughout update(), whether it
         comes from prev_belief.distribution or this fallback.
         """
         self.task_model = task_model
+        self._context = context
+        if context is not None:
+            context.check_against(task_model)
         self._path_cost = path_cost or likelihood_functions.straight_line_cost
         self._beta = beta
         self._speed = speed
@@ -518,15 +558,15 @@ class IntentionRecognizer:
         self._admissible: Optional[Set[HypothesisKey]] = self._build_admissible(assigned_tasks)
 
         if self._admissible is None:
-            # Uniform prior over all hypotheses
-            self._initial_prior: Dict[str, float] = self._prior([repr(h) for h in self._hypotheses])
+            # Equal evidence over all hypotheses
+            self._initial_evidence: Dict[str, float] = self._equal_evidence([repr(h) for h in self._hypotheses])
         else:
-            # Uniform over the admissible set only, then pinned — the same shape
-            # as every distribution update() produces, so prior and posterior
-            # agree. Built in hypothesis order, the order update()
-            # produces, not in the admissible set's iteration order.
-            self._initial_prior = self._pin(
-                self._prior([repr(h) for h in self._hypotheses if h in self._admissible]),
+            # Equal over the admissible set only, then pinned — the same shape
+            # as every distribution update() produces. Built in hypothesis
+            # order, the order update() produces, not in the admissible set's
+            # iteration order.
+            self._initial_evidence = self._pin(
+                self._equal_evidence([repr(h) for h in self._hypotheses if h in self._admissible]),
                 {repr(h) for h in self._hypotheses if h not in self._admissible},
             )
         # Keys pinned at BELIEF_FLOOR on every output because of the restriction.
@@ -534,16 +574,20 @@ class IntentionRecognizer:
             set() if self._admissible is None
             else {repr(h) for h in self._hypotheses if h not in self._admissible}
         )
-        self._evidence = {k: v for k, v in self._initial_prior.items() if k not in self._inadmissible}
+        self._evidence = {k: v for k, v in self._initial_evidence.items() if k not in self._inadmissible}
         self._base = dict(self._evidence)
+        # The prior's weights of this tick over H (context_prior), set by
+        # update(); every weight 1.0 with context knowledge off (P1).
+        self._weights: Dict[str, float] = {k: 1.0 for k in self._evidence}
+        self._levels: Dict[str, StrengthLevel] = {}
 
     @staticmethod
-    def _prior(live: List[str]) -> Dict[str, float]:
+    def _equal_evidence(live: List[str]) -> Dict[str, float]:
         """
-        The prior over the hypotheses in `live` (keys, in hypothesis order):
-        uniform. The one prior the recognizer has — used at
-        construction over the admissible set and at every episode boundary
-        over the hypotheses still live. Nothing else is stored to re-start
+        The equal evidence over the hypotheses in `live` (keys, in hypothesis
+        order): the evidence's base at construction over the admissible set and
+        at every episode boundary over the hypotheses still live (AM1: a share
+        of the evidence, not of the belief). Nothing else is stored to re-start
         from.
         """
         return {k: 1.0 / len(live) for k in live}
@@ -554,12 +598,13 @@ class IntentionRecognizer:
         action (T-D L1), and the intention the recognizer estimates — the task of the CURRENT
         behavioural episode — is a new question. The ended episode's evidence
         (every fold, every event) is discarded uniformly: every live
-        hypothesis's base becomes the prior over the hypotheses still live,
-        whatever its phase history was, and every origin moves to the agent's
+        hypothesis's base becomes the equal evidence over the hypotheses still
+        live (AM1), whatever its phase history was, and every origin moves to the agent's
         position. Every phase is now entered from the observed agent's
         completion, so each is priced the standing the Projector attributes to
         it (the action latency and the observed agent's task latency, T-D E9).
-        Every phase is empty, so the belief IS the prior until the agent moves.
+        Every phase is empty, so the belief IS the prior until the agent moves
+        (with context knowledge off, equal; on, the prior of the context facts).
         On this tick no hypothesis is a member of the adequacy test (the
         finding is unresolved, or the lifecycle exhausted); on the next, the
         priced latency tick is an observation (E6, second amendment). Retired hypotheses are not
@@ -571,7 +616,7 @@ class IntentionRecognizer:
         """
         # In hypothesis order, whatever order the bases were set in (a re-entry
         # sets its base after the others): the tie-break, handback §1.7.
-        self._base = self._prior([repr(h) for h in self._hypotheses if repr(h) in self._base])
+        self._base = self._equal_evidence([repr(h) for h in self._hypotheses if repr(h) in self._base])
         self._evidence = dict(self._base)
         # Observation warrant resets with the origins (T-D G, AD1): the phases
         # the boundary opens are not entered by a completion in this episode.
@@ -664,6 +709,7 @@ class IntentionRecognizer:
         obs: Observation,
         world: WorldState,
         prev_belief: Optional[BeliefState] = None,
+        recent: Optional[Sequence[PersonalTask]] = None,
     ) -> BeliefState:
         """
         Bayesian update: P(τ|obs_1..t) ∝ P(obs_t|τ) · P(τ|obs_1..t-1),
@@ -699,7 +745,12 @@ class IntentionRecognizer:
              this tick only (replaced next tick): 1 while D <= 0 (nothing
              walked and no standing beyond the priced standing — not a
              charge).
-        Then normalize over the live hypothesis set H (T-D R1, R6). If the
+        Then normalize over the live hypothesis set H (T-D R1, R6). Then the
+        prior of this tick (T-K part 1, R2, R3): with context knowledge on, the
+        weights of context_prior from the context facts in `world` and the
+        recency facts in `recent` (required then: the memory of observed
+        completions hands them in, AM30; ignored when off), which multiply the
+        evidence on the output. If the
         observed agent completed a terminal action on this tick
         (_observed_terminal_completion, L1), the episode ends: the belief
         re-initialises to the prior over H and every origin moves to the
@@ -713,6 +764,8 @@ class IntentionRecognizer:
         compatibility and not consulted (its distribution already contains the
         output-only factors, so feeding it back would count them twice).
         """
+        if self._context is not None and recent is None:
+            raise ValueError("context knowledge is on: update() requires the recency facts of this tick (recent)")
         self._history.append(obs)
         self._tick_actions = {}
         memo: Dict[tuple, float] = {}          # likelihood computations this tick, by inputs
@@ -861,6 +914,7 @@ class IntentionRecognizer:
                          "prior over %d hypotheses, origins reset",
                          int(obs.timestamp), agent, self._action_label(completed_terminal), len(self._origin))
 
+        self._weights, self._levels = self._prior_weights(world, recent)
         belief = self._belief()
         distribution = self._output(obs, world)
         if belief:
@@ -890,6 +944,8 @@ class IntentionRecognizer:
             observation_warrant=observation_warrant,
             episode_boundary=boundary,
             belief=belief,
+            prior=self._prior_over_h(),
+            levels=dict(self._levels),
         )
 
     # -------------------------------------------------------------------------
@@ -1150,16 +1206,57 @@ class IntentionRecognizer:
                 walked, origin, pos, target_pos, self._path_cost)
         return memo[memo_key]
 
+    def _prior_weights(self, world: WorldState,
+                       recent: Optional[Sequence[PersonalTask]]) -> Tuple[Dict[str, float], Dict[str, StrengthLevel]]:
+        """
+        The prior's weights of this tick over H (context_prior) and the
+        foreseeable tasks' levels. The live hypotheses are grouped by their
+        schema's class (the one place beside _build_admissible that reads it):
+        a WorkTask's belongs to the assigned tasks as a whole, a PersonalTask's
+        to its task. Context knowledge off: every weight 1.0 (P1), no levels.
+        """
+        if self._context is None:
+            return {k: 1.0 for k in self._evidence}, {}
+        work: List[str] = []
+        by_task: List[Tuple[TaskSchema, List[str]]] = []
+        for key in self._evidence:
+            schema = self._by_key[key].schema
+            if isinstance(schema, WorkTask):
+                work.append(key)
+            else:
+                group = next((keys for task, keys in by_task if task is schema), None)
+                if group is None:
+                    by_task.append((schema, [key]))
+                else:
+                    group.append(key)
+        levels = {task.name: self._context.level(task, world.predicates, recent) for task, _ in by_task}
+        foreseeable = [(keys, self._context.strength_at(task, levels[task.name]).value) for task, keys in by_task]
+        weights = context_prior(work, foreseeable)
+        return {k: weights[k] for k in self._evidence}, levels
+
+    def _prior_over_h(self) -> Dict[str, float]:
+        """pi over H: the weights normalised (empty with context knowledge off and when exhausted)."""
+        if self._context is None or not self._weights:
+            return {}
+        total = sum(self._weights.values())
+        return {k: w / total for k, w in self._weights.items()}
+
     def _belief(self) -> Dict[str, float]:
         """
-        The belief over the live hypothesis set H (T-K part 1, AM42): the
-        evidence normalised over H, in hypothesis order; its keys are exactly H.
-        The value the leader's `confidence` reports and the gate compares with
-        theta. The floor and the pin scaling belong to the reported
-        distribution only (_output, _finalize): the number of hypotheses that
-        are not live says nothing about the observed agent's intention.
+        The belief over the live hypothesis set H (T-K part 1, R2, AM42): the
+        evidence × the prior's weights, normalised over H, in hypothesis order;
+        its keys are exactly H. The value the leader's `confidence` reports and
+        the gate compares with theta. The floor and the pin scaling belong to
+        the reported distribution only (_output, _finalize): the number of
+        hypotheses that are not live says nothing about the observed agent's
+        intention. With context knowledge off the weights are 1.0 and this is
+        the normalised evidence bit for bit (P1).
         """
-        return dict(self._evidence)
+        if self._context is None:
+            return dict(self._evidence)
+        unnorm = {k: v * self._weights[k] for k, v in self._evidence.items()}
+        total = sum(unnorm.values()) or 1.0
+        return {k: v / total for k, v in unnorm.items()}
 
     def _output(self, obs: Observation, world: WorldState) -> Dict[str, float]:
         """
@@ -1167,10 +1264,13 @@ class IntentionRecognizer:
         with the inadmissible, the retired and the inapplicable hypotheses
         pinned at BELIEF_FLOOR and the floor applied. State factors only —
         nothing here is fed back. Not the value the gate reads since AM42
-        (_belief). Until the prior is built (T-K part 1, stage 5) every weight
-        is 1.0, the equal prior: the evidence itself.
+        (_belief). With context knowledge off every weight is 1.0: the evidence
+        itself, bit for bit (P1).
         """
-        unnorm: Dict[str, float] = dict(self._evidence)
+        if self._context is None:
+            unnorm: Dict[str, float] = dict(self._evidence)
+        else:
+            unnorm = {k: v * self._weights[k] for k, v in self._evidence.items()}
         return self._finalize(unnorm, self._inadmissible | self._retired | self._inapplicable)
 
     def _finalize(self, unnorm: Dict[str, float], pinned: Optional[Set[str]] = None) -> Dict[str, float]:

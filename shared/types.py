@@ -126,6 +126,11 @@ class BeliefState:
     belief        the belief over the live hypothesis set H (T-K part 1, AM42): the
                   evidence × the prior, normalised over H, before the floor and
                   the pin scaling; its keys are exactly H. Empty when EXHAUSTED.
+    prior         the prior over H (T-K part 1, R3): the normalisation of the
+                  strengths of what is live, pi(h); empty with context knowledge
+                  off (the equal prior, every weight 1) and when EXHAUSTED.
+    levels        per foreseeable task with a live hypothesis, the level its
+                  strength took on this tick (AM36); empty with context knowledge off.
     most_likely   the argmax over H (of `belief`); None when EXHAUSTED.
     confidence    the leader's belief over H, `belief[most_likely]` (AM42: the
                   value the gate compares with theta); 0.0 when EXHAUSTED.
@@ -163,6 +168,10 @@ class BeliefState:
     observation_warrant: Dict[str, ObservationWarrant]  # {intention_id: value}, every live hypothesis
     episode_boundary: bool  # the belief was re-initialised at an episode boundary on this tick
     belief: Dict[str, float] = field(default_factory=dict)  # {intention_id: P} over exactly H (AM42); empty when exhausted
+    prior: Dict[str, float] = field(default_factory=dict)   # {intention_id: pi} the prior over exactly H, normalised (T-K part 1,
+                                                            # R3, R4); empty with context knowledge off and when exhausted
+    levels: Dict[str, "StrengthLevel"] = field(default_factory=dict)  # {task name: level} per foreseeable task with a live
+                                                            # hypothesis (AM36); empty with context knowledge off
     # predicted_next_actions: Dict[str, List[str]] = field(default_factory=dict)  # {intention_id: [action_types]}  
                             # OUTDATED: current design uses ProjectedPlan for multi-step prediction; 
                             # this field is retained for backward compatibility but should not be used in new code.
@@ -1119,6 +1128,14 @@ class Timeline:
 
     def __str__(self):
         return "[" + " ".join(str(w) for w in self.windows) + "]"
+
+
+class StrengthLevel(Enum):
+    """The level of a foreseeable task's strength on a tick (T-K part 1, AM36): suppressed if its suppressing
+    condition is satisfied; else raised if its raising condition is satisfied; else ordinary."""
+    SUPPRESSED = "suppressed"
+    ORDINARY = "ordinary"
+    RAISED = "raised"
 
 
 class TimelineSource(Enum):

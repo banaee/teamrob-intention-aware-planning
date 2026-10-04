@@ -15,6 +15,12 @@ PURPOSE:
     - StateDeclaration: one state the domain declares (T-G A5), defined in
                     shared/types.py (a timeline's Window names one) and
                     re-exported here.
+    - ContextKnowledge: the declared context knowledge of a domain (T-K part 1,
+                    AM26, AM36 to AM38): the suppressed and the ordinary strength,
+                    and per foreseeable task its suppressing and raising
+                    condition, its raised strength and its recency duration, each
+                    with its source. It reaches the recognizer's prior directly, as
+                    the task model does; it never drives the human (R1).
 
 WHAT THIS MODULE DOES:
     - Holds typed schema objects and answers queries with them, not strings
@@ -41,11 +47,11 @@ USED BY:
 """
 
 from dataclasses import dataclass
-from typing import Dict, FrozenSet, List, Optional, Sequence
+from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from shared.types import (
-    ActionSchema, ActionStep, HumanOnlyTask, LANDMARK_TYPE, StateDeclaration, TaskSchema, TaskStep, WorkTask,
-    destination_derivations,
+    ActionSchema, ActionStep, HumanOnlyTask, LANDMARK_TYPE, PersonalTask, Predicate, StateDeclaration, StrengthLevel,
+    TaskSchema, TaskStep, WorkTask, destination_derivations,
 )
 
 
@@ -231,3 +237,203 @@ class TaskModel(ProceduralKnowledge):
         if missing:
             raise ValueError(f"task model: every WorkTask of the tree is in it; missing: {missing}")
         super().__init__(schemas, tree.get_all_actions(), tree.get_microactions(), tree._costs)
+
+
+# ========================================================================
+# Context knowledge (T-K part 1): the declared knowledge the recognizer's
+# prior reads. Values are modelling assumptions, each with its source.
+# ========================================================================
+
+@dataclass(frozen=True)
+class Strength:
+    """A declared relative weight of a foreseeable task against the assigned tasks as a whole, which contributes 1
+    (R3, AM36), with its source. Greater than zero (AM4): checked at construction."""
+    value: float
+    source: str
+
+    def __post_init__(self):
+        if isinstance(self.value, bool) or not isinstance(self.value, (int, float)) or not self.value > 0:
+            raise ValueError(f"a strength is a number greater than zero, not {self.value!r} (AM4)")
+
+
+@dataclass(frozen=True)
+class RecencyDuration:
+    """The declared duration for which a task's recency fact holds after its observed completion (AM14 to AM16), in
+    the physical form a duration binding uses (ISO-8601, PT180S); the body converts it to ticks. With its source."""
+    duration: str
+    source: str
+
+
+class ConditionFact:
+    """One fact a condition reads (AM11, AM36): a closed family of three, below. `holds` reads the world's predicates
+    and the recency facts the mind derives from its memory of observed completions. Not constructed directly."""
+
+    def __init__(self):
+        if type(self) is ConditionFact:
+            raise TypeError("a ConditionFact is a TimelineFact, an ObjectState or a RecencyFact")
+
+    def holds(self, predicates: Set[Predicate], recent: Sequence[PersonalTask]) -> bool:
+        raise NotImplementedError
+
+
+class TimelineFact(ConditionFact):
+    """A timeline fact (a declared state about no object): holds iff its predicate, with no argument, is in the world
+    state (the environment emits it on the ticks of its window, AM25, AM40)."""
+
+    def __init__(self, state: StateDeclaration):
+        super().__init__()
+        if state.object_type is not None:
+            raise ValueError(f"'{state.name}' is a state about type '{state.object_type}', not a timeline fact")
+        self.state = state
+
+    def holds(self, predicates: Set[Predicate], recent: Sequence[PersonalTask]) -> bool:
+        return Predicate(self.state.name, ()) in predicates
+
+    def __repr__(self):
+        return f"TimelineFact({self.state.name})"
+
+
+class ObjectState(ConditionFact):
+    """An object state (T-G A5): holds iff the state holds for any object of its declared type in the world state
+    (AM44; with at most one A/C switch per layout, that switch's state). Read by the state's name with one argument,
+    as the planner reads a ConditionSchema; the environment admits the fact for objects of the declared type only."""
+
+    def __init__(self, state: StateDeclaration):
+        super().__init__()
+        if state.object_type is None:
+            raise ValueError(f"'{state.name}' is a fact about no object, not an object state")
+        self.state = state
+
+    def holds(self, predicates: Set[Predicate], recent: Sequence[PersonalTask]) -> bool:
+        return any(p.name == self.state.name and len(p.args) == 1 for p in predicates)
+
+    def __repr__(self):
+        return f"ObjectState({self.state.name})"
+
+
+class RecencyFact(ConditionFact):
+    """The recency fact of a foreseeable task (AM14, AM27, AM47): holds iff the task is among the recency facts the
+    recognizer is given on this run, derived by the mind's memory of observed completions. The task is compared by
+    identity."""
+
+    def __init__(self, task: PersonalTask):
+        super().__init__()
+        self.task = task
+
+    def holds(self, predicates: Set[Predicate], recent: Sequence[PersonalTask]) -> bool:
+        return any(t is self.task for t in recent)
+
+    def __repr__(self):
+        return f"RecencyFact({self.task.name})"
+
+
+@dataclass(frozen=True)
+class Condition:
+    """A conjunction of facts (AM11, AM36): satisfied iff every fact holds. At least one fact; no "not", no "or"
+    (T-K part 2's)."""
+    facts: Tuple[ConditionFact, ...]
+
+    def __post_init__(self):
+        if not self.facts:
+            raise ValueError("a condition is one fact or a conjunction of facts; it has none")
+        for f in self.facts:
+            if not isinstance(f, ConditionFact):
+                raise TypeError(f"a condition's fact is a ConditionFact, not {f!r}")
+
+    def satisfied(self, predicates: Set[Predicate], recent: Sequence[PersonalTask]) -> bool:
+        return all(f.holds(predicates, recent) for f in self.facts)
+
+
+@dataclass(frozen=True)
+class ForeseeableKnowledge:
+    """What the domain declares about one foreseeable task (AM36 to AM38): its suppressing condition, its raising
+    condition with its raised strength (present together), and its recency duration (present iff a recency fact of the
+    task may be named). The suppressed and the ordinary strength are the domain's, in ContextKnowledge."""
+    task: PersonalTask
+    suppressing: Optional[Condition] = None
+    raising: Optional[Condition] = None
+    raised: Optional[Strength] = None
+    recency: Optional[RecencyDuration] = None
+
+    def __post_init__(self):
+        if not isinstance(self.task, PersonalTask) or isinstance(self.task, HumanOnlyTask):
+            raise ValueError(f"'{self.task.name}' is not a foreseeable task (a PersonalTask a robot may be given)")
+        if (self.raising is None) != (self.raised is None):
+            raise ValueError(f"'{self.task.name}': a raising condition and a raised strength are declared together")
+
+
+class ContextKnowledge:
+    """
+    The declared context knowledge of a domain (AM26): the suppressed and the ordinary strength, held for every
+    foreseeable task of the domain, and per foreseeable task its ForeseeableKnowledge. One entry per task (checked);
+    a RecencyFact names a task of the entries that declares a recency duration (checked). `check_against(task_model)`
+    (AM4): every foreseeable task of a robot's task model has an entry and no entry names a task outside it; asked
+    when a robot is built with context knowledge on.
+    `level(task, predicates, recent)` selects the level (AM36): the suppressing condition first, then the raising,
+    else ordinary; `strength` is the level's value. The recognizer only groups and divides (P4).
+    """
+
+    def __init__(self, suppressed: Strength, ordinary: Strength, tasks: Sequence[ForeseeableKnowledge]):
+        self.suppressed = suppressed
+        self.ordinary = ordinary
+        self._entries: List[ForeseeableKnowledge] = list(tasks)
+        for i, e in enumerate(self._entries):
+            if any(o.task is e.task for o in self._entries[:i]):
+                raise ValueError(f"context knowledge declares '{e.task.name}' twice")
+        for e in self._entries:
+            for cond in (e.suppressing, e.raising):
+                for f in (cond.facts if cond is not None else ()):
+                    if isinstance(f, RecencyFact):
+                        named = next((o for o in self._entries if o.task is f.task), None)
+                        if named is None or named.recency is None:
+                            raise ValueError(f"'{e.task.name}': a condition names the recency fact of "
+                                             f"'{f.task.name}', which declares no recency duration here")
+
+    def entries(self) -> List[ForeseeableKnowledge]:
+        return list(self._entries)
+
+    def entry(self, task: TaskSchema) -> ForeseeableKnowledge:
+        e = next((o for o in self._entries if o.task is task), None)
+        if e is None:
+            raise ValueError(f"context knowledge declares nothing for '{task.name}'")
+        return e
+
+    def check_against(self, task_model: ProceduralKnowledge) -> None:
+        """AM4: with context knowledge on, every foreseeable task of the task model declares a strength (has an
+        entry), and no entry names a task outside the task model."""
+        foreseeable = [t for t in task_model.task_schemas() if isinstance(t, PersonalTask)]
+        missing = [t.name for t in foreseeable if not any(e.task is t for e in self._entries)]
+        if missing:
+            raise ValueError(f"context knowledge declares nothing for the foreseeable tasks {missing} of the task model (AM4)")
+        outside = [e.task.name for e in self._entries if not task_model.holds(e.task)]
+        if outside:
+            raise ValueError(f"context knowledge names {outside}, which are not task schemas of the task model")
+
+    def level(self, task: TaskSchema, predicates: Set[Predicate], recent: Sequence[PersonalTask]) -> StrengthLevel:
+        e = self.entry(task)
+        if e.suppressing is not None and e.suppressing.satisfied(predicates, recent):
+            return StrengthLevel.SUPPRESSED
+        if e.raising is not None and e.raising.satisfied(predicates, recent):
+            return StrengthLevel.RAISED
+        return StrengthLevel.ORDINARY
+
+    def strength_at(self, task: TaskSchema, level: StrengthLevel) -> Strength:
+        if level is StrengthLevel.SUPPRESSED:
+            return self.suppressed
+        if level is StrengthLevel.RAISED:
+            return self.entry(task).raised
+        return self.ordinary
+
+    def strength(self, task: TaskSchema, predicates: Set[Predicate], recent: Sequence[PersonalTask]) -> Strength:
+        return self.strength_at(task, self.level(task, predicates, recent))
+
+    def fact_names(self) -> List[str]:
+        """The names of the timeline facts and object states the conditions read, sorted; for the log."""
+        names = set()
+        for e in self._entries:
+            for cond in (e.suppressing, e.raising):
+                for f in (cond.facts if cond is not None else ()):
+                    if isinstance(f, (TimelineFact, ObjectState)):
+                        names.add(f.state.name)
+        return sorted(names)
+

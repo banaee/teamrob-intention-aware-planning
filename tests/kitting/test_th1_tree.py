@@ -139,7 +139,7 @@ def test_support_restriction_on_hypothesis_keys():
     m = model_for("env_layout_05", registered("env_layout_05", "scenario_s04_01"))
     robot = next(iter(m.robots.values()))
     human = next(a for a in registered("env_layout_05", "scenario_s04_01").agents if a.agent_type == "human")
-    rec = IntentionRecognizer(task_model=robot.recognizer.task_model, hypotheses=build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type),
+    rec = IntentionRecognizer(task_model=robot.recognizer.task_model, context=None, hypotheses=build_hypothesis_space(robot.recognizer.task_model, m._objects_by_type),
                               beta=0.01, speed=20.0, duration_to_steps=float, default_action_cost=1.0,
                               action_completion_latency=1.0, observed_task_completion_latency=0.0, alpha=0.05,
                               assigned_tasks=human.assigned_tasks)
@@ -148,7 +148,7 @@ def test_support_restriction_on_hypothesis_keys():
     assert rec._admissible == assigned | personal
     # a model that omits ac_activation: its hypotheses do not exist, so none is admissible
     small = TaskModel(m.tree, [deliver_item, coffee_break])
-    rec2 = IntentionRecognizer(task_model=small, hypotheses=build_hypothesis_space(small, m._objects_by_type),
+    rec2 = IntentionRecognizer(task_model=small, context=None, hypotheses=build_hypothesis_space(small, m._objects_by_type),
                                beta=0.01, speed=20.0, duration_to_steps=float, default_action_cost=1.0,
                               action_completion_latency=1.0, observed_task_completion_latency=0.0, alpha=0.05,
                                assigned_tasks=human.assigned_tasks)

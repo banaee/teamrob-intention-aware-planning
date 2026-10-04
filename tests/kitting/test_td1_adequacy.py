@@ -48,7 +48,7 @@ def item(i):
 def recognizer(m, hypotheses, alpha=0.05, assigned_tasks=None):
     robot = next(iter(m.robots.values()))
     return IntentionRecognizer(
-        task_model=robot.recognizer.task_model, hypotheses=hypotheses,
+        task_model=robot.recognizer.task_model, hypotheses=hypotheses, context=None,
         beta=BETA, speed=SPEED, duration_to_steps=lambda d: _parse_duration_to_steps(d, m),
         default_action_cost=1.0, action_completion_latency=1.0, observed_task_completion_latency=0.0,
         alpha=alpha, assigned_tasks=assigned_tasks)

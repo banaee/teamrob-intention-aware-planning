@@ -34,13 +34,15 @@ from dataclasses import replace
 from typing import TYPE_CHECKING, List, Optional, Dict, Tuple
 
 from shared.knowledge import TaskModel
+from shared.completion_memory import ObservedCompletions
 from shared.projection import Projector
 from shared.recognizer import IntentionRecognizer, HypothesisKey
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
 from shared.types import (AbstractPlan, AdequacyFinding, BeliefState, Decision, ExecutorState, GroundedAction, Script,
-                          ScriptDependence, Start, RecognizerLifecycle, TaskInstance, same_task, task_instance_key)
+                          ScriptDependence, Start, RecognizerLifecycle, TaskInstance, WorldState, same_task,
+                          task_instance_key)
 from world.record import Record, Snapshot
 from world.human_executor import StackMachine, RunAction, ResumeAction
 
@@ -304,9 +306,24 @@ class RobotAgent(FactoryAgent):
         speed = _get_step_size(model)
         duration_to_steps = lambda duration: _parse_duration_to_steps(duration, model)
         default_action_cost = 1.0     # a stationary action is one tick (GRASP/RELEASE)
+        # Context knowledge (T-K part 1): the domain's declared knowledge reaches
+        # the recognizer's prior directly (AM26) when the run option is on; the
+        # memory of observed completions (AM30, its own component of the mind)
+        # then holds, per foreseeable task that declares a recency duration,
+        # that duration in ticks (the body's conversion, as a wait's) and the
+        # task's hypotheses, and hands the recognizer the recency facts on each
+        # run. Off: no prior from context (the equal prior), no memory.
+        context = model.declared_context if model.context_knowledge else None
+        self.memory: Optional[ObservedCompletions] = None
+        if context is not None:
+            self.memory = ObservedCompletions(task_model, [
+                (entry.task, int(duration_to_steps(entry.recency.duration)),
+                 [h.task_instance() for h in hypotheses if h.schema is entry.task])
+                for entry in context.entries() if entry.recency is not None and task_model.holds(entry.task)])
         self.recognizer = IntentionRecognizer(
             task_model=task_model,
             hypotheses=hypotheses,
+            context=context,
             beta=beta,
             speed=speed,
             duration_to_steps=duration_to_steps,
@@ -437,7 +454,8 @@ class RobotAgent(FactoryAgent):
                 self.belief = self.recognizer.update(
                     obs=obs,
                     world=world,
-                    prev_belief=self.prev_belief
+                    prev_belief=self.prev_belief,
+                    recent=self._recent(human, world),
                 )
 
         if self.belief is not None and human is not None:
@@ -473,6 +491,20 @@ class RobotAgent(FactoryAgent):
                 f"confidence={self.belief.confidence:.3f} "
                 f"dist=[{dist_str}]"
             )
+            if self.model.context_knowledge:
+                # The prior's inputs and result this tick (T-K part 1): the
+                # context facts that hold (the timeline facts and object states
+                # the declared conditions read), the recency facts, each
+                # foreseeable task's level and the prior over H, to 4 decimals.
+                names = set(self.model.declared_context.fact_names())
+                facts_str = " ".join(sorted(str(p) for p in world.predicates if p.name in names))
+                recent_str = " ".join(sorted(t.name for t in self._recent(human, world, observe=False)))
+                levels_str = " ".join(f"{k}={v.value}" for k, v in self.belief.levels.items())
+                prior_str = "  ".join(f"{k}={v:.4f}" for k, v in self.belief.prior.items())
+                logging.info(
+                    f"[IR-context] step={int(obs.timestamp)} facts=[{facts_str}] recent=[{recent_str}] "
+                    f"levels=[{levels_str}] prior=[{prior_str}]"
+                )
 
         # The empty task pool stops planning and execution only: after the
         # terminal return no trigger is evaluated (no_current_task would refire
@@ -585,11 +617,24 @@ class RobotAgent(FactoryAgent):
             model=self.model,
             timestamp=float(self.model.schedule.steps),
         )
-        self.recognizer.update(obs=obs, world=world, prev_belief=None)
+        self.recognizer.update(obs=obs, world=world, prev_belief=None, recent=self._recent(human, world))
 
     # =========================================================================
     # Internal helpers
     # =========================================================================
+
+    def _recent(self, human: "HumanAgent", world: WorldState, observe: bool = True) -> Optional[Tuple]:
+        """
+        The recency facts of this tick (AM30): the memory observes the world
+        first (the terminal facts of the remembered hypotheses for the observed
+        human, AM47), then answers which tasks were completed within their
+        recency duration. None with context knowledge off.
+        """
+        if self.memory is None:
+            return None
+        if observe:
+            self.memory.observe(human.unique_id, world)
+        return self.memory.recent(int(world.timestamp))
 
     def _perceive(self, world: WorldState, human: Optional["HumanAgent"]) -> WorldState:
         """
