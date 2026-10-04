@@ -3,7 +3,8 @@
 Written by ccode on 4 October 2026 (T-K part 1, step 2; BUILD DISCIPLINE, step 1: plan only, no code; 41efa76).
 Amended the same day to Hadi's rulings on it: the decisions D1 to D10 and two additions of the review are AM42 to AM53
 (`docs/design_decisions.md` and `docs/design_records.md`, "T-K", THE BUILD'S PLAN, RULED); the proposals P1 to P5 are
-accepted. Amended again the same day to Hadi's rulings on section 11 (AM54 to AM58; THE CROSS-CHECK, RULED). Nothing in it is built. Every build session of T-K part 1 reads this file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
+accepted. Amended again the same day to Hadi's rulings on section 11 (AM54 to AM58; THE CROSS-CHECK, RULED) and on its
+consequences (AM59 to AM63; THE CROSS-CHECK'S CONSEQUENCES, RULED). The plan is approved; the build has not started. Nothing in it is built. Every build session of T-K part 1 reads this file first, then `CLAUDE.md`, `docs/glossary.md`, `docs/context_knowledge_method.md` and the T-K entries
 (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K").
 The rulings fix what and why; this file fixes how, the names and the build order. Section 7 lists the decisions as
 ruled; section 11 is ccode's cross-check of the rulings, with the points Hadi has not ruled on.
@@ -385,18 +386,22 @@ since", which the final README sections state.
    floor and the pins; `BeliefState.belief`; `_clears_gate` unchanged (it reads `confidence`); a unit test that a
    belief with pinned keys clears θ on its value over H. 2b: the instruments follow (the IRB oracle's `confidence` and
    gate columns from the belief over H; `tdlib`, `summary.py`, `baseline.py` take θ crossings from `confidence`).
-   Check against stage 1: every difference is in the lines section 6 names for this stage, each listed. Then the
-   test-bed sets, rerun with the new gate (AM57), each through its own pipeline (`analysis/instruments/irb/run.sh
+   Check against stage 1: every difference is in the lines section 6 names for this stage, each listed. Before the
+   reruns, the untracked data of round 1, the IRB and the MPB are copied outside the repository, one copy, named in
+   each README (AM59). Then the test-bed sets, rerun with the new gate (AM57), each through its own pipeline (`analysis/instruments/irb/run.sh
    kitting` for round 1 and for the IRB's scenario_s08 and s09; `analysis/instruments/mpb/run.sh` for the MPB set, its
    variants as its README states, the prior-off appendix included as a diagnostic): the IRB sets and the MPB's parts 1
-   to 3 agree with the oracle (0 disagreements at 1e-9), and every declared property of the MPB's part 4 holds. A
-   declared property that no longer holds is a finding: the build stops there and reports it with its cause; no ruling
-   and no scenario is changed for it (section 11, X12, X13). 2c, its own commit: B2 recorded, a new README section in
+   to 3 agree with the oracle (0 disagreements at 1e-9), every declared property of the MPB's part 4 holds, and every
+   scenario of the coverage matrix still reaches its authored case. A disagreement, a declared property that no
+   longer holds, or a scenario that no longer reaches its case stops the build (AM57, AM61): its cause is examined and
+   reported; no ruling and no scenario is changed for it. The run without assignment knowledge is a diagnostic: its
+   changes are listed and never stop (AM62). 2c, its own commit: B2 recorded, a new README section in
    each maintained set (md5s, the lines that moved and why); in round 1's, the IRB's and the MPB's README a section
    that states what changed and names the last commit that holds the old results (section 11, X11); their reports'
    moved numbers and the moved findings in the design records (KT8, KT10; the IRB's and the MPB's T-D records) marked
    with a dated line, not rewritten; a stale note in dock_loading's IRB and MPB READMEs (until dock_loading's step).
-   The commits of stage 2 are made only after its checks pass.
+   The commits of stage 2 are made only after its checks pass; a stop leaves the committed state on the old gate
+   (AM60).
 3. The run option `context_knowledge` and the removal of ω (TODO-66), off only (one commit): the flag, the run files
    and sweeps state `context_knowledge: false`, tests state both (AM51); the old `ContextKnowledge` and the
    recognizer's constants removed; `_output` multiplies by unit weights (P1). Check against B2: the four sets and round
@@ -519,7 +524,9 @@ where a ruling looks incomplete from the code's side. Hadi rules on each; the pl
 - X10. AM44 and AM18. AM18's "not taken: ac_on as a condition of the task" is a decision, not a load check. Nothing
   refuses ac_on in a guard, as AM52 refuses a timeline fact. No schema does this today. Flagged only.
 
-Consequences of the rulings on section 11 (ccode, 4 October 2026), not ruled:
+Consequences of the rulings on section 11 (ccode, 4 October 2026). RULED (Hadi, 4 October 2026): X11 as AM59 (one
+external copy), X12 as AM60, X13 as AM61 (two stop conditions: a disagreement with the oracle, a scenario that no
+longer reaches its coverage case; a stop means its cause is examined), X14 as AM62; X3 accepted as AM63. As raised:
 
 - X11. "The last commit that holds the old results" (AM57) holds only what git tracks. Under the rule for analysis/
   (2 October 2026) the per-tick data (csv, json) and the figures are untracked. For kitting's IRB and MPB sets they

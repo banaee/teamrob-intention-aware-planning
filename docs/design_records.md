@@ -3028,6 +3028,27 @@ recorded as stated in the plan's section 11.
 - AM58, the viewer's confidence (X2): deferred work, TODO-180. The viewer is not checked for which value it shows as
   the confidence.
 
+THE CROSS-CHECK'S CONSEQUENCES, RULED (Hadi, 4 October 2026, on the plan's section 11, X11 to X14, and on ccode's
+judgement of X3; recorded the same day). Records and the plan only; nothing is built. X11 is AM59, X12 AM60, X13 AM61,
+X14 AM62, X3's acceptance AM63.
+
+- AM59, the old data (X11). Before the gate's stage replaces the outputs of the three kitting sets (round 1, the IRB,
+  the MPB), their untracked data (per-tick data and figures) are copied outside the repository: one external copy;
+  nothing of it is added to the repository. Each set's README names the copy.
+  Reason: round 1's per-tick data and figures are in no commit; kitting's IRB and MPB data are restorable from 7d00f43.
+
+- AM60, the gate's stage and its commits (X12). The gate's stage is committed only after its checks pass. If it stops
+  before, the committed state stays on the old gate.
+
+- AM61, the stop conditions in the planning set (X13). Two: a disagreement with the independent computation (the
+  oracle's parts 1 to 3), and a scenario that no longer reaches its authored coverage case. A stop means that its cause
+  is examined; it does not mean that the ruling on the gate is rejected.
+
+- AM62, the run without assignment knowledge (X14). A diagnostic: its changes are reported and never stop the build.
+
+- AM63, the label of the episode boundary for a switch_on (X3). Accepted as ccode reported it (AM56): the label stays
+  deferred (TODO-179); the tick of the episode boundary is not changed.
+
 Next: the three open items, then T-K part 1's build plan (BUILD DISCIPLINE, step 1).
 AMENDED (Hadi, 3 October 2026): the design is ruled and amended (AM1 to AM9); the three open items are unchanged (the
 values for kitting and dock_loading, the perception assumption, the tests). T-K is framework-wide: it concerns

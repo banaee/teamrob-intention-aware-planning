@@ -22,6 +22,9 @@ Updated 4 October 2026 after Hadi's ruling on where the timeline of context fact
 section 5 in line (5.1 to 5.4, 5.6 to 5.8, 5.10).
 Updated 4 October 2026 after Hadi's rulings on the build's plan (AM42 to AM53; docs/handoffs/plan_T-K_part1.md): 5.2,
 5.3, 5.7 and 5.10 in line.
+Updated 4 October 2026 at the close of the design chat on T-K part 1's build plan (rulings AM40 to AM63): section 5
+brought to the state the next design chat starts from (its opening, 5.6, 5.7 and 5.10 rewritten); section 2's T-K
+paragraph; section 11 gains the rules Hadi set for the design chat on 4 October 2026.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -97,9 +100,9 @@ Scope of stage 1's tests, as Hadi set it [ruled]: they are an initial check that
 behavioural analysis belongs to stage 2. Hadi wants stage 2's questions, rulings and discussion taken in full
 depth, one at a time.
 
-T-K part 1 runs now. Its design is ruled and recorded (2 and 3 October 2026), all three content points included (the
-values, the perception assumption, the tests). The first round of its tests, on kitting without context knowledge, is
-built and run. The mechanism is not built. Section 5 holds its state.
+T-K part 1 runs now. Its design is ruled and recorded (2 to 4 October 2026), the build's plan included and approved
+(docs/handoffs/plan_T-K_part1.md). The first round of its tests, on kitting without context knowledge, is built and
+run. The mechanism is not built. Section 5 holds its state.
 
 ---
 
@@ -192,11 +195,24 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 
 ## 5. T-K part 1: context knowledge (framework-wide: kitting and dock_loading)
 
-State at the close of 3 October 2026, written for a design chat that has read nothing else. The design of T-K part 1
-is ruled and recorded, all three content points included (the values, the perception assumption, the tests). The rooms
-for the tests on kitting and the first round of tests, without context knowledge, are built and run. The mechanism is
-not built. The next design chat takes the rest of T-K part 1 from 5.7. Where this section and the records disagree,
-the records win. Step 1 of 5.7 is done (4 October 2026).
+State at the close of 4 October 2026, written for a design chat that has read nothing else. [ruled]
+- Every decision for the build is ruled and the build's plan is approved: docs/handoffs/plan_T-K_part1.md, which
+  states the structure, the stages, what each stage's commit holds and how each is checked. The build has not started.
+- Steps 1 and 2 of 5.7 are done (the layouts with one A/C switch at most; the plan). The next design chat takes the
+  rest of T-K part 1 from step 3: the build by the approved plan, then the timelines and the runs with context
+  knowledge on, the planning cases, dock_loading's part, the close.
+- Its first act is the build prompt: build by the plan, stage by stage; stop and report on a failed check that is not
+  a plain defect, on something that cannot be built as ruled, or on a question that changes what is built; the how is
+  ccode's.
+- The rulings made in the design chat of 4 October 2026, in plain words: the setup states the default timeline of
+  context facts and a scenario may state its own, which replaces it whole; one setup per room; the tests compare
+  context knowledge off against on, each case labelled by the state the script meets; the gate compares the threshold
+  with the belief over the live hypotheses (with context knowledge on or off), the floor and the scaling by the pinned
+  hypotheses staying in the reported distribution only; the gate's change has its own commit and its own regenerated
+  baseline, and its stage reruns round 1 and kitting's recognition and planning sets with the new gate, replacing their
+  outputs; the A/C is switched on by a new action, switch_on; no condition of any task or action reads a timeline
+  fact. The records: design_decisions.md and design_records.md, "T-K", AM40 to AM63 and KT13, KT14.
+Where this section and the records disagree, the records win.
 
 T-K is context knowledge as a whole: a task of the pipeline, framework-wide (it concerns kitting and dock_loading
 alike), not a stage of T-G. Part 1 (V1, now): crisp context knowledge. Part 2 (V1, at the end of the V1 queue, after
@@ -206,7 +222,8 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 ### 5.1 Where it is recorded
 
 - docs/design_decisions.md, the entry "T-K: context knowledge in the recognizer's belief": the conceptual part. R1 to
-  R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM34 (the amendments, each under the ruling it amends), the
+  R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM63 (the amendments, each under the ruling it amends, the
+  record parts in design_records.md; AM40 to AM63 are of 4 October 2026: the timeline, the plan, the cross-check), the
   corrections C1, C3 and C4. AM1 to AM9 come from the review of the records; AM10 to AM29 from content points 1 and 2
   (the block CONTENT POINTS 1 AND 2, after R8; that chat's A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29);
   AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11); a CLARIFIED line under
@@ -464,43 +481,63 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 
 ### 5.6 What is not built
 
-- The mechanism: everything in 5.3.
-- The setups' timelines and the scenarios' own timelines; the runs with context knowledge on (KT14). (The second setup
-  per room is dropped, KT13.)
-- The two MPB cases.
-- dock_loading's part: the re-measurement of T-G stage 1's baseline with context knowledge on.
+- The mechanism: everything in 5.3, built by the approved plan (step 3).
+- The timelines of the setups and of the scenarios that state their own; the runs with context knowledge on (step 4).
+- The planning cases (step 5).
+- dock_loading's part (step 6).
 
 ### 5.7 The steps from here
 
-1. The layouts with more than one A/C switch (AM19): ccode lists every such layout and every scenario, test and
-   analysis that rests on it; Hadi decides on the list; the layouts are changed to the V1 rule; the baselines that
-   remain are regenerated. Affected analyses and tests are deleted or regenerated (Hadi: the existing layouts, setups
-   and their analyses are not an evaluation reference).
-   Known input (AM19's KNOWN INPUT): env_layout_05 holds three A/C switches (ac_switch_0, _1, _2). Its scenarios are
-   scenario_s04_01 to _03 (env_setup_04); scenario_s04_01, a fixture of the regression sweep, scripts two
-   activations, at ac_switch_1 and then ac_switch_2; four tests in tests/kitting/ name the layout or its scenarios.
-   The full list, over every layout of both domains, is this step's work.
-   DONE (4 October 2026; design_records.md, "T-K", STEP 1; 32029d3, 098b1a8): env_layout_05 was the only layout of
-   either domain with more than one A/C switch. Hadi ruled on the list: it keeps ac_switch_1 only, and scenario_s04_01
-   one ac_activation, at ac_switch_1. tb1a_destination's two s04_01 logs regenerated, every other maintained baseline
-   byte-identical; one test adapted (test_td15_build's rival is ac_activation(ac_switch_1)), none removed; 14 early
-   frozen analyses deleted (analysis/README.md), the s04_01 logs of six others deleted with a note in each report.
-   Every layout of both domains now holds at most one A/C switch.
-2. The build's plan (BUILD DISCIPLINE, step 1): ccode's plan, with no code, reviewed in the design chat. It reads
-   docs/context_knowledge_method.md as the statement of the prior. Open for it (5.10, item 9): which value the gate
-   compares with θ.
-   DONE (4 October 2026): docs/handoffs/plan_T-K_part1.md, its decisions ruled (AM42 to AM53; ccode's P1 to P5
-   accepted). The gate's change has its own commit and its own regenerated baseline (AM53).
-3. The build, its verification (AM24) and the review. The existing sets either state context_knowledge off and stay
-   identical, or are regenerated with the reason stated; round 1 with context_knowledge off is expected identical
-   except the lines the build names.
-4. The timelines in the setups and in the scenarios that state their own (AM40; the windows authored from the
-   foreseeable tasks' ticks in the round's README; no second setup, KT13), the expected directions restated by the
-   design chat (5.4), expectations before the runs, the runs with context knowledge on, read against off with each
-   case labelled by the state the script meets (KT14).
-5. The two MPB cases, with a working robot.
-6. dock_loading's part: what its layouts and scenarios need for context knowledge, and the re-measurement of T-G
-   stage 1's baseline (section 4's figures were measured with the equal prior).
+1. The layouts with more than one A/C switch (AM19). DONE (4 October 2026; design_records.md, "T-K", STEP 1; 32029d3,
+   098b1a8): env_layout_05 keeps one A/C switch, ac_switch_1, and scenario_s04_01 one ac_activation; every layout of
+   both domains holds at most one A/C switch. [ruled]
+2. The build's plan. DONE (4 October 2026; docs/handoffs/plan_T-K_part1.md, 41efa76, amended to the rulings): its
+   decisions ruled (AM42 to AM53), ccode's cross-check ruled (AM54 to AM63), ccode's proposals P1 to P5 accepted. The
+   plan is approved. [ruled]
+3. The build (BUILD DISCIPLINE, step 2), stage by stage as the plan states, each stage checked before the next. The
+   first act of the next design chat is its prompt (the state above). The gate's stage is committed only after its
+   checks pass; it stops on a disagreement with the oracle, on a declared property of the planning set that no longer
+   holds, or on a scenario that no longer reaches its authored coverage case; a stop means its cause is examined, not
+   that the ruling on the gate is rejected. The run without assignment knowledge is a diagnostic and never stops the
+   build. [ruled]
+4. The timelines and the runs with context knowledge on. [ruled unless marked]
+   - One setup per room with its default timeline; a scenario may state its own, which replaces the setup's whole
+     (AM40, KT13).
+   - The windows are authored only after ccode supplies the start and completion ticks of the foreseeable tasks in the
+     existing scripts. A case that no existing script covers needs a new script. (ccode, a fact: round 1's README
+     already lists these ticks for its 31 scripts; the robot is idle there, so the gate's change does not move the
+     human's ticks; ccode confirms them after the build's rerun.)
+   - The design chat restates the expected directions before the runs: context knowledge off against on, each case
+     labelled by the state the script meets (KT14), with the revised strengths (5.2).
+   - To add to them, as Hadi ruled (KT11's RULED line): with no raising fact holding, a lone live assigned task is
+     admitted early on its commitment warrant, and a retraction follows if the human then takes a foreseeable task.
+     Its admission still waits for its first observation (the gate refuses a leader with no observation).
+   - With no assigned task live, the foreseeable tasks share the whole prior (the method document, section 12). Hadi's
+     caution: this state is no argument for or against any strength value.
+   - At a foreseeable task's completion (the plan, section 11, X9): on the completion tick the task's hypothesis is
+     retired and takes no share; it re-enters with 1/|H| of the evidence, under its suppressed strength, on the tick its
+     terminal fact stops holding (the human's next step); while the human stands at the machine, it stays retired.
+   - The expectations are stated before the runs; every expectation near a window's edge depends on the half-open
+     reading by one tick (AM46).
+5. The planning cases, with a working robot. KT3 rules two: a coffee break inside the break time, and deliveries
+   through the whole break time (env_layout_17 serves; the robot must not hold the items of the two shelves beside
+   the A/C switch). Hadi wants a recommendation on one case for the early admission and its retraction, since it is
+   the consequence of the new prior that reaches planning most directly. [open] (ccode, a flag: whether this case is
+   a third planning case or takes the place of one of KT3's two is not stated.)
+6. dock_loading's part. [open unless marked]
+   - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
+     pallets, 5d19859). [ruled as a fact]
+   - Its two test sets (the recognition set and the planning set of stage 1) are stale since the gate's change; the
+     build does not rerun them; this step measures them again (AM55, AM57). [ruled]
+   - The removal of the long-shift rule changes its runs of 500 steps or more (the 22 MPB runs of section 4's caveat,
+     the milestone runs). [ruled as a fact]
+   - Whether T-K part 1 answers the open item on the scan the robot does not anticipate (TODO-154: the robot's own
+     delivery makes a scan applicable, and the share at the episode's start) is not decided.
+   - The open flag on the coffee break from the office (the method document, section 12): its walk to the machine is
+     warranted on its entry from the walk to the office door, so the method document's cases of the gate with no
+     assigned task live do not hold there.
+   - What its layouts and scenarios need for context knowledge (the timelines in its setups; no A/C switch in its three
+     rooms; its ac_activation has one method, from the hall, AM45).
 7. The close of T-K part 1, with this file updated. Then a later design chat returns to T-G's stage 2 (section 6).
 
 ### 5.8 What waits
@@ -558,41 +595,21 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 
 ### 5.10 Open points the next chat must put to Hadi [open]
 
-1. The expected directions for the runs with context knowledge on, restated before those runs (5.4). The arithmetic
-   that stood here (the coffee break's prior inside the break time in env_layout_17, 3 / 4.005 = 0.749) was stated for
-   the old values and is superseded (AM36 to AM38). Ruled by Hadi for the restatement: with no raising fact holding, a
-   lone live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if the human
-   then takes a foreseeable task; its admission still waits for an observation (R7, AM5, G1).
-2. ANSWERED (AM40, KT13, Hadi, 4 October 2026): the second setup per room is dropped; a scenario may state its own
-   timeline. The earlier question: the second setup per room: a scenario names one setup, so how the same scenarios run on a room's second setup
-   (copies of the scenarios per setup, or another form) is for the build's plan; and whether two setups per layout
-   (KT3) are still needed where one window already splits the scenarios into B and C (KT11). The design chat's view,
-   not a ruling: the same script under two timelines is the cleanest comparison of B against C.
-3. The windows of break_time and room_warm per setup (which scenarios fall in B, which in C), authored from the
-   round's foreseeable-task ticks, before the runs. Hadi's addition (KT4, its ADDED line): the same activity under a
-   window whose edge falls before the human leaves for the foreseeable task, during the walk to it, or after the
-   arrival. The middle case is the recorded cost of crisp facts (R5): the prior changes inside the episode at one
-   tick.
-4. The two MPB cases: their scenarios on env_layout_17 (the robot's pool not holding the items of the two shelves
-   beside the A/C switch), and the separation when two deliveries finish together at the shared table.
-5. dock_loading's part: what its layouts and scenarios need for context knowledge (the timelines in its setups; no
-   A/C switch in its three rooms); which of stage 1's sets are re-measured; whether the 22 potentially confounded MPB
-   runs (section 4's caveat) are rerun then or in stage 2.
-6. TODO-154 (the robot does not anticipate the scan its own delivery makes applicable): recorded for T-K part 1 as
-   the share at an episode's start, not ruled; the records do not say whether T-K part 1 answers it.
-7. The decision on ccode's AM19 list (step 1; decided 4 October 2026, 5.7), and the items the build's plan proposes: the declaration of ac_on,
-   dock_loading's object type and task, the setup's timeline form. (No form for "not" is needed, AM36.)
-   RULED (4 October 2026): the plan's items, AM40 to AM53.
-8. Whether env_layout_16's two south-east shelves return once the build removes the step-500 limit (KT9, its ADDED
+1. The expected directions for the runs with context knowledge on, restated before those runs (5.7, step 4).
+2. The windows of break_time and room_warm: the setups' defaults and the scenarios that state their own, authored from
+   the foreseeable tasks' ticks ccode supplies. Hadi's addition (KT4, its ADDED line): the same activity under a window
+   whose edge falls before the human leaves for the foreseeable task, during the walk to it, or after the arrival. The
+   middle case is the recorded cost of crisp facts: the prior changes inside the episode at one tick.
+3. The planning cases (5.7, step 5): the recommendation on one case for the early admission and its retraction; their
+   scenarios on env_layout_17; the separation when two deliveries finish together at the shared table.
+4. dock_loading's part (5.7, step 6): what its layouts and scenarios need; whether TODO-154 is answered; the 22
+   potentially confounded MPB runs, measured again in this step.
+5. Whether env_layout_16's two south-east shelves return once the build removes the step-500 limit (KT9, its ADDED
    line; Hadi accepted the room as it is).
-9. For the build's plan (recorded open, Hadi, 3 October 2026; design_records.md, "T-K", NOTES FOR THE BUILD'S PLAN):
-   which value the gate compares with θ, the belief over the live hypotheses or the output after its scaling by the
-   pinned hypotheses. A design question, argued from what each value means. The plan reports the facts of the code; it
-   is not settled by whether a given value passes.
-   RULED (AM42, Hadi, 4 October 2026): the belief over the live hypotheses.
-10. ccode's flags on docs/context_knowledge_method.md (design_records.md, "T-K", THE STRENGTHS REVISED, F): the first
-   three resolved by Hadi on 4 October 2026. Open: section 12's three cases do not hold for dock_loading's coffee_break
-   from the office, whose walk to the machine is warranted on its entry from the walk to the office door.
+6. The open flag on dock_loading's coffee break from the office (5.7, step 6).
+Answered on 4 October 2026 and no longer open: the second setup per room (dropped, a scenario may state its own
+timeline); the items of the build's plan (ruled); which value the gate compares with the threshold (the belief over
+the live hypotheses).
 
 ### 5.11 What the build must respect [recorded]
 
@@ -814,6 +831,21 @@ injected at run time; one further test track on adaptation under conflict. T-K p
   - Once a plan with numbered steps is agreed, replies keep those step numbers.
   - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.
     Detail goes into the repository's files.
+- Rules Hadi set for the design chat on 4 October 2026 (the design chat on T-K part 1's build plan):
+  - A decision is put in plain wording: what it is about, what the design says, the issue, what each option means,
+    "in simple terms", one example, what the option does not change, a recommendation, an explicit question.
+  - Simple decisions that match the design may be grouped in one reply, each with its kind and its consequence. A
+    decision already ruled is not asked again. A decision where the design chat differs from ccode stays separate.
+  - When explaining to Hadi, no document codes or numbering unless the content is beside them.
+  - One ccode prompt per reply. The next prompt comes after the report of the previous one is reviewed and closed.
+  - A ccode prompt states what is ruled and why as the fixed part, and invites ccode to check consequences, to
+    cross-check, and to propose better ways. It lists no files and no sections.
+    FLAGGED by ccode (4 October 2026), not resolved: the rule of 3 October 2026 below (also CLAUDE.md, "How sessions
+    work") says that ccode "is not asked for alternatives or opinions on" the decisions. This rule asks ccode to propose
+    better ways. One reading that reconciles them: a proposal that changes a ruled decision is put to Hadi as a
+    proposal, with its alternatives, and the ruled part stays fixed until Hadi rules. Hadi rules which wording stands.
+  - The design chat states a fact about the repo only with the material in front of it, and says so when it has none.
+  - The design is revised on arguments, never on a run's result. A surprising result is a finding to examine.
 - Rule Hadi set on 4 October 2026 (also in CLAUDE.md, "Where to look"): a ruling that changes the method of context
   knowledge updates docs/context_knowledge_method.md in the same records step. ccode does not change the method itself;
   it flags a contradiction with its evidence, and Hadi rules. The records win where the two disagree.

@@ -486,7 +486,10 @@ Decisions
   `SimModel` takes both run options explicitly (AM51); no condition of a schema names a timeline fact (AM52, AM54);
   ccode's P1 to P5 accepted. On the cross-check (AM55 to AM58): the gate's stage reruns round 1 and kitting's IRB and
   MPB sets, outputs replaced, and stops on a failed declared property; dock_loading's IRB and MPB sets stale until its
-  step; TODO-179 (the boundary label for switch_on), TODO-180 (the viewer's confidence). Nothing built. Next: the build (BUILD DISCIPLINE, step 2), stage by stage as the plan states.
+  step; TODO-179 (the boundary label for switch_on), TODO-180 (the viewer's confidence). On its consequences (AM59 to
+  AM63): one external copy of the three kitting sets' untracked data before they are replaced; the gate's stage
+  committed only after its checks pass; its stop conditions; the run without assignment knowledge never stops the
+  build. The plan is approved; a new design chat takes the build from `docs/handoffs/T-G_forward_inputs.md`, section 5. Nothing built. Next: the build (BUILD DISCIPLINE, step 2), stage by stage as the plan states.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

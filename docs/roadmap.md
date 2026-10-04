@@ -896,7 +896,8 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     hypotheses, in its own commit and baseline; switch_on; the conditions, the windows, the memory, the regression
     scope, the run options; no condition of a task or action reads a timeline fact, AM52, AM54); on ccode's cross-check,
     AM55 to AM58 (round 1 and kitting's IRB and MPB sets rerun with the new gate in the build; dock_loading's sets stale
-    until its step; TODO-179, TODO-180). Nothing built. Next: the build, stage by stage.
+    until its step; TODO-179, TODO-180); on its consequences, AM59 to AM63. The plan is approved. Nothing built. Next:
+    a new design chat takes the build, stage by stage (`docs/handoffs/T-G_forward_inputs.md`, section 5).
   - Part 2, degrees of context facts (V1, at the end of the V1 queue, after track 3b; R5). The build of R5: a context fact
     satisfied to a degree in [0, 1], the membership function from a context value, the operators (minimum, maximum,
     1 minus the degree), strength = low + degree × (high − low). Part 1's crisp facts are its special case, so nothing
