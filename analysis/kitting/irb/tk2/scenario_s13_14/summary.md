@@ -141,7 +141,7 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 14 to 26 | deliver_item(item_3) | none(below_theta) |
 | 27 to 64 | deliver_item(item_3) | clears |
 | 65 to 80 | coffee_break(coffee_machine_0) | none(below_theta) |
-| 81 to 91 | coffee_break(coffee_machine_0) | clears |
+| 81 to 91 | coffee_break(coffee_machine_0) | none(leader_outranked) |
 | 92 to 97 | coffee_break(coffee_machine_0) | none(below_theta) |
 | 98 to 101 | deliver_item(item_2) | none(below_theta) |
 | 102 to 121 | deliver_item(item_2) | clears |

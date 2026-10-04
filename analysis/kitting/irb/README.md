@@ -572,7 +572,7 @@ from its own evidence (the `evidence` column, rule 33's E, never read from the r
 | rule | content | source |
 |---|---|---|
 | 23 (amended) | The gate's outcome per tick: `none(leader_unwarranted)` if the leader is not observation-warranted (rule 22); commitment warrant (rule 1's known keys) admits nothing. The rest of rule 23 stands | AM67; D2 |
-| 34 (new) | The rank per live hypothesis, column `rank`: `outranked` iff another live key's evidence is strictly greater beyond the comparison's agreement level (relative 1e-9, absolute 1e-12, compare.py's numeric tolerance); `not_outranked` iff no other key's evidence is greater and none lies within that level; `undetermined` otherwise (some other key within the level, either side, none greater beyond it). The recognizer compares exactly (AM75); the generator's evidence agrees with it to that level, not bit for bit, so where the exact rule turns on a closer difference it is not decided here | AM68, AM73, AM75, AM76; D3 |
+| 34 (new) | The rank per live hypothesis, column `rank`: `outranked` iff another live key's evidence is strictly greater beyond the comparison's agreement level (relative 1e-9, absolute 1e-12, compare.py's numeric tolerance); `not_outranked` iff no other key's evidence is greater and none lies within that level; `undetermined` otherwise (some other key within the level, either side, none greater beyond it). The recognizer compares exactly (AM75); the generator's evidence agrees with it to that level, not bit for bit, so where the exact rule turns on a closer difference it is not decided here. AMENDED (D3 amended, Hadi, 5 October 2026): an other key whose evidence is exactly equal to this one's is a tie, `not_outranked`; `undetermined` stays for a value within the level that is not equal | AM68, AM73, AM75, AM76; D3, D3 amended |
 | 35 (new) | The gate's last refusal (D1): after rule 23's warrant, `none(leader_outranked)` if the leader's rank is `outranked`; `undetermined` if it is `undetermined`; else `clears` | AM68, AM73; D1, D3 |
 | 36 (new) | The comparison (compare.py): `rank` against actual.csv (`BeliefState.evidence_rank`) and actual_log.csv (the `[IR-rank]` line), exactly; a `rank` or `gate` cell the generator marks `undetermined` is skipped and counted (diff.md, "Undetermined"), never compared | D3 |
 
@@ -628,3 +628,32 @@ f37da48853e36c7918ac8f14f5185ad0  runs/env_layout_11_scenario_s09_12_on.log
 f774c91985761e7f759b99b8583513bc  runs/env_layout_11_scenario_s09_13_on.log
 739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
 ```
+
+## D3 amended: exact ties in the generator (T-K part 1, step 5d, 5 October 2026)
+
+D3 AMENDED (Hadi, 5 October 2026; design_records.md, "T-K", THE GATE'S BUILD PLAN, RULED, D3's AMENDED line): the
+generator ranks a key whose evidence is exactly equal to another's as a tie, not_outranked; undetermined stays for a
+value within the agreement level that is not equal (rule 34 as amended; oracle.py rank()). The oracle and the
+comparison were rerun on the existing runs (no simulation; the runs and their logs unchanged;
+analysis/kitting/tk5d/REPORT.md). Every change of the tables is a cell the generator marked undetermined before: over
+all of kitting's test-bed sets 3241 rank cells became not_outranked and 6 gate ticks clears. In this set: 0
+disagreements, the exact ties now compared. The new expected tables (md5): Undetermined left: 2 rank cells
+(scenario_s09_07 at 35, a tie decided by rounding, D7).
+
+    2eb55927e6f767cd40e0f5cc9f5b1e96  scenario_s08_01/expected.csv
+    a3d9f3f179320059f83162195a915250  scenario_s08_02/expected.csv
+    c9b057bb6d544fb8a49418b6557ab848  scenario_s08_03/expected.csv
+    d4473b3297f8d32135d7276a46b636b1  scenario_s08_04/expected.csv
+    272aa46a0952a5a26357c425a9a3849f  scenario_s09_01/expected.csv
+    bd391a65c8bd29b48fd76f388f31b274  scenario_s09_02/expected.csv
+    3f8dd055ef7a3938552d55e85de3d954  scenario_s09_03/expected.csv
+    677dd329dc8c45dad300d90f54b5c17f  scenario_s09_04/expected.csv
+    4815ee8756e57ee949d258026b8cc6b1  scenario_s09_05/expected.csv
+    2eec287e1afe3efab2d77b2b29046242  scenario_s09_06/expected.csv
+    49f8d55e6bfb7b7216038ce786ac4052  scenario_s09_07/expected.csv
+    120127b0f7a6e15f7780103dc3f37937  scenario_s09_08/expected.csv
+    263fa0d6dccddb82af53e3013a05b55d  scenario_s09_09/expected.csv
+    69ed75fcdc9a80390817a25725d84b5d  scenario_s09_10/expected.csv
+    703dec3728e9f49862f8d7a9c06bb292  scenario_s09_11/expected.csv
+    08da9a833e820e6ca590279f1f091866  scenario_s09_12/expected.csv
+    7e7341a53fec02301b07f46b855ab9dc  scenario_s09_13/expected.csv

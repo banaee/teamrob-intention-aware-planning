@@ -105,7 +105,7 @@ Reachable by timing alone; covered by A1 and A2.
 | B9 `projection_expired` with the gate clearing | none | **unreachable** by construction |
 | B10 retraction with the gate clearing | none | **unreachable** by construction |
 | B11 replaced with the new leader admitted on the same tick | none | **unreachable** in scope (derivation B11) |
-| B12 θ, adequacy and warrant passed, the leader outranked (`none(leader_outranked)`) | with context knowledge off none; with it on, claimed from step 5's scenarios (predicted: scenario_s16_03 and s16_05 at 0) | **unreachable** off by construction; **claimed** on (D4), its instance verified in the measurement step |
+| B12 θ, adequacy and warrant passed, the leader outranked (`none(leader_outranked)`) | with context knowledge off none; with it on, scenario_s16_03 and s16_05 at 0 (step 5d) | **unreachable** off by construction; **verified** on (D4; step 5d, 0 disagreements) |
 
 **B8 to B10.** C3: entered fires only when no record stands and the gate clears. C2 and C3: with a fallback recorded,
 a clearing gate fires entered, which precedes the expiry on the tick, so the expiry never meets a clearing gate. C3:
@@ -282,7 +282,9 @@ question on the coverage matrix.
   leader is never outranked: unreachable by construction (the build's stage 2: 1298 outputs byte-identical). With it
   on, claimed (D4): step 5's scenario_s16_03 and s16_05 are predicted to refuse their tick-0 admission
   `none(leader_outranked)` at a `no_current_task` decision (plan, section 4); the instance is verified when the
-  measurement step reruns step 5.
+  measurement step reruns step 5. VERIFIED (step 5d, 5 October 2026; analysis/kitting/tk5d/REPORT.md): both refuse
+  their tick-0 `no_current_task` decision `none(leader_outranked)` and rest on the moving fallback; 0 disagreements
+  with the oracle; C4 and C6 detected there (56 disagreements each).
 - **E7** stays out of coverage; AD3's derivation reads "a lone delivery admitted on its first step" (no admission on
   commitment, AM67).
 - **The alteration test.** C1 (commitment warrant ignored) is retired: AM67 made it the rule. C4 to C6 (the outranked

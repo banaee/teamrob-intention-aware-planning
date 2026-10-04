@@ -126,7 +126,7 @@ Results: `REPORT.md`. 0 disagreements with the oracle in all nine; the expectati
 The oracle after the gate's build (8357b74: the rank column, D3; observation warrant at admission, AM67;
 none(leader_outranked) last, AM68 and D1) recomputes every table; the trajectories are byte-identical to stage 1's
 (the human's script is open-loop). Commands as above, with --expect. The runs follow in the next commit; the reading:
-analysis/kitting/mpb/tk5b/COMPARISON_5d.md. Step 5's properties moved by the rulings are re-declared in
+analysis/kitting/tk5d/REPORT.md. Step 5's properties moved by the rulings are re-declared in
 analysis/kitting/mpb/properties.py (D5 (a); the old ones kept in its docstring, marked superseded): PK4a.r, PK4b.r,
 PK4e.r (scenario_s16_03), PK1b.r (s16_04), PK5a.r (s16_05); PK4c and PK5b have no successor, the separation in their
 windows a measure. The expected chain (tk5.py expect) agrees with the plan's section 4: s16_03 on refused
@@ -143,3 +143,59 @@ unchanged (item_4 at 0 and 38). Off: s16_03 coffee_break 36, item_4 97; s16_05 i
     a5e0b6da5725137936ba0f7050714cac  scenario_s16_04/on_single_task/expected_ticks.json
     c21d7ea06c28baf9182db64d53677823  scenario_s16_05/on_single_task/expected_ticks.json
     237cbdf8442eac7dc2efe2259f802e47  scenario_s16_06/on_single_task/expected_ticks.json
+
+## Step 5d: the runs (5 October 2026)
+
+The runs with the commands above, at f02b04c (the code of the gate's build); each run's own oracle call reproduced
+the expectations committed in the section above (md5 check). D3 was then amended by Hadi (exact ties:
+design_records.md, "T-K", D3's AMENDED line) and the oracle and the comparison rerun on these runs (no simulation):
+every change of the tables a cell marked undetermined before. The reading, with the comparison off / on before the
+gate change / on after it: analysis/kitting/tk5d/REPORT.md. 6 on runs and 3 off runs: 0 disagreements on parts 1 to
+3. Properties: every re-declared one holds (PK4a.r, PK4b.r, PK4e.r, PK1b.r, PK5a.r) and PK1a, PK1c, PK2a, PK3a, PK3b,
+PK4d, PK5rw, PK1off, PK1off.stale, PK3off, PK3off.sep, PK5off hold; PK3c and PK2b fail as before the gate change (the
+turn, TODO-146). B12's instance (D4): s16_03 and s16_05 refuse their tick-0 decision none(leader_outranked). The
+alteration test (D6): C4 detected in s16_03 and s16_05 (56 each), C6 the same, C5 (since D3's amendment: an exact tie
+counted outranked) undetected in all six, since on no tick of the six a leader passes θ, adequacy and warrant tied
+with another key: a property of the set.
+
+The expected tables after D3's amendment (md5):
+
+    6d01fc6c5897726ada80d8f1e92ad066  off/scenario_s16_01/on_single_task/expected_ticks.json
+    a85612a49071befde40dbad7e36d5263  off/scenario_s16_03/on_single_task/expected_ticks.json
+    d78b9273888bd91c8089ef962904ac44  off/scenario_s16_05/on_single_task/expected_ticks.json
+    e45523c3f845dfb1c0f0b6d8f7f0a7b7  scenario_s16_01/on_single_task/expected_ticks.json
+    7518ff025ae3dfbe2d87c96f49c333d5  scenario_s16_02/on_single_task/expected_ticks.json
+    97b038557fa12240c294a05372a0021b  scenario_s16_03/on_single_task/expected_ticks.json
+    a5e0b6da5725137936ba0f7050714cac  scenario_s16_04/on_single_task/expected_ticks.json
+    c21d7ea06c28baf9182db64d53677823  scenario_s16_05/on_single_task/expected_ticks.json
+    237cbdf8442eac7dc2efe2259f802e47  scenario_s16_06/on_single_task/expected_ticks.json
+
+Runs (git-ignored; md5s):
+
+    0050c7cb6c10db9f84bd7f75d11f3ca4  off/runs/env_layout_18_scenario_s16_01_on_single_task.log
+    707f245e178199a79489dea107fd85a7  off/runs/env_layout_18_scenario_s16_01_on_single_task.rec
+    8f8202925985958770a81871f3c02b0e  off/runs/env_layout_18_scenario_s16_01_reference_single_task.log
+    3e5debb5007061e9d1e1effd50f1e7a3  off/runs/env_layout_18_scenario_s16_03_on_single_task.log
+    678830665da62649ad71e5fd5db6e679  off/runs/env_layout_18_scenario_s16_03_on_single_task.rec
+    170650d7431ec052246d27b5cca6a621  off/runs/env_layout_18_scenario_s16_03_reference_single_task.log
+    96bd07da7c99ad08c497cce202479a66  off/runs/env_layout_18_scenario_s16_05_on_single_task.log
+    4c9b7e1d71713afc3d4f4512f1430a41  off/runs/env_layout_18_scenario_s16_05_on_single_task.rec
+    f9929f298f171991bf56f9f04d29b30a  off/runs/env_layout_18_scenario_s16_05_reference_single_task.log
+    9d7650d67f159e38da8d4b3c6d20e0f9  runs/env_layout_18_scenario_s16_01_on_single_task.log
+    707f245e178199a79489dea107fd85a7  runs/env_layout_18_scenario_s16_01_on_single_task.rec
+    a679767445a6ec38c0c8e9185a2a8b33  runs/env_layout_18_scenario_s16_01_reference_single_task.log
+    db9f16a84d8dcc6fc294f6c2e62dfd78  runs/env_layout_18_scenario_s16_02_on_single_task.log
+    707f245e178199a79489dea107fd85a7  runs/env_layout_18_scenario_s16_02_on_single_task.rec
+    1de66ae2fa87f8c5afb3610f12d074a8  runs/env_layout_18_scenario_s16_02_reference_single_task.log
+    68e8868774796f7ad4055b6391c99c15  runs/env_layout_18_scenario_s16_03_on_single_task.log
+    678830665da62649ad71e5fd5db6e679  runs/env_layout_18_scenario_s16_03_on_single_task.rec
+    77fc6a362c4d5ef9915d26ab3ce5c5bf  runs/env_layout_18_scenario_s16_03_reference_single_task.log
+    fe60bfb1b38e47b82bef65cfc96b1443  runs/env_layout_18_scenario_s16_04_on_single_task.log
+    678830665da62649ad71e5fd5db6e679  runs/env_layout_18_scenario_s16_04_on_single_task.rec
+    7135203fb5ad3a45e4dd136bc6c66f93  runs/env_layout_18_scenario_s16_04_reference_single_task.log
+    919a7c2299d64c53db89ca049c1b2473  runs/env_layout_18_scenario_s16_05_on_single_task.log
+    4c9b7e1d71713afc3d4f4512f1430a41  runs/env_layout_18_scenario_s16_05_on_single_task.rec
+    4a8995b59a6ac2bd26b2ce15abd3c9f2  runs/env_layout_18_scenario_s16_05_reference_single_task.log
+    fd6de3ddeabf737f8ae53652a4a8affc  runs/env_layout_18_scenario_s16_06_on_single_task.log
+    4c9b7e1d71713afc3d4f4512f1430a41  runs/env_layout_18_scenario_s16_06_on_single_task.rec
+    0322dfb2e9c441f47866ca3c374923c0  runs/env_layout_18_scenario_s16_06_reference_single_task.log

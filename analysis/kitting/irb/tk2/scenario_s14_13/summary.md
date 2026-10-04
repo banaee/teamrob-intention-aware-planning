@@ -137,7 +137,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 167 to 170 | deliver_item(item_2) | none(below_theta) |
 | 171 to 223 | deliver_item(item_2) | clears |
 | 224 to 224 | deliver_item(item_1) | none(leader_no_observation) |
-| 225 to 323 | deliver_item(item_1) | clears |
+| 225 to 225 | deliver_item(item_1) | none(leader_unwarranted) |
+| 226 to 323 | deliver_item(item_1) | clears |
 | 324 to 378 | ac_activation(ac_switch_0) | none(below_theta) |
 
 Context knowledge (actual): per foreseeable task its level, and the recency facts, as stretches of ticks (the prior's inputs; `[IR-context]`).

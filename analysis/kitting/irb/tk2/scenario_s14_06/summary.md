@@ -162,7 +162,7 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 89 to 128 | deliver_item(item_2) | none(below_theta) |
 | 129 to 178 | deliver_item(item_2) | clears |
 | 179 to 179 | deliver_item(item_2) | none(leader_no_observation) |
-| 180 to 187 | deliver_item(item_2) | clears |
+| 180 to 187 | deliver_item(item_2) | none(leader_unwarranted) |
 | 188 to 217 | deliver_item(item_2) | none(leader_inadequate) |
 | 218 to 220 | deliver_item(item_2) | none(below_theta) |
 | 221 to 223 | coffee_break(coffee_machine_0) | none(below_theta) |
@@ -172,7 +172,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 258 to 264 | deliver_item(item_2) | none(below_theta) |
 | 265 to 305 | deliver_item(item_2) | clears |
 | 306 to 306 | deliver_item(item_1) | none(leader_no_observation) |
-| 307 to 407 | deliver_item(item_1) | clears |
+| 307 to 307 | deliver_item(item_1) | none(leader_unwarranted) |
+| 308 to 407 | deliver_item(item_1) | clears |
 | 408 to 462 | ac_activation(ac_switch_0) | none(below_theta) |
 
 Context knowledge (actual): per foreseeable task its level, and the recency facts, as stretches of ticks (the prior's inputs; `[IR-context]`).

@@ -394,7 +394,7 @@ CAUSES = {
     ("step 5", "scenario_s16_05", "on", 22): ("wrong admission", "deliver_item(item_4) admitted while the human walks to the A/C switch; no hold"),
     ("step 5b", "scenario_s11_03", "on", 11): ("wrong admission", "deliver_item(item_12), assigned and never performed, admitted at 0 while the human stands at the occupied table; no hold, item_8 released beside the human"),
     ("step 5b", "scenario_s12_02", "off", 138): ("other", "the human, leaving the coffee machine, walks past the robot standing in its hold (decided at 137 on a moving fallback); the robot moves off at 140"),
-    ("step 5b", "scenario_s12_02", "on", 138): ("other", "the human, leaving the coffee machine, walks past the robot standing in its hold (decided at 134 on the admitted deliver_item(item_2), the true task); the robot moves off at 141"),
+    ("step 5b", "scenario_s12_02", "on", 138): ("other", "the human, leaving the coffee machine, walks past the robot standing in its hold (decided at 135 on the admitted deliver_item(item_2), the true task; 134 before the gate change); the robot moves off at 141"),
 }
 
 

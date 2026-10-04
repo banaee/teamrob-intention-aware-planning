@@ -2,9 +2,9 @@ Separation (env_layout_12_scenario_s11_03_on_single_task; min_separation 50 cm, 
 
 | class | ticks | stretches |
 |---|---|---|
-| a moving robot, violating (viol) | 2 | 11 to 12 |
-| a moving robot, receding (recede) | 3 | 17 to 19 |
+| a moving robot, violating (viol) | 0 | - |
+| a moving robot, receding (recede) | 0 | - |
 | a standing robot, the human passing (moved on the tick) | 0 | - |
-| a standing robot, the human standing beside it | 4 | 13 to 16 |
+| a standing robot, the human standing beside it | 0 | - |
 
-The [sep] minimum: 11.33 cm at tick 12 (sampled), 11.33 cm at tick 12 (continuous).
+The [sep] minimum: 51.33 cm at tick 13 (sampled), 51.33 cm at tick 13 (continuous).

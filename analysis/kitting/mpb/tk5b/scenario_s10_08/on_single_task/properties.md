@@ -24,6 +24,6 @@ None declared.
 | 40 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_5,?kitting_table=kitting_table_1) | 0 |
 | 74 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 108 | recognition_changed | replaced | none(leader_no_observation) | deliver_item(?item=item_1) | fallback standing k=2 end=111.00 | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
-| 109 | recognition_changed | entered | clears | deliver_item(?item=item_1) | admitted deliver_item(?item=item_1) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
+| 110 | recognition_changed | entered | clears | deliver_item(?item=item_1) | admitted deliver_item(?item=item_1) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 118 | no_current_task |  | clears | deliver_item(?item=item_1) | admitted deliver_item(?item=item_1) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 169 | no_current_task |  | clears | deliver_item(?item=item_1) | admitted deliver_item(?item=item_1) | None | 0 |

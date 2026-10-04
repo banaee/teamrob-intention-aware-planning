@@ -7,4 +7,4 @@ Separation (env_layout_12_scenario_s11_01_on_single_task; min_separation 50 cm, 
 | a standing robot, the human passing (moved on the tick) | 0 | - |
 | a standing robot, the human standing beside it | 0 | - |
 
-The [sep] minimum: 66.17 cm at tick 58 (sampled), 66.15 cm at tick 58 (continuous).
+The [sep] minimum: 66.17 cm at tick 56 (sampled), 66.15 cm at tick 56 (continuous).

@@ -542,3 +542,47 @@ eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_full_reo
 6f3d01e117cde5017e7174d701048a70  runs/env_layout_14_scenario_s12_02_on_single_task.log
 eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_single_task.rec
 ```
+
+## D3 amended: exact ties in the generator (T-K part 1, step 5d, 5 October 2026)
+
+D3 AMENDED (Hadi, 5 October 2026; design_records.md, "T-K", THE GATE'S BUILD PLAN, RULED, D3's AMENDED line): the
+generator ranks a key whose evidence is exactly equal to another's as a tie, not_outranked; undetermined stays for a
+value within the agreement level that is not equal (rule 34 as amended; oracle.py rank()). The oracle and the
+comparison were rerun on the existing runs (no simulation; the runs and their logs unchanged;
+analysis/kitting/tk5d/REPORT.md). Every change of the tables is a cell the generator marked undetermined before: over
+all of kitting's test-bed sets 3241 rank cells became not_outranked and 6 gate ticks clears. In this set: 0
+disagreements, the exact ties now compared. The new expected tables (md5): No change in this set's tables (context
+knowledge off: no exact tie reaches the gate's last question); 0 disagreements on parts 1 to 3 under both strategies.
+
+    218fcb2ca6f67445314d92658e6df912  scenario_s10_01/on_full_reorder/expected_ticks.json
+    218fcb2ca6f67445314d92658e6df912  scenario_s10_01/on_single_task/expected_ticks.json
+    cad3e127a6b714d2a198c9acc2ea77d6  scenario_s10_02/on_full_reorder/expected_ticks.json
+    cad3e127a6b714d2a198c9acc2ea77d6  scenario_s10_02/on_single_task/expected_ticks.json
+    1aa1f9e2fb71c5db0c977d62de0d902b  scenario_s10_03/on_full_reorder/expected_ticks.json
+    1aa1f9e2fb71c5db0c977d62de0d902b  scenario_s10_03/on_single_task/expected_ticks.json
+    948b8fd8c5303012fa27677e3901cab6  scenario_s10_04/on_full_reorder/expected_ticks.json
+    948b8fd8c5303012fa27677e3901cab6  scenario_s10_04/on_single_task/expected_ticks.json
+    f8c96a299a0fbcc0974d6e90f743b3cc  scenario_s10_05/on_full_reorder/expected_ticks.json
+    f8c96a299a0fbcc0974d6e90f743b3cc  scenario_s10_05/on_single_task/expected_ticks.json
+    57d3d5fdfdd56780c2c5dc078750963f  scenario_s10_06/on_full_reorder/expected_ticks.json
+    57d3d5fdfdd56780c2c5dc078750963f  scenario_s10_06/on_single_task/expected_ticks.json
+    75fe180bdc84bed334c109b3a9b33af2  scenario_s10_07/on_full_reorder/expected_ticks.json
+    75fe180bdc84bed334c109b3a9b33af2  scenario_s10_07/on_single_task/expected_ticks.json
+    be5c2cbbd2fe3bbe169cc9344259172f  scenario_s10_08/on_full_reorder/expected_ticks.json
+    be5c2cbbd2fe3bbe169cc9344259172f  scenario_s10_08/on_single_task/expected_ticks.json
+    c09da8bd96c5e730b5b8ee7a81ce4ac1  scenario_s10_09/on_full_reorder/expected_ticks.json
+    c09da8bd96c5e730b5b8ee7a81ce4ac1  scenario_s10_09/on_single_task/expected_ticks.json
+    a62ea67bdcee8a9678c56cebb40917a7  scenario_s10_10/on_full_reorder/expected_ticks.json
+    a62ea67bdcee8a9678c56cebb40917a7  scenario_s10_10/on_single_task/expected_ticks.json
+    75573736760d725700582947ebc0a9d6  scenario_s10_11/on_full_reorder/expected_ticks.json
+    75573736760d725700582947ebc0a9d6  scenario_s10_11/on_single_task/expected_ticks.json
+    e0315ed33855153aea423033c1e2c0a8  scenario_s11_01/on_full_reorder/expected_ticks.json
+    e0315ed33855153aea423033c1e2c0a8  scenario_s11_01/on_single_task/expected_ticks.json
+    efa990aabebb58f90262d1098a8447ee  scenario_s11_02/on_full_reorder/expected_ticks.json
+    efa990aabebb58f90262d1098a8447ee  scenario_s11_02/on_single_task/expected_ticks.json
+    bd13f9c1d1501155c6727635a280c3a3  scenario_s11_03/on_full_reorder/expected_ticks.json
+    bd13f9c1d1501155c6727635a280c3a3  scenario_s11_03/on_single_task/expected_ticks.json
+    1ca16efdbed6056db0e3e91824e4b301  scenario_s12_01/on_full_reorder/expected_ticks.json
+    1ca16efdbed6056db0e3e91824e4b301  scenario_s12_01/on_single_task/expected_ticks.json
+    dd97c34a6343d3daf9c214a94deacad7  scenario_s12_02/on_full_reorder/expected_ticks.json
+    dd97c34a6343d3daf9c214a94deacad7  scenario_s12_02/on_single_task/expected_ticks.json

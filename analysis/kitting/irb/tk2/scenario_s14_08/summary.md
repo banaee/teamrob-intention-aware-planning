@@ -134,7 +134,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 179 to 221 | deliver_item(item_1) | none(below_theta) |
 | 222 to 227 | ac_activation(ac_switch_0) | none(below_theta) |
 | 228 to 228 | deliver_item(item_1) | none(leader_no_observation) |
-| 229 to 291 | deliver_item(item_1) | clears |
+| 229 to 229 | deliver_item(item_1) | none(leader_unwarranted) |
+| 230 to 291 | deliver_item(item_1) | clears |
 | 292 to 292 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
 | 293 to 304 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
 | 305 to 309 | coffee_break(coffee_machine_0) | none(leader_inadequate) |

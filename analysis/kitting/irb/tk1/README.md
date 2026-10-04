@@ -716,3 +716,45 @@ e9eeb841e037368262639d66e76b08e7  runs/env_layout_17_scenario_s15_12_on.log
 f29ffdabae9d833224bd83e65a86ee54  runs/env_layout_17_scenario_s15_13_on.log
 36343581ab71fd1cc3b2a5f428df326c  runs/env_layout_17_scenario_s15_13_on.rec
 ```
+
+## D3 amended: exact ties in the generator (T-K part 1, step 5d, 5 October 2026)
+
+D3 AMENDED (Hadi, 5 October 2026; design_records.md, "T-K", THE GATE'S BUILD PLAN, RULED, D3's AMENDED line): the
+generator ranks a key whose evidence is exactly equal to another's as a tie, not_outranked; undetermined stays for a
+value within the agreement level that is not equal (rule 34 as amended; oracle.py rank()). The oracle and the
+comparison were rerun on the existing runs (no simulation; the runs and their logs unchanged;
+analysis/kitting/tk5d/REPORT.md). Every change of the tables is a cell the generator marked undetermined before: over
+all of kitting's test-bed sets 3241 rank cells became not_outranked and 6 gate ticks clears. In this set: 0
+disagreements, the exact ties now compared. The new expected tables (md5): Undetermined left: none.
+
+    f6978d6a62d9e946c5869ae907810f52  scenario_s13_01/expected.csv
+    88b64aa3309cbacc7a7429277a943392  scenario_s13_02/expected.csv
+    46df7cf168855771a008fefe30f87462  scenario_s13_03/expected.csv
+    dfb58702c7b89fe9190aa30788048630  scenario_s13_04/expected.csv
+    d31bfe601f68f499d89456460a61a469  scenario_s13_05/expected.csv
+    7fc8e43ac302fca53c122dd6ecadf226  scenario_s13_06/expected.csv
+    e6493f9e8c5fc4d925ac98710cd9c82c  scenario_s13_07/expected.csv
+    2cb484a9725b4dc8f8fd2e83c1323ff4  scenario_s14_01/expected.csv
+    1fcfa6cbc1c3f94914aac1f7aa99fc8a  scenario_s14_02/expected.csv
+    ba3af50282950ba7296cbd8830099798  scenario_s14_03/expected.csv
+    296f3109ae6a074af5dda195dc223e51  scenario_s14_04/expected.csv
+    6c8b63431c62355ae3e111486806fbd2  scenario_s14_05/expected.csv
+    4191e2881b407c132ac5763b3fd6399a  scenario_s14_06/expected.csv
+    3ad3e99d179d80d2cd3d7adab7f187fd  scenario_s14_07/expected.csv
+    c55ef3e129c4083e31bc4d9b69909ba0  scenario_s14_08/expected.csv
+    fb7f1c4ed96fd48857f0c7cd82754836  scenario_s14_09/expected.csv
+    cef98274354e5acf4a45e13a8b7ed317  scenario_s14_10/expected.csv
+    6f1960536fd7c71984163091c148f6ce  scenario_s14_11/expected.csv
+    46c0d0221095070fc97911039d8f9937  scenario_s15_01/expected.csv
+    17e40c77f810a45d03a42a25916b90ba  scenario_s15_02/expected.csv
+    415c56f904d73086d901623f56911bc4  scenario_s15_03/expected.csv
+    43843cf79bd331e3f2b3b913baaf17dc  scenario_s15_04/expected.csv
+    7adfdd7eeb5aa691aa7cec7138ee5181  scenario_s15_05/expected.csv
+    0e86bb86ab981d02f4123a2f58a7df9f  scenario_s15_06/expected.csv
+    4fa5e8e830fb296b6dfbce9fc5611866  scenario_s15_07/expected.csv
+    2c6165d4586836b872019f9c3af7cb1c  scenario_s15_08/expected.csv
+    433006350d21c3c75d0ab8577ccc6926  scenario_s15_09/expected.csv
+    afbc8e7ec80f4806db731281d0e0b77a  scenario_s15_10/expected.csv
+    ce4c8bd0888acf48b577c98264a6d4ba  scenario_s15_11/expected.csv
+    7ca8a28962de2af154963531ef877f1e  scenario_s15_12/expected.csv
+    d794989367348d78c4e14d71c20d570d  scenario_s15_13/expected.csv

@@ -967,7 +967,7 @@ d845aa4ac311b344cdaed07c5c3ea626  off/runs/env_layout_15_scenario_s13_15_on.rec
 The oracle after the gate's build (8357b74: the rank column, D3; observation warrant at admission, AM67;
 none(leader_outranked) last, AM68 and D1) recomputes every table; the trajectories are byte-identical to stage 1's
 (the human's script is open-loop). Commands as above, with --expect. The runs follow in the next commit; the reading:
-analysis/kitting/mpb/tk5b/COMPARISON_5d.md.
+analysis/kitting/tk5d/REPORT.md.
 
     b38f1255fee1d911866cc68242436c49  off/scenario_s13_15/expected.csv
     0510a802c36d152ba1da9b534cd7e172  off/scenario_s15_21/expected.csv
@@ -1028,3 +1028,196 @@ analysis/kitting/mpb/tk5b/COMPARISON_5d.md.
     bbed690df7fb3135285679e63ba6e7df  scenario_s15_19/expected.csv
     625fb17d60727f616a4c165c84ac4995  scenario_s15_20/expected.csv
     d7e95905606fce287acb7dade9de5d54  scenario_s15_21/expected.csv
+
+## Step 5d: the runs (5 October 2026)
+
+The runs with the commands above, at f02b04c (the code of the gate's build); each run's own oracle call reproduced
+the expectations committed in the section above (md5 check). D3 was then amended by Hadi (exact ties:
+design_records.md, "T-K", D3's AMENDED line) and the oracle and the comparison rerun on these runs (no simulation):
+every change of the tables a cell marked undetermined before. The reading, with the comparison off / on before the
+gate change / on after it: analysis/kitting/tk5d/REPORT.md. Step 4's 57 runs and the two off runs: 0 disagreements
+with the oracle (the print-precision flag of the s14_02 script in its four runs apart, unchanged); undetermined left:
+none.
+
+The expected tables after D3's amendment (md5):
+
+    a1a70fdf60decff6f335b9e80e398b65  off/scenario_s13_15/expected.csv
+    50002b06dcd74570efabad83b29c2911  off/scenario_s15_21/expected.csv
+    5ee637162d7d3f8792d744f3b928b6ee  scenario_s13_01/expected.csv
+    5cec4c717d3c84f04d41d81f43b21b0b  scenario_s13_02/expected.csv
+    0255d0af31ed926837ac1daa70477fff  scenario_s13_03/expected.csv
+    0aa6da3e9c100379f2ae74241c6ce005  scenario_s13_04/expected.csv
+    02ba4d6b45f611a63ee4ee5de77e0f9d  scenario_s13_05/expected.csv
+    48e775d4bd81d5227343952294f1308b  scenario_s13_06/expected.csv
+    ae4ce31a42294f3145a39734ebbe8d8d  scenario_s13_07/expected.csv
+    c668f8e18742a296b54d7bda05ea6638  scenario_s13_08/expected.csv
+    c61bb999697a0fc9f361310ed891141a  scenario_s13_09/expected.csv
+    6414606301128388b93a3b1300d15f59  scenario_s13_10/expected.csv
+    cb518a7cf86212ff31ccc849b6054ebd  scenario_s13_11/expected.csv
+    89ccf1abb652230241b7d415cc32a91b  scenario_s13_12/expected.csv
+    3d6171c6c2135e1e22a3aaa5ec7e8484  scenario_s13_13/expected.csv
+    7d1164d8da2050ee8bac34a440d4ee00  scenario_s13_14/expected.csv
+    21691973f63df07b5fc88c48e7153e9a  scenario_s13_15/expected.csv
+    e7962527b1ca5d67d57f6985987e7f5b  scenario_s14_01/expected.csv
+    77fa98a96786439a65d4b9b40327ec71  scenario_s14_02/expected.csv
+    68f0dcd7e04e52452175456d196cf1af  scenario_s14_03/expected.csv
+    3247b6094dd1fe16f7ea9e9dcd189870  scenario_s14_04/expected.csv
+    cf0b2412bd5c7b000fc105fbdf8625df  scenario_s14_05/expected.csv
+    14640109c95da7808fe782f2e2571f31  scenario_s14_06/expected.csv
+    f555684502336c8931fb95739b9639d0  scenario_s14_07/expected.csv
+    52b16685703244237cd9f273444c3136  scenario_s14_08/expected.csv
+    38ef2b195d045e61a511d7f37ad21205  scenario_s14_09/expected.csv
+    a033bb1b6773d918a1d13fe67f522689  scenario_s14_10/expected.csv
+    bf7f52e9f2e2d8fdc037c41bab3832e9  scenario_s14_11/expected.csv
+    466d1a2718e3f890e41288e72d8a5435  scenario_s14_12/expected.csv
+    13feeb95a05598f031bc6537327b6104  scenario_s14_13/expected.csv
+    97c57d75f3c8016f2d7312f16126b81a  scenario_s14_14/expected.csv
+    aff751410f2f19ff94c8f438a8d003b2  scenario_s14_15/expected.csv
+    52476fab7894688f95b3f28ab37ba892  scenario_s14_16/expected.csv
+    20292ccc384c1f3acec3f071311e8df1  scenario_s14_17/expected.csv
+    c149511a7f9a8c9f2b27c582b5276e87  scenario_s14_18/expected.csv
+    33531d974b5c49857dcebb60bed2804c  scenario_s14_19/expected.csv
+    ae89facf4e1282426c4c637b38564277  scenario_s14_20/expected.csv
+    3acf80cf0d33e33d9c8cec8de4f40b1f  scenario_s14_21/expected.csv
+    a073dc1877a21906e02b969bad880d88  scenario_s15_01/expected.csv
+    572b327b9f3b69f7254ffd10275e536f  scenario_s15_02/expected.csv
+    8f05649576b7e83d2ffdba0987b813e9  scenario_s15_03/expected.csv
+    6ce612be2fef7c41289cc60b7cd105c0  scenario_s15_04/expected.csv
+    dd5d1f70c98dc55ce6e7aafc3e4058d0  scenario_s15_05/expected.csv
+    c22726519294b30a83c47ff3e318a702  scenario_s15_06/expected.csv
+    a7e0999dacb863fef3783dfb554ab904  scenario_s15_07/expected.csv
+    3d23a01f44b69289646e1ffe630ca3f5  scenario_s15_08/expected.csv
+    b89c57d9e2d62ee93c4444214125347f  scenario_s15_09/expected.csv
+    b6e7c4f1a529c149c3b1ca847e7fd7d3  scenario_s15_10/expected.csv
+    738f1978aa8b3be985a0855bc665f0c7  scenario_s15_11/expected.csv
+    54400c0564e48dee1e9933d6206fc750  scenario_s15_12/expected.csv
+    281cf7fc8d0553dabe602950f91864ad  scenario_s15_13/expected.csv
+    edd5299b13daef6cc5e2bee4a6b4870b  scenario_s15_14/expected.csv
+    01276bf8c8a6156422da3bb98947fe8a  scenario_s15_15/expected.csv
+    16786c9191173695283c08e9b3ef5450  scenario_s15_16/expected.csv
+    bd16b4b0fc27fffa1b4d3f86afd364e4  scenario_s15_17/expected.csv
+    fcbc50b807144c84be51249613fc3297  scenario_s15_18/expected.csv
+    8830834c5ba7c421550ba5398d51b8df  scenario_s15_19/expected.csv
+    313d173f18228d961477540cbdae8dc8  scenario_s15_20/expected.csv
+    8e200229918e517d82c600f6f20cd9c6  scenario_s15_21/expected.csv
+
+Runs (git-ignored; md5s):
+
+    8ee7876c07d70a54dc3ff1da6bfa5175  off/runs/env_layout_15_scenario_s13_15_on.log
+    d845aa4ac311b344cdaed07c5c3ea626  off/runs/env_layout_15_scenario_s13_15_on.rec
+    bbc14b1855f74396f45a798bf4f4c00b  off/runs/env_layout_17_scenario_s15_21_on.log
+    018c8fdb1002afd33140d34a41cf6976  off/runs/env_layout_17_scenario_s15_21_on.rec
+    343c8366a61354e10822f3ca637a8247  runs/env_layout_15_scenario_s13_01_on.log
+    e478e3955464c5da8e4483fb6a58801a  runs/env_layout_15_scenario_s13_01_on.rec
+    40b7f1288bb97714bec1ad2110673963  runs/env_layout_15_scenario_s13_02_on.log
+    6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_15_scenario_s13_02_on.rec
+    ee62c8eeb80648e51f91ac32fa20b8c1  runs/env_layout_15_scenario_s13_03_on.log
+    6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_15_scenario_s13_03_on.rec
+    cb93c31f0d84f6e4d739517d00391b79  runs/env_layout_15_scenario_s13_04_on.log
+    08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_15_scenario_s13_04_on.rec
+    45f3bd09099fd1dc2b5fb450bd8aecfb  runs/env_layout_15_scenario_s13_05_on.log
+    726dd2b9a82635f2139aed1d8b5970c3  runs/env_layout_15_scenario_s13_05_on.rec
+    8d809f7d1b7d3b0aee2404c97bf5fbf4  runs/env_layout_15_scenario_s13_06_on.log
+    c537966a26ce76c9537c0e9e4ba8df11  runs/env_layout_15_scenario_s13_06_on.rec
+    fc477af222efb65568caa4e9db10fc59  runs/env_layout_15_scenario_s13_07_on.log
+    f759306928400bdc9427ba0569c11433  runs/env_layout_15_scenario_s13_07_on.rec
+    825d4ce7efef2cf369388baedb1955d1  runs/env_layout_15_scenario_s13_08_on.log
+    6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_15_scenario_s13_08_on.rec
+    b7f8c305d6bd9c376af43f46df7eb020  runs/env_layout_15_scenario_s13_09_on.log
+    6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_15_scenario_s13_09_on.rec
+    c68a86007157315ccbd4be77fdf36870  runs/env_layout_15_scenario_s13_10_on.log
+    6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_15_scenario_s13_10_on.rec
+    fce7ba520657708a0d790d63324396be  runs/env_layout_15_scenario_s13_11_on.log
+    6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_15_scenario_s13_11_on.rec
+    d0e13fa1b4e3050b7c2f78fd2c00cc5b  runs/env_layout_15_scenario_s13_12_on.log
+    6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_15_scenario_s13_12_on.rec
+    fe2bb18ce9e1b3c5bf67ad22231cd6b8  runs/env_layout_15_scenario_s13_13_on.log
+    08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_15_scenario_s13_13_on.rec
+    c0553d3a60d9d80186db2957bc86f3f6  runs/env_layout_15_scenario_s13_14_on.log
+    e478e3955464c5da8e4483fb6a58801a  runs/env_layout_15_scenario_s13_14_on.rec
+    d6849f835b361e1e425847298c2b5527  runs/env_layout_15_scenario_s13_15_on.log
+    d845aa4ac311b344cdaed07c5c3ea626  runs/env_layout_15_scenario_s13_15_on.rec
+    845141637b4364c275885aaf3ed1b371  runs/env_layout_16_scenario_s14_01_on.log
+    962e436075b7c3f9f555445c944b8bff  runs/env_layout_16_scenario_s14_01_on.rec
+    e6fa99b4f1cc03f8495bc5e53afd5d37  runs/env_layout_16_scenario_s14_02_on.log
+    c2d2afc42bf1c9e6a69f104ccd364765  runs/env_layout_16_scenario_s14_02_on.rec
+    63ab8b2724fd2aecf0efd0dbd9c3febe  runs/env_layout_16_scenario_s14_03_on.log
+    1d8302b47da19e51d38441c3e6beb23b  runs/env_layout_16_scenario_s14_03_on.rec
+    6e72310ae1039d2f723efa12204ed8ee  runs/env_layout_16_scenario_s14_04_on.log
+    99a4a214e4681eb7483925ca5e9d78b1  runs/env_layout_16_scenario_s14_04_on.rec
+    b12e9f80d59f7bb4a9352f0f58bf2583  runs/env_layout_16_scenario_s14_05_on.log
+    c6a4c9bfd459f09856302fc32ce8c301  runs/env_layout_16_scenario_s14_05_on.rec
+    6b2cdc5075a64910b6326801540a55d2  runs/env_layout_16_scenario_s14_06_on.log
+    40ce5a270689411dd5ad07819564fbe1  runs/env_layout_16_scenario_s14_06_on.rec
+    1f256b10ec62182528863835dadf8e7c  runs/env_layout_16_scenario_s14_07_on.log
+    ac459e141d935406a26e730d5aacf887  runs/env_layout_16_scenario_s14_07_on.rec
+    ac9421b487aac987fb5e5662a3b08cfd  runs/env_layout_16_scenario_s14_08_on.log
+    4fc04cbdedc31350db303be82bd79e22  runs/env_layout_16_scenario_s14_08_on.rec
+    c3b2fad05214b279656f80270a40d6d6  runs/env_layout_16_scenario_s14_09_on.log
+    0ed61d1b9861e0190690aa25d9284d51  runs/env_layout_16_scenario_s14_09_on.rec
+    f544804ca7bb98cbfcc10d0fdad46feb  runs/env_layout_16_scenario_s14_10_on.log
+    6ce37100f6281b2b4458faef05e0c77c  runs/env_layout_16_scenario_s14_10_on.rec
+    1ffec2d879783789020d84f7c37c46f9  runs/env_layout_16_scenario_s14_11_on.log
+    349ccc75b98e2268d47524c50015acf9  runs/env_layout_16_scenario_s14_11_on.rec
+    caad6f9d2679f0ec9f894264f3461377  runs/env_layout_16_scenario_s14_12_on.log
+    c2d2afc42bf1c9e6a69f104ccd364765  runs/env_layout_16_scenario_s14_12_on.rec
+    6de8ee7f58e6c111e31d5eb83d35b98b  runs/env_layout_16_scenario_s14_13_on.log
+    c2d2afc42bf1c9e6a69f104ccd364765  runs/env_layout_16_scenario_s14_13_on.rec
+    8f17e5e25d822a339faed9b4d2c9625a  runs/env_layout_16_scenario_s14_14_on.log
+    c2d2afc42bf1c9e6a69f104ccd364765  runs/env_layout_16_scenario_s14_14_on.rec
+    568bed39da67ffe646f5bef9389ecb34  runs/env_layout_16_scenario_s14_15_on.log
+    ac459e141d935406a26e730d5aacf887  runs/env_layout_16_scenario_s14_15_on.rec
+    78f3bc58d669715698c1e3cb7482ccdd  runs/env_layout_16_scenario_s14_16_on.log
+    ac459e141d935406a26e730d5aacf887  runs/env_layout_16_scenario_s14_16_on.rec
+    62f8893563c16cd352c9f8f82e636019  runs/env_layout_16_scenario_s14_17_on.log
+    ac459e141d935406a26e730d5aacf887  runs/env_layout_16_scenario_s14_17_on.rec
+    ca8d6c19af9a6bd8ac18c9915411328e  runs/env_layout_16_scenario_s14_18_on.log
+    1d8302b47da19e51d38441c3e6beb23b  runs/env_layout_16_scenario_s14_18_on.rec
+    8a1ff9ba0dde2d020cdcd530cfca7ff4  runs/env_layout_16_scenario_s14_19_on.log
+    1d8302b47da19e51d38441c3e6beb23b  runs/env_layout_16_scenario_s14_19_on.rec
+    8cdb56718d17f04543824d067f300e11  runs/env_layout_16_scenario_s14_20_on.log
+    962e436075b7c3f9f555445c944b8bff  runs/env_layout_16_scenario_s14_20_on.rec
+    e9f4fa9d4c2540c74783a80427db1038  runs/env_layout_16_scenario_s14_21_on.log
+    4fc04cbdedc31350db303be82bd79e22  runs/env_layout_16_scenario_s14_21_on.rec
+    f758fcf609201999335eea484388eeee  runs/env_layout_17_scenario_s15_01_on.log
+    e478e3955464c5da8e4483fb6a58801a  runs/env_layout_17_scenario_s15_01_on.rec
+    9869abce34fd91e1a0551f32480ec96c  runs/env_layout_17_scenario_s15_02_on.log
+    6756b6ac7ee181c819ce54c78ae73aba  runs/env_layout_17_scenario_s15_02_on.rec
+    1992fd527a4f45e2b03832acc9feb52f  runs/env_layout_17_scenario_s15_03_on.log
+    6c2ee6a1b45e58bfd0c76b83d7275cd6  runs/env_layout_17_scenario_s15_03_on.rec
+    f0e01d3255022e7752b2738304df0407  runs/env_layout_17_scenario_s15_04_on.log
+    08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_17_scenario_s15_04_on.rec
+    f298241a8e9d3d4ef1db81090422d30f  runs/env_layout_17_scenario_s15_05_on.log
+    726dd2b9a82635f2139aed1d8b5970c3  runs/env_layout_17_scenario_s15_05_on.rec
+    195f1f8a5ac0484a5d9b900e1a864a7b  runs/env_layout_17_scenario_s15_06_on.log
+    c537966a26ce76c9537c0e9e4ba8df11  runs/env_layout_17_scenario_s15_06_on.rec
+    b8f6e80f7f279f6c685fc75948976937  runs/env_layout_17_scenario_s15_07_on.log
+    f759306928400bdc9427ba0569c11433  runs/env_layout_17_scenario_s15_07_on.rec
+    fed7e4c923fbdd04879580e8a7d9e6ab  runs/env_layout_17_scenario_s15_08_on.log
+    ffdd1b085c77ac1b2b700883047d44b7  runs/env_layout_17_scenario_s15_08_on.rec
+    619a657d1d8a157cfeb775cf1fac4639  runs/env_layout_17_scenario_s15_09_on.log
+    10badc90f3949849526a162004929f47  runs/env_layout_17_scenario_s15_09_on.rec
+    29478a9b10a668711710d0e629ff2b7d  runs/env_layout_17_scenario_s15_10_on.log
+    15542ad2f74ae4201ca81b0365d5ad64  runs/env_layout_17_scenario_s15_10_on.rec
+    af81091380143564e9a000575d820395  runs/env_layout_17_scenario_s15_11_on.log
+    4241f5198f6729e2e13c1b358b3bac80  runs/env_layout_17_scenario_s15_11_on.rec
+    5177bc17e024ab0ebb7c1258aabdd4d0  runs/env_layout_17_scenario_s15_12_on.log
+    3839d3ec27e8f1e28ac7a66fedf87b81  runs/env_layout_17_scenario_s15_12_on.rec
+    0ddb66aa21f11921a68d20d4d88652c1  runs/env_layout_17_scenario_s15_13_on.log
+    36343581ab71fd1cc3b2a5f428df326c  runs/env_layout_17_scenario_s15_13_on.rec
+    b5b2ae858d93811d56c3bd096ae7ab12  runs/env_layout_17_scenario_s15_14_on.log
+    ffdd1b085c77ac1b2b700883047d44b7  runs/env_layout_17_scenario_s15_14_on.rec
+    173bdf2395309517d46926b4ed9a6513  runs/env_layout_17_scenario_s15_15_on.log
+    ffdd1b085c77ac1b2b700883047d44b7  runs/env_layout_17_scenario_s15_15_on.rec
+    67f58c746cc55312ef3aeaf257cfb77d  runs/env_layout_17_scenario_s15_16_on.log
+    ffdd1b085c77ac1b2b700883047d44b7  runs/env_layout_17_scenario_s15_16_on.rec
+    c921c2a111305e2f80ae243608f2015e  runs/env_layout_17_scenario_s15_17_on.log
+    08fbfda9fa0a03fb33c96c9b8c9a63ad  runs/env_layout_17_scenario_s15_17_on.rec
+    9966169de809f65379a5bf41ed078f30  runs/env_layout_17_scenario_s15_18_on.log
+    e478e3955464c5da8e4483fb6a58801a  runs/env_layout_17_scenario_s15_18_on.rec
+    4dcd254803f449de667e3afb9bfc17f3  runs/env_layout_17_scenario_s15_19_on.log
+    15542ad2f74ae4201ca81b0365d5ad64  runs/env_layout_17_scenario_s15_19_on.rec
+    f78ffb0169d74c7c7a86370d3346d28a  runs/env_layout_17_scenario_s15_20_on.log
+    15542ad2f74ae4201ca81b0365d5ad64  runs/env_layout_17_scenario_s15_20_on.rec
+    4eb63a90b150dac49c83ce296385242d  runs/env_layout_17_scenario_s15_21_on.log
+    018c8fdb1002afd33140d34a41cf6976  runs/env_layout_17_scenario_s15_21_on.rec

@@ -181,7 +181,7 @@ md5s of the expectations (`expected_ticks.json` and the `trajectory.json` it is 
 The oracle after the gate's build (8357b74: the rank column, D3; observation warrant at admission, AM67;
 none(leader_outranked) last, AM68 and D1) recomputes every table; the trajectories are byte-identical to stage 1's
 (the human's script is open-loop). Commands as above, with --expect. The runs follow in the next commit; the reading:
-analysis/kitting/mpb/tk5b/COMPARISON_5d.md.
+analysis/kitting/tk5d/REPORT.md.
 
     5b127dc0f5302f61b3c692a09877f9e5  scenario_s10_01/on_single_task/expected_ticks.json
     7e7be5b6ff6d7a44d77f43ecc7188b5f  scenario_s10_02/on_single_task/expected_ticks.json
@@ -199,3 +199,69 @@ analysis/kitting/mpb/tk5b/COMPARISON_5d.md.
     6504633b3da03ae3fcdc2188511eca80  scenario_s11_03/on_single_task/expected_ticks.json
     ec5e17408f819d7012f3f6c8bb9f38d3  scenario_s12_01/on_single_task/expected_ticks.json
     eef81536cb4f37cbd2e08c2dd63becd6  scenario_s12_02/on_single_task/expected_ticks.json
+
+## Step 5d: the runs (5 October 2026)
+
+The runs with the commands above, at f02b04c (the code of the gate's build); each run's own oracle call reproduced
+the expectations committed in the section above (md5 check). D3 was then amended by Hadi (exact ties:
+design_records.md, "T-K", D3's AMENDED line) and the oracle and the comparison rerun on these runs (no simulation):
+every change of the tables a cell marked undetermined before. The reading, with the comparison off / on before the
+gate change / on after it: analysis/kitting/tk5d/REPORT.md. 16 runs: 0 disagreements on parts 1 to 3. Before D3's
+amendment scenario_s10_04 and s12_02 had no chain (an undetermined gate at their decision of 135, coffee_break's
+re-entry with evidence 1/2 each); after it they are compared, 0 disagreements. Properties as step 5b's: P10.10 fails
+as before (s10_10 does not reach E6); every other declared property holds.
+
+The expected tables after D3's amendment (md5):
+
+    5b127dc0f5302f61b3c692a09877f9e5  scenario_s10_01/on_single_task/expected_ticks.json
+    7e7be5b6ff6d7a44d77f43ecc7188b5f  scenario_s10_02/on_single_task/expected_ticks.json
+    50baface73319785852ee0970bda5009  scenario_s10_03/on_single_task/expected_ticks.json
+    c600d453a36fc9e9bb2e5298fc921e2d  scenario_s10_04/on_single_task/expected_ticks.json
+    659b17abb4f18336802911dda3a62b1d  scenario_s10_05/on_single_task/expected_ticks.json
+    9e231e67d2baf73719ba383c6ff90549  scenario_s10_06/on_single_task/expected_ticks.json
+    55b52f47b775320f180c3c756b798094  scenario_s10_07/on_single_task/expected_ticks.json
+    c99091edf47816057915a323f221579a  scenario_s10_08/on_single_task/expected_ticks.json
+    400313fd769aad4f225d0c633b41ed90  scenario_s10_09/on_single_task/expected_ticks.json
+    da95b19f6274b7715992ae5da6859418  scenario_s10_10/on_single_task/expected_ticks.json
+    75573736760d725700582947ebc0a9d6  scenario_s10_11/on_single_task/expected_ticks.json
+    4fbe1f2fae229f88f96a7139b6662db6  scenario_s11_01/on_single_task/expected_ticks.json
+    3af6a2c30ea651ee82aeb5af38300a8d  scenario_s11_02/on_single_task/expected_ticks.json
+    6504633b3da03ae3fcdc2188511eca80  scenario_s11_03/on_single_task/expected_ticks.json
+    ec5e17408f819d7012f3f6c8bb9f38d3  scenario_s12_01/on_single_task/expected_ticks.json
+    5953a081e64fbf05535b253bb740d4af  scenario_s12_02/on_single_task/expected_ticks.json
+
+Runs (git-ignored; md5s):
+
+    7397d5eec592d911cb78d6740081fc00  runs/env_layout_12_scenario_s10_01_on_single_task.log
+    8451bf1f7048ec68b33375c2cc99cb15  runs/env_layout_12_scenario_s10_01_on_single_task.rec
+    c1028821f8476965538f196a54482718  runs/env_layout_12_scenario_s10_02_on_single_task.log
+    321732473c562c43b06ae158ca81cdef  runs/env_layout_12_scenario_s10_02_on_single_task.rec
+    054185fd48bfdf4a83fc44495657ab65  runs/env_layout_12_scenario_s10_03_on_single_task.log
+    7fa9d641f1a0df5af13e70ec188ad19e  runs/env_layout_12_scenario_s10_03_on_single_task.rec
+    3ec9981a7d43dccceae7ac0842bb2393  runs/env_layout_12_scenario_s10_04_on_single_task.log
+    88dcf2598e25a94807b1e1f981218bff  runs/env_layout_12_scenario_s10_04_on_single_task.rec
+    3d642ac55307012e5d01bc8b723336e4  runs/env_layout_12_scenario_s10_05_on_single_task.log
+    c0b3c52826984a71c0637d8dfc8eba55  runs/env_layout_12_scenario_s10_05_on_single_task.rec
+    8cb265cc7ce5fbecf955beb2203fe1f0  runs/env_layout_12_scenario_s10_06_on_single_task.log
+    4bdc76ccc6f1ee3244e89c5458b19ffe  runs/env_layout_12_scenario_s10_06_on_single_task.rec
+    9e7e94d77804ea4d18b7f3b6eee2ca06  runs/env_layout_12_scenario_s10_06_reference_single_task.log
+    aba3f810038bb2fc6676fc318540a7c7  runs/env_layout_12_scenario_s10_07_on_single_task.log
+    9f6bde960f345934b2423236f91fa158  runs/env_layout_12_scenario_s10_07_on_single_task.rec
+    2eb28857d89d94ac2b26ad3b12e66580  runs/env_layout_12_scenario_s10_08_on_single_task.log
+    33ee73bcf6ffefa2c81b3607397ac879  runs/env_layout_12_scenario_s10_08_on_single_task.rec
+    6914640d1b587df59e0779d9964d4dcc  runs/env_layout_12_scenario_s10_09_on_single_task.log
+    ebcb27b9f5dbf9cfcfa67e4b25a2ba3a  runs/env_layout_12_scenario_s10_09_on_single_task.rec
+    6179d1b4fdb91c1badba5e366ff8fbee  runs/env_layout_12_scenario_s10_10_on_single_task.log
+    4251537079b3d12ed72aa11e6771f5e0  runs/env_layout_12_scenario_s10_10_on_single_task.rec
+    06ee53c28eb33f3923bff726ee5734f6  runs/env_layout_12_scenario_s11_01_on_single_task.log
+    2b20839311f61f384b627483ddebc626  runs/env_layout_12_scenario_s11_01_on_single_task.rec
+    e662275c92b0b10bb690d508ac67affe  runs/env_layout_12_scenario_s11_02_on_single_task.log
+    86397e984d81ec47aa978760989c152f  runs/env_layout_12_scenario_s11_02_on_single_task.rec
+    aa7accb04808a8d447828380a3051dca  runs/env_layout_12_scenario_s11_03_on_single_task.log
+    bd84a77d4d232d4657b782614615bccb  runs/env_layout_12_scenario_s11_03_on_single_task.rec
+    770f23d90246fa1dfd4e49e850055ab9  runs/env_layout_13_scenario_s10_11_on_single_task.log
+    955c7b71a51a1cf3d80a3f8ed51931da  runs/env_layout_13_scenario_s10_11_on_single_task.rec
+    7703cf624f827f72713129d0ded679c3  runs/env_layout_14_scenario_s12_01_on_single_task.log
+    fc4ef52bbf1c640efa64a535a9385f7f  runs/env_layout_14_scenario_s12_01_on_single_task.rec
+    216f7085f0b15ad3438f9ae0d6291e33  runs/env_layout_14_scenario_s12_02_on_single_task.log
+    eeff90b54d1ee23e20d5635de4ce1a07  runs/env_layout_14_scenario_s12_02_on_single_task.rec

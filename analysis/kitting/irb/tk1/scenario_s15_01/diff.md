@@ -32,9 +32,9 @@ Rows (tick, live hypothesis) present on one side only: 0
 | member | 1431 | 0 |
 | adequacy | 1431 | 0 |
 | warrant | 1431 | 0 |
-| rank | 1403 | 0 |
+| rank | 1431 | 0 |
 
-Undetermined (D3; skipped, not compared): rank 28
+Undetermined (D3; skipped, not compared): none
 
 Disagreements: 0
 
@@ -62,9 +62,9 @@ Rows (tick, live hypothesis) present on one side only: 0
 | member | 1431 | 0 |
 | adequacy | 1431 | 0 |
 | warrant | 1431 | 0 |
-| rank | 1403 | 0 |
+| rank | 1431 | 0 |
 
-Undetermined (D3; skipped, not compared): rank 28
+Undetermined (D3; skipped, not compared): none
 
 Disagreements: 0
 

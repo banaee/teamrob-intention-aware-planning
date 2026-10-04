@@ -27,5 +27,5 @@ None declared.
 | 115 | projection_expired |  | none(leader_inadequate) | deliver_item(?item=item_1) | fallback moving k=9 end=120.50 | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 120 | recognition_changed | entered | clears | deliver_item(?item=item_1) | admitted deliver_item(?item=item_1) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 123 | recognition_changed | replaced | none(leader_no_observation) | deliver_item(?item=item_2) | fallback standing k=3 end=127.00 | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
-| 124 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
+| 125 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_4,?kitting_table=kitting_table_1) | 0 |
 | 163 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | None | 0 |

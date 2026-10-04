@@ -1,6 +1,6 @@
 # scenario_s12_02: part 4 and the measures (single_task, prior on)
 
-Completion (world tick) 162; terminal decision 164. [sep] minimum 33.61 (139), continuous 33.61 (139); near-encounters 4 ticks; F1 classes {'viol': 0, 'stand': 3, 'recede': 1, '?': 0}; holds [(93, 18), (133, 30), (134, 7)] (55 ticks).
+Completion (world tick) 162; terminal decision 164. [sep] minimum 33.61 (139), continuous 33.61 (139); near-encounters 4 ticks; F1 classes {'viol': 0, 'stand': 3, 'recede': 1, '?': 0}; holds [(93, 18), (133, 30), (135, 6)] (54 ticks).
 
 ## Declared properties
 
@@ -23,9 +23,11 @@ Completion (world tick) 162; terminal decision 164. [sep] minimum 33.61 (139), c
 | 8 | recognition_changed | entered | clears | deliver_item(?item=item_1) | admitted deliver_item(?item=item_1) | deliver_item(?item=item_3,?kitting_table=kitting_table_1) | 0 |
 | 33 | no_current_task |  | clears | deliver_item(?item=item_1) | admitted deliver_item(?item=item_1) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
 | 61 | recognition_changed | replaced | none(leader_no_observation) | deliver_item(?item=item_2) | fallback standing k=2 end=64.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
-| 62 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
-| 84 | recognition_changed | retraction | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=22 end=102.53 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
+| 64 | projection_expired |  | none(leader_outranked) | deliver_item(?item=item_2) | fallback moving k=2 end=67.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
+| 67 | projection_expired |  | none(leader_outranked) | deliver_item(?item=item_2) | fallback moving k=5 end=73.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
+| 73 | projection_expired |  | none(leader_outranked) | deliver_item(?item=item_2) | fallback moving k=11 end=85.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
+| 85 | projection_expired |  | none(below_theta) | deliver_item(?item=item_2) | fallback moving k=23 end=102.53 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 0 |
 | 93 | recognition_changed | entered | clears | coffee_break(?coffee_machine=coffee_machine_0) | admitted coffee_break(?coffee_machine=coffee_machine_0) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 18 |
 | 133 | recognition_changed | replaced | none(leader_no_observation) | deliver_item(?item=item_2) | fallback standing k=31 end=165.00 | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 30 |
-| 134 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 7 |
+| 135 | recognition_changed | entered | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | deliver_item(?item=item_14,?kitting_table=kitting_table_6) | 6 |
 | 164 | no_current_task |  | clears | deliver_item(?item=item_2) | admitted deliver_item(?item=item_2) | None | 0 |

@@ -1,6 +1,6 @@
 # scenario_s11_02: part 4 and the measures (single_task, prior on)
 
-Completion (world tick) 169; terminal decision 171. [sep] minimum 50.44 (24), continuous 50.44 (24); near-encounters 0 ticks; F1 classes {'viol': 0, 'stand': 0, 'recede': 0, '?': 0}; holds [(10, 2), (20, 2), (25, 2), (27, 4), (31, 8), (39, 16), (55, 32)] (66 ticks).
+Completion (world tick) 169; terminal decision 171. [sep] minimum 50.44 (24), continuous 50.44 (24); near-encounters 0 ticks; F1 classes {'viol': 0, 'stand': 0, 'recede': 0, '?': 0}; holds [(14, 2), (20, 2), (25, 2), (27, 4), (31, 8), (39, 16), (55, 32)] (66 ticks).
 
 ## Declared properties
 
@@ -19,8 +19,10 @@ None declared.
 
 | tick | trigger | cause | gate | leader | projection | winner | hold |
 |---|---|---|---|---|---|---|---|
-| 0 | no_current_task |  | clears | deliver_item(?item=item_12) | admitted deliver_item(?item=item_12) | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 0 |
-| 10 | recognition_changed | retraction | none(leader_inadequate) | deliver_item(?item=item_12) | fallback moving k=11 end=20.00 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 2 |
+| 0 | no_current_task |  | none(leader_unwarranted) | deliver_item(?item=item_12) | fallback moving k=1 end=2.00 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 0 |
+| 2 | projection_expired |  | none(leader_unwarranted) | deliver_item(?item=item_12) | fallback moving k=3 end=6.00 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 0 |
+| 6 | projection_expired |  | none(leader_unwarranted) | deliver_item(?item=item_12) | fallback moving k=7 end=14.00 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 0 |
+| 14 | projection_expired |  | none(leader_inadequate) | deliver_item(?item=item_12) | fallback moving k=15 end=20.00 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 2 |
 | 20 | projection_expired |  | none(leader_inadequate) | deliver_item(?item=item_12) | fallback standing k=1 end=22.00 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 2 |
 | 22 | projection_expired |  | none(leader_inadequate) | deliver_item(?item=item_12) | fallback moving k=2 end=24.22 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 0 |
 | 25 | projection_expired |  | none(leader_inadequate) | deliver_item(?item=item_12) | fallback standing k=1 end=27.00 | deliver_item(?item=item_10,?kitting_table=kitting_table_1) | 2 |

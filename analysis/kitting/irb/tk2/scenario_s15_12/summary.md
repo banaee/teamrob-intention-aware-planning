@@ -184,7 +184,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 26 to 64 | deliver_item(item_3) | clears |
 | 65 to 66 | deliver_item(item_1) | none(below_theta) |
 | 67 to 86 | deliver_item(item_2) | none(below_theta) |
-| 87 to 108 | deliver_item(item_2) | clears |
+| 87 to 104 | deliver_item(item_2) | clears |
+| 105 to 108 | deliver_item(item_2) | none(leader_outranked) |
 | 109 to 113 | deliver_item(item_2) | none(leader_inadequate) |
 | 114 to 120 | deliver_item(item_2) | none(below_theta) |
 | 121 to 124 | ac_activation(ac_switch_0) | none(below_theta) |
@@ -196,7 +197,8 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 183 to 220 | deliver_item(item_1) | none(below_theta) |
 | 221 to 276 | deliver_item(item_1) | clears |
 | 277 to 277 | deliver_item(item_4) | none(leader_no_observation) |
-| 278 to 370 | deliver_item(item_4) | clears |
+| 278 to 278 | deliver_item(item_4) | none(leader_unwarranted) |
+| 279 to 370 | deliver_item(item_4) | clears |
 | 371 to 371 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
 | 372 to 372 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
 | 373 to 394 | coffee_break(coffee_machine_0) | clears |

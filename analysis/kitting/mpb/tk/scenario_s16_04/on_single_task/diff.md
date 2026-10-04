@@ -1,6 +1,6 @@
 # scenario_s16_04: expected against actual (single_task, prior on)
 
-Horizon: ticks 0 to 192 (the first observed completion point + 30, capped at the run's 252 steps; MPB-5). Terminal decision: 92; the human's last acknowledgement: 162. The run's no_current_task ticks: [0, 92].
+Horizon: ticks 0 to 192 (the first observed completion point + 30, capped at the run's 252 steps; MPB-5). Terminal decision: 93; the human's last acknowledgement: 162. The run's no_current_task ticks: [0, 93].
 
 ## Per tick (in-process)
 
@@ -12,7 +12,7 @@ Horizon: ticks 0 to 192 (the first observed completion point + 30, capped at the
 | gate | 193 | 0 |
 | adequacy | 193 | 0 |
 | observation_warrant | 193 | 0 |
-| perception | 93 | 0 |
+| perception | 94 | 0 |
 
 ## Decisions
 

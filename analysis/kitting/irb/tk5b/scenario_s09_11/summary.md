@@ -99,12 +99,14 @@ The gate's answer per tick (actual; the leader and the outcome, stretches):
 | 0 to 18 | deliver_item(item_1) | none(below_theta) |
 | 19 to 60 | deliver_item(item_1) | clears |
 | 61 to 61 | deliver_item(item_3) | none(leader_no_observation) |
-| 62 to 79 | deliver_item(item_3) | clears |
+| 62 to 62 | deliver_item(item_3) | none(leader_unwarranted) |
+| 63 to 79 | deliver_item(item_3) | none(leader_outranked) |
 | 80 to 83 | deliver_item(item_3) | none(below_theta) |
 | 84 to 86 | coffee_break(coffee_machine_0) | none(below_theta) |
 | 87 to 132 | coffee_break(coffee_machine_0) | clears |
 | 133 to 133 | deliver_item(item_3) | none(leader_no_observation) |
-| 134 to 194 | deliver_item(item_3) | clears |
+| 134 to 134 | deliver_item(item_3) | none(leader_unwarranted) |
+| 135 to 194 | deliver_item(item_3) | clears |
 | 195 to 195 | coffee_break(coffee_machine_0) | none(leader_no_observation) |
 | 196 to 196 | coffee_break(coffee_machine_0) | none(leader_unwarranted) |
 | 197 to 228 | coffee_break(coffee_machine_0) | clears |
