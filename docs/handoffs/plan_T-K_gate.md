@@ -1,7 +1,8 @@
 # T-K part 1: the plan of the build of the two gate rulings (AM67, AM68)
 
-Written by ccode, 4 October 2026 (BUILD DISCIPLINE, step 1: plan only, no code). Status: NOT CONFIRMED. Nothing is
-built until Hadi and the design chat confirm it. Every build session reads this file first.
+Written by ccode, 4 October 2026 (BUILD DISCIPLINE, step 1: plan only, no code). Status: APPROVED (Hadi, 4 October
+2026), with the rulings on D1 to D7 (section 7, each marked RULED; design_records.md, "T-K", THE GATE'S BUILD PLAN,
+RULED). Every build session reads this file first.
 
 What is built: AM67 (observation warrant is required at admission, for every hypothesis; commitment warrant alone no
 longer admits) and AM68 (the gate refuses an outranked leader, as a condition of admission only), with AM73 (the term
@@ -244,6 +245,8 @@ prints; the gate's answer (clears or not) is the same.
   `none(leader_outranked)` appears only where AM68 alone refuses, so a log diff shows exactly AM68's effect.
 - (b) Before warrant, after adequacy (the evidence before the warrant).
 Recommendation: (a). It follows how G1 and warrant were added, each after the existing checks.
+RULED (a): last, after `none(leader_unwarranted)`. Reason: every tick refused today keeps its printed reason, so a log
+difference shows this ruling's effect alone.
 
 D2. What happens to commitment warrant's parts (section 2.3).
 - (a) Remove the input and the matching from the meta-planner; keep `[meta-proj] projection=built warrant=observation`
@@ -253,6 +256,8 @@ D2. What happens to commitment warrant's parts (section 2.3).
 - (c) Keep the matching for the log only, printing whether the admitted leader is assigned.
 Recommendation: (a). It removes what decides nothing, keeps AD4 as ruled, and leaves the instruments' parser of that
 line unchanged; (c) prints a field that suggests a role the rulings removed.
+RULED (a): the parts removed from the meta-planner; the admission line keeps its warrant field. Reason: an input that
+decides nothing invites a later role the rulings removed.
 
 D3. How the oracle checks an exact rule it can reproduce only to 1e-9. The recognizer compares its floats exactly
 (AM75). The oracle computes its own evidence, which agrees with the recognizer's to 1e-9, not bit for bit; where two
@@ -262,6 +267,8 @@ differently.
   rule stays exact, the tolerance is the instrument's agreement level, as for its numeric columns.
 - (b) The oracle compares exactly and every disagreement is examined by hand.
 Recommendation: (a).
+RULED (a): undetermined within the oracle's agreement level, skipped and counted. Reason: the rule stays exact; the
+tolerance is the instrument's.
 
 D4. The coverage matrix (open question 3 of the discussion). With context knowledge off the outranked refusal is
 unreachable by construction, so the off matrix cannot cover it.
@@ -271,6 +278,8 @@ unreachable by construction, so the off matrix cannot cover it.
 - (b) A full context-on column for every row.
 - (c) New scenarios authored for it.
 Recommendation: (a).
+RULED (a): the off setting's matrix, one added row for the outranked refusal, claimed with context knowledge on from
+step 5's existing scenarios; no new scenario. It closes the open question on the coverage matrix.
 
 D5. Step 5's declared properties that the rulings move (section 4: PK4a, PK4b, PK4c, PK4e, PK1b, PK5a, PK5b). Cases 4
 and 5 lose their premise: the early admission against the context no longer happens at 0.
@@ -280,6 +289,8 @@ and 5 lose their premise: the early admission against the context no longer happ
 - (b) Keep the old properties and report them as failed by ruling.
 Recommendation: (a). The separation is what the measurement is for; declaring it in advance would state the hoped
 result as an expectation.
+RULED (a): re-declared before the measurement runs; the old ones kept, marked superseded; the separation a measure,
+not a property.
 
 D6. The alteration test. C1 is retired by AM67.
 - (a) Add C4 to C6 (section 3) and run the C group on step 5's six scenarios (context on, where the outranked condition
@@ -287,6 +298,8 @@ D6. The alteration test. C1 is retired by AM67.
   of that set).
 - (b) Retire C1 and add nothing now.
 Recommendation: (a); the gate's rule changed, and the test exists to show the comparison would catch a wrong gate.
+RULED (a), narrowed: C4 to C6 run on step 5's six scenarios only. On the planning set's sixteen, with context
+knowledge off, they cannot be detected by construction; stated as a property of that set, not run there.
 
 D7. Exact ties decided by rounding (F6, AM75). A mathematical tie computed as two floats that differ in the last bit is
 ranked by the rounding: deterministic, stable, arbitrary. One tick in the context-off outputs (scenario_s09_07 at 35,
@@ -294,6 +307,7 @@ ranked by the rounding: deterministic, stable, arbitrary. One tick in the contex
 - (a) Accept it and record it as a consequence of AM75 (as KT11's ADDED line recorded the same for θ).
 - (b) Ask for a different rule.
 Recommendation: (a). AM75's reason ("no number in the rule") already accepts it; this asks only that it be recorded.
+RULED (a): accepted and recorded as a consequence of the exact comparison (AM75).
 
 ## 8. The measurements after the build (a separate step and session)
 

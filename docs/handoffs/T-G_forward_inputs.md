@@ -814,7 +814,8 @@ Changes to the core stay minimal.
    after a correct admission (docs/assumptions.md 6.4).
 Open: the order of the remaining work; question 3 below (the planning set's coverage matrix); the build of AM67 and
 AM68, which starts with a plan step in its own session. ccode's facts for that plan: design_records.md, "T-K", THE GATE
-AFTER STEP 5B, RULED. The plan: docs/handoffs/plan_T-K_gate.md (written 4 October 2026; awaiting confirmation).
+AFTER STEP 5B, RULED. The plan: docs/handoffs/plan_T-K_gate.md, APPROVED (Hadi, 4 October 2026, with D1 to D7;
+design_records.md, "T-K", THE GATE'S BUILD PLAN, RULED). D4 closes question 3 (the coverage matrix).
 What follows is the discussion as recorded before the ruling.
 
 The design chat discussed the results of steps 4, 5 and 5b with Hadi. Nothing was ruled. Hadi continues the

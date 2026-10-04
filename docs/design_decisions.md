@@ -4475,6 +4475,9 @@ every boundary that meets a recorded decision (TODO-119's G part).
   which output is the build plan's (design_records.md, "T-K", THE GATE AFTER STEP 5B, RULED, ccode's facts).
   RULED (AM76, Hadi, 4 October 2026): one category per live hypothesis, read for the leader only ("T-K: context
   knowledge in the recognizer's belief", R7, AM76).
+  RULED (Hadi, 4 October 2026, on the build's plan, D2): commitment warrant's parts are removed from the meta-planner
+  (the assigned tasks it received for this ruling, their matching, the commitment source); the admission line keeps
+  its warrant field, now `warrant=observation`. The recognizer's support restriction is unchanged.
 
 - AD3, loss of warrant.
   Ruling. Loss of observation warrant fires nothing and clears no admitted projection. Retraction stays on the
@@ -5315,6 +5318,9 @@ reason as ccode corrected it, accepted. Not built.
   `none(leader_outranked)`.
   RULED (AM75, Hadi, 4 October 2026), the tie: "a tie passes" is an exact comparison, with no tolerance. Reason: no
   number in the rule.
+  Consequence, accepted (Hadi, 4 October 2026, on the build's plan, D7): a mathematical tie computed as two floats
+  that differ in the last bit is ranked by the rounding: deterministic, stable, arbitrary. Measured before the build:
+  one tick of 15,175 in the context-off IRB outputs (scenario_s09_07 at 35, 1.7e-16), where it moves no gate answer.
   RULED (AM76, Hadi, 4 October 2026), what the recognizer reports: for the outranked condition the recognizer reports
   one category per live hypothesis. The gate reads it for the leader only, as it reads hypothesis adequacy and
   observation warrant. Reason: the gate reconstructs no recognizer quantity and receives no raw value ("T-D G:

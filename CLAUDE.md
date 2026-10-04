@@ -535,9 +535,11 @@ Decisions
   R3; design_records.md, "T-K", THE GATE AFTER STEP 5B, RULED): observation warrant is required at admission for every
   hypothesis (commitment warrant alone no longer admits); the gate refuses a leader that the evidence alone ranks below
   another live hypothesis (rank only, an exact tie passes; the leader is "outranked", reported by the recognizer as a category per live hypothesis); the end of an admission
-  and all strengths unchanged. Nothing built. Next: open. What remains (the build of AM67 and AM68, a plan step first
-  in its own session; dock_loading's part (step 6); the close; the question on the planning set's coverage matrix) has
-  no decided order (`docs/handoffs/T-G_forward_inputs.md`, section 5).
+  and all strengths unchanged. Nothing built. Next: open. The build's plan is approved (Hadi,
+  4 October 2026, D1 to D7; `docs/handoffs/plan_T-K_gate.md`; design_records.md, "T-K", THE GATE'S BUILD PLAN, RULED;
+  D4 closed the coverage-matrix question). What remains (the build of AM67 and AM68, stages 0 to 5; the measurements
+  with context knowledge on, a separate step; dock_loading's part (step 6); the close) has no decided order beyond
+  that (`docs/handoffs/T-G_forward_inputs.md`, section 5).
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

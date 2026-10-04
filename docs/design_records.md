@@ -3795,3 +3795,28 @@ nothing built.
   (the gate reconstructs no recognizer quantity and receives no raw value); of the two options in ccode's facts above,
   the second. ccode's correction of AM70's reason (the fact above) is accepted as recorded (design_decisions.md, under
   R3's AM70, CORRECTED). The plan of the build: docs/handoffs/plan_T-K_gate.md.
+THE GATE'S BUILD PLAN, RULED (Hadi, 4 October 2026, on ccode's plan, docs/handoffs/plan_T-K_gate.md, e4147bf). The plan
+is approved with these rulings on its decisions D1 to D7; the plan is amended to them.
+- D1 (a): the outranked check stands last among the gate's refusals, after `none(leader_unwarranted)`. Reason: every
+  tick refused today keeps its printed reason, so a log difference shows this ruling's effect alone.
+- D2 (a): commitment warrant's parts are removed from the meta-planner (the constructor argument
+  `observed_assigned_tasks`, the matching by `same_task` in `_warrant`, `WarrantSource.COMMITMENT`); the admission
+  line keeps its warrant field (`[meta-proj] projection=built warrant=observation`, AD4 unchanged). Reason: an input
+  that decides nothing invites a later role the rulings removed. The recognizer's support restriction is untouched.
+- D3 (a): the IRB oracle marks the rank undetermined where its own two evidence values lie within its agreement level
+  (1e-9); the comparison skips and counts those ticks. Reason: the rule stays exact (AM75); the tolerance is the
+  instrument's.
+- D4 (a): the planning set's coverage matrix stays the matrix of the setting with context knowledge off, with one added
+  row for the outranked refusal, claimed with context knowledge on, its instance from step 5's existing scenarios. No
+  new scenario. This closes the open question on the coverage matrix (THE DESIGN DISCUSSION AFTER STEP 5B, question 3).
+- D5 (a): step 5's properties that the rulings move (PK4a, PK4b, PK4c, PK4e, PK1b, PK5a, PK5b) are re-declared before
+  the measurement runs; the old ones stay in the record, marked superseded; the separation stays a measure, not a
+  property.
+- D6 (a), narrowed: the three new alterations (C4 the outranked condition not asked, C5 a tie refused, C6 the rank read
+  from the belief instead of the evidence) run on step 5's six scenarios only. On the planning set's sixteen, with
+  context knowledge off, they cannot be detected by construction: stated as a property of that set, not run there.
+  C1 (commitment warrant ignored) is retired by AM67.
+- D7 (a): a mathematical tie decided by float rounding is accepted and recorded as a consequence of the exact
+  comparison (design_decisions.md, "T-K", R7's AM75, its consequence line).
+Open after it: the order of the remaining work. Next: the build, stages 0 to 5 of the plan, each committed after its
+check, with a pause at each stage boundary; the measurements with context knowledge on are a separate step after it.
