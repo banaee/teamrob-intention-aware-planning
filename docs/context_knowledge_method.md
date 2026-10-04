@@ -2,7 +2,7 @@
 
 Status: the design records hold the rulings and their reasons and are authoritative (`docs/design_decisions.md`, "T-K: context knowledge in the recognizer's belief"; `docs/design_records.md`, "T-K"). This document states the result of the rulings. If the two disagree, the records win and this document is corrected. A ruling that changes the method of context knowledge updates this document in the same records step.
 
-It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39), with the question of 4 October 2026 on the equal prior. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
+It states the method as ruled by Hadi on 3 October 2026 (AM35 to AM39). Section 13 is a derivation from the method, not a ruling. It describes the concept, the formulas and worked examples. It does not describe the implementation. The values are modelling assumptions. Terms: `docs/glossary.md` §5.
 
 ## 1. The idea
 
@@ -143,7 +143,7 @@ The meta-planner admits the leading hypothesis $h^*$ when three conditions hold:
 2. It is adequate: the observed movement does not contradict it. A hypothesis turns inadequate after about 334 cm of excess path, or after 17 ticks of standing.
 3. It is warranted.
    - An assigned task has commitment warrant, from the assignment. It can be admitted before any distinguishing movement.
-   - A foreseeable task needs observation warrant from movement: the human's path cost to the task's target has decreased since the start of the present phase. One step that brings the human closer satisfies it.
+   - A foreseeable task needs observation warrant. It has two sources. The first is the path-cost gain toward the target: the human's path cost to the task's target has decreased since the start of the present phase. One step that brings the human closer satisfies it. The second is the observed completion of the hypothesis's previous step, which entered the present phase. In a phase without a movement target (a wait), the second is the only source.
 
 ## 9. The procedure in four steps
 

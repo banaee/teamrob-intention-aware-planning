@@ -540,9 +540,9 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    which value the gate compares with θ, the belief over the live hypotheses or the output after its scaling by the
    pinned hypotheses. A design question, argued from what each value means. The plan reports the facts of the code; it
    is not settled by whether a given value passes.
-10. ccode's flags on docs/context_knowledge_method.md (design_records.md, "T-K", THE STRENGTHS REVISED, F): a question of
-   4 October 2026 named in its status that no record holds; three statements of its section 14 the records do not hold;
-   its section 8 states a foreseeable task's warrant without the entry-by-completion source of observation warrant.
+10. ccode's flags on docs/context_knowledge_method.md (design_records.md, "T-K", THE STRENGTHS REVISED, F): the first
+   three resolved by Hadi on 4 October 2026. Open: section 12's three cases do not hold for dock_loading's coffee_break
+   from the office, whose walk to the machine is warranted on its entry from the walk to the office door.
 
 ### 5.11 What the build must respect [recorded]
 

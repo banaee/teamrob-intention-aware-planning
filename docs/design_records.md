@@ -2638,10 +2638,17 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   - ac_activation raised, 0.5 in place of 0.2. Source, Hadi, 3 October 2026: a warm room is a matter of comfort with no
     stated time, so the human more often starts an assigned task first, and the activation follows within about 3 task
     starts. 0.2 asserted 6 task starts.
+  - ADDED (Hadi, 4 October 2026, on ccode's flag 2), beside the two sources: the two raised strengths lie on opposite
+    sides of 1, because break time is a scheduled norm of the site and a warm room is a weaker call.
   - ac_activation with the room not warm and the A/C off: the ordinary strength 0.02, in place of 0.005. Nothing states
     that the task is pointless there.
   - A coffee break just completed has the suppressed strength in every situation, inside break time too.
   - No value was chosen from the threshold or from a scenario.
+  NOT TAKEN (Hadi, 4 October 2026, on ccode's flag 2):
+  - The raised strength 1 for coffee_break. It asserts no direction. Hadi stated one: break time favours the coffee
+    break.
+  - One raised strength shared by all foreseeable tasks. Hadi stated different directions for coffee_break and
+    ac_activation, which is knowledge that the two differ.
   Each value rests on an argument about what it states about the human; none rests on a run or on the threshold. The
   reading per value: design_decisions.md, this title, R3's AM39.
 
@@ -3012,3 +3019,20 @@ reading and for a later paper; it serves the build's plan as the statement of th
      decreased since the start of the present phase). Observation warrant has a second source, the phase entered by
      the observed completion of the hypothesis's previous step, the only source in a phase without a movement target
      (glossary §7, observation warrant; design_decisions.md, "T-D G: admission", AD1, AD2).
+  RESOLVED (Hadi, 4 October 2026; follow-up records step):
+  1. The question of 4 October 2026 was Hadi's question in the design chat on the equal prior; its answer is the
+     derivation in section 13, no ruling. The status line names no question and says that section 13 is a derivation.
+  2. Recorded under AM38 (above): the raised strength 1 and one raised strength shared by all foreseeable tasks as
+     alternatives not taken, each with its reason; beside the two sources, why the raised strengths lie on opposite
+     sides of 1.
+  3. Section 8 corrected to the records: observation warrant has two sources, the path-cost gain toward the target and
+     the observed completion of the hypothesis's previous step, the only source in a phase without a movement target.
+  FLAGGED by ccode (4 October 2026), not resolved: section 12's three cases hold for kitting's coffee_break, whose
+  walking phase is its first step (`coffee_break_default`: move_to, wait_at), so only the gain source applies there.
+  They do not hold for dock_loading's coffee_break from the office (`coffee_break_office`: go to the office door, go to
+  the coffee machine, wait_at). Its walk to the machine is entered by the observed completion of the walk to the door,
+  and the recognizer gives the entry source before the gain (`shared/recognizer.py`, the observation warrant). A human
+  who passes the office door on an unmodelled walk then makes that phase warranted, also when the human then stands
+  (case 1) or walks away from the machine (case 2), until the phase is left or turns inadequate.
+  CHECKED by ccode (4 October 2026): every number in the tables of sections 5, 10, 11, 12 and 13 was recomputed from the
+  document's formulas and the declared values; none differs beyond the document's rounding.
