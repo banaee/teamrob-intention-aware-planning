@@ -3376,6 +3376,8 @@ QUESTION S, RULED (Hadi, 4 October 2026; AM65, its conceptual part in design_dec
   evidence.
 - A table of step 4's cases under compressed values is a sensitivity analysis for the close of T-K part 1, not a
   candidate design. Not built; it belongs to the close.
+- UNDER DISCUSSION AGAIN since 4 October 2026 (the note in design_decisions.md under R3's AM65; THE DESIGN DISCUSSION
+  AFTER STEP 5B, below). The ruling stands until Hadi rules.
 
 THE READING FOR QUESTION G (ccode, 4 October 2026; `analysis/kitting/irb/tk2/REPORT.md`, "The reading for question G",
 and Appendix C; `analysis/kitting/irb/tk2/g_reading.py`). A reading of step 4's outputs, nothing run, nothing ruled.
@@ -3402,6 +3404,8 @@ retraction stay as ruled under context knowledge. The reasons and the consequenc
 rest on THE READING FOR QUESTION G above (the late catch: the evidence alone turns 3 to 9 ticks after the human left,
 the trigger rule 3 to 8 ticks later; the A/C beside the delivery's shelf: s15_19; the record kept 1 to 9 ticks past the
 per-tick gate in 18 of 32 rows). Question G is closed.
+UNDER DISCUSSION AGAIN since 4 October 2026 (the note in design_decisions.md under R7's AM66; THE DESIGN DISCUSSION
+AFTER STEP 5B, below). The ruling stands until Hadi rules.
 
 THE PLANNING CASES, RULED (KT15, Hadi, 4 October 2026; step 5 of T-K part 1). Amends KT3's "two cases also run in the
 MPB".
@@ -3618,14 +3622,16 @@ authored: the counts compare the settings and are no rate of occurrence.
 THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT (Hadi, 4 October 2026; recorded by ccode the same day;
 CORRECTED the same day by Hadi, the first wording being the design chat's and wrong). Recorded in docs/assumptions.md,
 6.4. An admission of a hypothesis that is not the true task, read against the evidence alone (the run with context
-knowledge off): in the first ticks of a walk the evidence ratio is near 1 (no wrong tick is an exact tie; the smallest
-ratio ×1.0008), and only this part is a limit of the situation; after it the evidence ranks the true task first
-(311 ticks, ×1.0008 to ×14.2, ×3 to ×14 at the end of a long walk) and the prior overrules it, which follows from the
-declared strengths and the gate (questions S and G, ruled). 141 further wrong ticks have the evidence alone ranking the
-admitted hypothesis first (the off run admits most of them too). The largest gain and the largest costs come from one
-mechanism, a lone assigned task admitted before the human starts it (59 correct, 9 not; both new planning cases below
-min_separation). Not settled there: how the meta-planner acts on an admitted hypothesis that can be wrong (an open
-design question); communication (T-D X). Numbers: analysis/kitting/mpb/tk5b/COMPARISON.md and WHATIF.md.
+knowledge off), has two parts. In the first ticks of a walk the evidence for two targets is nearly equal (18 ticks, the
+ratio within ×1.01 of 1, the smallest ×1.0008; no tick an exact tie); only this part is a limit of the situation. After
+it the evidence ranks the true task first, weakly at first and by about ×3 to ×14 at the end of the walk (×3.05 to
+×14.2), and the prior overrules it (293 ticks); this part follows from the declared strengths and the gate (questions S
+and G). 141 further wrong ticks have the evidence alone ranking the admitted hypothesis first (the off run admits most
+of them too). The ratios are reported with no cut between separating and not separating; ×1.01 is COMPARISON.md's
+reporting threshold. The largest gain and the largest costs come from one mechanism, a lone assigned task admitted
+before the human starts it (59 correct, 9 not; both new planning cases below min_separation). Not settled there: how
+the meta-planner acts on an admitted hypothesis that can be wrong (THE DESIGN DISCUSSION AFTER STEP 5B, below, not
+ruled); communication (T-D X). Numbers: analysis/kitting/mpb/tk5b/COMPARISON.md and WHATIF.md.
 TWO WHAT-IF READINGS, X AND Y (ccode, 4 October 2026, at Hadi's request; analysis/kitting/mpb/tk5b/WHATIF.md and
 whatif.py; filters on the recorded gate answers with context knowledge on of step 4 and step 5b's recognition set, not
 runs; no ruling). X: admissible only where the evidence alone ranks no other live hypothesis strictly above; Y:
@@ -3634,3 +3640,66 @@ admitted on a completion tick by 1 tick. Wrong admissions of kind (ii) (17 rows,
 both 11; of kind (iii) (26, 149): X 122, Y 72, both 55. scenario_s16_05's admission is refused by X (not by Y),
 scenario_s11_03's by Y (not by X), both by X and Y together. Changes of the answer within a true stretch: 673 recorded,
 653 X, 579 Y, 560 both.
+THE DESIGN DISCUSSION AFTER STEP 5B (the design chat with Hadi, 4 October 2026; recorded by ccode the same day). A
+DISCUSSION, NOT RULED. Hadi continues it in the next design chat and rules there. Nothing below carries a ruling
+number; each point is attributed. Rulings S (AM65) and G (AM66) stand as recorded until Hadi rules (their notes of
+4 October 2026, design_decisions.md, "T-K", under R3 and R7). No order of the remaining work is decided.
+- The problem as discussed. After an admission the meta-planner uses the projection of the admitted task alone. The
+  projection is the same for a belief of 0.76 and of 1.0, and the same with and without observation warrant. Context
+  knowledge makes the belief high earlier, also before any movement.
+- The changes discussed, with their labels:
+  - 1.A (prior): a larger ordinary strength only; 0.1 and 0.2 were named as values to compare; the raised and the
+    suppressed strengths stay.
+  - 2.A (gate): commitment warrant alone does not admit; observation warrant is required.
+  - 2.B (gate): the leader is admitted only if the evidence alone ranks no other hypothesis above it.
+  - 3.A (projection): an admitted task without observation warrant is projected as the human staying at the observed
+    position until the human moves.
+  - 3.B (meta-planner): the robot's plan is checked against the admitted task's projection and the fallback projection
+    together.
+  - 4.A (response): communication or slowing down when the admission is weak (T-D X).
+- Hadi's positions in the discussion (not rulings):
+  - Hadi does not want 3.B in this framework: it changes the meta-planner and mixes high-level planning with a lower
+    level; the framework's objective is IR → AP, to show what recognition contributes, not to run a perfect
+    simulation. Hadi sees 3.B as possibly part of future work on planning that uses the belief.
+  - A ruled decision can be reopened if there is a good reason. Hadi asked why 1.A is not reopened.
+  - Some admissions of a hypothesis that is not the true task are sound reasoning: the human did the less probable
+    thing.
+- The design chat's suggestions (not confirmed by Hadi):
+  - A principle for the gate: context knowledge may make an admission earlier; it may not admit a task that the
+    observation does not show.
+  - 2.A as necessary. With context knowledge on, the admission before movement gains 1 tick in the 59 correct cases and
+    produces the 11.3 cm case (scenario_s11_03). It would reverse the part of T-D G that admits an assigned task before
+    any movement.
+  - 1.A and 2.B as two candidates for the same problem (the prior overruling the evidence), to be decided from numbers.
+    Unknown for 2.B: how much gain it keeps, and whether the admission switches on and off at ratios near 1. For 1.A: a
+    new value needs an argument about its meaning from Hadi (by the proposed reading of a strength, AM39: 0.02, 1 of 51
+    task starts; 0.1, 1 of 11; 0.2, 1 of 6).
+  - 3.A not needed if 2.A is taken. 4.A as future work.
+  - The reasons it gave for looking at S and G again: its argument for S used an estimate (one walk shifts the belief
+    by a factor of 3 to 4) that the data corrected (12 to 14); its argument for G (a), that an evidence condition acts
+    on differences of 0.0002, holds only in the first ticks of a walk.
+  - Which measured case each change would cover. The standing human (scenario_s11_03, 11.3 cm): 2.A yes, 2.B no. The
+    walk to the A/C switch (scenario_s16_05, 28.3 cm): 2.A no; 2.B on a ratio of 1.003 to 1.09; 1.A at 0.2 yes (the
+    lone delivery's prior is 0.71, below the threshold, in a room with two foreseeable tasks). The wrong admissions of
+    43 to 60 ticks: 2.B after the first ticks; 1.A shortens them. The gap between plan and execution at a turn
+    (TODO-146) is a separate defect that none covers.
+  - A table that could inform the ruling, from existing outputs with no simulation run: the recognition sets under
+    2.A, under 2.B, under 1.A at 0.1 and at 0.2, and their combinations, each as gains kept, wrong admissions removed,
+    and switches within a stretch. For the strengths the oracle recomputes the belief, since the human's trajectories
+    do not depend on them. It would also serve as the sensitivity table that question S planned for the close.
+- Questions put to Hadi, unanswered: the direction for the gate and the prior; whether that table is wanted; whether
+  the coverage matrix of the planning set stays the matrix of the off setting with one added column for context
+  knowledge on, or new scenarios are authored; the order of the remaining work.
+- ccode's notes, facts from the repository for the next chat (no position):
+  - WHATIF.md (6f11c13) already holds part of that table. Its filter Y is 2.A and its filter X is 2.B (the evidence
+    alone ranks no other live hypothesis strictly above the leader, by more than 1e-9), each alone and together, on
+    step 4's 57 runs and step 5b's 17 recognition runs with context knowledge on. X keeps all 216 earlier admissions of
+    the true task; Y delays the 59 lone assigned tasks by 1 tick. Changes of the answer within a true stretch: 673
+    recorded, 653 under X, 579 under Y, 560 under both. Missing: 1.A and its combinations. With the robot idle the
+    belief, adequacy and warrant do not depend on the gate, so the filter's per-tick answer is the answer a run would
+    give; the decision record and the trigger rule are not recomputed.
+  - 2.A also reverses T-K's R7 as amended by AM5 (an assigned task may be admitted before any distinguishing movement,
+    on its commitment warrant) and KT11's RULED line for the expected directions (a lone live assigned task admitted
+    early on its commitment warrant).
+  - scenario_s16_05, the off run, the ratio of the A/C activation over deliver_item(item_4): ×1.0014 at tick 0 (the
+    admission), ×1.0029 at 1, ×1.09 at 25 and 26; the discussion's "1.003 to 1.09" starts at tick 1.

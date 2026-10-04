@@ -25,6 +25,10 @@ Updated 4 October 2026 after Hadi's rulings on the build's plan (AM42 to AM53; d
 Updated 4 October 2026 at the close of the design chat on T-K part 1's build plan (rulings AM40 to AM63): section 5
 brought to the state the next design chat starts from (its opening, 5.6, 5.7 and 5.10 rewritten); section 2's T-K
 paragraph; section 11 gains the rules Hadi set for the design chat on 4 October 2026.
+Updated 4 October 2026 after step 5b and the design discussion that followed it (the design chat with Hadi, not ruled):
+section 5's state rewritten (the build, steps 4, 5 and 5b, the reading for question G, the comparison, what remains
+with no order decided); 5.5, 5.6, 5.7 and 5.10 in line; 5.13 added (the discussion); section 2's T-K paragraph;
+section 11 gains the working rules Hadi set in that chat.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -101,8 +105,9 @@ behavioural analysis belongs to stage 2. Hadi wants stage 2's questions, rulings
 depth, one at a time.
 
 T-K part 1 runs now. Its design is ruled and recorded (2 to 4 October 2026), the build's plan included and approved
-(docs/handoffs/plan_T-K_part1.md). The first round of its tests, on kitting without context knowledge, is built and
-run. The mechanism is not built. Section 5 holds its state.
+(docs/handoffs/plan_T-K_part1.md). The mechanism is built, and kitting's tests with context knowledge on are run
+(steps 4, 5 and 5b). A design discussion that followed them (4 October 2026) is open and not ruled. dock_loading's part
+and the close remain. Section 5 holds its state.
 
 ---
 
@@ -195,23 +200,54 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 
 ## 5. T-K part 1: context knowledge (framework-wide: kitting and dock_loading)
 
-State at the close of 4 October 2026, written for a design chat that has read nothing else. [ruled]
-- Every decision for the build is ruled and the build's plan is approved: docs/handoffs/plan_T-K_part1.md, which
-  states the structure, the stages, what each stage's commit holds and how each is checked. The build has not started.
-- Steps 1 and 2 of 5.7 are done (the layouts with one A/C switch at most; the plan). The next design chat takes the
-  rest of T-K part 1 from step 3: the build by the approved plan, then the timelines and the runs with context
-  knowledge on, the planning cases, dock_loading's part, the close.
-- Its first act is the build prompt: build by the plan, stage by stage; stop and report on a failed check that is not
-  a plain defect, on something that cannot be built as ruled, or on a question that changes what is built; the how is
-  ccode's.
-- The rulings made in the design chat of 4 October 2026, in plain words: the setup states the default timeline of
-  context facts and a scenario may state its own, which replaces it whole; one setup per room; the tests compare
-  context knowledge off against on, each case labelled by the state the script meets; the gate compares the threshold
-  with the belief over the live hypotheses (with context knowledge on or off), the floor and the scaling by the pinned
-  hypotheses staying in the reported distribution only; the gate's change has its own commit and its own regenerated
-  baseline, and its stage reruns round 1 and kitting's recognition and planning sets with the new gate, replacing their
-  outputs; the A/C is switched on by a new action, switch_on; no condition of any task or action reads a timeline
-  fact. The records: design_decisions.md and design_records.md, "T-K", AM40 to AM63 and KT13, KT14.
+State at the close of 4 October 2026, after step 5b and the design discussion that followed it; written for a design
+chat that has read nothing else. [ruled unless marked]
+- The build (step 3 of 5.7) is done: b85494d to c62e7ea, eight stages by the approved plan, each checked against the
+  previous stage's outputs (design_records.md, "T-K", THE BUILD). Both run options, assignment_knowledge and
+  context_knowledge, are on by default. With context knowledge off every maintained log and instrument output is the
+  gate stage's except the named lines. Where it lives: 5.5.
+- Step 4, kitting with the idle robot, is done (a271c72, 32ce7ed, fffcffb, eec1903, f1ea2c4, caa708e;
+  analysis/kitting/irb/tk2/REPORT.md). The setups' default timeline break_time 178 to 300, the A/C scripts room_warm
+  from 150, and a scenario that is to meet another window states its own timeline. 59 runs, 0 disagreements with the
+  oracle. The deliveries are admitted earlier; the coffee break earlier inside break_time and later outside it.
+- Question S is ruled (AM65, 2daef04): the four strengths stay as ruled, not tuned to the movement evidence. Under
+  discussion again since 4 October 2026 (5.13); no change until Hadi rules.
+- The reading for question G (002e1ce; analysis/kitting/irb/tk2/REPORT.md, "The reading for question G"): the evidence
+  alone turns against an interrupted delivery 3 to 9 ticks after the human left, the trigger rule 3 to 8 ticks later;
+  a lone delivery admitted early lasts 43 to 60 ticks. Question G is ruled (AM66, 1fad437): the gate and the
+  retraction stay as ruled. Under discussion again since 4 October 2026 (5.13); no change until Hadi rules.
+- Step 5, the planning cases, is done (1fad437, 450dad5, cfbf778, 17cadf0; analysis/kitting/mpb/tk/REPORT.md). Five
+  cases on env_layout_18, 9 runs, 0 disagreements with the oracle. A gain as an earlier decision when the human acts
+  as the context makes probable (cases 1 and 3); a cost when the human acts against it (case 5: a pass at 28.3 cm with
+  the robot moving; case 4: no decision until the retraction at 43). Findings for TODO-146 and TODO-132 (a).
+- Step 5b, the existing kitting sets with context knowledge on, is done (aa73ce3, 398d890, 613803b, a519475;
+  analysis/kitting/mpb/tk5b/REPORT.md). 33 runs, 0 disagreements with the oracle; only the state with no raising fact
+  occurs. 12 of the planning set's 16 authored cases reached. In scenario_s11_03 the robot releases item_8 11.3 cm from
+  a standing human who never performs the assigned delivery admitted at tick 0.
+- The comparison of context knowledge on against off (374283c; analysis/kitting/mpb/tk5b/COMPARISON.md), from existing
+  outputs, no run. Three main numbers: the true task is admitted earlier in 206 of 325 true stretches (3005 ticks
+  earlier, 365 later); admissions of a hypothesis that is not the true task during modelled tasks, 17 off and 47 on
+  (114 and 504 gate ticks); in planning, completion better in 7 of 22 runs and worse in 2, and cases below
+  min_separation 2 off and 5 on. The scenarios are authored: the counts compare the settings and are no rate of
+  occurrence.
+- The limitation of admission from context and movement (docs/assumptions.md 6.4; 298b22e, 479c3c7, restated in two
+  parts in the records step after the discussion). In the first ticks of a walk the evidence for two targets is
+  nearly equal (18 ticks); only this part is a limit of the situation. After it the evidence ranks the true task
+  first, weakly at first and by about ×3 to ×14 at the end of the walk, and the prior overrules it (293 ticks); this
+  part follows from the declared strengths and the gate. The largest gain and the largest costs come from one
+  mechanism, a lone assigned task admitted before the human starts it (59 correct, 9 not; both new planning cases
+  below min_separation).
+- Two what-if readings, X and Y (6f11c13; analysis/kitting/mpb/tk5b/WHATIF.md): filters on the recorded gate answers,
+  not runs. X is the discussion's 2.B, Y its 2.A (5.13).
+- The design discussion that followed step 5b: 5.13. [open, not ruled]
+
+What remains of T-K part 1. A list; no order is decided. [open]
+- The open design question of 5.13: the gate and the prior after an admission (Hadi rules).
+- The table of 5.13, from existing outputs, if Hadi wants it.
+- If Hadi rules a change: its build, and new measurements.
+- dock_loading's part (5.7, step 6).
+- The close (5.7, step 7), with this file updated.
+The design chat suggested settling the design question before dock_loading's part. Hadi has not confirmed it.
 Where this section and the records disagree, the records win.
 
 T-K is context knowledge as a whole: a task of the pipeline, framework-wide (it concerns kitting and dock_loading
@@ -222,8 +258,10 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 ### 5.1 Where it is recorded
 
 - docs/design_decisions.md, the entry "T-K: context knowledge in the recognizer's belief": the conceptual part. R1 to
-  R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM64 (the amendments, each under the ruling it amends, the
-  record parts in design_records.md; AM40 to AM64 are of 4 October 2026: the timeline, the plan, the cross-check), the
+  R8 (the rulings), A1 to A7 (the assumptions), AM1 to AM66 (the amendments, each under the ruling it amends, the
+  record parts in design_records.md; AM40 to AM64 are of 4 October 2026: the timeline, the plan, the cross-check; AM65
+  question S under R3 and AM66 question G under R7, each with a NOTE of 4 October 2026 that it is under discussion
+  again), the
   corrections C1, C3 and C4. AM1 to AM9 come from the review of the records; AM10 to AM29 from content points 1 and 2
   (the block CONTENT POINTS 1 AND 2, after R8; that chat's A1 to A15 are AM10 to AM24, its B1 to B5 are AM25 to AM29);
   AM30 to AM33 from Hadi's rulings on ccode's report; AM34 from content point 3 (under AM11); a CLARIFIED line under
@@ -244,9 +282,15 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - docs/context_knowledge_method.md: the method of context knowledge at the state of AM35 to AM39, the concept, the
   formulas of the prior and worked examples. It is the statement of the prior that the build's plan reads. The records
   win where the two disagree; a ruling that changes the method updates it in the same records step (CLAUDE.md).
+- docs/design_records.md, "T-K", after the build: STEP 4, KITTING, THE IDLE ROBOT; QUESTION S, RULED; THE READING FOR
+  QUESTION G; QUESTION G, RULED; THE PLANNING CASES, RULED (KT15); STEP 5 (its stages and its result); STEP 5B; CONTEXT
+  KNOWLEDGE ON AGAINST OFF, AN OVERVIEW; THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT; TWO WHAT-IF READINGS, X
+  AND Y; THE DESIGN DISCUSSION AFTER STEP 5B (not ruled).
 - docs/assumptions.md 5.4 (the timeline's facts known exactly and at once; the source of a recency fact), 6.1 (given
   the task, the movement does not depend on the context), 6.2 (the declared and the actual duration match, a baseline
-  whose violation is a deviation), 6.3 (the declared durations are at a compressed demonstration scale).
+  whose violation is a deviation), 6.3 (the declared durations are at a compressed demonstration scale), 6.4 (an
+  admission of a hypothesis that is not the true task, read against the evidence alone: the first part a boundary,
+  the second part a consequence of the strengths and the gate).
 - TODOs: TODO-66 (the hardcoded context weight; the build closes it); TODO-144 (T-F; its time-scale item holds the
   recency finding); TODO-154 and TODO-155 [V1]; TODO-158 to TODO-161, TODO-163, TODO-164 [FW]; TODO-162 superseded
   (AM3).
@@ -477,7 +521,8 @@ What the rooms show:
 - env_layout_16: the movement recognises nothing in the cluster before the arrival (deliveries reach θ only on the
   carry back, the coffee break only during its wait, the A/C never).
 
-Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
+Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K. (The state before the build; superseded
+by the paragraph below.)
 
 THE MECHANISM IS BUILT (step 3, 4 October 2026; design_records.md, "T-K", THE BUILD, STAGES 1 AND 2 and THE BUILD,
 STAGES 3 TO 7; the state file `docs/handoffs/build_T-K_part1_state.md`): everything in 5.3, by the approved plan, in
@@ -499,8 +544,10 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
 
 - The mechanism: everything in 5.3, built by the approved plan (step 3). BUILT (4 October 2026; 5.5).
 - The timelines of the setups and of the scenarios that state their own; the runs with context knowledge on (step 4).
-- The planning cases (step 5).
-- dock_loading's part (step 6).
+  DONE for kitting (4 October 2026).
+- The planning cases (step 5). DONE (4 October 2026), with step 5b.
+- dock_loading's part (step 6). Not built.
+- Any change the discussion of 5.13 may lead to: nothing ruled, nothing built.
 
 ### 5.7 The steps from here
 
@@ -573,6 +620,9 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    cases reached; not reached: s10_08 (the cause boundary in place of replaced), s10_10 (E6), s11_01 (P6.1's trigger),
    s11_03 (D9; the robot delivers 11.3 cm from a standing human who never performs the assigned delivery admitted at
    tick 0). [done]
+   After step 5b: the comparison, the limitation (docs/assumptions.md 6.4), the what-if readings and the design
+   discussion (section 5's opening, 5.13). Steps 6 and 7 keep their numbers; their order against the open design
+   question of 5.13 is not decided. [open]
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]
@@ -645,6 +695,8 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
 
 ### 5.10 Open points the next chat must put to Hadi [open]
 
+ANSWERED on 4 October 2026 (steps 4 and 5): points 1, 2 and 3 below. Open: points 4, 5 and 6, and the questions of
+5.13.
 1. The expected directions for the runs with context knowledge on, restated before those runs (5.7, step 4).
 2. The windows of break_time and room_warm: the setups' defaults and the scenarios that state their own, authored from
    the foreseeable tasks' ticks ccode supplies. Hadi's addition (KT4, its ADDED line): the same activity under a window
@@ -698,6 +750,85 @@ the live hypotheses).
   enables (TODO-154).
 - Superseded for T-K part 1 by R1: Hadi's earlier sketch in which a context fact triggers a foreseeable task of the
   human or interrupts a task in progress.
+
+
+### 5.13 The design discussion of 4 October 2026 after step 5b [open, not ruled]
+
+The design chat discussed the results of steps 4, 5 and 5b with Hadi. Nothing was ruled. Hadi continues the
+discussion in the next design chat and rules there. No point below carries a ruling number. Each point is attributed:
+Hadi's position in the discussion, or the design chat's suggestion, not confirmed by Hadi. The rulings S (AM65, the
+strengths stay) and G (AM66, the gate and the retraction stay) stand as recorded until Hadi rules; each carries a note
+that it is under discussion again (design_decisions.md, "T-K", under R3 and R7). The record: design_records.md, "T-K",
+THE DESIGN DISCUSSION AFTER STEP 5B.
+
+The problem as discussed. After an admission the meta-planner uses the projection of the admitted task alone. The
+projection is the same for a belief of 0.76 and of 1.0, and the same with and without observation warrant. Context
+knowledge makes the belief high earlier, also before any movement.
+
+The changes discussed, with their labels:
+- 1.A (prior): a larger ordinary strength only. 0.1 and 0.2 were named as values to compare. The raised and the
+  suppressed strengths stay.
+- 2.A (gate): commitment warrant alone does not admit; observation warrant is required.
+- 2.B (gate): the leader is admitted only if the evidence alone ranks no other hypothesis above it.
+- 3.A (projection): an admitted task without observation warrant is projected as the human staying at the observed
+  position until the human moves.
+- 3.B (meta-planner): the robot's plan is checked against the admitted task's projection and the fallback projection
+  together.
+- 4.A (response): communication or slowing down when the admission is weak (T-D X).
+
+Hadi's positions in the discussion (not rulings):
+- Hadi does not want 3.B in this framework. It changes the meta-planner and mixes high-level planning with a lower
+  level. The framework's objective is IR → AP: to show what recognition contributes, not to run a perfect simulation.
+  Hadi sees 3.B as possibly part of future work on planning that uses the belief.
+- A ruled decision can be reopened if there is a good reason. Hadi asked why 1.A is not reopened.
+- Some admissions of a hypothesis that is not the true task are sound reasoning: the human did the less probable
+  thing.
+
+The design chat's suggestions (not confirmed by Hadi):
+- A principle for the gate: context knowledge may make an admission earlier; it may not admit a task that the
+  observation does not show.
+- 2.A as necessary. With context knowledge on, the admission before movement gains 1 tick in the 59 correct cases and
+  produces the 11.3 cm case (scenario_s11_03). It would reverse the part of T-D G that admits an assigned task before
+  any movement.
+- 1.A and 2.B as two candidates for the same problem (the prior overruling the evidence), to be decided from numbers.
+  Unknown for 2.B: how much gain it keeps, and whether the admission switches on and off at ratios near 1. For 1.A: a
+  new value needs an argument about its meaning from Hadi. By the proposed reading of a strength (AM39): 0.02 is 1 of
+  51 task starts; 0.1 is 1 of 11; 0.2 is 1 of 6.
+- 3.A is not needed if 2.A is taken. 4.A as future work.
+- The reasons it gave for looking at S and G again. Its argument for S used an estimate (one walk shifts the belief by
+  a factor of 3 to 4) that the data corrected (12 to 14). Its argument for G (a), that an evidence condition acts on
+  differences of 0.0002, holds only in the first ticks of a walk.
+- Which measured case each change would cover:
+  - the standing human (scenario_s11_03, 11.3 cm): 2.A yes, 2.B no;
+  - the walk to the A/C switch (scenario_s16_05, 28.3 cm): 2.A no; 2.B on a ratio of 1.003 to 1.09; 1.A at 0.2 yes
+    (the lone delivery's prior is 0.71, below the threshold, in a room with two foreseeable tasks);
+  - the wrong admissions of 43 to 60 ticks: 2.B after the first ticks; 1.A shortens them;
+  - the gap between plan and execution at a turn (TODO-146) is a separate defect that none covers.
+- A table that could inform the ruling, from existing outputs with no simulation run: the recognition sets under 2.A,
+  under 2.B, under 1.A at 0.1 and at 0.2, and their combinations, each as gains kept, wrong admissions removed, and
+  switches within a stretch. For the strengths the oracle recomputes the belief, since the human's trajectories do not
+  depend on them. It would also serve as the sensitivity table that question S planned for the close.
+
+Questions put to Hadi, unanswered:
+1. The direction for the gate and the prior.
+2. Whether that table is wanted.
+3. Whether the coverage matrix of the planning set stays the matrix of the off setting with one added column for
+   context knowledge on, or new scenarios are authored.
+4. The order of the remaining work.
+
+Facts from the repository for this discussion (ccode, the records step of 4 October 2026; no position):
+- WHATIF.md already holds part of that table. Its filter Y is 2.A and its filter X is 2.B (the evidence alone ranks no
+  other live hypothesis strictly above the leader, by more than 1e-9), each alone and together, on step 4's 57 runs
+  and step 5b's 17 recognition runs with context knowledge on. X keeps all 216 earlier admissions of the true task; Y
+  delays the 59 lone assigned tasks by 1 tick. Changes of the answer within a true stretch: 673 recorded, 653 under X,
+  579 under Y, 560 under both. Missing: 1.A and its combinations. With the robot idle, the belief, adequacy and warrant
+  do not depend on the gate, so a filter's per-tick answer is the answer a run would give; the decision record and the
+  trigger rule are not recomputed.
+- 2.A would also reverse T-K's R7 as amended by AM5 (an assigned task may be admitted before any distinguishing
+  movement, on its commitment warrant) and KT11's RULED line (a lone live assigned task admitted early on its
+  commitment warrant; 5.4).
+- scenario_s16_05, the run with context knowledge off: the ratio of the A/C activation over deliver_item(item_4) is
+  ×1.0014 at tick 0 (the admission), ×1.0029 at 1 and ×1.09 at 25 and 26.
 
 ---
 
@@ -866,6 +997,7 @@ injected at run time; one further test track on adaptation under conflict. T-K p
   projection, the planner's method selection, the triggers) are not changed without Hadi's ruling.
 - Prompts for Claude Code: the model and the session stated above the prompt; the step in the first line; what
   and why fixed, how left open; plain copiable text; one prompt at a time; commits on main, never a push.
+  SUPERSEDED IN PART (Hadi, 4 October 2026, below): the model to use stands as the first line inside each prompt.
 - Hadi reads recommendations quickly. A package ruled with one "ok" must state its consequential items
   separately and plainly.
 - A stage whose subject is conceptual is first discussed as research: the concept, its terms and its
@@ -901,3 +1033,14 @@ injected at run time; one further test track on adaptation under conflict. T-K p
 - Rule Hadi set on 4 October 2026 (also in CLAUDE.md, "Where to look"): a ruling that changes the method of context
   knowledge updates docs/context_knowledge_method.md in the same records step. ccode does not change the method itself;
   it flags a contradiction with its evidence, and Hadi rules. The records win where the two disagree.
+- Rules Hadi set on 4 October 2026 (the design chat after step 5b):
+  - A test or observation step needs no approval from Hadi. It runs on one model, with no pause between its stages.
+  - A new ccode session per step.
+  - When Hadi switches the model between stages, there is a pause at each stage boundary.
+  - A test step is told what is of most interest. When it is a basic check, it is kept to a few scenarios.
+  - The model to use stands as the first line inside each prompt.
+  - An overview of parts, steps and stages is one nested tree. "Step" is the handoff's numbering; "stage" is the
+    numbering inside a step.
+  - In a design discussion the design chat writes literally, in the framework's terms, in short sentences with short
+    examples. It gives no prompt and no task list unless asked.
+  - A suggestion of the design chat is not a ruling. The design chat does not treat it as one until Hadi confirms it.

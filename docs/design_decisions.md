@@ -5146,6 +5146,11 @@ exercises a raised strength.
   walk the prior outweighs the movement evidence. A table of step 4's cases under compressed values is a sensitivity
   analysis for the close of T-K part 1, not a candidate design. The finding and the table's place: the record ("T-K",
   QUESTION S, RULED).
+  NOTE (4 October 2026): under discussion again since 4 October 2026; no change until Hadi rules. Reason: the design
+  chat's argument for this ruling used an estimate (one walk shifts the belief by a factor of 3 to 4) that the data
+  of steps 4 and 5b corrected (×12 to ×14 at the end of a long walk; docs/assumptions.md 6.4), and Hadi asked why a
+  larger ordinary strength is not reopened. The discussion is recorded, not ruled: the record, "T-K", THE DESIGN
+  DISCUSSION AFTER STEP 5B.
 
 - R4, division inside assigned work: equal among the live assigned tasks, in T-K part 1.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -5212,6 +5217,11 @@ exercises a raised strength.
   context makes probable is caught late; the A/C case is not corrected by the movement at all (a delivery admitted
   early beside the switch stays admitted through the whole activation); the meta-planner keeps an admission 1 to 9
   ticks longer than the gate's tick-by-tick answer shows.
+  NOTE (4 October 2026): under discussion again since 4 October 2026; no change until Hadi rules. Reason: the design
+  chat's argument (a) for this ruling, that an evidence condition acts on differences of about 0.0002, holds only in
+  the first ticks of a walk; after them the evidence ranks the true task first, by about ×3 to ×14 at the end of the
+  walk, and the prior overrules it (docs/assumptions.md 6.4). The discussion is recorded, not ruled: the record,
+  "T-K", THE DESIGN DISCUSSION AFTER STEP 5B.
 
 - R8, the entry "Assigned-task pool is a support restriction, not a prior" is revised in one sentence. Kept: the
   assignment restricts the support and is not a weight. Revised: "every admissible hypothesis carries unit weight";
