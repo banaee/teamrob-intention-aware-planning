@@ -1,0 +1,16 @@
+# configs/kitting/irb/tk5b/scenario_s08_04.yaml — T-K part 1, step 5b (context knowledge on): the IRB's run file for scenario_s08_04, the same run as
+# configs/kitting/irb/scenario_s08_04.yaml (context knowledge off, the set's reference) but for context_knowledge (analysis/kitting/irb/tk5b/README.md).
+# The setup states no timeline, so no raising fact holds. steps: run.sh computes IRB.3b's rule from the replay and runs with it.
+#   analysis/instruments/irb/run.sh kitting -o analysis/kitting/irb/tk5b configs/kitting/irb/tk5b/scenario_s08_04.yaml
+domain: kitting
+layout: env_layout_10
+setup: env_setup_08
+scenario: scenario_s08_04
+steps: 282
+assignment_knowledge: true
+context_knowledge: true
+strategy: "single_task"
+gate_strategy: "none"
+cost_strategy: "realized"
+separation_stop: false
+test_level: 0.05
