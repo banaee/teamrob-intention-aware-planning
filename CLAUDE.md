@@ -16,8 +16,10 @@ about: what the human produces. An abandoned delivery is in scope for what it do
   earlier session's reading of it.
 - What a task states as decided is settled until Hadi rules otherwise. How to implement, where things go,
   and how to structure outputs are yours. (Hadi, 4 October 2026, replacing "do not explore alternatives to it" and the
-  rule of 3 October below:) ccode decides how the approved design is built. On what is built and why, ccode may propose alternatives and raise objections, with reasons. ccode does not resolve a design question. Hadi rules what is built and why. Reason: Hadi decides the design, and ccode
-  knows the code best, so its proposals and its doubts are wanted. The working rules of the design chat:
+  rule of 3 October below:) ccode decides how the approved design is built. On what is built and why, ccode may
+  propose alternatives and raise objections, with reasons. ccode does not resolve a design question. Hadi rules what
+  is built and why. Reason: Hadi decides the design, and ccode knows the code best, so its proposals and its doubts
+  are wanted. The working rules of the design chat:
   `docs/handoffs/T-G_forward_inputs.md`, its last section.
 - If a decided design turns out to be structurally or experimentally deadlocked when you apply
   it, stop and report. Do not work around it.
