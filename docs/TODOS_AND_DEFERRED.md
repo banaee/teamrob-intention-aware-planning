@@ -4000,6 +4000,12 @@ G-RECORDS (T-D G, ruled by Hadi, 29 Sept 2026; design_decisions.md, "T-D G: admi
   stand broke at 57; as built it re-decides at the projection's end, 87. The measured cost of its absence in this
   instance is the last hold's 30 ticks past the stay (holds 4, 8, 16, 32 at 27, 31, 39, 55). A measurement, not a
   ruling.
+  T-K PART 1, STEP 5 EVIDENCE (4 October 2026; analysis/kitting/mpb/tk/REPORT.md; recorded by Hadi's acceptance of
+  ccode's suggestion, step 5b): scenario_s16_03, context knowledge off, single_task. At the coffee break's boundary (72)
+  the decision rests on the fallback stand of the observed 31-tick stand, projected to 104, and sends a hold of 30; the
+  human leaves the machine at 74, and the robot holds 25 ticks while the human walks away, until deliver_item(item_4) is
+  admitted at 97 (completion 113). Both sides with context knowledge on end the stale hold at 73 by admitting the lone
+  delivery (completion 89 and 90). A measurement, not a ruling.
 - (b) CLOSED into X's occupied-target item (`docs/handoffs/handoff_G_X_onward.md` §5).
 - (c) CLOSED as answered: L5 B refuses on the boundary tick (no hypothesis is a member there), and the decision at
   b + 1 is AD1's.
@@ -4327,6 +4333,12 @@ the robot cannot correct by a report: it sees no executor cursor of the human. M
 The question: whether the human projection should resume from the recognized phase (the observed cursor: the phase
 advance E8 reads, the expected action the recognizer derives) instead of re-decomposing from the live world. Not the
 cause of the class-2 violations (the cross-pairing: the planned robot against the actual human keeps F1). Not built.
+T-K PART 1, STEP 5 MEASUREMENT, AT A TURN (4 October 2026; analysis/kitting/mpb/tk/REPORT.md, "What surprised";
+recorded by Hadi's acceptance of ccode's suggestion, step 5b): scenario_s16_01 and _02, context knowledge on,
+single_task, the human's turn at shelf_4. The admitted plan has the human stop at the arrival radius (145, -420) and
+leave at 47.1; the executed human walks on to (148, -438) and leaves at 48: about one tick and 18 cm on the human's side,
+with about 11 cm on the robot's (step quantisation). The planned minimum of 54.8 cm (s16_01) and 51.0 cm (s16_02)
+became an executed 41.7 cm and 29.3 cm, below min_separation (F1 violations at 49, 50 and at 48, 49).
 Files: shared/projection.py (project_human), shared/meta_planner.py (update_human_projection)
 Reference: design_decisions.md, "The meta-planner test-bed (MPB)", MPB-4's class-2 record; TODO-77; T-D R and E (E8, E9)
 
