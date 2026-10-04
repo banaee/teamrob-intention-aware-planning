@@ -167,6 +167,7 @@ from shared.types import (
     same_task,
     HypothesisAdequacy,
     ObservationWarrant,
+    EvidenceRank,
 )
 
 
@@ -216,13 +217,19 @@ class GateOutcome(Enum):
                             derived phase (G1);
     LEADER_UNWARRANTED      at theta and adequate, but the leader has no
                             warrant: neither commitment nor observation
-                            (T-D G, AD1, AD4).
+                            (T-D G, AD1, AD4);
+    LEADER_OUTRANKED        at theta, adequate and warranted, but the evidence
+                            alone ranks another live hypothesis strictly above
+                            the leader (T-K part 1, AM68, AM73: the recognizer's
+                            evidence rank, AM76). Asked last (D1), so every
+                            other refusal keeps its reason.
     """
     CLEARS = "clears"
     BELOW_THETA = "none(below_theta)"
     LEADER_NO_OBSERVATION = "none(leader_no_observation)"
     LEADER_INADEQUATE = "none(leader_inadequate)"
     LEADER_UNWARRANTED = "none(leader_unwarranted)"
+    LEADER_OUTRANKED = "none(leader_outranked)"
 
 
 class WarrantSource(Enum):
@@ -538,7 +545,7 @@ class MetaPlanner:
           - the belief does not clear the gate (_clears_gate(); the projector is
             not called; the refusal's reason is the gate's outcome: below theta,
             or the leader with no observation or inadequate in its own phase,
-            G1, or unwarranted, T-D G),
+            G1, or unwarranted, T-D G, or outranked, T-K part 1 AM68),
           - no human is observed (no human_agent_id),
           - the hypothesis cannot be resolved (project_human() returned None).
         On a refusal it returns the FALLBACK PROJECTION (T-D P, P4;
@@ -722,7 +729,13 @@ class MetaPlanner:
         commitment or observation that justifies admission (_warrant()). Asked
         in this order: theta, then the guard, then warrant, so a belief below
         theta refuses as it did before G1, and an inadequate leader as before
-        G (AD4: none(leader_unwarranted) after none(leader_inadequate)).
+        G (AD4: none(leader_unwarranted) after none(leader_inadequate)). Last,
+        the leader must not be OUTRANKED (T-K part 1, AM68): the evidence alone
+        ranks no other live hypothesis strictly above it, read as the leader's
+        categorical evidence rank (belief.evidence_rank, AM76), never the
+        evidence; a tie passes (AM75). Asked last (D1), so a log difference
+        shows AM68's effect alone: none(leader_outranked). A condition of
+        admission only: retention stays by identity (AM69).
         Both consumers ask this question and neither compares numbers itself:
           - evaluate_triggers(): `recognition_changed` asks it on its
             entering side only — a task hypothesis clears the gate while no
@@ -764,6 +777,8 @@ class MetaPlanner:
             return GateOutcome.LEADER_NO_OBSERVATION
         if not self._warrant(belief):
             return GateOutcome.LEADER_UNWARRANTED
+        if belief.evidence_rank.get(belief.most_likely) is EvidenceRank.OUTRANKED:
+            return GateOutcome.LEADER_OUTRANKED
         return GateOutcome.CLEARS
 
     def _warrant(self, belief: BeliefState) -> FrozenSet[WarrantSource]:

@@ -12,7 +12,8 @@ knowledge on (the plan's section 8) are not in this session.
 |---|---|---|
 | (rulings) | 3a4f00b | D1 to D7 recorded, the plan approved |
 | 0 | none (B0 at 3a4f00b, local) | all jobs exit 0; 0 oracle disagreements (s14_02's known print-precision flag apart); every MPB property holds; 352 tests; B0 byte-identical to the repository's outputs |
-| 1 | (this commit) | passed: 1298 output files identical to B0 after dropping `[IR-rank]` lines (logs, .rec, every instrument output); 54,816 `[IR-rank]` lines; the leader never outranked on 50,734 ticks (context off, F7); 359 tests |
+| 1 | 2c939a5 | passed: 1298 output files identical to B0 after dropping `[IR-rank]` lines (logs, .rec, every instrument output); 54,816 `[IR-rank]` lines; the leader never outranked on 50,734 ticks (context off, F7); 359 tests |
+| 2 | (this commit) | passed: 1298 output files byte-identical to stage 1 (context knowledge off: AM68 refuses nothing, F7); 365 tests |
 
 ## Where the outputs lie
 

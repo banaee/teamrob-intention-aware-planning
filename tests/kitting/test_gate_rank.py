@@ -8,6 +8,7 @@ above it; NOT_OUTRANKED otherwise, a tie included. The comparison is exact, with
 in hypothesis order; empty when exhausted.
 """
 import dataclasses
+import logging
 import math
 
 import pytest
@@ -16,7 +17,10 @@ import pytest
 from tests.kitting.test_td1_adequacy import H, SPEED, item, obs, recognizer
 from tests.kitting.test_td15_build import start_of
 from tests.kitting.test_th1_tree import model_for, registered
-from shared.types import BeliefState, EvidenceRank
+from domains.kitting.tasks import deliver_item
+from shared.meta_planner import DEFAULT_THETA, GateOutcome, MetaPlanner
+from shared.types import (AdequacyFinding, BeliefState, Const, EvidenceRank, ExecutorState, HypothesisAdequacy,
+                          ObservationWarrant, RecognizerLifecycle, TaskInstance, Var)
 from mesa_sim.world_state_builder import build_world_state
 
 OUT, NOT = EvidenceRank.OUTRANKED, EvidenceRank.NOT_OUTRANKED
@@ -99,3 +103,76 @@ def test_every_belief_states_the_rank():
     names = {f.name for f in dataclasses.fields(BeliefState) if f.default is dataclasses.MISSING
              and f.default_factory is dataclasses.MISSING}
     assert "evidence_rank" in names
+
+
+# ---------------------------------------------------------------------------
+# Stage 2: the gate refuses an outranked leader, asked last (AM68, D1)
+# ---------------------------------------------------------------------------
+
+A, I, N = HypothesisAdequacy.ADEQUATE, HypothesisAdequacy.INADEQUATE, HypothesisAdequacy.NO_OBSERVATION
+WN, WO = ObservationWarrant.NONE, ObservationWarrant.OBSERVATION
+I5, I2 = "deliver_item(?item=item_5)", "deliver_item(?item=item_2)"
+
+
+def belief(adequacy, warrant, rank, confidence=0.9, leader=I5):
+    rival = I2
+    return BeliefState(timestamp=0.0, agent_id=H, distribution={leader: confidence, rival: 1.0 - confidence},
+                       most_likely=leader, confidence=confidence, finding=AdequacyFinding.ADEQUATE,
+                       lifecycle=RecognizerLifecycle.LIVE, tails={}, hypothesis_adequacy={leader: adequacy, rival: A},
+                       observation_warrant={leader: warrant, rival: WO},
+                       evidence_rank={leader: rank, rival: NOT if rank is OUT else OUT}, episode_boundary=False)
+
+
+def planner(model):
+    """A meta-planner on the model's robot's parts; the gate's subject is the belief alone."""
+    robot = next(iter(model.robots.values()))
+    return MetaPlanner(task_model=robot.meta_planner._task_model, projector=robot.projector,
+                       recognizer=robot.recognizer, min_separation=50.0, human_agent_id=H)
+
+
+def test_an_outranked_leader_is_refused(model):
+    mp = planner(model)
+    assert mp._clears_gate(belief(A, WO, OUT)) is GateOutcome.LEADER_OUTRANKED
+    assert GateOutcome.LEADER_OUTRANKED.value == "none(leader_outranked)"
+
+
+def test_a_leader_tied_for_the_top_clears(model):
+    # a tie passes (AM75): NOT_OUTRANKED is the tie's value as well as the top's
+    assert planner(model)._clears_gate(belief(A, WO, NOT)) is GateOutcome.CLEARS
+
+
+def test_the_outranked_check_is_asked_last(model):
+    # D1: every other refusal keeps its reason when the leader is also outranked
+    mp = planner(model)
+    assert mp._clears_gate(belief(A, WO, OUT, confidence=DEFAULT_THETA - 0.01)) is GateOutcome.BELOW_THETA
+    assert mp._clears_gate(belief(I, WO, OUT)) is GateOutcome.LEADER_INADEQUATE
+    assert mp._clears_gate(belief(N, WO, OUT)) is GateOutcome.LEADER_NO_OBSERVATION
+    assert mp._clears_gate(belief(A, WN, OUT)) is GateOutcome.LEADER_UNWARRANTED
+
+
+def test_the_refusal_is_logged_and_nothing_is_recorded(model, caplog):
+    # the world as built carries no previous observation of the human, so no fallback: the reason alone
+    mp = planner(model)
+    with caplog.at_level(logging.INFO):
+        assert mp.update_human_projection(belief(A, WO, OUT), build_world_state(model)) is None
+    assert "projection=none(leader_outranked)" in caplog.text
+    assert mp._projected_hypothesis is None
+
+
+def test_the_entering_side_waits_while_the_leader_is_outranked(model):
+    # no record: recognition_changed does not fire on an outranked leader; once it is not outranked, it does
+    executing = ExecutorState(agent_id="robot_0", holding=None,
+                              current_task=TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4")}))
+    mp = planner(model)
+    w = build_world_state(model)
+    assert not mp.evaluate_triggers(belief(A, WO, OUT), w, executing).fired
+    assert mp.evaluate_triggers(belief(A, WO, NOT), w, executing).fired
+
+
+def test_an_admission_is_not_ended_by_the_rank(model):
+    # AM68 is a condition of admission only (AM69): a recorded leader that becomes outranked fires nothing
+    executing = ExecutorState(agent_id="robot_0", holding=None,
+                              current_task=TaskInstance(schema=deliver_item, bindings={Var("?item"): Const("item_4")}))
+    mp = planner(model)
+    mp._projected_hypothesis = I5
+    assert not mp.evaluate_triggers(belief(A, WO, OUT), build_world_state(model), executing).fired

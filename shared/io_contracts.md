@@ -151,8 +151,8 @@ adequacy (G1, T-D 1.5 rulings), and the lifecycle state. Since G-build (R3 as am
 warrant per live hypothesis is a further independent output (`observation_warrant`): not a kind of adequacy. The meta-planner reads `confidence`, `most_likely` and the
 leader's `hypothesis_adequacy` (its gate, `_clears_gate`, G1) and, since G-build, the leader's `observation_warrant`
 (the gate's warrant condition, T-D G); since the build of the gate rulings (T-K part 1, AM76) the evidence rank per
-live hypothesis is a fourth independent output (`evidence_rank`), and the gate reads the leader's value (AM68, its
-build's stage 2); it never reads alpha or `tails`, and never the evidence itself. `finding`, `lifecycle`
+live hypothesis is a fourth independent output (`evidence_rank`), and the gate reads the leader's value (AM68:
+`none(leader_outranked)`, asked last, D1); it never reads alpha or `tails`, and never the evidence itself. `finding`, `lifecycle`
 and `tails` exist for evaluation and for the rest of G.
 
 **Invariants:**
@@ -930,7 +930,12 @@ home; it reconstructs no recognizer quantity. Loss of observation warrant fires 
 "T-D G: admission". As built: `_clears_gate` asks θ, then the leader's adequacy (INADEQUATE, then NO_OBSERVATION), then
 `_warrant(belief) -> FrozenSet[WarrantSource]` (COMMITMENT: the leader resolved through `get_hypothesis()` and matched
 by `same_task` to an assigned task; OBSERVATION: `belief.observation_warrant[leader]`), refusing on an empty set;
-`update_human_projection()` reads `_warrant` again for its log only. The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
+`update_human_projection()` reads `_warrant` again for its log only.
+RULED (T-K part 1, AM68, AM73, AM76, 4 October 2026; BUILT in the gate rulings' build, stage 2): the gate also refuses
+a leader that is OUTRANKED (`belief.evidence_rank[leader]`, the recognizer's fourth output: the evidence alone ranks
+another live hypothesis strictly above it), `LEADER_OUTRANKED` (`none(leader_outranked)`), asked last, after
+`LEADER_UNWARRANTED` (D1), so every other refusal keeps its reason. A tie passes (AM75). A condition of admission only:
+retention stays by identity (AM69). With context knowledge off the leader is never outranked. The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
 and a margin gate (TODO-65) were considered and not taken; design_decisions.md, "The gate stays
 a fixed share".
 
@@ -1209,6 +1214,9 @@ RULED (T-D G, AD1, AD4, 29 September 2026; BUILT in G-build, 81a9f86): the gate'
 when both hold), as does `[meta-b2]` where that line exists (under `b2a` only). design_decisions.md, "T-D G:
 admission". As built: `projection=built warrant=commitment`, `warrant=observation` or `warrant=commitment,observation`;
 `[meta-b2]` prints the admission's reason, so it carries the same field.
+RULED (T-K part 1, AM68, AM73; BUILT in the gate rulings' build, stage 2): a further refusal reason,
+`none(leader_outranked)`, after `none(leader_unwarranted)`; on a refusal with a fallback, `fallback
+refused=none(leader_outranked)`.
 No `step` or `trigger` field: both belong to the caller and are recoverable from the
 `[meta-trig]` line of the same tick.
 

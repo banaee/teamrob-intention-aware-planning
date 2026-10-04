@@ -713,6 +713,10 @@ the tails; the finding and the lifecycle are for the rest of G and X (R5):
   on inadequacy. Measured at the G-build regeneration: prior on, the lone coffee_break at b + 1 on a standing tick is no
   longer admitted (scenario_s02_01 at 363, scenario_s05_01 / _02 at 142) or is admitted one tick later on its first
   step's gain (scenario_s03_06, 123 for 122); no prior-on completion moved.
+  SINCE THE GATE RULINGS' BUILD, STAGE 2 (T-K part 1, AM68, AM73): CLEARS also requires the leader not to be OUTRANKED
+  (`belief.evidence_rank[leader]`, AM76); a fourth refusal, LEADER_OUTRANKED (`none(leader_outranked)`), is asked last,
+  after LEADER_UNWARRANTED (D1). A tie passes (AM75); retention is untouched (AM69). With context knowledge off the
+  leader is never outranked, so no gate answer moves there.
   The gate's input changed meaning with R1 (the leader's share over H); the gate ruling
   (September 2026) stands and its justification is G's. Measured at the 1.5b and 1.5c regenerations
   (`analysis/td_stage1b/REPORT.md`): every boundary admission of a lone live task moves from the boundary tick to
@@ -733,7 +737,7 @@ the tails; the finding and the lifecycle are for the rest of G and X (R5):
 - `update_human_projection()` admits a projection only when the gate clears. It resolves the key through
   `recognizer.get_hypothesis()` (the same live instance, held by reference) to project the human's task, and
   records the hypothesis it projected. Its refusal reasons are `none(below_theta)`, `none(leader_no_observation)`,
-  `none(leader_inadequate)` (G1), `none(leader_unwarranted)` (T-D G), `none(no_human)` and `none(unprojectable)` (the projector could not resolve the
+  `none(leader_inadequate)` (G1), `none(leader_unwarranted)` (T-D G), `none(leader_outranked)` (T-K part 1, AM68), `none(no_human)` and `none(unprojectable)` (the projector could not resolve the
   task; `none(unresolved)` before the Stage 1 build). When the recognizer is exhausted it refuses as
   `none(below_theta)`.
 
