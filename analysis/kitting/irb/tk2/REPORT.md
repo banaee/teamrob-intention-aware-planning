@@ -127,9 +127,9 @@ Appendix B, last table; per run off against on.
   against 367 to 378); none on where room_warm raises the A/C that is still off (s15_17, s15_18; off 367 to 378 and 319
   to 330); none in P9, off and on. Every one is retracted as inadequate.
 - During modelled tasks, on only (beyond the early lone admissions in 1):
-  - a delivery admitted before a break begun inside it stays admitted a few ticks into the break, then is retracted
-    (s13_05, s13_06, s15_05, s15_06, s14_04, s14_05 and with the A/C s14_09, s14_10, s15_11, s15_12; 1 to 13 ticks):
-    off the same delivery had not reached θ before the break;
+  - a delivery interrupted by a foreseeable task begun inside it (s13_05, s13_06, s15_05, s15_06, s14_04, s14_05 and
+    with the A/C s14_09, s14_10, s15_11, s15_12): on admitted that delivery while it was the true task, where off never
+    did; after the human interrupted it, the admission lasted 1 to 13 ticks until the retraction;
   - with break_time raised from the start (s13_11, s13_12, s13_14), the coffee break is admitted 81 to 91 while the
     human walks to shelf_2, its neighbour, retracted at 92 (below θ);
   - s13_03, s15_03: item_4 admitted 150 to 161 while the human walks to the machine (no fact holds), retracted at 162;
@@ -149,8 +149,9 @@ Appendix B, last table; per run off against on.
 - With the A/C as the foreseeable task in a lone-delivery state (P4), the early admission of the delivery is never
   retracted by the movement: the switch stands beside shelf_4, and the gate stops only at the A/C's completion.
 - The end of the recency fact, not the window's opening, is where admitted deliveries lose the threshold in this set.
-- The early admission reaches several live deliveries too: a delivery reaches θ before the break begun inside it (3
-  live), so the break now begins with a wrong admission that off did not have.
+- The early admission reaches several live deliveries too (2 and 3 live): on admitted a delivery while it was the true
+  task, before a foreseeable task begun inside it, where off never did; after the human interrupted it, the admission
+  lasted 1 to 13 ticks until the retraction.
 - Under break_time the coffee break is admitted wrongly while the human walks to the shelf beside the machine (s13_11,
   s13_12, s13_14), though its prior stays below θ.
 
