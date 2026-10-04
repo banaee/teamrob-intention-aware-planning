@@ -33,6 +33,12 @@ about: what the human produces. An abandoned delivery is in scope for what it do
   - ccode's chat reports stay short: what was built, what it shows in plain words, what surprised, what it suggests.
     Detail goes into the files the task already produces (a room's notes, a set's README, a report the task asked
     for); this rule creates no new report file (workflow rule 6).
+- Rules Hadi set on 4 October 2026 (also `docs/handoffs/T-G_forward_inputs.md`, section 11, the design chat after
+  step 5b):
+  - A test or observation step needs no approval from Hadi. It runs on one model, with no pause between its stages.
+  - When Hadi switches the model between stages, there is a pause at each stage boundary.
+  - The model to use stands as the first line inside each prompt.
+  - A new ccode session per step.
 
 ## Where to look, and what to skip
 
