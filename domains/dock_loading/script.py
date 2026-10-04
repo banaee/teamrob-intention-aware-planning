@@ -16,11 +16,11 @@ its words. The script types and the event sugar (Script, RepeatableEntry, .at,
 
 from typing import Optional
 
-from shared.types import Const, TaskInstance
+from shared.types import Const, StateDeclaration, TaskInstance, Window
 from domains.dock_loading import tasks
 
 __all__ = ["deliver_pallet", "load_return", "confirm_delivered_pallet", "coffee_break", "office_break",
-           "go_to", "stand", "go_to_and_stand"]
+           "go_to", "stand", "go_to_and_stand", "window"]
 
 
 def deliver_pallet(pallet: str, bay: Optional[str] = None) -> TaskInstance:
@@ -76,3 +76,12 @@ def go_to_and_stand(landmark: str, duration: str) -> TaskInstance:
     landmark_var, duration_var = tasks.go_to_and_stand.parameters
     return TaskInstance(schema=tasks.go_to_and_stand,
                         bindings={landmark_var: Const(landmark), duration_var: Const(duration)})
+
+
+def window(fact: StateDeclaration, start: int, end: Optional[int] = None) -> Window:
+    """A window of a scenario's own timeline of context facts (T-K part 1, AM40, AM46): `fact`, one of the domain's
+    timeline facts (domains/dock_loading/facts.py), holds on the ticks start <= t < end; `end` omitted: to the run's
+    end. A scenario states its timeline as `timeline=Timeline((window(BREAK_TIME, 100, 200), ...))`; it replaces the
+    setup's whole."""
+    return Window(fact, start, end)
+

@@ -7,7 +7,7 @@ simulator-specific implementations.
 """
 
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Any, Set, Union
+from typing import Callable, Dict, FrozenSet, List, Optional, Sequence, Tuple, Any, Set, Union
 from enum import Enum
 
 
@@ -1045,6 +1045,89 @@ class AgentConfig:
             )
 
 
+@dataclass(frozen=True)
+class StateDeclaration:
+    """
+    One state the domain declares (T-G A5): a fact named `name`, about one
+    object of type `object_type` (is_empty(pallet)), or, with `object_type`
+    None, a fact about no object. Listed in the domain registry's "states"; the
+    setup's "states" block states which hold at the start (one not listed does
+    not hold); the environment holds the true facts and changes them when an
+    action that declares one as an effect or a retraction has run. Never a
+    physical fact (at, holding, obj_at, waited): those stay the simulator's
+    derivation.
+    A timeline fact (T-K part 1; P3, X5) has the same form, a fact about no
+    object, and is listed in the registry's "timeline_facts" instead: it holds
+    on the ticks of a window of the timeline in force (Timeline, below) and in
+    no other way; no condition of any schema names one (AM20, AM52, AM54).
+    """
+    name: str
+    object_type: Optional[str]
+
+
+@dataclass(frozen=True)
+class Window:
+    """
+    One window of a timeline of context facts (T-K part 1, AM40, AM46): the
+    timeline fact `fact` (a StateDeclaration about no object) holds in every
+    world state of tick t with start <= t < end, in ticks, half-open; `end`
+    None: to the run's end. Checked at construction: start >= 0, start < end.
+    """
+    fact: StateDeclaration
+    start: int
+    end: Optional[int] = None
+
+    def __post_init__(self):
+        if self.fact.object_type is not None:
+            raise ValueError(f"window on '{self.fact.name}': a timeline fact is a fact about no object, "
+                             f"not about type '{self.fact.object_type}'")
+        if isinstance(self.start, bool) or not isinstance(self.start, int) or self.start < 0:
+            raise ValueError(f"window on '{self.fact.name}': its start {self.start!r} is not a tick >= 0")
+        if self.end is not None and (isinstance(self.end, bool) or not isinstance(self.end, int)
+                                     or self.end <= self.start):
+            raise ValueError(f"window on '{self.fact.name}': its end {self.end!r} is not a tick after its start "
+                             f"{self.start}")
+
+    def holds_at(self, tick: int) -> bool:
+        return self.start <= tick and (self.end is None or tick < self.end)
+
+    def __str__(self):
+        return f"{self.fact.name} {self.start}..{'end' if self.end is None else self.end}"
+
+
+@dataclass(frozen=True)
+class Timeline:
+    """
+    A timeline of context facts (T-K part 1, AM34, AM40): its windows. Stated by
+    a setup (the default) or by a scenario (which replaces the setup's whole);
+    `Timeline(())` is a timeline stated empty. The environment applies the one in
+    force as a function of the tick (facts_at); the mind never reads this
+    object, only the facts in its world state (AM25). Checked at construction:
+    no two windows of one fact overlap (AM46).
+    """
+    windows: Tuple[Window, ...] = ()
+
+    def __post_init__(self):
+        for i, a in enumerate(self.windows):
+            for b in self.windows[i + 1:]:
+                if a.fact is b.fact and (a.end is None or b.start < a.end) and (b.end is None or a.start < b.end):
+                    raise ValueError(f"timeline: two windows of '{a.fact.name}' overlap: {a} and {b}")
+
+    def facts_at(self, tick: int) -> FrozenSet[Predicate]:
+        """The timeline facts that hold at `tick`: Predicate(name, ()) of every window holding it."""
+        return frozenset(Predicate(w.fact.name, ()) for w in self.windows if w.holds_at(tick))
+
+    def __str__(self):
+        return "[" + " ".join(str(w) for w in self.windows) + "]"
+
+
+class TimelineSource(Enum):
+    """Where the timeline in force comes from (AM40): the scenario's own, the setup's default, or none."""
+    SCENARIO = "scenario"
+    SETUP = "setup"
+    NONE = "none"
+
+
 @dataclass
 class ScenarioConfig:
     """
@@ -1060,6 +1143,8 @@ class ScenarioConfig:
     agents: List[AgentConfig]
     setup: str
     reference_layouts: List[str]
+    timeline: Optional[Timeline] = None   # the scenario's own timeline of context facts (AM40): None not stated
+                                          # (the setup's applies); Timeline(()) stated empty
 
     def __post_init__(self):
         if not self.reference_layouts:

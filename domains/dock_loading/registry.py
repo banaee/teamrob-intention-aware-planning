@@ -39,6 +39,10 @@ domain_config = {
     # registered by the files in their folders, the scenarios by discovery
     # over the scenarios package (domains/discovery.py) — no hand-written
     # list, a duplicate scenario id is an error at import.
+    # The timeline facts (T-K part 1; P3, X5): facts about no object that hold
+    # only on the ticks of a window of the timeline in force (AM40); no condition
+    # of a schema names one (the loader checks it).
+    "timeline_facts": [],
     "layouts":   discover_files(_HERE / "layouts"),
     "setups":    discover_files(_HERE / "setups"),
     "scenarios": discover_scenarios(_scenarios),

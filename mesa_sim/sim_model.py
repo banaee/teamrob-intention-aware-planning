@@ -36,8 +36,8 @@ from shared.knowledge import StateDeclaration, Tree, TaskModel
 from shared.planner import AdaptivePlanner
 from shared.recognizer import build_hypothesis_space
 from shared.types import (
-    Area, Const, GroundedAction, Predicate, ScenarioConfig, Start, TaskInstance, TaskSchema, check_task_bindings,
-    check_task_destinations, destination_derivations, task_instance_key,
+    Area, ConditionSchema, Const, GroundedAction, Predicate, ScenarioConfig, Start, TaskInstance, TaskSchema, Timeline,
+    TimelineSource, Window, check_task_bindings, check_task_destinations, destination_derivations, task_instance_key,
 )
 from world.human_executor import check_script
 from world.record import ClosingRef, OrdinaryRef, RepeatableRef, StillOpen
@@ -110,7 +110,8 @@ class SimModel(model.Model):
                  separation_stop: bool = False,
                  test_level: float = 0.05,
                  overrides: Sequence[Override] = (),
-                 state_declarations: Sequence[StateDeclaration] = ()):
+                 state_declarations: Sequence[StateDeclaration] = (),
+                 timeline_declarations: Sequence[StateDeclaration] = ()):
         super().__init__()
 
         # The two knowledge switches (T-K part 1, AM3, AM9, AM51): both stated by
@@ -211,9 +212,28 @@ class SimModel(model.Model):
             if declaration.name in self.state_declarations:
                 raise ValueError(f"the domain declares the state '{declaration.name}' twice")
             self.state_declarations[declaration.name] = declaration
+        # The timeline facts (T-K part 1, P3, X5): declared in their own list, so
+        # the loader can refuse them where AM20, AM50, AM52 and AM54 forbid them.
+        self.timeline_declarations: Dict[str, StateDeclaration] = {}
+        for declaration in timeline_declarations:
+            if declaration.object_type is not None:
+                raise ValueError(f"the domain declares the timeline fact '{declaration.name}' about type "
+                                 f"'{declaration.object_type}'; a timeline fact is a fact about no object")
+            if declaration.name in self.timeline_declarations or declaration.name in self.state_declarations:
+                raise ValueError(f"the domain declares '{declaration.name}' twice (as a timeline fact and a state, or "
+                                 f"twice as a timeline fact)")
+            self.timeline_declarations[declaration.name] = declaration
         self._check_declared_effects()
+        self._check_no_schema_reads_a_timeline_fact()
         self.state_facts: Set[Predicate] = set()
         self._init_states(env_setup.get("states", []), setup_path)
+        # The timeline in force (AM40): the scenario's own if it states one, else
+        # the setup's default, else none; applied by the builder as a function of
+        # the tick (P2). One resolution, here; AM41's override (TODO-177) becomes
+        # a branch before the other two.
+        setup_timeline = self._setup_timeline(env_setup, setup_path)
+        self.timeline, self.timeline_source = self._timeline_in_force(scenario, setup_timeline)
+        logger.info(f"[run_mesa] timeline source={self.timeline_source.value} windows={self.timeline}")
 
 
         # ------------------------------------------------------------------
@@ -402,6 +422,83 @@ class SimModel(model.Model):
                 raise ValueError(f"setup '{setup_path}': the state {fact} is listed twice")
             self.state_facts.add(fact)
 
+    def _setup_timeline(self, env_setup: dict, setup_path: str) -> Optional[Timeline]:
+        """
+        The setup's "timeline" list (AM34, AM40, AM46): one entry per window,
+        {"fact": <declared timeline fact>, "from": <tick>, "until": <tick>}, "until"
+        optional (to the run's end), resolved against the domain's timeline
+        facts. Absent: the setup has no timeline (None); []: an empty timeline.
+        Each entry is validated (Window, Timeline); an entry with another key or
+        an undeclared fact is an error naming the setup.
+        """
+        entries = env_setup.get("timeline")
+        if entries is None:
+            return None
+        windows = []
+        for entry in entries:
+            unknown = set(entry) - {"fact", "from", "until"}
+            if "fact" not in entry or "from" not in entry or unknown:
+                raise ValueError(
+                    f"setup '{setup_path}': timeline entry {entry} is not of the form "
+                    f"{{\"fact\": <name>, \"from\": <tick>, \"until\": <tick>}} (\"until\" optional)"
+                )
+            declaration = self.timeline_declarations.get(entry["fact"])
+            if declaration is None:
+                raise ValueError(f"setup '{setup_path}': timeline entry {entry}: '{entry['fact']}' is not a timeline "
+                                 f"fact the domain declares ({sorted(self.timeline_declarations)})")
+            try:
+                windows.append(Window(declaration, entry["from"], entry.get("until")))
+            except ValueError as e:
+                raise ValueError(f"setup '{setup_path}': {e}") from e
+        try:
+            return Timeline(tuple(windows))
+        except ValueError as e:
+            raise ValueError(f"setup '{setup_path}': {e}") from e
+
+    def _timeline_in_force(self, scenario: ScenarioConfig,
+                           setup_timeline: Optional[Timeline]) -> Tuple[Timeline, TimelineSource]:
+        """
+        The timeline in force (AM40): the scenario's own if it states one (stated
+        empty: no timeline fact holds), else the setup's if it has one, else none.
+        A scenario's window names a declared timeline fact by identity.
+        """
+        if scenario.timeline is not None:
+            for window in scenario.timeline.windows:
+                if not any(d is window.fact for d in self.timeline_declarations.values()):
+                    raise ValueError(f"scenario '{scenario.id}': its timeline names '{window.fact.name}', which is not "
+                                     f"a timeline fact this domain declares ({sorted(self.timeline_declarations)})")
+            return scenario.timeline, TimelineSource.SCENARIO
+        if setup_timeline is not None:
+            return setup_timeline, TimelineSource.SETUP
+        return Timeline(()), TimelineSource.NONE
+
+    def _check_no_schema_reads_a_timeline_fact(self):
+        """
+        No condition of any schema of the world's tree names a timeline fact
+        (AM20, AM32, AM52, AM54): no effect or retraction and no precondition or
+        completion condition of an action schema, no guard of a method. Read by
+        the condition's name against the declaration's, as _check_declared_effects
+        reads a state. The tree holds every schema of the robot's task model too.
+        Context knowledge never drives the human (R1).
+        """
+        names = self.timeline_declarations
+        for action in self.tree.get_all_actions():
+            places = (("an effect", action.effects), ("a retraction", action.retracts),
+                      ("a precondition", action.preconditions),
+                      ("the completion condition",
+                       [action.completion] if isinstance(action.completion, ConditionSchema) else []))
+            for place, conditions in places:
+                for condition in conditions:
+                    if condition.name in names:
+                        raise ValueError(f"action '{action.name}': {place} names the timeline fact "
+                                         f"'{condition.name}'; no condition of a schema reads a timeline fact")
+        for task in self.tree.task_schemas():
+            for method in task.methods:
+                for guard in method.guards:
+                    if guard.name in names:
+                        raise ValueError(f"task '{task.name}', method '{method.name}': a guard names the timeline "
+                                         f"fact '{guard.name}'; no condition of a schema reads a timeline fact")
+
     def _state_fact(self, name: str, obj_id: Optional[str]) -> Predicate:
         """
         The state fact `name` about `obj_id` (None: about no object), validated
@@ -409,6 +506,9 @@ class SimModel(model.Model):
         object of a type names an existing object of that type; a state about
         no object names none.
         """
+        if name in self.timeline_declarations:
+            raise ValueError(f"'{name}' is a timeline fact: it is stated by a timeline only (AM50; a fact that holds "
+                             f"from the start is a window from tick 0)")
         declaration = self.state_declarations.get(name)
         if declaration is None:
             raise ValueError(f"'{name}' is not a state the domain declares ({sorted(self.state_declarations)})")

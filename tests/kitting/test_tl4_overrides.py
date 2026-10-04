@@ -80,12 +80,15 @@ def test_the_cli_and_the_run_file_give_the_same_line(monkeypatch, caplog, tmp_pa
         f.write("\noverrides:\n  layout.shelf_2.position: [380, -120]\n")
     from_file = start_lines(monkeypatch, caplog, ["--run", str(run_file)])
     from_cli = start_lines(monkeypatch, caplog, ["--override", "layout.shelf_2.position=380,-120"])
-    # between the start line and the completion line
-    assert from_file[1:-1] == from_cli[1:-1] == ["[run_mesa] override layout.shelf_2.position=380.0,-120.0"]
+    # between the start line and the timeline line (T-K part 1, AM40), which the loader prints after the overrides
+    assert from_file[1:-2] == from_cli[1:-2] == ["[run_mesa] override layout.shelf_2.position=380.0,-120.0"]
+    assert from_file[-2] == from_cli[-2] == "[run_mesa] timeline source=none windows=[]"
 
 
 def test_no_override_prints_no_line(monkeypatch, caplog):
-    assert len(start_lines(monkeypatch, caplog, [])) == 2   # the start line and the completion line
+    # the start line, the timeline line (T-K part 1, AM40) and the completion line
+    lines = start_lines(monkeypatch, caplog, [])
+    assert len(lines) == 3 and lines[1].startswith("[run_mesa] timeline ")
 
 
 # ---------------------------------------------------------------- refused

@@ -49,6 +49,10 @@ PREDICATES GENERATED:
         fact about no object — every fact the environment holds
         (SimModel.state_facts), emitted as held; the builder derives none.
 
+    Timeline facts (T-K part 1):
+        Predicate(<timeline fact>, ()) for every window of the timeline in force
+        that holds at the tick (SimModel.timeline.facts_at).
+
 PREDICATE NAMING RATIONALE:
     "in_area" and "at" are intentionally distinct:
     - in_area(agent, area) — the agent's area, read by method guards (not by IR since I3)
@@ -197,6 +201,12 @@ def build_world_state(model: SimModel) -> WorldState:
     # The object states the environment holds (T-G A5; A6, assumptions 5.3)
     # ------------------------------------------------------------------
     predicates |= model.state_facts
+
+    # ------------------------------------------------------------------
+    # The timeline facts in force at this tick (T-K part 1, AM25, AM40, AM46):
+    # a function of the world state's own timestamp, never stored (P2)
+    # ------------------------------------------------------------------
+    predicates |= model.timeline.facts_at(int(timestamp))
 
     # ------------------------------------------------------------------
     # TODO Phase 4: derive additional predicates

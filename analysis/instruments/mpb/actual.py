@@ -73,7 +73,7 @@ def in_process(run_file, steps, strategy, prior):
     root.addHandler(collect)
     logging.getLogger("rec").propagate = False
     m = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
-                 state_declarations=domain_config["states"],
+                 state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup], assignment_knowledge=prior, strategy=strategy,
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],

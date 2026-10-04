@@ -297,6 +297,7 @@ def resolve_model_params(user_config: dict) -> dict:
         "register_fn":      domain["register_fn"],
         "task_model_schemas": domain["task_model"],
         "state_declarations": domain["states"],
+        "timeline_declarations": domain["timeline_facts"],
         "layout_path":      domain["layouts"][layout_id],
         "setup_path":       domain["setups"][setup_id],
         "assignment_knowledge": bool(user_config.get("assignment_knowledge", False)),

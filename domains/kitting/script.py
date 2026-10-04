@@ -16,10 +16,10 @@ Kitting's, not the world's: the functions name kitting's schemas and its words
 
 from typing import Optional
 
-from shared.types import Const, TaskInstance
+from shared.types import Const, StateDeclaration, TaskInstance, Window
 from domains.kitting import tasks
 
-__all__ = ["deliver_item", "coffee_break", "ac_activation", "go_to", "stand", "go_to_and_stand"]
+__all__ = ["deliver_item", "coffee_break", "ac_activation", "go_to", "stand", "go_to_and_stand", "window"]
 
 
 def deliver_item(item: str, table: Optional[str] = None) -> TaskInstance:
@@ -58,3 +58,12 @@ def go_to_and_stand(landmark: str, duration: str) -> TaskInstance:
     landmark_var, duration_var = tasks.go_to_and_stand.parameters
     return TaskInstance(schema=tasks.go_to_and_stand,
                         bindings={landmark_var: Const(landmark), duration_var: Const(duration)})
+
+
+def window(fact: StateDeclaration, start: int, end: Optional[int] = None) -> Window:
+    """A window of a scenario's own timeline of context facts (T-K part 1, AM40, AM46): `fact`, one of the domain's
+    timeline facts (domains/kitting/facts.py), holds on the ticks start <= t < end; `end` omitted: to the run's
+    end. A scenario states its timeline as `timeline=Timeline((window(BREAK_TIME, 100, 200), ...))`; it replaces the
+    setup's whole."""
+    return Window(fact, start, end)
+

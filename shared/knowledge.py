@@ -12,8 +12,9 @@ PURPOSE:
     - TaskModel:    one robot's task model, the subset of the tree the robot is
                     given, by whole schemas. The robot's recognizer, projector,
                     planner and meta-planner use it only.
-    - StateDeclaration: one object state the domain declares (T-G A5), in the
-                    registry's "states" list; the environment holds its facts.
+    - StateDeclaration: one state the domain declares (T-G A5), defined in
+                    shared/types.py (a timeline's Window names one) and
+                    re-exported here.
 
 WHAT THIS MODULE DOES:
     - Holds typed schema objects and answers queries with them, not strings
@@ -43,25 +44,9 @@ from dataclasses import dataclass
 from typing import Dict, FrozenSet, List, Optional, Sequence
 
 from shared.types import (
-    ActionSchema, ActionStep, HumanOnlyTask, LANDMARK_TYPE, TaskSchema, TaskStep, WorkTask,
+    ActionSchema, ActionStep, HumanOnlyTask, LANDMARK_TYPE, StateDeclaration, TaskSchema, TaskStep, WorkTask,
     destination_derivations,
 )
-
-
-@dataclass(frozen=True)
-class StateDeclaration:
-    """
-    One state the domain declares (T-G A5): a fact named `name`, about one
-    object of type `object_type` (is_empty(pallet)), or, with `object_type`
-    None, a fact about no object (the form admits it for context knowledge,
-    T-K part 1). Listed in the domain registry's "states"; the setup's "states"
-    block states which hold at the start (one not listed does not hold); the
-    environment holds the true facts and changes them when an action that
-    declares one as an effect or a retraction has run. Never a physical fact
-    (at, holding, obj_at, waited): those stay the simulator's derivation.
-    """
-    name: str
-    object_type: Optional[str]
 
 
 class ProceduralKnowledge:
