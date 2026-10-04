@@ -363,18 +363,21 @@ class Oracle:
         return "clears"
 
     def output(self, E):
-        """HB §1.7 (reading R2): normalise over H, the floor, the pinned keys at the floor, the live keys scaled to
-        1 − FLOOR·|pinned|; the context weight ω = 1 (inert: 21 °C, no run reaches 500 steps, HB §2)."""
+        """HB §1.7 (reading R2): the reported distribution P: normalise over H, the floor, the pinned keys at the
+        floor, the live keys scaled to 1 − FLOOR·|pinned|; the context weight ω = 1 (inert: 21 °C, no run reaches 500
+        steps, HB §2). The leader and its confidence (rule 28, T-K part 1, AM42): the argmax of the belief over H (E,
+        normalised over H, before the floor and the pins) and its value there, not P's."""
         pinned = [k for k in self.space if k not in E]
         P = {k: FLOOR for k in pinned}
         if E:
             tot = sum(E.values())
-            r = {k: max(v / tot, FLOOR) for k, v in E.items()}
+            B = {k: v / tot for k, v in E.items()}       # the belief over H (rule 28)
+            r = {k: max(v, FLOOR) for k, v in B.items()}
             sr = sum(r.values())
             P.update({k: v / sr * (1.0 - FLOOR * len(pinned)) for k, v in r.items()})
-            ml = max(sorted(E), key=lambda k: P[k])      # ties to the first live key in sorted order
-            return P, ml, P[ml]
-        return P, None, 0.0
+            ml = max(sorted(B), key=lambda k: B[k])      # ties to the first live key in sorted order
+            return P, B, ml, B[ml]
+        return P, {}, None, 0.0
 
     def adequacy(self, k, pos, world, boundary, advanced):
         """Membership as amended twice with the boundary-tick rule, reading R3 (DD E6, E8; HB §1.10); S (E5)."""
@@ -392,7 +395,7 @@ class Oracle:
 
 COLUMNS = ["tick", "human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence",
            "finding", "lifecycle", "pins", "reentries", "boundary", "gate", "key", "expected_action", "origin_x", "origin_y", "e",
-           "s", "s_exp", "D", "L", "evidence", "belief", "S", "member", "adequacy", "warrant"]
+           "s", "s_exp", "D", "L", "evidence", "belief", "belief_h", "S", "member", "adequacy", "warrant"]
 
 
 def run(traj, alpha, theta, domain_config):
@@ -400,7 +403,7 @@ def run(traj, alpha, theta, domain_config):
     rows, phases = [], {k: [] for k in orc.space}
     for r in traj["rows"]:
         world, E, pins, reentries, boundary, advanced, folds = orc.update(r)
-        P, ml, conf = orc.output(E)
+        P, B, ml, conf = orc.output(E)
         pos = (r["x"], r["y"])
         live = sorted(orc.base)
         per = {}
@@ -434,7 +437,7 @@ def run(traj, alpha, theta, domain_config):
             o = orc.origin[k][0]
             rows.append(dict(common, key=k, expected_action=label(orc.expected.get(k)), origin_x=o[0], origin_y=o[1],
                              e=ph["e"], s=ph["s"], s_exp=ph["s_exp"], D=ph["D"], L=ph["L"], evidence=E[k],
-                             belief=P[k], S=S, member=int(member), adequacy=adequacy, warrant=warrant))
+                             belief=P[k], belief_h=B[k], S=S, member=int(member), adequacy=adequacy, warrant=warrant))
     return rows, phases, sorted(orc.admissible)
 
 

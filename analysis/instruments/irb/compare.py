@@ -6,7 +6,8 @@ count compared and the count that disagrees, then every disagreement with its ti
 the clock starts, RobotAgent.observe_initial) has no log line and is not compared (reading R4).
 
 Categorical columns exactly (since G-build also `warrant`, the observation warrant per hypothesis, against both files,
-and `gate`, the gate's outcome per tick, against actual.csv only: the log carries no per-tick gate); numeric columns against actual.csv at relative tolerance 1e-9 (absolute 1e-12 near
+and `gate`, the gate's outcome per tick, against actual.csv only: the log carries no per-tick gate; since T-K part 1's
+gate stage `belief_h`, the belief over H per hypothesis, against actual.csv only); numeric columns against actual.csv at relative tolerance 1e-9 (absolute 1e-12 near
 zero), against actual_log.csv at half a unit of the printed digit (belief and confidence 5e-4, S 5e-5, position
 5e-3). The columns the recognizer does not output (expected_action, origin_x, origin_y, e, s, s_exp, D, L,
 evidence) are empty in both actual files and skipped.
@@ -22,8 +23,8 @@ import sys
 
 TICK = ["human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence", "finding",
         "lifecycle", "pins", "reentries", "boundary", "gate"]
-HYP = ["belief", "S", "member", "adequacy", "warrant"]
-NUMERIC = {"human_x", "human_y", "confidence", "belief", "S"}
+HYP = ["belief", "belief_h", "S", "member", "adequacy", "warrant"]
+NUMERIC = {"human_x", "human_y", "confidence", "belief", "belief_h", "S"}
 PRINTED = {"human_x": 5e-3, "human_y": 5e-3, "confidence": 5e-4, "belief": 5e-4, "S": 5e-5}
 LOG_COLUMNS = ["human_x", "human_y", "micro", "most_likely", "confidence", "finding", "lifecycle", "pins", "reentries",
                "boundary",

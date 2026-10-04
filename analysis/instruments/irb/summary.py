@@ -3,7 +3,8 @@
 summary.py — the tables REPORT.md quotes, per scenario (IRB.3b; layout-independent since IRB.4b), printed as markdown:
 the script's actions, the expected-action table (phases.json, from the oracle), the derived tick table of events, and
 the descriptive trends read from actual.csv (the in-process BeliefState): each true hypothesis's first tick at or
-above θ, each hypothesis's belief at the tick its S falls below α and the v·D that took it there, the finding's
+above θ (read on `belief_h`, the belief over H, the value the gate reads since T-K part 1's gate stage, AM42; the
+printed beliefs elsewhere are the reported distribution's), each hypothesis's belief at the tick its S falls below α and the v·D that took it there, the finding's
 transitions, every task started by an event (its start, its pin, the resumption), and the script's last entry (the
 exit walk by the authoring convention). v·D is recovered from the actual S (the inverse of E5's tail); its split into e
 and the standing charge v·(s − s_exp) is read from expected.csv, whose every compared column equals actual.csv
@@ -148,7 +149,8 @@ def main(d, log):
 
     # trends: the true hypothesis's first tick at or above theta, per stretch of ticks it is the truth
     out += ["True hypothesis and θ (actual): per contiguous stretch of ticks on which the hypothesis is the truth, its "
-            "first tick with belief ≥ θ, its belief and hypothesis adequacy there, and whether it leads.", "",
+            "first tick with belief ≥ θ (the belief over H, the value the gate reads; AM42), its belief and hypothesis "
+            "adequacy there, and whether it leads.", "",
             "| true hypothesis | ticks | first tick ≥ θ | belief | leads | hypothesis adequacy |", "|---|---|---|---|---|---|"]
     stretches, cur = [], None
     for t in range(T + 1):
@@ -164,12 +166,12 @@ def main(d, log):
         if k not in admissible:
             out.append(f"| {short(k)} | {a} to {b} | outside the support (at the floor) | - | - | - |")
             continue
-        hit = next((t for t in range(a, b + 1) if k in by[t] and float(by[t][k]["belief"]) >= THETA), None)
+        hit = next((t for t in range(a, b + 1) if k in by[t] and float(by[t][k]["belief_h"]) >= THETA), None)
         if hit is None:
             out.append(f"| {short(k)} | {a} to {b} | not reached | - | - | - |")
         else:
             r = by[hit][k]
-            out.append(f"| {short(k)} | {a} to {b} | {hit} | {float(r['belief']):.4f} | "
+            out.append(f"| {short(k)} | {a} to {b} | {hit} | {float(r['belief_h']):.4f} | "
                        f"{'yes' if r['most_likely'] == k else 'no'} | {r['adequacy']} |")
     out.append("")
 

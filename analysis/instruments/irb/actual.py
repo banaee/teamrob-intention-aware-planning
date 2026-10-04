@@ -19,6 +19,9 @@ Since G-build: the observation warrant per hypothesis (`BeliefState.observation_
 per tick, the robot's meta-planner's `_clears_gate` on that tick's BeliefState (the gate's one home; the idle robot of
 the test-bed asks admission at tick 0 only, so its answer is read here, not from the log).
 
+Since T-K part 1's gate stage (AM42): `belief_h`, the belief over H per hypothesis (`BeliefState.belief`, the value
+`confidence` reports for the leader and the gate reads), in actual.csv only (the log carries the leader's value alone).
+
 Nothing in the recognizer is read beyond its output. The columns the recognizer does not output are left empty in
 both files and skipped by the comparison: expected_action, origin_x, origin_y, e, s, s_exp, D, L, evidence.
 
@@ -174,7 +177,7 @@ def in_process(run_file, steps, alpha):
             rows.append(common)
         for k in live:
             S = b.tails.get(k)
-            rows.append(dict(common, key=k, belief=b.distribution[k], S=S, member=int(S is not None),
+            rows.append(dict(common, key=k, belief=b.distribution[k], belief_h=b.belief[k], S=S, member=int(S is not None),
                              adequacy=b.hypothesis_adequacy[k].value, warrant=b.observation_warrant[k].value))
     root.removeHandler(collect)
     return rows, [l for l in collect.lines if l.startswith("[IR")]

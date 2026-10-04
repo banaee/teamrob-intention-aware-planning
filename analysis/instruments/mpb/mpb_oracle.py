@@ -137,9 +137,10 @@ if __name__ == "__main__":
     rows, _, _ = ir.run(traj, alpha, theta, ir.domain_of(run_file))
     extra = {}
     for r in rows:
-        e = extra.setdefault(r["tick"], dict(belief={}, S={}, lifecycle=r.get("lifecycle")))
+        e = extra.setdefault(r["tick"], dict(belief={}, belief_h={}, S={}, lifecycle=r.get("lifecycle")))
         if r.get("key"):
             e["belief"][r["key"]] = r["belief"]
+            e["belief_h"][r["key"]] = r["belief_h"]          # the belief over H (T-K part 1, AM42)
             if r.get("S") not in (None, ""):
                 e["S"][r["key"]] = r["S"]
     written = json.load(open(sys.argv[4]))

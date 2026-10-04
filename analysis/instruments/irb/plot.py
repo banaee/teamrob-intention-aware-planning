@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-plot.py — one figure per scenario for the IRB (IRB.3b): the belief per hypothesis and S per hypothesis over
+plot.py — one figure per scenario for the IRB (IRB.3b): the belief per hypothesis (since T-K part 1's gate stage the
+belief over H, `belief_h`, the value the gate compares with θ; AM42) and S per hypothesis over
 ticks (expected as lines, actual as markers every fifth tick), the finding and the lifecycle as a band, and the
 script's action boundaries (trajectory.json) as thin vertical lines, the task starts labelled. Since G-build a fourth
 panel: per hypothesis, the ticks it holds observation warrant (expected as a bar, actual as a dot every tick), and the
@@ -73,7 +74,7 @@ def figure(d, exp, act, traj, THETA, alpha, keys, name, part):
     T = max(int(r["tick"]) for r in exp)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 8.6), sharex=True,
                                              gridspec_kw=dict(height_ratios=[3, 3, 0.45, 1.3], hspace=0.08))
-    for ax, col, ylabel in ((ax1, "belief", "belief"), (ax2, "S", "tail probability S")):
+    for ax, col, ylabel in ((ax1, "belief_h", "belief over H"), (ax2, "S", "tail probability S")):
         e, a = series(exp, col), series(act, col)
         for k in keys:
             ts = range(T + 1)

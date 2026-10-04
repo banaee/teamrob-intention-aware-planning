@@ -7,8 +7,9 @@ actual.csv, its run log); nothing is recomputed.
 A true stretch is summary.py's: a contiguous run of ticks on which the human's action belongs to one task whose
 [coverage] value is `covered`, the truth being that task's hypothesis key (unmodelled tasks and the idle human have
 none). Per stretch: its length in ticks; the live hypotheses at its first tick (the keys actual.csv holds there); and
-the delay, ticks from its first tick to the first on which the true hypothesis's belief is at or above θ (from the
-run's [run] header), or "never" within the stretch; a truth outside the support is marked so.
+the delay, ticks from its first tick to the first on which the true hypothesis's belief over H (`belief_h`, the value
+the gate reads; T-K part 1, AM42) is at or above θ (from the run's [run] header), or "never" within the stretch; a
+truth outside the support is marked so.
 
     baseline.py <set dir> [<set dir> ...]       prints one markdown table per room, then the summary counts
 """
@@ -51,7 +52,7 @@ def stretches(d, log):
         if k not in support:
             rows.append(dict(key=k, start=a, length=b - a + 1, live=live, delay="outside the support"))
             continue
-        hit = next((t for t in range(a, b + 1) if k in by[t] and float(by[t][k]["belief"]) >= THETA), None)
+        hit = next((t for t in range(a, b + 1) if k in by[t] and float(by[t][k]["belief_h"]) >= THETA), None)   # AM42
         rows.append(dict(key=k, start=a, length=b - a + 1, live=live, delay="never" if hit is None else hit - a))
     return traj["layout"], traj["scenario"], rows
 

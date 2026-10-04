@@ -10,7 +10,8 @@ A true stretch is a contiguous run of ticks on which the human's action belongs 
 (the trajectory's task, as a hypothesis key); the exit walk and the idle human have none. The scripts this is written
 for hold modelled tasks only, so this is summary.py's stretch without its [coverage] reading, and it needs no run log.
 Per stretch:
-- θ: the first tick with the true hypothesis's belief at or above θ, and its delay from the stretch's start;
+- θ: the first tick with the true hypothesis's belief over H (`belief_h`, the value the gate reads; T-K part 1, AM42)
+  at or above θ, and its delay from the stretch's start;
 - admitted: the first tick on which the gate clears with the true hypothesis leading (the idle robot asks admission at
   tick 0 only; the gate per tick is what admission would answer on that tick, as in summary.py's gate table);
 - after admission: the ticks of the stretch, from the admission to the true hypothesis's pin (its task's completion,
@@ -61,7 +62,7 @@ def stretches(d, name, theta):
             continue
         tick_row[t] = r
         if r["key"]:
-            by.setdefault(t, {})[r["key"]] = float(r["belief"])
+            by.setdefault(t, {})[r["key"]] = float(r["belief_h"])     # the belief over H, the gate's value (AM42)
     truth = {r["tick"]: (S.hypothesis_key(r["task"]) if r["task"] else None) for r in traj["rows"] if r["tick"] >= 0}
     out = []
     for k, (a, b) in ((k, ab) for k in set(truth.values()) if k

@@ -10,7 +10,9 @@ Saved as figure_ir.png beside figure.png, which stays the MPB's decisions-and-di
 
 The hypotheses drawn are the support's, the expected table's keys. The belief carries the output floor of the setup's
 robot items (held outside the support, each at the floor), so the support's shares sum to slightly less than 1, on the
-expected side and the actual side alike. Prior on only: prior off has no oracle table (MPB-6).
+expected side and the actual side alike. Since T-K part 1's gate stage (AM42) the belief panel draws the belief over
+H (`belief_h`, the value the gate compares with θ, without the floor and the pins), recorded on both sides. Prior on
+only: prior off has no oracle table (MPB-6).
 """
 import csv
 import json
@@ -23,7 +25,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[0] / "irb"))
 import plot as ir_plot                                  # analysis/irb/plot.py, unchanged
 
-COLUMNS = ["tick", "key", "belief", "S", "finding", "lifecycle", "gate", "warrant"]
+COLUMNS = ["tick", "key", "belief", "belief_h", "S", "finding", "lifecycle", "gate", "warrant"]
 
 
 def rows(ticks, keys, belief_of, s_of):
@@ -31,7 +33,8 @@ def rows(ticks, keys, belief_of, s_of):
     for t in ticks:
         for k in keys:
             s = s_of(t).get(k)
-            out.append(dict(tick=t["tick"], key=k, belief=belief_of(t).get(k, ""), S="" if s is None else s,
+            out.append(dict(tick=t["tick"], key=k, belief=belief_of(t).get(k, ""),
+                            belief_h=t.get("belief_h", {}).get(k, ""), S="" if s is None else s,
                             finding=t["finding"] or "", lifecycle=t["lifecycle"], gate=t["gate"],
                             warrant=t["observation_warrant"].get(k, "none")))
     return out

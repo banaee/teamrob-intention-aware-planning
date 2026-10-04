@@ -24,8 +24,9 @@ robot's position, microaction and held item; the human's position).
 
 Added at the MPB close-out (instrument only; never compared, compare.py reads its named fields):
 - actual_ticks.json, per tick: the belief of every hypothesis of the robot's BeliefState (the distribution, the setup's
-  robot items at the output floor included), the tail probability S of the adequacy test's members (`tails`) and the
-  lifecycle; plot_ir.py draws them.
+  robot items at the output floor included), the belief over H (`belief_h`, BeliefState.belief, since T-K part 1's gate
+  stage, AM42), the tail probability S of the adequacy test's members (`tails`) and the lifecycle; plot_ir.py draws
+  them.
 - actual_decisions.json, per admitted decision: the admitted human projection's segments (`human_segments`) and the
   winner's realized plan's segments (`robot_segments`, the hold before the first entry included), each as
   [start_step, end_step, start_pos, end_pos] on the projection clock, where step s is the end of world tick
@@ -136,7 +137,8 @@ def in_process(run_file, steps, strategy, prior):
                           adequacy={k: v.value for k, v in b.hypothesis_adequacy.items()},
                           observation_warrant={k: v.value for k, v in b.observation_warrant.items()},
                           record=mp._projected_hypothesis, evaluated=world is not None, perception=perception,
-                          belief=dict(b.distribution), S=dict(b.tails), lifecycle=b.lifecycle.value))
+                          belief=dict(b.distribution), belief_h=dict(b.belief), S=dict(b.tails),
+                          lifecycle=b.lifecycle.value))
         agents.append(dict(tick=t, robot=[float(robot.pos[0]), float(robot.pos[1])], micro=robot.current_microaction,
                            carrying=robot.carrying, task=None if robot.current_task_instance is None
                            else _key_task(robot.current_task_instance),
