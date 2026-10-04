@@ -534,7 +534,7 @@ Decisions
   discussion followed and is closed: Hadi ruled (4 October 2026; design_decisions.md, "T-K", AM67 to AM72 under R7 and
   R3; design_records.md, "T-K", THE GATE AFTER STEP 5B, RULED): observation warrant is required at admission for every
   hypothesis (commitment warrant alone no longer admits); the gate refuses a leader that the evidence alone ranks below
-  another live hypothesis (rank only, a tie passes; the term "outranked" proposed, not ruled); the end of an admission
+  another live hypothesis (rank only, an exact tie passes; the leader is "outranked", reported by the recognizer as a category per live hypothesis); the end of an admission
   and all strengths unchanged. Nothing built. Next: open. What remains (the build of AM67 and AM68, a plan step first
   in its own session; dock_loading's part (step 6); the close; the question on the planning set's coverage matrix) has
   no decided order (`docs/handoffs/T-G_forward_inputs.md`, section 5).

@@ -262,15 +262,15 @@ gate; how they are read in an evaluation.
   unchanged). Not taken: projecting an admission without observation warrant as the human staying, checking the plan
   against two projections together, communication on a weak admission (the last two possible future work, TODO-97,
   TODO-96).
-- The cases that remain are limitations, not defects (Hadi, 4 October 2026; AM72): the first ticks of a walk with equal
-  evidence; the evidence itself ranking another task first after the human interrupts a task (the 141 ticks above, in
+- The cases that remain are limitations, not defects (Hadi, 4 October 2026; AM72, its first case reworded by AM74): a
+  near-tie in the evidence that favours a hypothesis the human is not doing; the evidence itself ranking another task first after the human interrupts a task (the 141 ticks above, in
   part); the human doing the less probable task after a correct admission. Kind: boundary (framework scope). Hadi's
   principle: if the robot admits task X and the human does Y, the recognizer was not wrong for that reason; either the
   human did something unexpected given the modelled knowledge and the evidence, or the recognizer is limited. The
   framework shows what recognition contributes to adaptive planning and is not changed to make every run flawless.
-  ccode's note (the record, "T-K", THE GATE AFTER STEP 5B, RULED): the 18 measured ticks of the first part rank the true
-  task first by ×1.0008 to ×1.01, so AM68 refuses them; what remains of the first case is an exact tie with observation
-  warrant, or near-equal evidence that ranks the admitted hypothesis first.
+  Why the rewording (AM74): the first part's 18 measured ticks rank the true task first by ×1.0008 to ×1.01, so AM68
+  refuses them, and AM67 refuses the boundary tick before them; as first worded ("the first ticks of a walk with equal
+  evidence") the case does not occur in the measured sets.
 
 ## Rejected or dropped
 

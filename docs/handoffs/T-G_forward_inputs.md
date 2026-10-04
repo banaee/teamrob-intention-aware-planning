@@ -31,6 +31,8 @@ with no order decided); 5.5, 5.6, 5.7 and 5.10 in line; 5.13 added (the discussi
 section 11 gains the working rules Hadi set in that chat.
 Updated 4 October 2026 after Hadi's rulings that closed the design discussion after step 5b (AM67 to AM72): section 5's
 state, 5.1, 5.2, 5.4, 5.6, 5.7, 5.10 and 5.13 in line; section 2's T-K paragraph.
+Updated 4 October 2026 after Hadi's rulings on ccode's report of those records (AM73 to AM76: the term "outranked",
+the first limitation reworded, the exact tie, the recognizer's category; AM70's reason as corrected): 5.1 and 5.13.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -296,7 +298,8 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
   QUESTION G; QUESTION G, RULED; THE PLANNING CASES, RULED (KT15); STEP 5 (its stages and its result); STEP 5B; CONTEXT
   KNOWLEDGE ON AGAINST OFF, AN OVERVIEW; THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT; TWO WHAT-IF READINGS, X
   AND Y; THE DESIGN DISCUSSION AFTER STEP 5B (closed); THE GATE AFTER STEP 5B, RULED (AM67 to AM72: the measured
-  basis, what becomes stale, the proposed term "outranked", ccode's facts for the build's plan, what stays open).
+  basis, what becomes stale, the term "outranked", ccode's facts for the build's plan, what stays open; the rulings
+  on it, AM73 to AM76).
 - docs/assumptions.md 5.4 (the timeline's facts known exactly and at once; the source of a recency fact), 6.1 (given
   the task, the movement does not depend on the context), 6.2 (the declared and the actual duration match, a baseline
   whose violation is a deviation), 6.3 (the declared durations are at a compressed demonstration scale), 6.4 (an
@@ -794,21 +797,24 @@ Changes to the core stay minimal.
    evidence alone ranks below another live hypothesis. Rank only; a tie passes; no constant, no margin; a condition of
    admission only. Reason: context knowledge may make an admission earlier; it may not admit a task against the rank of
    the observed evidence; a margin would be a new constant. Not taken: the same condition as a ground for ending an
-   admission (it changes T-D L). The term is open: ccode proposes "outranked" and the refusal reason
-   none(leader_outranked). [open]
+   admission (it changes T-D L). The term (AM73): such a leader is outranked; the refusal reason
+   none(leader_outranked). The tie is an exact comparison, with no tolerance (AM75). The recognizer reports one
+   category per live hypothesis; the gate reads the leader's (AM76).
 3. AM69. The rule on when an admission ends (T-D L) is unchanged: an admission that was correct when made stays until
    the retraction. A stated limitation.
 4. AM70. All strengths stay as ruled: raised 2 (coffee_break) and 0.5 (ac_activation), ordinary 0.02, suppressed
    0.005; 1.A not taken. Reason: a strength is the designer's statement about a site, not chosen from test results;
-   with 1 and 2 the wrong admissions no longer depend on the value. The table at other values stays a sensitivity
-   analysis for the close.
+   with 1 and 2 which hypothesis is admitted no longer depends on the value; whether and how long a leader the
+   evidence ranks first stays at the threshold still does (the reason as ccode corrected it, accepted). The table at
+   other values stays a sensitivity analysis for the close.
 5. AM71. Not taken: 3.A, 3.B, 4.A. 3.B and 4.A are possible future work (TODO-97, TODO-96).
-6. AM72. The cases that remain are limitations, not defects: the first ticks of a walk with equal evidence; the
+6. AM72. The cases that remain are limitations, not defects: a near-tie in the evidence that favours a hypothesis the
+   human is not doing (AM74's wording); the
    evidence itself ranking another task first after the human interrupts a task; the human doing the less probable task
    after a correct admission (docs/assumptions.md 6.4).
 Open: the order of the remaining work; question 3 below (the planning set's coverage matrix); the build of AM67 and
 AM68, which starts with a plan step in its own session. ccode's facts for that plan: design_records.md, "T-K", THE GATE
-AFTER STEP 5B, RULED.
+AFTER STEP 5B, RULED. The plan: docs/handoffs/plan_T-K_gate.md (written 4 October 2026; awaiting confirmation).
 What follows is the discussion as recorded before the ruling.
 
 The design chat discussed the results of steps 4, 5 and 5b with Hadi. Nothing was ruled. Hadi continues the

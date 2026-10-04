@@ -3744,6 +3744,7 @@ nothing built.
 - The term, PROPOSED, NOT RULED (ccode, 4 October 2026; Hadi rules). AM68's condition has no glossary term. Proposed:
   "outranked": a live hypothesis is outranked when the evidence alone ranks another live hypothesis strictly above it;
   the refusal reason `none(leader_outranked)`. Recorded as proposed in docs/glossary.md §7.
+  RULED (AM73, Hadi, 4 October 2026): the term and the refusal reason are accepted; the proposed marks are removed.
 - Open, not ruled: the order of the remaining work; whether the planning set's coverage matrix stays the matrix of the
   off setting with one added column for context knowledge on, or new scenarios are authored; the build of AM67 and
   AM68, which starts with a plan step in its own session (BUILD DISCIPLINE).
@@ -3785,3 +3786,12 @@ nothing built.
   - AM70's reason. Under AM68 which hypothesis is admitted no longer depends on the strength values (the evidence must
     rank it first or tie). Whether and how long a leader the evidence ranks first stays at the threshold still does:
     the 55 ticks of kind (iii) left under X and Y are such admissions.
+- RULED ON THIS RECORD (Hadi, 4 October 2026; AM73 to AM76, the conceptual part in design_decisions.md, "T-K", under
+  R7 and R3). AM73: the term "outranked" and `none(leader_outranked)` accepted. AM74: AM72's first case reads "a
+  near-tie in the evidence that favours a hypothesis the human is not doing" (as first worded it does not occur: AM67
+  and AM68 refuse those ticks in the measured sets). AM75: "a tie passes" is an exact comparison, with no tolerance (no
+  number in the rule); the 1e-9 of WHATIF's filter X is a reading's agreement level, not the rule. AM76: for the
+  outranked condition the recognizer reports one category per live hypothesis, read by the gate for the leader only
+  (the gate reconstructs no recognizer quantity and receives no raw value); of the two options in ccode's facts above,
+  the second. ccode's correction of AM70's reason (the fact above) is accepted as recorded (design_decisions.md, under
+  R3's AM70, CORRECTED). The plan of the build: docs/handoffs/plan_T-K_gate.md.

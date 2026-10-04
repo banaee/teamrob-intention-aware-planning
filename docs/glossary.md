@@ -429,7 +429,7 @@ is the belief over H and `confidence` its leader's value; `_clears_gate` is unch
 `[meta-proj]` print it; `[IR-dist]` keeps the reported distribution.
 RULED, NOT BUILT (T-K part 1, AM67, AM68, Hadi, 4 October 2026): admission requires observation warrant for every
 hypothesis (commitment warrant alone no longer admits), and the gate refuses a leader that the evidence alone ranks
-below another live hypothesis (rank only, a tie passes; proposed term **outranked**, §7). Neither is asked for the end
+below another live hypothesis (rank only, a tie passes, by exact comparison; the leader is **outranked**, §7). Neither is asked for the end
 of an admission (AM69). design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM67, AM68.
 
 **β, u, ρ** — β the tolerance on wasted path in the movement likelihood (0.01 /cm, supplied by the
@@ -1232,14 +1232,15 @@ SUPERSEDED IN PART (AM67, Hadi, 4 October 2026; not built): commitment warrant a
 admission. "Warrants projecting it before movement" no longer holds: the prior states which task is probable; nothing
 states when the human starts. design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM67; "T-D G: admission", AD1's mark.
 
-**outranked** — PROPOSED TERM, NOT RULED (ccode, 4 October 2026; Hadi rules). A live hypothesis is outranked when the
+**outranked** (AM73, Hadi, 4 October 2026) — a live hypothesis is outranked when the
 evidence alone ranks another live hypothesis strictly above it. The evidence alone is E_t, the movement likelihood
 accumulated in the present episode over the live hypotheses, without the **prior** (§5; R2;
-`docs/context_knowledge_method.md`, section 7). Rank only: a tie is not outranked; no constant, no margin. The gate
-refuses an outranked leader (AM68; proposed refusal reason `none(leader_outranked)`), at admission only, never as the
-end of an admission (AM69). With context knowledge off the prior is equal and the belief's leader is never outranked.
-Neither adequacy nor warrant. Ruled as a condition, not built.
-→ design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM68.
+`docs/context_knowledge_method.md`, section 7). Rank only: a tie is not outranked; the comparison is exact, with no
+tolerance (AM75); no constant, no margin. The recognizer reports one category per live hypothesis (outranked or not,
+AM76); the gate reads it for the leader only and refuses an outranked leader (AM68; the refusal reason
+`none(leader_outranked)`), at admission only, never as the end of an admission (AM69). With context knowledge off the
+prior is equal and the belief's leader is never outranked. Neither adequacy nor warrant. Ruled, not built.
+→ design_decisions.md, "T-K: context knowledge in the recognizer's belief", R7's AM68, AM73, AM75, AM76.
 
 **unresolved** — the value of the **adequacy finding** while no live hypothesis is a member of the test: no live
 hypothesis's current derived phase holds an observation (E6, as amended twice). A phase holds an observation once it
@@ -1315,7 +1316,7 @@ adequacy, warrant); X adds nothing to admission, and X5 records when communicati
 design_decisions.md, "T-D G: admission", AD1; "T-D X: response", X5.
 RULED, NOT BUILT (T-K part 1, AM67, AM68, Hadi, 4 October 2026): admitted also means that the leader held observation
 warrant (commitment warrant alone no longer suffices) and that the evidence alone ranked no other live hypothesis above
-it (not **outranked**, above, a proposed term). An admission ends as before (AM69; "T-D L"). design_decisions.md,
+it (not **outranked**, above). An admission ends as before (AM69; "T-D L"). design_decisions.md,
 "T-K: context knowledge in the recognizer's belief", R7's AM67 to AM69.
 
 USAGE RULE, in prose:

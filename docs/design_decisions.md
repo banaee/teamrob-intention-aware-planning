@@ -4473,6 +4473,8 @@ every boundary that meets a recorded decision (TODO-119's G part).
   meta-planner for it decide no admission; whether they stay, for the log of AD4, is the build plan's question. AM68
   needs a recognizer output that the gate reads for the leader, since the gate reconstructs no recognizer quantity;
   which output is the build plan's (design_records.md, "T-K", THE GATE AFTER STEP 5B, RULED, ccode's facts).
+  RULED (AM76, Hadi, 4 October 2026): one category per live hypothesis, read for the leader only ("T-K: context
+  knowledge in the recognizer's belief", R7, AM76).
 
 - AD3, loss of warrant.
   Ruling. Loss of observation warrant fires nothing and clears no admitted projection. Retraction stays on the
@@ -5019,8 +5021,12 @@ at admission, for every hypothesis), AM68 (the gate refuses a leader that the ev
 hypothesis), AM69 (the end of an admission unchanged, a stated limitation), AM71 (the changes not taken) and AM72 (the
 cases that remain are limitations). Under R3: AM70 (the strengths stay). The notes that AM65 and AM66 were under
 discussion again are resolved. In the record ("T-K", THE GATE AFTER STEP 5B, RULED): the measured basis, what becomes
-stale, the proposed term, ccode's facts for the build's plan, what stays open. AM67 and AM68 are not built; their build
+stale, the term, ccode's facts for the build's plan, what stays open. AM67 and AM68 are not built; their build
 starts with a plan step in its own session.
+AMENDED (Hadi, 4 October 2026, on ccode's report of the records of AM67 to AM72; AM73 to AM76): under R7, AM73 the term
+"outranked" and the refusal reason `none(leader_outranked)`, AM75 the tie an exact comparison, AM76 the recognizer's
+category per live hypothesis (each under AM68), AM74 the first limitation reworded (under AM72); under R3, AM70's
+reason as ccode corrected it, accepted. Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -5185,6 +5191,10 @@ starts with a plan step in its own session.
   Reason: a strength is the designer's statement about a site; it is not chosen from test results. With AM67 and AM68
   (under R7) the admissions of a hypothesis that is not the true task no longer depend on the value. The table of the
   cases at other values stays a sensitivity analysis for the close of T-K part 1 (AM65).
+  CORRECTED (Hadi, 4 October 2026, accepting ccode's correction; the record, "T-K", THE GATE AFTER STEP 5B, RULED,
+  ccode's facts), the reason's second sentence reads: with AM67 and AM68, which hypothesis is admitted no longer depends
+  on the strength values (the evidence must rank it first or tie). Whether and how long a leader that the evidence
+  ranks first stays at the threshold still depends on them.
 
 - R4, division inside assigned work: equal among the live assigned tasks, in T-K part 1.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -5289,8 +5299,8 @@ starts with a plan step in its own session.
   gate refuses a leader (the hypothesis with the highest belief) that the evidence alone ranks below another live
   hypothesis. Rank only: a tie passes. No constant, no margin. It is a condition of admission only. The evidence alone
   is E_t of R2, the movement likelihood accumulated in the present episode over the live hypotheses, without the prior
-  (`docs/context_knowledge_method.md`, section 7). PROPOSED, NOT RULED (ccode, 4 October 2026; Hadi rules): the term
-  "outranked" for a leader so ranked, and the refusal reason `none(leader_outranked)` (`docs/glossary.md` §7).
+  (`docs/context_knowledge_method.md`, section 7). The term: such a leader is outranked; the refusal reason
+  `none(leader_outranked)` (AM73 below; `docs/glossary.md` §7).
   Reason: context knowledge may make an admission earlier. It may not admit a task against the rank of the observed
   evidence. A margin would be a new constant, which the gate has avoided before (no threshold on the path gain, "T-D
   G: admission", AD1, its Set aside).
@@ -5300,6 +5310,15 @@ starts with a plan step in its own session.
   condition refuses nothing. On the first walking tick after a boundary the evidence's rank can rest on a difference of
   about 0.0003 (scenario_s14_19 at 181: 0.333484 against 0.333225), the case the first reason of AM66 named; the
   ruling takes the rank as it is. Not built.
+  RULED (AM73, Hadi, 4 October 2026, on ccode's proposal), the term: a live hypothesis is outranked when the evidence
+  alone ranks another live hypothesis strictly above it. The gate's refusal reason for an outranked leader is
+  `none(leader_outranked)`.
+  RULED (AM75, Hadi, 4 October 2026), the tie: "a tie passes" is an exact comparison, with no tolerance. Reason: no
+  number in the rule.
+  RULED (AM76, Hadi, 4 October 2026), what the recognizer reports: for the outranked condition the recognizer reports
+  one category per live hypothesis. The gate reads it for the leader only, as it reads hypothesis adequacy and
+  observation warrant. Reason: the gate reconstructs no recognizer quantity and receives no raw value ("T-D G:
+  admission", AD2; G1).
 
   RULED (AM69, Hadi, 4 October 2026), the end of an admission: the rule on when an admission ends ("T-D L: the belief
   lifecycle"; D2) is unchanged. An admission that was correct when made stays until the retraction, as today. This is a
@@ -5315,6 +5334,9 @@ starts with a plan step in its own session.
   RULED (AM72, Hadi, 4 October 2026): the cases that remain are limitations, not defects: the first ticks of a walk with
   equal evidence; the evidence itself ranking another task first after the human interrupts a task; the human doing
   the less probable task after a correct admission. Recorded in `docs/assumptions.md` 6.4.
+  AMENDED (AM74, Hadi, 4 October 2026), the first case reworded: "the first ticks of a walk with equal evidence" reads
+  "a near-tie in the evidence that favours a hypothesis the human is not doing". Reason: as first worded the case does
+  not occur; AM67 and AM68 refuse those ticks in the measured sets.
 
 - R8, the entry "Assigned-task pool is a support restriction, not a prior" is revised in one sentence. Kept: the
   assignment restricts the support and is not a weight. Revised: "every admissible hypothesis carries unit weight";

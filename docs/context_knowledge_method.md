@@ -142,7 +142,7 @@ The meta-planner admits the leading hypothesis $h^*$ when four conditions hold (
 1. $P_t(h^*) \ge \theta$, with $\theta = 0.75$. $P_t$ is the belief over the live hypotheses of section 7, with context knowledge on or off; the floor and the scaling by the pinned hypotheses stay in the reported distribution only (AM42).
 2. It is adequate: the observed movement does not contradict it. A hypothesis turns inadequate after about 334 cm of excess path, or after 17 ticks of standing.
 3. It has observation warrant, whether it is an assigned task or a foreseeable task (AM67). Observation warrant has two sources. The first is the path-cost gain toward the target: the human's path cost to the task's target has decreased since the start of the present phase. One step that brings the human closer satisfies it. The second is the observed completion of the hypothesis's previous step, which entered the present phase. In a phase without a movement target (a wait), the second is the only source. Commitment warrant, from the assignment, no longer admits: the prior states which task is probable, and nothing states when the human starts.
-4. The evidence alone does not rank another live hypothesis above it (AM68): no $h \in H_t$ has $E_t(h) > E_t(h^*)$, with $E_t$ of section 7. Rank only: a tie passes; no constant, no margin. With context knowledge off the prior is equal, so the belief's leader is the evidence's leader and this condition refuses nothing. A leader that fails it is called outranked (a proposed term, not ruled).
+4. The evidence alone does not rank another live hypothesis above it (AM68): no $h \in H_t$ has $E_t(h) > E_t(h^*)$, with $E_t$ of section 7. Rank only: a tie passes; no constant, no margin. With context knowledge off the prior is equal, so the belief's leader is the evidence's leader and this condition refuses nothing. A leader that fails it is outranked (AM73). The comparison is exact, with no tolerance (AM75). The recognizer reports one category per live hypothesis, outranked or not, and the gate reads the leader's (AM76).
 
 What context knowledge can do at the gate: make an admission earlier, by bringing a leader that the evidence already ranks first, or ties, to the threshold sooner. It cannot admit a task against the rank of the observed evidence, and no task is admitted before an observation warrants it.
 
@@ -301,10 +301,11 @@ Consequences to measure, not reasons to adjust the design:
   movement evidence. A table of step 4's cases under compressed values is a sensitivity analysis for the close of T-K
   part 1, not a candidate design.
   Ruled again after step 5b (AM70, 4 October 2026): all strengths stay; a larger ordinary strength was discussed and not
-  taken. A strength is the designer's statement about a site, not chosen from test results; with AM67 and AM68 the
-  admissions of a hypothesis that is not the true task no longer depend on the value.
-- The cases that remain are limitations, not defects (AM72, 4 October 2026): the first ticks of a walk with equal
-  evidence; the evidence itself ranking another task first after the human interrupts a task; the human doing the less
+  taken. A strength is the designer's statement about a site, not chosen from test results; with AM67 and AM68 which
+  hypothesis is admitted no longer depends on the value, while whether and how long a leader the evidence ranks first
+  stays at the threshold still does (AM70's reason as corrected).
+- The cases that remain are limitations, not defects (AM72, 4 October 2026; AM74): a near-tie in the evidence that
+  favours a hypothesis the human is not doing; the evidence itself ranking another task first after the human interrupts a task; the human doing the less
   probable task after a correct admission. An admission that was correct when made stays until the retraction (AM69).
 
 Open questions:
