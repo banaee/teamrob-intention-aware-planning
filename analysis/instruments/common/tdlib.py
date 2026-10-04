@@ -100,6 +100,9 @@ def parse(path):
       triggers  every [meta-trig]: (step, trigger, cause)
       known     the [IR-assignment] known list (strings, as logged; `[IR-prior] switch=` before T-K part 1's
                 rename, AM9); prior 'on' | 'off' (the assignment knowledge)
+      context   step -> dict(facts [str], recent [task names], levels {task name: level}, prior {key: pi, 4 decimals})
+                from the [IR-context] lines (T-K part 1, stage 5; absent with context knowledge off)
+      timeline  the `[run_mesa] timeline source=... windows=[...]` line's text after the tag (None before stage 4)
       coverage  task string -> coverage value ([coverage] lines)
       human, robot  step -> (action, micro, (x, y), task)
       decisions list of dict(step, trigger, proj, conf_proj, winner, queue, b3, holds) — one per [meta] line
@@ -114,6 +117,7 @@ def parse(path):
     human, robot = {}, {}
     decisions, holds = [], []
     known, prior, header, done = [], None, {}, None
+    context, timeline = {}, None
     trig = proj = b3 = None
     for l in open(path, errors="replace"):
         l = l.rstrip("\n")
@@ -142,6 +146,12 @@ def parse(path):
         elif l.startswith("[IR-assignment]"):
             prior = re.search(r"knowledge=(\w+)", l)[1]
             known = re.findall(r"'([^']+)'", l)
+        elif l.startswith("[IR-context]"):
+            m = re.match(r"\[IR-context\] step=(-?\d+) facts=\[(.*?)\] recent=\[(.*?)\] levels=\[(.*?)\] prior=\[(.*)\]$", l)
+            context[int(m[1])] = dict(facts=m[2].split(), recent=m[3].split(),
+                                      levels=dict(x.split("=") for x in m[4].split()), prior=_kv(m[5]) if m[5] else {})
+        elif l.startswith("[run_mesa] timeline "):
+            timeline = l[len("[run_mesa] timeline "):]
         elif l.startswith("[coverage]"):
             m = re.match(r"\[coverage\] \S+ \S+ entry=\d+ (\S+?\))=(\S+)$", l)
             cov[m[1]] = m[2]
@@ -177,7 +187,7 @@ def parse(path):
     return dict(ir=ir, dist=dist, complete=complete, boundary=boundary, known=known, prior=prior, coverage=cov,
                 human=human, robot=robot, decisions=decisions, holds=holds, done=done, header=header,
                 pins=pins, reentries=reentries, boundary_action=boundary_action, triggers=triggers,
-                inapplicable=inapplicable)
+                inapplicable=inapplicable, context=context, timeline=timeline)
 
 
 def retired(log, key, t):

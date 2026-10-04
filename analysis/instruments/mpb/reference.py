@@ -63,6 +63,7 @@ def run(run_file, steps, strategy):
     logging.getLogger("rec").propagate = False
     m = SimModel(scenario=reference_scenario(scenario), register_fn=domain_config["register_fn"],
                  state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
+                 declared_context=domain_config["context_knowledge"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
                  assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=strategy,

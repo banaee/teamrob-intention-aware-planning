@@ -484,3 +484,33 @@ c3515ed75407562597852c6bf654c806  runs/env_layout_11_scenario_s09_10_on.rec
 fd3f36430463c7e087a40103e8032899  runs/env_layout_11_scenario_s09_13_on.log
 739ce3199f341516687bfc7701b29143  runs/env_layout_11_scenario_s09_13_on.rec
 ```
+
+## T-K part 1, build stage 6: the prior from context knowledge in the generator (4 October 2026)
+
+With context knowledge on (the run file's `context_knowledge`, or `run.sh --context on|off`), the generator derives
+the prior from the domain's declared context knowledge (its registry's `"context_knowledge"`, read as the task model
+is) and the method document (`docs/context_knowledge_method.md`), nothing from `shared/recognizer.py`; off, every
+weight is 1 (the equal prior, ω's place in rule 15). Rules, with their sources:
+
+| # | rule (new) | source |
+|---|---|---|
+| 29 | The facts (method section 3): a timeline fact holds on a tick iff the trajectory's row carries it with no argument (the environment's timeline in force, resolved at load, half-open windows in ticks); an object state iff a fact of its name with one argument is among the row's facts (any object of its type, AM44); a recency fact of task f iff the generator's memory holds an observed completion of f at t_obs with 0 ≤ t − t_obs < d_f | design_decisions.md "T-K", AM11, AM40, AM44, AM46; glossary §5 |
+| 30 | The memory of observed completions (AM47): per hypothesis of a task that declares a recency duration, its terminal fact (the decomposition's last completion predicate, as rule 5 reads it) holding on a tick after a tick on which it was read and did not hold is an observed completion of the task at that tick; the first observation, and a tick after one on which the hypothesis was not applicable, record nothing; d_f in ticks from the trajectory (`params.recency_ticks`, the body's conversion of the declared physical duration) | AM14, AM16, AM27, AM30, AM33, AM47 |
+| 31 | The level (method section 4): suppressed if every fact of the suppressing condition holds; else raised if every fact of the raising condition holds; else ordinary. The suppressed and the ordinary strength are the domain's, the raised strength the task's | AM36 to AM38 |
+| 32 | The weights (method section 6): the live hypotheses of the WorkTasks (the assigned tasks as a whole; with assignment knowledge off every work task's) share 1 equally, nothing when none is live; each foreseeable task's live hypotheses share its strength equally; π = w / Σw | R3, R4, AM3, AM35 |
+| 33 | The belief (method section 7): B = normalise(E × w) over H; the reported distribution P applies rule 15's floor and pins to B; the leader and its confidence read B (rule 28) | R2, AM1, AM42 |
+| columns | `prior` per hypothesis (π, 4 decimals in the log's `[IR-context]` line), `levels` and `recent` per tick (the foreseeable tasks' levels and the recency facts); compared against actual.csv at 1e-9 and against actual_log.csv at print precision; empty on both sides with context knowledge off | AM42's requirement, the plan's section 9 |
+
+The readers: `admission.py` labels each true stretch by the state the script meets (KT14: the level on the
+stretch's first tick, a foreseeable task's own, an assigned task's rivals') and gives the A/C hypothesis's belief over
+H at its arrival, the first tick of its switch_on (KT10); `summary.py` prints the levels and the recency facts as
+stretches; `tdlib.py` reads `[IR-context]` and the `[run_mesa] timeline` line. The trajectory carries the timeline
+facts in force per tick (the observation before the clock on the world of tick 0) and `params.recency_ticks`.
+
+The stage's check (the plan, section 8, stage 6): the seventeen of this set and round 1's 31 with context knowledge
+off, every instrument output identical to the gate stage's (the section above) after the named additions (the three
+columns and their rows in `diff.md`; `params.recency_ticks`; in an A/C scenario's trajectory the action's name
+`switch_on` and its effect `ac_on(switch)` among the facts from the completion on, the build's stage 4b); round 1 with
+it on (`run.sh kitting -o <scratch> --context on configs/kitting/irb/tk1/*.yaml`), 0 disagreements at 1e-9 in all 31
+(s14_02 tick 181's print-precision flag as before), its results not read (AM49). The on runs are not a set: their
+outputs stayed outside the repository.

@@ -261,6 +261,19 @@ def main(d, log):
         out.append(f"| {a} to {b} | {short(ml)} | {g} |")
     out.append("")
 
+    # context knowledge (T-K part 1, stage 6): the levels per foreseeable task and the recency facts, as stretches
+    if any(tick0(t).get("levels") for t in by):
+        out += ["Context knowledge (actual): per foreseeable task its level, and the recency facts, as stretches of "
+                "ticks (the prior's inputs; `[IR-context]`).", "", "| what | stretches |", "|---|---|"]
+        names = sorted({x.split("=")[0] for t in by for x in tick0(t).get("levels", "").split()})
+        for n in names:
+            st = stretches_of([(t, dict(x.split("=") for x in tick0(t)["levels"].split()).get(n, "retired"))
+                               for t in sorted(by)])
+            out.append(f"| level of {n} | " + ", ".join(f"{a} to {b} {v}" for v, a, b in st) + " |")
+        rec = stretches_of([(t, tick0(t).get("recent", "") or "none") for t in sorted(by)])
+        out.append("| recency facts | " + ", ".join(f"{a} to {b} {v}" for v, a, b in rec) + " |")
+        out.append("")
+
     # the script's last entry (the exit walk by the authoring convention)
     walk = [r for r in traj["rows"] if exit_start <= r["tick"] <= traj["last_ack"]]
     last_step = max(r["tick"] for r in walk if r["micro"] == "step")

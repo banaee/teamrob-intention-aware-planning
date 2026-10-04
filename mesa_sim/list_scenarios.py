@@ -45,6 +45,7 @@ def list_domain(domain_name, domain_config):
             model = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
                              task_model_schemas=domain_config["task_model"],
                              state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
+                             declared_context=domain_config["context_knowledge"],
                              layout_path=domain_config["layouts"][layout_id],
                              setup_path=domain_config["setups"][scenario.setup], assignment_knowledge=False, context_knowledge=False)
             pairs = [(h, r) for r in scenario.agents if r.agent_type == "robot"

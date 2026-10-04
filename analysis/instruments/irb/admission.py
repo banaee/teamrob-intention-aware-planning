@@ -18,6 +18,11 @@ Per stretch:
   the `pins` column) or the stretch's end, on which the gate no longer clears for the true hypothesis (the retraction
   reading), each run of ticks with its outcome and leader;
 - other admissions: the ticks of the stretch on which the gate clears with another hypothesis leading.
+Since T-K part 1's build stage 6 (KT10, KT14), two columns: the state the case meets, read on the stretch's first tick
+from the `levels` column (a foreseeable task's own level; for an assigned task the levels of its foreseeable rivals);
+and, for an ac_activation stretch, the A/C hypothesis's belief over H (`belief_h`) at its arrival, the first tick of
+its switch_on in the trajectory (its wait is one tick, so admission is not the informative measure, KT10). Both read
+"-" with context knowledge off (no levels).
 
     admission.py <set dir> <csv name> <theta>      e.g. admission.py analysis/kitting/irb/tk1 expected.csv 0.75
 """
@@ -63,6 +68,11 @@ def stretches(d, name, theta):
         tick_row[t] = r
         if r["key"]:
             by.setdefault(t, {})[r["key"]] = float(r["belief_h"])     # the belief over H, the gate's value (AM42)
+    # the arrival of each switch_on: the first tick of the action in the trajectory, per task (KT10)
+    arrival = {}
+    for b in traj["actions"]:
+        if b["action"] == "switch_on":
+            arrival.setdefault(b["task"], b["tick"])
     truth = {r["tick"]: (S.hypothesis_key(r["task"]) if r["task"] else None) for r in traj["rows"] if r["tick"] >= 0}
     out = []
     for k, (a, b) in ((k, ab) for k in set(truth.values()) if k
@@ -76,7 +86,14 @@ def stretches(d, name, theta):
             if adm < t < pin and not (tick_row[t]["gate"] == "clears" and tick_row[t]["most_likely"] == k)]
         other = [(t, S.short(tick_row[t]["most_likely"])) for t in span
                  if tick_row[t]["gate"] == "clears" and tick_row[t]["most_likely"] != k]
-        out.append(dict(key=k, a=a, b=b, hit=hit, adm=adm, after=after, other=other))
+        levels = dict(x.split("=") for x in tick_row[a].get("levels", "").split())
+        name = k.split("(")[0]
+        state = levels.get(name) if name in levels else " ".join(f"{n} {v}" for n, v in sorted(levels.items()))
+        task_key = next((tk for tk in arrival if S.hypothesis_key(tk) == k), None)
+        at_arrival = (f"{by[arrival[task_key]].get(k, float('nan')):.4f} at {arrival[task_key]}"
+                      if task_key is not None and arrival[task_key] in by else None)
+        out.append(dict(key=k, a=a, b=b, hit=hit, adm=adm, after=after, other=other, state=state or None,
+                        at_arrival=at_arrival))
     return traj["scenario"], traj["layout"], sorted(out, key=lambda r: r["a"])
 
 
@@ -84,15 +101,15 @@ def main(root, name, theta):
     root = Path(root)
     S.SCHEMAS.update({s.name: s for s in importlib.import_module("domains.kitting.registry").domain_config["task_model"]})
     print(f"From `{name}`, θ = {theta:g}. Ticks inclusive; delay from the stretch's first tick in brackets.\n")
-    print("| scenario | true hypothesis | ticks | first ≥ θ | admitted | after admission (not clearing for it) | other admissions |")
-    print("|---|---|---|---|---|---|---|")
+    print("| scenario | true hypothesis | ticks | first ≥ θ | admitted | after admission (not clearing for it) | other admissions | state at start (levels) | A/C belief at arrival |")
+    print("|---|---|---|---|---|---|---|---|---|")
     for d in sorted(p for p in root.iterdir() if p.is_dir() and (p / name).exists()):
         sid, _, rows = stretches(d, name, theta)
         for r in rows:
             hit = "never" if r["hit"] is None else f"{r['hit']} ({r['hit'] - r['a']})"
             adm = "never" if r["adm"] is None else f"{r['adm']} ({r['adm'] - r['a']})"
             print(f"| {sid.removeprefix('scenario_')} | {S.short(r['key'])} | {r['a']} to {r['b']} | {hit} | {adm} | "
-                  f"{fmt_runs(r['after'])} | {fmt_runs(r['other'])} |")
+                  f"{fmt_runs(r['after'])} | {fmt_runs(r['other'])} | {r['state'] or '-'} | {r['at_arrival'] or '-'} |")
 
 
 if __name__ == "__main__":

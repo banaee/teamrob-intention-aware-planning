@@ -74,6 +74,7 @@ def in_process(run_file, steps, strategy, prior):
     logging.getLogger("rec").propagate = False
     m = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
                  state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
+                 declared_context=domain_config["context_knowledge"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup], assignment_knowledge=prior, strategy=strategy,
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
@@ -231,6 +232,9 @@ if __name__ == "__main__":
         else bool(yaml.safe_load(open(run_file))["assignment_knowledge"])
     out.mkdir(parents=True, exist_ok=True)
     lines, ticks, decisions, selection, agents, segments = in_process(run_file, steps, strategy, prior)
+    # the same prefixes set aside on both sides: the model logs the `[run_mesa] timeline` line itself (T-K part 1,
+    # stage 4a), so the in-process run carries one `[run_mesa]` line the loader's filter below would keep
+    lines = [l for l in lines if not l.startswith(RUN_MESA_LINES)]
     logged = [l.rstrip("\n") for l in open(log_path) if not l.startswith(RUN_MESA_LINES)]
     same = lines == logged
     print(f"{run_file}: in-process model lines {'identical to' if same else 'DIFFER from'} the logged run's "

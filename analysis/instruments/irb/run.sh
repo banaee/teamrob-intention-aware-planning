@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run.sh <domain> [--expect] [-o out_root] [run files] — the IRB (IRB.3b, made layout-independent in IRB.4b; the code shared
+# run.sh <domain> [--expect] [-o out_root] [--context on|off] [run files] — the IRB (IRB.3b, made layout-independent in IRB.4b; the code shared
 # by the domains since the sort, 1 October 2026): per run file (default: every configs/<domain>/irb/*.yaml), the
 # run length from the trajectory (the executor's rule, since the sort), the run, the trajectory and its check against the
 # run's human lines, the expectations, the actual outputs, the comparison, the figure, the summary and the separation
@@ -14,10 +14,17 @@ set -eo pipefail
 MARGIN=30
 DOMAIN=$1; shift
 PY=~/python-envs/ir-nomesa-env/bin/python; D=analysis/instruments/irb; ROOT=analysis/$DOMAIN/irb
-EXPECT=""
-if [ "$1" = "--expect" ]; then EXPECT=1; shift; fi
-if [ "$1" = "-o" ]; then ROOT=$2; shift 2; fi
-RUNS=${*:-$(ls configs/$DOMAIN/irb/*.yaml)}
+EXPECT=""; CTX=""; CTXARG=""; RUNS=""
+while [ $# -gt 0 ]; do
+  case $1 in
+    --expect) EXPECT=1; shift;;
+    -o) ROOT=$2; shift 2;;
+    --context) CTX=$2; shift 2;;     # context knowledge on|off for every run (T-K part 1, stage 6); default: the run file's
+    *) RUNS="$RUNS $1"; shift;;
+  esac
+done
+RUNS=${RUNS:-$(ls configs/$DOMAIN/irb/*.yaml)}
+if [ -n "$CTX" ]; then CTXARG="context=$CTX"; [ "$CTX" = on ] && CTXFLAG="--context_knowledge true" || CTXFLAG="--context_knowledge false"; else CTXFLAG=""; fi
 mkdir -p $ROOT/runs
 for RUN in $RUNS; do
   sid=$(awk '/^scenario:/ {print $2}' $RUN); layout=$(awk '/^layout:/ {print $2}' $RUN)
@@ -29,15 +36,15 @@ for RUN in $RUNS; do
     # the expectations before any run (since the sort): the trajectory and the oracle's tables, with theta the value
     # of record (the [run] header's theta=0.75, DEFAULT_THETA); the run's own oracle call must reproduce them
     PYTHONHASHSEED=0 $PY $D/trajectory.py $RUN $steps $OUT/trajectory.json 2>&1 | grep -v '^\['
-    PYTHONHASHSEED=0 $PY $D/oracle.py $OUT/trajectory.json $RUN $OUT/expected.csv $OUT/phases.json theta=0.75
+    PYTHONHASHSEED=0 $PY $D/oracle.py $OUT/trajectory.json $RUN $OUT/expected.csv $OUT/phases.json theta=0.75 $CTXARG
     continue
   fi
-  PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --run $RUN --steps $steps < /dev/null > /dev/null 2>&1
+  PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --run $RUN --steps $steps $CTXFLAG < /dev/null > /dev/null 2>&1
   cp "$(ls -t logs/run_*.log | head -1)" $LOG
   cp "$(ls -t logs/run_*.rec | head -1)" ${LOG%.log}.rec
   PYTHONHASHSEED=0 $PY $D/trajectory.py $RUN $steps $OUT/trajectory.json $LOG 2>&1 | grep -v '^\['
-  PYTHONHASHSEED=0 $PY $D/oracle.py $OUT/trajectory.json $RUN $OUT/expected.csv $OUT/phases.json $LOG
-  PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $OUT/actual.csv $OUT/actual_log.csv 2>&1 | grep -v -e '^\[' -e '^  step'
+  PYTHONHASHSEED=0 $PY $D/oracle.py $OUT/trajectory.json $RUN $OUT/expected.csv $OUT/phases.json $LOG $CTXARG
+  PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $OUT/actual.csv $OUT/actual_log.csv $CTXFLAG 2>&1 | grep -v -e '^\[' -e '^  step'
   $PY $D/compare.py $sid $OUT/expected.csv $OUT/actual.csv $OUT/actual_log.csv $OUT/diff.md
   $PY $D/plot.py $OUT $LOG
   $PY $D/summary.py $OUT $LOG > $OUT/summary.md

@@ -75,7 +75,8 @@ def derive(traj, run_file, alpha, theta):
         raise OutsidePreRunDomain(f"{traj['scenario']}: the human has no assigned tasks, so the support restriction is "
                                   f"off (shared/io_contracts.md: None or [] switches it off); MPB-3's pre-run "
                                   f"independence does not hold")
-    rows, _, _ = ir.run(traj, alpha, theta, domain_config)
+    context = bool(yaml.safe_load(open(run_file))["context_knowledge"])          # T-K part 1 (stage 6)
+    rows, _, _ = ir.run(traj, alpha, theta, domain_config, context)
     agent = human.agent_id
     committed = ir.known_keys(human.assigned_tasks)                                 # DG AD1: commitment, prior on
     task_model = TaskModel(domain_config["register_fn"](), domain_config["task_model"])
@@ -134,7 +135,7 @@ if __name__ == "__main__":
         sys.exit(3)
     dump(table, sys.argv[4])
     # the figure's columns (plot_ir.py): the IR oracle's belief, S and lifecycle per tick, beside the compared table
-    rows, _, _ = ir.run(traj, alpha, theta, ir.domain_of(run_file))
+    rows, _, _ = ir.run(traj, alpha, theta, ir.domain_of(run_file), bool(yaml.safe_load(open(run_file))["context_knowledge"]))
     extra = {}
     for r in rows:
         e = extra.setdefault(r["tick"], dict(belief={}, belief_h={}, S={}, lifecycle=r.get("lifecycle")))

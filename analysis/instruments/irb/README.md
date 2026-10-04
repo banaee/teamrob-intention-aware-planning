@@ -50,3 +50,11 @@ moved on the tick) or standing beside it (it did not).
 **The baseline table** (`baseline.py <set dir>`, reporting only, 2 October 2026): from a set's existing outputs, per true
 stretch (summary.py's definition) its length, the live hypotheses at its first tick and the ticks to the first tick
 with the true hypothesis's belief at or above θ, or "never"; one table per room and the counts.
+
+## T-K part 1 (4 October 2026)
+
+- Stage 2 (the gate, AM42): rule 28, the leader and its confidence from the belief over H; the column `belief_h`.
+- Stage 6 (context knowledge): rules 29 to 33, the generator's own prior from the domain's declared context knowledge
+  and the method document; the columns `prior`, `levels`, `recent`; `run.sh --context on|off` (every run and its
+  oracle and in-process actual under that setting; default: the run file's `context_knowledge`). Both in kitting's
+  `analysis/kitting/irb/README.md`, the sections of this date, with their sources.

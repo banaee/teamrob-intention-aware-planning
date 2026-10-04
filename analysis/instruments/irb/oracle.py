@@ -4,7 +4,14 @@ oracle.py — the IRB's expectation generator (IRB.3b; design_decisions.md, "The
 boundary"): the recognizer's outputs per tick, derived from the recognizer records at HEAD and from nothing of the
 recognizer's code.
 
-    oracle.py <trajectory.json> <run file> <expected.csv> <phases.json> <run.log | theta=<value>>
+    oracle.py <trajectory.json> <run file> <expected.csv> <phases.json> <run.log | theta=<value>> [context=on|off]
+
+T-K part 1's gate stage (rule 28): the leader and its confidence from the belief over H. T-K part 1's build, stage 6
+(rules 29 to 33): with context knowledge on (the run file's `context_knowledge`, or `context=on|off` given), the
+prior from the domain's declared context knowledge (its registry's "context_knowledge": the declared values are read
+as the task model is; the levels, the groups and the division are computed here from the method document,
+docs/context_knowledge_method.md, sections 3, 4 and 6, not by shared/recognizer.py), its own memory of observed
+completions from the rows (AM47), and the columns `prior` per key and `levels` per tick.
 
 Independence. It imports nothing from shared/recognizer.py or shared/likelihood_functions.py, and asserts at the end
 that neither module was loaded in its process. It uses the planner's decomposition (`AdaptivePlanner.decompose`, on
@@ -41,9 +48,9 @@ sys.path.insert(0, str(ROOT))
 import importlib
 import itertools
 import yaml
-from shared.types import (ActionStep, AgentState, Area, Const, PersonalTask, Predicate, TaskInstance, Var, WorldState,
-                          area_fact, task_instance_key)
-from shared.knowledge import TaskModel
+from shared.types import (ActionStep, AgentState, Area, Const, PersonalTask, Predicate, TaskInstance, Var, WorkTask,
+                          WorldState, area_fact, task_instance_key)
+from shared.knowledge import ObjectState, RecencyFact, TaskModel, TimelineFact
 from shared.planner import AdaptivePlanner, DecompositionError
 
 
@@ -135,8 +142,93 @@ def label(a):
         f"{k}={v}" for k, v in sorted(a.bindings.items()) if k != "?agent") + ")"
 
 
+class ContextPrior:
+    """
+    The prior from the declared context knowledge (T-K part 1; docs/context_knowledge_method.md, sections 3, 4, 6;
+    design_decisions.md "T-K", R3, R4, AM35 to AM38, AM44, AM47), derived here from the domain's declarations and
+    the rows' facts; nothing of shared/recognizer.py.
+    - Rule 29, the facts (section 3): a timeline fact holds iff its name is among the row's facts with no argument; an
+      object state iff a fact of its name with one argument is among them (any object of its type, AM44); a recency
+      fact of task f iff this oracle's memory holds an observed completion of f at t_obs with 0 <= t - t_obs < d_f.
+    - Rule 30, the memory (AM47): per hypothesis of a task that declares a recency duration, its terminal fact (the
+      decomposition's last completion predicate, as the pin reads it) newly holding after a tick on which it did
+      not (read, applicable) is an observed completion of the task at that tick; d_f from the trajectory's
+      recency_ticks (the body's conversion).
+    - Rule 31, the level (section 4): suppressed if the suppressing condition (every fact of its conjunction) is
+      satisfied; else raised if the raising condition is; else ordinary. The suppressed and the ordinary strength are
+      the domain's, the raised strength the task's.
+    - Rule 32, the weights (section 6): the live WorkTask hypotheses share 1 equally (nothing when none is live);
+      each foreseeable task's live hypotheses share its strength equally; pi = w / sum(w).
+    - Rule 33, the belief (section 7): B = normalise(E x w) over H; the reported distribution P applies the floor and
+      the pins to B (rule 15); the leader and its confidence read B (rule 28).
+    """
+
+    def __init__(self, knowledge, space, recency_ticks):
+        self.k = knowledge                          # the declared values: suppressed, ordinary, entries()
+        self.entries = knowledge.entries()          # per task its ForeseeableKnowledge; the lookup is this class's own
+        self.space = space                          # key -> TaskInstance
+        self.ticks = recency_ticks                  # task name -> d_f in ticks
+        self.held = {}                              # key -> whether its terminal fact held last tick (None: not read)
+        self.completed = {}                         # task name -> the tick of its last observed completion
+
+    def observe(self, t, key, actions):
+        """Rule 30: `actions` the decomposition this tick (None: not applicable)."""
+        task = self.space[key].schema
+        if task.name not in self.ticks:
+            return
+        if actions is None:
+            self.held[key] = None
+            return
+        pred = actions[-1].completion_predicate
+        holds = pred is not None and pred in self.world_predicates
+        if holds and self.held.get(key) is False:
+            self.completed[task.name] = t
+        self.held[key] = holds
+
+    def recent(self, t):
+        return {name for name, t0 in self.completed.items() if 0 <= t - t0 < self.ticks[name]}
+
+    def fact_holds(self, f, facts, recent):
+        if isinstance(f, TimelineFact):
+            return (f.state.name,) in facts
+        if isinstance(f, ObjectState):
+            return any(x[0] == f.state.name and len(x) == 2 for x in facts)
+        if isinstance(f, RecencyFact):
+            return f.task.name in recent
+        raise TypeError(f)
+
+    def entry(self, task):
+        return next(e for e in self.entries if e.task is task)
+
+    def level(self, task, facts, recent):
+        e = self.entry(task)
+        if e.suppressing is not None and all(self.fact_holds(f, facts, recent) for f in e.suppressing.facts):
+            return "suppressed"
+        if e.raising is not None and all(self.fact_holds(f, facts, recent) for f in e.raising.facts):
+            return "raised"
+        return "ordinary"
+
+    def strength(self, task, lev):
+        return {"suppressed": self.k.suppressed, "ordinary": self.k.ordinary}.get(lev, self.entry(task).raised).value
+
+    def weights(self, t, live, facts):
+        """Rules 31 and 32: the weights over the live keys and the levels per foreseeable task with a live key."""
+        recent = self.recent(t)
+        work = [k for k in live if isinstance(self.space[k].schema, WorkTask)]
+        groups = {}
+        for k in live:
+            if k not in work:
+                groups.setdefault(self.space[k].schema.name, []).append(k)
+        levels = {name: self.level(self.space[keys[0]].schema, facts, recent) for name, keys in groups.items()}
+        w = {k: 1.0 / len(work) for k in work}
+        for name, keys in groups.items():
+            s = self.strength(self.space[keys[0]].schema, levels[name])
+            w.update({k: s / len(keys) for k in keys})
+        return w, levels, sorted(recent)
+
+
 class Oracle:
-    def __init__(self, traj, alpha, theta, domain_config):
+    def __init__(self, traj, alpha, theta, domain_config, context=False):
         p = traj["params"]
         self.v, self.beta, self.alpha, self.theta = p["speed"], p["beta"], alpha, theta
         self.lat_action, self.lat_task = p["action_completion_latency"], p["observed_task_completion_latency"]
@@ -166,6 +258,9 @@ class Oracle:
         self.entered = set()
         self.last_pos, self.odo, self.still = None, 0.0, 0
         self.prev_facts = None                         # the previous tick's world facts, for the boundary (DL L1)
+        # T-K part 1 (rules 29 to 33): the prior from the declared context knowledge, with context knowledge on
+        self.context = ContextPrior(domain_config["context_knowledge"], self.space,
+                                    traj["params"]["recency_ticks"]) if context else None
 
     # ---- the phase term (HB §1.4, §1.8, §1.10; DD E2, E9, E10) ---------------------------------------------------
     def s_exp(self, k, a):
@@ -213,11 +308,15 @@ class Oracle:
         mu = None if row["micro"] is None else row["micro"].upper()
         boundary = self.terminal_completed(row["facts"])                     # DL L1
         pins, reentries, advanced, U, folds = [], [], set(), {}, {}
+        if self.context is not None:
+            self.context.world_predicates = world.predicates
         for k in sorted(self.admissible):                  # every admissible key; live: its terminal fact not holding
             try:
                 A = self.planner.decompose(self.space[k], self.agent, world)
             except DecompositionError:
                 A = None
+            if self.context is not None:
+                self.context.observe(row["tick"], k, A)     # rule 30: before the recognizer's reading, as the memory does
             if A is None and k not in self.completed:     # T-G A4: no applicable method: not live (HB §1.1)
                 if k not in self.inapplicable:
                     self.inapplicable.add(k)
@@ -362,22 +461,32 @@ class Oracle:
             return "none(leader_unwarranted)"
         return "clears"
 
-    def output(self, E):
+    def output(self, E, t, facts):
         """HB §1.7 (reading R2): the reported distribution P: normalise over H, the floor, the pinned keys at the
-        floor, the live keys scaled to 1 − FLOOR·|pinned|; the context weight ω = 1 (inert: 21 °C, no run reaches 500
-        steps, HB §2). The leader and its confidence (rule 28, T-K part 1, AM42): the argmax of the belief over H (E,
-        normalised over H, before the floor and the pins) and its value there, not P's."""
+        floor, the live keys scaled to 1 − FLOOR·|pinned|. Since T-K part 1 (rules 32, 33): E is multiplied by the
+        prior's weights first with context knowledge on (every weight 1 with it off: ω's place, HB §2, now the
+        equal prior). The leader and its confidence (rule 28, AM42): the argmax of the belief over H (B, before the
+        floor and the pins) and its value there, not P's. Returns P, B, the leader, its confidence, pi over H and
+        the levels (empty with context knowledge off)."""
         pinned = [k for k in self.space if k not in E]
         P = {k: FLOOR for k in pinned}
+        pi, levels, recent = {}, {}, []
         if E:
-            tot = sum(E.values())
-            B = {k: v / tot for k, v in E.items()}       # the belief over H (rule 28)
+            if self.context is not None:
+                w, levels, recent = self.context.weights(t, sorted(E), facts)
+                z = sum(w.values())
+                pi = {k: w[k] / z for k in E}
+                U = {k: v * w[k] for k, v in E.items()}
+            else:
+                U = dict(E)
+            tot = sum(U.values())
+            B = {k: v / tot for k, v in U.items()}       # the belief over H (rules 28, 33)
             r = {k: max(v, FLOOR) for k, v in B.items()}
             sr = sum(r.values())
             P.update({k: v / sr * (1.0 - FLOOR * len(pinned)) for k, v in r.items()})
             ml = max(sorted(B), key=lambda k: B[k])      # ties to the first live key in sorted order
-            return P, B, ml, B[ml]
-        return P, {}, None, 0.0
+            return P, B, ml, B[ml], pi, levels, recent
+        return P, {}, None, 0.0, pi, levels, recent
 
     def adequacy(self, k, pos, world, boundary, advanced):
         """Membership as amended twice with the boundary-tick rule, reading R3 (DD E6, E8; HB §1.10); S (E5)."""
@@ -394,16 +503,17 @@ class Oracle:
 
 
 COLUMNS = ["tick", "human_x", "human_y", "micro", "holding", "waited", "obj_at", "at", "most_likely", "confidence",
-           "finding", "lifecycle", "pins", "reentries", "boundary", "gate", "key", "expected_action", "origin_x", "origin_y", "e",
-           "s", "s_exp", "D", "L", "evidence", "belief", "belief_h", "S", "member", "adequacy", "warrant"]
+           "finding", "lifecycle", "pins", "reentries", "boundary", "gate", "levels", "recent", "key", "expected_action",
+           "origin_x", "origin_y", "e", "s", "s_exp", "D", "L", "evidence", "prior", "belief", "belief_h", "S", "member",
+           "adequacy", "warrant"]
 
 
-def run(traj, alpha, theta, domain_config):
-    orc = Oracle(traj, alpha, theta, domain_config)
+def run(traj, alpha, theta, domain_config, context=False):
+    orc = Oracle(traj, alpha, theta, domain_config, context)
     rows, phases = [], {k: [] for k in orc.space}
     for r in traj["rows"]:
         world, E, pins, reentries, boundary, advanced, folds = orc.update(r)
-        P, B, ml, conf = orc.output(E)
+        P, B, ml, conf, pi, levels, recent = orc.output(E, r["tick"], {tuple(f) for f in r["facts"]})
         pos = (r["x"], r["y"])
         live = sorted(orc.base)
         per = {}
@@ -429,7 +539,8 @@ def run(traj, alpha, theta, domain_config):
                       waited=r["waited"], obj_at=";".join(f"{i}@{l}" for i, l in sorted(r["item_loc"].items())),
                       at=";".join(f[2] for f in r["facts"] if f[0] == "at"), most_likely=ml, confidence=conf,
                       finding=finding, lifecycle=lifecycle, pins=";".join(pins), reentries=";".join(reentries),
-                      boundary=int(boundary), gate=orc.gate(ml, conf, per))
+                      boundary=int(boundary), gate=orc.gate(ml, conf, per),
+                      levels=" ".join(f"{n}={v}" for n, v in sorted(levels.items())), recent=" ".join(recent))
         if not live:
             rows.append(dict(common))
         for k in live:
@@ -437,7 +548,8 @@ def run(traj, alpha, theta, domain_config):
             o = orc.origin[k][0]
             rows.append(dict(common, key=k, expected_action=label(orc.expected.get(k)), origin_x=o[0], origin_y=o[1],
                              e=ph["e"], s=ph["s"], s_exp=ph["s_exp"], D=ph["D"], L=ph["L"], evidence=E[k],
-                             belief=P[k], belief_h=B[k], S=S, member=int(member), adequacy=adequacy, warrant=warrant))
+                             prior=pi.get(k), belief=P[k], belief_h=B[k], S=S, member=int(member), adequacy=adequacy,
+                             warrant=warrant))
     return rows, phases, sorted(orc.admissible)
 
 
@@ -452,7 +564,11 @@ if __name__ == "__main__":
     else:
         header = next(l for l in open(sys.argv[5]) if l.startswith("[run] "))
         theta = float(header.split("theta=")[1].split()[0])
-    rows, phases, space = run(traj, alpha, theta, domain_of(sys.argv[2]))
+    # context knowledge: the run file's option, or context=on|off given (run.sh's --context, T-K part 1, stage 6)
+    context = bool(yaml.safe_load(open(sys.argv[2]))["context_knowledge"])
+    if len(sys.argv) > 6 and sys.argv[6].startswith("context="):
+        context = sys.argv[6].split("=", 1)[1] == "on"
+    rows, phases, space = run(traj, alpha, theta, domain_of(sys.argv[2]), context)
     with open(sys.argv[3], "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()

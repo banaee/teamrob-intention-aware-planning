@@ -41,7 +41,8 @@ each action, read from mesa_sim/executor.Executor.step and mesa_sim/sim_agents.H
   - with nothing to run (Wait, Idle; after the script): the human stands, action=None, micro=None.
 The world facts (mesa_sim/world_state_builder.build_world_state, the human's part): at(human, o) for every
 non-held object within PROXIMITY_THRESHOLD; holding(human, item); obj_at(item, location), the location a holder
-while carried; waited(human, o); and the declared states that hold (T-G A5; none in kitting), as the model holds them. The robot's facts are not produced: no hypothesis of the observed human reads
+while carried; waited(human, o); and the declared states that hold (T-G A5), as the model holds them; and the timeline facts in force at the tick (T-K part
+1, AM40, read from the model's resolved timeline, the observation before the clock on the world of tick 0). The robot's facts are not produced: no hypothesis of the observed human reads
 them. Tick -1 is the robot's observation before the clock starts (RobotAgent.observe_initial): the start position
 and the initial world.
 
@@ -102,7 +103,8 @@ def load(run_file, overrides=()):
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][base.setup],
-                 state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"], overrides=overrides, assignment_knowledge=False, context_knowledge=False)
+                 state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
+                 declared_context=domain_config["context_knowledge"], overrides=overrides, assignment_knowledge=False, context_knowledge=False)
     return m, human, base, layout
 
 
@@ -186,11 +188,14 @@ class Body:
 
     def row(self, tick, action, micro, top):
         H = self.agent
+        # the timeline facts in force at the tick (T-K part 1, AM40; the environment's own resolution, as a function
+        # of the world state's tick: the observation before the clock starts, tick -1, reads the world of tick 0)
+        timeline = sorted([f.name] for f in self.m.timeline.facts_at(max(tick, 0)))
         return dict(tick=tick, x=self.pos[0], y=self.pos[1], action=action, micro=micro, task=top,
                     holding=self.carrying, waited=self.waited_at,
                     item_loc={i: (H if l is None else l) for i, l in self.item_loc.items()},
                     item_pos={i: list(self.position_of(i)) for i in self.item_loc},
-                    facts=self.facts())
+                    facts=self.facts() + timeline)
 
     # the body's microactions
     def step(self, p):
@@ -312,7 +317,11 @@ def expand(run_file, steps=None, overrides=()):
                   action_completion_latency=ACTION_COMPLETION_LATENCY,
                   observed_task_completion_latency=HUMAN_TASK_COMPLETION_LATENCY,
                   default_action_cost=1.0,        # mesa_sim/sim_agents.RobotAgent: a stationary action is one tick
-                  duration_ticks=hypothesis_durations(m, ticks_of, domain_config))
+                  duration_ticks=hypothesis_durations(m, ticks_of, domain_config),
+                  # the recency durations in ticks, the body's conversion of the declared physical durations (T-K
+                  # part 1, AM16; RobotAgent builds the memory with the same conversion)
+                  recency_ticks={e.task.name: ticks_of(e.recency.duration)
+                                 for e in domain_config["context_knowledge"].entries() if e.recency is not None})
     return dict(scenario=base.id, layout=layout, steps=steps, last_ack=last_ack, params=params,
                 fixed={i: list(p) for i, p in body.fixed.items()}, home=body.home, dest=body.dest,
                 types={i: o.type for i, o in m.objects.items()},

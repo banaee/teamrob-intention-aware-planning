@@ -25,7 +25,11 @@ Since T-K part 1's gate stage (AM42): `belief_h`, the belief over H per hypothes
 Nothing in the recognizer is read beyond its output. The columns the recognizer does not output are left empty in
 both files and skipped by the comparison: expected_action, origin_x, origin_y, e, s, s_exp, D, L, evidence.
 
-    actual.py <run file> <steps> <run.log> <actual.csv> <actual_log.csv>
+    actual.py <run file> <steps> <run.log> <actual.csv> <actual_log.csv> [--context_knowledge true|false]
+
+Since T-K part 1's build stage 6: `prior` per hypothesis (`BeliefState.prior`; in the log the `[IR-context]` line's
+prior, 4 decimals), `levels` and `recent` per tick (the line's levels and recent; empty with context knowledge off);
+`--context_knowledge` overrides the run file's option, as run.sh passes it (its --context).
 
 The steps are the run's (run.sh computes them from the replay and runs with them); the layout is the run file's, or
 the scenario's first reference layout when it names none; the observed human is the scenario's one human.
@@ -106,17 +110,20 @@ def from_log(log_path, alpha, domain_config):
         reentries = [k for s, k in log["reentries"] if s == t]
         live = [k for k in admissible if not tdlib.retired(log, k, t) and not tdlib.inapplicable(log, k, t)]
         act, micro, (x, y), _ = log["human"][t]
+        ctx = log["context"].get(t, {})
         common = dict(tick=t, human_x=x, human_y=y, micro=None if micro == "None" else micro,
                       most_likely=None if ir["ml"] == "none" else ir["ml"], confidence=ir["conf"],
                       finding=ir["finding"], lifecycle=ir["lifecycle"], pins=";".join(sorted(pins)),
-                      reentries=";".join(sorted(reentries)), boundary=int(t in log["boundary"]))
+                      reentries=";".join(sorted(reentries)), boundary=int(t in log["boundary"]),
+                      levels=" ".join(f"{n}={v}" for n, v in sorted(ctx.get("levels", {}).items())),
+                      recent=" ".join(ctx.get("recent", [])))
         if not live:
             rows.append(common)
         for k in live:
             S = ir["tails"].get(k)
             adequacy = "no_observation" if S is None else ("adequate" if S >= alpha else "inadequate")
-            rows.append(dict(common, key=k, belief=dist[k], S=S, member=int(S is not None), adequacy=adequacy,
-                             warrant=warrant[t][k]))
+            rows.append(dict(common, key=k, belief=dist[k], prior=ctx.get("prior", {}).get(k), S=S,
+                             member=int(S is not None), adequacy=adequacy, warrant=warrant[t][k]))
     return rows
 
 
@@ -129,7 +136,7 @@ class Collect(logging.Handler):
         self.lines.append(record.getMessage())
 
 
-def in_process(run_file, steps, alpha):
+def in_process(run_file, steps, alpha, context=None):
     domain_config = domain_of(run_file)
     from mesa_sim.sim_model import SimModel
     from mesa_sim.world_state_builder import build_world_state
@@ -144,13 +151,14 @@ def in_process(run_file, steps, alpha):
     logging.getLogger("rec").propagate = False
     m = SimModel(scenario=scenario, register_fn=domain_config["register_fn"],
                  state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
+                 declared_context=domain_config["context_knowledge"],
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
                  assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=cfg["strategy"],
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
                  separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]),
-                 context_knowledge=bool(cfg["context_knowledge"]))
+                 context_knowledge=bool(cfg["context_knowledge"]) if context is None else context)
     robot = next(iter(m.robots.values()))
     human = m.humans[H]
     rows = []
@@ -172,23 +180,27 @@ def in_process(run_file, steps, alpha):
                       finding=None if b.finding is None else b.finding.value, lifecycle=b.lifecycle.value,
                       pins=";".join(pins), reentries=";".join(reentries),
                       boundary=int(any(l.startswith("[IR-boundary]") for l in new)),
-                      gate=robot.meta_planner._clears_gate(b).value)
+                      gate=robot.meta_planner._clears_gate(b).value,
+                      levels=" ".join(f"{n}={v.value}" for n, v in sorted(b.levels.items())),
+                      recent=" ".join(sorted(x.name for x in (robot.memory.recent(t) if robot.memory else ()))))
         live = sorted(b.hypothesis_adequacy)
         if not live:
             rows.append(common)
         for k in live:
             S = b.tails.get(k)
-            rows.append(dict(common, key=k, belief=b.distribution[k], belief_h=b.belief[k], S=S, member=int(S is not None),
-                             adequacy=b.hypothesis_adequacy[k].value, warrant=b.observation_warrant[k].value))
+            rows.append(dict(common, key=k, belief=b.distribution[k], belief_h=b.belief[k], prior=b.prior.get(k), S=S,
+                             member=int(S is not None), adequacy=b.hypothesis_adequacy[k].value,
+                             warrant=b.observation_warrant[k].value))
     root.removeHandler(collect)
     return rows, [l for l in collect.lines if l.startswith("[IR")]
 
 
 if __name__ == "__main__":
     run_file, steps, log_path, out_full, out_log = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
+    context = (sys.argv[sys.argv.index("--context_knowledge") + 1] == "true") if "--context_knowledge" in sys.argv else None
     alpha = float(yaml.safe_load(open(run_file))["test_level"])
     _write(out_log, from_log(log_path, alpha, domain_of(run_file)))
-    rows, ir_lines = in_process(run_file, steps, alpha)
+    rows, ir_lines = in_process(run_file, steps, alpha, context)
     logged = [l.rstrip("\n") for l in open(log_path) if l.startswith("[IR")]
     same = ir_lines == logged
     print(f"{run_file}: in-process [IR*] lines {'byte-identical to' if same else 'DIFFER from'} the logged run's "
