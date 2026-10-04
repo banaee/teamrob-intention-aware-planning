@@ -204,34 +204,42 @@ is the schema's, converted by the body (TODO-32, R2)" · the projection; the sta
 compressed demonstration scale and are not calibrated.
 Simulator convention · Hadi, 3 Oct 2026 (T-K part 1, AM23) · the domains' task schemas and context knowledge.
 
-**6.4** When the movement cannot separate two targets (the coffee machine beside a shelf; the A/C switch beside
-shelf_4) and the declared context makes one of them probable, the robot admits that one, and the human may then do the
-less probable thing. This is a limit of recognising from context and movement, not a defect of the recognizer or of
-the gate. A careful human observer with the same knowledge could make the same guess. No rule inside recognition
-removes it, because the information that would separate the two tasks does not exist at that time. It is the stated
-meaning of the threshold: at θ = 0.75 the robot accepts that an admitted hypothesis can be other than what the human
-does.
-Boundary (framework scope) · Hadi, 4 Oct 2026 (T-K part 1, after step 5b; design_records.md, "T-K", THE LIMITATION OF
-ADMISSION FROM CONTEXT AND MOVEMENT) · the recognizer's belief and the gate; how they are read in an evaluation.
+**6.4** An admission of a hypothesis that is not the true task, read against the evidence alone. Where two targets lie
+close (the coffee machine beside a shelf; the A/C switch beside shelf_4), the movement of the first ticks of a walk
+hardly separates them, and the declared context makes one of them probable: the robot admits that one, and the human
+may do the other. Only this first part is a limit of the situation. A careful observer with the same knowledge could
+make the same guess, and no rule inside recognition removes it, because the information that would separate the two
+tasks does not exist yet. It is the stated meaning of the threshold: at θ = 0.75 the robot accepts that an admitted
+hypothesis can be other than what the human does. After the first ticks the evidence ranks the true task first, and
+the prior overrules it while the admission stands. That part follows from the declared strengths and the gate as
+ruled (question S, AM65; question G, AM66), not from the situation.
+Boundary (framework scope), the first part only · Hadi, 4 Oct 2026, corrected the same day (T-K part 1, after step 5b;
+design_records.md, "T-K", THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT) · the recognizer's belief and the
+gate; how they are read in an evaluation.
 - "An admission of a hypothesis that is not the true task" names the outcome. It does not say the reasoning was wrong.
-- Two kinds, as the reading for question G separates them by the evidence alone (the run with context knowledge off,
-  the equal prior). (i) The movement does not separate the targets, and the prior decides. (ii) The evidence ranks the
-  true task first, and the prior overrules it. This item is about kind (i). Kind (ii) depends on the declared
-  strengths; the sensitivity table planned for the close of T-K part 1 shows it (AM65).
-- Measured instances. The evidence ratio is the true task's belief over the admitted one's in the off run.
-  - The coffee break admitted under break_time during the walk to the neighbouring shelf (step 4: scenario_s13_11,
-    _12, _14). Admitted at 81 with belief 0.754 (prior 0.667), held 11 ticks; evidence ratio ×1.22 at the admission,
-    ×1.71 at its end.
-  - The last delivery admitted through the whole A/C activation (step 4, P4: scenario_s15_19). Admitted at 216 on
-    commitment (prior 0.962), held 46 ticks. The evidence ties on its first tick, is ×1.0015 on the next, stays
-    within 1 percent for 5 ticks, then rises to ×3.05 at the end.
-  - The pass at 28.3 cm in step 5's case 5 (scenario_s16_05). The delivery is admitted 0 to 45 while the human walks to
-    the A/C switch, with F1 violations at 22 to 25. The evidence ratio is ×1.003 at 0, ×1.02 at 10, and ×1.065 to
-    ×1.087 at 22 to 25.
-  - Measured by ccode (analysis/kitting/mpb/tk5b/COMPARISON.md, A2, a 1-percent reporting threshold, not a design
-    value): the first instance ranks the true task first from its first tick, ×1.22. The second and third are within
-    1 percent only on their first ticks. Whether they count as kind (i) depends on how small a ratio "does not
-    separate" means; Hadi rules.
+- Measured (analysis/kitting/mpb/tk5b/COMPARISON.md and WHATIF.md, existing outputs of steps 4 and 5b, the robot idle;
+  the ratio is the true task's belief over the admitted one's in the run with context knowledge off, the evidence
+  alone; no cut between separating and not separating is used). With context knowledge on there are 47 such
+  admissions during modelled tasks (504 gate ticks); 43 of them (453 ticks) have a true hypothesis.
+  - No wrong tick is a tie (equal within 1e-9).
+  - On 311 ticks the evidence ranks the true task first: the ratio runs from ×1.0008 (median ×1.45) to ×14.2. In
+    an admission that lasts a walk the ratio starts near 1 and grows with the walk. The lone delivery during a coffee
+    break or an A/C activation: ×1.0008 to ×13.7 (scenario_s14_19), ×1.0092 to ×12.7 (s13_13), ×1.0015 to ×3.05
+    (s15_19, the A/C beside shelf_4), ×1.048 to ×13.6 (s08_02), ×1.06 to ×14.2 (s09_11). The coffee break under
+    break_time during the walk to the neighbouring shelf: ×1.22 to ×1.71 (s13_11, _12, _14).
+  - On 141 ticks the evidence alone ranks the admitted hypothesis above the true task (×0.93 down to near 0): mostly the
+    first ticks after the human leaves a delivery for a coffee break or the A/C, where the delivery still fits. The run
+    with context knowledge off makes most of these admissions too. They belong to neither part above. On 1 tick a
+    third hypothesis is first.
+  - Step 5's case 5 (scenario_s16_05, the pass at 28.3 cm at 22 to 25): the evidence ranks the A/C activation first
+    by ×1.0015 at 0, ×1.065 to ×1.087 during the pass.
+- What the comparison concentrates in one mechanism: a lone assigned task admitted before the human starts it, on its
+  commitment warrant and its prior. Correct 59 times (admitted on the previous task's completion tick, the human
+  starting it on the next): 1773 of the 3005 ticks by which the true task's admissions come earlier, and in planning
+  the gain of 24 and 23 ticks in scenario_s16_03 and _04 (admitted at 73, the human starting at 74). Not correct 9
+  times (retracted after 8 to 60 ticks): 230 of the 504 wrong gate ticks during modelled tasks, and both new cases
+  below min_separation in planning (scenario_s16_05, 28.3 cm; scenario_s11_03, 11.3 cm, whose 78 ticks gained come from
+  the same wrong admission).
 - Not settled here: how the robot acts on an admitted hypothesis that can be wrong. Today it plans on the admitted task
   alone and does not use the fallback projection while the admission stands. That is an open design question about
   the meta-planner, not part of this limitation. Communication with the human is the other place where such a case can

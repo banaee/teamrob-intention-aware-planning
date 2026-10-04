@@ -3615,11 +3615,14 @@ by the evidence alone 0 near-ties, 17 the true task first with the prior overrul
 admitted one first, 4 with no true hypothesis; planning completion better in 7 of 22 runs, worse in 2 (134 ticks gained,
 3 lost); cases below min_separation 2 off, 5 on (2 wrong admissions, 2 TODO-146 at a turn, 1 other). The scenarios are
 authored: the counts compare the settings and are no rate of occurrence.
-THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT (Hadi, 4 October 2026; recorded by ccode the same day). A
-finding, recorded as a boundary of the framework in docs/assumptions.md, 6.4: when the movement cannot separate two
-targets and the declared context makes one probable, the robot admits that one and the human may do the other; a limit
-of recognising from context and movement, the stated meaning of θ, no defect of the recognizer or the gate. It concerns
-kind (i) of the reading for question G (the movement does not separate, the prior decides), not kind (ii) (the evidence
-ranks the true task first, the prior overrules; the close's sensitivity table). The measured instances and ccode's
-note on their kind are in 6.4. Not settled there: how the meta-planner acts on an admitted hypothesis that can be
-wrong (an open design question); communication (T-D X).
+THE LIMITATION OF ADMISSION FROM CONTEXT AND MOVEMENT (Hadi, 4 October 2026; recorded by ccode the same day;
+CORRECTED the same day by Hadi, the first wording being the design chat's and wrong). Recorded in docs/assumptions.md,
+6.4. An admission of a hypothesis that is not the true task, read against the evidence alone (the run with context
+knowledge off): in the first ticks of a walk the evidence ratio is near 1 (no wrong tick is an exact tie; the smallest
+ratio ×1.0008), and only this part is a limit of the situation; after it the evidence ranks the true task first
+(311 ticks, ×1.0008 to ×14.2, ×3 to ×14 at the end of a long walk) and the prior overrules it, which follows from the
+declared strengths and the gate (questions S and G, ruled). 141 further wrong ticks have the evidence alone ranking the
+admitted hypothesis first (the off run admits most of them too). The largest gain and the largest costs come from one
+mechanism, a lone assigned task admitted before the human starts it (59 correct, 9 not; both new planning cases below
+min_separation). Not settled there: how the meta-planner acts on an admitted hypothesis that can be wrong (an open
+design question); communication (T-D X). Numbers: analysis/kitting/mpb/tk5b/COMPARISON.md and WHATIF.md.
