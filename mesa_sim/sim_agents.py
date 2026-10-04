@@ -480,6 +480,11 @@ class RobotAgent(FactoryAgent):
                 f"lifecycle={self.belief.lifecycle.value}{finding}{leader_adequacy} tails=[{tails_str}] "
                 f"warrant=[{warrant_str}]"
             )
+            # The evidence rank of every live hypothesis (T-K part 1, AM76), in
+            # hypothesis order; empty when exhausted. Its own line, so the
+            # [IR] line and its readers stay as they are.
+            rank_str = "  ".join(f"{k}={v.value}" for k, v in self.belief.evidence_rank.items())
+            logging.info(f"[IR-rank] step={int(obs.timestamp)} rank=[{rank_str}]")
      
             dist_str = "  ".join(
             f"{k}={v:.3f}"
@@ -695,6 +700,7 @@ class RobotAgent(FactoryAgent):
             tails={},
             hypothesis_adequacy={},
             observation_warrant={},
+            evidence_rank={},
             episode_boundary=False,
         )
 

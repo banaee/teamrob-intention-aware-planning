@@ -82,6 +82,12 @@ from a run. It names what the build's checks expect; a run decides.
   order, as `warrant=[...]`; empty when exhausted. (ccode's choice of form; it follows AD4's placement of warrant. The
   alternative, a separate `[IR-rank]` line, would leave `[IR]` byte-identical; either costs the instruments one parser
   change.)
+  AMENDED (ccode, the build's stage 1, 4 October 2026): the separate line is built, `[IR-rank] step=N
+  rank=[<key>=outranked|not_outranked ...]`, printed after `[IR]`. Reason, found at stage 0: the IRB instrument's
+  parsers (`irb/actual.py`'s warrant regex, anchored at the line's end, and `tdlib`'s greedy `tails=[...]`) would
+  misread an `[IR]` line with a new last field before stage 4 updates them; with a line of its own, `[IR]` and every
+  instrument output stay byte-identical through stages 1 to 3, a stronger check. Wherever this plan says "the `rank`
+  field" it reads "the `[IR-rank]` line".
 - Docs updated in the same commit: `shared/io_contracts.md` (BeliefState, its invariants, the gate's reading),
   `docs/recognizer_handback.md` (the outputs, §1.10's neighbourhood, the gate's paragraph).
 

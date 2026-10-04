@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "mesa_sim"))
 
 from shared.meta_planner import GateOutcome
 from shared.recognizer import BELIEF_FLOOR, build_hypothesis_space
-from shared.types import (AdequacyFinding, BeliefState, HypothesisAdequacy, ObservationWarrant, RecognizerLifecycle)
+from shared.types import (AdequacyFinding, BeliefState, HypothesisAdequacy, ObservationWarrant, EvidenceRank, RecognizerLifecycle)
 from mesa_sim.world_state_builder import build_world_state
 from tests.kitting.test_td1_adequacy import H, obs, recognizer
 from tests.kitting.test_th1_tree import model_for, registered
@@ -68,6 +68,8 @@ def test_the_gate_clears_on_the_belief_over_h_with_pinned_keys(model):
                     finding=AdequacyFinding.ADEQUATE, lifecycle=RecognizerLifecycle.LIVE, tails={leader: 1.0},
                     hypothesis_adequacy={k: HypothesisAdequacy.ADEQUATE for k in belief},
                     observation_warrant={k: ObservationWarrant.OBSERVATION for k in belief},
+                    evidence_rank={k: EvidenceRank.NOT_OUTRANKED if k == leader else EvidenceRank.OUTRANKED
+                                   for k in belief},
                     episode_boundary=False, belief=belief)
     assert distribution[leader] < mp.theta <= b.confidence
     assert mp._clears_gate(b) is GateOutcome.CLEARS

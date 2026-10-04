@@ -24,7 +24,7 @@ from shared.projection import Projector
 from shared.realization import realize
 from shared.trajectory_algorithms import stationary_segment
 from shared.types import (
-    AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, ObservationWarrant, ProjectedPlan,
+    AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, ObservationWarrant, EvidenceRank, ProjectedPlan,
     ProjectedPlanEntry,
     RecognitionChange, RecognizerLifecycle, Segment, TaskInstance, Var, Workspace, task_instance_key,
 )
@@ -208,7 +208,8 @@ def belief(confidence, adequacy=HypothesisAdequacy.ADEQUATE):
     return BeliefState(timestamp=0.0, agent_id=H, distribution={key: confidence}, most_likely=key,
                        confidence=confidence, finding=AdequacyFinding.ADEQUATE, lifecycle=RecognizerLifecycle.LIVE,
                        tails={}, hypothesis_adequacy={key: adequacy},
-                       observation_warrant={key: ObservationWarrant.OBSERVATION}, episode_boundary=False)
+                       observation_warrant={key: ObservationWarrant.OBSERVATION},
+                       evidence_rank={key: EvidenceRank.NOT_OUTRANKED}, episode_boundary=False)
 
 
 class Stub:

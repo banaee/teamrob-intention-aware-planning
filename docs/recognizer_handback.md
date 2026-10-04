@@ -693,7 +693,11 @@ Also stated, lower in consequence:
 `update()` returns a `BeliefState` (`shared/io_contracts.md` §1.2; contract §2.1): `timestamp`, `agent_id`,
 `distribution` (every hypothesis key, pinned ones at 10⁻³), `most_likely` (the argmax over H, `None` when
 exhausted), `confidence` (its value, 0.0 when exhausted), `finding`, `lifecycle`, `tails`,
-`hypothesis_adequacy` and, since G-build, `observation_warrant` (§1.10). The meta-planner reads `most_likely`,
+`hypothesis_adequacy`, since G-build `observation_warrant` (§1.10) and, since the gate rulings' build (T-K part 1, AM76,
+stage 1), `evidence_rank`: per live hypothesis OUTRANKED iff another live hypothesis's evidence (`_evidence`, the
+normalised evidence over H, without the prior) is strictly greater, by exact comparison (AM75), NOT_OUTRANKED
+otherwise, a tie included; keys exactly H, empty when exhausted; logged as `[IR-rank] step=N rank=[...]` after `[IR]`
+(`shared/io_contracts.md`, the fourth output). The meta-planner reads `most_likely`,
 `confidence`, the leader's `hypothesis_adequacy` and the leader's `observation_warrant` (io_contracts §2.2), never α or
 the tails; the finding and the lifecycle are for the rest of G and X (R5):
 - `_clears_gate(belief) -> GateOutcome`, the one place θ is applied and the one home of the guard on admission

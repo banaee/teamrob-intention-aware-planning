@@ -24,7 +24,7 @@ from domains.kitting.registry import domain_config
 from domains.kitting.tasks import deliver_item
 from shared.meta_planner import DEFAULT_THETA, GateOutcome, MetaPlanner
 from shared.types import (
-    AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, ObservationWarrant, RecognizerLifecycle,
+    AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, ObservationWarrant, EvidenceRank, RecognizerLifecycle,
     TaskInstance, Var,
 )
 from mesa_sim.world_state_builder import build_world_state
@@ -255,7 +255,8 @@ def belief(leader, adequacy, warrant, confidence=0.9):
     return BeliefState(timestamp=0.0, agent_id=H, distribution={leader: confidence, rival: 1.0 - confidence},
                        most_likely=leader, confidence=confidence, finding=AdequacyFinding.ADEQUATE,
                        lifecycle=RecognizerLifecycle.LIVE, tails={}, hypothesis_adequacy={leader: adequacy},
-                       observation_warrant={leader: warrant}, episode_boundary=False)
+                       observation_warrant={leader: warrant}, evidence_rank={leader: EvidenceRank.NOT_OUTRANKED},
+                       episode_boundary=False)
 
 
 def planner(model, assigned):

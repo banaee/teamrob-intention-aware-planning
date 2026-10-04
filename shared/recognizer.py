@@ -240,7 +240,7 @@ from typing import Callable, Dict, FrozenSet, List, Optional, Sequence, Set, Tup
 from shared.types import (
     Observation, BeliefState, WorldState, GroundedAction, ActionSchema, Predicate,
     TaskInstance, TaskSchema, Var, Const, task_instance_key, PersonalTask, WorkTask, same_task,
-    AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy, ObservationWarrant, StrengthLevel,
+    AdequacyFinding, RecognizerLifecycle, HypothesisAdequacy, ObservationWarrant, EvidenceRank, StrengthLevel,
 )
 from shared.knowledge import ContextKnowledge, TaskModel
 from shared.planner import AdaptivePlanner, DecompositionError
@@ -930,6 +930,7 @@ class IntentionRecognizer:
             most_likely, confidence = None, 0.0
         finding, lifecycle, tails, hypothesis_adequacy = self._adequacy(pos, odo, still, world, advanced, boundary, memo)
         observation_warrant = self._observation_warrant(pos, world)
+        evidence_rank = self._evidence_rank()
 
         return BeliefState(
             timestamp=obs.timestamp,
@@ -942,6 +943,7 @@ class IntentionRecognizer:
             tails=tails,
             hypothesis_adequacy=hypothesis_adequacy,
             observation_warrant=observation_warrant,
+            evidence_rank=evidence_rank,
             episode_boundary=boundary,
             belief=belief,
             prior=self._prior_over_h(),
@@ -1082,6 +1084,25 @@ class IntentionRecognizer:
                 else:
                     warrant[key] = ObservationWarrant.NONE
         return warrant
+
+    def _evidence_rank(self) -> Dict[str, EvidenceRank]:
+        """
+        Every live hypothesis's evidence rank (T-K part 1, AM68, AM76): whether
+        the evidence alone, `_evidence` after this tick's update and boundary
+        (the evidence the belief of the same tick multiplies by the prior's
+        weights), ranks another live hypothesis strictly above it. A fourth
+        output: it reads neither the prior nor the belief, the adequacy nor the
+        warrant, and nothing in the recognizer reads it.
+        The comparison is exact, the floats' own `>` with no tolerance (AM75):
+        a tie is NOT_OUTRANKED, and a mathematical tie that the arithmetic
+        leaves one rounding apart is ranked by that rounding (deterministic,
+        stable, arbitrary; accepted, AM75's consequence). On a boundary tick
+        the evidence restarts equal, so no hypothesis is outranked. In
+        hypothesis order, keys exactly H; empty when EXHAUSTED.
+        """
+        top = max(self._evidence.values(), default=None)
+        return {key: (EvidenceRank.OUTRANKED if self._evidence[key] < top else EvidenceRank.NOT_OUTRANKED)
+                for key in (repr(h) for h in self._hypotheses if repr(h) in self._evidence)}
 
     # -------------------------------------------------------------------------
     # The phase's projected completion delay D (T-D E2, E9, E10)

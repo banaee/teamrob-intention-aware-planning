@@ -27,7 +27,7 @@ from shared.meta_planner import DEFAULT_THETA
 from shared.recognizer import build_hypothesis_space
 from shared.types import (
     ActionContext, AdequacyFinding, BeliefState, Const, ExecutorState, HypothesisAdequacy, Observation,
-    ObservationWarrant, RecognitionChange, RecognizerLifecycle, SpatialContext, TaskInstance, Var,
+    ObservationWarrant, EvidenceRank, RecognitionChange, RecognizerLifecycle, SpatialContext, TaskInstance, Var,
 )
 from domains.kitting.tasks import deliver_item
 from mesa_sim.world_state_builder import build_world_state
@@ -222,6 +222,8 @@ def belief(leader, adequacy, confidence=0.9, boundary=False):
                        most_likely=leader, confidence=confidence, finding=AdequacyFinding.ADEQUATE,
                        lifecycle=RecognizerLifecycle.LIVE, tails={}, hypothesis_adequacy=adequacy,
                        observation_warrant={k: ObservationWarrant.OBSERVATION for k in adequacy},
+                       evidence_rank={k: EvidenceRank.NOT_OUTRANKED if k == leader else EvidenceRank.OUTRANKED
+                                      for k in adequacy},
                        episode_boundary=boundary)
 
 

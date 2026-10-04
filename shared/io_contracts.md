@@ -137,6 +137,7 @@ class BeliefState:
     tails: Dict[str, float]                # S_k of each member of the adequacy test this tick
     hypothesis_adequacy: Dict[str, HypothesisAdequacy]   # ADEQUATE | INADEQUATE | NO_OBSERVATION per live hypothesis
     observation_warrant: Dict[str, ObservationWarrant]   # NONE | OBSERVATION per live hypothesis (T-D G, AD1, AD2)
+    evidence_rank: Dict[str, EvidenceRank]   # OUTRANKED | NOT_OUTRANKED per live hypothesis (T-K part 1, AM68, AM76)
     episode_boundary: bool                 # the belief was re-initialised at an episode boundary on this tick (T-D L1, L5)
     # predicted_next_actions: Dict[str, List[str]] — DEPRECATED, commented out in the
     # dataclass itself. Multi-step prediction now goes through ProjectedPlan (§1.7) and
@@ -149,7 +150,9 @@ with the floor and the pins, `belief` the belief over H the gate reads, AM42; de
 adequacy (G1, T-D 1.5 rulings), and the lifecycle state. Since G-build (R3 as amended by T-D G, AD2) the observation
 warrant per live hypothesis is a further independent output (`observation_warrant`): not a kind of adequacy. The meta-planner reads `confidence`, `most_likely` and the
 leader's `hypothesis_adequacy` (its gate, `_clears_gate`, G1) and, since G-build, the leader's `observation_warrant`
-(the gate's warrant condition, T-D G); it never reads alpha or `tails`. `finding`, `lifecycle`
+(the gate's warrant condition, T-D G); since the build of the gate rulings (T-K part 1, AM76) the evidence rank per
+live hypothesis is a fourth independent output (`evidence_rank`), and the gate reads the leader's value (AM68, its
+build's stage 2); it never reads alpha or `tails`, and never the evidence itself. `finding`, `lifecycle`
 and `tails` exist for evaluation and for the rest of G.
 
 **Invariants:**
@@ -158,8 +161,8 @@ and `tails` exist for evaluation and for the rest of G.
   the returned `distribution` sums to 1.0 (within numerical tolerance) with every retired or inadmissible
   hypothesis at exactly `BELIEF_FLOOR` and the live keys carrying the rest
 - EXHAUSTED (H empty): `distribution` holds the pins alone (the output convention, not belief mass; it does
-  not sum to 1), `most_likely` is `None`, `confidence` 0.0, `finding` `None`, `tails`, `observation_warrant` and `hypothesis_adequacy`
-  empty
+  not sum to 1), `most_likely` is `None`, `confidence` 0.0, `finding` `None`, `tails`, `observation_warrant`,
+  `evidence_rank` and `hypothesis_adequacy` empty
 - otherwise `most_likely` is a key of H in `distribution`; `tails` keys are a subset of H; `hypothesis_adequacy`
   keys are exactly H, a key is ADEQUATE / INADEQUATE iff it is in `tails` with S_k ≥ / < alpha, NO_OBSERVATION iff
   it is not; `finding` is ADEQUATE iff some value is ADEQUATE
@@ -827,6 +830,16 @@ difference of the two costs so that p = o gives exactly 0). No movement warrant 
 target) nor for an unresolved `move_to` (a movement target, no computable gain): each has the entry source only.
 Commitment warrant is the meta-planner's, never computed or printed here. Logged at the end of the `[IR]` line as
 `warrant=[<key>=none|observation ...]`, every live hypothesis in hypothesis order, empty when exhausted.
+
+The fourth output (T-K part 1, AM68, AM73, AM75, AM76; built in the gate rulings' build, stage 1): `evidence_rank` per
+live hypothesis (`_evidence_rank`), from `_evidence`, the normalised evidence over exactly H after the tick's update and
+boundary (the evidence the belief multiplies by the prior's weights), reading neither the prior nor the belief, the
+adequacy nor the warrant. OUTRANKED iff another live hypothesis's evidence is strictly greater, by the floats' own
+comparison with no tolerance (AM75); NOT_OUTRANKED otherwise, a tie included. Keys exactly H, in hypothesis order;
+empty when exhausted; on a boundary tick every value is NOT_OUTRANKED (the evidence restarts equal). With context
+knowledge off the belief is the evidence, so the leader is never OUTRANKED. A mathematical tie that the arithmetic
+leaves one rounding apart is ranked by the rounding (AM75's accepted consequence). Logged on its own line after
+`[IR]`: `[IR-rank] step=N rank=[<key>=outranked|not_outranked ...]`, every live hypothesis in hypothesis order.
 
 Dispatches by schema-declared `microactions` membership and `progress_evaluator` name — never by hardcoded
 microaction strings. See `design_decisions.md`, "IR likelihood dispatch."

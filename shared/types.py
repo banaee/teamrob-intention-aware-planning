@@ -104,6 +104,23 @@ class ObservationWarrant(Enum):
     OBSERVATION = "observation"
 
 
+class EvidenceRank(Enum):
+    """
+    The rank of the evidence (T-K part 1, AM68, AM73, AM75, AM76): per live
+    hypothesis, whether the evidence alone (the movement likelihood of the
+    present episode over the live hypotheses, without the prior) ranks another
+    live hypothesis strictly above it. A fourth output beside the belief, the
+    adequacy and the observation warrant; it reads none of them.
+    OUTRANKED      some other live hypothesis's evidence is strictly greater;
+    NOT_OUTRANKED  none is: the hypothesis's evidence is the greatest, or tied
+                   for the greatest.
+    The comparison is exact, with no tolerance (AM75). The meta-planner reads
+    the leader's value only (its gate, _clears_gate), never the evidence.
+    """
+    OUTRANKED = "outranked"
+    NOT_OUTRANKED = "not_outranked"
+
+
 class RecognizerLifecycle(Enum):
     """
     The recognizer's lifecycle state (T-D R3, R4): LIVE while some task
@@ -150,6 +167,12 @@ class BeliefState:
                   AD1, AD2): a third output, independent of the belief and of
                   the adequacy. Empty exactly when EXHAUSTED. The meta-planner
                   reads the leader's value only (its gate, _clears_gate).
+    evidence_rank
+                  the evidence rank of every live hypothesis (T-K part 1,
+                  AM76): OUTRANKED or NOT_OUTRANKED, from the evidence alone,
+                  by exact comparison (AM75). Empty exactly when EXHAUSTED.
+                  The meta-planner reads the leader's value only (its gate,
+                  _clears_gate, AM68).
     episode_boundary
                   whether this tick is an episode boundary: the observed agent
                   completed a terminal action (T-D L1) and the belief was
@@ -166,6 +189,7 @@ class BeliefState:
     tails: Dict[str, float]  # {intention_id: S_k}, members of the adequacy test only
     hypothesis_adequacy: Dict[str, HypothesisAdequacy]  # {intention_id: value}, every live hypothesis
     observation_warrant: Dict[str, ObservationWarrant]  # {intention_id: value}, every live hypothesis
+    evidence_rank: Dict[str, EvidenceRank]  # {intention_id: value}, every live hypothesis (AM76)
     episode_boundary: bool  # the belief was re-initialised at an episode boundary on this tick
     belief: Dict[str, float] = field(default_factory=dict)  # {intention_id: P} over exactly H (AM42); empty when exhausted
     prior: Dict[str, float] = field(default_factory=dict)   # {intention_id: pi} the prior over exactly H, normalised (T-K part 1,
