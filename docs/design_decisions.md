@@ -4952,6 +4952,18 @@ AM20); AM33 what an observed completion is (under AM27). Notes for the build's p
 AMENDED (Hadi, 3 October 2026, content point 3, the tests): AM34, the setup holds the timeline of context facts (under
 AM11). The rest of content point 3 (the order of the tests, the rooms, the basic set, the round without context
 knowledge, the findings) is in the record ("T-K", CONTENT POINT 3, THE TESTS). Not built.
+AMENDED (Hadi, 3 October 2026, the design chat on the rest of T-K part 1, the form and the values of the strengths;
+AM35 to AM39, recorded 4 October 2026). The chat's A.1 to A.5 are AM35 to AM39, in order. Each rests on an argument
+about what a value or the form states about the human; none rests on a run or on the threshold. The conceptual part is
+here, under R3: AM35 the name "the assigned tasks as a whole"; AM36 three levels per foreseeable task, with a
+suppressing condition and a raising condition, in place of the low strength, the high strength and the occurrence
+condition; AM39 the reading of a strength, per value. In the record ("T-K"): AM37 the declarations (under AM13), AM38
+the values and their sources (under AM17), and the block THE STRENGTHS REVISED (what becomes stale, the open item on
+the value the gate compares with the threshold, the method document). Terms: `docs/glossary.md` §5 (suppressing
+condition, raising condition, suppressed strength, ordinary strength, raised strength, the assigned tasks as a whole,
+timeline of context facts, timeline fact, observed completion, memory of observed completions); "occurrence condition"
+is retired. The statement of the prior, with its formulas and worked examples: `docs/context_knowledge_method.md`
+(the records win where the two disagree). Not built.
 
 - R1, scope. Context knowledge acts in the robot's mind only: in the recognizer's belief. It does not drive the human,
   and it starts or interrupts no task of the human. Conditions of tasks stay in the task model; they decide which
@@ -4989,12 +5001,15 @@ knowledge, the findings) is in the record ("T-K", CONTENT POINT 3, THE TESTS). N
   - A foreseeable task declares a low strength and a high strength. The low strength applies when its occurrence
     condition is not satisfied, the high strength when it is satisfied. A foreseeable task with no occurrence condition
     declares one strength.
+    SUPERSEDED (AM36, Hadi, 3 October 2026; below): three levels per foreseeable task, selected by a suppressing
+    condition and a raising condition.
   - Each declared strength carries its source. It is a modelling assumption until a site measures it.
   Reason: the prior probability of a foreseeable task should not depend on the number of live assigned tasks. Equal
   shares for all hypotheses assert equal strengths, which was never argued.
   Proposed operational meaning, to be validated, not claimed: a strength is a ratio of counted task starts (starts of
   the foreseeable task over starts of any assigned task), counted over task starts at which both were applicable, in
   the stated situation. It is a ratio of counts, not a probability.
+  AMENDED (AM39, below): the reading stated per value.
   When no assigned task is live, the same normalisation runs over the live foreseeable tasks alone. This prior is
   conditional on one of the modelled foreseeable tasks; it has no option "none of the modelled tasks".
   Not taken in T-K part 1: a share for "none of the modelled tasks"; recorded under TODO-155, with the note that it
@@ -5008,6 +5023,9 @@ knowledge, the findings) is in the record ("T-K", CONTENT POINT 3, THE TESTS). N
   foreseeable task, not per hypothesis. There is one selection of the low or the high strength per task, which is then
   divided among the task's live hypotheses. This is why V1 has at most one A/C switch per layout (AM18, in the record),
   and why a condition that differs per hypothesis is future work (TODO-164).
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026), the wording: "an occurrence condition" reads "the suppressing
+  condition and the raising condition"; "one selection of the low or the high strength per task" reads "one selection
+  of the suppressed, the ordinary or the raised strength per task". The evaluation per task stands.
   AMENDED (AM3, Hadi, 3 October 2026; it replaces R9, in the record): two independent run options, both on by default:
   assignment knowledge (the support restriction; the present switch `assignment_prior`) and context knowledge (new;
   its name is `context_knowledge`, AM9). "Work as a whole" in R3 is the live hypotheses of work tasks in the support.
@@ -5043,6 +5061,42 @@ knowledge, the findings) is in the record ("T-K", CONTENT POINT 3, THE TESTS). N
   SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): "not" is in T-K part 1. An occurrence condition reads context facts,
   object states and recency facts, and uses "and" and "not". "Or" stays in T-K part 2. The block CONTENT POINTS 1 AND 2 below,
   AM11.
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026; below): T-K part 1 builds no "not"; "not" and "or" are T-K part 2's.
+  A suppressing condition and a raising condition are each one fact or a conjunction of facts.
+  AMENDED (AM35, Hadi, 3 October 2026; the design chat on the rest of T-K part 1), the name: "the assigned tasks as a
+  whole" replaces "work as a whole" ("assigned work as a whole", "the human's work as a whole"), here and wherever the
+  records say it. With assignment knowledge off, every work task of the task model takes the place of the assigned
+  tasks. Wording only: the prior's formula and the behaviour do not change. AM3's content (two run options; with
+  assignment knowledge off, every work task of the task model) stands; its wording of the group, and the wording that
+  C3 and R8's CORRECTED line took from it, are superseded.
+  Reason: Hadi's term for the group is the assigned tasks. The assigned tasks and the foreseeable tasks together are
+  the modelled behaviour. The default configuration is the framework as designed; the off setting is an ablation, and
+  one sentence describes it.
+  AMENDED (AM36, Hadi, 3 October 2026), the form: three levels per foreseeable task. It replaces the low strength, the
+  high strength and the one occurrence condition (R3's bullet above, AM7, AM11 in part, AM12's wording, the CLARIFIED
+  line under AM2 in its wording). Wherever the records say "occurrence condition" for T-K part 1, it reads "the
+  suppressing condition and the raising condition".
+  - A foreseeable task declares a suppressing condition and a raising condition. Each is optional.
+  - Evaluation per task, not per hypothesis, as before. If the suppressing condition is satisfied, the task has the
+    suppressed strength. Otherwise, if the raising condition is satisfied, the task has its raised strength. Otherwise
+    the task has the ordinary strength.
+  - The suppressed strength and the ordinary strength are declared once per domain and hold for every foreseeable task
+    of the domain. The raised strength is declared per task, with the raising condition.
+  - A condition is one fact or a conjunction of facts, from the three sources already ruled (AM11): a timeline fact, an
+    object state, a recency fact. T-K part 1 builds no "not". "Not" and "or" are T-K part 2's.
+  - Unchanged: every strength is greater than zero (AM4); context removes no hypothesis (AM12); a task's strength is
+    divided equally among its live hypotheses (AM2); the prior's formula; at most one A/C switch per layout (AM18).
+  Reason: the principle the records keep (R8), that a number must not decide between hypotheses that the robot has no
+  knowledge to tell apart. The six values of AM17 violated it. A coffee break just completed outside break time kept
+  0.02, while an office break just completed fell to 0.005, because one low and one high value cannot state three
+  situations. The knowledge that exists is a classification of the situation: suppressed (the task was just done, or
+  is pointless now), ordinary (nothing calls for it, nothing speaks against it), raised (the situation calls for it).
+  Not taken: keeping the pair of values and only fixing their meaning; a coarse declared scale (0.01, 0.1, 1, 10).
+  The declarations and the values: the record ("T-K"), AM37 under AM13 and AM38 under AM17.
+  AMENDED (AM39, Hadi, 3 October 2026), the reading of a strength: the proposed meaning stays proposed and not
+  validated. Stated per value: at a task start, with only this foreseeable task and the assigned tasks live, the
+  probability that the start is the foreseeable task is s / (1 + s). 0.005: 1 of 201 task starts. 0.02: 1 of 51. 0.5:
+  1 of 3. 2: 2 of 3.
 
 - R4, division inside assigned work: equal among the live assigned tasks, in T-K part 1.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -5066,6 +5120,10 @@ knowledge, the findings) is in the record ("T-K", CONTENT POINT 3, THE TESTS). N
   largest error.
   SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): the parenthesis on AM7. In T-K part 1 an occurrence condition uses
   "and" and "not"; "or" stays T-K part 2's. AM10 (below) confirms that every fact of T-K part 1 is crisp.
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026; R3): "not" is T-K part 2's again, with "or"; in T-K part 1 a
+  condition is one fact or a conjunction of facts. The linear rule "strength = low + degree × (high − low)" was stated
+  for the pair of a low and a high strength; it is restated for two conditions, an open item of T-K part 2 (the
+  record, "T-K", T-K part 2's OPEN ITEMS).
 
 - R6, duration and projection. A task keeps one declared duration. Context changes how strongly the robot considers a
   task; it does not change the content of a projection. The only path from context to the projection is: prior,
@@ -5125,10 +5183,15 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
   agents' behaviour. One timeline is then shared by several scenarios. The two setups of a layout differ in their
   timeline, and this is also how the effect of a different window on the same activity is tested.
   Pointer: "Layouts, setups and scenarios: the three artefacts of a run", ruling 1, the setup.
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026; R3): the three sources stand, and are read by a suppressing condition
+  and a raising condition; "uses 'and' and 'not'" reads "is one fact or a conjunction of facts". The reason stands as
+  the reason of a suppressing condition.
 
 - AM12, context removes no hypothesis (under R3, with AM4). Context still removes no hypothesis. With its occurrence
   condition not satisfied, a foreseeable task has its low strength and stays live. The condition's change selects the
   strength; the prior stays a probability distribution.
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026; R3), the wording: at each of the three levels (suppressed, ordinary,
+  raised) the foreseeable task stays live; the conditions select the level. The ruling stands.
 
 - AM14, recency facts are per task (under R3). A recency fact is declared per task, with its own recency duration. A
   recency fact is a context fact derived from the time since the robot observed completion of a named task; it holds
@@ -5149,6 +5212,8 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
   world. A recency fact changes through the robot's observation of a completion, in the mind.
   Reason: the rule concerns the world's timeline facts; the recency fact is derived in the mind and was never an
   effect of the action.
+  SUPERSEDED IN PART (AM36, AM37, Hadi, 3 October 2026), the wording: "the task then has its low strength through the
+  object state ac_on" reads "the task then has the suppressed strength, through its suppressing condition ac_on".
 
 - AM21, a clarification, no new decision (under R2). A context fact is a state. An entry of the timeline is the
   change; the fact then holds on every tick until the next change. The change is no trigger of the meta-planner; the
@@ -5167,6 +5232,9 @@ the values and the rest are in the record ("T-K", CONTENT POINTS 1 AND 2). Terms
 - AM26, the declared context knowledge (content point 2). The declared context knowledge (the facts that exist, the
   occurrence conditions, the strengths, the recency durations) reaches the mind directly from the knowledge component,
   as the task model does.
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026), the wording: "the occurrence conditions, the strengths" reads "the
+  suppressing and the raising conditions, the strengths (the suppressed and the ordinary strength per domain, the
+  raised strength per task)".
 
 - AM27, the source of a recency fact (content point 2). A recency fact rests on the mind's own memory of an observed
   completion. The world state holds no history, and the mind does not read the simulator's record of the human.
@@ -5226,7 +5294,9 @@ whole contains, so it shapes the prior through the support.
 (content points 1 and 2): CONTENT POINTS 1 AND 2 (AM13, AM14's record part, AM16 to AM19, AM23, AM24, AM28, AM29;
 the ideas not ruled, each to its place); the open items' state. Amended 3 October 2026 (AM30 to AM33): the notes
 for the build's plan, with the open items. Amended 3 October 2026 (content point 3): CONTENT POINT 3, THE TESTS (KT1 to
-KT7; KT4 is AM34's record part).
+KT7; KT4 is AM34's record part). Amended 3 October 2026, recorded 4 October 2026 (AM35 to AM39): AM37 under AM13,
+AM38 under AM17, THE STRENGTHS REVISED (what becomes stale, the open item on the value the gate compares with the
+threshold, the method document).
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one

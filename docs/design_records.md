@@ -2464,6 +2464,10 @@ items as amended, and the open items' state.
 AMENDED (Hadi, 3 October 2026, content point 3, the tests): CONTENT POINT 3, THE TESTS (below), KT1 to KT7. Its
 conceptual part, AM34 (the setup holds the timeline of context facts), is in design_decisions.md under this title,
 under AM11.
+AMENDED (Hadi, 3 October 2026, the design chat on the rest of T-K part 1, the form and the values of the strengths;
+recorded 4 October 2026): AM35 to AM39. Their conceptual part (AM35 the name, AM36 the three levels, AM39 the reading
+of a strength) is in design_decisions.md under this title, under R3; here AM37 the declarations (under AM13), AM38 the
+values and their sources (under AM17), and the block THE STRENGTHS REVISED (below).
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -2499,6 +2503,9 @@ THE CUT AND THE QUEUE.
   component (AM26), which replaces the class `ContextKnowledge` in `shared/knowledge.py` (glossary §5, context
   knowledge); the removal of the long-shift rule with nothing in its place (AM22). Before the build, in its own step:
   the layouts with more than one A/C switch (AM19).
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026): the build contains no "not". It contains the suppressing condition
+  and the raising condition of each foreseeable task, each one fact or a conjunction of facts over the three sources,
+  and the three levels of a strength.
   AMENDED (Hadi, 3 October 2026; AM30, AM33): the memory of observed completions is its own component of the robot's
   mind, outside the recognizer, and records the tick of an observed completion; an observed completion is the task's
   terminal fact in the robot's world state (design_decisions.md, this title, AM27's AM30 and AM33).
@@ -2508,6 +2515,8 @@ THE CUT AND THE QUEUE.
   T-K part 2's operators include "or" and "not" in an occurrence condition; T-K part 1's occurrence condition is a conjunction
   (AM7).
   SUPERSEDED IN PART (AM11, Hadi, 3 October 2026): "not" is in T-K part 1; T-K part 2's operators keep "or" (and the degrees).
+  SUPERSEDED IN PART (AM36, Hadi, 3 October 2026): "not" is T-K part 2's again; T-K part 2's operators hold "or" and
+  "not" (and the degrees).
   T-K part 2's OPEN ITEMS (AM8, Hadi, 3 October 2026): the representation of a context value and of a degree. The fact form of
   T-G A5 holds crisp facts only.
   ADDED (Hadi's ideas and open items, the design chat of 3 October 2026; NOT RULED):
@@ -2518,6 +2527,9 @@ THE CUT AND THE QUEUE.
     (AM22).
   Open, also part 2's: whether succession between tasks affects the division inside work as a whole (R4), after T-G
   stage 2, to be argued with `store_pallet` present.
+  OPEN (AM36, Hadi, 3 October 2026): the linear rule "strength = low + degree × (high − low)" (R5) was stated for the
+  pair of a low and a high strength. It is restated for two conditions (the suppressing condition and the raising
+  condition).
 - Future work, each a TODO tagged [FW]: duration uncertainty and a projection that depends on context (TODO-158);
   unobservable states of the human as context (TODO-159); scopes of knowledge (general, sector, domain) and norms
   (TODO-160); validation of the strengths on site data (TODO-161); the robot without knowledge of the assignment
@@ -2555,12 +2567,19 @@ NOTES FOR THE BUILD'S PLAN (Hadi, 3 October 2026; confirmed on ccode's report of
 not rulings of design):
 - "not" in an occurrence condition (AM11) needs a condition form of its own; ccode proposes it in the build's plan.
   (The code's `ConditionSchema` has no negation flag, by its own comment.)
+  SUPERSEDED (AM36, Hadi, 3 October 2026): T-K part 1 builds no "not"; no form for "not" is needed.
 - ac_on (AM18) needs a declared state and a declared effect of the action; dock_loading needs the object type and the
   task ac_activation.
 - Recency durations (AM16) are declared in physical time and converted by the body.
 - ADDED (the design chat, 3 October 2026): the instruments are part of the build's plan. The IRB's expectations must
   be computed with the new prior (the oracle assumes the equal prior and ω = 1 today); its report must read the three
   conditions A, B and C (KT11); the A/C's measure is its belief at its arrival (KT10). The plan states what this costs.
+- OPEN (Hadi, 3 October 2026; THE STRENGTHS REVISED, below): which value the gate compares with the threshold, the
+  belief over the live hypotheses or the output after its scaling by the pinned hypotheses. It is a design question,
+  argued from what each value means. The plan reports the facts of the code. It is not settled by whether a given
+  value passes.
+- ADDED (Hadi, 4 October 2026): the statement of the prior that the plan reads is `docs/context_knowledge_method.md`
+  (THE STRENGTHS REVISED, below, F).
 
 Also recorded: the open questions of C1, T-K PART 1 (the T-G heading above) are answered by the rulings, except the
 liveness of a hypothesis whose condition turns false while the human executes its task, which is not answered (C1,
@@ -2579,6 +2598,13 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   - ac_activation (kitting, dock_loading): room_warm and not ac_on.
   - office_break (dock_loading): not recent. It has no timeline fact.
   break_time and room_warm are timeline facts (AM11); ac_on is the A/C switch's object state (AM18).
+  SUPERSEDED (AM37, Hadi, 3 October 2026; the design chat on the rest of T-K part 1): the declarations under the three
+  levels (design_decisions.md, this title, R3's AM36), the same in both domains where the task exists:
+  - Suppressed strength 0.005. Ordinary strength 0.02. Each declared once per domain, for every foreseeable task.
+  - coffee_break: suppressing condition, its recency fact. Raising condition, break_time, with the raised strength 2.
+  - ac_activation: suppressing condition, ac_on. Raising condition, room_warm, with the raised strength 0.5.
+  - office_break: suppressing condition, its recency fact. No raising condition.
+  - The recency durations are unchanged (AM16): 90 ticks and 135 ticks.
 
 - AM14, record part (the chat's A5): coffee_break and office_break each declare a recency fact, with its own recency
   duration. ac_activation declares none (ac_on covers it).
@@ -2602,6 +2628,22 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   unscheduled coffees per shift".
   Stated consequence, not a criterion: the values decide whether an assigned task is at or above the threshold before
   any distinguishing movement. No value was chosen from the threshold or from a scenario.
+  SUPERSEDED (AM38, Hadi, 3 October 2026; the design chat on the rest of T-K part 1): the values and their sources,
+  under the three levels (AM36; the declarations, AM37 under AM13).
+  - 0.005 and 0.02 keep the recorded source sentence above.
+  - coffee_break raised, 2 in place of 3. Source, Hadi, 3 October 2026: break time favours the coffee break; it is more
+    probable than an assigned task, and not as strongly as 3 stated. Reason for leaving 3: held over a whole period, 3
+    asserts that 3 of 4 task starts are the coffee break, so that the human almost never starts an assigned task in
+    break time.
+  - ac_activation raised, 0.5 in place of 0.2. Source, Hadi, 3 October 2026: a warm room is a matter of comfort with no
+    stated time, so the human more often starts an assigned task first, and the activation follows within about 3 task
+    starts. 0.2 asserted 6 task starts.
+  - ac_activation with the room not warm and the A/C off: the ordinary strength 0.02, in place of 0.005. Nothing states
+    that the task is pointless there.
+  - A coffee break just completed has the suppressed strength in every situation, inside break time too.
+  - No value was chosen from the threshold or from a scenario.
+  Each value rests on an argument about what it states about the human; none rests on a run or on the threshold. The
+  reading per value: design_decisions.md, this title, R3's AM39.
 
 - AM18, the A/C switch (the chat's A9). An A/C switch is an object in the layout with a state, on or off (ac_on).
   ac_activation sets it to on. A setup may state its initial state. The state is read by the occurrence condition, not
@@ -2615,6 +2657,9 @@ CONTENT POINTS 1 AND 2. The chat's labels map in order: its A1 to A15 are AM10 t
   foreseeable task, not per hypothesis (design_decisions.md, this title, R3's AM2, its CLARIFIED line), so the state of
   one switch cannot select the strength of one hypothesis of ac_activation; a condition per hypothesis is TODO-164.
   Not taken: the state of the A/C as a condition of the task (context only lowers the strength).
+  SUPERSEDED IN PART (AM36, AM37, Hadi, 3 October 2026), the wording: "the occurrence condition" reads "the suppressing
+  condition of ac_activation"; "an occurrence condition is evaluated per foreseeable task" reads "the suppressing and
+  the raising condition are evaluated per foreseeable task".
 
 - AM19, the layouts with more than one A/C switch (the chat's A10). They are changed to the V1 rule (AM18), in their own
   step before the build of T-K part 1. First ccode lists every such layout and every scenario, test and analysis that
@@ -2684,6 +2729,11 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
   the north wall in all three (014538a). env_layout_16 lost its two south-east shelves, shelf_3 and shelf_4, outside
   the cluster (4cd7bca), so that its runs end before step 500; the cluster is unchanged. ccode may adjust these rooms
   where it makes a better basic test, decided before the runs and never after seeing a result.
+  CORRECTED (recorded 4 October 2026; Hadi's correction in the layout tool's chat, 3 October 2026): "env_layout_10, _11 and _02 stay unchanged" reads "stay
+  as they are", env_layout_02 as it is after Hadi's correction of its object sizes (4191202, 3 October 2026: the
+  coffee machine 50 × 50, the A/C switch 20 × 20, the sizes of every other kitting layout; nothing else changed).
+  ccode's check, 4 October 2026: the correction is committed; only the viewer reads an object's size
+  (`mesa_sim/viz/space_drawer.py`), so no run's behaviour depends on it.
 
 - KT3, the basic set. The only variation is where a foreseeable task is placed: between tasks (after the first
   delivery, after the second, and so on) and inside a task, between its actions. No other kind of deviation.
@@ -2720,6 +2770,9 @@ conceptual: AM34 in design_decisions.md under this title (under AM11); its recor
     (AM17's stated consequence).
     AMENDED (Hadi, 3 October 2026; ROUND 1, KT11, below): work as a whole contributes 1 however many deliveries are
     live, so in env_layout_15 the coffee break's prior inside the break time is 0.75 in every scenario.
+    SUPERSEDED (AM36, AM38, Hadi, 3 October 2026; THE STRENGTHS REVISED, below): the coffee break's raised strength is
+    2. With one coffee machine and no A/C switch, its prior inside the break time is now 2/3 for any number of live
+    deliveries, and each of n live deliveries has 1/(3n). The finding that it equals the threshold no longer holds.
   - The recency duration of 90 ticks (AM16) was derived from the wait, which is compressed, while walking is not. In
     these rooms the walk from the coffee machine to the table and back takes about 84 to 94 ticks. It joins T-F's open
     item on the time scale (TODO-144, its open item of 3 October 2026).
@@ -2819,6 +2872,14 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   floating-point rounding. The runs are deterministic, so the result is stable, and it is arbitrary.
   Reason: the run with context knowledge off is not a neutral baseline, since the equal prior gives a foreseeable task
   the share of one delivery; A to C alone would mix the effect of the strengths with that of the fact.
+  SUPERSEDED (AM36 to AM38, Hadi, 3 October 2026; THE STRENGTHS REVISED, below): the expected directions for the runs
+  with context knowledge on, and their arithmetic (the first directions, the CORRECTED directions with their numbers,
+  the "Also recorded" line on 0.75, and the case of a prior of exactly 0.75 in the ADDED line; that line's statement of
+  the gate, which refuses only below the threshold, stands). The design chat restates them before those runs. The
+  three conditions A, B and C stand; in B, "(the low strengths)" reads "(no raising condition satisfied)".
+  RULED (Hadi, 3 October 2026), for that restatement: with context knowledge on and no raising fact holding, a lone
+  live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if the human then
+  takes a foreseeable task.
 
 - KT12, the state. The round without context knowledge is done; it is condition A. Next: a new design chat takes the
   rest of T-K part 1: the list of the layouts with more than one A/C switch and their change (AM19); the build's plan;
@@ -2843,6 +2904,10 @@ without context knowledge (KT5); then a new design chat takes the build of T-K p
 more than one A/C switch, AM19; the build's plan, BUILD DISCIPLINE step 1; the build; the runs with context knowledge
 on; dock_loading; the close); a later chat returns to T-G's stage 2.
 SUPERSEDED (Hadi, 3 October 2026; ROUND 1 above, KT12): the round without context knowledge is done. Next: KT12.
+AMENDED (Hadi, 3 October 2026, recorded 4 October 2026; THE STRENGTHS REVISED, below): the form and the values of the
+strengths are revised (AM35 to AM39) before the build's plan. Next: KT12's steps, unchanged; the build's plan reads
+`docs/context_knowledge_method.md` as the statement of the prior, and the design chat restates the expected directions
+before the runs with context knowledge on.
 
 THE TASK RENAMED: T-K AND ITS PARTS (Hadi, 3 October 2026). Records only: a reorganisation of task names; no change of
 behaviour. The old name and the new are mapped in one line each in CLAUDE.md and docs/design_decisions.md (this
@@ -2877,3 +2942,73 @@ entry's head); git commit messages use the old name.
    does, the robot gets a recency fact for a completion it did not observe, against AM27 and AM33.
 6. Hadi's direction for T-K part 1's tests (content point 3, OPEN ITEMS item 3; still open, not ruled): recorded there.
    RULED (Hadi, 3 October 2026): CONTENT POINT 3, THE TESTS above (KT1 to KT7).
+
+THE STRENGTHS REVISED, RULED (Hadi, 3 October 2026; the design chat on the rest of T-K part 1, on the form and the
+values of the strengths; recorded 4 October 2026). Records only: no code, layout, setup, scenario, test or run is
+changed. The design of context knowledge was reviewed before its build. Each revision rests on an argument about what
+a value or the form states about the human; none rests on a run or on the threshold. The rulings are in the records
+before the build's plan is written.
+
+A. The rulings. The chat's A.1 to A.5 are AM35 to AM39, in order.
+- AM35, the name "the assigned tasks as a whole" (wording only); AM36, three levels per foreseeable task, with a
+  suppressing condition and a raising condition; AM39, the reading of a strength per value: design_decisions.md, this
+  title, under R3, each with its reason.
+- AM37, the declarations: under AM13 above. AM38, the values and their sources: under AM17 above.
+- The marks they set, each with a pointer: in design_decisions.md, R3's bullet on the low and the high strength, the
+  CLARIFIED line under AM2, AM7's line, R5, AM11, AM12, AM20, AM26; here, THE CUT (no "not"), T-K part 2's OPEN ITEMS,
+  AM18's wording, NOTES FOR THE BUILD'S PLAN.
+
+B. The glossary (`docs/glossary.md` §5). New entries: suppressing condition; raising condition; suppressed strength,
+ordinary strength, raised strength; the assigned tasks as a whole; timeline of context facts; timeline fact; observed
+completion; memory of observed completions. Amended: strength, prior, context knowledge, assignment knowledge, and §8's
+T-K and T-K part 2. Retired, with a pointer: occurrence condition, the older records' term for the single condition,
+replaced by the suppressing condition and the raising condition.
+
+C. What becomes stale, marked superseded with a pointer here; the expected directions are not restated in this record.
+- The finding that the coffee break's prior in break time equals the threshold (KT6, its first finding and its
+  AMENDED line; KT11's "Also recorded"). With one coffee machine and no A/C switch it is now 2/3 for any number of live
+  deliveries, and each of n live deliveries has 1/(3n).
+- The expected directions for the runs with context knowledge on, and their arithmetic (KT11). The design chat
+  restates them before those runs. RULED by Hadi for that restatement: with context knowledge on and no raising fact
+  holding, a lone live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if
+  the human then takes a foreseeable task (KT11's RULED line).
+- T-K part 2's formula, strength = low + degree × (high − low), was stated for the pair of values: an open item of T-K
+  part 2 that it is restated for two conditions (T-K part 2's OPEN ITEMS, above).
+- The notes for the build's plan: no form for "not" is needed (NOTES FOR THE BUILD'S PLAN, above).
+- OPEN, for the build's plan: which value the gate compares with the threshold, the belief over the live hypotheses or
+  the output after its scaling by the pinned hypotheses (NOTES FOR THE BUILD'S PLAN, above).
+- The same marks in `docs/handoffs/T-G_forward_inputs.md`, section 5.
+
+D. Records from the layout tool's chat (3 October 2026).
+- KT2's line "env_layout_10, _11 and _02 stay unchanged, as a comparison" is brought in line with Hadi's correction of
+  env_layout_02's object sizes (KT2's CORRECTED line). The correction is committed (4191202).
+- `docs/handoffs/T-G_forward_inputs.md` (5.11) names the two entries of 3 October 2026 in design_decisions.md, "An
+  object id is an opaque name" and "`subtype` is a stated fact of an object", with their bearing: the build identifies
+  no object by the text of its id; dock_loading's layouts and setups changed after stage 1's baseline was measured
+  (5d19859: `subtype` on the delivery bays and the pallets that touch them).
+
+F. The method document. Hadi added `docs/context_knowledge_method.md` (812283c, 4 October 2026): the method of
+context knowledge at the state of these rulings, the concept, the formulas and worked examples, written for Hadi's
+reading and for a later paper; it serves the build's plan as the statement of the prior.
+- Its place and name are kept (ccode's choice): `docs/` at the top level, beside `glossary.md`, `assumptions.md` and
+  `terminology_revision.md`, the living documents of the design, which carry snake_case names. It is not a handoff (a
+  handoff is written for one chat) and not an analysis.
+- Its status, in its first lines: the design records hold the rulings and their reasons and are authoritative; the
+  document states the result of the rulings; if the two disagree, the records win and the document is corrected.
+- Its terms are brought in line with the glossary as amended in B. No formula, value or example is changed. The
+  sentence of its section 3 on the half-open window edges is left; the build's plan confirms it.
+- The standing rule, in CLAUDE.md beside the rule on where a ruling is recorded: a ruling that changes the method of
+  context knowledge updates this document in the same records step. ccode does not change the method itself; ccode
+  flags a contradiction with its evidence, and Hadi rules.
+- Named in `docs/handoffs/T-G_forward_inputs.md` (5.1, 5.3, 5.7) as the statement of the prior that the build's plan
+  reads.
+- FLAGGED by ccode (4 October 2026), not resolved:
+  1. Its status line named "the question of 4 October 2026 on the equal prior" (its section 13); no record holds a
+     ruling or a question of that date. The phrase is kept in the new status line.
+  2. Its section 14 states three things that A and the records do not hold: the value 1 not taken because it asserts
+     no direction; the two raised strengths on opposite sides of 1 (break time a scheduled norm of the site, a warm room
+     a weaker call); "one raised strength shared by all tasks" among the alternatives not taken.
+  3. Its section 8 states a foreseeable task's warrant as supporting movement only (the path cost to the task's target
+     decreased since the start of the present phase). Observation warrant has a second source, the phase entered by
+     the observed completion of the hypothesis's previous step, the only source in a phase without a movement target
+     (glossary §7, observation warrant; design_decisions.md, "T-D G: admission", AD1, AD2).
