@@ -519,9 +519,11 @@ Decisions
   the A/C scripts room_warm from 150, 26 scenarios state their own; 59 runs agree with the oracle; the directions are
   read per side in its REPORT.md. Question S is ruled (AM65, 4 October 2026): the four strengths stay as ruled, not
   tuned to the movement evidence. The reading for question G (admission and retraction under context knowledge) is in
-  step 4's REPORT.md ("The reading for question G"; design_records.md, "T-K", THE READING FOR QUESTION G). Next:
-  question G and step 5 of `docs/handoffs/T-G_forward_inputs.md`, section 5.7 (the planning cases), in the design
-  chat; then dock_loading's part, the close.
+  step 4's REPORT.md ("The reading for question G"; design_records.md, "T-K", THE READING FOR QUESTION G). Question G
+  is ruled (AM66, 4 October 2026): the gate and the retraction stay as ruled. Step 5, the planning cases (five, KT15),
+  is under way (stage 1's proposal: design_records.md, "T-K", STEP 5, STAGE 1: THE PROPOSAL). Next: step 5's stages 2
+  and 3; then step 5b (the existing kitting sets with context knowledge on, planned); then dock_loading's part, the
+  close.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

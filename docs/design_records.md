@@ -2476,6 +2476,9 @@ AMENDED (Hadi, 4 October 2026, on ccode's plan of the build; AM42 to AM53): the 
 (after THE TIMELINE IN THE SCENARIO).
 AMENDED (Hadi, 4 October 2026, on ccode's cross-check of the plan's rulings; AM54 to AM58): AM54 is in
 design_decisions.md under this title, under R1; here the block THE CROSS-CHECK, RULED (after THE BUILD'S PLAN, RULED).
+AMENDED (Hadi, 4 October 2026, step 5; AM66, KT15): question G ruled, its conceptual part in design_decisions.md
+under this title, under R7; here QUESTION G, RULED, THE PLANNING CASES, RULED (KT15), STEP 5B, PLANNED and STEP 5,
+STAGE 1: THE PROPOSAL (at the end of this heading).
 
 R9. The support restriction (the switch named `assignment_prior`) is on by default for every further analysis and test
 in V1. The robot without knowledge of the assignment is future work (TODO-162). Recorded only: the run option's default
@@ -3392,3 +3395,108 @@ relies on retraction for a deviation.
   lasts 43 to 60 ticks, the evidence alone near a tie (×1.0006 to ×1.009), with observation warrant held because the
   walk to the machine or the switch gains path toward its shelf; the trigger rule ends an admission later than the
   per-tick gate in 18 of 32 rows. Next: question G in the design chat.
+
+QUESTION G, RULED (Hadi, 4 October 2026; AM66, its conceptual part in design_decisions.md under R7). The gate and the
+retraction stay as ruled under context knowledge. The reasons and the consequences are stated there; the consequences
+rest on THE READING FOR QUESTION G above (the late catch: the evidence alone turns 3 to 9 ticks after the human left,
+the trigger rule 3 to 8 ticks later; the A/C beside the delivery's shelf: s15_19; the record kept 1 to 9 ticks past the
+per-tick gate in 18 of 32 rows). Question G is closed.
+
+THE PLANNING CASES, RULED (KT15, Hadi, 4 October 2026; step 5 of T-K part 1). Amends KT3's "two cases also run in the
+MPB".
+- The planning cases are five, on env_layout_17. The case of the early admission is added; it replaces neither of
+  KT3's two.
+  1. The human takes a coffee break inside break_time (raised, in accord).
+  2. The human delivers through the whole break_time (raised, against).
+  3. No fact holds, and the human does the last delivery (ordinary, in accord: the early admission, correct).
+  4. No fact holds, and the human takes a coffee break instead of the last delivery (ordinary, against: the early
+     admission and its retraction).
+  5. No fact holds, and the human activates the A/C instead of the last delivery (ordinary, against: the admission
+     that the movement does not correct).
+- Purpose: step 4 showed what the prior does to recognition; step 5 shows whether a changed admission changes the
+  robot's decision, when the human acts in accord with the context and when not.
+- Each case: the same script and the same robot task on up to three sides (context knowledge off; on without the
+  raising fact for the true task; on with it), every verdict within one script; the robot's task conflicts with the
+  human at the place and time where the admission differs between the sides; KT3's condition stands (the robot does
+  not hold the items of the two shelves beside the A/C switch). Measures per side: each decision of the robot with its
+  tick and the projection it rests on; the admissions and retractions as the meta-planner holds them, not the gate's
+  tick-by-tick answer; the completion ticks; the separation.
+- The step's rules: no script, window, robot task or expectation changes after a run with context knowledge on (a
+  surprising result is a finding); it stops on a disagreement with the oracle that is not a plain defect, on a ruled
+  case that cannot be given a conflict, and on anything that would need a change to a core algorithm. No change to the
+  recognizer, the gate, the projection, the meta-planner or any ruled value. Three stages, a pause after each.
+
+STEP 5B, PLANNED (Hadi, 4 October 2026). After step 5 and before dock_loading's part (step 6): the existing sets of
+kitting run with context knowledge on, with no new authoring. First the recognition set (17 scenarios on
+env_layout_10 and _11, the robot idle), then the planning set (16 scenarios on env_layout_12 to _14), read against its
+coverage matrix (analysis/kitting/mpb/coverage.md). Purpose: to see what the prior does to the human's deviations,
+which the context rooms exclude, and which authored decision paths remain when the prior changes the admissions. The
+run files with context knowledge off stay each set's reference. Not part of step 5's session.
+
+STEP 5, STAGE 1: THE PROPOSAL (ccode, 4 October 2026; not ruled, Hadi rules at the pause). Authoring runs with
+context knowledge off only. The on sides' admissions are the IRB oracle's previews on the drafted scripts (no run with
+context knowledge on); they equal step 4's ticks once shifted to the stretch's start.
+- The disjointness rule (the robot's items and shelves disjoint from the human's; Hadi's question at stage 1).
+  - With step 4's assignment (item_1 to item_4 on shelf_1 to shelf_4) it cannot hold: every shelf holds a human item,
+    and KT3 excludes the two shelves beside the switch for the robot.
+  - It holds with a reduced assignment: the human is assigned item_4 alone, the robot item_2 on shelf_2. The human then
+    starts in the state of step 4's last delivery (live: item_4, coffee_break, ac_activation; the same walk from the
+    table). With it every ruled case gets a conflict, all on the robot's first walk. With one kitting table, every
+    later robot route is a ray from the table, as every human walk is, and two such rays come within min_separation
+    only 60 to 130 cm from the table. A first walk from inside the room meets a human walk no later than tick 28 (a
+    search over starts).
+  - Alternative (a), the full assignment and a shared shelf (the robot's item in shelf_2's second slot): step 4's
+    scripts run verbatim, but the human's 216-tick prefix with a working robot makes earlier admissions differ between
+    the sides (a confound), the robot meets the human at shelf_2, and its routes stay rays from the table, so no
+    conflict reaches the last delivery. No gain.
+  - Alternative (b), a robot-side addition: a robot table and a robot shelf in a copy of env_layout_17 under a new id,
+    off every human walk and its continuation. The robot's routes then cross the human's walks away from the table at
+    times its chain of tasks sets, so a case can reach the human's turn at shelf_4 (ticks 44 to 48), the wait at the
+    machine (42 to 71) and the walk after the break (from 73), where an admitted projection knows what the fallback
+    does not; the table event below goes. Cost: a new room, "on env_layout_17" read as env_layout_17 plus robot-only
+    objects (Hadi rules); no assigned task names the added objects, so the human's hypotheses are unchanged.
+  - Recommended: the reduced assignment on env_layout_17 as it is; (b) only if the correct early admission is to be
+    tested where the projection differs from a straight walk.
+- What shapes the predictions (the authoring runs, off): on a straight walk the fallback projection (T-D P4)
+  anticipates the conflict. Its expiries fall at 2, 6, 14 and 30, each projecting to the next, so a conflict from tick
+  15 is seen at 14, and a hold of 2 to 6 ticks clears it (separation above 50 cm in every crossing tried). A correct
+  early admission then moves the decision earlier and is not expected to change the hold's effect. A wrong one either
+  displaces the fallback (no fallback is built while an admission stands) or holds the robot for a walk that does not
+  come.
+- The set. env_setup_16 on env_layout_17: item_4 on shelf_4 (the human's), item_2 on shelf_2 (the robot's), both to
+  kitting_table_0; no default timeline. The human starts at (0, 450), is assigned deliver_item(item_4), and every script
+  ends with the exit walk to corner_NE. The robot has one task, deliver_item(item_2), from a start per family.
+  single_task only (with one task full_reorder has one ordering). Per family, off and on without the fact on a scenario
+  with no timeline, on with the fact on a scenario stating its own timeline, the fact from tick 0 to the run's end (no
+  edge inside an episode). scenario_s16_01 to _08, run files in configs/kitting/mpb/tk/, 12 runs.
+  - F1 (s16_01; s16_02 break_time): deliver item_4. Robot from (-310, 90); its walk to shelf_2 meets the walk to shelf_4
+    from tick 15 (8 cm unheld). item_4 admitted: off 47 (step 4: s15_01, +45), on without 0 (38 of 38 lone deliveries
+    at their first observation), on with break_time 38 (s15_01, s15_18: +37, +39). Expected: off holds 2 at 14 on the
+    fallback (the authoring run); on without decides its hold at 0 against the admitted plan; on with is off's up to
+    38. Cases 3 and 2: nothing expected in ticks or separation; the decision's tick and place differ.
+  - F2 (s16_03; s16_04 break_time): coffee_break, then deliver item_4. Robot from (-60, -480); meets the walk to the
+    machine from 27 (17 cm unheld), 169 cm from the walk to shelf_4. coffee_break admitted: off 36 (s15_04, +36), on
+    with break_time 22 (s15_04, +22); on without, item_4 0 to 42 (s15_19: 216 to 261; s13_13: 216 to 258), its
+    retraction at 43, coffee_break from 55. Expected: off and on with hold 3 at 14 on the fallback (on with is below the
+    threshold until 22), and on with re-decides at 22 with no further hold: case 1, nothing expected. On without: no
+    hold, the robot passes the human at about 17 cm at 27 (the wrong admission displaced the fallback; a case 4
+    consequence, read beside F3).
+  - F3 (s16_05; s16_06 break_time): F2's script. Robot from (-310, 90); meets the walk to shelf_4 at 15, where on
+    without's projection puts the human, 103 cm from the walk to the machine. Expected: off and on with, no hold (the
+    authoring run: none); on without, a hold of a few ticks at 0 for a walk that does not come (case 4, a cost in
+    ticks). The retraction at 43 comes after the robot has passed.
+  - F4 (s16_07; s16_08 room_warm): ac_activation, then deliver item_4. Robot from (-475, -408); meets the walk to the
+    switch from 27 (8 cm unheld), 63 to 85 cm from the walk to shelf_4. Admitted: off nothing until 63; on without
+    item_4 0 to 45 (s15_19: 216 to 261); on with room_warm nothing until 47 (the A/C below the threshold, s15_10: 0.60
+    at its arrival). Expected: off and on with hold 6 at 14 on the fallback; on without, no hold, the robot passes the
+    human at about 8 cm at 27 (case 5, a cost in separation, the robot moving).
+- The shared table. In every authoring run the robot completes (declared 69 to 92) before the human returns to place
+  item_4 (89, 135, 135, 99), then stands at the table with an empty pool, 3 to 22 cm from the human's placement: a
+  standing robot, not robot-responsible under F1, the same on every side while the robot completes first, which the
+  expectations check. It confounds no verdict; the separation is reported per conflict window and over the run with
+  F1's class. No two deliveries finish together in this set.
+- Not shown on env_layout_17 as it is: the correct early admission where the projection differs from a straight walk
+  (a turn, a stand); any planning consequence of case 4's retraction (at 43, after every reachable conflict). Further
+  cases proposed, both needing (b): E1, a correct early admission at a turn (the robot meets the human's carry back
+  from shelf_4 or the human at the shelf); E2, the lone delivery admitted early after an observed break (the recency
+  fact: item_4 at 73 on both on sides against 97 off, on the walk from the machine), direction 4 reaching planning.

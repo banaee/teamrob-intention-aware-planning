@@ -551,7 +551,17 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
      compressed values is a sensitivity analysis for the close, not a candidate design. [ruled]
    - Question G, admission and retraction under context knowledge: ccode's reading of step 4's outputs is in
      analysis/kitting/irb/tk2/REPORT.md, "The reading for question G" (design_records.md, "T-K", THE READING FOR
-     QUESTION G). [open]
+     QUESTION G). RULED (AM66, Hadi, 4 October 2026): the gate and the retraction stay as ruled; a deviation from what
+     the context makes probable is caught late, the A/C case is not corrected by the movement, the meta-planner keeps
+     an admission 1 to 9 ticks past the gate's answer. [ruled]
+   - The planning cases are five (KT15, Hadi, 4 October 2026; design_records.md, "T-K", THE PLANNING CASES, RULED):
+     KT3's two, the early admission correct, and the early admission against the context with a coffee break and with
+     the A/C. Stage 1's proposal (the set, the disjointness rule on env_layout_17, the predictions): design_records.md,
+     "T-K", STEP 5, STAGE 1: THE PROPOSAL. [ruled; the proposal open]
+5b. The existing sets of kitting with context knowledge on, no new authoring (Hadi, 4 October 2026; design_records.md,
+   "T-K", STEP 5B, PLANNED): first the recognition set (17 scenarios on env_layout_10 and _11, the robot idle), then the
+   planning set (16 scenarios on env_layout_12 to _14), read against its coverage matrix. The run files with context
+   knowledge off stay each set's reference. [ruled, planned]
 6. dock_loading's part. [open unless marked]
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]

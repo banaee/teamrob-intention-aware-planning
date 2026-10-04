@@ -5200,6 +5200,18 @@ exercises a raised strength.
   Later work, recorded: the removal of the floor and the scaling from the reported distribution as well (TODO-178).
   Consequence: gate outcomes near the threshold change with context knowledge off too; the build gives the change its
   own commit and its own regenerated baseline (AM53, in the record).
+  RULED (AM66, Hadi, 4 October 2026; question G, after step 4's reading): under context knowledge the gate and the
+  retraction stay as ruled. Admission asks the threshold on the belief over the live hypotheses, with adequacy and
+  warrant (AM42; T-D G); a recorded admission ends on a change of leader, a boundary or its inadequacy (D2; T-D L), and
+  the gate is not asked for retention. No rule lets the evidence alone veto the prior, and no retraction comes below
+  the threshold.
+  Reasons: a rule by which the evidence alone could veto the prior would cancel the prior where the movement is
+  ambiguous, which is where the prior is needed; with a margin it needs a new constant, which T-D G declined. A
+  retraction below the threshold gains little and reopens the rule that an admission is kept by identity.
+  Consequences, from step 4's reading (the record, "T-K", THE READING FOR QUESTION G): a deviation from what the
+  context makes probable is caught late; the A/C case is not corrected by the movement at all (a delivery admitted
+  early beside the switch stays admitted through the whole activation); the meta-planner keeps an admission 1 to 9
+  ticks longer than the gate's tick-by-tick answer shows.
 
 - R8, the entry "Assigned-task pool is a support restriction, not a prior" is revised in one sentence. Kept: the
   assignment restricts the support and is not a weight. Revised: "every admissible hypothesis carries unit weight";
@@ -5394,7 +5406,8 @@ threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and K
 (AM42 to AM53): THE BUILD'S PLAN, RULED (AM43, AM45, AM48, AM49, AM51, AM53; P1 to P5 accepted). Amended 4 October
 2026 (AM54 to AM58): THE CROSS-CHECK, RULED (AM55 to AM58). Amended 4 October 2026
 (AM59 to AM64): THE CROSS-CHECK'S CONSEQUENCES, RULED. Amended 4 October 2026 (AM65): QUESTION S, RULED; THE READING
-FOR QUESTION G.
+FOR QUESTION G. Amended 4 October 2026 (AM66): QUESTION G, RULED; THE PLANNING CASES, RULED (KT15); STEP 5B, PLANNED;
+STEP 5, STAGE 1: THE PROPOSAL.
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one
