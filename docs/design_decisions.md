@@ -5140,6 +5140,12 @@ exercises a raised strength.
   holds for any object of its declared type in the world state. With at most one A/C switch per layout (AM18) it is
   that switch's state. The evaluation stays per task (AM2's CLARIFIED line, AM36).
   Not taken: grounding the state through the task's own parameter (per hypothesis; TODO-164's direction).
+  RULED (AM65, Hadi, 4 October 2026; question S, after step 4 on kitting): the four strengths stay as ruled (the
+  suppressed 0.005, the ordinary 0.02, the raised 2 for coffee_break and 0.5 for ac_activation; AM38). They state the
+  designer's knowledge and are not tuned to the movement evidence. The finding that led to the question: within one
+  walk the prior outweighs the movement evidence. A table of step 4's cases under compressed values is a sensitivity
+  analysis for the close of T-K part 1, not a candidate design. The finding and the table's place: the record ("T-K",
+  QUESTION S, RULED).
 
 - R4, division inside assigned work: equal among the live assigned tasks, in T-K part 1.
   Reason: the robot holds no knowledge that distinguishes them. It is not a claim about the human.
@@ -5387,7 +5393,7 @@ AM38 under AM17, THE STRENGTHS REVISED (what becomes stale, the open item on the
 threshold, the method document). Amended 4 October 2026 (AM40, AM41): KT13 and KT14, after KT12. Amended 4 October 2026
 (AM42 to AM53): THE BUILD'S PLAN, RULED (AM43, AM45, AM48, AM49, AM51, AM53; P1 to P5 accepted). Amended 4 October
 2026 (AM54 to AM58): THE CROSS-CHECK, RULED (AM55 to AM58). Amended 4 October 2026
-(AM59 to AM64): THE CROSS-CHECK'S CONSEQUENCES, RULED.
+(AM59 to AM64): THE CROSS-CHECK'S CONSEQUENCES, RULED. Amended 4 October 2026 (AM65): QUESTION S, RULED.
 
 **An object id is an opaque name** (Hadi, 3 October 2026)
 No code reads meaning from the text of an id: no prefix, suffix or substring test, no pattern on it. An id names one

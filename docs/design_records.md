@@ -3361,3 +3361,14 @@ Hadi ruled; `analysis/kitting/irb/tk2/README.md` and `REPORT.md`).
   break_time, never where a window opens; the early admission also reaches a delivery with three live before a break
   begun inside it. Flags: the MPB instrument's `reference.py` drops a scenario's own timeline (no MPB scenario states
   one). Next: step 5, the planning cases (5.7 of the forward inputs).
+
+QUESTION S, RULED (Hadi, 4 October 2026; AM65, its conceptual part in design_decisions.md under R3).
+- The finding that led to the question, from step 4: within one walk the prior outweighs the movement evidence. In the
+  reading for question G (below) the evidence alone ranked another hypothesis first on the tick the gate admitted, in 7
+  of its 32 rows: the coffee break raised by break_time while the human walks to its neighbour, shelf_2 or the A/C
+  switch (×1.18 to ×1.22), and item_4 while the human walks to the coffee machine with no fact holding (×1.90 to
+  ×2.01).
+- Ruled: the four strengths stay as ruled (AM38). They state the designer's knowledge and are not tuned to the movement
+  evidence.
+- A table of step 4's cases under compressed values is a sensitivity analysis for the close of T-K part 1, not a
+  candidate design. Not built; it belongs to the close.

@@ -288,6 +288,10 @@ Consequences to measure, not reasons to adjust the design:
 - A human who works through break time: the robot expects a break and recognises the assigned task later (section 11).
 - One assigned task left, no raising fact: its prior is about 0.98. The gate can admit it early on its assignment. If the human then takes a foreseeable task, a retraction follows.
 - A crisp fact that changes in the middle of an episode changes the prior at once, with no new movement.
+- Measured in step 4 on kitting: within one walk the prior outweighs the movement evidence. Ruled (question S, AM65,
+  4 October 2026): the four strengths stay as ruled; they state the designer's knowledge and are not tuned to the
+  movement evidence. A table of step 4's cases under compressed values is a sensitivity analysis for the close of T-K
+  part 1, not a candidate design.
 
 Open questions:
 
