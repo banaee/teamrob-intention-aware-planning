@@ -2914,6 +2914,10 @@ KT11, in order; KT12 is the state. Each states its reason. Nothing of the mechan
   RULED (Hadi, 3 October 2026), for that restatement: with context knowledge on and no raising fact holding, a lone
   live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if the human then
   takes a foreseeable task.
+  SUPERSEDED (AM67, Hadi, 4 October 2026; THE GATE AFTER STEP 5B, RULED, below): the RULED line above. Commitment
+  warrant alone no longer admits; a lone live assigned task needs observation warrant (the human's first step toward
+  it, or the observed completion that enters its phase), and the gate refuses it while the evidence alone ranks another
+  live hypothesis above it (AM68). A retraction still follows if the human then takes a foreseeable task.
   SUPERSEDED IN PART (KT14, Hadi, 4 October 2026; THE TIMELINE IN THE SCENARIO, below): the three conditions read
   context knowledge off against on, each case labelled by the state that the script meets.
 
@@ -3146,6 +3150,7 @@ C. What becomes stale, marked superseded with a pointer here; the expected direc
   restates them before those runs. RULED by Hadi for that restatement: with context knowledge on and no raising fact
   holding, a lone live assigned task is admitted on its commitment warrant from its prior, and a retraction follows if
   the human then takes a foreseeable task (KT11's RULED line).
+  SUPERSEDED (AM67, Hadi, 4 October 2026): that RULED line, as KT11's SUPERSEDED line above states.
 - T-K part 2's formula, strength = low + degree × (high − low), was stated for the pair of values: an open item of T-K
   part 2 that it is restated for two conditions (T-K part 2's OPEN ITEMS, above).
 - The notes for the build's plan: no form for "not" is needed (NOTES FOR THE BUILD'S PLAN, above).
@@ -3378,6 +3383,8 @@ QUESTION S, RULED (Hadi, 4 October 2026; AM65, its conceptual part in design_dec
   candidate design. Not built; it belongs to the close.
 - UNDER DISCUSSION AGAIN since 4 October 2026 (the note in design_decisions.md under R3's AM65; THE DESIGN DISCUSSION
   AFTER STEP 5B, below). The ruling stands until Hadi rules.
+- RESOLVED (AM70, Hadi, 4 October 2026; THE GATE AFTER STEP 5B, RULED, below): the strengths stay as ruled; the table
+  of the cases at other values stays the sensitivity analysis for the close.
 
 THE READING FOR QUESTION G (ccode, 4 October 2026; `analysis/kitting/irb/tk2/REPORT.md`, "The reading for question G",
 and Appendix C; `analysis/kitting/irb/tk2/g_reading.py`). A reading of step 4's outputs, nothing run, nothing ruled.
@@ -3406,6 +3413,10 @@ the trigger rule 3 to 8 ticks later; the A/C beside the delivery's shelf: s15_19
 per-tick gate in 18 of 32 rows). Question G is closed.
 UNDER DISCUSSION AGAIN since 4 October 2026 (the note in design_decisions.md under R7's AM66; THE DESIGN DISCUSSION
 AFTER STEP 5B, below). The ruling stands until Hadi rules.
+RESOLVED (AM67 to AM69, Hadi, 4 October 2026; THE GATE AFTER STEP 5B, RULED, below): question G reopened and ruled.
+Observation warrant is required at admission for every hypothesis (AM67); the gate refuses a leader that the evidence
+alone ranks below another live hypothesis (AM68); the end of an admission is unchanged (AM69). AM66 is superseded in
+part (design_decisions.md, "T-K", under R7).
 
 THE PLANNING CASES, RULED (KT15, Hadi, 4 October 2026; step 5 of T-K part 1). Amends KT3's "two cases also run in the
 MPB".
@@ -3641,7 +3652,8 @@ both 11; of kind (iii) (26, 149): X 122, Y 72, both 55. scenario_s16_05's admiss
 scenario_s11_03's by Y (not by X), both by X and Y together. Changes of the answer within a true stretch: 673 recorded,
 653 X, 579 Y, 560 both.
 THE DESIGN DISCUSSION AFTER STEP 5B (the design chat with Hadi, 4 October 2026; recorded by ccode the same day). A
-DISCUSSION, NOT RULED. Hadi continues it in the next design chat and rules there. Nothing below carries a ruling
+DISCUSSION, NOT RULED. Hadi continues it in the next design chat and rules there. CLOSED (Hadi, 4 October 2026):
+ruled the same day, THE GATE AFTER STEP 5B, RULED, below (AM67 to AM72). Nothing below carries a ruling
 number; each point is attributed. Rulings S (AM65) and G (AM66) stand as recorded until Hadi rules (their notes of
 4 October 2026, design_decisions.md, "T-K", under R3 and R7). No order of the remaining work is decided.
 - The problem as discussed. After an admission the meta-planner uses the projection of the admitted task alone. The
@@ -3703,3 +3715,73 @@ number; each point is attributed. Rulings S (AM65) and G (AM66) stand as recorde
     early on its commitment warrant).
   - scenario_s16_05, the off run, the ratio of the A/C activation over deliver_item(item_4): ×1.0014 at tick 0 (the
     admission), ×1.0029 at 1, ×1.09 at 25 and 26; the discussion's "1.003 to 1.09" starts at tick 1.
+THE GATE AFTER STEP 5B, RULED (Hadi, 4 October 2026, in the design chat; recorded by ccode the same day; AM67 to AM72).
+The conceptual part is in design_decisions.md, "T-K": Hadi's principle, AM67, AM68, AM69, AM71 and AM72 under R7; AM70
+under R3. It closes THE DESIGN DISCUSSION AFTER STEP 5B above and resolves the notes on questions S and G. Records only;
+nothing built.
+- The rulings in brief. AM67: observation warrant is required at admission, for every hypothesis; commitment warrant
+  alone no longer admits; a lost observation warrant still ends nothing. AM68: the gate refuses a leader that the
+  evidence alone ranks below another live hypothesis; rank only, a tie passes, no constant, no margin; a condition of
+  admission only. AM69: the rule on when an admission ends (T-D L) is unchanged; a stated limitation. AM70: all
+  strengths stay as ruled. AM71: 3.A, 3.B and 4.A not taken; 3.B and 4.A possible future work. AM72: the cases that
+  remain are limitations, not defects (docs/assumptions.md 6.4).
+- The discussion's labels: 2.A is AM67; 2.B is AM68, as a condition of admission only; 1.A is not taken (AM70); 3.A,
+  3.B and 4.A are not taken (AM71; TODO-181 for 3.B, TODO-96 for 4.A).
+- The measured basis (analysis/kitting/mpb/tk5b/WHATIF.md; filters on recorded answers, not runs; the robot idle,
+  except the two planning rows). Y, the reading of AM67: the 59 lone assigned tasks admitted on the previous task's
+  completion tick come 1 tick later, still earlier than with context knowledge off; scenario_s11_03's admission (0 to
+  10) is refused. X, the reading of AM68: all 216 earlier admissions of the true task keep their tick; scenario_s16_05's
+  admission (0 to 21) is refused. Both together leave 11 of the 310 wrong gate ticks of kind (ii) and 55 of the 149 of
+  kind (iii). In a run with the rules built the later ticks change too; a filter does not show it.
+- The strengths (AM70): the table of the cases at other values stays the sensitivity analysis for the close of T-K
+  part 1 (QUESTION S, RULED, above).
+- What becomes stale, each marked with a pointer: here, KT11's RULED line and THE STRENGTHS REVISED, C, its RULED
+  sentence; QUESTION S's and QUESTION G's notes (resolved). In design_decisions.md: R7's first sentence and AM5, AM6's
+  gate policy, AM66 in part (under R7); "T-D G: admission", AD1's commitment source and its consequences, AD2 (a note),
+  AD3's derivation in its delivery case; "T-D L", L2 (a line: unchanged). docs/assumptions.md 6.4; docs/
+  context_knowledge_method.md, sections 8, 12 and 15; docs/glossary.md §5 (θ) and §7 (warrant, observation warrant,
+  commitment warrant, warranted / unwarranted, admitted).
+- The term, PROPOSED, NOT RULED (ccode, 4 October 2026; Hadi rules). AM68's condition has no glossary term. Proposed:
+  "outranked": a live hypothesis is outranked when the evidence alone ranks another live hypothesis strictly above it;
+  the refusal reason `none(leader_outranked)`. Recorded as proposed in docs/glossary.md §7.
+- Open, not ruled: the order of the remaining work; whether the planning set's coverage matrix stays the matrix of the
+  off setting with one added column for context knowledge on, or new scenarios are authored; the build of AM67 and
+  AM68, which starts with a plan step in its own session (BUILD DISCIPLINE).
+- ccode's facts for the build's plan (the review of these records, 4 October 2026; read from the existing logs and the
+  code, nothing run; no position):
+  - Commitment warrant in the maintained sets. 17 of the 48 logs hold one admission each on commitment warrant alone
+    (`[meta-proj] ... projection=built warrant=commitment`): the lone last delivery at b + 1, at confidence 1.000, all
+    with assignment knowledge on (tb1a 3, tb1b 2, tb1c 4, tb3 8). 65 admissions name both sources, 113 observation
+    alone. Under AM67 the 17 are refused and come on a later tick, so AM67 changes behaviour and the maintained sets
+    are regenerated with it. After AM67 no admission can depend on commitment warrant: in the code it is read only by
+    the gate (`MetaPlanner._warrant`, `_clears_gate`) and by admission's log line.
+  - The test-bed sets. The MPB holds 7 commitment-only admissions in 6 of its 50 log files, step 5's set 4 in 4 of its
+    18 (scenario_s16_03 to _06, context knowledge on), step 5b's 18 in 15 of its 17; the IRB (robot idle) logs none, but its oracle computes the gate per tick with commitment
+    warrant (analysis/instruments/irb/oracle.py), as the MPB's does (analysis/instruments/mpb/mpb_oracle.py). The MPB's
+    coverage cell B5, "clears by commitment only" (scenario_s10_04 at 134; analysis/kitting/mpb/coverage.md), becomes
+    unreachable by construction, and the MPB alteration C1, "commitment warrant ignored"
+    (analysis/instruments/mpb/alteration.py), becomes the rule.
+  - What AM68 requires the recognizer to report. `BeliefState` carries the belief over H (`belief`) and the prior
+    (`prior`, empty with context knowledge off), not the evidence; the recognizer holds the normalised evidence over H
+    internally (`Recognizer._evidence`). The gate reconstructs no recognizer quantity (T-D G, AD2), so dividing the
+    belief by the prior in the gate is excluded, and with context knowledge off there is no prior to divide by. A new
+    recognizer output is needed: either the evidence over H, which the gate compares by rank for the leader, or a
+    categorical value per live hypothesis that the gate reads for the leader only, as it reads hypothesis adequacy and
+    observation warrant. Which one, its line in `[IR]`, and the place of the check in the gate's order (it decides
+    only the printed refusal reason) are the plan's.
+  - With context knowledge off the belief is the normalised evidence bit for bit (`Recognizer._belief`), so AM68
+    refuses nothing there: its build can leave the maintained sets identical except the lines it adds. AM67 changes
+    them (above).
+  - Rank only, with no constant, makes the comparison exact. WHATIF's filter X counted "strictly above by more than
+    1e-9"; the built rule may differ from X where two evidence values differ by less than 1e-9 (none on the 453 wrong
+    ticks with a true hypothesis; no tie within 1e-9 there). An exact tie occurs on a boundary tick, where the evidence
+    restarts equal (scenario_s14_19 at 180, 1/3 each); there AM67 refuses (no observation warrant).
+  - AM68 acts where `_clears_gate` is asked: at admission and on the entering side of `recognition_changed`, as warrant
+    does (AD3); not on retention.
+  - AM72's first case, the first ticks of a walk with equal evidence. The 18 measured ticks of 6.4's first part rank
+    the true task first by ×1.0008 to ×1.01; AM68 refuses them, and the boundary tick before them is refused by AM67.
+    In the measured sets none of them remains under both; what remains of the case is an exact tie with observation
+    warrant, or near-equal evidence that ranks the admitted hypothesis first.
+  - AM70's reason. Under AM68 which hypothesis is admitted no longer depends on the strength values (the evidence must
+    rank it first or tie). Whether and how long a leader the evidence ranks first stays at the threshold still does:
+    the 55 ticks of kind (iii) left under X and Y are such admissions.
