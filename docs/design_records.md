@@ -3036,3 +3036,44 @@ reading and for a later paper; it serves the build's plan as the statement of th
   (case 1) or walks away from the machine (case 2), until the phase is left or turns inadequate.
   CHECKED by ccode (4 October 2026): every number in the tables of sections 5, 10, 11, 12 and 13 was recomputed from the
   document's formulas and the declared values; none differs beyond the document's rounding.
+
+STEP 1, THE LAYOUTS WITH MORE THAN ONE A/C SWITCH (AM19): LISTED, RULED AND BUILT (4 October 2026).
+- The list (ccode, 4 October 2026; read only): over every layout file of both domains, registered or not, counted by
+  the object type `ac_switch` (ac_activation's `parameter_types`), only kitting's env_layout_05 holds more than one:
+  ac_switch_0 (400, 550), ac_switch_1 (356, -210), ac_switch_2 (230, -550). One each in kitting's env_layout_02, _07,
+  _16, _17 and the unregistered env_layout99.json; none in the other kitting layouts and none in dock_loading. On
+  env_layout_05 rest env_setup_04, scenario_s04_01 to _03 (only s04_01 scripts an activation: ac_switch_1, then
+  ac_switch_2; ac_switch_0 never visited), tb1a_destination's two s04_01 logs, five tests, and twenty frozen analyses.
+- RULED (Hadi, 4 October 2026, on the list): env_layout_05 keeps ac_switch_1 and no other A/C switch; ac_switch_0 and
+  ac_switch_2 are removed, nothing takes their place. scenario_s04_01's script keeps one ac_activation, at ac_switch_1;
+  the walk to ac_switch_2 and its activation are removed; the rest of the script keeps its order and purpose.
+  env_setup_04 and scenario_s04_02, _03 are brought in line where they need it. The earlier logs, runs and analyses of
+  this layout are no evaluation reference. Reason: the V1 rule (AM18), at most one A/C switch per layout, in every
+  domain, before the build of context knowledge, so that the build's regression check starts from baselines that
+  already follow the rule; a foreseeable task's conditions are evaluated per task, not per hypothesis, so the state of
+  one switch cannot select the strength of one hypothesis of ac_activation (TODO-164).
+- RULED (Hadi, 4 October 2026), the frozen analyses: the 14 early folders (runs of early tests, no systematic
+  evaluation) are deleted whole: c_separation_stop, d2_recognition_trigger, f1_foreseeable_fixture,
+  f1_robot_responsible, g1_graded_evidence, i2_ir_foundations, i3_phase_model, i4_evidence_model, i4c_episode,
+  i4d_fold_unknown, i5_handback, t1b_realization, t6_ablation, t9_arrival_radius. In the other six (l_build, td_stage1,
+  td_stage1b, irb2b_exposed_interval, tc2c_scripts, f47_fixtures) only scenario_s04_01's logs and the scripts that read
+  only them are deleted, with one note per report that its case on the scenario is no longer reproducible. Citations
+  in the records stay.
+- BUILT: 32029d3 (the layout, the script, the notes, the test, tb1a's regeneration, CLAUDE.md's regression table),
+  098b1a8 (the analyses; the deleted folders named in analysis/README.md, last held by 32029d3; CLAUDE.md and the
+  roadmap mark them), and this records step. env_setup_04 and scenario_s04_02, _03 needed no change (they name no
+  switch). The layout's stale note on env_layout_02's spelling of the type is dropped (it spells `ac_switch`).
+- Acceptance: the four maintained sets rerun whole. Byte-identical: every log and `.rec` of tb1b, tb1c and tb3 and the
+  other 14 logs of tb1a (92 of 96 files). scenario_s04_01's two logs and `.rec` streams differ, both priors: the
+  `[coverage]` lines at load, every `[IR*]` line from tick 0 (two hypotheses fewer), the human's record from tick 207
+  (on from ac_switch_1 to shelf_6); completion 384 → 379 prior on, 384 → 392 prior off (the world tick), no F1
+  violation (tb1a README, its new section). 307 tests pass.
+- Tests: one adapted, none removed. test_td15_build's two grasp tests (E8, E9 with E6's second amendment) took
+  ac_activation(ac_switch_0) as the refuted foreseeable rival; it is now ac_activation(ac_switch_1), still refuted by
+  the hand-walked delivery (tail < 0.05, inadequate), so both still check that the true hypothesis is the member that
+  keeps the finding adequate. The other tests on the layout (test_g_build, test_td1_adequacy, test_th1_tree,
+  test_th3_scenarios) read no removed switch and pass unchanged.
+- Deleted beside the 14 folders: 20 local, git-ignored logs of scenario_s04_01 in the `pre*/tb1a_destination/` folders
+  of l_build, td_stage1, td_stage1b (two sets) and irb2b_exposed_interval, in no commit; all 20 are in the copy at
+  /home/hadi/teamrob_analysis_2026-10-02/ (irb2b's under its earlier name tb2b_exposed_interval). No script in the six
+  reads only them; tc2c_scripts and f47_fixtures held none.

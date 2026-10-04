@@ -192,7 +192,7 @@ State at the close of 3 October 2026, written for a design chat that has read no
 is ruled and recorded, all three content points included (the values, the perception assumption, the tests). The rooms
 for the tests on kitting and the first round of tests, without context knowledge, are built and run. The mechanism is
 not built. The next design chat takes the rest of T-K part 1 from 5.7. Where this section and the records disagree,
-the records win.
+the records win. Step 1 of 5.7 is done (4 October 2026).
 
 T-K is context knowledge as a whole: a task of the pipeline, framework-wide (it concerns kitting and dock_loading
 alike), not a stage of T-G. Part 1 (V1, now): crisp context knowledge. Part 2 (V1, at the end of the V1 queue, after
@@ -347,7 +347,8 @@ name. T-G is paused after its stage 1 and resumes at its stage 2 when T-K part 1
 - The instruments (NOTES FOR THE BUILD'S PLAN, the design chat's addition): the IRB's expectations must be computed
   with the new prior (its oracle assumes the equal prior and no context weight today); its report must read the three
   conditions A, B and C (5.4); the A/C's measure is its belief at its arrival. The plan states what this costs.
-- Before the build, in its own step (AM19): the layouts with more than one A/C switch (5.7, step 1).
+- Before the build, in its own step (AM19): the layouts with more than one A/C switch (5.7, step 1). Done, 4 October
+  2026.
 
 ### 5.4 The tests [ruled]
 
@@ -430,7 +431,6 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
 ### 5.6 What is not built
 
 - The mechanism: everything in 5.3.
-- The step before the build (AM19).
 - The setups' timelines and the second setup per room; the runs in conditions B and C.
 - The two MPB cases.
 - dock_loading's part: the re-measurement of T-G stage 1's baseline with context knowledge on.
@@ -445,6 +445,12 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    scenario_s04_01 to _03 (env_setup_04); scenario_s04_01, a fixture of the regression sweep, scripts two
    activations, at ac_switch_1 and then ac_switch_2; four tests in tests/kitting/ name the layout or its scenarios.
    The full list, over every layout of both domains, is this step's work.
+   DONE (4 October 2026; design_records.md, "T-K", STEP 1; 32029d3, 098b1a8): env_layout_05 was the only layout of
+   either domain with more than one A/C switch. Hadi ruled on the list: it keeps ac_switch_1 only, and scenario_s04_01
+   one ac_activation, at ac_switch_1. tb1a_destination's two s04_01 logs regenerated, every other maintained baseline
+   byte-identical; one test adapted (test_td15_build's rival is ac_activation(ac_switch_1)), none removed; 14 early
+   frozen analyses deleted (analysis/README.md), the s04_01 logs of six others deleted with a note in each report.
+   Every layout of both domains now holds at most one A/C switch.
 2. The build's plan (BUILD DISCIPLINE, step 1): ccode's plan, with no code, reviewed in the design chat. It reads
    docs/context_knowledge_method.md as the statement of the prior. Open for it (5.10, item 9): which value the gate
    compares with θ.
@@ -532,7 +538,7 @@ Nothing of the mechanism is built. Nothing on dock_loading is changed for T-K.
    runs (section 4's caveat) are rerun then or in stage 2.
 6. TODO-154 (the robot does not anticipate the scan its own delivery makes applicable): recorded for T-K part 1 as
    the share at an episode's start, not ruled; the records do not say whether T-K part 1 answers it.
-7. The decision on ccode's AM19 list (step 1), and the items the build's plan proposes: the declaration of ac_on,
+7. The decision on ccode's AM19 list (step 1; decided 4 October 2026, 5.7), and the items the build's plan proposes: the declaration of ac_on,
    dock_loading's object type and task, the setup's timeline form. (No form for "not" is needed, AM36.)
 8. Whether env_layout_16's two south-east shelves return once the build removes the step-500 limit (KT9, its ADDED
    line; Hadi accepted the room as it is).
