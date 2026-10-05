@@ -35,6 +35,9 @@ Updated 4 October 2026 after Hadi's rulings that closed the design discussion af
 state, 5.1, 5.2, 5.4, 5.6, 5.7, 5.10 and 5.13 in line; section 2's T-K paragraph.
 Updated 4 October 2026 after Hadi's rulings on ccode's report of those records (AM73 to AM76: the term "outranked",
 the first limitation reworded, the exact tie, the recognizer's category; AM70's reason as corrected): 5.1 and 5.13.
+Updated 5 October 2026 at T-F part 1's close (ccode): section 12 added (what T-F part 1 produced for the next chat);
+section 2's T-K paragraph brought in line with the repo (the gate rulings built, steps 5d and 5e done); section 11 gains
+the standing rules made in T-F part 1.
 
 Purpose. This file is the single place a new design chat reads to know what lies ahead in T-G and in T-K. It
 collects, per stage of T-G and per part of T-K, what is already ruled, what is open, what is parked, and the ideas Hadi
@@ -113,8 +116,11 @@ depth, one at a time.
 T-K part 1 runs now. Its design is ruled and recorded (2 to 4 October 2026), the build's plan included and approved
 (docs/handoffs/plan_T-K_part1.md). The mechanism is built, and kitting's tests with context knowledge on are run
 (steps 4, 5 and 5b). The design discussion that followed them is closed: Hadi ruled on the gate and the strengths
-(4 October 2026, AM67 to AM72; not built). The build of the two rulings on the gate, dock_loading's part and the close
-remain, in no decided order. Section 5 holds its state.
+(4 October 2026, AM67 to AM72); the two gate rulings are built (step 5c) and measured (step 5d), and step 5e is run
+(5 October 2026). dock_loading's part (step 6) and the close (step 7) remain. Section 5 holds its state.
+T-F part 1 (the conditions human-unaware and intention-unaware) ran between them and is closed (5 October 2026); what
+it produced for this chat is section 12. Hadi's next chat is T-G's next stage with T-K part 1's steps on dock_loading.
+[ruled]
 
 ---
 
@@ -1124,6 +1130,9 @@ injected at run time; one further test track on adaptation under conflict. T-K p
 
 ## 11. How Hadi wants the work done (binds every reply)
 
+Since T-F part 1 (5 October 2026) [ruled]: every test or analysis run has its per-tick figure, one file per run; no
+setting in a file or folder name; the settings are columns of the result table (section 12).
+
 - The design chat settles what and why. Claude Code builds and runs everything. Design before implementation;
   rulings are recorded before code.
 - At the start of a chat: verify this file against the repo, report disagreements, show the zoomed-out plan
@@ -1189,3 +1198,42 @@ injected at run time; one further test track on adaptation under conflict. T-K p
   - In a design discussion the design chat writes literally, in the framework's terms, in short sentences with short
     examples. It gives no prompt and no task list unless asked.
   - A suggestion of the design chat is not a ruling. The design chat does not treat it as one until Hadi confirms it.
+
+---
+
+## 12. What T-F part 1 produced for the next chat (5 October 2026)
+
+Source for every item: design_decisions.md and design_records.md, "T-F part 1: the conditions human-unaware and
+intention-unaware" (the label named); the handoff docs/handoffs/handoff_T-F_part1.md.
+
+- dock_loading can run in the three conditions. [ruled] The run options `human_aware` and `intention_aware` (R3) and
+  the override (R5) are framework-wide; a dock_loading run states them in its run file as kitting does. The planning
+  test-bed's instruments carry both conditions (R9); dock_loading's six scripts that depend on the robot get no oracle
+  in the new conditions, measures only (G). The measurement of T-F part 1 ran on kitting only (G); no dock_loading run
+  has been made in the new conditions.
+- May a domain forbid a run condition? [open] TODO-183 (G), not ruled, for T-G's next stage. Its example, a mandatory
+  check-in: if the robot learns of the check-in as a state of an object, a human-unaware robot still waits for it; if
+  the robot must recognise the human's act, a human-unaware run is not a meaningful baseline there. It bears on stage 3
+  (check-in and check-out).
+- dock_loading's two test-beds are stale since the gate rulings. [ruled] O as corrected (design_records.md, "T-F part
+  1", THE MEASUREMENT): dock_loading's IRB and MPB sets and its six milestone runs were not rerun in T-F part 1; their
+  rerun, and the figures they then get, belong to dock_loading's step (T-K part 1's step 6, section 5.7).
+- The standing rules made in T-F part 1 (section 11 names them too). [ruled]
+  - Every run made through a test or analysis instrument produces its per-tick figure: one file per run, every panel on
+    one tick axis (the figures rule; N). A run made by run_mesa.py directly gets it from its log
+    (analysis/instruments/mpb/figure_of_log.py).
+  - No setting in a file or folder name (I, K): one folder per scenario, the runs of its conditions inside by serial;
+    the runner `analysis/instruments/mpb/run_set.sh`.
+  - The settings are columns of the result table (I): `analysis/instruments/mpb/table.py`, one row per run, the
+    effective settings from the `[run]` header.
+- Findings that bear on dock_loading. [open: findings, none ruled; design_records.md, "T-F part 1", THE CLOSE]
+  - A stand at the robot's target that does not end (TODO-184; X1's case with no alternative task): in kitting's
+    scenario_s02_02 the robots that observe the human hold without end and do not finish. dock_loading's scripts end
+    with the walk to the desk (B13), so the case arises there only if a script ends at a robot's target.
+  - An admission at tick 0 with context knowledge on, of a task the human is not doing (kitting's scenario_s05_01,
+    s05_02, s16_01, s16_02): with no timeline fact in force the assigned tasks lead the prior. It bears on step 6's
+    timelines and expectations for dock_loading's foreseeable tasks.
+  - Recognition and context knowledge show no difference the kitting set can distinguish from zero on completion and
+    violations (COMPARISON.md); planning against the observed human removes most violations at a mean delay of about
+    6 ticks. The kitting set is authored, single_task, with a scripted human; no claim transfers to dock_loading
+    without its own measurement.
