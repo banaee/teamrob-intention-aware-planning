@@ -566,10 +566,14 @@ Decisions
   The measurement is RUN (5 October 2026; rulings K to O, design_records.md, "T-F part 1", THE MEASUREMENT;
   `analysis/kitting/tf1/REPORT.md`): 128 scenarios in the four conditions and step 5e's 176 timeline copies
   intention-aware with context knowledge on, 688 runs, `single_task`, 0 disagreements with the oracle; outputs one
-  folder per scenario, the runs by serial (K); one figure per run on one tick axis (N). Next: Hadi's ruling on the table
-  of the folders under analysis/ and configs/ (part E); nothing deleted before it.
+  folder per scenario, the runs by serial (K); one figure per run on one tick axis (N).
+  T-F part 1 is CLOSED (Hadi, 5 October 2026; design_records.md, "T-F part 1", THE CLOSE; for a reader outside the
+  repository `analysis/kitting/tf1/COMPARISON.md`): steps 2 and 3 (recognition, context knowledge) show no difference
+  this set can distinguish from zero; part E executed (analysis/ 16,488 files, 2.0 GB; analysis/README.md). T-F part 2
+  is parked (docs/handoffs/handoff_T-F_part1.md). Next: T-G's next stage with T-K part 1's steps on dock_loading
+  (docs/handoffs/T-G_forward_inputs.md).
   Not to be
-  started unasked: T-F (its part 1 ruled and taken now), T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
+  started unasked: T-F (part 1 closed, part 2 parked), T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized

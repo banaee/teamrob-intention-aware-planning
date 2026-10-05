@@ -3954,6 +3954,9 @@ STEPS 5D AND 5E: THE DECISIONS CONFIRMED; THE DISCOVERY TEST UPDATED (Hadi, 5 Oc
   added), and with it the same test's set of setups, env_setup_01 to _30 (step 5e's env_setup_17 to _30). The test
   suite: 365 passed.
 Next: steps 6 and 7 on hold until Hadi rules.
+A FINDING OF T-F PART 1 THAT BEARS ON T-K (5 October 2026; not ruled): with context knowledge on and no timeline fact in
+force, an admission at tick 0 of a task the human is not doing (scenario_s05_01, s05_02; s16_01, s16_02); recorded
+under "T-F part 1", THE CLOSE, FINDINGS.
 
 
 ## T-F part 1: the conditions human-unaware and intention-unaware
@@ -4176,3 +4179,52 @@ BUILT AND RUN (ccode, 5 October 2026):
   context panel after the finding, the figure keeps it under the belief (the earlier figures ruling's place); deleting
   the recognition runs' run files would leave their outputs with no way to rerun them.
 State: the measurement run and reported; part E's table with Hadi. Next: Hadi's ruling on part E.
+THE CLOSE (Hadi, 5 October 2026; recorded by ccode the same day). The statistics report (analysis/kitting/tf1/
+COMPARISON.md, comparison.html, comparison.py) is accepted; part E's table and the untrack step are accepted as ccode
+proposed them (reason: analysis/ held 18,071 files and 2.5 GB; the deleted runs are replaced by the measurement or were
+made on a recognizer that no longer exists; their conclusions are in the records, and git history, the copy of 2
+October and ccode's backup hold them). T-F part 1 is CLOSED. T-F part 2 is parked. Hadi's next chat is T-G's next stage
+with T-K part 1's steps on dock_loading.
+- What T-F part 1 built: the run options `human_aware` and `intention_aware` (R3), the override (R5) in `SimModel`, the
+  refusals `none(intention_off)` and `none(no_human)` (R6, R7, E); the planning test-bed's runner of a set whose settings
+  live in its run files (`run_set.sh`), its result table with the settings as columns (`table.py`), the oracle in both
+  new conditions (R9); one figure per run on one tick axis (N). What it measured: 128 kitting scenarios in the four
+  conditions and 176 timeline copies, 688 runs, `single_task`, 0 disagreements with the oracle (REPORT.md; for a reader
+  outside the repository, COMPARISON.md).
+- PART E EXECUTED (a63e11b, 02c8e5c): analysis/ from 30,771 files and 3.9 GB (the measurement's 688 runs included) to
+  16,488 files and 2.0 GB; configs/ from 1,757 to 912 files; tracked files under analysis/ from 1,056 to 95. Deleted:
+  the 12 frozen kitting folders, the runs and run files of T-K part 1's steps 5, 5b (planning) and 5e and of stage 2's
+  check (their READMEs and reports kept), tf1/figure_examples, the 120 superseded figure files; untracked: 806 per-run
+  detail files .gitignore names (kept on disk). The last commit holding the deleted tracked files is 362af19; everything
+  deleted is also in /home/hadi/teamrob_tf1_handoff/deleted_2026-10-05_part_E.tgz. Nothing deleted was in use (no import
+  or read by code, a test or a maintained set); after it the tests pass (385) and the IRB, the MPB's run.sh and
+  run_set.sh and a maintained sweep run, their outputs identical to those on disk. analysis/README.md holds the note;
+  each record citing a deleted path has one line.
+- FINDINGS (none ruled):
+  - A stand that does not end (X1's case with no alternative task, measured). scenario_s02_02 (env_layout_02; T-C2c's
+    scenario A, whose script ends with the delivery of item_5 at kitting_table_0 and no exit walk, docs/assumptions.md
+    1.1): from tick 250 the human stands at kitting_table_0, the robot's remaining target (item_1). The three conditions
+    that observe the human do not finish within the cap of 704 ticks: the robot holds on fallback projections of the
+    stand, each as long as the stand observed so far (P4); intention-unaware 30 ticks at 278, 64 at 310, 128 at 374, 256
+    at 502 (478 held ticks); intention-aware, context knowledge off and on, 14 at 270, 48 at 294, 96 at 342, 192 at 438,
+    384 at 630 (734). Human-unaware completes at 422, as the robot alone. The same in its timeline copies scenario_s17_08
+    and s17_10 (intention-aware, context knowledge on). Open question, not ruled: what the robot does when a stand at its
+    target does not end (TODO-184; X1 set aside a give-up threshold and pointed to communication, X5).
+  - An admission at tick 0 with context knowledge on. In scenario_s05_01 and s05_02 (env_layout_07) the human's first
+    task is coffee_break; at tick 0 no timeline fact holds, coffee_break has the ordinary strength, and the belief over H
+    puts deliver_item(item_5) at about 0.97 (the oracle's value as well); the gate clears on it from tick 0 to 23, the
+    robot admits it at tick 0 (hold 2) and violates at ticks 27 to 29 (minimum 30.0 cm) before its next decision at 40.
+    With context knowledge off the same ticks rest on fallback decisions and no tick lies below min_separation. The same
+    form in scenario_s16_01 (admission at 0, violations at 49 and 50) and s16_02 (admission at 38, violations 48 and 49).
+    It bears on T-K (the strengths as ruled, AM65; the gate, AM66).
+  - Steps 2 and 3 show no difference this set can distinguish from zero (COMPARISON.md): recognition over the fallback
+    alone, completion 15 earlier, 101 equal, 11 later of 127 scenarios, mean -0.84 ticks, violation ticks 14 → 17;
+    context knowledge, completion 8 earlier, 112 equal, 7 later, mean -0.28, violation ticks 17 → 23; for both the 95%
+    interval of the mean change, resampling the 10 rooms, includes zero. Step 1 (planning against the observed human):
+    violation ticks 137 → 14, completion later in 36 of 127 scenarios, mean +5.83 ticks.
+- TODOs: TODO-137 closed (built and measured); TODO-144 part 1's result recorded, part 2 parked; TODO-183 forwarded to
+  T-G's next stage (docs/handoffs/T-G_forward_inputs.md); TODO-184 recorded (the stand that does not end); TODO-181 and
+  TODO-182 unchanged.
+- The handoff: docs/handoffs/handoff_T-F_part1.md (the options, the instruments, the result, the findings, the parked
+  notes for T-F part 2).
+State: T-F part 1 CLOSED; T-F part 2 parked. Next: T-G's next stage with T-K part 1's steps on dock_loading.

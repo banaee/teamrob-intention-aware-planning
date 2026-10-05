@@ -4099,7 +4099,7 @@ future work with this reactive human; the two grounds on which communication is 
 Files: world/human_executor.py, mesa_sim/sim_agents.py (`HumanAgent`)
 Reference: docs/assumptions.md 4.2; design_decisions.md, "T-H" (item 10, Alternative 1)
 
-**TODO-137: The fallback-only control for the near-encounter comparison (recorded, Track 2.5, 29 Sept 2026)** [RULED (T-F part 1, 5 Oct 2026); not built] [V1]
+**TODO-137: The fallback-only control for the near-encounter comparison (recorded, Track 2.5, 29 Sept 2026)** [CLOSED (T-F part 1, 5 Oct 2026): built and measured] [V1]
 docs/assumptions.md 4.6 compares the IR planner (realized cost) with the no-IR planner: plain cost (`--cost_strategy
 plain`, candidates ranked without realization) and the fallback-only control (the planner realizing against the
 fallback projection always, admission never). The second is no run option today (the flags: `--strategy`,
@@ -4116,6 +4116,9 @@ ANSWERED (Hadi, 5 October 2026; design_decisions.md and design_records.md, "T-F 
 and intention-unaware"): this control is the **intention-unaware** condition, the run option `intention_aware` off;
 the gate refuses for both its callers with `none(intention_off)` (R6). Ruled with it: the **human-unaware** condition
 (`human_aware` off). The build is T-F part 1's; its plan: docs/handoffs/plan_T-F_part1.md. Closed when built.
+CLOSED (T-F part 1's close, 5 October 2026; design_records.md, "T-F part 1", THE CLOSE): built (stages 1 and 2) and
+measured (analysis/kitting/tf1/REPORT.md, COMPARISON.md): over the fallback alone, recognition shows no difference
+this set can distinguish from zero.
 Files: mesa_sim/run_mesa.py (the option), shared/meta_planner.py (admission)
 Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135, TODO-144
 
@@ -4303,6 +4306,12 @@ TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
 4. T-D's blocked fixture uses a stay that ends (TODO-80; the scenario-authoring convention).
 5. At the recognizer pass (T-D Q2 to Q4): raise TODO-95 (stationarity channel) and rule whether it joins the pass or
    stays recorded for T-H.
+PART 1 CLOSED (5 October 2026; design_records.md, "T-F part 1", THE CLOSE): the conditions human-unaware and
+intention-unaware built (TODO-137) and measured on 128 kitting scenarios under `single_task` (analysis/kitting/tf1/
+REPORT.md, COMPARISON.md): planning against the observed human removes violation ticks (137 → 14) at a mean delay of
++5.83 ticks; recognition and context knowledge show no difference this set can distinguish from zero. T-F part 2
+parked; its notes (full_reorder the default strategy, strategy a column of the same result table, J; no setting in a
+name, K): docs/handoffs/handoff_T-F_part1.md.
 
 **TODO-145: Track 3b: consequential activation under conflict (not ruled) (recorded, the MPB close-out, 30 Sept 2026)** [OPEN; after the MPB, before T-F] [V1]
 [V1] (T-G A1, T-G records 1, 1 Oct 2026): in V1. design_decisions.md, "T-G: the second domain's rulings", A1.
@@ -4837,3 +4846,16 @@ it. If the robot must recognise the human's act, a human-unaware run is not a me
 Files: domains/dock_loading/, mesa_sim/run_mesa.py
 Reference: design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware", G; T-G stage 3
 (check-in and check-out)
+FORWARDED (T-F part 1's close, 5 October 2026): an input of T-G's next stage (docs/handoffs/T-G_forward_inputs.md).
+
+**TODO-184: A stand at the robot's target that does not end (recorded, T-F part 1's close, 5 Oct 2026)** open; not ruled
+X1's case with no alternative task, measured (design_records.md, "T-F part 1", THE CLOSE, FINDINGS): in
+scenario_s02_02 (env_layout_02; its script ends with the human delivering at kitting_table_0 and no exit walk,
+docs/assumptions.md 1.1) the human stands at the robot's remaining target from tick 250 to the run's end. The three
+conditions that observe the human hold on fallback projections of the stand, each as long as the stand so far (P4), and
+do not finish within the cap of 704 ticks (holds up to 256 ticks at 502, intention-unaware; 384 at 630, intention-aware);
+human-unaware completes at 422. The question: what the robot does when a stand at its target does not end. X1 set
+aside a give-up threshold (a constant) and pointed to communication (X5, TODO-96, TODO-141). Whether the script is an
+authoring artefact (1.1) or the case is to be designed is the first decision.
+Files: shared/meta_planner.py (the fallback's re-decision), shared/projection.py (the fallback projection)
+Reference: design_decisions.md, "T-D X: response", X1, X5; "T-D P", P4; TODO-96, TODO-141
