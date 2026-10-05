@@ -3987,3 +3987,19 @@ of this title. Records only, nothing built.
   standing robot. Which sets: decided at that step.
 State: nothing built. The build's plan: docs/handoffs/plan_T-F_part1.md, written by ccode, not approved. Next: Hadi's
 rulings on the plan's open points, then the build's stage 1.
+THE PLAN APPROVED, A TO G (Hadi, 5 October 2026; on ccode's flags 1 to 4 and Q1 to Q7 of the plan). A, B, C, E and
+F's Q4 are conceptual: design_decisions.md, the same title, AMENDED. Here:
+- D (Q1). The loader gives the robot no observed human; the scenario stays as written. Future work, Hadi's alternative
+  (TODO-182): the robot keeps the observed human and each component skips its computation; its reason: an
+  execution-time avoidance (C, TODO-181) could then still use the human.
+- F, Q3. A run in which the recognizer does not run (human-unaware, intention-unaware) prints no `[coverage]` and
+  `[scenario-coverage]` lines. Reason: they describe what recognition can explain. (ccode's check: only the IRB's
+  instruments read them, and the IRB is not run in these conditions.)
+- G (Q5, Q6). dock_loading's six scripts that depend on the robot get no oracle in the new conditions, measures only.
+  The check that a human-unaware robot moves as the robot alone applies only where the robot's and the human's objects
+  are separate; elsewhere a difference is a recorded finding, not a disagreement. The measurement of T-F part 1 (R10)
+  runs on kitting only. Open for T-G's next stage, not ruled (TODO-183): may a domain forbid a run condition?
+- The oracle's scope (R9 as amended by A): for the intention-unaware run it checks the decisions and the fallback
+  projections only; "the recognition columns as today" is superseded.
+- The plan: APPROVED with A to G (docs/handoffs/plan_T-F_part1.md, its status line and the sections A to G change).
+Next: the build's stage 1, then a pause.

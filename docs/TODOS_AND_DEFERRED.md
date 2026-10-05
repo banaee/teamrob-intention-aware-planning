@@ -4811,3 +4811,24 @@ under mesa_sim/viz/ reads `confidence` or `distribution` today, so the viewer sh
 applies when it does (T-V track 1).
 Files: mesa_sim/viz/
 Reference: design_records.md, "T-K", THE CROSS-CHECK, RULED, AM58; docs/handoffs/plan_T-K_part1.md, section 11, X2
+
+**TODO-181: Execution-time collision avoidance in a human-unaware run (recorded, T-F part 1, ruling C, 5 Oct 2026)** open
+`human_aware` off sets the separation stop off, so a human-unaware run has no check against the human at execution.
+For runs that simulate execution fully, not only compare recognition and planning: an execution-time collision
+avoidance that also acts in a human-unaware run. Future work; not designed.
+Files: mesa_sim/executor.py, mesa_sim/sim_model.py
+Reference: design_decisions.md, "T-F part 1: the conditions human-unaware and intention-unaware", C; TODO-73
+
+**TODO-182: Human-unaware with the observed human kept (recorded, T-F part 1, ruling D, 5 Oct 2026)** open
+Hadi's alternative to D: the robot keeps the observed human and each component of the mind skips its computation,
+instead of the loader giving the robot no observed human. Its reason: an execution-time avoidance (TODO-181) could then
+still use the human. Future work.
+Files: mesa_sim/sim_model.py, mesa_sim/sim_agents.py
+Reference: design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware", D; TODO-181
+
+**TODO-183: May a domain forbid a run condition? (recorded, T-F part 1, ruling G, 5 Oct 2026)** open, for T-G's next stage; not ruled
+Example: a mandatory check-in. If the robot learns of it as a state of an object, a human-unaware robot still waits for
+it. If the robot must recognise the human's act, a human-unaware run is not a meaningful baseline there.
+Files: domains/dock_loading/, mesa_sim/run_mesa.py
+Reference: design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware", G; T-G stage 3
+(check-in and check-out)

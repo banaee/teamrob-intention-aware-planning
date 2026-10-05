@@ -1534,13 +1534,16 @@ ADDED (T-F part 1, Hadi, 5 October 2026; not built): the three conditions of the
 "Blind" is not used for any of them.
 
 **human-unaware** — the robot's condition in which the human is in the world, moves, and the robot can come below
-`min_separation` of the human, while the recognizer and the meta-planner receive no human: the robot plans and moves as
-if the workspace were empty. A condition of the robot's mind, not of its perception: the world state keeps the human's
-facts (TODO-131). Run option `human_aware` off.
+`min_separation` of the human, while the recognizer and the meta-planner receive no observed human: the robot does no
+recognition and no planning against the human, and does not track the human's assigned tasks. The world state keeps
+the human's facts; the robot reads object states for its own assigned tasks (a task of its pool the human completes it
+reads as complete). It covers the mind and one check of the body, the separation stop, set off (TODO-131, TODO-181).
+Run option `human_aware` off.
 
-**intention-unaware** — the robot's condition in which it observes the human and the gate admits nothing: every
-decision rests on the **fallback projection**, or on no projection before a first observation. The gate's refusal is
-`none(intention_off)`. TODO-137's fallback-only control. Run option `intention_aware` off.
+**intention-unaware** — the robot's condition in which it observes the human's position and motion, the recognizer
+computes nothing, and the gate admits nothing (`none(intention_off)`): every decision rests on the **fallback
+projection**, or on no projection before a first observation. TODO-137's fallback-only control. Run option
+`intention_aware` off.
 
 **intention-aware** — the framework as designed: the robot observes the human and the gate may admit a task; assignment
 knowledge and context knowledge are its own options (§5). Both run options on.

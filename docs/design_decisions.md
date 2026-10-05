@@ -5600,3 +5600,25 @@ It answers TODO-137.
   setting that is not in effect. Reason: as R6, the log prints the cause.
 → RECORD [T-F_part1/1] (written 5 October 2026): docs/design_records.md, under "T-F part 1: the conditions
 human-unaware and intention-unaware": R1, R3, R5's form, R8, R9, R10; the state.
+AMENDED (Hadi, 5 October 2026, with the plan's approval; A to G, on ccode's flags and questions; the record part, D,
+F's Q3 and G, in design_records.md under this title):
+- A (amends R6, R5's premise). Under `intention_aware` off the recognizer computes nothing. The gate receives no
+  intention and refuses with `none(intention_off)`. The robot still observes the human's position and motion, which the
+  fallback projection needs. Supersedes, for this condition, "the recognizer runs and logs on every tick" (R6). Reason:
+  the knowledge options are off because the component they feed does not run, which removes the conflict between R5
+  and R6 (with assignment knowledge forced off the logged recognition would not be the default run's, and MPB-6 gives
+  no exact oracle for it). The three conditions then differ by one thing each: no observed human; the fallback
+  projection; recognition and admission.
+- B (amends R2's and R4's wording). Human-unaware: the recognizer and the meta-planner receive no observed human; the
+  robot does no recognition and no planning against the human, and it does not track the human's assigned tasks. The
+  world state keeps the human's facts; the robot reads object states for its own assigned tasks. Corner case,
+  recorded: if the human completes a task in the robot's own pool, the robot reads that task as complete in the world;
+  it does not occur in the present sets. Reason: the robot does not reason about the human's behaviour; reasoning on
+  objects stays.
+- C (amends R4). `human_aware` off sets the separation stop off, for now: human-unaware covers the mind and this one
+  check of the body. An execution-time collision avoidance that also acts in a human-unaware run is future work
+  (TODO-181).
+- E (amends R7). Admission checks "no human" before the gate, in every run. Reason: one rule; the printed reason is the
+  cause. The robot-alone reference logs change in that one line.
+- F, Q4 (amends R7). "No label states a setting not in effect" covers the run options only; the `[run]` header prints
+  the constants (θ, ρ, min_separation, β, α, speed) in every run.
