@@ -3956,7 +3956,9 @@ STEPS 5D AND 5E: THE DECISIONS CONFIRMED; THE DISCOVERY TEST UPDATED (Hadi, 5 Oc
 Next: steps 6 and 7 on hold until Hadi rules.
 A FINDING OF T-F PART 1 THAT BEARS ON T-K (5 October 2026; not ruled): with context knowledge on and no timeline fact in
 force, an admission at tick 0 of a task the human is not doing (scenario_s05_01, s05_02; s16_01, s16_02); recorded
-under "T-F part 1", THE CLOSE, FINDINGS.
+under "T-F part 1", THE CLOSE, FINDINGS. A second (5 October 2026; not ruled): with a timeline fact in force, a fact in
+accord with the human's task speeds its admission, a fact not in accord delays it (design_records.md, "T-F part 1",
+PART 1 OF THE LAST STEP; COMPARISON.md).
 
 
 ## T-F part 1: the conditions human-unaware and intention-unaware
@@ -4227,4 +4229,21 @@ with T-K part 1's steps on dock_loading.
   TODO-182 unchanged.
 - The handoff: docs/handoffs/handoff_T-F_part1.md (the options, the instruments, the result, the findings, the parked
   notes for T-F part 2).
+PART 1 OF THE LAST STEP: CONTEXT KNOWLEDGE WITH A FACT IN FORCE (Hadi, 5 October 2026; recorded by ccode the same day).
+Ruling: step 3 of COMPARISON.md compares context knowledge off and on almost only where no timeline fact is in force
+(125 of 128 scenarios), so it measures the prior alone; pair each copy with a timeline (context knowledge on) with its
+base's run with context knowledge off, by class (the human's behaviour in accord with the fact in force, or not);
+complete the set by new copies where a class is missing (both classes for every script that allows them; reason: a set
+with facts only in accord would show a benefit by construction), one rule written down before the runs; two
+recognition measures beside the others (how many ticks after its start each of the human's tasks is admitted; how many
+ticks a task other than the one the human performs is admitted), because context knowledge acts on recognition first.
+BUILT AND RUN (05b4dd3, 673d1b6): the rule in analysis/kitting/tf1/REPORT.md ("Part 1"), committed before the runs;
+`make_copies.py` (the classes, the windows, the new copies); 32 new copies (7 in accord, 25 not in accord, on 25 bases;
+new scenario literals only, tests/test_tl2_discovery.py's count 689 → 721), run_689 to run_720, 0 disagreements with the
+oracle; the classes: 73 copies in accord, 135 not in accord, step 5's 3 whole-run copies apart. Results: COMPARISON.md,
+"Context knowledge with a fact in force". FINDING (not ruled): with the fact in accord, of 66 stretches of the human's
+tasks starting while the fact holds, 52 are admitted earlier than with context knowledge off and 2 later; with the fact
+not in accord, of 119 such stretches, 31 earlier and 70 later. Wrong-admission ticks 633 → 613 (in accord) and 999 →
+1175 (not in accord). Completion and violations change little: completion 5 earlier, 62 equal, 5 later of 72 (in
+accord) and 5 / 119 / 10 of 134 (not in accord); violation ticks 10 → 5 and 18 → 24.
 State: T-F part 1 CLOSED; T-F part 2 parked. Next: T-G's next stage with T-K part 1's steps on dock_loading.

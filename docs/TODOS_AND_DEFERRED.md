@@ -4312,6 +4312,9 @@ REPORT.md, COMPARISON.md): planning against the observed human removes violation
 +5.83 ticks; recognition and context knowledge show no difference this set can distinguish from zero. T-F part 2
 parked; its notes (full_reorder the default strategy, strategy a column of the same result table, J; no setting in a
 name, K): docs/handoffs/handoff_T-F_part1.md.
+With a timeline fact in force (the last step's part 1, 5 October 2026; COMPARISON.md): a fact in accord with the
+human's task speeds its admission (52 of 66 stretches earlier), one not in accord delays it (70 of 119 later); completion
+and violations change little. Not ruled.
 
 **TODO-145: Track 3b: consequential activation under conflict (not ruled) (recorded, the MPB close-out, 30 Sept 2026)** [OPEN; after the MPB, before T-F] [V1]
 [V1] (T-G A1, T-G records 1, 1 Oct 2026): in V1. design_decisions.md, "T-G: the second domain's rulings", A1.

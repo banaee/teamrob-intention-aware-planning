@@ -569,7 +569,9 @@ Decisions
   folder per scenario, the runs by serial (K); one figure per run on one tick axis (N).
   T-F part 1 is CLOSED (Hadi, 5 October 2026; design_records.md, "T-F part 1", THE CLOSE; for a reader outside the
   repository `analysis/kitting/tf1/COMPARISON.md`): steps 2 and 3 (recognition, context knowledge) show no difference
-  this set can distinguish from zero; part E executed (analysis/ 16,488 files, 2.0 GB; analysis/README.md). T-F part 2
+  this set can distinguish from zero; with a timeline fact in force, a fact in accord with the human's task speeds its
+  admission and one not in accord delays it, with little change in completion and violations (COMPARISON.md, "Context
+  knowledge with a fact in force"); part E executed (analysis/ 16,488 files, 2.0 GB; analysis/README.md). T-F part 2
   is parked (docs/handoffs/handoff_T-F_part1.md). Next: T-G's next stage with T-K part 1's steps on dock_loading
   (docs/handoffs/T-G_forward_inputs.md).
   Not to be
