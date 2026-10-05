@@ -67,7 +67,7 @@ Relevant (read as needed):
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - The record of planning and building (the records split, 2 October 2026): `docs/design_records.md`, one heading per
-  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-K). A session reads its own task's heading. In
+  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-K, T-F part 1). A session reads its own task's heading. In
   `design_decisions.md` an index line `→ RECORD [<id>]` stands where a moved block was; `design_records.md` heads the
   block with the entry's title and the same id, so a citation by title and label resolves.
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
@@ -548,8 +548,14 @@ Decisions
   `docs/handoffs/T-G_forward_inputs.md`, section 5. Step 5e, context knowledge on kitting's rooms 02, 05, 06, 07 and on env_layout_19 and _20 (copies of 08 and 09 with a
   coffee machine), with 100 new scripts, is DONE (5 October 2026; analysis/kitting/tk5e/REPORT.md; design_records.md,
   "T-K", STEP 5E): 772 runs, 0 disagreements. Steps 6 (dock_loading's part) and 7 (the close) are on hold.
+  T-F part 1, the conditions human-unaware and intention-unaware, is RULED (Hadi, 5 October 2026; design_decisions.md
+  and design_records.md, the entry of that title, R1 to R10; glossary §9): two run options `human_aware` and
+  `intention_aware`, both on by default, an option off setting the options above it off; intention-unaware is
+  TODO-137's fallback-only control (the gate refuses for both callers, `none(intention_off)`); human-unaware is a
+  condition of the mind, not of perception. Nothing built; the build's plan `docs/handoffs/plan_T-F_part1.md`, not
+  approved. The rest of T-F keeps its place after T-G.
   Not to be
-  started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
+  started unasked: T-F (its part 1 ruled and taken now), T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized

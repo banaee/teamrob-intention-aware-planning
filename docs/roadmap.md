@@ -392,6 +392,9 @@ paragraph, not in the alphabet.
   letter is never given to a different task; a task may be paused, resumed and revisited, and may hold a V1 part and a
   later part. T-G is paused after its stage 1; T-K part 1 runs now; T-G resumes at its stage 2 when T-K part 1 is
   closed.
+- ADDED (Hadi, 5 October 2026; design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware",
+  R1): T-F part 1, the conditions human-unaware and intention-unaware (TODO-137), is taken now, while T-K part 1's steps
+  6 and 7 are on hold: its build, then its measurement (R10). The rest of T-F keeps its place after T-G.
 
 V1 AND FW (Hadi, 1 October 2026, amended by Hadi 3 October 2026 for T-K; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
@@ -613,6 +616,10 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
   READING (recorded): track 3b follows T-F, in the T-D tail, so an evaluation before 3b measures without knowing that
   the adaptive branches fire under conflict; it cannot test behaviour in which the human projection conflicts with the
   robot's plan.
+  T-F PART 1 (Hadi, 5 October 2026; design_decisions.md and design_records.md, "T-F part 1: the conditions
+  human-unaware and intention-unaware"): the admission-off condition (TODO-137) is the intention-unaware condition,
+  built now with the human-unaware condition, before the rest of T-F; realization off (`plain`) is not a column of its
+  measurement (R8). Ruled; not built.
   T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A8, A11): track 4's reduced form now comes before T-F (after T-G's stage 2).
   SCOPE REVISED (Hadi, 1 October 2026): T-F may use the unmonitored office on dock_loading; kitting's part of T-F stays
   without a departure; "no genuine departure (track 4 follows T-F)" above is superseded for dock_loading, and the

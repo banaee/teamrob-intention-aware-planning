@@ -4097,7 +4097,7 @@ future work with this reactive human; the two grounds on which communication is 
 Files: world/human_executor.py, mesa_sim/sim_agents.py (`HumanAgent`)
 Reference: docs/assumptions.md 4.2; design_decisions.md, "T-H" (item 10, Alternative 1)
 
-**TODO-137: The fallback-only control for the near-encounter comparison (recorded, Track 2.5, 29 Sept 2026)** [OPEN]
+**TODO-137: The fallback-only control for the near-encounter comparison (recorded, Track 2.5, 29 Sept 2026)** [RULED (T-F part 1, 5 Oct 2026); not built] [V1]
 docs/assumptions.md 4.6 compares the IR planner (realized cost) with the no-IR planner: plain cost (`--cost_strategy
 plain`, candidates ranked without realization) and the fallback-only control (the planner realizing against the
 fallback projection always, admission never). The second is no run option today (the flags: `--strategy`,
@@ -4108,6 +4108,12 @@ plain cost and this control.
 MPB (29 Sept 2026; design_decisions.md, "The meta-planner test-bed (MPB)", MPB-5): an evaluation item, not built in
 the meta-planner test-bed.
 T-F (29 Sept 2026): the admission-off condition of the evaluation, a prerequisite of it (TODO-144).
+CORRECTED (5 Oct 2026): the flags listed above are those of 29 Sept 2026; `--assignment_prior` is `--assignment_knowledge`
+since T-K part 1's build, and `--context_knowledge` was added beside it.
+ANSWERED (Hadi, 5 October 2026; design_decisions.md and design_records.md, "T-F part 1: the conditions human-unaware
+and intention-unaware"): this control is the **intention-unaware** condition, the run option `intention_aware` off;
+the gate refuses for both its callers with `none(intention_off)` (R6). Ruled with it: the **human-unaware** condition
+(`human_aware` off). The build is T-F part 1's; its plan: docs/handoffs/plan_T-F_part1.md. Closed when built.
 Files: mesa_sim/run_mesa.py (the option), shared/meta_planner.py (admission)
 Reference: docs/assumptions.md 4.6; design_decisions.md, "T-D P"; TODO-135, TODO-144
 
@@ -4274,6 +4280,12 @@ A framing for Phase 5 (T-F), recorded so the evaluation starts from what the MPB
   recency duration of 90 ticks (coffee_break, T-K AM16) was derived from the wait, which is compressed, while walking
   is not; in env_layout_15 to _17 the walk from the coffee machine to the table and back takes about 84 to 94 ticks.
 - Before the evaluation: track 3b (TODO-145), consequential activation under conflict.
+NOTE (T-F part 1, Hadi, 5 October 2026; design_records.md, "T-F part 1: the conditions human-unaware and
+intention-unaware", R1, R8, R10): T-F part 1 builds the conditions human-unaware and intention-unaware now (admission
+off above is intention-unaware, TODO-137); the rest of T-F keeps its place after T-G. Realization off (`--cost_strategy
+plain`): the human-unaware condition covers its comparison (the same behaviour in the verification's two runs; plain
+differs by construction, re-deciding at triggers whose results it ignores); `plain` stays untouched, is not a column
+of T-F part 1's measurement, and keeping or retiring it is ruled with T-F.
 Files: analysis/ (the evaluation), domains/kitting/ (the evaluation set), mesa_sim/run_mesa.py (TODO-137's option)
 Reference: docs/assumptions.md 1.4, 4.6; design_decisions.md, "The meta-planner test-bed (MPB)", F1; TODO-47,
 TODO-135, TODO-137, TODO-138, TODO-140, TODO-141

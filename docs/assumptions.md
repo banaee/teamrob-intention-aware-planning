@@ -148,6 +148,11 @@ Framework scope · Hadi, 28 Sept 2026, reframing F1's stance (F1 stays the safet
 The fallback-only control is no run option today (TODO-137); the evaluation scenario is TODO-135 (its first
 instance: scenario_s01_06, the exit walk through the holding robot, 5.23 cm at 147, stands and a recede).
 The evaluation's framing (the conditions, the measures, the scenario dimension; not ruled): TODO-144.
+CORRECTED (5 Oct 2026): F1's `rule` is in `analysis/instruments/common/sep_classes.py` (its old place,
+`analysis/f1_robot_responsible/evaluate.py`, deleted 4 Oct 2026). RULED (T-F part 1, Hadi, 5 October 2026;
+design_decisions.md, "T-F part 1: the conditions human-unaware and intention-unaware"): the fallback-only control is
+the intention-unaware condition (`intention_aware` off), beside the human-unaware condition (`human_aware` off); plain
+cost stays untouched and is not a column of T-F part 1's measurement (R8). Not built.
 
 ## 5. Perception
 
