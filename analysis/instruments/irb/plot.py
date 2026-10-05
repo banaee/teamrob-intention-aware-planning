@@ -13,7 +13,8 @@ with context knowledge on (the run log holds `[IR-context]` lines), a panel dire
 the context facts in force as the mind read them (`facts=`: a timeline fact, labelled `timeline` when the run's
 `[run_mesa] timeline` line names it, else an object state, labelled `state`) and the recency facts (`recent=`); with
 context knowledge off the figure is as before. With no expected table (a planning run with no oracle: assignment
-knowledge off, a script that depends on the robot) the actual values are drawn as lines, alone.
+knowledge off, a script that depends on the robot) the actual values are drawn as lines, alone. A caller may add a
+last panel on the same tick axis (`extra`, the planning test-bed's decision panel) and a line of settings to the title.
 
     plot.py <scenario dir> <run.log>
 """
@@ -101,7 +102,7 @@ def short(k):
     return re.sub(r"\?\w+=", "", k)
 
 
-def main(d, log):
+def main(d, log, extra=None, title=None):
     d = Path(d)
     THETA, alpha = header(log)
     exp, act = read(d / "expected.csv"), read(d / "actual.csv")
@@ -112,21 +113,25 @@ def main(d, log):
     for n, keys in enumerate(groups):
         name = "figure.png" if n == 0 else f"figure_{n + 1}.png"
         part = "" if len(groups) == 1 else f" (hypotheses {n * len(SERIES) + 1} to {n * len(SERIES) + len(keys)} of {len(every)})"
-        figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx)
+        figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx, extra, title)
 
 
-def figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx=None):
+def figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx=None, extra=None, title=None):
     color = dict(zip(keys, SERIES))
     T = max(int(r["tick"]) for r in (exp or act))
-    if ctx is None:
-        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 8.6), sharex=True,
-                                                 gridspec_kw=dict(height_ratios=[3, 3, 0.45, 1.3], hspace=0.08))
-    else:                     # context knowledge on: the context panel directly under the belief (T-F part 1)
-        n_ctx = max(len({f for fs, _ in ctx[0].values() for f in fs} | {r for _, rs in ctx[0].values() for r in rs}), 1)
-        fig, (ax1, axc, ax2, ax3, ax4) = plt.subplots(
-            5, 1, figsize=(12, 8.6 + 0.3 * n_ctx), sharex=True,
-            gridspec_kw=dict(height_ratios=[3, 0.35 * n_ctx + 0.2, 3, 0.45, 1.3], hspace=0.08))
-        context_panel(axc, ctx, T)
+    # the panels: the belief; the context (context knowledge on, T-F part 1); S; the finding; warrant and the gate; a
+    # caller's last panel (the decisions)
+    n_ctx = 0 if ctx is None else \
+        max(len({f for fs, _ in ctx[0].values() for f in fs} | {r for _, rs in ctx[0].values() for r in rs}), 1)
+    ratios = [3] + ([0.35 * n_ctx + 0.2] if ctx else []) + [3, 0.45, 1.3] + ([1.4] if extra else [])
+    axes = plt.subplots(len(ratios), 1, figsize=(12, 8.6 + 0.3 * n_ctx + (1.9 if extra else 0)), sharex=True,
+                        gridspec_kw=dict(height_ratios=ratios, hspace=0.08))[1]
+    ax1, rest = axes[0], list(axes[1:])
+    if ctx is not None:
+        context_panel(rest.pop(0), ctx, T)
+    ax2, ax3, ax4 = rest[:3]
+    if extra is not None:
+        extra(rest[3])
     for ax, col, ylabel in ((ax1, "belief_h", "belief over H"), (ax2, "S", "tail probability S")):
         e, a = series(exp, col), series(act, col)
         for k in keys:
@@ -178,7 +183,7 @@ def figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx=None):
     ax4.set_ylim(-0.6, len(rows4) - 0.4)
     for s in ("top", "right"):
         ax4.spines[s].set_visible(False)
-    ax4.set_xlabel("tick")
+    axes[-1].set_xlabel("tick")
     ax4.set_xlim(-1, T + 1)
     # the script's action boundaries; the task starts labelled
     last_task = None
@@ -188,8 +193,13 @@ def figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx=None):
         if b["task"] != last_task:
             ax1.text(b["tick"] + 1, 1.05, short(b["task"]), fontsize=7.5, color=INK, va="bottom", rotation=0)
             last_task = b["task"]
-    fig.suptitle(f"{traj['scenario']} on {traj['layout']}, {'prior on' if exp else 'no oracle table'}{part}"
-                 + ("" if ctx is None else ", context knowledge on"), x=0.06, ha="left", fontsize=11, color=INK)
+    if title is None:
+        text = (f"{traj['scenario']} on {traj['layout']}, {'prior on' if exp else 'no oracle table'}{part}"
+                + ("" if ctx is None else ", context knowledge on"))
+    else:
+        text = f"{traj['scenario']} on {traj['layout']}{part}{'' if exp else ', no oracle table'}\n{title}"
+    fig = axes[0].figure
+    fig.suptitle(text, x=0.06, ha="left", fontsize=11, color=INK)
     fig.savefig(d / name, dpi=130, bbox_inches="tight")
     plt.close(fig)
 

@@ -15,7 +15,8 @@ H (`belief_h`, the value the gate compares with θ, without the floor and the pi
 Since T-F part 1 (the standing rule on figures, Hadi, 5 October 2026): drawn for every run in which the recognizer
 runs; with no oracle table (assignment knowledge off, MPB-6; a script that depends on the robot) the actual values
 alone, the hypotheses the actual belief's keys; with context knowledge on the context panel under the belief
-(analysis/instruments/irb/plot.py).
+(analysis/instruments/irb/plot.py). Beneath them the decision panel (decision_panel.py: the robot's task and the
+holds, the projection each decision rested on, the decisions by trigger and cause), and the run's settings in the title.
 """
 import csv
 import json
@@ -26,7 +27,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[0] / "irb"))
-import plot as ir_plot                                  # analysis/irb/plot.py, unchanged
+import plot as ir_plot                                  # analysis/irb/plot.py
+import decision_panel                                  # the decision panel and the settings line (T-F part 1)
 
 COLUMNS = ["tick", "key", "belief", "belief_h", "S", "finding", "lifecycle", "gate", "warrant"]
 
@@ -65,7 +67,9 @@ def main(d, log):
         traj = json.load(open(d / "trajectory.json"))
         traj["actions"] = [a for a in traj["actions"] if a["tick"] < horizon]
         json.dump(traj, open(tmp / "trajectory.json", "w"))
-        ir_plot.main(tmp, log)
+        # the decisions on the same tick axis, the run's settings in the title (the figures rule, T-F part 1)
+        ir_plot.main(tmp, log, extra=lambda ax: decision_panel.draw(ax, d, horizon),
+                     title=decision_panel.settings_text(log))
         for f in sorted(tmp.glob("figure*.png")):      # every part when the hypotheses are faceted (T-F part 1)
             shutil.copy(f, d / f.name.replace("figure", "figure_ir"))
 

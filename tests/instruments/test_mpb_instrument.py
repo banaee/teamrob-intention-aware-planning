@@ -285,3 +285,31 @@ def test_the_human_unaware_checks_the_hold_and_the_reference_positions(tmp_path)
     assert bad == [(5, "hold", 0, 2), (2, "position (the reference run)", [3.0, 0.0], [2.0, 0.0])]
     bad, finding, n = human_unaware_checks(tmp_path, 10, separate=False)       # objects shared: a finding (G)
     assert bad == [(5, "hold", 0, 2)] and finding is not None and "2" in finding
+
+
+# ---- the figures rule (Hadi, 5 October 2026): the decision panel and the settings line --------------------------
+def test_the_decision_panel_draws_each_kind_of_projection_and_the_settings_line(tmp_path):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import decision_panel
+    fb = dict(mode="standing", k=2, duration=2.0, end=6.0)
+    adm = dict(key="deliver_item(?item=item_1,?kitting_table=kitting_table_0)", actions=[])
+    decisions = [dict(tick=0, trigger="no_current_task", cause=None, admitted=None, fallback=None),
+                 dict(tick=3, trigger="projection_expired", cause=None, admitted=None, fallback=fb),
+                 dict(tick=7, trigger="recognition_changed", cause="entered", admitted=adm, fallback=None)]
+    (tmp_path / "actual_decisions.json").write_text(json.dumps(decisions))
+    (tmp_path / "selection.json").write_text(json.dumps([dict(tick=0, hold=0), dict(tick=7, hold=3)]))
+    (tmp_path / "robot.json").write_text(json.dumps([dict(tick=t, task=None if t > 9 else "deliver_item(?item=item_7)")
+                                                     for t in range(12)]))
+    fig, ax = plt.subplots()
+    decision_panel.draw(ax, tmp_path, 12)
+    texts = [t.get_text() for t in ax.texts]
+    assert "deliver_item(item_1,kitting_table_0)" in texts and "entered" in texts and "hold 3" in texts
+    assert " deliver_item(item_7)" in texts
+    plt.close(fig)
+    log = tmp_path / "run.log"
+    log.write_text("[run] robot_0 strategy=single_task gate_strategy=none cost_strategy=realized separation_stop=off "
+                   "human_aware=on intention_aware=off assignment_knowledge=off context_knowledge=off theta=0.750\n")
+    assert decision_panel.settings_text(log) == ("strategy single_task; human_aware on, intention_aware off, "
+                                                 "assignment_knowledge off, context_knowledge off")

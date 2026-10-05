@@ -59,7 +59,7 @@ e = s['effective']; print(s['condition'], s['dependence'], s['objects_separate']
     fi
   fi
   PYTHONHASHSEED=0 $PY $D/measures.py $sid $OUT $LOG $RUN
-  $PY $D/plot.py $sid $OUT
+  $PY $D/plot.py $sid $OUT $LOG
   if [ "$condition" = intention-aware ]; then $PY $D/plot_ir.py $OUT $LOG; fi   # the recognizer runs: its figure
   $PY analysis/instruments/common/separation.py $LOG > $OUT/separation.md
 done

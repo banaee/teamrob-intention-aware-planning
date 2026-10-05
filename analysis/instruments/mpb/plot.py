@@ -8,7 +8,11 @@ Since T-F part 1 (the standing rule on figures, Hadi, 5 October 2026; design_rec
 a human-unaware or intention-unaware run (its settings.json) draws no gate and no belief, the recognizer not running:
 (top) every decision on the row of the projection it rested on, none or the fallback projection, the fallback's span
 from the decision to its end as a bar, the mark by trigger; (bottom) the robot–human distance per tick against the
-run's min_separation (its [run] header) and the holds. The intention-aware figure is unchanged.
+run's min_separation (its [run] header) and the holds. Since the follow-up of the same day: the top panel is the
+decision panel (decision_panel.py), the same as beneath the belief in figure_ir.png, so the conditions compare by eye;
+given the run log (third argument), every figure's title carries the run's settings, the strategy included.
+
+    plot.py <scenario> <dir> [<run.log>]
 """
 import json
 import math
@@ -19,28 +23,23 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import decision_panel                                  # the decision panel and the settings line (T-F part 1)
+
 GATES = ["clears", "none(below_theta)", "none(leader_no_observation)", "none(leader_inadequate)",
          "none(leader_unwarranted)", "none(leader_outranked)"]
 MARK = {"no_current_task": ("s", "tab:gray"), "recognition_changed": ("o", "tab:blue"),
         "projection_expired": ("^", "tab:orange")}
 
-def unaware_figure(sid, d, settings, H):
+def unaware_figure(sid, d, settings, H, log):
     """The figure of a run in which the recognizer does not run (T-F part 1)."""
     agents = [a for a in json.load(open(d / "robot.json")) if a["tick"] < H]
-    act = [x for x in json.load(open(d / "actual_decisions.json")) if x["tick"] < H]
     sel = {s["tick"]: s for s in json.load(open(d / "selection.json"))}
     sep = settings["min_separation"]
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(12, 5.2), sharex=True, gridspec_kw=dict(height_ratios=[0.7, 1.3]))
-    for x in act:
-        m, c = MARK[x["trigger"]]
-        if x["fallback"]:
-            a1.plot([x["tick"], x["fallback"]["end"]], [1, 1], color=c, lw=4, alpha=0.35, solid_capstyle="butt")
-        a1.scatter([x["tick"]], [1 if x["fallback"] else 0], marker=m, s=40, facecolors="none", edgecolors=c)
-    a1.set_yticks([0, 1], ["no projection", "fallback projection"], fontsize=8)
-    a1.set_ylim(-0.6, 1.6)
-    a1.set_title(f"{sid} ({settings['condition']}, {settings['effective']['strategy']}): the decisions and the "
-                 "projection each rested on (bar: the fallback's span); ■ no_current_task, ▲ projection_expired",
-                 fontsize=8)
+    fig, (a1, a2) = plt.subplots(2, 1, figsize=(12, 5.6), sharex=True, gridspec_kw=dict(height_ratios=[1.1, 1.3]))
+    decision_panel.draw(a1, d, H)
+    a1.set_title(f"{sid} ({settings['condition']}; {decision_panel.settings_text(log)}): the decisions; no belief, "
+                 "the recognizer does not run", fontsize=8)
     dist = [math.dist(a["robot"], a["human"]) for a in agents]
     a2.plot([a["tick"] for a in agents], dist, lw=0.8)
     a2.axhline(sep, color="r", lw=0.6, ls="--")
@@ -60,8 +59,9 @@ def unaware_figure(sid, d, settings, H):
 if __name__ == "__main__":
     sid, d = sys.argv[1], Path(sys.argv[2])
     settings = json.load(open(d / "settings.json")) if (d / "settings.json").exists() else None
+    log = sys.argv[3] if len(sys.argv) > 3 else None
     if settings is not None and settings["condition"] != "intention-aware":
-        unaware_figure(sid, d, settings, json.load(open(d / "observed.json"))["horizon"])
+        unaware_figure(sid, d, settings, json.load(open(d / "observed.json"))["horizon"], log)
         sys.exit(0)
     obs = json.load(open(d / "observed.json"))
     H = obs["horizon"]
@@ -87,7 +87,8 @@ if __name__ == "__main__":
     for t in changes:
         a1.annotate((t["leader"] or "none").split("(")[0] + "(" + (t["leader"] or "").split("=")[-1],
                     (t["tick"], len(GATES) - 0.6), fontsize=6, rotation=45)
-    a1.set_title(f"{sid} ({obs['strategy']}, prior {'on' if obs['prior'] else 'off'}): gate per tick; decisions "
+    a1.set_title(f"{sid} ({obs['strategy']}, prior {'on' if obs['prior'] else 'off'}"
+                 + ("" if log is None else f"; {decision_panel.settings_text(log)}") + "): gate per tick; decisions "
                  "(expected: green lines; actual: ■ no_current_task, ● recognition_changed, ▲ projection_expired)",
                  fontsize=8)
     dist = [math.dist(a["robot"], a["human"]) for a in agents]

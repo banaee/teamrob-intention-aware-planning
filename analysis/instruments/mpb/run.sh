@@ -73,7 +73,7 @@ print(next(a for a in sc.agents if a.agent_type == 'human').scheduled_tasks.depe
     fi
   fi
   PYTHONHASHSEED=0 $PY $DOM/properties.py $sid $OUT $LOG $RUN
-  $PY $D/plot.py $sid $OUT
+  $PY $D/plot.py $sid $OUT $LOG
   $PY $D/plot_ir.py $OUT $LOG   # the IRB's figure; with no oracle table the actual alone (T-F part 1, the figures rule)
   $PY analysis/instruments/common/separation.py $LOG > $OUT/separation.md          # since the sort
 done
