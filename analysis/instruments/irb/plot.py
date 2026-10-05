@@ -8,6 +8,12 @@ panel: per hypothesis, the ticks it holds observation warrant (expected as a bar
 ticks the gate clears (the leader admissible: θ, adequate, warranted; T-D G), expected bar, actual dots. θ and α are read from
 the run's [run] header; a hypothesis or task is labelled by its key without the parameter names. No id, coordinate or
 tick is written here (IRB.4b).
+Since T-F part 1 (the standing rule on figures, Hadi, 5 October 2026; design_records.md, "T-F part 1", THE FIGURES):
+with context knowledge on (the run log holds `[IR-context]` lines), a panel directly under the belief shows, per tick,
+the context facts in force as the mind read them (`facts=`: a timeline fact, labelled `timeline` when the run's
+`[run_mesa] timeline` line names it, else an object state, labelled `state`) and the recency facts (`recent=`); with
+context knowledge off the figure is as before. With no expected table (a planning run with no oracle: assignment
+knowledge off, a script that depends on the robot) the actual values are drawn as lines, alone.
 
     plot.py <scenario dir> <run.log>
 """
@@ -39,6 +45,45 @@ def header(log):
     raise ValueError(f"{log}: no [run] header")
 
 
+CTX = re.compile(r"^\[IR-context\] step=(-?\d+) facts=\[([^\]]*)\] recent=\[([^\]]*)\]")
+
+
+def context(log):
+    """Per tick the context facts in force and the recency facts the mind read ([IR-context]), and the run's timeline
+    line; None with context knowledge off (no [IR-context] line)."""
+    rows, timeline = {}, ""
+    for l in open(log):
+        if l.startswith("[run_mesa] timeline"):
+            timeline = l
+        m = CTX.match(l)
+        if m:
+            rows[int(m[1])] = (m[2].split(), m[3].split())
+    return None if not rows else (rows, timeline)
+
+
+def context_panel(ax, ctx, T):
+    rows, timeline = ctx
+    facts = sorted({f for fs, _ in rows.values() for f in fs})
+    recent = sorted({r for _, rs in rows.values() for r in rs})
+    label = lambda f: ("timeline " if f.split("(")[0] in timeline else "state ") + f.replace("()", "")
+    lines = [(label(f), lambda t, f=f: f in rows.get(t, ((), ()))[0]) for f in facts] + \
+            [("recent " + r, lambda t, r=r: r in rows.get(t, ((), ()))[1]) for r in recent]
+    for i, (name, holds) in enumerate(lines):
+        y = len(lines) - 1 - i
+        on = [t for t in range(T + 1) if holds(t)]
+        ax.broken_barh([(t - 0.5, 1) for t in on], (y - 0.3, 0.6), color=INK if name.startswith("timeline") else MUTED,
+                       alpha=0.55, lw=0)
+    ax.set_yticks(range(len(lines)))
+    ax.set_yticklabels([n for n, _ in reversed(lines)], fontsize=7.5)
+    ax.set_ylim(-0.6, max(len(lines), 1) - 0.4)
+    if not lines:
+        ax.text(0.01, 0.5, "context knowledge on: no context fact or recency fact held", transform=ax.transAxes,
+                fontsize=8, color=MUTED, va="center")
+    ax.set_ylabel("context", rotation=0, ha="right", va="center", color=INK)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+
+
 def read(path):
     return [r for r in csv.DictReader(open(path)) if int(r["tick"]) >= 0]
 
@@ -61,27 +106,39 @@ def main(d, log):
     THETA, alpha = header(log)
     exp, act = read(d / "expected.csv"), read(d / "actual.csv")
     traj = json.load(open(d / "trajectory.json"))
-    every = sorted({r["key"] for r in exp if r["key"]})
+    ctx = context(log)
+    every = sorted({r["key"] for r in (exp or act) if r["key"]})
     groups = [every[i:i + len(SERIES)] for i in range(0, len(every), len(SERIES))] or [[]]
     for n, keys in enumerate(groups):
         name = "figure.png" if n == 0 else f"figure_{n + 1}.png"
         part = "" if len(groups) == 1 else f" (hypotheses {n * len(SERIES) + 1} to {n * len(SERIES) + len(keys)} of {len(every)})"
-        figure(d, exp, act, traj, THETA, alpha, keys, name, part)
+        figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx)
 
 
-def figure(d, exp, act, traj, THETA, alpha, keys, name, part):
+def figure(d, exp, act, traj, THETA, alpha, keys, name, part, ctx=None):
     color = dict(zip(keys, SERIES))
-    T = max(int(r["tick"]) for r in exp)
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 8.6), sharex=True,
-                                             gridspec_kw=dict(height_ratios=[3, 3, 0.45, 1.3], hspace=0.08))
+    T = max(int(r["tick"]) for r in (exp or act))
+    if ctx is None:
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 8.6), sharex=True,
+                                                 gridspec_kw=dict(height_ratios=[3, 3, 0.45, 1.3], hspace=0.08))
+    else:                     # context knowledge on: the context panel directly under the belief (T-F part 1)
+        n_ctx = max(len({f for fs, _ in ctx[0].values() for f in fs} | {r for _, rs in ctx[0].values() for r in rs}), 1)
+        fig, (ax1, axc, ax2, ax3, ax4) = plt.subplots(
+            5, 1, figsize=(12, 8.6 + 0.3 * n_ctx), sharex=True,
+            gridspec_kw=dict(height_ratios=[3, 0.35 * n_ctx + 0.2, 3, 0.45, 1.3], hspace=0.08))
+        context_panel(axc, ctx, T)
     for ax, col, ylabel in ((ax1, "belief_h", "belief over H"), (ax2, "S", "tail probability S")):
         e, a = series(exp, col), series(act, col)
         for k in keys:
             ts = range(T + 1)
-            ys = [e.get(k, {}).get(t) for t in ts]
-            ax.plot(list(ts), [float("nan") if y is None else y for y in ys], color=color[k], lw=2, label=short(k))
-            at = [t for t in sorted(a.get(k, {})) if t % 5 == 0 and a[k][t] is not None]
-            ax.plot(at, [a[k][t] for t in at], "o", ms=3.5, color=color[k], mec="white", mew=0.6)
+            if exp:
+                ys = [e.get(k, {}).get(t) for t in ts]
+                ax.plot(list(ts), [float("nan") if y is None else y for y in ys], color=color[k], lw=2, label=short(k))
+                at = [t for t in sorted(a.get(k, {})) if t % 5 == 0 and a[k][t] is not None]
+                ax.plot(at, [a[k][t] for t in at], "o", ms=3.5, color=color[k], mec="white", mew=0.6)
+            else:             # no expected table: the actual values alone, as lines
+                ys = [a.get(k, {}).get(t) for t in ts]
+                ax.plot(list(ts), [float("nan") if y is None else y for y in ys], color=color[k], lw=2, label=short(k))
         ax.set_ylabel(ylabel, color=INK)
         ax.set_ylim(-0.03, 1.05)
         ax.grid(axis="y", color="#e6e5e0", lw=0.6)
@@ -92,7 +149,7 @@ def figure(d, exp, act, traj, THETA, alpha, keys, name, part):
     ax2.axhline(alpha, color=MUTED, lw=0.8, ls="--")
     ax2.text(T, alpha + 0.015, f"α = {alpha:g}", ha="right", va="bottom", fontsize=8, color=MUTED)
     ax1.legend(loc="upper left", bbox_to_anchor=(1.0, 1.0), frameon=False, fontsize=9,
-               title="lines expected, dots actual", title_fontsize=8)
+               title="lines expected, dots actual" if exp else "actual (no oracle table)", title_fontsize=8)
     # the band: the finding, or the lifecycle when exhausted
     state = {}
     for r in act:
@@ -131,7 +188,8 @@ def figure(d, exp, act, traj, THETA, alpha, keys, name, part):
         if b["task"] != last_task:
             ax1.text(b["tick"] + 1, 1.05, short(b["task"]), fontsize=7.5, color=INK, va="bottom", rotation=0)
             last_task = b["task"]
-    fig.suptitle(f"{traj['scenario']} on {traj['layout']}, prior on{part}", x=0.06, ha="left", fontsize=11, color=INK)
+    fig.suptitle(f"{traj['scenario']} on {traj['layout']}, {'prior on' if exp else 'no oracle table'}{part}"
+                 + ("" if ctx is None else ", context knowledge on"), x=0.06, ha="left", fontsize=11, color=INK)
     fig.savefig(d / name, dpi=130, bbox_inches="tight")
     plt.close(fig)
 

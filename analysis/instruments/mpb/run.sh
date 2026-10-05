@@ -6,7 +6,7 @@
 # against the run's human lines (the IRB's trajectory.py), the in-process actual and the log (actual.py); prior
 # on also the oracle's per-tick table (mpb_oracle.py), the chain (chain.py) and the comparison (compare.py); the
 # declared properties and the measures (properties.py); for the control, the reference run (reference.py); the figure
-# and the summary; prior on, the IRB's figure (plot_ir.py, figure_ir.png). Outputs in <out_root>/<scenario>/<prior>_<strategy>/; the logs and .rec in <out_root>/runs/
+# and the summary; every run, the IRB's figure (plot_ir.py, figure_ir.png; with no oracle table the actual alone, since T-F part 1). Outputs in <out_root>/<scenario>/<prior>_<strategy>/; the logs and .rec in <out_root>/runs/
 # (git-ignored). PYTHONHASHSEED=0. Sequential: each run's log is the newest logs/run_*.log. Run from the repo root.
 set -eo pipefail
 DOMAIN=$1; shift
@@ -74,6 +74,6 @@ print(next(a for a in sc.agents if a.agent_type == 'human').scheduled_tasks.depe
   fi
   PYTHONHASHSEED=0 $PY $DOM/properties.py $sid $OUT $LOG $RUN
   $PY $D/plot.py $sid $OUT
-  if [ "$PRIOR" = on ] && [ -f $OUT/expected_ticks.json ]; then $PY $D/plot_ir.py $OUT $LOG; fi   # the IRB's figure
+  $PY $D/plot_ir.py $OUT $LOG   # the IRB's figure; with no oracle table the actual alone (T-F part 1, the figures rule)
   $PY analysis/instruments/common/separation.py $LOG > $OUT/separation.md          # since the sort
 done

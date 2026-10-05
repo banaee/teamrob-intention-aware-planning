@@ -111,6 +111,8 @@ if __name__ == "__main__":
                    layout=cfg.get("layout") or scenario_of(run_file)[1].reference_layouts[0],
                    stated=asdict(stated(run_file)), effective=asdict(reading), header=asdict(printed),
                    agree=reading == printed, condition=reading.condition.value,
+                   min_separation=float(next(l for l in open(log_path) if l.startswith("[run] "))
+                                        .split("min_separation=")[1].split()[0]),
                    objects_separate=objects_separate(run_file), dependence=dependence(run_file)),
               open(out / "settings.json", "w"), indent=1)
     print(f"{run_file}: {reading.condition.value}; header {'agrees' if reading == printed else 'DISAGREES'} with R5's "

@@ -11,8 +11,11 @@ Saved as figure_ir.png beside figure.png, which stays the MPB's decisions-and-di
 The hypotheses drawn are the support's, the expected table's keys. The belief carries the output floor of the setup's
 robot items (held outside the support, each at the floor), so the support's shares sum to slightly less than 1, on the
 expected side and the actual side alike. Since T-K part 1's gate stage (AM42) the belief panel draws the belief over
-H (`belief_h`, the value the gate compares with θ, without the floor and the pins), recorded on both sides. Prior on
-only: prior off has no oracle table (MPB-6).
+H (`belief_h`, the value the gate compares with θ, without the floor and the pins), recorded on both sides.
+Since T-F part 1 (the standing rule on figures, Hadi, 5 October 2026): drawn for every run in which the recognizer
+runs; with no oracle table (assignment knowledge off, MPB-6; a script that depends on the robot) the actual values
+alone, the hypotheses the actual belief's keys; with context knowledge on the context panel under the belief
+(analysis/instruments/irb/plot.py).
 """
 import csv
 import json
@@ -49,12 +52,12 @@ def write(path, table):
 
 def main(d, log):
     d = Path(d)
-    exp = json.load(open(d / "expected_ticks.json"))
+    exp = json.load(open(d / "expected_ticks.json")) if (d / "expected_ticks.json").exists() else []
     act = json.load(open(d / "actual_ticks.json"))
     horizon = json.load(open(d / "observed.json"))["horizon"]
     exp = [t for t in exp if t["tick"] < horizon]
     act = [t for t in act if t["tick"] < horizon]
-    keys = sorted({k for t in exp for k in t["belief"]})
+    keys = sorted({k for t in (exp or act) for k in t["belief"]})
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         write(tmp / "expected.csv", rows(exp, keys, lambda t: t["belief"], lambda t: t["S"]))
@@ -63,7 +66,8 @@ def main(d, log):
         traj["actions"] = [a for a in traj["actions"] if a["tick"] < horizon]
         json.dump(traj, open(tmp / "trajectory.json", "w"))
         ir_plot.main(tmp, log)
-        shutil.copy(tmp / "figure.png", d / "figure_ir.png")
+        for f in sorted(tmp.glob("figure*.png")):      # every part when the hypotheses are faceted (T-F part 1)
+            shutil.copy(f, d / f.name.replace("figure", "figure_ir"))
 
 
 if __name__ == "__main__":
