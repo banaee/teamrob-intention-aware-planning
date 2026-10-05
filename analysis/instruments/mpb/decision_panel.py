@@ -12,13 +12,19 @@ Three rows:
   admitted task named), the fallback projection (an open
   mark and a bar to the fallback's end), or none (a cross);
 - decision: each decision's tick, the mark by trigger (■ no_current_task, ● recognition_changed, ▲ projection_expired),
-  the cause of a recognition_changed written above it.
+  the cause of a recognition_changed written above it; where the oracle's chain exists (expected_decisions.json), the
+  expected decision ticks as thin green lines on the row (they were the old figure.png's, which the one figure of N
+  replaces; the measurement of T-F part 1).
 
 `settings_text(log)`: the run's settings from its [run] header (the effective values), for the figures' titles.
 """
 import json
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "irb"))
+import plot as ir_plot                                  # analysis/instruments/irb/plot.py: the settings line
 
 MARK = {"no_current_task": ("s", "tab:gray"), "recognition_changed": ("o", "tab:blue"),
         "projection_expired": ("^", "tab:orange")}
@@ -34,9 +40,7 @@ def short(key):
 
 def settings_text(log) -> str:
     """The run's settings, the strategy first, as its [run] header printed them (effective values)."""
-    h = dict(re.findall(r"(\w+)=(\S+)", next(l for l in open(log) if l.startswith("[run] "))))
-    keys = ("human_aware", "intention_aware", "assignment_knowledge", "context_knowledge")
-    return f"strategy {h['strategy']}; " + ", ".join(f"{k} {h[k]}" for k in keys if k in h)
+    return ir_plot.settings_text(log)
 
 
 def draw(ax, d, horizon):
@@ -62,6 +66,11 @@ def draw(ax, d, horizon):
         if s.get("hold") and t < horizon:
             ax.broken_barh([(t - 0.5, s["hold"])], (1.72, 0.56), facecolor="none", edgecolor=HOLD, hatch="////", lw=0.8)
             ax.text(t + s["hold"], 2.36, f"hold {s['hold']}", fontsize=6.5, color=HOLD, ha="right")
+    # the expected decisions (the oracle's chain), thin green lines on the decision row
+    if (d / "expected_decisions.json").exists():
+        for x in json.load(open(d / "expected_decisions.json")):
+            if x["tick"] < horizon:
+                ax.plot([x["tick"], x["tick"]], [-0.4, 0.4], color="tab:green", lw=0.8, alpha=0.7)
     # projection and decision; an admitted task is named where it differs from the last one named
     named = None
     for x in decisions:
@@ -83,6 +92,8 @@ def draw(ax, d, horizon):
     ax.set_ylim(-0.5, 2.7)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
-    ax.text(1.0, 1.02, "projection: ● admitted (named)  ○ fallback (bar to its end)  × none;  decision: ■ no_current_task  "
-            "● recognition_changed (cause above)  ▲ projection_expired;  hatched: hold", transform=ax.transAxes,
-            fontsize=6.5, color=MUTED, ha="right", va="bottom")
+
+
+# the panel's key, written under the figure by the builder (analysis/instruments/irb/plot.py, `draw`)
+KEY = ("decision panel — projection: ● admitted (named)  ○ fallback (bar to its end)  × none;  decision: ■ no_current_task  "
+       "● recognition_changed (cause above)  ▲ projection_expired;  green line: expected (the oracle);  hatched: hold")

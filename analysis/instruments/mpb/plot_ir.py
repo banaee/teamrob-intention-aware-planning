@@ -1,34 +1,21 @@
 #!/usr/bin/env python3
 """
-plot_ir.py — the IRB's figure for an MPB run (added at the MPB close-out): the same panels as
-analysis/irb/plot.py (the belief per hypothesis, the tail probability S per hypothesis, the finding band, the
-observation-warrant bands and the gate's clearing; expected as lines, actual as dots; θ and α marked), drawn by that
-script, imported unchanged, on the MPB's oracle table (expected_ticks.json) and in-process actual (actual_ticks.json).
-Saved as figure_ir.png beside figure.png, which stays the MPB's decisions-and-distance figure (plot.py).
+plot_ir.py — the recognition rows of a planning run for its figure: per tick and hypothesis the belief, the belief over
+H (`belief_h`), S, the finding, the lifecycle, the gate's answer and the observation warrant, from the oracle's table
+(expected_ticks.json) or the in-process actual (actual_ticks.json), in the columns the IRB's builder reads
+(analysis/instruments/irb/plot.py).
 
-    plot_ir.py <scenario dir>/<prior>_<strategy> <run.log>
+Until the measurement of T-F part 1 it drew the IRB's figure of an MPB run as figure_ir.png (added at the MPB close-out;
+since T-F part 1's figures rule with the decision panel and, with no oracle table, the actual alone). Since N (Hadi,
+5 October 2026: one figure file per run, every panel on one shared tick axis) plot.py draws that one figure,
+figure.png, and calls `rows` here; no runner calls this file.
 
 The hypotheses drawn are the support's, the expected table's keys. The belief carries the output floor of the setup's
 robot items (held outside the support, each at the floor), so the support's shares sum to slightly less than 1, on the
-expected side and the actual side alike. Since T-K part 1's gate stage (AM42) the belief panel draws the belief over
-H (`belief_h`, the value the gate compares with θ, without the floor and the pins), recorded on both sides.
-Since T-F part 1 (the standing rule on figures, Hadi, 5 October 2026): drawn for every run in which the recognizer
-runs; with no oracle table (assignment knowledge off, MPB-6; a script that depends on the robot) the actual values
-alone, the hypotheses the actual belief's keys; with context knowledge on the context panel under the belief
-(analysis/instruments/irb/plot.py). Beneath them the decision panel (decision_panel.py: the robot's task and the
-holds, the projection each decision rested on, the decisions by trigger and cause), and the run's settings in the title.
+expected side and the actual side alike; the figure draws the belief over H (`belief_h`, the value the gate compares
+with θ, without the floor and the pins, AM42), recorded on both sides.
 """
 import csv
-import json
-import shutil
-import sys
-import tempfile
-from pathlib import Path
-
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[0] / "irb"))
-import plot as ir_plot                                  # analysis/irb/plot.py
-import decision_panel                                  # the decision panel and the settings line (T-F part 1)
 
 COLUMNS = ["tick", "key", "belief", "belief_h", "S", "finding", "lifecycle", "gate", "warrant"]
 
@@ -50,29 +37,3 @@ def write(path, table):
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
         w.writerows(table)
-
-
-def main(d, log):
-    d = Path(d)
-    exp = json.load(open(d / "expected_ticks.json")) if (d / "expected_ticks.json").exists() else []
-    act = json.load(open(d / "actual_ticks.json"))
-    horizon = json.load(open(d / "observed.json"))["horizon"]
-    exp = [t for t in exp if t["tick"] < horizon]
-    act = [t for t in act if t["tick"] < horizon]
-    keys = sorted({k for t in (exp or act) for k in t["belief"]})
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp = Path(tmp)
-        write(tmp / "expected.csv", rows(exp, keys, lambda t: t["belief"], lambda t: t["S"]))
-        write(tmp / "actual.csv", rows(act, keys, lambda t: t["belief"], lambda t: t["S"]))
-        traj = json.load(open(d / "trajectory.json"))
-        traj["actions"] = [a for a in traj["actions"] if a["tick"] < horizon]
-        json.dump(traj, open(tmp / "trajectory.json", "w"))
-        # the decisions on the same tick axis, the run's settings in the title (the figures rule, T-F part 1)
-        ir_plot.main(tmp, log, extra=lambda ax: decision_panel.draw(ax, d, horizon),
-                     title=decision_panel.settings_text(log))
-        for f in sorted(tmp.glob("figure*.png")):      # every part when the hypotheses are faceted (T-F part 1)
-            shutil.copy(f, d / f.name.replace("figure", "figure_ir"))
-
-
-if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])

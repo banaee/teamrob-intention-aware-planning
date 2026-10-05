@@ -4,6 +4,7 @@ table.py <out_root> — the planning test-bed's result table over the runs of ru
 "T-F part 1: the conditions human-unaware and intention-unaware", I, R9, R10): one row per run, the run's settings as
 columns (I: the effective values the run printed in its `[run]` header), then the measures read from the run's own
 outputs, then the oracle's check. Writes <out_root>/results.csv and <out_root>/results.md, rows in run-name order.
+The runs are run_set.sh's: <out_root>/<scenario>/<run>/, the log <run>.log in it (K, the measurement of T-F part 1).
 
 Columns:
 - run (the run file's name), domain, scenario, layout; human_aware, intention_aware, assignment_knowledge,
@@ -33,7 +34,7 @@ COLUMNS = ["run", "domain", "scenario", "layout", "human_aware", "intention_awar
 def row(d: Path, root: Path):
     s = json.load(open(d / "settings.json"))
     m = json.load(open(d / "measures.json"))
-    _, by, passing, beside, _, _, cont = separation.counts(root / "runs" / f"{d.name}.log")
+    _, by, passing, beside, _, _, cont = separation.counts(d / f"{d.name}.log")
     diff = json.load(open(d / "diff.json")) if (d / "diff.json").exists() else None
     reference = "none"
     if s["condition"] == "human-unaware" and (d / "reference.json").exists() and diff is not None:
@@ -55,7 +56,7 @@ def row(d: Path, root: Path):
 
 if __name__ == "__main__":
     root = Path(sys.argv[1])
-    rows = [row(d, root) for d in sorted(p for p in root.iterdir() if (p / "settings.json").exists())]
+    rows = sorted((row(d, root) for d in root.glob("*/*") if (d / "settings.json").exists()), key=lambda r: r["run"])
     with open(root / "results.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()

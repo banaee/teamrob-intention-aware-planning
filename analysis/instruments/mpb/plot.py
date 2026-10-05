@@ -1,104 +1,64 @@
 #!/usr/bin/env python3
 """
-plot.py <scenario> <dir> — the meta-planner test-bed's figure: over the comparison horizon, (top) the gate's outcome per
-tick with the leader's changes, the expected decisions (thin lines, prior on only) and the actual ones (marks, by
-trigger); (bottom) the robot–human distance per tick with min_separation, and the holds the decisions sent (bars from
-the decision tick for the hold's length).
-Since T-F part 1 (the standing rule on figures, Hadi, 5 October 2026; design_records.md, "T-F part 1", THE FIGURES):
-a human-unaware or intention-unaware run (its settings.json) draws no gate and no belief, the recognizer not running:
-(top) every decision on the row of the projection it rested on, none or the fallback projection, the fallback's span
-from the decision to its end as a bar, the mark by trigger; (bottom) the robot–human distance per tick against the
-run's min_separation (its [run] header) and the holds. Since the follow-up of the same day: the top panel is the
-decision panel (decision_panel.py), the same as beneath the belief in figure_ir.png, so the conditions compare by eye;
-given the run log (third argument), every figure's title carries the run's settings, the strategy included.
+plot.py <scenario> <dir> <run.log> — the planning test-bed's figure of a run: one file, figure.png, every panel on one
+shared tick axis over the comparison horizon (observed.json), drawn by the IRB's builder (analysis/instruments/irb/
+plot.py, `draw`).
 
-    plot.py <scenario> <dir> [<run.log>]
+Since the measurement of T-F part 1 (N, Hadi, 5 October 2026; design_records.md, "T-F part 1", THE MEASUREMENT): the
+two figures of a run (figure.png, the gate and the distance; figure_ir.png, the recognition and the decision panel,
+faceted into figure_ir_2.png, ... beyond four hypotheses) are replaced by this one. The panels, each where the run has
+it: the belief over H; the context panel (context knowledge on); the tail probability S; the adequacy finding; the
+observation warrant per hypothesis and the gate's answer per tick, one row per answer (clears or the refusal's reason);
+the decision panel (decision_panel.py: the robot's task and the holds, the projection each decision rested on, the
+decisions by trigger and cause, the oracle's expected decisions); the robot–human distance on a scale readable near
+min_separation, the ticks below it shaded by F1's class. Expected values (the oracle's table, expected_ticks.json) as
+lines and bars, actual (actual.py's actual_ticks.json) as dots and marks; with no oracle table the actual alone.
+The condition is read from the run's [run] header (its effective values): human-unaware, no recognition panel and no
+gate row (admission refuses with none(no_human) before the gate is asked); intention-unaware, no recognition panel, the
+gate's answer per tick (none(intention_off)); intention-aware, every panel. The title: the scenario and layout, the
+condition, the run's settings (the strategy first).
 """
 import json
-import math
+import re
 import sys
 from pathlib import Path
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import decision_panel                                  # the decision panel (T-F part 1); imports irb/plot.py as `plot`
+import plot_ir                                         # the recognition rows from the per-tick tables
+ir_plot = decision_panel.ir_plot
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import decision_panel                                  # the decision panel and the settings line (T-F part 1)
 
-GATES = ["clears", "none(below_theta)", "none(leader_no_observation)", "none(leader_inadequate)",
-         "none(leader_unwarranted)", "none(leader_outranked)"]
-MARK = {"no_current_task": ("s", "tab:gray"), "recognition_changed": ("o", "tab:blue"),
-        "projection_expired": ("^", "tab:orange")}
+def condition(log):
+    h = dict(re.findall(r"(\w+)=(\S+)", next(l for l in open(log) if l.startswith("[run] "))))
+    return "human-unaware" if h.get("human_aware") == "off" else \
+        "intention-unaware" if h.get("intention_aware") == "off" else "intention-aware"
 
-def unaware_figure(sid, d, settings, H, log):
-    """The figure of a run in which the recognizer does not run (T-F part 1)."""
-    agents = [a for a in json.load(open(d / "robot.json")) if a["tick"] < H]
-    sel = {s["tick"]: s for s in json.load(open(d / "selection.json"))}
-    sep = settings["min_separation"]
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(12, 5.6), sharex=True, gridspec_kw=dict(height_ratios=[1.1, 1.3]))
-    decision_panel.draw(a1, d, H)
-    a1.set_title(f"{sid} ({settings['condition']}; {decision_panel.settings_text(log)}): the decisions; no belief, "
-                 "the recognizer does not run", fontsize=8)
-    dist = [math.dist(a["robot"], a["human"]) for a in agents]
-    a2.plot([a["tick"] for a in agents], dist, lw=0.8)
-    a2.axhline(sep, color="r", lw=0.6, ls="--")
-    a2.text(agents[-1]["tick"] if agents else 0, sep, f"min_separation {sep:g} cm", ha="right", va="bottom",
-            fontsize=7, color="r")
-    for t, s in sel.items():
-        if s["hold"] and t < H:
-            a2.barh(0, s["hold"], left=t, height=15, color="tab:orange", alpha=0.6)
-            a2.text(t, 17, f"hold {s['hold']}", fontsize=7, color="tab:orange")
-    a2.set_ylabel("robot–human distance (cm)", fontsize=8)
-    a2.set_xlabel("tick")
-    a2.set_ylim(bottom=0)
-    fig.tight_layout()
-    fig.savefig(d / "figure.png", dpi=110)
+
+def main(sid, d, log):
+    d = Path(d)
+    H = json.load(open(d / "observed.json"))["horizon"]
+    exp = [t for t in json.load(open(d / "expected_ticks.json")) if t["tick"] < H] \
+        if (d / "expected_ticks.json").exists() else []
+    act = [t for t in json.load(open(d / "actual_ticks.json")) if t["tick"] < H]
+    traj = json.load(open(d / "trajectory.json"))
+    cond = condition(log)
+    recog = gate = None
+    if cond == "intention-aware":
+        # the hypotheses of H (the belief over H's keys over the run), not the robot's items the reported belief holds
+        # at the output floor
+        keys = sorted({k for t in (exp or act) for k in t.get("belief_h") or t["belief"]})
+        recog = dict(exp=plot_ir.rows(exp, keys, lambda t: t["belief"], lambda t: t["S"]),
+                     act=plot_ir.rows(act, keys, lambda t: t["belief"], lambda t: t["S"]))
+    elif cond == "intention-unaware":
+        gate = dict(exp={t["tick"]: t["gate"] for t in exp}, act={t["tick"]: t["gate"] for t in act})
+    title = (f"{sid} on {traj['layout']} ({cond}){'' if exp or cond != 'intention-aware' else ', no oracle table'}\n"
+             f"{decision_panel.settings_text(log)}"
+             + ("" if cond == "intention-aware" else "; no belief, the recognizer does not run"))
+    ir_plot.draw(d / "figure.png", log=log, T=H - 1, title=title, recog=recog, traj=traj, gate=gate,
+                 decisions=lambda ax: decision_panel.draw(ax, d, H), key=decision_panel.KEY)
 
 
 if __name__ == "__main__":
-    sid, d = sys.argv[1], Path(sys.argv[2])
-    settings = json.load(open(d / "settings.json")) if (d / "settings.json").exists() else None
-    log = sys.argv[3] if len(sys.argv) > 3 else None
-    if settings is not None and settings["condition"] != "intention-aware":
-        unaware_figure(sid, d, settings, json.load(open(d / "observed.json"))["horizon"], log)
-        sys.exit(0)
-    obs = json.load(open(d / "observed.json"))
-    H = obs["horizon"]
-    ticks = [t for t in json.load(open(d / "actual_ticks.json")) if t["tick"] < H]
-    agents = [a for a in json.load(open(d / "robot.json")) if a["tick"] < H]
-    act = [x for x in json.load(open(d / "actual_decisions.json")) if x["tick"] < H]
-    sel = {s["tick"]: s for s in json.load(open(d / "selection.json"))}
-    exp = [x for x in json.load(open(d / "expected_decisions.json")) if x["tick"] < H] \
-        if (d / "expected_decisions.json").exists() else []
-    # T-F part 1: the two refusals of the new conditions join the axis only where a run carries them, so the figure
-    # of every earlier run is unchanged
-    GATES = GATES + [g for g in ("none(intention_off)", "none(no_human)")
-                     if any(x["gate"] == g for x in ticks + act)]
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(12, 6), sharex=True, gridspec_kw=dict(height_ratios=[1, 1]))
-    a1.scatter([t["tick"] for t in ticks], [GATES.index(t["gate"]) for t in ticks], s=4, c="k")
-    a1.set_yticks(range(len(GATES)), GATES, fontsize=7)
-    for x in exp:
-        a1.axvline(x["tick"], color="tab:green", lw=0.6, alpha=0.6)
-    for x in act:
-        m, c = MARK[x["trigger"]]
-        a1.scatter([x["tick"]], [GATES.index(x["gate"])], marker=m, s=40, facecolors="none", edgecolors=c)
-    changes = [t for p, t in zip(ticks[:-1], ticks[1:]) if t["leader"] != p["leader"]]
-    for t in changes:
-        a1.annotate((t["leader"] or "none").split("(")[0] + "(" + (t["leader"] or "").split("=")[-1],
-                    (t["tick"], len(GATES) - 0.6), fontsize=6, rotation=45)
-    a1.set_title(f"{sid} ({obs['strategy']}, prior {'on' if obs['prior'] else 'off'}"
-                 + ("" if log is None else f"; {decision_panel.settings_text(log)}") + "): gate per tick; decisions "
-                 "(expected: green lines; actual: ■ no_current_task, ● recognition_changed, ▲ projection_expired)",
-                 fontsize=8)
-    dist = [math.dist(a["robot"], a["human"]) for a in agents]
-    a2.plot([a["tick"] for a in agents], dist, lw=0.8)
-    a2.axhline(50, color="r", lw=0.6, ls="--")
-    for t, s in sel.items():
-        if s["hold"] and t < H:
-            a2.barh(0, s["hold"], left=t, height=15, color="tab:orange", alpha=0.6)
-    a2.set_ylabel("robot–human distance (cm)", fontsize=8)
-    a2.set_xlabel("tick")
-    a2.set_ylim(bottom=0)
-    fig.tight_layout()
-    fig.savefig(d / "figure.png", dpi=110)
+    main(sys.argv[1], sys.argv[2], sys.argv[3])

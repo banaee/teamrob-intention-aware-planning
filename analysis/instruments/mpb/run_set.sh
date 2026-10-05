@@ -2,14 +2,15 @@
 # run_set.sh <domain> -o <out_root> <run files> — the planning test-bed for a set whose settings live in its run files
 # (T-F part 1; design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware", I, R9 as amended by
 # A, G). No setting is passed on the command line and none is in a name (I): a run is named by its run file
-# (<name>.yaml), its outputs in <out_root>/<name>/, its log and .rec in <out_root>/runs/<name>.log; the settings are
+# (<name>.yaml, a serial), its outputs in <out_root>/<scenario>/<name>/ with its log and .rec there (<name>.log; K, the
+# measurement of T-F part 1: one folder per scenario, the runs of its conditions inside it by serial); the settings are
 # the run file's, printed in the run's [run] header and written as columns of <out_root>/results.csv (table.py).
 # Per run file: the safety cap (the domain's horizon.py, MPB-5) as the run's steps; the run; the trajectory and its
 # check; the in-process actual (actual.py); the settings (conditions.py: R5's reading of the run file against the
 # header, the condition, whether the objects are separate); human-unaware with an independent script, the reference
 # run (reference.py); the oracle's table, the chain and the comparison where a table is derivable before the run (an
 # independent script, and in the intention-aware run assignment knowledge on, MPB-6); the measures with no declared
-# property (measures.py); the figure; the separation counts. Last, table.py over the out_root.
+# property (measures.py); the run's one figure (plot.py, N); the separation counts. Last, table.py over the out_root.
 # run.sh stays the runner of the maintained outputs (their names and folders unchanged). PYTHONHASHSEED=0. Sequential:
 # each run's log is the newest logs/run_*.log. Run from the repo root.
 set -eo pipefail
@@ -23,10 +24,10 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ -n "$ROOT" ] && [ -n "$RUNS" ] || { echo "usage: run_set.sh <domain> -o <out_root> <run files>"; exit 2; }
-mkdir -p $ROOT/runs
+mkdir -p $ROOT
 for RUN in $RUNS; do
   name=$(basename $RUN .yaml); sid=$(awk '/^scenario:/ {print $2}' $RUN)
-  OUT=$ROOT/$name; LOG=$ROOT/runs/$name.log; mkdir -p $OUT
+  OUT=$ROOT/$sid/$name; LOG=$OUT/$name.log; mkdir -p $OUT
   steps=$(PYTHONHASHSEED=0 $PY $DOM/horizon.py $RUN 2>/dev/null | tail -1)
   last=$(PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN --length 2>/dev/null | tail -1)
   PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --run $RUN --steps $steps < /dev/null > /dev/null 2>&1
@@ -46,7 +47,7 @@ e = s['effective']; print(s['condition'], s['dependence'], s['objects_separate']
   fi
   PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $last $OUT 2>&1 | grep -v -e '^\[' -e '^  step' || true
   if [ "$condition" = human-unaware ] && [ "$dep" != on_robot ]; then
-    PYTHONHASHSEED=0 $PY $D/reference.py $RUN $steps $ROOT/runs/${name}_reference.log $OUT/reference.json \
+    PYTHONHASHSEED=0 $PY $D/reference.py $RUN $steps $OUT/${name}_reference.log $OUT/reference.json \
       --strategy $strategy 2>&1 | grep -v -e '^\[' -e '^  step' || true
   fi
   if [ "$dep" != on_robot ] && { [ "$condition" != intention-aware ] || [ "$assignment" = True ]; }; then
@@ -59,8 +60,7 @@ e = s['effective']; print(s['condition'], s['dependence'], s['objects_separate']
     fi
   fi
   PYTHONHASHSEED=0 $PY $D/measures.py $sid $OUT $LOG $RUN
-  $PY $D/plot.py $sid $OUT $LOG
-  if [ "$condition" = intention-aware ]; then $PY $D/plot_ir.py $OUT $LOG; fi   # the recognizer runs: its figure
+  $PY $D/plot.py $sid $OUT $LOG   # the run's one figure, the panels its condition has (N)
   $PY analysis/instruments/common/separation.py $LOG > $OUT/separation.md
 done
 $PY $D/table.py $ROOT
