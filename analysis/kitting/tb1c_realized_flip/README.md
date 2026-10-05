@@ -670,3 +670,18 @@ Commands: `bash analysis/kitting/tb1c_realized_flip/sweep.sh analysis/kitting/tb
 | env_layout_08_scenario_s06_01_realized_off | faa7ec4685b146b62c9c5ab115576254 | 8cf0930761924a3aab1f1713f3f4bf29 | 224 | 412.25 (105) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_plain_off | 4201be520d3cdff189077fdce7ccdefb | c9c444622f25d15abfd849fc495db540 | 224 | 37.48 (221) | 1 | 2 | 0 |
 | env_layout_08_scenario_s06_03_realized_off | e414031865be587bd6f2cb2e1e20e024 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
+
+## The [run] header's condition fields and the figures (T-F part 1, the measurement, O; 5 October 2026) — the logs from here on
+
+Regenerated at 3d7a26a (no framework code changed since 02f18ff) with `sweep.sh`, which since this step also draws each run's per-tick figure beside its log (`<log>.png`, git-ignored; analysis/instruments/mpb/figure_of_log.py; design_records.md, "T-F part 1", THE MEASUREMENT, O). Against the section above: every log identical except its `[run]` line, which gains ` human_aware=on intention_aware=on` (T-F part 1, stage 1; the logs of the section above were written before it); every `.rec` stream byte-identical; completion, the `[sep]` minima and F1's classes unchanged.
+
+| log | md5 (.log) |
+|---|---|
+| env_layout_08_scenario_s06_01_plain_off | f65ba65f7e67bf0b6aaed9c743c3bc52 |
+| env_layout_08_scenario_s06_01_plain_on | 7527f790c1f33e3eb1f057671388affd |
+| env_layout_08_scenario_s06_01_realized_off | ef6dbfb9a97643e4b09ad8b21464c969 |
+| env_layout_08_scenario_s06_01_realized_on | 97cf701768c40e3bcef61b3f14ea769e |
+| env_layout_08_scenario_s06_03_plain_off | 2003931a210aeab9390f44a40fd363f4 |
+| env_layout_08_scenario_s06_03_plain_on | 4606efa47f15e66f1627ffbc5210694b |
+| env_layout_08_scenario_s06_03_realized_off | ee956541681996e42dd1be41912361e6 |
+| env_layout_08_scenario_s06_03_realized_on | e01355be5683762d58242f97cb32aabc |

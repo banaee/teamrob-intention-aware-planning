@@ -852,3 +852,26 @@ Commands: `bash analysis/kitting/tb1a_destination/sweep.sh analysis/kitting/tb1a
 | env_layout_06_scenario_s03_06_off | 5594796d25746df49b17f321be45389f | 3e4fd412ba39ddd3267d1d37089beaac | 237 | 48.25 (57) | 1 | 0 | 1 |
 | env_layout_07_scenario_s05_01_off | 43cc750d841df40cf414bfebfbfc6610 | a3927888957766c7da70eea660062fd5 | 198 | 58.31 (25) | 0 | 0 | 0 |
 | env_layout_07_scenario_s05_02_off | c19b5b12b7d1c5b2ddbf77cce7fac03e | a3927888957766c7da70eea660062fd5 | 218 | 50.00 (57) | 0 | 0 | 0 |
+
+## The [run] header's condition fields and the figures (T-F part 1, the measurement, O; 5 October 2026) — the logs from here on
+
+Regenerated at 3d7a26a (no framework code changed since 02f18ff) with `sweep.sh`, which since this step also draws each run's per-tick figure beside its log (`<log>.png`, git-ignored; analysis/instruments/mpb/figure_of_log.py; design_records.md, "T-F part 1", THE MEASUREMENT, O). Against the section above: every log identical except its `[run]` line, which gains ` human_aware=on intention_aware=on` (T-F part 1, stage 1; the logs of the section above were written before it); every `.rec` stream byte-identical; completion, the `[sep]` minima and F1's classes unchanged.
+
+| log | md5 (.log) |
+|---|---|
+| env_layout_01_scenario_s01_01_off | e31bf8b1ce14d9990937cc670015e5ff |
+| env_layout_01_scenario_s01_01_on | 98eedb6e1bd3500273e8ab9a241feacf |
+| env_layout_02_scenario_s02_01_off | f79353fefa37993a02f1049a53506fb6 |
+| env_layout_02_scenario_s02_01_on | fbb159e803871f1c0f9fc8eea6a74438 |
+| env_layout_03_scenario_s03_01_off | aacb02c50f096e970b6bd51d6db8f518 |
+| env_layout_03_scenario_s03_01_on | 2d87516ceadb107cbd29f494d4256457 |
+| env_layout_04_scenario_s01_06_off | af5f7b1dd2e4256d5c83ec4a963f2e06 |
+| env_layout_04_scenario_s01_06_on | a0ac46101fe247b0b12a7768c35d857e |
+| env_layout_05_scenario_s04_01_off | dfd92f82c4e790ec16d333d1f0252b2e |
+| env_layout_05_scenario_s04_01_on | 5109bc1716bcc5cdefd18aec4edf26c6 |
+| env_layout_06_scenario_s03_06_off | 573910627ea31e932c9039a0e3a6955f |
+| env_layout_06_scenario_s03_06_on | c281fc56e09e4f5c343c94c63174231f |
+| env_layout_07_scenario_s05_01_off | 978e41aff63dcfeb1803b56600db88cc |
+| env_layout_07_scenario_s05_01_on | 801631ea179061173a12d9e53b643d16 |
+| env_layout_07_scenario_s05_02_off | 62d1f3db07b04deaaf78071e7b260237 |
+| env_layout_07_scenario_s05_02_on | c3fedc2cc343dffa5bf79e92b0cba103 |

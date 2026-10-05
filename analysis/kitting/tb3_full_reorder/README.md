@@ -796,3 +796,30 @@ Commands: `bash analysis/kitting/tb3_full_reorder/sweep.sh analysis/kitting/tb3_
 | env_layout_08_scenario_s06_02_single_task_off | 1cd8f13142c67f133f95f0310a3bd271 | 329590c9c1249859bfe20d107588c50a | 267 | 63.37 (73) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_full_reorder_off | e414031865be587bd6f2cb2e1e20e024 | c9c444622f25d15abfd849fc495db540 | 226 | 54.58 (223) | 0 | 0 | 0 |
 | env_layout_08_scenario_s06_03_single_task_off | 4d7114e01d552456a81691535f438b73 | c9c444622f25d15abfd849fc495db540 | 314 | 68.41 (264) | 0 | 0 | 0 |
+
+## The [run] header's condition fields and the figures (T-F part 1, the measurement, O; 5 October 2026) — the logs from here on
+
+Regenerated at 3d7a26a (no framework code changed since 02f18ff) with `sweep.sh`, which since this step also draws each run's per-tick figure beside its log (`<log>.png`, git-ignored; analysis/instruments/mpb/figure_of_log.py; design_records.md, "T-F part 1", THE MEASUREMENT, O). Against the section above: every log identical except its `[run]` line, which gains ` human_aware=on intention_aware=on` (T-F part 1, stage 1; the logs of the section above were written before it); every `.rec` stream byte-identical; completion, the `[sep]` minima and F1's classes unchanged.
+
+| log | md5 (.log) |
+|---|---|
+| env_layout_03_scenario_s03_01_full_reorder_off | c5db8aa58c0506391a15da631e576bc3 |
+| env_layout_03_scenario_s03_01_full_reorder_on | 587a013dda7f006834588fe50fdf6657 |
+| env_layout_03_scenario_s03_01_single_task_off | aacb02c50f096e970b6bd51d6db8f518 |
+| env_layout_03_scenario_s03_01_single_task_on | 2d87516ceadb107cbd29f494d4256457 |
+| env_layout_07_scenario_s05_01_full_reorder_off | 861aebffe995fb02ecddedeef4c8e862 |
+| env_layout_07_scenario_s05_01_full_reorder_on | a85e672f8045ffc371a69e613f396cd7 |
+| env_layout_07_scenario_s05_01_single_task_off | 978e41aff63dcfeb1803b56600db88cc |
+| env_layout_07_scenario_s05_01_single_task_on | 801631ea179061173a12d9e53b643d16 |
+| env_layout_08_scenario_s06_01_full_reorder_off | ef6dbfb9a97643e4b09ad8b21464c969 |
+| env_layout_08_scenario_s06_01_full_reorder_on | 97cf701768c40e3bcef61b3f14ea769e |
+| env_layout_08_scenario_s06_01_single_task_off | 51e32f51db90bc0935758f4d517de758 |
+| env_layout_08_scenario_s06_01_single_task_on | b13eff13b08f639e756d4bd819a83db0 |
+| env_layout_08_scenario_s06_02_full_reorder_off | 2cbfbb93180e13b3a2b2b77790491cca |
+| env_layout_08_scenario_s06_02_full_reorder_on | ed1199ffdc6b3caeeb84bedc957588ef |
+| env_layout_08_scenario_s06_02_single_task_off | 174f26c097a08ad91da28cd911d48ebf |
+| env_layout_08_scenario_s06_02_single_task_on | 71a84a8522e848b33246b08c8fcf23d0 |
+| env_layout_08_scenario_s06_03_full_reorder_off | ee956541681996e42dd1be41912361e6 |
+| env_layout_08_scenario_s06_03_full_reorder_on | e01355be5683762d58242f97cb32aabc |
+| env_layout_08_scenario_s06_03_single_task_off | 7bfe5cce51b6d25fa1da731b9207e3ab |
+| env_layout_08_scenario_s06_03_single_task_on | 5bf5de4bcf34be71edad2315276fb999 |
