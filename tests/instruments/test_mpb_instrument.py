@@ -204,3 +204,84 @@ def test_the_chain_stops_on_an_undetermined_gate_it_asks():
     # not asked (a record stands and nothing fires): no stop
     rows = [row(0, gate=Gate.CLEARS), row(1, gate=Gate.UNDETERMINED)]
     assert chain(rows) == [(0, "no_current_task", None)]
+
+
+# ---- T-F part 1: the conditions human-unaware and intention-unaware (R5, R6, R7, R9 as amended by A, E, G) -----
+def settings_of(tmp_path, **keys):
+    from conditions import effective, stated
+    f = tmp_path / "run.yaml"
+    f.write_text("domain: kitting\nscenario: scenario_s10_02\n" + "".join(f"{k}: {str(v).lower()}\n"
+                                                                          for k, v in keys.items()))
+    return effective(stated(f))
+
+
+def test_r5_as_the_instrument_reads_it(tmp_path):
+    from conditions import Condition
+    s = settings_of(tmp_path)                                                  # absent keys: on, single_task
+    assert (s.condition, s.assignment_knowledge, s.context_knowledge, s.strategy) == \
+        (Condition.INTENTION_AWARE, True, True, "single_task")
+    s = settings_of(tmp_path, human_aware=False, intention_aware=True)
+    assert (s.condition, s.intention_aware, s.assignment_knowledge, s.context_knowledge) == \
+        (Condition.HUMAN_UNAWARE, False, False, False)
+    s = settings_of(tmp_path, intention_aware=False, context_knowledge=True)
+    assert (s.condition, s.assignment_knowledge, s.context_knowledge) == (Condition.INTENTION_UNAWARE, False, False)
+
+
+def unaware_table(condition):
+    from mpb_oracle import unaware_rows
+    # the human stands 3 ticks, then walks east 4 ticks, then stands
+    xs = [0, 0, 0, 0, 20, 40, 60, 80, 80, 80, 80, 80, 80, 80, 80]
+    traj = dict(rows=[dict(tick=i - 1, x=float(x), y=0.0) for i, x in enumerate(xs)])
+    return unaware_rows(traj, ROOM, condition)
+
+
+def test_the_intention_unaware_table_refuses_every_tick_and_carries_the_fallback():
+    from conditions import Condition
+    rows = unaware_table(Condition.INTENTION_UNAWARE)
+    assert all(r.gate is Gate.INTENTION_OFF and r.leader is None and r.admitted is None for r in rows)
+    assert rows[0].fallback == Fallback(Mode.STANDING, 1, 1.0, 2.0)            # stood 1 tick at tick 0
+    assert all(r.fallback is not None for r in rows)
+    # decisions at no_current_task and at the fallbacks' expiries only, each on a fallback
+    ds = assemble(rows, {0}, None, len(rows))
+    assert {d.trigger for d in ds} == {Trigger.NO_CURRENT_TASK, Trigger.PROJECTION_EXPIRED}
+    assert all(d.fallback is not None and d.gate is Gate.INTENTION_OFF and d.cause is None for d in ds)
+
+
+def test_the_human_unaware_table_has_no_perception_no_fallback_and_decides_at_task_ends_only():
+    from conditions import Condition
+    rows = unaware_table(Condition.HUMAN_UNAWARE)
+    assert all(r.gate is Gate.NO_HUMAN and r.perception is None and r.fallback is None for r in rows)
+    ds = assemble(rows, {0, 9}, None, len(rows))
+    assert [(d.tick, d.trigger) for d in ds] == [(0, Trigger.NO_CURRENT_TASK), (9, Trigger.NO_CURRENT_TASK)]
+    assert log_text(ds[0]) == "none(no_human)"
+
+
+def test_the_log_text_of_an_intention_unaware_decision():
+    fb = Fallback(Mode.STANDING, 2, 2.0, 5.0)
+    d = Decision(3, Trigger.PROJECTION_EXPIRED, None, Gate.INTENTION_OFF, None, (), None, fb)
+    assert log_text(d) == "fallback refused=none(intention_off)"
+
+
+def test_the_columns_compared_follow_the_condition():
+    from compare import COLUMNS
+    exp = [row(0, gate=Gate.INTENTION_OFF)]
+    act = [dict(tick=0, leader="other", boundary=True, finding="unresolved", gate="none(intention_off)", adequacy={},
+                observation_warrant={}, evaluated=False, perception=None)]
+    counts, bad = compare_ticks(exp, act, 10, COLUMNS["intention-unaware"])
+    assert bad == [] and set(counts) == {"gate", "perception"}                 # no recognition columns
+    act[0]["gate"] = "none(below_theta)"
+    assert compare_ticks(exp, act, 10, COLUMNS["intention-unaware"])[1] == [(0, "gate", "none(intention_off)",
+                                                                             "none(below_theta)")]
+
+
+def test_the_human_unaware_checks_the_hold_and_the_reference_positions(tmp_path):
+    from compare import human_unaware_checks
+    (tmp_path / "selection.json").write_text(json.dumps([dict(tick=0, hold=0), dict(tick=5, hold=2)]))
+    (tmp_path / "robot.json").write_text(json.dumps([dict(tick=t, robot=[float(t), 0.0]) for t in range(4)]))
+    (tmp_path / "reference.json").write_text(json.dumps(dict(ticks=[dict(tick=t, x=float(t) + (t == 2), y=0.0)
+                                                                    for t in range(4)])))
+    bad, finding, n = human_unaware_checks(tmp_path, 10, separate=True)
+    assert n == 4 and finding is None
+    assert bad == [(5, "hold", 0, 2), (2, "position (the reference run)", [3.0, 0.0], [2.0, 0.0])]
+    bad, finding, n = human_unaware_checks(tmp_path, 10, separate=False)       # objects shared: a finding (G)
+    assert bad == [(5, "hold", 0, 2)] and finding is not None and "2" in finding

@@ -178,3 +178,15 @@ def main(evaluate):
     (d / "properties.md").write_text(markdown(r))
     held = [f"{p['name']}={'yes' if p['holds'] else 'NO'}" for p in r["properties"]]
     print(f"{sid} ({r['strategy']}): properties {held or 'none'}; detectors {r['detectors']}")
+
+
+if __name__ == "__main__":
+    # T-F part 1 (design_records.md, "T-F part 1", R9): the measures of a run with no declared property, for
+    # run_set.sh: measures.py <scenario> <dir> <run.log> <run file> writes measures.json and measures.md in <dir>.
+    sid, d, log_path, run_file = sys.argv[1], Path(sys.argv[2]), sys.argv[3], sys.argv[4]
+    r = Part4(sid, d, log_path, run_file).out
+    json.dump(r, open(d / "measures.json", "w"), indent=1)
+    (d / "measures.md").write_text(markdown(r).replace(
+        "None declared.", "Not evaluated (T-F part 1, R9: the declared properties were authored for the "
+                          "intention-aware run; run_set.sh evaluates none)."))
+    print(f"{sid}: completion {r['completion']}, holds {r['measures']['holds']}, F1 {r['measures']['f1']}")

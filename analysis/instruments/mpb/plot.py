@@ -29,6 +29,10 @@ if __name__ == "__main__":
     sel = {s["tick"]: s for s in json.load(open(d / "selection.json"))}
     exp = [x for x in json.load(open(d / "expected_decisions.json")) if x["tick"] < H] \
         if (d / "expected_decisions.json").exists() else []
+    # T-F part 1: the two refusals of the new conditions join the axis only where a run carries them, so the figure
+    # of every earlier run is unchanged
+    GATES = GATES + [g for g in ("none(intention_off)", "none(no_human)")
+                     if any(x["gate"] == g for x in ticks + act)]
     fig, (a1, a2) = plt.subplots(2, 1, figsize=(12, 6), sharex=True, gridspec_kw=dict(height_ratios=[1, 1]))
     a1.scatter([t["tick"] for t in ticks], [GATES.index(t["gate"]) for t in ticks], s=4, c="k")
     a1.set_yticks(range(len(GATES)), GATES, fontsize=7)

@@ -21,6 +21,14 @@ Compared, exactly unless stated:
   end (relative 1e-9) and the tick its expiry fires;
 - the log check, per logged decision: trigger and cause as in-process; its [meta-proj] text as the expected decision
   implies (`built warrant=...`, `fallback refused=<gate>`); the tick's [IR] leader.
+
+T-F part 1 (design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware", R9 as amended by A, G):
+when <dir> holds settings.json (written by run_set.sh; the existing outputs hold none and are compared as above), its
+condition selects the per-tick columns. Intention-unaware: the gate and P4's perception only (no recognition columns).
+Human-unaware: P4's perception only (none on either side); and, beside the decisions, the hold 0 at every decision
+(selection.json) and, where the human's script is independent and the objects are separate, the robot's position at
+every tick equal to the reference run's (reference.json); with the objects shared a difference is a finding, reported
+and not counted (G).
 """
 import json
 import math
@@ -31,18 +39,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mpblib import Gate, Trigger, load_decisions, load_ticks
 
 TOL = 1e-9
+ALL_COLUMNS = ("leader", "boundary", "finding", "gate", "adequacy", "observation_warrant", "perception")
+COLUMNS = {"intention-aware": ALL_COLUMNS, "intention-unaware": ("gate", "perception"), "human-unaware": ("perception",)}
 
 
 def close(a, b):
     return math.isclose(a, b, rel_tol=TOL, abs_tol=1e-12)
 
 
-def compare_ticks(exp, act, horizon):
-    out, counts = [], {c: [0, 0] for c in ("leader", "boundary", "finding", "gate", "adequacy", "observation_warrant",
-                                           "perception")}
+def compare_ticks(exp, act, horizon, columns=ALL_COLUMNS):
+    out, counts = [], {c: [0, 0] for c in columns}
     act = {a["tick"]: a for a in act}
 
     def check(col, t, e, a):
+        if col not in columns:
+            return
         if col == "gate" and e == Gate.UNDETERMINED.value:                   # D3: skipped and counted
             counts.setdefault("gate undetermined (D3, skipped)", [0, 0])[0] += 1
             return
@@ -63,7 +74,7 @@ def compare_ticks(exp, act, horizon):
         check("adequacy", t, dict(sorted(e.adequacy.items())), dict(sorted(a["adequacy"].items())))
         check("observation_warrant", t, dict(sorted(e.observation_warrant.items())),
               dict(sorted(a["observation_warrant"].items())))
-        if a["evaluated"]:
+        if a["evaluated"] and "perception" in columns:
             p, q = e.perception, a["perception"]
             same = (p is None and q is None) or (
                 p is not None and q is not None and p.run_length == q["run_length"]
@@ -117,6 +128,27 @@ def compare_decisions(exp, act):
     return dict(part1=[len(e_set), len(a_set)], part2=n2, part3=n3), out
 
 
+def human_unaware_checks(d, horizon, separate):
+    """T-F part 1, R9, G: the hold 0 at every decision; the robot's positions against the reference run's."""
+    out, finding, compared = [], None, 0
+    for x in json.load(open(d / "selection.json")):
+        if x["tick"] < horizon and x["hold"]:
+            out.append((x["tick"], "hold", 0, x["hold"]))
+    ref = d / "reference.json"
+    if ref.exists():
+        robot = {a["tick"]: a["robot"] for a in json.load(open(d / "robot.json"))}
+        rows = [r for r in json.load(open(ref))["ticks"] if r["tick"] in robot and r["tick"] < horizon]
+        compared = len(rows)
+        moved = [(r["tick"], [r["x"], r["y"]], robot[r["tick"]]) for r in rows
+                 if any(abs(u - v) > TOL for u, v in zip([r["x"], r["y"]], robot[r["tick"]]))]
+        if separate:
+            out += [(t, "position (the reference run)", e, a) for t, e, a in moved]
+        elif moved:
+            finding = f"the objects are shared (G): the positions differ from the reference run's on {len(moved)} " \
+                      f"ticks from {moved[0][0]}; a finding, not a disagreement"
+    return out, finding, compared
+
+
 def log_text(d):
     """The [meta-proj] projection text a decision implies (shared/io_contracts.md §2.2; T-D G AD4)."""
     if d.gate is Gate.CLEARS:
@@ -152,10 +184,14 @@ if __name__ == "__main__":
     act_t = json.load(open(d / "actual_ticks.json"))
     act_d = [x for x in load_decisions(d / "actual_decisions.json") if x.tick < H]
     log_d = [x for x in json.load(open(d / "actual_log_decisions.json")) if x["tick"] < H]
-    tc, tb = compare_ticks(exp_t, act_t, H)
+    settings = json.load(open(d / "settings.json")) if (d / "settings.json").exists() else None
+    condition = "intention-aware" if settings is None else settings["condition"]
+    tc, tb = compare_ticks(exp_t, act_t, H, COLUMNS[condition])
     dc, db = compare_decisions(exp_d, act_d)
     lb = compare_log(act_d, log_d, {x.tick: x for x in exp_d})
-    bad = tb + db + lb
+    hb, finding, compared = (human_unaware_checks(d, H, settings["objects_separate"]) if condition == "human-unaware"
+                             else ([], None, 0))
+    bad = tb + db + lb + hb
     lines = [f"# {sid}: expected against actual ({obs['strategy']}, prior {'on' if obs['prior'] else 'off'})", "",
              f"Horizon: ticks 0 to {H - 1} (the first observed completion point + 30, capped at the run's "
              f"{obs['steps']} steps; MPB-5). Terminal decision: {obs['terminal']}; the human's last acknowledgement: "
@@ -170,8 +206,15 @@ if __name__ == "__main__":
         lines += ["| tick | where | expected | actual |", "|---|---|---|---|"]
         lines += [f"| {t} | {w} | {e} | {a} |" for t, w, e, a in bad]
         lines.append("")
+    if settings is not None:
+        lines += ["## Condition (T-F part 1)", "", f"{condition}; the effective settings {settings['effective']}"
+                  + (f"; the robot's position against the reference run's on {compared} ticks"
+                     if condition == "human-unaware" else "") + (f"; {finding}" if finding else "") + ".", ""]
     lines += ["## Classification", "", "None to classify." if not bad else "(written after investigation)", ""]
     (d / "diff.md").write_text("\n".join(lines))
-    json.dump(dict(ticks=tc, decisions=dc, disagreements=[list(map(str, b)) for b in bad]),
-              open(d / "diff.json", "w"), indent=1)
-    print(f"{sid} ({obs['strategy']}): {len(tb)} per-tick, {len(db)} decision, {len(lb)} log disagreements")
+    result = dict(ticks=tc, decisions=dc, disagreements=[list(map(str, b)) for b in bad])
+    if settings is not None:
+        result.update(condition=condition, finding=finding, reference_ticks_compared=compared)
+    json.dump(result, open(d / "diff.json", "w"), indent=1)
+    print(f"{sid} ({obs['strategy']}): {len(tb)} per-tick, {len(db)} decision, {len(lb)} log disagreements"
+          + (f", {len(hb)} of the hold and the reference run ({compared} ticks)" if condition == "human-unaware" else ""))

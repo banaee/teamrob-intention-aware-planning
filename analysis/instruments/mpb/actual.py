@@ -14,6 +14,12 @@ as the IRB's actual.py reads it), the decision record (_projected_hypothesis), a
 model's log lines are asserted identical to the logged run's (the lines run_mesa.py itself adds removed: the per-agent
 step lines, [sep], [run_mesa]): the recorders changed nothing, and the in-process run is the logged run.
 
+T-F part 1 (design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware"): the run file's
+`human_aware` and `intention_aware` (absent: on) reach the model as stated, which applies the override (R5); where the
+recognizer does not run (A), the per-tick record reads the belief the meta-planner receives (the body's dummy belief);
+a decision whose admission printed none(no_human) (E) records that refusal as its gate. observed.json's `prior` is the
+model's effective assignment knowledge; `--strategy` absent, the run file's strategy.
+
 Log: per fired [meta-trig], its tick, trigger and cause; the next [meta-proj] (the refusal reason, or built with its
 warrant sources); the [IR] leader of the tick; [meta-cand] (single_task) and [meta-b3] (winner, hold, T_h).
 
@@ -76,7 +82,8 @@ def in_process(run_file, steps, strategy, prior):
                  state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
                  declared_context=domain_config["context_knowledge"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
-                 setup_path=domain_config["setups"][scenario.setup], human_aware=True, intention_aware=True, assignment_knowledge=prior, strategy=strategy,
+                 setup_path=domain_config["setups"][scenario.setup], human_aware=bool(cfg.get("human_aware", True)),
+                 intention_aware=bool(cfg.get("intention_aware", True)), assignment_knowledge=prior, strategy=strategy,
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
                  separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]),
                  context_knowledge=bool(cfg["context_knowledge"]))
@@ -94,10 +101,13 @@ def in_process(run_file, steps, strategy, prior):
 
     def record_projection(orig):
         def wrapped(belief, world):
-            tick_state["gate"] = mp._clears_gate(belief)
+            outcome = mp._clears_gate(belief).value
             # the leader's observation warrant, the only warrant source since T-K part 1's AM67 (D2: no _warrant)
             tick_state["warrant"] = belief.observation_warrant.get(belief.most_likely)
             p = orig(belief=belief, world=world)
+            # none(no_human) is asked before the gate (T-F part 1, E): the refusal admission printed is the decision's
+            tick_state["gate"] = (Gate.NO_HUMAN.value if mp._last_projection_reason == Gate.NO_HUMAN.value
+                                  else outcome)
             tick_state["projection"] = p
             return p
         return wrapped
@@ -128,7 +138,7 @@ def in_process(run_file, steps, strategy, prior):
         tick_state.clear()
         n0 = len(collect.lines)
         m.step()
-        b = robot.belief
+        b = robot.belief or robot._make_dummy_belief()      # the belief the meta-planner receives (A: none computed)
         world = tick_state.get("world")
         perception = None
         if world is not None and H in world.agent_displacements:
@@ -149,7 +159,7 @@ def in_process(run_file, steps, strategy, prior):
         d = tick_state.get("trigger")
         if d is None or not d.fired:
             continue
-        gate = Gate(tick_state["gate"].value)
+        gate = Gate(tick_state["gate"])
         proj = tick_state["projection"]
         admitted, fb, warrant = None, None, ()
         if gate is Gate.CLEARS and proj is not None:
@@ -186,7 +196,7 @@ def in_process(run_file, steps, strategy, prior):
                               candidates=cands))
     root.removeHandler(collect)
     meta_planner_module.realize = realize_orig
-    return collect.lines, ticks, decisions, selection, agents, segments
+    return collect.lines, ticks, decisions, selection, agents, segments, m.assignment_knowledge
 
 
 def _segments(segs):
@@ -228,11 +238,12 @@ def from_log(log_path):
 if __name__ == "__main__":
     run_file, steps, log_path, last_ack, out = (sys.argv[1], int(sys.argv[2]), sys.argv[3], int(sys.argv[4]),
                                                Path(sys.argv[5]))
-    strategy = sys.argv[sys.argv.index("--strategy") + 1] if "--strategy" in sys.argv else "single_task"
+    strategy = sys.argv[sys.argv.index("--strategy") + 1] if "--strategy" in sys.argv \
+        else yaml.safe_load(open(run_file)).get("strategy", "single_task")
     prior = (sys.argv[sys.argv.index("--assignment_knowledge") + 1] == "true") if "--assignment_knowledge" in sys.argv \
         else bool(yaml.safe_load(open(run_file))["assignment_knowledge"])
     out.mkdir(parents=True, exist_ok=True)
-    lines, ticks, decisions, selection, agents, segments = in_process(run_file, steps, strategy, prior)
+    lines, ticks, decisions, selection, agents, segments, prior = in_process(run_file, steps, strategy, prior)
     # the same prefixes set aside on both sides: the model logs the `[run_mesa] timeline` line itself (T-K part 1,
     # stage 4a), so the in-process run carries one `[run_mesa]` line the loader's filter below would keep
     lines = [l for l in lines if not l.startswith(RUN_MESA_LINES)]

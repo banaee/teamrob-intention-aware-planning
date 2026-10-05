@@ -39,8 +39,11 @@ class Cause(Enum):
 class Gate(Enum):
     """The gate's outcome (design_decisions.md "T-D G", AD1, AD4; G1; "T-K", AM68, AM73), by the names the records give
     it. UNDETERMINED is the IRB oracle's (D3): the gate turns on an evidence rank its own evidence cannot decide; never
-    an actual outcome."""
+    an actual outcome. T-F part 1: INTENTION_OFF, the intention-unaware robot's gate (R6, A); NO_HUMAN, admission's
+    refusal before the gate when no human is observed (R7, E), the human-unaware robot's (the gate is not asked)."""
     CLEARS = "clears"
+    INTENTION_OFF = "none(intention_off)"
+    NO_HUMAN = "none(no_human)"
     BELOW_THETA = "none(below_theta)"
     LEADER_NO_OBSERVATION = "none(leader_no_observation)"
     LEADER_INADEQUATE = "none(leader_inadequate)"
