@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 figure_of_log.py <run.log> <figure.png> — the per-tick figure of a run made by run_mesa.py directly (the four maintained
-sets' sweep.sh, dock_loading's milestone runs), which no instrument ran (the measurement of T-F part 1, O: every test
+sets' sweep.sh; dock_loading's milestone runs at dock_loading's own step, O as corrected), which no instrument ran (the measurement of T-F part 1, O: every test
 and analysis run has its figure; Hadi, 5 October 2026).
 
 The run is read from its own log: the triple and the steps from the `[run_mesa]` start line, the settings from the
