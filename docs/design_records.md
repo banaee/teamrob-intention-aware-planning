@@ -3884,7 +3884,7 @@ step 5's planning cases (6 and 3 off), step 5b's recognition (17) and planning r
   a wrong admission (s16_05, s11_03) gone, no new case. Every case that moved is as expected by ruling (AM67 or AM68);
   no defect in the framework. The cost: s11_03's completion 35 → 113 (its gain rested on admitting a delivery never
   performed), s16_05 +5, s16_04 +1; no admission of the true task later than its first tick.
-- Decided provisionally by ccode, for Hadi's confirmation: the report's place (analysis/kitting/tk5d/, with
+- Decided by ccode, confirmed by Hadi (5 October 2026): the report's place (analysis/kitting/tk5d/, with
   moved5d.py); the off column of the comparison is the off setting after the gate change (its earlier values in
   brackets); "wrong hypothesis held by the meta-planner" counted only before the robot's completion; C5 retargeted to
   the amended tie rule; the class "as expected by ruling" given where every lost tick is refused by AM67 or AM68.
@@ -3911,7 +3911,7 @@ the free stretch of the north wall between kitting_table_0 and shelf_3); env_set
 06, 07; 30 per new room) and the 5 existing measured scripts (scenario_s02_01, s02_02, s04_01, s03_06, the one script of
 s05_01 and s05_02), in 555 new scenario literals (scenarios_s17.py to _s30.py: each script's idle and working form, and
 its window copies); run files in configs/kitting/tk5e/ (772 runs). Every behaviour the prompt names was expressible.
-Decided provisionally by ccode, for Hadi's confirmation: the window rules (accord per instance over the task's ticks;
+Decided by ccode, confirmed by Hadi (5 October 2026): the window rules (accord per instance over the task's ticks;
 through with break_time over the first plain delivery, in every room; through_rw with room_warm for the deliveries-only
 scripts of the rooms with an A/C switch); the idle robot's place per room; the literals written by ccode's generator,
 which stays outside the repository (the literals are the source); the outputs under analysis/kitting/tk5e/{irb,mpb}/
@@ -3940,9 +3940,16 @@ the new md5s in the README). Undetermined (D3): rank cells in 6 runs, one gate t
   delivery cut by a coffee break inside it, 19.3 cm, a limitation); gone on: 024, 025, 043.
 - No defect in the framework. Flag: tests/test_tl2_discovery.py's count of the registry (134) fails with the step's
   555 new scenarios (689); left unchanged (new files only), its one-line update for Hadi.
-- Decided provisionally by ccode, for Hadi's confirmation: the authoring rules and the window rules (above); the
+- Decided by ccode, confirmed by Hadi (5 October 2026): the authoring rules and the window rules (above); the
   classes of a wrong admission (main, unmodelled, exit, pin); the rule "the same case on both sides" for a case below
   min_separation with the same ticks and minimum on both sides; the oracle's `recent` fix; the per-run outputs kept
   untracked under analysis/kitting/tk5e/{irb,mpb}/{on,off}/ (Hadi, 5 October 2026: the convention of steps 5b and 5d).
+Next: steps 6 and 7 on hold until Hadi rules.
+STEPS 5D AND 5E: THE DECISIONS CONFIRMED; THE DISCOVERY TEST UPDATED (Hadi, 5 October 2026):
+- The decisions ccode took provisionally in step 5d and in step 5e are confirmed, all of them (their lists above, now
+  marked "confirmed by Hadi"; the same in analysis/kitting/tk5e/README.md and REPORT.md).
+- tests/test_tl2_discovery.py: the registry's count updated to the present number, 689 scenarios (step 5e's 555
+  added), and with it the same test's set of setups, env_setup_01 to _30 (step 5e's env_setup_17 to _30). The test
+  suite: 365 passed.
 Next: steps 6 and 7 on hold until Hadi rules.
 

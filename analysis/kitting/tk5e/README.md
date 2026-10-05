@@ -46,7 +46,7 @@ Written by ccode, 5 October 2026. Step 5e of T-K part 1 (named by Hadi after ste
 - env_setup_29 (env_layout_20): the cross shift: the north-west shelf_2 and the south-west shelf_6 to the south table, the others to the north table (shelf_3's carry along the north wall past the coffee machine). Items: item_61 (shelf_1 → T0), item_62 (shelf_2 → T1), item_63 (shelf_3 → T0), item_64 (shelf_4 → T0), item_65 (shelf_5 → T0), item_66 (shelf_6 → T1).
 - env_setup_30 (env_layout_20): the near shift: the west shelves to the north table kitting_table_0, the east shelves to the south table kitting_table_1; shelf_2 and shelf_4 hold two parts each. Items: item_71 (shelf_1 → T0), item_72 (shelf_2 → T0), item_76 (shelf_6 → T0), item_73 (shelf_3 → T1), item_74 (shelf_4 → T1), item_75 (shelf_5 → T1), item_77 (shelf_2 → T0), item_78 (shelf_4 → T1).
 
-### The rules of the authoring (ccode's, provisional)
+### The rules of the authoring (ccode's; confirmed by Hadi, 5 October 2026)
 
 - Every new script ends with the exit walk to a landmark (docs/assumptions.md 1.1); the human is assigned every delivery it performs (at its designated table) and every delivery it never starts. The disjointness rule of the planning sets: no item both in the robot's pool and among the human's assigned tasks (checked by the generator).
 - The idle robot stands at one place per room, off the human's main walks: env_layout_02 (−100, −450), _05 (−700, 300), _06 (−550, 100), _07 (−700, 500), _19 (−400, 250), _20 (−900, 25).
@@ -54,7 +54,7 @@ Written by ccode, 5 October 2026. Step 5e of T-K part 1 (named by Hadi after ste
 - Kinds of unmodelled behaviour used: a stand (20 to 60 ticks), a walk elsewhere (with or without a stand), a delivery abandoned before the grasp (`.at(move_to, drop, occurrence=0)`) or after it (`.at(pick_up, drop)`, the part kept in hand), a never-started delivery (assigned, not in the script), a delivery to the other table (the table bound to the other one). Every behaviour the prompt names was expressible; none was left out.
 - Places of a foreseeable task: at the start, between deliveries, inside a delivery (before the grasp, after the grasp, or at the table before the release: `.at(move_to, X, occurrence=0)`, `.at(pick_up, X)`, `.at(move_to, X, occurrence=1)`), at the end; one or two per script.
 
-### The windows (ccode's rules, provisional; placed from the instrument's replay before any run, never moved)
+### The windows (ccode's rules, confirmed by Hadi, 5 October 2026; placed from the instrument's replay before any run, never moved)
 
 - accord: per foreseeable task, its raising fact (coffee_break: break_time; ac_activation: room_warm) on [the first tick the task is the top of the human's stack, the tick after its last such tick); one window per instance. A second coffee break gets its own window (its recency fact suppresses it regardless: suppression is asked first).
 - through: break_time on the ticks of the first delivery the human performs at its designated table with no event inside it. break_time in every room: the coffee machine is the foreseeable task all six rooms share, and its raised strength (2) is the larger cost.

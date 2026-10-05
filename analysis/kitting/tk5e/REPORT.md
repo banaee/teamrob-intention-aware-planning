@@ -275,7 +275,7 @@ Why, room by room:
 - The gate's AM68 now refuses the true task on a few ticks, delaying the raised coffee break's admission by 1 to 6
   ticks.
 
-## Decided provisionally by ccode
+## Decided by ccode (confirmed by Hadi, 5 October 2026)
 
 - The window rules: accord per instance, over the task's ticks. through with break_time over the first delivery
   performed with no event inside it, in every room. through_rw with room_warm for the deliveries-only scripts of the

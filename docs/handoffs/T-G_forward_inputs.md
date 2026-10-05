@@ -726,7 +726,9 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    (four rooms: completion worse in 6 runs, better in 1); AM68 now refuses the true task on a few ticks; two new cases
    below min_separation (07: a near-tie resolved for the assigned delivery, 30.0 cm; an admitted delivery cut by a
    coffee break, 19.3 cm). [done]
-6. dock_loading's part. [open unless marked] ON HOLD (Hadi, 5 October 2026, with step 7, while step 5e runs).
+   ccode's decisions of steps 5d and 5e confirmed by Hadi (5 October 2026); tests/test_tl2_discovery.py's count updated
+   (689 scenarios, env_setup_01 to _30); the test suite passes (365). [ruled]
+6. dock_loading's part. [open unless marked] ON HOLD (Hadi, 5 October 2026, with step 7; step 5e done, the hold stands until Hadi rules).
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]
    - Its two test sets (the recognition set and the planning set of stage 1) are stale since the gate's change; the
