@@ -232,11 +232,11 @@ T-K part 1: context knowledge
 │   ├─ step 5b's recognition runs and planning runs again
 │   ├─ the comparison: off, on before the gate change, on after it
 │   └─ D3 amended (exact ties in the oracle) ................... ruled
-├─ step 5e kitting's rooms 02, 05, 06, 07 and copies of 08, 09 .. under way
+├─ step 5e kitting's rooms 02, 05, 06, 07 and copies of 08, 09 .. done
 │   ├─ the authoring: 100 new scripts, 5 existing; env_layout_19, _20 (08, 09 + a coffee machine)
 │   ├─ the windows and the oracles' expectations, before the runs
-│   ├─ the runs: the idle robot (IRB), then the working robot (MPB); off, on, accord, through
-│   └─ the report
+│   ├─ the runs: the idle robot (IRB), then the working robot (MPB); off, on, accord, through (772, 0 disagreements)
+│   └─ the report (analysis/kitting/tk5e/REPORT.md)
 ├─ step 6  dock_loading's part .................................. on hold
 └─ step 7  the close of T-K part 1 .............................. on hold
 
@@ -718,7 +718,14 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    Settings: off; on with no timeline fact; on with the foreseeable task's raising fact over it (accord); on with a
    raising fact over a delivery (through). Each script with the idle robot through the IRB, then with a working robot
    through the MPB; the oracles' expectations committed before the runs. The set and its rules:
-   analysis/kitting/tk5e/README.md; design_records.md, "T-K", STEP 5E. [ruled; under way]
+   analysis/kitting/tk5e/README.md; design_records.md, "T-K", STEP 5E. [ruled]
+   DONE (5 October 2026; analysis/kitting/tk5e/REPORT.md; design_records.md, "T-K", STEP 5E, DONE): 384 recognition and
+   388 planning runs, 0 disagreements (after a fix of the recognition oracle's `recent` column). Step 5d's recognition
+   results hold; the gains are smaller in the two new rooms, the work-through cost larger where an assigned and a
+   foreseeable target share a line (07, 20); in planning the earlier admissions mostly become earlier, longer holds
+   (four rooms: completion worse in 6 runs, better in 1); AM68 now refuses the true task on a few ticks; two new cases
+   below min_separation (07: a near-tie resolved for the assigned delivery, 30.0 cm; an admitted delivery cut by a
+   coffee break, 19.3 cm). [done]
 6. dock_loading's part. [open unless marked] ON HOLD (Hadi, 5 October 2026, with step 7, while step 5e runs).
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]

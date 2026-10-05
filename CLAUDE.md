@@ -545,7 +545,9 @@ Decisions
   design_records.md, "T-K", STEP 5D): 0 disagreements after D3 amended (Hadi: exact ties in the oracle are ties); every
   moved case as expected by ruling; the true task's admissions unchanged, the wrong ones and the two cases below
   min_separation from a wrong admission removed. The steps of T-K part 1 stand as a tree at the top of
-  `docs/handoffs/T-G_forward_inputs.md`, section 5. Next: dock_loading's part (step 6), then the close (step 7).
+  `docs/handoffs/T-G_forward_inputs.md`, section 5. Step 5e, context knowledge on kitting's rooms 02, 05, 06, 07 and on env_layout_19 and _20 (copies of 08 and 09 with a
+  coffee machine), with 100 new scripts, is DONE (5 October 2026; analysis/kitting/tk5e/REPORT.md; design_records.md,
+  "T-K", STEP 5E): 772 runs, 0 disagreements. Steps 6 (dock_loading's part) and 7 (the close) are on hold.
   Not to be
   started unasked: T-F, T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour

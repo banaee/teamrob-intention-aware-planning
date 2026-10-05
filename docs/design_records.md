@@ -3916,4 +3916,33 @@ through with break_time over the first plain delivery, in every room; through_rw
 scripts of the rooms with an A/C switch); the idle robot's place per room; the literals written by ccode's generator,
 which stays outside the repository (the literals are the source); the outputs under analysis/kitting/tk5e/{irb,mpb}/
 {on,off}/.
+STEP 5E, DONE (ccode, 5 October 2026; analysis/kitting/tk5e/REPORT.md, the step's one document; the comparison
+comp5e.py). The runs: 384 recognition (idle robot) and 388 planning (working robot), the recognition runs first, through
+repository copies in parallel; 0 disagreements with the oracles in all 772. Every planning expectation as committed;
+33 recognition expectations changed by an instrument fix during the runs (the oracle's `recent` column on ticks with no
+live hypothesis: the committed oracle reproduces the committed tables, the fixed one changes only that column there;
+the new md5s in the README). Undetermined (D3): rank cells in 6 runs, one gate tick in each of 3.
+- Recognition, on against off (no fact): deliveries earlier (four rooms 81 / 11 / 0, median −6; new rooms 102 / 24 /
+  0, median −3); the coffee break outside break_time later (median +10, +13); inside it (accord) earlier (median −7,
+  −3: less than step 5d's −14, off already early and AM68's refusals); wrong admissions during modelled tasks 7 / 5
+  and 9 / 8 against off, all of kind (iii) or (i).
+- The work-through cost: a delivery under break_time later than with no fact by a median 12 and 6 ticks (at most 61),
+  later than off by 4 and 3; 2 never admitted (env_layout_20, the carry along the north wall at the machine); in
+  env_layout_07 the raised coffee break admitted wrongly during a delivery toward the machine (17, 40 ticks).
+- The A/C admitted more often than in step 5d (no fact 3 of 10, room_warm 8 of 10): env_layout_07's switch stands
+  apart from every other target; where it follows the last delivery the foreseeable tasks share the whole prior.
+- The gate: AM68 refuses the true task on 1 to 9 ticks (11 accord coffee breaks delayed 1 to 6 ticks; two deliveries
+  interrupted), which step 5d did not meet; AM67 never refuses the true task.
+- Planning: four rooms completion better / equal / worse 1 / 39 / 6 (16 ticks gained, 32 lost: longer holds against
+  earlier admissions); new rooms 2 / 58 / 0. Cases below min_separation 58 on and 58 off (17 with the robot moving),
+  mostly the same on both sides; added on: script 035 (env_layout_07, a near-tie of the coffee machine and shelf_5
+  on one bearing resolved for the delivery, 30.0 cm, a limitation, docs/assumptions.md 6.4) and 038 (an admitted
+  delivery cut by a coffee break inside it, 19.3 cm, a limitation); gone on: 024, 025, 043.
+- No defect in the framework. Flag: tests/test_tl2_discovery.py's count of the registry (134) fails with the step's
+  555 new scenarios (689); left unchanged (new files only), its one-line update for Hadi.
+- Decided provisionally by ccode, for Hadi's confirmation: the authoring rules and the window rules (above); the
+  classes of a wrong admission (main, unmodelled, exit, pin); the rule "the same case on both sides" for a case below
+  min_separation with the same ticks and minimum on both sides; the oracle's `recent` fix; the per-run outputs kept
+  untracked under analysis/kitting/tk5e/{irb,mpb}/{on,off}/ (Hadi, 5 October 2026: the convention of steps 5b and 5d).
+Next: steps 6 and 7 on hold until Hadi rules.
 
