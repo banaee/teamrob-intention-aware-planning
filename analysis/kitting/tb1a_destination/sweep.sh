@@ -24,5 +24,7 @@ while read -r lay sc st; do
       --assignment_knowledge $p --context_knowledge false < /dev/null > /dev/null 2>&1 || echo "$tag: exit $?"
     cp "$(ls -t logs/run_*.log | head -1)" "$OUT/$tag.log"
     cp "$(ls -t logs/run_*.rec | head -1)" "$OUT/$tag.rec"    # the human executor's record stream (T-H2)
+    # the run's per-tick figure beside its log (the measurement of T-F part 1, O; the figures rule)
+    PYTHONHASHSEED=0 $PY analysis/instruments/mpb/figure_of_log.py "$OUT/$tag.log" "$OUT/$tag.png"
   done
 done <<< "$RUNS"
