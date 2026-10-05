@@ -143,3 +143,85 @@ scenario_s16_06 = ScenarioConfig(
         _robot((400, 210), "item_5"),
     ],
 )
+
+
+# T-F part 1, part 1b (5 October 2026): copies with a fact in force (analysis/kitting/tf1/make_copies.py; REPORT.md, "Part 1").
+scenario_s16_07 = ScenarioConfig(
+    id="scenario_s16_07",
+    setup="env_setup_16",
+    reference_layouts=["env_layout_18"],
+    timeline=Timeline((window(BREAK_TIME, 0, 95),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s16_01's copy with a fact in force, not in accord: break_time over ticks 0 to 95 (deliver_item(item_4,kitting_table_0)). "
+        "Everything else is scenario_s16_01's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        _human([deliver_item("item_4", table="kitting_table_0"), go_to("corner_NE")]),
+        _robot((-470, -120), "item_5"),
+    ],
+)
+
+
+scenario_s16_08 = ScenarioConfig(
+    id="scenario_s16_08",
+    setup="env_setup_16",
+    reference_layouts=["env_layout_18"],
+    timeline=Timeline((window(BREAK_TIME, 0, 74),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s16_03's copy with a fact in force, in accord: break_time over ticks 0 to 74 (coffee_break(coffee_machine_0)). "
+        "Everything else is scenario_s16_03's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        _human([coffee_break("coffee_machine_0"), deliver_item("item_4", table="kitting_table_0"), go_to("corner_NE")]),
+        _robot((-200, 0), "item_6"),
+    ],
+)
+
+
+scenario_s16_09 = ScenarioConfig(
+    id="scenario_s16_09",
+    setup="env_setup_16",
+    reference_layouts=["env_layout_18"],
+    timeline=Timeline((window(BREAK_TIME, 74, 141),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s16_03's copy with a fact in force, not in accord: break_time over ticks 74 to 141 (deliver_item(item_4,kitting_table_0)). "
+        "Everything else is scenario_s16_03's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        _human([coffee_break("coffee_machine_0"), deliver_item("item_4", table="kitting_table_0"), go_to("corner_NE")]),
+        _robot((-200, 0), "item_6"),
+    ],
+)
+
+
+scenario_s16_10 = ScenarioConfig(
+    id="scenario_s16_10",
+    setup="env_setup_16",
+    reference_layouts=["env_layout_18"],
+    timeline=Timeline((window(ROOM_WARM, 0, 48),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s16_05's copy with a fact in force, in accord: room_warm over ticks 0 to 48 (ac_activation(ac_switch_0)). "
+        "Everything else is scenario_s16_05's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        _human([ac_activation("ac_switch_0"), deliver_item("item_4", table="kitting_table_0"), go_to("corner_NE")]),
+        _robot((400, 210), "item_5"),
+    ],
+)
+
+
+scenario_s16_11 = ScenarioConfig(
+    id="scenario_s16_11",
+    setup="env_setup_16",
+    reference_layouts=["env_layout_18"],
+    timeline=Timeline((window(ROOM_WARM, 48, 104),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s16_05's copy with a fact in force, not in accord: room_warm over ticks 48 to 104 (deliver_item(item_4,kitting_table_0)). "
+        "Everything else is scenario_s16_05's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        _human([ac_activation("ac_switch_0"), deliver_item("item_4", table="kitting_table_0"), go_to("corner_NE")]),
+        _robot((400, 210), "item_5"),
+    ],
+)
+

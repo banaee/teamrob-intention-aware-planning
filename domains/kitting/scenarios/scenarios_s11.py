@@ -20,6 +20,9 @@ carrying.
 
 from shared.types import AgentConfig, ScenarioConfig, Script
 from domains.kitting.script import deliver_item, go_to, go_to_and_stand, stand
+from shared.types import Timeline
+from domains.kitting.script import window
+from domains.kitting.facts import BREAK_TIME, ROOM_WARM
 
 # The human's assigned delivery, never performed (commitment warrant, never admitted: authoring.md, part (iv)).
 _UNPERFORMED = [deliver_item("item_12", table="kitting_table_0")]
@@ -151,3 +154,111 @@ scenario_s11_03 = ScenarioConfig(
         ),
     ],
 )
+
+
+# T-F part 1, part 1b (5 October 2026): copies with a fact in force (analysis/kitting/tf1/make_copies.py; REPORT.md, "Part 1").
+scenario_s11_04 = ScenarioConfig(
+    id="scenario_s11_04",
+    setup="env_setup_11",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 61),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s11_01's copy with a fact in force, not in accord: break_time over ticks 0 to 61 (stand(PT120S)). "
+        "Everything else is scenario_s11_01's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-270, 620),
+            scheduled_tasks=Script([
+                stand("PT120S"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_UNPERFORMED),
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-420, 280),
+            assigned_tasks=[
+                deliver_item("item_8", table="kitting_table_2"),
+                deliver_item("item_9", table="kitting_table_4"),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+
+scenario_s11_05 = ScenarioConfig(
+    id="scenario_s11_05",
+    setup="env_setup_11",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 21),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s11_02's copy with a fact in force, not in accord: break_time over ticks 0 to 21 (go_to(door_N)). "
+        "Everything else is scenario_s11_02's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(300, 260),
+            scheduled_tasks=Script([
+                go_to("door_N"),
+                go_to_and_stand("spot_E", "PT60S"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_UNPERFORMED),
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-100, 600),
+            assigned_tasks=[
+                deliver_item("item_10", table="kitting_table_1"),
+                deliver_item("item_11", table="kitting_table_1"),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+
+scenario_s11_06 = ScenarioConfig(
+    id="scenario_s11_06",
+    setup="env_setup_11",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 61),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s11_03's copy with a fact in force, not in accord: break_time over ticks 0 to 61 (stand(PT120S)). "
+        "Everything else is scenario_s11_03's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-270, 620),
+            scheduled_tasks=Script([
+                stand("PT120S"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_UNPERFORMED),
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(-420, 540),
+            assigned_tasks=[
+                deliver_item("item_8", table="kitting_table_2"),
+                deliver_item("item_9", table="kitting_table_4"),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+

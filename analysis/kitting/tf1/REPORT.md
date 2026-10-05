@@ -883,3 +883,33 @@ Rows 688; the oracle compared on 688 (0 disagreements); none derivable on 0; set
    s28_02 3 → 7), all with more ticks of a standing robot.
 7. **The 176 copies with a timeline (IA-on):** 174 completed (the two of finding 2), 700 ticks below in 79, 27
    violations; no comparison is drawn here (one condition only).
+
+## Part 1: context knowledge with a fact in force (the rule, written before the runs; 5 October 2026)
+
+Hadi's ruling (5 October 2026, the last step of T-F part 1): step 3 of COMPARISON.md compares context knowledge off and
+on almost only where no timeline fact is in force, so it measures the prior alone. Part 1 pairs each copy of a
+measurement scenario with a timeline of its own (intention-aware, context knowledge on) with its base scenario's run
+with context knowledge off, split by class, and completes the set where a class is missing.
+
+The rule for every copy (`make_copies.py`):
+- **in accord**: the fact holds over the ticks in which the human performs the foreseeable task the fact raises
+  (coffee_break: break_time; ac_activation: room_warm);
+- **not in accord**: the fact holds while the human performs another task, or the human never performs the foreseeable
+  task;
+- **whole run**: step 5's three copies (scenario_s16_02, _04, _06), whose fact holds from tick 0 to the run's end over
+  the foreseeable task and other tasks alike, belong to neither class and are reported apart.
+The existing copies are step 5e's 176 (its README, "The scripts": accord is in accord; through and through_rw are not in
+accord). A base gets a new copy in a class when its room has a foreseeable task (a coffee machine or an A/C switch) and
+it has no copy in that class; in accord only when its human performs a foreseeable task (both classes for every script
+that allows them). The windows of a new copy, from the base's replay (half-open, in ticks): in accord, one window per
+stretch in which a foreseeable task is the top of the human's stack, with that task's fact; not in accord, the fact of
+the first foreseeable task the human performs (break_time when it performs none and the room has a coffee machine,
+else room_warm) over the first stretch in which a task that is not foreseeable is the top of the human's stack. New
+copies: 32 (7 in accord, 25 not in accord), on 25 bases; run intention-aware with context knowledge on, single_task,
+with the oracle and the figure, in this measurement's folder and names (run_689 onward).
+
+The recognition measures (1c), per run, over the ticks before the robot's terminal decision (the whole run when it has
+none), from its per-tick record (`actual_ticks.json`: the decision record, the projected hypothesis) and the human's
+replay (`trajectory.json`): per stretch of a modelled task the human performs, the ticks from its first tick to the
+first tick on which the decision record holds that task's hypothesis (admitted), or not admitted within the stretch;
+the ticks on which the decision record holds a hypothesis other than the task the human performs (a wrong admission).

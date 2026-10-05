@@ -2024,3 +2024,80 @@ scenario_s28_48 = ScenarioConfig(
         ),
     ],
 )
+
+
+# T-F part 1, part 1b (5 October 2026): copies with a fact in force (analysis/kitting/tf1/make_copies.py; REPORT.md, "Part 1").
+scenario_s28_49 = ScenarioConfig(
+    id="scenario_s28_49",
+    setup="env_setup_28",
+    reference_layouts=["env_layout_20"],
+    timeline=Timeline((window(BREAK_TIME, 0, 93),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s28_28's copy with a fact in force, not in accord: break_time over ticks 0 to 93 (deliver_item(item_1,kitting_table_1)). "
+        "Everything else is scenario_s28_28's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-900, 0),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_1").at(move_to, coffee_break("coffee_machine_0"), occurrence=1),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=[
+                deliver_item("item_1", table="kitting_table_1"),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(900, 300),
+            assigned_tasks=[
+                deliver_item("item_4", table="kitting_table_1"),
+                deliver_item("item_5", table="kitting_table_1"),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+
+
+scenario_s28_50 = ScenarioConfig(
+    id="scenario_s28_50",
+    setup="env_setup_28",
+    reference_layouts=["env_layout_20"],
+    timeline=Timeline((window(BREAK_TIME, 0, 79),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s28_48's copy with a fact in force, not in accord: break_time over ticks 0 to 79 (deliver_item(item_6,kitting_table_1)). "
+        "Everything else is scenario_s28_48's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-200, -300),
+            scheduled_tasks=Script([
+                deliver_item("item_6", table="kitting_table_1"),
+                go_to("door"),
+            ]),
+            assigned_tasks=[
+                deliver_item("item_6", table="kitting_table_0"),
+                deliver_item("item_3", table="kitting_table_1"),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(700, 0),
+            assigned_tasks=[
+                deliver_item("item_4", table="kitting_table_1"),
+                deliver_item("item_5", table="kitting_table_1"),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+

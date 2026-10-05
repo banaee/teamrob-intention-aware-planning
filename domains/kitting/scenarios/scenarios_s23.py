@@ -1483,3 +1483,44 @@ scenario_s23_35 = ScenarioConfig(
         ),
     ],
 )
+
+
+# T-F part 1, part 1b (5 October 2026): copies with a fact in force (analysis/kitting/tf1/make_copies.py; REPORT.md, "Part 1").
+scenario_s23_36 = ScenarioConfig(
+    id="scenario_s23_36",
+    setup="env_setup_23",
+    reference_layouts=["env_layout_07"],
+    timeline=Timeline((window(ROOM_WARM, 0, 54),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s23_27's copy with a fact in force, not in accord: room_warm over ticks 0 to 54 (deliver_item(item_3,kitting_table_0)). "
+        "Everything else is scenario_s23_27's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-400, 0),
+            scheduled_tasks=Script([
+                deliver_item("item_3", table="kitting_table_0").at(pick_up, drop),
+                ac_activation("ac_switch_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=[
+                deliver_item("item_3", table="kitting_table_0"),
+                deliver_item("item_5", table="kitting_table_0"),
+            ],
+            observes=[],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, 0),
+            assigned_tasks=[
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+            ],
+            observes=["human_0"],
+        ),
+    ],
+)
+

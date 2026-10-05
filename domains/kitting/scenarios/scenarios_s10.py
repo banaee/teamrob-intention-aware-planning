@@ -22,6 +22,9 @@ kept through a dip below theta; _11 the cause boundary, on env_layout_13 (env_la
 from shared.types import AgentConfig, ScenarioConfig, Script
 from domains.kitting.actions import move_to, pick_up
 from domains.kitting.script import deliver_item, coffee_break, go_to, stand
+from shared.types import Timeline
+from domains.kitting.script import window
+from domains.kitting.facts import BREAK_TIME, ROOM_WARM
 
 
 # ===============================================================
@@ -394,3 +397,393 @@ scenario_s10_11 = ScenarioConfig(
         _robot((460, 480), _NE_POOL),
     ],
 )
+
+
+# T-F part 1, part 1b (5 October 2026): copies with a fact in force (analysis/kitting/tf1/make_copies.py; REPORT.md, "Part 1").
+scenario_s10_12 = ScenarioConfig(
+    id="scenario_s10_12",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 63),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_01's copy with a fact in force, not in accord: break_time over ticks 0 to 63 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_01's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_13 = ScenarioConfig(
+    id="scenario_s10_13",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 63),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_02's copy with a fact in force, not in accord: break_time over ticks 0 to 63 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_02's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((390, -573), [deliver_item("item_7", table="kitting_table_3")]),
+    ],
+)
+
+
+scenario_s10_14 = ScenarioConfig(
+    id="scenario_s10_14",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 46, 107),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_03's copy with a fact in force, in accord: break_time over ticks 46 to 107 (coffee_break(coffee_machine_0)). "
+        "Everything else is scenario_s10_03's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").during(
+                    move_to, "PT28S", coffee_break("coffee_machine_0"), occurrence=1),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-250, 560), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_15 = ScenarioConfig(
+    id="scenario_s10_15",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 46),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_03's copy with a fact in force, not in accord: break_time over ticks 0 to 46 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_03's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").during(
+                    move_to, "PT28S", coffee_break("coffee_machine_0"), occurrence=1),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-250, 560), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_16 = ScenarioConfig(
+    id="scenario_s10_16",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 63, 135),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_04's copy with a fact in force, in accord: break_time over ticks 63 to 135 (coffee_break(coffee_machine_0)). "
+        "Everything else is scenario_s10_04's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                coffee_break("coffee_machine_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_17 = ScenarioConfig(
+    id="scenario_s10_17",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 63),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_04's copy with a fact in force, not in accord: break_time over ticks 0 to 63 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_04's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                coffee_break("coffee_machine_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_18 = ScenarioConfig(
+    id="scenario_s10_18",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 132, 204),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_05's copy with a fact in force, in accord: break_time over ticks 132 to 204 (coffee_break(coffee_machine_0)). "
+        "Everything else is scenario_s10_05's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                stand("PT10S"),
+                coffee_break("coffee_machine_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_19 = ScenarioConfig(
+    id="scenario_s10_19",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 63),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_05's copy with a fact in force, not in accord: break_time over ticks 0 to 63 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_05's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+                deliver_item("item_2", table="kitting_table_0"),
+                stand("PT10S"),
+                coffee_break("coffee_machine_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_20 = ScenarioConfig(
+    id="scenario_s10_20",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 63),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_06's copy with a fact in force, not in accord: break_time over ticks 0 to 63 (deliver_item(item_2,kitting_table_0)). "
+        "Everything else is scenario_s10_06's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=[deliver_item("item_2", table="kitting_table_0")],
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_21 = ScenarioConfig(
+    id="scenario_s10_21",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 46),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_07's copy with a fact in force, not in accord: break_time over ticks 0 to 46 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_07's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").during(
+                    move_to, "PT28S", stand("PT120S"), occurrence=1),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_22 = ScenarioConfig(
+    id="scenario_s10_22",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 32),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_08's copy with a fact in force, not in accord: break_time over ticks 0 to 32 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_08's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").at(
+                    pick_up, deliver_item("item_2", table="kitting_table_0")),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-165, 490), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_23 = ScenarioConfig(
+    id="scenario_s10_23",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 75),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_09's copy with a fact in force, not in accord: break_time over ticks 0 to 75 (deliver_item(item_1,kitting_table_2)). "
+        "Everything else is scenario_s10_09's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_2"),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((460, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_24 = ScenarioConfig(
+    id="scenario_s10_24",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 30, 84),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_10's copy with a fact in force, in accord: break_time over ticks 30 to 84 (coffee_break(coffee_machine_0)). "
+        "Everything else is scenario_s10_10's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").at(
+                    move_to, coffee_break("coffee_machine_0"), occurrence=0),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-250, 480), _NE_POOL),
+    ],
+)
+
+
+scenario_s10_25 = ScenarioConfig(
+    id="scenario_s10_25",
+    setup="env_setup_10",
+    reference_layouts=["env_layout_12"],
+    timeline=Timeline((window(BREAK_TIME, 0, 30),)),
+    description=(
+        "T-F part 1, part 1b: scenario_s10_10's copy with a fact in force, not in accord: break_time over ticks 0 to 30 (deliver_item(item_1,kitting_table_0)). "
+        "Everything else is scenario_s10_10's (analysis/kitting/tf1/make_copies.py)."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0").at(
+                    move_to, coffee_break("coffee_machine_0"), occurrence=0),
+                deliver_item("item_2", table="kitting_table_0"),
+                go_to("corner_SE"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((-250, 480), _NE_POOL),
+    ],
+)
+
