@@ -4031,3 +4031,21 @@ STAGE 1 BUILT (ccode, 5 October 2026; the plan's section 2, with A to F):
   `no_current_task` and 11 `projection_expired` ticks, holds 5 at 40 on a fallback, completes at 66 with the minimum
   52.20 cm (the intention-aware run: the hold 5 at 25 on the admitted plan, 66, 52.20 cm).
 Next: stage 2 (the instruments), after Hadi's go.
+STAGE 1 ACCEPTED; H TO J (Hadi, 5 October 2026). Stage 1 accepted; ccode's two decisions in it (`[IR-assignment]`
+printed with the effective value; the two stale texts corrected) accepted; B's second corner case recorded
+(design_decisions.md); stage 2's check on `single_task` only.
+- H. The measurement of T-F part 1 (R10; the step after the build): the kitting scenarios in which the robot has
+  assigned tasks: the planning test-bed's 16, step 5's 6 planning cases, step 5e's 106 planning scripts; all four
+  conditions run anew into one new folder, under `single_task`. Reason: where the robot is idle the conditions give the
+  same robot; one folder complete on its own does not depend on the folders of steps 5 to 5e.
+- I. Naming: no file or folder of runs carries a parameter, an argument or a variable in its name. A run's settings are
+  stated in its run file, in its `[run]` header and as columns of the instrument's result (`human_aware`,
+  `intention_aware`, `assignment_knowledge`, `context_knowledge`, `strategy`). It applies to the new outputs of T-F
+  part 1; the older folders are handled after the measurement, from a list Hadi rules on. Reason: a folder per setting
+  multiplies files and archives; with the settings as columns, a later condition or strategy adds rows to the same table
+  and renames nothing. In part 1 the column `strategy` holds `single_task` in every row.
+- J. Notes for T-F part 2, recorded, not built: `full_reorder` becomes the default strategy of the runs of the actual
+  evaluation (under it an early admission can change the next task and the whole remaining order, so recognition has
+  more ways to change the result; a different choice rule from `single_task`, not a superset of it). Strategy is then a
+  second dimension of the same result table; the human-unaware condition needs its own reference run per strategy;
+  TODO-141 applies.

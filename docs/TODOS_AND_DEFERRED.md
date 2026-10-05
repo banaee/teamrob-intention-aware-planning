@@ -4286,6 +4286,9 @@ off above is intention-unaware, TODO-137); the rest of T-F keeps its place after
 plain`): the human-unaware condition covers its comparison (the same behaviour in the verification's two runs; plain
 differs by construction, re-deciding at triggers whose results it ignores); `plain` stays untouched, is not a column
 of T-F part 1's measurement, and keeping or retiring it is ruled with T-F.
+NOTE (T-F part 2, Hadi, 5 October 2026; design_records.md, "T-F part 1", J): `full_reorder` becomes the default
+strategy of the evaluation's runs; strategy a second dimension of the result table (I); the human-unaware condition
+then needs its own reference run per strategy; TODO-141 applies.
 Files: analysis/ (the evaluation), domains/kitting/ (the evaluation set), mesa_sim/run_mesa.py (TODO-137's option)
 Reference: docs/assumptions.md 1.4, 4.6; design_decisions.md, "The meta-planner test-bed (MPB)", F1; TODO-47,
 TODO-135, TODO-137, TODO-138, TODO-140, TODO-141

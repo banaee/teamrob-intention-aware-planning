@@ -5615,6 +5615,9 @@ F's Q3 and G, in design_records.md under this title):
   recorded: if the human completes a task in the robot's own pool, the robot reads that task as complete in the world;
   it does not occur in the present sets. Reason: the robot does not reason about the human's behaviour; reasoning on
   objects stays.
+  A second corner case (ccode's flag, accepted by Hadi, 5 October 2026): if the human carries an object of the robot's
+  own task, the robot reads that object's position as the human's (`shared/target_resolution.object_position`) and
+  walks toward the human. It does not occur in the present sets (the robot's and the human's objects are separate).
 - C (amends R4). `human_aware` off sets the separation stop off, for now: human-unaware covers the mind and this one
   check of the body. An execution-time collision avoidance that also acts in a human-unaware run is future work
   (TODO-181).
