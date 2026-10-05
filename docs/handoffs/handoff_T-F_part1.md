@@ -67,13 +67,16 @@ intention-unaware", THE CLOSE). Everything named here is committed on `main`; Ha
   by run_mesa.py directly through `analysis/instruments/mpb/figure_of_log.py <log> <png>` (the four maintained sets'
   sweep.sh call it). The context panel stands under the belief, not after the finding as N lists it (ccode's flag).
 - **The measurement's tools** (analysis/kitting/tf1/): `make_runs.py` (wrote the 688 run files; its sources were deleted
-  in part E, held by 362af19), `tables.py` (REPORT.md's tables), `comparison.py` (COMPARISON.md and comparison.html).
+  in part E, held by 362af19), `make_copies.py` (the copies with a fact in force: their classes, `classes()`, and the 32
+  copies of the last step's part 1 with run_689 to run_720), `tables.py` (REPORT.md's tables), `comparison.py`
+  (COMPARISON.md and comparison.html, every number generated).
 
 ## 3. The measurement's result
 
 - **[finding]** 128 kitting scenarios (the planning test-bed's 16, step 5's 6, step 5e's 106 with no timeline fact; 10
   rooms) in the four conditions, and step 5e's 176 timeline copies intention-aware with context knowledge on: 688 runs,
-  `single_task`. The oracle compared on all 688: 0 disagreements. Every human-unaware run moves as the robot alone.
+  `single_task`; with the last step's 32 copies, 720 runs. The oracle compared on all 720: 0 disagreements. Every
+  human-unaware run moves as the robot alone.
 - **[finding]** Step 1, planning against the observed human (human-unaware → intention-unaware): violation ticks
   137 → 14; completion later in 36 of 127 scenarios, equal in 91, earlier in none; mean +5.83 ticks; 741 ticks of
   delay for 117 violation ticks removed.
@@ -81,6 +84,12 @@ intention-unaware", THE CLOSE). Everything named here is committed on `main`; Ha
   101 equal, 11 later, mean −0.84; violation ticks 14 → 17. Step 3, context knowledge (off → on): completion 8 earlier,
   112 equal, 7 later, mean −0.28; violation ticks 17 → 23. For both steps the 95% interval of the mean change, resampling
   the rooms, includes zero: no difference this set can distinguish from zero.
+- **[finding]** Context knowledge with a fact in force (the last step's part 1; COMPARISON.md, "Context knowledge with a
+  fact in force"): each copy with a timeline (context knowledge on) against its base with context knowledge off, by
+  class under a rule written before the runs (REPORT.md, "Part 1"): 73 copies in accord, 135 not in accord (32 of them
+  authored in this step). In accord: of 66 stretches of the human's tasks starting while the fact holds, 52 admitted
+  earlier and 2 later; not in accord: of 119, 31 earlier and 70 later. Wrong-admission ticks 633 → 613 and 999 → 1175.
+  Completion and violations change little (violation ticks 10 → 5 in accord, 18 → 24 not in accord).
 - Documents: analysis/kitting/tf1/REPORT.md (the working record, per-scenario tables, findings 1 to 7);
   analysis/kitting/tf1/COMPARISON.md and comparison.html (for a reader outside the repository; accepted by Hadi).
 
@@ -137,6 +146,7 @@ intention-unaware", THE CLOSE). Everything named here is committed on `main`; Ha
 Repo facts verified by ccode at the commit that adds this file. The commits of T-F part 1: the rulings and plan
 df01ae9, 9509ada, adaa9ca, 6cc69fb; stage 1 f269b6a, 2f3d61b, a34ccde; stage 2 f320f99, ca8a4aa, a84977d, 07ae835,
 02f18ff; the measurement f849db9, edae0e4, 3d7a26a, 8da7b2a, 26ca369, efb16fe, 54e3d75, 7c8b841, 9a710df; the
-statistics report 362af19; the close a63e11b, 02c8e5c, 92314fa. Outside the repository: /home/hadi/teamrob_tf1_handoff/
+statistics report 362af19; the close a63e11b, 02c8e5c, 92314fa, f849016; the last step's part 1 05b4dd3, 673d1b6,
+13f2830. Outside the repository: /home/hadi/teamrob_tf1_handoff/
 (the backup of the reran sets' outputs before the reruns, o_sets_before.tgz; everything part E deleted,
 deleted_2026-10-05_part_E.tgz; the inventory of part E).

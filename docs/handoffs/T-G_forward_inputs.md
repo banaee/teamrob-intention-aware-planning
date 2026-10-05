@@ -35,7 +35,7 @@ Updated 4 October 2026 after Hadi's rulings that closed the design discussion af
 state, 5.1, 5.2, 5.4, 5.6, 5.7, 5.10 and 5.13 in line; section 2's T-K paragraph.
 Updated 4 October 2026 after Hadi's rulings on ccode's report of those records (AM73 to AM76: the term "outranked",
 the first limitation reworded, the exact tie, the recognizer's category; AM70's reason as corrected): 5.1 and 5.13.
-Updated 5 October 2026 at T-F part 1's close (ccode): section 12 added (what T-F part 1 produced for the next chat);
+Updated 5 October 2026 at T-F part 1's close (ccode; amended with the last step's part 1): section 12 added (what T-F part 1 produced for the next chat);
 section 2's T-K paragraph brought in line with the repo (the gate rulings built, steps 5d and 5e done); section 11 gains
 the standing rules made in T-F part 1.
 
@@ -1237,3 +1237,9 @@ intention-unaware" (the label named); the handoff docs/handoffs/handoff_T-F_part
     violations (COMPARISON.md); planning against the observed human removes most violations at a mean delay of about
     6 ticks. The kitting set is authored, single_task, with a scripted human; no claim transfers to dock_loading
     without its own measurement.
+  - With a timeline fact in force (the last step's part 1; design_records.md, "T-F part 1", PART 1 OF THE LAST STEP;
+    COMPARISON.md, "Context knowledge with a fact in force"): a fact in accord with the human's task speeds its
+    admission (52 of 66 stretches earlier), a fact not in accord delays it (70 of 119 later); completion and violations
+    change little. It bears on step 6's timelines on dock_loading: a test set with facts only in accord would show a
+    benefit by construction; the rule of the copies (REPORT.md, "Part 1": both classes for every script that allows
+    them, the windows from the replay) is one way to author both. [open: a finding and a reading, not ruled]
