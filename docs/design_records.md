@@ -3889,4 +3889,31 @@ step 5's planning cases (6 and 3 off), step 5b's recognition (17) and planning r
   brackets); "wrong hypothesis held by the meta-planner" counted only before the robot's completion; C5 retargeted to
   the amended tie rule; the class "as expected by ruling" given where every lost tick is refused by AM67 or AM68.
 Next: step 6 (dock_loading's part).
+STEP 5E NAMED AND RULED (Hadi, 5 October 2026): context knowledge on kitting's rooms 02, 05, 06 and 07 (the rooms of
+layouts 1 to 9 that hold a coffee machine or an A/C switch) with new scenarios, then the test off against on on all of
+them. Steps 6 and 7 on hold. Ruled with it: new files only (no existing layout, setup, scenario, test or output changed
+or deleted; no framework code, strength or ruled value changed); a behaviour the human model cannot express is left out
+and named; about 2 setups and 4 to 6 scenarios per setup; the existing scenarios on these rooms that hold a measured
+script join as they are; the settings off, on with no timeline fact, accord (the foreseeable task's raising fact over
+the ticks where the human does it), through (a raising fact over a delivery); a window as a copy of the scenario with
+its own timeline, placed from the scripts and never moved after a result; each script once with the idle robot through
+the IRB and once with a working robot through the MPB, the idle robot first, the oracles' expectations committed before
+the runs; declared properties and coverage rows not required; the report's five questions. ADDITIONS (Hadi, the same
+day): layouts 08 and 09 join as two new layouts, copies with one coffee machine each, placed by a stated reason from
+the room's arrangement, no A/C switch; on them 3 or more setups and 10 or more scenarios per setup, each scenario
+differing from the others in a stated respect (the deliveries' number, order and tables; the place and number of the
+foreseeable tasks; the kind, place and length of the unmodelled behaviour; the start and the first walk's direction
+against the coffee machine; the robot's side).
+STEP 5E, THE AUTHORING (ccode, 5 October 2026; analysis/kitting/tk5e/README.md): env_layout_19 (env_layout_08 with
+coffee_machine_0 at (0, 450), the north wall's free middle) and env_layout_20 (env_layout_09 with it at (125, 450),
+the free stretch of the north wall between kitting_table_0 and shelf_3); env_setup_17 to _30 (two per room on 02, 05,
+06, 07, the first repeating the existing setup's shift; three per new room); 100 new scripts (10 per room on 02, 05,
+06, 07; 30 per new room) and the 5 existing measured scripts (scenario_s02_01, s02_02, s04_01, s03_06, the one script of
+s05_01 and s05_02), in 555 new scenario literals (scenarios_s17.py to _s30.py: each script's idle and working form, and
+its window copies); run files in configs/kitting/tk5e/ (772 runs). Every behaviour the prompt names was expressible.
+Decided provisionally by ccode, for Hadi's confirmation: the window rules (accord per instance over the task's ticks;
+through with break_time over the first plain delivery, in every room; through_rw with room_warm for the deliveries-only
+scripts of the rooms with an A/C switch); the idle robot's place per room; the literals written by ccode's generator,
+which stays outside the repository (the literals are the source); the outputs under analysis/kitting/tk5e/{irb,mpb}/
+{on,off}/.
 

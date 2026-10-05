@@ -1,0 +1,17 @@
+# configs/kitting/tk5e/irb/off/scenario_s17_29.yaml — T-K part 1, step 5e: the recognition test-bed's (IRB) run file for scenario_s17_29 on env_layout_02,
+# context knowledge off (analysis/kitting/tk5e/README.md). steps: the replay's last acknowledgement + 1 + 30 (IRB.3b's rule); the instrument computes it and runs with it.
+# The timeline in force is the scenario's own, or none (the setup states none).
+#   analysis/instruments/irb/run.sh kitting -o analysis/kitting/tk5e/irb/off configs/kitting/tk5e/irb/off/scenario_s17_29.yaml
+
+domain: kitting
+layout: env_layout_02
+setup: env_setup_17
+scenario: scenario_s17_29
+steps: 349
+assignment_knowledge: true
+context_knowledge: false
+strategy: "single_task"
+gate_strategy: "none"
+cost_strategy: "realized"
+separation_stop: false
+test_level: 0.05

@@ -1,0 +1,17 @@
+# configs/kitting/tk5e/mpb/on/scenario_s23_15.yaml — T-K part 1, step 5e: the planning test-bed's (MPB) run file for scenario_s23_15 on env_layout_07,
+# context knowledge on (analysis/kitting/tk5e/README.md). steps: the safety cap (horizon.py, MPB-5); the instrument computes it and runs with it.
+# The timeline in force is the scenario's own, or none (the setup states none).
+#   analysis/instruments/mpb/run.sh kitting -o analysis/kitting/tk5e/mpb/on configs/kitting/tk5e/mpb/on/scenario_s23_15.yaml
+
+domain: kitting
+layout: env_layout_07
+setup: env_setup_23
+scenario: scenario_s23_15
+steps: 471
+assignment_knowledge: true
+context_knowledge: true
+strategy: "single_task"
+gate_strategy: "none"
+cost_strategy: "realized"
+separation_stop: false
+test_level: 0.05

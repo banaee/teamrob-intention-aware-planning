@@ -206,7 +206,7 @@ setup in which all pallets go to one bay (recorded as conditional, never needed)
 ## 5. T-K part 1: context knowledge (framework-wide: kitting and dock_loading)
 
 The steps of T-K part 1 (Hadi, 5 October 2026: one tree, kept here and brought up to date at each step's close; the
-step numbers are those of 5.7, steps 5c and 5d named by Hadi on 5 October 2026; details in 5.7 and the records):
+step numbers are those of 5.7, steps 5c, 5d and 5e named by Hadi on 5 October 2026; details in 5.7 and the records):
 
 ```text
 T-K part 1: context knowledge
@@ -232,8 +232,13 @@ T-K part 1: context knowledge
 │   ├─ step 5b's recognition runs and planning runs again
 │   ├─ the comparison: off, on before the gate change, on after it
 │   └─ D3 amended (exact ties in the oracle) ................... ruled
-├─ step 6  dock_loading's part .................................. open
-└─ step 7  the close of T-K part 1 .............................. open
+├─ step 5e kitting's rooms 02, 05, 06, 07 and copies of 08, 09 .. under way
+│   ├─ the authoring: 100 new scripts, 5 existing; env_layout_19, _20 (08, 09 + a coffee machine)
+│   ├─ the windows and the oracles' expectations, before the runs
+│   ├─ the runs: the idle robot (IRB), then the working robot (MPB); off, on, accord, through
+│   └─ the report
+├─ step 6  dock_loading's part .................................. on hold
+└─ step 7  the close of T-K part 1 .............................. on hold
 
 then: T-G stage 2 (the full dock_loading domain)
 ```
@@ -707,7 +712,14 @@ tests against the method document cover it (AM49). dock_loading's IRB and MPB se
    tasks 47 to 19 with context knowledge on (off 9); planning completion better in 5 of 22 runs against off (50 ticks),
    worse in 1; the two cases below min_separation from a wrong admission gone, no new case; the cost s11_03's 78 ticks.
    [done]
-6. dock_loading's part. [open unless marked]
+5e. Context knowledge on kitting's rooms 02, 05, 06 and 07 and on two new rooms, env_layout_19 and env_layout_20 (copies
+   of env_layout_08 and _09, each with one coffee machine added), with new scenarios (named by Hadi, 5 October 2026,
+   after step 5d; steps 6 and 7 on hold). New files only; no change to framework code, a strength or a ruled value.
+   Settings: off; on with no timeline fact; on with the foreseeable task's raising fact over it (accord); on with a
+   raising fact over a delivery (through). Each script with the idle robot through the IRB, then with a working robot
+   through the MPB; the oracles' expectations committed before the runs. The set and its rules:
+   analysis/kitting/tk5e/README.md; design_records.md, "T-K", STEP 5E. [ruled; under way]
+6. dock_loading's part. [open unless marked] ON HOLD (Hadi, 5 October 2026, with step 7, while step 5e runs).
    - Its layouts and setups changed after stage 1's baseline was measured (`subtype` on the delivery bays and the
      pallets, 5d19859). [ruled as a fact]
    - Its two test sets (the recognition set and the planning set of stage 1) are stale since the gate's change; the
