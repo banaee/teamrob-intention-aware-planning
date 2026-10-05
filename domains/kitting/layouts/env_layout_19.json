@@ -1,0 +1,203 @@
+{
+  "space": {
+    "width": 2000,
+    "height": 1000,
+    "name": "Kitting Domain Layout 19",
+    "units": "cm",
+    "notes": "env_layout_08 with one coffee machine added (T-K part 1, step 5e; Hadi, 5 October 2026): every other object at its place, no A/C switch. env_layout_08's own note: Two kitting tables, for B3.B (T-B1b). env_layout_02's room and shelf positions."
+  },
+  "areas": [
+    {
+      "id": "zone_NW",
+      "bounds": {
+        "x_min": -1000,
+        "x_max": 0,
+        "y_min": 0,
+        "y_max": 500
+      }
+    },
+    {
+      "id": "zone_NE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 1000,
+        "y_min": 0,
+        "y_max": 500
+      }
+    },
+    {
+      "id": "zone_SW",
+      "bounds": {
+        "x_min": -1000,
+        "x_max": 0,
+        "y_min": -500,
+        "y_max": 0
+      }
+    },
+    {
+      "id": "zone_SE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 1000,
+        "y_min": -500,
+        "y_max": 0
+      }
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table_0",
+      "type": "kitting_table",
+      "position": [
+        -700,
+        -250
+      ],
+      "size": [
+        200,
+        100
+      ]
+    },
+    {
+      "id": "kitting_table_1",
+      "type": "kitting_table",
+      "position": [
+        700,
+        -50
+      ],
+      "size": [
+        200,
+        100
+      ]
+    },
+    {
+      "id": "shelf_0",
+      "type": "shelf",
+      "position": [
+        -950,
+        400
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "shelf_1",
+      "type": "shelf",
+      "position": [
+        -950,
+        -450
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [
+        -950,
+        0
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [
+        950,
+        400
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "shelf_4",
+      "type": "shelf",
+      "position": [
+        950,
+        -300
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "shelf_5",
+      "type": "shelf",
+      "position": [
+        950,
+        0
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "shelf_6",
+      "type": "shelf",
+      "position": [
+        -500,
+        -450
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "shelf_7",
+      "type": "shelf",
+      "position": [
+        300,
+        -450
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2
+    },
+    {
+      "id": "corner_SE",
+      "type": "landmark",
+      "position": [
+        950,
+        -450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls. Added in Track 2.5 (docs/assumptions.md 1.1) as the exit walk's target; the layout declared no landmark before."
+    },
+    {
+      "id": "coffee_machine_0",
+      "type": "coffee_machine",
+      "position": [
+        0,
+        450
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "notes": "Added in step 5e. Where it stands, and why: the north wall's middle. The shelves line the west, east and south walls and the two tables stand in the south-west and the east of the floor; the north wall between shelf_0 and shelf_3 is the one wall stretch with nothing against it, so a break corner there stays off the storage and the work, and its middle is about equally far from both tables. It stands on x = 0, the edge between zone_NW and zone_NE (the first declared, zone_NW, holds it; no kitting method reads an area). Placed from the room's arrangement, not for a recognizer result. From kitting_table_0: bearing 45.0 deg, 990 cm; from kitting_table_1: bearing 144.5 deg, 860 cm. Delivery walks: kitting_table_0 -> shelf_3: passes 395 cm from it, its heading 23.5 deg off the machine's bearing from kitting_table_0; kitting_table_1 -> shelf_0: passes 298 cm from it, its heading 20.3 deg off the machine's bearing from kitting_table_1; shelf_0 -> kitting_table_1: passes 298 cm from it, its heading 18.3 deg off the machine's bearing from shelf_0; shelf_2 -> kitting_table_1: passes 479 cm from it, its heading 27.1 deg off the machine's bearing from shelf_2; shelf_3 -> kitting_table_0: passes 395 cm from it, its heading 24.5 deg off the machine's bearing from shelf_3; shelf_5 -> kitting_table_0: passes 587 cm from it, its heading 34.0 deg off the machine's bearing from shelf_5; kitting_table_0 -> shelf_0: passes 905 cm from it, its heading 66.0 deg off the machine's bearing from kitting_table_0."
+    }
+  ]
+}

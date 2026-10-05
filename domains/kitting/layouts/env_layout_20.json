@@ -1,0 +1,241 @@
+{
+  "space": {
+    "width": 2000,
+    "height": 1000,
+    "name": "Kitting Domain Layout 20",
+    "units": "cm",
+    "notes": "env_layout_09 with one coffee machine added (T-K part 1, step 5e; Hadi, 5 October 2026): every other object at its place, no A/C switch. env_layout_09's own note: Two kitting tables against opposite walls (kitting_table_0 on the north wall, kitting_table_1 on the south wall): the realistic-placement variant of env_layout_08, where both tables stand in open floor. Storage along the side walls. T-B1b follow-up; scenario_s07_01 opens it, and it is not a measured fixture."
+  },
+  "areas": [
+    {
+      "id": "zone_NW",
+      "bounds": {
+        "x_min": -1000,
+        "x_max": 0,
+        "y_min": 0,
+        "y_max": 500
+      },
+      "label": "northwest_work"
+    },
+    {
+      "id": "zone_NE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 1000,
+        "y_min": 0,
+        "y_max": 500
+      },
+      "label": "northeast_work"
+    },
+    {
+      "id": "zone_SW",
+      "bounds": {
+        "x_min": -1000,
+        "x_max": 0,
+        "y_min": -500,
+        "y_max": 0
+      },
+      "label": "southwest_storage"
+    },
+    {
+      "id": "zone_SE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 1000,
+        "y_min": -500,
+        "y_max": 0
+      },
+      "label": "southeast_storage"
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table_0",
+      "type": "kitting_table",
+      "position": [
+        -500,
+        450
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "notes": "Against the north wall, centred in the northwest zone."
+    },
+    {
+      "id": "kitting_table_1",
+      "type": "kitting_table",
+      "position": [
+        500,
+        -450
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "notes": "Against the south wall, on the opposite side: the arrangement of the two that separates the tables most (67.3 ticks apart)."
+    },
+    {
+      "id": "shelf_1",
+      "type": "shelf",
+      "position": [
+        -950,
+        -350
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "West wall, south end. Robot item, delivered across the room to kitting_table_1."
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [
+        -950,
+        400
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "West wall, north end. Human's first item; no other shelf lies near its bearing from the human's start."
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [
+        700,
+        450
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "North wall, east end. Human's second item."
+    },
+    {
+      "id": "shelf_4",
+      "type": "shelf",
+      "position": [
+        950,
+        -100
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "East wall. Robot item, short haul to kitting_table_1."
+    },
+    {
+      "id": "shelf_5",
+      "type": "shelf",
+      "position": [
+        950,
+        -350
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "East wall, south end. Robot item, the shortest single task from the robot's start."
+    },
+    {
+      "id": "shelf_6",
+      "type": "shelf",
+      "position": [
+        -600,
+        -450
+      ],
+      "size": [
+        100,
+        100
+      ],
+      "slots": 2,
+      "notes": "South wall, west end. The robot's only kitting_table_0 item: its delivery ends at the far table."
+    },
+    {
+      "id": "corner_NE",
+      "type": "landmark",
+      "position": [
+        950,
+        450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_NW",
+      "type": "landmark",
+      "position": [
+        -950,
+        450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SE",
+      "type": "landmark",
+      "position": [
+        950,
+        -450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "corner_SW",
+      "type": "landmark",
+      "position": [
+        -950,
+        -450
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark (T-C1): a place for the human's script only; no task binds it. 50 cm in from both walls."
+    },
+    {
+      "id": "door",
+      "type": "landmark",
+      "position": [
+        0,
+        -480
+      ],
+      "size": [
+        80,
+        20
+      ],
+      "notes": "Landmark (T-C1): at the midpoint of the south wall, 20 cm inside it; no task binds it."
+    },
+    {
+      "id": "coffee_machine_0",
+      "type": "coffee_machine",
+      "position": [
+        125,
+        450
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "notes": "Added in step 5e. Where it stands, and why: the middle of the free stretch of the north wall, between kitting_table_0 (to x = -400) and shelf_3 (from x = 650). The tables stand against opposite walls and the storage along the side walls; a break corner against a wall beside a workplace, not on the open floor between the tables, and on the north wall rather than the south, where the door stands in the middle of the free stretch. Placed from the room's arrangement, not for a recognizer result. From kitting_table_0: bearing 0.0 deg, 625 cm; from kitting_table_1: bearing 112.6 deg, 975 cm. Delivery walks: kitting_table_0 -> shelf_3: passes 0 cm from it, its heading 0.0 deg off the machine's bearing from kitting_table_0; shelf_3 -> kitting_table_0: passes 0 cm from it, its heading 0.0 deg off the machine's bearing from shelf_3; kitting_table_1 -> shelf_2: passes 587 cm from it, its heading 37.0 deg off the machine's bearing from kitting_table_1; shelf_2 -> kitting_table_1: passes 587 cm from it, its heading 33.0 deg off the machine's bearing from shelf_2; kitting_table_1 -> shelf_3: passes 561 cm from it, its heading 35.1 deg off the machine's bearing from kitting_table_1; kitting_table_0 -> shelf_6: passes 625 cm from it, its heading 96.3 deg off the machine's bearing from kitting_table_0."
+    }
+  ]
+}

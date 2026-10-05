@@ -1,0 +1,60 @@
+{
+  "notes": "T-K part 1, step 5e, on env_layout_06: a second shift: the human's parts on the east shelves (shelf_2, shelf_7) and shelf_6, the robot's on the two middle shelves. No timeline of context facts (a scenario that is to meet a window states its own).",
+  "env_objects": [
+    {
+      "id": "item_41",
+      "type": "item",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_06): on shelf_2, designated to kitting_table_0."
+    },
+    {
+      "id": "item_42",
+      "type": "item",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_06): on shelf_7, designated to kitting_table_0."
+    },
+    {
+      "id": "item_43",
+      "type": "item",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_06): on shelf_6, designated to kitting_table_0."
+    },
+    {
+      "id": "item_44",
+      "type": "item",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_06): on shelf_4, designated to kitting_table_0."
+    },
+    {
+      "id": "item_45",
+      "type": "item",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_06): on shelf_3, designated to kitting_table_0."
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "notes": "T-K part 1, step 5e, on env_layout_05: env_setup_04's shift, so scenario_s04_01's script has its copies here. No timeline of context facts (a scenario that is to meet a window states its own).",
+  "env_objects": [
+    {
+      "id": "item_3",
+      "type": "item",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_05): on shelf_3, designated to kitting_table_0."
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_05): on shelf_6, designated to kitting_table_0."
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_05): on shelf_4, designated to kitting_table_0."
+    },
+    {
+      "id": "item_7",
+      "type": "item",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_05): on shelf_7, designated to kitting_table_0."
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_05): on shelf_5, designated to kitting_table_0."
+    }
+  ]
+}

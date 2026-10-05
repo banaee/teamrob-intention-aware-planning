@@ -1,0 +1,93 @@
+{
+  "notes": "T-K part 1, step 5e, on env_layout_02: a second shift: the human's parts on the west and south shelves around the break corner (shelf_1 beside the coffee machine and the A/C switch), the robot's on the east and south-east shelves. No timeline of context facts (a scenario that is to meet a window states its own).",
+  "env_objects": [
+    {
+      "id": "item_10",
+      "type": "item",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_1, designated to kitting_table_0."
+    },
+    {
+      "id": "item_11",
+      "type": "item",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_2, designated to kitting_table_0."
+    },
+    {
+      "id": "item_12",
+      "type": "item",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_6, designated to kitting_table_0."
+    },
+    {
+      "id": "item_13",
+      "type": "item",
+      "initial_container": "shelf_0",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_0, designated to kitting_table_0."
+    },
+    {
+      "id": "item_14",
+      "type": "item",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_3, designated to kitting_table_0."
+    },
+    {
+      "id": "item_15",
+      "type": "item",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_5, designated to kitting_table_0."
+    },
+    {
+      "id": "item_16",
+      "type": "item",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_4, designated to kitting_table_0."
+    },
+    {
+      "id": "item_17",
+      "type": "item",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_02): on shelf_7, designated to kitting_table_0."
+    }
+  ]
+}

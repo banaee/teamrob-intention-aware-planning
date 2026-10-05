@@ -1,0 +1,71 @@
+{
+  "notes": "T-K part 1, step 5e, on env_layout_20: the cross shift: the north-west shelf_2 and the south-west shelf_6 to the south table, the others to the north table (shelf_3's carry along the north wall past the coffee machine). No timeline of context facts (a scenario that is to meet a window states its own).",
+  "env_objects": [
+    {
+      "id": "item_61",
+      "type": "item",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_20): on shelf_1, designated to kitting_table_0."
+    },
+    {
+      "id": "item_62",
+      "type": "item",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_20): on shelf_2, designated to kitting_table_1."
+    },
+    {
+      "id": "item_63",
+      "type": "item",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_20): on shelf_3, designated to kitting_table_0."
+    },
+    {
+      "id": "item_64",
+      "type": "item",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_20): on shelf_4, designated to kitting_table_0."
+    },
+    {
+      "id": "item_65",
+      "type": "item",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_20): on shelf_5, designated to kitting_table_0."
+    },
+    {
+      "id": "item_66",
+      "type": "item",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5e (env_layout_20): on shelf_6, designated to kitting_table_1."
+    }
+  ]
+}
