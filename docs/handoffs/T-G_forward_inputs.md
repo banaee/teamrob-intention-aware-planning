@@ -1218,6 +1218,14 @@ intention-unaware" (the label named); the handoff docs/handoffs/handoff_T-F_part
 - dock_loading's two test-beds are stale since the gate rulings. [ruled] O as corrected (design_records.md, "T-F part
   1", THE MEASUREMENT): dock_loading's IRB and MPB sets and its six milestone runs were not rerun in T-F part 1; their
   rerun, and the figures they then get, belong to dock_loading's step (T-K part 1's step 6, section 5.7).
+- The tag per task, for the analyses of T-K part 1's step on dock_loading (Hadi, 5 October 2026; design_records.md, "T-F
+  part 1", THE TAG PER TASK; glossary §7). [ruled] Each task the human performs gets one tag by the facts in force when
+  it starts: in accord (a fact holds and the human performs the task the fact makes more likely), not in accord (a fact
+  holds and the human performs another task), no fact. Reported per tag: the ticks until the task is admitted, the
+  ticks a wrong task is admitted, the violation ticks inside the task; completion stays per run. A label of the
+  analysis, a term of the world; the robot never has it. It needs no special copy of a scenario. [open] For a fact that
+  lowers a task (the human just had a break), what "in accord" means is not decided (TODO-185), a question for this
+  chat.
 - The standing rules made in T-F part 1 (section 11 names them too). [ruled]
   - Every run made through a test or analysis instrument produces its per-tick figure: one file per run, every panel on
     one tick axis (the figures rule; N). A run made by run_mesa.py directly gets it from its log

@@ -134,6 +134,15 @@ intention-unaware", THE CLOSE). Everything named here is committed on `main`; Ha
 - **[ruling]** The recognition sets of steps 4 to 5b (analysis/kitting/irb/tk1, tk2, tk5b, with their run files) stay
   until T-F part 2 (O as narrowed). **[suggestion]** Decide at part 2 whether they are rerun under its runner or deleted.
 
+- **[ruling]** The tag per task, for the next analyses (T-K part 1's step on dock_loading, T-F part 2; Hadi, 5 October
+  2026; design_records.md, "T-F part 1", THE TAG PER TASK; glossary §7): each task the human performs gets one tag by the
+  facts in force when it starts: in accord (a fact holds and the human performs the task the fact makes more likely),
+  not in accord (a fact holds and the human performs another task), no fact. Reported per tag: the ticks until the task
+  is admitted, the ticks a wrong task is admitted, the violation ticks inside the task; completion stays per run. The
+  tag is a label of the analysis, a term of the world; the robot never has it. It replaces step 3b's class per scenario
+  copy, which mixes a run's tasks. **[open]** For a fact that lowers a task (the human just had a break), what "in
+  accord" means is not decided (TODO-185).
+
 ## 6. Open TODOs this work touched (verify the numbers in the repo)
 
 - TODO-137 closed (built and measured). TODO-144 (the evaluation's framing): part 1's result recorded, part 2 parked.
@@ -141,6 +150,7 @@ intention-unaware", THE CLOSE). Everything named here is committed on `main`; Ha
   human kept): open, future work.
 - TODO-183 (may a domain forbid a run condition?): forwarded to T-G's next stage.
 - TODO-184 (a stand at the robot's target that does not end): recorded, open.
+- TODO-185 ("in accord" for a fact that lowers a task): recorded, open, for Hadi's next chat.
 
 ## 7. Provenance
 

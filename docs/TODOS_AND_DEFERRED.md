@@ -4863,3 +4863,10 @@ aside a give-up threshold (a constant) and pointed to communication (X5, TODO-96
 authoring artefact (1.1) or the case is to be designed is the first decision.
 Files: shared/meta_planner.py (the fallback's re-decision), shared/projection.py (the fallback projection)
 Reference: design_decisions.md, "T-D X: response", X1, X5; "T-D P", P4; TODO-96, TODO-141
+
+**TODO-185: "In accord" for a fact that lowers a task (recorded, the tag per task, 5 Oct 2026)** open; not ruled; for Hadi's next chat
+The tag per task (design_records.md, "T-F part 1", THE TAG PER TASK; glossary §7, **in accord**) is defined for facts
+that raise a task (break_time raises coffee_break; room_warm raises ac_activation). For a fact that lowers a task (a
+suppressing condition: the human just had a break, the A/C is on), what "in accord" and "not in accord" mean is not
+decided.
+Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM36 (the three levels)

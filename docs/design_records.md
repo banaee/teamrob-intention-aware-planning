@@ -4249,4 +4249,20 @@ tasks starting while the fact holds, 52 are admitted earlier than with context k
 not in accord, of 119 such stretches, 31 earlier and 70 later. Wrong-admission ticks 633 → 613 (in accord) and 999 →
 1175 (not in accord). Completion and violations change little: completion 5 earlier, 62 equal, 5 later of 72 (in
 accord) and 5 / 119 / 10 of 134 (not in accord); violation ticks 10 → 5 and 18 → 24.
+THE TAG PER TASK (Hadi, 5 October 2026; recorded by ccode the same day; records only, nothing built). For the next
+analyses (T-K part 1's step on dock_loading, T-F part 2). Each task the human performs gets one tag in the analysis, by
+the facts in force when the task starts:
+- in accord: a fact holds, and the human performs the task that the fact makes more likely;
+- not in accord: a fact holds, and the human performs another task;
+- no fact: no fact holds.
+Reported per tag: how many ticks until the task is admitted, how many ticks a wrong task is admitted, and the violation
+ticks that fall inside the task. Completion stays per run.
+Reason: a run has several tasks, and a fact holds for only some of them, so a class per scenario copy mixes them; step
+3b already had to split inside each class. A tag per task works for any scenario, with no special copy.
+Points that belong to the ruling:
+- The tag is a label of the analysis. It compares what the human does with what the fact suggests; the robot never has
+  it. It is a term of the world, not of the robot's mind.
+- "in accord" and "not in accord" are new terms (glossary §7).
+- OPEN, not ruled, for Hadi's next chat (TODO-185): the definition covers facts that raise a task. For a fact that lowers
+  a task (the human just had a break), what "in accord" means is not decided.
 State: T-F part 1 CLOSED; T-F part 2 parked. Next: T-G's next stage with T-K part 1's steps on dock_loading.

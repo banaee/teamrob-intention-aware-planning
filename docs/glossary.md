@@ -1333,6 +1333,17 @@ stays not a term: it would suggest that the recognizer performs the θ gate. The
 (`none(unresolved)` before the Stage 1 build) is log text with its own meaning (the projector could not resolve the admitted hypothesis's task), not the finding's value
 **unresolved**.
 
+**in accord** / **not in accord** / **no fact** (the tag per task; Hadi, 5 October 2026; records only) — the one tag an
+analysis gives each task the human performs, by the facts in force when the task starts: **in accord**, a fact holds and
+the human performs the task that the fact makes more likely; **not in accord**, a fact holds and the human performs
+another task; **no fact**, no fact holds. A label of the analysis, a term of the world: it compares what the human does
+with what the fact suggests; the robot never has it, and no component of the mind reads it. Reported per tag: the ticks
+until the task is admitted, the ticks a wrong task is admitted, the violation ticks inside the task; completion stays per
+run. Open (TODO-185): the definition covers facts that raise a task; for a fact that lowers one (the human just had a
+break), what "in accord" means is not decided. Before it, step 3b of T-F part 1 used the two words as classes of a
+scenario copy (COMPARISON.md; analysis/kitting/tf1/make_copies.py), which the tag per task replaces for the next analyses.
+→ design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware", THE TAG PER TASK.
+
 ---
 
 ## 8. Sessions
