@@ -741,7 +741,7 @@ the tails; the finding and the lifecycle are for the rest of G and X (R5):
 - `update_human_projection()` admits a projection only when the gate clears. It resolves the key through
   `recognizer.get_hypothesis()` (the same live instance, held by reference) to project the human's task, and
   records the hypothesis it projected. Its refusal reasons are `none(below_theta)`, `none(leader_no_observation)`,
-  `none(leader_inadequate)` (G1), `none(leader_unwarranted)` (T-D G), `none(leader_outranked)` (T-K part 1, AM68), `none(no_human)` and `none(unprojectable)` (the projector could not resolve the
+  `none(leader_inadequate)` (G1), `none(leader_unwarranted)` (T-D G), `none(leader_outranked)` (T-K part 1, AM68), `none(intention_off)` (T-F part 1, the intention-unaware robot: the recognizer is not called, A), `none(no_human)` (asked before the gate since T-F part 1, E) and `none(unprojectable)` (the projector could not resolve the
   task; `none(unresolved)` before the Stage 1 build). When the recognizer is exhausted it refuses as
   `none(below_theta)`.
 

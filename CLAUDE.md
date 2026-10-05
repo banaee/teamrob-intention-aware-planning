@@ -552,8 +552,12 @@ Decisions
   and design_records.md, the entry of that title, R1 to R10; glossary §9): two run options `human_aware` and
   `intention_aware`, both on by default, an option off setting the options above it off; intention-unaware is
   TODO-137's fallback-only control (the gate refuses for both callers, `none(intention_off)`); human-unaware is a
-  condition of the mind, not of perception. Nothing built; the build's plan `docs/handoffs/plan_T-F_part1.md`, not
-  approved. The rest of T-F keeps its place after T-G.
+  condition of the mind, not of perception. The plan (`docs/handoffs/plan_T-F_part1.md`) is approved with A to G
+  (5 October 2026: under `intention_aware` off the recognizer computes nothing; human-unaware covers the mind and the
+  separation stop; `none(no_human)` before the gate in every run). Stage 1 is BUILT (5 October 2026; design_records.md,
+  the same title, STAGE 1 BUILT): the two options, the override and its line, the header, the refusals; with both on
+  every existing run is identical but for the two header fields and the reference logs' `none(no_human)`. Next: stage 2
+  (the planning test-bed's oracle, R9), after Hadi's go. The rest of T-F keeps its place after T-G.
   Not to be
   started unasked: T-F (its part 1 ruled and taken now), T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
@@ -686,7 +690,9 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout_03 --sce
 ```
 
 Logs go to `logs/run_<timestamp>.log`. Defaults come from the run file, `configs/experiment.yaml` or the yaml
-`--run` names; CLI flags override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--assignment_knowledge`
+`--run` names; CLI flags override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--human_aware` and `--intention_aware` (true/false; T-F
+part 1: off the human-unaware and the intention-unaware robot, an option off setting the options above it off),
+`--assignment_knowledge`
 (true/false; `--assignment_prior` before T-K part 1's build, no alias), `--context_knowledge` (true/false), `--strategy` (single_task | full_reorder), `--gate_strategy` (none | b2a | b2b),
 `--cost_strategy` (realized | plain),
 `--separation_stop` (true/false), `--test_level` (the recognizer's adequacy test level α, strictly between 0 and 1), `--run` (another run file; it replaced `--experiment` in T-L stage 4, no alias) and
@@ -696,7 +702,9 @@ names the policy and evaluation switches the run took (strategy, gate, cost, sto
 knowledge, θ, ρ, min_separation and β, each with its source: the body supplies both, `mesa_sim/mesa_configs.yaml`, 50 cm
 and 0.01 /cm; since T-D Stage 1 also the test level α and the body's speed, 20 cm/tick). After the `[run_mesa]` start
 line every log prints `[run_mesa] timeline source=<scenario|setup|none> windows=[...]`, the timeline of context facts in
-force (T-K part 1, AM40).
+force (T-K part 1, AM40). A run with `human_aware` or `intention_aware` off then prints `[run_mesa] options <option>=off
+sets off: ...`, the options the override set off (T-F part 1, R5); the `[run]` header prints `human_aware` and
+`intention_aware` and every option's effective value.
 
 Overrides (T-L stage 4; design_decisions.md, "Layouts, setups and scenarios", ruling 7; glossary §9): a closed list of
 three, one path each, the same in the run file's `overrides:` block (a mapping path: value) and in `--override`:
@@ -785,6 +793,7 @@ grep "^\[IR-reentry\]"  <log>   # a retired hypothesis live again, its terminal 
 grep "^\[IR-assignment\]" <log>  # at load: assignment knowledge on|off and the known assigned tasks (`[IR-prior] switch=` before T-K part 1)
 grep "^\[IR-context\]"   <log>   # context knowledge on: per tick the facts, the recency facts, the foreseeable tasks' levels and the prior (T-K part 1)
 grep "^\[run_mesa\] timeline" <log>   # the timeline of context facts in force and its source (T-K part 1, AM40)
+grep "^\[run_mesa\] options" <log>    # the options the override set off (T-F part 1, R5)
 grep "^\[sep\]"         <log>   # actual robot-human distance per tick
 grep "^\[hold\]"        <log>   # decided holds: start, end, planned, executed, interrupted
 grep "^\[stop\]"        <log>   # separation-stop refusals (stop on), with the assessed-window label

@@ -57,7 +57,8 @@ What changes, where:
   - admission asks `none(no_human)` before the gate, in every run [E].
   - the constructor's `intention_aware: bool = True` (the meta-planner's other options have defaults); the docstrings
     of `GateOutcome`, `_clears_gate`, `update_human_projection`; `evaluate_triggers`' "Two real triggers" corrected.
-- Tests, `tests/test_tf1_conditions.py`: the override for every combination of the four options (effective values, the
+- Tests, `tests/kitting/test_tf1_conditions.py` (kitting scenarios only): the override on six combinations of the
+  five options (effective values, the
   message); `_clears_gate` returns `INTENTION_OFF` on a belief that clears; the entering side does not fire; admission
   logs `fallback refused=none(intention_off)` and sets the fallback's expiry; a meta-planner with no human logs
   `none(no_human)`; one short headless run per condition on scenario_s10_02 (human-unaware: positions equal the

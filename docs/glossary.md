@@ -1554,6 +1554,10 @@ off sets `intention_aware`, both knowledge options and the separation stop off; 
 knowledge options off. The run names what it set to off; the `[run]` header prints the effective values.
 → design_decisions.md, "T-F part 1: the conditions human-unaware and intention-unaware"; design_records.md, the same
 title, R3, R5.
+BUILT (T-F part 1, stage 1, 5 October 2026): `--human_aware` and `--intention_aware`, the run file's keys, `true` by
+default in `configs/experiment.yaml` and the loader's fallback; `SimModel` takes both with no default and applies the
+override (`[run_mesa] options <option>=off sets off: ...`); the `[run]` header prints `human_aware=on|off
+intention_aware=on|off` before `assignment_knowledge`.
 
 ADDED (T-G records 11, Hadi, 2 October 2026; MPB-DL disposition D10): five terms of the test-beds, each defined from
 its use in the records. They name how scenarios are written and checked; none is a code name.

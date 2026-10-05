@@ -944,6 +944,11 @@ another live hypothesis strictly above it), `LEADER_OUTRANKED` (`none(leader_out
 retention stays by identity (AM69). With context knowledge off the leader is never outranked. The gate ruling (September 2026) kept the fixed share: a derived θ (TODO-64)
 and a margin gate (TODO-65) were considered and not taken; design_decisions.md, "The gate stays
 a fixed share".
+BUILT (T-F part 1, R6, A, E, 5 October 2026; design_decisions.md, "T-F part 1: the conditions human-unaware and
+intention-unaware"): the constructor takes `intention_aware: bool = True`; with it False, `_clears_gate` answers
+`INTENTION_OFF` (`none(intention_off)`) before anything else, for both its callers, so `recognition_changed` never
+enters and admission always refuses to the fallback projection. Admission asks `human_agent_id is None`
+(`none(no_human)`) before the gate, in every run; the order of the refusals below is otherwise unchanged.
 
 `recognizer` is the **same live instance** the owning agent holds, not a second one built
 here — `get_hypothesis()` is a static lookup built once at recognizer construction and is

@@ -4003,3 +4003,31 @@ F's Q4 are conceptual: design_decisions.md, the same title, AMENDED. Here:
   projections only; "the recognition columns as today" is superseded.
 - The plan: APPROVED with A to G (docs/handoffs/plan_T-F_part1.md, its status line and the sections A to G change).
 Next: the build's stage 1, then a pause.
+STAGE 1 BUILT (ccode, 5 October 2026; the plan's section 2, with A to F):
+- The options: `--human_aware`, `--intention_aware` and the run file's keys (`mesa_sim/run_mesa.py`,
+  `configs/experiment.yaml`, its stale commitment-warrant comment corrected); `SimModel` takes both with no default and
+  applies the override (R5) in its one home, so the headless run, the viewer and the instruments get the same effective
+  values; the line `[run_mesa] options <option>=off sets off: ...` after the timeline line, naming only the options
+  whose stated or default value was on (none: no line); the `[run]` header's `human_aware=on|off intention_aware=on|off`
+  before `assignment_knowledge`. Human-unaware: the robot is given no observed human (D). Intention-unaware: the
+  recognizer is not called (`RobotAgent.step`, `observe_initial`), `_perceive` still runs (A). No `[coverage]` and
+  `[scenario-coverage]` lines with `intention_aware` off (F).
+- `shared/meta_planner.py`: `intention_aware: bool = True`; `GateOutcome.INTENTION_OFF` (`none(intention_off)`), asked
+  first in `_clears_gate` (R6, A); admission asks `none(no_human)` before the gate (E); docstrings, `evaluate_triggers`'
+  "Two real triggers" corrected. Unchanged: the recognizer, the gate's rule for the intention-aware run, the trigger
+  rule, the fallback projection, the candidates and the cost.
+- The other `SimModel` call sites pass `human_aware=True, intention_aware=True` (17 test files, list_scenarios.py, the
+  IRB's and the MPB's instruments, the two frozen scripts as at AM51). Tests: tests/kitting/test_tf1_conditions.py (13:
+  the override on six combinations, the header, the gate's two callers, `none(no_human)` before the gate, one run per
+  condition on scenario_s10_02); the suite 378 passed (365 before).
+- The identity check (B0 at 6cc69fb, no code change since db99f74, against the build; both in the session's scratchpad,
+  each job in its own copy of the tree): the four maintained sets (48 logs), the kitting MPB under single_task,
+  full_reorder and the prior-off appendix (16 scenarios each, every instrument output), the IRB's s08 and s09 (17),
+  dock_loading's six milestone runs: 1082 outputs identical (logs after removing ` human_aware=on intention_aware=on`
+  from `[run]`; every `.rec` and instrument output by bytes); 3 differ, the robot-alone reference logs of
+  scenario_s10_06 (one per run variant), in 5 `[meta-proj]` lines each, `none(below_theta)` → `none(no_human)` (E).
+- The conditions on scenario_s10_02, headless: human-unaware completes at 61 with no hold and the [sep] minimum 18.54
+  cm (3 violations by the moving robot, 1 recede), as the robot alone; intention-unaware decides at
+  `no_current_task` and 11 `projection_expired` ticks, holds 5 at 40 on a fallback, completes at 66 with the minimum
+  52.20 cm (the intention-aware run: the hold 5 at 25 on the admitted plan, 66, 52.20 cm).
+Next: stage 2 (the instruments), after Hadi's go.
