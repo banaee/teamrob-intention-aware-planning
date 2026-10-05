@@ -4098,3 +4098,79 @@ facts dark; the decision panel's rows are robot task (with the holds hatched), p
 named where it differs from the last named. Not covered by the rule as built: the regression sweeps of the four
 maintained sets and the dock_loading milestone runs (run_mesa.py directly, logs only), and the robot-alone reference
 run; a question for Hadi.
+THE MEASUREMENT, RULINGS K TO O (Hadi, 5 October 2026; recorded by ccode the same day, as given). The measurement of
+R10 and H: what recognition adds to planning, four conditions on the same scenarios (human-unaware, intention-unaware,
+intention-aware with context knowledge off and on), all under `single_task`. Steps 4 to 5e of T-K part 1 compared
+context knowledge off against on, both sides recognising intentions; this adds the missing side.
+- K. Names. One folder per scenario, named by the scenario id; inside it the runs of the conditions by serial; no
+  setting in any file or folder name. Supersedes naming every run by serial alone (I's form for the outputs). Reason:
+  the scenario is what a run is about, not a setting the measurement varies; the runs of one scenario then lie side by
+  side, and a reader finds a figure without opening the table.
+- L. The scenarios: the planning test-bed's 16, step 5's 6 planning cases and step 5e's 106 planning scenarios in the
+  form with no timeline fact, 128 in all four conditions (512 runs); step 5e's 176 copies with timeline facts,
+  intention-aware with context knowledge on only; 688 runs in total. Reason: the four conditions must run identical
+  scenarios; a timeline acts only through context knowledge, so the 176 copies add rows in that one condition only;
+  they are the runs in which the context panel shows timeline facts, and their old folders are to be deleted.
+- M. Declared properties are not checked in the measurement; the oracle check runs on every row where it applies.
+  Reason: they were written for one condition; the planning test-bed keeps checking them in its own maintained outputs.
+- N. The figure, completing what the last session built: one figure file per run, every panel on one shared tick axis:
+  the belief; the tail probability S; the adequacy finding; the context panel (context knowledge on); the observation
+  warrant and the gate's answer per tick with its refusal reason; the decision panel; the robot-to-human distance,
+  readable near min_separation. A human-unaware or intention-unaware run keeps the panels that apply. Reason: the reader
+  lines up belief, gate, decision and distance on one tick by eye; two files with different axes do not allow it; the
+  ticks below min_separation are the measure, and a scale of 0 to 1600 cm hides them.
+- O. Figures for the sets the measurement does not run: run them once more so that each has its figures; every other
+  output must come out identical to the existing one, and any that does not is reported. Not the robot-alone reference
+  run. Reason: the standing rule (every test and analysis run has its per-tick figure) should hold for what exists now.
+  NARROWED (Hadi, the same day): of the recognition runs of steps 4 to 5e only those of steps 4 to 5b (irb/tk1, tk2,
+  tk5b), which stay as sets until T-F part 2; step 5e's recognition runs are not rerun (the measurement runs the same
+  human scripts with a working robot; Hadi intends to delete them). CORRECTED (Hadi, the same day): dock_loading's two
+  test-beds and its milestone runs are not rerun; they are stale since the gate rulings, until dock_loading's own step,
+  which brings their figures.
+- E (the step's part E; widened by Hadi the same day): a table, not executed, of every folder under analysis/ and the run
+  files under configs/: what it is, whether a record cites it (by its present path or its path before the sort of 1
+  October), and a judgement: maintained (stays, and takes K's names on its next run), replaced (runs deleted, report
+  kept), old record (data deleted, reports and scripts kept), or keep. Hadi's intentions: step 5e, steps 5 and 5b's
+  planning runs, stage 2's check and their run files are replaced; the recognition runs' run files deleted, each
+  step's report kept, every record citing a deleted path given one line; the old frozen analyses under analysis/kitting
+  (td_stage1, td_stage1b, l_build, irb2b_exposed_interval, ablation_task_committed, f47_fixtures,
+  t1_conflict_measurement, todo90_b2a_window, tc2c_scripts, tb1d_designations, tb2c_per_entry_holds, big_picture)
+  deleted completely, as on 4 October (one note in analysis/README.md naming the last commit that holds them; the
+  records' citations stay), unless something in one is still used. Reason: analysis/ holds about 18,000 files and
+  2.5 GB (step 5e alone 12,001 and 1.7 GB), which Hadi cannot read; the frozen analyses were made on a recognizer that
+  no longer exists, their conclusions are in the records, and git history and the outside copy of 2 October hold them.
+  Nothing is deleted or untracked before Hadi rules on the table.
+BUILT AND RUN (ccode, 5 October 2026):
+- A (f849db9, edae0e4): `analysis/instruments/irb/plot.py` `draw`, the one figure's builder, the panels from the top:
+  the belief over H (one panel per four hypotheses, all in the file), the context panel directly under the belief (the
+  earlier figures ruling's place), S (one panel per four), the finding, the warrant per hypothesis and the gate's answer
+  per tick (one row per answer: clears or the refusal's reason), the decision panel (with the oracle's expected
+  decisions), the distance (the `[sep]` line's continuous minimum on 0 to 4 × min_separation, larger values at the top
+  edge, the ticks below min_separation shaded by F1's class, the closest approach written); `mpb/plot.py` draws it for
+  every planning run (figure_ir.png no longer drawn; `plot_ir.py` keeps the rows helper); `mpb/figure_of_log.py` draws
+  it for a run made by run_mesa.py directly, from its log (the four maintained sets' sweep.sh call it). K:
+  `run_set.sh` writes `<out_root>/<scenario>/<run>/`, the log and `.rec` inside; `table.py` reads that layout.
+- B (3d7a26a, efb16fe): 688 run files, `configs/kitting/tf1/measurement/<scenario>/run_NNN.yaml` (written by
+  `analysis/kitting/tf1/make_runs.py`; the four conditions of a scenario consecutive); outputs in
+  `analysis/kitting/tf1/measurement/`, `results.csv` and `results.md`. The oracle compared on all 688 rows, 0
+  disagreements; every row's header settings agree with R5's reading; the 128 human-unaware rows equal the robot-alone
+  reference run on every compared tick (objects separate in all 128).
+- D (efb16fe): `analysis/kitting/tf1/REPORT.md` (tables per set and condition, the pair counts, findings 1 to 7, none
+  ruled; `tables.py`). ccode's correction: the result table's `completion` is the tick after the robot's last release
+  even when its pool did not complete; the report counts completion only with a terminal decision (five runs do not
+  complete within the cap: scenario_s02_02 intention-unaware and intention-aware, and its copies s17_08, s17_10).
+- O (edae0e4, 26ca369, and the copy-in of this record's commit): rerun with their figures, every other output compared
+  with the existing one: the four maintained sets (48 runs; every `.rec` byte-identical, every log identical but the
+  `[run]` line's ` human_aware=on intention_aware=on`, which the logs on disk predated; new md5 sections in their
+  READMEs); kitting's IRB s08/s09 (17), irb/tk1 (31), irb/tk2 (57 and tk2/off 2), irb/tk5b (17): 1116 files identical,
+  124 logs identical but those two fields, none differing; kitting's MPB set under single_task, full_reorder and the
+  prior-off appendix: 659 identical, 48 logs but the two fields, 2 differing, the robot-alone reference logs of
+  scenario_s10_06 in their 5 `[meta-proj]` lines (`none(below_theta)` → `none(no_human)`: stage 1's named exception
+  E). No tracked file changed. Not rerun (O as narrowed and corrected): step 5e's recognition runs, dock_loading's IRB,
+  MPB and milestone runs (the milestone sweep added in edae0e4 withdrawn, 8da7b2a). The old `figure_N.png` (88, the
+  IRB's faceted parts) and `figure_ir*.png` (32) stay beside the new `figure.png` until Hadi's ruling on part E.
+- ccode's flags on the rulings (the step's report): L runs step 5's three timeline copies (scenario_s16_02, _04, _06)
+  in all four conditions, against L's own reason (they equal their bases in HU, IU and IA-off); N's list puts the
+  context panel after the finding, the figure keeps it under the belief (the earlier figures ruling's place); deleting
+  the recognition runs' run files would leave their outputs with no way to rerun them.
+State: the measurement run and reported; part E's table with Hadi. Next: Hadi's ruling on part E.

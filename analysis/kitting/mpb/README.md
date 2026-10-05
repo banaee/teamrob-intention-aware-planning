@@ -622,3 +622,14 @@ STAGE 2 BUILT and THE FIGURES). `run.sh` and its outputs are unchanged but for t
   and intention-aware; outputs in `analysis/kitting/tf1/check/`, its `results.md`).
 
     bash analysis/instruments/mpb/run_set.sh kitting -o analysis/kitting/tf1/check configs/kitting/tf1/check/run_*.yaml
+
+## The measurement of T-F part 1: one figure per run, the set rerun (5 October 2026)
+
+Since the measurement (N; design_records.md, "T-F part 1", THE MEASUREMENT): `run.sh` draws one figure per run,
+`figure.png` (`analysis/instruments/mpb/plot.py` through the IRB's builder): the belief over H, the context panel, S,
+the finding, the warrant and the gate's answer per tick, the decision panel with the oracle's expected decisions, and
+the robot–human distance on 0 to 4 × min_separation; `figure_ir.png` is no longer drawn (the old `figure_ir*.png` files
+stay beside it until Hadi's ruling on the folders, part E). `run_set.sh` names a run's folder `<out_root>/<scenario>/<run>/`
+(K). The set was rerun under single_task, full_reorder and the prior-off appendix (O): every output identical to the
+section above but the figures, the two condition fields of each log's `[run]` line, and stage 1's named exception E in
+the two robot-alone reference logs of scenario_s10_06 (`none(below_theta)` → `none(no_human)`, 5 lines each).

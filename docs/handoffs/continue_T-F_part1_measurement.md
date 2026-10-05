@@ -1,5 +1,8 @@
 # Continuation note: T-F part 1, the measurement (ccode, 5 October 2026)
 
+RESOLVED (the same session resumed, 5 October 2026): the three remaining steps are done; the record is
+design_records.md, "T-F part 1", THE MEASUREMENT, RULINGS K TO O. This note stays as written below.
+
 Written at a safe stop, in case the session cannot resume. Nothing is running; nothing was deleted; no file is
 half-edited. The step's prompt: "STEP: the measurement of T-F part 1" (parts A to E, rulings K to O), with Hadi's three
 later changes below.

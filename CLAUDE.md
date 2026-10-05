@@ -562,6 +562,11 @@ Decisions
   (`table.py`), the oracle extended to both conditions; the check (the planning test-bed's 16 in each condition,
   `configs/kitting/tf1/check/`, `analysis/kitting/tf1/check/`) 0 disagreements. Next: the measurement (H), after
   Hadi's rulings on its open points. The rest of T-F keeps its place after T-G.
+  The measurement is RUN (5 October 2026; rulings K to O, design_records.md, "T-F part 1", THE MEASUREMENT;
+  `analysis/kitting/tf1/REPORT.md`): 128 scenarios in the four conditions and step 5e's 176 timeline copies
+  intention-aware with context knowledge on, 688 runs, `single_task`, 0 disagreements with the oracle; outputs one
+  folder per scenario, the runs by serial (K); one figure per run on one tick axis (N). Next: Hadi's ruling on the table
+  of the folders under analysis/ and configs/ (part E); nothing deleted before it.
   Not to be
   started unasked: T-F (its part 1 ruled and taken now), T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
@@ -615,7 +620,9 @@ Decisions
   the decisions per tick, and with context knowledge on the context facts in force beneath the belief; in a
   human-unaware or intention-unaware run the decisions, their projection (none or the fallback), the holds and the
   robot–human distance against min_separation. A set gets its figures when it is next run; no old set is rerun only to
-  make figures. Reason: Hadi reads a run from its figure.
+  make figures. Reason: Hadi reads a run from its figure. Since the measurement of T-F part 1 (N): one figure file per
+  run (`figure.png`), every panel on one shared tick axis, the distance on a scale readable near min_separation; a run
+  made by `run_mesa.py` directly gets it from its log (`analysis/instruments/mpb/figure_of_log.py`).
 - When a task delegates a decision, decide from the design: state the reasoning before implementing, then evaluate. If the evaluation contradicts the reasoning, report it; do not switch the decision to fit the results.
 
 ## Workflow rules
