@@ -1,0 +1,17 @@
+# The measurement of T-F part 1 (not a baseline): scenario_s25_06, intention-aware, context knowledge on. From configs/kitting/tk5e/mpb/off/scenario_s25_06.yaml.
+# Run: analysis/instruments/mpb/run_set.sh kitting -o analysis/kitting/tf1/measurement <this file>
+
+domain: kitting
+layout: env_layout_19
+setup: env_setup_25
+scenario: scenario_s25_06
+steps: 358
+human_aware: true
+intention_aware: true
+assignment_knowledge: true
+context_knowledge: true
+strategy: single_task
+gate_strategy: none
+cost_strategy: realized
+separation_stop: false
+test_level: 0.05
