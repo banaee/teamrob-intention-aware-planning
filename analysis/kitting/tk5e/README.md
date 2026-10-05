@@ -1090,3 +1090,45 @@ f94de4cf4f3101003b898cda56dccffc  mpb/off/scenario_s30_38/on_single_task/expecte
 9aac8d465a4249cadad0caf37ec96ea5  mpb/off/scenario_s30_42/on_single_task/expected_ticks.json
 09c91501419c7f1ccba216518c479444  mpb/off/scenario_s30_46/on_single_task/expected_ticks.json
 ```
+
+## After the runs (5 October 2026): the oracle's `recent` fix and the 33 changed expectation tables
+
+The recognition oracle's `recent` column was empty on ticks with no live hypothesis, though its memory held the completion (the recognizer reports it there): 9 runs showed it as their only disagreement. Fixed in `analysis/instruments/irb/oracle.py` (REPORT.md, "What was run"). The committed oracle reproduces every table committed above; the fixed one changes only `recent` on those ticks, in these 33 tables (their md5 after the fix; all other 351 recognition and all 388 planning tables are as committed):
+
+```
+12424ad652cb06e36edf7b17bc78ec16  irb/on/scenario_s21_01/expected.csv
+04bd95c4eb05b38da7da46d217c2938a  irb/on/scenario_s21_02/expected.csv
+d0c38a15553e5714ca78c6f8fcc7d39c  irb/on/scenario_s21_04/expected.csv
+4be6c6addd5ec16eaa77a86a11bd446c  irb/on/scenario_s22_05/expected.csv
+5fd6c55fc621d55f41f35390d160fbe5  irb/on/scenario_s22_07/expected.csv
+f42089016a7e0eeec5f7809ef61a35f5  irb/on/scenario_s22_09/expected.csv
+571a402302de8a0c95e2d4347a9305df  irb/on/scenario_s22_17/expected.csv
+f2fb5ae44666a20003f4afaebc4969f2  irb/on/scenario_s22_19/expected.csv
+b9c1dc2dcfb438f58d89481186969c9d  irb/on/scenario_s22_21/expected.csv
+76eed4fb8a768fd48240a3d6472e9577  irb/on/scenario_s25_27/expected.csv
+0dcf03b0ef8a35638c79e290771ea6db  irb/on/scenario_s25_29/expected.csv
+1cee95dba8fa6fcd8743a3a67425c8a8  irb/on/scenario_s25_31/expected.csv
+4ca2b326d9035e4fffaec7e7a45b9ad6  irb/on/scenario_s25_33/expected.csv
+abb7e1c8302b52cf1c9c8a32ab4dfd46  irb/on/scenario_s25_35/expected.csv
+ebc8a19d8a4ba28f03a36dc9dae45947  irb/on/scenario_s25_37/expected.csv
+44c769ca66a27751591cb2712196ef16  irb/on/scenario_s26_47/expected.csv
+0dcaf20a17ef7b062da489e1d9451521  irb/on/scenario_s26_49/expected.csv
+356ea66532fb6b60d9b05c19488304c7  irb/on/scenario_s26_51/expected.csv
+8a1296cba65700c3b7adb66095e57bd5  irb/on/scenario_s27_29/expected.csv
+7eb0bd35c1a69f855a59cc3a893ef240  irb/on/scenario_s27_31/expected.csv
+63473c5ef6f9bf2633ab4c6a7148ffa1  irb/on/scenario_s27_33/expected.csv
+801d4f55d4cefa96549744c9efb62e2e  irb/on/scenario_s27_43/expected.csv
+9c52bfd4bf0b5c51e7d7131f4155b25f  irb/on/scenario_s27_45/expected.csv
+9a90ebdfa19f8368a1baad4da4ef22af  irb/on/scenario_s27_47/expected.csv
+823725b11012683753d680ca41fafd2e  irb/on/scenario_s28_31/expected.csv
+67221b05579153e6a09a19c2dd0d50c5  irb/on/scenario_s28_33/expected.csv
+12d1961902c542340cdc6b9418937340  irb/on/scenario_s28_35/expected.csv
+545345958b025bbdb1bfde72a513f0ba  irb/on/scenario_s29_09/expected.csv
+b7832669601ff1c20a4164ec19870d5d  irb/on/scenario_s29_11/expected.csv
+95f56c01404573368869bae6fe0542aa  irb/on/scenario_s29_13/expected.csv
+2d75165cfdfaba781dc89ff5e59e3062  irb/on/scenario_s30_27/expected.csv
+1024964a6db6d0189450b68bbf60879b  irb/on/scenario_s30_29/expected.csv
+2d75165cfdfaba781dc89ff5e59e3062  irb/on/scenario_s30_31/expected.csv
+```
+
+Results: REPORT.md; the comparison: `comp5e.py` (run from the repository root). The per-run outputs stay untracked under `irb/{on,off}/` and `mpb/{on,off}/` (logs and `.rec` in each `runs/`).
