@@ -1530,6 +1530,28 @@ the run log. A run with an override is never a fixture or a baseline. Not an inj
 `layout.<object>.position`, `setup.<object>.initial_container`), read into a typed class at the input boundary.
 → `mesa_sim/overrides.py`; `mesa_sim/sim_model.py`, `SimModel.__init__` (where they are applied).
 
+ADDED (T-F part 1, Hadi, 5 October 2026; not built): the three conditions of the robot and their run options.
+"Blind" is not used for any of them.
+
+**human-unaware** — the robot's condition in which the human is in the world, moves, and the robot can come below
+`min_separation` of the human, while the recognizer and the meta-planner receive no human: the robot plans and moves as
+if the workspace were empty. A condition of the robot's mind, not of its perception: the world state keeps the human's
+facts (TODO-131). Run option `human_aware` off.
+
+**intention-unaware** — the robot's condition in which it observes the human and the gate admits nothing: every
+decision rests on the **fallback projection**, or on no projection before a first observation. The gate's refusal is
+`none(intention_off)`. TODO-137's fallback-only control. Run option `intention_aware` off.
+
+**intention-aware** — the framework as designed: the robot observes the human and the gate may admit a task; assignment
+knowledge and context knowledge are its own options (§5). Both run options on.
+
+**`human_aware`** / **`intention_aware`** (the run options) — two run options, both on by default, in the form of
+`assignment_knowledge` and `context_knowledge`. An option that is off sets every option above it to off: `human_aware`
+off sets `intention_aware`, both knowledge options and the separation stop off; `intention_aware` off sets both
+knowledge options off. The run names what it set to off; the `[run]` header prints the effective values.
+→ design_decisions.md, "T-F part 1: the conditions human-unaware and intention-unaware"; design_records.md, the same
+title, R3, R5.
+
 ADDED (T-G records 11, Hadi, 2 October 2026; MPB-DL disposition D10): five terms of the test-beds, each defined from
 its use in the records. They name how scenarios are written and checked; none is a code name.
 

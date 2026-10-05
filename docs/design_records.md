@@ -3953,3 +3953,37 @@ STEPS 5D AND 5E: THE DECISIONS CONFIRMED; THE DISCOVERY TEST UPDATED (Hadi, 5 Oc
   suite: 365 passed.
 Next: steps 6 and 7 on hold until Hadi rules.
 
+
+## T-F part 1: the conditions human-unaware and intention-unaware
+
+THE RULINGS (Hadi, 5 October 2026; recorded by ccode the same day). Made after ccode's read-only verification of the
+same day (chat only, no file). The conceptual part (R2, R4, R5's premise, R6, R7) is in design_decisions.md, the entry
+of this title. Records only, nothing built.
+- R1. The name: "T-F part 1: the conditions human-unaware and intention-unaware", taken now, while T-K part 1's steps 6
+  and 7 are on hold. The rest of T-F keeps its place after T-G. Reason: its only purpose is the evaluation's comparison,
+  and TODO-144 names TODO-137 as a prerequisite.
+- R3. Two run options, `human_aware` and `intention_aware`, both on by default, in the form of `assignment_knowledge`
+  and `context_knowledge`: `--human_aware true|false`, `--intention_aware true|false`, the run file's keys of the same
+  names, `human_aware=on|off intention_aware=on|off` in the `[run]` header. Reason: each names its condition directly
+  (`human_aware` off is the human-unaware robot, `intention_aware` off the intention-unaware robot).
+- R5, its form. An option that is off sets every option above it to off, whatever the default, the run file or the
+  command states: `human_aware` off sets `intention_aware`, `assignment_knowledge`, `context_knowledge` and the
+  separation stop to off; `intention_aware` off sets `assignment_knowledge` and `context_knowledge` to off. The run
+  prints a message naming what it set to off, then runs; the `[run]` header prints the effective values; nothing stops
+  at load. Reason: design_decisions.md, R5's premise.
+- R8. `--cost_strategy plain` stays untouched and is not a column of the measurement. Reason: the verification showed
+  the same behaviour as human-unaware in both runs, and plain differs by construction (re-decisions at triggers whose
+  results it ignores); removing it is a cleanup outside this work, ruled with T-F (TODO-144's note).
+- R9. The planning test-bed's oracle is extended to both conditions, as instrument work, in the build's second stage.
+  Intention-unaware: the recognition columns as today; the gate refuses on every tick with `none(intention_off)`;
+  decisions only at `no_current_task` and `projection_expired`; every projection a fallback projection. Human-unaware:
+  no recognition lines; decisions only at `no_current_task`, no projection, hold 0; the robot's positions equal the
+  reference run's where the human's script is independent of the robot. Not included: the declared properties per
+  scenario (authored for the intention-aware run). Reason: the oracle checks the mechanism, not a scenario's design;
+  without it these two columns would be the only unverified columns of the measurement.
+- R10. The measurement, a separate step after the build, not planned now: the existing planning scenarios in four
+  columns (human-unaware; intention-unaware; intention-aware with context knowledge off; intention-aware with it on).
+  Measures from the log: completion, held ticks, the ticks below `min_separation` with F1's classes, the passes by a
+  standing robot. Which sets: decided at that step.
+State: nothing built. The build's plan: docs/handoffs/plan_T-F_part1.md, written by ccode, not approved. Next: Hadi's
+rulings on the plan's open points, then the build's stage 1.

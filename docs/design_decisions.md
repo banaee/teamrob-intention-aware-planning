@@ -5561,3 +5561,42 @@ subtype, the two must be equal, or loading the setup fails; an object without a 
 stays free: the human can place a pallet in a bay of another subtype, and that is a deviation in the world, not an
 error of the setup. The robot does not read `subtype`. The setup's `destination` field stays the statement of where a
 pallet belongs. A fixed object reads its subtype from the layout entry, a movable object from the setup entry.
+
+**T-F part 1: the conditions human-unaware and intention-unaware (ruled by Hadi, 5 October 2026)**
+Ruled after ccode's read-only verification of 5 October 2026; records only, nothing built. R1 to R10 are this entry's
+labels (not T-K's). The conceptual part is here: R2, R4, R5's premise, R6, R7. The name, the run options, the form of
+the override, plain cost, the test-bed's oracle and the measurement are in `docs/design_records.md` (index line below).
+Terms: glossary §9 (**human-unaware**, **intention-unaware**, **intention-aware**; `human_aware`, `intention_aware`).
+It answers TODO-137.
+- R2. Three conditions of the robot.
+  - human-unaware: the human is in the world and moves, and the robot can come below `min_separation` of the human.
+    The recognizer and the meta-planner receive no human. The robot plans and moves as if the workspace were empty.
+  - intention-unaware: the robot observes the human. The gate admits nothing. Every decision rests on the fallback
+    projection, or on no projection before a first observation.
+  - intention-aware: the framework as designed. The gate may admit a task. Assignment knowledge and context knowledge
+    are its own options.
+  Reason: the evaluation compares what recognition adds to planning; steps 4 to 5e of T-K part 1 compared two sides
+  that both recognise intentions. The words are literal and parallel. "Blind" is not used: it is figurative, and an
+  older record uses it for another thing (TODO-85 (b)).
+- R4. Human-unaware is a condition of the robot's mind, not of its perception. The world state stays as the body writes
+  it, the human's facts included; no component of the mind uses them. Limit: a world state without the human is the
+  perception layer's design (TODO-131), not a run option. Reason: the measured behaviour is the same (the verification:
+  the robot's per-tick positions equal the robot-alone reference run's in scenario_s10_02 and scenario_s06_02).
+- R5, its premise. The gate is the one reader of the belief for a decision (`_clears_gate`; the planner takes the
+  belief and reads nothing of it). When the gate always refuses, assignment knowledge and context knowledge change no
+  decision; when the mind holds no human, they and the execution-time separation stop (which reads the human's actual
+  position) have nothing to act on. So an option that is off sets every option that depends on it to off (the form:
+  the record). Reason: a knowledge option stated as on would label a run with a setting that has no effect, and two runs
+  with the same information would carry different labels.
+- R6. Intention-unaware: the gate refuses for both of its callers, admission and the entering side of
+  `recognition_changed`, with the printed reason `none(intention_off)`. Reasons: the gate has one home, and a refusal at
+  admission alone would let `recognition_changed` fire on every tick the gate clears; the log prints the cause, not the
+  gate's natural outcome on that tick. Consequence: no hypothesis is ever recorded, so `recognition_changed` cannot
+  fire; decisions come at `no_current_task` and `projection_expired`, each on a fallback projection. The recognizer runs
+  and logs on every tick, as today, so the log records what the gate would have admitted beside the run that did not use
+  it. Unchanged: the recognizer, the gate's rule in the intention-aware run, the trigger rule, the fallback projection,
+  the candidates and the cost.
+- R7. Human-unaware: admission prints `none(no_human)`, not `none(below_theta)`, and no label in the log states a
+  setting that is not in effect. Reason: as R6, the log prints the cause.
+→ RECORD [T-F_part1/1] (written 5 October 2026): docs/design_records.md, under "T-F part 1: the conditions
+human-unaware and intention-unaware": R1, R3, R5's form, R8, R9, R10; the state.
