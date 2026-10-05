@@ -9,7 +9,9 @@ The runs are run_set.sh's: <out_root>/<scenario>/<run>/, the log <run>.log in it
 Columns:
 - run (the run file's name), domain, scenario, layout; human_aware, intention_aware, assignment_knowledge,
   context_knowledge, strategy (the header's; `settings_agree`: R5's reading of the run file gives the same);
-- completion (the world tick after the robot's last release on a task), terminal (the terminal decision's tick),
+- completion (the world tick after the robot's last release on a task, where the pool completed; `unfinished` when the
+  run has no terminal decision within its cap, whatever releases came before; since the comparative report of the
+  measurement, 5 October 2026: the column had shown the last release's tick for an unfinished run), terminal (the terminal decision's tick),
   decisions (fired triggers), hold_ticks, near_encounters (ticks whose continuous [sep] minimum lies below
   min_separation), viol, recede (a moving robot), stand_passing, stand_beside (a standing robot, the human passing or
   standing; analysis/instruments/common/separation.py), sep_min (the continuous minimum);
@@ -44,7 +46,7 @@ def row(d: Path, root: Path):
     return dict(run=d.name, domain=s["domain"], scenario=s["scenario"], layout=s["layout"],
                 human_aware=h["human_aware"], intention_aware=h["intention_aware"],
                 assignment_knowledge=h["assignment_knowledge"], context_knowledge=h["context_knowledge"],
-                strategy=h["strategy"], settings_agree=s["agree"], completion=m["completion"], terminal=m["terminal"],
+                strategy=h["strategy"], settings_agree=s["agree"], completion=m["completion"] if m["terminal"] is not None else "unfinished", terminal=m["terminal"],
                 decisions=len(m["decisions"]), hold_ticks=m["measures"]["hold_ticks"],
                 near_encounters=m["measures"]["near_encounters"], viol=len(by["viol"]), recede=len(by["recede"]),
                 stand_passing=len(passing), stand_beside=len(beside),

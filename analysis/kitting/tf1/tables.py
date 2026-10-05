@@ -42,7 +42,7 @@ def cond(r):
 
 
 def num(x):
-    return None if x in ("", "None") else int(x)
+    return None if x in ("", "None", "unfinished") else int(x)
 
 
 def cmp(a, b, lower_better=True):

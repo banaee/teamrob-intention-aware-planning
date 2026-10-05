@@ -95,9 +95,9 @@
 | run_091 | kitting | scenario_s02_01 | env_layout_02 | True | True | True | False | single_task | True | 422 | 424 | 31 | 0 | 7 | 0 | 3 | 2 | 2 | 30.87 | compared | 0 | True | none |
 | run_092 | kitting | scenario_s02_01 | env_layout_02 | True | True | True | True | single_task | True | 422 | 424 | 29 | 0 | 7 | 0 | 3 | 2 | 2 | 30.87 | compared | 0 | True | none |
 | run_093 | kitting | scenario_s02_02 | env_layout_02 | False | False | False | False | single_task | True | 422 | 424 | 5 | 0 | 297 | 6 | 3 | 0 | 288 | 6.97 | compared | 0 | True | equal |
-| run_094 | kitting | scenario_s02_02 | env_layout_02 | True | False | False | False | single_task | True | 167 | None | 35 | 478 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
-| run_095 | kitting | scenario_s02_02 | env_layout_02 | True | True | True | False | single_task | True | 167 | None | 24 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
-| run_096 | kitting | scenario_s02_02 | env_layout_02 | True | True | True | True | single_task | True | 167 | None | 21 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
+| run_094 | kitting | scenario_s02_02 | env_layout_02 | True | False | False | False | single_task | True | unfinished | None | 35 | 478 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
+| run_095 | kitting | scenario_s02_02 | env_layout_02 | True | True | True | False | single_task | True | unfinished | None | 24 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
+| run_096 | kitting | scenario_s02_02 | env_layout_02 | True | True | True | True | single_task | True | unfinished | None | 21 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
 | run_097 | kitting | scenario_s03_06 | env_layout_06 | False | False | False | False | single_task | True | 229 | 231 | 4 | 0 | 11 | 5 | 2 | 2 | 2 | 9.02 | compared | 0 | True | equal |
 | run_098 | kitting | scenario_s03_06 | env_layout_06 | True | False | False | False | single_task | True | 239 | 241 | 31 | 10 | 0 | 0 | 0 | 0 | 0 | 53.80 | compared | 0 | True | none |
 | run_099 | kitting | scenario_s03_06 | env_layout_06 | True | True | True | False | single_task | True | 237 | 239 | 14 | 8 | 2 | 1 | 1 | 0 | 0 | 48.25 | compared | 0 | True | none |
@@ -516,8 +516,8 @@
 | run_512 | kitting | scenario_s30_46 | env_layout_20 | True | True | True | True | single_task | True | 107 | 109 | 12 | 0 | 8 | 0 | 0 | 5 | 3 | 20.46 | compared | 0 | True | none |
 | run_513 | kitting | scenario_s17_03 | env_layout_02 | True | True | True | True | single_task | True | 422 | 424 | 19 | 0 | 7 | 0 | 3 | 2 | 2 | 30.87 | compared | 0 | True | none |
 | run_514 | kitting | scenario_s17_05 | env_layout_02 | True | True | True | True | single_task | True | 422 | 424 | 31 | 0 | 7 | 0 | 3 | 2 | 2 | 30.87 | compared | 0 | True | none |
-| run_515 | kitting | scenario_s17_08 | env_layout_02 | True | True | True | True | single_task | True | 167 | None | 20 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
-| run_516 | kitting | scenario_s17_10 | env_layout_02 | True | True | True | True | single_task | True | 167 | None | 21 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
+| run_515 | kitting | scenario_s17_08 | env_layout_02 | True | True | True | True | single_task | True | unfinished | None | 20 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
+| run_516 | kitting | scenario_s17_10 | env_layout_02 | True | True | True | True | single_task | True | unfinished | None | 21 | 734 | 0 | 0 | 0 | 0 | 0 | 60.28 | compared | 0 | True | none |
 | run_517 | kitting | scenario_s17_14 | env_layout_02 | True | True | True | True | single_task | True | 279 | 281 | 13 | 0 | 5 | 0 | 0 | 2 | 3 | 40.58 | compared | 0 | True | none |
 | run_518 | kitting | scenario_s17_16 | env_layout_02 | True | True | True | True | single_task | True | 279 | 281 | 13 | 0 | 5 | 0 | 0 | 2 | 3 | 40.58 | compared | 0 | True | none |
 | run_519 | kitting | scenario_s17_20 | env_layout_02 | True | True | True | True | single_task | True | 305 | 307 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 86.67 | compared | 0 | True | none |
