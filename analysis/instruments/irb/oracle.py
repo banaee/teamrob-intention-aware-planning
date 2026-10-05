@@ -496,6 +496,8 @@ class Oracle:
             P.update({k: v / sr * (1.0 - FLOOR * len(pinned)) for k, v in r.items()})
             ml = max(sorted(B), key=lambda k: B[k])      # ties to the first live key in sorted order
             return P, B, ml, B[ml], pi, levels, recent
+        if self.context is not None:                     # nothing live: no prior, but the memory's recency facts hold
+            recent = sorted(self.context.recent(t))     # (step 5e: the column read the memory only through weights())
         return P, {}, None, 0.0, pi, levels, recent
 
     def adequacy(self, k, pos, world, boundary, advanced):
