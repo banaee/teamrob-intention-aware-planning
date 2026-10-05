@@ -1233,12 +1233,13 @@ intention-unaware" (the label named); the handoff docs/handoffs/handoff_T-F_part
   - An admission at tick 0 with context knowledge on, of a task the human is not doing (kitting's scenario_s05_01,
     s05_02, s16_01, s16_02): with no timeline fact in force the assigned tasks lead the prior. It bears on step 6's
     timelines and expectations for dock_loading's foreseeable tasks.
-  - Recognition and context knowledge show no difference the kitting set can distinguish from zero on completion and
-    violations (COMPARISON.md); planning against the observed human removes most violations at a mean delay of about
+  - Recognition, and context knowledge with no timeline fact in force (125 of 128 scenarios: the prior alone), show
+    no difference the kitting set can distinguish from zero on completion and violations (COMPARISON.md, steps 2 and
+    3a); planning against the observed human removes most violations at a mean delay of about
     6 ticks. The kitting set is authored, single_task, with a scripted human; no claim transfers to dock_loading
     without its own measurement.
   - With a timeline fact in force (the last step's part 1; design_records.md, "T-F part 1", PART 1 OF THE LAST STEP;
-    COMPARISON.md, "Context knowledge with a fact in force"): a fact in accord with the human's task speeds its
+    COMPARISON.md, "Step 3b: context knowledge with a timeline fact in force"): a fact in accord with the human's task speeds its
     admission (52 of 66 stretches earlier), a fact not in accord delays it (70 of 119 later); completion and violations
     change little. It bears on step 6's timelines on dock_loading: a test set with facts only in accord would show a
     benefit by construction; the rule of the copies (REPORT.md, "Part 1": both classes for every script that allows

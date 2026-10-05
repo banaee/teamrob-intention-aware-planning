@@ -4224,6 +4224,9 @@ with T-K part 1's steps on dock_loading.
     context knowledge, completion 8 earlier, 112 equal, 7 later, mean -0.28, violation ticks 17 → 23; for both the 95%
     interval of the mean change, resampling the 10 rooms, includes zero. Step 1 (planning against the observed human):
     violation ticks 137 → 14, completion later in 36 of 127 scenarios, mean +5.83 ticks.
+    AMENDED (5 October 2026, with the last step's part 1): step 3 is context knowledge with no timeline fact in force
+    (125 of 128 scenarios), so it measures the prior alone; COMPARISON.md names it step 3a. Context knowledge with a
+    fact in force is step 3b (PART 1 OF THE LAST STEP, below).
 - TODOs: TODO-137 closed (built and measured); TODO-144 part 1's result recorded, part 2 parked; TODO-183 forwarded to
   T-G's next stage (docs/handoffs/T-G_forward_inputs.md); TODO-184 recorded (the stand that does not end); TODO-181 and
   TODO-182 unchanged.
@@ -4241,7 +4244,7 @@ BUILT AND RUN (05b4dd3, 673d1b6): the rule in analysis/kitting/tf1/REPORT.md ("P
 `make_copies.py` (the classes, the windows, the new copies); 32 new copies (7 in accord, 25 not in accord, on 25 bases;
 new scenario literals only, tests/test_tl2_discovery.py's count 689 → 721), run_689 to run_720, 0 disagreements with the
 oracle; the classes: 73 copies in accord, 135 not in accord, step 5's 3 whole-run copies apart. Results: COMPARISON.md,
-"Context knowledge with a fact in force". FINDING (not ruled): with the fact in accord, of 66 stretches of the human's
+"Step 3b: context knowledge with a timeline fact in force". FINDING (not ruled): with the fact in accord, of 66 stretches of the human's
 tasks starting while the fact holds, 52 are admitted earlier than with context knowledge off and 2 later; with the fact
 not in accord, of 119 such stretches, 31 earlier and 70 later. Wrong-admission ticks 633 → 613 (in accord) and 999 →
 1175 (not in accord). Completion and violations change little: completion 5 earlier, 62 equal, 5 later of 72 (in

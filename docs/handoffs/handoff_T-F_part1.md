@@ -81,13 +81,14 @@ intention-unaware", THE CLOSE). Everything named here is committed on `main`; Ha
   137 → 14; completion later in 36 of 127 scenarios, equal in 91, earlier in none; mean +5.83 ticks; 741 ticks of
   delay for 117 violation ticks removed.
 - **[finding]** Step 2, recognition (intention-unaware → intention-aware, context knowledge off): completion 15 earlier,
-  101 equal, 11 later, mean −0.84; violation ticks 14 → 17. Step 3, context knowledge (off → on): completion 8 earlier,
+  101 equal, 11 later, mean −0.84; violation ticks 14 → 17. Step 3a, context knowledge with no timeline fact in force
+  (125 of 128 scenarios; it measures the prior alone): completion 8 earlier,
   112 equal, 7 later, mean −0.28; violation ticks 17 → 23. For both steps the 95% interval of the mean change, resampling
   the rooms, includes zero: no difference this set can distinguish from zero.
-- **[finding]** Context knowledge with a fact in force (the last step's part 1; COMPARISON.md, "Context knowledge with a
-  fact in force"): each copy with a timeline (context knowledge on) against its base with context knowledge off, by
+- **[finding]** Step 3b, context knowledge with a timeline fact in force (the last step's part 1; COMPARISON.md,
+  "Step 3b: context knowledge with a timeline fact in force"): each copy with a timeline (context knowledge on) against its base with context knowledge off, by
   class under a rule written before the runs (REPORT.md, "Part 1"): 73 copies in accord, 135 not in accord (32 of them
-  authored in this step). In accord: of 66 stretches of the human's tasks starting while the fact holds, 52 admitted
+  authored in this step; step 5's 3 whole-run copies apart). In accord: of 66 stretches of the human's tasks starting while the fact holds, 52 admitted
   earlier and 2 later; not in accord: of 119, 31 earlier and 70 later. Wrong-admission ticks 633 → 613 and 999 → 1175.
   Completion and violations change little (violation ticks 10 → 5 in accord, 18 → 24 not in accord).
 - Documents: analysis/kitting/tf1/REPORT.md (the working record, per-scenario tables, findings 1 to 7);

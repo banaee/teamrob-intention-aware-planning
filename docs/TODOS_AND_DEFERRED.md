@@ -4309,7 +4309,8 @@ TODO-135, TODO-137, TODO-138, TODO-140, TODO-141
 PART 1 CLOSED (5 October 2026; design_records.md, "T-F part 1", THE CLOSE): the conditions human-unaware and
 intention-unaware built (TODO-137) and measured on 128 kitting scenarios under `single_task` (analysis/kitting/tf1/
 REPORT.md, COMPARISON.md): planning against the observed human removes violation ticks (137 → 14) at a mean delay of
-+5.83 ticks; recognition and context knowledge show no difference this set can distinguish from zero. T-F part 2
++5.83 ticks; recognition, and context knowledge with no timeline fact in force (the prior alone), show no difference
+this set can distinguish from zero. T-F part 2
 parked; its notes (full_reorder the default strategy, strategy a column of the same result table, J; no setting in a
 name, K): docs/handoffs/handoff_T-F_part1.md.
 With a timeline fact in force (the last step's part 1, 5 October 2026; COMPARISON.md): a fact in accord with the

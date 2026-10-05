@@ -43,8 +43,8 @@ STEPS = [("HU", "IU", "Step 1: planning against the observed human",
           "human-unaware → intention-unaware"),
          ("IU", "OFF", "Step 2: recognition of the human's task",
           "intention-unaware → intention-aware, context knowledge off"),
-         ("OFF", "ON", "Step 3: context knowledge",
-          "context knowledge off → on")]
+         ("OFF", "ON", "Step 3a: context knowledge with no timeline fact in force",
+          "context knowledge off → on, the starting likelihoods alone")]
 SETS = [("A", 1, 64, "the planning test-bed"), ("B", 65, 88, "the context-knowledge planning cases"),
         ("C", 89, 512, "the context-knowledge scenarios on six rooms")]
 INK, MUTED, BAR = "#0b0b0b", "#8a8880", "#2a78d6"
@@ -293,7 +293,8 @@ def windows(d):
     """The timeline windows of a run, from its log's `[run_mesa] timeline` line: [(fact, first tick, end)]."""
     log = d / f"{d.name}.log"
     line = next(l for l in open(log) if l.startswith("[run_mesa] timeline"))
-    return [(f, int(a), int(b)) for f, a, b in re.findall(r"(\w+) (\d+)\.\.(\d+)", line.split("windows=")[1])]
+    return [(f, int(a), 10 ** 9 if b == "end" else int(b))          # "end": the window runs to the run's end
+            for f, a, b in re.findall(r"(\w+) (\d+)\.\.(\d+|end)", line.split("windows=")[1])]
 
 
 def part1(rows, by):
@@ -310,10 +311,10 @@ def part1(rows, by):
         pairs.setdefault(c["cls"], []).append((c["base"], copy, by[c["base"]]["OFF"], by[c["base"]]["ON"], on))
     out = []
     w = out.append
-    w("## Context knowledge with a fact in force")
+    w("## Step 3b: context knowledge with a timeline fact in force")
     w("")
-    w("Step 3 above compares context knowledge off and on in scenarios where, with three exceptions, no context fact "
-      "is in force: it measures the starting likelihoods alone. Here each *copy* of a scenario with a context fact in "
+    w("Step 3a compares context knowledge off and on in scenarios where, with three exceptions, no context fact "
+      "is in force: it measures the starting likelihoods alone. Step 3b takes each *copy* of a scenario with a context fact in "
       "force over chosen ticks (a timeline: for example *break time* over some ticks) is run with context knowledge "
       "on, and compared with its base scenario run with context knowledge off. The human's script is the same in both; "
       "only the fact and the knowledge differ. The copies fall into two classes, by a rule fixed before the runs:")
@@ -440,11 +441,13 @@ def part1(rows, by):
     for k, label in names[:2]:
         ps, rec = data[k]
         ins = split(k, True)
+        cs = [on["completion"] - off["completion"] for _, _, off, _, on in ps
+              if off["completion"] is not None and on["completion"] is not None]
         summary_lines.append(
-            f"{label}: of {len(ins)} task stretches starting while the fact holds, admitted earlier in "
-            f"{sum(x < 0 for x in ins)} and later in {sum(x > 0 for x in ins)}; violation ticks "
-            f"{sum(off['viol'] for _, _, off, _, on in ps)} → {sum(on['viol'] for _, _, off, _, on in ps)} over "
-            f"{len(ps)} copies")
+            f"{label} ({len(ps)} copies): of {len(ins)} task stretches starting while the fact holds, admitted earlier "
+            f"in {sum(x < 0 for x in ins)} and later in {sum(x > 0 for x in ins)}; completion {sum(x < 0 for x in cs)} "
+            f"earlier, {sum(x == 0 for x in cs)} equal, {sum(x > 0 for x in cs)} later; violation ticks "
+            f"{sum(off['viol'] for _, _, off, _, on in ps)} → {sum(on['viol'] for _, _, off, _, on in ps)}")
     return out, summary_lines
 
 
@@ -469,6 +472,19 @@ def main():
 
     total_hold = {c: sum(by[s][c]["hold_ticks"] for s in scen) for c in CONDS}
 
+    # ---- step 3b (part 1): computed first, placed after the step tables
+    allrows = [r for r in csv.DictReader(open(RESULTS))]
+    for r in allrows:
+        r["done"] = r["completion"] != "unfinished"
+        for k in ("hold_ticks", "near_encounters", "viol"):
+            r[k] = int(r[k])
+        r["completion"] = int(r["completion"]) if r["done"] else None
+        r["dir"] = HERE / "measurement" / r["scenario"] / r["run"]
+    p1, p1_summary = part1(allrows, by)
+    with_fact = sorted(s for s in scen if windows(by[s]["ON"]["dir"]))
+    nofact = len(scen) - len(with_fact)
+    wf = ", ".join(with_fact)
+
     # ---- the document
     w("# What recognising the human's intention adds to a robot's planning: a comparison in simulation")
     w("")
@@ -486,7 +502,8 @@ def main():
     w("")
     w("1. What does planning against the observed human add over a robot that ignores the human?")
     w("2. What does recognising the human's task add over planning against the observed motion alone?")
-    w("3. What does context knowledge add to that recognition?")
+    w("3. What does context knowledge add to that recognition: (a) with no context fact in force, and (b) with a context "
+      "fact in force over chosen ticks?")
     w("")
     w("## Terms")
     w("")
@@ -509,7 +526,11 @@ def main():
       "situation: for example whether it is break time, whether the room is warm, whether the human has just had a "
       "break. These facts change how likely each task is before any motion is seen.")
     w("- **Step.** The change from one condition to the next: step 1 is human-unaware → intention-unaware, step 2 is "
-      "intention-unaware → intention-aware with context knowledge off, step 3 is context knowledge off → on.")
+      "intention-unaware → intention-aware with context knowledge off, step 3 is context knowledge off → on: step 3a "
+      "with no timeline fact in force (the starting likelihoods alone), step 3b with a timeline fact in force.")
+    w("- **Timeline fact.** A context fact stated to hold over chosen ticks of a run, for example *break time* from "
+      "tick 77 to tick 155. With context knowledge on, a fact in force makes the task it belongs to (here the coffee "
+      "break) more likely before any motion is seen.")
     w("- **min_separation.** The distance the robot's planning tries to keep from the human: 50 cm.")
     w("- **Tick below min_separation.** A tick in which the smallest distance between robot and human during the tick "
       "is below 50 cm. Each such tick is put into one class:")
@@ -539,10 +560,17 @@ def main():
                 f"({v['lower']} scenarios fewer, {v['higher']} more, {v['equal']} equal); completion "
                 f"{c['higher']} scenarios later, {c['lower']} earlier, {c['equal']} equal, mean change "
                 f"{signed(c['mean'], 2)} ticks.")
+        if b == "ON":
+            line += (f" No timeline fact is in force in {nofact} of these {len(scen)} scenarios: this step measures "
+                     "the starting likelihoods alone, not context knowledge with a fact in force (step 3b).")
         if flat(c) and flat(v):
             line += (" Individual scenarios change in both directions; neither mean change is distinguishable from "
                      "zero in this set (the room-resampled intervals of both include zero).")
         w(line)
+    w("- **Step 3b: context knowledge with a timeline fact in force** (copies of the scenarios with a fact over chosen "
+      "ticks, context knowledge on, against the base scenario with context knowledge off): " + "; ".join(p1_summary)
+      + ". The fact in accord with the human's task speeds the recognition of that task, the fact not in accord "
+      "delays it; completion and violation ticks change in few copies.")
     w("")
     w("## What was run")
     w("")
@@ -579,9 +607,11 @@ def main():
     w("## The four conditions side by side")
     w("")
     w(f"Completion over the {len(finished)} scenarios that finish in all four conditions; every other measure over all "
-      f"{len(scen)} scenarios.")
+      f"{len(scen)} scenarios. In the last column no timeline fact is in force in {nofact} of the {len(scen)} scenarios "
+      f"(a fact holds over the whole run in {wf}): it shows context knowledge with the starting likelihoods alone. "
+      "Context knowledge with a fact in force is step 3b.")
     w("")
-    head = ["measure"] + [LONG[c] for c in CONDS]
+    head = ["measure"] + [LONG[c] for c in CONDS[:3]] + [f"{LONG['ON']}, no timeline fact in force in {nofact} of {len(scen)}"]
     rows = []
     comp = {c: [by[s][c]["completion"] for s in finished] for c in CONDS}
     rows.append(["completion, mean (ticks)"] + [num(mean(comp[c])) for c in CONDS])
@@ -608,6 +638,9 @@ def main():
     # ---- the steps, all scenarios
     w("## The three steps, paired per scenario")
     w("")
+    w(f"Step 3a is context knowledge with no timeline fact in force in {nofact} of the {len(scen)} scenarios: the "
+      "starting likelihoods alone. Step 3b, with a fact in force, has its own section after these tables.")
+    w("")
     w("A change is the second condition's value minus the first's, in the same scenario: negative means earlier "
       "completion or fewer ticks. The interval and the room counts treat the room as the unit (see *Statistics*). "
       "The Wilcoxon signed-rank p-value is given as an indication only; it assumes independent scenarios.")
@@ -628,6 +661,9 @@ def main():
     w("")
     w(table(STEP_HEAD, step_rows(by, inter, fin_inter)))
     w("")
+
+    # ---- step 3b
+    out.extend(p1)
 
     # ---- the trade of step 1
     w("## The trade of step 1: delay against violations")
@@ -702,20 +738,6 @@ def main():
       "run counted over its whole length.")
     w("")
 
-    # ---- part 1: context knowledge with a fact in force
-    allrows = [r for r in csv.DictReader(open(RESULTS))]
-    for r in allrows:
-        r["done"] = r["completion"] != "unfinished"
-        for k in ("hold_ticks", "near_encounters", "viol"):
-            r[k] = int(r[k])
-        r["completion"] = int(r["completion"]) if r["done"] else None
-        r["dir"] = HERE / "measurement" / r["scenario"] / r["run"]
-    p1, p1_summary = part1(allrows, by)
-    out.extend(p1)
-    i = out.index("## What was run")
-    out[i - 1:i - 1] = ["- **Context knowledge with a fact in force** (copies of the scenarios with a context fact over "
-                        "chosen ticks, against context knowledge off; see its section): " + "; ".join(p1_summary) + "."]
-
     # ---- figures
     w("## The change per scenario")
     w("")
@@ -753,8 +775,16 @@ def main():
     w("- The human is scripted and does not react to the robot. A real person would step aside, wait, or change the "
       "order of work.")
     w("- One domain (kitting) in simulation, with point agents and a fixed speed.")
-    w("- Nothing here measures how well the robot recognises the human's task; only what the recognition changes in "
-      "the robot's deliveries and distance, in this set.")
+    w("- Recognition itself is measured only in step 3b, by two counts (the admission delay and the wrong-admission "
+      "ticks); elsewhere only what recognition changes in the robot's deliveries and distance, in this set.")
+    w(f"- The scenarios of steps 1 to 3a have no timeline fact in force in {nofact} of {len(scen)}, so step 3a "
+      "measures context knowledge with the starting likelihoods alone. What context knowledge does when a fact is in "
+      "force is step 3b alone.")
+    w("- The timeline facts of step 3b are placed by a fixed rule on chosen ticks of each script (REPORT.md, \"Part "
+      "1\"); they are not a sample of real shifts. Both classes exist for every script that allows them, but their "
+      "counts differ (in accord fewer than not in accord).")
+    w("- Step 3b compares each copy with context knowledge on against its base with context knowledge off, so its "
+      "admission delays include what the starting likelihoods alone do (its reference table).")
     w("")
     text = "\n".join(out) + "\n"
     (HERE / "COMPARISON.md").write_text(text)
