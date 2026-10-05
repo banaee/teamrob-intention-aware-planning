@@ -1,5 +1,7 @@
 # T-K part 1, step 5b: the planning set with context knowledge on (kitting, the working robot)
 
+Its runs, outputs and run files were deleted on 5 October 2026 (T-F part 1's close, part E; analysis/README.md), replaced by the measurement of T-F part 1 (analysis/kitting/tf1/); this file and the report stay. The last commit that holds them is 362af19.
+
 The records: design_records.md, "T-K", STEP 5B, PLANNED and the step's entries after it. A basic check, not a coverage
 set. Results: `REPORT.md` (stage 3).
 

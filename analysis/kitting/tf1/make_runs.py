@@ -13,6 +13,8 @@ settings, the condition's one option changed (R5's override sets the rest off at
   2 intention-unaware                          intention_aware: false
   3 intention-aware, context knowledge off     context_knowledge: false
   4 intention-aware, context knowledge on      (the defaults)
+Its sources under configs/kitting/mpb/tk and configs/kitting/tk5e were deleted at T-F part 1's close (part E,
+5 October 2026); the run files it wrote are committed, and the sources are held by commit 362af19.
 Serials (K): run_001 onward, the four conditions of a scenario consecutive in the order above, the scenarios in the order
 above (each set sorted by id); no setting in a name.
 """

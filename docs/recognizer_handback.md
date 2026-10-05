@@ -1,4 +1,6 @@
 # The intention recognizer — current description
+
+Deleted 5 October 2026 (T-F part 1's close, part E; analysis/README.md): the frozen analyses td_stage1, td_stage1b, l_build, irb2b_exposed_interval (tb2b_exposed_interval before 3 October), ablation_task_committed, f47_fixtures, t1_conflict_measurement, todo90_b2a_window, tc2c_scripts, tb1d_designations, tb2c_per_entry_holds and big_picture under analysis/kitting/ (analysis/ before the sort); the runs and run files of T-K part 1's steps 5 and 5b (planning) and 5e and of T-F part 1's stage 2 check (configs/kitting/mpb/tk, mpb/tk5b, tk5e, tf1/check; their READMEs and reports stay). A path cited below under these names is held by commit 362af19 (`git checkout 362af19 -- <path>`).
 REWRITTEN TO HEAD at the T-D Stage 1 build (27 September 2026; design_decisions.md, "T-D R and E"): the `unknown`
 hypothesis, u, the grade and the odds accounting are gone (R1); the recognizer reports an adequacy finding and a
 lifecycle state beside the belief (R2 to R4, E1 to E7). The earlier text is in git history (before commit 367a3a7).

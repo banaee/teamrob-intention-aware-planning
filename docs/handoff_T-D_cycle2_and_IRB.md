@@ -1,5 +1,7 @@
 # Handoff: T-D cycle 1 closed; cycle 2 (L) and the IRB
 
+Deleted 5 October 2026 (T-F part 1's close, part E; analysis/README.md): the frozen analyses td_stage1, td_stage1b, l_build, irb2b_exposed_interval (tb2b_exposed_interval before 3 October), ablation_task_committed, f47_fixtures, t1_conflict_measurement, todo90_b2a_window, tc2c_scripts, tb1d_designations, tb2c_per_entry_holds and big_picture under analysis/kitting/ (analysis/ before the sort); the runs and run files of T-K part 1's steps 5 and 5b (planning) and 5e and of T-F part 1's stage 2 check (configs/kitting/mpb/tk, mpb/tk5b, tk5e, tf1/check; their READMEs and reports stay). A path cited below under these names is held by commit 362af19 (`git checkout 362af19 -- <path>`).
+
 Written 27 September 2026, at the close of the chat "T-D-cont-2" (the continuation of "T-D-cont"). For the next chat, which carries two tracks: the IRB and cycle 2 of T-D (L). Informative. The repo is authoritative over this text. Nothing here is a task list; sections 6 to 8 say what is open.
 
 Terms follow docs/glossary.md §7's prose rule: "the `unknown` hypothesis" (historical), "unmodelled behaviour", "unexplained", "admitted"; never "unknown behaviour". New terms from this chat: adequacy finding, adequate, unresolved, unexplained (as a finding value), exhausted, derived phase, projected completion delay (D), tail probability (S_k), test level (α), hypothesis adequacy.

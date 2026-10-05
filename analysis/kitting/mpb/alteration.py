@@ -4,7 +4,7 @@ alteration.py — kitting's single-rule alteration test (MPB-4): the shared engi
 analysis/instruments/mpb/alteration.py, with kitting's B1 (the method guards of deliver_item) in its place.
 
     alteration.py <scratch dir> <scenario dir> [<scenario dir> ...]      (each: analysis/kitting/mpb/<scenario>/on_single_task)
-    alteration.py --rank <scratch dir> <scenario dir> ...    (C4 to C6, D6: step 5's six, analysis/kitting/mpb/tk/<scenario>/on_single_task)
+    alteration.py --rank <scratch dir> <scenario dir> ...    (C4 to C6, D6: step 5's six, analysis/kitting/mpb/tk/<scenario>/on_single_task; deleted 5 October 2026, held by 362af19)
 """
 import sys
 from pathlib import Path

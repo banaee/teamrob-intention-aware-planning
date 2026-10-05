@@ -1,5 +1,7 @@
 # T-K part 1: the plan of the build of the two gate rulings (AM67, AM68)
 
+Deleted 5 October 2026 (T-F part 1's close, part E; analysis/README.md): the frozen analyses td_stage1, td_stage1b, l_build, irb2b_exposed_interval (tb2b_exposed_interval before 3 October), ablation_task_committed, f47_fixtures, t1_conflict_measurement, todo90_b2a_window, tc2c_scripts, tb1d_designations, tb2c_per_entry_holds and big_picture under analysis/kitting/ (analysis/ before the sort); the runs and run files of T-K part 1's steps 5 and 5b (planning) and 5e and of T-F part 1's stage 2 check (configs/kitting/mpb/tk, mpb/tk5b, tk5e, tf1/check; their READMEs and reports stay). A path cited below under these names is held by commit 362af19 (`git checkout 362af19 -- <path>`).
+
 Written by ccode, 4 October 2026 (BUILD DISCIPLINE, step 1: plan only, no code). Status: APPROVED (Hadi, 4 October
 2026), with the rulings on D1 to D7 (section 7, each marked RULED; design_records.md, "T-K", THE GATE'S BUILD PLAN,
 RULED). Every build session reads this file first. BUILT (4 October 2026; design_records.md, "T-K", THE GATE

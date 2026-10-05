@@ -1,5 +1,7 @@
 # T-K part 1, step 5e: context knowledge on kitting's rooms 02, 05, 06, 07 and the copies of 08 and 09
 
+Its runs, outputs and run files were deleted on 5 October 2026 (T-F part 1's close, part E; analysis/README.md), replaced by the measurement of T-F part 1 (analysis/kitting/tf1/); this file and the report stay. The last commit that holds them is 362af19.
+
 Written by ccode, 5 October 2026. Step 5e of T-K part 1 (named by Hadi after step 5d; docs/handoffs/T-G_forward_inputs.md, section 5's tree; design_records.md, "T-K", STEP 5E). Results: `REPORT.md` (written after the runs). This file: the set, the settings, the rules the authoring followed, the expectations (committed before any run) and the commands.
 
 **The scenarios are authored.** Each was written to place a case; the counts of the report compare settings on the same scripts and are no rate of occurrence.

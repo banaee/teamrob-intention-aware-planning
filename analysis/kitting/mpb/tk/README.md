@@ -1,5 +1,7 @@
 # T-K part 1, step 5: the planning cases with context knowledge (kitting, a working robot, env_layout_18)
 
+Its runs, outputs and run files were deleted on 5 October 2026 (T-F part 1's close, part E; analysis/README.md), replaced by the measurement of T-F part 1 (analysis/kitting/tf1/); this file and the report stay. The last commit that holds them is 362af19.
+
 The records: design_records.md, "T-K", THE PLANNING CASES, RULED (KT15), THE ROOM, RULED, THE STEP'S MODE AND SIZE and
 STEP 5, STAGE 1, REVISED: THE SET. A basic check that context knowledge works through the planning chain, not a coverage
 set: (1) the chain follows the oracle and the reference; (2) a gain where the human acts in accord with the context;
