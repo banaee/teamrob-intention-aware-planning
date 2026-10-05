@@ -51,7 +51,7 @@ from shared.types import Var                                  # noqa: E402
 def costs(layout_name: str, scenario_id: str, robot_id: str = "robot_0"):
     layout = domain_config["layouts"][layout_name]
     model = SimModel(layout["scenarios"][scenario_id], domain_config["register_fn"],
-                     env_layout_path=layout["path"], assignment_knowledge=False, context_knowledge=False)
+                     env_layout_path=layout["path"], human_aware=True, intention_aware=True, assignment_knowledge=False, context_knowledge=False)
     robot = model.robots[robot_id]
     world = build_world_state(model)
     belief = robot._make_dummy_belief()

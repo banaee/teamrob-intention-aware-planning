@@ -383,6 +383,7 @@ class RobotAgent(FactoryAgent):
             strategy=self.model.strategy,
             gate_strategy=self.model.gate_strategy,
             cost_strategy=self.model.cost_strategy,
+            intention_aware=self.model.intention_aware,
         )
         # The run header (TODO-78): the policy values and evaluation switches this
         # robot's decisions are taken under, once per run, so a log can be read
@@ -393,6 +394,8 @@ class RobotAgent(FactoryAgent):
             f"gate_strategy={self.meta_planner.gate_strategy} "
             f"cost_strategy={self.meta_planner.cost_strategy} "
             f"separation_stop={'on' if self.model.separation_stop else 'off'} "
+            f"human_aware={'on' if self.model.human_aware else 'off'} "
+            f"intention_aware={'on' if self.model.intention_aware else 'off'} "
             f"assignment_knowledge={'on' if self.model.assignment_knowledge else 'off'} "
             f"context_knowledge={'on' if self.model.context_knowledge else 'off'} "
             f"theta={self.meta_planner.theta:.3f} rho={self.meta_planner.rho} "
@@ -442,7 +445,10 @@ class RobotAgent(FactoryAgent):
 
         world = self._perceive(build_world_state(model=self.model), human)
 
-        if human is not None:
+        # intention_aware off (T-F part 1, A): the recognizer computes nothing, so
+        # no belief and no [IR...] line; the human's position and motion are still
+        # perceived above (_perceive), which the fallback projection reads.
+        if human is not None and self.model.intention_aware:
             obs = build_observation(
                 human_agent=human,
                 model=self.model,
@@ -616,6 +622,8 @@ class RobotAgent(FactoryAgent):
         if human is None:
             return
         world = self._perceive(build_world_state(model=self.model), human)
+        if not self.model.intention_aware:
+            return   # the recognizer computes nothing (T-F part 1, A); the observation above is kept
         obs = build_observation(
             human_agent=human,
             model=self.model,

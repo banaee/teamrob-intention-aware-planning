@@ -57,7 +57,7 @@ def model(setup_path=None, timeline=None, register_fn=register_kitting_domain, d
     return SimModel(scenario=scenario, register_fn=register_fn, task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][LAYOUT],
                     setup_path=setup_path or domain_config["setups"][scenario.setup],
-                    timeline_declarations=declared, assignment_knowledge=False, context_knowledge=False)
+                    timeline_declarations=declared, human_aware=True, intention_aware=True, assignment_knowledge=False, context_knowledge=False)
 
 
 # ---------------------------------------------------------------- the form

@@ -112,7 +112,7 @@ EXPERIMENT_CONFIG_PATH = "configs/experiment.yaml"
 STRATEGIES = ("single_task", "full_reorder")
 GATE_STRATEGIES = ("none", "b2a", "b2b")
 COST_STRATEGIES = ("realized", "plain")
-BOOL_OPTIONS = ("assignment_knowledge", "context_knowledge", "separation_stop")
+BOOL_OPTIONS = ("human_aware", "intention_aware", "assignment_knowledge", "context_knowledge", "separation_stop")
 
 def load_experiment(run_path: str, flags: dict, cli_overrides=()) -> dict:
     """
@@ -197,6 +197,8 @@ def parse_user_args():
     parser.add_argument("--layout", type=str, default=None, help="Layout selection (default: the scenario's first reference layout)")
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_s02_02)")
     parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
+    parser.add_argument("--human_aware", type=_bool_arg, default=None, help="Human-aware override: true/false (off: the human-unaware robot, no observed human; sets intention_aware, both knowledge options and separation_stop off; T-F part 1)")
+    parser.add_argument("--intention_aware", type=_bool_arg, default=None, help="Intention-aware override: true/false (off: the intention-unaware robot, the recognizer computes nothing and the gate admits nothing; sets both knowledge options off; T-F part 1)")
     parser.add_argument("--assignment_knowledge", type=_bool_arg, default=None, help="Assignment knowledge override: true/false (the robot knows the observed human's assigned tasks)")
     parser.add_argument("--context_knowledge", type=_bool_arg, default=None, help="Context knowledge override: true/false (the recognizer's prior from the declared context knowledge, T-K part 1; off: the equal prior)")
     parser.add_argument("--strategy", type=str, default=None, choices=STRATEGIES, help="MetaPlanner B3 strategy override")
@@ -301,6 +303,8 @@ def resolve_model_params(user_config: dict) -> dict:
         "declared_context":   domain["context_knowledge"],
         "layout_path":      domain["layouts"][layout_id],
         "setup_path":       domain["setups"][setup_id],
+        "human_aware":      bool(user_config.get("human_aware", True)),       # both on by default (T-F part 1, R3);
+        "intention_aware":  bool(user_config.get("intention_aware", True)),   # SimModel applies the override (R5)
         "assignment_knowledge": bool(user_config.get("assignment_knowledge", True)),   # both on by default (AM3, AM9)
         "context_knowledge":  bool(user_config.get("context_knowledge", True)),
         "strategy":         user_config.get("strategy", "single_task"),

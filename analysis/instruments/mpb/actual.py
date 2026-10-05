@@ -76,7 +76,7 @@ def in_process(run_file, steps, strategy, prior):
                  state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
                  declared_context=domain_config["context_knowledge"],
                  task_model_schemas=domain_config["task_model"], layout_path=domain_config["layouts"][layout],
-                 setup_path=domain_config["setups"][scenario.setup], assignment_knowledge=prior, strategy=strategy,
+                 setup_path=domain_config["setups"][scenario.setup], human_aware=True, intention_aware=True, assignment_knowledge=prior, strategy=strategy,
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
                  separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]),
                  context_knowledge=bool(cfg["context_knowledge"]))

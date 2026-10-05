@@ -38,7 +38,7 @@ def model_for(layout, scenario):
                     layout_path=domain_config["layouts"][layout],
                     setup_path=domain_config["setups"][cfg.setup],
                     timeline_declarations=domain_config["timeline_facts"],   # a setup may state a timeline (AM40)
-                    assignment_knowledge=False, context_knowledge=False)
+                    human_aware=True, intention_aware=True, assignment_knowledge=False, context_knowledge=False)
 
 
 def test_every_registered_scenario_loads():
@@ -114,7 +114,7 @@ def test_loader_errors_name_the_scenario():
         SimModel(scenario=scenario, register_fn=register_kitting_domain,
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"]["env_layout_01"],
-                 setup_path=domain_config["setups"][base.setup], assignment_knowledge=False, context_knowledge=False)
+                 setup_path=domain_config["setups"][base.setup], human_aware=True, intention_aware=True, assignment_knowledge=False, context_knowledge=False)
 
 
 def test_landmark_parameter_rejected():

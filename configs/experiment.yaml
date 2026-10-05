@@ -1,7 +1,7 @@
 # configs/experiment.yaml
 # Default experiment configuration.
 # Every key is a run option, and each has a CLI flag of the same name that overrides it:
-# --domain, --layout, --scenario, --steps, --assignment_knowledge, --context_knowledge, --strategy, --gate_strategy, --cost_strategy,
+# --domain, --layout, --scenario, --steps, --human_aware, --intention_aware, --assignment_knowledge, --context_knowledge, --strategy, --gate_strategy, --cost_strategy,
 # --separation_stop, --test_level (and --run, the path of this file: the run file). mesa_sim/run_mesa.py rejects an
 # unknown key or flag, a strategy outside its choices, and a switch that is not true/false.
 # layout is optional (here and on the CLI): a run that names none takes the scenario's first
@@ -18,7 +18,11 @@ domain: kitting
 scenario: scenario_s01_01
 steps: 50
 
-# Assignment knowledge (T-K part 1, AM9; assignment_prior before it): the robot knows the observed human's assigned tasks, so the recognizer's support is restricted to the assigned and foreseeable tasks and an assigned task has commitment warrant (a run option, not a scenario fact). On by default since the build (AM3); off is an ablation
+# The conditions of T-F part 1 (R3, R5): human_aware off is the human-unaware robot (the recognizer and the meta-planner receive no observed human; it plans and moves as if the workspace were empty); intention_aware off the intention-unaware robot (the recognizer computes nothing, the gate admits nothing, every decision rests on the fallback projection). An option that is off sets every option above it to off, whatever is stated here: human_aware off sets intention_aware, both knowledge options and separation_stop off; intention_aware off sets both knowledge options off. Both on by default
+human_aware: true
+intention_aware: true
+
+# Assignment knowledge (T-K part 1, AM9; assignment_prior before it): the robot knows the observed human's assigned tasks, so the recognizer's support is restricted to the assigned and foreseeable tasks (a run option, not a scenario fact; since AM67 it gives no commitment warrant). On by default since the build (AM3); off is an ablation
 assignment_knowledge: true
 
 # Context knowledge (T-K part 1, AM3): the recognizer's prior comes from the domain's declared context knowledge (the timeline facts, the object states, the recency facts); off: the equal prior over the live hypotheses. On by default since the build

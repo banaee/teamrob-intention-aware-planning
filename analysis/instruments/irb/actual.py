@@ -161,7 +161,7 @@ def in_process(run_file, steps, alpha, context=None):
                  task_model_schemas=domain_config["task_model"],
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][scenario.setup],
-                 assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=cfg["strategy"],
+                 human_aware=True, intention_aware=True, assignment_knowledge=bool(cfg["assignment_knowledge"]), strategy=cfg["strategy"],
                  gate_strategy=cfg["gate_strategy"], cost_strategy=cfg["cost_strategy"],
                  separation_stop=bool(cfg["separation_stop"]), test_level=float(cfg["test_level"]),
                  context_knowledge=bool(cfg["context_knowledge"]) if context is None else context)

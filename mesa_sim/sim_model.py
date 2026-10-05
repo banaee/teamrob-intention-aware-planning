@@ -102,6 +102,8 @@ class SimModel(model.Model):
                  setup_path: str,
                  seed=None,
                  *,
+                 human_aware: bool,
+                 intention_aware: bool,
                  assignment_knowledge: bool,
                  context_knowledge: bool,
                  strategy: str = "single_task",
@@ -122,12 +124,33 @@ class SimModel(model.Model):
         # since T-K part 1's AM67 no commitment warrant, D2). context_knowledge: the
         # recognizer's prior comes from the domain's declared context knowledge;
         # off, the prior is equal over the live hypotheses.
-        self.assignment_knowledge = assignment_knowledge
-        self.context_knowledge = context_knowledge
+        # The two conditions of T-F part 1 (R3, R5; A to D), both stated by every
+        # caller as the knowledge switches are: human_aware off is the
+        # human-unaware robot (no observed human), intention_aware off the
+        # intention-unaware robot (the recognizer computes nothing, the gate admits
+        # nothing). An option that is off sets every option above it to off,
+        # whatever was stated (R5): human_aware off sets intention_aware, both
+        # knowledge switches and the separation stop off; intention_aware off sets
+        # both knowledge switches off. The values here are the effective ones,
+        # read by everything after; the options set off are named below.
+        self.human_aware = human_aware
+        self.intention_aware = intention_aware and human_aware
+        self.assignment_knowledge = assignment_knowledge and self.intention_aware
+        self.context_knowledge = context_knowledge and self.intention_aware
+        effective_stop = separation_stop and human_aware
+        set_off = [name for name, stated, effective in (
+            ("intention_aware", intention_aware, self.intention_aware),
+            ("assignment_knowledge", assignment_knowledge, self.assignment_knowledge),
+            ("context_knowledge", context_knowledge, self.context_knowledge),
+            ("separation_stop", separation_stop, effective_stop)) if stated and not effective]
+        options_line = None
+        if set_off:
+            cause = "human_aware" if not human_aware else "intention_aware"
+            options_line = f"[run_mesa] options {cause}=off sets off: {' '.join(set_off)}"
         # The domain's declared context knowledge (AM26), handed to every robot's
         # recognizer when context knowledge is on; required then.
         self.declared_context = declared_context
-        if context_knowledge and declared_context is None:
+        if self.context_knowledge and declared_context is None:
             raise ValueError("context_knowledge=true, but the domain declares no context knowledge "
                              "(its registry's \"context_knowledge\")")
         # MetaPlanner B3 strategy for every robot ("single_task" | "full_reorder");
@@ -140,8 +163,8 @@ class SimModel(model.Model):
         # likewise a run option (T10).
         self.cost_strategy = cost_strategy
         # Execution-time separation stop for every robot (C, TODO-73); a run
-        # option, off by default.
-        self.separation_stop = separation_stop
+        # option, off by default; off whenever human_aware is off (T-F part 1, C).
+        self.separation_stop = effective_stop
         # The recognizer's adequacy test level alpha for every robot (T-D E5); a
         # run option, 0.05 by convention, never chosen from a scenario.
         self.test_level = test_level
@@ -238,6 +261,9 @@ class SimModel(model.Model):
         setup_timeline = self._setup_timeline(env_setup, setup_path)
         self.timeline, self.timeline_source = self._timeline_in_force(scenario, setup_timeline)
         logger.info(f"[run_mesa] timeline source={self.timeline_source.value} windows={self.timeline}")
+        # What the override set off (T-F part 1, R5): one line, only when it set an option off.
+        if options_line is not None:
+            logger.info(options_line)
 
 
         # ------------------------------------------------------------------
@@ -652,7 +678,9 @@ class SimModel(model.Model):
                 self.observing[agent_cfg.agent_id] = ObservingRobot(task_model, frozenset(hypotheses),
                                                                     self._destination_by_id())
                 self._check_destinations(scenario, agent_cfg, agent_cfgs)
-                observed_id = agent_cfg.observes[0] if agent_cfg.observes else None
+                # human_aware off (T-F part 1, D): the robot is given no observed
+                # human; the scenario's `observes` stays as written.
+                observed_id = agent_cfg.observes[0] if (self.human_aware and agent_cfg.observes) else None
                 observed_cfg = agent_cfgs.get(observed_id) if observed_id else None
                 observed_assigned = (
                     observed_cfg.assigned_tasks
@@ -768,7 +796,11 @@ class SimModel(model.Model):
         reads it, and it is the same with the assignment prior on and off.
         Then one `[scenario-coverage]` line per robot: the script's composition
         and its scenario coverage (world/composition.scenario_composition).
+        None in a run whose recognizer does not run, intention_aware off (T-F
+        part 1, F): the lines describe what recognition can explain.
         """
+        if not self.intention_aware:
+            return
         observers = [a.agent_id for a in scenario.agents
                      if a.agent_type == "robot" and human_cfg.agent_id in a.observes]
         for robot_id in observers:

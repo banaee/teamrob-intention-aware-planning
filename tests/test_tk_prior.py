@@ -189,7 +189,7 @@ def test_the_recency_fact_holds_on_exactly_90_ticks_from_the_observed_completion
     m = SimModel(scenario=cfg, register_fn=register_kitting_domain, task_model_schemas=kitting["task_model"],
                  layout_path=kitting["layouts"]["env_layout_17"], setup_path=kitting["setups"][cfg.setup],
                  state_declarations=kitting["states"], timeline_declarations=kitting["timeline_facts"],
-                 declared_context=CK, assignment_knowledge=True, context_knowledge=True)
+                 declared_context=CK, human_aware=True, intention_aware=True, assignment_knowledge=True, context_knowledge=True)
     robot = next(iter(m.robots.values()))
     recent, levels = {}, {}
     for t in range(240):
@@ -214,7 +214,7 @@ def test_a_robot_with_context_knowledge_on_loads_in_every_registered_scenario(do
         SimModel(scenario=cfg, register_fn=domain["register_fn"], task_model_schemas=domain["task_model"],
                  layout_path=domain["layouts"][cfg.reference_layouts[0]], setup_path=domain["setups"][cfg.setup],
                  state_declarations=domain["states"], timeline_declarations=domain["timeline_facts"],
-                 declared_context=domain["context_knowledge"], assignment_knowledge=True, context_knowledge=True)
+                 declared_context=domain["context_knowledge"], human_aware=True, intention_aware=True, assignment_knowledge=True, context_knowledge=True)
         n += 1
     assert n > 0
 

@@ -105,7 +105,7 @@ def load(run_file, overrides=()):
                  layout_path=domain_config["layouts"][layout],
                  setup_path=domain_config["setups"][base.setup],
                  state_declarations=domain_config["states"], timeline_declarations=domain_config["timeline_facts"],
-                 declared_context=domain_config["context_knowledge"], overrides=overrides, assignment_knowledge=False, context_knowledge=False)
+                 declared_context=domain_config["context_knowledge"], overrides=overrides, human_aware=True, intention_aware=True, assignment_knowledge=False, context_knowledge=False)
     return m, human, base, layout
 
 

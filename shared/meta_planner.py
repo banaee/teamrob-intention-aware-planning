@@ -206,6 +206,10 @@ class GateOutcome(Enum):
     clears it, or the reason it does not, in the order the gate asks. A
     refusal's value is the [meta-proj] reason admission logs for it; CLEARS
     is never logged as one (admission then logs what the projection became).
+    INTENTION_OFF           the meta-planner was built intention-unaware (T-F
+                            part 1, R6, A): it receives no intention and the
+                            gate admits nothing. Asked first, so the printed
+                            reason is the cause, not the belief's outcome;
     CLEARS                  the leader's share reaches theta, its
                             hypothesis adequacy is adequate (G1), it has
                             observation warrant (T-D G, AD1; T-K part 1, AM67)
@@ -226,6 +230,7 @@ class GateOutcome(Enum):
                             other refusal keeps its reason.
     """
     CLEARS = "clears"
+    INTENTION_OFF = "none(intention_off)"
     BELOW_THETA = "none(below_theta)"
     LEADER_NO_OBSERVATION = "none(leader_no_observation)"
     LEADER_INADEQUATE = "none(leader_inadequate)"
@@ -250,6 +255,7 @@ class MetaPlanner:
         cost_strategy: Literal["realized", "plain"] = "realized",
         human_agent_id: Optional[str] = None,
         rho: float = 0.5,
+        intention_aware: bool = True,
     ):
         """
         task_model:             the robot's task model (T-H), passed through to planner.py calls.
@@ -310,6 +316,13 @@ class MetaPlanner:
                                  the human's remaining projected duration at the trigger.
                                  0.5 is a STATED ASSUMPTION to be varied in T6, not a
                                  calibrated value.
+        intention_aware:         the run option of T-F part 1 (R3, R6, A). False is the
+                                 intention-unaware robot: the gate refuses every belief
+                                 with none(intention_off), for both its callers, so every
+                                 decision rests on the fallback projection (or on none
+                                 before a first observation). The gate's rule, the
+                                 trigger rule, the fallback, the candidates and the cost
+                                 are unchanged.
         """
         self._task_model = task_model
         self._recognizer = recognizer
@@ -319,6 +332,7 @@ class MetaPlanner:
         self._gate_strategy = gate_strategy
         self._cost_strategy = cost_strategy
         self._human_agent_id = human_agent_id
+        self._intention_aware = intention_aware
         self._min_separation = min_separation
         self._rho = rho
         # For the pool's completion test only (_is_complete()). Decomposition
@@ -390,9 +404,9 @@ class MetaPlanner:
         """
         Replaces replanning.py's should_replan(). Event-driven only.
 
-        Two real triggers (DESIGN-07; the second replaced in D2, the third,
-        task_committed, removed in D3: the robot's own grasp was in the plan
-        the last decision priced, not a change in what it rested on):
+        Three triggers (DESIGN-07; the second replaced in D2; task_committed
+        removed in D3: the robot's own grasp was in the plan the last decision
+        priced, not a change in what it rested on; the third added in T-D P4):
             - no_current_task: executor_state.current_task is None. Covers BOTH
               t=0 (see seed_tasks()) AND ordinary task completion — this assumes
               whoever builds ExecutorState (sim_agents.py, step 9) clears
@@ -518,11 +532,14 @@ class MetaPlanner:
         points elsewhere, against a hypothesis no decision used.
 
         Refuses, in this order, when
+          - no human is observed (no human_agent_id): none(no_human), asked
+            before the gate in every run (T-F part 1, E: the printed reason is
+            the cause);
           - the belief does not clear the gate (_clears_gate(); the projector is
-            not called; the refusal's reason is the gate's outcome: below theta,
-            or the leader with no observation or inadequate in its own phase,
-            G1, or unwarranted, T-D G, or outranked, T-K part 1 AM68),
-          - no human is observed (no human_agent_id),
+            not called; the refusal's reason is the gate's outcome: intention
+            off, T-F part 1 R6, or below theta, or the leader with no
+            observation or inadequate in its own phase, G1, or unwarranted,
+            T-D G, or outranked, T-K part 1 AM68),
           - the hypothesis cannot be resolved (project_human() returned None).
         On a refusal it returns the FALLBACK PROJECTION (T-D P, P4;
         Projector.project_fallback()): where to expect the human from what was
@@ -541,22 +558,23 @@ class MetaPlanner:
         caller. Both are recoverable by adjacency — this is called only on a
         fired trigger, so the [meta-trig] line of the same tick precedes it.
         """
-        gate = self._clears_gate(belief)
         projection: Optional[ProjectedPlan] = None
         refused: Optional[str] = None
-        if gate is not GateOutcome.CLEARS:
-            refused = gate.value
-        elif self._human_agent_id is None:
+        if self._human_agent_id is None:
             refused = "none(no_human)"
         else:
-            projection = self._projector.project_human(
-                belief=belief,
-                world=world,
-                human_agent_id=self._human_agent_id,
-                recognizer=self._recognizer,
-            )
-            if projection is None:
-                refused = "none(unprojectable)"
+            gate = self._clears_gate(belief)
+            if gate is not GateOutcome.CLEARS:
+                refused = gate.value
+            else:
+                projection = self._projector.project_human(
+                    belief=belief,
+                    world=world,
+                    human_agent_id=self._human_agent_id,
+                    recognizer=self._recognizer,
+                )
+                if projection is None:
+                    refused = "none(unprojectable)"
 
         # The record: the hypothesis on admission only; a fallback admits nothing,
         # and its end is the record's second value (T-D P4 / Q6).
@@ -709,7 +727,9 @@ class MetaPlanner:
         path, phase, target) is reconstructed here. Loss of observation warrant
         fires nothing (AD3): this is asked at admission and on the entering side
         of recognition_changed only. Asked
-        in this order: theta, then the guard, then warrant, so a belief below
+        in this order: intention off first (T-F part 1, R6, A: an
+        intention-unaware meta-planner admits nothing, and the reason printed is
+        that cause), then theta, then the guard, then warrant, so a belief below
         theta refuses as it did before G1, and an inadequate leader as before
         G (AD4: none(leader_unwarranted) after none(leader_inadequate)). Last,
         the leader must not be OUTRANKED (T-K part 1, AM68): the evidence alone
@@ -750,6 +770,8 @@ class MetaPlanner:
         record's question (`recognition_changed`, D2), not this predicate's,
         and that reading must not be built into this name.
         """
+        if not self._intention_aware:
+            return GateOutcome.INTENTION_OFF
         if belief.confidence < self._theta:
             return GateOutcome.BELOW_THETA
         leader = belief.hypothesis_adequacy.get(belief.most_likely)

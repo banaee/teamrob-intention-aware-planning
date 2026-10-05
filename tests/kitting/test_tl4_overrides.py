@@ -27,7 +27,7 @@ def model(overrides):
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"]["env_layout_01"],
                     setup_path=domain_config["setups"][SCENARIO.setup],
-                    overrides=overrides, assignment_knowledge=False, context_knowledge=False)
+                    overrides=overrides, human_aware=True, intention_aware=True, assignment_knowledge=False, context_knowledge=False)
 
 
 def start_lines(monkeypatch, caplog, argv):

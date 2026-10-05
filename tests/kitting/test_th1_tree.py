@@ -36,7 +36,7 @@ def model_for(layout, scenario_cfg):
     return SimModel(scenario=scenario_cfg, register_fn=register_kitting_domain,
                     task_model_schemas=domain_config["task_model"],
                     layout_path=domain_config["layouts"][layout],
-                    setup_path=domain_config["setups"][scenario_cfg.setup], assignment_knowledge=False, context_knowledge=False)
+                    setup_path=domain_config["setups"][scenario_cfg.setup], human_aware=True, intention_aware=True, assignment_knowledge=False, context_knowledge=False)
 
 
 def registered(layout, sid):
