@@ -4049,3 +4049,52 @@ printed with the effective value; the two stale texts corrected) accepted; B's s
   more ways to change the result; a different choice rule from `single_task`, not a superset of it). Strategy is then a
   second dimension of the same result table; the human-unaware condition needs its own reference run per strategy;
   TODO-141 applies.
+STAGE 2 BUILT (ccode, 5 October 2026; the plan's section 3 as amended by I; analysis/kitting/mpb/README.md, the T-F
+part 1 section):
+- `analysis/instruments/mpb/run_set.sh` (new): a set whose settings live in its run files; a run named by its run file
+  (I); `table.py` (new) writes `results.csv` and `results.md`, one row per run, the effective settings (the `[run]`
+  header) as columns, then completion, terminal, decisions, held ticks, near-encounters, F1's classes, the passes by a
+  standing robot (passing, beside), the [sep] minimum, the oracle's check. `run.sh` stays the runner of the maintained
+  outputs, its names unchanged.
+- `conditions.py` (new): R5 as the instrument reads it (its own reading of the records), the header's settings, their
+  agreement, the condition, objects separate (G: no movable object of the setup bound by both the robot's pool and the
+  human's script; a shared shelf or table counts as separate), the script's dependence.
+- The oracle and the comparison in the recorded scope: intention-unaware, no recognition columns, `none(intention_off)`
+  on every tick, the decisions and the fallback projections; human-unaware, `none(no_human)` (asked before the gate, E;
+  the gate is not asked, so the oracle and `mpblib.Gate` carry it as the decision's refusal), decisions at
+  `no_current_task` only, no projection, hold 0, the robot's position against the reference run's on every tick within
+  the horizon. No declared property in `run_set.sh` (`measures.py`: the measures alone). `actual.py` reads the
+  meta-planner's belief where the recognizer does not run and `none(no_human)` as admission printed it.
+- The check (the planning test-bed's 16 in each new condition and intention-aware, `single_task`;
+  configs/kitting/tf1/check/run_001 to _048, named by serial, the scenario a column; outputs in
+  analysis/kitting/tf1/check/, its results.md): 0 disagreements in all 48; every row's header settings agree with R5's
+  reading; human-unaware equal to the reference run on every compared tick in all 16 (objects separate in all 16); the
+  intention-aware rows through `run_set.sh` identical to `run.sh`'s runs and outputs (but for the run's name in
+  separation.md's title); `run.sh`'s outputs (single_task, full_reorder, the prior-off appendix) identical to stage 1's
+  (790 files). Tests: 385 passed.
+- Read from the table, not analysed (the measurement is H's): human-unaware completes as the robot alone and comes
+  closest to the human (s11_01 and s11_03 11.33 cm, s10_02 18.54 cm); intention-unaware never below min_separation in
+  the s10 scripts, holds on fallbacks (s11_02 66 ticks, s11_03 62); intention-aware equal to intention-unaware on most
+  s10 rows.
+THE FIGURES, A STANDING RULE (Hadi, 5 October 2026; CLAUDE.md, "Methodology"): every run made through a test or
+analysis instrument produces its per-tick figure (png, ignored by git). A run in which the recognizer runs: the belief,
+the adequacy, the gate and the decisions per tick; with context knowledge on, beneath the belief, the timeline facts in
+force per tick (they are what changes the prior). A human-unaware or intention-unaware run: the decisions, the kind of
+projection (none or the fallback), the holds, the robot–human distance against min_separation; no belief. A set gets
+its figures when it is next run; no old set is rerun only to make figures. Reason: Hadi reads a run from its figure.
+Follow-up (Hadi, the same day): a decision panel on the belief's tick axis (the decision ticks with trigger and cause,
+the projection each used, the robot's task over the ticks, the decided holds), the same panel in the two new
+conditions' figures, the run's settings, the strategy included, in the title. Reason: the belief shows what the robot
+believed; the panel shows what it did with it.
+BUILT (ccode, 5 October 2026): `irb/plot.py` (the context panel under the belief from the run's `[IR-context]` lines:
+the context facts in force, a timeline fact labelled `timeline` when the run's timeline line names it, an object state
+`state`, and the recency facts `recent`; with no oracle table the actual alone; a caller's last panel and settings
+line); `mpb/decision_panel.py` (new); `mpb/plot_ir.py` (every run in which the recognizer runs, the decision panel,
+every faceted part kept: it had kept only the first, losing hypotheses 5 on); `mpb/plot.py` (the new conditions' figure:
+the decision panel and the distance); `run.sh` and `run_set.sh` draw them. The IRB's figures of runs with context
+knowledge off and of runs with an oracle table are byte-identical to before (checked by redrawing). ccode's choices:
+the context panel shows all three sources the prior reads (timeline facts, object states, recency facts), the timeline
+facts dark; the decision panel's rows are robot task (with the holds hatched), projection, decision; an admitted task is
+named where it differs from the last named. Not covered by the rule as built: the regression sweeps of the four
+maintained sets and the dock_loading milestone runs (run_mesa.py directly, logs only), and the robot-alone reference
+run; a question for Hadi.

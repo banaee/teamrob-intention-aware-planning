@@ -86,25 +86,35 @@ How the existing runs are shown identical with both options on:
 - The two conditions, beyond the tests: scenario_s10_02 and scenario_s06_02 run in both, headless, outside the
   repository, read against the verification's runs.
 
-## 3. Stage 2: the instruments (R9)
+## 3. Stage 2: the instruments (R9), as built [I]
 
-- `analysis/instruments/mpb/run.sh`: a `--condition human_unaware|intention_unaware` argument passing the two options
-  to `run_mesa.py` and `actual.py`; outputs in `<scenario>/<condition>_<strategy>/` (the intention-aware folders keep
-  their names).
-- `actual.py`: builds `SimModel` with the options; in both conditions records no recognition (the belief is None:
-  the recognizer does not run [A]).
-- `mpb_oracle.py`: intention-unaware: the gate column `none(intention_off)` on every tick, no admitted projection, the
-  fallback a decision on the tick would rest on (mpblib, as today); no recognition columns: the oracle checks the
-  decisions and the fallback projections only [A]; human-unaware: no recognition, no gate, no projection.
-- `chain.py`: unchanged rules (with the gate never clearing, C3 never enters); human-unaware: `no_current_task` only.
-- `compare.py`: human-unaware also compares hold 0 at every decision and the robot's positions with `reference.py`'s,
-  where the robot's and the human's objects are separate; elsewhere a difference is a recorded finding [G].
-  dock_loading's six scripts that depend on the robot: no oracle in the new conditions, measures only [G].
-- `measures.py` and each domain's `properties.py`: the measures for every run; the declared properties skipped in both
-  conditions. `plot.py`: the new gate value; `plot_ir.py` not drawn under human-unaware.
-- `tests/instruments/test_mpb_instrument.py`: one case per condition.
-- Check: the kitting MPB set (16) in both conditions, `single_task`: 0 disagreements expected; every intention-aware
-  output identical to stage 1's. Not extended: the alteration test (MPB-4), the IRB.
+The plan's first form (a `--condition` argument to `run.sh`, folders `<scenario>/<condition>_<strategy>/`) is replaced
+by I (no setting in a run's name; the settings as columns). `run.sh` stays the runner of the maintained outputs, its
+names and folders unchanged.
+- `run_set.sh <domain> -o <out_root> <run files>` (new): the settings come from each run file only; a run is named by its
+  run file (`<out_root>/<name>/`, `<out_root>/runs/<name>.log`); `table.py` writes `<out_root>/results.csv` and
+  `results.md`, one row per run, the settings as columns (the header's effective values), the measures, the oracle's
+  check.
+- `conditions.py` (new): the run file's settings, R5 as the instrument reads it (its own reading), the header's, the
+  condition, whether the objects are separate (G: no movable object of the setup bound by both the robot's pool and the
+  human's script), the script's dependence; written per run as `settings.json`.
+- `actual.py`: the run file's two options to `SimModel`; the meta-planner's belief where the recognizer does not run
+  [A]; `none(no_human)` read from what admission printed [E]; `observed.json`'s `prior` the effective value; the run
+  file's strategy when no `--strategy` is given.
+- `mpb_oracle.py`: the condition by R5 from the run file; intention-unaware: no recognition columns, the gate
+  `none(intention_off)` on every tick, P4's perception and the fallback per tick [A]; human-unaware: `none(no_human)`, no
+  perception, no fallback. `mpblib.py`: the gate values `none(intention_off)` and `none(no_human)`. `chain.py`:
+  unchanged.
+- `compare.py`: with a `settings.json`, the per-tick columns by condition (intention-unaware: the gate and the
+  perception; human-unaware: the perception); human-unaware also the hold 0 at every decision and the robot's position
+  against the reference run's on every tick, a difference with the objects shared a finding [G].
+- `measures.py`: an entry point for the measures with no declared property (`measures.json`, `measures.md`); the
+  declared properties are evaluated by `run.sh` only. `plot.py`: the two refusals on the axis only where a run carries
+  them. dock_loading's scripts that depend on the robot: no oracle, measures only [G].
+- `tests/instruments/test_mpb_instrument.py`: six cases.
+- Check: the kitting MPB set (16) in each new condition through `run_set.sh`, `single_task`, 0 disagreements expected;
+  the same 16 intention-aware through `run_set.sh` (the cross-check of the new runner); `run.sh`'s outputs identical to
+  stage 1's. Not extended: the alteration test (MPB-4), the IRB.
 
 ## 4. Open points for Hadi: answered (A to G)
 

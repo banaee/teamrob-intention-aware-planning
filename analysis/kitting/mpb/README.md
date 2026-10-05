@@ -586,3 +586,39 @@ knowledge off: no exact tie reaches the gate's last question); 0 disagreements o
     1ca16efdbed6056db0e3e91824e4b301  scenario_s12_01/on_single_task/expected_ticks.json
     dd97c34a6343d3daf9c214a94deacad7  scenario_s12_02/on_full_reorder/expected_ticks.json
     dd97c34a6343d3daf9c214a94deacad7  scenario_s12_02/on_single_task/expected_ticks.json
+
+## T-F part 1: the conditions human-unaware and intention-unaware, and the figures (5 October 2026)
+
+Instrument work for T-F part 1 (design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware",
+STAGE 2 BUILT and THE FIGURES). `run.sh` and its outputs are unchanged but for the figures below.
+
+- **`run_set.sh <domain> -o <out_root> <run files>`** runs a set whose settings live in its run files (`human_aware`,
+  `intention_aware`, `assignment_knowledge`, `context_knowledge`, `strategy`; absent keys at the loader's fallback). No
+  setting is passed on the command line or written into a name (I): a run is named by its run file, its outputs in
+  `<out_root>/<name>/`, its log in `<out_root>/runs/<name>.log`; `table.py` writes `<out_root>/results.csv` and
+  `results.md`, one row per run, the effective settings (the run's `[run]` header) as columns, then the measures and the
+  oracle's check.
+- **`conditions.py`** writes each run's `settings.json`: the stated settings, R5 as the instrument reads it, the
+  header's, their agreement, the condition, `min_separation`, whether the robot's and the human's objects are separate
+  (no movable object of the setup bound by both; G), the script's dependence.
+- **The oracle** (`mpb_oracle.py`) reads the condition from the run file by R5. Intention-unaware: no recognition
+  columns, the gate `none(intention_off)` on every tick, P4's perception and the fallback per tick (it checks the
+  decisions and the fallback projections only, A). Human-unaware: `none(no_human)`, no perception, no fallback.
+  `compare.py`, given a `settings.json`, compares the columns of the condition, and in a human-unaware run the hold 0 at
+  every decision and the robot's position against the reference run's on every tick (with the objects shared, a
+  difference is a finding, not a disagreement). No declared property in run_set.sh (`measures.py`: the measures alone).
+  A table is derived where it is derivable before the run: an independent script, and in the intention-aware run
+  assignment knowledge on (MPB-6).
+- **The figures** (the standing rule): `figure_ir.png` (`plot_ir.py`, the IRB's panels) for every run in which the
+  recognizer runs, with no oracle table the actual alone, every faceted part kept (`figure_ir_2.png`, ...); with context
+  knowledge on, the context facts in force and the recency facts per tick under the belief; beneath the warrant and
+  the gate, the decision panel (`decision_panel.py`: the robot's task and the decided holds, the projection each decision
+  rested on, the admitted task named, the fallback with its span, or none, the decisions by trigger and cause).
+  `figure.png` of a human-unaware or intention-unaware run: the same decision panel, then the distance against the
+  run's `min_separation`. Every planning figure's title carries the run's settings (its `[run]` header), the strategy
+  included. The IRB's own figures (the idle robot) are unchanged with context knowledge off; `figure_ir.png` and the
+  intention-aware `figure.png` (its title) change on their next run.
+- **The check** (`configs/kitting/tf1/check/run_001` to `_048`: this set's 16 run files human-unaware, intention-unaware
+  and intention-aware; outputs in `analysis/kitting/tf1/check/`, its `results.md`).
+
+    bash analysis/instruments/mpb/run_set.sh kitting -o analysis/kitting/tf1/check configs/kitting/tf1/check/run_*.yaml
