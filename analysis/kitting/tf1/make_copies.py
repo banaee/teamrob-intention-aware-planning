@@ -105,10 +105,11 @@ def classes():
     for copy, base in WHOLE.items():
         out[copy] = dict(base=base, cls="whole run", source="step 5")
     for f in sorted(SCEN.glob("scenarios_s*.py")):
-        for m in re.finditer(r'id="(scenario_s\d+_\d+)",.*?description=\(\s*"' + re.escape(MARK)
-                             + r'(scenario_s\d+_\d+)\'s copy with a fact in force, (in accord|not in accord)', f.read_text(),
-                             re.S):
-            out[m[1]] = dict(base=m[2], cls=m[3], source="part 1b")
+        for lit in re.finditer(r"^(scenario_s\d+_\d+) = ScenarioConfig\(\n(.*?)^\)\n", f.read_text(), re.M | re.S):
+            m = re.search(re.escape(MARK) + r"(scenario_s\d+_\d+)'s copy with a fact in force, (in accord|not in accord)",
+                          lit[2])
+            if m:
+                out[lit[1]] = dict(base=m[1], cls=m[2], source="part 1b")
     return out
 
 

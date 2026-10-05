@@ -240,6 +240,214 @@ def figure(by, finished, scen, inter):
     plt.close(fig)
 
 
+# ---- part 1: context knowledge with a fact in force (the last step of T-F part 1)
+sys.path.insert(0, str(HERE))
+import make_copies                                     # the copies, their base and class (the rule: REPORT.md, "Part 1")
+
+MODELLED = re.compile(r"^(deliver_item|coffee_break|ac_activation)\(")
+
+
+def _bind(key):
+    name, args = key.split("(", 1)
+    return name, dict(a.split("=", 1) for a in args.rstrip(")").split(",") if "=" in a)
+
+
+def _hyp(task, keys):
+    """The hypothesis key of a task the human performs, or None (a task with no hypothesis)."""
+    if not MODELLED.match(task):
+        return None
+    name, b = _bind(task)
+    for k in keys:
+        kn, kb = _bind(k)
+        if kn == name and all(b.get(x) == v for x, v in kb.items()):
+            return k
+    return None
+
+
+def recognition(d):
+    """The two recognition measures of a run (REPORT.md, "Part 1", 1c): per stretch of a modelled task the human
+    performs, the ticks from its first tick to the first tick the decision record holds its hypothesis (None: not
+    admitted within the stretch); the ticks on which the decision record holds a hypothesis other than the human's
+    task. Over the ticks before the robot's terminal decision (the whole run when it has none)."""
+    obs = json.load(open(d / "observed.json"))
+    end = obs["terminal"] if obs["terminal"] is not None else obs["steps"]
+    ticks = {t["tick"]: t for t in json.load(open(d / "actual_ticks.json")) if t["tick"] < end}
+    keys = sorted({k for t in ticks.values() for k in (t.get("belief_h") or t["belief"])})
+    st = make_copies.stretches(json.load(open(d / "trajectory.json")))
+    lat, wrong = [], 0
+    for task, a, b in st:
+        h = _hyp(task, keys)
+        if h is None or a >= end:
+            continue
+        hit = next((t for t in range(a, min(b, end)) if ticks.get(t, {}).get("record") == h), None)
+        lat.append((task, a, None if hit is None else hit - a))
+    for t, row in ticks.items():
+        cur = next((task for task, a, b in st if a <= t < b), None)
+        h = None if cur is None else _hyp(cur, keys)
+        if row.get("record") is not None and row["record"] != h:
+            wrong += 1
+    return lat, wrong
+
+
+def windows(d):
+    """The timeline windows of a run, from its log's `[run_mesa] timeline` line: [(fact, first tick, end)]."""
+    log = d / f"{d.name}.log"
+    line = next(l for l in open(log) if l.startswith("[run_mesa] timeline"))
+    return [(f, int(a), int(b)) for f, a, b in re.findall(r"(\w+) (\d+)\.\.(\d+)", line.split("windows=")[1])]
+
+
+def part1(rows, by):
+    """The section's lines: the copies by class against the base's run with context knowledge off."""
+    run_of = {}
+    for r in rows:
+        run_of.setdefault(r["scenario"], {})[cond(r)] = r
+    cls = make_copies.classes()
+    pairs = {}
+    for copy, c in sorted(cls.items()):
+        if copy not in run_of or c["base"] not in by:
+            continue
+        on = run_of[copy]["ON"]
+        pairs.setdefault(c["cls"], []).append((c["base"], copy, by[c["base"]]["OFF"], by[c["base"]]["ON"], on))
+    out = []
+    w = out.append
+    w("## Context knowledge with a fact in force")
+    w("")
+    w("Step 3 above compares context knowledge off and on in scenarios where, with three exceptions, no context fact "
+      "is in force: it measures the starting likelihoods alone. Here each *copy* of a scenario with a context fact in "
+      "force over chosen ticks (a timeline: for example *break time* over some ticks) is run with context knowledge "
+      "on, and compared with its base scenario run with context knowledge off. The human's script is the same in both; "
+      "only the fact and the knowledge differ. The copies fall into two classes, by a rule fixed before the runs:")
+    w("")
+    w("- **in accord**: the fact holds over the ticks in which the human does the task the fact makes more likely "
+      "(break time during the coffee break; room warm during the visit to the air-conditioning switch);")
+    w("- **not in accord**: the fact holds while the human does another task, or the human never does that task.")
+    w("")
+    w("A set with facts only in accord would show a benefit by construction; the second class shows the cost of a fact "
+      "that misleads. Three copies whose fact holds over the whole run are listed apart. Two recognition measures are "
+      "added, because context knowledge acts on recognition first: the **admission delay** (for each task the human "
+      "performs that the robot can recognise, the ticks from the task's start until the robot plans around that task; "
+      "or never within the task) and the **wrong-admission ticks** (ticks on which the robot plans around a task the "
+      "human is not doing). Both are counted over the ticks before the robot's work ends.")
+    w("")
+    names = [("in accord", "in accord"), ("not in accord", "not in accord"), ("whole run", "fact over the whole run")]
+    data = {}
+    for k, label in names:
+        ps = pairs.get(k, [])
+        rec = [(recognition(off["dir"]), recognition(on["dir"]), recognition(nof["dir"])) for _, _, off, nof, on in ps]
+        data[k] = (ps, rec)
+    head = ["measure"] + [f"{label} ({len(data[k][0])} copies, {len({p[0] for p in data[k][0]})} base scenarios)"
+                          for k, label in names]
+    rows_ = []
+    rows_.append(["completion: earlier / equal / later than context knowledge off (scenarios finished in both)"] + [
+        (lambda ds: f"{sum(x < 0 for x in ds)} / {sum(x == 0 for x in ds)} / {sum(x > 0 for x in ds)} ({len(ds)})")(
+            [on["completion"] - off["completion"] for _, _, off, _, on in data[k][0]
+             if off["completion"] is not None and on["completion"] is not None]) for k, _ in names])
+    for key, label in (("completion", "completion, mean change (ticks)"), ("hold_ticks", "held ticks, mean change"),
+                       ("viol", "violation ticks, mean change"),
+                       ("near_encounters", "ticks below min_separation, mean change")):
+        rows_.append([label] + [signed(mean([on[key] - off[key] for _, _, off, _, on in data[k][0]
+                                             if off[key] is not None and on[key] is not None]), 2) for k, _ in names])
+    for key, label in (("viol", "violation ticks, total: off → on with the fact"),
+                       ("near_encounters", "ticks below min_separation, total: off → on with the fact"),
+                       ("hold_ticks", "held ticks, total: off → on with the fact")):
+        rows_.append([label] + [f"{sum(off[key] for _, _, off, _, on in data[k][0])} → "
+                                f"{sum(on[key] for _, _, off, _, on in data[k][0])}" for k, _ in names])
+    rows_.append(["unfinished runs: off / on with the fact"] + [
+        f"{sum(off['completion'] is None for _, _, off, _, on in data[k][0])} / "
+        f"{sum(on['completion'] is None for _, _, off, _, on in data[k][0])}" for k, _ in names])
+
+    def lat_rows(k):
+        st = [(o, n) for (lo, _), (ln, _), _ in data[k][1] for o, n in zip(lo, ln)]
+        both = [(o[2], n[2]) for o, n in st if o[2] is not None and n[2] is not None]
+        ds = [n - o for o, n in both]
+        return st, both, ds
+    rows_.append(["recognisable task stretches the human performs"] + [len(lat_rows(k)[0]) for k, _ in names])
+    rows_.append(["of them admitted: off / on with the fact"] + [
+        f"{sum(o[2] is not None for o, _ in lat_rows(k)[0])} / {sum(n[2] is not None for _, n in lat_rows(k)[0])}"
+        for k, _ in names])
+    rows_.append(["admission delay, median (ticks; stretches admitted in both): off / on with the fact"] + [
+        (lambda st, both, ds: "–" if not both else
+         f"{num(median([o for o, _ in both]))} / {num(median([n for _, n in both]))} ({len(both)})")(*lat_rows(k))
+        for k, _ in names])
+    rows_.append(["admission delay per stretch: earlier / equal / later with the fact"] + [
+        (lambda st, both, ds: f"{sum(x < 0 for x in ds)} / {sum(x == 0 for x in ds)} / {sum(x > 0 for x in ds)}")(
+            *lat_rows(k)) for k, _ in names])
+    def split(k, inside):
+        out_ = []
+        for (b, copy, off, nof, on), ((lo, _), (ln, _), _) in zip(data[k][0], data[k][1]):
+            ws = windows(on["dir"])
+            for o, n in zip(lo, ln):
+                if (any(a <= o[1] < e for _, a, e in ws)) == inside and o[2] is not None and n[2] is not None:
+                    out_.append(n[2] - o[2])
+        return out_
+    for inside, label in ((True, "starting inside the fact's window"), (False, "starting outside it")):
+        rows_.append([f"admission delay per stretch {label}: earlier / equal / later with the fact (stretches)"] + [
+            (lambda ds: f"{sum(x < 0 for x in ds)} / {sum(x == 0 for x in ds)} / {sum(x > 0 for x in ds)} ({len(ds)})")(
+                split(k, inside)) for k, _ in names])
+    rows_.append(["wrong-admission ticks, total: off → on with the fact"] + [
+        f"{sum(ro[1] for ro, rn, _ in data[k][1])} → {sum(rn[1] for ro, rn, _ in data[k][1])}" for k, _ in names])
+    rows_.append(["wrong-admission ticks per copy: fewer / equal / more with the fact"] + [
+        (lambda ds: f"{sum(x < 0 for x in ds)} / {sum(x == 0 for x in ds)} / {sum(x > 0 for x in ds)}")(
+            [rn[1] - ro[1] for ro, rn, _ in data[k][1]]) for k, _ in names])
+    w(table(head, rows_))
+    w("")
+    w("For reference, the same base scenarios with context knowledge on and **no** fact in force (the starting "
+      "likelihoods alone), against context knowledge off:")
+    w("")
+    ref = []
+    for k, label in names:
+        ps, rec = data[k]
+        seen, cs, vs, ws, ls = set(), [], [], [], []
+        for (b, _, off, nof, on), (ro, rn, rnf) in zip(ps, rec):
+            if b in seen:
+                continue
+            seen.add(b)
+            if off["completion"] is not None and nof["completion"] is not None:
+                cs.append(nof["completion"] - off["completion"])
+            vs.append(nof["viol"] - off["viol"])
+            ws.append(rnf[1] - ro[1])
+            ls += [n[2] - o[2] for o, n in zip(ro[0], rnf[0]) if o[2] is not None and n[2] is not None]
+        ref.append([f"{label}: its {len(seen)} base scenarios",
+                    f"{sum(x < 0 for x in cs)} / {sum(x == 0 for x in cs)} / {sum(x > 0 for x in cs)}",
+                    signed(mean(cs), 2), f"{sum(x < 0 for x in vs)} / {sum(x == 0 for x in vs)} / {sum(x > 0 for x in vs)}",
+                    f"{sum(x < 0 for x in ws)} / {sum(x == 0 for x in ws)} / {sum(x > 0 for x in ws)}",
+                    f"{sum(x < 0 for x in ls)} / {sum(x == 0 for x in ls)} / {sum(x > 0 for x in ls)} ({len(ls)})"])
+    w(table(["base scenarios", "completion: earlier / equal / later", "completion: mean change",
+             "violation ticks: fewer / equal / more", "wrong-admission ticks: fewer / equal / more",
+             "admission delay per stretch: earlier / equal / later (stretches)"], ref))
+    w("")
+    # what the tables show, stated from the numbers
+    for k, label in names[:2]:
+        ps, rec = data[k]
+        cs = [on["completion"] - off["completion"] for _, _, off, _, on in ps
+              if off["completion"] is not None and on["completion"] is not None]
+        wr = [rn[1] - ro[1] for ro, rn, _ in rec]
+        st, both, ds = lat_rows(k)
+        ins = split(k, True)
+        w(f"- **{label}** ({len(ps)} copies): completion {sum(x < 0 for x in cs)} earlier, {sum(x > 0 for x in cs)} "
+          f"later, {sum(x == 0 for x in cs)} equal, mean {signed(mean(cs), 2)} ticks; violation ticks "
+          f"{sum(off['viol'] for _, _, off, _, on in ps)} → {sum(on['viol'] for _, _, off, _, on in ps)}; admission "
+          f"delay earlier in {sum(x < 0 for x in ds)} task stretches and later in {sum(x > 0 for x in ds)} of "
+          f"{len(both)}, of the {len(ins)} starting inside the fact's window earlier in {sum(x < 0 for x in ins)} and "
+          f"later in {sum(x > 0 for x in ins)}; wrong-admission ticks {sum(ro[1] for ro, rn, _ in rec)} → "
+          f"{sum(rn[1] for ro, rn, _ in rec)}.")
+    w("")
+    w("The admission delays compare a copy with context knowledge on against its base with it off, so they include "
+      "what the starting likelihoods alone do (the reference table); the stretches starting inside the fact's window "
+      "are those the fact acts on.")
+    w("")
+    summary_lines = []
+    for k, label in names[:2]:
+        ps, rec = data[k]
+        ins = split(k, True)
+        summary_lines.append(
+            f"{label}: of {len(ins)} task stretches starting while the fact holds, admitted earlier in "
+            f"{sum(x < 0 for x in ins)} and later in {sum(x > 0 for x in ins)}; violation ticks "
+            f"{sum(off['viol'] for _, _, off, _, on in ps)} → {sum(on['viol'] for _, _, off, _, on in ps)} over "
+            f"{len(ps)} copies")
+    return out, summary_lines
+
+
 def main():
     by = load()
     scen = sorted(by)
@@ -359,8 +567,9 @@ def main():
       f"(the test-bed's oracle): {checked} of {len(allrows)} runs checked, {dis} disagreements. In {ref_eq} of "
       f"{len(scen)} scenarios the human-unaware robot moves exactly as the robot does in the same room with no human.")
     copies = sum(1 for r in csv.DictReader(open(RESULTS)) if int(r["run"][4:]) > 512)
-    w(f"- {copies} further runs of the same measurement (copies of set C's scenarios with the context facts given "
-      "over time, run with context knowledge on only) have no counterpart in the other conditions and are left out.")
+    w(f"- {copies} further runs, copies of these scenarios with a context fact in force over chosen ticks, run with "
+      "context knowledge on only, are compared with their base scenarios in the section *Context knowledge with a fact "
+      "in force*; the four-condition tables leave them out.")
     w(f"- {len(by) * 4 - len(unfinished)} of {len(by) * 4} runs finish. The {len(unfinished)} unfinished runs are "
       "reported in their own section. The completion comparisons use the "
       f"{len(finished)} scenarios that finish in all four conditions; the distance measures use all {len(scen)}.")
@@ -492,6 +701,20 @@ def main():
       "This scenario is left out of every completion figure above; in the distance measures it is included, each "
       "run counted over its whole length.")
     w("")
+
+    # ---- part 1: context knowledge with a fact in force
+    allrows = [r for r in csv.DictReader(open(RESULTS))]
+    for r in allrows:
+        r["done"] = r["completion"] != "unfinished"
+        for k in ("hold_ticks", "near_encounters", "viol"):
+            r[k] = int(r[k])
+        r["completion"] = int(r["completion"]) if r["done"] else None
+        r["dir"] = HERE / "measurement" / r["scenario"] / r["run"]
+    p1, p1_summary = part1(allrows, by)
+    out.extend(p1)
+    i = out.index("## What was run")
+    out[i - 1:i - 1] = ["- **Context knowledge with a fact in force** (copies of the scenarios with a context fact over "
+                        "chosen ticks, against context knowledge off; see its section): " + "; ".join(p1_summary) + "."]
 
     # ---- figures
     w("## The change per scenario")

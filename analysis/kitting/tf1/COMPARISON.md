@@ -35,6 +35,7 @@ Over 127 scenarios that finish in all four conditions (completion) and 128 scena
 - **Step 1: planning against the observed human** (human-unaware → intention-unaware): violation ticks 137 → 14 (35 scenarios fewer, 0 more, 93 equal); completion 36 scenarios later, 0 earlier, 91 equal, mean change +5.83 ticks.
 - **Step 2: recognition of the human's task** (intention-unaware → intention-aware, context knowledge off): violation ticks 14 → 17 (5 scenarios fewer, 6 more, 117 equal); completion 11 scenarios later, 15 earlier, 101 equal, mean change -0.84 ticks. Individual scenarios change in both directions; neither mean change is distinguishable from zero in this set (the room-resampled intervals of both include zero).
 - **Step 3: context knowledge** (context knowledge off → on): violation ticks 17 → 23 (4 scenarios fewer, 5 more, 119 equal); completion 7 scenarios later, 8 earlier, 112 equal, mean change -0.28 ticks. Individual scenarios change in both directions; neither mean change is distinguishable from zero in this set (the room-resampled intervals of both include zero).
+- **Context knowledge with a fact in force** (copies of the scenarios with a context fact over chosen ticks, against context knowledge off; see its section): in accord: of 66 task stretches starting while the fact holds, admitted earlier in 52 and later in 2; violation ticks 10 → 5 over 73 copies; not in accord: of 119 task stretches starting while the fact holds, admitted earlier in 31 and later in 70; violation ticks 18 → 24 over 135 copies.
 
 ## What was run
 
@@ -47,7 +48,7 @@ Over 127 scenarios that finish in all four conditions (completion) and 128 scena
   Set A was written to make every decision path of the planner occur. Sets B and C were written to test context knowledge; set C places the human's breaks, air-conditioning visits, unplanned stops and walks, and abandoned deliveries at many points of the work.
 - In every run the robot decides one delivery at a time (the strategy *single_task*). Its planner, its thresholds and every parameter are the same in all runs; only the condition changes.
 - Every run was checked against an independent re-computation of what the robot should decide on every tick (the test-bed's oracle): 512 of 512 runs checked, 0 disagreements. In 128 of 128 scenarios the human-unaware robot moves exactly as the robot does in the same room with no human.
-- 176 further runs of the same measurement (copies of set C's scenarios with the context facts given over time, run with context knowledge on only) have no counterpart in the other conditions and are left out.
+- 208 further runs, copies of these scenarios with a context fact in force over chosen ticks, run with context knowledge on only, are compared with their base scenarios in the section *Context knowledge with a fact in force*; the four-condition tables leave them out.
 - 509 of 512 runs finish. The 3 unfinished runs are reported in their own section. The completion comparisons use the 127 scenarios that finish in all four conditions; the distance measures use all 128.
 
 ## The four conditions side by side
@@ -143,6 +144,48 @@ Over all 128 scenarios, unfinished runs included, step 1 removes 123 violation t
   - intention-aware, context knowledge on: tick limit 704; the human's script ends at tick 250; after it the robot starts 5 holds, of 14 ticks at tick 270, 48 ticks at tick 294, 96 ticks at tick 342, 192 ticks at tick 438, 384 ticks at tick 630; held ticks in all 734.
 
 At the end of its script the human stands still beside the robot's remaining target and stays there to the end of the run. The robots that observe the human wait for the standing human to move; each wait is as long as the human has stood so far, so the waits double. The human-unaware robot walks to its target and finishes. This scenario is left out of every completion figure above; in the distance measures it is included, each run counted over its whole length.
+
+## Context knowledge with a fact in force
+
+Step 3 above compares context knowledge off and on in scenarios where, with three exceptions, no context fact is in force: it measures the starting likelihoods alone. Here each *copy* of a scenario with a context fact in force over chosen ticks (a timeline: for example *break time* over some ticks) is run with context knowledge on, and compared with its base scenario run with context knowledge off. The human's script is the same in both; only the fact and the knowledge differ. The copies fall into two classes, by a rule fixed before the runs:
+
+- **in accord**: the fact holds over the ticks in which the human does the task the fact makes more likely (break time during the coffee break; room warm during the visit to the air-conditioning switch);
+- **not in accord**: the fact holds while the human does another task, or the human never does that task.
+
+A set with facts only in accord would show a benefit by construction; the second class shows the cost of a fact that misleads. Three copies whose fact holds over the whole run are listed apart. Two recognition measures are added, because context knowledge acts on recognition first: the **admission delay** (for each task the human performs that the robot can recognise, the ticks from the task's start until the robot plans around that task; or never within the task) and the **wrong-admission ticks** (ticks on which the robot plans around a task the human is not doing). Both are counted over the ticks before the robot's work ends.
+
+| measure | in accord (73 copies, 73 base scenarios) | not in accord (135 copies, 124 base scenarios) | fact over the whole run (3 copies, 3 base scenarios) |
+|---|---|---|---|
+| completion: earlier / equal / later than context knowledge off (scenarios finished in both) | 5 / 62 / 5 (72) | 5 / 119 / 10 (134) | 2 / 1 / 0 (3) |
+| completion, mean change (ticks) | +0.29 | +0.07 | -8.00 |
+| held ticks, mean change | +1.00 | +0.92 | -0.67 |
+| violation ticks, mean change | -0.07 | +0.04 | +0.33 |
+| ticks below min_separation, mean change | -0.18 | +0.01 | -1.33 |
+| violation ticks, total: off → on with the fact | 10 → 5 | 18 → 24 | 1 → 2 |
+| ticks below min_separation, total: off → on with the fact | 271 → 258 | 460 → 461 | 7 → 3 |
+| held ticks, total: off → on with the fact | 1082 → 1155 | 1408 → 1532 | 72 → 70 |
+| unfinished runs: off / on with the fact | 1 / 1 | 1 / 1 | 0 / 0 |
+| recognisable task stretches the human performs | 213 | 330 | 5 |
+| of them admitted: off / on with the fact | 196 / 204 | 305 / 298 | 4 / 4 |
+| admission delay, median (ticks; stretches admitted in both): off / on with the fact | 13.0 / 5.0 (196) | 14.0 / 13.0 (291) | 29.5 / 11.0 (4) |
+| admission delay per stretch: earlier / equal / later with the fact | 171 / 23 / 2 | 136 / 41 / 114 | 4 / 0 / 0 |
+| admission delay per stretch starting inside the fact's window: earlier / equal / later with the fact (stretches) | 52 / 12 / 2 (66) | 31 / 18 / 70 (119) | 0 / 0 / 0 (0) |
+| admission delay per stretch starting outside it: earlier / equal / later with the fact (stretches) | 119 / 11 / 0 (130) | 105 / 23 / 44 (172) | 4 / 0 / 0 (4) |
+| wrong-admission ticks, total: off → on with the fact | 633 → 613 | 999 → 1175 | 0 → 4 |
+| wrong-admission ticks per copy: fewer / equal / more with the fact | 10 / 55 / 8 | 8 / 108 / 19 | 0 / 2 / 1 |
+
+For reference, the same base scenarios with context knowledge on and **no** fact in force (the starting likelihoods alone), against context knowledge off:
+
+| base scenarios | completion: earlier / equal / later | completion: mean change | violation ticks: fewer / equal / more | wrong-admission ticks: fewer / equal / more | admission delay per stretch: earlier / equal / later (stretches) |
+|---|---|---|---|---|---|
+| in accord: its 73 base scenarios | 4 / 63 / 5 | -0.32 | 3 / 67 / 3 | 5 / 54 / 14 | 121 / 22 / 44 (187) |
+| not in accord: its 124 base scenarios | 6 / 110 / 7 | -0.09 | 4 / 116 / 4 | 9 / 99 / 16 | 190 / 40 / 44 (274) |
+| fact over the whole run: its 3 base scenarios | 2 / 1 / 0 | -8.33 | 0 / 2 / 1 | 0 / 2 / 1 | 3 / 0 / 1 (4) |
+
+- **in accord** (73 copies): completion 5 earlier, 5 later, 62 equal, mean +0.29 ticks; violation ticks 10 → 5; admission delay earlier in 171 task stretches and later in 2 of 196, of the 66 starting inside the fact's window earlier in 52 and later in 2; wrong-admission ticks 633 → 613.
+- **not in accord** (135 copies): completion 5 earlier, 10 later, 119 equal, mean +0.07 ticks; violation ticks 18 → 24; admission delay earlier in 136 task stretches and later in 114 of 291, of the 119 starting inside the fact's window earlier in 31 and later in 70; wrong-admission ticks 999 → 1175.
+
+The admission delays compare a copy with context knowledge on against its base with it off, so they include what the starting likelihoods alone do (the reference table); the stretches starting inside the fact's window are those the fact acts on.
 
 ## The change per scenario
 
