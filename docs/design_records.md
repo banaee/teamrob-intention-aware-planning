@@ -4323,3 +4323,10 @@ Points that belong to the ruling:
 - OPEN, not ruled, for Hadi's next chat (TODO-185): the definition covers facts that raise a task. For a fact that lowers
   a task (the human just had a break), what "in accord" means is not decided.
 State: T-F part 1 CLOSED; T-F part 2 parked. Next: T-G's next stage with T-K part 1's steps on dock_loading.
+THE MEASUREMENT EXTENDED BY FULL_REORDER (Hadi, 6 October 2026; debugging, not T-F part 2's evaluation): the 128 kitting
+scenarios of the measurement run under `full_reorder` in the same four conditions. Reason: as on dock_loading, under
+`single_task` an admission can change only the hold. The same scenarios, no window copies; the single_task runs not
+rerun unless a check requires it; the same form (run files by serial, strategy a column of the one result table, one
+figure per run, the oracle's expectations committed before the runs, the human-unaware reference run per strategy);
+COMPARISON.md gains the three steps under `full_reorder` and a table of `full_reorder` against `single_task` per
+condition, its single_task numbers unchanged. TODO-141 applies.
