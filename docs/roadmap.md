@@ -861,6 +861,11 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     no planned path (paths in the scene: 1b, TODO-197); in 1a the camera keeps two presets and moves freely
     (TODO-195), an object's state may change its shape (TODO-194), and the web-ui's start command is defined, with the
     question of one command with subcommands (TODO-196); no dark mode in stage 1 (TODO-193, stage 2 or 3).
+    AMENDED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1a, HADI'S REVIEW OF INCREMENT
+    (i); `docs/handoffs/plan_T-viz_1a.md`, P17 to P24): 1a is built in five increments: (i) built and reviewed; (ii)
+    and (iii) together, then one pause for Hadi's review; (iv) in a new session; then (v), polishing, from a written
+    list Hadi gives, ccode working that list and nothing else. Whether a second polishing round follows after stage 1c
+    is open.
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.

@@ -8,11 +8,13 @@ web-ui", 1a, HADI'S PREFERENCES and 1a, HADI'S ANSWERS ON THE PLAN. What 1a star
 after stage 0".
 
 Every build session of 1a reads this file first, then the handoff's "State after stage 0". One increment per session;
-ccode pauses after each increment for Hadi's review in the browser.
+ccode pauses after each increment for Hadi's review in the browser. AMENDED (Hadi, 6 October 2026, preferred, P24):
+increments (ii) and (iii) are built in one session with no pause between them; then one pause; (iv) and (v) each in a
+session of its own.
 
 Progress: increment (i) BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
-BUILT, with its checks and its deviations from this plan); Hadi's review of it open. Increments (ii) to (iv) not
-started.
+BUILT, with its checks and its deviations from this plan); Hadi's review of it done (6 October 2026; design_records.md,
+"T-viz, the web-ui", 1a, HADI'S REVIEW OF INCREMENT (i); P17 to P24 below). Increments (ii) to (v) not started.
 
 ---
 
@@ -59,6 +61,24 @@ Given as answers on the plan:
 - P15. Test 2's limit is stated (section 7).
 - P16. Recorded in TODO-33, not decided: Hadi's idea that every start stops when no agent has anything left scheduled
   or scripted.
+
+Given at the review of increment (i) (Hadi, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, HADI'S REVIEW
+OF INCREMENT (i)). Increment (i) works for Hadi as a first stage; he will ask for tuning later.
+
+- P17. The selection panel folds at the first step and reopens from the header's button: kept.
+- P18. Panel 4a is 300 px wide for now and may grow to 400 px; its width is adjusted in increment (iv). Panel 4b stays
+  a thin rail until stage 1b.
+- P19. The control bar stays under the env-pane, for now.
+- P20. The env-pane's header shows the layout's id only, not its title, for now, until the stale titles are corrected
+  (open item 12 stays open).
+- P21. Table tops are drawn see-through in increment (iii), so that an agent at a table is not hidden. Hadi judges it
+  when he sees it.
+- P22. The default play speed stays 5 ticks per second.
+- P23. `mesa_sim/webui_export.py` and the saved sample messages of the 0.3 trial are removed in increment (ii), after
+  verifying that nothing else reads them; the README is updated where it names them.
+- P24. The order of the rest of 1a: (ii) and (iii) built together, no pause between them; one pause for Hadi's review;
+  (iv) in a new session; then (v), polishing, from a written list Hadi gives, ccode working that list and nothing else.
+  Whether a second polishing round follows after stage 1c is open.
 
 ---
 
@@ -132,8 +152,8 @@ ticks before the point.
 
 ## 2. The increments
 
-Four increments, each ending with a pause for Hadi's review. They follow cchat's proposal with two changes, each with
-its reason:
+Four increments, each ending with a pause for Hadi's review. AMENDED (P24): five increments; (ii) and (iii) share
+one pause, and (v), polishing, follows (iv). They follow cchat's proposal with two changes, each with its reason:
 - The page layout moves from (iv) to (i): the whole frame of the page (header, selection panel, env-pane with its
   control bar, the places of 4a, 4b and 4c) is built first, empty where later increments fill it. Reason: Hadi
   reviews the page layout while it is cheap to change, and the later increments fill places instead of moving them.
@@ -174,6 +194,9 @@ Scope:
 - The loader's layout part and setup part moved into functions that `SimModel` and the piece both call (F4); the view
   of a layout and the view of a layout with a setup produced from them (section 3, M2; P3, P7).
 - dock_loading's four layout files: the key `space.note` renamed `notes` (P8); nothing reads it, no sim-run changes.
+- `mesa_sim/webui_export.py` and the 0.3 trial's sample messages (`webui/page/public/samples/`) removed, after
+  verifying that nothing else reads them; the README and CLAUDE.md updated where they name them (P23).
+- The env-pane's header shows the layout's id only (P20).
 - The selection panel: domain, layouts, setups, scenarios as P2 states; the layout shown on choosing a layout, with
   the setup's objects on choosing a setup (P3, P7); the notes of layouts and setups, the scenarios' descriptions and
   the text filter (P4).
@@ -203,6 +226,8 @@ Scope:
   and open gate as the first two.
 - Display places kept while an object stays, freed places and too many objects (section 4, item 10).
 - `current` returns every tick update of the sim-run (section 3, M3): a reload keeps the picture.
+- Table tops see-through (P21): the `counter` form's top is drawn see-through, so that an agent at a table is not
+  hidden; the page names the form, not the domain's type.
 - Page-side unit tests (vitest, pinned) for the display places and the choice of a look by state.
 
 What Hadi sees: the camera turned, tilted, zoomed and moved during play, and the presets bringing it back; pallets
@@ -215,7 +240,7 @@ one free angle.
 ### (iv) Panel 4a, test 2, the close of 1a
 
 Scope:
-- Panel 4a (section 4, item 8; P5).
+- Panel 4a (section 4, item 8; P5); its width adjusted between 300 and 400 pixels (P18).
 - Test 2 (section 7).
 - The page's README, the README's starts, and the records of 1a's build.
 
@@ -223,7 +248,15 @@ What Hadi sees: the whole page of 1a; the human's activity changing as the human
 break started by an event) and resumes.
 
 Checks: test 2; the domain-word scan of `webui/` and the page; screenshots of both domains, every page state. Then
-Hadi's acceptance of 1a, from which the solara-ui is archived (the README and the roadmap say so).
+Hadi's acceptance of 1a, from which the solara-ui is archived (the README and the roadmap say so). AMENDED (P24):
+Hadi's acceptance of 1a follows (v).
+
+### (v) Polishing (added by Hadi, 6 October 2026, P24)
+
+Scope: the written list Hadi gives after (iv), and nothing else; in a session of its own. Whether a second polishing
+round follows after stage 1c is open.
+
+Checks: those of section 8 that the list's items touch.
 
 ---
 
@@ -443,7 +476,7 @@ for a laptop screen (1440 x 900) and up.
 │            │   notes…          │ env_setup_17    │ scenario_s02_02                  │ strategy  [..]  │ the first
 │            │ env_layout_03 …   │ env_setup_18    │   …                              │ limit [none ]   │ step
 ├──────────────┬───────────────────────────────────────────────────────────────┬───────────────┤
-│ The human    │ Kitting Domain Layout 1                   [Tilted|From above]  │ The robot's   │
+│ The human    │ env_layout_02                             [Tilted|From above]  │ The robot's   │
 │ ● human_0    │                                                               │ mind          │
 │ action in    │                                                               │ (stage 1b)    │
 │ hand …       │                        the scene                              │               │ main row
@@ -466,11 +499,12 @@ for a laptop screen (1440 x 900) and up.
   scenario changes (P13); the step limit is a number field that reads "none" when empty.
 - The main row: panel 4a 300 pixels wide, the env-pane the rest, panel 4b 300 pixels. In 1a, 4b is folded to a narrow
   rail with its title, so the env-pane gets its width; in 1b it unfolds. Below 1200 pixels of width, 4a also folds to
-  a rail.
-- The control bar: at the foot of the env-pane, because it acts on what the env-pane shows; the plots of 1c, below
-  it, share its tick axis. Reset, step, play and pause (one button), the speed in ticks per second (1, 2, 5, 10, 20,
-  as fast as the server answers), and the tick as the run log numbers it, beside the steps done. Without a step limit
-  (P11): "tick 211 · 212 steps", no bar. With a limit: "tick 211 · 212 of 450 steps", with a bar over the limit.
+  a rail. PREFERRED (P18): 4a is 300 pixels for now and may grow to 400, adjusted in (iv); 4b a thin rail until 1b.
+- The env-pane's header: the layout's id only, not its title, for now (P20), and the two presets.
+- The control bar: at the foot of the env-pane (PREFERRED for now, P19), because it acts on what the env-pane shows;
+  the plots of 1c, below it, share its tick axis. Reset, step, play and pause (one button), the speed in ticks per
+  second (1, 2, 5, 10, 20, as fast as the server answers; 5 by default, P22), and the tick as the run log numbers it,
+  beside the steps done. Without a step limit (P11): "tick 211 · 212 steps", no bar. With a limit: "tick 211 · 212 of 450 steps", with a bar over the limit.
   Before the first step the tick reads "start". The tick's number is the one a log line or a figure carries, so a
   moment seen in the page is found in the log. From the point where all agents have finished (P12), the bar also reads
   "All agents have finished at tick N".
@@ -571,7 +605,8 @@ Test 2: a domain the web-ui has never seen is drawn without a change to the web-
 
 ## 9. Outside 1a: flagged, not done
 
-- The stale layout titles (open item 12): the selection shows the id first and the title beside it.
+- The stale layout titles (open item 12): the selection shows the id first and the title beside it. AMENDED (P20):
+  the env-pane's header shows the layout's id only, until the titles are corrected; the item stays open.
 - The run-level lines say "headless" for the web-ui too (TODO-191), unchanged until the next regeneration; the start
   line's `steps=none` (item 11) joins that question.
 - `analysis/instruments/mpb/actual.py` keeps its own copy of reading and ending (flagged in 0.2), untouched.

@@ -5103,3 +5103,23 @@ DEVIATIONS FROM THE PLAN, each with its reason:
 FLAGS (outside (i), not done): `mesa_sim/webui_export.py` and the samples under `webui/page/public/samples/` are no
 longer read by the page; whether they are removed is Hadi's. In the tilted view an agent at a kitting table is partly
 hidden under the table's top (the handoff's 10.6, item 5), seen in the screenshots; a question for the review.
+
+1a, HADI'S REVIEW OF INCREMENT (i) (Hadi, 6 October 2026, preferred; recorded by ccode the same day, before any code
+of increments (ii) and (iii)). Hadi tried increment (i) in the browser in both domains. It works for him as a first
+stage; he will ask for tuning later. `docs/handoffs/plan_T-viz_1a.md` is amended to match (its P17 to P24, and the
+increments of its section 2). Every proposal of the plan not named here stays proposed by ccode.
+1. The selection panel folds at the first step and reopens from the header's button: kept.
+2. Panel 4a is 300 px wide for now and may grow to 400 px; its width is adjusted in increment (iv). Panel 4b stays a
+   thin rail until stage 1b.
+3. The control bar stays under the env-pane, for now.
+4. The env-pane's header shows the layout's id only, not its title, for now, until the stale titles are corrected. The
+   open item on the stale titles (the handoff's "State after stage 0", open item 12) stays open.
+5. Table tops are drawn see-through in increment (iii), so that an agent at a table is not hidden (the flag of
+   increment (i)). Hadi judges it when he sees it.
+6. The default play speed stays 5 ticks per second.
+7. `mesa_sim/webui_export.py` and the saved sample messages of the 0.3 trial (`webui/page/public/samples/`) are removed
+   in increment (ii), after verifying that nothing else reads them; the README is updated where it names them.
+8. The order of the rest of 1a: increments (ii) and (iii) are built together, with no pause between them; then one
+   pause for Hadi's review; then increment (iv) in a new session; then a new increment (v), polishing. For (v) Hadi
+   gives a written list, and ccode works that list and nothing else. Whether a second polishing round follows after
+   stage 1c is open.
